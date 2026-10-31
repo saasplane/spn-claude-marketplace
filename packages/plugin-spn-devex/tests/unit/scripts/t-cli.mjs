@@ -97,7 +97,7 @@ console.log("\n=== cli — an unknown group or command refuses with the list, ne
   ok("and names what the group holds", badCommand.err.includes("unknown command `docs nosuchcommand`") && badCommand.err.includes("audit") && badCommand.err.includes("face"), badCommand.err);
 
   const noCommand = await capture(["docs"]);
-  ok("a group with no further word exits 2 and names what the group holds", noCommand.code === 2 && noCommand.err.includes("audit"), noCommand.err);
+  ok("a group with no further word exits 0 and prints what the group holds", noCommand.code === 0 && noCommand.out.includes("audit"), noCommand.out);
   ok("a helper's name is no command", (await capture(["docs", "_lib"])).code === 2);
 }
 

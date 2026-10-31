@@ -50,7 +50,7 @@ import { fileURLToPath } from "node:url";
 import { emit, readPayload, runAlone, unescape, workspaceRoot, type Payload, type Verdict } from "../lib/payload.ts";
 import { sentenceColumn } from "../lib/item-cells.ts";
 import { findWorkingDetail } from "../lib/working-detail.ts";
-import { isBuilderWorkspace } from "../events/orientation.ts";
+import { isBuilderWorkspace } from "../lib/builder.ts";
 import { findPartnerWords } from "./partner-words.ts";
 import { bookClassFaults, knownHolders, ownMarketplace } from "./book-classes.ts";
 import { GUIDE_PAGE_SUFFIX, APPROACH_SUFFIX, ARTIFACT, CONSTRUCT_PAGES, CONSTRUCT_PAGE_SUFFIX, HUB, OVERVIEW_PAGE_SUFFIX, PLUGIN_TEMPLATES, POCKET,

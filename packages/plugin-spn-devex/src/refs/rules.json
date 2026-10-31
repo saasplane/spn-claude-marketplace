@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "book": {
     "repository": "spn-foundation",
-    "commit": "f758913c"
+    "commit": "05c79d7f"
   },
   "rules": [
     {
@@ -1217,7 +1217,7 @@
       "sentence": "A tool's output stays short, because every later turn reads it again",
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "Work is sized by its kind, and fixes gather into a round",
-      "decision": null,
+      "decision": "DEC.DEVEX.AGENT.106",
       "restated": [
         {
           "plugin": "spn-devex",
@@ -2121,6 +2121,31 @@
         "ref": "refs/devex/agent/agent.md",
         "heading": "A reply speaks as a teammate: the moment chooses its register, its icon and its shape"
       }
+    },
+    {
+      "id": "RULE.DEVEX.AGENT.163",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
+      "sentence": "A command group's usage is learned from the CLI's own usage error, and no check refuses a first write for want of reading it",
+      "chapter": "04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
+      "heading": "The four token levers are hooks that refuse, not lines of prose",
+      "decision": "DEC.DEVEX.AGENT.163",
+      "restated": []
+    },
+    {
+      "id": "RULE.DEVEX.AGENT.164",
+      "level": "MUST",
+      "params": {
+        "check": "orientation",
+        "due": "036/N011"
+      },
+      "class": "checked",
+      "sentence": "The first reply of a workspace's day opens with the whole welcome, whatever the prompt, and every later window that day opens on the status line and one Go line",
+      "chapter": "04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
+      "heading": "It opens on the welcome and one status line, never a status dump",
+      "decision": "DEC.DEVEX.AGENT.164",
+      "restated": []
     },
     {
       "id": "RULE.DEVEX.FUNCTION.007",
@@ -9289,7 +9314,7 @@
       "sentence": "`spnutils workspace worktree remove <NNN>` removes the set and refuses work that is not on origin",
       "chapter": "04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md",
       "heading": "The worktree set",
-      "decision": null,
+      "decision": "DEC.DEVEX.WORKSPACE.349",
       "restated": []
     },
     {
@@ -11048,6 +11073,11 @@
       "restated": [
         {
           "plugin": "spn-devex",
+          "path": "refs/devex/workspace/docs/decision-cards.md",
+          "heading": "A card is only for what the rules leave open"
+        },
+        {
+          "plugin": "spn-devex",
           "path": "refs/devex/workspace/workstream.md",
           "heading": "A card is only for what the rules leave open"
         }
@@ -11067,10 +11097,155 @@
       "restated": [
         {
           "plugin": "spn-devex",
+          "path": "refs/devex/workspace/docs/decision-cards.md",
+          "heading": "A card is only for what the rules leave open"
+        },
+        {
+          "plugin": "spn-devex",
           "path": "refs/devex/workspace/workstream.md",
           "heading": "A card is only for what the rules leave open"
         }
       ]
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.469",
+      "level": "MUST",
+      "params": {
+        "check": "stop",
+        "due": "036/N011"
+      },
+      "class": "checked",
+      "sentence": "A part that waits on something outside the window reads waiting on, and is never named as ready",
+      "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
+      "heading": "After the go, every moment names the next step",
+      "decision": null,
+      "restated": []
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.470",
+      "level": "MUST",
+      "params": {
+        "check": "workstream-state",
+        "due": "036/N011"
+      },
+      "class": "checked",
+      "sentence": "A code part added after a repository's full run has landed opens a second full run",
+      "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
+      "heading": "After the go, every moment names the next step",
+      "decision": null,
+      "restated": []
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.471",
+      "level": "MUST",
+      "params": {
+        "check": "stop",
+        "due": "036/N011"
+      },
+      "class": "checked",
+      "sentence": "A finding names only this window's workstreams, and is said once until its state changes",
+      "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
+      "heading": "A check at the end of a turn speaks once, and only about this window's work",
+      "decision": null,
+      "restated": []
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.472",
+      "level": "MUST",
+      "params": {
+        "check": "workstream-state",
+        "due": "036/N011"
+      },
+      "class": "checked",
+      "sentence": "The merge note and the take-up of a suggestion read only this window's arcs and the command that records them",
+      "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
+      "heading": "A check at the end of a turn speaks once, and only about this window's work",
+      "decision": null,
+      "restated": []
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.473",
+      "level": "MUST",
+      "params": {
+        "check": "stop",
+        "due": "036/N011"
+      },
+      "class": "checked",
+      "sentence": "The block is written by `workstream handover` from the data, and the agent adds only the lines the data cannot say",
+      "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
+      "heading": "Stopping in the middle is a handover",
+      "decision": null,
+      "restated": []
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.474",
+      "level": "MUST",
+      "params": {
+        "check": "workstream-state",
+        "due": "036/N011"
+      },
+      "class": "checked",
+      "sentence": "Every workspace command takes one address form, and a card is settled by one command",
+      "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
+      "heading": "The commands",
+      "decision": null,
+      "restated": []
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.475",
+      "level": "MUST",
+      "params": {
+        "check": "workstream-state",
+        "due": "036/N011"
+      },
+      "class": "checked",
+      "sentence": "Every write of a `workstream` command commits what it wrote in `.spndevex`, and `report write` lands the row",
+      "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
+      "heading": "The commands",
+      "decision": null,
+      "restated": []
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.476",
+      "level": "MUST",
+      "params": {
+        "check": "workstream-state",
+        "due": "036/N011"
+      },
+      "class": "checked",
+      "sentence": "A refusal to land, to write a sheet or to write the plan names every fault it finds, and a run lands a row when its tree is the commit's tree",
+      "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
+      "heading": "In an arc that keeps a sheet, a row lands on a run of its tests",
+      "decision": null,
+      "restated": []
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.477",
+      "level": "MUST",
+      "params": {
+        "check": "workstream-state",
+        "due": "036/N011"
+      },
+      "class": "checked",
+      "sentence": "The managing ratio is printed at each landing and at the close",
+      "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
+      "heading": "Each arc reports what it cost and how much of it was rework",
+      "decision": null,
+      "restated": []
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.478",
+      "level": "MUST",
+      "params": {
+        "check": "pretooluse",
+        "due": "036/N011"
+      },
+      "class": "checked",
+      "sentence": "A helper searches with `grep` in Bash, and its size stop is sized from the entries its part holds",
+      "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
+      "heading": "An order is one delegated execution, and every order follows the same rules",
+      "decision": null,
+      "restated": []
     },
     {
       "id": "RULE.LAUNCHPAD.CONTROL_PLANE.001",

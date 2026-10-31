@@ -368,5 +368,57 @@ console.log("\n=== a short subject — RULE.DEVEX.WORKSPACE.265");
   ok("red: a sentence is not kebab-case", subjectFault("Layout model") !== null);
 }
 
+console.log("\n=== the landing gate reads the tree and names every fault — MKT.HOOKS.321");
+{
+  const { put, cli } = await import("../../../helpers/workstream-fixture.mjs");
+  const { execFileSync } = await import("node:child_process");
+  const { contentHash } = await import("../../../../src/scripts/checks/push-tiers.ts");
+  const row = { id: "1", parent: "N001", title: "build it", kind: "change", repo: "spn-x", altitude: "CODE", blockedBy: [], touches: [], state: "ready", entries: ["E1"] };
+  const w = await dataWorkspace("t-workstream-landing-tree", { rows: [row] });
+  put(w.repo, "pkg/x.ts", "export const x = 1;\n");
+  w.git(["add", "-A"]);
+  w.git(["-c", "user.email=t@t", "-c", "user.name=t", "commit", "-q", "-m", "second"]);
+  const sha = w.git(["rev-parse", "HEAD"]);
+  const data = arcData([{ ...row, commits: { "spn-x": [sha] } }]);
+  const entry = { id: "E1", op: "edit", file: "spn-x:pkg/x.ts", what: "change E1", decidedBy: [], facts: ["f1"], then: [], rules: [], callers: [], tiers: { unit: ["U.1", "U.2"], contract: ["C.1"] }, docs: [], book: [] };
+  writeFileSync(join(w.ws, "arcs", "N001", "sheet.json"), JSON.stringify({ schemaVersion: 1, releaseChain: [], dependsOn: [], stack: { folder: "x", dmo: "none", reset: "x" }, entries: [entry] }, null, 2));
+  const tree = new Map(execFileSync("git", ["ls-tree", "-r", "-z", sha, "--", "pkg"], { cwd: w.repo, encoding: "utf8" }).split("\0").filter(Boolean)
+    .map((line) => [line.slice(line.indexOf("\t") + 1), line.slice(0, line.indexOf("\t")).split(" ")[2]]));
+  const treeHash = contentHash(tree, "pkg");
+  const early = "2020-01-01T00:00:00Z";
+  const run = (tier, results, content) => {
+    put(w.repo, `pkg/tests/.output/${tier}/runs/r1.json`, JSON.stringify({ run: "r1", tier, ranAt: early, env: "local", results: results.map(([id, status]) => ({ id, tier, status, title: id })) }));
+    if (content) put(w.repo, `pkg/tests/.output/${tier}/runs/r1.stamp.json`, JSON.stringify({ tier: tier.toUpperCase(), narrowed: false, content }));
+  };
+  const gate = () => lib.landingFault(w.ws, "N001", data, data.rows[0], "r1");
+
+  run("unit", [["U.1", "SUCCESS"], ["U.2", "SUCCESS"]], treeHash);
+  run("contract", [["C.1", "SUCCESS"]], treeHash);
+  ok("[MKT.HOOKS.321] a run of the commit's tree lands although its clock is earlier than the commit", gate() === null, String(gate()));
+
+  run("unit", [["U.1", "SUCCESS"], ["U.2", "SUCCESS"]], "0".repeat(64));
+  ok("[MKT.HOOKS.321] a run of another tree with an earlier clock is still refused as taken before the commit", /r1 was taken before/.test(gate() ?? ""), String(gate()));
+
+  run("unit", [["U.1", "FAILED"]]);
+  run("contract", [["C.1", "SUCCESS"]]);
+  const refusal = gate() ?? "";
+  ok("[MKT.HOOKS.321] one refusal names a stale run, a failure and a missing id", /was taken before/.test(refusal) && /unit U\.1 reads FAILURE/.test(refusal) && /U\.2 is not in the run/.test(refusal), refusal);
+
+  const plain = await dataWorkspace("t-workstream-commits-plain");
+  const unkept = cli(plain.root, ["workstream", "row", "state", "031/N001", "1", "running"]);
+  ok("[MKT.HOOKS.324] where .spndevex is no git repository a write succeeds and commits nothing", unkept.code === 0, unkept.out);
+  const kept = await dataWorkspace("t-workstream-commits");
+  const keptDev = join(kept.root, ".spndevex");
+  execFileSync("git", ["init", "-q"], { cwd: keptDev });
+  const inKept = (...args) => execFileSync("git", ["-c", "user.email=t@t", "-c", "user.name=t", ...args], { cwd: keptDev, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim();
+  inKept("add", "-A");
+  inKept("commit", "-q", "-m", "base");
+  const moved = cli(kept.root, ["workstream", "row", "state", "031/N001", "1", "running"]);
+  ok("[MKT.HOOKS.324] a command that writes commits what it wrote in .spndevex", moved.code === 0 && inKept("status", "--porcelain") === "" && Number(inKept("rev-list", "--count", "HEAD")) > 1, `${moved.out}\n${inKept("status", "--porcelain")}`);
+  const message = inKept("log", "-1", "--format=%s");
+  const logged = readFileSync(join(kept.ws, "arcs", "N001", "log.jsonl"), "utf8").trim().split("\n").at(-1);
+  ok("[MKT.HOOKS.324] the commit message is the log line", message === logged, message);
+}
+
 console.log(failed ? `\n  ${failed} of ${total} FAILED — workstream library` : `\n  all ${total} passed — workstream library`);
 process.exit(failed ? 1 : 0);

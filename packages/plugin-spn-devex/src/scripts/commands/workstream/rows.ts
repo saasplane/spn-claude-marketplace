@@ -7,12 +7,14 @@
 // whose `touches` do not overlap; `--tree` draws each row under its parent.
 
 import { basename } from "node:path";
-import { type Action, FLAG, UsageFault, readWords } from "../../../../../plugin-support-lib/src/lib/command.ts";
+import { type Action, FLAG, UsageFault, readAddress, readWords } from "../../../../../plugin-support-lib/src/lib/command.ts";
 import { arcIdsOf, parallelRows, readArc, readQuestions, readyRows, stateOfRow } from "../../lib/workstream.ts";
 import { type ArcData, type ArcRow } from "../../lib/workstream-schema.ts";
 import { arcNamed, workstreamNamed } from "./_shared.ts";
 
 export const describe = "the rows of a workstream's arcs: every one, the ready ones, or those that can run side by side";
+/** `rows <workstream>[/N<nnn>]` means `rows show`. */
+export const bare = "show";
 
 type Listed = ArcRow & { arc: string; derived: string };
 
@@ -21,7 +23,8 @@ function show(args: string[]): number {
   const [target, ...more] = words.paths;
   if (more.length) throw new UsageFault("takes one workstream or arc.");
   if (!target) throw new UsageFault("needs a workstream, or an arc as `<workstream>/N<nnn>`.");
-  const { ws, arcs } = /(?:^|\/)N\d+[a-z]?$/.test(target)
+  const { id } = readAddress(target);
+  const { ws, arcs } = id && /^N\d+[a-z]?$/.test(id)
     ? (() => { const named = arcNamed(target); return { ws: named.ws, arcs: [named.arc] }; })()
     : (() => { const ws = workstreamNamed(target); return { ws, arcs: arcIdsOf(ws) }; })();
   const questions = readQuestions(ws);

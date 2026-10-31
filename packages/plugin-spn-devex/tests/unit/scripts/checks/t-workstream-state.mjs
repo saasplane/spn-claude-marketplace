@@ -496,7 +496,11 @@ console.log("\n=== a suggestion an arc carries is never left raised");
   writeFileSync(file, JSON.stringify(data, null, 2));
   writeFileSync(join(ws, "suggestions.jsonl"), suggestion("raised"));
   writeFileSync(join(ws, "arcs", "N001", "log.jsonl"), `${JSON.stringify({ at: "2026-10-31T10:00:00Z", kind: "note", row: null, note: "S1 shaped into this arc" })}\n`);
-  ok("red: [MKT.HOOKS.309] a suggestion at raised that the arc's log cites fails", has(checkWorkstream(ws), "suggestions", /s1 is still raised and N001's log cites it/), said(checkWorkstream(ws)));
+  ok("green: [MKT.HOOKS.322] a suggestion at raised that the arc's log only mentions passes: a mention is not a take-up", !has(checkWorkstream(ws), "suggestions", /s1/), said(checkWorkstream(ws)));
+  writeFileSync(join(ws, "arcs", "N001", "log.jsonl"), `${JSON.stringify({ at: "2026-10-31T10:00:00Z", kind: "note", row: null, suggestion: "s1", note: "s1 shaped into this arc" })}\n`);
+  ok("green: [MKT.HOOKS.322] a log line with a `suggestion` field passes too", !has(checkWorkstream(ws), "suggestions", /s1/), said(checkWorkstream(ws)));
+  writeFileSync(join(ws, "arcs", "N001", "state.json"), JSON.stringify({ ...data, carries: ["s1"] }, null, 2));
+  ok("red: [MKT.HOOKS.322] the arc that carries it, which `suggestion edit --arc` writes, still fails it at raised", has(checkWorkstream(ws), "suggestions", /s1 is still raised and N001 carries it/), said(checkWorkstream(ws)));
 }
 
 console.log(failed ? `\n  ${failed} of ${total} FAILED — workstream state check` : `\n  all ${total} passed — workstream state check`);

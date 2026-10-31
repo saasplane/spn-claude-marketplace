@@ -348,12 +348,10 @@ export function staleFacts(ws: string, arc: string, root: string): string[] {
   return out;
 }
 
-/** The suggestion ids a text names, `S3` or `s3`, as the file writes them. */
-const suggestionsNamed = (text: unknown): string[] => typeof text === "string" ? [...text.matchAll(/\bs(\d+)\b/gi)].map((found) => `s${found[1]}`) : [];
-
 /**
  * A suggestion an arc takes up reads shaped, at the arc's go decided, and at its drop dropped: one still at `raised`
- * while an arc carries it, or the arc's log cites it, was missed by that move.
+ * while an arc carries it was missed by that move. Only `suggestion edit --arc` takes one up; a log line that
+ * mentions a suggestion is a mention, not a take-up.
  */
 export function carriedSuggestionFindings(ws: string): string[] {
   const raised: string[] = [];
@@ -364,11 +362,8 @@ export function carriedSuggestionFindings(ws: string): string[] {
   for (const arc of arcIdsOf(ws)) {
     const data = readJson(stateFileOf(ws, arc)) as Record<string, unknown> | null;
     const carried = Array.isArray(data?.carries) ? (data!.carries as unknown[]).filter((id): id is string => typeof id === "string") : [];
-    const cited = (readJsonl(logFileOf(ws, arc)) as Array<Record<string, unknown> | undefined>).flatMap((line) => line ? [...suggestionsNamed(line.suggestion), ...suggestionsNamed(line.note)] : []);
-    for (const id of raised) {
+    for (const id of raised)
       if (carried.includes(id)) out.push(`${id} is still raised and ${arc} carries it — a suggestion an arc carries reads shaped, and decided at the arc's go; move it with \`spn-devex workstream suggestion\``);
-      else if (cited.includes(id)) out.push(`${id} is still raised and ${arc}'s log cites it — a suggestion an arc takes up reads shaped; move it with \`spn-devex workstream suggestion\``);
-    }
   }
   return out;
 }

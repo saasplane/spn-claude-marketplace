@@ -5,7 +5,7 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { workspace, BASE } from "../../../helpers/fixture.mjs";
 
-const { checkChildSize, stopLine, childTranscript } = await import(join(CHECKS, "child-size.ts"));
+const { checkChildSize, stopLine, childTranscript, entriesIn } = await import(join(CHECKS, "child-size.ts"));
 
 let total = 0, failed = 0;
 const ok = (label, condition, detail = "") => {
@@ -40,6 +40,25 @@ console.log("=== the line an order sets");
   ok("`Stop at 150k of context or 100 turns` reads as 150000 and 100", JSON.stringify(stopLine(ORDER)) === JSON.stringify({ context: 150000, turns: 100 }));
   ok("a line with only turns reads turns alone", JSON.stringify(stopLine("Stop at 40 turns.")) === JSON.stringify({ context: null, turns: 40 }));
   ok("an order with no stop line sets none", stopLine("# no line here\n") === null);
+}
+
+console.log("\n=== the line is sized from the entries the part holds");
+{
+  const entries = (count) => `---\ngo: "N011"\nentries: [${Array.from({ length: count }, (_, at) => `"N011/E${at + 1}"`).join(", ")}]\n---\n# Part\n\nNo line is set here.\n`;
+  ok("[MKT.HOOKS.325] the entries of the part are counted from its front matter", entriesIn(entries(8)) === 8 && entriesIn(entries(1)) === 1 && entriesIn("# none\n") === 0, [entriesIn(entries(8)), entriesIn(entries(1))].join());
+  ok("[MKT.HOOKS.325] an order with no sentence gets a line that grows with its entries", (() => {
+    const small = stopLine(entries(1)), large = stopLine(entries(8));
+    return small && large && large.context > small.context && large.turns > small.turns;
+  })(), JSON.stringify([stopLine(entries(1)), stopLine(entries(8))]));
+  ok("[MKT.HOOKS.325] the sentence the order states still wins", JSON.stringify(stopLine(entries(8).replace("No line is set here.", "Stop at 40 turns."))) === JSON.stringify({ context: null, turns: 40 }));
+  const sized = "---\nentries: [\"a\", \"b\", \"c\", \"d\", \"e\", \"f\", \"g\", \"h\"]\n---\n# Order 8\n";
+  const sizedOrder = join(root, ".spndevex/workstreams/open/031-probe/notes/N001/orders/8-sized.md");
+  mkdirSync(join(sizedOrder, ".."), { recursive: true });
+  writeFileSync(sizedOrder, sized);
+  const brief = `Carry out the order ${sizedOrder} and nothing more.`;
+  ok("[MKT.HOOKS.325] a child of an eight-entry part is let through at 100k and stopped past its sized line",
+    checkChildSize(call(transcript("sized-light", { turns: 5, held: 100000, brief }), "Bash", { command: "ls" })) === null
+    && Boolean(checkChildSize(call(transcript("sized-heavy", { turns: 5, held: 400000, brief }), "Bash", { command: "ls" }))?.deny));
 }
 
 console.log("\n=== refused: a child past its line");

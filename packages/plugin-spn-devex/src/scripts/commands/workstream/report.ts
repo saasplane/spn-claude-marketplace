@@ -8,7 +8,9 @@
 // carries no cost, the cost is read from the telemetry (`debug cost show`) for the arc and the order.
 //
 // A report named for a part of the arc's go plan folds into the part: it lands the part, and lands each step
-// whose entries all sit in landed parts, a code or proving step on the full run. It ends with the next step.
+// whose entries all sit in landed parts, a code or proving step on the full run, or on the run the report names.
+// A row it lands or leaves is printed with its split of change, proof, managing and refusals; every fault that
+// keeps a row is named at once. It ends with the next step.
 
 import { existsSync, readFileSync } from "node:fs";
 import { basename, join, resolve } from "node:path";
@@ -20,6 +22,7 @@ import { OUTCOMES, ROW_ID, type ArcRow, type Cost, type GoPart, type GoPlan } fr
 import { afterWrite, arcSignatures, refreshIfMoved, typed, workstreamNamed } from "./_shared.ts";
 import { readCost } from "../../lib/cost.ts";
 import { nextStep, save } from "./go.ts";
+import { readSplit } from "../debug/cost.ts";
 
 export const describe = "a child's hand-back, folded into its row from the report's front matter";
 
@@ -36,6 +39,17 @@ function measuredCost(ws: string, arc: string, order: string): Cost | null {
   } catch { return null; }
 }
 
+/** The row's calls and minutes in each class, as `debug cost show` splits them, or null where the telemetry holds none for it. */
+function splitLine(ws: string, arc: string, rowId: string): string | null {
+  try {
+    const root = workspaceOf(ws);
+    if (!root) return null;
+    const found = readSplit(root, `${basename(ws)}/${arc}`).find((one) => one.key === `${arc} · row ${rowId}`);
+    const share = (kind: "change" | "proof" | "managing" | "refusals"): string => `${kind} ${found ? `${found[kind].calls} · ${found[kind].minutes}m` : "0 · 0m"}`;
+    return `row ${rowId} split: ${(["change", "proof", "managing", "refusals"] as const).map(share).join(" · ")}`;
+  } catch { return null; }
+}
+
 /** Folds a part's report: the part lands, and so does each step whose entries all sit in landed parts. */
 function foldPart(ws: string, lead: string, plan: GoPlan, part: GoPart, outcome: string, matter: Record<string, unknown>): number {
   const signatures = arcSignatures(ws);
@@ -45,6 +59,7 @@ function foldPart(ws: string, lead: string, plan: GoPlan, part: GoPart, outcome:
   logEvent(ws, lead, "go", null, `${part.id} ${outcome}`);
   const said: string[] = [];
   const refused: string[] = [];
+  const splits: string[] = [];
   if (outcome === "landed") {
     const landed = new Set(parts.filter((one) => one.state === "landed").flatMap((one) => one.entries));
     const run = typeof matter.run === "string" ? matter.run : null;
@@ -61,8 +76,11 @@ function foldPart(ws: string, lead: string, plan: GoPlan, part: GoPart, outcome:
           row.commits = all;
         }
         if (!held.every((id) => landed.has(`${arc}/${id}`))) continue;
-        if ((row.altitude === "CODE" || row.altitude === "PROOF") && part.pass !== "FULL_RUN") continue;
+        // A code or proof step waits for the full run, unless the report names a run, which the landing gate judges.
+        if ((row.altitude === "CODE" || row.altitude === "PROOF") && part.pass !== "FULL_RUN" && !run) continue;
         const fault = landingFault(ws, arc, data, row, run);
+        const split = splitLine(ws, arc, row.id);
+        if (split) splits.push(split);
         if (fault) { refused.push(`${arc} ${row.id} stays: ${fault}`); continue; }
         row.state = "landed";
         if (run) row.proof = `run ${run}`;
@@ -74,7 +92,7 @@ function foldPart(ws: string, lead: string, plan: GoPlan, part: GoPart, outcome:
   }
   const refreshed = refreshIfMoved(ws, signatures);
   console.log([`ok`, `${lead} part ${part.id} ${outcome === "landed" ? "landed" : "not landed"}`, ...said, ...refreshed.said].join(" · "));
-  for (const line of [...refused.map((one) => `! ${one}`), ...refreshed.lines, ...afterWrite(ws)]) console.log(line);
+  for (const line of [...refused.map((one) => `! ${one}`), ...splits, ...refreshed.lines, ...afterWrite(ws)]) console.log(line);
   console.log(nextStep(`${basename(ws)}/${lead}`, ws, next));
   return 0;
 }
@@ -142,6 +160,8 @@ function write(args: string[]): number {
   console.log(["ok", `${arc} ${done}/${total}`, ...added.map((id) => `${id} added`), ...ready.map((id) => `${id} ready`),
     ...(outcome === "needs-you" ? [`${rowId} needs you`] : []), ...refreshed.said].join(" · "));
   for (const line of [...refreshed.lines, ...afterWrite(ws)]) console.log(line);
+  const split = outcome === "landed" ? splitLine(ws, arc, rowId) : null;
+  if (split) console.log(split);
   if (plan) console.log(nextStep(`${basename(ws)}/${arc}`, ws, plan));
   return 0;
 }

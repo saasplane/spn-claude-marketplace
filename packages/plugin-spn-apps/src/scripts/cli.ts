@@ -25,7 +25,7 @@
 import { readdirSync, statSync } from "node:fs";
 import { basename, join } from "node:path";
 import { pathToFileURL } from "node:url";
-import { type CommandFile, actionOwed, commandWords, isSubject, runCommand, usageLine, usageOf } from "../../../plugin-support-lib/src/lib/command.ts";
+import { type CommandFile, actionOwed, commandWords, groupUsage, isSubject, runCommand, usageLine, usageOf } from "../../../plugin-support-lib/src/lib/command.ts";
 
 const PLUGIN_NAME = "spn-apps";
 // FROM SOURCE, `commands/<group>/<file>.ts` beside this file; BUNDLED, `dist/commands/<group>/<file>.mjs`
@@ -141,10 +141,12 @@ export async function main(argv: string[]): Promise<number> {
     console.error(`\`${group} ${second}\` is no command — the command words come first and the subject after them: \`${PLUGIN_NAME} ${group} ${rest.slice(0, 2).filter((word) => !word.startsWith("--")).join(" ")} ${second} …\``);
     return 2;
   }
-  if (second === undefined || !exported) {
-    console.error(second === undefined
-      ? `usage: ${PLUGIN_NAME} ${group} [<subject>] <action> […] — \`${group}\` holds: ${files.join(" · ")}`
-      : `unknown command \`${group} ${second}\` — \`${group}\` holds: ${files.join(" · ")}`);
+  if (second === undefined) {
+    console.log(groupUsage(PLUGIN_NAME, group, files));
+    return 0;
+  }
+  if (!exported) {
+    console.error(`unknown command \`${group} ${second}\` — \`${group}\` holds: ${files.join(" · ")}`);
     return 2;
   }
 
@@ -152,6 +154,10 @@ export async function main(argv: string[]): Promise<number> {
     return runCommand({ plugin: PLUGIN_NAME, group, subject: null, action: second, usage: exported.usage ?? "", run: exported.run }, rest);
 
   const [third, ...words] = rest;
+  // A subject that names a `bare` action takes it for an address typed in the action's place: `rows 036/N010` is `rows show 036/N010`.
+  const bare = (exported as { bare?: string }).bare;
+  if (bare && third !== undefined && !third.startsWith("--") && !Object.hasOwn(exported.actions, third) && Object.hasOwn(exported.actions, bare))
+    return runCommand({ plugin: PLUGIN_NAME, group, subject: second, action: bare, usage: exported.actions[bare].usage, run: exported.actions[bare].run }, rest);
   const action = third !== undefined && Object.hasOwn(exported.actions, third) ? exported.actions[third] : null;
   if (third === undefined || !action) {
     console.error(`${usageOf(PLUGIN_NAME, group, second, exported.actions)}\n${actionOwed(group, second, exported.actions, rest)}`);

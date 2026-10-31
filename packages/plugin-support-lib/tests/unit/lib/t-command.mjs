@@ -15,6 +15,7 @@ import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { FLAG, MANIFEST, OPTIONAL, REQUIRED, VALUE, UsageFault, actionOwed, commandWords, docsTreeOf, isSubject,
   isUsageFault, onePath, readWords, repositoryOf, scopeOf, under, usageOf } from "../../../src/lib/command.ts";
+import * as lib from "../../../src/lib/command.ts";
 import { DEVEX, DOCS, SEAT, docsOf } from "../../../src/lib/docs-tree.ts";
 
 const LIB = resolve(import.meta.dirname, "..", "..", "..", "src", "lib");
@@ -193,6 +194,26 @@ console.log("\n=== runCommand records a command once, with its words as the leve
       run: () => { throw new TypeError("the command's own error"); } }, []));`);
   same("untouched: an error that is no usage fault is thrown on, never read as one",
     [broken.code !== 0 && broken.code !== 2, broken.out.includes("the command's own error"), broken.out.includes("usage:")], [true, true, false]);
+}
+
+console.log("\n=== an address names a workstream and an id one way, and a bare group teaches itself");
+{
+  const read = (ref) => { try { return lib.readAddress(ref); } catch (thrown) { return String(thrown?.name ?? thrown); } };
+  same("[MKT.HOOKS.325] 036/N010, 036/q11 and 036/s24 read as a workstream and an id",
+    [read("036/N010"), read("036/q11"), read("036/s24")],
+    [{ workstream: "036", id: "N010" }, { workstream: "036", id: "q11" }, { workstream: "036", id: "s24" }]);
+  same("[MKT.HOOKS.325] the bare id is read where the window has one workstream",
+    [read("N010"), read("q11")], [{ workstream: null, id: "N010" }, { workstream: null, id: "q11" }]);
+  same("[MKT.HOOKS.325] a long workstream name keeps its dashes", read("036-agent-follows-rules/N010"), { workstream: "036-agent-follows-rules", id: "N010" });
+  const run = (args) => {
+    try { return { out: execFileSync(process.execPath, [join(PACKAGES, "plugin-spn-devex", "src", "scripts", "cli.ts"), ...args], { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] }), code: 0 }; }
+    catch (error) { return { out: `${error.stdout}${error.stderr}`, code: error.status }; }
+  };
+  const bare = run(["workstream"]);
+  same("[MKT.HOOKS.325] a bare group prints its usage and exits 0", [bare.out.includes("usage: spn-devex workstream"), bare.code], [true, 0]);
+  const bad = run(["workstream", "sheet", "show", "--nope"]);
+  same("[MKT.HOOKS.325] a bad option prints the one usage line of its action",
+    [bad.out.split("\n").filter((line) => line.startsWith("usage:")).length, bad.out.includes("does not take `--nope`."), bad.code], [1, true, 2]);
 }
 
 console.log("\n=== the two plugins ship one entry");

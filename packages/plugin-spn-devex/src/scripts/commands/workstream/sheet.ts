@@ -8,21 +8,40 @@
 //   spn-devex workstream sheet check <workstream>/N<nnn>
 //
 // The sheet is the arc's data, `arcs/N<nnn>/sheet.json`, and these commands write it. A gap is refused where it is written:
-// every entry is validated, and every fact it cites must be one the arc's `facts.jsonl` holds. An arc with no `sheet.json` is
+// every entry is validated, and every fact it cites must be one the arc's `facts.jsonl` holds, and a refusal names every
+// fault at once. `check` also measures the two budgets an entry can move. An arc with no `sheet.json` is
 // judged as it was before sheets, so `show` and `check` say so and exit 0, and `write` creates the file.
 
-import { readFileSync } from "node:fs";
+import { execFileSync } from "node:child_process";
+import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import { type Action, FLAG, VALUE, UsageFault, readWords } from "../../../../../plugin-support-lib/src/lib/command.ts";
+import { workspaceRoot } from "../../../../../plugin-support-lib/src/lib/timing.ts";
 import { logEvent, readArc, readJsonl, readQuestions, readSheet, factsFileOf, sheetFileOf, writeArc, writeWhole } from "../../lib/workstream.ts";
 import { ENTRY_OPS, parentIds, sheetFaults, type ArcData, type ArcRow, type Fact, type Sheet, type SheetEntry } from "../../lib/workstream-schema.ts";
 import { arcNamed, listOf, typed } from "./_shared.ts";
 
 export const describe = "the arc's change sheet: write it whole, edit or drop one entry, show it, check it against the rows and the cards";
 
+/**
+ * The faults of a sheet's `needsRelease` (MKT.HOOKS.322): a list of {repo, release, command}, each a text that says
+ * something. The go reads it to mark a repository's first part waiting on that release; absent is fine.
+ */
+function needsReleaseFaults(sheet: Sheet): string[] {
+  const rows = sheet.needsRelease;
+  if (rows === undefined) return [];
+  if (!Array.isArray(rows)) return ["`needsRelease` is not a list of {repo, release, command}"];
+  return rows.flatMap((row, at) => {
+    const one = (row && typeof row === "object" ? row : {}) as Record<string, unknown>;
+    const missing = ["repo", "release", "command"].filter((field) => typeof one[field] !== "string" || !(one[field] as string).trim());
+    return missing.length ? [`needsRelease[${at}] has no ${missing.join(", ")} as text`] : [];
+  });
+}
+
 /** Each fault of a sheet as the arc would hold it: its schema, and every fact an entry cites being one the arc's facts hold. */
 function writeFaults(ws: string, arc: string, sheet: Sheet, whole: boolean): string[] {
-  const out = sheetFaults(sheet);
+  const out = [...sheetFaults(sheet), ...needsReleaseFaults(sheet)];
   if (whole && sheet.stack === null) out.push("the sheet's `stack` is null — name the folder the tiers run from, the dmo version and the reset");
   const held = new Set(readJsonl(factsFileOf(ws, arc)).map((line) => (line as Fact | undefined)?.id));
   for (const entry of Array.isArray(sheet.entries) ? sheet.entries : [])
@@ -108,11 +127,11 @@ function write(args: string[]): number {
   try { data = JSON.parse(readFileSync(resolve(process.cwd(), file), "utf8")); }
   catch (thrown) { throw new UsageFault(`reads \`${file}\` as no JSON: ${(thrown as Error).message}.`); }
   const faults = writeFaults(ws, arc, data as Sheet, true);
-  if (faults.length) return refused(faults);
   // A decided arc's sheet is what the work was cut from: a rewrite carries the developer's words that changed it, and an empty sheet is written once.
   const because = words.value("because")?.trim() ?? "";
   if (readArc(ws, arc)?.status === "DECIDED" && (readSheet(ws, arc)?.entries.length ?? 0) > 0 && !because)
-    return refused([`${arc} is decided and its sheet holds entries — a rewrite carries \`--because "<the developer's words that changed it>"\``]);
+    faults.push(`${arc} is decided and its sheet holds entries — a rewrite carries \`--because "<the developer's words that changed it>"\``);
+  if (faults.length) return refused(faults);
   save(ws, arc, data as Sheet);
   const count = (data as Sheet).entries.length;
   const added = deriveSteps(ws, arc, data as Sheet);
@@ -227,6 +246,9 @@ function show(args: string[]): number {
   const lines = entries.map(entryLine);
   const width = Math.max(0, ...lines.map((line) => line.head.length));
   for (const line of lines) console.log(line.tail ? `${line.head.padEnd(width)}   ${line.tail}` : line.head);
+  if (Array.isArray(sheet.needsRelease) && !needsReleaseFaults(sheet).length)
+    for (const need of sheet.needsRelease as { repo: string; release: string; command: string }[])
+      console.log(`needs release · ${need.repo} ${need.release} ships ${need.command}`);
   console.log("--json for every field");
   return 0;
 }
@@ -244,7 +266,7 @@ export function sheetFindings(ws: string, arc: string): string[] {
   const held = new Map(entries.map((entry) => [entry.id, entry]));
   const parents = parentIds(data.rows);
   const leaves = data.rows.filter((row) => !parents.has(row.id));
-  const out: string[] = [];
+  const out: string[] = needsReleaseFaults(sheet);
   const named = new Set<string>();
   for (const row of data.rows) for (const id of row.entries ?? []) {
     named.add(id);
@@ -265,13 +287,74 @@ export function sheetFindings(ws: string, arc: string): string[] {
   return out;
 }
 
+/** The session start's ceiling in characters; `events/orientation.ts` owns the number, and is not imported here because it is the heaviest module the commands could load. */
+const SESSION_START_CEILING = 9_500;
+/** Files whose change can move each budget: the entries naming one of them have a figure to give. */
+const MOVES_SESSION_START = /(^|\/)(events\/orientation|lib\/builder|lib\/window)\.ts$|(^|\/)refs\//;
+const MOVES_TOOL_HOOK = /(^|\/)(events\/pretooluse|lib\/bash-timing|lib\/window|lib\/go-plan|lib\/workstream|lib\/command-reader)\.ts$|(^|\/)checks\/|plugin-support-lib\/src\/lib\/(command|timing)\.ts$/;
+
+/** The hook script beside the commands, as source or as the built bundle; null where neither is there. */
+function hookFile(name: string): string | null {
+  for (const ext of ["ts", "mjs"]) {
+    const file = fileURLToPath(new URL(`../../events/${name}.${ext}`, import.meta.url));
+    if (existsSync(file)) return file;
+  }
+  return null;
+}
+
+/** One run of a hook script on a payload, in the workspace: how long the whole process took, and what it printed. Null where it cannot run. */
+function runHook(name: string, args: string[], payload: object, root: string): { ms: number; out: string } | null {
+  const file = hookFile(name);
+  if (!file) return null;
+  const started = performance.now();
+  try {
+    const out = execFileSync(process.execPath, [file, ...args], { input: JSON.stringify({ cwd: root, session_id: "sheet-check", ...payload }),
+      encoding: "utf8", cwd: root, timeout: 30_000, maxBuffer: 16 * 1024 * 1024, stdio: ["pipe", "pipe", "ignore"], env: { ...process.env, SPN_TELEMETRY: "off" } });
+    return { ms: performance.now() - started, out };
+  } catch { return null; }
+}
+
+const thousands = (n: number): string => n.toLocaleString("en-US");
+
+/**
+ * The budgets a sheet's entries can move, measured on this checkout: the session start's size, and the tool-call hook's
+ * time on a Bash call. The projected after is the figure the sheet gives in `budgets.sessionStart` (characters) and
+ * `budgets.toolHook` (ms), "unchanged" where no entry touches the budget's files, and a request for the figure where one does.
+ */
+function budgetLines(root: string, sheet: Sheet): { lines: string[]; findings: string[] } {
+  const given = (sheet.budgets && typeof sheet.budgets === "object" ? sheet.budgets : {}) as Record<string, unknown>;
+  const files = (Array.isArray(sheet.entries) ? sheet.entries : []).map((entry) => ({ id: entry.id, path: entry.file.slice(entry.file.indexOf(":") + 1) }));
+  const projection = (key: string, moves: RegExp, unit: string): { text: string; value: number | null } => {
+    const figure = given[key];
+    if (typeof figure === "number" && Number.isFinite(figure)) return { text: `${thousands(figure)}${unit} projected`, value: figure };
+    const touching = files.filter((one) => moves.test(one.path)).map((one) => one.id);
+    return { text: touching.length ? `not projected: ${touching.join(", ")} touch${touching.length === 1 ? "es" : ""} it, so the sheet needs \`budgets.${key}\`` : "unchanged", value: null };
+  };
+  const lines: string[] = [], findings: string[] = [];
+  const start = runHook("orientation", ["--stdin"], {}, root);
+  let size: number | null = null;
+  try { size = start ? (JSON.parse(start.out).hookSpecificOutput.additionalContext as string).length : null; } catch { /* a start that prints no context has no size */ }
+  const after = projection("sessionStart", MOVES_SESSION_START, "");
+  lines.push(`budgets · session start  ${size === null ? "not measured" : `${thousands(size)} of ${thousands(SESSION_START_CEILING)} characters now`} · ${after.text}`);
+  if (size !== null && size > SESSION_START_CEILING) findings.push(`the session start is ${thousands(size)} characters, past the ${thousands(SESSION_START_CEILING)} ceiling`);
+  if (after.value !== null && after.value > SESSION_START_CEILING) findings.push(`the session start is projected at ${thousands(after.value)} characters, past the ${thousands(SESSION_START_CEILING)} ceiling`);
+  const runs = [0, 1, 2].map(() => runHook("pretooluse", [], { hook_event_name: "PreToolUse", tool_name: "Bash", tool_input: { command: "ls" } }, root));
+  const times = runs.flatMap((run) => (run ? [run.ms] : [])).sort((a, b) => a - b);
+  const hook = projection("toolHook", MOVES_TOOL_HOOK, " ms");
+  lines.push(`budgets · tool-call hook  ${times.length ? `${Math.round(times[Math.floor(times.length / 2)])} ms added now` : "not measured"} · ${hook.text}`);
+  return { lines, findings };
+}
+
 function check(args: string[]): number {
   const words = readWords(args);
   const [ref, ...more] = words.paths;
   if (more.length) throw new UsageFault("takes one arc.");
   const { ws, arc } = arcNamed(ref);
   if (!readSheet(ws, arc)) { console.log(`${arc} keeps no sheet — it is judged as before sheets.`); return 0; }
-  const findings = sheetFindings(ws, arc);
+  const root = workspaceRoot(resolve(process.env.SPN_WORKSPACE ?? process.cwd()));
+  const measured = root ? budgetLines(root, readSheet(ws, arc) as Sheet) : { lines: [], findings: [] };
+  for (const line of measured.lines) console.log(line);
+  const findings = [...sheetFindings(ws, arc), ...measured.findings];
   if (!findings.length) { console.log(`${arc} sheet whole`); return 0; }
   for (const line of findings) console.log(line);
   console.log(`${findings.length} finding${findings.length === 1 ? "" : "s"} · exit 1`);

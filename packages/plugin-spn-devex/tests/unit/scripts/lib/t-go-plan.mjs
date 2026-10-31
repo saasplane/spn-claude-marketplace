@@ -8,7 +8,7 @@ import { join, resolve } from "node:path";
 import { PLUGIN } from "../../../helpers/harness.mjs";
 
 const lib = resolve(PLUGIN, "src", "scripts", "lib");
-const { deriveGo, readyParts, ratesOf, boundOf, testFilesOf, entryHash, changedEntries, staleEntries } = await import(join(lib, "go-plan.ts"));
+const { deriveGo, readyParts, clearWaiting, markWaiting, ratesOf, boundOf, testFilesOf, entryHash, changedEntries, staleEntries } = await import(join(lib, "go-plan.ts"));
 const { goFaults, entryAltitude } = await import(join(lib, "workstream-schema.ts"));
 
 let total = 0, failed = 0;
@@ -109,6 +109,36 @@ const ready = (states) => readyParts({ ...plan, parts: plan.parts.map((p) => ({ 
 same("[MKT.SCRIPTS.304] a ready part whose waits are open is not in the ready list", ready({}).slice(0, 2), ["docs-lib-repo-1", "baseline-lib-repo"]);
 same("[MKT.SCRIPTS.304] a part is ready once every part it waits on has landed", ready({ "baseline-lib-repo": "landed", "docs-lib-repo-1": "landed" }).includes("code-lib-repo-1"), true);
 same("[MKT.SCRIPTS.304] a held or running part is never in the ready list", ready({ "docs-lib-repo-1": "held", "baseline-lib-repo": "running" }), ["baseline-app-repo"]);
+
+// A part that waits on something outside the window is `waiting`, with a plain field naming what, and is never ready.
+const needing = [{ arc: "N009", sheet: { ...sheet([entry("E1", "app-repo:src/a.ts"), entry("E2", "lib-repo:src/b.ts")]), needsRelease: [{ repo: "app-repo", release: "lib-repo", command: "spnutils x run" }] } }];
+const needed = deriveGo(needing);
+const firstOfApp = needed.parts.find((p) => p.repo === "app-repo" && p.pass !== "RELEASE");
+same("[MKT.HOOKS.322] a repository's first pass waits on the release that ships a command it needs (s23)", [firstOfApp.id, firstOfApp.state, firstOfApp.waitingOn], ["baseline-app-repo", "waiting", "the release of lib-repo that ships spnutils x run"]);
+same("[MKT.HOOKS.322] only that repository's first pass waits, and a plan with a waiting part holds to its schema", [needed.parts.filter((p) => p.state === "waiting").map((p) => p.id), goFaults(needed)], [["baseline-app-repo"], []]);
+same("[MKT.HOOKS.322] a waiting part is not ready, and what waits on it is not either", readyParts(needed).map((p) => p.id).filter((id) => id.endsWith("app-repo") || id.includes("app-repo-")), []);
+const marked = markWaiting(plan, "docs-lib-repo-1", "your sign-in to the registry");
+same("[MKT.HOOKS.322] a part marked waiting names what it waits on, the plan holds to its schema, and the plan given is untouched", [marked.parts.find((p) => p.id === "docs-lib-repo-1").state, marked.parts.find((p) => p.id === "docs-lib-repo-1").waitingOn, goFaults(marked), plan.parts[0].state], ["waiting", "your sign-in to the registry", [], "ready"]);
+same("[MKT.HOOKS.322] a part marked waiting is not in the ready list", readyParts(marked).map((p) => p.id).includes("docs-lib-repo-1"), false);
+same("[MKT.HOOKS.322] marking a part that is not in the plan is refused", (() => { try { markWaiting(plan, "docs-nowhere-1", "x"); return "no error"; } catch { return "refused"; } })(), "refused");
+same("[MKT.HOOKS.322] a wait marked by hand is kept when the plan is derived again", deriveGo(scope, { previous: marked }).parts.find((p) => p.id === "docs-lib-repo-1").waitingOn, "your sign-in to the registry");
+
+// A new code part in a repository whose full run has landed opens a second full run.
+const secondPlan = deriveGo(changed, { previous: landedAll });
+same("[MKT.HOOKS.324] a new code part in a repository whose full run landed opens full-<repo>-2", secondPlan.parts.filter((p) => p.pass === "FULL_RUN" && p.repo === "lib-repo").map((p) => [p.id, p.state]), [["full-lib-repo", "landed"], ["full-lib-repo-2", "ready"]]);
+same("[MKT.HOOKS.324] the second full run waits on the repository's code", secondPlan.parts.find((p) => p.id === "full-lib-repo-2").waitsOn, ["code-lib-repo-1", "code-lib-repo-2"]);
+same("[MKT.HOOKS.324] with no new code part, no second full run", deriveGo(scope, { previous: landedAll }).parts.filter((p) => p.pass === "FULL_RUN").map((p) => p.id), ["full-lib-repo", "full-app-repo"]);
+same("[MKT.HOOKS.324] derived again, the second full run is made once", deriveGo(changed, { previous: secondPlan }).parts.filter((p) => p.id.startsWith("full-lib-repo")).map((p) => p.id), ["full-lib-repo", "full-lib-repo-2"]);
+
+// E67 · a hand-marked wait comes off
+const cleared = clearWaiting(marked, "docs-lib-repo-1");
+same("[MKT.HOOKS.322] clearing a wait with nothing open in the plan reads the part ready, with no reason", [cleared.parts.find((one) => one.id === "docs-lib-repo-1").state, cleared.parts.find((one) => one.id === "docs-lib-repo-1").waitingOn], ["ready", undefined]);
+same("[MKT.HOOKS.322] clearing a wait on a part that is not waiting is refused", (() => { try { clearWaiting(plan, "docs-lib-repo-1"); return "no error"; } catch { return "refused"; } })(), "refused");
+same("[MKT.HOOKS.322] clearing a part not in the plan is refused", (() => { try { clearWaiting(plan, "docs-nowhere-1"); return "no error"; } catch { return "refused"; } })(), "refused");
+const blocked = { ...marked, parts: [...marked.parts.filter((one) => one.id !== "docs-lib-repo-1"), { ...marked.parts.find((one) => one.id === "docs-lib-repo-1"), waitsOn: ["code-nowhere-1"] }, { ...marked.parts[0], id: "code-nowhere-1", state: "ready", waitingOn: undefined }] };
+const stillWaiting = clearWaiting(blocked, "docs-lib-repo-1").parts.find((one) => one.id === "docs-lib-repo-1");
+same("[MKT.HOOKS.322] clearing a wait whose plan parts have not landed reads it waiting on them", [stillWaiting.state, stillWaiting.waitingOn.includes("code-nowhere-1")], ["waiting", true]);
+same("[MKT.HOOKS.322] clearing leaves the plan given unchanged", marked.parts.find((one) => one.id === "docs-lib-repo-1").state, "waiting");
 
 console.log(`\n${total - failed}/${total} passed`);
 process.exit(failed ? 1 : 0);

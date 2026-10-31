@@ -3,7 +3,7 @@
 // running. Run as the agent types the commands, in a throwaway workspace.
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { cli, dataWorkspace } from "../../../../helpers/workstream-fixture.mjs";
+import { cli, dataWorkspace, put } from "../../../../helpers/workstream-fixture.mjs";
 
 let total = 0, failed = 0;
 const ok = (label, condition, detail = "") => {
@@ -147,6 +147,107 @@ console.log("\n=== write: a proof still owed after the code landed");
   const ids = existsSync(join(owed.ws, "arcs", "N001", "go.json")) ? json(join(owed.ws, "arcs", "N001", "go.json")).parts.map((p) => p.id) : [];
   ok("[MKT.SCRIPTS.322] go write gives a repository its full run while a proof step there has not landed", wrote.code === 0 && ids.includes("full-spn-x"), wrote.out + JSON.stringify(ids));
   ok("[MKT.SCRIPTS.322] and no baseline, with no code left to compare", !ids.includes("baseline-spn-x"), JSON.stringify(ids));
+}
+
+console.log("\n=== wait: a part waits on something outside the plan");
+{
+  const waited = go("wait", "N001", "code-spn-x-1", "--on", "the release of spn-support-ts");
+  const part = json(goFile).parts.find((p) => p.id === "code-spn-x-1");
+  ok("[MKT.HOOKS.322] go wait marks the part waiting and keeps the reason", waited.code === 0 && part?.state === "waiting" && part?.waitingOn === "the release of spn-support-ts", waited.out);
+  ok("[MKT.HOOKS.322] go wait ends with the next step", lastLine(waited.out).startsWith("Next:"), waited.out);
+  ok("[MKT.HOOKS.322] show reads that part as waiting", go("show", "N001", "--part", "code-spn-x-1").out.includes("waiting on the release of spn-support-ts"), "");
+  const landed = go("wait", "N001", "docs-spn-x-1", "--on", "a sign-in");
+  ok("[MKT.HOOKS.322] a landed part cannot wait, and the plan is unchanged", landed.code !== 0 && json(goFile).parts.find((p) => p.id === "docs-spn-x-1")?.state === "landed", landed.out);
+  const bare = go("wait", "N001", "code-spn-x-1");
+  ok("[MKT.HOOKS.322] go wait without --on is refused", bare.code !== 0 && bare.out.includes("--on"), bare.out);
+}
+
+console.log("\n=== wait --clear: a hand-marked wait comes off (E67)");
+{
+  const snapshot = readFileSync(goFile, "utf8");
+  const stateOf = (id) => json(goFile).parts.find((p) => p.id === id);
+  const opened = go("wait", "N001", "code-spn-x-1", "--clear");
+  ok("[MKT.HOOKS.322] E67 clear reads a part waiting again, on the part not landed, when what it waits on has not landed", opened.code === 0 && stateOf("code-spn-x-1")?.state === "waiting" && String(stateOf("code-spn-x-1")?.waitingOn).includes("baseline-spn-x"), opened.out);
+  go("wait", "N001", "code-spn-x-1", "--on", "a sign-in");
+  const plan = json(goFile);
+  writeFileSync(goFile, JSON.stringify({ ...plan, parts: plan.parts.map((p) => (p.id === "baseline-spn-x" ? { ...p, state: "landed" } : p)) }, null, 2));
+  const cleared = go("wait", "N001", "code-spn-x-1", "--clear");
+  ok("[MKT.HOOKS.322] E67 clear reads the part ready again when what it waits on has landed, and drops the reason", cleared.code === 0 && stateOf("code-spn-x-1")?.state === "ready" && !stateOf("code-spn-x-1")?.waitingOn, cleared.out);
+  ok("[MKT.HOOKS.322] E67 clear ends with the next step", lastLine(cleared.out).startsWith("Next:"), cleared.out);
+  const again = go("wait", "N001", "code-spn-x-1", "--clear");
+  ok("[MKT.HOOKS.322] E67 clearing a part that is not waiting is refused, the plan unchanged", again.code !== 0 && again.out.includes("Refused") && stateOf("code-spn-x-1")?.state === "ready", again.out);
+  go("wait", "N001", "code-spn-x-1", "--on", "a sign-in");
+  go("wait", "N001", "full-spn-x", "--on", "another window's hold");
+  const stays = go("wait", "N001", "full-spn-x", "--clear");
+  ok("[MKT.HOOKS.322] E67 clear reads the part waiting again when what it waits on in the plan has not landed, and says on what (full run waits on the code)", stays.code === 0 && stateOf("full-spn-x")?.state === "waiting" && String(stateOf("full-spn-x")?.waitingOn).includes("code-spn-x-1"), stays.out + JSON.stringify(stateOf("full-spn-x")));
+  const both = go("wait", "N001", "full-spn-x", "--clear", "--on", "x");
+  ok("[MKT.HOOKS.322] E67 --clear with --on is refused", both.code !== 0, both.out);
+  writeFileSync(goFile, snapshot);
+}
+
+console.log("\n=== write: one refusal names every fault");
+{
+  const wide = go("write", "N001", "--scope", "N002,N001");
+  ok("[MKT.HOOKS.324] the lead mismatch and the other faults come in one refusal", wide.code === 1 && wide.out.includes("N002") && wide.out.includes("lead") && wide.out.includes("N002 has no data"), wide.out);
+  const file = join(ws, "arcs", "N001", "state.json");
+  const data = json(file);
+  writeFileSync(file, JSON.stringify({ ...data, status: "PROPOSED" }, null, 2));
+  const sheetFile = join(ws, "arcs", "N001", "sheet.json");
+  const sheet = json(sheetFile);
+  writeFileSync(sheetFile, JSON.stringify({ ...sheet, releaseChain: ["spn-x then spn-y"] }, null, 2));
+  const both = go("write", "N001");
+  ok("[MKT.HOOKS.324] an undecided arc and a bad release line are both named", both.code === 1 && both.out.includes("DECIDED") && both.out.includes("release order line"), both.out);
+  writeFileSync(file, JSON.stringify(data, null, 2));
+  writeFileSync(sheetFile, JSON.stringify(sheet, null, 2));
+}
+
+console.log("\n=== start: a full run is refused on a tree that holds uncommitted changes");
+{
+  const row = (id, altitude, over = {}) => ({ id, parent: "N001", kind: "change", repo: "spn-x", blockedBy: [], touches: [], state: "landed", title: `row ${id}`, altitude, ...over });
+  const dirty = await dataWorkspace("go-dirty", { rows: [
+    row("1", "DOCS", { entries: ["E1"] }), row("2", "CODE", { entries: ["E2"] }), row("3", "RELEASE"), row("4", "PROOF", { state: "ready" }),
+  ] });
+  cli(dirty.root, ["workstream", "fact", "write", "N001", "--source", "spn-x/a.ts", "--fact", "a is 1", "--used-by", "1"]);
+  writeFileSync(join(dirty.ws, "arcs", "N001", "sheet.json"), JSON.stringify(sheetOf([entry("E1", "spn-x:docs/a.md"), entry("E2", "spn-x:src/b.ts")]), null, 2));
+  cli(dirty.root, ["workstream", "go", "write", "N001"]);
+  const file = join(dirty.ws, "arcs", "N001", "go.json");
+  const stateOfFull = () => json(file).parts.find((p) => p.id === "full-spn-x")?.state;
+  writeFileSync(join(dirty.repo, "pending.ts"), "export const b = 2;\n");
+  writeFileSync(join(dirty.repo, "a.ts"), "export const a = 3;\n");
+  const refused = cli(dirty.root, ["workstream", "go", "start", "N001", "full-spn-x"]);
+  ok("[MKT.HOOKS.322] start is refused, naming each changed file, and the part stays", refused.code === 1 && refused.out.includes("pending.ts") && refused.out.includes("a.ts") && stateOfFull() === "ready", `${stateOfFull()} ${refused.out}`);
+  dirty.git(["add", "-A"]);
+  dirty.git(["-c", "user.email=t@t", "-c", "user.name=t", "commit", "-q", "-m", "second"]);
+  const clean = cli(dirty.root, ["workstream", "go", "start", "N001", "full-spn-x"]);
+  ok("[MKT.HOOKS.322] the same start runs once the tree is committed", clean.code === 0 && stateOfFull() === "running", clean.out);
+}
+
+console.log("\n=== report write: a part's report lands its row on a green run, in one command");
+{
+  const row = (id, altitude, over = {}) => ({ id, parent: "N001", kind: "change", repo: "spn-x", blockedBy: [], touches: [], state: "waiting", title: `row ${id}`, altitude, ...over });
+  const rep = await dataWorkspace("go-report", { rows: [row("1", "CODE", { entries: ["E1"] })] });
+  cli(rep.root, ["workstream", "fact", "write", "N001", "--source", "spn-x/a.ts", "--fact", "a is 1", "--used-by", "1"]);
+  const sheetFile = join(rep.ws, "arcs", "N001", "sheet.json");
+  writeFileSync(sheetFile, JSON.stringify(sheetOf([entry("E1", "spn-x:src/b.ts")]), null, 2));
+  cli(rep.root, ["workstream", "go", "write", "N001"]);
+  const arcFile = join(rep.ws, "arcs", "N001", "state.json");
+  const rowState = () => json(arcFile).rows[0].state;
+  const part = json(join(rep.ws, "arcs", "N001", "go.json")).parts.find((p) => p.pass === "CODE");
+  const sha = rep.git(["rev-parse", "HEAD"]);
+  const runIn = (results) => put(rep.root, "spn-x/pkg/tests/.output/unit/runs/r1.json", JSON.stringify({ run: "r1", tier: "unit", ranAt: new Date(Date.now() + 3600e3).toISOString(), env: "local", results: results.map((id) => ({ id, tier: "unit", status: "SUCCESS", title: id })) }));
+  const report = (id, ...extra) => { put(rep.ws, `notes/N001/orders/${id}.report.md`, ["---", 'row: "1"', "outcome: landed", ...extra, "---", "Body.", ""].join("\n")); return cli(rep.root, ["workstream", "report", "write", "031", `notes/N001/orders/${id}.report.md`]); };
+
+  // two faults at once: the entry names no test, and the report records no commit
+  writeFileSync(sheetFile, JSON.stringify(sheetOf([entry("E1", "spn-x:src/b.ts", { tiers: {} })]), null, 2));
+  runIn([]);
+  const faulty = report(part.id, "run: r1");
+  ok("[MKT.HOOKS.324] a report that cannot land its row names every fault at once, and the row stays", rowState() !== "landed" && faulty.out.includes("name no test") && faulty.out.includes("no commit"), faulty.out);
+
+  writeFileSync(sheetFile, JSON.stringify(sheetOf([entry("E1", "spn-x:src/b.ts")]), null, 2));
+  runIn(["T.E1.01"]);
+  const once = report(part.id, "run: r1", `commits: { spn-x: [${sha}] }`);
+  ok("[MKT.HOOKS.321] one report write records the commits and the run, and lands the row", rowState() === "landed" && json(arcFile).rows[0].commits["spn-x"].includes(sha) && json(arcFile).rows[0].proof === "run r1", once.out);
+  ok("[MKT.HOOKS.321] and prints the row's split of change, proof, managing and refusals", /row 1 split.*change.*proof.*managing.*refusals/.test(once.out), once.out);
 }
 
 console.log(`\n${total - failed}/${total} passed`);
