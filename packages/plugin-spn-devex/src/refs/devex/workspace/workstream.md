@@ -17,7 +17,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
-      "seen": "ce840e1a"
+      "seen": "c1c83792"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -339,7 +339,7 @@ The plan holds the release parts too, merged from the scope's sheets in chain or
 
 ### In an arc that keeps a sheet, a row lands on a run of its tests
 
-**A code row lands only on a named run, taken after the row's last commit, in which every id its entries name reads `SUCCESS` at the tier the entry names** (`RULE.DEVEX.WORKSPACE.328` · MUST · check:workstream-state). A proof row lands only on a whole run of each tier the arc owes its repository. No row of those altitudes is stamped by hand: `row state <arc> <row> landed --run <run>` names the run. The run is what `spnutils apps test <tier> <run> <package>` or `spnutils infra test` writes, read by the reader `behaviours stamp write` uses. A refusal names the id that reads `FAILURE`, the id the run does not hold, and an id green only at another tier; `report write` reads the report's `run` before it lands a row, so a proof string written by hand is refused. A docs, generated or release row lands as it did, and so does any row of an arc that has no sheet.
+**A code row lands only on a named run, taken after the row's last commit, in which every id its entries name reads `SUCCESS` at the tier the entry names** (`RULE.DEVEX.WORKSPACE.328` · MUST · check:workstream-state). A proof row lands only on a whole run of each tier the arc owes its repository. The book holds documents and no suite, so its proof row lands on a named run of the book check, `spn-devex docs book check --run <run>`, which records the run only when every chapter reads clean. No row of those altitudes is stamped by hand: `row state <arc> <row> landed --run <run>` names the run. The run is what `spnutils apps test <tier> <run> <package>` or `spnutils infra test` writes, read by the reader `behaviours stamp write` uses. A refusal names the id that reads `FAILURE`, the id the run does not hold, and an id green only at another tier; `report write` reads the report's `run` before it lands a row, so a proof string written by hand is refused. A docs, generated or release row lands as it did, and so does any row of an arc that has no sheet.
 
 **Each arc reports what its orders cost and how many rows were rework, split into what ideation missed and what a later answer of the developer's asked for** (`RULE.DEVEX.WORKSPACE.331` · MUST · check:workstream-state · due:036/N008). Rework is the rows added after the arc's go. `workstream state show` prints each arc's cost and its rework beside its rows.
 

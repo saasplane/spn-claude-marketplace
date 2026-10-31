@@ -36,6 +36,8 @@ spn-devex docs audit check [<path>…] [--variant <name>] [--finding <name>] —
 
 spn-devex docs audit report <repo> [--json] — the gap scan of one repository, printed; with --json, as data
 
+spn-devex docs book check [<book>] [--run <name>] — read every chapter of the book through the book check; with --run, record a clean read as a named run in the book
+
 spn-devex docs coherence check [<path>] [--finding <name>] — the findings under the path, from every document of its repository compared with the others
 
 spn-devex docs cycles show <workstream> [--json] — print the Cycles table of a workstream from its arcs; with --json, each row as data

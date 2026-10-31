@@ -3,14 +3,10 @@
 // (the book's RULE.DEVEX.UTILS.071). A reused name replaces that one file, and the tier keeps its 20
 // newest. It lives once, here in the shared folder, because each plugin's runner writes the same file.
 
-import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
-import { dirname, join } from "node:path";
-import { RUN_NAME } from "../../src/lib/runs.ts";
+import { RUN_NAME, RUNS_KEPT, runFilePath, writeRunFile } from "../../src/lib/runs.ts";
 
-export { RUN_NAME };
-
-/** How many run files each tier keeps. */
-export const RUNS_KEPT = 20;
+// THE WRITER IS THE LIBRARY'S, so a runner and a plugin command that records a run write one shape.
+export { RUN_NAME, RUNS_KEPT, runFilePath, writeRunFile };
 
 /** The behaviour id a case's title carries in brackets — the book's rule that a test title carries the id. */
 export const ID = /\[([A-Z][A-Z0-9]*(?:\.[A-Z0-9]+){2})\]/;
@@ -31,12 +27,6 @@ export function takeAppend() {
   return append;
 }
 
-/** The run file a named run of one tier writes under a repository. */
-export const runFilePath = (repo, tier, run) => join(repo, "tests", ".output", tier.toLowerCase(), "runs", `${run}.json`);
-
-/** The instant a run finished, to the second, in UTC — the string a row's `Updated at` carries unchanged. */
-const instant = () => `${new Date().toISOString().slice(0, 19)}Z`;
-
 /** The run's name the caller gave — the first argument that is not an option — or null. A name that cannot be a file exits. */
 export function runNameOf(argv) {
   const name = argv.find((arg) => !arg.startsWith("--")) ?? null;
@@ -56,28 +46,6 @@ export function resultsOf(out, tier) {
     if (id) results.push({ id: id[1], tier, status: verdict[1] === "PASS" ? "SUCCESS" : "FAILED", title: verdict[2].trim() });
   }
   return results;
-}
-
-/**
- * Writes one run's file and prunes the tier's folder to its newest `RUNS_KEPT`. Refuses a name that
- * cannot be a file name, rather than writing somewhere nobody would look. With `append`, the results
- * join those a file of the same run already holds.
- */
-export function writeRunFile(repo, run, tier, results, append = false) {
-  if (!RUN_NAME.test(run)) {
-    throw new Error(`'${run}' is not a run name: a letter or digit first, then letters, digits, dots, dashes and underscores`);
-  }
-  const file = runFilePath(repo, tier, run);
-  mkdirSync(dirname(file), { recursive: true });
-  const before = append && existsSync(file) ? JSON.parse(readFileSync(file, "utf8")).results ?? [] : [];
-  writeFileSync(file, `${JSON.stringify({ run, tier, phase: null, ranAt: instant(), env: "local", results: [...before, ...results] }, null, 2)}\n`, "utf8");
-  const older = readdirSync(dirname(file))
-    .filter((name) => name.endsWith(".json"))
-    .map((name) => join(dirname(file), name))
-    .filter((path) => path !== file)
-    .sort((left, right) => statSync(right).mtimeMs - statSync(left).mtimeMs);
-  for (const stale of older.slice(RUNS_KEPT - 1)) rmSync(stale, { force: true });
-  return file;
 }
 
 /** Writes a named run's file and says where, or says that no run name was given. */

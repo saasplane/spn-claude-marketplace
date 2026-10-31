@@ -3,10 +3,11 @@
 //
 // The book check: every parenthesis in the book reads, names a level, and names a holder that exists.
 //
-//   called by: checks/doc-check.ts on a write under `spn-foundation/docs/`, and scripts/release-plugins.mjs over the whole book
+//   called by: checks/doc-check.ts on a write under `spn-foundation/docs/`, and `docs book check` over the whole book
 
-import { readFileSync, readdirSync, statSync } from "node:fs";
-import { join } from "node:path";
+import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { workstreamsDir } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { holderFaults, isTestHolder, readMarks } from "../../../../plugin-support-lib/src/lib/rule-mark.ts";
 import { TERMINAL } from "./arc-status.ts";
@@ -27,6 +28,13 @@ const isDir = (path: string): boolean => { try { return statSync(path).isDirecto
 const statusOf = (stateFile: string): string | null => {
   try { return (JSON.parse(readFileSync(stateFile, "utf8")) as { status?: string }).status ?? null; } catch { return null; }
 };
+
+/** The marketplace this check runs from, found from its own file, in source or in a bundle. */
+export function ownMarketplace(): string {
+  let at = dirname(fileURLToPath(import.meta.url));
+  for (; dirname(at) !== at; at = dirname(at)) if (existsSync(join(at, "packages", "plugin-spn-devex"))) return at;
+  return at;
+}
 
 /** The holders the marketplace ships, and the open arcs of the workspace's `.spndevex` where there is one. */
 export function knownHolders(marketplace: string, workspace: string | null): Known {

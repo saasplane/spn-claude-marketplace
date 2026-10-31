@@ -189,6 +189,8 @@ Every row below is declared and none is claimed: a run writes the last two cells
 | MKT.SCRIPTS.315 | Backend developer | be told the next step by every command | The go, `go write`, `go start` and `report write` each end with the next step to run | POSITIVE | UNIT | PLANNED | — |
 | MKT.SCRIPTS.316 | Backend developer | see what was already decided before proposing | Raising a suggestion or opening an arc prints the decisions and rules whose words match its subject | POSITIVE | UNIT | PLANNED | — |
 | MKT.SCRIPTS.317 | Backend developer | keep a suggestion's stage with its arc | An arc that carries a suggestion moves it to shaped, its go to decided, and its drop to dropped | POSITIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.318 | Backend developer | land the book's proof row on a named run | `docs book check --run` reads every chapter and, when all read clean, records the run in the book | POSITIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.319 | Backend developer | never land the book's proof row on a read with a fault | `docs book check --run` names each fault and records no run when any chapter has one | NEGATIVE | UNIT | PLANNED | — |
 
 ## Retired ids
 
