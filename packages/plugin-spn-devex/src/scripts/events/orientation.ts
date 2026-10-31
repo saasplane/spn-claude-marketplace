@@ -20,9 +20,10 @@
 //   1. the welcome — a heading that greets you by name, the tagline, who the agent is, the eight
 //      stages and every role. The heading has two forms: a returning visit, and a first visit, which
 //      is a workspace with no workstream in any state.
-//   2. ONE status line — the repositories, the open workstreams, the backlog, and the other windows
-//      open here, each part dropped when it is zero. Unwired repositories, a stale plugin or a rung
-//      below an ordinary session add a clause to the same line, never a second line.
+//   2. ONE status line of counts — the repositories, the open workstreams, the backlog, and the other
+//      windows open here, each part dropped when it is zero. Checkouts behind their base, unwired
+//      repositories, a stale plugin or a rung below an ordinary session go on a line only the agent
+//      reads, and the agent says each one when the work reaches it.
 //   3. the tables, for when you ask — the members, the law each carries, the wiring, and every
 //      workstream — then ONE open question, never a typed list of options. Beside it, and only when
 //      exactly one workstream is open and no second session is live under this root, a standing
@@ -30,7 +31,7 @@
 //
 // `systemMessage`, the developer's pane, carries parts 1 and 2. `additionalContext`, what the agent
 // reads, carries all three, the note that says how to use them, and the short rules a reply must
-// follow (RULE.DEVEX.AGENT.089), each with the reference that holds it whole.
+// follow (RULE.DEVEX.AGENT.089), each under the reference that holds it whole, ending on its number.
 //
 // A workstream carries its state in its parent folder, so the three are read and shown together:
 // `open/` is available now, `backlog/` is parked, and `closed/` is the receipt. The number in the
@@ -508,16 +509,16 @@ export function welcome(who: string | null, firstVisit: boolean, builder = false
   const name = who ? `, ${who}` : "";
   return [
     firstVisit
-      ? `# 👋 Welcome to SaaS Plane${name}. Glad you're here!`
+      ? `# 👋 Welcome to SaaS Plane${name}. Let's build something great.`
       : `# 👋 Good to see you again${name}. Welcome back to SaaS Plane!`,
     "",
     "*The AI-native, DevEx-first Foundation for Building and Launching Secure, Scalable, Compliance-ready SaaS Platforms.*",
     WELCOME_SPACER,
-    "🤖 **I'm your DevEx agent.** Think of me as the engineering teammate who has read every standard in this workspace, so your time can go to the product.",
+    `🤖 **I'm your DevEx agent${name}.** Think of me as the teammate who has read every standard in this workspace, so your time goes to the product.`,
     WELCOME_SPACER,
-    "🧭 I work with you through the whole software lifecycle, five phases and the eight stages inside them: **Start** (Bootstrap, Source control), **Plan** (Ideate), **Build** (Develop, Test), **Ship** (Provision, Deliver) and **Run** (Operate). Each stage has its own standards and its own proof, and I carry both for you.",
+    "🧭 I hold every stage to its own standards, and we prove each step together: **Start** (Bootstrap, Source control) · **Plan** (Ideate) · **Build** (Develop, Test) · **Ship** (Provision, Deliver) · **Run** (Operate).",
     WELCOME_SPACER,
-    `👥 I look at the work through every role on your team: **Leadership** (Chief executive, Engineering leader), **Engineering** (Architect, Backend developer, Web developer, Quality engineer, DevOps / SRE, DevSecOps / Security), **Product and design** (Product manager, UX designer, UI designer, Editor), **Data and AI** (Data lead, AI lead), **Go-to-market** (Product marketer, Sales lead, Growth lead, Customer success lead) and **Finance and business** (Finance lead, Business manager). ${builder ? "And I speak for every partner who builds on SaaS Plane, so a change of ours never breaks them without a version and a way across. " : ""}Tell me whose view you need, and I'll bring it.`,
+    `👥 I bring every role's view to the table as we talk the work through: **Leadership** (Chief executive, Engineering leader) · **Engineering** (Architect, Backend, Web, Quality, DevOps / SRE, DevSecOps / Security) · **Product and design** (Product manager, UX, UI, Editor) · **Data and AI** · **Go-to-market** (Product marketer, Sales, Growth, Customer success) · **Finance and business**.${builder ? " And I speak for every partner who builds on SaaS Plane, so nothing we change breaks them without a version and a way across." : ""}`,
   ];
 }
 
@@ -558,7 +559,7 @@ type StartPart = { text: string; rank: number; readAt: string };
 /**
  * The session start in its priority order (RULE.DEVEX.AGENT.105). The head (the welcome, the status and the first-reply
  * note) always goes whole. The parts keep their order on the page, and past the ceiling the highest rank is left out
- * first (the router, then the debug lines), with one line naming where to read what went.
+ * first (the debug lines, then the router, which is the front desk), with one line naming where to read what went.
  */
 export function fitSessionStart(head: string, parts: StartPart[]): string {
   const kept = [...parts];
@@ -576,8 +577,8 @@ export function fitSessionStart(head: string, parts: StartPart[]): string {
 /** The parts below the head, in page order, each ranked by how much a first reply needs it. */
 function startParts(): StartPart[] {
   return [
-    { text: commandsRefBlock(), rank: 2, readAt: "`refs/commands.md`" },
-    { text: wayIndex(), rank: 3, readAt: "`refs/devex/agent/way.md`" },
+    { text: commandsRefBlock(), rank: 3, readAt: "`refs/commands.md`" },
+    { text: wayIndex(), rank: 2, readAt: "`refs/devex/agent/way.md`" },
     { text: shortRules(), rank: 1, readAt: "the short rules in `refs/devex/agent/agent.md`" },
   ];
 }
@@ -588,7 +589,9 @@ export function shortRules(index: RulesIndex | null = rulesIndex()): string {
   for (const rule of index?.rules ?? []) {
     if (!rule.params.short || !rule.line) continue;
     const lines = groups.get(rule.line.ref) ?? [];
-    lines.push(`- ${rule.line.text} § ${rule.line.heading}`);
+    // A LINE POINTS BY ITS RULE'S NUMBER, which the rules index resolves: the section heading said the same
+    // thing at three times the length, and that length is what pushed the router out (DEC.DEVEX.AGENT.105).
+    lines.push(`- ${rule.line.text} (${rule.id.replace(/^RULE\.DEVEX\./, "")})`);
     groups.set(rule.line.ref, lines);
   }
   if (!groups.size) return "";
@@ -682,18 +685,31 @@ function setsLeftBehind(root: string, streams: Workstream[]): string[] {
   return [...closed, ...unnamed];
 }
 
+const plural = (n: number, one: string, many = `${one}s`) => `${n} ${n === 1 ? one : many}`;
+
 /**
- * The ground in one line. A part that is zero is dropped rather than printed as `0`, and a problem
- * adds a clause to the same line — a second line is how a status line turns back into a dump.
+ * The ground in one line of counts, which the developer reads. A part that is zero is dropped rather
+ * than printed as `0`. A problem never joins it: what is wrong with the ground is the agent's to act
+ * on, so it goes on the agent's line (`groundLine`), and a status line that names branches turns back
+ * into a dump (DEC.DEVEX.AGENT.105).
  */
 export function statusLine(s: Status): string {
-  const plural = (n: number, one: string, many = `${one}s`) => `${n} ${n === 1 ? one : many}`;
   const parts = [plural(s.repos, "repo", "repos")];
   if (s.open.length)
     parts.push(`${plural(s.open.length, "workstream")} open `
       + `(${s.open.map((w) => w.number || w.subject).join(", ")})`);
   if (s.backlog) parts.push(`${s.backlog} in backlog`);
   if (s.others) parts.push(`${plural(s.others, "other window", "other windows")} open here`);
+  return parts.join(" · ");
+}
+
+/**
+ * What is wrong with the ground, as one line only the agent reads: the checkouts behind their base, the
+ * unwired repositories, a stale plugin copy, the worktree sets left behind and a rung short of building.
+ * The agent says each one when the work reaches it. Empty where nothing is wrong.
+ */
+export function groundLine(s: Status): string {
+  const parts: string[] = [];
   if (s.unwired) parts.push(`${s.unwired} unwired`);
   if (s.stale) parts.push(s.stale);
   if (s.behind) parts.push(s.behind);
@@ -701,7 +717,7 @@ export function statusLine(s: Status): string {
   if (s.left.length)
     parts.push(`${plural(s.left.length, "worktree set")} left behind, remove ${s.left.length === 1 ? "it" : "each"}: ${s.left.join(", ")}`);
   if (s.rung) parts.push(s.rung);
-  return parts.join(" · ");
+  return parts.length ? `Ground to act on, said only when the work reaches it: ${parts.join(" · ")}.` : "";
 }
 
 /**
@@ -768,8 +784,8 @@ function sessionsHere(root: string): number {
  * one workstream is how an approach page grows two authors, and a cheap check is worth more than the
  * convenience it costs.
  */
-function closingLines(streams: Workstream[], others: number): string[] {
-  const ask = "So — what are we building?";
+function closingLines(streams: Workstream[], others: number, who: string | null = null): string[] {
+  const ask = `So${who ? `, ${who}` : ""} — what are we building today?`;
   const openNow = streams.filter((w) => w.state === "open");
   if (openNow.length !== 1) return ["", ask, ""];
   const only = openNow[0];
@@ -930,7 +946,7 @@ export function orient(root: string, cwd: string): [message: string, context: st
   const cache = plugins.length ? cacheState(root, plugins) : null;
   const behind = loadedBehind();
   const others = sessionsHere(root);
-  const status = statusLine({
+  const ground: Status = {
     repos: repos.length,
     open: streams.filter((w) => w.state === "open"),
     backlog: streams.filter((w) => w.state === "backlog").length,
@@ -942,20 +958,22 @@ export function orient(root: string, cwd: string): [message: string, context: st
     left: setsLeftBehind(root, streams),
     // Rung 4 is an ordinary session, and an ordinary session says nothing about its rung.
     rung: level < 4 ? `rung ${level}: ${why}` : null,
-  });
-  const message = clean([...greeting, WELCOME_SPACER, status]);
+  };
+  const message = clean([...greeting, WELCOME_SPACER, statusLine(ground)]);
 
   // THE GROUND IS READ ON ASKING. The members, their law, the wiring and every workstream are one command
   // away (`spnutils workspace status`), and no first reply needs them: a window carries what the first
   // reply needs and nothing else (RULE.DEVEX.AGENT.105).
   const lines: string[] = [];
+  const problems = groundLine(ground);
+  if (problems) lines.push(problems, "");
   if (behind)
     lines.push(`⚠ this window loaded \`${behind.plugin} ${behind.loaded}\` and \`${behind.newest}\` is installed — ` +
       "it keeps the copy it started with, so take a fresh window before trusting a skill, a brief or a rule file", "");
   if (resolve(cwd) !== root) lines.push(`Rooted in \`${relative(root, resolve(cwd))}\`.`, "");
   lines.push(...migrationLines(root));
   lines.push(...goLines(root));
-  lines.push(...closingLines(streams, others));
+  lines.push(...closingLines(streams, others, who));
   const note = "\n---\nThe ground is read on asking: run `spnutils workspace status` for *where are we?*. " +
     "Ask the closing question ONLY when the first message does not say what to do. A handover block, an arc name, " +
     "or any named next step replaces it — under the status line, one line: *Picking up N<nn> — <the arc's title>, " +

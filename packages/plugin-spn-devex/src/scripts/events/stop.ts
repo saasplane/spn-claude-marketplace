@@ -1460,12 +1460,13 @@ export function firstTurnText(transcript: string): string {
  * every word of it is there.
  */
 export function missingWelcome(text: string): string[] {
-  const said = plain(text);
+  // The 🤖 line carries the name as the heading does, so it is matched with the name's clause taken out.
+  const said = plain(text).replace(/(I'm your DevEx agent), [^.]{1,21}\./, "$1.");
   const [, , tagline, , agent, , stages, , roles] = welcome(null, false).map(plain);
   // A builder's 👥 line carries the partner sentence, so either variant is the whole line.
   const builderRoles = plain(welcome(null, false, true)[8]);
   const missing: string[] = [];
-  if (!/Welcome back to SaaS Plane!|Glad you're here!/.test(said)) missing.push("the heading");
+  if (!/Welcome back to SaaS Plane!|Let's build something great\./.test(said)) missing.push("the heading");
   for (const [name, line] of [["the italic line", tagline], ["the 🤖 line", agent], ["the 🧭 line", stages]] as const)
     if (!said.includes(line)) missing.push(name);
   if (!said.includes(roles) && !said.includes(builderRoles)) missing.push("the 👥 line");

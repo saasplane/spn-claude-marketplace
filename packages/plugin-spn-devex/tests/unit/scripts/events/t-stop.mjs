@@ -862,7 +862,7 @@ console.log("\n=== welcome — a session's first turn opens with the welcome, wo
   const { welcome } = await import("../../../../src/scripts/events/orientation.ts");
   const whole = welcome("Dhruv", false).join("\n");
   const firstVisit = welcome("Dhruv", true).join("\n");
-  const cut = whole.replace(" Tell me whose view you need, and I'll bring it.", "");
+  const cut = whole.replace(" · **Finance and business**.", "");
   const headingOnly = whole.split("\n")[0] + "\n\nLooking into how ports are picked.";
   const plainText = whole.replace(/\*\*/g, "").replace(/^\*|\*$/gm, "").replace(/^# /, "");
   for (const [what, got, expected] of [

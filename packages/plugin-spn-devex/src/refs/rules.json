@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "book": {
     "repository": "spn-foundation",
-    "commit": "1497f7b2"
+    "commit": "7e72bd4a"
   },
   "rules": [
     {
@@ -1193,7 +1193,7 @@
       "sentence": "What every window carries before its first word is kept small",
       "chapter": "04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "heading": "What every window carries before its first word is kept small",
-      "decision": null,
+      "decision": "DEC.DEVEX.AGENT.105",
       "restated": [
         {
           "plugin": "spn-devex",

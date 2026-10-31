@@ -9,7 +9,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "section": "It opens on the welcome and one status line, never a status dump",
-      "seen": "bbfbb700"
+      "seen": "41cdd1cb"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
@@ -24,7 +24,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "section": "The rules of a reply reach the agent at session start, in short form",
-      "seen": "ea5ff3ed"
+      "seen": "c5f85f1c"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
@@ -39,7 +39,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "section": "What every window carries before its first word is kept small",
-      "seen": "7e0aa277"
+      "seen": "917592a2"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
@@ -92,12 +92,16 @@ judgment gate*).
 **The first reply opens with the welcome, whatever the prompt — MUST** (`DEC.DEVEX.WORKSPACE.045`).
 The session-start hook prints it. It is a heading that greets the developer by name, the tagline,
 🤖 who the agent is, 🧭 the five phases with the eight stages inside them, by their names, and 👥
-every seat on the team by its lens's role name, grouped by function. In a builder's workspace, the one
+every seat on the team, grouped by function. Each line opens on what the agent holds, in *I*, and
+carries what is done together, in *we*: the agent holds each stage to its standards and brings every
+role's view to the table, while the proof and the talk are shared and the decisions stay the
+developer's. A workspace that holds no workstream yet is greeted as new, *Let's build something
+great*, and any other as a return. In a builder's workspace, the one
 `SPN_DEVEX_AGENT_WORKSPACE` names, it also names the partner view by what it guards, because that view
 speaks for the people who build on what the builders publish and is no seat on a partner's team. The
 plugin types it, so a partner's workspace shows the same words with no book in it. The roles line
 groups the team by function: Leadership, Engineering, Product and design, Data and AI, Go-to-market,
-and Finance and business, each with its role names (`RULE.DEVEX.WORKSPACE.283` · MUST · check:orientation · due:036/N008).
+and Finance and business, each naming the roles inside it that its own name does not already say (`RULE.DEVEX.WORKSPACE.283` · MUST · check:orientation · due:036/N008).
 
 **The instruction to say it comes before the welcome itself.** A long session-start text reaches the
 agent as its first 2 KB, with the rest kept in a file, so the line that says to open with the whole
@@ -106,9 +110,12 @@ welcome, word for word, stands above the welcome, where that first part always h
 **A missed welcome is never printed a second time.** A later reply that prints it again shows a short
 welcome and then a long one. Say once, in one line, that the first reply missed it, and go on.
 
-**The ground follows as one status line**, such as
+**The ground follows as one status line of counts**, such as
 `7 repos · 1 workstream open (008) · 3 other windows open here`. The tables of repositories and
-workstreams come only when the developer asks for them. A reply that opens with a table is a wall of
+workstreams come only when the developer asks for them. What is wrong with the ground — a checkout
+behind its base, an unwired repository, a stale plugin copy, a worktree set left behind — is yours
+to act on, not the developer's to read at the door: it reaches you on the line *Ground to act on*,
+and you say each one when the work reaches that repository. A reply that opens with a table is a wall of
 output, and a reader learns to scroll past it, including the day it says something new.
 
 **Then the reply answers what the developer typed:**
@@ -141,7 +148,7 @@ developer's pane does not show them.
 
 **Which rules are short rules is read from their parentheses, and never listed here.** A rule whose
 parenthesis carries `short` has one line: the sentence a reference of this plugin restates it with,
-then `§` and the heading that holds it whole. The lines are read from `refs/rules.json`, which the
+under the reference that holds it whole, ending on the rule's number, which the rules index resolves. The lines are read from `refs/rules.json`, which the
 plugins build writes from the book.
 
 **A line is a pointer, never a second copy of the rule.** When a line applies to the reply you are
@@ -164,8 +171,9 @@ reply of every session.
   10,000 characters to a file and shows the model only its first 2,000, so the session start holds under
   9,500 characters, counted as Claude Code counts. What goes in is chosen by need, not by size: what makes a
   first reply correct (the welcome, the status line and the first-reply note), then the short rules, then
-  the debug commands, then the router, and a line that changes no behaviour stays out. Past the ceiling the
-  router is left out first, then the debug lines, and one line names where to read them. Past 8,000
+  the router, then the debug commands, and a line that changes no behaviour stays out. Past the ceiling the
+  debug lines are left out first, then the router, and one line names where to read them: the router is
+  the front desk, so it outlasts every part but the ones a first reply cannot do without. Past 8,000
   characters it still loads whole, and its test asks why the new text earns its place. The command lines are
   generated from the command tree, the way a repository's `rules.md` lists the commands of `spnutils`
   (`DEC.DEVEX.WORKSPACE.180`), so you find them without a search. The ground tables are read on asking, with
