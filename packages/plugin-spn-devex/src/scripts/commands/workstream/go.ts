@@ -15,7 +15,7 @@ import { basename, join } from "node:path";
 import { type Action, FLAG, VALUE, UsageFault, readWords } from "../../../../../plugin-support-lib/src/lib/command.ts";
 import { isTestCommand } from "../../checks/test-run.ts";
 import {
-  changedEntries, deriveGo, fullRunMinutes, goFileOf, landedEntries, landedMeasures, planScope, readGo, readyParts, ratesOf, unheldEntries,
+  deriveGo, fullRunMinutes, goFileOf, landedEntries, landedMeasures, planScope, readGo, readyParts, ratesOf, staleEntries, unheldEntries,
   type ScopeSheet,
 } from "../../lib/go-plan.ts";
 import { logEvent, notesDirOf, readArc, readSheet, workspaceOf, writeWhole } from "../../lib/workstream.ts";
@@ -151,7 +151,7 @@ export function checkGo(args: string[]): number {
   const findings = unheldEntries(plan, scope).map((ref) => `${ref} is held by no part`);
   let marked = false;
   const parts = plan.parts.map((part) => {
-    const moved = changedEntries(part, scope);
+    const moved = staleEntries(part, plan, scope);
     if (!moved.length) return part;
     findings.push(`part ${part.id}${part.state === "ready" ? " is held" : ` (${part.state})`}: entries ${moved.join(" and ")} changed after the plan was written`);
     if (part.state !== "ready") return part;

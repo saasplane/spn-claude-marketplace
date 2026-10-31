@@ -297,6 +297,12 @@ export function changedEntries(part: GoPart, scope: readonly ScopeSheet[]): stri
   });
 }
 
+/** A part's changed entries that no later part of the plan carries: a follow-up part answers its landed part's change. */
+export function staleEntries(part: GoPart, plan: GoPlan, scope: readonly ScopeSheet[]): string[] {
+  const later = plan.parts.slice(plan.parts.indexOf(part) + 1).flatMap((one) => one.entries);
+  return changedEntries(part, scope).filter((ref) => !later.includes(ref));
+}
+
 /** The parts a helper may be launched for: `ready`, and every part they wait on landed. A `ready` part with a wait open is waiting. */
 export function readyParts(plan: GoPlan): GoPart[] {
   const landed = new Set(plan.parts.filter((one) => one.state === "landed").map((one) => one.id));
