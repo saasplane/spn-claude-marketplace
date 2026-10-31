@@ -177,6 +177,19 @@ console.log("\n=== a whole suite runs only while a baseline or full run of the g
     verdictOf(checkTestRun(bash(running, "node scripts/test-all.mjs", "spn-y"), NOW)) === "deny");
   ok("[MKT.HOOKS.31] a repository's own runner is a test command, so the edits wait while it runs",
     isTestCommand(reading("run.mjs", null, null, null)) && isTestCommand(reading("test-all.mjs", null, null, null)));
+
+  // A commit made after the full run landed still owes the push check a stamped run of that commit (036 N010, Q12 A).
+  const landed = at("test-run-whole-landed", goFiles("landed"));
+  for (const [what, command] of [WHOLE[3], WHOLE[4]])
+    ok(`[MKT.HOOKS.320] a stamped whole run by ${what} passes once the repository's full run has landed`,
+      checkTestRun(bash(landed, command), NOW) === null, JSON.stringify(checkTestRun(bash(landed, command), NOW)));
+  for (const [what, command] of [WHOLE[0], WHOLE[2]])
+    ok(`[MKT.HOOKS.320] and a whole suite by ${what}, which leaves no stamp, is still refused`,
+      verdictOf(checkTestRun(bash(landed, command), NOW)) === "deny");
+  ok("[MKT.HOOKS.320] a full run landed in another repository does not count for this one",
+    verdictOf(checkTestRun(bash(landed, "spnutils apps test unit r1 api", "spn-y"), NOW)) === "deny");
+  ok("[MKT.HOOKS.320] a test command's help runs nothing, so it passes with no full run",
+    checkTestRun(bash(none, "spnutils apps test --help"), NOW) === null && checkTestRun(bash(none, "spnutils apps test -h"), NOW) === null);
 }
 
 console.log(failed ? `\n  ${failed} of ${total} FAILED — test-run` : `\n  all ${total} passed — test-run`);

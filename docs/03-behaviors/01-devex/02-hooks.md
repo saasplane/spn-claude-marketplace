@@ -161,6 +161,7 @@ Every row below is declared and none is claimed: a run writes the last two cells
 | MKT.HOOKS.317 | Backend developer | get the handover last | A tool call after a handover block tells the agent once to finish the work and end on the one block; the tool still runs | NEGATIVE | UNIT | PLANNED | — |
 | MKT.HOOKS.318 | Backend developer | never hear about another workstream's cards | `cards` sends back another workstream's card, by number or in words, even with its workstream named, and either on the `open:` line (RULE.DEVEX.WORKSPACE.197 · MUST) | NEGATIVE | UNIT | PLANNED | — |
 | MKT.HOOKS.319 | Backend developer | still get an answer when I ask about one | A reply to a prompt that names that card or that workstream passes | POSITIVE | UNIT | PLANNED | — |
+| MKT.HOOKS.320 | Backend developer | push a commit made after the full run | Once a repository's full run of a go has landed, a whole run by `spnutils`, which leaves the stamp the push check reads, passes; a runner that leaves no stamp, and another repository's run, are still refused; a test command's `--help` runs nothing and passes | POSITIVE | UNIT | PLANNED | — |
 
 ## Retired ids
 

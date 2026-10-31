@@ -86,6 +86,8 @@ export function isWholeSuite(found: Reading): boolean {
   if (!isTestCommand(found)) return false;
   if (WHOLE_RUNNERS.includes(found.script)) return true;
   const words = [found.action, ...(found.args ?? "").split(/\s+/)].filter((word): word is string => Boolean(word));
+  // A command's help runs nothing.
+  if (found.script === "spnutils" && words.some((word) => word === "--help" || word === "-h")) return false;
   const selection = words.indexOf("--");
   if (found.script === "spnutils") return selection < 0 || selection === words.length - 1;
   if (found.script === "nx") return found.action === "run-many";
@@ -132,6 +134,10 @@ export function checkWholeSuite(payload: Payload): Verdict {
   const plans = openPlans(root);
   const forRepo = (part: GoPart): boolean => isSuitePart(part) && (!repo || part.repo === repo);
   if (plans.some(({ plan }) => plan.parts.some((part) => forRepo(part) && part.state === "running"))) return null;
+  // Once the repository's full run has landed, a commit made after it still owes the push check a stamped run of that
+  // commit, and only `spnutils` leaves the stamp (RULE.DEVEX.WORKSPACE.281).
+  const landed = plans.some(({ plan }) => plan.parts.some((part) => forRepo(part) && part.pass === "FULL_RUN" && part.state === "landed"));
+  if (landed && whole.every((found) => found.script === "spnutils")) return null;
   const own = new Set(windowWorkstreams(root, payload.session_id));
   const named = plans.find(({ ws }) => own.has(basename(ws))) ?? plans[0];
   const quoted = command.trim().length > 120 ? `${command.trim().slice(0, 117)}…` : command.trim();
