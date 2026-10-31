@@ -14,7 +14,10 @@
 import { basename, join } from "node:path";
 import { type Action, FLAG, VALUE, UsageFault, readWords } from "../../../../../plugin-support-lib/src/lib/command.ts";
 import { isTestCommand } from "../../checks/test-run.ts";
-import { changedEntries, deriveGo, fullRunMinutes, goFileOf, landedMeasures, readGo, readyParts, ratesOf, refOf, type ScopeSheet } from "../../lib/go-plan.ts";
+import {
+  changedEntries, deriveGo, fullRunMinutes, goFileOf, landedEntries, landedMeasures, planScope, readGo, readyParts, ratesOf, unheldEntries,
+  type ScopeSheet,
+} from "../../lib/go-plan.ts";
 import { logEvent, notesDirOf, readArc, readSheet, workspaceOf, writeWhole } from "../../lib/workstream.ts";
 import type { ArcData, GoPart, GoPlan } from "../../lib/workstream-schema.ts";
 import { arcNamed, listOf } from "./_shared.ts";
@@ -60,7 +63,9 @@ function scopeOf(ws: string, scope: string[]): { sheets: ScopeSheet[]; arcs: Arc
     if (data.status !== "DECIDED") faults.push(`${arc} is ${data.status}, not DECIDED`);
     if (!sheet) { faults.push(`${arc} keeps no sheet`); continue; }
     for (const finding of sheetFindings(ws, arc)) faults.push(`${arc} sheet: ${finding}`);
-    sheets.push({ arc, sheet });
+    // A release part is named for its repository, so a line that is not one name would make a part no reader accepts.
+    for (const line of sheet.releaseChain) if (!/^\S+$/.test(line)) faults.push(`${arc} sheet: the release order line "${line}" is not a repository's name`);
+    sheets.push({ arc, sheet, landed: landedEntries(data) });
     arcs.push(data);
   }
   return { sheets, arcs, faults };
@@ -138,12 +143,8 @@ export function checkGo(args: string[]): number {
   if (more.length) throw new UsageFault("takes one arc.");
   const { ws, arc } = arcNamed(ref);
   const plan = planOf(ws, arc);
-  const scope: ScopeSheet[] = [];
-  for (const one of plan.scope) { const sheet = readSheet(ws, one); if (sheet) scope.push({ arc: one, sheet }); }
-  const held = new Set(plan.parts.flatMap((one) => one.entries));
-  const findings: string[] = [];
-  for (const { arc: of, sheet } of scope) for (const entry of sheet.entries)
-    if (!held.has(refOf(of, entry))) findings.push(`${refOf(of, entry)} is held by no part`);
+  const scope = planScope(ws, plan);
+  const findings = unheldEntries(plan, scope).map((ref) => `${ref} is held by no part`);
   let marked = false;
   const parts = plan.parts.map((part) => {
     const moved = changedEntries(part, scope);

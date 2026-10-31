@@ -71,6 +71,10 @@ console.log("\n=== close: an unfinished plan refuses it");
   cli(root, ["workstream", "sheet", "write", "N001", "--file", sheetIn]);
   const planned = cli(root, ["workstream", "go", "write", "N001"]);
   const before = readFileSync(join(ws, "approach.html"), "utf8");
+  const checked = cli(root, ["workstream", "go", "check", "N001"]);
+  const partsHolding = json(join(ws, "arcs", "N001", "go.json")).parts.filter((part) => part.entries.includes("N001/E1")).map((part) => part.id);
+  ok("[MKT.SCRIPTS.320] an entry a landed row holds is planned in no part, and go check does not name it",
+    planned.code === 0 && !partsHolding.length && checked.code === 0 && !checked.out.includes("held by no part"), `${partsHolding.join(", ")}\n${planned.out}\n${checked.out}`);
 
   const refused = cli(root, ["workstream", "close", "031"]);
   ok("[MKT.SCRIPTS.310] a plan with a part not landed refuses the close, and the folder stays", planned.code === 0 && refused.code === 1 && /go|part/.test(refused.out) && !existsSync(closed) && existsSync(ws), `${planned.out}\n${refused.out}`);
@@ -87,6 +91,22 @@ console.log("\n=== close: an unfinished plan refuses it");
   ok("[MKT.SCRIPTS.310] a whole, landed go closes: the folder moves into closed", done.code === 0 && existsSync(moved) && !existsSync(ws), done.out);
   const page = existsSync(moved) ? readFileSync(moved, "utf8") : "";
   ok("[MKT.SCRIPTS.310] the approach page is stamped DONE", /sds-done">[^<]*DONE</.test(page) && !page.includes("PLANNING</span>"), page.slice(0, 600));
+}
+
+console.log("\n=== go write: a release order line that is not a repository's name refuses the plan");
+{
+  const rows = [
+    { id: "1", parent: "N001", title: "write the book", kind: "change", repo: "spn-x", altitude: "DOCS", blockedBy: [], touches: ["spn-x:docs"], state: "ready", entries: ["E1"] },
+  ];
+  const { root, ws } = await dataWorkspace("lifecycle-chain", { rows });
+  const entry = { id: "E1", op: "edit", file: "spn-x:docs/a.md", what: "change E1", decidedBy: ["q1"], facts: ["f1"], then: [], rules: [], callers: [], tiers: {}, docs: [], book: [] };
+  const sheetIn = join(root, "sheet-in.json");
+  writeFileSync(sheetIn, JSON.stringify({ schemaVersion: 1, releaseChain: ["spn-x: one docs pull request into develop"], dependsOn: [], stack: { folder: "the spn-x checkout", dmo: "none", reset: "from empty" }, entries: [entry] }));
+  cli(root, ["workstream", "fact", "write", "N001", "--source", "spn-x/a.ts", "--fact", "a is 1", "--used-by", "1"]);
+  cli(root, ["workstream", "sheet", "write", "N001", "--file", sheetIn]);
+  const refused = cli(root, ["workstream", "go", "write", "N001"]);
+  ok("[MKT.SCRIPTS.321] a release order line that is not a repository's name is refused, naming it, and no plan is written",
+    refused.code === 1 && refused.out.includes("not a repository's name") && !existsSync(join(ws, "arcs", "N001", "go.json")), refused.out);
 }
 
 console.log(`\n${total - failed}/${total} passed`);

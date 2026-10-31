@@ -48,9 +48,8 @@ import { APPROACH_SUFFIX, ARCS, DEVEX, SESSIONS, WORKSTREAM_STATES, WORKSTREAMS,
          type WorkstreamState } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { OWN_COPY, linksSharedStyles } from "../../../../plugin-support-lib/src/lib/page-styles.ts";
 import { alreadyTold, fromWorkspace, named, windowSet } from "../lib/window.ts";
-import { logLinesOf, arcStatus as readArcStatus, readArc, readQuestions, readSheet } from "../lib/workstream.ts";
-import { changedEntries, readGo, refOf } from "../lib/go-plan.ts";
-import type { ScopeSheet } from "../lib/go-plan.ts";
+import { logLinesOf, arcStatus as readArcStatus, readArc, readQuestions } from "../lib/workstream.ts";
+import { changedEntries, planScope, readGo, unheldEntries } from "../lib/go-plan.ts";
 
 // The state a row reaches. `landed` is the only one that satisfies the documents pass; all three
 // named states satisfy the close. A mark nobody wrote is what the close refuses.
@@ -1056,11 +1055,8 @@ function goFindings(folders: string[]): string[] {
       let plan;
       try { plan = readGo(folder, arc); } catch (fault) { out.push(String((fault as Error).message ?? fault).slice(0, 200)); continue; }
       if (!plan) continue;
-      const scope: ScopeSheet[] = [];
-      for (const one of plan.scope) { const sheet = readSheet(folder, one); if (sheet) scope.push({ arc: one, sheet }); }
-      const held = new Set(plan.parts.flatMap((part) => part.entries));
-      for (const { arc: of, sheet } of scope) for (const entry of sheet.entries)
-        if (!held.has(refOf(of, entry))) out.push(`${refOf(of, entry)} is held by no part`);
+      const scope = planScope(folder, plan);
+      for (const ref of unheldEntries(plan, scope)) out.push(`${ref} is held by no part`);
       for (const part of plan.parts) {
         const moved = changedEntries(part, scope);
         if (moved.length) out.push(`part ${part.id}: entries ${moved.join(" and ")} changed after the plan was written`);
