@@ -35,9 +35,12 @@ process.on("exit", () => rmSync(BASE, { recursive: true, force: true }));
 
 let n = 0, failed = 0;
 
+// A PASSING CASE IS PRINTED TOO: the runner records a case's id only from its PASS line, so a suite that
+// printed failures alone proved nothing to a named run, and a row its ids cover could never land.
 function one(label, ok) {
   n += 1;
-  if (!ok) { failed += 1; console.log(`  FAIL  ${label}`); }
+  if (!ok) failed += 1;
+  console.log(`  ${ok ? "PASS" : "FAIL"}  ${label}`);
 }
 
 /** One `docs coherence check` of a path through the entry, with what follows the path. A refusal's text is handed back with the rest. */
