@@ -56,11 +56,14 @@ function kindOf(entry: SheetEntry): "DOCS" | "GENERATED" | "CODE" {
  * The arc's steps as its sheet derives them: one for each repository and kind of change, holding that group's entries;
  * a release step for each repository when the sheet names a release order, and a proof step for each repository with code.
  * A step the arc already has for the same repository and kind keeps its place and takes the entries; nothing is added twice.
+ * A landed step keeps what it landed: an entry written after it goes to a step of its own, and its repository gets a new
+ * release step and, for code, a new proof step.
  * Returns the number of steps added.
  */
 function deriveSteps(ws: string, arc: string, sheet: Sheet): number {
   const data = readArc(ws, arc);
   if (!data) return 0;
+  const followed = new Set<string>();
   const groups = new Map<string, { repo: string; altitude: string; ids: string[] }>();
   for (const entry of sheet.entries) {
     const repo = entry.file.includes(":") ? entry.file.slice(0, entry.file.indexOf(":")) : "";
@@ -72,11 +75,17 @@ function deriveSteps(ws: string, arc: string, sheet: Sheet): number {
   let added = 0;
   const top = (): ArcRow[] => data.rows.filter((row) => row.parent === arc);
   const place = (repo: string, altitude: string, title: string, entries: string[] | null): void => {
-    const found = top().find((row) => row.repo === repo && row.altitude === altitude);
-    if (found) { if (entries) found.entries = entries; return; }
+    // A landed step keeps what it landed; an entry written after it goes to an open step, or to a new one.
+    const same = top().filter((row) => row.repo === repo && row.altitude === altitude);
+    const landed = new Set(same.filter((row) => row.state === "landed").flatMap((row) => row.entries ?? []));
+    const fresh = entries?.filter((id) => !landed.has(id)) ?? null;
+    const open = same.find((row) => row.state !== "landed");
+    if (open) { if (fresh) open.entries = fresh; return; }
+    if (same.length && (fresh ? !fresh.length : !followed.has(repo))) return;
+    if (fresh?.length && same.length) followed.add(repo);
     const id = String(Math.max(0, ...top().map((row) => parseInt(row.id, 10) || 0)) + 1);
     const row: ArcRow = { id, parent: arc, title, kind: "change", repo, altitude, state: data.status === "DECIDED" ? "ready" : "waiting" };
-    if (entries) row.entries = entries;
+    if (fresh) row.entries = fresh;
     data.rows.push(row);
     added += 1;
   };

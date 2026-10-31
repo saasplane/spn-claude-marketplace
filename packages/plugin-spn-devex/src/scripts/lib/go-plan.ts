@@ -25,8 +25,8 @@ export const UNMEASURED_ENTRIES = 8;
 const GO_FILE = "go.json";
 const HOOKS_LOG = "hooks.jsonl";
 
-/** A sheet of the scope, with the arc it belongs to and the ids of the entries its landed rows hold. */
-export type ScopeSheet = { arc: string; sheet: Sheet; landed?: readonly string[] };
+/** A sheet of the scope, with its arc, the ids of the entries its landed rows hold, and the repositories it still owes a proof in. */
+export type ScopeSheet = { arc: string; sheet: Sheet; landed?: readonly string[]; proofs?: readonly string[] };
 /** What a landed row took: entries done in a repository at a kind of change, in minutes. */
 export type Measure = { repo: string; altitude: string; entries: number; minutes: number };
 /** A line of `hooks.jsonl`, as far as a test command is told apart. */
@@ -216,6 +216,8 @@ export function deriveGo(scope: readonly ScopeSheet[], options: DeriveOptions = 
     }
   }
   for (const part of kept) if (!repos.includes(part.repo) && part.pass !== "RELEASE") repos.push(part.repo);
+  const owed = new Set(scope.flatMap(({ proofs }) => proofs ?? []));
+  for (const repo of owed) if (!repos.includes(repo)) repos.push(repo);
   const rank = (repo: string) => { const at = chain.indexOf(repo); return at < 0 ? chain.length : at; };
   repos.sort((a, b) => rank(a) - rank(b));
 
@@ -237,7 +239,9 @@ export function deriveGo(scope: readonly ScopeSheet[], options: DeriveOptions = 
     for (const pass of PASS_ORDER) {
       if (pass === "BASELINE" || pass === "FULL_RUN") {
         const id = `${pass === "BASELINE" ? "baseline" : "full"}-${repo}`;
-        if (hasCode && !keptIds.has(id)) fresh.push(part(id, repo, pass, [], [], {
+        // A proof still owed needs the repository's full run once its code has landed; a baseline needs code to compare.
+        const runs = hasCode || (pass === "FULL_RUN" && owed.has(repo));
+        if (runs && !keptIds.has(id)) fresh.push(part(id, repo, pass, [], [], {
           minutes: full, measuredFrom: full === null ? null : "last 3 full runs",
         }));
         continue;

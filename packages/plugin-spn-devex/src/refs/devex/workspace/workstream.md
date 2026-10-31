@@ -17,7 +17,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
-      "seen": "c1c83792"
+      "seen": "ed884641"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -249,7 +249,7 @@ developer as soon as the batch lands.
 
 **An arc with no `sheet.json` is judged as it was before the sheet existed — MUST.** The write that opens an arc writes its sheet with an empty list of entries. An arc already running has none and needs no migration, and every refusal below is skipped for it.
 
-**In an arc that keeps a sheet, the steps are derived from the sheet and never added by hand.** `sheet write` writes one step for each repository and kind of change its entries name, and each entry names its kind: docs, code or generated. The release and proof steps come from the sheet's release order. `fact write` pins a fact on the workstream's own branch where one exists, so a fact is read where the work is written.
+**In an arc that keeps a sheet, the steps are derived from the sheet and never added by hand.** `sheet write` writes one step for each repository and kind of change its entries name, and each entry names its kind: docs, code or generated. The release and proof steps come from the sheet's release order. A step that has landed keeps what it landed: an entry written into the sheet after it goes to a step of its own, and its repository gets a new release step and, for code, a new proof step. `fact write` pins a fact on the workstream's own branch where one exists, so a fact is read where the work is written.
 
 **An entry points at what was decided and never says it again, and it holds no code.** The sheet's header holds `releaseChain` (what releases, in what order, and the release slots of other workstreams it must follow), `dependsOn` (other repositories and workstreams' branches that merge first) and `stack` (the folder the tiers run from, the `dmo` version, how it is reset, the ports; none where the stack has no `dmo`). Each entry holds `id`, `op` (`create` · `edit` · `drop` · `rename`), `file` (`repository:path`), `what`, `decidedBy` (the cards or preview sections), `facts` (by id; the drift step reads their commits), `then` (the generators to run after it), `rules`, `callers` (found by search, by path), `tiers` (the named tests by tier, each a behaviour id, a new test marked red first) and `docs` and `book` (what it changes, and the book line it changes or must still agree with).
 
@@ -277,7 +277,7 @@ developer as soon as the batch lands.
 | **The parts**: a pass split by files that do not overlap, so each part finishes within 45 measured minutes. Where nothing has been measured yet, a part holds at most eight entries | the files each entry names |
 | **The time of each part**: the same kind of work in the same repository. A full suite is priced from its last three timed runs | the timed commands and the cost of past orders |
 | **The tests each part runs**: only the test files whose cases carry the part's behaviour ids | each entry's tiers, and the ids in the test labels |
-| **The full runs**: one baseline run per repository before its code pass, and one full run at the end that every code change lands on | the repositories the scope touches |
+| **The full runs**: one baseline run per repository before its code pass, and one full run at the end that every code change lands on. A repository whose code has all landed still gets its full run while an arc of the scope owes a proof there, and the proof of an arc that changes no repository lands on the named run its own check records in the arc's `work/` folder | the repositories the scope touches, and the proof steps that have not landed |
 | **Each helper's brief**: its files, its changes, the decisions behind them and its test commands, written from the order template | the part's entries |
 
 **The plan is written only by `go write`, into the lead arc's `go.json`, and it never appears on a preview or on the approach page** (`RULE.DEVEX.WORKSPACE.456` · MUST · skill:spn-devex/execute). The lead arc is the lowest arc of the scope. The developer reviews the goal, the constructs and the files; how the work runs is the agent's job, and the agent adds nothing to a brief by hand.
@@ -699,7 +699,7 @@ notes.
 
 | What the window did | Tie |
 | --- | --- |
-| Sent a first prompt that names exactly one workstream folder, or a handover whose `continue:` line names workstreams | **owns** each one named; a handover that names two gives two |
+| Sent a first prompt that names exactly one workstream folder, or a handover | **owns** the one folder the prompt names, or the workstream the handover's `continue:` line opens with. A handover also owns each other workstream its line names by the whole folder name. A bare number after the first, as in *waits for 035*, is a mention and owns nothing |
 | Wrote a file inside a workstream folder, or ran a `workstream` command that writes an arc's data there, in its own turn or in a child's call, owning none yet and nothing having named one | **owns** it: the first one it writes inside |
 | Wrote a file inside a workstream folder when it already owns another | **visits** it; a visit never becomes ownership by itself |
 | Read a file, wrote text that only names another workstream, or sent a prompt naming two workstreams with no handover | nothing |
