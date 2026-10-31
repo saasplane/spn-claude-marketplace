@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "book": {
     "repository": "spn-foundation",
-    "commit": "70309c5c"
+    "commit": "408f81c1"
   },
   "rules": [
     {
@@ -10969,7 +10969,13 @@
       "chapter": "04-capabilities/04-launchpad/01-control-plane/01-control-plane.md",
       "heading": "A platform registers with the control plane; it never depends on it",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.LAUNCHPAD.CONTROL_PLANE.002",
@@ -10982,7 +10988,13 @@
       "chapter": "04-capabilities/04-launchpad/01-control-plane/01-control-plane.md",
       "heading": "The stage is built the way a partner builds",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.LAUNCHPAD.CONTROL_PLANE.003",
@@ -10995,7 +11007,13 @@
       "chapter": "04-capabilities/04-launchpad/01-control-plane/01-control-plane.md",
       "heading": "The stage is not a domain of the model",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.PLATFORM.CORE.001",
@@ -12016,7 +12034,13 @@
       "chapter": "04-capabilities/03-platform/02-modules/01-reference-data/01-reference-data.md",
       "heading": "The base catalog is read, never restated",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.PLATFORM.MODULES.002",
@@ -12029,7 +12053,13 @@
       "chapter": "04-capabilities/03-platform/02-modules/01-reference-data/01-reference-data.md",
       "heading": "How a value is written belongs to the value, not to the screen",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.PLATFORM.MODULES.003",
@@ -12042,7 +12072,13 @@
       "chapter": "04-capabilities/03-platform/02-modules/01-reference-data/01-reference-data.md",
       "heading": "The registry is open, and its capability set is closed",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.PLATFORM.MODULES.004",
@@ -12055,7 +12091,13 @@
       "chapter": "04-capabilities/03-platform/02-modules/01-reference-data/01-reference-data.md",
       "heading": "The dependency direction is one-way, and it is what makes the catalog safe",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.PLATFORM.MODULES.005",
@@ -12068,7 +12110,13 @@
       "chapter": "04-capabilities/03-platform/02-modules/02-translation/01-translation.md",
       "heading": "Who owns the words decides who may translate them",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.PLATFORM.MODULES.006",
@@ -12081,7 +12129,13 @@
       "chapter": "04-capabilities/03-platform/02-modules/02-translation/01-translation.md",
       "heading": "A translated map is replaced whole, never merged",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.PLATFORM.MODULES.007",
@@ -12094,7 +12148,13 @@
       "chapter": "04-capabilities/03-platform/02-modules/02-translation/01-translation.md",
       "heading": "A language is named from the catalog, never typed",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.PLATFORM.MODULES.008",
@@ -12107,7 +12167,13 @@
       "chapter": "04-capabilities/03-platform/02-modules/03-notifications/01-notifications.md",
       "heading": "Every message comes from the catalog",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.PLATFORM.MODULES.009",
@@ -12120,7 +12186,13 @@
       "chapter": "04-capabilities/03-platform/02-modules/03-notifications/01-notifications.md",
       "heading": "A configuration is drafted, checked, then published",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.PLATFORM.MODULES.010",
@@ -12133,7 +12205,13 @@
       "chapter": "04-capabilities/03-platform/02-modules/03-notifications/01-notifications.md",
       "heading": "Some actions are nobody's to reword",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.PLATFORM.MODULES.011",
@@ -12146,7 +12224,13 @@
       "chapter": "04-capabilities/03-platform/02-modules/03-notifications/01-notifications.md",
       "heading": "A channel sits behind a seam, and each one is on or off",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.PLATFORM.MODULES.012",
@@ -12159,7 +12243,13 @@
       "chapter": "04-capabilities/03-platform/02-modules/03-notifications/01-notifications.md",
       "heading": "A send is answered rather than guessed at",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.PLATFORM.MODULES.013",
@@ -12172,7 +12262,13 @@
       "chapter": "04-capabilities/03-platform/02-modules/03-notifications/01-notifications.md",
       "heading": "The suppression list refuses; it does not prefer",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.PLATFORM.MODULES.014",
@@ -12185,7 +12281,13 @@
       "chapter": "04-capabilities/03-platform/02-modules/04-documents/01-documents.md",
       "heading": "An upload is a lifecycle, not a moment",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.PLATFORM.MODULES.015",
@@ -12198,7 +12300,13 @@
       "chapter": "04-capabilities/03-platform/02-modules/04-documents/01-documents.md",
       "heading": "The record is immutable, and different content is a different file",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.PLATFORM.MODULES.016",
@@ -12211,7 +12319,13 @@
       "chapter": "04-capabilities/03-platform/02-modules/04-documents/01-documents.md",
       "heading": "Sensitivity and access are different questions",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.PLATFORM.MODULES.017",
@@ -12224,7 +12338,13 @@
       "chapter": "04-capabilities/03-platform/02-modules/04-documents/01-documents.md",
       "heading": "Variants are generated, never uploaded",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.PLATFORM.MODULES.018",
@@ -12237,7 +12357,13 @@
       "chapter": "04-capabilities/03-platform/02-modules/04-documents/01-documents.md",
       "heading": "The key leads with its access class, and the class never changes",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.PLATFORM.MODULES.019",
@@ -12250,7 +12376,13 @@
       "chapter": "04-capabilities/03-platform/02-modules/04-documents/01-documents.md",
       "heading": "The store is reached through a seam, never named",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.PLATFORM.MODULES.020",
@@ -12263,7 +12395,13 @@
       "chapter": "04-capabilities/03-platform/02-modules/05-entities/01-entities.md",
       "heading": "Opting in is declared once, in the registry",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.PLATFORM.MODULES.021",
@@ -12276,7 +12414,13 @@
       "chapter": "04-capabilities/03-platform/02-modules/05-entities/01-entities.md",
       "heading": "A definition and a value are different things",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.PLATFORM.MODULES.022",
@@ -12289,7 +12433,13 @@
       "chapter": "04-capabilities/03-platform/02-modules/05-entities/01-entities.md",
       "heading": "A field that picks from a list names a registered type",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.PLATFORM.MODULES.023",
@@ -12302,7 +12452,13 @@
       "chapter": "04-capabilities/03-platform/02-modules/05-entities/01-entities.md",
       "heading": "Attachments link, they do not store",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.PLATFORM.MODULES.024",
@@ -12315,7 +12471,13 @@
       "chapter": "04-capabilities/03-platform/02-modules/05-entities/01-entities.md",
       "heading": "Activity is a closed list, and it is not the audit trail",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.PLATFORM.MODULES.025",
@@ -12328,7 +12490,13 @@
       "chapter": "04-capabilities/03-platform/02-modules/05-entities/01-entities.md",
       "heading": "Sharing is a named relation, not a permission",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.PLATFORM.MODULES.026",
@@ -12341,7 +12509,13 @@
       "chapter": "04-capabilities/03-platform/02-modules/06-jobs/01-jobs.md",
       "heading": "Once, or on a pattern — one shape",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.PLATFORM.MODULES.027",
@@ -12354,7 +12528,13 @@
       "chapter": "04-capabilities/03-platform/02-modules/06-jobs/01-jobs.md",
       "heading": "A firing travels to its destinations, in order",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.PLATFORM.MODULES.028",
@@ -12367,7 +12547,13 @@
       "chapter": "04-capabilities/03-platform/02-modules/06-jobs/01-jobs.md",
       "heading": "Retry belongs to the destination, never the schedule",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.PLATFORM.MODULES.029",
@@ -12380,7 +12566,13 @@
       "chapter": "04-capabilities/03-platform/02-modules/06-jobs/01-jobs.md",
       "heading": "A run is what makes a schedule answerable",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.PLATFORM.MODULES.030",
@@ -12393,7 +12585,13 @@
       "chapter": "04-capabilities/03-platform/02-modules/07-audit-log/01-audit-log.md",
       "heading": "A record names its actor rather than deriving one",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.PLATFORM.MODULES.031",
@@ -12406,7 +12604,13 @@
       "chapter": "04-capabilities/03-platform/02-modules/07-audit-log/01-audit-log.md",
       "heading": "A trail is only useful if it can be searched",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.PLATFORM.MODULES.032",
@@ -12419,7 +12623,13 @@
       "chapter": "04-capabilities/03-platform/02-modules/07-audit-log/01-audit-log.md",
       "heading": "Retention sits on the record",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.SUPPORT.APPS.001",
