@@ -8,7 +8,7 @@
     },
     {
       "path": "spn-foundation/docs/01-purpose/04-way.md",
-      "seen": "03e7f9b3"
+      "seen": "16c00452"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/03-platform/01-core/05-lifecycle/01-lifecycle.md",

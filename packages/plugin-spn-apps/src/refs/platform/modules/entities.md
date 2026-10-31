@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/03-platform/02-modules/05-entities/",
-      "seen": "27b98165"
+      "seen": "2bcd4504"
     }
   ]
 }
