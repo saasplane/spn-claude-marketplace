@@ -5,6 +5,7 @@
 // WHAT IT READS. The `<h3>` and `<h4>` of an `.html` write, and the `###` and `####` lines of a `.md` write,
 // under `docs/`, `refs/` or a workstream's folder.
 
+import { DEVEX_WORKSTREAMS } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { emit, readPayload, runAlone, type Payload, type Verdict } from "../lib/payload.ts";
 
 const MOST_WORDS = 5;
@@ -12,7 +13,7 @@ const SHOWN = 4;
 
 export function applies(path: string): boolean {
   if (!/\.(?:md|html)$/.test(path)) return false;
-  return path.includes("/docs/") || path.includes("/refs/") || path.includes("/.spndevex/workstreams/");
+  return path.includes("/docs/") || path.includes("/refs/") || path.includes(`/${DEVEX_WORKSTREAMS}/`);
 }
 
 const plain = (html: string): string => html.replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim();

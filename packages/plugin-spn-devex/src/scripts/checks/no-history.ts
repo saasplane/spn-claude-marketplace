@@ -7,6 +7,7 @@
 // not a word on the page. A log, a register and a changelog keep history by design and are never read.
 
 import { basename } from "node:path";
+import { DEVEX_WORKSTREAMS, POCKET, hasSegment } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { emit, readPayload, runAlone, type Payload, type Verdict } from "../lib/payload.ts";
 
 const HISTORY = /\b(formerly|renamed from|moved from|replaced by|legacy)\b/i;
@@ -14,8 +15,8 @@ const HISTORY = /\b(formerly|renamed from|moved from|replaced by|legacy)\b/i;
 /** A page under the book, a ref, a repository's docs or a workstream, and not one that keeps history. */
 export function applies(path: string): boolean {
   if (!/\.(?:md|html)$/.test(path)) return false;
-  if (path.includes("/registers/") || /changelog/i.test(basename(path))) return false;
-  return path.includes("/docs/") || path.includes("/refs/") || path.includes("/.spndevex/workstreams/");
+  if (hasSegment(path, POCKET.registers) || /changelog/i.test(basename(path))) return false;
+  return path.includes("/docs/") || path.includes("/refs/") || path.includes(`/${DEVEX_WORKSTREAMS}/`);
 }
 
 export function checkNoHistory(payload: Payload): Verdict {

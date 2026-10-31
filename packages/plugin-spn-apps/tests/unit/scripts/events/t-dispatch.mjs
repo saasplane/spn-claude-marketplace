@@ -80,7 +80,7 @@ const IFACE = "apps/api/src/contract/services/UserService.ts";
 one("read-verb-naming's refusal", {
   root: tree({ ...REPO, ...APP }),
   input: { file_path: IFACE, content: "export interface U {\n  getUsers(): Promise<UserList>;\n}\n" },
-  expect: "deny", says: "read verb is named for the list",
+  expect: "deny", says: "getUsers returns Promise<UserList>",
 });
 
 const SRC = "apps/api/src/app/Loader.ts";

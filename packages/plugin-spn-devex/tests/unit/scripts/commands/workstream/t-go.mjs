@@ -41,15 +41,17 @@ console.log("=== write: an arc with no sheet is refused");
 
 cli(root, ["workstream", "fact", "write", "N001", "--source", "spn-x/a.ts", "--fact", "a is 1", "--used-by", "1"]);
 putSheet([entry("E1", "spn-x:docs/a.md"), entry("E2", "spn-x:src/b.ts")]);
-cli(root, ["workstream", "sheet", "write", "N001", "--file", sheetIn]);
+cli(root, ["workstream", "sheet", "write", "N001", "--file", sheetIn, "--because", "the developer added E3"]);
 
 console.log("\n=== write: a sheet with a finding is refused");
 {
   putSheet([entry("E1", "spn-x:docs/a.md"), entry("E2", "spn-x:src/b.ts"), entry("E3", "spn-x:src/c.ts")]);
-  cli(root, ["workstream", "sheet", "write", "N001", "--file", sheetIn]);
+  cli(root, ["workstream", "sheet", "write", "N001", "--file", sheetIn, "--because", "the developer added E3"]);
+  cli(root, ["workstream", "sheet", "drop", "N001", "E3", "--note", "not needed"]);
   const refused = go("write", "N001");
   ok("[MKT.SCRIPTS.303] a sheet finding refuses the go and names the finding", refused.code === 1 && refused.out.includes("E3") && !existsSync(goFile), refused.out);
-  cli(root, ["workstream", "sheet", "drop", "N001", "E3", "--note", "not needed"]);
+  putSheet([entry("E1", "spn-x:docs/a.md"), entry("E2", "spn-x:src/b.ts")]);
+  cli(root, ["workstream", "sheet", "write", "N001", "--file", sheetIn, "--because", "E3 is not needed"]);
 }
 
 console.log("\n=== write: a scope arc not decided is refused");
@@ -94,10 +96,11 @@ console.log("\n=== check");
   const clean = go("check", "N001");
   ok("[MKT.SCRIPTS.305] a plan that reads whole exits 0", clean.code === 0 && clean.out.includes("whole"), clean.out);
   putSheet([entry("E1", "spn-x:docs/a.md"), entry("E2", "spn-x:src/b.ts"), entry("E3", "spn-x:src/c.ts")]);
-  cli(root, ["workstream", "sheet", "write", "N001", "--file", sheetIn]);
+  cli(root, ["workstream", "sheet", "write", "N001", "--file", sheetIn, "--because", "the developer added E3"]);
   const lost = go("check", "N001");
   ok("[MKT.SCRIPTS.305] an entry no part holds is named, exit 1", lost.code === 1 && lost.out.includes("N001/E3"), lost.out);
-  cli(root, ["workstream", "sheet", "drop", "N001", "E3", "--note", "not needed"]);
+  putSheet([entry("E1", "spn-x:docs/a.md"), entry("E2", "spn-x:src/b.ts")]);
+  cli(root, ["workstream", "sheet", "write", "N001", "--file", sheetIn, "--because", "E3 is not needed"]);
   cli(root, ["workstream", "sheet", "edit", "N001", "E2", "--what", "changed after the plan"]);
   const moved = go("check", "N001");
   ok("[MKT.SCRIPTS.308] a part whose entry changed is named, exit 1", moved.code === 1 && moved.out.includes("code-spn-x-1") && moved.out.includes("N001/E2"), moved.out);

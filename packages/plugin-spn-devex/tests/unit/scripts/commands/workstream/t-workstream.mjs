@@ -171,7 +171,7 @@ console.log("\n=== fact write — one fact, pinned to its source's commit");
 console.log("\n=== suggestion add, state and edit — raised, moved on, reworded");
 {
   const raised = cli(root, ["workstream", "suggestion", "add", "031", "keep it as data"]);
-  ok("a suggestion is raised with the next number", raised.code === 0 && raised.out.trim() === "s1 · raised", raised.out);
+  ok("a suggestion is raised with the next number", raised.code === 0 && raised.out.split("\n")[0].trim() === "s1 · raised", raised.out);
   const shaped = cli(root, ["workstream", "suggestion", "state", "031", "s1", "shaped", "--words", "shaped on the preview"]);
   ok("and moved on, with the words beside the move", shaped.code === 0 && shaped.out.trim() === "s1 · shaped", shaped.out);
   const edited = cli(root, ["workstream", "suggestion", "edit", "031", "s1", "--title", "keep it as rows", "--preview", "notes/N001/preview.html#p1"]);

@@ -39,7 +39,7 @@ put(join(market, "packages", "plugin-spn-devex", "src", "refs", "agent.md"),
 const cited = `<!-- spn:restates\n{ "docs": [ { "path": "spn-foundation/docs/${SEAT.constructs}/01-rules.md", "seen": "x" } ] }\n-->\n\n# Contract\n\nSteps.\n`;
 put(join(market, "packages", "plugin-spn-apps", "src", "skills", "implement", "steps", "contract.md"), cited);
 put(join(market, "packages", "plugin-spn-apps", "src", "skills", "implement", "steps", "ui.md"), "# UI\n\nSteps.\n");
-put(join(market, "packages", "plugin-spn-apps", "src", "skills", "implement", "SKILL.md"), "# Implement\n\nThe skill.\n");
+put(join(market, "packages", "plugin-spn-apps", "src", "skills", "implement", "SKILL.md"), "---\nname: implement\ndescription: The skill.\n---\n\nThe skill.\n");
 
 console.log("=== the index");
 const first = restates.writeRulesIndex(book, market);
@@ -69,6 +69,8 @@ ok("[MKT.SCRIPTS.205] a `skill:` rule no step cites lands in SKILL.md instead",
     restates.writeRulesIndex(book, market);
     return readFileSync(skillPath, "utf8").includes("RULE.SUPPORT.APPS.904");
   })());
+ok("[MKT.SCRIPTS.205] a skill with no title keeps its front matter first, and the block lands under it",
+  (() => { const text = readFileSync(skillPath, "utf8"); return text.startsWith("---\nname: implement\n") && text.indexOf("\n---\n") < text.indexOf("## The rules this step holds"); })());
 
 console.log("\n=== a second run");
 // The blocks a run writes are plugin files that restate their rules, so the index of the next run lists them; the

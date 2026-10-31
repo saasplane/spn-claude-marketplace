@@ -700,7 +700,8 @@ export function withRulesBlock(text: string, rules: RuleEntry[]): string {
     while (end < rest.length && rest[end].startsWith("- ")) end += 1;
     return text.slice(0, at) + block + rest.slice(end).join("\n");
   }
-  const title = /^# .+\n/m.exec(text);
+  // Under the title; with no title, under the front matter a skill opens with; with neither, first.
+  const title = /^# .+\n/m.exec(text) ?? /^---\n[\s\S]*?\n---\n/.exec(text);
   if (!title) return `${block}\n${text}`;
   const after = title.index + title[0].length;
   return `${text.slice(0, after)}\n${block}${text.slice(after)}`;

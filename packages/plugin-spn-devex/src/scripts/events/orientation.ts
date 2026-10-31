@@ -573,12 +573,12 @@ export function fitSessionStart(head: string, parts: StartPart[]): string {
   return head + kept.map((part) => part.text).join("") + tail;
 }
 
-/** The parts below the head, in page order, each ranked by how much a first reply needs it. */
-function startParts(): StartPart[] {
+/** The parts below the head, in page order, each ranked by how much a first reply needs it. Day zero holds no arc and no workstream, so the short rules, which are about them, stay out of it. */
+function startParts(dayZero = false): StartPart[] {
   return [
     { text: commandsRefBlock(), rank: 2, readAt: "`refs/commands.md`" },
     { text: wayIndex(), rank: 3, readAt: "`refs/devex/agent/way.md`" },
-    { text: shortRules(), rank: 1, readAt: "the short rules in `refs/devex/agent/agent.md`" },
+    { text: dayZero ? "" : shortRules(), rank: 1, readAt: "the short rules in `refs/devex/agent/agent.md`" },
   ];
 }
 
@@ -921,7 +921,7 @@ export function orient(root: string, cwd: string): [message: string, context: st
             ? "act 1 has already run — `spnutils workspace init` minted this folder, so do not run it again — and act 2 "
             : "act 1 mints the workspace and act 2 ") +
           "opens the workstream that holds the answers, before the first question is asked.\n");
-    return [message, fitSessionStart(WELCOME_LEAD + "\n\n" + message + note + "\n", startParts())];
+    return [message, fitSessionStart(WELCOME_LEAD + "\n\n" + message + note + "\n", startParts(true))];
   }
 
   const settings = readJson(join(root, ".claude", "settings.json")) ?? {};

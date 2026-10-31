@@ -6,9 +6,10 @@
 // and assistant text are not prompts. A window with no transcript to read is not a finding.
 
 import { readFileSync } from "node:fs";
+import { ARTIFACT, DOCS, POCKET } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { emit, readPayload, runAlone, type Payload, type Verdict } from "../lib/payload.ts";
 
-const REPORTS = "/docs/artifacts/reports/";
+const REPORTS = `/${DOCS}/${POCKET.artifacts}/${ARTIFACT.reports}/`;
 const ASK = /\breports?\b/i;
 
 /** What a person typed in one transcript line, or null where the line is not a user prompt. */

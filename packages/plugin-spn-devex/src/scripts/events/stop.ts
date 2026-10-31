@@ -784,10 +784,10 @@ export function cardsByWorkstream(root: string, mine: Set<string>): Map<string, 
   return out;
 }
 
-/** Every card each open workstream carries, on its pages or in `questions.jsonl`, with whether it is still open. */
-function cardsOfWorkstreams(root: string): Map<string, Map<string, boolean>> {
+/** Every card each given workstream carries, on its pages or in `questions.jsonl`, with whether it is still open. */
+function cardsOfWorkstreams(folders: string[]): Map<string, Map<string, boolean>> {
   const out = new Map<string, Map<string, boolean>>();
-  for (const folder of openWorkstreamFolders(root)) {
+  for (const folder of folders) {
     const cards = new Map<string, boolean>();
     for (const page of pagesOf(folder)) for (const card of cardsOf(page)) cards.set(card.number, !card.decided);
     for (const one of readQuestions(folder)) cards.set(one.id.toUpperCase(), one.state === "open");
@@ -803,8 +803,7 @@ function cardsOfWorkstreams(root: string): Map<string, Map<string, boolean>> {
  */
 export function checkCardsNamed(reply: string, root: string, mine: Set<string>): Warning[] {
   if (!mine.size) return [];
-  const all = cardsOfWorkstreams(root);
-  const own = [...all].filter(([name]) => mine.has(name));
+  const own = [...cardsOfWorkstreams(scoped(openWorkstreamFolders(root), mine))];
   if (!own.length) return [];
   const prose = unquoted(reply);
   const named = [...new Set(prose.match(/\bQ\d+\b/g) ?? [])];
@@ -818,7 +817,8 @@ export function checkCardsNamed(reply: string, root: string, mine: Set<string>):
         out.push({ check: "cards", message: `Needs you names ${card}, and ${home[0]} has answered it. Leave a settled card out of Needs you.` });
       continue;
     }
-    const elsewhere = [...all].find(([name, cards]) => !mine.has(name) && cards.has(card));
+    // Only a reply naming a card no workstream of this window carries reads the others, to say whose it is.
+    const elsewhere = [...cardsOfWorkstreams(openWorkstreamFolders(root).filter((folder) => !mine.has(basename(folder))))].find(([, cards]) => cards.has(card));
     if (elsewhere && (prose.includes(elsewhere[0]) || new RegExp(`\\b${elsewhere[0].slice(0, 3)}\\b`).test(prose))) continue;
     out.push({ check: "cards", message: elsewhere
       ? `This reply names ${card}, which belongs to ${elsewhere[0]}, not to ${ours}. Name the workstream it belongs to, or leave it out.`

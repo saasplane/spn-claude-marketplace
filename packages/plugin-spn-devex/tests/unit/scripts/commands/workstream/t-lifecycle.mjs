@@ -16,7 +16,7 @@ const json = (path) => JSON.parse(readFileSync(path, "utf8"));
 
 const BLOCK = {
   subject: "probe-reach", goal: "The probe reaches every partner.", whyNow: "Partners ask for it every week.",
-  reaches: "The partner sign-in and its pages.", seeFirst: "The sign-in page with the probe on it.", limits: "No change to billing.",
+  reaches: "The partner sign-in and its pages.", seeFirst: "Sign-in page with probe", limits: "No change to billing.",
 };
 const WORDS = "I want the probe to reach every partner";
 
@@ -79,6 +79,9 @@ console.log("\n=== close: an unfinished plan refuses it");
   const plan = join(ws, "arcs", "N001", "go.json");
   const data = json(plan);
   writeFileSync(plan, JSON.stringify({ ...data, parts: data.parts.map((part) => ({ ...part, state: "landed" })) }, null, 2));
+  const arcFile = join(ws, "arcs", "N001", "state.json");
+  const arcData = json(arcFile);
+  writeFileSync(arcFile, JSON.stringify({ ...arcData, rows: arcData.rows.map((row) => ({ ...row, state: "landed" })) }, null, 2));
   const done = cli(root, ["workstream", "close", "031"]);
   const moved = join(closed, "approach.html");
   ok("[MKT.SCRIPTS.310] a whole, landed go closes: the folder moves into closed", done.code === 0 && existsSync(moved) && !existsSync(ws), done.out);

@@ -3,8 +3,9 @@
 // them, so the search a proposal owes is made by the command and never left to memory.
 
 import { readdirSync, readFileSync } from "node:fs";
-import { join } from "node:path";
+import { join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
+import { decisionsRegister, docsOf } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import type { RuleEntry } from "../../../../plugin-support-lib/src/lib/rule-mark.ts";
 
 /** One decision or rule that speaks to a subject: its id, its words and where it is read in full. */
@@ -59,8 +60,8 @@ export function candidatesAt(root: string | null): Precedent[] {
   let repos: string[] = [];
   try { repos = root ? readdirSync(root) : []; } catch { /* a root that cannot be listed holds no register */ }
   for (const repo of repos) {
-    const register = join(root!, repo, "docs", "registers", "decisions.md");
-    try { out.push(...decisionsIn(readFileSync(register, "utf8"), `${repo}/docs/registers/decisions.md`)); } catch { /* a repository with no register */ }
+    const register = decisionsRegister(docsOf(join(root!, repo)));
+    try { out.push(...decisionsIn(readFileSync(register, "utf8"), `${repo}/${relative(join(root!, repo), register)}`)); } catch { /* a repository with no register */ }
   }
   try {
     const index = JSON.parse(readFileSync(fileURLToPath(new URL("../../refs/rules.json", import.meta.url)), "utf8")) as { rules?: RuleEntry[] };
