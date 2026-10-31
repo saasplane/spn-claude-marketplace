@@ -339,6 +339,21 @@ export function markWaiting(plan: GoPlan, partId: string, reason: string): GoPla
   return { ...plan, parts: plan.parts.map((part) => (part.id === partId ? { ...part, state: "waiting", waitingOn: reason.trim() } : part)) };
 }
 
+/**
+ * The plan with one hand-marked wait taken off (`go wait <part> --clear`). The part reads `ready` when every part it waits
+ * on in the plan has landed, else `waiting` again, on those parts. The plan given is not changed; a part that is not
+ * waiting, or not in the plan, is refused.
+ */
+export function clearWaiting(plan: GoPlan, partId: string): GoPlan {
+  const one = plan.parts.find((part) => part.id === partId);
+  if (!one) throw new Error(`${partId} is not a part of the plan`);
+  if (one.state !== "waiting") throw new Error(`${partId} is ${one.state}, not waiting`);
+  const open = one.waitsOn.filter((id) => plan.parts.find((part) => part.id === id)?.state !== "landed");
+  const { waitingOn: _held, ...rest } = one;
+  const next: GoPart = open.length ? { ...rest, state: "waiting", waitingOn: `${open.join(", ")}, which has not landed` } : { ...rest, state: "ready" };
+  return { ...plan, parts: plan.parts.map((part) => (part.id === partId ? next : part)) };
+}
+
 /** The parts a helper may be launched for: `ready`, and every part they wait on landed. A `waiting` part is never one. */
 export function readyParts(plan: GoPlan): GoPart[] {
   const landed = new Set(plan.parts.filter((one) => one.state === "landed").map((one) => one.id));

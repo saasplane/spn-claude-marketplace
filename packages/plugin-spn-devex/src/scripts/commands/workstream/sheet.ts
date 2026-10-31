@@ -24,9 +24,24 @@ import { arcNamed, listOf, typed } from "./_shared.ts";
 
 export const describe = "the arc's change sheet: write it whole, edit or drop one entry, show it, check it against the rows and the cards";
 
+/**
+ * The faults of a sheet's `needsRelease` (MKT.HOOKS.322): a list of {repo, release, command}, each a text that says
+ * something. The go reads it to mark a repository's first part waiting on that release; absent is fine.
+ */
+function needsReleaseFaults(sheet: Sheet): string[] {
+  const rows = sheet.needsRelease;
+  if (rows === undefined) return [];
+  if (!Array.isArray(rows)) return ["`needsRelease` is not a list of {repo, release, command}"];
+  return rows.flatMap((row, at) => {
+    const one = (row && typeof row === "object" ? row : {}) as Record<string, unknown>;
+    const missing = ["repo", "release", "command"].filter((field) => typeof one[field] !== "string" || !(one[field] as string).trim());
+    return missing.length ? [`needsRelease[${at}] has no ${missing.join(", ")} as text`] : [];
+  });
+}
+
 /** Each fault of a sheet as the arc would hold it: its schema, and every fact an entry cites being one the arc's facts hold. */
 function writeFaults(ws: string, arc: string, sheet: Sheet, whole: boolean): string[] {
-  const out = sheetFaults(sheet);
+  const out = [...sheetFaults(sheet), ...needsReleaseFaults(sheet)];
   if (whole && sheet.stack === null) out.push("the sheet's `stack` is null — name the folder the tiers run from, the dmo version and the reset");
   const held = new Set(readJsonl(factsFileOf(ws, arc)).map((line) => (line as Fact | undefined)?.id));
   for (const entry of Array.isArray(sheet.entries) ? sheet.entries : [])
@@ -231,6 +246,9 @@ function show(args: string[]): number {
   const lines = entries.map(entryLine);
   const width = Math.max(0, ...lines.map((line) => line.head.length));
   for (const line of lines) console.log(line.tail ? `${line.head.padEnd(width)}   ${line.tail}` : line.head);
+  if (Array.isArray(sheet.needsRelease) && !needsReleaseFaults(sheet).length)
+    for (const need of sheet.needsRelease as { repo: string; release: string; command: string }[])
+      console.log(`needs release · ${need.repo} ${need.release} ships ${need.command}`);
   console.log("--json for every field");
   return 0;
 }
@@ -248,7 +266,7 @@ export function sheetFindings(ws: string, arc: string): string[] {
   const held = new Map(entries.map((entry) => [entry.id, entry]));
   const parents = parentIds(data.rows);
   const leaves = data.rows.filter((row) => !parents.has(row.id));
-  const out: string[] = [];
+  const out: string[] = needsReleaseFaults(sheet);
   const named = new Set<string>();
   for (const row of data.rows) for (const id of row.entries ?? []) {
     named.add(id);

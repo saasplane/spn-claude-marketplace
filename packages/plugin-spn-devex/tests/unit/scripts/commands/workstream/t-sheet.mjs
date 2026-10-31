@@ -314,5 +314,28 @@ console.log("\n=== carried suggestions, precedent, steps from the sheet");
   ok("[MKT.SCRIPTS.324] writing the follow-up again adds no step", twice.code === 0 && json(stateOf("N009")).rows.length === after.length, twice.out);
 }
 
+console.log("\n=== needsRelease: the release a repository's first part waits on (E66, MKT.HOOKS.322)");
+{
+  const sheetPath = join(ws, "arcs", "N009", "sheet.json");
+  const need = { repo: "spn-support-ts", release: "0.9.0", command: "spnutils apps gen-barrel" };
+  const withNeed = sheetOf([entry("E1")], { releaseChain: ["spn-x releases"], needsRelease: [need] });
+  const wrote = sheet("write", "N009", "--file", put("n9-need.json", withNeed));
+  ok("[MKT.HOOKS.322] E66 write keeps a whole needsRelease row", wrote.code === 0 && JSON.stringify(json(sheetPath).needsRelease) === JSON.stringify([need]), wrote.out);
+  const shown = sheet("show", "N009");
+  ok("[MKT.HOOKS.322] E66 show prints the row: repo, release and command", shown.code === 0 && /needs release/.test(shown.out) && shown.out.includes("spn-support-ts") && shown.out.includes("0.9.0") && shown.out.includes("spnutils apps gen-barrel"), shown.out);
+  const before = readFileSync(sheetPath, "utf8");
+  const bad = sheet("write", "N009", "--file", put("n9-bad.json", sheetOf([entry("E1", { what: "" })], { releaseChain: ["spn-x releases"], needsRelease: [{ repo: "spn-support-ts", release: "0.9.0" }, "spn-x"] })));
+  ok("[MKT.HOOKS.322] E66 a malformed row is refused in the one refusal, with the other faults, and nothing is written",
+    bad.code === 1 && bad.out.startsWith("Refused: ") && bad.out.includes("Nothing was written.") && bad.out.includes("E1") && /needsRelease/.test(bad.out) && bad.out.includes("command") && bad.out.split("needsRelease").length > 2 && bad.out.includes(" · ")
+      && readFileSync(sheetPath, "utf8") === before, bad.out);
+  const notList = sheet("write", "N009", "--file", put("n9-bad2.json", sheetOf([entry("E1")], { releaseChain: ["spn-x releases"], needsRelease: "spn-support-ts" })));
+  ok("[MKT.HOOKS.322] E66 a needsRelease that is no list is refused", notList.code === 1 && /needsRelease/.test(notList.out), notList.out);
+  const held = json(sheetPath);
+  writeFileSync(sheetPath, JSON.stringify({ ...held, needsRelease: [{ repo: "spn-support-ts", release: "", command: "x" }] }, null, 2));
+  const checked = sheet("check", "N009");
+  ok("[MKT.HOOKS.322] E66 check finds a malformed row already on the sheet", checked.code === 1 && /needsRelease/.test(checked.out) && checked.out.includes("release"), checked.out);
+  writeFileSync(sheetPath, JSON.stringify(held, null, 2));
+}
+
 console.log(failed ? `\n  ${failed} of ${total} FAILED — sheet` : `\n  all ${total} passed — sheet`);
 process.exit(failed ? 1 : 0);

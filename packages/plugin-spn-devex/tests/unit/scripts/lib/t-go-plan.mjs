@@ -8,7 +8,7 @@ import { join, resolve } from "node:path";
 import { PLUGIN } from "../../../helpers/harness.mjs";
 
 const lib = resolve(PLUGIN, "src", "scripts", "lib");
-const { deriveGo, readyParts, markWaiting, ratesOf, boundOf, testFilesOf, entryHash, changedEntries, staleEntries } = await import(join(lib, "go-plan.ts"));
+const { deriveGo, readyParts, clearWaiting, markWaiting, ratesOf, boundOf, testFilesOf, entryHash, changedEntries, staleEntries } = await import(join(lib, "go-plan.ts"));
 const { goFaults, entryAltitude } = await import(join(lib, "workstream-schema.ts"));
 
 let total = 0, failed = 0;
@@ -129,6 +129,16 @@ same("[MKT.HOOKS.324] a new code part in a repository whose full run landed open
 same("[MKT.HOOKS.324] the second full run waits on the repository's code", secondPlan.parts.find((p) => p.id === "full-lib-repo-2").waitsOn, ["code-lib-repo-1", "code-lib-repo-2"]);
 same("[MKT.HOOKS.324] with no new code part, no second full run", deriveGo(scope, { previous: landedAll }).parts.filter((p) => p.pass === "FULL_RUN").map((p) => p.id), ["full-lib-repo", "full-app-repo"]);
 same("[MKT.HOOKS.324] derived again, the second full run is made once", deriveGo(changed, { previous: secondPlan }).parts.filter((p) => p.id.startsWith("full-lib-repo")).map((p) => p.id), ["full-lib-repo", "full-lib-repo-2"]);
+
+// E67 · a hand-marked wait comes off
+const cleared = clearWaiting(marked, "docs-lib-repo-1");
+same("[MKT.HOOKS.322] clearing a wait with nothing open in the plan reads the part ready, with no reason", [cleared.parts.find((one) => one.id === "docs-lib-repo-1").state, cleared.parts.find((one) => one.id === "docs-lib-repo-1").waitingOn], ["ready", undefined]);
+same("[MKT.HOOKS.322] clearing a wait on a part that is not waiting is refused", (() => { try { clearWaiting(plan, "docs-lib-repo-1"); return "no error"; } catch { return "refused"; } })(), "refused");
+same("[MKT.HOOKS.322] clearing a part not in the plan is refused", (() => { try { clearWaiting(plan, "docs-nowhere-1"); return "no error"; } catch { return "refused"; } })(), "refused");
+const blocked = { ...marked, parts: [...marked.parts.filter((one) => one.id !== "docs-lib-repo-1"), { ...marked.parts.find((one) => one.id === "docs-lib-repo-1"), waitsOn: ["code-nowhere-1"] }, { ...marked.parts[0], id: "code-nowhere-1", state: "ready", waitingOn: undefined }] };
+const stillWaiting = clearWaiting(blocked, "docs-lib-repo-1").parts.find((one) => one.id === "docs-lib-repo-1");
+same("[MKT.HOOKS.322] clearing a wait whose plan parts have not landed reads it waiting on them", [stillWaiting.state, stillWaiting.waitingOn.includes("code-nowhere-1")], ["waiting", true]);
+same("[MKT.HOOKS.322] clearing leaves the plan given unchanged", marked.parts.find((one) => one.id === "docs-lib-repo-1").state, "waiting");
 
 console.log(`\n${total - failed}/${total} passed`);
 process.exit(failed ? 1 : 0);

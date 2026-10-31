@@ -71,6 +71,23 @@ try {
   ok("it prints the checks, then the events, always both", printed.indexOf("Check") >= 0 && printed.indexOf("Event") > printed.indexOf("Check")
     && /spn-devex › docs-face › docs-face/.test(printed) && /PreToolUse/.test(printed) && /Out bytes/.test(printed), printed);
 
+  console.log("\n=== the send-backs (E68, MKT.HOOKS.321)");
+  const back = (session, checks) => JSON.stringify({ at: "2026-10-10T11:00:00Z", session, agent: null, checks });
+  const before = JSON.parse(typed(root, "show", "--json").out);
+  ok("E68 with no sendbacks.jsonl the data form names no check to fix", Array.isArray(before.toFix) && !before.toFix.length, JSON.stringify(before.toFix));
+  writeFileSync(join(telemetry, "sendbacks.jsonl"), [
+    // s1 is cumulative: its last line wins, the first is not added to it.
+    back("s1", { "no-op": { sent: 1, idle: 1 }, half: { sent: 1, idle: 0 } }),
+    back("s1", { "no-op": { sent: 3, idle: 3 }, half: { sent: 2, idle: 1 }, acted: { sent: 2, idle: 0 } }),
+    back("s2", { "no-op": { sent: 1, idle: 0 }, half: { sent: 2, idle: 1 }, acted: { sent: 1, idle: 0 } }),
+    "{ torn line",
+  ].join("\n") + "\n");
+  const fix = JSON.parse(typed(root, "show", "--json").out).toFix;
+  ok("E68 a check with more than half its send-backs followed by no tool call is one to fix", fix?.length === 1 && fix[0].check === "no-op" && fix[0].sent === 4 && fix[0].idle === 3, JSON.stringify(fix));
+  ok("E68 exactly half is not, and a followed check is not", !fix?.some((one) => one.check === "half" || one.check === "acted"));
+  const fixPrinted = typed(root, "show").out;
+  ok("E68 the printed form names it as a check to fix", /to fix/i.test(fixPrinted) && /no-op/.test(fixPrinted) && !/half/.test(fixPrinted.split(/to fix/i)[1] ?? ""), fixPrinted);
+
   console.log("\n=== the words");
   const USAGE = "usage: spn-devex debug hooks show [--json]\n";
   const option = typed(root, "show", "--since", "1");

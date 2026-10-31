@@ -18,7 +18,7 @@ import { basename, join } from "node:path";
 import { type Action, FLAG, VALUE, UsageFault, readWords } from "../../../../../plugin-support-lib/src/lib/command.ts";
 import { isTestCommand } from "../../checks/test-run.ts";
 import {
-  deriveGo, fullRunMinutes, goFileOf, landedEntries, landedMeasures, markWaiting, planScope, readGo, readyParts, ratesOf, staleEntries, unheldEntries,
+  clearWaiting, deriveGo, fullRunMinutes, goFileOf, landedEntries, landedMeasures, markWaiting, planScope, readGo, readyParts, ratesOf, staleEntries, unheldEntries,
   type ScopeSheet,
 } from "../../lib/go-plan.ts";
 import { logEvent, notesDirOf, readArc, readSheet, workspaceOf, writeWhole } from "../../lib/workstream.ts";
@@ -208,12 +208,23 @@ function start(args: string[]): number {
 }
 
 function wait(args: string[]): number {
-  const words = readWords(args, { on: VALUE });
+  const words = readWords(args, { on: VALUE, clear: FLAG });
   const [ref, id, ...more] = words.paths;
   const reason = words.value("on");
-  if (!id || more.length || !reason) throw new UsageFault("takes an arc, one part and what it waits on: `go wait <workstream>/N<nnn> <part> --on \"…\"`.");
+  const clear = words.given("clear");
+  if (!id || more.length || (clear ? !!reason : !reason)) throw new UsageFault("takes an arc, one part and what it waits on, or `--clear`: `go wait <workstream>/N<nnn> <part> --on \"…\"` or `go wait <workstream>/N<nnn> <part> --clear`.");
   const { ws, arc } = arcNamed(ref);
   const plan = planOf(ws, arc);
+  if (clear) {
+    let cleared: GoPlan;
+    try { cleared = clearWaiting(plan, id); } catch (thrown) { console.log(`Refused: ${(thrown as Error).message}. Nothing was changed.`); return 1; }
+    save(ws, arc, cleared);
+    const now = cleared.parts.find((one) => one.id === id)!;
+    logEvent(ws, arc, "go", null, `${id} wait cleared, ${now.state === "ready" ? "ready" : `waiting on ${now.waitingOn}`}`);
+    console.log(`ok · ${arc} ${id} ${now.state === "ready" ? "ready" : `waiting on ${now.waitingOn}`}`);
+    console.log(nextStep(`${basename(ws)}/${arc}`, ws, cleared));
+    return 0;
+  }
   let next: GoPlan;
   try { next = markWaiting(plan, id, reason); } catch (thrown) { console.log(`Refused: ${(thrown as Error).message}. Nothing was changed.`); return 1; }
   save(ws, arc, next);
@@ -228,5 +239,5 @@ export const actions: Record<string, Action> = {
   show: { describe: "print the parts: their files, their tests, their measured time and what each waits on", usage: "<workstream>/N<nnn> [--part <id>] [--json]", run: show },
   check: { describe: "read the plan against the sheets: an entry no part holds, or a part whose entries changed since the plan was written, which it marks held; exits 1 on any", usage: "<workstream>/N<nnn>", run: checkGo },
   start: { describe: "mark a baseline or full run as running, so the test-run check lets the whole suite run", usage: "<workstream>/N<nnn> <part>", run: start },
-  wait: { describe: "mark a part waiting on something outside the plan (a release, a sign-in, another window's hold), with the reason in plain words", usage: "<workstream>/N<nnn> <part> --on \"…\"", run: wait },
+  wait: { describe: "mark a part waiting on something outside the plan (a release, a sign-in, another window's hold), with the reason in plain words; `--clear` takes the wait off, and the part reads ready when what it waits on in the plan has landed", usage: "<workstream>/N<nnn> <part> (--on \"…\" | --clear)", run: wait },
 };

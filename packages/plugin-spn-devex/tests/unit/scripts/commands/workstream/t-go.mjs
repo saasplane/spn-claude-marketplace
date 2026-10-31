@@ -162,6 +162,29 @@ console.log("\n=== wait: a part waits on something outside the plan");
   ok("[MKT.HOOKS.322] go wait without --on is refused", bare.code !== 0 && bare.out.includes("--on"), bare.out);
 }
 
+console.log("\n=== wait --clear: a hand-marked wait comes off (E67)");
+{
+  const snapshot = readFileSync(goFile, "utf8");
+  const stateOf = (id) => json(goFile).parts.find((p) => p.id === id);
+  const opened = go("wait", "N001", "code-spn-x-1", "--clear");
+  ok("[MKT.HOOKS.322] E67 clear reads a part waiting again, on the part not landed, when what it waits on has not landed", opened.code === 0 && stateOf("code-spn-x-1")?.state === "waiting" && String(stateOf("code-spn-x-1")?.waitingOn).includes("baseline-spn-x"), opened.out);
+  go("wait", "N001", "code-spn-x-1", "--on", "a sign-in");
+  const plan = json(goFile);
+  writeFileSync(goFile, JSON.stringify({ ...plan, parts: plan.parts.map((p) => (p.id === "baseline-spn-x" ? { ...p, state: "landed" } : p)) }, null, 2));
+  const cleared = go("wait", "N001", "code-spn-x-1", "--clear");
+  ok("[MKT.HOOKS.322] E67 clear reads the part ready again when what it waits on has landed, and drops the reason", cleared.code === 0 && stateOf("code-spn-x-1")?.state === "ready" && !stateOf("code-spn-x-1")?.waitingOn, cleared.out);
+  ok("[MKT.HOOKS.322] E67 clear ends with the next step", lastLine(cleared.out).startsWith("Next:"), cleared.out);
+  const again = go("wait", "N001", "code-spn-x-1", "--clear");
+  ok("[MKT.HOOKS.322] E67 clearing a part that is not waiting is refused, the plan unchanged", again.code !== 0 && again.out.includes("Refused") && stateOf("code-spn-x-1")?.state === "ready", again.out);
+  go("wait", "N001", "code-spn-x-1", "--on", "a sign-in");
+  go("wait", "N001", "full-spn-x", "--on", "another window's hold");
+  const stays = go("wait", "N001", "full-spn-x", "--clear");
+  ok("[MKT.HOOKS.322] E67 clear reads the part waiting again when what it waits on in the plan has not landed, and says on what (full run waits on the code)", stays.code === 0 && stateOf("full-spn-x")?.state === "waiting" && String(stateOf("full-spn-x")?.waitingOn).includes("code-spn-x-1"), stays.out + JSON.stringify(stateOf("full-spn-x")));
+  const both = go("wait", "N001", "full-spn-x", "--clear", "--on", "x");
+  ok("[MKT.HOOKS.322] E67 --clear with --on is refused", both.code !== 0, both.out);
+  writeFileSync(goFile, snapshot);
+}
+
 console.log("\n=== write: one refusal names every fault");
 {
   const wide = go("write", "N001", "--scope", "N002,N001");
