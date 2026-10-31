@@ -16,6 +16,7 @@ import {
   approachOf, fromWorkstream, logEvent, now, questionsFileOf, readArc, readQuestions, resolveRef, writeJsonl, writeOpenBlocks,
 } from "../../lib/workstream.ts";
 import { isFile } from "../../lib/payload.ts";
+import { runningWorkFault } from "../../checks/questions.ts";
 import { QUESTION_ID, cardFaults, type Card, type Question } from "../../lib/workstream-schema.ts";
 import { afterWrite, arcNamed, arcSignatures, refreshIfMoved, typed } from "./_shared.ts";
 
@@ -59,6 +60,8 @@ function raise(args: string[]): number {
   try { card = JSON.parse(readFileSync(resolve(file), "utf8")); } catch { throw new UsageFault(`reads no JSON at \`${file}\`.`); }
   const faults = [...(typeof card.title === "string" && card.title.trim() ? [] : ["the card has no `title`"]), ...cardFaults(card)];
   if (faults.length) throw new UsageFault(`refuses a card with a part missing: ${faults.join("; ")}.`);
+  const running = runningWorkFault(ws, card.title ?? "", (card.options ?? []).map((option) => option.does));
+  if (running) throw new UsageFault(running);
   const records = readQuestions(ws);
   const page = approachOf(ws);
   const id = nextQuestionId(records, page ? readFileSync(page, "utf8") : "");

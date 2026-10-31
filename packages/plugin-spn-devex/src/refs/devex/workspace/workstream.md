@@ -9,7 +9,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "section": "The reply while work runs shows what needs you, then what moved",
-      "seen": "c0f8d092"
+      "seen": "ab8f9d7d"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/02-workstream.md",
@@ -17,7 +17,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
-      "seen": "ed884641"
+      "seen": "b2917d48"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -389,7 +389,9 @@ goes back to `PROPOSED` and its running steps stop. A closed workstream reopens 
 
 **Say in one line where the new thing went and why** — *"a fix to N006's band buttons, on review fixes:
 N006's goal is unchanged"* — so the developer can move it with one word. Never name a step or an order by
-its number (`RULE.DEVEX.WORKSPACE.312` · MUST · check:workstream-state · due:036/N008).
+its number. **Never cite a part of a go, an entry of a sheet, or a file of an arc's notes either**; an arc
+is named by its number and its title, and a link to a preview or a sample is fine
+(`RULE.DEVEX.WORKSPACE.312` · MUST · check:stop).
 
 **A running step is never edited underneath.** A step that has not started can take the new thing while
 the run goes on. The step running now cannot, because a session is following it as a brief at this moment.
@@ -524,9 +526,22 @@ each with its own cards. Once the answer settles the shape, write the arc row, a
 
 | Reason | What it covers |
 | --- | --- |
-| **a boundary shifts** | the scope of an arc or a workstream, a published contract or interface, the security or trust posture, deleting data, cost or infrastructure, what a user sees |
+| **a boundary shifts** | the scope of an arc or a workstream, a published contract or interface, the security or trust posture, deleting the product's data or a person's, cost or infrastructure, what a user sees. The agent's own measurements, notes and logs are not data in this sense |
 | **information is missing** | a fact that no reading and no measurement can supply |
 | **the choice is people's** | priority, taste, business direction |
+
+**No Needs you line, and no ask a reply ends on, puts to the developer how the work runs**
+(`RULE.DEVEX.WORKSPACE.467` · MUST · check:stop). What `refs/devex/agent/agent.md` § *Who decides what*
+gives the agent, it decides, does, and reports in one line. A **Needs you** line holds a card's
+question, a page to look at, or an act no grant covers. At the end of a turn the stop check reads the
+**Needs you** part and the reply's last paragraph, and sends back a reply that asks leave for, or asks
+a question about, the order of the work, the agent's own measurements or files, its worktrees and
+branches, or an act a grant covers.
+
+**No card and no suggestion is raised about how the work runs** (`RULE.DEVEX.WORKSPACE.468` · MUST ·
+check:questions). `workstream question raise` and `workstream suggestion add` refuse one whose question
+and options are all acts of running the work. In the builder's workspace, a workstream that changes the
+agent may raise one, because there the agent's design is the subject.
 
 **The test for a card is two readings that lead to materially different work, where the choice is
 the developer's to make**, and the three reasons are what *the developer's* means. A design they
@@ -616,7 +631,9 @@ under a heading they no longer read.
 
 **Ask only the questions and suggestions of the workstream you are working on — MUST**
 (`RULE.DEVEX.WORKSPACE.197` · MUST · check:orientation). The cards under **Needs you** are the ones on that workstream's page. A
-card on another workstream's page belongs to the window that works there, so you do not repeat it.
+card on another workstream's page belongs to the window that works there, so you do not name it, even
+to say it is set aside, unless the developer's prompt asked about that card or that workstream. A
+handover's `open:` line holds only this workstream's cards.
 When you help shape an idea and a new workstream is opened from it, that workstream is yours from then
 on, and you ask its cards here. A workstream is yours when a write of this window put its path inside
 the folder, or when your first prompt or a handover named it; a log line that only mentions another
@@ -735,6 +752,11 @@ the handover block only when your reply directs somebody there: it says to open 
 window, or says where the next one starts. A status reply that mentions another window, a release
 order, or what happens later passes no work on, and you write no block for it. The block is written
 once, in the reply that passes the work on, and a later reply in the same window names it in one line.
+
+**The handover is given as markdown, once, as the turn's last message** (`RULE.DEVEX.WORKSPACE.393` ·
+MUST · check:stop). Every fact the block needs is read, and the arc's log line is written, before the
+block is given. A line found after that goes into the one block, never into a second. A block in an
+earlier message of the turn counts as given, and a second block is named as extra.
 
 **A finding on a handover reply is answered without the block.** Fix what the finding names and point
 at the block above it. The check keeps the step rows it read when a whole block was written, and

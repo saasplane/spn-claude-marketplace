@@ -75,6 +75,60 @@ type Check = {
 
 const PROSE_SUFFIXES = [".md", ".html"];
 
+// ---------------------------------------------------------------------------- a handover written before the turn ends
+
+// The lines a handover block is made of (`stop.ts` keeps the full list); a fenced block with three of them is read as one.
+const HANDOVER_LINE = /^(?:continue|model|read first|pins|live now|done when|do not touch|open):/gm;
+
+/**
+ * Where in the transcript the current turn's handover block stands: the line of the turn's prompt when a text
+ * message of the turn already holds a filled-in block, or null. The turn starts at the developer's last prompt of
+ * their own text; a tool result and a Stop hook's feedback do not start one. A block still holding `{{` is a template.
+ */
+export function handoverInTurn(transcript: string): string | null {
+  let raw = "";
+  try { raw = readFileSync(transcript, "utf8"); } catch { return null; }
+  // The fast path: every block carries this label, so a transcript without it holds none.
+  if (!raw.includes("do not touch:")) return null;
+  let turn = -1;
+  let found = false;
+  const lines = raw.split("\n");
+  for (let at = 0; at < lines.length; at += 1) {
+    if (!lines[at].trim()) continue;
+    let entry: { type?: string; isMeta?: boolean; isSidechain?: boolean; message?: { content?: unknown } };
+    try { entry = JSON.parse(lines[at]); } catch { continue; }
+    if (entry.isSidechain) continue;
+    const content = entry.message?.content;
+    if (entry.type === "user" && !entry.isMeta) {
+      const text = typeof content === "string" ? content
+        : Array.isArray(content) ? content.filter((part) => (part as { type?: string }).type === "text")
+            .map((part) => (part as { text?: string }).text ?? "").join("\n") : "";
+      if (text.trim() && !text.startsWith("Stop hook feedback:")) { turn = at; found = false; }
+      continue;
+    }
+    if (entry.type !== "assistant" || !Array.isArray(content)) continue;
+    for (const part of content as Array<{ type?: string; text?: string }>) {
+      if (part.type !== "text" || !part.text || !part.text.includes("do not touch:")) continue;
+      for (const fence of part.text.matchAll(/^ {0,3}(`{3,}|~{3,})[^\n]*\n([\s\S]*?)\n {0,3}\1/gm))
+        if (!fence[2].includes("{{") && (fence[2].match(HANDOVER_LINE)?.length ?? 0) >= 3) found = true;
+    }
+  }
+  return found ? `turn@${turn}` : null;
+}
+
+/** RULE.DEVEX.WORKSPACE.393: a text message of this turn already holds a handover block, so the agent is told once, and the tool still runs. */
+export function checkHandoverLast(payload: Payload & { transcript_path?: string }): Verdict {
+  if (payload.agent_id || !payload.transcript_path) return null;
+  const turn = handoverInTurn(payload.transcript_path);
+  if (!turn) return null;
+  const root = workspaceRoot(payload.cwd ?? process.cwd());
+  if (!root || alreadyTold(root, payload.session_id, "handover-last|turn", turn)) return null;
+  return { note:
+    "A handover block is written and this turn goes on. A handover is the turn's last message, after every read and write. " +
+    "Finish the work, then end with one line that says the block above stands, or with one block that replaces it. " +
+    "Never print both (RULE.DEVEX.WORKSPACE.393)." };
+}
+
 // Cheapest first: a path check before a file read, a file read before a workspace walk.
 //
 // `applies` NO LONGER SAVES AN IMPORT, and it is kept anyway. In Python it decided whether to pay
@@ -116,6 +170,8 @@ const CHECKS: Check[] = [
     applies: (_path, command) => command.includes("workstream") && command.includes("DECIDED") },
   { name: { group: "doc-check", action: "doc-check" }, run: checkDoc, needs: ["command", "file_path"],
     applies: (path, command) => PROSE_SUFFIXES.some((s) => path.endsWith(s) || command.includes(s)) },
+  // A note once a turn, after a handover block: it reads the transcript, and its fast path is the label every block carries.
+  { name: { group: "handover-last", action: "handover-last" }, run: checkHandoverLast, needs: ["any"], applies: () => true },
   // The writes a page or a plugin file is judged for, each by a test of the path first. The two that read
   // a file after the path, the transcript and the drawings, come last.
   { name: { group: "restates-first", action: "restates-first" }, run: checkRestatesFirst, needs: ["file_path"], applies: () => true },

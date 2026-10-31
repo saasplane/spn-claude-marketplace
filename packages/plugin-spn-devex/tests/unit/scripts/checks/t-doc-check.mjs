@@ -870,6 +870,25 @@ console.log("\n=== doc-check — an approach page or a preview keeps nothing of 
   const viaCheck = docCheck.check(approach, "<p>Row 4 lands the doc check.</p>", true);
   say("[MKT.HOOKS.131] red: an Edit of the approach page naming a row is flagged through the doc check",
     viaCheck.some(([grade, text]) => grade === "SOFT" && text.includes("a row, in")), JSON.stringify(viaCheck).slice(0, 300));
+
+  // A chapter's name on a preview: found outside the builder's workspace (SPN_DEVEX_AGENT_WORKSPACE names no
+  // workspace here), passed inside it. The list is partner-words'; the doc check reads it as a SOFT finding.
+  const CHAPTER_TEXT = "<p>The rule is stated in the book, in refs/devex/agent/agent.md, and the Agent chapter says the same.</p>";
+  const PLAIN_TEXT = "<p>The check reads one file and the agent answers in your words.</p>";
+  const softCount = (text) => docCheck.check(preview, page(text)).filter(([grade]) => grade === "SOFT").length;
+  const savedBuilder = process.env.SPN_DEVEX_AGENT_WORKSPACE;
+  try {
+    delete process.env.SPN_DEVEX_AGENT_WORKSPACE;
+    const outsidePlain = softCount(PLAIN_TEXT);
+    const outsideChapter = softCount(CHAPTER_TEXT);
+    say("[MKT.HOOKS.315] red: outside the builder's workspace, a chapter's name on a preview is a SOFT finding",
+      outsideChapter > outsidePlain, `plain ${outsidePlain}, chapter ${outsideChapter}`);
+    process.env.SPN_DEVEX_AGENT_WORKSPACE = WORKSPACE;
+    const insideChapter = softCount(CHAPTER_TEXT);
+    say("[MKT.HOOKS.315] green: inside the builder's workspace the same chapter's name passes", insideChapter <= outsidePlain, `inside ${insideChapter}, plain ${outsidePlain}`);
+  } finally {
+    if (savedBuilder === undefined) delete process.env.SPN_DEVEX_AGENT_WORKSPACE; else process.env.SPN_DEVEX_AGENT_WORKSPACE = savedBuilder;
+  }
 }
 
 console.log(failed ? `\n  ${failed} FAILED` : `\n  all ${n} passed`);

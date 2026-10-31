@@ -780,11 +780,11 @@ console.log("\n=== stop — the hook reads this window's arc rows to tell a prog
     return root;
   };
   one("a progress reply over an older card, while a row is running, is silent",
-    await running("m14-hook-progress"), "silent", { reply: "The book landed.", parity: false, why: "Q49 B" });
+    await running("m14-hook-progress"), "silent", { reply: "The page landed.", parity: false, why: "Q49 B" });
   one("one line for an older card that names its recommended letter is silent",
     build("m14-hook-letter", { pageOpts: { cards: CARD } }),
     "silent", { session: "m14-letter", edit: () => {},
-                reply: "## Needs you\n\nQ1 · a real question — recommendation is A — on the approach page.\n\n## Progress\n\nThe book landed.",
+                reply: "## Needs you\n\nQ1 · a real question — recommendation is A — on the approach page.\n\n## Progress\n\nThe page landed.",
                 parity: false, why: "Q49 B" });
 }
 
@@ -840,8 +840,8 @@ console.log("\n=== 2m — a card is put in full once, at the top of the reply th
 console.log("\n=== 2m — the hook knows which card this turn raised, from the session's last Stop");
 {
   const FULL_Q1 = "## Needs you\n\n### Q1 · a real question\n\n**What** — the drawer, kept or moved.\n\n**Why** — it changes what a user sees.\n\n" +
-    "| | Option | Trade-off |\n| --- | --- | --- |\n| **A** | one way | nothing |\n| **B** | another | a sweep |\n\nRecommendation: A.\n\n## Progress\n\nThe book landed.";
-  const ONE_LINE_Q1 = NEEDS + "The book landed.";
+    "| | Option | Trade-off |\n| --- | --- | --- |\n| **A** | one way | nothing |\n| **B** | another | a sweep |\n\nRecommendation: A.\n\n## Progress\n\nThe page landed.";
+  const ONE_LINE_Q1 = NEEDS + "The page landed.";
   const raise = (root) => {
     const pagePath = join(root, `.spndevex/${WORKSTREAMS}/open/001-a-subject/a-subject-approach.html`);
     writeFileSync(pagePath, page({ cards: CARD }), "utf8");
@@ -1295,7 +1295,7 @@ ${tableOf(cyclesOf(folder))}
     if (!named) writeFileSync(join(ws, "approach.html"), readFileSync(join(ws, "approach.html"), "utf8").replace(/\s*<tr id="N001"[^\n]*<\/tr>/, ""));
     return root;
   };
-  const stop = (root, session, reply = "The book landed.", extra = {}) => {
+  const stop = (root, session, reply = "The page landed.", extra = {}) => {
     bindOpen(root, session);
     return run("node", [HOOK], { cwd: root, session_id: session, last_assistant_message: reply, ...extra }, root);
   };
@@ -1362,7 +1362,7 @@ ${tableOf(cyclesOf(folder))}
   }
   {
     const root = await built("n009-held-reply", { named: false });
-    const out = stop(root, "held-reply", "The book landed.\n\nPick B and we move on.");
+    const out = stop(root, "held-reply", "The page landed.\n\nPick B and we move on.");
     check("known-bad: a decision put with no card still sends the agent back while a row is running", /\[reply-shape\]/.test(out), out);
     check("and the finding about the page is held in that same turn", !/\[state\]/.test(out), out);
     land(root, "held-reply");
@@ -1376,13 +1376,13 @@ ${tableOf(cyclesOf(folder))}
       /\[handover\]/.test(out) && !/\[state\]/.test(out), out);
   }
   {
-    const ABOUT_THE_REPLY = ["needs-you", "reply-shape", "handover", "welcome"];
+    const ABOUT_THE_REPLY = ["needs-you", "reply-shape", "handover", "welcome", "how-it-runs", "partner-words"];
     const THE_REST = ["notes", "carried", "stopped-no-card", "page-stale", "state", "own-copy", "runnable", "hold", "corpus"];
     const all = [...ABOUT_THE_REPLY, ...THE_REST].map((name) => ({ check: name, message: `the ${name} finding, whole` }));
     const names = (list) => list.map((warning) => warning.check).join(" ");
     const split = typeof splitFindings === "function" ? splitFindings : () => ({ said: [], held: [] });
     const running = split(all, true), waiting = split(all, false);
-    check("while a row is running, the four findings about the reply are said", names(running.said) === ABOUT_THE_REPLY.join(" "), names(running.said));
+    check("[MKT.HOOKS.319] while a row is running, the findings about the reply are said, how-it-runs and partner-words among them", names(running.said) === ABOUT_THE_REPLY.join(" "), names(running.said));
     check("and every other finding is held, with its message as it was", names(running.held) === THE_REST.join(" ")
       && running.held.every((warning) => warning.message === `the ${warning.check} finding, whole`), names(running.held));
     check("with no row running, every finding is said and none is held", names(waiting.said) === names(all) && waiting.held.length === 0, names(waiting.held));
@@ -1694,8 +1694,27 @@ console.log("\n=== stop — the checks the first round fixed or wired, and the g
     const answered = call("checkCardsNamed", "## Needs you\n\nQ1 · which way the probe goes — on the approach page.\n\n## Progress\n\nThe checks are green.", root, mine);
     check("[MKT.HOOKS.115] known-bad: Needs you putting a card already answered is named",
       answered.length === 1 && answered[0].message.includes("Needs you names Q1, and 031-probe has answered it"), JSON.stringify(answered));
-    check("[MKT.HOOKS.115] an open card of the window, and another workstream's card named with it, pass",
-      call("checkCardsNamed", "Q2 · where it lands is open, and Q7 of 032-other waits there.", root, mine).length === 0);
+    check("[MKT.HOOKS.115] an open card of the window passes",
+      call("checkCardsNamed", "Q2 · where it lands is open.", root, mine).length === 0);
+    const withName = call("checkCardsNamed", "Q2 · where it lands is open, and Q7 of 032-other waits there.", root, mine);
+    check("[MKT.HOOKS.318] another workstream's card named with its workstream is sent back all the same",
+      withName.some((one) => one.message.includes("Q7, which belongs to 032-other")), JSON.stringify(withName));
+    const inWords = call("checkCardsNamed", "The release is done. 032-other has an open question about the plugins.", root, mine);
+    check("[MKT.HOOKS.318] another workstream's cards in words are sent back",
+      inWords.length === 1 && inWords[0].message.includes("names the cards of another workstream"), JSON.stringify(inWords));
+    const OPEN_LINE = (open) => ["Pick this up in a new window.", "", "```text", "continue:     workstream `031-probe`, arc `N001`, row 2", "open:         " + open, "```"].join("\n");
+    const onLine = call("checkCardsNamed", OPEN_LINE("Q7 — another question"), root, mine);
+    check("[MKT.HOOKS.318] another workstream's card on the open line is sent back",
+      onLine.length >= 1 && onLine.some((one) => one.message.includes("Q7")), JSON.stringify(onLine));
+    const lineByName = call("checkCardsNamed", OPEN_LINE("032-other has one"), root, mine);
+    check("[MKT.HOOKS.318] another workstream named on the open line is sent back", lineByName.length >= 1, JSON.stringify(lineByName));
+    check("[MKT.HOOKS.319] a reply to a prompt that names the card passes",
+      call("checkCardsNamed", "Q7 is still open.", root, mine, "what is Q7 about?").length === 0);
+    check("[MKT.HOOKS.319] a reply to a prompt that names the workstream passes, by number or by folder",
+      call("checkCardsNamed", "Q7 of 032-other waits there.", root, mine, "how is 032-other going?").length === 0
+        && call("checkCardsNamed", "032-other has an open question.", root, mine, "how is 032 going?").length === 0);
+    check("[MKT.HOOKS.319] and the open line passes where the prompt named that workstream",
+      call("checkCardsNamed", OPEN_LINE("Q7 — another question"), root, mine, "carry on with 032").length === 0);
     check("[MKT.HOOKS.115] a report of an answered card outside Needs you passes", call("checkCardsNamed", "Q1 was answered A.", root, mine).length === 0);
   }
   {
@@ -1712,6 +1731,30 @@ console.log("\n=== stop — the checks the first round fixed or wired, and the g
       count.length === 1 && count[0].message.startsWith("This close opens with a count"), JSON.stringify(count));
     const prose = call("checkHandover", "The checks now stop the agent where it was told before, and the cost of each is measured.\n\nThe workstream is closed.", ROOT, mine);
     check("[MKT.HOOKS.116] a close that opens with what was delivered passes", prose.length === 0, JSON.stringify(prose));
+    // A handover block in an earlier message of the turn counts as given (RULE.DEVEX.WORKSPACE.393).
+    const BLOCK = ["The work is done.", "", "```text", "continue:     workstream `001-a-subject`, arc `N001`, step 1",
+      "model:        Opus 5.5, effort high", "read first:   `approach.html#N001`", "pins:         spn-x abc1234", "live now:     no reload",
+      "done when:    the suite passes", "do not touch: the templates folder", "open:         none", "```"].join("\n");
+    const PASS_ON = "Pick this up in a new window.";
+    const owed = call("checkHandover", PASS_ON, ROOT, mine);
+    check("[MKT.HOOKS.316] known-bad: a pass-on with no block anywhere in the turn is sent back", owed.length >= 1, JSON.stringify(owed));
+    const early = call("checkHandover", PASS_ON, ROOT, mine, false, [BLOCK]);
+    check("[MKT.HOOKS.316] a block in an earlier message of the turn counts as given: no second one is asked for", early.length === 0, JSON.stringify(early));
+    const twice = call("checkHandover", `${BLOCK}\n\n${PASS_ON}`, ROOT, mine, false, [BLOCK]);
+    check("[MKT.HOOKS.316] known-bad: a second block is named as the extra one",
+      twice.length === 1 && twice[0].message.includes("two handover blocks") && twice[0].message.includes("The second is the extra one"), JSON.stringify(twice));
+    // turnOf reads the prompt and every earlier text message of the turn from the transcript.
+    const transcript = join(ROOT, "turn.jsonl");
+    const entry = (type, content) => JSON.stringify({ type, message: { content } });
+    writeFileSync(transcript, [
+      entry("user", "an older prompt"), entry("assistant", [{ type: "text", text: "an older reply" }]),
+      entry("user", "how is 032-other going?"),
+      entry("assistant", [{ type: "text", text: BLOCK }]), entry("assistant", [{ type: "tool_use", name: "Bash" }]),
+      entry("assistant", [{ type: "text", text: PASS_ON }]),
+    ].join("\n") + "\n");
+    const turn = call("turnOf", transcript, PASS_ON);
+    check("[MKT.HOOKS.316] the turn is the last prompt of the developer's with the text messages before the reply",
+      turn.prompt === "how is 032-other going?" && Array.isArray(turn.earlier) && turn.earlier.length === 1 && turn.earlier[0] === BLOCK, JSON.stringify(turn));
   }
   {
     const settings = (allow) => `${JSON.stringify({ permissions: { allow, ask: [], deny: [] } }, null, 2)}\n`;
@@ -1719,8 +1762,8 @@ console.log("\n=== stop — the checks the first round fixed or wired, and the g
       [`.spndevex/${WORKSTREAMS}/open/001-a-subject/a-subject-approach.html`]: page({}),
       ".claude/settings.local.json": settings(["Bash(gh pr merge * --repo saasplane/* --merge --admin)"]),
     });
-    one("[MKT.HOOKS.117] the turn's end runs standing-grant on the reply: an ask the grant allows is sent back", root, "warns",
-      { says: "[standing-grant]", reply: "The checks are green.\n\nShall I merge the pull request now?" });
+    one("[MKT.HOOKS.117] the turn's end runs how-it-runs on the reply: an ask the grant allows is sent back", root, "warns",
+      { says: "[how-it-runs]", reply: "The checks are green.\n\nShall I merge the pull request now?" });
     one("[MKT.HOOKS.117] and a fenced block quoting such an ask is not read", root, "silent",
       { reply: "The checks are green.\n\n```text\nShall I merge the pull request now?\n```" });
     one("[MKT.HOOKS.119] the turn's end runs page-path on the reply: a page handed over by its bare name is sent back", root, "warns",

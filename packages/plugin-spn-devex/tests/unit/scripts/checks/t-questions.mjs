@@ -116,5 +116,30 @@ console.log("\n=== a preview's Open follows the records on every write");
     kept.includes("spn:generated open") && cardsOn(kept).some((card) => card.id === "q2"), JSON.stringify(cardsOn(kept).map((card) => card.id)));
 }
 
+console.log("\n=== a card that asks how the work runs is refused at raise, unless the workstream changes the agent");
+{
+  const RUNS = { ...CARD, title: "Discard the develop baseline?", options: [{ key: "A", does: "Keep the baseline", costs: "little" }, { key: "B", does: "Take the baseline again", costs: "more" }] };
+  // A workstream like 035: its arc reaches spn-x only, even in the builder's workspace.
+  const plain = await dataWorkspace("questions-baseline");
+  put(plain.root, "runs.json", JSON.stringify(RUNS));
+  const refused = cli(plain.root, ["workstream", "question", "raise", "031/N001", "--file", "runs.json"], { SPN_DEVEX_AGENT_WORKSPACE: plain.root });
+  ok("[MKT.HOOKS.311] the baseline card is refused at raise in a workstream whose arc does not reach the marketplace",
+    refused.code !== 0 && refused.out.includes("it asks how the work runs") && readQuestions(plain.ws).length === 0, refused.out);
+  put(plain.root, "card.json", JSON.stringify(CARD));
+  const goalAgain = cli(plain.root, ["workstream", "question", "raise", "031/N001", "--file", "card.json"], { SPN_DEVEX_AGENT_WORKSPACE: plain.root });
+  ok("[MKT.HOOKS.311] a card about a goal is raised in the same workstream", goalAgain.code === 0 && /^q1 · open/.test(goalAgain.out), goalAgain.out);
+
+  // A design card in a builder workstream with an arc in spn-claude-marketplace.
+  const row = (id, repo) => ({ id, parent: "N001", title: `row ${id}`, kind: "change", repo, altitude: "CODE", blockedBy: [], touches: [`marketplace:${id}`], state: "waiting" });
+  const builder = await dataWorkspace("questions-builder", { rows: [row("1", "spn-claude-marketplace")] });
+  put(builder.root, "runs.json", JSON.stringify(RUNS));
+  const design = cli(builder.root, ["workstream", "question", "raise", "031/N001", "--file", "runs.json"], { SPN_DEVEX_AGENT_WORKSPACE: builder.root });
+  ok("[MKT.HOOKS.312] a design card is raised in a builder workstream with an arc in spn-claude-marketplace", design.code === 0 && /^q1 · open/.test(design.out), design.out);
+  const outside = await dataWorkspace("questions-outside", { rows: [row("1", "spn-claude-marketplace")] });
+  put(outside.root, "runs.json", JSON.stringify(RUNS));
+  const away = cli(outside.root, ["workstream", "question", "raise", "031/N001", "--file", "runs.json"], { SPN_DEVEX_AGENT_WORKSPACE: "" });
+  ok("[MKT.HOOKS.312] the same arc outside the builder's workspace is still refused", away.code !== 0 && away.out.includes("it asks how the work runs"), away.out);
+}
+
 console.log(failed ? `\n  ${failed} of ${total} FAILED — questions` : `\n  all ${total} passed — questions`);
 process.exit(failed ? 1 : 0);

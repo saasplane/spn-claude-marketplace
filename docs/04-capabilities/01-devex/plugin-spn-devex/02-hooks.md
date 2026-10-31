@@ -195,7 +195,7 @@
 ### A handover block is asked for once
 
 **Why** — *a handover block is written once, in the reply that passes the work on* (the book's RULE.DEVEX.WORKSPACE.189 and RULE.DEVEX.WORKSPACE.198). The check had no memory of a block. Any later reply that named the next window was told to write the block again, and so was the reply that answered another finding on the handover reply. A pass-on over an open card was told to put the card in full.
-**What** — when a reply holds a whole block, the baseline keeps a hash of the step rows of this window's arcs. While those rows have not moved, a pass-on with no block draws no finding. Once they move, the old block no longer says where to start, and a block is owed again. A block printed a second time is still read. A pass-on while a card is open is asked to name each open card in one line, on the block's `open:` line, and never to put it in full.
+**What** — the finding reads every text message of the turn from the transcript, not only the last: a block written in an earlier message counts as given, so no second one is asked for, and a turn with two blocks is told which was extra. Before a tool call, when a text message of the current turn holds a handover block, the agent is told once that the handover is the turn's last message; the tool still runs (RULE.DEVEX.WORKSPACE.393). When a reply holds a whole block, the baseline keeps a hash of the step rows of this window's arcs. While those rows have not moved, a pass-on with no block draws no finding. Once they move, the old block no longer says where to start, and a block is owed again. A block printed a second time is still read. A pass-on while a card is open is asked to name each open card in one line, on the block's `open:` line, and never to put it in full.
 **How** — `givesHandover` reads a filled-in block with all nine labels. `stepsMark` hashes the step-row hashes of the arcs in the window's workstreams. `checkHandover` takes the answer as its fourth argument. A reply that puts a whole card is still left alone, because it asks a question and hands nothing over. `packages/plugin-spn-devex/src/scripts/events/stop.ts`, proven in `packages/plugin-spn-devex/tests/unit/scripts/events/t-stop.mjs`.
 
 ### A page left stale is named before the turn ends
@@ -228,11 +228,26 @@
 **What** — a call that moves an arc to `DECIDED` is refused when the words it quotes appear in no prompt of this window and in no log line of the workstream. The message names the arc and the quoted words, and asks for the developer's own, as they wrote them.
 **How** — `packages/plugin-spn-devex/src/scripts/checks/arc-status.ts`, an entry in the `CHECKS` list of `pretooluse.ts`.
 
-### An ask for leave the developer already gave is refused
+### How the work runs
 
-**Why** — *a reply that asks leave for an act a grant allows costs the developer a turn for nothing* (RULE.DEVEX.WORKSPACE.069 · MUST).
-**What** — at the turn's end, a reply that closes by asking leave for a merge, a push, a commit, a pull request or a minor release is refused when a rule of the floor already allows that act. The message names the rule and the settings file it sits in, and says to do the act now.
-**How** — the allow rules are read from `.claude/settings.json` and `.claude/settings.local.json`. `packages/plugin-spn-devex/src/scripts/checks/standing-grant.ts`, a check of the turn's end in `stop.ts`.
+**An ask about how the work runs is refused.**
+**Why** — *the developer decides what is built and the agent decides how the work runs, so an ask about the second costs a turn for nothing* (RULE.DEVEX.AGENT.159, RULE.DEVEX.WORKSPACE.069 · MUST, RULE.DEVEX.WORKSPACE.467).
+**What** — at the turn's end, a **Needs you** part or the reply's last paragraph that asks about the order of the work, the agent's own measurements, its files, its workspace, or an act a grant covers is sent back, and the agent is told to decide it and say the outcome. An ask is a leave-asking phrase, a go for, or a question mark. A card's line, a page to look at, an act no grant covers, a boundary and a new workstream pass. The message names the act and, for an act a grant covers, the rule and the settings file that holds it.
+**How** — the allow rules are read from `.claude/settings.json` and `.claude/settings.local.json`. `packages/plugin-spn-devex/src/scripts/checks/how-it-runs.ts`, a check of the turn's end in `stop.ts`. It takes the acts and the reading of the settings that `standing-grant.ts` held, and the list of acts is the one the questions check reads at raise.
+
+### Cards at raise
+
+**A card about how the work runs is refused at raise.**
+**Why** — *a card about running the work puts the agent's decision on the developer* (RULE.DEVEX.WORKSPACE.468).
+**What** — raising a question card, or adding a suggestion, whose title and every option are acts of running the work is refused with its reason, before the record is written. In the builder's workspace, a workstream with an arc in `spn-claude-marketplace` passes, since the agent's design is then the subject.
+**How** — `workstream question raise` and `workstream suggestion add` ask `checks/questions.ts`, which reads how-it-runs' list of acts. `packages/plugin-spn-devex/src/scripts/checks/questions.ts`.
+
+### A partner's words
+
+**A partner is not told about the book.**
+**Why** — *a partner holds the plugins and not the book, so a reply that cites ours cannot be followed* (RULE.DEVEX.AGENT.160).
+**What** — outside the builder's workspace, a reply's prose outside code blocks that names a rule, decision or behaviour id of ours, a book, chapter or refs path, a skill step, or a hook or check by name, or that says an ask conflicts with them, is sent back. The partner's own ids, their files, SaaS Plane by name, code blocks and a reply to a prompt that named the book pass. The builder's workspace is not read. An approach page and a preview are read for the same list by the doc check, as a soft finding.
+**How** — `packages/plugin-spn-devex/src/scripts/checks/partner-words.ts`, a check of the turn's end in `stop.ts` and of the doc check in `doc-check.ts`, which share the one list.
 
 ### A page is handed over as its whole `file:///` address
 
@@ -333,7 +348,7 @@
 ### The turn's end sends the agent back on what the developer reads
 
 **Why** — *the developer reads the reply, and a rule that only warns about it is a rule nothing keeps* (RULE.DEVEX.WORKSPACE.189 · MUST, RULE.DEVEX.WORKSPACE.197 · MUST).
-**What** — four checks of the turn's end refuse in this section and not warn. `runnable` refuses a reply that ends on a promise of the next step while an arc this window works on is decided, has a ready row and no open card. `reply-shape` also refuses a **Needs you** part that names a card or a suggestion by its number alone, and a reply that names a row or order number, an order's file, a bare suggestion number, a rule id or a check's file name: it is flagged back with the sentence to rewrite. An arc number, and a card's number beside its words, pass. `cards` refuses a reply that names a question card no page of this window's workstream carries, one already answered, or one of another workstream. `handover` also refuses a close or a handover that opens with a table, a hash heading or a count, or that has no paragraph on what was delivered and what was learned (RULE.DEVEX.WORKSPACE.206 · MUST). The doc check takes the same list of working detail for a write to an approach page or a preview.
+**What** — four checks of the turn's end refuse in this section and not warn. `runnable` refuses a reply that ends on a promise of the next step while an arc this window works on is decided, has a ready row and no open card. `reply-shape` also refuses a **Needs you** part that names a card or a suggestion by its number alone, and a reply that names a row or order number, an order's file, a bare suggestion number, a rule id, a check's file name, a named part of a go, an entry such as E7, or a path into an arc's notes work, orders or scripts: it is flagged back with the sentence to rewrite. An arc number, a card's number beside its words, and a link to a preview or a sample, pass. `cards` refuses a reply that names a question card no page of this window's workstream carries, one already answered, or one of another workstream, by number or in words, even with its workstream named, and on the `open:` line too, unless the turn's prompt names that card or workstream (RULE.DEVEX.WORKSPACE.197). `handover` also refuses a close or a handover that opens with a table, a hash heading or a count, or that has no paragraph on what was delivered and what was learned (RULE.DEVEX.WORKSPACE.206 · MUST). The doc check takes the same list of working detail for a write to an approach page or a preview.
 **How** — the four checks sit in `packages/plugin-spn-devex/src/scripts/events/stop.ts` and `checks/questions.ts`.
 
 ### A page is judged by the template and by the book
