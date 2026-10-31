@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "book": {
     "repository": "spn-foundation",
-    "commit": "96a0ff14"
+    "commit": "7cf70526"
   },
   "rules": [
     {
@@ -17762,7 +17762,7 @@
         "skill": "spn-apps/implement"
       },
       "class": "stated in a skill",
-      "sentence": "The tier reaches only what the local stack provides",
+      "sentence": "The integration tier reaches only what the local stack provides",
       "chapter": "04-capabilities/02-support/02-apps/06-tests/01-server/02-integration.md",
       "heading": "The entry condition",
       "decision": null,
