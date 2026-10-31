@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/02-apps/06-tests.md",
-      "seen": "7307c2b3"
+      "seen": "4322e8b8"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/06-tests/",
-      "seen": "5fe0fc5b"
+      "seen": "d4819ed9"
     }
   ]
 }
@@ -29,7 +29,7 @@ Five tiers, each buying something the others cannot. When you place a case, pick
 | --- | --- | --- | --- |
 | `UNIT` | a rule, a transformation, or a rendering decision, in isolation | that any of it is wired to anything | nothing running; doubles at seams the code owns |
 | `COMPONENT` | what a rendering harness cannot compute — styles, mode flips, layout at real breakpoints, hover and portals, visual change | that anything is wired to anything | a real browser, real CSS, no application |
-| `INTEGRATION` | the code against its real backing resource — scoping, isolation, invalidation, delivery | that a caller can reach it, or may | a freshly migrated resource, provisioned for the run |
+| `INTEGRATION` | the code against its real backing resource — scoping, isolation, invalidation, delivery | that a caller can reach it, or may | a freshly migrated resource, provisioned for the run, and only what the local stack provides — never a hosted registry, repository or marketplace (`RULE.SUPPORT.APPS.248` · MUST · skill:spn-apps/implement) |
 | `CONTRACT` | the published surface under a real principal — gates, error shapes, read levels, compatibility | why a person gave up halfway through | a running application reached the way consumers reach it |
 | `JOURNEY` | a person completing an outcome through a real entry | which rule failed when it fails | a quiesced running stack |
 
@@ -52,7 +52,7 @@ Derive the tier — never debate it. A project's kind fixes its consumer, and th
 | `MODULE_WEB` | unit | ships no shell on the other face — cites a journey of the composing application; may carry a component tier it does not owe, in `tests/component/`, with the scaffold's `playwright-ct.config.ts` (`RULE.SUPPORT.APPS.134` · MUST · skill:spn-apps/implement) |
 | `APP_SERVER` | contract | it is the runtime, so it owns the API face of every behaviour it composes · **no journey** — a journey is a person at a screen, and an `APP_SERVER` deploys none |
 | `APP_WEB` | journey · component | it is the runtime, so it owns the UI face — actions, states, refusals, whether a screen is offered |
-| `APP_UTILITY` | unit · integration | integration is the invoked command, end to end |
+| `APP_UTILITY` | unit · integration | integration is the invoked command, end to end, against the local stack alone · may carry a journey, a person at the terminal against the published world, in `tests/journeys/` under its own `jest.config.journey.cjs`, which `apps release` runs once the tag is pushed |
 | `CLIENT_API` | contract | against a running service — the suite is its service's contract tier, sits in `tests/contract/` (the only kind that carries that folder, laid out by the service's modules), and reports under that name |
 
 **Read the owed set as a floor, never a ceiling.** A node carrying more than it owes is correct rather than in breach, and the tiers a node can actually run are the tiers it has cases for — if you derive from the ladder alone and delete a working suite that went beyond it, you have deleted proof the project actually had. **A tier declared with no cases behind it is a finding, not a pass.** A target naming a tier the node holds no cases for reports green every run, and every row resting on that tier reads as covered when it is not — either the node owes those cases and nobody wrote them, or the tier was declared by copying a sibling; the first is a gap, the second is a deletion, and neither is served by a green tick.
