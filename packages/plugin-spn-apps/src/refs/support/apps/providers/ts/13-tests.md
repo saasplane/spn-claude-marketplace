@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/10-providers/ts/13-tests.md",
-      "seen": "ba0be14f"
+      "seen": "0f1ce807"
     }
   ]
 }
@@ -21,8 +21,8 @@
 | unit | Jest on the server, Vitest on the web | one unit, nothing real behind it |
 | component | Playwright component testing | one component rendered, in a browser |
 | contract | the generated client against a live service | that the published surface is what the client believes |
-| integration | Testcontainers | the node against a real resource it fronts |
-| journey | Playwright against a running stack | a path a person takes, end to end |
+| integration | Testcontainers, or a working folder for a CLI | the node against a real resource it fronts, on the local stack alone |
+| journey | Playwright against a running stack; for a CLI, Jest from its own `jest.config.journey.cjs`, which `apps release` runs once the tag is pushed | a path a person takes, end to end — a CLI's against the published world |
 
 **A `MODULE_WEB` that carries a component tier keeps its suites in `tests/component/**/*.ct.spec.tsx`**, the folder of the tier they answer to, and a browser case never sits under `tests/unit/` behind an override.
 
