@@ -85,6 +85,10 @@ function brief(plan: GoPlan, part: GoPart, ws: string, root: string): string {
     ...part.entries.map((ref) => `- \`${ref}\`: \`workstream sheet show ${ref.split("/")[0]}\` prints it whole`), "",
     "## Acceptance", "",
     ...(part.tests.length ? part.tests.map((file) => `- \`node ${file}\`, run directly, never a whole suite`) : ["- the part names no test file of its own"]), "",
+    "## Report", "",
+    "Its front matter is what `workstream report write` folds into the plan:", "",
+    "```text", "---", `go: "${plan.lead}"`, `part: "${part.id}"`, "outcome: landed · stopped · needs-you",
+    'proof: "<what you ran, and what it printed>"', "commits: {}", "followUps: []", "cost: { tokens: <n>, minutes: <n> }", "---", "```", "",
   ];
   return `${lines.join("\n")}\n`;
 }
