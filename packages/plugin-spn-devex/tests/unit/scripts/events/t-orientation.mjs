@@ -971,15 +971,17 @@ console.log("\n=== orientation — the fetch, the behind-develop clause and the 
   says("known-bad: the ground and the way's principles are not carried",
     !big.context.includes("### Repositories") && !big.context.includes("Start from what the thing is for"));
 
-  // THE DEBUG GROUP'S COMMANDS, one line each under the pointer line, rendered from the same command tree as `refs/commands.md`.
+  // THE DEBUG GROUP'S COMMANDS: the block is rendered from the same command tree as `refs/commands.md`, and with
+  // the short rules an ordinary start is past the ceiling, so the block is the first left out (036 N010, Q11 A).
   const { commandsRef } = await import("../../../../src/scripts/cli.ts");
   const treeDebug = (await commandsRef()).split("\n").filter((one) => one.startsWith("spn-devex debug "));
   const shown = big.context.split("\n").filter((one) => one.startsWith("spn-devex debug "));
-  says(`the session start lists the eight debug commands, ${shown.length} lines`, shown.length === 8 && treeDebug.length === 8);
-  says("and each line is the one the command tree renders, in the tree's order, arguments included",
-    JSON.stringify(shown) === JSON.stringify(treeDebug) && shown.every((one) => /^spn-devex debug \w+ \w+/.test(one)), shown.join("\n"));
-  says("and they sit right after the pointer line to `refs/commands.md`",
-    big.context.includes("read it before a window's first write of a command.\n\n" + treeDebug.join("\n") + "\n\n"));
+  says(`the command tree renders the eight debug commands, ${treeDebug.length} lines`,
+    treeDebug.length === 8 && treeDebug.every((one) => /^spn-devex debug \w+ \w+/.test(one)), treeDebug.join("\n"));
+  says(`past the ceiling an ordinary start leaves the debug lines out first, ${shown.length} lines`,
+    shown.length === 0 && big.context.length <= SESSION_START_CEILING + 200);
+  says("and names `refs/commands.md` as read on asking",
+    /Left out to stay inline, read on asking: [^\n]*`refs\/commands\.md`/.test(big.context), big.context.slice(-400));
   says("and no other command line is carried", !big.context.includes("spn-devex workstream ") && !big.context.includes("spn-devex docs "));
 }
 

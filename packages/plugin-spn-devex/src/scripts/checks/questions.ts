@@ -14,8 +14,10 @@ import { readFileSync } from "node:fs";
 import { basename, join, resolve } from "node:path";
 import { type Payload, type Verdict } from "../lib/payload.ts";
 import {
-  approachOf, blockAt, cardHtml, fromWorkstream, isDataLayout, readQuestions, workstreamAround,
+  approachOf, arcIdsOf, arcRepos, blockAt, cardHtml, fromWorkstream, isDataLayout, readArc, readQuestions, workspaceOf, workstreamAround,
 } from "../lib/workstream.ts";
+import { isBuilderWorkspace } from "../events/orientation.ts";
+import { runsTheWork } from "./how-it-runs.ts";
 import { type Question } from "../lib/workstream-schema.ts";
 
 export type CardOnPage = { id: string; html: string; from: number; inBlock: boolean };
@@ -98,6 +100,32 @@ export function cardsDiffer(ws: string, records: readonly Question[] = readQuest
         out.push(`${record.id} is shown in ${name} by its record, and its card is not there`);
   }
   return out;
+}
+
+/** Whether the workstream changes the agent itself: the builder's workspace, and an arc that reaches the marketplace. */
+function agentIsTheSubject(ws: string): boolean {
+  const root = workspaceOf(ws);
+  if (!root || !isBuilderWorkspace(root)) return false;
+  return arcIdsOf(ws).some((arc) => {
+    const data = readArc(ws, arc);
+    return !!data && arcRepos(data).includes("spn-claude-marketplace");
+  });
+}
+
+/**
+ * The refusal for a card or suggestion that asks how the work runs, or null. It is refused when its title and every
+ * option are acts of running the work (how-it-runs' list); a workstream that changes the agent passes whole.
+ *
+ * @param ws       the workstream the card or suggestion is raised in
+ * @param title    its title
+ * @param options  what each option does, empty for a suggestion
+ */
+export function runningWorkFault(ws: string, title: string, options: readonly string[] = []): string | null {
+  const kinds = [title, ...options].map((one) => runsTheWork(one));
+  if (kinds.some((one) => one === null) || agentIsTheSubject(ws)) return null;
+  return `Refused: it asks how the work runs. Its question${options.length ? " and every option are" : " is"} acts the agent decides ` +
+    `(${[...new Set(kinds)].join(", ")}). Decide it, log it in the arc, and say the outcome in one line. ` +
+    `A card is for a goal, a construct, a requirement or a boundary (RULE.DEVEX.WORKSPACE.468).`;
 }
 
 /** The pages a hand-made card is judged on: the approach page and a preview, in a workstream kept as data. */

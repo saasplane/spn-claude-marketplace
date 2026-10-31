@@ -1,7 +1,7 @@
 // The agent's working detail a reader never sees: the numbers and file names it keeps for itself while it
 // works. A reply, an approach page and a preview speak in goals and in the developer's words, so a sentence
 // that names a row or order number, an order's file, a suggestion by its number alone, a rule id or a check's
-// file name is sent back to be rewritten. An arc number, and a card number beside its words, are the reader's
+// file name, a named part of a go, an entry or a path into an arc's notes is sent back to be rewritten. An arc number, and a card number beside its words, are the reader's
 // own and pass. One list serves the turn's end (`events/stop.ts`) and the doc check (`checks/doc-check.ts`).
 
 /** One sentence that holds working detail, and the kind of detail it holds. */
@@ -17,6 +17,9 @@ const DETAIL: ReadonlyArray<{ kind: string; found: RegExp }> = [
   { kind: "order file", found: /\borders\/\d+(?:\.report)?\.md\b|\b\d+\.report\.md\b/ },
   { kind: "suggestion", found: BARE_SUGGESTION },
   { kind: "rule", found: /\bRULE\.[A-Z]+(?:\.[A-Z]+)*\.\d+\b/ },
+  { kind: "part", found: /\b(?:baseline|docs|code|full|generated|release)-spn-[a-z0-9]+(?:-[a-z0-9]+)*\b/ },
+  { kind: "entry", found: /\b(?:N\d+\/)?E\d+\b/ },
+  { kind: "notes file", found: /\bnotes\/N\d+[a-z]?\/(?:work|orders|scripts)\/[\w./-]*|\b(?:work|orders|scripts)\/[\w-]+\.[a-z]+\b/ },
   { kind: "check file", found: /\bchecks\/[\w-]+\.ts\b|\b[a-z][a-z0-9]*(?:-[a-z0-9]+)+\.ts\b/ },
 ];
 

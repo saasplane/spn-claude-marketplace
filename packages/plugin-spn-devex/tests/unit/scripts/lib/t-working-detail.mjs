@@ -26,6 +26,11 @@ console.log("=== each kind of working detail is found with its sentence");
   ok("[MKT.HOOKS.113] a check's file name is found", kinds("The fix is in standing-grant.ts now.") === "check file", kinds("The fix is in standing-grant.ts now."));
   const two = findWorkingDetail("Row 4 is done. Nothing else changed. Order 5 follows.");
   ok("[MKT.HOOKS.113] two sentences with detail are two findings, and the plain one none", two.length === 2 && two[1].sentence === "Order 5 follows.", JSON.stringify(two));
+  ok("[MKT.HOOKS.113] a named part of a go is found", kinds("Part code-spn-claude-marketplace-3 is running now.") !== "", kinds("Part code-spn-claude-marketplace-3 is running now."));
+  ok("[MKT.HOOKS.113] an entry such as E7 is found", kinds("Entry E7 is landed.") !== "" && kinds("E7 is landed.") !== "", `${kinds("Entry E7 is landed.")} | ${kinds("E7 is landed.")}`);
+  ok("[MKT.HOOKS.113] a path into an arc's notes work is found", kinds("The output is in notes/N010/work/proof.txt for later.") !== "", kinds("The output is in notes/N010/work/proof.txt for later."));
+  ok("[MKT.HOOKS.113] a path into an arc's notes orders is found", kinds("See notes/N010/orders/brief.md for later.") !== "", kinds("See notes/N010/orders/brief.md for later."));
+  ok("[MKT.HOOKS.113] a path into an arc's notes scripts is found", kinds("It runs notes/N010/scripts/run.sh each time.") !== "", kinds("It runs notes/N010/scripts/run.sh each time."));
 }
 
 console.log("\n=== what passes");
@@ -34,6 +39,8 @@ console.log("\n=== what passes");
   ok("[MKT.HOOKS.114] a card number beside its words passes", findWorkingDetail("Q12 (should the check refuse or note?) is waiting on you.").length === 0);
   ok("[MKT.HOOKS.114] a suggestion beside its title passes", findWorkingDetail("S27 (shorter arc titles) is parked.").length === 0);
   ok("[MKT.HOOKS.114] plain words about rows and orders pass", findWorkingDetail("The table has a row for each order of business.").length === 0);
+  ok("[MKT.HOOKS.114] a link to a preview passes", findWorkingDetail("Open notes/N010/preview.html#s3j to see it.").length === 0);
+  ok("[MKT.HOOKS.114] a link to a sample passes", findWorkingDetail("The shape is in notes/N010/samples/rules.md for you.").length === 0);
   ok("[MKT.HOOKS.114] a plain source file name passes", findWorkingDetail("I edited index.html and README.md.").length === 0);
 }
 
