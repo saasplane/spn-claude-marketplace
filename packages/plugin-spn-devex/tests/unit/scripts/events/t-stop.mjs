@@ -1836,7 +1836,11 @@ console.log("\n=== stop — the checks the first round fixed or wired, and the g
     const { root: telRoot } = await dataWorkspace("n011-sendbacks");
     writeSwitch(telRoot, "telemetry", true);
     writeFileSync(join(telRoot, "t.jsonl"), `${log}\n`);
-    if (stopModule.recordSendBacks) stopModule.recordSendBacks(telRoot, { script: "spn-devex", event: "Stop", session: "s1" }, join(telRoot, "t.jsonl"));
+    // The suites run with `SPN_TELEMETRY=off`, and this write is in-process, so the variable comes out for the call.
+    const silenced = process.env.SPN_TELEMETRY;
+    delete process.env.SPN_TELEMETRY;
+    try { if (stopModule.recordSendBacks) stopModule.recordSendBacks(telRoot, { script: "spn-devex", event: "Stop", session: "s1" }, join(telRoot, "t.jsonl")); }
+    finally { if (silenced !== undefined) process.env.SPN_TELEMETRY = silenced; }
     const written = existsSync(join(telemetryFolder(telRoot), "sendbacks.jsonl")) ? JSON.parse(readFileSync(join(telemetryFolder(telRoot), "sendbacks.jsonl"), "utf8").trim().split("\n").pop()) : null;
     check("[MKT.HOOKS.326] the counts are written to the turn-end telemetry, one cumulative line for the session", written?.session === "s1" && written?.checks?.state?.idle === 1 && written?.checks?.["go-next"]?.sent === 1, JSON.stringify(written));
   }

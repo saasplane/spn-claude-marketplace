@@ -67,8 +67,9 @@ console.log("=== a matched command, paired before and after");
   same("a command's line has no verdict, and `out` is the bytes of its output", [line.verdict, line.out], [null, 7]);
   same("every hook line carries at ending in Z too", logOf(root).every((one) => /Z$/.test(one.at)), true);
   const checks = logOf(root).filter((one) => one.event !== "command");
-  same("a hook check's line keeps the twenty keys, and no `programs`",
-    checks.length > 0 && checks.every((one) => JSON.stringify(Object.keys(one)) === JSON.stringify(KEYS)), true);
+  // A hook's whole-run line adds the kind of call, `program` and `pathKind`, after the twenty (timing.ts).
+  same("a hook check's line keeps the twenty keys, the kind of call at most, and no `programs`",
+    checks.length > 0 && checks.every((one) => [JSON.stringify(KEYS), JSON.stringify([...KEYS, "program", "pathKind"])].includes(JSON.stringify(Object.keys(one)))), true);
 }
 
 console.log("\n=== a failed call, read from PostToolUseFailure");

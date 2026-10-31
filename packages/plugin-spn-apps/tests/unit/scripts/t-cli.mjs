@@ -66,7 +66,7 @@ console.log("\n=== cli — unknown names, refused by name");
 
 {
   const { out, code } = run("coverage");
-  ok("a group with no further word exits 2", code === 2, out);
+  ok("a group with no further word prints its usage and exits 0", code === 0, out);
   ok("and names what the group holds", out.includes("`coverage` holds: check"), out);
 }
 

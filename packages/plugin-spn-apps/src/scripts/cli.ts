@@ -154,6 +154,10 @@ export async function main(argv: string[]): Promise<number> {
     return runCommand({ plugin: PLUGIN_NAME, group, subject: null, action: second, usage: exported.usage ?? "", run: exported.run }, rest);
 
   const [third, ...words] = rest;
+  // A subject that names a `bare` action takes it for an address typed in the action's place: `rows 036/N010` is `rows show 036/N010`.
+  const bare = (exported as { bare?: string }).bare;
+  if (bare && third !== undefined && !third.startsWith("--") && !Object.hasOwn(exported.actions, third) && Object.hasOwn(exported.actions, bare))
+    return runCommand({ plugin: PLUGIN_NAME, group, subject: second, action: bare, usage: exported.actions[bare].usage, run: exported.actions[bare].run }, rest);
   const action = third !== undefined && Object.hasOwn(exported.actions, third) ? exported.actions[third] : null;
   if (third === undefined || !action) {
     console.error(`${usageOf(PLUGIN_NAME, group, second, exported.actions)}\n${actionOwed(group, second, exported.actions, rest)}`);
