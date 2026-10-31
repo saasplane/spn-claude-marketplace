@@ -59,6 +59,12 @@ A partner holding this plugin has no checkout of the foundation book beside it, 
 **What** — everything a ref restates is written out here, under a stamp naming each chapter and the hash last read from it.
 **How** — a drift run compares those hashes, so a copy that fell behind is reported rather than believed. `packages/plugin-spn-apps/src/refs/support/apps/shape.md`.
 
+### A parenthesis restates the rule whole
+
+**Why** — *a ref that names a rule without its level lets the sentence around it soften the rule*, and nothing compared the two.
+**What** — every parenthesis a ref writes after a sentence restates the book's mark: the rule's id, its level and the check, skill or arc that holds it, as the book states them. A ref that drops a MUST is a finding.
+**How** — `spn-devex restates check` compares each parenthesis with the book's, one finding per field that differs. `packages/plugin-spn-devex/src/scripts/commands/restates/check.ts`.
+
 ## Between modules
 
 | Direction | With | What | Why |

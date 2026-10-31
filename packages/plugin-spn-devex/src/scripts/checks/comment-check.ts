@@ -194,6 +194,25 @@ const HISTORY: Array<[RegExp, string]> = [
   [/\bno longer (?:called|named)\b/i, "no longer called"],
 ];
 
+// AN OLD NAME KEPT BESIDE THE NEW ONE. A rename changes every place at once (RULE.DEVEX.WORKSPACE.142),
+// so a code line that keeps the old name alive is the history the comments are not allowed to tell:
+// `export const Old = New`, `export { New as Old }` and a `@deprecated` tag. `as default` is a form of
+// export, not a second name, and a constant built from a call or a literal is a value, not an alias.
+const ALIAS_EXPORT = /^export\s+const\s+([A-Za-z_$][\w$]*)\s*=\s*(?!null\b|undefined\b|true\b|false\b)([A-Za-z_$][\w$]*)\s*;?\s*$/;
+const RENAMED_EXPORT = /^export\s+(?:type\s+)?\{[^}]*\b[A-Za-z_$][\w$]*\s+as\s+(?!default\b)[A-Za-z_$][\w$]*/;
+const DEPRECATED = /@deprecated\b/;
+
+/** The lines of a fragment that keep an old name beside the new one, each with its 1-based line. */
+function oldNames(fragment: string): Array<{ line: number; what: string }> {
+  const found: Array<{ line: number; what: string }> = [];
+  fragment.split("\n").forEach((text, index) => {
+    const line = text.trim();
+    if (ALIAS_EXPORT.test(line)) found.push({ line: index + 1, what: `\`${line.replace(/;$/, "")}\` keeps an old name` });
+    else if (RENAMED_EXPORT.test(line)) found.push({ line: index + 1, what: `\`${line.slice(0, 60)}\` exports a name beside the one it renames` });
+  });
+  return found;
+}
+
 // FINDING 6 — a guess. Rule 4: *a guess is never published; where purpose is genuinely unclear the
 // comment is left blank and flagged*. A published guess is worse than a published gap, because a
 // reader cannot tell it from a fact.
@@ -301,8 +320,18 @@ const WHERE = "07-comments/README.md, The check, and what each finding costs";
 
 export function findings(fragment: string): Array<{ deny: boolean; message: string }> {
   const out: Array<{ deny: boolean; message: string }> = [];
+  for (const one of oldNames(fragment))
+    out.push({ deny: true, message:
+      `Line ${one.line} — an old name kept beside the new one: ${one.what}. A rename changes every ` +
+      `place at once, so delete the old name and update its callers (${WHERE}, and the no-legacy rule).` });
+
   for (const block of blocks(fragment)) {
     if (!block.text) continue;
+
+    if (DEPRECATED.test(block.text))
+      out.push({ deny: true, message:
+        `Line ${block.line} — a \`@deprecated\` tag keeps an old name alive. A rename changes every ` +
+        `place at once, so delete the old name and update its callers (${WHERE}, and the no-legacy rule).` });
 
     for (const [pattern, name] of HISTORY)
       if (pattern.test(block.text)) {

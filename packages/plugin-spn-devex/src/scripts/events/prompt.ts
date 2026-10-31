@@ -17,6 +17,9 @@
 // the `continue:` value. Those are recorded as visited, never owned, so the window is not asked to carry
 // another window's cards; only what `continue:` names before it is this window's own.
 //
+// WHILE A GO RUNS, every prompt also carries the mid-run reminder to the agent (`midRunReminder`): a go of the
+// window's workstreams with a part running or ready.
+//
 // A handover names its workstream by the folder or by the number: `025-partner-web, N011` and
 // `025 · N011` name the same workstream, because a number is never given to a second workstream. A
 // prompt with no handover binds a workstream only by its folder's name, because a three-digit number
@@ -32,7 +35,8 @@ import { ARCS, DEVEX, WORKSTREAM_STATES, workstreamsDir } from "../../../../plug
 import { sessionDir } from "../../../../plugin-support-lib/src/lib/debug-store.ts";
 import { begin, end, span, tagsOf } from "../../../../plugin-support-lib/src/lib/timing.ts";
 import { ARC_NAME, WORKSTREAM_NAME, handoverLines } from "./stop.ts";
-import { bindNamed, bindVisited, readWindow } from "../lib/window.ts";
+import { bindNamed, bindVisited, readWindow, windowSet } from "../lib/window.ts";
+import { goStandings } from "./orientation.ts";
 
 /** What a session is called, and which of the two forms the name has. */
 export type SessionName = { name: string; form: "workstream" | "arc" };
@@ -230,13 +234,30 @@ export function answerFor(payload: Payload, start: string): string {
     for (const bound of bindingsOf(prompt, root, session)) bindNamed(root, session, bound.name, bound.by);
     for (const visited of alsoOpenOf(prompt, root)) bindVisited(root, session, visited);
   } catch { /* a binding that cannot be written is a window that hears less */ }
+  const reminder = midRunReminder(root, windowSet(root, session));
   const file = recordFile(root, session);
-  if (!file) return "";
-  const give = nameToGive(sessionName(prompt, root), readRecord(file));
-  if (!give) return "";
-  mkdirSync(dirname(file), { recursive: true });
-  writeFileSync(file, JSON.stringify(give), "utf8");
-  return JSON.stringify({ hookSpecificOutput: { hookEventName: "UserPromptSubmit", sessionTitle: give.name } });
+  let give = file ? nameToGive(sessionName(prompt, root), readRecord(file)) : null;
+  if (file && give) {
+    try { mkdirSync(dirname(file), { recursive: true }); writeFileSync(file, JSON.stringify(give), "utf8"); } catch { give = null; }
+  }
+  if (!give && !reminder) return "";
+  return JSON.stringify({ hookSpecificOutput: { hookEventName: "UserPromptSubmit",
+    ...(give ? { sessionTitle: give.name } : {}), ...(reminder ? { additionalContext: reminder } : {}) } });
+}
+
+/**
+ * The mid-run reminder: while a go of this window's workstreams has a part running or ready, the developer's
+ * message is read for what it changes before anything else. Empty while no go runs.
+ */
+export function midRunReminder(root: string, mine: Set<string>): string {
+  if (!mine.size) return "";
+  let gos: ReturnType<typeof goStandings> = [];
+  try { gos = goStandings(root, mine).filter((go) => go.running.length || go.ready.length); } catch { return ""; }
+  if (!gos.length) return "";
+  return `A go is running: ${gos.map((go) => `${go.workstream}/${go.lead} (${go.running.length} running, ${go.ready.length} ready)`).join(" · ")}. ` +
+    "Read this message for what it changes before you go on. An idea or a later want is a suggestion, and nothing that runs changes. " +
+    "A change to what is being built follows the steps of a change mid-run: what is running finishes, the parts it touches are held, " +
+    "the entries and the preview take the change, the plan is derived again with `workstream go write`, and the full run comes after.";
 }
 
 if (runAlone("prompt.ts")) {

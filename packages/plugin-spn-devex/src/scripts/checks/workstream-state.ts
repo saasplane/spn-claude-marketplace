@@ -98,6 +98,12 @@ export function notesTreeFindings(ws: string, arc: string): string[] {
     .map(([entry, home]) => `\`${NOTES}/${arc}/${entry}\` is not one of the six entries of an arc's notes folder — it belongs in ${home}`);
 }
 
+/** The most words an arc's title may run to: a topic name, with its sentence kept in the goal. */
+const TITLE_WORDS_MAX = 5;
+
+/** The arc folder a path inside the workstream's `notes/` sits in, or null where it sits elsewhere. */
+const notesFolderOf = (ws: string, path: string): string | null => /^N\d+[a-z]?$/.exec(relative(join(ws, NOTES), path).split(/[\\/]/)[0])?.[0] ?? null;
+
 /**
  * RULE.DEVEX.WORKSPACE.264 and .265: the arc's goal, its subject's length, and its data folder — the three
  * data files and one name file, which reads as the commands write it from the data.
@@ -108,6 +114,9 @@ export function nameFindings(ws: string, arc: string, data: ArcData): string[] {
     out.push(`${arc} has no goal — \`spn-devex workstream arc edit ${arc} --goal "…"\`, the outcome once it is done, in a sentence or two`);
   const short = subjectFault(data.subject);
   if (short) out.push(`${arc}'s subject \`${data.subject}\` ${short} — \`spn-devex workstream arc edit ${arc} --subject <short-name>\``);
+  const words = typeof data.title === "string" ? data.title.trim().split(/\s+/).filter(Boolean).length : 0;
+  if (words > TITLE_WORDS_MAX || (typeof data.title === "string" && data.title.includes(",")))
+    out.push(`${arc}'s title \`${data.title}\` ${words > TITLE_WORDS_MAX ? `is ${words} words` : "holds a comma"} — an arc title is a topic name of at most ${TITLE_WORDS_MAX} words and no comma; the sentence goes in the goal, \`spn-devex workstream arc edit ${arc} --title "…"\``);
   const name = `${data.subject}.md`;
   const markdown = markdownIn(ws, arc);
   for (const other of markdown.filter((one) => one !== name))
@@ -134,6 +143,9 @@ export function arcPreviewFindings(ws: string, arc: string, data: ArcData, owner
   const path = previewPathOf(ws, arc, data);
   const href = previewHrefOf(arc, data);
   const number = workstreamName(ws).number;
+  const inFolder = notesFolderOf(ws, path);
+  if (inFolder && inFolder !== arc)
+    out.push(`${arc}'s \`preview\` field names \`${href}\`, ${inFolder}'s folder — an arc's preview sits in its own, \`${NOTES}/${arc}/\``);
   if (!isFile(path)) {
     out.push(`${arc} has no preview — every arc has one, \`${href}\`, written when it opens; \`spn-devex workstream arc edit ${number}/${arc}\` writes it from the template (RULE.DEVEX.WORKSPACE.254)`);
     return out;
@@ -179,6 +191,11 @@ export function pageFindings(ws: string, arc: string, data: ArcData, page: strin
     if (!other || other === arc || crossed.has(other)) continue;
     crossed.add(other);
     out.push(`${arc}'s What entry links \`${link.href}\`, ${other}'s preview — an arc's entry links its own preview only, and names another arc by its What, \`approach.html#${whatId(other)}\``);
+  }
+  for (const link of links) {
+    const folder = notesFolderOf(ws, link.path);
+    if (!folder || folder === arc || owners.get(link.path)) continue;
+    out.push(`${arc}'s What entry links \`${link.href}\`, inside ${folder}'s folder — an arc's entry links into \`${NOTES}/${arc}/\` only, and names another arc by its What, \`approach.html#${whatId(folder)}\``);
   }
   if (!links.some((link) => link.path === own)) out.push(`${arc}'s preview is not linked from its What entry, \`#${whatId(arc)}\``);
   return out;
@@ -331,6 +348,31 @@ export function staleFacts(ws: string, arc: string, root: string): string[] {
   return out;
 }
 
+/** The suggestion ids a text names, `S3` or `s3`, as the file writes them. */
+const suggestionsNamed = (text: unknown): string[] => typeof text === "string" ? [...text.matchAll(/\bs(\d+)\b/gi)].map((found) => `s${found[1]}`) : [];
+
+/**
+ * A suggestion an arc takes up reads shaped, at the arc's go decided, and at its drop dropped: one still at `raised`
+ * while an arc carries it, or the arc's log cites it, was missed by that move.
+ */
+export function carriedSuggestionFindings(ws: string): string[] {
+  const raised: string[] = [];
+  for (const line of readJsonl(suggestionsFileOf(ws)) as Array<Record<string, unknown> | undefined>)
+    if (line && line.state === "raised" && typeof line.id === "string") raised.push(line.id);
+  const out: string[] = [];
+  if (!raised.length) return out;
+  for (const arc of arcIdsOf(ws)) {
+    const data = readJson(stateFileOf(ws, arc)) as Record<string, unknown> | null;
+    const carried = Array.isArray(data?.carries) ? (data!.carries as unknown[]).filter((id): id is string => typeof id === "string") : [];
+    const cited = (readJsonl(logFileOf(ws, arc)) as Array<Record<string, unknown> | undefined>).flatMap((line) => line ? [...suggestionsNamed(line.suggestion), ...suggestionsNamed(line.note)] : []);
+    for (const id of raised) {
+      if (carried.includes(id)) out.push(`${id} is still raised and ${arc} carries it — a suggestion an arc carries reads shaped, and decided at the arc's go; move it with \`spn-devex workstream suggestion\``);
+      else if (cited.includes(id)) out.push(`${id} is still raised and ${arc}'s log cites it — a suggestion an arc takes up reads shaped; move it with \`spn-devex workstream suggestion\``);
+    }
+  }
+  return out;
+}
+
 /** Every finding of one workstream. A workstream that still keeps its arcs as Markdown gets one, and nothing else is read. */
 export function checkWorkstream(ws: string): Finding[] {
   const name = basename(ws);
@@ -378,6 +420,7 @@ export function checkWorkstream(ws: string): Finding[] {
   for (const arc of listdir(join(ws, NOTES)))
     if (/^N\d+[a-z]?$/.test(arc) && isDir(join(ws, NOTES, arc))) out.push(...notesTreeFindings(ws, arc).map(say(arc, "notes")));
   out.push(...linesFindings(suggestionsFileOf(ws), "suggestions.jsonl", suggestionFaults).map(say(null, "schema")));
+  out.push(...carriedSuggestionFindings(ws).map(say(null, "suggestions")));
   const questionLines = linesFindings(questionsFileOf(ws), "questions.jsonl", questionFaults);
   out.push(...questionLines.map(say(null, "schema")));
   const records = readQuestions(ws);

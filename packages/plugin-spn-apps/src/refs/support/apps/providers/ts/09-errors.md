@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/10-providers/ts/09-errors.md",
-      "seen": "ed75d8fb"
+      "seen": "0b96df5d"
     }
   ]
 }

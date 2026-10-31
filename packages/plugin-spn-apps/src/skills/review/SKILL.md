@@ -7,11 +7,11 @@ description: Review SaaS Plane TS changes against the standards. Use when the us
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
-      "seen": "44c80d89"
+      "seen": "c110978c"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/04-develop.md",
-      "seen": "810ac3e8"
+      "seen": "1f777cff"
     }
   ]
 }
@@ -54,7 +54,7 @@ The TypeScript standards, as this skill carries them. **Treat this restatement a
 
 ## Docs coupling (both modes)
 
-A change to a module's contract surface, schema, permissions, errors, or env with **no delta in its doc set** is a **should-fix**. That doc set is `docs/04-capabilities/README.md` or its `data-model.md`, `docs/03-behaviors/README.md`, and `docs/artifacts/resources/schema.sql`. The doc set changes in the same PR as the API it describes. New `I*Service` methods or exported components without a one-line intent comment: should-fix (foundation rule RULE.SUPPORT.APPS.006). A behavior row flipped to ✅ without a citable test: blocking (statuses never claim what the code doesn't back).
+A change to a module's contract surface, schema, permissions, errors, or env with **no delta in its doc set** is a **should-fix**. That doc set is `docs/04-capabilities/README.md` or its `data-model.md`, `docs/03-behaviors/README.md`, and `docs/artifacts/resources/schema.sql`. The doc set changes in the same PR as the API it describes. New `I*Service` methods or exported components without a one-line intent comment: should-fix (`RULE.SUPPORT.APPS.006` · MUST · skill:spn-apps/implement). A behavior row flipped to ✅ without a citable test: blocking (statuses never claim what the code doesn't back).
 
 ## Lenses
 

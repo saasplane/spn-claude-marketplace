@@ -803,5 +803,59 @@ console.log("\n=== split-plan — a page that holds its own copy of the styles")
     `<p>As Q7 settled, the library covers pages built from sections.</p>`, "Q7");
 }
 
+{
+  // THE DOCUMENTS ROW GATES THE CODE (RULE.DEVEX.WORKSPACE.320): the arc's own rows, a DOCS row of the repository, and
+  // a write under src/ or tests/ of that repository.
+  const decided = (rows) => ({ "arcs/N2/state.json": dataArc("N2", "DECIDED", rows) });
+  const code = (root) => ({ file_path: join(root, "probe-repo", "packages", "p", "src", "a.ts"), content: "export const a = 1;\n" });
+  const docsWaiting = [["1", "probe-repo", "write the documents", "waiting"], ["2", "probe-repo", "write the code", "waiting", { altitude: "CODE" }]];
+  console.log("\n=== split-plan — documents first: a code write waits for the repository's documents row");
+  {
+    const root = buildArcs("m104-docs-waiting", docsWaiting, { extra: decided(docsWaiting) });
+    one("[MKT.HOOKS.104] a write under src/ before the repository's documents row has landed is refused", "documents-first", root,
+      code(root), "deny", { says: "documents row of probe-repo", parity: false, why: "the Python never read the arc's rows for a code write" });
+    const tests = { file_path: join(root, "probe-repo", "tests", "t-a.mjs"), content: "x\n" };
+    one("[MKT.HOOKS.104] a write under tests/ is refused the same way", "documents-first", root,
+      tests, "deny", { says: "Land the documents first", parity: false, why: "the Python never read the arc's rows for a code write" });
+  }
+  {
+    const landed = [["1", "probe-repo", "write the documents", "landed"], ["2", "probe-repo", "write the code", "waiting", { altitude: "CODE" }]];
+    const root = buildArcs("m105-docs-landed", landed, { extra: decided(landed) });
+    one("[MKT.HOOKS.105] a landed documents row lets the code be written", "documents-first", root, code(root), "silent",
+      { parity: false, why: "the Python never read the arc's rows for a code write" });
+    const none = [["1", "probe-repo", "write the code", "waiting", { altitude: "CODE" }]];
+    const bare = buildArcs("m105-no-docs-row", none, { extra: decided(none) });
+    one("[MKT.HOOKS.105] a repository with no documents row is not held", "documents-first", bare, code(bare), "silent",
+      { parity: false, why: "the Python never read the arc's rows for a code write" });
+    const other = buildArcs("m105-other-repo", docsWaiting, { extra: decided(docsWaiting) });
+    one("[MKT.HOOKS.105] a documents row of another repository does not hold this one", "documents-first", other,
+      { file_path: join(other, "elsewhere", "src", "a.ts"), content: "x\n" }, "silent", { parity: false, why: "the Python never read the arc's rows for a code write" });
+  }
+
+  // THE CLOSE WAITS ON THE GO: go check finds nothing and every part has landed.
+  const { entryHash } = await import("../../../../src/scripts/lib/go-plan.ts");
+  const entry = (id) => ({ id, op: "edit", file: "probe-repo:src/a.ts", what: "a change", decidedBy: [], facts: [], then: [], rules: [],
+    callers: [], tiers: {}, docs: [], book: [] });
+  const sheet = (ids) => `${JSON.stringify({ schemaVersion: 1, releaseChain: [], dependsOn: [], stack: null, entries: ids.map(entry) })}\n`;
+  const plan = (state, entries = ["N2/E1"], signature = entryHash(entry("E1"))) => `${JSON.stringify({ schemaVersion: 1, lead: "N2", scope: ["N2"],
+    writtenAt: "2026-10-31T10:00:00.000Z", parts: [{ id: "code-probe-repo-1", repo: "probe-repo", pass: "CODE", entries, tests: [], minutes: null,
+      measuredFrom: null, waitsOn: [], model: "sonnet", signature, state }] })}\n`;
+  const closing = (name, files) => buildArcs(name, ARC_LANDED, { page: true, extra: files });
+  const shut = (root) => move(`.spndevex/${WORKSTREAMS}/open/001-a-subject`, `.spndevex/${WORKSTREAMS}/closed/`);
+  console.log("\n=== split-plan — the close gate waits on the go");
+  one("[MKT.HOOKS.308] a part of the go that has not landed refuses the close", "close",
+    closing("m308-unlanded", { "arcs/N2/sheet.json": sheet(["E1"]), "arcs/N2/go.json": plan("ready") }), shut(), "deny",
+    { says: "code-probe-repo-1", parity: false, why: "the Python knows no go" });
+  one("[MKT.HOOKS.308] an entry no part holds refuses the close", "close",
+    closing("m308-unheld", { "arcs/N2/sheet.json": sheet(["E1", "E2"]), "arcs/N2/go.json": plan("landed") }), shut(), "deny",
+    { says: "N2/E2 is held by no part", parity: false, why: "the Python knows no go" });
+  one("[MKT.HOOKS.308] a part whose entry changed since the plan refuses the close", "close",
+    closing("m308-moved", { "arcs/N2/sheet.json": sheet(["E1"]), "arcs/N2/go.json": plan("landed", ["N2/E1"], "00000000") }), shut(), "deny",
+    { says: "N2/E1", parity: false, why: "the Python knows no go" });
+  one("[MKT.HOOKS.308] a go whole, every part landed, closes", "close",
+    closing("m308-whole", { "arcs/N2/sheet.json": sheet(["E1"]), "arcs/N2/go.json": plan("landed") }), shut(), "silent",
+    { parity: false, why: "the Python knows no go" });
+}
+
 console.log(failed ? `\n  ${failed} FAILED` : `\n  all ${n} passed`);
 process.exit(failed ? 1 : 0);

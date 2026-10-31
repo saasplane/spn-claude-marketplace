@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-infra/04-resources.md",
-      "seen": "557503ab"
+      "seen": "03e7fa16"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/04-resources/",
-      "seen": "f796b4c0"
+      "seen": "22301782"
     }
   ]
 }
@@ -32,7 +32,7 @@ A resource is a backing service that holds state: a database, a cache, a queue, 
 
 **The secret store is on no row, because nobody declares it — every environment has one, so asking for it would be asking for something already there.** The set of four is closed and total: a fifth engine is a contract change, exactly the ceremony a baseline set should demand.
 
-**An environment also stands a key for stored secrets, and nobody declares that either** (`RULE.SUPPORT.INFRA.109`). A product stores some secrets it must read back, such as a provider key an organization brings, and its service encrypts each one before it saves the row. That needs a master key held where the data is not, so the environment's blueprint creates one in each environment, at apply. **It is a key of its own** — not the key that encrypts the engines' data, so reading the data and opening a stored secret are two separate rights. **It carries a policy of its own**: only the role of an application whose row lists the `SEAL` grant may use it; the role that provisions the account may not, and no database role can. **It is one for each environment** — the platform and its spaces share it, so an application in a space that lists the grant seals with the same key. **The declaration gains nothing for it** — no row to write and no engine family to name. **The key service renews it every year.** The key is built and released in the blueprints. It has not been stood on a real cloud account yet.
+**An environment also stands a key for stored secrets, and nobody declares that either** (`RULE.SUPPORT.INFRA.109` · MUST · skill:spn-infra/implement). A product stores some secrets it must read back, such as a provider key an organization brings, and its service encrypts each one before it saves the row. That needs a master key held where the data is not, so the environment's blueprint creates one in each environment, at apply. **It is a key of its own** — not the key that encrypts the engines' data, so reading the data and opening a stored secret are two separate rights. **It carries a policy of its own**: only the role of an application whose row lists the `SEAL` grant may use it; the role that provisions the account may not, and no database role can. **It is one for each environment** — the platform and its spaces share it, so an application in a space that lists the grant seals with the same key. **The declaration gains nothing for it** — no row to write and no engine family to name. **The key service renews it every year.** The key is built and released in the blueprints. It has not been stood on a real cloud account yet.
 
 **An application selects no engine and names no share — MUST NOT.** Every scheduled deployment receives a derived share scoped to its own coordinates: its role set from the factory, topics named for their owner, storage reached through the one document system, its own configuration prefix. Nothing nameable crosses the seam in either direction, in either direction — that is what keeps the estate from ever reading a code repository. A new application is one reviewed row; a new version is no estate change at all.
 
@@ -78,7 +78,7 @@ export interface SPEstateSpace {
 
 **A space is per-need where the platform resources are total.** A family absent from a space is not stood at all. Its database family speaks the baseline's own grammar — the same `schemas` rows, the same `users` grant rows. A space's storage is the default store alone unless it names more, as `"storage": { "mtype": "OBJECT" }`. A space owns no applications, no accounts, no domains; an application binds to one by the `space` key on its registration row, and an absent key means the platform resources answer. A row that names a space may also keep the platform, and its deployment is then given both sets of settings. An application still declares no demand — selecting a space is passing a code.
 
-**A space carries its platform's code** (`RULE.SUPPORT.INFRA.112`). Every name the estate publishes for a space starts with the platform's code and then the space's code.
+**A space carries its platform's code** (`RULE.SUPPORT.INFRA.112` · MUST · skill:spn-infra/implement). Every name the estate publishes for a space starts with the platform's code and then the space's code.
 
 | What | The platform's own | A space's |
 | --- | --- | --- |
@@ -89,15 +89,15 @@ export interface SPEstateSpace {
 
 A prefix is one word for a platform and two words for a space. A space's code must differ from the other spaces' codes of its platform; two platforms may use the same space code. The world token in a host name always matches the key prefix that carries it.
 
-**On a machine, a space's engines take their ports from the five hundred the platform declares, and nobody writes them** (`RULE.SUPPORT.INFRA.062`). The first hundred of the range holds the engines, ten ports for each world: the platform's own take the first ten, and space *i*, counting from one in declaration order, takes the ten ports from `+10 × i`, with each family at the same offset it has in the platform's own engines. So a platform stands at most nine spaces locally. A space has engines and nothing else; an application that belongs to a space takes a service's port or a web application's port like any other.
+**On a machine, a space's engines take their ports from the five hundred the platform declares, and nobody writes them** (`RULE.SUPPORT.INFRA.062` · MUST · skill:spn-infra/implement). The first hundred of the range holds the engines, ten ports for each world: the platform's own take the first ten, and space *i*, counting from one in declaration order, takes the ten ports from `+10 × i`, with each family at the same offset it has in the platform's own engines. So a platform stands at most nine spaces locally. A space has engines and nothing else; an application that belongs to a space takes a service's port or a web application's port like any other.
 
-**A space is one of two independent extension axes, and they never couple** (`RULE.SUPPORT.INFRA.085`). A space extends by **data**; a service domain (bound by `serviceDomain`) extends by **face**. An application takes either, both or neither.
+**A space is one of two independent extension axes, and they never couple** (`RULE.SUPPORT.INFRA.085` · MUST · skill:spn-infra/implement). A space extends by **data**; a service domain (bound by `serviceDomain`) extends by **face**. An application takes either, both or neither.
 
 **The platform's own resources are a preset composition of the same blueprint functions a space composes** — database, schema, user, topic, bucket. There is no privileged path a space cannot take, and no capability the baseline has that a space cannot ask for.
 
 ## A module owns its own world
 
-A module's resources are its own engine instances, in its own world, under the module's own purpose code — **never databases or schemas inside the platform's engines** (`RULE.SUPPORT.INFRA.053`). A module that migrates itself is structurally the administrator of *something*, so it owns the whole world its administrator role reaches. **The estate standardizes the boundary — the world code, its host labels, the local ports it derives inside the platform's declared range, its placement, a private configuration seat, a ledger seat, and the standing guardrails — and never the interior.** Which resources a module stands, and how its blueprint stands them, is the module's own business. A module's placement is `layer`, `after` and `hosting` on its `modules[]` entry; its config vocabulary is its own, free-form through the entry's `config: {}`, with no standardized module config variables and no estate-declared families, and a module never carries a `space` key. How a module reaches applications through the configuration plane is a separate topic, restated in the modules card.
+A module's resources are its own engine instances, in its own world, under the module's own purpose code — **never databases or schemas inside the platform's engines** (`RULE.SUPPORT.INFRA.053` · MUST · skill:spn-infra/implement). A module that migrates itself is structurally the administrator of *something*, so it owns the whole world its administrator role reaches. **The estate standardizes the boundary — the world code, its host labels, the local ports it derives inside the platform's declared range, its placement, a private configuration seat, a ledger seat, and the standing guardrails — and never the interior.** Which resources a module stands, and how its blueprint stands them, is the module's own business. A module's placement is `layer`, `after` and `hosting` on its `modules[]` entry; its config vocabulary is its own, free-form through the entry's `config: {}`, with no standardized module config variables and no estate-declared families, and a module never carries a `space` key. How a module reaches applications through the configuration plane is a separate topic, restated in the modules card.
 
 ## Hosting and size are independent axes
 
@@ -111,7 +111,7 @@ A module's resources are its own engine instances, in its own world, under the m
 
 ## Every family has one default engine, and a declaration lists the rest
 
-**Each family gives a world one default engine, named `app` and never written — as a database gets its baseline schemas** (`RULE.SUPPORT.INFRA.124`, amending `.122`). A declaration lists only what goes beyond it: named engines with a reason, lifecycle rules for storage, and access groups beyond the application's own. **`app` is the one reserved name.**
+**Each family gives a world one default engine, named `app` and never written — as a database gets its baseline schemas** (`RULE.SUPPORT.INFRA.124` · MUST · skill:spn-infra/implement), amending (`RULE.SUPPORT.INFRA.122` · MUST · skill:spn-infra/implement). A declaration lists only what goes beyond it: named engines with a reason, lifecycle rules for storage, and access groups beyond the application's own. **`app` is the one reserved name.**
 
 | Family | Default (`app`) | Named entries | `dedicated` gives | `need`, a closed set | Created by code |
 | --- | --- | --- | --- | --- | --- |
@@ -120,7 +120,7 @@ A module's resources are its own engine instances, in its own world, under the m
 | cache | the world's cache | `caches` | its own user | `PERSISTENT` · `ISOLATED` | keys |
 | queue | the world's broker | `brokers` | its own user | `ISOLATED` · `REGION` | topics |
 
-**Both stores take the two roots `private/` and `public/`** (`RULE.SUPPORT.INFRA.125`). A module's area in the default store sits under a root (`private/<module>/…`) and is formed only by Support's `prepareStorageModuleAreaKey(root, moduleCode, areaKey)` over `prepareStorageKey(root, segments)`; a module writes only in its own area and composes no key in another's. The default store's `public/` is not served until a public endpoint is declared, so enabling it moves no data. The platform's default `STORAGE` provider row is seeded from its own keys, and the document module reaches the docs store through it.
+**Both stores take the two roots `private/` and `public/`** (`RULE.SUPPORT.INFRA.125` · MUST · skill:spn-infra/implement). A module's area in the default store sits under a root (`private/<module>/…`) and is formed only by Support's `prepareStorageModuleAreaKey(root, moduleCode, areaKey)` over `prepareStorageKey(root, segments)`; a module writes only in its own area and composes no key in another's. The default store's `public/` is not served until a public endpoint is declared, so enabling it moves no data. The platform's default `STORAGE` provider row is seeded from its own keys, and the document module reaches the docs store through it.
 
 **A named engine is the same four fields in every family:** `name` (lowercase, never `app`, unique in its family); `dedicated` (always written — true gives its own credentials the default group cannot reach, false shares the app's pair); `need` (from the family's set); `region` (an organization `regions[]` code, only with `REGION`, else null). Storage adds `lifecycle`. A named engine is added only for what the default cannot give — a need an area, a key prefix or a topic can meet gets no engine.
 
@@ -152,7 +152,7 @@ Storage is the one engine whose *provider* is derived rather than declared — a
 
 ## A public store's key grammar
 
-**In a public store, every object key leads with its access class — `public` or `private` — as the first segment, and those two roots are the only part of a key the estate ever reads** (`RULE.SUPPORT.INFRA.080`). The edge and the store's policy both scope by prefix; a class buried mid-key is one neither can see. Everything beneath the root belongs to the application layer, which is what lets a store be swapped without either side learning the other's vocabulary.
+**In a public store, every object key leads with its access class — `public` or `private` — as the first segment, and those two roots are the only part of a key the estate ever reads** (`RULE.SUPPORT.INFRA.080` · MUST · skill:spn-infra/implement). The edge and the store's policy both scope by prefix; a class buried mid-key is one neither can see. Everything beneath the root belongs to the application layer, which is what lets a store be swapped without either side learning the other's vocabulary.
 
 **A stored file cannot be reclassified — MUST NOT.** Its class is stamped at creation, and because the class *is* the file's location, changing it would mean moving bytes and invalidating every link already handed out. A file needing a different class is a different file, uploaded as one — the store's contract carries no move and no copy. **A key is derived, never authored.** What a person sees is a logical folder path of bounded slugs, so traversal is excluded by shape rather than by a check; the display name is a row, not part of the key.
 

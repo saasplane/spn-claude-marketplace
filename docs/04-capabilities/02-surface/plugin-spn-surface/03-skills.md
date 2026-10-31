@@ -30,6 +30,12 @@ The folder under this plugin's `skills/` is named for a command of the Surface g
 **What** — `design` serves the ideate stage. You ask it to design, lay out or draw a page, and it states the page as a tree of named blocks. Its steps are `draw`, which draws that tree in Figma, and `change-library`, which changes a library file through the connector.
 **How** — the steps are written in no language, so they sit in the skill's own folder and no provider holds them. `packages/plugin-spn-surface/src/skills/design/steps/draw.md`.
 
+### A step opens with the rules its skill holds
+
+**Why** — *a skill that names a rule only where its author remembered to leaves the rest to memory*, and a step is the moment a rule matters.
+**What** — each step that does a skill's work opens with a generated block of the rules that skill holds, each with the level the book gives it. A reader sees how strongly a rule binds without opening the book.
+**How** — the plugins build writes the block from the rules index that spn-devex builds from the book (`refs/rules.json`), so a skill step in spn-surface restates nothing by hand. A rule changed in the book changes the block at the next build.
+
 ## Between modules
 
 | Direction | With | What | Why |

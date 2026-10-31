@@ -1,7 +1,7 @@
 // `commands/workstream/sheet.ts` — the change sheet as the arc's data: written whole from a file, one entry
 // edited or dropped, shown for a row, and checked against the rows and the cards. Run as the agent types
 // the commands, in a throwaway workspace.
-import { existsSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { CARD, cli, dataWorkspace } from "../../../../helpers/workstream-fixture.mjs";
 
@@ -189,6 +189,87 @@ console.log("\n=== drop");
   ok("the note goes to its log line", lines(log).at(-1).note.includes("no longer needed") && lines(log).at(-1).kind === "sheet");
   const again = sheet("drop", "N001", "E1", "--note", "x");
   ok("a missing entry is refused", again.code !== 0, again.out);
+}
+
+console.log("\n=== a decided arc's sheet is rewritten only on the developer's words");
+{
+  const file = put("again.json", sheetOf([entry("E1"), entry("E2")]));
+  const before = readFileSync(sheetFile, "utf8");
+  const logged = lines(log).length;
+  const bare = sheet("write", "N001", "--file", file);
+  ok("[MKT.SCRIPTS.236] a rewrite of a decided arc's sheet without --because is refused, nothing written",
+    bare.code === 1 && bare.out.includes("--because") && bare.out.includes("Nothing was written") && readFileSync(sheetFile, "utf8") === before && lines(log).length === logged, bare.out);
+  const said = sheet("write", "N001", "--file", file, "--because", "the developer: add E1 back");
+  ok("[MKT.SCRIPTS.237] with --because it is written and the words are logged", said.code === 0 && json(sheetFile).entries.length === 2 && lines(log).at(-1).note.includes("add E1 back"), said.out);
+  const opened = cli(root, ["workstream", "arc", "edit", "031-probe/N005", "--title", "empty sheet", "--subject", "empty-sheet", "--goal", "an empty sheet is written once"]);
+  const flip = cli(root, ["workstream", "arc", "edit", "031-probe/N005", "--status", "DECIDED", "--note", "go"]);
+  const empty = sheet("write", "N005", "--file", put("empty.json", sheetOf([])));
+  ok("[MKT.SCRIPTS.237] an empty sheet on a decided arc is written once, with no --because", opened.code === 0 && flip.code === 0 && empty.code === 0, `${opened.out}${flip.out}${empty.out}`);
+}
+
+console.log("\n=== an arc title is a short topic name");
+{
+  const open = (title) => cli(root, ["workstream", "arc", "edit", "031-probe/N006", "--title", title, "--subject", "short-title", "--goal", "a short title"]);
+  const long = open("one two three four five six");
+  ok("[MKT.SCRIPTS.230] a title past five words is refused", long.code !== 0 && long.out.includes("five words") && !existsSync(join(ws, "arcs", "N006", "state.json")), long.out);
+  const comma = open("a title, with a comma");
+  ok("[MKT.SCRIPTS.230] a title with a comma is refused", comma.code !== 0 && comma.out.includes("comma") && !existsSync(join(ws, "arcs", "N006", "state.json")), comma.out);
+  const fine = open("a five word title now");
+  ok("[MKT.SCRIPTS.230] a title of five words opens", fine.code === 0 && existsSync(join(ws, "arcs", "N006", "state.json")), fine.out);
+  const retitle = cli(root, ["workstream", "arc", "edit", "031-probe/N006", "--title", "one two three four five six"]);
+  ok("[MKT.SCRIPTS.230] a long title on an existing arc is refused", retitle.code !== 0 && json(join(ws, "arcs", "N006", "state.json")).title === "a five word title now", retitle.out);
+}
+
+console.log("\n=== the go is refused while the sheet has a finding");
+{
+  const stateOf = (arc) => join(ws, "arcs", arc, "state.json");
+  cli(root, ["workstream", "arc", "edit", "031-probe/N007", "--title", "go with finding", "--subject", "go-finding", "--goal", "the go waits for the sheet"]);
+  cli(root, ["workstream", "fact", "write", "N007", "--source", "spn-x/a.ts", "--fact", "a is 1", "--used-by", "1"]);
+  const written = sheet("write", "N007", "--file", put("n7.json", sheetOf([entry("E1")])));
+  const derivedRows = json(stateOf("N007"));
+  writeFileSync(stateOf("N007"), JSON.stringify({ ...derivedRows, rows: [] }, null, 2));
+  const go = cli(root, ["workstream", "arc", "edit", "031-probe/N007", "--status", "DECIDED", "--note", "go"]);
+  ok("[MKT.SCRIPTS.235] the go is refused with the findings and nothing written", written.code === 0 && go.code !== 0 && go.out.includes("E1") && json(stateOf("N007")).status === "PROPOSED", `${written.out}${go.out}`);
+  const rows = json(stateOf("N007"));
+  rows.rows = [{ id: "1", parent: "N007", title: "build it", kind: "change", repo: "spn-x", altitude: "CODE", entries: ["E1"], state: "waiting" }];
+  writeFileSync(stateOf("N007"), JSON.stringify(rows, null, 2));
+  const clean = cli(root, ["workstream", "arc", "edit", "031-probe/N007", "--status", "DECIDED", "--note", "go"]);
+  ok("[MKT.SCRIPTS.235] a sheet with no finding lets the go through", clean.code === 0 && json(stateOf("N007")).status === "DECIDED", clean.out);
+  ok("[MKT.SCRIPTS.315] the go ends by naming go write as the next step", /Next: .*go write/.test(clean.out), clean.out);
+}
+
+console.log("\n=== carried suggestions, precedent, steps from the sheet");
+{
+  const stateOf = (arc) => join(ws, "arcs", arc, "state.json");
+  const sugg = join(ws, "suggestions.jsonl");
+  writeFileSync(sugg, `${JSON.stringify({ id: "s1", title: "first", state: "raised", preview: null, words: null })}\n${JSON.stringify({ id: "s2", title: "second", state: "raised", preview: null, words: null })}\n`);
+  const registers = join(root, "spn-x", "docs", "registers");
+  cli(root, ["help"]);
+  mkdirSync(registers, { recursive: true });
+  writeFileSync(join(registers, "decisions.md"), "### D7 — turnstile ledger rotation happens nightly\n");
+  const opened = cli(root, ["workstream", "arc", "edit", "031-probe/N008", "--title", "turnstile ledger", "--subject", "ledger", "--goal", "rotation of the turnstile ledger", "--carries", "s1,s2"]);
+  ok("[MKT.SCRIPTS.316] opening an arc prints the decisions that speak to its title and goal", opened.code === 0 && opened.out.includes("D7"), opened.out);
+  const states = () => Object.fromEntries(lines(sugg).map((one) => [one.id, one.state]));
+  ok("[MKT.SCRIPTS.317] a carried suggestion reads shaped", json(stateOf("N008")).carries?.join() === "s1,s2" && states().s1 === "shaped" && states().s2 === "shaped", JSON.stringify(states()));
+  cli(root, ["workstream", "arc", "edit", "031-probe/N008", "--status", "DECIDED", "--note", "go"]);
+  ok("[MKT.SCRIPTS.317] it reads decided at the arc's go", states().s1 === "decided" && states().s2 === "decided", JSON.stringify(states()));
+  cli(root, ["workstream", "arc", "edit", "031-probe/N008", "--status", "DROPPED", "--reason", "no longer", "--note", "drop it"]);
+  ok("[MKT.SCRIPTS.317] it reads dropped when the arc is dropped", states().s1 === "dropped", JSON.stringify(states()));
+
+  // steps from the sheet
+  cli(root, ["workstream", "arc", "edit", "031-probe/N009", "--title", "derived steps", "--subject", "derived-steps", "--goal", "steps come from entries"]);
+  cli(root, ["workstream", "fact", "write", "N009", "--source", "spn-x/a.ts", "--fact", "a is 1", "--used-by", "1"]);
+  const data = sheetOf([entry("E1"), entry("E2", { file: "spn-x:docs/guide.md" })], { releaseChain: ["spn-x releases"] });
+  const derived = sheet("write", "N009", "--file", put("n9.json", data));
+  const rows = json(stateOf("N009")).rows;
+  const code = rows.find((one) => one.altitude === "CODE" && one.repo === "spn-x");
+  const docs = rows.find((one) => one.altitude === "DOCS" && one.repo === "spn-x");
+  ok("[MKT.SCRIPTS.311] the sheet write derives a step for each repository and kind of change", derived.code === 0 && code?.entries?.join() === "E1" && docs?.entries?.join() === "E2", derived.out + JSON.stringify(rows));
+  ok("[MKT.SCRIPTS.311] it derives the release and proof steps from the release order", rows.some((one) => one.altitude === "RELEASE") && rows.some((one) => one.altitude === "PROOF"), JSON.stringify(rows));
+  const again = sheet("write", "N009", "--file", put("n9.json", data));
+  ok("[MKT.SCRIPTS.311] writing the same sheet again adds no step", again.code === 0 && json(stateOf("N009")).rows.length === rows.length, again.out);
+  const added = cli(root, ["workstream", "row", "add", "031-probe/N009", "by hand", "--repo", "spn-x", "--altitude", "CODE"]);
+  ok("[MKT.SCRIPTS.311] a step added by hand to an arc that keeps a sheet is refused", added.code !== 0 && added.out.includes("sheet") && json(stateOf("N009")).rows.length === rows.length, added.out);
 }
 
 console.log(failed ? `\n  ${failed} of ${total} FAILED — sheet` : `\n  all ${total} passed — sheet`);

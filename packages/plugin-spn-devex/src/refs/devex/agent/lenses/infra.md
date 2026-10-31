@@ -8,29 +8,29 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/README.md",
-      "seen": "5904d346"
+      "seen": "a03990a0"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/01-function/02-scm.md",
-      "seen": "ae9375a4"
+      "seen": "29b8a0ac"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/01-function/07-deliver.md",
-      "seen": "3e8fbfab"
+      "seen": "1759f186"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/02-delivery.md",
-      "seen": "7db26161"
+      "seen": "2dd93f3f"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/01-function/02-scm.md",
       "section": "A task has three possible fates, and promotion is only one of them",
-      "seen": "459917b3"
+      "seen": "2c989bf3"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/01-function/02-scm.md",
       "section": "Repo tasks",
-      "seen": "9b3398b1"
+      "seen": "5639c6c7"
     }
   ]
 }
@@ -92,9 +92,9 @@
   - **Configuration follows the config plane**: logical keys per namespace and app, local env files and cloud paths as two realizations of one list — never a value pasted into code.
   - **Promotion is the branch map's.** Where a change deploys is manifest data (each environment row's `deploy` trigger), by pull request along a path chosen at each promotion, and a pull request merges only once every check its world requires passes. A required job, `promotion-source`, refuses any other head into `qa`, `uat` or `main`.
   - **A check that cannot fail is not written.** An estate with no modules gets no `lint` and no `cis-scan`, because a check over nothing proves nothing; a tier that needs a running stack joins CI with the job that stands it, never `test`.
-  - **Every workflow pins its actions by commit and its images by digest**, and installs `spnutils` at a named release; a tag can be moved after it was reviewed (`RULE.DEVEX.FUNCTION.065`).
-  - **Ask who invokes a script before you ask where it belongs.** A person or a pipeline reaches for a `tasks/` script or a CLI command; the agent's own loop reaches for a hook under `hooks/` or `hooks/tools/`. The bar there is foundational, proposed and built only once approved, and a hook degrades to silence (`RULE.DEVEX.FUNCTION.060`).
-  - **A repo-scoped script stays, is promoted or retires**, and a script that probes the estate for a fact a manifest declares only retires — promoting it makes the workaround permanent (`RULE.SUPPORT.APPS.121`).
+  - **Every workflow pins its actions by commit and its images by digest**, and installs `spnutils` at a named release; a tag can be moved after it was reviewed (`RULE.DEVEX.FUNCTION.065` · MUST · skill:spn-devex/scm).
+  - **Ask who invokes a script before you ask where it belongs.** A person or a pipeline reaches for a `tasks/` script or a CLI command; the agent's own loop reaches for a hook under `hooks/` or `hooks/tools/`. The bar there is foundational, proposed and built only once approved, and a hook degrades to silence (`RULE.DEVEX.FUNCTION.060` · MUST · skill:spn-devex/scm).
+  - **A repo-scoped script stays, is promoted or retires**, and a script that probes the estate for a fact a manifest declares only retires — promoting it makes the workaround permanent (`RULE.SUPPORT.APPS.121` · MUST · skill:spn-apps/implement).
   - **Destructive operations are named and gated**: teardown, reset and migration confirm before they mutate and report what they did.
   - Bring-up and teardown belong to the `up` and `down` commands, invoked deliberately, never on this lens's own initiative.
 

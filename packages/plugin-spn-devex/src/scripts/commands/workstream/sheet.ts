@@ -14,9 +14,9 @@
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { type Action, FLAG, VALUE, UsageFault, readWords } from "../../../../../plugin-support-lib/src/lib/command.ts";
-import { logEvent, readArc, readJsonl, readQuestions, readSheet, factsFileOf, sheetFileOf, writeWhole } from "../../lib/workstream.ts";
-import { ENTRY_OPS, parentIds, sheetFaults, type ArcData, type Fact, type Sheet, type SheetEntry } from "../../lib/workstream-schema.ts";
-import { arcNamed, listOf } from "./_shared.ts";
+import { logEvent, readArc, readJsonl, readQuestions, readSheet, factsFileOf, sheetFileOf, writeArc, writeWhole } from "../../lib/workstream.ts";
+import { ENTRY_OPS, parentIds, sheetFaults, type ArcData, type ArcRow, type Fact, type Sheet, type SheetEntry } from "../../lib/workstream-schema.ts";
+import { arcNamed, listOf, typed } from "./_shared.ts";
 
 export const describe = "the arc's change sheet: write it whole, edit or drop one entry, show it, check it against the rows and the cards";
 
@@ -45,8 +45,51 @@ function sheetOf(ws: string, arc: string): Sheet {
 
 const save = (ws: string, arc: string, sheet: Sheet): void => writeWhole(sheetFileOf(ws, arc), `${JSON.stringify(sheet, null, 2)}\n`);
 
+/** The kind of change an entry makes, by where its file sits: docs, generated output, or code. */
+function kindOf(entry: SheetEntry): "DOCS" | "GENERATED" | "CODE" {
+  const path = entry.file.slice(entry.file.indexOf(":") + 1);
+  if (/(^|\/)docs\//.test(path) || /\.md$/.test(path)) return "DOCS";
+  return /(^|\/)(generated|dist)\//.test(path) ? "GENERATED" : "CODE";
+}
+
+/**
+ * The arc's steps as its sheet derives them: one for each repository and kind of change, holding that group's entries;
+ * a release step for each repository when the sheet names a release order, and a proof step for each repository with code.
+ * A step the arc already has for the same repository and kind keeps its place and takes the entries; nothing is added twice.
+ * Returns the number of steps added.
+ */
+function deriveSteps(ws: string, arc: string, sheet: Sheet): number {
+  const data = readArc(ws, arc);
+  if (!data) return 0;
+  const groups = new Map<string, { repo: string; altitude: string; ids: string[] }>();
+  for (const entry of sheet.entries) {
+    const repo = entry.file.includes(":") ? entry.file.slice(0, entry.file.indexOf(":")) : "";
+    const altitude = kindOf(entry);
+    const group = groups.get(`${repo}|${altitude}`) ?? { repo, altitude, ids: [] };
+    group.ids.push(entry.id);
+    groups.set(`${repo}|${altitude}`, group);
+  }
+  let added = 0;
+  const top = (): ArcRow[] => data.rows.filter((row) => row.parent === arc);
+  const place = (repo: string, altitude: string, title: string, entries: string[] | null): void => {
+    const found = top().find((row) => row.repo === repo && row.altitude === altitude);
+    if (found) { if (entries) found.entries = entries; return; }
+    const id = String(Math.max(0, ...top().map((row) => parseInt(row.id, 10) || 0)) + 1);
+    const row: ArcRow = { id, parent: arc, title, kind: "change", repo, altitude, state: data.status === "DECIDED" ? "ready" : "waiting" };
+    if (entries) row.entries = entries;
+    data.rows.push(row);
+    added += 1;
+  };
+  for (const group of groups.values()) place(group.repo, group.altitude, `${group.repo} ${group.altitude.toLowerCase()}`, group.ids);
+  const repos = [...new Set([...groups.values()].map((group) => group.repo))];
+  if (sheet.releaseChain.length) for (const repo of repos) place(repo, "RELEASE", `release ${repo}`, null);
+  for (const group of groups.values()) if (group.altitude === "CODE") place(group.repo, "PROOF", `prove ${group.repo}`, null);
+  if (added || groups.size) typed(() => writeArc(ws, data));
+  return added;
+}
+
 function write(args: string[]): number {
-  const words = readWords(args, { file: VALUE });
+  const words = readWords(args, { file: VALUE, because: VALUE });
   const [ref, ...more] = words.paths;
   if (more.length) throw new UsageFault("takes one arc.");
   const { ws, arc } = arcNamed(ref);
@@ -57,10 +100,15 @@ function write(args: string[]): number {
   catch (thrown) { throw new UsageFault(`reads \`${file}\` as no JSON: ${(thrown as Error).message}.`); }
   const faults = writeFaults(ws, arc, data as Sheet, true);
   if (faults.length) return refused(faults);
+  // A decided arc's sheet is what the work was cut from: a rewrite carries the developer's words that changed it, and an empty sheet is written once.
+  const because = words.value("because")?.trim() ?? "";
+  if (readArc(ws, arc)?.status === "DECIDED" && (readSheet(ws, arc)?.entries.length ?? 0) > 0 && !because)
+    return refused([`${arc} is decided and its sheet holds entries — a rewrite carries \`--because "<the developer's words that changed it>"\``]);
   save(ws, arc, data as Sheet);
   const count = (data as Sheet).entries.length;
-  logEvent(ws, arc, "sheet", null, `written · ${count} entries`);
-  console.log(`ok · ${arc} sheet written · ${count} entries`);
+  const added = deriveSteps(ws, arc, data as Sheet);
+  logEvent(ws, arc, "sheet", null, `written · ${count} entries${because ? ` · because ${because}` : ""}`);
+  console.log(`ok · ${arc} sheet written · ${count} entries${added ? ` · ${added} step${added === 1 ? "" : "s"} derived` : ""}`);
   return 0;
 }
 

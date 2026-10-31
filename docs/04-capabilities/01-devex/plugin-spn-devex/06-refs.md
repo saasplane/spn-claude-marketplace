@@ -17,6 +17,7 @@ The files under `packages/plugin-spn-devex/src/refs/devex/` each restate part of
 | How the folder is arranged | `packages/plugin-spn-devex/src/refs/README.md` | only domain folders at the top, and which files are authored, generated or copied |
 | The CLI restated | `packages/plugin-spn-devex/src/refs/devex/utils/spnutils.md` | one file, merging what used to be a `README.md` and a separate `commands.md` — restated from the book's `01-spnutils.md` chapters through a `docs` citation, in its own words |
 | The copied templates | `packages/plugin-spn-devex/src/refs/devex/workspace/docs/templates/` | copied byte for byte, because a template is copied rather than restated |
+| The rules index | `packages/plugin-spn-devex/src/refs/rules.json` | written by the plugins build from the book: every rule's level, holder and class, where the book states it, and each plugin file that restates it; the session start and the skill steps read it |
 | The block and its hash | `packages/plugin-spn-devex/src/scripts/lib/restates.ts` | parsing, the hash, and the undeclared, unstamped and unread classification |
 | The comparison | `packages/plugin-spn-devex/src/scripts/commands/restates/check.ts` | every stamp re-read against a book handed to it, run as `spn-devex restates check` |
 | A stamped block, as written | the first lines of `packages/plugin-spn-devex/src/refs/devex/workspace/workspace.md` | the `spn:restates` comment: each chapter's path, an optional section, and its hash |
@@ -69,6 +70,12 @@ The files under `packages/plugin-spn-devex/src/refs/devex/` each restate part of
 **Why** — *loading every rule into every turn drowns the turn that needed one*.
 **What** — no file here loads on its own. A skill, an agent brief or a check names the one it needs at the point it needs it.
 **How** — read the citations rather than the folder: `skills/ideate/SKILL.md` names its ref, and `agents/spn-panel.md` names a lens by the argument it was handed.
+
+### A parenthesis restates the rule whole
+
+**Why** — *a ref that names a rule without its level lets the sentence around it soften the rule*, and nothing compared the two.
+**What** — every parenthesis a ref writes after a sentence restates the book's mark: the rule's id, its level and the check, skill or arc that holds it, as the book states them. A ref that drops a MUST is a finding.
+**How** — `spn-devex restates check` compares each parenthesis with the book's, one finding per field that differs. `packages/plugin-spn-devex/src/scripts/commands/restates/check.ts`.
 
 ## Between modules
 

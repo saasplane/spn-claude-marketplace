@@ -7,11 +7,11 @@ description: Start a SaaS Plane TS platform locally or run its test suites. Use 
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
-      "seen": "44c80d89"
+      "seen": "c110978c"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/04-develop.md",
-      "seen": "810ac3e8"
+      "seen": "1f777cff"
     }
   ]
 }
@@ -142,7 +142,7 @@ specified path does not exist`, which reads as a broken command rather than a mi
 
 ## After a run: the rows say what it found
 
-Every run is named by its caller, and leaves `tests/.output/<tier>/runs/<run>.json` behind — or `<run>.<phase>.json` for a journey phase — with every behaviour id its case titles carried, and what the runner actually did with each. **`spnutils` writes the run file and never a row** (`RULE.DEVEX.UTILS.071`). Writing it into the registers is the **spn-devex** plugin's row writer, `spn-devex behaviours stamp` in that plugin (cross-plugin pointer; it ships alongside this plugin), run the way its `test` skill runs it: first `spn-devex behaviours stamp check <run> <repo>` to see what it would change, then `spn-devex behaviours stamp write <run> <repo>`. It reads only the run you name, and writes `Updated at` as `<time> · <run>`. The run's name there is a label, and nothing checks a row against its run file after the stamp.
+Every run is named by its caller, and leaves `tests/.output/<tier>/runs/<run>.json` behind — or `<run>.<phase>.json` for a journey phase — with every behaviour id its case titles carried, and what the runner actually did with each. **`spnutils` writes the run file and never a row** (`RULE.DEVEX.UTILS.071` · MUST · check:behaviour-proof). Writing it into the registers is the **spn-devex** plugin's row writer, `spn-devex behaviours stamp` in that plugin (cross-plugin pointer; it ships alongside this plugin), run the way its `test` skill runs it: first `spn-devex behaviours stamp check <run> <repo>` to see what it would change, then `spn-devex behaviours stamp write <run> <repo>`. It reads only the run you name, and writes `Updated at` as `<time> · <run>`. The run's name there is a label, and nothing checks a row against its run file after the stamp.
 
 The join reads the rows and the case titles together:
 
@@ -152,7 +152,7 @@ spn-devex behaviours coverage show <repo> --json > /tmp/coverage.json   # a case
 
 Write `--json` to a file and read the file.
 
-**Code coverage is read, never enforced** (`RULE.SUPPORT.APPS.133`). A run that collects coverage prints its summary after the tests — lines, statements, functions and branches — and the test tool writes `coverage-summary.json` beside its report. Report those numbers as they are. No configuration carries a threshold, and nothing fails a run on a percentage. The one rule about coverage you check is that every exclude says why:
+**Code coverage is read, never enforced** (`RULE.SUPPORT.APPS.133` · MUST · skill:spn-apps/implement). A run that collects coverage prints its summary after the tests — lines, statements, functions and branches — and the test tool writes `coverage-summary.json` beside its report. Report those numbers as they are. No configuration carries a threshold, and nothing fails a run on a percentage. The one rule about coverage you check is that every exclude says why:
 
 ```bash
 spn-apps coverage check <project>   # an exclude with no comment giving its reason
@@ -236,7 +236,7 @@ means a build value was missing and threw at boot, naming the key.
 ## Mode: local — start the platform stack (start only, no tests)
 
 1. **Organization layer** (once per machine — skip if already up): `spnutils infra organization up --apply` — the machine's trust bootstrap: the local certificate authority, its one trust prompt, the shared ingress. The organization layer takes no `<spc>`, because a repository has at most one organization.
-2. **Platform layer**: `spnutils infra platform up <spc> --apply` — this platform's container group (database, cache, queue, and each installed module's local rendering) from the pinned declaration. `<spc>` is the platform code `sprepo.json` pins, and a different one is refused (`RULE.DEVEX.UTILS.072`). Check with `spnutils infra platform status <spc>`.
+2. **Platform layer**: `spnutils infra platform up <spc> --apply` — this platform's container group (database, cache, queue, and each installed module's local rendering) from the pinned declaration. `<spc>` is the platform code `sprepo.json` pins, and a different one is refused (`RULE.DEVEX.UTILS.072` · MUST · check:command-shape · due:036/N008). Check with `spnutils infra platform status <spc>`.
 3. **App layer** (per app, if not yet registered): `spnutils infra app up <app>` — schemas, per-schema roles, local TLS certificate, hosts entry, ingress vhost. No containers of its own.
 4. **Hosted-vendor modules** need no step of their own — a vendor you run is a module row in the platform declaration, and its local rendering comes up with the platform layer. There is no vendor command.
 5. **Start the service app**: `npx nx run <service>:dev`. It loads `local.env`, and its port and API-docs path come from the repo's own app env — read them rather than assume. On a fresh schema run `pnpm --filter <service> migrate up` first; it needs the platform-owner env variables sourced.

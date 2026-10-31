@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/03-platform/01-core/03-surfaces.md",
-      "seen": "0228dc9c"
+      "seen": "2ca9548a"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/03-platform/01-core/03-surfaces/",
-      "seen": "1126cd50"
+      "seen": "8b073916"
     }
   ]
 }
@@ -55,7 +55,7 @@ Never read the anchor as the bound organization — MUST NOT. A site anchored to
 
 You resolve a request in two reads and no code: the host finds the site's application, its anchor and its branding; the site then carries that context into sign-in, where the server — never the client — resolves it to the organization, application and scope a session will bind to. A caller sends a host and nothing else about itself, which is what makes the site behave like a registered client identifier: nothing a caller asserts can put it on an organization its site does not name.
 
-**A new customer touchpoint is a row somebody adds, never a release somebody ships.** If the developer wants to onboard an organization onto its own branded domain, add an app-site row naming the host, the app scope, and the owning organization — no code changes, and no deploy. The host serves because the running platform writes its route — which environment and application it opens — through the edge seam, and never a DNS record (`RULE.SUPPORT.INFRA.105`); deactivating the site deletes every host's route.
+**A new customer touchpoint is a row somebody adds, never a release somebody ships.** If the developer wants to onboard an organization onto its own branded domain, add an app-site row naming the host, the app scope, and the owning organization — no code changes, and no deploy. The host serves because the running platform writes its route — which environment and application it opens — through the edge seam, and never a DNS record (`RULE.SUPPORT.INFRA.105` · MUST · skill:spn-infra/run); deactivating the site deletes every host's route.
 
 ## Custom domains
 

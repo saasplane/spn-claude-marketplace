@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-infra/03-blueprints.md",
-      "seen": "14b2b8f2"
+      "seen": "92b08de7"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/03-blueprints/",
-      "seen": "506efbc4"
+      "seen": "de97d04e"
     }
   ]
 }
@@ -21,7 +21,7 @@ This card is provider-agnostic. The estate ships as one plugin, and a cloud is a
 
 ## What a blueprint is
 
-A blueprint is published code, written by SaaS Plane and never by the company running it — the same relationship a support package has to an application (rule `RULE.SUPPORT.INFRA.013`). **You never write the code that stands an estate up — you give it a declaration, and it runs in a fixed order.** The execution engine is SaaS Plane's own choice, made once. The resource vocabulary is closed, because nothing can provision a type with no blueprint behind it. And a company parameterizes rather than writes, which is what makes an estate reproducible by someone who has never seen it.
+A blueprint is published code, written by SaaS Plane and never by the company running it — the same relationship a support package has to an application (`RULE.SUPPORT.INFRA.013` · MUST · skill:spn-infra/implement). **You never write the code that stands an estate up — you give it a declaration, and it runs in a fixed order.** The execution engine is SaaS Plane's own choice, made once. The resource vocabulary is closed, because nothing can provision a type with no blueprint behind it. And a company parameterizes rather than writes, which is what makes an estate reproducible by someone who has never seen it.
 
 > A layer is an input shape, an output shape, and the components it creates.
 
@@ -39,11 +39,11 @@ The command surface **resolves and drives**; the blueprint library **creates**. 
 | 3 | `ENVIRONMENT` | environment | in order — the network, then the resources that sit in it, then the compute beside them, then under `CLUSTER` the engines on that compute, and last each world's users and published facts |
 | 4 | `DEPLOYMENTS` | environment | what actually runs |
 
-**Every layer above `GROUND` keeps its state in that store**, and a layer initialized with no shared backend is a conformance finding that refuses a cloud apply (`RULE.SUPPORT.INFRA.071`). `PLATFORM` creates a product's own organizational units and accounts, its control accounts and its two workload accounts, and then stands up what lives inside them; `ORGANIZATION` creates none of a product's accounts (`RULE.SUPPORT.INFRA.070`).
+**Every layer above `GROUND` keeps its state in that store**, and a layer initialized with no shared backend is a conformance finding that refuses a cloud apply (`RULE.SUPPORT.INFRA.071` · MUST · skill:spn-infra/implement). `PLATFORM` creates a product's own organizational units and accounts, its control accounts and its two workload accounts, and then stands up what lives inside them; `ORGANIZATION` creates none of a product's accounts (`RULE.SUPPORT.INFRA.070` · MUST · skill:spn-infra/implement).
 
 **These five are the model's layer nouns — `GROUND`, never `BOOTSTRAP`.** `GROUND` has no principals of its own and rides the `organization` command noun; `DEPLOYMENTS` rides the `environment` command noun the same way, so the command surface speaks three nouns for five layers.
 
-**Ordering inside a layer is not a boundary.** `PLATFORM` builds its containers before its accounts before its policies; `ENVIRONMENT` builds its network before the resources that sit in it before the compute beside them before the engines on it. A sequence earns a boundary only where the two sides differ in blast radius or in cadence (`RULE.SUPPORT.INFRA.024`). Everything inside one environment goes up together and comes down together.
+**Ordering inside a layer is not a boundary.** `PLATFORM` builds its containers before its accounts before its policies; `ENVIRONMENT` builds its network before the resources that sit in it before the compute beside them before the engines on it. A sequence earns a boundary only where the two sides differ in blast radius or in cadence (`RULE.SUPPORT.INFRA.024` · MUST · skill:spn-infra/implement). Everything inside one environment goes up together and comes down together.
 
 **Under `CLUSTER`, the engines step is its own — never folded into resources or compute.** It cannot ride the resources step, which runs before any cluster exists; it cannot ride the compute step, because an engine holds data and an environment operation may remove compute while it refuses data — putting an engine there would put data where the removable part is; and it cannot ride the world rendering, because a world mints its users inside a running engine and publishes the engine's address, so the engine must already stand. The step reads the same declaration the resources step reads, and under `MANAGED` it stands nothing, because the provider's own services are the resources step's.
 
@@ -75,7 +75,7 @@ The tree is logical and free of any provider's words — stated once in the name
 
 **A third account holds no environments at all.** Outside data lands in the staging account and is conditioned there before any of it reaches a workload. Workloads **pull** what they are entitled to; the staging account never pushes into them, holds no interactive access, and assumes no role into either workload.
 
-**Two workload accounts, however many regions a product runs in.** One environment lives in exactly one region; a workload holds as many regions as the product declares (`RULE.SUPPORT.INFRA.017`). An environment owns only its own slices, so it tears down without touching a sibling — by construction, not by care. A region's substrate rises with the first environment declared in it, the platform layer stands nothing per region ahead of demand (`RULE.SUPPORT.INFRA.074`), and the shared substrate falls only with a region's last environment.
+**Two workload accounts, however many regions a product runs in.** One environment lives in exactly one region; a workload holds as many regions as the product declares (`RULE.SUPPORT.INFRA.017` · MUST · skill:spn-infra/implement). An environment owns only its own slices, so it tears down without touching a sibling — by construction, not by care. A region's substrate rises with the first environment declared in it, the platform layer stands nothing per region ahead of demand (`RULE.SUPPORT.INFRA.074` · MUST · skill:spn-infra/implement), and the shared substrate falls only with a region's last environment.
 
 ## The trust graph
 
@@ -99,7 +99,7 @@ governance  ◀──  everything     receives only, and can deploy nothing
 
 ## Realization is a target, never a value
 
-A provider entry always names a real provider. **The local realization binds none of them and stands the same declared resources up as containers — realization is a target a command is pointed at, never a value stored in a manifest** (`RULE.SUPPORT.INFRA.018`). **Local is the default and cloud is never implicit — the target that creates real accounts is the one somebody has to ask for by name.**
+A provider entry always names a real provider. **The local realization binds none of them and stands the same declared resources up as containers — realization is a target a command is pointed at, never a value stored in a manifest** (`RULE.SUPPORT.INFRA.018` · MUST · skill:spn-infra/implement). **Local is the default and cloud is never implicit — the target that creates real accounts is the one somebody has to ask for by name.**
 
 | Layer | On a laptop | In the cloud |
 | --- | --- | --- |
@@ -114,7 +114,7 @@ A provider entry always names a real provider. **The local realization binds non
 
 ## An environment is derived — three things may vary
 
-**Only what an environment's own row declares may vary: its workload, its size, and its hosting** (`RULE.SUPPORT.INFRA.064`). If a difference between two environments cannot be written as one of those three, it is a defect in the design rather than a case for a special environment.
+**Only what an environment's own row declares may vary: its workload, its size, and its hosting** (`RULE.SUPPORT.INFRA.064` · MUST · skill:spn-infra/implement). If a difference between two environments cannot be written as one of those three, it is a defect in the design rather than a case for a special environment.
 
 | Decides | Source |
 | --- | --- |
@@ -124,7 +124,7 @@ A provider entry always names a real provider. **The local realization binds non
 | how much capacity | the size, read within the workload |
 | where its engines run | the hosting — non-production only |
 
-**Invariants reach every environment, with no exception anywhere — MUST.** Encryption at rest, transport security, no publicly readable data stores, no long-lived credentials, mandatory tagging, audit trails, the application firewall — all of them, from the first apply. There is no *harden it before production* phase, and no template that varies any of it (`RULE.SUPPORT.INFRA.014`): anything a template would vary is either a workload concern or a security control that must not be optional anywhere. A control exercised only in production is a control nobody has tested.
+**Invariants reach every environment, with no exception anywhere — MUST.** Encryption at rest, transport security, no publicly readable data stores, no long-lived credentials, mandatory tagging, audit trails, the application firewall — all of them, from the first apply. There is no *harden it before production* phase, and no template that varies any of it (`RULE.SUPPORT.INFRA.014` · MUST · skill:spn-infra/implement): anything a template would vary is either a workload concern or a security control that must not be optional anywhere. A control exercised only in production is a control nobody has tested.
 
 **Workload is posture and isolation, not a label.** A product has exactly two workloads, and each is its own account, its own governance, its own place in the trust graph, and its own reliability posture.
 
@@ -152,7 +152,7 @@ Five rungs rather than three, because a three-rung ladder collapses production-a
 
 ## What proves an estate change
 
-**A declaration is proven by rendering it against a target, never by calling a function and reading what comes back** (`RULE.SUPPORT.INFRA.097`). **The tiers are the apps ladder's own** — `SPTestTierType`, never a second enum that would drift from it (`DEC.SUPPORT.INFRA.102`) — and an estate node reuses a tier's name wherever its meaning is the same (`RULE.SUPPORT.INFRA.107`).
+**A declaration is proven by rendering it against a target, never by calling a function and reading what comes back** (`RULE.SUPPORT.INFRA.097` · MUST · skill:spn-infra/implement). **The tiers are the apps ladder's own** — `SPTestTierType`, never a second enum that would drift from it (`DEC.SUPPORT.INFRA.102`) — and an estate node reuses a tier's name wherever its meaning is the same (`RULE.SUPPORT.INFRA.107` · MUST · skill:spn-infra/implement).
 
 | Tier | Stands on | Proves | Cannot prove |
 | --- | --- | --- | --- |
@@ -164,7 +164,7 @@ Five rungs rather than three, because a three-rung ladder collapses production-a
 
 **Two rungs sit outside the ladder, on purpose.** The build — the declaration parses, the tree matches its type, the manifest matches its contract — is a static gate, never proof, the same way a type check is not a test; `spnutils infra test <run>` runs it first and it prints no case. A stand-up provisions against a real target and speaks for that target and for no other — never claim a layer works on the strength of a run that never touched the target in question. Where nothing has ever been applied against a target, say plainly that the tiers pass and the stand-up has not run.
 
-**Every estate package keeps its tests in the same tree**: one folder per owed tier under `tests/` — the folder naming the tier, the file's kind naming the engine — so a case sitting in the wrong folder is refused rather than counted. A harness reports cases, never only an exit code: `ok`, `not ok` or `skip`, the tier, the behaviour id, a title, through `helpers/case.sh`; `spnutils infra test <run>` turns the lines into run files, one per tier at `tests/.output/<tier>/runs/<run>.json`, in the shape apps write; the agent stamps the rows from the run it names, and `spnutils infra release` names its own test run `release-<version>`, such as `release-0.4.1`, and refuses a node whose owed tier has no case or a failing one. A pipeline publishes the run file and stops there; it never edits a document to say a run succeeded (`RULE.SUPPORT.INFRA.094` — every provisioning run names its own mode, and a rehearsal needs no credential).
+**Every estate package keeps its tests in the same tree**: one folder per owed tier under `tests/` — the folder naming the tier, the file's kind naming the engine — so a case sitting in the wrong folder is refused rather than counted. A harness reports cases, never only an exit code: `ok`, `not ok` or `skip`, the tier, the behaviour id, a title, through `helpers/case.sh`; `spnutils infra test <run>` turns the lines into run files, one per tier at `tests/.output/<tier>/runs/<run>.json`, in the shape apps write; the agent stamps the rows from the run it names, and `spnutils infra release` names its own test run `release-<version>`, such as `release-0.4.1`, and refuses a node whose owed tier has no case or a failing one. A pipeline publishes the run file and stops there; it never edits a document to say a run succeeded (`RULE.SUPPORT.INFRA.094` · MUST · skill:spn-infra/implement): every provisioning run names its own mode, and a rehearsal needs no credential.
 
 ## What it makes checkable
 

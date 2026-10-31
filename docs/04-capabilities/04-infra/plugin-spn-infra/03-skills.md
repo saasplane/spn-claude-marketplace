@@ -64,6 +64,12 @@ The folders under `packages/plugin-spn-infra/src/skills/` are `new`, `implement`
 **What** — no skill here loads a per-cloud procedure, and this plugin ships no skills half under any provider folder. The walk reads the same whichever cloud the estate resolves to.
 **How** — what does differ per cloud is the vocabulary, restated as a fact in the refs tree. `packages/plugin-spn-infra/src/refs/support/infra/providers/`.
 
+### A step opens with the rules its skill holds
+
+**Why** — *a skill that names a rule only where its author remembered to leaves the rest to memory*, and a step is the moment a rule matters.
+**What** — each step that does a skill's work opens with a generated block of the rules that skill holds, each with the level the book gives it. A reader sees how strongly a rule binds without opening the book.
+**How** — the plugins build writes the block from the rules index that spn-devex builds from the book (`refs/rules.json`), so a skill step in spn-infra restates nothing by hand. A rule changed in the book changes the block at the next build.
+
 ## Between modules
 
 | Direction | With | What | Why |

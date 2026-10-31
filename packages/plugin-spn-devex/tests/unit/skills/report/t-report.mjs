@@ -26,7 +26,7 @@ const order = ["Summary", "Findings", "Records", "Measured", "Recommendations"].
 check("5.1: the five sections are listed in the book's order", order.every((at, i) => at > 0 && (i === 0 || at > order[i - 1])));
 check("5.1: the header's second line is Repo · Commit · Generated", SKILL.includes("Repo: <folder name> | Commit: <short hash> | Generated: <time>"));
 check("5.1: the block carries `repository`", /`repository`/.test(SKILL) && /`reportType`/.test(SKILL));
-check("5.1: no status and no comparison with an earlier report", /No status, and no comparison with an earlier report — MUST/.test(SKILL));
+check("5.1: no status and no comparison with an earlier report", /No status, and no comparison with an earlier report\*\* \(`RULE\.DEVEX\.WORKSPACE\.192` · MUST/.test(SKILL));
 check("5.1: Measured shows Scope, Measure again and Not looked at, and folds Method",
   /\*\*Scope\*\*/.test(SKILL) && /\*\*Measure again\*\*/.test(SKILL) && /\*\*Not looked at\*\*/.test(SKILL) && /folded under \*How each number was produced\*/.test(SKILL));
 check("5.1: the old section names are gone", !/What was measured|What this did not look at|What to do/.test(SKILL));
@@ -42,7 +42,7 @@ check("5.1: the plain words table maps seat, construct, kind and owed tier",
 check("5.1: the report fixes nothing — an arc for the agent's items, Q cards for the developer's",
   /\*\*The report fixes nothing\.\*\*/.test(SKILL) && /open an arc/.test(SKILL) && /`Q<n>` card/.test(SKILL));
 check("2l: never published unless the developer asks, handed over as the full path",
-  /Never publish a report unless the developer asks — MUST/.test(SKILL) && /full path/.test(SKILL) && /RULE\.DEVEX\.WORKSPACE\.117/.test(SKILL));
+  /Never publish a report unless the developer asks\*\* \(`RULE\.DEVEX\.WORKSPACE\.117` · MUST/.test(SKILL) && /full path/.test(SKILL) && /RULE\.DEVEX\.WORKSPACE\.117/.test(SKILL));
 
 console.log("\n=== 5.1 — each report type: its command, its tables and its record groups");
 const TYPES = {

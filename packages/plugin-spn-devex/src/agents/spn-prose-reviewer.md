@@ -58,7 +58,7 @@ For each passage, compare before and after:
 ## A masthead is judged by a stricter rule
 
 **A page's Title, Subtitle and Description are plain language, and a rewrite of them is judged on
-that too** (rules RULE.DEVEX.WORKSPACE.182 · RULE.DEVEX.WORKSPACE.187). Where the sample holds a
+that too** (`RULE.DEVEX.WORKSPACE.182` · MUST · check:doc-check) (`RULE.DEVEX.WORKSPACE.187` · MUST · check:doc-check). Where the sample holds a
 masthead, answer three more questions:
 
 1. **Plain.** Everyday words, one idea a sentence, no number, no slogan, no figure of speech, and no

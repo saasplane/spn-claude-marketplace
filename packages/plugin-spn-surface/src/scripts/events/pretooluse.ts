@@ -19,6 +19,7 @@ import { begin, span, end as endTiming, tagsOf, type SpanName } from "../../../.
 import { emit, payload } from "../../../../plugin-support-lib/src/lib/payload.ts";
 import { FIGMA_TOOL, run as runFigmaConnector } from "../checks/figma-connector.ts";
 import { run as runUnitRead } from "../checks/unit-read.ts";
+import { run as runDesignGuidance, watched as guidanceWatched } from "../checks/design-guidance.ts";
 import { isTsxSource } from "../lib/node.ts";
 
 export async function dispatch(event: Payload, span: <T>(name: SpanName, fn: () => T) => T): Promise<Verdict> {
@@ -32,6 +33,9 @@ export async function dispatch(event: Payload, span: <T>(name: SpanName, fn: () 
   // text, before a file is read or the check is loaded: start-up and loading were nine tenths of a
   // hook's cost, and most writes are not Surface code.
   const path = event.tool_input?.file_path;
+  // DESIGN GUIDANCE reads the refs, design-system pages and check sources, on the path's text alone.
+  if ((event.tool_name === "Write" || event.tool_name === "Edit") && path && guidanceWatched(path))
+    return span({ group: "surface", action: "guidance" }, () => runDesignGuidance(event.tool_input ?? {}));
   if ((event.tool_name !== "Write" && event.tool_name !== "Edit") || !path || !isTsxSource(path)) return null;
   const reader = await span({ group: "surface", action: "load" },
     async () => (await import("../checks/subjects.ts")).surfaceFor(path));

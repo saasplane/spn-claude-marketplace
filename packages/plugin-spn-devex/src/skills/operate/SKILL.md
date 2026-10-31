@@ -7,11 +7,11 @@ description: How a running platform is observed, responded to, and maintained - 
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
-      "seen": "44c80d89"
+      "seen": "c110978c"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/08-operate.md",
-      "seen": "9fc36d41"
+      "seen": "f2e63b1d"
     }
   ]
 }

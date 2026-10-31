@@ -112,4 +112,35 @@ one("a payload with no file path", {
   expect: "",
 });
 
+console.log("\n=== read-verb-naming — the naming chapter outside the contract seat [MKT.HOOKS.141]");
+
+const SERVICE = "packages/thing-ts/src/app/services/UserService.ts";
+const ENTITY = "packages/thing-ts/src/app/entities/IamUserEntity.ts";
+const klass = (body) => `export class UserService {\n${body}\n}\n`;
+const naming = (label, path, content, expect, says) => one(`[MKT.HOOKS.141] ${label}`, {
+  script: "read-verb-naming", root: tree({ [path]: content }), input: { file_path: path, content }, expect, says });
+
+naming("a method with no verb is refused", SERVICE,
+  klass("  sessionData(): Promise<Session> {\n    return load();\n  }"), "deny", "sessionData() opens with no verb");
+naming("the fix names the verb", SERVICE,
+  klass("  sessionData(): Promise<Session> {\n    return load();\n  }"), "deny", "readSessionData");
+naming("a boolean that does not read yes or no", SERVICE,
+  klass("  active(): boolean {\n    return true;\n  }"), "deny", "isActive");
+naming("a boolean field that does not read yes or no", SERVICE,
+  klass("  locked: boolean;"), "deny", "isLocked");
+naming("an enum type that does not end in _type", SERVICE,
+  klass("  readonly sql = 'CREATE TYPE iam_handle AS ENUM (\\'EMAIL\\')';"), "deny", "iam_handle_type");
+naming("a bare type discriminator on an entity", ENTITY,
+  klass("  type!: string;"), "deny", "<noun>Type");
+naming("a reference column not named <table>_id", ENTITY,
+  klass("  orgRef!: string;"), "deny", "<table>_id");
+naming("a method that opens with a verb", SERVICE,
+  klass("  readSession(): Promise<Session> {\n    return load();\n  }"), "");
+naming("a boolean that reads yes or no", SERVICE,
+  klass("  isActive(): boolean {\n    return true;\n  }"), "");
+naming("an enum type that ends in _type", SERVICE,
+  klass("  readonly sql = 'CREATE TYPE iam_handle_type AS ENUM (\\'EMAIL\\')';"), "");
+naming("a control statement and a constructor are not methods", SERVICE,
+  klass("  constructor(private readonly db: Db) {}\n  readAll(): void {\n    if (this.db) {\n      return;\n    }\n  }"), "");
+
 done("read-verb-naming");

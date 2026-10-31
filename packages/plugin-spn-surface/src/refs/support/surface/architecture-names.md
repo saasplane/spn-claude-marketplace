@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/04-architecture-names.md",
-      "seen": "fe2e8637"
+      "seen": "2e8468bd"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/04-architecture-names/",
-      "seen": "0cd321cf"
+      "seen": "af87c320"
     }
   ]
 }
@@ -37,7 +37,7 @@ Read this before you name a new block, a new prop or a new layer of the design s
 
 One name is used in the book, in the design library and in every stack. The book names every block, prop, closed value and token. The design library draws each one under that name, and a stack builds it under that name. No file maps a design name to a code name. A stack may add the form its language asks for, and never a second name.
 
-- **A token has one name, the book's, written in small letters with dashes** (`RULE.SUPPORT.SURFACE.298`). The library names its variable with it as it is, and each stack spells it by one fixed rule of its language: the web as a custom property, `--surface-raised`, and a native stack as its language writes a name, such as `surfaceRaised`. A slash, which only a design tool can hold, is never part of a token's name.
+- **A token has one name, the book's, written in small letters with dashes** (`RULE.SUPPORT.SURFACE.298` · MUST · skill:spn-surface/design). The library names its variable with it as it is, and each stack spells it by one fixed rule of its language: the web as a custom property, `--surface-raised`, and a native stack as its language writes a name, such as `surfaceRaised`. A slash, which only a design tool can hold, is never part of a token's name.
 
 ## The three shared names — ✅
 
@@ -47,7 +47,7 @@ One name is used in the book, in the design library and in every stack. The book
 | `color` | the hue | `DEFAULT` · `CUSTOM` · `PRIMARY` · `INFO` · `SUCCESS` · `WARNING` · `ERROR` | `DSColorType` |
 | `size` | the density step, read smallest to largest | `XS` · `SM` · `MD` · `LG` · `XL` | `DSSizeType` |
 
-**The five values of `size` are read smallest to largest, `XS` to `XL`, wherever they are listed** — in the book, in the design library and in every stack — **and `SM` is the default size a theme sets**; a block told no size takes it. `color` has no order, because a hue is no scale. **The values of `variant` are named by their strength, as the tones are, and read from the strongest to the faintest** (`RULE.SUPPORT.SURFACE.154`): `SOLID` the hue's full colour, `QUIET` a medium tint, `SUBTLE` a light tint with no edge, `SUBTLE_OUTLINE` the light tint with a line, `OUTLINE` a line and no fill, `GHOST` no fill until the pointer, `LINK` text alone. Every variant of every hue keeps its text at 4.5 to 1, at rest and under the pointer; the line of an outline is a decoration, not held to 3 to 1. `architecture-core.md` gives the shades.
+**The five values of `size` are read smallest to largest, `XS` to `XL`, wherever they are listed** — in the book, in the design library and in every stack — **and `SM` is the default size a theme sets**; a block told no size takes it. `color` has no order, because a hue is no scale. **The values of `variant` are named by their strength, as the tones are, and read from the strongest to the faintest** (`RULE.SUPPORT.SURFACE.154` · MUST · skill:spn-surface/design): `SOLID` the hue's full colour, `QUIET` a medium tint, `SUBTLE` a light tint with no edge, `SUBTLE_OUTLINE` the light tint with a line, `OUTLINE` a line and no fill, `GHOST` no fill until the pointer, `LINK` text alone. Every variant of every hue keeps its text at 4.5 to 1, at rest and under the pointer; the line of an outline is a decoration, not held to 3 to 1. `architecture-core.md` gives the shades.
 
 **`CUSTOM` is a value of `color` that means the caller owns the colour.** A block's inner text and icon take the colour around them, and a page passes a chosen colour as `customColor` on the blocks that take it. It is the one named way a page sets a colour outside the theme. `DSButton` and `DSSeparator` take no `customColor`. A colour the page chooses gives every variant: the design system works the fill, the text and the line of each out from the one colour, in light and in dark, and pulls the text until it reads at 4.5 to 1 on its fill.
 
@@ -55,7 +55,7 @@ Keep each of the three names for its one meaning, on every block — a block tak
 
 ### Size and scale size
 
-The design system has two sizes, and each means one thing (`RULE.SUPPORT.SURFACE.100`). A person operates a control, so its height follows the density of the place it stands in. A picture is only shown, so a page chooses how large it is drawn.
+The design system has two sizes, and each means one thing (`RULE.SUPPORT.SURFACE.100` · MUST · skill:spn-surface/design). A person operates a control, so its height follows the density of the place it stands in. A picture is only shown, so a page chooses how large it is drawn.
 
 | What is compared | `size` | `scaleSize`, with the vocabulary `DSScaleSizeType` |
 | --- | --- | --- |
@@ -100,9 +100,9 @@ A design and its code agree on a prop only when they agree on what it takes. Wit
 - **A prop whose values are a vocabulary is stated with its values.** A long code list may be stated by the vocabulary's name and the place its values are stated, as the icons are. The first table below holds the vocabularies of the design system, and the second holds the shared ones.
 - **The design library carries such a prop under the same name and the same values, and every stack takes it under the same name and the same values.** This is the rule that a name is the contract, applied to the values of a prop.
 - **A vocabulary is either the design system's own or a shared one of the platform.** The design system's own is `DS<Component><Word>Type`, and it drops the component where several blocks take it, as `DSOrientationType` does. A shared one is `SP…Type`. It is realized once, in the Support contract, so that a service and a surface use the same values, and a design system never defines a shared one again.
-- **An alignment takes the core's vocabulary of its axis, on any unit** (`RULE.SUPPORT.SURFACE.249`). There is one for each axis: `DSHorizontalAlignType`, `START` · `CENTER` · `END` in the reading direction, and `DSVerticalAlignType`, `TOP` · `CENTER` · `BOTTOM`. They are the design system's own and drop the component, as `DSOrientationType` does, because any unit takes them. The prop keeps the unit's word, such as `mediaAlign`, `endAlign`, `verticalAlignment` or `textAlign`, and no unit defines an alignment vocabulary of its own (`architecture-core.md`).
+- **An alignment takes the core's vocabulary of its axis, on any unit** (`RULE.SUPPORT.SURFACE.249` · MUST · skill:spn-surface/design). There is one for each axis: `DSHorizontalAlignType`, `START` · `CENTER` · `END` in the reading direction, and `DSVerticalAlignType`, `TOP` · `CENTER` · `BOTTOM`. They are the design system's own and drop the component, as `DSOrientationType` does, because any unit takes them. The prop keeps the unit's word, such as `mediaAlign`, `endAlign`, `verticalAlignment` or `textAlign`, and no unit defines an alignment vocabulary of its own (`architecture-core.md`).
 - **A unit or a prop of the design library follows one order: the construct in the book, then the library in Figma as its visual proof, then each stack, then the showcase.** Each step follows the one before it. A component that belongs to one app does not follow this order.
-- **The order binds a core unit and its props, which are the ones the book names. It does not bind a unit that a stack provides on its own** (`RULE.SUPPORT.SURFACE.082`). The foundation does not drive such a unit, as `architecture-components.md` states. The stack builds it and states it in its own docs, and the showcase shows it marked as the stack's own. A stack's own unit that is to join the core units takes the order from its first step.
+- **The order binds a core unit and its props, which are the ones the book names. It does not bind a unit that a stack provides on its own** (`RULE.SUPPORT.SURFACE.082` · MUST · skill:spn-surface/design). The foundation does not drive such a unit, as `architecture-components.md` states. The stack builds it and states it in its own docs, and the showcase shows it marked as the stack's own. A stack's own unit that is to join the core units takes the order from its first step.
 
 **The design system's own vocabularies.** A yes-or-no prop takes no vocabulary. The default is the value shown with "when unset".
 
@@ -182,7 +182,7 @@ A design and its code agree on a prop only when they agree on what it takes. Wit
 | `DSPopover` | `trigger` | `HOVER` · `CLICK`, `HOVER` when unset | `DSTriggerType` |
 | `DSSticky` | `mode` (required) | `TOP` · `BOTTOM` | `DSPlacementVerticalType` |
 
-**A block that draws itself by its place on a page takes `pageLevel` for that place, with the vocabulary `DSPageLevelType`** (`RULE.SUPPORT.SURFACE.113`). The values are read from the top of the page down: `PAGE`, `CONTAINER`, `WIDGET`, `GROUP`, `CONTENT`, `INLINE`. `DSItem`, `DSItemFacts`, `DSTabs`, `DSStepper` and `DSFeature` take it, and a block takes no vocabulary of its own for its place on a page. `architecture-components.md` states what each level draws.
+**A block that draws itself by its place on a page takes `pageLevel` for that place, with the vocabulary `DSPageLevelType`** (`RULE.SUPPORT.SURFACE.113` · MUST · skill:spn-surface/design). The values are read from the top of the page down: `PAGE`, `CONTAINER`, `WIDGET`, `GROUP`, `CONTENT`, `INLINE`. `DSItem`, `DSItemFacts`, `DSTabs`, `DSStepper` and `DSFeature` take it, and a block takes no vocabulary of its own for its place on a page. `architecture-components.md` states what each level draws.
 
 **The shared vocabularies of the platform.** The Support contract realizes them for code, and the book states the values for a designer.
 
@@ -224,8 +224,8 @@ A suffix names where a unit is placed: `App`, `Layout`, `Container` and `Widget`
 | Around a page | `Layout` | `DSLayout` |
 | Around an app | `App` | `DSApp` |
 
-- **A suffix MUST name where a unit is placed: `App`, `Layout`, `Container` or `Widget`** (`RULE.SUPPORT.SURFACE.229`). A reader then tells where a block stands from its name alone, in the book, in the design library and in every stack.
-- **The word before `Container` MUST name the box the unit draws, and the unit MUST be written in place of that box** (`RULE.SUPPORT.SURFACE.267`). A `…PanelContainer` stands where a panel may, and a `…SectionContainer` where a section may. There is no `DSCardContainer`, `DSFeatureContainer` or `DSFeatureSectionContainer`. `architecture-containers.md` states the rule and the props it carries.
+- **A suffix MUST name where a unit is placed: `App`, `Layout`, `Container` or `Widget`** (`RULE.SUPPORT.SURFACE.229` · MUST · skill:spn-surface/design). A reader then tells where a block stands from its name alone, in the book, in the design library and in every stack.
+- **The word before `Container` MUST name the box the unit draws, and the unit MUST be written in place of that box** (`RULE.SUPPORT.SURFACE.267` · MUST · skill:spn-surface/design). A `…PanelContainer` stands where a panel may, and a `…SectionContainer` where a section may. There is no `DSCardContainer`, `DSFeatureContainer` or `DSFeatureSectionContainer`. `architecture-containers.md` states the rule and the props it carries.
 - **A component MUST take no such word.** A composite is placed nowhere in particular, so it is a component and takes none: a data table is `DSDataTable`, never a widget by name.
 - **No block MAY carry a letter for its layer before its name.** A letter before the name was the only mark of its kind in the design system, and a reader had to be told what it stood for.
 - **A name that belongs to a block MUST keep the block's whole name first, and its own word follows.** This holds for a config, a vocabulary, an item and a private part. The table below gives the names that belong to the core composites and the core widget.

@@ -48,7 +48,9 @@ import { APPROACH_SUFFIX, ARCS, DEVEX, SESSIONS, WORKSTREAM_STATES, WORKSTREAMS,
          type WorkstreamState } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { OWN_COPY, linksSharedStyles } from "../../../../plugin-support-lib/src/lib/page-styles.ts";
 import { alreadyTold, fromWorkspace, named, windowSet } from "../lib/window.ts";
-import { logLinesOf, readQuestions } from "../lib/workstream.ts";
+import { logLinesOf, arcStatus as readArcStatus, readArc, readQuestions, readSheet } from "../lib/workstream.ts";
+import { changedEntries, readGo, refOf } from "../lib/go-plan.ts";
+import type { ScopeSheet } from "../lib/go-plan.ts";
 
 // The state a row reaches. `landed` is the only one that satisfies the documents pass; all three
 // named states satisfy the close. A mark nobody wrote is what the close refuses.
@@ -852,13 +854,44 @@ function silent(payload: Payload, root: string, slot: string, finding: string, f
   return alreadyTold(root, payload.session_id, slot, finding);
 }
 
-export function gateDocumentsFirst(payload: Payload): Verdict {
-  if (!TOUCHES_PLAN.test(subjectText(payload))) return null;      // the fast path
+/** A path under `src/` or `tests/` of a member repository: code, as the documents row must precede it. */
+const CODE_SEAT = /\/(?:src|tests)\//;
 
+/** The row of an arc this window works on that makes a repository's code wait: its documents row, not landed. Null where none does. */
+function documentsPending(root: string, session: string | undefined, repo: string): string | null {
+  for (const [subject] of [...ownWorkstreams(root, session)].sort((a, b) => a[0].localeCompare(b[0]))) {
+    for (const folder of subjectFolders(root, subject, null)) {
+      for (const arc of dataArcsOf(folder)) {
+        const data = readArc(folder, arc);
+        if (!data || !Array.isArray(data.rows)) continue;
+        // An arc with no go builds nothing yet, and a carried or dropped arc builds nothing at all.
+        if (!["DECIDED", "RUNNING"].includes(readArcStatus(data))) continue;
+        const parents = new Set(data.rows.map((row) => row.parent));
+        const waiting = data.rows.find((row) => !parents.has(row.id) && row.altitude === "DOCS" && row.repo === repo
+          && !["landed", "carried", "deferred", "replaced"].includes(row.state ?? ""));
+        if (waiting) return `Row ${waiting.id} of ${arc}, the documents row of ${repo}, has not landed. Land the documents first (RULE.DEVEX.WORKSPACE.320).`;
+      }
+    }
+  }
+  return null;
+}
+
+export function gateDocumentsFirst(payload: Payload): Verdict {
   const supplied = payload.tool_input ?? {};
   const cwd = payload.cwd ?? process.cwd();
+  const plan = TOUCHES_PLAN.test(subjectText(payload));
+  const code = supplied.file_path ? resolve(cwd, supplied.file_path) : null;
+  const codeWrite = code !== null && CODE_SEAT.test(slashes(code)) && !slashes(code).includes(`/${DEVEX}/`);
+  if (!plan && !codeWrite) return null;                          // the fast path
+
   const root = workspaceRoot(cwd);
-  if (root) {
+  if (codeWrite && code !== null) {
+    const seatRoot = workspaceRoot(code) ?? root;
+    const repo = seatRoot ? repoOf(seatRoot, code) : null;
+    const held = seatRoot && repo ? documentsPending(seatRoot, payload.session_id, repo) : null;
+    if (held) return { deny: held };
+  }
+  if (root && plan) {
     // THE ANSWERED CARD. It is the rule most often broken by the agent that just obeyed it: the
     // answer lands, the work moves on, and the page keeps asking. Checked here rather than at close
     // because by then it has misled every reader. Only the workstreams this window works on are read,
@@ -938,7 +971,7 @@ export function gateDocumentsFirst(payload: Payload): Verdict {
   // A PAGE THAT HOLDS ITS OWN COPY OF THE STYLES IS NAMED to the window that works on its workstream,
   // once for one page, and never to a child. The page the call itself writes is `doc-check`'s to name,
   // so one call never says it twice.
-  if (root && !payload.agent_id) {
+  if (root && plan && !payload.agent_id) {
     const written = supplied.file_path ? resolve(cwd, supplied.file_path) : null;
     const unmoved = [...ownWorkstreams(root, payload.session_id)].sort((a, b) => a[0].localeCompare(b[0]))
       .flatMap(([, pages]) => ownCopyLines(root, pages.filter((page) => resolve(page) !== written)));
@@ -1009,6 +1042,33 @@ const WORKTREES = ".worktrees";
 function setsRoot(root: string): string {
   const above = dirname(root);
   return basename(above) === WORKTREES ? dirname(above) : root;
+}
+
+/**
+ * What `go check` finds in the go plans of a workstream's arcs, and the parts that have not landed: an entry of a sheet no
+ * part holds, a part whose entries changed since the plan was written, and a part still ready, running or held. A workstream
+ * with no go plan finds nothing.
+ */
+function goFindings(folders: string[]): string[] {
+  const out: string[] = [];
+  for (const folder of [...new Set(folders.map((one) => resolve(one)))]) {
+    for (const arc of dataArcsOf(folder)) {
+      let plan;
+      try { plan = readGo(folder, arc); } catch (fault) { out.push(String((fault as Error).message ?? fault).slice(0, 200)); continue; }
+      if (!plan) continue;
+      const scope: ScopeSheet[] = [];
+      for (const one of plan.scope) { const sheet = readSheet(folder, one); if (sheet) scope.push({ arc: one, sheet }); }
+      const held = new Set(plan.parts.flatMap((part) => part.entries));
+      for (const { arc: of, sheet } of scope) for (const entry of sheet.entries)
+        if (!held.has(refOf(of, entry))) out.push(`${refOf(of, entry)} is held by no part`);
+      for (const part of plan.parts) {
+        const moved = changedEntries(part, scope);
+        if (moved.length) out.push(`part ${part.id}: entries ${moved.join(" and ")} changed after the plan was written`);
+        if (part.state !== "landed") out.push(`part ${part.id} of ${arc} has not landed (${part.state})`);
+      }
+    }
+  }
+  return out;
 }
 
 export function gateClose(payload: Payload): Verdict {
@@ -1083,6 +1143,18 @@ export function gateClose(payload: Payload): Verdict {
           `If this scope genuinely planned nothing, say so in a one-row arc rather than by ` +
           `leaving the rows out — an absent plan and a finished one are indistinguishable to any ` +
           `reader, not just to this hook.`,
+      };
+
+    // THE GO MUST BE WHOLE AND RUN: `go check` finds nothing, and every part of the plan has landed.
+    const goLeft = goFindings(folders);
+    if (goLeft.length)
+      return {
+        note: `Close gate — \`${subject}\` has a go that is not whole or not run.`,
+        deny:
+          `Denied: \`${subject}\` cannot close while its go is unfinished.\n\n` +
+          `${goLeft.slice(0, 10).map((line) => `  - ${line}`).join("\n")}${goLeft.length > 10 ? `\n  … and ${goLeft.length - 10} more` : ""}\n\n` +
+          `Run \`spn-devex workstream go check <workstream>/N<nnn>\` and read what it names; a part lands when its helper's report is in, ` +
+          `and a plan that lost an entry is written again with \`go write\`.`,
       };
 
     const pending = rows.filter((row) => !accounted(row));

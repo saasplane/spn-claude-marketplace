@@ -59,6 +59,12 @@ The cards sit under `packages/plugin-spn-infra/src/refs/support/infra/`. Each re
 **What** — each cloud has a card of its own, numbered subject by subject — realization, ground, session, addressing, tagging, organization, platform, environment, deployments, library, conformance.
 **How** — a cloud the plugin ships no validator for still has its entries here, because the words are true whether or not code reads them. `packages/plugin-spn-infra/src/refs/support/infra/providers/local/`.
 
+### A parenthesis restates the rule whole
+
+**Why** — *a ref that names a rule without its level lets the sentence around it soften the rule*, and nothing compared the two.
+**What** — every parenthesis a ref writes after a sentence restates the book's mark: the rule's id, its level and the check, skill or arc that holds it, as the book states them. A ref that drops a MUST is a finding.
+**How** — `spn-devex restates check` compares each parenthesis with the book's, one finding per field that differs. `packages/plugin-spn-devex/src/scripts/commands/restates/check.ts`.
+
 ## Between modules
 
 | Direction | With | What | Why |

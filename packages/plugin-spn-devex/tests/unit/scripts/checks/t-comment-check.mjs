@@ -308,5 +308,40 @@ one("and an Edit that adds nothing to argue with is silent", {
   source: `  // Ordered before the cache purge: a reader between the two would see a dropped session.
   return listener.topic;`});
 
+console.log("\n=== comment-check — an old name kept beside the new one");
+
+one("[MKT.HOOKS.132] an alias export under the old name is refused", {
+  expect: "deny", says: "old name",
+  source: `
+export const SHORT_RULES = loadRules();
+export const SHORT_RULES_V1 = SHORT_RULES;
+`});
+
+one("[MKT.HOOKS.132] a re-export under the old name is refused", {
+  expect: "deny", says: "old name",
+  source: `
+import { topicOf } from "./topic.ts";
+export { topicOf as listenerTopic };
+`});
+
+one("[MKT.HOOKS.132] a @deprecated tag is refused", {
+  expect: "deny", says: "old name",
+  source: `
+/**
+ * The identity's live sessions.
+ *
+ * @deprecated use sessionsOf.
+ */
+export function liveSessions(identityId) { return []; }
+`});
+
+one("[MKT.HOOKS.132] a constant built from a call is not an alias", {
+  expect: "silent",
+  source: `
+export const SHORT_RULES = loadRules();
+export { topicOf } from "./topic.ts";
+export { topicOf as default };
+`});
+
 console.log(failed ? `\n  ${failed} FAILED` : `\n  all ${n} passed`);
 process.exit(failed ? 1 : 0);

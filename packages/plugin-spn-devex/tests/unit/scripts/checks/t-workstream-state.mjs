@@ -449,5 +449,55 @@ console.log("\n=== the change sheet — allowed in the arc's data, held to its s
   ok("green: an arc with no sheet reads as before", staleFacts(ws, "N001", root).every((line) => !line.includes("refresh")), staleFacts(ws, "N001", root).join(" | "));
 }
 
+console.log("\n=== RULE.DEVEX.WORKSPACE.254 — a preview and a What link stay inside the arc's own notes folder");
+{
+  const { ws } = await dataWorkspace("state-own-folder");
+  const file = join(ws, "arcs", "N001", "state.json");
+  const data = arcData();
+  put(ws, "notes/N002/preview.html", PREVIEW);
+  put(ws, "notes/N002/samples/x.html", PREVIEW);
+  writeFileSync(file, JSON.stringify({ ...data, preview: "notes/N002/preview.html" }, null, 2));
+  const red = checkWorkstream(ws);
+  ok("red: [MKT.HOOKS.106] a preview field naming another arc's preview fails", has(red, "preview", /N001's `preview` field names `notes\/N002\/preview.html`.*notes\/N001\//), said(red));
+  writeFileSync(file, JSON.stringify(data, null, 2));
+  ok("green: [MKT.HOOKS.106] the arc's own preview passes", !has(checkWorkstream(ws), "preview", /`preview` field/), said(checkWorkstream(ws)));
+  const page = join(ws, "approach.html");
+  const text = readFileSync(page, "utf8");
+  writeFileSync(page, text.replace('<a href="notes/N001/preview.html">the probe</a></p>\n</section>', '<a href="notes/N001/preview.html">the probe</a> <a href="notes/N002/samples/x.html">a sample</a></p>\n</section>'));
+  ok("red: [MKT.HOOKS.106] a What link into another arc's notes folder fails", has(checkWorkstream(ws), "stamp", /N001's What entry links `notes\/N002\/samples\/x.html`, inside N002.s folder/), said(checkWorkstream(ws)));
+  writeFileSync(page, text);
+}
+
+console.log("\n=== the short-title rule — an arc title is a topic name of at most five words");
+{
+  const { ws } = await dataWorkspace("state-title");
+  const file = join(ws, "arcs", "N001", "state.json");
+  const data = arcData();
+  writeFileSync(file, JSON.stringify({ ...data, title: "the probe arc is answered in full" }, null, 2));
+  ok("red: [MKT.HOOKS.107] a stored title of seven words fails", has(checkWorkstream(ws), "name", /N001's title .* is 7 words/), said(checkWorkstream(ws)));
+  writeFileSync(file, JSON.stringify({ ...data, title: "probe, then answer" }, null, 2));
+  ok("red: [MKT.HOOKS.107] a stored title with a comma fails", has(checkWorkstream(ws), "name", /N001's title .* holds a comma/), said(checkWorkstream(ws)));
+  writeFileSync(file, JSON.stringify({ ...data, title: "one two three four five" }, null, 2));
+  ok("green: [MKT.HOOKS.107] a title of five words passes", !has(checkWorkstream(ws), "name", /N001's title/), said(checkWorkstream(ws)));
+}
+
+console.log("\n=== a suggestion an arc carries is never left raised");
+{
+  const { ws } = await dataWorkspace("state-carried");
+  const file = join(ws, "arcs", "N001", "state.json");
+  const data = arcData();
+  const suggestion = (state) => `${JSON.stringify({ id: "s1", title: "a thing", state, preview: null, words: null })}\n`;
+  writeFileSync(join(ws, "suggestions.jsonl"), suggestion("raised"));
+  ok("green: [MKT.HOOKS.309] a raised suggestion no arc carries passes", !has(checkWorkstream(ws), "suggestions", /s1/), said(checkWorkstream(ws)));
+  writeFileSync(file, JSON.stringify({ ...data, carries: ["s1"] }, null, 2));
+  ok("red: [MKT.HOOKS.309] a suggestion at raised while an arc carries it fails", has(checkWorkstream(ws), "suggestions", /s1 is still raised and N001 carries it/), said(checkWorkstream(ws)));
+  writeFileSync(join(ws, "suggestions.jsonl"), suggestion("shaped"));
+  ok("green: [MKT.HOOKS.309] the same suggestion at shaped passes", !has(checkWorkstream(ws), "suggestions", /s1/), said(checkWorkstream(ws)));
+  writeFileSync(file, JSON.stringify(data, null, 2));
+  writeFileSync(join(ws, "suggestions.jsonl"), suggestion("raised"));
+  writeFileSync(join(ws, "arcs", "N001", "log.jsonl"), `${JSON.stringify({ at: "2026-10-31T10:00:00Z", kind: "note", row: null, note: "S1 shaped into this arc" })}\n`);
+  ok("red: [MKT.HOOKS.309] a suggestion at raised that the arc's log cites fails", has(checkWorkstream(ws), "suggestions", /s1 is still raised and N001's log cites it/), said(checkWorkstream(ws)));
+}
+
 console.log(failed ? `\n  ${failed} of ${total} FAILED — workstream state check` : `\n  all ${total} passed — workstream state check`);
 process.exit(failed ? 1 : 0);

@@ -3,15 +3,15 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/01-shape/03-architecture.md",
-      "seen": "8d924b6f"
+      "seen": "cbbdd181"
     },
     {
       "path": "spn-foundation/docs/registers/conformance.md",
-      "seen": "7e98a4ed"
+      "seen": "883f1ee6"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/03-module/01-server/01-contract/01-states.md",
-      "seen": "1f3c8b4a"
+      "seen": "f7e907e3"
     }
   ]
 }
@@ -54,9 +54,9 @@ A contract is a chain of six constructs: **Contract** → **Services** → **Met
 - **Delivered one-time codes are challenge-based:** the challenge stores only a hash of the code, verification atomically checks and burns it, and no delivered code is ever kept as a credential.
 - Recovery/backup codes: minted server-side, revealed exactly once at creation in a dedicated response state, persisted only as hashes; each burns on use; regenerating a set invalidates the old one.
 - Passkeys: only verified public material persists — never the raw attestation.
-- Session tokens, and the two are not one rule. A refresh token the server **stores** rotates, with hashed storage — every refresh burns the old one, so a leaked token dies on next use. A renewal token the server does **not** store is short-lived, signed, and **names its use**; every check refuses a token whose use does not match (`RULE.SUPPORT.APPS.090` · `RULE.SUPPORT.APPS.095`). Nothing revokes an unstored token, so ending the session is what ends it. Follow the same hash-only rule for device-trust secrets.
+- Session tokens, and the two are not one rule. A refresh token the server **stores** rotates, with hashed storage — every refresh burns the old one, so a leaked token dies on next use. A renewal token the server does **not** store is short-lived, signed, and **names its use**; every check refuses a token whose use does not match (`RULE.SUPPORT.APPS.090` · MUST · skill:spn-apps/implement) (`RULE.SUPPORT.APPS.095` · MUST · skill:spn-apps/implement). Nothing revokes an unstored token, so ending the session is what ends it. Follow the same hash-only rule for device-trust secrets.
 - **Storage ≠ retrievability — write-only internals.** Some secrets must be stored to be used (authenticator seeds, raw delivery targets, BYOK provider keys). For these, every contract read returns a **masked** state. Unmasked access exists only as an internal server-side capability — never registered as a route — consumed solely by the delivery or verification path. **A secret that must be stored MUST NOT be returnable by any API.** A design that requires reading a secret back out is a wrong design.
-- **A secret that must be read back MUST be stored sealed** (`RULE.PLATFORM.CORE.041` · `RULE.SUPPORT.APPS.166`). A mask protects what leaves through the API. It does not protect the row, so a copy of the database would hold the secret as it was typed. Sealed means the service encrypts the whole `internal` sub-object before it saves the row, under a data key made for that value alone; a key service holds the master key, apart from the key that encrypts the database, and only the running service may use it. A server-side read opens the value for use, and the read model still masks it. The seal is built: the repository seals the `internal` sub-object before the row is saved, and opens it on every read.
+- **A secret that must be read back MUST be stored sealed** (`RULE.PLATFORM.CORE.041` · MUST · skill:spn-apps/implement) (`RULE.SUPPORT.APPS.166` · MUST · skill:spn-apps/implement). A mask protects what leaves through the API. It does not protect the row, so a copy of the database would hold the secret as it was typed. Sealed means the service encrypts the whole `internal` sub-object before it saves the row, under a data key made for that value alone; a key service holds the master key, apart from the key that encrypts the database, and only the running service may use it. A server-side read opens the value for use, and the read model still masks it. The seal is built: the repository seals the `internal` sub-object before the row is saved, and opens it on every read.
 
 ## Evolution and versioning
 
@@ -66,9 +66,9 @@ A contract is a chain of six constructs: **Contract** → **Services** → **Met
 
 ## The generation chain
 
-The hand-written contract states are the **only** hand-written artifact of the API surface. Validators, the contract's methods as data (one entry for each method of each service interface, naming the validators of what goes in and what comes out), the published API spec, the API client, and agent tool schemas are all generated — and generated files are never edited; regeneration is the only edit path. There is no second hand-written client. The generator that produces the methods writes inside the contract folder and nowhere else, and refuses, by name, a method that is not one command in and one state out (RULE.SUPPORT.APPS.169).
+The hand-written contract states are the **only** hand-written artifact of the API surface. Validators, the contract's methods as data (one entry for each method of each service interface, naming the validators of what goes in and what comes out), the published API spec, the API client, and agent tool schemas are all generated — and generated files are never edited; regeneration is the only edit path. There is no second hand-written client. The generator that produces the methods writes inside the contract folder and nowhere else, and refuses, by name, a method that is not one command in and one state out (`RULE.SUPPORT.APPS.169` · MUST · skill:spn-apps/implement).
 
-**The published specification keeps the ladder — MUST** (`RULE.SUPPORT.APPS.219`). A client generated from a specification that writes every level flat cannot tell that `RoleInfo` is `RoleMeta` and more. So the specification composes each level from the one below it: the level is the reference to its base and its own fields beside it, joined by `allOf`, and a client reads `RoleInfo = RoleMeta & {…}` with the same fields it had before, so no caller changes.
+**The published specification keeps the ladder** (`RULE.SUPPORT.APPS.219` · MUST · skill:spn-apps/implement). A client generated from a specification that writes every level flat cannot tell that `RoleInfo` is `RoleMeta` and more. So the specification composes each level from the one below it: the level is the reference to its base and its own fields beside it, joined by `allOf`, and a client reads `RoleInfo = RoleMeta & {…}` with the same fields it had before, so no caller changes.
 
 - **Each level is open where it is declared, and closed where it is used.** A level is also the base of the next, so every component leaves its fields open, and every place that uses a level, a response, a container such as `RoleMetas` or `RoleList`, or a branch of a union, closes it beside the reference with `unevaluatedProperties: false`. A component read alone accepts a stray field, by design, since no payload is a bare component.
 - **A level that re-declares a field of its base stays flat**, because composed it would state the field twice and the two could disagree.
@@ -78,7 +78,7 @@ The hand-written contract states are the **only** hand-written artifact of the A
 
 **Pass cross-module calls through contracts, never internals.** This is what makes the monolith/microservice choice reversible: callers depend on the contract, not the deployment. A module is either mounted in a service or held remotely, where only its contract is present and the call crosses to the service that mounts it, by the API entry's remote route, by module, service, method and command. A service that holds a module remotely **MUST NOT** be able to name its inner services. A person's public token stops at the first service; from there the caller travels as the passport the identity module signed, with the calling service's own credential on every call. What a call may do is decided by the method's own check and nothing at the route.
 
-**On the web, reach a service through that service's client — MUST** (`RULE.SUPPORT.APPS.201`). Each service has a client of its own, and the client holds the service's address. A second service means a second client. No page and no container is given an address to call. A web module exports its pages, its containers, its widgets, its hooks, and its routes as data, so that a partner can take a whole page, place a container, place a smaller piece, or build their own (`RULE.SUPPORT.APPS.180`, `RULE.SUPPORT.APPS.181`). The four ways as a set are proposed. `shape.md` in this plugin states them, with the provider a partner mounts to place a container.
+**On the web, reach a service through that service's client** (`RULE.SUPPORT.APPS.201` · MUST · skill:spn-apps/implement). Each service has a client of its own, and the client holds the service's address. A second service means a second client. No page and no container is given an address to call. A web module exports its pages, its containers, its widgets, its hooks, and its routes as data, so that a partner can take a whole page, place a container, place a smaller piece, or build their own (`RULE.SUPPORT.APPS.180` · MUST · skill:spn-apps/implement) (`RULE.SUPPORT.APPS.181` · MUST · skill:spn-apps/implement). The four ways as a set are proposed. `shape.md` in this plugin states them, with the provider a partner mounts to place a container.
 
 ## The review card
 

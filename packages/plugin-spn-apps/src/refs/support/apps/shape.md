@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/02-apps/01-shape.md",
-      "seen": "dea108e0"
+      "seen": "4ac7710b"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/01-shape/",
-      "seen": "17320694"
+      "seen": "4dcbb793"
     }
   ]
 }
@@ -51,7 +51,7 @@ When you scaffold or classify a node, you pick exactly one of ten kinds — one 
 | `APP_UTILITY` | APP · server | an installed tool serving an operator — runs on the server runtime despite being named for how it is delivered | `utility{-usecase}-{stack}` |
 | `CLIENT_API` | CLIENT · universal | a generated client mirroring one service's published surface | `client-{usecase}-api-{stack}` |
 
-Read the name against two conventions before you trust it. A project **leads with its family token**, except the `APP` family, which you will find named by delivery form (`service-` · `web-` · `utility-`), and `UNIVERSAL`, the unmarked runtime — so a universal support package is simply `support-`. Never type `{stack}` yourself; tooling appends it. A kind is spelled `FAMILY_RUNTIME`, family first, and a spelling the grammar does not produce fails validation as an unknown value (RULE.SUPPORT.APPS.022).
+Read the name against two conventions before you trust it. A project **leads with its family token**, except the `APP` family, which you will find named by delivery form (`service-` · `web-` · `utility-`), and `UNIVERSAL`, the unmarked runtime — so a universal support package is simply `support-`. Never type `{stack}` yourself; tooling appends it. A kind is spelled `FAMILY_RUNTIME`, family first, and a spelling the grammar does not produce fails validation as an unknown value (`RULE.SUPPORT.APPS.022` · MUST · skill:spn-apps/implement).
 
 When you are unsure which kind fits, ask the same three questions the vocabulary is built from: is it imported, or does it run; does it hold state while running; does it stay up or finish and exit. Embeddable kinds are libraries something imports and that never start on their own (`TOOLCHAIN`, `SUPPORT_*`, `MODULE_*`, `CLIENT_API`). Runnable kinds are applications a process starts (`APP_SERVER`, `APP_WEB`, `APP_UTILITY`) — the same code can run to completion or stay resident, and you decide which one it is at deployment, never by how you wrote it.
 
@@ -84,7 +84,7 @@ Every node you build from `contract` / `app` / `entry` follows the same three la
 
 If you invoke `release` on a node, expect a refusal — versioning is lockstep within a repository: every publishable project releases at one version, the source carries a placeholder, and the real number is stamped at publish. A node's own release line is the repository's per-package step; do not invoke it alone.
 
-**Every published package carries the repository's licence notice, and the notices of code it ships from others** (`RULE.SUPPORT.APPS.214`). The release writes the repository's `LICENSE` into every package it publishes, and the repository's `THIRD-PARTY-NOTICES.md` into each package whose folder a `Where:` line of that file names. It verifies both as it verifies the version, and refuses a repository with publishable packages and no `LICENSE`, or a `Where:` path that is no folder.
+**Every published package carries the repository's licence notice, and the notices of code it ships from others** (`RULE.SUPPORT.APPS.214` · MUST · skill:spn-apps/implement). The release writes the repository's `LICENSE` into every package it publishes, and the repository's `THIRD-PARTY-NOTICES.md` into each package whose folder a `Where:` line of that file names. It verifies both as it verifies the version, and refuses a repository with publishable packages and no `LICENSE`, or a `Where:` path that is no folder.
 
 ### Test tiers
 
@@ -147,13 +147,13 @@ Check each level on its own — folders are what is standardized, never the file
 
 ### Kind-fixed skeletons versus a library's own groups
 
-Kinds divide in two by how you decide their `src/` interior. Where the **layer model fixes the folder set** (`MODULE_SERVER`, `MODULE_WEB`, `APP_SERVER`, `APP_WEB`, `APP_UTILITY`, `CLIENT_API`), every node of the kind gets the same folders — start a new node from the scaffold's own tree, and treat a scaffold asset as bound by its kind's rules exactly as a built node is. Scaffold a `MODULE_SERVER` with `contract/{states,validators,services,methods}`, `app/{entities,repositories,services,support,utils}`, `entry/api/controllers`, `migrations/`, its second door, and a `tests/` folder per tier it owes. The second door is two folders: `src/remote/`, which holds what another service takes to call the module's contract, and `remote/` at the root, which is the door's own entry. Scaffold a `MODULE_WEB` with only `entry/ui/{components,hooks,pages,utils}` — **the browser is a transport, so you put a web module's surface under an entry** (`RULE.SUPPORT.APPS.031`). Give `APP_SERVER` and `APP_WEB` the same `modules/` folder at the source root, and add `public/`, `src/assets/styles/` for its stylesheets, and a component harness for the web kind. Build `APP_UTILITY` like a module, entering it only through `entry/cli/`. Scaffold `CLIENT_API` like any package, and leave its `src/` empty until you generate the client into it.
+Kinds divide in two by how you decide their `src/` interior. Where the **layer model fixes the folder set** (`MODULE_SERVER`, `MODULE_WEB`, `APP_SERVER`, `APP_WEB`, `APP_UTILITY`, `CLIENT_API`), every node of the kind gets the same folders — start a new node from the scaffold's own tree, and treat a scaffold asset as bound by its kind's rules exactly as a built node is. Scaffold a `MODULE_SERVER` with `contract/{states,validators,services,methods}`, `app/{entities,repositories,services,support,utils}`, `entry/api/controllers`, `migrations/`, its second door, and a `tests/` folder per tier it owes. The second door is two folders: `src/remote/`, which holds what another service takes to call the module's contract, and `remote/` at the root, which is the door's own entry. Scaffold a `MODULE_WEB` with only `entry/ui/{components,hooks,pages,utils}` — **the browser is a transport, so you put a web module's surface under an entry** (`RULE.SUPPORT.APPS.031` · MUST · skill:spn-apps/implement). Give `APP_SERVER` and `APP_WEB` the same `modules/` folder at the source root, and add `public/`, `src/assets/styles/` for its stylesheets, and a component harness for the web kind. Build `APP_UTILITY` like a module, entering it only through `entry/cli/`. Scaffold `CLIENT_API` like any package, and leave its `src/` empty until you generate the client into it.
 
 Where the rule is instead **one folder per group** (`TOOLCHAIN`, `SUPPORT_*`), the groups belong to the package and you grow them as it grows — a `TOOLCHAIN` publishes one folder per configuration area (`eslint/`, `jest/`, `vite/`, …) and no barrel at all; a `SUPPORT_*` library publishes one folder per capability it offers (`cache/`, `queue/`, `auth/`, …). Read each tree you find here as an example rather than a standard — the groups are the library's own to name.
 
 ### Modules that live inside an application
 
-You may find a module living inside an application's folder instead of shipping as its own project — that is a packaging decision, never a different kind of thing. It still declares the same `MODULE_SERVER` or `MODULE_WEB` kind, carries the same three layers, and owns the same documents as the packaged form. It carries no field that says it is app-owned: a `MODULE_*` node under an `APP_*` node's `src/modules/` is app-owned by where it sits, so resolve its parent before you apply what follows (RULE.SUPPORT.APPS.057). Expect three consequences: its identity is its folder, named for its mnemonic, because a name pattern belongs to a published project and this one publishes nothing; it emits no index of its own surface, because nothing installs it; its proof rides the application's own tests, because a test tree belongs to a project and this is not one. It may depend on packages, and nothing may depend on it. The day a second application wants it, package it: give it a name, its own tests, and a build of its own, while its identifiers and documents travel unchanged.
+You may find a module living inside an application's folder instead of shipping as its own project — that is a packaging decision, never a different kind of thing. It still declares the same `MODULE_SERVER` or `MODULE_WEB` kind, carries the same three layers, and owns the same documents as the packaged form. It carries no field that says it is app-owned: a `MODULE_*` node under an `APP_*` node's `src/modules/` is app-owned by where it sits, so resolve its parent before you apply what follows (`RULE.SUPPORT.APPS.057` · MUST · skill:spn-apps/implement). Expect three consequences: its identity is its folder, named for its mnemonic, because a name pattern belongs to a published project and this one publishes nothing; it emits no index of its own surface, because nothing installs it; its proof rides the application's own tests, because a test tree belongs to a project and this is not one. It may depend on packages, and nothing may depend on it. The day a second application wants it, package it: give it a name, its own tests, and a build of its own, while its identifiers and documents travel unchanged.
 
 ## The four shapes a platform is built in on the server
 
@@ -171,7 +171,7 @@ A platform's server code takes one of four shapes, and a module is written the s
 
 ## The four ways a partner builds on the web
 
-On the server the choice is how many services run. On the web it is how much of a SaaS Plane screen a partner takes. A partner builds on the web in one of four ways, and the ways can be mixed in one app, page by page (`RULE.SUPPORT.APPS.180`). **The four as a set are proposed**: the developer has not confirmed the set by name.
+On the server the choice is how many services run. On the web it is how much of a SaaS Plane screen a partner takes. A partner builds on the web in one of four ways, and the ways can be mixed in one app, page by page (`RULE.SUPPORT.APPS.180` · MUST · skill:spn-apps/implement). **The four as a set are proposed**: the developer has not confirmed the set by name.
 
 | The way | What the partner takes from a SaaS Plane web module | What the partner writes |
 | --- | --- | --- |
@@ -180,7 +180,7 @@ On the server the choice is how many services run. On the web it is how much of 
 | Place a widget or a smaller piece | the widgets a container is built from, and the hooks that load and save | containers of their own, and the page that places them |
 | Build their own | nothing of the module | everything on the page, from the design system and the service's client |
 
-**A web module MUST export its pages, its containers, its widgets, its hooks, and its routes as data** (`RULE.SUPPORT.APPS.181`). A module that leaves one out takes that way from a partner. The platform's own web modules export pages, widgets and hooks today, and no container yet.
+**A web module MUST export its pages, its containers, its widgets, its hooks, and its routes as data** (`RULE.SUPPORT.APPS.181` · MUST · skill:spn-apps/implement). A module that leaves one out takes that way from a partner. The platform's own web modules export pages, widgets and hooks today, and no container yet.
 
 Hold a web module to these rules when you write or review one. A rule marked proposed is one the developer has not confirmed, so say so when you apply it.
 
@@ -208,7 +208,7 @@ Hold a web module to these rules when you write or review one. A rule marked pro
 | A page, a container and a hook reach a service through that service's client. A second service means a second client | `RULE.SUPPORT.APPS.201` | decided |
 | A web module declares one route name beside its code, and each route says whether it is a page of work or a page of setup. A page of work is at `/<name>/<rest>`, and a page of setup is at `/settings/<name>/<rest>` | `RULE.SUPPORT.APPS.204` | decided |
 
-Four choices beside the provider are proposed: it stands outside the design system's app root, it is not handed the service's client, a container shows its denied state when nobody is signed in, and the provider tells the app once that a sign-in is needed. On a page of groups and their items, the swap of the items for the groups changes the address (`RULE.SUPPORT.SURFACE.079`).
+Four choices beside the provider are proposed: it stands outside the design system's app root, it is not handed the service's client, a container shows its denied state when nobody is signed in, and the provider tells the app once that a sign-in is needed. On a page of groups and their items, the swap of the items for the groups changes the address (`RULE.SUPPORT.SURFACE.079` · MUST · skill:spn-surface/design).
 
 The TypeScript names for these are in `providers/ts/08-web.md` and `providers/ts/02-naming.md` in this plugin. The page chapter's rules are restated in `module/README.md`.
 

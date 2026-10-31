@@ -26,8 +26,9 @@
 // The repository is the one the command runs in — `npm run` runs it at the marketplace root.
 
 import { execFileSync } from "node:child_process";
-import { readFileSync, writeFileSync } from "node:fs";
+import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
+import { pathToFileURL } from "node:url";
 import {
   VERSION_PATTERN, agreedVersion, compareVersions, listedPlugins, newestReleaseNumber, readVersions,
   releaseTags, withVersion,
@@ -65,7 +66,16 @@ function run(root, command, args) {
   execFileSync(command, args, { cwd: root, stdio: "inherit" });
 }
 
-function prepare(root, version) {
+/** The faults of the book beside this checkout, read through the built restates bundle; none where there is no book. */
+async function bookFaults(root) {
+  const bundle = join(root, "packages", "plugin-spn-devex", "src", "dist", "commands", "restates", "check.mjs");
+  if (!existsSync(bundle)) return [];
+  const { findBook, writeRulesIndex } = await import(pathToFileURL(bundle).href);
+  const book = findBook(undefined, root);
+  return book === null ? [] : writeRulesIndex(book, root).faults;
+}
+
+async function prepare(root, version) {
   if (!version) throw new Refusal(`prepare needs a version\n${USAGE}`);
   if (!VERSION_PATTERN.test(version)) throw new Refusal(`"${version}" is not a version — write it as X.Y.Z, numbers only`);
   refuseDirty(root);
@@ -82,11 +92,23 @@ function prepare(root, version) {
   agreedVersion(readVersions(root));
   console.log(`wrote ${version} into ${plugins.map((plugin) => plugin.manifest).join(", ")}`);
 
+  const restore = () => git(root, ["checkout", "--", ...plugins.map((plugin) => plugin.manifest)]);
   try {
     run(root, "npm", ["run", "build:plugins"]);
+  } catch {
+    restore();
+    throw new Refusal("the build or the tests failed — the manifests are restored and nothing is committed");
+  }
+  // A book with a parenthesis that does not read is never released: the rules index would leave that rule out.
+  const faults = await bookFaults(root);
+  if (faults.length > 0) {
+    restore();
+    throw new Refusal(`the book holds ${faults.length} parenthes(es) that do not read — the manifests are restored and nothing is committed:\n${faults.join("\n")}`);
+  }
+  try {
     run(root, "npm", ["test"]);
   } catch {
-    git(root, ["checkout", "--", ...plugins.map((plugin) => plugin.manifest)]);
+    restore();
     throw new Refusal("the build or the tests failed — the manifests are restored and nothing is committed");
   }
 
@@ -145,7 +167,7 @@ function tag(root, push) {
 const [action, ...rest] = process.argv.slice(2);
 try {
   const root = repositoryRoot();
-  if (action === "prepare") prepare(root, rest[0]);
+  if (action === "prepare") await prepare(root, rest[0]);
   else if (action === "tag") {
     const unknown = rest.filter((arg) => arg !== "--push");
     if (unknown.length > 0) throw new Refusal(`unknown option(s): ${unknown.join(" ")}\n${USAGE}`);

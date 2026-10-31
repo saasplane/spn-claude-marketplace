@@ -24,9 +24,13 @@ import { execFileSync } from "node:child_process";
 import { lstatSync, readFileSync, readdirSync, realpathSync, statSync } from "node:fs";
 import { basename, dirname, join, relative, resolve } from "node:path";
 import { UsageFault, readWords } from "../../../../../plugin-support-lib/src/lib/command.ts";
-import { isDir, isFile, workspaceRoot } from "../../lib/payload.ts";
+import { isDir, isFile, read, workspaceRoot } from "../../lib/payload.ts";
 import { capabilitiesDir, decisionsRegister, docsOf } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
-import { check, declaresASource, headerSources, nameIndex, namedSources, parse, resolveSource, undeclared } from "../../lib/restates.ts";
+import { check, declaresASource, headerSources, nameIndex, namedSources, parenFindings, parse, resolveSource, ruleMarks, undeclared,
+  writeRulesIndex } from "../../lib/restates.ts";
+
+/** The build writes the rules index through this bundle, as it writes `refs/commands.md` through `cli.mjs`. */
+export { writeRulesIndex };
 
 const SKIP = new Set(["node_modules", ".git", "dist", "build", ".nx", "coverage", "__pycache__"]);
 
@@ -180,30 +184,29 @@ function headerFindings(root: string, book: string): string[] {
 }
 
 /**
- * The one book a restates command reads: the path it is given, else `spn-foundation` in the workspace
- * it runs in — the nearest folder up that holds `.spndevex` — and null where neither is a book.
+ * The one book a restates command reads: the path it is given, else the `spn-foundation` of the nearest
+ * folder up from where it runs that holds one with a decisions register, and null where none does.
  *
- * AN ALPHABETICAL GUESS AMONG SIBLINGS ANSWERED WITH WHICHEVER CHECKOUT SORTED FIRST. A workspace
- * holding two foundation-like folders read the wrong one without saying so, so the book is now named
- * by the workspace, never found by the order of a directory listing (RULE.DEVEX.WORKSPACE.229).
+ * THE NEAREST BOOK UP IS THE ONE BESIDE THE CHECKOUT. A worktree set holds its own checkouts side by side,
+ * `.worktrees/<set>/spn-foundation` beside `.worktrees/<set>/spn-claude-marketplace`, so a run from the set meets
+ * the set's book before the workspace's main checkout, and a run from the workspace meets the main one. The book is
+ * found by where the run stands, never by the order of a directory listing (RULE.DEVEX.WORKSPACE.229).
  */
 export function findBook(argument: string | undefined, root: string): string | null {
   if (argument) {
     const given = resolve(argument);
     return isFile(decisionsRegister(docsOf(given))) ? given : null;
   }
-  const workspace = workspaceRoot(root);
-  if (workspace === null) return null;
-  const book = join(workspace, "spn-foundation");
-  return isFile(decisionsRegister(docsOf(book))) ? book : null;
+  for (let folder = resolve(root); ; folder = dirname(folder)) {
+    const book = join(folder, "spn-foundation");
+    if (isFile(decisionsRegister(docsOf(book)))) return book;
+    if (dirname(folder) === folder) return null;
+  }
 }
 
-/** Why no book was found, naming the workspace that was looked in. */
+/** Why no book was found, naming the folder the walk started from. */
 export function noBookReason(root: string): string {
-  const workspace = workspaceRoot(root);
-  return workspace === null
-    ? `no workspace found walking up from ${resolve(root)} (no .spndevex), so there is no spn-foundation to read`
-    : `the workspace ${workspace} holds no spn-foundation with a decisions register`;
+  return `no folder at or above ${resolve(root)} holds an spn-foundation with a decisions register`;
 }
 
 /**
@@ -376,6 +379,16 @@ export function main(argv: string[], root: string): number {
     console.log("              " + [...unclassified].sort().slice(0, 12).join(" · "));
   }
 
+  // THE PARENTHESES, FIELD BY FIELD. A stamp says a cited section moved. This says a line restates a rule at a level,
+  // or with a holder, that the book does not give it, which no hash of the book can see (RULE.DEVEX.AGENT.117).
+  const stated = ruleMarks(dirname(book));
+  const parens = documents.flatMap((path) => parenFindings(shown(path), read(path), stated));
+  if (parens.length) {
+    console.log();
+    console.log(`LEVEL       ${parens.length} parenthes(es) restate a rule other than as the book states it, field by field:`);
+    for (const finding of parens) console.log(`              ${finding}`);
+  }
+
   // THE CODE'S OWN HEADERS, which no run had ever read. Reported apart from a document's drift,
   // because a broken header is a claim pointing at nothing rather than a chapter that moved.
   const strays = strayStamps(dirname(book), marketplaceOf(root) ?? root);
@@ -402,10 +415,10 @@ export function main(argv: string[], root: string): number {
 
   console.log();
   console.log(`${documents.length} plugin document(s) · ${stamped} carrying spn:restates · ` +
-    `${findings.length} drift · ${omissions.length} undeclared · ${unstamped.length} unstamped · ` +
+    `${findings.length} drift · ${parens.length} level · ${omissions.length} undeclared · ${unstamped.length} unstamped · ` +
     `${unclassified.size} unread name(s) · ${headers.length} broken header(s) · ` +
     `${strays.length + selves.length} misplaced (SOFT) — book at ${book}`);
-  return findings.length + omissions.length + headers.length + strays.length + selves.length;
+  return findings.length + parens.length + omissions.length + headers.length + strays.length + selves.length;
 }
 
 export const describe = "all four spn:restates kinds at once, plugins against the book — the release gate";

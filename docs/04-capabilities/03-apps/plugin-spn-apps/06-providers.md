@@ -17,7 +17,8 @@ One folder sits under `packages/plugin-spn-apps/src/providers/`, named for the s
 | The source door | `packages/plugin-spn-apps/src/providers/ts/scripts/checks/src.ts` | parses once, orders the verdicts, isolates a rule that throws |
 | The tests door | `packages/plugin-spn-apps/src/providers/ts/scripts/checks/tests.ts` | the same, for the subject that reads a test file |
 | The enablement grammar | `packages/plugin-spn-apps/src/providers/ts/scripts/checks/_src/enablement-grammar.ts` | prefix, verb, noun, and no hardcoded organization types |
-| The read-method name | `packages/plugin-spn-apps/src/providers/ts/scripts/checks/_src/read-verb-naming.ts` | a read returning a list type under a plural name |
+| The naming rule | `packages/plugin-spn-apps/src/providers/ts/scripts/checks/_src/read-verb-naming.ts` | reads the naming chapter on every `.ts` file under `src/` (`RULE.SUPPORT.APPS.232`, MUST): a method opens with a verb, a boolean reads yes or no, an enum type ends in `_type`, a reference column is `<table>_id`; it also keeps the read-method name, a read returning a list type under a plural name |
+| The app-style note | `packages/plugin-spn-apps/src/providers/ts/scripts/checks/_src/app-style.ts` | notes a forced `!` utility, or a colour or spacing set by hand, on a design-system unit in an app, and names the app's stylesheet and the surface context |
 | The sequencing rule | `packages/plugin-spn-apps/src/providers/ts/scripts/checks/_src/await-sequencing.ts` | a chained continuation in a server node's source |
 | The contract cycle | `packages/plugin-spn-apps/src/providers/ts/scripts/checks/_src/contract-cycle.ts` | a contract state write that would close a dependency cycle |
 | The host assertion | `packages/plugin-spn-apps/src/providers/ts/scripts/checks/_tests/host-assertion.ts` | an unanchored host pattern in a navigation assertion |
@@ -73,7 +74,7 @@ One folder sits under `packages/plugin-spn-apps/src/providers/`, named for the s
 ### Refusals where the model is settled, warnings where it is not
 
 **Why** — *a refusal on a rule still being designed teaches people to work around the hook*. The coverage model belongs to its own argument.
-**What** — the coverage findings warn and under-report on purpose; the grammar, naming, sequencing, cycle and host rules refuse, because each is settled and each names its own exception.
+**What** — the coverage findings warn and under-report on purpose; the grammar, naming, sequencing, cycle and host rules refuse, because each is settled and each names its own exception. The app-style rule only notes, because how a unit is used is guidance with cases and the choice stays with whoever writes the page.
 **How** — the coverage file marks the function to replace when the model lands, and keeps its trigger and its message meanwhile. `packages/plugin-spn-apps/src/providers/ts/scripts/checks/_tests/coverage.ts`.
 
 ### An exclude carries its reason, and nothing else is enforced

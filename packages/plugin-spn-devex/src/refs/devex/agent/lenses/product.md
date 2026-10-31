@@ -17,7 +17,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/01-standards-core/01-common/01-standards.md",
       "section": "Who an app is for",
-      "seen": "2752aca1"
+      "seen": "1406d762"
     }
   ]
 }

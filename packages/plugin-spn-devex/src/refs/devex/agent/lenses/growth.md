@@ -18,7 +18,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/01-common/02-app-patterns.md",
       "section": "An overview",
-      "seen": "374c636f"
+      "seen": "f1bb8b03"
     }
   ]
 }

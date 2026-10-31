@@ -6,13 +6,14 @@
 
 `For: Architect · Engineering leader` · `Status: ✅ DONE` · `Realizes: Skills`
 
-`spn-devex` ships one folder per stack-agnostic DevEx stage: `bootstrap`, `check`, `deliver`, `develop`, `ideate`, `operate`, `provision`, `report`, `scm` and `test`. Each folder holds one `SKILL.md` and nothing else, so none of them uses the `steps/` folder a domain plugin's larger skills need. What a reader should know before opening one is that **every rule a skill carries belongs to a chapter somewhere else**. A skill sequences work and states the vocabulary; the moment it invents a rule, it has become an undeclared second source.
+`spn-devex` ships one folder per stack-agnostic DevEx stage: `bootstrap`, `check`, `deliver`, `develop`, `ideate`, `operate`, `provision`, `report`, `scm` and `test`, and with them `execute`, which carries out a go. Each folder holds one `SKILL.md` and nothing else, so none of them uses the `steps/` folder a domain plugin's larger skills need. What a reader should know before opening one is that **every rule a skill carries belongs to a chapter somewhere else**. A skill sequences work and states the vocabulary; the moment it invents a rule, it has become an undeclared second source.
 
 ## Where
 
 | Part of the construct | Lives in | What it is |
 | --- | --- | --- |
 | The skill folders | `packages/plugin-spn-devex/src/skills/` | one folder per stack-agnostic stage skill |
+| The skill that carries out a go | `packages/plugin-spn-devex/src/skills/execute/SKILL.md` | fires the moment the developer gives the go on one arc or several, and walks eight steps: the scope, the drift, the plan, the baselines, the parts, the full runs, the generated files and the release chain, and the close |
 | The file a session loads | `packages/plugin-spn-devex/src/skills/ideate/SKILL.md` | frontmatter with `name` and `description`, then the instructions |
 | The vocabulary and the command surface | `packages/plugin-spn-devex/src/refs/devex/utils/spnutils.md` | the command groups and the stage skills, restated in one file from the book |
 | What each stage is for | `packages/plugin-spn-devex/src/refs/devex/function/` | one restatement per function: `bootstrap` · `deliver` · `develop` · `ideate` · `operate` · `provision` · `scm` · `test` |
@@ -79,6 +80,12 @@
 **Why** — *a skill with no stamped block is invisible to the drift run*, so a chapter could move and every skill restating it would keep reading as though nothing had happened.
 **What** — each `SKILL.md` opens with a `spn:restates` block naming the chapters it restates and the hash it last read there.
 **How** — the block is read by the same parser a ref's is, so a stale skill and a stale ref are one finding rather than two. `packages/plugin-spn-devex/src/scripts/commands/restates/check.ts`, run as `spn-devex restates check`.
+
+### A step opens with the rules its skill holds
+
+**Why** — *a skill that names a rule only where its author remembered to leaves the rest to memory*, and a step is the moment a rule matters.
+**What** — each step that does a skill's work opens with a generated block of the rules that skill holds, each with the level the book gives it. A reader sees how strongly a rule binds without opening the book.
+**How** — the plugins build writes the block from the rules index that spn-devex builds from the book (`refs/rules.json`), so a skill step in spn-devex restates nothing by hand. A rule changed in the book changes the block at the next build.
 
 ## Between modules
 

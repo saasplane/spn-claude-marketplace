@@ -5,7 +5,7 @@
 import { readFileSync, readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { PLUGIN } from "../../../helpers/harness.mjs";
-import { DEFAULT_PROGRAMS, PLUGIN_SUBJECTS, programsFrom, readCommand, segments } from "../../../../src/scripts/lib/command-reader.ts";
+import { DEFAULT_PROGRAMS, PLUGIN_SUBJECTS, TEST_RUNNERS, isRunnerRun, programsFrom, readCommand, segments } from "../../../../src/scripts/lib/command-reader.ts";
 
 let total = 0, failed = 0;
 const same = (label, got, expected) => {
@@ -91,6 +91,18 @@ same("untouched: a three-level spnutils command typed in full reads as it did", 
   };
   for (const plugin of ["spn-devex", "spn-surface", "spn-apps"])
     same(`[MKT.SCRIPTS.175] the subjects the reader names for ${plugin} are the command files that export \`actions\``, PLUGIN_SUBJECTS[plugin], fromSource(plugin));
+}
+
+console.log("\n=== every test runner is timed, a repository's own included, from one list");
+{
+  const own = read("node tests/run.mjs --reporter dot");
+  same("[MKT.HOOKS.307] a repository's own runner script is read as a program", own.map((one) => one.script), ["run.mjs"]);
+  same("[MKT.HOOKS.307] a repository's whole-suite script is read too", read("node scripts/test-all.mjs").map((one) => one.script), ["test-all.mjs"]);
+  same("[MKT.HOOKS.307] a test framework's CLI is read, through npx", read("npx vitest run src/a.test.ts").map((one) => [one.script, one.action]), [["vitest", "run"]]);
+  same("[MKT.HOOKS.307] one test file run directly is no runner", read("node tests/unit/t-a.mjs"), []);
+  same("[MKT.HOOKS.307] each runner on the list is read as itself", TEST_RUNNERS.every((name) => read(`${name === "run.mjs" || name === "test-all.mjs" ? `node ${name}` : name} x`).some((one) => one.script === name)), true);
+  same("[MKT.HOOKS.307] the check's reading of a run and the timing's program list are the one list",
+    [isRunnerRun(own[0]), isRunnerRun(read("git status")[0]), TEST_RUNNERS.every((name) => DEFAULT_PROGRAMS.some((program) => program.script === name))], [true, false, true]);
 }
 
 console.log("\n=== secrets");

@@ -8,12 +8,12 @@
 // note that never fails the check.
 
 import { readdirSync } from "node:fs";
-import { basename, join } from "node:path";
+import { basename, dirname, join } from "node:path";
 import { type Action, FLAG, UsageFault, readWords } from "../../../../../plugin-support-lib/src/lib/command.ts";
 import { TERMINAL } from "../../checks/arc-status.ts";
 import { checkWorkstream, staleFacts } from "../../checks/workstream-state.ts";
 import {
-  arcIdsOf, arcStatus, doneOf, logFileOf, markdownArcsOf, notesDirOf, readArc, readJsonl, readQuestions, stateOfRow, suggestionsFileOf, workspaceOf, workstreamsOf,
+  arcIdsOf, arcStatus, doneOf, logFileOf, markdownArcsOf, notesDirOf, readArc, readJsonl, readQuestions, stateOfRow, suggestionsFileOf, workspaceOf, workstreamsOf, writeOpenBlocks,
 } from "../../lib/workstream.ts";
 import { type ArcData, type LogLine, type Suggestion } from "../../lib/workstream-schema.ts";
 import { workstreamNamed } from "./_shared.ts";
@@ -109,6 +109,8 @@ function check(args: string[]): number {
   const words = readWords(args, { json: FLAG, facts: FLAG });
   if (words.paths.length > 1) throw new UsageFault("takes one workstream.");
   const folders = chosen(words.paths[0]);
+  // a page's Open block is drawn from the cards, so the findings read what the cards say; a closed workstream keeps what it closed with
+  for (const ws of folders) if (basename(dirname(ws)) !== "closed") writeOpenBlocks(ws);
   const findings = folders.flatMap(checkWorkstream);
   const root = workspaceOf() ?? "";
   const notes = words.given("facts") ? folders.flatMap((ws) => arcIdsOf(ws).flatMap((arc) => staleFacts(ws, arc, root).map((line) => `${basename(ws)} ${line}`))) : [];

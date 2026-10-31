@@ -1,5 +1,12 @@
 #!/usr/bin/env node
-// Refuse a read verb that returns an XList under a plural name, at the moment it is written.
+// Refuse a name the naming chapter does not allow, at the moment it is written.
+//
+// Four rules from the chapter are read in every `.ts` file under `src/`: a method opens with an action
+// verb, a boolean reads yes or no (`isActive`, `hasRole`), a discriminator is `<noun>Type` and its SQL
+// enum ends in `_type`, and a reference column is `<table>_id`. They are judged by name only, and only
+// for a name the write itself introduces.
+//
+// The rest of this header is the read-verb rule, which keeps its narrower seat.
 //
 // A method returning an `XList` is named for that type. The rule governs read verbs, which is every
 // method whose name starts with `get`. These are the shapes it allows:
@@ -41,7 +48,8 @@ import { emit, payload, runAlone } from "../../../../../../../plugin-support-lib
 import { mask, read, resultingText } from "../../../../../../../plugin-support-lib/src/lib/source.ts";
 import { filesUnder, introduced, lineOf } from "../../../../../scripts/lib/source.ts";
 
-const WATCHED = "/src/contract/services/";
+const WATCHED = "/src/";
+const CONTRACT_SEAT = "/src/contract/services/";
 
 // A declaration: a read verb, its parameter list, and a return type promising an XList. The
 // parameter list may span lines and may not hold a semicolon or a brace, so the match never runs on
@@ -52,15 +60,45 @@ const READ_LIST_DECLARATION =
 // The shapes the rule allows.
 const NAMED_FOR_ITS_LIST = /^get[A-Za-z0-9_]*List(?:By[A-Z][A-Za-z0-9_]*)?$/;
 
+// The first word of a method name. A name that opens with none of these has no verb.
+const VERBS = new Set(("get set create update delete remove add read write find list search fetch load save send build make " +
+  "parse render handle run start stop open close check validate verify resolve compute calculate convert format map filter " +
+  "sort merge apply emit publish subscribe unsubscribe register unregister init initialize reset clear toggle select copy " +
+  "move login logout sign consume revoke issue grant deny assign attach detach bind unbind enable disable activate " +
+  "deactivate cancel retry process execute dispatch invoke call notify log track record collect count sum group split " +
+  "join push pop shift insert upsert patch post put purge flush sync refresh reload import export serialize deserialize " +
+  "encode decode encrypt decrypt hash verify sanitize normalize escape prepare ensure assert throw wrap unwrap use to " +
+  "on handle submit confirm accept reject approve decline invite join leave lock unlock suspend resume restore archive " +
+  "mount unmount focus blur scroll navigate redirect show hide expand collapse wait sleep delay schedule trigger fire " +
+  "release acquire reserve allocate extract transform generate derive define declare require match test compare diff " +
+  "reconcile rebuild rename replace swap reorder commit rollback begin end finish complete abort stub spy").split(" "));
+
+// A boolean reads yes or no.
+const BOOLEAN_PREFIX = /^(?:is|has|can|should|does|did|will|are|was|were|must|needs|allows|supports|includes|contains)[A-Z]/;
+
+// A method: a name, a parameter list with no nested parentheses, and a return type or a body.
+const METHOD =
+  /^[ \t]+(?:(?:public|private|protected|static|async|abstract|override|readonly)\s+)*([a-z][A-Za-z0-9]*)\s*(?:<[^()>]*>)?\s*\(([^;{}()]*)\)\s*(?::\s*([^;{}=]+?))?\s*([;{])/gm;
+const NOT_A_METHOD = new Set(["if", "for", "while", "switch", "catch", "constructor", "return", "function", "with", "else"]);
+
+// A property, a field or a parameter typed boolean.
+const BOOLEAN_PROPERTY =
+  /^[ \t]+(?:(?:public|private|protected|static|readonly|declare)\s+)*([a-z][A-Za-z0-9]*)\??\s*:\s*boolean\s*[;,=]?\s*$/gm;
+
+const SQL_ENUM = /\bCREATE\s+TYPE\s+([a-z][a-z0-9_]*)\s+AS\s+ENUM\b/gi;
+const BARE_TYPE_COLUMN = /^[ \t]+(?:(?:public|private|protected|readonly)\s+)?type\??\s*[:!]/gm;
+const REFERENCE_NAME = /^[ \t]+(?:(?:public|private|protected|readonly)\s+)?([a-z][A-Za-z0-9_]*(?:Ref|_ref|Fk|_fk))\??\s*[:!]/gm;
+
 const REMEDY = "A method whose name starts with get and returns an XList is named for that list. It " +
   "takes one of these shapes: getAll<X>List, get<X>List, or get<X>ListBy<Scope>. Rename the method " +
   "in this interface; the typecheck carries the rename to the service and the controller. A read " +
   "that returns a keyed map, such as Promise<OrgMetas>, keeps its plural name. Write verbs and " +
-  "search… are not judged.";
+  "search… are not judged. Elsewhere a method opens with an action verb, a boolean reads yes or no " +
+  "(isActive), a discriminator is <noun>Type with an _type SQL enum, and a reference column is <table>_id.";
 
 export function watched(path: string): boolean {
   const normalized = resolve(path).split("\\").join("/");
-  return normalized.endsWith(".ts") && normalized.includes(WATCHED);
+  return normalized.endsWith(".ts") && !/\.(?:d|test|spec)\.ts$/.test(normalized) && normalized.includes(WATCHED);
 }
 
 /** The name the rule asks for, built from the type the method already promises. */
@@ -76,9 +114,14 @@ export function suggestedName(name: string, listType: string): string {
  * `added` is the text the write introduces, or null for a scan. A method is judged only when the
  * write names it, so a finding elsewhere in the file does not block an unrelated edit.
  */
-export function findings(source: string, added: string | null): string[] {
+export function findings(source: string, added: string | null, path = CONTRACT_SEAT): string[] {
   const masked = mask(source);
   const found: string[] = [];
+  const names = (name: string): boolean =>
+    // nosemgrep: javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp -- pattern built from this script's own constants and escaped text, never outside input
+    added === null || new RegExp(`\\b${name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`).test(added);
+  found.push(...namingFindings(masked, source, path, names));
+  if (!path.split("\\").join("/").includes(CONTRACT_SEAT)) return found;
   // A FRESH REGEX PER CALL. `READ_LIST_DECLARATION` carries the `g` flag, and a global regex keeps a
   // `lastIndex` between calls — the fault that made `doc-check`'s reach share wrong across a whole
   // corpus. `matchAll` resets it, which is why it is used here rather than a `while (exec)` loop.
@@ -95,7 +138,48 @@ export function findings(source: string, added: string | null): string[] {
   return found;
 }
 
-/** The verdict for one write, or null. Called alone and by the dispatcher. */
+/** The name a verb-less method asks for: its own words, opened by `read`. */
+function withVerb(name: string): string {
+  return `read${name[0].toUpperCase()}${name.slice(1)}`;
+}
+
+/** The naming chapter's verb, boolean, `_type` and `_id` rules, for the names this write introduces. */
+function namingFindings(masked: string, source: string, path: string, names: (name: string) => boolean): string[] {
+  const found: string[] = [];
+  for (const match of masked.matchAll(METHOD)) {
+    const [, name, , returns = "", end] = match;
+    if (NOT_A_METHOD.has(name) || (end === ";" && !returns) || !names(name)) continue;
+    const line = lineOf(source, match.index);
+    if (/^(?:Promise\s*<\s*)?boolean\s*>?$/.test(returns.trim())) {
+      if (!BOOLEAN_PREFIX.test(name))
+        found.push(`line ${line}: ${name}() returns a boolean and does not read yes or no — name it is${name[0].toUpperCase()}${name.slice(1)}`);
+    } else if (!VERBS.has(/^[a-z]+/.exec(name)![0]) && !BOOLEAN_PREFIX.test(name)) {
+      found.push(`line ${line}: ${name}() opens with no verb — name it ${withVerb(name)}`);
+    }
+  }
+  for (const match of masked.matchAll(BOOLEAN_PROPERTY)) {
+    const name = match[1];
+    if (BOOLEAN_PREFIX.test(name) || !names(name)) continue;
+    found.push(`line ${lineOf(source, match.index)}: ${name} is a boolean and does not read yes or no — name it is${name[0].toUpperCase()}${name.slice(1)}`);
+  }
+  // SQL lives in strings, so these two read the source and not the masked text.
+  for (const match of source.matchAll(SQL_ENUM)) {
+    if (/_type$/.test(match[1]) || !names(match[1])) continue;
+    found.push(`line ${lineOf(source, match.index)}: the enum ${match[1]} does not end in _type — name it ${match[1]}_type`);
+  }
+  if (/Entity\.ts$/.test(path)) {
+    for (const match of masked.matchAll(BARE_TYPE_COLUMN)) {
+      if (!names("type")) continue;
+      found.push(`line ${lineOf(source, match.index)}: a discriminator is named for its noun — <noun>Type, never a bare type`);
+    }
+    for (const match of masked.matchAll(REFERENCE_NAME)) {
+      if (!names(match[1])) continue;
+      found.push(`line ${lineOf(source, match.index)}: ${match[1]} is a reference column — name it <table>_id, such as org_id`);
+    }
+  }
+  return found;
+}
+
 /**
  * The verdict for one write, given text that has ALREADY been parsed.
  *
@@ -108,12 +192,12 @@ export function verdict(path: string, source: string | null, added: string | nul
   if (source === null) return null;
   let found: string[];
   try {
-    found = findings(source, added);
+    found = findings(source, added, resolve(path).split("\\").join("/"));
   } catch {
     return null;                     // a parse this check cannot do allows, never blocks
   }
   if (!found.length) return null;
-  const lines = [`Denied — a read verb is named for the list it returns. In ${basename(path)}:`];
+  const lines = [`Denied — a name breaks the naming chapter. In ${basename(path)}:`];
   for (const item of found) lines.push(`  - ${item}`);
   lines.push(`  ${REMEDY}`);
   return { deny: lines.join("\n") };
@@ -139,7 +223,7 @@ export function scan(paths: string[]): number {
     if (!watched(target)) continue;
     const source = read(target);
     if (source === null) continue;
-    for (const item of findings(source, null)) {
+    for (const item of findings(source, null, resolve(target).split("\\").join("/"))) {
       total += 1;
       console.log(`${target}: ${item}`);
     }

@@ -3,17 +3,17 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/03-platform/01-core/01-tenancy/03-people-access.md",
-      "seen": "5856fbb7"
+      "seen": "198b3bd7"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/03-platform/01-core/01-tenancy/03-people-access.md",
       "section": "Enablement: what an organization type is offered",
-      "seen": "61a67756"
+      "seen": "88faaa26"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/10-providers/ts/06-service.md",
       "section": "`@SPAuthorize` + the module `_AUTHZ` table",
-      "seen": "92726a2f"
+      "seen": "9b0e48e0"
     }
   ]
 }
@@ -38,13 +38,13 @@ Ask what the answer varies by. That one question separates the three axes.
 
 Two of these rows carry a trap. A plan feature looks like an org type when the estate has one plan, so you fold it into the enablement and the two dimensions become one. And a read gated by an offer refuses a module doing work on an organization's behalf. That module still stores the file, writes the audit row and sends the notification, whoever the customer is.
 
-Outside identity, what an organization may configure follows ownership and never its type: a thing scoped to the organization is its to change, for every organization type alike (RULE.PLATFORM.CORE.028).
+Outside identity, what an organization may configure follows ownership and never its type: a thing scoped to the organization is its to change, for every organization type alike (`RULE.PLATFORM.CORE.028` · GUIDE).
 
 **A permission and an enablement never substitute for each other.** A permission is app-specific and says who may act. An enablement is cross-cutting and says what the caller's organization type is offered at all. A gate passes when both hold.
 
 ### A gate's `appScope` is neither, and pins one value only
 
-Inside one `appPermissions` entry you may also narrow by `appScope` — which application the caller is in. **That is a third thing, and it is never a stand-in for an enablement.** A gate names an app scope for exactly one reason: to pin `PLATFORM`, guarding a platform master. Deciding what an organization type may reach is the enablement cell's job, never the scope's. **A gate never names an app id, ever** — an id is minted per install, so it would mean a different thing in every environment. Nothing is lost by leaving it out: the session already carries `appId` beside `appScope`, and permissions resolve against it at mint (RULE.PLATFORM.CORE.034).
+Inside one `appPermissions` entry you may also narrow by `appScope` — which application the caller is in. **That is a third thing, and it is never a stand-in for an enablement.** A gate names an app scope for exactly one reason: to pin `PLATFORM`, guarding a platform master. Deciding what an organization type may reach is the enablement cell's job, never the scope's. **A gate never names an app id, ever** — an id is minted per install, so it would mean a different thing in every environment. Nothing is lost by leaving it out: the session already carries `appId` beside `appScope`, and permissions resolve against it at mint (`RULE.PLATFORM.CORE.034` · MUST · skill:spn-apps/implement).
 
 ## If it is an enablement
 
