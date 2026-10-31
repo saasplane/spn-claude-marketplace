@@ -191,7 +191,7 @@ Every row below is declared and none is claimed: a run writes the last two cells
 | MKT.SCRIPTS.317 | Backend developer | keep a suggestion's stage with its arc | An arc that carries a suggestion moves it to shaped, its go to decided, and its drop to dropped | POSITIVE | UNIT | PLANNED | — |
 | MKT.SCRIPTS.318 | Backend developer | land the book's proof row on a named run | `docs book check --run` reads every chapter and, when all read clean, records the run in the book | POSITIVE | UNIT | PLANNED | — |
 | MKT.SCRIPTS.319 | Backend developer | never land the book's proof row on a read with a fault | `docs book check --run` names each fault and records no run when any chapter has one | NEGATIVE | UNIT | PLANNED | — |
-| MKT.SCRIPTS.320 | Backend developer | plan only the work still to do | `go write` leaves out every entry a landed row holds, and `go check` does not name it as held by no part | POSITIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.320 | Backend developer | plan only the work still to do | `go write` leaves out every entry a landed row holds, unless it changed after its part landed, which gets a follow-up part; `go check` does not name a landed row's entry as held by no part | POSITIVE | UNIT | PLANNED | — |
 | MKT.SCRIPTS.321 | Backend developer | be refused a release order that names no repository | `go write` refuses a sheet whose release order holds a line that is not a repository's name, and writes nothing | NEGATIVE | UNIT | PLANNED | — |
 
 ## Retired ids
