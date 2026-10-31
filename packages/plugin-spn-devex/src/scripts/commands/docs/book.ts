@@ -12,6 +12,7 @@
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join, relative } from "node:path";
 import { type Action, readWords, UsageFault, VALUE } from "../../../../../plugin-support-lib/src/lib/command.ts";
+import { POCKET } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { writeRunFile } from "../../../../../plugin-support-lib/src/lib/runs.ts";
 import { bookClassFaults, knownHolders, ownMarketplace } from "../../checks/book-classes.ts";
 import { workspaceRoot } from "../../lib/payload.ts";
@@ -25,7 +26,7 @@ export function chapters(book: string): string[] {
   const walk = (dir: string): void => {
     for (const name of readdirSync(dir).sort()) {
       const full = join(dir, name);
-      if (statSync(full).isDirectory()) { if (name !== "artifacts") walk(full); }
+      if (statSync(full).isDirectory()) { if (name !== POCKET.artifacts) walk(full); }
       else if (name.endsWith(".md")) found.push(full);
     }
   };
