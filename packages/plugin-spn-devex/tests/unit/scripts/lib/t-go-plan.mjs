@@ -85,6 +85,7 @@ same("[MKT.SCRIPTS.307] derived again, a landed baseline is kept and not made tw
 const landedAll = { ...plan, parts: plan.parts.map((p) => ({ ...p, state: "landed" })) };
 same("[MKT.SCRIPTS.307] a landed part whose entry changed gets a follow-up part", deriveGo(changed, { previous: landedAll }).parts.filter((p) => p.entries.includes("N009/E2")).map((p) => [p.id, p.state]),
   [["code-lib-repo-1", "landed"], ["code-lib-repo-2", "ready"]]);
+same("[MKT.SCRIPTS.307] a plan with a follow-up part holds to its schema", goFaults(deriveGo(changed, { previous: landedAll })), []);
 const doneFirst = deriveGo([{ ...scope[0], landed: ["E2", "E3"] }]);
 same("[MKT.SCRIPTS.320] an entry a landed row holds is in no part", doneFirst.parts.flatMap((p) => p.entries), ["N009/E1"]);
 same("[MKT.SCRIPTS.320] a repository whose entries all landed gets no docs or code part", doneFirst.parts.filter((p) => p.repo === "lib-repo" && p.pass !== "RELEASE").map((p) => p.id), []);
