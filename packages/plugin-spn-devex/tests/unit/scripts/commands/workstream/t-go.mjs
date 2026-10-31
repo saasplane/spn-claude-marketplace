@@ -132,5 +132,22 @@ console.log("\n=== start");
   ok("[MKT.SCRIPTS.315] start ends with the next step", lastLine(baseline.out).startsWith("Next:"), baseline.out);
 }
 
+console.log("\n=== write: a proof still owed after the code landed");
+{
+  const done = (over) => ({ parent: "N001", kind: "change", repo: "spn-x", blockedBy: [], touches: [], state: "landed", ...over });
+  const owed = await dataWorkspace("go-proof", { rows: [
+    done({ id: "1", title: "write the book", altitude: "DOCS", entries: ["E1"] }),
+    done({ id: "2", title: "build it", altitude: "CODE", entries: ["E2"] }),
+    done({ id: "3", title: "release spn-x", altitude: "RELEASE" }),
+    done({ id: "4", title: "prove spn-x", altitude: "PROOF", state: "ready" }),
+  ] });
+  cli(owed.root, ["workstream", "fact", "write", "N001", "--source", "spn-x/a.ts", "--fact", "a is 1", "--used-by", "1"]);
+  writeFileSync(join(owed.ws, "arcs", "N001", "sheet.json"), JSON.stringify(sheetOf([entry("E1", "spn-x:docs/a.md"), entry("E2", "spn-x:src/b.ts")]), null, 2));
+  const wrote = cli(owed.root, ["workstream", "go", "write", "N001"]);
+  const ids = existsSync(join(owed.ws, "arcs", "N001", "go.json")) ? json(join(owed.ws, "arcs", "N001", "go.json")).parts.map((p) => p.id) : [];
+  ok("[MKT.SCRIPTS.322] go write gives a repository its full run while a proof step there has not landed", wrote.code === 0 && ids.includes("full-spn-x"), wrote.out + JSON.stringify(ids));
+  ok("[MKT.SCRIPTS.322] and no baseline, with no code left to compare", !ids.includes("baseline-spn-x"), JSON.stringify(ids));
+}
+
 console.log(`\n${total - failed}/${total} passed`);
 process.exit(failed ? 1 : 0);

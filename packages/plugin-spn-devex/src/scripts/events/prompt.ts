@@ -70,11 +70,12 @@ function workstreamOfNumber(root: string, number: string): string | null {
  * the line: by its folder's name, or by a standalone three-digit number. `name` is null where the
  * folder or the number matches no folder.
  */
-function workstreamsOfLine(line: string, root: string): Array<{ name: string | null; index: number }> {
+function workstreamsOfLine(line: string, root: string): Array<{ name: string | null; index: number; whole: boolean }> {
   const either = new RegExp(`${WORKSTREAM_NAME.source}|\\b\\d{3}\\b(?!-)`, "g");
   return [...line.matchAll(either)].map((found) => ({
     name: found[0].length > 3 ? (workstreamFolder(root, found[0]) ? found[0] : null) : workstreamOfNumber(root, found[0]),
     index: found.index ?? 0,
+    whole: found[0].length > 3,
   }));
 }
 
@@ -169,8 +170,9 @@ export function sessionName(prompt: string, root: string): SessionName | null {
 /**
  * The workstreams a prompt makes this window OWN (RULE.DEVEX.WORKSPACE.236), and how.
  *
- * A handover owns every workstream its `continue:` line names that exists, before any `also open:`: the
- * reload form names two, and a window that continues one while the other waits on it owns both. What
+ * A handover owns the workstream its `continue:` line opens with, and each other one the line names by its whole
+ * folder name, before any `also open:`: the reload form names two, and a window that continues one while the other
+ * waits on it owns both. A bare number after the first, such as "waits for 035", is a mention and owns nothing. What
  * `also open:` names is visited, never owned (`alsoOpenOf`). A prompt with no handover owns
  * a workstream only where it names exactly one workstream folder that exists, and only while the window
  * owns none yet: a later prompt often names a second workstream to compare it or cite it.
@@ -178,7 +180,7 @@ export function sessionName(prompt: string, root: string): SessionName | null {
 export function bindingsOf(prompt: string, root: string, session: string): Array<{ name: string; by: "prompt" | "handover" }> {
   const next = handoverLines(prompt).get("continue");
   if (next !== undefined) {
-    const owned = [...new Set(workstreamsOfLine(continuedPart(next), root).map((found) => found.name))]
+    const owned = [...new Set(workstreamsOfLine(continuedPart(next), root).filter((found, at) => at === 0 || found.whole).map((found) => found.name))]
       .filter((name): name is string => name !== null);
     if (owned.length) return owned.map((name) => ({ name, by: "handover" as const }));
   }

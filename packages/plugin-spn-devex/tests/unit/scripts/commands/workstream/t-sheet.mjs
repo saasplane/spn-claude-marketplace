@@ -270,6 +270,20 @@ console.log("\n=== carried suggestions, precedent, steps from the sheet");
   ok("[MKT.SCRIPTS.311] writing the same sheet again adds no step", again.code === 0 && json(stateOf("N009")).rows.length === rows.length, again.out);
   const added = cli(root, ["workstream", "row", "add", "031-probe/N009", "by hand", "--repo", "spn-x", "--altitude", "CODE"]);
   ok("[MKT.SCRIPTS.311] a step added by hand to an arc that keeps a sheet is refused", added.code !== 0 && added.out.includes("sheet") && json(stateOf("N009")).rows.length === rows.length, added.out);
+
+  // a follow-up written after every step landed
+  const held = json(stateOf("N009"));
+  for (const row of held.rows) row.state = "landed";
+  writeFileSync(stateOf("N009"), JSON.stringify(held, null, 2));
+  const follow = sheet("write", "N009", "--file", put("n9.json", sheetOf([...data.entries, entry("E3")], { releaseChain: ["spn-x releases"] })));
+  const after = json(stateOf("N009")).rows;
+  const of = (altitude) => after.filter((one) => one.altitude === altitude);
+  ok("[MKT.SCRIPTS.324] a landed step keeps the entries it landed", follow.code === 0 && of("CODE")[0]?.entries?.join() === "E1" && of("CODE")[0]?.state === "landed", follow.out + JSON.stringify(after));
+  ok("[MKT.SCRIPTS.324] an entry written after its step landed gets a step of its own", of("CODE").length === 2 && of("CODE")[1]?.entries?.join() === "E3" && of("CODE")[1]?.state !== "landed", JSON.stringify(after));
+  ok("[MKT.SCRIPTS.324] the follow-up gets its own release and proof steps", of("RELEASE").filter((one) => one.state !== "landed").length === 1 && of("PROOF").filter((one) => one.state !== "landed").length === 1, JSON.stringify(after));
+  ok("[MKT.SCRIPTS.324] the docs repository with nothing new gets no step", of("DOCS").length === 1, JSON.stringify(after));
+  const twice = sheet("write", "N009", "--file", put("n9.json", sheetOf([...data.entries, entry("E3")], { releaseChain: ["spn-x releases"] })));
+  ok("[MKT.SCRIPTS.324] writing the follow-up again adds no step", twice.code === 0 && json(stateOf("N009")).rows.length === after.length, twice.out);
 }
 
 console.log(failed ? `\n  ${failed} of ${total} FAILED — sheet` : `\n  all ${total} passed — sheet`);

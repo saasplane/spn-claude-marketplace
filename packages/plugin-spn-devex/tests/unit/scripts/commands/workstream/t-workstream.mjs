@@ -633,6 +633,23 @@ console.log("\n=== landing on a run — a sheet arc holds the agent to the sheet
   const whole = land("3", "--run", "r2");
   ok("a proof row lands on a whole run", whole.code === 0 && stateOf("3") === "landed", whole.out);
 
+  // a proof row with no commits of its own, and the proof of an arc that changes no repository
+  const addRow = (fields) => { const data = json(arcPath); data.rows.push(row(fields.id, "PROOF", fields)); writeFileSync(arcPath, JSON.stringify(data, null, 2)); };
+  addRow({ id: "5" });
+  runFile(unitDir, "unit", [["U.1", "SUCCESS"], ["U.2", "SUCCESS"]], { name: "r3", ranAt: "2020-01-01T00:00:00Z" });
+  runFile(unitDir, "contract", [["C.1", "SUCCESS"]], { name: "r3", ranAt: "2020-01-01T00:00:00Z" });
+  const before = land("5", "--run", "r3");
+  ok("[MKT.SCRIPTS.323] a proof row with no commits is refused on a run taken before its arc's last commit", before.code === 1 && before.out.includes("r3 was taken before") && stateOf("5") === "ready", before.out);
+  const ownless = land("5", "--run", "r2");
+  ok("[MKT.SCRIPTS.323] a proof row with no commits lands on a run taken after its arc's commits", ownless.code === 0 && stateOf("5") === "landed", ownless.out);
+  addRow({ id: "6", repo: "none" });
+  const work = join(hold.ws, "notes", "N001", "work");
+  const noWork = land("6", "--run", "m1");
+  ok("[MKT.SCRIPTS.323] the proof of an arc with no repository is refused without its run in the work folder", noWork.code === 1 && noWork.out.includes("work") && stateOf("6") === "ready", noWork.out);
+  runFile(work, "unit", [["M.1", "SUCCESS"]], { name: "m1" });
+  const onWork = land("6", "--run", "m1");
+  ok("[MKT.SCRIPTS.323] it lands on the run its check recorded in the work folder", onWork.code === 0 && stateOf("6") === "landed", onWork.out);
+
   const docs = land("1");
   ok("a docs row lands as today", docs.code === 0 && stateOf("1") === "landed", docs.out);
 

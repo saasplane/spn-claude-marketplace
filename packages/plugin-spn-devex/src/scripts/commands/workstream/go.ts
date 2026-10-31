@@ -19,7 +19,7 @@ import {
   type ScopeSheet,
 } from "../../lib/go-plan.ts";
 import { logEvent, notesDirOf, readArc, readSheet, workspaceOf, writeWhole } from "../../lib/workstream.ts";
-import type { ArcData, GoPart, GoPlan } from "../../lib/workstream-schema.ts";
+import { DONE_STATES, type ArcData, type GoPart, type GoPlan } from "../../lib/workstream-schema.ts";
 import { arcNamed, listOf } from "./_shared.ts";
 import { sheetFindings } from "./sheet.ts";
 
@@ -65,7 +65,9 @@ function scopeOf(ws: string, scope: string[]): { sheets: ScopeSheet[]; arcs: Arc
     for (const finding of sheetFindings(ws, arc)) faults.push(`${arc} sheet: ${finding}`);
     // A release part is named for its repository, so a line that is not one name would make a part no reader accepts.
     for (const line of sheet.releaseChain) if (!/^\S+$/.test(line)) faults.push(`${arc} sheet: the release order line "${line}" is not a repository's name`);
-    sheets.push({ arc, sheet, landed: landedEntries(data) });
+    // A proof step not landed owes its repository a full run; an arc that changes no repository lands its proof on its check's run.
+    const proofs = data.rows.filter((row) => row.altitude === "PROOF" && !DONE_STATES.has(row.state) && row.repo && row.repo !== "none").map((row) => row.repo as string);
+    sheets.push({ arc, sheet, landed: landedEntries(data), proofs: [...new Set(proofs)] });
     arcs.push(data);
   }
   return { sheets, arcs, faults };
