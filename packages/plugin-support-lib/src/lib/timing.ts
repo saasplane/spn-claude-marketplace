@@ -16,6 +16,10 @@
 // line carries one more key after those, `programs`: how many programs the filter names the call ran.
 // No other line carries it.
 //
+// A hook's whole-run line says what kind of call it was, by `program` and `pathKind` (`callOf`): the first
+// program of a Bash command, and WORKSTREAM, TEST, SOURCE or OTHER for the file the call touches. Never the
+// path or the command: the kind is all `debug cost` needs to class a call, and a path is the developer's.
+//
 // `verdict` is what a hook check decided: `pass` (it said nothing), `note` (it added words to the
 // context) or `deny` (it refused the call or held the turn); null on a command's line. `out` is the
 // bytes put into the context: the words a check added, the tool's response on a `PostToolUse` run's
@@ -39,7 +43,7 @@
 // refuses to run is infinitely more expensive than a number nobody recorded.
 
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
-import { dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
+import { basename, dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 import { appendLog, readSwitch, sessionDir, telemetryFolder } from "./debug-store.ts";
 import { isWorkspaceDevex, workstreamPrefixSource } from "./docs-tree.ts";
 
@@ -61,7 +65,7 @@ export type SpanName = { group?: string | null; subgroup?: string | null; action
  * Bash command alone, and only an entry that sets it writes the key.
  */
 export type Entry = SpanName & { ms: number; exit?: number | null; script?: string; repo?: string | null; programs?: number;
-  verdict?: Verdict | null; out?: number | null };
+  program?: string | null; pathKind?: PathKind | null; verdict?: Verdict | null; out?: number | null };
 
 /**
  * What every line of one run shares. `script` is the plugin; `cwd` is where the call ran, read for
@@ -78,6 +82,8 @@ export type Facts = {
   order?: string | null;
   row?: string | null;
   cwd?: string;
+  program?: string | null;
+  pathKind?: PathKind | null;
   process?: SpanName;
 };
 
@@ -144,6 +150,62 @@ export function argsText(words: string[]): string | null {
     out.push(/\s/.test(word) || word === "" ? JSON.stringify(word) : word);
   }
   return out.length ? out.join(" ") : null;
+}
+
+/** The kind of file a call touches: under a `.spndevex/` folder, a test, any other file of a repository, or none of those. */
+export type PathKind = "WORKSTREAM" | "TEST" | "SOURCE" | "OTHER";
+
+const TEST_PATH = /(?:^|\/)tests?\/|(?:^|\/)t-[^/]+\.mjs$|\.(?:test|spec)\.[A-Za-z]+$/;
+const IN_DEVEX = /(?:^|\/)\.spndevex(?:\/|$)/;
+const KIND_RANK: PathKind[] = ["OTHER", "SOURCE", "TEST", "WORKSTREAM"];
+
+function kindOfPath(path: string, cwd: string, root: string | null): PathKind {
+  const whole = isAbsolute(path) ? path : resolve(cwd, path);
+  if (IN_DEVEX.test(whole)) return "WORKSTREAM";
+  if (!/\/\.worktrees\//.test(whole) && !repoOf(root, whole)) return "OTHER";
+  return TEST_PATH.test(whole) ? "TEST" : "SOURCE";
+}
+
+/** The first program of a command, after any `cd …&&` and env assignments; its name, never its folder. */
+function programIn(command: string): string | null {
+  let rest = command.trim();
+  for (let m = /^(?:cd\s+\S+\s*(?:&&|;)\s*|[A-Za-z_]\w*=\S*\s+)/.exec(rest); m; m = /^(?:cd\s+\S+\s*(?:&&|;)\s*|[A-Za-z_]\w*=\S*\s+)/.exec(rest))
+    rest = rest.slice(m[0].length);
+  const first = rest.split(/\s+/)[0]?.replace(/^["']|["']$/g, "");
+  return first ? basename(first) : null;
+}
+
+/** The strongest kind among the paths a command names: a word with a slash, or one ending in a file extension. */
+function kindInCommand(command: string, cwd: string, root: string | null): PathKind | null {
+  let best: PathKind | null = null;
+  for (const word of command.split(/\s+/)) {
+    const path = word.replace(/^[^=]*=(?=.*[/.])/, "").replace(/^["'(]+|["')\],;]+$/g, "");
+    if (!path || /:\/\//.test(path) || !(path.includes("/") || /^[\w.-]+\.(?:mjs|cjs|js|ts|json|jsonl|md|html|py|sh)$/.test(path))) continue;
+    const kind = kindOfPath(path, cwd, root);
+    if (best === null || KIND_RANK.indexOf(kind) > KIND_RANK.indexOf(best)) best = kind;
+  }
+  return best;
+}
+
+/**
+ * What kind of call a hook payload is: the `program` of a Bash command, and the `pathKind` of the file a Read, Edit, Write or
+ * search touches (for Bash, of the paths the command names, the strongest of them). Neither holds the path or the command.
+ * Null for what the call does not have. Never throws.
+ */
+export function callOf(payload: { tool_name?: unknown; tool_input?: unknown; cwd?: string } | null | undefined): { program: string | null; pathKind: PathKind | null } {
+  const none = { program: null, pathKind: null };
+  try {
+    if (!payload || !payload.tool_input || typeof payload.tool_input !== "object") return none;
+    const input = payload.tool_input as Record<string, unknown>;
+    const cwd = typeof payload.cwd === "string" && payload.cwd ? payload.cwd : process.cwd();
+    const root = workspaceRoot(cwd);
+    if (payload.tool_name === "Bash") {
+      const command = typeof input.command === "string" ? input.command : "";
+      return { program: programIn(command), pathKind: kindInCommand(command, cwd, root) };
+    }
+    const file = [input.file_path, input.notebook_path, input.path].find((one) => typeof one === "string" && one) as string | undefined;
+    return { program: null, pathKind: file ? kindOfPath(file, cwd, root) : null };
+  } catch { return none; }
 }
 
 /** The work a line belongs to. Every field is `null` where the call named none. */
@@ -342,6 +404,7 @@ export function write(root: string | null, facts: Facts, entries: Entry[], cwd?:
       session: facts.session ?? null, agent: facts.agent ?? null,
       workstream: work.workstream, arc: work.arc, order: work.order, row: work.row,
       ...(entry.programs !== undefined ? { programs: entry.programs } : {}),
+      ...(entry.program || entry.pathKind ? { program: entry.program ?? null, pathKind: entry.pathKind ?? null } : {}),
     }));
     appendLog(join(dir, LOG), lines.join("\n"));
   } catch { /* a tool never fails because timing failed */ }
@@ -432,6 +495,7 @@ export function end(exit: number | null = null, always = false, run?: { verdict?
     // The whole process, Node start to here. Startup, TypeScript loading and the imports are most of
     // a hook's cost, and no span inside a check can see them.
     const whole: Entry = { ...(facts.process ?? { group: "events", action: null }), ms: round(performance.now()), exit,
+                           program: facts.program, pathKind: facts.pathKind,
                            ...(facts.event === "command" ? {} : wholeJudgement(state.spans, run)) };
     write(state.root, facts, [...state.spans, whole], state.cwd);
     state.spans = [];

@@ -106,7 +106,7 @@ try {
   {
     const none = typed(root, "show", "window/this");
     ok("with no start file for this command it is refused and names `debug window show <session>`", none.code === 2
-      && none.out.includes("`debug window show <session>`") && none.out.includes("usage: spn-devex debug cost show <target> [--json]"), none.out);
+      && none.out.includes("`debug window show <session>`") && none.out.includes("usage: spn-devex debug cost show <target> [--from <time>] [--to <time>] [--lead] [--json]"), none.out);
     const pending = join(root, ".spndevex", ".debug", "sessions", "s2", "pending");
     mkdirSync(pending, { recursive: true });
     const start = (args) => JSON.stringify({ at: Date.now(), background: false, found: [{ script: "spn-devex", group: "debug", subgroup: "cost", action: "show", args, repo: null }] });
@@ -123,39 +123,88 @@ try {
     ok("the newest of several is the window", json(root, "window/this").rows.map((one) => one.key).join(" ") === "window child agent-aaa child agent-bbb");
   }
 
-  console.log("\n=== <workstream> — the split of a recorded day, from the hooks log alone");
+  console.log("\n=== <workstream> — the split of a small constructed day, from the hooks log alone");
   {
-    // One day of one arc: 20 edits, 6 proof runs, 40 workstream commands, 8 refused calls and 3 waits of 20 minutes, each call 30 seconds after the last.
+    // The marketplace is public, so no real telemetry is a fixture. This day is built from the kinds of call the 31 October measure
+    // (`036-agent-follows-rules`, notes N010 `slowness-measure.md`) classes, each 30 seconds after the last: it proves that each kind
+    // lands in the class the measure gives it. The "within 10%" reading of the real day is the work file
+    // `036-agent-follows-rules/notes/N011/work/cost-split-vs-measure.md` (MKT.HOOKS.321); it needs the real log, so no case here holds it.
     let clock = Date.parse("2026-10-31T10:00:00Z");
     const stamp = () => new Date(clock).toISOString().slice(0, 19) + "Z";
     const lines = [];
-    const base = (row) => ({ ms: 5, exit: null, pid: 1, out: null, session: "d1", agent: null, workstream: "040-split", arc: "N011", order: null, row, repo: null });
-    const post = (tool, row, extra = {}) => lines.push({ ...base(row), script: "spn-devex", group: "events", subgroup: null, action: null, args: null, event: "PostToolUse", tool, at: stamp(), verdict: "pass", ...extra });
-    const command = (row, entry) => lines.push({ ...base(row), subgroup: null, event: "command", tool: "Bash", at: stamp(), verdict: null, programs: 1, ...entry });
+    const base = (row, agent) => ({ ms: 5, exit: null, pid: 1, out: null, session: "d1", agent, workstream: "040-split", arc: "N011", order: null, row, repo: null });
+    const events = (event, tool, row, agent, verdict = "pass") => lines.push({ ...base(row, agent), script: "spn-devex", group: "events", subgroup: null, action: null, args: null, event, tool, at: stamp(), verdict });
+    const command = (row, agent, entry) => lines.push({ ...base(row, agent), subgroup: null, group: null, event: "command", tool: "Bash", at: stamp(), verdict: null, programs: 1, ...entry });
     const step = (seconds) => { clock += seconds * 1000; };
-    const wait = () => { step(20 * 60); };
-    let n = 0;
-    const rowOf = () => ((n += 1) % 2 ? "1" : "2");
-    for (let i = 0; i < 20; i += 1) { step(30); post("Edit", rowOf()); }
-    for (let i = 0; i < 6; i += 1) { step(30); const row = rowOf(); command(row, { script: "spnutils", group: "test", action: "run", args: "unit" }); post("Bash", row); }
-    for (let i = 0; i < 40; i += 1) { step(30); const row = rowOf(); command(row, { script: "spn-devex", group: "workstream", action: "row", args: "show" }); post("Bash", row); if (i % 13 === 12) wait(); }
-    for (let i = 0; i < 8; i += 1) { step(30); lines.push({ ...base(rowOf()), script: "spn-devex", group: "events", subgroup: null, action: null, args: null, event: "PreToolUse", tool: "Bash", at: stamp(), verdict: "deny" }); }
+    /** A Bash command the hooks recorded, then the call that ran. */
+    const ran = (row, agent, entry, event = "PostToolUse") => { step(30); command(row, agent, entry); events(event, "Bash", row, agent); };
+    // The window: a `.spndevex` page edit, a `workstream row state`, a refused call and its retry, a read the log holds no program for, a git log,
+    // a test run, a generated write, a CLI refusal by exit status, a send-back (not a call), a wait of 20 minutes and a commit.
+    step(30); events("PreToolUse", "Edit", "1", null);
+    ran("1", null, { script: "spn-devex", group: "workstream", subgroup: "row", action: "state", args: "040-split/N011 1 landed" });
+    step(30); lines.push({ ...base("1", null), script: "spn-devex", group: "command-shape", subgroup: null, action: "command-shape", args: null, event: "PreToolUse", tool: "Bash", at: stamp(), verdict: "deny" });
+    events("PreToolUse", "Bash", "1", null, "deny");
+    ran("1", null, { script: "spn-devex", group: "workstream", subgroup: "row", action: "state", args: "040-split/N011 1 landed --note x" });
+    step(30); events("PostToolUse", "Bash", "1", null);
+    ran("1", null, { script: "git", action: "log", args: "--oneline -1" });
+    ran("1", null, { script: "spnutils", group: "test", action: "run", args: "unit" });
+    ran("1", null, { script: "spn-devex", group: "restates", subgroup: "docs", action: "write", args: "docs/x.md" });
+    ran("1", null, { script: "spn-devex", group: "workstream", subgroup: "row", action: "land", args: "040-split/N011 1", exit: 2 }, "PostToolUseFailure");
+    step(30); events("Stop", null, "1", null, "deny");
+    step(20 * 60); command("1", null, { script: "git", action: "commit", args: "-q -m done" }); events("PostToolUse", "Bash", "1", null);
+    // A child: a source edit, a read, a write.
+    step(30); events("PreToolUse", "Edit", "2", "c1");
+    step(30); events("PreToolUse", "Read", "2", "c1");
+    step(30); events("PreToolUse", "Write", "2", "c1");
     writeFileSync(join(telemetry, "hooks.jsonl"), lines.map((one) => JSON.stringify(one)).join("\n") + "\n");
     const split = json(root, "040-split").split;
     const arc = (split ?? []).find((one) => one.key === "N011");
-    const near = (got, want) => got !== undefined && Math.abs(got - want) <= want * 0.1;
-    ok("[MKT.HOOKS.321] each arc is split into change, proof, managing, refusals and waiting, calls within 10% of the day", !!arc
-      && near(arc.change?.calls, 20) && near(arc.proof?.calls, 6) && near(arc.managing?.calls, 40) && near(arc.refusals?.calls, 8) && near(arc.waiting?.calls, 3), JSON.stringify(arc));
-    ok("[MKT.HOOKS.321] and the minutes within 10%, the waits apart from the work", !!arc
-      && near(arc.change?.minutes, 10) && near(arc.proof?.minutes, 3) && near(arc.managing?.minutes, 20) && near(arc.refusals?.minutes, 4) && near(arc.waiting?.minutes, 60), JSON.stringify(arc));
+    const calls = (kind) => arc?.[kind]?.calls;
+    ok("[MKT.HOOKS.321] a `.spndevex` page edit, a `workstream row state` and a commit are managing", calls("managing") === 3, JSON.stringify(arc));
+    ok("[MKT.HOOKS.321] a refused call and its retry, and a CLI refusal by its exit status, are refusals; a send-back is no call", calls("refusals") === 3, JSON.stringify(arc));
+    ok("[MKT.HOOKS.321] a source edit and a write by a child, and a generated write, are change", calls("change") === 3, JSON.stringify(arc));
+    ok("[MKT.HOOKS.321] a test run is proof", calls("proof") === 1, JSON.stringify(arc));
+    ok("[MKT.HOOKS.321] a git log, a read and a Bash command the log holds no program for are reading, never change", calls("reading") === 3, JSON.stringify(arc));
+    ok("[MKT.HOOKS.321] a gap of 20 minutes is one wait, apart from the work after it", calls("waiting") === 1 && Math.abs(arc.waiting.minutes - 20.5) < 0.2, JSON.stringify(arc?.waiting));
     ok("[MKT.HOOKS.321] each row of the arc is split too", (split ?? []).filter((one) => /^N011 · row \d$/.test(one.key)).length === 2, JSON.stringify((split ?? []).map((one) => one.key)));
     const printed = typed(root, "show", "040-split").out;
-    ok("[MKT.HOOKS.321] the printed form names the five classes", ["change", "proof", "managing", "refusals", "waiting"].every((word) => printed.includes(word)) && /N011 · row 1/.test(printed), printed);
+    ok("[MKT.HOOKS.321] the printed form names the five classes and no sixth", ["change", "proof", "managing", "refusals", "waiting"].every((word) => printed.includes(word)) && !/reading/.test(printed) && /N011 · row 1/.test(printed), printed);
+    const lead = (extra) => (JSON.parse(typed(root, "show", "040-split", "--json", ...extra).out).split ?? []).find((one) => one.key === "N011");
+    ok("`--lead` leaves the child's calls out", lead(["--lead"])?.change.calls === 1 && lead([])?.change.calls === 3, JSON.stringify(lead(["--lead"])));
+    ok("`--from` and `--to` bound the split to a time", lead(["--to", "2026-10-31T10:03:00Z"])?.managing.calls === 2 && lead(["--from", "2026-10-31T10:20:00Z"])?.managing.calls === 1,
+      JSON.stringify([lead(["--to", "2026-10-31T10:03:00Z"]), lead(["--from", "2026-10-31T10:20:00Z"])]));
+    const bad = typed(root, "show", "040-split", "--from", "yesterday-ish");
+    ok("a time that is none is refused with exit 2", bad.code === 2 && bad.out.includes("not one"), bad.out);
+  }
+
+  console.log("\n=== <workstream> — a record that carries `program` and `pathKind` is classed the measure's way");
+  {
+    let clock = Date.parse("2026-10-31T11:00:00Z");
+    const lines = [];
+    const at = () => new Date(clock).toISOString().slice(0, 19) + "Z";
+    const call = (event, tool, agent, extra) => {
+      clock += 30_000;
+      lines.push({ ms: 5, exit: null, pid: 1, out: null, session: "k1", agent, workstream: "041-kinds", arc: "N001", order: null, row: "1", repo: null,
+        script: "spn-devex", group: "events", subgroup: null, action: null, args: null, event, tool, at: at(), verdict: "pass", ...extra });
+    };
+    const pre = (tool, agent, pathKind) => call("PreToolUse", tool, agent, { pathKind });
+    const post = (program, pathKind) => call("PostToolUse", "Bash", null, { program, pathKind });
+    pre("Read", null, "WORKSTREAM"); pre("Read", null, "SOURCE"); pre("Read", null, "OTHER");
+    pre("Edit", null, "SOURCE"); pre("Write", null, "TEST"); pre("Edit", null, "WORKSTREAM"); pre("Write", null, "OTHER");
+    post("cat", "WORKSTREAM"); post("cat", "SOURCE"); post("node", "TEST"); post("cp", "SOURCE"); post("cp", "WORKSTREAM"); post("vitest", null);
+    pre("Edit", "c1", "WORKSTREAM"); pre("Read", "c1", "WORKSTREAM"); pre("Edit", "c1", "SOURCE");
+    writeFileSync(join(telemetry, "hooks.jsonl"), lines.map((one) => JSON.stringify(one)).join("\n") + "\n");
+    const arc = (json(root, "041-kinds").split ?? []).find((one) => one.key === "N001");
+    const calls = (kind) => arc?.[kind]?.calls;
+    ok("[MKT.HOOKS.321] a Read or Edit of a workstream file, a child's too, and a cat or a copy of one, is managing", calls("managing") === 6, JSON.stringify(arc));
+    ok("[MKT.HOOKS.321] an Edit or Write of a source or test file, and a copy into a repository, is change", calls("change") === 4, JSON.stringify(arc));
+    ok("[MKT.HOOKS.321] a node run of a test file, and a test runner, is proof", calls("proof") === 2, JSON.stringify(arc));
+    ok("[MKT.HOOKS.321] a Read of source or of other files, a write outside a repository and a cat of source are reading", calls("reading") === 4, JSON.stringify(arc));
   }
 
   console.log("\n=== the words");
   {
-    const USAGE = "usage: spn-devex debug cost show <target> [--json]\n";
+    const USAGE = "usage: spn-devex debug cost show <target> [--from <time>] [--to <time>] [--lead] [--json]\n";
     const option = typed(root, "show", "all", "--by", "arc");
     ok("[MKT.SCRIPTS.174] an option the command does not take is refused with exit 2 and the usage line", option.code === 2 && option.out === USAGE + "`debug cost show` does not take `--by`.\n", option.out);
     const second = typed(root, "show", "all", "--json", "--since");

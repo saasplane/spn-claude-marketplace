@@ -47,7 +47,7 @@ import { applies as longRunApplies, checkLongRun } from "../checks/long-run.ts";
 import { applies as commandShapeApplies, checkCommandShape } from "../checks/command-shape.ts";
 import { applies as ownerApplies, checkOwner } from "../checks/workstream-owner.ts";
 import { applies as questionsApply, checkQuestions } from "../checks/questions.ts";
-import { begin, end, span, tagsOf, type SpanName } from "../../../../plugin-support-lib/src/lib/timing.ts";
+import { begin, end, span, tagsOf, callOf, type SpanName } from "../../../../plugin-support-lib/src/lib/timing.ts";
 import { startCommand } from "../lib/bash-timing.ts";
 import { checkChildSize } from "../checks/child-size.ts";
 import { checkReadSize } from "../checks/read-size.ts";
@@ -607,7 +607,8 @@ const payload = readPayload();
 // times and always reports. What the window decides is whether any of it is ever written down —
 // which is the only part anybody pays for.
 begin({ script: "spn-devex", event: "PreToolUse", tool: payload.tool_name ?? null, session: payload.session_id ?? null,
-        ...tagsOf(payload), process: { group: "events", action: "pretooluse" } },
+        ...tagsOf(payload), ...callOf(payload),
+        process: { group: "events", action: "pretooluse" } },
       payload.cwd ?? process.cwd());
 let verdict: Verdict = null;
 try { verdict = dispatch(payload); } catch { verdict = null; }   // never take the chain down
