@@ -49,11 +49,13 @@ try {
   const parsed = JSON.parse(out);
   const context = parsed.hookSpecificOutput.additionalContext;
   const at = context.indexOf("## The SaaS Plane way, and the ask router");
-  check("the agent's context holds the index", at > 0);
+  // PAST THE CEILING THE ROUTER IS LEFT OUT FIRST, and one line names where to read it (RULE.DEVEX.AGENT.089's chapter).
+  const leftOut = /Left out to stay inline, read on asking: .*`refs\/devex\/agent\/way\.md`/.test(context);
+  check("the agent's context holds the index, or names where to read it once the start is past its ceiling", at > 0 || leftOut);
   // THE SHORT RULES ARE READ FROM THE RULES INDEX THE BUILD WRITES, so where this checkout has none there is no block to stand after.
   const blockAt = context.indexOf("## The short rules");
   check("[MKT.HOOKS.91] the index stands before the short rules, so their count is unchanged",
-    at > 0 && (blockAt < 0 ? !existsSync(join(PLUGIN, "src", "refs", "rules.json")) : at < blockAt));
+    at > 0 ? (blockAt < 0 ? !existsSync(join(PLUGIN, "src", "refs", "rules.json")) : at < blockAt) : leftOut && blockAt > 0);
   check("the developer's pane does not show it", !parsed.systemMessage.includes("The SaaS Plane way, and the ask router"));
   check("no lens file is loaded at the start of a window",
     !/^## Asks it owns$/m.test(context) && !/^\*\*Consumer first:\*\*/m.test(context));

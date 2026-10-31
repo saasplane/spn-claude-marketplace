@@ -51,7 +51,10 @@ function compare(label, root, mustSay = [], mustNotSay = []) {
   const ts = run("node", [`${HOOKS}/src/scripts/events/orientation.ts`, root], root);
   const identical = py === null || py === ts;
   const says = mustSay.every((s) => ts.includes(s));
-  const quiet = mustNotSay.every((s) => !ts.includes(s));
+  // The short rules are the same lines in every start, day zero included (RULE.DEVEX.AGENT.089), so what a state
+  // must not say is judged on the rest of the start.
+  const stated = ts.replace(/## The short rules[\s\S]*?(?=\n## |$)/, "");
+  const quiet = mustNotSay.every((s) => !stated.includes(s));
   const ok = identical && says && quiet && !ts.startsWith("ERROR");
   if (!ok) failed += 1;
   console.log(`  ${ok ? "PASS" : "FAIL"}  ${label}\n        identical ${identical}${mustSay.length ? ` · says what it must ${says}` : ""}${mustNotSay.length ? ` · silent where it must be ${quiet}` : ""}`);
