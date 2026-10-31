@@ -8,7 +8,7 @@ import { join, resolve } from "node:path";
 import { PLUGIN } from "../../../helpers/harness.mjs";
 
 const lib = resolve(PLUGIN, "src", "scripts", "lib");
-const { deriveGo, readyParts, ratesOf, boundOf, testFilesOf, entryHash, changedEntries } = await import(join(lib, "go-plan.ts"));
+const { deriveGo, readyParts, ratesOf, boundOf, testFilesOf, entryHash, changedEntries, staleEntries } = await import(join(lib, "go-plan.ts"));
 const { goFaults, entryAltitude } = await import(join(lib, "workstream-schema.ts"));
 
 let total = 0, failed = 0;
@@ -86,6 +86,9 @@ const landedAll = { ...plan, parts: plan.parts.map((p) => ({ ...p, state: "lande
 same("[MKT.SCRIPTS.307] a landed part whose entry changed gets a follow-up part", deriveGo(changed, { previous: landedAll }).parts.filter((p) => p.entries.includes("N009/E2")).map((p) => [p.id, p.state]),
   [["code-lib-repo-1", "landed"], ["code-lib-repo-2", "ready"]]);
 same("[MKT.SCRIPTS.307] a plan with a follow-up part holds to its schema", goFaults(deriveGo(changed, { previous: landedAll })), []);
+const followed = deriveGo(changed, { previous: landedAll });
+same("[MKT.SCRIPTS.307] a landed part's change that a follow-up part carries is not stale", staleEntries(followed.parts.find((p) => p.id === "code-lib-repo-1"), followed, changed), []);
+same("[MKT.SCRIPTS.307] a landed part's change that no part carries is stale", staleEntries(landedAll.parts.find((p) => p.id === "code-lib-repo-1"), landedAll, changed), ["N009/E2"]);
 const doneFirst = deriveGo([{ ...scope[0], landed: ["E2", "E3"] }]);
 same("[MKT.SCRIPTS.320] an entry a landed row holds is in no part", doneFirst.parts.flatMap((p) => p.entries), ["N009/E1"]);
 same("[MKT.SCRIPTS.320] a repository whose entries all landed gets no docs or code part", doneFirst.parts.filter((p) => p.repo === "lib-repo" && p.pass !== "RELEASE").map((p) => p.id), []);
