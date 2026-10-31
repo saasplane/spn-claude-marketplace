@@ -799,5 +799,32 @@ console.log("\n=== state show — cost and rework of the running arc");
   ok("--json carries the numbers", asJson.orders === 2 && asJson.tokens === 412000 && asJson.rework.missed === 2 && asJson.rework.fromAnswers === 1, JSON.stringify(asJson));
 }
 
+console.log("\n=== question answer — a card settled in one call; addresses read both ways; rows by arc address (MKT.HOOKS.323, .325)");
+{
+  const one = await dataWorkspace("settle");
+  const sheetFile = join(one.ws, "arcs", "N001", "sheet.json");
+  const entry = (id) => ({ id, op: "edit", file: "spn-x:a.ts", what: "x", decidedBy: ["an earlier word"], facts: [], then: [], rules: [], callers: [], tiers: {}, docs: [], book: [] });
+  put(one.root, ".spndevex/workstreams/open/031-probe/arcs/N001/sheet.json", JSON.stringify({ schemaVersion: 1, releaseChain: [], dependsOn: [], stack: null, entries: [entry("E7"), entry("E9")] }));
+  put(one.root, "card.json", JSON.stringify(CARD));
+  const raised = cli(one.root, ["workstream", "question", "raise", "031/N001", "--file", "card.json"]);
+  const id = /^(q\d+)/.exec(raised.out)?.[1] ?? "q1";
+  const missing = cli(one.root, ["workstream", "question", "answer", `031/${id}`, "--key", "A", "--words", "go", "--entries", "E7,E8,E10"]);
+  ok("[MKT.HOOKS.323] red: entries that do not exist are all named at once, and nothing is recorded", missing.code === 2 && missing.out.includes("E8") && missing.out.includes("E10") &&
+    lines(join(one.ws, "questions.jsonl")).find((row) => row.id === id).state === "open", missing.out);
+  const done = cli(one.root, ["workstream", "question", "answer", `031/${id}`, "--key", "A", "--words", "take A, folded", "--entries", "E7,E9"]);
+  const record = lines(join(one.ws, "questions.jsonl")).find((row) => row.id === id);
+  ok("[MKT.HOOKS.323] a card is settled in one call: the record", done.code === 0 && record.state === "answered" && record.answer.words === "take A, folded", done.out);
+  ok("[MKT.HOOKS.323] the answer is folded into the arc's What", /<p>[^<]*take A, folded[^<]*<\/p>/.test(readFileSync(join(one.ws, "approach.html"), "utf8").split('id="N001-what"')[1] ?? ""));
+  ok("[MKT.HOOKS.323] the log line is written", lines(join(one.ws, "arcs", "N001", "log.jsonl")).some((line) => line.kind === "answered" && line.note.includes("take A, folded")));
+  const sheet = json(sheetFile);
+  ok("[MKT.HOOKS.323] the card is cited in both entries", sheet.entries.every((one2) => one2.decidedBy.some((text) => new RegExp(`\\b${id}\\b`).test(text))), JSON.stringify(sheet.entries));
+  ok("[MKT.HOOKS.323] nothing is owed by the line", !/owed:/.test(done.out), done.out);
+  const bare = cli(one.root, ["workstream", "question", "show", id, "--in", "notes/N001/preview.html"]);
+  ok("[MKT.HOOKS.325] the bare id and the address both read the card", /is answered/.test(bare.out) && /is answered/.test(cli(one.root, ["workstream", "question", "show", `031/${id}`, "--in", "notes/N001/preview.html"]).out), bare.out);
+  const rows = cli(one.root, ["workstream", "rows", "031/N001"]);
+  ok("[MKT.HOOKS.325] `rows 031/N001` shows the arc's rows", rows.code === 0 && /N001 1 /.test(rows.out), rows.out);
+  ok("[MKT.HOOKS.325] `rows 031/N001 --json` takes the options of show", cli(one.root, ["workstream", "rows", "031/N001", "--json"]).out.trim().startsWith("["));
+}
+
 console.log(failed ? `\n  ${failed} of ${total} FAILED — workstream commands` : `\n  all ${total} passed — workstream commands`);
 process.exit(failed ? 1 : 0);

@@ -180,6 +180,25 @@ console.log("\n=== check: a whole sheet exits 0");
   ok("no finding, exit 0", run.code === 0 && !run.out.includes("finding"), run.out);
 }
 
+console.log("\n=== check: the budgets a sheet can move, before and projected after");
+{
+  const budgets = sheet("check", "N001");
+  ok("[MKT.HOOKS.324] check prints the session start's size against its ceiling, as measured now", /session start +[\d,]+ of 9,500 characters now/.test(budgets.out), budgets.out);
+  ok("[MKT.HOOKS.324] and the tool-call hook's added time, as measured now", /tool-call hook +[\d.]+ ms added now/.test(budgets.out), budgets.out);
+  ok("[MKT.HOOKS.324] with no figure on the sheet the projection says it is unchanged", (budgets.out.match(/unchanged/g) ?? []).length === 2, budgets.out);
+  const data = json(sheetFile);
+  data.budgets = { sessionStart: 7000, toolHook: 90 };
+  writeFileSync(sheetFile, JSON.stringify(data, null, 2));
+  const projected = sheet("check", "N001");
+  ok("[MKT.HOOKS.324] a figure on the sheet is the projected after", /7,000 projected/.test(projected.out) && /90 ms projected/.test(projected.out) && projected.code === 0, projected.out);
+  data.budgets = { sessionStart: 12000 };
+  writeFileSync(sheetFile, JSON.stringify(data, null, 2));
+  const over = sheet("check", "N001");
+  ok("[MKT.HOOKS.324] a projection past the ceiling is a finding and exits 1", over.code === 1 && over.out.includes("12,000") && /past the 9,500 ceiling/.test(over.out), over.out);
+  delete data.budgets;
+  writeFileSync(sheetFile, JSON.stringify(data, null, 2));
+}
+
 console.log("\n=== drop");
 {
   const noNote = sheet("drop", "N001", "E1");
@@ -196,6 +215,9 @@ console.log("\n=== a decided arc's sheet is rewritten only on the developer's wo
   const file = put("again.json", sheetOf([entry("E1"), entry("E2")]));
   const before = readFileSync(sheetFile, "utf8");
   const logged = lines(log).length;
+  const faulty = sheet("write", "N001", "--file", put("faulty.json", sheetOf([entry("E1", { what: "" }), entry("E2", { facts: ["f9"] })], { stack: null })));
+  ok("[MKT.HOOKS.324] a sheet with several faults, rewritten on a decided arc without --because, is refused once and names every one",
+    faulty.code === 1 && ["E1", "what", "f9", "stack", "--because"].every((word) => faulty.out.includes(word)) && faulty.out.trim().split("\n").length === 1, faulty.out);
   const bare = sheet("write", "N001", "--file", file);
   ok("[MKT.SCRIPTS.236] a rewrite of a decided arc's sheet without --because is refused, nothing written",
     bare.code === 1 && bare.out.includes("--because") && bare.out.includes("Nothing was written") && readFileSync(sheetFile, "utf8") === before && lines(log).length === logged, bare.out);
@@ -249,6 +271,12 @@ console.log("\n=== carried suggestions, precedent, steps from the sheet");
   writeFileSync(join(registers, "decisions.md"), "### D7 — turnstile ledger rotation happens nightly\n");
   const opened = cli(root, ["workstream", "arc", "edit", "031-probe/N008", "--title", "turnstile ledger", "--subject", "ledger", "--goal", "rotation of the turnstile ledger", "--carries", "s1,s2"]);
   ok("[MKT.SCRIPTS.316] opening an arc prints the decisions that speak to its title and goal", opened.code === 0 && opened.out.includes("D7"), opened.out);
+  // E28: the five earlier decisions an arc opens with are ranked by the title's words, not left in register order.
+  writeFileSync(join(registers, "decisions.md"), `### D7 — turnstile ledger rotation happens nightly\n${Array.from({ length: 8 }, (_, at) => `### D${11 + at} — nightly rotation of ledgers number ${at}\n`).join("")}### D30 — quartz clock sync is monitored\n`);
+  const ranked = cli(root, ["workstream", "arc", "edit", "031-probe/N010", "--title", "quartz clock sync", "--subject", "quartz", "--goal", "nightly rotation of ledgers"]);
+  const listed = ranked.out.split("\n").filter((line) => /^  D\d+ · /.test(line));
+  ok("[MKT.HOOKS.326] the earlier decisions are capped at five, and the count of the rest is said", ranked.code === 0 && listed.length === 5 && /and \d+ more/.test(ranked.out), ranked.out);
+  ok("[MKT.HOOKS.326] the one that shares the title's words leads, though the register puts it last", listed[0]?.startsWith("  D30 · "), ranked.out);
   const states = () => Object.fromEntries(lines(sugg).map((one) => [one.id, one.state]));
   ok("[MKT.SCRIPTS.317] a carried suggestion reads shaped", json(stateOf("N008")).carries?.join() === "s1,s2" && states().s1 === "shaped" && states().s2 === "shaped", JSON.stringify(states()));
   cli(root, ["workstream", "arc", "edit", "031-probe/N008", "--status", "DECIDED", "--note", "go"]);

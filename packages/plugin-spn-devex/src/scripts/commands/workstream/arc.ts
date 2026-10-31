@@ -20,7 +20,7 @@ import {
   previewPathFault, proposedLines, readArc, readJsonl, restamped, sheetFileOf, stampsOn, suggestionsFileOf, whatEntryOf, whatId, withEntryLink, withWhatEntry, workspaceOf, writeArc, writeJsonl, writeWhole,
 } from "../../lib/workstream.ts";
 import { isFile } from "../../lib/payload.ts";
-import { precedentLines } from "../../lib/precedent.ts";
+import { candidatesAt, precedentFor, wordsOf } from "../../lib/precedent.ts";
 import { refreshViews } from "../docs/cycles.ts";
 import { SHEET_SCHEMA_VERSION, subjectFault, type ArcData } from "../../lib/workstream-schema.ts";
 import { sheetFindings } from "./sheet.ts";
@@ -36,6 +36,24 @@ const OPTIONS = {
 } as const;
 
 const TITLE_WORDS = 5;
+
+/**
+ * The earlier decisions and rules that speak to an arc's title and goal, at most five, those that share the most of the
+ * title's words first (the register's order breaks a tie), and how many more there are. None where nothing speaks to it.
+ */
+function rankedPrecedent(root: string | null, title: string, goal: string, limit = 5): string[] {
+  const found = precedentFor(`${title} ${goal}`, candidatesAt(root));
+  if (!found.length) return [];
+  const named = wordsOf(title);
+  const shared = (text: string): number => { const held = new Set(wordsOf(text)); return named.filter((word) => held.has(word)).length; };
+  const ranked = found.map((one, at) => ({ one, at, shared: shared(one.text) })).sort((a, b) => b.shared - a.shared || a.at - b.at).map((one) => one.one);
+  const cut = (text: string): string => (text.length > 110 ? `${text.slice(0, 107)}...` : text);
+  return [
+    `already decided or ruled on this subject (${found.length}): read before going on`,
+    ...ranked.slice(0, limit).map((one) => `  ${one.id} · ${cut(one.text)} · ${one.where}`),
+    ...(found.length > limit ? [`  and ${found.length - limit} more`] : []),
+  ];
+}
 
 /** What is wrong with an arc's title, as the words a refusal ends with, or null where it is a topic name: at most five words, no comma. */
 function titleFault(title: string): string | null {
@@ -246,7 +264,7 @@ function edit(args: string[]): number {
     opened = leavePageWhole(ws, data, under);
     said.push("preview", "What entry", "Cycles row");
     if (data.carries?.length) said.push(...shapedWords(ws, data.carries));
-    for (const line of precedentLines(workspaceOf(), `${title} ${words.value("goal")}`)) precedent.push(line);
+    precedent.push(...rankedPrecedent(workspaceOf(), title, words.value("goal") ?? ""));
   } else {
     const was = data.status;
     wordsGuard(arc, data, everDecided(data, logLinesOf(ws, arc)), words);

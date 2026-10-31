@@ -123,6 +123,36 @@ try {
     ok("the newest of several is the window", json(root, "window/this").rows.map((one) => one.key).join(" ") === "window child agent-aaa child agent-bbb");
   }
 
+  console.log("\n=== <workstream> — the split of a recorded day, from the hooks log alone");
+  {
+    // One day of one arc: 20 edits, 6 proof runs, 40 workstream commands, 8 refused calls and 3 waits of 20 minutes, each call 30 seconds after the last.
+    let clock = Date.parse("2026-10-31T10:00:00Z");
+    const stamp = () => new Date(clock).toISOString().slice(0, 19) + "Z";
+    const lines = [];
+    const base = (row) => ({ ms: 5, exit: null, pid: 1, out: null, session: "d1", agent: null, workstream: "040-split", arc: "N011", order: null, row, repo: null });
+    const post = (tool, row, extra = {}) => lines.push({ ...base(row), script: "spn-devex", group: "events", subgroup: null, action: null, args: null, event: "PostToolUse", tool, at: stamp(), verdict: "pass", ...extra });
+    const command = (row, entry) => lines.push({ ...base(row), subgroup: null, event: "command", tool: "Bash", at: stamp(), verdict: null, programs: 1, ...entry });
+    const step = (seconds) => { clock += seconds * 1000; };
+    const wait = () => { step(20 * 60); };
+    let n = 0;
+    const rowOf = () => ((n += 1) % 2 ? "1" : "2");
+    for (let i = 0; i < 20; i += 1) { step(30); post("Edit", rowOf()); }
+    for (let i = 0; i < 6; i += 1) { step(30); const row = rowOf(); command(row, { script: "spnutils", group: "test", action: "run", args: "unit" }); post("Bash", row); }
+    for (let i = 0; i < 40; i += 1) { step(30); const row = rowOf(); command(row, { script: "spn-devex", group: "workstream", action: "row", args: "show" }); post("Bash", row); if (i % 13 === 12) wait(); }
+    for (let i = 0; i < 8; i += 1) { step(30); lines.push({ ...base(rowOf()), script: "spn-devex", group: "events", subgroup: null, action: null, args: null, event: "PreToolUse", tool: "Bash", at: stamp(), verdict: "deny" }); }
+    writeFileSync(join(telemetry, "hooks.jsonl"), lines.map((one) => JSON.stringify(one)).join("\n") + "\n");
+    const split = json(root, "040-split").split;
+    const arc = (split ?? []).find((one) => one.key === "N011");
+    const near = (got, want) => got !== undefined && Math.abs(got - want) <= want * 0.1;
+    ok("[MKT.HOOKS.321] each arc is split into change, proof, managing, refusals and waiting, calls within 10% of the day", !!arc
+      && near(arc.change?.calls, 20) && near(arc.proof?.calls, 6) && near(arc.managing?.calls, 40) && near(arc.refusals?.calls, 8) && near(arc.waiting?.calls, 3), JSON.stringify(arc));
+    ok("[MKT.HOOKS.321] and the minutes within 10%, the waits apart from the work", !!arc
+      && near(arc.change?.minutes, 10) && near(arc.proof?.minutes, 3) && near(arc.managing?.minutes, 20) && near(arc.refusals?.minutes, 4) && near(arc.waiting?.minutes, 60), JSON.stringify(arc));
+    ok("[MKT.HOOKS.321] each row of the arc is split too", (split ?? []).filter((one) => /^N011 · row \d$/.test(one.key)).length === 2, JSON.stringify((split ?? []).map((one) => one.key)));
+    const printed = typed(root, "show", "040-split").out;
+    ok("[MKT.HOOKS.321] the printed form names the five classes", ["change", "proof", "managing", "refusals", "waiting"].every((word) => printed.includes(word)) && /N011 · row 1/.test(printed), printed);
+  }
+
   console.log("\n=== the words");
   {
     const USAGE = "usage: spn-devex debug cost show <target> [--json]\n";
