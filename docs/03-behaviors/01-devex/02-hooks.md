@@ -151,6 +151,7 @@ Every row below is declared and none is claimed: a run writes the last two cells
 | MKT.HOOKS.307 | Backend developer | time every test runner | Every runner the test-run check knows is timed, a repository's own runner included | POSITIVE | UNIT | PLANNED | — |
 | MKT.HOOKS.308 | Backend developer | close only when the work has run | The close gate refuses while `go check` finds anything or a part has not landed | NEGATIVE | UNIT | PLANNED | — |
 | MKT.HOOKS.309 | Backend developer | never leave a carried suggestion raised | The state check names a suggestion still at raised while an arc carries it or its log cites it | NEGATIVE | UNIT | PLANNED | — |
+| MKT.HOOKS.310 | Backend developer | be handed only the work a handover continues | A handover owns the workstream its `continue:` line opens with and each other one it names by the whole folder name; a bare number after the first, such as "waits for 035", owns nothing | NEGATIVE | UNIT | PLANNED | — |
 
 ## Retired ids
 

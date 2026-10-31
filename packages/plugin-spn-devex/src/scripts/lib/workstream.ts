@@ -1325,6 +1325,11 @@ export function landingFault(ws: string, arc: string, data: ArcData, row: ArcRow
   const mine = entries.filter((one) => (row.entries ?? []).includes(one.id));
   if (row.altitude === "CODE" && !mine.some((one) => Object.values(one.tiers ?? {}).some((ids) => ids.length)))
     return `row ${row.id} is a CODE row and its entries name no test; \`workstream sheet check ${arc}\` lists what is missing.`;
+  // An arc that changes no repository has no runner and no commits: its proof lands on the run its check records in the work folder.
+  if (row.altitude === "PROOF" && (!repo || repo === "none")) {
+    const work = join(notesDirOf(ws, arc), "work");
+    return namedRun(work, run).runs.length ? null : `${run} is not in ${work}; the arc's check records it there with --run.`;
+  }
 
   const places = runPlaces(ws, repo);
   const found = places.map((place) => ({ place, runs: namedRun(place, run).runs })).filter((one) => one.runs.length);
@@ -1332,8 +1337,10 @@ export function landingFault(ws: string, arc: string, data: ArcData, row: ArcRow
   if (found.length > 1) return `${run} is in two places, ${found.map((one) => one.place).join(" and ")}; name a run that is in one.`;
   const runs: Run[] = found[0].runs;
 
-  const shas = row.commits?.[repo] ?? [];
-  if (!shas.length) return `row ${row.id} has no commit in ${repo || "its repository"}; \`workstream report write\` records them.`;
+  // A proof step makes no commits of its own: it is judged against every commit its arc recorded in the repository.
+  const own = row.commits?.[repo] ?? [];
+  const shas = own.length || row.altitude !== "PROOF" ? own : data.rows.flatMap((one) => one.commits?.[repo] ?? []);
+  if (!shas.length && row.altitude === "CODE") return `row ${row.id} has no commit in ${repo || "its repository"}; \`workstream report write\` records them.`;
   const last = lastCommitOf(places, shas);
   const ranAt = runs.map((one) => one.ranAt).filter(Boolean).sort()[0] ?? null;
   if (last && ranAt && Date.parse(ranAt) < last.at) return `${run} was taken before ${last.sha.slice(0, 8)}, row ${row.id}'s last commit.`;

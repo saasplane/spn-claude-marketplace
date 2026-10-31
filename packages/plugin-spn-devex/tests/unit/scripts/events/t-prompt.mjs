@@ -150,6 +150,12 @@ console.log("\n=== prompt");
     bindingsOf(handover("020 · N011 — row 8"), root, "sess-owns"), [{ name: THIS, by: "handover" }]);
   same("[MKT.HOOKS.49] a handover naming a number with no folder owns nothing, and the prompt binds nothing",
     bindingsOf(bare("099 · N011"), root, "sess-owns"), []);
+  same("[MKT.HOOKS.310] a bare number after the first is a mention, and owns nothing",
+    bindingsOf(bare(`workstream ${THIS}: N011 row 3; later checks waits for 021`), root, "sess-owns"), [{ name: THIS, by: "handover" }]);
+  same("[MKT.HOOKS.310] a first workstream named by its number is still owned",
+    bindingsOf(bare("020 · N011, then 021 waits on it"), root, "sess-owns"), [{ name: THIS, by: "handover" }]);
+  same("[MKT.HOOKS.310] two workstreams named by their whole folder names are both owned",
+    bindingsOf(bare(`workstreams ${THIS} and ${NEXT}: N011`), root, "sess-owns"), [{ name: THIS, by: "handover" }, { name: NEXT, by: "handover" }]);
 }
 
 // ---------------------------------------------------------------- `also open:` is visited, never owned (S175)

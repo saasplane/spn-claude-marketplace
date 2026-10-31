@@ -193,6 +193,9 @@ Every row below is declared and none is claimed: a run writes the last two cells
 | MKT.SCRIPTS.319 | Backend developer | never land the book's proof row on a read with a fault | `docs book check --run` names each fault and records no run when any chapter has one | NEGATIVE | UNIT | PLANNED | — |
 | MKT.SCRIPTS.320 | Backend developer | plan only the work still to do | `go write` leaves out every entry a landed row holds, unless it changed after its part landed, which gets a follow-up part; `go check` does not name a landed row's entry as held by no part | POSITIVE | UNIT | PLANNED | — |
 | MKT.SCRIPTS.321 | Backend developer | be refused a release order that names no repository | `go write` refuses a sheet whose release order holds a line that is not a repository's name, and writes nothing | NEGATIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.322 | Backend developer | prove an arc after its code has landed | `go write` gives a repository its full run, with no baseline, while an arc of the scope has a proof step there that has not landed, even once every code change in it has landed | POSITIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.323 | Backend developer | land a proof that has no repository's commits | `row state … landed --run` lands the proof of an arc that changes no repository on a named run in the arc's `work/` folder, and refuses it without one; a proof step with no commits of its own is judged against the newest commit its arc recorded in that repository | POSITIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.324 | Backend developer | add work to an arc after its steps landed | `sheet write` keeps each landed step's entries as they landed, and gives an entry written after it a step of its own, with a new release step and, for code, a new proof step | POSITIVE | UNIT | PLANNED | — |
 
 ## Retired ids
 

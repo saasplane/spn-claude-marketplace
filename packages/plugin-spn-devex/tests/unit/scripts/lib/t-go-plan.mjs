@@ -96,6 +96,10 @@ const rowsLanded = [{ ...changed[0], landed: ["E2", "E3"] }];
 same("[MKT.SCRIPTS.320] an entry that changed after its part landed gets a follow-up part, though a landed row holds it", deriveGo(rowsLanded, { previous: landedAll }).parts.filter((p) => p.entries.includes("N009/E2")).map((p) => [p.id, p.state]),
   [["code-lib-repo-1", "landed"], ["code-lib-repo-2", "ready"]]);
 same("[MKT.SCRIPTS.320] an unchanged entry of a landed row gets no follow-up", deriveGo(rowsLanded, { previous: landedAll }).parts.filter((p) => p.entries.includes("N009/E3")).map((p) => p.state), ["landed"]);
+const allLanded = { ...scope[0], landed: ["E1", "E2", "E3"] };
+same("[MKT.SCRIPTS.322] code landed and a proof owed: a full run and no baseline", deriveGo([{ ...allLanded, proofs: ["lib-repo"] }]).parts.filter((p) => p.pass !== "RELEASE").map((p) => p.id), ["full-lib-repo"]);
+same("[MKT.SCRIPTS.322] code landed and no proof owed: neither", deriveGo([allLanded]).parts.filter((p) => p.pass !== "RELEASE").map((p) => p.id), []);
+same("[MKT.SCRIPTS.322] the full run for a proof owed waits on nothing of its own repository", deriveGo([{ ...allLanded, proofs: ["lib-repo"] }]).parts.find((p) => p.id === "full-lib-repo")?.waitsOn, []);
 same("[MKT.SCRIPTS.311] a part held twice fails the schema", goFaults({ ...plan, parts: [plan.parts[0], { ...plan.parts[0], id: "docs-lib-repo-9" }] }).length > 0, true);
 same("[MKT.SCRIPTS.311] a signature that misses an entry fails the schema", goFaults({ ...plan, parts: [{ ...plan.parts[0], signature: "a.b" }] }).length, 1);
 same("[MKT.SCRIPTS.311] a pass that is a number fails the schema", goFaults({ ...plan, parts: [{ ...plan.parts[0], pass: 1 }] }).length > 0, true);
