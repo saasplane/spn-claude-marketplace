@@ -8,7 +8,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/06-tests/README.md",
-      "seen": "aefb3708"
+      "seen": "9fc1ddfc"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/06-tests/README.md",
@@ -86,6 +86,7 @@
   - **Where you stand decides what a run collects, and nothing else does** (`RULE.SUPPORT.APPS.120` · MUST · skill:spn-apps/implement). A folder declaring a kind is a node, and the run takes that node's cases alone; a repository root takes the cross-application scenarios; anywhere else is a refusal that says so.
   - **An application owns its own flows even when the walk leaves it.** Registration and sign-in belong to the application they are *for*.
   - **Tier follows scope, and setup follows the tier rather than the node.** Unit stands on nothing, component and integration on the node's own setup, a journey on one stack stood up once for the run.
+  - **The integration tier reaches only what the local stack provides** (`RULE.SUPPORT.APPS.248` · MUST · skill:spn-apps/implement). A hosted registry, repository or marketplace is out of its reach, because the tier gates a push and a release where the network may not be. A case that needs the published world is a journey of its node, run after the publish.
   - **A node carries the configuration its own run needs, and own collection is not own setup** (`RULE.SUPPORT.APPS.120` · MUST · skill:spn-apps/implement). The collection is narrow; the setup is shared.
   - **A run owes two outputs, for two readers** (`RULE.SUPPORT.APPS.119` · MUST · skill:spn-apps/implement): the run file `tests/.output/<tier>/runs/<run>.json`, naming the run, the ids, the tier, the environment and the instant, which the stamp reads to write `Status` and `Updated at` as `<time> · <run>`; and the framework's own HTML page, which a person opens and a pipeline uploads. Neither is a fallback for the other.
   - **The obligation sits on the toolchain, never on the test framework.** A run that cannot say what it proved is not a finished realization of the test command.
