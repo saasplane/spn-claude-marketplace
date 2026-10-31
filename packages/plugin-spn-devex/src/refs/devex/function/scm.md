@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/01-function/02-scm.md",
-      "seen": "29a2c878"
+      "seen": "29b8a0ac"
     }
   ]
 }

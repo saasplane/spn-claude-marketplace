@@ -50,6 +50,7 @@ description: The repository and project standard - what a project must declare, 
 - **RULE.DEVEX.FUNCTION.086** (`RULE.DEVEX.FUNCTION.086` · MUST · skill:spn-devex/scm)
 - **RULE.DEVEX.FUNCTION.087** (`RULE.DEVEX.FUNCTION.087` · MUST · skill:spn-devex/scm)
 - **RULE.DEVEX.FUNCTION.088** (`RULE.DEVEX.FUNCTION.088` · MUST · skill:spn-devex/scm)
+- **RULE.DEVEX.FUNCTION.089** (`RULE.DEVEX.FUNCTION.089` · MUST · skill:spn-devex/scm)
 
 **Read [`refs/devex/workspace/workstream.md`](../../refs/devex/workspace/workstream.md) before acting.** It holds the loop this skill runs inside: how a prompt is read, where a new ask goes, what a prompt does to a running arc, and how a reply closes.
 

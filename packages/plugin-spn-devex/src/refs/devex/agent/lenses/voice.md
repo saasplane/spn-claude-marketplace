@@ -13,7 +13,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/01-corpus.md",
-      "seen": "0c562b94"
+      "seen": "49efc31b"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/02-document.md",
@@ -21,7 +21,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md",
-      "seen": "11a26765"
+      "seen": "66dcc62b"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",

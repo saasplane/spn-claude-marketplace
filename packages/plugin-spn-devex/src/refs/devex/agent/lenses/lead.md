@@ -12,7 +12,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/01-corpus.md",
-      "seen": "0c562b94"
+      "seen": "49efc31b"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/03-platform/01-core/03-surfaces/03-service-namespaces.md",
@@ -20,7 +20,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/01-function/02-scm.md",
-      "seen": "29a2c878"
+      "seen": "29b8a0ac"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/01-function/02-scm.md",
@@ -30,7 +30,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/01-function/02-scm.md",
       "section": "Repo tasks",
-      "seen": "bc677dfe"
+      "seen": "5639c6c7"
     }
   ]
 }

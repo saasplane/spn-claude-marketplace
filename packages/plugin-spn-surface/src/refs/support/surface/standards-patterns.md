@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/",
-      "seen": "98829f23"
+      "seen": "744c8ae7"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
@@ -92,7 +92,7 @@ An action that needs a confirmation first asks the person for it. A confirmation
 
 - **A confirmation fits as a popover for an act a person can undo, and as a dialog for an act that cannot be undone.** A dialog for every small act teaches a person to confirm without reading. Then the dialog no longer stops them on the one act that matters.
 - **Both blocks stay open while the act runs.** A failure is then shown where the person confirmed, and the act is never sent twice.
-- **A form shows each default as its real value, marked Default, and never as a faded placeholder** (`RULE.SUPPORT.SURFACE.405` · MUST · short). A faded placeholder reads as an empty field, so a person cannot tell a value the form will save from a hint.
+- **A form shows each default as its real value, marked Default, and never as a faded placeholder** (`RULE.SUPPORT.SURFACE.405` · MUST · skill:spn-surface/design). A faded placeholder reads as an empty field, so a person cannot tell a value the form will save from a hint.
 
 ### On the web: the keys, the pointer and hover
 
@@ -129,7 +129,7 @@ Adding an intent checks that a new task is not an old one under another name. A 
 
 **How a thing is shown follows from the data and from the person who uses it** (`RULE.SUPPORT.SURFACE.047` · MUST · skill:spn-surface/design). A page is not arranged by how another page looks, or by which block is at hand. Two pages that look alike may hold data that grows in different ways. They may also serve people who come for different reasons. The same arrangement would then be right for one page and wrong for the other.
 
-**A page is shaped from how people use it and from the nature of its data, through the UX lens, before it is built** (`RULE.SUPPORT.SURFACE.396` · MUST · short). One thing is one page, a bounded set is cards, and a set that grows is a list with its detail. A page built first and shaped after keeps the shape of its first draft.
+**A page is shaped from how people use it and from the nature of its data, through the UX lens, before it is built** (`RULE.SUPPORT.SURFACE.396` · MUST · skill:spn-surface/design). One thing is one page, a bounded set is cards, and a set that grows is a list with its detail. A page built first and shaped after keeps the shape of its first draft.
 
 **The person is read twice.** The kind of person the app is for is read once, before any page, and it decides between two patterns that fit the same data. Who comes to this page, how often and to do what is read for each page.
 

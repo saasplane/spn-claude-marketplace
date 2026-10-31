@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/03-lenses/01-lenses.md",
-      "seen": "a22cffc4"
+      "seen": "e7a2c034"
     }
   ]
 }

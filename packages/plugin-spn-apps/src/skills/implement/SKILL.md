@@ -15,7 +15,7 @@ description: THE requirement router for SaaS Plane TS repos. Use whenever the us
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/",
-      "seen": "98829f23"
+      "seen": "744c8ae7"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/07-architecture-widgets/",

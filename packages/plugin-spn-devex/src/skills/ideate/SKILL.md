@@ -38,6 +38,9 @@ description: Decide what a node IS, and design a requirement inside that shape -
 - **spec-first** (`RULE.DEVEX.FUNCTION.007` · MUST · skill:spn-devex/ideate)
 - **RULE.DEVEX.FUNCTION.028** (`RULE.DEVEX.FUNCTION.028` · MUST · skill:spn-devex/ideate)
 - **The DevEx stages are eight — `BOOTSTRAP` · `SCM` · `IDEATE` · `DEVELOP` · `TEST` · `PROVISION` · `DELIVER` · `OPERATE` — and this phase covers both deciding a node's shape and designing a requirement inside it** (`RULE.DEVEX.FUNCTION.062` · MUST · skill:spn-devex/ideate)
+- **A sample is drawn from the page's own data and rules** (`RULE.DEVEX.WORKSPACE.427` · MUST · skill:spn-devex/ideate)
+- **The agent searches the decisions already taken before it proposes a shape** (`RULE.DEVEX.WORKSPACE.429` · MUST · skill:spn-devex/ideate)
+- **While you are still ideating, the agent talks it through in chat** (`RULE.DEVEX.WORKSPACE.443` · MUST · skill:spn-devex/ideate)
 
 **Read [`refs/devex/workspace/workstream.md`](../../refs/devex/workspace/workstream.md) before acting.** It holds the loop this skill runs inside: how a prompt is read, where a new ask goes, what a prompt does to a running arc, and how a reply closes.
 

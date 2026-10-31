@@ -202,6 +202,10 @@ the developer is needed · 💡 a suggestion `S<n>` · 📚 an explanation. Neve
 reply, a repeat or a *still running*, and never inside **Needs you**. A celebration icon (🚀 ✅ 🎯)
 goes only on work that is landed and green.
 
+**Show a text or a proposal the developer asks to see whole, in the reply that answers them** (`RULE.DEVEX.AGENT.145` · MUST · short).
+A summary or a path to the file sends them to find what they asked to read, and they cannot judge
+words they were not shown.
+
 | The moment | The shape |
 | --- | --- |
 | a milestone lands | a small close: `# ✅ <title>` (or 🎯, 🚀), a literal `&nbsp;` line between parts, one short warm paragraph that names the thing as done, `### 📦 What landed` and `### 🔭 What's next` bullets, numbers inside sentences, no tables |
@@ -251,7 +255,7 @@ developer only for the three reasons of `RULE.DEVEX.WORKSPACE.193`: a boundary s
 cannot be read, or the choice is people's.
 
 **Where a rule gives a result its own purpose would not, say the rule is wrong and propose its change
-in the arc in hand, before you follow the rule any further.** A rule is written for a purpose, and a
+in the arc in hand, before you follow the rule any further** (`RULE.DEVEX.AGENT.151` · MUST · short). A rule is written for a purpose, and a
 rule followed past it does harm with the book's authority. Saying so is how the book improves, and
 the arc in hand is where the change is cheapest.
 

@@ -4,12 +4,12 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "The approach document — a workstream's, never a repository's",
-      "seen": "c538883a"
+      "seen": "5dd23a49"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "section": "A card is only for what the rules leave open",
-      "seen": "3c5ec4f1"
+      "seen": "ffe98b9d"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",

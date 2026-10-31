@@ -12,7 +12,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/01-function/02-scm.md",
-      "seen": "29a2c878"
+      "seen": "29b8a0ac"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/01-function/07-deliver.md",
@@ -30,7 +30,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/01-function/02-scm.md",
       "section": "Repo tasks",
-      "seen": "bc677dfe"
+      "seen": "5639c6c7"
     }
   ]
 }

@@ -15,7 +15,7 @@ description: Design a page of a SaaS Plane app from the blocks of the design sys
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/",
-      "seen": "bf59bc6a"
+      "seen": "6f657f14"
     }
   ]
 }
@@ -305,6 +305,8 @@ description: Design a page of a SaaS Plane app from the blocks of the design sys
 - **One claim picks a provider: the stack claim of the repository the code stands in, `config.stack` in its `sprepo.json`** (`RULE.SUPPORT.SURFACE.383` · MUST · skill:spn-surface/design)
 - **A mark is no link, and no level rings a mark** (`RULE.SUPPORT.SURFACE.389` · MUST · skill:spn-surface/design)
 - **RULE.SUPPORT.SURFACE.392** (`RULE.SUPPORT.SURFACE.392` · MUST · skill:spn-surface/design)
+- **A unit or a prop of the library goes construct, then Figma, then stack, then showcase, and its work starts from the domain and the user's goals** (`RULE.SUPPORT.SURFACE.397` · MUST · skill:spn-surface/design)
+- **A form shows each default as its real value, marked Default, and never as a faded placeholder** (`RULE.SUPPORT.SURFACE.405` · MUST · skill:spn-surface/design)
 
 **Read `refs/devex/workspace/workstream.md` (spn-devex) before acting.** It holds the loop this skill runs inside: how a prompt is read, where a new ask goes, what a prompt does to a running arc, and how a reply closes.
 
@@ -351,7 +353,7 @@ The same list is built one way for a trained team that works in it all day, and 
 - **List each task the person does on the page.** Read the tasks from the behavior rows of the owning docs. Where a task has no row, say so: the `ideate` skill writes the row.
 - **Name the kind of surface.** It is web today. A rule that names hover or a pointer holds for the web alone.
 - **Read what the app holds already**: its theme, and the layout its other pages use.
-- **Shape the page from how people use it and from the nature of its data, through the UX lens, before it is built** (`RULE.SUPPORT.SURFACE.396` · MUST · short). One thing is one page, a bounded set is cards, and a set that grows is a list with its detail.
+- **Shape the page from how people use it and from the nature of its data, through the UX lens, before it is built** (`RULE.SUPPORT.SURFACE.396` · MUST · skill:spn-surface/design). One thing is one page, a bounded set is cards, and a set that grows is a list with its detail.
 - **Place by purpose before you pick a unit** (`RULE.SUPPORT.SURFACE.207` · MUST · skill:spn-surface/design). Group the controls of each task by intent, put each beside what it relates to, and draw alternatives as equals. Only then choose the units that carry that. A page built from a list of parts reads as a page of parts.
 
 ## 1. Pick the layout
@@ -474,7 +476,7 @@ A page is decided in four steps, in this order (`RULE.SUPPORT.SURFACE.052` · MU
 | one value among many of one kind | in its row | in its line | Change in place, in a list |
 | a thing that is only on or off | in place, as a switch | the same | the pattern of the page it stands on |
 
-- **The kind of person sets how much an entry asks at once** (`standards-core.md`, *What each kind changes*). A Team takes many fields at once, up to about 12 in a sheet, keyboard first, defaults filled. A form shows each default as its real value, marked Default, and never as a faded placeholder (`RULE.SUPPORT.SURFACE.405` · MUST · short). Everyday users take about 5 fields a screen and one decision, every format accepted and nothing they entered lost, so their medium entry is an entry that is a page in steps, with `DSStepper`. A Visitor takes one ask and the fewest fields, with no account before value.
+- **The kind of person sets how much an entry asks at once** (`standards-core.md`, *What each kind changes*). A Team takes many fields at once, up to about 12 in a sheet, keyboard first, defaults filled. A form shows each default as its real value, marked Default, and never as a faded placeholder (`RULE.SUPPORT.SURFACE.405` · MUST · skill:spn-surface/design). Everyday users take about 5 fields a screen and one decision, every format accepted and nothing they entered lost, so their medium entry is an entry that is a page in steps, with `DSStepper`. A Visitor takes one ask and the fewest fields, with no account before value.
 - **On the web an entry over the page is an address** (`RULE.SUPPORT.SURFACE.366` · MUST · skill:spn-surface/design): Back closes it, a reload opens it again, and a link opens it over its page. A confirmation, and proving it is you again, are not.
 
 ### Start from the spec of the pattern

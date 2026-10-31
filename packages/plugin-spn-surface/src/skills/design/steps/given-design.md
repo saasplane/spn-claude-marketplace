@@ -29,6 +29,7 @@
 - **The levels are the surface's own: the layout, the page level, the containers, the widgets and cards, and the components** (`RULE.SUPPORT.SURFACE.202` · MUST · skill:spn-surface/design)
 - **RULE.SUPPORT.SURFACE.205** (`RULE.SUPPORT.SURFACE.205` · MUST · skill:spn-surface/design)
 - **RULE.SUPPORT.SURFACE.394** (`RULE.SUPPORT.SURFACE.394` · MUST · skill:spn-surface/design)
+- **A page is shaped from how people use it and from the nature of its data, through the UX lens, before it is built** (`RULE.SUPPORT.SURFACE.396` · MUST · skill:spn-surface/design)
 
 Read this step when an ask brings a design of the page or points at a page to follow. **It is the same skill, with the same steps and the same tree.** The mode adds one read and two lists, and each of steps 1 to 5 starts from the partner's version instead of from nothing. With nothing brought, the skill runs as written and proposes from the cases.
 

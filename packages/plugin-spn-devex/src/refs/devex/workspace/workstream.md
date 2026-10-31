@@ -17,12 +17,12 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
-      "seen": "2a782db3"
+      "seen": "ce840e1a"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "section": "A step row says where, at what altitude, and how",
-      "seen": "16674105"
+      "seen": "934ecc44"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -51,7 +51,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "seen": "d2ff2f73"
+      "seen": "8293e302"
     }
   ]
 }
@@ -129,7 +129,7 @@ folded in: `proof`, `cost`, `commits`, `order`. **Every row is a build step**: r
 planning jobs, which record no step (`RULE.DEVEX.WORKSPACE.278` · MUST · short). A step's `state` is `waiting`, `ready`,
 `running`, `stopped`, `replaced`, `landed`, `deferred` or `carried`. Steps run in chain order, by repository with the foundation first, then by altitude. After each
 write the `row` commands name, in a `note:` line, a build row with no `repo` or no `altitude` and a row out of
-chain order; it reports and never refuses (`RULE.DEVEX.WORKSPACE.183` · MUST · short).
+chain order; it reports and never refuses (`RULE.DEVEX.WORKSPACE.183` · MUST · check:workstream-state · due:036/N008).
 
 ### The commands
 

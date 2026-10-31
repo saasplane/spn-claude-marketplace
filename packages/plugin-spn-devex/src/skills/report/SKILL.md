@@ -46,6 +46,7 @@ description: Write one of the five reports on a repository — coverage (how muc
 - **A lens's sweep is a report over the whole, for drift that no single change shows. It runs before a major release or when a lead asks where things stand, never on every change** (`RULE.DEVEX.AGENT.101` · MUST · skill:spn-devex/report)
 - **The Agent stewards artifacts and never manufactures them** (`RULE.DEVEX.WORKSPACE.104` · MUST · skill:spn-devex/report)
 - **Recommendations is three groups, by who decides** (`RULE.DEVEX.WORKSPACE.411` · MUST · skill:spn-devex/report)
+- **A section that holds only a table or a code block is drawn flush, and the fix is made for the whole kind** (`RULE.DEVEX.WORKSPACE.438` · MUST · skill:spn-devex/report)
 
 **Read [`refs/devex/workspace/workstream.md`](../../refs/devex/workspace/workstream.md) before acting.** It holds the loop this skill runs inside: how a prompt is read, where a new ask goes, and how a reply closes.
 
