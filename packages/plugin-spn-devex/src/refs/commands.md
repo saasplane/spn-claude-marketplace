@@ -128,7 +128,19 @@ spn-devex workstream arc stamp write <workstream>/N<nnn> — write: restamp an a
 
 spn-devex workstream arc delete <workstream>/N<nnn> --note "…" — delete an arc never decided, on the developer's words
 
+spn-devex workstream close <workstream> — close a workstream: run the close gate, stamp the approach page DONE, and move the folder into closed/
+
 spn-devex workstream fact write <workstream>/N<nnn> --source <repository>/<path>[:<line>] --fact "…" [--used-by …] — write one fact, the source's current commit pinned
+
+spn-devex workstream go write <workstream>/N<nnn> --scope N<nnn>,… — after the go: derive the plan from the scope's sheets and the telemetry, and write every part's brief; run again it keeps landed and running parts
+
+spn-devex workstream go show <workstream>/N<nnn> [--part <id>] [--json] — print the parts: their files, their tests, their measured time and what each waits on
+
+spn-devex workstream go check <workstream>/N<nnn> — read the plan against the sheets: an entry no part holds, or a part whose entries changed since the plan was written, which it marks held; exits 1 on any
+
+spn-devex workstream go start <workstream>/N<nnn> <part> — mark a baseline or full run as running, so the test-run check lets the whole suite run
+
+spn-devex workstream open --file <block.json> --note "<the developer's words>" [--backlog "<the blocker>"] — open a workstream from the six-things block: the next number, its folder, its approach page and its first arc
 
 spn-devex workstream progress write <workstream> — regenerate the progress block in the approach page's Cycles
 
@@ -148,7 +160,7 @@ spn-devex workstream row state <workstream>/N<nnn> <row> <state> [--note …] [-
 
 spn-devex workstream row note <workstream>/N<nnn> <row> "<text>" — write one line on a row's log, and change nothing else
 
-spn-devex workstream row edit <workstream>/N<nnn> <row> [--title …] [--kind …] [--repo …] [--altitude …] [--model …] [--blocked-by …] [--touches …] [--entries E1,E2] [--position …] — change the fields of a row the arc holds; a row it lacks is refused, and `row add` is named
+spn-devex workstream row edit <workstream>/N<nnn> <row> [--title …] [--kind …] [--repo …] [--altitude …] [--model …] [--blocked-by …] [--touches …] [--entries E1,E2] [--position …] [--proof …] — change the fields of a row the arc holds; --proof names a carried row's successor; a row it lacks is refused, and `row add` is named
 
 spn-devex workstream row discard <workstream>/N<nnn> <row> --note "…" — take a row found invalid or not needed out of the arc; --note carries the developer's words into its one log line
 
@@ -168,7 +180,7 @@ spn-devex workstream state show [<workstream>] [--json] — where each open and 
 
 spn-devex workstream state check [<workstream>] [--facts] [--json] — whether each open and backlog workstream is whole: its data, previews, samples, notes folders, stamps, cards and step files
 
-spn-devex workstream suggestion add <workstream> "<title>" [--preview …] — raise a suggestion: the next number, raised
+spn-devex workstream suggestion add <workstream> "<title>" [--preview …] — raise a suggestion: the next number, raised; it also prints the decisions and rules that already speak to its title
 
 spn-devex workstream suggestion state <workstream> <sN> <state> [--words "…"] — move it on: shaped, decided, parked or dropped, with the words beside the move
 
