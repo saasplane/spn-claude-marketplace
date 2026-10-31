@@ -5,17 +5,20 @@
 //   spn-devex workstream go show  <workstream>/N<nnn> [--part <id>] [--json]
 //   spn-devex workstream go check <workstream>/N<nnn>
 //   spn-devex workstream go start <workstream>/N<nnn> <part>
+//   spn-devex workstream go wait  <workstream>/N<nnn> <part> --on "<what it waits on>"
 //
 // A go is the plan of the work after the developer's go: `go.json` in the lead arc's folder, derived from the sheets of the
 // scope, and one brief for each part. `write` refuses a scope that is not decided or whose sheet has a finding; run again
-// it keeps every landed and running part. `check` reads the plan against the sheets and holds the parts whose entries moved.
+// it keeps every landed and running part and names every fault of the scope in one refusal. `check` reads the plan against the sheets and holds the parts whose entries moved.
 // Every command ends with the next step to run.
 
+import { execFileSync } from "node:child_process";
+import { existsSync } from "node:fs";
 import { basename, join } from "node:path";
 import { type Action, FLAG, VALUE, UsageFault, readWords } from "../../../../../plugin-support-lib/src/lib/command.ts";
 import { isTestCommand } from "../../checks/test-run.ts";
 import {
-  deriveGo, fullRunMinutes, goFileOf, landedEntries, landedMeasures, planScope, readGo, readyParts, ratesOf, staleEntries, unheldEntries,
+  clearWaiting, deriveGo, fullRunMinutes, goFileOf, landedEntries, landedMeasures, markWaiting, planScope, readGo, readyParts, ratesOf, staleEntries, unheldEntries,
   type ScopeSheet,
 } from "../../lib/go-plan.ts";
 import { logEvent, notesDirOf, readArc, readSheet, workspaceOf, writeWhole } from "../../lib/workstream.ts";
@@ -52,10 +55,11 @@ export function nextStep(ref: string, ws: string, plan: GoPlan): string {
 }
 
 /** The sheets of the scope, or the lines that refuse it. */
-function scopeOf(ws: string, scope: string[]): { sheets: ScopeSheet[]; arcs: ArcData[]; faults: string[] } {
+function scopeOf(ws: string, scope: string[], lead: string): { sheets: ScopeSheet[]; arcs: ArcData[]; faults: string[] } {
   const sheets: ScopeSheet[] = [];
   const arcs: ArcData[] = [];
   const faults: string[] = [];
+  if (scope[0] !== lead) faults.push(`\`--scope\` starts with \`${scope[0] ?? "nothing"}\`, and the lead is \`${lead}\`: the lead is the first arc of the scope`);
   for (const arc of scope) {
     const data = readArc(ws, arc);
     const sheet = readSheet(ws, arc);
@@ -101,8 +105,7 @@ function write(args: string[]): number {
   if (more.length) throw new UsageFault("takes one arc.");
   const { ws, arc: lead } = arcNamed(ref);
   const scope = listOf(words, "scope") ?? [lead];
-  if (scope[0] !== lead) throw new UsageFault(`names \`${lead}\` as the lead, and \`--scope\` starts with \`${scope[0] ?? "nothing"}\`: the lead is the first arc of the scope.`);
-  const { sheets, arcs, faults } = scopeOf(ws, scope);
+  const { sheets, arcs, faults } = scopeOf(ws, scope, lead);
   if (faults.length) { console.log(`Refused: ${faults.join(" · ")}. Nothing was written.`); return 1; }
   const root = workspaceOf() ?? process.cwd();
   const previous = readGo(ws, lead);
@@ -122,7 +125,8 @@ function write(args: string[]): number {
 function partLine(part: GoPart, waiting: boolean): string {
   const state = part.state === "ready" && waiting ? "waiting" : part.state;
   const time = part.minutes === null ? "not measured" : `${part.minutes} min`;
-  const tail = [part.entries.length ? part.entries.join(" ") : "", part.tests.length ? `tests ${part.tests.join(" ")}` : "", part.waitsOn.length ? `waits on ${part.waitsOn.join(", ")}` : ""].filter(Boolean);
+  const tail = [part.entries.length ? part.entries.join(" ") : "", part.tests.length ? `tests ${part.tests.join(" ")}` : "", part.waitsOn.length ? `waits on ${part.waitsOn.join(", ")}` : "",
+    part.state === "waiting" && part.waitingOn ? `waiting on ${part.waitingOn}` : ""].filter(Boolean);
   return [`${part.id}  ${part.pass}  ${state}  ${time}`, ...tail].join(" · ");
 }
 
@@ -168,6 +172,17 @@ export function checkGo(args: string[]): number {
   return findings.length ? 1 : 0;
 }
 
+/** The files a repository's worktree for this workstream (else its checkout) holds uncommitted, or none where it is no git tree. */
+function uncommitted(ws: string, repo: string): string[] {
+  const root = workspaceOf() ?? process.cwd();
+  const dir = [join(root, ".worktrees", basename(ws), repo), join(root, repo)].find((one) => existsSync(one));
+  if (!dir) return [];
+  try {
+    return execFileSync("git", ["status", "--porcelain", "--untracked-files=all"], { cwd: dir, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] })
+      .split("\n").filter(Boolean).map((line) => line.slice(3));
+  } catch { return []; }
+}
+
 function start(args: string[]): number {
   const words = readWords(args);
   const [ref, id, ...more] = words.paths;
@@ -181,6 +196,9 @@ function start(args: string[]): number {
   if (part.state !== "ready") return refuse(`${id} is ${part.state}, not ready`);
   const open = part.waitsOn.filter((wait) => plan.parts.find((one) => one.id === wait)?.state !== "landed");
   if (open.length) return refuse(`${id} waits on ${open.join(", ")}, which has not landed`);
+  // A full run is taken on a tree that is not about to change, so the repository holds no uncommitted file.
+  const changed = part.pass === "FULL_RUN" ? uncommitted(ws, part.repo) : [];
+  if (changed.length) return refuse(`${id} is a full run, and ${part.repo} holds uncommitted changes: ${changed.join(", ")}; commit them, then start it`);
   const next: GoPlan = { ...plan, parts: plan.parts.map((one) => (one.id === id ? { ...one, state: "running" as const } : one)) };
   save(ws, arc, next);
   logEvent(ws, arc, "go", null, `${id} started`);
@@ -189,9 +207,37 @@ function start(args: string[]): number {
   return 0;
 }
 
+function wait(args: string[]): number {
+  const words = readWords(args, { on: VALUE, clear: FLAG });
+  const [ref, id, ...more] = words.paths;
+  const reason = words.value("on");
+  const clear = words.given("clear");
+  if (!id || more.length || (clear ? !!reason : !reason)) throw new UsageFault("takes an arc, one part and what it waits on, or `--clear`: `go wait <workstream>/N<nnn> <part> --on \"…\"` or `go wait <workstream>/N<nnn> <part> --clear`.");
+  const { ws, arc } = arcNamed(ref);
+  const plan = planOf(ws, arc);
+  if (clear) {
+    let cleared: GoPlan;
+    try { cleared = clearWaiting(plan, id); } catch (thrown) { console.log(`Refused: ${(thrown as Error).message}. Nothing was changed.`); return 1; }
+    save(ws, arc, cleared);
+    const now = cleared.parts.find((one) => one.id === id)!;
+    logEvent(ws, arc, "go", null, `${id} wait cleared, ${now.state === "ready" ? "ready" : `waiting on ${now.waitingOn}`}`);
+    console.log(`ok · ${arc} ${id} ${now.state === "ready" ? "ready" : `waiting on ${now.waitingOn}`}`);
+    console.log(nextStep(`${basename(ws)}/${arc}`, ws, cleared));
+    return 0;
+  }
+  let next: GoPlan;
+  try { next = markWaiting(plan, id, reason); } catch (thrown) { console.log(`Refused: ${(thrown as Error).message}. Nothing was changed.`); return 1; }
+  save(ws, arc, next);
+  logEvent(ws, arc, "go", null, `${id} waiting on ${reason.trim()}`);
+  console.log(`ok · ${arc} ${id} waiting on ${reason.trim()}`);
+  console.log(nextStep(`${basename(ws)}/${arc}`, ws, next));
+  return 0;
+}
+
 export const actions: Record<string, Action> = {
   write: { describe: "after the go: derive the plan from the scope's sheets and the telemetry, and write every part's brief; run again it keeps landed and running parts", usage: "<workstream>/N<nnn> --scope N<nnn>,…", run: write },
   show: { describe: "print the parts: their files, their tests, their measured time and what each waits on", usage: "<workstream>/N<nnn> [--part <id>] [--json]", run: show },
   check: { describe: "read the plan against the sheets: an entry no part holds, or a part whose entries changed since the plan was written, which it marks held; exits 1 on any", usage: "<workstream>/N<nnn>", run: checkGo },
   start: { describe: "mark a baseline or full run as running, so the test-run check lets the whole suite run", usage: "<workstream>/N<nnn> <part>", run: start },
+  wait: { describe: "mark a part waiting on something outside the plan (a release, a sign-in, another window's hold), with the reason in plain words; `--clear` takes the wait off, and the part reads ready when what it waits on in the plan has landed", usage: "<workstream>/N<nnn> <part> (--on \"…\" | --clear)", run: wait },
 };

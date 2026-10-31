@@ -16,9 +16,11 @@ import { workspaceRoot } from "../../../../../plugin-support-lib/src/lib/timing.
 export const describe = "every hook check's runs, time, notes and refusals, then every event's runs, time and bytes put into the context";
 
 const HOOKS_LOG = "hooks.jsonl";
+const SENDBACKS_LOG = "sendbacks.jsonl";
 
 type Check = { script: string; group: string; action: string; runs: number; ms: number; notes: number; denies: number; out: number };
 type Event = { event: string; runs: number; ms: number; out: number };
+type ToFix = { check: string; sent: number; idle: number };
 
 const round = (ms: number): number => Math.round(ms * 100) / 100;
 const text = (value: unknown): string | null => (typeof value === "string" && value ? value : null);
@@ -53,6 +55,33 @@ function read(root: string): { checks: Check[]; events: Event[] } {
            events: [...events.values()].sort(byMs).map((one) => ({ ...one, ms: round(one.ms) })) };
 }
 
+/**
+ * The checks to fix (MKT.HOOKS.321): a check whose send-backs were mostly, which is more than half, followed by no tool
+ * call. A session writes one cumulative line each time, so the last line per session is the one that counts.
+ */
+function readToFix(root: string): ToFix[] {
+  const last = new Map<string, Record<string, unknown>>();
+  for (const file of logFiles(join(telemetryFolder(root), SENDBACKS_LOG))) {
+    for (const raw of readFileSync(file, "utf8").split("\n")) {
+      if (!raw.trim()) continue;
+      try {
+        const one = JSON.parse(raw) as Record<string, unknown>;
+        const session = text(one.session);
+        if (session && one.checks && typeof one.checks === "object") last.set(session, one.checks as Record<string, unknown>);
+      } catch { /* a torn last line is skipped */ }
+    }
+  }
+  const sums = new Map<string, ToFix>();
+  for (const checks of last.values()) {
+    for (const [check, counts] of Object.entries(checks)) {
+      const held = sums.get(check) ?? { check, sent: 0, idle: 0 };
+      const { sent, idle } = (counts ?? {}) as Record<string, unknown>;
+      sums.set(check, { check, sent: held.sent + number(sent), idle: held.idle + number(idle) });
+    }
+  }
+  return [...sums.values()].filter((one) => one.idle * 2 > one.sent).sort((a, b) => b.idle - a.idle);
+}
+
 /** A duration as a person reads it: milliseconds below a second, seconds above. */
 const shown = (ms: number): string => (ms >= 1000 ? `${round(ms / 1000)}s` : `${round(ms)}ms`);
 
@@ -62,8 +91,9 @@ function show(args: string[]): number {
   const root = workspaceRoot(resolve(process.env.SPN_WORKSPACE ?? process.cwd()));
   if (!root) throw new UsageFault("finds no workspace above this folder.");
   const { checks, events } = read(root);
-  if (words.given("json")) { console.log(JSON.stringify({ checks, events }, null, 2)); return 0; }
-  if (!checks.length && !events.length) {
+  const toFix = readToFix(root);
+  if (words.given("json")) { console.log(JSON.stringify({ checks, events, toFix }, null, 2)); return 0; }
+  if (!checks.length && !events.length && !toFix.length) {
     console.log(`no hook telemetry in ${telemetryFolder(root)} — \`debug switch on telemetry\` records from the next hook`);
     return 0;
   }
@@ -75,6 +105,10 @@ function show(args: string[]): number {
   console.log("\n" + "Event".padEnd(width) + "Runs".padStart(7) + "Time".padStart(10) + "Out bytes".padStart(11));
   for (const one of events)
     console.log(one.event.padEnd(width) + String(one.runs).padStart(7) + shown(one.ms).padStart(10) + String(one.out).padStart(11));
+  if (toFix.length) {
+    console.log("\nChecks to fix: most of their send-backs were followed by no tool call");
+    for (const one of toFix) console.log(`${one.check}`.padEnd(width) + `${one.idle} of ${one.sent} unanswered`.padStart(24));
+  }
   return 0;
 }
 

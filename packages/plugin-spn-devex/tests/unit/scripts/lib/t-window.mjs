@@ -11,6 +11,7 @@ import { workspace } from "../../../helpers/fixture.mjs";
 import { CARD as RAISED_CARD } from "../../../helpers/workstream-fixture.mjs";
 import { WORKSTREAMS } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { linesFor } from "../../../../../plugin-support-lib/src/lib/page-styles.ts";
+import * as windowLib from "../../../../src/scripts/lib/window.ts";
 import { bindNamed, readWindow, recordWrites, reposWritten, visitedWorkstreams, windowWorkstreams } from "../../../../src/scripts/lib/window.ts";
 import { bindingsOf } from "../../../../src/scripts/events/prompt.ts";
 
@@ -207,6 +208,18 @@ console.log("\n=== window — the repositories a window has written under");
   pre(root, "reader", { file_path: join(root, "repo-b", "docs", "x.md") }, { tool_name: "Read" });
   check("a write under a repository records it, and only a member repository, and only by path", [...reposWritten(root, "writer")].join() === "repo-a");
   check("a read under a repository records nothing", reposWritten(root, "reader").size === 0);
+}
+
+console.log("\n=== window — the usage-read record is gone with usage-first");
+{
+  const root = workspace("w-no-usage", { "repo-a/sprepo.json": "{}" });
+  pre(root, "reads-usage", { command: "spn-devex workstream" });
+  pre(root, "reads-usage", { command: "spn-devex workstream arc edit 001/N001 --status DECIDED" });
+  check("[MKT.HOOKS.325] a window's note holds no record of the usage it read", !("usage" in readWindow(root, "reads-usage")), JSON.stringify(readWindow(root, "reads-usage")));
+  check("[MKT.HOOKS.325] the writer and the reader of that record are no longer exported", windowLib.recordUsage === undefined && windowLib.usageRead === undefined);
+  const file = join(root, ".spndevex", ".debug", "sessions", "reads-usage", "window.json");
+  let text = ""; try { text = readFileSync(file, "utf8"); } catch { /* no note written is fine */ }
+  check("[MKT.HOOKS.325] and no note on disk names a usage", !text.includes("\"usage\""), text);
 }
 
 console.log("\n=== window — no hook reads every open workstream to speak of it");

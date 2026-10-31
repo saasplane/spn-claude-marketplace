@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-// After a Bash call that merged into `develop`, remind the agent which open workstreams hold that repository
-// and which of their arcs are running, and the `workstream arc edit <ws>/<arc> --note` line each one is owed.
+// After a Bash call that merged into `develop`, remind the agent which of the window's own open workstreams hold that
+// repository and which of their arcs are running, and the `workstream arc edit <ws>/<arc> --note` line each one is owed.
 // The agent writes the lines, because what changed is judgement; this reads no diff and writes nothing.
 // A note for the agent alone, never a refusal, and silent where no running arc holds the repository.
 
@@ -8,6 +8,7 @@ import { execFileSync } from "node:child_process";
 import { basename, join } from "node:path";
 import { isDir, workspaceRoot, type Payload, type Verdict } from "../lib/payload.ts";
 import { arcIdsOf, arcRepos, arcStatus, readArc, workstreamsOf } from "../lib/workstream.ts";
+import { windowSet } from "../lib/window.ts";
 import { ranIn } from "./rebase-moved.ts";
 
 const PR_MERGE = /\bgh\s+pr\s+merge\b/;
@@ -55,11 +56,11 @@ function holds(root: string, ws: string, repo: string): boolean {
   return arcIdsOf(ws).some((arc) => { const data = readArc(ws, arc); return !!data && arcRepos(data).includes(repo); });
 }
 
-/** The running arcs of each open workstream whose set holds the repository, as the ref `arc edit` takes. */
-export function owing(root: string, repo: string): Array<{ workstream: string; arcs: string[] }> {
+/** The running arcs of each of the window's own open workstreams whose set holds the repository, as the ref `arc edit` takes. */
+export function owing(root: string, repo: string, mine: Set<string>): Array<{ workstream: string; arcs: string[] }> {
   const out: Array<{ workstream: string; arcs: string[] }> = [];
   for (const ws of workstreamsOf(root, ["open"])) {
-    if (!holds(root, ws, repo)) continue;
+    if (!mine.has(basename(ws)) || !holds(root, ws, repo)) continue;
     const number = /^(\d+)/.exec(basename(ws))?.[1] ?? basename(ws);
     const arcs = arcIdsOf(ws).filter((arc) => { const data = readArc(ws, arc); return !!data && arcStatus(data) === "RUNNING"; })
       .map((arc) => `${number}/${arc}`);
@@ -76,8 +77,8 @@ export function checkMergeTold(payload: Payload): Verdict {
   if (!root) return null;
   const repo = mergedRepo(payload, command);
   if (!repo) return null;
-  const owed = owing(root, repo);
+  const owed = owing(root, repo, windowSet(root, payload.session_id));
   if (!owed.length) return null;
   const lines = owed.flatMap((one) => one.arcs.map((arc) => `- ${one.workstream}: \`spn-devex workstream arc edit ${arc} --note "…"\``));
-  return { note: `\`${repo}\` took a merge into \`develop\`. Each running arc below belongs to an open workstream whose set holds it, and each is owed one line: what changed, a dependency the merge added, and for a breaking change its cutover (what must land with it, and in what order). You write the lines; nothing was written for you.\n${lines.join("\n")}` };
+  return { note: `\`${repo}\` took a merge into \`develop\`. Each running arc below belongs to a workstream this window owns whose set holds it, and each is owed one line: what changed, a dependency the merge added, and for a breaking change its cutover (what must land with it, and in what order). You write the lines; nothing was written for you.\n${lines.join("\n")}` };
 }

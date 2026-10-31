@@ -16,7 +16,7 @@ import { type Payload, type Verdict } from "../lib/payload.ts";
 import {
   approachOf, arcIdsOf, arcRepos, blockAt, cardHtml, fromWorkstream, isDataLayout, readArc, readQuestions, workspaceOf, workstreamAround,
 } from "../lib/workstream.ts";
-import { isBuilderWorkspace } from "../events/orientation.ts";
+import { isBuilderWorkspace } from "../lib/builder.ts";
 import { runsTheWork } from "./how-it-runs.ts";
 import { type Question } from "../lib/workstream-schema.ts";
 

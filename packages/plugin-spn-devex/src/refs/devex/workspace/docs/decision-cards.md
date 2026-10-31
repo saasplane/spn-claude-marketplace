@@ -9,12 +9,12 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "section": "A card is only for what the rules leave open",
-      "seen": "ffe98b9d"
+      "seen": "e87bd37e"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "section": "The reply while work runs shows what needs you, then what moved",
-      "seen": "c0f8d092"
+      "seen": "ab8f9d7d"
     }
   ]
 }
@@ -88,9 +88,17 @@ is written, and anything still open becomes the page's next `Q<n>` card, in the 
 
 | Reason | What it covers |
 | --- | --- |
-| **a boundary shifts** | the scope of an arc or a workstream, a published contract or interface, the security or trust posture, deleting data, cost or infrastructure, what a user sees |
+| **a boundary shifts** | the scope of an arc or a workstream, a published contract or interface, the security or trust posture, deleting the product's data or a person's, cost or infrastructure, what a user sees. The agent's own measurements, notes and logs are not data in this sense |
 | **information is missing** | a fact that no reading and no measurement can supply |
 | **the choice is people's** | priority, taste, business direction |
+
+**No `Needs you` line, no ask a reply ends on, and no card or suggestion puts to the developer how the work runs**
+(`RULE.DEVEX.WORKSPACE.467` · MUST · check:stop) and in no card or suggestion (`RULE.DEVEX.WORKSPACE.468` · MUST · check:questions). What the agent
+chapter gives the agent, it decides, does, and reports in one line. A `Needs you` line holds a card's question, a page to look
+at, or an act no grant covers. The stop check sends back a reply that asks leave for, or asks a question about, the order of the
+work, the agent's own measurements or files, its worktrees and branches, or an act a grant covers; `workstream question raise`
+and `workstream suggestion add` refuse one whose question and options are all acts of running the work. In the builder's
+workspace, a workstream that changes the agent may raise one, because there the agent's design is the subject.
 
 ## The card
 
@@ -210,7 +218,7 @@ moved* holds that shape.
 
 **The cards named there are those of the workstream you are working on — MUST**
 (`RULE.DEVEX.WORKSPACE.197` · MUST · check:orientation). A card on another workstream's page belongs to the window that works
-there. A workstream you open while you help shape an idea is yours from then on. A workstream is
+there, so the reply does not name it, even to say it is set aside, unless your prompt asked about that card or that workstream. A handover's `open:` line holds only this workstream's cards. A workstream you open while you help shape an idea is yours from then on. A workstream is
 yours when this window wrote a file inside its folder or ran a `workstream` command that writes an arc
 there, or its first prompt or a handover named it (`RULE.DEVEX.WORKSPACE.236` · MUST · short); a window that works on
 none asks no card.

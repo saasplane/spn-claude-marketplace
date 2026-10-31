@@ -8,11 +8,12 @@
 
 import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import { appendFileSync, mkdirSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
+import { appendFileSync, mkdirSync, readFileSync, realpathSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { basename, dirname, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import { namedRun, worst, type Run } from "../../../../plugin-support-lib/src/lib/runs.ts";
 import { STATUSES, TERMINAL, type Status } from "../checks/arc-status.ts";
+import { contentHash } from "../checks/push-tiers.ts";
 import { withOffset } from "./clock.ts";
 import { isDir, isFile, listdir, workspaceRoot } from "./payload.ts";
 import { APPROACH_PAGE, ARCS, PLUGIN_TEMPLATES, WORKSTREAM_STATES, isApproachPage, workstreamPrefixSource, workstreamsDir, type WorkstreamState } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
@@ -426,7 +427,30 @@ export const now = (): string => withOffset(new Date());
 
 /** One event on an arc's log. */
 export function logEvent(ws: string, arc: string, kind: string, row: string | null, note: string | null): void {
-  appendJsonl(logFileOf(ws, arc), { at: now(), kind, row, note });
+  const line = JSON.stringify({ at: now(), kind, row, note });
+  appendJsonl(logFileOf(ws, arc), JSON.parse(line));
+  commitWrites(ws, line);
+  // A command may write its pages after its log line; whatever is left is committed under the same line when the run ends.
+  if (!lastLines.has(ws)) process.once("exit", () => { commitWrites(ws, lastLines.get(ws) ?? line); });
+  lastLines.set(ws, line);
+}
+
+/** The newest log line each workstream was written with in this process. */
+const lastLines = new Map<string, string>();
+
+/**
+ * Commits what a command wrote in the workspace's `.spndevex`, with the log line as the message, so a write never waits for
+ * a hand commit. Where `.spndevex` is not a git repository of its own, or git refuses, the write stands and nothing is committed.
+ */
+export function commitWrites(ws: string, message: string): boolean {
+  const dev = dirname(dirname(dirname(ws)));
+  if (basename(dev) !== ".spndevex" || !(isDir(join(dev, ".git")) || isFile(join(dev, ".git")))) return false;
+  try {
+    const git = (args: string[]): void => { execFileSync("git", args, { cwd: dev, stdio: "ignore" }); };
+    git(["add", "-A", "--", "."]);
+    git(["commit", "-q", "--no-verify", "-m", message, "--", "."]);
+    return true;
+  } catch { return false; }
 }
 
 /** A new arc's data, `PROPOSED`, with no row. */
@@ -1308,6 +1332,27 @@ function lastCommitOf(places: readonly string[], shas: readonly string[]): { at:
   return last;
 }
 
+/**
+ * Whether a run file was taken on exactly the tree a commit holds: its stamp names the content hash of the node it ran
+ * on, whole and not narrowed, and the commit holds the same content under that node. A run with no stamp is not one.
+ */
+function ranOnTree(place: string, one: Run, sha: string): boolean {
+  try {
+    const stamp = JSON.parse(readFileSync(join(place, one.from.replace(/\.json$/, ".stamp.json")), "utf8")) as { content?: string; narrowed?: boolean };
+    if (stamp.narrowed !== false || typeof stamp.content !== "string") return false;
+    const node = join(place, one.node);
+    const git = (args: string[], cwd: string): string => execFileSync("git", args, { cwd, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] });
+    const top = git(["rev-parse", "--show-toplevel"], node).trim();
+    const folder = relative(realpathSync(top), realpathSync(node)).split(sep).join("/") || ".";
+    const entries = new Map<string, string>();
+    for (const line of git(["ls-tree", "-r", "-z", sha, "--", folder], top).split("\0").filter(Boolean)) {
+      const tab = line.indexOf("\t");
+      entries.set(line.slice(tab + 1), line.slice(0, tab).split(" ")[2]);
+    }
+    return contentHash(entries, folder) === stamp.content;
+  } catch { return false; }
+}
+
 const SHOWN: Record<string, string> = { FAILED: "FAILURE", PENDING: "PENDING", SUCCESS: "SUCCESS" };
 
 /**
@@ -1323,8 +1368,10 @@ export function landingFault(ws: string, arc: string, data: ArcData, row: ArcRow
       + `Name the run: \`workstream row state ${arc} ${row.id} landed --run <name>\`.`;
   const repo = row.repo ?? "";
   const mine = entries.filter((one) => (row.entries ?? []).includes(one.id));
+  // Every fault the gate can judge is gathered and named in one refusal; only a run it cannot find ends the judging early.
+  const faults: string[] = [];
   if (row.altitude === "CODE" && !mine.some((one) => Object.values(one.tiers ?? {}).some((ids) => ids.length)))
-    return `row ${row.id} is a CODE row and its entries name no test; \`workstream sheet check ${arc}\` lists what is missing.`;
+    faults.push(`row ${row.id} is a CODE row and its entries name no test; \`workstream sheet check ${arc}\` lists what is missing`);
   // An arc that changes no repository has no runner and no commits: its proof lands on the run its check records in the work folder.
   if (row.altitude === "PROOF" && (!repo || repo === "none")) {
     const work = join(notesDirOf(ws, arc), "work");
@@ -1340,14 +1387,15 @@ export function landingFault(ws: string, arc: string, data: ArcData, row: ArcRow
   // A proof step makes no commits of its own: it is judged against every commit its arc recorded in the repository.
   const own = row.commits?.[repo] ?? [];
   const shas = own.length || row.altitude !== "PROOF" ? own : data.rows.flatMap((one) => one.commits?.[repo] ?? []);
-  if (!shas.length && row.altitude === "CODE") return `row ${row.id} has no commit in ${repo || "its repository"}; \`workstream report write\` records them.`;
+  if (!shas.length && row.altitude === "CODE") faults.push(`row ${row.id} has no commit in ${repo || "its repository"}; \`workstream report write\` records them`);
   const last = lastCommitOf(places, shas);
   const ranAt = runs.map((one) => one.ranAt).filter(Boolean).sort()[0] ?? null;
-  if (last && ranAt && Date.parse(ranAt) < last.at) return `${run} was taken before ${last.sha.slice(0, 8)}, row ${row.id}'s last commit.`;
+  // A run of the commit's own tree lands whatever its clock says; a run with no stamp or another tree is judged by the clock.
+  const sameTree = last !== null && runs.every((one) => ranOnTree(found[0].place, one, last.sha));
+  if (last && ranAt && !sameTree && Date.parse(ranAt) < last.at) faults.push(`${run} was taken before ${last.sha.slice(0, 8)}, row ${row.id}'s last commit`);
 
   const statusAt = (tier: string, id: string): string[] =>
     runs.flatMap((one) => one.results).filter((result) => result.id === id && String(result.tier).toLowerCase() === tier).map((result) => result.status);
-  const faults: string[] = [];
   const judge = (tier: string, ids: readonly string[]): void => {
     for (const id of ids) {
       const seen = statusAt(tier, id);

@@ -436,6 +436,8 @@ console.log("\n=== orientation — the welcome word for word, and one status lin
     const env = { ...process.env, HOME: home(name), SPN_TELEMETRY: "off" };
     delete env.SPN_DEVEX_AGENT_WORKSPACE;
     if (workspaceKey !== null) env.SPN_DEVEX_AGENT_WORKSPACE = workspaceKey;
+    // Each call here is the day's first start: the whole welcome is shown once a day, and the short start has its own cases below.
+    rmSync(join(root, ".spndevex", ".debug", "workspace", "welcome.json"), { force: true });
     try {
       const out = execFileSync("node", [script, "--stdin"], {
         input: JSON.stringify({ cwd: root, session_id: "t-orientation" }), encoding: "utf8", cwd: root,
@@ -1017,6 +1019,48 @@ console.log("\n=== orientation — the running go at the session start");
   const goes = many.split("\n").filter((line) => line.startsWith("Go "));
   says("[MKT.HOOKS.304] six gos stay inside the session start's limit: three named, the rest counted",
     goes.length === 3 && many.includes("And 3 more running") && many.length <= SESSION_START_CEILING, `${goes.length} · ${many.length}`);
+}
+
+// ── the whole welcome once a day per workspace; every other start is the status line and the one Go line (036 N011) ──
+console.log("\n=== orientation — the short welcome, and the whole one once a day");
+{
+  const says = (label, ok, detail = "") => { n += 1; if (!ok) failed += 1; console.log(`  ${ok ? "PASS" : "FAIL"}  ${label}${ok || !detail ? "" : `\n        ${String(detail).slice(0, 400)}`}`); };
+  const part = (id, state, entry) => ({ id, repo: "spn-x", pass: "CODE", entries: [entry], tests: [], minutes: null, measuredFrom: null,
+    waitsOn: [], model: "opus", signature: "abc12345", state });
+  const plan = (parts) => `${JSON.stringify({ schemaVersion: 1, lead: "N001", scope: ["N001"], writtenAt: "2026-10-31T00:00:00Z", parts }, null, 2)}\n`;
+  const files = {
+    "spn-app-ts/sprepo.json": repo("APPS", { stack: "TS" }),
+    "spn-app-ts/CONCEPT.md": "# concept\n",
+    "spn-app-ts/.claude/settings.json": JSON.stringify({ enabledPlugins: { "spn-devex@saasplane": true } }),
+  };
+  for (let at = 0; at < 3; at += 1) {
+    const ws = `.spndevex/${WORKSTREAMS}/open/${String(50 + at).padStart(3, "0")}-probe-${at}`;
+    files[`${ws}/arcs/N001/state.json`] = "{}\n";
+    files[`${ws}/arcs/N001/go.json`] = plan([part("code-spn-x-1", "ready", "N001/E1")]);
+  }
+  const root = fixture("welcome-day", files);
+  const start = (session) => {
+    const out = execFileSync("node", [`${HOOKS}/src/scripts/events/orientation.ts`, "--stdin"], {
+      input: JSON.stringify({ cwd: root, session_id: session }), encoding: "utf8", cwd: root, env: { ...process.env, SPN_TELEMETRY: "off" }, maxBuffer: 16 * 1024 * 1024 });
+    const parsed = JSON.parse(out);
+    return { message: parsed.systemMessage, context: parsed.hookSpecificOutput.additionalContext };
+  };
+  const first = start("w1"), second = start("w2");
+  says("[MKT.HOOKS.326] the day's first start carries the whole welcome", first.message.includes("I'm your DevEx agent") && first.context.startsWith(`${WELCOME_LEAD}\n\n`), first.message);
+  says("[MKT.HOOKS.326] the next start the same day is the status line alone",
+    !second.message.includes("DevEx agent") && !second.message.includes("Welcome") && second.message.trim().split("\n").length === 1 && /\b1 repo\b/.test(second.message), second.message);
+  says("[MKT.HOOKS.326] and its context opens on the status line, not the welcome's order",
+    second.context.includes(second.message) && !second.context.startsWith(WELCOME_LEAD), second.context.slice(0, 300));
+  const goes = second.context.split("\n").filter((line) => line.startsWith("Go "));
+  says("[MKT.HOOKS.326] it carries one Go line, the rest counted", goes.length === 1 && second.context.includes("And 2 more running"), goes.join(" | "));
+  says("[MKT.HOOKS.326] the whole start still names three", first.context.split("\n").filter((line) => line.startsWith("Go ")).length === 3);
+  says("[MKT.HOOKS.326] the short start is shorter than the whole one", second.context.length < first.context.length, `${second.context.length} vs ${first.context.length}`);
+  writeFileSync(join(root, ".spndevex", ".debug", "workspace", "welcome.json"), `${JSON.stringify({ day: "2020-01-01" })}\n`);
+  says("[MKT.HOOKS.326] a day later the whole welcome is shown again", start("w3").message.includes("I'm your DevEx agent"));
+  const mark = join(root, ".spndevex", ".debug", "workspace", "welcome.json");
+  rmSync(mark, { force: true });
+  const hand = run("node", [`${HOOKS}/src/scripts/events/orientation.ts`, root], root);
+  says("[MKT.HOOKS.326] a hand run shows the whole welcome and records nothing", hand.includes("DevEx agent") && !existsSync(mark), hand.slice(0, 200));
 }
 
 console.log(failed ? `\n  ${failed} FAILED` : `\n  all ${n} passed`);

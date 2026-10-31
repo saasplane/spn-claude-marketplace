@@ -38,7 +38,7 @@ import { basename, resolve } from "node:path";
 import { isDir, readPayload, runAlone, workspaceRoot, type Payload } from "../lib/payload.ts";
 import { ARCS, SESSIONS, WORKSTREAM_STATES, WORKSTREAMS } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { HELD_STATE, closing, moves, stateOf, subjectFolders, subjectPages, workstreamPlan } from "../checks/split-plan.ts";
-import { begin, end, span, tagsOf } from "../../../../plugin-support-lib/src/lib/timing.ts";
+import { begin, callOf, end, span, tagsOf } from "../../../../plugin-support-lib/src/lib/timing.ts";
 import { finishCommand } from "../lib/bash-timing.ts";
 
 const STRUCTURE = new Set<string>([WORKSTREAMS, SESSIONS, ARCS, ...WORKSTREAM_STATES, ""]);
@@ -107,7 +107,8 @@ if (runAlone("closed.ts")) {
   // breakdown would cost more attention than it buys. `PreToolUse` is the hot path, and it times
   // per check.
   begin({ script: "spn-devex", event: failed ? "PostToolUseFailure" : "PostToolUse", tool: payload.tool_name ?? null,
-          session: payload.session_id ?? null, ...tagsOf(payload), process: { group: "events", action: "closed" } },
+          session: payload.session_id ?? null, ...tagsOf(payload), ...callOf(payload),
+          process: { group: "events", action: "closed" } },
         payload.cwd ?? process.cwd());
   let message: string | null = null;
   if (!failed) {

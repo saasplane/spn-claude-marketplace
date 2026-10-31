@@ -3,22 +3,28 @@
 //
 //   spn-devex workstream question raise <workstream>/N<nnn> --file card.json
 //   spn-devex workstream question show <qN> --in <notes/N<nnn>/preview.html>
-//   spn-devex workstream question answer <qN> --key A --words "…"
+//   spn-devex workstream question answer <qN> --key A --words "…" [--entries E7,E9]
 //   spn-devex workstream question withdraw <qN> --words "…"
 //
 // The only writers of `questions.jsonl`. Each write renders every page's `open` block from the
 // records, so a card is the same wherever it stands and leaves every page in the same write.
+// An answer given `--entries` is settled in the one call: the answer folded into the arc's What, the card cited in
+// those entries of the sheet, and each go plan that holds the arc written again. It refuses only entries the sheet
+// does not hold, and names all of them at once.
 
-import { readFileSync } from "node:fs";
+import { readFileSync, writeFileSync } from "node:fs";
 import { basename, resolve } from "node:path";
-import { type Action, VALUE, UsageFault, readWords } from "../../../../../plugin-support-lib/src/lib/command.ts";
+import { type Action, VALUE, UsageFault, readAddress, readWords } from "../../../../../plugin-support-lib/src/lib/command.ts";
 import {
-  approachOf, fromWorkstream, logEvent, now, questionsFileOf, readArc, readQuestions, resolveRef, writeJsonl, writeOpenBlocks,
+  approachOf, arcIdsOf, fromWorkstream, inline, logEvent, now, questionsFileOf, readArc, readQuestions, readSheet, resolveRef, sheetFileOf, whatEntryOf,
+  writeJsonl, writeOpenBlocks, writeWhole,
 } from "../../lib/workstream.ts";
+import { readGo } from "../../lib/go-plan.ts";
 import { isFile } from "../../lib/payload.ts";
 import { runningWorkFault } from "../../checks/questions.ts";
 import { QUESTION_ID, cardFaults, type Card, type Question } from "../../lib/workstream-schema.ts";
-import { afterWrite, arcNamed, arcSignatures, refreshIfMoved, typed } from "./_shared.ts";
+import { afterWrite, arcNamed, arcSignatures, listOf, refreshIfMoved, typed } from "./_shared.ts";
+import { actions as goActions } from "./go.ts";
 
 export const describe = "a question card, from raised to answered or withdrawn: the record and every page's Open";
 
@@ -32,7 +38,8 @@ export function nextQuestionId(records: readonly Question[], page: string): stri
 /** The record a reference names, and its workstream. */
 function recordNamed(ref: string | undefined): { ws: string; records: Question[]; record: Question } {
   if (!ref) throw new UsageFault("needs a question, as `q<n>` or `<workstream>/q<n>`.");
-  const { ws, id } = typed(() => resolveRef(ref, (folder, question) => readQuestions(folder).some((one) => one.id === question)));
+  const address = readAddress(ref);
+  const { ws, id } = typed(() => resolveRef(address.workstream ? `${address.workstream}/${address.id}` : address.id, (folder, question) => readQuestions(folder).some((one) => one.id === question)));
   if (!QUESTION_ID.test(id)) throw new UsageFault(`reads \`${id}\` as no question — a question is \`q<n>\`.`);
   const records = readQuestions(ws);
   const record = records.find((one) => one.id === id);
@@ -98,8 +105,48 @@ function show(args: string[]): number {
   return 0;
 }
 
+/** The answer written into the arc's What entry, as a paragraph before the entry ends; false where What holds no entry for the arc. */
+function foldIntoWhat(ws: string, record: Question, key: string | null, said: string): boolean {
+  const page = approachOf(ws);
+  if (!page) return false;
+  const text = readFileSync(page, "utf8");
+  const entry = whatEntryOf(text, record.arc);
+  if (!entry) return false;
+  let cut = entry.to;
+  while (cut > entry.from && /\s/.test(text[cut - 1])) cut -= 1;
+  writeWhole(page, `${text.slice(0, cut)}\n  <p>${record.id.replace(/^q/, "Q")}${key ? ` ${key}` : ""}: ${inline(said)}</p>${text.slice(cut)}`);
+  return true;
+}
+
+/** The sheet's entries the card is cited in. */
+function citeInEntries(ws: string, arc: string, id: string, key: string | null, entries: string[]): void {
+  const sheet = readSheet(ws, arc);
+  if (!sheet) return;
+  for (const entry of sheet.entries) {
+    if (!entries.includes(entry.id) || entry.decidedBy.some((text) => new RegExp(`\\b${id}\\b`).test(text))) continue;
+    entry.decidedBy.push(`${id}${key ? ` ${key}` : ""}`);
+  }
+  writeWhole(sheetFileOf(ws, arc), `${JSON.stringify(sheet, null, 2)}\n`);
+}
+
+/** Every go plan whose scope holds the arc, written again from the sheets as the answer left them. */
+function writeGoAgain(ws: string, arc: string): string[] {
+  const said: string[] = [];
+  for (const lead of arcIdsOf(ws)) {
+    let plan;
+    try { plan = readGo(ws, lead); } catch { continue; }
+    if (!plan || !plan.scope.includes(arc)) continue;
+    const before = console.log;
+    const held: string[] = [];
+    console.log = (...parts: unknown[]) => { held.push(parts.join(" ")); };
+    try { goActions.write.run([`${basename(ws)}/${lead}`, "--scope", plan.scope.join(",")]); } finally { console.log = before; }
+    said.push(...held.map((line) => `go ${lead}: ${line}`));
+  }
+  return said;
+}
+
 function settle(args: string[], state: "answered" | "withdrawn"): number {
-  const words = readWords(args, state === "answered" ? { key: VALUE, words: VALUE } : { words: VALUE });
+  const words = readWords(args, state === "answered" ? { key: VALUE, words: VALUE, entries: VALUE } : { words: VALUE });
   const [ref, ...more] = words.paths;
   if (more.length) throw new UsageFault("takes one question.");
   const { ws, records, record } = recordNamed(ref);
@@ -109,6 +156,12 @@ function settle(args: string[], state: "answered" | "withdrawn"): number {
   const key = state === "answered" ? words.value("key") : null;
   if (state === "answered" && (!key || !record.card.options.some((option) => option.key === key)))
     throw new UsageFault(`needs \`--key\`, one of ${record.card.options.map((option) => option.key).join(" · ")}.`);
+  const cited = state === "answered" ? listOf(words, "entries") : null;
+  if (cited) {
+    const held = new Set((readSheet(ws, record.arc)?.entries ?? []).map((entry) => entry.id));
+    const absent = cited.filter((id) => !held.has(id));
+    if (absent.length) throw new UsageFault(`finds no ${absent.join(", ")} in ${record.arc}'s sheet: ${held.size ? `it holds ${[...held].join(" · ")}` : "it holds no entry"}. Nothing was recorded.`);
+  }
   const off = pagesOf(record);
   const before = arcSignatures(ws);
   record.state = state;
@@ -116,8 +169,15 @@ function settle(args: string[], state: "answered" | "withdrawn"): number {
   const lines = finish(ws, records);
   if (readArc(ws, record.arc)) logEvent(ws, record.arc, state, null, `${record.id}${key ? ` ${key}` : ""} · ${said}`);
   const refreshed = refreshIfMoved(ws, before);
-  const owed = state === "answered" ? `owed: ${record.arc}'s What, its Log line` : "owed: its Log line";
-  console.log(`${[`${record.id} · ${state}${key ? ` ${key}` : ""} · off ${off} page${off === 1 ? "" : "s"}`, ...refreshed.said, owed].join(" · ")}`);
+  const settled: string[] = [];
+  if (cited) {
+    const folded = foldIntoWhat(ws, record, key, said);
+    citeInEntries(ws, record.arc, record.id, key, cited);
+    settled.push(folded ? `folded into ${record.arc}'s What` : `! ${record.arc} has no What entry to fold into`, `cited in ${cited.join(", ")}`);
+    settled.push(...writeGoAgain(ws, record.arc));
+  }
+  const owed = state === "answered" ? (cited ? "" : `owed: ${record.arc}'s What, its Log line`) : "owed: its Log line";
+  console.log(`${[`${record.id} · ${state}${key ? ` ${key}` : ""} · off ${off} page${off === 1 ? "" : "s"}`, ...refreshed.said, ...settled, ...(owed ? [owed] : [])].join(" · ")}`);
   for (const line of [...refreshed.lines, ...lines]) console.log(line);
   return 0;
 }
@@ -125,6 +185,6 @@ function settle(args: string[], state: "answered" | "withdrawn"): number {
 export const actions: Record<string, Action> = {
   raise: { describe: "raise a card: the next number, the record, the card in the approach page's Open", usage: "<workstream>/N<nnn> --file card.json", run: raise },
   show: { describe: "show an open card on an arc's preview, in its Open", usage: "<qN> --in <notes/N<nnn>/preview.html>", run: show },
-  answer: { describe: "answer a card in your words; it leaves every Open", usage: "<qN> --key <option> --words \"…\"", run: (args) => settle(args, "answered") },
+  answer: { describe: "answer a card in your words; it leaves every Open; with --entries, folded into the What, cited, and the go written again", usage: "<qN> --key <option> --words \"…\" [--entries E7,E9]", run: (args) => settle(args, "answered") },
   withdraw: { describe: "withdraw a card in your words; it leaves every Open", usage: "<qN> --words \"…\"", run: (args) => settle(args, "withdrawn") },
 };

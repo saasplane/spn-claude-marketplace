@@ -170,18 +170,16 @@ export function shapeHint(floor: Floor, command: string): string | null {
   if (!parts.length) return null;
   if (parts.length === 1 && !parts[0].background && tierOf(floor, parts[0].text) !== null) return null;
   const read = parts.map((part) => ({ part, ...readPart(floor, part) }));
+  // A write in a composite is run on its own: the harness would ask about the whole call, and a lone write is asked about by itself.
+  const writes = parts.length > 1 ? read.filter((one) => one.tier === "ask" || one.tier === "deny") : [];
+  if (writes.length)
+    return `This call joins ${writes.map((one) => `\`${one.part.text}\``).join(", ")} to other commands. Run a write as a call of its own.`;
   // A part an ask or deny rule names, or one no rule allows and no shape explains, is a prompt about what the call does.
   if (read.some((one) => one.tier === "ask" || one.tier === "deny")) return null;
   if (read.some((one) => one.tier === null && one.shape === null)) return null;
-  const shaped = read.filter((one) => one.shape !== null);
-  if (!shaped.length) {
-    if (parts.length < 2) return null;
-    const instead: string[] = [];
-    if (parts.some((part) => /^cd(?:\s|$)/.test(part.text))) instead.push("`cd <dir>` as a call of its own, then the command, or the tool's own path option in place of the `cd`");
-    if (/(?:^|[^|])\|(?:[^|]|$)/.test(command)) instead.push("the Read or Grep tool, or the program's own option, in place of the pipe");
-    return `Each part of this call is allowed on its own (${parts.map((part) => `\`${part.text}\``).join(", ")}), and joined they are sent for ` +
-      `approval by their shape. Run one command per call${instead.length ? `: ${instead.join(", and ")}` : ""}.`;
-  }
+  // A `cd` before the commands, a pipe and a join of allowed reads pass: the shape is no reason to refuse them.
+  const shaped = read.filter((one, at) => one.shape !== null && !(at === 0 && /^cd(?:\s|$)/.test(one.part.text)));
+  if (!shaped.length) return null;
   // One line for each plain form, so a loop's opening and closing words share the line that names them.
   const byPlain = new Map<string, string[]>();
   for (const one of shaped) byPlain.set(one.plain!, [...(byPlain.get(one.plain!) ?? []), one.shape!]);

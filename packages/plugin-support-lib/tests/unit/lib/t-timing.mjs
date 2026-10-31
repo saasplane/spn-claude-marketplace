@@ -12,6 +12,7 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync,
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { argsText, commandFacts, LINE_KEYS, repoOf, tagsOf } from "../../../src/lib/timing.ts";
+import * as timing from "../../../src/lib/timing.ts";
 import { WORKSTREAMS } from "../../../src/lib/docs-tree.ts";
 
 const LIB = resolve(import.meta.dirname, "..", "..", "..", "src", "lib");
@@ -43,7 +44,7 @@ const ON = { ".spndevex/README.md": "# .spndevex\n", ".spndevex/.debug/switches.
 const env = () => { const copy = { ...process.env }; delete copy.SPN_TELEMETRY; return copy; };
 /** Run a module snippet against the library in a child, the way a hook process does. */
 const child = (body) => execFileSync("node", ["--input-type=module", "-e",
-  `import { begin, end, record, span, tagsOf } from ${JSON.stringify(join(LIB, "timing.ts"))};\n${body}`],
+  `import { begin, callOf, end, record, span, tagsOf } from ${JSON.stringify(join(LIB, "timing.ts"))};\n${body}`],
   { env: env(), encoding: "utf8" });
 const logOf = (root) => readFileSync(join(root, ".spndevex", ".debug", "telemetry", "hooks.jsonl"), "utf8")
   .trim().split("\n").map((l) => JSON.parse(l));
@@ -286,6 +287,44 @@ console.log("\n=== row and order — normalised, and read from where the work is
   same("a main window's line carries order null, and the row of the order it writes", rows[0], [null, null, "50"]);
   same("a child's line carries the order and its row", rows[1], ["lane", "38-plugin-debug-layout", "50"]);
   same("the row a main window moves to running replaces the carried one", rows[2], [null, null, "51"]);
+}
+
+console.log("\n=== callOf — the program of a Bash command and the kind of file a call touches, never the path (MKT.HOOKS.321)");
+{
+  const root = workspace("e72-kinds", { ...ON, "spn-claude-marketplace/README.md": "x\n" });
+  const repo = join(root, "spn-claude-marketplace");
+  const at = (tool_name, tool_input) => timing.callOf({ tool_name, tool_input, cwd: repo });
+  same("a Bash call records its first program", at("Bash", { command: "node tests/unit/t-a.mjs" }).program, "node");
+  same("after a cd and env assignments", at("Bash", { command: "cd /x/y && FOO=1 BAR=2 grep -rn a src" }).program, "grep");
+  same("a program is its name, never its folder", at("Bash", { command: "/usr/bin/python3 -I x.py" }).program, "python3");
+  same("a Read, Edit or Write records no program", [at("Read", { file_path: join(repo, "src/a.ts") }).program, at("Edit", { file_path: join(repo, "src/a.ts") }).program], [null, null]);
+  same("a file under .spndevex is WORKSTREAM", at("Edit", { file_path: join(root, ".spndevex/workstreams/open/036-x/approach.html") }).pathKind, "WORKSTREAM");
+  same("a file in a tests folder is TEST", at("Read", { file_path: join(repo, "packages/p/tests/unit/a.mjs") }).pathKind, "TEST");
+  same("a test file name is TEST", at("Write", { file_path: join(repo, "packages/p/src/t-thing.mjs") }).pathKind, "TEST");
+  same("any other file in a repository is SOURCE", at("Edit", { file_path: join(repo, "packages/p/src/a.ts") }).pathKind, "SOURCE");
+  same("a file outside any repository is OTHER", at("Write", { file_path: "/private/tmp/x/a.ts" }).pathKind, "OTHER");
+  same("a worktree's file is SOURCE", at("Edit", { file_path: "/opt/work/saasplane/code/.worktrees/036-x/spn-y/src/a.ts" }).pathKind, "SOURCE");
+  same("a Bash call takes its kind from the paths it names", [
+    at("Bash", { command: "cat .spndevex/state.json" }).pathKind,
+    at("Bash", { command: "node packages/p/tests/unit/t-a.mjs" }).pathKind,
+    at("Bash", { command: "sed -i s/a/b/ packages/p/src/a.ts" }).pathKind,
+    at("Bash", { command: "cp /private/tmp/a /private/tmp/b" }).pathKind,
+  ], ["WORKSTREAM", "TEST", "SOURCE", "OTHER"]);
+  same("a workstream path outranks a source path in one command", at("Bash", { command: "cp packages/p/src/a.ts .spndevex/x" }).pathKind, "WORKSTREAM");
+  same("a Bash call naming no path has no kind, and a tool without one has none", [at("Bash", { command: "git status" }).pathKind, at("Agent", {}).pathKind], [null, null]);
+  same("no payload never throws", timing.callOf(undefined), { program: null, pathKind: null });
+
+  const path = join(repo, "packages/p/src/a.ts");
+  child(`
+    const payload = { session_id: "k1", cwd: ${JSON.stringify(repo)}, tool_name: "Edit", tool_input: { file_path: ${JSON.stringify(path)} } };
+    begin({ script: "spn-devex", event: "PreToolUse", tool: "Edit", session: "k1", ...tagsOf(payload), ...callOf(payload),
+            process: { group: "events", action: "pretooluse" } }, ${JSON.stringify(root)});
+    record({ group: "a-check", action: "a-check" }, 1);
+    end();`);
+  const lines = logOf(root);
+  same("the whole run's line carries the kind", [lines[1].program ?? null, lines[1].pathKind], [null, "SOURCE"]);
+  same("a check's line carries neither", [lines[0].program, lines[0].pathKind], [undefined, undefined]);
+  same("no line holds the path", JSON.stringify(lines).includes("a.ts"), false);
 }
 
 console.log(failed ? `\n  ${failed} of ${total} FAILED — timing` : `\n  all ${total} passed — timing`);

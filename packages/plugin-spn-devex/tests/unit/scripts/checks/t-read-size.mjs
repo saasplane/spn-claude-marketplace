@@ -1,5 +1,5 @@
 import { CHECKS, EVENTS, run } from "../../../helpers/harness.mjs";
-// `checks/read-size.ts` — a `Read` with no range of a file over 20 KB is refused, naming the ranged form.
+// `checks/read-size.ts` — a `Read` with no range of a file over 20 KB passes with a note naming its size and the ranged form.
 // A ranged read, a small file and a picture or a PDF are left alone.
 import { join } from "node:path";
 import { writeFileSync } from "node:fs";
@@ -19,15 +19,15 @@ const root = workspace("read-size", { "big.md": "x".repeat(21 * 1024), "small.md
 writeFileSync(join(root, "big.png"), Buffer.alloc(40 * 1024));
 const read = (file_path, more = {}) => ({ tool_name: "Read", tool_input: { file_path, ...more }, cwd: root, session_id: "w1" });
 
-console.log("=== refused");
+console.log("=== passed with a note");
 {
   const verdict = checkReadSize(read(join(root, "big.md")));
-  ok("a whole read of a file over 20 KB is refused", Boolean(verdict?.deny), JSON.stringify(verdict));
-  ok("the refusal names the ranged form, offset and limit", /offset/.test(verdict?.deny ?? "") && /limit/.test(verdict?.deny ?? ""), verdict?.deny);
-  ok("and says to search first", /Grep/.test(verdict?.deny ?? ""), verdict?.deny);
-  ok("a path relative to the call's folder is read the same way", Boolean(checkReadSize(read("big.md"))?.deny));
+  ok("[MKT.HOOKS.325] a whole read of a file over 20 KB passes", !verdict?.deny && Boolean(verdict?.note), JSON.stringify(verdict));
+  ok("[MKT.HOOKS.325] the note names the size and the ranged form, offset and limit", /21 KB/.test(verdict?.note ?? "") && /offset/.test(verdict?.note ?? "") && /limit/.test(verdict?.note ?? ""), verdict?.note);
+  ok("[MKT.HOOKS.325] the note is one line", !(verdict?.note ?? "").includes("\n"), verdict?.note);
+  ok("[MKT.HOOKS.325] a path relative to the call's folder is read the same way", Boolean(checkReadSize(read("big.md"))?.note));
   const out = run("node", [join(EVENTS, "pretooluse.ts")], read(join(root, "big.md")), root);
-  ok("the pre-tool hook carries the refusal", /"permissionDecision":"deny"/.test(out), out);
+  ok("[MKT.HOOKS.325] the pre-tool hook lets the read through with the note", !/permissionDecision/.test(out) && /21 KB/.test(out), out);
 }
 
 console.log("\n=== silent");

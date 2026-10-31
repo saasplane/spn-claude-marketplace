@@ -2,7 +2,7 @@
 go: "N{{lead}}"                         # the go whose plan this order carries out
 part: "{{part}}"                        # the part; the file is orders/{{part}}.md, written by `workstream go write`
 entries: [{{N<nnn>/E<n>, …}}]           # the entries the part carries, across the go's scope
-model: {{sonnet}}                       # Sonnet for a written order; Opus only where the order designs, and says why
+model: {{sonnet}}                       # Sonnet for a written order; Opus only where the order designs, and says why; a launch that names no model takes this line
 blockedBy: ["{{part or q<n>}}"]          # what must land first; [] when nothing
 touches: ["{{repository:place}}"]       # what the part writes, so two orders never write one file
 decisions: [{{q<n>}}]                   # the cards the part rests on, by id
@@ -33,9 +33,9 @@ facts: [{{f<n>}}]                       # the facts it rests on, by id, from the
 | **Repo** | `{{repo}}` · **Run from:** `{{absolute path}}` |
 | **Arc** | `{{NNN-subject}}` [`N{{nnn}}`](../../../approach.html#N{{nnn}}), part {{part}} |
 
-**Launch no agent.** Stop at 150k of context or 100 turns, at the next whole step, save the report with what is left and
+**Launch no agent.** Stop at {{the stop, sized from the entries of this part: tokens of context and turns}}, at the next whole step, save the report with what is left and
 hand back. **Read only** the files below; read further only where one of them sends you, and read a file over 20 KB in
-parts. **Hand back** at most 8 lines; save the report, at most 15 lines, as `orders/{{part}}.report.md` beside this order, its front matter first.
+parts. **Search with `grep` in Bash**, since you have no Grep tool. **Hand back** at most 8 lines; save the report, at most 15 lines, as `orders/{{part}}.report.md` beside this order, its front matter first.
 
 <!-- IN AN ARC THAT KEEPS A CHANGE SHEET (arcs/N<nnn>/sheet.json), THE ORDER NAMES ITS PART AND NOTHING ELSE ABOUT THE WORK:
      the files, the rules, the callers, the tiers and the book lines come from the part's entries, read first with

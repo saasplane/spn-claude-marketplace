@@ -6,9 +6,10 @@ import { CHECKS, EVENTS } from "../../../helpers/harness.mjs";
 import { chmodSync, mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { BASE } from "../../../helpers/fixture.mjs";
-import { dataWorkspace } from "../../../helpers/workstream-fixture.mjs";
+import { dataWorkspace, put } from "../../../helpers/workstream-fixture.mjs";
 
 const { applies, checkMergeTold, owing } = await import(join(CHECKS, "merge-told.ts"));
+const { bindNamed, windowSet } = await import(join(CHECKS, "..", "lib", "window.ts"));
 const { rebasedNote } = await import(join(EVENTS, "rebased.ts"));
 
 let total = 0, failed = 0;
@@ -47,6 +48,7 @@ console.log("=== which commands it reads");
 console.log("\n=== a merge into develop with a running arc in a set that holds the repository");
 {
   const { root, repo, git } = await dataWorkspace("merge-told-bad", { rows: running });
+  bindNamed(root, "w1", "031-probe", "prompt");
   git(["checkout", "-q", "-b", "develop"]);
   git(["checkout", "-q", "-b", "feature"]);
   commit(git, "feature work");
@@ -67,8 +69,25 @@ console.log("\n=== a merge into develop with a running arc in a set that holds t
   ok("a pull request merged into another branch says nothing", checkMergeTold(bash("gh pr merge 12 --squash", repo)) === null);
   delete process.env.GH_BASE;
   ok("a failed call is not read", checkMergeTold({ ...bash("git merge feature", repo), hook_event_name: "PostToolUseFailure" }) === null);
-  ok("owing lists the running arcs by workstream number", JSON.stringify(owing(root, "spn-x")) === JSON.stringify([{ workstream: "031-probe", arcs: ["031/N001"] }]));
-  ok("a repository no set holds is owed nothing", owing(root, "spn-other").length === 0);
+  ok("owing lists the running arcs by workstream number", JSON.stringify(owing(root, "spn-x", windowSet(root, "w1"))) === JSON.stringify([{ workstream: "031-probe", arcs: ["031/N001"] }]));
+  ok("a repository no set holds is owed nothing", owing(root, "spn-other", windowSet(root, "w1")).length === 0);
+}
+
+console.log("\n=== only the window's own running arcs");
+{
+  const { root, repo, git } = await dataWorkspace("merge-told-own", { rows: running });
+  const state = (await import("node:fs")).readFileSync(join(root, ".spndevex/workstreams/open/031-probe/arcs/N001/state.json"), "utf8");
+  put(root, ".spndevex/workstreams/open/032-other/arcs/N002/state.json", state);
+  bindNamed(root, "w1", "031-probe", "prompt");
+  git(["checkout", "-q", "-b", "develop"]);
+  git(["checkout", "-q", "-b", "feature"]);
+  commit(git, "feature work");
+  git(["checkout", "-q", "develop"]);
+  merge(git, "merge feature", "feature");
+  const verdict = checkMergeTold(bash("git merge --no-ff feature", repo));
+  ok("[MKT.HOOKS.322] the note names the window's own running arc", verdict?.note?.includes("031/N001"), verdict?.note);
+  ok("[MKT.HOOKS.322] another workstream's running arc is not named", !(verdict?.note ?? "").includes("032"), verdict?.note);
+  ok("[MKT.HOOKS.322] a window that owns no workstream is told nothing", checkMergeTold({ ...bash("git merge --no-ff feature", repo), session_id: "w2" }) === null);
 }
 
 console.log("\n=== silent");
