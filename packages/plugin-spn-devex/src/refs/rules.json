@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "book": {
     "repository": "spn-foundation",
-    "commit": "a48782b8"
+    "commit": "f758913c"
   },
   "rules": [
     {
@@ -2054,6 +2054,73 @@
           "heading": "The rules this step holds"
         }
       ]
+    },
+    {
+      "id": "RULE.DEVEX.AGENT.159",
+      "level": "MUST",
+      "params": {
+        "short": true
+      },
+      "class": "stated",
+      "sentence": "You decide what is built, and the agent decides how the work runs within its grants, and tells you the outcome in one line, never as a question",
+      "chapter": "04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
+      "heading": "Who decides what",
+      "decision": "DEC.DEVEX.AGENT.159",
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/agent/agent.md",
+          "heading": "Who decides what"
+        }
+      ],
+      "line": {
+        "text": "The developer decides what is built, and the agent decides how the work runs within its grants, and tells the developer the outcome in one line, never as a question.",
+        "ref": "refs/devex/agent/agent.md",
+        "heading": "Who decides what"
+      }
+    },
+    {
+      "id": "RULE.DEVEX.AGENT.160",
+      "level": "MUST",
+      "params": {
+        "check": "stop"
+      },
+      "class": "checked",
+      "sentence": "In a partner's workspace, a reply speaks in the partner's product, and names no rule we ship, no chapter of the book and no part of the plugins",
+      "chapter": "04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
+      "heading": "A reply speaks as a teammate: the moment chooses its register, its icon and its shape",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/agent/agent.md",
+          "heading": "A reply speaks as a teammate: the moment chooses its register, its icon and its shape"
+        }
+      ]
+    },
+    {
+      "id": "RULE.DEVEX.AGENT.161",
+      "level": "MUST",
+      "params": {
+        "short": true
+      },
+      "class": "stated",
+      "sentence": "Where what SaaS Plane ships and what a partner needs pull apart, the agent shows a product choice with its trade-off, and never says the ask conflicts with a rule",
+      "chapter": "04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
+      "heading": "A reply speaks as a teammate: the moment chooses its register, its icon and its shape",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/agent/agent.md",
+          "heading": "A reply speaks as a teammate: the moment chooses its register, its icon and its shape"
+        }
+      ],
+      "line": {
+        "text": "Where what SaaS Plane ships and what a partner needs pull apart, the agent shows a product choice with its trade-off, and never says the ask conflicts with a rule.",
+        "ref": "refs/devex/agent/agent.md",
+        "heading": "A reply speaks as a teammate: the moment chooses its register, its icon and its shape"
+      }
     },
     {
       "id": "RULE.DEVEX.FUNCTION.007",
@@ -5941,6 +6008,11 @@
       "restated": [
         {
           "plugin": "spn-devex",
+          "path": "refs/devex/agent/agent.md",
+          "heading": "Who decides what"
+        },
+        {
+          "plugin": "spn-devex",
           "path": "refs/devex/workspace/docs/decision-cards.md",
           "heading": "While a card is open"
         },
@@ -8602,11 +8674,10 @@
       "id": "RULE.DEVEX.WORKSPACE.312",
       "level": "MUST",
       "params": {
-        "check": "workstream-state",
-        "due": "036/N008"
+        "check": "stop"
       },
       "class": "checked",
-      "sentence": "The agent never cites a step or an order to you by its number",
+      "sentence": "The agent never cites a step, an order, a part of a go or an entry of a sheet to you by its number, and never names a file of the arc's notes",
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "You are told about arcs, never about steps",
       "decision": null,
@@ -9829,15 +9900,20 @@
       "id": "RULE.DEVEX.WORKSPACE.393",
       "level": "MUST",
       "params": {
-        "check": "workstream-state",
-        "due": "036/N008"
+        "check": "stop"
       },
       "class": "checked",
-      "sentence": "The handover is written into the arc AND given in the reply, as markdown, once",
+      "sentence": "The handover is written into the arc AND given in the reply, as markdown, once, as the turn's last message",
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "Stopping in the middle is a handover",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/workstream.md",
+          "heading": "A check at the end of a turn speaks once, and only about this window's work"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.394",
@@ -10957,6 +11033,44 @@
       "heading": "How the register works",
       "decision": null,
       "restated": []
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.467",
+      "level": "MUST",
+      "params": {
+        "check": "stop"
+      },
+      "class": "checked",
+      "sentence": "No Needs you line, and no ask a reply ends on, puts to you how the work runs",
+      "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
+      "heading": "A card is only for what the rules leave open",
+      "decision": "DEC.DEVEX.WORKSPACE.467",
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/workstream.md",
+          "heading": "A card is only for what the rules leave open"
+        }
+      ]
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.468",
+      "level": "MUST",
+      "params": {
+        "check": "questions"
+      },
+      "class": "checked",
+      "sentence": "No card and no suggestion is raised about how the work runs",
+      "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
+      "heading": "A card is only for what the rules leave open",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/workstream.md",
+          "heading": "A card is only for what the rules leave open"
+        }
+      ]
     },
     {
       "id": "RULE.LAUNCHPAD.CONTROL_PLANE.001",

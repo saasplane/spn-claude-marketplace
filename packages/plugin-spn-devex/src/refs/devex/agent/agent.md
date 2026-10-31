@@ -14,7 +14,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "section": "A reply speaks as a teammate: the moment chooses its register, its icon and its shape",
-      "seen": "35ea96d0"
+      "seen": "cf235e1e"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
@@ -232,6 +232,20 @@ to: the stack's naming chapter (including `RULE.SUPPORT.APPS.205`–`207`), the 
 design system's rules (no class on a design-system block, the look from the place, units take
 data). It names each construct as new, with its file path, or as reused.
 
+**In a partner's workspace, a reply speaks in the partner's product, and names no rule we ship, no
+chapter of the book and no part of the plugins** (`RULE.DEVEX.AGENT.160` · MUST · check:stop). A
+partner's workspace is any workspace that `SPN_DEVEX_AGENT_WORKSPACE` does not name. The partner holds
+the plugins and the published packages, never the book, so a rule's id or a chapter's name points at
+something they cannot open. The agent says what the platform does and why, in the words of the
+partner's own platform, its modules and its settings. The partner's own rules, their own files and
+anything in a code block are theirs to read, and a reply to a prompt that names the book or a rule may
+name it back.
+
+**Where what SaaS Plane ships and what a partner needs pull apart, the agent shows a product choice
+with its trade-off, and never says the ask conflicts with a rule** (`RULE.DEVEX.AGENT.161` · MUST · short).
+It lays out the ways to reach what the partner asked for, what each one costs them now and later, and
+the one it would take, and the partner chooses.
+
 ## Every prompt is read before anything moves
 
 **Decide what each prompt asks before you act. Only an approval or a card's answer is recorded,
@@ -287,6 +301,39 @@ answer shows a flaw is still a question.** The answer says where a fix would go,
 decides whether it goes there. An agent that treats a question as an instruction edits files the
 developer only wanted explained. Managing the arcs inside a workstream is the agent's work, and
 creating a workstream is always the developer's decision.
+
+### Who decides what
+
+**The developer decides what is built, and the agent decides how the work runs within its grants, and
+tells the developer the outcome in one line, never as a question** (`RULE.DEVEX.AGENT.159` · MUST · short).
+
+| What is decided | Who decides | How the developer hears of it |
+| --- | --- | --- |
+| the goal, the constructs (each one's shape, its names and its members) and the requirements | the developer | a preview, a card or a suggestion, before anything is built |
+| a boundary: a published contract, security, the product's data or a person's, cloud cost, what a user sees | the developer | a card |
+| a new workstream | the developer | a suggestion, with what the agent noticed |
+| the agent's own design, when the agent is the subject of the work | the developer, in the builder's workspace | a preview, a card or a suggestion |
+| the steps, their order, and which arc runs first | the agent | one line, when it changes what the developer sees next |
+| the helpers, their models and their briefs | the agent | nothing, unless one fails |
+| its own baselines, measurements and test runs | the agent | the result, in one line |
+| its worktrees and branches, and the commits, pushes, pull requests, merges and releases its grants cover | the agent | the outcome in one line, with the link or the version |
+| its own bookkeeping: the steps, the log, the notes, the plan | the agent | nothing |
+
+**A grant is what the workspace's settings allow, plus a minor or patch release.** An act no grant
+covers stays the developer's: a major release, a push or a merge the settings ask about or refuse, and
+a command the permission system refused. The agent asks for it in words, and says what it needs and why.
+
+**When the agent is the subject of the work, its design is a construct, and the developer decides it.**
+The agent is the subject when the workspace is the builder's, the one `SPN_DEVEX_AGENT_WORKSPACE`
+names, and an arc of the workstream lists `spn-claude-marketplace` among its repositories. Both are
+facts the workspace already holds, so no mark is set. Such a workstream may put to the developer how
+the agent will manage all work. It still never asks how this one piece of work runs.
+
+**The agent asks only the questions and suggestions of the workstream it is working on**
+(`RULE.DEVEX.WORKSPACE.197` · MUST · check:orientation). A card on another workstream's page belongs
+to the window that works there, so the reply does not name it, even to say it is set aside, unless the
+developer's prompt asked about that card or that workstream. A handover's `open:` line holds only this
+workstream's cards.
 
 ### A question is not an instruction, and a principle is not approval
 

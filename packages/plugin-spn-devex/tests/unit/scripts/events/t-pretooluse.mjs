@@ -529,6 +529,29 @@ console.log("\n=== pretooluse — an order asks for no screenshot unless the dev
     tool_input: { file_path: join(WORKSPACE, "notes.md"), content: "take a screenshot\n" } }, "silent", waived);
 }
 
+console.log("\n=== pretooluse — a handover block written before the turn ends is told once (RULE.DEVEX.WORKSPACE.393)");
+{
+  const BLOCK = ["```text", "continue:      041-probe N001", "model:         opus", "read first:    approach.html", "pins:          none",
+    "live now:      nothing", "done when:     the probe lands", "do not touch:  the main checkout", "open:          none", "```"].join("\n");
+  const entry = (type, content, extra = {}) => JSON.stringify({ type, message: { content }, ...extra });
+  const transcript = (name, lines) => { const file = join(WORKSPACE, `${name}.jsonl`); writeFileSync(file, `${lines.join("\n")}\n`); return file; };
+  const call = (session, file) => ({ tool_name: "Bash", session_id: session, cwd: WORKSPACE, transcript_path: file, tool_input: { command: "git status --short" } });
+  const waived = { parity: false, why: "a new check" };
+  const after = transcript("hl-after", [entry("user", "Carry on."), entry("assistant", [{ type: "text", text: `The state so far.\n\n${BLOCK}` }])]);
+  one("[MKT.HOOKS.317] known-bad: a tool call after a handover block in the turn is told the handover is the last message",
+    call("hl-1", after), "note", { says: "the turn's last message", ...waived });
+  one("[MKT.HOOKS.317] and the same turn is told once: the next call hears nothing", call("hl-1", after), "silent", waived);
+  one("[MKT.HOOKS.317] a tool call before any block hears nothing",
+    call("hl-2", transcript("hl-before", [entry("user", "Carry on."), entry("assistant", [{ type: "text", text: "Reading the page now." }])])), "silent", waived);
+  one("[MKT.HOOKS.317] a block of an earlier turn does not count: the developer's new prompt starts a new turn",
+    call("hl-3", transcript("hl-earlier", [entry("user", "Carry on."), entry("assistant", [{ type: "text", text: BLOCK }]),
+      entry("user", "Now the next thing."), entry("assistant", [{ type: "text", text: "On it." }])])), "silent", waived);
+  one("[MKT.HOOKS.317] a template with placeholders left is not a block",
+    call("hl-4", transcript("hl-template", [entry("user", "Carry on."), entry("assistant", [{ type: "text", text: BLOCK.replace("the probe lands", "{{done}}") }])])),
+    "silent", waived);
+  one("[MKT.HOOKS.317] a helper's call is not told", { ...call("hl-5", after), agent_id: "child-1" }, "silent", waived);
+}
+
 console.log("\n=== pretooluse — the chain's cost per call");
 {
   const RUNS = 15;

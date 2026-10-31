@@ -6,6 +6,7 @@
 //   spn-devex workstream suggestion edit <workstream> <sN> [--title …] [--preview …]         change its title or its preview
 
 import { type Action, VALUE, UsageFault, readWords } from "../../../../../plugin-support-lib/src/lib/command.ts";
+import { runningWorkFault } from "../../checks/questions.ts";
 import { precedentLines } from "../../lib/precedent.ts";
 import { readJsonl, suggestionsFileOf, workspaceOf, writeJsonl } from "../../lib/workstream.ts";
 import { SUGGESTION_ID, SUGGESTION_STATES, suggestionFaults, type Suggestion } from "../../lib/workstream-schema.ts";
@@ -48,6 +49,8 @@ function add(args: string[]): number {
   const [ref, title, ...more] = words.paths;
   if (!title?.trim() || more.length) throw new UsageFault("takes a workstream and one title: `suggestion add <workstream> \"<title>\" [--preview …]`.");
   const { file, records } = load(ref);
+  const running = runningWorkFault(workstreamNamed(ref), title);
+  if (running) throw new UsageFault(running);
   const next = Math.max(0, ...records.map((one) => Number(/^s(\d+)$/.exec(one.id)?.[1] ?? 0))) + 1;
   const record: Suggestion = { id: `s${next}`, title, state: "raised", preview: words.value("preview"), words: null };
   records.push(record);

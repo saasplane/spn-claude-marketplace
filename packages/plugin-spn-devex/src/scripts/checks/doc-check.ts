@@ -50,6 +50,8 @@ import { fileURLToPath } from "node:url";
 import { emit, readPayload, runAlone, unescape, workspaceRoot, type Payload, type Verdict } from "../lib/payload.ts";
 import { sentenceColumn } from "../lib/item-cells.ts";
 import { findWorkingDetail } from "../lib/working-detail.ts";
+import { isBuilderWorkspace } from "../events/orientation.ts";
+import { findPartnerWords } from "./partner-words.ts";
 import { bookClassFaults, knownHolders, ownMarketplace } from "./book-classes.ts";
 import { GUIDE_PAGE_SUFFIX, APPROACH_SUFFIX, ARTIFACT, CONSTRUCT_PAGES, CONSTRUCT_PAGE_SUFFIX, HUB, OVERVIEW_PAGE_SUFFIX, PLUGIN_TEMPLATES, POCKET,
          artifactDocsPathOf, decisionsRegister, inArtifacts, workstreamPrefixSource, isApproachPage, isRegister as inRegisters, pagePlaceOf,
@@ -636,6 +638,21 @@ export function workingDetail(path: string, text: string): Finding[] {
   return findWorkingDetail(prose).slice(0, 4).map((one) => ["SOFT",
     `names the agent's working detail, ${/^[aeiou]/.test(one.kind) ? "an" : "a"} ${one.kind}, in "${one.sentence.slice(0, 160)}" · say it in the goal's words and the ` +
     "developer's; an arc number, and a card's number beside its words, may stay"] as Finding);
+}
+
+/**
+ * What a partner cannot open, on an approach page or a preview outside the builder's workspace, by the list the turn's
+ * end reads too (`checks/partner-words.ts`): each kind found is flagged with the first words that name it. A code block,
+ * a table, a heading and a file's frame title are not read.
+ */
+export function partnerWords(path: string, text: string): Finding[] {
+  if (!isArcPreview(path) && !isApproachPage(path)) return [];
+  const root = workspaceRoot(dirname(path));
+  if (root && isBuilderWorkspace(root)) return [];
+  const prose = proseOf(text.replace(/<figcaption\b[\s\S]*?<\/figcaption>/gi, " "), true);
+  return findPartnerWords(prose).map((one) => ["SOFT",
+    `names ${one.kind}, "${one.phrase}", which a partner cannot open · say it in the partner's product: what the platform does, ` +
+    "why, and the ways to reach it, each with its trade-off (RULE.DEVEX.AGENT.160)"] as Finding);
 }
 
 /** An overview borrows its outline and carries no argument organs (05-artifacts). */
@@ -1290,7 +1307,7 @@ export function check(path: string, text: string, fragment = false): Finding[] {
   // What the template left in, on the whole page; the working detail in whatever is written.
   if (isHtml && !exemptWorkstream(path) && !inClosedWorkstream(path)) {
     if (!fragment) out.push(...templateShape(path, text));
-    out.push(...workingDetail(path, text));
+    out.push(...workingDetail(path, text), ...partnerWords(path, text));
   }
   if (isHtml && itemCellPage(path) && !inClosedWorkstream(path)) out.push(...columnRule(text));
 
