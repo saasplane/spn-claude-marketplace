@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "book": {
     "repository": "spn-foundation",
-    "commit": "13001124"
+    "commit": "1497f7b2"
   },
   "rules": [
     {
@@ -1467,14 +1467,20 @@
       "id": "RULE.DEVEX.AGENT.121",
       "level": "MUST",
       "params": {
-        "short": true
+        "skill": "spn-devex/execute"
       },
-      "class": "stated",
+      "class": "stated in a skill",
       "sentence": "A lens is worn while writing and convened at review, and the two are never substituted",
       "chapter": "04-capabilities/01-devex/02-agent/03-lenses/01-lenses.md",
       "heading": "Worn and convened are different acts, and only one is a review",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/execute/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.AGENT.122",
@@ -1833,7 +1839,18 @@
       "chapter": "04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "heading": "A reply speaks as a teammate: the moment chooses its register, its icon and its shape",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/agent/agent.md",
+          "heading": "A reply speaks as a teammate: the moment chooses its register, its icon and its shape"
+        }
+      ],
+      "line": {
+        "text": "Show a text or a proposal the developer asks to see whole, in the reply that answers them.",
+        "ref": "refs/devex/agent/agent.md",
+        "heading": "A reply speaks as a teammate: the moment chooses its register, its icon and its shape"
+      }
     },
     {
       "id": "RULE.DEVEX.AGENT.146",
@@ -1922,7 +1939,18 @@
       "chapter": "04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "heading": "Every prompt is read before anything moves",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/agent/agent.md",
+          "heading": "Every prompt is read before anything moves"
+        }
+      ],
+      "line": {
+        "text": "Where a rule gives a result its own purpose would not, say the rule is wrong and propose its change in the arc in hand, before you follow the rule any further.",
+        "ref": "refs/devex/agent/agent.md",
+        "heading": "Every prompt is read before anything moves"
+      }
     },
     {
       "id": "RULE.DEVEX.AGENT.152",
@@ -2810,14 +2838,20 @@
       "id": "RULE.DEVEX.FUNCTION.089",
       "level": "MUST",
       "params": {
-        "short": true
+        "skill": "spn-devex/scm"
       },
-      "class": "stated",
+      "class": "stated in a skill",
       "sentence": null,
       "chapter": "04-capabilities/01-devex/01-function/02-scm.md",
       "heading": "Repo tasks",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/scm/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.UTILS.004",
@@ -2899,14 +2933,20 @@
       "id": "RULE.DEVEX.UTILS.041",
       "level": "MUST",
       "params": {
-        "short": true
+        "skill": "spn-devex/develop"
       },
-      "class": "stated",
+      "class": "stated in a skill",
       "sentence": "A stack-agnostic command reads SPN manifests and nothing else",
       "chapter": "04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
       "heading": "repo — the repository and its remote",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/develop/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.UTILS.042",
@@ -3363,14 +3403,20 @@
       "id": "RULE.DEVEX.WORKSPACE.020",
       "level": "MUST",
       "params": {
-        "short": true
+        "skill": "spn-devex/bootstrap"
       },
-      "class": "stated",
+      "class": "stated in a skill",
       "sentence": null,
       "chapter": "04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md",
       "heading": "DevEx Workspace — One Window, Laws by Declaration",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/bootstrap/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.024",
@@ -5519,9 +5565,10 @@
       "id": "RULE.DEVEX.WORKSPACE.183",
       "level": "MUST",
       "params": {
-        "short": true
+        "check": "workstream-state",
+        "due": "036/N008"
       },
-      "class": "stated",
+      "class": "checked",
       "sentence": "Every step is one row, and the row carries six columns",
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "A step row says where, at what altitude, and how",
@@ -9192,9 +9239,10 @@
       "id": "RULE.DEVEX.WORKSPACE.351",
       "level": "MUST",
       "params": {
-        "short": true
+        "check": "workstream-state",
+        "due": "036/N008"
       },
-      "class": "stated",
+      "class": "checked",
       "sentence": "A workstream is worked through seven states, and the agent says which one it is in",
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "The loop has seven states, and each one is held by something that runs",
@@ -9233,9 +9281,10 @@
       "id": "RULE.DEVEX.WORKSPACE.354",
       "level": "MUST",
       "params": {
-        "short": true
+        "check": "workstream-state",
+        "due": "036/N008"
       },
-      "class": "stated",
+      "class": "checked",
       "sentence": "The agent proposes the starting state and you decide",
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "Three states, and the parent folder is the state",
@@ -9566,14 +9615,20 @@
       "id": "RULE.DEVEX.WORKSPACE.378",
       "level": "MUST",
       "params": {
-        "short": true
+        "skill": "spn-devex/execute"
       },
-      "class": "stated",
+      "class": "stated in a skill",
       "sentence": "You instruct and correct while the work runs, and each one is written down before it is acted on",
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "An instruction is recorded before it is executed",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/execute/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.379",
@@ -10245,40 +10300,58 @@
       "id": "RULE.DEVEX.WORKSPACE.427",
       "level": "MUST",
       "params": {
-        "short": true
+        "skill": "spn-devex/ideate"
       },
-      "class": "stated",
+      "class": "stated in a skill",
       "sentence": "A sample is drawn from the page's own data and rules",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "The approach document — a workstream's, never a repository's",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.428",
       "level": "MUST",
       "params": {
-        "short": true
+        "skill": "spn-devex/execute"
       },
-      "class": "stated",
+      "class": "stated in a skill",
       "sentence": "When one step waits on something, the agent carries on with every step that does not depend on it",
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "Orders name what they need by id, and a workflow runs the ready rows",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/execute/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.429",
       "level": "MUST",
       "params": {
-        "short": true
+        "skill": "spn-devex/ideate"
       },
-      "class": "stated",
+      "class": "stated in a skill",
       "sentence": "The agent searches the decisions already taken before it proposes a shape",
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "Ideation is kept as it happens",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.430",
@@ -10297,22 +10370,29 @@
       "id": "RULE.DEVEX.WORKSPACE.431",
       "level": "MUST",
       "params": {
-        "short": true
+        "skill": "spn-devex/execute"
       },
-      "class": "stated",
+      "class": "stated in a skill",
       "sentence": "A fix you ask for now is done now",
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "Work is sized by its kind, and fixes gather into a round",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/execute/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.432",
       "level": "MUST",
       "params": {
-        "short": true
+        "check": "corpus",
+        "due": "036/N008"
       },
-      "class": "stated",
+      "class": "checked",
       "sentence": "A public or partner-facing page says only what is real and decided",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/01-corpus.md",
       "heading": "What the pattern binds",
@@ -10334,9 +10414,10 @@
       "id": "RULE.DEVEX.WORKSPACE.434",
       "level": "MUST",
       "params": {
-        "short": true
+        "check": "doc-check",
+        "due": "036/N008"
       },
-      "class": "stated",
+      "class": "checked",
       "sentence": "The book is changed only where it needs it, and docs are kept small",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md",
       "heading": "Scope control",
@@ -10389,14 +10470,20 @@
       "id": "RULE.DEVEX.WORKSPACE.438",
       "level": "MUST",
       "params": {
-        "short": true
+        "skill": "spn-devex/report"
       },
-      "class": "stated",
+      "class": "stated in a skill",
       "sentence": "A section that holds only a table or a code block is drawn flush, and the fix is made for the whole kind",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "The shape of a section, on every page kind",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/report/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.439",
@@ -10416,9 +10503,10 @@
       "id": "RULE.DEVEX.WORKSPACE.440",
       "level": "MUST",
       "params": {
-        "short": true
+        "check": "command-shape",
+        "due": "036/N008"
       },
-      "class": "stated",
+      "class": "checked",
       "sentence": "The script-file route around the seat guard is for a command whose text quotes the seat path",
       "chapter": "04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md",
       "heading": "Two dot-homes",
@@ -10443,9 +10531,10 @@
       "id": "RULE.DEVEX.WORKSPACE.442",
       "level": "MUST",
       "params": {
-        "short": true
+        "check": "questions",
+        "due": "036/N008"
       },
-      "class": "stated",
+      "class": "checked",
       "sentence": "Each option on a card is one decision",
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "A card is only for what the rules leave open",
@@ -10456,14 +10545,20 @@
       "id": "RULE.DEVEX.WORKSPACE.443",
       "level": "MUST",
       "params": {
-        "short": true
+        "skill": "spn-devex/ideate"
       },
-      "class": "stated",
+      "class": "stated in a skill",
       "sentence": "While you are still ideating, the agent talks it through in chat",
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "Ideation is kept as it happens",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.444",
@@ -10511,14 +10606,20 @@
       "id": "RULE.DEVEX.WORKSPACE.447",
       "level": "MUST",
       "params": {
-        "short": true
+        "skill": "spn-devex/test"
       },
-      "class": "stated",
+      "class": "stated in a skill",
       "sentence": "While a re-check or a sweep runs against a served API, nothing that API imports is edited",
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "A page is proved by its values, in the arc's final row",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/test/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.448",
@@ -10549,9 +10650,10 @@
       "id": "RULE.DEVEX.WORKSPACE.450",
       "level": "MUST",
       "params": {
-        "short": true
+        "check": "corpus",
+        "due": "036/N008"
       },
-      "class": "stated",
+      "class": "checked",
       "sentence": "Before writing, the agent names the place it writes in and that place's reader",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/01-corpus.md",
       "heading": "What the pattern binds",
@@ -10846,9 +10948,10 @@
       "id": "RULE.DEVEX.WORKSPACE.466",
       "level": "MUST",
       "params": {
-        "short": true
+        "check": "doc-check",
+        "due": "036/N008"
       },
-      "class": "stated",
+      "class": "checked",
       "sentence": "Conflicts land here — always",
       "chapter": "registers/decisions.md",
       "heading": "How the register works",
@@ -31158,9 +31261,9 @@
       "id": "RULE.SUPPORT.SURFACE.396",
       "level": "MUST",
       "params": {
-        "short": true
+        "skill": "spn-surface/design"
       },
-      "class": "stated",
+      "class": "stated in a skill",
       "sentence": "A page is shaped from how people use it and from the nature of its data, through the UX lens, before it is built",
       "chapter": "04-capabilities/02-support/01-surface/03-standards-patterns/01-common/02-app-patterns.md",
       "heading": "How an app pattern is chosen",
@@ -31175,6 +31278,11 @@
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
           "heading": "Before the first layout — say what the page is for"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/given-design.md",
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -31182,14 +31290,20 @@
       "id": "RULE.SUPPORT.SURFACE.397",
       "level": "MUST",
       "params": {
-        "short": true
+        "skill": "spn-surface/design"
       },
-      "class": "stated",
+      "class": "stated in a skill",
       "sentence": "A unit or a prop of the library goes construct, then Figma, then stack, then showcase, and its work starts from the domain and the user's goals",
       "chapter": "04-capabilities/02-support/01-surface/11-delivery-library/01-common/01-library.md",
       "heading": "The library draws what the book names",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.SUPPORT.SURFACE.398",
@@ -31229,14 +31343,19 @@
       "id": "RULE.SUPPORT.SURFACE.400",
       "level": "MUST",
       "params": {
-        "short": true
+        "skill": "spn-surface/design"
       },
-      "class": "stated",
+      "class": "stated in a skill",
       "sentence": "The agent never hands the developer a Figma step to draw, rebind, delete or tick",
       "chapter": "04-capabilities/02-support/01-surface/11-delivery-library/02-figma/04-drawing.md",
       "heading": "How an agent changes a library file through the connector",
       "decision": null,
       "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/writer-brief.md",
+          "heading": "The rules this step holds"
+        },
         {
           "plugin": "spn-surface",
           "path": "skills/design/steps/writer-brief.md",
@@ -31310,9 +31429,9 @@
       "id": "RULE.SUPPORT.SURFACE.405",
       "level": "MUST",
       "params": {
-        "short": true
+        "skill": "spn-surface/design"
       },
-      "class": "stated",
+      "class": "stated in a skill",
       "sentence": "A form shows each default as its real value, marked Default, and never as a faded placeholder",
       "chapter": "04-capabilities/02-support/01-surface/03-standards-patterns/01-common/01-task-patterns.md",
       "heading": "Enter",
@@ -31322,6 +31441,11 @@
           "plugin": "spn-surface",
           "path": "refs/support/surface/standards-patterns.md",
           "heading": "The task patterns, by intent — 🔮"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/SKILL.md",
+          "heading": "The rules this step holds"
         },
         {
           "plugin": "spn-surface",
