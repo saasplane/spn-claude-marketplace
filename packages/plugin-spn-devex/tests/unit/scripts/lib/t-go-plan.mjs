@@ -88,6 +88,10 @@ same("[MKT.SCRIPTS.307] a landed part whose entry changed gets a follow-up part"
 const doneFirst = deriveGo([{ ...scope[0], landed: ["E2", "E3"] }]);
 same("[MKT.SCRIPTS.320] an entry a landed row holds is in no part", doneFirst.parts.flatMap((p) => p.entries), ["N009/E1"]);
 same("[MKT.SCRIPTS.320] a repository whose entries all landed gets no docs or code part", doneFirst.parts.filter((p) => p.repo === "lib-repo" && p.pass !== "RELEASE").map((p) => p.id), []);
+const rowsLanded = [{ ...changed[0], landed: ["E2", "E3"] }];
+same("[MKT.SCRIPTS.320] an entry that changed after its part landed gets a follow-up part, though a landed row holds it", deriveGo(rowsLanded, { previous: landedAll }).parts.filter((p) => p.entries.includes("N009/E2")).map((p) => [p.id, p.state]),
+  [["code-lib-repo-1", "landed"], ["code-lib-repo-2", "ready"]]);
+same("[MKT.SCRIPTS.320] an unchanged entry of a landed row gets no follow-up", deriveGo(rowsLanded, { previous: landedAll }).parts.filter((p) => p.entries.includes("N009/E3")).map((p) => p.state), ["landed"]);
 same("[MKT.SCRIPTS.311] a part held twice fails the schema", goFaults({ ...plan, parts: [plan.parts[0], { ...plan.parts[0], id: "docs-lib-repo-9" }] }).length > 0, true);
 same("[MKT.SCRIPTS.311] a signature that misses an entry fails the schema", goFaults({ ...plan, parts: [{ ...plan.parts[0], signature: "a.b" }] }).length, 1);
 same("[MKT.SCRIPTS.311] a pass that is a number fails the schema", goFaults({ ...plan, parts: [{ ...plan.parts[0], pass: 1 }] }).length > 0, true);

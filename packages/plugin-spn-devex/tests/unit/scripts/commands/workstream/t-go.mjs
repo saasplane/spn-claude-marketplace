@@ -74,6 +74,7 @@ console.log("\n=== write: the plan and the briefs");
   ok("[MKT.SCRIPTS.303] every part with entries has a brief", plan.parts.filter((p) => p.entries.length).every((p) => existsSync(join(orders, `${p.id}.md`))), wrote.out);
   const brief = existsSync(join(orders, "code-spn-x-1.md")) ? readFileSync(join(orders, "code-spn-x-1.md"), "utf8") : "";
   ok("[MKT.SCRIPTS.303] a brief opens with the go, the part and its entries", brief.startsWith("---\n") && brief.includes('go: "N001"') && brief.includes('part: "code-spn-x-1"') && brief.includes("N001/E2"), brief.slice(0, 200));
+  ok("[MKT.SCRIPTS.306] a brief gives the report's front matter that report write folds", brief.includes("## Report") && brief.includes("outcome: landed · stopped · needs-you") && brief.includes("cost: {"), brief.slice(-500));
   ok("[MKT.SCRIPTS.315] write ends with the next step", lastLine(wrote.out).startsWith("Next:"), wrote.out);
 }
 
