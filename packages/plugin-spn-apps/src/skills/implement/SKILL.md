@@ -286,6 +286,7 @@ description: THE requirement router for SaaS Plane TS repos. Use whenever the us
 - **RULE.SUPPORT.APPS.230** (`RULE.SUPPORT.APPS.230` · MUST · skill:spn-apps/implement)
 - **Encryption is the default: a database, cache or queue connection is encrypted unless its key says otherwise** (`RULE.SUPPORT.APPS.231` · MUST · skill:spn-apps/implement)
 - **A module's data is still reached through that module's contract** (`RULE.SUPPORT.APPS.247` · MUST · skill:spn-apps/implement)
+- **The tier reaches only what the local stack provides** (`RULE.SUPPORT.APPS.248` · MUST · skill:spn-apps/implement)
 
 **Read `refs/devex/workspace/workstream.md` (spn-devex) before acting.** It holds the loop this skill runs inside: how a prompt is read, where a new ask goes, what a prompt does to a running arc, and how a reply closes.
 

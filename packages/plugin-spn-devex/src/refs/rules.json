@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "book": {
     "repository": "spn-foundation",
-    "commit": "05c79d7f"
+    "commit": "96a0ff14"
   },
   "rules": [
     {
@@ -17752,6 +17752,35 @@
           "plugin": "spn-apps",
           "path": "skills/implement/SKILL.md",
           "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.APPS.248",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-apps/implement"
+      },
+      "class": "stated in a skill",
+      "sentence": "The tier reaches only what the local stack provides",
+      "chapter": "04-capabilities/02-support/02-apps/06-tests/01-server/02-integration.md",
+      "heading": "The entry condition",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "refs/support/apps/tests.md",
+          "heading": "The tier ladder"
+        },
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/agent/lenses/qa.md",
+          "heading": "Produces to"
         }
       ]
     },
