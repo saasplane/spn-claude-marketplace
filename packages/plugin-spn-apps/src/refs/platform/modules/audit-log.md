@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/03-platform/02-modules/07-audit-log/",
-      "seen": "3d10bd7b"
+      "seen": "902a89f7"
     }
   ]
 }

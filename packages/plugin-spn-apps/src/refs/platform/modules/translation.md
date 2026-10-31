@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/03-platform/02-modules/02-translation/",
-      "seen": "c21ea064"
+      "seen": "21221241"
     }
   ]
 }
