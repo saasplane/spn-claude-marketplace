@@ -16,7 +16,7 @@ import {
   entryAltitude, goFaults, GO_SCHEMA_VERSION,
   type ArcData, type GoPart, type GoPass, type GoPlan, type Sheet, type SheetEntry,
 } from "./workstream-schema.ts";
-import { arcDataDir } from "./workstream.ts";
+import { arcDataDir, readArc, readSheet } from "./workstream.ts";
 
 /** The minutes a part is cut to. */
 export const PART_MINUTES = 45;
@@ -25,8 +25,8 @@ export const UNMEASURED_ENTRIES = 8;
 const GO_FILE = "go.json";
 const HOOKS_LOG = "hooks.jsonl";
 
-/** A sheet of the scope, with the arc it belongs to. */
-export type ScopeSheet = { arc: string; sheet: Sheet };
+/** A sheet of the scope, with the arc it belongs to and the ids of the entries its landed rows hold. */
+export type ScopeSheet = { arc: string; sheet: Sheet; landed?: readonly string[] };
 /** What a landed row took: entries done in a repository at a kind of change, in minutes. */
 export type Measure = { repo: string; altitude: string; entries: number; minutes: number };
 /** A line of `hooks.jsonl`, as far as a test command is told apart. */
@@ -49,6 +49,30 @@ const repoOf = (entry: SheetEntry): string => entry.file.slice(0, entry.file.ind
 
 /** An entry as a go names it, `N009/E14`. */
 export const refOf = (arc: string, entry: SheetEntry): string => `${arc}/${entry.id}`;
+
+/** The ids of the entries an arc's landed rows hold. */
+export const landedEntries = (data: ArcData): string[] => data.rows.filter((row) => row.state === "landed").flatMap((row) => row.entries ?? []);
+
+/** The entries a landed row of the scope holds, by ref: work already done, which no part plans again. */
+export const landedRefs = (scope: readonly ScopeSheet[]): Set<string> =>
+  new Set(scope.flatMap(({ arc, landed }) => (landed ?? []).map((id) => `${arc}/${id}`)));
+
+/** The sheets of a plan's scope, each with the entries its arc's landed rows hold: what `go check` and the close gate read. */
+export function planScope(ws: string, plan: GoPlan): ScopeSheet[] {
+  const scope: ScopeSheet[] = [];
+  for (const arc of plan.scope) {
+    const sheet = readSheet(ws, arc);
+    const data = readArc(ws, arc);
+    if (sheet) scope.push({ arc, sheet, landed: data ? landedEntries(data) : [] });
+  }
+  return scope;
+}
+
+/** The entries of the scope that neither a part nor a landed row holds, by ref. */
+export function unheldEntries(plan: GoPlan, scope: readonly ScopeSheet[]): string[] {
+  const held = new Set([...plan.parts.flatMap((part) => part.entries), ...landedRefs(scope)]);
+  return scope.flatMap(({ arc, sheet }) => sheet.entries.map((entry) => refOf(arc, entry)).filter((ref) => !held.has(ref)));
+}
 
 /** A short hash of one entry as written, so a part's signature changes with any change to any of its entries. */
 export const entryHash = (entry: SheetEntry): string => createHash("sha1").update(JSON.stringify(entry)).digest("hex").slice(0, 8);
@@ -158,9 +182,9 @@ const numberOf = (part: GoPart): number => Number(part.id.slice(part.id.lastInde
  * The plan of a go over the arcs of its scope, the first being the lead. Entries are grouped by repository, in the order of
  * the scope's release chain (a repository outside the chain last), then by pass, and each group is cut into parts of at most
  * its bound. A repository with code also gets a baseline and a full run, and the release comes last, one part to each line of
- * the scope's release chain. Derived again after a change, the previous plan's landed and running parts stay as they were and
- * the entries they hold are left out, except a landed part's entry that changed, which gets a follow-up part; every other
- * part is cut anew.
+ * the scope's release chain. An entry a landed row holds is left out. Derived again after a change, the previous plan's landed
+ * and running parts stay as they were and the entries they hold are left out, except a landed part's entry that changed, which
+ * gets a follow-up part; every other part is cut anew.
  */
 export function deriveGo(scope: readonly ScopeSheet[], options: DeriveOptions = {}): GoPlan {
   const rates = options.rates ?? {};
@@ -172,12 +196,13 @@ export function deriveGo(scope: readonly ScopeSheet[], options: DeriveOptions = 
     const moved = part.state === "landed" ? new Set(changedEntries(part, scope)) : new Set<string>();
     return part.entries.filter((ref) => !moved.has(ref));
   }));
+  const done = landedRefs(scope);
   const groups = new Map<string, { repo: string; pass: GoPass; refs: string[]; entries: SheetEntry[] }>();
   const repos: string[] = [];
   for (const { arc, sheet } of scope) {
     for (const entry of sheet.entries) {
       const ref = refOf(arc, entry);
-      if (keptRefs.has(ref)) continue;
+      if (keptRefs.has(ref) || done.has(ref)) continue;
       const repo = repoOf(entry);
       if (!repos.includes(repo)) repos.push(repo);
       const pass = passOf(entry);
