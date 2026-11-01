@@ -356,5 +356,20 @@ console.log("\n=== a decided suggestion against an arc is cited by its sheet, or
   ok("[MKT.SCRIPTS.405] cited as s65, the lowercase form, it counts too", cli(cited.root, ["workstream", "go", "write", "N001"]).code === 0);
 }
 
+console.log("\n=== write --follow-up: one part the lead carries out, with one report");
+{
+  const fu = await dataWorkspace("go-follow", { rows });
+  const cliFu = (...args) => cli(fu.root, ["workstream", ...args]);
+  cliFu("fact", "write", "N001", "--source", "spn-x/a.ts", "--fact", "a is 1", "--used-by", "1");
+  writeFileSync(join(fu.root, "sheet-in.json"), JSON.stringify(sheetOf([entry("E1", "spn-x:docs/a.md"), entry("E2", "spn-x:src/b.ts")])));
+  cliFu("sheet", "write", "N001", "--file", join(fu.root, "sheet-in.json"), "--because", "the developer added E2");
+  const wrote = cliFu("go", "write", "N001", "--follow-up");
+  const plan = json(join(fu.ws, "arcs", "N001", "go.json"));
+  ok("[MKT.SCRIPTS.416] --follow-up plans the entries as one lead part, then the full run because code changed",
+    wrote.code === 0 && JSON.stringify(plan.parts.filter((p) => !p.id.startsWith("release") && !p.id.startsWith("proof")).map((p) => [p.id, p.entries.length, p.model])) === '[["code-spn-x-1",2,"lead"],["full-spn-x",0,"none"]]', wrote.out + JSON.stringify(plan.parts.map((p) => p.id)));
+  const briefText = readFileSync(join(fu.ws, "notes", "N001", "orders", "code-spn-x-1.md"), "utf8");
+  ok("[MKT.SCRIPTS.416] its brief says the lead window carries it out itself, and the next step says so", briefText.includes("the lead window carries this out itself") && !briefText.includes("Launch no agent") && wrote.out.includes("carry out code-spn-x-1 yourself"), wrote.out);
+}
+
 console.log(`\n${total - failed}/${total} passed`);
 process.exit(failed ? 1 : 0);

@@ -2,7 +2,7 @@
 //           RULE.DEVEX.WORKSPACE.485, a go's first plan and each release part wait for a panel's verdict on record
 // The chapter is the source of truth; a rule change is edited there first, then here, in the same change.
 //
-//   spn-devex workstream go write <workstream>/N<nnn> [--scope N<nnn>,…]
+//   spn-devex workstream go write <workstream>/N<nnn> [--scope N<nnn>,…] [--follow-up]
 //   spn-devex workstream go show  <workstream>/N<nnn> [--part <id>] [--json]
 //   spn-devex workstream go check <workstream>/N<nnn>
 //   spn-devex workstream go start <workstream>/N<nnn> <part>
@@ -62,6 +62,7 @@ export function nextStep(ref: string, ws: string, plan: GoPlan): string {
   if (first) {
     if (first.work === "TEST") return `Next: \`workstream go start ${ref} ${first.id}\`, then run the repository's whole suite.`;
     if (first.work === "RELEASE") return `Next: \`workstream go start ${ref} ${first.id}\`, then release ${first.repo}.`;
+    if (first.model === "lead") return `Next: carry out ${first.id} yourself from its brief ${briefOf(ws, plan.lead, first)}, then \`workstream report write\` on its report.`;
     return `Next: launch the brief of ${first.id}: ${briefOf(ws, plan.lead, first)}${ready.length > 1 ? ` (${ready.length} parts ready)` : ""}.`;
   }
   const running = plan.parts.filter((one) => one.state === "running");
@@ -101,8 +102,11 @@ function brief(plan: GoPlan, part: GoPart, ws: string, root: string): string {
     "| | |", "| --- | --- |",
     `| **Repo** | \`${part.repo}\` · **Run from:** \`${join(root, ".worktrees", basename(ws), part.repo)}\` |`,
     `| **Work** | ${part.work} · ${part.minutes === null ? "not measured" : `${part.minutes} min (${part.measuredFrom})`} |`, "",
-    "**Launch no agent.** Stop at 150k of context or 100 turns, at the next whole step, save the report with what is left and hand back.",
-    "Commit nothing. Hand back at most 8 lines; save the report, at most 15 lines, beside this brief as " + `\`${part.id}.report.md\`, its front matter first.`, "",
+    ...(part.model === "lead"
+      ? ["**A follow-up: the lead window carries this out itself**, as one part with one report, and launches no helper.",
+         "Save the report, at most 15 lines, beside this brief as " + `\`${part.id}.report.md\`, its front matter first.`, ""]
+      : ["**Launch no agent.** Stop at 150k of context or 100 turns, at the next whole step, save the report with what is left and hand back.",
+         "Commit nothing. Hand back at most 8 lines; save the report, at most 15 lines, beside this brief as " + `\`${part.id}.report.md\`, its front matter first.`, ""]),
     "## The entries", "",
     ...part.entries.map((ref) => `- \`${ref}\`: \`workstream sheet show ${ref.split("/")[0]}\` prints it whole`), "",
     "## Acceptance", "",
@@ -148,7 +152,7 @@ export function releaseGate(ws: string, lead: string, plan: GoPlan, part: GoPart
 }
 
 function write(args: string[]): number {
-  const words = readWords(args, { scope: VALUE });
+  const words = readWords(args, { scope: VALUE, "follow-up": FLAG });
   const [ref, ...more] = words.paths;
   if (more.length) throw new UsageFault("takes one arc.");
   const { ws, arc: lead } = arcNamed(ref);
@@ -168,7 +172,7 @@ function write(args: string[]): number {
   const previous = readGo(ws, lead);
   const measures = landedMeasures(root, basename(ws), arcs);
   const plan = deriveGo(sheets, {
-    rates: ratesOf(measures), measures, previous, fullRunMinutes: fullRunMinutes(root), landedOrder: landedOrder(ws, lead),
+    rates: ratesOf(measures), measures, previous, fullRunMinutes: fullRunMinutes(root), landedOrder: landedOrder(ws, lead), followUp: words.given("follow-up"),
     dirsOf: (repo) => [join(root, ".worktrees", basename(ws), repo), join(root, repo)],
   });
   save(ws, lead, plan);
@@ -299,7 +303,7 @@ function wait(args: string[]): number {
 }
 
 export const actions: Record<string, Action> = {
-  write: { describe: "after the go: derive the plan from the scope's sheets and the telemetry, and write every part's brief; run again it keeps landed and running parts", usage: "<workstream>/N<nnn> --scope N<nnn>,…", run: write },
+  write: { describe: "after the go: derive the plan from the scope's sheets and the telemetry, and write every part's brief; run again it keeps landed and running parts", usage: "<workstream>/N<nnn> --scope N<nnn>,… [--follow-up]", run: write },
   show: { describe: "print the parts: their files, their tests, their measured time and what each waits on", usage: "<workstream>/N<nnn> [--part <id>] [--json]", run: show },
   check: { describe: "read the plan against the sheets: an entry no part holds, or a part whose entries changed since the plan was written, which it marks held; exits 1 on any", usage: "<workstream>/N<nnn>", run: checkGo },
   start: { describe: "mark a baseline, a full run or a release as running; only a baseline or a full run lets the test-run check open the whole suite", usage: "<workstream>/N<nnn> <part>", run: start },

@@ -240,6 +240,7 @@ Every row below is declared and none is claimed: a run writes the last two cells
 | MKT.SCRIPTS.413 | Engineering leader | have a repository's code built in the order it depends on | `go write` orders a repository's code entries so that one creating a file comes before one that file's `callers` or `then` name as using it; where the fields cannot tell, or two entries name each other, the number order stands | POSITIVE | UNIT | PLANNED | — |
 | MKT.SCRIPTS.414 | Engineering leader | have no two parts edit one file at once | `go write` marks a part ready only once the parts that edit the files its entries' `book` lines name have landed, and the later of two parts that edit one file waits on the earlier; a wait that would close a circle is not added | NEGATIVE | UNIT | PLANNED | — |
 | MKT.SCRIPTS.415 | Engineering leader | finish a decided arc's own row with a fix and no card | `sheet write --because "<row>"` takes new entries on a decided arc when the words name a row of the arc not yet landed and every new entry cites that row in `decidedBy`; an entry that does not is refused by name, and the log says which row it finishes | POSITIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.416 | Engineering leader | plan a small follow-up the lead window does itself | `go write --follow-up` plans each repository's new entries as one part, with one report, that the lead window carries out itself, with the repository's full run only if code changed and no baseline or new release | POSITIVE | UNIT | PLANNED | — |
 
 ## Retired ids
 

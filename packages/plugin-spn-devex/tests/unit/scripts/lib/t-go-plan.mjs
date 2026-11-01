@@ -221,5 +221,13 @@ same("[MKT.SCRIPTS.414] a part waits for the part that edits the file its entrie
   [generated.parts.find((p) => p.id === "generated-lib-repo-1").waitsOn.includes("docs-lib-repo-1"), readyParts(generated).map((p) => p.id).includes("generated-lib-repo-1")], [true, false]);
 same("[MKT.SCRIPTS.414] and the plan passes the schema", goFaults(byOne), []);
 
+// A follow-up is one part for each repository, carried out by the lead.
+const fu = deriveGo([{ arc: "N009", sheet: sheet([entry("E1", "lib-repo:docs/a.md"), entry("E2", "lib-repo:docs/b.md"), entry("E3", "lib-repo:src/c.ts")]) }], { followUp: true });
+same("[MKT.SCRIPTS.416] a follow-up is one part with its entries of every kind, the lead's own, and the repository's full run because code changed; no baseline and no release",
+  fu.parts.map((p) => [p.id, p.entries.length, p.model]), [["code-lib-repo-1", 3, "lead"], ["full-lib-repo", 0, "none"]]);
+const fuDocs = deriveGo([{ arc: "N009", sheet: sheet([entry("E1", "lib-repo:docs/a.md"), entry("E2", "lib-repo:docs/b.md")]) }], { followUp: true });
+same("[MKT.SCRIPTS.416] a follow-up of docs only has no full run", fuDocs.parts.map((p) => [p.id, p.entries.length]), [["docs-lib-repo-1", 2]]);
+same("[MKT.SCRIPTS.416] and both pass the schema", [goFaults(fu), goFaults(fuDocs)], [[], []]);
+
 console.log(`\n${total - failed}/${total} passed`);
 process.exit(failed ? 1 : 0);

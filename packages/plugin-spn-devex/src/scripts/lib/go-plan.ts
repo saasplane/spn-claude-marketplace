@@ -185,6 +185,8 @@ export type DeriveOptions = {
   writtenAt?: string;
   /** The ids of the parts that landed, in the order they landed (`landedOrder`): tells a code part kept from before from one that landed after a full run. */
   landedOrder?: readonly string[];
+  /** A small follow-up the lead window carries out itself: each repository's new entries in ONE part with one report, no baseline and no new release (s22). */
+  followUp?: boolean;
 };
 
 /** The ids of the parts that landed, oldest first, read from the `<part> landed` go lines of the lead arc's log. */
@@ -299,6 +301,18 @@ export function deriveGo(scope: readonly ScopeSheet[], options: DeriveOptions = 
       groups.set(`${repo}|${pass}`, group);
     }
   }
+  // A FOLLOW-UP IS ONE PART FOR EACH REPOSITORY: its entries of every kind together, in the code pass where any entry is code.
+  if (options.followUp) {
+    for (const repo of repos) {
+      const mine = [...groups.values()].filter((group) => group.repo === repo);
+      const into = mine.find((group) => group.pass === "CODE") ?? mine[0];
+      for (const group of mine) {
+        if (group === into) continue;
+        into.refs.push(...group.refs); into.entries.push(...group.entries);
+        groups.delete(`${repo}|${group.pass}`);
+      }
+    }
+  }
   for (const part of kept) if (!repos.includes(part.repo) && slotOf(part) !== "RELEASE") repos.push(part.repo);
   const owed = new Set(scope.flatMap(({ proofs }) => proofs ?? []));
   for (const repo of owed) if (!repos.includes(repo)) repos.push(repo);
@@ -324,7 +338,7 @@ export function deriveGo(scope: readonly ScopeSheet[], options: DeriveOptions = 
       if (pass === "BASELINE" || pass === "FULL_RUN") {
         let id = `${pass === "BASELINE" ? "baseline" : "full"}-${repo}`;
         // A proof still owed needs the repository's full run once its code has landed; a baseline needs code to compare.
-        let runs = hasCode || (pass === "FULL_RUN" && owed.has(repo));
+        let runs = (hasCode && !(options.followUp && pass === "BASELINE")) || (pass === "FULL_RUN" && owed.has(repo));
         if (pass === "FULL_RUN") {
           // A new code part in a repository whose full run has landed opens the next full run, full-<repo>-2.
           const fulls = kept.filter((one) => one.repo === repo && slotOf(one) === "FULL_RUN");
@@ -346,7 +360,7 @@ export function deriveGo(scope: readonly ScopeSheet[], options: DeriveOptions = 
       const group = groups.get(`${repo}|${pass}`);
       if (!group) continue;
       if (pass === "CODE") orderByUse(group);
-      const bound = boundOf(rates, repo, pass);
+      const bound = options.followUp ? Number.POSITIVE_INFINITY : boundOf(rates, repo, pass);
       const rate = rates[`${repo}|${pass}`];
       let next = Math.max(0, ...kept.filter((one) => one.repo === repo && slotOf(one) === pass).map(numberOf)) + 1;
       for (let at = 0; at < group.refs.length; at += bound) {
@@ -354,7 +368,7 @@ export function deriveGo(scope: readonly ScopeSheet[], options: DeriveOptions = 
         const held = group.entries.slice(at, at + bound);
         const ids = held.flatMap((entry) => Object.values(entry.tiers ?? {}).flat());
         fresh.push(part(`${pass.toLowerCase()}-${repo}-${next++}`, repo, pass, refs, held, {
-          tests: testFilesOf([...new Set(ids)], options.dirsOf?.(repo) ?? []),
+          tests: testFilesOf([...new Set(ids)], options.dirsOf?.(repo) ?? []), ...(options.followUp ? { model: "lead" } : {}),
           minutes: rate > 0 ? Math.round(rate * refs.length * 10) / 10 : null, measuredFrom: measuredOf(repo, pass),
         }));
       }
@@ -413,6 +427,7 @@ export function deriveGo(scope: readonly ScopeSheet[], options: DeriveOptions = 
     // A RELEASE THAT LANDED SHIPPED WHAT WAS THEN: docs or code planned after it need the next release, release-<repo>-2 and so on (s38).
     const mine = kept.filter((one) => one.repo === repo && slotOf(one) === "RELEASE");
     parts.push(...mine);
+    if (options.followUp) continue;
     const lastN = Math.max(0, ...mine.map(numberOf));
     const live = mine.some((one) => one.state === "running");
     const planned = fresh.some((one) => one.repo === repo && ENTRY_SLOTS.includes(slotOf(one)));
