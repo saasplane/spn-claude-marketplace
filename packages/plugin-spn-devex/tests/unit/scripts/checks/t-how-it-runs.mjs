@@ -79,6 +79,14 @@ console.log("\n=== a reply the check leaves alone");
     checkHowItRuns("The plugins are ready.\n\nShall I cut the major release?", BUILDER).length === 0);
   ok("[MKT.HOOKS.118] a boundary passes: deleting a person's data", checkHowItRuns("Should I delete the person's data from the export?", PARTNER).length === 0);
   ok("[MKT.HOOKS.118] a new workstream is the developer's to create", checkHowItRuns("Should I open a new workstream for the arc order?", PARTNER).length === 0);
+  const NEEDS = "**Needs you:** Q28: should spn-infra's develop be promoted to main, which runs the estate's first cloud apply?";
+  ok("[MKT.HOOKS.404] a labelled card passes: the Needs you label before Q<n>, bold or not",
+    checkHowItRuns(NEEDS, BUILDER).length === 0 && checkHowItRuns("Needs you: S4 · shall I merge it?", BUILDER).length === 0 && checkHowItRuns("Needs you Q2: shall I merge it?", BUILDER).length === 0);
+  ok("[MKT.HOOKS.404] a label with no card number does not pass", checkHowItRuns("Needs you: shall I merge it now?", BUILDER).length === 1);
+  ok("[MKT.HOOKS.405] an ask about a cloud apply, production, a teardown or an act that cannot be undone passes",
+    ["Shall I merge it and run the cloud apply?", "Should I merge the fix into production?", "Shall I tear down the stack and merge?", "Shall I destroy the stack and merge?",
+     "May I merge this, since it cannot be undone?"].every((one) => checkHowItRuns(one, BUILDER).length === 0));
+  ok("[MKT.HOOKS.405] the same ask without those words is still sent back", checkHowItRuns("Shall I merge the fix?", BUILDER).length === 1);
   ok("[MKT.HOOKS.118] a card or suggestion text with no act of running reads as null", runsTheWork("Which grid do the cards sit on?") === null);
 }
 

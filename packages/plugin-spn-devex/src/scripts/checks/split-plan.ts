@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 // RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § The approach document · § The split plan is the arcs' step rows, and Repo is the scope
+//           RULE.DEVEX.WORKSPACE.485, a go's first plan and each release part wait for a panel's verdict on record
 //           docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § The workstream is a scope of work, not a window · § A step row says where, what work, and how · § Documents first, and the order they are written in · § Retirement is close-or-graduate · § Closing a workstream is a check; closing a window is nothing
 // The chapters are the source of truth. A rule change is edited there first, then here, in the same change.
 //
@@ -38,7 +39,7 @@
 // in versions). No class is read of a page that links no shared stylesheet: its cards are read by
 // their `id`, its header is not read, and the gate names the page once with `OWN_COPY`.
 
-import { readdirSync, statSync } from "node:fs";
+import { readFileSync, readdirSync, statSync } from "node:fs";
 import { TERMINAL } from "./arc-status.ts";
 import { statusOfData } from "../lib/workstream.ts";
 import { basename, dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
@@ -50,6 +51,9 @@ import { OWN_COPY, linksSharedStyles } from "../../../../plugin-support-lib/src/
 import { alreadyTold, fromWorkspace, named, windowSet } from "../lib/window.ts";
 import { logLinesOf, arcStatus as readArcStatus, readArc, readQuestions } from "../lib/workstream.ts";
 import { planScope, readGo, staleEntries, unheldEntries } from "../lib/go-plan.ts";
+import { logFiles, telemetryFolder } from "../../../../plugin-support-lib/src/lib/debug-store.ts";
+import { telemetryDir } from "../../../../plugin-support-lib/src/lib/timing.ts";
+import { SPDevExAgentPanelVerdictType, SPDevExWorkspaceTelemetryRowType } from "../../../../plugin-support-lib/src/lib/telemetry-values.ts";
 
 // The state a row reaches. `landed` is the only one that satisfies the documents pass; all three
 // named states satisfy the close. A mark nobody wrote is what the close refuses.
@@ -1342,6 +1346,45 @@ export function gateClose(payload: Payload): Verdict {
 const UNACCOUNTED: Array<[state: string, word: string]> = [
   ["empty", "undecided"], ["pending", "pending"], ["stopped", "stopped"], ["in-progress", "in progress"], [HELD_STATE, "held"],
 ];
+
+// ---------------------------------------------------------------------------- a panel on record
+
+/** The two logs a telemetry row is written to. */
+const TELEMETRY_LOGS = ["hooks.jsonl", "usage.jsonl"] as const;
+
+/** Whether the telemetry logs can be read: recording is on. Where it is off, no verdict can be seen and a gate that needs one lets the work through. */
+export const panelsVisible = (root: string): boolean => telemetryDir(root) !== null;
+
+/**
+ * Whether a review panel's verdict is on record (RULE.DEVEX.WORKSPACE.485): a `PANEL` row in `hooks.jsonl` or `usage.jsonl` that names the
+ * same workstream and arc, the same part or no part, a verdict that is not BLOCKED, and a time on or after `since`. A `part` of null
+ * accepts a row of any part. Never throws.
+ *
+ * @param since  an ISO time, or null for any time
+ * @param lens   a lens the row must name (RULE.DEVEX.WORKSPACE.492), or null for any
+ */
+export function panelOnRecord(root: string, workstream: string, arc: string, part: string | null, since: string | null = null, lens: string | null = null): boolean {
+  const from = since === null ? Number.NEGATIVE_INFINITY : Date.parse(since);
+  for (const log of TELEMETRY_LOGS) {
+    try {
+      for (const file of logFiles(join(telemetryFolder(root), log))) {
+        for (const raw of readFileSync(file, "utf8").split("\n")) {
+          if (!raw.includes(SPDevExWorkspaceTelemetryRowType.PANEL)) continue;
+          let row: Record<string, unknown>;
+          try { row = JSON.parse(raw); } catch { continue; }
+          if (row.v !== 1 || row.mtype !== SPDevExWorkspaceTelemetryRowType.PANEL || row.workstream !== workstream || row.arc !== arc) continue;
+          if (row.verdict === SPDevExAgentPanelVerdictType.BLOCKED) continue;
+          if (lens !== null && row.lens !== lens) continue;
+          if (part !== null && row.part !== null && row.part !== undefined && row.part !== part) continue;
+          const at = Date.parse(String(row.at));
+          if (!Number.isNaN(from) && (Number.isNaN(at) || at < from)) continue;
+          return true;
+        }
+      }
+    } catch { /* a log that cannot be read holds no row */ }
+  }
+  return false;
+}
 
 /**
  * The close gate's report over one set of rows, as lines: the tally first, then each row nobody

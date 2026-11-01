@@ -86,8 +86,17 @@ export function unheldEntries(plan: GoPlan, scope: readonly ScopeSheet[]): strin
   return scope.flatMap(({ arc, sheet }) => sheet.entries.map((entry) => refOf(arc, entry)).filter((ref) => !held.has(ref)));
 }
 
-/** A short hash of one entry as written, so a part's signature changes with any change to any of its entries. */
-export const entryHash = (entry: SheetEntry): string => createHash("sha1").update(JSON.stringify(entry)).digest("hex").slice(0, 8);
+/**
+ * A short hash of one entry as written, so a part's signature changes with any change to any of its entries. CITING A CARD IS NO
+ * CHANGE TO THE WORK: `decidedBy` is left out, so a citation added or moved plans no follow-up and flags no part stale (s35, s58).
+ */
+export const entryHash = (entry: SheetEntry): string => {
+  const { decidedBy: _cited, ...work } = entry;
+  return createHash("sha1").update(JSON.stringify(work)).digest("hex").slice(0, 8);
+};
+
+/** The hash a plan signed before citations left it, decidedBy hashed in: an entry that stands as it was still matches its landed part. */
+const signedWhole = (entry: SheetEntry): string => createHash("sha1").update(JSON.stringify(entry)).digest("hex").slice(0, 8);
 
 /** Minutes for one entry in each repository and kind of change, from rows that landed: `<repo>|<work>`. Absent where unmeasured. */
 export function ratesOf(measures: readonly Measure[]): Record<string, number> {
@@ -177,7 +186,21 @@ export type DeriveOptions = {
   fullRunMinutes?: number | null;
   /** When the plan is written. */
   writtenAt?: string;
+  /** The ids of the parts that landed, in the order they landed (`landedOrder`): tells a code part kept from before from one that landed after a full run. */
+  landedOrder?: readonly string[];
+  /** A small follow-up the lead window carries out itself: each repository's new entries in ONE part with one report, no baseline and no new release (s22). */
+  followUp?: boolean;
 };
+
+/** The ids of the parts that landed, oldest first, read from the `<part> landed` go lines of the lead arc's log. */
+export function landedOrder(ws: string, lead: string): string[] {
+  const rows: Array<{ at: number; id: string }> = [];
+  for (const line of logLinesOf(ws, lead) as Array<{ kind?: unknown; note?: unknown; at?: unknown }>) {
+    const found = line && line.kind === "go" && typeof line.note === "string" ? /^(\S+) landed$/.exec(line.note) : null;
+    if (found) rows.push({ at: Date.parse(String(line.at)) || 0, id: found[1] });
+  }
+  return rows.sort((a, b) => a.at - b.at).map((one) => one.id);
+}
 
 /** Entries to a part: the 45 minutes over the rate for a repository and kind of change, or 8 where it is unmeasured. */
 export function boundOf(rates: Record<string, number>, repo: string, work: string): number {
@@ -203,7 +226,46 @@ const entrySlot = (entry: SheetEntry): Slot => {
   const work = entryWork(entry);
   return work === "DOCS" || work === "GENERATED" ? work : "CODE";
 };
+/** The files an entry's `callers`, `then` and `book` strings name, each as `<repo>:<path>` (a bare path is in the entry's own repository). */
+export function namedFiles(entry: SheetEntry, fields: ReadonlyArray<"callers" | "then" | "book">): Set<string> {
+  const out = new Set<string>();
+  for (const field of fields)
+    for (const text of Array.isArray(entry[field]) ? entry[field] as string[] : [])
+      for (const found of String(text).matchAll(/(?:[\w.@-]+:)?[\w@.-]+(?:\/[\w@.-]+)+/g)) out.add(found[0].includes(":") ? found[0] : `${repoOf(entry)}:${found[0]}`);
+  return out;
+}
+
 const numberOf = (part: GoPart): number => Number(part.id.slice(part.id.lastIndexOf("-") + 1)) || 0;
+
+/**
+ * A repository's code entries in the order they can be built: an entry that creates a file comes before an entry that uses it,
+ * read from the entries' `file` against the other's `callers` and `then`. Where nothing says, the number order stands (s60).
+ */
+export function orderByUse(group: { refs: string[]; entries: SheetEntry[] }): void {
+  const count = group.entries.length;
+  const before: Set<number>[] = group.entries.map(() => new Set<number>());
+  group.entries.forEach((maker, at) => {
+    if (maker.op !== "create") return;
+    const users = namedFiles(maker, ["callers", "then"]);
+    group.entries.forEach((user, other) => { if (other !== at && users.has(user.file)) before[other].add(at); });
+  });
+  // EACH ENTRY FOLLOWS WHAT IT BUILDS ON, placed just before its first user; ANY CYCLE KEEPS THE NUMBER ORDER, whole.
+  let done: number[] = [];
+  const state = new Map<number, "walking" | "done">();
+  let cycle = false;
+  const visit = (at: number): void => {
+    if (state.get(at) === "done") return;
+    if (state.get(at) === "walking") { cycle = true; return; }
+    state.set(at, "walking");
+    for (const one of [...before[at]].sort((x, y) => x - y)) visit(one);
+    state.set(at, "done");
+    done.push(at);
+  };
+  for (let at = 0; at < count; at += 1) visit(at);
+  if (cycle) done = group.entries.map((_, at) => at);
+  const refs = done.map((at) => group.refs[at]), entries = done.map((at) => group.entries[at]);
+  group.refs.splice(0, count, ...refs); group.entries.splice(0, count, ...entries);
+}
 
 /**
  * The plan of a go over the arcs of its scope, the first being the lead. Entries are grouped by repository, in the order of
@@ -242,6 +304,18 @@ export function deriveGo(scope: readonly ScopeSheet[], options: DeriveOptions = 
       groups.set(`${repo}|${pass}`, group);
     }
   }
+  // A FOLLOW-UP IS ONE PART FOR EACH REPOSITORY: its entries of every kind together, in the code pass where any entry is code.
+  if (options.followUp) {
+    for (const repo of repos) {
+      const mine = [...groups.values()].filter((group) => group.repo === repo);
+      const into = mine.find((group) => group.pass === "CODE") ?? mine[0];
+      for (const group of mine) {
+        if (group === into) continue;
+        into.refs.push(...group.refs); into.entries.push(...group.entries);
+        groups.delete(`${repo}|${group.pass}`);
+      }
+    }
+  }
   for (const part of kept) if (!repos.includes(part.repo) && slotOf(part) !== "RELEASE") repos.push(part.repo);
   const owed = new Set(scope.flatMap(({ proofs }) => proofs ?? []));
   for (const repo of owed) if (!repos.includes(repo)) repos.push(repo);
@@ -267,13 +341,19 @@ export function deriveGo(scope: readonly ScopeSheet[], options: DeriveOptions = 
       if (pass === "BASELINE" || pass === "FULL_RUN") {
         let id = `${pass === "BASELINE" ? "baseline" : "full"}-${repo}`;
         // A proof still owed needs the repository's full run once its code has landed; a baseline needs code to compare.
-        let runs = hasCode || (pass === "FULL_RUN" && owed.has(repo));
+        let runs = (hasCode && !(options.followUp && pass === "BASELINE")) || (pass === "FULL_RUN" && owed.has(repo));
         if (pass === "FULL_RUN") {
           // A new code part in a repository whose full run has landed opens the next full run, full-<repo>-2.
           const fulls = kept.filter((one) => one.repo === repo && slotOf(one) === "FULL_RUN");
           const landedN = Math.max(0, ...fulls.filter((one) => one.state === "landed").map((one) => numberOf(one) || 1));
           if (fulls.some((one) => one.state === "running")) runs = false;
-          else if (landedN > 0) { if (groups.has(`${repo}|CODE`)) id = `${id}-${landedN + 1}`; else runs = false; }
+          else if (landedN > 0) {
+            // A CODE PART THAT LANDS AFTER THE FULL RUN OPENS THE NEXT ONE, fresh or kept from a previous plan (s34).
+            const order = options.landedOrder ?? [];
+            const lastFull = order.lastIndexOf(fulls.filter((one) => one.state === "landed").sort((a, b) => numberOf(b) - numberOf(a))[0]?.id ?? "");
+            const lateCode = lastFull >= 0 && kept.some((one) => one.repo === repo && slotOf(one) === "CODE" && one.state === "landed" && order.lastIndexOf(one.id) > lastFull);
+            if (groups.has(`${repo}|CODE`) || lateCode) id = `${id}-${landedN + 1}`; else runs = false;
+          }
         }
         if (runs && !keptIds.has(id)) fresh.push(part(id, repo, pass, [], [], {
           minutes: full, measuredFrom: full === null ? null : "last 3 full runs",
@@ -282,7 +362,8 @@ export function deriveGo(scope: readonly ScopeSheet[], options: DeriveOptions = 
       }
       const group = groups.get(`${repo}|${pass}`);
       if (!group) continue;
-      const bound = boundOf(rates, repo, pass);
+      if (pass === "CODE") orderByUse(group);
+      const bound = options.followUp ? Number.POSITIVE_INFINITY : boundOf(rates, repo, pass);
       const rate = rates[`${repo}|${pass}`];
       let next = Math.max(0, ...kept.filter((one) => one.repo === repo && slotOf(one) === pass).map(numberOf)) + 1;
       for (let at = 0; at < group.refs.length; at += bound) {
@@ -290,7 +371,7 @@ export function deriveGo(scope: readonly ScopeSheet[], options: DeriveOptions = 
         const held = group.entries.slice(at, at + bound);
         const ids = held.flatMap((entry) => Object.values(entry.tiers ?? {}).flat());
         fresh.push(part(`${pass.toLowerCase()}-${repo}-${next++}`, repo, pass, refs, held, {
-          tests: testFilesOf([...new Set(ids)], options.dirsOf?.(repo) ?? []),
+          tests: testFilesOf([...new Set(ids)], options.dirsOf?.(repo) ?? []), ...(options.followUp ? { model: "lead" } : {}),
           minutes: rate > 0 ? Math.round(rate * refs.length * 10) / 10 : null, measuredFrom: measuredOf(repo, pass),
         }));
       }
@@ -311,6 +392,24 @@ export function deriveGo(scope: readonly ScopeSheet[], options: DeriveOptions = 
       one.waitsOn = prior ? parts.filter((other) => other.repo === prior && slotOf(other) === "DOCS").map((other) => other.id) : [];
     }
   }
+  // TWO PARTS THAT EDIT ONE FILE NEVER RUN TOGETHER, and a part is ready only once the parts that edit the files its entries' `book` lines
+  // name have landed (s51). A wait that would close a circle is not added.
+  const held = new Map(scope.flatMap(({ arc, sheet }) => sheet.entries.map((entry) => [refOf(arc, entry), entry] as const)));
+  const entriesOf = (one: GoPart): SheetEntry[] => one.entries.flatMap((ref) => held.get(ref) ?? []);
+  const editsOf = (one: GoPart): Set<string> => new Set(entriesOf(one).map((entry) => entry.file));
+  const sourcesOf = (one: GoPart): Set<string> => new Set(entriesOf(one).flatMap((entry) => [...namedFiles(entry, ["book"])]));
+  const waitsFor = (from: GoPart, target: GoPart, seen = new Set<string>()): boolean =>
+    from.id === target.id || (!seen.has(from.id) && (seen.add(from.id), from.waitsOn.some((id) => { const next = parts.find((other) => other.id === id); return !!next && waitsFor(next, target, seen); })));
+  for (const [at, one] of parts.entries()) {
+    if (keptIds.has(one.id) || !one.entries.length) continue;
+    const mine = editsOf(one), sources = sourcesOf(one);
+    for (const [other, q] of parts.entries()) {
+      if (q === one || q.state === "landed" || !q.entries.length || one.waitsOn.includes(q.id) || waitsFor(q, one)) continue;
+      const files = editsOf(q);
+      const sameFile = other < at && [...files].some((file) => mine.has(file));
+      if (sameFile || [...files].some((file) => sources.has(file))) one.waitsOn.push(q.id);
+    }
+  }
   // A repository's first pass waits on the release that ships a command it needs, which another go or window cuts: the part
   // is `waiting`, and it waits on no part of this plan, because the release it waits on is not one of them (s23).
   for (const { sheet } of scope) {
@@ -328,9 +427,15 @@ export function deriveGo(scope: readonly ScopeSheet[], options: DeriveOptions = 
   const releases: string[] = [];
   for (const { sheet } of scope) for (const repo of sheet.releaseChain ?? []) if (!releases.includes(repo)) releases.push(repo);
   for (const repo of releases) {
-    const id = `release-${repo}-1`;
-    const old = (options.previous?.parts ?? []).find((one) => one.id === id && keptIds.has(id));
-    parts.push(old ?? part(id, repo, "RELEASE", [], [], { waitsOn: ending }));
+    // A RELEASE THAT LANDED SHIPPED WHAT WAS THEN: docs or code planned after it need the next release, release-<repo>-2 and so on (s38).
+    const mine = kept.filter((one) => one.repo === repo && slotOf(one) === "RELEASE");
+    parts.push(...mine);
+    if (options.followUp) continue;
+    const lastN = Math.max(0, ...mine.map(numberOf));
+    const live = mine.some((one) => one.state === "running");
+    const planned = fresh.some((one) => one.repo === repo && ENTRY_SLOTS.includes(slotOf(one)));
+    if (!mine.length) parts.push(part(`release-${repo}-1`, repo, "RELEASE", [], [], { waitsOn: ending }));
+    else if (!live && planned) parts.push(part(`release-${repo}-${lastN + 1}`, repo, "RELEASE", [], [], { waitsOn: ending }));
   }
   // A proof still owed after the releases is its own step: the whole suites on what was released, once every release has landed.
   // A proof part that landed or is running stays as it was.
@@ -353,7 +458,7 @@ export function changedEntries(part: GoPart, scope: readonly ScopeSheet[]): stri
   const now = new Map(scope.flatMap(({ arc, sheet }) => sheet.entries.map((entry) => [refOf(arc, entry), entry] as const)));
   return part.entries.filter((ref, at) => {
     const entry = now.get(ref);
-    return !entry || hashes[at] !== entryHash(entry);
+    return !entry || (hashes[at] !== entryHash(entry) && hashes[at] !== signedWhole(entry));
   });
 }
 

@@ -1,4 +1,7 @@
 // RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § The commands · § The close gate
+//           RULE.DEVEX.WORKSPACE.489, a workstream closes only once every suggestion is decided, parked or dropped
+//           RULE.DEVEX.WORKSPACE.485, a go's first plan and each release part wait for a panel's verdict on record
+//           RULE.DEVEX.WORKSPACE.206, a close is a milestone, and the agent writes its message before it asks, or right after it closes on a standing grant
 // The chapter is the source of truth; a rule change is edited there first, then here, in the same change.
 //
 //   spn-devex workstream close <workstream>
@@ -16,8 +19,9 @@ import { stageOf } from "../../../../../plugin-support-lib/src/lib/telemetry-val
 import { isTestCommand } from "../../checks/test-run.ts";
 import { goFileOf } from "../../lib/go-plan.ts";
 import { USAGE_LOG } from "../../lib/usage.ts";
-import { approachOf, arcIdsOf, logFileOf, readJson, readJsonl, suggestionsFileOf, workspaceOf, writeJsonl, writeWhole } from "../../lib/workstream.ts";
-import { OUTCOMES, suggestionFaults, type Suggestion } from "../../lib/workstream-schema.ts";
+import { approachOf, arcIdsOf, logFileOf, readJson, readJsonl, suggestionName, suggestionOpen, suggestionsFileOf, suggestionsOf, workspaceOf, writeJsonl, writeWhole } from "../../lib/workstream.ts";
+import { OUTCOMES, cardName, suggestionFaults, type Suggestion } from "../../lib/workstream-schema.ts";
+import { readSplit, type SplitRow } from "../debug/cost.ts";
 import { checkGo, renameGo } from "./go.ts";
 import { workstreamNamed } from "./_shared.ts";
 
@@ -25,6 +29,26 @@ export const describe = "close a workstream: run the close gate, stamp the appro
 export const usage = "<workstream>";
 
 const refuse = (why: string): number => { console.log(`Refused: ${why}. Nothing was changed.`); return 1; };
+
+/** The start of the title of every suggestion the close's retrospective raises. */
+const RETRO_PREFIX = "Retrospective · ";
+
+/** What a closed page carries as its closing block: what was delivered, what was learned and the thanks. */
+const CLOSING_PARTS: Array<[RegExp, string]> = [
+  [/What (?:was|we) delivered/i, "\"What was delivered\""], [/What (?:was|we) learned/i, "\"What was learned\""], [/Thank you/i, "\"Thank you\""],
+];
+
+/** The closing block's pieces an approach page lacks, named; none where it carries all. */
+export function missingClosingBlock(page: string): string[] {
+  return CLOSING_PARTS.filter(([pattern]) => !pattern.test(page)).map(([, name]) => name);
+}
+
+/** The refusal of a page without its closing block: the shape closed pages carry, the rule, and that nothing was changed. */
+const closingRefusal = (missing: string[]): string =>
+  `the approach page has no closing block (missing ${missing.join(", ")}). Write it under the masthead, in the shape closed pages carry: ` +
+  "a `<div class=\"sds-note\">` holding a 🚀 lead line, `<p>&nbsp;</p>`, `<p><strong>📦 What was delivered</strong></p>` and a list, " +
+  "`<p>&nbsp;</p>`, `<p><strong>🧠 What was learned</strong></p>` and a list, `<p>&nbsp;</p>`, then `<p><strong>Thank you 👍</strong></p>` and a line " +
+  "(RULE.DEVEX.WORKSPACE.206)";
 
 /** The page with its masthead status and its header block reading DONE. */
 function stamped(text: string): string {
@@ -45,7 +69,26 @@ type Retro = {
   commands: Record<string, { runs: number; failed: number; retried: number; refused: number }>;
   shape: Record<string, number>;
   ungated: string[];
+  /** The workstream's calls and minutes by what they were, read from the telemetry, and the minutes of managing over the minutes of change (null with no change). */
+  split: Record<(typeof SPLIT_KINDS)[number], { calls: number; minutes: number }>;
+  managingToChange: number | null;
 };
+
+const SPLIT_KINDS = ["change", "proof", "managing", "refusals", "waiting"] as const;
+
+/** The split of a workstream: its arcs' lines added together, and the ratio of managing to change by minutes. */
+export function splitOf(root: string, name: string): Pick<Retro, "split" | "managingToChange"> {
+  const split = Object.fromEntries(SPLIT_KINDS.map((kind) => [kind, { calls: 0, minutes: 0 }])) as Retro["split"];
+  for (const row of readSplit(root, name) as SplitRow[]) {
+    if (row.key.includes(" · part ")) continue;
+    for (const kind of SPLIT_KINDS) { split[kind].calls += row[kind].calls; split[kind].minutes = Math.round((split[kind].minutes + row[kind].minutes) * 10) / 10; }
+  }
+  return { split, managingToChange: split.change.minutes > 0 ? Math.round((split.managing.minutes / split.change.minutes) * 100) / 100 : null };
+}
+
+/** The split as the line the close prints. */
+export const splitLine = (one: Pick<Retro, "split" | "managingToChange">): string =>
+  `split · ${SPLIT_KINDS.map((kind) => `${kind} ${one.split[kind].calls} calls ${one.split[kind].minutes}m`).join(" · ")} · managing to change ${one.managingToChange === null ? "not known (no change minutes)" : `${one.managingToChange} to 1`}`;
 
 type Row = Record<string, unknown>;
 const text = (value: unknown): string | null => (typeof value === "string" && value ? value : null);
@@ -96,7 +139,7 @@ function shapeOf(ws: string): Record<string, number> {
 function retroOf(ws: string, root: string): Retro {
   const name = basename(ws);
   const rows = rowsOf(root, name);
-  const retro: Retro = { v: 1, workstream: name, at: new Date().toISOString(), stages: {}, works: {}, outcomes: {}, checks: {}, parts: {}, commands: {}, shape: shapeOf(ws), ungated: [] };
+  const retro: Retro = { v: 1, workstream: name, at: new Date().toISOString(), stages: {}, works: {}, outcomes: {}, checks: {}, parts: {}, commands: {}, shape: shapeOf(ws), ungated: [], ...splitOf(root, name) };
   const part = (id: string) => (retro.parts[id] ??= { repo: null, work: null, starts: 0, needsYou: 0, modelMs: 0, plannedMs: null });
   const helpers = new Map<string, Set<string>>();
   const panels = { parts: new Set<string>(), arcs: new Set<string>() };
@@ -134,7 +177,9 @@ function retroOf(ws: string, root: string): Retro {
       else if (one.exit === 2) c.refused += 1; else if (one.exit !== null && one.exit !== undefined && num(one.exit) !== 0) c.failed += 1;
       if (text(one.retryOf)) c.retried += 1;
     } else if (mtype === "PANEL") {
-      if (id) panels.parts.add(id); else if (text(one.arc)) panels.arcs.add(String(one.arc));
+      // A PANEL ROW GATES WHAT IT NAMES: its part, and its arc (RULE.DEVEX.WORKSPACE.485), so a release part counts as gated by a row naming either.
+      if (id) panels.parts.add(id);
+      if (text(one.arc)) panels.arcs.add(String(one.arc));
     }
   }
   for (const [id, agents] of helpers) part(id).starts = agents.size;
@@ -149,11 +194,12 @@ function retroOf(ws: string, root: string): Retro {
     }
     if (!existsSync(goFileOf(ws, arc))) continue;
     renameGo(ws, arc);
-    const plan = readJson(goFileOf(ws, arc)) as { parts?: Array<{ id: string; repo: string; work: string; minutes: number | null }> } | null;
+    const plan = readJson(goFileOf(ws, arc)) as { parts?: Array<{ id: string; repo: string; work: string; minutes: number | null; entries?: string[] }> } | null;
     for (const one of plan?.parts ?? []) {
       const p = part(one.id);
       p.repo = one.repo; p.work = one.work; p.plannedMs = one.minutes === null ? null : one.minutes * 60000;
-      if (one.work === "RELEASE" && !panels.parts.has(one.id)) retro.ungated.push(`release part ${one.id} has no panel row`);
+      const arcs = [arc, ...(one.entries ?? []).map((ref) => ref.split("/")[0])];
+      if (one.work === "RELEASE" && !panels.parts.has(one.id) && !arcs.some((name) => panels.arcs.has(name))) retro.ungated.push(`release part ${one.id} has no panel row`);
     }
     if (!panels.arcs.has(arc) && plan?.parts?.length) retro.ungated.push(`${arc} go has no panel row on its preview`);
   }
@@ -227,16 +273,24 @@ function retrospective(ws: string, root: string): string[] {
   const records = readJsonl(file).filter((line): line is Suggestion => !!line && typeof line === "object");
   const raised: string[] = [];
   for (const finding of findingsOf(now, earlier)) {
-    const title = `Retrospective · ${finding}`;
+    const title = `${RETRO_PREFIX}${finding}`;
     if (records.some((one) => one.title === title)) continue;
     const next = Math.max(0, ...records.map((one) => Number(/^s(\d+)$/.exec(one.id)?.[1] ?? 0))) + 1;
     const record: Suggestion = { id: `s${next}`, title, state: "raised", preview: null, words: null };
-    if (suggestionFaults(record, record.id).length) continue;
+    if (suggestionFaults(record, cardName(record.id)).length) continue;
     records.push(record);
-    raised.push(`${record.id} ${title}`);
+    raised.push(`${cardName(record.id)} ${title}`);
   }
   if (raised.length) writeJsonl(file, records);
   return raised;
+}
+
+/** The refusal naming each suggestion that reads raised or shaped, the retrospective's included, or null where none does. */
+function openRefusal(ws: string): string | null {
+  const open = suggestionsOf(ws).filter(suggestionOpen);
+  if (!open.length) return null;
+  return `${open.length === 1 ? "a suggestion" : `${open.length} suggestions`} still read${open.length === 1 ? "s" : ""} raised or shaped: ${open.map(suggestionName).join(" · ")}. ` +
+    "Decide, park or drop each with `workstream suggestion state` before the workstream closes (RULE.DEVEX.WORKSPACE.489)";
 }
 
 export function run(args: string[]): number {
@@ -249,6 +303,18 @@ export function run(args: string[]): number {
   const held = basename(dirname(ws));
   if (held === "closed") return refuse(`${basename(ws)} is already closed`);
 
+  // THE CLOSING BLOCK IS WRITTEN BEFORE THE CLOSE (RULE.DEVEX.WORKSPACE.206): a page found without it after its folder has moved has to be
+  // opened again, so a page without it refuses here, before anything is stamped, raised or moved.
+  // A SUGGESTION LEFT OPEN IS A CHOICE NOBODY MADE (RULE.DEVEX.WORKSPACE.489): the close names each one, before anything is stamped, raised or moved.
+  const undecided = openRefusal(ws);
+  if (undecided) return refuse(undecided);
+
+  const closingPage = approachOf(ws);
+  if (closingPage) {
+    const missing = missingClosingBlock(readFileSync(closingPage, "utf8"));
+    if (missing.length) return refuse(closingRefusal(missing));
+  }
+
   // Each go is read against its sheets first; the gate then reads the plan again for the parts that have not landed.
   for (const arc of arcIdsOf(ws)) {
     if (!existsSync(goFileOf(ws, arc))) continue;
@@ -258,6 +324,14 @@ export function run(args: string[]): number {
   // The retrospective runs before the gate: it only reads rows and raises suggestions, and a refused close keeps what it raised.
   const raised = retrospective(ws, root);
   for (const line of raised) console.log(`retrospective · raised ${line}`);
+  // WHERE THE WORKSTREAM'S TIME WENT is printed beside the retrospective, from the telemetry (the same split is in retro.json).
+  const written = readJson(join(ws, "retro.json")) as Retro | null;
+  if (written?.split) console.log(splitLine(written));
+
+  // THE RETROSPECTIVE'S OWN SUGGESTIONS ARE HELD AGAINST THE CLOSE TOO (RULE.DEVEX.WORKSPACE.489): it raised them just above, and it does not
+  // raise one whose title is already in the workstream, so the developer decides them and the next close passes.
+  const left = openRefusal(ws);
+  if (left) return refuse(left);
 
   const page = approachOf(ws);
   const target = `${workstreamsDir(root, "closed")}/${basename(ws)}`;
@@ -272,5 +346,8 @@ export function run(args: string[]): number {
   mkdirSync(dirname(target), { recursive: true });
   renameSync(ws, target);
   console.log(`ok · ${basename(ws)} closed · approach page stamped DONE · moved from ${held}/ into closed/`);
+  // A CLOSE IS A MILESTONE (RULE.DEVEX.WORKSPACE.206): the message is written right now, and the Stop hook sends back a reply that lacks it.
+  console.log("Next: write the closing message now: a `# 🚀 <title>` heading (or ✈️), a line reading `&nbsp;`, `### 📦 What we delivered` with bullets, " +
+    "`### 🧠 What we learned` with bullets, `Thank you 👍`, and one plain line that the window can be retired (RULE.DEVEX.WORKSPACE.206).");
   return 0;
 }

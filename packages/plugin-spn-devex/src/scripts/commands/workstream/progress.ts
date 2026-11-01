@@ -1,4 +1,4 @@
-// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § `How` ends in Cycles, and the arcs are the state
+// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § After `How` comes a section of its own, Plan (RULE.DEVEX.WORKSPACE.487)
 // The chapter is the source of truth; a rule change is edited there first, then here, in the same change.
 //
 //   spn-devex workstream progress write <workstream>
@@ -10,7 +10,7 @@ import { type Action, UsageFault, readWords } from "../../../../../plugin-suppor
 import { writeProgress } from "../../lib/workstream.ts";
 import { workstreamNamed } from "./_shared.ts";
 
-export const describe = "the progress block in Cycles, written from the arcs' data";
+export const describe = "the progress block in Plan, written from the arcs' data";
 
 function write(args: string[]): number {
   const words = readWords(args);
@@ -21,5 +21,5 @@ function write(args: string[]): number {
 }
 
 export const actions: Record<string, Action> = {
-  write: { describe: "regenerate the progress block in the approach page's Cycles", usage: "<workstream>", run: write },
+  write: { describe: "regenerate the progress block in the approach page's Plan", usage: "<workstream>", run: write },
 };

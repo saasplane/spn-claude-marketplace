@@ -85,7 +85,7 @@ console.log("\n=== a card is raised, never typed");
   const text = readFileSync(page, "utf8");
   const forged = '<div class="sds-open">\n<h4 id="q42">Q42 &middot; typed by hand</h4>\n</div>\n';
   const [typed, why] = hook({ tool_name: "Edit", cwd: root, tool_input: { file_path: page, old_string: "<h4 id=\"N001-what\">The probe</h4>", new_string: `<h4 id="c1">The probe</h4>\n${forged}` } }, root);
-  ok("red: a card typed by hand is refused in the hook's words", typed === "deny" && why.includes("q42 has no record: raise it with `workstream question raise`"), why.slice(0, 240));
+  ok("red: a card typed by hand is refused in the hook's words", typed === "deny" && why.includes("Q42 has no record: raise it with `workstream question raise`"), why.slice(0, 240));
   ok("green: the raised card stands on the page", /<h4 id="q1">Q1 &middot; Which way the <code>probe<\/code> goes<\/h4>/.test(text));
 }
 

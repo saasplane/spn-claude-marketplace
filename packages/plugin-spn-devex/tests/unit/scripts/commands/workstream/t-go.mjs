@@ -1,8 +1,9 @@
 // `commands/workstream/go.ts` — the go commands: `write` refuses an unready scope and otherwise writes `go.json` and every
 // part's brief, `show` prints the parts, `check` reads the plan against the sheets, `start` marks a baseline or full run
 // running. Run as the agent types the commands, in a throwaway workspace.
-import { existsSync, readFileSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
+import { appendFileSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { basename, join } from "node:path";
+import { writeSwitch, telemetryFolder } from "../../../../../../plugin-support-lib/src/lib/debug-store.ts";
 import { cli, dataWorkspace, put } from "../../../../helpers/workstream-fixture.mjs";
 
 let total = 0, failed = 0;
@@ -263,6 +264,16 @@ console.log("\n=== report write: a part's report lands its row on a green run, i
   const runIn = (results) => put(rep.root, "spn-x/pkg/tests/.output/unit/runs/r1.json", JSON.stringify({ run: "r1", tier: "unit", ranAt: new Date(Date.now() + 3600e3).toISOString(), env: "local", results: results.map((id) => ({ id, tier: "unit", status: "SUCCESS", title: id })) }));
   const report = (id, ...extra) => { put(rep.ws, `notes/N001/orders/${id}.report.md`, ["---", 'row: "1"', "outcome: landed", ...extra, "---", "Body.", ""].join("\n")); return cli(rep.root, ["workstream", "report", "write", "031", `notes/N001/orders/${id}.report.md`]); };
 
+  // A HELPER THAT MET AN UNNAMED CONSTRUCT STOPPED (RULE.DEVEX.WORKSPACE.495)
+  const brief0 = readFileSync(join(rep.ws, "notes", "N001", "orders", `${part.id}.md`), "utf8");
+  ok("[MKT.SCRIPTS.428] a brief carries the stop line and the report's `unnamed:` field", brief0.includes("RULE.DEVEX.WORKSPACE.495") && brief0.includes("unnamed: []"), brief0.slice(-600));
+  const named = report(part.id, "run: r1", "unnamed: [\"IamRemoteRoute\"]", `commits: { spn-x: [${sha}] }`);
+  ok("[MKT.SCRIPTS.428] red: a report that lands and lists an unnamed construct is refused, naming it and the rule, and nothing is written",
+    named.code === 1 && named.out.includes("IamRemoteRoute") && named.out.includes("RULE.DEVEX.WORKSPACE.495") && rowState() !== "landed", named.out);
+  put(rep.ws, `notes/N001/orders/${part.id}.report.md`, ["---", 'row: "1"', "outcome: needs-you", 'unnamed: ["IamRemoteRoute"]', "---", "Met a name no entry holds.", ""].join("\n"));
+  const stopped = cli(rep.root, ["workstream", "report", "write", "031", `notes/N001/orders/${part.id}.report.md`]);
+  ok("[MKT.SCRIPTS.428] green: the same list on a needs-you report is accepted, and the row does not land", stopped.code === 0 && rowState() !== "landed", stopped.out);
+
   // two faults at once: the entry names no test, and the report records no commit
   writeFileSync(sheetFile, JSON.stringify(sheetOf([entry("E1", "spn-x:src/b.ts", { tiers: {} })]), null, 2));
   runIn([]);
@@ -274,6 +285,100 @@ console.log("\n=== report write: a part's report lands its row on a green run, i
   const once = report(part.id, "run: r1", `commits: { spn-x: [${sha}] }`);
   ok("[MKT.HOOKS.321] one report write records the commits and the run, and lands the row", rowState() === "landed" && json(arcFile).rows[0].commits["spn-x"].includes(sha) && json(arcFile).rows[0].proof === "run r1", once.out);
   ok("[MKT.HOOKS.321] and prints the row's split of change, proof, managing and refusals", /row 1 split.*change.*proof.*managing.*refusals/.test(once.out), once.out);
+}
+
+console.log("\n=== a panel's verdict on record gates a go's first plan and a release part (RULE.DEVEX.WORKSPACE.485)");
+{
+  const row = (id, work, over = {}) => ({ id, parent: "N001", kind: "change", repo: "spn-x", blockedBy: [], touches: [], state: "landed", title: `row ${id}`, work, ...over });
+  const gated = await dataWorkspace("go-panel", { rows: [row("1", "DOCS", { entries: ["E1"] }), row("2", "CODE", { entries: ["E2"] }), row("3", "RELEASE"), row("4", "PROOF", { state: "ready" })] });
+  cli(gated.root, ["workstream", "fact", "write", "N001", "--source", "spn-x/a.ts", "--fact", "a is 1", "--used-by", "1"]);
+  writeFileSync(join(gated.ws, "arcs", "N001", "sheet.json"), JSON.stringify(sheetOf([entry("E1", "spn-x:docs/a.md"), entry("E2", "spn-x:src/b.ts")]), null, 2));
+  const name = basename(gated.ws);
+  const plan = join(gated.ws, "arcs", "N001", "go.json");
+  const on = { SPN_TELEMETRY: "on" };
+  const run = (...args) => cli(gated.root, ["workstream", "go", ...args], on);
+  const folder = telemetryFolder(gated.root);
+  const panel = (over = {}) => { mkdirSync(folder, { recursive: true });
+    appendFileSync(join(folder, "hooks.jsonl"), `${JSON.stringify({ v: 1, mtype: "PANEL", id: Math.random().toString(16).slice(2), at: new Date().toISOString().slice(0, 19) + "Z", ms: 0, event: "SubagentStop",
+      session: "s", agent: "a", workstream: name, arc: "N001", part: null, skill: null, work: null, retryOf: null, lens: "LEAD", verdict: "PASS", ...over })}\n`); };
+  const note = "telemetry recording is off";
+
+  const off = cli(gated.root, ["workstream", "go", "write", "N001"]);
+  ok("[MKT.SCRIPTS.389] with recording off the first plan is written, and one note says the panel can't be seen", off.code === 0 && existsSync(plan) && off.out.split(note).length === 2, off.out);
+  rmSync(plan);
+  writeSwitch(gated.root, "telemetry", true);
+  const none = run("write", "N001");
+  ok("[MKT.SCRIPTS.389] go write of a first plan with no panel on record is refused, naming the panel, the arc and the rule, and writes nothing",
+    none.code === 1 && none.out.includes("spn-devex:spn-panel") && none.out.includes(`${name}/N001`) && none.out.includes("RULE.DEVEX.WORKSPACE.485") && !existsSync(plan), none.out);
+  panel({ verdict: "BLOCKED" });
+  panel({ arc: "N002" });
+  panel({ workstream: "999-other" });
+  ok("[MKT.SCRIPTS.389] a blocked verdict, another arc's and another workstream's do not open the gate", run("write", "N001").code === 1 && !existsSync(plan));
+  panel({ verdict: "PASS_WITH_ADVICE" });
+  const wrote = run("write", "N001");
+  ok("[MKT.SCRIPTS.389] a verdict that is not blocked, on the same workstream and arc, opens it", wrote.code === 0 && existsSync(plan), wrote.out);
+  writeFileSync(join(folder, "hooks.jsonl"), "");
+  ok("[MKT.SCRIPTS.389] deriving an existing plan again is never refused", run("write", "N001").code === 0);
+
+  const parts = json(plan).parts;
+  writeFileSync(plan, JSON.stringify({ ...json(plan), parts: parts.map((p) => ({ ...p, state: p.id === "release-spn-x-1" ? "ready" : "landed" })) }, null, 2));
+  const refusal = run("start", "N001", "release-spn-x-1");
+  ok("[MKT.SCRIPTS.390] go start of a release part with no panel on record is refused, naming the part, the arc and the rule",
+    refusal.code === 1 && refusal.out.includes("spn-devex:spn-panel") && refusal.out.includes("release-spn-x-1") && refusal.out.includes(`${name}/N001`) && refusal.out.includes("RULE.DEVEX.WORKSPACE.485")
+      && json(plan).parts.find((p) => p.id === "release-spn-x-1").state === "ready", refusal.out);
+  const stamp = (ms) => new Date(Date.now() + ms).toISOString().slice(0, 19) + "Z";
+  appendFileSync(join(gated.ws, "arcs", "N001", "log.jsonl"), `${JSON.stringify({ at: stamp(0), kind: "go", row: null, note: `${parts.find((p) => p.work !== "RELEASE").id} landed` })}\n`);
+  panel({ at: stamp(-3600_000) });
+  ok("[MKT.SCRIPTS.390] a panel's verdict from before the repository's last part landed does not open it", run("start", "N001", "release-spn-x-1").code === 1);
+  panel({ at: stamp(3600_000), part: "release-spn-x-2" });
+  ok("[MKT.SCRIPTS.390] nor does a verdict naming another part", run("start", "N001", "release-spn-x-1").code === 1);
+  panel({ at: stamp(3600_000), part: "release-spn-x-1" });
+  const started = run("start", "N001", "release-spn-x-1");
+  ok("[MKT.SCRIPTS.390] a verdict after it, naming the part, opens it", started.code === 0 && json(plan).parts.find((p) => p.id === "release-spn-x-1").state === "running", started.out);
+
+  writeFileSync(plan, JSON.stringify({ ...json(plan), parts: json(plan).parts.map((p) => ({ ...p, state: p.id === "release-spn-x-1" ? "ready" : p.state })) }, null, 2));
+  writeFileSync(join(folder, "hooks.jsonl"), "");
+  const blind = cli(gated.root, ["workstream", "go", "start", "N001", "release-spn-x-1"]);
+  ok("[MKT.SCRIPTS.390] with recording off the release starts, and one note says the panel can't be seen", blind.code === 0 && blind.out.split(note).length === 2, blind.out);
+}
+
+console.log("\n=== a decided suggestion against an arc is cited by its sheet, or the go is refused (RULE.DEVEX.WORKSPACE.488)");
+{
+  const row = (id, work, over = {}) => ({ id, parent: "N001", kind: "change", repo: "spn-x", blockedBy: [], touches: [], state: "ready", title: `row ${id}`, work, ...over });
+  const cited = await dataWorkspace("go-cites", { rows: [row("1", "DOCS", { entries: ["E1"] })] });
+  cli(cited.root, ["workstream", "fact", "write", "N001", "--source", "spn-x/a.ts", "--fact", "a is 1", "--used-by", "1"]);
+  const sheetPath = join(cited.ws, "arcs", "N001", "sheet.json");
+  const withCite = (decidedBy) => writeFileSync(sheetPath, JSON.stringify(sheetOf([entry("E1", "spn-x:docs/a.md", { decidedBy })]), null, 2));
+  const suggestions = (list) => writeFileSync(join(cited.ws, "suggestions.jsonl"), list.map((one) => JSON.stringify({ preview: null, words: null, ...one })).join("\n") + "\n");
+  const planFile = join(cited.ws, "arcs", "N001", "go.json");
+  suggestions([{ id: "s65", title: "move the footbar under Plan", state: "decided", arc: "N001" }, { id: "s66", title: "raised only", state: "raised", arc: "N001" }, { id: "s67", title: "another arc's", state: "decided", arc: "N002" }, { id: "s68", title: "no arc", state: "decided" }]);
+  withCite(["q1"]);
+  const refused = cli(cited.root, ["workstream", "go", "write", "N001"]);
+  ok("[MKT.SCRIPTS.405] go write refuses a decided suggestion of an arc in the go's scope that no entry cites, naming it with a capital and writing nothing",
+    refused.code === 1 && refused.out.includes("S65") && !refused.out.includes("S66") && !refused.out.includes("S67") && !refused.out.includes("S68") && refused.out.includes("Nothing was written") && !existsSync(planFile), refused.out);
+  const check = cli(cited.root, ["workstream", "sheet", "check", "N001"]);
+  ok("[MKT.SCRIPTS.405] sheet check names the same suggestion", check.code === 1 && check.out.includes("S65 is decided against N001"), check.out);
+  withCite(["q1", "S65"]);
+  const wrote = cli(cited.root, ["workstream", "go", "write", "N001"]);
+  ok("[MKT.SCRIPTS.405] cited as S65 in an entry's decidedBy, the go is written", wrote.code === 0 && existsSync(planFile), wrote.out);
+  rmSync(planFile);
+  withCite(["s65"]);
+  ok("[MKT.SCRIPTS.405] cited as s65, the lowercase form, it counts too", cli(cited.root, ["workstream", "go", "write", "N001"]).code === 0);
+}
+
+console.log("\n=== write --follow-up: one part the lead carries out, with one report");
+{
+  const fu = await dataWorkspace("go-follow", { rows });
+  const cliFu = (...args) => cli(fu.root, ["workstream", ...args]);
+  cliFu("fact", "write", "N001", "--source", "spn-x/a.ts", "--fact", "a is 1", "--used-by", "1");
+  writeFileSync(join(fu.root, "sheet-in.json"), JSON.stringify(sheetOf([entry("E1", "spn-x:docs/a.md"), entry("E2", "spn-x:src/b.ts")])));
+  cliFu("sheet", "write", "N001", "--file", join(fu.root, "sheet-in.json"), "--because", "the developer added E2");
+  const wrote = cliFu("go", "write", "N001", "--follow-up");
+  const plan = json(join(fu.ws, "arcs", "N001", "go.json"));
+  ok("[MKT.SCRIPTS.416] --follow-up plans the entries as one lead part, then the full run because code changed",
+    wrote.code === 0 && JSON.stringify(plan.parts.filter((p) => !p.id.startsWith("release") && !p.id.startsWith("proof")).map((p) => [p.id, p.entries.length, p.model])) === '[["code-spn-x-1",2,"lead"],["full-spn-x",0,"none"]]', wrote.out + JSON.stringify(plan.parts.map((p) => p.id)));
+  const briefText = readFileSync(join(fu.ws, "notes", "N001", "orders", "code-spn-x-1.md"), "utf8");
+  ok("[MKT.SCRIPTS.416] its brief says the lead window carries it out itself, and the next step says so", briefText.includes("the lead window carries this out itself") && !briefText.includes("Launch no agent") && wrote.out.includes("carry out code-spn-x-1 yourself"), wrote.out);
 }
 
 console.log(`\n${total - failed}/${total} passed`);

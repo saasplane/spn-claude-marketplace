@@ -102,7 +102,7 @@ console.log("\n=== the stamp — the arc's goal, title and repositories, never i
   ok("the repositories are the header's and the rows', sorted, with no empty cell",
     lib.arcRepos({ repos: ["spn-b"], rows: [{ repo: "spn-a" }, { repo: "—" }, { repo: "spn-b" }, {}] }).join() === "spn-a,spn-b");
   const page = approachPage("old");
-  ok("the page's stamp is read from the arc's Cycles row", lib.stampsOn(page).get("N001")?.stamp === "old");
+  ok("the page's stamp is read from the arc's Plan row", lib.stampsOn(page).get("N001")?.stamp === "old");
   ok("a restamp writes the new value on that row alone", lib.stampsOn(lib.restamped(page, "N001", stamp)).get("N001")?.stamp === stamp);
   ok("a page with no stamp yet gains one", lib.stampsOn(lib.restamped(approachPage(""), "N001", stamp)).get("N001")?.stamp === stamp);
   ok("an arc with no row has no restamp", lib.restamped(page, "N002", stamp) === null);
@@ -488,6 +488,27 @@ console.log("\n=== work replaces altitude and pass — MKT.SCRIPTS.326");
   const data = { rows: [{ id: "1", altitude: "DOCS" }, { id: "2", work: "CODE" }], parts: [{ id: "p", pass: "BASELINE" }] };
   ok("[MKT.SCRIPTS.326] renameDataToWork counts the records it renamed", schema.renameDataToWork(data) === 2 && data.rows[0].work === "DOCS" && data.parts[0].work === "TEST", JSON.stringify(data));
   ok("[MKT.SCRIPTS.326] a second read changes nothing", schema.renameDataToWork(data) === 0 && schema.renameToWork(data.rows[0]) === false);
+}
+
+console.log("\n=== versioned records — MKT.SCRIPTS.417");
+{
+  const dir = mkdtempSync(join(tmpdir(), "versioned-"));
+  const log = join(dir, "log.jsonl");
+  writeFileSync(log, `${JSON.stringify({ at: "2026-11-01T10:00+05:30", kind: "note", row: null, note: "old line, no v" })}\n${JSON.stringify({ v: 1, at: "2026-11-01T10:01+05:30", kind: "note", row: null, note: "new" })}\n`);
+  ok("[MKT.SCRIPTS.417] a line without v reads as version 1, beside one that carries it", lib.readJsonl(log).length === 2);
+  ok("[MKT.SCRIPTS.417] versioned puts v first and recordVersionFault accepts 1 and an absent v", Object.keys(schema.versioned({ id: "x" }))[0] === "v" && schema.recordVersionFault({ id: "x" }, "f") === null && schema.recordVersionFault({ v: 1 }, "f") === null);
+  writeFileSync(log, `${JSON.stringify({ v: 2, at: "2026-11-01T10:00+05:30", kind: "note", row: null, note: "from the future" })}\n`);
+  let said = "";
+  try { lib.readJsonl(log); } catch (thrown) { said = thrown.message; }
+  ok("[MKT.SCRIPTS.417] red: a line of a higher version is refused, naming the version and what to do", said.includes("version 2") && said.includes("migration"), said);
+  const other = join(dir, "orders.jsonl");
+  writeFileSync(other, `${JSON.stringify({ v: 9 })}\n`);
+  ok("[MKT.SCRIPTS.417] a file that is not one of the four is read as it was", lib.readJsonl(other).length === 1);
+  const { root, ws } = await dataWorkspace("versioned");
+  lib.logEvent(ws, "N001", "note", null, "written now");
+  const last = lib.readJsonl(join(ws, "arcs", "N001", "log.jsonl")).at(-1);
+  ok("[MKT.SCRIPTS.417] a new log line carries v 1", last?.v === 1 && last.note === "written now", JSON.stringify(last));
+  void root;
 }
 
 console.log(failed ? `\n  ${failed} of ${total} FAILED — workstream library` : `\n  all ${total} passed — workstream library`);

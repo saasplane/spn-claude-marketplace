@@ -10,7 +10,7 @@ import { readFileSync } from "node:fs";
 import { join, relative } from "node:path";
 import { type Migration } from "../migration.ts";
 import { isFile } from "../payload.ts";
-import { arcIdsOf, builtOf, isDataLayout, previewOf, previewWithStatus, readArc, workstreamsOf, writePreviewStatus } from "../workstream.ts";
+import { arcIdsOf, arcStatus, builtOf, isDataLayout, previewOf, previewWithStatus, readArc, workstreamsOf, writePreviewStatus } from "../workstream.ts";
 import { DEVEX_WORKSTREAMS } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 
 /** Each preview of an arc kept as data in an open or backlog workstream whose header does not show the arc's status as the commands write it. */
@@ -23,7 +23,8 @@ export function previewsWithoutStatus(root: string): string[] {
       const path = previewOf(ws, arc);
       if (!data || typeof data.status !== "string" || !isFile(path)) continue;
       const text = readFileSync(path, "utf8");
-      if (previewWithStatus(text, arc, data.status, builtOf(data).done, builtOf(data).total) !== text)
+      // The check reads the status the arc's commands write, worked out from its rows, never the stored word: a running arc's header reads RUNNING.
+      if (previewWithStatus(text, arc, arcStatus(data), builtOf(data).done, builtOf(data).total) !== text)
         out.push(`${name}/notes/${arc}/preview.html: its header does not show the arc's status → the arc's commands write it`);
     }
   }
@@ -31,7 +32,7 @@ export function previewsWithoutStatus(root: string): string[] {
 }
 
 /** Writes the arc's status into each preview the check names, and says which it wrote. */
-function writeAll(root: string): string[] {
+export function writeAll(root: string): string[] {
   return workstreamsOf(root).filter(isDataLayout).flatMap((ws) => {
     const name = relative(join(root, DEVEX_WORKSTREAMS), ws).split("\\").join("/");
     return writePreviewStatus(ws).map((preview) => `${name}/${preview}: wrote the arc's status`);

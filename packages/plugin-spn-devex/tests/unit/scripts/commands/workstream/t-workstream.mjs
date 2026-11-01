@@ -5,7 +5,7 @@ import { execFileSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { basename, join, resolve } from "node:path";
 import { PLUGIN } from "../../../../helpers/harness.mjs";
-import { CARD as BARE_CARD, arcData, cli, dataWorkspace as dataArc, put } from "../../../../helpers/workstream-fixture.mjs";
+import { CARD as BARE_CARD, arcData, cli, writeClosingBlock, dataWorkspace as dataArc, put } from "../../../../helpers/workstream-fixture.mjs";
 // A card's What cites what it read, or `question raise` refuses it (MKT.SCRIPTS.383).
 const CARD = { ...BARE_CARD, what: "The file is `a.ts:12`." };
 import { workspace } from "../../../../helpers/fixture.mjs";
@@ -173,17 +173,21 @@ console.log("\n=== fact write — one fact, pinned to its source's commit");
 console.log("\n=== suggestion add, state and edit — raised, moved on, reworded");
 {
   const raised = cli(root, ["workstream", "suggestion", "add", "031", "keep it as data"]);
-  ok("a suggestion is raised with the next number", raised.code === 0 && raised.out.split("\n")[0].trim() === "s1 · raised", raised.out);
+  ok("a suggestion is raised with the next number", raised.code === 0 && raised.out.split("\n")[0].trim() === "S1 · raised", raised.out);
   const shaped = cli(root, ["workstream", "suggestion", "state", "031", "s1", "shaped", "--words", "shaped on the preview"]);
-  ok("and moved on, with the words beside the move", shaped.code === 0 && shaped.out.trim() === "s1 · shaped", shaped.out);
+  ok("and moved on, with the words beside the move", shaped.code === 0 && shaped.out.trim() === "S1 · shaped", shaped.out);
+  const upperS = cli(root, ["workstream", "suggestion", "state", "031", "S1", "parked"]);
+  ok("[MKT.SCRIPTS.396] a suggestion is named in either case: S1 moves the suggestion s1 names, and it prints S1", upperS.code === 0 && upperS.out.trim() === "S1 · parked", upperS.out);
+  ok("[MKT.SCRIPTS.395] the stored suggestion id stays lowercase", lines(join(ws, "suggestions.jsonl")).some((one) => one.id === "s1" && one.state === "parked"));
+  cli(root, ["workstream", "suggestion", "state", "031", "s1", "shaped"]);
   const edited = cli(root, ["workstream", "suggestion", "edit", "031", "s1", "--title", "keep it as rows", "--preview", "notes/N001/preview.html#p1"]);
-  ok("its title and preview are changed", edited.code === 0 && edited.out.trim() === "s1 · shaped", edited.out);
+  ok("its title and preview are changed", edited.code === 0 && edited.out.trim() === "S1 · shaped", edited.out);
   const record = lines(join(ws, "suggestions.jsonl"))[0];
   ok("its record holds the new title, the preview, the state and the words", record.title === "keep it as rows" && record.state === "shaped" && record.preview === "notes/N001/preview.html#p1" && record.words === "shaped on the preview");
   const second = cli(root, ["workstream", "suggestion", "add", "031", "a second one", "--preview", "notes/N001/preview.html#p2"]);
-  ok("the next one takes the next number and may carry a preview", second.code === 0 && second.out.trim() === "s2 · raised" && lines(join(ws, "suggestions.jsonl"))[1].preview === "notes/N001/preview.html#p2", second.out);
+  ok("the next one takes the next number and may carry a preview", second.code === 0 && second.out.trim() === "S2 · raised" && lines(join(ws, "suggestions.jsonl"))[1].preview === "notes/N001/preview.html#p2", second.out);
   const bad = cli(root, ["workstream", "suggestion", "state", "031", "s9", "decided"]);
-  ok("red: a suggestion not recorded is refused", bad.code === 2 && bad.out.includes("finds no s9"), bad.out);
+  ok("red: a suggestion not recorded is refused", bad.code === 2 && bad.out.includes("finds no S9"), bad.out);
   const maybe = cli(root, ["workstream", "suggestion", "state", "031", "s1", "maybe"]);
   ok("red: a state outside the four is refused", maybe.code === 2 && maybe.out.includes("shaped · decided · parked · dropped"), maybe.out);
   const again = cli(root, ["workstream", "suggestion", "state", "031", "s1", "raised"]);
@@ -216,7 +220,7 @@ console.log("\n=== progress write, and arc stamp write");
   // The opening write puts the arc's row on the page; this arc is the one whose row was taken off by hand.
   put(ws, "approach.html", readFileSync(join(ws, "approach.html"), "utf8").replace(/\s*<tr id="N009"[^\n]*<\/tr>/, ""));
   const noRow = cli(root, ["workstream", "arc", "stamp", "write", "031/N009"]);
-  ok("red: an arc with no Cycles row is not stamped, and names `docs cycles write`", noRow.code === 1 && noRow.out.includes("docs cycles write"), noRow.out);
+  ok("red: an arc with no Plan row is not stamped, and names `docs cycles write`", noRow.code === 1 && noRow.out.includes("docs cycles write"), noRow.out);
   const stamped = cli(root, ["workstream", "arc", "stamp", "write", "031/N001"]);
   ok("the arc is stamped", stamped.code === 0 && /N001 · stamped [0-9a-f]{12}/.test(stamped.out), stamped.out);
 }
@@ -235,28 +239,32 @@ console.log("\n=== question — raise, show, answer, withdraw");
   const text = readFileSync(page, "utf8");
   put(ws, "approach.html", text.replace('<h4 id="N001-what">', '<li id="q7">an answer folded earlier</li>\n  <h4 id="N001-what">'));
   const raised = cli(root, ["workstream", "question", "raise", "031/N001", "--file", "card.json"]);
-  ok("[MKT.SCRIPTS.383] a What with a path:line is taken, and the number is past every anchor the page carries", raised.code === 0 && raised.out.startsWith("q8 · open · approach.html Open — Q8"), raised.out);
+  ok("[MKT.SCRIPTS.383] a What with a path:line is taken, and the number is past every anchor the page carries", raised.code === 0 && raised.out.startsWith("Q8 · open · approach.html Open — Q8"), raised.out);
   ok("the card stands in the approach page's Open, under its heading", /<h2>Open &mdash; Q8<\/h2>/.test(readFileSync(page, "utf8")) && readFileSync(page, "utf8").includes('<h4 id="q8">'));
   const notPreview = cli(root, ["workstream", "question", "show", "031/q8", "--in", "notes/N001/plan.md"]);
   ok("red: a card is shown only on an arc's preview", notPreview.code === 2 && notPreview.out.includes("notes/N<nnn>/preview.html"), notPreview.out);
   const shown = cli(root, ["workstream", "question", "show", "031/q8", "--in", "notes/N001/preview.html"]);
   const preview = readFileSync(join(ws, "notes", "N001", "preview.html"), "utf8");
   ok("shown on the preview, with the line back to the approach page", shown.code === 0 && preview.includes('<h4 id="q8">') && preview.includes('href="../../approach.html#s4"'), shown.out);
+  const upper = cli(root, ["workstream", "question", "show", "031/Q8", "--in", "notes/N001/preview.html"]);
+  ok("[MKT.SCRIPTS.396] a question is named in either case: 031/Q8 reads the card 031/q8 reads", upper.code === 0 && upper.out.startsWith("Q8 · shown in"), upper.out);
+  ok("[MKT.SCRIPTS.395] the log line a raise writes names the card with a capital, and the stored id stays lowercase",
+    lines(join(ws, "arcs", "N001", "log.jsonl")).some((line) => line.kind === "question" && line.note.startsWith("Q8 raised")) && lines(join(ws, "questions.jsonl")).some((one) => one.id === "q8"));
   const key = cli(root, ["workstream", "question", "answer", "031/q8", "--key", "Z", "--words", "Z"]);
   ok("red: an answer naming no option is refused with the options", key.code === 2 && key.out.includes("one of A · B"), key.out);
   cli(root, ["workstream", "suggestion", "add", "031", "x"]);
   put(root, "card2.json", JSON.stringify({ ...CARD, title: "a second question", what: "Today's check is f9." }));
   ok("[MKT.SCRIPTS.383] a What with a fact id is taken", cli(root, ["workstream", "question", "raise", "031/N001", "--file", "card2.json"]).code === 0);
   const withdrawn = cli(root, ["workstream", "question", "withdraw", "031/q9", "--words", "not needed"]);
-  ok("a card is withdrawn in your words, off its one page", withdrawn.code === 0 && withdrawn.out.startsWith("q9 · withdrawn · off 1 page · owed: its Log line"), withdrawn.out);
+  ok("a card is withdrawn in your words, off its one page", withdrawn.code === 0 && withdrawn.out.startsWith("Q9 · withdrawn · off 1 page · owed: its Log line"), withdrawn.out);
   const answered = cli(root, ["workstream", "question", "answer", "031/q8", "--key", "A", "--words", "Q8 - A"]);
-  ok("a card is answered, and the line says what is owed", answered.code === 0 && answered.out.startsWith("q8 · answered A · off 2 pages · owed: N001's What, its Log line"), answered.out);
+  ok("a card is answered, and the line says what is owed", answered.code === 0 && answered.out.startsWith("Q8 · answered A · off 2 pages · owed: N001's What, its Log line"), answered.out);
   ok("it leaves both pages, and the preview drops its Open", !readFileSync(page, "utf8").includes('<h4 id="q8">') && !readFileSync(join(ws, "notes", "N001", "preview.html"), "utf8").includes("sds-open"));
   const record = lines(join(ws, "questions.jsonl")).find((one) => one.id === "q8");
   ok("the record holds the answer in your words", record.state === "answered" && record.answer.key === "A" && record.answer.words === "Q8 - A");
   const again = cli(root, ["workstream", "question", "answer", "031/q8", "--key", "A", "--words", "again"]);
-  ok("red: a card already answered is not answered again", again.code === 2 && again.out.includes("q8 is answered"), again.out);
-  ok("the arc's log carries the answer", lines(log).some((line) => line.kind === "answered" && /q8 A · Q8 - A/.test(line.note)));
+  ok("red: a card already answered is not answered again", again.code === 2 && again.out.includes("Q8 is answered"), again.out);
+  ok("the arc's log carries the answer", lines(log).some((line) => line.kind === "answered" && /Q8 A · Q8 - A/.test(line.note)));
 }
 
 console.log("\n=== arc edit and row state — a status or a row state moved refreshes every view of it (RULE.DEVEX.WORKSPACE.273)");
@@ -269,9 +277,9 @@ console.log("\n=== arc edit and row state — a status or a row state moved refr
   const preview = join(views.ws, "notes", "N001", "preview.html");
   cli(views.root, ["workstream", "row", "state", "031/N001", "1", "landed"]);
   const landed = cli(views.root, ["workstream", "row", "state", "031/N001", "2", "landed"]);
-  ok("red before the change: the last step landed names each view it rewrote", landed.code === 0 && /N001 2\/2 · row 2 · state · N001 reads LANDED · approach: (?:[a-z]+, )*cycles · preview badge/.test(landed.out), landed.out);
+  ok("red before the change: the last step landed names each view it rewrote", landed.code === 0 && /N001 2\/2 · row 2 · state · N001 reads LANDED · approach: (?:[a-z ]+, )*plan · preview badge/.test(landed.out), landed.out);
   const text = readFileSync(page, "utf8");
-  ok("the Cycles table row shows LANDED, worked out from the steps, as its badge", /<tr id="N001"[^>]*>.*sds-status sds-landed">LANDED<\/span><\/td><\/tr>/s.test(text) && !text.includes("sds-decided"), text);
+  ok("the Plan table row shows LANDED, worked out from the steps, as its badge", /<tr id="N001"[^>]*>.*sds-status sds-landed">LANDED<\/span><\/td><\/tr>/s.test(text) && !text.includes("sds-decided"), text);
   ok("the status card moves with the arcs", /<div class="sds-eyebrow">(?:(?!<\/div>).)*sds-status sds-implementing">[^<]*IMPLEMENTING/s.test(text), text);
   ok("the preview's badge shows LANDED", readFileSync(preview, "utf8").includes('sds-status sds-landed" href="../../approach.html#N001">LANDED</a>'));
   ok("the data still stores the developer's DECIDED", json(join(views.ws, "arcs", "N001", "state.json")).status === "DECIDED");
@@ -282,7 +290,7 @@ console.log("\n=== arc edit and row state — a status or a row state moved refr
   ok("a note alone refreshes nothing", note.code === 0 && !/approach:|preview badge/.test(note.out), note.out);
 }
 
-console.log("\n=== arc edit --preview — a carried arc's Cycles row links where its notes now live (S137)");
+console.log("\n=== arc edit --preview — a carried arc's Plan row links where its notes now live (S137)");
 {
   const carried = await dataWorkspace("commands-preview");
   const elsewhere = "../032-next/notes/N002/preview.html";
@@ -298,7 +306,7 @@ console.log("\n=== arc edit --preview — a carried arc's Cycles row links where
   const data = json(join(carried.ws, "arcs", "N001", "state.json"));
   ok("the path is written onto the arc's data", moved.code === 0 && data.preview === elsewhere && /N001 · status, preview|N001 · preview, status|preview/.test(moved.out), `${moved.out}\n${JSON.stringify(data.preview)}`);
   const cyclesRow = (/<tr id="N001"[^>]*>.*?<\/tr>/s.exec(readFileSync(page, "utf8")) ?? [""])[0];
-  ok("the Cycles row links the preview and the sample where the notes now live, and not the empty folder",
+  ok("the Plan row links the preview and the sample where the notes now live, and not the empty folder",
     cyclesRow.includes(`href="${elsewhere}"`) && cyclesRow.includes('href="../032-next/notes/N002/samples/table.md"') && !cyclesRow.includes('href="notes/N001/preview.html"'), cyclesRow);
   ok("no state check finding asks for a preview at notes/N001/", !/has no preview/.test(moved.out), moved.out);
   const back = cli(carried.root, ["workstream", "arc", "edit", "031/N001", "--preview", "preview.html"]);
@@ -314,7 +322,7 @@ console.log("\n=== state show and state check");
   const asData = JSON.parse(cli(root, ["workstream", "state", "show", "031", "--json"]).out);
   ok("show --json: the same, as data", asData[0].workstream === "031-probe" && asData[0].arcs.length === 3);
   const check = cli(root, ["workstream", "state", "check", "031"]);
-  ok("check: N009 has no Cycles row, and the check says so", check.code === 1 && /N009 \[stamp\] N009 has no row in Cycles/.test(check.out), check.out);
+  ok("check: N009 has no Plan row, and the check says so", check.code === 1 && /N009 \[stamp\] N009 has no row in Plan/.test(check.out), check.out);
   const legacy = workspace("commands-legacy", { ".spndevex/workstreams/open/026-old/arcs/N001-old.md": "# N001 — old\n\nStatus: **RUNNING**\n" });
   const old = cli(legacy, ["workstream", "state", "show"]);
   ok("show: a workstream not moved yet says so", old.out.trim() === "026 · keeps its arcs as Markdown — not moved to the data layout yet", old.out);
@@ -424,7 +432,7 @@ console.log("\n=== arc edit --review-fixes — one arc takes every fix to a land
   ok("the developer's word to close stores its LANDED", closed.code === 0 && json(file).status === "LANDED", closed.out);
 }
 
-console.log("\n=== arc edit — an arc opens whole: its data, its preview, its What entry and its stamped Cycles row (RULE.DEVEX.WORKSPACE.254)");
+console.log("\n=== arc edit — an arc opens whole: its data, its preview, its What entry and its stamped Plan row (RULE.DEVEX.WORKSPACE.254)");
 {
   const whole = await dataWorkspace("commands-opening");
   const page = join(whole.ws, "approach.html");
@@ -447,11 +455,11 @@ console.log("\n=== arc edit — an arc opens whole: its data, its preview, its W
   ok("red: and nothing is written", !existsSync(arcOf("N003")) && !existsSync(noteOf("N003")) && readFileSync(page, "utf8") === domains);
 
   const opened = write("031/N003", "--title", "Evidence export", "--subject", "evidence-export", "--goal", goal, "--under", "d1");
-  ok("the line names the four pieces", opened.code === 0 && opened.out.startsWith("ok · N003 0/0 · N003 opened · PROPOSED · preview · What entry · Cycles row\n"), opened.out);
+  ok("the line names the four pieces", opened.code === 0 && opened.out.startsWith("ok · N003 0/0 · N003 opened · PROPOSED · preview · What entry · Plan row\n"), opened.out);
   ok("and each piece's place, as drawn", opened.out.includes("  arcs/N003/state.json       written, with its log line and its name file, evidence-export.md\n")
     && opened.out.includes("  notes/N003/preview.html    written from the template: the masthead, the PROPOSED badge, the back link to #N003-what, four sections to fill\n")
     && opened.out.includes("  approach.html · What       #N003-what written under d1, Platform · Data and trust: the title, the goal, and the link to notes/N003/preview.html\n")
-    && opened.out.includes("  approach.html · Cycles     row N003 written and stamped, its preview linked\n"), opened.out);
+    && opened.out.includes("  approach.html · Plan       row N003 written and stamped, its preview linked\n"), opened.out);
   ok("the data holds the goal, PROPOSED, and the fixed preview", json(join(arcOf("N003"), "state.json")).goal === goal && json(join(arcOf("N003"), "state.json")).status === "PROPOSED");
   const preview = readFileSync(noteOf("N003"), "utf8");
   ok("the preview is the template with its masthead filled: title, back link, title, arc, badge",
@@ -462,7 +470,7 @@ console.log("\n=== arc edit — an arc opens whole: its data, its preview, its W
   const after = readFileSync(page, "utf8");
   const entry = '  <h4 id="N003-what">Evidence export</h4>\n  <p>Each control\'s evidence leaves as one file an auditor can read, named for the control.</p>\n  <p>Read the preview &rarr; <a href="notes/N003/preview.html">Evidence export</a></p>\n  <h3 id="d2">';
   ok("the What entry stands at the end of d1's part, before d2, with the title, the goal and the link", after.includes(entry), after);
-  ok("the Cycles row is there, stamped", /<tr id="N003" data-arc="arcs\/N003\/state.json" data-arc-stamp="[0-9a-f]{12}">/.test(after) && after.includes('href="notes/N003/preview.html"'));
+  ok("the Plan row is there, stamped", /<tr id="N003" data-arc="arcs\/N003\/state.json" data-arc-stamp="[0-9a-f]{12}">/.test(after) && after.includes('href="notes/N003/preview.html"'));
   const check = cli(whole.root, ["workstream", "state", "check", "031"]);
   ok("the workstream passes its own check at once", check.code === 0 && /whole/.test(check.out), check.out);
 
@@ -478,7 +486,7 @@ console.log("\n=== arc edit — an arc opens whole: its data, its preview, its W
   const bytes = readFileSync(page, "utf8");
   rmSync(noteOf("N004"));
   const filled = write("031/N004");
-  ok("a bare write fills the preview it finds missing and keeps the entry and the row", filled.code === 0 && filled.out.startsWith("ok · N004 · preview written from the template · What entry kept · Cycles row kept"), filled.out);
+  ok("a bare write fills the preview it finds missing and keeps the entry and the row", filled.code === 0 && filled.out.startsWith("ok · N004 · preview written from the template · What entry kept · Plan row kept"), filled.out);
   ok("the fresh preview is the template again, and the page is as it was", readFileSync(noteOf("N004"), "utf8").includes("<title>031 · N004 - Second Export</title>") && readFileSync(page, "utf8") === bytes);
   const twice = write("031/N004");
   ok("and a second bare write finds it whole", twice.out.startsWith("ok · N004 · whole: nothing written") && readFileSync(page, "utf8") === bytes, twice.out);
@@ -486,14 +494,14 @@ console.log("\n=== arc edit — an arc opens whole: its data, its preview, its W
   writeFileSync(page, bytes.replace(/\s*<h4 id="N004-what">[^]*?<\/p>\n  <p>Read the preview[^\n]*N004[^\n]*<\/p>/, "").replace(/\s*<tr id="N004"[^\n]*<\/tr>/, ""));
   const both = write("031/N004");
   ok("a bare write writes the entry and the row it finds missing, and keeps the preview",
-    both.code === 0 && both.out.includes("What entry: #N004-what written at the end of What") && both.out.includes("Cycles row written and stamped") && both.out.includes("preview kept"), both.out);
+    both.code === 0 && both.out.includes("What entry: #N004-what written at the end of What") && both.out.includes("Plan row written and stamped") && both.out.includes("preview kept"), both.out);
   ok("and the workstream passes its check again", cli(whole.root, ["workstream", "state", "check", "031"]).code === 0);
 
   // An existing arc takes the anchor on a subject heading.
   writeFileSync(page, readFileSync(page, "utf8").replace('<h4 id="N001-what">The probe</h4>', '<h4 id="c1">The probe</h4>'));
   const anchored = write("031/N001", "--under", "c1");
   ok("--under on a subject heading anchors an arc that already exists", anchored.code === 0
-    && anchored.out.startsWith("ok · N001 · What entry: #N001-what anchored on c1 · preview kept · Cycles row kept"), anchored.out);
+    && anchored.out.startsWith("ok · N001 · What entry: #N001-what anchored on c1 · preview kept · Plan row kept"), anchored.out);
   ok("the anchor is a span on the heading, and the heading is as it was", readFileSync(page, "utf8").includes('<h4 id="c1"><span id="N001-what"></span>The probe</h4>'));
   ok("and the workstream passes its check", cli(whole.root, ["workstream", "state", "check", "031"]).code === 0);
   const noHeading = write("031/N001", "--under", "zz");
@@ -814,17 +822,17 @@ console.log("\n=== question answer — a card settled in one call; addresses rea
   put(one.root, ".spndevex/workstreams/open/031-probe/arcs/N001/sheet.json", JSON.stringify({ schemaVersion: 1, releaseChain: [], dependsOn: [], stack: null, entries: [entry("E7"), entry("E9")] }));
   put(one.root, "card.json", JSON.stringify(CARD));
   const raised = cli(one.root, ["workstream", "question", "raise", "031/N001", "--file", "card.json"]);
-  const id = /^(q\d+)/.exec(raised.out)?.[1] ?? "q1";
+  const id = /^([Qq]\d+)/.exec(raised.out)?.[1] ?? "Q1";
   const missing = cli(one.root, ["workstream", "question", "answer", `031/${id}`, "--key", "A", "--words", "go", "--entries", "E7,E8,E10"]);
   ok("[MKT.HOOKS.323] red: entries that do not exist are all named at once, and nothing is recorded", missing.code === 2 && missing.out.includes("E8") && missing.out.includes("E10") &&
-    lines(join(one.ws, "questions.jsonl")).find((row) => row.id === id).state === "open", missing.out);
+    lines(join(one.ws, "questions.jsonl")).find((row) => row.id === id.toLowerCase()).state === "open", missing.out);
   const done = cli(one.root, ["workstream", "question", "answer", `031/${id}`, "--key", "A", "--words", "take A, folded", "--entries", "E7,E9"]);
-  const record = lines(join(one.ws, "questions.jsonl")).find((row) => row.id === id);
+  const record = lines(join(one.ws, "questions.jsonl")).find((row) => row.id === id.toLowerCase());
   ok("[MKT.HOOKS.323] a card is settled in one call: the record", done.code === 0 && record.state === "answered" && record.answer.words === "take A, folded", done.out);
   ok("[MKT.HOOKS.323] the answer is folded into the arc's What", /<p>[^<]*take A, folded[^<]*<\/p>/.test(readFileSync(join(one.ws, "approach.html"), "utf8").split('id="N001-what"')[1] ?? ""));
   ok("[MKT.HOOKS.323] the log line is written", lines(join(one.ws, "arcs", "N001", "log.jsonl")).some((line) => line.kind === "answered" && line.note.includes("take A, folded")));
   const sheet = json(sheetFile);
-  ok("[MKT.HOOKS.323] the card is cited in both entries", sheet.entries.every((one2) => one2.decidedBy.some((text) => new RegExp(`\\b${id}\\b`).test(text))), JSON.stringify(sheet.entries));
+  ok("[MKT.HOOKS.323] the card is cited in both entries", sheet.entries.every((one2) => one2.decidedBy.some((text) => new RegExp(`\\b${id}\\b`, "i").test(text))), JSON.stringify(sheet.entries));
   ok("[MKT.HOOKS.323] nothing is owed by the line", !/owed:/.test(done.out), done.out);
   const bare = cli(one.root, ["workstream", "question", "show", id, "--in", "notes/N001/preview.html"]);
   ok("[MKT.HOOKS.325] the bare id and the address both read the card", /is answered/.test(bare.out) && /is answered/.test(cli(one.root, ["workstream", "question", "show", `031/${id}`, "--in", "notes/N001/preview.html"]).out), bare.out);
@@ -926,17 +934,24 @@ console.log("\n=== workstream close — retro.json and the suggestions it raises
     { at: "2026-10-01T10:00:00Z", kind: "header", row: null, note: "the panel overturned the first shape" },
     { at: "2026-10-01T10:01:00Z", kind: "note", row: null, note: "the panel blocked it" },
   ].map((one) => JSON.stringify(one)).join("\n") + "\n");
+  writeClosingBlock(retro.ws);
   const closing = cli(retro.root, ["workstream", "close", "031"]);
   const home = existsSync(join(retro.root, ".spndevex", "workstreams", "closed", "031-probe", "retro.json")) ? join(retro.root, ".spndevex", "workstreams", "closed", "031-probe") : retro.ws;
   const record = existsSync(join(home, "retro.json")) ? json(join(home, "retro.json")) : null;
   ok("[MKT.SCRIPTS.332] `close` with no arguments writes retro.json, a version 1 record of this workstream", !!record && record.v === 1 && record.workstream === "031-probe", closing.out);
   ok("[MKT.SCRIPTS.332] the record tallies the checks and commands from the telemetry", record?.checks["test-run"]?.runs === 3 && record.checks["test-run"].denies === 3 && record.checks["test-run"].retried === 2 && record.commands["workstream row"]?.refused === 2, JSON.stringify(record?.checks) + JSON.stringify(record?.commands));
+  ok("[MKT.SCRIPTS.418] the close prints the workstream's split and retro.json holds the same, with the managing-to-change ratio",
+    /split · change \d+ calls [\d.]+m · proof .* · waiting \d+ calls [\d.]+m · managing to change /.test(closing.out) && ["change", "proof", "managing", "refusals", "waiting"].every((kind) => typeof record?.split?.[kind]?.calls === "number") && "managingToChange" in record, closing.out);
+  const { splitLine } = await import("../../../../../src/scripts/commands/workstream/close.ts");
+  const none = { change: { calls: 0, minutes: 0 }, proof: { calls: 0, minutes: 0 }, managing: { calls: 0, minutes: 0 }, refusals: { calls: 0, minutes: 0 }, waiting: { calls: 0, minutes: 0 } };
+  ok("[MKT.SCRIPTS.418] the line states the ratio of managing minutes to change minutes, and says so when there is no change",
+    splitLine({ split: { ...none, change: { calls: 4, minutes: 10 }, managing: { calls: 9, minutes: 25 } }, managingToChange: 2.5 }).endsWith("managing to change 2.5 to 1") && splitLine({ split: none, managingToChange: null }).includes("not known"));
   ok("[MKT.SCRIPTS.332] a part's red first is not counted: the suite runs are in no command tally", !!record && !Object.keys(record.commands).some((key) => key.includes("test")), JSON.stringify(record?.commands));
   const raised = lines(join(home, "suggestions.jsonl")).map((one) => one.title);
   ok("[MKT.SCRIPTS.332] it raises the check, the command and the shape that stand out against the earlier workstream", raised.some((t) => t.includes("check:test-run")) && raised.some((t) => t.includes("command:workstream row")) && raised.some((t) => t.includes("ideate:panel-overturned")), JSON.stringify(raised));
   ok("[MKT.SCRIPTS.332] and none for the suite's red first", !raised.some((t) => /apps test|command:apps/.test(t)), JSON.stringify(raised));
   ok("each suggestion is raised, not decided", lines(join(home, "suggestions.jsonl")).filter((one) => /^Retrospective/.test(one.title)).every((one) => one.state === "raised"));
-  ok("the close prints each one it raised", /retrospective · raised s\d+ Retrospective · check:test-run/.test(closing.out), closing.out);
+  ok("[MKT.SCRIPTS.395] the close prints each one it raised, with a capital S", /retrospective · raised S\d+ Retrospective · check:test-run/.test(closing.out), closing.out);
 }
 
 console.log("\n=== workstream close — the retrospective counts failed tests, the release gate, brief:, part-size: and the thresholds (MKT.SCRIPTS.332)");
@@ -957,6 +972,7 @@ console.log("\n=== workstream close — the retrospective counts failed tests, t
   const testRow = (status, retryOf = null, extra = {}) => row({ mtype: "TEST", work: "TEST", status, retryOf, call: { program: "spnutils", group: "apps", action: "test" }, test: { node: "page-ts", tier: "UNIT", tests: { passed: 1, failed: status === "FAILED" ? 1 : 0, skipped: 0 } }, ...extra });
   const finish = (w, rows) => {
     writeFileSync(join(w.root, ".spndevex", ".debug", "telemetry", "hooks.jsonl"), rows.join("\n") + "\n");
+    writeClosingBlock(w.ws);
     const closing = cli(w.root, ["workstream", "close", "031"]);
     const home = existsSync(join(w.root, ".spndevex", "workstreams", "closed", "031-probe", "retro.json")) ? join(w.root, ".spndevex", "workstreams", "closed", "031-probe") : w.ws;
     return { record: json(join(home, "retro.json")), raised: existsSync(join(home, "suggestions.jsonl")) ? lines(join(home, "suggestions.jsonl")).map((one) => one.title) : [], out: closing.out };
@@ -1022,6 +1038,59 @@ console.log("\n=== workstream close — the retrospective counts failed tests, t
     ok("[MKT.SCRIPTS.332] a go with no panel row on its preview is a finding too", has(got.raised, "N001 go has no panel row"), JSON.stringify(got.raised));
     ok("[MKT.SCRIPTS.332] part-size: names the repository and work whose model time is far from the plan's", has(got.raised, "part-size:spn-x|DOCS"), JSON.stringify(got.raised) + got.out);
   }
+  // a PANEL row gates what it names: its part, and its arc, both when it names both (RULE.DEVEX.WORKSPACE.485)
+  {
+    const gatedGo = async (name) => {
+      const w = await dataArc(name, { rows: [{ id: "1", parent: "N001", title: "r", kind: "change", repo: "spn-x", work: "DOCS", blockedBy: [], touches: [], state: "ready", entries: ["E1"] }] });
+      mkdirSync(join(w.root, ".spndevex", ".debug", "telemetry"), { recursive: true });
+      const entry = { id: "E1", op: "edit", file: "spn-x:docs/a.md", what: "x", decidedBy: ["q1"], facts: [], then: [], rules: [], callers: [], tiers: {}, docs: [], book: [] };
+      writeFileSync(join(w.ws, "arcs", "N001", "sheet.json"), JSON.stringify({ schemaVersion: 1, releaseChain: ["spn-x"], dependsOn: [], stack: null, entries: [entry] }));
+      cli(w.root, ["workstream", "go", "write", "N001", "--scope", "N001"]);
+      return { w, release: json(join(w.ws, "arcs", "N001", "go.json")).parts.find((one) => one.work === "RELEASE") };
+    };
+    const panelRow = (extra) => row({ mtype: "PANEL", event: "SubagentStop", lens: "LEAD", verdict: "PASS", ...extra });
+    const byArc = await gatedGo("retro-panel-arc");
+    const gotArc = finish(byArc.w, [panelRow({ part: null })]);
+    ok("[MKT.SCRIPTS.391] a panel row naming the arc gates the arc's go and its release part", !has(gotArc.raised, "go has no panel row") && !has(gotArc.raised, "has no panel row"), JSON.stringify(gotArc.raised));
+    const byPart = await gatedGo("retro-panel-part");
+    const gotPart = finish(byPart.w, [panelRow({ arc: null, part: byPart.release.id })]);
+    ok("[MKT.SCRIPTS.391] a panel row naming only the release part gates that part, and not the arc's go",
+      !has(gotPart.raised, `release part ${byPart.release.id} has no panel row`) && has(gotPart.raised, "N001 go has no panel row"), JSON.stringify(gotPart.raised));
+    const both = await gatedGo("retro-panel-both");
+    const gotBoth = finish(both.w, [panelRow({ part: both.release.id })]);
+    ok("[MKT.SCRIPTS.391] a panel row naming the part and the arc gates both: the arc is not skipped for having a part", !has(gotBoth.raised, "go has no panel row") && !has(gotBoth.raised, "has no panel row"), JSON.stringify(gotBoth.raised));
+  }
+}
+
+console.log("\n=== a suggestion belongs to an arc (RULE.DEVEX.WORKSPACE.488, .489)");
+{
+  const rowsOf = [{ id: "1", parent: "N001", title: "write the book", kind: "change", repo: "spn-x", work: "DOCS", blockedBy: [], touches: [], state: "ready", entries: ["E1"] }];
+  const sg = await dataWorkspace("sugg-arc", { rows: rowsOf });
+  const run = (...args) => cli(sg.root, ["workstream", ...args]);
+  const records = () => lines(join(sg.ws, "suggestions.jsonl"));
+  const into = run("suggestion", "add", "031/N001", "keep the footbar under Plan");
+  const loose = run("suggestion", "add", "031", "a thought for later");
+  ok("[MKT.SCRIPTS.403] suggestion add takes <NNN>/N<nnn> and writes the arc into the record, S<n> printed with a capital",
+    into.code === 0 && into.out.trim().split("\n")[0] === "S1 · raised" && records()[0].arc === "N001" && records()[0].id === "s1", into.out);
+  ok("[MKT.SCRIPTS.403] raised against the workstream, the record's arc is null", loose.code === 0 && records()[1].arc === null, loose.out);
+  const noArc = run("suggestion", "add", "031/N009", "against an arc that is not there");
+  ok("[MKT.SCRIPTS.403] an arc the workstream does not hold is refused", noArc.code !== 0 && records().length === 2, noArc.out);
+  const moved = run("suggestion", "state", "031", "S2", "shaped", "--arc", "N001");
+  ok("[MKT.SCRIPTS.403] suggestion state shaped --arc N<nnn> sets the arc of a suggestion that had none", moved.code === 0 && records()[1].arc === "N001" && records()[1].state === "shaped", moved.out);
+  const parkedArc = run("suggestion", "state", "031", "S2", "parked", "--arc", "N001");
+  ok("[MKT.SCRIPTS.403] --arc goes only with shaped or decided", parkedArc.code === 2 && /only with `shaped` or `decided`/.test(parkedArc.out), parkedArc.out);
+  writeFileSync(join(sg.ws, "suggestions.jsonl"), `${JSON.stringify({ id: "s1", title: "an older record", state: "raised", preview: null, words: null })}\n`);
+  ok("[MKT.SCRIPTS.403] a record with no arc field is read as null, never as an error", run("suggestion", "state", "031", "S1", "parked").code === 0 && records()[0].state === "parked" && !("arc" in records()[0]));
+
+  // the last row does not land while a suggestion against the arc is open
+  writeFileSync(join(sg.ws, "suggestions.jsonl"), `${JSON.stringify({ id: "s1", title: "x".repeat(80), state: "raised", preview: null, words: null, arc: "N001" })}\n${JSON.stringify({ id: "s2", title: "another", state: "shaped", preview: null, words: null, arc: "N001" })}\n${JSON.stringify({ id: "s3", title: "someone else's", state: "raised", preview: null, words: null, arc: "N002" })}\n`);
+  const refused = run("row", "state", "031/N001", "1", "landed");
+  ok("[MKT.SCRIPTS.404] the write that lands an arc's last row refuses while a suggestion against it is raised or shaped, naming each and saying to decide, park or drop it",
+    refused.code === 1 && refused.out.includes("S1") && refused.out.includes("S2") && !refused.out.includes("S3") && /decide, park or drop/i.test(refused.out) && refused.out.includes("Nothing was changed")
+      && json(join(sg.ws, "arcs", "N001", "state.json")).rows[0].state === "ready", refused.out);
+  writeFileSync(join(sg.ws, "suggestions.jsonl"), `${JSON.stringify({ id: "s1", title: "done", state: "decided", preview: null, words: null, arc: "N001" })}\n${JSON.stringify({ id: "s2", title: "later", state: "parked", preview: null, words: null, arc: "N001" })}\n${JSON.stringify({ id: "s3", title: "someone else's", state: "raised", preview: null, words: null, arc: "N002" })}\n`);
+  const landed = run("row", "state", "031/N001", "1", "landed");
+  ok("[MKT.SCRIPTS.404] decided, parked or dropped suggestions, and another arc's, let it land", landed.code === 0 && json(join(sg.ws, "arcs", "N001", "state.json")).rows[0].state === "landed", landed.out);
 }
 
 console.log(failed ? `\n  ${failed} of ${total} FAILED — workstream commands` : `\n  all ${total} passed — workstream commands`);

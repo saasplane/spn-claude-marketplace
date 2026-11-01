@@ -31,7 +31,7 @@ import { basename, resolve } from "node:path";
 import { emit, eventWorkspace, readPayload, type Payload, type Verdict } from "../lib/payload.ts";
 import { arcIdsOf, logEvent, readArc, readSheet, writeWhole } from "../lib/workstream.ts";
 import { changedEntries, goFileOf, readGo, type ScopeSheet } from "../lib/go-plan.ts";
-import { alreadyTold, commandWrites, fromWorkspace, recordWrites } from "../lib/window.ts";
+import { alreadyTold, commandWrites, fromWorkspace, recordGoes, recordWrites } from "../lib/window.ts";
 import { checkSaasplaneEnv } from "../checks/saasplane-env.ts";
 import { checkDoc, bashWrites } from "../checks/doc-check.ts";
 import { gateDocumentsFirst, gateClose, moves } from "../checks/split-plan.ts";
@@ -55,6 +55,7 @@ import { checkReadSize } from "../checks/read-size.ts";
 import { checkArcStatus } from "../checks/arc-status.ts";
 import { checkProofRun } from "../checks/proof-run.ts";
 import { checkPluginSync } from "../checks/plugin-sync.ts";
+import { applies as whereItRunsApplies, checkRepoSync, checkWorkspaceCwd } from "../checks/where-it-runs.ts";
 import { checkBrowserProfile } from "../checks/browser-profile.ts";
 import { applies as noHistoryApplies, checkNoHistory } from "../checks/no-history.ts";
 import { checkFigureSpacing } from "../checks/figure-spacing.ts";
@@ -167,6 +168,8 @@ const CHECKS: Check[] = [
     applies: (path, command) => longRunApplies(path, command) },
   // Three refusals whose whole cost is a regular expression or two over the command, and no file read.
   { name: { group: "plugin-sync", action: "plugin-sync" }, run: checkPluginSync, needs: ["command"], applies: () => true },
+  { name: { group: "where-it-runs", action: "workspace-cwd" }, run: checkWorkspaceCwd, needs: ["command"], applies: (path, command) => whereItRunsApplies(path, command) },
+  { name: { group: "where-it-runs", action: "repo-sync" }, run: checkRepoSync, needs: ["command"], applies: (_path, command) => /\bagent-sync\b/.test(command) },
   { name: { group: "browser-profile", action: "browser-profile" }, run: checkBrowserProfile, needs: ["command"], applies: () => true },
   { name: { group: "proof-run", action: "proof-run" }, run: checkProofRun, needs: ["command"], applies: () => true },
   // The round-1 refusals on a command, each by a substring or one regular expression over it before any read, and each
@@ -436,7 +439,7 @@ export function checkOrderEntries(payload: Payload): Verdict {
 
 /**
  * THE LAUNCH CHECK: a helper starts only from a part of the go's plan. An order whose front matter names no `go:`, in a
- * workstream where an arc keeps a `go.json`, is refused; so is a part the plan does not hold, a held part, and a part whose
+ * workstream where a go covers the order's arc, is refused, and the refusal names that arc (an arc no go covers yet is let through); so is a part the plan does not hold, a held part, and a part whose
  * entries changed since the plan was written. A ready part that passes is marked running in the plan. A workstream with no
  * plan, and an order that cannot be read, are not judged.
  */
@@ -446,18 +449,20 @@ export function checkLaunch(payload: Payload): Verdict {
   for (const named of (input.prompt ?? "").matchAll(/[^\s'"`()]*notes\/N\d+[a-z]?\/orders\/[^\s'"`()]+\.md/g)) {
     try {
       const path = resolve(cwd, named[0]);
-      const placed = /^(.*)\/notes\/N\d+[a-z]?\/orders\/([^/]+)$/.exec(path.split("\\").join("/"));
+      const placed = /^(.*)\/notes\/(N\d+[a-z]?)\/orders\/([^/]+)$/.exec(path.split("\\").join("/"));
       if (!placed || path.endsWith(".report.md")) continue;
-      const [, ws, file] = placed;
+      const [, ws, orderArc, file] = placed;
       const plans = arcIdsOf(ws).map((arc) => readGo(ws, arc)).filter((plan) => plan !== null);
-      if (!plans.length) continue;
+      // AN ORDER OF AN ARC NO GO COVERS YET (A SHEET OR A PREVIEW ORDER) IS NOT HELD TO A PART, though another arc keeps a go.json.
+      const covering = plans.filter((plan) => plan.lead === orderArc || plan.scope.includes(orderArc));
+      if (!covering.length) continue;
       const number = /^\d+/.exec(basename(ws))?.[0] ?? basename(ws);
       const front = /^---\n([\s\S]*?)\n---/.exec(readFileSync(path, "utf8"))?.[1] ?? "";
       const lead = /^go:\s*"?([^"\s]+)"?/m.exec(front)?.[1];
       const id = /^part:\s*"?([^"\s]+)"?/m.exec(front)?.[1];
-      const shown = `\`workstream go show ${number}/${plans[0].lead}\``;
+      const shown = `\`workstream go show ${number}/${covering[0].lead}\``;
       if (!lead || !id)
-        return { deny: `Refused: orders/${file} names no go, and ${number}'s go has a plan.\n`
+        return { deny: `Refused: orders/${file} belongs to ${orderArc}, and ${number}'s go for ${orderArc} (lead ${covering[0].lead}) has a plan.\n`
           + `A helper is briefed from a part: run ${shown} and launch the part's own brief.` };
       const plan = plans.find((one) => one.lead === lead);
       const part = plan?.parts.find((one) => one.id === id);
@@ -581,7 +586,10 @@ export function dispatch(payload: Payload): Verdict {
   try {
     const cwd = payload.cwd ?? process.cwd();
     const root = eventWorkspace(cwd);
-    if (root && payload.session_id) recordWrites(root, payload.session_id, cwd, bindingPaths(payload));
+    if (root && payload.session_id) {
+      recordWrites(root, payload.session_id, cwd, bindingPaths(payload));
+      if (supplied.command) recordGoes(root, payload.session_id, cwd, supplied.command);
+    }
   } catch { /* a binding that cannot be written is a window that hears less */ }
 
   const path = supplied.file_path ?? "";

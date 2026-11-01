@@ -158,7 +158,7 @@ A sign of complexity is one of these, each read from the change itself: the choi
 >
 > **Server developer and Partner:** No objection.
 
-**Shorten a view's words for the card, and keep its name and its meaning — MUST.** A fresh view still writes what it has to say in full. Keep those whole words in the arc's notes, in `notes/N<nnn>/views/`, and do not link them from the card. The voice is the same on a card as in a reply: a colleague speaking, in short full sentences, and never a slogan. Two views that disagree still stand as two lines. A view's whole words on a card say the Why and the What a second time, and the developer must read the problem again to find the one new reason.
+**Shorten a view's words for the card, and keep its name and its meaning — MUST.** A fresh view still writes what it has to say in full. Keep those whole words in the arc's notes, in `notes/N<nnn>/work/`, and do not link them from the card. The voice is the same on a card as in a reply: a colleague speaking, in short full sentences, and never a slogan. Two views that disagree still stand as two lines. A view's whole words on a card say the Why and the What a second time, and the developer must read the problem again to find the one new reason.
 
 **A card or a suggestion put in chat follows the same order and the same shortness.** In an ordinary reply that is not a card, a view may still say what it objects to at the length the point needs. `refs/devex/workspace/docs/decision-cards.md` § *The card* states the card's parts and their order.
 

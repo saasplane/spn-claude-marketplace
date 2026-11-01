@@ -77,6 +77,14 @@ Two repositories come out of this, and the estate one comes first. It carries a 
 - **A partner holds no marketplace checkout, and nothing has to be said about it.** The mode follows from where they are standing, so the same command wires the published source. Their plugins resolve from the published marketplace, and the book reaches them as a published rendering rather than a path they can open.
 - **Act 1 opens with one question: the workspace's name.** Ask it alone, before init runs, because init refuses a new workspace without one. A name is lower-case letters, digits and hyphens, starting with a letter, at most 40 characters, such as `saasplane` or `acme-platform`, and it is given once: init writes it to the `workspace` node of `.spndevex/state.json`, and a later run keeps it. Then run `spnutils workspace init <name>` with their answer.
 - **Act 1 also writes the saasplane env, `~/.spnenv`.** The command writes the file's **shape** — its markers, its managed defaults and an empty keep region. **It derives no key**, so a fresh partner file has nothing to fill in yet. A key arrives later, when you build what needs it, and you ask them for the value. Their own keys go in `spnutils:dev`, which no run reads or writes. Never print a value back — `refs/devex/workspace/workspace.md` § The saasplane env carries the rule.
+- **Unfold the partner's idea in the order their own words lead** (`RULE.DEVEX.FUNCTION.098` · MUST · skill:spn-devex/ideate). Take this step when the idea is first taken in, before act 10 hands it to `ideate`; each step waits for the one before it:
+  1. **The idea, in their words**, quoted, and what it proves for them.
+  2. **The trade before the constructs.** The actors in the trade's own words, then the modules and the states by name, then the day-zero flow, and only then the cut of how deep the first version goes. Fields come when they ask for them.
+  3. **The existing twin before a new construct.** Each part names the construct the book or the platform already holds for it, and a new construct is proposed only where none fits.
+  4. **Several modules are planned with a split test and one table.** The test says why the modules split where they do, and one module table holds the set, which the developer decides and names.
+  5. **Open asks stay few.** A *settled so far* table holds what is agreed, and no more than three asks are open at once.
+  6. **Each new term is defined once,** where it first appears, and used the same way after.
+  7. **The preview follows their spine,** the order in which they told the idea, and not the order of the book's chapters.
 - **Act 10 is a conversation, not a generation.** Hand it to `ideate`, which agrees one block at a time. A concept you drafted whole is a concept nobody agreed to.
 - **Acts 11 to 13 are the acceptance, and they are what day zero is for.** A partner who has never seen this estate finishes the walk, runs the local stack, and sees the default SaaS Plane platform answer. Anything short of that is a form somebody filled in.
 - **Acts 5, 12 and 13 go through the CLI's own doors.** `infra organization up` and `infra platform up <spc>` are the commands, and `tofu apply` is never hand-run, locally or anywhere else.
@@ -109,7 +117,7 @@ It opens in `open/` because nothing blocks it — the developer is in front of y
 
 **An arc is data, and only the arc commands write it.** `spn-devex workstream arc edit` writes `arcs/N001/`, and the hook that runs before every edit refuses a hand edit there. So you never type a file into `arcs/`. The arc a command opens is the arc the page, the hooks and `spn-devex workstream state check` all read. `refs/devex/workspace/workstream.md` carries the commands and what each field holds.
 
-**The page argues nothing, and it is still needed.** An approach page usually argues. The routing test in `refs/devex/workspace/docs/doc-sets.md` is one question — *were options weighed and one chosen?* — and on day zero nothing is weighed. The developer is telling you their organization's code, not choosing between two, so the coordinates are a record, and a record belongs in the arc. But an arc stands on its workstream's page: its row in Cycles is its address, `approach.html#N001`, and the state check reads the arc against that row. So the page holds a masthead, one paragraph of Why, one line of What, and the Cycles table.
+**The page argues nothing, and it is still needed.** An approach page usually argues. The routing test in `refs/devex/workspace/docs/doc-sets.md` is one question — *were options weighed and one chosen?* — and on day zero nothing is weighed. The developer is telling you their organization's code, not choosing between two, so the coordinates are a record, and a record belongs in the arc. But an arc stands on its workstream's page: its row in Plan is its address, `approach.html#N001`, and the state check reads the arc against that row. So the page holds a masthead, one paragraph of Why, one line of What, and the Cycles table.
 
 **A partner has the page to copy.** The template ships with this plugin, at `refs/devex/workspace/docs/templates/workstream/approach-template.html`, so a partner who never checks out the book copies the same page as a builder. **Where the developer asks for the argument written up, that is an ordinary page in an ordinary sitting** — offer it after act 4, and never let the walk wait on it.
 
@@ -117,7 +125,7 @@ It opens in `open/` because nothing blocks it — the developer is in front of y
 
 Write these at act 2, in this order, before the first question is asked. `{NNN}` is the number `workspace status` gave.
 
-1. **The page.** Copy the template to `approach.html` in the folder. Its masthead reads `{NNN} - New platform`, and its subtitle says it holds the estate's coordinates. Its Why is one paragraph: five answers name every account address, package scope, repository name and code prefix in this estate, permanently, and this workstream holds them until `CONCEPT.md` exists to carry them. Its What is one line: the coordinates are a record, not a choice, with `Read the preview →` linking `notes/N001/preview.html`. Keep How's Cycles table, and take out every slot the walk does not fill, the sample card under Open and the row under Deferred among them.
+1. **The page.** Copy the template to `approach.html` in the folder. Its masthead reads `{NNN} - New platform`, and its subtitle says it holds the estate's coordinates. Its Why is one paragraph: five answers name every account address, package scope, repository name and code prefix in this estate, permanently, and this workstream holds them until `CONCEPT.md` exists to carry them. Its What is one line: the coordinates are a record, not a choice, with `Read the preview →` linking `notes/N001/preview.html`. Keep the Plan section's arcs table, and take out every slot the walk does not fill, the sample card under Open and the row under Deferred among them.
 2. **The arc**, opened as `PROPOSED`:
 
    ```sh
@@ -145,7 +153,7 @@ Write these at act 2, in this order, before the first question is asked. `{NNN}`
    | 19 | The stack running, and the platform answering | they open the surface and it responds | act 13 |
 
 5. **The preview's first draft.** This arc has a preview because the developer decides the go from the read-back. Copy `refs/devex/workspace/docs/templates/workstream/approach-preview-template.html` to `notes/N001/preview.html`. Its Today says nothing exists yet. Its Proposed holds the coordinates table (the question, `— not yet asked`, and what the answer decides) and the table of what derives from them, each value `— not yet derived`. Its Where it lands names the estate and platform repositories as not known yet. Take out every block and slot it does not fill, its Open among them.
-6. **The arc's row in Cycles, then its stamp:**
+6. **The arc's row in Plan, then its stamp:**
 
    ```sh
    spn-devex docs cycles write {NNN}

@@ -1,16 +1,16 @@
 // A workstream kept as data, on disk in a throwaway workspace: an approach page in the template's
-// shape (What holding the arc's entry, N001-what, which links the preview, Cycles with the arc's row and the progress block, Open as the open
+// shape (What holding the arc's entry, N001-what, which links the preview, Plan with the arc's row and the progress block, Open as the open
 // block), one arc's `state.json` with its name file, its preview and its plan. Each case starts whole
 // and breaks one thing.
 import { execFileSync } from "node:child_process";
-import { mkdirSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { workspace } from "./fixture.mjs";
 import { PLUGIN } from "./harness.mjs";
 
 export const CLI = resolve(PLUGIN, "src", "scripts", "cli.ts");
 
-/** The approach page, its Cycles row carrying `stamp`. */
+/** The approach page, its Plan row carrying `stamp`. */
 export function approachPage(stamp = "") {
   return [
     `<meta charset="utf-8">`,
@@ -24,7 +24,9 @@ export function approachPage(stamp = "") {
     `</section>`,
     `<section id="s3" data-block="sequence">`,
     `  <div class="sds-section-head"><h2>How</h2></div>`,
-    `  <h3 id="h9">Cycles</h3>`,
+    `</section>`,
+    `<section id="arcs" data-block="sequence">`,
+    `  <div class="sds-section-head"><h2>Plan</h2></div>`,
     `  <div class="sds-scroll"><table>`,
     `    <thead><tr><th>Arc</th><th class="sds-status-col">Status</th></tr></thead>`,
     `    <tbody>`,
@@ -62,9 +64,10 @@ export function arcData(rows) {
 /** A card a `question raise` takes, whole. */
 export const CARD = {
   title: "Which way the `probe` goes", why: "It blocks row 2.", what: "The file is `a.ts:12`.", viewsLead: "One view.",
-  views: [{ lens: "Architect", text: "Keep it in one place." }],
-  options: [{ key: "A", does: "one way", costs: "little" }, { key: "B", does: "the other", costs: "more" }],
-  recommended: { key: "A", reason: "It costs less." },
+  views: [{ lens: "Architect", text: "Keep it in one place.", made: "SPOKEN" }],
+  options: [{ key: "A", does: "one way", costs: "little", leaveIt: true }, { key: "B", does: "the other", costs: "more" }],
+  recommended: { key: "A", reason: "It costs less.", scope: "CORE" },
+  nearest: "spn-x", signs: [], others: "A third way, set aside: it costs more than B.",
 };
 
 /**
@@ -106,4 +109,26 @@ export function cli(root, args, env = {}) {
 export function put(root, path, body) {
   mkdirSync(join(root, path, ".."), { recursive: true });
   writeFileSync(join(root, path), body, "utf8");
+}
+
+/** The closing block a closed approach page carries, in the shape closed pages hold (RULE.DEVEX.WORKSPACE.206). */
+export const CLOSING_BLOCK = `<div class="sds-note">
+  <p>&#x1F680; <strong>031 Probe has shipped.</strong> One arc, two steps.</p>
+  <p>&nbsp;</p>
+  <p><strong>&#x1F4E6; What was delivered</strong></p>
+  <ul><li>the probe</li></ul>
+  <p>&nbsp;</p>
+  <p><strong>&#x1F9E0; What was learned</strong></p>
+  <ul><li>it works</li></ul>
+  <p>&nbsp;</p>
+  <p><strong>Thank you &#x1F44D;</strong></p>
+  <p>Done.</p>
+</div>
+`;
+
+/** Writes the closing block into a workstream's approach page, under the masthead (or at the end where the page has none). */
+export function writeClosingBlock(ws) {
+  const page = join(ws, "approach.html");
+  const text = readFileSync(page, "utf8");
+  writeFileSync(page, text.includes("</header>") ? text.replace("</header>", `</header>\n${CLOSING_BLOCK}`) : `${text}\n${CLOSING_BLOCK}`);
 }

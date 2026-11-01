@@ -7,7 +7,7 @@
 // The plugins' one release command. The four plugins release in lockstep at one version, and the
 // marketplace's release tag is that version.
 //
-//     npm run release:plugins -- prepare <version>    write the version, build, test, commit
+//     npm run release:plugins -- prepare <version> [--skip-cases "<reason>"]    write the version, build, test, run the proposal cases, commit
 //     npm run release:plugins -- tag                  print the five tags the release would cut
 //     npm run release:plugins -- tag --push           cut them, push them, read them back
 //
@@ -23,19 +23,24 @@
 // them annotated, pushes those five refs and no others, and reads them back from `origin`, failing
 // by name on any that did not land on `HEAD`.
 //
+// THE PROPOSAL CASES RUN FIRST WHEN THE RELEASE'S DIFF TOUCHES THE IDEATE SKILL, THE PANEL OR THE CARD GRAMMAR (RULE.DEVEX.AGENT.169): each
+// fixed case in tests/proposal-cases is answered by a fresh agent session, and a failed case restores the manifests and commits nothing.
+// `--skip-cases` exists only with a reason, which is printed into the release commit.
+//
 // The repository is the one the command runs in — `npm run` runs it at the marketplace root.
 
 import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
+import { touchesProposalSurface } from "./lib/proposal-cases.mjs";
 import {
   VERSION_PATTERN, agreedVersion, compareVersions, listedPlugins, newestReleaseNumber, readVersions,
   releaseTags, withVersion,
 } from "./lib/plugin-versions.mjs";
 
 const USAGE = [
-  "usage: npm run release:plugins -- prepare <version>",
+  "usage: npm run release:plugins -- prepare <version> [--skip-cases \"<reason>\"]",
   "       npm run release:plugins -- tag [--push]",
 ].join("\n");
 
@@ -75,7 +80,13 @@ async function bookFaults(root) {
   return book === null ? [] : writeRulesIndex(book, root).faults;
 }
 
-async function prepare(root, version) {
+/** The paths changed since the newest release, or null where that release's tag is not in this checkout (then the cases run). */
+function changedSince(root, newest) {
+  if (newest === null) return null;
+  try { return git(root, ["diff", "--name-only", `v${newest}`, "HEAD"]).split("\n").filter(Boolean); } catch { return null; }
+}
+
+async function prepare(root, version, skipReason = null) {
   if (!version) throw new Refusal(`prepare needs a version\n${USAGE}`);
   if (!VERSION_PATTERN.test(version)) throw new Refusal(`"${version}" is not a version — write it as X.Y.Z, numbers only`);
   refuseDirty(root);
@@ -112,6 +123,19 @@ async function prepare(root, version) {
     throw new Refusal("the build or the tests failed — the manifests are restored and nothing is committed");
   }
 
+  // THE PROPOSAL CASES (RULE.DEVEX.AGENT.169): run when the diff touches what they guard, and a failed case holds the release.
+  const touched = changedSince(root, newest);
+  if (skipReason !== null) console.log(`proposal cases skipped — ${skipReason}`);
+  else if (touched === null || touchesProposalSurface(touched)) {
+    console.log("proposal cases: the release changes the ideate skill, the panel or the card grammar — running them");
+    const { runAndReport } = await import("./proposal-cases.mjs");
+    const workspace = process.env.SPN_WORKSPACE ? process.env.SPN_WORKSPACE : join(root, "..");
+    if (!runAndReport(workspace)) {
+      restore();
+      throw new Refusal("a proposal case failed — the manifests are restored and nothing is committed (`--skip-cases \"<reason>\"` skips them, and the reason goes into the release commit)");
+    }
+  }
+
   const manifests = new Set(plugins.map((plugin) => plugin.manifest));
   // `-z` keeps each entry's two status columns intact, where a trimmed line would lose the first.
   const changed = execFileSync("git", ["-C", root, "status", "--porcelain", "-z", "--untracked-files=all"], { encoding: "utf8" })
@@ -121,7 +145,7 @@ async function prepare(root, version) {
     throw new Refusal(`the build or the tests changed files a release does not carry — nothing is committed:\n${stray.join("\n")}`);
   }
   git(root, ["add", "--", ...changed]);
-  git(root, ["commit", "-q", "-m", `chore(release): plugins ${version}`, "--", ...changed]);
+  git(root, ["commit", "-q", "-m", `chore(release): plugins ${version}`, ...(skipReason !== null ? ["-m", `Proposal cases skipped: ${skipReason}`] : []), "--", ...changed]);
   console.log(`committed ${changed.length} file(s) as "chore(release): plugins ${version}" — nothing is pushed`);
   console.log("next: the PRs to develop and then to main; on main, `npm run release:plugins -- tag`, then `-- tag --push`");
 }
@@ -167,7 +191,16 @@ function tag(root, push) {
 const [action, ...rest] = process.argv.slice(2);
 try {
   const root = repositoryRoot();
-  if (action === "prepare") await prepare(root, rest[0]);
+  if (action === "prepare") {
+    const at = rest.indexOf("--skip-cases");
+    let skipReason = null;
+    if (at >= 0) {
+      skipReason = (rest[at + 1] ?? "").trim();
+      if (!skipReason || skipReason.startsWith("--")) throw new Refusal(`--skip-cases needs a reason, which is printed into the release commit\n${USAGE}`);
+      rest.splice(at, 2);
+    }
+    await prepare(root, rest[0], skipReason);
+  }
   else if (action === "tag") {
     const unknown = rest.filter((arg) => arg !== "--push");
     if (unknown.length > 0) throw new Refusal(`unknown option(s): ${unknown.join(" ")}\n${USAGE}`);

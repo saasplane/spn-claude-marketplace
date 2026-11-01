@@ -156,7 +156,7 @@ name, so `workstream arc stamp write` is the group `workstream`, the subject `ar
 | `row note <arc> <row> "<text>"` | writes one line on a row's log and changes nothing else |
 | `row edit <arc> <row> [--title …] [--kind …] [--repo …] [--work …] [--model …] [--blocked-by …] [--touches …] [--position …]` | changes the fields of a row the arc holds; a row it does not hold is refused, and `row add` is named |
 | `row discard <arc> <row> --note "…"` | takes a waiting, ready or deferred row found invalid or not needed out of `state.json`; its `discarded` log line carries the developer's words and the row's *What* |
-| `arc stamp write <arc>` | restamps the arc's *Cycles* row, once its part of the page is current |
+| `arc stamp write <arc>` | restamps the arc's *Plan* row, once its part of the page is current |
 | `arc delete <arc> --note "…"` | deletes an arc never decided, both its folders, on the developer's words; an arc ever decided is refused, and becomes `DROPPED` instead |
 | `report write <workstream> <notes/N<nnn>/orders/<row>.report.md>` | folds a child's hand-back in from its front matter: state, proof, cost, commits, follow-ups. `ok · N007 18/19 · 57b added · 58 ready` |
 | `fact write <arc> --source <repository>/<path>[:<line>] --fact "…"` | one fact, its source's current commit pinned: `f12 · pinned 8b99ae92` |
@@ -171,7 +171,7 @@ backlog workstream holds it.
 
 **`state check` reads every open and backlog workstream, and never a closed one.** It validates each
 arc's data; an arc with no preview, and no second preview beside the one by its fixed name; the stamp of
-each arc's *Cycles* row, a hash of the arc's goal, title and repositories; the arc's own `What` entry,
+each arc's *Plan* row, a hash of the arc's goal, title and repositories; the arc's own `What` entry,
 `N<nnn>-what`, which links its preview, and a `What` entry or a preview that links another arc's preview;
 a `{{…}}` slot left in the preview of a decided arc; the cards against
 their records; the report of each landed row with an order; and each status against
@@ -189,14 +189,14 @@ files it writes, and a file a command owns is written only by that command.
 | Step | Files it writes |
 | --- | --- |
 | shape | `suggestions.jsonl`, by command; nothing else moves |
-| open the arc, as the plan becomes clear | `state.json`, `log.jsonl` and `<subject>.md`, by command (`arc edit <arc> --title … --subject … --goal …`); the preview from the template and its `What` entry, `N<nnn>-what`; one line in `How`; the *Cycles* row (`docs cycles write`), then `arc stamp write` |
+| open the arc, as the plan becomes clear | `state.json`, `log.jsonl` and `<subject>.md`, by command (`arc edit <arc> --title … --subject … --goal …`); the preview from the template and its `What` entry, `N<nnn>-what`; one line in `How`; the *Plan* row (`docs cycles write`), then `arc stamp write` |
 | preview and cards | the preview, filled by planning jobs, which record no step, while the arc reads `PROPOSED`; the cards in `Open`, by `question raise`; each fact read, by `fact write` |
 | decide | the developer's go on the preview, written with their words: `arc edit <arc> --status DECIDED --note "<the developer's words>"`, with `--wait` where they said wait; the answers folded into `What` and the preview, and each line the write lists as still saying proposed brought current; the register rows owed |
 | plan | the rows, by `row add`, each with its kind, model, `blockedBy` and `touches`; `plan.md` where the arc has traps, a set or a move table; the one line of each new place in the page's `How` |
 | run | `orders/<row>.md`, by reference; the reports, folded in by `report write`; samples and shots |
 | a comment mid-run | a row, by command; a card if it is a question; when the arc moves, its rows, its log and the page's parts |
 | gate | the arc's final re-check row: the whole tiers once; one restart; the walks and the look; the review list |
-| release and land | the steps, by command, which work out `LANDED`; the book's rows; the references restated; *Cycles* |
+| release and land | the steps, by command, which work out `LANDED`; the book's rows; the references restated; *Plan* |
 | review fixes | `arc edit <ws>/<arc> --review-fixes --note "<their words>"` at the first fix after a landing; one step per fix, naming the arc it fixes |
 | carry, drop, delete | `CARRIED` or `DROPPED` and its reason, by command; an arc never decided, by `arc delete` |
 | close the workstream | on the developer's word, after the review links: the review-fixes arc's `LANDED`, by command; the close gate (`workstream close` runs it), which refuses an arc `PROPOSED` or `DECIDED`, any finding of `go check` and a part of the plan not landed (`RULE.DEVEX.WORKSPACE.463` · MUST · check:split-plan); once it passes, the command stamps the page `DONE` and the folder moves to `closed/` |
@@ -330,6 +330,14 @@ Derive the plan again with `workstream go write 036/N004 --scope …`, then laun
 ### After the go, every moment names the next step
 
 The plan holds the release parts too, merged from the scope's sheets in chain order, so no release is added on the side. A helper's report is named for its part, and folding the report lands the part.
+
+**A suggestion belongs to an arc, as a card does, and the arc's sheet cites it** (`RULE.DEVEX.WORKSPACE.488` · MUST · check:split-plan). It is raised against the arc it would change, `suggestion add <NNN>/N<nnn> "…"`, as `question raise` takes its arc, and `suggestion state <S> shaped --arc N<nnn>` moves it to the arc that takes it up. Before that arc's plan is written, an entry of its sheet cites the suggestion in `decidedBy`, as `S65`, and `go write` refuses a sheet that leaves a decided one out, naming it. Before the arc reads `LANDED`, every suggestion against it is decided and built, parked or dropped, and the last row's landing refuses while one is still raised or shaped. A suggestion raised with no arc yet sits against the workstream until an arc takes it up.
+
+**A workstream closes only once every suggestion is decided, parked or dropped** (`RULE.DEVEX.WORKSPACE.489` · MUST · check:split-plan). `workstream close` refuses while one still reads raised or shaped, and names each, before it stamps or moves anything.
+
+**A question is named `Q<n>` and a suggestion `S<n>`, with a capital letter, wherever a person reads it** (`RULE.DEVEX.WORKSPACE.486` · MUST · check:stop). That covers a reply, a page, a log line and every line a command prints. The record keeps its own id and a page keeps its `q<n>` anchor, because neither is read as words. A reply that names a card or a suggestion in lowercase is sent back with the capital form, so you meet one spelling for one thing.
+
+**A go's first plan and each release part wait for a panel's verdict on record** (`RULE.DEVEX.WORKSPACE.485` · MUST · check:split-plan). The design gate and a release are two of the three judgment gates, where the lenses that own the decision read the work fresh. `go write` writes an arc's first plan only once a panel has given its verdict on that arc. `go start` starts a release part only once a panel has given its verdict on the part's arc since that repository's last part landed. The verdict is on record when the panel stops: the hook that logs a helper's turns writes a panel row naming the workstream, the arc, the part, the lens and the verdict. A blocked verdict holds the gate until the work is changed and the panel reads it again. Deriving a plan again is never held, and with telemetry recording off the gate cannot see a verdict, so it says so and lets the work through. The closing retrospective reads the same rows, so a workstream that convened its panels has no ungated part to report.
 
 **A step lands once every entry it holds sits in a landed part, and a code step lands on the full run** (`RULE.DEVEX.WORKSPACE.461` · MUST · skill:spn-devex/execute). Every command's output ends with the next step. Each moment of the loop reads the plan and says one thing, which is what comes next.
 
@@ -991,7 +999,7 @@ a fact, a preview edit, a card's answer or a step added inside the arc's goal ne
 | `DROPPED` | stored, with the reason | not wanted, once it had been decided |
 
 **One owner works it out, and every reader asks it**: `arcStatus` in the plugin's workstream library, which
-the page's status, the *Cycles* table, the progress block, a preview's badge, `arc edit`, the `row` commands, `state check`, the
+the page's status, the *Plan* table, the progress block, a preview's badge, `arc edit`, the `row` commands, `state check`, the
 go check and the Stop hook all read. **A stored `PROPOSED` wins over the steps**: when the developer agrees
 an arc's goal changed, it goes back to `PROPOSED`, and any step it was building stops until their next go.
 **A wait keeps a decided arc from starting**, in this window or the next, until their *start*. `HELD` and
@@ -1411,7 +1419,7 @@ number and the subject, so the file name repeats neither. A workstream that clos
 `<subject>-approach.html` keeps it.
 
 **The parts of the page that the arcs and the records decide are produced, never typed — MUST.** They
-are the header's status, the places of `How` with their `Arcs:` lines, and the Cycles table, which
+are the header's status, the places of `How` with their `Arcs:` lines, and the Plan table, which
 `spn-devex docs cycles write <workstream>` writes from the arcs' data; the progress block under the table, which `workstream progress write` writes
 and every other `workstream` write refreshes (`RULE.DEVEX.WORKSPACE.250` · MUST · check:doc-check); and `Open` with its heading,
 which the `workstream question` commands write from `questions.jsonl`. The table has two columns: Arc,
@@ -1447,7 +1455,7 @@ colour appears only when the arc's steps work out `LANDED`.
 **The rest of the page is yours to bring current in the same step** (`RULE.DEVEX.WORKSPACE.251` · MUST · check:confirmed). A
 new arc, or an arc whose goal, title or repositories changed, owes the page its `Why`, its `What` and
 its `How`, and a Subtitle and a Description that still cover what the page plans. The stamp holds it:
-each *Cycles* row carries `data-arc-stamp`, a hash of its arc's goal, its title and its repositories
+each *Plan* row carries `data-arc-stamp`, a hash of its arc's goal, its title and its repositories
 (its `repos` and each row's `repo`), never of its rows; `workstream state check` fails a stamp behind
 them, and the Stop hook refuses to end a turn on it. **Adding a row never puts the page behind.**
 Once the page is current, `workstream arc stamp write <arc>` writes the new stamp, and it is the
@@ -1457,7 +1465,7 @@ the detail. The page never states a preview's tables, trees or lists a second ti
 of the page never repeats another (`RULE.DEVEX.WORKSPACE.223` · GUIDE).
 
 **A write that changes an arc's status, or a row's state, refreshes every view of it in the same command**
-(`RULE.DEVEX.WORKSPACE.273` · MUST · check:workstream-state). The views are the approach page's status card, its Cycles table and
+(`RULE.DEVEX.WORKSPACE.273` · MUST · check:workstream-state). The views are the approach page's status card, its Plan table and
 headings, and the arc preview's Status badge. `workstream arc edit` and the `row` commands (and `report write`) rewrite them across
 all the workstream's arcs when `status` or a row's `state` moved, and says each view in its line:
 `ok · N015 · status · approach: card, cycles · preview badge`. A `question` write does the same when an answer
@@ -1519,13 +1527,15 @@ links to `../../approach.html#N<nnn>`, the preview, the plan and the samples; no
 `report write` and `docs cycles write` write it, and rename it with the subject. Never write it by hand:
 the hook refuses it, and `state check` names a hand edit and a second `.md` in the folder.
 
-**A close is a milestone, and you say so before you ask** (`RULE.DEVEX.WORKSPACE.206` · MUST · check:split-plan). Open with
-a titled line that names the workstream as shipped, led by a rocket or a plane rather than a party
+**A close is a milestone, and you write it before you ask, or right after the close on a standing grant** (`RULE.DEVEX.WORKSPACE.206` · MUST · check:split-plan). When
+you ask the developer to close a workstream, write the close as a titled message first, never a table. When you close on a standing grant, with
+nothing to ask, write the same message right after the close: `workstream close` names it as the next step, and a reply in that turn without it
+is sent back. Open with a titled line that names the workstream as shipped, led by a rocket or a plane rather than a party
 icon. Under it, *What was delivered*, *What was learned* and *Thank you* each get their own heading
 with their own icon — the first two lead with their icon, *Thank you* trails with 👍 — and each holds
 one bullet per distinct thing, or a single line where there is only one thing to say. Measure every
 number from the arcs and the close report. Separate the heading and every section with a `&nbsp;`
-line, as the welcome does, and never put them in a quote block. Then ask. Before the folder moves, the
+line, as the welcome does, and never put them in a quote block. Then ask, where there is something to ask. Before the folder moves, the
 page gets its closed masthead and a closing block in the same shape.
 
 ## Nothing is published unless the developer asks
@@ -1608,13 +1618,13 @@ Nothing above is enforced by good intentions. Every transition that can be check
 
 | Held | By |
 | --- | --- |
-| a page keeps its shape and its voice, and its `How` ends in a Cycles table that matches the arcs | `doc-check.ts`, on every write |
+| a page keeps its shape and its voice, and its Plan section holds a table that matches the arcs | `doc-check.ts`, on every write |
 | the outline folds | `doc-check.ts` |
 | an answered card does not sit in `Open` | `split-plan.ts`, on every write |
 | every row accounted for, and the page stamped, before a close — a row still waiting, ready, running or stopped refuses | `split-plan.ts --gate close` |
 | a file a script owns, a `progress` or `open` block, and an arc's stamp written only by its command | `workstream-owner.ts`, on every write |
 | a card on a page that is its record rendered, and never typed | `questions.ts`, on every write to a page |
-| each open and backlog workstream whole: its data, one preview per arc, each arc's `What` entry linking its own preview and no other, each arc's row in Cycles and its stamp current with its goal, title and repositories, an approach page to stand on, a stored `LANDED` arc with every step landed, every card equal to its record, the report of each landed row with an order | `workstream state check`; the Stop hook refuses a turn while it fails for this window's workstream |
+| each open and backlog workstream whole: its data, one preview per arc, each arc's `What` entry linking its own preview and no other, each arc's row in Plan and its stamp current with its goal, title and repositories, an approach page to stand on, a stored `LANDED` arc with every step landed, every card equal to its record, the report of each landed row with an order | `workstream state check`; the Stop hook refuses a turn while it fails for this window's workstream |
 | a step started before the go or against a wait, a stored status moved without the developer's words, `RUNNING` written, and a step added to an arc that reads `LANDED` | `workstream arc edit`, `row add` and `row state` refuses it; `workstream state check` names a step running on an arc not `DECIDED` or holding a wait |
 | an arc ever decided deleted, or one never decided dropped | `workstream arc delete` and `arc edit`, which name the other |
 | a close while an arc is `PROPOSED` or `DECIDED`, while `go check` finds anything, or while a part of the plan has not landed | `split-plan.ts --gate close` |

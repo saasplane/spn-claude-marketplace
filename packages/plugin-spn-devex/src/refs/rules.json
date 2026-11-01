@@ -19010,7 +19010,13 @@
       "chapter": "04-capabilities/02-support/02-apps/03-module/01-server/03-entry/01-api.md",
       "heading": "The remote route",
       "decision": "DEC.SUPPORT.APPS.256",
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.SUPPORT.INFRA.001",

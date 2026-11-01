@@ -228,5 +228,47 @@ console.log("\n=== tag --push puts all five on origin, annotated, on main's comm
   } finally { f.cleanup(); }
 }
 
+console.log("\n=== prepare runs the proposal cases when the diff touches what they guard (RULE.DEVEX.AGENT.169)");
+{
+  const f = fixture();
+  try {
+    const panel = join(f.work, "packages", "plugin-spn-devex", "src", "agents", "spn-panel.md");
+    mkdirSync(join(panel, ".."), { recursive: true });
+    writeFileSync(panel, "---\nname: spn-panel\n---\nthe panel\n", "utf8");
+    f.git(f.work, "add", "-A");
+    f.git(f.work, "commit", "-q", "-m", "change the panel");
+    // A `claude` that answers every case with a wrong answer, so a model is never called.
+    const bin = join(f.home, "bin");
+    mkdirSync(bin, { recursive: true });
+    writeFileSync(join(bin, "claude"), '#!/bin/sh\necho \'{"type":"result","result":"Put it on IAMModuleController. I recommend IAMModuleController."}\'\n', { mode: 0o755 });
+    const withFake = (...args) => spawnSync(process.execPath, [SCRIPT, ...args], { cwd: f.work, env: { ...process.env, PATH: `${bin}:${process.env.PATH}`, GIT_CONFIG_GLOBAL: join(f.home, "gitconfig"), GIT_CONFIG_NOSYSTEM: "1",
+      GIT_AUTHOR_NAME: "Release Case", GIT_AUTHOR_EMAIL: "case@example.invalid", GIT_COMMITTER_NAME: "Release Case", GIT_COMMITTER_EMAIL: "case@example.invalid" }, encoding: "utf8" });
+    const failedCase = withFake("prepare", "0.76.0");
+    ok("[MKT.SCRIPTS.433] a failed case refuses the release, names the case, and says what the fresh agent proposed",
+      failedCase.status !== 0 && /FAIL\s+001-remote-contribution-route/.test(said(failedCase)) && /IAMModuleController/.test(said(failedCase)) && /proposal case failed/.test(said(failedCase)), said(failedCase));
+    ok("[MKT.SCRIPTS.433] and the manifests are restored with nothing committed", f.versionOf("spn-devex") === "0.75.0" && f.git(f.work, "log", "-1", "--format=%s") === "change the panel");
+    // The build's output is the build's to clear: a release that stopped leaves it for the next run.
+    rmSync(join(f.work, "packages", "plugin-spn-devex", "src", "dist"), { recursive: true, force: true });
+    const noReason = withFake("prepare", "0.76.0", "--skip-cases");
+    ok("[MKT.SCRIPTS.433] `--skip-cases` with no reason is refused", noReason.status !== 0 && /needs a reason/.test(said(noReason)), said(noReason));
+    const skipped = withFake("prepare", "0.76.0", "--skip-cases", "the model is down");
+    ok("[MKT.SCRIPTS.433] `--skip-cases` with a reason skips the cases and prints the reason into the release commit",
+      skipped.status === 0 && /proposal cases skipped/.test(said(skipped)) && f.git(f.work, "log", "-1", "--format=%B").includes("Proposal cases skipped: the model is down"), said(skipped));
+  } finally { f.cleanup(); }
+}
+
+console.log("\n=== prepare runs no case when the diff touches none of them");
+{
+  const f = fixture();
+  try {
+    const bin = join(f.home, "bin");
+    mkdirSync(bin, { recursive: true });
+    writeFileSync(join(bin, "claude"), "#!/bin/sh\nexit 9\n", { mode: 0o755 });
+    const quiet = spawnSync(process.execPath, [SCRIPT, "prepare", "0.76.0"], { cwd: f.work, env: { ...process.env, PATH: `${bin}:${process.env.PATH}`, GIT_CONFIG_GLOBAL: join(f.home, "gitconfig"), GIT_CONFIG_NOSYSTEM: "1",
+      GIT_AUTHOR_NAME: "Release Case", GIT_AUTHOR_EMAIL: "case@example.invalid", GIT_COMMITTER_NAME: "Release Case", GIT_COMMITTER_EMAIL: "case@example.invalid" }, encoding: "utf8" });
+    ok("[MKT.SCRIPTS.433] a release that changes none of the guarded files runs no case", quiet.status === 0 && !/proposal case/.test(said(quiet)), said(quiet));
+  } finally { f.cleanup(); }
+}
+
 console.log(`\n${failed ? `${failed} of ${total} FAILED` : `all ${total} passed`}`);
 process.exit(failed ? 1 : 0);

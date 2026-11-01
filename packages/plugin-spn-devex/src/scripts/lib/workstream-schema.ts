@@ -1,4 +1,5 @@
 // RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § An arc is cut by what is reviewed and released together, and named for its domain · § The formats · § An arc's status is one of six, stored or worked out · § Questions are records, and every card is one rendered · § A suggestion is recorded the moment it is raised · § Ideation is kept as it happens
+//           RULE.DEVEX.WORKSPACE.491 and .492, a proposal starts from the construct that exists, and its views are fresh and on record; RULE.DEVEX.AGENT.168
 // The chapter is the source of truth; a rule change is edited there first, then here, in the same change.
 //
 // The one schema for every file a script owns in a workstream. `workstream state check` runs it, and
@@ -62,8 +63,13 @@ export const ENTRY_ID = /^E\d+$/;
 export const ENTRY_OPS = ["create", "edit", "drop", "rename"] as const;
 /** The tiers an entry's tests are named at. */
 export const TIERS = ["unit", "component", "contract", "integration", "journey"] as const;
+/** A STORED id stays lowercase (`s3`, `q28`); a person reads and types the capital (RULE.DEVEX.WORKSPACE.486). */
 export const SUGGESTION_ID = /^s\d+$/;
 export const QUESTION_ID = /^q\d+$/;
+/** A card's stored id as a person reads it: `q28` is Q28 and `s3` is S3. Anything else is left as it is. */
+export const cardName = (id: string): string => id.replace(/^([qs])(\d+)$/, (_, kind: string, number: string) => `${kind.toUpperCase()}${number}`);
+/** A card's id as typed, in either case, as it is stored: `Q28` and `q28` both read `q28`; a leading `<workstream>/` is kept. */
+export const cardId = (typed: string): string => typed.replace(/(^|\/)([QSqs])(\d+)$/, (_, lead: string, kind: string, number: string) => `${lead}${kind.toLowerCase()}${number}`);
 /** What a row may wait on: a row of its arc, a card, or an arc or a row of another arc (`N011`, `N011/3`). */
 export const BLOCKER = /^(?:\d+[a-z]?(?:\.\d+[a-z]?)*|q\d+|N\d+[a-z]?(?:\/\d+[a-z]?(?:\.\d+[a-z]?)*)?)$/i;
 
@@ -77,23 +83,38 @@ export type ArcRow = {
   waitingOn?: string | null;
   [field: string]: unknown;
 };
+/** What an arc is for (RULE.DEVEX.WORKSPACE.494): a `build` arc has steps; an `ideate` arc holds the read, the fresh views and the one preview, and proposes the build arcs. */
+export const ARC_KINDS = ["build", "ideate"] as const;
 export type ArcData = {
   schemaVersion: number; arc: string; subject: string; title: string; goal?: string | null; status: string; reason: string | null;
+  /** `ideate` for an ideate arc; an arc with none is a build arc. */
+  kind?: string;
+  /** The build arcs an ideate arc proposes. Its status is worked out from them (`arcStatus`). */
+  proposes?: string[];
   wait?: string | null; reviewFixes?: boolean;
   carries?: string[]; decides?: string | null; repos?: string[]; cycle?: string | null; follows?: string | null; model?: string | null; position?: number | null;
   preview: string; rows: ArcRow[];
   [field: string]: unknown;
 };
 export type LogLine = { at: string; kind: string; row?: string | null; note?: string | null; [field: string]: unknown };
-export type Fact = { id: string; fact: string; source: string; commit: string; readAt: string; usedBy: string[]; [field: string]: unknown };
-export type Suggestion = { id: string; title: string; state: string; preview: string | null; words: string | null; [field: string]: unknown };
-export type View = { lens: string; text: string };
-export type Option = { key: string; does: string; costs: string };
-export type Card = { why: string; what: string; viewsLead: string; views: View[]; options: Option[]; recommended: { key: string; reason: string } };
+export type Fact = { v?: number; id: string; fact: string; source: string; commit: string; readAt: string; usedBy: string[]; [field: string]: unknown };
+export type Suggestion = { v?: number; id: string; title: string; state: string; preview: string | null; words: string | null; [field: string]: unknown };
+/** `made` and `words` are written on a card raised after RULE.DEVEX.WORKSPACE.492; a FRESH view's `words` is a file under the arc's `notes/N<nnn>/work/`. */
+export type View = { lens: string; text: string; made?: string; words?: string };
+export type Option = { key: string; does: string; costs: string; leaveIt?: boolean };
+/** The fields a card carries from RULE.DEVEX.WORKSPACE.491: all optional on read, all required when a card is raised or added (`raisedCardFaults`). */
+export type Card = {
+  why: string; what: string; viewsLead: string; views: View[]; options: Option[]; recommended: { key: string; reason: string; scope?: string };
+  nearest?: string; signs?: string[]; others?: string; noLeaveIt?: string;
+};
+/** The signs of complexity a card may declare (RULE.DEVEX.WORKSPACE.491), and how a view was made (RULE.DEVEX.WORKSPACE.492). */
+export const SIGNS = ["CROSSES_REPO", "CHANGES_PARTNER_SURFACE", "SETS_PATTERN"] as const;
+export const VIEW_MADE = ["FRESH", "SPOKEN"] as const;
+export const SCOPES = ["CORE", "PERIPHERY"] as const;
 /** `entries` is what the card is cited in, and `[]` records that the answer changes no repository file. */
 export type Answer = { key?: string | null; words: string; at: string; entries?: string[] };
 /** `raisedBy` is the session id of the window that raised the card; a card raised before it was recorded has none. */
-export type Question = { id: string; arc: string; title: string; state: string; raised: string; raisedBy?: string; shownIn: string[]; card: Card; answer: Answer | null; [field: string]: unknown };
+export type Question = { v?: number; id: string; arc: string; title: string; state: string; raised: string; raisedBy?: string; shownIn: string[]; card: Card; answer: Answer | null; [field: string]: unknown };
 
 // ---------------------------------------------------------------------------- the field rules
 
@@ -161,6 +182,8 @@ const ARC_FIELDS: Record<string, Rule> = {
   model: { kind: "text", required: false },
   position: { kind: "number", required: false },
   preview: { kind: "string", required: true },
+  kind: { kind: "enum", required: false, values: ARC_KINDS },
+  proposes: { kind: "strings", required: false, pattern: ARC_ID },
 };
 
 const ROW_FIELDS: Record<string, Rule> = {
@@ -197,6 +220,22 @@ export function versionFault(version: unknown, where = "state.json"): string {
   if (typeof version === "number" && version > SCHEMA_VERSION)
     return `${where}'s \`schemaVersion\` is ${version}, and this spn-devex reads ${SCHEMA_VERSION}: update the plugin, and it reads the file`;
   return `${where}'s \`schemaVersion\` is \`${String(version)}\`, and this spn-devex reads ${SCHEMA_VERSION}: \`spn-devex plugin migration write 006\` brings it to ${SCHEMA_VERSION}`;
+}
+
+/** The version a card, suggestion, log or fact line is written at. A line with no `v` is version 1, so old lines are never rewritten. */
+export const RECORD_VERSION = 1;
+/** The files whose lines carry `v`. */
+export const VERSIONED_RECORDS: readonly string[] = ["questions.jsonl", "suggestions.jsonl", "log.jsonl", "facts.jsonl"];
+/** A new line of a versioned file: `v` first, then the record. */
+export const versioned = <T extends object>(record: T): { v: number } & T => ({ v: RECORD_VERSION, ...record });
+/**
+ * The fault of a line written at a version this plugin does not read, naming what to do, or null where it reads. A line without
+ * `v` is version 1.
+ */
+export function recordVersionFault(line: unknown, where: string): string | null {
+  const v = isObject(line) ? line.v : undefined;
+  if (v === undefined || (typeof v === "number" && v <= RECORD_VERSION)) return null;
+  return `${where} holds a line of version ${String(v)}, and this spn-devex reads ${RECORD_VERSION}: update the plugin, because the release that writes version ${String(v)} carries the migration that reads it`;
 }
 
 /** Every fault of an arc's `state.json`, read as JSON already. Empty where it holds to the schema. */
@@ -253,6 +292,8 @@ const SUGGESTION_FIELDS: Record<string, Rule> = {
   id: { kind: "string", required: true, pattern: SUGGESTION_ID }, title: { kind: "string", required: true },
   state: { kind: "enum", required: true, values: SUGGESTION_STATES },
   preview: { kind: "text", required: true }, words: { kind: "text", required: true },
+  // The arc a suggestion belongs to (RULE.DEVEX.WORKSPACE.488); a record raised before it has none, read as null.
+  arc: { kind: "text", required: false },
 };
 const QUESTION_FIELDS: Record<string, Rule> = {
   id: { kind: "string", required: true, pattern: QUESTION_ID }, arc: { kind: "string", required: true, pattern: ARC_ID },
@@ -290,6 +331,33 @@ export function cardFaults(card: unknown, where = "the card"): string[] {
   if (!isObject(recommended) || !text(recommended.key) || !text(recommended.reason)) out.push(`${where} has no \`recommended\` key and reason`);
   else if (!options.some((option) => isObject(option) && option.key === recommended.key))
     out.push(`${where} recommends \`${String(recommended.key)}\`, which is none of its options`);
+  return out;
+}
+
+/**
+ * What a card raised now must carry on top of `cardFaults` (RULE.DEVEX.WORKSPACE.491 and .492): its nearest construct, its signs, its
+ * others, a leave-it option or the reason for none, core or periphery, and how each view was made. APPLIED ONLY WHEN A CARD IS RAISED OR
+ * ADDED, never to a record read, so a card raised before it reads clean. The checks that need the workspace are `raiseFaults`.
+ */
+export function raisedCardFaults(card: unknown, where = "the card"): string[] {
+  if (!isObject(card)) return [`${where} is not a JSON object`];
+  const out: string[] = [];
+  const text = (value: unknown) => typeof value === "string" && value.trim().length > 0;
+  if (!text(card.nearest)) out.push(`${where} has no \`nearest\`: the path of the nearest existing construct of its kind, or \`"none"\``);
+  if (!Array.isArray(card.signs) || card.signs.some((sign) => !(SIGNS as readonly unknown[]).includes(sign)))
+    out.push(`${where}'s \`signs\` is not a list drawn from ${SIGNS.join(" · ")} (an empty list is whole)`);
+  if (!text(card.others)) out.push(`${where} has no \`others\`: the options considered and set aside`);
+  const options = Array.isArray(card.options) ? card.options : [];
+  if (!options.some((option) => isObject(option) && option.leaveIt === true) && !text(card.noLeaveIt))
+    out.push(`${where} has no option marked \`leaveIt: true\` and no \`noLeaveIt\` saying why leaving it does not apply`);
+  const recommended = card.recommended;
+  if (!isObject(recommended) || !(SCOPES as readonly unknown[]).includes(recommended.scope))
+    out.push(`${where}'s \`recommended.scope\` is not one of ${SCOPES.join(" · ")}`);
+  for (const [at, view] of (Array.isArray(card.views) ? card.views : []).entries()) {
+    if (!isObject(view)) continue;
+    if (!(VIEW_MADE as readonly unknown[]).includes(view.made)) out.push(`${where}'s view ${at + 1} has no \`made\`, and it is one of ${VIEW_MADE.join(" · ")}`);
+    else if (view.made === "FRESH" && !text(view.words)) out.push(`${where}'s view ${at + 1} is FRESH and names no \`words\` file under the arc's notes work folder`);
+  }
   return out;
 }
 

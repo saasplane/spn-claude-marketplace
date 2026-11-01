@@ -39,8 +39,10 @@ description: Carry out a go. Use the moment the developer gives the go on one ar
 3. The plan: `workstream go write <lead> --scope …`, then `go show` to read it.
 4. Baselines: `go start` each repository's baseline, and record what already fails.
 5. The parts: launch each part's brief, a pass at a time; fold each report with `report write`.
+   Each brief carries the line that a helper meeting a name, a shape or a construct no entry holds stops, returns `needs-you` and lists it under `unnamed:`; `report write` refuses `landed` while it lists one (`RULE.DEVEX.WORKSPACE.495` · MUST · check:split-plan).
    A change from the developer mid-run: let what is running finish, `go check` to hold the parts it
    touches, update their entries and the preview and show it, then `go write` again before they run.
+   A change that rewrites the approach page's What decides its figure in the same pass (`RULE.DEVEX.WORKSPACE.497` · MUST · check:doc-check): a figure, or the one `<!-- no figure: … -->` line.
 6. Full runs: `go start` each repository's full run; every code row lands on it.
 7. Generated files, then the release chain, in the order the sheets set.
 8. Close: `go check` prints nothing, and every row of the scope is LANDED; then `workstream close <workstream>`.
