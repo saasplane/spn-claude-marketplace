@@ -223,6 +223,7 @@ Every row below is declared and none is claimed: a run writes the last two cells
 | MKT.SCRIPTS.396 | Engineering leader | type a card in either case | A question or suggestion reference reads q28, Q28 and 036/Q28 the same, and an arc's --carries takes either case | POSITIVE | UNIT | PLANNED | — |
 | MKT.SCRIPTS.397 | Engineering leader | start a preview from a template whose masthead already has Progress | The preview template's masthead line carries the Progress fact between Arc and Shown in the markup the arc's commands write, and says the commands write it and it is left out while the arc has no sheet | POSITIVE | UNIT | PLANNED | — |
 | MKT.SCRIPTS.398 | Engineering leader | be stopped from closing a workstream whose page has no closing block | `workstream close` refuses, before it stamps, raises or moves anything, an approach page without what was delivered, what was learned and Thank you, names the shape closed pages carry and RULE.DEVEX.WORKSPACE.206, and says nothing was changed | NEGATIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.399 | Engineering leader | start an approach page from a template that shows the closing block | The approach template carries the closing block's shape as a comment under the masthead, saying it is written at the close and the close refuses a page without it | POSITIVE | UNIT | PLANNED | — |
 
 ## Retired ids
 

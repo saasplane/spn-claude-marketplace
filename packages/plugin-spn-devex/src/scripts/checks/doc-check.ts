@@ -585,8 +585,8 @@ function workstreamTemplates(): string | null {
 /** An arc's preview, by its fixed name in `notes/N<nnn>/`. */
 const isArcPreview = (path: string): boolean => /[\\/]notes[\\/]N\d+[a-z]?[\\/]preview\.html$/.test(path);
 
-// A comment every page keeps: the restated chapter, the page's `spn:doc` block, and the markers of a generated block.
-const KEPT_COMMENT = /^\s*(?:RESTATES:|spn:doc\b|\/?spn:generated\b)/;
+// A comment every page keeps: the restated chapter, the page's `spn:doc` block, the approach page's `spn:closing` shape (replaced by the closing block at the close), and the markers of a generated block.
+const KEPT_COMMENT = /^\s*(?:RESTATES:|spn:doc\b|spn:closing\b|\/?spn:generated\b)/;
 const commentsOf = (text: string): string[] =>
   [...text.matchAll(/<!--([\s\S]*?)-->/g)].map((m) => m[1].replace(/\s+/g, " ").trim()).filter((one) => !KEPT_COMMENT.test(one));
 
