@@ -235,6 +235,7 @@ Every row below is declared and none is claimed: a run writes the last two cells
 | MKT.SCRIPTS.408 | Engineering leader | have citing a card change nothing in the plan | An entry's hash leaves out `decidedBy`, so a citation added or moved plans no follow-up part and flags no part stale; every other field still counts | POSITIVE | UNIT | PLANNED | — |
 | MKT.SCRIPTS.409 | Engineering leader | have a handover list only the orders really running | The handover's `live now` lists only an order whose part is `running` in a go plan and has no report, and its `read first` and `pins` come from the arc that is running, or the lead of the newest go | POSITIVE | UNIT | PLANNED | — |
 | MKT.SCRIPTS.410 | Engineering leader | have a handover name the suggestions still open | The handover's `open` lists a suggestion still raised or shaped as S<n> beside the open cards, and leaves a decided one out | POSITIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.411 | Engineering leader | have a second release when work is planned after the release landed | `go write` adds `release-<repo>-2`, and so on, when a docs or code entry of a repository is planned after that repository's release part landed, and adds none while a release of it is running | POSITIVE | UNIT | PLANNED | — |
 
 ## Retired ids
 

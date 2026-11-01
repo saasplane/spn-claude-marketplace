@@ -334,9 +334,14 @@ export function deriveGo(scope: readonly ScopeSheet[], options: DeriveOptions = 
   const releases: string[] = [];
   for (const { sheet } of scope) for (const repo of sheet.releaseChain ?? []) if (!releases.includes(repo)) releases.push(repo);
   for (const repo of releases) {
-    const id = `release-${repo}-1`;
-    const old = (options.previous?.parts ?? []).find((one) => one.id === id && keptIds.has(id));
-    parts.push(old ?? part(id, repo, "RELEASE", [], [], { waitsOn: ending }));
+    // A RELEASE THAT LANDED SHIPPED WHAT WAS THEN: docs or code planned after it need the next release, release-<repo>-2 and so on (s38).
+    const mine = kept.filter((one) => one.repo === repo && slotOf(one) === "RELEASE");
+    parts.push(...mine);
+    const lastN = Math.max(0, ...mine.map(numberOf));
+    const live = mine.some((one) => one.state === "running");
+    const planned = fresh.some((one) => one.repo === repo && ENTRY_SLOTS.includes(slotOf(one)));
+    if (!mine.length) parts.push(part(`release-${repo}-1`, repo, "RELEASE", [], [], { waitsOn: ending }));
+    else if (!live && planned) parts.push(part(`release-${repo}-${lastN + 1}`, repo, "RELEASE", [], [], { waitsOn: ending }));
   }
   // A proof still owed after the releases is its own step: the whole suites on what was released, once every release has landed.
   // A proof part that landed or is running stays as it was.

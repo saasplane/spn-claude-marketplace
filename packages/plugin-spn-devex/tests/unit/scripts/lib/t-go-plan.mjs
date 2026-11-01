@@ -179,5 +179,13 @@ same("[MKT.SCRIPTS.408] any other field still changes the hash", entryHash({ ...
 const citedScope = [{ arc: "N009", sheet: sheet([entry("E1", "app-repo:src/a.ts"), cited, entry("E3", "lib-repo:docs/c.md")]) }];
 same("[MKT.SCRIPTS.408] a landed part whose entry only gained a citation plans no follow-up and is not stale", [changedEntries(plan.parts.find((p) => p.id === "code-lib-repo-1"), citedScope), staleEntries(plan.parts.find((p) => p.id === "code-lib-repo-1"), plan, citedScope)], [[], []]);
 
+const afterRelease = deriveGo([{ arc: "N009", sheet: sheet([...scope[0].sheet.entries, entry("E4", "lib-repo:docs/late.md")]) }], { previous: landedAll });
+same("[MKT.SCRIPTS.411] a docs entry planned after its repository's release landed gets a second release part, and a repository with nothing new keeps one",
+  afterRelease.parts.filter((p) => p.work === "RELEASE").map((p) => [p.id, p.state]), [["release-lib-repo-1", "landed"], ["release-lib-repo-2", "ready"], ["release-app-repo-1", "landed"]]);
+const afterTwo = deriveGo([{ arc: "N009", sheet: sheet([...scope[0].sheet.entries, entry("E4", "lib-repo:docs/late.md"), entry("E5", "lib-repo:docs/later.md")]) }],
+  { previous: { ...afterRelease, parts: afterRelease.parts.map((p) => ({ ...p, state: p.id === "release-lib-repo-2" ? "landed" : p.state === "ready" && p.entries.includes("N009/E4") ? "landed" : p.state })) } });
+same("[MKT.SCRIPTS.411] and a third after the second landed", afterTwo.parts.filter((p) => p.id.startsWith("release-lib-repo")).map((p) => p.id), ["release-lib-repo-1", "release-lib-repo-2", "release-lib-repo-3"]);
+same("[MKT.SCRIPTS.411] the second release waits on the new docs' pass like the first, and the plan passes the schema", [afterRelease.parts.find((p) => p.id === "release-lib-repo-2").waitsOn.length > 0, goFaults(afterRelease)], [true, []]);
+
 console.log(`\n${total - failed}/${total} passed`);
 process.exit(failed ? 1 : 0);
