@@ -128,7 +128,7 @@ spn-devex restates files write <book> — copy the book's templates into this pl
 
 spn-devex workstream arc edit <workstream>/N<nnn> [--title …] [--goal …] [--status …] [--wait …] [--reason …] [--start] [--review-fixes] [--subject …] [--under …] [--preview …] [--decides …] [--repos …] [--cycle …] [--follows …] [--model …] [--position …] [--note …] — open an arc, or change any field of its header and its status; --note writes a log line
 
-spn-devex workstream arc stamp write <workstream>/N<nnn> — write: restamp an arc's Cycles row once its part of the page is current
+spn-devex workstream arc stamp write <workstream>/N<nnn> — write: restamp an arc's Plan row once its part of the page is current
 
 spn-devex workstream arc delete <workstream>/N<nnn> --note "…" — delete an arc never decided, on the developer's words
 
@@ -150,7 +150,7 @@ spn-devex workstream handover <workstream> [--continue "…"] [--do-not-touch "�
 
 spn-devex workstream open --file <block.json> --note "<the developer's words>" [--backlog "<the blocker>"] — open a workstream from the six-things block: the next number, its folder, its approach page and its first arc
 
-spn-devex workstream progress write <workstream> — regenerate the progress block in the approach page's Cycles
+spn-devex workstream progress write <workstream> — regenerate the progress block in the approach page's Plan
 
 spn-devex workstream question raise <workstream>/N<nnn> --file card.json — raise a card: the next number, the record, the card in the approach page's Open
 
@@ -188,9 +188,9 @@ spn-devex workstream state show [<workstream>] [--json] — where each open and 
 
 spn-devex workstream state check [<workstream>] [--facts] [--json] — whether each open and backlog workstream is whole: its data, previews, samples, notes folders, stamps, cards and step files
 
-spn-devex workstream suggestion add <workstream> "<title>" [--preview …] — raise a suggestion: the next number, raised; it also prints the decisions and rules that already speak to its title
+spn-devex workstream suggestion add <workstream>[/N<nnn>] "<title>" [--preview …] — raise a suggestion: the next number, raised; it also prints the decisions and rules that already speak to its title
 
-spn-devex workstream suggestion state <workstream> S<n> <state> [--words "…"] — move it on: shaped, decided, parked or dropped, with the words beside the move
+spn-devex workstream suggestion state <workstream> S<n> <state> [--words "…"] [--arc N<nnn>] — move it on: shaped, decided, parked or dropped, with the words beside the move
 
 spn-devex workstream suggestion edit <workstream> S<n> [--title …] [--preview …] — change its title or its preview, never its state
 
