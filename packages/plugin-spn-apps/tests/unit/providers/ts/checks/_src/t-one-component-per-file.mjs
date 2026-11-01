@@ -1,10 +1,10 @@
-// `one-component-per-file` (MKT.HOOKS.144) — a second exported component in a .tsx, a runtime export from an interfaces file.
+// `one-component-per-file` (MKT.HOOKS.392) — a second exported component in a .tsx, a runtime export from an interfaces file.
 import { one, done, tree } from "../../../../../helpers/harness.mjs";
 
 const TSX = "apps/web-dmo/src/ui/Panel.tsx";
 const IFACE = "apps/web-dmo/src/ui/interfaces.ts";
 const go = (label, file, content, expect, says) =>
-  one(`MKT.HOOKS.144 ${label}`, { script: "one-component-per-file", root: tree({ [file]: "" }), input: { file_path: file, content }, expect, says });
+  one(`[MKT.HOOKS.392] ${label}`, { script: "one-component-per-file", root: tree({ [file]: "" }), input: { file_path: file, content }, expect, says });
 
 console.log("=== one-component-per-file — known-bad");
 go("two exported function components", TSX,
@@ -26,7 +26,7 @@ go("a component in a story file", "apps/web-dmo/src/ui/Panel.stories.tsx", "expo
 {
   // An Edit that touches a different line of a file already holding two components is not blocked.
   const before = "export function Panel() { return null; }\nexport function Header() { return null; }\n";
-  one("MKT.HOOKS.144 an unrelated edit to a file already over the line", { script: "one-component-per-file", root: tree({ [TSX]: before }),
+  one("[MKT.HOOKS.392] an unrelated edit to a file already over the line", { script: "one-component-per-file", root: tree({ [TSX]: before }),
     input: { file_path: TSX, old_string: "Panel() { return null; }", new_string: "Panel() { return 1; }" }, expect: "" });
 }
 

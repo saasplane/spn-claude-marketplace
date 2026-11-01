@@ -1,11 +1,11 @@
-// `env-name-branch` (MKT.HOOKS.143) — a comparison of env, APP_ENV or NODE_ENV against a literal environment name is refused.
+// `env-name-branch` (MKT.HOOKS.391) — a comparison of env, APP_ENV or NODE_ENV against a literal environment name is refused.
 import { one, done, tree } from "../../../../../helpers/harness.mjs";
 
 const FILE = "apps/web-dmo/src/app/config.ts";
 const deny = (label, content, says = "isDebug") =>
-  one(`MKT.HOOKS.143 ${label}`, { script: "env-name-branch", root: tree({ [FILE]: "" }), input: { file_path: FILE, content }, expect: "deny", says });
+  one(`[MKT.HOOKS.391] ${label}`, { script: "env-name-branch", root: tree({ [FILE]: "" }), input: { file_path: FILE, content }, expect: "deny", says });
 const quiet = (label, content, file = FILE) =>
-  one(`MKT.HOOKS.143 ${label}`, { script: "env-name-branch", root: tree({ [file]: "" }), input: { file_path: file, content }, expect: "" });
+  one(`[MKT.HOOKS.391] ${label}`, { script: "env-name-branch", root: tree({ [file]: "" }), input: { file_path: file, content }, expect: "" });
 
 console.log("=== env-name-branch — known-bad");
 deny("env equals production", "export const live = this.appConfig.env === 'production';\n");

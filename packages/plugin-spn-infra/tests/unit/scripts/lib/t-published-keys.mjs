@@ -9,15 +9,15 @@ const { validate } = await import(join(PLUGIN, "src", "scripts", "lib", "publish
 let total = 0, failed = 0;
 const ok = (label, condition, detail = "") => {
   total += 1;
-  if (condition) { console.log(`  PASS  ${label}`); return; }
+  if (condition) { console.log(`  PASS  [MKT.HOOKS.400] ${label}`); return; }
   failed += 1;
-  console.log(`  FAIL  ${label}${detail ? `\n        ${detail}` : ""}`);
+  console.log(`  FAIL  [MKT.HOOKS.400] ${label}${detail ? `\n        ${detail}` : ""}`);
 };
 
 const BLUEPRINT = "/repo/packages/infra-blueprints/src/edge.tf";
 const PLATFORM = "/repo/packages/infra-platform-dmo/src/world.json";
 
-console.log("=== MKT.HOOKS.28 published-keys - known-bad");
+console.log("=== MKT.HOOKS.400 published-keys - known-bad");
 {
   const refused = validate(BLUEPRINT, 'output "k" { value = { DMO_IAM_EDGE_TARGET = aws_cloudfront_distribution.edge.domain_name } }');
   ok("a published key spelling the identity module is refused", Boolean(refused?.deny), JSON.stringify(refused));
@@ -26,7 +26,7 @@ console.log("=== MKT.HOOKS.28 published-keys - known-bad");
   ok("a platform layer file is read as well", Boolean(validate(PLATFORM, '{"SPN_IAM_EDGE_DISTRIBUTION_ID": "E1"}')?.deny));
 }
 
-console.log("\n=== MKT.HOOKS.28 published-keys - what it must allow");
+console.log("\n=== MKT.HOOKS.400 published-keys - what it must allow");
 ok("the owner's published key", validate(BLUEPRINT, 'DMO_PLATFORM_INTEGRATION_EDGE_TARGET = "x"') === null);
 ok("a file that publishes nothing: a module's own settings", validate("/repo/packages/infra-module-idp/src/settings.json", '{"DMO_IAM_EDGE_TARGET": "ref"}') === null);
 ok("an unrelated key in a blueprint", validate(BLUEPRINT, 'DMO_PLATFORM_DOMAIN = "x"') === null);

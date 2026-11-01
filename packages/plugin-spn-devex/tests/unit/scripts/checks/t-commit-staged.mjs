@@ -12,9 +12,9 @@ const { producedPageOf } = await import("../../../../../plugin-support-lib/src/l
 let total = 0, failed = 0;
 const ok = (label, condition, detail = "") => {
   total += 1;
-  if (condition) { console.log(`  PASS  [MKT.HOOKS.383] ${label}`); return; }
+  if (condition) { console.log(`  PASS  [MKT.HOOKS.384] ${label}`); return; }
   failed += 1;
-  console.log(`  FAIL  [MKT.HOOKS.383] ${label}${detail ? `\n        ${String(detail).slice(0, 400)}` : ""}`);
+  console.log(`  FAIL  [MKT.HOOKS.384] ${label}${detail ? `\n        ${String(detail).slice(0, 400)}` : ""}`);
 };
 
 const BASE = realpathSync(mkdtempSync(join(tmpdir(), "spn-devex-commit-staged-")));

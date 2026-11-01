@@ -357,14 +357,19 @@ export function changedEntries(part: GoPart, scope: readonly ScopeSheet[]): stri
   });
 }
 
-/** A part's changed entries that no later part of the plan carries: a follow-up part answers its landed part's change. */
+/**
+ * A part's changed entries that no later part of the plan carries: a follow-up part answers its landed part's change. An
+ * entry another landed part holds as it stands now is done too, as `deriveGo` reads it, so it needs no follow-up.
+ */
 export function staleEntries(part: GoPart, plan: GoPlan, scope: readonly ScopeSheet[]): string[] {
   const later = plan.parts.slice(plan.parts.indexOf(part) + 1).flatMap((one) => one.entries);
+  const current = new Set(plan.parts.filter((one) => one !== part && one.state === "landed")
+    .flatMap((one) => { const changed = changedEntries(one, scope); return one.entries.filter((ref) => !changed.includes(ref)); }));
   // An entry the sheet dropped with its logged note is no change: nothing is left to do for it, so a landed part that held it is no finding.
   const dropped = new Set(scope.flatMap(({ arc, dropped }) => (dropped ?? []).map((id) => `${arc}/${id}`)));
   const gone = (ref: string): boolean => part.state === "landed" && dropped.has(ref)
     && !scope.some(({ arc, sheet }) => sheet.entries.some((entry) => refOf(arc, entry) === ref));
-  return changedEntries(part, scope).filter((ref) => !later.includes(ref) && !gone(ref));
+  return changedEntries(part, scope).filter((ref) => !later.includes(ref) && !current.has(ref) && !gone(ref));
 }
 
 /**

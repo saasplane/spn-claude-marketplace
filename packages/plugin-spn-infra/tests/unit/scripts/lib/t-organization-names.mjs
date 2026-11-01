@@ -9,15 +9,15 @@ const { validate } = await import(join(PLUGIN, "src", "scripts", "lib", "organiz
 let total = 0, failed = 0;
 const ok = (label, condition, detail = "") => {
   total += 1;
-  if (condition) { console.log(`  PASS  ${label}`); return; }
+  if (condition) { console.log(`  PASS  [MKT.HOOKS.399] ${label}`); return; }
   failed += 1;
-  console.log(`  FAIL  ${label}${detail ? `\n        ${detail}` : ""}`);
+  console.log(`  FAIL  [MKT.HOOKS.399] ${label}${detail ? `\n        ${detail}` : ""}`);
 };
 
 const PATH = "/repo/packages/infra-organization/src/spestate.json";
 const declaration = (org, name) => JSON.stringify({ type: "ORGANIZATION", config: { mtype: "ORGANIZATION", name, org } }, null, 2);
 
-console.log("=== MKT.HOOKS.27 organization-names - known-bad");
+console.log("=== MKT.HOOKS.399 organization-names - known-bad");
 {
   const readable = validate(PATH, declaration("SaaS Plane", "SaaS Plane"));
   ok("a readable name in org is refused", Boolean(readable?.deny) && readable.deny.includes("reads as a name"), JSON.stringify(readable));
@@ -26,7 +26,7 @@ console.log("=== MKT.HOOKS.27 organization-names - known-bad");
   ok("a capitalised token is refused", Boolean(validate(PATH, declaration("Spn", "SaaS Plane"))?.deny));
 }
 
-console.log("\n=== MKT.HOOKS.27 organization-names - what it must allow");
+console.log("\n=== MKT.HOOKS.399 organization-names - what it must allow");
 ok("the real declaration, token spn and name SaaS Plane", validate(PATH, declaration("spn", "SaaS Plane")) === null);
 ok("a half-written declaration", validate(PATH, '{"type": "ORGANIZATION", "config": {') === null);
 ok("a declaration with no name yet", validate(PATH, JSON.stringify({ config: { org: "spn" } })) === null);
