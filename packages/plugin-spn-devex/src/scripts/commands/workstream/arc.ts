@@ -1,7 +1,7 @@
 // RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § The approach page keeps up with its arcs · § The commands · § The formats · § The life of an arc, and every file it touches · § An arc's status is one of six, stored or worked out · § Shaping: arcs open as the plan becomes clear
 // The chapter is the source of truth; a rule change is edited there first, then here, in the same change.
 //
-//   spn-devex workstream arc edit <workstream>/N<nnn> [--title …] [--goal …] [--status …] [--wait …] [--reason …] [--start] [--review-fixes] [--subject …] [--under …] [--preview …] …
+//   spn-devex workstream arc edit <workstream>/N<nnn> [--kind ideate] [--proposes N<nnn>,…] [--title …] [--goal …] [--status …] [--wait …] [--reason …] [--start] [--review-fixes] [--subject …] [--under …] [--preview …] …
 //   spn-devex workstream arc stamp write <workstream>/N<nnn>
 //   spn-devex workstream arc delete <workstream>/N<nnn> --note "<the developer's words>"
 //
@@ -22,17 +22,17 @@ import {
 import { isFile } from "../../lib/payload.ts";
 import { candidatesAt, precedentFor, wordsOf } from "../../lib/precedent.ts";
 import { refreshViews } from "../docs/cycles.ts";
-import { SHEET_SCHEMA_VERSION, subjectFault, type ArcData } from "../../lib/workstream-schema.ts";
+import { ARC_ID, ARC_KINDS, ROW_KINDS, SHEET_SCHEMA_VERSION, cardId, cardName, subjectFault, type ArcData } from "../../lib/workstream-schema.ts";
 import { sheetFindings } from "./sheet.ts";
 import { ROW_FLAGS, afterWrite, arcNamed, arcSignatures, listOf, refreshIfMoved, refuseFlags, typed } from "./_shared.ts";
 
-export const describe = "an arc's header written, opened or changed; the stamp an arc's Cycles row carries, written once the page is current with its goal, title and repositories; or an arc never decided, deleted";
+export const describe = "an arc's header written, opened or changed; the stamp an arc's Plan row carries, written once the page is current with its goal, title and repositories; or an arc never decided, deleted";
 
 const HEADER_TEXT = ["title", "subject", "goal", "reason", "decides", "cycle", "follows", "model"] as const;
 
 const OPTIONS = {
   title: VALUE, subject: VALUE, goal: VALUE, status: STORED_STATUSES, reason: VALUE, wait: VALUE, start: FLAG, "review-fixes": FLAG, decides: VALUE, repos: VALUE, cycle: VALUE, follows: VALUE,
-  model: VALUE, position: VALUE, preview: VALUE, under: VALUE, note: VALUE, carries: VALUE,
+  model: VALUE, position: VALUE, preview: VALUE, under: VALUE, note: VALUE, carries: VALUE, kind: VALUE, proposes: VALUE,
 } as const;
 
 const TITLE_WORDS = 5;
@@ -81,7 +81,14 @@ function header(data: ArcData, words: Words): string[] {
   }
   const repos = listOf(words, "repos");
   if (repos) { data.repos = repos; changed.push("repos"); }
-  const carries = listOf(words, "carries");
+  const proposes = listOf(words, "proposes");
+  if (proposes) {
+    if (data.kind !== "ideate") throw new UsageFault(`takes \`--proposes\` only on an ideate arc, and ${data.arc} is a build arc: the build arcs an ideate arc proposes are named on it (RULE.DEVEX.WORKSPACE.494).`);
+    const odd = proposes.filter((id) => !ARC_ID.test(id));
+    if (odd.length) throw new UsageFault(`takes \`--proposes\` as arc ids, such as \`N002\`: \`${odd[0]}\` is none.`);
+    if (JSON.stringify(data.proposes ?? []) !== JSON.stringify(proposes)) { data.proposes = proposes; changed.push("proposes"); }
+  }
+  const carries = listOf(words, "carries")?.map(cardId);
   if (carries) { data.carries = carries; changed.push("carries"); }
   const position = words.value("position");
   if (position !== null) {
@@ -94,6 +101,7 @@ function header(data: ArcData, words: Words): string[] {
     if (fault) throw new UsageFault(`takes \`--preview\` as the path from the workstream folder to the arc's preview, such as \`../030-next/notes/N002/${PREVIEW_FILE}\`: \`${preview}\` ${fault}.`);
     if (data.preview !== preview) { data.preview = preview; changed.push("preview"); }
   }
+  if (words.value("kind") !== null && data.kind !== "ideate" && words.value("kind") === "ideate") throw new UsageFault(`takes \`--kind\` when an arc is opened: ${data.arc} is open already.`);
   const status = words.value("status");
   if (status && status !== data.status) {
     data.status = status;
@@ -159,7 +167,7 @@ function repairedWords(pieces: Pieces, arc: string): string[] {
   (pieces.preview === "written" ? done : kept).push(pieces.preview === "written" ? "preview written from the template"
     : pieces.preview === "elsewhere" ? "preview not found where its field names it" : "preview kept");
   (pieces.entry === "kept" ? kept : done).push(pieces.entry === "kept" ? "What entry kept" : entry);
-  (pieces.cycles === "kept" ? kept : done).push(`Cycles row ${pieces.cycles === "kept" ? "kept" : pieces.cycles === "written" ? "written and stamped" : "stamped"}`);
+  (pieces.cycles === "kept" ? kept : done).push(`Plan row ${pieces.cycles === "kept" ? "kept" : pieces.cycles === "written" ? "written and stamped" : "stamped"}`);
   return done.length ? [...done, ...kept] : ["whole: nothing written"];
 }
 
@@ -174,7 +182,7 @@ function openingLines(data: ArcData, pieces: Pieces): string[] {
     ["approach.html · What", pieces.entry === "kept" ? `#${whatId(arc)} kept`
       : pieces.entry === "anchored" ? `#${whatId(arc)} ${pieces.where}`
       : `#${whatId(arc)} written ${pieces.where}: the title, the goal, and the link to ${href}`],
-    ["approach.html · Cycles", `row ${arc} ${pieces.cycles === "kept" ? "kept" : "written and stamped"}, its preview linked`],
+    ["approach.html · Plan", `row ${arc} ${pieces.cycles === "kept" ? "kept" : "written and stamped"}, its preview linked`],
   ];
   return rows.map(([label, text]) => `  ${label.padEnd(27)}${text}`);
 }
@@ -182,7 +190,7 @@ function openingLines(data: ArcData, pieces: Pieces): string[] {
 /** Throws, before anything is written, where the approach page cannot take the arc's What entry: no page, no What, or no such heading. */
 function foresee(ws: string, data: ArcData, under: string | null): void {
   const page = approachOf(ws);
-  if (!page) throw new UsageFault(`finds no approach page beside ${data.arc}'s workstream to write its What entry and its Cycles row in.`);
+  if (!page) throw new UsageFault(`finds no approach page beside ${data.arc}'s workstream to write its What entry and its Plan row in.`);
   const text = readFileSync(page, "utf8");
   if (under !== null || whatEntryOf(text, data.arc) === null) typed(() => withWhatEntry(text, data, under));
 }
@@ -190,13 +198,13 @@ function foresee(ws: string, data: ArcData, under: string | null): void {
 /**
  * RULE.DEVEX.WORKSPACE.254: the three pieces an arc owes beside its data, each written only where it is missing, in the
  * order the page needs them: the preview from the template at its fixed place, the What entry `N<nnn>-what`, and the
- * Cycles row with its stamp. Nothing that is there is changed. An arc carried elsewhere keeps its preview where its
+ * Plan row with its stamp. Nothing that is there is changed. An arc carried elsewhere keeps its preview where its
  * `preview` field names it, and its What entry links it there. Throws, before it writes anything, where `under` names
  * no heading of What.
  */
 function leavePageWhole(ws: string, data: ArcData, under: string | null): Pieces {
   const page = approachOf(ws);
-  if (!page) throw new UsageFault(`finds no approach page beside ${data.arc}'s workstream to write its What entry and its Cycles row in.`);
+  if (!page) throw new UsageFault(`finds no approach page beside ${data.arc}'s workstream to write its What entry and its Plan row in.`);
   const arc = data.arc;
   let text = readFileSync(page, "utf8");
   const needsEntry = whatEntryOf(text, arc) === null;
@@ -227,11 +235,15 @@ function leavePageWhole(ws: string, data: ArcData, under: string | null): Pieces
 }
 
 /** The words that say which suggestions an arc took up: none where none moved. */
-const movedWords = (ids: string[], to: string): string[] => (ids.length ? [`${ids.join(", ")} ${to}`] : []);
+const movedWords = (ids: string[], to: string): string[] => (ids.length ? [`${ids.map(cardName).join(", ")} ${to}`] : []);
 const shapedWords = (ws: string, ids: readonly string[]): string[] => movedWords(moveCarried(ws, ids, "shaped", "raised"), "shaped");
 
 function edit(args: string[]): number {
-  refuseFlags(args, ROW_FLAGS, (name) => `does not take \`--${name}\`: it is a row's field — \`row edit <workstream>/N<nnn> <row> --${name} …\` changes it, and \`row add\` adds the row.`);
+  // `--kind` is the arc's own (build or ideate) and a row's too (fix, change, question): a row's word is refused and names `row edit`.
+  const kindAt = args.findIndex((word) => word === "--kind" || word.startsWith("--kind="));
+  const kindGiven = kindAt < 0 ? null : args[kindAt].includes("=") ? args[kindAt].slice(7) : args[kindAt + 1] ?? null;
+  const rowKind = kindGiven !== null && !(ARC_KINDS as readonly string[]).includes(kindGiven) && (ROW_KINDS as readonly string[]).includes(kindGiven);
+  refuseFlags(args, rowKind ? ROW_FLAGS : ROW_FLAGS.filter((name) => name !== "kind"), (name) => `does not take \`--${name}\`: it is a row's field — \`row edit <workstream>/N<nnn> <row> --${name} …\` changes it, and \`row add\` adds the row.`);
   const words = readWords(args, OPTIONS);
   const [ref, ...more] = words.paths;
   if (more.length) throw new UsageFault("takes one arc; a row is `row edit <workstream>/N<nnn> <row>`.");
@@ -265,6 +277,12 @@ function edit(args: string[]): number {
       if (!hasWords(note)) throw new UsageFault(`opens the review-fixes arc on the developer's words: \`--note "<their words>"\` (RULE.DEVEX.WORKSPACE.261).`);
     }
     data = newArc(arc, subject, title);
+    // `--kind ideate` opens an ideate arc (RULE.DEVEX.WORKSPACE.494): it holds the overall proposal and proposes the build arcs.
+    const kind = words.value("kind");
+    if (kind !== null) {
+      if (!(ARC_KINDS as readonly string[]).includes(kind)) throw new UsageFault(`takes \`--kind\` as one of ${ARC_KINDS.join(" · ")}: \`${kind}\` is none.`);
+      if (kind === "ideate") data.kind = "ideate";
+    }
     if (reviewFixes) { data.reviewFixes = true; data.status = "DECIDED"; }
     wordsGuard(arc, null, reviewFixes, words);
     header(data, words);
@@ -274,7 +292,7 @@ function edit(args: string[]): number {
     logEvent(ws, arc, "opened", null, note ? `opened as ${data.status} · ${note}` : `opened as ${data.status}`);
     said.push(`${arc} opened · ${data.status}${reviewFixes ? " · review fixes" : ""}`);
     opened = leavePageWhole(ws, data, under);
-    said.push("preview", "What entry", "Cycles row");
+    said.push("preview", "What entry", "Plan row");
     if (data.carries?.length) said.push(...shapedWords(ws, data.carries));
     precedent.push(...rankedPrecedent(workspaceOf(), title, words.value("goal") ?? ""));
   } else {
@@ -290,7 +308,7 @@ function edit(args: string[]): number {
         return 1;
       }
     }
-    // A bare edit, or one with `--under`, leaves the page whole: whatever of the preview, the What entry and the Cycles row is missing.
+    // A bare edit, or one with `--under`, leaves the page whole: whatever of the preview, the What entry and the Plan row is missing.
     const repairs = (!changed.length && !note) || under !== null;
     // A stored PROPOSED wins over the steps: a changed goal stops what the arc was building.
     const stopped = changed.includes("status") && data.status === "PROPOSED"
@@ -309,7 +327,7 @@ function edit(args: string[]): number {
     // A status line leads with the move, so the log says where the arc went, and the developer's words sit beside it.
     const move = changed.includes("status") ? `${was} → ${data.status}${data.reason ? ` · ${data.reason}` : ""}`
       : changed.includes("wait") ? `${data.status} · wait: ${data.wait}` : changed.includes("start") ? `${data.status} · started` : "";
-    const wrote = repaired ? [repaired.preview === "written" ? "preview" : "", repaired.entry !== "kept" ? "What entry" : "", repaired.cycles !== "kept" ? "Cycles row" : ""].filter(Boolean) : [];
+    const wrote = repaired ? [repaired.preview === "written" ? "preview" : "", repaired.entry !== "kept" ? "What entry" : "", repaired.cycles !== "kept" ? "Plan row" : ""].filter(Boolean) : [];
     if (move || changed.length || note || wrote.length)
       logEvent(ws, arc, move ? "status" : changed.length || wrote.length ? "header" : "note", null,
         move ? (note ? `${move} · ${note}` : move) : note ?? (changed.length ? `changed ${changed.join(", ")}` : `wrote ${wrote.join(", ")}`));
@@ -322,7 +340,7 @@ function edit(args: string[]): number {
     if (goes && data.carries?.length) said.push(...movedWords(moveCarried(ws, data.carries, "decided"), "decided"));
     if (changed.includes("status") && data.status === "DROPPED" && data.carries?.length) said.push(...movedWords(moveCarried(ws, data.carries, "dropped"), "dropped"));
   }
-  // A preview that moved is a view moved: the Cycles row links it in the same write.
+  // A preview that moved is a view moved: the Plan row links it in the same write.
   const refreshed = refreshIfMoved(ws, before, previewMoved);
   const { done, total } = doneOf(data);
   console.log(`ok · ${bare ? arc : `${arc} ${done}/${total}`} · ${[...said, ...refreshed.said].join(" · ")}`);
@@ -363,7 +381,7 @@ function stamp(args: string[]): number {
   const text = readFileSync(page, "utf8");
   const next = restamped(text, arc, value);
   if (next === null) {
-    console.error(`${arc} has no row in Cycles carrying \`data-arc="arcs/${arc}/state.json"\` — run \`spn-devex docs cycles write\` first. Nothing was written.`);
+    console.error(`${arc} has no row in Plan carrying \`data-arc="arcs/${arc}/state.json"\` — run \`spn-devex docs cycles write\` first. Nothing was written.`);
     return 1;
   }
   if (next !== text) writeFileSync(page, next, "utf8");
@@ -395,9 +413,9 @@ function remove(args: string[]): number {
 export const actions: Record<string, Action> = {
   edit: {
     describe: "open an arc, or change any field of its header and its status; --note writes a log line",
-    usage: "<workstream>/N<nnn> [--title …] [--goal …] [--status …] [--wait …] [--reason …] [--start] [--review-fixes] [--subject …] [--under …] [--preview …] [--decides …] [--repos …] [--cycle …] [--follows …] [--model …] [--position …] [--note …]",
+    usage: "<workstream>/N<nnn> [--kind ideate] [--proposes N<nnn>,…] [--title …] [--goal …] [--status …] [--wait …] [--reason …] [--start] [--review-fixes] [--subject …] [--under …] [--preview …] [--decides …] [--repos …] [--cycle …] [--follows …] [--model …] [--position …] [--note …]",
     run: edit,
   },
-  stamp: { describe: "write: restamp an arc's Cycles row once its part of the page is current", usage: "write <workstream>/N<nnn>", run: stamp },
+  stamp: { describe: "write: restamp an arc's Plan row once its part of the page is current", usage: "write <workstream>/N<nnn>", run: stamp },
   delete: { describe: "delete an arc never decided, on the developer's words", usage: "<workstream>/N<nnn> --note \"…\"", run: remove },
 };

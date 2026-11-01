@@ -274,7 +274,7 @@ console.log("\n=== stop — an arc is read from its data: state.json, log.jsonl 
     const page = join(ws, "approach.html");
     writeFileSync(page, readFileSync(page, "utf8").replace(/\s*<tr id="N001"[^\n]*<\/tr>/, ""));
     const out = stopAt(root, "d17-unnamed");
-    check("an arc the page's Cycles does not carry is named by [state]", /\[state\].*N001 has no row in Cycles/.test(out), out);
+    check("an arc the page's Plan does not carry is named by [state]", /\[state\].*N001 has no row in Plan/.test(out), out);
   }
   {
     const { root, ws } = await dataWorkspace("d17-pageless");
@@ -295,7 +295,7 @@ console.log("\n=== stop — an arc is read from its data: state.json, log.jsonl 
     const page = join(ws, "approach.html");
     writeFileSync(page, readFileSync(page, "utf8").replace(/<div class="sds-open">[\s\S]*?<div class="sds-recommended">[^\n]*\n\s*<\/div>/, ""));
     const out = stopAt(root, "d17-card-off-page", NEEDS + "done");
-    check("an open record whose card is not on the page is named by [state]", /\[state\].*q1 is open and its card is not on/.test(out), out);
+    check("an open record whose card is not on the page is named by [state]", /\[state\].*Q1 is open and its card is not on/.test(out), out);
   }
 }
 
@@ -400,7 +400,7 @@ console.log("\n=== the handover check — what counts as saying a window is need
   const ROOT = workspace("stop-handover-wiring");
   const BLOCK = ["```", "continue:     workstream `008-plain-language`, arc `N13`, step 4",
     "model:        Opus 5.5", "read first:   the arc", "pins:         spn-foundation abc1234",
-    "live now:     no reload", "done when:    it lands",
+    "state:        row 1 landed", "live now:     no reload", "done when:    it lands",
     "do not touch: Q115", "open:         Q138", "```"].join("\n");
   // ROOT IS PASSED EXPLICITLY. Calling with one argument leaves `root` undefined, the wiring read
   // throws, and the whole install precondition is skipped in silence — a suite that would pass
@@ -569,6 +569,7 @@ console.log("\n=== handover — the template's fields, and a fence that quotes t
     "              `/w/notes/N116/plan.md`",
     "pins:         spn-claude-marketplace 2f8c5a0 · spn-foundation 907b11f; re-run the plan's stale",
     "              check first — `git -C spn-claude-marketplace log 2f8c5a0..HEAD -- packages`",
+    "state:        row 1 landed, row 2 not started",
     "live now:     the hook script is live · waits for the window: the skill",
     "done when:    Commands row `plugin unit` → all passed",
     "do not touch: the templates folder",
@@ -627,12 +628,31 @@ console.log("\n=== handover — the template's fields, and a fence that quotes t
   console.log(`  ${told ? "PASS" : "FAIL"}  a block with a {{…}} left is refused, and told to fill in every label`);
 
   // EACH LABEL IS OWED. A block missing one is refused, and the refusal names the label it lacks.
-  for (const label of ["continue", "pins", "live now", "open"]) {
+  for (const label of ["continue", "pins", "state", "live now", "open"]) {
     n += 1;
     const got = checkHandover(`Pick this up in a new window.\n\n${withoutLabel(label)}`, ROOT, everyone(ROOT));
     const ok = got.length === 1 && new RegExp(`missing \`${label}:\``).test(got[0].message);
     if (!ok) failed += 1;
     console.log(`  ${ok ? "PASS" : "FAIL"}  a block missing \`${label}:\` is refused, naming it${ok ? "" : ` — got ${JSON.stringify(got)}`}`);
+  }
+
+  // THE HANDOVER HAS NINE LABELS (RULE.DEVEX.WORKSPACE.394): `state:` sits between `pins:` and `live now:`, and the template carries it.
+  {
+    n += 1;
+    const noState = checkHandover(`Pick this up in a new window.\n\n${withoutLabel("state")}`, ROOT, everyone(ROOT));
+    const sentBack = noState.length === 1 && /missing `state:`/.test(noState[0].message) && /pins: · state: · live now:/.test(noState[0].message);
+    if (!sentBack) failed += 1;
+    console.log(`  ${sentBack ? "PASS" : "FAIL"}  [MKT.HOOKS.438] known-bad: a block without \`state:\` is sent back, naming it and the nine labels in the book's order${sentBack ? "" : ` — got ${JSON.stringify(noState)}`}`);
+    n += 1;
+    const template = readFileSync(resolve(PLUGIN, "src", "refs", "devex", "workspace", "docs", "templates", "workstream", "handover-template.md"), "utf8");
+    const own = /```text\n([\s\S]*?)\n```/.exec(template)?.[1] ?? "";
+    // Its placeholders filled in as the writer would, every value left where the template puts it.
+    const filled = own.replace(/\{\{next NNN-subject\}\}/g, "032-next").replace(/\{\{NNN-subject\}\}/g, "031-probe").replace(/N\{\{nnn\}\}/g, "N001").replace(/\{\{[^}]*\}\}/g, "x");
+    const labelsOf = filled.split("\n").filter((line) => /^[a-z ]+:/.test(line)).map((line) => line.split(":")[0]);
+    const passes = checkHandover(`Pick this up in a new window.\n\n\`\`\`text\n${filled}\n\`\`\``, ROOT, everyone(ROOT));
+    const whole = labelsOf.join("|") === "continue|model|read first|pins|state|live now|done when|do not touch|open" && passes.length === 0;
+    if (!whole) failed += 1;
+    console.log(`  ${whole ? "PASS" : "FAIL"}  [MKT.HOOKS.438] the template's own block, filled in, carries the nine labels in order and passes${whole ? "" : ` — ${labelsOf.join("|")} ${JSON.stringify(passes)}`}`);
   }
 
   // NO LEGACY: the sentence form is refused as a block missing every label.
@@ -1035,12 +1055,12 @@ console.log("\n=== handover — the labels are read as one column, the one `do n
   const { checkHandover, handoverColumns } = await import("../../../../src/scripts/events/stop.ts");
   const ROOT = workspace("n006-stop-handover-column");
   const check = (label, ok, detail = "") => { n += 1; if (!ok) failed += 1; console.log(`  ${ok ? "PASS" : "FAIL"}  ${label}${ok || !detail ? "" : `\n        ${detail}`}`); };
-  const LABELS = ["continue", "model", "read first", "pins", "live now", "done when", "do not touch", "open"];
+  const LABELS = ["continue", "model", "read first", "pins", "state", "live now", "done when", "do not touch", "open"];
   const block = (lines) => "I am handing this over.\n\n```text\n" + lines.join("\n") + "\n```\n";
   const value = (at) => `value ${at} 020-agent-workstream-improvements N006`;
   const aligned = LABELS.map((label, at) => `${`${label}:`.padEnd(14)}${value(at)}`);
 
-  // KNOWN-BAD: eight label lines, every label present, whose values start in different columns.
+  // KNOWN-BAD: nine label lines, every label present, whose values start in different columns.
   const ragged = checkHandover(block(LABELS.map((label, at) => `${label}:${at % 2 ? " " : "      "}${value(at)}`)), ROOT, everyone(ROOT));
   check("[MKT.HOOKS.37] known-bad: values that start in different columns get one [handover] warning",
     ragged.length === 1 && ragged[0].check === "handover", JSON.stringify(ragged));
@@ -1127,12 +1147,13 @@ console.log("\n=== stop — a page left stale by an arc this session wrote");
     goal: "the chapter says where the model sits", status: ["RUNNING", "LANDED"].includes(status) ? "DECIDED" : status, reason: null, preview: "preview.html", rows: [
       { id: "1", parent: "N001", title: "the chapter", kind: "change", repo: "spn-foundation", work: "DOCS", state: ["RUNNING", "LANDED"].includes(status) ? "landed" : "waiting" },
       { id: "2", parent: "N001", title: "the check", kind: "change", repo: "spn-support-ts", work: "CODE", state }] }, null, 2)}\n`;
-  // A page in the approach template's shape: a labelled status, How ending in Cycles, and Open.
+  // A page in the approach template's shape: a labelled status, a Plan section after How, and Open.
   const pageFor = (folder, status, glyph) => `<!doctype html>
 ${STYLES}
 <div class="sds-eyebrow"><span class="sds-line1">Workstream</span><span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-${status.toLowerCase()}">${glyph} ${status}</span></span></div>
 <section id="s3"><div class="sds-section-head"><h2>How &mdash; the order</h2></div>
-  <h3 id="h9">Cycles &mdash; the arcs, in the order they run</h3>
+</section>
+<section id="arcs" data-block="sequence"><div class="sds-section-head"><h2>Plan &mdash; the arcs, in the order they run</h2></div>
 ${tableOf(cyclesOf(folder))}
 </section>
 <section id="s4"><div class="sds-section-head"><h2>Open &mdash; no card is open</h2></div>
@@ -1208,13 +1229,13 @@ ${tableOf(cyclesOf(folder))}
     const out = stop(built, "d-other");
     check("[MKT.HOOKS.35] a workstream another session wrote is not this session's to hear about", !/\[page-stale\]/.test(out), out);
   }
-  // UNTOUCHED: a page in the older shape has no Cycles table, so the command has nothing to write.
+  // UNTOUCHED: a page in the older shape has no arcs table, so the command has nothing to write.
   {
     const built = build("n006-stop-page-older-shape");
     writeFileSync(built.page, page({}));
     stop(built, "d-older");
     move(built, "RUNNING", "waiting");
-    check("[MKT.HOOKS.35] a page with no Cycles table is not told to run the command", !/\[page-stale\]/.test(stop(built, "d-older")));
+    check("[MKT.HOOKS.35] a page with no arcs table is not told to run the command", !/\[page-stale\]/.test(stop(built, "d-older")));
   }
 
   console.log("\n=== stop — a page that holds its own copy of the styles");
@@ -1331,7 +1352,7 @@ ${tableOf(cyclesOf(folder))}
     land(root, "held-page");
     const waiting = stop(root, "held-page");
     check("known-bad: the same finding is said at the first turn end where no row is running",
-      /\[state\]/.test(waiting) && waiting.includes("N001 has no row in Cycles"), waiting);
+      /\[state\]/.test(waiting) && waiting.includes("N001 has no row in Plan"), waiting);
   }
   {
     const root = await built("n009-held-notes");
@@ -1398,6 +1419,7 @@ ${tableOf(cyclesOf(folder))}
     "model:        Opus 5.5, effort high",
     "read first:   `approach.html#N001`, rows 1 and 2",
     "pins:         spn-x abc1234",
+    "state:        row 1 landed",
     "live now:     no reload",
     "done when:    the suite passes",
     "do not touch: the templates folder",
@@ -1757,7 +1779,7 @@ console.log("\n=== stop — the checks the first round fixed or wired, and the g
     check("[MKT.HOOKS.116] a close that opens with what was delivered passes", prose.length === 0, JSON.stringify(prose));
     // A handover block in an earlier message of the turn counts as given (RULE.DEVEX.WORKSPACE.393).
     const BLOCK = ["The work is done.", "", "```text", "continue:     workstream `001-a-subject`, arc `N001`, step 1",
-      "model:        Opus 5.5, effort high", "read first:   `approach.html#N001`", "pins:         spn-x abc1234", "live now:     no reload",
+      "model:        Opus 5.5, effort high", "read first:   `approach.html#N001`", "pins:         spn-x abc1234", "state:        row 1 landed", "live now:     no reload",
       "done when:    the suite passes", "do not touch: the templates folder", "open:         none", "```"].join("\n");
     const PASS_ON = "Pick this up in a new window.";
     const owed = call("checkHandover", PASS_ON, ROOT, mine);
@@ -1818,6 +1840,9 @@ console.log("\n=== stop — the checks the first round fixed or wired, and the g
       unfolded.length === 1 && unfolded[0].message.includes("a report waiting to be folded (code-spn-x-1)")
         && unfolded[0].message.includes("`spn-devex workstream report write 031-probe notes/N001/orders/code-spn-x-1.report.md`"), JSON.stringify(unfolded));
     check("[MKT.HOOKS.306] a workstream that is not this window's is not read", call("checkGoNext", root, new Set(), []).length === 0);
+    check("[MKT.HOOKS.414] a go this window did not start is not its next step, though the workstream is its own", call("checkGoNext", root, everyone(root), [], new Set()).length === 0);
+    check("[MKT.HOOKS.414] a go this window started is its next step", call("checkGoNext", root, everyone(root), [], new Set(["031-probe/N001"])).length === 1);
+    check("[MKT.HOOKS.414] a go a handover gave the window is its next step", call("checkGoNext", root, everyone(root), [], new Set(["031-probe/*"])).length === 1);
     // A PART THAT WAITS ON SOMETHING OUTSIDE THE WINDOW IS NEVER THE NEXT STEP: it is said once, as waiting, with what it waits on.
     planWith([part("code-spn-x-1", "waiting", { waitingOn: "the release of spn-y that ships spnutils x run" }), part("code-spn-x-2", "ready", { entries: ["N001/E2"] })]);
     const mixed = call("checkGoNext", root, everyone(root), []);
@@ -1948,9 +1973,9 @@ console.log("\n=== stop — send-backs are written as they are said, the welcome
   const editRows = (ws, change) => { const data = JSON.parse(readFileSync(arcFile(ws), "utf8")); change(data); writeFileSync(arcFile(ws), `${JSON.stringify(data, null, 2)}\n`); };
   const PROMISE = "The page is written and its checks are green.\n\nNext I'll build it.";
 
-  check("[MKT.HOOKS.341] the nine checks about the reply are one set in lib/payload.ts",
-    payloadLib.REPLY_CHECKS instanceof Set && payloadLib.REPLY_CHECKS.size === 9
-      && ["needs-you", "reply-shape", "cards", "handover", "how-it-runs", "partner-words", "page-path", "welcome", "window"].every((name) => payloadLib.REPLY_CHECKS.has(name)),
+  check("[MKT.HOOKS.341] the twelve checks about the reply are one set in lib/payload.ts",
+    payloadLib.REPLY_CHECKS instanceof Set && payloadLib.REPLY_CHECKS.size === 12
+      && ["needs-you", "reply-shape", "cards", "handover", "how-it-runs", "partner-words", "page-path", "close-message", "card-case", "proposal-record", "welcome", "window"].every((name) => payloadLib.REPLY_CHECKS.has(name)),
     JSON.stringify([...(payloadLib.REPLY_CHECKS ?? [])]));
 
   // The suite runs with SPN_TELEMETRY=off (tests/run.mjs); these cases read the rows a hook writes, so they take it out
@@ -2003,6 +2028,77 @@ console.log("\n=== stop — send-backs are written as they are said, the welcome
     check("[MKT.HOOKS.342] a first reply that opens with the status line is not sent back where the note says short", !speaks("wl-short", "short"));
     check("[MKT.HOOKS.342] nor where the window holds no welcome", !speaks("wl-none", null));
     check("[MKT.HOOKS.342] the same reply is sent back where the note says whole", speaks("wl-whole", "whole"));
+  }
+
+  // A CLOSE IS A MILESTONE: the reply that follows a close's success text is its closing message (RULE.DEVEX.WORKSPACE.206).
+  {
+    const entry = (type, content) => JSON.stringify({ type, message: { role: type, content } });
+    const SUCCESS = "ok · 031-probe closed · approach page stamped DONE · moved from open/ into closed/";
+    const closing = "# 🚀 The probe is answered\n\n&nbsp;\n\n### 📦 What we delivered\n\n- the probe\n\n### 🧠 What we learned\n\n- it works\n\nThank you 👍\n\nThis window can be retired.";
+    const closed = (name, results) => {
+      const file = join(BASE, `${name}.jsonl`);
+      writeFileSync(file, [entry("user", "close it"), entry("assistant", [{ type: "tool_use", id: "t1", name: "Bash", input: {} }]),
+        entry("user", results.map((text) => ({ type: "tool_result", tool_use_id: "t1", content: text })))].join("\n") + "\n");
+      return file;
+    };
+    const file = closed("close-turn", [SUCCESS]);
+    check("[MKT.HOOKS.406] the turn's tool results are read from the transcript, after the last prompt", stopModule.toolResultsOf(file).join() === SUCCESS, JSON.stringify(stopModule.toolResultsOf(file)));
+    const bare = stopModule.checkCloseMessage("Closed 031.", stopModule.toolResultsOf(file));
+    check("[MKT.HOOKS.406] a reply after a close that is not the closing message is sent back, naming every missing piece and the rule",
+      bare.length === 1 && bare[0].check === "close-message" && ["🚀 or ✈️", "What we delivered", "What we learned", "Thank you 👍", "retired", "RULE.DEVEX.WORKSPACE.206"].every((word) => bare[0].message.includes(word)), JSON.stringify(bare));
+    const part = stopModule.checkCloseMessage(closing.replace("Thank you 👍\n\n", ""), [SUCCESS]);
+    check("[MKT.HOOKS.406] a reply missing one piece is sent back naming only that piece", part.length === 1 && part[0].message.split("Write it as")[0].includes("Thank you 👍") && !part[0].message.split("Write it as")[0].includes("What we learned"), JSON.stringify(part));
+    check("[MKT.HOOKS.407] the whole closing message passes, with a ✈️ heading and the other wordings of the two headings",
+      stopModule.checkCloseMessage(closing, [SUCCESS]).length === 0
+        && stopModule.checkCloseMessage(closing.replace("🚀", "✈️").replace("we delivered", "was delivered").replace("we learned", "was learned"), [SUCCESS]).length === 0);
+    check("[MKT.HOOKS.407] a turn whose tool results hold no close success is never asked for the message", stopModule.checkCloseMessage("Done.", ["all 12 passed"]).length === 0 && stopModule.checkCloseMessage("Done.", []).length === 0);
+    check("[MKT.HOOKS.406] the check is about the reply: it is said while a row runs", payloadLib.REPLY_CHECKS.has("close-message"));
+    const root = build("close-message-hook");
+    bindOpen(root, "cm-1");
+    const out = run("node", [HOOK], { cwd: root, session_id: "cm-1", transcript_path: file, last_assistant_message: "Closed 031." }, root);
+    const ok = run("node", [HOOK], { cwd: root, session_id: "cm-2", transcript_path: file, last_assistant_message: closing }, root);
+    check("[MKT.HOOKS.406] the hook sends the bare reply back and lets the closing message through", out.includes("[close-message]") && !ok.includes("[close-message]"), `${out.slice(0, 300)} | ${ok.slice(0, 300)}`);
+  }
+
+  // A CARD IS NAMED WITH A CAPITAL (RULE.DEVEX.WORKSPACE.486).
+  {
+    const flagged = stopModule.checkCardCase("I answered q28 and raised s3, then q28 again.");
+    check("[MKT.HOOKS.408] a reply that names a card with a lowercase letter is sent back, naming each once with its capital form and the rule",
+      flagged.length === 1 && flagged[0].check === "card-case" && flagged[0].message.includes("`q28` is `Q28`") && flagged[0].message.includes("`s3` is `S3`")
+        && flagged[0].message.split("`q28`").length === 2 && flagged[0].message.includes("RULE.DEVEX.WORKSPACE.486"), JSON.stringify(flagged));
+    const quiet = (text) => stopModule.checkCardCase(text).length === 0;
+    check("[MKT.HOOKS.409] a capital Q<n> and S<n> pass", quiet("Q28 is answered, and S3 is parked."));
+    check("[MKT.HOOKS.409] a code span, a fenced block, a link and a URL are left alone",
+      quiet("The id `q28` is stored.\n\n```\nq28 s3\n```\n\nSee [q28](approach.html) and https://x.test/q28."));
+    check("[MKT.HOOKS.409] a path or an anchor is left alone: after a slash or a hash, or inside a word",
+      quiet("Open 036-agent-follows-rules/q28, approach.html#q28, notes/s3 and sq28 or aq1."));
+    check("[MKT.HOOKS.408] the check is about the reply: it is said while a row runs", payloadLib.REPLY_CHECKS.has("card-case"));
+    const root = build("card-case-hook");
+    bindOpen(root, "cc-1");
+    const bad = run("node", [HOOK], { cwd: root, session_id: "cc-1", last_assistant_message: "Q28 is open, and q29 too." }, root);
+    const good = run("node", [HOOK], { cwd: root, session_id: "cc-2", last_assistant_message: "Q28 is open, and Q29 too." }, root);
+    check("[MKT.HOOKS.408] the hook sends the lowercase reply back and lets the capital one through", bad.includes("[card-case]") && bad.includes("`q29` is `Q29`") && !good.includes("[card-case]"), `${bad.slice(0, 300)} | ${good.slice(0, 200)}`);
+  }
+
+  // A PROPOSAL IN CHAT ENDS AS A RECORD (RULE.DEVEX.WORKSPACE.493).
+  {
+    const { root } = await dataWorkspace("proposal-record");
+    const mine = new Set(["031-probe"]);
+    const table = "Here are the ways.\n\n| Option | What it does |\n| --- | --- |\n| **A** | send it to the framework route |\n| **B** | send it to IAM's controller |\n\nMy recommendation is A.";
+    const list = "Two ways:\n\nA. send it to the framework route, which costs little.\nB. send it to IAM's controller, which costs more.";
+    const check1 = (reply) => stopModule.checkProposalRecorded(reply, root, mine);
+    // The Q22 chat reply: a table of lettered options, no number.
+    check("[MKT.HOOKS.427] red: a reply that sets out a lettered table and names no Q<n> or S<n> is sent back, naming the way to record it and the rule",
+      check1(table).length === 1 && check1(table)[0].check === "proposal-record" && check1(table)[0].message.includes("RULE.DEVEX.WORKSPACE.493") && check1(table)[0].message.includes("question raise"), JSON.stringify(check1(table)));
+    check("[MKT.HOOKS.427] red: a list of A. and B. options with no number is sent back too", check1(list).length === 1, JSON.stringify(check1(list)));
+    check("[MKT.HOOKS.427] red: a number that holds no record in the window's workstream is sent back", check1(`Q77 is open.\n\n${table}`).length === 1);
+    cli(root, ["workstream", "question", "raise", "031/N001", "--file", put(root, "p.json", JSON.stringify(DATA_CARD)) ?? "p.json"]);
+    check("[MKT.HOOKS.427] green: a number that holds a record passes", check1(`Q1 records this.\n\n${table}`).length === 0, JSON.stringify(check1(`Q1 records this.\n\n${table}`)));
+    cli(root, ["workstream", "suggestion", "add", "031/N001", "a better way"]);
+    check("[MKT.HOOKS.427] green: and so does a suggestion's number", check1(`S1 records this.\n\n${list}`).length === 0);
+    check("[MKT.HOOKS.427] green: a reply with no lettered options owes no number", check1("The page is written and the checks are green. See A. Smith's note.").length === 0);
+    check("[MKT.HOOKS.427] green: a fenced list is a quotation and sets out nothing", check1("The block:\n\n```\nA. one\nB. two\n```").length === 0);
+    check("[MKT.HOOKS.427] the check is about the reply", payloadLib.REPLY_CHECKS.has("proposal-record"));
   }
 
   // A RUN OUTSIDE THE WORKSPACE, WITH THE PROJECT DIRECTORY AT IT, READS THE WORKSPACE (s43).

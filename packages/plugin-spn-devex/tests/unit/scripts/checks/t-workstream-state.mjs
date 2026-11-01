@@ -24,7 +24,7 @@ console.log("=== a whole workstream");
   ok("green: a workstream kept as data and whole has no finding", findings.length === 0, said(findings));
 }
 
-console.log("\n=== S7 — the stamp on each arc's Cycles row: its goal, title and repositories");
+console.log("\n=== S7 — the stamp on each arc's Plan row: its goal, title and repositories");
 {
   const { root, ws } = await dataWorkspace("state-stamp");
   const file = join(ws, "arcs", "N001", "state.json");
@@ -47,7 +47,7 @@ console.log("\n=== S7 — the stamp on each arc's Cycles row: its goal, title an
   const page = join(ws, "approach.html");
   const text = readFileSync(page, "utf8");
   writeFileSync(page, text.replace(/<tr id="N001" data-arc="arcs\/N001\/state.json"[^>]*>/, "<tr>"));
-  ok("red: an arc with no row in Cycles fails", has(checkWorkstream(ws), "stamp", /has no row in Cycles/), said(checkWorkstream(ws)));
+  ok("red: an arc with no row in Cycles fails", has(checkWorkstream(ws), "stamp", /has no row in Plan/), said(checkWorkstream(ws)));
   writeFileSync(page, text.replace('<a href="notes/N001/preview.html">the probe</a>', "the probe"));
   ok("red: an arc whose preview its What entry does not link fails", has(checkWorkstream(ws), "stamp", /N001's preview is not linked from its What entry, `#N001-what`/), said(checkWorkstream(ws)));
   writeFileSync(page, text);
@@ -72,7 +72,7 @@ console.log("\n=== RULE.DEVEX.WORKSPACE.273 — a view of an arc's status that d
   ok("`docs cycles write` mends it", mended.code === 0 && checkWorkstream(ws).length === 0, `${mended.out} ${said(checkWorkstream(ws))}`);
   writeFileSync(page, original.replace('sds-decided">DECIDED', 'sds-running">RUNNING'));
   const redRow = checkWorkstream(ws);
-  ok("red: a Cycles row showing another status fails", has(redRow, "views", /N001 reads RUNNING in the approach page's Cycles table and its data reads DECIDED — `spn-devex docs cycles write 031`/), said(redRow));
+  ok("red: a Plan row showing another status fails", has(redRow, "views", /N001 reads RUNNING in the approach page's Plan table and its data reads DECIDED — `spn-devex docs cycles write 031`/), said(redRow));
   writeFileSync(page, original.replace('sds-planning">&#x1F52E; PLANNING', 'sds-implementing">&#x1F6A7; IMPLEMENTING'));
   const redCard = checkWorkstream(ws);
   ok("red: a status card that disagrees with the arcs fails", has(redCard, "views", /status card reads IMPLEMENTING and the arcs give PLANNING/), said(redCard));
@@ -80,14 +80,14 @@ console.log("\n=== RULE.DEVEX.WORKSPACE.273 — a view of an arc's status that d
   ok("green: the page put back passes", checkWorkstream(ws).length === 0, said(checkWorkstream(ws)));
 }
 
-console.log("\n=== RULE.DEVEX.WORKSPACE.263 — every arc has an address, its Cycles row's id");
+console.log("\n=== RULE.DEVEX.WORKSPACE.263 — every arc has an address, its Plan row's id");
 {
   const { root, ws } = await dataWorkspace("state-address");
   const page = join(ws, "approach.html");
   const text = readFileSync(page, "utf8");
   writeFileSync(page, text.replace('<tr id="N001" ', "<tr "));
   const red = checkWorkstream(ws);
-  ok("red: a Cycles row with no id fails, naming the address it leaves empty", has(red, "stamp", /carries no `id="N001"`, so `approach.html#N001` opens nothing/), said(red));
+  ok("red: a Plan row with no id fails, naming the address it leaves empty", has(red, "stamp", /carries no `id="N001"`, so `approach.html#N001` opens nothing/), said(red));
   const wrote = cli(root, ["docs", "cycles", "write", "031"]);
   ok("`docs cycles write` gives the row its id", wrote.code === 0 && readFileSync(page, "utf8").includes('<tr id="N001" data-arc="arcs/N001/state.json"'), wrote.out);
   ok("green: the row under its address passes", checkWorkstream(ws).length === 0, said(checkWorkstream(ws)));

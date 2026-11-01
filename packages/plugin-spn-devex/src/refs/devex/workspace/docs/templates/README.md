@@ -16,6 +16,8 @@ disagree the book wins. `restates files write` writes them and `restates check` 
 that has fallen behind, so a builder's edit reaches every partner with the next plugin release
 rather than being discovered by somebody's first session going wrong.
 
+**The plugins carry a copy built from the book, never one edited on its own** (`RULE.DEVEX.WORKSPACE.490` · MUST · check:doc-check). The build, `node scripts/build-plugins.mjs`, copies every file of the book's templates folder into this one, subfolders kept, as it builds the rules index from the same book. A template is changed in the book and nowhere else; a file only this folder holds is reported by the build and never deleted, and with no book beside the checkout the copy stays as committed.
+
 **The stamp above names the folder, not each file** (`RULE.DEVEX.AGENT.072` · MUST · skill:spn-devex/develop). One citation per template
 would report every edit and miss every addition — a template nobody cited has nothing to compare
 against, and *the book grew a shape a partner does not have* is what this copy exists to prevent.

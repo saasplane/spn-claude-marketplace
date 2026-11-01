@@ -41,10 +41,14 @@
 // THE RULES INDEX AND THE SKILL BLOCKS ARE WRITTEN HERE TOO. Once spn-devex is bundled, its restates bundle
 // writes `refs/rules.json` and each skill step's rules block from the book beside this checkout, the way
 // `refs/commands.md` is written from `cli.mjs`. With no book there, both stay as committed.
+//
+// THE TEMPLATES ARE COPIED HERE TOO (RULE.DEVEX.WORKSPACE.490): every file of the book's `04-docs/templates/` folder is copied into
+// spn-devex's `refs/devex/workspace/docs/templates/`, subfolders kept, from the same book. A template is changed in the book and nowhere
+// else; a file only the plugin holds is reported and never deleted, and with no book beside the checkout the plugin's copy stays as committed.
 
 import * as esbuild from "esbuild";
 import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
-import { dirname, join } from "node:path";
+import { dirname, join, relative } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { bannerFor, pluginSourceHash } from "./lib/source-hash.mjs";
 
@@ -161,6 +165,46 @@ async function writeRules() {
   return { book, ...writeRulesIndex(book, ROOT) };
 }
 
+/** The book's templates folder, from the book's root. */
+const BOOK_TEMPLATES = join("docs", "04-capabilities", "01-devex", "04-workspace", "04-docs", "templates");
+/** Where spn-devex carries its copy. */
+const PLUGIN_TEMPLATES = join(PACKAGES, "plugin-spn-devex", "src", "refs", "devex", "workspace", "docs", "templates");
+
+/** Every file under a folder, as paths relative to it, sorted; nothing where the folder is absent. */
+function filesUnder(folder) {
+  const out = [];
+  const walk = (dir) => {
+    if (!existsSync(dir)) return;
+    for (const name of readdirSync(dir).sort()) {
+      if (name.startsWith(".")) continue;
+      const path = join(dir, name);
+      if (statSync(path).isDirectory()) walk(path); else out.push(relative(folder, path));
+    }
+  };
+  walk(folder);
+  return out;
+}
+
+/**
+ * The book's templates copied into the plugin's folder, byte for byte, subfolders kept. Returns the files written and the files only the
+ * plugin holds (reported, never deleted), or null where there is no book beside the checkout.
+ */
+function copyTemplates(book) {
+  if (book === null) return null;
+  const from = join(book, BOOK_TEMPLATES);
+  const written = [];
+  for (const file of filesUnder(from)) {
+    const source = readFileSync(join(from, file));
+    const target = join(PLUGIN_TEMPLATES, file);
+    if (isFile(target) && readFileSync(target).equals(source)) continue;
+    mkdirSync(dirname(target), { recursive: true });
+    writeFileSync(target, source);
+    written.push(join("packages", "plugin-spn-devex", "src", "refs", "devex", "workspace", "docs", "templates", file));
+  }
+  const held = new Set(filesUnder(from));
+  return { written, pluginOnly: filesUnder(PLUGIN_TEMPLATES).filter((file) => !held.has(file)) };
+}
+
 /** `dist/` rebuilt from nothing every time, so a renamed or removed source leaves no orphan bundle. */
 function cleanDist(outdir) {
   if (existsSync(outdir)) rmSync(outdir, { recursive: true, force: true });
@@ -193,6 +237,13 @@ async function buildOnce() {
   else if (rules) {
     console.log(`  ok    rules index  (${rules.rules} rules, book at ${rules.commit}${rules.faults.length ? `, ${rules.faults.length} that do not read` : ""})`);
     for (const file of rules.written) console.log(`          ${file}`);
+  }
+  const copied = copyTemplates(rules?.book ?? null);
+  if (copied === null) console.log("  keep  refs/devex/workspace/docs/templates — no spn-foundation beside this checkout");
+  else {
+    console.log(`  ok    templates  (${copied.written.length} copied from the book)`);
+    for (const file of copied.written) console.log(`          ${file}`);
+    for (const file of copied.pluginOnly) console.log(`  note  ${file} is only in the plugin's templates, so it is kept`);
   }
   return builtAny;
 }

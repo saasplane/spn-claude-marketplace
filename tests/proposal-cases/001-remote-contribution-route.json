@@ -1,0 +1,13 @@
+{
+  "id": "001-remote-contribution-route",
+  "title": "A migration contribution from a service that holds IAM remotely goes to the framework's route beside /remote",
+  "rule": "RULE.DEVEX.AGENT.169",
+  "problem": "A service that holds the identity module (IAM) remotely must send IAM a migration contribution, once per module and version, and IAM must apply it with its own code at its own version. Today the support library's remote module manager posts the contribution to the remote route with a service named MigrationContribution and a method apply, and a second design gives IAM its own controller route for it. The two ends must meet, and the choice is where the contribution is sent and received.",
+  "nearest": [
+    "The remote route the support library already uses for a call to a service that holds a module remotely: SPServiceAppRemoteModuleManager.ts, where sendMigrationContribution posts to API_REMOTE_ROUTE_PATH.",
+    "The framework serves the remote route on its private listener, and a route that belongs to every module is registered by the framework, not by a module's own controller."
+  ],
+  "ask": "Say in a few sentences where the contribution should be sent and received, and which existing construct that follows. Do not write code.",
+  "expect": ["\\/remote", "private listener", "framework"],
+  "refuse": ["recommend[^.\\n]{0,120}IAMModuleController", "recommend[^.\\n]{0,120}MigrationContribution", "(?:name|call) the service\\s+`?MigrationContribution"]
+}

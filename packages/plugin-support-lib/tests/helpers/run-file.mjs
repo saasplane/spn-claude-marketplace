@@ -48,13 +48,27 @@ export function resultsOf(out, tier) {
   return results;
 }
 
+/**
+ * The run this one reuses the results of, from `--reused-from=<run>` on the command line (every runner is handed the
+ * caller's arguments), or null. A name that cannot be a run name exits.
+ */
+export function reusedFromOf(argv) {
+  const given = argv.find((arg) => arg.startsWith("--reused-from="));
+  const name = given ? given.slice("--reused-from=".length) : null;
+  if (name !== null && !RUN_NAME.test(name)) {
+    console.error(`'${name}' is not a run name to reuse: a letter or digit first, then letters, digits, dots, dashes and underscores.`);
+    process.exit(2);
+  }
+  return name;
+}
+
 /** Writes a named run's file and says where, or says that no run name was given. */
 export function recordRun(repo, run, tier, results, append = false) {
   if (run === null) {
     console.log("  no run name given, so no run file was written — name one to leave what this run proved: node run.mjs <run>");
     return null;
   }
-  const file = writeRunFile(repo, run, tier, results, append);
+  const file = writeRunFile(repo, run, tier, results, append, { reusedFrom: reusedFromOf(process.argv.slice(2)) });
   console.log(`  ${results.length} case(s) carry a behaviour id -> ${file.slice(repo.length + 1)}`);
   return file;
 }

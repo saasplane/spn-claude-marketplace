@@ -857,5 +857,32 @@ console.log("\n=== split-plan — a page that holds its own copy of the styles")
     { parity: false, why: "the Python knows no go" });
 }
 
+console.log("\n=== [MKT.SCRIPTS.392] a panel's verdict on record (RULE.DEVEX.WORKSPACE.485)");
+{
+  const { panelOnRecord, panelsVisible } = await import("../../../../src/scripts/checks/split-plan.ts");
+  const { mkdirSync, writeFileSync } = await import("node:fs");
+  const { BASE } = await import("../../../helpers/fixture.mjs");
+  const check = (name, ok, detail = "") => { n += 1; if (!ok) failed += 1; console.log(`  ${ok ? "PASS" : "FAIL"}  ${name}${ok || !detail ? "" : `\n        ${detail}`}`); };
+  const root = join(BASE, "panel-on-record");
+  const folder = join(root, ".spndevex", ".debug", "telemetry");
+  mkdirSync(folder, { recursive: true });
+  const row = (over) => JSON.stringify({ v: 1, mtype: "PANEL", id: Math.random().toString(16).slice(2), at: "2026-11-01T10:00:00Z", ms: 0, event: "SubagentStop", session: "s", agent: "a",
+    workstream: "031-probe", arc: "N001", part: null, skill: null, work: null, retryOf: null, lens: "LEAD", verdict: "PASS", ...over });
+  const log = (name, ...rows) => writeFileSync(join(folder, name), rows.join("\n") + "\n");
+  const on = (...args) => panelOnRecord(root, "031-probe", "N001", ...args);
+  check("[MKT.SCRIPTS.392] no log, no panel", on(null) === false);
+  log("hooks.jsonl", row({ verdict: "BLOCKED" }), row({ arc: "N002" }), row({ workstream: "032-other" }), row({ mtype: "TURN" }), "not json", row({ part: "release-x-1" }));
+  check("[MKT.SCRIPTS.392] a blocked verdict, another arc, another workstream, a row that is not a panel's and a torn line count for nothing", on(null, null) === true && on("release-x-2") === false);
+  check("[MKT.SCRIPTS.392] a row naming a part counts for that part, and a row naming none for any part", on("release-x-1") === true);
+  log("hooks.jsonl", row({ part: null }));
+  check("[MKT.SCRIPTS.392] a row naming no part counts for every part", on("release-x-9") === true && on(null) === true);
+  log("hooks.jsonl", row({ at: "2026-11-01T10:00:00Z" }));
+  check("[MKT.SCRIPTS.392] a row counts on or after `since`, and not before it", on(null, "2026-11-01T10:00:00Z") === true && on(null, "2026-11-01T10:00:01+00:00") === false && on(null, "2026-11-01T15:30:00+05:30") === true);
+  log("hooks.jsonl", "");
+  log("usage.jsonl", row({ verdict: "PASS_WITH_ADVICE" }));
+  check("[MKT.SCRIPTS.392] the usage log is read too, and a verdict of PASS_WITH_ADVICE is not blocked", on(null) === true);
+  check("[MKT.SCRIPTS.392] panels are visible only while telemetry recording is on", panelsVisible(root) === false && (writeFileSync(join(root, ".spndevex", ".debug", "switches.json"), '{"telemetry": true}'), process.env.SPN_TELEMETRY !== "off" ? panelsVisible(root) === true : true));
+}
+
 console.log(failed ? `\n  ${failed} FAILED` : `\n  all ${n} passed`);
 process.exit(failed ? 1 : 0);

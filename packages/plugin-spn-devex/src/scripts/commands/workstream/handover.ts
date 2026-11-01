@@ -4,15 +4,18 @@
 //   spn-devex workstream handover <workstream> [--continue "…"] [--do-not-touch "…"]
 //
 // Writes the handover block from the data (the arcs' rows, the cards, the orders still running and the facts' pins)
-// as a note in the log of the workstream's first open arc, and prints it. The agent's own words are the two it cannot
+// as a note in the log of the arc that is running (or the lead of the newest go, else the first open arc), and prints it. The agent's own words are the two it cannot
 // read from the data: what to continue, and what not to touch.
 
-import { existsSync, readdirSync } from "node:fs";
+import { existsSync } from "node:fs";
 import { basename, join } from "node:path";
 import { VALUE, UsageFault, readWords } from "../../../../../plugin-support-lib/src/lib/command.ts";
 import {
-  arcIdsOf, arcStatus, builtOf, factsFileOf, firstOpenArc, logEvent, notesDirOf, openQuestions, readArc, readJsonl, readQuestions, whatId,
+  arcIdsOf, arcStatus, builtOf, factsFileOf, firstOpenArc, logEvent, notesDirOf, openQuestions, readArc, readJsonl, readQuestions,
+  suggestionOpen, suggestionsOf, whatId,
 } from "../../lib/workstream.ts";
+import { readGo } from "../../lib/go-plan.ts";
+import { cardName, type ArcData, type GoPlan } from "../../lib/workstream-schema.ts";
 import { workstreamNamed } from "./_shared.ts";
 
 export const describe = "the handover block, written from the rows, the cards, the live orders and the pins into the arc's log, and printed";
@@ -21,27 +24,43 @@ export const usage = "<workstream> [--continue \"…\"] [--do-not-touch \"…\"]
 const OWED = "(yours to add: `--continue \"…\"`)";
 const OWED_TOUCH = "(yours to add: `--do-not-touch \"…\"`, or `nothing`)";
 
-/** The orders of an arc that have a brief and no report yet. */
-function liveOrders(ws: string, arc: string): string[] {
-  const dir = join(notesDirOf(ws, arc), "orders");
-  if (!existsSync(dir)) return [];
-  const names = readdirSync(dir);
-  return names.filter((name) => /\.md$/.test(name) && !/\.(?:report|ledger)\.md$/.test(name) && !names.includes(name.replace(/\.md$/, ".report.md")))
-    .map((name) => `${arc} order ${name.replace(/\.md$/, "")}`);
+/** The go plans of a workstream, newest first by `writtenAt`. */
+function goPlans(ws: string, arcs: readonly string[]): GoPlan[] {
+  const plans: GoPlan[] = [];
+  for (const arc of arcs) { try { const plan = readGo(ws, arc); if (plan) plans.push(plan); } catch { /* a plan that fails its schema is not read here */ } }
+  return plans.sort((a, b) => String(b.writtenAt).localeCompare(String(a.writtenAt)));
+}
+
+/** THE ARC THE NEXT WINDOW READS FIRST: the lead of a go with a part running, else an arc that is running, else the lead of the newest go, else the first open arc. */
+export function runningArc(ws: string, arcs: readonly ArcData[]): string | null {
+  const plans = goPlans(ws, arcs.map((one) => one.arc));
+  const running = plans.find((plan) => plan.parts.some((part) => part.state === "running"));
+  return running?.lead ?? arcs.find((one) => arcStatus(one) === "RUNNING")?.arc ?? plans[0]?.lead ?? firstOpenArc(ws) ?? arcs[0]?.arc ?? null;
+}
+
+/** THE LIVE ORDERS: a part that is `running` in a go plan and has no report yet, one line for each. */
+export function liveOrders(ws: string, arcs: readonly string[]): string[] {
+  const out: string[] = [];
+  for (const plan of goPlans(ws, arcs)) {
+    const dir = join(notesDirOf(ws, plan.lead), "orders");
+    for (const part of plan.parts)
+      if (part.state === "running" && !existsSync(join(dir, `${part.id}.report.md`))) out.push(`${plan.lead} order ${part.id}`);
+  }
+  return out;
 }
 
 /** The block's text: one label after another, each read from the workstream's data. */
 export function handoverBlock(ws: string, said: { continue?: string; doNotTouch?: string }): { lead: string; text: string } {
   const arcs = arcIdsOf(ws).map((arc) => readArc(ws, arc)).filter((one) => one !== null);
-  const lead = firstOpenArc(ws) ?? arcs[0]?.arc;
+  const lead = runningArc(ws, arcs);
   if (!lead) throw new UsageFault(`finds no arc in ${basename(ws)} to write a handover in.`);
   const questions = readQuestions(ws);
-  const open = openQuestions(questions).map((one) => one.id);
+  const open = [...openQuestions(questions).map((one) => cardName(one.id)), ...suggestionsOf(ws).filter(suggestionOpen).map((one) => cardName(one.id))];
   const pins = new Set<string>();
-  for (const arc of arcs) for (const fact of readJsonl(factsFileOf(ws, arc.arc)) as Array<{ source?: string; commit?: string }>)
+  for (const arc of arcs.filter((one) => one.arc === lead)) for (const fact of readJsonl(factsFileOf(ws, arc.arc)) as Array<{ source?: string; commit?: string }>)
     if (fact.commit && fact.source) pins.add(`${fact.source.split("/")[0].split(":")[0]} ${fact.commit}`);
   const state = arcs.map((arc) => { const built = builtOf(arc); return `${arc.arc} ${arcStatus(arc)} ${built.done}/${built.total}`; });
-  const live = arcs.flatMap((arc) => liveOrders(ws, arc.arc));
+  const live = liveOrders(ws, arcs.map((arc) => arc.arc));
   const unfinished = arcs.filter((arc) => arcStatus(arc) !== "LANDED").map((arc) => `${arc.arc} LANDED`);
   const leadData = arcs.find((arc) => arc.arc === lead);
   const date = new Date().toISOString().slice(0, 10);

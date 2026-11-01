@@ -1,11 +1,15 @@
 // RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § Questions are records, and every card is one rendered
+//           RULE.DEVEX.WORKSPACE.486, a question is named Q<n> and a suggestion S<n>, with a capital letter, wherever a person reads it
+//           RULE.DEVEX.WORKSPACE.491 and .492, a proposal starts from the construct that exists, and its views are fresh and on record; RULE.DEVEX.AGENT.168
 // The chapter is the source of truth; a rule change is edited there first, then here, in the same change.
+// Input takes either case (`q28`, `Q28`, `036/Q28`); a stored id stays lowercase and everything printed or logged names the card with the capital.
 //
 //   spn-devex workstream question raise <workstream>/N<nnn> --file card.json
-//   spn-devex workstream question show <qN> --in <notes/N<nnn>/preview.html>
-//   spn-devex workstream question answer <qN> --key A --words "…" [--entries E7,E9]
-//   spn-devex workstream question cite <qN> --entries E7,E9|none
-//   spn-devex workstream question withdraw <qN> --words "…"
+//   spn-devex workstream question show Q<n> --in <notes/N<nnn>/preview.html>
+//   spn-devex workstream question brief <workstream>/Q<n>
+//   spn-devex workstream question answer Q<n> --key A --words "…" [--entries E7,E9]
+//   spn-devex workstream question cite Q<n> --entries E7,E9|none
+//   spn-devex workstream question withdraw Q<n> --words "…"
 //
 // The only writers of `questions.jsonl`. Each write renders every page's `open` block from the
 // records, so a card is the same wherever it stands and leaves every page in the same write.
@@ -18,13 +22,14 @@ import { readFileSync, writeFileSync } from "node:fs";
 import { basename, resolve } from "node:path";
 import { type Action, VALUE, UsageFault, readAddress, readWords } from "../../../../../plugin-support-lib/src/lib/command.ts";
 import {
-  approachOf, arcIdsOf, fromWorkstream, inline, logEvent, now, questionsFileOf, readArc, readQuestions, readSheet, resolveRef, sheetFileOf, whatEntryOf,
+  approachOf, arcIdsOf, fromWorkstream, inline, logEvent, now, questionsFileOf, readArc, readQuestions, readSheet, resolveRef, sheetFileOf, whatEntryOf, workspaceOf,
   writeJsonl, writeOpenBlocks, writeWhole,
 } from "../../lib/workstream.ts";
 import { readGo } from "../../lib/go-plan.ts";
 import { isFile } from "../../lib/payload.ts";
-import { runningWorkFault } from "../../checks/questions.ts";
-import { QUESTION_ID, cardFaults, type Card, type Question } from "../../lib/workstream-schema.ts";
+import { PANELS_BLIND, raiseFaults, runningWorkFault } from "../../checks/questions.ts";
+import { panelsVisible } from "../../checks/split-plan.ts";
+import { QUESTION_ID, RECORD_VERSION, cardFaults, cardId, cardName, type Card, type Question } from "../../lib/workstream-schema.ts";
 import { afterWrite, arcNamed, arcSignatures, listOf, refreshIfMoved, typed } from "./_shared.ts";
 import { actions as goActions } from "./go.ts";
 
@@ -39,13 +44,13 @@ export function nextQuestionId(records: readonly Question[], page: string): stri
 
 /** The record a reference names, and its workstream. */
 function recordNamed(ref: string | undefined): { ws: string; records: Question[]; record: Question } {
-  if (!ref) throw new UsageFault("needs a question, as `q<n>` or `<workstream>/q<n>`.");
-  const address = readAddress(ref);
+  if (!ref) throw new UsageFault("needs a question, as `Q<n>` or `<workstream>/Q<n>`.");
+  const address = readAddress(cardId(ref));
   const { ws, id } = typed(() => resolveRef(address.workstream ? `${address.workstream}/${address.id}` : address.id, (folder, question) => readQuestions(folder).some((one) => one.id === question)));
-  if (!QUESTION_ID.test(id)) throw new UsageFault(`reads \`${id}\` as no question — a question is \`q<n>\`.`);
+  if (!QUESTION_ID.test(id)) throw new UsageFault(`reads \`${id}\` as no question — a question is \`Q<n>\`.`);
   const records = readQuestions(ws);
   const record = records.find((one) => one.id === id);
-  if (!record) throw new UsageFault(`finds no ${id} in ${basename(ws)}'s questions.jsonl.`);
+  if (!record) throw new UsageFault(`finds no ${cardName(id)} in ${basename(ws)}'s questions.jsonl.`);
   return { ws, records, record };
 }
 
@@ -78,6 +83,12 @@ function raise(args: string[]): number {
   const faults = [...(typeof card.title === "string" && card.title.trim() ? [] : ["the card has no `title`"]), ...cardFaults(card)];
   if (faults.length) throw new UsageFault(`refuses a card with a part missing: ${faults.join("; ")}.`);
   if (!CITATION.test(card.what ?? "")) throw new UsageFault(UNCITED);
+  // A CARD RAISED NOW CARRIES THE FIELDS OF RULES 491 AND 492; a record read never needs them.
+  const root = workspaceOf();
+  const raised = raiseFaults(ws, arc, card, root);
+  if (raised.faults.length) throw new UsageFault(`refuses a card that leaves out what a proposal starts from: ${raised.faults.join("; ")}.`);
+  card.signs = raised.signs;
+  if (root && !panelsVisible(root) && card.views.some((view) => view.made === "FRESH")) console.log(PANELS_BLIND);
   const running = runningWorkFault(ws, card.title ?? "", (card.options ?? []).map((option) => option.does));
   if (running) throw new UsageFault(running);
   const records = readQuestions(ws);
@@ -87,14 +98,49 @@ function raise(args: string[]): number {
   // THE WINDOW THAT RAISES A CARD IS RECORDED, so the Stop hook puts the card to that window and no other.
   // Claude Code gives every command its window's session id; run by hand, there is none and nothing is recorded.
   const raiser = (process.env.CLAUDE_CODE_SESSION_ID ?? "").trim();
-  const record: Question = { id, arc, title: title!, state: "open", raised: now(), ...(raiser ? { raisedBy: raiser } : {}), shownIn: [],
-    card: { why: rest.why, what: rest.what, viewsLead: rest.viewsLead, views: rest.views, options: rest.options, recommended: rest.recommended }, answer: null };
+  const record: Question = { v: RECORD_VERSION, id, arc, title: title!, state: "open", raised: now(), ...(raiser ? { raisedBy: raiser } : {}), shownIn: [],
+    card: { why: rest.why, what: rest.what, viewsLead: rest.viewsLead, views: rest.views, options: rest.options, recommended: rest.recommended,
+      nearest: rest.nearest, signs: rest.signs, others: rest.others, ...(rest.noLeaveIt ? { noLeaveIt: rest.noLeaveIt } : {}) }, answer: null };
   records.push(record);
   const lines = finish(ws, records);
-  if (readArc(ws, arc)) logEvent(ws, arc, "question", null, `${id} raised · ${title}`);
-  const open = records.filter((one) => one.state === "open").map((one) => one.id.replace(/^q/, "Q")).join(" · ");
-  console.log(`${id} · open · ${page ? basename(page) : "approach.html"} Open — ${open}`);
+  if (readArc(ws, arc)) logEvent(ws, arc, "question", null, `${cardName(id)} raised · ${title}`);
+  const open = records.filter((one) => one.state === "open").map((one) => cardName(one.id)).join(" · ");
+  console.log(`${cardName(id)} · open · ${page ? basename(page) : "approach.html"} Open — ${open}`);
   for (const line of lines) console.log(line);
+  return 0;
+}
+
+/**
+ * A fresh view's brief, written from the card's why, what, nearest construct and signs (RULE.DEVEX.WORKSPACE.492): the problem and the
+ * constraints first, no options, and the line that says the proposals come after the view has answered.
+ */
+export function briefOf(workstream: string, record: Question): string {
+  const card = record.card;
+  const signs = Array.isArray(card.signs) && card.signs.length ? card.signs.join(", ") : "none declared";
+  return [
+    `You are one fresh view on ${workstream}/${record.arc}, ${cardName(record.id)}: ${record.title}`,
+    "",
+    "The problem",
+    card.why,
+    "",
+    "What is true today, and the constraints",
+    card.what,
+    "",
+    `The nearest existing construct: ${card.nearest ?? "none named"}`,
+    `Signs of complexity: ${signs}`,
+    "",
+    "Say from your lens and the construct above what you would build and where it would live. Write your whole words, then keep them in " +
+      `${workstream}/notes/${record.arc}/work/.`,
+    "The proposals are not in this brief. They come by message after your first answer; read them then and say where they differ from yours.",
+  ].join("\n");
+}
+
+function brief(args: string[]): number {
+  const words = readWords(args, {});
+  const [ref, ...more] = words.paths;
+  if (more.length) throw new UsageFault("takes one question.");
+  const { ws, record } = recordNamed(ref);
+  console.log(briefOf(basename(ws), record));
   return 0;
 }
 
@@ -108,10 +154,10 @@ function show(args: string[]): number {
   const path = isFile(resolve(target)) ? resolve(target) : resolve(ws, target);
   const rel = fromWorkstream(ws, path);
   if (!/^notes\/N\d+[a-z]?\/preview\.html$/.test(rel) || !isFile(path)) throw new UsageFault(`shows a card on an arc's preview, \`notes/N<nnn>/preview.html\`, and \`${target}\` is none.`);
-  if (record.state !== "open") throw new UsageFault(`shows an open card, and ${record.id} is ${record.state}.`);
+  if (record.state !== "open") throw new UsageFault(`shows an open card, and ${cardName(record.id)} is ${record.state}.`);
   if (!record.shownIn.includes(rel)) record.shownIn.push(rel);
   const lines = finish(ws, records);
-  console.log(`${record.id} · shown in ${record.shownIn.length} preview${record.shownIn.length === 1 ? "" : "s"}`);
+  console.log(`${cardName(record.id)} · shown in ${record.shownIn.length} preview${record.shownIn.length === 1 ? "" : "s"}`);
   for (const line of lines) console.log(line);
   return 0;
 }
@@ -125,7 +171,7 @@ function foldIntoWhat(ws: string, record: Question, key: string | null, said: st
   if (!entry) return false;
   let cut = entry.to;
   while (cut > entry.from && /\s/.test(text[cut - 1])) cut -= 1;
-  writeWhole(page, `${text.slice(0, cut)}\n  <p>${record.id.replace(/^q/, "Q")}${key ? ` ${key}` : ""}: ${inline(said)}</p>${text.slice(cut)}`);
+  writeWhole(page, `${text.slice(0, cut)}\n  <p>${cardName(record.id)}${key ? ` ${key}` : ""}: ${inline(said)}</p>${text.slice(cut)}`);
   return true;
 }
 
@@ -134,8 +180,8 @@ function citeInEntries(ws: string, arc: string, id: string, key: string | null, 
   const sheet = readSheet(ws, arc);
   if (!sheet) return;
   for (const entry of sheet.entries) {
-    if (!entries.includes(entry.id) || entry.decidedBy.some((text) => new RegExp(`\\b${id}\\b`).test(text))) continue;
-    entry.decidedBy.push(`${id}${key ? ` ${key}` : ""}`);
+    if (!entries.includes(entry.id) || entry.decidedBy.some((text) => new RegExp(`\\b${id}\\b`, "i").test(text))) continue;
+    entry.decidedBy.push(`${cardName(id)}${key ? ` ${key}` : ""}`);
   }
   writeWhole(sheetFileOf(ws, arc), `${JSON.stringify(sheet, null, 2)}\n`);
 }
@@ -171,15 +217,15 @@ function cite(args: string[]): number {
   const [ref, ...more] = words.paths;
   if (more.length) throw new UsageFault("takes one question.");
   const { ws, records, record } = recordNamed(ref);
-  if (record.state !== "answered" || !record.answer) throw new UsageFault(`cites an answered card, and ${record.id} is ${record.state}.`);
+  if (record.state !== "answered" || !record.answer) throw new UsageFault(`cites an answered card, and ${cardName(record.id)} is ${record.state}.`);
   const cited = listOf(words, "entries");
   if (!cited) throw new UsageFault("needs `--entries E7,E9`, or `--entries none` for an answer that changes no repository file.");
   heldEntries(ws, record.arc, cited);
   record.answer.entries = [...new Set([...(record.answer.entries ?? []), ...cited])];
   const lines = finish(ws, records);
   if (cited.length) citeInEntries(ws, record.arc, record.id, record.answer.key ?? null, cited);
-  if (readArc(ws, record.arc)) logEvent(ws, record.arc, "cited", null, `${record.id} · ${citedLine(cited)}`);
-  console.log([`${record.id} · ${citedLine(cited)}`, ...writeGoAgain(ws, record.arc)].join(" · "));
+  if (readArc(ws, record.arc)) logEvent(ws, record.arc, "cited", null, `${cardName(record.id)} · ${citedLine(cited)}`);
+  console.log([`${cardName(record.id)} · ${citedLine(cited)}`, ...writeGoAgain(ws, record.arc)].join(" · "));
   for (const line of lines) console.log(line);
   return 0;
 }
@@ -189,7 +235,7 @@ function settle(args: string[], state: "answered" | "withdrawn"): number {
   const [ref, ...more] = words.paths;
   if (more.length) throw new UsageFault("takes one question.");
   const { ws, records, record } = recordNamed(ref);
-  if (record.state !== "open") throw new UsageFault(`settles an open card, and ${record.id} is ${record.state}.`);
+  if (record.state !== "open") throw new UsageFault(`settles an open card, and ${cardName(record.id)} is ${record.state}.`);
   const said = words.value("words");
   if (!said) throw new UsageFault("needs `--words \"…\"`: your words, as you gave them.");
   const key = state === "answered" ? words.value("key") : null;
@@ -202,7 +248,7 @@ function settle(args: string[], state: "answered" | "withdrawn"): number {
   record.state = state;
   record.answer = { key, words: said, at: now(), ...(cited ? { entries: cited } : {}) };
   const lines = finish(ws, records);
-  if (readArc(ws, record.arc)) logEvent(ws, record.arc, state, null, `${record.id}${key ? ` ${key}` : ""} · ${said}`);
+  if (readArc(ws, record.arc)) logEvent(ws, record.arc, state, null, `${cardName(record.id)}${key ? ` ${key}` : ""} · ${said}`);
   const refreshed = refreshIfMoved(ws, before);
   const settled: string[] = [];
   if (cited) {
@@ -212,15 +258,16 @@ function settle(args: string[], state: "answered" | "withdrawn"): number {
     settled.push(...writeGoAgain(ws, record.arc));
   }
   const owed = state === "answered" ? (cited ? "" : `owed: ${record.arc}'s What, its Log line`) : "owed: its Log line";
-  console.log(`${[`${record.id} · ${state}${key ? ` ${key}` : ""} · off ${off} page${off === 1 ? "" : "s"}`, ...refreshed.said, ...settled, ...(owed ? [owed] : [])].join(" · ")}`);
+  console.log(`${[`${cardName(record.id)} · ${state}${key ? ` ${key}` : ""} · off ${off} page${off === 1 ? "" : "s"}`, ...refreshed.said, ...settled, ...(owed ? [owed] : [])].join(" · ")}`);
   for (const line of [...refreshed.lines, ...lines]) console.log(line);
   return 0;
 }
 
 export const actions: Record<string, Action> = {
   raise: { describe: "raise a card: the next number, the record, the card in the approach page's Open", usage: "<workstream>/N<nnn> --file card.json", run: raise },
-  show: { describe: "show an open card on an arc's preview, in its Open", usage: "<qN> --in <notes/N<nnn>/preview.html>", run: show },
-  answer: { describe: "answer a card in your words; it leaves every Open; with --entries, folded into the What, cited, and the go written again", usage: "<qN> --key <option> --words \"…\" [--entries E7,E9]", run: (args) => settle(args, "answered") },
-  cite: { describe: "cite an answered card in entries of its arc's sheet, or record with none that it changes no repository file; the go written again", usage: "<qN> --entries E7,E9|none", run: cite },
-  withdraw: { describe: "withdraw a card in your words; it leaves every Open", usage: "<qN> --words \"…\"", run: (args) => settle(args, "withdrawn") },
+  brief: { describe: "print a fresh view's brief from the card: the problem and the constraints first, no options, the proposals to follow", usage: "<workstream>/Q<n>", run: brief },
+  show: { describe: "show an open card on an arc's preview, in its Open", usage: "Q<n> --in <notes/N<nnn>/preview.html>", run: show },
+  answer: { describe: "answer a card in your words; it leaves every Open; with --entries, folded into the What, cited, and the go written again", usage: "Q<n> --key <option> --words \"…\" [--entries E7,E9]", run: (args) => settle(args, "answered") },
+  cite: { describe: "cite an answered card in entries of its arc's sheet, or record with none that it changes no repository file; the go written again", usage: "Q<n> --entries E7,E9|none", run: cite },
+  withdraw: { describe: "withdraw a card in your words; it leaves every Open", usage: "Q<n> --words \"…\"", run: (args) => settle(args, "withdrawn") },
 };

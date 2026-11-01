@@ -18,6 +18,11 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
+      "section": "A declared fact is read, never inferred",
+      "seen": "0dde9fb6"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "section": "Every prompt is read before anything moves",
       "seen": "268ef0f4"
     },
@@ -245,6 +250,19 @@ name it back.
 with its trade-off, and never says the ask conflicts with a rule** (`RULE.DEVEX.AGENT.161` · MUST · short).
 It lays out the ways to reach what the partner asked for, what each one costs them now and later, and
 the one it would take, and the partner chooses.
+
+## A declared fact is read, never inferred
+
+**The agent follows what is defined and never guesses a name, a shape or a value** (`RULE.DEVEX.AGENT.167` · MUST · short). Its goal is
+that its own work follows the standards. Where the book, a construct, a pattern or a declaration defines the thing, you read it and
+follow it. Where none does, you stop: in a proposal you name the gap, in a helper's part you return `needs-you`, and you never invent a
+name and carry on.
+
+**A gap you find becomes a suggestion, never a quiet fill** (`RULE.DEVEX.AGENT.168` · MUST · check:questions). In the builder's
+workspace, a thing the book or a construct does not define becomes a suggestion that improves the book, raised against the arc that
+met it, and a card whose nearest construct is `none` links that suggestion. In a partner's workspace you cannot change the book: the gap
+becomes an issue drafted for the public marketplace repository in the book's own terms, which a person reads and files. It never
+carries the partner's code, product names or words, and you never file it on your own.
 
 ## Every prompt is read before anything moves
 

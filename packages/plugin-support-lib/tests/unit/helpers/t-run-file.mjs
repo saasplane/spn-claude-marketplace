@@ -1,8 +1,9 @@
 // `tests/helpers/run-file.mjs` — where every package's suite runner leaves what a run proved.
-import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync } from "node:fs";
+import { execFileSync } from "node:child_process";
+import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { RUNS_KEPT, resultsOf, runFilePath, writeRunFile } from "../../helpers/run-file.mjs";
+import { RUNS_KEPT, resultsOf, reusedFromOf, runFilePath, writeRunFile } from "../../helpers/run-file.mjs";
 
 const kept = [];
 process.on("exit", () => { for (const dir of kept) rmSync(dir, { recursive: true, force: true }); });
@@ -26,8 +27,8 @@ console.log("=== the suite runner's run file");
   const written = JSON.parse(readFileSync(file, "utf8"));
   ok("[MKT.TESTS.07] a run writes tests/.output/<tier>/runs/<run>.json under the name its caller gave",
     file === join(root, "tests", ".output", "unit", "runs", "full-1001.json") && existsSync(file), file);
-  ok("[MKT.TESTS.07] in the shape every runner writes: run, tier, phase, ranAt, env and results",
-    JSON.stringify(Object.keys(written)) === '["run","tier","phase","ranAt","env","results"]'
+  ok("[MKT.TESTS.07] in the shape every runner writes: run, tier, phase, ranAt, env and results, with the commit, the package count and reusedFrom",
+    JSON.stringify(Object.keys(written)) === '["run","tier","phase","ranAt","env","commit","packages","reusedFrom","results"]'
       && written.run === "full-1001" && written.tier === "UNIT" && written.phase === null
       && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/.test(written.ranAt) && written.results[0].id === "MKT.TESTS.07", JSON.stringify(written));
 }
@@ -73,6 +74,23 @@ console.log("=== the suite runner's run file");
   const found = resultsOf(out, "UNIT");
   ok("[MKT.TESTS.07] a suite's output yields each PASS or FAIL line that carries an id, and nothing else",
     found.length === 2 && found[0].status === "SUCCESS" && found[1].status === "FAILED" && found[1].id === "MKT.HOOKS.142", JSON.stringify(found));
+}
+
+{
+  const root = repo();
+  execFileSync("git", ["init", "-q"], { cwd: root });
+  execFileSync("git", ["-c", "user.name=t", "-c", "user.email=t@t", "commit", "-q", "--allow-empty", "-m", "x"], { cwd: root });
+  for (const name of ["a", "b"]) { mkdirSync(join(root, "packages", name, "tests"), { recursive: true }); writeFileSync(join(root, "packages", name, "tests", "run.mjs"), ""); }
+  mkdirSync(join(root, "packages", "c"), { recursive: true });
+  const head = execFileSync("git", ["rev-parse", "HEAD"], { cwd: root, encoding: "utf8" }).trim();
+  const plain = JSON.parse(readFileSync(writeRunFile(root, "own", "UNIT", RESULTS), "utf8"));
+  ok("[MKT.SCRIPTS.420] a run file carries the commit it was taken on and the number of packages that carry a runner", plain.commit === head && plain.packages === 2 && plain.reusedFrom === null, JSON.stringify(plain));
+  const reused = JSON.parse(readFileSync(writeRunFile(root, "again", "UNIT", RESULTS, false, { reusedFrom: "own" }), "utf8"));
+  ok("[MKT.SCRIPTS.420] a run that reuses another says which in reusedFrom", reused.reusedFrom === "own", JSON.stringify(reused));
+  const first = writeRunFile(root, "joined", "UNIT", [], false, { reusedFrom: "own" });
+  const second = JSON.parse(readFileSync(writeRunFile(root, "joined", "UNIT", RESULTS, true), "utf8"));
+  ok("[MKT.SCRIPTS.420] a package that adds to the file keeps what it reuses", second.reusedFrom === "own" && second.results.length === 1 && first.endsWith("joined.json"), JSON.stringify(second));
+  ok("[MKT.SCRIPTS.420] reusedFromOf reads the option from the caller's arguments", reusedFromOf(["full-1", "--write-status", "--reused-from=own"]) === "own" && reusedFromOf(["full-1"]) === null);
 }
 
 console.log(failed ? `\n  ${failed} of ${total} FAILED — run-file` : `\n  all ${total} passed — run-file`);

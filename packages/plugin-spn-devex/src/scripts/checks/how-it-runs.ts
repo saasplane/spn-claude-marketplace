@@ -54,11 +54,14 @@ export const RUNNING: Running[] = [
 
 /** What passes whatever else a sentence names: a card's line, a page to look at, a refused act, a boundary, a new workstream. */
 const PASSES: RegExp[] = [
-  /^\W*[QS]\d+\b/,
+  // A card's line, with or without the "Needs you" label in front of its number.
+  /^\W*(?:[Nn]eeds [Yy]ou\b\W*)?[QS]\d+\b/,
   /\b(?:look at|review|read|your go on)\b[^.?!]{0,60}\b(?:preview|page|design)\b/i,
   /\b(?:refus(?:es|ed)|denied|blocked by|permission system|harness)\b/i,
   /\b(?:published contract|contract|security|customer data|product(?:'|’)s data|person(?:'|’)s data|personal data|cloud cost|infrastructure|what (?:a |the )?users? (?:see|sees))\b/i,
   /\bnew workstreams?\b/i,
+  // An act outside the standing grants is the developer's: a cloud apply, production, a teardown, an act that cannot be undone.
+  /\bcloud (?:apply|applies)\b|\bproduction\b|\bprod\b|\b(?:tear(?:s|ing)? down|teardown|destroy(?:s|ed|ing)?)\b|\b(?:cannot|can(?:'|’)t|can not) be (?:undone|reversed)\b|\birreversible\b|\bnot reversible\b|\bno undo\b/i,
 ];
 
 /** Whether a sentence is one of the passes. */

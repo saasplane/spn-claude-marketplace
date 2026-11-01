@@ -813,8 +813,12 @@ console.log("\n=== orientation — a pending plugin migration is the agent's fir
   const recorded = hook(old).context;
   says("green: once the ledger records 001, the window's start says nothing of it", !/\*\*001\*\*|- 001[:,]/.test(recorded), recorded.slice(recorded.indexOf(HEADING), recorded.indexOf(HEADING) + 300));
   const current = hook(fixture("migration-nothing", { ...ground, [`.spndevex/${WORKSTREAMS}/open/042-widget-pricing/arcs/N1/state.json`]: "{}\n" }));
-  says("kept as data and nothing recorded — one line says 001 has nothing to do, and the command that records it",
-    current.context.includes(HEADING) && current.context.includes("- 001, 002, 003, 004, 005, 006, 007, 008, 009: the check finds nothing in the old shape — `spn-devex plugin migration write 001 002 003 004 005 006 007 008 009`"));
+  // THE IDS ARE THE REGISTRY'S OWN, so a migration added later never leaves this case reading a list that was true once.
+  const { MIGRATIONS } = await import("../../../../src/scripts/lib/migrations/index.ts");
+  const ids = MIGRATIONS.map((one) => one.id);
+  says("kept as data and nothing recorded — one line says every migration has nothing to do, and the command that records them",
+    current.context.includes(HEADING) && current.context.includes(`- ${ids.join(", ")}: the check finds nothing in the old shape — \`spn-devex plugin migration write ${ids.join(" ")}\``),
+    current.context.slice(current.context.indexOf(HEADING), current.context.indexOf(HEADING) + 500));
 }
 
 

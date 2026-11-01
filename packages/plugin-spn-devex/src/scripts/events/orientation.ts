@@ -828,9 +828,11 @@ export function migrationLines(root: string): string[] {
 /**
  * Each go of the open workstreams that has a part not landed, read from the lead arc's `go.json`: its parts
  * running, held, waiting (with what they wait on) and ready to launch, the running parts whose report sits beside the brief waiting to be folded,
- * and the next step. `only` keeps the workstreams of one window; a plan that cannot be read is left out.
+ * and the next step. `only` keeps the workstreams of one window; a plan that cannot be read is left out. `started` keeps
+ * the goes one window started or was handed (`<workstream>/<lead>`, or `<workstream>/*`): ANOTHER WINDOW'S GO ON THE SAME
+ * WORKSTREAM IS NOT THIS WINDOW'S NEXT STEP.
  */
-export function goStandings(root: string, only: Set<string> | null = null): Array<{ workstream: string; lead: string; scope: string[];
+export function goStandings(root: string, only: Set<string> | null = null, started: Set<string> | null = null): Array<{ workstream: string; lead: string; scope: string[];
   running: string[]; held: string[]; ready: string[]; waiting: Array<{ id: string; on: string }>; unfolded: string[]; next: string }> {
   const out: ReturnType<typeof goStandings> = [];
   const open = workstreamsDir(root, "open");
@@ -839,6 +841,7 @@ export function goStandings(root: string, only: Set<string> | null = null): Arra
     if (!isDir(ws) || (only && !only.has(name))) continue;
     for (const lead of arcIdsOf(ws)) {
       let plan;
+      if (started && !started.has(`${name}/${lead}`) && !started.has(`${name}/*`)) continue;
       try { plan = readGo(ws, lead); } catch { continue; }
       if (!plan || plan.parts.every((part) => part.state === "landed")) continue;
       const orders = join(notesDirOf(ws, lead), "orders");

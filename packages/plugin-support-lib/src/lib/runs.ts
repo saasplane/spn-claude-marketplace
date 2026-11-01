@@ -3,6 +3,7 @@
 // reader is always told which run to read (the book's RULE.DEVEX.UTILS.071). This file lives once, in
 // the shared support-lib folder; spn-devex and spn-apps each import it by relative path.
 
+import { execFileSync } from "node:child_process";
 import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { basename, dirname, join, relative } from "node:path";
 
@@ -34,20 +35,36 @@ export const RUNS_KEPT = 20;
 export const runFilePath = (repo: string, tier: string, run: string): string =>
   join(repo, "tests", ".output", tier.toLowerCase(), RUNS_FOLDER, `${run}.json`);
 
+/** What a plugins run file says about the tree it was taken on: the commit, the package count, and the run whose results it reuses. */
+export type RunMeta = { commit?: string | null; packages?: number | null; reusedFrom?: string | null };
+
+/** The commit a repository stands on, or null where it is no git tree. */
+export function headCommit(repo: string): string | null {
+  try { return execFileSync("git", ["-C", repo, "rev-parse", "HEAD"], { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim() || null; } catch { return null; }
+}
+
+/** The packages that carry a runner (a `tests/run.mjs` of their own): what a full run covers. */
+export function packageCount(repo: string): number {
+  try { return readdirSync(join(repo, "packages")).filter((name) => existsSync(join(repo, "packages", name, "tests", "run.mjs"))).length; } catch { return 0; }
+}
+
 /**
  * Writes one run's file, in the shape every stack's runner writes, and prunes the tier's folder to its newest
  * `RUNS_KEPT`. A name that cannot be a file name is refused rather than written somewhere nobody would look. With
  * `append`, the results join those a file of the same run already holds; without it a reused name replaces the file.
  */
-export function writeRunFile(repo: string, run: string, tier: string, results: Result[], append = false): string {
+export function writeRunFile(repo: string, run: string, tier: string, results: Result[], append = false, meta: RunMeta = {}): string {
   if (!RUN_NAME.test(run)) {
     throw new Error(`'${run}' is not a run name: a letter or digit first, then letters, digits, dots, dashes and underscores`);
   }
   const file = runFilePath(repo, tier, run);
   mkdirSync(dirname(file), { recursive: true });
-  const before: Result[] = append && existsSync(file) ? JSON.parse(readFileSync(file, "utf8")).results ?? [] : [];
+  const held = append && existsSync(file) ? JSON.parse(readFileSync(file, "utf8")) : {};
+  const before: Result[] = held.results ?? [];
   const ranAt = `${new Date().toISOString().slice(0, 19)}Z`;
-  writeFileSync(file, `${JSON.stringify({ run, tier, phase: null, ranAt, env: "local", results: [...before, ...results] }, null, 2)}\n`, "utf8");
+  // THE FILE SAYS WHAT IT WAS TAKEN ON: the commit and the package count, and the run it reuses where it reuses one (s61).
+  const taken = { commit: meta.commit ?? headCommit(repo), packages: meta.packages ?? packageCount(repo), reusedFrom: meta.reusedFrom ?? held.reusedFrom ?? null };
+  writeFileSync(file, `${JSON.stringify({ run, tier, phase: null, ranAt, env: "local", ...taken, results: [...before, ...results] }, null, 2)}\n`, "utf8");
   const older = readdirSync(dirname(file))
     .filter((name) => name.endsWith(".json"))
     .map((name) => join(dirname(file), name))

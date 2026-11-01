@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "book": {
     "repository": "spn-foundation",
-    "commit": "fbeece6b"
+    "commit": "4f19a216"
   },
   "rules": [
     {
@@ -2125,6 +2125,68 @@
       "heading": "Three classes of rule",
       "decision": null,
       "restated": []
+    },
+    {
+      "id": "RULE.DEVEX.AGENT.167",
+      "level": "MUST",
+      "params": {
+        "short": true
+      },
+      "class": "stated",
+      "sentence": "The agent follows what is defined and never guesses a name, a shape or a value",
+      "chapter": "04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
+      "heading": "A declared fact is read, never inferred",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/agent/agent.md",
+          "heading": "A declared fact is read, never inferred"
+        }
+      ],
+      "line": {
+        "text": "The agent follows what is defined and never guesses a name, a shape or a value.",
+        "ref": "refs/devex/agent/agent.md",
+        "heading": "A declared fact is read, never inferred"
+      }
+    },
+    {
+      "id": "RULE.DEVEX.AGENT.168",
+      "level": "MUST",
+      "params": {
+        "check": "questions"
+      },
+      "class": "checked",
+      "sentence": "A gap the agent finds becomes a suggestion, never a quiet fill",
+      "chapter": "04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
+      "heading": "A declared fact is read, never inferred",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/agent/agent.md",
+          "heading": "A declared fact is read, never inferred"
+        }
+      ]
+    },
+    {
+      "id": "RULE.DEVEX.AGENT.169",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-devex/deliver"
+      },
+      "class": "stated in a skill",
+      "sentence": "A plugins release that changes the ideate skill, the panel or the card grammar runs the fixed proposal cases first, and does not ship on a failed one",
+      "chapter": "04-capabilities/01-devex/02-agent/04-plugins/01-plugins.md",
+      "heading": "A release that changes how the agent proposes runs the proposal cases first",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/deliver/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.FUNCTION.007",
@@ -6500,7 +6562,7 @@
       "class": "checked",
       "sentence": "The parts of the page that the arcs and the records decide are produced, never typed",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "heading": "How ends in Cycles, and the arcs are the state",
+      "heading": "Plan lists the arcs, and the arcs are the state",
       "decision": null,
       "restated": [
         {
@@ -6948,7 +7010,7 @@
       "class": "guidance",
       "sentence": "A fact has one home",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "heading": "How ends in Cycles, and the arcs are the state",
+      "heading": "Plan lists the arcs, and the arcs are the state",
       "decision": null,
       "restated": [
         {
@@ -7512,7 +7574,7 @@
       "class": "guidance",
       "sentence": null,
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "heading": "How ends in Cycles, and the arcs are the state",
+      "heading": "Plan lists the arcs, and the arcs are the state",
       "decision": null,
       "restated": []
     },
@@ -7579,9 +7641,9 @@
         "check": "doc-check"
       },
       "class": "checked",
-      "sentence": "Cycles holds the progress block, generated and never written by hand, and there is no progress page",
+      "sentence": "Plan holds the progress block, generated and never written by hand, and there is no progress page",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "heading": "How ends in Cycles, and the arcs are the state",
+      "heading": "Plan lists the arcs, and the arcs are the state",
       "decision": "DEC.DEVEX.WORKSPACE.250",
       "restated": [
         {
@@ -7887,7 +7949,7 @@
       "class": "checked",
       "sentence": "Every arc has an address on the approach page, `approach.html#N<nnn>`, and every link to an arc points there",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "heading": "How ends in Cycles, and the arcs are the state",
+      "heading": "Plan lists the arcs, and the arcs are the state",
       "decision": null,
       "restated": [
         {
@@ -10862,7 +10924,7 @@
       "class": "guidance",
       "sentence": "Two generated kinds live on a workstream's pages, `progress` and `open`, and a kind is added only with the developer's approval",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "heading": "How ends in Cycles, and the arcs are the state",
+      "heading": "Plan lists the arcs, and the arcs are the state",
       "decision": null,
       "restated": []
     },
@@ -12022,7 +12084,13 @@
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "After the go, every moment names the next step",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/workstream.md",
+          "heading": "After the go, every moment names the next step"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.486",
@@ -12034,6 +12102,178 @@
       "sentence": "A question is named `Q<n>` and a suggestion `S<n>`, with a capital letter, wherever a person reads it",
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "The commands",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/workstream.md",
+          "heading": "After the go, every moment names the next step"
+        }
+      ]
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.487",
+      "level": "MUST",
+      "params": {
+        "check": "doc-check"
+      },
+      "class": "checked",
+      "sentence": "After `How` comes a section of its own, *Plan*: one row per arc, in the order the arcs run",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "heading": "Plan lists the arcs, and the arcs are the state",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/workspace.md",
+          "heading": "The two gates a workstream carries"
+        }
+      ]
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.488",
+      "level": "MUST",
+      "params": {
+        "check": "split-plan"
+      },
+      "class": "checked",
+      "sentence": "A suggestion belongs to an arc, as a card does, and the arc's sheet cites it",
+      "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
+      "heading": "A suggestion is recorded the moment it is raised",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/workstream.md",
+          "heading": "After the go, every moment names the next step"
+        }
+      ]
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.489",
+      "level": "MUST",
+      "params": {
+        "check": "split-plan"
+      },
+      "class": "checked",
+      "sentence": "A workstream closes only once every suggestion is decided, parked or dropped",
+      "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
+      "heading": "A suggestion is recorded the moment it is raised",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/workstream.md",
+          "heading": "After the go, every moment names the next step"
+        }
+      ]
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.490",
+      "level": "MUST",
+      "params": {
+        "check": "doc-check"
+      },
+      "class": "checked",
+      "sentence": "The plugins carry a copy built from these, never one edited on its own",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/README.md",
+      "heading": "The templates sit beside the chapters, in templates/",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/docs/templates/README.md",
+          "heading": "The templates, as a partner has them"
+        }
+      ]
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.491",
+      "level": "MUST",
+      "params": {
+        "check": "questions"
+      },
+      "class": "checked",
+      "sentence": "A proposal starts from the construct that already exists for its kind of problem",
+      "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
+      "heading": "A card is only for what the rules leave open",
+      "decision": null,
+      "restated": []
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.492",
+      "level": "MUST",
+      "params": {
+        "check": "questions"
+      },
+      "class": "checked",
+      "sentence": "The views a card carries are the ones its signs call for, made fresh and on record",
+      "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
+      "heading": "A card is only for what the rules leave open",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "The views that take part"
+        }
+      ]
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.493",
+      "level": "MUST",
+      "params": {
+        "check": "stop"
+      },
+      "class": "checked",
+      "sentence": "A proposal in chat ends as a card or a suggestion",
+      "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
+      "heading": "A card is only for what the rules leave open",
+      "decision": null,
+      "restated": []
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.494",
+      "level": "MUST",
+      "params": {
+        "check": "arc-status"
+      },
+      "class": "checked",
+      "sentence": "When the shape is not settled, the first arc is an ideate arc, and it holds the overall proposal",
+      "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
+      "heading": "An arc is cut by what is reviewed and released together, and named for its domain",
+      "decision": null,
+      "restated": []
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.495",
+      "level": "MUST",
+      "params": {
+        "check": "split-plan"
+      },
+      "class": "checked",
+      "sentence": "A helper that meets a name, a shape or a construct no entry holds stops, and never invents it",
+      "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
+      "heading": "An order is one delegated execution, and every order follows the same rules",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/execute/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.496",
+      "level": "MUST",
+      "params": {
+        "check": "test-run"
+      },
+      "class": "checked",
+      "sentence": "Follow-ups decided after a close run as small batches, with no arc",
+      "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
+      "heading": "A suggestion is recorded the moment it is raised",
       "decision": null,
       "restated": []
     },

@@ -196,7 +196,7 @@ console.log("\n=== a check that finds nothing → recorded without work");
   const [one] = standings(root, MIGRATIONS);
   ok("001 has nothing to do where the workstream is kept as data", one.state === "nothing to do", one.state);
   ok("the window's start says so in one line, naming the command that records it",
-    windowStartLines(root, MIGRATIONS).join("\n") === "- 001, 002, 003, 004, 005, 006, 007, 008, 009: the check finds nothing in the old shape — `spn-devex plugin migration write 001 002 003 004 005 006 007 008 009` records it, with nothing to do.",
+    windowStartLines(root, MIGRATIONS).join("\n") === "- 001, 002, 003, 004, 005, 006, 007, 008, 009, 010, 011: the check finds nothing in the old shape — `spn-devex plugin migration write 001 002 003 004 005 006 007 008 009 010 011` records it, with nothing to do.",
     windowStartLines(root, MIGRATIONS).join("\n"));
   const applied = applyMigrations(root, MIGRATIONS, ["001"]);
   const line = JSON.parse(readFileSync(ledgerOf(root), "utf8").trim());
@@ -378,7 +378,7 @@ console.log("\n=== 005 — no row writes a plan, and the stamp follows the arc's
   ok("the arc's log keeps the row's words in one discarded line",
     readFileSync(join(ws, "arcs", "N001", "log.jsonl"), "utf8").split("\n").filter(Boolean).map((line) => JSON.parse(line))
       .some((line) => line.kind === "discarded" && line.row === "0" && line.note.includes("write notes/N001/plan.md")));
-  ok("the Cycles row is restamped from the arc's goal, title and repositories", stampsOn(page).get("N001")?.stamp === arcStamp(after), lines.join(" | "));
+  ok("the Plan row is restamped from the arc's goal, title and repositories", stampsOn(page).get("N001")?.stamp === arcStamp(after), lines.join(" | "));
   ok("a plan row that landed, and a closed workstream, stay as they are",
     JSON.parse(readFileSync(join(ws, "arcs", "N002", "state.json"), "utf8")).rows.some((row) => row.id === "0")
       && readFileSync(join(closed, "state.json"), "utf8") === closedText);
@@ -496,6 +496,58 @@ console.log("\n=== a script, steps, and the id order");
   const throwing = { id: "103", version: "9.0.0", changed: "x.", check: () => { throw new Error("cannot read"); } };
   const [, , third] = standings(root, [...set, throwing]);
   ok("red: a check that throws is pending, never clean", third.state === "pending" && /could not run: cannot read/.test(third.found[0]), JSON.stringify(third));
+}
+
+console.log("\n=== 010 — a preview whose header is not what the commands write is rewritten, and a closed one stays");
+{
+  const m010 = MIGRATIONS.find((one) => one.id === "010");
+  ok("[MKT.SCRIPTS.393] the plugin ships 010 after 009, at 0.105.0, with a script and no steps",
+    MIGRATIONS[9]?.id === "010" && m010?.version === "0.105.0" && m010.changed.endsWith(".") && typeof m010.script === "function" && !m010.steps?.length);
+  const { root, ws } = await dataWorkspace("headers-010");
+  const preview = join(ws, "notes", "N001", "preview.html");
+  const old = `<header class="sds-masthead"><div class="sds-eyebrow"><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Preview</span><span class="sds-separator">|</span><span class="sds-label">Arc:</span> <span class="sds-badge">N001</span><span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-decided">DECIDED</span></span></span></div><h1>Probe</h1></header>\n`;
+  writeFileSync(preview, old);
+  mkdirSync(join(root, ".spndevex/workstreams/closed/020-done/notes/N001"), { recursive: true });
+  writeFileSync(join(root, ".spndevex/workstreams/closed/020-done/notes/N001/preview.html"), old);
+  const found = m010.check(root);
+  ok("[MKT.SCRIPTS.393] red: 010 names the open preview whose header is behind, and not the closed one", found.length === 1 && found[0].startsWith("open/031-probe/notes/N001/preview.html"), found.join(" | "));
+  const lines = m010.script(root);
+  ok("[MKT.SCRIPTS.393] its script has the arc's writer rewrite it", lines.length === 1 && readFileSync(preview, "utf8").includes("Progress:"), lines.join(" | "));
+  ok("[MKT.SCRIPTS.393] green: 010 then finds nothing, and a second run writes nothing", m010.check(root).length === 0 && m010.script(root).length === 0);
+  ok("[MKT.SCRIPTS.393] a closed workstream's preview stays as it closed", readFileSync(join(root, ".spndevex/workstreams/closed/020-done/notes/N001/preview.html"), "utf8") === old);
+}
+
+console.log("\n=== 011 — the arcs table moves out of How's Cycles subsection into a Plan section after How, and a closed page stays");
+{
+  const m011 = MIGRATIONS.find((one) => one.id === "011");
+  ok("[MKT.SCRIPTS.401] the plugin ships 011 after 010, at 0.105.0, with a script and no steps",
+    MIGRATIONS[10]?.id === "011" && m011?.version === "0.105.0" && m011.changed.endsWith(".") && typeof m011.script === "function" && !m011.steps?.length);
+  const page = (plan) => `<!doctype html>\n<header class="sds-masthead"><h1>Probe</h1></header>\n<section id="s3" data-block="sequence">\n  <div class="sds-section-head"><h2>How</h2></div>\n  <h3 id="h1">spn-x</h3>\n  <p>One line.</p>\n` +
+    (plan ? `</section>\n\n<section id="arcs" data-block="sequence">\n  <div class="sds-section-head"><h2>Plan</h2></div>\n  <p>Order.</p>\n  <div class="sds-scroll"><table><tr><td>N001</td></tr></table></div>\n  <!-- spn:generated progress -->\n  <!-- /spn:generated -->\n</section>\n`
+      : `  <h3 id="h9">Cycles</h3>\n  <p>Order.</p>\n  <div class="sds-scroll"><table><tr><td>N001</td></tr></table></div>\n  <!-- spn:generated progress -->\n  <!-- /spn:generated -->\n</section>\n`) +
+    `<section id="s4"><div class="sds-section-head"><h2>Open</h2></div></section>\n`;
+  const WS = ".spndevex/workstreams";
+  const root = workspace("m011", {
+    [`${WS}/open/031-probe/approach.html`]: page(false), [`${WS}/backlog/032-later/approach.html`]: page(false),
+    [`${WS}/open/033-new/approach.html`]: page(true), [`${WS}/closed/020-done/approach.html`]: page(false),
+  }, [], { migrated: false });
+  const found = m011.check(root);
+  ok("[MKT.SCRIPTS.401] red: 011 names the open and the backlog page that end How in Cycles, and not the new shape nor the closed page",
+    found.length === 2 && found.every((line) => /^(open\/031-probe|backlog\/032-later)\/approach\.html/.test(line)), found.join(" | "));
+  const wrote = m011.script(root);
+  const read = (path) => readFileSync(join(root, WS, path), "utf8");
+  ok("[MKT.SCRIPTS.401] its script moves the subsection, its order line, its table and its progress block into a Plan section right after How",
+    wrote.length === 2 && read("open/031-probe/approach.html") === page(true).replace("<h2>Plan</h2>", "<h2>Plan</h2>"), wrote.join(" | ") + read("open/031-probe/approach.html"));
+  ok("[MKT.SCRIPTS.401] a page already in the new shape and a closed page are left as they were", read("open/033-new/approach.html") === page(true) && read("closed/020-done/approach.html") === page(false));
+  ok("[MKT.SCRIPTS.401] green: a second run writes nothing, and the check finds nothing", m011.script(root).length === 0 && m011.check(root).length === 0);
+}
+
+console.log("\n=== the preview template's masthead carries Progress between Arc and Shown, as the writer writes it");
+{
+  const { previewProgress } = await import("../../../../src/scripts/lib/workstream.ts");
+  const template = readFileSync(join("src", "refs", "devex", "workspace", "docs", "templates", "workstream", "approach-preview-template.html"), "utf8");
+  const written = previewProgress(7, 10).replace("sds-step-4", "sds-step-{{step}}").replace("width:70%", "width:{{pct}}%").replace("7 of 10", "{{done}} of {{total}}");
+  ok("[MKT.SCRIPTS.397] the template's masthead line holds the writer's Progress markup, after Arc and before Shown", template.includes(`</a><span class="sds-separator">|</span>${written}<span class="sds-separator">|</span><span class="sds-label">Shown:</span>`), written);
 }
 
 console.log(failed ? `\n  ${failed} of ${total} FAILED — migration` : `\n  all ${total} passed — migration`);
