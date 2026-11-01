@@ -885,7 +885,7 @@ console.log("\n=== go start — a release part starts, a helper's part does not 
   ok("[MKT.SCRIPTS.326] red: a release part already running is refused, not ready", twice.code === 1 && /not ready/.test(twice.out), twice.out);
 }
 
-console.log("\n=== workstream close — retro.json and the suggestions it raises; a part's red first is not counted (MKT.SCRIPTS.326, .332)");
+console.log("\n=== workstream close — retro.json and the suggestions it raises; a part's red first is not counted (MKT.SCRIPTS.332)");
 {
   const retro = await dataWorkspace("retro");
   const closedEarlier = join(retro.root, ".spndevex", "workstreams", "closed", "030-older");
@@ -899,14 +899,15 @@ console.log("\n=== workstream close — retro.json and the suggestions it raises
   let n = 0;
   const at = () => `2026-10-10T10:${String(n).padStart(2, "0")}:00Z`;
   const check = (verdict, retryOf = null) => JSON.stringify({ ...base, mtype: "CHECK", id: `c${++n}`, at: at(), check: "test-run", verdict, retryOf });
-  const command = (call, exit, retryOf = null) => JSON.stringify({ ...base, mtype: "COMMAND", id: `m${++n}`, at: at(), call, exit, retryOf });
+  const command = (call, exit, retryOf = null, extra = {}) => JSON.stringify({ ...base, mtype: "COMMAND", id: `m${++n}`, at: at(), call, exit, retryOf, ...extra });
+  const own_part = { part: "code-spn-x-1", work: "CODE" };
   const own = { program: "spn-devex", group: "workstream", action: "row" };
   const suite = { program: "spnutils", group: "apps", action: "test" };
   writeFileSync(join(telemetry, "hooks.jsonl"), [
     check("DENY"), check("DENY", "c1"), check("DENY", "c2"),
     command(own, 2), command(own, 2, "m4"),
     // a part's own red first: the suite fails, then passes inside the part
-    command(suite, 1), command(suite, 0, "m6"),
+    command(suite, 1, null, own_part), command(suite, 0, "m6", own_part),
   ].join("\n") + "\n");
   writeFileSync(join(retro.ws, "arcs", "N001", "log.jsonl"), [
     { at: "2026-10-01T10:00:00Z", kind: "header", row: null, note: "the panel overturned the first shape" },
@@ -915,14 +916,99 @@ console.log("\n=== workstream close — retro.json and the suggestions it raises
   const closing = cli(retro.root, ["workstream", "close", "031"]);
   const home = existsSync(join(retro.root, ".spndevex", "workstreams", "closed", "031-probe", "retro.json")) ? join(retro.root, ".spndevex", "workstreams", "closed", "031-probe") : retro.ws;
   const record = existsSync(join(home, "retro.json")) ? json(join(home, "retro.json")) : null;
-  ok("[MKT.SCRIPTS.326] `close` with no arguments writes retro.json, a version 1 record of this workstream", !!record && record.v === 1 && record.workstream === "031-probe", closing.out);
-  ok("[MKT.SCRIPTS.326] the record tallies the checks and commands from the telemetry", record?.checks["test-run"]?.runs === 3 && record.checks["test-run"].denies === 3 && record.checks["test-run"].retried === 2 && record.commands["workstream row"]?.refused === 2, JSON.stringify(record?.checks) + JSON.stringify(record?.commands));
+  ok("[MKT.SCRIPTS.332] `close` with no arguments writes retro.json, a version 1 record of this workstream", !!record && record.v === 1 && record.workstream === "031-probe", closing.out);
+  ok("[MKT.SCRIPTS.332] the record tallies the checks and commands from the telemetry", record?.checks["test-run"]?.runs === 3 && record.checks["test-run"].denies === 3 && record.checks["test-run"].retried === 2 && record.commands["workstream row"]?.refused === 2, JSON.stringify(record?.checks) + JSON.stringify(record?.commands));
   ok("[MKT.SCRIPTS.332] a part's red first is not counted: the suite runs are in no command tally", !!record && !Object.keys(record.commands).some((key) => key.includes("test")), JSON.stringify(record?.commands));
   const raised = lines(join(home, "suggestions.jsonl")).map((one) => one.title);
-  ok("[MKT.SCRIPTS.326] it raises the check, the command and the shape that stand out against the earlier workstream", raised.some((t) => t.includes("check:test-run")) && raised.some((t) => t.includes("command:workstream row")) && raised.some((t) => t.includes("ideate:panel-overturned")), JSON.stringify(raised));
+  ok("[MKT.SCRIPTS.332] it raises the check, the command and the shape that stand out against the earlier workstream", raised.some((t) => t.includes("check:test-run")) && raised.some((t) => t.includes("command:workstream row")) && raised.some((t) => t.includes("ideate:panel-overturned")), JSON.stringify(raised));
   ok("[MKT.SCRIPTS.332] and none for the suite's red first", !raised.some((t) => /apps test|command:apps/.test(t)), JSON.stringify(raised));
   ok("each suggestion is raised, not decided", lines(join(home, "suggestions.jsonl")).filter((one) => /^Retrospective/.test(one.title)).every((one) => one.state === "raised"));
   ok("the close prints each one it raised", /retrospective · raised s\d+ Retrospective · check:test-run/.test(closing.out), closing.out);
+}
+
+console.log("\n=== workstream close — the retrospective counts failed tests, the release gate, brief:, part-size: and the thresholds (MKT.SCRIPTS.332)");
+{
+  const sinceThen = (name, earlierCommands, earlierParts = {}) => async () => {
+    const w = await dataWorkspace(name);
+    const old = join(w.root, ".spndevex", "workstreams", "closed", "030-older");
+    mkdirSync(old, { recursive: true });
+    writeFileSync(join(old, "retro.json"), JSON.stringify({ v: 1, workstream: "030-older", at: "2026-09-01T00:00:00Z", stages: {}, works: {}, outcomes: {}, checks: {}, parts: earlierParts, shape: {}, ungated: [], commands: earlierCommands }));
+    mkdirSync(join(w.root, ".spndevex", ".debug", "telemetry"), { recursive: true });
+    return w;
+  };
+  let n = 0;
+  const base = { v: 1, event: "PostToolUse", session: "s1", agent: null, workstream: "031-probe", arc: "N001", part: null, skill: null, work: null };
+  const at = () => `2026-10-10T11:${String(n % 60).padStart(2, "0")}:${String(Math.floor(n / 60)).padStart(2, "0")}Z`;
+  const row = (extra) => JSON.stringify({ ...base, id: `r${++n}`, at: at(), ...extra });
+  const command = (action, exit, retryOf = null, extra = {}) => row({ mtype: "COMMAND", call: { program: "spn-devex", group: "probe", action }, exit, retryOf, ...extra });
+  const testRow = (status, retryOf = null, extra = {}) => row({ mtype: "TEST", work: "TEST", status, retryOf, call: { program: "spnutils", group: "apps", action: "test" }, test: { node: "page-ts", tier: "UNIT", tests: { passed: 1, failed: status === "FAILED" ? 1 : 0, skipped: 0 } }, ...extra });
+  const finish = (w, rows) => {
+    writeFileSync(join(w.root, ".spndevex", ".debug", "telemetry", "hooks.jsonl"), rows.join("\n") + "\n");
+    const closing = cli(w.root, ["workstream", "close", "031"]);
+    const home = existsSync(join(w.root, ".spndevex", "workstreams", "closed", "031-probe", "retro.json")) ? join(w.root, ".spndevex", "workstreams", "closed", "031-probe") : w.ws;
+    return { record: json(join(home, "retro.json")), raised: existsSync(join(home, "suggestions.jsonl")) ? lines(join(home, "suggestions.jsonl")).map((one) => one.title) : [], out: closing.out };
+  };
+  const has = (raised, text) => raised.some((t) => t.includes(text));
+
+  // a test that failed and ran again counts, a code part's own red first does not
+  {
+    const w = await sinceThen("retro-tests", { "apps test": { runs: 10, failed: 0, retried: 0, refused: 0 } })();
+    const got = finish(w, [
+      testRow("FAILED"), testRow("SUCCESS", "r1"),
+      testRow("FAILED", null, { part: "code-spn-x-1" }), testRow("SUCCESS", "r3", { part: "code-spn-x-1" }),
+      command("test", 1, null, { call: { program: "spnutils", group: "apps", action: "test" }, part: "code-spn-x-1", work: "CODE" }),
+    ]);
+    const c = got.record.commands["apps test"];
+    ok("[MKT.SCRIPTS.332] a test that failed and ran again is counted: a TEST row's status and retryOf are read", c?.failed === 1 && c.retried === 1 && c.runs === 2, JSON.stringify(got.record.commands));
+    ok("[MKT.SCRIPTS.332] only a CODE part's own runs are skipped, whether a TEST row or a command", c?.runs === 2, JSON.stringify(got.record.commands));
+    ok("[MKT.SCRIPTS.332] and the count raises command:apps test once, against earlier workstreams that never failed", has(got.raised, "command:apps test"), JSON.stringify(got.raised));
+  }
+  // a pattern with no earlier rate raises at 2 or more, never at 1
+  {
+    const two = finish(await sinceThen("retro-new-2", {})(), [command("fresh", 1), command("fresh", 1), command("fresh", 0)]);
+    ok("[MKT.SCRIPTS.332] a pattern earlier workstreams never had raises at exactly 2", has(two.raised, "command:probe fresh"), JSON.stringify(two.raised));
+    const one = finish(await sinceThen("retro-new-1", {})(), [command("fresh", 1), command("fresh", 0), command("fresh", 0)]);
+    ok("[MKT.SCRIPTS.332] and does not raise at 1", !has(one.raised, "command:probe fresh"), JSON.stringify(one.raised));
+  }
+  // thresholds against an earlier rate of 2 in 10
+  {
+    const earlier = { "probe fresh": { runs: 10, failed: 2, retried: 0, refused: 0 } };
+    const runs = (bad) => Array.from({ length: 10 }, (_, i) => command("fresh", i < bad ? 1 : 0));
+    const exact = finish(await sinceThen("retro-x15", earlier)(), runs(3));
+    ok("[MKT.SCRIPTS.332] a rate of exactly 1.5 times the earlier rate does not raise", !has(exact.raised, "command:probe fresh"), JSON.stringify(exact.raised));
+    const past = finish(await sinceThen("retro-x16", earlier)(), runs(4));
+    ok("[MKT.SCRIPTS.332] a rate past 1.5 times raises", has(past.raised, "command:probe fresh"), JSON.stringify(past.raised));
+    const few = finish(await sinceThen("retro-one", { "probe fresh": { runs: 100, failed: 0, retried: 0, refused: 0 } })(), [command("fresh", 1)]);
+    ok("[MKT.SCRIPTS.332] a count of 1 never raises, whatever the rate", !has(few.raised, "command:probe fresh"), JSON.stringify(few.raised));
+  }
+  // brief: parts launched again by a second helper
+  {
+    const turn = (part, agent) => row({ mtype: "TURN", part, agent, work: "CODE", ms: 1000, skill: null });
+    const got = finish(await sinceThen("retro-brief", {})(), [turn("code-a-1", "h1"), turn("code-a-1", "h2"), turn("code-b-1", "h1"), turn("code-b-1", "h3"), turn("code-c-1", "h1")]);
+    ok("[MKT.SCRIPTS.332] parts launched again for a second helper raise brief:<work>", has(got.raised, "brief:CODE") || has(got.raised, "brief:none"), JSON.stringify(got.raised) + JSON.stringify(got.record.parts));
+  }
+  // the release gate and part-size: from a go
+  {
+    const w = await dataArc("retro-go", { rows: [{ id: "1", parent: "N001", title: "r", kind: "change", repo: "spn-x", work: "DOCS", blockedBy: [], touches: [], state: "ready", entries: ["E1"] }] });
+    const old = join(w.root, ".spndevex", "workstreams", "closed", "030-older");
+    mkdirSync(old, { recursive: true });
+    writeFileSync(join(old, "retro.json"), JSON.stringify({ v: 1, workstream: "030-older", at: "2026-09-01T00:00:00Z", stages: {}, works: {}, outcomes: {}, checks: {}, parts: {}, shape: {}, ungated: [], commands: {} }));
+    mkdirSync(join(w.root, ".spndevex", ".debug", "telemetry"), { recursive: true });
+    const entry = { id: "E1", op: "edit", file: "spn-x:docs/a.md", what: "x", decidedBy: ["q1"], facts: [], then: [], rules: [], callers: [], tiers: {}, docs: [], book: [] };
+    writeFileSync(join(w.ws, "arcs", "N001", "sheet.json"), JSON.stringify({ schemaVersion: 1, releaseChain: ["spn-x"], dependsOn: [], stack: null, entries: [entry] }));
+    // rows of the arc's state are DOCS rows of repo spn-x already; the go derives a docs part and a release part
+    cli(w.root, ["workstream", "go", "write", "N001", "--scope", "N001"]);
+    const goFile = join(w.ws, "arcs", "N001", "go.json");
+    const plan = json(goFile);
+    const docs = plan.parts.find((one) => one.work === "DOCS");
+    const release = plan.parts.find((one) => one.work === "RELEASE");
+    for (const one of plan.parts) one.minutes = one.id === docs.id ? 10 : one.minutes;
+    writeFileSync(goFile, JSON.stringify(plan, null, 2));
+    const got = finish(w, [row({ mtype: "TURN", part: docs.id, work: "DOCS", ms: 3600000, agent: "h1", skill: null })]);
+    ok("[MKT.SCRIPTS.332] a release part with no panel row is a finding: gate:", !!release && has(got.raised, `gate:release part ${release.id} has no panel row`), JSON.stringify(got.raised));
+    ok("[MKT.SCRIPTS.332] a go with no panel row on its preview is a finding too", has(got.raised, "N001 go has no panel row"), JSON.stringify(got.raised));
+    ok("[MKT.SCRIPTS.332] part-size: names the repository and work whose model time is far from the plan's", has(got.raised, "part-size:spn-x|DOCS"), JSON.stringify(got.raised) + got.out);
+  }
 }
 
 console.log(failed ? `\n  ${failed} of ${total} FAILED — workstream commands` : `\n  all ${total} passed — workstream commands`);

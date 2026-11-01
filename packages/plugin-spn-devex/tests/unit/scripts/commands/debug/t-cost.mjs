@@ -229,11 +229,11 @@ try {
     ok("[MKT.SCRIPTS.326] a reply before its arc's DECIDED line is planning, the rest executing", line?.phases.planning === 120000 && line.phases.executing === 300000 && line.modelMs === 420000, JSON.stringify(line?.phases));
     const block = data.goBlocks[0];
     const by = (label) => block?.lines.find((one) => one.label === label);
-    ok("[MKT.SCRIPTS.327] a go block gives each reply of a helper to its part's work, a baseline and a full run apart by their ids",
+    ok("[MKT.SCRIPTS.326] a go block gives each reply of a helper to its part's work, a baseline and a full run apart by their ids",
       block?.lead === "N001" && by("Code")?.replies === 1 && by("Test · baseline")?.replies === 1 && by("Test · full")?.replies === 2 && by("Test · full").helpers === 1 && by("Test · full").parts === 1, JSON.stringify(block));
-    ok("[MKT.SCRIPTS.327] every lead reply is on the Lead line, which has no parts", block?.leadLine.label === "Lead" && block.leadLine.replies === 3 && block.leadLine.modelMs === 180000 && block.leadLine.parts === 0 && block.noPart === null, JSON.stringify(block?.leadLine));
-    ok("[MKT.SCRIPTS.327] a go log with a launched and a landed part shows its whole minutes as Elapsed, a started full run as well", by("Code")?.elapsedMin === 12 && by("Test · full")?.elapsedMin === 8, JSON.stringify(block?.lines.map((one) => [one.label, one.elapsedMin])));
-    ok("[MKT.SCRIPTS.327] a part with no launch shows none", by("Test · baseline")?.elapsedMin === null && block?.leadLine.elapsedMin === null, JSON.stringify(block?.lines.map((one) => [one.label, one.elapsedMin])));
+    ok("[MKT.SCRIPTS.326] every lead reply is on the Lead line, which has no parts", block?.leadLine.label === "Lead" && block.leadLine.replies === 3 && block.leadLine.modelMs === 180000 && block.leadLine.parts === 0 && block.noPart === null, JSON.stringify(block?.leadLine));
+    ok("[MKT.SCRIPTS.326] a go log with a launched and a landed part shows its whole minutes as Elapsed, a started full run as well", by("Code")?.elapsedMin === 12 && by("Test · full")?.elapsedMin === 8, JSON.stringify(block?.lines.map((one) => [one.label, one.elapsedMin])));
+    ok("[MKT.SCRIPTS.326] a part with no launch shows none", by("Test · baseline")?.elapsedMin === null && block?.leadLine.elapsedMin === null, JSON.stringify(block?.lines.map((one) => [one.label, one.elapsedMin])));
     const planning = data.windows.find((one) => one.arc === "N001" && one.phase === "planning");
     ok("[MKT.SCRIPTS.327] a window's time is working, waiting on a run where a background run began in the gap, else waiting on you",
       planning?.workingMs === 120000 && planning.waitingOnYouMs === 540000 && planning.waitingOnRunMs === 4740000, JSON.stringify(data.windows));

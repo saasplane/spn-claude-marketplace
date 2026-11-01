@@ -2978,6 +2978,11 @@
         {
           "plugin": "spn-devex",
           "path": "skills/ideate/SKILL.md",
+          "heading": "The rules this step holds"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
           "heading": "How a first proposal is shaped"
         }
       ]
@@ -2998,6 +3003,11 @@
           "plugin": "spn-devex",
           "path": "refs/devex/function/ideate.md",
           "heading": "How a first proposal is shaped"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "The rules this step holds"
         },
         {
           "plugin": "spn-devex",
@@ -3026,6 +3036,11 @@
         {
           "plugin": "spn-devex",
           "path": "skills/ideate/SKILL.md",
+          "heading": "The rules this step holds"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
           "heading": "How a first proposal is shaped"
         }
       ]
@@ -3046,6 +3061,11 @@
           "plugin": "spn-devex",
           "path": "refs/devex/function/ideate.md",
           "heading": "How a first proposal is shaped"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "The rules this step holds"
         },
         {
           "plugin": "spn-devex",
@@ -3074,6 +3094,11 @@
         {
           "plugin": "spn-devex",
           "path": "skills/ideate/SKILL.md",
+          "heading": "The rules this step holds"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
           "heading": "How a first proposal is shaped"
         }
       ]
@@ -3094,6 +3119,11 @@
           "plugin": "spn-devex",
           "path": "refs/devex/function/ideate.md",
           "heading": "How a first proposal is shaped"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "The rules this step holds"
         },
         {
           "plugin": "spn-devex",
@@ -11857,6 +11887,11 @@
         {
           "plugin": "spn-devex",
           "path": "skills/ideate/SKILL.md",
+          "heading": "The rules this step holds"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
           "heading": "How a first proposal is shaped"
         }
       ]
@@ -11877,6 +11912,11 @@
           "plugin": "spn-devex",
           "path": "refs/devex/workspace/workstream.md",
           "heading": "The workstream is kept as data, and every file has one owner"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/develop/SKILL.md",
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -11896,6 +11936,11 @@
           "plugin": "spn-devex",
           "path": "refs/devex/workspace/workstream.md",
           "heading": "The workstream is kept as data, and every file has one owner"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/execute/SKILL.md",
+          "heading": "The rules this step holds"
         }
       ]
     },

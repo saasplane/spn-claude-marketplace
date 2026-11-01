@@ -233,14 +233,14 @@ console.log("\n=== a retried call carries the failed row's id — MKT.SCRIPTS.32
   same("[MKT.SCRIPTS.328] a failure is retried by the same agent only: another agent's call, and the main window's, retry nothing", after.map((one) => one.retryOf), [null, null, null]);
 }
 
-console.log("\n=== a plugin command refused for its usage — MKT.SCRIPTS.330");
+console.log("\n=== a plugin command refused for its usage — MKT.SCRIPTS.328");
 {
   const root = workspace("2p-usage", ON);
   let code = 0;
   try { execFileSync("node", [join(PLUGIN, "src", "scripts", "cli.ts"), "debug", "store", "show", "--sizes"], { env: { ...env(), SPN_WORKSPACE: root }, cwd: root, stdio: "pipe" }); } catch (error) { code = error.status; }
   const line = commands(root).at(-1) ?? {};
-  same("[MKT.SCRIPTS.330] a command refused for its usage is a COMMAND row with exit 2", [code, line.exit], [2, 2]);
-  same("[MKT.SCRIPTS.330] and the row names the program and the group and action it was typed with, never the option", [line.call?.program, line.call?.group, line.call?.action, JSON.stringify(line).includes("sizes")], ["spn-devex", "debug", "store show", false]);
+  same("[MKT.SCRIPTS.328] a command refused for its usage is a COMMAND row with exit 2", [code, line.exit], [2, 2]);
+  same("[MKT.SCRIPTS.328] and the row names the program and the group and action it was typed with, never the option", [line.call?.program, line.call?.group, line.call?.action, JSON.stringify(line).includes("sizes")], ["spn-devex", "debug", "store show", false]);
 }
 
 console.log("\n=== a background test run is written from its verdict — MKT.SCRIPTS.330");

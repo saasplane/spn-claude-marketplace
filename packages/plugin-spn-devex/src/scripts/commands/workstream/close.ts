@@ -120,16 +120,18 @@ function retroOf(ws: string, root: string): Retro {
       const c = (retro.checks[check] ??= { runs: 0, denies: 0, retried: 0 });
       c.runs += 1;
       if (one.verdict === "DENY") { c.denies += 1; if (text(one.retryOf)) c.retried += 1; }
-    } else if (mtype === "COMMAND") {
+    } else if (mtype === "COMMAND" || mtype === "TEST") {
       const call = (one.call ?? {}) as Record<string, unknown>;
       const key = [text(call.group), text(call.action)].filter(Boolean).join(" ") || String(text(call.program));
-      // A code part's own tests failing and then passing inside that part are its red first: no pattern counts them.
-      if (isTestCommand({ script: text(call.program), group: text(call.group), action: text(call.action) } as never)) {
-        continue;
-      }
+      // Only a code part's own tests failing and then passing inside that part are its red first: no pattern counts them.
+      // Any other test or build that failed and was run again counts.
+      const own = work === "CODE" || !!id?.startsWith("code-");
+      if (own && mtype === "COMMAND" && isTestCommand({ script: text(call.program), group: text(call.group), action: text(call.action) } as never)) continue;
+      if (own && mtype === "TEST") continue;
       const c = (retro.commands[key] ??= { runs: 0, failed: 0, retried: 0, refused: 0 });
       c.runs += 1;
-      if (one.exit === 2) c.refused += 1; else if (one.exit !== null && one.exit !== undefined && num(one.exit) !== 0) c.failed += 1;
+      if (mtype === "TEST") { if (text(one.status) && one.status !== "SUCCESS") c.failed += 1; }
+      else if (one.exit === 2) c.refused += 1; else if (one.exit !== null && one.exit !== undefined && num(one.exit) !== 0) c.failed += 1;
       if (text(one.retryOf)) c.retried += 1;
     } else if (mtype === "PANEL") {
       if (id) panels.parts.add(id); else if (text(one.arc)) panels.arcs.add(String(one.arc));
@@ -158,11 +160,12 @@ function retroOf(ws: string, root: string): Retro {
   return retro;
 }
 
-const MORE = 1.5;
-/** Whether a count stands out against earlier workstreams': at least two, and a rate past one and a half times theirs (any, where theirs is none). */
+/** Whether a count stands out against earlier workstreams': at least two, and a rate past one and a half times theirs; where they never had the pattern, two is enough. */
 function stands(bad: number, n: number, before: Tally): boolean {
-  if (bad < 2 || n === 0 || before.n === 0) return false;
-  return bad / n > MORE * (before.bad / before.n);
+  if (bad < 2 || n === 0) return false;
+  if (before.n === 0) return true;
+  // 3 / 2 by whole numbers: exactly one and a half times does not stand out.
+  return bad * before.n * 2 > 3 * before.bad * n;
 }
 
 function findingsOf(now: Retro, earlier: Retro[]): string[] {
@@ -201,7 +204,7 @@ function findingsOf(now: Retro, earlier: Retro[]): string[] {
   for (const [key, one] of sizes) if (one.off === one.n && one.n >= 1) out.push(`part-size:${key} model time is far from the plan's`);
   for (const [pattern, count] of Object.entries(now.shape)) {
     const before = sum((r) => ({ n: 1, bad: r.shape?.[pattern] ?? 0 }));
-    if (count >= 2 && before.n > 0 && count > MORE * (before.bad / before.n)) out.push(`ideate:${pattern} the decided shape is far from its first preview`);
+    if (count >= 2 && before.n > 0 && count * before.n * 2 > 3 * before.bad) out.push(`ideate:${pattern} the decided shape is far from its first preview`);
   }
   return out;
 }

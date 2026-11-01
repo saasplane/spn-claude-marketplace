@@ -153,10 +153,10 @@ console.log("\n=== the row — one family, one row for each check");
     record({ group: "ok", action: "ok-check" }, 1);
     end();`);
   const lines = logOf(root);
-  same("[MKT.SCRIPTS.329] a workstream, arc or part off its pattern is written null, and a skill the copy does not know too",
+  same("[MKT.SCRIPTS.330] a workstream, arc or part off its pattern is written null, and a skill the copy does not know too",
     [lines[0].workstream, lines[0].arc, lines[0].part, lines[0].skill], [null, null, null, null]);
-  same("[MKT.SCRIPTS.329] a check whose name is off its pattern writes no row", lines.map((l) => l.check), ["ok-check"]);
-  same("[MKT.SCRIPTS.329] the work a caller names is kept", lines[0].work, "CODE");
+  same("[MKT.SCRIPTS.330] a check whose name is off its pattern writes no row", lines.map((l) => l.check), ["ok-check"]);
+  same("[MKT.SCRIPTS.330] the work a caller names is kept", lines[0].work, "CODE");
 }
 {
   const root = workspace("n8-head-ok", ON);
@@ -166,7 +166,7 @@ console.log("\n=== the row — one family, one row for each check");
     record({ group: "a", action: "a-check" }, 1);
     end();`);
   const row = logOf(root)[0];
-  same("[MKT.SCRIPTS.329] a part names its work by its prefix when the caller names none", [row.workstream, row.arc, row.part, row.skill, row.work],
+  same("[MKT.SCRIPTS.330] a part names its work by its prefix when the caller names none", [row.workstream, row.arc, row.part, row.skill, row.work],
     ["036-agent-follows-rules", "N017", "code-spn-claude-marketplace-4", "DEVEX_EXECUTE", "CODE"]);
 }
 {
