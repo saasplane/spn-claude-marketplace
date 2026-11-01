@@ -21,6 +21,7 @@ import { goFileOf } from "../../lib/go-plan.ts";
 import { USAGE_LOG } from "../../lib/usage.ts";
 import { approachOf, arcIdsOf, logFileOf, readJson, readJsonl, suggestionName, suggestionOpen, suggestionsFileOf, suggestionsOf, workspaceOf, writeJsonl, writeWhole } from "../../lib/workstream.ts";
 import { OUTCOMES, cardName, suggestionFaults, type Suggestion } from "../../lib/workstream-schema.ts";
+import { readSplit, type SplitRow } from "../debug/cost.ts";
 import { checkGo, renameGo } from "./go.ts";
 import { workstreamNamed } from "./_shared.ts";
 
@@ -68,7 +69,26 @@ type Retro = {
   commands: Record<string, { runs: number; failed: number; retried: number; refused: number }>;
   shape: Record<string, number>;
   ungated: string[];
+  /** The workstream's calls and minutes by what they were, read from the telemetry, and the minutes of managing over the minutes of change (null with no change). */
+  split: Record<(typeof SPLIT_KINDS)[number], { calls: number; minutes: number }>;
+  managingToChange: number | null;
 };
+
+const SPLIT_KINDS = ["change", "proof", "managing", "refusals", "waiting"] as const;
+
+/** The split of a workstream: its arcs' lines added together, and the ratio of managing to change by minutes. */
+export function splitOf(root: string, name: string): Pick<Retro, "split" | "managingToChange"> {
+  const split = Object.fromEntries(SPLIT_KINDS.map((kind) => [kind, { calls: 0, minutes: 0 }])) as Retro["split"];
+  for (const row of readSplit(root, name) as SplitRow[]) {
+    if (row.key.includes(" · part ")) continue;
+    for (const kind of SPLIT_KINDS) { split[kind].calls += row[kind].calls; split[kind].minutes = Math.round((split[kind].minutes + row[kind].minutes) * 10) / 10; }
+  }
+  return { split, managingToChange: split.change.minutes > 0 ? Math.round((split.managing.minutes / split.change.minutes) * 100) / 100 : null };
+}
+
+/** The split as the line the close prints. */
+export const splitLine = (one: Pick<Retro, "split" | "managingToChange">): string =>
+  `split · ${SPLIT_KINDS.map((kind) => `${kind} ${one.split[kind].calls} calls ${one.split[kind].minutes}m`).join(" · ")} · managing to change ${one.managingToChange === null ? "not known (no change minutes)" : `${one.managingToChange} to 1`}`;
 
 type Row = Record<string, unknown>;
 const text = (value: unknown): string | null => (typeof value === "string" && value ? value : null);
@@ -119,7 +139,7 @@ function shapeOf(ws: string): Record<string, number> {
 function retroOf(ws: string, root: string): Retro {
   const name = basename(ws);
   const rows = rowsOf(root, name);
-  const retro: Retro = { v: 1, workstream: name, at: new Date().toISOString(), stages: {}, works: {}, outcomes: {}, checks: {}, parts: {}, commands: {}, shape: shapeOf(ws), ungated: [] };
+  const retro: Retro = { v: 1, workstream: name, at: new Date().toISOString(), stages: {}, works: {}, outcomes: {}, checks: {}, parts: {}, commands: {}, shape: shapeOf(ws), ungated: [], ...splitOf(root, name) };
   const part = (id: string) => (retro.parts[id] ??= { repo: null, work: null, starts: 0, needsYou: 0, modelMs: 0, plannedMs: null });
   const helpers = new Map<string, Set<string>>();
   const panels = { parts: new Set<string>(), arcs: new Set<string>() };
@@ -299,6 +319,9 @@ export function run(args: string[]): number {
   // The retrospective runs before the gate: it only reads rows and raises suggestions, and a refused close keeps what it raised.
   const raised = retrospective(ws, root);
   for (const line of raised) console.log(`retrospective · raised ${line}`);
+  // WHERE THE WORKSTREAM'S TIME WENT is printed beside the retrospective, from the telemetry (the same split is in retro.json).
+  const written = readJson(join(ws, "retro.json")) as Retro | null;
+  if (written?.split) console.log(splitLine(written));
 
   const page = approachOf(ws);
   const target = `${workstreamsDir(root, "closed")}/${basename(ws)}`;

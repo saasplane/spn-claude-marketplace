@@ -242,6 +242,7 @@ Every row below is declared and none is claimed: a run writes the last two cells
 | MKT.SCRIPTS.415 | Engineering leader | finish a decided arc's own row with a fix and no card | `sheet write --because "<row>"` takes new entries on a decided arc when the words name a row of the arc not yet landed and every new entry cites that row in `decidedBy`; an entry that does not is refused by name, and the log says which row it finishes | POSITIVE | UNIT | PLANNED | — |
 | MKT.SCRIPTS.416 | Engineering leader | plan a small follow-up the lead window does itself | `go write --follow-up` plans each repository's new entries as one part, with one report, that the lead window carries out itself, with the repository's full run only if code changed and no baseline or new release | POSITIVE | UNIT | PLANNED | — |
 | MKT.SCRIPTS.417 | Engineering leader | have the records carry the version they were written at | Every new line of `questions.jsonl`, `suggestions.jsonl`, `log.jsonl` and `facts.jsonl` carries `"v":1`; a reader takes a line without `v` as version 1, refuses a higher version naming what to do, and no old line is rewritten | POSITIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.418 | Engineering leader | see where a workstream's time went when it closes | `workstream close` prints the workstream's split from the telemetry (change, proof, managing, refusals and waiting, each in calls and minutes) with the minutes of managing to the minutes of change, and writes the same into `retro.json` | POSITIVE | UNIT | PLANNED | — |
 
 ## Retired ids
 

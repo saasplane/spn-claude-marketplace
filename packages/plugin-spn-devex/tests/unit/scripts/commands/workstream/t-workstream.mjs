@@ -933,6 +933,12 @@ console.log("\n=== workstream close — retro.json and the suggestions it raises
   const record = existsSync(join(home, "retro.json")) ? json(join(home, "retro.json")) : null;
   ok("[MKT.SCRIPTS.332] `close` with no arguments writes retro.json, a version 1 record of this workstream", !!record && record.v === 1 && record.workstream === "031-probe", closing.out);
   ok("[MKT.SCRIPTS.332] the record tallies the checks and commands from the telemetry", record?.checks["test-run"]?.runs === 3 && record.checks["test-run"].denies === 3 && record.checks["test-run"].retried === 2 && record.commands["workstream row"]?.refused === 2, JSON.stringify(record?.checks) + JSON.stringify(record?.commands));
+  ok("[MKT.SCRIPTS.418] the close prints the workstream's split and retro.json holds the same, with the managing-to-change ratio",
+    /split · change \d+ calls [\d.]+m · proof .* · waiting \d+ calls [\d.]+m · managing to change /.test(closing.out) && ["change", "proof", "managing", "refusals", "waiting"].every((kind) => typeof record?.split?.[kind]?.calls === "number") && "managingToChange" in record, closing.out);
+  const { splitLine } = await import("../../../../../src/scripts/commands/workstream/close.ts");
+  const none = { change: { calls: 0, minutes: 0 }, proof: { calls: 0, minutes: 0 }, managing: { calls: 0, minutes: 0 }, refusals: { calls: 0, minutes: 0 }, waiting: { calls: 0, minutes: 0 } };
+  ok("[MKT.SCRIPTS.418] the line states the ratio of managing minutes to change minutes, and says so when there is no change",
+    splitLine({ split: { ...none, change: { calls: 4, minutes: 10 }, managing: { calls: 9, minutes: 25 } }, managingToChange: 2.5 }).endsWith("managing to change 2.5 to 1") && splitLine({ split: none, managingToChange: null }).includes("not known"));
   ok("[MKT.SCRIPTS.332] a part's red first is not counted: the suite runs are in no command tally", !!record && !Object.keys(record.commands).some((key) => key.includes("test")), JSON.stringify(record?.commands));
   const raised = lines(join(home, "suggestions.jsonl")).map((one) => one.title);
   ok("[MKT.SCRIPTS.332] it raises the check, the command and the shape that stand out against the earlier workstream", raised.some((t) => t.includes("check:test-run")) && raised.some((t) => t.includes("command:workstream row")) && raised.some((t) => t.includes("ideate:panel-overturned")), JSON.stringify(raised));
