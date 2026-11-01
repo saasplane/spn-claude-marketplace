@@ -148,7 +148,7 @@ console.log("\n=== a secret, a background call, and a compound command");
   same("a background call writes its line at PostToolUse with exit null", commands(root).at(-1)?.exit, null);
 
   const before = commands(root).length;
-  const compound = call(root, "toolu_many", "git add x && git commit -m 'a b' && spnutils apps check x");
+  const compound = call(root, "toolu_many", "git add x && git commit -m 'a b' -- x && spnutils apps check x");
   hook("pretooluse", { ...compound, hook_event_name: "PreToolUse" });
   hook("closed", { ...compound, hook_event_name: "PostToolUse", tool_response: {} });
   const written = commands(root).slice(before);

@@ -18,12 +18,13 @@
 
 import { homedir } from "node:os";
 import { resolve } from "node:path";
+import { DEVEX, WORKSTREAMS } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { emit, readPayload, runAlone, type Payload, type Verdict } from "../lib/payload.ts";
 
 /** The kinds of `spn:generated` block the book names; a kind outside this list needs the developer's yes. */
 export const KNOWN_KINDS = ["constructs", "glossary", "glossary-html", "progress", "open", "contents", "dictionary", "commands"];
 
-const CLOSED = "/.spndevex/workstreams/closed/";
+const CLOSED = `/${DEVEX}/${WORKSTREAMS}/closed/`;
 const WORKSPACE_CACHE = /\/\.spndevex\/(?:\.?cache|\.?state-cache)\//;
 const SETTINGS = /\/\.claude\/settings(?:\.local)?\.json$/;
 /** An allow rule that writes a path wildcard: a file tool with a `*`, or a Bash rule with a path and a `*`. */

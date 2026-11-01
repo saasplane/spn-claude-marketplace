@@ -15,7 +15,7 @@
 
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { basename, dirname, join } from "node:path";
-import { workstreamsDir } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
+import { WORKSTREAMS, workstreamsDir } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { segments } from "../lib/command-reader.ts";
 import { emit, readPayload, runAlone, workspaceRoot, type Payload, type Verdict } from "../lib/payload.ts";
 
@@ -121,7 +121,7 @@ export function landedOf(command: string): string | null {
  */
 function workstreamOf(from: string): string | null {
   for (let at = from; dirname(at) !== at; at = dirname(at)) {
-    if (["open", "backlog"].includes(basename(dirname(at))) && basename(dirname(dirname(at))) === "workstreams") return at;
+    if (["open", "backlog"].includes(basename(dirname(at))) && basename(dirname(dirname(at))) === WORKSTREAMS) return at;
   }
   return null;
 }

@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "book": {
     "repository": "spn-foundation",
-    "commit": "00806244"
+    "commit": "f09a9bde"
   },
   "rules": [
     {
@@ -1123,7 +1123,7 @@
       "id": "RULE.DEVEX.AGENT.104",
       "level": "MUST",
       "params": {
-        "check": "pretooluse"
+        "check": "agent-model"
       },
       "class": "checked",
       "sentence": null,
@@ -1267,9 +1267,9 @@
       "id": "RULE.DEVEX.AGENT.110",
       "level": "MUST",
       "params": {
-        "skill": "spn-devex/deliver"
+        "check": "plugin-landed"
       },
-      "class": "stated in a skill",
+      "class": "checked",
       "sentence": "The four plugins carry one version, and release together",
       "chapter": "04-capabilities/01-devex/02-agent/04-plugins/01-plugins.md",
       "heading": "What names a plugin, and what a version means",
@@ -1584,9 +1584,9 @@
       "id": "RULE.DEVEX.AGENT.131",
       "level": "MUST",
       "params": {
-        "skill": "spn-devex/deliver"
+        "check": "publish-lockstep"
       },
-      "class": "stated in a skill",
+      "class": "checked",
       "sentence": "The plugins release in lockstep, through one command",
       "chapter": "04-capabilities/01-devex/02-agent/04-plugins/01-plugins.md",
       "heading": "The place you are standing decides the install mode",
@@ -7376,9 +7376,9 @@
       "id": "RULE.DEVEX.WORKSPACE.243",
       "level": "MUST",
       "params": {
-        "short": true
+        "check": "workstream-open"
       },
-      "class": "stated",
+      "class": "checked",
       "sentence": "Managing the arcs inside a workstream is the agent's, and creating a workstream is always your decision",
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "The agent manages the arcs, and you decide every new workstream",
@@ -7399,12 +7399,7 @@
           "path": "skills/ideate/SKILL.md",
           "heading": "What you put to the developer, and what is yours"
         }
-      ],
-      "line": {
-        "text": "Managing the arcs inside a workstream is the agent's, and creating a workstream is always the developer's decision.",
-        "ref": "refs/devex/workspace/workstream.md",
-        "heading": "A new subject: another arc, or a workstream of its own"
-      }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.244",

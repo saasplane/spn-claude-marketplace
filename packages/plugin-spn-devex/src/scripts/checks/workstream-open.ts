@@ -17,10 +17,10 @@
 import { isAbsolute, resolve } from "node:path";
 import { segments } from "../lib/command-reader.ts";
 import { emit, listdir, readPayload, runAlone, type Payload, type Verdict } from "../lib/payload.ts";
-import { DEVEX, WORKSTREAM_STATES, workstreamsDir } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
+import { DEVEX, DEVEX_WORKSTREAMS, WORKSTREAMS, WORKSTREAM_STATES, workstreamsDir } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
 
-const MKDIR = /\bmkdir\b[^|;&\n]*workstreams\//;
-const FOLDER = new RegExp(`^(.*)/${DEVEX.replace(/\./g, "\\.")}/workstreams/(open|backlog)/([^/]+)/?$`);
+const MKDIR = new RegExp(`\\bmkdir\\b[^|;&\\n]*${WORKSTREAMS}/`);
+const FOLDER = new RegExp(`^(.*)/${DEVEX.replace(/\./g, "\\.")}/${WORKSTREAMS}/(open|backlog)/([^/]+)/?$`);
 
 /** Whether a command could make a workstream folder: a regular expression over the text, so every other call stops here. */
 export function applies(_path: string, command: string): boolean {
@@ -62,7 +62,7 @@ export function checkWorkstreamOpen(payload: Payload): Verdict {
     if (number !== free)
       return { deny:
         `Denied: \`${made.name}\` does not carry the next free workstream number, ${free}. Name it \`${free}-<subject>\` ` +
-        `and make it under \`${DEVEX}/workstreams/${made.state}/\` (RULE.DEVEX.WORKSPACE.308); \`spnutils workspace status\` prints the next free number.` };
+        `and make it under \`${DEVEX_WORKSTREAMS}/${made.state}/\` (RULE.DEVEX.WORKSPACE.308); \`spnutils workspace status\` prints the next free number.` };
     if (payload.agent_id)
       return { deny:
         `Denied: creating a workstream is always the developer's decision, and a subagent never holds their yes. ` +
