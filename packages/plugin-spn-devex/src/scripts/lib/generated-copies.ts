@@ -10,13 +10,14 @@
 
 import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
+import { BOOK_TEMPLATES, PLUGIN_TEMPLATES } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
 
 /** The repository that holds the plugins. */
 export const PLUGINS_REPO = "spn-claude-marketplace";
 /** The repository that holds the book. */
 export const BOOK_REPO = "spn-foundation";
-const TEMPLATES_IN_BOOK = "docs/04-capabilities/01-devex/04-workspace/04-docs/templates/";
-const TEMPLATES_IN_PLUGIN = "packages/plugin-spn-devex/src/refs/devex/workspace/docs/templates/";
+const TEMPLATES_IN_BOOK = `${BOOK_TEMPLATES}/`;
+const TEMPLATES_IN_PLUGIN = `packages/plugin-spn-devex/src/${PLUGIN_TEMPLATES}/`;
 const RULES_INDEX = "packages/plugin-spn-devex/src/refs/rules.json";
 
 /** The markdown files under a folder, as paths from it; nothing where the folder is not there. */

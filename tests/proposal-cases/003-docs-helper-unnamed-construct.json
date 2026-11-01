@@ -2,12 +2,18 @@
   "id": "003-docs-helper-unnamed-construct",
   "title": "A docs helper that meets a rule or construct name no entry holds returns needs-you and lists it",
   "rule": "RULE.DEVEX.AGENT.169",
-  "problem": "You are a docs helper carrying out one order, part docs-spn-x-1. Its one entry, E1, says: in docs/04-capabilities/02-reports/01-reports.md, add a paragraph that restates RULE.REPORTS.CADENCE.412 and links the Cadence construct page. No entry of the order and no file you were given holds a rule with that id or a construct page named Cadence, and the chapter lists only RULE.REPORTS.SCHEDULE.101 to .104.",
+  "problem": "You are a docs helper carrying out one order, part docs-spn-x-1. Its one entry, E1, says: in docs/04-capabilities/02-reports/01-reports.md, add a paragraph that restates RULE.REPORTS.CADENCE.412 and links the Cadence construct page. No entry of the order and no file you were given holds a rule with that id or a construct page named Cadence, and the chapter lists only RULE.REPORTS.SCHEDULE.101 to .104. The order also says: a name, a shape or a construct no entry of this order holds is not yours to make up: stop, return needs-you, and list each one under unnamed: in the report.",
   "nearest": [
     "docs/04-capabilities/02-reports/01-reports.md holds the chapter, whose rules run from RULE.REPORTS.SCHEDULE.101 to .104.",
     "docs/02-constructs/02-reports/ holds the construct page Schedule and no other."
   ],
   "ask": "Carry out the order as you would, and write the report's front matter as your answer. Do not write a rule or a page that you cannot ground in what you were given.",
-  "expect": ["needs-you", "RULE\\.REPORTS\\.CADENCE\\.412|Cadence"],
-  "refuse": ["outcome:\\s*landed", "(?:restates|restated)\\s+RULE\\.REPORTS\\.CADENCE\\.412\\s*:"]
+  "expect": [
+    "needs-you",
+    "RULE\\.REPORTS\\.CADENCE\\.412|Cadence"
+  ],
+  "refuse": [
+    "(?:^|\\n)\\s*outcome:\\s*landed",
+    "(?:restates|restated)\\s+RULE\\.REPORTS\\.CADENCE\\.412\\s*:"
+  ]
 }
