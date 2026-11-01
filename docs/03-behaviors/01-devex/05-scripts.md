@@ -260,6 +260,8 @@ Every row below is declared and none is claimed: a run writes the last two cells
 | MKT.SCRIPTS.434 | Builder | judge a fresh agent's answer against a fixed case | `scripts/proposal-cases.mjs` runs each case as a fresh non-interactive session that sees only the problem and its nearest constructs, and a case passes when the final text matches its `expect` patterns and none of its `refuse` patterns | POSITIVE | UNIT | PLANNED | — |
 | MKT.SCRIPTS.435 | Builder | keep the first three proposal cases | `tests/proposal-cases` holds the framework-route case for a migration contribution from a service that holds IAM remotely, and the code and docs helper cases that must return needs-you on a name no entry holds (RULE.DEVEX.AGENT.169) | POSITIVE | UNIT | PLANNED | — |
 | MKT.SCRIPTS.436 | Builder | know the checker is checked | A unit test reads the rules index and fails, naming each rule whose holder is a check the plugins do not register, or that no test file proves by a bracketed case for its behaviour or by its own id | NEGATIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.437 | Partner / integrator | have my idea unfolded in the order my own words lead | The ideate and bootstrap skills each carry the seven steps of the day-zero order, in order, citing RULE.DEVEX.FUNCTION.098, and the ideate ref restates them | POSITIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.438 | Engineering leader | have the figure of a What decided as it is written | The ideate skill's step that writes the What, and the execute skill's step that rewrites the page, each carry one line to decide the figure or the no-figure reason (RULE.DEVEX.WORKSPACE.497) | POSITIVE | UNIT | PLANNED | — |
 
 ## Retired ids
 

@@ -118,6 +118,20 @@ A first proposal starts where the book already stands, so the developer reads a 
 - **Every part a proposal adds is listed beside the developer's words it serves, and cut if it serves none.** A part that serves nothing is cut to one *later, not now* line. A rule that must hold, a check or a refusal names the failure it prevents and who meets it, and is guidance unless that failure is real. A proposal that sets a shape says how others solve it, marked verified or not verified. The cut test asks which part could go with nothing failing (`RULE.DEVEX.FUNCTION.096` · MUST · skill:spn-devex/ideate). It follows `RULE.DEVEX.WORKSPACE.194`, by which the agent proposes the constructs the ask needs and stops.
 - **A proposal is placed where it is read.** The chat holds what the developer asked to see, whole; the approach page holds one line for each part in the *What*; the preview holds what the developer judges, at the depth the preview rules already give: a sized unit whole at its smallest and largest size, a page as a skeleton at each screen size, a flow as its pages in order. Code shown anywhere uses today's names and real values, never placeholders (`RULE.DEVEX.FUNCTION.097` · MUST · skill:spn-devex/ideate). It follows `RULE.DEVEX.WORKSPACE.210`, that a preview holds what the developer judges.
 
+## An idea is unfolded on day zero in one order
+
+A partner's or developer's idea is unfolded in the order their own words lead (`RULE.DEVEX.FUNCTION.098` · MUST · skill:spn-devex/ideate). The bootstrap and ideate skills take it in this order, and each step waits for the one before it:
+
+1. **The idea, in their words**, quoted, and what it proves for them.
+2. **The trade before the constructs.** The actors in the trade's own words, then the modules and the states by name, then the day-zero flow, and only then the cut of how deep the first version goes. Fields come when they ask for them.
+3. **The existing twin before a new construct.** Each part names the construct the book or the platform already holds for it, and a new construct is proposed only where none fits.
+4. **Several modules are planned with a split test and one table.** The test says why the modules split where they do, and one module table holds the set, which the developer decides and names.
+5. **Open asks stay few.** A *settled so far* table holds what is agreed, and no more than three asks are open at once.
+6. **Each new term is defined once,** where it first appears, and used the same way after.
+7. **The preview follows their spine,** the order in which they told the idea, and not the order of the book's chapters.
+
+It comes from a study of one day-zero workstream's windows, where the pages that read well followed this order and the ones the developer sent back did not. The approach page's What decides its figure as it is written (`RULE.DEVEX.WORKSPACE.497` · MUST · check:doc-check).
+
 ## What the design lands as
 
 **Behaviours first.** State what an actor can do, one line each, in language the person who asked would recognise. Each becomes something provable later — a behaviour nobody can prove is a wish.
