@@ -395,6 +395,11 @@
           "plugin": "spn-devex",
           "path": "refs/devex/workspace/workspace.md",
           "heading": "The loop belongs to the devex agent, and both modes run it"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/develop/SKILL.md",
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -414,6 +419,11 @@
           "plugin": "spn-devex",
           "path": "refs/devex/agent/plugins.md",
           "heading": "The spn:restates stamp"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/develop/SKILL.md",
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -468,6 +478,11 @@
           "plugin": "spn-devex",
           "path": "refs/devex/agent/agent.md",
           "heading": "The front desk stays open while work runs"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/execute/SKILL.md",
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -574,6 +589,11 @@
           "plugin": "spn-devex",
           "path": "refs/devex/utils/spnutils.md",
           "heading": "workspace — the folder your day runs in"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/develop/SKILL.md",
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -814,6 +834,11 @@
         {
           "plugin": "spn-devex",
           "path": "skills/ideate/SKILL.md",
+          "heading": "The rules this step holds"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
           "heading": "The views that take part"
         },
         {
@@ -982,6 +1007,11 @@
           "plugin": "spn-devex",
           "path": "refs/devex/function/ideate.md",
           "heading": "A partner platform starts from its industry"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "The rules this step holds"
         },
         {
           "plugin": "spn-devex",
@@ -1201,6 +1231,11 @@
           "plugin": "spn-devex",
           "path": "refs/devex/agent/skills.md",
           "heading": "A skill is matched, never routed"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/develop/SKILL.md",
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -1220,6 +1255,11 @@
           "plugin": "spn-devex",
           "path": "refs/devex/agent/plugins.md",
           "heading": "Two install modes, and the place you are standing decides"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/deliver/SKILL.md",
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -1244,6 +1284,11 @@
           "plugin": "spn-devex",
           "path": "refs/devex/agent/plugins.md",
           "heading": "Two install modes, and the place you are standing decides"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/deliver/SKILL.md",
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -1285,6 +1330,11 @@
           "plugin": "spn-devex",
           "path": "refs/devex/agent/plugins.md",
           "heading": "How a plugin's command is typed"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/develop/SKILL.md",
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -1412,7 +1462,13 @@
       "chapter": "04-capabilities/01-devex/02-agent/03-lenses/01-lenses.md",
       "heading": "A view is shown in its own voice",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.AGENT.123",
@@ -1425,7 +1481,13 @@
       "chapter": "04-capabilities/01-devex/02-agent/03-lenses/01-lenses.md",
       "heading": "A view is shown in its own voice",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.AGENT.124",
@@ -1499,7 +1561,13 @@
       "chapter": "04-capabilities/01-devex/02-agent/04-plugins/01-plugins.md",
       "heading": "What names a plugin, and what a version means",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/deliver/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.AGENT.130",
@@ -1523,7 +1591,13 @@
       "chapter": "04-capabilities/01-devex/02-agent/04-plugins/01-plugins.md",
       "heading": "The place you are standing decides the install mode",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/deliver/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.AGENT.132",
@@ -1560,7 +1634,13 @@
       "chapter": "04-capabilities/01-devex/02-agent/04-plugins/01-plugins.md",
       "heading": "The set a repository gets is derived from its own claim",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/develop/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.AGENT.135",
@@ -1889,7 +1969,13 @@
       "chapter": "04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "heading": "Three classes of rule",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/develop/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.AGENT.157",
@@ -2120,7 +2206,13 @@
       "chapter": "04-capabilities/01-devex/02-agent/02-skills/01-skills.md",
       "heading": "The stage vocabulary is closed, and a request belongs to exactly one",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.FUNCTION.023",
@@ -2174,7 +2266,13 @@
       "chapter": "05-guides/README.md",
       "heading": "The machine",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/bootstrap/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.FUNCTION.051",
@@ -2192,6 +2290,11 @@
           "plugin": "spn-infra",
           "path": "refs/support/infra/providers/local/09-deployments.md",
           "heading": "Registering an application is not a layer"
+        },
+        {
+          "plugin": "spn-infra",
+          "path": "skills/run/SKILL.md",
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -2299,6 +2402,11 @@
           "plugin": "spn-apps",
           "path": "refs/support/apps/tests.md",
           "heading": "Case titles carry the id and the sentence"
+        },
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
         },
         {
           "plugin": "spn-apps",
@@ -2429,6 +2537,11 @@
           "plugin": "spn-devex",
           "path": "refs/devex/function/scm.md",
           "heading": "How a change moves up"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/scm/SKILL.md",
+          "heading": "The rules this step holds"
         },
         {
           "plugin": "spn-devex",
@@ -2661,6 +2774,11 @@
           "plugin": "spn-devex",
           "path": "refs/devex/function/provision.md",
           "heading": "The rules"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/provision/SKILL.md",
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -2675,7 +2793,13 @@
       "chapter": "04-capabilities/01-devex/01-function/04-develop.md",
       "heading": "Where each gate runs",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/develop/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.FUNCTION.082",
@@ -2693,6 +2817,11 @@
           "plugin": "spn-devex",
           "path": "refs/devex/function/test.md",
           "heading": "Reading a result honestly"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/test/SKILL.md",
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -2845,6 +2974,11 @@
           "plugin": "spn-devex",
           "path": "refs/devex/utils/spnutils.md",
           "heading": "The derivation laws"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/develop/SKILL.md",
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -2859,7 +2993,13 @@
       "chapter": "02-constructs/01-devex/03-utils/01-spnutils.md",
       "heading": "repo",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/develop/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.UTILS.018",
@@ -2872,7 +3012,13 @@
       "chapter": "02-constructs/01-devex/03-utils/01-spnutils.md",
       "heading": "Four command groups",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/develop/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.UTILS.019",
@@ -2885,7 +3031,13 @@
       "chapter": "04-capabilities/01-devex/03-utils/01-spnutils/02-delivery.md",
       "heading": "One public marketplace",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/deliver/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.UTILS.027",
@@ -2898,7 +3050,13 @@
       "chapter": "04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
       "heading": "The machine's own layout",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/develop/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.UTILS.041",
@@ -2930,7 +3088,13 @@
       "chapter": "04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
       "heading": "login — the cloud session",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/develop/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.UTILS.044",
@@ -2981,7 +3145,13 @@
       "chapter": "04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
       "heading": "help — how a utility describes itself",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/develop/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.UTILS.056",
@@ -3066,6 +3236,11 @@
           "heading": "Act 12 — bring the platform up"
         },
         {
+          "plugin": "spn-devex",
+          "path": "skills/develop/SKILL.md",
+          "heading": "The rules this step holds"
+        },
+        {
           "plugin": "spn-infra",
           "path": "refs/support/infra/shape/README.md",
           "heading": "Layer nouns × commands"
@@ -3094,6 +3269,11 @@
       "heading": "infra — the estate",
       "decision": null,
       "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/develop/SKILL.md",
+          "heading": "The rules this step holds"
+        },
         {
           "plugin": "spn-infra",
           "path": "refs/support/infra/shape/README.md",
@@ -3136,6 +3316,11 @@
           "plugin": "spn-devex",
           "path": "refs/devex/utils/spnutils.md",
           "heading": "The two machine paths under ~/.saasplane"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/develop/SKILL.md",
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -3174,7 +3359,13 @@
       "chapter": "04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
       "heading": "repo — the repository and its remote",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/develop/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.UTILS.078",
@@ -3187,7 +3378,13 @@
       "chapter": "04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
       "heading": "repo — the repository and its remote",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/develop/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.UTILS.079",
@@ -3200,7 +3397,13 @@
       "chapter": "04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
       "heading": "repo — the repository and its remote",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/develop/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.UTILS.080",
@@ -3213,7 +3416,13 @@
       "chapter": "04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
       "heading": "repo — the repository and its remote",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/develop/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.UTILS.081",
@@ -3226,7 +3435,13 @@
       "chapter": "04-capabilities/01-devex/03-utils/01-spnutils/02-delivery.md",
       "heading": "Wiring — two levels, never the person",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/develop/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.UTILS.082",
@@ -3250,7 +3465,13 @@
       "chapter": "04-capabilities/01-devex/03-utils/01-spnutils/02-delivery.md",
       "heading": "The set a repo gets is derived from its own claim",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/develop/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.UTILS.084",
@@ -3263,7 +3484,13 @@
       "chapter": "04-capabilities/01-devex/03-utils/01-spnutils/02-delivery.md",
       "heading": "The three permission tiers",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/develop/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.UTILS.085",
@@ -3335,7 +3562,13 @@
       "chapter": "04-capabilities/README.md",
       "heading": "Capabilities — What the Foundation Provides",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.009",
@@ -3411,7 +3644,13 @@
       "chapter": "04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md",
       "heading": "Minted, then discovered",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/develop/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.037",
@@ -3448,7 +3687,13 @@
       "chapter": "04-capabilities/01-devex/03-utils/01-spnutils/02-delivery.md",
       "heading": "The three permission tiers",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/develop/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.045",
@@ -3480,7 +3725,13 @@
       "chapter": "04-capabilities/01-devex/03-utils/01-spnutils/02-delivery.md",
       "heading": "The three permission tiers",
       "decision": "DEC.DEVEX.WORKSPACE.046",
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/develop/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.054",
@@ -3528,7 +3779,13 @@
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "An arc carries its specification, or names the note that holds it",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.065",
@@ -3541,7 +3798,13 @@
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "Ideating is free, executing is not, and a number is a promise",
       "decision": "DEC.DEVEX.WORKSPACE.065",
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/execute/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.069",
@@ -3619,7 +3882,13 @@
       "chapter": "02-constructs/01-devex/04-workspace/04-docs.md",
       "heading": "Guides are steps",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/new/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.075",
@@ -3632,7 +3901,13 @@
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/01-corpus.md",
       "heading": "The book pattern",
       "decision": "DEC.DEVEX.WORKSPACE.075",
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/develop/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.076",
@@ -3661,6 +3936,11 @@
           "plugin": "spn-apps",
           "path": "refs/support/apps/agent-surface.md",
           "heading": "The one rule that governs all four"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/develop/SKILL.md",
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -3737,6 +4017,11 @@
         {
           "plugin": "spn-devex",
           "path": "skills/develop/SKILL.md",
+          "heading": "The rules this step holds"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/develop/SKILL.md",
           "heading": "The loop"
         }
       ]
@@ -3782,7 +4067,13 @@
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md",
       "heading": "Naming rules",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/develop/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.085",
@@ -3817,6 +4108,11 @@
           "plugin": "spn-devex",
           "path": "refs/devex/workspace/docs/doc-sets.md",
           "heading": "The capabilities seat hangs by domain, then package, then construct"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -3973,7 +4269,13 @@
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/02-document.md",
       "heading": "Metadata",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/develop/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.098",
@@ -4015,6 +4317,11 @@
           "plugin": "spn-devex",
           "path": "refs/devex/workspace/workspace.md",
           "heading": "A consumer repo needs no peer checkout"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/develop/SKILL.md",
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -4443,7 +4750,13 @@
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md",
       "heading": "Restatement discipline",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/develop/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.119",
@@ -4563,7 +4876,13 @@
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "Docs per change: each kind of change owes the documents its own share",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/execute/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.127",
@@ -4850,7 +5169,13 @@
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/01-corpus.md",
       "heading": "What a concept is made of",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.146",
@@ -4920,6 +5245,11 @@
       "heading": "Reports and templates",
       "decision": null,
       "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/report/SKILL.md",
+          "heading": "The rules this step holds"
+        },
         {
           "plugin": "spn-devex",
           "path": "skills/report/SKILL.md",
@@ -5012,7 +5342,13 @@
       "chapter": "04-capabilities/02-support/02-apps/04-resources/01-server/02-database.md",
       "heading": "Database — Schemas, Entities, and Tenancy",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.158",
@@ -5133,7 +5469,13 @@
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/06-registers.md",
       "heading": "The identifier",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/develop/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.167",
@@ -5168,7 +5510,13 @@
       "chapter": "04-capabilities/02-support/02-apps/01-shape/02-packaging.md",
       "heading": "What a node root holds",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.171",
@@ -5181,7 +5529,13 @@
       "chapter": "04-capabilities/01-devex/01-function/03-ideate.md",
       "heading": "Classify the altitude before you classify the change",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.172",
@@ -5246,7 +5600,13 @@
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/06-registers.md",
       "heading": "The identifier",
       "decision": "DEC.DEVEX.WORKSPACE.178",
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/develop/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.179",
@@ -5259,7 +5619,13 @@
       "chapter": "04-capabilities/02-support/02-apps/10-providers/02-contract.md",
       "heading": "A stack with no capability writes the file anyway",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/new/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.180",
@@ -5290,6 +5656,11 @@
           "plugin": "spn-apps",
           "path": "skills/verify/SKILL.md",
           "heading": "verify — run the gates against a target"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/test/SKILL.md",
+          "heading": "The rules this step holds"
         },
         {
           "plugin": "spn-devex",
@@ -5400,7 +5771,13 @@
       "chapter": "04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
       "heading": "workspace — the folder your day runs in",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/develop/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.186",
@@ -5557,6 +5934,11 @@
           "plugin": "spn-devex",
           "path": "refs/devex/workspace/workspace.md",
           "heading": "When work earns a workstream"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/develop/SKILL.md",
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -5585,6 +5967,11 @@
         {
           "plugin": "spn-devex",
           "path": "skills/report/SKILL.md",
+          "heading": "The rules this step holds"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/report/SKILL.md",
           "heading": "Coverage — how much is written, built and proved?"
         }
       ]
@@ -5605,6 +5992,11 @@
           "plugin": "spn-devex",
           "path": "refs/devex/workspace/docs/doc-sets.md",
           "heading": "Metadata"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/report/SKILL.md",
+          "heading": "The rules this step holds"
         },
         {
           "plugin": "spn-devex",
@@ -5827,6 +6219,11 @@
           "plugin": "spn-devex",
           "path": "refs/devex/workspace/workstream.md",
           "heading": "Anything the developer has not reviewed: preview, confirm, record, then code"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -5983,6 +6380,11 @@
         {
           "plugin": "spn-devex",
           "path": "skills/report/SKILL.md",
+          "heading": "The rules this step holds"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/report/SKILL.md",
           "heading": "Records — list items, never a table — MUST"
         }
       ]
@@ -6003,6 +6405,11 @@
           "plugin": "spn-devex",
           "path": "refs/devex/workspace/workstream.md",
           "heading": "Anything the developer has not reviewed: preview, confirm, record, then code"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -6403,6 +6810,11 @@
           "plugin": "spn-devex",
           "path": "refs/devex/workspace/workstream.md",
           "heading": "An order is one delegated execution, and every order follows the same rules"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/execute/SKILL.md",
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -6481,6 +6893,11 @@
           "plugin": "spn-surface",
           "path": "refs/support/surface/standards-patterns.md",
           "heading": "The specs a screen starts from — 🔮"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/mock.md",
+          "heading": "The rules this step holds"
         },
         {
           "plugin": "spn-surface",
@@ -6749,6 +7166,11 @@
           "plugin": "spn-devex",
           "path": "refs/devex/workspace/workstream.md",
           "heading": "The order of execution is set before the rows are written"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -7173,6 +7595,11 @@
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
           "heading": "Start from the spec of the pattern"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/mock.md",
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -7370,6 +7797,11 @@
           "plugin": "spn-devex",
           "path": "refs/devex/workspace/docs/blocks.md",
           "heading": "skeleton — a mock of a layout, and nothing about how it looks"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/develop/SKILL.md",
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -7399,6 +7831,11 @@
           "plugin": "spn-devex",
           "path": "refs/devex/workspace/docs/blocks.md",
           "heading": "skeleton — a mock of a layout, and nothing about how it looks"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/develop/SKILL.md",
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -7418,6 +7855,11 @@
           "plugin": "spn-devex",
           "path": "refs/devex/workspace/docs/blocks.md",
           "heading": "skeleton — a mock of a layout, and nothing about how it looks"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/develop/SKILL.md",
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -7437,6 +7879,11 @@
           "plugin": "spn-devex",
           "path": "refs/devex/workspace/docs/blocks.md",
           "heading": "skeleton — a mock of a layout, and nothing about how it looks"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/develop/SKILL.md",
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -7565,6 +8012,11 @@
           "plugin": "spn-devex",
           "path": "refs/devex/workspace/workstream.md",
           "heading": "Work is sized by its kind, and fixes gather into a round"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/execute/SKILL.md",
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -7657,6 +8109,11 @@
           "plugin": "spn-devex",
           "path": "refs/devex/workspace/workstream.md",
           "heading": "The state a row carries"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/develop/SKILL.md",
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -7738,6 +8195,11 @@
           "plugin": "spn-devex",
           "path": "refs/devex/workspace/docs/blocks.md",
           "heading": "skeleton — a mock of a layout, and nothing about how it looks"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/develop/SKILL.md",
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -7757,6 +8219,11 @@
           "plugin": "spn-devex",
           "path": "refs/devex/workspace/docs/blocks.md",
           "heading": "skeleton — a mock of a layout, and nothing about how it looks"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/develop/SKILL.md",
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -7776,6 +8243,11 @@
           "plugin": "spn-devex",
           "path": "refs/devex/workspace/docs/blocks.md",
           "heading": "skeleton — a mock of a layout, and nothing about how it looks"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/develop/SKILL.md",
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -7795,6 +8267,11 @@
           "plugin": "spn-devex",
           "path": "refs/devex/workspace/docs/blocks.md",
           "heading": "skeleton — a mock of a layout, and nothing about how it looks"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/develop/SKILL.md",
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -7814,6 +8291,11 @@
           "plugin": "spn-devex",
           "path": "refs/devex/workspace/docs/blocks.md",
           "heading": "skeleton — a mock of a layout, and nothing about how it looks"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/develop/SKILL.md",
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -7833,6 +8315,11 @@
           "plugin": "spn-devex",
           "path": "refs/devex/workspace/docs/blocks.md",
           "heading": "skeleton — a mock of a layout, and nothing about how it looks"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/develop/SKILL.md",
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -7852,6 +8339,11 @@
           "plugin": "spn-devex",
           "path": "refs/devex/workspace/docs/blocks.md",
           "heading": "skeleton — a mock of a layout, and nothing about how it looks"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/develop/SKILL.md",
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -7871,6 +8363,11 @@
           "plugin": "spn-devex",
           "path": "refs/devex/workspace/docs/blocks.md",
           "heading": "skeleton — a mock of a layout, and nothing about how it looks"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/develop/SKILL.md",
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -7890,6 +8387,11 @@
           "plugin": "spn-devex",
           "path": "refs/devex/workspace/docs/blocks.md",
           "heading": "skeleton — a mock of a layout, and nothing about how it looks"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/develop/SKILL.md",
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -7914,6 +8416,11 @@
           "plugin": "spn-devex",
           "path": "refs/devex/workspace/docs/blocks.md",
           "heading": "skeleton — a mock of a layout, and nothing about how it looks"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/develop/SKILL.md",
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -7943,6 +8450,11 @@
           "plugin": "spn-devex",
           "path": "refs/devex/workspace/docs/blocks.md",
           "heading": "skeleton — a mock of a layout, and nothing about how it looks"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/develop/SKILL.md",
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -8001,6 +8513,11 @@
           "plugin": "spn-devex",
           "path": "refs/devex/workspace/docs/blocks.md",
           "heading": "skeleton — a mock of a layout, and nothing about how it looks"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/develop/SKILL.md",
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -8020,6 +8537,11 @@
           "plugin": "spn-devex",
           "path": "refs/devex/workspace/docs/blocks.md",
           "heading": "skeleton — a mock of a layout, and nothing about how it looks"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/develop/SKILL.md",
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -8039,6 +8561,11 @@
           "plugin": "spn-devex",
           "path": "refs/devex/workspace/docs/blocks.md",
           "heading": "skeleton — a mock of a layout, and nothing about how it looks"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/develop/SKILL.md",
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -8063,6 +8590,11 @@
           "plugin": "spn-devex",
           "path": "refs/devex/workspace/docs/blocks.md",
           "heading": "skeleton — a mock of a layout, and nothing about how it looks"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/develop/SKILL.md",
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -8082,6 +8614,11 @@
           "plugin": "spn-devex",
           "path": "refs/devex/workspace/docs/blocks.md",
           "heading": "skeleton — a mock of a layout, and nothing about how it looks"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/develop/SKILL.md",
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -8106,6 +8643,11 @@
           "plugin": "spn-devex",
           "path": "refs/devex/workspace/docs/blocks.md",
           "heading": "skeleton — a mock of a layout, and nothing about how it looks"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/develop/SKILL.md",
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -8130,6 +8672,11 @@
           "plugin": "spn-devex",
           "path": "refs/devex/workspace/docs/blocks.md",
           "heading": "skeleton — a mock of a layout, and nothing about how it looks"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/develop/SKILL.md",
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -8149,6 +8696,11 @@
           "plugin": "spn-devex",
           "path": "refs/devex/workspace/docs/blocks.md",
           "heading": "skeleton — a mock of a layout, and nothing about how it looks"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/develop/SKILL.md",
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -8168,6 +8720,11 @@
           "plugin": "spn-devex",
           "path": "refs/devex/workspace/docs/blocks.md",
           "heading": "skeleton — a mock of a layout, and nothing about how it looks"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/develop/SKILL.md",
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -8192,6 +8749,11 @@
           "plugin": "spn-devex",
           "path": "refs/devex/workspace/workstream.md",
           "heading": "An order is one delegated execution, and every order follows the same rules"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/execute/SKILL.md",
+          "heading": "The rules this step holds"
         },
         {
           "plugin": "spn-devex",
@@ -8240,6 +8802,11 @@
           "plugin": "spn-devex",
           "path": "refs/devex/workspace/workstream.md",
           "heading": "Before a workstream exists, you know six things"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -8259,6 +8826,11 @@
           "plugin": "spn-devex",
           "path": "refs/devex/workspace/workstream.md",
           "heading": "How arcs are cut"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -8278,6 +8850,11 @@
           "plugin": "spn-devex",
           "path": "refs/devex/workspace/workstream.md",
           "heading": "Placing something new"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -8372,6 +8949,11 @@
           "plugin": "spn-devex",
           "path": "refs/devex/workspace/workspace.md",
           "heading": "The workspace's working state — .spndevex/"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/develop/SKILL.md",
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -8475,7 +9057,13 @@
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "The commands",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/develop/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.322",
@@ -8499,7 +9087,13 @@
       "chapter": "04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "heading": "The cost of a window is read from telemetry, never from a transcript",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/develop/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.324",
@@ -8522,6 +9116,11 @@
           "plugin": "spn-devex",
           "path": "refs/devex/workspace/workspace.md",
           "heading": "The workspace's working state — .spndevex/"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/develop/SKILL.md",
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -8627,6 +9226,11 @@
           "plugin": "spn-devex",
           "path": "refs/devex/workspace/workstream.md",
           "heading": "An arc carries what its steps act on"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -8646,6 +9250,11 @@
           "plugin": "spn-devex",
           "path": "refs/devex/workspace/workstream.md",
           "heading": "Once an arc is decided, a drift step runs, then four passes per repository"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/execute/SKILL.md",
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -8665,6 +9274,11 @@
           "plugin": "spn-devex",
           "path": "refs/devex/workspace/workstream.md",
           "heading": "In an arc that keeps a sheet, a row lands on a run of its tests"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/execute/SKILL.md",
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -8690,7 +9304,13 @@
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/06-registers.md",
       "heading": "The identifier",
       "decision": "DEC.DEVEX.WORKSPACE.334",
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/develop/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.335",
@@ -8736,7 +9356,13 @@
       "chapter": "04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md",
       "heading": "Two dot-homes",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/develop/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.339",
@@ -8771,7 +9397,13 @@
       "chapter": "04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md",
       "heading": "The state file has a node for each owner",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/develop/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.342",
@@ -8816,7 +9448,13 @@
       "chapter": "04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md",
       "heading": ".spndevex/ keeps its own history, and it never takes a remote",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/develop/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.345",
@@ -8829,7 +9467,13 @@
       "chapter": "04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md",
       "heading": ".spndevex/ keeps its own history, and it never takes a remote",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/develop/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.346",
@@ -8842,7 +9486,13 @@
       "chapter": "04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md",
       "heading": "The worktree set",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/develop/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.347",
@@ -8855,7 +9505,13 @@
       "chapter": "04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md",
       "heading": "The worktree set",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/develop/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.348",
@@ -8881,7 +9537,13 @@
       "chapter": "04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md",
       "heading": "The worktree set",
       "decision": "DEC.DEVEX.WORKSPACE.349",
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/develop/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.350",
@@ -8894,7 +9556,13 @@
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "The workstream is a scope of work, not a window",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/develop/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.351",
@@ -8944,7 +9612,13 @@
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "Three states, and the parent folder is the state",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.355",
@@ -8957,7 +9631,13 @@
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "The number is assigned once",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/develop/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.356",
@@ -8970,7 +9650,13 @@
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "The number is assigned once",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/develop/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.357",
@@ -9009,7 +9695,13 @@
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "An arc keeps a change sheet, and only its commands write it",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/develop/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.360",
@@ -9022,7 +9714,13 @@
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "Once an arc is decided, a drift step runs, then four passes per repository",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/execute/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.361",
@@ -9048,7 +9746,13 @@
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "A step names every surface the change reaches, and how you would know",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.363",
@@ -9087,7 +9791,13 @@
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "An arc carries its specification, or names the note that holds it",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.366",
@@ -9100,7 +9810,13 @@
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "An order is one delegated execution, and every order follows the same rules",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.367",
@@ -9113,7 +9829,13 @@
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "An order is one delegated execution, and every order follows the same rules",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/execute/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.368",
@@ -9126,7 +9848,13 @@
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "An order is one delegated execution, and every order follows the same rules",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/execute/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.369",
@@ -9139,7 +9867,13 @@
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "An order is one delegated execution, and every order follows the same rules",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/execute/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.370",
@@ -9152,7 +9886,13 @@
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "An order is one delegated execution, and every order follows the same rules",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/execute/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.371",
@@ -9228,7 +9968,13 @@
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "A suggestion is recorded the moment it is raised",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.377",
@@ -9241,7 +9987,13 @@
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "The approach page keeps up with its arcs",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/develop/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.378",
@@ -9312,7 +10064,13 @@
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "Every workstream document is current before you execute",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/develop/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.383",
@@ -9325,7 +10083,13 @@
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "A card is only for what the rules leave open",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.384",
@@ -9338,7 +10102,13 @@
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "A card is only for what the rules leave open",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.385",
@@ -9377,7 +10147,13 @@
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "A check at the end of a turn speaks once, and only about this window's work",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/develop/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.388",
@@ -9390,7 +10166,13 @@
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "A check at the end of a turn speaks once, and only about this window's work",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/develop/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.389",
@@ -9442,7 +10224,13 @@
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "Documents first, and the order they are written in",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.393",
@@ -9524,7 +10312,13 @@
       "chapter": "04-capabilities/01-devex/04-workspace/03-repos/01-repos.md",
       "heading": "Each manifest has exactly one reader",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/scm/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.399",
@@ -9537,7 +10331,13 @@
       "chapter": "04-capabilities/01-devex/04-workspace/03-repos/01-repos.md",
       "heading": "A claim exists only where there is something to claim about",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/scm/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.400",
@@ -9550,7 +10350,13 @@
       "chapter": "04-capabilities/01-devex/04-workspace/03-repos/01-repos.md",
       "heading": "One grammar for every package reference",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/scm/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.401",
@@ -9619,7 +10425,13 @@
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "Reports and templates",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/report/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.406",
@@ -9632,7 +10444,13 @@
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "The header and the five sections",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/report/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.407",
@@ -9645,7 +10463,13 @@
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "Findings in a report",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/report/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.408",
@@ -9658,7 +10482,13 @@
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "Findings in a report",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/report/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.409",
@@ -9671,7 +10501,13 @@
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "Findings in a report",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/report/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.410",
@@ -9684,7 +10520,13 @@
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "Records in a report",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/report/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.411",
@@ -9716,7 +10558,13 @@
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "Who decides",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/report/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.413",
@@ -9729,7 +10577,13 @@
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "The words a report uses",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/report/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.415",
@@ -9742,7 +10596,13 @@
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "The coverage report — written, built and proved",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/report/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.416",
@@ -9755,7 +10615,13 @@
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "The audit report — how the repository is set up",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/report/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.417",
@@ -9840,7 +10706,13 @@
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "A card says which views spoke",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.424",
@@ -9853,7 +10725,13 @@
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "A card says which views spoke",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.425",
@@ -10101,7 +10979,13 @@
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "A card is only for what the rules leave open",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.443",
@@ -10146,7 +11030,13 @@
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "Questions are records, and every card is one rendered",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/develop/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.446",
@@ -10191,7 +11081,13 @@
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "Stopping in the middle is a handover",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/execute/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.449",
@@ -10270,6 +11166,11 @@
           "plugin": "spn-surface",
           "path": "refs/support/surface/standards-patterns.md",
           "heading": "The specs a screen starts from — 🔮"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/mock.md",
+          "heading": "The rules this step holds"
         },
         {
           "plugin": "spn-surface",
@@ -10480,7 +11381,13 @@
       "chapter": "04-capabilities/01-devex/04-workspace/03-repos/01-repos.md",
       "heading": "The world is a value, never an absence",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/scm/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.465",
@@ -10493,7 +11400,13 @@
       "chapter": "04-capabilities/01-devex/04-workspace/03-repos/01-repos.md",
       "heading": "The root's shape follows the world, and so does its documentation",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/scm/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.466",
@@ -10506,7 +11419,13 @@
       "chapter": "registers/decisions.md",
       "heading": "How the register works",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.467",
@@ -10567,7 +11486,13 @@
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "After the go, every moment names the next step",
       "decision": "DEC.DEVEX.WORKSPACE.469",
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/execute/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.470",
@@ -10580,7 +11505,13 @@
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "After the go, every moment names the next step",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/execute/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.471",
@@ -10632,7 +11563,13 @@
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "The commands",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/develop/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.475",
@@ -10645,7 +11582,13 @@
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "The commands",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/develop/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.476",
@@ -10658,7 +11601,13 @@
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "In an arc that keeps a sheet, a row lands on a run of its tests",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/develop/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.477",
@@ -10671,7 +11620,13 @@
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "Each arc reports what it cost and how much of it was rework",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/develop/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.478",
@@ -17035,7 +17990,13 @@
       "chapter": "04-capabilities/02-support/02-apps/03-module/01-server/05-config/01-env.md",
       "heading": "Read once, at the edge",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.SUPPORT.APPS.234",
@@ -17048,7 +18009,13 @@
       "chapter": "04-capabilities/02-support/02-apps/02-support/01-server/02-polymorphic.md",
       "heading": "Selection is data, not code",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.SUPPORT.APPS.235",
@@ -17061,7 +18028,13 @@
       "chapter": "04-capabilities/02-support/02-apps/08-agent-surface/03-validators.md",
       "heading": "What generation and stacks own",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.SUPPORT.APPS.236",
@@ -17087,7 +18060,13 @@
       "chapter": "04-capabilities/02-support/02-apps/10-providers/ts/03-structure.md",
       "heading": "Module Organization",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "providers/ts/skills/implement/steps/service.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.SUPPORT.APPS.238",
@@ -17122,7 +18101,13 @@
       "chapter": "04-capabilities/02-support/02-apps/02-support/02-web/02-ui.md",
       "heading": "Folder discipline",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.SUPPORT.APPS.241",
@@ -17135,7 +18120,13 @@
       "chapter": "04-capabilities/02-support/02-apps/10-providers/ts/03-structure.md",
       "heading": "Where New Code Goes",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "providers/ts/skills/implement/steps/service.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.SUPPORT.APPS.242",
@@ -17159,7 +18150,13 @@
       "chapter": "04-capabilities/02-support/02-apps/03-module/02-web/03-entry/02-components.md",
       "heading": "Props in, events out",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.SUPPORT.APPS.244",
@@ -17183,7 +18180,13 @@
       "chapter": "04-capabilities/02-support/02-apps/10-providers/ts/11-generation.md",
       "heading": "The Never-Hand-Edit Rule",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.SUPPORT.APPS.246",
@@ -17196,7 +18199,13 @@
       "chapter": "04-capabilities/02-support/02-apps/03-module/01-server/04-migrations/01-foundation.md",
       "heading": "The only schema-change path",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.SUPPORT.APPS.247",
@@ -31766,6 +32775,11 @@
           "plugin": "spn-surface",
           "path": "refs/support/surface/architecture-components.md",
           "heading": "A unit's choice table — 🔮"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/SKILL.md",
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -31780,7 +32794,13 @@
       "chapter": "04-capabilities/02-support/01-surface/12-delivery-showcase/01-common/01-showcase.md",
       "heading": "What the showcase proves",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.SUPPORT.SURFACE.400",
@@ -31834,7 +32854,13 @@
       "chapter": "04-capabilities/02-support/01-surface/12-delivery-showcase/01-common/01-showcase.md",
       "heading": "The pages of a unit",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.SUPPORT.SURFACE.403",
@@ -31847,7 +32873,13 @@
       "chapter": "04-capabilities/02-support/01-surface/11-delivery-library/02-figma/03-reading.md",
       "heading": "The tool reads the units, and the connector reads the variables and the styles",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.SUPPORT.SURFACE.404",
@@ -31923,7 +32955,13 @@
       "chapter": "04-capabilities/02-support/01-surface/11-delivery-library/02-figma/01-files.md",
       "heading": "SaaS Plane's library, file by file",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.SUPPORT.SURFACE.408",
@@ -31936,7 +32974,13 @@
       "chapter": "04-capabilities/02-support/01-surface/12-delivery-showcase/01-common/01-showcase.md",
       "heading": "What the showcase proves",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.SUPPORT.SURFACE.409",
