@@ -7,7 +7,7 @@ description: Prove SaaS Plane TS work is sound by running gates. Use when the as
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
-      "seen": "c110978c"
+      "seen": "d6a6cbd5"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/05-test.md",

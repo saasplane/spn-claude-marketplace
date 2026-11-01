@@ -85,7 +85,7 @@ function one(label, payload, expect, { says, cwd = `${WORKSPACE}`, parity = true
 console.log("\n=== pretooluse — every check still reaches the turn through the chain");
 
 // KNOWN-BAD, one per check.
-one("saasplane-env's refusal survives the chain",
+one("[MKT.HOOKS.380] saasplane-env's refusal survives the chain",
   { tool_name: "Bash", tool_input: { command: "cat ~/.spnenv" } }, "deny", { says: "workspace env show" });
 
 

@@ -7,7 +7,7 @@ description: Write one of the five reports on a repository — coverage (how muc
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
-      "seen": "c110978c"
+      "seen": "d6a6cbd5"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/05-report.md",
@@ -16,22 +16,22 @@ description: Write one of the five reports on a repository — coverage (how muc
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "The masthead, and the opening",
-      "seen": "1a0d2100"
+      "seen": "a964af7f"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "Reports and templates",
-      "seen": "ae927f3d"
+      "seen": "b89030ff"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "The header — two lines, six fields, produced from the block",
-      "seen": "34365463"
+      "seen": "4abc9580"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "Nothing is published unless the developer asks",
-      "seen": "9af225b3"
+      "seen": "2a3b2edf"
     }
   ]
 }
@@ -64,7 +64,7 @@ description: Write one of the five reports on a repository — coverage (how muc
 
 **Read [`refs/devex/workspace/workstream.md`](../../refs/devex/workspace/workstream.md) before acting.** It holds the loop this skill runs inside: how a prompt is read, where a new ask goes, and how a reply closes.
 
-**A report measures one repository against one question, at one moment** (`RULE.DEVEX.WORKSPACE.149` · MUST · check:doc-check). It has two readers. A leader reads it to learn where things stand and presents it for review, so its first screen stands alone. You read it as a work list: you close the gaps a rule lets you close, and you bring the developer only the decisions that need a person.
+**A report measures one repository against one question, at one moment** (`RULE.DEVEX.WORKSPACE.149` · MUST · skill:spn-devex/report). It has two readers. A leader reads it to learn where things stand and presents it for review, so its first screen stands alone. You read it as a work list: you close the gaps a rule lets you close, and you bring the developer only the decisions that need a person.
 
 **A report is written on request and never on initiative.** If nobody asked, do not write one and do not refresh one.
 
@@ -74,7 +74,7 @@ description: Write one of the five reports on a repository — coverage (how muc
 
 ## The five report types
 
-**The set is closed** (`RULE.DEVEX.WORKSPACE.149` · MUST · check:doc-check); a sixth is a decision entry, never a new filename. **No report states a finding another report owns**, so one problem is counted once.
+**The set is closed** (`RULE.DEVEX.WORKSPACE.149` · MUST · skill:spn-devex/report); a sixth is a decision entry, never a new filename. **No report states a finding another report owns**, so one problem is counted once.
 
 | Report | Answers | Its unit | Its states |
 | --- | --- | --- | --- |
@@ -105,7 +105,7 @@ The block names the type with one `SPDocReportType` value: `COVERAGE` · `TESTS`
 
 **The page you write links the shared files, and holds no copy of them** (`RULE.DEVEX.WORKSPACE.214` · MUST · check:doc-check). The copy keeps the template's two lines: one links one version of `sds-docs.css` by its address, and the other loads `sds-docs.js` from the same version. The stylesheet gives the report its forms in both themes. The script shows the Generated time and builds the outline. A report needs no style of its own: every form it uses is in the shared stylesheet. A `style` attribute stays only where the template has one, such as the width of a column.
 
-**Keep the template's class names, and every one opens with `sds-`** (`RULE.DEVEX.WORKSPACE.216` · MUST · check:doc-check). A class the shared stylesheet does not hold has no form, so never invent one. A result takes one of the status classes: `sds-success`, `sds-warning` or `sds-error` (`RULE.DEVEX.WORKSPACE.217` · MUST · check:doc-check).
+**Keep the template's class names, and every one opens with `sds-`** (`RULE.DEVEX.WORKSPACE.216` · GUIDE). A class the shared stylesheet does not hold has no form, so never invent one. A result takes one of the status classes: `sds-success`, `sds-warning` or `sds-error` (`RULE.DEVEX.WORKSPACE.217` · GUIDE).
 
 **A report is written by you, not produced by a command.** No tool renders it. You run the measuring commands, decide what is worth saying, and fill the template — which is how a report can name a fault no check could.
 
@@ -120,7 +120,7 @@ Repo: <folder name> | Commit: <short hash> | Generated: <time>
 - **Subtitle**: the question, naming the repository by its folder name — *How much of spn-support-ts is written, built and proved?*
 - **Description**: one paragraph saying what was counted, **with no number**, and when you would read it.
 - **Generated** is `generatedAt`, a date and a time with its offset (`2026-09-30T12:57+05:30`), in a `<time class="sds-local" datetime="…">` element whose text is the same value; the shared script shows it in the reader's own time zone.
-- **No status, and no comparison with an earlier report** (`RULE.DEVEX.WORKSPACE.192` · MUST · check:doc-check). A report is a snapshot, and Generated says when its numbers were true. `docs audit` refuses a report that carries a status.
+- **No status, and no comparison with an earlier report** (`RULE.DEVEX.WORKSPACE.192` · MUST · skill:spn-devex/report). A report is a snapshot, and Generated says when its numbers were true. `docs audit` refuses a report that carries a status.
 - **The metadata block** carries `id`, `variant` (`report`), `reportType`, `title`, `repository`, `generatedAt`, `summary` and `keywords`. A `tests` report also carries `measuredAt`, the newest `Updated at` among the rows it read, stated in Measured and never in the header. Where no row cites a run, the block leaves `measuredAt` out and Measured says that no run is stamped; `docs audit` refuses the key written as `null`.
 
 **Each report type has one approved Subtitle**, copied word for word with `{repo}` replaced by the repository's folder name:
@@ -177,7 +177,7 @@ Every section fits about one screen, and Records is folded so it never swamps th
 - **An item** (`<li class="sds-record">`) is a state dot, the location in code type, one plain sentence, and a small second line. The dot is filled in the failure colour for the worst state, filled in the gap colour for the middle one, and an empty ring for the least, so its shape carries the grade as well as its colour; the grade is also its accessible name.
 - **Every item has a stable id** `<KIND>.<GROUP>.<nnn>` (`CODE.HIST.047`), a **Decided by** value with its reason, and the data attributes `data-id`, `data-rule`, `data-severity`, `data-decider` (`agent`, `agent-flagged` or `developer`) and `data-location`, so you can read the list back without parsing sentences.
 - **Every group prints open.**
-- **One item per file inside a group** (`RULE.DEVEX.WORKSPACE.208` · MUST · check:doc-check). Where one cause occurs many times in one file, the item names the file once, with the count and the first line it occurs on. Never one item per occurrence.
+- **One item per file inside a group** (`RULE.DEVEX.WORKSPACE.208` · MUST · skill:spn-devex/report). Where one cause occurs many times in one file, the item names the file once, with the count and the first line it occurs on. Never one item per occurrence.
 - **One list.** The page and the data file it is built from flag the same records.
 
 ### Measured — shows three things and folds one
@@ -259,7 +259,7 @@ Developers and leaders who have not learned the book's words read a report, so i
 | **Findings** | **Repository** by domain, plus the whole-repository row: Name · Written · Built · Proved · Not written (— for a domain) · Not built · Not proved → **Apps** → **Packages**: Name · Written · Built · Proved · Not written · Not built · Not proved |
 | **Records** | level 1 the gap — Not written · Not built · Not proved · Not proved: whole repository · Ids used twice; level 2 the package or app. An item is a path, a seat or a row id, and the gap |
 
-**Every side counts behaviours, so the numbers compare directly** (`RULE.DEVEX.WORKSPACE.191` · MUST · check:doc-check). A design topic is built when its capability chapter exists and every path its `## Where` table names resolves in `src/`; each of its behaviours then counts as built. **A whole-repository behaviour has no design topic, so it is never built**, even when a test proves it. Not built is Written minus Built, and Not proved is Written minus Proved. Not written counts files and folders in `src/` that no Where row names, so it is never Written subtracted from anything.
+**Every side counts behaviours, so the numbers compare directly** (`RULE.DEVEX.WORKSPACE.191` · MUST · skill:spn-devex/report). A design topic is built when its capability chapter exists and every path its `## Where` table names resolves in `src/`; each of its behaviours then counts as built. **A whole-repository behaviour has no design topic, so it is never built**, even when a test proves it. Not built is Written minus Built, and Not proved is Written minus Proved. Not written counts files and folders in `src/` that no Where row names, so it is never Written subtracted from anything.
 
 **A `MANUAL` row counts in none of the numbers — MUST.** A person proves it by following the repository's *Check in a Browser* guide, and no run records it, so counted as written it would read as *Not proved* and open a gap that is not there. The command already leaves it out of Written, Built and Proved at every level and lists it per level as `manual: [{ id, file }]`. Show it in two places: **one line under Findings** — *N behaviours are proved by hand, in Check in a Browser* — and a Records group **Proved by hand** that lists each with the guide's check that names it. A manual row no check in the guide names is listed there as a gap. **The report rolls up and never lists a behaviour**; the tests report keeps each one, so link it for the detail. A count says how much, never how well.
 
