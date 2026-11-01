@@ -24,6 +24,8 @@ import { basename, dirname, join } from "node:path";
 import type { Verdict } from "../../../../plugin-support-lib/src/lib/payload.ts";
 import { validate as testTreeShape } from "../lib/test-file-outside-tier-folder.ts";
 import { validate as harnessManifestIdentity } from "../lib/harness-reimplements-manifest-identity.ts";
+import { validate as organizationNames } from "../lib/organization-names.ts";
+import { validate as publishedKeys } from "../lib/published-keys.ts";
 
 /** One subject, parsed once per provider that has an opinion about it. */
 export type Subject = {
@@ -49,6 +51,8 @@ const CORE_SUBJECTS: Subject[] = [
   { name: "test-tree-shape", group: "test-tree-shape", action: "test-tree-shape", validate: testTreeShape },
   { name: "harness-manifest-identity", group: "harness-manifest-identity", action: "harness-manifest-identity",
     validate: harnessManifestIdentity },
+  { name: "organization-names", group: "organization-names", action: "organization-names", validate: organizationNames },
+  { name: "published-keys", group: "published-keys", action: "published-keys", validate: publishedKeys },
 ];
 
 /**

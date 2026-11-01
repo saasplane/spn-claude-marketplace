@@ -26,6 +26,10 @@ import { verdict as enablementGrammar, watched as enablementWatched } from "./_s
 import { verdict as awaitSequencing, watched as awaitWatched } from "./_src/await-sequencing.ts";
 import { verdict as appStyle, watched as appStyleWatched } from "./_src/app-style.ts";
 import { verdict as contractCycle, watched as contractCycleWatched } from "./_src/contract-cycle.ts";
+import { verdict as envNameBranch, watched as envNameBranchWatched } from "./_src/env-name-branch.ts";
+import { verdict as oneComponentPerFile, watched as oneComponentPerFileWatched } from "./_src/one-component-per-file.ts";
+import { verdict as shadcnHandsOff, watched as shadcnHandsOffWatched } from "./_src/shadcn-hands-off.ts";
+import { verdict as runtimeSlots, watched as runtimeSlotsWatched } from "./_src/runtime-slots.ts";
 
 /** One rule in this subject: what it looks at, and what it says once the text is parsed. */
 type Bound = { name: string; watched: (path: string) => boolean; verdict: (path: string, source: string | null, added: string | null) => Verdict };
@@ -36,6 +40,10 @@ export const RULES: Bound[] = [
   { name: "await-sequencing", watched: awaitWatched, verdict: awaitSequencing },
   { name: "contract-cycle", watched: contractCycleWatched, verdict: contractCycle },
   { name: "app-style", watched: appStyleWatched, verdict: appStyle },
+  { name: "env-name-branch", watched: envNameBranchWatched, verdict: envNameBranch },
+  { name: "one-component-per-file", watched: oneComponentPerFileWatched, verdict: oneComponentPerFile },
+  { name: "shadcn-hands-off", watched: shadcnHandsOffWatched, verdict: shadcnHandsOff },
+  { name: "runtime-slots", watched: runtimeSlotsWatched, verdict: runtimeSlots },
 ];
 
 /**

@@ -20,6 +20,9 @@ import { emit, payload } from "../../../../plugin-support-lib/src/lib/payload.ts
 import { FIGMA_TOOL, run as runFigmaConnector } from "../checks/figma-connector.ts";
 import { run as runUnitRead } from "../checks/unit-read.ts";
 import { run as runDesignGuidance, watched as guidanceWatched } from "../checks/design-guidance.ts";
+import { run as runDesignWording } from "../checks/design-wording.ts";
+import { run as runStoryOrder } from "../checks/story-order.ts";
+import { run as runProductName } from "../checks/product-name.ts";
 import { isTsxSource } from "../lib/node.ts";
 
 export async function dispatch(event: Payload, span: <T>(name: SpanName, fn: () => T) => T): Promise<Verdict> {
@@ -36,6 +39,16 @@ export async function dispatch(event: Payload, span: <T>(name: SpanName, fn: () 
   // DESIGN GUIDANCE reads the refs, design-system pages and check sources, on the path's text alone.
   if ((event.tool_name === "Write" || event.tool_name === "Edit") && path && guidanceWatched(path))
     return span({ group: "surface", action: "guidance" }, () => runDesignGuidance(event.tool_input ?? {}));
+  // THE ROUND-4 CHECKS read the path's text first: each one's applies test returns before any read on a
+  // call it does not concern, and the first deny wins.
+  if ((event.tool_name === "Write" || event.tool_name === "Edit") && path) {
+    for (const [action, check] of [["design-wording", runDesignWording], ["story-order", runStoryOrder],
+                                    ["product-name", runProductName]] as const) {
+      let found: Verdict = null;
+      try { found = span({ group: "surface", action }, () => check(event.tool_input ?? {})); } catch { found = null; }
+      if (found) return found;
+    }
+  }
   if ((event.tool_name !== "Write" && event.tool_name !== "Edit") || !path || !isTsxSource(path)) return null;
   const reader = await span({ group: "surface", action: "load" },
     async () => (await import("../checks/subjects.ts")).surfaceFor(path));
