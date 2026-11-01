@@ -200,6 +200,8 @@ Every row below is declared and none is claimed: a run writes the last two cells
 | MKT.HOOKS.414 | Engineering leader | be told the next step only of a go my window started | The turn-end go-next names only a go this window started (it ran `go start` or `go write` for it, recorded in the window's note) or a handover gave it; another window's go on the same workstream is not this window's next step | NEGATIVE | UNIT | PLANNED | — |
 | MKT.HOOKS.415 | Engineering leader | start a sheet or preview order before the arc has a go | The launch check lets through an order for an arc that no go plan covers yet, even while another arc keeps a `go.json`, and refuses an order with no go for a covered arc naming that arc and its go | POSITIVE | UNIT | PLANNED | — |
 | MKT.HOOKS.416 | Engineering leader | not be refused for naming a plugin install in a message | The raw-install check tests the command with its quoted arguments taken out, so a commit message or search string that names a raw plugin install passes, and one outside the quotes is still refused | NEGATIVE | UNIT | PLANNED | — |
+| MKT.HOOKS.417 | Engineering leader | not converge a workstream's folder by mistake | A tool-call check refuses `spnutils workspace init`, `spnutils workspace agent-sync` and a plugin install or update run with the working folder (or a `cd`) inside `.spndevex/workstreams`, and names the scratchpad as the place for a probe | NEGATIVE | UNIT | PLANNED | — |
+| MKT.HOOKS.418 | Engineering leader | sync every member from the root | A tool-call check refuses `spnutils repo agent-sync` run in a workspace member or a worktree, and names `spnutils workspace agent-sync` | NEGATIVE | UNIT | PLANNED | — |
 
 ## Retired ids
 

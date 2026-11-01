@@ -55,6 +55,7 @@ import { checkReadSize } from "../checks/read-size.ts";
 import { checkArcStatus } from "../checks/arc-status.ts";
 import { checkProofRun } from "../checks/proof-run.ts";
 import { checkPluginSync } from "../checks/plugin-sync.ts";
+import { applies as whereItRunsApplies, checkRepoSync, checkWorkspaceCwd } from "../checks/where-it-runs.ts";
 import { checkBrowserProfile } from "../checks/browser-profile.ts";
 import { applies as noHistoryApplies, checkNoHistory } from "../checks/no-history.ts";
 import { checkFigureSpacing } from "../checks/figure-spacing.ts";
@@ -167,6 +168,8 @@ const CHECKS: Check[] = [
     applies: (path, command) => longRunApplies(path, command) },
   // Three refusals whose whole cost is a regular expression or two over the command, and no file read.
   { name: { group: "plugin-sync", action: "plugin-sync" }, run: checkPluginSync, needs: ["command"], applies: () => true },
+  { name: { group: "where-it-runs", action: "workspace-cwd" }, run: checkWorkspaceCwd, needs: ["command"], applies: (path, command) => whereItRunsApplies(path, command) },
+  { name: { group: "where-it-runs", action: "repo-sync" }, run: checkRepoSync, needs: ["command"], applies: (_path, command) => /\bagent-sync\b/.test(command) },
   { name: { group: "browser-profile", action: "browser-profile" }, run: checkBrowserProfile, needs: ["command"], applies: () => true },
   { name: { group: "proof-run", action: "proof-run" }, run: checkProofRun, needs: ["command"], applies: () => true },
   // The round-1 refusals on a command, each by a substring or one regular expression over it before any read, and each
