@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/03-platform/01-core/03-surfaces.md",
-      "seen": "2ca9548a"
+      "seen": "d0e4a304"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/03-platform/01-core/03-surfaces/",
-      "seen": "8b073916"
+      "seen": "9d9741b9"
     }
   ]
 }
@@ -15,27 +15,28 @@
 
 # Surfaces
 
-What the platform already gives you: an application catalog, a site row that turns a host into an organization and an application, the coordinates a running instance carries, the namespaces that divide who owns a service, and a ladder public routes charge for arriving on. Do not add a `?tenant=` parameter, a frontend-parsed subdomain, or a bespoke rate limiter — the platform already resolves a request before any handler runs, and a parallel resolution is a second place that can disagree with the first.
+What the platform already gives you: an application catalog of rows on four app scopes, a site row that turns a host into an organization and an application, the coordinates a running instance carries, the namespaces that divide who owns a service, and a ladder public routes charge for arriving on. Do not add a `?tenant=` parameter, a frontend-parsed subdomain, or a bespoke rate limiter — the platform already resolves a request before any handler runs, and a parallel resolution is a second place that can disagree with the first.
 
 ## What a surface is
 
 A surface is defined by **who reaches it**, never by its technology. An operator console and a customer portal differ in what may be reached, what is shown on failure, and what is logged — that is the whole difference. The API is a surface under the same rules: a capability reachable through the UI but not the API is an accident, and the reverse is a security finding.
 
-## The app catalog: one surface per tier
+## The app catalog: rows on four app scopes
+
+An application is a row on one app scope. There are four app scopes, they are closed, and the core branches on them. What a platform builds on top is rows: it adds an application by adding a row, and no catalog of seven is released with the platform.
 
 ```ts
 export enum AppScopeType {
-  IDENTITY = 'IDENTITY',                        // the shared hub — serves no tier, and is where signing in happens
-  PLATFORM = 'PLATFORM',                        // the platform's own console
-  ACCOUNT = 'ACCOUNT',                          // an account's workspace
-  ACCOUNT_CONSUMER = 'ACCOUNT_CONSUMER',        // an account's consumer storefront
-  ACCOUNT_ENTERPRISE = 'ACCOUNT_ENTERPRISE',    // an account's business portal
-  PLATFORM_ENTERPRISE = 'PLATFORM_ENTERPRISE',  // the marketplace's seller surface
-  PLATFORM_CONSUMER = 'PLATFORM_CONSUMER',      // the marketplace's shopper surface
+  IDENTITY = 'IDENTITY',      // the shared hub — serves no org category, and is where signing in happens
+  PLATFORM = 'PLATFORM',      // the platform's own console
+  ENTERPRISE = 'ENTERPRISE',  // a door for the categories of the enterprise org type
+  CONSUMER = 'CONSUMER',      // a door for the categories of the consumer org type
 }
 ```
 
-Six of these are one tenancy tier each; `IDENTITY` is the one that is not. It is deliberately catalog-free — generic self-service, never a governed business surface — and it is where authentication always happens. A business application hands a visitor off carrying its site, and gets back a session bound to what that site resolved. **A permission is per app; an enablement is per organization type** — the app catalog decides what a person may do inside a surface they can already reach, and enablement (in the tenancy model) decides whether their organization's type is offered that surface at all.
+An app is a sign-in surface and nothing else. It owns its permission set, and an org category names the app that serves it, so the link runs one way and an app lists no categories. The categories an app serves are found by reading the categories that name it, and they all sit on the app scope's org type. An account's workspace, a merchant's portal and a shopper's storefront are three apps, two of them on `ENTERPRISE` and one on `CONSUMER`. A host such as `api`, `auth` or `www` is a host and not an app, so it has no row.
+
+`PLATFORM`, `ENTERPRISE` and `CONSUMER` each match an org type, and `IDENTITY` is the one that does not. The identity application serves no category of its own — generic self-service, never a governed business surface — and it is where authentication always happens. A business application hands a visitor off carrying its site, and gets back a session bound to what that site resolved. **A permission is per app; an enablement is per organization type** — the app catalog decides what a person may do inside a surface they can already reach, and enablement (in the tenancy model) decides whether their organization is offered that surface at all.
 
 ## App sites: routing as data
 
@@ -45,17 +46,17 @@ A host is only ever a string a caller sends. The **app site** is the one row of 
 export interface AppSite {
   id: CDTString;            // the site itself — what a caller names, and what a minted session records
   host: CDTString;          // the address a browser or a client asks for; unique across the platform
-  appId: CDTString;         // the application this host opens, which fixes the tier it serves
-  orgId: CDTString | null;  // the ANCHOR organization; null is a shared site, resolved by the application's scope
+  appId: CDTString;         // the application this host opens, which fixes the app scope it serves
+  orgId: CDTString | null;  // the ANCHOR organization; null is a shared site, resolved by the application's app scope
   isActive: CDTBoolean;     // whether the host answers at all
 }
 ```
 
-Never read the anchor as the bound organization — MUST NOT. A site anchored to one organization resolves handles within it and its descendants; a shared site has no anchor at all, and resolves across every organization a person belongs to at the application's scope, pausing for an explicit choice when more than one matches. The organization a session ends up bound to is whichever the person picked or turned out to belong to — that is why the fields are separate.
+Never read the anchor as the bound organization — MUST NOT. A site anchored to one organization resolves handles within it and its descendants; a shared site has no anchor at all, and resolves across every organization a person belongs to at the application's app scope, pausing for an explicit choice when more than one matches. The organization a session ends up bound to is whichever the person picked or turned out to belong to — that is why the fields are separate.
 
 You resolve a request in two reads and no code: the host finds the site's application, its anchor and its branding; the site then carries that context into sign-in, where the server — never the client — resolves it to the organization, application and scope a session will bind to. A caller sends a host and nothing else about itself, which is what makes the site behave like a registered client identifier: nothing a caller asserts can put it on an organization its site does not name.
 
-**A new customer touchpoint is a row somebody adds, never a release somebody ships.** If the developer wants to onboard an organization onto its own branded domain, add an app-site row naming the host, the app scope, and the owning organization — no code changes, and no deploy. The host serves because the running platform writes its route — which environment and application it opens — through the edge seam, and never a DNS record (`RULE.SUPPORT.INFRA.105` · MUST · skill:spn-infra/run); deactivating the site deletes every host's route.
+**A new customer touchpoint is a row somebody adds, never a release somebody ships.** If the developer wants to onboard an organization onto its own branded domain, add that organization's app site, a row naming the host, the application, and the owning organization — no code changes, and no deploy. The host serves because the running platform writes its route — which environment and application it opens — through the edge seam, and never a DNS record (`RULE.SUPPORT.INFRA.105` · MUST · skill:spn-infra/run); deactivating the site deletes every host's route.
 
 ## Custom domains
 

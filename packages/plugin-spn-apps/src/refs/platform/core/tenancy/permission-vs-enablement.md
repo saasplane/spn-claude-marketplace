@@ -3,17 +3,17 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/03-platform/01-core/01-tenancy/03-people-access.md",
-      "seen": "198b3bd7"
+      "seen": "b23c225e"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/03-platform/01-core/01-tenancy/03-people-access.md",
       "section": "Enablement: what an organization type is offered",
-      "seen": "88faaa26"
+      "seen": "d4aafb5c"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/10-providers/ts/06-service.md",
       "section": "`@SPAuthorize` + the module `_AUTHZ` table",
-      "seen": "9b0e48e0"
+      "seen": "49f2ea7c"
     }
   ]
 }
@@ -40,15 +40,19 @@ Two of these rows carry a trap. A plan feature looks like an org type when the e
 
 Outside identity, what an organization may configure follows ownership and never its type: a thing scoped to the organization is its to change, for every organization type alike (`RULE.PLATFORM.CORE.028` · GUIDE).
 
-**A permission and an enablement never substitute for each other.** A permission is app-specific and says who may act. An enablement is cross-cutting and says what the caller's organization type is offered at all. A gate passes when both hold.
+**A permission and an enablement never substitute for each other.** A permission is app-specific and says who may act. An enablement is cross-cutting and says what the caller's organization is offered at all, by its org type and category. A gate passes when both hold.
 
 ### A gate's `appScope` is neither, and pins one value only
 
-Inside one `appPermissions` entry you may also narrow by `appScope` — which application the caller is in. **That is a third thing, and it is never a stand-in for an enablement.** A gate names an app scope for exactly one reason: to pin `PLATFORM`, guarding a platform master. Deciding what an organization type may reach is the enablement cell's job, never the scope's. **A gate never names an app id, ever** — an id is minted per install, so it would mean a different thing in every environment. Nothing is lost by leaving it out: the session already carries `appId` beside `appScope`, and permissions resolve against it at mint (`RULE.PLATFORM.CORE.034` · MUST · skill:spn-apps/implement).
+Inside one `appPermissions` entry you may also narrow by `appScope` — which application the caller is in. **That is a third thing, and it is never a stand-in for an enablement.** A gate names an app scope for exactly one reason: to pin `PLATFORM`, guarding a platform master. Deciding what an organization type may reach is the enablement cell's job, never the scope's. The values of `appScope` are four, and a gate on `ENTERPRISE` would admit every enterprise category's staff alike, so an organization's staff are narrowed by the permission codes of the app. **A gate never names an app id, ever** — an id is minted per install, so it would mean a different thing in every environment. Nothing is lost by leaving it out: the session already carries `appId` beside `appScope`, and permissions resolve against it at mint (`RULE.PLATFORM.CORE.034` · MUST · skill:spn-apps/implement).
 
 ## If it is an enablement
 
 **Enablement is a construct, and it is modelled where every construct is.** It lives at `02-constructs/<iam>/enablement.md`, beside permission, and it depends on authorization and on organization type. It is realized the way a permission is: a module **registers its enablement definitions** in its contract constants, the session carries `enablements` exactly as it carries `permissions`, and a module's services and screens read `session.enablements` to decide what to offer. The chapter states the rule; the construct states the model, and this file restates neither more than once.
+
+**A module states its ceilings and defaults by org type and never reads a category's code** (`RULE.PLATFORM.CORE.065`).
+
+**Enablement narrows and never widens** (`RULE.PLATFORM.CORE.070` · MUST · skill:spn-apps/implement). An org can pass on only what it holds, so a parent's answer caps its children's, and a child's cell is never read alone. The enablement console shows, beside a parent's cell, the child categories that lose the offer when it is switched off.
 
 ### Two answers means two codes
 
@@ -91,9 +95,9 @@ The ceiling is the list of organization types a definition may be set for. It an
 
 The ceiling is not an exemption mechanism. A type inside the ceiling with the answer `false` is governed and off. A type outside the ceiling was never asked. Reaching for the ceiling to grant something is the move that makes one column mean two things.
 
-### `PLATFORM` is governed like every other type
+### The platform is governed like every other organization
 
-`PLATFORM` sits in every ceiling where the question applies, with an authored row of its own. Most of its answers are `true`, and `true` is a value rather than an exemption.
+The platform's category sits in every ceiling where the question applies, with an authored row of its own. Most of its answers are `true`, and `true` is a value rather than an exemption. The value is one answer per category whose org type is inside the ceiling, and the master answers the same cells every other category does.
 
 **Never write an exemption branch.** A resolver that answers on for one type carries a rule the console cannot show and the seed cannot state. The master gets one protection, and it is a refusal in `updateOrgTypeEnablement`. A `PLATFORM` boolean cannot be set to false. Provisioning runs with platform authority, so turning one off bricks onboarding.
 
@@ -125,7 +129,7 @@ A module owns a question, or it contributes an option to someone else's. The two
 | 1 | a code whose prefix is not its own module's |
 | 2 | a code whose second segment is not `MANAGE` |
 | 3 | a multi-value definition named after a generic area |
-| 4 | a hardcoded set of organization types in a service |
+| 4 | a hardcoded set of organization types in a service, or a category code in a ceiling |
 
 **One rule is deliberately not hooked.** *Every gated method is a write* needs the decorator-to-method map, which a write-time hook cannot build from one file. It belongs in the module's own `tests/unit/enablement/authz.spec.ts`, where the gate table and the methods are both in scope. Write that spec when you add the module; a module whose gates nothing checks is the module that breaks the rule silently.
 
@@ -137,8 +141,7 @@ A module owns a question, or it contributes an option to someone else's. The two
 
 ```ts
 const SUBDOMAIN_OWNER_ORG_TYPES: ReadonlySet<OrgType> = new Set([
-  OrgType.ACCOUNT,
-  OrgType.PLATFORM_ENTERPRISE,
+  OrgType.ENTERPRISE,
 ]);
 // …inside updateOrgSubdomain:
 if (!SUBDOMAIN_OWNER_ORG_TYPES.has(org.orgType)) {

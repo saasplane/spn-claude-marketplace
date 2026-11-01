@@ -1,7 +1,7 @@
 <!-- spn:restates
 {
   "docs": [
-    { "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/10-providers/ts/07-data.md", "seen": "1607a602" }
+    { "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/10-providers/ts/07-data.md", "seen": "c578a405" }
   ]
 }
 -->
@@ -18,6 +18,9 @@
 - **An org-scoped table carries its tenant column, and that column leads every index.**
 - **Every business table carries an active flag, and no table anywhere carries a deleted-at column.** A hard delete is for a junction or owned-child row and for wholesale set replacement.
 - **Application-managed columns are not null and take no SQL default.**
+- **Every schema object carries its module's prefix, in lower case with an underscore, and no name is over 63 bytes**, because Postgres truncates a longer one silently and two names could then collide.
+- **A reference column is named for the table it points at** (`org_category_id`, `parent_org_id`), and **a table whose rows belong to another row names its owner first** (`iam_org_app_site`).
+- **A module joins only to a table its owner publishes through `getReferenceableTables()`**, by a foreign key to its primary key. Everything else it reads through the owner's contract service and never by SQL. The `MIGRATE` run reads the Postgres catalog after the migrations and before the contributions apply, and reports each object that breaks either rule.
 
 **Column order runs id, tenant scope, entity reference, business fields, lifecycle, then the audit tail.** An immutable table carries only the creation stamp; an assignment table may carry only the creation pair.
 
@@ -36,6 +39,10 @@
 - **Apply the where-builder to both queries**, and never apply sorting or pagination to the count query.
 - **Pagination is offset-based, one-based, and both page and size are nullable**, with null meaning unpaginated. A result's total is null where the mode skipped the count.
 - **Offset pagination over a mutating set can skip or duplicate rows across pages.** That is acceptable for an administrative listing, which is the only place it is used.
+
+## Data-scope narrowing
+
+A person's data scope narrows what a read returns to the records whose column holds one of the person's values. **A repository narrows by data scope only through `SPRepository`'s `applyDataScope` and `filterByDataScope`, on the column it opts in, and never with a predicate of its own.** `applyDataScope` is protected and mutates a query builder, so a search and a read by id narrow with the same call. `filterByDataScope` is public, so a service that reads a row from its cache checks it through its own repository, and a row outside the person's values answers as not found. A person with no value for the scope is not narrowed, so the helper then leaves the query untouched.
 
 ## Tenant scoping
 
@@ -85,11 +92,11 @@
 
 ## Migrations
 
-**A migration is the only way the schema changes**, and the runner merges every module's migrations into one global order by version.
+**A migration is the only way the schema changes**, and the runner merges every module's migrations into one global order by version, then by module code. The tracker's table has a `module` column and a unique `(module, migration_version)`, so two modules that share a version both run.
 
 - **A version is the epoch milliseconds at authoring time.** A new migration exceeds every existing one and runs last. It must also exceed every migration it depends on, across modules.
 - **Treat the file name, the array position and the module registration order as cosmetic.** Only the version orders anything.
-- **Schema migrations run before seed migrations**, which come in dependency order at higher versions. A seed migration's rollback deletes only its own rows.
+- **Schema migrations run before seed migrations**, which come in dependency order at higher versions. A seed migration's rollback deletes only its own rows, and a migration writes only its own module's tables. Rows that belong to IAM or MDM travel as the module's migration contributions (`src/migrations/contributions.ts`), which the owner applies after the migrations.
 - **A migration is self-contained.** No shared helpers, inline validation and hashing, and the only source imports permitted are immutable seed-id constants. Read the environment through the helpers rather than the raw process environment.
 
 **Adding a required field to a document-persisted type breaks every seeded row.** A migration writes that column as a JSON literal no compiler checks against the type, so existing rows silently violate it and the response validator then rejects every read — a broad outage while every package still typechecks clean.

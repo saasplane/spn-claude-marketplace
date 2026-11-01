@@ -1,6 +1,6 @@
 ---
 name: bootstrap
-description: Walk an empty folder to a platform running locally - the door first, then the workspace, then a workstream that holds the estate answers, then the acts that bring the organization up, make the estate repo, wire it, scaffold and release its packages, create the platform repo with its concept, name the provider keys the partner fills, bring the platform layer up and run the stack. Asks the identity, legal, hosting, cloud, owner, region, archetype, domain, stack and twin coordinates one at a time, and derives the tiers, the surfaces and both repository names rather than asking for them. Use when the workspace holds no sprepo.json at all, when someone is starting a new organization or platform from nothing, or when the session orientation reports day-0 mode. Interactive by design - you ask, they answer, and no act runs on an answer nobody gave. Stack-agnostic.
+description: Walk an empty folder to a platform running locally - the door first, then the workspace, then a workstream that holds the estate answers, then the acts that bring the organization up, make the estate repo, wire it, scaffold and release its packages, create the platform repo with its concept, name the provider keys the partner fills, bring the platform layer up and run the stack. Asks the identity, legal, hosting, cloud, owner, region, business model, domain, stack and twin coordinates one at a time, and derives the category tree, the apps and both repository names rather than asking for them. Use when the workspace holds no sprepo.json at all, when someone is starting a new organization or platform from nothing, or when the session orientation reports day-0 mode. Interactive by design - you ask, they answer, and no act runs on an answer nobody gave. Stack-agnostic.
 ---
 <!-- spn:restates
 {
@@ -173,7 +173,7 @@ Get these wrong and you rename accounts, package scopes and every code prefix af
 | 5 | One platform or several, the code and the name for each, and its domain | The estate nodes, the isolation units, and every `{APP}_` prefix |
 | 6 | The platform's first human — email, first name, last name, display name | `owner.*` on the platform, and who the first account belongs to |
 | 7 | The region they launch in, and where each Account's data must stay | `regions[].code`, and the residency answer the compliance envelope reads |
-| 8 | Which archetypes they launch with — **more than one is allowed** | The tiers, and through them every surface the scaffold creates |
+| 8 | Which business models the partner sells — **more than one is allowed** | The category tree, and through it the pools, categories and apps the partner's product module declares |
 | 9 | Which service domains the product needs | The app set and the module set — and whether an existing module already answers |
 | 10 | Whether they want a public marketing site at launch | Whether `www` is scaffolded |
 | 11 | The stack | Which apps plugin binds the platform repo, and which scaffolds run |
@@ -183,8 +183,8 @@ Get these wrong and you rename accounts, package scopes and every code prefix af
 
 | It derives | From | The rule |
 | --- | --- | --- |
-| The tiers the platform activates | the archetypes | the table below, unioned, duplicates collapsed |
-| The surface set, and so the app set | the tiers | one surface per tier, plus `IDENTITY`, plus `www` if they want one |
+| The category tree the platform declares | the business models | the table below, unioned, duplicates collapsed |
+| The apps, and so the surface set | the categories | one app per category that signs in, plus `IDENTITY`, plus `www` if they want one |
 | Both repository names | `{org}`, `{spc}` and the stack | `{org}-infra` and `{org}-{spc}-{stack}` |
 | `apps[].repo` and `apps[].kindCode` | the surfaces | declared data, which is why act 4 reads the names back |
 | `modules[].code`, `.layer`, `.after` | the service domains | the module set the domains imply |
@@ -193,23 +193,27 @@ Get these wrong and you rename accounts, package scopes and every code prefix af
 | The setup, and so the environment | nothing — it is defaulted | `dev`, giving one environment named `{region}-dev` |
 
 - **The setup is safe to default and the region is not.** `uat`, `stg` and `prod` are catalog rows added when somebody needs them, so starting at one costs nothing. A region is a residency answer with legal weight, and it is written into the manifests.
-- **The archetype question is the one that must accept several answers.** A platform may launch B2B and B2B2C together, and a single-select control would make that unanswerable. A set of one is the ordinary answer rather than an edge case.
+- **The business model question is the one that must accept several answers.** A platform may sell B2B and B2B2C together, and a single-select control would make that unanswerable. A set of one is the ordinary answer rather than an edge case.
 
-### Archetype to tiers, which is the derivation everything else hangs off
+### Business model to categories, which is the derivation everything else hangs off
 
-| Archetype | Tiers it activates |
-| --- | --- |
-| B2C | `ACCOUNT` — of one, because the Account is the user |
-| B2B | `ACCOUNT` — a workspace per client organization |
-| B2B2C | `ACCOUNT` + `ACCOUNT_CONSUMER` |
-| B2B2B | `ACCOUNT` + `ACCOUNT_ENTERPRISE` |
-| Marketplace | `PLATFORM_ENTERPRISE` + `PLATFORM_CONSUMER` |
+The answer is a category tree. Each model is made from categories and the apps that open them, and no category is added for a model, since an app is the door one audience signs in through and a model is the choice of which doors are open.
 
-`PLATFORM` always exists, so it is never in the table and never asked about.
+| Business model | Categories it declares | Apps it opens |
+| --- | --- | --- |
+| B2C | Platform → Account, one person's workspace | account |
+| B2B | Platform → Account | account |
+| B2B2C | Platform → Account → Account Consumer | account, account-consumer |
+| B2B2B | Platform → Account → Account Enterprise | account, account-enterprise |
+| Marketplace | Platform → Merchant and Shopper | merchant, shopper |
 
-**Take the union and collapse the duplicates.** B2B with B2B2C and B2B2B activates `ACCOUNT` once, then `ACCOUNT_CONSUMER` and `ACCOUNT_ENTERPRISE` beside it. Each tier in the union gets one surface, `IDENTITY` joins them because business apps never implement login, and `www` joins if they asked for one.
+`Platform` always exists, so it is never in the table and never asked about.
 
-**Marketplace composes on a different axis from the rest.** Every other archetype activates tiers of the customer's own organization. Marketplace activates tiers of the operator's root, which is sellers and shoppers on the platform itself. Choosing it beside B2B is not a contradiction, and it is what produces the widest surface set.
+**Take the union and collapse the duplicates.** B2B with B2B2C and B2B2B declares `Account` once, then `Account Consumer` and `Account Enterprise` beside it.
+
+**The answer writes the partner's product module.** A platform has one app-owned product module, named by the platform's code, and it declares the pools, categories and apps the partner sells. Write it with only those, so nothing is switched off afterwards and no migration closes a door. Each app carries its kind code and its platform site's subdomain, and every declared app opens at the first run. `IDENTITY` joins them because business apps never implement login, and `www` joins if they asked for one. Adding a model later adds a category and an app to the product module.
+
+**Marketplace composes on a different axis from the rest.** Every other model declares categories under the customer's own account. Marketplace declares merchants and shoppers beneath the platform itself. Choosing it beside B2B is not a contradiction, and it is what produces the widest set of apps.
 
 ### How to ask
 
@@ -230,7 +234,7 @@ Show every answered row as it now stands, and then show what you derived from it
 | --- | --- |
 | The answers, as given | They correct their own typing before anything derives from it |
 | **The two repository names** | They are declared data rather than convenience, and a rename moves every path a pin resolves against |
-| **The surface set, and the tiers it came from** | A wrong archetype shows up here as a missing surface, which is cheap, rather than at boot, which is not |
+| **The app set, and the categories it came from** | A wrong business model shows up here as a missing app, which is cheap, rather than at boot, which is not |
 
 **The names are derived and read back, never typed.** `{spc}` is permanent — three lowercase letters, never renamed — and the repository name inherits that permanence. Showing it is how a wrong `{spc}` gets caught while it still costs nothing.
 
@@ -239,7 +243,7 @@ Show every answered row as it now stands, and then show what you derived from it
 **A go is written down or it did not happen.** Record it with the command that moves the arc out of `PROPOSED`, carrying their words as they gave them, as `refs/devex/workspace/workstream.md` shows:
 
 ```sh
-spn-devex workstream row state {NNN}/N001 13 landed --note "<the read-back: the repository names, the tiers, the surfaces>"
+spn-devex workstream row state {NNN}/N001 13 landed --note "<the read-back: the repository names, the categories, the apps>"
 spn-devex workstream arc edit {NNN}/N001 --status DECIDED --note "<the developer's words>"
 ```
 
@@ -287,7 +291,7 @@ spnutils infra platform up <spc>
 Then say, in plain words, what they are looking at:
 
 - **Which surface to open**, by name, and what answering looks like.
-- **What the default platform does** — sign-in through `IDENTITY`, and the consoles their archetypes activated.
+- **What the default platform does** — sign-in through `IDENTITY`, and the consoles their business models opened.
 - **What is deliberately empty.** A fresh platform has no data, and an empty console is the correct result rather than a failure.
 
 **Then stop.** Day zero ends here. The first real workstream is theirs to open, and the skeleton is ready for it.

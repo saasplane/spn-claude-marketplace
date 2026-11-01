@@ -12230,7 +12230,7 @@
         "skill": "spn-apps/implement"
       },
       "class": "stated in a skill",
-      "sentence": null,
+      "sentence": "platform and enterprise orgs own a subdomain, and their customers' sites ride it",
       "chapter": "04-capabilities/03-platform/01-core/03-surfaces/01-apps-surfaces.md",
       "heading": "Who owns a subdomain",
       "decision": null,
@@ -12638,7 +12638,7 @@
         "skill": "spn-apps/implement"
       },
       "class": "stated in a skill",
-      "sentence": "A door is shaped by the tier it serves",
+      "sentence": "A door is shaped by the category it serves",
       "chapter": "04-capabilities/03-platform/01-core/03-surfaces/01-apps-surfaces.md",
       "heading": "What a registration door asks for",
       "decision": null,
@@ -12987,7 +12987,7 @@
         "skill": "spn-apps/implement"
       },
       "class": "stated in a skill",
-      "sentence": "A session names the membership, the organization, the application and the site it was minted for",
+      "sentence": "A session names the membership, the organization with its type and category, the identity pool, the application and the org app site it was minted for",
       "chapter": "04-capabilities/03-platform/01-core/02-identity/01-identity.md",
       "heading": "A session belongs to one place",
       "decision": null,
@@ -13006,7 +13006,7 @@
         "skill": "spn-apps/implement"
       },
       "class": "stated in a skill",
-      "sentence": "Only an organization that is a destination owns a subdomain",
+      "sentence": "Platform and enterprise organizations own a subdomain, and their customers ride it",
       "chapter": "04-capabilities/03-platform/01-core/02-identity/01-identity.md",
       "heading": "A subdomain is owned by a destination",
       "decision": null,
@@ -13025,7 +13025,7 @@
         "skill": "spn-apps/implement"
       },
       "class": "stated in a skill",
-      "sentence": "What a signup creates — which organization type, whose namespace, and under what policy — is stored rather than inferred from the flow that ran",
+      "sentence": "What a signup creates — which organization category and the org type it sits on, whose namespace, and under what policy — is stored rather than inferred from the flow that ran",
       "chapter": "04-capabilities/03-platform/01-core/02-identity/01-identity.md",
       "heading": "The registration boundary is a stored decision",
       "decision": null,
@@ -13066,6 +13066,317 @@
       "sentence": "A session's authentication requirement is read from the organization's own policy at every mint, and never resolved once and cached",
       "chapter": "04-capabilities/03-platform/01-core/02-identity/01-identity.md",
       "heading": "The organization decides, at every mint",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.PLATFORM.CORE.059",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-apps/implement"
+      },
+      "class": "stated in a skill",
+      "sentence": "A member with no value for a scope is not narrowed on it",
+      "chapter": "04-capabilities/03-platform/01-core/01-tenancy/03-people-access.md",
+      "heading": "A person's data scope: what narrows one member",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.PLATFORM.CORE.060",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-apps/implement"
+      },
+      "class": "stated in a skill",
+      "sentence": null,
+      "chapter": "02-constructs/03-platform/01-core/01-tenancy.md",
+      "heading": "The parent is the seller",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "refs/platform/core/tenancy/README.md",
+          "heading": "The parent is the seller"
+        },
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.PLATFORM.CORE.061",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-apps/implement"
+      },
+      "class": "stated in a skill",
+      "sentence": "The tree records only who sells to whom",
+      "chapter": "02-constructs/03-platform/01-core/01-tenancy.md",
+      "heading": "The parent is the seller",
+      "decision": "DEC.PLATFORM.CORE.061",
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "refs/platform/core/tenancy/README.md",
+          "heading": "The parent is the seller"
+        },
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.PLATFORM.CORE.062",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-apps/implement"
+      },
+      "class": "stated in a skill",
+      "sentence": "A category never has itself as an ancestor",
+      "chapter": "02-constructs/03-platform/01-core/01-tenancy.md",
+      "heading": "The parent is the seller",
+      "decision": "DEC.PLATFORM.CORE.062",
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "refs/platform/core/tenancy/README.md",
+          "heading": "The parent is the seller"
+        },
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.PLATFORM.CORE.063",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-apps/implement"
+      },
+      "class": "stated in a skill",
+      "sentence": "No module knows how deep the tree is",
+      "chapter": "02-constructs/03-platform/01-core/01-tenancy.md",
+      "heading": "The parent is the seller",
+      "decision": "DEC.PLATFORM.CORE.063",
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "refs/platform/core/tenancy/README.md",
+          "heading": "The parent is the seller"
+        },
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.PLATFORM.CORE.064",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-apps/implement"
+      },
+      "class": "stated in a skill",
+      "sentence": null,
+      "chapter": "02-constructs/03-platform/01-core/01-tenancy.md",
+      "heading": "Notifications have one sender of record",
+      "decision": "DEC.PLATFORM.CORE.064",
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "refs/platform/core/tenancy/README.md",
+          "heading": "The parent is the seller"
+        },
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.PLATFORM.CORE.065",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-apps/implement"
+      },
+      "class": "stated in a skill",
+      "sentence": "Modules know org types and never know categories",
+      "chapter": "02-constructs/03-platform/01-core/01-tenancy.md",
+      "heading": "What enablement means",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "refs/platform/core/tenancy/README.md",
+          "heading": "Enablement: what a type is offered, never what a person may do"
+        },
+        {
+          "plugin": "spn-apps",
+          "path": "refs/platform/core/tenancy/permission-vs-enablement.md",
+          "heading": "If it is an enablement"
+        },
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.PLATFORM.CORE.066",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-apps/implement"
+      },
+      "class": "stated in a skill",
+      "sentence": "A category's pool is fixed once it has people",
+      "chapter": "02-constructs/03-platform/01-core/02-identity.md",
+      "heading": "Model",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "refs/platform/core/identity.md",
+          "heading": "Identity pool: what \"the same person\" means"
+        },
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.PLATFORM.CORE.067",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-apps/implement"
+      },
+      "class": "stated in a skill",
+      "sentence": "An org's type, category and parent are fixed at birth",
+      "chapter": "04-capabilities/03-platform/01-core/01-tenancy/02-organizations.md",
+      "heading": "The organization tree",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.PLATFORM.CORE.068",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-apps/implement"
+      },
+      "class": "stated in a skill",
+      "sentence": "A parent acts on a child only through a closed list of acts",
+      "chapter": "04-capabilities/03-platform/01-core/01-tenancy/02-organizations.md",
+      "heading": "The organization tree",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.PLATFORM.CORE.069",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-apps/implement"
+      },
+      "class": "stated in a skill",
+      "sentence": "A seller adds a customer directly only where an offer allows it",
+      "chapter": "04-capabilities/03-platform/01-core/01-tenancy/02-organizations.md",
+      "heading": "Platform archetypes are category choices",
+      "decision": "DEC.PLATFORM.CORE.069",
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.PLATFORM.CORE.070",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-apps/implement"
+      },
+      "class": "stated in a skill",
+      "sentence": "Enablement narrows and never widens",
+      "chapter": "04-capabilities/03-platform/01-core/01-tenancy/03-people-access.md",
+      "heading": "How an offer is read",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "refs/platform/core/tenancy/permission-vs-enablement.md",
+          "heading": "If it is an enablement"
+        },
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.PLATFORM.CORE.071",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-apps/implement"
+      },
+      "class": "stated in a skill",
+      "sentence": "An offer is the platform's, and a door is the tenant's",
+      "chapter": "04-capabilities/03-platform/01-core/03-surfaces/01-apps-surfaces.md",
+      "heading": "Where an organization registers",
+      "decision": "DEC.PLATFORM.CORE.071",
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.PLATFORM.CORE.072",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-apps/implement"
+      },
+      "class": "stated in a skill",
+      "sentence": "A door for an org's own customers opens only with its legal profile",
+      "chapter": "04-capabilities/03-platform/01-core/03-surfaces/01-apps-surfaces.md",
+      "heading": "Where an organization registers",
       "decision": null,
       "restated": [
         {
@@ -18528,7 +18839,7 @@
         "skill": "spn-apps/implement"
       },
       "class": "stated in a skill",
-      "sentence": "In `spn-platform-ts` the migration that owns a table is edited, instead of adding a migration or an `ALTER`, and the stack is reset clean before testing",
+      "sentence": "In `spn-platform-ts` the migration that owns a table is edited, instead of adding a migration or an `ALTER`, and the stack is reset clean before testing. A module's migrations write only its own tables, and what a module has for another module travels as a contribution that the owner applies",
       "chapter": "04-capabilities/02-support/02-apps/03-module/01-server/04-migrations/01-foundation.md",
       "heading": "The only schema-change path",
       "decision": null,
@@ -18587,6 +18898,119 @@
           "heading": "Produces to"
         }
       ]
+    },
+    {
+      "id": "RULE.SUPPORT.APPS.249",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-apps/implement"
+      },
+      "class": "stated in a skill",
+      "sentence": "A repository narrows by data scope only through `SPRepository`'s `applyDataScope` and `filterByDataScope`, on the column it opts in, and never with a predicate of its own",
+      "chapter": "04-capabilities/02-support/02-apps/10-providers/ts/07-data.md",
+      "heading": "Data-scope narrowing",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "providers/ts/skills/implement/steps/service.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.APPS.251",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-apps/implement"
+      },
+      "class": "stated in a skill",
+      "sentence": "A reference column says what it points at, and a table whose rows belong to another row names its owner first",
+      "chapter": "04-capabilities/02-support/02-apps/10-providers/ts/02-naming.md",
+      "heading": "SQL Naming",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "refs/support/apps/providers/ts/02-naming.md",
+          "heading": "SQL"
+        },
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.APPS.252",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-apps/implement"
+      },
+      "class": "stated in a skill",
+      "sentence": "A key that only the first run reads is named `{SPC}_PLATFORM_SEED_*`",
+      "chapter": "04-capabilities/02-support/02-apps/05-app/01-server/01-lifecycle.md",
+      "heading": "Migration execution",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.APPS.254",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-apps/implement"
+      },
+      "class": "stated in a skill",
+      "sentence": "Every schema object carries its module's prefix, and no name is over 63 bytes",
+      "chapter": "04-capabilities/02-support/02-apps/04-resources/01-server/02-database.md",
+      "heading": "SQL naming grammar",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.APPS.255",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-apps/implement"
+      },
+      "class": "stated in a skill",
+      "sentence": "A module holds a foreign key only to a table its owner publishes",
+      "chapter": "04-capabilities/02-support/02-apps/04-resources/01-server/02-database.md",
+      "heading": "SQL naming grammar",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.APPS.256",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-apps/implement"
+      },
+      "class": "stated in a skill",
+      "sentence": "A contribution for an owner held in another service travels on a route of the framework's own, and is never a contract method",
+      "chapter": "04-capabilities/02-support/02-apps/03-module/01-server/03-entry/01-api.md",
+      "heading": "The remote route",
+      "decision": "DEC.SUPPORT.APPS.256",
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.INFRA.001",
