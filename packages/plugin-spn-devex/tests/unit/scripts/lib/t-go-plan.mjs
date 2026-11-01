@@ -198,5 +198,15 @@ same("[MKT.SCRIPTS.412] one that landed before the full run opens none",
 same("[MKT.SCRIPTS.412] and with no landing order read, none is opened",
   deriveGo(noNewEntry, { previous: kept2 }).parts.some((p) => p.id === "full-lib-repo-2"), false);
 
+// A code entry that creates a file comes before the one that uses it.
+const user = entry("E1", "lib-repo:src/use.ts"), maker = { ...entry("E2", "lib-repo:src/type.ts"), op: "create", callers: ["src/use.ts"] }, other = entry("E3", "lib-repo:src/other.ts");
+const ordered = deriveGo([{ arc: "N009", sheet: sheet([user, other, maker]) }]);
+same("[MKT.SCRIPTS.413] the entry that creates a file is built before the one that uses it, the rest keeping their number order", ordered.parts.find((p) => p.id === "code-lib-repo-1").entries, ["N009/E2", "N009/E1", "N009/E3"]);
+const unknown = deriveGo([{ arc: "N009", sheet: sheet([user, other, { ...maker, callers: [] }]) }]);
+same("[MKT.SCRIPTS.413] where nothing says what builds on what, the number order stands", unknown.parts.find((p) => p.id === "code-lib-repo-1").entries, ["N009/E1", "N009/E3", "N009/E2"]);
+const loop = deriveGo([{ arc: "N009", sheet: sheet([{ ...user, op: "create", callers: ["src/type.ts"] }, maker]) }]);
+same("[MKT.SCRIPTS.413] two entries that name each other keep the number order", loop.parts.find((p) => p.id === "code-lib-repo-1").entries, ["N009/E1", "N009/E2"]);
+same("[MKT.SCRIPTS.413] the signature follows the new order and the plan passes the schema", [ordered.parts.find((p) => p.id === "code-lib-repo-1").signature.split(".").length, goFaults(ordered)], [3, []]);
+
 console.log(`\n${total - failed}/${total} passed`);
 process.exit(failed ? 1 : 0);

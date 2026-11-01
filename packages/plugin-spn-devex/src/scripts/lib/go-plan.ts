@@ -221,7 +221,46 @@ const entrySlot = (entry: SheetEntry): Slot => {
   const work = entryWork(entry);
   return work === "DOCS" || work === "GENERATED" ? work : "CODE";
 };
+/** The files an entry's `callers`, `then` and `book` strings name, each as `<repo>:<path>` (a bare path is in the entry's own repository). */
+export function namedFiles(entry: SheetEntry, fields: ReadonlyArray<"callers" | "then" | "book">): Set<string> {
+  const out = new Set<string>();
+  for (const field of fields)
+    for (const text of Array.isArray(entry[field]) ? entry[field] as string[] : [])
+      for (const found of String(text).matchAll(/(?:[\w.@-]+:)?[\w@.-]+(?:\/[\w@.-]+)+/g)) out.add(found[0].includes(":") ? found[0] : `${repoOf(entry)}:${found[0]}`);
+  return out;
+}
+
 const numberOf = (part: GoPart): number => Number(part.id.slice(part.id.lastIndexOf("-") + 1)) || 0;
+
+/**
+ * A repository's code entries in the order they can be built: an entry that creates a file comes before an entry that uses it,
+ * read from the entries' `file` against the other's `callers` and `then`. Where nothing says, the number order stands (s60).
+ */
+export function orderByUse(group: { refs: string[]; entries: SheetEntry[] }): void {
+  const count = group.entries.length;
+  const before: Set<number>[] = group.entries.map(() => new Set<number>());
+  group.entries.forEach((maker, at) => {
+    if (maker.op !== "create") return;
+    const users = namedFiles(maker, ["callers", "then"]);
+    group.entries.forEach((user, other) => { if (other !== at && users.has(user.file)) before[other].add(at); });
+  });
+  // EACH ENTRY FOLLOWS WHAT IT BUILDS ON, placed just before its first user; ANY CYCLE KEEPS THE NUMBER ORDER, whole.
+  let done: number[] = [];
+  const state = new Map<number, "walking" | "done">();
+  let cycle = false;
+  const visit = (at: number): void => {
+    if (state.get(at) === "done") return;
+    if (state.get(at) === "walking") { cycle = true; return; }
+    state.set(at, "walking");
+    for (const one of [...before[at]].sort((x, y) => x - y)) visit(one);
+    state.set(at, "done");
+    done.push(at);
+  };
+  for (let at = 0; at < count; at += 1) visit(at);
+  if (cycle) done = group.entries.map((_, at) => at);
+  const refs = done.map((at) => group.refs[at]), entries = done.map((at) => group.entries[at]);
+  group.refs.splice(0, count, ...refs); group.entries.splice(0, count, ...entries);
+}
 
 /**
  * The plan of a go over the arcs of its scope, the first being the lead. Entries are grouped by repository, in the order of
@@ -306,6 +345,7 @@ export function deriveGo(scope: readonly ScopeSheet[], options: DeriveOptions = 
       }
       const group = groups.get(`${repo}|${pass}`);
       if (!group) continue;
+      if (pass === "CODE") orderByUse(group);
       const bound = boundOf(rates, repo, pass);
       const rate = rates[`${repo}|${pass}`];
       let next = Math.max(0, ...kept.filter((one) => one.repo === repo && slotOf(one) === pass).map(numberOf)) + 1;
