@@ -202,6 +202,7 @@ Every row below is declared and none is claimed: a run writes the last two cells
 | MKT.HOOKS.416 | Engineering leader | not be refused for naming a plugin install in a message | The raw-install check tests the command with its quoted arguments taken out, so a commit message or search string that names a raw plugin install passes, and one outside the quotes is still refused | NEGATIVE | UNIT | PLANNED | — |
 | MKT.HOOKS.417 | Engineering leader | not converge a workstream's folder by mistake | A tool-call check refuses `spnutils workspace init`, `spnutils workspace agent-sync` and a plugin install or update run with the working folder (or a `cd`) inside `.spndevex/workstreams`, and names the scratchpad as the place for a probe | NEGATIVE | UNIT | PLANNED | — |
 | MKT.HOOKS.418 | Engineering leader | sync every member from the root | A tool-call check refuses `spnutils repo agent-sync` run in a workspace member or a worktree, and names `spnutils workspace agent-sync` | NEGATIVE | UNIT | PLANNED | — |
+| MKT.HOOKS.427 | Developer | have every proposal in chat recorded | A turn-end check sends back a reply that sets out lettered options (a table, or a list of A. / B. / bold-letter lines) and names no Q<n> or S<n> that holds a record in the window's workstream (RULE.DEVEX.WORKSPACE.493) | NEGATIVE | UNIT | PLANNED | — |
 
 ## Retired ids
 

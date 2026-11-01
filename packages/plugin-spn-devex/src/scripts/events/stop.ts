@@ -27,6 +27,8 @@
 //   how-it-runs, partner-words, page-path  the reply's last asks about running the work, the words a partner cannot open, and its page addresses, after the handover
 //   close-message  a turn whose tool results hold a close's success text ends on the closing message: a 🚀 or ✈️ heading, what was
 //              delivered, what was learned, Thank you 👍 and that the window can be retired (RULE.DEVEX.WORKSPACE.206)
+//   proposal-record  a reply that sets out lettered options names the Q<n> or S<n> that records them, and the number holds a record in the
+//              window's workstream (RULE.DEVEX.WORKSPACE.493)
 //   card-case  a reply that names a card as a lowercase q<n> or s<n> in its prose (outside code, links, URLs and paths) is sent back
 //              with each one and its capital form (RULE.DEVEX.WORKSPACE.486)
 //   go-next    a go of the window with a part ready and not started, or a report waiting to be folded,
@@ -52,7 +54,7 @@
 // unfinished, and that window hears about it. A window bound to none hears nothing about them.
 //
 // WHILE A ROW IS IN PROGRESS, ONLY A FINDING ABOUT THE REPLY SENDS THE AGENT BACK (RULE.DEVEX.WORKSPACE.244):
-// `needs-you`, `reply-shape`, `cards`, `handover`, `how-it-runs`, `partner-words`, `page-path`, `close-message`, `card-case` and `welcome`. Every other finding is held, and the checks find
+// `needs-you`, `reply-shape`, `cards`, `handover`, `how-it-runs`, `partner-words`, `page-path`, `close-message`, `card-case`, `proposal-record` and `welcome`. Every other finding is held, and the checks find
 // it again at the first turn end where no row is in progress (`splitFindings`).
 //
 // `corpus` is the newest and the odd one out: every other check here reads what the TURN wrote, and
@@ -75,10 +77,10 @@ import { checkHowItRuns } from "../checks/how-it-runs.ts";
 import { checkPartnerWords } from "../checks/partner-words.ts";
 import { checkPagePath } from "../checks/page-path.ts";
 import { checkWorkstream, heldByStop } from "../checks/workstream-state.ts";
-import { PREVIEW_FILE, arcDataDir, arcStatus, stepsMayStart, arcIdsOf, leafRows, logLinesOf, notesDirOf, previewOf, readArc, readQuestions, readyRows, stateFileOf,
-         workstreamsOf } from "../lib/workstream.ts";
+import { PREVIEW_FILE, approachOf, arcDataDir, arcStatus, stepsMayStart, arcIdsOf, leafRows, logLinesOf, notesDirOf, previewOf, readArc, readJsonl, readQuestions, readyRows, stateFileOf,
+         suggestionsFileOf, workstreamsOf } from "../lib/workstream.ts";
 import { findWorkingDetail } from "../lib/working-detail.ts";
-import type { ArcData, LogLine, Question } from "../lib/workstream-schema.ts";
+import { cardName, type ArcData, type LogLine, type Question } from "../lib/workstream-schema.ts";
 import { applyLine, standings } from "../lib/migration.ts";
 import { MIGRATIONS } from "../lib/migrations/index.ts";
 import { cardsOf, holdsOwnCopy, markAge, openWorkstreams, ownCopyLines, stateOf, workstreamPlan } from "../checks/split-plan.ts";
@@ -1676,6 +1678,44 @@ export function checkCardCase(reply: string): Warning[] {
     "A question is named Q<n> and a suggestion S<n>, with a capital letter, wherever a person reads it (RULE.DEVEX.WORKSPACE.486). Say it again with the capital." }];
 }
 
+// ---------------------------------------------------------------------------- a proposal in chat ends as a record
+
+/** A list of lettered options: two lines or more opening `A.`, `B)`, `**A**`, `- A:` and so on, with different letters. */
+const LETTERED_LINE = /^[ \t]*(?:[-*+][ \t]+)?(?:\*\*|__)?([A-D])(?:\*\*|__)?(?:[.):\u2014:]|[ \t]+[-\u2014])[ \t]+\S/;
+
+/** Whether a reply sets out lettered options, as a lettered table or a list of `A.` / `B.` / `**A**` lines. Fences are set aside. */
+export function setsOutOptions(reply: string): boolean {
+  const text = withoutFences(reply);
+  if (TABLE.test(text) && LETTERED_ROW.test(text)) return true;
+  const letters = new Set(text.split("\n").map((line) => LETTERED_LINE.exec(line)?.[1]).filter(Boolean));
+  return letters.size >= 2;
+}
+
+/**
+ * A PROPOSAL IN CHAT ENDS AS A CARD OR A SUGGESTION (RULE.DEVEX.WORKSPACE.493): a reply that sets out lettered options is sent back unless
+ * it names a `Q<n>` or `S<n>` that has a record in the window's workstream. Seen on Q22: a table of options with no number, so no record.
+ */
+export function checkProposalRecorded(reply: string, root: string, mine: Set<string>): Warning[] {
+  if (!setsOutOptions(reply)) return [];
+  const named = [...new Set(withoutFences(reply).match(/\b[QSqs]\d+\b/g) ?? [])].map((one) => one.toLowerCase());
+  const folders = scoped(openWorkstreamFolders(root), mine);
+  const held = new Set<string>();
+  for (const ws of folders) {
+    for (const record of readQuestions(ws)) held.add(record.id);
+    // A workstream argued before the records held its cards as anchors on the approach page.
+    const page = approachOf(ws);
+    if (page) { try { for (const found of readFileSync(page, "utf8").matchAll(/\bid="([qs]\d+)"/g)) held.add(found[1]); } catch { /* an unreadable page holds none */ } }
+    for (const line of readJsonl(suggestionsFileOf(ws))) { const id = (line as { id?: unknown } | undefined)?.id; if (typeof id === "string") held.add(id); }
+  }
+  const fix = "Record the proposal first: `spn-devex workstream question raise <workstream>/N<nnn> --file card.json` for a card, or `spn-devex workstream suggestion add <workstream>/N<nnn> \"<title>\"` for a suggestion, and name its number in this reply (RULE.DEVEX.WORKSPACE.493).";
+  if (!named.length)
+    return [{ check: "proposal-record", message: `This reply sets out lettered options and names no Q<n> or S<n> that records them. ${fix}` }];
+  const missing = named.filter((one) => !held.has(one));
+  if (missing.length === named.length)
+    return [{ check: "proposal-record", message: `This reply sets out lettered options, and ${missing.map(cardName).join(", ")} ${missing.length > 1 ? "hold" : "holds"} no record in this window's workstream. ${fix}` }];
+  return [];
+}
+
 // ---------------------------------------------------------------------------- the closing message
 
 /** The success text of `workstream close`, which a turn's tool results hold when the close landed. */
@@ -1963,6 +2003,7 @@ if (argv1Base === "stop.ts" || argv1Base === "stop.mjs") {
     ...span({ group: "stop", action: "runnable" }, () => checkRunnable(root, baseline?.at ?? 0, baseline?.steps ?? {}, wrote, mine, reply)),
     ...span({ group: "stop", action: "close-message" }, () => checkCloseMessage(reply, event.transcript_path ? toolResultsOf(event.transcript_path) : [])),
     ...span({ group: "stop", action: "card-case" }, () => checkCardCase(reply)),
+    ...span({ group: "stop", action: "proposal-record" }, () => checkProposalRecorded(reply, root, mine)),
     ...span({ group: "stop", action: "go-next" }, () => checkGoNext(root, mine, waiting, windowGoes(root, session))),
     ...span({ group: "stop", action: "handover" }, () => checkHandover(reply, root, mine, given, turn.earlier)),
     ...span({ group: "stop", action: "how-it-runs" }, () => checkHowItRuns(withoutFences(reply), root)),

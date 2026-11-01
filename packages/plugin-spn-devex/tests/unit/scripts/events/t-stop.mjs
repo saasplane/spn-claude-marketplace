@@ -1952,9 +1952,9 @@ console.log("\n=== stop — send-backs are written as they are said, the welcome
   const editRows = (ws, change) => { const data = JSON.parse(readFileSync(arcFile(ws), "utf8")); change(data); writeFileSync(arcFile(ws), `${JSON.stringify(data, null, 2)}\n`); };
   const PROMISE = "The page is written and its checks are green.\n\nNext I'll build it.";
 
-  check("[MKT.HOOKS.341] the eleven checks about the reply are one set in lib/payload.ts",
-    payloadLib.REPLY_CHECKS instanceof Set && payloadLib.REPLY_CHECKS.size === 11
-      && ["needs-you", "reply-shape", "cards", "handover", "how-it-runs", "partner-words", "page-path", "close-message", "card-case", "welcome", "window"].every((name) => payloadLib.REPLY_CHECKS.has(name)),
+  check("[MKT.HOOKS.341] the twelve checks about the reply are one set in lib/payload.ts",
+    payloadLib.REPLY_CHECKS instanceof Set && payloadLib.REPLY_CHECKS.size === 12
+      && ["needs-you", "reply-shape", "cards", "handover", "how-it-runs", "partner-words", "page-path", "close-message", "card-case", "proposal-record", "welcome", "window"].every((name) => payloadLib.REPLY_CHECKS.has(name)),
     JSON.stringify([...(payloadLib.REPLY_CHECKS ?? [])]));
 
   // The suite runs with SPN_TELEMETRY=off (tests/run.mjs); these cases read the rows a hook writes, so they take it out
@@ -2057,6 +2057,27 @@ console.log("\n=== stop — send-backs are written as they are said, the welcome
     const bad = run("node", [HOOK], { cwd: root, session_id: "cc-1", last_assistant_message: "Q28 is open, and q29 too." }, root);
     const good = run("node", [HOOK], { cwd: root, session_id: "cc-2", last_assistant_message: "Q28 is open, and Q29 too." }, root);
     check("[MKT.HOOKS.408] the hook sends the lowercase reply back and lets the capital one through", bad.includes("[card-case]") && bad.includes("`q29` is `Q29`") && !good.includes("[card-case]"), `${bad.slice(0, 300)} | ${good.slice(0, 200)}`);
+  }
+
+  // A PROPOSAL IN CHAT ENDS AS A RECORD (RULE.DEVEX.WORKSPACE.493).
+  {
+    const { root } = await dataWorkspace("proposal-record");
+    const mine = new Set(["031-probe"]);
+    const table = "Here are the ways.\n\n| Option | What it does |\n| --- | --- |\n| **A** | send it to the framework route |\n| **B** | send it to IAM's controller |\n\nMy recommendation is A.";
+    const list = "Two ways:\n\nA. send it to the framework route, which costs little.\nB. send it to IAM's controller, which costs more.";
+    const check1 = (reply) => stopModule.checkProposalRecorded(reply, root, mine);
+    // The Q22 chat reply: a table of lettered options, no number.
+    check("[MKT.HOOKS.427] red: a reply that sets out a lettered table and names no Q<n> or S<n> is sent back, naming the way to record it and the rule",
+      check1(table).length === 1 && check1(table)[0].check === "proposal-record" && check1(table)[0].message.includes("RULE.DEVEX.WORKSPACE.493") && check1(table)[0].message.includes("question raise"), JSON.stringify(check1(table)));
+    check("[MKT.HOOKS.427] red: a list of A. and B. options with no number is sent back too", check1(list).length === 1, JSON.stringify(check1(list)));
+    check("[MKT.HOOKS.427] red: a number that holds no record in the window's workstream is sent back", check1(`Q77 is open.\n\n${table}`).length === 1);
+    cli(root, ["workstream", "question", "raise", "031/N001", "--file", put(root, "p.json", JSON.stringify(DATA_CARD)) ?? "p.json"]);
+    check("[MKT.HOOKS.427] green: a number that holds a record passes", check1(`Q1 records this.\n\n${table}`).length === 0, JSON.stringify(check1(`Q1 records this.\n\n${table}`)));
+    cli(root, ["workstream", "suggestion", "add", "031/N001", "a better way"]);
+    check("[MKT.HOOKS.427] green: and so does a suggestion's number", check1(`S1 records this.\n\n${list}`).length === 0);
+    check("[MKT.HOOKS.427] green: a reply with no lettered options owes no number", check1("The page is written and the checks are green. See A. Smith's note.").length === 0);
+    check("[MKT.HOOKS.427] green: a fenced list is a quotation and sets out nothing", check1("The block:\n\n```\nA. one\nB. two\n```").length === 0);
+    check("[MKT.HOOKS.427] the check is about the reply", payloadLib.REPLY_CHECKS.has("proposal-record"));
   }
 
   // A RUN OUTSIDE THE WORKSPACE, WITH THE PROJECT DIRECTORY AT IT, READS THE WORKSPACE (s43).
