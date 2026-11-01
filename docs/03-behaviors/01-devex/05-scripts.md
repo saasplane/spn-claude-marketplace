@@ -233,6 +233,8 @@ Every row below is declared and none is claimed: a run writes the last two cells
 | MKT.SCRIPTS.406 | Engineering leader | not close a workstream with a suggestion nobody decided | `workstream close` refuses, before it stamps or moves anything, while any suggestion reads raised or shaped, naming each as S<n> with its title cut to about 60 characters, and says nothing was changed; the retrospective's own suggestions are not held against the close (RULE.DEVEX.WORKSPACE.489) | NEGATIVE | UNIT | PLANNED | — |
 | MKT.SCRIPTS.407 | Builder | have the plugin's templates built from the book | With a book beside the checkout, every file of the book's templates folder is in the plugin's copy byte for byte; the build copies them, subfolders kept, reports a file only the plugin holds without deleting it, and with no book keeps the copy and says so (RULE.DEVEX.WORKSPACE.490) | POSITIVE | UNIT | PLANNED | — |
 | MKT.SCRIPTS.408 | Engineering leader | have citing a card change nothing in the plan | An entry's hash leaves out `decidedBy`, so a citation added or moved plans no follow-up part and flags no part stale; every other field still counts | POSITIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.409 | Engineering leader | have a handover list only the orders really running | The handover's `live now` lists only an order whose part is `running` in a go plan and has no report, and its `read first` and `pins` come from the arc that is running, or the lead of the newest go | POSITIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.410 | Engineering leader | have a handover name the suggestions still open | The handover's `open` lists a suggestion still raised or shaped as S<n> beside the open cards, and leaves a decided one out | POSITIVE | UNIT | PLANNED | — |
 
 ## Retired ids
 
