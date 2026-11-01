@@ -3269,22 +3269,36 @@
     color: var(--sds-text-fact);
     font-variant-numeric: tabular-nums;
   }
-  .sds-chip.sds-step-1,.sds-footbar-summary.sds-step-1 {
+  .sds-chip-open {
+    text-decoration-line: none;
+    color: inherit;
+  }
+  .sds-eyebrow .sds-progress {
+    display: inline-flex;
+    align-items: center;
+    --sds-arc: var(--sds-step-1);
+    gap: .4rem;
+  }
+  .sds-eyebrow .sds-progress .sds-chip-bar {
+    width: 4.5rem;
+    height: .5rem;
+  }
+  .sds-chip.sds-step-1,.sds-footbar-summary.sds-step-1,.sds-progress.sds-step-1 {
     --sds-arc: var(--sds-step-1);
   }
-  .sds-chip.sds-step-2,.sds-footbar-summary.sds-step-2 {
+  .sds-chip.sds-step-2,.sds-footbar-summary.sds-step-2,.sds-progress.sds-step-2 {
     --sds-arc: var(--sds-step-2);
   }
-  .sds-chip.sds-step-3,.sds-footbar-summary.sds-step-3 {
+  .sds-chip.sds-step-3,.sds-footbar-summary.sds-step-3,.sds-progress.sds-step-3 {
     --sds-arc: var(--sds-step-3);
   }
-  .sds-chip.sds-step-4,.sds-footbar-summary.sds-step-4 {
+  .sds-chip.sds-step-4,.sds-footbar-summary.sds-step-4,.sds-progress.sds-step-4 {
     --sds-arc: var(--sds-step-4);
   }
-  .sds-chip.sds-step-5,.sds-footbar-summary.sds-step-5 {
+  .sds-chip.sds-step-5,.sds-footbar-summary.sds-step-5,.sds-progress.sds-step-5 {
     --sds-arc: var(--sds-step-5);
   }
-  .sds-chip.sds-step-done,.sds-footbar-summary.sds-step-done {
+  .sds-chip.sds-step-done,.sds-footbar-summary.sds-step-done,.sds-progress.sds-step-done {
     --sds-arc: var(--sds-step-done);
   }
   .sds-chip.sds-step-design {

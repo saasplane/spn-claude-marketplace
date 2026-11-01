@@ -109,7 +109,6 @@ description: Author an estate node - locate it, write the choices a person actua
 - **`CLUSTER` mirrors the local realization, one engine at a time** (`RULE.SUPPORT.INFRA.108` · MUST · skill:spn-infra/implement)
 - **RULE.SUPPORT.INFRA.109** (`RULE.SUPPORT.INFRA.109` · MUST · skill:spn-infra/implement)
 - **RULE.SUPPORT.INFRA.110** (`RULE.SUPPORT.INFRA.110` · MUST · skill:spn-infra/implement)
-- **The estate publishes a fact under a name that carries no module of the code that reads it** (`RULE.SUPPORT.INFRA.111` · MUST · skill:spn-infra/implement)
 - **RULE.SUPPORT.INFRA.112** (`RULE.SUPPORT.INFRA.112` · MUST · skill:spn-infra/implement)
 - **RULE.SUPPORT.INFRA.113** (`RULE.SUPPORT.INFRA.113` · MUST · skill:spn-infra/implement)
 - **RULE.SUPPORT.INFRA.114** (`RULE.SUPPORT.INFRA.114` · MUST · skill:spn-infra/implement)

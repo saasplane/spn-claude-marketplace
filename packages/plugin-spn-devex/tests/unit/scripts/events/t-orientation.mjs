@@ -30,7 +30,7 @@ import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { PLUGIN } from "../../../helpers/harness.mjs";
 import { WORKSTREAMS } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
-import { SESSION_START_CEILING, SESSION_START_NOTE, WELCOME_LEAD, fitSessionStart, orient, shortRules, workstreams } from "../../../../src/scripts/events/orientation.ts";
+import { SESSION_START_CEILING, SESSION_START_NOTE, SHORT_LEAD, WELCOME_LEAD, fitSessionStart, orient, shortRules, workstreams } from "../../../../src/scripts/events/orientation.ts";
 
 // A THROWAWAY ROOT, MADE FRESH EACH RUN. This named a session scratchpad that no longer
 // exists on any other machine, so the suite passed only where it was written.
@@ -436,8 +436,6 @@ console.log("\n=== orientation — the welcome word for word, and one status lin
     const env = { ...process.env, HOME: home(name), SPN_TELEMETRY: "off" };
     delete env.SPN_DEVEX_AGENT_WORKSPACE;
     if (workspaceKey !== null) env.SPN_DEVEX_AGENT_WORKSPACE = workspaceKey;
-    // Each call here is the day's first start: the whole welcome is shown once a day, and the short start has its own cases below.
-    rmSync(join(root, ".spndevex", ".debug", "workspace", "welcome.json"), { force: true });
     try {
       const out = execFileSync("node", [script, "--stdin"], {
         input: JSON.stringify({ cwd: root, session_id: "t-orientation" }), encoding: "utf8", cwd: root,
@@ -816,7 +814,7 @@ console.log("\n=== orientation — a pending plugin migration is the agent's fir
   says("green: once the ledger records 001, the window's start says nothing of it", !/\*\*001\*\*|- 001[:,]/.test(recorded), recorded.slice(recorded.indexOf(HEADING), recorded.indexOf(HEADING) + 300));
   const current = hook(fixture("migration-nothing", { ...ground, [`.spndevex/${WORKSTREAMS}/open/042-widget-pricing/arcs/N1/state.json`]: "{}\n" }));
   says("kept as data and nothing recorded — one line says 001 has nothing to do, and the command that records it",
-    current.context.includes(HEADING) && current.context.includes("- 001, 002, 003, 004, 005, 006, 007, 008: the check finds nothing in the old shape — `spn-devex plugin migration write 001 002 003 004 005 006 007 008`"));
+    current.context.includes(HEADING) && current.context.includes("- 001, 002, 003, 004, 005, 006, 007, 008, 009: the check finds nothing in the old shape — `spn-devex plugin migration write 001 002 003 004 005 006 007 008 009`"));
 }
 
 
@@ -1021,8 +1019,8 @@ console.log("\n=== orientation — the running go at the session start");
     goes.length === 3 && many.includes("And 3 more running") && many.length <= SESSION_START_CEILING, `${goes.length} · ${many.length}`);
 }
 
-// ── the whole welcome once a day per workspace; every other start is the status line and the one Go line (036 N011) ──
-console.log("\n=== orientation — the short welcome, and the whole one once a day");
+// ── the whole welcome for every new window; a compaction or a resume is the status line and the one Go line (036 N011, N018) ──
+console.log("\n=== orientation — the short welcome, and the whole one for every new window");
 {
   const says = (label, ok, detail = "") => { n += 1; if (!ok) failed += 1; console.log(`  ${ok ? "PASS" : "FAIL"}  ${label}${ok || !detail ? "" : `\n        ${String(detail).slice(0, 400)}`}`); };
   const part = (id, state, entry) => ({ id, repo: "spn-x", work: "CODE", entries: [entry], tests: [], minutes: null, measuredFrom: null,
@@ -1039,29 +1037,36 @@ console.log("\n=== orientation — the short welcome, and the whole one once a d
     files[`${ws}/arcs/N001/go.json`] = plan([part("code-spn-x-1", "ready", "N001/E1")]);
   }
   const root = fixture("welcome-day", files);
-  const start = (session) => {
+  const start = (session, source) => {
     const out = execFileSync("node", [`${HOOKS}/src/scripts/events/orientation.ts`, "--stdin"], {
-      input: JSON.stringify({ cwd: root, session_id: session }), encoding: "utf8", cwd: root, env: { ...process.env, SPN_TELEMETRY: "off" }, maxBuffer: 16 * 1024 * 1024 });
+      input: JSON.stringify({ cwd: root, session_id: session, ...(source ? { source } : {}) }), encoding: "utf8", cwd: root, env: { ...process.env, SPN_TELEMETRY: "off" }, maxBuffer: 16 * 1024 * 1024 });
     const parsed = JSON.parse(out);
     return { message: parsed.systemMessage, context: parsed.hookSpecificOutput.additionalContext };
   };
-  const first = start("w1"), second = start("w2");
-  says("[MKT.HOOKS.326] the day's first start carries the whole welcome", first.message.includes("I'm your DevEx agent") && first.context.startsWith(`${WELCOME_LEAD}\n\n`), first.message);
-  says("[MKT.HOOKS.326] the next start the same day is the status line alone",
-    !second.message.includes("DevEx agent") && !second.message.includes("Welcome") && second.message.trim().split("\n").length === 1 && /\b1 repo\b/.test(second.message), second.message);
+  const first = start("w1", "startup"), again = start("w2", "startup"), cleared = start("w3", "clear"), bare = start("w4");
+  const second = start("w5", "compact"), resumed = start("w6", "resume");
+  const whole = (r) => r.message.includes("I'm your DevEx agent") && r.context.startsWith(`${WELCOME_LEAD}\n\n`);
+  says("[MKT.HOOKS.326] a start carries the whole welcome", whole(first), first.message);
+  says("[MKT.HOOKS.326] a second start the same day gets the whole welcome too", whole(again), again.message);
+  says("[MKT.HOOKS.326] a clear gets the whole welcome", whole(cleared), cleared.message);
+  says("[MKT.HOOKS.326] a start with no source gets the whole welcome", whole(bare), bare.message);
+  says("[MKT.HOOKS.326] a compact is the status line alone, with no lead asking for the welcome",
+    !second.message.includes("DevEx agent") && !second.message.includes("Welcome") && second.message.trim().split("\n").length === 1 && /\b1 repo\b/.test(second.message)
+    && !second.context.startsWith(WELCOME_LEAD) && second.context.startsWith(`${SHORT_LEAD}\n\n`), second.message);
+  says("[MKT.HOOKS.326] a resume is the status line alone, with no lead asking for the welcome",
+    !resumed.message.includes("DevEx agent") && resumed.message.trim().split("\n").length === 1 && !resumed.context.startsWith(WELCOME_LEAD), resumed.message);
+  says("[MKT.HOOKS.326] the short lead no longer says the welcome was shown today", !SHORT_LEAD.includes("today"), SHORT_LEAD);
   says("[MKT.HOOKS.326] and its context opens on the status line, not the welcome's order",
     second.context.includes(second.message) && !second.context.startsWith(WELCOME_LEAD), second.context.slice(0, 300));
   const goes = second.context.split("\n").filter((line) => line.startsWith("Go "));
   says("[MKT.HOOKS.326] it carries one Go line, the rest counted", goes.length === 1 && second.context.includes("And 2 more running"), goes.join(" | "));
   says("[MKT.HOOKS.326] the whole start still names three", first.context.split("\n").filter((line) => line.startsWith("Go ")).length === 3);
   says("[MKT.HOOKS.326] the short start is shorter than the whole one", second.context.length < first.context.length, `${second.context.length} vs ${first.context.length}`);
-  writeFileSync(join(root, ".spndevex", ".debug", "workspace", "welcome.json"), `${JSON.stringify({ day: "2020-01-01" })}\n`);
-  says("[MKT.HOOKS.326] a day later the whole welcome is shown again", start("w3").message.includes("I'm your DevEx agent"));
   const noted = (session) => { try { return JSON.parse(readFileSync(join(root, ".spndevex", ".debug", "sessions", session, "window.json"), "utf8")).welcome; } catch { return null; } };
-  says("[MKT.HOOKS.342] the day's first start writes welcome whole into the window's note", noted("w1") === "whole", String(noted("w1")));
-  says("[MKT.HOOKS.342] a second start that day writes short", noted("w2") === "short", String(noted("w2")));
+  says("[MKT.HOOKS.342] a start writes welcome whole into the window's note", noted("w1") === "whole" && noted("w2") === "whole" && noted("w3") === "whole", String(noted("w1")));
+  says("[MKT.HOOKS.342] a compact and a resume write short", noted("w5") === "short" && noted("w6") === "short", `${noted("w5")} ${noted("w6")}`);
   const mark = join(root, ".spndevex", ".debug", "workspace", "welcome.json");
-  rmSync(mark, { force: true });
+  says("[MKT.HOOKS.326] no start writes welcome.json", !existsSync(mark));
   const hand = run("node", [`${HOOKS}/src/scripts/events/orientation.ts`, root], root);
   says("[MKT.HOOKS.326] a hand run shows the whole welcome and records nothing", hand.includes("DevEx agent") && !existsSync(mark), hand.slice(0, 200));
 }

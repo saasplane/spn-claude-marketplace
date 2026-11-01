@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/04-plugins/01-plugins.md",
-      "seen": "b5ee2be6"
+      "seen": "583e9aa2"
     }
   ]
 }
@@ -167,7 +167,7 @@ The listing is the only file that knows all four plugins exist, and nothing gene
 
 **A version names what is published, never what you are working on — MUST.** The number moves only when a release begins, written by the marketplace's release command, and stays put while work lands between releases. **That is what makes a stale cache findable** — a cache directory is keyed by name and version, so a plugin edited without moving the number installs over its own published bytes, and nothing tells you which copy you are running.
 
-**The four plugins carry one version, and release together** (`RULE.DEVEX.AGENT.110` · MUST · skill:spn-devex/deliver). They share code compiled into every one of them, one test run proves them together, and one tag ships them, so a number that moved for one plugin and not another would claim a difference nobody built. The current number is the one the four manifests carry; the released number is the marketplace's newest `vX.Y.Z` tag, and only the release command writes either.
+**The four plugins carry one version, and release together** (`RULE.DEVEX.AGENT.110` · MUST · check:plugin-landed). They share code compiled into every one of them, one test run proves them together, and one tag ships them, so a number that moved for one plugin and not another would claim a difference nobody built. The current number is the one the four manifests carry; the released number is the marketplace's newest `vX.Y.Z` tag, and only the release command writes either.
 
 ## Two install modes, and the place you are standing decides
 
@@ -180,7 +180,7 @@ The listing is the only file that knows all four plugins exist, and nothing gene
 
 **A partner's marketplace is pinned to a release tag, never a branch — MUST.** The wiring command writes the published repository's source with a `ref` naming the marketplace's own release tag, `vX.Y.Z` on `main`, and a source that names a branch, or none, is rewritten to the tag on the next sync. The tag is never typed: a Support release reads the marketplace's newest `vX.Y.Z` tag once, proves its install against it and stamps it into what it publishes, and the wiring command writes the tag it was released with. Run from source with no stamp, it refuses to write a partner's source, by name. Without a `ref`, Claude Code reads the repository's default branch, which is `develop`, so a partner would run plugins nobody released. A builder's directory source names no `ref`: it is the checkout, read as it is on disk.
 
-**The plugins release in lockstep, through one command.** The four are released together at the one version they all carry, and the marketplace tag is that version. A release tags `main` with `v<version>`, and with `<plugin>--v<version>` for each plugin, Claude Code's own convention for tagging a plugin (`RULE.DEVEX.AGENT.109` · MUST · skill:spn-devex/deliver) (`RULE.DEVEX.AGENT.110` · MUST · skill:spn-devex/deliver). The tag action refuses off `main`, on a dirty tree, on versions that disagree and on a tag that already exists, so a release can neither skip its tag nor cut one twice. In the marketplace, the release runs in four steps:
+**The plugins release in lockstep, through one command.** The four are released together at the one version they all carry, and the marketplace tag is that version. A release tags `main` with `v<version>`, and with `<plugin>--v<version>` for each plugin, Claude Code's own convention for tagging a plugin (`RULE.DEVEX.AGENT.109` · MUST · skill:spn-devex/deliver) (`RULE.DEVEX.AGENT.110` · MUST · check:plugin-landed). The tag action refuses off `main`, on a dirty tree, on versions that disagree and on a tag that already exists, so a release can neither skip its tag nor cut one twice. In the marketplace, the release runs in four steps:
 
 | Step | What it does |
 | --- | --- |
@@ -287,7 +287,7 @@ spn-devex plugin migration write <id>… [--steps-done]   apply and record, in i
 
 **The Stop hook's `window` check offers a new window.** It reads the last call's context from the transcript. From 200k, at a clean point (no row running, no helper out, `workstream state check` whole), in any phase, it asks the turn to write every open point and offer a new window, and to tell the person in their own words why a new window helps, that the handover keeps every open point, and how to open one; past 450k it asks always, and again only after another 50k (`RULE.DEVEX.AGENT.103` · MUST · check:stop).
 
-**The PreToolUse `agent-model` check holds every launch to its model.** It refuses a launch of the Agent tool that names no model, a launch of an order on a model other than its `model:` line names, and a fork (`RULE.DEVEX.AGENT.104` · MUST · check:pretooluse).
+**The PreToolUse `agent-model` check holds every launch to its model.** It refuses a launch of the Agent tool that names no model, a launch of an order on a model other than its `model:` line names, and a fork (`RULE.DEVEX.AGENT.104` · MUST · check:agent-model).
 
 ## Where the Surface check sits among the hooks
 

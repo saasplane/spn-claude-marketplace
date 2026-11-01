@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "book": {
     "repository": "spn-foundation",
-    "commit": "f09a9bde"
+    "commit": "7f29aef6"
   },
   "rules": [
     {
@@ -2088,11 +2088,17 @@
         "check": "stop"
       },
       "class": "checked",
-      "sentence": "The first reply of a workspace's day opens with the whole welcome, whatever the prompt, and every later window that day opens on the status line and one Go line",
+      "sentence": "The first reply of every new window opens with the whole welcome, whatever the prompt, and then the status line",
       "chapter": "04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "heading": "It opens on the welcome and one status line, never a status dump",
       "decision": "DEC.DEVEX.AGENT.164",
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/agent/agent.md",
+          "heading": "A session opens on the welcome, then one status line"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.AGENT.165",
@@ -3103,6 +3109,64 @@
       "chapter": "04-capabilities/01-devex/01-function/03-ideate.md",
       "heading": "How a first proposal is shaped",
       "decision": "DEC.DEVEX.FUNCTION.095",
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/function/ideate.md",
+          "heading": "How a first proposal is shaped"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "The rules this step holds"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "How a first proposal is shaped"
+        }
+      ]
+    },
+    {
+      "id": "RULE.DEVEX.FUNCTION.096",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-devex/ideate"
+      },
+      "class": "stated in a skill",
+      "sentence": null,
+      "chapter": "04-capabilities/01-devex/01-function/03-ideate.md",
+      "heading": "How a first proposal is shaped",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/function/ideate.md",
+          "heading": "How a first proposal is shaped"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "The rules this step holds"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "How a first proposal is shaped"
+        }
+      ]
+    },
+    {
+      "id": "RULE.DEVEX.FUNCTION.097",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-devex/ideate"
+      },
+      "class": "stated in a skill",
+      "sentence": null,
+      "chapter": "04-capabilities/01-devex/01-function/03-ideate.md",
+      "heading": "How a first proposal is shaped",
+      "decision": null,
       "restated": [
         {
           "plugin": "spn-devex",
@@ -11421,7 +11485,7 @@
         "check": "test-run"
       },
       "class": "checked",
-      "sentence": "A whole suite runs only in a baseline run or a full run of the plan",
+      "sentence": "A whole suite runs only in a baseline run, a full run or a proof run of the plan",
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "Once an arc is decided, a drift step runs, then four passes per repository",
       "decision": null,
@@ -11925,6 +11989,25 @@
           "plugin": "spn-devex",
           "path": "skills/execute/SKILL.md",
           "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.484",
+      "level": "MUST",
+      "params": {
+        "check": "doc-check"
+      },
+      "class": "checked",
+      "sentence": "Book text never cites a workstream, an arc or a card of a workspace, because work history is not a standard",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md",
+      "heading": "Scope control",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/workspace.md",
+          "heading": "The loop belongs to the devex agent, and both modes run it"
         }
       ]
     },
@@ -20975,9 +21058,9 @@
       "id": "RULE.SUPPORT.INFRA.111",
       "level": "MUST",
       "params": {
-        "skill": "spn-infra/implement"
+        "check": "subjects"
       },
-      "class": "stated in a skill",
+      "class": "checked",
       "sentence": "The estate publishes a fact under a name that carries no module of the code that reads it",
       "chapter": "04-capabilities/02-support/03-infra/06-modules/02-config.md",
       "heading": "A published key carries no module's name",
@@ -21007,11 +21090,6 @@
           "plugin": "spn-infra",
           "path": "refs/support/infra/shape/naming.md",
           "heading": "The published vocabulary — one format, in the shape the app opens (RULE.SUPPORT.INFRA.043)"
-        },
-        {
-          "plugin": "spn-infra",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },

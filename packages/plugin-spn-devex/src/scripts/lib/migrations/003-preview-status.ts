@@ -10,7 +10,7 @@ import { readFileSync } from "node:fs";
 import { join, relative } from "node:path";
 import { type Migration } from "../migration.ts";
 import { isFile } from "../payload.ts";
-import { arcIdsOf, isDataLayout, previewOf, previewWithStatus, readArc, workstreamsOf, writePreviewStatus } from "../workstream.ts";
+import { arcIdsOf, builtOf, isDataLayout, previewOf, previewWithStatus, readArc, workstreamsOf, writePreviewStatus } from "../workstream.ts";
 import { DEVEX_WORKSTREAMS } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 
 /** Each preview of an arc kept as data in an open or backlog workstream whose header does not show the arc's status as the commands write it. */
@@ -23,7 +23,7 @@ export function previewsWithoutStatus(root: string): string[] {
       const path = previewOf(ws, arc);
       if (!data || typeof data.status !== "string" || !isFile(path)) continue;
       const text = readFileSync(path, "utf8");
-      if (previewWithStatus(text, arc, data.status) !== text)
+      if (previewWithStatus(text, arc, data.status, builtOf(data).done, builtOf(data).total) !== text)
         out.push(`${name}/notes/${arc}/preview.html: its header does not show the arc's status → the arc's commands write it`);
     }
   }

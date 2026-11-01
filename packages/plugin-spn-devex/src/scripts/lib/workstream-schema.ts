@@ -381,7 +381,7 @@ export const GO_SCHEMA_VERSION = 1;
 /** Where a part of a go stands. `waiting` is a part that waits on something outside the window, named in its `waitingOn`. */
 export const GO_PART_STATES = ["ready", "running", "held", "landed", "waiting"] as const;
 /** A part's id: its pass in lower case, its repository and its number, `code-spn-claude-marketplace-2`; a baseline or full run has no number. */
-export const GO_PART_ID = /^(baseline|docs|code|full|generated|release)-\S+$/;
+export const GO_PART_ID = /^(baseline|docs|code|full|generated|release|proof)-\S+$/;
 /** An entry as a go names it: its arc and its id, `N009/E14`. */
 export const GO_ENTRY = /^N\d+[a-z]?\/E\d+$/;
 

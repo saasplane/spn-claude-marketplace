@@ -49,6 +49,8 @@ description: Decide what a node IS, and design a requirement inside that shape -
 - **RULE.DEVEX.FUNCTION.093** (`RULE.DEVEX.FUNCTION.093` · MUST · skill:spn-devex/ideate)
 - **RULE.DEVEX.FUNCTION.094** (`RULE.DEVEX.FUNCTION.094` · MUST · skill:spn-devex/ideate)
 - **RULE.DEVEX.FUNCTION.095** (`RULE.DEVEX.FUNCTION.095` · MUST · skill:spn-devex/ideate)
+- **RULE.DEVEX.FUNCTION.096** (`RULE.DEVEX.FUNCTION.096` · MUST · skill:spn-devex/ideate)
+- **RULE.DEVEX.FUNCTION.097** (`RULE.DEVEX.FUNCTION.097` · MUST · skill:spn-devex/ideate)
 - **RULE.DEVEX.WORKSPACE.006** (`RULE.DEVEX.WORKSPACE.006` · MUST · skill:spn-devex/ideate)
 - **A step acting on a set carries that set** (`RULE.DEVEX.WORKSPACE.064` · MUST · skill:spn-devex/ideate)
 - **`migrations/` earns you none either** (`RULE.DEVEX.WORKSPACE.086` · MUST · skill:spn-devex/ideate)
@@ -231,7 +233,7 @@ Every unanswered question is a card with **real options and a recommendation**. 
 ## What you put to the developer, and what is yours
 
 - **A decision that sets a shape, a name, a member, a check or the direction of a dependency goes to the developer before it is built** (`RULE.DEVEX.WORKSPACE.239` · MUST · check:stop). Put it with what was weighed and the views that spoke, because other work is built on a decision of this kind and a correction undoes that work too. Decide it alone where a rule settles it, or where the purpose the book states for the construct settles it and no option shifts a boundary, adds cost or is a matter of taste; name the rule or the purpose and log it. Where a rule gives a result its own purpose would not, say the rule is wrong and propose its change in the arc in hand.
-- **The arcs inside a workstream are yours to manage, and a new workstream is always the developer's decision** (`RULE.DEVEX.WORKSPACE.243` · MUST · short). Open, split, order, pause or close an arc and say so in one line; the developer may guide you at any moment. Suggest a workstream with the trigger you saw, and ask.
+- **The arcs inside a workstream are yours to manage, and a new workstream is always the developer's decision** (`RULE.DEVEX.WORKSPACE.243` · MUST · check:workstream-open). Open, split, order, pause or close an arc and say so in one line; the developer may guide you at any moment. Suggest a workstream with the trigger you saw, and ask.
 - **Needs you opens a reply in two cases only** (`RULE.DEVEX.WORKSPACE.189` · MUST · check:orientation): the reply raises a card, shown there in full once, or the work is done or blocked and you now wait. A progress reply carries none, because a heading that opens every reply is one the developer stops reading.
 
 The full text of all three is in [`refs/devex/workspace/workstream.md`](../../refs/devex/workspace/workstream.md).
@@ -260,6 +262,8 @@ A first proposal starts where the book already stands, so the developer reads a 
 - **Propose a field only where a report the developer asked for reads it** (`RULE.DEVEX.FUNCTION.091` · MUST · skill:spn-devex/ideate). A field no report reads is cut, and a field a report does read is kept.
 - **Give each idea one name, in the construct that owns it** (`RULE.DEVEX.FUNCTION.092` · MUST · skill:spn-devex/ideate). A second word for an idea already named is replaced by the first, and a new type is named for its domain, its group and its attribute.
 - **Migrate only live records** (`RULE.DEVEX.FUNCTION.093` · MUST · skill:spn-devex/ideate). A record nothing reads again is left as it is, a log that holds only history is skipped by its readers, and no migration is planned for either.
+- **List every part beside the developer's words it serves, and cut what serves none** (`RULE.DEVEX.FUNCTION.096` · MUST · skill:spn-devex/ideate). Take this step before the first proposal is shown. A part that serves nothing is cut to one *later, not now* line, and the cut test asks which part could go with nothing failing. `refs/devex/function/ideate.md` § *How a first proposal is shaped* holds the step in full.
+- **Place the proposal where it is read** (`RULE.DEVEX.FUNCTION.097` · MUST · skill:spn-devex/ideate). Take this step before the first proposal is shown, after the list-and-cut step. The chat holds what the developer asked to see, whole; the approach page one line for each part in the *What*; the preview what the developer judges. Code shown anywhere uses today's names and real values, never placeholders. `refs/devex/function/ideate.md` § *How a first proposal is shaped* holds the step in full.
 - **Explain the proposal in what the developer will see, before the code's own terms** (`RULE.DEVEX.FUNCTION.094` · MUST · skill:spn-devex/ideate). Lead with the printed output, the rows or the page the developer will read, and let the code's terms follow.
 - **Convene the proposal's panel before the proposal is called final** (`RULE.DEVEX.FUNCTION.095` · MUST · skill:spn-devex/ideate). The reader who did not write the proposal reads it first, and a block from that reader is answered in the proposal and not after it.
 - **Workspace plumbing is yours to resolve, and never a card** (`RULE.DEVEX.WORKSPACE.481` · MUST · skill:spn-devex/ideate). A stale checkout, tool output left uncommitted and a stash you name are yours to fix, and you say in one line what you did. A helper never stashes: the window that coordinates does.

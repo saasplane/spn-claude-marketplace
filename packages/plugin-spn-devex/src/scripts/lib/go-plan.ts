@@ -15,7 +15,7 @@ import {
   entryWork, goFaults, GO_SCHEMA_VERSION,
   type ArcData, type GoPart, type GoPlan, type Sheet, type SheetEntry, type Work,
 } from "./workstream-schema.ts";
-import { arcDataDir, readArc, readSheet } from "./workstream.ts";
+import { arcDataDir, logLinesOf, readArc, readSheet } from "./workstream.ts";
 
 /** The minutes a part is cut to. */
 export const PART_MINUTES = 45;
@@ -24,8 +24,11 @@ export const UNMEASURED_ENTRIES = 8;
 const GO_FILE = "go.json";
 const HOOKS_LOG = "hooks.jsonl";
 
-/** A sheet of the scope, with its arc, the ids of the entries its landed rows hold, and the repositories it still owes a proof in. */
-export type ScopeSheet = { arc: string; sheet: Sheet; landed?: readonly string[]; proofs?: readonly string[] };
+/**
+ * A sheet of the scope, with its arc, the ids of the entries its landed rows hold, the repositories it still owes a proof in,
+ * and the ids of the entries `sheet drop` took out with a logged note.
+ */
+export type ScopeSheet = { arc: string; sheet: Sheet; landed?: readonly string[]; proofs?: readonly string[]; dropped?: readonly string[] };
 /** What a landed row took: entries done in a repository at a kind of change, in minutes. */
 export type Measure = { repo: string; work: string; entries: number; minutes: number };
 /** A `TEST` row of `hooks.jsonl`, as far as a full run is told apart. */
@@ -56,13 +59,23 @@ export const landedEntries = (data: ArcData): string[] => data.rows.filter((row)
 export const landedRefs = (scope: readonly ScopeSheet[]): Set<string> =>
   new Set(scope.flatMap(({ arc, landed }) => (landed ?? []).map((id) => `${arc}/${id}`)));
 
+/** The ids of the entries `sheet drop` took out of an arc's sheet, read from the log lines it wrote: `E12 dropped · why`. */
+export function droppedEntries(ws: string, arc: string): string[] {
+  const ids: string[] = [];
+  for (const line of logLinesOf(ws, arc) as Array<{ kind?: unknown; note?: unknown }>) {
+    const found = line && line.kind === "sheet" && typeof line.note === "string" ? /^(E\d+) dropped · /.exec(line.note) : null;
+    if (found) ids.push(found[1]);
+  }
+  return ids;
+}
+
 /** The sheets of a plan's scope, each with the entries its arc's landed rows hold: what `go check` and the close gate read. */
 export function planScope(ws: string, plan: GoPlan): ScopeSheet[] {
   const scope: ScopeSheet[] = [];
   for (const arc of plan.scope) {
     const sheet = readSheet(ws, arc);
     const data = readArc(ws, arc);
-    if (sheet) scope.push({ arc, sheet, landed: data ? landedEntries(data) : [] });
+    if (sheet) scope.push({ arc, sheet, landed: data ? landedEntries(data) : [], dropped: droppedEntries(ws, arc) });
   }
   return scope;
 }
@@ -173,16 +186,18 @@ export function boundOf(rates: Record<string, number>, repo: string, work: strin
 }
 
 /** The places a part has in a repository's run: a baseline and a full run are both TEST work, told apart by their ids. */
-type Slot = "DOCS" | "BASELINE" | "CODE" | "FULL_RUN" | "GENERATED" | "RELEASE";
+type Slot = "DOCS" | "BASELINE" | "CODE" | "FULL_RUN" | "GENERATED" | "RELEASE" | "PROOF";
 /** The slots that carry entries; an entry of another kind of work is built with the code. */
 const ENTRY_SLOTS: readonly Slot[] = ["DOCS", "CODE", "GENERATED"];
 /** The order slots run in inside a repository. */
 const SLOT_ORDER: readonly Slot[] = ["DOCS", "BASELINE", "CODE", "FULL_RUN", "GENERATED"];
+/** The order parts are listed in: those slots, then the proof run, which comes after the releases. */
+const LISTED_ORDER: readonly Slot[] = [...SLOT_ORDER, "PROOF"];
 
-/** The slot a part stands in: its work, and for TEST work its id (`baseline-` or `full-`). */
+/** The slot a part stands in: its work, and for TEST work its id (`baseline-`, `full-` or `proof-`). */
 const slotOf = (part: Pick<GoPart, "id" | "work">): Slot =>
-  part.work === "TEST" ? (part.id.startsWith("baseline-") ? "BASELINE" : "FULL_RUN") : part.work as Slot;
-const workOf = (slot: Slot): Work => (slot === "BASELINE" || slot === "FULL_RUN" ? "TEST" : slot);
+  part.work === "TEST" ? (part.id.startsWith("baseline-") ? "BASELINE" : part.id.startsWith("proof-") ? "PROOF" : "FULL_RUN") : part.work as Slot;
+const workOf = (slot: Slot): Work => (slot === "BASELINE" || slot === "FULL_RUN" || slot === "PROOF" ? "TEST" : slot);
 
 const entrySlot = (entry: SheetEntry): Slot => {
   const work = entryWork(entry);
@@ -282,12 +297,12 @@ export function deriveGo(scope: readonly ScopeSheet[], options: DeriveOptions = 
     }
   }
 
-  const all = [...kept.filter((one) => slotOf(one) !== "RELEASE"), ...fresh];
-  const parts = all.sort((a, b) => repos.indexOf(a.repo) - repos.indexOf(b.repo) || SLOT_ORDER.indexOf(slotOf(a)) - SLOT_ORDER.indexOf(slotOf(b)) || numberOf(a) - numberOf(b));
+  const all = [...kept.filter((one) => slotOf(one) !== "RELEASE" && slotOf(one) !== "PROOF"), ...fresh];
+  const parts = all.sort((a, b) => repos.indexOf(a.repo) - repos.indexOf(b.repo) || LISTED_ORDER.indexOf(slotOf(a)) - LISTED_ORDER.indexOf(slotOf(b)) || numberOf(a) - numberOf(b));
   // What each fresh part waits on: every part of the pass before it in its repository; a repository's first pass waits on the
   // docs of the repository before it; a baseline waits on nothing, and a full run waits on the repository's code.
   for (const one of parts) {
-    if (keptIds.has(one.id) || slotOf(one) === "BASELINE") continue;
+    if (keptIds.has(one.id) || slotOf(one) === "BASELINE" || slotOf(one) === "PROOF") continue;
     const mine = parts.filter((other) => other.repo === one.repo);
     const before = SLOT_ORDER.slice(0, SLOT_ORDER.indexOf(slotOf(one))).reverse().find((pass) => mine.some((other) => slotOf(other) === pass));
     if (before) one.waitsOn = mine.filter((other) => slotOf(other) === before).map((other) => other.id);
@@ -317,6 +332,15 @@ export function deriveGo(scope: readonly ScopeSheet[], options: DeriveOptions = 
     const old = (options.previous?.parts ?? []).find((one) => one.id === id && keptIds.has(id));
     parts.push(old ?? part(id, repo, "RELEASE", [], [], { waitsOn: ending }));
   }
+  // A proof still owed after the releases is its own step: the whole suites on what was released, once every release has landed.
+  // A proof part that landed or is running stays as it was.
+  const released = parts.filter((one) => slotOf(one) === "RELEASE").map((one) => one.id);
+  for (const repo of repos) {
+    const id = `proof-${repo}`;
+    const old = kept.find((one) => one.id === id);
+    if (old) parts.push(old);
+    else if (owed.has(repo)) parts.push(part(id, repo, "PROOF", [], [], { waitsOn: released }));
+  }
   return {
     schemaVersion: GO_SCHEMA_VERSION, lead: scope[0]?.arc ?? "", scope: scope.map((one) => one.arc),
     writtenAt: options.writtenAt ?? new Date().toISOString(), parts,
@@ -336,7 +360,11 @@ export function changedEntries(part: GoPart, scope: readonly ScopeSheet[]): stri
 /** A part's changed entries that no later part of the plan carries: a follow-up part answers its landed part's change. */
 export function staleEntries(part: GoPart, plan: GoPlan, scope: readonly ScopeSheet[]): string[] {
   const later = plan.parts.slice(plan.parts.indexOf(part) + 1).flatMap((one) => one.entries);
-  return changedEntries(part, scope).filter((ref) => !later.includes(ref));
+  // An entry the sheet dropped with its logged note is no change: nothing is left to do for it, so a landed part that held it is no finding.
+  const dropped = new Set(scope.flatMap(({ arc, dropped }) => (dropped ?? []).map((id) => `${arc}/${id}`)));
+  const gone = (ref: string): boolean => part.state === "landed" && dropped.has(ref)
+    && !scope.some(({ arc, sheet }) => sheet.entries.some((entry) => refOf(arc, entry) === ref));
+  return changedEntries(part, scope).filter((ref) => !later.includes(ref) && !gone(ref));
 }
 
 /**

@@ -221,6 +221,35 @@ console.log("\n=== a whole suite runs only while a baseline or full run of the g
     verdictOf(checkTestRun(bash(landed, "spnutils apps test unit r1 api", "spn-y"), NOW)) === "deny");
   ok("[MKT.HOOKS.320] a test command's help runs nothing, so it passes with no full run",
     checkTestRun(bash(none, "spnutils apps test --help"), NOW) === null && checkTestRun(bash(none, "spnutils apps test -h"), NOW) === null);
+
+  // The proof run after the releases: a go plan holding the repository's landed full run, its release at `release`, and its proof at `proof`.
+  const proofFiles = (release, proof) => {
+    const part = (id, work, state) => ({ id, repo: "spn-x", work, entries: [], tests: [], minutes: null, measuredFrom: null, waitsOn: [], model: "none", signature: "", state });
+    return {
+      [`${OPEN}/arcs/N004/state.json`]: `${JSON.stringify({ schemaVersion: 2, arc: "N004", subject: "probe", title: "t", goal: null, status: "DECIDED", reason: null, preview: "preview.html", rows: [] })}\n`,
+      [`${OPEN}/arcs/N004/go.json`]: `${JSON.stringify({ schemaVersion: 1, lead: "N004", scope: ["N004"], writtenAt: "2026-10-31T09:00+05:30", parts: [
+        part("full-spn-x", "TEST", "landed"), part("release-spn-x", "RELEASE", release), part("proof-spn-x", "TEST", proof),
+      ] })}\n`,
+    };
+  };
+  const proving = at("test-run-whole-proof-running", proofFiles("landed", "running"));
+  for (const [what, command] of WHOLE)
+    ok(`[MKT.HOOKS.301] a whole suite by ${what} passes while the go's proof run is running`,
+      checkTestRun(bash(proving, command), NOW) === null, JSON.stringify(checkTestRun(bash(proving, command), NOW)));
+  ok("[MKT.HOOKS.301] a proof run of another repository does not count for this one",
+    verdictOf(checkTestRun(bash(proving, "node scripts/test-all.mjs", "spn-y"), NOW)) === "deny");
+  const proved = at("test-run-whole-proof-landed", proofFiles("landed", "landed"));
+  for (const [what, command] of [WHOLE[0], WHOLE[2]])
+    ok(`[MKT.HOOKS.301] a whole suite by ${what} is refused once the proof run has landed`,
+      verdictOf(checkTestRun(bash(proved, command), NOW)) === "deny");
+  const owing = at("test-run-whole-proof-ready", proofFiles("landed", "ready"));
+  const owed = checkTestRun(bash(owing, "node scripts/test-all.mjs"), NOW)?.deny ?? "";
+  ok("[MKT.HOOKS.301] once the releases have landed the refusal names the proof part to start",
+    owed.includes("no proof run of 036's go is running") && owed.includes("`workstream go start 036/N004 proof-spn-x`"), owed);
+  const waiting = at("test-run-whole-proof-waiting", proofFiles("ready", "waiting"));
+  const early = checkTestRun(bash(waiting, "node scripts/test-all.mjs"), NOW)?.deny ?? "";
+  ok("[MKT.HOOKS.301] before the releases have landed it still names the full run, not the proof",
+    !early.includes("proof-spn-x"), early);
 }
 
 console.log(failed ? `\n  ${failed} of ${total} FAILED — test-run` : `\n  all ${total} passed — test-run`);

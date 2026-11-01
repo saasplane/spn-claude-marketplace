@@ -824,8 +824,12 @@ function arcChip(data: ArcData, ws: string, questions: readonly Question[]): str
   const said = `${built.done} of ${built.total} steps landed`;
   const label = `${data.arc} ${name}, ${status}, ${said}${reason}${runningWords.length ? `, ${escapeHtml(runningWords.join(", "))}` : ""}`;
   const tip = `<span class="sds-tip"><span class="sds-badge sds-status sds-${word}">${escapeHtml(status)}</span><strong>${escapeHtml(data.title)}</strong><span>${said}</span>${why ? `<span>${escapeHtml(why)}</span>` : ""}${runningWords.map((words) => `<span>${escapeHtml(words)}</span>`).join("")}</span>`;
-  return `      <a class="sds-chip sds-${word} sds-step-${step}" href="#${data.arc}" aria-label="${label}">`
-    + `<span class="sds-chip-line"><span class="sds-chip-name"><span class="sds-mono">${number}</span><span class="sds-chip-subject"> &middot; ${name}</span></span><span class="sds-arc-count">${count}</span></span>`
+  // A chip whose arc has a preview opens it in a new tab, with an arrow after the count; one without keeps the jump to the arc's row.
+  const opens = isFile(previewOf(ws, data.arc));
+  const link = opens ? `href="${NOTES}/${data.arc}/${PREVIEW_FILE}" target="_blank" rel="noopener"` : `href="#${data.arc}"`;
+  const chipLabel = opens ? `${label}, ${data.arc} preview, opens in a new tab` : label;
+  return `      <a class="sds-chip sds-${word} sds-step-${step}" ${link} aria-label="${chipLabel}">`
+    + `<span class="sds-chip-line"><span class="sds-chip-name"><span class="sds-mono">${number}</span><span class="sds-chip-subject"> &middot; ${name}</span></span><span class="sds-arc-count">${count}${opens ? `<span class="sds-chip-open" aria-hidden="true"> &#8599;</span>` : ""}</span></span>`
     + `<span class="sds-chip-bar"><i style="width:${width}%"></i></span>${tip}</a>`;
 }
 
@@ -859,10 +863,16 @@ function statusBar(ws: string, arcs: readonly ArcData[], closed: number): string
   ];
 }
 
-/** The inside of the progress block: the sticky card alone, its chips in the order the arcs run. Progress shows nowhere else on the page. */
+/**
+ * The inside of the progress block: the sticky card alone. Its chips open on the running arcs, then every other arc not
+ * closed, then the closed arcs, each group in the order the arcs run. Progress shows nowhere else on the page.
+ */
 export function progressInside(ws: string, arcs: readonly ArcData[] = arcIdsOf(ws).map((arc) => readArc(ws, arc)!).filter(Boolean)): string {
   const closed = arcs.filter((data) => TERMINAL.has(arcStatus(data))).length;
-  const lines = statusBar(ws, executionOrder(ws, arcs), closed);
+  const ordered = executionOrder(ws, arcs);
+  const open = (data: ArcData): boolean => !TERMINAL.has(arcStatus(data));
+  const running = (data: ArcData): boolean => arcStatus(data) === "RUNNING";
+  const lines = statusBar(ws, [...ordered.filter(running), ...ordered.filter((data) => open(data) && !running(data)), ...ordered.filter((data) => !open(data))], closed);
   return lines.length ? `${lines.join("\n")}\n` : "";
 }
 
@@ -901,6 +911,11 @@ export function previewArc(arc: string): string {
   return `<span class="sds-label">Arc:</span> <a class="sds-badge" href="${arcAddress(arc, "../../")}">${escapeHtml(arc)}</a>`;
 }
 
+/** The header's progress fact: a short bar in the chip's fill and the steps landed, `8 of 18 landed`. */
+export function previewProgress(done: number, total: number): string {
+  return `<span class="sds-label">Progress:</span> <span class="sds-progress sds-step-${progressStep(done, total)}"><span class="sds-chip-bar"><i style="width:${share(done, total)}%"></i></span> ${done} of ${total} landed</span>`;
+}
+
 /**
  * The header's status as the commands write it: the arc's status, `PROPOSED` until the design is decided, as its
  * badge, which links the arc's row on the approach page.
@@ -913,10 +928,11 @@ export function previewState(arc: string, status: string): string {
 /**
  * A preview's page with its header naming its arc and showing the arc's status (RULE.DEVEX.WORKSPACE.266): the header
  * line keeps its other facts, loses any `Arc:` or `Arc file:` fact of its own and the status it showed, gains the
- * arc fact `previewArc` writes right after the type, and ends in the state `previewState` writes. The page as it
- * was where it has no header line.
+ * arc fact `previewArc` writes right after the type, and ends in the state `previewState` writes. Where the arc has
+ * steps (`total` above 0) the progress fact `previewProgress` follows the arc fact. The page as it was where it has no
+ * header line.
  */
-export function previewWithStatus(text: string, arc: string, status: string): string {
+export function previewWithStatus(text: string, arc: string, status: string, done = 0, total = 0): string {
   const eyebrow = text.indexOf(`<div class="sds-eyebrow"`);
   if (eyebrow < 0) return text;
   const lineAt = text.indexOf(LINE_OPEN, eyebrow);
@@ -931,9 +947,9 @@ export function previewWithStatus(text: string, arc: string, status: string): st
     if (stateEnd < 0) return text;
     inner = inner.slice(0, stateAt) + inner.slice(stateEnd);
   }
-  const facts = inner.split(SEPARATOR).filter((fact) => fact.trim() && !/^\s*<span class="sds-label">Arc(?: file)?:<\/span>/.test(fact));
+  const facts = inner.split(SEPARATOR).filter((fact) => fact.trim() && !/^\s*<span class="sds-label">(?:Arc(?: file)?|Progress):<\/span>/.test(fact));
   const typeAt = facts.findIndex((fact) => /^\s*<span class="sds-label">Type:<\/span>/.test(fact));
-  facts.splice(typeAt + 1, 0, previewArc(arc));
+  facts.splice(typeAt + 1, 0, previewArc(arc), ...(total > 0 ? [previewProgress(done, total)] : []));
   const line = `${LINE_OPEN}${facts.join(SEPARATOR)}${previewState(arc, status)}</span>`;
   return text.slice(0, lineAt) + line + text.slice(lineEnd);
 }
@@ -977,7 +993,8 @@ export function writePreviewStatus(ws: string): string[] {
     const path = previewOf(ws, arc);
     if (!data || typeof data.status !== "string" || !isFile(path)) continue;
     const text = readFileSync(path, "utf8");
-    const next = previewWithOpen(ws, path, previewWithStatus(text, arc, arcStatus(data)), questions);
+    const built = builtOf(data);
+    const next = previewWithOpen(ws, path, previewWithStatus(text, arc, arcStatus(data), built.done, built.total), questions);
     if (next !== text) { writeFileSync(path, next, "utf8"); wrote.push(fromWorkstream(ws, path)); }
   }
   return wrote;
