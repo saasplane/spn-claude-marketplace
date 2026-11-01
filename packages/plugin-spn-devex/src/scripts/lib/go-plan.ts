@@ -86,8 +86,14 @@ export function unheldEntries(plan: GoPlan, scope: readonly ScopeSheet[]): strin
   return scope.flatMap(({ arc, sheet }) => sheet.entries.map((entry) => refOf(arc, entry)).filter((ref) => !held.has(ref)));
 }
 
-/** A short hash of one entry as written, so a part's signature changes with any change to any of its entries. */
-export const entryHash = (entry: SheetEntry): string => createHash("sha1").update(JSON.stringify(entry)).digest("hex").slice(0, 8);
+/**
+ * A short hash of one entry as written, so a part's signature changes with any change to any of its entries. CITING A CARD IS NO
+ * CHANGE TO THE WORK: `decidedBy` is left out, so a citation added or moved plans no follow-up and flags no part stale (s35, s58).
+ */
+export const entryHash = (entry: SheetEntry): string => {
+  const { decidedBy: _cited, ...work } = entry;
+  return createHash("sha1").update(JSON.stringify(work)).digest("hex").slice(0, 8);
+};
 
 /** Minutes for one entry in each repository and kind of change, from rows that landed: `<repo>|<work>`. Absent where unmeasured. */
 export function ratesOf(measures: readonly Measure[]): Record<string, number> {

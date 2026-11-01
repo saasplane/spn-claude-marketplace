@@ -232,6 +232,7 @@ Every row below is declared and none is claimed: a run writes the last two cells
 | MKT.SCRIPTS.405 | Engineering leader | not have a go written with a decided suggestion left out of the sheet | `go write` and `sheet check` refuse a suggestion that reads decided against an arc in the go's scope when no entry of that arc's sheet cites it in `decidedBy` as S<n>, naming each | NEGATIVE | UNIT | PLANNED | — |
 | MKT.SCRIPTS.406 | Engineering leader | not close a workstream with a suggestion nobody decided | `workstream close` refuses, before it stamps or moves anything, while any suggestion reads raised or shaped, naming each as S<n> with its title cut to about 60 characters, and says nothing was changed; the retrospective's own suggestions are not held against the close (RULE.DEVEX.WORKSPACE.489) | NEGATIVE | UNIT | PLANNED | — |
 | MKT.SCRIPTS.407 | Builder | have the plugin's templates built from the book | With a book beside the checkout, every file of the book's templates folder is in the plugin's copy byte for byte; the build copies them, subfolders kept, reports a file only the plugin holds without deleting it, and with no book keeps the copy and says so (RULE.DEVEX.WORKSPACE.490) | POSITIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.408 | Engineering leader | have citing a card change nothing in the plan | An entry's hash leaves out `decidedBy`, so a citation added or moved plans no follow-up part and flags no part stale; every other field still counts | POSITIVE | UNIT | PLANNED | — |
 
 ## Retired ids
 

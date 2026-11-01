@@ -173,5 +173,11 @@ writeFileSync(join(root, ".spndevex", ".debug", "telemetry", "hooks.jsonl"), [
 ].join("\n"));
 same("[MKT.SCRIPTS.326] fullRunMinutes is the span of a full run's TEST rows, from the earliest start to the latest end; a baseline, a red run and a row of another kind are left out", fullRunMinutes(root), 3);
 
+const cited = { ...entry("E2", "lib-repo:src/b.ts"), decidedBy: ["Q9"] };
+same("[MKT.SCRIPTS.408] citing a card changes no entry's hash", entryHash(cited), entryHash(entry("E2", "lib-repo:src/b.ts")));
+same("[MKT.SCRIPTS.408] any other field still changes the hash", entryHash({ ...cited, what: "other" }) === entryHash(cited), false);
+const citedScope = [{ arc: "N009", sheet: sheet([entry("E1", "app-repo:src/a.ts"), cited, entry("E3", "lib-repo:docs/c.md")]) }];
+same("[MKT.SCRIPTS.408] a landed part whose entry only gained a citation plans no follow-up and is not stale", [changedEntries(plan.parts.find((p) => p.id === "code-lib-repo-1"), citedScope), staleEntries(plan.parts.find((p) => p.id === "code-lib-repo-1"), plan, citedScope)], [[], []]);
+
 console.log(`\n${total - failed}/${total} passed`);
 process.exit(failed ? 1 : 0);
