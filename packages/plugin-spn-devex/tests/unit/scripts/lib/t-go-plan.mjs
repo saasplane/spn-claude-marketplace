@@ -2,6 +2,7 @@
 // order, the bound and the split, the test files found by behaviour id, and a derivation kept after a change.
 // Driven through the exports; the test files are looked for in a temporary git repository.
 import { execFileSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
@@ -178,6 +179,13 @@ same("[MKT.SCRIPTS.408] citing a card changes no entry's hash", entryHash(cited)
 same("[MKT.SCRIPTS.408] any other field still changes the hash", entryHash({ ...cited, what: "other" }) === entryHash(cited), false);
 const citedScope = [{ arc: "N009", sheet: sheet([entry("E1", "app-repo:src/a.ts"), cited, entry("E3", "lib-repo:docs/c.md")]) }];
 same("[MKT.SCRIPTS.408] a landed part whose entry only gained a citation plans no follow-up and is not stale", [changedEntries(plan.parts.find((p) => p.id === "code-lib-repo-1"), citedScope), staleEntries(plan.parts.find((p) => p.id === "code-lib-repo-1"), plan, citedScope)], [[], []]);
+const legacyHash = (one) => createHash("sha1").update(JSON.stringify(one)).digest("hex").slice(0, 8);
+const signedBefore = plan.parts.find((p) => p.id === "code-lib-repo-1");
+const asWritten = new Map(scope[0].sheet.entries.map((one) => [`N009/${one.id}`, one]));
+const oldSigned = { ...signedBefore, signature: signedBefore.entries.map((ref) => legacyHash(asWritten.get(ref))).join(".") };
+same("[MKT.SCRIPTS.408] a landed part signed before citations left the hash, with decidedBy hashed in, is unchanged while its entries stand as written", changedEntries(oldSigned, scope), []);
+const editedSince = [{ arc: "N009", sheet: sheet(scope[0].sheet.entries.map((one) => (one.id === "E2" ? { ...one, what: "other" } : one))) }];
+same("[MKT.SCRIPTS.408] and an entry edited since it landed is still found", changedEntries(oldSigned, editedSince), ["N009/E2"]);
 
 const afterRelease = deriveGo([{ arc: "N009", sheet: sheet([...scope[0].sheet.entries, entry("E4", "lib-repo:docs/late.md")]) }], { previous: landedAll });
 same("[MKT.SCRIPTS.411] a docs entry planned after its repository's release landed gets a second release part, and a repository with nothing new keeps one",
