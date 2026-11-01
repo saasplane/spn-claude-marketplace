@@ -24,7 +24,7 @@ pins:         {{repo}} {{short sha}} · {{repo}} {{short sha}} · {{package}} {{
 live now:     {{what is installed and live}} · waits for the window:
               {{what only a new window reads}} — or "no reload"
 done when:    Commands row `{{name}}` → {{Green after}}
-do not touch: {{files or cycles this window must leave alone}}
+do not touch: {{files or arcs this window must leave alone}}
 open:         Q{{n}} on `{{approach page}}` — {{the question, as the developer would answer it}}; weighed: {{each option
               considered, by name}} — or "none"
 ```

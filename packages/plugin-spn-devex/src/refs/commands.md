@@ -136,7 +136,7 @@ spn-devex workstream close <workstream> — close a workstream: run the close ga
 
 spn-devex workstream fact write <workstream>/N<nnn> --source <repository>/<path>[:<line>] --fact "…" [--used-by …] — write one fact, the source's current commit pinned
 
-spn-devex workstream go write <workstream>/N<nnn> --scope N<nnn>,… — after the go: derive the plan from the scope's sheets and the telemetry, and write every part's brief; run again it keeps landed and running parts
+spn-devex workstream go write <workstream>/N<nnn> --scope N<nnn>,… [--follow-up] — after the go: derive the plan from the scope's sheets and the telemetry, and write every part's brief; run again it keeps landed and running parts
 
 spn-devex workstream go show <workstream>/N<nnn> [--part <id>] [--json] — print the parts: their files, their tests, their measured time and what each waits on
 
