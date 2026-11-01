@@ -19,7 +19,7 @@ import { isTestCommand } from "../../checks/test-run.ts";
 import { goFileOf } from "../../lib/go-plan.ts";
 import { USAGE_LOG } from "../../lib/usage.ts";
 import { approachOf, arcIdsOf, logFileOf, readJson, readJsonl, suggestionsFileOf, workspaceOf, writeJsonl, writeWhole } from "../../lib/workstream.ts";
-import { OUTCOMES, suggestionFaults, type Suggestion } from "../../lib/workstream-schema.ts";
+import { OUTCOMES, cardName, suggestionFaults, type Suggestion } from "../../lib/workstream-schema.ts";
 import { checkGo, renameGo } from "./go.ts";
 import { workstreamNamed } from "./_shared.ts";
 
@@ -236,9 +236,9 @@ function retrospective(ws: string, root: string): string[] {
     if (records.some((one) => one.title === title)) continue;
     const next = Math.max(0, ...records.map((one) => Number(/^s(\d+)$/.exec(one.id)?.[1] ?? 0))) + 1;
     const record: Suggestion = { id: `s${next}`, title, state: "raised", preview: null, words: null };
-    if (suggestionFaults(record, record.id).length) continue;
+    if (suggestionFaults(record, cardName(record.id)).length) continue;
     records.push(record);
-    raised.push(`${record.id} ${title}`);
+    raised.push(`${cardName(record.id)} ${title}`);
   }
   if (raised.length) writeJsonl(file, records);
   return raised;

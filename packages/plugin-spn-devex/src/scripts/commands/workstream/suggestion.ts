@@ -1,15 +1,17 @@
 // RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § A suggestion is recorded the moment it is raised
+//           RULE.DEVEX.WORKSPACE.486, a question is named Q<n> and a suggestion S<n>, with a capital letter, wherever a person reads it
 // The chapter is the source of truth; a rule change is edited there first, then here, in the same change.
+// Input takes either case (`q28`, `Q28`, `036/Q28`); a stored id stays lowercase and everything printed or logged names the card with the capital.
 //
 //   spn-devex workstream suggestion add <workstream> "<title>" [--preview …]                 raise the next one
-//   spn-devex workstream suggestion state <workstream> <sN> <state> [--words "…"]            move it on
-//   spn-devex workstream suggestion edit <workstream> <sN> [--title …] [--preview …]         change its title or its preview
+//   spn-devex workstream suggestion state <workstream> S<n> <state> [--words "…"]            move it on
+//   spn-devex workstream suggestion edit <workstream> S<n> [--title …] [--preview …]         change its title or its preview
 
 import { type Action, VALUE, UsageFault, readWords } from "../../../../../plugin-support-lib/src/lib/command.ts";
 import { runningWorkFault } from "../../checks/questions.ts";
 import { precedentLines } from "../../lib/precedent.ts";
 import { readJsonl, suggestionsFileOf, workspaceOf, writeJsonl } from "../../lib/workstream.ts";
-import { SUGGESTION_ID, SUGGESTION_STATES, suggestionFaults, type Suggestion } from "../../lib/workstream-schema.ts";
+import { SUGGESTION_ID, SUGGESTION_STATES, cardId, cardName, suggestionFaults, type Suggestion } from "../../lib/workstream-schema.ts";
 import { refuseFlags, workstreamNamed } from "./_shared.ts";
 
 export const describe = "a suggestion, raised the moment it is raised and moved on as it is shaped, decided, parked or dropped";
@@ -26,24 +28,25 @@ function load(ref: string | undefined): { file: string; records: Suggestion[] } 
   return { file, records };
 }
 
-function find(records: Suggestion[], id: string): Suggestion {
-  if (!SUGGESTION_ID.test(id)) throw new UsageFault(`reads \`${id}\` as no suggestion — a suggestion is \`s<n>\`.`);
+function find(records: Suggestion[], typed: string): Suggestion {
+  const id = cardId(typed);
+  if (!SUGGESTION_ID.test(id)) throw new UsageFault(`reads \`${typed}\` as no suggestion — a suggestion is \`S<n>\`.`);
   const found = records.find((one) => one.id === id);
-  if (!found) throw new UsageFault(`finds no ${id} in this workstream.`);
+  if (!found) throw new UsageFault(`finds no ${cardName(id)} in this workstream.`);
   return found;
 }
 
 function save(file: string, records: Suggestion[], record: Suggestion): number {
-  const faults = suggestionFaults(record, record.id);
+  const faults = suggestionFaults(record, cardName(record.id));
   if (faults.length) throw new UsageFault(`${faults.join("; ")}.`);
   writeJsonl(file, records);
-  console.log(`${record.id} · ${record.state}`);
+  console.log(`${cardName(record.id)} · ${record.state}`);
   return 0;
 }
 
 function add(args: string[]): number {
-  refuseFlags(args, ["state"], () => "does not take `--state`: a suggestion is raised, and `suggestion state <workstream> <sN> <state>` moves it on.");
-  refuseFlags(args, ["words"], () => "does not take `--words`: the words come beside a move, `suggestion state <workstream> <sN> <state> --words \"…\"`.");
+  refuseFlags(args, ["state"], () => "does not take `--state`: a suggestion is raised, and `suggestion state <workstream> S<n> <state>` moves it on.");
+  refuseFlags(args, ["words"], () => "does not take `--words`: the words come beside a move, `suggestion state <workstream> S<n> <state> --words \"…\"`.");
   refuseFlags(args, ["title"], () => "does not take `--title`: the title is the second word, `suggestion add <workstream> \"<title>\"`.");
   const words = readWords(args, { preview: VALUE });
   const [ref, title, ...more] = words.paths;
@@ -60,10 +63,10 @@ function add(args: string[]): number {
 }
 
 function state(args: string[]): number {
-  refuseFlags(args, ["title", "preview"], (name) => `does not take \`--${name}\`: it is the suggestion's own — \`suggestion edit <workstream> <sN> --${name} …\` changes it.`);
+  refuseFlags(args, ["title", "preview"], (name) => `does not take \`--${name}\`: it is the suggestion's own — \`suggestion edit <workstream> S<n> --${name} …\` changes it.`);
   const words = readWords(args, { words: VALUE });
   const [ref, id, to, ...more] = words.paths;
-  if (!id || !to || more.length) throw new UsageFault(`takes a workstream, a suggestion and a state: \`suggestion state <workstream> <sN> <${MOVES.join(" · ")}> [--words "…"]\`.`);
+  if (!id || !to || more.length) throw new UsageFault(`takes a workstream, a suggestion and a state: \`suggestion state <workstream> S<n> <${MOVES.join(" · ")}> [--words "…"]\`.`);
   if (!(MOVES as readonly string[]).includes(to)) throw new UsageFault(`reads \`${to}\` as no state to move to — one of ${MOVES.join(" · ")}. (A suggestion is raised by \`suggestion add\`.)`);
   const { file, records } = load(ref);
   const record = find(records, id);
@@ -74,11 +77,11 @@ function state(args: string[]): number {
 }
 
 function edit(args: string[]): number {
-  refuseFlags(args, ["state"], () => "does not take `--state`: a suggestion's state moves with `suggestion state <workstream> <sN> <state>`.");
-  refuseFlags(args, ["words"], () => "does not take `--words`: the words come beside a move, `suggestion state <workstream> <sN> <state> --words \"…\"`.");
+  refuseFlags(args, ["state"], () => "does not take `--state`: a suggestion's state moves with `suggestion state <workstream> S<n> <state>`.");
+  refuseFlags(args, ["words"], () => "does not take `--words`: the words come beside a move, `suggestion state <workstream> S<n> <state> --words \"…\"`.");
   const words = readWords(args, { title: VALUE, preview: VALUE });
   const [ref, id, ...more] = words.paths;
-  if (!id || more.length) throw new UsageFault("takes a workstream and one suggestion: `suggestion edit <workstream> <sN> [--title …] [--preview …]`.");
+  if (!id || more.length) throw new UsageFault("takes a workstream and one suggestion: `suggestion edit <workstream> S<n> [--title …] [--preview …]`.");
   const title = words.value("title");
   const preview = words.value("preview");
   if (title === null && preview === null) throw new UsageFault("changes its title or its preview: give `--title …`, `--preview …`, or both.");
@@ -111,7 +114,7 @@ function write(args: string[]): number {
 
 export const actions: Record<string, Action> = {
   add: { describe: "raise a suggestion: the next number, raised; it also prints the decisions and rules that already speak to its title", usage: "<workstream> \"<title>\" [--preview …]", run: add },
-  state: { describe: "move it on: shaped, decided, parked or dropped, with the words beside the move", usage: "<workstream> <sN> <state> [--words \"…\"]", run: state },
-  edit: { describe: "change its title or its preview, never its state", usage: "<workstream> <sN> [--title …] [--preview …]", run: edit },
-  write: { describe: "retired: refuses, and names the command that fits what it was typed with", usage: "<workstream> [<sN>] …", hidden: true, run: write },
+  state: { describe: "move it on: shaped, decided, parked or dropped, with the words beside the move", usage: "<workstream> S<n> <state> [--words \"…\"]", run: state },
+  edit: { describe: "change its title or its preview, never its state", usage: "<workstream> S<n> [--title …] [--preview …]", run: edit },
+  write: { describe: "retired: refuses, and names the command that fits what it was typed with", usage: "<workstream> [S<n>] …", hidden: true, run: write },
 };

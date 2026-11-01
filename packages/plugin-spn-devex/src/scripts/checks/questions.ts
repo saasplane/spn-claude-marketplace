@@ -18,7 +18,7 @@ import {
 } from "../lib/workstream.ts";
 import { isBuilderWorkspace } from "../lib/builder.ts";
 import { runsTheWork } from "./how-it-runs.ts";
-import { type Question } from "../lib/workstream-schema.ts";
+import { cardName, type Question } from "../lib/workstream-schema.ts";
 
 export type CardOnPage = { id: string; html: string; from: number; inBlock: boolean };
 
@@ -54,8 +54,8 @@ export function handMadeCards(before: string, after: string, records: readonly Q
   for (const [id, html] of outside(after)) {
     if (was.get(id) === html) continue;
     out.push(records.some((record) => record.id === id)
-      ? `${id}'s card stands outside the open block — only \`workstream question\` writes a card, from its record`
-      : `${id} has no record: raise it with \`workstream question raise\``);
+      ? `${cardName(id)}'s card stands outside the open block — only \`workstream question\` writes a card, from its record`
+      : `${cardName(id)} has no record: raise it with \`workstream question raise\``);
   }
   return out;
 }
@@ -67,7 +67,7 @@ export function openWithoutCard(ws: string, records: readonly Question[] = readQ
   const shown = new Set(cardsOn(text).filter((card) => card.inBlock).map((card) => card.id));
   const name = page ? basename(page) : "approach.html";
   return records.filter((record) => record.state === "open" && !shown.has(record.id))
-    .map((record) => `${record.id} is open and its card is not on ${name}`);
+    .map((record) => `${cardName(record.id)} is open and its card is not on ${name}`);
 }
 
 /**
@@ -89,15 +89,15 @@ export function cardsDiffer(ws: string, records: readonly Question[] = readQuest
     const name = basename(rel) === "preview.html" ? rel : basename(rel);
     for (const card of cards) {
       const record = byId.get(card.id);
-      if (!record) { out.push(`${name}'s ${card.id} has no record`); continue; }
-      if (record.state !== "open") { out.push(`${card.id} is ${record.state} and its card still stands on ${name}`); continue; }
-      if (same(card.html) !== same(cardHtml(record, ""))) out.push(`${name}'s ${card.id} differs from its record`);
+      if (!record) { out.push(`${name}'s ${cardName(card.id)} has no record`); continue; }
+      if (record.state !== "open") { out.push(`${cardName(card.id)} is ${record.state} and its card still stands on ${name}`); continue; }
+      if (same(card.html) !== same(cardHtml(record, ""))) out.push(`${name}'s ${cardName(card.id)} differs from its record`);
     }
     if (isApproach) continue;
     const onPage = new Set(cards.map((card) => card.id));
     for (const record of records)
       if (record.state === "open" && record.shownIn.includes(rel) && !onPage.has(record.id))
-        out.push(`${record.id} is shown in ${name} by its record, and its card is not there`);
+        out.push(`${cardName(record.id)} is shown in ${name} by its record, and its card is not there`);
   }
   return out;
 }

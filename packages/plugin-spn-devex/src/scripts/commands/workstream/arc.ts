@@ -22,7 +22,7 @@ import {
 import { isFile } from "../../lib/payload.ts";
 import { candidatesAt, precedentFor, wordsOf } from "../../lib/precedent.ts";
 import { refreshViews } from "../docs/cycles.ts";
-import { SHEET_SCHEMA_VERSION, subjectFault, type ArcData } from "../../lib/workstream-schema.ts";
+import { SHEET_SCHEMA_VERSION, cardId, cardName, subjectFault, type ArcData } from "../../lib/workstream-schema.ts";
 import { sheetFindings } from "./sheet.ts";
 import { ROW_FLAGS, afterWrite, arcNamed, arcSignatures, listOf, refreshIfMoved, refuseFlags, typed } from "./_shared.ts";
 
@@ -81,7 +81,7 @@ function header(data: ArcData, words: Words): string[] {
   }
   const repos = listOf(words, "repos");
   if (repos) { data.repos = repos; changed.push("repos"); }
-  const carries = listOf(words, "carries");
+  const carries = listOf(words, "carries")?.map(cardId);
   if (carries) { data.carries = carries; changed.push("carries"); }
   const position = words.value("position");
   if (position !== null) {
@@ -227,7 +227,7 @@ function leavePageWhole(ws: string, data: ArcData, under: string | null): Pieces
 }
 
 /** The words that say which suggestions an arc took up: none where none moved. */
-const movedWords = (ids: string[], to: string): string[] => (ids.length ? [`${ids.join(", ")} ${to}`] : []);
+const movedWords = (ids: string[], to: string): string[] => (ids.length ? [`${ids.map(cardName).join(", ")} ${to}`] : []);
 const shapedWords = (ws: string, ids: readonly string[]): string[] => movedWords(moveCarried(ws, ids, "shaped", "raised"), "shaped");
 
 function edit(args: string[]): number {

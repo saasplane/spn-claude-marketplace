@@ -173,17 +173,21 @@ console.log("\n=== fact write — one fact, pinned to its source's commit");
 console.log("\n=== suggestion add, state and edit — raised, moved on, reworded");
 {
   const raised = cli(root, ["workstream", "suggestion", "add", "031", "keep it as data"]);
-  ok("a suggestion is raised with the next number", raised.code === 0 && raised.out.split("\n")[0].trim() === "s1 · raised", raised.out);
+  ok("a suggestion is raised with the next number", raised.code === 0 && raised.out.split("\n")[0].trim() === "S1 · raised", raised.out);
   const shaped = cli(root, ["workstream", "suggestion", "state", "031", "s1", "shaped", "--words", "shaped on the preview"]);
-  ok("and moved on, with the words beside the move", shaped.code === 0 && shaped.out.trim() === "s1 · shaped", shaped.out);
+  ok("and moved on, with the words beside the move", shaped.code === 0 && shaped.out.trim() === "S1 · shaped", shaped.out);
+  const upperS = cli(root, ["workstream", "suggestion", "state", "031", "S1", "parked"]);
+  ok("[MKT.SCRIPTS.396] a suggestion is named in either case: S1 moves the suggestion s1 names, and it prints S1", upperS.code === 0 && upperS.out.trim() === "S1 · parked", upperS.out);
+  ok("[MKT.SCRIPTS.395] the stored suggestion id stays lowercase", lines(join(ws, "suggestions.jsonl")).some((one) => one.id === "s1" && one.state === "parked"));
+  cli(root, ["workstream", "suggestion", "state", "031", "s1", "shaped"]);
   const edited = cli(root, ["workstream", "suggestion", "edit", "031", "s1", "--title", "keep it as rows", "--preview", "notes/N001/preview.html#p1"]);
-  ok("its title and preview are changed", edited.code === 0 && edited.out.trim() === "s1 · shaped", edited.out);
+  ok("its title and preview are changed", edited.code === 0 && edited.out.trim() === "S1 · shaped", edited.out);
   const record = lines(join(ws, "suggestions.jsonl"))[0];
   ok("its record holds the new title, the preview, the state and the words", record.title === "keep it as rows" && record.state === "shaped" && record.preview === "notes/N001/preview.html#p1" && record.words === "shaped on the preview");
   const second = cli(root, ["workstream", "suggestion", "add", "031", "a second one", "--preview", "notes/N001/preview.html#p2"]);
-  ok("the next one takes the next number and may carry a preview", second.code === 0 && second.out.trim() === "s2 · raised" && lines(join(ws, "suggestions.jsonl"))[1].preview === "notes/N001/preview.html#p2", second.out);
+  ok("the next one takes the next number and may carry a preview", second.code === 0 && second.out.trim() === "S2 · raised" && lines(join(ws, "suggestions.jsonl"))[1].preview === "notes/N001/preview.html#p2", second.out);
   const bad = cli(root, ["workstream", "suggestion", "state", "031", "s9", "decided"]);
-  ok("red: a suggestion not recorded is refused", bad.code === 2 && bad.out.includes("finds no s9"), bad.out);
+  ok("red: a suggestion not recorded is refused", bad.code === 2 && bad.out.includes("finds no S9"), bad.out);
   const maybe = cli(root, ["workstream", "suggestion", "state", "031", "s1", "maybe"]);
   ok("red: a state outside the four is refused", maybe.code === 2 && maybe.out.includes("shaped · decided · parked · dropped"), maybe.out);
   const again = cli(root, ["workstream", "suggestion", "state", "031", "s1", "raised"]);
@@ -235,28 +239,32 @@ console.log("\n=== question — raise, show, answer, withdraw");
   const text = readFileSync(page, "utf8");
   put(ws, "approach.html", text.replace('<h4 id="N001-what">', '<li id="q7">an answer folded earlier</li>\n  <h4 id="N001-what">'));
   const raised = cli(root, ["workstream", "question", "raise", "031/N001", "--file", "card.json"]);
-  ok("[MKT.SCRIPTS.383] a What with a path:line is taken, and the number is past every anchor the page carries", raised.code === 0 && raised.out.startsWith("q8 · open · approach.html Open — Q8"), raised.out);
+  ok("[MKT.SCRIPTS.383] a What with a path:line is taken, and the number is past every anchor the page carries", raised.code === 0 && raised.out.startsWith("Q8 · open · approach.html Open — Q8"), raised.out);
   ok("the card stands in the approach page's Open, under its heading", /<h2>Open &mdash; Q8<\/h2>/.test(readFileSync(page, "utf8")) && readFileSync(page, "utf8").includes('<h4 id="q8">'));
   const notPreview = cli(root, ["workstream", "question", "show", "031/q8", "--in", "notes/N001/plan.md"]);
   ok("red: a card is shown only on an arc's preview", notPreview.code === 2 && notPreview.out.includes("notes/N<nnn>/preview.html"), notPreview.out);
   const shown = cli(root, ["workstream", "question", "show", "031/q8", "--in", "notes/N001/preview.html"]);
   const preview = readFileSync(join(ws, "notes", "N001", "preview.html"), "utf8");
   ok("shown on the preview, with the line back to the approach page", shown.code === 0 && preview.includes('<h4 id="q8">') && preview.includes('href="../../approach.html#s4"'), shown.out);
+  const upper = cli(root, ["workstream", "question", "show", "031/Q8", "--in", "notes/N001/preview.html"]);
+  ok("[MKT.SCRIPTS.396] a question is named in either case: 031/Q8 reads the card 031/q8 reads", upper.code === 0 && upper.out.startsWith("Q8 · shown in"), upper.out);
+  ok("[MKT.SCRIPTS.395] the log line a raise writes names the card with a capital, and the stored id stays lowercase",
+    lines(join(ws, "arcs", "N001", "log.jsonl")).some((line) => line.kind === "question" && line.note.startsWith("Q8 raised")) && lines(join(ws, "questions.jsonl")).some((one) => one.id === "q8"));
   const key = cli(root, ["workstream", "question", "answer", "031/q8", "--key", "Z", "--words", "Z"]);
   ok("red: an answer naming no option is refused with the options", key.code === 2 && key.out.includes("one of A · B"), key.out);
   cli(root, ["workstream", "suggestion", "add", "031", "x"]);
   put(root, "card2.json", JSON.stringify({ ...CARD, title: "a second question", what: "Today's check is f9." }));
   ok("[MKT.SCRIPTS.383] a What with a fact id is taken", cli(root, ["workstream", "question", "raise", "031/N001", "--file", "card2.json"]).code === 0);
   const withdrawn = cli(root, ["workstream", "question", "withdraw", "031/q9", "--words", "not needed"]);
-  ok("a card is withdrawn in your words, off its one page", withdrawn.code === 0 && withdrawn.out.startsWith("q9 · withdrawn · off 1 page · owed: its Log line"), withdrawn.out);
+  ok("a card is withdrawn in your words, off its one page", withdrawn.code === 0 && withdrawn.out.startsWith("Q9 · withdrawn · off 1 page · owed: its Log line"), withdrawn.out);
   const answered = cli(root, ["workstream", "question", "answer", "031/q8", "--key", "A", "--words", "Q8 - A"]);
-  ok("a card is answered, and the line says what is owed", answered.code === 0 && answered.out.startsWith("q8 · answered A · off 2 pages · owed: N001's What, its Log line"), answered.out);
+  ok("a card is answered, and the line says what is owed", answered.code === 0 && answered.out.startsWith("Q8 · answered A · off 2 pages · owed: N001's What, its Log line"), answered.out);
   ok("it leaves both pages, and the preview drops its Open", !readFileSync(page, "utf8").includes('<h4 id="q8">') && !readFileSync(join(ws, "notes", "N001", "preview.html"), "utf8").includes("sds-open"));
   const record = lines(join(ws, "questions.jsonl")).find((one) => one.id === "q8");
   ok("the record holds the answer in your words", record.state === "answered" && record.answer.key === "A" && record.answer.words === "Q8 - A");
   const again = cli(root, ["workstream", "question", "answer", "031/q8", "--key", "A", "--words", "again"]);
-  ok("red: a card already answered is not answered again", again.code === 2 && again.out.includes("q8 is answered"), again.out);
-  ok("the arc's log carries the answer", lines(log).some((line) => line.kind === "answered" && /q8 A · Q8 - A/.test(line.note)));
+  ok("red: a card already answered is not answered again", again.code === 2 && again.out.includes("Q8 is answered"), again.out);
+  ok("the arc's log carries the answer", lines(log).some((line) => line.kind === "answered" && /Q8 A · Q8 - A/.test(line.note)));
 }
 
 console.log("\n=== arc edit and row state — a status or a row state moved refreshes every view of it (RULE.DEVEX.WORKSPACE.273)");
@@ -814,17 +822,17 @@ console.log("\n=== question answer — a card settled in one call; addresses rea
   put(one.root, ".spndevex/workstreams/open/031-probe/arcs/N001/sheet.json", JSON.stringify({ schemaVersion: 1, releaseChain: [], dependsOn: [], stack: null, entries: [entry("E7"), entry("E9")] }));
   put(one.root, "card.json", JSON.stringify(CARD));
   const raised = cli(one.root, ["workstream", "question", "raise", "031/N001", "--file", "card.json"]);
-  const id = /^(q\d+)/.exec(raised.out)?.[1] ?? "q1";
+  const id = /^([Qq]\d+)/.exec(raised.out)?.[1] ?? "Q1";
   const missing = cli(one.root, ["workstream", "question", "answer", `031/${id}`, "--key", "A", "--words", "go", "--entries", "E7,E8,E10"]);
   ok("[MKT.HOOKS.323] red: entries that do not exist are all named at once, and nothing is recorded", missing.code === 2 && missing.out.includes("E8") && missing.out.includes("E10") &&
-    lines(join(one.ws, "questions.jsonl")).find((row) => row.id === id).state === "open", missing.out);
+    lines(join(one.ws, "questions.jsonl")).find((row) => row.id === id.toLowerCase()).state === "open", missing.out);
   const done = cli(one.root, ["workstream", "question", "answer", `031/${id}`, "--key", "A", "--words", "take A, folded", "--entries", "E7,E9"]);
-  const record = lines(join(one.ws, "questions.jsonl")).find((row) => row.id === id);
+  const record = lines(join(one.ws, "questions.jsonl")).find((row) => row.id === id.toLowerCase());
   ok("[MKT.HOOKS.323] a card is settled in one call: the record", done.code === 0 && record.state === "answered" && record.answer.words === "take A, folded", done.out);
   ok("[MKT.HOOKS.323] the answer is folded into the arc's What", /<p>[^<]*take A, folded[^<]*<\/p>/.test(readFileSync(join(one.ws, "approach.html"), "utf8").split('id="N001-what"')[1] ?? ""));
   ok("[MKT.HOOKS.323] the log line is written", lines(join(one.ws, "arcs", "N001", "log.jsonl")).some((line) => line.kind === "answered" && line.note.includes("take A, folded")));
   const sheet = json(sheetFile);
-  ok("[MKT.HOOKS.323] the card is cited in both entries", sheet.entries.every((one2) => one2.decidedBy.some((text) => new RegExp(`\\b${id}\\b`).test(text))), JSON.stringify(sheet.entries));
+  ok("[MKT.HOOKS.323] the card is cited in both entries", sheet.entries.every((one2) => one2.decidedBy.some((text) => new RegExp(`\\b${id}\\b`, "i").test(text))), JSON.stringify(sheet.entries));
   ok("[MKT.HOOKS.323] nothing is owed by the line", !/owed:/.test(done.out), done.out);
   const bare = cli(one.root, ["workstream", "question", "show", id, "--in", "notes/N001/preview.html"]);
   ok("[MKT.HOOKS.325] the bare id and the address both read the card", /is answered/.test(bare.out) && /is answered/.test(cli(one.root, ["workstream", "question", "show", `031/${id}`, "--in", "notes/N001/preview.html"]).out), bare.out);
@@ -929,7 +937,7 @@ console.log("\n=== workstream close — retro.json and the suggestions it raises
   ok("[MKT.SCRIPTS.332] it raises the check, the command and the shape that stand out against the earlier workstream", raised.some((t) => t.includes("check:test-run")) && raised.some((t) => t.includes("command:workstream row")) && raised.some((t) => t.includes("ideate:panel-overturned")), JSON.stringify(raised));
   ok("[MKT.SCRIPTS.332] and none for the suite's red first", !raised.some((t) => /apps test|command:apps/.test(t)), JSON.stringify(raised));
   ok("each suggestion is raised, not decided", lines(join(home, "suggestions.jsonl")).filter((one) => /^Retrospective/.test(one.title)).every((one) => one.state === "raised"));
-  ok("the close prints each one it raised", /retrospective · raised s\d+ Retrospective · check:test-run/.test(closing.out), closing.out);
+  ok("[MKT.SCRIPTS.395] the close prints each one it raised, with a capital S", /retrospective · raised S\d+ Retrospective · check:test-run/.test(closing.out), closing.out);
 }
 
 console.log("\n=== workstream close — the retrospective counts failed tests, the release gate, brief:, part-size: and the thresholds (MKT.SCRIPTS.332)");

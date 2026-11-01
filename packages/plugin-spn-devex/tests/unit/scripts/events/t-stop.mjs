@@ -295,7 +295,7 @@ console.log("\n=== stop — an arc is read from its data: state.json, log.jsonl 
     const page = join(ws, "approach.html");
     writeFileSync(page, readFileSync(page, "utf8").replace(/<div class="sds-open">[\s\S]*?<div class="sds-recommended">[^\n]*\n\s*<\/div>/, ""));
     const out = stopAt(root, "d17-card-off-page", NEEDS + "done");
-    check("an open record whose card is not on the page is named by [state]", /\[state\].*q1 is open and its card is not on/.test(out), out);
+    check("an open record whose card is not on the page is named by [state]", /\[state\].*Q1 is open and its card is not on/.test(out), out);
   }
 }
 
@@ -1948,9 +1948,9 @@ console.log("\n=== stop — send-backs are written as they are said, the welcome
   const editRows = (ws, change) => { const data = JSON.parse(readFileSync(arcFile(ws), "utf8")); change(data); writeFileSync(arcFile(ws), `${JSON.stringify(data, null, 2)}\n`); };
   const PROMISE = "The page is written and its checks are green.\n\nNext I'll build it.";
 
-  check("[MKT.HOOKS.341] the ten checks about the reply are one set in lib/payload.ts",
-    payloadLib.REPLY_CHECKS instanceof Set && payloadLib.REPLY_CHECKS.size === 10
-      && ["needs-you", "reply-shape", "cards", "handover", "how-it-runs", "partner-words", "page-path", "close-message", "welcome", "window"].every((name) => payloadLib.REPLY_CHECKS.has(name)),
+  check("[MKT.HOOKS.341] the eleven checks about the reply are one set in lib/payload.ts",
+    payloadLib.REPLY_CHECKS instanceof Set && payloadLib.REPLY_CHECKS.size === 11
+      && ["needs-you", "reply-shape", "cards", "handover", "how-it-runs", "partner-words", "page-path", "close-message", "card-case", "welcome", "window"].every((name) => payloadLib.REPLY_CHECKS.has(name)),
     JSON.stringify([...(payloadLib.REPLY_CHECKS ?? [])]));
 
   // The suite runs with SPN_TELEMETRY=off (tests/run.mjs); these cases read the rows a hook writes, so they take it out
@@ -2033,6 +2033,26 @@ console.log("\n=== stop — send-backs are written as they are said, the welcome
     const out = run("node", [HOOK], { cwd: root, session_id: "cm-1", transcript_path: file, last_assistant_message: "Closed 031." }, root);
     const ok = run("node", [HOOK], { cwd: root, session_id: "cm-2", transcript_path: file, last_assistant_message: closing }, root);
     check("[MKT.HOOKS.406] the hook sends the bare reply back and lets the closing message through", out.includes("[close-message]") && !ok.includes("[close-message]"), `${out.slice(0, 300)} | ${ok.slice(0, 300)}`);
+  }
+
+  // A CARD IS NAMED WITH A CAPITAL (RULE.DEVEX.WORKSPACE.486).
+  {
+    const flagged = stopModule.checkCardCase("I answered q28 and raised s3, then q28 again.");
+    check("[MKT.HOOKS.408] a reply that names a card with a lowercase letter is sent back, naming each once with its capital form and the rule",
+      flagged.length === 1 && flagged[0].check === "card-case" && flagged[0].message.includes("`q28` is `Q28`") && flagged[0].message.includes("`s3` is `S3`")
+        && flagged[0].message.split("`q28`").length === 2 && flagged[0].message.includes("RULE.DEVEX.WORKSPACE.486"), JSON.stringify(flagged));
+    const quiet = (text) => stopModule.checkCardCase(text).length === 0;
+    check("[MKT.HOOKS.409] a capital Q<n> and S<n> pass", quiet("Q28 is answered, and S3 is parked."));
+    check("[MKT.HOOKS.409] a code span, a fenced block, a link and a URL are left alone",
+      quiet("The id `q28` is stored.\n\n```\nq28 s3\n```\n\nSee [q28](approach.html) and https://x.test/q28."));
+    check("[MKT.HOOKS.409] a path or an anchor is left alone: after a slash or a hash, or inside a word",
+      quiet("Open 036-agent-follows-rules/q28, approach.html#q28, notes/s3 and sq28 or aq1."));
+    check("[MKT.HOOKS.408] the check is about the reply: it is said while a row runs", payloadLib.REPLY_CHECKS.has("card-case"));
+    const root = build("card-case-hook");
+    bindOpen(root, "cc-1");
+    const bad = run("node", [HOOK], { cwd: root, session_id: "cc-1", last_assistant_message: "Q28 is open, and q29 too." }, root);
+    const good = run("node", [HOOK], { cwd: root, session_id: "cc-2", last_assistant_message: "Q28 is open, and Q29 too." }, root);
+    check("[MKT.HOOKS.408] the hook sends the lowercase reply back and lets the capital one through", bad.includes("[card-case]") && bad.includes("`q29` is `Q29`") && !good.includes("[card-case]"), `${bad.slice(0, 300)} | ${good.slice(0, 200)}`);
   }
 
   // A RUN OUTSIDE THE WORKSPACE, WITH THE PROJECT DIRECTORY AT IT, READS THE WORKSPACE (s43).

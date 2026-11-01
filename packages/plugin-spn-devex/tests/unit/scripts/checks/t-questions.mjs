@@ -20,9 +20,9 @@ const page = join(ws, "approach.html");
 const preview = join(ws, "notes", "N001", "preview.html");
 put(root, "card.json", JSON.stringify(CARD));
 const raised = cli(root, ["workstream", "question", "raise", "031/N001", "--file", "card.json"]);
-ok("a card is raised through its command", raised.code === 0 && /^q1 · open · approach.html Open — Q1/.test(raised.out), raised.out);
+ok("a card is raised through its command", raised.code === 0 && /^Q1 · open · approach.html Open — Q1/.test(raised.out), raised.out);
 const shown = cli(root, ["workstream", "question", "show", "031/q1", "--in", "notes/N001/preview.html"]);
-ok("and shown on its arc's preview", shown.code === 0 && /q1 · shown in 1 preview/.test(shown.out), shown.out);
+ok("and shown on its arc's preview", shown.code === 0 && /Q1 · shown in 1 preview/.test(shown.out), shown.out);
 const records = readQuestions(ws);
 
 console.log("\n=== a card is the markup, not the anchor");
@@ -39,12 +39,12 @@ console.log("\n=== hand-made — no card on a page that is not in the record (th
   const forged = cardHtml({ id: "q99", title: "a card typed by hand", card: records[0].card }, "");
   const after = before.replace("</section>\n<section id=\"s3\"", `${forged}\n</section>\n<section id="s3"`);
   const red = handMadeCards(before, after, records);
-  ok("red: a card with no record fails, in the hook's words", red.some((line) => line === "q99 has no record: raise it with `workstream question raise`"), red.join(" | "));
+  ok("[MKT.SCRIPTS.395] red: a card with no record fails, in the hook's words, naming it with a capital", red.some((line) => line === "Q99 has no record: raise it with `workstream question raise`"), red.join(" | "));
   const copied = before.replace("</section>\n<section id=\"s3\"", `${cardHtml(records[0], "")}\n</section>\n<section id="s3"`);
-  ok("red: a recorded card copied outside the block fails", handMadeCards(before, copied, records).some((line) => /q1's card stands outside the open block/.test(line)));
+  ok("red: a recorded card copied outside the block fails", handMadeCards(before, copied, records).some((line) => /Q1's card stands outside the open block/.test(line)));
   ok("green: a write that adds no card passes", handMadeCards(before, before.replace("<p>the probe</p>", "<p>the probe, said better</p>"), records).length === 0);
   const verdict = checkQuestions({ tool_name: "Write", cwd: root, tool_input: { file_path: page, content: after } });
-  ok("red: the hook's check refuses that write", verdict?.deny?.includes("q99 has no record"), JSON.stringify(verdict));
+  ok("red: the hook's check refuses that write", verdict?.deny?.includes("Q99 has no record"), JSON.stringify(verdict));
   const edit = checkQuestions({ tool_name: "Edit", cwd: root, tool_input: { file_path: page, old_string: "<h4 id=\"c1\">The probe</h4>", new_string: "<h4 id=\"c1\">The probe, renamed</h4>" } });
   ok("green: an edit elsewhere on the page passes", edit === null, JSON.stringify(edit));
 }
@@ -55,7 +55,7 @@ console.log("\n=== on-page — no open record without its card on the approach p
   ok("green: the raised card stands on the approach page", openWithoutCard(ws, records).length === 0);
   writeFileSync(page, good.replace(/<div class="sds-open">[\s\S]*?<div class="sds-recommended">[\s\S]*?<\/div>\n\s*<\/div>\n/, ""));
   const red = openWithoutCard(ws, records);
-  ok("red: an open record whose card was taken off fails", red.includes("q1 is open and its card is not on approach.html"), red.join(" | "));
+  ok("red: an open record whose card was taken off fails", red.includes("Q1 is open and its card is not on approach.html"), red.join(" | "));
   writeFileSync(page, good);
   ok("green: the card back, it passes", openWithoutCard(ws, records).length === 0);
 }
@@ -66,15 +66,15 @@ console.log("\n=== same — each page's card equal to its record's (state check)
   const good = readFileSync(preview, "utf8");
   writeFileSync(preview, good.replace("It costs less.", "It costs less, and reads better."));
   const red = cardsDiffer(ws, records);
-  ok("red: a preview's card drifting from its record fails", red.includes("notes/N001/preview.html's q1 differs from its record"), red.join(" | "));
+  ok("red: a preview's card drifting from its record fails", red.includes("notes/N001/preview.html's Q1 differs from its record"), red.join(" | "));
   writeFileSync(preview, good);
   ok("green: the card rendered again, it passes", cardsDiffer(ws, records).length === 0);
   const answered = cli(root, ["workstream", "question", "answer", "031/q1", "--key", "A", "--words", "Q1 - A"]);
-  ok("an answer takes the card off both pages", answered.code === 0 && /q1 · answered A · off 2 pages · owed: N001's What, its Log line/.test(answered.out), answered.out);
+  ok("an answer takes the card off both pages", answered.code === 0 && /Q1 · answered A · off 2 pages · owed: N001's What, its Log line/.test(answered.out), answered.out);
   const after = readQuestions(ws);
   ok("green: nothing differs once the card is off every page", cardsDiffer(ws, after).length === 0 && openWithoutCard(ws, after).length === 0, cardsDiffer(ws, after).join(" | "));
   writeFileSync(page, readFileSync(page, "utf8").replace("<!-- /spn:generated -->\n</section>\n</div>", `${cardHtml(after[0], "  ")}\n  <!-- /spn:generated -->\n</section>\n</div>`));
-  ok("red: an answered card left in Open fails", cardsDiffer(ws, after).includes("q1 is answered and its card still stands on approach.html"), cardsDiffer(ws, after).join(" | "));
+  ok("red: an answered card left in Open fails", cardsDiffer(ws, after).includes("Q1 is answered and its card still stands on approach.html"), cardsDiffer(ws, after).join(" | "));
 }
 
 console.log("\n=== shownIn is read for open cards only (state check)");
@@ -127,14 +127,14 @@ console.log("\n=== a card that asks how the work runs is refused at raise, unles
     refused.code !== 0 && refused.out.includes("it asks how the work runs") && readQuestions(plain.ws).length === 0, refused.out);
   put(plain.root, "card.json", JSON.stringify(CARD));
   const goalAgain = cli(plain.root, ["workstream", "question", "raise", "031/N001", "--file", "card.json"], { SPN_DEVEX_AGENT_WORKSPACE: plain.root });
-  ok("[MKT.HOOKS.311] a card about a goal is raised in the same workstream", goalAgain.code === 0 && /^q1 · open/.test(goalAgain.out), goalAgain.out);
+  ok("[MKT.HOOKS.311] a card about a goal is raised in the same workstream", goalAgain.code === 0 && /^Q1 · open/.test(goalAgain.out), goalAgain.out);
 
   // A design card in a builder workstream with an arc in spn-claude-marketplace.
   const row = (id, repo) => ({ id, parent: "N001", title: `row ${id}`, kind: "change", repo, work: "CODE", blockedBy: [], touches: [`marketplace:${id}`], state: "waiting" });
   const builder = await dataWorkspace("questions-builder", { rows: [row("1", "spn-claude-marketplace")] });
   put(builder.root, "runs.json", JSON.stringify(RUNS));
   const design = cli(builder.root, ["workstream", "question", "raise", "031/N001", "--file", "runs.json"], { SPN_DEVEX_AGENT_WORKSPACE: builder.root });
-  ok("[MKT.HOOKS.312] a design card is raised in a builder workstream with an arc in spn-claude-marketplace", design.code === 0 && /^q1 · open/.test(design.out), design.out);
+  ok("[MKT.HOOKS.312] a design card is raised in a builder workstream with an arc in spn-claude-marketplace", design.code === 0 && /^Q1 · open/.test(design.out), design.out);
   const outside = await dataWorkspace("questions-outside", { rows: [row("1", "spn-claude-marketplace")] });
   put(outside.root, "runs.json", JSON.stringify(RUNS));
   const away = cli(outside.root, ["workstream", "question", "raise", "031/N001", "--file", "runs.json"], { SPN_DEVEX_AGENT_WORKSPACE: "" });

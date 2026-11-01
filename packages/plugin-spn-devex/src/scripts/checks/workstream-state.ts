@@ -18,7 +18,7 @@ import {
   strayLevels, strayNotes, suggestionsFileOf, readJson, workstreamsOf, previewWithStatus, builtOf,
   localLinks, previewHrefOf, previewOwners, slotsIn, whatEntryOf, whatId, whatRange, workstreamName,
 } from "../lib/workstream.ts";
-import { WORK, DONE_STATES, arcFaults, factFaults, sheetFaults, logFaults, questionFaults, subjectFault, suggestionFaults, type ArcData, type Fact } from "../lib/workstream-schema.ts";
+import { WORK, DONE_STATES, arcFaults, factFaults, sheetFaults, logFaults, questionFaults, cardName, subjectFault, suggestionFaults, type ArcData, type Fact } from "../lib/workstream-schema.ts";
 
 export type Finding = { workstream: string; arc: string | null; check: string; message: string };
 
@@ -422,7 +422,7 @@ export function checkWorkstream(ws: string): Finding[] {
   const records = readQuestions(ws);
   const seen = new Set<string>();
   for (const record of records) {
-    if (seen.has(record.id)) out.push(say(record.arc ?? null, "questions")(`${record.id} is recorded twice`));
+    if (seen.has(record.id)) out.push(say(record.arc ?? null, "questions")(`${cardName(record.id)} is recorded twice`));
     seen.add(record.id);
   }
   out.push(...openWithoutCard(ws, records).map(say(null, "questions")));

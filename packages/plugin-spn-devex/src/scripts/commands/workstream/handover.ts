@@ -13,6 +13,7 @@ import { VALUE, UsageFault, readWords } from "../../../../../plugin-support-lib/
 import {
   arcIdsOf, arcStatus, builtOf, factsFileOf, firstOpenArc, logEvent, notesDirOf, openQuestions, readArc, readJsonl, readQuestions, whatId,
 } from "../../lib/workstream.ts";
+import { cardName } from "../../lib/workstream-schema.ts";
 import { workstreamNamed } from "./_shared.ts";
 
 export const describe = "the handover block, written from the rows, the cards, the live orders and the pins into the arc's log, and printed";
@@ -36,7 +37,7 @@ export function handoverBlock(ws: string, said: { continue?: string; doNotTouch?
   const lead = firstOpenArc(ws) ?? arcs[0]?.arc;
   if (!lead) throw new UsageFault(`finds no arc in ${basename(ws)} to write a handover in.`);
   const questions = readQuestions(ws);
-  const open = openQuestions(questions).map((one) => one.id);
+  const open = openQuestions(questions).map((one) => cardName(one.id));
   const pins = new Set<string>();
   for (const arc of arcs) for (const fact of readJsonl(factsFileOf(ws, arc.arc)) as Array<{ source?: string; commit?: string }>)
     if (fact.commit && fact.source) pins.add(`${fact.source.split("/")[0].split(":")[0]} ${fact.commit}`);

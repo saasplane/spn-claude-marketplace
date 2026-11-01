@@ -107,7 +107,7 @@ export function eventWorkspace(cwd: string | null | undefined): string | null {
  * while a row runs, and `debug hooks show` judges them by the next Stop's span.
  */
 export const REPLY_CHECKS: ReadonlySet<string> =
-  new Set(["needs-you", "reply-shape", "cards", "handover", "how-it-runs", "partner-words", "page-path", "close-message", "welcome", "window"]);
+  new Set(["needs-you", "reply-shape", "cards", "handover", "how-it-runs", "partner-words", "page-path", "close-message", "card-case", "welcome", "window"]);
 
 /** Visible entries of a folder, sorted, or nothing. */
 export function listdir(path: string): string[] {

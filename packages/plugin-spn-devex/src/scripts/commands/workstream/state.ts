@@ -42,8 +42,8 @@ function reworkOf(ws: string, data: ArcData): { missed: number; fromAnswers: num
   const late = new Set(readQuestions(ws).filter((one) => one.state === "answered" && one.answer && Date.parse(one.answer.at) > Date.parse(go.at)).map((one) => one.id));
   let missed = 0, fromAnswers = 0;
   for (const row of data.rows.filter((one) => after.has(one.id))) {
-    const cited = (row.decisions ?? []).join(" ").match(/\bq\d+\b/g) ?? [];
-    if (cited.some((id) => late.has(id))) fromAnswers += 1; else missed += 1;
+    const cited = (row.decisions ?? []).join(" ").match(/\bq\d+\b/gi) ?? [];
+    if (cited.some((id) => late.has(id.toLowerCase()))) fromAnswers += 1; else missed += 1;
   }
   return { missed, fromAnswers };
 }

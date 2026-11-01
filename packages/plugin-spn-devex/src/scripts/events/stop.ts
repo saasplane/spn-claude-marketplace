@@ -3,6 +3,7 @@
 //           docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § The approach document
 //           docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md § The reply while work runs shows what needs you, then what moved
 //           docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § A card is only for what the rules leave open
+//           RULE.DEVEX.WORKSPACE.486, a question is named Q<n> and a suggestion S<n>, with a capital letter, wherever a person reads it
 //           RULE.DEVEX.WORKSPACE.206, a close is a milestone, and the agent writes its message before it asks, or right after it closes on a standing grant
 // The chapters are the source of truth. A rule change is edited there first, then here, in the same change.
 //
@@ -26,6 +27,8 @@
 //   how-it-runs, partner-words, page-path  the reply's last asks about running the work, the words a partner cannot open, and its page addresses, after the handover
 //   close-message  a turn whose tool results hold a close's success text ends on the closing message: a 🚀 or ✈️ heading, what was
 //              delivered, what was learned, Thank you 👍 and that the window can be retired (RULE.DEVEX.WORKSPACE.206)
+//   card-case  a reply that names a card as a lowercase q<n> or s<n> in its prose (outside code, links, URLs and paths) is sent back
+//              with each one and its capital form (RULE.DEVEX.WORKSPACE.486)
 //   go-next    a go of the window with a part ready and not started, or a report waiting to be folded,
 //              and no card open, is told its next step
 //   page-stale an arc this window wrote left its workstream's page, or its preview's status, behind the arcs
@@ -49,7 +52,7 @@
 // unfinished, and that window hears about it. A window bound to none hears nothing about them.
 //
 // WHILE A ROW IS IN PROGRESS, ONLY A FINDING ABOUT THE REPLY SENDS THE AGENT BACK (RULE.DEVEX.WORKSPACE.244):
-// `needs-you`, `reply-shape`, `cards`, `handover`, `how-it-runs`, `partner-words`, `page-path`, `close-message` and `welcome`. Every other finding is held, and the checks find
+// `needs-you`, `reply-shape`, `cards`, `handover`, `how-it-runs`, `partner-words`, `page-path`, `close-message`, `card-case` and `welcome`. Every other finding is held, and the checks find
 // it again at the first turn end where no row is in progress (`splitFindings`).
 //
 // `corpus` is the newest and the odd one out: every other check here reads what the TURN wrote, and
@@ -1646,6 +1649,33 @@ export function toolResultsOf(transcript: string): string[] {
   return results;
 }
 
+// ---------------------------------------------------------------------------- the card's capital letter
+
+/**
+ * The cards a reply's prose names with a lowercase letter, once each, as written (`q28`, `s3`). Read outside fenced blocks, code spans,
+ * links, URLs and paths: a name after a `/` or a `#`, or inside a word, is an address and is left alone.
+ */
+export function lowercaseCards(reply: string): string[] {
+  const prose = withoutFences(reply)
+    .replace(/`[^`\n]*`/g, " ")
+    .replace(/\[[^\]]*\]\([^)]*\)/g, " ")
+    .replace(/https?:\/\/\S+/g, " ")
+    .replace(/<[^>\n]*>/g, " ");
+  return [...new Set([...prose.matchAll(/(?<![\w/#.\-@])([qs])(\d+)\b/g)].map((found) => `${found[1]}${found[2]}`))];
+}
+
+/**
+ * THE CARD-CASE CHECK (RULE.DEVEX.WORKSPACE.486): a question is named Q<n> and a suggestion S<n>, with a capital letter, wherever a person
+ * reads it. A reply that names one with a lowercase letter is sent back, naming each and its capital form.
+ */
+export function checkCardCase(reply: string): Warning[] {
+  const found = lowercaseCards(reply);
+  if (!found.length) return [];
+  return [{ check: "card-case", message:
+    `This reply names ${found.length === 1 ? "a card" : "cards"} with a lowercase letter: ${found.map((one) => `\`${one}\` is \`${one[0].toUpperCase()}${one.slice(1)}\``).join(", ")}. ` +
+    "A question is named Q<n> and a suggestion S<n>, with a capital letter, wherever a person reads it (RULE.DEVEX.WORKSPACE.486). Say it again with the capital." }];
+}
+
 // ---------------------------------------------------------------------------- the closing message
 
 /** The success text of `workstream close`, which a turn's tool results hold when the close landed. */
@@ -1932,6 +1962,7 @@ if (argv1Base === "stop.ts" || argv1Base === "stop.mjs") {
     ...span({ group: "stop", action: "cards" }, () => checkCardsNamed(reply, root, mine, turn.prompt)),
     ...span({ group: "stop", action: "runnable" }, () => checkRunnable(root, baseline?.at ?? 0, baseline?.steps ?? {}, wrote, mine, reply)),
     ...span({ group: "stop", action: "close-message" }, () => checkCloseMessage(reply, event.transcript_path ? toolResultsOf(event.transcript_path) : [])),
+    ...span({ group: "stop", action: "card-case" }, () => checkCardCase(reply)),
     ...span({ group: "stop", action: "go-next" }, () => checkGoNext(root, mine, waiting)),
     ...span({ group: "stop", action: "handover" }, () => checkHandover(reply, root, mine, given, turn.earlier)),
     ...span({ group: "stop", action: "how-it-runs" }, () => checkHowItRuns(withoutFences(reply), root)),

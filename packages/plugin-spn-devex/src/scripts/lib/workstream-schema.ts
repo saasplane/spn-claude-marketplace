@@ -62,8 +62,13 @@ export const ENTRY_ID = /^E\d+$/;
 export const ENTRY_OPS = ["create", "edit", "drop", "rename"] as const;
 /** The tiers an entry's tests are named at. */
 export const TIERS = ["unit", "component", "contract", "integration", "journey"] as const;
+/** A STORED id stays lowercase (`s3`, `q28`); a person reads and types the capital (RULE.DEVEX.WORKSPACE.486). */
 export const SUGGESTION_ID = /^s\d+$/;
 export const QUESTION_ID = /^q\d+$/;
+/** A card's stored id as a person reads it: `q28` is Q28 and `s3` is S3. Anything else is left as it is. */
+export const cardName = (id: string): string => id.replace(/^([qs])(\d+)$/, (_, kind: string, number: string) => `${kind.toUpperCase()}${number}`);
+/** A card's id as typed, in either case, as it is stored: `Q28` and `q28` both read `q28`; a leading `<workstream>/` is kept. */
+export const cardId = (typed: string): string => typed.replace(/(^|\/)([QSqs])(\d+)$/, (_, lead: string, kind: string, number: string) => `${lead}${kind.toLowerCase()}${number}`);
 /** What a row may wait on: a row of its arc, a card, or an arc or a row of another arc (`N011`, `N011/3`). */
 export const BLOCKER = /^(?:\d+[a-z]?(?:\.\d+[a-z]?)*|q\d+|N\d+[a-z]?(?:\/\d+[a-z]?(?:\.\d+[a-z]?)*)?)$/i;
 

@@ -32,7 +32,7 @@ console.log("=== handover — the block is written from the data, with every lab
   ok("[MKT.HOOKS.326] state is read from the rows", /state: [^.]*N001 [A-Z]+ 0\/\d+/.test(text), text);
   ok("[MKT.HOOKS.326] the pins are the facts' repository and commit", /pins: [^.]*spn-x abc12345/.test(text), text);
   ok("[MKT.HOOKS.326] live now names the order that has no report, and not the one that has", /live now: [^.]*\b3\b/.test(text) && !/live now: [^.]*\b2\b/.test(text), text);
-  ok("[MKT.HOOKS.326] open names the open card", /open: [^.]*q\d+/.test(text), text);
+  ok("[MKT.HOOKS.326] open names the open card", /open: [^.]*Q\d+/.test(text), text);
   const last = lines(join(ws, "arcs", "N001", "log.jsonl")).at(-1);
   ok("[MKT.HOOKS.326] the same block is the last line of the arc's log", last?.kind === "note" && /^HANDOVER, /.test(last.note ?? "") && (last.note ?? "").includes("pins:"), JSON.stringify(last));
   const bare = cli(root, ["workstream", "handover", "031"]);

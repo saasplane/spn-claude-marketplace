@@ -154,7 +154,7 @@ console.log("\n=== check");
 
   for (const one of ["E1", "E2"]) sheet("edit", "N001", one, "--decided-by", "s2");
   const raised = cli(root, ["workstream", "question", "raise", "N001", "--file", put("card.json", CARD)]);
-  const id = /q\d+/.exec(raised.out)?.[0];
+  const id = /[Qq]\d+/.exec(raised.out)?.[0];
   const answered = id ? cli(root, ["workstream", "question", "answer", id, "--key", "A", "--words", "A it is"]) : raised;
   const fourth = sheet("check", "N001");
   ok("an answered card no entry cites is found", id && fourth.out.includes(`${id} is answered and no entry cites it`) || false, `${raised.out} ${answered.out} ${fourth.out}`);
