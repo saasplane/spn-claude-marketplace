@@ -923,5 +923,29 @@ console.log("\n=== doc-check — the book cites no workstream of this workspace"
   say("[MKT.HOOKS.401] green: a page outside the book is not read", docCheck.check(outside, "# A note\n\nSee 061-citation-probe.\n").every(([, message]) => !message.includes("the book cites")));
 }
 
+// ── a long What owes a figure, or the reason it has none (MKT.HOOKS.441) ──
+console.log("\n=== doc-check — a long What on an open approach page holds a figure or says why not");
+{
+  const docCheck = await import("../../../../src/scripts/checks/doc-check.ts");
+  const say = (label, ok, detail = "") => { n += 1; if (!ok) failed += 1; console.log(`  ${ok ? "PASS" : "FAIL"}  ${label}${ok || !detail ? "" : `\n        ${String(detail).slice(0, 300)}`}`); };
+  const open = join(workstreamsDir(WORKSPACE, "open"), "062-figure-probe", "approach.html");
+  const backlog = join(workstreamsDir(WORKSPACE, "backlog"), "063-figure-probe", "approach.html");
+  const closed = join(workstreamsDir(WORKSPACE, "closed"), "064-figure-probe", "approach.html");
+  const prose = "<p>The check reads one file and says what it found.</p>\n".repeat(140);
+  const page = (what) => `${linesFor("1.0.0").stylesheet}\n<h2>Why</h2><p>The page.</p>\n<h2>What</h2>\n${what}\n<h2>How</h2><p>In steps.</p>\n`;
+  const figures = (path, text) => docCheck.figureRule(path, text);
+  const named = figures(open, page(prose));
+  say("[MKT.HOOKS.441] red: a What past 6,000 characters with no figure is named, with the rule and the page",
+    named.length === 1 && named[0][0] === "RULE" && named[0][1].includes("RULE.DEVEX.WORKSPACE.497") && named[0][1].startsWith("approach.html") && named[0][1].includes("no figure:"), JSON.stringify(named));
+  say("[MKT.HOOKS.441] red: a backlog page is read the same way", figures(backlog, page(prose)).length === 1);
+  say("[MKT.HOOKS.441] red: the whole check carries the finding", docCheck.check(open, page(prose)).some(([, m]) => m.includes("RULE.DEVEX.WORKSPACE.497")));
+  say("[MKT.HOOKS.441] green: a long What with a figure passes", figures(open, page(`<figure><svg viewBox="0 0 10 10"></svg></figure>${prose}`)).length === 0);
+  say("[MKT.HOOKS.441] green: a long What with an svg passes", figures(open, page(`${prose}<svg viewBox="0 0 10 10"></svg>`)).length === 0);
+  say("[MKT.HOOKS.441] green: a long What with the reason line passes", figures(open, page(`<!-- no figure: the argument is a single chain -->${prose}`)).length === 0);
+  say("[MKT.HOOKS.441] green: the reason line is kept as a comment the page may carry", !docCheck.check(open, page(`<!-- no figure: the argument is a single chain -->${prose}`)).some(([, m]) => m.includes("template") && m.includes("no figure")));
+  say("[MKT.HOOKS.441] green: a short What passes", figures(open, page("<p>One short line.</p>")).length === 0);
+  say("[MKT.HOOKS.441] green: a closed page is never read", figures(closed, page(prose)).length === 0);
+}
+
 console.log(failed ? `\n  ${failed} FAILED` : `\n  all ${n} passed`);
 process.exit(failed ? 1 : 0);

@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "book": {
     "repository": "spn-foundation",
-    "commit": "4f19a216"
+    "commit": "95a35f33"
   },
   "rules": [
     {
@@ -3234,6 +3234,40 @@
           "plugin": "spn-devex",
           "path": "refs/devex/function/ideate.md",
           "heading": "How a first proposal is shaped"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "The rules this step holds"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "How a first proposal is shaped"
+        }
+      ]
+    },
+    {
+      "id": "RULE.DEVEX.FUNCTION.098",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-devex/ideate"
+      },
+      "class": "stated in a skill",
+      "sentence": "A partner's or developer's idea is unfolded in one order, the one their own words lead",
+      "chapter": "04-capabilities/01-devex/01-function/03-ideate.md",
+      "heading": "How an idea is unfolded on day zero",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/function/ideate.md",
+          "heading": "An idea is unfolded on day zero in one order"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/bootstrap/SKILL.md",
+          "heading": "The acts, and their order is forced rather than chosen"
         },
         {
           "plugin": "spn-devex",
@@ -12276,6 +12310,35 @@
       "heading": "A suggestion is recorded the moment it is raised",
       "decision": null,
       "restated": []
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.497",
+      "level": "MUST",
+      "params": {
+        "check": "doc-check"
+      },
+      "class": "checked",
+      "sentence": "A section opens with its own overview, then a figure where seeing is faster, then its content as blocks",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "heading": "The shape of a section, on every page kind",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/function/ideate.md",
+          "heading": "An idea is unfolded on day zero in one order"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/execute/SKILL.md",
+          "heading": "The rules this step holds"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "How a first proposal is shaped"
+        }
+      ]
     },
     {
       "id": "RULE.LAUNCHPAD.CONTROL_PLANE.001",
