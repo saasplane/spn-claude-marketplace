@@ -19,8 +19,9 @@ import { basename, dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { type Action, FLAG, VALUE, UsageFault, readWords } from "../../../../../plugin-support-lib/src/lib/command.ts";
 import { workspaceRoot } from "../../../../../plugin-support-lib/src/lib/timing.ts";
-import { logEvent, readArc, readJson, readJsonl, readQuestions, readSheet, factsFileOf, sheetFileOf, stateFileOf, suggestionsOf, writeArc, writeWhole } from "../../lib/workstream.ts";
+import { logEvent, readArc, readJson, workspaceOf, readJsonl, readQuestions, readSheet, factsFileOf, sheetFileOf, stateFileOf, suggestionsOf, writeArc, writeWhole } from "../../lib/workstream.ts";
 import { ENTRY_OPS, cardName, entryWork, parentIds, renameDataToWork, sheetFaults, type ArcData, type ArcRow, type Fact, type Sheet, type SheetEntry } from "../../lib/workstream-schema.ts";
+import { missingCopies } from "../../lib/generated-copies.ts";
 import { arcNamed, listOf, typed } from "./_shared.ts";
 
 export const describe = "the arc's change sheet: write it whole, edit or drop one entry, show it, check it against the rows and the cards";
@@ -70,6 +71,9 @@ function writeFaults(ws: string, arc: string, sheet: Sheet, whole: boolean): str
   for (const entry of Array.isArray(sheet.entries) ? sheet.entries : [])
     for (const id of Array.isArray(entry?.facts) ? entry.facts : [])
       if (typeof id === "string" && !held.has(id)) out.push(`${entry.id} cites ${id}, which ${arc}'s facts do not hold`);
+  // A CHANGED BOOK FILE MOVES ITS GENERATED COPIES: each the sheet does not name is a fault where the whole sheet is written (s59).
+  const root = workspaceOf(ws);
+  if (whole && root && Array.isArray(sheet.entries)) out.push(...missingCopies(root, sheet.entries.filter((entry) => typeof entry?.file === "string" && entry.file.includes(":"))));
   return out;
 }
 
@@ -322,6 +326,8 @@ export function sheetFindings(ws: string, arc: string): string[] {
   // A SUGGESTION DECIDED AGAINST THIS ARC IS CITED BY AN ENTRY (RULE.DEVEX.WORKSPACE.488): `decidedBy` carries it as S<n>, or the go leaves it out.
   for (const one of suggestionsOf(ws).filter((suggestion) => suggestion.arc === arc && suggestion.state === "decided"))
     if (!cites(entries, one.id)) out.push(`${cardName(one.id)} is decided against ${arc} and no entry cites it in \`decidedBy\` (as \`${cardName(one.id)}\`)`);
+  const root = workspaceOf(ws);
+  if (root) out.push(...missingCopies(root, entries.filter((entry) => typeof entry?.file === "string" && entry.file.includes(":"))));
   if (sheet.stack === null && leaves.some((row) => row.work === "CODE" || row.work === "PROOF"))
     out.push(`the sheet's stack is null, and ${arc} has a CODE or PROOF row`);
   return out;
