@@ -10,7 +10,8 @@
      a preview with no card shown drops its Open. A section and a subsection are repeated as often as the preview needs, and a subsection keeps only
      the block that fits: the subsections below are a choice of blocks, and an author deletes those the
      preview does not need. A preview never frames a sample file: it shows a thing with these blocks, and
-     links a real file in the samples folder. -->
+     links a real file in the samples folder. The masthead's Progress fact (a short bar and `N of M landed`) is written
+     by the arc's commands, never by hand, and is left out while the arc has no sheet. -->
 <meta charset="utf-8">
 <title>{{NNN}} · N{{nnn}} - {{THE ARC'S SUBJECT, IN TITLE CASE}}</title>
 <!-- spn:doc
@@ -18,7 +19,7 @@
 -->
 
 
-<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.9.0/sds-docs.css" integrity="sha384-k12hGVnFbxTR1J0pYYYnUHv4ZFRUCeBkzCoiy5KtV1JouafmYxg6paLrolc6xv8D" crossorigin="anonymous">
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.11.0/sds-docs.css" integrity="sha384-QbzPmQ63VQSEjVwJoszTgGGYZwwPTzxtbNrXRJR/DlEuZmU84LkiSnyZ9sYW/L44" crossorigin="anonymous">
 <div class="sds-page">
 
 <nav class="sds-rail" id="rail">
@@ -28,7 +29,7 @@
 <div class="sds-wrap">
 
 <header class="sds-masthead">
-  <div class="sds-eyebrow"><span class="sds-line1">{{WORKSPACE}} &nbsp;|&nbsp; Workstream {{NNN}} &nbsp;|&nbsp; {{THE PREVIEW NAME}}</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Preview</span><span class="sds-separator">|</span><span class="sds-label">Arc:</span> <a class="sds-badge" href="../../approach.html#N{{nnn}}">N{{nnn}}</a><span class="sds-separator">|</span><span class="sds-label">Shown:</span> <span class="sds-badge">{{date}}</span><span class="sds-state"><span class="sds-label">Status:</span> <a class="sds-badge sds-status sds-{{arc status}}" href="../../approach.html#N{{nnn}}">{{THE ARC'S STATUS}}</a></span></span></div>
+  <div class="sds-eyebrow"><span class="sds-line1">{{WORKSPACE}} &nbsp;|&nbsp; Workstream {{NNN}} &nbsp;|&nbsp; {{THE PREVIEW NAME}}</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Preview</span><span class="sds-separator">|</span><span class="sds-label">Arc:</span> <a class="sds-badge" href="../../approach.html#N{{nnn}}">N{{nnn}}</a><span class="sds-separator">|</span><span class="sds-label">Progress:</span> <span class="sds-progress sds-step-{{step}}"><span class="sds-chip-bar"><i style="width:{{pct}}%"></i></span> {{done}} of {{total}} landed</span><span class="sds-separator">|</span><span class="sds-label">Shown:</span> <span class="sds-badge">{{date}}</span><span class="sds-state"><span class="sds-label">Status:</span> <a class="sds-badge sds-status sds-{{arc status}}" href="../../approach.html#N{{nnn}}">{{THE ARC'S STATUS}}</a></span></span></div>
   <h1>{{THE PREVIEW NAME}}</h1>
   <p class="sds-subtitle">{{THE SUBTITLE: what you are asked to decide from this page, one plain sentence.}}</p>
   <p class="sds-standfirst">{{THE DESCRIPTION, one paragraph: what this page shows, why you would look at it, and how the page runs.}}</p>
@@ -280,4 +281,4 @@
   The approach preview template &middot; copy it and fill the slots &middot; an arc's one preview is <code>notes/N&lt;nnn&gt;/preview.html</code>, and the approach page links it &middot; a real sample sits in <code>notes/N&lt;nnn&gt;/samples/</code> under its own name &middot; every block and figure is shown once in <code>blocks-template.html</code>
 </footer>
 
-<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.9.0/sds-docs.js" integrity="sha384-MUUUVipJdxCmJyrxeNHKq8xMzGTvQ+TAsWDvN5w6TKPfuOUPtHk1E90wKCBZNRC7" crossorigin="anonymous"></script>
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.11.0/sds-docs.js" integrity="sha384-wCFcUN8WHuihR4yVBolwrWWQDsbdzAocPJ2ql89kWPohRUNkJI33uWvUy/t/RDQu" crossorigin="anonymous"></script>

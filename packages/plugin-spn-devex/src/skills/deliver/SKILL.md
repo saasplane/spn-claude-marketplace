@@ -30,6 +30,7 @@ description: How a change reaches a running setup - what must be true before a r
 - **RULE.DEVEX.AGENT.109** (`RULE.DEVEX.AGENT.109` · MUST · skill:spn-devex/deliver)
 - **A version names what is published, never what you are working on** (`RULE.DEVEX.AGENT.129` · MUST · skill:spn-devex/deliver)
 - **The tool is released before the plugins are synced** (`RULE.DEVEX.AGENT.135` · MUST · skill:spn-devex/deliver)
+- **A plugins release that changes the ideate skill, the panel or the card grammar runs the fixed proposal cases first, and does not ship on a failed one** (`RULE.DEVEX.AGENT.169` · MUST · skill:spn-devex/deliver)
 - **Nothing lands in a person's own agent settings** (`RULE.DEVEX.FUNCTION.073` · MUST · skill:spn-devex/deliver)
 - **RULE.DEVEX.UTILS.019** (`RULE.DEVEX.UTILS.019` · MUST · skill:spn-devex/deliver)
 - **spnutils and the plugin ship on their own trains, so Support 5.50.0 goes out first and plugins 0.89.0 after it** (`RULE.DEVEX.WORKSPACE.343` · MUST · skill:spn-devex/deliver)
