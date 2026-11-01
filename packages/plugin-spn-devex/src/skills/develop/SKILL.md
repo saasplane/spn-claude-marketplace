@@ -7,16 +7,16 @@ description: The contract-first build loop - the order work is done in, what eac
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
-      "seen": "c110978c"
+      "seen": "d6a6cbd5"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/04-develop.md",
-      "seen": "1f777cff"
+      "seen": "dc4a1be7"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/04-develop.md",
       "section": "Model",
-      "seen": "41d6c366"
+      "seen": "1b4998d8"
     }
   ]
 }
@@ -127,7 +127,7 @@ description: The contract-first build loop - the order work is done in, what eac
 
 **The loop runs in four stages — documents, source, tests, run — and each part of a change runs all four before the next part starts.** Source is the contract, the regeneration, the implementation and the entry, in that order.
 
-1. **Documents** — update the seat the change touches so it says what will be true, before any code. Documents lead code (`RULE.DEVEX.WORKSPACE.081` · MUST · check:stop), so the code is written against a page rather than a page written to match the code.
+1. **Documents** — update the seat the change touches so it says what will be true, before any code. Documents lead code (`RULE.DEVEX.WORKSPACE.081` · MUST · skill:spn-devex/develop), so the code is written against a page rather than a page written to match the code.
 2. **Contract** — the states, then the service interface. One method: one command in, one state out. Write the **intent** as you create each published declaration; it is harvested into what agents read, and an intent added later is an intent nobody wrote.
 3. **Regenerate** — the validators derive from the contract states. They are never hand-written and never hand-edited.
 4. **Implementation** — the service behind the contract, plus its storage access. Policy, authorization, and transactional integrity live at this boundary and nowhere else.

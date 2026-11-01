@@ -29,6 +29,16 @@ import { BOOK_PATTERNS, BOOK_SITE_PATTERNS, BOOK_TEMPLATES, PLUGIN_PATTERNS, PLU
 
 const HERE = dirname(new URL(import.meta.url).pathname);
 const PLUGIN = resolve(HERE, "..", "..", "..");
+
+/** A rule's parenthesis as the book states it, read from `refs/rules.json` (which the build writes from the book), so the index never names a holder of its own. */
+function ruleParens(id: string): string {
+  try {
+    const rules = (JSON.parse(readFileSync(join(PLUGIN, "refs", "rules.json"), "utf8")) as { rules?: { id: string; level?: string; params?: Record<string, string> }[] }).rules ?? [];
+    const rule = rules.find((one) => one.id === id);
+    if (rule?.level) return [`\`${id}\``, rule.level, ...Object.entries(rule.params ?? {}).map(([kind, value]) => `${kind}:${value}`)].join(" · ");
+  } catch { /* no rules index beside the plugin: the bare id stands */ }
+  return `\`${id}\``;
+}
 // THE COPY SITS BESIDE THE REF THAT NAMES IT. `doc-sets.md` carries the `files` citation for this
 // folder, so a drift check reads one directory rather than two — the citation and the thing cited
 // are siblings (RULE.DEVEX.AGENT.072).
@@ -162,7 +172,7 @@ const templatesCopyIndex = (from: string, rows: string[]): string[] => [
     "that has fallen behind, so a builder's edit reaches every partner with the next plugin release",
     "rather than being discovered by somebody's first session going wrong.",
     "",
-    "**The stamp above names the folder, not each file** (`RULE.DEVEX.AGENT.072` · MUST · check:corpus). One citation per template",
+    `**The stamp above names the folder, not each file** (${ruleParens("RULE.DEVEX.AGENT.072")}). One citation per template`,
     "would report every edit and miss every addition — a template nobody cited has nothing to compare",
     "against, and *the book grew a shape a partner does not have* is what this copy exists to prevent.",
     "A folder hash covers added, removed, renamed and edited at once.",

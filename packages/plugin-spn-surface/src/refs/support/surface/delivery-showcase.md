@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/12-delivery-showcase/",
-      "seen": "0e0db0a0"
+      "seen": "637b829f"
     }
   ]
 }
