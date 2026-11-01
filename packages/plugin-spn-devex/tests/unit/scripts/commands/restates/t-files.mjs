@@ -48,6 +48,17 @@ function exported(book, out, write) {
 
 const BOOK = { "pages/report-template.html": "<h1>report</h1>\n", "agent/hook-template.ts": "export const hook = 1;\n" };
 
+console.log("=== restates files — the templates index states its rule as the book does");
+{
+  const { book, out } = pair(BOOK, {});
+  exported(book, out, true);
+  const index = readFileSync(join(out, "README.md"), "utf8");
+  const rule072 = JSON.parse(readFileSync(join(PLUGIN, "src", "refs", "rules.json"), "utf8")).rules.find((one) => one.id === "RULE.DEVEX.AGENT.072");
+  const holder072 = Object.entries(rule072.params).map(([kind, value]) => `${kind}:${value}`).join(" · ");
+  ok("[MKT.SCRIPTS.176] the index states RULE.DEVEX.AGENT.072 with the book's parenthesis, read from rules.json, never a holder of its own",
+    index.includes(`(\`RULE.DEVEX.AGENT.072\` · ${rule072.level} · ${holder072})`), index.split("\n").find((line) => line.includes("AGENT.072")) ?? "no line");
+}
+
 console.log("=== restates files — the specs of the app patterns, a flat folder with a page of the book's own");
 {
   // The book's folder holds two specs and a README it writes by hand; the copy takes the specs, and its README is the index.

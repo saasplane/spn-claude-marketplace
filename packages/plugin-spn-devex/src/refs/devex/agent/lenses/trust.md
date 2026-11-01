@@ -8,11 +8,11 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/03-platform/01-core/04-data-and-trust/02-trust.md",
-      "seen": "1aaab825"
+      "seen": "0133bc17"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/03-platform/01-core/04-data-and-trust/03-control-map.md",
-      "seen": "90095f18"
+      "seen": "c405f569"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/08-agent-surface/README.md",
@@ -40,7 +40,7 @@
 ## Asks it owns
 
 - *Is this secure enough for an enterprise?* — each requirement met or missing, by number, and the evidence an auditor gets.
-- *Does this standard read supported yet?* — the control map's rows for that standard, each met with its evidence, or naming the work that meets it.
+- *Does this standard read supported yet?* — the control map's rows for that standard, each met with its evidence, or reading *planned*.
 
 ## Mastery
 
@@ -128,7 +128,7 @@ A fix that will miss its deadline names why and the new date, and a finding kept
   - **A verified browser exists only because somebody asked for one**, and a recovery code may never write one.
   - **A session is per app site, renewed the one way its host allows** (`RULE.SUPPORT.APPS.090` · MUST · skill:spn-apps/implement).
   - **The four build invariants hold**: reachable via contract, authorized and audited at the service layer, routes registered with schemas, forms bound to validators.
-- **The control map** — a change that adds, meets or breaks a control moves that control's row in the same change: its evidence, its Met mark, and the planned work it no longer needs.
+- **The control map** — a change that adds, meets or breaks a control moves that control's row in the same change: its evidence, its Met mark, and the word *planned* it no longer needs.
 
 ## Gates
 

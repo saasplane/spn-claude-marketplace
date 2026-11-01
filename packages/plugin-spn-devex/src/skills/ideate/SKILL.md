@@ -7,7 +7,7 @@ description: Decide what a node IS, and design a requirement inside that shape -
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
-      "seen": "c110978c"
+      "seen": "d6a6cbd5"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/03-ideate.md",
@@ -16,7 +16,7 @@ description: Decide what a node IS, and design a requirement inside that shape -
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "The masthead, and the opening",
-      "seen": "1a0d2100"
+      "seen": "a964af7f"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
@@ -79,7 +79,7 @@ description: Decide what a node IS, and design a requirement inside that shape -
 
 A boundary nobody decides still gets drawn: the first three features draw it, implicitly, and by the time anyone notices, moving it means moving everything built inside it. **That is how projects go wrong slowly** — in the twenty minutes nobody spent deciding what the thing is and, harder, what it deliberately is not.
 
-Your output is exactly one file: **`CONCEPT.md` at the repository root**, beside `sprepo.json`. A concept belongs to a repo root, never to a node (`RULE.DEVEX.WORKSPACE.080` · MUST · check:doc-check). Nodes carry `README.md` alone, so ideating a node lands as sections of its repo's concept. Never `docs/`, with one exception: on a partner platform the industry brief goes in the partner's own purpose part (`RULE.DEVEX.AGENT.099` · MUST · check:restates). Never code.
+Your output is exactly one file: **`CONCEPT.md` at the repository root**, beside `sprepo.json`. A concept belongs to a repo root, never to a node (`RULE.DEVEX.WORKSPACE.080` · MUST · check:doc-check). Nodes carry `README.md` alone, so ideating a node lands as sections of its repo's concept. Never `docs/`, with one exception: on a partner platform the industry brief goes in the partner's own purpose part (`RULE.DEVEX.AGENT.099` · MUST · skill:spn-devex/ideate). Never code.
 
 ## One skill, three modes — and `plan` is not a fourth
 
@@ -139,7 +139,7 @@ A page that the requirement holds → the `design` skill of the apps plugin, bef
 
 ### Before the gates — the industry brief, on a partner platform
 
-**On a partner platform, the lenses write the industry brief before the boundary is drawn** (`RULE.DEVEX.AGENT.099` · MUST · check:restates). The partner describes its business in its own words and never learns the constructs to do it; that bridge is yours.
+**On a partner platform, the lenses write the industry brief before the boundary is drawn** (`RULE.DEVEX.AGENT.099` · MUST · skill:spn-devex/ideate). The partner describes its business in its own words and never learns the constructs to do it; that bridge is yours.
 
 - **Each lens learns its share of the industry for its own discipline**, from named sources, and maps it onto the constructs: the domain model becomes modules, a rule becomes controls, a workflow becomes journeys. `refs/devex/agent/lenses.md` says which lens learns what, and where each lands.
 - **Write it once, in the partner's own purpose part**: the industry, its people and buyers, its workflows and words, its data and exchange standards, its rules and its usual systems. Each fact names its source and the date it was read.
@@ -210,9 +210,9 @@ Every unanswered question is a card with **real options and a recommendation**. 
 
 - **More views, or more passes, need the developer's word.** The limit keeps a small choice from costing a wait and a long reply.
 - **A view whose word is to count as a review that can block a gate is a fresh `spn-panel`, at any number of signs.** You wrote the proposal, so a lens file you read yourself gives advice and blocks nothing.
-- **Show each view in its own voice** (`RULE.DEVEX.AGENT.090` · MUST · check:restates): its name in bold, such as **Architect:** or **Partner:**, then what it said, as a colleague would say it out loud: short full sentences, everyday words, one idea in each, never a slogan. Such as *"**Architect:** If we hold a finding back, we have to show it later. Let's show it in full the next time the agent stops and waits. If we don't, it gets lost."* and *"**Lead:** This is the same problem as Needs you. Let's fix both in this arc. We don't need a new one."* A view with no objection says so in its own line. Never sum up what "the views" thought, and where two views disagree, leave them as two lines. The developer can then answer one view. The form is in [`refs/devex/agent/lenses.md`](../../refs/devex/agent/lenses.md) § *A view is shown in its own voice*.
+- **Show each view in its own voice** (`RULE.DEVEX.AGENT.090` · MUST · skill:spn-devex/ideate): its name in bold, such as **Architect:** or **Partner:**, then what it said, as a colleague would say it out loud: short full sentences, everyday words, one idea in each, never a slogan. Such as *"**Architect:** If we hold a finding back, we have to show it later. Let's show it in full the next time the agent stops and waits. If we don't, it gets lost."* and *"**Lead:** This is the same problem as Needs you. Let's fix both in this arc. We don't need a new one."* A view with no objection says so in its own line. Never sum up what "the views" thought, and where two views disagree, leave them as two lines. The developer can then answer one view. The form is in [`refs/devex/agent/lenses.md`](../../refs/devex/agent/lenses.md) § *A view is shown in its own voice*.
 - **Say in one line which views you brought, why those, and which way each was made.** Without it the developer cannot tell an independent objection from your own. On a card that line, and each view's own line under it, are its *Views* part.
-- **On a card or a suggestion, keep each view to one or two plain sentences** (`RULE.DEVEX.AGENT.090` · MUST · check:restates). The *Views* part comes after Why and What and before the options. So a view says only what Why and What do not already say, and it names no option by its letter. Name the views with nothing to add together in one line, such as *QA and Partner: no objection*. Shorten a view's words yourself, and keep its name and its meaning. Keep what a fresh view wrote in full in the arc's notes, `notes/N<nnn>/views/`. In an ordinary reply that is not a card, a view may say what it objects to at the length the point needs.
+- **On a card or a suggestion, keep each view to one or two plain sentences** (`RULE.DEVEX.AGENT.090` · MUST · skill:spn-devex/ideate). The *Views* part comes after Why and What and before the options. So a view says only what Why and What do not already say, and it names no option by its letter. Name the views with nothing to add together in one line, such as *QA and Partner: no objection*. Shorten a view's words yourself, and keep its name and its meaning. Keep what a fresh view wrote in full in the arc's notes, `notes/N<nnn>/views/`. In an ordinary reply that is not a card, a view may say what it objects to at the length the point needs.
 - **A view does not replace the review.** Once a draft exists, the convened lens still reads it.
 
 ## Structure first, and what other platforms do

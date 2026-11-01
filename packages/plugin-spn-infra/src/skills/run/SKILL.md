@@ -7,11 +7,11 @@ description: Realize the estate - bring a layer up, take it down, read its statu
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
-      "seen": "c110978c"
+      "seen": "d6a6cbd5"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/04-develop.md",
-      "seen": "1f777cff"
+      "seen": "dc4a1be7"
     }
   ]
 }
@@ -63,7 +63,7 @@ spnutils infra app up   <package>
 spnutils infra app down <package> [--clean]
 ```
 
-**A platform-scoped command names its platform first, as an argument** (`RULE.DEVEX.UTILS.072` · MUST · check:command-shape): `<spc>` comes straight after the verb, and `<env>` after it. No environment entry selects a platform. The organization layer takes none, because a repository has at most one organization. In an apps repository the `<spc>` is checked against the `sprepo.json` pin, and one that differs is refused.
+**A platform-scoped command names its platform first, as an argument** (`RULE.DEVEX.UTILS.072` · MUST · skill:spn-devex/develop): `<spc>` comes straight after the verb, and `<env>` after it. No environment entry selects a platform. The organization layer takes none, because a repository has at most one organization. In an apps repository the `<spc>` is checked against the `sprepo.json` pin, and one that differs is refused.
 
 | Noun | Locally | In the cloud |
 | --- | --- | --- |

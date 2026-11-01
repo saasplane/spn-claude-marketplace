@@ -7,7 +7,7 @@ description: What proves a behaviour, at which tier, and what a passing suite do
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
-      "seen": "c110978c"
+      "seen": "d6a6cbd5"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/05-test.md",
@@ -26,7 +26,7 @@ description: What proves a behaviour, at which tier, and what a passing suite do
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/06-tests/README.md",
       "section": "A case title carries the id and the sentence",
-      "seen": "ff839024"
+      "seen": "e5e10894"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/06-tests/README.md",
@@ -36,7 +36,7 @@ description: What proves a behaviour, at which tier, and what a passing suite do
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/06-tests/README.md",
       "section": "The selective loop — what runs while work is under way",
-      "seen": "11502ff4"
+      "seen": "ae6f8f25"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/10-providers/ts/13-tests.md",
@@ -51,12 +51,12 @@ description: What proves a behaviour, at which tier, and what a passing suite do
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/03-tree.md",
       "section": "How — guides: steps, and nothing proven",
-      "seen": "65b1d929"
+      "seen": "d3cbe134"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "section": "An order is one delegated execution, and every order follows the same rules",
-      "seen": "1b40c40b"
+      "seen": "f7b59796"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/06-tests/README.md",
@@ -80,7 +80,7 @@ description: What proves a behaviour, at which tier, and what a passing suite do
 
 **Read [`refs/devex/workspace/workstream.md`](../../refs/devex/workspace/workstream.md) before acting.** It holds the loop this skill runs inside: how a prompt is read, where a new ask goes, what a prompt does to a running arc, and how a reply closes.
 
-**Read the repository's *Test and verify* guide first — `docs/05-guides/*-test-and-verify.md` — and never `CLAUDE.md` for how to run anything** (`RULE.DEVEX.WORKSPACE.181` · MUST · check:corpus). A repository that can run owes that guide: the keys the run reads, the numbered steps with their commands, what you should see, and what to do when a step fails. `CLAUDE.md` is generated and states nothing about running. The repository's `.claude/saasplane/rules.md` § How this repository is tested names the guide's path, or says there is none. Where there is none, say so in your report rather than guessing a sequence.
+**Read the repository's *Test and verify* guide first — `docs/05-guides/*-test-and-verify.md` — and never `CLAUDE.md` for how to run anything** (`RULE.DEVEX.WORKSPACE.181` · MUST · skill:spn-devex/test). A repository that can run owes that guide: the keys the run reads, the numbered steps with their commands, what you should see, and what to do when a step fails. `CLAUDE.md` is generated and states nothing about running. The repository's `.claude/saasplane/rules.md` § How this repository is tested names the guide's path, or says there is none. Where there is none, say so in your report rather than guessing a sequence.
 
 **A behavior is a claim that someone can do something. A test is what makes the claim checkable.** A behavior nobody can prove is a wish, and a claim marked done without a test citing it is a status nobody verified.
 
@@ -164,7 +164,7 @@ A **double** stands in for a collaborator and belongs to the unit tier only; a *
 
 ## Which case carries an id
 
-**A case carries the id of the row it proves, and the tier decides which cases do** (`RULE.DEVEX.FUNCTION.064` · MUST · check:subjects). The id opens the case's title and the sentence follows it — `IAM.LOGIN.01 a person signs in with a password` — because a person reading a failed run in cloud needs both what broke and what it means.
+**A case carries the id of the row it proves, and the tier decides which cases do** (`RULE.DEVEX.FUNCTION.064` · MUST · skill:spn-apps/implement). The id opens the case's title and the sentence follows it — `IAM.LOGIN.01 a person signs in with a password` — because a person reading a failed run in cloud needs both what broke and what it means.
 
 | Tier | Which cases carry an id | What a case with no id names instead |
 | --- | --- | --- |
@@ -221,7 +221,7 @@ Everything after `--` reaches the runner unchanged, so the words are the runner'
 | one working name, reused | every selective run made while coding | a reused name replaces its own file, so the 20 files a tier keeps are not spent on small runs |
 | one fresh name, used once | one run over every case the step touched, once they pass | this is the run the rows are stamped from; a row whose status it moved takes an `Updated at` naming it |
 
-**Stamp from the freshly named run, and never with `--reach repository`.** The stamp writes the rows that run names whose status changed, and leaves every other row as it is: a row the run only confirms keeps its `Updated at` (`RULE.DEVEX.WORKSPACE.306` · MUST · check:workstream-state). `--reach repository` says the run was the whole of its tiers, and it sets every row the run did not name back to `PLANNED`. So a `SUCCESS` row says that its own case passed when that case last ran, and `Updated at` says when it reached that status.
+**Stamp from the freshly named run, and never with `--reach repository`.** The stamp writes the rows that run names whose status changed, and leaves every other row as it is: a row the run only confirms keeps its `Updated at` (`RULE.DEVEX.WORKSPACE.306` · MUST · skill:spn-devex/execute). `--reach repository` says the run was the whole of its tiers, and it sets every row the run did not name back to `PLANNED`. So a `SUCCESS` row says that its own case passed when that case last ran, and `Updated at` says when it reached that status.
 
 **State acceptance as named behaviour ids, read as `SUCCESS` from the run file.** It is never an exit code: the runner exits clean when a selection matches no case, so a mistyped selection passes. It is never a count of a whole tier, which only a whole run can meet. **Report a selection that matched no case as *nothing proves this*.**
 
