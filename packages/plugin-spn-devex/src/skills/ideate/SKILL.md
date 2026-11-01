@@ -49,6 +49,8 @@ description: Decide what a node IS, and design a requirement inside that shape -
 - **RULE.DEVEX.FUNCTION.093** (`RULE.DEVEX.FUNCTION.093` · MUST · skill:spn-devex/ideate)
 - **RULE.DEVEX.FUNCTION.094** (`RULE.DEVEX.FUNCTION.094` · MUST · skill:spn-devex/ideate)
 - **RULE.DEVEX.FUNCTION.095** (`RULE.DEVEX.FUNCTION.095` · MUST · skill:spn-devex/ideate)
+- **RULE.DEVEX.FUNCTION.096** (`RULE.DEVEX.FUNCTION.096` · MUST · skill:spn-devex/ideate)
+- **RULE.DEVEX.FUNCTION.097** (`RULE.DEVEX.FUNCTION.097` · MUST · skill:spn-devex/ideate)
 - **RULE.DEVEX.WORKSPACE.006** (`RULE.DEVEX.WORKSPACE.006` · MUST · skill:spn-devex/ideate)
 - **A step acting on a set carries that set** (`RULE.DEVEX.WORKSPACE.064` · MUST · skill:spn-devex/ideate)
 - **`migrations/` earns you none either** (`RULE.DEVEX.WORKSPACE.086` · MUST · skill:spn-devex/ideate)
