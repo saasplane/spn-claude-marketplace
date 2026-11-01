@@ -158,6 +158,19 @@ console.log("\n=== check");
   const answered = id ? cli(root, ["workstream", "question", "answer", id, "--key", "A", "--words", "A it is"]) : raised;
   const fourth = sheet("check", "N001");
   ok("an answered card no entry cites is found", id && fourth.out.includes(`${id} is answered and no entry cites it`) || false, `${raised.out} ${answered.out} ${fourth.out}`);
+  const stray = id ? cli(root, ["workstream", "question", "cite", id, "--entries", "E1,E8"]) : raised;
+  ok("[MKT.HOOKS.402] red: `question cite` names an entry the sheet does not hold, and records nothing", stray.code === 2 && stray.out.includes("E8") &&
+    lines(join(ws, "questions.jsonl")).find((row) => row.id === id)?.answer?.entries === undefined, stray.out);
+  const none = id ? cli(root, ["workstream", "question", "cite", id, "--entries", "none"]) : raised;
+  const after = sheet("check", "N001");
+  ok("[MKT.HOOKS.402] `question cite --entries none` records that the answer changes no repository file", none.code === 0 && none.out.includes("changes no repository file") &&
+    JSON.stringify(lines(join(ws, "questions.jsonl")).find((row) => row.id === id)?.answer?.entries) === "[]", none.out);
+  ok("[MKT.HOOKS.402] the sheet check no longer finds a card recorded as changing no file", !after.out.includes(`${id} is answered and no entry cites it`), after.out);
+  const open = cli(root, ["workstream", "question", "raise", "N001", "--file", put("card2.json", CARD)]);
+  const openId = /q\d+/.exec(open.out)?.[0];
+  const early = openId ? cli(root, ["workstream", "question", "cite", openId, "--entries", "none"]) : open;
+  ok("[MKT.HOOKS.402] red: `question cite` refuses an open card", early.code === 2 && early.out.includes("is open"), early.out);
+  if (openId) cli(root, ["workstream", "question", "answer", openId, "--key", "A", "--words", "A, a local fix", "--entries", "none"]);
 
   const sheetData = json(sheetFile);
   sheetData.stack = null;

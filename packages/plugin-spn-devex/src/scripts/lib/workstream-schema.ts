@@ -90,7 +90,8 @@ export type Suggestion = { id: string; title: string; state: string; preview: st
 export type View = { lens: string; text: string };
 export type Option = { key: string; does: string; costs: string };
 export type Card = { why: string; what: string; viewsLead: string; views: View[]; options: Option[]; recommended: { key: string; reason: string } };
-export type Answer = { key?: string | null; words: string; at: string };
+/** `entries` is what the card is cited in, and `[]` records that the answer changes no repository file. */
+export type Answer = { key?: string | null; words: string; at: string; entries?: string[] };
 /** `raisedBy` is the session id of the window that raised the card; a card raised before it was recorded has none. */
 export type Question = { id: string; arc: string; title: string; state: string; raised: string; raisedBy?: string; shownIn: string[]; card: Card; answer: Answer | null; [field: string]: unknown };
 
@@ -300,6 +301,9 @@ export function questionFaults(line: unknown, where: string): string[] {
   if ((line.state === "answered" || line.state === "withdrawn") &&
       !(isObject(line.answer) && typeof line.answer.words === "string" && typeof line.answer.at === "string"))
     out.push(`${where} is ${String(line.state)} and carries no answer with your words and when`);
+  if (isObject(line.answer) && line.answer.entries !== undefined &&
+      !(Array.isArray(line.answer.entries) && line.answer.entries.every((id) => typeof id === "string" && /^E\d+$/.test(id))))
+    out.push(`${where}'s answer carries entries that are not a list of entry ids`);
   return out;
 }
 

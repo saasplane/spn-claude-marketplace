@@ -19,7 +19,7 @@ import { fileURLToPath } from "node:url";
 import { type Action, FLAG, VALUE, UsageFault, readWords } from "../../../../../plugin-support-lib/src/lib/command.ts";
 import { workspaceRoot } from "../../../../../plugin-support-lib/src/lib/timing.ts";
 import { logEvent, readArc, readJson, readJsonl, readQuestions, readSheet, factsFileOf, sheetFileOf, stateFileOf, writeArc, writeWhole } from "../../lib/workstream.ts";
-import { ENTRY_OPS, entryWork, parentIds, renameDataToWork, sheetFaults, type ArcData, type ArcRow, type Fact, type Sheet, type SheetEntry } from "../../lib/workstream-schema.ts";
+import { ENTRY_OPS, entryWork, parentIds, renameDataToWork, sheetFaults, type ArcData, type ArcRow, type Fact, type Question, type Sheet, type SheetEntry } from "../../lib/workstream-schema.ts";
 import { arcNamed, listOf, typed } from "./_shared.ts";
 
 export const describe = "the arc's change sheet: write it whole, edit or drop one entry, show it, check it against the rows and the cards";
@@ -275,6 +275,9 @@ function show(args: string[]): number {
 const cites = (entries: readonly SheetEntry[], id: string): boolean =>
   entries.some((entry) => entry.decidedBy.some((text) => new RegExp(`\\b${id}\\b`).test(text)));
 
+/** Whether a card's answer records that it changes no repository file, cited with `--entries none`. */
+const changesNoFile = (card: Question): boolean => Array.isArray(card.answer?.entries) && card.answer.entries.length === 0;
+
 /** What `sheet check` prints, and what the go lists: the sheet read against the arc's rows and cards. Empty where the arc keeps no sheet. */
 export function sheetFindings(ws: string, arc: string): string[] {
   renameFirstRead(ws, arc);
@@ -300,7 +303,7 @@ export function sheetFindings(ws: string, arc: string): string[] {
     if (!tested) out.push(`row ${row.id} is a CODE row and its entries name no test`);
   }
   for (const card of readQuestions(ws).filter((one) => one.arc === arc && one.state === "answered"))
-    if (!cites(entries, card.id)) out.push(`${card.id} is answered and no entry cites it`);
+    if (!cites(entries, card.id) && !changesNoFile(card)) out.push(`${card.id} is answered and no entry cites it`);
   if (sheet.stack === null && leaves.some((row) => row.work === "CODE" || row.work === "PROOF"))
     out.push(`the sheet's stack is null, and ${arc} has a CODE or PROOF row`);
   return out;
