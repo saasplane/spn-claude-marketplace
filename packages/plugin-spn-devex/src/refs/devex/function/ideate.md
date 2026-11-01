@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/01-function/03-ideate.md",
-      "seen": "28cb28c9"
+      "seen": "aee932e8"
     }
   ]
 }
@@ -104,6 +104,17 @@ You classify twice, and the order matters. First the **nature of the work**, whi
 | what varies the answer — the person, the organization type, or the plan | those are a permission, an enablement and billing, and none substitutes for another |
 
 The last row is the one that silently bakes a product decision into code. Settle it here and the gate writes itself later.
+
+## How a first proposal is shaped
+
+A first proposal starts where the book already stands, so the developer reads a proposal that is mostly confirmed rather than invented. Six rules carry that, and each extends one the book already holds.
+
+- **A first proposal uses the vocabulary already written, and names the source of every name and value.** The book's constructs, the skills' step ids and the contract's `SP*Type` enums come first, and only a value no source holds is marked new (`RULE.DEVEX.FUNCTION.090` · MUST · skill:spn-devex/ideate). A name or a value with no source is the plausible invented detail that *a section is written, not filled* refuses.
+- **A field is proposed only where a report the developer asked for reads it.** A field no report reads is cut, and a field a report does read is kept (`RULE.DEVEX.FUNCTION.091` · MUST · skill:spn-devex/ideate). A field nothing reads is rework waiting to be done (`RULE.DEVEX.WORKSPACE.331` · MUST · skill:spn-devex/execute).
+- **One name stands for each idea, in the construct that owns it, named by its group.** A second word for an idea already named is replaced by the first, and a new type is named for its domain, its group and its attribute (`RULE.DEVEX.FUNCTION.092` · MUST · skill:spn-devex/ideate).
+- **Only live records are migrated.** A record nothing reads again is left as it is, a log that holds only history is skipped by its readers, and no migration is planned for either (`RULE.DEVEX.FUNCTION.093` · MUST · skill:spn-devex/ideate).
+- **A proposal is explained in what the developer will see, before the code's own terms.** It leads with the printed output, the rows or the page the developer will read, and the code's terms follow (`RULE.DEVEX.FUNCTION.094` · MUST · skill:spn-devex/ideate).
+- **A proposal's panel is convened before the proposal is called final.** The reader who did not write the proposal reads it first, and a block from that reader is answered in the proposal and not after it (`RULE.DEVEX.FUNCTION.095` · MUST · skill:spn-devex/ideate).
 
 ## What the design lands as
 
