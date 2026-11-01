@@ -13,16 +13,16 @@
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/02-workstream.md",
-      "seen": "78b6721b"
+      "seen": "6dafd471"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
-      "seen": "8730eeff"
+      "seen": "a261fec5"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
-      "section": "A step row says where, at what altitude, and how",
-      "seen": "71d58a35"
+      "section": "A step row says where, what work, and how",
+      "seen": "a90f40b1"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -47,11 +47,11 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "section": "A prompt while an arc runs",
-      "seen": "0828fab5"
+      "seen": "25adff56"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "seen": "8040c40d"
+      "seen": "1ecfaeea"
     }
   ]
 }
@@ -121,15 +121,21 @@ It carries `schemaVersion`; one schema in the plugin validates it, and every wri
 header is `arc`, `subject`, `title`, `goal`, `status` and its `reason` (for `CARRIED` and `DROPPED`), `wait`
 (the developer's words, or `null`), `reviewFixes` (on the review-fixes arc alone), `decides`, `repos`, `cycle`,
 `follows`, `model` and `preview`; `schemaVersion` is 2. A row is `id`, `parent`, `title` (the
-step's *What*), `kind` (`fix` · `change` · `question`), `repo`, `altitude`, `mechanism`, `acceptance`,
+step's *What*), `kind` (`fix` · `change` · `question`), `repo`, `work`, `mechanism`, `acceptance`,
 `model`, `blockedBy`, `touches` (`repository:place`), `decisions`, `facts`, `state` (`waiting` until the
 step starts, `running` while it runs, with the log line that moved it there saying when, then what it
 reached), and what its report
 folded in: `proof`, `cost`, `commits`, `order`. **Every row is a build step**: reading and drafting are
 planning jobs, which record no step (`RULE.DEVEX.WORKSPACE.278` · MUST · short). A step's `state` is `waiting`, `ready`,
-`running`, `stopped`, `replaced`, `landed`, `deferred` or `carried`. Steps run in chain order, by repository with the foundation first, then by altitude. After each
-write the `row` commands name, in a `note:` line, a build row with no `repo` or no `altitude` and a row out of
+`running`, `stopped`, `replaced`, `landed`, `deferred` or `carried`. Steps run in chain order, by repository with the foundation first, then by work. After each
+write the `row` commands name, in a `note:` line, a build row with no `repo` or no `work` and a row out of
 chain order; it reports and never refuses (`RULE.DEVEX.WORKSPACE.183` · MUST · check:workstream-state).
+
+`work` is one value of `SPDevExWorkstreamWorkType` (`DOCS` · `CODE` · `GENERATED` · `DESIGN` · `TEST` · `RELEASE` · `PROOF`), the kind of work a row, a sheet entry, a go part or a telemetry row stands for, and each place takes the values that fit it: a sheet entry `DOCS`, `CODE` or `GENERATED`; a row of an arc every value but `TEST`; a go part every value; a telemetry row every value, or null where no part was started. A baseline run, a part's own tests and a full run are all `TEST`, told apart by the part's id.
+
+**The plugins keep a copy of the contract's telemetry values beside the writer, in the contract's structure, and `toolchain-ts` holds it to the contract enum for enum** (`RULE.DEVEX.WORKSPACE.482` · MUST · skill:spn-devex/develop). The plugins read their own copy and never the contract at run time.
+
+**Closing a workstream runs a retrospective that raises a suggestion for each pattern it finds** (`RULE.DEVEX.WORKSPACE.483` · MUST · skill:spn-devex/execute). `workstream close` reads the workstream's rows beside earlier workstreams' and raises one suggestion for each pattern, naming the check, the brief, the command, the part size or the shaping rule to adjust; you decide each one, and nothing changes a plugin until you do. The workstream keeps `retro.json` of times, counts and tags only, and never an argument, a path or a word.
 
 ### The commands
 
@@ -145,10 +151,10 @@ name, so `workstream arc stamp write` is the group `workstream`, the subject `ar
 | `state check [<workstream>] [--facts]` | whether each open and backlog workstream is whole; exits 1 on a finding. `--facts` also names each pinned fact whose source moved, as a note |
 | `rows show <workstream>[/<arc>] [--ready] [--parallel] [--tree]` | the rows; the ready ones; of those, the ones whose `touches` do not overlap |
 | `arc edit <arc> [--title …] [--goal …] [--status …] [--wait …] [--reason …] [--start] [--review-fixes] [--subject …] [--under …] [--preview …] …` | opens an arc as `PROPOSED` (`--title`, `--subject`, and `--goal`), as many as the plan needs, or changes any field of its header and its stored status, writing the arc's name file with its data; an arc field is written nowhere else. A `--subject` over three words or 24 characters is refused; `--position <n>` sets the arc's place in the planned sequence, which orders the arcs still `DECIDED` or `PROPOSED` on the approach page's sticky card; `--note` writes a log line. `--status` stores the developer's words, `PROPOSED`, `DECIDED`, `CARRIED` or `DROPPED`, and `LANDED` only on the review-fixes arc at the close; every move needs `--note` with their words. The go, `--status DECIDED`, lists each line of the preview that still says proposed. `--wait "<their words>"` holds a decided arc and `--start --note "…"` clears it; `--review-fixes` opens the review-fixes arc, `DECIDED` on their words. A move back to `PROPOSED` stops the arc's running steps. `DROPPED` is refused on an arc never decided. A row's field is refused, and `row edit` is named |
-| `row add <arc> "<title>" --repo <repo> --altitude <altitude> [--kind change] [--state ready] [--blocked-by …] [--touches …] [--position …] [--model …] [--note …]` | adds a row, takes the arc's next number and prints it; refused without `--repo` or `--altitude`. A step written `running` or `landed` on an arc not `DECIDED`, or holding a wait, is refused, and a step is never added to an arc that reads `LANDED` |
+| `row add <arc> "<title>" --repo <repo> --work <work> [--kind change] [--state ready] [--blocked-by …] [--touches …] [--position …] [--model …] [--note …]` | adds a row, takes the arc's next number and prints it; refused without `--repo` or `--work`. A step written `running` or `landed` on an arc not `DECIDED`, or holding a wait, is refused, and a step is never added to an arc that reads `LANDED` |
 | `row state <arc> <row> <state> [--note …]` | the everyday call: moves a row to a state, and the log line says from where; a row the arc does not hold is refused, and `row add` is named |
 | `row note <arc> <row> "<text>"` | writes one line on a row's log and changes nothing else |
-| `row edit <arc> <row> [--title …] [--kind …] [--repo …] [--altitude …] [--model …] [--blocked-by …] [--touches …] [--position …]` | changes the fields of a row the arc holds; a row it does not hold is refused, and `row add` is named |
+| `row edit <arc> <row> [--title …] [--kind …] [--repo …] [--work …] [--model …] [--blocked-by …] [--touches …] [--position …]` | changes the fields of a row the arc holds; a row it does not hold is refused, and `row add` is named |
 | `row discard <arc> <row> --note "…"` | takes a waiting, ready or deferred row found invalid or not needed out of `state.json`; its `discarded` log line carries the developer's words and the row's *What* |
 | `arc stamp write <arc>` | restamps the arc's *Cycles* row, once its part of the page is current |
 | `arc delete <arc> --note "…"` | deletes an arc never decided, both its folders, on the developer's words; an arc ever decided is refused, and becomes `DROPPED` instead |
@@ -339,7 +345,7 @@ The plan holds the release parts too, merged from the scope's sheets in chain or
 
 ### In an arc that keeps a sheet, a row lands on a run of its tests
 
-**A code row lands only on a named run, taken after the row's last commit, in which every id its entries name reads `SUCCESS` at the tier the entry names** (`RULE.DEVEX.WORKSPACE.328` · MUST · check:workstream-state). A proof row lands only on a whole run of each tier the arc owes its repository. The book holds documents and no suite, so its proof row lands on a named run of the book check, `spn-devex docs book check --run <run>`, which records the run only when every chapter reads clean. No row of those altitudes is stamped by hand: `row state <arc> <row> landed --run <run>` names the run. The run is what `spnutils apps test <tier> <run> <package>` or `spnutils infra test` writes, read by the reader `behaviours stamp write` uses. A refusal names the id that reads `FAILURE`, the id the run does not hold, and an id green only at another tier; `report write` reads the report's `run` before it lands a row, so a proof string written by hand is refused. A docs, generated or release row lands as it did, and so does any row of an arc that has no sheet.
+**A code row lands only on a named run, taken after the row's last commit, in which every id its entries name reads `SUCCESS` at the tier the entry names** (`RULE.DEVEX.WORKSPACE.328` · MUST · check:workstream-state). A proof row lands only on a whole run of each tier the arc owes its repository. The book holds documents and no suite, so its proof row lands on a named run of the book check, `spn-devex docs book check --run <run>`, which records the run only when every chapter reads clean. No row of those kinds of work is stamped by hand: `row state <arc> <row> landed --run <run>` names the run. The run is what `spnutils apps test <tier> <run> <package>` or `spnutils infra test` writes, read by the reader `behaviours stamp write` uses. A refusal names the id that reads `FAILURE`, the id the run does not hold, and an id green only at another tier; `report write` reads the report's `run` before it lands a row, so a proof string written by hand is refused. A docs, generated or release row lands as it did, and so does any row of an arc that has no sheet.
 
 **Each arc reports what its orders cost and how many rows were rework, split into what ideation missed and what a later answer of the developer's asked for** (`RULE.DEVEX.WORKSPACE.331` · MUST · skill:spn-devex/execute). Rework is the rows added after the arc's go. `workstream state show` prints each arc's cost and its rework beside its rows.
 
@@ -471,7 +477,7 @@ replies. Choosing costs the work built on the choice.
 
 **A `RUNNING` arc that the developer reshapes stops before it goes on — MUST.** Let the tool call in
 flight finish, so nothing is left half-written, and do not start the next one. Rewrite the affected
-steps in chain order: by repository, then by altitude, and mark a step you replaced `replaced`. Tell the
+steps in chain order: by repository, then by work, and mark a step you replaced `replaced`. Tell the
 developer the new plan in words, never by step number. Then resume from the first step that has not
 landed, unless the developer says otherwise.
 
@@ -788,7 +794,7 @@ meets two of those stops reading the third.
 
 ## A new subject: another arc, or a workstream of its own
 
-**Different nature is never a reason to fork.** An arc carries its own altitude and its own highest
+**Different nature is never a reason to fork.** An arc carries its own work and its own highest
 document, so one workstream holds a driver change, an estate change and a plugin change at once.
 
 **A workstream is a scope that closes as one thing**, so the fork is about closability and collision:
@@ -913,7 +919,7 @@ thin, and a page that holds the plan is too thick.**
 
 **Before an arc's rows are written, the architect's view sets their order from the kind of work**
 (`RULE.DEVEX.WORKSPACE.241` · MUST · skill:spn-devex/ideate). It is one judgement of what order makes the whole work cheapest,
-made once, before the first row. Chain order and the altitudes still hold. This judgement decides
+made once, before the first row. Chain order and the kinds of work still hold. This judgement decides
 what they leave open.
 
 | The judgement | What it prevents |

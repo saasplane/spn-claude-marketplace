@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/04-plugins.md",
-      "seen": "7c57fd6c"
+      "seen": "3a4b697a"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/04-plugins/01-plugins.md",
@@ -51,6 +51,8 @@ An edit to the folder changes nothing about the cache until an install copies on
 **Nothing loads a ref on its own.** A ref reaches a session only when a skill names it. A file sitting in `refs/` that no skill cites is dead weight nobody will ever read in a session, whatever its content says.
 
 **A hook either refuses a call or reports on it, and the difference is declared rather than emergent.** A refusal stops the tool call and says which rule it met; a report warns and lets the call through. A check that could refuse but only warns is a decision somebody made, and it belongs in the hook rather than in a habit.
+
+**A hook check's run ends in one of three verdicts, and the verdict is a contract type** (`SPDevExAgentHookVerdictType`). A check that lets the call go on and says nothing passes (`PASS`), a check that lets it go on and gives the agent advice notes (`NOTE`), and a check that stops the call denies it (`DENY`). The telemetry row of a check's run carries the verdict, so a refusal is read from the rows and not kept as a log of its own.
 
 **A ref is the only layer a consumer actually has.** The book is not loaded in a session, and a partner holds no checkout of it. So a ref carries the actionable substance itself and cites its chapter **by name**, never by a path that resolves only for somebody holding both trees.
 
