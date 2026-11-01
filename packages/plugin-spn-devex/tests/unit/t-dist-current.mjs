@@ -28,7 +28,7 @@ const ok = (label, condition, detail = "") => {
 
 console.log("=== dist current — every bundle this plugin ships matches its own source hash");
 const result = staleness(PLUGIN, SUPPORT_LIB, BUNDLES);
-ok("cli.mjs and every events/*.mjs carry the plugin's current source hash", result.current === true,
+ok("[MKT.HOOKS.27] cli.mjs and every events/*.mjs carry the plugin's current source hash", result.current === true,
   JSON.stringify(result));
 for (const bundle of result.bundles)
   ok(`${bundle.path.slice(PLUGIN.length + 1)} is current`, bundle.current === true, JSON.stringify(bundle));

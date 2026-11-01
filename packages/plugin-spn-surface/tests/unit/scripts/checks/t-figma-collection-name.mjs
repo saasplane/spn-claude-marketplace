@@ -18,9 +18,9 @@ function answer(code) {
 }
 const ok = (label, condition, detail = "") => {
   total += 1;
-  if (condition) { console.log(`  PASS  ${label}`); return; }
+  if (condition) { console.log(`  PASS  [MKT.HOOKS.398] ${label}`); return; }
   failed += 1;
-  console.log(`  FAIL  ${label}${detail ? `\n        ${detail}` : ""}`);
+  console.log(`  FAIL  [MKT.HOOKS.398] ${label}${detail ? `\n        ${detail}` : ""}`);
 };
 const denied = (out) => out.includes('"permissionDecision":"deny"') || out.includes('"permissionDecision": "deny"');
 
