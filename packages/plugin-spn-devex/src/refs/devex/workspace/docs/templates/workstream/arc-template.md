@@ -109,5 +109,5 @@ notes/N{{nnn}}/
 
 Every row is landed, replaced, carried or deferred, and none is stopped or waits on a card. The PROOF row's output is in its
 `proof`, run with the cache off. Every card this arc answered has left `Open`, and the page's `What` states its
-result. The approach page's part for the arc is current, its stamp written, and its Cycles row reads LANDED. The
+result. The approach page's part for the arc is current, its stamp written, and its Plan row reads LANDED. The
 landing is committed.

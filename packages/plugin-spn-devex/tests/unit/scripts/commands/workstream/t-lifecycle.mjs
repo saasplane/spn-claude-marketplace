@@ -2,7 +2,7 @@
 // close gate. Run as the agent types the commands, in a throwaway workspace.
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { cli, dataWorkspace } from "../../../../helpers/workstream-fixture.mjs";
+import { writeClosingBlock, cli, dataWorkspace } from "../../../../helpers/workstream-fixture.mjs";
 import { workspace } from "../../../../helpers/fixture.mjs";
 
 let total = 0, failed = 0;
@@ -44,6 +44,9 @@ console.log("=== open: a block with one of the six things missing is refused");
     json(join(root, ".spndevex", "state.json")).workstreams.lastNumber === 41 && json(join(root, ".spndevex", "state.json")).debug.telemetry === false);
   const page = existsSync(join(folder, "approach.html")) ? readFileSync(join(folder, "approach.html"), "utf8") : "";
   ok("[MKT.SCRIPTS.309] the approach page is written from the block", page.includes("041 - Probe Reach") && page.includes(BLOCK.whyNow) && page.includes(BLOCK.limits) && page.includes(BLOCK.reaches), page.slice(0, 200));
+  ok("[MKT.SCRIPTS.402] the new page reads Why, What, How, Plan, Open, with the arcs table and the progress block in the Plan section after How",
+    /<section id="arcs"[^>]*>\s*<div class="sds-section-head"><h2>Plan<\/h2><\/div>[\s\S]*<table>[\s\S]*spn:generated progress[\s\S]*<\/section>/.test(page) && !page.includes("<h3 id=\"h9\">Cycles")
+      && page.indexOf("<h2>How</h2>") < page.indexOf("<h2>Plan</h2>") && page.indexOf("<h2>Plan</h2>") < page.indexOf("<h2>Open"), page.slice(page.indexOf("<h2>How")));
   const arc = join(folder, "arcs", "N001");
   ok("[MKT.SCRIPTS.309] the first arc is opened for what the developer wants to see first", existsSync(join(arc, "state.json")) && json(join(arc, "state.json")).title === BLOCK.seeFirst);
   ok("[MKT.SCRIPTS.309] the developer's words are in the arc's log", existsSync(join(arc, "log.jsonl")) && readFileSync(join(arc, "log.jsonl"), "utf8").includes(WORDS));
@@ -51,10 +54,13 @@ console.log("=== open: a block with one of the six things missing is refused");
   const again = open("--file", put("again.json", { ...BLOCK, subject: "second-one" }), "--note", WORDS);
   ok("[MKT.SCRIPTS.309] the next workstream takes the next number", again.code === 0 && existsSync(join(opened("open"), "042-second-one")) && json(join(root, ".spndevex", "state.json")).workstreams.lastNumber === 42, again.out);
 
+  const ideate = open("--file", put("ideate.json", { ...BLOCK, subject: "shape-first" }), "--note", WORDS, "--kind", "ideate");
+  ok("[MKT.SCRIPTS.429] `workstream open --kind ideate` opens the first arc as an ideate arc", ideate.code === 0 && json(join(opened("open"), "043-shape-first", "arcs", "N001", "state.json")).kind === "ideate", ideate.out);
+
   const noBlocker = open("--file", put("third.json", { ...BLOCK, subject: "third-one" }), "--note", WORDS, "--backlog", " ");
-  ok("[MKT.SCRIPTS.309] a backlog workstream without its blocker is refused", noBlocker.code === 1 && noBlocker.out.includes("blocker") && !existsSync(join(opened("backlog"), "043-third-one")), noBlocker.out);
+  ok("[MKT.SCRIPTS.309] a backlog workstream without its blocker is refused", noBlocker.code === 1 && noBlocker.out.includes("blocker") && !existsSync(join(opened("backlog"), "044-third-one")), noBlocker.out);
   const parked = open("--file", put("third.json", { ...BLOCK, subject: "third-one" }), "--note", WORDS, "--backlog", "the partner contract is not signed");
-  ok("[MKT.SCRIPTS.309] a backlog workstream with its blocker is opened in backlog", parked.code === 0 && existsSync(join(opened("backlog"), "043-third-one", "approach.html")), parked.out);
+  ok("[MKT.SCRIPTS.309] a backlog workstream with its blocker is opened in backlog", parked.code === 0 && existsSync(join(opened("backlog"), "044-third-one", "approach.html")), parked.out);
 }
 
 console.log("\n=== close: an unfinished plan refuses it");
@@ -76,9 +82,26 @@ console.log("\n=== close: an unfinished plan refuses it");
   ok("[MKT.SCRIPTS.320] an entry a landed row holds is planned in no part, and go check does not name it",
     planned.code === 0 && !partsHolding.length && checked.code === 0 && !checked.out.includes("held by no part"), `${partsHolding.join(", ")}\n${planned.out}\n${checked.out}`);
 
+  // A WORKSTREAM CLOSES ONLY ONCE EVERY SUGGESTION IS DECIDED, PARKED OR DROPPED (RULE.DEVEX.WORKSPACE.489).
+  const suggestionsFile = join(ws, "suggestions.jsonl");
+  const suggest = (list) => writeFileSync(suggestionsFile, list.map((one) => JSON.stringify({ preview: null, words: null, ...one })).join("\n") + "\n");
+  suggest([{ id: "s1", title: "a suggestion nobody has decided, with a title that runs on well past sixty characters in all", state: "raised" }, { id: "s2", title: "shaped, not decided", state: "shaped", arc: "N001" },
+    { id: "s3", title: "settled", state: "decided" }, { id: "s4", title: "Retrospective · command:x fails", state: "raised" }]);
+  const held = cli(root, ["workstream", "close", "031"]);
+  ok("[MKT.SCRIPTS.406] a close refuses while a suggestion, the retrospective's own included, reads raised or shaped, naming each as S<n> with its title cut to about sixty characters, the rule, and that nothing was changed",
+    held.code === 1 && held.out.includes('S1 "a suggestion nobody has decided, with a title that runs o..."') && held.out.includes('S2 "shaped, not decided"') && !held.out.includes("S3") && held.out.includes("S4")
+      && held.out.includes("RULE.DEVEX.WORKSPACE.489") && held.out.includes("Nothing was changed") && !existsSync(closed) && existsSync(ws) && readFileSync(join(ws, "approach.html"), "utf8") === before, held.out);
+  suggest([{ id: "s1", title: "decided now", state: "decided" }, { id: "s2", title: "parked now", state: "parked" }, { id: "s3", title: "dropped now", state: "dropped" }, { id: "s4", title: "Retrospective · command:x fails", state: "decided" }]);
+  const noBlock = cli(root, ["workstream", "close", "031"]);
+  ok("[MKT.SCRIPTS.398] a page with no closing block refuses the close, naming the shape, the rule and that nothing was changed, before the go is read",
+    noBlock.code === 1 && noBlock.out.includes("no closing block") && noBlock.out.includes("What was delivered") && noBlock.out.includes("What was learned") && noBlock.out.includes("Thank you")
+      && noBlock.out.includes("sds-note") && noBlock.out.includes("RULE.DEVEX.WORKSPACE.206") && noBlock.out.includes("Nothing was changed") && !existsSync(closed) && existsSync(ws)
+      && readFileSync(join(ws, "approach.html"), "utf8") === before, noBlock.out);
+  writeClosingBlock(ws);
+  const withBlock = readFileSync(join(ws, "approach.html"), "utf8");
   const refused = cli(root, ["workstream", "close", "031"]);
   ok("[MKT.SCRIPTS.310] a plan with a part not landed refuses the close, and the folder stays", planned.code === 0 && refused.code === 1 && /go|part/.test(refused.out) && !existsSync(closed) && existsSync(ws), `${planned.out}\n${refused.out}`);
-  ok("[MKT.SCRIPTS.310] a refused close leaves the approach page as it was", readFileSync(join(ws, "approach.html"), "utf8") === before);
+  ok("[MKT.SCRIPTS.310] a refused close leaves the approach page as it was", readFileSync(join(ws, "approach.html"), "utf8") === withBlock);
 
   const plan = join(ws, "arcs", "N001", "go.json");
   const data = json(plan);
@@ -86,11 +109,23 @@ console.log("\n=== close: an unfinished plan refuses it");
   const arcFile = join(ws, "arcs", "N001", "state.json");
   const arcData = json(arcFile);
   writeFileSync(arcFile, JSON.stringify({ ...arcData, rows: arcData.rows.map((row) => ({ ...row, state: "landed" })) }, null, 2));
+  // THE RETROSPECTIVE'S OWN SUGGESTIONS HOLD THE CLOSE (RULE.DEVEX.WORKSPACE.489): the first close raises them and refuses; the developer decides them; the next passes.
+  const first = cli(root, ["workstream", "close", "031"]);
+  const raisedNow = readFileSync(suggestionsFile, "utf8").trim().split("\n").map((line) => JSON.parse(line)).filter((one) => one.title.startsWith("Retrospective · ") && one.state === "raised");
+  ok("[MKT.SCRIPTS.432] the retrospective's own raised suggestions refuse the close that raised them, naming each, and nothing moves",
+    first.code === 1 && raisedNow.length >= 1 && raisedNow.every((one) => first.out.includes(`S${one.id.slice(1)} `)) && first.out.includes("RULE.DEVEX.WORKSPACE.489") && !existsSync(closed) && existsSync(ws), first.out);
+  const countBefore = readFileSync(suggestionsFile, "utf8").trim().split("\n").length;
+  suggest(readFileSync(suggestionsFile, "utf8").trim().split("\n").map((line) => ({ ...JSON.parse(line), state: "decided" })));
   const done = cli(root, ["workstream", "close", "031"]);
+  const keptTitles = existsSync(join(closed, "suggestions.jsonl")) ? readFileSync(join(closed, "suggestions.jsonl"), "utf8").trim().split("\n").length : -1;
+  ok("[MKT.SCRIPTS.432] once the developer has decided them the next close raises none again and passes", done.code === 0 && keptTitles === countBefore, `${keptTitles} ${countBefore}\n${done.out}`);
   const moved = join(closed, "approach.html");
   ok("[MKT.SCRIPTS.310] a whole, landed go closes: the folder moves into closed", done.code === 0 && existsSync(moved) && !existsSync(ws), done.out);
   const page = existsSync(moved) ? readFileSync(moved, "utf8") : "";
   ok("[MKT.SCRIPTS.310] the approach page is stamped DONE", /sds-done">[^<]*DONE</.test(page) && !page.includes("PLANNING</span>"), page.slice(0, 600));
+  ok("[MKT.SCRIPTS.394] the close ends with the line that asks for the closing message, naming its shape",
+    done.out.split("\n").some((line) => line.startsWith("Next: write the closing message now:") && ["🚀", "✈️", "&nbsp;", "What we delivered", "What we learned", "Thank you 👍", "retired", "RULE.DEVEX.WORKSPACE.206"].every((word) => line.includes(word)))
+      && done.out.indexOf("approach page stamped DONE") < done.out.indexOf("Next: write the closing message"), done.out);
 }
 
 console.log("\n=== go write: a release order line that is not a repository's name refuses the plan");

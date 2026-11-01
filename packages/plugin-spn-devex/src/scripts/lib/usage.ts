@@ -96,7 +96,7 @@ export function windowSize(text: string): number {
 }
 
 /** Whole lines of `file` from byte `from`, and the byte the next read starts at. */
-function readFrom(file: string, from: number, limit?: number): { text: string; next: number } | null {
+export function readFrom(file: string, from: number, limit?: number): { text: string; next: number } | null {
   const size = statSync(file).size;
   if (size < from) from = 0;
   const buffer = Buffer.alloc(limit === undefined ? size - from : Math.min(limit, size - from));
@@ -151,7 +151,7 @@ export function recordUsage(root: string | null, facts: Facts, transcript: strin
 const ORDER_PATH = new RegExp(`${workstreamPrefixSource()}(\\d{3}-[a-z0-9][a-z0-9-]*)/notes/(N\\d{3})[^/\\s'"\`]*/orders/([A-Za-z0-9][A-Za-z0-9._-]*?)\\.md`);
 
 /** The text of a message's content: a string, or the text blocks of a list. */
-function contentText(content: unknown): string {
+export function contentText(content: unknown): string {
   if (typeof content === "string") return content;
   if (Array.isArray(content)) return content.map((one) => (one && typeof one === "object" && typeof (one as { text?: unknown }).text === "string" ? (one as { text: string }).text : "")).join("\n");
   return "";

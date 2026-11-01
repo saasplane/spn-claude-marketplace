@@ -41,6 +41,7 @@ const handover = (next) => [
   "model:        Opus 5.5, effort high",
   `read first:   \`/work/${DEVEX}/${WORKSTREAMS}/open/${THIS}/${ARCS}/N011/state.json\` (fields, and row 3)`,
   "pins:         spn-foundation db1e69f · spn-claude-marketplace 7fc99c1",
+  "state:        row 1 landed",
   "live now:     no reload",
   "done when:    Commands row `suites` → exit 0",
   "do not touch: nothing",

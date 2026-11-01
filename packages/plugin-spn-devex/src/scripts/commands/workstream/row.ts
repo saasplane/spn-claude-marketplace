@@ -1,4 +1,5 @@
 // RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § The commands · § The formats · § The life of an arc, and every file it touches · § A step row says where, what work, and how
+//           RULE.DEVEX.WORKSPACE.488, a suggestion belongs to an arc, as a card does, and the arc's sheet cites it
 // The chapter is the source of truth; a rule change is edited there first, then here, in the same change.
 //
 //   spn-devex workstream row add <workstream>/N<nnn> "<title>" --repo <repo> --work <work> [--kind change] [--state ready] …
@@ -13,7 +14,7 @@
 
 import { type Action, FLAG, VALUE, UsageFault, readWords, type Words } from "../../../../../plugin-support-lib/src/lib/command.ts";
 import { basename, dirname, join } from "node:path";
-import { arcStatus, doneOf, landingFault, logEvent, readArc, readSheet, stateOfRow, stepsMayStart, writeArc } from "../../lib/workstream.ts";
+import { arcStatus, doneOf, landingFault, logEvent, suggestionLandingFault, readArc, readSheet, stateOfRow, stepsMayStart, writeArc } from "../../lib/workstream.ts";
 import { WORK, ROW_ID, ROW_KINDS, ROW_STATES, parentIds, type ArcData, type ArcRow } from "../../lib/workstream-schema.ts";
 import { ARC_FLAGS, afterWrite, arcNamed, arcSignatures, listOf, refreshIfMoved, refuseFlags, typed } from "./_shared.ts";
 import { renameFirstRead } from "./sheet.ts";
@@ -165,6 +166,9 @@ function state(args: string[]): number {
   if (next === "landed") {
     const fault = landingFault(ws, arc, data, row, run);
     if (fault) { console.log(`Refused: ${fault}`); return 1; }
+    // THE LAST ROW OF AN ARC DOES NOT LAND WHILE A SUGGESTION AGAINST IT IS OPEN (RULE.DEVEX.WORKSPACE.488).
+    const open = suggestionLandingFault(ws, arc, data, row);
+    if (open) { console.log(`Refused: ${open}. Nothing was changed.`); return 1; }
     // A plugin change is landed once it is installed (RULE.DEVEX.AGENT.110): the check reads nothing for any other row.
     const files = (readSheet(ws, arc)?.entries ?? []).filter((entry) => (row.entries ?? []).includes(entry.id)).map((entry) => entry.file);
     const unplugged = pluginLandedApplies(row.repo, next, [...files, ...(row.touches ?? [])]) ? pluginLandedRefusal(join(mainCheckoutOf(ws), row.repo!)) : null;

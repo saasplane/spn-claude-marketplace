@@ -3,6 +3,8 @@
 //           docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § The approach document
 //           docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md § The reply while work runs shows what needs you, then what moved
 //           docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § A card is only for what the rules leave open
+//           RULE.DEVEX.WORKSPACE.486, a question is named Q<n> and a suggestion S<n>, with a capital letter, wherever a person reads it
+//           RULE.DEVEX.WORKSPACE.206, a close is a milestone, and the agent writes its message before it asks, or right after it closes on a standing grant
 // The chapters are the source of truth. A rule change is edited there first, then here, in the same change.
 //
 // The Stop checks. They read what the turn is about to leave behind, and warn — never refuse, because
@@ -19,10 +21,16 @@
 //   cards      a reply names no card the window's pages do not carry, one answered, or one of another workstream
 //   notes      a note, once: an answered card a preview shows, whose arc's notes did not move
 //   carried    a proposed arc never carries a review point to a later row of itself
-//   handover   a reply that says a new window is needed carries the eight labelled lines, in one column,
+//   handover   a reply that says a new window is needed carries the nine labelled lines, in one column,
 //              once while the rows stand, and names each open card in one line; a close or a handover
 //              never opens with a table, a heading or a count
 //   how-it-runs, partner-words, page-path  the reply's last asks about running the work, the words a partner cannot open, and its page addresses, after the handover
+//   close-message  a turn whose tool results hold a close's success text ends on the closing message: a 🚀 or ✈️ heading, what was
+//              delivered, what was learned, Thank you 👍 and that the window can be retired (RULE.DEVEX.WORKSPACE.206)
+//   proposal-record  a reply that sets out lettered options names the Q<n> or S<n> that records them, and the number holds a record in the
+//              window's workstream (RULE.DEVEX.WORKSPACE.493)
+//   card-case  a reply that names a card as a lowercase q<n> or s<n> in its prose (outside code, links, URLs and paths) is sent back
+//              with each one and its capital form (RULE.DEVEX.WORKSPACE.486)
 //   go-next    a go of the window with a part ready and not started, or a report waiting to be folded,
 //              and no card open, is told its next step
 //   page-stale an arc this window wrote left its workstream's page, or its preview's status, behind the arcs
@@ -46,7 +54,7 @@
 // unfinished, and that window hears about it. A window bound to none hears nothing about them.
 //
 // WHILE A ROW IS IN PROGRESS, ONLY A FINDING ABOUT THE REPLY SENDS THE AGENT BACK (RULE.DEVEX.WORKSPACE.244):
-// `needs-you`, `reply-shape`, `cards`, `handover`, `how-it-runs`, `partner-words`, `page-path` and `welcome`. Every other finding is held, and the checks find
+// `needs-you`, `reply-shape`, `cards`, `handover`, `how-it-runs`, `partner-words`, `page-path`, `close-message`, `card-case`, `proposal-record` and `welcome`. Every other finding is held, and the checks find
 // it again at the first turn end where no row is in progress (`splitFindings`).
 //
 // `corpus` is the newest and the odd one out: every other check here reads what the TURN wrote, and
@@ -69,10 +77,10 @@ import { checkHowItRuns } from "../checks/how-it-runs.ts";
 import { checkPartnerWords } from "../checks/partner-words.ts";
 import { checkPagePath } from "../checks/page-path.ts";
 import { checkWorkstream, heldByStop } from "../checks/workstream-state.ts";
-import { PREVIEW_FILE, arcDataDir, arcStatus, stepsMayStart, arcIdsOf, leafRows, logLinesOf, notesDirOf, previewOf, readArc, readQuestions, readyRows, stateFileOf,
-         workstreamsOf } from "../lib/workstream.ts";
+import { PREVIEW_FILE, approachOf, arcDataDir, arcStatus, stepsMayStart, arcIdsOf, leafRows, logLinesOf, notesDirOf, previewOf, readArc, readJsonl, readQuestions, readyRows, stateFileOf,
+         suggestionsFileOf, workstreamsOf } from "../lib/workstream.ts";
 import { findWorkingDetail } from "../lib/working-detail.ts";
-import type { ArcData, LogLine, Question } from "../lib/workstream-schema.ts";
+import { cardName, type ArcData, type LogLine, type Question } from "../lib/workstream-schema.ts";
 import { applyLine, standings } from "../lib/migration.ts";
 import { MIGRATIONS } from "../lib/migrations/index.ts";
 import { cardsOf, holdsOwnCopy, markAge, openWorkstreams, ownCopyLines, stateOf, workstreamPlan } from "../checks/split-plan.ts";
@@ -85,17 +93,17 @@ import { sessionDir } from "../../../../plugin-support-lib/src/lib/debug-store.t
 import { cacheState, goStandings, welcome } from "./orientation.ts";
 import { begin, span, end, settle, tagsOf } from "../../../../plugin-support-lib/src/lib/timing.ts";
 import { recordUsage, windowSize } from "../lib/usage.ts";
-import { arcsWrittenSince, fromWorkspace, named, readWindow, reposWritten, visitedWorkstreams, windowSet } from "../lib/window.ts";
+import { arcsWrittenSince, fromWorkspace, named, readWindow, reposWritten, visitedWorkstreams, windowGoes, windowSet } from "../lib/window.ts";
 
 type Warning = { check: string; message: string };
 
-// The labels the handover template carries (`templates/workstream/handover-template.md`), in its
-// order. Every handover owes all eight: a line that has nothing to say still says so (`no reload`,
-// `none`), because a label left out cannot be told from a label forgotten. A label counts only where
-// it opens a line, lowercase, with its colon, which is the layout the chapter states; the sentence
-// form (`Continue workstream …`, `Model: …`) names none of them and is refused as a block missing
-// all eight. The state and the next steps are what `workstream go show` prints, so no label holds them.
-const HANDOVER_LABELS = ["continue", "model", "read first", "pins", "live now", "done when",
+// The labels the handover template carries (`templates/workstream/handover-template.md`, which the build copies from the book), in its
+// order, as the chapter's table and `workstream handover` hold them (RULE.DEVEX.WORKSPACE.394). Every handover owes all nine: a line that has
+// nothing to say still says so (`no reload`, `none`), because a label left out cannot be told from a label forgotten. A label counts only
+// where it opens a line, lowercase, with its colon, which is the layout the chapter states; the sentence form (`Continue workstream …`,
+// `Model: …`) names none of them and is refused as a block missing all nine. `state:` holds what every row reached, and in a go with a plan
+// it names `workstream go show`, which prints the parts.
+const HANDOVER_LABELS = ["continue", "model", "read first", "pins", "state", "live now", "done when",
   "do not touch", "open"];
 const HANDOVER_LABEL_LINE = new RegExp(`^(${HANDOVER_LABELS.join("|")}):(.*)$`);
 // `continue:` must carry the workstream (`008-plain-language`) and the arc (`N119`), because the next
@@ -965,7 +973,7 @@ function handoverFences(reply: string): Fence[] {
 }
 
 /**
- * Whether the reply holds a handover block that is filled in and carries all eight labels. The hook
+ * Whether the reply holds a handover block that is filled in and carries all nine labels. The hook
  * keeps this, so the block is asked for once (RULE.DEVEX.WORKSPACE.189).
  */
 export function givesHandover(reply: string): boolean {
@@ -1101,7 +1109,7 @@ export function checkHandover(reply: string, root: string, mine: Set<string>, gi
 //
 // A ROW WAITING ON THE DEVELOPER WHILE THE PAGE'S `Open` CARRIES NO CARD. The rest of what a page owes
 // its arcs is `workstream state check`'s, which the `state` check below runs: an arc with no row in
-// Cycles, a workstream with arcs and no page, and a card with no record or a record with no card.
+// the Plan table, a workstream with arcs and no page, and a card with no record or a record with no card.
 
 /**
  * Whether a page names a card number anywhere — an open card, a settled row, or a deferred one.
@@ -1404,10 +1412,10 @@ export function checkArcToPage(root: string, mine: Set<string>): Warning[] {
  *
  * @param cards  the cards open on this window's pages (`cardsWaiting`)
  */
-export function checkGoNext(root: string, mine: Set<string>, cards: string[]): Warning[] {
+export function checkGoNext(root: string, mine: Set<string>, cards: string[], started: Set<string> | null = null): Warning[] {
   if (cards.length || !mine.size) return [];
   // A PART THAT WAITS ON SOMETHING OUTSIDE THE WINDOW IS SAID AS WAITING AND NEVER AS NEXT, and only beside a step that can be taken.
-  return goStandings(root, mine).filter((go) => go.ready.length || go.unfolded.length).map((go) => ({ check: "go-next", message:
+  return goStandings(root, mine, started).filter((go) => go.ready.length || go.unfolded.length).map((go) => ({ check: "go-next", message:
     `The go of ${go.workstream}/${go.lead} has ` +
     [go.ready.length ? `${go.ready.length === 1 ? "a part" : `${go.ready.length} parts`} ready and not started (${go.ready.join(", ")})` : "",
      go.unfolded.length ? `${go.unfolded.length === 1 ? "a report" : `${go.unfolded.length} reports`} waiting to be folded (${go.unfolded.join(", ")})` : ""]
@@ -1421,9 +1429,9 @@ export function checkGoNext(root: string, mine: Set<string>, cards: string[]): W
 
 /**
  * A page left stale by an arc this session wrote (RULE.DEVEX.WORKSPACE.204). The parts of a page that
- * the arcs decide are the Cycles table, the header's status and the heading of `Open`. The write-time
+ * the arcs decide are the Plan table, the header's status and the heading of `Open`. The write-time
  * check sees them only when the whole page is written, so an arc that moves leaves the page behind
- * and this is where it is said. A page with no Cycles table is left alone, because the command named
+ * and this is where it is said. A page with no arcs table is left alone, because the command named
  * here has nothing to write on it. So is a page that holds its own copy of the styles, which that
  * command refuses.
  *
@@ -1438,7 +1446,7 @@ export function checkPageCurrent(touched: Set<string> | null): Warning[] {
     for (const page of pagesOf(folder)) {
       const text = read(page);
       if (exemptWorkstream(page) || holdsOwnCopy(page) || !cyclesTableAt(text)) continue;
-      if (cyclesRule(page, text).length) parts.add("the Cycles table");
+      if (cyclesRule(page, text).length) parts.add("the Plan table");
       if (headerRule(page, text).length) parts.add("the header's status");
       if (openHeadingRule(page, text).length) parts.add("the heading of `Open`");
     }
@@ -1461,8 +1469,8 @@ export function checkPageCurrent(touched: Set<string> | null): Warning[] {
     behind.map((one) => `\`${one.workstream}\`: ${one.parts.join(", ")}`).join(" · ") +
     `. The parts of a page that the arcs decide are produced, never typed (RULE.DEVEX.WORKSPACE.204). Run ` +
     behind.map((one) => `\`spn-devex docs cycles write ${one.workstream}\``).join(" and ") +
-    `, which writes the header's status, the Cycles table and the heading of \`Open\` from the arcs. The rest ` +
-    `of the page is yours to bring current in the same turn (05-artifacts.md § How ends in Cycles).` }];
+    `, which writes the header's status, the Plan table and the heading of \`Open\` from the arcs. The rest ` +
+    `of the page is yours to bring current in the same turn (05-artifacts.md § After How comes a section of its own, Plan).` }];
 }
 
 /** The status a preview's header shows, as its status badge reads it; null where it shows none. */
@@ -1614,6 +1622,133 @@ export function turnOf(transcript: string, reply: string): { prompt: string; ear
   }
   if (texts.length && texts[texts.length - 1].trim() === reply.trim()) texts.pop();
   return { prompt, earlier: texts };
+}
+
+/** A tool result's text: a string, or the text blocks of a list. */
+function resultText(content: unknown): string {
+  if (typeof content === "string") return content;
+  if (Array.isArray(content)) return content.map((part) => (part as { text?: string }).text ?? "").join("\n");
+  return "";
+}
+
+/**
+ * Every tool result of the turn the Stop hook ends, from the transcript: the text of each `tool_result` block after the last
+ * prompt of the developer's own, read as `turnOf` reads the turn. A helper's side chain is left out.
+ */
+export function toolResultsOf(transcript: string): string[] {
+  let raw = "";
+  try { raw = readFileSync(transcript, "utf8"); } catch { return []; }
+  let results: string[] = [];
+  for (const line of raw.split("\n")) {
+    if (!line.trim()) continue;
+    let entry: { type?: string; isMeta?: boolean; isSidechain?: boolean; message?: { content?: unknown } };
+    try { entry = JSON.parse(line); } catch { continue; }
+    if (promptTextOf(entry)) { results = []; continue; }
+    if (entry.type !== "user" || entry.isSidechain || !Array.isArray(entry.message?.content)) continue;
+    for (const part of entry.message.content as Array<{ type?: string; content?: unknown }>)
+      if (part.type === "tool_result") results.push(resultText(part.content));
+  }
+  return results;
+}
+
+// ---------------------------------------------------------------------------- the card's capital letter
+
+/**
+ * The cards a reply's prose names with a lowercase letter, once each, as written (`q28`, `s3`). Read outside fenced blocks, code spans,
+ * links, URLs and paths: a name after a `/` or a `#`, or inside a word, is an address and is left alone.
+ */
+export function lowercaseCards(reply: string): string[] {
+  const prose = withoutFences(reply)
+    .replace(/`[^`\n]*`/g, " ")
+    .replace(/\[[^\]]*\]\([^)]*\)/g, " ")
+    .replace(/https?:\/\/\S+/g, " ")
+    .replace(/<[^>\n]*>/g, " ");
+  return [...new Set([...prose.matchAll(/(?<![\w/#.\-@])([qs])(\d+)\b/g)].map((found) => `${found[1]}${found[2]}`))];
+}
+
+/**
+ * THE CARD-CASE CHECK (RULE.DEVEX.WORKSPACE.486): a question is named Q<n> and a suggestion S<n>, with a capital letter, wherever a person
+ * reads it. A reply that names one with a lowercase letter is sent back, naming each and its capital form.
+ */
+export function checkCardCase(reply: string): Warning[] {
+  const found = lowercaseCards(reply);
+  if (!found.length) return [];
+  return [{ check: "card-case", message:
+    `This reply names ${found.length === 1 ? "a card" : "cards"} with a lowercase letter: ${found.map((one) => `\`${one}\` is \`${one[0].toUpperCase()}${one.slice(1)}\``).join(", ")}. ` +
+    "A question is named Q<n> and a suggestion S<n>, with a capital letter, wherever a person reads it (RULE.DEVEX.WORKSPACE.486). Say it again with the capital." }];
+}
+
+// ---------------------------------------------------------------------------- a proposal in chat ends as a record
+
+/** A list of lettered options: two lines or more opening `A.`, `B)`, `**A**`, `- A:` and so on, with different letters. */
+const LETTERED_LINE = /^[ \t]*(?:[-*+][ \t]+)?(?:\*\*|__)?([A-D])(?:\*\*|__)?(?:[.):\u2014:]|[ \t]+[-\u2014])[ \t]+\S/;
+
+/** Whether a reply sets out lettered options, as a lettered table or a list of `A.` / `B.` / `**A**` lines. Fences are set aside. */
+export function setsOutOptions(reply: string): boolean {
+  const text = withoutFences(reply);
+  if (TABLE.test(text) && LETTERED_ROW.test(text)) return true;
+  const letters = new Set(text.split("\n").map((line) => LETTERED_LINE.exec(line)?.[1]).filter(Boolean));
+  return letters.size >= 2;
+}
+
+/**
+ * A PROPOSAL IN CHAT ENDS AS A CARD OR A SUGGESTION (RULE.DEVEX.WORKSPACE.493): a reply that sets out lettered options is sent back unless
+ * it names a `Q<n>` or `S<n>` that has a record in the window's workstream. Seen on Q22: a table of options with no number, so no record.
+ */
+export function checkProposalRecorded(reply: string, root: string, mine: Set<string>): Warning[] {
+  if (!setsOutOptions(reply)) return [];
+  const named = [...new Set(withoutFences(reply).match(/\b[QSqs]\d+\b/g) ?? [])].map((one) => one.toLowerCase());
+  const folders = scoped(openWorkstreamFolders(root), mine);
+  const held = new Set<string>();
+  for (const ws of folders) {
+    for (const record of readQuestions(ws)) held.add(record.id);
+    // A workstream argued before the records held its cards as anchors on the approach page.
+    const page = approachOf(ws);
+    if (page) { try { for (const found of readFileSync(page, "utf8").matchAll(/\bid="([qs]\d+)"/g)) held.add(found[1]); } catch { /* an unreadable page holds none */ } }
+    for (const line of readJsonl(suggestionsFileOf(ws))) { const id = (line as { id?: unknown } | undefined)?.id; if (typeof id === "string") held.add(id); }
+  }
+  const fix = "Record the proposal first: `spn-devex workstream question raise <workstream>/N<nnn> --file card.json` for a card, or `spn-devex workstream suggestion add <workstream>/N<nnn> \"<title>\"` for a suggestion, and name its number in this reply (RULE.DEVEX.WORKSPACE.493).";
+  if (!named.length)
+    return [{ check: "proposal-record", message: `This reply sets out lettered options and names no Q<n> or S<n> that records them. ${fix}` }];
+  const missing = named.filter((one) => !held.has(one));
+  if (missing.length === named.length)
+    return [{ check: "proposal-record", message: `This reply sets out lettered options, and ${missing.map(cardName).join(", ")} ${missing.length > 1 ? "hold" : "holds"} no record in this window's workstream. ${fix}` }];
+  return [];
+}
+
+// ---------------------------------------------------------------------------- the closing message
+
+/** The success text of `workstream close`, which a turn's tool results hold when the close landed. */
+export const CLOSE_SUCCESS = "closed · approach page stamped DONE";
+
+/** The parts of a closing message, each with the pattern that finds it and the words that name it to the agent. */
+const CLOSING_PARTS: Array<[RegExp, string]> = [
+  [/^#{1,6}[ \t]*(?:🚀|✈️)/mu, "a heading with 🚀 or ✈️ after the #"],
+  [/What (?:we|was) delivered/i, "\"What we delivered\" (or \"What was delivered\")"],
+  [/What (?:we|was) learned/i, "\"What we learned\" (or \"What was learned\")"],
+  [/Thank you 👍/u, "\"Thank you 👍\""],
+  [/\bretired\b/i, "the word \"retired\", in the line that says the window can be retired"],
+];
+
+/** The pieces of the closing message a reply leaves out. */
+export function missingClosing(reply: string): string[] {
+  return CLOSING_PARTS.filter(([pattern]) => !pattern.test(reply)).map(([, name]) => name);
+}
+
+/**
+ * THE CLOSE-MESSAGE CHECK (RULE.DEVEX.WORKSPACE.206): a close is a milestone, and the agent writes its message right after the
+ * close. A turn whose tool results hold the close's success text is sent back unless its reply carries every piece.
+ *
+ * @param results  the tool results of the turn (`toolResultsOf`)
+ */
+export function checkCloseMessage(reply: string, results: readonly string[]): Warning[] {
+  if (!results.some((one) => one.includes(CLOSE_SUCCESS))) return [];
+  const missing = missingClosing(reply);
+  if (!missing.length) return [];
+  return [{ check: "close-message", message:
+    `The close landed, and a close is a milestone: this reply must be its closing message (RULE.DEVEX.WORKSPACE.206). It leaves out ${missing.join("; ")}. ` +
+    "Write it as a `# 🚀 <title>` heading, a line reading `&nbsp;`, `### 📦 What we delivered` with bullets, `### 🧠 What we learned` with bullets, " +
+    "`Thank you 👍`, and one plain line that the window can be retired." }];
 }
 
 /**
@@ -1866,7 +2001,10 @@ if (argv1Base === "stop.ts" || argv1Base === "stop.mjs") {
     ...span({ group: "stop", action: "own-copy" }, () => checkOwnCopy(root, mine, baseline?.ownCopy ?? [])),
     ...span({ group: "stop", action: "cards" }, () => checkCardsNamed(reply, root, mine, turn.prompt)),
     ...span({ group: "stop", action: "runnable" }, () => checkRunnable(root, baseline?.at ?? 0, baseline?.steps ?? {}, wrote, mine, reply)),
-    ...span({ group: "stop", action: "go-next" }, () => checkGoNext(root, mine, waiting)),
+    ...span({ group: "stop", action: "close-message" }, () => checkCloseMessage(reply, event.transcript_path ? toolResultsOf(event.transcript_path) : [])),
+    ...span({ group: "stop", action: "card-case" }, () => checkCardCase(reply)),
+    ...span({ group: "stop", action: "proposal-record" }, () => checkProposalRecorded(reply, root, mine)),
+    ...span({ group: "stop", action: "go-next" }, () => checkGoNext(root, mine, waiting, windowGoes(root, session))),
     ...span({ group: "stop", action: "handover" }, () => checkHandover(reply, root, mine, given, turn.earlier)),
     ...span({ group: "stop", action: "how-it-runs" }, () => checkHowItRuns(withoutFences(reply), root)),
     ...span({ group: "stop", action: "partner-words" }, () => checkPartnerWords(withoutFences(reply), root, turn.prompt)),

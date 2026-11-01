@@ -25,6 +25,23 @@
   <p class="sds-standfirst">{{THE DESCRIPTION, one paragraph: what changes, why you would read this page, and how the page runs.}}</p>
 </header>
 
+<!-- spn:closing
+     The closing block goes here, under the masthead. The agent writes it at the close, and `workstream close` refuses a page without it
+     (RULE.DEVEX.WORKSPACE.206): it is written at the close, and the close refuses a page without it. Replace this comment with it, in this shape:
+       <div class="sds-note">
+         <p>🚀 <strong>{{NNN}} {{TITLE}} has shipped.</strong> {{one line of measured numbers}}</p>
+         <p>&nbsp;</p>
+         <p><strong>📦 What was delivered</strong></p>
+         <ul><li>{{one bullet for each distinct thing}}</li></ul>
+         <p>&nbsp;</p>
+         <p><strong>🧠 What was learned</strong></p>
+         <ul><li>{{one bullet for each distinct thing}}</li></ul>
+         <p>&nbsp;</p>
+         <p><strong>Thank you 👍</strong></p>
+         <p>{{one line}}</p>
+       </div>
+-->
+
 <section id="s1" data-block="reasons">
   <div class="sds-section-head"><h2>Why</h2></div>
   <p class="sds-standfirst">{{The problem in one line, and the evidence for it.}}</p>
@@ -75,7 +92,10 @@
   <p class="sds-standfirst">{{What the heading would have said, as one sentence: the statement this subsection makes.}}</p>
   <p>{{&hellip; Ships: &hellip;}}</p>
   <p><span class="sds-small">Arcs: N002</span></p>
-  <h3 id="h9">Cycles</h3>
+</section>
+
+<section id="arcs" data-block="sequence">
+  <div class="sds-section-head"><h2>Plan</h2></div>
   <p>{{The order the arcs run in, in a sentence.}}</p>
   <div class="sds-scroll"><table>
     <thead><tr><th>Arc</th><th class="sds-status-col">Status</th></tr></thead>

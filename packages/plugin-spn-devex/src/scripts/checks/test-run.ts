@@ -1,10 +1,13 @@
 #!/usr/bin/env node
-// RESTATES: spn-foundation RULE.DEVEX.WORKSPACE.207 — no source or test file changes while a test run for
+// RESTATES: spn-foundation RULE.DEVEX.WORKSPACE.496 — a follow-up batch after a close runs its whole suite under `followup-<NNN>-<n>`; RULE.DEVEX.WORKSPACE.207 — no source or test file changes while a test run for
 // that repository is in flight, and a whole suite runs at the go's named points, never per change.
 //
 // Refuses a write under a repository's `src` or `tests` while a test command for that repository has
 // a start file under `.spndevex/.debug/sessions/<id>/pending/`, which `lib/bash-timing.ts` writes before a
 // timed Bash command. The design is in the hooks chapter, § A source edit waits while a test run is going.
+//
+// A whole suite run under the name `followup-<NNN>-<n>` passes while workstream `<NNN>` is closed and holds a decided suggestion: a follow-up
+// decided after a close runs as a small batch with no arc and no go (RULE.DEVEX.WORKSPACE.496).
 //
 // Refuses a whole suite, by any runner the repository uses, unless a baseline, full or proof run of a go is running for that
 // repository: `workstream go start` marks one running in the lead arc's `go.json`. A narrowed run always passes.
@@ -19,7 +22,7 @@ import { repoOf } from "../../../../plugin-support-lib/src/lib/timing.ts";
 import { isRunnerRun, loadPrograms, readCommand, TEST_RUNNERS, type Reading } from "../lib/command-reader.ts";
 import { readGo } from "../lib/go-plan.ts";
 import { windowWorkstreams } from "../lib/window.ts";
-import { arcIdsOf, workstreamsOf } from "../lib/workstream.ts";
+import { arcIdsOf, readJsonl, suggestionsFileOf, workstreamsOf } from "../lib/workstream.ts";
 import type { GoPart, GoPlan } from "../lib/workstream-schema.ts";
 
 /**
@@ -94,6 +97,32 @@ export function isWholeSuite(found: Reading): boolean {
   return !words.some((word) => !word.startsWith("-") && word !== "run" && word !== "test");
 }
 
+/**
+ * The run name a whole-suite command was given, or null where it names none. `spnutils apps test <tier> <run> [<node>]` takes it second, after
+ * the tier; `spnutils infra test <run>` and a repository's own runner (`node scripts/test-all.mjs <run>`) take it first.
+ */
+export function runNameOfCommand(found: Reading): string | null {
+  const words = [found.action, ...(found.args ?? "").split(/\s+/)].filter((word): word is string => Boolean(word));
+  const rest = found.script === "spnutils" ? words.filter((word) => word !== "test") : words;
+  const plain: string[] = [];
+  for (const word of rest) {
+    if (word === "--") break;
+    if (!word.startsWith("-")) plain.push(word);
+  }
+  return (found.script === "spnutils" && found.group === "apps" ? plain[1] : plain[0]) ?? null;
+}
+
+/**
+ * Whether a run name is a follow-up batch's (RULE.DEVEX.WORKSPACE.496): `followup-<NNN>-<n>`, where workstream `<NNN>` sits in `closed/` and holds
+ * at least one suggestion that reads `decided`. The same name for an open workstream, a closed one with none decided, or a name of another shape is not.
+ */
+export function followupRun(root: string, name: string | null): boolean {
+  const found = name === null ? null : /^followup-(\d{3})-(\d+)$/.exec(name);
+  if (!found) return false;
+  const closed = workstreamsOf(root, ["closed"]).filter((ws) => basename(ws).startsWith(`${found[1]}-`));
+  return closed.some((ws) => readJsonl(suggestionsFileOf(ws)).some((one) => (one as { state?: unknown } | undefined)?.state === "decided"));
+}
+
 /** A part of a go that lets a whole suite run: a baseline, a full run, or the proof run after the releases. */
 const isSuitePart = (part: GoPart): boolean =>
   part.work === "TEST" && (part.id.startsWith("baseline-") || part.id.startsWith("full-") || part.id.startsWith("proof-"));
@@ -137,6 +166,7 @@ export function checkWholeSuite(payload: Payload): Verdict {
   if (!root) return null;
   const whole = readCommand(command, cwd, loadPrograms(root), root).filter(isWholeSuite);
   if (!whole.length) return null;
+  if (whole.every((found) => followupRun(root, runNameOfCommand(found)))) return null;
   const repo = whole.map((found) => found.repo).find(Boolean) ?? repoAt(root, cwd);
   const plans = openPlans(root);
   const forRepo = (part: GoPart): boolean => isSuitePart(part) && (!repo || part.repo === repo);

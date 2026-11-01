@@ -173,5 +173,61 @@ writeFileSync(join(root, ".spndevex", ".debug", "telemetry", "hooks.jsonl"), [
 ].join("\n"));
 same("[MKT.SCRIPTS.326] fullRunMinutes is the span of a full run's TEST rows, from the earliest start to the latest end; a baseline, a red run and a row of another kind are left out", fullRunMinutes(root), 3);
 
+const cited = { ...entry("E2", "lib-repo:src/b.ts"), decidedBy: ["Q9"] };
+same("[MKT.SCRIPTS.408] citing a card changes no entry's hash", entryHash(cited), entryHash(entry("E2", "lib-repo:src/b.ts")));
+same("[MKT.SCRIPTS.408] any other field still changes the hash", entryHash({ ...cited, what: "other" }) === entryHash(cited), false);
+const citedScope = [{ arc: "N009", sheet: sheet([entry("E1", "app-repo:src/a.ts"), cited, entry("E3", "lib-repo:docs/c.md")]) }];
+same("[MKT.SCRIPTS.408] a landed part whose entry only gained a citation plans no follow-up and is not stale", [changedEntries(plan.parts.find((p) => p.id === "code-lib-repo-1"), citedScope), staleEntries(plan.parts.find((p) => p.id === "code-lib-repo-1"), plan, citedScope)], [[], []]);
+
+const afterRelease = deriveGo([{ arc: "N009", sheet: sheet([...scope[0].sheet.entries, entry("E4", "lib-repo:docs/late.md")]) }], { previous: landedAll });
+same("[MKT.SCRIPTS.411] a docs entry planned after its repository's release landed gets a second release part, and a repository with nothing new keeps one",
+  afterRelease.parts.filter((p) => p.work === "RELEASE").map((p) => [p.id, p.state]), [["release-lib-repo-1", "landed"], ["release-lib-repo-2", "ready"], ["release-app-repo-1", "landed"]]);
+const afterTwo = deriveGo([{ arc: "N009", sheet: sheet([...scope[0].sheet.entries, entry("E4", "lib-repo:docs/late.md"), entry("E5", "lib-repo:docs/later.md")]) }],
+  { previous: { ...afterRelease, parts: afterRelease.parts.map((p) => ({ ...p, state: p.id === "release-lib-repo-2" ? "landed" : p.state === "ready" && p.entries.includes("N009/E4") ? "landed" : p.state })) } });
+same("[MKT.SCRIPTS.411] and a third after the second landed", afterTwo.parts.filter((p) => p.id.startsWith("release-lib-repo")).map((p) => p.id), ["release-lib-repo-1", "release-lib-repo-2", "release-lib-repo-3"]);
+same("[MKT.SCRIPTS.411] the second release waits on the new docs' pass like the first, and the plan passes the schema", [afterRelease.parts.find((p) => p.id === "release-lib-repo-2").waitsOn.length > 0, goFaults(afterRelease)], [true, []]);
+
+// A code part kept from before, landed after the repository's full run, opens the next full run.
+const partsOf = (landed) => plan.parts.map((p) => ({ ...p, state: landed.includes(p.id) ? "landed" : "held" }));
+const kept2 = { ...plan, parts: partsOf(["docs-lib-repo-1", "baseline-lib-repo", "code-lib-repo-1", "full-lib-repo"]) };
+const noNewEntry = [{ arc: "N009", sheet: sheet([scope[0].sheet.entries[1], scope[0].sheet.entries[2]]), landed: ["E2", "E3"] }];
+same("[MKT.SCRIPTS.412] a code part that landed after the full run opens the next full run, though it was kept from a previous plan",
+  deriveGo(noNewEntry, { previous: kept2, landedOrder: ["docs-lib-repo-1", "baseline-lib-repo", "full-lib-repo", "code-lib-repo-1"] }).parts.some((p) => p.id === "full-lib-repo-2"), true);
+same("[MKT.SCRIPTS.412] one that landed before the full run opens none",
+  deriveGo(noNewEntry, { previous: kept2, landedOrder: ["docs-lib-repo-1", "baseline-lib-repo", "code-lib-repo-1", "full-lib-repo"] }).parts.some((p) => p.id === "full-lib-repo-2"), false);
+same("[MKT.SCRIPTS.412] and with no landing order read, none is opened",
+  deriveGo(noNewEntry, { previous: kept2 }).parts.some((p) => p.id === "full-lib-repo-2"), false);
+
+// A code entry that creates a file comes before the one that uses it.
+const user = entry("E1", "lib-repo:src/use.ts"), maker = { ...entry("E2", "lib-repo:src/type.ts"), op: "create", callers: ["src/use.ts"] }, other = entry("E3", "lib-repo:src/other.ts");
+const ordered = deriveGo([{ arc: "N009", sheet: sheet([user, other, maker]) }]);
+same("[MKT.SCRIPTS.413] the entry that creates a file is built before the one that uses it, the rest keeping their number order", ordered.parts.find((p) => p.id === "code-lib-repo-1").entries, ["N009/E2", "N009/E1", "N009/E3"]);
+const unknown = deriveGo([{ arc: "N009", sheet: sheet([user, other, { ...maker, callers: [] }]) }]);
+same("[MKT.SCRIPTS.413] where nothing says what builds on what, the number order stands", unknown.parts.find((p) => p.id === "code-lib-repo-1").entries, ["N009/E1", "N009/E3", "N009/E2"]);
+const loop = deriveGo([{ arc: "N009", sheet: sheet([{ ...user, op: "create", callers: ["src/type.ts"] }, maker]) }]);
+same("[MKT.SCRIPTS.413] two entries that name each other keep the number order", loop.parts.find((p) => p.id === "code-lib-repo-1").entries, ["N009/E1", "N009/E2"]);
+same("[MKT.SCRIPTS.413] the signature follows the new order and the plan passes the schema", [ordered.parts.find((p) => p.id === "code-lib-repo-1").signature.split(".").length, goFaults(ordered)], [3, []]);
+
+// Two parts that edit one file never run together; a part waits for the parts that edit its sources.
+const same1 = entry("E1", "lib-repo:src/shared.ts"), same2 = entry("E2", "lib-repo:src/shared.ts"), apart = entry("E3", "lib-repo:src/apart.ts");
+const byOne = deriveGo([{ arc: "N009", sheet: sheet([same1, apart, same2]) }], { rates: { "lib-repo|CODE": 45 / 1 } });
+same("[MKT.SCRIPTS.414] two code parts that edit one file: the later waits on the earlier, and the one that edits another file does not",
+  Object.fromEntries(byOne.parts.filter((p) => p.id.startsWith("code-")).map((p) => [p.id, p.waitsOn.filter((id) => id.startsWith("code-"))])),
+  { "code-lib-repo-1": [], "code-lib-repo-2": [], "code-lib-repo-3": ["code-lib-repo-1"] });
+const gen = { ...entry("E4", "lib-repo:src/dist/rules.json"), work: "GENERATED", book: ["lib-repo:docs/book.md"] };
+const book = { ...entry("E5", "lib-repo:docs/book.md"), work: "DOCS" };
+const generated = deriveGo([{ arc: "N009", sheet: sheet([gen, book]) }]);
+same("[MKT.SCRIPTS.414] a part waits for the part that edits the file its entries' book lines name, so nothing is ready before its sources landed",
+  [generated.parts.find((p) => p.id === "generated-lib-repo-1").waitsOn.includes("docs-lib-repo-1"), readyParts(generated).map((p) => p.id).includes("generated-lib-repo-1")], [true, false]);
+same("[MKT.SCRIPTS.414] and the plan passes the schema", goFaults(byOne), []);
+
+// A follow-up is one part for each repository, carried out by the lead.
+const fu = deriveGo([{ arc: "N009", sheet: sheet([entry("E1", "lib-repo:docs/a.md"), entry("E2", "lib-repo:docs/b.md"), entry("E3", "lib-repo:src/c.ts")]) }], { followUp: true });
+same("[MKT.SCRIPTS.416] a follow-up is one part with its entries of every kind, the lead's own, and the repository's full run because code changed; no baseline and no release",
+  fu.parts.map((p) => [p.id, p.entries.length, p.model]), [["code-lib-repo-1", 3, "lead"], ["full-lib-repo", 0, "none"]]);
+const fuDocs = deriveGo([{ arc: "N009", sheet: sheet([entry("E1", "lib-repo:docs/a.md"), entry("E2", "lib-repo:docs/b.md")]) }], { followUp: true });
+same("[MKT.SCRIPTS.416] a follow-up of docs only has no full run", fuDocs.parts.map((p) => [p.id, p.entries.length]), [["docs-lib-repo-1", 2]]);
+same("[MKT.SCRIPTS.416] and both pass the schema", [goFaults(fu), goFaults(fuDocs)], [[], []]);
+
 console.log(`\n${total - failed}/${total} passed`);
 process.exit(failed ? 1 : 0);

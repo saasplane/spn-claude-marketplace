@@ -31,7 +31,7 @@ export function previewsWithoutStatus(root: string): string[] {
 }
 
 /** Writes the arc's status into each preview the check names, and says which it wrote. */
-function writeAll(root: string): string[] {
+export function writeAll(root: string): string[] {
   return workstreamsOf(root).filter(isDataLayout).flatMap((ws) => {
     const name = relative(join(root, DEVEX_WORKSTREAMS), ws).split("\\").join("/");
     return writePreviewStatus(ws).map((preview) => `${name}/${preview}: wrote the arc's status`);

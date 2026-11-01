@@ -37,6 +37,8 @@ facts: [{{f<n>}}]                       # the facts it rests on, by id, from the
 hand back. **Read only** the files below; read further only where one of them sends you, and read a file over 20 KB in
 parts. **Search with `grep` in Bash**, since you have no Grep tool. **Hand back** at most 8 lines; save the report, at most 15 lines, as `orders/{{part}}.report.md` beside this order, its front matter first.
 
+**A name, a shape or a construct no entry of this order holds is not yours to make up** (RULE.DEVEX.WORKSPACE.495): stop, return `needs-you`, and list each one under `unnamed:` in the report.
+
 <!-- IN AN ARC THAT KEEPS A CHANGE SHEET (arcs/N<nnn>/sheet.json), THE ORDER NAMES ITS PART AND NOTHING ELSE ABOUT THE WORK:
      the files, the rules, the callers, the tiers and the book lines come from the part's entries, read first with
      `spn-devex workstream go show N{{lead}} --part {{part}}`, and never from prose here. The launch check refuses an
@@ -79,6 +81,7 @@ outcome: {{landed · stopped · needs-you}}
 proof: "{{each gate's command and exit code, joined by middots}}"
 commits: { {{repo}}: [{{sha}}] }
 followUps: ["{{new row id}} {{its title}}"]
+unnamed: [{{a name, shape or construct no entry holds, or leave it empty}}]
 ---
 ```
 

@@ -32,9 +32,11 @@ export type WindowNote = {
   welcome?: "whole" | "short";
   /** The repositories (folder names under the workspace) this window has written under, by when it first did. */
   repos: Record<string, string>;
+  /** The goes this window started: `<workstream>/<lead>` it ran `go start` or `go write` for, or `<workstream>/*` a handover gave it. */
+  goes: Record<string, "start" | "write" | "handover">;
 };
 
-const empty = (): WindowNote => ({ workstreams: {}, wrote: {}, told: {}, repos: {} });
+const empty = (): WindowNote => ({ workstreams: {}, wrote: {}, told: {}, repos: {}, goes: {} });
 
 export type WelcomeForm = "whole" | "short";
 
@@ -59,7 +61,8 @@ export function readWindow(root: string, session: string | undefined): WindowNot
     const note: WindowNote = { workstreams: bound,
              wrote: held?.wrote && typeof held.wrote === "object" ? held.wrote : {},
              told: held?.told && typeof held.told === "object" ? held.told : {},
-             repos: held?.repos && typeof held.repos === "object" ? held.repos : {} };
+             repos: held?.repos && typeof held.repos === "object" ? held.repos : {},
+             goes: held?.goes && typeof held.goes === "object" ? held.goes : {} };
     // A note written before the field has no welcome, and reads it absent.
     if (held?.welcome === "whole" || held?.welcome === "short") note.welcome = held.welcome;
     return note;
@@ -204,6 +207,37 @@ export function recordWrites(root: string, session: string | undefined, cwd: str
   if (changed) save(root, session, note);
 }
 
+/**
+ * Record the goes a shell command starts or writes: `workstream go start <ws>/<lead> <part>` and `workstream go write <ws>/<lead>`.
+ * THE GO-NEXT AT A TURN'S END IS ABOUT THE GOES THIS WINDOW STARTED, never another window's on the same workstream (s57).
+ */
+export function recordGoes(root: string, session: string | undefined, cwd: string, command: string): void {
+  if (!windowFile(root, session)) return;
+  const found: Array<[string, "start" | "write"]> = [];
+  for (const segment of command.split(/&&|\|\||[;|\n]/)) {
+    const words = segment.trim().split(/\s+/).map((word) => word.replace(/^['"]|['"]$/g, ""));
+    const at = words.indexOf("workstream");
+    const verb = words[at + 1] === "go" ? words[at + 2] : "";
+    if (at < 0 || (verb !== "start" && verb !== "write")) continue;
+    const ref = words.slice(at + 3).find((word) => word && !word.startsWith("-"));
+    const slash = ref ? ref.lastIndexOf("/") : -1;
+    if (!ref || slash < 1 || !ARC_ID.test(ref.slice(slash + 1))) continue;
+    try {
+      const ws = workstreamNamed(root, cwd, ref.slice(0, slash));
+      if (ws) found.push([`${basename(ws)}/${ref.slice(slash + 1)}`, verb]);
+    } catch { /* a command this cannot read starts no go here */ }
+  }
+  if (!found.length) return;
+  const note = readWindow(root, session);
+  for (const [key, how] of found) note.goes[key] = how;
+  save(root, session, note);
+}
+
+/** The goes this window started or was handed, as `<workstream>/<lead>` or `<workstream>/*`. */
+export function windowGoes(root: string, session: string | undefined): Set<string> {
+  return new Set(Object.keys(readWindow(root, session).goes));
+}
+
 /** The member repositories (folders with an `sprepo.json`) these paths sit under, by folder name. */
 function reposWrittenUnder(root: string, cwd: string, paths: string[]): string[] {
   const out = new Set<string>();
@@ -231,6 +265,8 @@ export function bindNamed(root: string, session: string | undefined, name: strin
   const note = readWindow(root, session);
   if (note.workstreams[name]?.tie === "owns") return;
   note.workstreams[name] = { since: note.workstreams[name]?.since ?? new Date().toISOString(), by, tie: "owns" };
+  // A HANDOVER GIVES THE WINDOW THE WORKSTREAM'S GOES: its next step is the one the handover was written for.
+  if (by === "handover") note.goes[`${name}/*`] = "handover";
   save(root, session, note);
 }
 

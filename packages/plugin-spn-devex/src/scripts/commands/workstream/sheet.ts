@@ -1,4 +1,5 @@
 // RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § The change sheet is the arc's data · § The formats
+//           RULE.DEVEX.WORKSPACE.488, a suggestion belongs to an arc, as a card does, and the arc's sheet cites it
 // The chapter is the source of truth; a rule change is edited there first, then here, in the same change.
 //
 //   spn-devex workstream sheet write <workstream>/N<nnn> --file <sheet.json>
@@ -18,8 +19,9 @@ import { basename, dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { type Action, FLAG, VALUE, UsageFault, readWords } from "../../../../../plugin-support-lib/src/lib/command.ts";
 import { workspaceRoot } from "../../../../../plugin-support-lib/src/lib/timing.ts";
-import { logEvent, readArc, readJson, readJsonl, readQuestions, readSheet, factsFileOf, sheetFileOf, stateFileOf, writeArc, writeWhole } from "../../lib/workstream.ts";
-import { ENTRY_OPS, entryWork, parentIds, renameDataToWork, sheetFaults, type ArcData, type ArcRow, type Fact, type Question, type Sheet, type SheetEntry } from "../../lib/workstream-schema.ts";
+import { logEvent, readArc, readJson, workspaceOf, readJsonl, readQuestions, readSheet, factsFileOf, sheetFileOf, stateFileOf, suggestionsOf, writeArc, writeWhole } from "../../lib/workstream.ts";
+import { ENTRY_OPS, cardName, entryWork, parentIds, renameDataToWork, sheetFaults, type ArcData, type ArcRow, type Fact, type Question, type Sheet, type SheetEntry } from "../../lib/workstream-schema.ts";
+import { missingCopies } from "../../lib/generated-copies.ts";
 import { arcNamed, listOf, typed } from "./_shared.ts";
 
 export const describe = "the arc's change sheet: write it whole, edit or drop one entry, show it, check it against the rows and the cards";
@@ -69,6 +71,9 @@ function writeFaults(ws: string, arc: string, sheet: Sheet, whole: boolean): str
   for (const entry of Array.isArray(sheet.entries) ? sheet.entries : [])
     for (const id of Array.isArray(entry?.facts) ? entry.facts : [])
       if (typeof id === "string" && !held.has(id)) out.push(`${entry.id} cites ${id}, which ${arc}'s facts do not hold`);
+  // A CHANGED BOOK FILE MOVES ITS GENERATED COPIES: each the sheet does not name is a fault where the whole sheet is written (s59).
+  const root = workspaceOf(ws);
+  if (whole && root && Array.isArray(sheet.entries)) out.push(...missingCopies(root, sheet.entries.filter((entry) => typeof entry?.file === "string" && entry.file.includes(":"))));
   return out;
 }
 
@@ -132,6 +137,15 @@ function deriveSteps(ws: string, arc: string, sheet: Sheet): number {
   return added;
 }
 
+/** The row of a decided arc that a `--because` names, as `3` or `row 3`, or null where it names none: then it is the developer's words. */
+export function finishedRow(ws: string, arc: string, because: string): { id: string } | null {
+  const data = readArc(ws, arc);
+  if (!data || data.status !== "DECIDED") return null;
+  const id = because.replace(/^row\s+/i, "").trim();
+  const row = data.rows.find((one) => one.id === id && one.state !== "landed");
+  return row ? { id: row.id } : null;
+}
+
 function write(args: string[]): number {
   const words = readWords(args, { file: VALUE, because: VALUE });
   const [ref, ...more] = words.paths;
@@ -147,12 +161,20 @@ function write(args: string[]): number {
   // A decided arc's sheet is what the work was cut from: a rewrite carries the developer's words that changed it, and an empty sheet is written once.
   const because = words.value("because")?.trim() ?? "";
   if (readArc(ws, arc)?.status === "DECIDED" && (readSheet(ws, arc)?.entries.length ?? 0) > 0 && !because)
-    faults.push(`${arc} is decided and its sheet holds entries — a rewrite carries \`--because "<the developer's words that changed it>"\``);
+    faults.push(`${arc} is decided and its sheet holds entries — a rewrite carries \`--because "<the developer's words that changed it>"\` (or, for a fix that finishes the arc's own row or proof, \`--because "<its row>"\`)`);
+  // A FIX THAT FINISHES A DECIDED ARC'S OWN ROW OR PROOF NEEDS NO CARD: --because names that row, and every new entry cites it (s55).
+  const finishes = finishedRow(ws, arc, because);
+  if (finishes) {
+    const known = new Set((readSheet(ws, arc)?.entries ?? []).map((one) => one.id));
+    for (const entry of Array.isArray((data as Sheet).entries) ? (data as Sheet).entries : [])
+      if (!known.has(entry?.id) && !(Array.isArray(entry?.decidedBy) && entry.decidedBy.some((cite) => cite === `row ${finishes.id}` || cite === `${arc}/${finishes.id}`)))
+        faults.push(`${entry?.id} is new, and \`--because "${because}"\` says it finishes row ${finishes.id} of ${arc}: it cites \`row ${finishes.id}\` in \`decidedBy\``);
+  }
   if (faults.length) return refused(faults);
   save(ws, arc, data as Sheet);
   const count = (data as Sheet).entries.length;
   const added = deriveSteps(ws, arc, data as Sheet);
-  logEvent(ws, arc, "sheet", null, `written · ${count} entries${because ? ` · because ${because}` : ""}`);
+  logEvent(ws, arc, "sheet", null, `written · ${count} entries${because ? ` · ${finishes ? `finishes row ${finishes.id}` : `because ${because}`}` : ""}`);
   console.log(`ok · ${arc} sheet written · ${count} entries${added ? ` · ${added} step${added === 1 ? "" : "s"} derived` : ""}`);
   return 0;
 }
@@ -273,7 +295,7 @@ function show(args: string[]): number {
 
 /** Whether a card's id is cited by an entry's `decidedBy`. */
 const cites = (entries: readonly SheetEntry[], id: string): boolean =>
-  entries.some((entry) => entry.decidedBy.some((text) => new RegExp(`\\b${id}\\b`).test(text)));
+  entries.some((entry) => entry.decidedBy.some((text) => new RegExp(`\\b${id}\\b`, "i").test(text)));
 
 /** Whether a card's answer records that it changes no repository file, cited with `--entries none`. */
 const changesNoFile = (card: Question): boolean => Array.isArray(card.answer?.entries) && card.answer.entries.length === 0;
@@ -303,7 +325,12 @@ export function sheetFindings(ws: string, arc: string): string[] {
     if (!tested) out.push(`row ${row.id} is a CODE row and its entries name no test`);
   }
   for (const card of readQuestions(ws).filter((one) => one.arc === arc && one.state === "answered"))
-    if (!cites(entries, card.id) && !changesNoFile(card)) out.push(`${card.id} is answered and no entry cites it`);
+    if (!cites(entries, card.id) && !changesNoFile(card)) out.push(`${cardName(card.id)} is answered and no entry cites it`);
+  // A SUGGESTION DECIDED AGAINST THIS ARC IS CITED BY AN ENTRY (RULE.DEVEX.WORKSPACE.488): `decidedBy` carries it as S<n>, or the go leaves it out.
+  for (const one of suggestionsOf(ws).filter((suggestion) => suggestion.arc === arc && suggestion.state === "decided"))
+    if (!cites(entries, one.id)) out.push(`${cardName(one.id)} is decided against ${arc} and no entry cites it in \`decidedBy\` (as \`${cardName(one.id)}\`)`);
+  const root = workspaceOf(ws);
+  if (root) out.push(...missingCopies(root, entries.filter((entry) => typeof entry?.file === "string" && entry.file.includes(":"))));
   if (sheet.stack === null && leaves.some((row) => row.work === "CODE" || row.work === "PROOF"))
     out.push(`the sheet's stack is null, and ${arc} has a CODE or PROOF row`);
   return out;

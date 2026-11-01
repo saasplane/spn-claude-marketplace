@@ -9,10 +9,13 @@ import { emit, readPayload, runAlone, type Payload, type Verdict } from "../lib/
 
 const RAW = /(?:^|[\s;&|(])claude\s+plugins?\s+(?:install|update|marketplace\s+update)\b/;
 
+/** The command with its quoted arguments taken out, so words inside a message or a search string are not read as a command (s41). */
+export const withoutQuoted = (command: string): string => command.replace(/"(?:[^"\\]|\\.)*"|'[^']*'/g, '""');
+
 export function checkPluginSync(payload: Payload): Verdict {
   if (payload.tool_name !== "Bash") return null;
   const command = payload.tool_input?.command;
-  if (!command || !RAW.test(command)) return null;
+  if (!command || !RAW.test(withoutQuoted(command))) return null;
   return { deny:
     "Plugins are installed by `spnutils workspace agent-sync`, in this window. Run it and read its plugin actions, " +
     "in place of a raw `claude plugin` install or update (RULE.DEVEX.AGENT.034)." };

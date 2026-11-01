@@ -1,6 +1,8 @@
 // RESTATES: spn-foundation RULE.DEVEX.AGENT.110 — the four plugins carry one version, and one command writes it.
 // The chapter is the source of truth; a rule change is edited there first, then here.
 //
+// Only the registrations whose project folder still exists are read: a folder that is gone is not a place the plugin must land.
+//
 // Refuses a landed row that changes a plugin until the four `plugin.json` versions agree and `installed_plugins.json`
 // records that version in every location. A plugin change that is not installed is not landed.
 //
@@ -33,6 +35,9 @@ const versionOf = (file: string): string | null => {
   try { return (JSON.parse(readFileSync(file, "utf8")) as { version?: string }).version ?? null; } catch { return null; }
 };
 
+/** A registration counts only where its project folder is still on disk; one whose folder is gone is not a place the plugin must land. A registration naming no folder (a user install) counts. */
+const folderExists = (place: { projectPath?: string }): boolean => !place.projectPath || existsSync(place.projectPath);
+
 /** The refusal for a marketplace checkout and an install record, or null where all agree. */
 export function pluginLandedRefusal(marketplace: string, installed: string = installedFile()): string | null {
   const versions = PLUGINS.map((name) => ({ name, version: versionOf(join(marketplace, "packages", `plugin-${name}`, "src", ".claude-plugin", "plugin.json")) }));
@@ -42,11 +47,11 @@ export function pluginLandedRefusal(marketplace: string, installed: string = ins
     return `The four plugin versions do not agree (${versions.map((one) => `${one.name} ${one.version ?? "none"}`).join(", ")}), so the plugin change is not landed. ${fix}`;
   const version = distinct[0];
   if (!existsSync(installed)) return `${installed} does not exist, so ${version} is not installed. ${fix}`;
-  let record: { plugins?: Record<string, { version?: string }[]> };
+  let record: { plugins?: Record<string, { version?: string; projectPath?: string }[]> };
   try { record = JSON.parse(readFileSync(installed, "utf8")); } catch { return `${installed} cannot be read, so ${version} is not known to be installed. ${fix}`; }
   const behind: string[] = [];
   for (const name of PLUGINS) {
-    const places = Object.entries(record.plugins ?? {}).filter(([key]) => key.startsWith(`${name}@`)).flatMap(([, list]) => list);
+    const places = Object.entries(record.plugins ?? {}).filter(([key]) => key.startsWith(`${name}@`)).flatMap(([, list]) => list).filter(folderExists);
     if (!places.length) behind.push(`${name} (not installed)`);
     else if (places.some((place) => place.version !== version)) behind.push(`${name} (${places.filter((p) => p.version !== version).length} location(s) not at ${version})`);
   }

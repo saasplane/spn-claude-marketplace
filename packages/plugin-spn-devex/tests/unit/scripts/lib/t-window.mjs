@@ -12,7 +12,7 @@ import { CARD as RAISED_CARD } from "../../../helpers/workstream-fixture.mjs";
 import { WORKSTREAMS } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { linesFor } from "../../../../../plugin-support-lib/src/lib/page-styles.ts";
 import * as windowLib from "../../../../src/scripts/lib/window.ts";
-import { bindNamed, readWindow, recordWrites, reposWritten, visitedWorkstreams, windowWorkstreams } from "../../../../src/scripts/lib/window.ts";
+import { bindNamed, readWindow, recordGoes, recordWrites, windowGoes, reposWritten, visitedWorkstreams, windowWorkstreams } from "../../../../src/scripts/lib/window.ts";
 import { bindingsOf } from "../../../../src/scripts/events/prompt.ts";
 
 const SCRIPTS = resolve(PLUGIN, "src", "scripts");
@@ -256,6 +256,18 @@ console.log("\n=== window — which welcome a window was sent — MKT.HOOKS.342"
   check("[MKT.HOOKS.342] a note written before the field reads it absent", readWindow(root, "old").welcome === undefined);
   writeFileSync(file, JSON.stringify({ welcome: "loud" }), "utf8");
   check("[MKT.HOOKS.342] a welcome that is neither form reads absent", readWindow(root, "old").welcome === undefined);
+}
+
+console.log("\n=== window — the goes a window started: `go start` and `go write`, or a handover");
+{
+  const root = workspace("w-goes", { [`${open(A)}/arcs/N001/state.json`]: "{}\n", [`${open(B)}/arcs/N001/state.json`]: "{}\n" });
+  recordGoes(root, "g", root, `spnutils workstream go start 001/N001 code-x-1`);
+  recordGoes(root, "g", root, `spnutils workstream go write ${B}/N001 --scope N001`);
+  recordGoes(root, "g", root, `spnutils workstream go show 001/N001`);
+  check("[MKT.HOOKS.414] a go start and a go write mark the go as this window's, and a go show does not", JSON.stringify([...windowGoes(root, "g")].sort()) === JSON.stringify([`${A}/N001`, `${B}/N001`].sort()), JSON.stringify([...windowGoes(root, "g")]));
+  check("[MKT.HOOKS.414] another window has started none", windowGoes(root, "other").size === 0);
+  bindNamed(root, "h", A, "handover");
+  check("[MKT.HOOKS.414] a handover gives the window the workstream's goes", windowGoes(root, "h").has(`${A}/*`));
 }
 
 console.log(failed ? `\n  ${failed} FAILED` : `\n  all ${n} passed`);

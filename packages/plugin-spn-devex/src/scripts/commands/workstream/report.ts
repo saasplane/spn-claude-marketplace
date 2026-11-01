@@ -1,4 +1,6 @@
 // RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § The commands · § The formats
+//           RULE.DEVEX.WORKSPACE.495, a helper that meets a name, a shape or a construct no entry holds stops and lists it under `unnamed:`
+//           RULE.DEVEX.WORKSPACE.488, a suggestion belongs to an arc, as a card does, and the arc's sheet cites it
 // The chapter is the source of truth; a rule change is edited there first, then here, in the same change.
 //
 //   spn-devex workstream report write [<workstream>] <notes/N<nnn>/orders/<row>.report.md>
@@ -17,7 +19,7 @@ import { basename, join, resolve } from "node:path";
 import { type Action, UsageFault, readWords } from "../../../../../plugin-support-lib/src/lib/command.ts";
 import { frontMatter } from "../../lib/front-matter.ts";
 import { readGo } from "../../lib/go-plan.ts";
-import { doneOf, landingFault, logEvent, notesDirOf, readArc, readQuestions, readyRows, workspaceOf, writeArc } from "../../lib/workstream.ts";
+import { doneOf, landingFault, logEvent, suggestionLandingFault, notesDirOf, readArc, readQuestions, readyRows, workspaceOf, writeArc } from "../../lib/workstream.ts";
 import { OUTCOMES, ROW_ID, type ArcRow, type Cost, type GoPart, type GoPlan } from "../../lib/workstream-schema.ts";
 import { afterWrite, arcSignatures, refreshIfMoved, typed, workstreamNamed } from "./_shared.ts";
 import { logFiles, telemetryFolder } from "../../../../../plugin-support-lib/src/lib/debug-store.ts";
@@ -66,6 +68,13 @@ function splitLine(ws: string, arc: string, rowId: string): string | null {
   } catch { return null; }
 }
 
+/** What a report lists under `unnamed:`: each name, shape or construct the helper met that no entry holds. */
+export function unnamedOf(matter: Record<string, unknown>): string[] {
+  const listed = matter.unnamed;
+  const items = Array.isArray(listed) ? listed : typeof listed === "string" && listed.trim() ? [listed] : [];
+  return items.map((one) => String(one).trim()).filter(Boolean);
+}
+
 /** Folds a part's report: the part lands, and so does each step whose entries all sit in landed parts. */
 function foldPart(ws: string, lead: string, plan: GoPlan, part: GoPart, outcome: string, matter: Record<string, unknown>): number {
   const signatures = arcSignatures(ws);
@@ -94,7 +103,7 @@ function foldPart(ws: string, lead: string, plan: GoPlan, part: GoPart, outcome:
         if (!held.every((id) => landed.has(`${arc}/${id}`))) continue;
         // A code or proof step waits for a TEST part's full run, unless the report names a run, which the landing gate judges.
         if ((row.work === "CODE" || row.work === "PROOF") && !isFullRun(part) && !run) continue;
-        const fault = landingFault(ws, arc, data, row, run);
+        const fault = landingFault(ws, arc, data, row, run) ?? suggestionLandingFault(ws, arc, data, row);
         const split = splitLine(ws, arc, row.id);
         if (split) splits.push(split);
         if (fault) { refused.push(`${arc} ${row.id} stays: ${fault}`); continue; }
@@ -131,6 +140,13 @@ function write(args: string[]): number {
   const rowId = String(matter.row ?? named);
   const outcome = String(matter.outcome ?? "");
   if (!(OUTCOMES as readonly string[]).includes(outcome)) throw new UsageFault(`reads \`outcome: ${outcome}\`, and it is one of ${OUTCOMES.join(" · ")}.`);
+  // A HELPER THAT MET A NAME NO ENTRY HOLDS STOPPED (RULE.DEVEX.WORKSPACE.495): the part does not land with it unraised.
+  const unnamed = unnamedOf(matter);
+  if (outcome === "landed" && unnamed.length) {
+    console.log(`Refused: ${named} reports \`outcome: landed\` and lists ${unnamed.length === 1 ? "a name" : `${unnamed.length} names`} no entry holds under \`unnamed:\`: ${unnamed.map((one) => `\`${one}\``).join(", ")}. ` +
+      "Raise each one (a suggestion that improves the book in the builder's workspace, a card where it decides the shape), and give the helper the name in a new order. Nothing was written. (RULE.DEVEX.WORKSPACE.495)");
+    return 1;
+  }
   const plan = typed(() => readGo(ws, arc));
   const part = plan?.parts.find((one) => one.id === named);
   if (plan && part) return foldPart(ws, arc, plan, part, outcome, matter);

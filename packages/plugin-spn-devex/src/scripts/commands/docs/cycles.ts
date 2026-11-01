@@ -1,8 +1,9 @@
 // RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § `How` ends in Cycles, and the arcs are the state
+//           RULE.DEVEX.WORKSPACE.487, an approach page reads Why, What, How, Plan, Open, Deferred, and Plan lists the arcs at `approach.html#arcs`
 //           docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § An arc's status is one of six, stored or worked out
 // The chapters are the source of truth; a rule change is edited there first, then here.
 //
-// A workstream's Cycles table, read from its arcs' data (`arcs/N<nnn>/state.json`): one row per arc, in
+// A workstream's arcs table (the page's *Plan* section; the command keeps its name, `docs cycles`), read from its arcs' data (`arcs/N<nnn>/state.json`): one row per arc, in
 // the order the arcs run, in two columns. Arc holds the title, the description and the facts as links
 // separated by middots: the preview by its fixed name, each sample, and for CARRIED and DROPPED the reason, and for a decided arc its wait
 // the reason. Status holds the badge. The arc's number is the row's id, so `approach.html#N013` opens it
@@ -23,6 +24,10 @@
 // `Open`. `doc-check` compares a page with the same reading, through `tableDifferences` and
 // `headerStatusRule`.
 //
+// THE TABLE IS THE PLAN SECTION'S (RULE.DEVEX.WORKSPACE.487): `<section id="arcs">` under the `h2` Plan, right after How. A page that
+// still ends How in an older `h3` Cycles is read there too, which is how a closed page stays as it closed; `write` moves that
+// subsection into a Plan section of its own on an open or backlog page, and creates the section after How where there is none.
+//
 // Every class it reads and writes is a name of the shared stylesheet (05-artifacts.md § One stylesheet,
 // served in versions). A page that links no shared stylesheet is refused by `write`, and not written.
 
@@ -36,7 +41,7 @@ import { ARCS, WORKSTREAM_STATES, isApproachPage, workstreamsDir } from "../../.
 import { OWN_COPY, linksSharedStyles } from "../../../../../plugin-support-lib/src/lib/page-styles.ts";
 import { type Action, FLAG, UsageFault, readWords } from "../../../../../plugin-support-lib/src/lib/command.ts";
 
-export const describe = "a workstream's Cycles table, read from its arcs: one row per arc, with its file, its status and its previews";
+export const describe = "a workstream's arcs table (its Plan section), read from its arcs: one row per arc, with its file, its status and its previews";
 
 /** An arc's preview or one of its samples, as its Cycles row links it. */
 export type Preview = {
@@ -102,7 +107,8 @@ export function cycleOfData(folder: string, arc: string): Cycle | null {
   if (!data || typeof data !== "object") return null;
   // The status as it reads, from the one owner: the developer's words, or worked out from the steps (RULE.DEVEX.WORKSPACE.307).
   const status = typeof data.status === "string" && (STATUSES as readonly string[]).includes(data.status) && Array.isArray(data.rows)
-    ? arcStatus(data as Parameters<typeof arcStatus>[0]) : null;
+    // `readArc` carries what an ideate arc's status needs from the workspace (RULE.DEVEX.WORKSPACE.494).
+    ? arcStatus((readArc(folder, arc) ?? data) as Parameters<typeof arcStatus>[0]) : null;
   const wait = typeof data.wait === "string" && data.wait.trim() ? `wait: ${data.wait.trim()}` : "";
   // An arc carried to another workstream names where its preview now lives, and its samples sit beside it.
   const previewHref = previewHrefOf(arc, { preview: typeof data.preview === "string" ? data.preview : PREVIEW_FILE });
@@ -305,22 +311,82 @@ export function tableDifferences(table: string, cycles: Cycle[]): { missing: str
   };
 }
 
+/** The inside of the first `h2` whose text starts with `name`, and where its section's body runs to (the next `h2`, or the end). */
+function h2Body(text: string, name: string): { head: number; bodyAt: number; end: number } | null {
+  // nosemgrep: javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp -- pattern built from this script's own constants
+  const found = new RegExp(`<h2\\b[^>]*>\\s*(?:<[^>]+>\\s*)*${name}\\b[\\s\\S]*?</h2>`, "i").exec(text);
+  if (!found) return null;
+  const bodyAt = found.index + found[0].length;
+  const next = text.slice(bodyAt).search(/<h2\b/i);
+  return { head: found.index, bodyAt, end: next < 0 ? text.length : bodyAt + next };
+}
+
+/** The `h3` named Cycles in How's body of an older page: where it starts, and how far How's body runs. Null where How has none. */
+function oldCyclesAt(text: string): { from: number; headEnd: number; how: { head: number; bodyAt: number; end: number } } | null {
+  const how = h2Body(text, "How");
+  if (!how) return null;
+  const body = text.slice(how.bodyAt, how.end);
+  const named = [...body.matchAll(/<h3\b[^>]*>([\s\S]*?)<\/h3>/gi)].filter((found) => /^Cycles\b/i.test(flat(found[1]))).at(-1);
+  return named ? { from: how.bodyAt + named.index!, headEnd: how.bodyAt + named.index! + named[0].length, how } : null;
+}
+
+/** Whether How of a page still ends in an older `h3` named Cycles. */
+export const holdsCyclesSubsection = (text: string): boolean => oldCyclesAt(text) !== null;
+
+/** Whether a page carries a Plan section: an `h2` named Plan. */
+export const hasPlan = (text: string): boolean => h2Body(text, "Plan") !== null;
+
 /**
- * Where a page's Cycles table sits: the first table after the last `h3` named Cycles inside How,
- * which is where `cyclesRule` reads it. Null where How has no such `h3`, or no table follows it.
+ * Where a page's arcs table sits (RULE.DEVEX.WORKSPACE.487): the first table in the Plan section, else in an older page the first
+ * table after the last `h3` named Cycles inside How. Null where neither holds a table.
  */
 export function cyclesTableAt(text: string): { from: number; to: number } | null {
-  const how = /<h2\b[^>]*>\s*(?:<[^>]+>\s*)*How\b[\s\S]*?<\/h2>/i.exec(text);
-  if (!how) return null;
-  const bodyAt = how.index + how[0].length;
-  const next = text.slice(bodyAt).search(/<h2\b/i);
-  const body = next < 0 ? text.slice(bodyAt) : text.slice(bodyAt, bodyAt + next);
-  const named = [...body.matchAll(/<h3\b[^>]*>([\s\S]*?)<\/h3>/gi)].filter((found) => /^Cycles\b/i.test(flat(found[1]))).at(-1);
-  if (!named) return null;
-  const table = /<table\b[\s\S]*?<\/table>/i.exec(body.slice(named.index!));
+  const plan = h2Body(text, "Plan");
+  if (plan) {
+    const table = /<table\b[\s\S]*?<\/table>/i.exec(text.slice(plan.bodyAt, plan.end));
+    return table ? { from: plan.bodyAt + table.index, to: plan.bodyAt + table.index + table[0].length } : null;
+  }
+  const old = oldCyclesAt(text);
+  if (!old) return null;
+  const table = /<table\b[\s\S]*?<\/table>/i.exec(text.slice(old.from, old.how.end));
   if (!table) return null;
-  const from = bodyAt + named.index! + table.index;
+  const from = old.from + table.index;
   return { from, to: from + table[0].length };
+}
+
+/** Where How's own section closes, so a section can follow it: the last `</section>` of How's body, else the end of the body. */
+function afterHowSection(text: string): number | null {
+  const how = h2Body(text, "How");
+  if (!how) return null;
+  const close = text.lastIndexOf("</section>", how.end);
+  return close >= how.bodyAt ? close + "</section>".length : how.end;
+}
+
+/** The Plan section as a page carries it: its opening, the heading, then `inside`. */
+const planSection = (inside: string): string =>
+  `<section id="arcs" data-block="sequence">\n  <div class="sds-section-head"><h2>Plan</h2></div>\n${inside}</section>`;
+
+/**
+ * The page with its arcs table in a Plan section of its own after How (RULE.DEVEX.WORKSPACE.487). A page that has one is returned as it is.
+ * An older `h3` Cycles at the end of How (its order line, table and progress block) moves out into the section, and a page with none gets
+ * a section holding the table `rows` give, written by the caller. Null where the page has no How to follow.
+ */
+export function withPlanSection(text: string, table: () => string): string | null {
+  if (hasPlan(text)) return text;
+  const old = oldCyclesAt(text);
+  if (old) {
+    // The subsection runs to the close of How's section: everything after its heading is the Plan section's inside.
+    const closeAt = text.lastIndexOf("</section>", old.how.end);
+    const inner = closeAt >= old.headEnd ? closeAt : old.how.end;
+    const moved = text.slice(old.headEnd, inner).replace(/^\n/, "");
+    const outer = closeAt >= old.headEnd ? closeAt + "</section>".length : old.how.end;
+    const trail = closeAt >= old.headEnd ? text.slice(inner, outer) : "";
+    const how = text.slice(0, old.from).replace(/[ \t]*$/, "");
+    return `${how}${trail}\n\n${planSection(moved.endsWith("\n") ? moved : `${moved}\n`)}${text.slice(outer)}`;
+  }
+  const at = afterHowSection(text);
+  if (at === null) return null;
+  return `${text.slice(0, at)}\n\n${planSection(`  <p>The arcs, in the order they run.</p>\n${table()}\n`)}${text.slice(at)}`;
 }
 
 // The three words a workstream page's header shows, each with the class and the glyph the approach
@@ -442,32 +508,32 @@ function placeId(text: string, repo: string): string {
 /**
  * The page with each place of `How` written from the arcs, and whether it changed. A place whose `h3` is there
  * gets its `Arcs:` facts line: rewritten where it holds one, put first on its facts line where it has one, or
- * added under its line. A place with no `h3` is added before Cycles, its heading and its `Arcs:` line, for the
+ * added under its line. A place with no `h3` is added at the end of How (before an older Cycles subsection), its heading and its `Arcs:` line, for the
  * agent to write the one line under it. A heading that names no place is the agent's and is left as it is.
  */
 export function placedPage(text: string, places: Place[]): string {
-  const how = /<h2\b[^>]*>\s*(?:<[^>]+>\s*)*How\b[\s\S]*?<\/h2>/i.exec(text);
-  if (!how || !places.length) return text;
+  if (!h2Body(text, "How") || !places.length) return text;
   let out = text;
   for (const place of places) {
-    const bodyAt = how.index + how[0].length;
-    const rest = out.slice(bodyAt);
-    const next = rest.search(/<h2\b/i);
-    const body = next < 0 ? rest : rest.slice(0, next);
+    const how = h2Body(out, "How")!;
+    const bodyAt = how.bodyAt;
+    const body = out.slice(bodyAt, how.end);
+    // The places end where How's body does: before an older `h3` Cycles, else before the close of How's own section.
     const headings = [...body.matchAll(/<h3\b[^>]*>([\s\S]*?)<\/h3>/gi)];
     const cycles = headings.filter((found) => /^Cycles\b/i.test(flat(found[1]))).at(-1);
-    if (!cycles) return out;
-    const before = headings.filter((found) => found.index! < cycles.index!);
+    const closeAt = body.lastIndexOf("</section>");
+    const limit = cycles ? cycles.index! : closeAt >= 0 ? closeAt : body.length;
+    const before = headings.filter((found) => found.index! < limit && found !== cycles);
     const value = arcsValue(place);
     const at = before.findIndex((found) => namesPlace(flat(found[1]), place.repo));
     if (at < 0) {
-      const where = bodyAt + cycles.index!;
-      const added = `<h3 id="${placeId(out, place.repo)}">${escape(place.repo)}</h3>\n  <p><span class="sds-small">Arcs: ${value}</span></p>\n  `;
-      out = out.slice(0, where) + added + out.slice(where);
+      const where = bodyAt + limit;
+      const heading = `<h3 id="${placeId(out, place.repo)}">${escape(place.repo)}</h3>\n  <p><span class="sds-small">Arcs: ${value}</span></p>\n`;
+      out = out.slice(0, where) + (cycles ? `${heading}  ` : `  ${heading}`) + out.slice(where);
       continue;
     }
     const from = bodyAt + before[at].index! + before[at][0].length;
-    const to = bodyAt + (before[at + 1] ?? cycles).index!;
+    const to = bodyAt + (before[at + 1]?.index ?? limit);
     const part = out.slice(from, to);
     let written: string;
     if (ARCS_FACT.test(part)) written = part.replace(ARCS_FACT, `Arcs: ${value}`);
@@ -482,19 +548,22 @@ export function placedPage(text: string, places: Place[]): string {
 }
 
 /** The parts of a page that the arcs decide, as `write` names them. */
-export const PRODUCED_PARTS = { status: "the header's status", places: "the places of How", table: "the Cycles table", open: "the heading of Open" } as const;
+export const PRODUCED_PARTS = { status: "the header's status", places: "the places of How", plan: "the Plan section", table: "the Plan table", open: "the heading of Open" } as const;
 
 /**
- * A workstream's page as `write` leaves it: the header's status, the places of `How`, the Cycles table
+ * A workstream's page as `write` leaves it: the header's status, the places of `How`, the Plan section and its table
  * and the heading of `Open`, each replaced once and only where it differs from what the arcs and the cards give.
  * `wrote` names the parts that changed, and `skipped` says why a part that differs could not be
- * written. Null where the page holds no Cycles table to write.
+ * written. Null where the page holds no How to follow and no arcs table to write.
  */
 export function producedPage(folder: string, text: string, cycles: Cycle[] = cyclesOf(folder)): { text: string; wrote: string[]; skipped: string[] } | null {
-  if (!cyclesTableAt(text)) return null;
+  // THE PLAN SECTION FIRST (RULE.DEVEX.WORKSPACE.487): an older Cycles subsection moves into it, and a page with none gets one after How.
+  const planned = withPlanSection(text, () => tableOf(cycles));
+  if (planned === null || !cyclesTableAt(planned)) return null;
   const wrote: string[] = [];
   const skipped: string[] = [];
-  let out = text;
+  let out = planned;
+  if (planned !== text) wrote.push(PRODUCED_PARTS.plan);
   const splice = (at: { from: number; to: number }, replacement: string): void => {
     out = out.slice(0, at.from) + replacement + out.slice(at.to);
   };
@@ -579,7 +648,7 @@ function writeNameFiles(folder: string): string[] {
 }
 
 /** The views of an arc's status that the approach page holds, as a refresh names them. */
-export const VIEW_NAMES: Record<keyof typeof PRODUCED_PARTS, string> = { status: "card", places: "places", table: "cycles", open: "headings" };
+export const VIEW_NAMES: Record<keyof typeof PRODUCED_PARTS, string> = { status: "card", places: "places", plan: "plan section", table: "plan", open: "headings" };
 
 /**
  * Every view of the arcs' state, brought current from the arcs' data in one pass: the name files, each
@@ -601,7 +670,7 @@ export function refreshViews(folder: string): { views: string[]; skipped: string
     if (!linksSharedStyles(text)) skipped.push(`${basename(page)}: ${OWN_COPY}`);
     else {
       const produced = producedPage(folder, text);
-      if (!produced) skipped.push(`${basename(page)} has no Cycles table to write`);
+      if (!produced) skipped.push(`${basename(page)} has no arcs table to write`);
       else {
         skipped.push(...produced.skipped.map((reason) => `${basename(page)}: ${reason}`));
         if (produced.text !== text) writeFileSync(page, produced.text, "utf8");
@@ -615,7 +684,7 @@ export function refreshViews(folder: string): { views: string[]; skipped: string
   return { views, skipped };
 }
 
-/** The status each arc's row in the page's Cycles table shows: the word, and whether its cell is the arc's badge. */
+/** The status each arc's row in the page's arcs table shows: the word, and whether its cell is the arc's badge. */
 export function tableStatuses(text: string): Map<string, { word: string | null; cell: string }> {
   const at = cyclesTableAt(text);
   if (!at) return new Map();
@@ -652,8 +721,8 @@ function writePages(folder: string, target: string, cycles: Cycle[]): number {
     }
     const produced = producedPage(folder, text, cycles);
     if (!produced) {
-      console.error(`${shown} has no Cycles table to write — How ends in an h3 named Cycles, with a table under it ` +
-        `(05-artifacts.md § How ends in Cycles). Nothing was written.`);
+      console.error(`${shown} has no arcs table to write — the page has no How to put a Plan section after, or its Plan section holds no table ` +
+        `(05-artifacts.md § After How comes a section of its own, Plan; RULE.DEVEX.WORKSPACE.487). Nothing was written.`);
       code = 1;
       continue;
     }

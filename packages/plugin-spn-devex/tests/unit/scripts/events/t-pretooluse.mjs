@@ -507,7 +507,13 @@ console.log("\n=== pretooluse — a helper is launched only from a part of the g
   const launch = (path) => ({ tool_name: "Agent", session_id: "launch", cwd: WORKSPACE, tool_input: { description: "a", model: "sonnet", prompt: `Carry out the order at ${path} exactly.` } });
   const waived = { parity: false, why: "the Python has no Agent branch" };
   one("[MKT.HOOKS.300] an order with no go, in a workstream whose go has a plan, is refused",
-    launch(brief("8c.md", 'row: "8"')), "deny", { says: "orders/8c.md names no go, and 042's go has a plan", ...waived });
+    launch(brief("8c.md", 'row: "8"')), "deny", { says: "orders/8c.md belongs to N004, and 042's go for N004 (lead N004) has a plan", ...waived });
+  mkdirSync(join(base, "arcs", "N005"), { recursive: true });
+  mkdirSync(join(base, "notes", "N005", "orders"), { recursive: true });
+  writeFileSync(join(base, "arcs", "N005", "state.json"), JSON.stringify({ schemaVersion: 2, arc: "N005", subject: "probe", title: "t", goal: null, status: "DECIDED", reason: null, preview: "preview.html", rows: [] }));
+  const early = join(base, "notes", "N005", "orders", "sheet-order.md");
+  writeFileSync(early, "---\nrow: \"1\"\nmodel: sonnet\n---\n# Sheet\n");
+  one("[MKT.HOOKS.415] a sheet or preview order for an arc with no go yet is let through, though another arc keeps a go.json", launch(early), "silent", waived);
   one("[MKT.HOOKS.300] a part the plan does not hold is refused",
     launch(brief("code-probe-repo-9.md", 'go: "N004"\npart: "code-probe-repo-9"')), "deny", { says: "holds no part code-probe-repo-9", ...waived });
   one("[MKT.HOOKS.303] a held part is refused",
@@ -555,7 +561,7 @@ console.log("\n=== pretooluse — an order asks for no screenshot unless the dev
 console.log("\n=== pretooluse — a handover block written before the turn ends is told once (RULE.DEVEX.WORKSPACE.393)");
 {
   const BLOCK = ["```text", "continue:      041-probe N001", "model:         opus", "read first:    approach.html", "pins:          none",
-    "live now:      nothing", "done when:     the probe lands", "do not touch:  the main checkout", "open:          none", "```"].join("\n");
+    "state:         clean", "live now:      nothing", "done when:     the probe lands", "do not touch:  the main checkout", "open:          none", "```"].join("\n");
   const entry = (type, content, extra = {}) => JSON.stringify({ type, message: { content }, ...extra });
   const transcript = (name, lines) => { const file = join(WORKSPACE, `${name}.jsonl`); writeFileSync(file, `${lines.join("\n")}\n`); return file; };
   const call = (session, file) => ({ tool_name: "Bash", session_id: session, cwd: WORKSPACE, transcript_path: file, tool_input: { command: "git status --short" } });

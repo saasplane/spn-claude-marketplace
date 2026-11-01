@@ -126,9 +126,9 @@ spn-devex restates files check <book> — report each copy that is behind the bo
 
 spn-devex restates files write <book> — copy the book's templates into this plugin, and remove each copy the book no longer holds
 
-spn-devex workstream arc edit <workstream>/N<nnn> [--title …] [--goal …] [--status …] [--wait …] [--reason …] [--start] [--review-fixes] [--subject …] [--under …] [--preview …] [--decides …] [--repos …] [--cycle …] [--follows …] [--model …] [--position …] [--note …] — open an arc, or change any field of its header and its status; --note writes a log line
+spn-devex workstream arc edit <workstream>/N<nnn> [--kind ideate] [--proposes N<nnn>,…] [--title …] [--goal …] [--status …] [--wait …] [--reason …] [--start] [--review-fixes] [--subject …] [--under …] [--preview …] [--decides …] [--repos …] [--cycle …] [--follows …] [--model …] [--position …] [--note …] — open an arc, or change any field of its header and its status; --note writes a log line
 
-spn-devex workstream arc stamp write <workstream>/N<nnn> — write: restamp an arc's Cycles row once its part of the page is current
+spn-devex workstream arc stamp write <workstream>/N<nnn> — write: restamp an arc's Plan row once its part of the page is current
 
 spn-devex workstream arc delete <workstream>/N<nnn> --note "…" — delete an arc never decided, on the developer's words
 
@@ -136,7 +136,7 @@ spn-devex workstream close <workstream> — close a workstream: run the close ga
 
 spn-devex workstream fact write <workstream>/N<nnn> --source <repository>/<path>[:<line>] --fact "…" [--used-by …] — write one fact, the source's current commit pinned
 
-spn-devex workstream go write <workstream>/N<nnn> --scope N<nnn>,… — after the go: derive the plan from the scope's sheets and the telemetry, and write every part's brief; run again it keeps landed and running parts
+spn-devex workstream go write <workstream>/N<nnn> --scope N<nnn>,… [--follow-up] — after the go: derive the plan from the scope's sheets and the telemetry, and write every part's brief; run again it keeps landed and running parts
 
 spn-devex workstream go show <workstream>/N<nnn> [--part <id>] [--json] — print the parts: their files, their tests, their measured time and what each waits on
 
@@ -150,17 +150,19 @@ spn-devex workstream handover <workstream> [--continue "…"] [--do-not-touch "�
 
 spn-devex workstream open --file <block.json> --note "<the developer's words>" [--backlog "<the blocker>"] — open a workstream from the six-things block: the next number, its folder, its approach page and its first arc
 
-spn-devex workstream progress write <workstream> — regenerate the progress block in the approach page's Cycles
+spn-devex workstream progress write <workstream> — regenerate the progress block in the approach page's Plan
 
 spn-devex workstream question raise <workstream>/N<nnn> --file card.json — raise a card: the next number, the record, the card in the approach page's Open
 
-spn-devex workstream question show <qN> --in <notes/N<nnn>/preview.html> — show an open card on an arc's preview, in its Open
+spn-devex workstream question brief <workstream>/Q<n> — print a fresh view's brief from the card: the problem and the constraints first, no options, the proposals to follow
 
-spn-devex workstream question answer <qN> --key <option> --words "…" [--entries E7,E9] — answer a card in your words; it leaves every Open; with --entries, folded into the What, cited, and the go written again
+spn-devex workstream question show Q<n> --in <notes/N<nnn>/preview.html> — show an open card on an arc's preview, in its Open
 
-spn-devex workstream question cite <qN> --entries E7,E9|none — cite an answered card in entries of its arc's sheet, or record with none that it changes no repository file; the go written again
+spn-devex workstream question answer Q<n> --key <option> --words "…" [--entries E7,E9] — answer a card in your words; it leaves every Open; with --entries, folded into the What, cited, and the go written again
 
-spn-devex workstream question withdraw <qN> --words "…" — withdraw a card in your words; it leaves every Open
+spn-devex workstream question cite Q<n> --entries E7,E9|none — cite an answered card in entries of its arc's sheet, or record with none that it changes no repository file; the go written again
+
+spn-devex workstream question withdraw Q<n> --words "…" — withdraw a card in your words; it leaves every Open
 
 spn-devex workstream report write [<workstream>] <report.md> — fold a child's report into its row: state, proof, commits, follow-ups
 
@@ -190,10 +192,10 @@ spn-devex workstream state show [<workstream>] [--json] — where each open and 
 
 spn-devex workstream state check [<workstream>] [--facts] [--json] — whether each open and backlog workstream is whole: its data, previews, samples, notes folders, stamps, cards and step files
 
-spn-devex workstream suggestion add <workstream> "<title>" [--preview …] — raise a suggestion: the next number, raised; it also prints the decisions and rules that already speak to its title
+spn-devex workstream suggestion add <workstream>[/N<nnn>] "<title>" [--preview …] [--file card.json] — raise a suggestion: the next number, raised; it also prints the decisions and rules that already speak to its title
 
-spn-devex workstream suggestion state <workstream> <sN> <state> [--words "…"] — move it on: shaped, decided, parked or dropped, with the words beside the move
+spn-devex workstream suggestion state <workstream> S<n> <state> [--words "…"] [--arc N<nnn>] — move it on: shaped, decided, parked or dropped, with the words beside the move
 
-spn-devex workstream suggestion edit <workstream> <sN> [--title …] [--preview …] — change its title or its preview, never its state
+spn-devex workstream suggestion edit <workstream> S<n> [--title …] [--preview …] — change its title or its preview, never its state
 
 spn-devex workstream work write — rename altitude and pass to work in every open workstream, one log line for each arc

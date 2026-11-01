@@ -1,5 +1,5 @@
 // RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § An arc is cut by what is reviewed and released together, and named for its domain · § The workstream is kept as data, and every file has one owner · § The folder · § The formats · § The approach page keeps up with its arcs · § An arc carries its specification, or names the note that holds it
-//           docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § `How` ends in Cycles, and the arcs are the state · § The approach document — a workstream's, never a repository's
+//           docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § After `How` comes a section of its own, Plan (RULE.DEVEX.WORKSPACE.487) · § The approach document — a workstream's, never a repository's
 // The chapters are the source of truth; a rule change is edited there first, then here, in the same change.
 //
 // The shared state library: where each file a script owns sits, how it is read and written, the
@@ -18,7 +18,7 @@ import { withOffset } from "./clock.ts";
 import { isDir, isFile, listdir, workspaceRoot } from "./payload.ts";
 import { APPROACH_PAGE, ARCS, PLUGIN_TEMPLATES, WORKSTREAM_STATES, isApproachPage, workstreamPrefixSource, workstreamsDir, type WorkstreamState } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import {
-  ARC_ID, DONE_STATES, QUESTION_ID, SCHEMA_VERSION, arcFaults, parentIds,
+  ARC_ID, DONE_STATES, QUESTION_ID, SCHEMA_VERSION, VERSIONED_RECORDS, arcFaults, cardName, parentIds, recordVersionFault, versioned,
   type ArcData, type ArcRow, type Card, type LogLine, type Question, type RowState, type Sheet,
 } from "./workstream-schema.ts";
 
@@ -170,7 +170,7 @@ export const nameFileOf = (ws: string, arc: string, subject: string): string => 
 export const DATA_FILES: readonly string[] = [STATE_FILE, LOG_FILE, FACTS_FILE, SHEET_FILE, "go.json"];
 
 /**
- * The arc's address on the approach page: its Cycles row, by its number (RULE.DEVEX.WORKSPACE.263).
+ * The arc's address on the approach page: its Plan row, by its number (RULE.DEVEX.WORKSPACE.263).
  * `from` is the path from the folder the link is written in back to the workstream's folder.
  */
 export const arcAddress = (arc: string, from = ""): string => `${from}${APPROACH_PAGE}#${arc}`;
@@ -313,8 +313,14 @@ export function readJson(path: string): unknown {
 export function readJsonl(path: string): unknown[] {
   let text = "";
   try { text = readFileSync(path, "utf8"); } catch { return []; }
+  const checked = VERSIONED_RECORDS.includes(basename(path));
   return text.split("\n").filter((line) => line.trim()).map((line) => {
-    try { return JSON.parse(line); } catch { return undefined; }
+    let record: unknown;
+    try { record = JSON.parse(line); } catch { return undefined; }
+    // A LINE WITHOUT `v` IS VERSION 1; a higher one is refused, naming what to do.
+    const fault = checked ? recordVersionFault(record, path) : null;
+    if (fault) throw new Error(fault);
+    return record;
   });
 }
 
@@ -344,14 +350,25 @@ export function readSheet(ws: string, arc: string): Sheet | null {
 /** An arc's data, or null where its `state.json` is absent or does not parse. */
 export function readArc(ws: string, arc: string): ArcData | null {
   const data = readJson(stateFileOf(ws, arc));
-  return data && typeof data === "object" ? data as ArcData : null;
+  if (!data || typeof data !== "object") return null;
+  const one = data as ArcData;
+  // AN IDEATE ARC'S STATUS NEEDS THE WORKSPACE (RULE.DEVEX.WORKSPACE.494): whether each arc it proposes exists is read here, once, and carried
+  // for `arcStatus` as `proposesOpened`. It is never written: `writeArc` leaves it out.
+  if (one.kind === "ideate") one.proposesOpened = (Array.isArray(one.proposes) ? one.proposes : []).every((id) => isFile(stateFileOf(ws, id)));
+  return one;
 }
+
+/** An arc's data as it is stored: without the fields a read adds. */
+const asStored = (data: ArcData): ArcData => {
+  const { proposesOpened: _carried, ...rest } = data;
+  return rest as ArcData;
+};
 
 /** Writes an arc's data after the schema passes it, and its name file with it. Throws with every fault where it does not. */
 export function writeArc(ws: string, data: ArcData): void {
   const faults = arcFaults(data, `${data.arc}'s state.json`);
   if (faults.length) throw new Error(faults.join("; "));
-  writeWhole(stateFileOf(ws, data.arc), `${JSON.stringify(data, null, 2)}\n`);
+  writeWhole(stateFileOf(ws, data.arc), `${JSON.stringify(asStored(data), null, 2)}\n`);
   writeNameFile(ws, data);
 }
 
@@ -360,7 +377,7 @@ export function writeArc(ws: string, data: ArcData): void {
  * earlier version, which applies before the migration that brings the data to this one. Every other writer uses `writeArc`.
  */
 export function writeArcAsIs(ws: string, data: ArcData): void {
-  writeWhole(stateFileOf(ws, data.arc), `${JSON.stringify(data, null, 2)}\n`);
+  writeWhole(stateFileOf(ws, data.arc), `${JSON.stringify(asStored(data), null, 2)}\n`);
   writeNameFile(ws, data);
 }
 
@@ -427,7 +444,7 @@ export const now = (): string => withOffset(new Date());
 
 /** One event on an arc's log. */
 export function logEvent(ws: string, arc: string, kind: string, row: string | null, note: string | null): void {
-  const line = JSON.stringify({ at: now(), kind, row, note });
+  const line = JSON.stringify(versioned({ at: now(), kind, row, note }));
   appendJsonl(logFileOf(ws, arc), JSON.parse(line));
   commitWrites(ws, line);
   // A command may write its pages after its log line; whatever is left is committed under the same line when the run ends.
@@ -503,10 +520,13 @@ const STARTED: ReadonlySet<string> = new Set(["running", "stopped", "replaced", 
  * out from the steps each time it is read: `RUNNING` once a step has started, and `LANDED` once every step counted
  * has landed, the deferred, carried and replaced ones left out. The review-fixes arc reads `RUNNING` until the close
  * stores its `LANDED`. A stored `PROPOSED` wins over the steps. Every reader asks this, so no two disagree.
+ * An ideate arc is the exception: it never needs rows.
  */
-export function arcStatus(data: Pick<ArcData, "status" | "rows" | "reviewFixes">): Status {
-  const stored = (STATUSES as readonly string[]).includes(data.status) ? data.status as Status : "PROPOSED";
-  if (stored !== "DECIDED" || !Array.isArray(data.rows)) return stored;
+export function arcStatus(data: Pick<ArcData, "status" | "rows" | "reviewFixes"> & { kind?: string; proposesOpened?: unknown }): Status {
+  const held = (STATUSES as readonly string[]).includes(data.status) ? data.status as Status : "PROPOSED";
+  if (held !== "DECIDED" || !Array.isArray(data.rows)) return held;
+  // AN IDEATE ARC HAS NO STEPS (RULE.DEVEX.WORKSPACE.494): decided, it reads LANDED once every arc it proposes is opened, and DECIDED until then.
+  if (data.kind === "ideate") return data.proposesOpened === true ? "LANDED" : "DECIDED";
   const leaves = leafRows(data as ArcData);
   if (!leaves.some((row) => STARTED.has(row.state ?? ""))) return "DECIDED";
   const counted = leaves.filter((row) => !UNCOUNTED.has(row.state ?? ""));
@@ -668,7 +688,7 @@ export function arcStamp(data: Pick<ArcData, "goal" | "title" | "repos" | "rows"
   return createHash("sha256").update(JSON.stringify(stated)).digest("hex").slice(0, 12);
 }
 
-/** Every Cycles row of a page that names an arc's data, with the stamp it carries. */
+/** Every Plan row of a page that names an arc's data, with the stamp it carries. */
 export function stampsOn(text: string): Map<string, { stamp: string | null; at: number; tag: string }> {
   const out = new Map<string, { stamp: string | null; at: number; tag: string }>();
   for (const found of text.matchAll(/<tr\b[^>]*\bdata-arc="(?:[^"]*\/)?(N\d+[a-z]?)\/state\.json"[^>]*>/g)) {
@@ -678,7 +698,7 @@ export function stampsOn(text: string): Map<string, { stamp: string | null; at: 
   return out;
 }
 
-/** The page with one arc's Cycles row restamped, or null where the page has no row for it. */
+/** The page with one arc's Plan row restamped, or null where the page has no row for it. */
 export function restamped(text: string, arc: string, stamp: string): string | null {
   const row = stampsOn(text).get(arc);
   if (!row) return null;
@@ -780,7 +800,7 @@ export function progressStep(done: number, total: number): string {
  * the right, and a thin bar. Its border colour says its status, worked out by `arcStatus`, and the status is in its
  * tooltip and accessible name. A chip counts its arc's steps (RULE.DEVEX.WORKSPACE.278): the bar's shade is the chip's
  * third class, `sds-step-1` to `sds-step-5` by steps landed and `sds-step-done` at the end. An arc with no step yet
- * says its status, with no bar to fill. A wait or a reason is in the tooltip. The chip links the arc's Cycles row.
+ * says its status, with no bar to fill. A wait or a reason is in the tooltip. The chip links the arc's Plan row.
  */
 /** The moment an arc's log last moved, as its last line wrote it; "" where the log holds no line. */
 export function lastMoved(ws: string, arc: string): string {
@@ -882,7 +902,7 @@ export function writeProgress(ws: string): string {
   if (!page) return `${basename(ws)} has no approach page — no progress block written`;
   const text = readFileSync(page, "utf8");
   const next = withBlock(text, "progress", progressInside(ws));
-  if (next === null) return `${relative(dirname(ws), page)} holds no progress block — place its markers under the Cycles table, as the approach template does`;
+  if (next === null) return `${relative(dirname(ws), page)} holds no progress block — place its markers under the Plan table, as the approach template does`;
   if (next === text) return "progress current";
   writeFileSync(page, next, "utf8");
   return "progress written";
@@ -1436,4 +1456,41 @@ export function landingFault(ws: string, arc: string, data: ArcData, row: ArcRow
     }
   }
   return faults.length ? [...new Set(faults)].join(" · ") + "." : null;
+}
+
+// ---------------------------------------------------------------------------- a suggestion belongs to an arc
+
+/** The suggestions of a workstream, as recorded. A record raised before suggestions carried an arc has none. */
+export function suggestionsOf(ws: string): Array<{ id: string; title: string; state: string; arc: string | null }> {
+  return readJsonl(suggestionsFileOf(ws))
+    .filter((line): line is Record<string, unknown> => !!line && typeof line === "object")
+    .map((line) => ({ id: String(line.id), title: String(line.title ?? ""), state: String(line.state), arc: typeof line.arc === "string" && line.arc ? line.arc : null }));
+}
+
+/** A suggestion as a person reads it in a refusal: `S65 "its title"`, the title cut to about sixty characters. */
+export function suggestionName(one: { id: string; title: string }): string {
+  const title = one.title.length > 60 ? `${one.title.slice(0, 57).trimEnd()}...` : one.title;
+  return `${cardName(one.id)} "${title}"`;
+}
+
+/** Whether a suggestion is still open: raised, or shaped but not yet decided, parked or dropped. */
+export const suggestionOpen = (one: { state: string }): boolean => one.state === "raised" || one.state === "shaped";
+
+/** Whether landing `row` leaves every other leaf row of the arc done, which makes the arc LANDED. */
+export function landsTheArc(data: ArcData, row: ArcRow): boolean {
+  if (arcStatus(data) === "LANDED") return false;
+  const rows = data.rows.map((one) => (one.id === row.id ? { ...one, state: "landed" } : one));
+  return arcStatus({ ...data, rows }) === "LANDED";
+}
+
+/**
+ * The refusal of the write that lands an arc's last row while a suggestion against the arc is still raised or shaped
+ * (RULE.DEVEX.WORKSPACE.488), or null. It names each and says to decide, park or drop it.
+ */
+export function suggestionLandingFault(ws: string, arc: string, data: ArcData, row: ArcRow): string | null {
+  if (!landsTheArc(data, row)) return null;
+  const open = suggestionsOf(ws).filter((one) => one.arc === arc && suggestionOpen(one));
+  if (!open.length) return null;
+  return `row ${row.id} is the last row of ${arc}, and ${open.length === 1 ? "a suggestion against it is" : "suggestions against it are"} still open: ${open.map(suggestionName).join(" · ")}. ` +
+    "Decide, park or drop each with `workstream suggestion state` before the arc lands (RULE.DEVEX.WORKSPACE.488)";
 }

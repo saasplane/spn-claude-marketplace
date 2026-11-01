@@ -154,20 +154,20 @@ console.log("\n=== check");
 
   for (const one of ["E1", "E2"]) sheet("edit", "N001", one, "--decided-by", "s2");
   const raised = cli(root, ["workstream", "question", "raise", "N001", "--file", put("card.json", CARD)]);
-  const id = /q\d+/.exec(raised.out)?.[0];
+  const id = /[Qq]\d+/.exec(raised.out)?.[0];
   const answered = id ? cli(root, ["workstream", "question", "answer", id, "--key", "A", "--words", "A it is"]) : raised;
   const fourth = sheet("check", "N001");
   ok("an answered card no entry cites is found", id && fourth.out.includes(`${id} is answered and no entry cites it`) || false, `${raised.out} ${answered.out} ${fourth.out}`);
   const stray = id ? cli(root, ["workstream", "question", "cite", id, "--entries", "E1,E8"]) : raised;
   ok("[MKT.HOOKS.402] red: `question cite` names an entry the sheet does not hold, and records nothing", stray.code === 2 && stray.out.includes("E8") &&
-    lines(join(ws, "questions.jsonl")).find((row) => row.id === id)?.answer?.entries === undefined, stray.out);
+    lines(join(ws, "questions.jsonl")).find((row) => row.id === id?.toLowerCase())?.answer?.entries === undefined, stray.out);
   const none = id ? cli(root, ["workstream", "question", "cite", id, "--entries", "none"]) : raised;
   const after = sheet("check", "N001");
   ok("[MKT.HOOKS.402] `question cite --entries none` records that the answer changes no repository file", none.code === 0 && none.out.includes("changes no repository file") &&
-    JSON.stringify(lines(join(ws, "questions.jsonl")).find((row) => row.id === id)?.answer?.entries) === "[]", none.out);
+    JSON.stringify(lines(join(ws, "questions.jsonl")).find((row) => row.id === id?.toLowerCase())?.answer?.entries) === "[]", none.out);
   ok("[MKT.HOOKS.402] the sheet check no longer finds a card recorded as changing no file", !after.out.includes(`${id} is answered and no entry cites it`), after.out);
   const open = cli(root, ["workstream", "question", "raise", "N001", "--file", put("card2.json", CARD)]);
-  const openId = /q\d+/.exec(open.out)?.[0];
+  const openId = /[qQ]\d+/.exec(open.out)?.[0]?.toLowerCase();
   const early = openId ? cli(root, ["workstream", "question", "cite", openId, "--entries", "none"]) : open;
   ok("[MKT.HOOKS.402] red: `question cite` refuses an open card", early.code === 2 && early.out.includes("is open"), early.out);
   if (openId) cli(root, ["workstream", "question", "answer", openId, "--key", "A", "--words", "A, a local fix", "--entries", "none"]);
@@ -236,6 +236,13 @@ console.log("\n=== a decided arc's sheet is rewritten only on the developer's wo
     bare.code === 1 && bare.out.includes("--because") && bare.out.includes("Nothing was written") && readFileSync(sheetFile, "utf8") === before && lines(log).length === logged, bare.out);
   const said = sheet("write", "N001", "--file", file, "--because", "the developer: add E1 back");
   ok("[MKT.SCRIPTS.237] with --because it is written and the words are logged", said.code === 0 && json(sheetFile).entries.length === 2 && lines(log).at(-1).note.includes("add E1 back"), said.out);
+  const rowId = json(join(root, ".spndevex", "workstreams", "open", "031-probe", "arcs", "N001", "state.json")).rows.find((one) => one.state !== "landed")?.id;
+  const uncited = sheet("write", "N001", "--file", put("uncited.json", sheetOf([entry("E1"), entry("E2"), entry("E7")])), "--because", `row ${rowId}`);
+  ok("[MKT.SCRIPTS.415] a --because naming a row the arc has finishes it only if every new entry cites that row, and is refused naming the entry",
+    uncited.code === 1 && uncited.out.includes("E7") && uncited.out.includes(`row ${rowId}`), uncited.out);
+  const cited = sheet("write", "N001", "--file", put("cited.json", sheetOf([entry("E1"), entry("E2"), entry("E7", { decidedBy: [`row ${rowId}`] })])), "--because", `row ${rowId}`);
+  ok("[MKT.SCRIPTS.415] and with every new entry citing the row it is written with no card, the log saying which row it finishes",
+    cited.code === 0 && json(sheetFile).entries.some((one) => one.id === "E7") && lines(log).at(-1).note.includes(`finishes row ${rowId}`), cited.out);
   const opened = cli(root, ["workstream", "arc", "edit", "031-probe/N005", "--title", "empty sheet", "--subject", "empty-sheet", "--goal", "an empty sheet is written once"]);
   const flip = cli(root, ["workstream", "arc", "edit", "031-probe/N005", "--status", "DECIDED", "--note", "go"]);
   const empty = sheet("write", "N005", "--file", put("empty.json", sheetOf([])));
@@ -348,6 +355,30 @@ console.log("\n=== needsRelease: the release a repository's first part waits on 
   const checked = sheet("check", "N009");
   ok("[MKT.HOOKS.322] E66 check finds a malformed row already on the sheet", checked.code === 1 && /needsRelease/.test(checked.out) && checked.out.includes("release"), checked.out);
   writeFileSync(sheetPath, JSON.stringify(held, null, 2));
+}
+
+console.log("\n=== a changed book file: its generated copies are named (MKT.SCRIPTS.419)");
+{
+  const book = "docs/04-capabilities/01-devex/foo.md";
+  const inRepo = "packages/plugin-spn-devex/src/refs", base = `spn-claude-marketplace/${inRepo}`;
+  mkdirSync(join(root, "spn-foundation", "docs/04-capabilities/01-devex"), { recursive: true });
+  writeFileSync(join(root, "spn-foundation", book), "# Foo\n\n**A rule** (rule RULE.DEVEX.WORKSPACE.999 · MUST · check:x).\n");
+  mkdirSync(join(root, base), { recursive: true });
+  writeFileSync(join(root, base, "foo.md"), `<!-- spn:restates\n{ "docs": [ { "path": "spn-foundation/${book}", "seen": "00000000" } ] }\n-->\n# Foo\n`);
+  writeFileSync(join(root, base, "rules.json"), "{}\n");
+  const bookEntry = entry("E1", { file: `spn-foundation:${book}` });
+  const without = sheet("write", "N001", "--file", put("book-a.json", sheetOf([bookEntry])), "--because", "the developer: a book change");
+  ok("[MKT.SCRIPTS.419] a sheet that changes a book file without its generated copies is refused, naming the restating ref and the rules index",
+    without.code === 1 && without.out.includes(`${inRepo}/foo.md`) && without.out.includes("refs/rules.json") && without.out.includes("Nothing was written"), without.out);
+  const withCopies = sheet("write", "N001", "--file", put("book-b.json", sheetOf([bookEntry, entry("E2", { file: `spn-claude-marketplace:${inRepo}/foo.md` }), entry("E3", { file: `spn-claude-marketplace:${inRepo}/rules.json` })])), "--because", "the developer: a book change");
+  ok("[MKT.SCRIPTS.419] with an entry for each copy it is written", withCopies.code === 0, withCopies.out);
+  const template = "docs/04-capabilities/01-devex/04-workspace/04-docs/templates/workstream/x-template.md";
+  const tpl = sheet("write", "N001", "--file", put("book-c.json", sheetOf([entry("E1", { file: `spn-foundation:${template}` }), entry("E2", { file: `spn-claude-marketplace:${inRepo}/rules.json` })])), "--because", "the developer: a template");
+  ok("[MKT.SCRIPTS.419] a template names the plugin's copy, its templates README and its index",
+    tpl.code === 1 && ["docs/templates/workstream/x-template.md", "docs/templates/README.md", "docs/templates/index.md"].every((one) => tpl.out.includes(one)), tpl.out);
+  writeFileSync(sheetFile, JSON.stringify(sheetOf([bookEntry, entry("E2", { file: `spn-claude-marketplace:${inRepo}/foo.md` })]), null, 2));
+  const check = sheet("check", "N001");
+  ok("[MKT.SCRIPTS.419] sheet check names the copy still missing from a sheet already written", check.out.includes("generated copy") && check.out.includes("refs/rules.json") && !check.out.includes("refs/foo.md"), check.out);
 }
 
 console.log(failed ? `\n  ${failed} of ${total} FAILED — sheet` : `\n  all ${total} passed — sheet`);
