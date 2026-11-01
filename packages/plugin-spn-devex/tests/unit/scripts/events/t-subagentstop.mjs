@@ -36,14 +36,14 @@ console.log("=== a child's stop logs its turns under its agent id");
   const out = stop(root, { cwd: root, session_id: "s1", hook_event_name: "SubagentStop", agent_id: "a1", transcript_path: window, agent_transcript_path: child });
   const lines = existsSync(log) ? readFileSync(log, "utf8").trim().split("\n").map((line) => JSON.parse(line)) : [];
   check("the child's two turns are logged, once each, by message id, with the counts of the last line of each",
-    lines.length === 2 && lines[0].turn === "c1" && lines[0].output === 11 && lines[1].turn === "c2" && lines[1].output === 20, JSON.stringify(lines));
+    lines.length === 2 && lines.every((line) => line.v === 1 && line.mtype === "TURN" && line.event === "SubagentStop") && lines[0].id === "c1" && lines[0].tokens.out === 11 && lines[1].id === "c2" && lines[1].tokens.out === 20, JSON.stringify(lines));
   check("every line carries the child's agent id and the session", lines.every((line) => line.agent === "a1" && line.session === "s1"), JSON.stringify(lines));
-  check("the window's own transcript is not read: its turn is not logged", !lines.some((line) => line.turn === "w1"));
+  check("the window's own transcript is not read: its turn is not logged", !lines.some((line) => line.id === "w1"));
   check("the hook says nothing to the child", out === "");
   appendLine(child, assistant("c3", 5));
   stop(root, { cwd: root, session_id: "s1", hook_event_name: "SubagentStop", agent_id: "a1", agent_transcript_path: child });
   const after = readFileSync(log, "utf8").trim().split("\n").map((line) => JSON.parse(line));
-  check("a second stop logs only what the child gained since the first", after.length === 3 && after[2].turn === "c3", JSON.stringify(after.map((line) => line.turn)));
+  check("a second stop logs only what the child gained since the first", after.length === 3 && after[2].id === "c3", JSON.stringify(after.map((line) => line.id)));
 }
 
 console.log("\n=== [MKT.HOOKS.340] a child's stop sent from outside the workspace is filed under the workspace");
@@ -59,33 +59,35 @@ console.log("\n=== [MKT.HOOKS.340] a child's stop sent from outside the workspac
   const log = join(root, ".spndevex", ".debug", "telemetry", "usage.jsonl");
   stop(elsewhere, { cwd: elsewhere, session_id: "so", hook_event_name: "SubagentStop", agent_id: "ao", agent_transcript_path: child }, { CLAUDE_PROJECT_DIR: root });
   const lines = existsSync(log) ? readFileSync(log, "utf8").trim().split("\n").map((line) => JSON.parse(line)) : [];
-  check("the child's turn is filed under the workspace the project directory names", lines.length === 1 && lines[0].turn === "o1" && lines[0].agent === "ao", JSON.stringify(lines));
+  check("the child's turn is filed under the workspace the project directory names", lines.length === 1 && lines[0].id === "o1" && lines[0].agent === "ao", JSON.stringify(lines));
   check("and nothing is written in the folder the event stood in", !existsSync(join(elsewhere, ".spndevex")));
 }
 
-console.log("\n=== a usage line says the model, the model's own time and the row");
+console.log("\n=== a TURN row says the model, the model's own time and the work (MKT.SCRIPTS.326)");
 {
   const root = join(BASE, "fields");
-  const ws = "031-compliance";
-  const order = join(root, ".spndevex", "workstreams", "open", ws, "notes", "N008", "orders", "38-x.md");
+  const ws = "036-agent-follows-rules";
+  const order = join(root, ".spndevex", "workstreams", "open", ws, "notes", "N014", "orders", "docs-spn-support-ts-2.md");
   mkdirSync(join(order, ".."), { recursive: true });
   mkdirSync(join(root, ".spndevex", ".debug"), { recursive: true });
   writeFileSync(join(root, ".spndevex", ".debug", "switches.json"), '{"telemetry": true}');
-  writeFileSync(order, '---\nrow: "50"\n---\n# order\n');
+  writeFileSync(order, '---\ngo: "N012"\npart: "docs-spn-support-ts-2"\n---\n# order\n');
   const stamped = (type, at, extra = {}) => JSON.stringify({ type, timestamp: new Date(at).toISOString(), ...extra });
   const reply = (id, at, model) => stamped("assistant", at, { message: { id, model, usage: { input_tokens: 1, cache_creation_input_tokens: 2, cache_read_input_tokens: 3, output_tokens: 4 } } });
   const child = join(root, "agent-b.jsonl");
-  writeFileSync(child, [stamped("user", 1_000_000), reply("m1", 1_003_500, "claude-sonnet-5-5"), reply("m1", 1_004_000, "claude-sonnet-5-5"),
+  // The helper's first prompt names the order; it reads N014's folder, while the order's front matter says the go is N012's.
+  writeFileSync(child, [stamped("user", 1_000_000, { message: { content: `Do the work in ${order} now.` } }), reply("m1", 1_003_500, "claude-sonnet-5-5"), reply("m1", 1_004_000, "claude-sonnet-5-5"),
     stamped("user", 1_005_000, { message: { content: [{ type: "tool_result" }] } }), reply("m2", 1_007_250, "claude-sonnet-5-5")].join("\n") + "\n");
-  stop(root, { cwd: root, session_id: "sf", agent_id: "b", agent_transcript_path: child, tool_input: { file_path: order } });
+  stop(root, { cwd: root, session_id: "sf", agent_id: "b", agent_transcript_path: child });
   const log = join(root, ".spndevex", ".debug", "telemetry", "usage.jsonl");
   const lines = readFileSync(log, "utf8").trim().split("\n").map((line) => JSON.parse(line));
-  check("a line's keys are in the book's order",
-    lines.every((line) => Object.keys(line).join(",") === "at,session,agent,workstream,arc,order,row,turn,model,ms,input,cache_read,cache_write,output"), JSON.stringify(lines[0]));
+  check("a row's keys are in the book's order",
+    lines.every((line) => Object.keys(line).join(",") === "v,mtype,id,at,ms,event,session,agent,workstream,arc,part,skill,work,retryOf,model,tokens"), JSON.stringify(lines[0]));
   check("`model` is the reply's own", lines.map((line) => line.model).join() === "claude-sonnet-5-5,claude-sonnet-5-5", JSON.stringify(lines));
   check("`ms` runs from the line before the reply to the reply's first line", lines.map((line) => line.ms).join() === "3500,2250", JSON.stringify(lines));
-  check("`row` is the one the order's front matter names, beside the work tags",
-    lines.every((line) => line.row === "50" && line.order === "38-x" && line.arc === "N008" && line.workstream === ws), JSON.stringify(lines));
+  check("[MKT.SCRIPTS.326] a helper launched for docs-spn-support-ts-2 reading N014's folder: its rows carry arc N012, that part, work DOCS and event SubagentStop",
+    lines.every((line) => line.arc === "N012" && line.part === "docs-spn-support-ts-2" && line.work === "DOCS" && line.workstream === ws && line.event === "SubagentStop"), JSON.stringify(lines));
+  check("[MKT.SCRIPTS.326] a row holds no `row`, `order` or `turn` field", lines.every((line) => !("row" in line) && !("order" in line) && !("turn" in line)));
 }
 
 console.log("\n=== it is silent where there is nothing to log");

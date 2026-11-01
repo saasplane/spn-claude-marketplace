@@ -7,7 +7,7 @@ description: Start a SaaS Plane TS platform locally or run its test suites. Use 
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
-      "seen": "d6a6cbd5"
+      "seen": "67376a1f"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/04-develop.md",

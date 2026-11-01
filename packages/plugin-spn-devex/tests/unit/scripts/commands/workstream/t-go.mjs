@@ -15,8 +15,8 @@ const ok = (label, condition, detail = "") => {
 const json = (path) => JSON.parse(readFileSync(path, "utf8"));
 
 const rows = [
-  { id: "1", parent: "N001", title: "write the book", kind: "change", repo: "spn-x", altitude: "DOCS", blockedBy: [], touches: ["spn-x:docs"], state: "waiting", entries: ["E1"] },
-  { id: "2", parent: "N001", title: "build it", kind: "change", repo: "spn-x", altitude: "CODE", blockedBy: ["1"], touches: ["spn-x:src"], state: "waiting", entries: ["E2"] },
+  { id: "1", parent: "N001", title: "write the book", kind: "change", repo: "spn-x", work: "DOCS", blockedBy: [], touches: ["spn-x:docs"], state: "waiting", entries: ["E1"] },
+  { id: "2", parent: "N001", title: "build it", kind: "change", repo: "spn-x", work: "CODE", blockedBy: ["1"], touches: ["spn-x:src"], state: "waiting", entries: ["E2"] },
 ];
 const { root, ws } = await dataWorkspace("go", { rows });
 const goFile = join(ws, "arcs", "N001", "go.json");
@@ -70,11 +70,11 @@ console.log("\n=== write: the plan and the briefs");
   ok("[MKT.SCRIPTS.303] a ready scope writes go.json", wrote.code === 0 && existsSync(goFile), wrote.out);
   const plan = existsSync(goFile) ? json(goFile) : { parts: [], scope: [] };
   ok("[MKT.SCRIPTS.314] the plan records the go's scope and its lead", JSON.stringify(plan.scope) === '["N001"]' && plan.lead === "N001");
-  ok("[MKT.SCRIPTS.314] the plan carries the scope's release part, last", plan.parts.at(-1)?.id === "release-spn-x-1" && plan.parts.at(-1)?.pass === "RELEASE", JSON.stringify(plan.parts.map((p) => p.id)));
+  ok("[MKT.SCRIPTS.314] the plan carries the scope's release part, last", plan.parts.at(-1)?.id === "release-spn-x-1" && plan.parts.at(-1)?.work === "RELEASE", JSON.stringify(plan.parts.map((p) => p.id)));
   ok("[MKT.SCRIPTS.303] every part with entries has a brief", plan.parts.filter((p) => p.entries.length).every((p) => existsSync(join(orders, `${p.id}.md`))), wrote.out);
   const brief = existsSync(join(orders, "code-spn-x-1.md")) ? readFileSync(join(orders, "code-spn-x-1.md"), "utf8") : "";
   ok("[MKT.SCRIPTS.303] a brief opens with the go, the part and its entries", brief.startsWith("---\n") && brief.includes('go: "N001"') && brief.includes('part: "code-spn-x-1"') && brief.includes("N001/E2"), brief.slice(0, 200));
-  ok("[MKT.SCRIPTS.306] a brief gives the report's front matter that report write folds", brief.includes("## Report") && brief.includes("outcome: landed · stopped · needs-you") && brief.includes("cost: {"), brief.slice(-500));
+  ok("[MKT.SCRIPTS.306] a brief gives the report's front matter that report write folds, and asks for no cost", brief.includes("## Report") && brief.includes("outcome: landed · stopped · needs-you") && !brief.includes("cost:"), brief.slice(-500));
   ok("[MKT.SCRIPTS.315] write ends with the next step", lastLine(wrote.out).startsWith("Next:"), wrote.out);
 }
 
@@ -136,10 +136,10 @@ console.log("\n=== write: a proof still owed after the code landed");
 {
   const done = (over) => ({ parent: "N001", kind: "change", repo: "spn-x", blockedBy: [], touches: [], state: "landed", ...over });
   const owed = await dataWorkspace("go-proof", { rows: [
-    done({ id: "1", title: "write the book", altitude: "DOCS", entries: ["E1"] }),
-    done({ id: "2", title: "build it", altitude: "CODE", entries: ["E2"] }),
-    done({ id: "3", title: "release spn-x", altitude: "RELEASE" }),
-    done({ id: "4", title: "prove spn-x", altitude: "PROOF", state: "ready" }),
+    done({ id: "1", title: "write the book", work: "DOCS", entries: ["E1"] }),
+    done({ id: "2", title: "build it", work: "CODE", entries: ["E2"] }),
+    done({ id: "3", title: "release spn-x", work: "RELEASE" }),
+    done({ id: "4", title: "prove spn-x", work: "PROOF", state: "ready" }),
   ] });
   cli(owed.root, ["workstream", "fact", "write", "N001", "--source", "spn-x/a.ts", "--fact", "a is 1", "--used-by", "1"]);
   writeFileSync(join(owed.ws, "arcs", "N001", "sheet.json"), JSON.stringify(sheetOf([entry("E1", "spn-x:docs/a.md"), entry("E2", "spn-x:src/b.ts")]), null, 2));
@@ -203,7 +203,7 @@ console.log("\n=== write: one refusal names every fault");
 
 console.log("\n=== start: a full run is refused on a tree that holds uncommitted changes");
 {
-  const row = (id, altitude, over = {}) => ({ id, parent: "N001", kind: "change", repo: "spn-x", blockedBy: [], touches: [], state: "landed", title: `row ${id}`, altitude, ...over });
+  const row = (id, work, over = {}) => ({ id, parent: "N001", kind: "change", repo: "spn-x", blockedBy: [], touches: [], state: "landed", title: `row ${id}`, work, ...over });
   const dirty = await dataWorkspace("go-dirty", { rows: [
     row("1", "DOCS", { entries: ["E1"] }), row("2", "CODE", { entries: ["E2"] }), row("3", "RELEASE"), row("4", "PROOF", { state: "ready" }),
   ] });
@@ -224,7 +224,7 @@ console.log("\n=== start: a full run is refused on a tree that holds uncommitted
 
 console.log("\n=== report write: a part's report lands its row on a green run, in one command");
 {
-  const row = (id, altitude, over = {}) => ({ id, parent: "N001", kind: "change", repo: "spn-x", blockedBy: [], touches: [], state: "waiting", title: `row ${id}`, altitude, ...over });
+  const row = (id, work, over = {}) => ({ id, parent: "N001", kind: "change", repo: "spn-x", blockedBy: [], touches: [], state: "waiting", title: `row ${id}`, work, ...over });
   const rep = await dataWorkspace("go-report", { rows: [row("1", "CODE", { entries: ["E1"] })] });
   cli(rep.root, ["workstream", "fact", "write", "N001", "--source", "spn-x/a.ts", "--fact", "a is 1", "--used-by", "1"]);
   const sheetFile = join(rep.ws, "arcs", "N001", "sheet.json");
@@ -232,7 +232,7 @@ console.log("\n=== report write: a part's report lands its row on a green run, i
   cli(rep.root, ["workstream", "go", "write", "N001"]);
   const arcFile = join(rep.ws, "arcs", "N001", "state.json");
   const rowState = () => json(arcFile).rows[0].state;
-  const part = json(join(rep.ws, "arcs", "N001", "go.json")).parts.find((p) => p.pass === "CODE");
+  const part = json(join(rep.ws, "arcs", "N001", "go.json")).parts.find((p) => p.work === "CODE");
   const sha = rep.git(["rev-parse", "HEAD"]);
   const runIn = (results) => put(rep.root, "spn-x/pkg/tests/.output/unit/runs/r1.json", JSON.stringify({ run: "r1", tier: "unit", ranAt: new Date(Date.now() + 3600e3).toISOString(), env: "local", results: results.map((id) => ({ id, tier: "unit", status: "SUCCESS", title: id })) }));
   const report = (id, ...extra) => { put(rep.ws, `notes/N001/orders/${id}.report.md`, ["---", 'row: "1"', "outcome: landed", ...extra, "---", "Body.", ""].join("\n")); return cli(rep.root, ["workstream", "report", "write", "031", `notes/N001/orders/${id}.report.md`]); };

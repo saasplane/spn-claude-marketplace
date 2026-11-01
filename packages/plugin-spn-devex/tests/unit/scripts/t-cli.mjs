@@ -162,16 +162,16 @@ console.log("\n=== cli — a run writes one telemetry line, with its words as th
     run("docs", "face", "write");
     run("docs", "face");
     const lines = readFileSync(join(root, ".spndevex", ".debug", "telemetry", "hooks.jsonl"), "utf8").trim().split("\n").map((line) => JSON.parse(line));
-    const levels = (line) => [line.script, line.group, line.subgroup, line.action, line.args, line.exit];
-    const commands = lines.filter((line) => line.group !== "cli").map(levels);
-    ok("[MKT.SCRIPTS.116] a subject's action writes its group, its subject as `subgroup`, its action, and what followed the action",
-      JSON.stringify(commands[0]) === JSON.stringify(["spn-devex", "docs", "face", "check", "repo/docs --block tags", 0]), JSON.stringify(commands[0]));
-    ok("[MKT.SCRIPTS.116] a command of two words leaves `subgroup` empty, and is recorded though its file records nothing itself",
-      JSON.stringify(commands[1]) === JSON.stringify(["spn-devex", "behaviours", null, "check", "repo", 0]), JSON.stringify(commands[1]));
+    const levels = (line) => [line.call.program, line.call.group, line.call.action, line.exit];
+    const commands = lines.map(levels);
+    ok("[MKT.SCRIPTS.116] a subject's action writes its group and its action with the subject before it",
+      JSON.stringify(commands[0]) === JSON.stringify(["spn-devex", "docs", "face check", 0]), JSON.stringify(commands[0]));
+    ok("[MKT.SCRIPTS.116] a command of two words writes its action alone, and is recorded though its file records nothing itself",
+      JSON.stringify(commands[1]) === JSON.stringify(["spn-devex", "behaviours", "check", 0]), JSON.stringify(commands[1]));
     ok("[MKT.SCRIPTS.116] a run the command refuses is recorded with exit 2",
-      JSON.stringify(commands[2]) === JSON.stringify(["spn-devex", "docs", "face", "write", null, 2]), JSON.stringify(commands[2]));
+      JSON.stringify(commands[2]) === JSON.stringify(["spn-devex", "docs", "face write", 2]), JSON.stringify(commands[2]));
     ok("[MKT.SCRIPTS.116] each command is recorded once, and a run the entry refuses is no command",
-      commands.length === 3 && lines.filter((line) => line.group === "cli").length === 3, JSON.stringify(lines.map(levels)));
+      commands.length === 3 && lines.every((line) => line.v === 1 && line.mtype === "COMMAND"), JSON.stringify(lines.map(levels)));
   } finally {
     rmSync(root, { recursive: true, force: true });
   }

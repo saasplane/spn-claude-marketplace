@@ -14,12 +14,12 @@
 
 import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
-import { resolve } from "node:path";
+import { basename, dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { type Action, FLAG, VALUE, UsageFault, readWords } from "../../../../../plugin-support-lib/src/lib/command.ts";
 import { workspaceRoot } from "../../../../../plugin-support-lib/src/lib/timing.ts";
-import { logEvent, readArc, readJsonl, readQuestions, readSheet, factsFileOf, sheetFileOf, writeArc, writeWhole } from "../../lib/workstream.ts";
-import { ENTRY_OPS, parentIds, sheetFaults, type ArcData, type ArcRow, type Fact, type Sheet, type SheetEntry } from "../../lib/workstream-schema.ts";
+import { logEvent, readArc, readJson, readJsonl, readQuestions, readSheet, factsFileOf, sheetFileOf, stateFileOf, writeArc, writeWhole } from "../../lib/workstream.ts";
+import { ENTRY_OPS, entryWork, parentIds, renameDataToWork, sheetFaults, type ArcData, type ArcRow, type Fact, type Sheet, type SheetEntry } from "../../lib/workstream-schema.ts";
 import { arcNamed, listOf, typed } from "./_shared.ts";
 
 export const describe = "the arc's change sheet: write it whole, edit or drop one entry, show it, check it against the rows and the cards";
@@ -39,10 +39,32 @@ function needsReleaseFaults(sheet: Sheet): string[] {
   });
 }
 
+/**
+ * The first read of an open workstream's arc: its rows and its sheet's entries rename `altitude` to `work`, each file
+ * written back with one log line when anything changed, before any validation faults on the old name. A closed
+ * workstream is never passed in: it stays as it closed.
+ */
+export function renameFirstRead(ws: string, arc: string): void {
+  if (basename(dirname(resolve(ws))) === "closed") return;
+  let count = 0;
+  for (const file of [stateFileOf(ws, arc), sheetFileOf(ws, arc)]) {
+    const data = readJson(file);
+    const renamed = renameDataToWork(data);
+    if (renamed > 0) { writeWhole(file, `${JSON.stringify(data, null, 2)}\n`); count += renamed; }
+  }
+  if (count > 0) logEvent(ws, arc, "work", null, `altitude and pass renamed to work · ${count} record${count === 1 ? "" : "s"}`);
+}
+
+/** The kinds of work a sheet entry may name: a sheet entry changes docs, code or generated output, never the rest. */
+const ENTRY_WORK: readonly string[] = ["DOCS", "CODE", "GENERATED"];
+
 /** Each fault of a sheet as the arc would hold it: its schema, and every fact an entry cites being one the arc's facts hold. */
 function writeFaults(ws: string, arc: string, sheet: Sheet, whole: boolean): string[] {
   const out = [...sheetFaults(sheet), ...needsReleaseFaults(sheet)];
   if (whole && sheet.stack === null) out.push("the sheet's `stack` is null — name the folder the tiers run from, the dmo version and the reset");
+  for (const entry of Array.isArray(sheet.entries) ? sheet.entries : [])
+    if (typeof entry?.work === "string" && !ENTRY_WORK.includes(entry.work))
+      out.push(`${entry.id} names work ${entry.work} — an entry's work is DOCS, CODE or GENERATED, or left out and read from its file`);
   const held = new Set(readJsonl(factsFileOf(ws, arc)).map((line) => (line as Fact | undefined)?.id));
   for (const entry of Array.isArray(sheet.entries) ? sheet.entries : [])
     for (const id of Array.isArray(entry?.facts) ? entry.facts : [])
@@ -57,19 +79,13 @@ function refused(faults: string[]): number {
 }
 
 function sheetOf(ws: string, arc: string): Sheet {
+  renameFirstRead(ws, arc);
   const sheet = readSheet(ws, arc);
   if (!sheet) throw new UsageFault(`finds no sheet for ${arc}: \`sheet write ${arc} --file <sheet.json>\` writes it.`);
   return sheet;
 }
 
 const save = (ws: string, arc: string, sheet: Sheet): void => writeWhole(sheetFileOf(ws, arc), `${JSON.stringify(sheet, null, 2)}\n`);
-
-/** The kind of change an entry makes, by where its file sits: docs, generated output, or code. */
-function kindOf(entry: SheetEntry): "DOCS" | "GENERATED" | "CODE" {
-  const path = entry.file.slice(entry.file.indexOf(":") + 1);
-  if (/(^|\/)docs\//.test(path) || /\.md$/.test(path)) return "DOCS";
-  return /(^|\/)(generated|dist)\//.test(path) ? "GENERATED" : "CODE";
-}
 
 /**
  * The arc's steps as its sheet derives them: one for each repository and kind of change, holding that group's entries;
@@ -83,19 +99,19 @@ function deriveSteps(ws: string, arc: string, sheet: Sheet): number {
   const data = readArc(ws, arc);
   if (!data) return 0;
   const followed = new Set<string>();
-  const groups = new Map<string, { repo: string; altitude: string; ids: string[] }>();
+  const groups = new Map<string, { repo: string; work: string; ids: string[] }>();
   for (const entry of sheet.entries) {
     const repo = entry.file.includes(":") ? entry.file.slice(0, entry.file.indexOf(":")) : "";
-    const altitude = kindOf(entry);
-    const group = groups.get(`${repo}|${altitude}`) ?? { repo, altitude, ids: [] };
+    const work = entryWork(entry);
+    const group = groups.get(`${repo}|${work}`) ?? { repo, work, ids: [] };
     group.ids.push(entry.id);
-    groups.set(`${repo}|${altitude}`, group);
+    groups.set(`${repo}|${work}`, group);
   }
   let added = 0;
   const top = (): ArcRow[] => data.rows.filter((row) => row.parent === arc);
-  const place = (repo: string, altitude: string, title: string, entries: string[] | null): void => {
+  const place = (repo: string, work: string, title: string, entries: string[] | null): void => {
     // A landed step keeps what it landed; an entry written after it goes to an open step, or to a new one.
-    const same = top().filter((row) => row.repo === repo && row.altitude === altitude);
+    const same = top().filter((row) => row.repo === repo && row.work === work);
     const landed = new Set(same.filter((row) => row.state === "landed").flatMap((row) => row.entries ?? []));
     const fresh = entries?.filter((id) => !landed.has(id)) ?? null;
     const open = same.find((row) => row.state !== "landed");
@@ -103,15 +119,15 @@ function deriveSteps(ws: string, arc: string, sheet: Sheet): number {
     if (same.length && (fresh ? !fresh.length : !followed.has(repo))) return;
     if (fresh?.length && same.length) followed.add(repo);
     const id = String(Math.max(0, ...top().map((row) => parseInt(row.id, 10) || 0)) + 1);
-    const row: ArcRow = { id, parent: arc, title, kind: "change", repo, altitude, state: data.status === "DECIDED" ? "ready" : "waiting" };
+    const row: ArcRow = { id, parent: arc, title, kind: "change", repo, work, state: data.status === "DECIDED" ? "ready" : "waiting" };
     if (fresh) row.entries = fresh;
     data.rows.push(row);
     added += 1;
   };
-  for (const group of groups.values()) place(group.repo, group.altitude, `${group.repo} ${group.altitude.toLowerCase()}`, group.ids);
+  for (const group of groups.values()) place(group.repo, group.work, `${group.repo} ${group.work.toLowerCase()}`, group.ids);
   const repos = [...new Set([...groups.values()].map((group) => group.repo))];
   if (sheet.releaseChain.length) for (const repo of repos) place(repo, "RELEASE", `release ${repo}`, null);
-  for (const group of groups.values()) if (group.altitude === "CODE") place(group.repo, "PROOF", `prove ${group.repo}`, null);
+  for (const group of groups.values()) if (group.work === "CODE") place(group.repo, "PROOF", `prove ${group.repo}`, null);
   if (added || groups.size) typed(() => writeArc(ws, data));
   return added;
 }
@@ -121,6 +137,7 @@ function write(args: string[]): number {
   const [ref, ...more] = words.paths;
   if (more.length) throw new UsageFault("takes one arc.");
   const { ws, arc } = arcNamed(ref);
+  renameFirstRead(ws, arc);
   const file = words.value("file");
   if (!file) throw new UsageFault("needs `--file <sheet.json>`, the whole sheet.");
   let data: unknown;
@@ -230,6 +247,7 @@ function show(args: string[]): number {
   const [ref, ...more] = words.paths;
   if (more.length) throw new UsageFault("takes one arc.");
   const { ws, arc } = arcNamed(ref);
+  renameFirstRead(ws, arc);
   const sheet = readSheet(ws, arc);
   if (!sheet) { console.log(`${arc} keeps no sheet — it is judged as before sheets.`); return 0; }
   const rowId = words.value("row");
@@ -259,6 +277,7 @@ const cites = (entries: readonly SheetEntry[], id: string): boolean =>
 
 /** What `sheet check` prints, and what the go lists: the sheet read against the arc's rows and cards. Empty where the arc keeps no sheet. */
 export function sheetFindings(ws: string, arc: string): string[] {
+  renameFirstRead(ws, arc);
   const sheet = readSheet(ws, arc);
   const data: ArcData | null = readArc(ws, arc);
   if (!sheet || !data) return [];
@@ -274,15 +293,15 @@ export function sheetFindings(ws: string, arc: string): string[] {
   }
   for (const entry of entries) if (!named.has(entry.id)) out.push(`${entry.id} is named by no row`);
   // A RELEASE or PROOF row names its files through no entry, so it is never this finding.
-  for (const row of leaves.filter((one) => ["DOCS", "CODE", "GENERATED"].includes(one.altitude ?? "") && !(one.entries ?? []).length))
+  for (const row of leaves.filter((one) => ["DOCS", "CODE", "GENERATED"].includes(one.work ?? "") && !(one.entries ?? []).length))
     out.push(`row ${row.id} names no entry`);
-  for (const row of leaves.filter((one) => one.altitude === "CODE" && (one.entries ?? []).length)) {
+  for (const row of leaves.filter((one) => one.work === "CODE" && (one.entries ?? []).length)) {
     const tested = (row.entries ?? []).some((id) => Object.values(held.get(id)?.tiers ?? {}).some((ids) => ids.length));
     if (!tested) out.push(`row ${row.id} is a CODE row and its entries name no test`);
   }
   for (const card of readQuestions(ws).filter((one) => one.arc === arc && one.state === "answered"))
     if (!cites(entries, card.id)) out.push(`${card.id} is answered and no entry cites it`);
-  if (sheet.stack === null && leaves.some((row) => row.altitude === "CODE" || row.altitude === "PROOF"))
+  if (sheet.stack === null && leaves.some((row) => row.work === "CODE" || row.work === "PROOF"))
     out.push(`the sheet's stack is null, and ${arc} has a CODE or PROOF row`);
   return out;
 }
@@ -350,6 +369,7 @@ function check(args: string[]): number {
   const [ref, ...more] = words.paths;
   if (more.length) throw new UsageFault("takes one arc.");
   const { ws, arc } = arcNamed(ref);
+  renameFirstRead(ws, arc);
   if (!readSheet(ws, arc)) { console.log(`${arc} keeps no sheet — it is judged as before sheets.`); return 0; }
   const root = workspaceRoot(resolve(process.env.SPN_WORKSPACE ?? process.cwd()));
   const measured = root ? budgetLines(root, readSheet(ws, arc) as Sheet) : { lines: [], findings: [] };

@@ -1,29 +1,29 @@
-// This file OWNS these rules — the switch, the line's shape, the size cap and the carried tags — and
-// restates the book's RULE.DEVEX.WORKSPACE.185 (spn-foundation `04-capabilities/01-devex/03-utils/
-// 01-spnutils/01-utils.md` § the `timings` paragraph).
+// This file OWNS these rules — the switch, the row's shape, the size cap and the carried ids — and
+// restates the book's RULE.DEVEX.WORKSPACE.185 (spn-foundation `04-capabilities/01-devex/04-workspace/01-workspace/
+// 01-workspace.md`, the telemetry row; the spnutils chapter's `timings` paragraph points there).
 //
 // What a plugin's checks, its commands and the agent's Bash commands cost, written only while the
 // developer has asked for it. ONE LIBRARY, IN THE SHARED SUPPORT FOLDER: spn-devex, spn-surface, spn-apps
 // and spn-infra each import it by relative path, so the build copies it into each installed plugin's own
 // bundle and no plugin reaches into another. All four write the one log `debug hooks show` reads.
 //
-// ONE LINE SHAPE, WHOEVER WRITES IT (`LINE_KEYS`, in this order): `script` (the plugin, or the program
-// a Bash command ran), `group`, `subgroup`, `action` (up to three levels below it, null where unused),
-// `args` (what was typed after the action, a secret-looking option's value written `***`; null for a
-// hook check), `event`, `tool`, `ms`, `exit` (null for a hook check), `at` (UTC, ending in `Z`),
-// `repo` (the member repository the call ran in; null at the workspace root), `pid`, `verdict` and
-// `out`, and the work tags `session`, `agent`, `workstream`, `arc`, `order`, `row`. A Bash command's
-// line carries one more key after those, `programs`: how many programs the filter names the call ran.
-// No other line carries it.
+// ONE ROW FAMILY, READ BY ITS `mtype`: every row holds the base (`LINE_KEYS`, in this order) — `v` (1), `mtype`,
+// `id` (a short random id; a model turn's is its message id), `at` (UTC, ending in `Z`, when the thing started),
+// `ms`, `event`, then the head `session`, `agent`, `workstream`, `arc`, `part`, `skill`, `work`, `retryOf` — and
+// its variant adds only what its kind needs. This library writes two variants: a hook check's run, `CHECK`
+// (`check`, `verdict` PASS, NOTE or DENY, `out`), and a command, `COMMAND` (`call` { program, group, action },
+// `exit`). A model turn is `usage.ts`'s, a test run the test runner's, a panel the panel's. The values are the
+// contract's, copied into `telemetry-values.ts`, which toolchain-ts holds to the contract.
 //
-// A hook's whole-run line says what kind of call it was, by `program` and `pathKind` (`callOf`): the first
-// program of a Bash command, and WORKSTREAM, TEST, SOURCE or OTHER for the file the call touches. Never the
-// path or the command: the kind is all `debug cost` needs to class a call, and a path is the developer's.
+// A ROW HOLDS IDS, TIMES, COUNTS AND NAMES, NEVER WHAT WAS TYPED: a command is its program, group and action and
+// never its arguments, and a free-text field (`workstream`, `arc`, `part`, `check`) that does not match its
+// pattern is written as null.
 //
-// `verdict` is what a hook check decided: `pass` (it said nothing), `note` (it added words to the
-// context) or `deny` (it refused the call or held the turn); null on a command's line. `out` is the
-// bytes put into the context: the words a check added, the tool's response on a `PostToolUse` run's
-// whole-run line, a timed command's output; null where none.
+// `verdict` is what a hook check decided: `PASS` (it said nothing), `NOTE` (it added words to the context) or
+// `DENY` (it refused the call or held the turn). `out` is the bytes put into the context. A send-back is a
+// `DENY` row, under PreToolUse or Stop; the words are not kept.
+//
+// A hook's whole-run line is gone: each check is a row with its own ms. A command's row is its whole run.
 //
 // NAMES ARE STRUCTURED AT THE CALL SITE, never parsed from a string. A check file with sub-checks is
 // `{ group: <file>, action: <sub-check> }` (`split-plan` › `close`); a check file with one check names
@@ -33,26 +33,33 @@
 // Measuring is free; writing is the cost. `begin()` touches no filesystem, so a check that refuses
 // early and exits pays nothing. The switch is read at the moment of writing.
 //
-// EACH LINE SAYS WHICH WORK IT BELONGS TO. `workstream`, `arc`, `order` and `row` are read from the paths
-// the tool call touches (`row` from an order's front matter, or from the Bash call that moves a row to
-// `running`), and `agent` from the hook input when it carries one, so a transcript joins to its work by
-// `session`. A call that touches no workstream path inherits the tags its session and agent last carried
-// (`carryTags`). An order is a child's brief, so a main window's lines carry `order: null`.
+// EACH ROW SAYS WHICH WORK IT BELONGS TO. `workstream`, `arc` and `part` are read from what the tool call
+// touches (the paths under a workstream, a part's order, or the `workstream go start` call that starts a part),
+// `agent` from the hook input when it carries one, and `skill` from the Skill call that names it, so a
+// transcript joins to its work by `session`. A call that names none of them inherits what its session and agent
+// last carried (`carryTags`); a helper that has no skill of its own takes the one its window runs under.
+// `work` is read from the part's id (`workOfPart`).
 //
 // A TOOL MUST NEVER FAIL BECAUSE TIMING FAILED. Every path here swallows its own errors: a gate that
 // refuses to run is infinitely more expensive than a number nobody recorded.
 
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { basename, dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
+import { randomBytes } from "node:crypto";
 import { appendLog, readSwitch, sessionDir, telemetryFolder } from "./debug-store.ts";
 import { isWorkspaceDevex, workstreamPrefixSource } from "./docs-tree.ts";
+import {
+  ARC_PATTERN, CHECK_PATTERN, PART_PATTERN, WORKSTREAM_PATTERN, SPDevExAgentHookVerdictType, SPDevExAgentSkillType,
+  SPDevExWorkspaceTelemetryEventType, SPDevExWorkspaceTelemetryRowType, SPDevExWorkspaceTelemetryVersionType, SPDevExWorkstreamWorkType,
+  held, known,
+} from "./telemetry-values.ts";
 
 const DEVEX = ".spndevex", LOG = "hooks.jsonl";
 const CARRIED = "tags.json";
 
-/** Every key each line carries, in the order it is written. A Bash command's line adds `programs` after them. */
-export const LINE_KEYS = ["script", "group", "subgroup", "action", "args", "event", "tool", "ms", "exit", "at",
-  "repo", "pid", "verdict", "out", "session", "agent", "workstream", "arc", "order", "row"] as const;
+/** Every key each row carries, in the order it is written; a variant adds its own after them. */
+export const LINE_KEYS = ["v", "mtype", "id", "at", "ms", "event", "session", "agent", "workstream", "arc", "part", "skill",
+  "work", "retryOf"] as const;
 
 /** What a hook check decided: said nothing, added words to the context, or refused the call or held the turn. */
 export type Verdict = "pass" | "note" | "deny";
@@ -61,15 +68,17 @@ export type Verdict = "pass" | "note" | "deny";
 export type SpanName = { group?: string | null; subgroup?: string | null; action: string | null; args?: string | null };
 
 /**
- * One measured thing, before the facts every line of a run shares are added. `programs` is set for a
- * Bash command alone, and only an entry that sets it writes the key.
+ * One measured thing, before the facts every row of a run shares are added. For a command, `script` is the
+ * program, and `group` and `action` the rest of its call; `args`, `subgroup`, `repo`, `programs`, `program` and
+ * `pathKind` are accepted from a caller and written nowhere. `found` names the checks whose findings a Stop
+ * run's verdict was judged from.
  */
 export type Entry = SpanName & { ms: number; exit?: number | null; script?: string; repo?: string | null; programs?: number;
-  program?: string | null; pathKind?: PathKind | null; verdict?: Verdict | null; out?: number | null };
+  program?: string | null; pathKind?: PathKind | null; verdict?: Verdict | null; out?: number | null; found?: string[] };
 
 /**
- * What every line of one run shares. `script` is the plugin; `cwd` is where the call ran, read for
- * `repo`; `process` names the whole run, written as one more line at `end()`.
+ * What every row of one run shares. `script` is the plugin; `cwd` is where the call ran, read for
+ * `repo`;  `process` names the whole run of a command, written as its row at `end()`.
  */
 export type Facts = {
   script: string;
@@ -79,8 +88,11 @@ export type Facts = {
   agent?: string | null;
   workstream?: string | null;
   arc?: string | null;
-  order?: string | null;
-  row?: string | null;
+  part?: string | null;
+  /** The value of SPDevExAgentSkillType the window runs under, where this call names it. */
+  skill?: string | null;
+  /** The work the row stands for where the caller knows it; else read from the part's id. */
+  work?: string | null;
   cwd?: string;
   program?: string | null;
   pathKind?: PathKind | null;
@@ -208,8 +220,8 @@ export function callOf(payload: { tool_name?: unknown; tool_input?: unknown; cwd
   } catch { return none; }
 }
 
-/** The work a line belongs to. Every field is `null` where the call named none. */
-export type WorkTags = { workstream: string | null; arc: string | null; order: string | null; row: string | null; agent: string | null };
+/** The work a row belongs to. Every field is `null` where the call named none. */
+export type WorkTags = { workstream: string | null; arc: string | null; part: string | null; agent: string | null };
 
 // `.spndevex/workstreams/<state>/<NNN-subject>/` and whatever follows it inside that folder.
 const IN_WORKSTREAM = new RegExp(`${workstreamPrefixSource()}(\\d{3}-[A-Za-z0-9-]+)((?:\\/[^\\s'"\`)\\]|;&<>]*)?)`, "g");
@@ -250,20 +262,18 @@ function tagsIn(workstream: string, rest: string): Place {
 
 const depth = (tags: Place) => (tags.order ? 3 : tags.arc ? 2 : 1);
 
-/** The `row:` an order's front matter names, or null where the file, the front matter or the field is absent. */
-function rowOfOrder(file: string): string | null {
-  try {
-    const head = readFileSync(file, "utf8").slice(0, 2000);
-    const front = /^---\r?\n([\s\S]*?)\r?\n---/.exec(head)?.[1];
-    return front ? /^row:\s*["']?([^"'\s#]+)["']?\s*$/m.exec(front)?.[1] ?? null : null;
-  } catch { return null; }
+// A Bash call that starts a part names it: `workstream go start <ws>/N<nnn> <part>`; a bare `<NNN>` names no workstream folder.
+const GO_START = /\bworkstream\s+go\s+start\s+["']?(?:(\d{3}-[a-z0-9][a-z0-9-]*)|\d{3})\/(N\d{3})["']?\s+["']?([a-z0-9][a-z0-9-]*)/;
+
+/** The work a part's id stands for, from its prefix: `baseline-` and `full-` are TEST, and `docs-`, `code-`, `generated-`, `design-`, `release-` and `proof-` are their own. */
+export function workOfPart(part: string | null | undefined): SPDevExWorkstreamWorkType | null {
+  const prefix = typeof part === "string" ? /^([a-z]+)-/.exec(part)?.[1] : undefined;
+  if (prefix === "baseline" || prefix === "full") return SPDevExWorkstreamWorkType.TEST;
+  return prefix ? known(SPDevExWorkstreamWorkType, prefix.toUpperCase()) : null;
 }
 
-// A Bash call that moves a row to `running` names the row it works: `workstream row state <ws>/N<nnn> <row> running`.
-const ROW_RUNNING = /\bworkstream\s+row\s+state\s+\S+\s+["']?([A-Za-z0-9._-]+)["']?\s+running\b/;
-
 /**
- * The workstream, arc and order a hook's tool call touches, and the agent that made it.
+ * The workstream, arc and part a hook's tool call touches (a part is its order's name, or the part a `workstream go start` names), and the agent that made it.
  *
  * Every string in `tool_input` is read — a file path, a command, an edit — for a path under
  * `.spndevex/workstreams/<state>/<NNN-subject>/`. A relative `arcs/N<n>…` or `notes/N<n>/…` counts
@@ -272,84 +282,79 @@ const ROW_RUNNING = /\bworkstream\s+row\s+state\s+\S+\s+["']?([A-Za-z0-9._-]+)["
  * workstream), and the first of those. Never throws.
  */
 export function tagsOf(payload: { tool_input?: unknown; cwd?: string; agent_id?: unknown } | null | undefined): WorkTags {
-  const none: WorkTags = { workstream: null, arc: null, order: null, row: null, agent: null };
+  const none: WorkTags = { workstream: null, arc: null, part: null, agent: null };
   try {
     if (!payload) return none;
     const agent = typeof payload.agent_id === "string" && payload.agent_id ? payload.agent_id : null;
     let best: Place | null = null;
-    let bestFile: string | null = null;
-    // The order file each candidate names, so the winning order's front matter can be read for its row.
-    const consider = (found: Place, orderFile: string | null) => {
-      if (!best || depth(found) > depth(best)) { best = found; bestFile = found.order ? orderFile : null; }
-    };
+    const consider = (found: Place) => { if (!best || depth(found) > depth(best)) best = found; };
     const strings = stringsOf(payload.tool_input);
-    const orderPath = (folder: string, order: string | null) => (order ? `${folder.replace(/\/orders\/.*$/, "/orders/")}${order}.md` : null);
     for (const text of strings)
       for (const m of text.matchAll(IN_WORKSTREAM)) {
         const found = tagsIn(m[1], m[2] ?? "");
-        const lead = text.slice(0, m.index).match(/[^\s'"`=(]*$/)?.[0] ?? "";
-        const whole = `${lead}${m[0]}`;
-        consider(found, orderPath(isAbsolute(whole) ? whole : resolve(payload.cwd ?? ".", whole), found.order));
+        consider(found);
       }
     const here = typeof payload.cwd === "string" ? [...payload.cwd.matchAll(IN_WORKSTREAM)][0] : undefined;
     if (here) {
       const base = here[2] ?? "";
-      const folder = (payload.cwd as string).slice(0, (here.index ?? 0) + here[0].length - base.length);
       for (const text of strings)
         for (const m of text.matchAll(RELATIVE)) {
           const found = tagsIn(here[1], `${base.replace(/\/+$/, "")}/${m[1]}`);
-          consider(found, orderPath(join(folder, base, m[1]), found.order));
+          consider(found);
         }
     }
-    let row: string | null = null;
-    for (const text of strings) { const said = ROW_RUNNING.exec(text)?.[1]; if (said) { row = said; break; } }
+    let started: { workstream: string | null; arc: string; part: string } | null = null;
+    for (const text of strings) {
+      const said = GO_START.exec(text);
+      if (said) { started = { workstream: said[1] ?? null, arc: said[2], part: said[3] }; break; }
+    }
     const found = best as Place | null;
-    if (!row && bestFile) row = rowOfOrder(bestFile);
-    return found ? { ...found, row, agent } : { ...none, row, agent };
+    if (found) return { workstream: found.workstream, arc: found.arc ?? started?.arc ?? null, part: found.order ?? started?.part ?? null, agent };
+    if (started) return { workstream: started.workstream, arc: started.arc, part: started.part, agent };
+    return { ...none, agent };
   } catch { return none; }
 }
 
 /**
  * The facts a plugin command's lines carry. A command is run by the agent through the shell, so it
  * has no hook payload: its session comes from `CLAUDE_CODE_SESSION_ID`, the variable Claude Code
- * exports to every command it runs, and its workstream, arc and order from the paths in its own
- * arguments and the folder it runs in, read by the same `tagsOf` a hook uses. Its whole run is
- * `cli` › `cli`, with everything typed after the CLI as its `args`. Never throws.
+ * exports to every command it runs, and its workstream, arc and part from the paths in its own
+ * arguments and the folder it runs in, read by the same `tagsOf` a hook uses. Its row is one command: the
+ * plugin as the program, the first two words typed after the CLI as the group and action (each only if it
+ * is a plain lowercase word), and nothing else that was typed. Never throws.
  */
 export function commandFacts(script: string, args: string[]): Facts {
   const session = process.env.CLAUDE_CODE_SESSION_ID || null;
-  let tags: WorkTags = { workstream: null, arc: null, order: null, row: null, agent: null };
+  let tags: WorkTags = { workstream: null, arc: null, part: null, agent: null };
   try { tags = tagsOf({ tool_input: { command: args.join(" ") }, cwd: process.cwd() }); } catch { /* ignore */ }
-  let typed: string | null = null;
-  try { typed = argsText(process.argv.slice(2)); } catch { typed = null; }
+  const word = (one: string | undefined) => (one && /^[a-z0-9][a-z0-9-]*$/.test(one) ? one : null);
+  const [group, action] = [word(args[0]), word(args[1])];
   return { script, event: process.env.CLAUDE_HOOK_EVENT ?? "command", tool: null, session, ...tags,
-           cwd: process.cwd(), process: { group: "cli", action: "cli", args: typed } };
+           cwd: process.cwd(), process: { group, action: group ? action : null } };
 }
 
-type Work = { workstream: string | null; arc: string | null; order: string | null; row: string | null };
+type Work = { workstream: string | null; arc: string | null; part: string | null; skill: string | null };
 type Carried = Record<string, Work>;
 
 /**
- * The work a line is written under: its own tags, or the ones carried from the same session and
+ * The work a row is written under: its own ids, or the ones carried from the same session and
  * agent's last tagged call (RULE.DEVEX.WORKSPACE.185).
  *
- * - **A call that touches no workstream path inherits** the carried tags.
+ * - **A call that touches no workstream path inherits** the carried ids.
  * - **A call inside the carried work keeps what it does not name**: the same workstream, and the same
- *   arc where it names one, fills in the carried arc, order and row. A lane reading its arc's spec is
- *   still working its order.
+ *   arc where it names one, fills in the carried arc and part.
  * - **A call that names other work replaces them.**
- * - **A main window carries no order**: an order is a child's brief, so a main window's `order` is null
- *   and its `row` is the one of the order it writes or the row it moves to `running`.
+ * - **The skill is the window's**: the one a Skill call named last, carried across work; a helper with none of
+ *   its own takes the one its main window runs under.
  *
- * The carried tags are written back whenever they change, in the window's own folder
- * (`sessions/<id>/tags.json`), keyed by agent (`main` for none), so a lane never lends its tags to the
- * main window or to another lane. With no session there is nothing to key on, and the call's own tags
- * stand.
+ * The carried ids are written back whenever they change, in the window's own folder
+ * (`sessions/<id>/tags.json`), keyed by agent (`main` for none), so a lane never lends its ids to the
+ * main window or to another lane. With no session there is nothing to key on, and the call's own ids
+ * stand. A part stays carried until the window names other work; this library cannot see a part land.
  */
 export function carryTags(root: string, facts: Partial<Facts>): Work {
   const agent = typeof facts.agent === "string" && facts.agent ? facts.agent : null;
-  const own: Work = { workstream: facts.workstream ?? null, arc: facts.arc ?? null, order: agent ? facts.order ?? null : null,
-                      row: facts.row ?? null };
+  const own: Work = { workstream: facts.workstream ?? null, arc: facts.arc ?? null, part: facts.part ?? null, skill: facts.skill ?? null };
   const session = typeof facts.session === "string" && facts.session ? facts.session : null;
   if (!session) return own;
   const key = agent ?? "main";
@@ -357,14 +362,16 @@ export function carryTags(root: string, facts: Partial<Facts>): Work {
   let carried: Carried = {};
   try { carried = JSON.parse(readFileSync(path, "utf8")) ?? {}; } catch { carried = {}; }
   const was = carried[key];
+  const skill = own.skill ?? was?.skill ?? (agent ? carried.main?.skill ?? null : null);
   let work: Work;
   if (!own.workstream) {
-    work = was ? { workstream: was.workstream, arc: was.arc, order: was.order, row: own.row ?? was.row ?? null } : own;
+    work = was ? { workstream: was.workstream, arc: own.arc ?? was.arc, part: own.part ?? was.part ?? null, skill } : { ...own, skill };
   }
-  else if (was && was.workstream === own.workstream && (!own.arc || own.arc === was.arc) && (!own.order || own.order === was.order))
-    work = { workstream: own.workstream, arc: own.arc ?? was.arc, order: own.order ?? was.order, row: own.row ?? was.row ?? null };
-  else work = own;
-  if (work.workstream && (!was || was.workstream !== work.workstream || was.arc !== work.arc || was.order !== work.order || (was.row ?? null) !== work.row)) {
+  else if (was && was.workstream === own.workstream && (!own.arc || own.arc === was.arc) && (!own.part || own.part === was.part))
+    work = { workstream: own.workstream, arc: own.arc ?? was.arc, part: own.part ?? was.part ?? null, skill };
+  else work = { ...own, skill };
+  if ((work.workstream || work.skill) && (!was || was.workstream !== work.workstream || was.arc !== work.arc || (was.part ?? null) !== work.part
+      || (was.skill ?? null) !== work.skill)) {
     carried[key] = work;
     try { mkdirSync(dirname(path), { recursive: true }); writeFileSync(path, JSON.stringify(carried), "utf8"); }
     catch { /* a tool never fails because timing failed */ }
@@ -372,49 +379,71 @@ export function carryTags(root: string, facts: Partial<Facts>): Work {
   return work;
 }
 
-/** Now, in UTC to the second, ending in `Z`. */
-export function utcNow(): string {
-  return `${new Date().toISOString().slice(0, 19)}Z`;
+/** Now, in UTC to the second, ending in `Z`; `before` milliseconds earlier where given. */
+export function utcNow(before = 0): string {
+  return `${new Date(Date.now() - Math.max(0, before)).toISOString().slice(0, 19)}Z`;
 }
 
 const round = (ms: number) => Math.round(ms * 100) / 100;
 
+/** A short random id for a row that has no message id. */
+export function rowId(): string {
+  return randomBytes(4).toString("hex");
+}
+
+const VERDICTS: Record<Verdict, string> = {
+  pass: SPDevExAgentHookVerdictType.PASS, note: SPDevExAgentHookVerdictType.NOTE, deny: SPDevExAgentHookVerdictType.DENY };
+
 /**
- * Append one line per entry to the workspace's log, if and only if recording is on. The facts are
- * shared by every entry; an entry may name its own `script` and `repo` (a Bash command's program, and
- * the folder its `cd` moved to). Never throws.
+ * Append one row per entry to the workspace's log, if and only if recording is on: a `COMMAND` row where the
+ * facts' event is `command`, and a `CHECK` row for any other event. The ids and the head are shared by every
+ * entry; an entry may name its own `script`, the command's program. A row whose event the contract does not
+ * hold is not written. Never throws.
  */
 export function write(root: string | null, facts: Facts, entries: Entry[], cwd?: string | null): void {
   try {
+    void cwd;
     if (!entries.length) return;
     const dir = telemetryDir(root);
     if (!dir) return;
-    let work: Work = { workstream: facts.workstream ?? null, arc: facts.arc ?? null, order: facts.agent ? facts.order ?? null : null,
-                       row: facts.row ?? null };
-    try { if (root) work = carryTags(root, facts); } catch { /* the call's own tags stand */ }
-    const at = utcNow();
-    const repo = repoOf(root, cwd ?? facts.cwd ?? null);
-    const lines = entries.map((entry) => JSON.stringify({
-      script: entry.script ?? facts.script,
-      group: entry.group ?? null, subgroup: entry.subgroup ?? null, action: entry.action ?? null, args: entry.args ?? null,
-      event: facts.event ?? null, tool: facts.tool ?? null,
-      ms: entry.ms, exit: entry.exit ?? null, at,
-      repo: entry.repo !== undefined ? entry.repo : repo, pid: process.pid,
-      verdict: entry.verdict ?? null, out: entry.out ?? null,
+    const event = known(SPDevExWorkspaceTelemetryEventType, facts.event);
+    if (!event) return;
+    let work = { workstream: facts.workstream ?? null, arc: facts.arc ?? null, part: facts.part ?? null, skill: facts.skill ?? null };
+    try { if (root) work = carryTags(root, facts); } catch { /* the call's own ids stand */ }
+    const head = {
       session: facts.session ?? null, agent: facts.agent ?? null,
-      workstream: work.workstream, arc: work.arc, order: work.order, row: work.row,
-      ...(entry.programs !== undefined ? { programs: entry.programs } : {}),
-      ...(entry.program || entry.pathKind ? { program: entry.program ?? null, pathKind: entry.pathKind ?? null } : {}),
-    }));
-    appendLog(join(dir, LOG), lines.join("\n"));
+      workstream: held(work.workstream, WORKSTREAM_PATTERN), arc: held(work.arc, ARC_PATTERN), part: held(work.part, PART_PATTERN),
+      skill: known(SPDevExAgentSkillType, work.skill), work: known(SPDevExWorkstreamWorkType, facts.work) ?? workOfPart(held(work.part, PART_PATTERN)),
+      retryOf: null,
+    };
+    const lines = entries.flatMap((entry) => {
+      // A CHECK row's `check` is a non-null name; a check whose name fails the pattern writes no row, as an event the contract does not hold writes none.
+      const check = held(entry.action ?? entry.group, CHECK_PATTERN);
+      if (event !== SPDevExWorkspaceTelemetryEventType.COMMAND && !check) return [];
+      const base = {
+        v: SPDevExWorkspaceTelemetryVersionType.V1,
+        mtype: event === SPDevExWorkspaceTelemetryEventType.COMMAND ? SPDevExWorkspaceTelemetryRowType.COMMAND : SPDevExWorkspaceTelemetryRowType.CHECK,
+        id: rowId(), at: utcNow(entry.ms), ms: entry.ms, event,
+      };
+      if (event === SPDevExWorkspaceTelemetryEventType.COMMAND)
+        return [JSON.stringify({ ...base, ...head, call: { program: entry.script ?? facts.script ?? null, group: entry.group ?? null, action: entry.action ?? null },
+                                exit: entry.exit ?? null })];
+      return [JSON.stringify({ ...base, ...head, check,
+                              verdict: VERDICTS[entry.verdict ?? "pass"], out: entry.out ?? null })];
+    });
+    if (lines.length) appendLog(join(dir, LOG), lines.join("\n"));
   } catch { /* a tool never fails because timing failed */ }
 }
 
-/** The whole run's verdict and `out`: the worst of its checks' (`deny` over `note` over `pass`), their words summed, unless the run gives its own. */
-function wholeJudgement(spans: Entry[], run?: { verdict?: Verdict; out?: number | null }): { verdict: Verdict; out: number | null } {
-  const worst: Verdict = spans.some((one) => one.verdict === "deny") ? "deny" : spans.some((one) => one.verdict === "note") ? "note" : "pass";
-  const words = spans.reduce((sum, one) => sum + (one.out ?? 0), 0);
-  return { verdict: run?.verdict ?? worst, out: run && "out" in run ? run.out ?? null : worst === "pass" ? null : words };
+/**
+ * Carry the facts' workstream, arc, part and skill onto the window's later rows without writing a row. A call that runs no
+ * check (a `Skill` call) uses this: it names the skill the window runs under, and a CHECK row is one check's run.
+ */
+export function carry(): void {
+  try {
+    if (!state.root || !state.facts || !telemetryDir(state.root)) return;
+    carryTags(state.root, state.facts);
+  } catch { /* a tool never fails because timing failed */ }
 }
 
 /** Arm the recorder. Touches no filesystem beyond the walk, and never throws. */
@@ -441,14 +470,28 @@ function wordsOf(one: unknown): string | null {
  * `pass`. A `deny` field is `deny`; a string or a `note` is `note`. A list of findings is `note`, and
  * `deny` where the event is `Stop` (a finding there holds the turn) or any finding carries a `deny`.
  */
-function judge(result: unknown, event: string | null): { verdict: Verdict; out: number | null } {
+function judge(result: unknown, event: string | null): { verdict: Verdict; out: number | null; found?: string[] } {
   const items = Array.isArray(result) ? result : [result];
   const spoken = items.filter((one) => wordsOf(one) !== null);
   if (!spoken.length) return { verdict: "pass", out: null };
+  const found = spoken.flatMap((one) => typeof one === "object" && one && typeof (one as { check?: unknown }).check === "string" ? [(one as { check: string }).check] : []);
   const out = spoken.reduce((sum, one) => sum + Buffer.byteLength(wordsOf(one) as string), 0);
   const refused = spoken.some((one) => typeof one === "object" && typeof (one as { deny?: unknown }).deny === "string")
     || (Array.isArray(result) && event === "Stop");
-  return { verdict: refused ? "deny" : "note", out };
+  return { verdict: refused ? "deny" : "note", out, found };
+}
+
+/**
+ * Settle a Stop run's verdicts to what was said. A Stop check's findings are judged `deny` as they are found, and a
+ * finding that is held or already said is not a send-back, so the checks that were said keep `deny` and the others
+ * with findings become `note`. A run of any other event is left as judged.
+ */
+export function settle(said: string[]): void {
+  try {
+    if (state.facts?.event !== "Stop") return;
+    for (const one of state.spans)
+      if (one.verdict === "deny" && !(one.found ?? []).some((check) => said.includes(check))) one.verdict = "note";
+  } catch { /* ignore */ }
 }
 
 /**
@@ -483,21 +526,20 @@ export function record(name: SpanName, ms: number, exit: number | null = null, v
 }
 
 /**
- * Write what was measured, and the whole run as one more line, if and only if the switch is present.
- * `exit` is the whole run's exit code for a command; a hook run leaves it null. A run that timed no
- * check writes nothing, unless `always` asks for its whole-run line: the hook after a failed call
- * runs no check, and its cost is still read from that line.
+ * Write what was measured, if and only if the switch is present. A hook run writes one `CHECK` row for each check it
+ * timed and nothing for the run as a whole, so a run that timed no check writes nothing (`always` is kept for the callers
+ * that pass it, and changes nothing). A command run writes its one `COMMAND` row, with `exit` as the whole run's exit code.
  */
 export function end(exit: number | null = null, always = false, run?: { verdict?: Verdict; out?: number | null }): void {
   try {
+    void always; void run;
     const facts = state.facts;
-    if (!facts || !state.root || (!state.spans.length && !always)) return;
-    // The whole process, Node start to here. Startup, TypeScript loading and the imports are most of
-    // a hook's cost, and no span inside a check can see them.
-    const whole: Entry = { ...(facts.process ?? { group: "events", action: null }), ms: round(performance.now()), exit,
-                           program: facts.program, pathKind: facts.pathKind,
-                           ...(facts.event === "command" ? {} : wholeJudgement(state.spans, run)) };
-    write(state.root, facts, [...state.spans, whole], state.cwd);
+    if (!facts || !state.root) return;
+    if (facts.event === "command") {
+      // The whole process, Node start to here: a command's cost is its run.
+      const whole: Entry = { ...(facts.process ?? { group: null, action: null }), script: facts.script, ms: round(performance.now()), exit };
+      write(state.root, facts, [whole], state.cwd);
+    } else if (state.spans.length) write(state.root, facts, state.spans, state.cwd);
     state.spans = [];
   } catch { /* a tool never fails because timing failed */ }
 }

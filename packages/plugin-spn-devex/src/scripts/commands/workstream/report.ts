@@ -4,8 +4,8 @@
 //   spn-devex workstream report write [<workstream>] <notes/N<nnn>/orders/<row>.report.md>
 //
 // Folds a child's hand-back into its row from the report's front matter alone: the outcome as the
-// row's state, the proof, the commits and the cost, and each follow-up as a new row. Where the report
-// carries no cost, the cost is read from the telemetry (`debug cost show`) for the arc and the order.
+// row's state, the proof, the commits and each follow-up as a new row. The cost is never read from the report: it is
+// measured from the usage rows the telemetry holds for the arc and the part.
 //
 // A report named for a part of the arc's go plan folds into the part: it lands the part, and lands each step
 // whose entries all sit in landed parts, a code or proving step on the full run, or on the run the report names.
@@ -20,22 +20,38 @@ import { readGo } from "../../lib/go-plan.ts";
 import { doneOf, landingFault, logEvent, notesDirOf, readArc, readQuestions, readyRows, workspaceOf, writeArc } from "../../lib/workstream.ts";
 import { OUTCOMES, ROW_ID, type ArcRow, type Cost, type GoPart, type GoPlan } from "../../lib/workstream-schema.ts";
 import { afterWrite, arcSignatures, refreshIfMoved, typed, workstreamNamed } from "./_shared.ts";
-import { readCost } from "../../lib/cost.ts";
-import { nextStep, save } from "./go.ts";
+import { logFiles, telemetryFolder } from "../../../../../plugin-support-lib/src/lib/debug-store.ts";
+import { USAGE_LOG } from "../../lib/usage.ts";
+import { isFullRun, nextStep, renameGo, save } from "./go.ts";
+import { renameFirstRead } from "./sheet.ts";
 import { readSplit } from "../debug/cost.ts";
 
 export const describe = "a child's hand-back, folded into its row from the report's front matter";
 
-/** The cost of one order as `debug cost show <workstream>/<arc>` reads it, or null where the telemetry holds none. */
-function measuredCost(ws: string, arc: string, order: string): Cost | null {
+/** The cost of one part: the v 1 TURN rows of this workstream, arc and part, each reply once by its id, or null where the telemetry holds none. */
+function measuredCost(ws: string, arc: string, part: string): Cost | null {
   try {
     const root = workspaceOf(ws);
     if (!root) return null;
-    const found = readCost(root, `${basename(ws)}/${arc}`).rows.filter((row) => row.key.split(" · ").includes(`order ${order}`));
-    if (!found.length) return null;
-    const tokens = found.reduce((sum, row) => sum + row.input + row.cacheWrite + row.cacheRead + row.output, 0);
-    const minutes = Math.round(found.reduce((sum, row) => sum + row.modelMs, 0) / 60000);
-    return { tokens, minutes };
+    const seen = new Set<string>();
+    let tokens = 0, ms = 0, found = 0;
+    for (const file of logFiles(join(telemetryFolder(root), USAGE_LOG))) {
+      for (const raw of readFileSync(file, "utf8").split("\n")) {
+        if (!raw.trim()) continue;
+        try {
+          const one = JSON.parse(raw) as Record<string, unknown>;
+          if (one.v !== 1 || one.mtype !== "TURN") continue;
+          if (one.workstream !== basename(ws) || String(one.arc).toUpperCase() !== arc.toUpperCase() || one.part !== part) continue;
+          if (typeof one.id === "string" && one.id) { if (seen.has(one.id)) continue; seen.add(one.id); }
+          const n = (value: unknown): number => (typeof value === "number" && Number.isFinite(value) ? value : 0);
+          const used = (one.tokens ?? {}) as Record<string, unknown>;
+          tokens += n(used.in) + n(used.cacheRead) + n(used.cacheWrite) + n(used.out);
+          ms += n(one.ms);
+          found += 1;
+        } catch { /* a torn line is skipped */ }
+      }
+    }
+    return found ? { tokens, minutes: Math.round(ms / 60000) } : null;
   } catch { return null; }
 }
 
@@ -76,8 +92,8 @@ function foldPart(ws: string, lead: string, plan: GoPlan, part: GoPart, outcome:
           row.commits = all;
         }
         if (!held.every((id) => landed.has(`${arc}/${id}`))) continue;
-        // A code or proof step waits for the full run, unless the report names a run, which the landing gate judges.
-        if ((row.altitude === "CODE" || row.altitude === "PROOF") && part.pass !== "FULL_RUN" && !run) continue;
+        // A code or proof step waits for a TEST part's full run, unless the report names a run, which the landing gate judges.
+        if ((row.work === "CODE" || row.work === "PROOF") && !isFullRun(part) && !run) continue;
         const fault = landingFault(ws, arc, data, row, run);
         const split = splitLine(ws, arc, row.id);
         if (split) splits.push(split);
@@ -107,6 +123,8 @@ function write(args: string[]): number {
   const placed = /^(.*)\/notes\/(N\d+[a-z]?)\/orders\/([^/]+)\.report\.md$/.exec(path.split("\\").join("/"));
   if (!placed) throw new UsageFault("reads a report at `notes/N<nnn>/orders/<row>.report.md`.");
   const [, ws, arc, named] = placed;
+  renameFirstRead(ws, arc);
+  renameGo(ws, arc);
   const data = typed(() => { const one = readArc(ws, arc); if (!one) throw new Error(`finds no arcs/${arc}/state.json`); return one; });
   const matter = frontMatter(readFileSync(path, "utf8"));
   if (!matter) throw new UsageFault("reads a report that opens with front matter between two `---` lines.");
@@ -133,10 +151,8 @@ function write(args: string[]): number {
     const fault = landingFault(ws, arc, data, row, typeof matter.run === "string" ? matter.run : null);
     if (fault) { console.log(`Refused: ${fault} Nothing was written.`); return 1; }
   }
-  const cost = matter.cost as { tokens?: unknown; minutes?: unknown } | null;
-  if (cost && typeof cost === "object" && typeof cost.tokens === "number" && typeof cost.minutes === "number")
-    row.cost = { tokens: cost.tokens, minutes: cost.minutes };
-  else row.cost = measuredCost(ws, arc, named) ?? row.cost ?? null;
+  // A `cost:` line a report still carries is not read: the cost is what the usage rows of the part say.
+  row.cost = measuredCost(ws, arc, named) ?? row.cost ?? null;
   const order = `orders/${named}.md`;
   if (existsSync(join(notesDirOf(ws, arc), order))) row.order = order;
 
@@ -146,7 +162,7 @@ function write(args: string[]): number {
     if (!ROW_ID.test(id) || !title.length || data.rows.some((one) => one.id === id)) continue;
     // A follow-up is a build step, a fix (RULE.DEVEX.WORKSPACE.278).
     const next: ArcRow = { id, parent: row.parent, title: title.join(" "), kind: "fix", state: "waiting" };
-    for (const field of ["repo", "altitude", "model"] as const) if (row[field]) next[field] = row[field];
+    for (const field of ["repo", "work", "model"] as const) if (row[field]) next[field] = row[field];
     data.rows.push(next);
     added.push(id);
   }
@@ -167,5 +183,5 @@ function write(args: string[]): number {
 }
 
 export const actions: Record<string, Action> = {
-  write: { describe: "fold a child's report into its row: state, proof, cost, commits, follow-ups", usage: "[<workstream>] <report.md>", run: write },
+  write: { describe: "fold a child's report into its row: state, proof, commits, follow-ups", usage: "[<workstream>] <report.md>", run: write },
 };

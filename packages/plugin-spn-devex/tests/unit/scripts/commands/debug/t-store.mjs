@@ -1,7 +1,7 @@
 // `debug store show` — each container of `.spndevex/.debug/`, its files, its bytes and its lifetime rule as the book's
 // table states it (RULE.DEVEX.WORKSPACE.322, .323).
 import { execFileSync } from "node:child_process";
-import { mkdirSync, mkdtempSync, realpathSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { PLUGIN } from "../../../../helpers/harness.mjs";
@@ -69,6 +69,26 @@ try {
   const node = JSON.parse(typed(root, "show", "--json").out);
   ok("the data form shows the debug node, which wins over the old file", JSON.stringify(node.debug) === JSON.stringify({ from: ".spndevex/state.json", telemetry: false }), JSON.stringify(node.debug));
   ok("and the printed form says so", typed(root, "show").out.trimEnd().split("\n").at(-1) === "debug  telemetry off — the debug node of .spndevex/state.json", typed(root, "show").out);
+
+  console.log("\n=== reset — MKT.SCRIPTS.179");
+  const telemetry = join(debug, "telemetry");
+  mkdirSync(join(debug, "workspace"), { recursive: true });
+  writeFileSync(join(debug, "workspace", "filter.json"), "{}");
+  writeFileSync(join(telemetry, "hooks.1.jsonl"), "old\n");
+  writeFileSync(join(telemetry, "kept.txt"), "kept\n");
+  writeFileSync(join(root, ".spndevex", "state.json"), '{\n  "workspace": {},\n  "workstreams": {\n    "lastNumber": 0\n  },\n  "debug": {\n    "telemetry": true\n  }\n}\n');
+  const resetRun = (() => {
+    try { return { out: execFileSync("node", [TOOL, "debug", "store", "reset"], { encoding: "utf8", stdio: "pipe", env: { ...ENV, SPN_TELEMETRY: "on" }, cwd: root }), code: 0 }; }
+    catch (error) { return { out: `${error.stdout ?? ""}${error.stderr ?? ""}`, code: error.status ?? -1 }; }
+  })();
+  ok("[MKT.SCRIPTS.179] reset removes usage.jsonl, usage.1.jsonl, hooks.jsonl and hooks.1.jsonl", resetRun.code === 0
+    && ["usage.jsonl", "usage.1.jsonl", "hooks.1.jsonl"].every((name) => !existsSync(join(telemetry, name))) && resetRun.out.includes("removed usage.jsonl, usage.1.jsonl, hooks.jsonl, hooks.1.jsonl"), resetRun.out);
+  ok("[MKT.SCRIPTS.179] and nothing else: another file of the folder and the other containers stay", existsSync(join(telemetry, "kept.txt")) && existsSync(join(debug, "workspace", "filter.json"))
+    && existsSync(join(debug, "sessions", "a", "name.json")), "");
+  const opened = existsSync(join(telemetry, "hooks.jsonl")) ? readFileSync(join(telemetry, "hooks.jsonl"), "utf8").trim().split("\n").map((one) => JSON.parse(one)) : [];
+  ok("[MKT.SCRIPTS.179] its own row opens the new hooks.jsonl: version 1, a COMMAND row that exited 0, the old log's lines gone",
+    opened.length === 1 && opened[0].v === 1 && opened[0].mtype === "COMMAND" && opened[0].exit === 0 && !JSON.stringify(opened[0]).includes("old"), JSON.stringify(opened));
+  ok("[MKT.SCRIPTS.179] reset takes no target", typed(root, "reset", "telemetry").code === 2, "");
 
   console.log("\n=== the words");
   const USAGE = "usage: spn-devex debug store show [--json]\n";

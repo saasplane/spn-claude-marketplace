@@ -32,6 +32,7 @@ description: Carry out a go. Use the moment the developer gives the go on one ar
 - **A step lands once every entry it holds sits in a landed part, and a code step lands on the full run** (`RULE.DEVEX.WORKSPACE.461` · MUST · skill:spn-devex/execute)
 - **A part or a row that waits on something outside the window reads waiting on, and is never named as ready** (`RULE.DEVEX.WORKSPACE.469` · MUST · skill:spn-devex/execute)
 - **A code part added after a repository's full run has landed opens a second full run** (`RULE.DEVEX.WORKSPACE.470` · MUST · skill:spn-devex/execute)
+- **Closing a workstream runs a retrospective that raises a suggestion for each pattern it finds** (`RULE.DEVEX.WORKSPACE.483` · MUST · skill:spn-devex/execute)
 
 1. The scope: every arc the go covers is DECIDED and its sheet reads whole (`workstream sheet check`).
 2. Drift: `workstream state check --facts`, and `sheet edit` for each entry whose fact moved.

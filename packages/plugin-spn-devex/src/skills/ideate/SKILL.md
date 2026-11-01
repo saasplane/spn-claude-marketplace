@@ -7,7 +7,7 @@ description: Decide what a node IS, and design a requirement inside that shape -
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
-      "seen": "d6a6cbd5"
+      "seen": "67376a1f"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/03-ideate.md",
@@ -43,6 +43,12 @@ description: Decide what a node IS, and design a requirement inside that shape -
 - **`IDEATE` decides the shape, and designing a requirement inside that shape is part of it** (`RULE.DEVEX.FUNCTION.016` · MUST · skill:spn-devex/ideate)
 - **RULE.DEVEX.FUNCTION.028** (`RULE.DEVEX.FUNCTION.028` · MUST · skill:spn-devex/ideate)
 - **The DevEx stages are eight — `BOOTSTRAP` · `SCM` · `IDEATE` · `DEVELOP` · `TEST` · `PROVISION` · `DELIVER` · `OPERATE` — and this phase covers both deciding a node's shape and designing a requirement inside it** (`RULE.DEVEX.FUNCTION.062` · MUST · skill:spn-devex/ideate)
+- **RULE.DEVEX.FUNCTION.090** (`RULE.DEVEX.FUNCTION.090` · MUST · skill:spn-devex/ideate)
+- **RULE.DEVEX.FUNCTION.091** (`RULE.DEVEX.FUNCTION.091` · MUST · skill:spn-devex/ideate)
+- **RULE.DEVEX.FUNCTION.092** (`RULE.DEVEX.FUNCTION.092` · MUST · skill:spn-devex/ideate)
+- **RULE.DEVEX.FUNCTION.093** (`RULE.DEVEX.FUNCTION.093` · MUST · skill:spn-devex/ideate)
+- **RULE.DEVEX.FUNCTION.094** (`RULE.DEVEX.FUNCTION.094` · MUST · skill:spn-devex/ideate)
+- **RULE.DEVEX.FUNCTION.095** (`RULE.DEVEX.FUNCTION.095` · MUST · skill:spn-devex/ideate)
 - **RULE.DEVEX.WORKSPACE.006** (`RULE.DEVEX.WORKSPACE.006` · MUST · skill:spn-devex/ideate)
 - **A step acting on a set carries that set** (`RULE.DEVEX.WORKSPACE.064` · MUST · skill:spn-devex/ideate)
 - **`migrations/` earns you none either** (`RULE.DEVEX.WORKSPACE.086` · MUST · skill:spn-devex/ideate)
@@ -71,6 +77,7 @@ description: Decide what a node IS, and design a requirement inside that shape -
 - **Each option on a card is one decision** (`RULE.DEVEX.WORKSPACE.442` · MUST · skill:spn-devex/ideate)
 - **While you are still ideating, the agent talks it through in chat** (`RULE.DEVEX.WORKSPACE.443` · MUST · skill:spn-devex/ideate)
 - **Conflicts land here — always** (`RULE.DEVEX.WORKSPACE.466` · MUST · skill:spn-devex/ideate)
+- **Workspace plumbing is the agent's own to resolve, and never a card** (`RULE.DEVEX.WORKSPACE.481` · MUST · skill:spn-devex/ideate)
 - **Registering is optional, and the chain is complete without it.** (`RULE.LAUNCHPAD.CONTROL_PLANE.001` · MUST · skill:spn-devex/ideate)
 - **Launchpad is built at the partner stage, on the same backbone and with the same stack every adopter gets. It consumes the published packages rather than reading around them.** (`RULE.LAUNCHPAD.CONTROL_PLANE.002` · MUST · skill:spn-devex/ideate)
 - **Launchpad is a stage, not a sixth domain.** (`RULE.LAUNCHPAD.CONTROL_PLANE.003` · MUST · skill:spn-devex/ideate)
@@ -244,3 +251,15 @@ The full text of all three is in [`refs/devex/workspace/workstream.md`](../../re
 - **Never design.** Fields, tables, signatures are `plan` and later.
 - **Never close your own questions.** You draft options and a recommendation; a person decides.
 - **Never mark a section `AGREED` yourself**, and never proceed past a gate because the previous step looked finished.
+
+## How a first proposal is shaped
+
+A first proposal starts where the book already stands, so the developer reads a proposal that is mostly confirmed rather than invented. Each rule below governs one step of the proposal, in the order the steps come.
+
+- **Name the source of every name and value** (`RULE.DEVEX.FUNCTION.090` · MUST · skill:spn-devex/ideate). The book's constructs, the skills' step ids and the contract's `SP*Type` enums come first, and only a value no source holds is marked new. A name or a value with no source is the plausible invented detail a section that is written, not filled, refuses.
+- **Propose a field only where a report the developer asked for reads it** (`RULE.DEVEX.FUNCTION.091` · MUST · skill:spn-devex/ideate). A field no report reads is cut, and a field a report does read is kept.
+- **Give each idea one name, in the construct that owns it** (`RULE.DEVEX.FUNCTION.092` · MUST · skill:spn-devex/ideate). A second word for an idea already named is replaced by the first, and a new type is named for its domain, its group and its attribute.
+- **Migrate only live records** (`RULE.DEVEX.FUNCTION.093` · MUST · skill:spn-devex/ideate). A record nothing reads again is left as it is, a log that holds only history is skipped by its readers, and no migration is planned for either.
+- **Explain the proposal in what the developer will see, before the code's own terms** (`RULE.DEVEX.FUNCTION.094` · MUST · skill:spn-devex/ideate). Lead with the printed output, the rows or the page the developer will read, and let the code's terms follow.
+- **Convene the proposal's panel before the proposal is called final** (`RULE.DEVEX.FUNCTION.095` · MUST · skill:spn-devex/ideate). The reader who did not write the proposal reads it first, and a block from that reader is answered in the proposal and not after it.
+- **Workspace plumbing is yours to resolve, and never a card** (`RULE.DEVEX.WORKSPACE.481` · MUST · skill:spn-devex/ideate). A stale checkout, tool output left uncommitted and a stash you name are yours to fix, and you say in one line what you did. A helper never stashes: the window that coordinates does.

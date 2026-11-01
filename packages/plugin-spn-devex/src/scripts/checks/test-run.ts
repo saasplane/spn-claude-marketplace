@@ -36,7 +36,7 @@ const NAMES_GUARDED = new RegExp(`(?:^|[^\\w-])(?:${GUARDED.join("|")})(?:[^\\w-
 // nosemgrep: javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp -- pattern built from this script's own constants and escaped text, never outside input
 const NAMES_RUNNER = new RegExp(`(?:^|[^\\w.-])(?:spnutils|nx|${TEST_RUNNERS.map((name) => name.replace(/\./g, "\\.")).join("|")})(?:[^\\w.-]|$)`);
 
-/** One test run that is going: the command as it was read, its repository, when it started, and its start file. */
+/** One test run that is going: its call (program, group, action; no arguments), its repository, when it started, and its start file. */
 export type TestRun = { command: string; repo: string; startedAt: number; file: string };
 
 /**
@@ -95,7 +95,10 @@ export function isWholeSuite(found: Reading): boolean {
 }
 
 /** A part of a go that lets a whole suite run: a baseline or a full run. */
-const isSuitePart = (part: GoPart): boolean => part.pass === "BASELINE" || part.pass === "FULL_RUN";
+const isSuitePart = (part: GoPart): boolean => part.work === "TEST" && (part.id.startsWith("baseline-") || part.id.startsWith("full-"));
+
+/** A part that is the go's full run: TEST work, its id starting `full-`. */
+const isFullRun = (part: GoPart): boolean => part.work === "TEST" && part.id.startsWith("full-");
 
 /** The go plans of the open workstreams, each with its workstream's folder; a plan that fails its schema is skipped. */
 function openPlans(root: string): Array<{ ws: string; plan: GoPlan }> {
@@ -136,7 +139,7 @@ export function checkWholeSuite(payload: Payload): Verdict {
   if (plans.some(({ plan }) => plan.parts.some((part) => forRepo(part) && part.state === "running"))) return null;
   // Once the repository's full run has landed, a commit made after it still owes the push check a stamped run of that
   // commit, and only `spnutils` leaves the stamp (RULE.DEVEX.WORKSPACE.281).
-  const landed = plans.some(({ plan }) => plan.parts.some((part) => forRepo(part) && part.pass === "FULL_RUN" && part.state === "landed"));
+  const landed = plans.some(({ plan }) => plan.parts.some((part) => forRepo(part) && isFullRun(part) && part.state === "landed"));
   if (landed && whole.every((found) => found.script === "spnutils")) return null;
   const own = new Set(windowWorkstreams(root, payload.session_id));
   const named = plans.find(({ ws }) => own.has(basename(ws))) ?? plans[0];
@@ -147,7 +150,7 @@ export function checkWholeSuite(payload: Payload): Verdict {
       `Run your own test files, each directly. A whole suite runs at a go's named points, after ` +
       `\`workstream go start <workstream>/N<nnn> <part>\` marks its baseline or full run running (RULE.DEVEX.WORKSPACE.207).` };
   }
-  const part = named.plan.parts.find((one) => forRepo(one) && one.pass === "FULL_RUN" && one.state !== "landed")
+  const part = named.plan.parts.find((one) => forRepo(one) && isFullRun(one) && one.state !== "landed")
     ?? named.plan.parts.find((one) => forRepo(one) && one.state !== "landed");
   const go = `${numberOf(named.ws)}/${named.plan.lead}`;
   return { deny:
@@ -156,9 +159,12 @@ export function checkWholeSuite(payload: Payload): Verdict {
     `(RULE.DEVEX.WORKSPACE.207).` };
 }
 
-/** A reading as the command a person typed: the program, its levels and its arguments. */
-const commandOf = (found: Reading): string =>
-  [found.script, found.group, found.subgroup, found.action, found.args].filter(Boolean).join(" ");
+/** A call as the words that name it: the program, group and action, never its arguments. */
+const commandOf = (call: { program?: unknown; group?: unknown; action?: unknown }): string =>
+  [call.program, call.group, call.action].filter((word): word is string => typeof word === "string" && word !== "").join(" ");
+
+/** One reading of a start file: its repository, its call, and `suite` where `isTestCommand` judged it a test run when the file was written. */
+type StartedFound = { repo?: unknown; call?: { program?: unknown; group?: unknown; action?: unknown }; suite?: unknown };
 
 /**
  * Every test run that has a start file under `root`, younger than the bound. A start file that cannot
@@ -179,9 +185,9 @@ export function testRuns(root: string, now = Date.now()): TestRun[] {
       try { started = JSON.parse(readFileSync(join(pending, name), "utf8")); } catch { continue; }
       if (!started || typeof started.at !== "number" || !Array.isArray(started.found)) continue;
       if (now - started.at > RUN_BOUND_MS) continue;
-      for (const found of started.found as Reading[]) {
-        if (!found || typeof found !== "object" || !found.repo || !isTestCommand(found)) continue;
-        out.push({ command: commandOf(found), repo: found.repo, startedAt: started.at, file: join(pending, name) });
+      for (const found of started.found as StartedFound[]) {
+        if (!found || typeof found !== "object" || typeof found.repo !== "string" || !found.repo || found.suite !== true || !found.call || typeof found.call !== "object") continue;
+        out.push({ command: commandOf(found.call), repo: found.repo, startedAt: started.at, file: join(pending, name) });
       }
     }
   }

@@ -7,6 +7,7 @@
 // A FIELD IS ADDED AND NEVER REPURPOSED, so a field this schema does not know is left alone.
 
 import { STORED_STATUSES } from "../checks/arc-status.ts";
+import { TELEMETRY_VALUES } from "../../../../plugin-support-lib/src/lib/telemetry-values.ts";
 
 /** The version this plugin reads and writes. Migration 006 brings a version 1 file to 2. */
 export const SCHEMA_VERSION = 2;
@@ -21,8 +22,9 @@ export const DONE_STATES: ReadonlySet<string> = new Set(["landed", "replaced", "
  * planning jobs and are never recorded, so every row is a build step (RULE.DEVEX.WORKSPACE.278).
  */
 export const ROW_KINDS = ["fix", "change", "question"] as const;
-/** A step row's altitude (§ A step row says where, at what altitude, and how). */
-export const ALTITUDES = ["DOCS", "CODE", "GENERATED", "RELEASE", "PROOF"] as const;
+/** The kinds of work, the contract's `SPDevExWorkstreamWorkType` as the copy holds it (§ A step row says where, what work, and how). */
+export const WORK = Object.values(TELEMETRY_VALUES.SPDevExWorkstreamWorkType) as readonly string[];
+export type Work = string;
 /** The stored statuses that carry a reason. */
 export const REASONED: ReadonlySet<string> = new Set(["CARRIED", "DROPPED"]);
 export const SUGGESTION_STATES = ["raised", "shaped", "decided", "parked", "dropped"] as const;
@@ -68,7 +70,7 @@ export const BLOCKER = /^(?:\d+[a-z]?(?:\.\d+[a-z]?)*|q\d+|N\d+[a-z]?(?:\/\d+[a-
 export type Cost = { tokens: number; minutes: number };
 export type ArcRow = {
   id: string; parent: string; title: string; kind: string;
-  repo?: string | null; altitude?: string | null; mechanism?: string | null; acceptance?: string | null; model?: string | null;
+  repo?: string | null; work?: string | null; mechanism?: string | null; acceptance?: string | null; model?: string | null;
   blockedBy?: string[]; touches?: string[]; decisions?: string[]; facts?: string[]; entries?: string[];
   state?: RowState | null; proof?: string | null; cost?: Cost | null; commits?: Record<string, string[]> | null; order?: string | null;
   /** What a `waiting` row waits on outside the window, in plain words: a release, a sign-in, another window's hold. */
@@ -166,7 +168,7 @@ const ROW_FIELDS: Record<string, Rule> = {
   title: { kind: "string", required: true },
   kind: { kind: "enum", required: true, values: ROW_KINDS },
   repo: { kind: "text", required: false },
-  altitude: { kind: "enum", required: false, values: ALTITUDES, nullable: true },
+  work: { kind: "enum", required: false, values: WORK, nullable: true },
   mechanism: { kind: "text", required: false },
   acceptance: { kind: "text", required: false },
   model: { kind: "text", required: false },
@@ -307,8 +309,8 @@ export type SheetStack = { folder: string; dmo: string; reset: string; ports?: s
 export type SheetEntry = {
   id: string; op: string; file: string; what: string; decidedBy: string[]; facts: string[]; then: string[];
   rules: string[]; callers: string[]; tiers: Record<string, string[]>; docs: string[]; book: string[];
-  /** The kind of change the entry is; a sheet written before it was added has none, and `entryAltitude` reads the file's kind. */
-  altitude?: string | null;
+  /** The kind of work the entry is; a sheet written before it was added has none, and `entryWork` reads the file's kind. */
+  work?: string | null;
   [field: string]: unknown;
 };
 export type Sheet = { schemaVersion: number; releaseChain: string[]; dependsOn: string[]; stack: SheetStack | null; entries: SheetEntry[]; [field: string]: unknown };
@@ -328,15 +330,15 @@ const ENTRY_FIELDS: Record<string, Rule> = {
   decidedBy: { kind: "strings", required: true }, facts: { kind: "strings", required: true, pattern: FACT_ID },
   then: { kind: "strings", required: true }, rules: { kind: "strings", required: true }, callers: { kind: "strings", required: true },
   docs: { kind: "strings", required: true }, book: { kind: "strings", required: true },
-  altitude: { kind: "enum", required: false, values: ALTITUDES, nullable: true },
+  work: { kind: "enum", required: false, values: WORK, nullable: true },
 };
 
 /**
  * An entry's kind of change, from which an arc's steps are derived: the one it names, else the kind of its file's path —
  * a dist bundle or a generated ref is GENERATED, a docs or refs file DOCS, and a source or test file CODE.
  */
-export function entryAltitude(entry: Pick<SheetEntry, "file" | "altitude">): (typeof ALTITUDES)[number] {
-  if (typeof entry.altitude === "string" && (ALTITUDES as readonly string[]).includes(entry.altitude)) return entry.altitude as (typeof ALTITUDES)[number];
+export function entryWork(entry: Pick<SheetEntry, "file" | "work">): Work {
+  if (typeof entry.work === "string" && WORK.includes(entry.work)) return entry.work;
   const path = entry.file.slice(entry.file.indexOf(":") + 1);
   if (/(^|\/)dist\//.test(path) || /generated/i.test(path)) return "GENERATED";
   if (/(^|\/)(docs|refs)\//.test(path) || /\.md$/.test(path)) return "DOCS";
@@ -376,8 +378,6 @@ export function sheetFaults(data: unknown, where = "sheet.json"): string[] {
 
 /** The version of `go.json` this plugin reads and writes. */
 export const GO_SCHEMA_VERSION = 1;
-/** The passes of a go, in the order they run inside a repository (the release comes last, after every repository). */
-export const GO_PASSES = ["BASELINE", "DOCS", "CODE", "FULL_RUN", "GENERATED", "RELEASE"] as const;
 /** Where a part of a go stands. `waiting` is a part that waits on something outside the window, named in its `waitingOn`. */
 export const GO_PART_STATES = ["ready", "running", "held", "landed", "waiting"] as const;
 /** A part's id: its pass in lower case, its repository and its number, `code-spn-claude-marketplace-2`; a baseline or full run has no number. */
@@ -385,13 +385,12 @@ export const GO_PART_ID = /^(baseline|docs|code|full|generated|release)-\S+$/;
 /** An entry as a go names it: its arc and its id, `N009/E14`. */
 export const GO_ENTRY = /^N\d+[a-z]?\/E\d+$/;
 
-export type GoPass = (typeof GO_PASSES)[number];
 /**
  * One part of a go: what one helper carries out. `signature` is the entries' hashes joined by `.`, in the order of
  * `entries`, so a changed entry is the one whose hash differs.
  */
 export type GoPart = {
-  id: string; repo: string; pass: GoPass; entries: string[]; tests: string[];
+  id: string; repo: string; work: Work; entries: string[]; tests: string[];
   minutes: number | null; measuredFrom: string | null; waitsOn: string[]; model: string; signature: string;
   state: (typeof GO_PART_STATES)[number];
   /** What a `waiting` part waits on, in plain words: a release, a sign-in, another window's hold. */
@@ -406,7 +405,7 @@ const GO_FIELDS: Record<string, Rule> = {
 };
 const GO_PART_FIELDS: Record<string, Rule> = {
   id: { kind: "string", required: true, pattern: GO_PART_ID }, repo: { kind: "string", required: true },
-  pass: { kind: "enum", required: true, values: GO_PASSES },
+  work: { kind: "enum", required: true, values: WORK },
   entries: { kind: "strings", required: true, pattern: GO_ENTRY }, tests: { kind: "strings", required: true },
   minutes: { kind: "number", required: true, nullable: true }, measuredFrom: { kind: "text", required: true },
   waitsOn: { kind: "strings", required: true }, model: { kind: "string", required: true },
@@ -431,7 +430,7 @@ export function goFaults(data: unknown, where = "go.json"): string[] {
     if (typeof part.id === "string") { if (ids.has(part.id)) out.push(`${label} is written twice`); ids.add(part.id); }
     if (Array.isArray(part.entries)) {
       const hashes = typeof part.signature === "string" && part.signature ? part.signature.split(".").length : 0;
-      if (!part.entries.length && part.pass !== "BASELINE" && part.pass !== "FULL_RUN" && part.pass !== "RELEASE") out.push(`${label} holds no entry`);
+      if (!part.entries.length && part.work !== "TEST" && part.work !== "RELEASE") out.push(`${label} holds no entry`);
       if (typeof part.signature === "string" && hashes !== part.entries.length)
         out.push(`${label}'s \`signature\` holds ${hashes} hashes, and the part holds ${part.entries.length} entries`);
       for (const entry of part.entries) {
@@ -443,4 +442,39 @@ export function goFaults(data: unknown, where = "go.json"): string[] {
     }
   }
   return out;
+}
+
+// ---------------------------------------------------------------------------- altitude and pass become work
+
+/** The old names of the work a record held: a go part's BASELINE and FULL_RUN were both TEST. */
+const OLD_WORK: Record<string, string> = { BASELINE: "TEST", FULL_RUN: "TEST" };
+
+/**
+ * Rename the `altitude` of a row or entry, or the `pass` of a go part, to `work` in place, BASELINE and FULL_RUN
+ * becoming TEST. Reads of a record with `work` already change nothing, so reading it again is a no-op. Returns whether
+ * anything changed. The caller decides which files are read this way: a closed workstream's is never passed in.
+ */
+export function renameToWork(record: unknown): boolean {
+  if (!isObject(record)) return false;
+  let changed = false;
+  for (const old of ["altitude", "pass"] as const) {
+    if (!(old in record)) continue;
+    const value = record[old];
+    if (record.work === undefined) record.work = typeof value === "string" ? (OLD_WORK[value] ?? value) : value;
+    delete record[old];
+    changed = true;
+  }
+  return changed;
+}
+
+/**
+ * Rename every row of an arc's `state.json`, every entry of a sheet or every part of a go plan, whichever `data` is.
+ * Returns the number of records renamed; the caller writes the file and the one log line only where it is above zero.
+ */
+export function renameDataToWork(data: unknown): number {
+  if (!isObject(data)) return 0;
+  let count = 0;
+  for (const list of [data.rows, data.entries, data.parts])
+    if (Array.isArray(list)) for (const record of list) if (renameToWork(record)) count += 1;
+  return count;
 }

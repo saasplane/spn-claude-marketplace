@@ -76,7 +76,7 @@ console.log("\n=== 007 — a planning job is never a step: it leaves a decided a
   ok("the plugin ships 007 seventh, with a version, one sentence and a script",
     MIGRATIONS[6]?.id === "007" && /^\d+\.\d+\.\d+$/.test(m007?.version ?? "") && m007.changed.endsWith(".") && typeof m007.script === "function");
   const { root, ws } = await dataWorkspace("planning-rows-007");
-  const step = (arc, id, kind, state, extra = {}) => ({ id, parent: arc, title: `${kind} ${id}`, kind, repo: "spn-x", altitude: "CODE", state, ...extra });
+  const step = (arc, id, kind, state, extra = {}) => ({ id, parent: arc, title: `${kind} ${id}`, kind, repo: "spn-x", work: "CODE", state, ...extra });
   const preview = (arc, id, state) => step(arc, id, "change", state, { title: `The code preview, notes/${arc}/preview.html: the diffs` });
   const put2 = (data) => {
     mkdirSync(join(ws, "arcs", data.arc), { recursive: true });
@@ -323,7 +323,7 @@ console.log("\n=== 005 — no row writes a plan, and the stamp follows the arc's
   const { createHash } = await import("node:crypto");
   const rowsStamp = (data) => createHash("sha256").update(JSON.stringify([...data.rows].map((row) => [row.id, row.title])
     .sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0)))).digest("hex").slice(0, 12);
-  const planRow = { id: "0", parent: "N001", title: "write notes/N001/plan.md: the pins, the commands", kind: "change", repo: "—", altitude: "DOCS", state: "waiting" };
+  const planRow = { id: "0", parent: "N001", title: "write notes/N001/plan.md: the pins, the commands", kind: "change", repo: "—", work: "DOCS", state: "waiting" };
   const rows = [planRow, ...arcData().rows.map((row) => ({ ...row, blockedBy: row.id === "1" ? ["0"] : row.blockedBy }))];
   const data = { ...arcData(rows) };
   const { root, ws } = await dataWorkspace("lean-005", { rows, stamp: rowsStamp(data) });
@@ -367,7 +367,7 @@ console.log("\n=== 006 — the state's version 2: the developer's words stored, 
     mkdirSync(join(ws, "arcs", data.arc), { recursive: true });
     writeFileSync(join(ws, "arcs", data.arc, "state.json"), `${JSON.stringify(data, null, 2)}\n`);
   };
-  const step = (arc, id, kind, state, extra = {}) => ({ id, parent: arc, title: `${kind} ${id}`, kind, repo: "spn-x", altitude: "CODE", state, ...extra });
+  const step = (arc, id, kind, state, extra = {}) => ({ id, parent: arc, title: `${kind} ${id}`, kind, repo: "spn-x", work: "CODE", state, ...extra });
   put1(v1("N002", "HELD", [step("N002", "1", "change", "landed"), step("N002", "2", "change", "waiting")], { reason: "waits on q4" }));
   put1(v1("N003", "PART-LANDED", [step("N003", "1", "change", "landed"), step("N003", "2", "change", "waiting")]));
   put1(v1("N004", "PROPOSED", [step("N004", "1", "design", "landed"), step("N004", "2", "design", "waiting"), step("N004", "3", "change", "waiting", { blockedBy: ["2"] })]));
