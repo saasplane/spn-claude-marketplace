@@ -331,6 +331,8 @@ Derive the plan again with `workstream go write 036/N004 --scope …`, then laun
 
 The plan holds the release parts too, merged from the scope's sheets in chain order, so no release is added on the side. A helper's report is named for its part, and folding the report lands the part.
 
+**A go's first plan and each release part wait for a panel's verdict on record** (`RULE.DEVEX.WORKSPACE.485` · MUST · check:split-plan). The design gate and a release are two of the three judgment gates, where the lenses that own the decision read the work fresh. `go write` writes an arc's first plan only once a panel has given its verdict on that arc. `go start` starts a release part only once a panel has given its verdict on the part's arc since that repository's last part landed. The verdict is on record when the panel stops: the hook that logs a helper's turns writes a panel row naming the workstream, the arc, the part, the lens and the verdict. A blocked verdict holds the gate until the work is changed and the panel reads it again. Deriving a plan again is never held, and with telemetry recording off the gate cannot see a verdict, so it says so and lets the work through. The closing retrospective reads the same rows, so a workstream that convened its panels has no ungated part to report.
+
 **A step lands once every entry it holds sits in a landed part, and a code step lands on the full run** (`RULE.DEVEX.WORKSPACE.461` · MUST · skill:spn-devex/execute). Every command's output ends with the next step. Each moment of the loop reads the plan and says one thing, which is what comes next.
 
 | The moment | What it says |
@@ -1519,13 +1521,15 @@ links to `../../approach.html#N<nnn>`, the preview, the plan and the samples; no
 `report write` and `docs cycles write` write it, and rename it with the subject. Never write it by hand:
 the hook refuses it, and `state check` names a hand edit and a second `.md` in the folder.
 
-**A close is a milestone, and you say so before you ask** (`RULE.DEVEX.WORKSPACE.206` · MUST · check:split-plan). Open with
-a titled line that names the workstream as shipped, led by a rocket or a plane rather than a party
+**A close is a milestone, and you write it before you ask, or right after the close on a standing grant** (`RULE.DEVEX.WORKSPACE.206` · MUST · check:split-plan). When
+you ask the developer to close a workstream, write the close as a titled message first, never a table. When you close on a standing grant, with
+nothing to ask, write the same message right after the close: `workstream close` names it as the next step, and a reply in that turn without it
+is sent back. Open with a titled line that names the workstream as shipped, led by a rocket or a plane rather than a party
 icon. Under it, *What was delivered*, *What was learned* and *Thank you* each get their own heading
 with their own icon — the first two lead with their icon, *Thank you* trails with 👍 — and each holds
 one bullet per distinct thing, or a single line where there is only one thing to say. Measure every
 number from the arcs and the close report. Separate the heading and every section with a `&nbsp;`
-line, as the welcome does, and never put them in a quote block. Then ask. Before the folder moves, the
+line, as the welcome does, and never put them in a quote block. Then ask, where there is something to ask. Before the folder moves, the
 page gets its closed masthead and a closing block in the same shape.
 
 ## Nothing is published unless the developer asks

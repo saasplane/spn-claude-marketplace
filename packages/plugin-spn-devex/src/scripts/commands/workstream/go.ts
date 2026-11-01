@@ -1,4 +1,5 @@
 // RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § Once an arc is decided, it runs in three passes per repository · § The formats
+//           RULE.DEVEX.WORKSPACE.485, a go's first plan and each release part wait for a panel's verdict on record
 // The chapter is the source of truth; a rule change is edited there first, then here, in the same change.
 //
 //   spn-devex workstream go write <workstream>/N<nnn> [--scope N<nnn>,…]
@@ -20,9 +21,10 @@ import {
   clearWaiting, deriveGo, fullRunMinutes, goFileOf, landedEntries, landedMeasures, markWaiting, planScope, readGo, readyParts, ratesOf, staleEntries, unheldEntries,
   type ScopeSheet,
 } from "../../lib/go-plan.ts";
-import { logEvent, notesDirOf, readArc, readJson, readSheet, workspaceOf, writeWhole } from "../../lib/workstream.ts";
+import { logEvent, logFileOf, notesDirOf, readArc, readJson, readJsonl, readSheet, workspaceOf, writeWhole } from "../../lib/workstream.ts";
 import { DONE_STATES, renameDataToWork, type ArcData, type GoPart, type GoPlan } from "../../lib/workstream-schema.ts";
 import { arcNamed, listOf } from "./_shared.ts";
+import { panelOnRecord, panelsVisible } from "../../checks/split-plan.ts";
 import { renameFirstRead, sheetFindings } from "./sheet.ts";
 
 export const describe = "the plan of a go: derive it from the scope's sheets and write each part's brief, show it, check it against the sheets, start a baseline, a full run or a release";
@@ -113,6 +115,38 @@ function brief(plan: GoPlan, part: GoPart, ws: string, root: string): string {
   return `${lines.join("\n")}\n`;
 }
 
+// ---------------------------------------------------------------------------- the panel gates
+
+/** What a refusal names as the way through: the panel to convene, and what its prompt names (RULE.DEVEX.WORKSPACE.485). */
+const conveneFix = (ref: string, part: string | null): string =>
+  `convene \`spn-devex:spn-panel\` with the lens LEAD picks, naming \`${ref}\`${part ? ` and the part ${part}` : ""} in its prompt (RULE.DEVEX.WORKSPACE.485)`;
+
+/** The one note a gate prints where recording is off and no verdict can be seen. */
+const BLIND = "Note: telemetry recording is off, so a panel's verdict can't be seen; the panel gate (RULE.DEVEX.WORKSPACE.485) is not applied.";
+
+/** When the last non-release part of a repository landed, from the lead arc's log, or null where none has. */
+export function lastLandedAt(ws: string, arc: string, plan: GoPlan, repo: string): string | null {
+  const ids = new Set(plan.parts.filter((one) => one.repo === repo && one.work !== "RELEASE").map((one) => `${one.id} landed`));
+  const stamps = readJsonl(logFileOf(ws, arc)).map((line) => line as { at?: string; kind?: string; note?: string } | undefined)
+    .filter((one) => one?.kind === "go" && typeof one.note === "string" && ids.has(one.note) && typeof one.at === "string").map((one) => one!.at as string);
+  return stamps.sort((a, b) => Date.parse(a) - Date.parse(b)).at(-1) ?? null;
+}
+
+/** The arcs a release part's entries belong to, else the lead arc: the arcs whose panel counts for it. */
+const arcsOf = (part: GoPart, lead: string): string[] => [...new Set(part.entries.map((ref) => ref.split("/")[0]))].filter(Boolean).concat(part.entries.length ? [] : [lead]);
+
+/**
+ * The refusal of a release part's start where no panel's verdict is on record for its arc since its repository's last part landed,
+ * else null. Recording off lets it through with the note.
+ */
+export function releaseGate(ws: string, lead: string, plan: GoPlan, part: GoPart, root: string): string | null {
+  if (!panelsVisible(root)) { console.log(BLIND); return null; }
+  const since = lastLandedAt(ws, lead, plan, part.repo);
+  const arcs = arcsOf(part, lead);
+  if (arcs.some((arc) => panelOnRecord(root, basename(ws), arc, part.id, since))) return null;
+  return `${part.id} is a release, and no panel's verdict is on record for ${arcs.join(", ")}${since ? ` since ${part.repo}'s last part landed` : ""}: ${conveneFix(`${basename(ws)}/${arcs[0]}`, part.id)}`;
+}
+
 function write(args: string[]): number {
   const words = readWords(args, { scope: VALUE });
   const [ref, ...more] = words.paths;
@@ -122,6 +156,14 @@ function write(args: string[]): number {
   const { sheets, arcs, faults } = scopeOf(ws, scope, lead);
   if (faults.length) { console.log(`Refused: ${faults.join(" · ")}. Nothing was written.`); return 1; }
   const root = workspaceOf() ?? process.cwd();
+  // THE FIRST PLAN WAITS FOR A PANEL; deriving an existing plan again never does.
+  if (!existsSync(goFileOf(ws, lead))) {
+    if (!panelsVisible(root)) console.log(BLIND);
+    else if (!panelOnRecord(root, basename(ws), lead, null)) {
+      console.log(`Refused: ${lead} has no plan yet, and no panel's verdict is on record for it: ${conveneFix(`${basename(ws)}/${lead}`, null)}. Nothing was written.`);
+      return 1;
+    }
+  }
   renameGo(ws, lead);
   const previous = readGo(ws, lead);
   const measures = landedMeasures(root, basename(ws), arcs);
@@ -212,6 +254,10 @@ function start(args: string[]): number {
   const open = part.waitsOn.filter((wait) => plan.parts.find((one) => one.id === wait)?.state !== "landed");
   if (open.length) return refuse(`${id} waits on ${open.join(", ")}, which has not landed`);
   // A full run, and the proof run after the releases, are taken on a tree that is not about to change, so the repository holds no uncommitted file.
+  if (part.work === "RELEASE") {
+    const held = releaseGate(ws, arc, plan, part, workspaceOf() ?? process.cwd());
+    if (held) return refuse(held);
+  }
   const changed = isFullRun(part) ? uncommitted(ws, part.repo) : [];
   if (changed.length) return refuse(`${id} is a ${isProofRun(part) ? "proof" : "full"} run, and ${part.repo} holds uncommitted changes: ${changed.join(", ")}; commit them, then start it`);
   const next: GoPlan = { ...plan, parts: plan.parts.map((one) => (one.id === id ? { ...one, state: "running" as const } : one)) };

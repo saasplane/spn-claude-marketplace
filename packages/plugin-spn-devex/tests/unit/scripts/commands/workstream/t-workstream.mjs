@@ -1015,6 +1015,28 @@ console.log("\n=== workstream close — the retrospective counts failed tests, t
     ok("[MKT.SCRIPTS.332] a go with no panel row on its preview is a finding too", has(got.raised, "N001 go has no panel row"), JSON.stringify(got.raised));
     ok("[MKT.SCRIPTS.332] part-size: names the repository and work whose model time is far from the plan's", has(got.raised, "part-size:spn-x|DOCS"), JSON.stringify(got.raised) + got.out);
   }
+  // a PANEL row gates what it names: its part, and its arc, both when it names both (RULE.DEVEX.WORKSPACE.485)
+  {
+    const gatedGo = async (name) => {
+      const w = await dataArc(name, { rows: [{ id: "1", parent: "N001", title: "r", kind: "change", repo: "spn-x", work: "DOCS", blockedBy: [], touches: [], state: "ready", entries: ["E1"] }] });
+      mkdirSync(join(w.root, ".spndevex", ".debug", "telemetry"), { recursive: true });
+      const entry = { id: "E1", op: "edit", file: "spn-x:docs/a.md", what: "x", decidedBy: ["q1"], facts: [], then: [], rules: [], callers: [], tiers: {}, docs: [], book: [] };
+      writeFileSync(join(w.ws, "arcs", "N001", "sheet.json"), JSON.stringify({ schemaVersion: 1, releaseChain: ["spn-x"], dependsOn: [], stack: null, entries: [entry] }));
+      cli(w.root, ["workstream", "go", "write", "N001", "--scope", "N001"]);
+      return { w, release: json(join(w.ws, "arcs", "N001", "go.json")).parts.find((one) => one.work === "RELEASE") };
+    };
+    const panelRow = (extra) => row({ mtype: "PANEL", event: "SubagentStop", lens: "LEAD", verdict: "PASS", ...extra });
+    const byArc = await gatedGo("retro-panel-arc");
+    const gotArc = finish(byArc.w, [panelRow({ part: null })]);
+    ok("[MKT.SCRIPTS.391] a panel row naming the arc gates the arc's go and its release part", !has(gotArc.raised, "go has no panel row") && !has(gotArc.raised, "has no panel row"), JSON.stringify(gotArc.raised));
+    const byPart = await gatedGo("retro-panel-part");
+    const gotPart = finish(byPart.w, [panelRow({ arc: null, part: byPart.release.id })]);
+    ok("[MKT.SCRIPTS.391] a panel row naming only the release part gates that part, and not the arc's go",
+      !has(gotPart.raised, `release part ${byPart.release.id} has no panel row`) && has(gotPart.raised, "N001 go has no panel row"), JSON.stringify(gotPart.raised));
+    const both = await gatedGo("retro-panel-both");
+    const gotBoth = finish(both.w, [panelRow({ part: both.release.id })]);
+    ok("[MKT.SCRIPTS.391] a panel row naming the part and the arc gates both: the arc is not skipped for having a part", !has(gotBoth.raised, "go has no panel row") && !has(gotBoth.raised, "has no panel row"), JSON.stringify(gotBoth.raised));
+  }
 }
 
 console.log(failed ? `\n  ${failed} of ${total} FAILED — workstream commands` : `\n  all ${total} passed — workstream commands`);

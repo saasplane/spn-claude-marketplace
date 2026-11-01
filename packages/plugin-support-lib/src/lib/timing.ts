@@ -12,7 +12,7 @@
 // `ms`, `event`, then the head `session`, `agent`, `workstream`, `arc`, `part`, `skill`, `work`, `retryOf` — and
 // its variant adds only what its kind needs. This library writes two variants: a hook check's run, `CHECK`
 // (`check`, `verdict` PASS, NOTE or DENY, `out`), and a command, `COMMAND` (`call` { program, group, action },
-// `exit`). A model turn is `usage.ts`'s, a test run the test runner's, a panel the panel's. The values are the
+// `exit`), and a review panel's verdict, `PANEL` (`lens`, `verdict`), written by `writePanel`. A model turn is `usage.ts`'s, a test run the test runner's. The values are the
 // contract's, copied into `telemetry-values.ts`, which toolchain-ts holds to the contract.
 //
 // A ROW HOLDS IDS, TIMES, COUNTS AND NAMES, NEVER WHAT WAS TYPED: a command is its program, group and action and
@@ -50,8 +50,8 @@ import { appendLog, readSwitch, sessionDir, telemetryFolder } from "./debug-stor
 import { isWorkspaceDevex, workstreamPrefixSource } from "./docs-tree.ts";
 import {
   ARC_PATTERN, CHECK_PATTERN, PART_PATTERN, WORKSTREAM_PATTERN, SPDevExAgentHookVerdictType, SPDevExAgentSkillType,
-  SPDevExWorkspaceTelemetryEventType, SPDevExWorkspaceTelemetryRowType, SPDevExWorkspaceTelemetryVersionType, SPDevExWorkstreamWorkType,
-  held, known,
+  SPDevExAgentLensType, SPDevExAgentPanelVerdictType, SPDevExWorkspaceTelemetryEventType, SPDevExWorkspaceTelemetryRowType,
+  SPDevExWorkspaceTelemetryVersionType, SPDevExWorkstreamWorkType, held, known,
 } from "./telemetry-values.ts";
 
 const DEVEX = ".spndevex", LOG = "hooks.jsonl";
@@ -432,6 +432,41 @@ export function write(root: string | null, facts: Facts, entries: Entry[], cwd?:
                               verdict: VERDICTS[entry.verdict ?? "pass"], out: entry.out ?? null })];
     });
     if (lines.length) appendLog(join(dir, LOG), lines.join("\n"));
+  } catch { /* a tool never fails because timing failed */ }
+}
+
+/**
+ * Append one `PANEL` row to the workspace's log, if and only if recording is on: a review panel's verdict (RULE.DEVEX.WORKSPACE.485).
+ * The row holds the base and the head every row carries, then the `lens` and the `verdict`. The facts' own workstream, arc and part
+ * stand where the panel's launch named a workstream; where it named none, the main window's carried ids are read, with no agent,
+ * so a lane never lends its ids and the main window's are only read here. A lens or verdict the contract does not hold writes no
+ * row. Never throws.
+ *
+ * @param panel  the lens and the verdict, as the contract's values; `ms` is how long the panel ran
+ */
+export function writePanel(root: string | null, facts: Facts, panel: { lens: string | null; verdict: string | null; ms?: number }): void {
+  try {
+    const dir = telemetryDir(root);
+    if (!root || !dir) return;
+    const lens = known(SPDevExAgentLensType, panel.lens);
+    const verdict = known(SPDevExAgentPanelVerdictType, panel.verdict);
+    if (!lens || !verdict) return;
+    let work = { workstream: facts.workstream ?? null, arc: facts.arc ?? null, part: facts.part ?? null, skill: facts.skill ?? null };
+    if (!work.workstream) {
+      try { work = carryTags(root, { session: facts.session, script: facts.script, event: facts.event, tool: null, arc: facts.arc, part: facts.part, skill: facts.skill }); }
+      catch { /* the call's own ids stand */ }
+    }
+    const part = held(work.part, PART_PATTERN);
+    const ms = Math.max(0, Math.round(panel.ms ?? 0));
+    const row = {
+      v: SPDevExWorkspaceTelemetryVersionType.V1, mtype: SPDevExWorkspaceTelemetryRowType.PANEL, id: rowId(), at: utcNow(ms), ms,
+      event: SPDevExWorkspaceTelemetryEventType.SUBAGENT_STOP,
+      session: facts.session ?? null, agent: facts.agent ?? null,
+      workstream: held(work.workstream, WORKSTREAM_PATTERN), arc: held(work.arc, ARC_PATTERN), part,
+      skill: known(SPDevExAgentSkillType, work.skill), work: known(SPDevExWorkstreamWorkType, facts.work) ?? workOfPart(part), retryOf: null,
+      lens, verdict,
+    };
+    appendLog(join(dir, LOG), JSON.stringify(row));
   } catch { /* a tool never fails because timing failed */ }
 }
 

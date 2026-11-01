@@ -1,4 +1,5 @@
 // RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § The commands · § The close gate
+//           RULE.DEVEX.WORKSPACE.485, a go's first plan and each release part wait for a panel's verdict on record
 //           RULE.DEVEX.WORKSPACE.206, a close is a milestone, and the agent writes its message before it asks, or right after it closes on a standing grant
 // The chapter is the source of truth; a rule change is edited there first, then here, in the same change.
 //
@@ -135,7 +136,9 @@ function retroOf(ws: string, root: string): Retro {
       else if (one.exit === 2) c.refused += 1; else if (one.exit !== null && one.exit !== undefined && num(one.exit) !== 0) c.failed += 1;
       if (text(one.retryOf)) c.retried += 1;
     } else if (mtype === "PANEL") {
-      if (id) panels.parts.add(id); else if (text(one.arc)) panels.arcs.add(String(one.arc));
+      // A PANEL ROW GATES WHAT IT NAMES: its part, and its arc (RULE.DEVEX.WORKSPACE.485), so a release part counts as gated by a row naming either.
+      if (id) panels.parts.add(id);
+      if (text(one.arc)) panels.arcs.add(String(one.arc));
     }
   }
   for (const [id, agents] of helpers) part(id).starts = agents.size;
@@ -150,11 +153,12 @@ function retroOf(ws: string, root: string): Retro {
     }
     if (!existsSync(goFileOf(ws, arc))) continue;
     renameGo(ws, arc);
-    const plan = readJson(goFileOf(ws, arc)) as { parts?: Array<{ id: string; repo: string; work: string; minutes: number | null }> } | null;
+    const plan = readJson(goFileOf(ws, arc)) as { parts?: Array<{ id: string; repo: string; work: string; minutes: number | null; entries?: string[] }> } | null;
     for (const one of plan?.parts ?? []) {
       const p = part(one.id);
       p.repo = one.repo; p.work = one.work; p.plannedMs = one.minutes === null ? null : one.minutes * 60000;
-      if (one.work === "RELEASE" && !panels.parts.has(one.id)) retro.ungated.push(`release part ${one.id} has no panel row`);
+      const arcs = [arc, ...(one.entries ?? []).map((ref) => ref.split("/")[0])];
+      if (one.work === "RELEASE" && !panels.parts.has(one.id) && !arcs.some((name) => panels.arcs.has(name))) retro.ungated.push(`release part ${one.id} has no panel row`);
     }
     if (!panels.arcs.has(arc) && plan?.parts?.length) retro.ungated.push(`${arc} go has no panel row on its preview`);
   }
