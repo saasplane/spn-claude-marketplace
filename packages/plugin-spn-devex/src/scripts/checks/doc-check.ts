@@ -306,6 +306,26 @@ function inClosedWorkstream(path: string): boolean {
   return home !== null && basename(dirname(home.folder)) === "closed";
 }
 
+/** The longest What an approach page may run before it owes a figure, in characters of text. */
+const WHAT_WITHOUT_FIGURE = 6000;
+
+/**
+ * 05-artifacts.md § A section opens with its own overview, then a figure (RULE.DEVEX.WORKSPACE.497). On an open or backlog
+ * approach page, a What past 6,000 characters of text holds a `<figure>` or an `<svg>`, or one `<!-- no figure: … -->` line
+ * saying why prose is clearer there. A page in a closed workstream is not read.
+ */
+export function figureRule(path: string, text: string): Finding[] {
+  if (!workstreamOf(path) || inClosedWorkstream(path)) return [];
+  const what = section(text, "What");
+  if (what === null) return [];
+  const length = flat(what.replace(/<!--[\s\S]*?-->/g, " ")).length;
+  if (length <= WHAT_WITHOUT_FIGURE) return [];
+  if (/<figure\b|<svg\b|<!--\s*no figure:/i.test(what)) return [];
+  return [["RULE", `${basename(path)} runs ${length} characters in What and holds no figure ` +
+    "(05-artifacts.md § A section opens with its own overview; RULE.DEVEX.WORKSPACE.497) · add a figure where seeing is faster, " +
+    "or one line, `<!-- no figure: the reason prose is clearer here -->`"]];
+}
+
 /**
  * 05-artifacts.md § After `How` comes a section of its own, Plan (RULE.DEVEX.WORKSPACE.487). The Plan section is `<section id="arcs">`
  * under the `h2` Plan, and holds a table of two columns, Arc · Status. Inside a workstream the table has one row per arc in `arcs/`,
@@ -597,8 +617,8 @@ function workstreamTemplates(): string | null {
 /** An arc's preview, by its fixed name in `notes/N<nnn>/`. */
 const isArcPreview = (path: string): boolean => /[\\/]notes[\\/]N\d+[a-z]?[\\/]preview\.html$/.test(path);
 
-// A comment every page keeps: the restated chapter, the page's `spn:doc` block, the approach page's `spn:closing` shape (replaced by the closing block at the close), and the markers of a generated block.
-const KEPT_COMMENT = /^\s*(?:RESTATES:|spn:doc\b|spn:closing\b|\/?spn:generated\b)/;
+// A comment every page keeps: the restated chapter, the page's `spn:doc` block, the approach page's `spn:closing` shape (replaced by the closing block at the close), the markers of a generated block, and the `no figure:` line that says why a long What has no figure.
+const KEPT_COMMENT = /^\s*(?:RESTATES:|spn:doc\b|spn:closing\b|\/?spn:generated\b|no figure:)/;
 const commentsOf = (text: string): string[] =>
   [...text.matchAll(/<!--([\s\S]*?)-->/g)].map((m) => m[1].replace(/\s+/g, " ").trim()).filter((one) => !KEPT_COMMENT.test(one));
 
@@ -1308,7 +1328,7 @@ export function check(path: string, text: string, fragment = false): Finding[] {
       const exempt = exemptWorkstream(path);
       out.push(...approachShape(text, exempt));
       if (!exempt) out.push(...cyclesRule(path, text), ...headerRule(path, text));
-      out.push(...pageFurniture(text));
+      out.push(...pageFurniture(text), ...figureRule(path, text));
     }
     out.push(...openCards(text));
   } else if (isOverview) {
