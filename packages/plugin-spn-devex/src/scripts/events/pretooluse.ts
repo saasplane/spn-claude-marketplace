@@ -436,7 +436,7 @@ export function checkOrderEntries(payload: Payload): Verdict {
 
 /**
  * THE LAUNCH CHECK: a helper starts only from a part of the go's plan. An order whose front matter names no `go:`, in a
- * workstream where an arc keeps a `go.json`, is refused; so is a part the plan does not hold, a held part, and a part whose
+ * workstream where a go covers the order's arc, is refused, and the refusal names that arc (an arc no go covers yet is let through); so is a part the plan does not hold, a held part, and a part whose
  * entries changed since the plan was written. A ready part that passes is marked running in the plan. A workstream with no
  * plan, and an order that cannot be read, are not judged.
  */
@@ -446,18 +446,20 @@ export function checkLaunch(payload: Payload): Verdict {
   for (const named of (input.prompt ?? "").matchAll(/[^\s'"`()]*notes\/N\d+[a-z]?\/orders\/[^\s'"`()]+\.md/g)) {
     try {
       const path = resolve(cwd, named[0]);
-      const placed = /^(.*)\/notes\/N\d+[a-z]?\/orders\/([^/]+)$/.exec(path.split("\\").join("/"));
+      const placed = /^(.*)\/notes\/(N\d+[a-z]?)\/orders\/([^/]+)$/.exec(path.split("\\").join("/"));
       if (!placed || path.endsWith(".report.md")) continue;
-      const [, ws, file] = placed;
+      const [, ws, orderArc, file] = placed;
       const plans = arcIdsOf(ws).map((arc) => readGo(ws, arc)).filter((plan) => plan !== null);
-      if (!plans.length) continue;
+      // AN ORDER OF AN ARC NO GO COVERS YET (A SHEET OR A PREVIEW ORDER) IS NOT HELD TO A PART, though another arc keeps a go.json.
+      const covering = plans.filter((plan) => plan.lead === orderArc || plan.scope.includes(orderArc));
+      if (!covering.length) continue;
       const number = /^\d+/.exec(basename(ws))?.[0] ?? basename(ws);
       const front = /^---\n([\s\S]*?)\n---/.exec(readFileSync(path, "utf8"))?.[1] ?? "";
       const lead = /^go:\s*"?([^"\s]+)"?/m.exec(front)?.[1];
       const id = /^part:\s*"?([^"\s]+)"?/m.exec(front)?.[1];
-      const shown = `\`workstream go show ${number}/${plans[0].lead}\``;
+      const shown = `\`workstream go show ${number}/${covering[0].lead}\``;
       if (!lead || !id)
-        return { deny: `Refused: orders/${file} names no go, and ${number}'s go has a plan.\n`
+        return { deny: `Refused: orders/${file} belongs to ${orderArc}, and ${number}'s go for ${orderArc} (lead ${covering[0].lead}) has a plan.\n`
           + `A helper is briefed from a part: run ${shown} and launch the part's own brief.` };
       const plan = plans.find((one) => one.lead === lead);
       const part = plan?.parts.find((one) => one.id === id);
