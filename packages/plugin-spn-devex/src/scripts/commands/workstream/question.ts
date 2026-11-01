@@ -6,6 +6,7 @@
 //
 //   spn-devex workstream question raise <workstream>/N<nnn> --file card.json
 //   spn-devex workstream question show Q<n> --in <notes/N<nnn>/preview.html>
+//   spn-devex workstream question brief <workstream>/Q<n>
 //   spn-devex workstream question answer Q<n> --key A --words "…" [--entries E7,E9]
 //   spn-devex workstream question withdraw Q<n> --words "…"
 //
@@ -107,6 +108,40 @@ function raise(args: string[]): number {
   return 0;
 }
 
+/**
+ * A fresh view's brief, written from the card's why, what, nearest construct and signs (RULE.DEVEX.WORKSPACE.492): the problem and the
+ * constraints first, no options, and the line that says the proposals come after the view has answered.
+ */
+export function briefOf(workstream: string, record: Question): string {
+  const card = record.card;
+  const signs = Array.isArray(card.signs) && card.signs.length ? card.signs.join(", ") : "none declared";
+  return [
+    `You are one fresh view on ${workstream}/${record.arc}, ${cardName(record.id)}: ${record.title}`,
+    "",
+    "The problem",
+    card.why,
+    "",
+    "What is true today, and the constraints",
+    card.what,
+    "",
+    `The nearest existing construct: ${card.nearest ?? "none named"}`,
+    `Signs of complexity: ${signs}`,
+    "",
+    "Say from your lens and the construct above what you would build and where it would live. Write your whole words, then keep them in " +
+      `${workstream}/notes/${record.arc}/work/.`,
+    "The proposals are not in this brief. They come by message after your first answer; read them then and say where they differ from yours.",
+  ].join("\n");
+}
+
+function brief(args: string[]): number {
+  const words = readWords(args, {});
+  const [ref, ...more] = words.paths;
+  if (more.length) throw new UsageFault("takes one question.");
+  const { ws, record } = recordNamed(ref);
+  console.log(briefOf(basename(ws), record));
+  return 0;
+}
+
 function show(args: string[]): number {
   const words = readWords(args, { in: VALUE });
   const [ref, ...more] = words.paths;
@@ -204,6 +239,7 @@ function settle(args: string[], state: "answered" | "withdrawn"): number {
 
 export const actions: Record<string, Action> = {
   raise: { describe: "raise a card: the next number, the record, the card in the approach page's Open", usage: "<workstream>/N<nnn> --file card.json", run: raise },
+  brief: { describe: "print a fresh view's brief from the card: the problem and the constraints first, no options, the proposals to follow", usage: "<workstream>/Q<n>", run: brief },
   show: { describe: "show an open card on an arc's preview, in its Open", usage: "Q<n> --in <notes/N<nnn>/preview.html>", run: show },
   answer: { describe: "answer a card in your words; it leaves every Open; with --entries, folded into the What, cited, and the go written again", usage: "Q<n> --key <option> --words \"…\" [--entries E7,E9]", run: (args) => settle(args, "answered") },
   withdraw: { describe: "withdraw a card in your words; it leaves every Open", usage: "Q<n> --words \"…\"", run: (args) => settle(args, "withdrawn") },

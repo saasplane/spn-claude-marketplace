@@ -106,5 +106,14 @@ console.log("\n=== an old record reads clean");
   ok("[MKT.SCRIPTS.425] a record raised before the new fields reads with no fault", questionFaults(old, "Q1").length === 0, questionFaults(old, "Q1").join("; "));
 }
 
+console.log("\n=== a fresh view's brief comes from the record");
+{
+  const brief = cli(root, ["workstream", "question", "brief", "031/Q1"]);
+  ok("[MKT.SCRIPTS.426] the brief names the problem, the What and the nearest construct", brief.code === 0 && brief.out.includes(readQuestions(ws)[0].card.why) && brief.out.includes("The nearest existing construct: spn-x"), brief.out);
+  ok("[MKT.SCRIPTS.426] and holds no option, and ends by saying the proposals come after the view answers",
+    !/does: |one way|the other/.test(brief.out) && /The proposals are not in this brief/.test(brief.out.trim().split("\n").at(-1)), brief.out);
+  ok("[MKT.SCRIPTS.426] and sends the view's words to the arc's work folder", brief.out.includes("notes/N001/work/"), brief.out);
+}
+
 console.log(`\n${total - failed}/${total} passed`);
 process.exit(failed ? 1 : 0);
