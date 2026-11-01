@@ -4,7 +4,7 @@ import { one, done, tree } from "../../../../../helpers/harness.mjs";
 const FILE = "packages/thing-ts/src/runtime/SPApp.ts";
 const app = (body) => `export interface SPApp {\n${body}\n}\n`;
 const go = (label, content, expect, says, file = FILE) =>
-  one(`MKT.HOOKS.394 ${label}`, { script: "runtime-slots", root: tree({ [file]: "" }), input: { file_path: file, content }, expect, says });
+  one(`[MKT.HOOKS.394] ${label}`, { script: "runtime-slots", root: tree({ [file]: "" }), input: { file_path: file, content }, expect, says });
 
 console.log("=== runtime-slots — known-bad");
 go("a fourth member", app("  config: SPConfig;\n  providers: SPProvider[];\n  modules: SPModule[];\n  cache: Map<string, string>;"), "deny", "cache");
@@ -21,7 +21,7 @@ go("a file outside src", app("  cache: string;"), "", undefined, "packages/thing
 {
   // An Edit elsewhere in a file whose SPApp is already over the line is not blocked.
   const before = app("  config: SPConfig;\n  cache: string;") + "export const X = 1;\n";
-  one("MKT.HOOKS.394 an unrelated edit to a file already over the line", { script: "runtime-slots", root: tree({ [FILE]: before }),
+  one("[MKT.HOOKS.394] an unrelated edit to a file already over the line", { script: "runtime-slots", root: tree({ [FILE]: before }),
     input: { file_path: FILE, old_string: "X = 1", new_string: "X = 2" }, expect: "" });
 }
 
