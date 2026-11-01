@@ -179,10 +179,10 @@ console.log("\n=== the frame — any other path leaves before the check is loade
     try { text = readFileSync(join(telemetry, ".spndevex", ".debug", "telemetry", "hooks.jsonl"), "utf8").trim(); } catch { /* none */ }
     return text ? text.split("\n").map((line) => JSON.parse(line)).map((line) => line.check) : [];
   };
-  const markdown = spans({ file_path: join(WEB, "notes.md"), content: page(PAIRS[3][2]) });
-  ok("a non-`.tsx` write times nothing: no check was loaded", JSON.stringify(markdown) === "[]", JSON.stringify(markdown));
+  const markdown = spans({ file_path: join(WEB, "notes.txt"), content: page(PAIRS[3][2]) });
+  ok("a write no check watches (`.txt`) times nothing: no check was loaded", JSON.stringify(markdown) === "[]", JSON.stringify(markdown));
   const typescript = spans({ file_path: join(WEB, "util.ts"), content: "export const a = 1;\n" });
-  ok("a `.ts` write leaves the same way", JSON.stringify(typescript) === "[]", JSON.stringify(typescript));
+  ok("a `.ts` write leaves the same way (product-name watches only .md, .html, .tsx, .jsx)", JSON.stringify(typescript) === "[]", JSON.stringify(typescript));
   const tsx = spans({ file_path: join(WEB, "Page.tsx"), content: page(PAIRS[3][2]) });
   ok("a web node's `.tsx` loads the check and runs the stack's reader", tsx.includes("load") && tsx.includes("ts"), JSON.stringify(tsx));
   rmSync(telemetry, { recursive: true, force: true });

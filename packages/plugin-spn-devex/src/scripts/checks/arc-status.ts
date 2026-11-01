@@ -14,8 +14,8 @@
 //   called by: events/pretooluse.ts, before a Bash call
 
 import { existsSync, readdirSync, readFileSync } from "node:fs";
-import { join } from "node:path";
-import { workstreamsDir } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
+import { basename, dirname, join } from "node:path";
+import { WORKSTREAMS, workstreamsDir } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { segments } from "../lib/command-reader.ts";
 import { emit, readPayload, runAlone, workspaceRoot, type Payload, type Verdict } from "../lib/payload.ts";
 
@@ -103,10 +103,75 @@ function loggedWords(root: string, ref: string): string[] {
   return notes;
 }
 
+/** The arc reference of a `workstream arc edit … --status LANDED` call, or null; a cheap substring test comes first. */
+export function landedOf(command: string): string | null {
+  if (!command.includes("LANDED")) return null;
+  for (const words of segments(command)) {
+    const at = words.findIndex((word, index) => word === "workstream" && words[index + 1] === "arc" && words[index + 2] === "edit");
+    if (at < 0) continue;
+    const status = words.findIndex((word, i) => i > at && (word === "--status=LANDED" || (word === "--status" && words[i + 1] === "LANDED")));
+    if (status >= 0) return words[at + 3] ?? "";
+  }
+  return null;
+}
+
+/**
+ * The workstream folder a path stands in: an ancestor whose parent is `open` or `backlog`. Read here rather than from
+ * `lib/workstream.ts`, which imports the stored statuses from this file.
+ */
+function workstreamOf(from: string): string | null {
+  for (let at = from; dirname(at) !== at; at = dirname(at)) {
+    if (["open", "backlog"].includes(basename(dirname(at))) && basename(dirname(dirname(at))) === WORKSTREAMS) return at;
+  }
+  return null;
+}
+
+/** The suggestions an arc raised that are still `raised`: those whose preview sits under the arc's notes folder. */
+export function raisedSuggestions(root: string, ref: string, cwd: string): { arc: string; titles: string[] } | null {
+  const arc = ref.includes("/") ? ref.slice(ref.lastIndexOf("/") + 1) : ref;
+  if (!/^N\d+$/.test(arc)) return null;
+  const named = ref.includes("/") ? ref.slice(0, ref.lastIndexOf("/")) : null;
+  let folder: string | null = null;
+  if (named === null) folder = workstreamOf(cwd);
+  else for (const state of ["open", "backlog"] as const) {
+    const base = workstreamsDir(root, state);
+    if (!existsSync(base)) continue;
+    const hit = readdirSync(base).find((entry) => entry === named || entry.startsWith(`${named}-`));
+    if (hit) { folder = join(base, hit); break; }
+  }
+  if (!folder) return null;
+  const titles: string[] = [];
+  try {
+    for (const line of readFileSync(join(folder, "suggestions.jsonl"), "utf8").split("\n")) {
+      try {
+        const one = JSON.parse(line) as { state?: string; title?: string; preview?: string | null };
+        if (one.state === "raised" && typeof one.preview === "string" && one.preview.startsWith(`notes/${arc}/`)) titles.push(one.title ?? "");
+      } catch { /* a torn line says nothing */ }
+    }
+  } catch { /* no suggestions file says nothing */ }
+  return { arc, titles };
+}
+
+/** Refuse stamping an arc LANDED while a suggestion it raised is still raised; null where the call is not that. */
+function landedRefusal(payload: Payload): Verdict {
+  const command = payload.tool_input?.command;
+  const ref = command ? landedOf(command) : null;
+  if (ref === null) return null;
+  const root = workspaceRoot(payload.cwd ?? process.cwd());
+  if (!root) return null;
+  const found = raisedSuggestions(root, ref, payload.cwd ?? process.cwd());
+  if (!found || !found.titles.length) return null;
+  return { deny:
+    `${found.arc} cannot be stamped LANDED while ${found.titles.length} suggestion(s) it raised are still raised: '${found.titles[0].slice(0, 60)}'. ` +
+    `Move each on first: \`spn-devex workstream suggestion state <workstream> <sN> shaped|decided|parked|dropped\`, then stamp the arc.` };
+}
+
 /** Refuse a move to DECIDED whose quoted words the developer never typed in this window and the workstream never logged. */
 export function checkArcStatus(payload: Payload & { transcript_path?: string }): Verdict {
   try {
     if (payload.tool_name !== "Bash") return null;
+    const landed = landedRefusal(payload);
+    if (landed) return landed;
     const go = payload.tool_input?.command ? goOf(payload.tool_input.command) : null;
     if (!go || !payload.transcript_path) return null;
     const root = workspaceRoot(payload.cwd ?? process.cwd());

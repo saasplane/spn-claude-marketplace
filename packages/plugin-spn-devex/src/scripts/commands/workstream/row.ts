@@ -12,11 +12,13 @@
 // `row add` takes the arc's next number and prints it; the rules for a started step and a landed arc are RULE.DEVEX.WORKSPACE.278 and .261.
 
 import { type Action, FLAG, VALUE, UsageFault, readWords, type Words } from "../../../../../plugin-support-lib/src/lib/command.ts";
+import { basename, dirname, join } from "node:path";
 import { arcStatus, doneOf, landingFault, logEvent, readArc, readSheet, stateOfRow, stepsMayStart, writeArc } from "../../lib/workstream.ts";
 import { WORK, ROW_ID, ROW_KINDS, ROW_STATES, parentIds, type ArcData, type ArcRow } from "../../lib/workstream-schema.ts";
 import { ARC_FLAGS, afterWrite, arcNamed, arcSignatures, listOf, refreshIfMoved, refuseFlags, typed } from "./_shared.ts";
 import { renameFirstRead } from "./sheet.ts";
 import { stepRowFindings } from "../../checks/workstream-state.ts";
+import { applies as pluginLandedApplies, pluginLandedRefusal } from "../../checks/plugin-landed.ts";
 
 export const describe = "add a row, move its state, write a note on it, change its fields, or discard one found invalid";
 
@@ -89,6 +91,12 @@ function rowOf(ref: string | undefined, rowId: string | undefined): { ws: string
   return { ws, arc, data, row };
 }
 
+/** The main checkout's parent: the workspace folder, whether the workstream sits in it or in a `.worktrees/` set. */
+function mainCheckoutOf(ws: string): string {
+  const root = dirname(dirname(dirname(dirname(ws))));
+  return basename(dirname(root)) === ".worktrees" ? dirname(dirname(root)) : root;
+}
+
 /** Throws where a step would start against the arc's go or wait: a row set `running` or `landed` needs the arc decided with no wait. */
 function mayStart(arc: string, data: ArcData, rowId: string, state: string | null | undefined): void {
   if (!["running", "landed"].includes(state ?? "") || stepsMayStart(data)) return;
@@ -157,6 +165,10 @@ function state(args: string[]): number {
   if (next === "landed") {
     const fault = landingFault(ws, arc, data, row, run);
     if (fault) { console.log(`Refused: ${fault}`); return 1; }
+    // A plugin change is landed once it is installed (RULE.DEVEX.AGENT.110): the check reads nothing for any other row.
+    const files = (readSheet(ws, arc)?.entries ?? []).filter((entry) => (row.entries ?? []).includes(entry.id)).map((entry) => entry.file);
+    const unplugged = pluginLandedApplies(row.repo, next, [...files, ...(row.touches ?? [])]) ? pluginLandedRefusal(join(mainCheckoutOf(ws), row.repo!)) : null;
+    if (unplugged) { console.log(`Refused: ${unplugged}`); return 1; }
   }
   const statusBefore = arcStatus(data);
   const before = arcSignatures(ws);
