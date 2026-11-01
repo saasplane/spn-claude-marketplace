@@ -1284,11 +1284,6 @@
           "plugin": "spn-devex",
           "path": "refs/devex/agent/plugins.md",
           "heading": "Two install modes, and the place you are standing decides"
-        },
-        {
-          "plugin": "spn-devex",
-          "path": "skills/deliver/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -1591,13 +1586,7 @@
       "chapter": "04-capabilities/01-devex/02-agent/04-plugins/01-plugins.md",
       "heading": "The place you are standing decides the install mode",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-devex",
-          "path": "skills/deliver/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.DEVEX.AGENT.132",
