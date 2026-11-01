@@ -255,6 +255,7 @@ Every row below is declared and none is claimed: a run writes the last two cells
 | MKT.SCRIPTS.429 | Builder | open an arc that holds the overall proposal | `workstream open` and `arc edit` take `--kind ideate`, recorded on the arc, and `--proposes N<nnn>,…` names the build arcs an ideate arc proposes (RULE.DEVEX.WORKSPACE.494) | POSITIVE | UNIT | PLANNED | — |
 | MKT.SCRIPTS.430 | Builder | see an ideate arc land with no rows | An ideate arc's status is worked out: it reads LANDED once its preview is decided and every arc it proposes is opened, and DECIDED until then; the worked-out status is never written to its state.json | POSITIVE | UNIT | PLANNED | — |
 | MKT.SCRIPTS.431 | Builder | have every reader agree on an ideate arc | The state check, `docs cycles write` and the close gate read an ideate arc through the same owner, so its page row, badge and name file follow what it reads | POSITIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.432 | Developer | decide the retrospective's suggestions before the close | The close raises no retrospective suggestion whose title already exists in the workstream, and refuses while any suggestion, the retrospective's own included, reads raised or shaped; once decided, the next close passes (RULE.DEVEX.WORKSPACE.489) | NEGATIVE | UNIT | PLANNED | — |
 
 ## Retired ids
 

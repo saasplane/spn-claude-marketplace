@@ -88,10 +88,10 @@ console.log("\n=== close: an unfinished plan refuses it");
   suggest([{ id: "s1", title: "a suggestion nobody has decided, with a title that runs on well past sixty characters in all", state: "raised" }, { id: "s2", title: "shaped, not decided", state: "shaped", arc: "N001" },
     { id: "s3", title: "settled", state: "decided" }, { id: "s4", title: "Retrospective · command:x fails", state: "raised" }]);
   const held = cli(root, ["workstream", "close", "031"]);
-  ok("[MKT.SCRIPTS.406] a close refuses while a suggestion reads raised or shaped, naming each as S<n> with its title cut to about sixty characters, the rule, and that nothing was changed",
-    held.code === 1 && held.out.includes('S1 "a suggestion nobody has decided, with a title that runs o..."') && held.out.includes('S2 "shaped, not decided"') && !held.out.includes("S3") && !held.out.includes("S4")
+  ok("[MKT.SCRIPTS.406] a close refuses while a suggestion, the retrospective's own included, reads raised or shaped, naming each as S<n> with its title cut to about sixty characters, the rule, and that nothing was changed",
+    held.code === 1 && held.out.includes('S1 "a suggestion nobody has decided, with a title that runs o..."') && held.out.includes('S2 "shaped, not decided"') && !held.out.includes("S3") && held.out.includes("S4")
       && held.out.includes("RULE.DEVEX.WORKSPACE.489") && held.out.includes("Nothing was changed") && !existsSync(closed) && existsSync(ws) && readFileSync(join(ws, "approach.html"), "utf8") === before, held.out);
-  suggest([{ id: "s1", title: "decided now", state: "decided" }, { id: "s2", title: "parked now", state: "parked" }, { id: "s3", title: "dropped now", state: "dropped" }, { id: "s4", title: "Retrospective · command:x fails", state: "raised" }]);
+  suggest([{ id: "s1", title: "decided now", state: "decided" }, { id: "s2", title: "parked now", state: "parked" }, { id: "s3", title: "dropped now", state: "dropped" }, { id: "s4", title: "Retrospective · command:x fails", state: "decided" }]);
   const noBlock = cli(root, ["workstream", "close", "031"]);
   ok("[MKT.SCRIPTS.398] a page with no closing block refuses the close, naming the shape, the rule and that nothing was changed, before the go is read",
     noBlock.code === 1 && noBlock.out.includes("no closing block") && noBlock.out.includes("What was delivered") && noBlock.out.includes("What was learned") && noBlock.out.includes("Thank you")
@@ -109,7 +109,16 @@ console.log("\n=== close: an unfinished plan refuses it");
   const arcFile = join(ws, "arcs", "N001", "state.json");
   const arcData = json(arcFile);
   writeFileSync(arcFile, JSON.stringify({ ...arcData, rows: arcData.rows.map((row) => ({ ...row, state: "landed" })) }, null, 2));
+  // THE RETROSPECTIVE'S OWN SUGGESTIONS HOLD THE CLOSE (RULE.DEVEX.WORKSPACE.489): the first close raises them and refuses; the developer decides them; the next passes.
+  const first = cli(root, ["workstream", "close", "031"]);
+  const raisedNow = readFileSync(suggestionsFile, "utf8").trim().split("\n").map((line) => JSON.parse(line)).filter((one) => one.title.startsWith("Retrospective · ") && one.state === "raised");
+  ok("[MKT.SCRIPTS.432] the retrospective's own raised suggestions refuse the close that raised them, naming each, and nothing moves",
+    first.code === 1 && raisedNow.length >= 1 && raisedNow.every((one) => first.out.includes(`S${one.id.slice(1)} `)) && first.out.includes("RULE.DEVEX.WORKSPACE.489") && !existsSync(closed) && existsSync(ws), first.out);
+  const countBefore = readFileSync(suggestionsFile, "utf8").trim().split("\n").length;
+  suggest(readFileSync(suggestionsFile, "utf8").trim().split("\n").map((line) => ({ ...JSON.parse(line), state: "decided" })));
   const done = cli(root, ["workstream", "close", "031"]);
+  const keptTitles = existsSync(join(closed, "suggestions.jsonl")) ? readFileSync(join(closed, "suggestions.jsonl"), "utf8").trim().split("\n").length : -1;
+  ok("[MKT.SCRIPTS.432] once the developer has decided them the next close raises none again and passes", done.code === 0 && keptTitles === countBefore, `${keptTitles} ${countBefore}\n${done.out}`);
   const moved = join(closed, "approach.html");
   ok("[MKT.SCRIPTS.310] a whole, landed go closes: the folder moves into closed", done.code === 0 && existsSync(moved) && !existsSync(ws), done.out);
   const page = existsSync(moved) ? readFileSync(moved, "utf8") : "";

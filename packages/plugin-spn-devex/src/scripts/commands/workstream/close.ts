@@ -285,6 +285,14 @@ function retrospective(ws: string, root: string): string[] {
   return raised;
 }
 
+/** The refusal naming each suggestion that reads raised or shaped, the retrospective's included, or null where none does. */
+function openRefusal(ws: string): string | null {
+  const open = suggestionsOf(ws).filter(suggestionOpen);
+  if (!open.length) return null;
+  return `${open.length === 1 ? "a suggestion" : `${open.length} suggestions`} still read${open.length === 1 ? "s" : ""} raised or shaped: ${open.map(suggestionName).join(" · ")}. ` +
+    "Decide, park or drop each with `workstream suggestion state` before the workstream closes (RULE.DEVEX.WORKSPACE.489)";
+}
+
 export function run(args: string[]): number {
   const words = readWords(args);
   const [ref, ...more] = words.paths;
@@ -298,11 +306,8 @@ export function run(args: string[]): number {
   // THE CLOSING BLOCK IS WRITTEN BEFORE THE CLOSE (RULE.DEVEX.WORKSPACE.206): a page found without it after its folder has moved has to be
   // opened again, so a page without it refuses here, before anything is stamped, raised or moved.
   // A SUGGESTION LEFT OPEN IS A CHOICE NOBODY MADE (RULE.DEVEX.WORKSPACE.489): the close names each one, before anything is stamped, raised or moved.
-  // The retrospective's own suggestions (`Retrospective · …`) are raised by this very close, for the developer's next call, and are not held against it.
-  const open = suggestionsOf(ws).filter((one) => suggestionOpen(one) && !one.title.startsWith(RETRO_PREFIX));
-  if (open.length)
-    return refuse(`${open.length === 1 ? "a suggestion" : `${open.length} suggestions`} still read${open.length === 1 ? "s" : ""} raised or shaped: ${open.map(suggestionName).join(" · ")}. ` +
-      "Decide, park or drop each with `workstream suggestion state` before the workstream closes (RULE.DEVEX.WORKSPACE.489)");
+  const undecided = openRefusal(ws);
+  if (undecided) return refuse(undecided);
 
   const closingPage = approachOf(ws);
   if (closingPage) {
@@ -322,6 +327,11 @@ export function run(args: string[]): number {
   // WHERE THE WORKSTREAM'S TIME WENT is printed beside the retrospective, from the telemetry (the same split is in retro.json).
   const written = readJson(join(ws, "retro.json")) as Retro | null;
   if (written?.split) console.log(splitLine(written));
+
+  // THE RETROSPECTIVE'S OWN SUGGESTIONS ARE HELD AGAINST THE CLOSE TOO (RULE.DEVEX.WORKSPACE.489): it raised them just above, and it does not
+  // raise one whose title is already in the workstream, so the developer decides them and the next close passes.
+  const left = openRefusal(ws);
+  if (left) return refuse(left);
 
   const page = approachOf(ws);
   const target = `${workstreamsDir(root, "closed")}/${basename(ws)}`;
