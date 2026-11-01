@@ -18,7 +18,7 @@ import { withOffset } from "./clock.ts";
 import { isDir, isFile, listdir, workspaceRoot } from "./payload.ts";
 import { APPROACH_PAGE, ARCS, PLUGIN_TEMPLATES, WORKSTREAM_STATES, isApproachPage, workstreamPrefixSource, workstreamsDir, type WorkstreamState } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import {
-  ARC_ID, DONE_STATES, QUESTION_ID, SCHEMA_VERSION, arcFaults, parentIds,
+  ARC_ID, DONE_STATES, QUESTION_ID, SCHEMA_VERSION, arcFaults, cardName, parentIds,
   type ArcData, type ArcRow, type Card, type LogLine, type Question, type RowState, type Sheet,
 } from "./workstream-schema.ts";
 
@@ -1436,4 +1436,41 @@ export function landingFault(ws: string, arc: string, data: ArcData, row: ArcRow
     }
   }
   return faults.length ? [...new Set(faults)].join(" · ") + "." : null;
+}
+
+// ---------------------------------------------------------------------------- a suggestion belongs to an arc
+
+/** The suggestions of a workstream, as recorded. A record raised before suggestions carried an arc has none. */
+export function suggestionsOf(ws: string): Array<{ id: string; title: string; state: string; arc: string | null }> {
+  return readJsonl(suggestionsFileOf(ws))
+    .filter((line): line is Record<string, unknown> => !!line && typeof line === "object")
+    .map((line) => ({ id: String(line.id), title: String(line.title ?? ""), state: String(line.state), arc: typeof line.arc === "string" && line.arc ? line.arc : null }));
+}
+
+/** A suggestion as a person reads it in a refusal: `S65 "its title"`, the title cut to about sixty characters. */
+export function suggestionName(one: { id: string; title: string }): string {
+  const title = one.title.length > 60 ? `${one.title.slice(0, 57).trimEnd()}...` : one.title;
+  return `${cardName(one.id)} "${title}"`;
+}
+
+/** Whether a suggestion is still open: raised, or shaped but not yet decided, parked or dropped. */
+export const suggestionOpen = (one: { state: string }): boolean => one.state === "raised" || one.state === "shaped";
+
+/** Whether landing `row` leaves every other leaf row of the arc done, which makes the arc LANDED. */
+export function landsTheArc(data: ArcData, row: ArcRow): boolean {
+  if (arcStatus(data) === "LANDED") return false;
+  const rows = data.rows.map((one) => (one.id === row.id ? { ...one, state: "landed" } : one));
+  return arcStatus({ ...data, rows }) === "LANDED";
+}
+
+/**
+ * The refusal of the write that lands an arc's last row while a suggestion against the arc is still raised or shaped
+ * (RULE.DEVEX.WORKSPACE.488), or null. It names each and says to decide, park or drop it.
+ */
+export function suggestionLandingFault(ws: string, arc: string, data: ArcData, row: ArcRow): string | null {
+  if (!landsTheArc(data, row)) return null;
+  const open = suggestionsOf(ws).filter((one) => one.arc === arc && suggestionOpen(one));
+  if (!open.length) return null;
+  return `row ${row.id} is the last row of ${arc}, and ${open.length === 1 ? "a suggestion against it is" : "suggestions against it are"} still open: ${open.map(suggestionName).join(" · ")}. ` +
+    "Decide, park or drop each with `workstream suggestion state` before the arc lands (RULE.DEVEX.WORKSPACE.488)";
 }

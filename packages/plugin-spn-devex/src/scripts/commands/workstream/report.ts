@@ -1,4 +1,5 @@
 // RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § The commands · § The formats
+//           RULE.DEVEX.WORKSPACE.488, a suggestion belongs to an arc, as a card does, and the arc's sheet cites it
 // The chapter is the source of truth; a rule change is edited there first, then here, in the same change.
 //
 //   spn-devex workstream report write [<workstream>] <notes/N<nnn>/orders/<row>.report.md>
@@ -17,7 +18,7 @@ import { basename, join, resolve } from "node:path";
 import { type Action, UsageFault, readWords } from "../../../../../plugin-support-lib/src/lib/command.ts";
 import { frontMatter } from "../../lib/front-matter.ts";
 import { readGo } from "../../lib/go-plan.ts";
-import { doneOf, landingFault, logEvent, notesDirOf, readArc, readQuestions, readyRows, workspaceOf, writeArc } from "../../lib/workstream.ts";
+import { doneOf, landingFault, logEvent, suggestionLandingFault, notesDirOf, readArc, readQuestions, readyRows, workspaceOf, writeArc } from "../../lib/workstream.ts";
 import { OUTCOMES, ROW_ID, type ArcRow, type Cost, type GoPart, type GoPlan } from "../../lib/workstream-schema.ts";
 import { afterWrite, arcSignatures, refreshIfMoved, typed, workstreamNamed } from "./_shared.ts";
 import { logFiles, telemetryFolder } from "../../../../../plugin-support-lib/src/lib/debug-store.ts";
@@ -94,7 +95,7 @@ function foldPart(ws: string, lead: string, plan: GoPlan, part: GoPart, outcome:
         if (!held.every((id) => landed.has(`${arc}/${id}`))) continue;
         // A code or proof step waits for a TEST part's full run, unless the report names a run, which the landing gate judges.
         if ((row.work === "CODE" || row.work === "PROOF") && !isFullRun(part) && !run) continue;
-        const fault = landingFault(ws, arc, data, row, run);
+        const fault = landingFault(ws, arc, data, row, run) ?? suggestionLandingFault(ws, arc, data, row);
         const split = splitLine(ws, arc, row.id);
         if (split) splits.push(split);
         if (fault) { refused.push(`${arc} ${row.id} stays: ${fault}`); continue; }

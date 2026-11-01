@@ -332,5 +332,29 @@ console.log("\n=== a panel's verdict on record gates a go's first plan and a rel
   ok("[MKT.SCRIPTS.390] with recording off the release starts, and one note says the panel can't be seen", blind.code === 0 && blind.out.split(note).length === 2, blind.out);
 }
 
+console.log("\n=== a decided suggestion against an arc is cited by its sheet, or the go is refused (RULE.DEVEX.WORKSPACE.488)");
+{
+  const row = (id, work, over = {}) => ({ id, parent: "N001", kind: "change", repo: "spn-x", blockedBy: [], touches: [], state: "ready", title: `row ${id}`, work, ...over });
+  const cited = await dataWorkspace("go-cites", { rows: [row("1", "DOCS", { entries: ["E1"] })] });
+  cli(cited.root, ["workstream", "fact", "write", "N001", "--source", "spn-x/a.ts", "--fact", "a is 1", "--used-by", "1"]);
+  const sheetPath = join(cited.ws, "arcs", "N001", "sheet.json");
+  const withCite = (decidedBy) => writeFileSync(sheetPath, JSON.stringify(sheetOf([entry("E1", "spn-x:docs/a.md", { decidedBy })]), null, 2));
+  const suggestions = (list) => writeFileSync(join(cited.ws, "suggestions.jsonl"), list.map((one) => JSON.stringify({ preview: null, words: null, ...one })).join("\n") + "\n");
+  const planFile = join(cited.ws, "arcs", "N001", "go.json");
+  suggestions([{ id: "s65", title: "move the footbar under Plan", state: "decided", arc: "N001" }, { id: "s66", title: "raised only", state: "raised", arc: "N001" }, { id: "s67", title: "another arc's", state: "decided", arc: "N002" }, { id: "s68", title: "no arc", state: "decided" }]);
+  withCite(["q1"]);
+  const refused = cli(cited.root, ["workstream", "go", "write", "N001"]);
+  ok("[MKT.SCRIPTS.405] go write refuses a decided suggestion of an arc in the go's scope that no entry cites, naming it with a capital and writing nothing",
+    refused.code === 1 && refused.out.includes("S65") && !refused.out.includes("S66") && !refused.out.includes("S67") && !refused.out.includes("S68") && refused.out.includes("Nothing was written") && !existsSync(planFile), refused.out);
+  const check = cli(cited.root, ["workstream", "sheet", "check", "N001"]);
+  ok("[MKT.SCRIPTS.405] sheet check names the same suggestion", check.code === 1 && check.out.includes("S65 is decided against N001"), check.out);
+  withCite(["q1", "S65"]);
+  const wrote = cli(cited.root, ["workstream", "go", "write", "N001"]);
+  ok("[MKT.SCRIPTS.405] cited as S65 in an entry's decidedBy, the go is written", wrote.code === 0 && existsSync(planFile), wrote.out);
+  rmSync(planFile);
+  withCite(["s65"]);
+  ok("[MKT.SCRIPTS.405] cited as s65, the lowercase form, it counts too", cli(cited.root, ["workstream", "go", "write", "N001"]).code === 0);
+}
+
 console.log(`\n${total - failed}/${total} passed`);
 process.exit(failed ? 1 : 0);

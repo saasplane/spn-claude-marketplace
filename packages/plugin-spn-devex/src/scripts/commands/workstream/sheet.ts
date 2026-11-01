@@ -1,4 +1,5 @@
 // RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § The change sheet is the arc's data · § The formats
+//           RULE.DEVEX.WORKSPACE.488, a suggestion belongs to an arc, as a card does, and the arc's sheet cites it
 // The chapter is the source of truth; a rule change is edited there first, then here, in the same change.
 //
 //   spn-devex workstream sheet write <workstream>/N<nnn> --file <sheet.json>
@@ -18,7 +19,7 @@ import { basename, dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { type Action, FLAG, VALUE, UsageFault, readWords } from "../../../../../plugin-support-lib/src/lib/command.ts";
 import { workspaceRoot } from "../../../../../plugin-support-lib/src/lib/timing.ts";
-import { logEvent, readArc, readJson, readJsonl, readQuestions, readSheet, factsFileOf, sheetFileOf, stateFileOf, writeArc, writeWhole } from "../../lib/workstream.ts";
+import { logEvent, readArc, readJson, readJsonl, readQuestions, readSheet, factsFileOf, sheetFileOf, stateFileOf, suggestionsOf, writeArc, writeWhole } from "../../lib/workstream.ts";
 import { ENTRY_OPS, cardName, entryWork, parentIds, renameDataToWork, sheetFaults, type ArcData, type ArcRow, type Fact, type Sheet, type SheetEntry } from "../../lib/workstream-schema.ts";
 import { arcNamed, listOf, typed } from "./_shared.ts";
 
@@ -301,6 +302,9 @@ export function sheetFindings(ws: string, arc: string): string[] {
   }
   for (const card of readQuestions(ws).filter((one) => one.arc === arc && one.state === "answered"))
     if (!cites(entries, card.id)) out.push(`${cardName(card.id)} is answered and no entry cites it`);
+  // A SUGGESTION DECIDED AGAINST THIS ARC IS CITED BY AN ENTRY (RULE.DEVEX.WORKSPACE.488): `decidedBy` carries it as S<n>, or the go leaves it out.
+  for (const one of suggestionsOf(ws).filter((suggestion) => suggestion.arc === arc && suggestion.state === "decided"))
+    if (!cites(entries, one.id)) out.push(`${cardName(one.id)} is decided against ${arc} and no entry cites it in \`decidedBy\` (as \`${cardName(one.id)}\`)`);
   if (sheet.stack === null && leaves.some((row) => row.work === "CODE" || row.work === "PROOF"))
     out.push(`the sheet's stack is null, and ${arc} has a CODE or PROOF row`);
   return out;

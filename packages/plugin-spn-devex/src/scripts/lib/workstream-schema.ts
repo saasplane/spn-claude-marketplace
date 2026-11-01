@@ -257,6 +257,8 @@ const SUGGESTION_FIELDS: Record<string, Rule> = {
   id: { kind: "string", required: true, pattern: SUGGESTION_ID }, title: { kind: "string", required: true },
   state: { kind: "enum", required: true, values: SUGGESTION_STATES },
   preview: { kind: "text", required: true }, words: { kind: "text", required: true },
+  // The arc a suggestion belongs to (RULE.DEVEX.WORKSPACE.488); a record raised before it has none, read as null.
+  arc: { kind: "text", required: false },
 };
 const QUESTION_FIELDS: Record<string, Rule> = {
   id: { kind: "string", required: true, pattern: QUESTION_ID }, arc: { kind: "string", required: true, pattern: ARC_ID },

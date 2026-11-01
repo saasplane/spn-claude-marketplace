@@ -1,4 +1,5 @@
 // RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § The commands · § The close gate
+//           RULE.DEVEX.WORKSPACE.489, a workstream closes only once every suggestion is decided, parked or dropped
 //           RULE.DEVEX.WORKSPACE.485, a go's first plan and each release part wait for a panel's verdict on record
 //           RULE.DEVEX.WORKSPACE.206, a close is a milestone, and the agent writes its message before it asks, or right after it closes on a standing grant
 // The chapter is the source of truth; a rule change is edited there first, then here, in the same change.
@@ -18,7 +19,7 @@ import { stageOf } from "../../../../../plugin-support-lib/src/lib/telemetry-val
 import { isTestCommand } from "../../checks/test-run.ts";
 import { goFileOf } from "../../lib/go-plan.ts";
 import { USAGE_LOG } from "../../lib/usage.ts";
-import { approachOf, arcIdsOf, logFileOf, readJson, readJsonl, suggestionsFileOf, workspaceOf, writeJsonl, writeWhole } from "../../lib/workstream.ts";
+import { approachOf, arcIdsOf, logFileOf, readJson, readJsonl, suggestionName, suggestionOpen, suggestionsFileOf, suggestionsOf, workspaceOf, writeJsonl, writeWhole } from "../../lib/workstream.ts";
 import { OUTCOMES, cardName, suggestionFaults, type Suggestion } from "../../lib/workstream-schema.ts";
 import { checkGo, renameGo } from "./go.ts";
 import { workstreamNamed } from "./_shared.ts";
@@ -27,6 +28,9 @@ export const describe = "close a workstream: run the close gate, stamp the appro
 export const usage = "<workstream>";
 
 const refuse = (why: string): number => { console.log(`Refused: ${why}. Nothing was changed.`); return 1; };
+
+/** The start of the title of every suggestion the close's retrospective raises. */
+const RETRO_PREFIX = "Retrospective · ";
 
 /** What a closed page carries as its closing block: what was delivered, what was learned and the thanks. */
 const CLOSING_PARTS: Array<[RegExp, string]> = [
@@ -249,7 +253,7 @@ function retrospective(ws: string, root: string): string[] {
   const records = readJsonl(file).filter((line): line is Suggestion => !!line && typeof line === "object");
   const raised: string[] = [];
   for (const finding of findingsOf(now, earlier)) {
-    const title = `Retrospective · ${finding}`;
+    const title = `${RETRO_PREFIX}${finding}`;
     if (records.some((one) => one.title === title)) continue;
     const next = Math.max(0, ...records.map((one) => Number(/^s(\d+)$/.exec(one.id)?.[1] ?? 0))) + 1;
     const record: Suggestion = { id: `s${next}`, title, state: "raised", preview: null, words: null };
@@ -273,6 +277,13 @@ export function run(args: string[]): number {
 
   // THE CLOSING BLOCK IS WRITTEN BEFORE THE CLOSE (RULE.DEVEX.WORKSPACE.206): a page found without it after its folder has moved has to be
   // opened again, so a page without it refuses here, before anything is stamped, raised or moved.
+  // A SUGGESTION LEFT OPEN IS A CHOICE NOBODY MADE (RULE.DEVEX.WORKSPACE.489): the close names each one, before anything is stamped, raised or moved.
+  // The retrospective's own suggestions (`Retrospective · …`) are raised by this very close, for the developer's next call, and are not held against it.
+  const open = suggestionsOf(ws).filter((one) => suggestionOpen(one) && !one.title.startsWith(RETRO_PREFIX));
+  if (open.length)
+    return refuse(`${open.length === 1 ? "a suggestion" : `${open.length} suggestions`} still read${open.length === 1 ? "s" : ""} raised or shaped: ${open.map(suggestionName).join(" · ")}. ` +
+      "Decide, park or drop each with `workstream suggestion state` before the workstream closes (RULE.DEVEX.WORKSPACE.489)");
+
   const closingPage = approachOf(ws);
   if (closingPage) {
     const missing = missingClosingBlock(readFileSync(closingPage, "utf8"));

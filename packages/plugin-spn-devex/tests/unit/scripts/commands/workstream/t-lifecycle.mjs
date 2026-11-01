@@ -79,6 +79,16 @@ console.log("\n=== close: an unfinished plan refuses it");
   ok("[MKT.SCRIPTS.320] an entry a landed row holds is planned in no part, and go check does not name it",
     planned.code === 0 && !partsHolding.length && checked.code === 0 && !checked.out.includes("held by no part"), `${partsHolding.join(", ")}\n${planned.out}\n${checked.out}`);
 
+  // A WORKSTREAM CLOSES ONLY ONCE EVERY SUGGESTION IS DECIDED, PARKED OR DROPPED (RULE.DEVEX.WORKSPACE.489).
+  const suggestionsFile = join(ws, "suggestions.jsonl");
+  const suggest = (list) => writeFileSync(suggestionsFile, list.map((one) => JSON.stringify({ preview: null, words: null, ...one })).join("\n") + "\n");
+  suggest([{ id: "s1", title: "a suggestion nobody has decided, with a title that runs on well past sixty characters in all", state: "raised" }, { id: "s2", title: "shaped, not decided", state: "shaped", arc: "N001" },
+    { id: "s3", title: "settled", state: "decided" }, { id: "s4", title: "Retrospective · command:x fails", state: "raised" }]);
+  const held = cli(root, ["workstream", "close", "031"]);
+  ok("[MKT.SCRIPTS.406] a close refuses while a suggestion reads raised or shaped, naming each as S<n> with its title cut to about sixty characters, the rule, and that nothing was changed",
+    held.code === 1 && held.out.includes('S1 "a suggestion nobody has decided, with a title that runs o..."') && held.out.includes('S2 "shaped, not decided"') && !held.out.includes("S3") && !held.out.includes("S4")
+      && held.out.includes("RULE.DEVEX.WORKSPACE.489") && held.out.includes("Nothing was changed") && !existsSync(closed) && existsSync(ws) && readFileSync(join(ws, "approach.html"), "utf8") === before, held.out);
+  suggest([{ id: "s1", title: "decided now", state: "decided" }, { id: "s2", title: "parked now", state: "parked" }, { id: "s3", title: "dropped now", state: "dropped" }, { id: "s4", title: "Retrospective · command:x fails", state: "raised" }]);
   const noBlock = cli(root, ["workstream", "close", "031"]);
   ok("[MKT.SCRIPTS.398] a page with no closing block refuses the close, naming the shape, the rule and that nothing was changed, before the go is read",
     noBlock.code === 1 && noBlock.out.includes("no closing block") && noBlock.out.includes("What was delivered") && noBlock.out.includes("What was learned") && noBlock.out.includes("Thank you")

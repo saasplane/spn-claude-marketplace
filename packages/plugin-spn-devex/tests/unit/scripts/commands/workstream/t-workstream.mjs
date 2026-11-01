@@ -1049,5 +1049,36 @@ console.log("\n=== workstream close — the retrospective counts failed tests, t
   }
 }
 
+console.log("\n=== a suggestion belongs to an arc (RULE.DEVEX.WORKSPACE.488, .489)");
+{
+  const rowsOf = [{ id: "1", parent: "N001", title: "write the book", kind: "change", repo: "spn-x", work: "DOCS", blockedBy: [], touches: [], state: "ready", entries: ["E1"] }];
+  const sg = await dataWorkspace("sugg-arc", { rows: rowsOf });
+  const run = (...args) => cli(sg.root, ["workstream", ...args]);
+  const records = () => lines(join(sg.ws, "suggestions.jsonl"));
+  const into = run("suggestion", "add", "031/N001", "keep the footbar under Plan");
+  const loose = run("suggestion", "add", "031", "a thought for later");
+  ok("[MKT.SCRIPTS.403] suggestion add takes <NNN>/N<nnn> and writes the arc into the record, S<n> printed with a capital",
+    into.code === 0 && into.out.trim().split("\n")[0] === "S1 · raised" && records()[0].arc === "N001" && records()[0].id === "s1", into.out);
+  ok("[MKT.SCRIPTS.403] raised against the workstream, the record's arc is null", loose.code === 0 && records()[1].arc === null, loose.out);
+  const noArc = run("suggestion", "add", "031/N009", "against an arc that is not there");
+  ok("[MKT.SCRIPTS.403] an arc the workstream does not hold is refused", noArc.code !== 0 && records().length === 2, noArc.out);
+  const moved = run("suggestion", "state", "031", "S2", "shaped", "--arc", "N001");
+  ok("[MKT.SCRIPTS.403] suggestion state shaped --arc N<nnn> sets the arc of a suggestion that had none", moved.code === 0 && records()[1].arc === "N001" && records()[1].state === "shaped", moved.out);
+  const parkedArc = run("suggestion", "state", "031", "S2", "parked", "--arc", "N001");
+  ok("[MKT.SCRIPTS.403] --arc goes only with shaped or decided", parkedArc.code === 2 && /only with `shaped` or `decided`/.test(parkedArc.out), parkedArc.out);
+  writeFileSync(join(sg.ws, "suggestions.jsonl"), `${JSON.stringify({ id: "s1", title: "an older record", state: "raised", preview: null, words: null })}\n`);
+  ok("[MKT.SCRIPTS.403] a record with no arc field is read as null, never as an error", run("suggestion", "state", "031", "S1", "parked").code === 0 && records()[0].state === "parked" && !("arc" in records()[0]));
+
+  // the last row does not land while a suggestion against the arc is open
+  writeFileSync(join(sg.ws, "suggestions.jsonl"), `${JSON.stringify({ id: "s1", title: "x".repeat(80), state: "raised", preview: null, words: null, arc: "N001" })}\n${JSON.stringify({ id: "s2", title: "another", state: "shaped", preview: null, words: null, arc: "N001" })}\n${JSON.stringify({ id: "s3", title: "someone else's", state: "raised", preview: null, words: null, arc: "N002" })}\n`);
+  const refused = run("row", "state", "031/N001", "1", "landed");
+  ok("[MKT.SCRIPTS.404] the write that lands an arc's last row refuses while a suggestion against it is raised or shaped, naming each and saying to decide, park or drop it",
+    refused.code === 1 && refused.out.includes("S1") && refused.out.includes("S2") && !refused.out.includes("S3") && /decide, park or drop/i.test(refused.out) && refused.out.includes("Nothing was changed")
+      && json(join(sg.ws, "arcs", "N001", "state.json")).rows[0].state === "ready", refused.out);
+  writeFileSync(join(sg.ws, "suggestions.jsonl"), `${JSON.stringify({ id: "s1", title: "done", state: "decided", preview: null, words: null, arc: "N001" })}\n${JSON.stringify({ id: "s2", title: "later", state: "parked", preview: null, words: null, arc: "N001" })}\n${JSON.stringify({ id: "s3", title: "someone else's", state: "raised", preview: null, words: null, arc: "N002" })}\n`);
+  const landed = run("row", "state", "031/N001", "1", "landed");
+  ok("[MKT.SCRIPTS.404] decided, parked or dropped suggestions, and another arc's, let it land", landed.code === 0 && json(join(sg.ws, "arcs", "N001", "state.json")).rows[0].state === "landed", landed.out);
+}
+
 console.log(failed ? `\n  ${failed} of ${total} FAILED — workstream commands` : `\n  all ${total} passed — workstream commands`);
 process.exit(failed ? 1 : 0);
