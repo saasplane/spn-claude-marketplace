@@ -154,11 +154,11 @@ spn-devex workstream progress write <workstream> — regenerate the progress blo
 
 spn-devex workstream question raise <workstream>/N<nnn> --file card.json — raise a card: the next number, the record, the card in the approach page's Open
 
-spn-devex workstream question show <qN> --in <notes/N<nnn>/preview.html> — show an open card on an arc's preview, in its Open
+spn-devex workstream question show Q<n> --in <notes/N<nnn>/preview.html> — show an open card on an arc's preview, in its Open
 
-spn-devex workstream question answer <qN> --key <option> --words "…" [--entries E7,E9] — answer a card in your words; it leaves every Open; with --entries, folded into the What, cited, and the go written again
+spn-devex workstream question answer Q<n> --key <option> --words "…" [--entries E7,E9] — answer a card in your words; it leaves every Open; with --entries, folded into the What, cited, and the go written again
 
-spn-devex workstream question withdraw <qN> --words "…" — withdraw a card in your words; it leaves every Open
+spn-devex workstream question withdraw Q<n> --words "…" — withdraw a card in your words; it leaves every Open
 
 spn-devex workstream report write [<workstream>] <report.md> — fold a child's report into its row: state, proof, commits, follow-ups
 
@@ -190,8 +190,8 @@ spn-devex workstream state check [<workstream>] [--facts] [--json] — whether e
 
 spn-devex workstream suggestion add <workstream> "<title>" [--preview …] — raise a suggestion: the next number, raised; it also prints the decisions and rules that already speak to its title
 
-spn-devex workstream suggestion state <workstream> <sN> <state> [--words "…"] — move it on: shaped, decided, parked or dropped, with the words beside the move
+spn-devex workstream suggestion state <workstream> S<n> <state> [--words "…"] — move it on: shaped, decided, parked or dropped, with the words beside the move
 
-spn-devex workstream suggestion edit <workstream> <sN> [--title …] [--preview …] — change its title or its preview, never its state
+spn-devex workstream suggestion edit <workstream> S<n> [--title …] [--preview …] — change its title or its preview, never its state
 
 spn-devex workstream work write — rename altitude and pass to work in every open workstream, one log line for each arc
