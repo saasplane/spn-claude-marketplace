@@ -490,5 +490,26 @@ console.log("\n=== work replaces altitude and pass — MKT.SCRIPTS.326");
   ok("[MKT.SCRIPTS.326] a second read changes nothing", schema.renameDataToWork(data) === 0 && schema.renameToWork(data.rows[0]) === false);
 }
 
+console.log("\n=== versioned records — MKT.SCRIPTS.417");
+{
+  const dir = mkdtempSync(join(tmpdir(), "versioned-"));
+  const log = join(dir, "log.jsonl");
+  writeFileSync(log, `${JSON.stringify({ at: "2026-11-01T10:00+05:30", kind: "note", row: null, note: "old line, no v" })}\n${JSON.stringify({ v: 1, at: "2026-11-01T10:01+05:30", kind: "note", row: null, note: "new" })}\n`);
+  ok("[MKT.SCRIPTS.417] a line without v reads as version 1, beside one that carries it", lib.readJsonl(log).length === 2);
+  ok("[MKT.SCRIPTS.417] versioned puts v first and recordVersionFault accepts 1 and an absent v", Object.keys(schema.versioned({ id: "x" }))[0] === "v" && schema.recordVersionFault({ id: "x" }, "f") === null && schema.recordVersionFault({ v: 1 }, "f") === null);
+  writeFileSync(log, `${JSON.stringify({ v: 2, at: "2026-11-01T10:00+05:30", kind: "note", row: null, note: "from the future" })}\n`);
+  let said = "";
+  try { lib.readJsonl(log); } catch (thrown) { said = thrown.message; }
+  ok("[MKT.SCRIPTS.417] red: a line of a higher version is refused, naming the version and what to do", said.includes("version 2") && said.includes("migration"), said);
+  const other = join(dir, "orders.jsonl");
+  writeFileSync(other, `${JSON.stringify({ v: 9 })}\n`);
+  ok("[MKT.SCRIPTS.417] a file that is not one of the four is read as it was", lib.readJsonl(other).length === 1);
+  const { root, ws } = await dataWorkspace("versioned");
+  lib.logEvent(ws, "N001", "note", null, "written now");
+  const last = lib.readJsonl(join(ws, "arcs", "N001", "log.jsonl")).at(-1);
+  ok("[MKT.SCRIPTS.417] a new log line carries v 1", last?.v === 1 && last.note === "written now", JSON.stringify(last));
+  void root;
+}
+
 console.log(failed ? `\n  ${failed} of ${total} FAILED — workstream library` : `\n  all ${total} passed — workstream library`);
 process.exit(failed ? 1 : 0);

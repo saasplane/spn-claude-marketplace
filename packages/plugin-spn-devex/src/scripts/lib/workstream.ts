@@ -18,7 +18,7 @@ import { withOffset } from "./clock.ts";
 import { isDir, isFile, listdir, workspaceRoot } from "./payload.ts";
 import { APPROACH_PAGE, ARCS, PLUGIN_TEMPLATES, WORKSTREAM_STATES, isApproachPage, workstreamPrefixSource, workstreamsDir, type WorkstreamState } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import {
-  ARC_ID, DONE_STATES, QUESTION_ID, SCHEMA_VERSION, arcFaults, cardName, parentIds,
+  ARC_ID, DONE_STATES, QUESTION_ID, SCHEMA_VERSION, VERSIONED_RECORDS, arcFaults, cardName, parentIds, recordVersionFault, versioned,
   type ArcData, type ArcRow, type Card, type LogLine, type Question, type RowState, type Sheet,
 } from "./workstream-schema.ts";
 
@@ -313,8 +313,14 @@ export function readJson(path: string): unknown {
 export function readJsonl(path: string): unknown[] {
   let text = "";
   try { text = readFileSync(path, "utf8"); } catch { return []; }
+  const checked = VERSIONED_RECORDS.includes(basename(path));
   return text.split("\n").filter((line) => line.trim()).map((line) => {
-    try { return JSON.parse(line); } catch { return undefined; }
+    let record: unknown;
+    try { record = JSON.parse(line); } catch { return undefined; }
+    // A LINE WITHOUT `v` IS VERSION 1; a higher one is refused, naming what to do.
+    const fault = checked ? recordVersionFault(record, path) : null;
+    if (fault) throw new Error(fault);
+    return record;
   });
 }
 
@@ -427,7 +433,7 @@ export const now = (): string => withOffset(new Date());
 
 /** One event on an arc's log. */
 export function logEvent(ws: string, arc: string, kind: string, row: string | null, note: string | null): void {
-  const line = JSON.stringify({ at: now(), kind, row, note });
+  const line = JSON.stringify(versioned({ at: now(), kind, row, note }));
   appendJsonl(logFileOf(ws, arc), JSON.parse(line));
   commitWrites(ws, line);
   // A command may write its pages after its log line; whatever is left is committed under the same line when the run ends.

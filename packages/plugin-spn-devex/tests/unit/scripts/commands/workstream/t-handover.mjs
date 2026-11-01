@@ -26,6 +26,11 @@ put(root, `${home}/suggestions.jsonl`, [{ id: "s7", title: "raised one", state: 
 put(root, "card.json", JSON.stringify(CARD));
 cli(root, ["workstream", "question", "raise", "031/N001", "--file", "card.json"]);
 
+console.log("=== versioned records (MKT.SCRIPTS.417)");
+ok("[MKT.SCRIPTS.417] a card raised now carries v 1", lines(join(ws, "questions.jsonl")).at(-1)?.v === 1, JSON.stringify(lines(join(ws, "questions.jsonl")).at(-1)));
+const added = cli(root, ["workstream", "suggestion", "add", "031/N001", "a probe suggestion"]);
+ok("[MKT.SCRIPTS.417] a suggestion raised now carries v 1", added.code === 0 && lines(join(ws, "suggestions.jsonl")).at(-1)?.v === 1, added.out + JSON.stringify(lines(join(ws, "suggestions.jsonl")).at(-1)));
+
 console.log("=== handover — the block is written from the data, with every label present (MKT.HOOKS.326)");
 {
   const done = cli(root, ["workstream", "handover", "031", "--continue", "run the sheet", "--do-not-touch", "035's files"]);

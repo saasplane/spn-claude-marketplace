@@ -24,7 +24,7 @@ import {
 import { readGo } from "../../lib/go-plan.ts";
 import { isFile } from "../../lib/payload.ts";
 import { runningWorkFault } from "../../checks/questions.ts";
-import { QUESTION_ID, cardFaults, cardId, cardName, type Card, type Question } from "../../lib/workstream-schema.ts";
+import { QUESTION_ID, RECORD_VERSION, cardFaults, cardId, cardName, type Card, type Question } from "../../lib/workstream-schema.ts";
 import { afterWrite, arcNamed, arcSignatures, listOf, refreshIfMoved, typed } from "./_shared.ts";
 import { actions as goActions } from "./go.ts";
 
@@ -87,7 +87,7 @@ function raise(args: string[]): number {
   // THE WINDOW THAT RAISES A CARD IS RECORDED, so the Stop hook puts the card to that window and no other.
   // Claude Code gives every command its window's session id; run by hand, there is none and nothing is recorded.
   const raiser = (process.env.CLAUDE_CODE_SESSION_ID ?? "").trim();
-  const record: Question = { id, arc, title: title!, state: "open", raised: now(), ...(raiser ? { raisedBy: raiser } : {}), shownIn: [],
+  const record: Question = { v: RECORD_VERSION, id, arc, title: title!, state: "open", raised: now(), ...(raiser ? { raisedBy: raiser } : {}), shownIn: [],
     card: { why: rest.why, what: rest.what, viewsLead: rest.viewsLead, views: rest.views, options: rest.options, recommended: rest.recommended }, answer: null };
   records.push(record);
   const lines = finish(ws, records);

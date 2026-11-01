@@ -90,14 +90,14 @@ export type ArcData = {
   [field: string]: unknown;
 };
 export type LogLine = { at: string; kind: string; row?: string | null; note?: string | null; [field: string]: unknown };
-export type Fact = { id: string; fact: string; source: string; commit: string; readAt: string; usedBy: string[]; [field: string]: unknown };
-export type Suggestion = { id: string; title: string; state: string; preview: string | null; words: string | null; [field: string]: unknown };
+export type Fact = { v?: number; id: string; fact: string; source: string; commit: string; readAt: string; usedBy: string[]; [field: string]: unknown };
+export type Suggestion = { v?: number; id: string; title: string; state: string; preview: string | null; words: string | null; [field: string]: unknown };
 export type View = { lens: string; text: string };
 export type Option = { key: string; does: string; costs: string };
 export type Card = { why: string; what: string; viewsLead: string; views: View[]; options: Option[]; recommended: { key: string; reason: string } };
 export type Answer = { key?: string | null; words: string; at: string };
 /** `raisedBy` is the session id of the window that raised the card; a card raised before it was recorded has none. */
-export type Question = { id: string; arc: string; title: string; state: string; raised: string; raisedBy?: string; shownIn: string[]; card: Card; answer: Answer | null; [field: string]: unknown };
+export type Question = { v?: number; id: string; arc: string; title: string; state: string; raised: string; raisedBy?: string; shownIn: string[]; card: Card; answer: Answer | null; [field: string]: unknown };
 
 // ---------------------------------------------------------------------------- the field rules
 
@@ -201,6 +201,22 @@ export function versionFault(version: unknown, where = "state.json"): string {
   if (typeof version === "number" && version > SCHEMA_VERSION)
     return `${where}'s \`schemaVersion\` is ${version}, and this spn-devex reads ${SCHEMA_VERSION}: update the plugin, and it reads the file`;
   return `${where}'s \`schemaVersion\` is \`${String(version)}\`, and this spn-devex reads ${SCHEMA_VERSION}: \`spn-devex plugin migration write 006\` brings it to ${SCHEMA_VERSION}`;
+}
+
+/** The version a card, suggestion, log or fact line is written at. A line with no `v` is version 1, so old lines are never rewritten. */
+export const RECORD_VERSION = 1;
+/** The files whose lines carry `v`. */
+export const VERSIONED_RECORDS: readonly string[] = ["questions.jsonl", "suggestions.jsonl", "log.jsonl", "facts.jsonl"];
+/** A new line of a versioned file: `v` first, then the record. */
+export const versioned = <T extends object>(record: T): { v: number } & T => ({ v: RECORD_VERSION, ...record });
+/**
+ * The fault of a line written at a version this plugin does not read, naming what to do, or null where it reads. A line without
+ * `v` is version 1.
+ */
+export function recordVersionFault(line: unknown, where: string): string | null {
+  const v = isObject(line) ? line.v : undefined;
+  if (v === undefined || (typeof v === "number" && v <= RECORD_VERSION)) return null;
+  return `${where} holds a line of version ${String(v)}, and this spn-devex reads ${RECORD_VERSION}: update the plugin, because the release that writes version ${String(v)} carries the migration that reads it`;
 }
 
 /** Every fault of an arc's `state.json`, read as JSON already. Empty where it holds to the schema. */

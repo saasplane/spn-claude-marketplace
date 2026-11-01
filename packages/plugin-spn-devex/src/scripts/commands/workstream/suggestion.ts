@@ -13,7 +13,7 @@ import { type Action, VALUE, UsageFault, readWords } from "../../../../../plugin
 import { runningWorkFault } from "../../checks/questions.ts";
 import { precedentLines } from "../../lib/precedent.ts";
 import { readArc, readJsonl, suggestionsFileOf, workspaceOf, writeJsonl } from "../../lib/workstream.ts";
-import { SUGGESTION_ID, SUGGESTION_STATES, cardId, cardName, suggestionFaults, type Suggestion } from "../../lib/workstream-schema.ts";
+import { RECORD_VERSION, SUGGESTION_ID, SUGGESTION_STATES, cardId, cardName, suggestionFaults, type Suggestion } from "../../lib/workstream-schema.ts";
 import { arcNamed, refuseFlags, workstreamNamed } from "./_shared.ts";
 
 export const describe = "a suggestion, raised the moment it is raised and moved on as it is shaped, decided, parked or dropped";
@@ -67,7 +67,7 @@ function add(args: string[]): number {
   const running = runningWorkFault(place.ws, title);
   if (running) throw new UsageFault(running);
   const next = Math.max(0, ...records.map((one) => Number(/^s(\d+)$/.exec(one.id)?.[1] ?? 0))) + 1;
-  const record: Suggestion = { id: `s${next}`, title, state: "raised", preview: words.value("preview"), words: null, arc: place.arc };
+  const record: Suggestion = { v: RECORD_VERSION, id: `s${next}`, title, state: "raised", preview: words.value("preview"), words: null, arc: place.arc };
   records.push(record);
   const saved = save(file, records, record);
   for (const line of precedentLines(workspaceOf(), title)) console.log(line);

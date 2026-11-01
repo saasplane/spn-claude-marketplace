@@ -11,7 +11,7 @@ import { existsSync } from "node:fs";
 import { basename, join } from "node:path";
 import { type Action, VALUE, UsageFault, readWords } from "../../../../../plugin-support-lib/src/lib/command.ts";
 import { appendJsonl, factsFileOf, logEvent, now, readJsonl, workspaceOf } from "../../lib/workstream.ts";
-import { factFaults, type Fact } from "../../lib/workstream-schema.ts";
+import { factFaults, versioned, type Fact } from "../../lib/workstream-schema.ts";
 import { arcNamed, listOf } from "./_shared.ts";
 
 export const describe = "one fact, read while ideating, pinned to the commit of its source";
@@ -46,7 +46,7 @@ function write(args: string[]): number {
   const fact: Fact = { id: nextFactId(readJsonl(file)), fact: text, source, commit, readAt: now(), usedBy: listOf(words, "used-by") ?? [] };
   const faults = factFaults(fact, "the fact");
   if (faults.length) throw new UsageFault(`${faults.join("; ")}.`);
-  appendJsonl(file, fact);
+  appendJsonl(file, versioned(fact));
   logEvent(ws, arc, "fact", null, `${fact.id} · ${source}`);
   console.log(`${fact.id} · pinned ${commit}`);
   return 0;
