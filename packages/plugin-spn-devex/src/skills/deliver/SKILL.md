@@ -27,8 +27,13 @@ description: How a change reaches a running setup - what must be true before a r
 - **The tool that changed the wiring owes the handover** (`RULE.DEVEX.AGENT.057` · MUST · skill:spn-devex/deliver)
 - **The sitting that changed the wiring finishes it before it hands anything on** (`RULE.DEVEX.AGENT.059` · MUST · skill:spn-devex/deliver)
 - **A plugin release that changes a shape the agent writes or keeps ships a migration for it** (`RULE.DEVEX.AGENT.094` · MUST · skill:spn-devex/deliver)
+- **RULE.DEVEX.AGENT.109** (`RULE.DEVEX.AGENT.109` · MUST · skill:spn-devex/deliver)
+- **The four plugins carry one version, and release together** (`RULE.DEVEX.AGENT.110` · MUST · skill:spn-devex/deliver)
+- **A version names what is published, never what you are working on** (`RULE.DEVEX.AGENT.129` · MUST · skill:spn-devex/deliver)
+- **The plugins release in lockstep, through one command** (`RULE.DEVEX.AGENT.131` · MUST · skill:spn-devex/deliver)
 - **The tool is released before the plugins are synced** (`RULE.DEVEX.AGENT.135` · MUST · skill:spn-devex/deliver)
 - **Nothing lands in a person's own agent settings** (`RULE.DEVEX.FUNCTION.073` · MUST · skill:spn-devex/deliver)
+- **RULE.DEVEX.UTILS.019** (`RULE.DEVEX.UTILS.019` · MUST · skill:spn-devex/deliver)
 - **spnutils and the plugin ship on their own trains, so Support 5.50.0 goes out first and plugins 0.89.0 after it** (`RULE.DEVEX.WORKSPACE.343` · MUST · skill:spn-devex/deliver)
 
 **Read [`refs/devex/workspace/workstream.md`](../../refs/devex/workspace/workstream.md) before acting.** It holds the loop this skill runs inside: how a prompt is read, where a new ask goes, what a prompt does to a running arc, and how a reply closes.

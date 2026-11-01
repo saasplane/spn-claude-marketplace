@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/10-providers/local/09-deployments.md",
-      "seen": "f2a32f1f"
+      "seen": "578237d1"
     }
   ]
 }
@@ -16,7 +16,7 @@
 
 ## Registering an application is not a layer
 
-**The layer nouns you type are `organization`, `platform` and `environment`; `app` is not among them** (`RULE.DEVEX.FUNCTION.051` · MUST · check:subjects · due:036/N008). Deployments ride the environment noun in the cloud, and locally they are their own command, because an application has to be attached to something already up.
+**The layer nouns you type are `organization`, `platform` and `environment`; `app` is not among them** (`RULE.DEVEX.FUNCTION.051` · MUST · skill:spn-infra/run). Deployments ride the environment noun in the cloud, and locally they are their own command, because an application has to be attached to something already up.
 
 **There is no application-side estate file.** What the command reads comes from the application's own manifest, against the pinned platform declaration. That is what lets a scaffold run before any estate row exists.
 

@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
-      "seen": "fb327f9f"
+      "seen": "64d537b3"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/03-blueprints/01-layers.md",
@@ -40,7 +40,7 @@ A declaration asks four different questions, and each has its own group of facts
 
 **A fixed list is checked before anything is created**, so a misspelling costs a second rather than half an estate. It is also a promise: SaaS Plane publishes code for each value, so writing one is asking for something that already exists. **Adding a value is a register decision, never a setting somebody switches on.**
 
-**Never count the values in a list.** A list is read by the rule that defines it, not by how many values it holds today (`RULE.DEVEX.WORKSPACE.162` · MUST · check:doc-check), and each list is stated once with every other mention pointing at that statement (`RULE.DEVEX.WORKSPACE.165` · MUST · check:doc-check · due:036/N008). A sentence that says *the four postures* stops being true the day a fifth is ruled in.
+**Never count the values in a list.** A list is read by the rule that defines it, not by how many values it holds today (`RULE.DEVEX.WORKSPACE.162` · MUST · check:doc-check), and each list is stated once with every other mention pointing at that statement (`RULE.DEVEX.WORKSPACE.165` · GUIDE). A sentence that says *the four postures* stops being true the day a fifth is ruled in.
 
 ### What a package is, and which rung a fact sits on
 
@@ -64,11 +64,11 @@ An environment declares very little: its `setup`, `region` and `networkIndex`, t
 
 ## Layer nouns × commands
 
-The layers are nouns; each takes `up · down · status`, and `--plan` on `up` or `down` is the plan. Start them in order, and a lower layer missing is the usual reason a higher one will not start. **A platform-scoped command names its platform first, as an argument** (`RULE.DEVEX.UTILS.072` · MUST · check:command-shape · due:036/N008): `infra platform <verb> <spc>`, `infra environment <verb> <spc> <env>`, and the same for `config`, `show`, `logs`, `web` and `domain register`. No environment entry selects a platform. The organization layer takes none, because a repository has at most one organization.
+The layers are nouns; each takes `up · down · status`, and `--plan` on `up` or `down` is the plan. Start them in order, and a lower layer missing is the usual reason a higher one will not start. **A platform-scoped command names its platform first, as an argument** (`RULE.DEVEX.UTILS.072` · MUST · skill:spn-devex/develop): `infra platform <verb> <spc>`, `infra environment <verb> <spc> <env>`, and the same for `config`, `show`, `logs`, `web` and `domain register`. No environment entry selects a platform. The organization layer takes none, because a repository has at most one organization.
 
 | Noun | Commands | Locally | In the cloud |
 | --- | --- | --- | --- |
-| `organization` | up · down · status | the machine's trust bootstrap — the CA, its one trust prompt, the local resolver, the shared ingress, and the root door that `up` installs once so the resolver's files ask for nothing (`RULE.DEVEX.UTILS.073` · MUST · check:command-shape · due:036/N008); `down --clean` keeps the CA and its trust, so the next `up` asks for nothing, and `up --reset-certs` replaces the CA on purpose | accounts, root guardrails, registry pairs, zones |
+| `organization` | up · down · status | the machine's trust bootstrap — the CA, its one trust prompt, the local resolver, the shared ingress, and the root door that `up` installs once so the resolver's files ask for nothing (`RULE.DEVEX.UTILS.073` · MUST · skill:spn-devex/develop); `down --clean` keeps the CA and its trust, so the next `up` asks for nothing, and `up --reset-certs` replaces the CA on purpose | accounts, root guardrails, registry pairs, zones |
 | `platform` | up · down · status — `<spc>` | the platform's container group — engines + each module's local rendering + every stored route registered with the ingress; converges org prerequisites in place | containers, workload accounts, policies, zone, instruments, the tenant edge and its route store |
 | `environment` | up · down · status — `<spc> <env>`, **`--cloud` only** | **no local form exists** — the machine is one environment; targeting it locally is refused by name | network → resources → compute, in order |
 | `app` | up · down | the app's derived converge — schemas, certificates and the ingress vhost; app from the cwd, `-p` overrides | — (deploys ride the pipeline) |
@@ -106,7 +106,7 @@ The commands divide by **what is being changed**, never by who runs them. Each g
 | a cloud command with a missing layer below → **named refusal** | in the cloud each layer has its own principals; locally prerequisites converge in place instead |
 | an apply that ran from a checkout | an apply fetches the published version and applies *that* — a path ref resolves only where the sibling checkout exists, and deliberately not in CI |
 | a whole-estate command | "all layers" of an unstated subject is a context nothing can resolve |
-| an `<spc>` in an apps repository that differs from its `sprepo.json` pin | the platform is named on every platform-scoped command, and the repository already says which one it belongs to (`RULE.DEVEX.UTILS.072` · MUST · check:command-shape · due:036/N008) |
+| an `<spc>` in an apps repository that differs from its `sprepo.json` pin | the platform is named on every platform-scoped command, and the repository already says which one it belongs to (`RULE.DEVEX.UTILS.072` · MUST · skill:spn-devex/develop) |
 | `down` on stateful resources | teardown removes network and compute and **refuses its data** — destroying data is a separate act, named and confirmed separately; `--clean` runs only on an explicit instruction against a named target |
 | an unknown `${…}` reference at `config diff` or `config render` | one direction, one pass, resolved against the composed rungs — a literal `${…}` reaching a vendor is the failure this stops; credentials themselves never live in files, see `refs/laws.md` |
 | a release version already present in the registry pair | a published version is immutable — bump instead, never re-publish; the machine store keeps the same rule |

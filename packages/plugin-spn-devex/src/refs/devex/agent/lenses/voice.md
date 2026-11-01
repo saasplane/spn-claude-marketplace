@@ -13,25 +13,25 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/01-corpus.md",
-      "seen": "49efc31b"
+      "seen": "6fc57b30"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/02-document.md",
-      "seen": "976c630a"
+      "seen": "858e131a"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md",
-      "seen": "66dcc62b"
+      "seen": "9f7e2411"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "The masthead, and the opening",
-      "seen": "1a0d2100"
+      "seen": "a964af7f"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "The words a report uses",
-      "seen": "25da240f"
+      "seen": "aa9dbb74"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md",
@@ -41,7 +41,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/02-document.md",
       "section": "Structure rules",
-      "seen": "912c7da9"
+      "seen": "013e091d"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/01-corpus.md",
@@ -51,22 +51,22 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/02-document.md",
       "section": "The behaviour row",
-      "seen": "f6a350cf"
+      "seen": "cd65aff6"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md",
       "section": "Naming rules",
-      "seen": "f35875fe"
+      "seen": "1b9e1f83"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/03-tree.md",
       "section": "This book divides by area; every other repository divides by domain",
-      "seen": "2748392c"
+      "seen": "aefddb15"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "A construct types no proof, and its rows sit at its own path",
-      "seen": "1ec94c4e"
+      "seen": "44e6fe0b"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md",
@@ -76,7 +76,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md",
       "section": "Counting discipline",
-      "seen": "26c241ed"
+      "seen": "0c413a96"
     }
   ],
   "decisions": [
@@ -148,19 +148,19 @@
   - **A rule keeps its subject.** Warmth sits in the sentence beside it; a class subject never becomes *you*, and a record is never warmed (`RULE.DEVEX.WORKSPACE.096` · MUST · check:doc-check).
   - **Precision outranks warmth on a file that instructs** (DEC.DEVEX.AGENT.032), and the ranking runs both ways.
   - **Nothing measures length, and nothing counts *you*.** What is checked is the missing why, the undefined term, the idiom, the carried phrase and the dropped reasoning.
-  - **A node `README.md` uses no house word** (`RULE.DEVEX.WORKSPACE.125` · MUST · check:doc-check · due:036/N008): *seam*, *mirror*, *realize*, *face*, *construct*; a construct or a mirror defines each where first met.
+  - **A node `README.md` uses no house word** (`RULE.DEVEX.WORKSPACE.125` · GUIDE): *seam*, *mirror*, *realize*, *face*, *construct*; a construct or a mirror defines each where first met.
   - **A term names its area, and a generic word is not a name** (`RULE.DEVEX.WORKSPACE.146` · MUST · short). A second word only where the first collides head-on.
   - **A construct is prose, read to Parts**: Overview, Terms, Model, Parts, Boundary, Binds; the masthead alone above the first heading; a construct types no proof.
   - **The masthead is three levels, all plain language** (`RULE.DEVEX.WORKSPACE.187` · MUST · check:doc-check) (`RULE.DEVEX.WORKSPACE.182` · MUST · check:doc-check): Title, one-sentence Subtitle, one-paragraph Description; a number, slogan, figure of speech or unexplained book word is a finding. The foundation hub's Title and Subtitle are fixed (DEC.DEVEX.WORKSPACE.143), and a new Title or Subtitle the developer has not approved is a finding.
   - **A report uses plain words — MUST**: *docs folder*, *design topic*, *project type*, *worked out from*, *implement*, *folder*, *test*; the book's term only in `code`; the unit defined before it is counted.
-  - **A behaviour row is a record with a shape, and two of its cells are not yours to write** (`RULE.DEVEX.WORKSPACE.128` · MUST · check:doc-check · due:036/N008). The agent writes `Status` and `Updated at` from a named run; `Sees` is never empty; a status is a reading, never a claim.
-  - **A foundation row is a promise of five cells, and a built repository's row carries all ten** (`RULE.DEVEX.WORKSPACE.131` · MUST · check:corpus · due:036/N008) (`RULE.DEVEX.WORKSPACE.132` · MUST · check:doc-check · due:036/N008); a foundation row claiming a status is refused.
-  - **A persona is who the rows speak for, and the audience is a different set.** Every persona names the construct that defines it, and a behaviour row's subject is a persona, never an actor (`RULE.DEVEX.WORKSPACE.090` · MUST · check:doc-check · due:036/N008).
+  - **A behaviour row is a record with a shape, and two of its cells are not yours to write** (`RULE.DEVEX.WORKSPACE.128` · GUIDE). The agent writes `Status` and `Updated at` from a named run; `Sees` is never empty; a status is a reading, never a claim.
+  - **A foundation row is a promise of five cells, and a built repository's row carries all ten** (`RULE.DEVEX.WORKSPACE.131` · GUIDE) (`RULE.DEVEX.WORKSPACE.132` · MUST · check:corpus); a foundation row claiming a status is refused.
+  - **A persona is who the rows speak for, and the audience is a different set.** Every persona names the construct that defines it, and a behaviour row's subject is a persona, never an actor (`RULE.DEVEX.WORKSPACE.090` · GUIDE).
   - **A register row is a record and stays one** (`RULE.DEVEX.WORKSPACE.106` · MUST · check:doc-check): one clause a sentence, the ruling and nothing else, no *you*.
   - **An edit leaves what it touched at standard** (`RULE.DEVEX.WORKSPACE.142` · MUST · check:doc-check), and the reach stops at the file the change opened.
-  - **A number in prose only when the set is closed and the sentence names what it holds** (`RULE.DEVEX.WORKSPACE.144` · MUST · check:doc-check · due:036/N008). Ask what happens when somebody adds one.
+  - **A number in prose only when the set is closed and the sentence names what it holds** (`RULE.DEVEX.WORKSPACE.144` · MUST · check:doc-check). Ask what happens when somebody adds one.
   - **A bare `for you`, `to you` or `on you` is a finding graded RULE, never BLOCK** (`RULE.DEVEX.WORKSPACE.109` · MUST · check:doc-check): strip the phrase, and if what remains no longer reaches, address the reader.
-  - **A document states a status, never a tally of progress** (`RULE.DEVEX.WORKSPACE.163` · MUST · check:doc-check · due:036/N008); a count that is the point is a dated snapshot of a problem that says so.
+  - **A document states a status, never a tally of progress** (`RULE.DEVEX.WORKSPACE.163` · GUIDE); a count that is the point is a dated snapshot of a problem that says so.
   - **Could a newcomer do this after reading it?** A page with a rule and neither its why nor the symptom of breaking it fails, whatever its share says.
 - **The words of a page, by what it is for** — held by this lens worn. The writer decides whether a page is a doc, an app's screen or a marketing page before writing a word.
   - **A doc** follows the readability bar, holds no persuasion, and names the real command, the real path and what the reader will see.

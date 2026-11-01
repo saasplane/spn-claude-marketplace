@@ -8,7 +8,7 @@
 // WHY THIS EXISTS. Three surfaces state that a value in the machine seat is never printed or logged,
 // and a session broke it anyway — five live credentials went into a transcript, hours after arguing
 // the rule at length on the same day. A rule three documents state and no instrument checks is
-// exactly the shape workstream 009 exists to fix. Prose plainly did not stop it.
+// exactly the shape a rule that a check holds exists to fix. Prose plainly did not stop it.
 //
 // WHAT IS AND IS NOT REFUSED. The agent may READ this file; `Q7` settled that, and it has to —
 // `spnutils` reads the whole file on every `sync` to preserve the regions you own. What is refused

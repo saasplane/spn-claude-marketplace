@@ -52,7 +52,7 @@ import { sentenceColumn } from "../lib/item-cells.ts";
 import { findWorkingDetail } from "../lib/working-detail.ts";
 import { isBuilderWorkspace } from "../lib/builder.ts";
 import { findPartnerWords } from "./partner-words.ts";
-import { bookClassFaults, knownHolders, ownMarketplace } from "./book-classes.ts";
+import { bookClassFaults, inPluginSource, knownHolders, ownMarketplace, pluginNameFaults } from "./book-classes.ts";
 import { GUIDE_PAGE_SUFFIX, APPROACH_SUFFIX, ARTIFACT, CONSTRUCT_PAGES, CONSTRUCT_PAGE_SUFFIX, HUB, OVERVIEW_PAGE_SUFFIX, PLUGIN_TEMPLATES, POCKET,
          artifactDocsPathOf, decisionsRegister, inArtifacts, workstreamPrefixSource, isApproachPage, isRegister as inRegisters, pagePlaceOf,
          workstreamDirOf } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
@@ -265,7 +265,7 @@ export function structural(path: string): Finding[] {
 
 // An approach page lives in the workstream that argues it (05-artifacts.md § The approach document),
 // and its arcs sit beside it in `arcs/`. Only a page inside a workstream has arcs to compare against.
-// Workstream 008 is exempt by name: its page was written in the shape before this one, and it
+// One early workstream is exempt by name: its page was written in the shape before this one, and it
 // closes under that shape (05-artifacts.md § The approach document).
 const EXEMPT_WORKSTREAM = /^008-/;
 
@@ -422,7 +422,7 @@ const APPROACH_SECTIONS = ["why", "what", "how", "open", "deferred"];
 
 /**
  * An opening, then Why -> What -> How -> Open -> Deferred, in that order and nothing else
- * (05-artifacts.md § The approach document). `exempt` is workstream 008's page, which keeps the
+ * (05-artifacts.md § The approach document). `exempt` is the early workstream's page, which keeps the
  * shape it was written in and is held only to the skeleton.
  */
 export function approachShape(text: string, exempt = false): Finding[] {
@@ -461,7 +461,7 @@ export function approachShape(text: string, exempt = false): Finding[] {
 // 05-artifacts.md § The masthead, and the opening (RULE.DEVEX.WORKSPACE.187, RULE.DEVEX.WORKSPACE.182).
 // The header holds the Title (`h1`), an optional Subtitle (`p.sds-subtitle`) and the Description (one
 // `p.sds-standfirst`), in that order, and nothing after the Description. Every masthead finding is SOFT
-// while the trees outside the foundation wait for their retrofit (N116 row 9); when every tree
+// while the trees outside the foundation wait for their retrofit (the retrofit still owed); when every tree
 // audits clean, change SECOND_PARAGRAPH to RULE, because the chapter states that rule as MUST.
 const SECOND_PARAGRAPH = "SOFT";
 const MASTHEAD = "SOFT";
@@ -1302,7 +1302,7 @@ export function check(path: string, text: string, fragment = false): Finding[] {
   } else if (isOverview) {
     out.push(...overviewShape(text));
   }
-  // Workstream 008's own page keeps the shape it was written in, as it does for approachShape.
+  // The early workstream's own page keeps the shape it was written in, as it does for approachShape.
   if (isHtml && !fragment && !(isApproach && exemptWorkstream(path))) out.push(...masthead(path, text));
   // What the template left in, on the whole page; the working detail in whatever is written.
   if (isHtml && !exemptWorkstream(path) && !inClosedWorkstream(path)) {
@@ -1316,7 +1316,7 @@ export function check(path: string, text: string, fragment = false): Finding[] {
   // A plugin file is the agent's to act on, and the compressed fault reads only the places a person reads.
   if (!isOperative(path) && !isRegister(path)) out.push(...compressedRule(text, isHtml));
   if (isRegister(path)) out.push(...rows(text)[0]);
-  if (inBook(path)) out.push(...bookClassFaults(text, knownHolders(ownMarketplace(), workspaceRoot(dirname(path)))).map((f) => ["RULE", f] as Finding));
+  if (inBook(path)) out.push(...bookClassFaults(text, knownHolders(ownMarketplace())).map((f) => ["RULE", f] as Finding));
   return out;
 }
 
@@ -1516,11 +1516,16 @@ export function checkDoc(payload: Payload): Verdict {
   let fragment = false;
 
   if (path) {
-    if (!watched(path)) return null;
-    fragment = supplied.content === undefined && supplied.new_string !== undefined;
     const text = supplied.content || supplied.new_string || "";
-    if (!text && !structural(path).length) return null;
-    found = check(path, text, fragment);
+    // A write into a plugin's source or tests is judged for a workstream's name, as the book is.
+    const named: Finding[] = inPluginSource(path) ? pluginNameFaults(text, path).map((f) => ["RULE", f] as Finding) : [];
+    if (!watched(path)) { if (!named.length) return null; }
+    fragment = supplied.content === undefined && supplied.new_string !== undefined;
+    if (watched(path)) {
+      if (!text && !structural(path).length && !named.length) return null;
+      found = check(path, text, fragment);
+    }
+    found.push(...named);
   } else {
     const writes = bashWrites(supplied.command ?? "").filter((w) => watched(w[0]));
     if (!writes.length) return null;

@@ -1,7 +1,7 @@
 import { PLUGIN } from "../../../helpers/harness.mjs";
 // `window` — which workstreams a window works on, and what a hook says to it (RULE.DEVEX.WORKSPACE.236).
 //
-// The fault this proves gone: a window on workstream 021 was asked for the cards of workstream 024,
+// The fault this proves gone: a window on one workstream was asked for the cards of another,
 // because the Stop hook bound a window to any folder whose NAME appeared in the text of a write, and the
 // PreToolUse note read every open workstream with no window at all. Every case here fails on that code.
 import { execFileSync } from "node:child_process";
@@ -76,7 +76,7 @@ console.log("\n=== window — what binds a window, and what does not");
   check("a handover prompt owns the workstream its continue line names",
     JSON.stringify(bindingsOf(handover(`workstream ${B}, arc N1`), root, "h1")) === JSON.stringify([{ name: B, by: "handover" }]));
   check("a handover that names two workstreams gives two owned",
-    bindingsOf(handover(`open workstream ${A}; ${B} N1 waits on it`), root, "h2").map((one) => one.name).sort().join() === `${A},${B}`);
+    bindingsOf(handover(`open workstream ${A}; ${B} N001 waits on it`), root, "h2").map((one) => one.name).sort().join() === `${A},${B}`);
   check("a prompt that names two workstreams and holds no handover binds neither", bindingsOf(`compare ${A} with ${B}`, root, "h3").length === 0);
   check("a prompt that names one binds it", bindingsOf(`work on ${B}`, root, "h4")[0]?.name === B);
   bindNamed(root, "h5", A, "prompt");
@@ -239,6 +239,23 @@ console.log("\n=== window — no hook reads every open workstream to speak of it
     });
   }
   check("every read of the open workstreams is filtered by the window's set, bar the snapshot and the sweep", unfiltered.length === 0, unfiltered.join("\n        "));
+}
+
+console.log("\n=== window — which welcome a window was sent — MKT.HOOKS.342");
+{
+  const root = workspace("window-welcome", {});
+  check("[MKT.HOOKS.342] a note with no welcome reads it absent", readWindow(root, "wel").welcome === undefined, JSON.stringify(readWindow(root, "wel")));
+  check("[MKT.HOOKS.342] noteWelcome is exported", typeof windowLib.noteWelcome === "function");
+  windowLib.noteWelcome?.(root, "wel", "whole");
+  check("[MKT.HOOKS.342] readWindow keeps the welcome that noteWelcome wrote", readWindow(root, "wel").welcome === "whole", JSON.stringify(readWindow(root, "wel")));
+  windowLib.noteWelcome?.(root, "wel", "short");
+  check("[MKT.HOOKS.342] and the later form replaces it", readWindow(root, "wel").welcome === "short", JSON.stringify(readWindow(root, "wel")));
+  const file = join(root, ".spndevex", ".debug", "sessions", "old", "window.json");
+  mkdirSync(join(file, ".."), { recursive: true });
+  writeFileSync(file, JSON.stringify({ workstreams: {}, wrote: {}, told: {}, repos: {} }), "utf8");
+  check("[MKT.HOOKS.342] a note written before the field reads it absent", readWindow(root, "old").welcome === undefined);
+  writeFileSync(file, JSON.stringify({ welcome: "loud" }), "utf8");
+  check("[MKT.HOOKS.342] a welcome that is neither form reads absent", readWindow(root, "old").welcome === undefined);
 }
 
 console.log(failed ? `\n  ${failed} FAILED` : `\n  all ${n} passed`);

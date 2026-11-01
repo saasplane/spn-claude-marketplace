@@ -55,6 +55,7 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 import { workspaceDir } from "../../../../plugin-support-lib/src/lib/debug-store.ts";
 import { commandWords, usageLine } from "../../../../plugin-support-lib/src/lib/command.ts";
 import { isDir, isFile, listdir, read, readPayload, runAlone, type Payload } from "../lib/payload.ts";
+import { noteWelcome } from "../lib/window.ts";
 import { ARCS, DEVEX, SESSIONS, WORKSTREAM_STATES, isApproachPage, isWorkspaceDevex, legacyWorkstreamsDir, workstreamsDir } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { isBuilderWorkspace } from "../lib/builder.ts";
 import { arcIdsOf, notesDirOf } from "../lib/workstream.ts";
@@ -841,7 +842,7 @@ export function migrationLines(root: string): string[] {
  * running, held, waiting (with what they wait on) and ready to launch, the running parts whose report sits beside the brief waiting to be folded,
  * and the next step. `only` keeps the workstreams of one window; a plan that cannot be read is left out.
  */
-export function goStandings(root: string, only: Set<string> | null = null): Array<{ workstream: string; lead: string;
+export function goStandings(root: string, only: Set<string> | null = null): Array<{ workstream: string; lead: string; scope: string[];
   running: string[]; held: string[]; ready: string[]; waiting: Array<{ id: string; on: string }>; unfolded: string[]; next: string }> {
   const out: ReturnType<typeof goStandings> = [];
   const open = workstreamsDir(root, "open");
@@ -873,7 +874,7 @@ export function goStandings(root: string, only: Set<string> | null = null): Arra
                   ? `wait for ${running.join(", ")}, then fold each report with \`spn-devex workstream report write\`.`
                   : `\`spn-devex workstream go show ${ref}\`.`;
       const waiting = plan.parts.filter((part) => part.state === "waiting").map((part) => ({ id: part.id, on: part.waitingOn ?? "something outside the window" }));
-      out.push({ workstream: name, lead, running, held: ids("held"), ready: launchable.map((part) => part.id), waiting, unfolded, next });
+      out.push({ workstream: name, lead, scope: plan.scope, running, held: ids("held"), ready: launchable.map((part) => part.id), waiting, unfolded, next });
     }
   }
   return out;
@@ -1123,6 +1124,8 @@ if (runAlone("orientation.ts")) {
     const whole = !stdinMode || welcomeDue(root);
     result = orient(root, cwd, whole);
     if (stdinMode && whole) markWelcome(root);
+    // WHICH WELCOME WENT OUT, noted in the window so the Stop hook holds the first reply to the whole one only where it was sent.
+    if (stdinMode) noteWelcome(root, payload.session_id, whole ? "whole" : "short");
   }
   catch (err) {
     if (!stdinMode) console.error(`orientation unavailable: ${err}`);

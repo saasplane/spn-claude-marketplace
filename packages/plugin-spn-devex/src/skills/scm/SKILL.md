@@ -38,6 +38,7 @@ description: The repository and project standard - what a project must declare, 
 - **`spnutils repo promote <to> [--from <branch>]` moves a change up** (`RULE.DEVEX.FUNCTION.066` · MUST · skill:spn-devex/scm)
 - **A release is cut only from `main`** (`RULE.DEVEX.FUNCTION.067` · MUST · skill:spn-devex/scm)
 - **RULE.DEVEX.FUNCTION.068** (`RULE.DEVEX.FUNCTION.068` · MUST · skill:spn-devex/scm)
+- **A commit subject, a pull request title and a pull request body are written for a developer reviewing on GitHub** (`RULE.DEVEX.FUNCTION.069` · MUST · skill:spn-devex/scm)
 - **The checks are switched off until the cloud runs them** (`RULE.DEVEX.FUNCTION.070` · MUST · skill:spn-devex/scm)
 - **RULE.DEVEX.FUNCTION.071** (`RULE.DEVEX.FUNCTION.071` · MUST · skill:spn-devex/scm)
 - **A `hotfix/<subject>` is cut from `main` for production, or from `uat` or `qa` where only that environment needs the fix, never from `develop`. It merges by a pull request back into the branch it came from, and `spnutils repo backmerge <branch>` then merges it into each permanent branch below that one, in order, down to `develop`** (`RULE.DEVEX.FUNCTION.072` · MUST · skill:spn-devex/scm)
@@ -51,6 +52,11 @@ description: The repository and project standard - what a project must declare, 
 - **RULE.DEVEX.FUNCTION.087** (`RULE.DEVEX.FUNCTION.087` · MUST · skill:spn-devex/scm)
 - **RULE.DEVEX.FUNCTION.088** (`RULE.DEVEX.FUNCTION.088` · MUST · skill:spn-devex/scm)
 - **RULE.DEVEX.FUNCTION.089** (`RULE.DEVEX.FUNCTION.089` · MUST · skill:spn-devex/scm)
+- **Identity is carried by a manifest per system, and each is read by exactly one** (`RULE.DEVEX.WORKSPACE.398` · MUST · skill:spn-devex/scm)
+- **Only a repository whose world has a realization carries claims; every other world writes its configuration as empty** (`RULE.DEVEX.WORKSPACE.399` · MUST · skill:spn-devex/scm)
+- **Every package reference uses one grammar, whatever it points at** (`RULE.DEVEX.WORKSPACE.400` · MUST · skill:spn-devex/scm)
+- **A repository declares its world, and *no claim* is itself a value rather than a missing file** (`RULE.DEVEX.WORKSPACE.464` · MUST · skill:spn-devex/scm)
+- **A root's shape and its documentation seats derive from the world it declares, and a node's from its own manifest** (`RULE.DEVEX.WORKSPACE.465` · MUST · skill:spn-devex/scm)
 
 **Read [`refs/devex/workspace/workstream.md`](../../refs/devex/workspace/workstream.md) before acting.** It holds the loop this skill runs inside: how a prompt is read, where a new ask goes, what a prompt does to a running arc, and how a reply closes.
 
@@ -110,7 +116,7 @@ A repo is wired by `repo`; the folder the repos sit in is minted by `workspace`.
 | `workspace status` | the orientation — members, world, wiring, every workstream, and any split-plan row still unlanded | reads only |
 | `workspace worktree add <NNN>` · `remove <NNN>` | opens and removes the workstream's worktree set, `.worktrees/<NNN>-<subject>/`, with the branch `feat/<NNN>-<subject>` cut from `origin/develop` in each repository its rows name (`--from <branch>` cuts a fix's set from `main`, `uat` or `qa`) | the set, never a member |
 
-**The machine seat sits one level above again: `~/.spnenv`, one file for every SaaS Plane value.** `init` and `sync` provision its **shape** — five marked regions, the producer and managed regions rewritten whole, the devex region's two tokens written once when missing, the keep region laid out. **They derive no key from a declaration.** You add a key when you build what needs it, and the developer supplies the value. The tool writes no shell profile, and you never edit one either. **Never print or expand a value from that file** — test that a key is set, and nothing more. Run `init` inside a scratch folder and it rewrites the real seat, so point `HOME` at a temp directory for a demo. Read `refs/devex/workspace/workspace.md` § The machine seat for the regions, the layout and the namespacing rule.
+**The saasplane env sits one level above again: `~/.spnenv`, one file for every SaaS Plane value.** `init` and `sync` provision its **shape** — five marked regions, the producer and managed regions rewritten whole, the devex region's two tokens written once when missing, the keep region laid out. **They derive no key from a declaration.** You add a key when you build what needs it, and the developer supplies the value. The tool writes no shell profile, and you never edit one either. **Never print or expand a value from that file** — test that a key is set, and nothing more. Run `init` inside a scratch folder and it rewrites the real saasplane env, so point `HOME` at a temp directory for a demo. Read `refs/devex/workspace/workspace.md` § The saasplane env for the regions, the layout and the namespacing rule.
 
 **There is no workstream command, and adding one is a defect.** Opening a subject is `mkdir`, listing what is open is what `status` already reports, and the close is a gate rather than a command.
 
@@ -146,7 +152,7 @@ A workstream is `.spndevex/workstreams/{state}/{NNN}-{subject}/`, and its state 
 ## Branches, promotion and releases
 
 - **A workstream commits on `feat/<NNN>-<subject>` in its worktree set, and one pull request per repository carries it into `develop`.** A commit on `develop`, `qa`, `uat` or `main` is refused, and the branch takes `origin/develop` at the start of each pass and again before each push and each pull request, rebasing where `develop` moved.
-- **A commit subject, a pull request title and a pull request body are written for a developer reviewing on GitHub** (`RULE.DEVEX.FUNCTION.069` · MUST · check:stop · due:036/N008). They say what changed for someone using the code, in the words of the approach page and the preview, and name no workstream, arc, row, order or card number. A commit already pushed is not rewritten to fit this.
+- **A commit subject, a pull request title and a pull request body are written for a developer reviewing on GitHub** (`RULE.DEVEX.FUNCTION.069` · MUST · check:stop). They say what changed for someone using the code, in the words of the approach page and the preview, and name no workstream, arc, row, order or card number. A commit already pushed is not rewritten to fit this.
 - **Each check runs at the first step that can run it.** The push check runs the offline tiers; the stack tiers run on the pull request into `develop`; a promotion reruns nothing.
 - **The path to `main` is chosen at each promotion** with `spnutils repo promote <to> [--from <branch>]`, a merge commit each time. `main` takes merges from `develop`, `qa`, `uat` or a `hotfix/*`, never from a feature branch. A required job, `promotion-source`, refuses any other head into `qa`, `uat` or `main`, a fork's included, and names `spnutils repo promote`. The agent names the path and asks which branch a change goes to when the developer has not said.
 - **A fix takes its own path.** `hotfix/<subject>` is cut from `main`, `uat` or `qa`, never `develop`, is tested in its own pull request back into its source, and `spnutils repo backmerge <branch>` merges it down to `develop`.

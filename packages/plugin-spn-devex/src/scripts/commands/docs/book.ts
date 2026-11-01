@@ -15,7 +15,6 @@ import { type Action, readWords, UsageFault, VALUE } from "../../../../../plugin
 import { POCKET } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { writeRunFile } from "../../../../../plugin-support-lib/src/lib/runs.ts";
 import { bookClassFaults, knownHolders, ownMarketplace } from "../../checks/book-classes.ts";
-import { workspaceRoot } from "../../lib/payload.ts";
 import { bookLine, findBook, noBookReason } from "../restates/check.ts";
 
 export const describe = "the book check over the whole book — every parenthesis reads, names a level and a holder that exists";
@@ -41,7 +40,7 @@ function check(args: string[]): number {
   if (book === null) { console.error(noBookReason(process.cwd())); return 2; }
   console.log(bookLine(book, words.paths.length === 1, process.cwd()));
 
-  const known = knownHolders(ownMarketplace(), workspaceRoot(book));
+  const known = knownHolders(ownMarketplace());
   const read = chapters(book);
   let faults = 0;
   for (const file of read)

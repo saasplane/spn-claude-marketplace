@@ -2,9 +2,9 @@
 //
 // The paragraphs worth rewriting, so a prose pass reads candidates rather than a corpus.
 //
-// Workstream 008 covers every prose sentence in the workspace — 33,166 of them at the time this was
+// The prose pass covers every prose sentence in the workspace — 33,166 of them at the time this was
 // written. Handing that to agents whole is the expensive way to do it, and most of it needs no
-// change. Six of the nine faults that workstream names are detectable by pattern, so this reports
+// change. Six of the nine faults that pass names are detectable by pattern, so this reports
 // where they are and a rewriting pass reads only those paragraphs and their headings.
 //
 //   spn-devex docs prose list [<path>…]     report per file, most candidates first

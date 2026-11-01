@@ -4,17 +4,17 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "section": "One agent, one lens per engineering function",
-      "seen": "8189487f"
+      "seen": "63099a2f"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "section": "It opens on the welcome and one status line, never a status dump",
-      "seen": "4ac840e0"
+      "seen": "50157fa2"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "section": "A reply speaks as a teammate: the moment chooses its register, its icon and its shape",
-      "seen": "cf235e1e"
+      "seen": "5df29016"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
@@ -29,12 +29,12 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "section": "The front desk stays open while work runs",
-      "seen": "1b6effa4"
+      "seen": "e7031017"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "section": "Where work runs, by cost",
-      "seen": "3dd16782"
+      "seen": "f8f7d4fb"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
@@ -44,7 +44,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "section": "The four token levers are hooks that refuse, not lines of prose",
-      "seen": "42ed45d6"
+      "seen": "1295bd1f"
     }
   ]
 }
@@ -101,7 +101,7 @@ great*, and any other as a return. In a builder's workspace, the one
 speaks for the people who build on what the builders publish and is no seat on a partner's team. The
 plugin types it, so a partner's workspace shows the same words with no book in it. The roles line
 groups the team by function: Leadership, Engineering, Product and design, Data and AI, Go-to-market,
-and Finance and business, each naming the roles inside it that its own name does not already say (`RULE.DEVEX.WORKSPACE.283` · MUST · check:orientation · due:036/N008).
+and Finance and business, each naming the roles inside it that its own name does not already say (`RULE.DEVEX.WORKSPACE.283` · MUST · check:stop).
 
 **The instruction to say it comes before the welcome itself.** A long session-start text reaches the
 agent as its first 2 KB, with the rest kept in a file, so the line that says to open with the whole
@@ -123,7 +123,7 @@ output, and a reader learns to scroll past it, including the day it says somethi
 | The first prompt | What the agent does |
 | --- | --- |
 | **a handover, or a named workstream or arc** | picks it up at once, without asking again. **A handover's `model:` line is checked first** (`RULE.DEVEX.WORKSPACE.196` · MUST · short): compare its model with the one your system prompt names, and on a mismatch open the reply with one line naming both models and saying to switch with the model picker, then run nothing until the developer switches or says to go on. **The effort is not checked**: the developer sets it in the extension's picker, and `CLAUDE_EFFORT` can disagree with that picker, so the effort on the `model:` line is a note for the developer who opens the window. Then read its arcs and its plan before anything else |
-| **something new** | asks for the goal in one or two plain questions, never lettered options or a `Q<n>` card, because a card lives on an approach page that does not exist yet (`RULE.DEVEX.AGENT.077` · MUST · check:stop · due:036/N008); then opens a workstream for it. That is `S1` |
+| **something new** | asks for the goal in one or two plain questions, never lettered options or a `Q<n>` card, because a card lives on an approach page that does not exist yet (`RULE.DEVEX.AGENT.077` · MUST · check:stop); then opens a workstream for it. That is `S1` |
 | **a question** | answers it. A question needs no workstream |
 | **just hello** | offers the open work, with what each item waits on, or asks what to build. Only this prompt ends on a question |
 
@@ -386,7 +386,7 @@ recognize it and run the skill. **Telling someone to invoke a skill by name brea
 ## The front desk stays open while work runs
 
 **While work runs, the main agent plans, dispatches and reports, and a subagent does the long work**
-(`RULE.DEVEX.AGENT.076` · MUST · check:stop · due:036/N008). The main agent reads the next rows and the saved plan, hands a batch to
+(`RULE.DEVEX.AGENT.076` · MUST · skill:spn-devex/execute). The main agent reads the next rows and the saved plan, hands a batch to
 a subagent with a model chosen for the task, and writes the developer a milestone line when the
 batch lands, in the shape `refs/devex/workspace/workstream.md` § *The reply while work runs shows
 what needs you, then what moved* states. **A batch runs all its documents, then all its source, then
@@ -417,7 +417,7 @@ groups a child's rows into orders, at most five children at once, each with its 
 | a decision, a card, an arc record, a review of a child's work, a small edit | the main window | it is your conversation |
 
 **Before an arc's rows are written, the architect's view sets their order from the kind of work**
-(`RULE.DEVEX.WORKSPACE.241` · MUST · check:workstream-state · due:036/N008). Decisions come before building, a release comes once, and each
+(`RULE.DEVEX.WORKSPACE.241` · MUST · skill:spn-devex/ideate). Decisions come before building, a release comes once, and each
 piece goes to the cheapest mechanism that can do it properly. The table above places one piece of
 work. This rule orders all the pieces of an arc against each other.
 
@@ -429,7 +429,7 @@ below). The refusal names the report the order says the child owes, so the child
 rest of the order goes to a fresh child whose new order quotes the report. A follow-up never goes by
 `SendMessage` to a child past 150,000: it becomes the first line of a fresh child's order. An order is cut
 so that each child can stop between rows. A child's stop records the child's turns in telemetry, tagged with
-its `agent`, so the cost of a child is read from telemetry as a window's is (`RULE.DEVEX.AGENT.082` · MUST · check:subagentstop · due:036/N008).
+its `agent`, so the cost of a child is read from telemetry as a window's is (`RULE.DEVEX.AGENT.082` · MUST · skill:spn-devex/develop).
 
 ### The four token levers are hooks that refuse, not lines of prose
 

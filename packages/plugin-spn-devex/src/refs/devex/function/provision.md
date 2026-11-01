@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/06-provision.md",
-      "seen": "ed036da0"
+      "seen": "0f82b44d"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/01-function/06-provision.md",
-      "seen": "ccf8354e"
+      "seen": "8ef4e0e5"
     }
   ]
 }
@@ -30,7 +30,7 @@
 
 **An unimplemented layer is absent, never stubbed.** A stub answers, so you learn what you were relying on only when the real run refuses you.
 
-**The local stack keeps one domain for each app and one database, and a workstream resets and migrates it rather than registering a second host or database** (`RULE.DEVEX.FUNCTION.080` · MUST · check:stop · due:036/N008). A second host or database is a shape no declaration describes, so a test that passes against it proves nothing about the estate.
+**The local stack keeps one domain for each app and one database, and a workstream resets and migrates it rather than registering a second host or database** (`RULE.DEVEX.FUNCTION.080` · MUST · skill:spn-devex/provision). A second host or database is a shape no declaration describes, so a test that passes against it proves nothing about the estate.
 
 **Diagnose down the layers, never across the symptoms.** A higher layer failing usually means a lower one is not up. Chasing the symptom where it appeared is how an afternoon disappears.
 

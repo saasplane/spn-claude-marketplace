@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/01-function/05-test.md",
-      "seen": "c237698d"
+      "seen": "24d801fe"
     }
   ]
 }
@@ -30,7 +30,7 @@
 
 **A run is named by whoever starts it, and leaves its answer in a file of that name**: `tests/.output/<tier>/runs/<run>.json`, or `<run>.<phase>.json` for a journey phase. The name is required and the caller chooses it. A reused name replaces that one file, and each tier keeps its 20 newest. The stamp is told which run to read, and writes each row's `Updated at` as the time and the run's name, so a row names the run that proved it.
 
-**The tier decides which cases carry the id** (`RULE.DEVEX.FUNCTION.064` · MUST · check:subjects · due:036/N008). Every contract, component and journey case carries one, and so does every integration case proving a guarantee and every unit case proving a `UNIT` row. A case over a private rule names the rule instead.
+**The tier decides which cases carry the id** (`RULE.DEVEX.FUNCTION.064` · MUST · skill:spn-apps/implement). Every contract, component and journey case carries one, and so does every integration case proving a guarantee and every unit case proving a `UNIT` row. A case over a private rule names the rule instead.
 
 **A row's tier equals the tier of the case that proves it.** A run writes only the rows that declare the tier it ran, so a row naming one tier, whose only case runs at another, never reads as proven.
 
@@ -64,7 +64,7 @@
 
 **In a change to an apps page, the agent changes code only and shows the look** (`RULE.DEVEX.FUNCTION.079` · MUST · short). It writes or runs tests only after the developer confirms the look, and none where the arc says no tests. The look is the developer's call, and a test written before it fixes a look nobody agreed.
 
-**One repository's test calls run one after another, never in parallel Bash calls, and each output is read for the run file it names** (`RULE.DEVEX.FUNCTION.082` · MUST · check:stop · due:036/N008). Runs in one repository share its caches and result files, so a parallel run can overwrite or read another's. The run file the output names is how you know which run you read.
+**One repository's test calls run one after another, never in parallel Bash calls, and each output is read for the run file it names** (`RULE.DEVEX.FUNCTION.082` · MUST · skill:spn-devex/test). Runs in one repository share its caches and result files, so a parallel run can overwrite or read another's. The run file the output names is how you know which run you read.
 
 **How much of a tier runs is the tests group's to say, and this stage routes there.** While work is under way, the agent runs the cases of what it touched. A whole tier runs before a release, or in one of five named cases. The `test` skill states both, in § The selective loop and § When a whole tier runs: what counts as touched, how the runs are named and stamped, and the five cases.
 

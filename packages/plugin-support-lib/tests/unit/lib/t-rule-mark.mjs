@@ -26,22 +26,26 @@ console.log("=== the book's form, one class each");
     "",
     "**A page is handed over as its whole `file:///` address** (rule RULE.DEVEX.AGENT.113 · MUST · check:page-path).",
     "",
-    "**A runtime widens the three slots and never adds a fourth** (rule RULE.SUPPORT.CORE.001 · MUST · check:apps-runtime-slots · due:036/N008).",
+    "**A runtime widens the three slots and never adds a fourth** (rule RULE.SUPPORT.CORE.001 · MUST · skill:spn-apps/implement).",
     "",
     "**A provider enum is named for the side that declares it** (rule RULE.PLATFORM.IAM.005 · MUST · skill:spn-apps/implement).",
+    "",
+    "**A panel keeps its lenses' rules** (rule RULE.DEVEX.AGENT.200 · MUST · agent:spn-devex/spn-panel).",
     "",
     "| The end of a line | its actions, a badge, or both (rule RULE.SUPPORT.SURFACE.059 · GUIDE) |",
   ].join("\n");
   const { marks, faults } = readMarks(text, "book");
-  ok("[MKT.SCRIPTS.197] five parentheses read and none refused", marks.length === 5 && faults.length === 0, JSON.stringify(faults));
-  const [stated, checked, due, skill, guide] = marks;
+  ok("[MKT.SCRIPTS.197] six parentheses read and none refused", marks.length === 6 && faults.length === 0, JSON.stringify(faults));
+  const [stated, checked, core, skill, agent, guide] = marks;
   ok("[MKT.SCRIPTS.197] a sentence wrapped over two lines finds its parenthesis, on the line the parenthesis is on",
     stated.sentence.startsWith("Managing the arcs") && stated.line === 4, `${stated.line} ${stated.sentence}`);
   ok("[MKT.SCRIPTS.197] the heading above a parenthesis is carried", stated.heading === "Arcs and workstreams", stated.heading);
   ok("[MKT.SCRIPTS.197] `short` stands alone and makes the rule stated", stated.params.short === true && classOf(stated.level, stated.params) === "stated");
   ok("[MKT.SCRIPTS.197] `check:` makes the rule checked", checked.params.check === "page-path" && classOf(checked.level, checked.params) === "checked");
-  ok("[MKT.SCRIPTS.197] `due:` beside `check:` names the arc that builds it", due.params.due === "036/N008" && holderFaults(due.level, due.params).length === 0);
+  ok("[MKT.SCRIPTS.197] a runtime rule is held by the skill where a module is built", core.params.skill === "spn-apps/implement" && classOf(core.level, core.params) === "stated in a skill");
   ok("[MKT.SCRIPTS.197] `skill:` names a plugin and a skill", skill.params.skill === "spn-apps/implement" && classOf(skill.level, skill.params) === "stated in a skill");
+  ok("[MKT.SCRIPTS.325] `agent:` names a plugin and an agent, and the rule is kept by an agent",
+    agent.params.agent === "spn-devex/spn-panel" && holderFaults(agent.level, agent.params).length === 0 && classOf(agent.level, agent.params) === "kept by an agent");
   ok("[MKT.SCRIPTS.197] a table row's parenthesis reads, and GUIDE takes no holder", guide.level === "GUIDE" && classOf(guide.level, guide.params) === "guidance");
 }
 
@@ -56,7 +60,10 @@ console.log("\n=== what a writer is told");
   ok("[MKT.SCRIPTS.198] a parenthesis with no level reads, and its fault is the level", holderFaults(null, {})[0].includes("names no level"));
   ok("[MKT.SCRIPTS.198] a MUST that nothing holds is a fault", holderFaults("MUST", {})[0].includes("names what holds it"));
   ok("[MKT.SCRIPTS.198] a guidance rule that names a holder is a fault", holderFaults("GUIDE", { short: true })[0].includes("names no holder"));
-  ok("[MKT.SCRIPTS.198] `due:` with no `check:` is a fault", holderFaults("MUST", { short: true, due: "036/N008" }).some((f) => f.includes("comes with `check:`")));
+  ok("[MKT.SCRIPTS.325] a `due:` is an unknown key, as any other, and the list is named without it",
+    fault(" · MUST · check:page-path · due:a/b").includes("`due` is not a param key") && fault(" · MUST · due:a/b").endsWith("`check`, `short`, `skill`, `agent`"), fault(" · MUST · due:a/b"));
+  ok("[MKT.SCRIPTS.325] an agent holder beside another holder is a fault", holderFaults("MUST", { agent: "spn-devex/spn-panel", check: "x" }).some((f) => f.includes("one holder")));
+  ok("[MKT.SCRIPTS.325] a MUST that nothing holds names `agent:` among the holders", holderFaults("MUST", {})[0].includes("`agent:`"));
   ok("[MKT.SCRIPTS.198] two holders are a fault", holderFaults("MUST", { short: true, check: "x" }).some((f) => f.includes("one holder")));
 }
 

@@ -71,6 +71,8 @@ export type ArcRow = {
   repo?: string | null; altitude?: string | null; mechanism?: string | null; acceptance?: string | null; model?: string | null;
   blockedBy?: string[]; touches?: string[]; decisions?: string[]; facts?: string[]; entries?: string[];
   state?: RowState | null; proof?: string | null; cost?: Cost | null; commits?: Record<string, string[]> | null; order?: string | null;
+  /** What a `waiting` row waits on outside the window, in plain words: a release, a sign-in, another window's hold. */
+  waitingOn?: string | null;
   [field: string]: unknown;
 };
 export type ArcData = {
@@ -176,6 +178,7 @@ const ROW_FIELDS: Record<string, Rule> = {
   state: { kind: "enum", required: false, values: ROW_STATES, nullable: true },
   proof: { kind: "text", required: false },
   order: { kind: "text", required: false },
+  waitingOn: { kind: "text", required: false },
 };
 
 /** The row ids that have rows under them. */

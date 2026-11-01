@@ -22,17 +22,18 @@
 // ran each check with a redirected stdout and a swapped `sys.argv`, then parsed the last line of what
 // it printed. Anything that did not parse as JSON was discarded as though the check had said nothing
 // — which is exactly what happened to `confirmed` on every one of its 147 fires (finding F9), and to
-// `env-seat`'s refusal once before that, when only `Exception` was caught and not `SystemExit`.
+// `saasplane-env`'s refusal once before that, when only `Exception` was caught and not `SystemExit`.
 //
 // A check now RETURNS a `Verdict`. There is no round trip for a verdict to be lost in.
 
-import { readFileSync, statSync } from "node:fs";
+import { createHash } from "node:crypto";
+import { readFileSync, readdirSync, statSync } from "node:fs";
 import { basename, resolve } from "node:path";
-import { emit, readPayload, workspaceRoot, type Payload, type Verdict } from "../lib/payload.ts";
+import { emit, eventWorkspace, readPayload, type Payload, type Verdict } from "../lib/payload.ts";
 import { arcIdsOf, logEvent, readArc, readSheet, writeWhole } from "../lib/workstream.ts";
 import { changedEntries, goFileOf, readGo, type ScopeSheet } from "../lib/go-plan.ts";
 import { alreadyTold, commandWrites, fromWorkspace, recordWrites } from "../lib/window.ts";
-import { checkEnvSeat } from "../checks/env-seat.ts";
+import { checkSaasplaneEnv } from "../checks/saasplane-env.ts";
 import { checkDoc, bashWrites } from "../checks/doc-check.ts";
 import { gateDocumentsFirst, gateClose, moves } from "../checks/split-plan.ts";
 import { checkConfirmed } from "../checks/confirmed.ts";
@@ -47,7 +48,9 @@ import { applies as longRunApplies, checkLongRun } from "../checks/long-run.ts";
 import { applies as commandShapeApplies, checkCommandShape } from "../checks/command-shape.ts";
 import { applies as ownerApplies, checkOwner } from "../checks/workstream-owner.ts";
 import { applies as questionsApply, checkQuestions } from "../checks/questions.ts";
-import { begin, end, span, tagsOf, callOf, type SpanName } from "../../../../plugin-support-lib/src/lib/timing.ts";
+import { begin, end, span, tagsOf, callOf, utcNow, type SpanName } from "../../../../plugin-support-lib/src/lib/timing.ts";
+import { recordSendBack } from "../../../../plugin-support-lib/src/lib/debug-store.ts";
+import { workstreamsDir } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { startCommand } from "../lib/bash-timing.ts";
 import { checkChildSize } from "../checks/child-size.ts";
 import { checkReadSize } from "../checks/read-size.ts";
@@ -120,7 +123,7 @@ export function checkHandoverLast(payload: Payload & { transcript_path?: string 
   if (payload.agent_id || !payload.transcript_path) return null;
   const turn = handoverInTurn(payload.transcript_path);
   if (!turn) return null;
-  const root = workspaceRoot(payload.cwd ?? process.cwd());
+  const root = eventWorkspace(payload.cwd ?? process.cwd());
   if (!root || alreadyTold(root, payload.session_id, "handover-last|turn", turn)) return null;
   return { note:
     "A handover block is written and this turn goes on. A handover is the turn's last message, after every read and write. " +
@@ -134,7 +137,7 @@ export function checkHandoverLast(payload: Payload & { transcript_path?: string 
 // ~8 ms loading a module; here every check is imported once when the process starts. What it still
 // saves is the check's own work, which is the same saving by a shorter route.
 const CHECKS: Check[] = [
-  { name: { group: "env-seat", action: "env-seat" }, run: checkEnvSeat, needs: ["command", "file_path"], applies: () => true },
+  { name: { group: "saasplane-env", action: "saasplane-env" }, run: checkSaasplaneEnv, needs: ["command", "file_path"], applies: () => true },
   // The token levers (RULE.DEVEX.AGENT.111): refusals, so they run before the checks that only advise. A call
   // from the main window pays one test of `agent_id`; a `Read` pays one `stat`.
   { name: { group: "child-size", action: "child-size" }, run: checkChildSize, needs: ["any"], applies: () => true },
@@ -346,7 +349,7 @@ export function bindingPaths(payload: Payload): string[] {
   if (writes && supplied.command) {
     try { paths.push(...madeFolders(supplied.command), ...landings(supplied.command, cwd)); } catch { /* the binding is best effort */ }
     // A `workstream` command writes an arc's data through the library, never through a path the call names.
-    try { const root = workspaceRoot(cwd); if (root) paths.push(...commandWrites(root, cwd, supplied.command)); } catch { /* best effort */ }
+    try { const root = eventWorkspace(cwd); if (root) paths.push(...commandWrites(root, cwd, supplied.command)); } catch { /* best effort */ }
   }
   const notebook = (supplied as { notebook_path?: string }).notebook_path;
   if (notebook && writes) paths.push(notebook);
@@ -362,7 +365,7 @@ function docFindingHeard(payload: Payload, path: string, finding: string): boole
   if (!path || !payload.session_id) return false;
   try {
     const cwd = payload.cwd ?? process.cwd();
-    const root = workspaceRoot(cwd);
+    const root = eventWorkspace(cwd);
     if (!root) return false;
     return alreadyTold(root, payload.session_id, `doc-check|${fromWorkspace(root, resolve(cwd, path))}`, finding);
   } catch { return false; }
@@ -535,15 +538,27 @@ export function checkOrderPicture(payload: Payload): Verdict {
   return null;
 }
 
+/** The check whose refusal the last `dispatch` returned, for the send-back line the hook writes. */
+let refusal = "";
+function refusedBy(check: string, verdict: Verdict): Verdict {
+  if (verdict?.deny) refusal = check;
+  return verdict;
+}
+
+/** The open workstream a refusal's words name, or "" where they name none. */
+function workstreamNamedIn(root: string, message: string): string {
+  try { return readdirSync(workstreamsDir(root, "open")).sort().find((name) => message.includes(name)) ?? ""; } catch { return ""; }
+}
+
 export function dispatch(payload: Payload): Verdict {
   // A LAUNCH OF A HELPER AGENT has no path or command, so nothing below has anything to read in it.
   if (payload.tool_name === "Agent" || payload.tool_name === "Task") {
     let refused: Verdict = null;
     try { refused = span({ group: "agent-model", action: "agent-model" }, () => checkAgentModel(payload)); } catch { refused = null; }
-    if (refused) return refused;
+    if (refused) return refusedBy("agent-model", refused);
     try { refused = span({ group: "launch", action: "launch" }, () => checkLaunch(payload)); } catch { refused = null; }
-    if (refused) return refused;
-    try { return span({ group: "order-entries", action: "order-entries" }, () => checkOrderEntries(payload)); } catch { return null; }
+    if (refused) return refusedBy("launch", refused);
+    try { return refusedBy("order-entries", span({ group: "order-entries", action: "order-entries" }, () => checkOrderEntries(payload))); } catch { return null; }
   }
 
   const supplied = payload.tool_input ?? {};
@@ -552,34 +567,34 @@ export function dispatch(payload: Payload): Verdict {
   if (payload.tool_name && FILE_WRITERS.has(payload.tool_name)) {
     let refused: Verdict = null;
     try { refused = span({ group: "order-picture", action: "order-picture" }, () => checkOrderPicture(payload)); } catch { refused = null; }
-    if (refused) return refused;
+    if (refused) return refusedBy("order-picture", refused);
   }
 
   // A PUBLISH WRITES NO FILE HERE, so no other check has anything to read in it. It gets the one
   // reminder (RULE.DEVEX.WORKSPACE.117), and a refusal where the page it names loads its styles from
   // outside (RULE.DEVEX.WORKSPACE.215). The refusal leaves here as any other check's does.
   if (payload.tool_name === PUBLISHER) {
-    try { return span({ group: "publish", action: "publish" }, () => checkPublish(payload)); } catch { return null; }
+    try { return refusedBy("publish", span({ group: "publish", action: "publish" }, () => checkPublish(payload))); } catch { return null; }
   }
 
   // The generated-file guard runs first: it is the cheapest refusal there is, and it needs no
   // workspace walk to decide.
   for (const path of writtenPaths(payload)) {
     const reason = generatedRefusal(path);
-    if (reason) return { deny: reason };
+    if (reason) return refusedBy("generated-file", { deny: reason });
   }
   // The block `spnutils` writes is refused beside it: the same kind of text, inside a file that also
   // holds a person's own.
   let blocked: string | null = null;
   try { blocked = agentBlockRefusal(payload); } catch { blocked = null; }
-  if (blocked) return { deny: blocked };
+  if (blocked) return refusedBy("agent-block", { deny: blocked });
 
   // THE WINDOW'S BINDING IS WRITTEN HERE, from the paths this call writes (RULE.DEVEX.WORKSPACE.236), and
   // before the checks read it: the first write into a workstream makes it this window's. A child's call
   // carries its window's session id, so its writes bind the window that dispatched it.
   try {
     const cwd = payload.cwd ?? process.cwd();
-    const root = workspaceRoot(cwd);
+    const root = eventWorkspace(cwd);
     if (root && payload.session_id) recordWrites(root, payload.session_id, cwd, bindingPaths(payload));
   } catch { /* a binding that cannot be written is a window that hears less */ }
 
@@ -595,7 +610,7 @@ export function dispatch(payload: Payload): Verdict {
     try { verdict = span(check.name, () => check.run(payload)); }
     catch { continue; }                             // a check that throws is skipped, never fatal
     if (!verdict) continue;
-    if (verdict.deny) return verdict;               // the first refusal is the answer
+    if (verdict.deny) return refusedBy(check.name, verdict);   // the first refusal is the answer
     if (verdict.note && check.run === checkDoc && docFindingHeard(payload, path, verdict.note)) continue;
     if (verdict.note) notes.push(verdict.note);
   }
@@ -603,18 +618,25 @@ export function dispatch(payload: Payload): Verdict {
 }
 
 const payload = readPayload();
+const root = eventWorkspace(payload.cwd ?? process.cwd());
 // MEASURING IS FREE; WRITING IS THE COST. `begin` touches no filesystem, so the loop above always
 // times and always reports. What the window decides is whether any of it is ever written down —
 // which is the only part anybody pays for.
 begin({ script: "spn-devex", event: "PreToolUse", tool: payload.tool_name ?? null, session: payload.session_id ?? null,
         ...tagsOf(payload), ...callOf(payload),
         process: { group: "events", action: "pretooluse" } },
-      payload.cwd ?? process.cwd());
+      root ?? payload.cwd ?? process.cwd());
 let verdict: Verdict = null;
 try { verdict = dispatch(payload); } catch { verdict = null; }   // never take the chain down
 // A BASH COMMAND THIS HOOK LETS THROUGH IS TIMED: the start file its `PostToolUse` pairs with. A
 // refused call never runs, so it gets none.
 if (!verdict?.deny) startCommand(payload);
+else if (root) {
+  try {
+    recordSendBack(root, { at: utcNow(), session: payload.session_id ?? "", agent: payload.agent_id ?? "main", event: "PreToolUse",
+      check: refusal || "pretooluse", workstream: workstreamNamedIn(root, verdict.deny), finding: createHash("sha1").update(verdict.deny).digest("hex").slice(0, 12) });
+  } catch { /* telemetry never fails the hook */ }
+}
 end();
 const launched = payload.tool_name === "Agent" || payload.tool_name === "Task";
 const taken = !verdict?.deny && launched && !(payload.tool_input as { model?: string } | undefined)?.model ? orderModel(payload) : null;

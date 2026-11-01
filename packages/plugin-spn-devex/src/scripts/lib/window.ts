@@ -28,11 +28,15 @@ export type WindowNote = {
   workstreams: BoundMap;
   wrote: Record<string, number>;
   told: Record<string, string>;
+  /** Which welcome the session start sent this window: the whole one, or the short lead. Absent before this field. */
+  welcome?: "whole" | "short";
   /** The repositories (folder names under the workspace) this window has written under, by when it first did. */
   repos: Record<string, string>;
 };
 
 const empty = (): WindowNote => ({ workstreams: {}, wrote: {}, told: {}, repos: {} });
+
+export type WelcomeForm = "whole" | "short";
 
 const sessionKey = (id: string): string => (id || "").replace(/[^A-Za-z0-9_-]/g, "").slice(0, 80);
 
@@ -52,10 +56,13 @@ export function readWindow(root: string, session: string | undefined): WindowNot
     const bound: BoundMap = {};
     for (const [name, one] of Object.entries(held?.workstreams && typeof held.workstreams === "object" ? held.workstreams : {}))
       bound[name] = { ...one, tie: one?.tie === "visits" ? "visits" : "owns" };
-    return { workstreams: bound,
+    const note: WindowNote = { workstreams: bound,
              wrote: held?.wrote && typeof held.wrote === "object" ? held.wrote : {},
              told: held?.told && typeof held.told === "object" ? held.told : {},
              repos: held?.repos && typeof held.repos === "object" ? held.repos : {} };
+    // A note written before the field has no welcome, and reads it absent.
+    if (held?.welcome === "whole" || held?.welcome === "short") note.welcome = held.welcome;
+    return note;
   } catch { return empty(); }
 }
 
@@ -118,7 +125,7 @@ function workstreamNamed(root: string, cwd: string, name: string | null): string
  * The arc data a `workstream` command in a shell command writes, as one path inside each arc's folder
  * (`<workstream>/arcs/N<nnn>/log.jsonl`, which every such write appends to), so the window that runs it
  * is bound and its arc recorded as a write inside the folder is (01-workstream.md § The workstream is a
- * scope of work, not a window). The arc is named as the command takes it: `030/N004`, or `N004` in the
+ * scope of work, not a window). The arc is named as the command takes it: `<number>/N<nnn>`, or `N004` in the
  * workstream the command stands in or the one open or backlog workstream that holds it; a card as
  * `030/q12` or `q12`, whose record names its arc; a report by its path under `notes/N<nnn>/`. A command
  * that names nothing this can find writes nothing here.
@@ -224,6 +231,14 @@ export function bindNamed(root: string, session: string | undefined, name: strin
   const note = readWindow(root, session);
   if (note.workstreams[name]?.tie === "owns") return;
   note.workstreams[name] = { since: note.workstreams[name]?.since ?? new Date().toISOString(), by, tie: "owns" };
+  save(root, session, note);
+}
+
+/** Record which welcome the session start sent this window. Never throws. */
+export function noteWelcome(root: string, session: string | undefined, form: WelcomeForm): void {
+  if (!windowFile(root, session)) return;
+  const note = readWindow(root, session);
+  note.welcome = form;
   save(root, session, note);
 }
 

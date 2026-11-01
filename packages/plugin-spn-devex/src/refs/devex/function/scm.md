@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/01-function/02-scm.md",
-      "seen": "29b8a0ac"
+      "seen": "67eb1dcf"
     }
   ]
 }
@@ -92,7 +92,7 @@ feat/NNN-subject · fix/* · chore/*  ──►  develop  ──►  qa  ──�
 ### How a change moves up
 
 1. Open the worktree set. `spnutils workspace worktree add <NNN>` cuts the workstream's branch, `feat/<NNN>-<subject>`, from `origin/develop` in each repository the workstream's rows name. The set lives at `.worktrees/<NNN>-<subject>/` in the workspace, and the main checkouts stay on `develop`.
-2. Commit on the workstream's branch. Every arc of the workstream commits there, by path. A commit on `develop`, `qa`, `uat` or `main` is refused. A commit subject, a pull request title and a pull request body are written for a developer reviewing on GitHub (`RULE.DEVEX.FUNCTION.069` · MUST · check:stop · due:036/N008): they say what changed for someone using the code (the feature, the behaviour, the upgrade and the proof), in the words of the approach page and the preview, and they name no workstream, arc, row, order or card number. A commit already pushed is not rewritten to fit this.
+2. Commit on the workstream's branch. Every arc of the workstream commits there, by path. A commit on `develop`, `qa`, `uat` or `main` is refused. A commit subject, a pull request title and a pull request body are written for a developer reviewing on GitHub (`RULE.DEVEX.FUNCTION.069` · MUST · skill:spn-devex/scm): they say what changed for someone using the code (the feature, the behaviour, the upgrade and the proof), in the words of the approach page and the preview, and they name no workstream, arc, row, order or card number. A commit already pushed is not rewritten to fit this.
 3. Take `develop`, then push. The branch takes `origin/develop` at the start of each pass (the agent fetches, and rebases where `develop` moved) and again before each push and each pull request, so the pull request merges clean (`RULE.DEVEX.FUNCTION.071` · MUST · skill:spn-devex/scm). After a rebase the owed tiers run again only where it changed a node's content, as the stamp's content hash says. The agent's push is checked for the offline test tiers of each node it carries and, in a TypeScript repository, for the formatting of every file it adds or changes: the repository's own pinned Prettier runs `--check`, and a failure names the files and `pnpm exec prettier --write <files>`.
 4. Open the pull request into `develop`. The first push opens one pull request for the repository, and it stays open for the workstream. At least one approval is required, and new commits dismiss stale approvals. Every check the repository's world requires runs on the pull request, and it cannot merge while one fails.
 5. Merge, and let the environment that watches `develop` take it. The pull request is rebase-merged each time an arc lands a group of rows, so each row's commit stays as it was written. The environment that watches `develop` is named in the estate's declaration, never in your repository. After the merge, the merging window writes one line into every open workstream whose set holds the repository, naming what changed; a breaking contract change names its cutover, what must land with it and in what order (`RULE.DEVEX.FUNCTION.071` · MUST · skill:spn-devex/scm).

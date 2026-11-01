@@ -1,8 +1,9 @@
-import { compare, WORKSPACE } from "../../../helpers/harness.mjs";
+import { compare, run, reason, CHECKS, WORKSPACE } from "../../../helpers/harness.mjs";
 import { homedir } from "node:os";
 
 const HOME = process.env.HOME || homedir();
 const seat = (prefix) => `${prefix}/.spnenv`;
+const ID = "MKT.SCRIPTS.02";
 
 const cases = [
   // KNOWN-BAD — every route that puts a value on screen.
@@ -28,6 +29,10 @@ const cases = [
   // UNTOUCHED — the doors that stay open. A guard that refuses these is one people work around.
   { label: "Bash: the keys-only door", expect: "silent",
     payload: { tool_name: "Bash", tool_input: { command: "spnutils workspace status" } } },
+  { label: "[MKT.SCRIPTS.380] Bash: spnutils workspace env show passes", expect: "silent",
+    payload: { tool_name: "Bash", tool_input: { command: "spnutils workspace env show" } } },
+  { label: "[MKT.SCRIPTS.380] Bash: spnutils workspace env set passes", expect: "silent",
+    payload: { tool_name: "Bash", tool_input: { command: "spnutils workspace env set SITE_URL --value http://localhost" } } },
   { label: "Bash: an ordinary command", expect: "silent",
     payload: { tool_name: "Bash", tool_input: { command: "git status --short" } } },
   { label: "Bash: a different dotfile in the same home", expect: "silent",
@@ -42,4 +47,15 @@ const cases = [
     payload: { tool_name: "Task", tool_input: {} } },
 ];
 
-process.exit(compare("env-seat", ["@/env-seat.py"], "env-seat.ts", cases) ? 1 : 0);
+let failed = compare("saasplane-env", null, "saasplane-env.ts", cases);
+
+// [MKT.SCRIPTS.380] The refusal names the door: `env show` and `env set`, and never a value.
+console.log("\n=== saasplane-env — the refusal names the door");
+const said = reason(run("node", [`${CHECKS}/saasplane-env.ts`], { tool_name: "Bash", tool_input: { command: `cat ${seat("~")}` } }));
+for (const [label, ok] of [
+  ["[MKT.SCRIPTS.380] the refusal names `spnutils workspace env show`", said.includes("spnutils workspace env show")],
+  ["[MKT.SCRIPTS.380] the refusal names `env set`", said.includes("spnutils workspace env set")],
+  ["[MKT.SCRIPTS.380] the refusal asks the developer to type a secret in their own editor", said.includes("own editor")],
+  ["[MKT.SCRIPTS.380] the refusal no longer sends the agent to `workspace status` for keys", !said.includes("keys-only door")],
+]) { console.log(`  ${ok ? "PASS" : "FAIL"}  ${label}`); if (!ok) failed += 1; }
+process.exit(failed ? 1 : 0);

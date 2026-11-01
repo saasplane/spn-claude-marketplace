@@ -79,7 +79,7 @@ Never leave mutated: the platform org and its policies, org-TYPE/GLOBAL auth/dat
 ## Fixture rules
 
 - **PII is allowed ONLY in `tests/` fixtures, never in `src/`.** Test personas must stay env-overridable; passwords are never hardcoded anywhere — always the env variable.
-- **Behavior ids in titles — the tier decides which cases carry one** (`RULE.DEVEX.FUNCTION.064` · MUST · check:subjects · due:036/N008), amending DEC.DEVEX.FUNCTION.008. The id (`<MOD>.<CAP>.<NN>`) opens the case or `describe` title and the sentence follows it: `IAM.LOGIN.01 a person signs in with a password`.
+- **Behavior ids in titles — the tier decides which cases carry one** (`RULE.DEVEX.FUNCTION.064` · MUST · skill:spn-apps/implement), amending DEC.DEVEX.FUNCTION.008. The id (`<MOD>.<CAP>.<NN>`) opens the case or `describe` title and the sentence follows it: `IAM.LOGIN.01 a person signs in with a password`.
 
   | Tier | Which cases carry an id | A case with no id |
   | --- | --- | --- |

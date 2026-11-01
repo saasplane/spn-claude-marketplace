@@ -2,7 +2,7 @@
 // The chapter is the source of truth; a rule change is edited there first, then here, in the same change.
 //
 //   spn-devex workstream row add <workstream>/N<nnn> "<title>" --repo <repo> --altitude <altitude> [--kind change] [--state ready] …
-//   spn-devex workstream row state <workstream>/N<nnn> <row> <state> [--note "…"]
+//   spn-devex workstream row state <workstream>/N<nnn> <row> <state> [--on "<what it waits on>"] [--note "…"] [--run <name>]
 //   spn-devex workstream row note <workstream>/N<nnn> <row> "<text>"
 //   spn-devex workstream row edit <workstream>/N<nnn> <row> [--title …] [--kind …] [--repo …] [--altitude …] …
 //   spn-devex workstream row discard <workstream>/N<nnn> <row> --note "<the developer's words>"
@@ -139,10 +139,14 @@ function add(args: string[]): number {
 }
 
 function state(args: string[]): number {
-  const words = readWords(args, { note: VALUE, run: VALUE });
+  const words = readWords(args, { note: VALUE, run: VALUE, on: VALUE });
   const [ref, rowId, next, ...more] = words.paths;
   if (!rowId || !next || more.length) throw new UsageFault(`takes an arc, a row and the state: \`row state <workstream>/N<nnn> <row> <state>\`, one of ${ROW_STATES.join(" · ")}.`);
   if (!(ROW_STATES as readonly string[]).includes(next)) throw new UsageFault(`takes a state from ${ROW_STATES.join(" · ")}, and \`${next}\` is none of them.`);
+  // `--on` says what a waiting row waits on outside the window (RULE.DEVEX.WORKSPACE.469); no other state takes it.
+  const on = words.value("on");
+  if (on !== null && next !== "waiting") throw new UsageFault(`takes \`--on\` only with \`waiting\`: row ${rowId} moves to ${next}, which waits on nothing — \`row state … waiting --on "<what it waits on>"\` is the form.`);
+  if (on !== null && !on.trim()) throw new UsageFault("takes `--on` with the words of what the row waits on, and none were given.");
   const { ws, arc, data, row } = rowOf(ref, rowId);
   const was = stateOfRow(data.rows, row);
   if (was === next) throw new UsageFault(`changes nothing: row ${rowId} is already ${next}; \`row note\` writes a line on it.`);
@@ -155,8 +159,11 @@ function state(args: string[]): number {
   const statusBefore = arcStatus(data);
   const before = arcSignatures(ws);
   row.state = next;
+  // Any other state clears the wait: a row that is no longer waiting waits on nothing.
+  if (next === "waiting" && on !== null) row.waitingOn = on.trim(); else delete row.waitingOn;
+  const waited = next === "waiting" && on !== null ? ` · waiting on ${on.trim()}` : "";
   typed(() => writeArc(ws, data));
-  logEvent(ws, arc, next, rowId, words.value("note") ?? `${was} → ${next}${next === "landed" && run ? ` · run ${run}` : ""}`);
+  logEvent(ws, arc, next, rowId, `${words.value("note") ?? `${was} → ${next}${next === "landed" && run ? ` · run ${run}` : ""}`}${waited}`);
   return finish(ws, arc, data, before, statusBefore, [`row ${rowId} · state`]);
 }
 
@@ -262,8 +269,8 @@ export const actions: Record<string, Action> = {
     run: add,
   },
   state: {
-    describe: "move a row to a state; --note carries the words beside the move, and --run names the run a CODE or PROOF row of a sheet arc lands on",
-    usage: "<workstream>/N<nnn> <row> <state> [--note …] [--run <name>]",
+    describe: "move a row to a state; --on names what a waiting row waits on outside the window, --note carries the words beside the move, and --run names the run a CODE or PROOF row of a sheet arc lands on",
+    usage: "<workstream>/N<nnn> <row> <state> [--on \"<what it waits on>\"] [--note …] [--run <name>]",
     run: state,
   },
   note: {

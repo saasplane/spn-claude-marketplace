@@ -46,6 +46,23 @@ console.log("=== a child's stop logs its turns under its agent id");
   check("a second stop logs only what the child gained since the first", after.length === 3 && after[2].turn === "c3", JSON.stringify(after.map((line) => line.turn)));
 }
 
+console.log("\n=== [MKT.HOOKS.340] a child's stop sent from outside the workspace is filed under the workspace");
+{
+  const root = join(BASE, "outside-home");
+  const elsewhere = join(BASE, "outside-elsewhere");
+  mkdirSync(join(root, ".spndevex", ".debug"), { recursive: true });
+  mkdirSync(join(root, ".spndevex", "workstreams"), { recursive: true });
+  mkdirSync(elsewhere, { recursive: true });
+  writeFileSync(join(root, ".spndevex", ".debug", "switches.json"), '{"telemetry": true}');
+  const child = join(root, "agent-o.jsonl");
+  writeFileSync(child, assistant("o1", 7) + "\n");
+  const log = join(root, ".spndevex", ".debug", "telemetry", "usage.jsonl");
+  stop(elsewhere, { cwd: elsewhere, session_id: "so", hook_event_name: "SubagentStop", agent_id: "ao", agent_transcript_path: child }, { CLAUDE_PROJECT_DIR: root });
+  const lines = existsSync(log) ? readFileSync(log, "utf8").trim().split("\n").map((line) => JSON.parse(line)) : [];
+  check("the child's turn is filed under the workspace the project directory names", lines.length === 1 && lines[0].turn === "o1" && lines[0].agent === "ao", JSON.stringify(lines));
+  check("and nothing is written in the folder the event stood in", !existsSync(join(elsewhere, ".spndevex")));
+}
+
 console.log("\n=== a usage line says the model, the model's own time and the row");
 {
   const root = join(BASE, "fields");

@@ -162,7 +162,7 @@ spn-devex workstream report write [<workstream>] <report.md> — fold a child's 
 
 spn-devex workstream row add <workstream>/N<nnn> "<title>" --repo <repo> --altitude <altitude> [--kind change] [--state ready] [--blocked-by …] [--touches …] [--entries E1,E2] [--position …] [--model …] [--note …] — add a row to an arc, taking the arc's next number and printing it
 
-spn-devex workstream row state <workstream>/N<nnn> <row> <state> [--note …] [--run <name>] — move a row to a state; --note carries the words beside the move, and --run names the run a CODE or PROOF row of a sheet arc lands on
+spn-devex workstream row state <workstream>/N<nnn> <row> <state> [--on "<what it waits on>"] [--note …] [--run <name>] — move a row to a state; --on names what a waiting row waits on outside the window, --note carries the words beside the move, and --run names the run a CODE or PROOF row of a sheet arc lands on
 
 spn-devex workstream row note <workstream>/N<nnn> <row> "<text>" — write one line on a row's log, and change nothing else
 

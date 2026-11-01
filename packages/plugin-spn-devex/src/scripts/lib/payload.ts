@@ -90,6 +90,25 @@ export function workspaceRoot(start: string): string | null {
   } catch { return null; }
 }
 
+/**
+ * The workspace a hook event belongs to: the first above the event's `cwd`, else the first above the project
+ * directory Claude Code opened (`CLAUDE_PROJECT_DIR`). Null outside both, and never the bare directory.
+ */
+export function eventWorkspace(cwd: string | null | undefined): string | null {
+  const above = cwd ? workspaceRoot(cwd) : null;
+  if (above) return above;
+  const project = process.env.CLAUDE_PROJECT_DIR;
+  return project ? workspaceRoot(project) : null;
+}
+
+/**
+ * The checks whose finding is about the reply itself: a card it raised or a decision it put, a handover block, the
+ * welcome of a first reply. The developer is reading that reply, so the finding cannot wait. The Stop hook says them
+ * while a row runs, and `debug hooks show` judges them by the next Stop's span.
+ */
+export const REPLY_CHECKS: ReadonlySet<string> =
+  new Set(["needs-you", "reply-shape", "cards", "handover", "how-it-runs", "partner-words", "page-path", "welcome", "window"]);
+
 /** Visible entries of a folder, sorted, or nothing. */
 export function listdir(path: string): string[] {
   try { return readdirSync(path).filter((name) => !name.startsWith(".")).sort(); }

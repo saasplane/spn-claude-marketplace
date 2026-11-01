@@ -58,7 +58,7 @@ const SCRIPTS: Array<[plugin: string, script: string, args: string[]]> = [
   // Reads its event from stdin and gets none here. It must exit clean rather than block or crash: it
   // guards a file the loop legitimately uses, and a guard that takes the chain down is worse than the
   // exposure it was written for.
-  ["spn-devex", "env-seat.ts", []],
+  ["spn-devex", "saasplane-env.ts", []],
   // Same contract, and the same reason to prove it here: it fires on a source write, which is the
   // most common call a partner makes, and it opens no file of its own — so getting no event at all
   // must leave it silent rather than throwing where the whole chain would go down with it.

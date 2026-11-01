@@ -85,8 +85,8 @@ function one(label, payload, expect, { says, cwd = `${WORKSPACE}`, parity = true
 console.log("\n=== pretooluse — every check still reaches the turn through the chain");
 
 // KNOWN-BAD, one per check.
-one("env-seat's refusal survives the chain",
-  { tool_name: "Bash", tool_input: { command: "cat ~/.spnenv" } }, "deny", { says: "renders ~/.spnenv" });
+one("saasplane-env's refusal survives the chain",
+  { tool_name: "Bash", tool_input: { command: "cat ~/.spnenv" } }, "deny", { says: "workspace env show" });
 
 
 // The case is that doc-check's finding reaches the dispatcher at all. It rode a long sentence until
@@ -576,6 +576,34 @@ console.log("\n=== pretooluse — a handover block written before the turn ends 
 }
 
 console.log("\n=== pretooluse — the chain's cost per call");
+// ---------------------------------------------------------------- the root and the send-back line (036 N015 E23, E24)
+{
+  const { telemetryFolder, writeSwitch } = await import("../../../../../plugin-support-lib/src/lib/debug-store.ts");
+  const sendbacks = () => { try { return readFileSync(join(telemetryFolder(WORKSPACE), "sendbacks.jsonl"), "utf8").trim().split("\n").filter(Boolean).map((line) => JSON.parse(line)); } catch { return []; } };
+  const check = (label, ok, detail = "") => { n += 1; if (!ok) failed += 1; console.log(`  ${ok ? "PASS" : "FAIL"}  ${label}${ok || !detail ? "" : `\n        ${String(detail).slice(0, 400)}`}`); };
+  const HOOK = `${HOOKS}/src/scripts/events/pretooluse.ts`;
+  const call = (payload, cwd, env = {}) => {
+    try { return execFileSync("node", [HOOK], { input: JSON.stringify(payload), encoding: "utf8", cwd, env: { ...process.env, SPN_TELEMETRY: "off", ...env } }).trim(); }
+    catch (e) { return String(e.stderr ?? e.message); }
+  };
+  const generated = (id, cwd) => ({ tool_name: "Write", session_id: id, cwd, tool_input: { file_path: join(PROBE_REPO, "src", "contract", "validators", "thing.ts"), content: "x" } });
+  writeSwitch(WORKSPACE, "telemetry", true);
+  const before = sendbacks().length;
+  const refused = call(generated("sb-pre-1", WORKSPACE), WORKSPACE);
+  const lines = sendbacks().slice(before);
+  check("[MKT.HOOKS.343] a refusal the hook says writes one send-back line with the event and the check",
+    refused.includes("deny") && lines.length === 1 && lines[0].event === "PreToolUse" && lines[0].check === "generated-file"
+      && lines[0].session === "sb-pre-1" && /^[0-9a-f]{12}$/.test(lines[0].finding), `${refused.slice(0, 120)} · ${JSON.stringify(lines)}`);
+  const mid = sendbacks().length;
+  call({ tool_name: "Bash", session_id: "sb-pre-2", cwd: WORKSPACE, tool_input: { command: "git status --short" } }, WORKSPACE);
+  check("[MKT.HOOKS.343] a call let through writes none", sendbacks().length === mid);
+  const away = mkdtempSync(join(tmpdir(), "pretooluse-away-"));
+  const outside = call(generated("sb-pre-3", away), away, { CLAUDE_PROJECT_DIR: WORKSPACE });
+  check("[MKT.HOOKS.343] a refusal in a run outside the workspace, the project directory at it, lands its line in the workspace",
+    outside.includes("deny") && sendbacks().slice(mid).some((line) => line.session === "sb-pre-3"), outside.slice(0, 160));
+  rmSync(away, { recursive: true, force: true });
+}
+
 {
   const RUNS = 15;
   const median = (fn) => {

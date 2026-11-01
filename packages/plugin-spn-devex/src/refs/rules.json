@@ -2,17 +2,14 @@
   "schemaVersion": 1,
   "book": {
     "repository": "spn-foundation",
-    "commit": "7cf70526"
+    "commit": "e78eee83"
   },
   "rules": [
     {
       "id": "RULE.DEVEX.AGENT.002",
-      "level": "MUST",
-      "params": {
-        "check": "restates",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": null,
       "chapter": "02-constructs/01-devex/02-agent/04-plugins.md",
       "heading": "The four plugins",
@@ -27,12 +24,9 @@
     },
     {
       "id": "RULE.DEVEX.AGENT.003",
-      "level": "MUST",
-      "params": {
-        "check": "restates",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": null,
       "chapter": "02-constructs/01-devex/02-agent/02-skills.md",
       "heading": "Skills and step files",
@@ -52,12 +46,9 @@
     },
     {
       "id": "RULE.DEVEX.AGENT.014",
-      "level": "MUST",
-      "params": {
-        "check": "restates",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": "A skill is mapped to a stage, never named after one",
       "chapter": "04-capabilities/01-devex/02-agent/02-skills/01-skills.md",
       "heading": "The mappings are many-to-one, and that is the design",
@@ -90,12 +81,9 @@
     },
     {
       "id": "RULE.DEVEX.AGENT.017",
-      "level": "MUST",
-      "params": {
-        "check": "restates",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": null,
       "chapter": "02-constructs/01-devex/02-agent/02-skills.md",
       "heading": "Apps plugin skills",
@@ -110,12 +98,9 @@
     },
     {
       "id": "RULE.DEVEX.AGENT.025",
-      "level": "MUST",
-      "params": {
-        "check": "restates",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": "A skill's value is `{DOMAIN}_{SKILL}`, and the domain comes from the claim of the plugin that ships it",
       "chapter": "04-capabilities/01-devex/02-agent/02-skills/01-skills.md",
       "heading": "A value is derived, never authored twice",
@@ -155,8 +140,7 @@
       "id": "RULE.DEVEX.AGENT.029",
       "level": "MUST",
       "params": {
-        "check": "doc-check",
-        "due": "036/N008"
+        "check": "corpus"
       },
       "class": "checked",
       "sentence": null,
@@ -169,10 +153,9 @@
       "id": "RULE.DEVEX.AGENT.031",
       "level": "MUST",
       "params": {
-        "check": "restates",
-        "due": "036/N008"
+        "agent": "spn-devex/spn-panel"
       },
-      "class": "checked",
+      "class": "kept by an agent",
       "sentence": null,
       "chapter": "02-constructs/01-devex/02-agent/03-lenses.md",
       "heading": "Two voice checks",
@@ -192,12 +175,9 @@
     },
     {
       "id": "RULE.DEVEX.AGENT.033",
-      "level": "MUST",
-      "params": {
-        "check": "restates",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": "A partner may add a gate and may never add a lens",
       "chapter": "02-constructs/01-devex/02-agent/03-lenses.md",
       "heading": "What a lens may block",
@@ -273,12 +253,9 @@
     },
     {
       "id": "RULE.DEVEX.AGENT.055",
-      "level": "MUST",
-      "params": {
-        "check": "restates",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": null,
       "chapter": "02-constructs/01-devex/02-agent/02-skills.md",
       "heading": "Model",
@@ -336,12 +313,9 @@
     },
     {
       "id": "RULE.DEVEX.AGENT.061",
-      "level": "MUST",
-      "params": {
-        "check": "doc-check",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": null,
       "chapter": "04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "heading": "Where the agent's own surfaces live",
@@ -363,12 +337,9 @@
     },
     {
       "id": "RULE.DEVEX.AGENT.068",
-      "level": "MUST",
-      "params": {
-        "check": "stop",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": "The plugin type of the stack-agnostic domain is `DEVEX`, never `CORE`",
       "chapter": "04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "heading": "Where the agent's own surfaces live",
@@ -377,12 +348,9 @@
     },
     {
       "id": "RULE.DEVEX.AGENT.070",
-      "level": "MUST",
-      "params": {
-        "check": "restates",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": "A path written in a plugin file names a file the installed plugins carry",
       "chapter": "04-capabilities/01-devex/02-agent/02-skills/01-skills.md",
       "heading": "A skill is never a second place a rule lives",
@@ -397,12 +365,9 @@
     },
     {
       "id": "RULE.DEVEX.AGENT.071",
-      "level": "MUST",
-      "params": {
-        "check": "restates",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": null,
       "chapter": "02-constructs/01-devex/02-agent/02-skills.md",
       "heading": "Estate plugin skills",
@@ -413,10 +378,9 @@
       "id": "RULE.DEVEX.AGENT.072",
       "level": "MUST",
       "params": {
-        "check": "corpus",
-        "due": "036/N008"
+        "skill": "spn-devex/develop"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "A `spn:restates` citation names a file, a section of a file, or a whole folder",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md",
       "heading": "A citation may name a folder, and sometimes it must",
@@ -438,10 +402,9 @@
       "id": "RULE.DEVEX.AGENT.073",
       "level": "MUST",
       "params": {
-        "check": "restates",
-        "due": "036/N008"
+        "skill": "spn-devex/develop"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "A stamp lives in a marketplace plugin, and cites another repository — never its own",
       "chapter": "02-constructs/01-devex/02-agent/04-plugins.md",
       "heading": "The stamp and citations",
@@ -493,10 +456,9 @@
       "id": "RULE.DEVEX.AGENT.076",
       "level": "MUST",
       "params": {
-        "check": "stop",
-        "due": "036/N008"
+        "skill": "spn-devex/execute"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "While work runs, the main agent plans, dispatches and reports, and a subagent does the long work",
       "chapter": "04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "heading": "The front desk stays open while work runs",
@@ -513,8 +475,7 @@
       "id": "RULE.DEVEX.AGENT.077",
       "level": "MUST",
       "params": {
-        "check": "stop",
-        "due": "036/N008"
+        "check": "stop"
       },
       "class": "checked",
       "sentence": null,
@@ -531,12 +492,9 @@
     },
     {
       "id": "RULE.DEVEX.AGENT.078",
-      "level": "MUST",
-      "params": {
-        "check": "restates",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": null,
       "chapter": "04-capabilities/01-devex/02-agent/04-plugins/02-shape.md",
       "heading": "One entry, dispatching by group and action",
@@ -553,10 +511,9 @@
       "id": "RULE.DEVEX.AGENT.079",
       "level": "MUST",
       "params": {
-        "check": "restates",
-        "due": "036/N008"
+        "agent": "spn-devex/spn-panel"
       },
-      "class": "checked",
+      "class": "kept by an agent",
       "sentence": null,
       "chapter": "02-constructs/01-devex/02-agent/03-lenses.md",
       "heading": "Model",
@@ -565,12 +522,9 @@
     },
     {
       "id": "RULE.DEVEX.AGENT.080",
-      "level": "MUST",
-      "params": {
-        "check": "restates",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": null,
       "chapter": "02-constructs/01-devex/02-agent/02-skills.md",
       "heading": "Surface plugin skill",
@@ -603,10 +557,9 @@
       "id": "RULE.DEVEX.AGENT.082",
       "level": "MUST",
       "params": {
-        "check": "subagentstop",
-        "due": "036/N008"
+        "skill": "spn-devex/develop"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "A command of the plugin reads what a window cost from telemetry alone, and the agent never reads a transcript to answer that question",
       "chapter": "04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "heading": "The cost of a window is read from telemetry, never from a transcript",
@@ -825,10 +778,9 @@
       "id": "RULE.DEVEX.AGENT.090",
       "level": "MUST",
       "params": {
-        "check": "restates",
-        "due": "036/N008"
+        "skill": "spn-devex/ideate"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "A view is shown as a speaker: its name, then what it said, as a colleague would say it out loud",
       "chapter": "04-capabilities/01-devex/02-agent/03-lenses/01-lenses.md",
       "heading": "A view is shown in its own voice",
@@ -897,12 +849,9 @@
     },
     {
       "id": "RULE.DEVEX.AGENT.092",
-      "level": "MUST",
-      "params": {
-        "check": "pretooluse",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": "A hook shows the developer a refusal, and gives its advice to the agent alone",
       "chapter": "04-capabilities/01-devex/02-agent/04-plugins/01-plugins.md",
       "heading": "Who a hook's line is for",
@@ -958,12 +907,9 @@
     },
     {
       "id": "RULE.DEVEX.AGENT.095",
-      "level": "MUST",
-      "params": {
-        "check": "restates",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": "A lens names, by number, the principles of [the SaaS Plane way](../../../../01-purpose/04-way.md) it carries",
       "chapter": "04-capabilities/01-devex/02-agent/03-lenses/01-lenses.md",
       "heading": "Every lens file takes one shape",
@@ -983,12 +929,9 @@
     },
     {
       "id": "RULE.DEVEX.AGENT.097",
-      "level": "MUST",
-      "params": {
-        "check": "restates",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": "A lens file takes the shape the construct states, part by part, in its order: real-world title, consumer first, persona, carries, asks it owns, mastery, industry bridge, mentoring, behaviour, blind spots, by stage, produces to, gates, sweeps, and improves the book",
       "chapter": "04-capabilities/01-devex/02-agent/03-lenses/01-lenses.md",
       "heading": "Every lens file takes one shape",
@@ -1003,12 +946,9 @@
     },
     {
       "id": "RULE.DEVEX.AGENT.098",
-      "level": "MUST",
-      "params": {
-        "check": "restates",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": "The agent reads which kind of ask a developer brought, and wears or convenes the one lens [the router](../../../../02-constructs/01-devex/02-agent/03-lenses.md#the-ask-router) names for it",
       "chapter": "04-capabilities/01-devex/02-agent/03-lenses/01-lenses.md",
       "heading": "The ask router picks the one lens that owns an ask",
@@ -1025,10 +965,9 @@
       "id": "RULE.DEVEX.AGENT.099",
       "level": "MUST",
       "params": {
-        "check": "restates",
-        "due": "036/N008"
+        "skill": "spn-devex/ideate"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "Each lens learns the partner's industry for its own discipline, from the internet, and maps it onto the constructs and the SaaS Plane way",
       "chapter": "04-capabilities/01-devex/02-agent/03-lenses/01-lenses.md",
       "heading": "A lens bridges the partner's industry, and one brief keeps it",
@@ -1058,12 +997,9 @@
     },
     {
       "id": "RULE.DEVEX.AGENT.100",
-      "level": "MUST",
-      "params": {
-        "check": "restates",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": "Work is produced to its standards by the lens that owns it, and there is no reviewer lens and no review agent after the fact",
       "chapter": "04-capabilities/01-devex/02-agent/03-lenses/01-lenses.md",
       "heading": "Built right while it is made, so nothing needs a review after",
@@ -1133,8 +1069,7 @@
       "id": "RULE.DEVEX.AGENT.103",
       "level": "MUST",
       "params": {
-        "check": "stop",
-        "due": "036/N008"
+        "check": "stop"
       },
       "class": "checked",
       "sentence": "The agent offers a new window from 200,000 tokens of context at a clean point, and past 300,000 writes the handover at the next clean point unasked",
@@ -1249,10 +1184,9 @@
       "id": "RULE.DEVEX.AGENT.108",
       "level": "MUST",
       "params": {
-        "check": "restates",
-        "due": "036/N008"
+        "skill": "spn-devex/develop"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "A match needs the description in front of the session, so a skill's file opens with it",
       "chapter": "02-constructs/01-devex/02-agent/02-skills.md",
       "heading": "Model",
@@ -1274,10 +1208,9 @@
       "id": "RULE.DEVEX.AGENT.109",
       "level": "MUST",
       "params": {
-        "check": "restates",
-        "due": "036/N008"
+        "skill": "spn-devex/deliver"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": null,
       "chapter": "04-capabilities/01-devex/02-agent/04-plugins/01-plugins.md",
       "heading": "The place you are standing decides the install mode",
@@ -1294,10 +1227,9 @@
       "id": "RULE.DEVEX.AGENT.110",
       "level": "MUST",
       "params": {
-        "check": "restates",
-        "due": "036/N008"
+        "skill": "spn-devex/deliver"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "The four plugins carry one version, and release together",
       "chapter": "04-capabilities/01-devex/02-agent/04-plugins/01-plugins.md",
       "heading": "What names a plugin, and what a version means",
@@ -1341,10 +1273,9 @@
       "id": "RULE.DEVEX.AGENT.112",
       "level": "MUST",
       "params": {
-        "check": "restates",
-        "due": "036/N008"
+        "skill": "spn-devex/develop"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "A lookup reads every member at the workspace root, and names the repository each answer came from",
       "chapter": "04-capabilities/01-devex/02-agent/04-plugins/02-shape.md",
       "heading": "The path",
@@ -1361,8 +1292,7 @@
       "id": "RULE.DEVEX.AGENT.113",
       "level": "MUST",
       "params": {
-        "check": "stop",
-        "due": "036/N008"
+        "check": "stop"
       },
       "class": "checked",
       "sentence": "A session reads the ground before it writes anything, opens its first reply with the welcome and one status line, and never asks what it could have read",
@@ -1375,8 +1305,7 @@
       "id": "RULE.DEVEX.AGENT.114",
       "level": "MUST",
       "params": {
-        "check": "stop",
-        "due": "036/N008"
+        "check": "child-size"
       },
       "class": "checked",
       "sentence": "A long-running child is replaced by a fresh one with a short order, and never resumed",
@@ -1389,8 +1318,7 @@
       "id": "RULE.DEVEX.AGENT.115",
       "level": "MUST",
       "params": {
-        "check": "stop",
-        "due": "036/N008"
+        "check": "stop"
       },
       "class": "checked",
       "sentence": "A card is shown in full once, at the top of the reply that raises it",
@@ -1401,12 +1329,9 @@
     },
     {
       "id": "RULE.DEVEX.AGENT.116",
-      "level": "MUST",
-      "params": {
-        "check": "stop",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": "One icon opens a reply, and each icon means one thing",
       "chapter": "04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "heading": "A reply speaks as a teammate: the moment chooses its register, its icon and its shape",
@@ -1426,12 +1351,9 @@
     },
     {
       "id": "RULE.DEVEX.AGENT.118",
-      "level": "MUST",
-      "params": {
-        "check": "restates",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": "`SPDevExStageType` is a closed set, and every request sits in exactly one of its members",
       "chapter": "04-capabilities/01-devex/02-agent/02-skills/01-skills.md",
       "heading": "The stage vocabulary is closed, and a request belongs to exactly one",
@@ -1451,12 +1373,9 @@
     },
     {
       "id": "RULE.DEVEX.AGENT.120",
-      "level": "MUST",
-      "params": {
-        "check": "restates",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": "A skill carries the actionable substance and cites the book as provenance, by name. It never states a rule of its own",
       "chapter": "04-capabilities/01-devex/02-agent/02-skills/01-skills.md",
       "heading": "A skill is never a second place a rule lives",
@@ -1486,10 +1405,9 @@
       "id": "RULE.DEVEX.AGENT.122",
       "level": "MUST",
       "params": {
-        "check": "restates",
-        "due": "036/N008"
+        "skill": "spn-devex/ideate"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "On a card, a view is one or two plain sentences",
       "chapter": "04-capabilities/01-devex/02-agent/03-lenses/01-lenses.md",
       "heading": "A view is shown in its own voice",
@@ -1500,10 +1418,9 @@
       "id": "RULE.DEVEX.AGENT.123",
       "level": "MUST",
       "params": {
-        "check": "restates",
-        "due": "036/N008"
+        "skill": "spn-devex/ideate"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "The agent shortens a view's words for the card, and keeps its name and its meaning",
       "chapter": "04-capabilities/01-devex/02-agent/03-lenses/01-lenses.md",
       "heading": "A view is shown in its own voice",
@@ -1514,10 +1431,9 @@
       "id": "RULE.DEVEX.AGENT.124",
       "level": "MUST",
       "params": {
-        "check": "restates",
-        "due": "036/N008"
+        "agent": "spn-devex/spn-panel"
       },
-      "class": "checked",
+      "class": "kept by an agent",
       "sentence": "A panel reports; the writing context acts",
       "chapter": "04-capabilities/01-devex/02-agent/03-lenses/01-lenses.md",
       "heading": "What a panel may never do",
@@ -1528,10 +1444,9 @@
       "id": "RULE.DEVEX.AGENT.125",
       "level": "MUST",
       "params": {
-        "check": "subagentstop",
-        "due": "036/N008"
+        "agent": "spn-devex/spn-panel"
       },
-      "class": "checked",
+      "class": "kept by an agent",
       "sentence": "A panel never invents a rule",
       "chapter": "04-capabilities/01-devex/02-agent/03-lenses/01-lenses.md",
       "heading": "What a panel may never do",
@@ -1542,10 +1457,9 @@
       "id": "RULE.DEVEX.AGENT.126",
       "level": "MUST",
       "params": {
-        "check": "subagentstop",
-        "due": "036/N008"
+        "agent": "spn-devex/spn-panel"
       },
-      "class": "checked",
+      "class": "kept by an agent",
       "sentence": "A panel closes by naming what it did not look at",
       "chapter": "04-capabilities/01-devex/02-agent/03-lenses/01-lenses.md",
       "heading": "What a panel may never do",
@@ -1554,12 +1468,9 @@
     },
     {
       "id": "RULE.DEVEX.AGENT.127",
-      "level": "MUST",
-      "params": {
-        "check": "restates",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": "A partner may add a gate and may never add a lens",
       "chapter": "04-capabilities/01-devex/02-agent/03-lenses/01-lenses.md",
       "heading": "What a lens may block, and the threshold",
@@ -1568,12 +1479,9 @@
     },
     {
       "id": "RULE.DEVEX.AGENT.128",
-      "level": "MUST",
-      "params": {
-        "check": "doc-check",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": "A lens and a persona are different words for different jobs, and they never substitute",
       "chapter": "04-capabilities/01-devex/02-agent/03-lenses/01-lenses.md",
       "heading": "Actors build; personas use",
@@ -1584,10 +1492,9 @@
       "id": "RULE.DEVEX.AGENT.129",
       "level": "MUST",
       "params": {
-        "check": "restates",
-        "due": "036/N008"
+        "skill": "spn-devex/deliver"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "A version names what is published, never what you are working on",
       "chapter": "04-capabilities/01-devex/02-agent/04-plugins/01-plugins.md",
       "heading": "What names a plugin, and what a version means",
@@ -1596,12 +1503,9 @@
     },
     {
       "id": "RULE.DEVEX.AGENT.130",
-      "level": "MUST",
-      "params": {
-        "check": "restates",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": "Unset means partner, and that is the point",
       "chapter": "04-capabilities/01-devex/02-agent/04-plugins/01-plugins.md",
       "heading": "The place you are standing decides the install mode",
@@ -1612,10 +1516,9 @@
       "id": "RULE.DEVEX.AGENT.131",
       "level": "MUST",
       "params": {
-        "check": "restates",
-        "due": "036/N008"
+        "skill": "spn-devex/deliver"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "The plugins release in lockstep, through one command",
       "chapter": "04-capabilities/01-devex/02-agent/04-plugins/01-plugins.md",
       "heading": "The place you are standing decides the install mode",
@@ -1624,12 +1527,9 @@
     },
     {
       "id": "RULE.DEVEX.AGENT.132",
-      "level": "MUST",
-      "params": {
-        "check": "restates",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": "A partner reports a standard that is wrong or missing; they never edit the plugin they installed",
       "chapter": "04-capabilities/01-devex/02-agent/04-plugins/01-plugins.md",
       "heading": "The place you are standing decides the install mode",
@@ -1640,8 +1540,7 @@
       "id": "RULE.DEVEX.AGENT.133",
       "level": "MUST",
       "params": {
-        "check": "restates",
-        "due": "036/N008"
+        "check": "plugin-sync"
       },
       "class": "checked",
       "sentence": "You never type a plugin name",
@@ -1654,10 +1553,9 @@
       "id": "RULE.DEVEX.AGENT.134",
       "level": "MUST",
       "params": {
-        "check": "restates",
-        "due": "036/N008"
+        "skill": "spn-devex/develop"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "The world decides the set, and nothing else does",
       "chapter": "04-capabilities/01-devex/02-agent/04-plugins/01-plugins.md",
       "heading": "The set a repository gets is derived from its own claim",
@@ -1698,12 +1596,9 @@
     },
     {
       "id": "RULE.DEVEX.AGENT.137",
-      "level": "MUST",
-      "params": {
-        "check": "restates",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": "In alpha, a change to a standard still brings every existing file to it in the same change",
       "chapter": "04-capabilities/01-devex/02-agent/04-plugins/01-plugins.md",
       "heading": "A release carries its migration, and a window runs what is pending first",
@@ -1712,12 +1607,9 @@
     },
     {
       "id": "RULE.DEVEX.AGENT.138",
-      "level": "MUST",
-      "params": {
-        "check": "restates",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": "A hook runs a committed, pre-built bundle, never its source",
       "chapter": "04-capabilities/01-devex/02-agent/04-plugins/01-plugins.md",
       "heading": "What a hook runs, and where its cache lives",
@@ -1726,12 +1618,9 @@
     },
     {
       "id": "RULE.DEVEX.AGENT.139",
-      "level": "MUST",
-      "params": {
-        "check": "restates",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": "The plugin's own tests refuse a bundle older than its sources",
       "chapter": "04-capabilities/01-devex/02-agent/04-plugins/01-plugins.md",
       "heading": "What a hook runs, and where its cache lives",
@@ -1740,12 +1629,9 @@
     },
     {
       "id": "RULE.DEVEX.AGENT.140",
-      "level": "MUST",
-      "params": {
-        "check": "restates",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": "A plugin's cache lives in the machine store, under `~/.saasplane/cache/plugins/<name>/`, keyed by content, and never in the shared workspace folder",
       "chapter": "04-capabilities/01-devex/02-agent/04-plugins/01-plugins.md",
       "heading": "What a hook runs, and where its cache lives",
@@ -1786,12 +1672,9 @@
     },
     {
       "id": "RULE.DEVEX.AGENT.143",
-      "level": "MUST",
-      "params": {
-        "check": "restates",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": "A lesson for the agent goes into the book and the plugin, never only into memory",
       "chapter": "04-capabilities/01-devex/02-agent/04-plugins/01-plugins.md",
       "heading": "The place you are standing decides the install mode",
@@ -1854,12 +1737,9 @@
     },
     {
       "id": "RULE.DEVEX.AGENT.146",
-      "level": "MUST",
-      "params": {
-        "check": "restates",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": "A plugin script and its tests build a docs path through one layout module, never as a literal",
       "chapter": "04-capabilities/01-devex/02-agent/04-plugins/01-plugins.md",
       "heading": "What a hook runs, and where its cache lives",
@@ -1874,12 +1754,9 @@
     },
     {
       "id": "RULE.DEVEX.AGENT.147",
-      "level": "MUST",
-      "params": {
-        "check": "stop",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": "The agent assumes you run Claude in the VS Code extension, and never tells you to run a `claude` command or to use a terminal remedy",
       "chapter": "04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "heading": "Where the agent's own surfaces live",
@@ -1888,12 +1765,9 @@
     },
     {
       "id": "RULE.DEVEX.AGENT.148",
-      "level": "MUST",
-      "params": {
-        "check": "stop",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": "Every tree is drawn vertically, one entry per line with its comment on the same line, and never in two columns",
       "chapter": "04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "heading": "A reply speaks as a teammate: the moment chooses its register, its icon and its shape",
@@ -1972,7 +1846,7 @@
         "check": "book-classes"
       },
       "class": "checked",
-      "sentence": "The params' keys are a closed list: `check`, `due`, `short` and `skill`",
+      "sentence": "The params' keys are a closed list: `check`, `short`, `skill` and `agent`",
       "chapter": "04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "heading": "Three classes of rule",
       "decision": null,
@@ -2008,10 +1882,9 @@
       "id": "RULE.DEVEX.AGENT.156",
       "level": "MUST",
       "params": {
-        "check": "restates",
-        "due": "036/N008"
+        "skill": "spn-devex/develop"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "A ref restates a rule with the same parenthesis, the id in a code span",
       "chapter": "04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "heading": "Three classes of rule",
@@ -2137,14 +2010,39 @@
       "id": "RULE.DEVEX.AGENT.164",
       "level": "MUST",
       "params": {
-        "check": "orientation",
-        "due": "036/N011"
+        "check": "stop"
       },
       "class": "checked",
       "sentence": "The first reply of a workspace's day opens with the whole welcome, whatever the prompt, and every later window that day opens on the status line and one Go line",
       "chapter": "04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "heading": "It opens on the welcome and one status line, never a status dump",
       "decision": "DEC.DEVEX.AGENT.164",
+      "restated": []
+    },
+    {
+      "id": "RULE.DEVEX.AGENT.165",
+      "level": "MUST",
+      "params": {
+        "check": "book-classes"
+      },
+      "class": "checked",
+      "sentence": "The book names no workstream, no arc and no window",
+      "chapter": "04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
+      "heading": "Three classes of rule",
+      "decision": null,
+      "restated": []
+    },
+    {
+      "id": "RULE.DEVEX.AGENT.166",
+      "level": "MUST",
+      "params": {
+        "check": "book-classes"
+      },
+      "class": "checked",
+      "sentence": "A check still to be built holds nothing, so a rule names it only in the change that ships it",
+      "chapter": "04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
+      "heading": "Three classes of rule",
+      "decision": null,
       "restated": []
     },
     {
@@ -2202,12 +2100,9 @@
     },
     {
       "id": "RULE.DEVEX.FUNCTION.013",
-      "level": "MUST",
-      "params": {
-        "check": "restates",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": "The order is a cycle rather than a line",
       "chapter": "04-capabilities/01-devex/02-agent/02-skills/01-skills.md",
       "heading": "The stage vocabulary is closed, and a request belongs to exactly one",
@@ -2218,10 +2113,9 @@
       "id": "RULE.DEVEX.FUNCTION.016",
       "level": "MUST",
       "params": {
-        "check": "restates",
-        "due": "036/N008"
+        "skill": "spn-devex/ideate"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "`IDEATE` decides the shape, and designing a requirement inside that shape is part of it",
       "chapter": "04-capabilities/01-devex/02-agent/02-skills/01-skills.md",
       "heading": "The stage vocabulary is closed, and a request belongs to exactly one",
@@ -2273,10 +2167,9 @@
       "id": "RULE.DEVEX.FUNCTION.043",
       "level": "MUST",
       "params": {
-        "check": "doc-check",
-        "due": "036/N008"
+        "skill": "spn-devex/bootstrap"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": null,
       "chapter": "05-guides/README.md",
       "heading": "The machine",
@@ -2287,10 +2180,9 @@
       "id": "RULE.DEVEX.FUNCTION.051",
       "level": "MUST",
       "params": {
-        "check": "subjects",
-        "due": "036/N008"
+        "skill": "spn-infra/run"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "The layer nouns a person types are `organization`, `platform` and `environment`; `app` is not among them",
       "chapter": "04-capabilities/02-support/03-infra/10-providers/local/09-deployments.md",
       "heading": "Registering an application is not a layer",
@@ -2377,12 +2269,9 @@
     },
     {
       "id": "RULE.DEVEX.FUNCTION.063",
-      "level": "MUST",
-      "params": {
-        "check": "stop",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": null,
       "chapter": "02-constructs/01-devex/01-function/README.md",
       "heading": "Declaration",
@@ -2393,10 +2282,9 @@
       "id": "RULE.DEVEX.FUNCTION.064",
       "level": "MUST",
       "params": {
-        "check": "subjects",
-        "due": "036/N008"
+        "skill": "spn-apps/implement"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "The tier decides which cases bind an id",
       "chapter": "04-capabilities/02-support/02-apps/06-tests/README.md",
       "heading": "A case title carries the id and the sentence",
@@ -2529,10 +2417,9 @@
       "id": "RULE.DEVEX.FUNCTION.069",
       "level": "MUST",
       "params": {
-        "check": "stop",
-        "due": "036/N008"
+        "skill": "spn-devex/scm"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "A commit subject, a pull request title and a pull request body are written for a developer reviewing on GitHub",
       "chapter": "04-capabilities/01-devex/01-function/02-scm.md",
       "heading": "A workstream's branch, and its promotion",
@@ -2762,10 +2649,9 @@
       "id": "RULE.DEVEX.FUNCTION.080",
       "level": "MUST",
       "params": {
-        "check": "stop",
-        "due": "036/N008"
+        "skill": "spn-devex/provision"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "The local stack keeps one domain for each app and one database, and a workstream resets and migrates it rather than registering a second host or database",
       "chapter": "04-capabilities/01-devex/01-function/06-provision.md",
       "heading": "Stage — Provision",
@@ -2782,10 +2668,9 @@
       "id": "RULE.DEVEX.FUNCTION.081",
       "level": "MUST",
       "params": {
-        "check": "stop",
-        "due": "036/N008"
+        "skill": "spn-devex/develop"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "A book file that a check reads as data lands in the same commit as the code that reads it",
       "chapter": "04-capabilities/01-devex/01-function/04-develop.md",
       "heading": "Where each gate runs",
@@ -2796,10 +2681,9 @@
       "id": "RULE.DEVEX.FUNCTION.082",
       "level": "MUST",
       "params": {
-        "check": "stop",
-        "due": "036/N008"
+        "skill": "spn-devex/test"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "One repository's test calls run one after another, never in parallel Bash calls, and each output is read for the run file it names",
       "chapter": "04-capabilities/01-devex/01-function/05-test.md",
       "heading": "Stage — Test",
@@ -2949,10 +2833,9 @@
       "id": "RULE.DEVEX.UTILS.004",
       "level": "MUST",
       "params": {
-        "check": "command-shape",
-        "due": "036/N008"
+        "skill": "spn-devex/develop"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": null,
       "chapter": "02-constructs/01-devex/03-utils/01-spnutils.md",
       "heading": "The derivation laws",
@@ -2969,10 +2852,9 @@
       "id": "RULE.DEVEX.UTILS.005",
       "level": "MUST",
       "params": {
-        "check": "command-shape",
-        "due": "036/N008"
+        "skill": "spn-devex/develop"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": null,
       "chapter": "02-constructs/01-devex/03-utils/01-spnutils.md",
       "heading": "repo",
@@ -2983,10 +2865,9 @@
       "id": "RULE.DEVEX.UTILS.018",
       "level": "MUST",
       "params": {
-        "check": "command-shape",
-        "due": "036/N008"
+        "skill": "spn-devex/develop"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": null,
       "chapter": "02-constructs/01-devex/03-utils/01-spnutils.md",
       "heading": "Four command groups",
@@ -2997,10 +2878,9 @@
       "id": "RULE.DEVEX.UTILS.019",
       "level": "MUST",
       "params": {
-        "check": "command-shape",
-        "due": "036/N008"
+        "skill": "spn-devex/deliver"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": null,
       "chapter": "04-capabilities/01-devex/03-utils/01-spnutils/02-delivery.md",
       "heading": "One public marketplace",
@@ -3011,10 +2891,9 @@
       "id": "RULE.DEVEX.UTILS.027",
       "level": "MUST",
       "params": {
-        "check": "command-shape",
-        "due": "036/N008"
+        "skill": "spn-devex/develop"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "it is addressed by coordinate",
       "chapter": "04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
       "heading": "The machine's own layout",
@@ -3044,10 +2923,9 @@
       "id": "RULE.DEVEX.UTILS.042",
       "level": "MUST",
       "params": {
-        "check": "command-shape",
-        "due": "036/N008"
+        "skill": "spn-devex/develop"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "Nothing long-lived is stored anywhere, planned command or not",
       "chapter": "04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
       "heading": "login — the cloud session",
@@ -3058,13 +2936,12 @@
       "id": "RULE.DEVEX.UTILS.044",
       "level": "MUST",
       "params": {
-        "check": "env-seat",
-        "due": "036/N008"
+        "check": "saasplane-env"
       },
       "class": "checked",
-      "sentence": "Your SaaS Plane values have one machine seat, `~/.spnenv`, and the tool never writes a shell profile",
+      "sentence": "Your SaaS Plane values have one saasplane env, `~/.spnenv`, and the tool never writes a shell profile",
       "chapter": "04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
-      "heading": "The env seat — ~/.spnenv",
+      "heading": "The saasplane env — ~/.spnenv",
       "decision": "DEC.DEVEX.UTILS.044",
       "restated": [
         {
@@ -3078,11 +2955,10 @@
       "id": "RULE.DEVEX.UTILS.048",
       "level": "MUST",
       "params": {
-        "check": "env-seat",
-        "due": "036/N008"
+        "check": "saasplane-env"
       },
       "class": "checked",
-      "sentence": "The seat holds only what a partner or a builder configures",
+      "sentence": "The saasplane env holds only what a partner or a builder configures",
       "chapter": "04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
       "heading": "Five regions, one writer each",
       "decision": null,
@@ -3090,7 +2966,7 @@
         {
           "plugin": "spn-devex",
           "path": "refs/devex/workspace/workspace.md",
-          "heading": "The machine seat — ~/.spnenv"
+          "heading": "The saasplane env — ~/.spnenv"
         }
       ]
     },
@@ -3098,10 +2974,9 @@
       "id": "RULE.DEVEX.UTILS.050",
       "level": "MUST",
       "params": {
-        "check": "command-shape",
-        "due": "036/N008"
+        "skill": "spn-devex/develop"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "Every `APP_UTILITY` answers `help` and `help --json`",
       "chapter": "04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
       "heading": "help — how a utility describes itself",
@@ -3162,10 +3037,9 @@
       "id": "RULE.DEVEX.UTILS.072",
       "level": "MUST",
       "params": {
-        "check": "command-shape",
-        "due": "036/N008"
+        "skill": "spn-devex/develop"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "The platform layer is named by its spc, always and first",
       "chapter": "04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
       "heading": "infra — the estate",
@@ -3212,10 +3086,9 @@
       "id": "RULE.DEVEX.UTILS.073",
       "level": "MUST",
       "params": {
-        "check": "command-shape",
-        "due": "036/N008"
+        "skill": "spn-devex/develop"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "Locally, `organization up` installs the root door only when it is missing or out of date, and asks for the password once",
       "chapter": "04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
       "heading": "infra — the estate",
@@ -3251,10 +3124,9 @@
       "id": "RULE.DEVEX.UTILS.075",
       "level": "MUST",
       "params": {
-        "check": "command-shape",
-        "due": "036/N008"
+        "skill": "spn-devex/develop"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "The tool's home folder is the tool's own",
       "chapter": "04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
       "heading": "The machine's own layout",
@@ -3295,10 +3167,9 @@
       "id": "RULE.DEVEX.UTILS.077",
       "level": "MUST",
       "params": {
-        "check": "command-shape",
-        "due": "036/N008"
+        "skill": "spn-devex/develop"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "The core half reads no stack's file",
       "chapter": "04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
       "heading": "repo — the repository and its remote",
@@ -3309,10 +3180,9 @@
       "id": "RULE.DEVEX.UTILS.078",
       "level": "MUST",
       "params": {
-        "check": "command-shape",
-        "due": "036/N008"
+        "skill": "spn-devex/develop"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "The node inventory is a per-world question",
       "chapter": "04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
       "heading": "repo — the repository and its remote",
@@ -3323,10 +3193,9 @@
       "id": "RULE.DEVEX.UTILS.079",
       "level": "MUST",
       "params": {
-        "check": "command-shape",
-        "due": "036/N008"
+        "skill": "spn-devex/develop"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "The stack half sits behind the claim",
       "chapter": "04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
       "heading": "repo — the repository and its remote",
@@ -3337,10 +3206,9 @@
       "id": "RULE.DEVEX.UTILS.080",
       "level": "MUST",
       "params": {
-        "check": "command-shape",
-        "due": "036/N008"
+        "skill": "spn-devex/develop"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "The package scope comes from the declared organization",
       "chapter": "04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
       "heading": "repo — the repository and its remote",
@@ -3351,10 +3219,9 @@
       "id": "RULE.DEVEX.UTILS.081",
       "level": "MUST",
       "params": {
-        "check": "command-shape",
-        "due": "036/N008"
+        "skill": "spn-devex/develop"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "Nothing lands in a person's own agent settings",
       "chapter": "04-capabilities/01-devex/03-utils/01-spnutils/02-delivery.md",
       "heading": "Wiring — two levels, never the person",
@@ -3363,12 +3230,9 @@
     },
     {
       "id": "RULE.DEVEX.UTILS.082",
-      "level": "MUST",
-      "params": {
-        "check": "command-shape",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": "Nothing you edit is live before the install",
       "chapter": "04-capabilities/01-devex/03-utils/01-spnutils/02-delivery.md",
       "heading": "When an edit becomes behaviour",
@@ -3379,10 +3243,9 @@
       "id": "RULE.DEVEX.UTILS.083",
       "level": "MUST",
       "params": {
-        "check": "command-shape",
-        "due": "036/N008"
+        "skill": "spn-devex/develop"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "A repo with no claim gets the core plugin and never a stack's",
       "chapter": "04-capabilities/01-devex/03-utils/01-spnutils/02-delivery.md",
       "heading": "The set a repo gets is derived from its own claim",
@@ -3393,10 +3256,9 @@
       "id": "RULE.DEVEX.UTILS.084",
       "level": "MUST",
       "params": {
-        "check": "command-shape",
-        "due": "036/N008"
+        "skill": "spn-devex/develop"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "The allow tier is derived, never learned",
       "chapter": "04-capabilities/01-devex/03-utils/01-spnutils/02-delivery.md",
       "heading": "The three permission tiers",
@@ -3439,13 +3301,36 @@
       "restated": []
     },
     {
+      "id": "RULE.DEVEX.UTILS.088",
+      "level": "MUST",
+      "params": {
+        "check": "saasplane-env"
+      },
+      "class": "checked",
+      "sentence": "The agent reads the saasplane env through `spnutils workspace env show`, and writes a value that is not secret through `env set`, never by opening the file",
+      "chapter": "04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
+      "heading": "Five regions, one writer each",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/utils/spnutils.md",
+          "heading": "The saasplane env — ~/.spnenv"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/workspace.md",
+          "heading": "Five regions, one writer each"
+        }
+      ]
+    },
+    {
       "id": "RULE.DEVEX.WORKSPACE.006",
       "level": "MUST",
       "params": {
-        "check": "doc-check",
-        "due": "036/N008"
+        "skill": "spn-devex/ideate"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": null,
       "chapter": "04-capabilities/README.md",
       "heading": "Capabilities — What the Foundation Provides",
@@ -3454,12 +3339,9 @@
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.009",
-      "level": "MUST",
-      "params": {
-        "check": "corpus",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": "A provider node carries no seats",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/03-tree.md",
       "heading": "Realizations sit at the repository root",
@@ -3479,12 +3361,9 @@
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.011",
-      "level": "MUST",
-      "params": {
-        "check": "doc-check",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": null,
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "The approach document — a workstream's, never a repository's",
@@ -3512,12 +3391,9 @@
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.024",
-      "level": "MUST",
-      "params": {
-        "check": "doc-check",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": null,
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/06-registers.md",
       "heading": "What the pocket holds",
@@ -3528,10 +3404,9 @@
       "id": "RULE.DEVEX.WORKSPACE.036",
       "level": "MUST",
       "params": {
-        "check": "workstream-state",
-        "due": "036/N008"
+        "skill": "spn-devex/develop"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "A workspace is minted by a command; its members are discovered",
       "chapter": "04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md",
       "heading": "Minted, then discovered",
@@ -3540,12 +3415,9 @@
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.037",
-      "level": "MUST",
-      "params": {
-        "check": "workstream-state",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": null,
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "The workstream is a scope of work, not a window",
@@ -3569,10 +3441,9 @@
       "id": "RULE.DEVEX.WORKSPACE.040",
       "level": "MUST",
       "params": {
-        "check": "command-shape",
-        "due": "036/N008"
+        "skill": "spn-devex/develop"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "So the rails sit on the floor, and the tier a command sits in is a property of the command rather than of the repo somebody typed it in",
       "chapter": "04-capabilities/01-devex/03-utils/01-spnutils/02-delivery.md",
       "heading": "The three permission tiers",
@@ -3602,10 +3473,9 @@
       "id": "RULE.DEVEX.WORKSPACE.046",
       "level": "MUST",
       "params": {
-        "check": "doc-check",
-        "due": "036/N008"
+        "skill": "spn-devex/develop"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "A permission rule names only a command form the CLI accepts, and the tier writer proves each one against the command table",
       "chapter": "04-capabilities/01-devex/03-utils/01-spnutils/02-delivery.md",
       "heading": "The three permission tiers",
@@ -3614,12 +3484,9 @@
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.054",
-      "level": "MUST",
-      "params": {
-        "check": "command-shape",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": null,
       "chapter": "04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
       "heading": "workspace — the folder your day runs in",
@@ -3654,10 +3521,9 @@
       "id": "RULE.DEVEX.WORKSPACE.064",
       "level": "MUST",
       "params": {
-        "check": "workstream-state",
-        "due": "036/N008"
+        "skill": "spn-devex/ideate"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "A step acting on a set carries that set",
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "An arc carries its specification, or names the note that holds it",
@@ -3668,10 +3534,9 @@
       "id": "RULE.DEVEX.WORKSPACE.065",
       "level": "MUST",
       "params": {
-        "check": "workstream-state",
-        "due": "036/N008"
+        "skill": "spn-devex/execute"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "Ideating owes nothing, and once it stops, any edit runs against a step that already exists",
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "Ideating is free, executing is not, and a number is a promise",
@@ -3701,8 +3566,7 @@
       "id": "RULE.DEVEX.WORKSPACE.070",
       "level": "MUST",
       "params": {
-        "check": "doc-check",
-        "due": "036/N008"
+        "check": "doc-check"
       },
       "class": "checked",
       "sentence": "One docs grammar serves every repository, dispatched from the manifests it already declares, and each document lives at the highest node that owns its scope",
@@ -3713,12 +3577,9 @@
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.071",
-      "level": "MUST",
-      "params": {
-        "check": "doc-check",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": null,
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/03-tree.md",
       "heading": "The five seats",
@@ -3727,12 +3588,9 @@
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.072",
-      "level": "MUST",
-      "params": {
-        "check": "corpus",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": "one word at every altitude",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/03-tree.md",
       "heading": "The two pockets",
@@ -3754,10 +3612,9 @@
       "id": "RULE.DEVEX.WORKSPACE.074",
       "level": "MUST",
       "params": {
-        "check": "doc-check",
-        "due": "036/N008"
+        "skill": "spn-apps/new"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": null,
       "chapter": "02-constructs/01-devex/04-workspace/04-docs.md",
       "heading": "Guides are steps",
@@ -3768,10 +3625,9 @@
       "id": "RULE.DEVEX.WORKSPACE.075",
       "level": "MUST",
       "params": {
-        "check": "doc-check",
-        "due": "036/N008"
+        "skill": "spn-devex/develop"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "The reading strip is generated, never authored, and it walks the seats",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/01-corpus.md",
       "heading": "The book pattern",
@@ -3780,12 +3636,9 @@
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.076",
-      "level": "MUST",
-      "params": {
-        "check": "doc-check",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": null,
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/03-tree.md",
       "heading": "Number what is ordered; never number what is named",
@@ -3796,10 +3649,9 @@
       "id": "RULE.DEVEX.WORKSPACE.077",
       "level": "MUST",
       "params": {
-        "check": "subjects",
-        "due": "036/N008"
+        "skill": "spn-devex/develop"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": null,
       "chapter": "02-constructs/02-support/02-apps/08-agent-surface.md",
       "heading": "The derived-artifact rule",
@@ -3814,12 +3666,9 @@
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.078",
-      "level": "MUST",
-      "params": {
-        "check": "doc-check",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": null,
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/03-tree.md",
       "heading": "The five seats",
@@ -3830,8 +3679,7 @@
       "id": "RULE.DEVEX.WORKSPACE.079",
       "level": "MUST",
       "params": {
-        "check": "doc-check",
-        "due": "036/N008"
+        "check": "corpus"
       },
       "class": "checked",
       "sentence": "The `artifacts/` pocket holds four folders and no arguments, and templates sit beside the chapters that own their rules",
@@ -3873,10 +3721,9 @@
       "id": "RULE.DEVEX.WORKSPACE.081",
       "level": "MUST",
       "params": {
-        "check": "stop",
-        "due": "036/N008"
+        "skill": "spn-devex/develop"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": null,
       "chapter": "02-constructs/01-devex/01-function/04-develop.md",
       "heading": "Model",
@@ -3898,8 +3745,7 @@
       "id": "RULE.DEVEX.WORKSPACE.082",
       "level": "MUST",
       "params": {
-        "check": "doc-check",
-        "due": "036/N008"
+        "check": "corpus"
       },
       "class": "checked",
       "sentence": null,
@@ -3916,12 +3762,9 @@
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.083",
-      "level": "MUST",
-      "params": {
-        "check": "doc-check",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": null,
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/03-tree.md",
       "heading": "What — capabilities: the standard here, a chapter per construct everywhere else",
@@ -3932,10 +3775,9 @@
       "id": "RULE.DEVEX.WORKSPACE.084",
       "level": "MUST",
       "params": {
-        "check": "doc-check",
-        "due": "036/N008"
+        "skill": "spn-devex/develop"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "`group` is the source axis; `area` is the folder's division",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md",
       "heading": "Naming rules",
@@ -3944,12 +3786,9 @@
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.085",
-      "level": "MUST",
-      "params": {
-        "check": "corpus",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": "You never meet an absent seat",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/03-tree.md",
       "heading": "The five seats",
@@ -3966,10 +3805,9 @@
       "id": "RULE.DEVEX.WORKSPACE.086",
       "level": "MUST",
       "params": {
-        "check": "subjects",
-        "due": "036/N008"
+        "skill": "spn-devex/ideate"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "`migrations/` earns you none either",
       "chapter": "04-capabilities/02-support/02-apps/README.md",
       "heading": "Which chapter a kind realizes",
@@ -4016,12 +3854,9 @@
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.089",
-      "level": "MUST",
-      "params": {
-        "check": "doc-check",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": null,
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/03-tree.md",
       "heading": "A capability is realized by halves, and each half maps its own terms",
@@ -4030,12 +3865,9 @@
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.090",
-      "level": "MUST",
-      "params": {
-        "check": "doc-check",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": "A behaviour row's subject is a persona, never an actor",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/02-document.md",
       "heading": "The behaviour row",
@@ -4050,12 +3882,9 @@
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.092",
-      "level": "MUST",
-      "params": {
-        "check": "doc-check",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": null,
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/03-tree.md",
       "heading": "What — capabilities: the standard here, a chapter per construct everywhere else",
@@ -4064,12 +3893,9 @@
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.093",
-      "level": "MUST",
-      "params": {
-        "check": "doc-check",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": null,
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/03-tree.md",
       "heading": "What a capability chapter holds",
@@ -4078,12 +3904,9 @@
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.094",
-      "level": "MUST",
-      "params": {
-        "check": "doc-check",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": "A repository's docs tree never ships",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/03-tree.md",
       "heading": "The capability chain — what each document states, and what it may not",
@@ -4143,10 +3966,9 @@
       "id": "RULE.DEVEX.WORKSPACE.097",
       "level": "MUST",
       "params": {
-        "check": "doc-check",
-        "due": "036/N008"
+        "skill": "spn-devex/develop"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": null,
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/02-document.md",
       "heading": "Metadata",
@@ -4181,10 +4003,9 @@
       "id": "RULE.DEVEX.WORKSPACE.099",
       "level": "MUST",
       "params": {
-        "check": "doc-check",
-        "due": "036/N008"
+        "skill": "spn-devex/develop"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "every file that ships inside a repository, agent instruments included",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md",
       "heading": "Naming rules",
@@ -4199,12 +4020,9 @@
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.100",
-      "level": "MUST",
-      "params": {
-        "check": "doc-check",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": "The developer lenses are derived from the kind, through its declared runtime, with `ARCHITECT` added by seat and every other lens authored",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/02-document.md",
       "heading": "Metadata",
@@ -4219,12 +4037,9 @@
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.101",
-      "level": "MUST",
-      "params": {
-        "check": "doc-check",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": null,
       "chapter": "01-purpose/04-way.md",
       "heading": "How it is kept",
@@ -4300,12 +4115,9 @@
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.105",
-      "level": "MUST",
-      "params": {
-        "check": "doc-check",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": "A decided row names what proves it, or states why nothing does",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/06-registers.md",
       "heading": "Writing a row",
@@ -4464,8 +4276,7 @@
       "id": "RULE.DEVEX.WORKSPACE.108",
       "level": "MUST",
       "params": {
-        "check": "doc-check",
-        "due": "036/N008"
+        "check": "doc-check"
       },
       "class": "checked",
       "sentence": "An artifact carries a chapter's share of reach, fifteen percent, and no artifact leaves the sweep",
@@ -4532,12 +4343,9 @@
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.113",
-      "level": "MUST",
-      "params": {
-        "check": "doc-check",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": null,
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "The overview set is fixed, and a name says its source",
@@ -4546,12 +4354,9 @@
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.114",
-      "level": "MUST",
-      "params": {
-        "check": "doc-check",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": "The page uses the window, and only prose is held to a measure",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "The page itself — its outline, its rail, its width and its furniture",
@@ -4589,12 +4394,9 @@
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.116",
-      "level": "MUST",
-      "params": {
-        "check": "doc-check",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": "A corpus link is relative, and no page carries `file://`, a machine path or a hosted URL",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "Every link is relative, and the corpus has no single reader",
@@ -4634,10 +4436,9 @@
       "id": "RULE.DEVEX.WORKSPACE.118",
       "level": "MUST",
       "params": {
-        "check": "corpus",
-        "due": "036/N008"
+        "skill": "spn-devex/develop"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "A file that carries a rule it does not own is a restatement, and the command that reads it is `restates`",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md",
       "heading": "Restatement discipline",
@@ -4648,8 +4449,7 @@
       "id": "RULE.DEVEX.WORKSPACE.119",
       "level": "MUST",
       "params": {
-        "check": "doc-check",
-        "due": "036/N008"
+        "check": "corpus"
       },
       "class": "checked",
       "sentence": "Its seats divide by the domains this repository's own concept names, never by the packages it ships",
@@ -4662,8 +4462,7 @@
       "id": "RULE.DEVEX.WORKSPACE.120",
       "level": "MUST",
       "params": {
-        "check": "doc-check",
-        "due": "036/N008"
+        "check": "corpus"
       },
       "class": "checked",
       "sentence": "Constructs are the second seat, and the glossary is generated from them and from each domain's `data-model.md`, never typed",
@@ -4676,8 +4475,7 @@
       "id": "RULE.DEVEX.WORKSPACE.121",
       "level": "MUST",
       "params": {
-        "check": "doc-check",
-        "due": "036/N008"
+        "check": "corpus"
       },
       "class": "checked",
       "sentence": null,
@@ -4688,12 +4486,9 @@
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.122",
-      "level": "MUST",
-      "params": {
-        "check": "doc-check",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": null,
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/03-tree.md",
       "heading": "The invariants between the seats",
@@ -4702,12 +4497,9 @@
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.123",
-      "level": "MUST",
-      "params": {
-        "check": "doc-check",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": null,
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/02-document.md",
       "heading": "The behaviour row",
@@ -4735,12 +4527,9 @@
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.125",
-      "level": "MUST",
-      "params": {
-        "check": "doc-check",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": "The house words are for the people who need them, and a node README uses none of them",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md",
       "heading": "Naming rules",
@@ -4767,10 +4556,9 @@
       "id": "RULE.DEVEX.WORKSPACE.126",
       "level": "MUST",
       "params": {
-        "check": "doc-check",
-        "due": "036/N008"
+        "skill": "spn-devex/execute"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": null,
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "Docs per change: each kind of change owes the documents its own share",
@@ -4779,12 +4567,9 @@
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.127",
-      "level": "MUST",
-      "params": {
-        "check": "doc-check",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": null,
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/03-tree.md",
       "heading": "A capability is realized by halves, and each half maps its own terms",
@@ -4793,12 +4578,9 @@
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.128",
-      "level": "MUST",
-      "params": {
-        "check": "doc-check",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": null,
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/02-document.md",
       "heading": "The behaviour row",
@@ -4813,12 +4595,9 @@
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.130",
-      "level": "MUST",
-      "params": {
-        "check": "doc-check",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": null,
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "What the pocket holds",
@@ -4827,12 +4606,9 @@
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.131",
-      "level": "MUST",
-      "params": {
-        "check": "corpus",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": null,
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/03-tree.md",
       "heading": "This book divides by area; every other repository divides by domain",
@@ -4854,8 +4630,7 @@
       "id": "RULE.DEVEX.WORKSPACE.132",
       "level": "MUST",
       "params": {
-        "check": "doc-check",
-        "due": "036/N008"
+        "check": "corpus"
       },
       "class": "checked",
       "sentence": "What proves a construct is the behaviour rows in the behaviours seat, at the construct's own path",
@@ -4877,12 +4652,9 @@
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.133",
-      "level": "MUST",
-      "params": {
-        "check": "doc-check",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": null,
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/03-tree.md",
       "heading": "What a capability chapter holds",
@@ -4902,12 +4674,9 @@
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.134",
-      "level": "MUST",
-      "params": {
-        "check": "doc-check",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": null,
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/03-tree.md",
       "heading": "A capability is realized by halves, and each half maps its own terms",
@@ -4950,12 +4719,9 @@
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.137",
-      "level": "MUST",
-      "params": {
-        "check": "doc-check",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": null,
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/02-document.md",
       "heading": "Metadata",
@@ -4964,12 +4730,9 @@
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.138",
-      "level": "MUST",
-      "params": {
-        "check": "mirror",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": "The code mirror survives, and it moved to the node",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/03-tree.md",
       "heading": "What a capability chapter holds",
@@ -4994,12 +4757,9 @@
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.139",
-      "level": "MUST",
-      "params": {
-        "check": "doc-check",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": null,
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/02-document.md",
       "heading": "The behaviour row",
@@ -5008,12 +4768,9 @@
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.141",
-      "level": "MUST",
-      "params": {
-        "check": "doc-check",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": null,
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/02-document.md",
       "heading": "Structure rules",
@@ -5043,8 +4800,7 @@
       "id": "RULE.DEVEX.WORKSPACE.143",
       "level": "MUST",
       "params": {
-        "check": "doc-check",
-        "due": "036/N008"
+        "check": "doc-check"
       },
       "class": "checked",
       "sentence": "The punchline is `Your team's time belongs to your product.`, and the statement beside it does not change",
@@ -5068,8 +4824,7 @@
       "id": "RULE.DEVEX.WORKSPACE.144",
       "level": "MUST",
       "params": {
-        "check": "doc-check",
-        "due": "036/N008"
+        "check": "doc-check"
       },
       "class": "checked",
       "sentence": "A number appears in prose only when the set is closed and the same sentence names what it holds",
@@ -5088,10 +4843,9 @@
       "id": "RULE.DEVEX.WORKSPACE.145",
       "level": "MUST",
       "params": {
-        "check": "doc-check",
-        "due": "036/N008"
+        "skill": "spn-devex/ideate"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": null,
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/01-corpus.md",
       "heading": "What a concept is made of",
@@ -5145,8 +4899,7 @@
       "id": "RULE.DEVEX.WORKSPACE.148",
       "level": "MUST",
       "params": {
-        "check": "doc-check",
-        "due": "036/N008"
+        "check": "doc-check"
       },
       "class": "checked",
       "sentence": null,
@@ -5159,10 +4912,9 @@
       "id": "RULE.DEVEX.WORKSPACE.149",
       "level": "MUST",
       "params": {
-        "check": "doc-check",
-        "due": "036/N008"
+        "skill": "spn-devex/report"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "A report says where a repository stands at one moment, for two readers",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "Reports and templates",
@@ -5182,12 +4934,9 @@
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.150",
-      "level": "MUST",
-      "params": {
-        "check": "doc-check",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": null,
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/03-tree.md",
       "heading": "What — constructs: the model, read in order",
@@ -5202,12 +4951,9 @@
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.151",
-      "level": "MUST",
-      "params": {
-        "check": "doc-check",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": "The two trees need not carry the same domain names, and the book is never aligned to a realization's",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/03-tree.md",
       "heading": "What — capabilities: the standard here, a chapter per construct everywhere else",
@@ -5216,12 +4962,9 @@
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.153",
-      "level": "MUST",
-      "params": {
-        "check": "doc-check",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": null,
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/06-registers.md",
       "heading": "What the pocket holds",
@@ -5230,12 +4973,9 @@
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.154",
-      "level": "MUST",
-      "params": {
-        "check": "doc-check",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": "The set is the hub, one page per domain, and one more for every further reading path",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "The overview set is fixed, and a name says its source",
@@ -5252,8 +4992,7 @@
       "id": "RULE.DEVEX.WORKSPACE.156",
       "level": "MUST",
       "params": {
-        "check": "doc-check",
-        "due": "036/N008"
+        "check": "no-history"
       },
       "class": "checked",
       "sentence": "Written fresh, always current",
@@ -5266,10 +5005,9 @@
       "id": "RULE.DEVEX.WORKSPACE.157",
       "level": "MUST",
       "params": {
-        "check": "subjects",
-        "due": "036/N008"
+        "skill": "spn-apps/implement"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": null,
       "chapter": "04-capabilities/02-support/02-apps/04-resources/01-server/02-database.md",
       "heading": "Database — Schemas, Entities, and Tenancy",
@@ -5289,12 +5027,9 @@
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.159",
-      "level": "MUST",
-      "params": {
-        "check": "doc-check",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": null,
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/03-tree.md",
       "heading": "Realizations sit at the repository root",
@@ -5303,12 +5038,9 @@
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.160",
-      "level": "MUST",
-      "params": {
-        "check": "doc-check",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": null,
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/03-tree.md",
       "heading": "Number what is ordered; never number what is named",
@@ -5317,12 +5049,9 @@
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.161",
-      "level": "MUST",
-      "params": {
-        "check": "corpus",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": null,
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/03-tree.md",
       "heading": "Number what is ordered; never number what is named",
@@ -5350,12 +5079,9 @@
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.163",
-      "level": "MUST",
-      "params": {
-        "check": "doc-check",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": null,
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md",
       "heading": "Counting discipline",
@@ -5370,12 +5096,9 @@
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.164",
-      "level": "MUST",
-      "params": {
-        "check": "doc-check",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": null,
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/03-tree.md",
       "heading": "Number what is ordered; never number what is named",
@@ -5384,12 +5107,9 @@
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.165",
-      "level": "MUST",
-      "params": {
-        "check": "doc-check",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": "A chapter that owns a closed vocabulary states it as a `Contract` block",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/02-document.md",
       "heading": "Structure rules",
@@ -5406,10 +5126,9 @@
       "id": "RULE.DEVEX.WORKSPACE.166",
       "level": "MUST",
       "params": {
-        "check": "doc-check",
-        "due": "036/N008"
+        "skill": "spn-devex/develop"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": null,
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/06-registers.md",
       "heading": "The identifier",
@@ -5418,12 +5137,9 @@
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.167",
-      "level": "MUST",
-      "params": {
-        "check": "doc-check",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": "The decision column is the ruling, and nothing else",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/06-registers.md",
       "heading": "Writing a row",
@@ -5445,10 +5161,9 @@
       "id": "RULE.DEVEX.WORKSPACE.170",
       "level": "MUST",
       "params": {
-        "check": "subjects",
-        "due": "036/N008"
+        "skill": "spn-devex/ideate"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": null,
       "chapter": "04-capabilities/02-support/02-apps/01-shape/02-packaging.md",
       "heading": "What a node root holds",
@@ -5459,10 +5174,9 @@
       "id": "RULE.DEVEX.WORKSPACE.171",
       "level": "MUST",
       "params": {
-        "check": "stop",
-        "due": "036/N008"
+        "skill": "spn-devex/ideate"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": null,
       "chapter": "04-capabilities/01-devex/01-function/03-ideate.md",
       "heading": "Classify the altitude before you classify the change",
@@ -5473,8 +5187,7 @@
       "id": "RULE.DEVEX.WORKSPACE.172",
       "level": "MUST",
       "params": {
-        "check": "doc-check",
-        "due": "036/N008"
+        "check": "corpus"
       },
       "class": "checked",
       "sentence": "An id names its kind, the place it lives and its number, and it is never reused",
@@ -5485,12 +5198,9 @@
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.173",
-      "level": "MUST",
-      "params": {
-        "check": "doc-check",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": null,
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/02-document.md",
       "heading": "Structure rules",
@@ -5499,12 +5209,9 @@
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.175",
-      "level": "MUST",
-      "params": {
-        "check": "doc-check",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": null,
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/06-registers.md",
       "heading": "What the pocket holds",
@@ -5532,10 +5239,9 @@
       "id": "RULE.DEVEX.WORKSPACE.178",
       "level": "MUST",
       "params": {
-        "check": "doc-check",
-        "due": "036/N008"
+        "skill": "spn-devex/develop"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "The place is read from the repository itself",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/06-registers.md",
       "heading": "The identifier",
@@ -5546,10 +5252,9 @@
       "id": "RULE.DEVEX.WORKSPACE.179",
       "level": "MUST",
       "params": {
-        "check": "subjects",
-        "due": "036/N008"
+        "skill": "spn-apps/new"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "So the file exists and answers",
       "chapter": "04-capabilities/02-support/02-apps/10-providers/02-contract.md",
       "heading": "A stack with no capability writes the file anyway",
@@ -5573,10 +5278,9 @@
       "id": "RULE.DEVEX.WORKSPACE.181",
       "level": "MUST",
       "params": {
-        "check": "corpus",
-        "due": "036/N008"
+        "skill": "spn-devex/test"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": null,
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/03-tree.md",
       "heading": "How — guides: steps, and nothing proven",
@@ -5657,8 +5361,7 @@
       "id": "RULE.DEVEX.WORKSPACE.183",
       "level": "MUST",
       "params": {
-        "check": "workstream-state",
-        "due": "036/N008"
+        "check": "workstream-state"
       },
       "class": "checked",
       "sentence": "Every step is one row, and the row carries six columns",
@@ -5690,10 +5393,9 @@
       "id": "RULE.DEVEX.WORKSPACE.185",
       "level": "MUST",
       "params": {
-        "check": "command-shape",
-        "due": "036/N008"
+        "skill": "spn-devex/develop"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": null,
       "chapter": "04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
       "heading": "workspace — the folder your day runs in",
@@ -5702,12 +5404,9 @@
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.186",
-      "level": "MUST",
-      "params": {
-        "check": "workstream-state",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": "The rules an agent follows while it carries out an order are stated once, here",
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "An order is one delegated execution, and every order follows the same rules",
@@ -5846,10 +5545,9 @@
       "id": "RULE.DEVEX.WORKSPACE.190",
       "level": "MUST",
       "params": {
-        "check": "workstream-state",
-        "due": "036/N008"
+        "skill": "spn-devex/develop"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "The `workstreams` node holds only what the folder tree cannot show",
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "The number is assigned once",
@@ -5866,10 +5564,9 @@
       "id": "RULE.DEVEX.WORKSPACE.191",
       "level": "MUST",
       "params": {
-        "check": "doc-check",
-        "due": "036/N008"
+        "skill": "spn-devex/report"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": null,
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "The coverage report — written, built and proved",
@@ -5896,10 +5593,9 @@
       "id": "RULE.DEVEX.WORKSPACE.192",
       "level": "MUST",
       "params": {
-        "check": "doc-check",
-        "due": "036/N008"
+        "skill": "spn-devex/report"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "The header names the report and says when its numbers were true",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "The header and the five sections",
@@ -6071,8 +5767,7 @@
       "id": "RULE.DEVEX.WORKSPACE.199",
       "level": "MUST",
       "params": {
-        "check": "stop",
-        "due": "036/N008"
+        "check": "stop"
       },
       "class": "checked",
       "sentence": "Suggestion or question",
@@ -6101,8 +5796,7 @@
       "id": "RULE.DEVEX.WORKSPACE.200",
       "level": "MUST",
       "params": {
-        "check": "workstream-state",
-        "due": "036/N008"
+        "check": "workstream-state"
       },
       "class": "checked",
       "sentence": "A preview is saved in the arc's own folder, and so is a sample",
@@ -6121,10 +5815,9 @@
       "id": "RULE.DEVEX.WORKSPACE.201",
       "level": "MUST",
       "params": {
-        "check": "workstream-state",
-        "due": "036/N008"
+        "skill": "spn-devex/ideate"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "The agent picks the form of a preview, and your word overrides it",
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "An arc carries its specification, or names the note that holds it",
@@ -6141,8 +5834,7 @@
       "id": "RULE.DEVEX.WORKSPACE.202",
       "level": "MUST",
       "params": {
-        "check": "doc-check",
-        "due": "036/N008"
+        "check": "doc-check"
       },
       "class": "checked",
       "sentence": null,
@@ -6155,8 +5847,7 @@
       "id": "RULE.DEVEX.WORKSPACE.203",
       "level": "MUST",
       "params": {
-        "check": "workstream-state",
-        "due": "036/N008"
+        "check": "workstream-state"
       },
       "class": "checked",
       "sentence": "An arc is named by its number, `N<nnn>`, and its subject and title are fields of its data",
@@ -6175,8 +5866,7 @@
       "id": "RULE.DEVEX.WORKSPACE.204",
       "level": "MUST",
       "params": {
-        "check": "doc-check",
-        "due": "036/N008"
+        "check": "doc-check"
       },
       "class": "checked",
       "sentence": "The parts of the page that the arcs and the records decide are produced, never typed",
@@ -6195,8 +5885,7 @@
       "id": "RULE.DEVEX.WORKSPACE.205",
       "level": "MUST",
       "params": {
-        "check": "doc-check",
-        "due": "036/N008"
+        "check": "doc-check"
       },
       "class": "checked",
       "sentence": "The agent writes the Title and the Subtitle of every page kind itself, and keeps them current as the page grows",
@@ -6283,10 +5972,9 @@
       "id": "RULE.DEVEX.WORKSPACE.208",
       "level": "MUST",
       "params": {
-        "check": "doc-check",
-        "due": "036/N008"
+        "skill": "spn-devex/report"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "One item per file inside a group",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "Records in a report",
@@ -6303,10 +5991,9 @@
       "id": "RULE.DEVEX.WORKSPACE.209",
       "level": "MUST",
       "params": {
-        "check": "workstream-state",
-        "due": "036/N008"
+        "skill": "spn-devex/ideate"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "A preview outside any workstream uses the same template",
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "An arc carries its specification, or names the note that holds it",
@@ -6417,8 +6104,7 @@
       "id": "RULE.DEVEX.WORKSPACE.214",
       "level": "MUST",
       "params": {
-        "check": "doc-check",
-        "due": "036/N008"
+        "check": "doc-check"
       },
       "class": "checked",
       "sentence": "Every page links one shared stylesheet and one shared script as its base, and holds no copy of them",
@@ -6474,12 +6160,9 @@
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.216",
-      "level": "MUST",
-      "params": {
-        "check": "doc-check",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": "Every class and every token of ours opens with `sds-`",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "Every class and token opens with sds-",
@@ -6509,12 +6192,9 @@
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.217",
-      "level": "MUST",
-      "params": {
-        "check": "doc-check",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": "A status is a set of classes of its own, and never a tone of the palette",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "The statuses, the palette, the widths and the build",
@@ -6569,8 +6249,7 @@
       "id": "RULE.DEVEX.WORKSPACE.220",
       "level": "MUST",
       "params": {
-        "check": "doc-check",
-        "due": "036/N008"
+        "check": "corpus"
       },
       "class": "checked",
       "sentence": "A hub has no link above its rail",
@@ -6589,8 +6268,7 @@
       "id": "RULE.DEVEX.WORKSPACE.221",
       "level": "MUST",
       "params": {
-        "check": "doc-check",
-        "due": "036/N008"
+        "check": "corpus"
       },
       "class": "checked",
       "sentence": null,
@@ -6626,12 +6304,9 @@
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.223",
-      "level": "MUST",
-      "params": {
-        "check": "doc-check",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": "A fact has one home",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "How ends in Cycles, and the arcs are the state",
@@ -6692,8 +6367,7 @@
       "id": "RULE.DEVEX.WORKSPACE.225",
       "level": "MUST",
       "params": {
-        "check": "doc-check",
-        "due": "036/N008"
+        "check": "doc-check"
       },
       "class": "checked",
       "sentence": "The page is written for the developer who decides, and holds what they need to decide. The agent's own material stays in the arc and its notes.",
@@ -6717,10 +6391,9 @@
       "id": "RULE.DEVEX.WORKSPACE.226",
       "level": "MUST",
       "params": {
-        "check": "workstream-state",
-        "due": "036/N008"
+        "skill": "spn-devex/execute"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "Every order states three things, in its own words",
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "An order is one delegated execution, and every order follows the same rules",
@@ -6754,12 +6427,9 @@
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.228",
-      "level": "MUST",
-      "params": {
-        "check": "doc-check",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": "`What` groups by domain, `How` by repository, and `Why` by the nature of the problem",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "The approach document — a workstream's, never a repository's",
@@ -6789,10 +6459,9 @@
       "id": "RULE.DEVEX.WORKSPACE.230",
       "level": "MUST",
       "params": {
-        "check": "doc-check",
-        "due": "036/N008"
+        "skill": "spn-surface/design"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "A skeleton is drawn for one level: the app, a layout with its body, navigation and content, the page level, a container, a widget or a card, or a component. It shows where that level's primary sub-components are placed, each with its own component's name, and sample values fill the rest",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "SKELETON — a mock of a layout",
@@ -6824,8 +6493,7 @@
       "id": "RULE.DEVEX.WORKSPACE.231",
       "level": "MUST",
       "params": {
-        "check": "doc-check",
-        "due": "036/N008"
+        "check": "corpus"
       },
       "class": "checked",
       "sentence": "Every entry shows only the heading's words before its dash",
@@ -6838,8 +6506,7 @@
       "id": "RULE.DEVEX.WORKSPACE.232",
       "level": "MUST",
       "params": {
-        "check": "doc-check",
-        "due": "036/N008"
+        "check": "corpus"
       },
       "class": "checked",
       "sentence": "In its back link and its previous and next doors, a markdown file opens a markdown file and a page opens a page",
@@ -6863,8 +6530,7 @@
       "id": "RULE.DEVEX.WORKSPACE.233",
       "level": "MUST",
       "params": {
-        "check": "doc-check",
-        "due": "036/N008"
+        "check": "doc-check"
       },
       "class": "checked",
       "sentence": "A preview shows, and an approach page argues, so a preview's sections are `Overview`, `Today`, `Proposed` and `Where it lands`, and an `Open` only for the questions it raises",
@@ -6928,7 +6594,7 @@
       "sentence": "A window's workstreams are bound by where it wrote and by what the developer named, never by what it wrote",
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "The workstream is a scope of work, not a window",
-      "decision": null,
+      "decision": "DEC.DEVEX.WORKSPACE.236",
       "restated": [
         {
           "plugin": "spn-devex",
@@ -6964,12 +6630,9 @@
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.237",
-      "level": "MUST",
-      "params": {
-        "check": "doc-check",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": "A code block is coloured by the shared script when the page opens, and a page's file holds plain code",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "One stylesheet, served in versions",
@@ -6989,12 +6652,9 @@
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.238",
-      "level": "MUST",
-      "params": {
-        "check": "doc-check",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": "`Where it lands` is one folder tree for each repository, and the blocks that explain a change follow its tree",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "The approach document — a workstream's, never a repository's",
@@ -7072,10 +6732,9 @@
       "id": "RULE.DEVEX.WORKSPACE.241",
       "level": "MUST",
       "params": {
-        "check": "workstream-state",
-        "due": "036/N008"
+        "skill": "spn-devex/ideate"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "Before an arc's rows are written, the architect's view sets their order from the kind of work",
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "The order of execution is set before the rows are written",
@@ -7199,12 +6858,9 @@
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.246",
-      "level": "MUST",
-      "params": {
-        "check": "doc-check",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": null,
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "How ends in Cycles, and the arcs are the state",
@@ -7215,8 +6871,7 @@
       "id": "RULE.DEVEX.WORKSPACE.247",
       "level": "MUST",
       "params": {
-        "check": "doc-check",
-        "due": "036/N008"
+        "check": "no-history"
       },
       "class": "checked",
       "sentence": "The page reads as the design, not as its history",
@@ -7227,12 +6882,9 @@
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.248",
-      "level": "MUST",
-      "params": {
-        "check": "doc-check",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": "A preview shows each construct in the form that shows it best, and shows the public shapes as code",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "The approach document — a workstream's, never a repository's",
@@ -7275,8 +6927,7 @@
       "id": "RULE.DEVEX.WORKSPACE.250",
       "level": "MUST",
       "params": {
-        "check": "doc-check",
-        "due": "036/N008"
+        "check": "doc-check"
       },
       "class": "checked",
       "sentence": "Cycles holds the progress block, generated and never written by hand, and there is no progress page",
@@ -7406,8 +7057,7 @@
       "id": "RULE.DEVEX.WORKSPACE.255",
       "level": "MUST",
       "params": {
-        "check": "workstream-state",
-        "due": "036/N008"
+        "check": "stop"
       },
       "class": "checked",
       "sentence": "Every open and backlog workstream is held to the standard of the day, and a change to the standard brings them to it in the same step",
@@ -7429,12 +7079,9 @@
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.256",
-      "level": "MUST",
-      "params": {
-        "check": "doc-check",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": null,
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "The approach document — a workstream's, never a repository's",
@@ -7509,10 +7156,9 @@
       "id": "RULE.DEVEX.WORKSPACE.260",
       "level": "MUST",
       "params": {
-        "check": "doc-check",
-        "due": "036/N008"
+        "skill": "spn-surface/design"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "A page's skeleton stands in its layout and draws every level: the window, the layout's body, navigation and content, the page level, the containers, the widgets and cards, and the components",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "SKELETON — a mock of a layout",
@@ -7534,8 +7180,7 @@
       "id": "RULE.DEVEX.WORKSPACE.261",
       "level": "MUST",
       "params": {
-        "check": "confirmed",
-        "due": "036/N008"
+        "check": "workstream-state"
       },
       "class": "checked",
       "sentence": "A landed arc's goal and your review of it are the record of what was delivered, so it is never reopened",
@@ -7564,8 +7209,7 @@
       "id": "RULE.DEVEX.WORKSPACE.262",
       "level": "MUST",
       "params": {
-        "check": "doc-check",
-        "due": "036/N008"
+        "check": "workstream-owner"
       },
       "class": "checked",
       "sentence": "An arc's notes folder holds those six, and nothing else",
@@ -7675,8 +7319,7 @@
       "id": "RULE.DEVEX.WORKSPACE.267",
       "level": "MUST",
       "params": {
-        "check": "workstream-state",
-        "due": "036/N008"
+        "check": "workstream-state"
       },
       "class": "checked",
       "sentence": "A sample is the work's own file, never a page built with the page template",
@@ -7705,10 +7348,9 @@
       "id": "RULE.DEVEX.WORKSPACE.268",
       "level": "MUST",
       "params": {
-        "check": "doc-check",
-        "due": "036/N008"
+        "skill": "spn-devex/develop"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "Every level that has a box is outlined and carries its name, and holds its own header. The navigation's chosen entry is the page's own.",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "SKELETON — a mock of a layout",
@@ -7735,10 +7377,9 @@
       "id": "RULE.DEVEX.WORKSPACE.269",
       "level": "MUST",
       "params": {
-        "check": "doc-check",
-        "due": "036/N008"
+        "skill": "spn-devex/develop"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "The default frame of a container is one dotted extent with an unframed header, and one thin rounded box round its content and its footer",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "SKELETON — a mock of a layout",
@@ -7765,10 +7406,9 @@
       "id": "RULE.DEVEX.WORKSPACE.270",
       "level": "MUST",
       "params": {
-        "check": "doc-check",
-        "due": "036/N008"
+        "skill": "spn-devex/develop"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "A skeleton draws a rail shut to its icons on every device, desktop included, so the content gets the room",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "SKELETON — a mock of a layout",
@@ -7785,10 +7425,9 @@
       "id": "RULE.DEVEX.WORKSPACE.271",
       "level": "MUST",
       "params": {
-        "check": "doc-check",
-        "due": "036/N008"
+        "skill": "spn-devex/develop"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "Tabs that stand at the page level, in the content or in the page head's actions, are drawn as pills, and tabs inside a container, a card or a widget as the line",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "SKELETON — a mock of a layout",
@@ -7856,8 +7495,7 @@
       "id": "RULE.DEVEX.WORKSPACE.274",
       "level": "MUST",
       "params": {
-        "check": "workstream-state",
-        "due": "036/N008"
+        "check": "workstream-state"
       },
       "class": "checked",
       "sentence": "A change to how something looks is made in the arc's preview first, as often as you like, with no test",
@@ -7881,8 +7519,7 @@
       "id": "RULE.DEVEX.WORKSPACE.275",
       "level": "MUST",
       "params": {
-        "check": "workstream-state",
-        "due": "036/N008"
+        "check": "confirmed"
       },
       "class": "checked",
       "sentence": "The log gets one note per milestone, not one per step",
@@ -7911,10 +7548,9 @@
       "id": "RULE.DEVEX.WORKSPACE.276",
       "level": "MUST",
       "params": {
-        "check": "workstream-state",
-        "due": "036/N008"
+        "skill": "spn-devex/execute"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": null,
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "Work is sized by its kind, and fixes gather into a round",
@@ -8009,10 +7645,9 @@
       "id": "RULE.DEVEX.WORKSPACE.279",
       "level": "MUST",
       "params": {
-        "check": "workstream-state",
-        "due": "036/N008"
+        "skill": "spn-devex/develop"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "A row found invalid or not needed is discarded, never deferred",
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "An instruction is recorded before it is executed",
@@ -8072,8 +7707,7 @@
       "id": "RULE.DEVEX.WORKSPACE.283",
       "level": "MUST",
       "params": {
-        "check": "orientation",
-        "due": "036/N008"
+        "check": "stop"
       },
       "class": "checked",
       "sentence": null,
@@ -8092,10 +7726,9 @@
       "id": "RULE.DEVEX.WORKSPACE.284",
       "level": "MUST",
       "params": {
-        "check": "doc-check",
-        "due": "036/N008"
+        "skill": "spn-devex/develop"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "A feature's head is drawn as a head item, in `DSFeature`'s own names, and it leads the items under it",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "SKELETON — a mock of a layout",
@@ -8112,10 +7745,9 @@
       "id": "RULE.DEVEX.WORKSPACE.285",
       "level": "MUST",
       "params": {
-        "check": "doc-check",
-        "due": "036/N008"
+        "skill": "spn-devex/develop"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "A section of a page is drawn with its fill and its room, in `DSSectionContainer`'s own names",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "SKELETON — a mock of a layout",
@@ -8132,10 +7764,9 @@
       "id": "RULE.DEVEX.WORKSPACE.286",
       "level": "MUST",
       "params": {
-        "check": "doc-check",
-        "due": "036/N008"
+        "skill": "spn-devex/develop"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "A feature's frames are drawn where the design system takes them, in `DSFeature`'s own names",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "SKELETON — a mock of a layout",
@@ -8152,10 +7783,9 @@
       "id": "RULE.DEVEX.WORKSPACE.287",
       "level": "MUST",
       "params": {
-        "check": "doc-check",
-        "due": "036/N008"
+        "skill": "spn-devex/develop"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "A field that a skeleton does not have is a finding",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "SKELETON — a mock of a layout",
@@ -8172,10 +7802,9 @@
       "id": "RULE.DEVEX.WORKSPACE.288",
       "level": "MUST",
       "params": {
-        "check": "doc-check",
-        "due": "036/N008"
+        "skill": "spn-devex/develop"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "A feature's item lines stand each in a frame of their own where it takes `items.surface`, as `DSItemCard` draws them",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "SKELETON — a mock of a layout",
@@ -8192,10 +7821,9 @@
       "id": "RULE.DEVEX.WORKSPACE.289",
       "level": "MUST",
       "params": {
-        "check": "doc-check",
-        "due": "036/N008"
+        "skill": "spn-devex/develop"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "The lines between a feature's items, and between the cells of a grid section, are drawn in `DSGridBorderType`'s own words",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "SKELETON — a mock of a layout",
@@ -8212,10 +7840,9 @@
       "id": "RULE.DEVEX.WORKSPACE.290",
       "level": "MUST",
       "params": {
-        "check": "doc-check",
-        "due": "036/N008"
+        "skill": "spn-devex/develop"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "A skeleton draws a feature's numbered items with their number before the title, as `items.numbered` writes it in the design system",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "SKELETON — a mock of a layout",
@@ -8232,10 +7859,9 @@
       "id": "RULE.DEVEX.WORKSPACE.291",
       "level": "MUST",
       "params": {
-        "check": "doc-check",
-        "due": "036/N008"
+        "skill": "spn-devex/develop"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "A feature's `textAlign` lines up the rows that stand with its head, as the design system aligns a feature's words, its actions and its items",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "SKELETON — a mock of a layout",
@@ -8252,10 +7878,9 @@
       "id": "RULE.DEVEX.WORKSPACE.292",
       "level": "MUST",
       "params": {
-        "check": "doc-check",
-        "due": "036/N008"
+        "skill": "spn-devex/develop"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "A feature's `verticalAlign` stands the two sides of a split against each other, and each side keeps its own height",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "SKELETON — a mock of a layout",
@@ -8272,10 +7897,9 @@
       "id": "RULE.DEVEX.WORKSPACE.293",
       "level": "MUST",
       "params": {
-        "check": "doc-check",
-        "due": "036/N008"
+        "skill": "spn-devex/develop"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": null,
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "SKELETON — a mock of a layout",
@@ -8297,10 +7921,9 @@
       "id": "RULE.DEVEX.WORKSPACE.294",
       "level": "MUST",
       "params": {
-        "check": "doc-check",
-        "due": "036/N008"
+        "skill": "spn-devex/develop"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "An item line's media is read in `IDSItemMedia`'s own kinds, and a bare icon is drawn bare",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "SKELETON — a mock of a layout",
@@ -8366,10 +7989,9 @@
       "id": "RULE.DEVEX.WORKSPACE.297",
       "level": "MUST",
       "params": {
-        "check": "doc-check",
-        "due": "036/N008"
+        "skill": "spn-devex/develop"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "The arrow at the end of an item line is drawn bare, in `DSIconType`'s own names",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "SKELETON — a mock of a layout",
@@ -8386,10 +8008,9 @@
       "id": "RULE.DEVEX.WORKSPACE.298",
       "level": "MUST",
       "params": {
-        "check": "doc-check",
-        "due": "036/N008"
+        "skill": "spn-devex/develop"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "The chosen item line of a feature's boxed items is marked inside its box, as `DSItemCard` marks a selected tile",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "SKELETON — a mock of a layout",
@@ -8406,10 +8027,9 @@
       "id": "RULE.DEVEX.WORKSPACE.299",
       "level": "MUST",
       "params": {
-        "check": "doc-check",
-        "due": "036/N008"
+        "skill": "spn-devex/develop"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "A grid section's columns are read in each view of their screen class, as `IDSGrid` names them",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "SKELETON — a mock of a layout",
@@ -8426,10 +8046,9 @@
       "id": "RULE.DEVEX.WORKSPACE.300",
       "level": "MUST",
       "params": {
-        "check": "doc-check",
-        "due": "036/N008"
+        "skill": "spn-devex/develop"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "A feature's statistics are drawn as the design system draws a stat, its value large over its label, as `items.type` `STATS` writes them",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "SKELETON — a mock of a layout",
@@ -8451,10 +8070,9 @@
       "id": "RULE.DEVEX.WORKSPACE.301",
       "level": "MUST",
       "params": {
-        "check": "doc-check",
-        "due": "036/N008"
+        "skill": "spn-devex/develop"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "A `DSAccordionGroup` is drawn with its entries and the open one's body, in `IDSAccordionGroupOption`'s own names",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "SKELETON — a mock of a layout",
@@ -8471,10 +8089,9 @@
       "id": "RULE.DEVEX.WORKSPACE.302",
       "level": "MUST",
       "params": {
-        "check": "doc-check",
-        "due": "036/N008"
+        "skill": "spn-devex/develop"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "A row of tabs that names its `type` is drawn in it wherever it stands, as `DSTabs` draws the type a page names",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "SKELETON — a mock of a layout",
@@ -8496,10 +8113,9 @@
       "id": "RULE.DEVEX.WORKSPACE.303",
       "level": "MUST",
       "params": {
-        "check": "doc-check",
-        "due": "036/N008"
+        "skill": "spn-devex/develop"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "Words that run past their column wrap at a word inside it, as `DSItem` and `DSItemFacts` wrap them",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "SKELETON — a mock of a layout",
@@ -8521,10 +8137,9 @@
       "id": "RULE.DEVEX.WORKSPACE.304",
       "level": "MUST",
       "params": {
-        "check": "doc-check",
-        "due": "036/N008"
+        "skill": "spn-devex/develop"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "Code and a row of tabs wider than their column keep their width and scroll inside it, as `DSCodeBlockView` and `DSTabs` let them",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "SKELETON — a mock of a layout",
@@ -8541,10 +8156,9 @@
       "id": "RULE.DEVEX.WORKSPACE.305",
       "level": "MUST",
       "params": {
-        "check": "doc-check",
-        "due": "036/N008"
+        "skill": "spn-devex/develop"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "A feature of `type` `BACKDROP` stands its media behind its words and its actions, as `DSFeature` lays a backdrop",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "SKELETON — a mock of a layout",
@@ -8561,10 +8175,9 @@
       "id": "RULE.DEVEX.WORKSPACE.306",
       "level": "MUST",
       "params": {
-        "check": "workstream-state",
-        "due": "036/N008"
+        "skill": "spn-devex/execute"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "What a change owes the documents is set by its kind, and the agent reads the kind before it writes a line of the book",
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "Docs per change: each kind of change owes the documents its own share",
@@ -8615,10 +8228,9 @@
       "id": "RULE.DEVEX.WORKSPACE.308",
       "level": "MUST",
       "params": {
-        "check": "confirmed",
-        "due": "036/N008"
+        "skill": "spn-devex/ideate"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "The agent creates a workstream only on your yes to a block that says six things back to you",
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "Before a workstream exists, the agent knows six things",
@@ -8635,10 +8247,9 @@
       "id": "RULE.DEVEX.WORKSPACE.309",
       "level": "MUST",
       "params": {
-        "check": "workstream-state",
-        "due": "036/N008"
+        "skill": "spn-devex/ideate"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "The edge of an arc is what you review together and what releases together, and the domain gives it its name",
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "An arc is cut by what is reviewed and released together, and named for its domain",
@@ -8655,10 +8266,9 @@
       "id": "RULE.DEVEX.WORKSPACE.310",
       "level": "MUST",
       "params": {
-        "check": "workstream-state",
-        "due": "036/N008"
+        "skill": "spn-devex/ideate"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "One order of questions places anything new, and the agent stops at the first yes",
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "Placing something new",
@@ -8718,8 +8328,7 @@
       "id": "RULE.DEVEX.WORKSPACE.313",
       "level": "MUST",
       "params": {
-        "check": "split-plan",
-        "due": "036/N008"
+        "check": "split-plan"
       },
       "class": "checked",
       "sentence": "You close on your word, after the review links",
@@ -8732,8 +8341,7 @@
       "id": "RULE.DEVEX.WORKSPACE.314",
       "level": "MUST",
       "params": {
-        "check": "workstream-state",
-        "due": "036/N008"
+        "check": "permanent-branch"
       },
       "class": "checked",
       "sentence": "A workstream commits on one branch in each repository its rows name, `feat/<NNN>-<subject>`, and every arc commits on it by path",
@@ -8752,10 +8360,9 @@
       "id": "RULE.DEVEX.WORKSPACE.315",
       "level": "MUST",
       "params": {
-        "check": "workstream-state",
-        "due": "036/N008"
+        "skill": "spn-devex/develop"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "The set is the folder `.worktrees/<NNN>-<subject>/` in the workspace root",
       "chapter": "04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md",
       "heading": "The worktree set",
@@ -8772,8 +8379,7 @@
       "id": "RULE.DEVEX.WORKSPACE.316",
       "level": "MUST",
       "params": {
-        "check": "pretooluse",
-        "due": "036/N008"
+        "check": "pretooluse"
       },
       "class": "checked",
       "sentence": "One worktree set serves the whole workstream, and its lanes take turns by repository",
@@ -8792,8 +8398,7 @@
       "id": "RULE.DEVEX.WORKSPACE.317",
       "level": "MUST",
       "params": {
-        "check": "workstream-state",
-        "due": "036/N008"
+        "check": "rebase-moved"
       },
       "class": "checked",
       "sentence": "After a rebase, a merge or a pull from `develop`, the agent re-reads what moved underneath its arcs",
@@ -8825,8 +8430,7 @@
       "id": "RULE.DEVEX.WORKSPACE.319",
       "level": "MUST",
       "params": {
-        "check": "doc-check",
-        "due": "036/N008"
+        "check": "doc-check"
       },
       "class": "checked",
       "sentence": "A stored page links one version, in two lines, and each line carries that version's hash",
@@ -8864,10 +8468,9 @@
       "id": "RULE.DEVEX.WORKSPACE.321",
       "level": "MUST",
       "params": {
-        "check": "workstream-state",
-        "due": "036/N008"
+        "skill": "spn-devex/develop"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "One command per target, and a positional word is the target and its one value",
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "The commands",
@@ -8876,12 +8479,9 @@
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.322",
-      "level": "MUST",
-      "params": {
-        "check": "workstream-state",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": "`.debug/` holds three containers, and each has one lifetime rule",
       "chapter": "04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md",
       "heading": "Two dot-homes",
@@ -8892,10 +8492,9 @@
       "id": "RULE.DEVEX.WORKSPACE.323",
       "level": "MUST",
       "params": {
-        "check": "stop",
-        "due": "036/N008"
+        "skill": "spn-devex/develop"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "The `debug` group of the plugin reads the agent's own machinery, takes a target and no other option than `--json`, and every `show` takes `--json`",
       "chapter": "04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "heading": "The cost of a window is read from telemetry, never from a transcript",
@@ -8906,10 +8505,9 @@
       "id": "RULE.DEVEX.WORKSPACE.324",
       "level": "MUST",
       "params": {
-        "check": "workstream-state",
-        "due": "036/N008"
+        "skill": "spn-devex/develop"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "`.spndevex/state.json` is the one file where the workspace's commands record what the tree cannot show, with one node for each owner and one writer for each node",
       "chapter": "04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md",
       "heading": "The state file has a node for each owner",
@@ -8931,8 +8529,7 @@
       "id": "RULE.DEVEX.WORKSPACE.325",
       "level": "MUST",
       "params": {
-        "check": "split-plan",
-        "due": "036/N008"
+        "check": "split-plan"
       },
       "class": "checked",
       "sentence": "A workstream's worktree set is removed before the workstream closes, and a close is refused while the set is on disk, with no override",
@@ -8975,8 +8572,7 @@
       "id": "RULE.DEVEX.WORKSPACE.327",
       "level": "MUST",
       "params": {
-        "check": "workstream-state",
-        "due": "036/N008"
+        "check": "pretooluse"
       },
       "class": "checked",
       "sentence": "In an arc that keeps a change sheet, an order names its row and the row names its entries",
@@ -9019,10 +8615,9 @@
       "id": "RULE.DEVEX.WORKSPACE.329",
       "level": "MUST",
       "params": {
-        "check": "workstream-state",
-        "due": "036/N008"
+        "skill": "spn-devex/ideate"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "Every behaviour row an arc changes is shown on its preview, before and after, in the words of the person it is for",
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "An arc carries its specification, or names the note that holds it",
@@ -9039,10 +8634,9 @@
       "id": "RULE.DEVEX.WORKSPACE.330",
       "level": "MUST",
       "params": {
-        "check": "workstream-state",
-        "due": "036/N008"
+        "skill": "spn-devex/execute"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "Before a pull request, each entry that changes behaviour has its book line read against the landed code, and the verdict goes in the tiers pass's report",
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "Once an arc is decided, a drift step runs, then four passes per repository",
@@ -9059,10 +8653,9 @@
       "id": "RULE.DEVEX.WORKSPACE.331",
       "level": "MUST",
       "params": {
-        "check": "workstream-state",
-        "due": "036/N008"
+        "skill": "spn-devex/execute"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "Each arc reports what its orders cost and how many rows were rework, split into what ideation missed and what a later answer of yours asked for",
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "Each arc reports what it cost and how much of it was rework",
@@ -9077,12 +8670,9 @@
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.333",
-      "level": "MUST",
-      "params": {
-        "check": "doc-check",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": "A rule lives in its chapter with its id on it",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "Depth is decided by where else the detail lives",
@@ -9093,10 +8683,9 @@
       "id": "RULE.DEVEX.WORKSPACE.334",
       "level": "MUST",
       "params": {
-        "check": "doc-check",
-        "due": "036/N008"
+        "skill": "spn-devex/develop"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "An open card headed with the id its row will take is where that id resolves until the card compresses to the row",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/06-registers.md",
       "heading": "The identifier",
@@ -9105,12 +8694,9 @@
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.335",
-      "level": "MUST",
-      "params": {
-        "check": "workstream-state",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": "State and settings, never rules",
       "chapter": "04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md",
       "heading": "Two dot-homes",
@@ -9119,12 +8705,9 @@
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.336",
-      "level": "MUST",
-      "params": {
-        "check": "workstream-state",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": "The plugin is the only writer of `.debug/`",
       "chapter": "04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md",
       "heading": "Two dot-homes",
@@ -9133,12 +8716,9 @@
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.337",
-      "level": "MUST",
-      "params": {
-        "check": "workstream-state",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": "A container whose name starts with a dot is invisible to every workstream reader",
       "chapter": "04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md",
       "heading": "Two dot-homes",
@@ -9149,10 +8729,9 @@
       "id": "RULE.DEVEX.WORKSPACE.338",
       "level": "MUST",
       "params": {
-        "check": "workstream-state",
-        "due": "036/N008"
+        "skill": "spn-devex/develop"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "A hook keeps its notes in `.debug/` only inside a workspace it found, and a `.spndevex/` holding nothing but `.debug/` is no workspace",
       "chapter": "04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md",
       "heading": "Two dot-homes",
@@ -9161,12 +8740,9 @@
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.339",
-      "level": "MUST",
-      "params": {
-        "check": "workstream-state",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": "A node joins the file only when the folder tree cannot show its fact",
       "chapter": "04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md",
       "heading": "The state file has a node for each owner",
@@ -9175,12 +8751,9 @@
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.340",
-      "level": "MUST",
-      "params": {
-        "check": "workstream-state",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": "Each node has one writer, and a program changes only the nodes in its own column",
       "chapter": "04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md",
       "heading": "The state file has a node for each owner",
@@ -9191,10 +8764,9 @@
       "id": "RULE.DEVEX.WORKSPACE.341",
       "level": "MUST",
       "params": {
-        "check": "workstream-state",
-        "due": "036/N008"
+        "skill": "spn-devex/develop"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "A name is lower-case letters, digits and hyphens, starting with a letter, at most 40 characters",
       "chapter": "04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md",
       "heading": "The state file has a node for each owner",
@@ -9237,10 +8809,9 @@
       "id": "RULE.DEVEX.WORKSPACE.344",
       "level": "MUST",
       "params": {
-        "check": "workstream-state",
-        "due": "036/N008"
+        "skill": "spn-devex/develop"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "`.spndevex/` is a git repository, made by `workspace init` and never by hand",
       "chapter": "04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md",
       "heading": ".spndevex/ keeps its own history, and it never takes a remote",
@@ -9251,10 +8822,9 @@
       "id": "RULE.DEVEX.WORKSPACE.345",
       "level": "MUST",
       "params": {
-        "check": "workstream-state",
-        "due": "036/N008"
+        "skill": "spn-devex/develop"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "No remote is configured, and none is offered",
       "chapter": "04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md",
       "heading": ".spndevex/ keeps its own history, and it never takes a remote",
@@ -9265,10 +8835,9 @@
       "id": "RULE.DEVEX.WORKSPACE.346",
       "level": "MUST",
       "params": {
-        "check": "workstream-state",
-        "due": "036/N008"
+        "skill": "spn-devex/develop"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "The set holds no `CLAUDE.md`",
       "chapter": "04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md",
       "heading": "The worktree set",
@@ -9279,10 +8848,9 @@
       "id": "RULE.DEVEX.WORKSPACE.347",
       "level": "MUST",
       "params": {
-        "check": "orientation",
-        "due": "036/N008"
+        "skill": "spn-devex/develop"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "The set is not a member",
       "chapter": "04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md",
       "heading": "The worktree set",
@@ -9293,8 +8861,7 @@
       "id": "RULE.DEVEX.WORKSPACE.348",
       "level": "MUST",
       "params": {
-        "check": "workstream-state",
-        "due": "036/N008"
+        "check": "permanent-branch"
       },
       "class": "checked",
       "sentence": "The main checkouts stay on `develop`, fetched, and the agent never commits in one",
@@ -9307,10 +8874,9 @@
       "id": "RULE.DEVEX.WORKSPACE.349",
       "level": "MUST",
       "params": {
-        "check": "workstream-state",
-        "due": "036/N008"
+        "skill": "spn-devex/develop"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "`spnutils workspace worktree remove <NNN>` removes the set and refuses work that is not on origin",
       "chapter": "04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md",
       "heading": "The worktree set",
@@ -9321,10 +8887,9 @@
       "id": "RULE.DEVEX.WORKSPACE.350",
       "level": "MUST",
       "params": {
-        "check": "workstream-state",
-        "due": "036/N008"
+        "skill": "spn-devex/develop"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "The window itself is never tracked here",
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "The workstream is a scope of work, not a window",
@@ -9335,8 +8900,7 @@
       "id": "RULE.DEVEX.WORKSPACE.351",
       "level": "MUST",
       "params": {
-        "check": "workstream-state",
-        "due": "036/N008"
+        "check": "stop"
       },
       "class": "checked",
       "sentence": "A workstream is worked through seven states, and the agent says which one it is in",
@@ -9349,8 +8913,7 @@
       "id": "RULE.DEVEX.WORKSPACE.352",
       "level": "MUST",
       "params": {
-        "check": "workstream-state",
-        "due": "036/N008"
+        "check": "stop"
       },
       "class": "checked",
       "sentence": "Never a card without a recommendation, and never a blank page",
@@ -9361,12 +8924,9 @@
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.353",
-      "level": "MUST",
-      "params": {
-        "check": "workstream-state",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": "A workstream is in exactly one of three states, and its parent folder is what says so",
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "Three states, and the parent folder is the state",
@@ -9377,10 +8937,9 @@
       "id": "RULE.DEVEX.WORKSPACE.354",
       "level": "MUST",
       "params": {
-        "check": "workstream-state",
-        "due": "036/N008"
+        "skill": "spn-devex/ideate"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "The agent proposes the starting state and you decide",
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "Three states, and the parent folder is the state",
@@ -9391,10 +8950,9 @@
       "id": "RULE.DEVEX.WORKSPACE.355",
       "level": "MUST",
       "params": {
-        "check": "workstream-state",
-        "due": "036/N008"
+        "skill": "spn-devex/develop"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "Every workstream folder carries a number, assigned once in creation order",
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "The number is assigned once",
@@ -9405,10 +8963,9 @@
       "id": "RULE.DEVEX.WORKSPACE.356",
       "level": "MUST",
       "params": {
-        "check": "workstream-state",
-        "due": "036/N008"
+        "skill": "spn-devex/develop"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "The next number is one past the higher of two things",
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "The number is assigned once",
@@ -9419,8 +8976,7 @@
       "id": "RULE.DEVEX.WORKSPACE.357",
       "level": "MUST",
       "params": {
-        "check": "workstream-state",
-        "due": "036/N008"
+        "check": "workstream-state"
       },
       "class": "checked",
       "sentence": "Rows run in chain order by repository, and then by altitude inside each repository",
@@ -9433,8 +8989,7 @@
       "id": "RULE.DEVEX.WORKSPACE.358",
       "level": "MUST",
       "params": {
-        "check": "workstream-state",
-        "due": "036/N008"
+        "check": "workstream-state"
       },
       "class": "checked",
       "sentence": "An arc that has no `sheet.json` is judged as it was before the sheet existed",
@@ -9447,10 +9002,9 @@
       "id": "RULE.DEVEX.WORKSPACE.359",
       "level": "MUST",
       "params": {
-        "check": "workstream-state",
-        "due": "036/N008"
+        "skill": "spn-devex/develop"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "A command validates each entry as it is written, so a gap is refused where it is made",
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "An arc keeps a change sheet, and only its commands write it",
@@ -9461,10 +9015,9 @@
       "id": "RULE.DEVEX.WORKSPACE.360",
       "level": "MUST",
       "params": {
-        "check": "workstream-state",
-        "due": "036/N008"
+        "skill": "spn-devex/execute"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "A surprise in the tiers comes back to you as a card, with the rows it holds, and is never fixed quietly in code",
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "Once an arc is decided, a drift step runs, then four passes per repository",
@@ -9488,10 +9041,9 @@
       "id": "RULE.DEVEX.WORKSPACE.362",
       "level": "MUST",
       "params": {
-        "check": "workstream-state",
-        "due": "036/N008"
+        "skill": "spn-devex/ideate"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "A step that names one file for a change touching four is not a step",
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "A step names every surface the change reaches, and how you would know",
@@ -9515,8 +9067,7 @@
       "id": "RULE.DEVEX.WORKSPACE.364",
       "level": "MUST",
       "params": {
-        "check": "workstream-state",
-        "due": "036/N008"
+        "check": "workstream-state"
       },
       "class": "checked",
       "sentence": "The preview and each sample have a status, and you can read it without opening the arc",
@@ -9529,10 +9080,9 @@
       "id": "RULE.DEVEX.WORKSPACE.365",
       "level": "MUST",
       "params": {
-        "check": "workstream-state",
-        "due": "036/N008"
+        "skill": "spn-devex/ideate"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "A move is a table, and its targets are unique",
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "An arc carries its specification, or names the note that holds it",
@@ -9543,10 +9093,9 @@
       "id": "RULE.DEVEX.WORKSPACE.366",
       "level": "MUST",
       "params": {
-        "check": "workstream-state",
-        "due": "036/N008"
+        "skill": "spn-devex/ideate"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "Where a change must be seen to be judged, you see one real before-and-after on the arc's preview and say yes before any order goes out",
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "An order is one delegated execution, and every order follows the same rules",
@@ -9557,10 +9106,9 @@
       "id": "RULE.DEVEX.WORKSPACE.367",
       "level": "MUST",
       "params": {
-        "check": "workstream-state",
-        "due": "036/N008"
+        "skill": "spn-devex/execute"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "A brief is in the light form: the files to change, the one rule they follow, and the row's acceptance",
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "An order is one delegated execution, and every order follows the same rules",
@@ -9571,10 +9119,9 @@
       "id": "RULE.DEVEX.WORKSPACE.368",
       "level": "MUST",
       "params": {
-        "check": "workstream-state",
-        "due": "036/N008"
+        "skill": "spn-devex/execute"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "An order states its acceptance as named behaviour ids, and never as a count of a whole tier",
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "An order is one delegated execution, and every order follows the same rules",
@@ -9585,10 +9132,9 @@
       "id": "RULE.DEVEX.WORKSPACE.369",
       "level": "MUST",
       "params": {
-        "check": "workstream-state",
-        "due": "036/N008"
+        "skill": "spn-devex/execute"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "An order takes no baseline of its own where a run on the same commit exists",
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "An order is one delegated execution, and every order follows the same rules",
@@ -9599,10 +9145,9 @@
       "id": "RULE.DEVEX.WORKSPACE.370",
       "level": "MUST",
       "params": {
-        "check": "workstream-state",
-        "due": "036/N008"
+        "skill": "spn-devex/execute"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "An agent launches no child agent",
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "An order is one delegated execution, and every order follows the same rules",
@@ -9613,8 +9158,7 @@
       "id": "RULE.DEVEX.WORKSPACE.371",
       "level": "MUST",
       "params": {
-        "check": "workstream-state",
-        "due": "036/N008"
+        "check": "stop"
       },
       "class": "checked",
       "sentence": "Writing `Q<n>` asserts that the card is on the approach page",
@@ -9627,8 +9171,7 @@
       "id": "RULE.DEVEX.WORKSPACE.372",
       "level": "MUST",
       "params": {
-        "check": "workstream-state",
-        "due": "036/N008"
+        "check": "workstream-owner"
       },
       "class": "checked",
       "sentence": "Every file in a workstream has one owner, a script or the agent",
@@ -9639,12 +9182,9 @@
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.373",
-      "level": "MUST",
-      "params": {
-        "check": "workstream-state",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": "The workstream's folder is drawn once, here, and `.spndevex/README.md` shows it as drawn",
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "The folder",
@@ -9655,8 +9195,7 @@
       "id": "RULE.DEVEX.WORKSPACE.374",
       "level": "MUST",
       "params": {
-        "check": "workstream-state",
-        "due": "036/N008"
+        "check": "workstream-owner"
       },
       "class": "checked",
       "sentence": "`arcs/` and `notes/` hold arc folders, `N<nnn>/`, and nothing else",
@@ -9669,8 +9208,7 @@
       "id": "RULE.DEVEX.WORKSPACE.375",
       "level": "MUST",
       "params": {
-        "check": "workstream-state",
-        "due": "036/N008"
+        "check": "workstream-owner"
       },
       "class": "checked",
       "sentence": "The `workstream` commands are the only writers of what a script owns",
@@ -9683,10 +9221,9 @@
       "id": "RULE.DEVEX.WORKSPACE.376",
       "level": "MUST",
       "params": {
-        "check": "workstream-state",
-        "due": "036/N008"
+        "skill": "spn-devex/ideate"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "A suggestion is written to `suggestions.jsonl` when it is raised, by `workstream suggestion add`, moved on by `suggestion state` and reworded by `suggestion edit`",
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "A suggestion is recorded the moment it is raised",
@@ -9697,10 +9234,9 @@
       "id": "RULE.DEVEX.WORKSPACE.377",
       "level": "MUST",
       "params": {
-        "check": "workstream-state",
-        "due": "036/N008"
+        "skill": "spn-devex/develop"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "The progress block shows what is built",
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "The approach page keeps up with its arcs",
@@ -9730,8 +9266,7 @@
       "id": "RULE.DEVEX.WORKSPACE.379",
       "level": "MUST",
       "params": {
-        "check": "workstream-state",
-        "due": "036/N008"
+        "check": "questions"
       },
       "class": "checked",
       "sentence": "A card is a `div` with the class `sds-open`, wrapping an `h4` whose `id` is its number",
@@ -9744,8 +9279,7 @@
       "id": "RULE.DEVEX.WORKSPACE.380",
       "level": "MUST",
       "params": {
-        "check": "workstream-state",
-        "due": "036/N008"
+        "check": "stop"
       },
       "class": "checked",
       "sentence": "The approach page, the arc and the notes all say what is about to happen",
@@ -9758,8 +9292,7 @@
       "id": "RULE.DEVEX.WORKSPACE.381",
       "level": "MUST",
       "params": {
-        "check": "workstream-state",
-        "due": "036/N008"
+        "check": "stop"
       },
       "class": "checked",
       "sentence": "An arc reaching LANDED brings the page current in the same sitting",
@@ -9772,10 +9305,9 @@
       "id": "RULE.DEVEX.WORKSPACE.382",
       "level": "MUST",
       "params": {
-        "check": "workstream-state",
-        "due": "036/N008"
+        "skill": "spn-devex/develop"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "A milestone is committed, not left in the working tree",
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "Every workstream document is current before you execute",
@@ -9786,10 +9318,9 @@
       "id": "RULE.DEVEX.WORKSPACE.383",
       "level": "MUST",
       "params": {
-        "check": "workstream-state",
-        "due": "036/N008"
+        "skill": "spn-devex/ideate"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "One kind of decision is taken out of that: a decision that sets a shape, a name, a member, a check or the direction of a dependency",
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "A card is only for what the rules leave open",
@@ -9800,10 +9331,9 @@
       "id": "RULE.DEVEX.WORKSPACE.384",
       "level": "MUST",
       "params": {
-        "check": "questions",
-        "due": "036/N008"
+        "skill": "spn-devex/ideate"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "A question reaches you for one of three reasons, and for no other",
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "A card is only for what the rules leave open",
@@ -9814,8 +9344,7 @@
       "id": "RULE.DEVEX.WORKSPACE.385",
       "level": "MUST",
       "params": {
-        "check": "workstream-state",
-        "due": "036/N008"
+        "check": "stop"
       },
       "class": "checked",
       "sentence": "An answer lands in the card and the arc in the same turn, and in a preview only where the preview shows that card",
@@ -9828,8 +9357,7 @@
       "id": "RULE.DEVEX.WORKSPACE.386",
       "level": "MUST",
       "params": {
-        "check": "workstream-state",
-        "due": "036/N008"
+        "check": "stop"
       },
       "class": "checked",
       "sentence": "Writing a card down is half the act, and telling the developer is the other half",
@@ -9842,10 +9370,9 @@
       "id": "RULE.DEVEX.WORKSPACE.387",
       "level": "MUST",
       "params": {
-        "check": "workstream-state",
-        "due": "036/N008"
+        "skill": "spn-devex/develop"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "A window is held only for work it did",
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "A check at the end of a turn speaks once, and only about this window's work",
@@ -9856,10 +9383,9 @@
       "id": "RULE.DEVEX.WORKSPACE.388",
       "level": "MUST",
       "params": {
-        "check": "workstream-state",
-        "due": "036/N008"
+        "skill": "spn-devex/develop"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "A message about a workstream names it",
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "A check at the end of a turn speaks once, and only about this window's work",
@@ -9883,8 +9409,7 @@
       "id": "RULE.DEVEX.WORKSPACE.390",
       "level": "MUST",
       "params": {
-        "check": "workstream-state",
-        "due": "036/N008"
+        "check": "workstream-state"
       },
       "class": "checked",
       "sentence": "A `RUNNING` arc that you reshape stops before it goes on",
@@ -9897,8 +9422,7 @@
       "id": "RULE.DEVEX.WORKSPACE.391",
       "level": "MUST",
       "params": {
-        "check": "workstream-state",
-        "due": "036/N008"
+        "check": "split-plan"
       },
       "class": "checked",
       "sentence": "Approval opens the documents pass, never the code",
@@ -9911,10 +9435,9 @@
       "id": "RULE.DEVEX.WORKSPACE.392",
       "level": "MUST",
       "params": {
-        "check": "workstream-state",
-        "due": "036/N008"
+        "skill": "spn-devex/ideate"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "Scope names a node",
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "Documents first, and the order they are written in",
@@ -9944,8 +9467,7 @@
       "id": "RULE.DEVEX.WORKSPACE.394",
       "level": "MUST",
       "params": {
-        "check": "workstream-state",
-        "due": "036/N008"
+        "check": "stop"
       },
       "class": "checked",
       "sentence": "The block has nine labelled lines, in this order",
@@ -9958,8 +9480,7 @@
       "id": "RULE.DEVEX.WORKSPACE.395",
       "level": "MUST",
       "params": {
-        "check": "workstream-state",
-        "due": "036/N008"
+        "check": "stop"
       },
       "class": "checked",
       "sentence": "The prompt goes in a fenced code block",
@@ -9972,8 +9493,7 @@
       "id": "RULE.DEVEX.WORKSPACE.396",
       "level": "MUST",
       "params": {
-        "check": "workstream-state",
-        "due": "036/N008"
+        "check": "split-plan"
       },
       "class": "checked",
       "sentence": "The gate names the command and never removes",
@@ -9984,12 +9504,9 @@
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.397",
-      "level": "MUST",
-      "params": {
-        "check": "closed",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": "The close is where the session stops",
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "A close ends the session, and names the next scope",
@@ -10000,10 +9517,9 @@
       "id": "RULE.DEVEX.WORKSPACE.398",
       "level": "MUST",
       "params": {
-        "check": "corpus",
-        "due": "036/N008"
+        "skill": "spn-devex/scm"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "Identity is carried by a manifest per system, and each is read by exactly one",
       "chapter": "04-capabilities/01-devex/04-workspace/03-repos/01-repos.md",
       "heading": "Each manifest has exactly one reader",
@@ -10014,10 +9530,9 @@
       "id": "RULE.DEVEX.WORKSPACE.399",
       "level": "MUST",
       "params": {
-        "check": "orientation",
-        "due": "036/N008"
+        "skill": "spn-devex/scm"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "Only a repository whose world has a realization carries claims; every other world writes its configuration as empty",
       "chapter": "04-capabilities/01-devex/04-workspace/03-repos/01-repos.md",
       "heading": "A claim exists only where there is something to claim about",
@@ -10028,10 +9543,9 @@
       "id": "RULE.DEVEX.WORKSPACE.400",
       "level": "MUST",
       "params": {
-        "check": "orientation",
-        "due": "036/N008"
+        "skill": "spn-devex/scm"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "Every package reference uses one grammar, whatever it points at",
       "chapter": "04-capabilities/01-devex/04-workspace/03-repos/01-repos.md",
       "heading": "One grammar for every package reference",
@@ -10042,8 +9556,7 @@
       "id": "RULE.DEVEX.WORKSPACE.401",
       "level": "MUST",
       "params": {
-        "check": "doc-check",
-        "due": "036/N008"
+        "check": "doc-check"
       },
       "class": "checked",
       "sentence": "The Description is one paragraph, in the standfirst's place",
@@ -10062,8 +9575,7 @@
       "id": "RULE.DEVEX.WORKSPACE.402",
       "level": "MUST",
       "params": {
-        "check": "doc-check",
-        "due": "036/N008"
+        "check": "corpus"
       },
       "class": "checked",
       "sentence": "A construct in a `FOUNDATION` repository carries no status at all",
@@ -10076,8 +9588,7 @@
       "id": "RULE.DEVEX.WORKSPACE.403",
       "level": "MUST",
       "params": {
-        "check": "doc-check",
-        "due": "036/N008"
+        "check": "corpus"
       },
       "class": "checked",
       "sentence": "A construct may not carry a status its own rows do not derive",
@@ -10088,12 +9599,9 @@
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.404",
-      "level": "MUST",
-      "params": {
-        "check": "doc-check",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": "Every construct the pocket holds is linked from the hub",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "The overview is the hub, and the constructs are its spokes",
@@ -10104,10 +9612,9 @@
       "id": "RULE.DEVEX.WORKSPACE.405",
       "level": "MUST",
       "params": {
-        "check": "doc-check",
-        "due": "036/N008"
+        "skill": "spn-devex/report"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "Every number is measured, never estimated",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "Reports and templates",
@@ -10118,10 +9625,9 @@
       "id": "RULE.DEVEX.WORKSPACE.406",
       "level": "MUST",
       "params": {
-        "check": "doc-check",
-        "due": "036/N008"
+        "skill": "spn-devex/report"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "A report has five sections, always in this order",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "The header and the five sections",
@@ -10132,10 +9638,9 @@
       "id": "RULE.DEVEX.WORKSPACE.407",
       "level": "MUST",
       "params": {
-        "check": "doc-check",
-        "due": "036/N008"
+        "skill": "spn-devex/report"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "Findings holds the facts, one axis per table, and its tables run in one order",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "Findings in a report",
@@ -10146,10 +9651,9 @@
       "id": "RULE.DEVEX.WORKSPACE.408",
       "level": "MUST",
       "params": {
-        "check": "doc-check",
-        "due": "036/N008"
+        "skill": "spn-devex/report"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "A name cell in Findings has two levels, never three",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "Findings in a report",
@@ -10160,10 +9664,9 @@
       "id": "RULE.DEVEX.WORKSPACE.409",
       "level": "MUST",
       "params": {
-        "check": "doc-check",
-        "due": "036/N008"
+        "skill": "spn-devex/report"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "Tables with the same columns have the same widths",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "Findings in a report",
@@ -10174,10 +9677,9 @@
       "id": "RULE.DEVEX.WORKSPACE.410",
       "level": "MUST",
       "params": {
-        "check": "doc-check",
-        "due": "036/N008"
+        "skill": "spn-devex/report"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "Records are list items, never a table",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "Records in a report",
@@ -10207,10 +9709,9 @@
       "id": "RULE.DEVEX.WORKSPACE.412",
       "level": "MUST",
       "params": {
-        "check": "doc-check",
-        "due": "036/N008"
+        "skill": "spn-devex/report"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "Every record and every recommendation says who decides it",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "Who decides",
@@ -10221,10 +9722,9 @@
       "id": "RULE.DEVEX.WORKSPACE.413",
       "level": "MUST",
       "params": {
-        "check": "doc-check",
-        "due": "036/N008"
+        "skill": "spn-devex/report"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "A report is read by developers and leaders who have not learned this book's words, so it uses plain ones",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "The words a report uses",
@@ -10235,10 +9735,9 @@
       "id": "RULE.DEVEX.WORKSPACE.415",
       "level": "MUST",
       "params": {
-        "check": "doc-check",
-        "due": "036/N008"
+        "skill": "spn-devex/report"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "A `MANUAL` row counts in none of the numbers",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "The coverage report — written, built and proved",
@@ -10249,10 +9748,9 @@
       "id": "RULE.DEVEX.WORKSPACE.416",
       "level": "MUST",
       "params": {
-        "check": "doc-check",
-        "due": "036/N008"
+        "skill": "spn-devex/report"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "The audit report is about setup only",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "The audit report — how the repository is set up",
@@ -10261,12 +9759,9 @@
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.417",
-      "level": "MUST",
-      "params": {
-        "check": "doc-check",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": "Two generated kinds live on a workstream's pages, `progress` and `open`, and a kind is added only with the developer's approval",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "How ends in Cycles, and the arcs are the state",
@@ -10277,8 +9772,7 @@
       "id": "RULE.DEVEX.WORKSPACE.418",
       "level": "MUST",
       "params": {
-        "check": "doc-check",
-        "due": "036/N008"
+        "check": "split-plan"
       },
       "class": "checked",
       "sentence": "A row names the node it lands in",
@@ -10291,8 +9785,7 @@
       "id": "RULE.DEVEX.WORKSPACE.419",
       "level": "MUST",
       "params": {
-        "check": "doc-check",
-        "due": "036/N008"
+        "check": "split-plan"
       },
       "class": "checked",
       "sentence": "`carried` means the work leaves this workstream, and the target must be able to receive it",
@@ -10305,8 +9798,7 @@
       "id": "RULE.DEVEX.WORKSPACE.420",
       "level": "MUST",
       "params": {
-        "check": "doc-check",
-        "due": "036/N008"
+        "check": "split-plan"
       },
       "class": "checked",
       "sentence": "The close refuses a stopped row, and that is the one place it differs from deferred",
@@ -10317,12 +9809,9 @@
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.421",
-      "level": "MUST",
-      "params": {
-        "check": "doc-check",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": "Fold the card before you do the work it unblocked",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "Nothing is published unless the developer asks",
@@ -10331,12 +9820,9 @@
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.422",
-      "level": "MUST",
-      "params": {
-        "check": "doc-check",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": "The parts come in one order",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "Nothing is published unless the developer asks",
@@ -10347,10 +9833,9 @@
       "id": "RULE.DEVEX.WORKSPACE.423",
       "level": "MUST",
       "params": {
-        "check": "doc-check",
-        "due": "036/N008"
+        "skill": "spn-devex/ideate"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "A view on a card is short",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "A card says which views spoke",
@@ -10361,10 +9846,9 @@
       "id": "RULE.DEVEX.WORKSPACE.424",
       "level": "MUST",
       "params": {
-        "check": "doc-check",
-        "due": "036/N008"
+        "skill": "spn-devex/ideate"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "The agent shortens a view's words for the card, and keeps its name and its meaning",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "A card says which views spoke",
@@ -10488,12 +9972,9 @@
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.432",
-      "level": "MUST",
-      "params": {
-        "check": "corpus",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": "A public or partner-facing page says only what is real and decided",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/01-corpus.md",
       "heading": "What the pattern binds",
@@ -10513,12 +9994,9 @@
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.434",
-      "level": "MUST",
-      "params": {
-        "check": "doc-check",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": "The book is changed only where it needs it, and docs are kept small",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md",
       "heading": "Scope control",
@@ -10529,8 +10007,7 @@
       "id": "RULE.DEVEX.WORKSPACE.435",
       "level": "MUST",
       "params": {
-        "check": "workstream-state",
-        "due": "036/N008"
+        "check": "workstream-state"
       },
       "class": "checked",
       "sentence": "Before an arc is stamped `LANDED`, every suggestion it raised is decided, parked or dropped",
@@ -10541,12 +10018,9 @@
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.436",
-      "level": "MUST",
-      "params": {
-        "check": "workstream-state",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": "Processes are never listed with `pgrep -f`, `ps -f` or `ps -ww`",
       "chapter": "04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md",
       "heading": "One window, laws by declaration",
@@ -10555,12 +10029,9 @@
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.437",
-      "level": "MUST",
-      "params": {
-        "check": "doc-check",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": "A page uses the decided words: `command`, never `verb`, and `sign-in`, `device`, `client` or `caller`, never `browser`, for evidence or sessions",
       "chapter": "registers/naming.md",
       "heading": "Core vocabulary",
@@ -10588,12 +10059,9 @@
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.439",
-      "level": "MUST",
-      "params": {
-        "check": "doc-check",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": "The company and the product are spelled `SaaS Plane` in every visible text, never by a code name or in another casing",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/01-corpus.md",
       "heading": "What the pattern binds",
@@ -10602,13 +10070,10 @@
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.440",
-      "level": "MUST",
-      "params": {
-        "check": "command-shape",
-        "due": "036/N008"
-      },
-      "class": "checked",
-      "sentence": "The script-file route around the seat guard is for a command whose text quotes the seat path",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
+      "sentence": "The script-file route around the saasplane env's guard is for a command whose text quotes the env file's path",
       "chapter": "04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md",
       "heading": "Two dot-homes",
       "decision": null,
@@ -10616,12 +10081,9 @@
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.441",
-      "level": "MUST",
-      "params": {
-        "check": "doc-check",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": "The agent never opens or reads a published artifact itself",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "Nothing is published unless the developer asks",
@@ -10632,10 +10094,9 @@
       "id": "RULE.DEVEX.WORKSPACE.442",
       "level": "MUST",
       "params": {
-        "check": "questions",
-        "due": "036/N008"
+        "skill": "spn-devex/ideate"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "Each option on a card is one decision",
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "A card is only for what the rules leave open",
@@ -10665,8 +10126,7 @@
       "id": "RULE.DEVEX.WORKSPACE.444",
       "level": "MUST",
       "params": {
-        "check": "workstream-state",
-        "due": "036/N008"
+        "check": "stop"
       },
       "class": "checked",
       "sentence": "A handover and a question never share a reply",
@@ -10679,10 +10139,9 @@
       "id": "RULE.DEVEX.WORKSPACE.445",
       "level": "MUST",
       "params": {
-        "check": "workstream-state",
-        "due": "036/N008"
+        "skill": "spn-devex/develop"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "A new workstream numbers its cards from `Q1`, or from the first free number across its arcs",
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "Questions are records, and every card is one rendered",
@@ -10693,11 +10152,10 @@
       "id": "RULE.DEVEX.WORKSPACE.446",
       "level": "MUST",
       "params": {
-        "check": "workstream-state",
-        "due": "036/N008"
+        "check": "saasplane-env"
       },
       "class": "checked",
-      "sentence": "The agent manages the seat file's keys itself",
+      "sentence": "The agent manages the saasplane env's keys itself",
       "chapter": "04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md",
       "heading": "Two dot-homes",
       "decision": null,
@@ -10726,10 +10184,9 @@
       "id": "RULE.DEVEX.WORKSPACE.448",
       "level": "MUST",
       "params": {
-        "check": "workstream-state",
-        "due": "036/N008"
+        "skill": "spn-devex/execute"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "No handover is given while a child the window launched has no report",
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "Stopping in the middle is a handover",
@@ -10749,12 +10206,9 @@
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.450",
-      "level": "MUST",
-      "params": {
-        "check": "corpus",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": "Before writing, the agent names the place it writes in and that place's reader",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/01-corpus.md",
       "heading": "What the pattern binds",
@@ -10778,8 +10232,7 @@
       "id": "RULE.DEVEX.WORKSPACE.452",
       "level": "MUST",
       "params": {
-        "check": "workstream-state",
-        "due": "036/N008"
+        "check": "split-plan"
       },
       "class": "checked",
       "sentence": "The approach page reads `DONE` before its folder moves to `closed/`",
@@ -10805,10 +10258,9 @@
       "id": "RULE.DEVEX.WORKSPACE.454",
       "level": "MUST",
       "params": {
-        "check": "doc-check",
-        "due": "036/N008"
+        "skill": "spn-surface/design"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "A mock of a layout is a `SKELETON` figure drawn by its helper, with a flow file ordering the pages and each page drawn once",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "SKELETON — a mock of a layout",
@@ -11021,10 +10473,9 @@
       "id": "RULE.DEVEX.WORKSPACE.464",
       "level": "MUST",
       "params": {
-        "check": "orientation",
-        "due": "036/N008"
+        "skill": "spn-devex/scm"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "A repository declares its world, and *no claim* is itself a value rather than a missing file",
       "chapter": "04-capabilities/01-devex/04-workspace/03-repos/01-repos.md",
       "heading": "The world is a value, never an absence",
@@ -11035,10 +10486,9 @@
       "id": "RULE.DEVEX.WORKSPACE.465",
       "level": "MUST",
       "params": {
-        "check": "doc-check",
-        "due": "036/N008"
+        "skill": "spn-devex/scm"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "A root's shape and its documentation seats derive from the world it declares, and a node's from its own manifest",
       "chapter": "04-capabilities/01-devex/04-workspace/03-repos/01-repos.md",
       "heading": "The root's shape follows the world, and so does its documentation",
@@ -11049,10 +10499,9 @@
       "id": "RULE.DEVEX.WORKSPACE.466",
       "level": "MUST",
       "params": {
-        "check": "doc-check",
-        "due": "036/N008"
+        "skill": "spn-devex/ideate"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "Conflicts land here — always",
       "chapter": "registers/decisions.md",
       "heading": "How the register works",
@@ -11111,24 +10560,22 @@
       "id": "RULE.DEVEX.WORKSPACE.469",
       "level": "MUST",
       "params": {
-        "check": "stop",
-        "due": "036/N011"
+        "skill": "spn-devex/execute"
       },
-      "class": "checked",
-      "sentence": "A part that waits on something outside the window reads waiting on, and is never named as ready",
+      "class": "stated in a skill",
+      "sentence": "A part or a row that waits on something outside the window reads waiting on, and is never named as ready",
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "After the go, every moment names the next step",
-      "decision": null,
+      "decision": "DEC.DEVEX.WORKSPACE.469",
       "restated": []
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.470",
       "level": "MUST",
       "params": {
-        "check": "workstream-state",
-        "due": "036/N011"
+        "skill": "spn-devex/execute"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "A code part added after a repository's full run has landed opens a second full run",
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "After the go, every moment names the next step",
@@ -11139,8 +10586,7 @@
       "id": "RULE.DEVEX.WORKSPACE.471",
       "level": "MUST",
       "params": {
-        "check": "stop",
-        "due": "036/N011"
+        "check": "stop"
       },
       "class": "checked",
       "sentence": "A finding names only this window's workstreams, and is said once until its state changes",
@@ -11153,8 +10599,7 @@
       "id": "RULE.DEVEX.WORKSPACE.472",
       "level": "MUST",
       "params": {
-        "check": "workstream-state",
-        "due": "036/N011"
+        "check": "merge-told"
       },
       "class": "checked",
       "sentence": "The merge note and the take-up of a suggestion read only this window's arcs and the command that records them",
@@ -11167,8 +10612,7 @@
       "id": "RULE.DEVEX.WORKSPACE.473",
       "level": "MUST",
       "params": {
-        "check": "stop",
-        "due": "036/N011"
+        "check": "stop"
       },
       "class": "checked",
       "sentence": "The block is written by `workstream handover` from the data, and the agent adds only the lines the data cannot say",
@@ -11181,10 +10625,9 @@
       "id": "RULE.DEVEX.WORKSPACE.474",
       "level": "MUST",
       "params": {
-        "check": "workstream-state",
-        "due": "036/N011"
+        "skill": "spn-devex/develop"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "Every workspace command takes one address form, and a card is settled by one command",
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "The commands",
@@ -11195,10 +10638,9 @@
       "id": "RULE.DEVEX.WORKSPACE.475",
       "level": "MUST",
       "params": {
-        "check": "workstream-state",
-        "due": "036/N011"
+        "skill": "spn-devex/develop"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "Every write of a `workstream` command commits what it wrote in `.spndevex`, and `report write` lands the row",
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "The commands",
@@ -11209,10 +10651,9 @@
       "id": "RULE.DEVEX.WORKSPACE.476",
       "level": "MUST",
       "params": {
-        "check": "workstream-state",
-        "due": "036/N011"
+        "skill": "spn-devex/develop"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "A refusal to land, to write a sheet or to write the plan names every fault it finds, and a run lands a row when its tree is the commit's tree",
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "In an arc that keeps a sheet, a row lands on a run of its tests",
@@ -11223,10 +10664,9 @@
       "id": "RULE.DEVEX.WORKSPACE.477",
       "level": "MUST",
       "params": {
-        "check": "workstream-state",
-        "due": "036/N011"
+        "skill": "spn-devex/develop"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "The managing ratio is printed at each landing and at the close",
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "Each arc reports what it cost and how much of it was rework",
@@ -11237,14 +10677,50 @@
       "id": "RULE.DEVEX.WORKSPACE.478",
       "level": "MUST",
       "params": {
-        "check": "pretooluse",
-        "due": "036/N011"
+        "check": "child-size"
       },
       "class": "checked",
       "sentence": "A helper searches with `grep` in Bash, and its size stop is sized from the entries its part holds",
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "An order is one delegated execution, and every order follows the same rules",
       "decision": null,
+      "restated": []
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.479",
+      "level": "MUST",
+      "params": {
+        "short": true
+      },
+      "class": "stated",
+      "sentence": "Before it recommends an option, the agent says whether the subject is core or periphery, and for core it recommends the option that leaves it right",
+      "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
+      "heading": "A card is only for what the rules leave open",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/workstream.md",
+          "heading": "A card is only for what the rules leave open"
+        }
+      ],
+      "line": {
+        "text": "Before you recommend an option, say whether the subject is core or periphery, and for core recommend the option that leaves it right.",
+        "ref": "refs/devex/workspace/workstream.md",
+        "heading": "A card is only for what the rules leave open"
+      }
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.480",
+      "level": "MUST",
+      "params": {
+        "check": "stop"
+      },
+      "class": "checked",
+      "sentence": "Each send-back is counted from the telemetry when it is made, and answered by the kind of check",
+      "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
+      "heading": "A check at the end of a turn speaks once, and only about this window's work",
+      "decision": "DEC.DEVEX.WORKSPACE.480",
       "restated": []
     },
     {
@@ -12150,10 +11626,9 @@
       "id": "RULE.PLATFORM.CORE.050",
       "level": "MUST",
       "params": {
-        "check": "doc-check",
-        "due": "036/N008"
+        "agent": "spn-devex/spn-panel"
       },
-      "class": "checked",
+      "class": "kept by an agent",
       "sentence": "Self-assessed is never read as tested",
       "chapter": "04-capabilities/03-platform/01-core/04-data-and-trust/02-trust.md",
       "heading": "Findings: rated, fixed and answered",
@@ -14290,12 +13765,9 @@
     },
     {
       "id": "RULE.SUPPORT.APPS.086",
-      "level": "MUST",
-      "params": {
-        "check": "restates",
-        "due": "036/N008"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": "An action is an interaction whichever way it is reached",
       "chapter": "04-capabilities/02-support/02-apps/06-tests/README.md",
       "heading": "The behaviour rows are the denominator",
@@ -17556,10 +17028,9 @@
       "id": "RULE.SUPPORT.APPS.233",
       "level": "MUST",
       "params": {
-        "check": "subjects",
-        "due": "036/N008"
+        "skill": "spn-apps/implement"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "Code never branches on the name of an environment, and it reads a setting named for what it does",
       "chapter": "04-capabilities/02-support/02-apps/03-module/01-server/05-config/01-env.md",
       "heading": "Read once, at the edge",
@@ -17570,10 +17041,9 @@
       "id": "RULE.SUPPORT.APPS.234",
       "level": "MUST",
       "params": {
-        "check": "subjects",
-        "due": "036/N008"
+        "skill": "spn-apps/implement"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "A polymorphic contract type is a base interface that carries `mtype`, extended by one interface for each variant, and never a TypeScript union alias",
       "chapter": "04-capabilities/02-support/02-apps/02-support/01-server/02-polymorphic.md",
       "heading": "Selection is data, not code",
@@ -17584,10 +17054,9 @@
       "id": "RULE.SUPPORT.APPS.235",
       "level": "MUST",
       "params": {
-        "check": "subjects",
-        "due": "036/N008"
+        "skill": "spn-apps/implement"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "After contract states change, `gen-validators` runs, and after a library file is added or removed, `gen-barrel` runs, in the same step for every package touched",
       "chapter": "04-capabilities/02-support/02-apps/08-agent-surface/03-validators.md",
       "heading": "What generation and stacks own",
@@ -17598,8 +17067,7 @@
       "id": "RULE.SUPPORT.APPS.236",
       "level": "MUST",
       "params": {
-        "check": "subjects",
-        "due": "036/N008"
+        "check": "comment-check"
       },
       "class": "checked",
       "sentence": "A comment cites only names that exist now and describes the code as it stands, and the edit that changes the code corrects it",
@@ -17612,10 +17080,9 @@
       "id": "RULE.SUPPORT.APPS.237",
       "level": "MUST",
       "params": {
-        "check": "subjects",
-        "due": "036/N008"
+        "skill": "spn-apps/implement"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "A file holds one component and only what its name says, so an interface file holds types only",
       "chapter": "04-capabilities/02-support/02-apps/10-providers/ts/03-structure.md",
       "heading": "Module Organization",
@@ -17648,10 +17115,9 @@
       "id": "RULE.SUPPORT.APPS.240",
       "level": "MUST",
       "params": {
-        "check": "subjects",
-        "due": "036/N008"
+        "skill": "spn-apps/implement"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "Files under `src/_shadcn/` are never edited by hand",
       "chapter": "04-capabilities/02-support/02-apps/02-support/02-web/02-ui.md",
       "heading": "Folder discipline",
@@ -17662,10 +17128,9 @@
       "id": "RULE.SUPPORT.APPS.241",
       "level": "MUST",
       "params": {
-        "check": "subjects",
-        "due": "036/N008"
+        "skill": "spn-apps/implement"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "A script is written in the stack's language and kept in a folder the tree names",
       "chapter": "04-capabilities/02-support/02-apps/10-providers/ts/03-structure.md",
       "heading": "Where New Code Goes",
@@ -17687,10 +17152,9 @@
       "id": "RULE.SUPPORT.APPS.243",
       "level": "MUST",
       "params": {
-        "check": "subjects",
-        "due": "036/N008"
+        "skill": "spn-apps/implement"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "A web prop is typed by a contract state, command or result as it is, or as a union narrowed with `in`, and never by `Partial`, `Pick`, `Omit` or an intersection of it",
       "chapter": "04-capabilities/02-support/02-apps/03-module/02-web/03-entry/02-components.md",
       "heading": "Props in, events out",
@@ -17712,10 +17176,9 @@
       "id": "RULE.SUPPORT.APPS.245",
       "level": "MUST",
       "params": {
-        "check": "subjects",
-        "due": "036/N008"
+        "skill": "spn-apps/implement"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "`spnutils apps format` is never run as a reflex: named files are formatted with `prettier`, and any formatting a change needs is its own commit",
       "chapter": "04-capabilities/02-support/02-apps/10-providers/ts/11-generation.md",
       "heading": "The Never-Hand-Edit Rule",
@@ -17726,10 +17189,9 @@
       "id": "RULE.SUPPORT.APPS.246",
       "level": "MUST",
       "params": {
-        "check": "subjects",
-        "due": "036/N008"
+        "skill": "spn-apps/implement"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "In `spn-platform-ts` the migration that owns a table is edited, instead of adding a migration or an `ALTER`, and the stack is reset clean before testing",
       "chapter": "04-capabilities/02-support/02-apps/03-module/01-server/04-migrations/01-foundation.md",
       "heading": "The only schema-change path",
@@ -32292,10 +31754,9 @@
       "id": "RULE.SUPPORT.SURFACE.398",
       "level": "MUST",
       "params": {
-        "check": "subjects",
-        "due": "036/N008"
+        "skill": "spn-surface/design"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "A rule about how a page uses a prop of a unit is written as guidance with its cases: it names no `never` value, it says no `MUST`, and no check refuses it",
       "chapter": "04-capabilities/02-support/01-surface/06-architecture-components/01-common/01-components.md",
       "heading": "A unit's choice table",
@@ -32312,10 +31773,9 @@
       "id": "RULE.SUPPORT.SURFACE.399",
       "level": "MUST",
       "params": {
-        "check": "subjects",
-        "due": "036/N008"
+        "skill": "spn-surface/design"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "After a change to the design system, the showcase is restarted with its cache cleared, and the served bundle is proved newer than the change before any page is shown",
       "chapter": "04-capabilities/02-support/01-surface/12-delivery-showcase/01-common/01-showcase.md",
       "heading": "What the showcase proves",
@@ -32367,10 +31827,9 @@
       "id": "RULE.SUPPORT.SURFACE.402",
       "level": "MUST",
       "params": {
-        "check": "subjects",
-        "due": "036/N008"
+        "skill": "spn-surface/design"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "Playground is the last page of a unit, and every new unit joins the `storySort` order",
       "chapter": "04-capabilities/02-support/01-surface/12-delivery-showcase/01-common/01-showcase.md",
       "heading": "The pages of a unit",
@@ -32381,10 +31840,9 @@
       "id": "RULE.SUPPORT.SURFACE.403",
       "level": "MUST",
       "params": {
-        "check": "subjects",
-        "due": "036/N008"
+        "skill": "spn-surface/design"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "A Figma task starts at the design skill's own walk, its shipped scripts and the cached surface status, and never at the connector's generic discovery calls or a script made during the run",
       "chapter": "04-capabilities/02-support/01-surface/11-delivery-library/02-figma/03-reading.md",
       "heading": "The tool reads the units, and the connector reads the variables and the styles",
@@ -32458,10 +31916,9 @@
       "id": "RULE.SUPPORT.SURFACE.407",
       "level": "MUST",
       "params": {
-        "check": "subjects",
-        "due": "036/N008"
+        "skill": "spn-surface/design"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "A Figma file is named `DS <n>-<Name>`, with a hyphen and no middle dot, and its theme collections are named the same way",
       "chapter": "04-capabilities/02-support/01-surface/11-delivery-library/02-figma/01-files.md",
       "heading": "SaaS Plane's library, file by file",
@@ -32472,10 +31929,9 @@
       "id": "RULE.SUPPORT.SURFACE.408",
       "level": "MUST",
       "params": {
-        "check": "subjects",
-        "due": "036/N008"
+        "skill": "spn-surface/design"
       },
-      "class": "checked",
+      "class": "stated in a skill",
       "sentence": "Every new prop of the design system ships with a showcase case that shows it",
       "chapter": "04-capabilities/02-support/01-surface/12-delivery-showcase/01-common/01-showcase.md",
       "heading": "What the showcase proves",

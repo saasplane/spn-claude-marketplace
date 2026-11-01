@@ -62,18 +62,18 @@ same("an arc file names the workstream and the arc",
 same("an arc's notes name the arc",
   tagsOf({ tool_input: { file_path: `${WS}/notes/N116/plan.md` } }),
   tags("008-plain-language", "N116", null));
-// AN ARC NUMBERED IN THREE DIGITS, as `N001-book-change.md` and `notes/N001/` write it, keeps its
+// AN ARC NUMBERED IN THREE DIGITS, as an arc's file and its notes folder write it, keeps its
 // zeros: the arc file, a preview, a sample and an order all name the same arc.
 same("a three-digit arc file names its arc with its zeros",
   tagsOf({ tool_input: { file_path: `${WS}/arcs/N001-book-change.md` } }),
   tags("008-plain-language", "N001", null));
-same("a preview under notes/N001/previews/ names the arc",
+same("a preview under an arc's previews folder names the arc",
   tagsOf({ tool_input: { file_path: `${WS}/notes/N001/previews/sample1-preview.html` } }),
   tags("008-plain-language", "N001", null));
-same("a sample under notes/N001/samples/ names the arc",
+same("a sample under an arc's samples folder names the arc",
   tagsOf({ tool_input: { file_path: `${WS}/notes/N001/samples/close-message.md` } }),
   tags("008-plain-language", "N001", null));
-same("an order under notes/N001/orders/ names the arc and the order",
+same("an order under an arc's orders folder names the arc and the order",
   tagsOf({ tool_input: { file_path: `${WS}/notes/N001/orders/B1-book.md` } }),
   tags("008-plain-language", "N001", "B1-book"));
 same("a relative three-digit arc path, from inside the workstream, names the arc",
@@ -125,7 +125,7 @@ console.log("\n=== the line — one shape, key for key");
             cwd: ${JSON.stringify(join(root, "spn-support-ts"))}, process: { group: "events", action: "pretooluse" } },
           ${JSON.stringify(root)});
     span({ group: "split-plan", action: "close" }, () => 1);
-    record({ group: "env-seat", action: "env-seat" }, 1.5);
+    record({ group: "saasplane-env", action: "saasplane-env" }, 1.5);
     end();`);
   const lines = logOf(root);
   same("every line has the twenty keys, in the book's order", lines.map((l) => Object.keys(l).join(",")),

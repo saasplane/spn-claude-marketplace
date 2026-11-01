@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/02-apps/08-agent-surface.md",
-      "seen": "bb2e9940"
+      "seen": "2519b0d5"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/08-agent-surface/",
-      "seen": "ef5f2622"
+      "seen": "6fce773c"
     }
   ]
 }
@@ -26,7 +26,7 @@ Install a package and its source stays behind. You still owe whoever works again
 - **Generated at build, carried in the package.** The artifact travels inside the archive it describes, so the artifact and the code are the same version by construction. Never regenerate one yourself from an installed package — regenerating a description from installed output is inferring a surface, not reading one.
 - **Generation never fails a build.** A source file that cannot be read costs its own entries and nothing else. The one thing the generator refuses to do is emit something that fails its own schema — an invalid artifact reaching a consumer is worse than no artifact at all.
 - **A generator signals by absence and by findings, never by a count** (`RULE.SUPPORT.APPS.070` · MUST · skill:spn-apps/implement). What was published and what the artifact describes are the same set, every entry exactly once. No count is emitted and no gate reads one; findings ride beside the artifact rather than inside it, and a package that could not be described ships no artifact, which is the signal.
-- **A generated file protects its hand-earned regions.** Where a document or a barrel has room for something a developer wrote, that room is marked, and the generator owns everything outside the markers and nothing inside them. In a generated document the region sits between `<!-- spnutils:keep:begin -->` and `<!-- spnutils:keep:end -->`; a keep region holds content and never structure, and regions never nest (`RULE.DEVEX.WORKSPACE.077` · MUST · check:subjects · due:036/N008). The symbol index, the label manifest, the validators and a derived barrel reserve no such room, and a hand edit inside one is refused rather than reviewed (`RULE.SUPPORT.APPS.051` · MUST · skill:spn-apps/implement).
+- **A generated file protects its hand-earned regions.** Where a document or a barrel has room for something a developer wrote, that room is marked, and the generator owns everything outside the markers and nothing inside them. In a generated document the region sits between `<!-- spnutils:keep:begin -->` and `<!-- spnutils:keep:end -->`; a keep region holds content and never structure, and regions never nest (`RULE.DEVEX.WORKSPACE.077` · MUST · skill:spn-devex/develop). The symbol index, the label manifest, the validators and a derived barrel reserve no such room, and a hand edit inside one is refused rather than reviewed (`RULE.SUPPORT.APPS.051` · MUST · skill:spn-apps/implement).
 
 A hand-written index is correct the day it is written and wrong the day the code moves on without it — and it fails silently: a consumer finds out by writing code against something no longer true. Deriving it moves that failure to build time, in front of whoever caused it.
 
