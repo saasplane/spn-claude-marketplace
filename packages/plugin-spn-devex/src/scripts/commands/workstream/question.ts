@@ -8,13 +8,15 @@
 //   spn-devex workstream question show Q<n> --in <notes/N<nnn>/preview.html>
 //   spn-devex workstream question brief <workstream>/Q<n>
 //   spn-devex workstream question answer Q<n> --key A --words "…" [--entries E7,E9]
+//   spn-devex workstream question cite Q<n> --entries E7,E9|none
 //   spn-devex workstream question withdraw Q<n> --words "…"
 //
 // The only writers of `questions.jsonl`. Each write renders every page's `open` block from the
 // records, so a card is the same wherever it stands and leaves every page in the same write.
 // An answer given `--entries` is settled in the one call: the answer folded into the arc's What, the card cited in
 // those entries of the sheet, and each go plan that holds the arc written again. It refuses only entries the sheet
-// does not hold, and names all of them at once.
+// does not hold, and names all of them at once. `--entries none` records that the answer changes no repository file, and
+// `cite` does the same for a card answered earlier: the sheet check accepts a card cited in an entry or recorded as none.
 
 import { readFileSync, writeFileSync } from "node:fs";
 import { basename, resolve } from "node:path";
@@ -200,6 +202,34 @@ function writeGoAgain(ws: string, arc: string): string[] {
   return said;
 }
 
+/** Refuses every entry the arc's sheet does not hold, naming all of them at once. */
+function heldEntries(ws: string, arc: string, cited: string[]): void {
+  const held = new Set((readSheet(ws, arc)?.entries ?? []).map((entry) => entry.id));
+  const absent = cited.filter((id) => !held.has(id));
+  if (absent.length) throw new UsageFault(`finds no ${absent.join(", ")} in ${arc}'s sheet: ${held.size ? `it holds ${[...held].join(" · ")}` : "it holds no entry"}. Nothing was recorded.`);
+}
+
+const citedLine = (cited: string[]): string => (cited.length ? `cited in ${cited.join(", ")}` : "changes no repository file");
+
+/** An answered card cited in entries of its arc's sheet, or recorded as changing no repository file; the go written again. */
+function cite(args: string[]): number {
+  const words = readWords(args, { entries: VALUE });
+  const [ref, ...more] = words.paths;
+  if (more.length) throw new UsageFault("takes one question.");
+  const { ws, records, record } = recordNamed(ref);
+  if (record.state !== "answered" || !record.answer) throw new UsageFault(`cites an answered card, and ${cardName(record.id)} is ${record.state}.`);
+  const cited = listOf(words, "entries");
+  if (!cited) throw new UsageFault("needs `--entries E7,E9`, or `--entries none` for an answer that changes no repository file.");
+  heldEntries(ws, record.arc, cited);
+  record.answer.entries = [...new Set([...(record.answer.entries ?? []), ...cited])];
+  const lines = finish(ws, records);
+  if (cited.length) citeInEntries(ws, record.arc, record.id, record.answer.key ?? null, cited);
+  if (readArc(ws, record.arc)) logEvent(ws, record.arc, "cited", null, `${cardName(record.id)} · ${citedLine(cited)}`);
+  console.log([`${cardName(record.id)} · ${citedLine(cited)}`, ...writeGoAgain(ws, record.arc)].join(" · "));
+  for (const line of lines) console.log(line);
+  return 0;
+}
+
 function settle(args: string[], state: "answered" | "withdrawn"): number {
   const words = readWords(args, state === "answered" ? { key: VALUE, words: VALUE, entries: VALUE } : { words: VALUE });
   const [ref, ...more] = words.paths;
@@ -212,15 +242,11 @@ function settle(args: string[], state: "answered" | "withdrawn"): number {
   if (state === "answered" && (!key || !record.card.options.some((option) => option.key === key)))
     throw new UsageFault(`needs \`--key\`, one of ${record.card.options.map((option) => option.key).join(" · ")}.`);
   const cited = state === "answered" ? listOf(words, "entries") : null;
-  if (cited) {
-    const held = new Set((readSheet(ws, record.arc)?.entries ?? []).map((entry) => entry.id));
-    const absent = cited.filter((id) => !held.has(id));
-    if (absent.length) throw new UsageFault(`finds no ${absent.join(", ")} in ${record.arc}'s sheet: ${held.size ? `it holds ${[...held].join(" · ")}` : "it holds no entry"}. Nothing was recorded.`);
-  }
+  if (cited) heldEntries(ws, record.arc, cited);
   const off = pagesOf(record);
   const before = arcSignatures(ws);
   record.state = state;
-  record.answer = { key, words: said, at: now() };
+  record.answer = { key, words: said, at: now(), ...(cited ? { entries: cited } : {}) };
   const lines = finish(ws, records);
   if (readArc(ws, record.arc)) logEvent(ws, record.arc, state, null, `${cardName(record.id)}${key ? ` ${key}` : ""} · ${said}`);
   const refreshed = refreshIfMoved(ws, before);
@@ -228,7 +254,7 @@ function settle(args: string[], state: "answered" | "withdrawn"): number {
   if (cited) {
     const folded = foldIntoWhat(ws, record, key, said);
     citeInEntries(ws, record.arc, record.id, key, cited);
-    settled.push(folded ? `folded into ${record.arc}'s What` : `! ${record.arc} has no What entry to fold into`, `cited in ${cited.join(", ")}`);
+    settled.push(folded ? `folded into ${record.arc}'s What` : `! ${record.arc} has no What entry to fold into`, citedLine(cited));
     settled.push(...writeGoAgain(ws, record.arc));
   }
   const owed = state === "answered" ? (cited ? "" : `owed: ${record.arc}'s What, its Log line`) : "owed: its Log line";
@@ -242,5 +268,6 @@ export const actions: Record<string, Action> = {
   brief: { describe: "print a fresh view's brief from the card: the problem and the constraints first, no options, the proposals to follow", usage: "<workstream>/Q<n>", run: brief },
   show: { describe: "show an open card on an arc's preview, in its Open", usage: "Q<n> --in <notes/N<nnn>/preview.html>", run: show },
   answer: { describe: "answer a card in your words; it leaves every Open; with --entries, folded into the What, cited, and the go written again", usage: "Q<n> --key <option> --words \"…\" [--entries E7,E9]", run: (args) => settle(args, "answered") },
+  cite: { describe: "cite an answered card in entries of its arc's sheet, or record with none that it changes no repository file; the go written again", usage: "Q<n> --entries E7,E9|none", run: cite },
   withdraw: { describe: "withdraw a card in your words; it leaves every Open", usage: "Q<n> --words \"…\"", run: (args) => settle(args, "withdrawn") },
 };

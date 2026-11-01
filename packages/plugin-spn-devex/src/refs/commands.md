@@ -160,6 +160,8 @@ spn-devex workstream question show Q<n> --in <notes/N<nnn>/preview.html> — sho
 
 spn-devex workstream question answer Q<n> --key <option> --words "…" [--entries E7,E9] — answer a card in your words; it leaves every Open; with --entries, folded into the What, cited, and the go written again
 
+spn-devex workstream question cite Q<n> --entries E7,E9|none — cite an answered card in entries of its arc's sheet, or record with none that it changes no repository file; the go written again
+
 spn-devex workstream question withdraw Q<n> --words "…" — withdraw a card in your words; it leaves every Open
 
 spn-devex workstream report write [<workstream>] <report.md> — fold a child's report into its row: state, proof, commits, follow-ups

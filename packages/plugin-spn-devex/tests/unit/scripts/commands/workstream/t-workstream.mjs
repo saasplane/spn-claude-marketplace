@@ -31,7 +31,7 @@ console.log("=== help lists the group");
   const help = cli(root, ["help"]);
   for (const words of ["workstream state show", "workstream state check", "workstream rows show", "workstream arc edit", "workstream row add", "workstream row state", "workstream row note", "workstream row edit", "workstream row discard", "workstream arc stamp",
     "workstream report write", "workstream fact write", "workstream suggestion add", "workstream suggestion state", "workstream suggestion edit", "workstream progress write",
-    "workstream question raise", "workstream question show", "workstream question answer", "workstream question withdraw",
+    "workstream question raise", "workstream question show", "workstream question answer", "workstream question cite", "workstream question withdraw",
     "workstream sheet write", "workstream sheet edit", "workstream sheet drop", "workstream sheet show", "workstream sheet check"])
     ok(`help lists \`${words}\``, help.out.includes(words), words);
 }
@@ -838,6 +838,13 @@ console.log("\n=== question answer — a card settled in one call; addresses rea
   ok("[MKT.HOOKS.325] the bare id and the address both read the card", /is answered/.test(bare.out) && /is answered/.test(cli(one.root, ["workstream", "question", "show", `031/${id}`, "--in", "notes/N001/preview.html"]).out), bare.out);
   const rows = cli(one.root, ["workstream", "rows", "031/N001"]);
   ok("[MKT.HOOKS.325] `rows 031/N001` shows the arc's rows", rows.code === 0 && /N001 1 /.test(rows.out), rows.out);
+  const second = cli(one.root, ["workstream", "question", "raise", "031/N001", "--file", "card.json"]);
+  const secondId = /^(q\d+)/.exec(second.out)?.[1] ?? "q2";
+  const noFile = cli(one.root, ["workstream", "question", "answer", `031/${secondId}`, "--key", "A", "--words", "a local fix", "--entries", "none"]);
+  const noFileRecord = lines(join(one.ws, "questions.jsonl")).find((row) => row.id === secondId);
+  ok("[MKT.HOOKS.402] `--entries none` records the answer as changing no repository file, and owes nothing", noFile.code === 0 && JSON.stringify(noFileRecord.answer.entries) === "[]" &&
+    noFile.out.includes("changes no repository file") && !/owed:/.test(noFile.out), noFile.out);
+  ok("[MKT.HOOKS.402] no entry is cited for it", json(sheetFile).entries.every((one2) => !one2.decidedBy.some((text) => new RegExp(`\\b${secondId}\\b`).test(text))));
   ok("[MKT.HOOKS.325] `rows 031/N001 --json` takes the options of show", cli(one.root, ["workstream", "rows", "031/N001", "--json"]).out.trim().startsWith("["));
 }
 

@@ -20,7 +20,7 @@ import { fileURLToPath } from "node:url";
 import { type Action, FLAG, VALUE, UsageFault, readWords } from "../../../../../plugin-support-lib/src/lib/command.ts";
 import { workspaceRoot } from "../../../../../plugin-support-lib/src/lib/timing.ts";
 import { logEvent, readArc, readJson, workspaceOf, readJsonl, readQuestions, readSheet, factsFileOf, sheetFileOf, stateFileOf, suggestionsOf, writeArc, writeWhole } from "../../lib/workstream.ts";
-import { ENTRY_OPS, cardName, entryWork, parentIds, renameDataToWork, sheetFaults, type ArcData, type ArcRow, type Fact, type Sheet, type SheetEntry } from "../../lib/workstream-schema.ts";
+import { ENTRY_OPS, cardName, entryWork, parentIds, renameDataToWork, sheetFaults, type ArcData, type ArcRow, type Fact, type Question, type Sheet, type SheetEntry } from "../../lib/workstream-schema.ts";
 import { missingCopies } from "../../lib/generated-copies.ts";
 import { arcNamed, listOf, typed } from "./_shared.ts";
 
@@ -297,6 +297,9 @@ function show(args: string[]): number {
 const cites = (entries: readonly SheetEntry[], id: string): boolean =>
   entries.some((entry) => entry.decidedBy.some((text) => new RegExp(`\\b${id}\\b`, "i").test(text)));
 
+/** Whether a card's answer records that it changes no repository file, cited with `--entries none`. */
+const changesNoFile = (card: Question): boolean => Array.isArray(card.answer?.entries) && card.answer.entries.length === 0;
+
 /** What `sheet check` prints, and what the go lists: the sheet read against the arc's rows and cards. Empty where the arc keeps no sheet. */
 export function sheetFindings(ws: string, arc: string): string[] {
   renameFirstRead(ws, arc);
@@ -322,7 +325,7 @@ export function sheetFindings(ws: string, arc: string): string[] {
     if (!tested) out.push(`row ${row.id} is a CODE row and its entries name no test`);
   }
   for (const card of readQuestions(ws).filter((one) => one.arc === arc && one.state === "answered"))
-    if (!cites(entries, card.id)) out.push(`${cardName(card.id)} is answered and no entry cites it`);
+    if (!cites(entries, card.id) && !changesNoFile(card)) out.push(`${cardName(card.id)} is answered and no entry cites it`);
   // A SUGGESTION DECIDED AGAINST THIS ARC IS CITED BY AN ENTRY (RULE.DEVEX.WORKSPACE.488): `decidedBy` carries it as S<n>, or the go leaves it out.
   for (const one of suggestionsOf(ws).filter((suggestion) => suggestion.arc === arc && suggestion.state === "decided"))
     if (!cites(entries, one.id)) out.push(`${cardName(one.id)} is decided against ${arc} and no entry cites it in \`decidedBy\` (as \`${cardName(one.id)}\`)`);

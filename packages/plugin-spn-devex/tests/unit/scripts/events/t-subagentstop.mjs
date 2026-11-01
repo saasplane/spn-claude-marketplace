@@ -109,22 +109,22 @@ console.log("\n=== a review panel's stop writes one PANEL row (RULE.DEVEX.WORKSP
     return { root, rows, out };
   };
   const a = setup("panel-meta", { prompt: "Convene the architect lens on 031-probe/N001 for the release part release-spn-foundation-1.", reply: "Pass with advice\n\nRename the helper." });
-  check("[MKT.HOOKS.402] a panel known by the agentType in the meta file beside its transcript writes one PANEL row, the helper's own, v 1 and event SubagentStop",
+  check("[MKT.HOOKS.439] a panel known by the agentType in the meta file beside its transcript writes one PANEL row, the helper's own, v 1 and event SubagentStop",
     a.rows.length === 1 && a.rows[0].v === 1 && a.rows[0].event === "SubagentStop" && a.rows[0].agent === "ad63" && a.rows[0].session === "sp", JSON.stringify(a.rows));
-  check("[MKT.HOOKS.402] it holds the head, then the lens and the verdict",
+  check("[MKT.HOOKS.439] it holds the head, then the lens and the verdict",
     Object.keys(a.rows[0] ?? {}).join(",") === "v,mtype,id,at,ms,event,session,agent,workstream,arc,part,skill,work,retryOf,lens,verdict", JSON.stringify(a.rows[0]));
-  check("[MKT.HOOKS.402] the lens is the first one the prompt names, the verdict the first line of the last reply, and PASS_WITH_ADVICE is not PASS",
+  check("[MKT.HOOKS.439] the lens is the first one the prompt names, the verdict the first line of the last reply, and PASS_WITH_ADVICE is not PASS",
     a.rows[0]?.lens === "ARCHITECT" && a.rows[0]?.verdict === "PASS_WITH_ADVICE", JSON.stringify(a.rows[0]));
-  check("[MKT.HOOKS.402] the workstream, arc and part are the ones the prompt names, and work is read from the part", a.rows[0]?.workstream === "031-probe" && a.rows[0]?.arc === "N001"
+  check("[MKT.HOOKS.439] the workstream, arc and part are the ones the prompt names, and work is read from the part", a.rows[0]?.workstream === "031-probe" && a.rows[0]?.arc === "N001"
     && a.rows[0]?.part === "release-spn-foundation-1" && a.rows[0]?.work === "RELEASE", JSON.stringify(a.rows[0]));
-  check("[MKT.HOOKS.402] the hook says nothing to the child", a.out === "");
+  check("[MKT.HOOKS.439] the hook says nothing to the child", a.out === "");
 
   const b = setup("panel-payload", { via: "payload", type: "other:spn-panel", prompt: "Read 031/N001 as the INFRA lens.", reply: "**BLOCKED** — the file moves." });
-  check("[MKT.HOOKS.402] the payload's agent_type is read first, and a type that ends in spn-panel is the panel; a bare 031/N001 names the workstream folder",
+  check("[MKT.HOOKS.439] the payload's agent_type is read first, and a type that ends in spn-panel is the panel; a bare 031/N001 names the workstream folder",
     b.rows.length === 1 && b.rows[0].lens === "INFRA" && b.rows[0].verdict === "BLOCKED" && b.rows[0].workstream === "031-probe" && b.rows[0].arc === "N001" && b.rows[0].part === null, JSON.stringify(b.rows));
 
   const c = setup("panel-nocarry", { prompt: "Judge the proposal as the product lens.", reply: "Pass." });
-  check("[MKT.HOOKS.402] a prompt that names no work leaves the workstream, arc and part null where the main window carries none", c.rows.length === 1 && c.rows[0].workstream === null && c.rows[0].verdict === "PASS" && c.rows[0].lens === "PRODUCT", JSON.stringify(c.rows));
+  check("[MKT.HOOKS.439] a prompt that names no work leaves the workstream, arc and part null where the main window carries none", c.rows.length === 1 && c.rows[0].workstream === null && c.rows[0].verdict === "PASS" && c.rows[0].lens === "PRODUCT", JSON.stringify(c.rows));
   const d = join(BASE, "panel-carried-main");
   mkdirSync(join(d, ".spndevex", ".debug", "sessions", "sp"), { recursive: true });
   writeFileSync(join(d, ".spndevex", ".debug", "sessions", "sp", "tags.json"), JSON.stringify({ main: { workstream: "031-probe", arc: "N002", part: null, skill: null }, ad63: { workstream: "099-lane", arc: "N009", part: null, skill: null } }));
@@ -134,9 +134,9 @@ console.log("\n=== a review panel's stop writes one PANEL row (RULE.DEVEX.WORKSP
   writeFileSync(join(d, ".spndevex", ".debug", "switches.json"), '{"telemetry": true}');
   stop(d, { cwd: d, session_id: "sp", agent_id: "ad63", agent_transcript_path: child });
   const carriedRows = readFileSync(join(d, ".spndevex", ".debug", "telemetry", "hooks.jsonl"), "utf8").trim().split("\n").map((line) => JSON.parse(line)).filter((row) => row.mtype === "PANEL");
-  check("[MKT.HOOKS.402] a prompt that names no work takes the main window's carried tags, never the helper's own lane",
+  check("[MKT.HOOKS.439] a prompt that names no work takes the main window's carried tags, never the helper's own lane",
     carriedRows.length === 1 && carriedRows[0].workstream === "031-probe" && carriedRows[0].arc === "N002" && carriedRows[0].lens === "LEAD", JSON.stringify(carriedRows));
-  check("[MKT.HOOKS.402] and the main window's carried tags are left as they were",
+  check("[MKT.HOOKS.439] and the main window's carried tags are left as they were",
     JSON.parse(readFileSync(join(d, ".spndevex", ".debug", "sessions", "sp", "tags.json"), "utf8")).main.arc === "N002");
 
   const beside = (name, prompt) => setup(name, { prompt, reply: "Pass" }).rows[0]?.lens;
@@ -145,18 +145,18 @@ console.log("\n=== a review panel's stop writes one PANEL row (RULE.DEVEX.WORKSP
       && beside("lens-c", "The product work in 031/N001, through the infra lens.") === "INFRA" && beside("lens-d", "Support asks about 031/N001: the server dev lens please.") === "SERVER_DEV");
   check("[MKT.HOOKS.410] with no lens beside the word lens, the earliest lens word stands", beside("lens-e", "Judge 031/N001 as ux, then as ui.") === "UX");
   const other = setup("panel-not", { type: "general-purpose", prompt: "Review 031/N001 as the architect.", reply: "Pass" });
-  check("[MKT.HOOKS.403] a helper that is not the panel writes no PANEL row", other.rows.length === 0, JSON.stringify(other.rows));
+  check("[MKT.HOOKS.440] a helper that is not the panel writes no PANEL row", other.rows.length === 0, JSON.stringify(other.rows));
   const unsure = setup("panel-unsure", { prompt: "Review 031/N001 as the architect.", reply: "Looks fine to me.\n\nPass" });
-  check("[MKT.HOOKS.403] a panel whose last reply opens with no verdict writes no row", unsure.rows.length === 0, JSON.stringify(unsure.rows));
+  check("[MKT.HOOKS.440] a panel whose last reply opens with no verdict writes no row", unsure.rows.length === 0, JSON.stringify(unsure.rows));
   const lens = setup("panel-nolens", { prompt: "Review 031/N001, no view named.", reply: "Pass" });
-  check("[MKT.HOOKS.403] a prompt that names no lens writes no row, since a row holds a lens of the contract", lens.rows.length === 0, JSON.stringify(lens.rows));
+  check("[MKT.HOOKS.440] a prompt that names no lens writes no row, since a row holds a lens of the contract", lens.rows.length === 0, JSON.stringify(lens.rows));
   const off = join(BASE, "panel-off");
   mkdirSync(join(off, ".spndevex"), { recursive: true });
   const offChild = join(off, "agent-o.jsonl");
   writeFileSync(offChild, [user("architect 031/N001"), said("Pass")].join("\n") + "\n");
   writeFileSync(join(off, "agent-o.meta.json"), JSON.stringify({ agentType: "spn-devex:spn-panel" }));
   stop(off, { cwd: off, session_id: "sp", agent_id: "o", agent_transcript_path: offChild });
-  check("[MKT.HOOKS.402] with recording off nothing is written", !existsSync(join(off, ".spndevex", ".debug")));
+  check("[MKT.HOOKS.439] with recording off nothing is written", !existsSync(join(off, ".spndevex", ".debug")));
 }
 
 console.log("\n=== it is silent where there is nothing to log");

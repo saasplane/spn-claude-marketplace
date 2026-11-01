@@ -267,7 +267,7 @@ developer as soon as the batch lands.
 | `sheet edit <arc> <E> [--what …] [--tiers …] …` | one entry, as the drift step refreshes it |
 | `sheet drop <arc> <E> --note "…"` | an entry no longer needed |
 | `sheet show <arc> [--row <id>] [--json]` | what an order's child reads; `--row` prints only that row's entries |
-| `sheet check <arc>` | the sheet whole, and the rows and cards meeting it: a row with no entry, an entry no row names, a code row whose entries name no test, an answered card no entry cites. The go lists what it finds |
+| `sheet check <arc>` | the sheet whole, and the rows and cards meeting it: a row with no entry, an entry no row names, a code row whose entries name no test, an answered card no entry cites and whose answer does not record `--entries none`. The go lists what it finds |
 
 **A row names its entries, and a report names its run.** A step row gains `entries`, the ids of the entries it carries; a report's front matter gains `run`. Each is a field added and never repurposed.
 
