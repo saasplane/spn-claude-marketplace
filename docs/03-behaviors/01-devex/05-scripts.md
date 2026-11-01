@@ -252,6 +252,9 @@ Every row below is declared and none is claimed: a run writes the last two cells
 | MKT.SCRIPTS.425 | Builder | keep every old card readable | A card raised before the new fields reads with no fault, because the checks run only when a card is raised or added | POSITIVE | UNIT | PLANNED | — |
 | MKT.SCRIPTS.426 | Builder | give a fresh view the problem first | `workstream question brief <ws>/Q<n>` prints a fresh view's brief from the card's why, what, nearest construct and signs, with no options, ending by saying the proposals come after the view answers; its words go to the arc's notes work folder (RULE.DEVEX.WORKSPACE.492) | POSITIVE | UNIT | PLANNED | — |
 | MKT.SCRIPTS.428 | Builder | have a helper stop on a name nobody defined | A generated brief tells the helper to stop and return needs-you on a name, shape or construct no entry holds, listing it under `unnamed:`; `report write` refuses `outcome: landed` while the report lists one, naming each and saying to raise it (RULE.DEVEX.WORKSPACE.495) | NEGATIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.429 | Builder | open an arc that holds the overall proposal | `workstream open` and `arc edit` take `--kind ideate`, recorded on the arc, and `--proposes N<nnn>,…` names the build arcs an ideate arc proposes (RULE.DEVEX.WORKSPACE.494) | POSITIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.430 | Builder | see an ideate arc land with no rows | An ideate arc's status is worked out: it reads LANDED once its preview is decided and every arc it proposes is opened, and DECIDED until then; the worked-out status is never written to its state.json | POSITIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.431 | Builder | have every reader agree on an ideate arc | The state check, `docs cycles write` and the close gate read an ideate arc through the same owner, so its page row, badge and name file follow what it reads | POSITIVE | UNIT | PLANNED | — |
 
 ## Retired ids
 

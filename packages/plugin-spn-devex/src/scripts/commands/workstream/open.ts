@@ -114,7 +114,7 @@ function pageFrom(text: string, block: Block, number: string, workspace: string,
 }
 
 export function run(args: string[]): number {
-  const words = readWords(args, { file: VALUE, note: VALUE, backlog: VALUE });
+  const words = readWords(args, { file: VALUE, note: VALUE, backlog: VALUE, kind: VALUE });
   if (words.paths.length) throw new UsageFault("takes the block as `--file <block.json>`.");
   const file = words.value("file");
   const note = words.value("note")?.trim();
@@ -148,6 +148,7 @@ export function run(args: string[]): number {
   writeWhole(join(folder, "approach.html"), pageFrom(templateText(), block, number, workspace, blocker));
   console.log(`ok · ${name} opened in ${blocker ? "backlog" : "open"} · lastNumber ${next}`);
 
+  const kind = words.value("kind");
   return arcActions.edit.run([`${name}/N001`, "--title", block.seeFirst, "--subject", block.subject, "--goal", block.seeFirst,
-    "--note", blocker ? `${note} · backlog, blocked by: ${blocker}` : note]);
+    ...(kind ? ["--kind", kind] : []), "--note", blocker ? `${note} · backlog, blocked by: ${blocker}` : note]);
 }

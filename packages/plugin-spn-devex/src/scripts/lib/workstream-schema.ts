@@ -83,8 +83,14 @@ export type ArcRow = {
   waitingOn?: string | null;
   [field: string]: unknown;
 };
+/** What an arc is for (RULE.DEVEX.WORKSPACE.494): a `build` arc has steps; an `ideate` arc holds the read, the fresh views and the one preview, and proposes the build arcs. */
+export const ARC_KINDS = ["build", "ideate"] as const;
 export type ArcData = {
   schemaVersion: number; arc: string; subject: string; title: string; goal?: string | null; status: string; reason: string | null;
+  /** `ideate` for an ideate arc; an arc with none is a build arc. */
+  kind?: string;
+  /** The build arcs an ideate arc proposes. Its status is worked out from them (`arcStatus`). */
+  proposes?: string[];
   wait?: string | null; reviewFixes?: boolean;
   carries?: string[]; decides?: string | null; repos?: string[]; cycle?: string | null; follows?: string | null; model?: string | null; position?: number | null;
   preview: string; rows: ArcRow[];
@@ -175,6 +181,8 @@ const ARC_FIELDS: Record<string, Rule> = {
   model: { kind: "text", required: false },
   position: { kind: "number", required: false },
   preview: { kind: "string", required: true },
+  kind: { kind: "enum", required: false, values: ARC_KINDS },
+  proposes: { kind: "strings", required: false, pattern: ARC_ID },
 };
 
 const ROW_FIELDS: Record<string, Rule> = {

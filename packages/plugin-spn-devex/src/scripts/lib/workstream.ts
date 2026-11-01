@@ -350,14 +350,25 @@ export function readSheet(ws: string, arc: string): Sheet | null {
 /** An arc's data, or null where its `state.json` is absent or does not parse. */
 export function readArc(ws: string, arc: string): ArcData | null {
   const data = readJson(stateFileOf(ws, arc));
-  return data && typeof data === "object" ? data as ArcData : null;
+  if (!data || typeof data !== "object") return null;
+  const one = data as ArcData;
+  // AN IDEATE ARC'S STATUS NEEDS THE WORKSPACE (RULE.DEVEX.WORKSPACE.494): whether each arc it proposes exists is read here, once, and carried
+  // for `arcStatus` as `proposesOpened`. It is never written: `writeArc` leaves it out.
+  if (one.kind === "ideate") one.proposesOpened = (Array.isArray(one.proposes) ? one.proposes : []).every((id) => isFile(stateFileOf(ws, id)));
+  return one;
 }
+
+/** An arc's data as it is stored: without the fields a read adds. */
+const asStored = (data: ArcData): ArcData => {
+  const { proposesOpened: _carried, ...rest } = data;
+  return rest as ArcData;
+};
 
 /** Writes an arc's data after the schema passes it, and its name file with it. Throws with every fault where it does not. */
 export function writeArc(ws: string, data: ArcData): void {
   const faults = arcFaults(data, `${data.arc}'s state.json`);
   if (faults.length) throw new Error(faults.join("; "));
-  writeWhole(stateFileOf(ws, data.arc), `${JSON.stringify(data, null, 2)}\n`);
+  writeWhole(stateFileOf(ws, data.arc), `${JSON.stringify(asStored(data), null, 2)}\n`);
   writeNameFile(ws, data);
 }
 
@@ -366,7 +377,7 @@ export function writeArc(ws: string, data: ArcData): void {
  * earlier version, which applies before the migration that brings the data to this one. Every other writer uses `writeArc`.
  */
 export function writeArcAsIs(ws: string, data: ArcData): void {
-  writeWhole(stateFileOf(ws, data.arc), `${JSON.stringify(data, null, 2)}\n`);
+  writeWhole(stateFileOf(ws, data.arc), `${JSON.stringify(asStored(data), null, 2)}\n`);
   writeNameFile(ws, data);
 }
 
@@ -509,10 +520,13 @@ const STARTED: ReadonlySet<string> = new Set(["running", "stopped", "replaced", 
  * out from the steps each time it is read: `RUNNING` once a step has started, and `LANDED` once every step counted
  * has landed, the deferred, carried and replaced ones left out. The review-fixes arc reads `RUNNING` until the close
  * stores its `LANDED`. A stored `PROPOSED` wins over the steps. Every reader asks this, so no two disagree.
+ * An ideate arc is the exception: it never needs rows.
  */
-export function arcStatus(data: Pick<ArcData, "status" | "rows" | "reviewFixes">): Status {
-  const stored = (STATUSES as readonly string[]).includes(data.status) ? data.status as Status : "PROPOSED";
-  if (stored !== "DECIDED" || !Array.isArray(data.rows)) return stored;
+export function arcStatus(data: Pick<ArcData, "status" | "rows" | "reviewFixes"> & { kind?: string; proposesOpened?: unknown }): Status {
+  const held = (STATUSES as readonly string[]).includes(data.status) ? data.status as Status : "PROPOSED";
+  if (held !== "DECIDED" || !Array.isArray(data.rows)) return held;
+  // AN IDEATE ARC HAS NO STEPS (RULE.DEVEX.WORKSPACE.494): decided, it reads LANDED once every arc it proposes is opened, and DECIDED until then.
+  if (data.kind === "ideate") return data.proposesOpened === true ? "LANDED" : "DECIDED";
   const leaves = leafRows(data as ArcData);
   if (!leaves.some((row) => STARTED.has(row.state ?? ""))) return "DECIDED";
   const counted = leaves.filter((row) => !UNCOUNTED.has(row.state ?? ""));

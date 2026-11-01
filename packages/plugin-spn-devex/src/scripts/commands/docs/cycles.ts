@@ -107,7 +107,8 @@ export function cycleOfData(folder: string, arc: string): Cycle | null {
   if (!data || typeof data !== "object") return null;
   // The status as it reads, from the one owner: the developer's words, or worked out from the steps (RULE.DEVEX.WORKSPACE.307).
   const status = typeof data.status === "string" && (STATUSES as readonly string[]).includes(data.status) && Array.isArray(data.rows)
-    ? arcStatus(data as Parameters<typeof arcStatus>[0]) : null;
+    // `readArc` carries what an ideate arc's status needs from the workspace (RULE.DEVEX.WORKSPACE.494).
+    ? arcStatus((readArc(folder, arc) ?? data) as Parameters<typeof arcStatus>[0]) : null;
   const wait = typeof data.wait === "string" && data.wait.trim() ? `wait: ${data.wait.trim()}` : "";
   // An arc carried to another workstream names where its preview now lives, and its samples sit beside it.
   const previewHref = previewHrefOf(arc, { preview: typeof data.preview === "string" ? data.preview : PREVIEW_FILE });

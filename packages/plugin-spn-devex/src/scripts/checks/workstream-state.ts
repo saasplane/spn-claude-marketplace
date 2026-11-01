@@ -15,7 +15,7 @@ import { linksSharedStyles } from "../../../../plugin-support-lib/src/lib/page-s
 import {
   DATA_FILES, FACTS_FILE, SHEET_FILE, LOG_FILE, NOTES, PREVIEW_FILE, approachOf, arcStatus, stepsMayStart, arcDataDir, arcIdsOf, factsFileOf, sheetFileOf, readSheet, firstOpenArc, leafRows, isDataLayout, logFileOf, markdownArcsOf,
   NO_REPO, arcStamp, markdownIn, nameFileHolds, nameFileOf, notesDirOf, previewOf, questionsFileOf, readJsonl, readQuestions, stampsOn, stateFileOf,
-  strayLevels, strayNotes, suggestionsFileOf, readJson, workstreamsOf, previewWithStatus, builtOf,
+  strayLevels, strayNotes, suggestionsFileOf, readJson, readArc, workstreamsOf, previewWithStatus, builtOf,
   localLinks, previewHrefOf, previewOwners, slotsIn, whatEntryOf, whatId, whatRange, workstreamName,
 } from "../lib/workstream.ts";
 import { WORK, DONE_STATES, arcFaults, factFaults, sheetFaults, logFaults, questionFaults, cardName, subjectFault, suggestionFaults, type ArcData, type Fact } from "../lib/workstream-schema.ts";
@@ -389,7 +389,7 @@ export function checkWorkstream(ws: string): Finding[] {
     const sheetRaw = existsSync(sheetFileOf(ws, arc)) ? readJson(sheetFileOf(ws, arc)) : undefined;
     if (sheetRaw !== undefined)
       out.push(...(sheetRaw === null ? [`arcs/${arc}/${SHEET_FILE} is not JSON`] : sheetFaults(sheetRaw, `arcs/${arc}/${SHEET_FILE}`).map((fault) => fault.startsWith("arcs/") ? fault : `arcs/${arc}/${SHEET_FILE}: ${fault}`)).map(say(arc, "schema")));
-    const data = faults.length ? null : raw as ArcData;
+    const data = faults.length ? null : readArc(ws, arc);
     out.push(...previewFindings(ws, arc).map(say(arc, "preview")));
     out.push(...sampleFindings(ws, arc).map(say(arc, "samples")));
     if (!data) continue;

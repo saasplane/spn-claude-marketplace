@@ -54,10 +54,13 @@ console.log("=== open: a block with one of the six things missing is refused");
   const again = open("--file", put("again.json", { ...BLOCK, subject: "second-one" }), "--note", WORDS);
   ok("[MKT.SCRIPTS.309] the next workstream takes the next number", again.code === 0 && existsSync(join(opened("open"), "042-second-one")) && json(join(root, ".spndevex", "state.json")).workstreams.lastNumber === 42, again.out);
 
+  const ideate = open("--file", put("ideate.json", { ...BLOCK, subject: "shape-first" }), "--note", WORDS, "--kind", "ideate");
+  ok("[MKT.SCRIPTS.429] `workstream open --kind ideate` opens the first arc as an ideate arc", ideate.code === 0 && json(join(opened("open"), "043-shape-first", "arcs", "N001", "state.json")).kind === "ideate", ideate.out);
+
   const noBlocker = open("--file", put("third.json", { ...BLOCK, subject: "third-one" }), "--note", WORDS, "--backlog", " ");
-  ok("[MKT.SCRIPTS.309] a backlog workstream without its blocker is refused", noBlocker.code === 1 && noBlocker.out.includes("blocker") && !existsSync(join(opened("backlog"), "043-third-one")), noBlocker.out);
+  ok("[MKT.SCRIPTS.309] a backlog workstream without its blocker is refused", noBlocker.code === 1 && noBlocker.out.includes("blocker") && !existsSync(join(opened("backlog"), "044-third-one")), noBlocker.out);
   const parked = open("--file", put("third.json", { ...BLOCK, subject: "third-one" }), "--note", WORDS, "--backlog", "the partner contract is not signed");
-  ok("[MKT.SCRIPTS.309] a backlog workstream with its blocker is opened in backlog", parked.code === 0 && existsSync(join(opened("backlog"), "043-third-one", "approach.html")), parked.out);
+  ok("[MKT.SCRIPTS.309] a backlog workstream with its blocker is opened in backlog", parked.code === 0 && existsSync(join(opened("backlog"), "044-third-one", "approach.html")), parked.out);
 }
 
 console.log("\n=== close: an unfinished plan refuses it");
