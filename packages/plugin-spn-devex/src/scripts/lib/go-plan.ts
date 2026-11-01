@@ -95,6 +95,9 @@ export const entryHash = (entry: SheetEntry): string => {
   return createHash("sha1").update(JSON.stringify(work)).digest("hex").slice(0, 8);
 };
 
+/** The hash a plan signed before citations left it, decidedBy hashed in: an entry that stands as it was still matches its landed part. */
+const signedWhole = (entry: SheetEntry): string => createHash("sha1").update(JSON.stringify(entry)).digest("hex").slice(0, 8);
+
 /** Minutes for one entry in each repository and kind of change, from rows that landed: `<repo>|<work>`. Absent where unmeasured. */
 export function ratesOf(measures: readonly Measure[]): Record<string, number> {
   const sums = new Map<string, { entries: number; minutes: number }>();
@@ -455,7 +458,7 @@ export function changedEntries(part: GoPart, scope: readonly ScopeSheet[]): stri
   const now = new Map(scope.flatMap(({ arc, sheet }) => sheet.entries.map((entry) => [refOf(arc, entry), entry] as const)));
   return part.entries.filter((ref, at) => {
     const entry = now.get(ref);
-    return !entry || hashes[at] !== entryHash(entry);
+    return !entry || (hashes[at] !== entryHash(entry) && hashes[at] !== signedWhole(entry));
   });
 }
 
