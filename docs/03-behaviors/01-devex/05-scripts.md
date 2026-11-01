@@ -221,6 +221,7 @@ Every row below is declared and none is claimed: a run writes the last two cells
 | MKT.SCRIPTS.394 | Engineering leader | be told what the closing message holds when I close a workstream | `workstream close` prints, after its success line, a `Next: write the closing message now:` line naming the heading, the `&nbsp;` line, what we delivered, what we learned, Thank you 👍 and the line that the window can be retired | POSITIVE | UNIT | PLANNED | — |
 | MKT.SCRIPTS.395 | Engineering leader | read a question as Q<n> and a suggestion as S<n> in everything a command writes | Every line the workstream commands print, every log line they write and every fault they raise names a card with a capital (Q28, S3), while the stored record id and the page anchor stay lowercase | POSITIVE | UNIT | PLANNED | — |
 | MKT.SCRIPTS.396 | Engineering leader | type a card in either case | A question or suggestion reference reads q28, Q28 and 036/Q28 the same, and an arc's --carries takes either case | POSITIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.397 | Engineering leader | start a preview from a template whose masthead already has Progress | The preview template's masthead line carries the Progress fact between Arc and Shown in the markup the arc's commands write, and says the commands write it and it is left out while the arc has no sheet | POSITIVE | UNIT | PLANNED | — |
 
 ## Retired ids
 

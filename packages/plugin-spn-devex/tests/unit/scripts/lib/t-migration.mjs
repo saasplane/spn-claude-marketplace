@@ -517,5 +517,13 @@ console.log("\n=== 010 — a preview whose header is not what the commands write
   ok("[MKT.SCRIPTS.393] a closed workstream's preview stays as it closed", readFileSync(join(root, ".spndevex/workstreams/closed/020-done/notes/N001/preview.html"), "utf8") === old);
 }
 
+console.log("\n=== the preview template's masthead carries Progress between Arc and Shown, as the writer writes it");
+{
+  const { previewProgress } = await import("../../../../src/scripts/lib/workstream.ts");
+  const template = readFileSync(join("src", "refs", "devex", "workspace", "docs", "templates", "workstream", "approach-preview-template.html"), "utf8");
+  const written = previewProgress(7, 10).replace("sds-step-4", "sds-step-{{step}}").replace("width:70%", "width:{{pct}}%").replace("7 of 10", "{{done}} of {{total}}");
+  ok("[MKT.SCRIPTS.397] the template's masthead line holds the writer's Progress markup, after Arc and before Shown", template.includes(`</a><span class="sds-separator">|</span>${written}<span class="sds-separator">|</span><span class="sds-label">Shown:</span>`), written);
+}
+
 console.log(failed ? `\n  ${failed} of ${total} FAILED — migration` : `\n  all ${total} passed — migration`);
 process.exit(failed ? 1 : 0);
