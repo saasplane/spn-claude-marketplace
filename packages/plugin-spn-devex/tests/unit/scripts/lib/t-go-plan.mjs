@@ -208,5 +208,18 @@ const loop = deriveGo([{ arc: "N009", sheet: sheet([{ ...user, op: "create", cal
 same("[MKT.SCRIPTS.413] two entries that name each other keep the number order", loop.parts.find((p) => p.id === "code-lib-repo-1").entries, ["N009/E1", "N009/E2"]);
 same("[MKT.SCRIPTS.413] the signature follows the new order and the plan passes the schema", [ordered.parts.find((p) => p.id === "code-lib-repo-1").signature.split(".").length, goFaults(ordered)], [3, []]);
 
+// Two parts that edit one file never run together; a part waits for the parts that edit its sources.
+const same1 = entry("E1", "lib-repo:src/shared.ts"), same2 = entry("E2", "lib-repo:src/shared.ts"), apart = entry("E3", "lib-repo:src/apart.ts");
+const byOne = deriveGo([{ arc: "N009", sheet: sheet([same1, apart, same2]) }], { rates: { "lib-repo|CODE": 45 / 1 } });
+same("[MKT.SCRIPTS.414] two code parts that edit one file: the later waits on the earlier, and the one that edits another file does not",
+  Object.fromEntries(byOne.parts.filter((p) => p.id.startsWith("code-")).map((p) => [p.id, p.waitsOn.filter((id) => id.startsWith("code-"))])),
+  { "code-lib-repo-1": [], "code-lib-repo-2": [], "code-lib-repo-3": ["code-lib-repo-1"] });
+const gen = { ...entry("E4", "lib-repo:src/dist/rules.json"), work: "GENERATED", book: ["lib-repo:docs/book.md"] };
+const book = { ...entry("E5", "lib-repo:docs/book.md"), work: "DOCS" };
+const generated = deriveGo([{ arc: "N009", sheet: sheet([gen, book]) }]);
+same("[MKT.SCRIPTS.414] a part waits for the part that edits the file its entries' book lines name, so nothing is ready before its sources landed",
+  [generated.parts.find((p) => p.id === "generated-lib-repo-1").waitsOn.includes("docs-lib-repo-1"), readyParts(generated).map((p) => p.id).includes("generated-lib-repo-1")], [true, false]);
+same("[MKT.SCRIPTS.414] and the plan passes the schema", goFaults(byOne), []);
+
 console.log(`\n${total - failed}/${total} passed`);
 process.exit(failed ? 1 : 0);

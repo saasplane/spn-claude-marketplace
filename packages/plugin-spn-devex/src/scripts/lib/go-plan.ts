@@ -375,6 +375,24 @@ export function deriveGo(scope: readonly ScopeSheet[], options: DeriveOptions = 
       one.waitsOn = prior ? parts.filter((other) => other.repo === prior && slotOf(other) === "DOCS").map((other) => other.id) : [];
     }
   }
+  // TWO PARTS THAT EDIT ONE FILE NEVER RUN TOGETHER, and a part is ready only once the parts that edit the files its entries' `book` lines
+  // name have landed (s51). A wait that would close a circle is not added.
+  const held = new Map(scope.flatMap(({ arc, sheet }) => sheet.entries.map((entry) => [refOf(arc, entry), entry] as const)));
+  const entriesOf = (one: GoPart): SheetEntry[] => one.entries.flatMap((ref) => held.get(ref) ?? []);
+  const editsOf = (one: GoPart): Set<string> => new Set(entriesOf(one).map((entry) => entry.file));
+  const sourcesOf = (one: GoPart): Set<string> => new Set(entriesOf(one).flatMap((entry) => [...namedFiles(entry, ["book"])]));
+  const waitsFor = (from: GoPart, target: GoPart, seen = new Set<string>()): boolean =>
+    from.id === target.id || (!seen.has(from.id) && (seen.add(from.id), from.waitsOn.some((id) => { const next = parts.find((other) => other.id === id); return !!next && waitsFor(next, target, seen); })));
+  for (const [at, one] of parts.entries()) {
+    if (keptIds.has(one.id) || !one.entries.length) continue;
+    const mine = editsOf(one), sources = sourcesOf(one);
+    for (const [other, q] of parts.entries()) {
+      if (q === one || q.state === "landed" || !q.entries.length || one.waitsOn.includes(q.id) || waitsFor(q, one)) continue;
+      const files = editsOf(q);
+      const sameFile = other < at && [...files].some((file) => mine.has(file));
+      if (sameFile || [...files].some((file) => sources.has(file))) one.waitsOn.push(q.id);
+    }
+  }
   // A repository's first pass waits on the release that ships a command it needs, which another go or window cuts: the part
   // is `waiting`, and it waits on no part of this plan, because the release it waits on is not one of them (s23).
   for (const { sheet } of scope) {
