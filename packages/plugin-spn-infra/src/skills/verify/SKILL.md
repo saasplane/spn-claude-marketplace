@@ -7,7 +7,7 @@ description: Run the estate's gates - spnutils infra validate for the build, spn
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
-      "seen": "d6a6cbd5"
+      "seen": "67376a1f"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/05-test.md",

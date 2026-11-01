@@ -104,7 +104,7 @@ one("the one spelling the Python did handle, so the port is held to it",
 const ARC_DIR = `.spndevex/${WORKSTREAMS}/closed/001-a-subject/arcs/N002`;
 const stepArc = (rows) => `${JSON.stringify({ schemaVersion: 2, arc: "N002", subject: "the-arc", title: "the arc", goal: "it lands",
   status: "LANDED", reason: null, preview: "preview.html", rows: rows.map(([id, repo, state, fields = {}]) =>
-    ({ id, parent: "N002", title: "a change", kind: "change", repo, altitude: "DOCS", state, ...fields })) }, null, 2)}\n`;
+    ({ id, parent: "N002", title: "a change", kind: "change", repo, work: "DOCS", state, ...fields })) }, null, 2)}\n`;
 const logLine = (kind, row, note, at = "2026-09-29T14:32+05:30") => `${JSON.stringify({ at, kind, row, note })}\n`;
 
 one("a close with no page counts the arcs' landed rows, and a row with rows under it is not one",
@@ -179,9 +179,10 @@ one("a loose file moved into closed/ is not a scope finishing",
   `mv notes.md .spndevex/${WORKSTREAMS}/closed/`,
   "silent");
 
-// WHAT THE HOOK AFTER A CALL COST. The entry runs on `PostToolUse` and on `PostToolUseFailure`, and
-// each run writes its whole-run line, `events` › `closed`, while recording is on. The suite runs with
-// `SPN_TELEMETRY=off`, so these cases take that variable out for the hook they spawn.
+// WHAT THE HOOK AFTER A CALL COST. The entry runs on `PostToolUse` and on `PostToolUseFailure`. Each
+// check it runs writes one v 1 `CHECK` row with its own time while recording is on, and no line is written
+// for the run as a whole, so a failed call, which runs no check, writes no hook row; its command row carries
+// the call. The suite runs with `SPN_TELEMETRY=off`, so these cases take that variable out for the hook they spawn.
 {
   const recording = () => { const copy = { ...process.env }; delete copy.SPN_TELEMETRY; return copy; };
   const hook = (payload, env) => {
@@ -192,7 +193,7 @@ one("a loose file moved into closed/ is not a scope finishing",
     const log = join(root, ".spndevex", ".debug", "telemetry", "hooks.jsonl");
     return existsSync(log) ? readFileSync(log, "utf8").trim().split("\n").filter(Boolean).map((line) => JSON.parse(line)) : [];
   };
-  const wholeRuns = (root) => linesOf(root).filter((line) => line.group === "events" && line.action === "closed").map((line) => line.event);
+  const checkRows = (root) => linesOf(root).filter((line) => line.v === 1 && line.mtype === "CHECK").map((line) => `${line.event} ${line.check} ${line.verdict}`);
   const same = (label, got, expected) => {
     n += 1;
     const ok = JSON.stringify(got) === JSON.stringify(expected);
@@ -207,19 +208,18 @@ one("a loose file moved into closed/ is not a scope finishing",
   const call = (root, event, command) => ({ session_id: "sess-closed", tool_name: "Bash", tool_use_id: "toolu_closed", cwd: root,
     hook_event_name: event, tool_input: { command }, ...(event === "PostToolUseFailure" ? { error: "Exit code 128" } : { tool_response: {} }) });
 
-  // KNOWN-BAD — a failed call ran the hook and left no line saying what the hook cost.
+  // A failed call runs no check, so it writes no hook row and no line for the run as a whole.
   const failedRoot = workspace("n006-cl-failed", files);
   const said = hook(call(failedRoot, "PostToolUseFailure", move), recording());
-  same("[MKT.HOOKS.42] a failed call writes its `events › closed` line under PostToolUseFailure", wholeRuns(failedRoot), ["PostToolUseFailure"]);
-  same("[MKT.HOOKS.42] the line is a hook's: a time, and no exit code",
-    linesOf(failedRoot).map((line) => [line.script, line.tool, typeof line.ms, line.exit]), [["spn-devex", "Bash", "number", null]]);
+  same("[MKT.HOOKS.42] a failed call runs no check, so it writes no hook row under PostToolUseFailure", checkRows(failedRoot), []);
+  same("[MKT.HOOKS.42] and no line for the run as a whole", linesOf(failedRoot).filter((line) => line.event === "PostToolUseFailure"), []);
   same("a move that failed closed nothing, so nothing is said", said, "");
 
-  // UNTOUCHED — a call that worked writes the lines it always wrote, and recording off writes none.
+  // A call that worked writes its check's row, and recording off writes none.
   const workedRoot = workspace("n006-cl-worked", files);
   const cheer = messageOf(hook(call(workedRoot, "PostToolUse", move), recording()));
-  same("a call that worked still writes its check's line and its whole-run line, under PostToolUse",
-    linesOf(workedRoot).map((line) => `${line.event} ${line.group} › ${line.action}`), ["PostToolUse closed › closed", "PostToolUse events › closed"]);
+  same("a call that worked writes its check's row under PostToolUse, and no whole-run line",
+    checkRows(workedRoot), ["PostToolUse closed NOTE"]);
   same("and the close is still cheered", /1 row landed/.test(cheer), true);
   const offRoot = workspace("n006-cl-off", { [`.spndevex/${WORKSTREAMS}/closed/001-a-subject/a-subject-approach.html`]: files[`.spndevex/${WORKSTREAMS}/closed/001-a-subject/a-subject-approach.html`] });
   hook(call(offRoot, "PostToolUseFailure", move), recording());

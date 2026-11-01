@@ -3,15 +3,15 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/01-workspace.md",
-      "seen": "5a840071"
+      "seen": "24d440ad"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/02-workstream.md",
-      "seen": "78b6721b"
+      "seen": "6dafd471"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
-      "seen": "64d537b3"
+      "seen": "8857c838"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -31,7 +31,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md",
       "section": "Two dot-homes",
-      "seen": "5a114a9e"
+      "seen": "00970647"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md",
@@ -56,7 +56,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md",
       "section": "DevEx Workspace — One Window, Laws by Declaration",
-      "seen": "efee8ddc"
+      "seen": "cf8fd0bb"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
@@ -257,7 +257,11 @@ The workspace folder carries two dot-homes: `.claude/` (settings — the marketp
   README.md
 ```
 
-**`workstreams/` and `.debug/` are the only two containers, and `state.json` sits beside them.** `workstreams/` holds one folder per scope of work, `.debug/` holds what the machinery keeps and costs: its notes about each window and its logs, and `state.json` holds what the commands record that the tree cannot show. A leading dot hides `.debug/` from every reader of the workstreams, by a rule the corpus already carries. **`.debug/` holds three containers, and each has one lifetime rule — MUST.** `sessions/<session-id>/` is one folder for each Claude Code window, holding its notes (`name.json`, `window.json` for its bound workstreams, `stop.json` for the Stop baseline and `stop.<agent>.json` for each child's own, so a child and its window never write one file, `confirmed.json`, `mirror` for the mirrors already named to this window, one per line, `tags.json`, `usage-offsets.json` and `pending/`); it is swept whole, 14 days after the folder's newest write, at session start and by `debug window sweep`, and no store prunes on its own. `workspace/` is kept and holds what spans windows, `filter.json`. `telemetry/` holds `hooks.jsonl` and `usage.jsonl`; a log past 20 MB is renamed `<name>.1.jsonl`, replacing the previous one, and starts anew, and a reader reads both. **The plugin is the only writer of `.debug/`.** The switch that starts the recording is not there: it is the `debug` node of `state.json`. Read it with `spn-devex debug cost show`, `debug hooks show`, `debug window show`, `debug window sweep`, `debug switch show|on|off` and `debug store show`. Beside them sits one file, `migrations.jsonl`: the ledger of the plugin migrations applied here, appended to only by `spn-devex plugin migration write` (`refs/devex/agent/plugins.md` § A release carries its migration, and a window applies what is pending first).
+**`workstreams/` and `.debug/` are the only two containers, and `state.json` sits beside them.** `workstreams/` holds one folder per scope of work, `.debug/` holds what the machinery keeps and costs: its notes about each window and its logs, and `state.json` holds what the commands record that the tree cannot show. A leading dot hides `.debug/` from every reader of the workstreams, by a rule the corpus already carries. **`.debug/` holds three containers, and each has one lifetime rule — MUST.** `sessions/<session-id>/` is one folder for each Claude Code window, holding its notes (`name.json`, `window.json` for its bound workstreams, `stop.json` for the Stop baseline and `stop.<agent>.json` for each child's own, so a child and its window never write one file, `confirmed.json`, `mirror` for the mirrors already named to this window, one per line, `tags.json`, `usage-offsets.json` and `pending/`); it is swept whole, 14 days after the folder's newest write, at session start and by `debug window sweep`, and no store prunes on its own. `workspace/` is kept and holds what spans windows, `filter.json`. `telemetry/` holds `hooks.jsonl` and `usage.jsonl`; a log past 20 MB is renamed `<name>.1.jsonl`, replacing the previous one, and starts anew, a reader reads both, and `debug cost show` says the earliest time it covers. **The plugin is the only writer of `.debug/`.** The switch that starts the recording is not there: it is the `debug` node of `state.json`. Read it with `spn-devex debug cost show`, `debug hooks show`, `debug window show`, `debug window sweep`, `debug switch show|on|off` and `debug store show`. Beside them sits one file, `migrations.jsonl`: the ledger of the plugin migrations applied here, appended to only by `spn-devex plugin migration write` (`refs/devex/agent/plugins.md` § A release carries its migration, and a window applies what is pending first).
+
+**A telemetry row holds ids, times, counts and the names of things, never what was typed, and a field off its pattern is written as null** (`RULE.DEVEX.WORKSPACE.185` · MUST · skill:spn-devex/develop). Every line of `hooks.jsonl` and `usage.jsonl` is one `SPDevExWorkspaceTelemetryRow`, in the variant its `mtype` names: `TURN` (a model turn, in `usage.jsonl`, with its `model` and `tokens`), `CHECK` (a hook check's run, with `check`, `verdict` and `out`), `COMMAND` (`call` and `exit`), `TEST` (a test run, in place of its command's row, with `call`, `test` and `status`) or `PANEL` (`lens` and `verdict`). Every row holds the thirteen fields of the base: `v` (the one value `1`), `mtype`, `id`, `at`, `ms`, `session`, `agent`, then the tags `workstream`, `arc`, `part`, `skill`, `work` and `retryOf`; the variant adds its `event`. A command is written as its program, group and action and its exit, never its arguments. A reader skips a row whose `v` is not `1`, and the writer moves a log whose first line has no `v` to `<name>.1.jsonl` before it appends. A send-back is a `CHECK` row whose verdict is `DENY`, and no log of its own holds it.
+
+**Workspace plumbing is the agent's own to resolve, and never a card** (`RULE.DEVEX.WORKSPACE.481` · MUST · skill:spn-devex/ideate). A stale checkout, tool output left uncommitted and a stash the agent names are the agent's to fix, and it says in one line what it did. A helper never stashes: the window that coordinates does.
 
 **`.spndevex/state.json` is the one file where the workspace's commands record what they need to remember, with one node for each owner** (`RULE.DEVEX.WORKSPACE.324` · MUST · skill:spn-devex/develop). Only commands write it, and nobody edits it by hand:
 
@@ -296,7 +300,7 @@ A node joins the file only when the folder tree cannot show its fact — MUST; a
 | Inside a workstream | Written for | Lives | Ends as |
 | --- | --- | --- | --- |
 | the approach page | **you** — argued, corrected, re-read | while the subject is open | the argument, kept as a receipt once its arcs have moved the content into the documents that own it |
-| an arc | the agent, through the `workstream` commands — rows, each with its repository, its altitude, its check, what it waits on, what it writes and its state | until its rows are accounted for | closed through the sweep |
+| an arc | the agent, through the `workstream` commands — rows, each with its repository, its work, its check, what it waits on, what it writes and its state | until its rows are accounted for | closed through the sweep |
 | an order | the agent — one delegated execution | until the child reports back | the report is appended, and it stays as the audit trail |
 
 **There is no workstream file, and adding one is a defect.** The folder name is the subject, its parent is the state, and each arc's data carries its own rows and status.
@@ -483,7 +487,7 @@ Both read one thing: the **split plan**, which is the step rows of every arc rea
 
 ## An arc is the unit of cross-repo change
 
-Plan one change across repos as an **arc**: ordered rows, one per step, each carrying **Repo · Altitude · What · Mechanism · Acceptance · State**. The rows run in chain order by repository, then by altitude (`DOCS` · `CODE` · `GENERATED` · `RELEASE` · `PROOF`). Each step also has a **depth**, which decides where it runs.
+Plan one change across repos as an **arc**: ordered rows, one per step, each carrying **Repo · Work · What · Mechanism · Acceptance · State**. The rows run in chain order by repository, then by work (`DOCS` · `CODE` · `GENERATED` · `DESIGN` · `RELEASE` · `PROOF`). Each step also has a **depth**, which decides where it runs.
 
 | Step is… | Execute |
 | --- | --- |
@@ -526,7 +530,7 @@ the next go. The review-fixes arc reads `RUNNING` until the word to close stores
 **The status decides none of these three.** It does not carry **ordering**, which is the plan's
 business. It does not describe a **workstream**, whose state is the folder it sits in. It does not
 describe the **approach document**, which carries the document status vocabulary instead. Three
-altitudes, three vocabularies, and no word shared between them.
+levels, three vocabularies, and no word shared between them.
 
 **The stored status is written by `arc edit --status`, into the arc's `state.json`.** The plugin's schema
 holds the stored set, so `row add` and `row state` refuse a word outside it, `RUNNING` among them, and `workstream state

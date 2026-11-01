@@ -15,10 +15,10 @@ const ok = (label, condition, detail = "") => {
   console.log(`  FAIL  ${label}${detail ? `\n        ${detail}` : ""}`);
 };
 
-const arc = (altitude, state) => JSON.stringify({ schemaVersion: 1, arc: "N1", subject: "a-subject", title: "T", status: "DECIDED", reason: null,
-  preview: "notes/N1/preview.html", rows: [{ id: "1", parent: "", title: "Prove it", kind: "work", repo: "spn-x", altitude, state }] });
-const withArc = (name, altitude, state) => {
-  const root = workspace(name, { ".spndevex/workstreams/open/001-a-subject/arcs/N1/state.json": arc(altitude, state) });
+const arc = (work, state) => JSON.stringify({ schemaVersion: 1, arc: "N1", subject: "a-subject", title: "T", status: "DECIDED", reason: null,
+  preview: "notes/N1/preview.html", rows: [{ id: "1", parent: "", title: "Prove it", kind: "work", repo: "spn-x", work, state }] });
+const withArc = (name, work, state) => {
+  const root = workspace(name, { ".spndevex/workstreams/open/001-a-subject/arcs/N1/state.json": arc(work, state) });
   bindOpen(root, "s1");
   return root;
 };

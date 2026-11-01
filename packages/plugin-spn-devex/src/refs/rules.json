@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "book": {
     "repository": "spn-foundation",
-    "commit": "78165ad9"
+    "commit": "00806244"
   },
   "rules": [
     {
@@ -2959,6 +2959,180 @@
       ]
     },
     {
+      "id": "RULE.DEVEX.FUNCTION.090",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-devex/ideate"
+      },
+      "class": "stated in a skill",
+      "sentence": null,
+      "chapter": "04-capabilities/01-devex/01-function/03-ideate.md",
+      "heading": "How a first proposal is shaped",
+      "decision": "DEC.DEVEX.FUNCTION.090",
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/function/ideate.md",
+          "heading": "How a first proposal is shaped"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "The rules this step holds"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "How a first proposal is shaped"
+        }
+      ]
+    },
+    {
+      "id": "RULE.DEVEX.FUNCTION.091",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-devex/ideate"
+      },
+      "class": "stated in a skill",
+      "sentence": null,
+      "chapter": "04-capabilities/01-devex/01-function/03-ideate.md",
+      "heading": "How a first proposal is shaped",
+      "decision": "DEC.DEVEX.FUNCTION.091",
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/function/ideate.md",
+          "heading": "How a first proposal is shaped"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "The rules this step holds"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "How a first proposal is shaped"
+        }
+      ]
+    },
+    {
+      "id": "RULE.DEVEX.FUNCTION.092",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-devex/ideate"
+      },
+      "class": "stated in a skill",
+      "sentence": null,
+      "chapter": "04-capabilities/01-devex/01-function/03-ideate.md",
+      "heading": "How a first proposal is shaped",
+      "decision": "DEC.DEVEX.FUNCTION.092",
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/function/ideate.md",
+          "heading": "How a first proposal is shaped"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "The rules this step holds"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "How a first proposal is shaped"
+        }
+      ]
+    },
+    {
+      "id": "RULE.DEVEX.FUNCTION.093",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-devex/ideate"
+      },
+      "class": "stated in a skill",
+      "sentence": null,
+      "chapter": "04-capabilities/01-devex/01-function/03-ideate.md",
+      "heading": "How a first proposal is shaped",
+      "decision": "DEC.DEVEX.FUNCTION.093",
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/function/ideate.md",
+          "heading": "How a first proposal is shaped"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "The rules this step holds"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "How a first proposal is shaped"
+        }
+      ]
+    },
+    {
+      "id": "RULE.DEVEX.FUNCTION.094",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-devex/ideate"
+      },
+      "class": "stated in a skill",
+      "sentence": null,
+      "chapter": "04-capabilities/01-devex/01-function/03-ideate.md",
+      "heading": "How a first proposal is shaped",
+      "decision": "DEC.DEVEX.FUNCTION.094",
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/function/ideate.md",
+          "heading": "How a first proposal is shaped"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "The rules this step holds"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "How a first proposal is shaped"
+        }
+      ]
+    },
+    {
+      "id": "RULE.DEVEX.FUNCTION.095",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-devex/ideate"
+      },
+      "class": "stated in a skill",
+      "sentence": null,
+      "chapter": "04-capabilities/01-devex/01-function/03-ideate.md",
+      "heading": "How a first proposal is shaped",
+      "decision": "DEC.DEVEX.FUNCTION.095",
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/function/ideate.md",
+          "heading": "How a first proposal is shaped"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "The rules this step holds"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "How a first proposal is shaped"
+        }
+      ]
+    },
+    {
       "id": "RULE.DEVEX.UTILS.004",
       "level": "MUST",
       "params": {
@@ -5737,7 +5911,7 @@
       "class": "checked",
       "sentence": "Every step is one row, and the row carries six columns",
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
-      "heading": "A step row says where, at what altitude, and how",
+      "heading": "A step row says where, what work, and how",
       "decision": null,
       "restated": [
         {
@@ -5767,11 +5941,16 @@
         "skill": "spn-devex/develop"
       },
       "class": "stated in a skill",
-      "sentence": null,
-      "chapter": "04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
-      "heading": "workspace — the folder your day runs in",
+      "sentence": "A telemetry row holds ids, times, counts and the names of things, never what was typed, and a field off its pattern is written as null",
+      "chapter": "02-constructs/01-devex/04-workspace/01-workspace.md",
+      "heading": "The debug store's row",
       "decision": null,
       "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/workspace.md",
+          "heading": "The workspace's working state — .spndevex/"
+        },
         {
           "plugin": "spn-devex",
           "path": "skills/develop/SKILL.md",
@@ -9272,6 +9451,11 @@
       "restated": [
         {
           "plugin": "spn-devex",
+          "path": "refs/devex/function/ideate.md",
+          "heading": "How a first proposal is shaped"
+        },
+        {
+          "plugin": "spn-devex",
           "path": "refs/devex/workspace/workstream.md",
           "heading": "In an arc that keeps a sheet, a row lands on a run of its tests"
         },
@@ -9665,9 +9849,9 @@
         "check": "workstream-state"
       },
       "class": "checked",
-      "sentence": "Rows run in chain order by repository, and then by altitude inside each repository",
+      "sentence": "Rows run in chain order by repository, and then by work inside each repository",
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
-      "heading": "A step row says where, at what altitude, and how",
+      "heading": "A step row says where, what work, and how",
       "decision": null,
       "restated": []
     },
@@ -11677,6 +11861,88 @@
       "heading": "A check at the end of a turn speaks once, and only about this window's work",
       "decision": "DEC.DEVEX.WORKSPACE.480",
       "restated": []
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.481",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-devex/ideate"
+      },
+      "class": "stated in a skill",
+      "sentence": "Workspace plumbing is the agent's own to resolve, and never a card",
+      "chapter": "04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md",
+      "heading": "A repository without a claim is still a member",
+      "decision": "DEC.DEVEX.WORKSPACE.481",
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/utils/spnutils.md",
+          "heading": "workspace — the folder your day runs in"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/workspace.md",
+          "heading": "The workspace's working state — .spndevex/"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "The rules this step holds"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "How a first proposal is shaped"
+        }
+      ]
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.482",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-devex/develop"
+      },
+      "class": "stated in a skill",
+      "sentence": "The plugins keep a copy of the contract's telemetry values beside the writer, in the contract's structure, and `toolchain-ts` holds it to the contract enum for enum",
+      "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
+      "heading": "A check at the end of a turn speaks once, and only about this window's work",
+      "decision": "DEC.DEVEX.WORKSPACE.482",
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/workstream.md",
+          "heading": "The workstream is kept as data, and every file has one owner"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/develop/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.483",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-devex/execute"
+      },
+      "class": "stated in a skill",
+      "sentence": "Closing a workstream runs a retrospective that raises a suggestion for each pattern it finds",
+      "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
+      "heading": "A check at the end of a turn speaks once, and only about this window's work",
+      "decision": "DEC.DEVEX.WORKSPACE.483",
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/workstream.md",
+          "heading": "The workstream is kept as data, and every file has one owner"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/execute/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.LAUNCHPAD.CONTROL_PLANE.001",

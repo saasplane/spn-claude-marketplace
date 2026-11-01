@@ -60,7 +60,7 @@ console.log("=== open: a block with one of the six things missing is refused");
 console.log("\n=== close: an unfinished plan refuses it");
 {
   const rows = [
-    { id: "1", parent: "N001", title: "write the book", kind: "change", repo: "spn-x", altitude: "DOCS", blockedBy: [], touches: ["spn-x:docs"], state: "landed", entries: ["E1"] },
+    { id: "1", parent: "N001", title: "write the book", kind: "change", repo: "spn-x", work: "DOCS", blockedBy: [], touches: ["spn-x:docs"], state: "landed", entries: ["E1"] },
   ];
   const { root, ws } = await dataWorkspace("lifecycle-close", { rows });
   const closed = join(root, ".spndevex", "workstreams", "closed", "031-probe");
@@ -96,7 +96,7 @@ console.log("\n=== close: an unfinished plan refuses it");
 console.log("\n=== go write: a release order line that is not a repository's name refuses the plan");
 {
   const rows = [
-    { id: "1", parent: "N001", title: "write the book", kind: "change", repo: "spn-x", altitude: "DOCS", blockedBy: [], touches: ["spn-x:docs"], state: "ready", entries: ["E1"] },
+    { id: "1", parent: "N001", title: "write the book", kind: "change", repo: "spn-x", work: "DOCS", blockedBy: [], touches: ["spn-x:docs"], state: "ready", entries: ["E1"] },
   ];
   const { root, ws } = await dataWorkspace("lifecycle-chain", { rows });
   const entry = { id: "E1", op: "edit", file: "spn-x:docs/a.md", what: "change E1", decidedBy: ["q1"], facts: ["f1"], then: [], rules: [], callers: [], tiers: {}, docs: [], book: [] };

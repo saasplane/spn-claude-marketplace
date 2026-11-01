@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § The approach document · § The split plan is the arcs' step rows, and Repo is the scope
-//           docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § The workstream is a scope of work, not a window · § A step row says where, at what altitude, and how · § Documents first, and the order they are written in · § Retirement is close-or-graduate · § Closing a workstream is a check; closing a window is nothing
+//           docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § The workstream is a scope of work, not a window · § A step row says where, what work, and how · § Documents first, and the order they are written in · § Retirement is close-or-graduate · § Closing a workstream is a check; closing a window is nothing
 // The chapters are the source of truth. A rule change is edited there first, then here, in the same change.
 //
 // The two gates a workstream's split plan carries, and the parser both read it with. This script
@@ -866,7 +866,7 @@ function documentsPending(root: string, session: string | undefined, repo: strin
         // An arc with no go builds nothing yet, and a carried or dropped arc builds nothing at all.
         if (!["DECIDED", "RUNNING"].includes(readArcStatus(data))) continue;
         const parents = new Set(data.rows.map((row) => row.parent));
-        const waiting = data.rows.find((row) => !parents.has(row.id) && row.altitude === "DOCS" && row.repo === repo
+        const waiting = data.rows.find((row) => !parents.has(row.id) && row.work === "DOCS" && row.repo === repo
           && !["landed", "carried", "deferred", "replaced"].includes(row.state ?? ""));
         if (waiting) return `Row ${waiting.id} of ${arc}, the documents row of ${repo}, has not landed. Land the documents first (RULE.DEVEX.WORKSPACE.320).`;
       }
@@ -1130,9 +1130,9 @@ export function gateClose(payload: Payload): Verdict {
           `Denied: \`${subject}\` has no split plan, so this gate checked NOTHING — that is not ` +
           `the same as everything being accounted for, and it must not read the same.\n` +
           `The split plan is the rows of the workstream's arcs, kept as data: each row's \`repo\` ` +
-          `and its \`state\` (02-workstream/01-workstream.md § A step row says where, at what ` +
-          `altitude, and how). The gate reads those two and nothing else.\n\n` +
-          `Give each arc its rows with \`spn-devex workstream row add <arc> "<title>" --repo <repo> --altitude <altitude>\`, then give each row one of three states:\n` +
+          `and its \`state\` (02-workstream/01-workstream.md § A step row says where, what ` +
+          `work, and how). The gate reads those two and nothing else.\n\n` +
+          `Give each arc its rows with \`spn-devex workstream row add <arc> "<title>" --repo <repo> --work <work>\`, then give each row one of three states:\n` +
           `  landed <commit>   what reached its node, and the commit that landed it\n` +
           `  carried           the successor workstream that takes it on\n` +
           `  deferred          the event that brings it back\n\n` +

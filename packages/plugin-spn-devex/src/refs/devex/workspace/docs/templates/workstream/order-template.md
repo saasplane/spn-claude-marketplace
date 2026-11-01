@@ -79,7 +79,6 @@ outcome: {{landed · stopped · needs-you}}
 proof: "{{each gate's command and exit code, joined by middots}}"
 commits: { {{repo}}: [{{sha}}] }
 followUps: ["{{new row id}} {{its title}}"]
-cost: { tokens: {{n}}, minutes: {{n}} }
 ---
 ```
 

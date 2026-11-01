@@ -6,9 +6,10 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, realpath
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import {
-  LOG_CAP, SESSION_KEEP_MS, SWITCH_NAMES, appendLog, debugDir, logFiles, readSwitch, recordSendBack, sessionDir, switchesFile, sweepSessions,
+  LOG_CAP, SESSION_KEEP_MS, SWITCH_NAMES, appendLog, debugDir, logFiles, readSwitch, sessionDir, switchesFile, sweepSessions,
   telemetryFolder, workspaceDir, writeSwitch,
 } from "../../../src/lib/debug-store.ts";
+import * as store from "../../../src/lib/debug-store.ts";
 
 const BASE = realpathSync(mkdtempSync(join(tmpdir(), "spn-debug-store-")));
 process.on("exit", () => rmSync(BASE, { recursive: true, force: true }));
@@ -120,15 +121,15 @@ console.log("\n=== appendLog and logFiles — one rotation, the rotated file rea
   const root = fresh();
   const log = join(telemetryFolder(root), "hooks.jsonl");
   same("no file, no files", logFiles(log), []);
-  appendLog(log, '{"n":1}', 10); appendLog(log, '{"n":2}', 10);
-  same("under the cap one file holds both", [readFileSync(log, "utf8"), logFiles(log)], ['{"n":1}\n{"n":2}\n', [log]]);
-  appendLog(log, '{"n":3}', 10);
+  appendLog(log, '{"v":1,"n":1}', 20); appendLog(log, '{"v":1,"n":2}', 20);
+  same("under the cap one file holds both", [readFileSync(log, "utf8"), logFiles(log)], ['{"v":1,"n":1}\n{"v":1,"n":2}\n', [log]]);
+  appendLog(log, '{"v":1,"n":3}', 20);
   same("past the cap the live file moves to <stem>.1.jsonl", existsSync(join(telemetryFolder(root), "hooks.1.jsonl")), true);
-  same("and the line starts a fresh file", readFileSync(log, "utf8"), '{"n":3}\n');
+  same("and the line starts a fresh file", readFileSync(log, "utf8"), '{"v":1,"n":3}\n');
   same("a reader gets the rotated file, then the live one", logFiles(log), [join(telemetryFolder(root), "hooks.1.jsonl"), log]);
-  for (const one of [4, 5, 6]) appendLog(log, `{"n":${one}}`, 10);
+  for (const one of [4, 5, 6]) appendLog(log, `{"v":1,"n":${one}}`, 20);
   same("a second rotation replaces the first", [readFileSync(join(telemetryFolder(root), "hooks.1.jsonl"), "utf8"), readFileSync(log, "utf8")],
-    ['{"n":3}\n{"n":4}\n', '{"n":5}\n{"n":6}\n']);
+    ['{"v":1,"n":3}\n{"v":1,"n":4}\n', '{"v":1,"n":5}\n{"v":1,"n":6}\n']);
 }
 
 console.log("\n=== sweepSessions — a window nobody has written to for fourteen days goes");
@@ -150,23 +151,36 @@ console.log("\n=== sweepSessions — a window nobody has written to for fourteen
   same("no sessions folder is nothing to sweep", sweepSessions(fresh(), now), []);
 }
 
-console.log("\n=== recordSendBack — one line a send-back, only while telemetry is on");
+console.log("\n=== appendLog — a log whose first line has no `v` is moved before the append");
 {
-  const line = { at: "2026-11-01T10:00:00.000Z", session: "abc-1", agent: "main", event: "Stop", check: "split-plan", workstream: "036-agent-follows-rules", finding: "0123456789ab" };
-  const off = fresh();
-  recordSendBack(off, line);
-  same("telemetry off writes nothing", existsSync(join(telemetryFolder(off), "sendbacks.jsonl")), false);
-  const on = fresh();
-  writeSwitch(on, "telemetry", true);
-  recordSendBack(on, line);
-  recordSendBack(on, { ...line, event: "PreToolUse" });
-  const rows = readFileSync(join(telemetryFolder(on), "sendbacks.jsonl"), "utf8").trim().split("\n").map((l) => JSON.parse(l));
-  same("[MKT.HOOKS.341] telemetry on appends one line holding every field", rows[0], line);
-  same("[MKT.HOOKS.341] each call is one more line", rows.map((r) => r.event), ["Stop", "PreToolUse"]);
-  const broken = join(BASE, "not-a-workspace");
-  let threw = false;
-  try { recordSendBack(broken, line); } catch { threw = true; }
-  same("a root with no debug folder is never a failure", threw, false);
+  const root = fresh();
+  const log = join(telemetryFolder(root), "usage.jsonl");
+  const rotated = join(telemetryFolder(root), "usage.1.jsonl");
+  mkdirSync(telemetryFolder(root), { recursive: true });
+  writeFileSync(log, '{"script":"spn-devex","group":"events","verdict":"pass"}\n{"script":"spn-devex","group":"x"}\n');
+  appendLog(log, '{"v":1,"mtype":"TURN"}');
+  same("[MKT.SCRIPTS.179] a log of rows without `v` moves to <stem>.1.jsonl whole", readFileSync(rotated, "utf8"),
+    '{"script":"spn-devex","group":"events","verdict":"pass"}\n{"script":"spn-devex","group":"x"}\n');
+  same("[MKT.SCRIPTS.179] and the new line starts a fresh file", readFileSync(log, "utf8"), '{"v":1,"mtype":"TURN"}\n');
+  appendLog(log, '{"v":1,"mtype":"TURN","n":2}');
+  same("[MKT.SCRIPTS.179] a log whose first line has `v` is appended to and not moved",
+    [readFileSync(log, "utf8"), readFileSync(rotated, "utf8").split("\n").length], ['{"v":1,"mtype":"TURN"}\n{"v":1,"mtype":"TURN","n":2}\n', 3]);
+  same("[MKT.SCRIPTS.179] a reader gets the old rows first, then the live file", logFiles(log), [rotated, log]);
+  const empty = fresh();
+  const blank = join(telemetryFolder(empty), "hooks.jsonl");
+  mkdirSync(telemetryFolder(empty), { recursive: true });
+  writeFileSync(blank, "");
+  appendLog(blank, '{"v":1}');
+  same("[MKT.SCRIPTS.179] an empty log is not moved", [existsSync(join(telemetryFolder(empty), "hooks.1.jsonl")), readFileSync(blank, "utf8")], [false, '{"v":1}\n']);
+}
+
+console.log("\n=== no sendbacks.jsonl — a send-back is a DENY row of hooks.jsonl");
+{
+  same("[MKT.SCRIPTS.179] the library no longer exports recordSendBack", "recordSendBack" in store, false);
+  const root = fresh();
+  writeSwitch(root, "telemetry", true);
+  appendLog(join(telemetryFolder(root), "hooks.jsonl"), '{"v":1,"mtype":"CHECK","verdict":"DENY"}');
+  same("[MKT.SCRIPTS.179] the telemetry folder holds the two logs and no sendbacks.jsonl", readdirSync(telemetryFolder(root)), ["hooks.jsonl"]);
 }
 
 console.log(failed ? `\n  ${failed} of ${total} FAILED — debug store` : `\n  all ${total} passed — debug store`);

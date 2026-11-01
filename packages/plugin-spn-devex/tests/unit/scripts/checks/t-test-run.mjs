@@ -2,7 +2,9 @@
 // repository is going (the book's RULE.DEVEX.WORKSPACE.207).
 //
 // The guard knows a run only by its start file, `.spndevex/.debug/sessions/<id>/pending/<tool_use_id>.json`,
-// which `lib/bash-timing.ts` writes before a timed command and removes after it. Each case writes a
+// which `lib/bash-timing.ts` writes before a timed command and removes after it. The file holds, for each
+// program the filter matched, its repository, its call (program, group, action; no arguments) and `suite`,
+// true where the command is a test run. Each case writes a
 // start file into a temporary workspace and calls the check's own function. The suites run with
 // recording off, so the check reads `pending/` by path and never asks whether recording is on.
 import { mkdirSync, writeFileSync } from "node:fs";
@@ -28,7 +30,8 @@ function withRun(name, found, ageMs = 120_000, files = {}) {
   const root = workspace(name, { "spn-x/README.md": "x\n", "spn-y/README.md": "y\n", ...files });
   const pending = join(root, ".spndevex", ".debug", "sessions", "s-run", "pending");
   mkdirSync(pending, { recursive: true });
-  writeFileSync(join(pending, "toolu_run.json"), JSON.stringify({ at: NOW - ageMs, background: false, found }), "utf8");
+  const started = found.map((one) => ({ repo: one.repo, call: { program: one.script, group: one.group, action: one.action }, suite: isTestCommand(one) }));
+  writeFileSync(join(pending, "toolu_run.json"), JSON.stringify({ at: NOW - ageMs, background: false, found: started }), "utf8");
   return root;
 }
 const edit = (root, path) => ({ tool_name: "Edit", cwd: root, tool_input: { file_path: join(root, path), old_string: "a", new_string: "b" } });
@@ -40,7 +43,7 @@ console.log("=== a source edit waits while a test run for that repository is goi
   const refused = checkTestRun(edit(root, "spn-x/apps/api/src/a.ts"), NOW);
   ok("[MKT.HOOKS.31] an Edit under src is refused while `spnutils apps test` runs for that repository",
     verdictOf(refused) === "deny", JSON.stringify(refused));
-  ok("[MKT.HOOKS.31] the refusal names the run", (refused?.deny ?? "").includes("spnutils apps test contract r1 api"), refused?.deny);
+  ok("[MKT.HOOKS.31] the refusal names the run by its call, program group and action, and never its arguments", (refused?.deny ?? "").includes("spnutils apps test") && !(refused?.deny ?? "").includes("contract r1 api"), refused?.deny);
   ok("[MKT.HOOKS.31] and how long ago it started", (refused?.deny ?? "").includes("2 min ago"), refused?.deny);
   ok("[MKT.HOOKS.31] and the repository", (refused?.deny ?? "").includes("`spn-x`"), refused?.deny);
   ok("[MKT.HOOKS.31] and the start file it knows the run by, with the age at which one stops counting",
@@ -112,7 +115,7 @@ console.log("\n=== which commands are a test run, and which repository each is f
   const two = withRun("test-run-two", [reading("git", null, "status", null, "spn-y"), reading("nx", null, "test", "api", "spn-y")]);
   const runs = testRuns(two, NOW);
   ok("[MKT.HOOKS.31] a compound command is read for the test command inside it, with its repository",
-    runs.length === 1 && runs[0].repo === "spn-y" && runs[0].command === "nx test api", JSON.stringify(runs));
+    runs.length === 1 && runs[0].repo === "spn-y" && runs[0].command === "nx test", JSON.stringify(runs));
   ok("[MKT.HOOKS.31] so an edit in that repository is refused", verdictOf(checkTestRun(edit(two, "spn-y/src/a.ts"), NOW)) === "deny");
   ok("[MKT.HOOKS.32] and one in the other repository is not", checkTestRun(edit(two, "spn-x/apps/api/src/a.ts"), NOW) === null);
 
@@ -122,6 +125,34 @@ console.log("\n=== which commands are a test run, and which repository each is f
   ok("[MKT.HOOKS.32] a command that names neither folder does not apply", applies("", "git status --short") === false && applies("", "ls srcs testsuite") === false);
 }
 
+console.log("\n=== the start file's suite flag, and the call it names");
+{
+  // The check trusts the flag the start file was written with; it does not judge the words again.
+  const flagged = (name, suite, repo = "spn-x") => {
+    const root = workspace(name, { "spn-x/README.md": "x\n", "spn-y/README.md": "y\n" });
+    const pending = join(root, ".spndevex", ".debug", "sessions", "s-flag", "pending");
+    mkdirSync(pending, { recursive: true });
+    writeFileSync(join(pending, "toolu_flag.json"), JSON.stringify({ at: NOW - 60_000, background: false,
+      found: [{ repo, call: { program: "spnutils", group: "apps", action: "test" }, suite }] }), "utf8");
+    return root;
+  };
+  const yes = flagged("test-run-flag-true", true);
+  const runs = testRuns(yes, NOW);
+  ok("[MKT.SCRIPTS.330] a reading with suite true is a run, named by its call and its repository",
+    runs.length === 1 && runs[0].repo === "spn-x" && runs[0].command === "spnutils apps test", JSON.stringify(runs));
+  ok("[MKT.SCRIPTS.330] and an edit under its repository's src is refused", verdictOf(checkTestRun(edit(yes, "spn-x/apps/api/src/a.ts"), NOW)) === "deny");
+  const no = flagged("test-run-flag-false", false);
+  ok("[MKT.SCRIPTS.330] a reading with suite false is no run, though its call is named like one",
+    testRuns(no, NOW).length === 0 && checkTestRun(edit(no, "spn-x/apps/api/src/a.ts"), NOW) === null);
+  const old = workspace("test-run-old-shape", { "spn-x/README.md": "x\n" });
+  const pending = join(old, ".spndevex", ".debug", "sessions", "s-old", "pending");
+  mkdirSync(pending, { recursive: true });
+  writeFileSync(join(pending, "toolu_old.json"), JSON.stringify({ at: NOW - 60_000, background: false,
+    found: [{ script: "spnutils", group: "apps", subgroup: null, action: "test", args: "unit api", repo: "spn-x" }] }), "utf8");
+  ok("[MKT.SCRIPTS.330] a reading in the old shape, with no call and no flag, is not read as a run",
+    testRuns(old, NOW).length === 0);
+}
+
 console.log("\n=== a whole suite runs only while a baseline or full run of the go is running");
 {
   // A go plan in the lead arc's folder, `go.json`, holding one full run of `spn-x` at `state`.
@@ -129,7 +160,7 @@ console.log("\n=== a whole suite runs only while a baseline or full run of the g
   const goFiles = (state) => ({
     [`${OPEN}/arcs/N004/state.json`]: `${JSON.stringify({ schemaVersion: 2, arc: "N004", subject: "probe", title: "t", goal: null, status: "DECIDED", reason: null, preview: "preview.html", rows: [] })}\n`,
     [`${OPEN}/arcs/N004/go.json`]: `${JSON.stringify({ schemaVersion: 1, lead: "N004", scope: ["N004"], writtenAt: "2026-10-31T09:00+05:30", parts: [
-      { id: "full-spn-x", repo: "spn-x", pass: "FULL_RUN", entries: [], tests: [], minutes: null, measuredFrom: null, waitsOn: [], model: "sonnet", signature: "", state },
+      { id: "full-spn-x", repo: "spn-x", work: "TEST", entries: [], tests: [], minutes: null, measuredFrom: null, waitsOn: [], model: "sonnet", signature: "", state },
     ] })}\n`,
   });
   const at = (name, files = {}) => workspace(name, { "spn-x/README.md": "x\n", "spn-y/README.md": "y\n", ...files });

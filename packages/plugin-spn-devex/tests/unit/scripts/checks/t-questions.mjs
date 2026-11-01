@@ -130,7 +130,7 @@ console.log("\n=== a card that asks how the work runs is refused at raise, unles
   ok("[MKT.HOOKS.311] a card about a goal is raised in the same workstream", goalAgain.code === 0 && /^q1 · open/.test(goalAgain.out), goalAgain.out);
 
   // A design card in a builder workstream with an arc in spn-claude-marketplace.
-  const row = (id, repo) => ({ id, parent: "N001", title: `row ${id}`, kind: "change", repo, altitude: "CODE", blockedBy: [], touches: [`marketplace:${id}`], state: "waiting" });
+  const row = (id, repo) => ({ id, parent: "N001", title: `row ${id}`, kind: "change", repo, work: "CODE", blockedBy: [], touches: [`marketplace:${id}`], state: "waiting" });
   const builder = await dataWorkspace("questions-builder", { rows: [row("1", "spn-claude-marketplace")] });
   put(builder.root, "runs.json", JSON.stringify(RUNS));
   const design = cli(builder.root, ["workstream", "question", "raise", "031/N001", "--file", "runs.json"], { SPN_DEVEX_AGENT_WORKSPACE: builder.root });

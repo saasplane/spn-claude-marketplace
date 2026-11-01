@@ -7,7 +7,7 @@ import { BASE, bindOpen, wroteArcs, workspace } from "../../../helpers/fixture.m
 import { existsSync, mkdirSync, readFileSync, readdirSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { CARD as DATA_CARD, PREVIEW, cli, dataWorkspace, put } from "../../../helpers/workstream-fixture.mjs";
 import { bindNamed, noteWelcome, recordWrites, windowSet } from "../../../../src/scripts/lib/window.ts";
-import { resolve, join } from "node:path";
+import { basename, resolve, join } from "node:path";
 import { WORKSTREAMS } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { OWN_COPY, linesFor } from "../../../../../plugin-support-lib/src/lib/page-styles.ts";
 
@@ -1125,8 +1125,8 @@ console.log("\n=== stop — a page left stale by an arc this session wrote");
   // RUNNING and LANDED are worked out from the steps: the arc stores the developer's DECIDED, and its first step has landed.
   const arcText = (status, state = "waiting") => `${JSON.stringify({ schemaVersion: 2, arc: "N001", subject: "the-chapter", title: "the chapter",
     goal: "the chapter says where the model sits", status: ["RUNNING", "LANDED"].includes(status) ? "DECIDED" : status, reason: null, preview: "preview.html", rows: [
-      { id: "1", parent: "N001", title: "the chapter", kind: "change", repo: "spn-foundation", altitude: "DOCS", state: ["RUNNING", "LANDED"].includes(status) ? "landed" : "waiting" },
-      { id: "2", parent: "N001", title: "the check", kind: "change", repo: "spn-support-ts", altitude: "CODE", state }] }, null, 2)}\n`;
+      { id: "1", parent: "N001", title: "the chapter", kind: "change", repo: "spn-foundation", work: "DOCS", state: ["RUNNING", "LANDED"].includes(status) ? "landed" : "waiting" },
+      { id: "2", parent: "N001", title: "the check", kind: "change", repo: "spn-support-ts", work: "CODE", state }] }, null, 2)}\n`;
   // A page in the approach template's shape: a labelled status, How ending in Cycles, and Open.
   const pageFor = (folder, status, glyph) => `<!doctype html>
 ${STYLES}
@@ -1682,7 +1682,7 @@ console.log("\n=== stop — the checks the first round fixed or wired, and the g
     editArc(ws, (data) => { delete data.rows[1].waitingOn; });
     check("[MKT.HOOKS.322] the same row with nothing to wait on is sent back (the guard has teeth)",
       call("checkRunnable", root, 0, {}, new Set(), everyone(root), promise).length === 1);
-    const part = (id, state) => ({ id, repo: "spn-x", pass: "CODE", entries: ["N001/E1"], tests: [], minutes: null, measuredFrom: null,
+    const part = (id, state) => ({ id, repo: "spn-x", work: "CODE", entries: ["N001/E1"], tests: [], minutes: null, measuredFrom: null,
       waitsOn: [], model: "opus", signature: "abc12345", state });
     writeFileSync(join(arcOf(ws), "go.json"), `${JSON.stringify({ schemaVersion: GO_SCHEMA_VERSION, lead: "N001", scope: ["N001"], writtenAt: "2026-10-31T00:00:00Z", parts: [part("code-spn-x-1", "ready")] }, null, 2)}\n`);
     check("[MKT.HOOKS.322] an arc in a go with a part not landed gets no runnable finding while go-next speaks",
@@ -1798,7 +1798,7 @@ console.log("\n=== stop — the checks the first round fixed or wired, and the g
   {
     const { GO_SCHEMA_VERSION } = await import("../../../../src/scripts/lib/workstream-schema.ts");
     const { root, ws } = await dataWorkspace("n009-go-next");
-    const part = (id, state, extra = {}) => ({ id, repo: "spn-x", pass: "CODE", entries: ["N001/E1"], tests: [], minutes: null, measuredFrom: null,
+    const part = (id, state, extra = {}) => ({ id, repo: "spn-x", work: "CODE", entries: ["N001/E1"], tests: [], minutes: null, measuredFrom: null,
       waitsOn: [], model: "opus", signature: "abc12345", state, ...extra });
     const planWith = (parts) => writeFileSync(join(arcOf(ws), "go.json"),
       `${JSON.stringify({ schemaVersion: GO_SCHEMA_VERSION, lead: "N001", scope: ["N001"], writtenAt: "2026-10-31T00:00:00Z", parts }, null, 2)}\n`);
@@ -1942,7 +1942,8 @@ console.log("\n=== stop — send-backs are written as they are said, the welcome
   const stopModule = await import("../../../../src/scripts/events/stop.ts");
   const HOOK = `${HOOKS}/src/scripts/events/stop.ts`;
   const check = (label, ok, detail = "") => { n += 1; if (!ok) failed += 1; console.log(`  ${ok ? "PASS" : "FAIL"}  ${label}${ok || !detail ? "" : `\n        ${String(detail).slice(0, 500)}`}`); };
-  const sendbacks = (root) => { try { return readFileSync(join(telemetryFolder(root), "sendbacks.jsonl"), "utf8").trim().split("\n").filter(Boolean).map((line) => JSON.parse(line)); } catch { return []; } };
+  // A send-back is a CHECK row with verdict DENY in hooks.jsonl (MKT.SCRIPTS.328); sendbacks.jsonl is gone.
+  const sendbacks = (root) => { try { return readFileSync(join(telemetryFolder(root), "hooks.jsonl"), "utf8").trim().split("\n").filter(Boolean).map((line) => JSON.parse(line)).filter((row) => row.mtype === "CHECK" && row.verdict === "DENY"); } catch { return []; } };
   const arcFile = (ws) => join(ws, "arcs", "N001", "state.json");
   const editRows = (ws, change) => { const data = JSON.parse(readFileSync(arcFile(ws), "utf8")); change(data); writeFileSync(arcFile(ws), `${JSON.stringify(data, null, 2)}\n`); };
   const PROMISE = "The page is written and its checks are green.\n\nNext I'll build it.";
@@ -1952,6 +1953,10 @@ console.log("\n=== stop — send-backs are written as they are said, the welcome
       && ["needs-you", "reply-shape", "cards", "handover", "how-it-runs", "partner-words", "page-path", "welcome", "window"].every((name) => payloadLib.REPLY_CHECKS.has(name)),
     JSON.stringify([...(payloadLib.REPLY_CHECKS ?? [])]));
 
+  // The suite runs with SPN_TELEMETRY=off (tests/run.mjs); these cases read the rows a hook writes, so they take it out
+  // for the hooks they spawn and put it back after.
+  const telemetryWas = process.env.SPN_TELEMETRY;
+  delete process.env.SPN_TELEMETRY;
   {
     const { root, ws } = await dataWorkspace("n015-sendback");
     editRows(ws, (data) => { data.rows[0].state = "landed"; });
@@ -1960,9 +1965,10 @@ console.log("\n=== stop — send-backs are written as they are said, the welcome
     const payload = { cwd: root, session_id: "sb-1", last_assistant_message: PROMISE };
     const first = run("node", [HOOK], payload, root);
     const lines = sendbacks(root).filter((line) => line.check === "runnable");
-    check("[MKT.HOOKS.341] a said finding writes one send-back line with its check and workstream",
-      first.includes("[runnable]") && lines.length === 1 && lines[0].check === "runnable" && lines[0].workstream === "031-probe"
-        && lines[0].event === "Stop" && lines[0].session === "sb-1" && /^[0-9a-f]{12}$/.test(lines[0].finding), `${first.slice(0, 200)} · ${JSON.stringify(lines)}`);
+    check("[MKT.HOOKS.341] a said finding writes one CHECK row, verdict DENY, with its check",
+      first.includes("[runnable]") && lines.length === 1 && lines[0].check === "runnable"
+        && lines[0].event === "Stop" && lines[0].session === "sb-1" && lines[0].v === 1 && !("finding" in lines[0]), `${first.slice(0, 200)} · ${JSON.stringify(lines)}`);
+    check("[MKT.HOOKS.341] and the workstream the window is bound to", lines[0]?.workstream === basename(ws), JSON.stringify(lines[0] ?? null));
     run("node", [HOOK], payload, root);
     check("[MKT.HOOKS.341] a finding already said writes none", sendbacks(root).filter((line) => line.check === "runnable").length === 1, JSON.stringify(sendbacks(root)));
     check("[MKT.HOOKS.341] the transcript count is gone: sendBackStats and recordSendBacks are not exported",
@@ -1977,6 +1983,7 @@ console.log("\n=== stop — send-backs are written as they are said, the welcome
     const out = run("node", [HOOK], { cwd: root, session_id: "sb-held", last_assistant_message: PROMISE }, root);
     check("[MKT.HOOKS.341] a held finding writes none", !out.includes("[runnable]") && sendbacks(root).every((line) => line.check !== "runnable"), `${out.slice(0, 200)} · ${JSON.stringify(sendbacks(root))}`);
   }
+  if (telemetryWas === undefined) delete process.env.SPN_TELEMETRY; else process.env.SPN_TELEMETRY = telemetryWas;
 
   // THE WELCOME IS HELD TO THE WHOLE ONLY WHERE THE SESSION START SENT IT (s47).
   const cut = welcome("Dhruv", false).join("\n").replace(" · **Finance and business**.", "");

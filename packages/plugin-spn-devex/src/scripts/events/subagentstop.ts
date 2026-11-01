@@ -12,7 +12,8 @@
 // It writes nothing while recording is off, says nothing to the child and never blocks it.
 
 import { eventWorkspace, readPayload, runAlone } from "../lib/payload.ts";
-import { recordUsage } from "../lib/usage.ts";
+// launchedWork is added by E41 (lib/usage.ts): it reads the order a helper's first prompt names.
+import { launchedWork, recordUsage } from "../lib/usage.ts";
 import { begin, end, tagsOf } from "../../../../plugin-support-lib/src/lib/timing.ts";
 
 if (runAlone("subagentstop.ts")) {
@@ -21,7 +22,12 @@ if (runAlone("subagentstop.ts")) {
     const start = event.cwd || process.env.CLAUDE_PROJECT_DIR || process.cwd();
     // The workspace above the event's `cwd`, else above the project directory; the bare start only where neither holds one.
     const root = eventWorkspace(event.cwd) ?? start;
-    const facts = { script: "spn-devex", event: "SubagentStop", tool: null, session: event.session_id ?? null, ...tagsOf(event),
+    // The part, arc, work and workstream the helper's launch named, read once from its transcript; a launch naming none leaves each null.
+    const launched = launchedWork(event.agent_transcript_path) as { part?: string | null; arc?: string | null; work?: string | null; workstream?: string | null } | null;
+    const tags = tagsOf(event);
+    const facts = { script: "spn-devex", event: "SubagentStop", tool: null, session: event.session_id ?? null, ...tags,
+                    part: launched?.part ?? tags.part, arc: launched?.arc ?? tags.arc, work: launched?.work ?? null,
+                    workstream: launched?.workstream ?? tags.workstream,
                     process: { group: "events", action: "subagentstop" } };
     begin(facts, root);
     recordUsage(root, facts, event.agent_transcript_path);

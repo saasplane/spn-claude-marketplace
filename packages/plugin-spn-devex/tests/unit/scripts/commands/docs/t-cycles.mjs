@@ -398,8 +398,8 @@ console.log("\n=== the places of How, produced from the rows' repo (RULE.DEVEX.W
 
   const { root, ws } = await dataWorkspace("cycles-places", { rows: [
     ...arcData().rows,
-    { id: "3", parent: "N001", title: "prove it", kind: "change", repo: "—", altitude: "PROOF", state: "waiting" },
-    { id: "4", parent: "N001", title: "the second repository", kind: "change", repo: "spn-y", altitude: "CODE", state: "waiting" },
+    { id: "3", parent: "N001", title: "prove it", kind: "change", repo: "—", work: "PROOF", state: "waiting" },
+    { id: "4", parent: "N001", title: "the second repository", kind: "change", repo: "spn-y", work: "CODE", state: "waiting" },
   ] });
   ok("placesOf reads the header's repos and each row's repo, and a row that names none reaches no place",
     JSON.stringify(placesOf(ws)) === JSON.stringify([{ repo: "spn-x", arcs: ["N001"] }, { repo: "spn-y", arcs: ["N001"] }]), JSON.stringify(placesOf(ws)));

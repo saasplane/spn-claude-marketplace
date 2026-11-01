@@ -14,24 +14,35 @@
 
 import { execFileSync } from "node:child_process";
 import { existsSync } from "node:fs";
-import { basename, join } from "node:path";
+import { basename, dirname, join, resolve } from "node:path";
 import { type Action, FLAG, VALUE, UsageFault, readWords } from "../../../../../plugin-support-lib/src/lib/command.ts";
-import { isTestCommand } from "../../checks/test-run.ts";
 import {
   clearWaiting, deriveGo, fullRunMinutes, goFileOf, landedEntries, landedMeasures, markWaiting, planScope, readGo, readyParts, ratesOf, staleEntries, unheldEntries,
   type ScopeSheet,
 } from "../../lib/go-plan.ts";
-import { logEvent, notesDirOf, readArc, readSheet, workspaceOf, writeWhole } from "../../lib/workstream.ts";
-import { DONE_STATES, type ArcData, type GoPart, type GoPlan } from "../../lib/workstream-schema.ts";
+import { logEvent, notesDirOf, readArc, readJson, readSheet, workspaceOf, writeWhole } from "../../lib/workstream.ts";
+import { DONE_STATES, renameDataToWork, type ArcData, type GoPart, type GoPlan } from "../../lib/workstream-schema.ts";
 import { arcNamed, listOf } from "./_shared.ts";
-import { sheetFindings } from "./sheet.ts";
+import { renameFirstRead, sheetFindings } from "./sheet.ts";
 
-export const describe = "the plan of a go: derive it from the scope's sheets and write each part's brief, show it, check it against the sheets, start a baseline or full run";
+export const describe = "the plan of a go: derive it from the scope's sheets and write each part's brief, show it, check it against the sheets, start a baseline, a full run or a release";
 
 export const save = (ws: string, lead: string, plan: GoPlan): void => writeWhole(goFileOf(ws, lead), `${JSON.stringify(plan, null, 2)}\n`);
 const briefOf = (ws: string, lead: string, part: GoPart): string => join(notesDirOf(ws, lead), "orders", `${part.id}.md`);
 
+/** Whether a TEST part is the repository's full run rather than its baseline: the two are told apart by their ids. */
+export const isFullRun = (part: GoPart): boolean => part.work === "TEST" && !part.id.startsWith("baseline-");
+
+/** The first read of an open workstream's go plan: each part's `pass` becomes `work`, the file written back with one log line, before the schema reads it. A closed workstream's is left as it closed. */
+export function renameGo(ws: string, lead: string): void {
+  if (basename(dirname(resolve(ws))) === "closed") return;
+  const data = readJson(goFileOf(ws, lead));
+  const count = renameDataToWork(data);
+  if (count > 0) { writeWhole(goFileOf(ws, lead), `${JSON.stringify(data, null, 2)}\n`); logEvent(ws, lead, "work", null, `pass renamed to work · ${count} part${count === 1 ? "" : "s"}`); }
+}
+
 function planOf(ws: string, lead: string): GoPlan {
+  renameGo(ws, lead);
   let plan: GoPlan | null;
   try { plan = readGo(ws, lead); } catch (thrown) { throw new UsageFault(`${(thrown as Error).message}.`); }
   if (!plan) throw new UsageFault(`finds no plan for ${lead}: \`workstream go write ${lead} --scope …\` writes it.`);
@@ -45,8 +56,8 @@ export function nextStep(ref: string, ws: string, plan: GoPlan): string {
   const ready = readyParts(plan);
   const first = ready[0];
   if (first) {
-    if (first.pass === "BASELINE" || first.pass === "FULL_RUN") return `Next: \`workstream go start ${ref} ${first.id}\`, then run the repository's whole suite.`;
-    if (first.pass === "RELEASE") return `Next: release ${first.repo}.`;
+    if (first.work === "TEST") return `Next: \`workstream go start ${ref} ${first.id}\`, then run the repository's whole suite.`;
+    if (first.work === "RELEASE") return `Next: \`workstream go start ${ref} ${first.id}\`, then release ${first.repo}.`;
     return `Next: launch the brief of ${first.id}: ${briefOf(ws, plan.lead, first)}${ready.length > 1 ? ` (${ready.length} parts ready)` : ""}.`;
   }
   const running = plan.parts.filter((one) => one.state === "running");
@@ -61,6 +72,7 @@ function scopeOf(ws: string, scope: string[], lead: string): { sheets: ScopeShee
   const faults: string[] = [];
   if (scope[0] !== lead) faults.push(`\`--scope\` starts with \`${scope[0] ?? "nothing"}\`, and the lead is \`${lead}\`: the lead is the first arc of the scope`);
   for (const arc of scope) {
+    renameFirstRead(ws, arc);
     const data = readArc(ws, arc);
     const sheet = readSheet(ws, arc);
     if (!data) { faults.push(`${arc} has no data`); continue; }
@@ -70,7 +82,7 @@ function scopeOf(ws: string, scope: string[], lead: string): { sheets: ScopeShee
     // A release part is named for its repository, so a line that is not one name would make a part no reader accepts.
     for (const line of sheet.releaseChain) if (!/^\S+$/.test(line)) faults.push(`${arc} sheet: the release order line "${line}" is not a repository's name`);
     // A proof step not landed owes its repository a full run; an arc that changes no repository lands its proof on its check's run.
-    const proofs = data.rows.filter((row) => row.altitude === "PROOF" && !DONE_STATES.has(row.state) && row.repo && row.repo !== "none").map((row) => row.repo as string);
+    const proofs = data.rows.filter((row) => row.work === "PROOF" && !DONE_STATES.has(row.state) && row.repo && row.repo !== "none").map((row) => row.repo as string);
     sheets.push({ arc, sheet, landed: landedEntries(data), proofs: [...new Set(proofs)] });
     arcs.push(data);
   }
@@ -84,7 +96,7 @@ function brief(plan: GoPlan, part: GoPart, ws: string, root: string): string {
     `# Part ${part.id}`, "",
     "| | |", "| --- | --- |",
     `| **Repo** | \`${part.repo}\` · **Run from:** \`${join(root, ".worktrees", basename(ws), part.repo)}\` |`,
-    `| **Pass** | ${part.pass} · ${part.minutes === null ? "not measured" : `${part.minutes} min (${part.measuredFrom})`} |`, "",
+    `| **Work** | ${part.work} · ${part.minutes === null ? "not measured" : `${part.minutes} min (${part.measuredFrom})`} |`, "",
     "**Launch no agent.** Stop at 150k of context or 100 turns, at the next whole step, save the report with what is left and hand back.",
     "Commit nothing. Hand back at most 8 lines; save the report, at most 15 lines, beside this brief as " + `\`${part.id}.report.md\`, its front matter first.`, "",
     "## The entries", "",
@@ -94,7 +106,7 @@ function brief(plan: GoPlan, part: GoPart, ws: string, root: string): string {
     "## Report", "",
     "Its front matter is what `workstream report write` folds into the plan:", "",
     "```text", "---", `go: "${plan.lead}"`, `part: "${part.id}"`, "outcome: landed · stopped · needs-you",
-    'proof: "<what you ran, and what it printed>"', "commits: {}", "followUps: []", "cost: { tokens: <n>, minutes: <n> }", "---", "```", "",
+    'proof: "<what you ran, and what it printed>"', "commits: {}", "followUps: []", "---", "```", "",
   ];
   return `${lines.join("\n")}\n`;
 }
@@ -108,10 +120,11 @@ function write(args: string[]): number {
   const { sheets, arcs, faults } = scopeOf(ws, scope, lead);
   if (faults.length) { console.log(`Refused: ${faults.join(" · ")}. Nothing was written.`); return 1; }
   const root = workspaceOf() ?? process.cwd();
+  renameGo(ws, lead);
   const previous = readGo(ws, lead);
   const measures = landedMeasures(root, basename(ws), arcs);
   const plan = deriveGo(sheets, {
-    rates: ratesOf(measures), measures, previous, fullRunMinutes: fullRunMinutes(root, isTestCommand),
+    rates: ratesOf(measures), measures, previous, fullRunMinutes: fullRunMinutes(root),
     dirsOf: (repo) => [join(root, ".worktrees", basename(ws), repo), join(root, repo)],
   });
   save(ws, lead, plan);
@@ -127,7 +140,7 @@ function partLine(part: GoPart, waiting: boolean): string {
   const time = part.minutes === null ? "not measured" : `${part.minutes} min`;
   const tail = [part.entries.length ? part.entries.join(" ") : "", part.tests.length ? `tests ${part.tests.join(" ")}` : "", part.waitsOn.length ? `waits on ${part.waitsOn.join(", ")}` : "",
     part.state === "waiting" && part.waitingOn ? `waiting on ${part.waitingOn}` : ""].filter(Boolean);
-  return [`${part.id}  ${part.pass}  ${state}  ${time}`, ...tail].join(" · ");
+  return [`${part.id}  ${part.work}  ${state}  ${time}`, ...tail].join(" · ");
 }
 
 function show(args: string[]): number {
@@ -192,18 +205,19 @@ function start(args: string[]): number {
   const part = plan.parts.find((one) => one.id === id);
   if (!part) throw new UsageFault(`finds no part ${id} in ${arc}'s plan.`);
   const refuse = (why: string): number => { console.log(`Refused: ${why}. Nothing was changed.`); return 1; };
-  if (part.pass !== "BASELINE" && part.pass !== "FULL_RUN") return refuse(`${id} is a ${part.pass} part: only a baseline or a full run starts here, and a helper's part is launched from its brief`);
+  if (part.work !== "TEST" && part.work !== "RELEASE") return refuse(`${id} is a ${part.work} part: only a baseline, a full run or a release starts here, and a helper's part is launched from its brief`);
   if (part.state !== "ready") return refuse(`${id} is ${part.state}, not ready`);
   const open = part.waitsOn.filter((wait) => plan.parts.find((one) => one.id === wait)?.state !== "landed");
   if (open.length) return refuse(`${id} waits on ${open.join(", ")}, which has not landed`);
   // A full run is taken on a tree that is not about to change, so the repository holds no uncommitted file.
-  const changed = part.pass === "FULL_RUN" ? uncommitted(ws, part.repo) : [];
+  const changed = isFullRun(part) ? uncommitted(ws, part.repo) : [];
   if (changed.length) return refuse(`${id} is a full run, and ${part.repo} holds uncommitted changes: ${changed.join(", ")}; commit them, then start it`);
   const next: GoPlan = { ...plan, parts: plan.parts.map((one) => (one.id === id ? { ...one, state: "running" as const } : one)) };
   save(ws, arc, next);
   logEvent(ws, arc, "go", null, `${id} started`);
   console.log(`ok · ${arc} ${id} running`);
-  console.log(nextStep(`${basename(ws)}/${arc}`, ws, next).replace(/^Next: /, `Next: run the whole suite of ${part.repo}, then `));
+  if (part.work === "RELEASE") console.log(`Next: release ${part.repo}, then \`workstream report write\` on it.`);
+  else console.log(nextStep(`${basename(ws)}/${arc}`, ws, next).replace(/^Next: /, `Next: run the whole suite of ${part.repo}, then `));
   return 0;
 }
 
@@ -238,6 +252,6 @@ export const actions: Record<string, Action> = {
   write: { describe: "after the go: derive the plan from the scope's sheets and the telemetry, and write every part's brief; run again it keeps landed and running parts", usage: "<workstream>/N<nnn> --scope N<nnn>,…", run: write },
   show: { describe: "print the parts: their files, their tests, their measured time and what each waits on", usage: "<workstream>/N<nnn> [--part <id>] [--json]", run: show },
   check: { describe: "read the plan against the sheets: an entry no part holds, or a part whose entries changed since the plan was written, which it marks held; exits 1 on any", usage: "<workstream>/N<nnn>", run: checkGo },
-  start: { describe: "mark a baseline or full run as running, so the test-run check lets the whole suite run", usage: "<workstream>/N<nnn> <part>", run: start },
+  start: { describe: "mark a baseline, a full run or a release as running; only a baseline or a full run lets the test-run check open the whole suite", usage: "<workstream>/N<nnn> <part>", run: start },
   wait: { describe: "mark a part waiting on something outside the plan (a release, a sign-in, another window's hold), with the reason in plain words; `--clear` takes the wait off, and the part reads ready when what it waits on in the plan has landed", usage: "<workstream>/N<nnn> <part> (--on \"…\" | --clear)", run: wait },
 };

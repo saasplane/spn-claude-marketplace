@@ -1,5 +1,5 @@
 // What a go is made of: the entries of the scope's change sheets, grouped into parts. A part is what one helper carries out:
-// the entries of one repository in one pass, with a baseline and a full run around each repository's code. Repositories run
+// the entries of one repository in one kind of work, with a baseline and a full run around each repository's code. Repositories run
 // in release chain order, and the release comes last. `go.json` keeps the plan in the lead arc's folder, and a write or a
 // read of it is checked by `goFaults`.
 //
@@ -11,10 +11,9 @@ import { createHash } from "node:crypto";
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { logFiles, telemetryFolder } from "../../../../plugin-support-lib/src/lib/debug-store.ts";
-import { readCost } from "./cost.ts";
 import {
-  entryAltitude, goFaults, GO_SCHEMA_VERSION,
-  type ArcData, type GoPart, type GoPass, type GoPlan, type Sheet, type SheetEntry,
+  entryWork, goFaults, GO_SCHEMA_VERSION,
+  type ArcData, type GoPart, type GoPlan, type Sheet, type SheetEntry, type Work,
 } from "./workstream-schema.ts";
 import { arcDataDir, readArc, readSheet } from "./workstream.ts";
 
@@ -28,9 +27,9 @@ const HOOKS_LOG = "hooks.jsonl";
 /** A sheet of the scope, with its arc, the ids of the entries its landed rows hold, and the repositories it still owes a proof in. */
 export type ScopeSheet = { arc: string; sheet: Sheet; landed?: readonly string[]; proofs?: readonly string[] };
 /** What a landed row took: entries done in a repository at a kind of change, in minutes. */
-export type Measure = { repo: string; altitude: string; entries: number; minutes: number };
-/** A line of `hooks.jsonl`, as far as a test command is told apart. */
-export type CommandLine = { script?: string | null; group?: string | null; subgroup?: string | null; action?: string | null; args?: string | null; ms?: number; exit?: number | null };
+export type Measure = { repo: string; work: string; entries: number; minutes: number };
+/** A `TEST` row of `hooks.jsonl`, as far as a full run is told apart. */
+export type TestLine = { v?: number; mtype?: string; at?: string; ms?: number; part?: string | null; status?: string; test?: { run?: string } | null };
 
 /** `go.json`, in the folder of the lead arc. */
 export const goFileOf = (ws: string, lead: string): string => join(arcDataDir(ws, lead), GO_FILE);
@@ -77,12 +76,12 @@ export function unheldEntries(plan: GoPlan, scope: readonly ScopeSheet[]): strin
 /** A short hash of one entry as written, so a part's signature changes with any change to any of its entries. */
 export const entryHash = (entry: SheetEntry): string => createHash("sha1").update(JSON.stringify(entry)).digest("hex").slice(0, 8);
 
-/** Minutes for one entry in each repository and kind of change, from rows that landed: `<repo>|<altitude>`. Absent where unmeasured. */
+/** Minutes for one entry in each repository and kind of change, from rows that landed: `<repo>|<work>`. Absent where unmeasured. */
 export function ratesOf(measures: readonly Measure[]): Record<string, number> {
   const sums = new Map<string, { entries: number; minutes: number }>();
   for (const one of measures) {
     if (!(one.entries > 0) || !(one.minutes > 0)) continue;
-    const key = `${one.repo}|${one.altitude}`;
+    const key = `${one.repo}|${one.work}`;
     const held = sums.get(key) ?? { entries: 0, minutes: 0 };
     sums.set(key, { entries: held.entries + one.entries, minutes: held.minutes + one.minutes });
   }
@@ -90,37 +89,43 @@ export function ratesOf(measures: readonly Measure[]): Record<string, number> {
 }
 
 /**
- * What the landed rows of the arcs took: each row's model time from telemetry (`workstream` is the folder name the usage lines
- * are tagged with), else the cost the row recorded. A row with no repository, kind of change or entries measures nothing.
+ * What the landed rows of the arcs took: the cost each row recorded, which `report write` measures from the usage rows of its
+ * part. A row with no repository, kind of change or entries measures nothing.
  */
 export function landedMeasures(root: string, workstream: string, arcs: readonly ArcData[]): Measure[] {
+  void root; void workstream;
   const out: Measure[] = [];
   for (const data of arcs) {
-    let modelMs = new Map<string, number>();
-    try { modelMs = new Map(readCost(root, `${workstream}/${data.arc}`).rows.map((one) => [one.key.split(" · ")[0], one.modelMs])); } catch { /* no telemetry */ }
     for (const row of data.rows) {
-      if (row.state !== "landed" || !row.repo || !row.altitude || !row.entries?.length) continue;
-      const ms = modelMs.get(`row ${row.id}`) ?? 0;
-      const minutes = ms > 0 ? ms / 60000 : row.cost?.minutes ?? 0;
-      out.push({ repo: row.repo, altitude: row.altitude, entries: row.entries.length, minutes });
+      if (row.state !== "landed" || !row.repo || !row.work || !row.entries?.length) continue;
+      out.push({ repo: row.repo, work: row.work, entries: row.entries.length, minutes: row.cost?.minutes ?? 0 });
     }
   }
   return out;
 }
 
-/** The minutes of a full test run: the mean of the last three test commands in `hooks.jsonl` that exited 0, or null with none. */
-export function fullRunMinutes(root: string, isTestCommand: (line: CommandLine) => boolean): number | null {
-  const times: number[] = [];
+/**
+ * The minutes of a full test run: the mean of the last three full runs whose `TEST` rows in `hooks.jsonl` all read SUCCESS, or
+ * null with none. A full run is the rows of a part named `full-<repo>`; its time is from the earliest start among the rows of
+ * one run to the latest end, because its tiers and nodes run side by side.
+ */
+export function fullRunMinutes(root: string): number | null {
+  const runs = new Map<string, { from: number; to: number; green: boolean }>();
   for (const file of logFiles(join(telemetryFolder(root), HOOKS_LOG))) {
     for (const raw of readFileSync(file, "utf8").split("\n")) {
       if (!raw.trim()) continue;
       try {
-        const line = JSON.parse(raw) as CommandLine & { event?: string; tool?: string };
-        if (line.event === "command" && line.tool === "Bash" && line.exit === 0 && typeof line.ms === "number" && isTestCommand(line)) times.push(line.ms);
+        const line = JSON.parse(raw) as TestLine;
+        if (line.v !== 1 || line.mtype !== "TEST" || typeof line.part !== "string" || !line.part.startsWith("full-")) continue;
+        const run = line.test?.run, from = Date.parse(String(line.at)), ms = line.ms;
+        if (!run || Number.isNaN(from) || typeof ms !== "number") continue;
+        const held = runs.get(run) ?? { from, to: from + ms, green: true };
+        runs.delete(run);
+        runs.set(run, { from: Math.min(held.from, from), to: Math.max(held.to, from + ms), green: held.green && line.status === "SUCCESS" });
       } catch { /* a torn last line is skipped */ }
     }
   }
-  const last = times.slice(-3);
+  const last = [...runs.values()].filter((one) => one.green).slice(-3).map((one) => one.to - one.from);
   return last.length ? last.reduce((sum, ms) => sum + ms, 0) / last.length / 60000 : null;
 }
 
@@ -162,25 +167,32 @@ export type DeriveOptions = {
 };
 
 /** Entries to a part: the 45 minutes over the rate for a repository and kind of change, or 8 where it is unmeasured. */
-export function boundOf(rates: Record<string, number>, repo: string, altitude: string): number {
-  const rate = rates[`${repo}|${altitude}`];
+export function boundOf(rates: Record<string, number>, repo: string, work: string): number {
+  const rate = rates[`${repo}|${work}`];
   return rate && rate > 0 ? Math.max(1, Math.floor(PART_MINUTES / rate)) : UNMEASURED_ENTRIES;
 }
 
-/** The passes that carry entries; an entry of another kind of change is built with the code. */
-const ENTRY_PASSES: readonly GoPass[] = ["DOCS", "CODE", "GENERATED"];
-/** The order passes run in inside a repository. */
-const PASS_ORDER: readonly GoPass[] = ["DOCS", "BASELINE", "CODE", "FULL_RUN", "GENERATED"];
+/** The places a part has in a repository's run: a baseline and a full run are both TEST work, told apart by their ids. */
+type Slot = "DOCS" | "BASELINE" | "CODE" | "FULL_RUN" | "GENERATED" | "RELEASE";
+/** The slots that carry entries; an entry of another kind of work is built with the code. */
+const ENTRY_SLOTS: readonly Slot[] = ["DOCS", "CODE", "GENERATED"];
+/** The order slots run in inside a repository. */
+const SLOT_ORDER: readonly Slot[] = ["DOCS", "BASELINE", "CODE", "FULL_RUN", "GENERATED"];
 
-const passOf = (entry: SheetEntry): GoPass => {
-  const altitude = entryAltitude(entry);
-  return altitude === "DOCS" || altitude === "GENERATED" ? altitude : "CODE";
+/** The slot a part stands in: its work, and for TEST work its id (`baseline-` or `full-`). */
+const slotOf = (part: Pick<GoPart, "id" | "work">): Slot =>
+  part.work === "TEST" ? (part.id.startsWith("baseline-") ? "BASELINE" : "FULL_RUN") : part.work as Slot;
+const workOf = (slot: Slot): Work => (slot === "BASELINE" || slot === "FULL_RUN" ? "TEST" : slot);
+
+const entrySlot = (entry: SheetEntry): Slot => {
+  const work = entryWork(entry);
+  return work === "DOCS" || work === "GENERATED" ? work : "CODE";
 };
 const numberOf = (part: GoPart): number => Number(part.id.slice(part.id.lastIndexOf("-") + 1)) || 0;
 
 /**
  * The plan of a go over the arcs of its scope, the first being the lead. Entries are grouped by repository, in the order of
- * the scope's release chain (a repository outside the chain last), then by pass, and each group is cut into parts of at most
+ * the scope's release chain (a repository outside the chain last), then by kind of work, and each group is cut into parts of at most
  * its bound. A repository with code also gets a baseline and a full run, and the release comes last, one part to each line of
  * the scope's release chain. An entry a landed row holds is left out, unless it changed after its part landed. Derived again after a change, the previous plan's landed
  * and running parts stay as they were and the entries they hold are left out, except a landed part's entry that changed, which
@@ -200,7 +212,7 @@ export function deriveGo(scope: readonly ScopeSheet[], options: DeriveOptions = 
   }));
   // A landed row's entry is done, unless it changed after the part that held it landed: that one gets a follow-up part.
   const done = new Set([...landedRefs(scope)].filter((ref) => !moved.has(ref)));
-  const groups = new Map<string, { repo: string; pass: GoPass; refs: string[]; entries: SheetEntry[] }>();
+  const groups = new Map<string, { repo: string; pass: Slot; refs: string[]; entries: SheetEntry[] }>();
   const repos: string[] = [];
   for (const { arc, sheet } of scope) {
     for (const entry of sheet.entries) {
@@ -208,42 +220,42 @@ export function deriveGo(scope: readonly ScopeSheet[], options: DeriveOptions = 
       if (keptRefs.has(ref) || done.has(ref)) continue;
       const repo = repoOf(entry);
       if (!repos.includes(repo)) repos.push(repo);
-      const pass = passOf(entry);
+      const pass = entrySlot(entry);
       const group = groups.get(`${repo}|${pass}`) ?? { repo, pass, refs: [], entries: [] };
       group.refs.push(ref);
       group.entries.push(entry);
       groups.set(`${repo}|${pass}`, group);
     }
   }
-  for (const part of kept) if (!repos.includes(part.repo) && part.pass !== "RELEASE") repos.push(part.repo);
+  for (const part of kept) if (!repos.includes(part.repo) && slotOf(part) !== "RELEASE") repos.push(part.repo);
   const owed = new Set(scope.flatMap(({ proofs }) => proofs ?? []));
   for (const repo of owed) if (!repos.includes(repo)) repos.push(repo);
   const rank = (repo: string) => { const at = chain.indexOf(repo); return at < 0 ? chain.length : at; };
   repos.sort((a, b) => rank(a) - rank(b));
 
-  const measuredOf = (repo: string, pass: GoPass): string | null => {
+  const measuredOf = (repo: string, pass: Slot): string | null => {
     const rate = rates[`${repo}|${pass}`];
     if (!(rate > 0)) return null;
-    const count = (options.measures ?? []).filter((one) => one.repo === repo && one.altitude === pass && one.entries > 0 && one.minutes > 0).length;
+    const count = (options.measures ?? []).filter((one) => one.repo === repo && one.work === workOf(pass) && one.entries > 0 && one.minutes > 0).length;
     return `cost of ${count ? `${count} ` : ""}landed ${pass} rows in ${repo}`;
   };
   const full = typeof options.fullRunMinutes === "number" ? Math.round(options.fullRunMinutes * 10) / 10 : null;
-  const part = (id: string, repo: string, pass: GoPass, refs: string[], held: SheetEntry[], extra: Partial<GoPart> = {}): GoPart => ({
-    id, repo, pass, entries: refs, tests: [], minutes: null, measuredFrom: null, waitsOn: [],
-    model: ENTRY_PASSES.includes(pass) ? "sonnet" : "none", signature: held.map(entryHash).join("."), state: "ready", ...extra,
+  const part = (id: string, repo: string, pass: Slot, refs: string[], held: SheetEntry[], extra: Partial<GoPart> = {}): GoPart => ({
+    id, repo, work: workOf(pass), entries: refs, tests: [], minutes: null, measuredFrom: null, waitsOn: [],
+    model: ENTRY_SLOTS.includes(pass) ? "sonnet" : "none", signature: held.map(entryHash).join("."), state: "ready", ...extra,
   });
 
   const fresh: GoPart[] = [];
   for (const repo of repos) {
-    const hasCode = groups.has(`${repo}|CODE`) || kept.some((one) => one.repo === repo && one.pass === "CODE");
-    for (const pass of PASS_ORDER) {
+    const hasCode = groups.has(`${repo}|CODE`) || kept.some((one) => one.repo === repo && slotOf(one) === "CODE");
+    for (const pass of SLOT_ORDER) {
       if (pass === "BASELINE" || pass === "FULL_RUN") {
         let id = `${pass === "BASELINE" ? "baseline" : "full"}-${repo}`;
         // A proof still owed needs the repository's full run once its code has landed; a baseline needs code to compare.
         let runs = hasCode || (pass === "FULL_RUN" && owed.has(repo));
         if (pass === "FULL_RUN") {
           // A new code part in a repository whose full run has landed opens the next full run, full-<repo>-2.
-          const fulls = kept.filter((one) => one.repo === repo && one.pass === "FULL_RUN");
+          const fulls = kept.filter((one) => one.repo === repo && slotOf(one) === "FULL_RUN");
           const landedN = Math.max(0, ...fulls.filter((one) => one.state === "landed").map((one) => numberOf(one) || 1));
           if (fulls.some((one) => one.state === "running")) runs = false;
           else if (landedN > 0) { if (groups.has(`${repo}|CODE`)) id = `${id}-${landedN + 1}`; else runs = false; }
@@ -257,7 +269,7 @@ export function deriveGo(scope: readonly ScopeSheet[], options: DeriveOptions = 
       if (!group) continue;
       const bound = boundOf(rates, repo, pass);
       const rate = rates[`${repo}|${pass}`];
-      let next = Math.max(0, ...kept.filter((one) => one.repo === repo && one.pass === pass).map(numberOf)) + 1;
+      let next = Math.max(0, ...kept.filter((one) => one.repo === repo && slotOf(one) === pass).map(numberOf)) + 1;
       for (let at = 0; at < group.refs.length; at += bound) {
         const refs = group.refs.slice(at, at + bound);
         const held = group.entries.slice(at, at + bound);
@@ -270,25 +282,25 @@ export function deriveGo(scope: readonly ScopeSheet[], options: DeriveOptions = 
     }
   }
 
-  const all = [...kept.filter((one) => one.pass !== "RELEASE"), ...fresh];
-  const parts = all.sort((a, b) => repos.indexOf(a.repo) - repos.indexOf(b.repo) || PASS_ORDER.indexOf(a.pass) - PASS_ORDER.indexOf(b.pass) || numberOf(a) - numberOf(b));
+  const all = [...kept.filter((one) => slotOf(one) !== "RELEASE"), ...fresh];
+  const parts = all.sort((a, b) => repos.indexOf(a.repo) - repos.indexOf(b.repo) || SLOT_ORDER.indexOf(slotOf(a)) - SLOT_ORDER.indexOf(slotOf(b)) || numberOf(a) - numberOf(b));
   // What each fresh part waits on: every part of the pass before it in its repository; a repository's first pass waits on the
   // docs of the repository before it; a baseline waits on nothing, and a full run waits on the repository's code.
   for (const one of parts) {
-    if (keptIds.has(one.id) || one.pass === "BASELINE") continue;
+    if (keptIds.has(one.id) || slotOf(one) === "BASELINE") continue;
     const mine = parts.filter((other) => other.repo === one.repo);
-    const before = PASS_ORDER.slice(0, PASS_ORDER.indexOf(one.pass)).reverse().find((pass) => mine.some((other) => other.pass === pass));
-    if (before) one.waitsOn = mine.filter((other) => other.pass === before).map((other) => other.id);
+    const before = SLOT_ORDER.slice(0, SLOT_ORDER.indexOf(slotOf(one))).reverse().find((pass) => mine.some((other) => slotOf(other) === pass));
+    if (before) one.waitsOn = mine.filter((other) => slotOf(other) === before).map((other) => other.id);
     else {
       const prior = repos[repos.indexOf(one.repo) - 1];
-      one.waitsOn = prior ? parts.filter((other) => other.repo === prior && other.pass === "DOCS").map((other) => other.id) : [];
+      one.waitsOn = prior ? parts.filter((other) => other.repo === prior && slotOf(other) === "DOCS").map((other) => other.id) : [];
     }
   }
   // A repository's first pass waits on the release that ships a command it needs, which another go or window cuts: the part
   // is `waiting`, and it waits on no part of this plan, because the release it waits on is not one of them (s23).
   for (const { sheet } of scope) {
     for (const need of (Array.isArray(sheet.needsRelease) ? sheet.needsRelease : []) as { repo?: string; release?: string; command?: string }[]) {
-      const first = parts.find((one) => one.repo === need.repo && one.pass !== "RELEASE" && !keptIds.has(one.id));
+      const first = parts.find((one) => one.repo === need.repo && slotOf(one) !== "RELEASE" && !keptIds.has(one.id));
       if (first && need.release && !first.waitingOn) { first.state = "waiting"; first.waitingOn = `the release of ${need.release} that ships ${need.command ?? "a command it needs"}`; }
     }
   }
@@ -297,7 +309,7 @@ export function deriveGo(scope: readonly ScopeSheet[], options: DeriveOptions = 
     const old = (options.previous?.parts ?? []).find((was) => was.id === one.id);
     if (old?.state === "waiting" && !keptIds.has(one.id) && !one.waitingOn) { one.state = "waiting"; one.waitingOn = old.waitingOn; }
   }
-  const ending = parts.filter((one) => one.pass === "GENERATED" || one.pass === "FULL_RUN").map((one) => one.id);
+  const ending = parts.filter((one) => slotOf(one) === "GENERATED" || slotOf(one) === "FULL_RUN").map((one) => one.id);
   const releases: string[] = [];
   for (const { sheet } of scope) for (const repo of sheet.releaseChain ?? []) if (!releases.includes(repo)) releases.push(repo);
   for (const repo of releases) {

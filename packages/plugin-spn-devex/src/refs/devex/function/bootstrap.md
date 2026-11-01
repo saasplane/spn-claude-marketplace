@@ -15,7 +15,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
-      "seen": "64d537b3"
+      "seen": "8857c838"
     }
   ]
 }
@@ -62,6 +62,8 @@ install nothing for that.
 | 2 | Mint the workspace and name it — marketplace, plugin union, permission tiers, `~/.spnenv`, `.spndevex/` with its `state.json`; every repository inside wired. The name is lower-case letters, digits and hyphens, given once | Terminal | `spnutils workspace init <name>` | ✅ |
 | 3 | Open the folder in VS Code and Claude | Terminal · Claude in VS Code | `code .` | ✅ |
 | 4 | Read the orientation, and fill the GitHub token in the saasplane env | Terminal | `spnutils workspace status` | ✅ |
+
+The orientation ends with a telemetry line, printed only while the `debug` node's `telemetry` is `true`, and `status` writes nothing to the file. The plugin, not `spnutils`, writes the telemetry rows: `spn-devex debug hooks show` prints the time per check and per event, and `spn-devex debug cost show` prints the tokens spent per workstream, per arc and per part.
 
 **Part 2 · Your estate** (the infra repository)
 

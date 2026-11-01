@@ -287,13 +287,17 @@ export type Command = {
  * A `UsageFault` the command throws is printed after the command's usage line, and the exit code is
  * 2. Any other error is the command's own and is thrown on.
  *
- * The telemetry line holds the command's words as its levels: `group`, the subject as `subgroup`
- * (null for a command of two words), `action`, and `args`, which is what followed the action.
+ * The run writes one COMMAND row: its call names the plugin, the command's group, and its action with
+ * the subject written before it (`docs cycles write` is group `docs`, action `cycles write`), and its
+ * exit code. What was typed after the action is never written.
  */
 export async function runCommand(command: Command, args: string[]): Promise<number> {
   const startedAt = performance.now();
-  begin(commandFacts(command.plugin, args), process.env.SPN_WORKSPACE ?? process.cwd());
   const words = commandWords(command.group, command.subject, command.action);
+  // The row names the command, not the words typed: its group, and its action with the subject before it. Work tags still come from what was typed.
+  const facts = commandFacts(command.plugin, args);
+  facts.process = { group: command.group, action: [command.subject, command.action].filter(Boolean).join(" ") };
+  begin(facts, process.env.SPN_WORKSPACE ?? process.cwd());
   let code: number;
   try {
     code = await command.run(args);

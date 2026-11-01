@@ -130,13 +130,13 @@ console.log("\n=== check");
   ok("it ends on the count and exits 1", first.code === 1 && /\n2 findings · exit 1\n?$/.test(first.out), first.out);
   {
     const kinds = json(stateFile);
-    const was = kinds.rows[0].altitude;
-    const lone = (altitude) => { kinds.rows[0].altitude = altitude; writeFileSync(stateFile, JSON.stringify(kinds, null, 2)); return sheet("check", "N001").out; };
+    const was = kinds.rows[0].work;
+    const lone = (work) => { kinds.rows[0].work = work; writeFileSync(stateFile, JSON.stringify(kinds, null, 2)); return sheet("check", "N001").out; };
     ok("a CODE row that names no entry is found as that, not as a missing test", lone("CODE").includes("row 1 names no entry") && !lone("CODE").includes("row 1 is a CODE row"));
     ok("a GENERATED row that names no entry is found", lone("GENERATED").includes("row 1 names no entry"));
     ok("a RELEASE row names its files through no entry and is never this finding", !lone("RELEASE").includes("row 1 names no entry"));
     ok("a PROOF row is never this finding", !lone("PROOF").includes("row 1 names no entry"));
-    kinds.rows[0].altitude = was; writeFileSync(stateFile, JSON.stringify(kinds, null, 2));
+    kinds.rows[0].work = was; writeFileSync(stateFile, JSON.stringify(kinds, null, 2));
   }
 
   const rows = json(stateFile);
@@ -253,7 +253,7 @@ console.log("\n=== the go is refused while the sheet has a finding");
   const go = cli(root, ["workstream", "arc", "edit", "031-probe/N007", "--status", "DECIDED", "--note", "go"]);
   ok("[MKT.SCRIPTS.235] the go is refused with the findings and nothing written", written.code === 0 && go.code !== 0 && go.out.includes("E1") && json(stateOf("N007")).status === "PROPOSED", `${written.out}${go.out}`);
   const rows = json(stateOf("N007"));
-  rows.rows = [{ id: "1", parent: "N007", title: "build it", kind: "change", repo: "spn-x", altitude: "CODE", entries: ["E1"], state: "waiting" }];
+  rows.rows = [{ id: "1", parent: "N007", title: "build it", kind: "change", repo: "spn-x", work: "CODE", entries: ["E1"], state: "waiting" }];
   writeFileSync(stateOf("N007"), JSON.stringify(rows, null, 2));
   const clean = cli(root, ["workstream", "arc", "edit", "031-probe/N007", "--status", "DECIDED", "--note", "go"]);
   ok("[MKT.SCRIPTS.235] a sheet with no finding lets the go through", clean.code === 0 && json(stateOf("N007")).status === "DECIDED", clean.out);
@@ -290,13 +290,13 @@ console.log("\n=== carried suggestions, precedent, steps from the sheet");
   const data = sheetOf([entry("E1"), entry("E2", { file: "spn-x:docs/guide.md" })], { releaseChain: ["spn-x releases"] });
   const derived = sheet("write", "N009", "--file", put("n9.json", data));
   const rows = json(stateOf("N009")).rows;
-  const code = rows.find((one) => one.altitude === "CODE" && one.repo === "spn-x");
-  const docs = rows.find((one) => one.altitude === "DOCS" && one.repo === "spn-x");
+  const code = rows.find((one) => one.work === "CODE" && one.repo === "spn-x");
+  const docs = rows.find((one) => one.work === "DOCS" && one.repo === "spn-x");
   ok("[MKT.SCRIPTS.311] the sheet write derives a step for each repository and kind of change", derived.code === 0 && code?.entries?.join() === "E1" && docs?.entries?.join() === "E2", derived.out + JSON.stringify(rows));
-  ok("[MKT.SCRIPTS.311] it derives the release and proof steps from the release order", rows.some((one) => one.altitude === "RELEASE") && rows.some((one) => one.altitude === "PROOF"), JSON.stringify(rows));
+  ok("[MKT.SCRIPTS.311] it derives the release and proof steps from the release order", rows.some((one) => one.work === "RELEASE") && rows.some((one) => one.work === "PROOF"), JSON.stringify(rows));
   const again = sheet("write", "N009", "--file", put("n9.json", data));
   ok("[MKT.SCRIPTS.311] writing the same sheet again adds no step", again.code === 0 && json(stateOf("N009")).rows.length === rows.length, again.out);
-  const added = cli(root, ["workstream", "row", "add", "031-probe/N009", "by hand", "--repo", "spn-x", "--altitude", "CODE"]);
+  const added = cli(root, ["workstream", "row", "add", "031-probe/N009", "by hand", "--repo", "spn-x", "--work", "CODE"]);
   ok("[MKT.SCRIPTS.311] a step added by hand to an arc that keeps a sheet is refused", added.code !== 0 && added.out.includes("sheet") && json(stateOf("N009")).rows.length === rows.length, added.out);
 
   // a follow-up written after every step landed
@@ -305,7 +305,7 @@ console.log("\n=== carried suggestions, precedent, steps from the sheet");
   writeFileSync(stateOf("N009"), JSON.stringify(held, null, 2));
   const follow = sheet("write", "N009", "--file", put("n9.json", sheetOf([...data.entries, entry("E3")], { releaseChain: ["spn-x releases"] })));
   const after = json(stateOf("N009")).rows;
-  const of = (altitude) => after.filter((one) => one.altitude === altitude);
+  const of = (work) => after.filter((one) => one.work === work);
   ok("[MKT.SCRIPTS.324] a landed step keeps the entries it landed", follow.code === 0 && of("CODE")[0]?.entries?.join() === "E1" && of("CODE")[0]?.state === "landed", follow.out + JSON.stringify(after));
   ok("[MKT.SCRIPTS.324] an entry written after its step landed gets a step of its own", of("CODE").length === 2 && of("CODE")[1]?.entries?.join() === "E3" && of("CODE")[1]?.state !== "landed", JSON.stringify(after));
   ok("[MKT.SCRIPTS.324] the follow-up gets its own release and proof steps", of("RELEASE").filter((one) => one.state !== "landed").length === 1 && of("PROOF").filter((one) => one.state !== "landed").length === 1, JSON.stringify(after));

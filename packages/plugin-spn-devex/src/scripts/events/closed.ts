@@ -30,9 +30,8 @@
 //
 // IT ALSO CLOSES A TIMED BASH COMMAND. `hooks.json` runs this entry on `PostToolUse` and on
 // `PostToolUseFailure` for Bash, and both write the command's telemetry line (`lib/bash-timing.ts`).
-// A failed call writes that line and this run's own, `events` › `closed` under `PostToolUseFailure`,
-// which is what the hook after a failed call cost. A move that failed closed nothing, so nothing is
-// said.
+// A failed call runs no check, so it writes no hook row and no whole-run line. A move that failed
+// closed nothing, so nothing is said.
 
 import { basename, resolve } from "node:path";
 import { eventWorkspace, isDir, readPayload, runAlone, workspaceRoot, type Payload } from "../lib/payload.ts";
@@ -115,8 +114,7 @@ if (runAlone("closed.ts")) {
     try { message = span({ group: "closed", action: "closed" }, () => closingMessage(payload)); } catch { message = null; }
   }
   const responded = finishCommand(payload, failed);
-  // A failed call runs no check, so no span asks for the whole-run line: this run asks for it itself.
-  // Its `out` is the bytes the tool's response put into the context.
+  // A failed call runs no check, so it writes no hook row and no whole-run line.
   end(null, failed, { out: responded });
   if (message) console.log(JSON.stringify({ systemMessage: message }));
   process.exit(0);

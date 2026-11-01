@@ -7,7 +7,7 @@ description: The contract-first build loop - the order work is done in, what eac
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
-      "seen": "d6a6cbd5"
+      "seen": "67376a1f"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/04-develop.md",
@@ -66,7 +66,7 @@ description: The contract-first build loop - the order work is done in, what eac
 - **A file that carries a rule it does not own is a restatement, and the command that reads it is `restates`** (`RULE.DEVEX.WORKSPACE.118` · MUST · skill:spn-devex/develop)
 - **RULE.DEVEX.WORKSPACE.166** (`RULE.DEVEX.WORKSPACE.166` · MUST · skill:spn-devex/develop)
 - **The place is read from the repository itself** (`RULE.DEVEX.WORKSPACE.178` · MUST · skill:spn-devex/develop)
-- **RULE.DEVEX.WORKSPACE.185** (`RULE.DEVEX.WORKSPACE.185` · MUST · skill:spn-devex/develop)
+- **A telemetry row holds ids, times, counts and the names of things, never what was typed, and a field off its pattern is written as null** (`RULE.DEVEX.WORKSPACE.185` · MUST · skill:spn-devex/develop)
 - **The `workstreams` node holds only what the folder tree cannot show** (`RULE.DEVEX.WORKSPACE.190` · MUST · skill:spn-devex/develop)
 - **Every level that has a box is outlined and carries its name, and holds its own header. The navigation's chosen entry is the page's own.** (`RULE.DEVEX.WORKSPACE.268` · MUST · skill:spn-devex/develop)
 - **The default frame of a container is one dotted extent with an unframed header, and one thin rounded box round its content and its footer** (`RULE.DEVEX.WORKSPACE.269` · MUST · skill:spn-devex/develop)
@@ -118,6 +118,7 @@ description: The contract-first build loop - the order work is done in, what eac
 - **Every write of a `workstream` command commits what it wrote in `.spndevex`, and `report write` lands the row** (`RULE.DEVEX.WORKSPACE.475` · MUST · skill:spn-devex/develop)
 - **A refusal to land, to write a sheet or to write the plan names every fault it finds, and a run lands a row when its tree is the commit's tree** (`RULE.DEVEX.WORKSPACE.476` · MUST · skill:spn-devex/develop)
 - **The managing ratio is printed at each landing and at the close** (`RULE.DEVEX.WORKSPACE.477` · MUST · skill:spn-devex/develop)
+- **The plugins keep a copy of the contract's telemetry values beside the writer, in the contract's structure, and `toolchain-ts` holds it to the contract enum for enum** (`RULE.DEVEX.WORKSPACE.482` · MUST · skill:spn-devex/develop)
 
 **Read [`refs/devex/workspace/workstream.md`](../../refs/devex/workspace/workstream.md) before acting.** It holds the loop this skill runs inside: how a prompt is read, where a new ask goes, what a prompt does to a running arc, and how a reply closes.
 

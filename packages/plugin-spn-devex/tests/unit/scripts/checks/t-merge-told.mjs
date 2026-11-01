@@ -30,8 +30,8 @@ process.env.PATH = `${shim}:${process.env.PATH}`;
 const bash = (command, cwd, response = { stdout: "", stderr: "" }) =>
   ({ tool_name: "Bash", tool_input: { command }, tool_response: response, hook_event_name: "PostToolUse", cwd, session_id: "w1" });
 const running = [
-  { id: "1", parent: "N001", title: "write the book", kind: "change", repo: "spn-x", altitude: "DOCS", blockedBy: [], touches: [], state: "running" },
-  { id: "2", parent: "N001", title: "build it", kind: "change", repo: "spn-x", altitude: "CODE", blockedBy: ["1"], touches: [], state: "waiting" },
+  { id: "1", parent: "N001", title: "write the book", kind: "change", repo: "spn-x", work: "DOCS", blockedBy: [], touches: [], state: "running" },
+  { id: "2", parent: "N001", title: "build it", kind: "change", repo: "spn-x", work: "CODE", blockedBy: ["1"], touches: [], state: "waiting" },
 ];
 const commit = (git, message) => git(["-c", "user.email=t@t", "-c", "user.name=t", "commit", "-q", "--allow-empty", "-m", message]);
 // A merge commit needs an identity too, and a CI runner has none of its own.

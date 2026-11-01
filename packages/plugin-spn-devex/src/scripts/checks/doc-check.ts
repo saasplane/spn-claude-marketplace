@@ -2,7 +2,7 @@
 // RESTATES: the foundation book — 02-document.md rule 9 (RULE.DEVEX.WORKSPACE.162), rules 11-12 (RULE.DEVEX.WORKSPACE.096, the
 // one voice; RULE.DEVEX.WORKSPACE.106, its reach and its measure; RULE.DEVEX.WORKSPACE.107, the three moves that reach the
 // reader), 04-discipline.md § Voice discipline, 05-artifacts.md (the masthead, the approach document,
-// and How ends in Cycles), 01-workstream.md § A step row says where, at what altitude, and how
+// and How ends in Cycles), 01-workstream.md § A step row says where, what work, and how
 // (RULE.DEVEX.WORKSPACE.183), 05-artifacts.md § One stylesheet, served in versions (RULE.DEVEX.WORKSPACE.214)
 // and 06-registers.md § Writing a row. The chapters are the source of truth: a rule change is edited
 // there first, then here, in the same change. This script checks only what a script CAN check; the

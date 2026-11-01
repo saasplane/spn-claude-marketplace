@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
-      "seen": "64d537b3"
+      "seen": "8857c838"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
@@ -137,27 +137,16 @@ name       none yet — `spnutils workspace init <name>` names this workspace
 
 The telemetry line is printed only while the `debug` node's `telemetry` is `true`.
 
-**Each telemetry line names the work it was spent on — MUST.** While the `telemetry` switch is on
-(`spn-devex debug switch on telemetry`), every hook check and every plugin command appends one line to
-`.spndevex/.debug/telemetry/hooks.jsonl`, and so does each Bash command the agent runs through a program
-the filter names (by default `spnutils`, the plugin CLIs, `nx`, `git` and `docker`; a workspace file adds
-or removes programs). The line carries `script` (the program or plugin), `group`, `subgroup` and `action`
-(up to three levels, null where unused), `args` (what was typed after the action, with a secret-looking
-option's value written as `***`), `event`, `tool`, `ms`, `exit`, `at` in UTC ending in `Z`, `repo` and
-`pid`, then `verdict` and `out`. `verdict` says what a hook check did: `pass` when it said nothing,
-`note` when it added words to the context, `deny` when it refused the call or held the turn, and null for
-a command. `out` is the bytes a hook check or a tool call put into the context, null where it put none,
-because every later turn reads those bytes again. A Bash call that ran more than one program writes one
-line, named for the first program the filter picks, with `programs`, the count it ran. The line also
-carries `workstream`, `arc`, `order` and `row`, read from the paths the tool call touches (`row` from the
-order a call reads or writes, or else the row the window last moved to `running`), and `agent` when the
-hook's input carries one. **The tags carry forward**: per session and agent, the last tagged call's tags
-are kept in the window's folder, `.spndevex/.debug/sessions/<session-id>/tags.json`, a call that touches
-no workstream path inherits them, and a call that names other work replaces them. **The plugin, not
-`spnutils`, reads these lines**: `spn-devex debug hooks show` prints the time per check and per event,
-and `spn-devex debug cost show` prints the tokens spent per workstream, per arc and per order from the
-usage lines, which count each reply once, keyed by the message id. A window's cost is read from this
-telemetry and never from a transcript (`RULE.DEVEX.AGENT.082` · MUST · skill:spn-devex/develop).
+**Each telemetry row names the work it was spent on, and the workspace construct states its line.** The
+plugin, not `spnutils`, writes the rows: the recording switch, the row's shape, its tags and how they carry
+forward are `RULE.DEVEX.WORKSPACE.185`, in the workspace construct. `spn-devex debug hooks show` prints the
+time per check and per event, and `spn-devex debug cost show` prints the tokens spent per workstream, per
+arc and per part from the usage rows, which count each reply once, keyed by the message id. A window's cost
+is read from this telemetry and never from a transcript (`RULE.DEVEX.AGENT.082` · MUST · skill:spn-devex/develop).
+
+**Workspace plumbing is the agent's own to resolve, and never a card** (`RULE.DEVEX.WORKSPACE.481` · MUST ·
+skill:spn-devex/ideate). A stale checkout, tool output left uncommitted and a stash the agent names are the
+agent's to fix, and it says in one line what it did. A helper never stashes: the window that coordinates does.
 
 **The permission tiers the floor writes follow a rule of the delivery chapter.** A tier is declared on a
 command or on a group of commands, and a plugin declares the tiers of its own command groups. The same

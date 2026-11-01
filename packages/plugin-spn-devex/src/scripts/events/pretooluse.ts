@@ -26,8 +26,7 @@
 //
 // A check now RETURNS a `Verdict`. There is no round trip for a verdict to be lost in.
 
-import { createHash } from "node:crypto";
-import { readFileSync, readdirSync, statSync } from "node:fs";
+import { readFileSync, statSync } from "node:fs";
 import { basename, resolve } from "node:path";
 import { emit, eventWorkspace, readPayload, type Payload, type Verdict } from "../lib/payload.ts";
 import { arcIdsOf, logEvent, readArc, readSheet, writeWhole } from "../lib/workstream.ts";
@@ -48,9 +47,8 @@ import { applies as longRunApplies, checkLongRun } from "../checks/long-run.ts";
 import { applies as commandShapeApplies, checkCommandShape } from "../checks/command-shape.ts";
 import { applies as ownerApplies, checkOwner } from "../checks/workstream-owner.ts";
 import { applies as questionsApply, checkQuestions } from "../checks/questions.ts";
-import { begin, end, span, tagsOf, callOf, utcNow, type SpanName } from "../../../../plugin-support-lib/src/lib/timing.ts";
-import { recordSendBack } from "../../../../plugin-support-lib/src/lib/debug-store.ts";
-import { workstreamsDir } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
+import { begin, carry, end, record, span, tagsOf, callOf, type SpanName } from "../../../../plugin-support-lib/src/lib/timing.ts";
+import { skillValue } from "../../../../plugin-support-lib/src/lib/telemetry-values.ts";
 import { startCommand } from "../lib/bash-timing.ts";
 import { checkChildSize } from "../checks/child-size.ts";
 import { checkReadSize } from "../checks/read-size.ts";
@@ -443,7 +441,7 @@ export function checkOrderEntries(payload: Payload): Verdict {
       if (missing.length)
         return { deny: `order ${file} carries row ${rowId}, and row ${rowId} names ${missing.join(", ")}, which arcs/${arc}/sheet.json does not hold.\n`
           + `Add ${missing.join(", ")} with \`workstream sheet write\`, or take ${missing.length === 1 ? "it" : "them"} off the row, then launch again.` };
-      if (row.altitude === "CODE" && !(row.entries ?? []).length)
+      if (row.work === "CODE" && !(row.entries ?? []).length)
         return { deny: `order ${file} carries row ${rowId}, a CODE row of an arc that keeps a sheet, and row ${rowId} names no entry.\n`
           + `Name them with \`workstream row edit ${arc} ${rowId} --entries E1,E2\`, then launch again.` };
     } catch { /* an order that cannot be read is not judged */ }
@@ -538,19 +536,22 @@ export function checkOrderPicture(payload: Payload): Verdict {
   return null;
 }
 
-/** The check whose refusal the last `dispatch` returned, for the send-back line the hook writes. */
-let refusal = "";
-function refusedBy(check: string, verdict: Verdict): Verdict {
-  if (verdict?.deny) refusal = check;
+/**
+ * The verdict a refusal gives. A refusal is a send-back, and a send-back is the check's `DENY` row: a check run through
+ * `span` has written its own, and `unspanned` names one that was not, so it gets a row of its own.
+ */
+function refusedBy(check: string, verdict: Verdict, unspanned = false): Verdict {
+  if (unspanned && verdict?.deny) record({ group: check, action: check }, 0, null, "deny", Buffer.byteLength(verdict.deny));
   return verdict;
 }
 
-/** The open workstream a refusal's words name, or "" where they name none. */
-function workstreamNamedIn(root: string, message: string): string {
-  try { return readdirSync(workstreamsDir(root, "open")).sort().find((name) => message.includes(name)) ?? ""; } catch { return ""; }
-}
-
 export function dispatch(payload: Payload): Verdict {
+  // A SKILL CALL RUNS NO CHECK, so it writes no CHECK row (a CHECK row is one hook check's run): it only carries the skill onto the
+  // window's later rows, and its arguments are written nowhere.
+  if (payload.tool_name === "Skill") {
+    carry();
+    return null;
+  }
   // A LAUNCH OF A HELPER AGENT has no path or command, so nothing below has anything to read in it.
   if (payload.tool_name === "Agent" || payload.tool_name === "Task") {
     let refused: Verdict = null;
@@ -581,13 +582,13 @@ export function dispatch(payload: Payload): Verdict {
   // workspace walk to decide.
   for (const path of writtenPaths(payload)) {
     const reason = generatedRefusal(path);
-    if (reason) return refusedBy("generated-file", { deny: reason });
+    if (reason) return refusedBy("generated-file", { deny: reason }, true);
   }
   // The block `spnutils` writes is refused beside it: the same kind of text, inside a file that also
   // holds a person's own.
   let blocked: string | null = null;
   try { blocked = agentBlockRefusal(payload); } catch { blocked = null; }
-  if (blocked) return refusedBy("agent-block", { deny: blocked });
+  if (blocked) return refusedBy("agent-block", { deny: blocked }, true);
 
   // THE WINDOW'S BINDING IS WRITTEN HERE, from the paths this call writes (RULE.DEVEX.WORKSPACE.236), and
   // before the checks read it: the first write into a workstream makes it this window's. A child's call
@@ -622,8 +623,10 @@ const root = eventWorkspace(payload.cwd ?? process.cwd());
 // MEASURING IS FREE; WRITING IS THE COST. `begin` touches no filesystem, so the loop above always
 // times and always reports. What the window decides is whether any of it is ever written down —
 // which is the only part anybody pays for.
+// A Skill call writes the skill's value of SPDevExAgentSkillType alone, or null for a skill the copy does not know.
+const skill = payload.tool_name === "Skill" ? skillValue((payload.tool_input as { skill?: unknown } | undefined)?.skill) : null;
 begin({ script: "spn-devex", event: "PreToolUse", tool: payload.tool_name ?? null, session: payload.session_id ?? null,
-        ...tagsOf(payload), ...callOf(payload),
+        ...tagsOf(payload), ...(skill ? { skill } : {}), ...callOf(payload),
         process: { group: "events", action: "pretooluse" } },
       root ?? payload.cwd ?? process.cwd());
 let verdict: Verdict = null;
@@ -631,12 +634,6 @@ try { verdict = dispatch(payload); } catch { verdict = null; }   // never take t
 // A BASH COMMAND THIS HOOK LETS THROUGH IS TIMED: the start file its `PostToolUse` pairs with. A
 // refused call never runs, so it gets none.
 if (!verdict?.deny) startCommand(payload);
-else if (root) {
-  try {
-    recordSendBack(root, { at: utcNow(), session: payload.session_id ?? "", agent: payload.agent_id ?? "main", event: "PreToolUse",
-      check: refusal || "pretooluse", workstream: workstreamNamedIn(root, verdict.deny), finding: createHash("sha1").update(verdict.deny).digest("hex").slice(0, 12) });
-  } catch { /* telemetry never fails the hook */ }
-}
 end();
 const launched = payload.tool_name === "Agent" || payload.tool_name === "Task";
 const taken = !verdict?.deny && launched && !(payload.tool_input as { model?: string } | undefined)?.model ? orderModel(payload) : null;

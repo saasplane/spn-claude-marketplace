@@ -1357,23 +1357,23 @@ const SHOWN: Record<string, string> = { FAILED: "FAILURE", PENDING: "PENDING", S
 
 /**
  * Whether a row may land on a run (RULE.DEVEX.WORKSPACE.326–.331): null where it may, else the words of the refusal.
- * A row that is neither CODE nor PROOF gets null; a CODE or PROOF row is judged by its altitude alone, with a sheet or without one.
+ * A row that is neither CODE nor PROOF gets null; a CODE or PROOF row is judged by its work alone, with a sheet or without one.
  */
 export function landingFault(ws: string, arc: string, data: ArcData, row: ArcRow, run: string | null): string | null {
   const sheet = readSheet(ws, arc);
-  if (row.altitude !== "CODE" && row.altitude !== "PROOF") return null;
+  if (row.work !== "CODE" && row.work !== "PROOF") return null;
   const entries = sheet && Array.isArray(sheet.entries) ? sheet.entries : [];
   if (!run)
-    return `row ${row.id} is a ${row.altitude} row of an arc that keeps a sheet; it lands on a run of its entries' tests.\n`
+    return `row ${row.id} is a ${row.work} row of an arc that keeps a sheet; it lands on a run of its entries' tests.\n`
       + `Name the run: \`workstream row state ${arc} ${row.id} landed --run <name>\`.`;
   const repo = row.repo ?? "";
   const mine = entries.filter((one) => (row.entries ?? []).includes(one.id));
   // Every fault the gate can judge is gathered and named in one refusal; only a run it cannot find ends the judging early.
   const faults: string[] = [];
-  if (row.altitude === "CODE" && !mine.some((one) => Object.values(one.tiers ?? {}).some((ids) => ids.length)))
+  if (row.work === "CODE" && !mine.some((one) => Object.values(one.tiers ?? {}).some((ids) => ids.length)))
     faults.push(`row ${row.id} is a CODE row and its entries name no test; \`workstream sheet check ${arc}\` lists what is missing`);
   // An arc that changes no repository has no runner and no commits: its proof lands on the run its check records in the work folder.
-  if (row.altitude === "PROOF" && (!repo || repo === "none")) {
+  if (row.work === "PROOF" && (!repo || repo === "none")) {
     const work = join(notesDirOf(ws, arc), "work");
     return namedRun(work, run).runs.length ? null : `${run} is not in ${work}; the arc's check records it there with --run.`;
   }
@@ -1386,8 +1386,8 @@ export function landingFault(ws: string, arc: string, data: ArcData, row: ArcRow
 
   // A proof step makes no commits of its own: it is judged against every commit its arc recorded in the repository.
   const own = row.commits?.[repo] ?? [];
-  const shas = own.length || row.altitude !== "PROOF" ? own : data.rows.flatMap((one) => one.commits?.[repo] ?? []);
-  if (!shas.length && row.altitude === "CODE") faults.push(`row ${row.id} has no commit in ${repo || "its repository"}; \`workstream report write\` records them`);
+  const shas = own.length || row.work !== "PROOF" ? own : data.rows.flatMap((one) => one.commits?.[repo] ?? []);
+  if (!shas.length && row.work === "CODE") faults.push(`row ${row.id} has no commit in ${repo || "its repository"}; \`workstream report write\` records them`);
   const last = lastCommitOf(places, shas);
   const ranAt = runs.map((one) => one.ranAt).filter(Boolean).sort()[0] ?? null;
   // A run of the commit's own tree lands whatever its clock says; a run with no stamp or another tree is judged by the clock.
@@ -1406,7 +1406,7 @@ export function landingFault(ws: string, arc: string, data: ArcData, row: ArcRow
       } else if (worst(seen) !== "SUCCESS") faults.push(`${tier} ${id} reads ${SHOWN[worst(seen)]} in ${run}`);
     }
   };
-  if (row.altitude === "CODE") {
+  if (row.work === "CODE") {
     for (const one of mine) for (const [tier, ids] of Object.entries(one.tiers ?? {})) judge(tier, ids);
   } else {
     const owed = new Map<string, Set<string>>();

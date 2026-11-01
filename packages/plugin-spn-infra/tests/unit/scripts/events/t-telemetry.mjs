@@ -1,5 +1,4 @@
-// The spn-infra PreToolUse hook's telemetry lines: the one shape every plugin writes, under
-// `script: "spn-infra"`, with the work tags of the call (RULE.DEVEX.WORKSPACE.185, N8 row 2p).
+// The spn-infra PreToolUse hook's telemetry lines: the one shape every plugin writes, as v 1 CHECK rows, with the part tag of the call (RULE.DEVEX.WORKSPACE.185, N8 row 2p).
 //
 // A temporary workspace with `.spndevex/.debug/switches.json` is pointed at the recorder, in a child
 // with `SPN_TELEMETRY` removed; nothing is written into a real workspace.
@@ -10,8 +9,8 @@ import { join, resolve } from "node:path";
 import { PLUGIN } from "../../../helpers/harness.mjs";
 
 const EVENT = resolve(PLUGIN, "src", "scripts", "events", "pretooluse.ts");
-const KEYS = ["script", "group", "subgroup", "action", "args", "event", "tool", "ms", "exit", "at",
-  "repo", "pid", "verdict", "out", "session", "agent", "workstream", "arc", "order", "row"];
+const KEYS = ["v", "mtype", "id", "at", "ms", "event", "session", "agent", "workstream", "arc", "part", "skill", "work", "retryOf",
+  "check", "verdict", "out"];
 
 let total = 0, failed = 0;
 const same = (label, got, expected) => {
@@ -44,15 +43,13 @@ console.log("=== spn-infra — every line carries its plugin and the call's work
   };
   execFileSync("node", [EVENT], { input: JSON.stringify(payload), env, encoding: "utf8", cwd: payload.cwd });
   const lines = readFileSync(join(root, ".spndevex", ".debug", "telemetry", "hooks.jsonl"), "utf8").trim().split("\n").map((l) => JSON.parse(l));
-  same("every line has the twenty keys, in the book's order", lines.every((l) => JSON.stringify(Object.keys(l)) === JSON.stringify(KEYS)), true);
-  same("every line's script is the plugin", [...new Set(lines.map((l) => l.script))], ["spn-infra"]);
-  same("every line carries the work tags", lines.every((l) => l.workstream === "008-plain-language" && l.arc === "N8"
-    && l.order === "2p-plugin" && l.agent === "lane-2p" && l.session === "sess-infra"), true);
-  same("a provider's subject is its name and its cloud, structured", lines.some((l) => l.group === "rendering" && l.action === "aws"), true);
-  same("a cloud-free subject names itself twice", lines.some((l) => l.group === "test-tree-shape" && l.action === "test-tree-shape"), true);
-  same("the whole run is events › pretooluse", lines.at(-1) && [lines.at(-1).group, lines.at(-1).action], ["events", "pretooluse"]);
-  same("a hook check's exit is null, at ends in Z, and repo is the member",
-    lines.every((l) => l.exit === null && /Z$/.test(l.at) && l.repo === "spn-estate"), true);
+  same("every line is a v 1 CHECK row with the book's keys, in order", lines.every((l) => JSON.stringify(Object.keys(l)) === JSON.stringify(KEYS) && l.v === 1 && l.mtype === "CHECK" && l.event === "PreToolUse"), true);
+  same("every line has a check name and a PASS verdict", lines.every((l) => typeof l.check === "string" && l.check && l.verdict === "PASS"), true);
+  same("every line carries the work tags", lines.every((l) => l.workstream === "008-plain-language" && l.part === "2p-plugin" && l.agent === "lane-2p" && l.session === "sess-infra"), true);
+  same("a provider's subject is its name and its cloud, structured", lines.some((l) => l.check === "aws"), true);
+  same("a cloud-free subject names itself twice", lines.some((l) => l.check === "test-tree-shape"), true);
+  same("no whole-run row is written: every row is one check's", lines.some((l) => l.check === "pretooluse" || l.check === "events"), false);
+  same("a hook check's at ends in Z and its ms is a number", lines.every((l) => /Z$/.test(l.at) && typeof l.ms === "number"), true);
 }
 
 console.log(failed ? `\n  ${failed} of ${total} FAILED — telemetry` : `\n  all ${total} passed — telemetry`);

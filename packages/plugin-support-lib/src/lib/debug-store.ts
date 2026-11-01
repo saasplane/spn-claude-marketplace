@@ -1,7 +1,7 @@
 // This file OWNS the layout of `.spndevex/.debug/` and is the one place the folder is named. It restates the
 // book's `.debug/` table (spn-foundation `04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md`).
 //
-// `telemetry/` holds the two logs, `workspace/` what belongs to the workspace and `sessions/<id>/` everything
+// `telemetry/` holds the two logs (`usage.jsonl`, `hooks.jsonl`; a send-back is a DENY row of `hooks.jsonl`, not a log), `workspace/` what belongs to the workspace and `sessions/<id>/` everything
 // one window keeps. The session start sweeps a window nobody has written to for `SESSION_KEEP_MS`; no other
 // store prunes. The switches are not here: they are the `debug` node of `.spndevex/state.json`
 // (`workspace-state.ts`), and `switches.json` is read only where that node is not there yet.
@@ -9,7 +9,7 @@
 // A TOOL MUST NEVER FAIL BECAUSE THE DEBUG STORE FAILED: the reads answer "off" or "nothing", and the callers
 // of the writes swallow their own errors.
 
-import { appendFileSync, existsSync, mkdirSync, readFileSync, readdirSync, renameSync, rmSync, statSync, writeFileSync } from "node:fs";
+import { appendFileSync, closeSync, existsSync, mkdirSync, openSync, readFileSync, readSync, readdirSync, renameSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { type WorkspaceDebugState, hasStateFile, readDebugNode, writeDebugNode } from "./workspace-state.ts";
 
@@ -73,30 +73,32 @@ export const LOG_CAP = 20 * 1024 * 1024;
 
 const rotatedOf = (file: string): string => file.replace(/\.jsonl$/, "") + ".1.jsonl";
 
-/** Append one line. Past `cap` bytes the file moves to `<stem>.1.jsonl`, replacing the previous one, and the line starts a fresh file. */
+/** Whether a log's first line is a row without `v`, the mark of the rows before version one. A missing, empty or unreadable file is not. */
+function holdsOldRows(file: string): boolean {
+  try {
+    if (!existsSync(file)) return false;
+    const fd = openSync(file, "r");
+    try {
+      const buffer = Buffer.alloc(65536);
+      const read = readSync(fd, buffer, 0, buffer.length, 0);
+      const first = buffer.toString("utf8", 0, read).split("\n")[0].trim();
+      if (!first) return false;
+      const row: unknown = JSON.parse(first);
+      return !!row && typeof row === "object" && !Array.isArray(row) && !("v" in row);
+    } finally { closeSync(fd); }
+  } catch { return false; }
+}
+
+/**
+ * Append one line. Before it, a log whose first line has no `v` moves to `<stem>.1.jsonl` as a rotated one does, so
+ * the rows before version one are never read beside the new; past `cap` bytes the file moves there too, replacing
+ * the previous one, and the line starts a fresh file.
+ */
 export function appendLog(file: string, line: string, cap: number = LOG_CAP): void {
   mkdirSync(dirname(file), { recursive: true });
+  try { if (holdsOldRows(file)) renameSync(file, rotatedOf(file)); } catch { /* append anyway */ }
   try { if (existsSync(file) && statSync(file).size > cap) renameSync(file, rotatedOf(file)); } catch { /* append anyway */ }
   appendFileSync(file, line.endsWith("\n") ? line : `${line}\n`);
-}
-
-/** One send-back: a check's words that reached the turn. `finding` is the first 12 hex of the words' sha1, so the words themselves are never stored. */
-export interface SendBack {
-  at: string;
-  session: string;
-  agent: string;
-  event: "Stop" | "PreToolUse";
-  check: string;
-  workstream: string;
-  finding: string;
-}
-
-/** Record one send-back in `telemetry/sendbacks.jsonl`. A no-op while telemetry is off, and never a failure. */
-export function recordSendBack(root: string, line: SendBack): void {
-  try {
-    if (!readSwitch(root, "telemetry")) return;
-    appendLog(join(telemetryFolder(root), "sendbacks.jsonl"), JSON.stringify(line));
-  } catch { /* telemetry never fails the hook */ }
 }
 
 /** The files a reader reads, oldest first: the rotated one if it exists, then the live one if it exists. */

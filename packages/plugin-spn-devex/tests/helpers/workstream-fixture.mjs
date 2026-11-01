@@ -53,8 +53,8 @@ export function arcData(rows) {
     schemaVersion: 2, arc: "N001", subject: "probe", title: "the probe arc", goal: "the probe is answered", status: "DECIDED", reason: null,
     decides: "what it decides", repos: ["spn-x"], cycle: "a plugin release", follows: null, model: "Opus 5.5", preview: "preview.html",
     rows: rows ?? [
-      { id: "1", parent: "N001", title: "write the book", kind: "change", repo: "spn-x", altitude: "DOCS", blockedBy: [], touches: ["foundation:a"], state: "waiting" },
-      { id: "2", parent: "N001", title: "build it", kind: "change", repo: "spn-x", altitude: "CODE", blockedBy: ["1"], touches: ["marketplace:b"], state: "waiting" },
+      { id: "1", parent: "N001", title: "write the book", kind: "change", repo: "spn-x", work: "DOCS", blockedBy: [], touches: ["foundation:a"], state: "waiting" },
+      { id: "2", parent: "N001", title: "build it", kind: "change", repo: "spn-x", work: "CODE", blockedBy: ["1"], touches: ["marketplace:b"], state: "waiting" },
     ],
   };
 }

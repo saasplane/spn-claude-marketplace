@@ -1,4 +1,4 @@
-<!-- RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § The arc · § A step row says where, at what altitude, and how · § An arc's status is one of six, stored or worked out · § An arc carries its specification, or names the note that holds it · § The workstream is kept as data, and every file has one owner · § The folder · § The formats · § The commands · § The life of an arc, and every file it touches · § The approach page keeps up with its arcs
+<!-- RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § The arc · § A step row says where, what work, and how · § An arc's status is one of six, stored or worked out · § An arc carries its specification, or names the note that holds it · § The workstream is kept as data, and every file has one owner · § The folder · § The formats · § The commands · § The life of an arc, and every file it touches · § The approach page keeps up with its arcs
      and docs/04-capabilities/02-support/02-apps/06-tests/README.md § When a whole tier runs
      This file carries rules it does not own. The chapters above are the source of truth.
      A rule change is edited there first, then here, in the same change. Never add a rule here.
@@ -26,8 +26,8 @@ spn-devex workstream arc edit N{{nnn}} --decides "{{what this arc decides, in on
 # each fact read while ideating, the source's commit pinned
 spn-devex workstream fact write N{{nnn}} --source {{repository/path:line}} --fact "{{what the source says, in one line}}" --used-by {{q<n> or row}}
 
-# a row: its kind, where, at what altitude, how, and its acceptance; the rows are the steps, so none writes a plan
-spn-devex workstream row add N{{nnn}} "{{the step's What: the files, or plan § k}}" --kind {{fix · change · question}} --repo {{repo or —}} --altitude {{DOCS · CODE · GENERATED · RELEASE · PROOF}} --mechanism "{{by hand · script · command · agents}}" --acceptance "{{`command` → before → after}}" --model {{the row's model}} --blocked-by {{row or q<n>, or none}} --touches {{repository:place}} --decisions {{q<n>}} --facts {{f<n>}}
+# a row: its kind, where, what work, how, and its acceptance; the rows are the steps, so none writes a plan
+spn-devex workstream row add N{{nnn}} "{{the step's What: the files, or plan § k}}" --kind {{fix · change · question}} --repo {{repo or —}} --work {{DOCS · CODE · GENERATED · RELEASE · PROOF}} --mechanism "{{by hand · script · command · agents}}" --acceptance "{{`command` → before → after}}" --model {{the row's model}} --blocked-by {{row or q<n>, or none}} --touches {{repository:place}} --decisions {{q<n>}} --facts {{f<n>}}
 
 # a row's state, its note, and its fields: one command each, the row after the arc
 spn-devex workstream row state N{{nnn}} {{row}} {{ready · running · landed · stopped · deferred}} --note "{{what landed, or why it stopped}}"
@@ -66,17 +66,17 @@ spn-devex workstream arc stamp write N{{nnn}}
   "preview": "preview.html",
   "rows": [
     { "id": "{{1}}", "parent": "N{{nnn}}", "title": "{{the step's What: the files, or plan § k}}",
-      "kind": "{{change}}", "repo": "{{repo}}", "altitude": "{{DOCS}}", "mechanism": "{{agents}}",
+      "kind": "{{change}}", "repo": "{{repo}}", "work": "{{DOCS}}", "mechanism": "{{agents}}",
       "acceptance": "{{`command` → before → after}}", "model": "{{sonnet}}",
       "blockedBy": [], "touches": ["{{repository:place}}"], "decisions": ["{{q<n>}}"], "facts": ["{{f<n>}}"],
       "state": "waiting", "order": "orders/{{1}}.md" },
     { "id": "{{n}}", "parent": "N{{nnn}}", "title": "the final re-check, on clean trees, after the last write, cache off: run again what the rows above touched; the whole tiers of each touched node, the browser walks and the look, once for the arc; and the consumer install",
-      "kind": "change", "repo": "—", "altitude": "PROOF", "mechanism": "command",
+      "kind": "change", "repo": "—", "work": "PROOF", "mechanism": "command",
       "acceptance": "each gate → exit 0, and each named id → SUCCESS in that run's file", "state": "waiting" } ] }
 ```
 
 <!-- A row's state is waiting · ready · running · stopped · landed · carried · deferred, and `report write` folds a
-     child's hand-back into it: the outcome, the proof, the commits, the cost and the follow-ups. A row with rows under it
+     child's hand-back into it: the outcome, the proof, the commits and the follow-ups. A row with rows under it
      takes its state from them. The PROOF row is the arc's one final re-check, and it is never deleted. A row added asks
      for no page edit and no new stamp. -->
 
