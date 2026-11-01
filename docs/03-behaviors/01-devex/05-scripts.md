@@ -236,6 +236,7 @@ Every row below is declared and none is claimed: a run writes the last two cells
 | MKT.SCRIPTS.409 | Engineering leader | have a handover list only the orders really running | The handover's `live now` lists only an order whose part is `running` in a go plan and has no report, and its `read first` and `pins` come from the arc that is running, or the lead of the newest go | POSITIVE | UNIT | PLANNED | — |
 | MKT.SCRIPTS.410 | Engineering leader | have a handover name the suggestions still open | The handover's `open` lists a suggestion still raised or shaped as S<n> beside the open cards, and leaves a decided one out | POSITIVE | UNIT | PLANNED | — |
 | MKT.SCRIPTS.411 | Engineering leader | have a second release when work is planned after the release landed | `go write` adds `release-<repo>-2`, and so on, when a docs or code entry of a repository is planned after that repository's release part landed, and adds none while a release of it is running | POSITIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.412 | Engineering leader | have a full run follow code that landed after the last one | A code part that lands after its repository's full run landed opens the next full run, `full-<repo>-2` and so on, even when the part was kept from a previous plan; the order the parts landed in is read from the lead arc's log | POSITIVE | UNIT | PLANNED | — |
 
 ## Retired ids
 

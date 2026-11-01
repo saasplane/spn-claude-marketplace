@@ -187,5 +187,16 @@ const afterTwo = deriveGo([{ arc: "N009", sheet: sheet([...scope[0].sheet.entrie
 same("[MKT.SCRIPTS.411] and a third after the second landed", afterTwo.parts.filter((p) => p.id.startsWith("release-lib-repo")).map((p) => p.id), ["release-lib-repo-1", "release-lib-repo-2", "release-lib-repo-3"]);
 same("[MKT.SCRIPTS.411] the second release waits on the new docs' pass like the first, and the plan passes the schema", [afterRelease.parts.find((p) => p.id === "release-lib-repo-2").waitsOn.length > 0, goFaults(afterRelease)], [true, []]);
 
+// A code part kept from before, landed after the repository's full run, opens the next full run.
+const partsOf = (landed) => plan.parts.map((p) => ({ ...p, state: landed.includes(p.id) ? "landed" : "held" }));
+const kept2 = { ...plan, parts: partsOf(["docs-lib-repo-1", "baseline-lib-repo", "code-lib-repo-1", "full-lib-repo"]) };
+const noNewEntry = [{ arc: "N009", sheet: sheet([scope[0].sheet.entries[1], scope[0].sheet.entries[2]]), landed: ["E2", "E3"] }];
+same("[MKT.SCRIPTS.412] a code part that landed after the full run opens the next full run, though it was kept from a previous plan",
+  deriveGo(noNewEntry, { previous: kept2, landedOrder: ["docs-lib-repo-1", "baseline-lib-repo", "full-lib-repo", "code-lib-repo-1"] }).parts.some((p) => p.id === "full-lib-repo-2"), true);
+same("[MKT.SCRIPTS.412] one that landed before the full run opens none",
+  deriveGo(noNewEntry, { previous: kept2, landedOrder: ["docs-lib-repo-1", "baseline-lib-repo", "code-lib-repo-1", "full-lib-repo"] }).parts.some((p) => p.id === "full-lib-repo-2"), false);
+same("[MKT.SCRIPTS.412] and with no landing order read, none is opened",
+  deriveGo(noNewEntry, { previous: kept2 }).parts.some((p) => p.id === "full-lib-repo-2"), false);
+
 console.log(`\n${total - failed}/${total} passed`);
 process.exit(failed ? 1 : 0);

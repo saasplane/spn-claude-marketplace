@@ -18,7 +18,7 @@ import { existsSync } from "node:fs";
 import { basename, dirname, join, resolve } from "node:path";
 import { type Action, FLAG, VALUE, UsageFault, readWords } from "../../../../../plugin-support-lib/src/lib/command.ts";
 import {
-  clearWaiting, deriveGo, fullRunMinutes, goFileOf, landedEntries, landedMeasures, markWaiting, planScope, readGo, readyParts, ratesOf, staleEntries, unheldEntries,
+  clearWaiting, deriveGo, fullRunMinutes, goFileOf, landedEntries, landedOrder, landedMeasures, markWaiting, planScope, readGo, readyParts, ratesOf, staleEntries, unheldEntries,
   type ScopeSheet,
 } from "../../lib/go-plan.ts";
 import { logEvent, logFileOf, notesDirOf, readArc, readJson, readJsonl, readSheet, workspaceOf, writeWhole } from "../../lib/workstream.ts";
@@ -168,7 +168,7 @@ function write(args: string[]): number {
   const previous = readGo(ws, lead);
   const measures = landedMeasures(root, basename(ws), arcs);
   const plan = deriveGo(sheets, {
-    rates: ratesOf(measures), measures, previous, fullRunMinutes: fullRunMinutes(root),
+    rates: ratesOf(measures), measures, previous, fullRunMinutes: fullRunMinutes(root), landedOrder: landedOrder(ws, lead),
     dirsOf: (repo) => [join(root, ".worktrees", basename(ws), repo), join(root, repo)],
   });
   save(ws, lead, plan);

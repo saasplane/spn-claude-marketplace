@@ -183,7 +183,19 @@ export type DeriveOptions = {
   fullRunMinutes?: number | null;
   /** When the plan is written. */
   writtenAt?: string;
+  /** The ids of the parts that landed, in the order they landed (`landedOrder`): tells a code part kept from before from one that landed after a full run. */
+  landedOrder?: readonly string[];
 };
+
+/** The ids of the parts that landed, oldest first, read from the `<part> landed` go lines of the lead arc's log. */
+export function landedOrder(ws: string, lead: string): string[] {
+  const rows: Array<{ at: number; id: string }> = [];
+  for (const line of logLinesOf(ws, lead) as Array<{ kind?: unknown; note?: unknown; at?: unknown }>) {
+    const found = line && line.kind === "go" && typeof line.note === "string" ? /^(\S+) landed$/.exec(line.note) : null;
+    if (found) rows.push({ at: Date.parse(String(line.at)) || 0, id: found[1] });
+  }
+  return rows.sort((a, b) => a.at - b.at).map((one) => one.id);
+}
 
 /** Entries to a part: the 45 minutes over the rate for a repository and kind of change, or 8 where it is unmeasured. */
 export function boundOf(rates: Record<string, number>, repo: string, work: string): number {
@@ -279,7 +291,13 @@ export function deriveGo(scope: readonly ScopeSheet[], options: DeriveOptions = 
           const fulls = kept.filter((one) => one.repo === repo && slotOf(one) === "FULL_RUN");
           const landedN = Math.max(0, ...fulls.filter((one) => one.state === "landed").map((one) => numberOf(one) || 1));
           if (fulls.some((one) => one.state === "running")) runs = false;
-          else if (landedN > 0) { if (groups.has(`${repo}|CODE`)) id = `${id}-${landedN + 1}`; else runs = false; }
+          else if (landedN > 0) {
+            // A CODE PART THAT LANDS AFTER THE FULL RUN OPENS THE NEXT ONE, fresh or kept from a previous plan (s34).
+            const order = options.landedOrder ?? [];
+            const lastFull = order.lastIndexOf(fulls.filter((one) => one.state === "landed").sort((a, b) => numberOf(b) - numberOf(a))[0]?.id ?? "");
+            const lateCode = lastFull >= 0 && kept.some((one) => one.repo === repo && slotOf(one) === "CODE" && one.state === "landed" && order.lastIndexOf(one.id) > lastFull);
+            if (groups.has(`${repo}|CODE`) || lateCode) id = `${id}-${landedN + 1}`; else runs = false;
+          }
         }
         if (runs && !keptIds.has(id)) fresh.push(part(id, repo, pass, [], [], {
           minutes: full, measuredFrom: full === null ? null : "last 3 full runs",
