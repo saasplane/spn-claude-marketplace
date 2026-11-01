@@ -110,7 +110,8 @@ ${STYLES.stylesheet}
 <section id="s3"><div class="sds-section-head"><h2>How &mdash; the order</h2></div>
   <h3 id="h1">spn-foundation &mdash; the chapter</h3>
   <p>You read the chapter first, and the code follows it.</p>
-  <h3 id="h9">Cycles &mdash; the arcs, in the order they run</h3>
+</section>
+<section id="arcs" data-block="sequence"><div class="sds-section-head"><h2>Plan &mdash; the arcs, in the order they run</h2></div>
   <div class="sds-scroll"><table><thead><tr><th>Arc</th><th>What it does</th><th>Status</th><th>Previews</th></tr></thead>
   <tbody><tr><td><strong>N1 &mdash; the chapter</strong><br><a class="sds-small" href="arcs/N1-the-chapter.md">arcs/N1-the-chapter.md</a></td><td>the chapter, in one sentence.</td><td>RUNNING</td><td>&mdash;</td></tr>
   <tr><td><strong>N2 &mdash; the check</strong><br><a class="sds-small" href="arcs/N2-the-check.md">arcs/N2-the-check.md</a></td><td>the check, in one sentence.</td><td>DECIDED</td><td>&mdash;</td></tr></tbody></table></div>
@@ -424,21 +425,23 @@ one("a Subtitle under the Description is out of place",
   }
 }
 
-console.log("\n=== doc-check — the approach page: an opening, five sections, How ending in Cycles");
+console.log("\n=== doc-check — the approach page: an opening, six sections, Plan after How");
 
 // 05-artifacts.md § The approach document. The page is an opening, then Why > What > How > Open >
-// Deferred, nothing else; there is no Terms section; How's last subsection is Cycles.
-const HOW_TAIL = /<h3 id="h9">[\s\S]*?<\/table><\/div>\n/;
+// Deferred, nothing else; there is no Terms section; Plan is a section of its own after How.
+const PLAN_SECTION = /<section id="arcs"[\s\S]*?<\/section>\n/;
 
-one("How with no Cycles, only the retired What re-aligns",
-  write(APPROACH, CLEAN.replace(HOW_TAIL, `<h3>What re-aligns</h3>\n  <table><thead><tr><th>What</th><th>Scope</th><th>State</th></tr></thead><tbody><tr><td>x</td><td>y</td><td>z</td></tr></tbody></table>\n`)),
-  "reports", "does not end in Cycles");
+one("[MKT.HOOKS.412] an open page with no Plan section is told to have one, after How",
+  write(APPROACH, CLEAN.replace(PLAN_SECTION, "")),
+  "reports", "has no Plan section");
 
-one("a subsection after Cycles",
-  write(APPROACH, CLEAN.replace("</section>\n`", "").replace(/<\/table><\/div>\n<\/section>/, `</table></div>\n  <h3 id="h10">Later &mdash; a note</h3>\n  <p>You read this after the table.</p>\n</section>`)),
-  "reports", "after Cycles");
+// The shape a closed page keeps: How's last subsection an h3 named Cycles.
+const OLD_SHAPE = (text) => text.replace(/<\/section>\n<section id="arcs"[^>]*><div class="sds-section-head"><h2>Plan[^<]*<\/h2><\/div>/, `  <h3 id="h9">Cycles &mdash; the arcs, in the order they run</h3>`);
+one("[MKT.HOOKS.412] an open page still ending How in the older Cycles subsection is told to have a Plan section",
+  write(APPROACH, OLD_SHAPE(CLEAN)),
+  "reports", "has no Plan section");
 
-one("Cycles whose table has the wrong columns",
+one("Plan whose table has the wrong columns",
   write(APPROACH, CLEAN.replace(">Status</th>", ">Scope</th>")),
   "reports", "Arc · Status");
 
@@ -453,7 +456,7 @@ one("a section outside the five",
 one("sections out of order",
   write(APPROACH, CLEAN.replace(`<h2>What &mdash; the shape</h2>`, `<h2>Deferred &mdash; parked</h2>`)
     + `<section id="s7"><h2>What &mdash; late</h2><p>You read it last.</p></section>`),
-  "reports", "the order is Why > What > How > Open > Deferred");
+  "reports", "the order is Why > What > How > Plan > Open > Deferred");
 
 one("no opening — no standfirst above Why",
   write(APPROACH, CLEAN.replace(/<p class="sds-standfirst">[^\n]*\n/, "")),
@@ -517,6 +520,8 @@ try {
     write(closedPage, NO_PREVIEWS), "silent");
   one("a closed workstream's page stays as it closed: a status its arc does not carry is not compared",
     write(closedPage, NO_PREVIEWS.replace("<td>DECIDED</td>", "<td>RUNNING</td>")), "silent");
+  one("[MKT.HOOKS.413] a closed workstream's page that closed with How ending in Cycles is still read, and left alone",
+    write(closedPage, OLD_SHAPE(CLEAN_FOUR)), "silent");
   one("four columns in a closed workstream, matching its arcs",
     write(closedPage, CLEAN_FOUR), "silent");
   one("two columns in a closed workstream, matching its arcs",
@@ -545,7 +550,7 @@ try {
   const exempt = stream(TMP, "008-plain-probe");
   one("the plain-language workstream's page — exempt by name from Terms and Cycles",
     write(join(exempt, "plain-probe-approach.html"),
-      CLEAN.replace(HOW_TAIL, "").replace(`<section id="s1">`, `<section id="s0"><h2>Terms</h2><p>You read the words here.</p></section>\n<section id="s1">`)),
+      CLEAN.replace(PLAN_SECTION, "").replace(`<section id="s1">`, `<section id="s0"><h2>Terms</h2><p>You read the words here.</p></section>\n<section id="s1">`)),
     "silent");
 
   console.log("\n=== doc-check — an arc is data, and a Markdown arc file is no document it reads");
@@ -587,7 +592,7 @@ try {
   one("[MKT.HOOKS.40] known-bad: a page in closed/ that still reads IMPLEMENTING",
     write(closedPage, withStatus(CLEAN, "IMPLEMENTING", "&#x1F6A7;")), "reports", "a closed workstream reads DONE");
   one("[MKT.HOOKS.40] the plain-language workstream's page is exempt by name",
-    write(join(exempt, "plain-probe-approach.html"), withStatus(CLEAN, "PLANNING").replace(HOW_TAIL, "")), "silent");
+    write(join(exempt, "plain-probe-approach.html"), withStatus(CLEAN, "PLANNING").replace(PLAN_SECTION, "")), "silent");
 
   // THE STAMP BEFORE THE MOVE. The close gate asks for a page that says it is finished before the
   // folder moves, so a page in `open/` may read DONE once every arc carries a terminal status.

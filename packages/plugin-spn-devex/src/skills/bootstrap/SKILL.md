@@ -109,7 +109,7 @@ It opens in `open/` because nothing blocks it — the developer is in front of y
 
 **An arc is data, and only the arc commands write it.** `spn-devex workstream arc edit` writes `arcs/N001/`, and the hook that runs before every edit refuses a hand edit there. So you never type a file into `arcs/`. The arc a command opens is the arc the page, the hooks and `spn-devex workstream state check` all read. `refs/devex/workspace/workstream.md` carries the commands and what each field holds.
 
-**The page argues nothing, and it is still needed.** An approach page usually argues. The routing test in `refs/devex/workspace/docs/doc-sets.md` is one question — *were options weighed and one chosen?* — and on day zero nothing is weighed. The developer is telling you their organization's code, not choosing between two, so the coordinates are a record, and a record belongs in the arc. But an arc stands on its workstream's page: its row in Cycles is its address, `approach.html#N001`, and the state check reads the arc against that row. So the page holds a masthead, one paragraph of Why, one line of What, and the Cycles table.
+**The page argues nothing, and it is still needed.** An approach page usually argues. The routing test in `refs/devex/workspace/docs/doc-sets.md` is one question — *were options weighed and one chosen?* — and on day zero nothing is weighed. The developer is telling you their organization's code, not choosing between two, so the coordinates are a record, and a record belongs in the arc. But an arc stands on its workstream's page: its row in Plan is its address, `approach.html#N001`, and the state check reads the arc against that row. So the page holds a masthead, one paragraph of Why, one line of What, and the Cycles table.
 
 **A partner has the page to copy.** The template ships with this plugin, at `refs/devex/workspace/docs/templates/workstream/approach-template.html`, so a partner who never checks out the book copies the same page as a builder. **Where the developer asks for the argument written up, that is an ordinary page in an ordinary sitting** — offer it after act 4, and never let the walk wait on it.
 
@@ -117,7 +117,7 @@ It opens in `open/` because nothing blocks it — the developer is in front of y
 
 Write these at act 2, in this order, before the first question is asked. `{NNN}` is the number `workspace status` gave.
 
-1. **The page.** Copy the template to `approach.html` in the folder. Its masthead reads `{NNN} - New platform`, and its subtitle says it holds the estate's coordinates. Its Why is one paragraph: five answers name every account address, package scope, repository name and code prefix in this estate, permanently, and this workstream holds them until `CONCEPT.md` exists to carry them. Its What is one line: the coordinates are a record, not a choice, with `Read the preview →` linking `notes/N001/preview.html`. Keep How's Cycles table, and take out every slot the walk does not fill, the sample card under Open and the row under Deferred among them.
+1. **The page.** Copy the template to `approach.html` in the folder. Its masthead reads `{NNN} - New platform`, and its subtitle says it holds the estate's coordinates. Its Why is one paragraph: five answers name every account address, package scope, repository name and code prefix in this estate, permanently, and this workstream holds them until `CONCEPT.md` exists to carry them. Its What is one line: the coordinates are a record, not a choice, with `Read the preview →` linking `notes/N001/preview.html`. Keep the Plan section's arcs table, and take out every slot the walk does not fill, the sample card under Open and the row under Deferred among them.
 2. **The arc**, opened as `PROPOSED`:
 
    ```sh
@@ -145,7 +145,7 @@ Write these at act 2, in this order, before the first question is asked. `{NNN}`
    | 19 | The stack running, and the platform answering | they open the surface and it responds | act 13 |
 
 5. **The preview's first draft.** This arc has a preview because the developer decides the go from the read-back. Copy `refs/devex/workspace/docs/templates/workstream/approach-preview-template.html` to `notes/N001/preview.html`. Its Today says nothing exists yet. Its Proposed holds the coordinates table (the question, `— not yet asked`, and what the answer decides) and the table of what derives from them, each value `— not yet derived`. Its Where it lands names the estate and platform repositories as not known yet. Take out every block and slot it does not fill, its Open among them.
-6. **The arc's row in Cycles, then its stamp:**
+6. **The arc's row in Plan, then its stamp:**
 
    ```sh
    spn-devex docs cycles write {NNN}

@@ -1107,7 +1107,7 @@ export function checkHandover(reply: string, root: string, mine: Set<string>, gi
 //
 // A ROW WAITING ON THE DEVELOPER WHILE THE PAGE'S `Open` CARRIES NO CARD. The rest of what a page owes
 // its arcs is `workstream state check`'s, which the `state` check below runs: an arc with no row in
-// Cycles, a workstream with arcs and no page, and a card with no record or a record with no card.
+// the Plan table, a workstream with arcs and no page, and a card with no record or a record with no card.
 
 /**
  * Whether a page names a card number anywhere — an open card, a settled row, or a deferred one.
@@ -1427,9 +1427,9 @@ export function checkGoNext(root: string, mine: Set<string>, cards: string[]): W
 
 /**
  * A page left stale by an arc this session wrote (RULE.DEVEX.WORKSPACE.204). The parts of a page that
- * the arcs decide are the Cycles table, the header's status and the heading of `Open`. The write-time
+ * the arcs decide are the Plan table, the header's status and the heading of `Open`. The write-time
  * check sees them only when the whole page is written, so an arc that moves leaves the page behind
- * and this is where it is said. A page with no Cycles table is left alone, because the command named
+ * and this is where it is said. A page with no arcs table is left alone, because the command named
  * here has nothing to write on it. So is a page that holds its own copy of the styles, which that
  * command refuses.
  *
@@ -1444,7 +1444,7 @@ export function checkPageCurrent(touched: Set<string> | null): Warning[] {
     for (const page of pagesOf(folder)) {
       const text = read(page);
       if (exemptWorkstream(page) || holdsOwnCopy(page) || !cyclesTableAt(text)) continue;
-      if (cyclesRule(page, text).length) parts.add("the Cycles table");
+      if (cyclesRule(page, text).length) parts.add("the Plan table");
       if (headerRule(page, text).length) parts.add("the header's status");
       if (openHeadingRule(page, text).length) parts.add("the heading of `Open`");
     }
@@ -1467,8 +1467,8 @@ export function checkPageCurrent(touched: Set<string> | null): Warning[] {
     behind.map((one) => `\`${one.workstream}\`: ${one.parts.join(", ")}`).join(" · ") +
     `. The parts of a page that the arcs decide are produced, never typed (RULE.DEVEX.WORKSPACE.204). Run ` +
     behind.map((one) => `\`spn-devex docs cycles write ${one.workstream}\``).join(" and ") +
-    `, which writes the header's status, the Cycles table and the heading of \`Open\` from the arcs. The rest ` +
-    `of the page is yours to bring current in the same turn (05-artifacts.md § How ends in Cycles).` }];
+    `, which writes the header's status, the Plan table and the heading of \`Open\` from the arcs. The rest ` +
+    `of the page is yours to bring current in the same turn (05-artifacts.md § After How comes a section of its own, Plan).` }];
 }
 
 /** The status a preview's header shows, as its status badge reads it; null where it shows none. */

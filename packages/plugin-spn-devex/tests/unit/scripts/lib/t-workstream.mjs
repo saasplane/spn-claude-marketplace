@@ -102,7 +102,7 @@ console.log("\n=== the stamp — the arc's goal, title and repositories, never i
   ok("the repositories are the header's and the rows', sorted, with no empty cell",
     lib.arcRepos({ repos: ["spn-b"], rows: [{ repo: "spn-a" }, { repo: "—" }, { repo: "spn-b" }, {}] }).join() === "spn-a,spn-b");
   const page = approachPage("old");
-  ok("the page's stamp is read from the arc's Cycles row", lib.stampsOn(page).get("N001")?.stamp === "old");
+  ok("the page's stamp is read from the arc's Plan row", lib.stampsOn(page).get("N001")?.stamp === "old");
   ok("a restamp writes the new value on that row alone", lib.stampsOn(lib.restamped(page, "N001", stamp)).get("N001")?.stamp === stamp);
   ok("a page with no stamp yet gains one", lib.stampsOn(lib.restamped(approachPage(""), "N001", stamp)).get("N001")?.stamp === stamp);
   ok("an arc with no row has no restamp", lib.restamped(page, "N002", stamp) === null);

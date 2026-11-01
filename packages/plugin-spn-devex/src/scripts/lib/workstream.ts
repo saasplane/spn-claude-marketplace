@@ -1,5 +1,5 @@
 // RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § An arc is cut by what is reviewed and released together, and named for its domain · § The workstream is kept as data, and every file has one owner · § The folder · § The formats · § The approach page keeps up with its arcs · § An arc carries its specification, or names the note that holds it
-//           docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § `How` ends in Cycles, and the arcs are the state · § The approach document — a workstream's, never a repository's
+//           docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § After `How` comes a section of its own, Plan (RULE.DEVEX.WORKSPACE.487) · § The approach document — a workstream's, never a repository's
 // The chapters are the source of truth; a rule change is edited there first, then here, in the same change.
 //
 // The shared state library: where each file a script owns sits, how it is read and written, the
@@ -170,7 +170,7 @@ export const nameFileOf = (ws: string, arc: string, subject: string): string => 
 export const DATA_FILES: readonly string[] = [STATE_FILE, LOG_FILE, FACTS_FILE, SHEET_FILE, "go.json"];
 
 /**
- * The arc's address on the approach page: its Cycles row, by its number (RULE.DEVEX.WORKSPACE.263).
+ * The arc's address on the approach page: its Plan row, by its number (RULE.DEVEX.WORKSPACE.263).
  * `from` is the path from the folder the link is written in back to the workstream's folder.
  */
 export const arcAddress = (arc: string, from = ""): string => `${from}${APPROACH_PAGE}#${arc}`;
@@ -668,7 +668,7 @@ export function arcStamp(data: Pick<ArcData, "goal" | "title" | "repos" | "rows"
   return createHash("sha256").update(JSON.stringify(stated)).digest("hex").slice(0, 12);
 }
 
-/** Every Cycles row of a page that names an arc's data, with the stamp it carries. */
+/** Every Plan row of a page that names an arc's data, with the stamp it carries. */
 export function stampsOn(text: string): Map<string, { stamp: string | null; at: number; tag: string }> {
   const out = new Map<string, { stamp: string | null; at: number; tag: string }>();
   for (const found of text.matchAll(/<tr\b[^>]*\bdata-arc="(?:[^"]*\/)?(N\d+[a-z]?)\/state\.json"[^>]*>/g)) {
@@ -678,7 +678,7 @@ export function stampsOn(text: string): Map<string, { stamp: string | null; at: 
   return out;
 }
 
-/** The page with one arc's Cycles row restamped, or null where the page has no row for it. */
+/** The page with one arc's Plan row restamped, or null where the page has no row for it. */
 export function restamped(text: string, arc: string, stamp: string): string | null {
   const row = stampsOn(text).get(arc);
   if (!row) return null;
@@ -780,7 +780,7 @@ export function progressStep(done: number, total: number): string {
  * the right, and a thin bar. Its border colour says its status, worked out by `arcStatus`, and the status is in its
  * tooltip and accessible name. A chip counts its arc's steps (RULE.DEVEX.WORKSPACE.278): the bar's shade is the chip's
  * third class, `sds-step-1` to `sds-step-5` by steps landed and `sds-step-done` at the end. An arc with no step yet
- * says its status, with no bar to fill. A wait or a reason is in the tooltip. The chip links the arc's Cycles row.
+ * says its status, with no bar to fill. A wait or a reason is in the tooltip. The chip links the arc's Plan row.
  */
 /** The moment an arc's log last moved, as its last line wrote it; "" where the log holds no line. */
 export function lastMoved(ws: string, arc: string): string {
@@ -882,7 +882,7 @@ export function writeProgress(ws: string): string {
   if (!page) return `${basename(ws)} has no approach page — no progress block written`;
   const text = readFileSync(page, "utf8");
   const next = withBlock(text, "progress", progressInside(ws));
-  if (next === null) return `${relative(dirname(ws), page)} holds no progress block — place its markers under the Cycles table, as the approach template does`;
+  if (next === null) return `${relative(dirname(ws), page)} holds no progress block — place its markers under the Plan table, as the approach template does`;
   if (next === text) return "progress current";
   writeFileSync(page, next, "utf8");
   return "progress written";

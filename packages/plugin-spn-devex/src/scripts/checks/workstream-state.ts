@@ -1,5 +1,5 @@
 // RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § An arc is cut by what is reviewed and released together, and named for its domain · § The folder · § The commands · § The life of an arc, and every file it touches · § The approach page keeps up with its arcs · § Open and backlog workstreams follow the standard as it moves · § An arc carries its specification, or names the note that holds it
-//           docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § The approach document — a workstream's, never a repository's · § `How` ends in Cycles, and the arcs are the state
+//           docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § The approach document — a workstream's, never a repository's · § After `How` comes a section of its own, Plan (RULE.DEVEX.WORKSPACE.487)
 // The chapters are the source of truth; a rule change is edited there first, then here, in the same change.
 //
 // `workstream state check`, as a function: whether each open and backlog workstream is whole. The
@@ -166,16 +166,16 @@ export function arcPreviewFindings(ws: string, arc: string, data: ArcData, owner
 }
 
 /**
- * S7: the arc's row in Cycles under its address, its stamp against its goal, title and repositories, and its own What
+ * S7: the arc's row in Plan under its address, its stamp against its goal, title and repositories, and its own What
  * entry, `N<nnn>-what`, which links its preview and no other arc's (RULE.DEVEX.WORKSPACE.254).
  */
 export function pageFindings(ws: string, arc: string, data: ArcData, page: string | null, text: string, owners: ReadonlyMap<string, string> = previewOwners(ws)): string[] {
   if (!page) return [`${arc} has no approach page to stand on`];
   const out: string[] = [];
   const row = stampsOn(text).get(arc);
-  if (!row) out.push(`${arc} has no row in Cycles carrying \`data-arc="arcs/${arc}/state.json"\``);
+  if (!row) out.push(`${arc} has no row in Plan carrying \`data-arc="arcs/${arc}/state.json"\``);
   else if (!/\bid="([^"]*)"/.test(row.tag) || /\bid="([^"]*)"/.exec(row.tag)![1] !== arc)
-    out.push(`${arc}'s row in Cycles carries no \`id="${arc}"\`, so \`approach.html#${arc}\` opens nothing — \`spn-devex docs cycles write\` writes it`);
+    out.push(`${arc}'s row in Plan carries no \`id="${arc}"\`, so \`approach.html#${arc}\` opens nothing — \`spn-devex docs cycles write\` writes it`);
   else if (row.stamp !== arcStamp(data))
     out.push(`${arc}'s part on the approach page is behind its goal, title or repositories — bring Why, What and How current, then \`workstream arc stamp write ${arc}\``);
   const entry = whatEntryOf(text, arc);
@@ -220,7 +220,7 @@ export function whatLinkFindings(ws: string, page: string | null, text: string, 
 }
 
 /**
- * RULE.DEVEX.WORKSPACE.273: the views of an arc's status against its data. The Cycles row's word and badge,
+ * RULE.DEVEX.WORKSPACE.273: the views of an arc's status against its data. The Plan row's word and badge,
  * and the preview's Status badge, each name the arc, the view and the command that mends it.
  */
 export function viewFindings(ws: string, arc: string, data: ArcData, text: string): string[] {
@@ -229,9 +229,9 @@ export function viewFindings(ws: string, arc: string, data: ArcData, text: strin
   const status = arcStatus(data);
   const row = text ? tableStatuses(text).get(arc) : undefined;
   if (row && row.word !== status)
-    out.push(`${arc} reads ${row.word ?? "no status"} in the approach page's Cycles table and its data reads ${status} — ${fix} writes the page from the arcs`);
+    out.push(`${arc} reads ${row.word ?? "no status"} in the approach page's Plan table and its data reads ${status} — ${fix} writes the page from the arcs`);
   else if (row && !row.cell.includes(`sds-status sds-${status.toLowerCase()}`))
-    out.push(`${arc}'s Status in the Cycles table is not its badge, \`sds-status sds-${status.toLowerCase()}\` — ${fix} writes it`);
+    out.push(`${arc}'s Status in the Plan table is not its badge, \`sds-status sds-${status.toLowerCase()}\` — ${fix} writes it`);
   const preview = previewOf(ws, arc);
   if (isFile(preview)) {
     const shown = readFileSync(preview, "utf8");

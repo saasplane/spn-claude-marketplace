@@ -44,6 +44,9 @@ console.log("=== open: a block with one of the six things missing is refused");
     json(join(root, ".spndevex", "state.json")).workstreams.lastNumber === 41 && json(join(root, ".spndevex", "state.json")).debug.telemetry === false);
   const page = existsSync(join(folder, "approach.html")) ? readFileSync(join(folder, "approach.html"), "utf8") : "";
   ok("[MKT.SCRIPTS.309] the approach page is written from the block", page.includes("041 - Probe Reach") && page.includes(BLOCK.whyNow) && page.includes(BLOCK.limits) && page.includes(BLOCK.reaches), page.slice(0, 200));
+  ok("[MKT.SCRIPTS.402] the new page reads Why, What, How, Plan, Open, with the arcs table and the progress block in the Plan section after How",
+    /<section id="arcs"[^>]*>\s*<div class="sds-section-head"><h2>Plan<\/h2><\/div>[\s\S]*<table>[\s\S]*spn:generated progress[\s\S]*<\/section>/.test(page) && !page.includes("<h3 id=\"h9\">Cycles")
+      && page.indexOf("<h2>How</h2>") < page.indexOf("<h2>Plan</h2>") && page.indexOf("<h2>Plan</h2>") < page.indexOf("<h2>Open"), page.slice(page.indexOf("<h2>How")));
   const arc = join(folder, "arcs", "N001");
   ok("[MKT.SCRIPTS.309] the first arc is opened for what the developer wants to see first", existsSync(join(arc, "state.json")) && json(join(arc, "state.json")).title === BLOCK.seeFirst);
   ok("[MKT.SCRIPTS.309] the developer's words are in the arc's log", existsSync(join(arc, "log.jsonl")) && readFileSync(join(arc, "log.jsonl"), "utf8").includes(WORDS));

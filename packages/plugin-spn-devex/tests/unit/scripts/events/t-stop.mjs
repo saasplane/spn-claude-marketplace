@@ -274,7 +274,7 @@ console.log("\n=== stop — an arc is read from its data: state.json, log.jsonl 
     const page = join(ws, "approach.html");
     writeFileSync(page, readFileSync(page, "utf8").replace(/\s*<tr id="N001"[^\n]*<\/tr>/, ""));
     const out = stopAt(root, "d17-unnamed");
-    check("an arc the page's Cycles does not carry is named by [state]", /\[state\].*N001 has no row in Cycles/.test(out), out);
+    check("an arc the page's Plan does not carry is named by [state]", /\[state\].*N001 has no row in Plan/.test(out), out);
   }
   {
     const { root, ws } = await dataWorkspace("d17-pageless");
@@ -1127,12 +1127,13 @@ console.log("\n=== stop — a page left stale by an arc this session wrote");
     goal: "the chapter says where the model sits", status: ["RUNNING", "LANDED"].includes(status) ? "DECIDED" : status, reason: null, preview: "preview.html", rows: [
       { id: "1", parent: "N001", title: "the chapter", kind: "change", repo: "spn-foundation", work: "DOCS", state: ["RUNNING", "LANDED"].includes(status) ? "landed" : "waiting" },
       { id: "2", parent: "N001", title: "the check", kind: "change", repo: "spn-support-ts", work: "CODE", state }] }, null, 2)}\n`;
-  // A page in the approach template's shape: a labelled status, How ending in Cycles, and Open.
+  // A page in the approach template's shape: a labelled status, a Plan section after How, and Open.
   const pageFor = (folder, status, glyph) => `<!doctype html>
 ${STYLES}
 <div class="sds-eyebrow"><span class="sds-line1">Workstream</span><span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-${status.toLowerCase()}">${glyph} ${status}</span></span></div>
 <section id="s3"><div class="sds-section-head"><h2>How &mdash; the order</h2></div>
-  <h3 id="h9">Cycles &mdash; the arcs, in the order they run</h3>
+</section>
+<section id="arcs" data-block="sequence"><div class="sds-section-head"><h2>Plan &mdash; the arcs, in the order they run</h2></div>
 ${tableOf(cyclesOf(folder))}
 </section>
 <section id="s4"><div class="sds-section-head"><h2>Open &mdash; no card is open</h2></div>
@@ -1208,13 +1209,13 @@ ${tableOf(cyclesOf(folder))}
     const out = stop(built, "d-other");
     check("[MKT.HOOKS.35] a workstream another session wrote is not this session's to hear about", !/\[page-stale\]/.test(out), out);
   }
-  // UNTOUCHED: a page in the older shape has no Cycles table, so the command has nothing to write.
+  // UNTOUCHED: a page in the older shape has no arcs table, so the command has nothing to write.
   {
     const built = build("n006-stop-page-older-shape");
     writeFileSync(built.page, page({}));
     stop(built, "d-older");
     move(built, "RUNNING", "waiting");
-    check("[MKT.HOOKS.35] a page with no Cycles table is not told to run the command", !/\[page-stale\]/.test(stop(built, "d-older")));
+    check("[MKT.HOOKS.35] a page with no arcs table is not told to run the command", !/\[page-stale\]/.test(stop(built, "d-older")));
   }
 
   console.log("\n=== stop — a page that holds its own copy of the styles");
@@ -1331,7 +1332,7 @@ ${tableOf(cyclesOf(folder))}
     land(root, "held-page");
     const waiting = stop(root, "held-page");
     check("known-bad: the same finding is said at the first turn end where no row is running",
-      /\[state\]/.test(waiting) && waiting.includes("N001 has no row in Cycles"), waiting);
+      /\[state\]/.test(waiting) && waiting.includes("N001 has no row in Plan"), waiting);
   }
   {
     const root = await built("n009-held-notes");

@@ -222,14 +222,16 @@ ${linesFor("1.0.0").stylesheet}
 <section id="s3"><div class="sds-section-head"><h2>How &mdash; the order</h2></div>
   <h3 id="h1">spn-foundation &mdash; the chapter</h3>
   <p>The chapter first.</p>
-${cyclesBody}
 </section>
+${cyclesBody}
 <section id="s4"><div class="sds-section-head"><h2>${open}</h2></div>
 ${cards}
 </section>
 <section id="s5"><div class="sds-section-head"><h2>Deferred &mdash; parked</h2></div></section>
 ${linesFor("1.0.0").script}
 `;
+    // Plan is a section of its own after How (RULE.DEVEX.WORKSPACE.487); the older shape ended How in an h3 named Cycles.
+    const PLAN = (table) => `<section id="arcs" data-block="sequence"><div class="sds-section-head"><h2>Plan &mdash; the arcs, in the order they run</h2></div>\n${table}\n</section>`;
     const CYCLES_H3 = `  <h3 id="h9">Cycles &mdash; the arcs, in the order they run</h3>\n`;
     const OLD_TABLE = `  <div class="sds-scroll"><table><thead><tr><th>Arc</th><th>What it does</th><th>Status</th><th>Previews</th></tr></thead>\n` +
       `  <tbody><tr><td><strong>N1 &mdash; the chapter</strong><br><a class="sds-small" href="arcs/N1-the-chapter.md">arcs/N1-the-chapter.md</a></td><td>The chapter says where the model sits.</td><td>PROPOSED</td><td>&mdash;</td></tr></tbody></table></div>`;
@@ -243,7 +245,7 @@ ${linesFor("1.0.0").script}
     const stamp = (file) => { const past = (Date.now() - 3_600_000) / 1000; utimesSync(file, past, past); return statSync(file).mtimeMs; };
 
     // KNOWN-BAD: an old table, the wrong status and the wrong heading of Open, with one card open.
-    const home = build("open", "050-write", PAGE({ cyclesBody: CYCLES_H3 + OLD_TABLE, cards: CARD(3) }));
+    const home = build("open", "050-write", PAGE({ cyclesBody: PLAN(OLD_TABLE), cards: CARD(3) }));
     const page = join(home, "approach.html");
     const before = readFileSync(page, "utf8");
     ok("known-bad: the page is stale by all three rules before the command runs",
@@ -251,8 +253,8 @@ ${linesFor("1.0.0").script}
     const wrote = await capture(["docs", "cycles", "write", "050-write"], { SPN_WORKSPACE: TMP });
     const after = readFileSync(page, "utf8");
     ok("[MKT.SCRIPTS.79] `write` exits 0 and says which parts it wrote",
-      wrote.code === 0 && /the header's status/.test(wrote.out) && /the Cycles table/.test(wrote.out) && /the heading of Open/.test(wrote.out), `${wrote.code} ${wrote.out} ${wrote.err}`);
-    ok("[MKT.SCRIPTS.79] after it, the Cycles table is the arcs'", cyclesRule(page, after).length === 0, JSON.stringify(cyclesRule(page, after)));
+      wrote.code === 0 && /the header's status/.test(wrote.out) && /the Plan table/.test(wrote.out) && /the heading of Open/.test(wrote.out), `${wrote.code} ${wrote.out} ${wrote.err}`);
+    ok("[MKT.SCRIPTS.79] after it, the Plan table is the arcs'", cyclesRule(page, after).length === 0, JSON.stringify(cyclesRule(page, after)));
     ok("[MKT.SCRIPTS.79] the header's status is written with its class, its glyph and its word",
       after.includes(`<span class="sds-badge sds-status sds-implementing">&#x1F6A7; IMPLEMENTING</span>`) && headerRule(page, after).length === 0);
     ok("[MKT.SCRIPTS.79] the heading of Open names each open card by its number",
@@ -276,13 +278,13 @@ ${linesFor("1.0.0").script}
       untouched.code === 0 && readFileSync(page, "utf8") === current && statSync(page).mtimeMs === currentAt, untouched.out);
 
     // With no card open the heading has one form.
-    const quiet = build("open", "051-quiet", PAGE({ status: "IMPLEMENTING", glyph: "&#x1F6A7;", cyclesBody: CYCLES_H3 + OLD_TABLE, open: "Open &mdash; Q9 &middot; Q10" }));
+    const quiet = build("open", "051-quiet", PAGE({ status: "IMPLEMENTING", glyph: "&#x1F6A7;", cyclesBody: PLAN(OLD_TABLE), open: "Open &mdash; Q9 &middot; Q10" }));
     await capture(["docs", "cycles", "write", quiet]);
     ok("[MKT.SCRIPTS.79] with no card open the heading reads `Open — no card is open`",
       readFileSync(join(quiet, "approach.html"), "utf8").includes("<h2>Open &mdash; no card is open</h2>"));
 
     // A page whose Open is a generated block with no card raised: `write` fills the block with the heading the doc check asks for.
-    const blockPage = PAGE({ status: "IMPLEMENTING", glyph: "&#x1F6A7;", cyclesBody: CYCLES_H3 + OLD_TABLE })
+    const blockPage = PAGE({ status: "IMPLEMENTING", glyph: "&#x1F6A7;", cyclesBody: PLAN(OLD_TABLE) })
       .replace(/<section id="s4">[\s\S]*?<\/section>/, `<section id="s4">\n<!-- spn:generated open -->\n<!-- /spn:generated -->\n</section>`);
     const blank = build("open", "057-no-card", blockPage);
     const blankWrote = await capture(["docs", "cycles", "write", blank], { SPN_WORKSPACE: TMP });
@@ -294,7 +296,7 @@ ${linesFor("1.0.0").script}
     // The rows keep the order the page lists them in: N2 first here, and its stale status is what is written.
     const N2_FIRST = OLD_TABLE.replace("<tbody><tr>", `<tbody><tr><td><strong>N2 &mdash; the check</strong><br><a class="sds-small" href="arcs/N2-the-check.md">arcs/N2-the-check.md</a></td>` +
       `<td>A check reads the new shape.</td><td>PROPOSED</td><td>&mdash;</td></tr>\n  <tr>`);
-    const ordered = build("open", "056-ordered", PAGE({ status: "IMPLEMENTING", glyph: "&#x1F6A7;", cyclesBody: CYCLES_H3 + N2_FIRST }));
+    const ordered = build("open", "056-ordered", PAGE({ status: "IMPLEMENTING", glyph: "&#x1F6A7;", cyclesBody: PLAN(N2_FIRST) }));
     await capture(["docs", "cycles", "write", ordered]);
     const orderedText = readFileSync(join(ordered, "approach.html"), "utf8");
     ok("[MKT.SCRIPTS.79] the rows keep the order the page lists them in",
@@ -302,26 +304,46 @@ ${linesFor("1.0.0").script}
       orderedText.indexOf("<strong>N2 &mdash;") > 0, orderedText.slice(orderedText.indexOf("<tbody>"), orderedText.indexOf("</tbody>")));
 
     // UNTOUCHED: a page in closed/ keeps the table it closed with.
-    const closed = build("closed", "052-closed", PAGE({ cyclesBody: CYCLES_H3 + OLD_TABLE }));
+    const closed = build("closed", "052-closed", PAGE({ cyclesBody: PLAN(OLD_TABLE) }));
     const closedText = readFileSync(join(closed, "approach.html"), "utf8");
     const closedAt = stamp(join(closed, "approach.html"));
     const kept = await capture(["docs", "cycles", "write", closed]);
     ok("[MKT.SCRIPTS.79] a page in closed/ is not written",
       kept.code === 0 && readFileSync(join(closed, "approach.html"), "utf8") === closedText && statSync(join(closed, "approach.html")).mtimeMs === closedAt, `${kept.code} ${kept.out}`);
 
-    // UNTOUCHED: a page with no h3 named Cycles is refused, and nothing is written.
-    const shapeless = build("open", "053-shapeless", PAGE({ cyclesBody: `  <h3 id="h9">What re-aligns</h3>\n` + OLD_TABLE }));
+    // UNTOUCHED: a page with no How to put a Plan section after is refused, and nothing is written.
+    const shapelessPage = PAGE({ cyclesBody: PLAN(OLD_TABLE) }).replace(/<section id="s3">[\s\S]*?<\/section>\n/, "").replace(/<section id="arcs"[\s\S]*?<\/section>\n/, "");
+    const shapeless = build("open", "053-shapeless", shapelessPage);
     const shapelessText = readFileSync(join(shapeless, "approach.html"), "utf8");
     const refused = await capture(["docs", "cycles", "write", shapeless]);
-    ok("[MKT.SCRIPTS.79] a page with no h3 named Cycles exits 1 with a message and no write",
-      refused.code === 1 && /Cycles/.test(refused.err) && readFileSync(join(shapeless, "approach.html"), "utf8") === shapelessText, `${refused.code} ${refused.err}`);
+    ok("[MKT.SCRIPTS.79] a page with no How and no Plan exits 1 with a message and no write",
+      refused.code === 1 && /Plan/.test(refused.err) && readFileSync(join(shapeless, "approach.html"), "utf8") === shapelessText, `${refused.code} ${refused.err}`);
+
+    // THE PLAN SECTION IS CREATED, OR MOVED INTO (RULE.DEVEX.WORKSPACE.487).
+    const bare = build("open", "059-bare", PAGE({ cyclesBody: "" }));
+    const bareWrote = await capture(["docs", "cycles", "write", bare]);
+    const bareText = readFileSync(join(bare, "approach.html"), "utf8");
+    const howEnd = bareText.indexOf("</section>", bareText.indexOf("<h2>How"));
+    ok("[MKT.SCRIPTS.400] a page with no Plan section gets one after How, holding the arcs table from the arcs, and says so",
+      bareWrote.code === 0 && /the Plan section/.test(bareWrote.out) && bareText.indexOf('<section id="arcs"') > howEnd && bareText.indexOf('<section id="arcs"') < bareText.indexOf('<section id="s4"')
+        && bareText.includes("<h2>Plan</h2>") && count(bareText, "<th>Arc</th>") === 1 && cyclesRule(join(bare, "approach.html"), bareText).length === 0, `${bareWrote.out}${bareWrote.err}\n${bareText}`);
+    const oldHome = build("open", "060-older", PAGE({ cyclesBody: "" }));
+    const oldFile = join(oldHome, "approach.html");
+    writeFileSync(oldFile, readFileSync(oldFile, "utf8").replace("<p>The chapter first.</p>\n</section>", `<p>The chapter first.</p>\n${CYCLES_H3}${OLD_TABLE}\n</section>`));
+    const oldBefore = readFileSync(oldFile, "utf8");
+    ok("[MKT.SCRIPTS.400] the fixture really ends How in the older Cycles subsection", /<h3 id="h9">Cycles/.test(oldBefore) && !oldBefore.includes("<h2>Plan"), oldBefore.slice(oldBefore.indexOf("<h2>How")));
+    const oldWrote = await capture(["docs", "cycles", "write", oldHome]);
+    const oldAfter = readFileSync(oldFile, "utf8");
+    ok("[MKT.SCRIPTS.400] a page that ends How in Cycles has the subsection moved into a Plan section after How, with its table written from the arcs",
+      oldWrote.code === 0 && !/<h3 id="h9">Cycles/.test(oldAfter) && oldAfter.includes("<h2>Plan") && oldAfter.indexOf("<h2>Plan") > oldAfter.indexOf("<h2>How") && count(oldAfter, "<th>Arc</th>") === 1
+        && cyclesRule(oldFile, oldAfter).length === 0, `${oldWrote.out}${oldWrote.err}`);
 
     const pageless = build("open", "054-pageless", null);
     const noPage = await capture(["docs", "cycles", "write", pageless]);
     ok("[MKT.SCRIPTS.79] a workstream with no page exits 1", noPage.code === 1 && /no approach page/.test(noPage.err), `${noPage.code} ${noPage.err}`);
 
     // Without the option nothing is written, as before.
-    const printed = build("open", "055-printed", PAGE({ cyclesBody: CYCLES_H3 + OLD_TABLE }));
+    const printed = build("open", "055-printed", PAGE({ cyclesBody: PLAN(OLD_TABLE) }));
     const printedText = readFileSync(join(printed, "approach.html"), "utf8");
     const plain = await capture(["docs", "cycles", "show", printed]);
     ok("[MKT.SCRIPTS.79] with no option the command prints the table and writes no file",
@@ -378,14 +400,14 @@ console.log("\n=== the places of How, produced from the rows' repo (RULE.DEVEX.W
   const { placedPage, placesOf } = cyclesModule;
   const { approachPage, arcData, cli: runCli, dataWorkspace } = await import("../../../../helpers/workstream-fixture.mjs");
   const page = approachPage("x");
-  const cyclesAt = (text) => text.indexOf(`<h3 id="h9">Cycles</h3>`);
+  const planAt = (text) => text.indexOf(`</section>\n<section id="arcs"`);
   const placed = placedPage(page, [{ repo: "spn-x", arcs: ["N001"] }]);
   const heading = placed.indexOf(`<h3 id="how-spn-x">spn-x</h3>`);
-  ok("red: a repository the rows name with no h3 in How gains one, before Cycles", heading > 0 && heading < cyclesAt(placed), placed.slice(placed.indexOf("<h2>How"), cyclesAt(placed) + 40));
+  ok("red: a repository the rows name with no h3 in How gains one, at the end of How, before Plan", heading > 0 && heading < planAt(placed), placed.slice(placed.indexOf("<h2>How"), planAt(placed) + 40));
   ok("and its facts line names the arcs that reach it", placed.includes(`<p><span class="sds-small">Arcs: N001</span></p>`));
   ok("written twice, the page does not move", placedPage(placed, [{ repo: "spn-x", arcs: ["N001"] }]) === placed);
-  const withPlace = (facts) => page.replace(`<h3 id="h9">Cycles</h3>`,
-    `<h3 id="h1">spn-x &mdash; the book</h3>\n  <p>The chapter changes. Ships: the book.</p>\n  ${facts}\n  <h3 id="h2">spn-xy &mdash; another</h3>\n  <p>Not this one.</p>\n  <h3 id="h9">Cycles</h3>`);
+  const withPlace = (facts) => page.replace(`</section>\n<section id="arcs"`,
+    `<h3 id="h1">spn-x &mdash; the book</h3>\n  <p>The chapter changes. Ships: the book.</p>\n  ${facts}\n  <h3 id="h2">spn-xy &mdash; another</h3>\n  <p>Not this one.</p>\n</section>\n<section id="arcs"`);
   const sized = placedPage(withPlace(`<p><span class="sds-small">Size: large</span></p>`), [{ repo: "spn-x", arcs: ["N001", "N002"] }]);
   ok("a place's h3 is found by the name it starts with, and its facts line takes Arcs first",
     sized.includes(`<span class="sds-small">Arcs: N001 &middot; N002 &middot; Size: large</span>`) && !sized.includes(`how-spn-x`), sized);

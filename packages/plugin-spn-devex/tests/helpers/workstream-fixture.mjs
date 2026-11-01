@@ -1,5 +1,5 @@
 // A workstream kept as data, on disk in a throwaway workspace: an approach page in the template's
-// shape (What holding the arc's entry, N001-what, which links the preview, Cycles with the arc's row and the progress block, Open as the open
+// shape (What holding the arc's entry, N001-what, which links the preview, Plan with the arc's row and the progress block, Open as the open
 // block), one arc's `state.json` with its name file, its preview and its plan. Each case starts whole
 // and breaks one thing.
 import { execFileSync } from "node:child_process";
@@ -10,7 +10,7 @@ import { PLUGIN } from "./harness.mjs";
 
 export const CLI = resolve(PLUGIN, "src", "scripts", "cli.ts");
 
-/** The approach page, its Cycles row carrying `stamp`. */
+/** The approach page, its Plan row carrying `stamp`. */
 export function approachPage(stamp = "") {
   return [
     `<meta charset="utf-8">`,
@@ -24,7 +24,9 @@ export function approachPage(stamp = "") {
     `</section>`,
     `<section id="s3" data-block="sequence">`,
     `  <div class="sds-section-head"><h2>How</h2></div>`,
-    `  <h3 id="h9">Cycles</h3>`,
+    `</section>`,
+    `<section id="arcs" data-block="sequence">`,
+    `  <div class="sds-section-head"><h2>Plan</h2></div>`,
     `  <div class="sds-scroll"><table>`,
     `    <thead><tr><th>Arc</th><th class="sds-status-col">Status</th></tr></thead>`,
     `    <tbody>`,

@@ -220,7 +220,7 @@ console.log("\n=== progress write, and arc stamp write");
   // The opening write puts the arc's row on the page; this arc is the one whose row was taken off by hand.
   put(ws, "approach.html", readFileSync(join(ws, "approach.html"), "utf8").replace(/\s*<tr id="N009"[^\n]*<\/tr>/, ""));
   const noRow = cli(root, ["workstream", "arc", "stamp", "write", "031/N009"]);
-  ok("red: an arc with no Cycles row is not stamped, and names `docs cycles write`", noRow.code === 1 && noRow.out.includes("docs cycles write"), noRow.out);
+  ok("red: an arc with no Plan row is not stamped, and names `docs cycles write`", noRow.code === 1 && noRow.out.includes("docs cycles write"), noRow.out);
   const stamped = cli(root, ["workstream", "arc", "stamp", "write", "031/N001"]);
   ok("the arc is stamped", stamped.code === 0 && /N001 · stamped [0-9a-f]{12}/.test(stamped.out), stamped.out);
 }
@@ -277,9 +277,9 @@ console.log("\n=== arc edit and row state — a status or a row state moved refr
   const preview = join(views.ws, "notes", "N001", "preview.html");
   cli(views.root, ["workstream", "row", "state", "031/N001", "1", "landed"]);
   const landed = cli(views.root, ["workstream", "row", "state", "031/N001", "2", "landed"]);
-  ok("red before the change: the last step landed names each view it rewrote", landed.code === 0 && /N001 2\/2 · row 2 · state · N001 reads LANDED · approach: (?:[a-z]+, )*cycles · preview badge/.test(landed.out), landed.out);
+  ok("red before the change: the last step landed names each view it rewrote", landed.code === 0 && /N001 2\/2 · row 2 · state · N001 reads LANDED · approach: (?:[a-z ]+, )*plan · preview badge/.test(landed.out), landed.out);
   const text = readFileSync(page, "utf8");
-  ok("the Cycles table row shows LANDED, worked out from the steps, as its badge", /<tr id="N001"[^>]*>.*sds-status sds-landed">LANDED<\/span><\/td><\/tr>/s.test(text) && !text.includes("sds-decided"), text);
+  ok("the Plan table row shows LANDED, worked out from the steps, as its badge", /<tr id="N001"[^>]*>.*sds-status sds-landed">LANDED<\/span><\/td><\/tr>/s.test(text) && !text.includes("sds-decided"), text);
   ok("the status card moves with the arcs", /<div class="sds-eyebrow">(?:(?!<\/div>).)*sds-status sds-implementing">[^<]*IMPLEMENTING/s.test(text), text);
   ok("the preview's badge shows LANDED", readFileSync(preview, "utf8").includes('sds-status sds-landed" href="../../approach.html#N001">LANDED</a>'));
   ok("the data still stores the developer's DECIDED", json(join(views.ws, "arcs", "N001", "state.json")).status === "DECIDED");
@@ -290,7 +290,7 @@ console.log("\n=== arc edit and row state — a status or a row state moved refr
   ok("a note alone refreshes nothing", note.code === 0 && !/approach:|preview badge/.test(note.out), note.out);
 }
 
-console.log("\n=== arc edit --preview — a carried arc's Cycles row links where its notes now live (S137)");
+console.log("\n=== arc edit --preview — a carried arc's Plan row links where its notes now live (S137)");
 {
   const carried = await dataWorkspace("commands-preview");
   const elsewhere = "../032-next/notes/N002/preview.html";
@@ -306,7 +306,7 @@ console.log("\n=== arc edit --preview — a carried arc's Cycles row links where
   const data = json(join(carried.ws, "arcs", "N001", "state.json"));
   ok("the path is written onto the arc's data", moved.code === 0 && data.preview === elsewhere && /N001 · status, preview|N001 · preview, status|preview/.test(moved.out), `${moved.out}\n${JSON.stringify(data.preview)}`);
   const cyclesRow = (/<tr id="N001"[^>]*>.*?<\/tr>/s.exec(readFileSync(page, "utf8")) ?? [""])[0];
-  ok("the Cycles row links the preview and the sample where the notes now live, and not the empty folder",
+  ok("the Plan row links the preview and the sample where the notes now live, and not the empty folder",
     cyclesRow.includes(`href="${elsewhere}"`) && cyclesRow.includes('href="../032-next/notes/N002/samples/table.md"') && !cyclesRow.includes('href="notes/N001/preview.html"'), cyclesRow);
   ok("no state check finding asks for a preview at notes/N001/", !/has no preview/.test(moved.out), moved.out);
   const back = cli(carried.root, ["workstream", "arc", "edit", "031/N001", "--preview", "preview.html"]);
@@ -322,7 +322,7 @@ console.log("\n=== state show and state check");
   const asData = JSON.parse(cli(root, ["workstream", "state", "show", "031", "--json"]).out);
   ok("show --json: the same, as data", asData[0].workstream === "031-probe" && asData[0].arcs.length === 3);
   const check = cli(root, ["workstream", "state", "check", "031"]);
-  ok("check: N009 has no Cycles row, and the check says so", check.code === 1 && /N009 \[stamp\] N009 has no row in Cycles/.test(check.out), check.out);
+  ok("check: N009 has no Plan row, and the check says so", check.code === 1 && /N009 \[stamp\] N009 has no row in Plan/.test(check.out), check.out);
   const legacy = workspace("commands-legacy", { ".spndevex/workstreams/open/026-old/arcs/N001-old.md": "# N001 — old\n\nStatus: **RUNNING**\n" });
   const old = cli(legacy, ["workstream", "state", "show"]);
   ok("show: a workstream not moved yet says so", old.out.trim() === "026 · keeps its arcs as Markdown — not moved to the data layout yet", old.out);
@@ -432,7 +432,7 @@ console.log("\n=== arc edit --review-fixes — one arc takes every fix to a land
   ok("the developer's word to close stores its LANDED", closed.code === 0 && json(file).status === "LANDED", closed.out);
 }
 
-console.log("\n=== arc edit — an arc opens whole: its data, its preview, its What entry and its stamped Cycles row (RULE.DEVEX.WORKSPACE.254)");
+console.log("\n=== arc edit — an arc opens whole: its data, its preview, its What entry and its stamped Plan row (RULE.DEVEX.WORKSPACE.254)");
 {
   const whole = await dataWorkspace("commands-opening");
   const page = join(whole.ws, "approach.html");
@@ -455,11 +455,11 @@ console.log("\n=== arc edit — an arc opens whole: its data, its preview, its W
   ok("red: and nothing is written", !existsSync(arcOf("N003")) && !existsSync(noteOf("N003")) && readFileSync(page, "utf8") === domains);
 
   const opened = write("031/N003", "--title", "Evidence export", "--subject", "evidence-export", "--goal", goal, "--under", "d1");
-  ok("the line names the four pieces", opened.code === 0 && opened.out.startsWith("ok · N003 0/0 · N003 opened · PROPOSED · preview · What entry · Cycles row\n"), opened.out);
+  ok("the line names the four pieces", opened.code === 0 && opened.out.startsWith("ok · N003 0/0 · N003 opened · PROPOSED · preview · What entry · Plan row\n"), opened.out);
   ok("and each piece's place, as drawn", opened.out.includes("  arcs/N003/state.json       written, with its log line and its name file, evidence-export.md\n")
     && opened.out.includes("  notes/N003/preview.html    written from the template: the masthead, the PROPOSED badge, the back link to #N003-what, four sections to fill\n")
     && opened.out.includes("  approach.html · What       #N003-what written under d1, Platform · Data and trust: the title, the goal, and the link to notes/N003/preview.html\n")
-    && opened.out.includes("  approach.html · Cycles     row N003 written and stamped, its preview linked\n"), opened.out);
+    && opened.out.includes("  approach.html · Plan       row N003 written and stamped, its preview linked\n"), opened.out);
   ok("the data holds the goal, PROPOSED, and the fixed preview", json(join(arcOf("N003"), "state.json")).goal === goal && json(join(arcOf("N003"), "state.json")).status === "PROPOSED");
   const preview = readFileSync(noteOf("N003"), "utf8");
   ok("the preview is the template with its masthead filled: title, back link, title, arc, badge",
@@ -470,7 +470,7 @@ console.log("\n=== arc edit — an arc opens whole: its data, its preview, its W
   const after = readFileSync(page, "utf8");
   const entry = '  <h4 id="N003-what">Evidence export</h4>\n  <p>Each control\'s evidence leaves as one file an auditor can read, named for the control.</p>\n  <p>Read the preview &rarr; <a href="notes/N003/preview.html">Evidence export</a></p>\n  <h3 id="d2">';
   ok("the What entry stands at the end of d1's part, before d2, with the title, the goal and the link", after.includes(entry), after);
-  ok("the Cycles row is there, stamped", /<tr id="N003" data-arc="arcs\/N003\/state.json" data-arc-stamp="[0-9a-f]{12}">/.test(after) && after.includes('href="notes/N003/preview.html"'));
+  ok("the Plan row is there, stamped", /<tr id="N003" data-arc="arcs\/N003\/state.json" data-arc-stamp="[0-9a-f]{12}">/.test(after) && after.includes('href="notes/N003/preview.html"'));
   const check = cli(whole.root, ["workstream", "state", "check", "031"]);
   ok("the workstream passes its own check at once", check.code === 0 && /whole/.test(check.out), check.out);
 
@@ -486,7 +486,7 @@ console.log("\n=== arc edit — an arc opens whole: its data, its preview, its W
   const bytes = readFileSync(page, "utf8");
   rmSync(noteOf("N004"));
   const filled = write("031/N004");
-  ok("a bare write fills the preview it finds missing and keeps the entry and the row", filled.code === 0 && filled.out.startsWith("ok · N004 · preview written from the template · What entry kept · Cycles row kept"), filled.out);
+  ok("a bare write fills the preview it finds missing and keeps the entry and the row", filled.code === 0 && filled.out.startsWith("ok · N004 · preview written from the template · What entry kept · Plan row kept"), filled.out);
   ok("the fresh preview is the template again, and the page is as it was", readFileSync(noteOf("N004"), "utf8").includes("<title>031 · N004 - Second Export</title>") && readFileSync(page, "utf8") === bytes);
   const twice = write("031/N004");
   ok("and a second bare write finds it whole", twice.out.startsWith("ok · N004 · whole: nothing written") && readFileSync(page, "utf8") === bytes, twice.out);
@@ -494,14 +494,14 @@ console.log("\n=== arc edit — an arc opens whole: its data, its preview, its W
   writeFileSync(page, bytes.replace(/\s*<h4 id="N004-what">[^]*?<\/p>\n  <p>Read the preview[^\n]*N004[^\n]*<\/p>/, "").replace(/\s*<tr id="N004"[^\n]*<\/tr>/, ""));
   const both = write("031/N004");
   ok("a bare write writes the entry and the row it finds missing, and keeps the preview",
-    both.code === 0 && both.out.includes("What entry: #N004-what written at the end of What") && both.out.includes("Cycles row written and stamped") && both.out.includes("preview kept"), both.out);
+    both.code === 0 && both.out.includes("What entry: #N004-what written at the end of What") && both.out.includes("Plan row written and stamped") && both.out.includes("preview kept"), both.out);
   ok("and the workstream passes its check again", cli(whole.root, ["workstream", "state", "check", "031"]).code === 0);
 
   // An existing arc takes the anchor on a subject heading.
   writeFileSync(page, readFileSync(page, "utf8").replace('<h4 id="N001-what">The probe</h4>', '<h4 id="c1">The probe</h4>'));
   const anchored = write("031/N001", "--under", "c1");
   ok("--under on a subject heading anchors an arc that already exists", anchored.code === 0
-    && anchored.out.startsWith("ok · N001 · What entry: #N001-what anchored on c1 · preview kept · Cycles row kept"), anchored.out);
+    && anchored.out.startsWith("ok · N001 · What entry: #N001-what anchored on c1 · preview kept · Plan row kept"), anchored.out);
   ok("the anchor is a span on the heading, and the heading is as it was", readFileSync(page, "utf8").includes('<h4 id="c1"><span id="N001-what"></span>The probe</h4>'));
   ok("and the workstream passes its check", cli(whole.root, ["workstream", "state", "check", "031"]).code === 0);
   const noHeading = write("031/N001", "--under", "zz");

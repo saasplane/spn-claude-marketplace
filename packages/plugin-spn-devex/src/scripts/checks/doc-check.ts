@@ -2,7 +2,7 @@
 // RESTATES: the foundation book — 02-document.md rule 9 (RULE.DEVEX.WORKSPACE.162), rules 11-12 (RULE.DEVEX.WORKSPACE.096, the
 // one voice; RULE.DEVEX.WORKSPACE.106, its reach and its measure; RULE.DEVEX.WORKSPACE.107, the three moves that reach the
 // reader), 04-discipline.md § Voice discipline, 05-artifacts.md (the masthead, the approach document,
-// and How ends in Cycles), 01-workstream.md § A step row says where, what work, and how
+// and the Plan section after How, RULE.DEVEX.WORKSPACE.487), 01-workstream.md § A step row says where, what work, and how
 // (RULE.DEVEX.WORKSPACE.183), 05-artifacts.md § One stylesheet, served in versions (RULE.DEVEX.WORKSPACE.214)
 // and 06-registers.md § Writing a row. The chapters are the source of truth: a rule change is edited
 // there first, then here, in the same change. This script checks only what a script CAN check; the
@@ -279,7 +279,7 @@ export function exemptWorkstream(path: string): boolean {
   return EXEMPT_WORKSTREAM.test(workstreamOf(path)?.name ?? "");
 }
 
-// RULE, as the two-halves rule it replaces was. How ends in Cycles on every approach page; the
+// RULE, as the two-halves rule it replaces was. A Plan section follows How on every approach page; the
 // comparison with the arcs runs where the page sits in a workstream, which is where every approach
 // page now lives.
 const CYCLES = "RULE";
@@ -297,7 +297,7 @@ const flat = (html: string): string => unescape(html.replace(/<[^>]+>/g, " ")).r
 
 const listed = (keys: string[]) => keys.slice(0, 6).join(", ") + (keys.length > 6 ? ` and ${keys.length - 6} more` : "");
 
-// The header of the Cycles table, as a page writes it.
+// The header of the arcs table, as a page writes it.
 const CYCLES_HEADER = CYCLES_COLUMNS.join(" · ");
 
 /** Whether a path sits in a closed workstream, whose page keeps the table it closed with. */
@@ -307,61 +307,73 @@ function inClosedWorkstream(path: string): boolean {
 }
 
 /**
- * 05-artifacts.md § `How` ends in Cycles, and the arcs are the state. How's last subsection is an
- * `h3` named Cycles, whose table has two columns, Arc · Status. Inside a workstream the
- * table has one row per arc in `arcs/`, in the order a person chooses, and each row is the arc's own:
- * its name, its line and the links to its preview and its samples, and the reason a CARRIED or
- * DROPPED arc carries (all in the Arc cell), and its status badge.
- * `spn-devex docs cycles show` prints the rows; this compares the page against the same
- * reading, which is `tableDifferences` in that command's file. A page in a closed workstream stays as
- * it closed, and is not compared.
+ * 05-artifacts.md § After `How` comes a section of its own, Plan (RULE.DEVEX.WORKSPACE.487). The Plan section is `<section id="arcs">`
+ * under the `h2` Plan, and holds a table of two columns, Arc · Status. Inside a workstream the table has one row per arc in `arcs/`,
+ * in the order a person chooses, and each row is the arc's own: its name, its line and the links to its preview and its samples, and the
+ * reason a CARRIED or DROPPED arc carries (all in the Arc cell), and its status badge.
+ * `spn-devex docs cycles show` prints the rows; this compares the page against the same reading, which is `tableDifferences` in that
+ * command's file. A page in a closed workstream stays as it closed, and is read in the shape it closed with: Plan, or an older `h3`
+ * named Cycles at the end of How. An open or backlog page with no Plan section is told to have one (`docs cycles write` moves it).
  */
 export function cyclesRule(path: string, text: string): Finding[] {
-  const body = section(text, "How");
-  if (body === null) return [];                                   // approachShape reports a missing How
+  if (section(text, "How") === null) return [];                   // approachShape reports a missing How
   const fix = "`spn-devex docs cycles show <workstream>` prints the table from the arcs";
-  const subsections = [...body.matchAll(/<h3\b[^>]*>([\s\S]*?)<\/h3>/gi)];
-  const named = subsections.filter((m) => /^Cycles\b/i.test(flat(m[1]))).at(-1);
-  if (!named)
-    return [[CYCLES, "How does not end in Cycles — its last subsection is an h3 named Cycles, one row " +
-      `per arc with ${CYCLES_HEADER} (05-artifacts.md § How ends in Cycles) · ${fix}`]];
-  if (named !== subsections.at(-1))
-    return [[CYCLES, `How carries "${flat(subsections.at(-1)![1])}" after Cycles — Cycles is How's last ` +
-      "subsection (05-artifacts.md § How ends in Cycles)"]];
-
+  const where = "(05-artifacts.md § After How comes a section of its own, Plan; RULE.DEVEX.WORKSPACE.487)";
+  const plan = section(text, "Plan");
+  if (plan === null) {
+    if (!inClosedWorkstream(path)) {
+      return [[CYCLES, `the page has no Plan section — after How comes a section of its own, \`<section id="arcs">\` under the h2 Plan, one row ` +
+        `per arc with ${CYCLES_HEADER} ${where} · \`spn-devex docs cycles write <workstream>\` moves an older Cycles subsection of How into it`]];
+    }
+    return closedCyclesRule(text, fix);
+  }
   if (inClosedWorkstream(path)) return [];                       // a closed page stays as it closed
-  const table = /<table\b[\s\S]*?<\/table>/i.exec(body.slice(named.index!))?.[0];
+  const table = /<table\b[\s\S]*?<\/table>/i.exec(plan)?.[0];
   const columns = table ? tableColumns(table) : "";
   if (!table)
-    return [[CYCLES, `Cycles carries no table with ${CYCLES_HEADER} — one row per arc, from ` +
-      `the arcs' data (05-artifacts.md § How ends in Cycles) · ${fix}`]];
+    return [[CYCLES, `Plan carries no table with ${CYCLES_HEADER} — one row per arc, from ` +
+      `the arcs' data ${where} · ${fix}`]];
   const home = workstreamOf(path);
   if (!home) return [];
   if (columns !== headerOf(CYCLES_COLUMNS))
-    return [[CYCLES, `Cycles carries ${columns.split(" · ").map((name) => name.charAt(0).toUpperCase() + name.slice(1)).join(" · ")} where an open workstream carries ${CYCLES_HEADER} — each row holds the ` +
-      "arc's title, line and links, and its status (05-artifacts.md § How ends in Cycles) · " +
+    return [[CYCLES, `Plan carries ${columns.split(" · ").map((name) => name.charAt(0).toUpperCase() + name.slice(1)).join(" · ")} where an open workstream carries ${CYCLES_HEADER} — each row holds the ` +
+      `arc's title, line and links, and its status ${where} · ` +
       "run `spn-devex docs cycles write <workstream>` to write it from the arcs"]];
 
   // Rows are matched by arc, never by position: the page lists arcs in the order they run.
   const { missing, unknown, stale } = tableDifferences(table, cyclesOf(home.folder));
   const out: Finding[] = [];
   if (missing.length)
-    out.push([CYCLES, `Cycles has no row for ${listed(missing)} — every arc in arcs/ is one row ` +
-      `(05-artifacts.md § How ends in Cycles) · ${fix}`]);
+    out.push([CYCLES, `Plan has no row for ${listed(missing)} — every arc in arcs/ is one row ` +
+      `${where} · ${fix}`]);
   if (unknown.length)
-    out.push([CYCLES, `Cycles lists ${listed(unknown)}, and arcs/ holds no such arc — the table is read ` +
-      `from the arcs, never typed (05-artifacts.md § How ends in Cycles) · ${fix}`]);
+    out.push([CYCLES, `Plan lists ${listed(unknown)}, and arcs/ holds no such arc — the table is read ` +
+      `from the arcs, never typed ${where} · ${fix}`]);
   if (stale.length)
-    out.push([CYCLES, `Cycles disagrees with the arcs: ${listed(stale)} — the arcs are the state ` +
-      `(05-artifacts.md § How ends in Cycles) · ${fix}`]);
+    out.push([CYCLES, `Plan disagrees with the arcs: ${listed(stale)} — the arcs are the state ` +
+      `${where} · ${fix}`]);
   return out;
+}
+
+/** A closed page with no Plan section, read in the older shape it closed with: How's last subsection an `h3` named Cycles. */
+function closedCyclesRule(text: string, fix: string): Finding[] {
+  const body = section(text, "How")!;
+  const subsections = [...body.matchAll(/<h3\b[^>]*>([\s\S]*?)<\/h3>/gi)];
+  const named = subsections.filter((m) => /^Cycles\b/i.test(flat(m[1]))).at(-1);
+  if (!named)
+    return [[CYCLES, "the page has neither a Plan section nor How's older Cycles subsection — one row " +
+      `per arc with ${CYCLES_HEADER} (05-artifacts.md § After How comes a section of its own, Plan) · ${fix}`]];
+  if (named !== subsections.at(-1))
+    return [[CYCLES, `How carries "${flat(subsections.at(-1)![1])}" after Cycles — Cycles is How's last ` +
+      "subsection in the older shape (05-artifacts.md § After How comes a section of its own, Plan)"]];
+  return [];
 }
 
 // The command that writes the parts of a page the arcs decide (RULE.DEVEX.WORKSPACE.204).
 const WRITES_THE_PAGE = "`spn-devex docs cycles write <workstream>` writes it from the arcs";
 
 /**
- * 05-artifacts.md § How ends in Cycles: on a workstream's page the header's status follows the arcs.
+ * 05-artifacts.md § After How comes a section of its own, Plan: on a workstream's page the header's status follows the arcs.
  * It reads `PLANNING` while no arc is past `DECIDED`, `IMPLEMENTING` once an arc runs or has
  * landed, and `DONE` when the workstream closes. The rule itself is `headerStatusRule`, beside the
  * command that writes the status; this states the finding. A header that labels none of the three
@@ -374,13 +386,13 @@ export function headerRule(path: string, text: string): Finding[] {
   if (!found) return [];
   if (inClosedWorkstream(path))
     return [[CYCLES, `the header's status reads ${found.shows}, and a closed workstream reads ${found.gives} ` +
-      "(05-artifacts.md § How ends in Cycles) · stamp the header's status badge, which a closed page keeps by hand"]];
+      "(05-artifacts.md § After How comes a section of its own, Plan) · stamp the header's status badge, which a closed page keeps by hand"]];
   return [[CYCLES, `the header's status reads ${found.shows} and the arcs give ${found.gives} — the header's status ` +
-    `follows the arcs (05-artifacts.md § How ends in Cycles; RULE.DEVEX.WORKSPACE.204) · ${WRITES_THE_PAGE}`]];
+    `follows the arcs (05-artifacts.md § After How comes a section of its own, Plan; RULE.DEVEX.WORKSPACE.204) · ${WRITES_THE_PAGE}`]];
 }
 
 /**
- * 05-artifacts.md § How ends in Cycles: the heading of `Open` names the cards that are open, each by
+ * 05-artifacts.md § After How comes a section of its own, Plan: the heading of `Open` names the cards that are open, each by
  * its number, and with no card open it reads `Open — no card is open`. A page with no `Open` heading
  * and a page in a closed workstream are not judged.
  */
@@ -390,7 +402,7 @@ export function openHeadingRule(path: string, text: string): Finding[] {
   const gives = openHeadingFor(text);
   if (shows === null || shows === gives) return [];
   return [[CYCLES, `the heading of Open reads "${shows}" and the page's cards give "${gives}" ` +
-    `(05-artifacts.md § How ends in Cycles; RULE.DEVEX.WORKSPACE.204) · ${WRITES_THE_PAGE}`]];
+    `(05-artifacts.md § After How comes a section of its own, Plan; RULE.DEVEX.WORKSPACE.204) · ${WRITES_THE_PAGE}`]];
 }
 
 /** A page's line that loads the shared script, which builds the rail and folds it. */
@@ -418,10 +430,10 @@ function headings(text: string): string[] {
     .map((h) => h.split(/\s+/)[0].replace(/[:—-]+$/, "").toLowerCase());
 }
 
-const APPROACH_SECTIONS = ["why", "what", "how", "open", "deferred"];
+const APPROACH_SECTIONS = ["why", "what", "how", "plan", "open", "deferred"];
 
 /**
- * An opening, then Why -> What -> How -> Open -> Deferred, in that order and nothing else
+ * An opening, then Why -> What -> How -> Plan -> Open -> Deferred, in that order and nothing else
  * (05-artifacts.md § The approach document). `exempt` is the early workstream's page, which keeps the
  * shape it was written in and is held only to the skeleton.
  */
@@ -434,7 +446,7 @@ export function approachShape(text: string, exempt = false): Finding[] {
   if (missing.length)
     return [["RULE", "carries no " + missing.join(" + ") + " — this explains rather than argues, so " +
       `it is an overview: ${POCKET.artifacts}/${ARTIFACT.docs}/<domain>/<name>${OVERVIEW_PAGE_SUFFIX} (RULE.DEVEX.WORKSPACE.102 / 040). An approach ` +
-      "is an opening, then Why > What > How > Open > Deferred"]];
+      "is an opening, then Why > What > How > Plan > Open > Deferred"]];
   if (exempt) return [];
 
   const out: Finding[] = [];
@@ -445,11 +457,11 @@ export function approachShape(text: string, exempt = false): Finding[] {
   const others = [...new Set(heads.filter((h) => h !== "terms" && !APPROACH_SECTIONS.includes(h)))];
   if (others.length)
     out.push(["RULE", `carries ${others.join(" + ")} — an approach page is an opening, then Why > What > ` +
-      `How > Open > Deferred, and nothing else ${where}`]);
+      `How > Plan > Open > Deferred, and nothing else ${where}`]);
   const order = heads.filter((h) => APPROACH_SECTIONS.includes(h)).map((h) => APPROACH_SECTIONS.indexOf(h));
   if (order.some((at, i) => i > 0 && at < order[i - 1]))
     out.push(["RULE", `sections run ${heads.filter((h) => APPROACH_SECTIONS.includes(h)).join(" > ")} — ` +
-      `the order is Why > What > How > Open > Deferred ${where}`]);
+      `the order is Why > What > How > Plan > Open > Deferred ${where}`]);
   if (!/<p\b[^>]*class="(?:[^"]*\s)?sds-standfirst(?:\s[^"]*)?"/i.test(text))
     out.push(["RULE", "has no opening — one `p.sds-standfirst` in the header comes before Why " +
       "(05-artifacts.md § The masthead, and the opening; RULE.DEVEX.WORKSPACE.182) · start from the approach template"]);

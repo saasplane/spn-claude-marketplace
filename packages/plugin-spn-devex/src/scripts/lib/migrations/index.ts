@@ -15,5 +15,6 @@ import { migration007 } from "./007-planning-rows.ts";
 import { migration008 } from "./008-workspace-state.ts";
 import { migration009 } from "./009-styles-1-11.ts";
 import { migration010 } from "./010-preview-headers.ts";
+import { migration011 } from "./011-plan-section.ts";
 
-export const MIGRATIONS: readonly Migration[] = [migration001, migration002, migration003, migration004, migration005, migration006, migration007, migration008, migration009, migration010];
+export const MIGRATIONS: readonly Migration[] = [migration001, migration002, migration003, migration004, migration005, migration006, migration007, migration008, migration009, migration010, migration011];
