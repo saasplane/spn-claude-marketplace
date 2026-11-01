@@ -91,6 +91,9 @@ console.log("\n=== close: an unfinished plan refuses it");
   ok("[MKT.SCRIPTS.310] a whole, landed go closes: the folder moves into closed", done.code === 0 && existsSync(moved) && !existsSync(ws), done.out);
   const page = existsSync(moved) ? readFileSync(moved, "utf8") : "";
   ok("[MKT.SCRIPTS.310] the approach page is stamped DONE", /sds-done">[^<]*DONE</.test(page) && !page.includes("PLANNING</span>"), page.slice(0, 600));
+  ok("[MKT.SCRIPTS.394] the close ends with the line that asks for the closing message, naming its shape",
+    done.out.split("\n").some((line) => line.startsWith("Next: write the closing message now:") && ["🚀", "✈️", "&nbsp;", "What we delivered", "What we learned", "Thank you 👍", "retired", "RULE.DEVEX.WORKSPACE.206"].every((word) => line.includes(word)))
+      && done.out.indexOf("approach page stamped DONE") < done.out.indexOf("Next: write the closing message"), done.out);
 }
 
 console.log("\n=== go write: a release order line that is not a repository's name refuses the plan");

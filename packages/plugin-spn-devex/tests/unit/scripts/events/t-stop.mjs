@@ -1948,9 +1948,9 @@ console.log("\n=== stop — send-backs are written as they are said, the welcome
   const editRows = (ws, change) => { const data = JSON.parse(readFileSync(arcFile(ws), "utf8")); change(data); writeFileSync(arcFile(ws), `${JSON.stringify(data, null, 2)}\n`); };
   const PROMISE = "The page is written and its checks are green.\n\nNext I'll build it.";
 
-  check("[MKT.HOOKS.341] the nine checks about the reply are one set in lib/payload.ts",
-    payloadLib.REPLY_CHECKS instanceof Set && payloadLib.REPLY_CHECKS.size === 9
-      && ["needs-you", "reply-shape", "cards", "handover", "how-it-runs", "partner-words", "page-path", "welcome", "window"].every((name) => payloadLib.REPLY_CHECKS.has(name)),
+  check("[MKT.HOOKS.341] the ten checks about the reply are one set in lib/payload.ts",
+    payloadLib.REPLY_CHECKS instanceof Set && payloadLib.REPLY_CHECKS.size === 10
+      && ["needs-you", "reply-shape", "cards", "handover", "how-it-runs", "partner-words", "page-path", "close-message", "welcome", "window"].every((name) => payloadLib.REPLY_CHECKS.has(name)),
     JSON.stringify([...(payloadLib.REPLY_CHECKS ?? [])]));
 
   // The suite runs with SPN_TELEMETRY=off (tests/run.mjs); these cases read the rows a hook writes, so they take it out
@@ -2003,6 +2003,36 @@ console.log("\n=== stop — send-backs are written as they are said, the welcome
     check("[MKT.HOOKS.342] a first reply that opens with the status line is not sent back where the note says short", !speaks("wl-short", "short"));
     check("[MKT.HOOKS.342] nor where the window holds no welcome", !speaks("wl-none", null));
     check("[MKT.HOOKS.342] the same reply is sent back where the note says whole", speaks("wl-whole", "whole"));
+  }
+
+  // A CLOSE IS A MILESTONE: the reply that follows a close's success text is its closing message (RULE.DEVEX.WORKSPACE.206).
+  {
+    const entry = (type, content) => JSON.stringify({ type, message: { role: type, content } });
+    const SUCCESS = "ok · 031-probe closed · approach page stamped DONE · moved from open/ into closed/";
+    const closing = "# 🚀 The probe is answered\n\n&nbsp;\n\n### 📦 What we delivered\n\n- the probe\n\n### 🧠 What we learned\n\n- it works\n\nThank you 👍\n\nThis window can be retired.";
+    const closed = (name, results) => {
+      const file = join(BASE, `${name}.jsonl`);
+      writeFileSync(file, [entry("user", "close it"), entry("assistant", [{ type: "tool_use", id: "t1", name: "Bash", input: {} }]),
+        entry("user", results.map((text) => ({ type: "tool_result", tool_use_id: "t1", content: text })))].join("\n") + "\n");
+      return file;
+    };
+    const file = closed("close-turn", [SUCCESS]);
+    check("[MKT.HOOKS.406] the turn's tool results are read from the transcript, after the last prompt", stopModule.toolResultsOf(file).join() === SUCCESS, JSON.stringify(stopModule.toolResultsOf(file)));
+    const bare = stopModule.checkCloseMessage("Closed 031.", stopModule.toolResultsOf(file));
+    check("[MKT.HOOKS.406] a reply after a close that is not the closing message is sent back, naming every missing piece and the rule",
+      bare.length === 1 && bare[0].check === "close-message" && ["🚀 or ✈️", "What we delivered", "What we learned", "Thank you 👍", "retired", "RULE.DEVEX.WORKSPACE.206"].every((word) => bare[0].message.includes(word)), JSON.stringify(bare));
+    const part = stopModule.checkCloseMessage(closing.replace("Thank you 👍\n\n", ""), [SUCCESS]);
+    check("[MKT.HOOKS.406] a reply missing one piece is sent back naming only that piece", part.length === 1 && part[0].message.split("Write it as")[0].includes("Thank you 👍") && !part[0].message.split("Write it as")[0].includes("What we learned"), JSON.stringify(part));
+    check("[MKT.HOOKS.407] the whole closing message passes, with a ✈️ heading and the other wordings of the two headings",
+      stopModule.checkCloseMessage(closing, [SUCCESS]).length === 0
+        && stopModule.checkCloseMessage(closing.replace("🚀", "✈️").replace("we delivered", "was delivered").replace("we learned", "was learned"), [SUCCESS]).length === 0);
+    check("[MKT.HOOKS.407] a turn whose tool results hold no close success is never asked for the message", stopModule.checkCloseMessage("Done.", ["all 12 passed"]).length === 0 && stopModule.checkCloseMessage("Done.", []).length === 0);
+    check("[MKT.HOOKS.406] the check is about the reply: it is said while a row runs", payloadLib.REPLY_CHECKS.has("close-message"));
+    const root = build("close-message-hook");
+    bindOpen(root, "cm-1");
+    const out = run("node", [HOOK], { cwd: root, session_id: "cm-1", transcript_path: file, last_assistant_message: "Closed 031." }, root);
+    const ok = run("node", [HOOK], { cwd: root, session_id: "cm-2", transcript_path: file, last_assistant_message: closing }, root);
+    check("[MKT.HOOKS.406] the hook sends the bare reply back and lets the closing message through", out.includes("[close-message]") && !ok.includes("[close-message]"), `${out.slice(0, 300)} | ${ok.slice(0, 300)}`);
   }
 
   // A RUN OUTSIDE THE WORKSPACE, WITH THE PROJECT DIRECTORY AT IT, READS THE WORKSPACE (s43).

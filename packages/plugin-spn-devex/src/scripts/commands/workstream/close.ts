@@ -1,4 +1,5 @@
 // RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § The commands · § The close gate
+//           RULE.DEVEX.WORKSPACE.206, a close is a milestone, and the agent writes its message before it asks, or right after it closes on a standing grant
 // The chapter is the source of truth; a rule change is edited there first, then here, in the same change.
 //
 //   spn-devex workstream close <workstream>
@@ -272,5 +273,8 @@ export function run(args: string[]): number {
   mkdirSync(dirname(target), { recursive: true });
   renameSync(ws, target);
   console.log(`ok · ${basename(ws)} closed · approach page stamped DONE · moved from ${held}/ into closed/`);
+  // A CLOSE IS A MILESTONE (RULE.DEVEX.WORKSPACE.206): the message is written right now, and the Stop hook sends back a reply that lacks it.
+  console.log("Next: write the closing message now: a `# 🚀 <title>` heading (or ✈️), a line reading `&nbsp;`, `### 📦 What we delivered` with bullets, " +
+    "`### 🧠 What we learned` with bullets, `Thank you 👍`, and one plain line that the window can be retired (RULE.DEVEX.WORKSPACE.206).");
   return 0;
 }

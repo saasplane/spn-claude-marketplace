@@ -187,6 +187,8 @@ Every row below is declared and none is claimed: a run writes the last two cells
 | MKT.HOOKS.401 | Editor | be told when a book page cites one of this workspace's own workstreams | `doc-check` flags a book page that cites the id of a workstream of this workspace, and passes an approach page and a partner's own Q3 (RULE.DEVEX.WORKSPACE.484 · MUST) | NEGATIVE | UNIT | PLANNED | — |
 | MKT.HOOKS.404 | Backend developer | still be asked what only I can do, behind a card's label | A card's line passes with the Needs you label (bold or not) before its Q<n> or S<n>, and a label with no card number does not | POSITIVE | UNIT | PLANNED | — |
 | MKT.HOOKS.405 | Backend developer | still be asked about an act outside my standing grants | An ask that names a cloud apply, production, a teardown or destroy, or an act that cannot be undone passes how-it-runs, and the same ask without those words is sent back | POSITIVE | UNIT | PLANNED | — |
+| MKT.HOOKS.406 | Engineering leader | get a closing message right after a close | A turn whose tool results hold a close's success text is sent back unless its reply carries a 🚀 or ✈️ heading, what was delivered, what was learned, Thank you 👍 and the word retired; the message names each missing piece and RULE.DEVEX.WORKSPACE.206 | NEGATIVE | UNIT | PLANNED | — |
+| MKT.HOOKS.407 | Engineering leader | not be asked for a closing message when nothing closed | The whole closing message, in either wording of its two headings, passes, and a turn with no close success in its tool results is never asked for it | POSITIVE | UNIT | PLANNED | — |
 
 ## Retired ids
 

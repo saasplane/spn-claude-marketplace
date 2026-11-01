@@ -214,6 +214,7 @@ Every row below is declared and none is claimed: a run writes the last two cells
 | MKT.SCRIPTS.387 | Engineering leader | open an arc's preview from its bottom bar chip | A bottom bar chip opens its arc's preview in a new tab, and an arc with no preview keeps the jump to its row | POSITIVE | UNIT | PLANNED | — |
 | MKT.SCRIPTS.388 | Backend developer | not be held by an install registration whose folder is gone | `plugin-landed` counts only the registrations in `installed_plugins.json` whose project folder exists, so a folder that is gone is not a place the plugin must land | POSITIVE | UNIT | PLANNED | — |
 | MKT.SCRIPTS.393 | Engineering leader | have every held preview follow the header the commands write | Migration 010 (0.104.2) rewrites each preview of an open or backlog workstream whose header is not what the arc's commands write, by migration 003's check and script, and never reads `closed/` | POSITIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.394 | Engineering leader | be told what the closing message holds when I close a workstream | `workstream close` prints, after its success line, a `Next: write the closing message now:` line naming the heading, the `&nbsp;` line, what we delivered, what we learned, Thank you 👍 and the line that the window can be retired | POSITIVE | UNIT | PLANNED | — |
 
 ## Retired ids
 

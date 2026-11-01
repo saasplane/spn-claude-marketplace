@@ -3,6 +3,7 @@
 //           docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § The approach document
 //           docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md § The reply while work runs shows what needs you, then what moved
 //           docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § A card is only for what the rules leave open
+//           RULE.DEVEX.WORKSPACE.206, a close is a milestone, and the agent writes its message before it asks, or right after it closes on a standing grant
 // The chapters are the source of truth. A rule change is edited there first, then here, in the same change.
 //
 // The Stop checks. They read what the turn is about to leave behind, and warn — never refuse, because
@@ -23,6 +24,8 @@
 //              once while the rows stand, and names each open card in one line; a close or a handover
 //              never opens with a table, a heading or a count
 //   how-it-runs, partner-words, page-path  the reply's last asks about running the work, the words a partner cannot open, and its page addresses, after the handover
+//   close-message  a turn whose tool results hold a close's success text ends on the closing message: a 🚀 or ✈️ heading, what was
+//              delivered, what was learned, Thank you 👍 and that the window can be retired (RULE.DEVEX.WORKSPACE.206)
 //   go-next    a go of the window with a part ready and not started, or a report waiting to be folded,
 //              and no card open, is told its next step
 //   page-stale an arc this window wrote left its workstream's page, or its preview's status, behind the arcs
@@ -46,7 +49,7 @@
 // unfinished, and that window hears about it. A window bound to none hears nothing about them.
 //
 // WHILE A ROW IS IN PROGRESS, ONLY A FINDING ABOUT THE REPLY SENDS THE AGENT BACK (RULE.DEVEX.WORKSPACE.244):
-// `needs-you`, `reply-shape`, `cards`, `handover`, `how-it-runs`, `partner-words`, `page-path` and `welcome`. Every other finding is held, and the checks find
+// `needs-you`, `reply-shape`, `cards`, `handover`, `how-it-runs`, `partner-words`, `page-path`, `close-message` and `welcome`. Every other finding is held, and the checks find
 // it again at the first turn end where no row is in progress (`splitFindings`).
 //
 // `corpus` is the newest and the odd one out: every other check here reads what the TURN wrote, and
@@ -1616,6 +1619,68 @@ export function turnOf(transcript: string, reply: string): { prompt: string; ear
   return { prompt, earlier: texts };
 }
 
+/** A tool result's text: a string, or the text blocks of a list. */
+function resultText(content: unknown): string {
+  if (typeof content === "string") return content;
+  if (Array.isArray(content)) return content.map((part) => (part as { text?: string }).text ?? "").join("\n");
+  return "";
+}
+
+/**
+ * Every tool result of the turn the Stop hook ends, from the transcript: the text of each `tool_result` block after the last
+ * prompt of the developer's own, read as `turnOf` reads the turn. A helper's side chain is left out.
+ */
+export function toolResultsOf(transcript: string): string[] {
+  let raw = "";
+  try { raw = readFileSync(transcript, "utf8"); } catch { return []; }
+  let results: string[] = [];
+  for (const line of raw.split("\n")) {
+    if (!line.trim()) continue;
+    let entry: { type?: string; isMeta?: boolean; isSidechain?: boolean; message?: { content?: unknown } };
+    try { entry = JSON.parse(line); } catch { continue; }
+    if (promptTextOf(entry)) { results = []; continue; }
+    if (entry.type !== "user" || entry.isSidechain || !Array.isArray(entry.message?.content)) continue;
+    for (const part of entry.message.content as Array<{ type?: string; content?: unknown }>)
+      if (part.type === "tool_result") results.push(resultText(part.content));
+  }
+  return results;
+}
+
+// ---------------------------------------------------------------------------- the closing message
+
+/** The success text of `workstream close`, which a turn's tool results hold when the close landed. */
+export const CLOSE_SUCCESS = "closed · approach page stamped DONE";
+
+/** The parts of a closing message, each with the pattern that finds it and the words that name it to the agent. */
+const CLOSING_PARTS: Array<[RegExp, string]> = [
+  [/^#{1,6}[ \t]*(?:🚀|✈️)/mu, "a heading with 🚀 or ✈️ after the #"],
+  [/What (?:we|was) delivered/i, "\"What we delivered\" (or \"What was delivered\")"],
+  [/What (?:we|was) learned/i, "\"What we learned\" (or \"What was learned\")"],
+  [/Thank you 👍/u, "\"Thank you 👍\""],
+  [/\bretired\b/i, "the word \"retired\", in the line that says the window can be retired"],
+];
+
+/** The pieces of the closing message a reply leaves out. */
+export function missingClosing(reply: string): string[] {
+  return CLOSING_PARTS.filter(([pattern]) => !pattern.test(reply)).map(([, name]) => name);
+}
+
+/**
+ * THE CLOSE-MESSAGE CHECK (RULE.DEVEX.WORKSPACE.206): a close is a milestone, and the agent writes its message right after the
+ * close. A turn whose tool results hold the close's success text is sent back unless its reply carries every piece.
+ *
+ * @param results  the tool results of the turn (`toolResultsOf`)
+ */
+export function checkCloseMessage(reply: string, results: readonly string[]): Warning[] {
+  if (!results.some((one) => one.includes(CLOSE_SUCCESS))) return [];
+  const missing = missingClosing(reply);
+  if (!missing.length) return [];
+  return [{ check: "close-message", message:
+    `The close landed, and a close is a milestone: this reply must be its closing message (RULE.DEVEX.WORKSPACE.206). It leaves out ${missing.join("; ")}. ` +
+    "Write it as a `# 🚀 <title>` heading, a line reading `&nbsp;`, `### 📦 What we delivered` with bullets, `### 🧠 What we learned` with bullets, " +
+    "`Thank you 👍`, and one plain line that the window can be retired." }];
+}
+
 /**
  * The welcome's parts a first turn left out. The heading is matched by the words after the name,
  * because the name is optional and the heading has a first-visit form; the four lines under it are
@@ -1866,6 +1931,7 @@ if (argv1Base === "stop.ts" || argv1Base === "stop.mjs") {
     ...span({ group: "stop", action: "own-copy" }, () => checkOwnCopy(root, mine, baseline?.ownCopy ?? [])),
     ...span({ group: "stop", action: "cards" }, () => checkCardsNamed(reply, root, mine, turn.prompt)),
     ...span({ group: "stop", action: "runnable" }, () => checkRunnable(root, baseline?.at ?? 0, baseline?.steps ?? {}, wrote, mine, reply)),
+    ...span({ group: "stop", action: "close-message" }, () => checkCloseMessage(reply, event.transcript_path ? toolResultsOf(event.transcript_path) : [])),
     ...span({ group: "stop", action: "go-next" }, () => checkGoNext(root, mine, waiting)),
     ...span({ group: "stop", action: "handover" }, () => checkHandover(reply, root, mine, given, turn.earlier)),
     ...span({ group: "stop", action: "how-it-runs" }, () => checkHowItRuns(withoutFences(reply), root)),
