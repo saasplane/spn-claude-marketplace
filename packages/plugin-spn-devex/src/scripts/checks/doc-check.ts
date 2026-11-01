@@ -55,7 +55,7 @@ import { findPartnerWords } from "./partner-words.ts";
 import { bookClassFaults, inPluginSource, knownHolders, ownMarketplace, pluginNameFaults } from "./book-classes.ts";
 import { GUIDE_PAGE_SUFFIX, APPROACH_SUFFIX, ARTIFACT, CONSTRUCT_PAGES, CONSTRUCT_PAGE_SUFFIX, HUB, OVERVIEW_PAGE_SUFFIX, PLUGIN_TEMPLATES, POCKET,
          artifactDocsPathOf, decisionsRegister, inArtifacts, workstreamPrefixSource, isApproachPage, isRegister as inRegisters, pagePlaceOf,
-         workstreamDirOf } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
+         workstreamDirOf, workstreamsDir } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { BUNDLED_SUFFIX, OWN_COPY, PAGE_SCRIPT, SERVED_FILES, cutVersions, linksSharedStyles, stylesDir } from "../../../../plugin-support-lib/src/lib/page-styles.ts";
 import { CYCLES_COLUMNS, cyclesOf, headerOf, headerStatusRule, openHeadingFor, openHeadingOf, tableColumns,
          tableDifferences } from "../commands/docs/cycles.ts";
@@ -1317,11 +1317,39 @@ export function check(path: string, text: string, fragment = false): Finding[] {
   if (!isOperative(path) && !isRegister(path)) out.push(...compressedRule(text, isHtml));
   if (isRegister(path)) out.push(...rows(text)[0]);
   if (inBook(path)) out.push(...bookClassFaults(text, knownHolders(ownMarketplace())).map((f) => ["RULE", f] as Finding));
+  if (inBook(path)) out.push(...workstreamCitations(path, text));
   return out;
 }
 
 /** A book chapter: a markdown file under a folder named `spn-foundation/docs/`. */
 const inBook = (path: string): boolean => path.endsWith(".md") && slashes(path).includes("/spn-foundation/docs/");
+
+/** The workstream folders this workspace holds, in every state, as `NNN-subject`; empty outside a workspace. */
+function ownWorkstreams(path: string): string[] {
+  const root = workspaceRoot(dirname(resolve(path)));
+  if (!root) return [];
+  return (["backlog", "open", "closed"] as const).flatMap((state) => {
+    try { return readdirSync(workstreamsDir(root, state)).filter((name) => /^\d{3}-/.test(name)); } catch { return []; }
+  });
+}
+
+/**
+ * Book text that cites this workspace's own work: a workstream's folder name, `workstream 036`, or one of its arcs or cards
+ * written beside its number (`036 N018`, `036/N018`, `036 Q17`). The book states what holds, never the work that made it so.
+ * Only the numbers of workstreams this workspace holds count, so a partner's own `Q3`, and an `N018` of nobody's, pass.
+ */
+export function workstreamCitations(path: string, text: string): Finding[] {
+  const found = ownWorkstreams(path);
+  const prose = text.replace(/<!--[\s\S]*?-->/g, " ");
+  const out: Finding[] = [];
+  for (const name of found) {
+    const number = name.slice(0, 3);
+    const cite = new RegExp(`${name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}|\\bworkstream\\s+${number}\\b|\\b${number}[\\s/·.,-]+(?:N\\d{1,3}|[QqSs]\\d{1,3})\\b`).exec(prose);
+    if (cite) out.push(["RULE", `the book cites a workstream, "${cite[0]}" · state what holds, without the work that made it so ` +
+      "(a rule's reason is its own, and a workstream's id is this workspace's history)"]);
+  }
+  return out;
+}
 
 // ---------------------------------------------------------------------------- a column nobody reads down
 

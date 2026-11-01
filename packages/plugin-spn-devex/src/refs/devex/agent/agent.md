@@ -9,7 +9,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "section": "It opens on the welcome and one status line, never a status dump",
-      "seen": "50157fa2"
+      "seen": "8c4e40ab"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
@@ -89,8 +89,8 @@ judgment gate*).
 
 ## A session opens on the welcome, then one status line
 
-**The first reply opens with the welcome, whatever the prompt — MUST** (`DEC.DEVEX.WORKSPACE.045`).
-The session-start hook prints it. It is a heading that greets the developer by name, the tagline,
+**The first reply of every new window opens with the whole welcome, whatever the prompt, and then the status line — MUST** (`RULE.DEVEX.AGENT.164` · MUST · check:stop) (`DEC.DEVEX.WORKSPACE.045`).
+A window is new when the developer starts it or clears it; a compaction or a resume continues a window whose first reply was already given. The welcome costs about 2,000 tokens at the start of each window. The session-start hook prints it. It is a heading that greets the developer by name, the tagline,
 🤖 who the agent is, 🧭 the five phases with the eight stages inside them, by their names, and 👥
 every seat on the team, grouped by function. Each line opens on what the agent holds, in *I*, and
 carries what is done together, in *we*: the agent holds each stage to its standards and brings every

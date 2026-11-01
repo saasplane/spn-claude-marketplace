@@ -136,6 +136,26 @@ console.log("\n=== the generated blocks — progress and open");
     const written = [["N005", "2026-10-12T10:00+05:30"], ["N006", "2026-10-11T10:00+05:30"]];
     for (const [id, at] of written) { const dir = join(folder, "arcs", id); mkdirSync(dir, { recursive: true }); writeFileSync(join(dir, "log.jsonl"), `${JSON.stringify({ at, kind: "landed", row: "1", note: "waiting → landed" })}\n`); }
     ok("progress order: done arcs are in the order they finished, by their log, not by number", lib.executionOrder(folder, [done("N005"), done("N006")]).map((one) => one.arc).join(" ") === "N006 N005");
+    {
+      // The bar opens on what is still open: the running arcs, then every other arc not closed, then the closed ones, each in run order.
+      const chipIds = (html) => [...html.matchAll(/<a class="sds-chip [^"]*" href="[^"]*"/g)].map((one) => /N\d+/.exec(one[0])?.[0] ?? /notes\/(N\d+)/.exec(one[0])?.[1]).join(" ");
+      const bar = lib.progressInside("/nowhere", [done("N001"), arc("N002", "CARRIED"), started("N003"), arc("N009", "PROPOSED"), arc("N004", "DECIDED", 2), started("N010")]);
+      ok("progress: with closed arcs run first, the running arcs' chips come first, the decided and proposed next, and the closed last in their run order",
+        chipIds(bar) === "N003 N010 N004 N009 N001 N002", chipIds(bar));
+      ok("progress: Overall counts every arc whatever the chips' order", bar.includes("2 of 6 arcs closed"), bar);
+      // A chip whose arc has a preview opens it in a new tab; one without keeps the jump to its row.
+      const withPreview = mkdtempSync(join(tmpdir(), "chip-preview-"));
+      mkdirSync(join(withPreview, "notes", "N001"), { recursive: true });
+      writeFileSync(join(withPreview, "notes", "N001", "preview.html"), "<p>preview</p>\n");
+      const linked = lib.progressInside(withPreview, [started("N001"), started("N002")]);
+      const one = /<a class="sds-chip [^"]*" href="notes\/N001\/preview.html"[^>]*>[\s\S]*?<\/a>/.exec(linked)?.[0] ?? "";
+      ok("progress: a chip of an arc with a preview links the preview in a new tab, with an arrow after the count and its label",
+        one.includes('target="_blank" rel="noopener"') && /<span class="sds-arc-count">[^<]*<span class="sds-chip-open"[^>]*> &#8599;<\/span><\/span>/.test(one)
+          && one.includes("N001 preview, opens in a new tab"), one);
+      const plain = /<a class="sds-chip [^"]*" href="#N002"[^>]*>[\s\S]*?<\/a>/.exec(linked)?.[0] ?? "";
+      ok("progress: a chip of an arc with no preview links #N002, with no arrow and no new tab",
+        plain !== "" && !plain.includes("_blank") && !plain.includes("sds-chip-open") && !plain.includes("opens in a new tab"), linked);
+    }
     ok("progress: an arc's position is a whole number the schema accepts", schema.arcFaults({ ...arcData(), position: 3 }).length === 0 && schema.arcFaults({ ...arcData(), position: "x" }).length > 0);
   }
   ok("progress: a sticky card closes the block — the arcs' chips on the left, then the overall chip, and no line along its top edge",
@@ -348,6 +368,18 @@ console.log("\n=== a preview's one status, the arc's — RULE.DEVEX.WORKSPACE.26
   ok("a second write of the rewritten header changes nothing", lib.previewWithStatus(lib.previewWithStatus(stale, "N001", "LANDED"), "N001", "LANDED") === want);
   ok("the Arc fact stands right after the type and the page names the arc once", written.indexOf("Type:") < written.indexOf("Arc:") && written.indexOf("Arc:") < written.indexOf("Shown:") && written.split("Arc:").length === 2);
   ok("a page with no header line stays as it is", lib.previewWithStatus("<p>no header</p>\n", "N001", "LANDED") === "<p>no header</p>\n");
+  {
+    // The arc's steps landed, as a Progress fact right after Arc: a bar in the chip's fill and the count; Status stays last.
+    const progress = `<span class="sds-label">Progress:</span> <span class="sds-progress sds-step-3"><span class="sds-chip-bar"><i style="width:43%"></i></span> 3 of 7 landed</span>`;
+    const counted = lib.previewWithStatus(before, "N001", "LANDED", 3, 7);
+    ok("a preview's header gains Progress right after Arc, '3 of 7 landed', and Status stays last",
+      counted === eyebrow(`<span class="sds-line">${type}${sep}${arc}${sep}${progress}${sep}${shown}${status("LANDED")}</span>`), counted);
+    ok("Progress stands between Arc and Shown and the page names it once",
+      counted.indexOf("Arc:") < counted.indexOf("Progress:") && counted.indexOf("Progress:") < counted.indexOf("Shown:") && counted.indexOf("Shown:") < counted.indexOf("Status:") && counted.split("Progress:").length === 2);
+    ok("a second write with the same count changes nothing", lib.previewWithStatus(counted, "N001", "LANDED", 3, 7) === counted);
+    ok("the count moving rewrites the one fact", lib.previewWithStatus(counted, "N001", "LANDED", 4, 7).includes("4 of 7 landed") && !lib.previewWithStatus(counted, "N001", "LANDED", 4, 7).includes("3 of 7"));
+    ok("before the arc has a sheet there is nothing to count, so Progress is left out", lib.previewWithStatus(counted, "N001", "LANDED", 0, 0) === written);
+  }
 
   const { root, ws } = await dataWorkspace("t-workstream-preview-status");
   const preview = join(ws, "notes", "N001", "preview.html");

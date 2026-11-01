@@ -891,5 +891,25 @@ console.log("\n=== doc-check — an approach page or a preview keeps nothing of 
   }
 }
 
+// ── the book never cites this workspace's own workstreams (MKT.HOOKS.401) ──
+console.log("\n=== doc-check — the book cites no workstream of this workspace");
+{
+  const say = (label, ok, detail = "") => { n += 1; if (!ok) failed += 1; console.log(`  ${ok ? "PASS" : "FAIL"}  ${label}${ok || !detail ? "" : `\n        ${String(detail).slice(0, 300)}`}`); };
+  const docCheck = await import("../../../../src/scripts/checks/doc-check.ts");
+  mkdirSync(join(workstreamsDir(WORKSPACE, "open"), "061-citation-probe"), { recursive: true });
+  const chapter = join(WORKSPACE, "spn-foundation", "docs", "04-capabilities", "probe.md");
+  const cited = (text) => docCheck.check(chapter, text).filter(([grade, message]) => grade === "RULE" && message.includes("the book cites a workstream"));
+  const folder = cited("# A chapter\n\nThis came from 061-citation-probe, and holds.\n");
+  say("[MKT.HOOKS.401] red: a book page naming a workstream's folder is flagged, with what it cited", folder.length === 1 && folder[0][1].includes("061-citation-probe"), JSON.stringify(folder));
+  say("[MKT.HOOKS.401] red: a card of a workstream, written beside its number, is flagged", cited("# A chapter\n\nThe answer in 061 Q17 says so.\n").length === 1);
+  say("[MKT.HOOKS.401] red: an arc of a workstream, written beside its number, is flagged", cited("# A chapter\n\nSee 061/N018 for the shape.\n").length === 1);
+  say("[MKT.HOOKS.401] green: a partner's own Q3, and an arc number of nobody's, pass", cited("# A chapter\n\nThe partner's Q3 numbers hold, and so does N018.\n").length === 0);
+  say("[MKT.HOOKS.401] green: a number this workspace holds no workstream under passes", cited("# A chapter\n\nThe answer in 062 Q17 says so.\n").length === 0);
+  const approach = join(workstreamsDir(WORKSPACE, "open"), "061-citation-probe", "approach.html");
+  say("[MKT.HOOKS.401] green: an approach page citing its own workstream is not read", docCheck.check(approach, "<p>061 Q17 says so.</p>", true).every(([, message]) => !message.includes("the book cites")));
+  const outside = join(WORKSPACE, "probe-repo", "docs", "note.md");
+  say("[MKT.HOOKS.401] green: a page outside the book is not read", docCheck.check(outside, "# A note\n\nSee 061-citation-probe.\n").every(([, message]) => !message.includes("the book cites")));
+}
+
 console.log(failed ? `\n  ${failed} FAILED` : `\n  all ${n} passed`);
 process.exit(failed ? 1 : 0);

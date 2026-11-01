@@ -3,7 +3,7 @@
 // old shape and one kept as data, and made-up migrations for a script, steps and the id order.
 import { existsSync, mkdirSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { workspace } from "../../../helpers/fixture.mjs";
+import { BASE, workspace } from "../../../helpers/fixture.mjs";
 import { arcData, cli, dataWorkspace } from "../../../helpers/workstream-fixture.mjs";
 
 const lib = await import("../../../../src/scripts/lib/migration.ts");
@@ -158,13 +158,45 @@ console.log("\n=== 008 — the switch folds into the debug node once spnutils ha
       && kept.join() === `${SWITCHES} deleted — ${STATE} holds a debug node already, and it is kept (telemetry off)`, kept.join(" | "));
 }
 
+console.log("\n=== 009 — an open workstream's approach page and previews move to shared styles 1.11.0, and a closed one stays");
+{
+  const { moveToTarget } = await import("../../../../src/scripts/lib/migrations/009-styles-1-11.ts");
+  const m009 = MIGRATIONS.find((one) => one.id === "009");
+  ok("the plugin ships 009 after 008, with a script and no steps",
+    MIGRATIONS[8]?.id === "009" && /^\d+\.\d+\.\d+$/.test(m009?.version) && m009.changed.endsWith(".") && typeof m009.script === "function" && !m009.steps?.length);
+  const ADDRESS = "https://saasplane.github.io/spn-claude-marketplace/assets/docs/";
+  const page = (version) => `<!doctype html>\n<link rel="stylesheet" href="${ADDRESS}${version}/sds-docs.css" integrity="sha384-old" crossorigin="anonymous">\n<p>caf\u00e9</p>\n<script src="${ADDRESS}${version}/sds-docs.js" integrity="sha384-old" crossorigin="anonymous"></script>\n`;
+  const styles = join(BASE, "m009-styles");
+  mkdirSync(styles, { recursive: true });
+  writeFileSync(join(styles, "integrity.json"), JSON.stringify({ "1.11.0": { "sds-docs.css": "sha384-css", "sds-docs.js": "sha384-js", "sds-index.js": "sha384-index" } }));
+  const WS = ".spndevex/workstreams";
+  const root = workspace("m009", {
+    [`${WS}/open/031-probe/approach.html`]: page("1.9.0"),
+    [`${WS}/open/031-probe/notes/N001/preview.html`]: page("1.9.0"),
+    [`${WS}/open/032-later/approach.html`]: page("1.11.0"),
+    [`${WS}/closed/020-done/approach.html`]: page("1.9.0"),
+  }, [], { migrated: false });
+  ok("its check names the open page and the preview on 1.9.0, and not the 1.11.0 page nor the closed one",
+    m009.check(root).length === 2 && m009.check(root).every((place) => place.startsWith("open/031-probe/")), m009.check(root).join(" | "));
+  const said = moveToTarget(root, styles);
+  const read = (path) => readFileSync(join(root, WS, path), "utf8");
+  ok("red: the script moves both to 1.11.0 with its hashes, and leaves the rest as it was",
+    said.length === 2 && read("open/031-probe/approach.html") === page("1.11.0").replace(/sha384-old(?=" crossorigin="anonymous">)/, "sha384-css").replace(/sha384-old/, "sha384-js")
+      && read("open/031-probe/notes/N001/preview.html").includes(`${ADDRESS}1.11.0/sds-docs.js" integrity="sha384-js"`)
+      && read("open/032-later/approach.html") === page("1.11.0") && read("closed/020-done/approach.html") === page("1.9.0"), said.join(" | "));
+  ok("a second run changes nothing, and the check finds nothing", moveToTarget(root, styles).length === 0 && m009.check(root).length === 0);
+  const bare = workspace("m009-bare", { [`${WS}/open/031-probe/approach.html`]: page("1.9.0") }, [], { migrated: false });
+  ok("where 1.11.0 has no hash it refuses and moves nothing",
+    moveToTarget(bare, join(BASE, "empty-styles")).length === 1 && readFileSync(join(bare, WS, "open/031-probe/approach.html"), "utf8") === page("1.9.0"));
+}
+
 console.log("\n=== a check that finds nothing → recorded without work");
 {
   const root = current("nothing-to-do");
   const [one] = standings(root, MIGRATIONS);
   ok("001 has nothing to do where the workstream is kept as data", one.state === "nothing to do", one.state);
   ok("the window's start says so in one line, naming the command that records it",
-    windowStartLines(root, MIGRATIONS).join("\n") === "- 001, 002, 003, 004, 005, 006, 007, 008: the check finds nothing in the old shape — `spn-devex plugin migration write 001 002 003 004 005 006 007 008` records it, with nothing to do.",
+    windowStartLines(root, MIGRATIONS).join("\n") === "- 001, 002, 003, 004, 005, 006, 007, 008, 009: the check finds nothing in the old shape — `spn-devex plugin migration write 001 002 003 004 005 006 007 008 009` records it, with nothing to do.",
     windowStartLines(root, MIGRATIONS).join("\n"));
   const applied = applyMigrations(root, MIGRATIONS, ["001"]);
   const line = JSON.parse(readFileSync(ledgerOf(root), "utf8").trim());
@@ -244,7 +276,7 @@ console.log("\n=== 003 — a preview's header shows the arc's status");
   ok("its script writes it, and names the preview", lines.join() === "open/031-probe/notes/N001/preview.html: wrote the arc's status", lines.join(" | "));
   ok("green: 003 then finds nothing", m003.check(root).length === 0, m003.check(root).join(" | "));
   ok("the preview reads Status DECIDED, the arc's own, linking its row, and its Arc fact is the linked badge after the type",
-    readFileSync(preview, "utf8").includes(`<span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Preview</span><span class="sds-separator">|</span><span class="sds-label">Arc:</span> <a class="sds-badge" href="../../approach.html#N001">N001</a><span class="sds-state"><span class="sds-label">Status:</span> <a class="sds-badge sds-status sds-decided" href="../../approach.html#N001">DECIDED</a></span></span>`), readFileSync(preview, "utf8"));
+    readFileSync(preview, "utf8").includes(`<span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Preview</span><span class="sds-separator">|</span><span class="sds-label">Arc:</span> <a class="sds-badge" href="../../approach.html#N001">N001</a><span class="sds-separator">|</span><span class="sds-label">Progress:</span> <span class="sds-progress sds-step-1"><span class="sds-chip-bar"><i style="width:0%"></i></span> 0 of 2 landed</span><span class="sds-state"><span class="sds-label">Status:</span> <a class="sds-badge sds-status sds-decided" href="../../approach.html#N001">DECIDED</a></span></span>`), readFileSync(preview, "utf8"));
   ok("a closed workstream's preview stays as it closed", readFileSync(join(root, ".spndevex/workstreams/closed/020-done/notes/N001/preview.html"), "utf8") === old);
 }
 

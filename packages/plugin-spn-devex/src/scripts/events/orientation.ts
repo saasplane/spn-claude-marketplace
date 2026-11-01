@@ -48,11 +48,10 @@
 // it is not in.
 
 import { execFileSync, spawn } from "node:child_process";
-import { mkdirSync, readFileSync, readdirSync, realpathSync, statSync, writeFileSync } from "node:fs";
+import { readFileSync, readdirSync, realpathSync, statSync } from "node:fs";
 import { homedir } from "node:os";
 import { basename, dirname, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
-import { workspaceDir } from "../../../../plugin-support-lib/src/lib/debug-store.ts";
 import { commandWords, usageLine } from "../../../../plugin-support-lib/src/lib/command.ts";
 import { isDir, isFile, listdir, read, readPayload, runAlone, type Payload } from "../lib/payload.ts";
 import { noteWelcome } from "../lib/window.ts";
@@ -502,30 +501,19 @@ export const WELCOME_LEAD =
   "each of the three, then the status line. Trim nothing. The prompt is answered after it, never instead of it.";
 
 /**
- * The line the agent reads first on every start but the day's first: the welcome was shown once today in this workspace, so
- * the reply opens with the status line alone.
+ * The line the agent reads first on a start that continues a window (a compaction or a resume): that window's first reply
+ * was given already, so the reply opens with the status line alone.
  */
 export const SHORT_LEAD =
   "Your first reply opens with the status line below, word for word, before any tool call and before any other text, " +
-  "whatever the prompt. The welcome was shown today already, so it is not repeated. The prompt is answered after it, never instead of it.";
+  "whatever the prompt. This window continues one that has had its welcome, so it is not repeated. The prompt is answered after it, never instead of it.";
 
-/** The day the whole welcome was last shown in a workspace, kept beside the other state that spans windows. */
-const welcomeMark = (root: string): string => join(workspaceDir(root), "welcome.json");
-/** Today as the developer counts it: the local date. */
-const dayOf = (now: Date = new Date()): string =>
-  `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
-
-/** Whether the whole welcome is due: it is shown once a day for each workspace, and the first start of the day shows it. */
-export function welcomeDue(root: string, now: Date = new Date()): boolean {
-  try { return (JSON.parse(readFileSync(welcomeMark(root), "utf8")) as { day?: string }).day !== dayOf(now); } catch { return true; }
-}
-
-/** Records that the whole welcome was shown today. A workspace that cannot be written to just shows it again. */
-export function markWelcome(root: string, now: Date = new Date()): void {
-  try {
-    mkdirSync(workspaceDir(root), { recursive: true });
-    writeFileSync(welcomeMark(root), `${JSON.stringify({ day: dayOf(now) })}\n`);
-  } catch { /* shown again next start */ }
+/**
+ * Whether a session start opens a new window and so gets the whole welcome: a start or a clear does, and so does a start
+ * with no source. A compaction or a resume continues a window whose first reply was already given.
+ */
+export function welcomeDue(source?: string): boolean {
+  return source !== "compact" && source !== "resume";
 }
 
 export function welcome(who: string | null, firstVisit: boolean, builder = false): string[] {
@@ -899,7 +887,7 @@ export function goLines(root: string, named: number = GOS_NAMED): string[] {
 /**
  * The session's opening, as two strings: `message` is the developer's pane — the welcome and one
  * status line — and `context` is what the agent reads — the same, then the tables, the closing
- * question and the note. `whole` is false where the day's welcome was shown already: the start is then the status line and the
+ * question and the note. `whole` is false where the window continues one (a compaction or a resume): the start is then the status line and the
  * one Go line, and the welcome is left out.
  */
 export function orient(root: string, cwd: string, whole = true): [message: string, context: string] {
@@ -1120,10 +1108,9 @@ if (runAlone("orientation.ts")) {
     const root = workspaceRootOf(cwd);
     sweepSessions(root);
     await fetchMembers(members(root).map(([, path]) => path));
-    // The whole welcome is the day's first start in this workspace; the rest are short. A hand run records nothing.
-    const whole = !stdinMode || welcomeDue(root);
+    // The whole welcome goes out to every new window; a compaction or a resume continues one and is short. A hand run is whole.
+    const whole = !stdinMode || welcomeDue((payload as Payload & { source?: string }).source);
     result = orient(root, cwd, whole);
-    if (stdinMode && whole) markWelcome(root);
     // WHICH WELCOME WENT OUT, noted in the window so the Stop hook holds the first reply to the whole one only where it was sent.
     if (stdinMode) noteWelcome(root, payload.session_id, whole ? "whole" : "short");
   }

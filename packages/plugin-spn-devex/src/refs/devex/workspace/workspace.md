@@ -50,6 +50,11 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md",
+      "section": "Scope control",
+      "seen": "923d3752"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md",
       "section": "Restatement discipline",
       "seen": "49201c87"
     },
@@ -314,7 +319,7 @@ named by its number, `N<nnn>`, and its short subject, its title and its goal are
 number names its two folders, and `notes/` and `arcs/` hold nothing but arc folders. Its address is its row
 on the approach page, `approach.html#N<nnn>`, and every link to an arc points there. The commands, the formats and the life of an arc are in [`workstream.md`](workstream.md). Anything a status file would hold is expressed by the tree, so a second copy only gives it somewhere to fall out of date. **The window is never part of the state of the work** — Claude Code owns window identity, and a subject outlives any window. Which workstream a window works on is context the agent holds from the conversation. The plugin keeps a note of its own for hooks, `window.json` in that window's folder under `.debug/sessions/`, and the note never says which state a workstream is in: the folder tree says that.
 
-**A change to how something looks is made in the arc's preview first, as often as the developer likes, and built once in one order after their go** (`RULE.DEVEX.WORKSPACE.274` · MUST · check:workstream-state). A written order runs on Sonnet, shaping, cards and previews stay on the largest model, and every launch names its model (`RULE.DEVEX.AGENT.104` · MUST · check:pretooluse). An order quotes the facts it needs, each with its commit, and points to the rules it follows (`RULE.DEVEX.WORKSPACE.276` · MUST · skill:spn-devex/execute). The log gets one note per milestone (`RULE.DEVEX.WORKSPACE.275` · MUST · check:confirmed).
+**A change to how something looks is made in the arc's preview first, as often as the developer likes, and built once in one order after their go** (`RULE.DEVEX.WORKSPACE.274` · MUST · check:workstream-state). A written order runs on Sonnet, shaping, cards and previews stay on the largest model, and every launch names its model (`RULE.DEVEX.AGENT.104` · MUST · check:agent-model). An order quotes the facts it needs, each with its commit, and points to the rules it follows (`RULE.DEVEX.WORKSPACE.276` · MUST · skill:spn-devex/execute). The log gets one note per milestone (`RULE.DEVEX.WORKSPACE.275` · MUST · check:confirmed).
 
 **Every arc stands on its workstream's approach page** (`RULE.DEVEX.WORKSPACE.263` · MUST · check:workstream-state). Its row in *Cycles* is its address, `approach.html#N<nnn>`, so a subject with an arc and no page is a gap, and `workstream state check` names it. A page that argues nothing yet still carries the masthead and the Cycles row.
 
@@ -407,6 +412,8 @@ When a window opens, surface what is stale — a subject untouched across sittin
 **A restatement citing a chapter carries a stamp, and that stamp moves when the chapter moves.** Restatement discipline makes a rule change N declared edits: the owning document, plus every registered restatement, in one change. **The owning document changes first, and every restatement follows it** (`RULE.DEVEX.WORKSPACE.229` · MUST · check:doc-check): every reference a plugin ships restates the book, whatever it holds, so a builder edits the book, then runs `restates docs write` for a prose reference or `restates files write` for a folder restated as files. A restatement edited ahead of its source is undone by the next write from that source. Run `spn-devex restates check` to see which stamps your edit moved: it reads the path it is given, else `spn-foundation` in the workspace it runs in, and names that book on its first line. **It reports and writes nothing for a `docs` or `files` citation**, so you correct each of those `seen` values yourself once you have re-read the source and corrected any disagreement; `restates decisions write <ref>` restamps a `decisions` citation the same way, after the same re-read.
 
 **A citation names a file, a section of a file, or a whole folder** (`RULE.DEVEX.AGENT.072` · MUST · skill:spn-devex/develop). The first two answer *did this rule move*. A folder answers the one they cannot — *did the set change* — because a stamp per file reports every edit and says nothing about a file nobody cited. Use it wherever what is restated is **all of them**: the clearest case is what the plugins carry for a partner, who never gets the book, where *the book grew a shape a partner does not have* is the failure the copy exists to prevent.
+
+**Book text never cites a workstream, an arc or a card of a workspace, because work history is not a standard** (`RULE.DEVEX.WORKSPACE.484` · MUST · check:doc-check). `doc-check` flags it in the book's own pages, matching only the ids of the workspace's own workstreams.
 
 **A partner receives none of this until the marketplace is published.** Publishing is pushing that repository, and a plugin's installed cache is keyed by its version. So the version bump and the push belong to this loop rather than to whatever follows it. The marketplace's own instruction file rules when that count moves.
 

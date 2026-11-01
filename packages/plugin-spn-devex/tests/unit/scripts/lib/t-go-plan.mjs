@@ -97,9 +97,20 @@ same("[MKT.SCRIPTS.320] an entry that changed after its part landed gets a follo
   [["code-lib-repo-1", "landed"], ["code-lib-repo-2", "ready"]]);
 same("[MKT.SCRIPTS.320] an unchanged entry of a landed row gets no follow-up", deriveGo(rowsLanded, { previous: landedAll }).parts.filter((p) => p.entries.includes("N009/E3")).map((p) => p.state), ["landed"]);
 const allLanded = { ...scope[0], landed: ["E1", "E2", "E3"] };
-same("[MKT.SCRIPTS.322] code landed and a proof owed: a full run and no baseline", deriveGo([{ ...allLanded, proofs: ["lib-repo"] }]).parts.filter((p) => p.work !== "RELEASE").map((p) => p.id), ["full-lib-repo"]);
+same("[MKT.SCRIPTS.322] code landed and a proof owed: a full run and no baseline", deriveGo([{ ...allLanded, proofs: ["lib-repo"] }]).parts.filter((p) => p.work !== "RELEASE").map((p) => p.id), ["full-lib-repo", "proof-lib-repo"]);
 same("[MKT.SCRIPTS.322] code landed and no proof owed: neither", deriveGo([allLanded]).parts.filter((p) => p.work !== "RELEASE").map((p) => p.id), []);
 same("[MKT.SCRIPTS.322] the full run for a proof owed waits on nothing of its own repository", deriveGo([{ ...allLanded, proofs: ["lib-repo"] }]).parts.find((p) => p.id === "full-lib-repo")?.waitsOn, []);
+// The proof after the releases: the repository's full run has landed, so an owed PROOF row has a part of its own, not a second full run.
+const owedProof = deriveGo([{ ...allLanded, proofs: ["lib-repo"] }], { previous: landedAll });
+const proofPart = owedProof.parts.find((p) => p.id === "proof-lib-repo");
+same("[MKT.SCRIPTS.384] a PROOF row owed after a landed full run derives proof-<repo>, TEST work, waiting on every release of the plan",
+  [proofPart?.work, proofPart?.waitsOn, owedProof.parts.some((p) => p.id.startsWith("full-lib-repo-")), goFaults(owedProof)], ["TEST", ["release-lib-repo-1", "release-app-repo-1"], false, []]);
+same("[MKT.SCRIPTS.384] no proof is owed, no proof part", deriveGo([allLanded], { previous: landedAll }).parts.some((p) => p.id.startsWith("proof-")), false);
+const proofLanded = { ...owedProof, parts: owedProof.parts.map((p) => (p.id === "proof-lib-repo" ? { ...p, state: "landed" } : p)) };
+same("[MKT.SCRIPTS.384] a landed proof part is kept as it was and made once", deriveGo([{ ...allLanded, proofs: ["lib-repo"] }], { previous: proofLanded }).parts.filter((p) => p.id === "proof-lib-repo").map((p) => p.state), ["landed"]);
+const without = [{ arc: "N009", sheet: sheet([entry("E1", "app-repo:src/a.ts"), entry("E3", "lib-repo:docs/c.md")]), dropped: ["E2"] }];
+same("[MKT.SCRIPTS.384] a landed part holding an entry later dropped from the sheet is not stale", staleEntries(landedAll.parts.find((p) => p.id === "code-lib-repo-1"), landedAll, without), []);
+same("[MKT.SCRIPTS.384] and one whose entry was edited still is", staleEntries(landedAll.parts.find((p) => p.id === "code-lib-repo-1"), landedAll, changed), ["N009/E2"]);
 same("[MKT.SCRIPTS.311] a part held twice fails the schema", goFaults({ ...plan, parts: [plan.parts[0], { ...plan.parts[0], id: "docs-lib-repo-9" }] }).length > 0, true);
 same("[MKT.SCRIPTS.311] a signature that misses an entry fails the schema", goFaults({ ...plan, parts: [{ ...plan.parts[0], signature: "a.b" }] }).length, 1);
 same("[MKT.SCRIPTS.311] a work that is a number fails the schema", goFaults({ ...plan, parts: [{ ...plan.parts[0], work: 1 }] }).length > 0, true);

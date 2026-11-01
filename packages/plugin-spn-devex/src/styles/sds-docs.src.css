@@ -624,12 +624,15 @@
   .sds-chip-bar{@apply block bg-rule overflow-hidden; flex:none; height:4px; border-radius:999px}
   .sds-chip-bar i{@apply block h-full; background:var(--sds-arc)}
   .sds-arc-count{@apply font-mono text-xs text-fact; font-variant-numeric:tabular-nums}
-  .sds-chip.sds-step-1,.sds-footbar-summary.sds-step-1{--sds-arc:var(--sds-step-1)}
-  .sds-chip.sds-step-2,.sds-footbar-summary.sds-step-2{--sds-arc:var(--sds-step-2)}
-  .sds-chip.sds-step-3,.sds-footbar-summary.sds-step-3{--sds-arc:var(--sds-step-3)}
-  .sds-chip.sds-step-4,.sds-footbar-summary.sds-step-4{--sds-arc:var(--sds-step-4)}
-  .sds-chip.sds-step-5,.sds-footbar-summary.sds-step-5{--sds-arc:var(--sds-step-5)}
-  .sds-chip.sds-step-done,.sds-footbar-summary.sds-step-done{--sds-arc:var(--sds-step-done)}
+  .sds-chip-open{@apply no-underline; color:inherit}
+  .sds-eyebrow .sds-progress{@apply inline-flex items-center; --sds-arc:var(--sds-step-1); gap:.4rem}
+  .sds-eyebrow .sds-progress .sds-chip-bar{width:4.5rem; height:.5rem}
+  .sds-chip.sds-step-1,.sds-footbar-summary.sds-step-1,.sds-progress.sds-step-1{--sds-arc:var(--sds-step-1)}
+  .sds-chip.sds-step-2,.sds-footbar-summary.sds-step-2,.sds-progress.sds-step-2{--sds-arc:var(--sds-step-2)}
+  .sds-chip.sds-step-3,.sds-footbar-summary.sds-step-3,.sds-progress.sds-step-3{--sds-arc:var(--sds-step-3)}
+  .sds-chip.sds-step-4,.sds-footbar-summary.sds-step-4,.sds-progress.sds-step-4{--sds-arc:var(--sds-step-4)}
+  .sds-chip.sds-step-5,.sds-footbar-summary.sds-step-5,.sds-progress.sds-step-5{--sds-arc:var(--sds-step-5)}
+  .sds-chip.sds-step-done,.sds-footbar-summary.sds-step-done,.sds-progress.sds-step-done{--sds-arc:var(--sds-step-done)}
   .sds-chip.sds-step-design{--sds-arc:var(--sds-gap)}
   .sds-chip.sds-step-design .sds-chip-bar{background:var(--sds-gap-soft)}
   @media (max-width:40rem){
