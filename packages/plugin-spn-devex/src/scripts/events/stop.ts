@@ -91,7 +91,7 @@ import { sessionDir } from "../../../../plugin-support-lib/src/lib/debug-store.t
 import { cacheState, goStandings, welcome } from "./orientation.ts";
 import { begin, span, end, settle, tagsOf } from "../../../../plugin-support-lib/src/lib/timing.ts";
 import { recordUsage, windowSize } from "../lib/usage.ts";
-import { arcsWrittenSince, fromWorkspace, named, readWindow, reposWritten, visitedWorkstreams, windowSet } from "../lib/window.ts";
+import { arcsWrittenSince, fromWorkspace, named, readWindow, reposWritten, visitedWorkstreams, windowGoes, windowSet } from "../lib/window.ts";
 
 type Warning = { check: string; message: string };
 
@@ -1410,10 +1410,10 @@ export function checkArcToPage(root: string, mine: Set<string>): Warning[] {
  *
  * @param cards  the cards open on this window's pages (`cardsWaiting`)
  */
-export function checkGoNext(root: string, mine: Set<string>, cards: string[]): Warning[] {
+export function checkGoNext(root: string, mine: Set<string>, cards: string[], started: Set<string> | null = null): Warning[] {
   if (cards.length || !mine.size) return [];
   // A PART THAT WAITS ON SOMETHING OUTSIDE THE WINDOW IS SAID AS WAITING AND NEVER AS NEXT, and only beside a step that can be taken.
-  return goStandings(root, mine).filter((go) => go.ready.length || go.unfolded.length).map((go) => ({ check: "go-next", message:
+  return goStandings(root, mine, started).filter((go) => go.ready.length || go.unfolded.length).map((go) => ({ check: "go-next", message:
     `The go of ${go.workstream}/${go.lead} has ` +
     [go.ready.length ? `${go.ready.length === 1 ? "a part" : `${go.ready.length} parts`} ready and not started (${go.ready.join(", ")})` : "",
      go.unfolded.length ? `${go.unfolded.length === 1 ? "a report" : `${go.unfolded.length} reports`} waiting to be folded (${go.unfolded.join(", ")})` : ""]
@@ -1963,7 +1963,7 @@ if (argv1Base === "stop.ts" || argv1Base === "stop.mjs") {
     ...span({ group: "stop", action: "runnable" }, () => checkRunnable(root, baseline?.at ?? 0, baseline?.steps ?? {}, wrote, mine, reply)),
     ...span({ group: "stop", action: "close-message" }, () => checkCloseMessage(reply, event.transcript_path ? toolResultsOf(event.transcript_path) : [])),
     ...span({ group: "stop", action: "card-case" }, () => checkCardCase(reply)),
-    ...span({ group: "stop", action: "go-next" }, () => checkGoNext(root, mine, waiting)),
+    ...span({ group: "stop", action: "go-next" }, () => checkGoNext(root, mine, waiting, windowGoes(root, session))),
     ...span({ group: "stop", action: "handover" }, () => checkHandover(reply, root, mine, given, turn.earlier)),
     ...span({ group: "stop", action: "how-it-runs" }, () => checkHowItRuns(withoutFences(reply), root)),
     ...span({ group: "stop", action: "partner-words" }, () => checkPartnerWords(withoutFences(reply), root, turn.prompt)),

@@ -1819,6 +1819,9 @@ console.log("\n=== stop — the checks the first round fixed or wired, and the g
       unfolded.length === 1 && unfolded[0].message.includes("a report waiting to be folded (code-spn-x-1)")
         && unfolded[0].message.includes("`spn-devex workstream report write 031-probe notes/N001/orders/code-spn-x-1.report.md`"), JSON.stringify(unfolded));
     check("[MKT.HOOKS.306] a workstream that is not this window's is not read", call("checkGoNext", root, new Set(), []).length === 0);
+    check("[MKT.HOOKS.414] a go this window did not start is not its next step, though the workstream is its own", call("checkGoNext", root, everyone(root), [], new Set()).length === 0);
+    check("[MKT.HOOKS.414] a go this window started is its next step", call("checkGoNext", root, everyone(root), [], new Set(["031-probe/N001"])).length === 1);
+    check("[MKT.HOOKS.414] a go a handover gave the window is its next step", call("checkGoNext", root, everyone(root), [], new Set(["031-probe/*"])).length === 1);
     // A PART THAT WAITS ON SOMETHING OUTSIDE THE WINDOW IS NEVER THE NEXT STEP: it is said once, as waiting, with what it waits on.
     planWith([part("code-spn-x-1", "waiting", { waitingOn: "the release of spn-y that ships spnutils x run" }), part("code-spn-x-2", "ready", { entries: ["N001/E2"] })]);
     const mixed = call("checkGoNext", root, everyone(root), []);

@@ -31,7 +31,7 @@ import { basename, resolve } from "node:path";
 import { emit, eventWorkspace, readPayload, type Payload, type Verdict } from "../lib/payload.ts";
 import { arcIdsOf, logEvent, readArc, readSheet, writeWhole } from "../lib/workstream.ts";
 import { changedEntries, goFileOf, readGo, type ScopeSheet } from "../lib/go-plan.ts";
-import { alreadyTold, commandWrites, fromWorkspace, recordWrites } from "../lib/window.ts";
+import { alreadyTold, commandWrites, fromWorkspace, recordGoes, recordWrites } from "../lib/window.ts";
 import { checkSaasplaneEnv } from "../checks/saasplane-env.ts";
 import { checkDoc, bashWrites } from "../checks/doc-check.ts";
 import { gateDocumentsFirst, gateClose, moves } from "../checks/split-plan.ts";
@@ -581,7 +581,10 @@ export function dispatch(payload: Payload): Verdict {
   try {
     const cwd = payload.cwd ?? process.cwd();
     const root = eventWorkspace(cwd);
-    if (root && payload.session_id) recordWrites(root, payload.session_id, cwd, bindingPaths(payload));
+    if (root && payload.session_id) {
+      recordWrites(root, payload.session_id, cwd, bindingPaths(payload));
+      if (supplied.command) recordGoes(root, payload.session_id, cwd, supplied.command);
+    }
   } catch { /* a binding that cannot be written is a window that hears less */ }
 
   const path = supplied.file_path ?? "";
