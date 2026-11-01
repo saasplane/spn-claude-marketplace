@@ -35,7 +35,7 @@
 // said.
 
 import { basename, resolve } from "node:path";
-import { isDir, readPayload, runAlone, workspaceRoot, type Payload } from "../lib/payload.ts";
+import { eventWorkspace, isDir, readPayload, runAlone, workspaceRoot, type Payload } from "../lib/payload.ts";
 import { ARCS, SESSIONS, WORKSTREAM_STATES, WORKSTREAMS } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { HELD_STATE, closing, moves, stateOf, subjectFolders, subjectPages, workstreamPlan } from "../checks/split-plan.ts";
 import { begin, callOf, end, span, tagsOf } from "../../../../plugin-support-lib/src/lib/timing.ts";
@@ -52,7 +52,7 @@ export function closingMessage(payload: Payload): string | null {
   for (const [source, rawDestination] of moves(command)) {
     const destination = resolve(cwd, rawDestination);
     if (!closing(destination)) continue;
-    const root = workspaceRoot(destination) ?? workspaceRoot(cwd);
+    const root = workspaceRoot(destination) ?? eventWorkspace(payload.cwd);
     if (!root) continue;
     let subject = basename(source.replace(/\/+$/, ""));
     if (subject.startsWith("arc-") && subject.endsWith(".md"))

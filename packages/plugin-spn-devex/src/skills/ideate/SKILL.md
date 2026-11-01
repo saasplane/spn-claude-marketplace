@@ -35,12 +35,42 @@ description: Decide what a node IS, and design a requirement inside that shape -
 
 - **RULE.DEVEX.AGENT.026** (`RULE.DEVEX.AGENT.026` · MUST · skill:spn-devex/ideate)
 - **The architect's view follows a change through every place it lands, and it designs how the work on it is laid out and ordered** (`RULE.DEVEX.AGENT.087` · MUST · skill:spn-devex/ideate)
+- **A view is shown as a speaker: its name, then what it said, as a colleague would say it out loud** (`RULE.DEVEX.AGENT.090` · MUST · skill:spn-devex/ideate)
+- **Each lens learns the partner's industry for its own discipline, from the internet, and maps it onto the constructs and the SaaS Plane way** (`RULE.DEVEX.AGENT.099` · MUST · skill:spn-devex/ideate)
+- **On a card, a view is one or two plain sentences** (`RULE.DEVEX.AGENT.122` · MUST · skill:spn-devex/ideate)
+- **The agent shortens a view's words for the card, and keeps its name and its meaning** (`RULE.DEVEX.AGENT.123` · MUST · skill:spn-devex/ideate)
 - **spec-first** (`RULE.DEVEX.FUNCTION.007` · MUST · skill:spn-devex/ideate)
+- **`IDEATE` decides the shape, and designing a requirement inside that shape is part of it** (`RULE.DEVEX.FUNCTION.016` · MUST · skill:spn-devex/ideate)
 - **RULE.DEVEX.FUNCTION.028** (`RULE.DEVEX.FUNCTION.028` · MUST · skill:spn-devex/ideate)
 - **The DevEx stages are eight — `BOOTSTRAP` · `SCM` · `IDEATE` · `DEVELOP` · `TEST` · `PROVISION` · `DELIVER` · `OPERATE` — and this phase covers both deciding a node's shape and designing a requirement inside it** (`RULE.DEVEX.FUNCTION.062` · MUST · skill:spn-devex/ideate)
+- **RULE.DEVEX.WORKSPACE.006** (`RULE.DEVEX.WORKSPACE.006` · MUST · skill:spn-devex/ideate)
+- **A step acting on a set carries that set** (`RULE.DEVEX.WORKSPACE.064` · MUST · skill:spn-devex/ideate)
+- **`migrations/` earns you none either** (`RULE.DEVEX.WORKSPACE.086` · MUST · skill:spn-devex/ideate)
+- **RULE.DEVEX.WORKSPACE.145** (`RULE.DEVEX.WORKSPACE.145` · MUST · skill:spn-devex/ideate)
+- **RULE.DEVEX.WORKSPACE.170** (`RULE.DEVEX.WORKSPACE.170` · MUST · skill:spn-devex/ideate)
+- **RULE.DEVEX.WORKSPACE.171** (`RULE.DEVEX.WORKSPACE.171` · MUST · skill:spn-devex/ideate)
+- **The agent picks the form of a preview, and your word overrides it** (`RULE.DEVEX.WORKSPACE.201` · MUST · skill:spn-devex/ideate)
+- **A preview outside any workstream uses the same template** (`RULE.DEVEX.WORKSPACE.209` · MUST · skill:spn-devex/ideate)
+- **Before an arc's rows are written, the architect's view sets their order from the kind of work** (`RULE.DEVEX.WORKSPACE.241` · MUST · skill:spn-devex/ideate)
+- **The agent creates a workstream only on your yes to a block that says six things back to you** (`RULE.DEVEX.WORKSPACE.308` · MUST · skill:spn-devex/ideate)
+- **The edge of an arc is what you review together and what releases together, and the domain gives it its name** (`RULE.DEVEX.WORKSPACE.309` · MUST · skill:spn-devex/ideate)
+- **One order of questions places anything new, and the agent stops at the first yes** (`RULE.DEVEX.WORKSPACE.310` · MUST · skill:spn-devex/ideate)
+- **Every behaviour row an arc changes is shown on its preview, before and after, in the words of the person it is for** (`RULE.DEVEX.WORKSPACE.329` · MUST · skill:spn-devex/ideate)
+- **The agent proposes the starting state and you decide** (`RULE.DEVEX.WORKSPACE.354` · MUST · skill:spn-devex/ideate)
+- **A step that names one file for a change touching four is not a step** (`RULE.DEVEX.WORKSPACE.362` · MUST · skill:spn-devex/ideate)
+- **A move is a table, and its targets are unique** (`RULE.DEVEX.WORKSPACE.365` · MUST · skill:spn-devex/ideate)
+- **Where a change must be seen to be judged, you see one real before-and-after on the arc's preview and say yes before any order goes out** (`RULE.DEVEX.WORKSPACE.366` · MUST · skill:spn-devex/ideate)
+- **A suggestion is written to `suggestions.jsonl` when it is raised, by `workstream suggestion add`, moved on by `suggestion state` and reworded by `suggestion edit`** (`RULE.DEVEX.WORKSPACE.376` · MUST · skill:spn-devex/ideate)
+- **One kind of decision is taken out of that: a decision that sets a shape, a name, a member, a check or the direction of a dependency** (`RULE.DEVEX.WORKSPACE.383` · MUST · skill:spn-devex/ideate)
+- **A question reaches you for one of three reasons, and for no other** (`RULE.DEVEX.WORKSPACE.384` · MUST · skill:spn-devex/ideate)
+- **Scope names a node** (`RULE.DEVEX.WORKSPACE.392` · MUST · skill:spn-devex/ideate)
+- **A view on a card is short** (`RULE.DEVEX.WORKSPACE.423` · MUST · skill:spn-devex/ideate)
+- **The agent shortens a view's words for the card, and keeps its name and its meaning** (`RULE.DEVEX.WORKSPACE.424` · MUST · skill:spn-devex/ideate)
 - **A sample is drawn from the page's own data and rules** (`RULE.DEVEX.WORKSPACE.427` · MUST · skill:spn-devex/ideate)
 - **The agent searches the decisions already taken before it proposes a shape** (`RULE.DEVEX.WORKSPACE.429` · MUST · skill:spn-devex/ideate)
+- **Each option on a card is one decision** (`RULE.DEVEX.WORKSPACE.442` · MUST · skill:spn-devex/ideate)
 - **While you are still ideating, the agent talks it through in chat** (`RULE.DEVEX.WORKSPACE.443` · MUST · skill:spn-devex/ideate)
+- **Conflicts land here — always** (`RULE.DEVEX.WORKSPACE.466` · MUST · skill:spn-devex/ideate)
 - **Registering is optional, and the chain is complete without it.** (`RULE.LAUNCHPAD.CONTROL_PLANE.001` · MUST · skill:spn-devex/ideate)
 - **Launchpad is built at the partner stage, on the same backbone and with the same stack every adopter gets. It consumes the published packages rather than reading around them.** (`RULE.LAUNCHPAD.CONTROL_PLANE.002` · MUST · skill:spn-devex/ideate)
 - **Launchpad is a stage, not a sixth domain.** (`RULE.LAUNCHPAD.CONTROL_PLANE.003` · MUST · skill:spn-devex/ideate)
@@ -49,7 +79,7 @@ description: Decide what a node IS, and design a requirement inside that shape -
 
 A boundary nobody decides still gets drawn: the first three features draw it, implicitly, and by the time anyone notices, moving it means moving everything built inside it. **That is how projects go wrong slowly** — in the twenty minutes nobody spent deciding what the thing is and, harder, what it deliberately is not.
 
-Your output is exactly one file: **`CONCEPT.md` at the repository root**, beside `sprepo.json`. A concept belongs to a repo root, never to a node (`RULE.DEVEX.WORKSPACE.080` · MUST · check:doc-check). Nodes carry `README.md` alone, so ideating a node lands as sections of its repo's concept. Never `docs/`, with one exception: on a partner platform the industry brief goes in the partner's own purpose part (`RULE.DEVEX.AGENT.099` · MUST · check:restates · due:036/N008). Never code.
+Your output is exactly one file: **`CONCEPT.md` at the repository root**, beside `sprepo.json`. A concept belongs to a repo root, never to a node (`RULE.DEVEX.WORKSPACE.080` · MUST · check:doc-check). Nodes carry `README.md` alone, so ideating a node lands as sections of its repo's concept. Never `docs/`, with one exception: on a partner platform the industry brief goes in the partner's own purpose part (`RULE.DEVEX.AGENT.099` · MUST · check:restates). Never code.
 
 ## One skill, three modes — and `plan` is not a fourth
 
@@ -69,7 +99,7 @@ Pick the mode from the argument — `shape` · `design` · `decision`. Where non
 
 1. **Restate the requirement** in one paragraph, in the asker's own words.
 2. **Classify it**: new capability · additive change to an existing contract · **breaking** change · pure fix. **A breaking change stops here** — reroute through the versioning path and record it in `decision` mode. A breaking change never rides in as a plan row.
-3. **Locate ownership** — which module owns the capability. Where none does, this is a scaffolding conversation first, and the ladder is *use → configure → generalize into the platform → build domain-specific*; descend only with a reason. Then propose **the construct the ask needs, and no more** (`RULE.DEVEX.WORKSPACE.194` · MUST · short): its patterns, correct on their own. What it makes possible later is one line, *later, not now*, never a row or an option. Until an arc row owns the subject, put what you need decided as a suggestion in chat, `S<n>`, as a whole card, in the card's own order: why, what, the views that spoke, lettered options and the one you recommend (`RULE.DEVEX.WORKSPACE.199` · MUST · check:stop · due:036/N008).
+3. **Locate ownership** — which module owns the capability. Where none does, this is a scaffolding conversation first, and the ladder is *use → configure → generalize into the platform → build domain-specific*; descend only with a reason. Then propose **the construct the ask needs, and no more** (`RULE.DEVEX.WORKSPACE.194` · MUST · short): its patterns, correct on their own. What it makes possible later is one line, *later, not now*, never a row or an option. Until an arc row owns the subject, put what you need decided as a suggestion in chat, `S<n>`, as a whole card, in the card's own order: why, what, the views that spoke, lettered options and the one you recommend (`RULE.DEVEX.WORKSPACE.199` · MUST · check:stop).
 4. **Write the rows**, into the repository's own docs tree, under the domain the module belongs to. **The seats, what each holds and the row grammar are `refs/devex/workspace/docs/doc-sets.md`** — read it there rather than from a copy. Where the node is in a declared stack, that stack's own planning notes are `providers/{stack}/skills/ideate/plan.md` in the domain plugin, and the stack comes from the nearest `sprepo.json`.
 
 ### Mode: decision — one register row
@@ -109,7 +139,7 @@ A page that the requirement holds → the `design` skill of the apps plugin, bef
 
 ### Before the gates — the industry brief, on a partner platform
 
-**On a partner platform, the lenses write the industry brief before the boundary is drawn** (`RULE.DEVEX.AGENT.099` · MUST · check:restates · due:036/N008). The partner describes its business in its own words and never learns the constructs to do it; that bridge is yours.
+**On a partner platform, the lenses write the industry brief before the boundary is drawn** (`RULE.DEVEX.AGENT.099` · MUST · check:restates). The partner describes its business in its own words and never learns the constructs to do it; that bridge is yours.
 
 - **Each lens learns its share of the industry for its own discipline**, from named sources, and maps it onto the constructs: the domain model becomes modules, a rule becomes controls, a workflow becomes journeys. `refs/devex/agent/lenses.md` says which lens learns what, and where each lands.
 - **Write it once, in the partner's own purpose part**: the industry, its people and buyers, its workflows and words, its data and exchange standards, its rules and its usual systems. Each fact names its source and the date it was read.
@@ -153,7 +183,7 @@ Every unanswered question is a card with **real options and a recommendation**. 
 
 - **The stage ends when the questions are answered, not when they run out.**
 - **An expansion is made on request, and which kind it is depends on what was asked.** A question too large for an Open card needs somewhere to be **argued** — that is an approach document, `approach.html` in the open workstream's folder, never in a repository. A section too big to review in place needs somewhere to be **read** — that is an overview, `artifacts/docs/<folder>/<section>-overview.html`, in the folder of its domain. A concept states shape, so someone wanting the detail is asking for the expansion, not for a longer concept. The routing test is whether options were weighed and one chosen (`RULE.DEVEX.WORKSPACE.102` · MUST · check:doc-check) (`RULE.DEVEX.WORKSPACE.103` · MUST · check:doc-check). Either way the section names the file and the file names the section back. **Offer; never start one unasked**, and never write one to make a concept look finished. A concept whose sections have none is the normal case, not an incomplete one.
-- **An approach page or an overview opens on a masthead of three levels, and each is plain language** (`RULE.DEVEX.WORKSPACE.182` · MUST · check:doc-check) (`RULE.DEVEX.WORKSPACE.187` · MUST · check:doc-check). Copy the page from its template, which holds only the page's structure and the two lines that load the shared stylesheet and script. Keep those two lines, and add no `<style>` block and no inline script: every page links one version of the shared files, so a fault in the styles is fixed once (`RULE.DEVEX.WORKSPACE.214` · MUST · check:doc-check · due:036/N008). The approved masthead for each kind, a poor example for each level and the check before saving are in [`refs/devex/workspace/docs/doc-sets.md`](../../refs/devex/workspace/docs/doc-sets.md) § Every page opens on a masthead of three levels. An approach page's masthead carries no project shorthand — an arc number, a question number or a release name the sentence does not explain — and the workstream number that opens its `h1` is not part of the Title.
+- **An approach page or an overview opens on a masthead of three levels, and each is plain language** (`RULE.DEVEX.WORKSPACE.182` · MUST · check:doc-check) (`RULE.DEVEX.WORKSPACE.187` · MUST · check:doc-check). Copy the page from its template, which holds only the page's structure and the two lines that load the shared stylesheet and script. Keep those two lines, and add no `<style>` block and no inline script: every page links one version of the shared files, so a fault in the styles is fixed once (`RULE.DEVEX.WORKSPACE.214` · MUST · check:doc-check). The approved masthead for each kind, a poor example for each level and the check before saving are in [`refs/devex/workspace/docs/doc-sets.md`](../../refs/devex/workspace/docs/doc-sets.md) § Every page opens on a masthead of three levels. An approach page's masthead carries no project shorthand — an arc number, a question number or a release name the sentence does not explain — and the workstream number that opens its `h1` is not part of the Title.
 
   | Page | Title | Subtitle, one plain sentence | Description, one paragraph |
   | --- | --- | --- | --- |
@@ -161,7 +191,7 @@ Every unanswered question is a card with **real options and a recommendation**. 
   | preview | the preview's name | what you are asked to decide from the page | what the page shows · why look at it · how the page runs |
   | concept overview | the area's benefit line | the area's what line | what this area covers · why read on · what the pages below cover |
 
-  Plain means everyday words, one idea a sentence, no numbers, no slogan, no figure of speech, and no book word the same sentence does not explain. The argument starts in the first section: for an approach page that is `Why`, then `What`, `How`, `Open` and `Deferred`, with no `Terms` section. **Write the Title and the Subtitle yourself, from the kind's row and its approved example, and keep them current as the page grows** (`RULE.DEVEX.WORKSPACE.205` · MUST · check:doc-check · due:036/N008); do not ask the developer to approve one. The foundation hub's Title and Subtitle are the one exemption, fixed by `DEC.DEVEX.WORKSPACE.143`.
+  Plain means everyday words, one idea a sentence, no numbers, no slogan, no figure of speech, and no book word the same sentence does not explain. The argument starts in the first section: for an approach page that is `Why`, then `What`, `How`, `Open` and `Deferred`, with no `Terms` section. **Write the Title and the Subtitle yourself, from the kind's row and its approved example, and keep them current as the page grows** (`RULE.DEVEX.WORKSPACE.205` · MUST · check:doc-check); do not ask the developer to approve one. The foundation hub's Title and Subtitle are the one exemption, fixed by `DEC.DEVEX.WORKSPACE.143`.
 - A question deliberately not answered is **deferred with a trigger** — what would bring it back.
 
 ## The views that take part
@@ -180,9 +210,9 @@ Every unanswered question is a card with **real options and a recommendation**. 
 
 - **More views, or more passes, need the developer's word.** The limit keeps a small choice from costing a wait and a long reply.
 - **A view whose word is to count as a review that can block a gate is a fresh `spn-panel`, at any number of signs.** You wrote the proposal, so a lens file you read yourself gives advice and blocks nothing.
-- **Show each view in its own voice** (`RULE.DEVEX.AGENT.090` · MUST · check:restates · due:036/N008): its name in bold, such as **Architect:** or **Partner:**, then what it said, as a colleague would say it out loud: short full sentences, everyday words, one idea in each, never a slogan. Such as *"**Architect:** If we hold a finding back, we have to show it later. Let's show it in full the next time the agent stops and waits. If we don't, it gets lost."* and *"**Lead:** This is the same problem as Needs you. Let's fix both in this arc. We don't need a new one."* A view with no objection says so in its own line. Never sum up what "the views" thought, and where two views disagree, leave them as two lines. The developer can then answer one view. The form is in [`refs/devex/agent/lenses.md`](../../refs/devex/agent/lenses.md) § *A view is shown in its own voice*.
+- **Show each view in its own voice** (`RULE.DEVEX.AGENT.090` · MUST · check:restates): its name in bold, such as **Architect:** or **Partner:**, then what it said, as a colleague would say it out loud: short full sentences, everyday words, one idea in each, never a slogan. Such as *"**Architect:** If we hold a finding back, we have to show it later. Let's show it in full the next time the agent stops and waits. If we don't, it gets lost."* and *"**Lead:** This is the same problem as Needs you. Let's fix both in this arc. We don't need a new one."* A view with no objection says so in its own line. Never sum up what "the views" thought, and where two views disagree, leave them as two lines. The developer can then answer one view. The form is in [`refs/devex/agent/lenses.md`](../../refs/devex/agent/lenses.md) § *A view is shown in its own voice*.
 - **Say in one line which views you brought, why those, and which way each was made.** Without it the developer cannot tell an independent objection from your own. On a card that line, and each view's own line under it, are its *Views* part.
-- **On a card or a suggestion, keep each view to one or two plain sentences** (`RULE.DEVEX.AGENT.090` · MUST · check:restates · due:036/N008). The *Views* part comes after Why and What and before the options. So a view says only what Why and What do not already say, and it names no option by its letter. Name the views with nothing to add together in one line, such as *QA and Partner: no objection*. Shorten a view's words yourself, and keep its name and its meaning. Keep what a fresh view wrote in full in the arc's notes, `notes/N<nnn>/views/`. In an ordinary reply that is not a card, a view may say what it objects to at the length the point needs.
+- **On a card or a suggestion, keep each view to one or two plain sentences** (`RULE.DEVEX.AGENT.090` · MUST · check:restates). The *Views* part comes after Why and What and before the options. So a view says only what Why and What do not already say, and it names no option by its letter. Name the views with nothing to add together in one line, such as *QA and Partner: no objection*. Shorten a view's words yourself, and keep its name and its meaning. Keep what a fresh view wrote in full in the arc's notes, `notes/N<nnn>/views/`. In an ordinary reply that is not a card, a view may say what it objects to at the length the point needs.
 - **A view does not replace the review.** Once a draft exists, the convened lens still reads it.
 
 ## Structure first, and what other platforms do

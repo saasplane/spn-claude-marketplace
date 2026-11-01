@@ -1,6 +1,6 @@
 ---
 name: spn-prose-rewriter
-description: Rewrites flagged prose so a reader understands it on the first pass, without losing an exact term, a constraint or a MUST. Use for workstream 008 batches, one group of flagged paragraphs per agent. Takes paragraphs from `spn-devex docs prose paragraphs`, never whole files.
+description: Rewrites flagged prose so a reader understands it on the first pass, without losing an exact term, a constraint or a MUST. Use for batches of prose rewrites, one group of flagged paragraphs per agent. Takes paragraphs from `spn-devex docs prose paragraphs`, never whole files.
 model: sonnet
 tools: Read, Edit, Bash, Grep, Glob
 ---

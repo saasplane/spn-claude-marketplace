@@ -165,7 +165,7 @@ const lacks = (s) => (got) => !String(got).includes(s);
     run(ws, ["page", "write", seatPath]);
 
     // THE TEMPLATE'S FOOTER IS A NOTE TO ITS AUTHOR, never furniture. Copied into every produced
-    // page, readers of 122 construct pages met "A template from workstream 008 · copy it …", and an
+    // page, readers of 122 construct pages met "A template from the plain-language rewrite · copy it …", and an
     // edit to the note made every one of them stale at once. The template here carries a marked
     // footer, so the case fails if any of it reaches the page.
     const noted = mkdtempSync(join(tmpdir(), "spn-templates-"));

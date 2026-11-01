@@ -20,7 +20,7 @@ import { join } from "node:path";
 import { sessionDir } from "../../../../plugin-support-lib/src/lib/debug-store.ts";
 import { tagsOf, telemetryDir, write, type Entry } from "../../../../plugin-support-lib/src/lib/timing.ts";
 import { loadPrograms, readCommand, type Reading } from "./command-reader.ts";
-import { workspaceRoot, type Payload } from "./payload.ts";
+import { eventWorkspace, type Payload } from "./payload.ts";
 
 const PENDING = "pending";
 
@@ -42,7 +42,7 @@ export function startCommand(payload: Payload): void {
     const session = typeof payload.session_id === "string" ? payload.session_id : "";
     if (!file || !command || !session) return;
     const cwd = payload.cwd ?? process.cwd();
-    const root = workspaceRoot(cwd);
+    const root = eventWorkspace(cwd);
     const dir = telemetryDir(root);
     if (!dir) return;
     if (!root) return;
@@ -96,7 +96,7 @@ export function finishCommand(payload: Payload, failed: boolean): number {
     const file = fileOf(payload);
     const session = typeof payload.session_id === "string" ? payload.session_id : "";
     if (!file || !session) return out;
-    const root = workspaceRoot(payload.cwd ?? process.cwd());
+    const root = eventWorkspace(payload.cwd ?? process.cwd());
     if (!root) return out;
     const path = join(sessionDir(root, session), PENDING, file);
     let started: Started;

@@ -21,7 +21,7 @@ Every row below is declared and none is claimed: a run writes the last two cells
 | Id | Who | Does | Sees | Type | Tier | Status | Updated at |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | MKT.SCRIPTS.01 | Backend developer | make an ordinary edit and pay almost nothing for the gates | A check that cannot have an opinion about the path is never asked to read anything | POSITIVE | UNIT | PLANNED | — |
-| MKT.SCRIPTS.02 | DevSecOps / Security | be refused any route that would render the machine seat | The whole command is read, a quoted path inside a here-document included, and the message names the door | NEGATIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.02 | DevSecOps / Security | be refused any route that would render the saasplane env | The whole command is read, a quoted path inside a here-document included, and the message names the door `env show` | NEGATIVE | UNIT | PLANNED | — |
 | MKT.SCRIPTS.03 | Backend developer | write many files in one turn and read a warning once | A speaking check remembers what it said and does not repeat it in the same session | POSITIVE | UNIT | PLANNED | — |
 | MKT.SCRIPTS.04 | Architect | be told which document governs the folder being edited | The longest governing folder wins, and a folder no row governs is answered with silence | POSITIVE | UNIT | PLANNED | — |
 | MKT.SCRIPTS.05 | Engineering leader | close a scope with work pending and still pass | Landed, carried and deferred all pass, and only a row nobody decided is refused | POSITIVE | UNIT | PLANNED | — |
@@ -196,6 +196,7 @@ Every row below is declared and none is claimed: a run writes the last two cells
 | MKT.SCRIPTS.322 | Backend developer | prove an arc after its code has landed | `go write` gives a repository its full run, with no baseline, while an arc of the scope has a proof step there that has not landed, even once every code change in it has landed | POSITIVE | UNIT | PLANNED | — |
 | MKT.SCRIPTS.323 | Backend developer | land a proof that has no repository's commits | `row state … landed --run` lands the proof of an arc that changes no repository on a named run in the arc's `work/` folder, and refuses it without one; a proof step with no commits of its own is judged against the newest commit its arc recorded in that repository | POSITIVE | UNIT | PLANNED | — |
 | MKT.SCRIPTS.324 | Backend developer | add work to an arc after its steps landed | `sheet write` keeps each landed step's entries as they landed, and gives an entry written after it a step of its own, with a new release step and, for code, a new proof step | POSITIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.380 | DevSecOps / Security | be refused by the guard with the door named | The guard's refusal names `spnutils workspace env show` and `env set`, and both commands pass the guard | POSITIVE | UNIT | PLANNED | — |
 
 ## Retired ids
 

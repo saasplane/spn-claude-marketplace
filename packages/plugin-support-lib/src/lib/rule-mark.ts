@@ -14,14 +14,14 @@ export const LEVELS = ["MUST", "GUIDE"] as const;
 export type RuleLevel = (typeof LEVELS)[number];
 
 /** The closed list of param keys. A key joins this list, and the book's table of it, before any rule uses it. */
-export const PARAM_KEYS = ["check", "due", "short", "skill"] as const;
+export const PARAM_KEYS = ["check", "short", "skill", "agent"] as const;
 export type ParamKey = (typeof PARAM_KEYS)[number];
 
 /** What holds a rule. `short` stands alone, and every other key takes one token. */
-export type RuleParams = { check?: string; due?: string; short?: true; skill?: string };
+export type RuleParams = { check?: string; short?: true; skill?: string; agent?: string };
 
 /** The class a rule's level and params put it in, in the words the book's table uses. */
-export type RuleClass = "checked" | "stated" | "stated in a skill" | "guidance";
+export type RuleClass = "checked" | "stated" | "stated in a skill" | "kept by an agent" | "guidance";
 
 /** Where a parenthesis was written: the book names the rule `rule <ID>`, a plugin file cites `` `<ID>` ``. */
 export type MarkForm = "book" | "ref";
@@ -125,16 +125,15 @@ export function parseFields(rest: string): { level: RuleLevel | null; params: Ru
 
 /**
  * What the level and the params say together, where they say something the class table refuses: a MUST
- * that nothing holds, a guidance rule that names a holder, a `due:` with no `check:`, two holders.
+ * that nothing holds, a guidance rule that names a holder, two holders.
  */
 export function holderFaults(level: RuleLevel | null, params: RuleParams): string[] {
   if (level === null) return ["the parenthesis names no level — MUST or GUIDE"];
-  const holders = (["check", "short", "skill"] as const).filter((key) => params[key] !== undefined);
+  const holders = (["check", "short", "skill", "agent"] as const).filter((key) => params[key] !== undefined);
   const faults: string[] = [];
-  if (level === "GUIDE" && (holders.length || params.due)) faults.push("a guidance rule names no holder");
-  if (level === "MUST" && !holders.length) faults.push("a MUST names what holds it: `check:`, `short` or `skill:`");
+  if (level === "GUIDE" && (holders.length)) faults.push("a guidance rule names no holder");
+  if (level === "MUST" && !holders.length) faults.push("a MUST names what holds it: `check:`, `short`, `skill:` or `agent:`");
   if (holders.length > 1) faults.push(`one holder, never ${holders.map((key) => `\`${key}\``).join(" and ")}`);
-  if (params.due && !params.check) faults.push("`due:` waits on a check, so it comes with `check:`");
   return faults;
 }
 
@@ -144,6 +143,7 @@ export function classOf(level: RuleLevel | null, params: RuleParams): RuleClass 
   if (level === "GUIDE") return "guidance";
   if (params.check) return "checked";
   if (params.skill) return "stated in a skill";
+  if (params.agent) return "kept by an agent";
   return "stated";
 }
 

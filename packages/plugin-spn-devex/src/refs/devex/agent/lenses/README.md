@@ -6,7 +6,7 @@
 
 ## The shape, in its order
 
-Every file takes the same parts, in this order (`RULE.DEVEX.AGENT.097` · MUST · check:restates · due:036/N008): the real-world title in its heading; **Consumer first**, named before anything else; **Persona**; **Carries**, the principles of the way by number; how it is worn, convened, and whether it blocks; its **Source of truth**; then **Asks it owns**, **Mastery**, **Industry bridge**, **Mentoring** (junior, mid-level, senior), **Behaviour** (notices first, pushes back on, says yes when), **Blind spots**, **By stage** with the decisions it thinks hard about, **Produces to** with the hook or check that holds each chapter, **Gates**, **Sweeps** and **Improves the book**. A file stays within about 150 lines, because it is read whole for one task.
+Every file takes the same parts, in this order (`RULE.DEVEX.AGENT.097` · GUIDE): the real-world title in its heading; **Consumer first**, named before anything else; **Persona**; **Carries**, the principles of the way by number; how it is worn, convened, and whether it blocks; its **Source of truth**; then **Asks it owns**, **Mastery**, **Industry bridge**, **Mentoring** (junior, mid-level, senior), **Behaviour** (notices first, pushes back on, says yes when), **Blind spots**, **By stage** with the decisions it thinks hard about, **Produces to** with the hook or check that holds each chapter, **Gates**, **Sweeps** and **Improves the book**. A file stays within about 150 lines, because it is read whole for one task.
 
 ## Decide what they settle, and ask only what they leave open
 
@@ -20,7 +20,7 @@ that shifts, information nobody can read or measure, or a choice that is people'
 
 ## Built right while it is made, and convened only where judgment decides
 
-**There is no reviewer lens, and no review after the fact** (`RULE.DEVEX.AGENT.100` · MUST · check:restates · due:036/N008). Quality is held in three layers:
+**There is no reviewer lens, and no review after the fact** (`RULE.DEVEX.AGENT.100` · GUIDE). Quality is held in three layers:
 
 1. **The machine refuses at write time** — the plugin's hooks, lint and type checks, `spnutils apps check`. A rule a machine can check lives there and nowhere else.
 2. **The owning lens is worn while producing**, so there is nothing to catch afterwards. Wearing a lens is never a review: the context that drafted something already agrees with its own reasoning.

@@ -47,7 +47,8 @@ function show(args: string[]): number {
     const indent = words.given("tree") ? "  ".repeat(depth(row)) : "";
     const touches = row.touches?.length ? `  [${row.touches.join(", ")}]` : "";
     const waits = row.blockedBy?.length ? `  waits on ${row.blockedBy.join(", ")}` : "";
-    console.log(`${row.arc} ${indent}${row.id.padEnd(5)} ${row.derived.padEnd(8)} ${row.title}${touches}${waits}`);
+    const outside = row.waitingOn ? `  · waiting on ${row.waitingOn}` : "";
+    console.log(`${row.arc} ${indent}${row.id.padEnd(5)} ${row.derived.padEnd(8)} ${row.title}${touches}${waits}${outside}`);
   }
   return 0;
 }

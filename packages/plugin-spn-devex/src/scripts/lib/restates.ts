@@ -22,7 +22,7 @@
 //     }
 //     -->
 //
-// A CITATION IS AN OBJECT, and it carries its own `seen` (workstream 009, `Q11` answered A).
+// A CITATION IS AN OBJECT, and it carries its own `seen` (a question answered A).
 // `section` is optional: name one and the hash covers that heading's own text, leave it out and the
 // hash covers the whole file. So a citation is exactly as precise as the sentence it replaces.
 //
@@ -32,7 +32,7 @@
 // in sixty days, almost all of them on content nobody cited. A finding that is usually wrong teaches
 // people to stop reading the run.
 //
-// A BLOCK USED TO GET CREDIT FOR WHAT IT LEFT OUT (workstream 009, `A6`; fixed 2026-09-08). `check()`
+// A BLOCK USED TO GET CREDIT FOR WHAT IT LEFT OUT (fixed 2026-09-08). `check()`
 // walked `docs` and `decisions` and nothing else, so it could only ever validate what a file DECLARED.
 // A source the file named in its own prose and omitted from the block was unreachable rather than
 // unstamped, and both gates printed green over it. Two design lenses found that by reading, and no

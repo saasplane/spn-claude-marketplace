@@ -38,7 +38,7 @@ export type Finding = { check: string; grade: Grade; file: string; message: stri
 // THE SET IS OWNED BY `SPDocVariantType` in the CLI's contract, and this is a copy of it. Nothing
 // links the two, so a value added there and not here is silently refused, and one added here and
 // not there passes a check the contract would reject. Keeping them in step is manual until a check
-// reads the contract; that check is owed (workstream 008, N63).
+// reads the contract; that check is still owed.
 //
 // `capability` joined the set with Q130. The chapter kind existed, its template existed, and the
 // checker had never heard of it — so every capability chapter in the corpus was a document whose
@@ -86,7 +86,7 @@ export const STATUS_WORD: Record<string, string> = { PLANNING: "PLANNING", IMPLE
 /**
  * The fixed outlines. A construct is six sections in one order — Terms first, because the model uses
  * those words; Boundary after the parts, because an edge can be judged only once the shape is seen
- * (workstream 008, N13, 2026-09-21). Relations is gone: `dependsOn` in the block carries it.
+ * (2026-09-21). Relations is gone: `dependsOn` in the block carries it.
  *
  * `order` IS THE ONLY PLACE THE SEQUENCE IS WRITTEN, and `optional` names which of those sections a
  * page may leave out. Required is derived from the two. Two separate lists, `required` and
@@ -328,7 +328,7 @@ export function checkBlock(file: string, src: string, block: any, err: string | 
 
   if (variant === "construct") {
     // `parentId` is no longer asked for: the folder is the parent (N13). A block that still carries it is not wrong.
-    // RULE since workstream 008 closed. It was SOFT while the constructs were being written, because
+    // RULE since the prose pass closed. It was SOFT while the constructs were being written, because
     // a gate that fires on every unwritten file teaches everyone to scroll past it. Every construct
     // in the workspace now declares it, so the rule fires on nothing and holds the next one.
     if (!Array.isArray(block.dependsOn)) add("RULE", "a construct declares `dependsOn`, even as an empty list");

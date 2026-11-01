@@ -3,26 +3,26 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/03-utils/01-spnutils.md",
-      "seen": "3120cd3e"
+      "seen": "6f15f604"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
-      "seen": "fb327f9f"
+      "seen": "64d537b3"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
       "section": "`infra` — the estate",
-      "seen": "32740953"
+      "seen": "b1cddf91"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
       "section": "The machine's own layout",
-      "seen": "3933d067"
+      "seen": "d1a23ca7"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md",
       "section": "The state file has a node for each owner",
-      "seen": "9950ee87"
+      "seen": "25e51cd0"
     }
   ],
   "decisions": [
@@ -110,7 +110,7 @@ status` reads `debug.telemetry` for its recording line, or `.debug/switches.json
 `debug` node yet, and writes nothing to the file.
 
 **`spnutils workspace init [name]` takes the workspace's name as its one argument, and a name is given
-once** (`RULE.DEVEX.WORKSPACE.324` · MUST · check:workstream-state · due:036/N008). The name is positional, written to the `workspace` node, and is
+once** (`RULE.DEVEX.WORKSPACE.324` · MUST · skill:spn-devex/develop). The name is positional, written to the `workspace` node, and is
 lower-case letters, digits and hyphens, starting with a letter, at most 40 characters. A partner runs
 init before opening a window, so they type it themselves. Init meets four cases:
 
@@ -157,7 +157,7 @@ no workstream path inherits them, and a call that names other work replaces them
 `spnutils`, reads these lines**: `spn-devex debug hooks show` prints the time per check and per event,
 and `spn-devex debug cost show` prints the tokens spent per workstream, per arc and per order from the
 usage lines, which count each reply once, keyed by the message id. A window's cost is read from this
-telemetry and never from a transcript — MUST (`RULE.DEVEX.AGENT.082` · MUST · check:subagentstop · due:036/N008).
+telemetry and never from a transcript (`RULE.DEVEX.AGENT.082` · MUST · skill:spn-devex/develop).
 
 **The permission tiers the floor writes follow a rule of the delivery chapter.** A tier is declared on a
 command or on a group of commands, and a plugin declares the tiers of its own command groups. The same
@@ -225,7 +225,7 @@ Layer nouns are the vocabulary: `organization` · `platform` · `environment` ·
 whole-estate command**, because *all layers* of an unstated subject is a context nothing can resolve.
 
 **A command names its platform as an argument, always and first — never through the environment**
-(`RULE.DEVEX.UTILS.072` · MUST · check:command-shape · due:036/N008). Every platform-scoped command takes `<spc>` straight after its verb:
+(`RULE.DEVEX.UTILS.072` · MUST · skill:spn-devex/develop). Every platform-scoped command takes `<spc>` straight after its verb:
 `infra platform <verb> <spc>`, `infra environment <verb> <spc> <env>`, and the same for `config`,
 `show`, `logs`, `web` and `domain register`. The organization layer takes none, because a repository
 has at most one organization. In an apps repository the `<spc>` is checked against the
@@ -259,9 +259,9 @@ never exists.
 **A mutation is reviewable or it does not exist.** Pins bump by editing a manifest — the one-line
 diff is the whole review. A second stack changes no command: the groups are the platform's
 vocabulary, stack adapters are its realizations. Only `apps` dispatches through a stack's adapter;
-`workspace`, `repo` and `infra` are the same commands in every stack (`RULE.DEVEX.UTILS.004` · MUST · check:command-shape · due:036/N008).
+`workspace`, `repo` and `infra` are the same commands in every stack (`RULE.DEVEX.UTILS.004` · MUST · skill:spn-devex/develop).
 
-## The env seat — `~/.spnenv`
+## The saasplane env — `~/.spnenv`
 
 The second machine path, holding your own values, sitting **outside** `~/.saasplane` on purpose — a
 routine `rm -rf ~/.saasplane/*` is an allowed reset, and your typed credentials are the one thing on
@@ -275,11 +275,24 @@ the machine nobody can regenerate. Five regions, one writer each, read top to bo
 | 4 | `dev` | **you, entirely** | your own keys — no run writes between these markers |
 | 5 | `keep` | agent writes the key, you supply the value | every key a piece of built work needs |
 
-A partner's file starts at `devex`. The seat holds only what a partner or a builder configures, so a
+A partner's file starts at `devex`. The saasplane env holds only what a partner or a builder configures, so a
 variable only a test sets never reaches it. `spnutils` provisions the shape and derives no key from
-a declaration; it reads a token through the seat's reader, where a value exported for the run wins
-and the seat answers otherwise. A value is never
+a declaration; it reads a token through the saasplane env's reader, where a value exported for the run wins
+and the saasplane env answers otherwise. A value is never
 printed and never logged — a run reports a key name and whether it is set, nothing more.
+
+**You read it through `spnutils workspace env show`, and write a value that is not secret through `env set`, never by opening the file** (`RULE.DEVEX.UTILS.088` · MUST · check:saasplane-env):
+
+```text
+spnutils workspace env show [--json]
+    Read the saasplane env without opening it: a value nobody typed prints whole, a value that
+    is only a ${VAR} reference prints as written, and every typed value shows as set or unset.
+spnutils workspace env set <key> --value <value>
+    Write a value that is not secret into the keep region. Refused for a key that the producer,
+    managed, devex or dev region holds.
+```
+
+`show` prints by region. The `producer` and `managed` regions hold nothing anyone typed, so their values print whole, and a `${VAR}` reference prints as written and is never resolved. Every typed value, in `devex`, `dev` or `keep`, shows as set or unset whatever its key is called, so the command never prints a secret and never has to guess which key holds one. `set` writes only the `keep` region and refuses a key that `producer`, `managed`, `devex` or `dev` holds. You type a secret in your own editor, and no command prompts for one.
 
 ## The two machine paths under `~/.saasplane`
 
@@ -326,7 +339,7 @@ line that names the `spnutils` command that makes it, and a hook says nothing: t
 `spnutils workspace init`; `docs look` does not stop, prints that the browser profile is missing and names
 `spnutils infra organization up --apply`; the stop event stays silent.
 
-**The tool's home folder is the tool's own** (`RULE.DEVEX.UTILS.075` · MUST · check:command-shape · due:036/N008). A developer and an agent are
+**The tool's home folder is the tool's own** (`RULE.DEVEX.UTILS.075` · MUST · skill:spn-devex/develop). A developer and an agent are
 never asked to add or change a file in `~/.saasplane`. What the tool needs from outside is taken in by a
 command, which checks the file and copies it into place, so a file is prepared elsewhere and never left
 in the folder by hand.

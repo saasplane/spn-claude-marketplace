@@ -274,7 +274,7 @@ export function workstreamAround(from: string): string | null {
 }
 
 /**
- * The workstream and the id a reference names: `025/N010`, `025-partner-web/q94`, or the id alone,
+ * The workstream and the id a reference names: `<number>/N<nnn>`, `<number>-<subject>/q<nn>`, or the id alone,
  * which is read in the workstream the caller stands in, or else in the one open or backlog
  * workstream that holds it. Throws a plain error naming what to type where it is not one.
  */
@@ -621,10 +621,10 @@ export function blockerResolved(ws: string, data: ArcData, blocker: string, ques
   return !!row && DONE_STATES.has(stateOfRow(data.rows, row));
 }
 
-/** The rows ready to run: work rows marked `ready`, or `waiting` with every blocker resolved, in a decided arc with no wait. */
+/** The rows ready to run: work rows marked `ready`, or `waiting` with every blocker resolved, in a decided arc with no wait. A row that carries `waitingOn` is left out, whatever its blockers. */
 export function readyRows(ws: string, data: ArcData, questions: readonly Question[] = readQuestions(ws)): ArcRow[] {
   if (!stepsMayStart(data)) return [];
-  return leafRows(data).filter((row) => (row.state === "ready" || row.state === "waiting") &&
+  return leafRows(data).filter((row) => (row.state === "ready" || row.state === "waiting") && !row.waitingOn &&
     (row.blockedBy ?? []).every((blocker) => blockerResolved(ws, data, blocker, questions)));
 }
 

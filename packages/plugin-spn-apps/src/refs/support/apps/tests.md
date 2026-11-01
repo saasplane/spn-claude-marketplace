@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/06-tests/",
-      "seen": "d4819ed9"
+      "seen": "57571fc1"
     }
   ]
 }
@@ -136,7 +136,7 @@ A behaviour row and a case are joined by the row's id, and the join is mechanica
 
 **Use one working run name while coding, and one fresh name for the run you stamp from.** Every selective run of one node reuses the working name, so each replaces the one before it and the 20 files a tier keeps are not spent on small runs. One run with a fresh name, over every case the step touched, comes last.
 
-**Stamp the rows from the freshly named run, and never with `--reach repository`.** The stamp writes the rows the run names whose status changed and leaves every other row as it is, and each row it writes gets an `Updated at` naming the run; a row the run only confirms keeps its `Updated at` (`RULE.DEVEX.WORKSPACE.306` · MUST · check:workstream-state · due:036/N008). `--reach repository` says the run was the whole of its tiers and sets every row it did not name back to `PLANNED`. So a `SUCCESS` row says that its own case passed when that case last ran.
+**Stamp the rows from the freshly named run, and never with `--reach repository`.** The stamp writes the rows the run names whose status changed and leaves every other row as it is, and each row it writes gets an `Updated at` naming the run; a row the run only confirms keeps its `Updated at` (`RULE.DEVEX.WORKSPACE.306` · MUST · skill:spn-devex/execute). `--reach repository` says the run was the whole of its tiers and sets every row it did not name back to `PLANNED`. So a `SUCCESS` row says that its own case passed when that case last ran.
 
 **State acceptance as named behaviour ids, read as `SUCCESS` from the run file — MUST.** It is never an exit code, because the runner exits clean when a selection matches no case. It is never a count of a whole tier, because only a whole run can meet one. Report a selection that matched no case as *nothing proves this*.
 
@@ -174,7 +174,7 @@ IAM.LOGIN.01 a person signs in with a password
 
 A title of the id alone hands a reader in a pipeline an identifier and no way to know what broke. **Write a case title that carries both, at every tier that binds an id** — the id for the scan to join against, the sentence for the person reading the framework's own page.
 
-**The tier decides which cases bind an id** (`RULE.DEVEX.FUNCTION.064` · MUST · check:subjects · due:036/N008). A tier that proves what a consumer or a person meets binds every case; a tier that proves the code's own inside binds only the cases that prove a row.
+**The tier decides which cases bind an id** (`RULE.DEVEX.FUNCTION.064` · MUST · skill:spn-apps/implement). A tier that proves what a consumer or a person meets binds every case; a tier that proves the code's own inside binds only the cases that prove a row.
 
 | Tier | Which cases carry an id | What a case with no id names instead |
 | --- | --- | --- |

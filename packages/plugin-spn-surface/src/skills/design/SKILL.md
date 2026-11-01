@@ -7,7 +7,7 @@ description: Design a page of a SaaS Plane app from the blocks of the design sys
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
-      "seen": "c110978c"
+      "seen": "d6a6cbd5"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/03-ideate.md",
@@ -15,7 +15,7 @@ description: Design a page of a SaaS Plane app from the blocks of the design sys
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/",
-      "seen": "6f657f14"
+      "seen": "7518d7df"
     }
   ]
 }
@@ -306,7 +306,13 @@ description: Design a page of a SaaS Plane app from the blocks of the design sys
 - **A mark is no link, and no level rings a mark** (`RULE.SUPPORT.SURFACE.389` · MUST · skill:spn-surface/design)
 - **RULE.SUPPORT.SURFACE.392** (`RULE.SUPPORT.SURFACE.392` · MUST · skill:spn-surface/design)
 - **A unit or a prop of the library goes construct, then Figma, then stack, then showcase, and its work starts from the domain and the user's goals** (`RULE.SUPPORT.SURFACE.397` · MUST · skill:spn-surface/design)
+- **A rule about how a page uses a prop of a unit is written as guidance with its cases: it names no `never` value, it says no `MUST`, and no check refuses it** (`RULE.SUPPORT.SURFACE.398` · MUST · skill:spn-surface/design)
+- **After a change to the design system, the showcase is restarted with its cache cleared, and the served bundle is proved newer than the change before any page is shown** (`RULE.SUPPORT.SURFACE.399` · MUST · skill:spn-surface/design)
+- **Playground is the last page of a unit, and every new unit joins the `storySort` order** (`RULE.SUPPORT.SURFACE.402` · MUST · skill:spn-surface/design)
+- **A Figma task starts at the design skill's own walk, its shipped scripts and the cached surface status, and never at the connector's generic discovery calls or a script made during the run** (`RULE.SUPPORT.SURFACE.403` · MUST · skill:spn-surface/design)
 - **A form shows each default as its real value, marked Default, and never as a faded placeholder** (`RULE.SUPPORT.SURFACE.405` · MUST · skill:spn-surface/design)
+- **A Figma file is named `DS <n>-<Name>`, with a hyphen and no middle dot, and its theme collections are named the same way** (`RULE.SUPPORT.SURFACE.407` · MUST · skill:spn-surface/design)
+- **Every new prop of the design system ships with a showcase case that shows it** (`RULE.SUPPORT.SURFACE.408` · MUST · skill:spn-surface/design)
 
 **Read `refs/devex/workspace/workstream.md` (spn-devex) before acting.** It holds the loop this skill runs inside: how a prompt is read, where a new ask goes, what a prompt does to a running arc, and how a reply closes.
 
@@ -483,7 +489,7 @@ A page is decided in four steps, in this order (`RULE.SUPPORT.SURFACE.052` · MU
 
 - **Open the spec of the pattern you named**: for an app pattern in `refs/support/surface/app-patterns/`, and for each section of a site's page in `refs/support/surface/site-patterns/`, by the page's kind. It is a skeleton with a view for each screen class. Draw it with `spn-devex docs figure draw <spec>` where you want to see it.
 - **Read the tree by level of that pattern in `standards-patterns.md`, or a site pattern's look in `site-patterns.md`.** It names the page level, the panels, the widgets and cards, and the components the pattern is drawn with, and what changes on a tablet and a phone.
-- **The spec names the layout and the page level a tree starts from** (`RULE.DEVEX.WORKSPACE.260` · MUST · check:doc-check · due:036/N008). Its `layout` is the setting the sketch is drawn in, and never part of the pattern: the tree writes the layout chosen in decision 1. Its `page` is the page level, the head of the page: `DSPageLevel` at `PAGE` above the panels, or the header of the one panel that is the page, with `fullPage`. Each block's `unit` is the unit the tree writes for it, and a card stands at the level of a widget.
+- **The spec names the layout and the page level a tree starts from** (`RULE.DEVEX.WORKSPACE.260` · MUST · check:doc-check). Its `layout` is the setting the sketch is drawn in, and never part of the pattern: the tree writes the layout chosen in decision 1. Its `page` is the page level, the head of the page: `DSPageLevel` at `PAGE` above the panels, or the header of the one panel that is the page, with `fullPage`. Each block's `unit` is the unit the tree writes for it, and a card stands at the level of a widget.
 - **The values in a spec are samples.** They show what kind of data a part holds. Put the page's own data in their place, and keep the arrangement. Every title, description and value the tree writes is in the product's own words, and never the name of a pattern, a unit or a level.
 - **The words follow what the page is for** (`RULE.SUPPORT.SURFACE.208` · MUST · skill:spn-surface/design). Decide before writing a word whether the page is a doc, an app's screen or a marketing page, and never two at once (anything set one under another is a `DSList`, `DEC.SUPPORT.SURFACE.288`): on an app's screen a label is short, an action is a verb and its object in 1 to 3 words and 4 at most, with an arrow drawn as its icon and never typed (`RULE.SUPPORT.SURFACE.335` · MUST · skill:spn-surface/design), an error says how to fix it, and nothing persuades, with everyday words only for Everyday users; on a marketing page the personas come first, each section answers one reader question, and every number is real, in the length its level allows (`RULE.SUPPORT.SURFACE.286` · MUST · skill:spn-surface/design). The rule in full is `refs/support/surface/standards-core.md`, under "The words of a page, by what it is for".
 - **Never edit a spec in the plugin.** Work from a copy. Every page of one pattern then starts from the same arrangement.

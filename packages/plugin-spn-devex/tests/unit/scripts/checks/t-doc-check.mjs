@@ -543,7 +543,7 @@ try {
 
   // 008 is exempt by name: its page keeps the shape it was written in.
   const exempt = stream(TMP, "008-plain-probe");
-  one("workstream 008's page — exempt by name from Terms and Cycles",
+  one("the plain-language workstream's page — exempt by name from Terms and Cycles",
     write(join(exempt, "plain-probe-approach.html"),
       CLEAN.replace(HOW_TAIL, "").replace(`<section id="s1">`, `<section id="s0"><h2>Terms</h2><p>You read the words here.</p></section>\n<section id="s1">`)),
     "silent");
@@ -586,7 +586,7 @@ try {
     write(closedPage, withStatus(CLEAN, "DONE", "&#x2705;")), "silent");
   one("[MKT.HOOKS.40] known-bad: a page in closed/ that still reads IMPLEMENTING",
     write(closedPage, withStatus(CLEAN, "IMPLEMENTING", "&#x1F6A7;")), "reports", "a closed workstream reads DONE");
-  one("[MKT.HOOKS.40] workstream 008's page is exempt by name",
+  one("[MKT.HOOKS.40] the plain-language workstream's page is exempt by name",
     write(join(exempt, "plain-probe-approach.html"), withStatus(CLEAN, "PLANNING").replace(HOW_TAIL, "")), "silent");
 
   // THE STAMP BEFORE THE MOVE. The close gate asks for a page that says it is finished before the
@@ -765,7 +765,7 @@ console.log("\n=== RULE.DEVEX.WORKSPACE.259 — a column whose cells hold senten
   const { readFileSync } = await import("node:fs");
   const say = (label, pass, detail = "") => { n += 1; if (!pass) failed += 1; console.log(`  ${pass ? "PASS" : "FAIL"}  ${label}${pass || !detail ? "" : `\n        ${String(detail).slice(0, 300)}`}`); };
   const notes = (findings) => findings.filter(([grade, text]) => grade === "SOFT" && text.includes("RULE.DEVEX.WORKSPACE.259"));
-  // The shape workstream 030's N010 preview held before 26 Oct: three columns, every cell a sentence.
+  // The shape an arc's preview held before 26 Oct: three columns, every cell a sentence.
   const sentences = `<table><thead><tr><th>Finding</th><th>What it says</th><th>What it causes</th></tr></thead><tbody>
     <tr><td>Planning</td><td>A planning arc whose reading and drafting are rows, turned into build rows at the go.</td><td>An arc reads RUNNING while nothing is built, then flips back.</td></tr>
     <tr><td>Cutting</td><td>Arcs are cut by the release each pays, or one per site or repository.</td><td>Ten arcs stand for what the developer reviews as three.</td></tr>

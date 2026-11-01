@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/03-lenses.md",
-      "seen": "fb02e581"
+      "seen": "9374fd91"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/03-lenses/01-lenses.md",
-      "seen": "e7a2c034"
+      "seen": "033909e6"
     }
   ]
 }
@@ -41,11 +41,11 @@
 
 ## The ask router picks the one lens that owns an ask
 
-**Read which kind of ask the developer brought, and wear or convene the one lens the router names** (`RULE.DEVEX.AGENT.098` · MUST · check:restates · due:036/N008). The router is in every window, in `refs/devex/agent/way.md`, with the SaaS Plane way beside it. Every kind of ask has exactly one owner, and every lens owns at least one. **The router picks one lens and replaces nothing else**: where a choice shows signs of complexity, § *Which views speak, and how many* still brings the group of views.
+**Read which kind of ask the developer brought, and wear or convene the one lens the router names** (`RULE.DEVEX.AGENT.098` · GUIDE). The router is in every window, in `refs/devex/agent/way.md`, with the SaaS Plane way beside it. Every kind of ask has exactly one owner, and every lens owns at least one. **The router picks one lens and replaces nothing else**: where a choice shows signs of complexity, § *Which views speak, and how many* still brings the group of views.
 
 ## Built right while it is made, convened only at a judgment gate
 
-**Work is produced to its standards by the lens that owns it, and there is no reviewer lens and no review after the fact** (`RULE.DEVEX.AGENT.100` · MUST · check:restates · due:036/N008).
+**Work is produced to its standards by the lens that owns it, and there is no reviewer lens and no review after the fact** (`RULE.DEVEX.AGENT.100` · GUIDE).
 
 1. **The machine refuses at write time**: the plugin's hooks, lint and type checks, `spnutils apps check`. A checkable standard lives there and nowhere else.
 2. **The owning lens is worn while producing.** Wearing a lens makes the work right the first time, and is never a review, because the context that drafted something already agrees with its own reasoning.
@@ -77,7 +77,7 @@
 | when a partner's case needs it | a standard's or the industry's detail, looked up or read from the industry brief, then dropped |
 | never | the full text of a standard, or the whole book |
 
-**A lens learns the partner's industry for its own discipline, and one industry brief keeps it** (`RULE.DEVEX.AGENT.099` · MUST · check:restates · due:036/N008). The brief is written once at ideation in the partner's own purpose part, each fact with its source and date; every lens reads it before researching, and refreshes the part it owns.
+**A lens learns the partner's industry for its own discipline, and one industry brief keeps it** (`RULE.DEVEX.AGENT.099` · MUST · skill:spn-devex/ideate). The brief is written once at ideation in the partner's own purpose part, each fact with its source and date; every lens reads it before researching, and refreshes the part it owns.
 
 ## A view in a discussion about a shape
 
@@ -132,7 +132,7 @@ A sign of complexity is one of these, each read from the change itself: the choi
 
 ### A view is shown in its own voice
 
-**Show a view as a speaker: its name, then what it said, as a colleague would say it out loud** (`RULE.DEVEX.AGENT.090` · MUST · check:restates · due:036/N008). Use short full sentences and everyday words, with one idea in each sentence. Never give a summary of what "the views" thought. This is the form in a reply:
+**Show a view as a speaker: its name, then what it said, as a colleague would say it out loud** (`RULE.DEVEX.AGENT.090` · MUST · skill:spn-devex/ideate). Use short full sentences and everyday words, with one idea in each sentence. Never give a summary of what "the views" thought. This is the form in a reply:
 
 > **Architect:** If we hold a finding back, we have to show it later. Let's show it in full the next time the agent stops and waits. If we don't, it gets lost.
 >
@@ -148,7 +148,7 @@ A sign of complexity is one of these, each read from the change itself: the choi
 
 **One line before the views says which ones you brought, and why those.** The views follow it, one line each. A sentence such as *the views agreed that the name is fine* says nothing the developer can answer: it has no owner and no words of its own. The whole reply follows the same voice (`refs/devex/workspace/workstream.md` § *The reply while work runs shows what needs you, then what moved*).
 
-**On a card, a view is one or two plain sentences** (`RULE.DEVEX.AGENT.090` · MUST · check:restates · due:036/N008). A card already states the problem in its Why and the facts in its What, so a view on a card says only what those two parts do not say. Give its reason in words a developer can follow without opening the code. Name no option by its letter, because on a card the options come after the views. A harder question may take a sentence or two more. This is the form on a card:
+**On a card, a view is one or two plain sentences** (`RULE.DEVEX.AGENT.090` · MUST · skill:spn-devex/ideate). A card already states the problem in its Why and the facts in its What, so a view on a card says only what those two parts do not say. Give its reason in words a developer can follow without opening the code. Name no option by its letter, because on a card the options come after the views. A harder question may take a sentence or two more. This is the form on a card:
 
 > **Views** — four fresh views: the architect, the server developer, the partner and product.
 >

@@ -6,7 +6,7 @@ import { BASE, bindOpen, wroteArcs, workspace } from "../../../helpers/fixture.m
 
 import { existsSync, mkdirSync, readFileSync, readdirSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { CARD as DATA_CARD, PREVIEW, cli, dataWorkspace, put } from "../../../helpers/workstream-fixture.mjs";
-import { bindNamed, recordWrites, windowSet } from "../../../../src/scripts/lib/window.ts";
+import { bindNamed, noteWelcome, recordWrites, windowSet } from "../../../../src/scripts/lib/window.ts";
 import { resolve, join } from "node:path";
 import { WORKSTREAMS } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { OWN_COPY, linesFor } from "../../../../../plugin-support-lib/src/lib/page-styles.ts";
@@ -874,11 +874,11 @@ console.log("\n=== welcome — a session's first turn opens with the welcome, wo
     ["known-bad: a question answered under the heading alone", missingWelcome(headingOnly).length, 4],
     ["known-bad: the 👥 line cut at its last sentence, emoji and all", missingWelcome(cut).join(","), "the 👥 line"],
     ["no first turn read (no transcript) is silent", checkWelcome("").length, 0],
-    ["a cut welcome warns once, naming what is missing", checkWelcome(cut).map((w) => w.check + ":" + w.message.includes("the 👥 line")).join(), "welcome:true"],
+    ["a cut welcome warns once, naming what is missing", checkWelcome(cut, "whole").map((w) => w.check + ":" + w.message.includes("the 👥 line")).join(), "welcome:true"],
     // 025 N020: asked for the whole welcome again, the agent showed a short one and then a long one.
-    ["N020: the finding asks for one line and never a second welcome", checkWelcome(cut).map((w) =>
+    ["N020: the finding asks for one line and never a second welcome", checkWelcome(cut, "whole").map((w) =>
       w.message.includes("Do not print it again") && w.message.includes("Say once, in one line, that the first reply missed it")).join(), "true"],
-    ["N020 known-bad: the finding no longer asks for the welcome in full", checkWelcome(cut).some((w) => /Say it in full/.test(w.message)), false],
+    ["N020 known-bad: the finding no longer asks for the welcome in full", checkWelcome(cut, "whole").some((w) => /Say it in full/.test(w.message)), false],
     ["an unreadable transcript reads as nothing", firstTurnText("/nonexistent/transcript.jsonl"), ""],
   ]) { n += 1; const ok = got === expected; if (!ok) failed += 1;
        console.log(`  ${ok ? "PASS" : "FAIL"}  ${what}${ok ? "" : ` — got ${got}, expected ${expected}`}`); }
@@ -894,6 +894,8 @@ console.log("\n=== welcome — the hook reads the first turn from the transcript
   const bad = join(root, "bad.jsonl"), good = join(root, "good.jsonl");
   writeFileSync(bad, lines(["I'll start by reading the arc file.", "Done."]), "utf8");
   writeFileSync(good, lines([welcome("Dhruv", false).join("\n") + "\n\n7 repos", "Done."]), "utf8");
+  noteWelcome(root, "f1-bad", "whole");
+  noteWelcome(root, "f1-good", "whole");
   one("known-bad: a first turn with no welcome warns", root, "warns",
     { says: "[welcome]", session: "f1-bad", extra: { transcript_path: bad }, parity: false, why: "a new check" });
   one("a first turn that opens with the welcome is silent about it", root, "silent",
@@ -1670,6 +1672,24 @@ console.log("\n=== stop — the checks the first round fixed or wired, and the g
       call("checkRunnable", root, 0, {}, new Set(), everyone(root), promise).length === 0);
   }
   {
+    // [MKT.HOOKS.322] A ROW THAT WAITS ON SOMETHING OUTSIDE THE WINDOW IS NEVER RUNNABLE, and an arc a go carries is go-next's to speak for.
+    const { GO_SCHEMA_VERSION } = await import("../../../../src/scripts/lib/workstream-schema.ts");
+    const { root, ws } = await dataWorkspace("n015-promise-waiting");
+    editArc(ws, (data) => { data.rows[0].state = "landed"; data.rows[1].waitingOn = "the release of spn-y"; });
+    const promise = "The book is written and its checks are green.\n\nNext I'll build it.";
+    check("[MKT.HOOKS.322] a reply ending on a promise, with only a row waiting on, is not sent back",
+      call("checkRunnable", root, 0, {}, new Set(), everyone(root), promise).length === 0);
+    editArc(ws, (data) => { delete data.rows[1].waitingOn; });
+    check("[MKT.HOOKS.322] the same row with nothing to wait on is sent back (the guard has teeth)",
+      call("checkRunnable", root, 0, {}, new Set(), everyone(root), promise).length === 1);
+    const part = (id, state) => ({ id, repo: "spn-x", pass: "CODE", entries: ["N001/E1"], tests: [], minutes: null, measuredFrom: null,
+      waitsOn: [], model: "opus", signature: "abc12345", state });
+    writeFileSync(join(arcOf(ws), "go.json"), `${JSON.stringify({ schemaVersion: GO_SCHEMA_VERSION, lead: "N001", scope: ["N001"], writtenAt: "2026-10-31T00:00:00Z", parts: [part("code-spn-x-1", "ready")] }, null, 2)}\n`);
+    check("[MKT.HOOKS.322] an arc in a go with a part not landed gets no runnable finding while go-next speaks",
+      call("checkRunnable", root, 0, {}, new Set(), everyone(root), promise).length === 0 && call("checkGoNext", root, everyone(root), []).length === 1,
+      JSON.stringify([call("checkRunnable", root, 0, {}, new Set(), everyone(root), promise), call("checkGoNext", root, everyone(root), [])]));
+  }
+  {
     const bare = call("checkReplyShape", "## Needs you\n\n- S27 and S28\n- Q3\n\n## Progress\n\nThe checks are green.");
     check("[MKT.HOOKS.112] known-bad: a Needs you part naming suggestions and a card by number only is sent back",
       bare.some((one) => one.check === "reply-shape" && one.message.includes("Needs you names S27 and S28 and Q3 by number only")), JSON.stringify(bare));
@@ -1823,26 +1843,178 @@ console.log("\n=== stop — the checks the first round fixed or wired, and the g
       [first.said.length, again.said.length, changedMsg.said.length, back.said.length].join() === "1,0,1,1", [first.said.length, again.said.length, changedMsg.said.length, back.said.length].join());
     check("[MKT.HOOKS.322] a finding about the reply is said every time it is found",
       (stopModule.sayOnce ? stopModule.sayOnce([{ check: "handover", message: "x" }], { handover: "x" }) : { said: [] }).said.length === 1);
-    // EACH CHECK'S SEND-BACKS ARE COUNTED, and how many were followed by no tool call (RULE c12).
-    const entry = (type, content) => JSON.stringify({ type, message: { role: type === "user" ? "user" : "assistant", content } });
-    const sent = (check) => entry("user", `Stop hook feedback:\n[node stop.mjs]: [${check}] words.`);
-    const act = entry("assistant", [{ type: "tool_use", id: "t1", name: "Bash", input: {} }]);
-    const talk = entry("assistant", [{ type: "text", text: "I can't." }]);
-    const log = [entry("user", "go"), talk, sent("state"), act, entry("user", [{ type: "tool_result", tool_use_id: "t1", content: "ok" }]), talk,
-      sent("state"), talk, sent("go-next"), talk].join("\n");
-    check("[MKT.HOOKS.326] known-bad: send-backs are counted for each check, and the ones followed by no tool call",
-      JSON.stringify(call("sendBackStats", log)) === JSON.stringify({ state: { sent: 2, idle: 1 }, "go-next": { sent: 1, idle: 1 } }), JSON.stringify(call("sendBackStats", log)));
-    const { writeSwitch, telemetryFolder } = await import("../../../../../plugin-support-lib/src/lib/debug-store.ts");
-    const { root: telRoot } = await dataWorkspace("n011-sendbacks");
-    writeSwitch(telRoot, "telemetry", true);
-    writeFileSync(join(telRoot, "t.jsonl"), `${log}\n`);
-    // The suites run with `SPN_TELEMETRY=off`, and this write is in-process, so the variable comes out for the call.
-    const silenced = process.env.SPN_TELEMETRY;
-    delete process.env.SPN_TELEMETRY;
-    try { if (stopModule.recordSendBacks) stopModule.recordSendBacks(telRoot, { script: "spn-devex", event: "Stop", session: "s1" }, join(telRoot, "t.jsonl")); }
-    finally { if (silenced !== undefined) process.env.SPN_TELEMETRY = silenced; }
-    const written = existsSync(join(telemetryFolder(telRoot), "sendbacks.jsonl")) ? JSON.parse(readFileSync(join(telemetryFolder(telRoot), "sendbacks.jsonl"), "utf8").trim().split("\n").pop()) : null;
-    check("[MKT.HOOKS.326] the counts are written to the turn-end telemetry, one cumulative line for the session", written?.session === "s1" && written?.checks?.state?.idle === 1 && written?.checks?.["go-next"]?.sent === 1, JSON.stringify(written));
+    // The send-backs are written as they are said (MKT.HOOKS.341), tested below; the transcript count went with its functions.
+  }
+}
+
+console.log("\n=== stop — a card is held with its workstream, so one number in two workstreams is two cards (036 N016)");
+// A WINDOW BOUND TO 032 AND 037, each holding a Q2 and a Q3. The cases below are the mistake the change exists for:
+// a number settled in one workstream hid the same number open in the other.
+{
+  const stopModule = await import("../../../../src/scripts/events/stop.ts");
+  const HOOK = `${HOOKS}/src/scripts/events/stop.ts`;
+  const check = (label, ok, detail = "") => { n += 1; if (!ok) failed += 1; console.log(`  ${ok ? "PASS" : "FAIL"}  ${label}${ok || !detail ? "" : `\n        ${String(detail).slice(0, 500)}`}`); };
+  const cardHtml = (num, open) => CARD.replace('id="q1"', `id="q${num}"`).replace("Q1 &middot;", `Q${num} &middot;`)
+    .replace("<b>Decision:</b> &mdash;", open ? "<b>Decision:</b> &mdash;" : "<b>Decision:</b> A, 2026-09-29.");
+  // `state` for each workstream: whether its Q2 and Q3 are open; `raised` names who raised a card still open.
+  const two = (name, { a2 = false, a3 = false, b2 = true, b3 = true, raised = {} } = {}) => {
+    const side = (folder, flags, who) => ({
+      [`.spndevex/${WORKSTREAMS}/open/${folder}/approach.html`]: page({ cards: cardHtml(2, flags[0]) + "\n" + cardHtml(3, flags[1]) }),
+      [`.spndevex/${WORKSTREAMS}/open/${folder}/questions.jsonl`]: [[2, flags[0]], [3, flags[1]]]
+        .map(([num, open]) => JSON.stringify({ id: `q${num}`, state: open ? "open" : "answered", title: `Where it lands ${num}`, ...(open && who ? { raisedBy: who } : {}) })).join("\n") + "\n",
+    });
+    return workspace(name, { ...side("032-hiring-demo", [a2, a3], raised.a), ...side("037-other-demo", [b2, b3], raised.b) });
+  };
+  const mineOf = (root) => everyone(root);
+  const SHAPE = (body) => `## Needs you\n\n${body}\n\n## Progress\n\nThe checks are green.`;
+  const hook = (root, session, reply) => { bindOpen(root, session); return run("node", [HOOK], { cwd: root, session_id: session, last_assistant_message: reply }, root); };
+
+  {
+    const root = two("n016-360");
+    const mine = mineOf(root);
+    const found = (body) => stopModule.checkCardsNamed(SHAPE(body), root, mine).filter((one) => one.message.includes("has answered it"));
+    check("[MKT.HOOKS.360] never be told an open card is answered because another workstream's card of that number is: `037's Q2`",
+      found("037's Q2 · where it lands — it is on the approach page.").length === 0, JSON.stringify(found("037's Q2 · where it lands")));
+    check("[MKT.HOOKS.360] `037 Q2` is placed at 037 too", found("037 Q2 · where it lands — it is on the approach page.").length === 0);
+    check("[MKT.HOOKS.360] and a Q2 in a line about 037 is placed at 037",
+      found("Q2 · where it lands in 037 — it is on the approach page.").length === 0);
+    check("[MKT.HOOKS.360] a Q2 named with 032 is still told answered there",
+      found("032 Q2 · where it lands — it is on the approach page.").length === 1);
+  }
+  {
+    const root = two("n016-361");
+    const mine = mineOf(root);
+    const bare = stopModule.checkCardsNamed(SHAPE("Q2 · where it lands — it is on the approach page."), root, mine);
+    check("[MKT.HOOKS.361] a bare Q2 that 032 has answered and 037 holds open is not told answered", bare.length === 0, JSON.stringify(bare));
+    const root2 = two("n016-361-both", { b2: false, b3: false });
+    const both = stopModule.checkCardsNamed(SHAPE("Q2 · where it lands — it is on the approach page."), root2, mineOf(root2));
+    check("[MKT.HOOKS.361] with both Q2s answered a bare Q2 draws the fault (the guard)",
+      both.length === 1 && both[0].message.includes("Needs you names Q2"), JSON.stringify(both));
+  }
+  {
+    const root = two("n016-362", { a2: true, b3: false, raised: { a: "window-other", b: "window-me" } });
+    const out = hook(root, "window-me", "done");
+    check("[MKT.HOOKS.362] another window's card never hides this window's card of the same number in another workstream",
+      /\[needs-you\]/.test(out) && /037/.test(out), out);
+    const only = two("n016-362-only", { a2: true, b2: false, b3: false, raised: { a: "window-other" } });
+    check("[MKT.HOOKS.362] and a card raised by the other window alone is still not asked of this one",
+      !/\[needs-you\]/.test(hook(only, "window-me", "done")));
+  }
+  {
+    const root = two("n016-363", { a2: true, b2: true, a3: false, b3: false });
+    const mine = mineOf(root);
+    const handover = (open) => ["Pick this up in a new window.", "", "```text", "continue:     workstream `037-other-demo`, arc `N001`, row 2", `open:         ${open}`, "```"].join("\n");
+    const unnamed = (found) => found.filter((one) => one.check === "handover" && one.message.includes("does not name"));
+    const bareLine = unnamed(stopModule.checkHandover(handover("Q2 — where it lands"), root, mine));
+    check("[MKT.HOOKS.363] with two workstreams bound, a handover whose open line names a bare Q2 is told to name 032 Q2 and 037 Q2",
+      bareLine.length === 1 && bareLine[0].message.includes("032 Q2") && bareLine[0].message.includes("037 Q2"), JSON.stringify(bareLine));
+    const named = unnamed(stopModule.checkHandover(handover("032 Q2 — where it lands · 037 Q2 — where it lands"), root, mine));
+    check("[MKT.HOOKS.363] naming both with their workstreams passes", named.length === 0, JSON.stringify(named));
+    const bareNeeds = hook(root, "window-363a", SHAPE("Q2 · where it lands — it is on the approach page."));
+    check("[MKT.HOOKS.363] a Needs you naming a bare Q2 is told to name 032 Q2 and 037 Q2",
+      /\[needs-you\]/.test(bareNeeds) && bareNeeds.includes("032 Q2") && bareNeeds.includes("037 Q2"), bareNeeds);
+    const namedNeeds = hook(root, "window-363b", SHAPE("032 Q2 · where it lands — it is on the approach page.\n037 Q2 · where it lands — it is on the approach page."));
+    check("[MKT.HOOKS.363] a Needs you naming both with their workstreams passes", !/\[needs-you\]/.test(namedNeeds), namedNeeds);
+  }
+  {
+    // THE TURN-END NOTE STORES KEYS: one that holds bare numbers is read as no last Stop for cards.
+    const root = two("n016-note", { a2: true, raised: { a: "window-n", b: "window-n" } });
+    bindOpen(root, "window-n");
+    const dir = join(root, ".spndevex", ".debug", "sessions", "window-n");
+    mkdirSync(dir, { recursive: true });
+    run("node", [HOOK], { cwd: root, session_id: "window-n", last_assistant_message: "done" }, root);
+    const note = JSON.parse(readFileSync(join(dir, "stop.json"), "utf8"));
+    check("[MKT.HOOKS.363] the turn-end note stores a card as its workstream and its number",
+      note.cards.length > 0 && note.cards.every((card) => /^\d{3}-[^/]+\/Q\d+$/.test(card)), JSON.stringify(note.cards));
+    writeFileSync(join(dir, "stop.json"), JSON.stringify({ ...note, cards: ["Q9"] }));
+    const after = run("node", [HOOK], { cwd: root, session_id: "window-n", last_assistant_message: "done" }, root);
+    check("[MKT.HOOKS.363] a note holding bare numbers reads as no last Stop for cards: no card is called raised",
+      !/raised in this reply/.test(after), after);
+  }
+}
+
+console.log("\n=== stop — send-backs are written as they are said, the welcome is held where it was sent, a run outside the workspace reads it (036 N015)");
+{
+  const { writeSwitch, telemetryFolder } = await import("../../../../../plugin-support-lib/src/lib/debug-store.ts");
+  const { noteWelcome } = await import("../../../../src/scripts/lib/window.ts");
+  const { welcome } = await import("../../../../src/scripts/events/orientation.ts");
+  const payloadLib = await import("../../../../src/scripts/lib/payload.ts");
+  const stopModule = await import("../../../../src/scripts/events/stop.ts");
+  const HOOK = `${HOOKS}/src/scripts/events/stop.ts`;
+  const check = (label, ok, detail = "") => { n += 1; if (!ok) failed += 1; console.log(`  ${ok ? "PASS" : "FAIL"}  ${label}${ok || !detail ? "" : `\n        ${String(detail).slice(0, 500)}`}`); };
+  const sendbacks = (root) => { try { return readFileSync(join(telemetryFolder(root), "sendbacks.jsonl"), "utf8").trim().split("\n").filter(Boolean).map((line) => JSON.parse(line)); } catch { return []; } };
+  const arcFile = (ws) => join(ws, "arcs", "N001", "state.json");
+  const editRows = (ws, change) => { const data = JSON.parse(readFileSync(arcFile(ws), "utf8")); change(data); writeFileSync(arcFile(ws), `${JSON.stringify(data, null, 2)}\n`); };
+  const PROMISE = "The page is written and its checks are green.\n\nNext I'll build it.";
+
+  check("[MKT.HOOKS.341] the nine checks about the reply are one set in lib/payload.ts",
+    payloadLib.REPLY_CHECKS instanceof Set && payloadLib.REPLY_CHECKS.size === 9
+      && ["needs-you", "reply-shape", "cards", "handover", "how-it-runs", "partner-words", "page-path", "welcome", "window"].every((name) => payloadLib.REPLY_CHECKS.has(name)),
+    JSON.stringify([...(payloadLib.REPLY_CHECKS ?? [])]));
+
+  {
+    const { root, ws } = await dataWorkspace("n015-sendback");
+    editRows(ws, (data) => { data.rows[0].state = "landed"; });
+    writeSwitch(root, "telemetry", true);
+    bindOpen(root, "sb-1");
+    const payload = { cwd: root, session_id: "sb-1", last_assistant_message: PROMISE };
+    const first = run("node", [HOOK], payload, root);
+    const lines = sendbacks(root).filter((line) => line.check === "runnable");
+    check("[MKT.HOOKS.341] a said finding writes one send-back line with its check and workstream",
+      first.includes("[runnable]") && lines.length === 1 && lines[0].check === "runnable" && lines[0].workstream === "031-probe"
+        && lines[0].event === "Stop" && lines[0].session === "sb-1" && /^[0-9a-f]{12}$/.test(lines[0].finding), `${first.slice(0, 200)} · ${JSON.stringify(lines)}`);
+    run("node", [HOOK], payload, root);
+    check("[MKT.HOOKS.341] a finding already said writes none", sendbacks(root).filter((line) => line.check === "runnable").length === 1, JSON.stringify(sendbacks(root)));
+    check("[MKT.HOOKS.341] the transcript count is gone: sendBackStats and recordSendBacks are not exported",
+      stopModule.sendBackStats === undefined && stopModule.recordSendBacks === undefined);
+  }
+  {
+    // HELD: a row of the window's arcs is running, so a finding not about the reply is held and writes nothing.
+    const { root, ws } = await dataWorkspace("n015-held");
+    editRows(ws, (data) => { data.rows[0].state = "landed"; data.rows.push({ ...data.rows[1], id: "3", title: "run it", state: "running", waitsOn: [] }); });
+    writeSwitch(root, "telemetry", true);
+    bindOpen(root, "sb-held");
+    const out = run("node", [HOOK], { cwd: root, session_id: "sb-held", last_assistant_message: PROMISE }, root);
+    check("[MKT.HOOKS.341] a held finding writes none", !out.includes("[runnable]") && sendbacks(root).every((line) => line.check !== "runnable"), `${out.slice(0, 200)} · ${JSON.stringify(sendbacks(root))}`);
+  }
+
+  // THE WELCOME IS HELD TO THE WHOLE ONLY WHERE THE SESSION START SENT IT (s47).
+  const cut = welcome("Dhruv", false).join("\n").replace(" · **Finance and business**.", "");
+  check("[MKT.HOOKS.342] checkWelcome judges a cut welcome where the note says whole", stopModule.checkWelcome(cut, "whole").length === 1);
+  check("[MKT.HOOKS.342] and is silent where the note says short", stopModule.checkWelcome(cut, "short").length === 0);
+  check("[MKT.HOOKS.342] and where the note holds no welcome", stopModule.checkWelcome(cut, undefined).length === 0);
+  {
+    const entry = (type, content) => JSON.stringify({ type, message: { role: type, content } });
+    const root = build("n015-welcome-sent");
+    const transcript = join(root, "first.jsonl");
+    writeFileSync(transcript, [entry("user", "how is it going?"), entry("assistant", [{ type: "text", text: "7 repos · 1 workstream open\n\nGoing well." }])].join("\n") + "\n");
+    const speaks = (session, form) => {
+      bindOpen(root, session);
+      if (form) noteWelcome(root, session, form);
+      return run("node", [HOOK], { cwd: root, session_id: session, transcript_path: transcript, last_assistant_message: "7 repos · 1 workstream open\n\nGoing well." }, root).includes("[welcome]");
+    };
+    check("[MKT.HOOKS.342] a first reply that opens with the status line is not sent back where the note says short", !speaks("wl-short", "short"));
+    check("[MKT.HOOKS.342] nor where the window holds no welcome", !speaks("wl-none", null));
+    check("[MKT.HOOKS.342] the same reply is sent back where the note says whole", speaks("wl-whole", "whole"));
+  }
+
+  // A RUN OUTSIDE THE WORKSPACE, WITH THE PROJECT DIRECTORY AT IT, READS THE WORKSPACE (s43).
+  {
+    const { root, ws } = await dataWorkspace("n015-outside");
+    editRows(ws, (data) => { data.rows[0].state = "landed"; });
+    const away = join(BASE, "n015-outside-away");
+    mkdirSync(away, { recursive: true });
+    bindOpen(root, "out-1");
+    let out = "";
+    try {
+      out = execFileSync("node", [HOOK], { input: JSON.stringify({ cwd: away, session_id: "out-1", last_assistant_message: `The book says so.\n\n${PROMISE}` }), encoding: "utf8", cwd: away,
+        env: { ...process.env, CLAUDE_PROJECT_DIR: root, SPN_DEVEX_AGENT_WORKSPACE: root } });
+    } catch (e) { out = `${String(e.stdout ?? "")}${String(e.stderr ?? "")}`; }
+    const baseline = join(root, ".spndevex", ".debug", "sessions", "out-1");
+    check("[MKT.HOOKS.340] the hook run outside the workspace reads the window's workstreams and says the runnable finding", out.includes("[runnable]"), out.slice(0, 300));
+    check("[MKT.HOOKS.340] it writes its baseline in the workspace", existsSync(baseline) && readdirSync(baseline).includes("stop.json"), existsSync(baseline) ? readdirSync(baseline).join() : "no folder");
+    check("[MKT.HOOKS.340] partner-words is silent there: the workspace is the builder's", !out.includes("[partner-words]"), out.slice(0, 300));
+    check("[MKT.HOOKS.340] and nothing is written in the bare directory", !existsSync(join(away, ".spndevex")));
   }
 }
 
