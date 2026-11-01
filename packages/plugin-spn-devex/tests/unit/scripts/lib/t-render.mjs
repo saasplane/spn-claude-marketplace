@@ -78,8 +78,8 @@ ok("a table that is not the Terms table carries no such class",
 const { cutVersions, integrityTable, newestVersion, linesFor } = await import(pathToFileURL(resolve(HERE, "..", "plugin-support-lib", "src", "lib", "page-styles.ts")).href);
 const { readFileSync } = await import("node:fs");
 const STYLES_HOME = resolve(HERE, "src", "styles");
-ok("the newest version of the shared styles is 1.10.0, so every page writer links it",
-  newestVersion(Object.keys(cutVersions(STYLES_HOME))) === "1.10.0");
+ok("the newest version of the shared styles is 1.11.0, so every page writer links it",
+  newestVersion(Object.keys(cutVersions(STYLES_HOME))) === "1.11.0");
 ok("and 1.10.0 serves the Terms shares: a fixed layout, and the stacked rows under 40rem",
   /table\.sds-terms\{table-layout:fixed\}|table\.sds-terms\s*\{[^}]*table-layout:\s*fixed/.test(readFileSync(resolve(HERE, "..", "..", "public", "assets", "docs", "1.10.0", "sds-docs.css"), "utf8"))
   && readFileSync(resolve(HERE, "..", "..", "public", "assets", "docs", "1.10.0", "sds-docs.css"), "utf8").includes("max-width:40rem"));
