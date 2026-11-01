@@ -47,6 +47,7 @@ const cases = [
     payload: { tool_name: "Task", tool_input: {} } },
 ];
 
+for (const c of cases) c.label = `[${ID}] ${c.label}`;
 let failed = compare("saasplane-env", null, "saasplane-env.ts", cases);
 
 // [MKT.SCRIPTS.380] The refusal names the door: `env show` and `env set`, and never a value.
