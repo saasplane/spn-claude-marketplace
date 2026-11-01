@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "book": {
     "repository": "spn-foundation",
-    "commit": "cdec424d"
+    "commit": "a66237f1"
   },
   "rules": [
     {
@@ -2137,7 +2137,18 @@
       "chapter": "04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "heading": "A declared fact is read, never inferred",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/agent/agent.md",
+          "heading": "A declared fact is read, never inferred"
+        }
+      ],
+      "line": {
+        "text": "The agent follows what is defined and never guesses a name, a shape or a value.",
+        "ref": "refs/devex/agent/agent.md",
+        "heading": "A declared fact is read, never inferred"
+      }
     },
     {
       "id": "RULE.DEVEX.AGENT.168",
@@ -2150,7 +2161,13 @@
       "chapter": "04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "heading": "A declared fact is read, never inferred",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/agent/agent.md",
+          "heading": "A declared fact is read, never inferred"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.AGENT.169",
@@ -12194,7 +12211,13 @@
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "A card is only for what the rules leave open",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "The views that take part"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.493",
@@ -12233,7 +12256,13 @@
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "An order is one delegated execution, and every order follows the same rules",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/execute/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.496",

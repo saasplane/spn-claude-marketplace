@@ -126,7 +126,7 @@ spn-devex restates files check <book> — report each copy that is behind the bo
 
 spn-devex restates files write <book> — copy the book's templates into this plugin, and remove each copy the book no longer holds
 
-spn-devex workstream arc edit <workstream>/N<nnn> [--title …] [--goal …] [--status …] [--wait …] [--reason …] [--start] [--review-fixes] [--subject …] [--under …] [--preview …] [--decides …] [--repos …] [--cycle …] [--follows …] [--model …] [--position …] [--note …] — open an arc, or change any field of its header and its status; --note writes a log line
+spn-devex workstream arc edit <workstream>/N<nnn> [--kind ideate] [--proposes N<nnn>,…] [--title …] [--goal …] [--status …] [--wait …] [--reason …] [--start] [--review-fixes] [--subject …] [--under …] [--preview …] [--decides …] [--repos …] [--cycle …] [--follows …] [--model …] [--position …] [--note …] — open an arc, or change any field of its header and its status; --note writes a log line
 
 spn-devex workstream arc stamp write <workstream>/N<nnn> — write: restamp an arc's Plan row once its part of the page is current
 
@@ -153,6 +153,8 @@ spn-devex workstream open --file <block.json> --note "<the developer's words>" [
 spn-devex workstream progress write <workstream> — regenerate the progress block in the approach page's Plan
 
 spn-devex workstream question raise <workstream>/N<nnn> --file card.json — raise a card: the next number, the record, the card in the approach page's Open
+
+spn-devex workstream question brief <workstream>/Q<n> — print a fresh view's brief from the card: the problem and the constraints first, no options, the proposals to follow
 
 spn-devex workstream question show Q<n> --in <notes/N<nnn>/preview.html> — show an open card on an arc's preview, in its Open
 
@@ -188,7 +190,7 @@ spn-devex workstream state show [<workstream>] [--json] — where each open and 
 
 spn-devex workstream state check [<workstream>] [--facts] [--json] — whether each open and backlog workstream is whole: its data, previews, samples, notes folders, stamps, cards and step files
 
-spn-devex workstream suggestion add <workstream>[/N<nnn>] "<title>" [--preview …] — raise a suggestion: the next number, raised; it also prints the decisions and rules that already speak to its title
+spn-devex workstream suggestion add <workstream>[/N<nnn>] "<title>" [--preview …] [--file card.json] — raise a suggestion: the next number, raised; it also prints the decisions and rules that already speak to its title
 
 spn-devex workstream suggestion state <workstream> S<n> <state> [--words "…"] [--arc N<nnn>] — move it on: shaped, decided, parked or dropped, with the words beside the move
 
