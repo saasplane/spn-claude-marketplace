@@ -15,7 +15,7 @@ import { previewsWithoutStatus, writeAll } from "./003-preview-status.ts";
 
 export const migration010: Migration = {
   id: "010",
-  version: "0.104.2",
+  version: "0.105.0",
   changed: "A preview of an open or backlog workstream is rewritten to the header the arc's commands write now, so a release that adds a fact to the header " +
     "brings every held preview with it.",
   check: previewsWithoutStatus,

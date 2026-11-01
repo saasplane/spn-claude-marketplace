@@ -501,8 +501,8 @@ console.log("\n=== a script, steps, and the id order");
 console.log("\n=== 010 — a preview whose header is not what the commands write is rewritten, and a closed one stays");
 {
   const m010 = MIGRATIONS.find((one) => one.id === "010");
-  ok("[MKT.SCRIPTS.393] the plugin ships 010 after 009, at 0.104.2, with a script and no steps",
-    MIGRATIONS[9]?.id === "010" && m010?.version === "0.104.2" && m010.changed.endsWith(".") && typeof m010.script === "function" && !m010.steps?.length);
+  ok("[MKT.SCRIPTS.393] the plugin ships 010 after 009, at 0.105.0, with a script and no steps",
+    MIGRATIONS[9]?.id === "010" && m010?.version === "0.105.0" && m010.changed.endsWith(".") && typeof m010.script === "function" && !m010.steps?.length);
   const { root, ws } = await dataWorkspace("headers-010");
   const preview = join(ws, "notes", "N001", "preview.html");
   const old = `<header class="sds-masthead"><div class="sds-eyebrow"><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Preview</span><span class="sds-separator">|</span><span class="sds-label">Arc:</span> <span class="sds-badge">N001</span><span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-decided">DECIDED</span></span></span></div><h1>Probe</h1></header>\n`;
@@ -520,8 +520,8 @@ console.log("\n=== 010 — a preview whose header is not what the commands write
 console.log("\n=== 011 — the arcs table moves out of How's Cycles subsection into a Plan section after How, and a closed page stays");
 {
   const m011 = MIGRATIONS.find((one) => one.id === "011");
-  ok("[MKT.SCRIPTS.401] the plugin ships 011 after 010, at 0.104.2, with a script and no steps",
-    MIGRATIONS[10]?.id === "011" && m011?.version === "0.104.2" && m011.changed.endsWith(".") && typeof m011.script === "function" && !m011.steps?.length);
+  ok("[MKT.SCRIPTS.401] the plugin ships 011 after 010, at 0.105.0, with a script and no steps",
+    MIGRATIONS[10]?.id === "011" && m011?.version === "0.105.0" && m011.changed.endsWith(".") && typeof m011.script === "function" && !m011.steps?.length);
   const page = (plan) => `<!doctype html>\n<header class="sds-masthead"><h1>Probe</h1></header>\n<section id="s3" data-block="sequence">\n  <div class="sds-section-head"><h2>How</h2></div>\n  <h3 id="h1">spn-x</h3>\n  <p>One line.</p>\n` +
     (plan ? `</section>\n\n<section id="arcs" data-block="sequence">\n  <div class="sds-section-head"><h2>Plan</h2></div>\n  <p>Order.</p>\n  <div class="sds-scroll"><table><tr><td>N001</td></tr></table></div>\n  <!-- spn:generated progress -->\n  <!-- /spn:generated -->\n</section>\n`
       : `  <h3 id="h9">Cycles</h3>\n  <p>Order.</p>\n  <div class="sds-scroll"><table><tr><td>N001</td></tr></table></div>\n  <!-- spn:generated progress -->\n  <!-- /spn:generated -->\n</section>\n`) +

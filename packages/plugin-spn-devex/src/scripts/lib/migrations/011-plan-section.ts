@@ -45,7 +45,7 @@ export function movePlans(root: string): string[] {
 
 export const migration011: Migration = {
   id: "011",
-  version: "0.104.2",
+  version: "0.105.0",
   changed: "The approach page reads Why, What, How, Plan, Open, Deferred: the arcs table, with its order line and progress block, moves out of " +
     "How's Cycles subsection into a Plan section of its own after How.",
   check: pagesWithoutPlan,
