@@ -13,7 +13,7 @@
 import { readFileSync, rmSync, writeFileSync } from "node:fs";
 import { basename, resolve } from "node:path";
 import { type Action, FLAG, VALUE, UsageFault, readWords, type Words } from "../../../../../plugin-support-lib/src/lib/command.ts";
-import { STORED_STATUSES } from "../../checks/arc-status.ts";
+import { STORED_STATUSES, raisedSuggestions } from "../../checks/arc-status.ts";
 import { stepRowFindings } from "../../checks/workstream-state.ts";
 import {
   NOTES, PREVIEW_FILE, approachOf, arcDataDir, arcIdsOf, arcStamp, arcStatus, doneOf, everDecided, logEvent, logLinesOf, newArc, notesDirOf, previewFromTemplate, previewHrefOf, previewOf,
@@ -134,6 +134,18 @@ function wordsGuard(arc: string, data: ArcData | null, decidedBefore: boolean, w
     throw new UsageFault(`keeps ${arc} as it is: a wait and a start are the developer's words — add \`--note "<the developer's words>"\` (RULE.DEVEX.WORKSPACE.311).`);
   if (words.given("start") && !data?.wait)
     throw new UsageFault(`finds no wait on ${arc} to clear: it starts as soon as a step does (RULE.DEVEX.WORKSPACE.311).`);
+}
+
+/**
+ * The same refusal `arc-status` gives at the prompt, held here so no route stores it: LANDED stored on an arc while a
+ * suggestion it raised is still raised. Names the command that moves each one on.
+ */
+function raisedGuard(ws: string, arc: string, was: string, words: Words): void {
+  if (words.value("status") !== "LANDED" || was === "LANDED") return;
+  const root = workspaceOf(ws);
+  const found = root ? raisedSuggestions(root, `${basename(ws)}/${arc}`, ws) : null;
+  if (!found?.titles.length) return;
+  throw new UsageFault(`keeps ${arc} at ${was}: ${found.titles.length} suggestion(s) it raised are still raised, such as '${found.titles[0].slice(0, 60)}'. Move each on first — \`workstream suggestion state <workstream> <sN> shaped|decided|parked|dropped\` — then store LANDED (RULE.DEVEX.WORKSPACE.307).`);
 }
 
 /** What one run of the page pieces did: each piece of an arc's opening, written or kept. */
@@ -267,6 +279,7 @@ function edit(args: string[]): number {
     precedent.push(...rankedPrecedent(workspaceOf(), title, words.value("goal") ?? ""));
   } else {
     const was = data.status;
+    raisedGuard(ws, arc, was, words);
     wordsGuard(arc, data, everDecided(data, logLinesOf(ws, arc)), words);
     const oldHref = previewHrefOf(arc, data);
     const changed = header(data, words);

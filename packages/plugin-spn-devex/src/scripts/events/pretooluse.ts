@@ -62,6 +62,16 @@ import { applies as guideCommandsApply, checkGuideCommands } from "../checks/gui
 import { applies as pageTitleApplies, checkPageTitle } from "../checks/page-title.ts";
 import { checkRestatesFirst } from "../checks/restates-first.ts";
 import { checkReportAsked } from "../checks/report-asked.ts";
+import { applies as keptPathsApplies, checkKeptPaths } from "../checks/kept-paths.ts";
+import { applies as commitByPathApplies, checkCommitByPath } from "../checks/commit-by-path.ts";
+import { applies as commitStagedApplies, checkCommitStaged } from "../checks/commit-staged.ts";
+import { checkAgentModel, launchOrderModel } from "../checks/agent-model.ts";
+import { applies as workstreamOpenApplies, checkWorkstreamOpen } from "../checks/workstream-open.ts";
+import { applies as memoryLessonApplies, checkMemoryLesson } from "../checks/memory-lesson.ts";
+import { applies as publishLockstepApplies, checkPublishLockstep } from "../checks/publish-lockstep.ts";
+import { applies as processListApplies, checkProcessList } from "../checks/process-list.ts";
+import { applies as estateCardFirstApplies, checkEstateCardFirst } from "../checks/estate-card-first.ts";
+import { applies as seatPrintApplies, checkSeatPrint } from "../checks/seat-print.ts";
 
 type Check = {
   /** The check file, and the check inside it: `split-plan` › `close`. A file with one check names it twice. */
@@ -159,17 +169,39 @@ const CHECKS: Check[] = [
   { name: { group: "plugin-sync", action: "plugin-sync" }, run: checkPluginSync, needs: ["command"], applies: () => true },
   { name: { group: "browser-profile", action: "browser-profile" }, run: checkBrowserProfile, needs: ["command"], applies: () => true },
   { name: { group: "proof-run", action: "proof-run" }, run: checkProofRun, needs: ["command"], applies: () => true },
+  // The round-1 refusals on a command, each by a substring or one regular expression over it before any read, and each
+  // naming the form that works. A call that names none of their words pays those tests and stops.
+  { name: { group: "process-list", action: "process-list" }, run: checkProcessList, needs: ["command"],
+    applies: (path, command) => processListApplies(path, command) },
+  { name: { group: "seat-print", action: "seat-print" }, run: checkSeatPrint, needs: ["command"],
+    applies: (_path, command) => seatPrintApplies(command) },
+  { name: { group: "commit-by-path", action: "commit-by-path" }, run: checkCommitByPath, needs: ["command"],
+    applies: (path, command) => commitByPathApplies(path, command) },
+  { name: { group: "commit-staged", action: "commit-staged" }, run: checkCommitStaged, needs: ["command"],
+    applies: (path, command) => commitStagedApplies(path, command) },
+  { name: { group: "publish-lockstep", action: "publish-lockstep" }, run: checkPublishLockstep, needs: ["command"],
+    applies: (path, command) => publishLockstepApplies(path, command) },
+  { name: { group: "workstream-open", action: "workstream-open" }, run: checkWorkstreamOpen, needs: ["command"],
+    applies: (path, command) => workstreamOpenApplies(path, command) },
   // A refusal with the plain form: a call the floor would send for approval only by its shape is told
   // the plain form. Its fast path is one regular expression over the command; past it, one settings read.
   { name: { group: "command-shape", action: "command-shape" }, run: checkCommandShape, needs: ["command"],
     applies: (path, command) => commandShapeApplies(path, command) },
-  // It reads the transcript, so its fast path is two words a move to DECIDED always carries.
+  // It reads the transcript, so its fast path is two words a move to DECIDED or LANDED always carries.
   { name: { group: "arc-status", action: "arc-status" }, run: checkArcStatus, needs: ["command"],
-    applies: (_path, command) => command.includes("workstream") && command.includes("DECIDED") },
+    applies: (_path, command) => command.includes("workstream") && (command.includes("DECIDED") || command.includes("LANDED")) },
   { name: { group: "doc-check", action: "doc-check" }, run: checkDoc, needs: ["command", "file_path"],
     applies: (path, command) => PROSE_SUFFIXES.some((s) => path.endsWith(s) || command.includes(s)) },
   // A note once a turn, after a handover block: it reads the transcript, and its fast path is the label every block carries.
   { name: { group: "handover-last", action: "handover-last" }, run: checkHandoverLast, needs: ["any"], applies: () => true },
+  // Round-1 writes: a closed workstream, a cache or a card-less estate edit is refused; a memory write is told once. Each
+  // tests the path first, so an ordinary edit pays one comparison.
+  { name: { group: "kept-paths", action: "kept-paths" }, run: checkKeptPaths, needs: ["file_path"],
+    applies: (path, command) => keptPathsApplies(path, command) },
+  { name: { group: "estate-card-first", action: "estate-card-first" }, run: checkEstateCardFirst, needs: ["file_path"],
+    applies: (path) => estateCardFirstApplies(path) },
+  { name: { group: "memory-lesson", action: "memory-lesson" }, run: checkMemoryLesson, needs: ["file_path"],
+    applies: (path, command) => memoryLessonApplies(path, command) },
   // The writes a page or a plugin file is judged for, each by a test of the path first. The two that read
   // a file after the path, the transcript and the drawings, come last.
   { name: { group: "restates-first", action: "restates-first" }, run: checkRestatesFirst, needs: ["file_path"], applies: () => true },
@@ -367,53 +399,6 @@ function docFindingHeard(payload: Payload, path: string, finding: string): boole
     if (!root) return false;
     return alreadyTold(root, payload.session_id, `doc-check|${fromWorkspace(root, resolve(cwd, path))}`, finding);
   } catch { return false; }
-}
-
-/** The three model families an order and a launch are compared by. */
-const FAMILY = /opus|sonnet|haiku/i;
-
-/** The model family the first order a launch's prompt names puts on its `model:` line, or null where no order names one. */
-export function orderModel(payload: Payload): string | null {
-  const input = (payload.tool_input ?? {}) as { prompt?: string };
-  const cwd = payload.cwd ?? process.cwd();
-  for (const named of (input.prompt ?? "").matchAll(/[^\s'"`()]*notes\/N\d+[a-z]?\/orders\/[^\s'"`()]+\.md/g)) {
-    try {
-      const front = /^---\n([\s\S]*?)\n---/.exec(readFileSync(resolve(cwd, named[0]), "utf8"))?.[1] ?? "";
-      const wanted = FAMILY.exec(/^model:\s*(.*)$/m.exec(front)?.[1] ?? "")?.[0].toLowerCase();
-      if (wanted) return wanted;
-    } catch { /* an order that cannot be read names nothing */ }
-  }
-  return null;
-}
-
-/**
- * THE AGENT-MODEL CHECK: a launch of a helper agent names its model, and a launch of an order runs on the
- * model the order's own `model:` line names. A launch that names none but an order takes the order's (the hook
- * puts it in). A fork takes no model, since it runs on the window's own with the window's whole context, so a
- * fork is refused. Returns null where the launch is fine.
- */
-export function checkAgentModel(payload: Payload): Verdict {
-  const input = (payload.tool_input ?? {}) as { model?: string; subagent_type?: string; prompt?: string };
-  if (input.subagent_type === "fork") {
-    return { deny: "A fork runs on this window's own model with its whole context. Launch the agent with a `subagent_type` and the `model` its order names (sonnet for a written order)." };
-  }
-  const launched = FAMILY.exec(input.model ?? "")?.[0].toLowerCase();
-  if (!input.model) {
-    if (orderModel(payload)) return null;
-    return { deny: "This launch names no `model`. Add `model` to the call: the one the order's `model:` line names (sonnet for a written order, opus for design)." };
-  }
-  const cwd = payload.cwd ?? process.cwd();
-  for (const named of (input.prompt ?? "").matchAll(/[^\s'"`()]*notes\/N\d+[a-z]?\/orders\/[^\s'"`()]+\.md/g)) {
-    try {
-      const path = resolve(cwd, named[0]);
-      const front = /^---\n([\s\S]*?)\n---/.exec(readFileSync(path, "utf8"))?.[1] ?? "";
-      const wanted = FAMILY.exec(/^model:\s*(.*)$/m.exec(front)?.[1] ?? "")?.[0].toLowerCase();
-      if (wanted && wanted !== launched) {
-        return { deny: `The order ${basename(path)} names \`model: ${wanted}\` and this launch names \`${input.model}\`. Launch it with \`model: "${wanted}"\`, or change the order's \`model:\` line first.` };
-      }
-    } catch { /* an order that cannot be read is not judged */ }
-  }
-  return null;
 }
 
 /**
@@ -636,7 +621,7 @@ try { verdict = dispatch(payload); } catch { verdict = null; }   // never take t
 if (!verdict?.deny) startCommand(payload);
 end();
 const launched = payload.tool_name === "Agent" || payload.tool_name === "Task";
-const taken = !verdict?.deny && launched && !(payload.tool_input as { model?: string } | undefined)?.model ? orderModel(payload) : null;
+const taken = !verdict?.deny && launched && !(payload.tool_input as { model?: string } | undefined)?.model ? launchOrderModel(payload) : null;
 if (taken) {
   // A launch with no model takes the order's `model:` line, so the call runs instead of being refused and retried.
   const specific: Record<string, unknown> = { hookEventName: "PreToolUse", permissionDecision: "allow",

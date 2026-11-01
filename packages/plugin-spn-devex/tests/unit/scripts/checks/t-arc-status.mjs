@@ -104,5 +104,22 @@ console.log("\n=== a go carries the developer's own words: the words are in a pr
   ok("[MKT.HOOKS.103] a window with no transcript is not a finding", kind(checkArcStatus({ ...edit("all good"), transcript_path: undefined })) === "silent");
 }
 
+console.log("\n=== a LANDED stamp waits for the suggestions the arc raised");
+{
+  const { checkArcStatus } = await import("../../../../src/scripts/checks/arc-status.ts");
+  const sug = (id, state, preview) => JSON.stringify({ id, title: `suggestion ${id}`, state, preview, words: null });
+  const make = (name, lines) => workspace(name, { ".spndevex/workstreams/open/020-x/suggestions.jsonl": lines.join("\n") + "\n" });
+  const edit = (root, ref = "020/N001") => ({ tool_name: "Bash", cwd: root, tool_input: { command: `spn-devex workstream arc edit ${ref} --status LANDED --note "close"` } });
+  const kind = (verdict) => (verdict?.deny ? "deny" : "silent");
+  const raised = make("arc-landed-raised", [sug("s1", "raised", "notes/N001/preview.html"), sug("s2", "decided", "notes/N001/preview.html")]);
+  const refused = checkArcStatus(edit(raised));
+  ok("[MKT.SCRIPTS.381] a suggestion the arc raised, still raised, keeps it from LANDED", kind(refused) === "deny", JSON.stringify(refused));
+  ok("[MKT.SCRIPTS.381] the refusal names the corrected form", /suggestion state/.test(refused?.deny ?? "") && /suggestion s1/.test(refused?.deny ?? ""), refused?.deny);
+  const moved = make("arc-landed-moved", [sug("s1", "parked", "notes/N001/preview.html")]);
+  ok("[MKT.SCRIPTS.381] every suggestion moved on lets it through", kind(checkArcStatus(edit(moved))) === "silent");
+  ok("[MKT.SCRIPTS.381] a raised suggestion of another arc is not this arc's", kind(checkArcStatus(edit(make("arc-landed-other", [sug("s1", "raised", "notes/N002/preview.html")])))) === "silent");
+  ok("[MKT.SCRIPTS.381] a move to another status is not read", kind(checkArcStatus({ ...edit(raised), tool_input: { command: "spn-devex workstream arc edit 020/N001 --status CARRIED --reason x --note \"LANDED\"" } })) === "silent");
+}
+
 console.log(failed ? `  ${failed} FAILED` : `  all ${n} passed`);
 process.exit(failed ? 1 : 0);

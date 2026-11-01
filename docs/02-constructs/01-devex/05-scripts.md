@@ -5,7 +5,7 @@
   "title": "Scripts — The Code a Plugin Ships, Wired or Reached by Name",
   "subtitle": "Every file a plugin can run lives in one folder, sorted by what calls it.",
   "lenses": ["SERVER_DEV", "ARCHITECT"],
-  "status": "PLANNING",
+  "status": "IMPLEMENTING",
   "dependsOn": ["hook-set"],
   "summary": "Scripts is the one folder that holds everything a plugin can execute — the checks a hook composes, the tools a person reaches by typing their path, and the library code both sides read.",
   "keywords": ["script", "check", "tool", "applies", "finding", "grade"]
@@ -14,7 +14,7 @@
 
 # Scripts — The Code a Plugin Ships, Wired or Reached by Name
 
-`For: Backend developer · Architect` · `Status: 🔮 PLANNING`
+`For: Backend developer · Architect` · `Status: 🚧 IMPLEMENTING`
 
 Scripts is the one folder that holds everything a plugin can execute — the checks a hook composes, the tools a person reaches by typing their path, and the library code both sides read. Read this page before you add a new script, or when you are not sure whether a rule belongs in a hook or in a tool. It explains how each kind is reached and the two habits every file in the folder keeps.
 

@@ -199,7 +199,7 @@ function onceForAFile(shown) {
   });
   const waived = { parity: false, why: "the Python dispatcher never carried this check" };
   one("[MKT.HOOKS.121] command-shape's refusal survives the chain",
-    { tool_name: "Bash", cwd: root, tool_input: { command: "git status --short && git commit -m x" } }, "deny", { says: "Run a write as a call of its own", cwd: root, ...waived });
+    { tool_name: "Bash", cwd: root, tool_input: { command: "git status --short && git commit -m x -- a.ts" } }, "deny", { says: "Run a write as a call of its own", cwd: root, ...waived });
   one("[MKT.HOOKS.121] one plain command passes the chain",
     { tool_name: "Bash", cwd: root, tool_input: { command: "git status --short" } }, "silent", { cwd: root, ...waived });
 }
@@ -290,11 +290,11 @@ console.log("\n=== pretooluse — a push waits for a whole run of its tree, and 
     { tool_name: "Bash", cwd: repo, tool_input: { command: "git status" } },
     "silent", { cwd: root, parity: false, why: "a new guard" });
   one("[MKT.HOOKS.70] a commit on the workstream's branch passes the same chain",
-    { tool_name: "Bash", cwd: repo, tool_input: { command: "git commit -m x" } },
+    { tool_name: "Bash", cwd: repo, tool_input: { command: "git commit -m x -- pkg/src/a.ts" } },
     "silent", { cwd: root, parity: false, why: "a new guard" });
   git("checkout", "-q", "-b", "develop");
   one("[MKT.HOOKS.69] a commit on develop is refused by the chain, naming the pull request",
-    { tool_name: "Bash", cwd: repo, tool_input: { command: "git commit -m x" } },
+    { tool_name: "Bash", cwd: repo, tool_input: { command: "git commit -m x -- pkg/src/a.ts" } },
     "deny", { says: "pull request", cwd: root, parity: false, why: "a new guard" });
 }
 

@@ -32,12 +32,24 @@ const CURRENT_PAGE_ASSIGNMENT = /\bfigma\s*\??\.\s*currentPage\s*=(?![=>])/;
 const NOTIFY_CALL = /\bfigma\s*\??\.\s*notify\s*\(/;
 const CLOSE_CALL = /\bfigma\s*\??\.\s*closePlugin\s*\(/;
 const PAGE_SWITCH = /\bsetCurrentPageAsync\s*\(/g;
+/** A call or an assignment that names a variable collection, matched in the masked text and read in the raw one. */
+const COLLECTION_NAMING = /(?:\bcreateVariableCollection\s*\(|[Cc]ollection\w*(?:\[\d+\])?\s*\.\s*name\s*=(?![=>]))\s*/g;
 
 // nosemgrep: javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp -- pattern built from this script's own constants and escaped text, never outside input
 const unsupportedCall = (name: string): RegExp => new RegExp(`\\??\\.\\s*${name}\\b`);
 
-/** Every refusal the script's text shows, one sentence each. `masked` has comment and string bodies blanked. */
-export function refusals(masked: string): string[] {
+/** Each collection name the script spells with a middle dot. The match is found where code is, and the name is read from the raw text. */
+export function dottedCollectionNames(masked: string, code: string): string[] {
+  const names: string[] = [];
+  for (const call of masked.matchAll(COLLECTION_NAMING)) {
+    const literal = /^["'`]([^"'`]*)["'`]/.exec(code.slice(call.index + call[0].length));
+    if (literal && literal[1].includes("\u00b7")) names.push(literal[1]);
+  }
+  return names;
+}
+
+/** Every refusal the script's text shows, one sentence each. `masked` has comment and string bodies blanked; `code` is the raw text. */
+export function refusals(masked: string, code = ""): string[] {
   const found: string[] = [];
   for (const api of UNSUPPORTED)
     if (unsupportedCall(api.name).test(masked))
@@ -46,6 +58,8 @@ export function refusals(masked: string): string[] {
     found.push("The script assigns figma.currentPage, which throws in the connector: move with await figma.setCurrentPageAsync(page) instead.");
   if (NOTIFY_CALL.test(masked))
     found.push("The script calls figma.notify, which throws in the connector: return what you need to see, because only the return value comes back.");
+  for (const name of dottedCollectionNames(masked, code))
+    found.push(`The script names a collection "${name}" with a middle dot: a library file and its theme collections are named DS <n>-<Name>, with a hyphen and no middle dot.`);
   if (CLOSE_CALL.test(masked))
     found.push("The script calls figma.closePlugin, which has no place in a connector script: a script is plain JavaScript with top-level await and return, so remove the call.");
   return found;
@@ -73,7 +87,7 @@ export function validate(input: FigmaInput): Verdict {
   const code = input.code;
   if (typeof code !== "string") return null;       // no text to read: the connector says what is wrong
   const masked = mask(code);
-  const refused = refusals(masked);
+  const refused = refusals(masked, code);
   if (refused.length) {
     const headline = `Denied — ${refused[0]}`;
     return { deny: [headline, ...refused.slice(1)].join("\n"), headline };
