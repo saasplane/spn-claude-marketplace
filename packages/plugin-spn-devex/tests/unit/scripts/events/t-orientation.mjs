@@ -978,8 +978,8 @@ console.log("\n=== orientation — the fetch, the behind-develop clause and the 
   const { commandsRef } = await import("../../../../src/scripts/cli.ts");
   const treeDebug = (await commandsRef()).split("\n").filter((one) => one.startsWith("spn-devex debug "));
   const shown = big.context.split("\n").filter((one) => one.startsWith("spn-devex debug "));
-  says(`the command tree renders the eight debug commands, ${treeDebug.length} lines`,
-    treeDebug.length === 8 && treeDebug.every((one) => /^spn-devex debug \w+ \w+/.test(one)), treeDebug.join("\n"));
+  says(`the command tree renders the nine debug commands, ${treeDebug.length} lines`,
+    treeDebug.length === 9 && treeDebug.every((one) => /^spn-devex debug \w+ \w+/.test(one)), treeDebug.join("\n"));
   says(`past the ceiling an ordinary start leaves the debug lines out first, ${shown.length} lines`,
     shown.length === 0 && big.context.length <= SESSION_START_CEILING + 200);
   says("and names `refs/commands.md` as read on asking",
@@ -991,7 +991,7 @@ console.log("\n=== orientation — the fetch, the behind-develop clause and the 
 console.log("\n=== orientation — the running go at the session start");
 {
   const says = (label, ok, detail = "") => { n += 1; if (!ok) failed += 1; console.log(`  ${ok ? "PASS" : "FAIL"}  ${label}${ok || !detail ? "" : `\n        ${String(detail).slice(0, 400)}`}`); };
-  const part = (id, state, entry) => ({ id, repo: "spn-x", pass: "CODE", entries: [entry], tests: [], minutes: null, measuredFrom: null,
+  const part = (id, state, entry) => ({ id, repo: "spn-x", work: "CODE", entries: [entry], tests: [], minutes: null, measuredFrom: null,
     waitsOn: [], model: "opus", signature: "abc12345", state });
   const plan = (parts) => `${JSON.stringify({ schemaVersion: 1, lead: "N001", scope: ["N001"], writtenAt: "2026-10-31T00:00:00Z", parts }, null, 2)}\n`;
   const member = {
@@ -1025,7 +1025,7 @@ console.log("\n=== orientation — the running go at the session start");
 console.log("\n=== orientation — the short welcome, and the whole one once a day");
 {
   const says = (label, ok, detail = "") => { n += 1; if (!ok) failed += 1; console.log(`  ${ok ? "PASS" : "FAIL"}  ${label}${ok || !detail ? "" : `\n        ${String(detail).slice(0, 400)}`}`); };
-  const part = (id, state, entry) => ({ id, repo: "spn-x", pass: "CODE", entries: [entry], tests: [], minutes: null, measuredFrom: null,
+  const part = (id, state, entry) => ({ id, repo: "spn-x", work: "CODE", entries: [entry], tests: [], minutes: null, measuredFrom: null,
     waitsOn: [], model: "opus", signature: "abc12345", state });
   const plan = (parts) => `${JSON.stringify({ schemaVersion: 1, lead: "N001", scope: ["N001"], writtenAt: "2026-10-31T00:00:00Z", parts }, null, 2)}\n`;
   const files = {

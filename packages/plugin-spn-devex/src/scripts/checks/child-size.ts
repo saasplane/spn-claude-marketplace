@@ -93,7 +93,7 @@ export function checkChildSize(payload: Payload): Verdict {
   if (!line) return null;
   const turns = turnsIn(readFileSync(transcript, "utf8"));
   const last = turns.at(-1);
-  const held = last ? last.input + last.cache_read + last.cache_write : 0;
+  const held = last ? last.tokens.in + last.tokens.cacheRead + last.tokens.cacheWrite : 0;
   const over = line.context !== null && held >= line.context
     ? `its context holds ${Math.round(held / 1000)}k tokens, past the order's ${Math.round(line.context / 1000)}k`
     : line.turns !== null && turns.length >= line.turns ? `it has taken ${turns.length} turns, past the order's ${line.turns}` : null;

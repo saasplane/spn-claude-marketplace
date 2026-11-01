@@ -343,9 +343,9 @@ console.log("\n=== prompt");
   };
   const on = build("recorded", { [`${DEVEX}/.debug/switches.json`]: "{\"telemetry\": true}\n" });
   hook(event(on, "sess-timed", `pick up ${THIS}`), on, recording());
-  same("[MKT.HOOKS.48] while recording is on, a run writes its check's line and its whole-run line",
-    linesOf(on).map((line) => `${line.event} ${line.group} › ${line.action} ${line.session}`),
-    [`${EVENT} prompt › name sess-timed`, `${EVENT} events › prompt sess-timed`]);
+  same("[MKT.HOOKS.48] while recording is on, a run writes its check's one row",
+    linesOf(on).map((line) => `${line.mtype} ${line.check} ${line.session}`),
+    ["CHECK name sess-timed"]);
   const off = build("not-recorded");
   hook(event(off, "sess-timed", `pick up ${THIS}`), off, recording());
   same("[MKT.HOOKS.48] with recording off, a run writes no line", linesOf(off), []);
@@ -357,7 +357,7 @@ console.log("\n=== prompt");
 
 console.log("\n=== prompt — the mid-run reminder, while a go of the window has work running or ready (036 N009)");
 {
-  const part = (id, state, entry) => ({ id, repo: "spn-x", pass: "CODE", entries: [entry], tests: [], minutes: null, measuredFrom: null,
+  const part = (id, state, entry) => ({ id, repo: "spn-x", work: "CODE", entries: [entry], tests: [], minutes: null, measuredFrom: null,
     waitsOn: [], model: "opus", signature: "abc12345", state });
   const going = (name, parts) => build(name, { [`${DEVEX}/${WORKSTREAMS}/open/${THIS}/${ARCS}/N011/go.json`]:
     `${JSON.stringify({ schemaVersion: 1, lead: "N011", scope: ["N011"], writtenAt: "2026-10-31T00:00:00Z", parts }, null, 2)}\n` });

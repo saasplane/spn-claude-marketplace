@@ -158,7 +158,7 @@ console.log("\n=== runCommand records a command once, with its words as the leve
     catch (error) { return { out: `${error.stdout ?? ""}${error.stderr ?? ""}`, code: error.status }; }
   };
   const logOf = (root) => readFileSync(join(root, DEVEX, ".debug", "telemetry", "hooks.jsonl"), "utf8").trim().split("\n").map((line) => JSON.parse(line));
-  const levels = (line) => [line.script, line.group, line.subgroup, line.action, line.args, line.exit];
+  const levels = (line) => [line.call.program, line.call.group, line.call.action, line.exit];
 
   // A workspace's `.spndevex` holds its README beside `.debug/`; one holding `.debug/` alone is no workspace.
   const RECORDING = { [`${DEVEX}/README.md`]: "# .spndevex\n", [`${DEVEX}/.debug/switches.json`]: "{\"telemetry\": true}\n" };
@@ -169,16 +169,16 @@ console.log("\n=== runCommand records a command once, with its words as the leve
     process.exit(code);`);
   same("the command runs with what followed its action, and its exit code is handed back", [ran.out.trim(), ran.code], ["ran with docs,--block,tags", 1]);
   const lines = logOf(root);
-  same("[MKT.SCRIPTS.116] a subject's action writes group, the subject as `subgroup`, the action, and what followed it",
-    lines.filter((line) => line.group === "docs").map(levels), [["spn-devex", "docs", "face", "check", "docs --block tags", 1]]);
-  same("and the whole run is one more line, `cli` › `cli`", lines.filter((line) => line.group === "cli").map((line) => [line.action, line.exit]), [["cli", 1]]);
+  same("[MKT.SCRIPTS.116] a subject's action writes its group, and its action with the subject before it",
+    lines.filter((line) => line.call.group === "docs").map(levels), [["spn-devex", "docs", "face check", 1]]);
+  same("and the run is that one line, a v 1 COMMAND row", lines.map((line) => [line.v, line.mtype]), [[1, "COMMAND"]]);
 
   const two = folder("recorded-two", RECORDING);
   child(two, `
     process.exit(await runCommand({ plugin: "spn-apps", group: "coverage", subject: null, action: "check", usage: "[<path>…]",
       run: async () => 0 }, []));`);
-  same("[MKT.SCRIPTS.116] a command of two words leaves `subgroup` empty, and `args` too where nothing followed",
-    logOf(two).filter((line) => line.group === "coverage").map(levels), [["spn-apps", "coverage", null, "check", null, 0]]);
+  same("[MKT.SCRIPTS.116] a command of two words writes its action alone",
+    logOf(two).filter((line) => line.call.group === "coverage").map(levels), [["spn-apps", "coverage", "check", 0]]);
 
   const refused = folder("recorded-fault", RECORDING);
   const fault = child(refused, `
@@ -186,8 +186,8 @@ console.log("\n=== runCommand records a command once, with its words as the leve
       run: () => { throw new UsageFault("needs a path."); } }, []));`);
   same("[MKT.SCRIPTS.112] a usage fault prints the command's usage line, then the fault after the command's words, and exits 2",
     [fault.out.trim(), fault.code], ["usage: spn-devex docs face write <path> [--block glossary|tags]\n`docs face write` needs a path.", 2]);
-  same("and the refused run is recorded with exit 2", logOf(refused).filter((line) => line.group === "docs").map(levels),
-    [["spn-devex", "docs", "face", "write", null, 2]]);
+  same("and the refused run is recorded with exit 2", logOf(refused).filter((line) => line.call.group === "docs").map(levels),
+    [["spn-devex", "docs", "face write", 2]]);
 
   const broken = child(folder("recorded-error", RECORDING), `
     process.exit(await runCommand({ plugin: "spn-devex", group: "docs", subject: null, action: "audit", usage: "",
