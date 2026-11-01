@@ -12,6 +12,7 @@ import { existsSync } from "node:fs";
 import { basename, join, relative, resolve, sep } from "node:path";
 import { segments } from "../lib/command-reader.ts";
 import { eventWorkspace, type Payload, type Verdict, emit, readPayload, runAlone } from "../lib/payload.ts";
+import { DEVEX, DEVEX_WORKSTREAMS, WORKSTREAMS } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
 
 const ASSIGNMENT = /^[A-Za-z_][A-Za-z0-9_]*=/;
 
@@ -46,8 +47,8 @@ const installsPlugin = (run: Run): boolean => {
 /** Whether a folder is inside a workspace's `.spndevex/workstreams`. */
 export const inWorkstreams = (dir: string): boolean => {
   const parts = resolve(dir).split(sep);
-  const at = parts.indexOf(".spndevex");
-  return at >= 0 && parts[at + 1] === "workstreams";
+  const at = parts.indexOf(DEVEX);
+  return at >= 0 && parts[at + 1] === WORKSTREAMS;
 };
 
 /** Whether a command could be either: one pattern over the text, so every other call pays that and stops. */
@@ -62,7 +63,7 @@ export function checkWorkspaceCwd(payload: Payload): Verdict {
   for (const run of runsOf(command, payload.cwd ?? process.cwd())) {
     if (!(isSpnutils(run, "workspace", ["init", "agent-sync"]) || installsPlugin(run)) || !inWorkstreams(run.dir)) continue;
     return { deny:
-      `Refused: this runs \`${run.words.slice(0, 3).join(" ")}\` with its working folder inside \`.spndevex/workstreams\`, and it would converge that folder as if it were a workspace.\n` +
+      `Refused: this runs \`${run.words.slice(0, 3).join(" ")}\` with its working folder inside \`${DEVEX_WORKSTREAMS}\`, and it would converge that folder as if it were a workspace.\n` +
       "Probe in the session's scratchpad folder, and run the command for the workspace from its root." };
   }
   return null;

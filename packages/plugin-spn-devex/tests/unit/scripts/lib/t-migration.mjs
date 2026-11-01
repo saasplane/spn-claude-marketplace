@@ -545,7 +545,7 @@ console.log("\n=== 011 — the arcs table moves out of How's Cycles subsection i
 console.log("\n=== the preview template's masthead carries Progress between Arc and Shown, as the writer writes it");
 {
   const { previewProgress } = await import("../../../../src/scripts/lib/workstream.ts");
-  const template = readFileSync(join("src", "refs", "devex", "workspace", "docs", "templates", "workstream", "approach-preview-template.html"), "utf8");
+  const template = readFileSync(join(import.meta.dirname, "..", "..", "..", "..", "src", "refs", "devex", "workspace", "docs", "templates", "workstream", "approach-preview-template.html"), "utf8");
   const written = previewProgress(7, 10).replace("sds-step-4", "sds-step-{{step}}").replace("width:70%", "width:{{pct}}%").replace("7 of 10", "{{done}} of {{total}}");
   ok("[MKT.SCRIPTS.397] the template's masthead line holds the writer's Progress markup, after Arc and before Shown", template.includes(`</a><span class="sds-separator">|</span>${written}<span class="sds-separator">|</span><span class="sds-label">Shown:</span>`), written);
 }
