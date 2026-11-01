@@ -22,6 +22,8 @@ spn-devex debug hooks show [--json] — every hook check's, then every event's, 
 
 spn-devex debug store show [--json] — each container of the store: files, size, lifetime
 
+spn-devex debug store reset — remove usage.jsonl, hooks.jsonl and their .1 files, and nothing else
+
 spn-devex debug switch show [--json] — each switch and whether it is on
 
 spn-devex debug switch on <name> — turn a switch on
@@ -140,7 +142,7 @@ spn-devex workstream go show <workstream>/N<nnn> [--part <id>] [--json] — prin
 
 spn-devex workstream go check <workstream>/N<nnn> — read the plan against the sheets: an entry no part holds, or a part whose entries changed since the plan was written, which it marks held; exits 1 on any
 
-spn-devex workstream go start <workstream>/N<nnn> <part> — mark a baseline or full run as running, so the test-run check lets the whole suite run
+spn-devex workstream go start <workstream>/N<nnn> <part> — mark a baseline, a full run or a release as running; only a baseline or a full run lets the test-run check open the whole suite
 
 spn-devex workstream go wait <workstream>/N<nnn> <part> (--on "…" | --clear) — mark a part waiting on something outside the plan (a release, a sign-in, another window's hold), with the reason in plain words; `--clear` takes the wait off, and the part reads ready when what it waits on in the plan has landed
 
@@ -158,15 +160,15 @@ spn-devex workstream question answer <qN> --key <option> --words "…" [--entrie
 
 spn-devex workstream question withdraw <qN> --words "…" — withdraw a card in your words; it leaves every Open
 
-spn-devex workstream report write [<workstream>] <report.md> — fold a child's report into its row: state, proof, cost, commits, follow-ups
+spn-devex workstream report write [<workstream>] <report.md> — fold a child's report into its row: state, proof, commits, follow-ups
 
-spn-devex workstream row add <workstream>/N<nnn> "<title>" --repo <repo> --altitude <altitude> [--kind change] [--state ready] [--blocked-by …] [--touches …] [--entries E1,E2] [--position …] [--model …] [--note …] — add a row to an arc, taking the arc's next number and printing it
+spn-devex workstream row add <workstream>/N<nnn> "<title>" --repo <repo> --work <work> [--kind change] [--state ready] [--blocked-by …] [--touches …] [--entries E1,E2] [--position …] [--model …] [--note …] — add a row to an arc, taking the arc's next number and printing it
 
 spn-devex workstream row state <workstream>/N<nnn> <row> <state> [--on "<what it waits on>"] [--note …] [--run <name>] — move a row to a state; --on names what a waiting row waits on outside the window, --note carries the words beside the move, and --run names the run a CODE or PROOF row of a sheet arc lands on
 
 spn-devex workstream row note <workstream>/N<nnn> <row> "<text>" — write one line on a row's log, and change nothing else
 
-spn-devex workstream row edit <workstream>/N<nnn> <row> [--title …] [--kind …] [--repo …] [--altitude …] [--model …] [--blocked-by …] [--touches …] [--entries E1,E2] [--position …] [--proof …] — change the fields of a row the arc holds; --proof names a carried row's successor; a row it lacks is refused, and `row add` is named
+spn-devex workstream row edit <workstream>/N<nnn> <row> [--title …] [--kind …] [--repo …] [--work …] [--model …] [--blocked-by …] [--touches …] [--entries E1,E2] [--position …] [--proof …] — change the fields of a row the arc holds; --proof names a carried row's successor; a row it lacks is refused, and `row add` is named
 
 spn-devex workstream row discard <workstream>/N<nnn> <row> --note "…" — take a row found invalid or not needed out of the arc; --note carries the developer's words into its one log line
 
@@ -191,3 +193,5 @@ spn-devex workstream suggestion add <workstream> "<title>" [--preview …] — r
 spn-devex workstream suggestion state <workstream> <sN> <state> [--words "…"] — move it on: shaped, decided, parked or dropped, with the words beside the move
 
 spn-devex workstream suggestion edit <workstream> <sN> [--title …] [--preview …] — change its title or its preview, never its state
+
+spn-devex workstream work write — rename altitude and pass to work in every open workstream, one log line for each arc
