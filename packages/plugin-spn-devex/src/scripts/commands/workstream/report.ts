@@ -1,4 +1,5 @@
 // RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § The commands · § The formats
+//           RULE.DEVEX.WORKSPACE.495, a helper that meets a name, a shape or a construct no entry holds stops and lists it under `unnamed:`
 //           RULE.DEVEX.WORKSPACE.488, a suggestion belongs to an arc, as a card does, and the arc's sheet cites it
 // The chapter is the source of truth; a rule change is edited there first, then here, in the same change.
 //
@@ -67,6 +68,13 @@ function splitLine(ws: string, arc: string, rowId: string): string | null {
   } catch { return null; }
 }
 
+/** What a report lists under `unnamed:`: each name, shape or construct the helper met that no entry holds. */
+export function unnamedOf(matter: Record<string, unknown>): string[] {
+  const listed = matter.unnamed;
+  const items = Array.isArray(listed) ? listed : typeof listed === "string" && listed.trim() ? [listed] : [];
+  return items.map((one) => String(one).trim()).filter(Boolean);
+}
+
 /** Folds a part's report: the part lands, and so does each step whose entries all sit in landed parts. */
 function foldPart(ws: string, lead: string, plan: GoPlan, part: GoPart, outcome: string, matter: Record<string, unknown>): number {
   const signatures = arcSignatures(ws);
@@ -132,6 +140,13 @@ function write(args: string[]): number {
   const rowId = String(matter.row ?? named);
   const outcome = String(matter.outcome ?? "");
   if (!(OUTCOMES as readonly string[]).includes(outcome)) throw new UsageFault(`reads \`outcome: ${outcome}\`, and it is one of ${OUTCOMES.join(" · ")}.`);
+  // A HELPER THAT MET A NAME NO ENTRY HOLDS STOPPED (RULE.DEVEX.WORKSPACE.495): the part does not land with it unraised.
+  const unnamed = unnamedOf(matter);
+  if (outcome === "landed" && unnamed.length) {
+    console.log(`Refused: ${named} reports \`outcome: landed\` and lists ${unnamed.length === 1 ? "a name" : `${unnamed.length} names`} no entry holds under \`unnamed:\`: ${unnamed.map((one) => `\`${one}\``).join(", ")}. ` +
+      "Raise each one (a suggestion that improves the book in the builder's workspace, a card where it decides the shape), and give the helper the name in a new order. Nothing was written. (RULE.DEVEX.WORKSPACE.495)");
+    return 1;
+  }
   const plan = typed(() => readGo(ws, arc));
   const part = plan?.parts.find((one) => one.id === named);
   if (plan && part) return foldPart(ws, arc, plan, part, outcome, matter);

@@ -264,6 +264,16 @@ console.log("\n=== report write: a part's report lands its row on a green run, i
   const runIn = (results) => put(rep.root, "spn-x/pkg/tests/.output/unit/runs/r1.json", JSON.stringify({ run: "r1", tier: "unit", ranAt: new Date(Date.now() + 3600e3).toISOString(), env: "local", results: results.map((id) => ({ id, tier: "unit", status: "SUCCESS", title: id })) }));
   const report = (id, ...extra) => { put(rep.ws, `notes/N001/orders/${id}.report.md`, ["---", 'row: "1"', "outcome: landed", ...extra, "---", "Body.", ""].join("\n")); return cli(rep.root, ["workstream", "report", "write", "031", `notes/N001/orders/${id}.report.md`]); };
 
+  // A HELPER THAT MET AN UNNAMED CONSTRUCT STOPPED (RULE.DEVEX.WORKSPACE.495)
+  const brief0 = readFileSync(join(rep.ws, "notes", "N001", "orders", `${part.id}.md`), "utf8");
+  ok("[MKT.SCRIPTS.428] a brief carries the stop line and the report's `unnamed:` field", brief0.includes("RULE.DEVEX.WORKSPACE.495") && brief0.includes("unnamed: []"), brief0.slice(-600));
+  const named = report(part.id, "run: r1", "unnamed: [\"IamRemoteRoute\"]", `commits: { spn-x: [${sha}] }`);
+  ok("[MKT.SCRIPTS.428] red: a report that lands and lists an unnamed construct is refused, naming it and the rule, and nothing is written",
+    named.code === 1 && named.out.includes("IamRemoteRoute") && named.out.includes("RULE.DEVEX.WORKSPACE.495") && rowState() !== "landed", named.out);
+  put(rep.ws, `notes/N001/orders/${part.id}.report.md`, ["---", 'row: "1"', "outcome: needs-you", 'unnamed: ["IamRemoteRoute"]', "---", "Met a name no entry holds.", ""].join("\n"));
+  const stopped = cli(rep.root, ["workstream", "report", "write", "031", `notes/N001/orders/${part.id}.report.md`]);
+  ok("[MKT.SCRIPTS.428] green: the same list on a needs-you report is accepted, and the row does not land", stopped.code === 0 && rowState() !== "landed", stopped.out);
+
   // two faults at once: the entry names no test, and the report records no commit
   writeFileSync(sheetFile, JSON.stringify(sheetOf([entry("E1", "spn-x:src/b.ts", { tiers: {} })]), null, 2));
   runIn([]);

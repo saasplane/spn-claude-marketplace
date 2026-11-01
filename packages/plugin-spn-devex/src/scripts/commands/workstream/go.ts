@@ -107,6 +107,7 @@ function brief(plan: GoPlan, part: GoPart, ws: string, root: string): string {
          "Save the report, at most 15 lines, beside this brief as " + `\`${part.id}.report.md\`, its front matter first.`, ""]
       : ["**Launch no agent.** Stop at 150k of context or 100 turns, at the next whole step, save the report with what is left and hand back.",
          "Commit nothing. Hand back at most 8 lines; save the report, at most 15 lines, beside this brief as " + `\`${part.id}.report.md\`, its front matter first.`, ""]),
+    "**A name, a shape or a construct no entry holds is not yours to make up** (RULE.DEVEX.WORKSPACE.495): stop, return `needs-you`, and list what you met under `unnamed:` in the report.", "",
     "## The entries", "",
     ...part.entries.map((ref) => `- \`${ref}\`: \`workstream sheet show ${ref.split("/")[0]}\` prints it whole`), "",
     "## Acceptance", "",
@@ -114,7 +115,7 @@ function brief(plan: GoPlan, part: GoPart, ws: string, root: string): string {
     "## Report", "",
     "Its front matter is what `workstream report write` folds into the plan:", "",
     "```text", "---", `go: "${plan.lead}"`, `part: "${part.id}"`, "outcome: landed · stopped · needs-you",
-    'proof: "<what you ran, and what it printed>"', "commits: {}", "followUps: []", "---", "```", "",
+    'proof: "<what you ran, and what it printed>"', "commits: {}", "followUps: []", "unnamed: []", "---", "```", "",
   ];
   return `${lines.join("\n")}\n`;
 }

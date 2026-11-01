@@ -251,6 +251,7 @@ Every row below is declared and none is claimed: a run writes the last two cells
 | MKT.SCRIPTS.424 | Builder | raise a suggestion with the same card | `suggestion add <ws>/N<nnn> --file card.json` keeps the card on the suggestion under the same checks, and the title-only form still works | POSITIVE | UNIT | PLANNED | — |
 | MKT.SCRIPTS.425 | Builder | keep every old card readable | A card raised before the new fields reads with no fault, because the checks run only when a card is raised or added | POSITIVE | UNIT | PLANNED | — |
 | MKT.SCRIPTS.426 | Builder | give a fresh view the problem first | `workstream question brief <ws>/Q<n>` prints a fresh view's brief from the card's why, what, nearest construct and signs, with no options, ending by saying the proposals come after the view answers; its words go to the arc's notes work folder (RULE.DEVEX.WORKSPACE.492) | POSITIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.428 | Builder | have a helper stop on a name nobody defined | A generated brief tells the helper to stop and return needs-you on a name, shape or construct no entry holds, listing it under `unnamed:`; `report write` refuses `outcome: landed` while the report lists one, naming each and saying to raise it (RULE.DEVEX.WORKSPACE.495) | NEGATIVE | UNIT | PLANNED | — |
 
 ## Retired ids
 
