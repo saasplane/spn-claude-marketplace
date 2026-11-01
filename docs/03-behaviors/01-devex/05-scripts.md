@@ -259,6 +259,7 @@ Every row below is declared and none is claimed: a run writes the last two cells
 | MKT.SCRIPTS.433 | Builder | hold a release that changes the agent's judgment to fixed cases | `release-plugins.mjs prepare` runs the proposal cases when the release's diff touches `skills/ideate`, `agents/spn-panel.md` or `refs/devex/workspace/docs/decision-cards.md`, refuses to commit on a failed case, and takes `--skip-cases` only with a reason that is printed into the release commit (RULE.DEVEX.AGENT.169) | NEGATIVE | UNIT | PLANNED | — |
 | MKT.SCRIPTS.434 | Builder | judge a fresh agent's answer against a fixed case | `scripts/proposal-cases.mjs` runs each case as a fresh non-interactive session that sees only the problem and its nearest constructs, and a case passes when the final text matches its `expect` patterns and none of its `refuse` patterns | POSITIVE | UNIT | PLANNED | — |
 | MKT.SCRIPTS.435 | Builder | keep the first three proposal cases | `tests/proposal-cases` holds the framework-route case for a migration contribution from a service that holds IAM remotely, and the code and docs helper cases that must return needs-you on a name no entry holds (RULE.DEVEX.AGENT.169) | POSITIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.436 | Builder | know the checker is checked | A unit test reads the rules index and fails, naming each rule whose holder is a check the plugins do not register, or that no test file proves by a bracketed case for its behaviour or by its own id | NEGATIVE | UNIT | PLANNED | — |
 
 ## Retired ids
 
