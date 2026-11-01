@@ -56,5 +56,27 @@ console.log("\n=== landings it lets through");
   ok("[MKT.SCRIPTS.382] a row that names no paths, a release among them, is held", applies("spn-claude-marketplace", "landed", []));
 }
 
+console.log("\n=== registrations whose folder is gone");
+{
+  const gone = join(base, "folder-that-is-gone");
+  const here = join(base, "folder-that-is-here");
+  mkdirSync(here, { recursive: true });
+  const dir = join(base, "gone-fixture");
+  const file = join(dir, "installed_plugins.json");
+  const make = (stale) => {
+    PLUGINS.forEach((name) => {
+      const folder = join(dir, "packages", `plugin-${name}`, "src", ".claude-plugin");
+      mkdirSync(folder, { recursive: true });
+      writeFileSync(join(folder, "plugin.json"), JSON.stringify({ name, version: "1.0.0" }));
+    });
+    writeFileSync(file, JSON.stringify({ version: 2, plugins: Object.fromEntries(PLUGINS.map((name) => [`${name}@saasplane`, [
+      { scope: "project", version: "1.0.0", projectPath: here }, { scope: "project", version: stale, projectPath: gone }]])) }));
+  };
+  make("0.9.0");
+  ok("[MKT.SCRIPTS.388] a registration behind whose project folder is gone is not a place the plugin must land", pluginLandedRefusal(dir, file) === null, pluginLandedRefusal(dir, file) ?? "");
+  mkdirSync(gone, { recursive: true });
+  ok("[MKT.SCRIPTS.388] the same registration is read once its folder exists", /not at 1\.0\.0/.test(pluginLandedRefusal(dir, file) ?? ""));
+}
+
 console.log(failed ? `\n  ${failed} of ${total} FAILED — plugin landed` : `\n  all ${total} passed — plugin landed`);
 process.exit(failed ? 1 : 0);

@@ -212,6 +212,7 @@ Every row below is declared and none is claimed: a run writes the last two cells
 | MKT.SCRIPTS.385 | Engineering leader | see the arcs still open first in the bottom bar | The bottom bar opens on the running arcs, then the rest not closed, each in the order the arcs run, and the closed arcs follow | POSITIVE | UNIT | PLANNED | — |
 | MKT.SCRIPTS.386 | Engineering leader | see how far an arc has got on its preview | A preview's header row shows Progress after Arc, a bar and `N of M landed`, and shows none before the arc has a sheet | POSITIVE | UNIT | PLANNED | — |
 | MKT.SCRIPTS.387 | Engineering leader | open an arc's preview from its bottom bar chip | A bottom bar chip opens its arc's preview in a new tab, and an arc with no preview keeps the jump to its row | POSITIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.388 | Backend developer | not be held by an install registration whose folder is gone | `plugin-landed` counts only the registrations in `installed_plugins.json` whose project folder exists, so a folder that is gone is not a place the plugin must land | POSITIVE | UNIT | PLANNED | — |
 
 ## Retired ids
 
