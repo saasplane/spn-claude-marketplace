@@ -514,6 +514,14 @@ console.log("\n=== 010 — a preview whose header is not what the commands write
   const lines = m010.script(root);
   ok("[MKT.SCRIPTS.393] its script has the arc's writer rewrite it", lines.length === 1 && readFileSync(preview, "utf8").includes("Progress:"), lines.join(" | "));
   ok("[MKT.SCRIPTS.393] green: 010 then finds nothing, and a second run writes nothing", m010.check(root).length === 0 && m010.script(root).length === 0);
+  // A running arc keeps DECIDED stored while its rows run: its header reads RUNNING, as the arc's commands write it, and the check agrees.
+  const stateFile = join(ws, "arcs", "N001", "state.json");
+  const state = JSON.parse(readFileSync(stateFile, "utf8"));
+  state.status = "DECIDED";
+  state.rows = [...(state.rows ?? []), { id: "90", parent: "N001", title: "a running step", kind: "change", state: "running", repo: "spn-x", work: "CODE" }];
+  writeFileSync(stateFile, JSON.stringify(state, null, 2));
+  m010.script(root);
+  ok("[MKT.SCRIPTS.393] a running arc whose header reads RUNNING is not named, though DECIDED is stored", m010.check(root).length === 0 && readFileSync(preview, "utf8").includes("RUNNING"), m010.check(root).join(" | "));
   ok("[MKT.SCRIPTS.393] a closed workstream's preview stays as it closed", readFileSync(join(root, ".spndevex/workstreams/closed/020-done/notes/N001/preview.html"), "utf8") === old);
 }
 
