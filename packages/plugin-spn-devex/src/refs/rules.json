@@ -3147,6 +3147,11 @@
         {
           "plugin": "spn-devex",
           "path": "skills/ideate/SKILL.md",
+          "heading": "The rules this step holds"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
           "heading": "How a first proposal is shaped"
         }
       ]
@@ -3167,6 +3172,11 @@
           "plugin": "spn-devex",
           "path": "refs/devex/function/ideate.md",
           "heading": "How a first proposal is shaped"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "The rules this step holds"
         },
         {
           "plugin": "spn-devex",
@@ -21080,11 +21090,6 @@
           "plugin": "spn-infra",
           "path": "refs/support/infra/shape/naming.md",
           "heading": "The published vocabulary — one format, in the shape the app opens (RULE.SUPPORT.INFRA.043)"
-        },
-        {
-          "plugin": "spn-infra",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
