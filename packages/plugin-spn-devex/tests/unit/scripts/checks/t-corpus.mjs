@@ -132,7 +132,7 @@ console.log("\n=== corpus — the trigger, against a known-bad corpus");
 
   // F1 — THIS IS THE CASE THAT MATTERS MOST IN THE SUITE.
   const second = run(root);
-  check("[F1] a finding is replayed on a second run with nothing changed, rather than going silent",
+  check("[MKT.HOOKS.28] [F1] a finding is replayed on a second run with nothing changed, rather than going silent",
     second.warned && second.subjects["repo-a/docs"] === "replayed" && second.out.includes("no spn:doc block"),
     second.out.slice(0, 400));
   check("[F1] and it says it is a stored verdict rather than a fresh run",
@@ -151,7 +151,7 @@ console.log("\n=== corpus — the trigger, against a known-bad corpus");
   const later = new Date(Date.now() + 60_000);
   utimesSync(join(root, "repo-a", "sprepo.json"), later, later);
   const touched = run(root);
-  check("a touch that changes no byte replays rather than re-running", touched.subjects["repo-a/docs"] === "replayed",
+  check("[MKT.HOOKS.28] a touch that changes no byte replays rather than re-running", touched.subjects["repo-a/docs"] === "replayed",
     touched.out.slice(0, 300));
 }
 
