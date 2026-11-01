@@ -29,6 +29,8 @@ console.log("\n=== what passes");
 {
   ok("[MKT.HOOKS.126] agent-sync passes", checkPluginSync(bash("spnutils workspace agent-sync")) === null);
   ok("[MKT.HOOKS.126] listing plugins passes", checkPluginSync(bash("claude plugin list")) === null);
+  ok("[MKT.HOOKS.416] a raw install named inside a quoted argument passes", checkPluginSync(bash(`git commit -m "never run claude plugin install by hand"`)) === null && checkPluginSync(bash(`grep -rn 'claude plugin update' docs`)) === null);
+  ok("[MKT.HOOKS.416] a raw install outside the quotes is still refused", checkPluginSync(bash(`echo "x" && claude plugin install "spn-devex@saasplane"`))?.deny?.includes("agent-sync") === true);
   ok("[MKT.HOOKS.126] a non-Bash call passes", checkPluginSync({ tool_name: "Read", tool_input: { command: "claude plugin install x" } }) === null);
 }
 
