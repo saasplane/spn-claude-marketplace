@@ -11,7 +11,7 @@
 //
 // It writes nothing while recording is off, says nothing to the child and never blocks it.
 
-import { workspaceRoot, readPayload, runAlone } from "../lib/payload.ts";
+import { eventWorkspace, readPayload, runAlone } from "../lib/payload.ts";
 import { recordUsage } from "../lib/usage.ts";
 import { begin, end, tagsOf } from "../../../../plugin-support-lib/src/lib/timing.ts";
 
@@ -19,7 +19,8 @@ if (runAlone("subagentstop.ts")) {
   try {
     const event = readPayload() as { session_id?: string; cwd?: string; agent_id?: string; agent_transcript_path?: string };
     const start = event.cwd || process.env.CLAUDE_PROJECT_DIR || process.cwd();
-    const root = workspaceRoot(start) ?? start;
+    // The workspace above the event's `cwd`, else above the project directory; the bare start only where neither holds one.
+    const root = eventWorkspace(event.cwd) ?? start;
     const facts = { script: "spn-devex", event: "SubagentStop", tool: null, session: event.session_id ?? null, ...tagsOf(event),
                     process: { group: "events", action: "subagentstop" } };
     begin(facts, root);

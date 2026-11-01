@@ -71,23 +71,84 @@ try {
   ok("it prints the checks, then the events, always both", printed.indexOf("Check") >= 0 && printed.indexOf("Event") > printed.indexOf("Check")
     && /spn-devex › docs-face › docs-face/.test(printed) && /PreToolUse/.test(printed) && /Out bytes/.test(printed), printed);
 
-  console.log("\n=== the send-backs (E68, MKT.HOOKS.321)");
-  const back = (session, checks) => JSON.stringify({ at: "2026-10-10T11:00:00Z", session, agent: null, checks });
+  console.log("\n=== the send-backs (MKT.HOOKS.341)");
   const before = JSON.parse(typed(root, "show", "--json").out);
-  ok("E68 with no sendbacks.jsonl the data form names no check to fix", Array.isArray(before.toFix) && !before.toFix.length, JSON.stringify(before.toFix));
-  writeFileSync(join(telemetry, "sendbacks.jsonl"), [
-    // s1 is cumulative: its last line wins, the first is not added to it.
-    back("s1", { "no-op": { sent: 1, idle: 1 }, half: { sent: 1, idle: 0 } }),
-    back("s1", { "no-op": { sent: 3, idle: 3 }, half: { sent: 2, idle: 1 }, acted: { sent: 2, idle: 0 } }),
-    back("s2", { "no-op": { sent: 1, idle: 0 }, half: { sent: 2, idle: 1 }, acted: { sent: 1, idle: 0 } }),
+  ok("with no sendbacks.jsonl the data form names no send-back and no check to fix", before.sendBacks?.turnEnd?.sent === 0 && before.sendBacks?.toolCalls?.sent === 0 && !before.toFix.length, JSON.stringify(before.sendBacks));
+  ok("the checks that ran under a Stop are headed Found and those under a PreToolUse Denies", (() => {
+    const text = typed(root, "show").out;
+    return !/Found/.test(text) && /Denies/.test(text);
+  })());
+}
+finally { /* the cases below read a root of their own */ }
+
+const back = (at, session, event, check) => JSON.stringify({ at: `2026-10-10T${at}Z`, session, agent: null, event, check, workstream: null, finding: "0123456789ab" });
+const at = (time) => `2026-10-10T${time}Z`;
+const stopRun = (time, session, spans = {}) => [
+  ...Object.entries(spans).map(([action, verdict]) => line({ script: "spn-devex", group: "stop", action, event: "Stop", verdict, at: at(time), session })),
+  whole("Stop", Object.values(spans).includes("deny") ? "deny" : "pass", 50, null).replace('"at":"2026-10-10T10:00:00Z"', `"at":"${at(time)}"`).replace('"session":"s1"', `"session":"${session}"`),
+];
+const callRun = (time, session, spans = {}) => [
+  ...Object.entries(spans).map(([action, verdict]) => line({ script: "spn-devex", group: "command-shape", action, event: "PreToolUse", verdict, at: at(time), session })),
+  whole("PreToolUse", Object.values(spans).includes("deny") ? "deny" : "pass", 5, null).replace('"at":"2026-10-10T10:00:00Z"', `"at":"${at(time)}"`).replace('"session":"s1"', `"session":"${session}"`),
+];
+const second = realpathSync(mkdtempSync(join(tmpdir(), "debug-hooks-backs-")));
+try {
+  mkdirSync(join(second, ".spndevex", "workstreams"), { recursive: true });
+  const folder = join(second, ".spndevex", ".debug", "telemetry");
+  mkdirSync(folder, { recursive: true });
+  writeFileSync(join(folder, "hooks.jsonl"), [
+    // a check about the work: answered when a tool call comes before the window's next Stop
+    ...stopRun("12:00:01", "w", { runnable: "deny" }), ...callRun("12:00:05", "w"), ...stopRun("12:00:10", "w"),
+    // and unanswered when the next Stop comes with none, twice
+    ...stopRun("12:01:01", "w", { runnable: "deny" }), ...stopRun("12:01:10", "w"),
+    ...stopRun("12:08:01", "w", { runnable: "deny" }), ...stopRun("12:08:10", "w"),
+    // a check about the reply: answered by its own span finding nothing on the next Stop, unanswered by a finding
+    ...stopRun("12:02:01", "r", { cards: "deny" }), ...stopRun("12:02:10", "r", { cards: "pass" }),
+    ...stopRun("12:03:01", "r", { cards: "deny" }), ...stopRun("12:03:10", "r", { cards: "deny" }),
+    // a tool-call check: answered by its next span passing, unanswered by it refusing again
+    ...callRun("12:04:01", "t", { "command-shape": "deny" }), ...callRun("12:04:05", "t", { "command-shape": "pass" }),
+    ...callRun("12:05:01", "t", { "command-shape": "deny" }), ...callRun("12:05:05", "t", { "command-shape": "deny" }),
+    // nothing to judge by: no next Stop, and the window check
+    ...stopRun("12:06:01", "x", { "go-next": "deny" }),
+    ...stopRun("12:07:01", "y", { window: "deny" }),
+  ].join("\n") + "\n");
+  writeFileSync(join(folder, "sendbacks.jsonl"), [
+    back("12:00:00", "w", "Stop", "runnable"), back("12:01:00", "w", "Stop", "runnable"), back("12:08:00", "w", "Stop", "runnable"),
+    back("12:02:00", "r", "Stop", "cards"), back("12:03:00", "r", "Stop", "cards"),
+    back("12:06:00", "x", "Stop", "go-next"), back("12:07:00", "y", "Stop", "window"),
+    back("12:04:00", "t", "PreToolUse", "command-shape"), back("12:05:00", "t", "PreToolUse", "command-shape"),
+    // the older cumulative form is skipped
+    JSON.stringify({ at: "2026-10-10T11:00:00Z", session: "w", agent: null, checks: { runnable: { sent: 9, idle: 9 } } }),
     "{ torn line",
   ].join("\n") + "\n");
-  const fix = JSON.parse(typed(root, "show", "--json").out).toFix;
-  ok("E68 a check with more than half its send-backs followed by no tool call is one to fix", fix?.length === 1 && fix[0].check === "no-op" && fix[0].sent === 4 && fix[0].idle === 3, JSON.stringify(fix));
-  ok("E68 exactly half is not, and a followed check is not", !fix?.some((one) => one.check === "half" || one.check === "acted"));
-  const fixPrinted = typed(root, "show").out;
-  ok("E68 the printed form names it as a check to fix", /to fix/i.test(fixPrinted) && /no-op/.test(fixPrinted) && !/half/.test(fixPrinted.split(/to fix/i)[1] ?? ""), fixPrinted);
+  const data = JSON.parse(typed(second, "show", "--json").out);
+  const turn = data.sendBacks?.turnEnd, calls = data.sendBacks?.toolCalls;
+  const of = (part, name) => part?.checks.find((one) => one.check === name);
+  ok("[MKT.HOOKS.341] the turn end counts its send-backs against its Stop runs, per 100 replies", turn?.sent === 7 && turn.runs === 12 && turn.per100 === 58.3, JSON.stringify(turn));
+  ok("the tool calls count theirs against the PreToolUse runs, per 100 calls", calls?.sent === 2 && calls.runs === 5 && calls.per100 === 40, JSON.stringify(calls));
+  ok("each check carries its sent-back count and its per 100", of(turn, "runnable")?.sent === 3 && of(turn, "runnable")?.per100 === 25 && of(turn, "cards")?.per100 === 16.7, JSON.stringify(turn?.checks));
+  ok("a check about the work is answered by a tool call before the next Stop", of(turn, "runnable")?.judged === 3 && of(turn, "runnable")?.unanswered === 2, JSON.stringify(of(turn, "runnable")));
+  ok("a check about the reply is answered by its own span on the next Stop finding nothing", of(turn, "cards")?.judged === 2 && of(turn, "cards")?.unanswered === 1, JSON.stringify(of(turn, "cards")));
+  ok("a tool-call check is answered by its next judged call passing", of(calls, "command-shape")?.judged === 2 && of(calls, "command-shape")?.unanswered === 1, JSON.stringify(of(calls, "command-shape")));
+  ok("where the log holds nothing to judge by, Unanswered is null", of(turn, "go-next")?.unanswered === null && of(turn, "window")?.unanswered === null);
+  ok("Checks to fix lists the check with more than half unanswered, and not the one with exactly half",
+    data.toFix.length === 1 && data.toFix[0].check === "runnable" && data.toFix[0].unanswered === 2, JSON.stringify(data.toFix));
+  ok("an old cumulative line adds nothing", turn?.sent === 7);
 
+  const printed = typed(second, "show").out;
+  ok("Found heads a turn-end check's findings and Denies a tool-call check's refusals",
+    /Found/.test(printed) && /Denies/.test(printed) && printed.indexOf("Found") < printed.indexOf("spn-devex › stop › runnable")
+    && printed.indexOf("Denies") < printed.indexOf("spn-devex › command-shape › command-shape"), printed);
+  ok("the Send-backs part prints per 100 replies and per 100 calls", /Send-backs, turn end: 7 of 12 replies sent back, 58\.3 per 100/.test(printed)
+    && /Send-backs, tool calls: 2 of 5 calls refused, 40 per 100/.test(printed) && /Sent back/.test(printed) && /Refused/.test(printed) && /Unanswered/.test(printed), printed);
+  ok("a check with nothing to judge by prints a dash", /go-next\s+1\s+8\.3\s+-\n/.test(printed), printed);
+  const fixed = printed.split("Checks to fix")[1] ?? "";
+  ok("the printed form names the check to fix", /runnable/.test(fixed) && !/cards/.test(fixed) && !/command-shape/.test(fixed), printed);
+} finally {
+  rmSync(second, { recursive: true, force: true });
+}
+
+try {
   console.log("\n=== the words");
   const USAGE = "usage: spn-devex debug hooks show [--json]\n";
   const option = typed(root, "show", "--since", "1");

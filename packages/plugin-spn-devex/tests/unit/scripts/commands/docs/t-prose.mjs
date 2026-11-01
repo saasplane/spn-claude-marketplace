@@ -157,7 +157,7 @@ one("and 'wedded to' still is",
   only("wed", "The release is wedded to the branch it was cut from, for better or worse.")?.paragraphs === 1);
 
 // A QUOTATION ON AN HTML PAGE IS WRITTEN WITH ENTITIES. The marks were read as text, so a quoted idiom
-// was scored as the page's own words, and an agent reworded a quotation to pass (workstream 008).
+// was scored as the page's own words, and an agent reworded a quotation to pass.
 const html = (name, paragraph) => {
   const dir = join(patterns, name);
   mkdirSync(join(dir, "docs"), { recursive: true });

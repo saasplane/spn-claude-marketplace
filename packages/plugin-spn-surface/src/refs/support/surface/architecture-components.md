@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/06-architecture-components/",
-      "seen": "48e44cf1"
+      "seen": "3968a6d6"
     }
   ]
 }
@@ -126,7 +126,7 @@ The table is a guide. A case says where a value fits and who writes it, and a pa
 - **A container and a pattern have no choice table.** Each is chosen from facts about the page, the person's intent, the part of the pattern and the device, and `standards-patterns.md` and `architecture-containers.md` state them keyed by those facts. A block is chosen last (`RULE.SUPPORT.SURFACE.052` · MUST · skill:spn-surface/design), so a choice table never decides which block stands where: it gives the props of a block once the page has placed it.
 - **A unit the book does not name has no choice table either.** Such a unit is a stack's own, a module's or a partner's. Its props and their descriptions in the symbol index carry its use; a description says what the prop and each value are for, and never restates a rule of this ref. A unit built from a core block leaves to that block's table everything its own data does not decide.
 - **A unit with many props usually groups them by owner into named interfaces, and it holds a shared shape of props as a named attribute rather than extending a base** (`RULE.SUPPORT.SURFACE.406` · GUIDE). A reader then sees which part of the unit each prop serves, and a shared shape changes in one place.
-- **A rule about how a page uses a prop of a unit is written as guidance with its cases: it names no `never` value, it says no `MUST`, and no check refuses it** (`RULE.SUPPORT.SURFACE.398` · MUST · check:subjects · due:036/N008). A prop is there to be used, and its cases tell a page when each value fits.
+- **A rule about how a page uses a prop of a unit is written as guidance with its cases: it names no `never` value, it says no `MUST`, and no check refuses it** (`RULE.SUPPORT.SURFACE.398` · MUST · skill:spn-surface/design). A prop is there to be used, and its cases tell a page when each value fits.
 - **A mock is a skeleton, and it names units and never their props.** A designer's mock of a page or a flow is drawn as the skeleton the docs draw: one for each page, a view for each task state, and a flow file that lists the pages in order (`standards-patterns.md`, *The specs a screen starts from*). It shows where each block stands and which unit it is, and the choice table gives that unit its props when the page is built.
 
 Every core unit with a closed prop has its table in this ref, under its unit where the ref gives the unit a section of its own, and otherwise in *The choice tables of the other units* below; `DSCardWidget`'s is in `architecture-widgets.md`.

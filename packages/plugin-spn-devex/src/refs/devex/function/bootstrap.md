@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/01-bootstrap.md",
-      "seen": "c4169e54"
+      "seen": "46ba8a2f"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/01-function/01-bootstrap.md",
@@ -11,11 +11,11 @@
     },
     {
       "path": "spn-foundation/docs/05-guides/README.md",
-      "seen": "0e6f1053"
+      "seen": "194f4a38"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
-      "seen": "fb327f9f"
+      "seen": "64d537b3"
     }
   ]
 }
@@ -38,7 +38,7 @@ arrives is what the agent gets. **`tofu -v` reporting OpenTofu, `jq --version` a
 `spnutils --version` answering are the whole test**, and if all three do, the machine is ready.
 
 **Before step 1, the accounts and tokens.** A **GitHub organization** the two repositories are created
-under, which must exist before `repo create` runs and which the organization node's `providers.scm.org` names, and a **fine-grained token** for it kept in the machine seat as `SPN_DEVEX_AGENT_GITHUB_TOKEN`,
+under, which must exist before `repo create` runs and which the organization node's `providers.scm.org` names, and a **fine-grained token** for it kept in the saasplane env as `SPN_DEVEX_AGENT_GITHUB_TOKEN`,
 in the `spnutils:devex` region. `repo create` reads it. Its repository permissions are Administration,
 Contents and Pull requests read and write and Actions read; its organization permission is Members read
 and write. **Read access to the `@saasplane` packages' registry** is granted, not public: ask SaaS Plane for it. A Figma token is
@@ -61,7 +61,7 @@ install nothing for that.
 | 1 | Install the CLI | Terminal | `npm install -g @saasplane/utility-ts` | ✅ |
 | 2 | Mint the workspace and name it — marketplace, plugin union, permission tiers, `~/.spnenv`, `.spndevex/` with its `state.json`; every repository inside wired. The name is lower-case letters, digits and hyphens, given once | Terminal | `spnutils workspace init <name>` | ✅ |
 | 3 | Open the folder in VS Code and Claude | Terminal · Claude in VS Code | `code .` | ✅ |
-| 4 | Read the orientation, and fill the GitHub token in the machine seat | Terminal | `spnutils workspace status` | ✅ |
+| 4 | Read the orientation, and fill the GitHub token in the saasplane env | Terminal | `spnutils workspace status` | ✅ |
 
 **Part 2 · Your estate** (the infra repository)
 
@@ -83,7 +83,7 @@ install nothing for that.
 | 13 | Scaffold it against both pins, then wire | Claude in VS Code (asks) · Terminal (runs) | the `new` skill → `spnutils apps scaffold repo --stack <stack> --organization <ref> --platform <ref>` | 🚧 |
 | 14 | Decide what the platform is — `CONCEPT.md`: boundary, domains, surfaces, one agreed block at a time | Claude in VS Code | the `ideate` skill | 🚧 |
 | 15 | Scaffold the projects the concept implies | Claude in VS Code (asks) · Terminal (runs) | the `new` skill → `spnutils apps scaffold kind <kind>` | 🚧 |
-| 16 | Name the provider keys; the developer fills the machine seat; confirm by name, never by value | Claude in VS Code · Terminal | `spnutils workspace status` | 🚧 |
+| 16 | Name the provider keys; the developer fills the saasplane env; confirm by name, never by value | Claude in VS Code · Terminal | `spnutils workspace status` | 🚧 |
 | 17 | Bring the platform up locally | Terminal | `spnutils infra platform up <spc> --apply` | ✅ |
 | 18 | Register each app | Terminal, led by the agent | `spnutils infra app up <package>` | ✅ |
 | 19 | Run it, and say what should be seen — each app on `https://{label}.{local domain}` (label: the app row's `subdomains` entry; domain: `providers.local.domains.platform.domain`, `lc-spndemo.app` for the sample `dmo`), served on 443 with nothing added to `/etc/hosts`; the first sign-in at `https://identity.{local domain}/login`, landing on the identity dashboard; an empty console | Claude in VS Code | the `run` skill | 🚧 |

@@ -199,7 +199,7 @@ console.log("\n=== runCommand records a command once, with its words as the leve
 console.log("\n=== an address names a workstream and an id one way, and a bare group teaches itself");
 {
   const read = (ref) => { try { return lib.readAddress(ref); } catch (thrown) { return String(thrown?.name ?? thrown); } };
-  same("[MKT.HOOKS.325] 036/N010, 036/q11 and 036/s24 read as a workstream and an id",
+  same("[MKT.HOOKS.325] an arc, a question and a suggestion, each typed after a workstream, read as a workstream and an id",
     [read("036/N010"), read("036/q11"), read("036/s24")],
     [{ workstream: "036", id: "N010" }, { workstream: "036", id: "q11" }, { workstream: "036", id: "s24" }]);
   same("[MKT.HOOKS.325] the bare id is read where the window has one workstream",

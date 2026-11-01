@@ -80,6 +80,25 @@ export function appendLog(file: string, line: string, cap: number = LOG_CAP): vo
   appendFileSync(file, line.endsWith("\n") ? line : `${line}\n`);
 }
 
+/** One send-back: a check's words that reached the turn. `finding` is the first 12 hex of the words' sha1, so the words themselves are never stored. */
+export interface SendBack {
+  at: string;
+  session: string;
+  agent: string;
+  event: "Stop" | "PreToolUse";
+  check: string;
+  workstream: string;
+  finding: string;
+}
+
+/** Record one send-back in `telemetry/sendbacks.jsonl`. A no-op while telemetry is off, and never a failure. */
+export function recordSendBack(root: string, line: SendBack): void {
+  try {
+    if (!readSwitch(root, "telemetry")) return;
+    appendLog(join(telemetryFolder(root), "sendbacks.jsonl"), JSON.stringify(line));
+  } catch { /* telemetry never fails the hook */ }
+}
+
 /** The files a reader reads, oldest first: the rotated one if it exists, then the live one if it exists. */
 export function logFiles(file: string): string[] {
   return [rotatedOf(file), file].filter((one) => existsSync(one));

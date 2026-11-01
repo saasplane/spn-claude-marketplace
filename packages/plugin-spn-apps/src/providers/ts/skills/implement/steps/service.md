@@ -45,6 +45,8 @@
 - **RULE.SUPPORT.APPS.210** (`RULE.SUPPORT.APPS.210` · MUST · skill:spn-apps/implement)
 - **RULE.SUPPORT.APPS.211** (`RULE.SUPPORT.APPS.211` · MUST · skill:spn-apps/implement)
 - **RULE.SUPPORT.APPS.212** (`RULE.SUPPORT.APPS.212` · MUST · skill:spn-apps/implement)
+- **A file holds one component and only what its name says, so an interface file holds types only** (`RULE.SUPPORT.APPS.237` · MUST · skill:spn-apps/implement)
+- **A script is written in the stack's language and kept in a folder the tree names** (`RULE.SUPPORT.APPS.241` · MUST · skill:spn-apps/implement)
 
 Use one template for every module service — **this template is the standard**. The method families it fills in are the foundation book's, closed and stack-agnostic (`01-services.md` · `02-repositories.md`, the method-families sections). The TypeScript rendering and the fuller skeleton are the service-patterns and database-patterns chapters of the provider set. Layer rule: `app/services`, `app/repositories`, `app/entities` hold classes only — helpers go to `app/utils/` or `app/support/` (see `02-structure.md`).
 

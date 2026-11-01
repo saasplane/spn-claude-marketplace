@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/11-delivery-library/",
-      "seen": "cf33327a"
+      "seen": "1697bcd0"
     }
   ]
 }
@@ -115,7 +115,7 @@ A library file has two readers. The tool, `spnutils`, reads the units of a libra
 **The tool does not hold its own reading yet.** Until it does, the agent reads each library file through the connector, with the scripts that its setup ships, and writes what it read as one inventory, and the tool takes the inventory in. The sections below state that reading.
 
 - **A reading MUST only read.** It creates, sets, moves and deletes nothing in the file.
-- **The tool MUST read a library file with a read-only token, and the token MUST NOT be printed, logged or kept in a file the tool writes.** The token is a Figma personal access token with no write scope. The developer keeps it in the seat file, under the key `SPN_DEVEX_AGENT_FIGMA_TOKEN`, and the tool alone reads it from the seat.
+- **The tool MUST read a library file with a read-only token, and the token MUST NOT be printed, logged or kept in a file the tool writes.** The token is a Figma personal access token with no write scope. The developer keeps it in the saasplane env, under the key `SPN_DEVEX_AGENT_FIGMA_TOKEN`, and the tool alone reads it from the saasplane env.
 - **The connector reads the variables and the styles, and it makes every write.** It reads the variables with their collections and values, and the text and effect styles with their sizes. Figma's answer for a unit gives the id of a bound variable and never its name. In a file that uses Core, that id carries the variable's key in Core, so Core's variables are read first, with each variable's key, and the tool finds each name there. No plugin of the team's own runs inside Figma.
 - **One inventory is read for each library file.** A unit in one library file is bound to a variable of another, so no file is read alone, and the five inventories are read by the same rules.
 - **The tool takes an inventory in, and the agent never writes in the tool's folder.** The agent prepares the inventory outside the tool's folder, and a command of the tool checks it and copies it into place, as "The folders of the tool" states.

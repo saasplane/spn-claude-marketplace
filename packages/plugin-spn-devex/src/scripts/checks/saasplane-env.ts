@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// RESTATES: spn-foundation docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md § The env seat — a value in `~/.spnenv`
+// RESTATES: spn-foundation docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md § The saasplane env — a value in `~/.spnenv`
 // is never printed or logged. The chapter is the source of truth; a rule change is edited there
 // first, then here, in the same change.
 //
@@ -8,7 +8,7 @@
 // WHY THIS EXISTS. Three surfaces state that a value in the machine seat is never printed or logged,
 // and a session broke it anyway — five live credentials went into a transcript, hours after arguing
 // the rule at length on the same day. A rule three documents state and no instrument checks is
-// exactly the shape workstream 009 exists to fix. Prose plainly did not stop it.
+// exactly the shape a rule that a check holds exists to fix. Prose plainly did not stop it.
 //
 // WHAT IS AND IS NOT REFUSED. The agent may READ this file; `Q7` settled that, and it has to —
 // `spnutils` reads the whole file on every `sync` to preserve the regions you own. What is refused
@@ -29,7 +29,8 @@
 // Narrowing it would re-open a guard written because five live credentials reached a transcript. The
 // refusal names the way through instead — put the text in a script file and run the file.
 //
-// PORTED FROM `hooks/scripts/env-seat.py`. Same spellings, same three tool families, same words.
+// Same spellings and the same three tool families as `env-seat.ts`, the guard this file replaces;
+// the door it names is new.
 
 import { realpathSync } from "node:fs";
 import { homedir } from "node:os";
@@ -39,10 +40,9 @@ import { emit, readPayload, runAlone, type Payload, type Verdict } from "../lib/
 const SEAT = ".spnenv";
 
 const DOOR =
-  "Use the keys-only door: `spnutils workspace status` reports which keys this machine has and " +
-  "whether each is set, and never a value. To test one key, test presence without expanding it " +
-  "— `if [[ -n ${(P)k} ]]` — never printing the expansion. If the developer asked for one " +
-  "specific value by name, ask them to read it themselves.";
+  "Use the door: `spnutils workspace env show` prints each key, a value only where nobody typed it, " +
+  "and `spnutils workspace env set <key> --value …` writes one that is not secret. A secret is " +
+  "typed by the developer in their own editor, so ask them to type it there.";
 
 const WHY =
   "A transcript outlives the session that wrote it. A printed credential is exposed from that " +
@@ -98,7 +98,7 @@ export function namesTheSeat(text: string): boolean {
   return false;
 }
 
-export function checkEnvSeat(payload: Payload): Verdict {
+export function checkSaasplaneEnv(payload: Payload): Verdict {
   const tool = payload.tool_name ?? "";
   const supplied = payload.tool_input ?? {};
 
@@ -130,7 +130,7 @@ export function checkEnvSeat(payload: Payload): Verdict {
   return null;
 }
 
-if (runAlone("env-seat.ts")) {
-  try { emit(checkEnvSeat(readPayload())); } catch { /* a guard never takes the chain down */ }
+if (runAlone("saasplane-env.ts")) {
+  try { emit(checkSaasplaneEnv(readPayload())); } catch { /* a guard never takes the chain down */ }
   process.exit(0);
 }

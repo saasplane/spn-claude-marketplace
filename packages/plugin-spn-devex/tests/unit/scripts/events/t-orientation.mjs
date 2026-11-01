@@ -1057,6 +1057,9 @@ console.log("\n=== orientation — the short welcome, and the whole one once a d
   says("[MKT.HOOKS.326] the short start is shorter than the whole one", second.context.length < first.context.length, `${second.context.length} vs ${first.context.length}`);
   writeFileSync(join(root, ".spndevex", ".debug", "workspace", "welcome.json"), `${JSON.stringify({ day: "2020-01-01" })}\n`);
   says("[MKT.HOOKS.326] a day later the whole welcome is shown again", start("w3").message.includes("I'm your DevEx agent"));
+  const noted = (session) => { try { return JSON.parse(readFileSync(join(root, ".spndevex", ".debug", "sessions", session, "window.json"), "utf8")).welcome; } catch { return null; } };
+  says("[MKT.HOOKS.342] the day's first start writes welcome whole into the window's note", noted("w1") === "whole", String(noted("w1")));
+  says("[MKT.HOOKS.342] a second start that day writes short", noted("w2") === "short", String(noted("w2")));
   const mark = join(root, ".spndevex", ".debug", "workspace", "welcome.json");
   rmSync(mark, { force: true });
   const hand = run("node", [`${HOOKS}/src/scripts/events/orientation.ts`, root], root);

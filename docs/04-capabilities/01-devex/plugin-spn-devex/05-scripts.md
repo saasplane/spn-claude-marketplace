@@ -17,7 +17,7 @@ Everything this plugin can execute sits under `packages/plugin-spn-devex/src/scr
 | The questions a fragment cannot answer | `packages/plugin-spn-devex/src/scripts/checks/corpus.ts` | asks the corpus questions nobody would otherwise ask until they typed a command |
 | Confirmed execution | `packages/plugin-spn-devex/src/scripts/checks/confirmed.ts` | warns on an edit with no recorded go, and never on a read |
 | The document bars | `packages/plugin-spn-devex/src/scripts/checks/doc-check.ts` | measures prose against what a script can measure |
-| The machine seat | `packages/plugin-spn-devex/src/scripts/checks/env-seat.ts` | refuses a command that would render `~/.spnenv` |
+| The saasplane env | `packages/plugin-spn-devex/src/scripts/checks/saasplane-env.ts` | refuses a command that would render the saasplane env |
 | The governing mirror | `packages/plugin-spn-devex/src/scripts/checks/mirror.ts` | names the capability document an edit belongs to |
 | A publish nobody asked for | `packages/plugin-spn-devex/src/scripts/checks/publish.ts` | reminds, on a publish of a page, that nothing is published unless the developer asks, and names the full path to hand over instead; never refuses |
 | A release nobody agreed to | `packages/plugin-spn-devex/src/scripts/checks/release-go.ts` | refuses the bump that cannot be taken back without a recorded go |
@@ -109,9 +109,9 @@ Everything this plugin can execute sits under `packages/plugin-spn-devex/src/scr
 
 ### Refusing beats an allowlist of safe reads
 
-**Why** — *a value in the machine seat is never printed or logged*. Three surfaces said so and a session broke it anyway, putting five live credentials into a transcript.
+**Why** — *a value in the saasplane env is never printed or logged*. Three surfaces said so and a session broke it anyway, putting five live credentials into a transcript.
 **What** — every route that would render the file is refused, rather than the safe ones listed. One pipeline prints key names and the next prints every value, and telling those apart in a shell string is guesswork.
-**How** — the whole command is read, so even a heredoc quoting the path is refused, and the message names the door instead. `packages/plugin-spn-devex/src/scripts/checks/env-seat.ts`.
+**How** — the whole command is read, so even a heredoc quoting the path is refused, and the message names the door instead: `spnutils workspace env show` prints each key, and `spnutils workspace env set` writes one that is not secret. `packages/plugin-spn-devex/src/scripts/checks/saasplane-env.ts`.
 
 ### A fragment cannot see a corpus, so one check reads the tree
 
@@ -159,7 +159,7 @@ Everything this plugin can execute sits under `packages/plugin-spn-devex/src/scr
 ### A Bash call's time is summed once
 
 **Why** — *a compound call wrote a line for each command inside it, and every line carried the whole call's time*. Read on 2026-10-01, the log's Bash lines summed to 1,952,390 ms, and the calls behind them took 848,654 ms.
-**What** — `debug hooks show` reads one line for each hook check and for each hook run, in two parts that are always both: each check (`script › group › action`) with its runs, time, notes, refusals and the bytes it put into the context, then each event with its runs, time and bytes, then the checks to fix: each check whose send-backs, read from the last line of each session in `sendbacks.jsonl`, were more than half followed by no tool call. A command's line carries no verdict and is read by neither part, so a Bash call's time is held once, in its one line, filed under the first program the filter matched, with `programs` saying how many the call ran.
+**What** — `debug hooks show` reads one line for each hook check and for each hook run, in two parts that are always both: each check (`script › group › action`) with its runs, time, notes, refusals and the bytes it put into the context, then each event with its runs, time and bytes, then a Send-backs part: the turn end per 100 replies and the tool calls per 100 calls, each check with its Sent back or Refused, Per 100 and Unanswered, read from one line per send-back in `sendbacks.jsonl` and from `hooks.jsonl`, never a transcript. The refusal column reads Found for a turn-end check and Denies for a tool-call check. Checks to fix names each check with more than half its send-backs unanswered, and `--json` carries the part as `sendBacks`. A command's line carries no verdict and is read by neither part, so a Bash call's time is held once, in its one line, filed under the first program the filter matched, with `programs` saying how many the call ran.
 **How** — the writer is `finishCommand`, and `debug hooks show` reads the same log, so a change to the line's shape is made in the plugin and read there. `packages/plugin-spn-devex/src/scripts/commands/debug/hooks.ts` and `packages/plugin-spn-devex/src/scripts/lib/bash-timing.ts`, proven in `packages/plugin-spn-devex/tests/unit/scripts/commands/debug/t-hooks.mjs` and `packages/plugin-spn-devex/tests/unit/scripts/lib/t-bash-timing.mjs`.
 
 ### The document check is calibrated to the rule, never to the corpus

@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/01-function/03-ideate.md",
-      "seen": "d729a3bb"
+      "seen": "28cb28c9"
     }
   ]
 }
@@ -38,7 +38,7 @@ The DevEx stages are eight: `BOOTSTRAP · SCM · IDEATE · DEVELOP · TEST · PR
 
 ## A partner platform starts from its industry
 
-**On a partner platform, before the boundary is drawn, the lenses write the industry brief in the partner's own purpose part** (`RULE.DEVEX.AGENT.099` · MUST · check:restates · due:036/N008). A partner builds for an industry, such as health, payments or logistics, and never has to learn the constructs to describe its business: that bridge is the lenses' job. The brief holds the industry, its people and buyers, its workflows and words, its data and exchange standards, its rules and its usual systems, and each fact carries its source and the date it was read. Each lens learns its share for its own discipline and maps it onto the constructs: the domain model becomes modules, a rule becomes controls, a workflow becomes journeys. Every lens convenes for it, each for its own discipline.
+**On a partner platform, before the boundary is drawn, the lenses write the industry brief in the partner's own purpose part** (`RULE.DEVEX.AGENT.099` · MUST · skill:spn-devex/ideate). A partner builds for an industry, such as health, payments or logistics, and never has to learn the constructs to describe its business: that bridge is the lenses' job. The brief holds the industry, its people and buyers, its workflows and words, its data and exchange standards, its rules and its usual systems, and each fact carries its source and the date it was read. Each lens learns its share for its own discipline and maps it onto the constructs: the domain model becomes modules, a rule becomes controls, a workflow becomes journeys. Every lens convenes for it, each for its own discipline.
 
 **The brief is a source, never an agreement.** What the concept takes from it is still shown and agreed one block at a time. Where the industry and the SaaS Plane way meet badly, the lens raises it rather than bending either one. A later lens reads the brief before it researches again, and refreshes the part it owns when that part is stale. SaaS Plane is the first case, and its own industry is software engineering. `refs/devex/agent/lenses.md` says which lens learns what, and where each lands.
 

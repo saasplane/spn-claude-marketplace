@@ -92,7 +92,7 @@ console.log("\n=== arc edit and the row commands — open an arc, change its hea
   const modelOnly = cli(root, ["workstream", "arc", "edit", "031/N001", "--model", "Opus 5.5"]);
   ok("--model with no row sets the arc's model, a field the arc and its rows share", modelOnly.code === 0 && json(arcFile).model === "Opus 5.5", modelOnly.out);
   const usageText = cli(root, ["workstream", "row"]);
-  ok("the usage of the row commands prints the forms exactly", /row add <workstream>\/N<nnn> "<title>" --repo <repo> --altitude <altitude>/.test(usageText.out) && /row state <workstream>\/N<nnn> <row> <state>/.test(usageText.out) && /row note <workstream>\/N<nnn> <row> "<text>"/.test(usageText.out) && /row edit <workstream>\/N<nnn> <row> \[--title …\]/.test(usageText.out) && /row discard <workstream>\/N<nnn> <row>/.test(usageText.out) && !usageText.out.includes("<arc>") && !usageText.out.includes("row write"), usageText.out);
+  ok("the usage of the row commands prints the forms exactly", /row add <workstream>\/N<nnn> "<title>" --repo <repo> --altitude <altitude>/.test(usageText.out) && /row state <workstream>\/N<nnn> <row> <state> \[--on "<what it waits on>"\] \[--note …\] \[--run <name>\]/.test(usageText.out) && /row note <workstream>\/N<nnn> <row> "<text>"/.test(usageText.out) && /row edit <workstream>\/N<nnn> <row> \[--title …\]/.test(usageText.out) && /row discard <workstream>\/N<nnn> <row>/.test(usageText.out) && !usageText.out.includes("<arc>") && !usageText.out.includes("row write"), usageText.out);
   const subjectAfter = cli(root, ["workstream", "031-probe", "row", "add", "--title", "x"]);
   ok("red: a subject placed after the group is refused, naming the right form", subjectAfter.code === 2 && subjectAfter.out.includes("spn-devex workstream row add 031-probe"), subjectAfter.out);
   const held = cli(root, ["workstream", "arc", "edit", "031/N001", "--status", "HELD"]);
@@ -824,6 +824,29 @@ console.log("\n=== question answer — a card settled in one call; addresses rea
   const rows = cli(one.root, ["workstream", "rows", "031/N001"]);
   ok("[MKT.HOOKS.325] `rows 031/N001` shows the arc's rows", rows.code === 0 && /N001 1 /.test(rows.out), rows.out);
   ok("[MKT.HOOKS.325] `rows 031/N001 --json` takes the options of show", cli(one.root, ["workstream", "rows", "031/N001", "--json"]).out.trim().startsWith("["));
+}
+
+console.log("\n=== row state waiting --on — a row waits on something outside the window, and says what (MKT.HOOKS.322)");
+{
+  const one = await dataWorkspace("waiting-on");
+  const file = join(one.ws, "arcs", "N001", "state.json"), history = join(one.ws, "arcs", "N001", "log.jsonl");
+  const rowOne = () => json(file).rows.find((row) => row.id === "1");
+  cli(one.root, ["workstream", "row", "state", "031/N001", "1", "ready"]);
+  const waiting = cli(one.root, ["workstream", "row", "state", "031/N001", "1", "waiting", "--on", "the partner's keys"]);
+  ok("[MKT.HOOKS.322] `--on` with waiting writes `waitingOn` and a log line that carries it", waiting.code === 0 && rowOne().state === "waiting" && rowOne().waitingOn === "the partner's keys"
+    && lines(history).at(-1).kind === "waiting" && lines(history).at(-1).row === "1" && lines(history).at(-1).note.includes("the partner's keys"), `${waiting.out}${JSON.stringify(lines(history).at(-1))}`);
+  const shown = cli(one.root, ["workstream", "rows", "show", "031/N001"]);
+  ok("`rows show` prints the row's wait after its blockers", /N001 1 +waiting .*· waiting on the partner's keys/.test(shown.out) && /N001 2 .*waits on 1/.test(shown.out), shown.out);
+  const ready = cli(one.root, ["workstream", "rows", "show", "031/N001", "--ready"]);
+  ok("`--ready` leaves the waiting row out", !/N001 1 /.test(ready.out), ready.out);
+  const stray = cli(one.root, ["workstream", "row", "state", "031/N001", "1", "ready", "--on", "something"]);
+  ok("`--on` with another state is refused, exit 2, and nothing is written", stray.code === 2 && stray.out.includes("--on") && rowOne().state === "waiting" && rowOne().waitingOn === "the partner's keys", stray.out);
+  const blank = cli(one.root, ["workstream", "row", "state", "031/N001", "2", "waiting", "--on", " "]);
+  ok("a blank `--on` is refused too, and nothing is written", blank.code === 2 && json(file).rows.find((row) => row.id === "2").waitingOn == null && json(file).rows.find((row) => row.id === "2").state === "waiting", blank.out);
+  const cleared = cli(one.root, ["workstream", "row", "state", "031/N001", "1", "ready"]);
+  ok("any other state clears `waitingOn`", cleared.code === 0 && rowOne().state === "ready" && rowOne().waitingOn == null, cleared.out);
+  const back = cli(one.root, ["workstream", "rows", "show", "031/N001", "--ready"]);
+  ok("set to ready, the row is listed again", /N001 1 /.test(back.out), back.out);
 }
 
 console.log(failed ? `\n  ${failed} of ${total} FAILED — workstream commands` : `\n  all ${total} passed — workstream commands`);

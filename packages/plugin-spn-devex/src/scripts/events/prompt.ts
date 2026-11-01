@@ -30,7 +30,7 @@
 
 import { mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
-import { isDir, readPayload, runAlone, workspaceRoot, type Payload } from "../lib/payload.ts";
+import { eventWorkspace, isDir, readPayload, runAlone, type Payload } from "../lib/payload.ts";
 import { ARCS, DEVEX, WORKSTREAM_STATES, workstreamsDir } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { sessionDir } from "../../../../plugin-support-lib/src/lib/debug-store.ts";
 import { begin, end, span, tagsOf } from "../../../../plugin-support-lib/src/lib/timing.ts";
@@ -70,11 +70,12 @@ function workstreamOfNumber(root: string, number: string): string | null {
  * the line: by its folder's name, or by a standalone three-digit number. `name` is null where the
  * folder or the number matches no folder.
  */
-function workstreamsOfLine(line: string, root: string): Array<{ name: string | null; index: number; whole: boolean }> {
+function workstreamsOfLine(line: string, root: string): Array<{ name: string | null; index: number; end: number; whole: boolean }> {
   const either = new RegExp(`${WORKSTREAM_NAME.source}|\\b\\d{3}\\b(?!-)`, "g");
   return [...line.matchAll(either)].map((found) => ({
     name: found[0].length > 3 ? (workstreamFolder(root, found[0]) ? found[0] : null) : workstreamOfNumber(root, found[0]),
     index: found.index ?? 0,
+    end: (found.index ?? 0) + found[0].length,
     whole: found[0].length > 3,
   }));
 }
@@ -170,9 +171,9 @@ export function sessionName(prompt: string, root: string): SessionName | null {
 /**
  * The workstreams a prompt makes this window OWN (RULE.DEVEX.WORKSPACE.236), and how.
  *
- * A handover owns the workstream its `continue:` line opens with, and each other one the line names by its whole
- * folder name, before any `also open:`: the reload form names two, and a window that continues one while the other
- * waits on it owns both. A bare number after the first, such as "waits for 035", is a mention and owns nothing. What
+ * A handover owns the workstream its `continue:` line opens with, and each later one joined to it by "and" or named
+ * with an arc of its own, before any `also open:`. One only cited or waited on (`citedOf`) is visited, and a bare number
+ * after the first, such as "waits for 035", is a mention and owns nothing. What
  * `also open:` names is visited, never owned (`alsoOpenOf`). A prompt with no handover owns
  * a workstream only where it names exactly one workstream folder that exists, and only while the window
  * owns none yet: a later prompt often names a second workstream to compare it or cite it.
@@ -180,13 +181,44 @@ export function sessionName(prompt: string, root: string): SessionName | null {
 export function bindingsOf(prompt: string, root: string, session: string): Array<{ name: string; by: "prompt" | "handover" }> {
   const next = handoverLines(prompt).get("continue");
   if (next !== undefined) {
-    const owned = [...new Set(workstreamsOfLine(continuedPart(next), root).filter((found, at) => at === 0 || found.whole).map((found) => found.name))]
-      .filter((name): name is string => name !== null);
+    const owned = ownedOf(continuedPart(next), root);
     if (owned.length) return owned.map((name) => ({ name, by: "handover" as const }));
   }
   if (Object.values(readWindow(root, session).workstreams).some((one) => one.tie === "owns")) return [];
   const named = workstreamsNamed(prompt, root);
   return named.length === 1 ? [{ name: named[0], by: "prompt" }] : [];
+}
+
+/** An arc named right after a workstream: `, N001`, `/N001`, ` · N001` or ` N001`. */
+const ARC_AFTER = /^\s*(?:[,/·]\s*|\s)?N\d{3}\b/;
+
+/**
+ * The workstreams a `continue:` line (before `also open:`) gives work to: the first it names, and each later one that
+ * is joined to the one before by "and" or named with an arc of its own. Null names (no folder) are left out.
+ */
+function ownedOf(line: string, root: string): string[] {
+  const named = workstreamsOfLine(line, root);
+  const owned = named.filter((found, at) => {
+    if (at === 0) return true;
+    const gap = line.slice(named[at - 1].end, found.index);
+    return /\band\s*$/i.test(gap) || ARC_AFTER.test(line.slice(found.end));
+  }).map((found) => found.name);
+  return [...new Set(owned)].filter((name): name is string => name !== null);
+}
+
+/**
+ * The workstreams a handover's `continue:` line only cites: a later one named by its whole folder name that the line
+ * does not give work to ("raised by 032-hiring-demo", "waits for 036-agent-follows-rules"). They are visited, never
+ * owned. A bare number is a mention and cites nothing. A prompt with no handover cites nothing.
+ */
+export function citedOf(prompt: string, root: string): string[] {
+  const next = handoverLines(prompt).get("continue");
+  if (next === undefined) return [];
+  const line = continuedPart(next);
+  const owned = new Set(ownedOf(line, root));
+  const cited = workstreamsOfLine(line, root).filter((found, at) => at > 0 && found.whole).map((found) => found.name)
+    .filter((name): name is string => name !== null && !owned.has(name));
+  return [...new Set(cited)];
 }
 
 /**
@@ -229,12 +261,12 @@ export function answerFor(payload: Payload, start: string): string {
   const session = typeof payload.session_id === "string" ? payload.session_id : "";
   const prompt = typeof payload.prompt === "string" ? payload.prompt : "";
   if (!session || !prompt) return "";
-  const root = workspaceRoot(start);
+  const root = eventWorkspace(typeof payload.cwd === "string" && payload.cwd ? payload.cwd : start);
   if (!root) return "";
   // THE WINDOW'S BINDING, before the name: a window that asks before it writes is asked its cards.
   try {
     for (const bound of bindingsOf(prompt, root, session)) bindNamed(root, session, bound.name, bound.by);
-    for (const visited of alsoOpenOf(prompt, root)) bindVisited(root, session, visited);
+    for (const visited of [...citedOf(prompt, root), ...alsoOpenOf(prompt, root)]) bindVisited(root, session, visited);
   } catch { /* a binding that cannot be written is a window that hears less */ }
   const reminder = midRunReminder(root, windowSet(root, session));
   const file = recordFile(root, session);

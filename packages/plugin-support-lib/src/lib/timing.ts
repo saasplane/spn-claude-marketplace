@@ -27,7 +27,7 @@
 //
 // NAMES ARE STRUCTURED AT THE CALL SITE, never parsed from a string. A check file with sub-checks is
 // `{ group: <file>, action: <sub-check> }` (`split-plan` › `close`); a check file with one check names
-// it twice (`env-seat` › `env-seat`), so every check line has a group to sum by. A whole hook run is
+// it twice (`saasplane-env` › `saasplane-env`), so every check line has a group to sum by. A whole hook run is
 // `{ group: "events", action: <entry> }`, and a whole CLI run `{ group: "cli", action: "cli" }`.
 //
 // Measuring is free; writing is the cost. `begin()` touches no filesystem, so a check that refuses

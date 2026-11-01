@@ -6,7 +6,7 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, realpath
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import {
-  LOG_CAP, SESSION_KEEP_MS, SWITCH_NAMES, appendLog, debugDir, logFiles, readSwitch, sessionDir, switchesFile, sweepSessions,
+  LOG_CAP, SESSION_KEEP_MS, SWITCH_NAMES, appendLog, debugDir, logFiles, readSwitch, recordSendBack, sessionDir, switchesFile, sweepSessions,
   telemetryFolder, workspaceDir, writeSwitch,
 } from "../../../src/lib/debug-store.ts";
 
@@ -148,6 +148,25 @@ console.log("\n=== sweepSessions — a window nobody has written to for fourteen
   utimesSync(join(mixed, "window.json"), ago(SESSION_KEEP_MS + 1000), ago(SESSION_KEEP_MS + 1000));
   same("a folder with one fresh file in it stays", [sweepSessions(touched, now), existsSync(mixed)], [[], true]);
   same("no sessions folder is nothing to sweep", sweepSessions(fresh(), now), []);
+}
+
+console.log("\n=== recordSendBack — one line a send-back, only while telemetry is on");
+{
+  const line = { at: "2026-11-01T10:00:00.000Z", session: "abc-1", agent: "main", event: "Stop", check: "split-plan", workstream: "036-agent-follows-rules", finding: "0123456789ab" };
+  const off = fresh();
+  recordSendBack(off, line);
+  same("telemetry off writes nothing", existsSync(join(telemetryFolder(off), "sendbacks.jsonl")), false);
+  const on = fresh();
+  writeSwitch(on, "telemetry", true);
+  recordSendBack(on, line);
+  recordSendBack(on, { ...line, event: "PreToolUse" });
+  const rows = readFileSync(join(telemetryFolder(on), "sendbacks.jsonl"), "utf8").trim().split("\n").map((l) => JSON.parse(l));
+  same("[MKT.HOOKS.341] telemetry on appends one line holding every field", rows[0], line);
+  same("[MKT.HOOKS.341] each call is one more line", rows.map((r) => r.event), ["Stop", "PreToolUse"]);
+  const broken = join(BASE, "not-a-workspace");
+  let threw = false;
+  try { recordSendBack(broken, line); } catch { threw = true; }
+  same("a root with no debug folder is never a failure", threw, false);
 }
 
 console.log(failed ? `\n  ${failed} of ${total} FAILED — debug store` : `\n  all ${total} passed — debug store`);

@@ -5,7 +5,7 @@
 // never does, wearing the other sign. The set is stated once, in `arc-status.ts`, and what holds an arc to it is the
 // schema the `workstream` commands run, and the owner check that refuses a hand write under `arcs/`.
 import { writeFileSync } from "node:fs";
-import { join } from "node:path";
+import { basename, join } from "node:path";
 import { cli, dataWorkspace } from "../../../helpers/workstream-fixture.mjs";
 import { workspace } from "../../../helpers/fixture.mjs";
 
@@ -52,11 +52,12 @@ console.log("\n=== the one owner works RUNNING and LANDED out from the steps (RU
 console.log("\n=== the commands hold it: arc edit refuses a word outside the stored set, and the data reads through the owner");
 {
   const { root, ws } = await dataWorkspace("arc-status-row-write");
-  const refused = cli(root, ["workstream", "arc", "edit", "031/N001", "--status", "DONE"]);
+  const ref = `${basename(ws).slice(0, 3)}/N001`;
+  const refused = cli(root, ["workstream", "arc", "edit", ref, "--status", "DONE"]);
   ok("known-bad: `arc edit --status DONE` is refused and writes nothing", refused.code !== 0 && statusOfData(ws, "N001") === "DECIDED", refused.out);
-  cli(root, ["workstream", "row", "state", "031/N001", "1", "running"]);
+  cli(root, ["workstream", "row", "state", ref, "1", "running"]);
   ok("a step started is read as RUNNING through the owner", statusOfData(ws, "N001") === "RUNNING");
-  const moved = cli(root, ["workstream", "arc", "edit", "031/N001", "--status", "CARRIED", "--reason", "to 032", "--note", "the developer: move it"]);
+  const moved = cli(root, ["workstream", "arc", "edit", ref, "--status", "CARRIED", "--reason", "to another workstream", "--note", "the developer: move it"]);
   ok("a stored word of the set is written", moved.code === 0 && statusOfData(ws, "N001") === "CARRIED", moved.out);
 }
 
@@ -84,12 +85,13 @@ console.log("\n=== a go carries the developer's own words: the words are in a pr
     ".spndevex/workstreams/open/020-x/arcs/N001/state.json": "{}\n",
     ".spndevex/workstreams/open/020-x/arcs/N001/log.jsonl": `${logged}\n`,
   });
+  const ref = `${basename(join(root, ".spndevex/workstreams/open/020-x")).slice(0, 3)}/N001`;
   const line = (content) => JSON.stringify({ type: "user", message: { role: "user", content } });
   const transcript_path = join(root, "t.jsonl");
   writeFileSync(transcript_path, [line("show me the plan"), line([{ type: "text", text: "Yes, go ahead with all of it" }]),
     JSON.stringify({ type: "assistant", message: { role: "assistant", content: "all good" } })].join("\n") + "\n", "utf8");
   const edit = (note, extra = "--status DECIDED") => ({ tool_name: "Bash", cwd: root, transcript_path,
-    tool_input: { command: `spn-devex workstream arc edit 020/N001 ${extra} --note "${note}"` } });
+    tool_input: { command: `spn-devex workstream arc edit ${ref} ${extra} --note "${note}"` } });
   const kind = (verdict) => (verdict?.deny ? "deny" : "silent");
   const refused = checkArcStatus(edit("the developer: all good"));
   ok("[MKT.HOOKS.102] a go quoting words nobody typed is refused", kind(refused) === "deny", JSON.stringify(refused));

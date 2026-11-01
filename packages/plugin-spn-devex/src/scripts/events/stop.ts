@@ -79,13 +79,13 @@ import { cardsOf, holdsOwnCopy, markAge, openWorkstreams, ownCopyLines, stateOf,
 import { cyclesRule, exemptWorkstream, headerRule, openHeadingRule } from "../checks/doc-check.ts";
 import { cyclesTableAt } from "../commands/docs/cycles.ts";
 import { TERMINAL } from "../checks/arc-status.ts";
-import { workspaceRoot } from "../lib/payload.ts";
+import { REPLY_CHECKS, eventWorkspace, workspaceRoot } from "../lib/payload.ts";
 import { DEVEX, isApproachPage, workstreamsDir } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
-import { appendLog, sessionDir, telemetryFolder } from "../../../../plugin-support-lib/src/lib/debug-store.ts";
+import { recordSendBack, sessionDir } from "../../../../plugin-support-lib/src/lib/debug-store.ts";
 import { cacheState, goStandings, welcome } from "./orientation.ts";
-import { begin, span, end, tagsOf, telemetryDir, utcNow } from "../../../../plugin-support-lib/src/lib/timing.ts";
+import { begin, span, end, tagsOf, utcNow } from "../../../../plugin-support-lib/src/lib/timing.ts";
 import { recordUsage, windowSize } from "../lib/usage.ts";
-import { arcsWrittenSince, fromWorkspace, named, reposWritten, visitedWorkstreams, windowSet } from "../lib/window.ts";
+import { arcsWrittenSince, fromWorkspace, named, readWindow, reposWritten, visitedWorkstreams, windowSet } from "../lib/window.ts";
 
 type Warning = { check: string; message: string };
 
@@ -229,7 +229,7 @@ const dataOf = (arc: string): ArcData | null => readArc(homeOf(arc), idOf(arc));
 const statusOf = (arc: string): string => { const data = dataOf(arc); return data ? arcStatus(data) : ""; };
 /** The cards still open in a workstream's `questions.jsonl`. */
 const openQuestionsOf = (ws: string): Question[] => readQuestions(ws).filter((one) => one.state === "open");
-/** The way a command names an arc: the workstream's number and the arc, `030/N004`. */
+/** The way a command names an arc: the workstream's number and the arc, `<number>/N<nnn>`. */
 const arcRef = (arc: string): string => `${basename(homeOf(arc)).slice(0, 3)}/${idOf(arc)}`;
 
 
@@ -573,6 +573,10 @@ export function checkRunnable(root: string, since: number, stepsAt: Record<strin
                               touched: Set<string> | null, mine: Set<string>, reply = ""): Warning[] {
   const out: Warning[] = [];
   const promises = endsOnPromise(reply);
+  // AN ARC A GO CARRIES, WITH A PART NOT LANDED, IS GO-NEXT'S TO SPEAK FOR: the plan knows what is next, and this check
+  // would name a row the plan has put in a part.
+  let gos: ReturnType<typeof goStandings> = [];
+  try { gos = goStandings(root, mine); } catch { gos = []; }
 
   for (const ws of scoped(openWorkstreamFolders(root), mine)) {
     const questions = readQuestions(ws);
@@ -580,6 +584,7 @@ export function checkRunnable(root: string, since: number, stepsAt: Record<strin
     for (const arc of arcFoldersOf(ws)) {
       const data = dataOf(arc);
       if (!data) continue;
+      if (gos.some((go) => go.workstream === basename(ws) && go.scope.includes(idOf(arc)))) continue;
       // WHICH ARC IS BEING EXECUTED IS A FACT, NOT A CLAIM, AND IT IS THIS SESSION'S FACT. A status
       // word is a claim any window can have written. What this session wrote is in its window's note,
       // and an arc it wrote whose rows moved since its own last Stop is the arc it is executing.
@@ -751,50 +756,104 @@ export function carriesCard(reply: string): boolean {
 }
 
 /**
- * Every `Q<n>` open and unanswered on the pages of this window's workstreams: the question a handover
+ * A card held with its workstream: the workstream's folder name and the card's number, `032-hiring-demo/Q2`.
+ * A number belongs to one workstream, so the same `Q2` in two workstreams is two cards (RULE.DEVEX.WORKSPACE.197).
+ */
+export type CardKey = string;
+const keyOf = (workstream: string, number: string): CardKey => `${workstream}/${number.toUpperCase()}`;
+const keyWorkstream = (key: CardKey): string => key.includes("/") ? key.slice(0, key.indexOf("/")) : "";
+const keyNumber = (key: CardKey): string => key.includes("/") ? key.slice(key.indexOf("/") + 1) : key;
+/** A workstream as a text writes it for short: its three digits, or the whole folder name where it has none. */
+const shortOf = (workstream: string): string => /^\d+/.exec(workstream)?.[0] ?? workstream;
+const escaped = (text: string): string => text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+/** Whether a stretch of text mentions a workstream, by its number or its folder name. */
+const mentions = (text: string, workstream: string): boolean =>
+  // nosemgrep: javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp -- pattern built from a folder name and escaped
+  text.includes(workstream) || new RegExp(`\\b${escaped(shortOf(workstream))}\\b`).test(text);
+/** Whether a card is named with its workstream beside it: `032 Q2`, `032's Q2`, `032-hiring-demo/Q2`. */
+function namedWithWorkstream(text: string, key: CardKey): boolean {
+  const workstream = keyWorkstream(key);
+  // nosemgrep: javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp -- pattern built from a folder name and escaped
+  return new RegExp(`(?:${escaped(workstream)}|\\b${escaped(shortOf(workstream))})(?:'s)?[\\s/:\u00b7\`*_-]{0,4}${keyNumber(key)}\\b`, "i").test(text);
+}
+/** Whether a text names a card: by its number alone where one workstream is bound, with its workstream where several are. */
+const namedIn = (text: string, key: CardKey, several: boolean): boolean =>
+  several ? namedWithWorkstream(text, key) : namesCard(text, keyNumber(key));
+
+/**
+ * The cards a reply's `Q<n>` means: each of the `holders`, the bound workstreams that carry that number, or the ones
+ * the reply places it at. A card is placed by the workstream named beside it (`037's Q2`, `037 Q2`), else by the
+ * workstream its line is about, else the one its block is about; a number with none of those is each holder's.
+ */
+export function placeCard(reply: string, card: string, holders: string[]): CardKey[] {
+  if (holders.length <= 1) return holders.map((one) => keyOf(one, card));
+  const placed = new Set<string>();
+  // nosemgrep: javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp -- pattern built from a card number of this script's own pages
+  const at = new RegExp(`\\b${escaped(card)}\\b`, "gi");
+  for (const found of reply.matchAll(at)) {
+    const index = found.index ?? 0;
+    const before = reply.slice(Math.max(0, index - 80), index);
+    let here = holders.filter((one) => new RegExp(`(?:${escaped(one)}|\\b${escaped(shortOf(one))})(?:'s)?[\\s/:\u00b7\`*_-]{0,4}$`, "i").test(before));
+    if (!here.length) {
+      const from = reply.lastIndexOf("\n", index - 1) + 1;
+      const to = reply.indexOf("\n", index);
+      here = holders.filter((one) => mentions(reply.slice(from, to < 0 ? reply.length : to), one));
+    }
+    if (!here.length) {
+      const from = reply.lastIndexOf("\n\n", index - 1) + 1;
+      const to = reply.indexOf("\n\n", index);
+      here = holders.filter((one) => mentions(reply.slice(from, to < 0 ? reply.length : to), one));
+    }
+    for (const one of here.length ? here : holders) placed.add(one);
+  }
+  return holders.filter((one) => placed.has(one)).map((one) => keyOf(one, card));
+}
+
+/**
+ * Every card open and unanswered on the pages of this window's workstreams, as keys: the question a handover
  * has to answer. It subtracts what a workstream records as settled — a card the page still shows but
  * a record has answered is not work anybody is waiting on.
  */
-function cardsWaiting(root: string, mine: Set<string>): string[] {
+function cardsWaiting(root: string, mine: Set<string>): CardKey[] {
   return [...new Set([...cardsByWorkstream(root, mine).values()].flat())].sort();
 }
 
 /**
  * The open cards of this window's workstreams that ANOTHER window raised: a card whose record names a
  * raiser that is not this session. A card with no raiser recorded is judged as it always was, as this
- * window's. Numbers are upper case, as a page writes them (`Q42`).
+ * window's. Keys carry the number as a page writes it (`032-hiring-demo/Q42`), so another window's card
+ * hides only that card, in its own workstream.
  */
-export function raisedElsewhere(root: string, mine: Set<string>, session: string): Set<string> {
-  const out = new Set<string>();
+export function raisedElsewhere(root: string, mine: Set<string>, session: string): Set<CardKey> {
+  const out = new Set<CardKey>();
   for (const ws of scoped(openWorkstreamFolders(root), mine))
     for (const one of readQuestions(ws))
-      if (one.state === "open" && typeof one.raisedBy === "string" && one.raisedBy && one.raisedBy !== session) out.add(one.id.toUpperCase());
+      if (one.state === "open" && typeof one.raisedBy === "string" && one.raisedBy && one.raisedBy !== session) out.add(keyOf(basename(ws), one.id));
   return out;
 }
 
-/** The open cards of each workstream this window works on, by the workstream's folder name. */
-export function cardsByWorkstream(root: string, mine: Set<string>): Map<string, string[]> {
-  const out = new Map<string, string[]>();
+/** The open cards of each workstream this window works on, by the workstream's folder name, each as its key. */
+export function cardsByWorkstream(root: string, mine: Set<string>): Map<string, CardKey[]> {
+  const out = new Map<string, CardKey[]>();
   for (const [subject, pages] of argued(root, mine)) {
     // A card its record has answered or withdrawn in `questions.jsonl` is settled, whatever a page still shows.
     const answered = new Set(readQuestions(dirname(pages[0])).filter((one) => one.state !== "open").map((one) => one.id.toUpperCase()));
-    const cards: string[] = [];
+    const cards: CardKey[] = [];
     for (const page of pages)
       for (const card of cardsOf(page))
-        if (!card.decided && !answered.has(card.number)) cards.push(card.number);
+        if (!card.decided && !answered.has(card.number)) cards.push(keyOf(subject, card.number));
     if (cards.length) out.set(subject, [...new Set(cards)].sort());
   }
   return out;
 }
 
-/** Every card each given workstream carries, on its pages or in `questions.jsonl`, with whether it is still open. */
-function cardsOfWorkstreams(folders: string[]): Map<string, Map<string, boolean>> {
-  const out = new Map<string, Map<string, boolean>>();
+/** Every card each given workstream carries, on its pages or in `questions.jsonl`, by key, with whether it is still open. */
+function cardsOfWorkstreams(folders: string[]): Map<CardKey, boolean> {
+  const out = new Map<CardKey, boolean>();
   for (const folder of folders) {
-    const cards = new Map<string, boolean>();
-    for (const page of pagesOf(folder)) for (const card of cardsOf(page)) cards.set(card.number, !card.decided);
-    for (const one of readQuestions(folder)) cards.set(one.id.toUpperCase(), one.state === "open");
-    out.set(basename(folder), cards);
+    const name = basename(folder);
+    for (const page of pagesOf(folder)) for (const card of cardsOf(page)) out.set(keyOf(name, card.number), !card.decided);
+    for (const one of readQuestions(folder)) out.set(keyOf(name, one.id), one.state === "open");
   }
   return out;
 }
@@ -816,32 +875,44 @@ function promptNames(prompt: string, card: string | null, workstream: string | n
  */
 export function checkCardsNamed(reply: string, root: string, mine: Set<string>, prompt = ""): Warning[] {
   if (!mine.size) return [];
-  const own = [...cardsOfWorkstreams(scoped(openWorkstreamFolders(root), mine))];
-  if (!own.length) return [];
+  const ownFolders = scoped(openWorkstreamFolders(root), mine);
+  if (!ownFolders.length) return [];
+  const ownNames = ownFolders.map((folder) => basename(folder));
+  const own = cardsOfWorkstreams(ownFolders);
   const prose = unquoted(reply);
-  const named = [...new Set(prose.match(/\bQ\d+\b/g) ?? [])];
+  const named = [...new Set(prose.match(/\bQ\d+\b/g) ?? [])].map((card) => card.toUpperCase());
   const part = needsYouPart(reply);
   const out: Warning[] = [];
-  const ours = own.map(([name]) => name).join(", ");
-  const others = [...cardsOfWorkstreams(openWorkstreamFolders(root).filter((folder) => !mine.has(basename(folder))))];
+  const ours = ownNames.join(", ");
+  const otherFolders = openWorkstreamFolders(root).filter((folder) => !mine.has(basename(folder)));
+  const otherNames = otherFolders.map((folder) => basename(folder));
+  const others = cardsOfWorkstreams(otherFolders);
   const sent = new Set<string>();
   for (const card of named) {
-    const home = own.find(([, cards]) => cards.has(card));
-    if (home) {
-      if (home[1].get(card) === false && namesCard(part, card))
-        out.push({ check: "cards", message: `Needs you names ${card}, and ${home[0]} has answered it. Leave a settled card out of Needs you.` });
+    // A NUMBER IS EACH BOUND WORKSTREAM'S THAT HOLDS IT, unless the reply places it at one: a card is answered only
+    // when every card the number could mean is.
+    const holders = ownNames.filter((name) => own.has(keyOf(name, card)));
+    if (holders.length) {
+      if (namesCard(part, card)) {
+        const placed = placeCard(part, card, holders);
+        if (placed.length && placed.every((key) => own.get(key) === false)) {
+          const places = placed.map(keyWorkstream).join(" and ");
+          const many = placed.length > 1;
+          out.push({ check: "cards", message: `Needs you names ${card}, and ${places} ${many ? "have" : "has"} answered ${many ? "them" : "it"}. Leave a settled card out of Needs you.` });
+        }
+      }
       continue;
     }
-    const elsewhere = others.find(([, cards]) => cards.has(card));
-    if (elsewhere && promptNames(prompt, card, elsewhere[0])) continue;
+    const elsewhere = otherNames.find((name) => others.has(keyOf(name, card)));
+    if (elsewhere && promptNames(prompt, card, elsewhere)) continue;
     sent.add(card);
     out.push({ check: "cards", message: elsewhere
-      ? `This reply names ${card}, which belongs to ${elsewhere[0]}, not to ${ours}. It belongs to the window that works there, and the developer did not ask about it. ` +
+      ? `This reply names ${card}, which belongs to ${elsewhere}, not to ${ours}. It belongs to the window that works there, and the developer did not ask about it. ` +
         `Take the sentence out and change nothing else (RULE.DEVEX.WORKSPACE.197).`
       : `This reply names ${card}, and no approach page of ${ours} carries it.` });
   }
   // ANOTHER WORKSTREAM'S CARDS IN WORDS: a sentence that names an open workstream of another window with "card", "question" or "open".
-  for (const [name] of others) {
+  for (const name of otherNames) {
     if (promptNames(prompt, null, name)) continue;
     const number = new RegExp(`\\b${name.slice(0, 3)}\\b`);
     const sentence = prose.split(/(?<=[.?!])\s+|\n+/).find((one) => (one.includes(name) || number.test(one)) && /\b(?:cards?|questions?|open)\b/i.test(one));
@@ -853,9 +924,9 @@ export function checkCardsNamed(reply: string, root: string, mine: Set<string>, 
   for (const fence of handoverFences(reply).filter((one) => !quotesTemplate(one))) {
     const open = handoverLines(fence.body).get("open") ?? "";
     const strange = [
-      ...(open.match(/\bQ\d+\b/g) ?? []).filter((card) => !sent.has(card) && !own.some(([, cards]) => cards.has(card))
-        && others.some(([name, cards]) => cards.has(card) && !promptNames(prompt, card, name))),
-      ...others.map(([name]) => name).filter((name) => !promptNames(prompt, null, name)
+      ...(open.match(/\bQ\d+\b/g) ?? []).filter((card) => !sent.has(card) && !ownNames.some((name) => own.has(keyOf(name, card)))
+        && otherNames.some((name) => others.has(keyOf(name, card)) && !promptNames(prompt, card, name))),
+      ...otherNames.filter((name) => !promptNames(prompt, null, name)
         && (open.includes(name) || new RegExp(`\\b${name.slice(0, 3)}\\b`).test(open))),
     ];
     if (strange.length) out.push({ check: "cards", message:
@@ -866,20 +937,27 @@ export function checkCardsNamed(reply: string, root: string, mine: Set<string>, 
 }
 
 /**
- * Cards as a line that says which workstream each belongs to: `021-figma-design-standard: Q10 · Q8`.
+ * Cards as a line that says which workstream each belongs to: `021-figma-design-standard: Q10 · Q8`. Where the
+ * cards come from more than one workstream, each is named with its workstream as a reply writes it, `032 Q2 · 037 Q2`.
  * A card the map does not place is listed bare, so a caller with no map still gets its numbers.
  */
-export function cardList(cards: string[], where: Map<string, string[]> = new Map()): string {
+export function cardList(cards: CardKey[], where: Map<string, CardKey[]> = new Map()): string {
+  const spread = new Set(cards.map(keyWorkstream).filter(Boolean));
+  if (spread.size > 1 || (where.size > 1 && spread.size)) return cards.map((card) => keyWorkstream(card) ? `${shortOf(keyWorkstream(card))} ${keyNumber(card)}` : card).join(" · ");
   const placed = new Set<string>();
   const parts: string[] = [];
   for (const [subject, held] of where) {
     const here = held.filter((card) => cards.includes(card));
     here.forEach((card) => placed.add(card));
-    if (here.length) parts.push(`\`${subject}\`: ${here.join(" · ")}`);
+    if (here.length) parts.push(`\`${subject}\`: ${here.map(keyNumber).join(" · ")}`);
   }
   const bare = cards.filter((card) => !placed.has(card));
-  return [...parts, ...(bare.length ? [bare.join(" · ")] : [])].join("; ");
+  return [...parts, ...(bare.length ? [bare.map(keyNumber).join(" · ")] : [])].join("; ");
 }
+
+/** What a message adds where several workstreams are bound: a card is named with its workstream. */
+const withWorkstream = (several: boolean, cards: CardKey[]): string =>
+  several ? ` With more than one workstream bound, write each card with its workstream, as ${cards.slice(0, 2).map((card) => `${shortOf(keyWorkstream(card))} ${keyNumber(card)}`).join(" and ")}.` : "";
 
 /** The fenced blocks of a reply that are shaped as a handover; a `diff` block never is. */
 function handoverFences(reply: string): Fence[] {
@@ -962,14 +1040,15 @@ export function checkHandover(reply: string, root: string, mine: Set<string>, gi
   // know the question is there, and the block's `open:` line is where it looks. This comes before the
   // wiring check because it is the cheaper truth.
   const where = cardsByWorkstream(root, mine);
-  const unnamed = cardsWaiting(root, mine).filter((card) => !namesCard(reply, card));
+  const several = scoped(openWorkstreamFolders(root), mine).length > 1;
+  const unnamed = cardsWaiting(root, mine).filter((card) => !namedIn(reply, card, several));
   if (unnamed.length) {
     const many = unnamed.length > 1;
     return [{ check: "handover", message:
       `This reply passes work on while ${cardList(unnamed, where)} ${many ? "are" : "is"} open, and it does not name ` +
       `${many ? "them" : "it"}. Name each open card in one line on the block's \`open:\` line: its number and its question. ` +
       `Do not put the whole card in the reply: it is on the approach page, and the next window reads it there ` +
-      `(RULE.DEVEX.WORKSPACE.189).` }];
+      `(RULE.DEVEX.WORKSPACE.189).` + withWorkstream(several, unnamed) }];
   }
 
   // THE SECOND HALF FIRST, because it is the one that costs a window. A reply that tells somebody to
@@ -1218,9 +1297,9 @@ export function numbersOnly(part: string): string[] {
   return [...new Set(out)];
 }
 
-/** Whether a stretch of text puts card `card` in full: its number and a lettered options table. */
-function putsInFull(text: string, card: string): boolean {
-  return namesCard(text, card) && TABLE.test(text) && LETTERED_ROW.test(text);
+/** Whether a stretch of text puts card `card` in full: its number, with its workstream where several are bound, and a lettered options table. */
+function putsInFull(text: string, card: CardKey, several = false): boolean {
+  return namedIn(text, card, several) && TABLE.test(text) && LETTERED_ROW.test(text);
 }
 
 /**
@@ -1244,15 +1323,18 @@ function putsInFull(text: string, card: string): boolean {
  *                 empty when there is no last Stop to compare with, and then every card is an older one
  * @param running  whether a row of this window's arcs is in progress (`workRuns`); the reply is then a
  *                 progress reply, and otherwise it is a reply that waits
+ * @param bound    how many workstreams the window is bound to; with more than one a card counts as named in
+ *                 **Needs you** only when it is named with its workstream (`032 Q2`)
  */
-export function checkReplyShape(reply: string, open: string[] = [], raised: string[] = [],
-                                where: Map<string, string[]> = new Map(), running = false): Warning[] {
+export function checkReplyShape(reply: string, open: CardKey[] = [], raised: CardKey[] = [],
+                                where: Map<string, CardKey[]> = new Map(), running = false, bound = where.size): Warning[] {
+  const several = bound > 1;
   const out: Warning[] = [];
   const fresh = open.filter((card) => raised.includes(card));
   const older = open.filter((card) => !raised.includes(card));
   // The cards a reply that waits still owes one line each; a progress reply owes none.
   const owed = running ? [] : older;
-  const many = (cards: string[]) => cards.length > 1;
+  const many = (cards: CardKey[]) => cards.length > 1;
   if (!opensWithNeedsYou(reply)) {
     if (fresh.length)
       out.push({ check: "needs-you", message:
@@ -1267,18 +1349,18 @@ export function checkReplyShape(reply: string, open: string[] = [], raised: stri
         `open card in one line: its number, its question, and where it is (RULE.DEVEX.WORKSPACE.189).` });
   } else if (open.length) {
     const part = needsYouPart(reply);
-    const notWhole = fresh.filter((card) => !putsInFull(part, card));
+    const notWhole = fresh.filter((card) => !putsInFull(part, card, several));
     if (notWhole.length)
       out.push({ check: "needs-you", message:
         `${cardList(notWhole, where)} ${many(notWhole) ? "were" : "was"} raised in this reply and ${many(notWhole) ? "are" : "is"} not ` +
         `in full under **Needs you** at its top. A card goes there in full once; do not repeat it now, and from the next ` +
-        `reply that waits it is one line (RULE.DEVEX.WORKSPACE.189).` });
-    const unnamed = owed.filter((card) => !namesCard(part, card));
+        `reply that waits it is one line (RULE.DEVEX.WORKSPACE.189).` + withWorkstream(several, notWhole) });
+    const unnamed = owed.filter((card) => !namedIn(part, card, several));
     if (unnamed.length)
       out.push({ check: "needs-you", message:
         `${cardList(unnamed.slice(0, 4), where)} ${many(unnamed) ? "are" : "is"} still open and the **Needs you** part does not ` +
         `name ${many(unnamed) ? "them" : "it"}. Add one line for each: its number, its question, and where it is; the full ` +
-        `card stays on the approach page (RULE.DEVEX.WORKSPACE.189).` });
+        `card stays on the approach page (RULE.DEVEX.WORKSPACE.189).` + withWorkstream(several, unnamed) });
   }
   // A NEEDS YOU ITEM CARRIES ITS QUESTION OR ITS TITLE IN WORDS (RULE.DEVEX.WORKSPACE.189): a number alone is
   // the agent's handle, and the developer has to look it up.
@@ -1293,7 +1375,7 @@ export function checkReplyShape(reply: string, open: string[] = [], raised: stri
       `This reply names the agent's own working detail, which the developer does not read: ` +
       detail.slice(0, 3).map((one) => `${/^[aeiou]/.test(one.kind) ? "an" : "a"} ${one.kind} in "${one.sentence.slice(0, 160)}"`).join(" · ") +
       `. Rewrite ${detail.length > 1 ? "each sentence" : "the sentence"} in the goal's words; an arc number, and a card's number beside its words, may stay.` });
-  if (!asking(reply, older)) return out;
+  if (!asking(reply, older.map(keyNumber))) return out;
   const missing = missingParts(reply);
   if (!missing.length) return out;
   out.push({ check: "reply-shape", message:
@@ -1555,9 +1637,14 @@ export function missingWelcome(text: string): string[] {
   return missing;
 }
 
-/** A session's first turn that does not open with the whole welcome (02-agent/01-agent.md § The session opens on the ground). */
-export function checkWelcome(firstTurn: string): Warning[] {
-  if (!firstTurn.trim()) return [];
+/**
+ * A session's first turn that does not open with the whole welcome (02-agent/01-agent.md § The session opens on the ground).
+ *
+ * @param sent  which welcome the session start sent this window (the window's note): only where it sent the whole one
+ *              is the first reply held to it. A short start, or a window with no note of it, owes nothing.
+ */
+export function checkWelcome(firstTurn: string, sent?: "whole" | "short"): Warning[] {
+  if (sent !== "whole" || !firstTurn.trim()) return [];
   const missing = missingWelcome(firstTurn);
   if (!missing.length) return [];
   return [{ check: "welcome", message:
@@ -1570,10 +1657,6 @@ export function checkWelcome(firstTurn: string): Warning[] {
 
 // ---------------------------------------------------------------------------- what is said now, and what is held
 
-// THE CHECKS WHOSE FINDING IS ABOUT THE REPLY ITSELF: a card it raised or a decision it put, a handover
-// block, and the welcome of a first reply. The developer is reading that reply, so the finding cannot wait.
-const ABOUT_THE_REPLY = new Set(["needs-you", "reply-shape", "cards", "handover", "how-it-runs", "partner-words", "page-path", "welcome", "window"]);
-
 /**
  * The findings a turn end says now, and the ones it holds (RULE.DEVEX.WORKSPACE.244). While a row of this
  * window's arcs is in progress, only a finding about the reply sends the agent back. Every other one
@@ -1584,8 +1667,8 @@ const ABOUT_THE_REPLY = new Set(["needs-you", "reply-shape", "cards", "handover"
  */
 export function splitFindings(found: Warning[], running: boolean): { said: Warning[]; held: Warning[] } {
   if (!running) return { said: found, held: [] };
-  return { said: found.filter((warning) => ABOUT_THE_REPLY.has(warning.check)),
-           held: found.filter((warning) => !ABOUT_THE_REPLY.has(warning.check)) };
+  return { said: found.filter((warning) => REPLY_CHECKS.has(warning.check)),
+           held: found.filter((warning) => !REPLY_CHECKS.has(warning.check)) };
 }
 
 /**
@@ -1600,7 +1683,7 @@ export function ownOnly(found: Warning[], root: string, mine: Set<string>, visit
   let open: string[] = [];
   try { open = readdirSync(workstreamsDir(root, "open")); } catch { /* none open */ }
   const others = open.filter((name) => !mine.has(name) && !visits.has(name));
-  return found.filter((warning) => ABOUT_THE_REPLY.has(warning.check) || warning.check === "migration" || !others.some((name) => warning.message.includes(name)));
+  return found.filter((warning) => REPLY_CHECKS.has(warning.check) || warning.check === "migration" || !others.some((name) => warning.message.includes(name)));
 }
 
 /**
@@ -1614,7 +1697,7 @@ export function sayOnce(found: Warning[], told: Record<string, string>): { said:
   const now: Record<string, string> = {};
   const said: Warning[] = [];
   for (const warning of found) {
-    if (ABOUT_THE_REPLY.has(warning.check)) { said.push(warning); continue; }
+    if (REPLY_CHECKS.has(warning.check)) { said.push(warning); continue; }
     const mark = createHash("sha1").update(warning.message).digest("hex").slice(0, 12);
     now[warning.check] = mark;
     if (told[warning.check] !== mark) said.push(warning);
@@ -1696,42 +1779,22 @@ export function checkWindow(root: string, transcript: string, mine: Set<string>,
 
 // ---------------------------------------------------------------------------- the send-backs
 
-/**
- * Each check's send-backs in a transcript, and how many were followed by no tool call. A send-back is the hook's own
- * feedback entry, tagged `[check]`; it was acted on if the assistant called a tool before the next prompt or feedback.
- */
-export function sendBackStats(transcript: string): Record<string, { sent: number; idle: number }> {
-  const out: Record<string, { sent: number; idle: number }> = {};
-  const lines = transcript.split("\n");
-  const entries = lines.map((line) => { try { return line.includes("{") ? JSON.parse(line) as { type?: string; message?: { content?: unknown } } : null; } catch { return null; } });
-  const textOf = (content: unknown): string => typeof content === "string" ? content
-    : Array.isArray(content) ? content.map((part) => (part as { text?: string }).text ?? "").join("\n") : "";
-  entries.forEach((entry, at) => {
-    if (entry?.type !== "user") return;
-    const text = textOf(entry.message?.content);
-    if (!text.startsWith("Stop hook feedback:")) return;
-    let acted = false;
-    for (const next of entries.slice(at + 1)) {
-      if (!next) continue;
-      if (next.type === "assistant" && Array.isArray(next.message?.content) && (next.message!.content as Array<{ type?: string }>).some((block) => block.type === "tool_use")) { acted = true; break; }
-      if (next.type === "user" && !(Array.isArray(next.message?.content) && (next.message!.content as Array<{ type?: string }>).every((block) => block.type === "tool_result"))) break;
-    }
-    for (const check of new Set([...text.matchAll(/(?:^|\n|\]: )\[([a-z][a-z-]*)\] /g)].map((one) => one[1]))) {
-      const held = out[check] ?? { sent: 0, idle: 0 };
-      out[check] = { sent: held.sent + 1, idle: held.idle + (acted ? 0 : 1) };
-    }
-  });
-  return out;
+/** The open workstream a message names, by its folder name; the empty text where it names none. */
+export function workstreamNamedIn(root: string, message: string): string {
+  let open: string[] = [];
+  try { open = readdirSync(workstreamsDir(root, "open")); } catch { /* none open */ }
+  return open.sort().find((name) => message.includes(name)) ?? "";
 }
 
-/** The session's send-back counts so far, one cumulative line in `sendbacks.jsonl` beside the other turn-end telemetry; a no-op while recording is off. */
-export function recordSendBacks(root: string | null, facts: { session?: string | null; agent?: string | null }, transcript: string | undefined): void {
-  try {
-    if (!root || !transcript || !facts.session || !telemetryDir(root)) return;
-    const checks = sendBackStats(readFileSync(transcript, "utf8"));
-    if (!Object.keys(checks).length) return;
-    appendLog(join(telemetryFolder(root), "sendbacks.jsonl"), JSON.stringify({ at: utcNow(), session: facts.session, agent: facts.agent ?? null, checks }));
-  } catch { /* a check never fails because telemetry did */ }
+/**
+ * One send-back line for each finding said, written as it is said: its check, the workstream its words name and the
+ * first 12 hex of their sha1, never the words (`debug hooks show` judges each by the next Stop's span). A no-op while
+ * telemetry is off.
+ */
+function recordSaid(root: string, said: Warning[], session: string, agent: string | null): void {
+  for (const warning of said)
+    recordSendBack(root, { at: utcNow(), session, agent: agent ?? "main", event: "Stop", check: warning.check,
+      workstream: workstreamNamedIn(root, warning.message), finding: createHash("sha1").update(warning.message).digest("hex").slice(0, 12) });
 }
 
 // ---------------------------------------------------------------------------- the hook
@@ -1752,7 +1815,9 @@ if (argv1Base === "stop.ts" || argv1Base === "stop.mjs") {
   // payload's `cwd` and walked up to `.spndevex/`; this now does the same.
   let start = "";
   try { start = JSON.parse(input || "{}")?.cwd ?? ""; } catch { start = ""; }
-  const inWorkspace = workspaceRoot(start || process.env.CLAUDE_PROJECT_DIR || process.cwd());
+  // THE WORKSPACE OF THE EVENT, THE ONE ABOVE ITS `cwd` OR ABOVE THE PROJECT DIRECTORY (`eventWorkspace`); only where there is
+  // none is the bare directory the root, and nothing is written there.
+  const inWorkspace = eventWorkspace(start) ?? (start ? null : workspaceRoot(process.cwd()));
   const root = inWorkspace ?? (start || process.env.CLAUDE_PROJECT_DIR || process.cwd());
 
   let event: { session_id?: string; transcript_path?: string; stop_hook_active?: boolean; agent_id?: string; cwd?: string } = {};
@@ -1763,7 +1828,6 @@ if (argv1Base === "stop.ts" || argv1Base === "stop.mjs") {
   begin(facts, root);
   // WHAT THE TURNS COST, written beside the timing log while recording is on, for `debug cost show`.
   recordUsage(root, facts, event.transcript_path);
-  recordSendBacks(root, facts, event.transcript_path);
   // THIS SESSION'S OWN BASELINE, and the workstreams and arcs its own writes bound it to. Both come from
   // the window's note (`lib/window.ts`), which PreToolUse and the prompt hook write from the PATH of a
   // write, a prompt or a handover and never from text. The baseline's own old `workstreams` list is not
@@ -1791,6 +1855,9 @@ if (argv1Base === "stop.ts" || argv1Base === "stop.mjs") {
   // raised is put to that window, and demanding **Needs you** here for it is a demand nobody here can answer.
   const elsewhere = raisedElsewhere(root, mine, session);
   const ownCards = waiting.filter((card) => !elsewhere.has(card));
+  // THE NOTE STORES KEYS. One written before that held bare numbers, which no key matches, so it reads as no last
+  // Stop for cards: the first turn after the install calls no card raised.
+  const lastCards = baseline?.cards && baseline.cards.every((card) => keyWorkstream(card)) ? baseline.cards : null;
   // THE ARCS THIS WINDOW WROTE THIS TURN, IN ITS OWN WORKSTREAMS.
   const wrote = new Set([...touched].filter((arc) => mine.has(workstreamOf(arc))));
   // A VISITED WORKSTREAM IS READ FOR ONE THING: the notes rule on an arc this window itself changed there.
@@ -1805,7 +1872,8 @@ if (argv1Base === "stop.ts" || argv1Base === "stop.mjs") {
   const given = baseline?.handover !== undefined && baseline.handover === rowsNow;
   const found = [
     ...span({ group: "stop", action: "reply-shape" }, () => checkReplyShape(reply, ownCards,
-      baseline?.cards ? ownCards.filter((card) => !baseline.cards!.includes(card)) : [], where, running)),
+      lastCards ? ownCards.filter((card) => !lastCards.includes(card)) : [], where, running,
+      scoped(openWorkstreamFolders(root), mine).length)),
     ...span({ group: "stop", action: "notes" }, () => checkNotesLanded(root, baseline?.arcs, wroteAnywhere, mine, visits)),
     ...span({ group: "stop", action: "arc-to-page" }, () => checkArcToPage(root, mine)),
     ...span({ group: "stop", action: "page-stale" }, () => checkPageCurrent(wrote)),
@@ -1819,7 +1887,7 @@ if (argv1Base === "stop.ts" || argv1Base === "stop.mjs") {
     ...span({ group: "stop", action: "how-it-runs" }, () => checkHowItRuns(withoutFences(reply), root)),
     ...span({ group: "stop", action: "partner-words" }, () => checkPartnerWords(withoutFences(reply), root, turn.prompt)),
     ...span({ group: "stop", action: "page-path" }, () => checkPagePath(withoutFences(reply))),
-    ...span({ group: "stop", action: "welcome" }, () => checkWelcome(firstTurn)),
+    ...span({ group: "stop", action: "welcome" }, () => checkWelcome(firstTurn, readWindow(root, session).welcome)),
     ...span({ group: "stop", action: "corpus" }, () => checkCorpus(root, reposWritten(root, session))),
     // A MAIN WINDOW ONLY, AND NOT WHERE THE TURN CONTINUES BECAUSE A HOOK SPOKE: the offer is made once.
     ...span({ group: "stop", action: "window" }, () => {
@@ -1836,6 +1904,7 @@ if (argv1Base === "stop.ts" || argv1Base === "stop.mjs") {
   const ownCopyTold = [...new Set([...(baseline?.ownCopy ?? []),
     ...(said.some((warning) => warning.check === "own-copy") ? ownCopyPages(root, mine) : [])])];
   end();
+  if (inWorkspace) recordSaid(root, said, session, event.agent_id ?? null);
   // A HELD FINDING IS NOT STORED AS TEXT. A turn end that holds one leaves the baseline's marks where
   // they were, so the next turn end finds again what is still true. An arc new since then takes its
   // marks from now.

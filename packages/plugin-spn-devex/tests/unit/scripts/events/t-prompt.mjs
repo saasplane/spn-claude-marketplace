@@ -7,12 +7,12 @@
 // the script is run as a process wherever the case is about what reaches stdout, the exit code, or
 // the record under `.spndevex/.debug/sessions/<id>/name.json`.
 import { spawnSync } from "node:child_process";
-import { existsSync, readFileSync, readdirSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, readdirSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { PLUGIN } from "../../../helpers/harness.mjs";
 import { workspace } from "../../../helpers/fixture.mjs";
 import { ARCS, DEVEX, WORKSTREAMS } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
-import { alsoOpenOf, bindingsOf, nameToGive, readRecord, recordFile, sessionName } from "../../../../src/scripts/events/prompt.ts";
+import { alsoOpenOf, bindingsOf, citedOf, nameToGive, readRecord, recordFile, sessionName } from "../../../../src/scripts/events/prompt.ts";
 
 const SCRIPT = resolve(PLUGIN, "src", "scripts", "events", "prompt.ts");
 const EVENT = "UserPromptSubmit";
@@ -156,6 +156,41 @@ console.log("\n=== prompt");
     bindingsOf(bare("020 · N011, then 021 waits on it"), root, "sess-owns"), [{ name: THIS, by: "handover" }]);
   same("[MKT.HOOKS.310] two workstreams named by their whole folder names are both owned",
     bindingsOf(bare(`workstreams ${THIS} and ${NEXT}: N011`), root, "sess-owns"), [{ name: THIS, by: "handover" }, { name: NEXT, by: "handover" }]);
+}
+
+// ---------------------------------------------------------------- what a line owns, and what it only cites (036 N015)
+{
+  const root = build("cites");
+  const owns = (line) => bindingsOf(bare(line), root, "sess-cites").map((one) => one.name);
+  const cites = (line) => (typeof citedOf === "function" ? citedOf(bare(line), root) : null);
+  same("[MKT.HOOKS.310] a second workstream the line is raised by owns nothing and is cited",
+    [owns(`${THIS} N011, raised by ${NEXT}`), cites(`${THIS} N011, raised by ${NEXT}`)], [[THIS], [NEXT]]);
+  same("[MKT.HOOKS.310] a second workstream the line waits for owns nothing and is cited",
+    [owns(`${THIS} N011 row 3 waits for ${NEXT}`), cites(`${THIS} N011 row 3 waits for ${NEXT}`)], [[THIS], [NEXT]]);
+  same("[MKT.HOOKS.310] two workstreams joined by and are both owned, and none is cited",
+    [owns(`${THIS} and ${NEXT}: N011`), cites(`${THIS} and ${NEXT}: N011`)], [[THIS, NEXT], []]);
+  same("[MKT.HOOKS.310] a workstream named with an arc of its own is owned, in each of the three forms",
+    [owns(`${THIS}, N011; ${NEXT}, N001`), owns(`${THIS}/N011 and later ${NEXT}/N001`), owns("020 · N011; 021 · N001")], [[THIS, NEXT], [THIS, NEXT], [THIS, NEXT]]);
+  same("[MKT.HOOKS.310] a bare number after the first, with no arc, is a mention: owned nothing and cited nothing",
+    [owns(`${THIS} N011, then 021 waits on it`), cites(`${THIS} N011, then 021 waits on it`)], [[THIS], []]);
+  same("[MKT.HOOKS.310] a prompt with no handover cites nothing", citedOf?.(`compare ${THIS} with ${NEXT}`, root) ?? null, []);
+  hook(event(root, "sess-cited", fenced(handover(`${THIS} N011, raised by ${NEXT}`))), root);
+  const held = JSON.parse(readFileSync(join(root, DEVEX, ".debug", "sessions", "sess-cited", "window.json"), "utf8"));
+  same("[MKT.HOOKS.310] the hook writes the first as owned and the cited one as visited",
+    [held.workstreams[THIS]?.tie, held.workstreams[NEXT]?.tie], ["owns", "visits"]);
+}
+
+// ---------------------------------------------------------------- a run outside the workspace, with the project directory at it (036 N015)
+{
+  const root = build("outside");
+  const away = join(root, "..", "outside-away");
+  mkdirSync(away, { recursive: true });
+  const env = { ...process.env, SPN_TELEMETRY: "off", CLAUDE_PROJECT_DIR: root };
+  hook(event(root, "sess-away", fenced(handover(toArc("N011"))), away), away, env);
+  const noteFile = join(root, DEVEX, ".debug", "sessions", "sess-away", "window.json");
+  same("[MKT.HOOKS.340] a handover sent with cwd outside the workspace and the project directory at it binds its workstream",
+    existsSync(noteFile) ? JSON.parse(readFileSync(noteFile, "utf8")).workstreams[THIS]?.tie : null, "owns");
+  same("[MKT.HOOKS.340] and nothing is written in the bare directory", existsSync(join(away, DEVEX)), false);
 }
 
 // ---------------------------------------------------------------- `also open:` is visited, never owned (S175)

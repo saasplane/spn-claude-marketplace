@@ -213,9 +213,10 @@ export function under(file: string, paths: readonly string[]): boolean {
 export type Address = { workstream: string | null; id: string };
 
 /**
- * Reads the one form every command takes for a thing inside a workstream: `036/N010`, `036/q11`,
- * `036/s24`, or the bare id where the window has one workstream. The workstream is the words before
- * the last slash, and finding it on disk is the caller's.
+ * Reads the one form every command takes for a thing inside a workstream: `<workstream>/<arc>`,
+ * `<workstream>/<question>`, `<workstream>/<suggestion>`, or the bare id
+ * where the window has one workstream. The workstream is the words before the last slash, and
+ * finding it on disk is the caller's.
  */
 export function readAddress(ref: string): Address {
   const slash = ref.lastIndexOf("/");

@@ -8,7 +8,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/06-tests/README.md",
-      "seen": "9fc1ddfc"
+      "seen": "70f766c1"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/06-tests/README.md",
@@ -18,12 +18,12 @@
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/06-tests/README.md",
       "section": "The behaviour rows are the denominator",
-      "seen": "e9eb7744"
+      "seen": "a998b228"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/06-tests/README.md",
       "section": "What a run owes",
-      "seen": "389d7537"
+      "seen": "a121bab2"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/06-tests/README.md",
@@ -90,7 +90,7 @@
   - **A node carries the configuration its own run needs, and own collection is not own setup** (`RULE.SUPPORT.APPS.120` · MUST · skill:spn-apps/implement). The collection is narrow; the setup is shared.
   - **A run owes two outputs, for two readers** (`RULE.SUPPORT.APPS.119` · MUST · skill:spn-apps/implement): the run file `tests/.output/<tier>/runs/<run>.json`, naming the run, the ids, the tier, the environment and the instant, which the stamp reads to write `Status` and `Updated at` as `<time> · <run>`; and the framework's own HTML page, which a person opens and a pipeline uploads. Neither is a fallback for the other.
   - **The obligation sits on the toolchain, never on the test framework.** A run that cannot say what it proved is not a finished realization of the test command.
-  - **The tier decides which cases carry the behaviour id** (`RULE.DEVEX.FUNCTION.064` · MUST · check:subjects · due:036/N008). A row's `Tier` equals the tier of the case that proves it — MUST.
+  - **The tier decides which cases carry the behaviour id** (`RULE.DEVEX.FUNCTION.064` · MUST · skill:spn-apps/implement). A row's `Tier` equals the tier of the case that proves it — MUST.
   - **A case title carries the behaviour id AND the sentence** — MUST, at every tier that binds one.
   - **A node may double a seam it owns, and nothing else.** That decides where a case lives.
   - **A module ships no shell, so it owes `UNIT` alone and cites the rest**: a server module cites the composing application's `CONTRACT`, a web module its `JOURNEY`.

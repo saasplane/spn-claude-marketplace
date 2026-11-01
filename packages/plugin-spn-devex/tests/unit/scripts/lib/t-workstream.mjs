@@ -420,5 +420,20 @@ console.log("\n=== the landing gate reads the tree and names every fault — MKT
   ok("[MKT.HOOKS.324] the commit message is the log line", message === logged, message);
 }
 
+console.log("\n=== a row that waits on something outside the window is never ready — MKT.HOOKS.322");
+{
+  const rows = (extra) => [{ id: "1", parent: "N001", title: "a release", kind: "change", repo: "spn-x", altitude: "CODE", blockedBy: [], touches: ["marketplace:b"], state: "waiting", ...extra }];
+  const idsOf = (data) => lib.readyRows("/nowhere", data, []).map((row) => row.id);
+  const waits = arcData(rows({ waitingOn: "the 035 window" }));
+  ok("[MKT.HOOKS.322] a waiting row with waitingOn and every blocker resolved is not in readyRows", idsOf(waits).length === 0, JSON.stringify(idsOf(waits)));
+  const readied = arcData(rows({ state: "ready", waitingOn: null }));
+  ok("[MKT.HOOKS.322] set to ready, its wait cleared, it is", idsOf(readied).join() === "1", JSON.stringify(idsOf(readied)));
+  const plain = arcData(rows({}));
+  ok("[MKT.HOOKS.322] a waiting row with no waitingOn and no blockers is still ready", idsOf(plain).join() === "1", JSON.stringify(idsOf(plain)));
+  ok("[MKT.HOOKS.322] waitingOn is taken as text by the row's field rules", schema.arcFaults(waits).length === 0, schema.arcFaults(waits).join("; "));
+  const bad = arcData(rows({ waitingOn: 3 }));
+  ok("[MKT.HOOKS.322] a waitingOn that is not words fails", /waitingOn/.test(schema.arcFaults(bad).join("; ")), schema.arcFaults(bad).join("; "));
+}
+
 console.log(failed ? `\n  ${failed} of ${total} FAILED — workstream library` : `\n  all ${total} passed — workstream library`);
 process.exit(failed ? 1 : 0);

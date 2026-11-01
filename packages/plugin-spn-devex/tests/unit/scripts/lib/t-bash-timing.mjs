@@ -7,6 +7,8 @@
 // points a temporary workspace (with `.spndevex/.debug/switches.json`) at the recorder.
 import { execFileSync } from "node:child_process";
 import { existsSync, mkdirSync, readdirSync, readFileSync, utimesSync, writeFileSync } from "node:fs";
+import { mkdtempSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { PLUGIN } from "../../../helpers/harness.mjs";
 import { workspace } from "../../../helpers/fixture.mjs";
@@ -187,6 +189,19 @@ console.log("\n=== the workspace filter file");
   hook("pretooluse", { ...make, hook_event_name: "PreToolUse" });
   hook("closed", { ...make, hook_event_name: "PostToolUse", tool_response: {} });
   same("a program the filter adds is timed", commands(root).map((one) => [one.script, one.action]), [["make", "build"]]);
+}
+
+console.log("\n=== a call made outside the workspace — MKT.HOOKS.340");
+{
+  const root = workspace("2p-outside", ON);
+  const away = mkdtempSync(join(tmpdir(), "bash-timing-away-"));
+  const withProject = () => ({ ...env(), CLAUDE_PROJECT_DIR: root });
+  const run = (entry, payload) => { try { return execFileSync("node", [join(EVENTS, `${entry}.ts`)], { input: JSON.stringify(payload), env: withProject(), encoding: "utf8", cwd: away, stdio: ["pipe", "pipe", "pipe"] }); } catch (error) { return String(error.stdout ?? ""); } };
+  const outside = { session_id: "sess-2p", tool_name: "Bash", tool_use_id: "toolu_out", cwd: away, tool_input: { command: "spnutils infra platform up dmo --apply" } };
+  run("pretooluse", { ...outside, hook_event_name: "PreToolUse" });
+  same("[MKT.HOOKS.340] PreToolUse writes the start file under the workspace", existsSync(join(pendingOf(root), "toolu_out.json")), true);
+  run("closed", { ...outside, hook_event_name: "PostToolUse", tool_response: {} });
+  same("[MKT.HOOKS.340] the call is timed under the workspace's telemetry", commands(root).map((one) => one.action), ["up"]);
 }
 
 console.log(failed ? `\n  ${failed} of ${total} FAILED — bash timing` : `\n  all ${total} passed — bash timing`);
