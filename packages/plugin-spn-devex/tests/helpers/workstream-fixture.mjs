@@ -61,7 +61,7 @@ export function arcData(rows) {
 
 /** A card a `question raise` takes, whole. */
 export const CARD = {
-  title: "Which way the `probe` goes", why: "It blocks row 2.", what: "The file is `a.ts`.", viewsLead: "One view.",
+  title: "Which way the `probe` goes", why: "It blocks row 2.", what: "The file is `a.ts:12`.", viewsLead: "One view.",
   views: [{ lens: "Architect", text: "Keep it in one place." }],
   options: [{ key: "A", does: "one way", costs: "little" }, { key: "B", does: "the other", costs: "more" }],
   recommended: { key: "A", reason: "It costs less." },

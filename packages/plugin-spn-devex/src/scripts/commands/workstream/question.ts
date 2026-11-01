@@ -56,6 +56,14 @@ function finish(ws: string, records: Question[]): string[] {
   return [...skipped.map((line) => `! ${line}`), ...afterWrite(ws)];
 }
 
+/** What a card's What may cite: a file and line (`scripts/commands/workstream/question.ts:68`) or a fact id (`f9`). */
+const CITATION = /[\w./-]+\.\w+:\d+|(?<![\w`])f\d+\b/;
+
+/** The refusal of a What that cites nothing: the rule in plain words, one example, and the plugin's own reference. */
+const UNCITED = "refuses a card whose What cites nothing it read. Add the file and line, or a fact id, for what the card says about today, " +
+  "for example `scripts/commands/workstream/question.ts:68` or `f9`. " +
+  "The rule: refs/devex/workspace/docs/decision-cards.md, A card is only for what the rules leave open.";
+
 function raise(args: string[]): number {
   const words = readWords(args, { file: VALUE });
   const [ref, ...more] = words.paths;
@@ -67,6 +75,7 @@ function raise(args: string[]): number {
   try { card = JSON.parse(readFileSync(resolve(file), "utf8")); } catch { throw new UsageFault(`reads no JSON at \`${file}\`.`); }
   const faults = [...(typeof card.title === "string" && card.title.trim() ? [] : ["the card has no `title`"]), ...cardFaults(card)];
   if (faults.length) throw new UsageFault(`refuses a card with a part missing: ${faults.join("; ")}.`);
+  if (!CITATION.test(card.what ?? "")) throw new UsageFault(UNCITED);
   const running = runningWorkFault(ws, card.title ?? "", (card.options ?? []).map((option) => option.does));
   if (running) throw new UsageFault(running);
   const records = readQuestions(ws);

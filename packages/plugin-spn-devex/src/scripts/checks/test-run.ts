@@ -6,7 +6,7 @@
 // a start file under `.spndevex/.debug/sessions/<id>/pending/`, which `lib/bash-timing.ts` writes before a
 // timed Bash command. The design is in the hooks chapter, § A source edit waits while a test run is going.
 //
-// Refuses a whole suite, by any runner the repository uses, unless a baseline or full run of a go is running for that
+// Refuses a whole suite, by any runner the repository uses, unless a baseline, full or proof run of a go is running for that
 // repository: `workstream go start` marks one running in the lead arc's `go.json`. A narrowed run always passes.
 
 import { readdirSync, readFileSync } from "node:fs";
@@ -94,8 +94,12 @@ export function isWholeSuite(found: Reading): boolean {
   return !words.some((word) => !word.startsWith("-") && word !== "run" && word !== "test");
 }
 
-/** A part of a go that lets a whole suite run: a baseline or a full run. */
-const isSuitePart = (part: GoPart): boolean => part.work === "TEST" && (part.id.startsWith("baseline-") || part.id.startsWith("full-"));
+/** A part of a go that lets a whole suite run: a baseline, a full run, or the proof run after the releases. */
+const isSuitePart = (part: GoPart): boolean =>
+  part.work === "TEST" && (part.id.startsWith("baseline-") || part.id.startsWith("full-") || part.id.startsWith("proof-"));
+
+/** A part that is the go's proof run: TEST work, its id starting `proof-`; it runs the whole suites on what was released. */
+const isProofRun = (part: GoPart): boolean => part.work === "TEST" && part.id.startsWith("proof-");
 
 /** A part that is the go's full run: TEST work, its id starting `full-`. */
 const isFullRun = (part: GoPart): boolean => part.work === "TEST" && part.id.startsWith("full-");
@@ -122,7 +126,7 @@ function repoAt(root: string, dir: string): string | null {
 const numberOf = (ws: string): string => /^\d+/.exec(basename(ws))?.[0] ?? basename(ws);
 
 /**
- * Refuse a whole suite unless a baseline or full run of a go is running for its repository. The refusal names the window's
+ * Refuse a whole suite unless a baseline, full or proof run of a go is running for its repository. The refusal names the window's
  * go, or another open one, and the part that starts the full run; with no plan anywhere it names the command that starts one.
  */
 export function checkWholeSuite(payload: Payload): Verdict {
@@ -150,12 +154,16 @@ export function checkWholeSuite(payload: Payload): Verdict {
       `Run your own test files, each directly. A whole suite runs at a go's named points, after ` +
       `\`workstream go start <workstream>/N<nnn> <part>\` marks its baseline or full run running (RULE.DEVEX.WORKSPACE.207).` };
   }
-  const part = named.plan.parts.find((one) => forRepo(one) && isFullRun(one) && one.state !== "landed")
-    ?? named.plan.parts.find((one) => forRepo(one) && one.state !== "landed");
+  // Once the go's releases have landed, the whole suites belong to the proof run, and the refusal names it.
+  const released = named.plan.parts.every((one) => one.work !== "RELEASE" || one.state === "landed");
+  const proof = released ? named.plan.parts.find((one) => forRepo(one) && isProofRun(one) && one.state !== "landed") : undefined;
+  const part = proof
+    ?? named.plan.parts.find((one) => forRepo(one) && isFullRun(one) && one.state !== "landed")
+    ?? named.plan.parts.find((one) => forRepo(one) && !isProofRun(one) && one.state !== "landed");
   const go = `${numberOf(named.ws)}/${named.plan.lead}`;
   return { deny:
-    `Refused: \`${quoted}\` runs the whole suite, and no full run of ${numberOf(named.ws)}'s go is running.\n` +
-    `Run the part's own test files, or start the full run with \`workstream go start ${go} ${part?.id ?? `full-${repo ?? "<repo>"}`}\` ` +
+    `Refused: \`${quoted}\` runs the whole suite, and no ${proof ? "proof" : "full"} run of ${numberOf(named.ws)}'s go is running.\n` +
+    `Run the part's own test files, or start the ${proof ? "proof" : "full"} run with \`workstream go start ${go} ${part?.id ?? `full-${repo ?? "<repo>"}`}\` ` +
     `(RULE.DEVEX.WORKSPACE.207).` };
 }
 

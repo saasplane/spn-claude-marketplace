@@ -30,7 +30,9 @@ export const describe = "the plan of a go: derive it from the scope's sheets and
 export const save = (ws: string, lead: string, plan: GoPlan): void => writeWhole(goFileOf(ws, lead), `${JSON.stringify(plan, null, 2)}\n`);
 const briefOf = (ws: string, lead: string, part: GoPart): string => join(notesDirOf(ws, lead), "orders", `${part.id}.md`);
 
-/** Whether a TEST part is the repository's full run rather than its baseline: the two are told apart by their ids. */
+/** Whether a TEST part is the repository's proof run, after the releases: told apart by its id. */
+export const isProofRun = (part: GoPart): boolean => part.work === "TEST" && part.id.startsWith("proof-");
+/** Whether a TEST part is a repository's full run or its proof run rather than its baseline: told apart by their ids. */
 export const isFullRun = (part: GoPart): boolean => part.work === "TEST" && !part.id.startsWith("baseline-");
 
 /** The first read of an open workstream's go plan: each part's `pass` becomes `work`, the file written back with one log line, before the schema reads it. A closed workstream's is left as it closed. */
@@ -209,14 +211,16 @@ function start(args: string[]): number {
   if (part.state !== "ready") return refuse(`${id} is ${part.state}, not ready`);
   const open = part.waitsOn.filter((wait) => plan.parts.find((one) => one.id === wait)?.state !== "landed");
   if (open.length) return refuse(`${id} waits on ${open.join(", ")}, which has not landed`);
-  // A full run is taken on a tree that is not about to change, so the repository holds no uncommitted file.
+  // A full run, and the proof run after the releases, are taken on a tree that is not about to change, so the repository holds no uncommitted file.
   const changed = isFullRun(part) ? uncommitted(ws, part.repo) : [];
-  if (changed.length) return refuse(`${id} is a full run, and ${part.repo} holds uncommitted changes: ${changed.join(", ")}; commit them, then start it`);
+  if (changed.length) return refuse(`${id} is a ${isProofRun(part) ? "proof" : "full"} run, and ${part.repo} holds uncommitted changes: ${changed.join(", ")}; commit them, then start it`);
   const next: GoPlan = { ...plan, parts: plan.parts.map((one) => (one.id === id ? { ...one, state: "running" as const } : one)) };
   save(ws, arc, next);
   logEvent(ws, arc, "go", null, `${id} started`);
   console.log(`ok · ${arc} ${id} running`);
   if (part.work === "RELEASE") console.log(`Next: release ${part.repo}, then \`workstream report write\` on it.`);
+  else if (isProofRun(part))
+    console.log(`Next: run the whole tiers of ${part.repo} on what was released, then \`workstream row state ${basename(ws)}/${arc} <row> landed --run <name>\` for the arc's PROOF row, then \`workstream report write\` on it.`);
   else console.log(nextStep(`${basename(ws)}/${arc}`, ws, next).replace(/^Next: /, `Next: run the whole suite of ${part.repo}, then `));
   return 0;
 }

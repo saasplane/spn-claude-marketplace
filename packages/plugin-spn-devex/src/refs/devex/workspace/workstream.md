@@ -17,12 +17,12 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
-      "seen": "a261fec5"
+      "seen": "b3d715c4"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "section": "A step row says where, what work, and how",
-      "seen": "a90f40b1"
+      "seen": "0ae8fa01"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -51,7 +51,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "seen": "1ecfaeea"
+      "seen": "9577be57"
     }
   ]
 }
@@ -233,7 +233,7 @@ bring the developer only results and real decisions.
 
 **The model follows the kind of work.** Mechanical work runs on the smallest model, only where the order
 has nothing to decide; a written order on Sonnet; shaping, cards, previews and reading hand-backs stay
-with you on the largest. Every launch names its model, and a fork is refused (`RULE.DEVEX.AGENT.104` · MUST · check:pretooluse).
+with you on the largest. Every launch names its model, and a fork is refused (`RULE.DEVEX.AGENT.104` · MUST · check:agent-model).
 **An order quotes the facts it needs, each with its commit, and points to the rules it follows**
 (`RULE.DEVEX.WORKSPACE.276` · MUST · skill:spn-devex/execute). The log gets one note per milestone (`RULE.DEVEX.WORKSPACE.275` · MUST · check:confirmed), and you offer a
 new window from 200k at a clean point, writes the handover unasked at the next clean point past 300k, and always moves past 450k (`RULE.DEVEX.AGENT.103` · MUST · check:stop). Between 200k and 300k the offer comes once, and again only after another 50k; past 300k it stays in every reply until the developer moves or says to stay. **The offer tells the
@@ -295,7 +295,7 @@ Refused: orders/code-plugins.md names no go, and 036's go has a plan.
 A helper is briefed from a part: run `workstream go show 036/N004` and launch the part's own brief.
 ```
 
-**A whole suite runs only in a baseline run or a full run of the plan** (`RULE.DEVEX.WORKSPACE.458` · MUST · check:test-run). A part runs only its own test files. `workstream go start` marks a baseline or full run as running, and only then does the test-run check let the whole suite run:
+**A whole suite runs only in a baseline run, a full run or a proof run of the plan** (`RULE.DEVEX.WORKSPACE.458` · MUST · check:test-run). A part runs only its own test files. `workstream go start` marks a baseline or full run as running, and only then does the test-run check let the whole suite run:
 
 ```text
 Refused: `node packages/plugin-spn-devex/tests/run.mjs` runs the whole suite, and no full run of 036's go is running.
@@ -561,9 +561,12 @@ Views, Options and Recommendation, in that order ([`docs/decision-cards.md`](doc
 them this way:
 
 - **Why** comes first and stands by itself. It states the problem in plain words and what it costs
-  to leave it alone, and it names which of the three reasons makes the choice the developer's.
+  to leave it alone, and it names which of the three reasons makes the choice the developer's. A why
+  gets its reason first: the proposal changes only on the developer's word to change it or when the
+  reason does not hold.
 - **What** backs the Why with the facts. It starts from what exists, with the file and the line,
-  and says what changes.
+  and says what changes. It cites what the agent read, and `question raise` refuses a card that
+  cites nothing.
 - **Views** says in one line who spoke, why those, and how each was made. Then each view gives its
   reason in one or two plain sentences, and names no option by its letter. You shorten a view's
   words for the card and keep its name and its meaning (`refs/devex/agent/lenses.md` § *A view is shown in
@@ -573,6 +576,8 @@ them this way:
   the domain's usual workflow. Each lens names the references it judges against
   ([`refs/devex/agent/lenses/`](../agent/lenses/README.md)).
 - **The Recommendation** cites what decides it, and may name the views it rests on.
+
+**Two steps come before a card is raised.** The agent searches this workstream's answers, suggestions and arc logs for an answer already given, and a card that sets a shape carries an *Others:* line saying how others solve it. Both are steps the agent takes, and neither is a refusal.
 
 **An answer lands in the card and the arc in the same turn, and in a preview only where the preview
 shows that card — MUST.** An answer to a card, or any point the developer makes in review, lands
@@ -807,7 +812,9 @@ document, so one workstream holds a driver change, an estate change and a plugin
 | would hold this scope open indefinitely | a workstream nobody can close is a heading, not a scope |
 
 **Managing the arcs inside a workstream is the agent's, and creating a workstream is always the
-developer's decision** (`RULE.DEVEX.WORKSPACE.243` · MUST · short).
+developer's decision** (`RULE.DEVEX.WORKSPACE.243` · MUST · check:workstream-open).
+
+**Before new work is taken in, the agent reads the open workstreams' goals and names, in one line, the one that owns it.** When none does, it says so and leaves opening one to the developer.
 
 | The act | Who decides | The other side |
 | --- | --- | --- |
@@ -1122,7 +1129,7 @@ A failure that points outside the touched area is your judgement: say what you s
 choice was yours. A flake stays a finding until it is proven environmental.
 
 **An arc's `PROOF` row is its one final re-check, and the heavy checks run there, once — MUST.** Once
-every other row has landed, it runs again, on clean trees, what the arc's rows touched. The whole tiers
+every other row has landed, it runs again, on clean trees, what the arc's rows touched, as its repository's proof part of the go, after the releases. The whole tiers
 of each touched node, the browser walks and the look run in this row, once for the arc, and in no order
 before it. **Show the developer the look of each batch as soon as it lands**, not only at the close.
 
@@ -1226,8 +1233,8 @@ a thing with the page's own blocks, such as a table, a tree, a figure or a code 
 thing is a real file it links that file in the arc's `samples/` folder.
 
 **A preview's masthead names its arc and shows one status, labelled *Status*, and it is the arc's — MUST**
-(`RULE.DEVEX.WORKSPACE.266` · MUST · check:workstream-state). It reads Type · Arc · Shown · Status, and the *Arc* fact is a badge `N<nnn>`
-right after the type, linking the arc's row on the approach page. The status reads `PROPOSED` while the design is not decided, and once decided the
+(`RULE.DEVEX.WORKSPACE.266` · MUST · check:workstream-state). It reads Type · Arc · Progress · Shown · Status, with Status on its own at the row's right, and the *Arc* fact is a badge `N<nnn>`
+right after the type, linking the arc's row on the approach page. *Progress* follows it: a short bar and `N of M landed`, counted from the arc's rows, so the developer sees how far the arc has got without going back to the approach page. An arc with no sheet yet has nothing to count, so its masthead leaves Progress out. The status reads `PROPOSED` while the design is not decided, and once decided the
 arc's own status, as the one owner works it out (`DECIDED`, `RUNNING`, `LANDED` …), since every status after `PROPOSED`
 implies the design was decided. The badge links `../../approach.html#N<nnn>` with no underline (shared
 files `1.8.0`), is read from `state.json`
@@ -1429,7 +1436,10 @@ inside the `progress` or `open` block.
 
 **The progress block shows what is built** (`RULE.DEVEX.WORKSPACE.278` · MUST · short). Only build steps are
 recorded, so a chip counts its arc's steps, and an arc with no step yet shows its status word, with no bar
-to fill. *Overall*'s bar counts steps, and its word is the workstream's own, the one the page's header
+to fill. The bottom bar shows the arcs still open first, the running ones and then the rest not closed, each group
+in the order the arcs run, and the closed arcs after them, so the open arcs are in view at the bar's
+start without scrolling. A chip whose arc has a preview opens that preview in a new tab, marked with an
+arrow, and a chip whose arc has none keeps the jump to its row. *Overall*'s bar counts steps, and its word is the workstream's own, the one the page's header
 shows, so the two never disagree: `PLANNING` until the first step of any arc starts, then `IMPLEMENTING`,
 which says *waiting for your review* once every arc has landed, and `DONE` on the word to close. The done
 colour appears only when the arc's steps work out `LANDED`.

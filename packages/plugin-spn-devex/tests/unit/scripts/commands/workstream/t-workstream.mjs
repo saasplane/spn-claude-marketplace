@@ -5,7 +5,9 @@ import { execFileSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { basename, join, resolve } from "node:path";
 import { PLUGIN } from "../../../../helpers/harness.mjs";
-import { CARD, arcData, cli, dataWorkspace as dataArc, put } from "../../../../helpers/workstream-fixture.mjs";
+import { CARD as BARE_CARD, arcData, cli, dataWorkspace as dataArc, put } from "../../../../helpers/workstream-fixture.mjs";
+// A card's What cites what it read, or `question raise` refuses it (MKT.SCRIPTS.383).
+const CARD = { ...BARE_CARD, what: "The file is `a.ts:12`." };
 import { workspace } from "../../../../helpers/fixture.mjs";
 
 let total = 0, failed = 0;
@@ -226,10 +228,14 @@ console.log("\n=== question — raise, show, answer, withdraw");
   put(root, "half.json", JSON.stringify({ ...CARD, views: [] }));
   const half = cli(root, ["workstream", "question", "raise", "031/N001", "--file", "half.json"]);
   ok("red: a card with a part missing is refused", half.code === 2 && half.out.includes("refuses a card with a part missing") && half.out.includes("no `views`"), half.out);
+  put(root, "bare.json", JSON.stringify({ ...CARD, what: "The file holds the probe and nothing else." }));
+  const bare = cli(root, ["workstream", "question", "raise", "031/N001", "--file", "bare.json"]);
+  ok("[MKT.SCRIPTS.383] red: a What that cites no path:line and no fact id is refused, in the rule's words, one example and the plugin's reference",
+    bare.code === 2 && bare.out.includes("cites nothing it read") && bare.out.includes("`scripts/commands/workstream/question.ts:68` or `f9`") && bare.out.includes("refs/devex/workspace/docs/decision-cards.md"), bare.out);
   const text = readFileSync(page, "utf8");
   put(ws, "approach.html", text.replace('<h4 id="N001-what">', '<li id="q7">an answer folded earlier</li>\n  <h4 id="N001-what">'));
   const raised = cli(root, ["workstream", "question", "raise", "031/N001", "--file", "card.json"]);
-  ok("the next number is past every anchor the page carries", raised.code === 0 && raised.out.startsWith("q8 · open · approach.html Open — Q8"), raised.out);
+  ok("[MKT.SCRIPTS.383] a What with a path:line is taken, and the number is past every anchor the page carries", raised.code === 0 && raised.out.startsWith("q8 · open · approach.html Open — Q8"), raised.out);
   ok("the card stands in the approach page's Open, under its heading", /<h2>Open &mdash; Q8<\/h2>/.test(readFileSync(page, "utf8")) && readFileSync(page, "utf8").includes('<h4 id="q8">'));
   const notPreview = cli(root, ["workstream", "question", "show", "031/q8", "--in", "notes/N001/plan.md"]);
   ok("red: a card is shown only on an arc's preview", notPreview.code === 2 && notPreview.out.includes("notes/N<nnn>/preview.html"), notPreview.out);
@@ -239,8 +245,8 @@ console.log("\n=== question — raise, show, answer, withdraw");
   const key = cli(root, ["workstream", "question", "answer", "031/q8", "--key", "Z", "--words", "Z"]);
   ok("red: an answer naming no option is refused with the options", key.code === 2 && key.out.includes("one of A · B"), key.out);
   cli(root, ["workstream", "suggestion", "add", "031", "x"]);
-  put(root, "card2.json", JSON.stringify({ ...CARD, title: "a second question" }));
-  cli(root, ["workstream", "question", "raise", "031/N001", "--file", "card2.json"]);
+  put(root, "card2.json", JSON.stringify({ ...CARD, title: "a second question", what: "Today's check is f9." }));
+  ok("[MKT.SCRIPTS.383] a What with a fact id is taken", cli(root, ["workstream", "question", "raise", "031/N001", "--file", "card2.json"]).code === 0);
   const withdrawn = cli(root, ["workstream", "question", "withdraw", "031/q9", "--words", "not needed"]);
   ok("a card is withdrawn in your words, off its one page", withdrawn.code === 0 && withdrawn.out.startsWith("q9 · withdrawn · off 1 page · owed: its Log line"), withdrawn.out);
   const answered = cli(root, ["workstream", "question", "answer", "031/q8", "--key", "A", "--words", "Q8 - A"]);

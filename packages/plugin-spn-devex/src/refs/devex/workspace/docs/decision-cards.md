@@ -4,12 +4,12 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "The approach document — a workstream's, never a repository's",
-      "seen": "be2e0f5a"
+      "seen": "a4661902"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "section": "A card is only for what the rules leave open",
-      "seen": "e04a66f0"
+      "seen": "50102f94"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
@@ -67,6 +67,8 @@ already answers costs the developer's attention for nothing.
 change, propose the constructs the ask needs and their patterns, correct on their own, and stop there.
 What they make possible later is one line, *later, not now*, never a construct or an option of its own.
 
+**Two steps come before a card is raised.** The agent searches this workstream's answers, suggestions and arc logs for an answer already given, and a card that sets a shape carries an *Others:* line saying how others solve it. Both are steps the agent takes, and neither is a refusal.
+
 **One kind of decision is taken out of that: a decision that sets a shape, a name, a member, a check
 or the direction of a dependency** (`RULE.DEVEX.WORKSPACE.239` · MUST · check:stop). Decide it alone where a rule
 settles it, or where the purpose the book states for the construct settles it and no option shifts a
@@ -105,8 +107,8 @@ workspace, a workstream that changes the agent may raise one, because there the 
 | Part | What it carries |
 | --- | --- |
 | **Number + summary** | Numbered **`Q<n>`**, and the numbering is **stable across the whole exchange** — Q3 is Q3 in the question, the discussion, the answer and the page that later states it. One prefix, because a corpus that has used `O1`, `D1`, bare `1` and a trailing `card D58` costs the reader a guess before they can reply. An `S<n>` suggestion put in chat before an arc row exists has a card's parts, is not a page card, and never reaches a page. The summary names the **choice**, not the topic |
-| **Why** | Comes first and stands by itself. The problem in plain words, and what it costs to leave as is: the failure it causes. It does not lean on a detail that What has not given yet. It names which of the three reasons makes the choice the developer's. Never *"for consistency"*. On the page its label is `Why it matters` |
-| **What** | The facts that back the Why, concretely: the file, the rule, what is there today, the before → after, in names and counts, not adjectives. It starts from what exists, with the file and the line |
+| **Why** | Comes first and stands by itself. The problem in plain words, and what it costs to leave as is: the failure it causes. It does not lean on a detail that What has not given yet. It names which of the three reasons makes the choice the developer's. A why gets its reason first: the proposal changes only on the developer's word to change it or when the reason does not hold. Never *"for consistency"*. On the page its label is `Why it matters` |
+| **What** | The facts that back the Why, concretely: the file, the rule, what is there today, the before → after, in names and counts, not adjectives. It starts from what exists, with the file and the line. It cites what the agent read, and `question raise` refuses a card that cites nothing |
 | **Views** | Short. One line says who spoke, why those views, and how each was made. Then each view has its name in bold and its reason in one or two plain sentences that a developer can follow without opening the code. A view says only what Why and What do not already say. It names no option by its letter, because the options come after it. A harder question may take a sentence or two more. Views with nothing to add are named together in one line. Two views that disagree still stand as two lines. Such as: **Views** — four fresh views: the architect, the server developer, the partner and product. **Architect:** The job module finds a schedule only by its exact key. If the version is in the key, the module must remember every key it has used. **Product:** A person never sees the request key, so a version kept there tells them nothing. **Server developer and Partner:** No objection. You shorten a view's words for the card, and keep its name and its meaning. Keep what a fresh view wrote in full in the arc's notes, `notes/N<nnn>/views/`, and do not link it from the card. The voice is unchanged: a colleague speaking, in short full sentences, never a slogan, and never a summary of what "the views" thought (`RULE.DEVEX.AGENT.090` · MUST · skill:spn-devex/ideate). The agent picks the views from what is being decided and their number from the signs of complexity (`refs/devex/agent/lenses.md`). On the page the part is required: the check that runs when the page is written reports a card in `Open` without it. A card or a suggestion in chat carries it too, and no check reads it there |
 | **Options** | A **table**: lettered, trade-off in its own column. *"Leave it"* is a real option wherever viable, with its cost stated |
 | **→ Recommendation** | One option, carrying the reason it wins, and citing what decides it. It names the subject's place, core or periphery, and calls an option that only moves the problem a deferral. It may name the views it rests on, in a clause |
@@ -130,7 +132,7 @@ wherever it stands. The `workstream question` commands are the record's only wri
 
 | Command | What it does |
 | --- | --- |
-| `question raise <arc> --file card.json` | takes the next number from the record, writes the record, and puts the card in the approach page's `Open`. `card.json` is the card with its title, and a card with a part missing is refused |
+| `question raise <arc> --file card.json` | takes the next number from the record, writes the record, and puts the card in the approach page's `Open`. `card.json` is the card with its title, and a card with a part missing is refused, and so is a card whose What cites nothing it read: add the file and line, or a fact id, for what the card says about today, for example `scripts/commands/workstream/question.ts:68` or `f9` |
 | `question show <qN> --in notes/N<nnn>/preview.html` | shows the card in that preview's `Open`, with a line back to the approach page |
 | `question answer <qN> --key A --words "…"` | records the answer in the developer's words, and takes the card off every page |
 | `question withdraw <qN> --words "…"` | records the withdrawal, and takes the card off every page |

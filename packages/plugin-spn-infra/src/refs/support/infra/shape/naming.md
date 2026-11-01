@@ -8,7 +8,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/06-modules/02-config.md",
       "section": "The published vocabulary",
-      "seen": "3a0f15b3"
+      "seen": "bc594606"
     },
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-infra/06-modules.md",
@@ -84,7 +84,7 @@ Written by blueprints into each **resource world's own seat**. **Every configura
 
 Pairs per purpose the engine stands — db and queue `USER_RW`/`_RO`/`_MIGRATION`, cache `RW`/`RO`. Values are `{group}_{purpose}` full-word: `app_rw` · `app_ro` · `app_migration`, the migration block `migration_*`, a dedicated schema `{schema}_*`. Which pair a connection opens is the service's choice at boot. `ADM` is ledger-held, published to no application. Storage adds `PUBLIC_ENDPOINTS` (the public read path — the access class, never `CDN`-spelled). The seal block (`RULE.SUPPORT.INFRA.109` · MUST · skill:spn-infra/implement) carries `{SPC}_RESOURCE_SEAL_APP_PROVIDER` and `_{PROVIDER}_KEY_ID` and nothing else: the key id is plain and read from the cloud by the apply, no pair and no `ENDPOINTS` publish, and locally the block is the selector alone, `LOCAL`. A block whose engine's certificate the estate issued also names the authority it chains to (`RULE.SUPPORT.INFRA.126` · MUST · skill:spn-infra/implement): `_POSTGRESQL_SSL_CA_FILE`, `_REDIS_TLS_CA_FILE` and `_KAFKA_SSL_CA_FILE`, each beside its family's `_SSL` or `_TLS` key and holding a path inside the pod, `/var/run/secrets/spn/engines-ca/ca.pem`. They publish under `CLUSTER` and none under `MANAGED`, because the provider's certificates chain to an authority the client already trusts. `SEAL` is one of the `connections` tokens, and an application whose estate row lists the `SEAL` grant receives the block (`RULE.SUPPORT.INFRA.110` · MUST · skill:spn-infra/implement).
 
-- A published key never spells a product, a rendering, an app token, or a module of the code that reads it (`RULE.SUPPORT.INFRA.111` · MUST · skill:spn-infra/implement): the tenant edge's facts publish as `{SPC}_PLATFORM_INTEGRATION_EDGE_*`, and the identity module reads its own `{SPC}_IAM_EDGE_*`. A key that would repeat identically in every environment's rung belongs one rung up. A key a machine wants to write into the app plane belongs in a rung above, under a grammar name.
+- A published key never spells a product, a rendering, an app token, or a module of the code that reads it (`RULE.SUPPORT.INFRA.111` · MUST · check:subjects): the tenant edge's facts publish as `{SPC}_PLATFORM_INTEGRATION_EDGE_*`, and the identity module reads its own `{SPC}_IAM_EDGE_*`. A key that would repeat identically in every environment's rung belongs one rung up. A key a machine wants to write into the app plane belongs in a rung above, under a grammar name.
 - **A published fact is always a literal**; only dev-authored app-plane values carry `${…}` references — one direction, one pass, unknown references refuse by name. A published endpoint is **write-once**.
 
 ## Tags — the queryable rendering of the coordinates

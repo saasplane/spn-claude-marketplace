@@ -62,7 +62,7 @@ console.log("\n=== RULE.DEVEX.WORKSPACE.273 — a view of an arc's status that d
   const page = join(ws, "approach.html");
   const preview = join(ws, "notes", "N001", "preview.html");
   const original = readFileSync(page, "utf8");
-  const badge = (word) => `<header class="sds-masthead"><div class="sds-eyebrow"><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Preview</span><span class="sds-separator">|</span><span class="sds-label">Arc:</span> <a class="sds-badge" href="../../approach.html#N001">N001</a><span class="sds-state"><span class="sds-label">Status:</span> <a class="sds-badge sds-status sds-${word.toLowerCase()}" href="../../approach.html#N001">${word}</a></span></span></div><h1>Probe</h1></header>\n<div class="sds-wrap"></div>\n`;
+  const badge = (word) => `<header class="sds-masthead"><div class="sds-eyebrow"><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Preview</span><span class="sds-separator">|</span><span class="sds-label">Arc:</span> <a class="sds-badge" href="../../approach.html#N001">N001</a><span class="sds-separator">|</span><span class="sds-label">Progress:</span> <span class="sds-progress sds-step-1"><span class="sds-chip-bar"><i style="width:0%"></i></span> 0 of 2 landed</span><span class="sds-state"><span class="sds-label">Status:</span> <a class="sds-badge sds-status sds-${word.toLowerCase()}" href="../../approach.html#N001">${word}</a></span></span></div><h1>Probe</h1></header>\n<div class="sds-wrap"></div>\n`;
   writeFileSync(preview, badge("DECIDED"));
   ok("green: a preview badge that shows the arc's status passes", checkWorkstream(ws).length === 0, said(checkWorkstream(ws)));
   writeFileSync(preview, badge("LANDED"));

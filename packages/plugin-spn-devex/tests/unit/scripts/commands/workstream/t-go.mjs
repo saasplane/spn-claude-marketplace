@@ -70,7 +70,7 @@ console.log("\n=== write: the plan and the briefs");
   ok("[MKT.SCRIPTS.303] a ready scope writes go.json", wrote.code === 0 && existsSync(goFile), wrote.out);
   const plan = existsSync(goFile) ? json(goFile) : { parts: [], scope: [] };
   ok("[MKT.SCRIPTS.314] the plan records the go's scope and its lead", JSON.stringify(plan.scope) === '["N001"]' && plan.lead === "N001");
-  ok("[MKT.SCRIPTS.314] the plan carries the scope's release part, last", plan.parts.at(-1)?.id === "release-spn-x-1" && plan.parts.at(-1)?.work === "RELEASE", JSON.stringify(plan.parts.map((p) => p.id)));
+  ok("[MKT.SCRIPTS.314] the plan carries the scope's release part after every other part but the proof, which is last", plan.parts.at(-1)?.id === "proof-spn-x" && plan.parts.at(-2)?.id === "release-spn-x-1" && plan.parts.at(-2)?.work === "RELEASE" && plan.parts.slice(0, -2).every((p) => p.work !== "RELEASE"), JSON.stringify(plan.parts.map((p) => p.id)));
   ok("[MKT.SCRIPTS.303] every part with entries has a brief", plan.parts.filter((p) => p.entries.length).every((p) => existsSync(join(orders, `${p.id}.md`))), wrote.out);
   const brief = existsSync(join(orders, "code-spn-x-1.md")) ? readFileSync(join(orders, "code-spn-x-1.md"), "utf8") : "";
   ok("[MKT.SCRIPTS.303] a brief opens with the go, the part and its entries", brief.startsWith("---\n") && brief.includes('go: "N001"') && brief.includes('part: "code-spn-x-1"') && brief.includes("N001/E2"), brief.slice(0, 200));
@@ -88,7 +88,7 @@ console.log("\n=== show");
   const one = go("show", "N001", "--part", "code-spn-x-1");
   ok("[MKT.SCRIPTS.304] --part prints that part alone", one.code === 0 && one.out.includes("code-spn-x-1") && !one.out.split("\n").some((l) => l.startsWith("docs-spn-x-1")), one.out);
   const asJson = go("show", "N001", "--json");
-  ok("[MKT.SCRIPTS.304] --json prints the plan", asJson.code === 0 && JSON.parse(asJson.out).parts.length === 5, asJson.out);
+  ok("[MKT.SCRIPTS.304] --json prints the plan", asJson.code === 0 && JSON.parse(asJson.out).parts.length === 6, asJson.out);
   ok("[MKT.SCRIPTS.315] show ends with the next step", lastLine(shown.out).startsWith("Next:"), shown.out);
 }
 
@@ -220,6 +220,32 @@ console.log("\n=== start: a full run is refused on a tree that holds uncommitted
   dirty.git(["-c", "user.email=t@t", "-c", "user.name=t", "commit", "-q", "-m", "second"]);
   const clean = cli(dirty.root, ["workstream", "go", "start", "N001", "full-spn-x"]);
   ok("[MKT.HOOKS.322] the same start runs once the tree is committed", clean.code === 0 && stateOfFull() === "running", clean.out);
+}
+
+console.log("\n=== start: a ready proof part, after the releases, is taken, and refused on a tree that holds uncommitted changes");
+{
+  const row = (id, work, over = {}) => ({ id, parent: "N001", kind: "change", repo: "spn-x", blockedBy: [], touches: [], state: "landed", title: `row ${id}`, work, ...over });
+  const proving = await dataWorkspace("go-proof", { rows: [
+    row("1", "DOCS", { entries: ["E1"] }), row("2", "CODE", { entries: ["E2"] }), row("3", "RELEASE"), row("4", "PROOF", { state: "ready" }),
+  ] });
+  cli(proving.root, ["workstream", "fact", "write", "N001", "--source", "spn-x/a.ts", "--fact", "a is 1", "--used-by", "1"]);
+  writeFileSync(join(proving.ws, "arcs", "N001", "sheet.json"), JSON.stringify(sheetOf([entry("E1", "spn-x:docs/a.md"), entry("E2", "spn-x:src/b.ts")]), null, 2));
+  cli(proving.root, ["workstream", "go", "write", "N001"]);
+  // The plan as it stands once the code and the releases have landed: every part landed but the proof, which is ready.
+  const file = join(proving.ws, "arcs", "N001", "go.json");
+  const plan = json(file);
+  const held = plan.parts.filter((p) => !p.id.startsWith("proof-")).map((p) => ({ ...p, state: "landed" }));
+  const proof = plan.parts.find((p) => p.id === "proof-spn-x")
+    ?? { id: "proof-spn-x", repo: "spn-x", work: "TEST", entries: [], tests: [], minutes: null, measuredFrom: null, waitsOn: [], model: "none", signature: "" };
+  writeFileSync(file, JSON.stringify({ ...plan, parts: [...held, { ...proof, waitsOn: [], state: "ready" }] }, null, 2));
+  const stateOfProof = () => json(file).parts.find((p) => p.id === "proof-spn-x")?.state;
+  writeFileSync(join(proving.repo, "pending.ts"), "export const b = 2;\n");
+  const refused = cli(proving.root, ["workstream", "go", "start", "N001", "proof-spn-x"]);
+  ok("[MKT.SCRIPTS.384] a proof part start is refused on a dirty tree, naming the file, and the part stays ready", refused.code === 1 && refused.out.includes("pending.ts") && stateOfProof() === "ready", `${stateOfProof()} ${refused.out}`);
+  proving.git(["add", "-A"]);
+  proving.git(["-c", "user.email=t@t", "-c", "user.name=t", "commit", "-q", "-m", "third"]);
+  const taken = cli(proving.root, ["workstream", "go", "start", "N001", "proof-spn-x"]);
+  ok("[MKT.SCRIPTS.384] go start takes a ready proof part once the tree is committed", taken.code === 0 && stateOfProof() === "running", taken.out);
 }
 
 console.log("\n=== report write: a part's report lands its row on a green run, in one command");

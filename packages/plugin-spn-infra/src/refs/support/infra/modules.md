@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-infra/06-modules.md",
-      "seen": "908c620f"
+      "seen": "dd178ec1"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/06-modules/",
-      "seen": "0ebd2805"
+      "seen": "42ee10a7"
     }
   ]
 }
@@ -207,7 +207,7 @@ Every resource key follows one shape, and the middle token names the **connectio
 
 **An installed module's purpose code joins the family set** for the facts its own apply publishes. **Module facts keep a three-way placement**: plain boundary facts (`{SPC}_{MODULE}_{FACT}`) sit on the plain half; per-consumer minted pairs (`{SPC}_{MODULE}_{APP}_{FACT}`) sit on the secret half, composed only into their consumer's environment; the module's own interior sits in its own seat and is never published. The consumer token in a per-consumer minted key is the app's kind code, uppercase, in the slot where the resource grammar's world token sits; decomposition stays unambiguous because module codes and kind codes are closed, disjoint vocabularies. A published key never spells the product a module renders, and apart from that consumer token never spells an application's token.
 
-**A published key carries no module of the code that reads it** (`RULE.SUPPORT.INFRA.111` · MUST · skill:spn-infra/implement). The estate publishes a fact under a name for the thing the fact is about. A module reads a setting under its own prefix, `{SPC}_{MODULE}_*`, and nothing outside it. The service's own settings join the two: the module's key is written as a `${…}` reference to the published key. The tenant edge is the example, and the job scheduler has the same shape:
+**A published key carries no module of the code that reads it** (`RULE.SUPPORT.INFRA.111` · MUST · check:subjects). The estate publishes a fact under a name for the thing the fact is about. A module reads a setting under its own prefix, `{SPC}_{MODULE}_*`, and nothing outside it. The service's own settings join the two: the module's key is written as a `${…}` reference to the published key. The tenant edge is the example, and the job scheduler has the same shape:
 
 | | The estate publishes | The module reads | The service's own settings write |
 | --- | --- | --- | --- |

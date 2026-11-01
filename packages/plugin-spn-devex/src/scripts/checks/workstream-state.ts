@@ -15,7 +15,7 @@ import { linksSharedStyles } from "../../../../plugin-support-lib/src/lib/page-s
 import {
   DATA_FILES, FACTS_FILE, SHEET_FILE, LOG_FILE, NOTES, PREVIEW_FILE, approachOf, arcStatus, stepsMayStart, arcDataDir, arcIdsOf, factsFileOf, sheetFileOf, readSheet, firstOpenArc, leafRows, isDataLayout, logFileOf, markdownArcsOf,
   NO_REPO, arcStamp, markdownIn, nameFileHolds, nameFileOf, notesDirOf, previewOf, questionsFileOf, readJsonl, readQuestions, stampsOn, stateFileOf,
-  strayLevels, strayNotes, suggestionsFileOf, readJson, workstreamsOf, previewWithStatus,
+  strayLevels, strayNotes, suggestionsFileOf, readJson, workstreamsOf, previewWithStatus, builtOf,
   localLinks, previewHrefOf, previewOwners, slotsIn, whatEntryOf, whatId, whatRange, workstreamName,
 } from "../lib/workstream.ts";
 import { WORK, DONE_STATES, arcFaults, factFaults, sheetFaults, logFaults, questionFaults, subjectFault, suggestionFaults, type ArcData, type Fact } from "../lib/workstream-schema.ts";
@@ -235,7 +235,8 @@ export function viewFindings(ws: string, arc: string, data: ArcData, text: strin
   const preview = previewOf(ws, arc);
   if (isFile(preview)) {
     const shown = readFileSync(preview, "utf8");
-    if (previewWithStatus(shown, arc, status) !== shown)
+    const built = builtOf(data);
+    if (previewWithStatus(shown, arc, status, built.done, built.total) !== shown)
       out.push(`${arc}'s preview badge does not show ${status} — ${fix} writes it from the arc`);
   }
   return out;
