@@ -21,7 +21,7 @@
 //   cards      a reply names no card the window's pages do not carry, one answered, or one of another workstream
 //   notes      a note, once: an answered card a preview shows, whose arc's notes did not move
 //   carried    a proposed arc never carries a review point to a later row of itself
-//   handover   a reply that says a new window is needed carries the eight labelled lines, in one column,
+//   handover   a reply that says a new window is needed carries the nine labelled lines, in one column,
 //              once while the rows stand, and names each open card in one line; a close or a handover
 //              never opens with a table, a heading or a count
 //   how-it-runs, partner-words, page-path  the reply's last asks about running the work, the words a partner cannot open, and its page addresses, after the handover
@@ -97,13 +97,13 @@ import { arcsWrittenSince, fromWorkspace, named, readWindow, reposWritten, visit
 
 type Warning = { check: string; message: string };
 
-// The labels the handover template carries (`templates/workstream/handover-template.md`), in its
-// order. Every handover owes all eight: a line that has nothing to say still says so (`no reload`,
-// `none`), because a label left out cannot be told from a label forgotten. A label counts only where
-// it opens a line, lowercase, with its colon, which is the layout the chapter states; the sentence
-// form (`Continue workstream …`, `Model: …`) names none of them and is refused as a block missing
-// all eight. The state and the next steps are what `workstream go show` prints, so no label holds them.
-const HANDOVER_LABELS = ["continue", "model", "read first", "pins", "live now", "done when",
+// The labels the handover template carries (`templates/workstream/handover-template.md`, which the build copies from the book), in its
+// order, as the chapter's table and `workstream handover` hold them (RULE.DEVEX.WORKSPACE.394). Every handover owes all nine: a line that has
+// nothing to say still says so (`no reload`, `none`), because a label left out cannot be told from a label forgotten. A label counts only
+// where it opens a line, lowercase, with its colon, which is the layout the chapter states; the sentence form (`Continue workstream …`,
+// `Model: …`) names none of them and is refused as a block missing all nine. `state:` holds what every row reached, and in a go with a plan
+// it names `workstream go show`, which prints the parts.
+const HANDOVER_LABELS = ["continue", "model", "read first", "pins", "state", "live now", "done when",
   "do not touch", "open"];
 const HANDOVER_LABEL_LINE = new RegExp(`^(${HANDOVER_LABELS.join("|")}):(.*)$`);
 // `continue:` must carry the workstream (`008-plain-language`) and the arc (`N119`), because the next
@@ -973,7 +973,7 @@ function handoverFences(reply: string): Fence[] {
 }
 
 /**
- * Whether the reply holds a handover block that is filled in and carries all eight labels. The hook
+ * Whether the reply holds a handover block that is filled in and carries all nine labels. The hook
  * keeps this, so the block is asked for once (RULE.DEVEX.WORKSPACE.189).
  */
 export function givesHandover(reply: string): boolean {

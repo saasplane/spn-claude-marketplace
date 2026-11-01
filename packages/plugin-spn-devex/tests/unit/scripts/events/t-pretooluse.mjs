@@ -561,7 +561,7 @@ console.log("\n=== pretooluse — an order asks for no screenshot unless the dev
 console.log("\n=== pretooluse — a handover block written before the turn ends is told once (RULE.DEVEX.WORKSPACE.393)");
 {
   const BLOCK = ["```text", "continue:      041-probe N001", "model:         opus", "read first:    approach.html", "pins:          none",
-    "live now:      nothing", "done when:     the probe lands", "do not touch:  the main checkout", "open:          none", "```"].join("\n");
+    "state:         clean", "live now:      nothing", "done when:     the probe lands", "do not touch:  the main checkout", "open:          none", "```"].join("\n");
   const entry = (type, content, extra = {}) => JSON.stringify({ type, message: { content }, ...extra });
   const transcript = (name, lines) => { const file = join(WORKSPACE, `${name}.jsonl`); writeFileSync(file, `${lines.join("\n")}\n`); return file; };
   const call = (session, file) => ({ tool_name: "Bash", session_id: session, cwd: WORKSPACE, transcript_path: file, tool_input: { command: "git status --short" } });

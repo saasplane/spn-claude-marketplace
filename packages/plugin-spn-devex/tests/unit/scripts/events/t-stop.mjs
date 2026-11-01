@@ -400,7 +400,7 @@ console.log("\n=== the handover check — what counts as saying a window is need
   const ROOT = workspace("stop-handover-wiring");
   const BLOCK = ["```", "continue:     workstream `008-plain-language`, arc `N13`, step 4",
     "model:        Opus 5.5", "read first:   the arc", "pins:         spn-foundation abc1234",
-    "live now:     no reload", "done when:    it lands",
+    "state:        row 1 landed", "live now:     no reload", "done when:    it lands",
     "do not touch: Q115", "open:         Q138", "```"].join("\n");
   // ROOT IS PASSED EXPLICITLY. Calling with one argument leaves `root` undefined, the wiring read
   // throws, and the whole install precondition is skipped in silence — a suite that would pass
@@ -569,6 +569,7 @@ console.log("\n=== handover — the template's fields, and a fence that quotes t
     "              `/w/notes/N116/plan.md`",
     "pins:         spn-claude-marketplace 2f8c5a0 · spn-foundation 907b11f; re-run the plan's stale",
     "              check first — `git -C spn-claude-marketplace log 2f8c5a0..HEAD -- packages`",
+    "state:        row 1 landed, row 2 not started",
     "live now:     the hook script is live · waits for the window: the skill",
     "done when:    Commands row `plugin unit` → all passed",
     "do not touch: the templates folder",
@@ -627,12 +628,31 @@ console.log("\n=== handover — the template's fields, and a fence that quotes t
   console.log(`  ${told ? "PASS" : "FAIL"}  a block with a {{…}} left is refused, and told to fill in every label`);
 
   // EACH LABEL IS OWED. A block missing one is refused, and the refusal names the label it lacks.
-  for (const label of ["continue", "pins", "live now", "open"]) {
+  for (const label of ["continue", "pins", "state", "live now", "open"]) {
     n += 1;
     const got = checkHandover(`Pick this up in a new window.\n\n${withoutLabel(label)}`, ROOT, everyone(ROOT));
     const ok = got.length === 1 && new RegExp(`missing \`${label}:\``).test(got[0].message);
     if (!ok) failed += 1;
     console.log(`  ${ok ? "PASS" : "FAIL"}  a block missing \`${label}:\` is refused, naming it${ok ? "" : ` — got ${JSON.stringify(got)}`}`);
+  }
+
+  // THE HANDOVER HAS NINE LABELS (RULE.DEVEX.WORKSPACE.394): `state:` sits between `pins:` and `live now:`, and the template carries it.
+  {
+    n += 1;
+    const noState = checkHandover(`Pick this up in a new window.\n\n${withoutLabel("state")}`, ROOT, everyone(ROOT));
+    const sentBack = noState.length === 1 && /missing `state:`/.test(noState[0].message) && /pins: · state: · live now:/.test(noState[0].message);
+    if (!sentBack) failed += 1;
+    console.log(`  ${sentBack ? "PASS" : "FAIL"}  [MKT.HOOKS.438] known-bad: a block without \`state:\` is sent back, naming it and the nine labels in the book's order${sentBack ? "" : ` — got ${JSON.stringify(noState)}`}`);
+    n += 1;
+    const template = readFileSync(resolve(PLUGIN, "src", "refs", "devex", "workspace", "docs", "templates", "workstream", "handover-template.md"), "utf8");
+    const own = /```text\n([\s\S]*?)\n```/.exec(template)?.[1] ?? "";
+    // Its placeholders filled in as the writer would, every value left where the template puts it.
+    const filled = own.replace(/\{\{next NNN-subject\}\}/g, "032-next").replace(/\{\{NNN-subject\}\}/g, "031-probe").replace(/N\{\{nnn\}\}/g, "N001").replace(/\{\{[^}]*\}\}/g, "x");
+    const labelsOf = filled.split("\n").filter((line) => /^[a-z ]+:/.test(line)).map((line) => line.split(":")[0]);
+    const passes = checkHandover(`Pick this up in a new window.\n\n\`\`\`text\n${filled}\n\`\`\``, ROOT, everyone(ROOT));
+    const whole = labelsOf.join("|") === "continue|model|read first|pins|state|live now|done when|do not touch|open" && passes.length === 0;
+    if (!whole) failed += 1;
+    console.log(`  ${whole ? "PASS" : "FAIL"}  [MKT.HOOKS.438] the template's own block, filled in, carries the nine labels in order and passes${whole ? "" : ` — ${labelsOf.join("|")} ${JSON.stringify(passes)}`}`);
   }
 
   // NO LEGACY: the sentence form is refused as a block missing every label.
@@ -1035,12 +1055,12 @@ console.log("\n=== handover — the labels are read as one column, the one `do n
   const { checkHandover, handoverColumns } = await import("../../../../src/scripts/events/stop.ts");
   const ROOT = workspace("n006-stop-handover-column");
   const check = (label, ok, detail = "") => { n += 1; if (!ok) failed += 1; console.log(`  ${ok ? "PASS" : "FAIL"}  ${label}${ok || !detail ? "" : `\n        ${detail}`}`); };
-  const LABELS = ["continue", "model", "read first", "pins", "live now", "done when", "do not touch", "open"];
+  const LABELS = ["continue", "model", "read first", "pins", "state", "live now", "done when", "do not touch", "open"];
   const block = (lines) => "I am handing this over.\n\n```text\n" + lines.join("\n") + "\n```\n";
   const value = (at) => `value ${at} 020-agent-workstream-improvements N006`;
   const aligned = LABELS.map((label, at) => `${`${label}:`.padEnd(14)}${value(at)}`);
 
-  // KNOWN-BAD: eight label lines, every label present, whose values start in different columns.
+  // KNOWN-BAD: nine label lines, every label present, whose values start in different columns.
   const ragged = checkHandover(block(LABELS.map((label, at) => `${label}:${at % 2 ? " " : "      "}${value(at)}`)), ROOT, everyone(ROOT));
   check("[MKT.HOOKS.37] known-bad: values that start in different columns get one [handover] warning",
     ragged.length === 1 && ragged[0].check === "handover", JSON.stringify(ragged));
@@ -1399,6 +1419,7 @@ ${tableOf(cyclesOf(folder))}
     "model:        Opus 5.5, effort high",
     "read first:   `approach.html#N001`, rows 1 and 2",
     "pins:         spn-x abc1234",
+    "state:        row 1 landed",
     "live now:     no reload",
     "done when:    the suite passes",
     "do not touch: the templates folder",
@@ -1758,7 +1779,7 @@ console.log("\n=== stop — the checks the first round fixed or wired, and the g
     check("[MKT.HOOKS.116] a close that opens with what was delivered passes", prose.length === 0, JSON.stringify(prose));
     // A handover block in an earlier message of the turn counts as given (RULE.DEVEX.WORKSPACE.393).
     const BLOCK = ["The work is done.", "", "```text", "continue:     workstream `001-a-subject`, arc `N001`, step 1",
-      "model:        Opus 5.5, effort high", "read first:   `approach.html#N001`", "pins:         spn-x abc1234", "live now:     no reload",
+      "model:        Opus 5.5, effort high", "read first:   `approach.html#N001`", "pins:         spn-x abc1234", "state:        row 1 landed", "live now:     no reload",
       "done when:    the suite passes", "do not touch: the templates folder", "open:         none", "```"].join("\n");
     const PASS_ON = "Pick this up in a new window.";
     const owed = call("checkHandover", PASS_ON, ROOT, mine);
