@@ -180,11 +180,11 @@ console.log("\n=== 009 — an open workstream's approach page and previews move 
     m009.check(root).length === 2 && m009.check(root).every((place) => place.startsWith("open/031-probe/")), m009.check(root).join(" | "));
   const said = moveToTarget(root, styles);
   const read = (path) => readFileSync(join(root, WS, path), "utf8");
-  ok("red: the script moves both to 1.11.0 with its hashes, and leaves the rest as it was",
+  ok("[MKT.SCRIPTS.386] red: the script moves both to 1.11.0 with its hashes, and leaves the rest as it was",
     said.length === 2 && read("open/031-probe/approach.html") === page("1.11.0").replace(/sha384-old(?=" crossorigin="anonymous">)/, "sha384-css").replace(/sha384-old/, "sha384-js")
       && read("open/031-probe/notes/N001/preview.html").includes(`${ADDRESS}1.11.0/sds-docs.js" integrity="sha384-js"`)
       && read("open/032-later/approach.html") === page("1.11.0") && read("closed/020-done/approach.html") === page("1.9.0"), said.join(" | "));
-  ok("a second run changes nothing, and the check finds nothing", moveToTarget(root, styles).length === 0 && m009.check(root).length === 0);
+  ok("[MKT.SCRIPTS.387] a second run changes nothing, and the check finds nothing", moveToTarget(root, styles).length === 0 && m009.check(root).length === 0);
   const bare = workspace("m009-bare", { [`${WS}/open/031-probe/approach.html`]: page("1.9.0") }, [], { migrated: false });
   ok("where 1.11.0 has no hash it refuses and moves nothing",
     moveToTarget(bare, join(BASE, "empty-styles")).length === 1 && readFileSync(join(bare, WS, "open/031-probe/approach.html"), "utf8") === page("1.9.0"));
