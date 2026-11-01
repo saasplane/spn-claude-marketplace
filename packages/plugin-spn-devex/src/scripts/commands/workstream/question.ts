@@ -1,5 +1,6 @@
 // RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § Questions are records, and every card is one rendered
 //           RULE.DEVEX.WORKSPACE.486, a question is named Q<n> and a suggestion S<n>, with a capital letter, wherever a person reads it
+//           RULE.DEVEX.WORKSPACE.491 and .492, a proposal starts from the construct that exists, and its views are fresh and on record; RULE.DEVEX.AGENT.168
 // The chapter is the source of truth; a rule change is edited there first, then here, in the same change.
 // Input takes either case (`q28`, `Q28`, `036/Q28`); a stored id stays lowercase and everything printed or logged names the card with the capital.
 //
@@ -18,12 +19,13 @@ import { readFileSync, writeFileSync } from "node:fs";
 import { basename, resolve } from "node:path";
 import { type Action, VALUE, UsageFault, readAddress, readWords } from "../../../../../plugin-support-lib/src/lib/command.ts";
 import {
-  approachOf, arcIdsOf, fromWorkstream, inline, logEvent, now, questionsFileOf, readArc, readQuestions, readSheet, resolveRef, sheetFileOf, whatEntryOf,
+  approachOf, arcIdsOf, fromWorkstream, inline, logEvent, now, questionsFileOf, readArc, readQuestions, readSheet, resolveRef, sheetFileOf, whatEntryOf, workspaceOf,
   writeJsonl, writeOpenBlocks, writeWhole,
 } from "../../lib/workstream.ts";
 import { readGo } from "../../lib/go-plan.ts";
 import { isFile } from "../../lib/payload.ts";
-import { runningWorkFault } from "../../checks/questions.ts";
+import { PANELS_BLIND, raiseFaults, runningWorkFault } from "../../checks/questions.ts";
+import { panelsVisible } from "../../checks/split-plan.ts";
 import { QUESTION_ID, RECORD_VERSION, cardFaults, cardId, cardName, type Card, type Question } from "../../lib/workstream-schema.ts";
 import { afterWrite, arcNamed, arcSignatures, listOf, refreshIfMoved, typed } from "./_shared.ts";
 import { actions as goActions } from "./go.ts";
@@ -78,6 +80,12 @@ function raise(args: string[]): number {
   const faults = [...(typeof card.title === "string" && card.title.trim() ? [] : ["the card has no `title`"]), ...cardFaults(card)];
   if (faults.length) throw new UsageFault(`refuses a card with a part missing: ${faults.join("; ")}.`);
   if (!CITATION.test(card.what ?? "")) throw new UsageFault(UNCITED);
+  // A CARD RAISED NOW CARRIES THE FIELDS OF RULES 491 AND 492; a record read never needs them.
+  const root = workspaceOf();
+  const raised = raiseFaults(ws, arc, card, root);
+  if (raised.faults.length) throw new UsageFault(`refuses a card that leaves out what a proposal starts from: ${raised.faults.join("; ")}.`);
+  card.signs = raised.signs;
+  if (root && !panelsVisible(root) && card.views.some((view) => view.made === "FRESH")) console.log(PANELS_BLIND);
   const running = runningWorkFault(ws, card.title ?? "", (card.options ?? []).map((option) => option.does));
   if (running) throw new UsageFault(running);
   const records = readQuestions(ws);
@@ -88,7 +96,8 @@ function raise(args: string[]): number {
   // Claude Code gives every command its window's session id; run by hand, there is none and nothing is recorded.
   const raiser = (process.env.CLAUDE_CODE_SESSION_ID ?? "").trim();
   const record: Question = { v: RECORD_VERSION, id, arc, title: title!, state: "open", raised: now(), ...(raiser ? { raisedBy: raiser } : {}), shownIn: [],
-    card: { why: rest.why, what: rest.what, viewsLead: rest.viewsLead, views: rest.views, options: rest.options, recommended: rest.recommended }, answer: null };
+    card: { why: rest.why, what: rest.what, viewsLead: rest.viewsLead, views: rest.views, options: rest.options, recommended: rest.recommended,
+      nearest: rest.nearest, signs: rest.signs, others: rest.others, ...(rest.noLeaveIt ? { noLeaveIt: rest.noLeaveIt } : {}) }, answer: null };
   records.push(record);
   const lines = finish(ws, records);
   if (readArc(ws, arc)) logEvent(ws, arc, "question", null, `${cardName(id)} raised · ${title}`);

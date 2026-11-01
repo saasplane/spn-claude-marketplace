@@ -1,6 +1,7 @@
 // RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § A suggestion is recorded the moment it is raised
 //           RULE.DEVEX.WORKSPACE.486, a question is named Q<n> and a suggestion S<n>, with a capital letter, wherever a person reads it
 //           RULE.DEVEX.WORKSPACE.488, a suggestion belongs to an arc, as a card does, and the arc's sheet cites it
+//           RULE.DEVEX.WORKSPACE.491 and .492, a proposal starts from the construct that exists, and its views are fresh and on record; RULE.DEVEX.AGENT.168
 // The chapter is the source of truth; a rule change is edited there first, then here, in the same change.
 // Input takes either case (`q28`, `Q28`, `036/Q28`); a stored id stays lowercase and everything printed or logged names the card with the capital.
 //
@@ -10,10 +11,13 @@
 
 import { basename } from "node:path";
 import { type Action, VALUE, UsageFault, readWords } from "../../../../../plugin-support-lib/src/lib/command.ts";
-import { runningWorkFault } from "../../checks/questions.ts";
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
+import { PANELS_BLIND, raiseFaults, runningWorkFault } from "../../checks/questions.ts";
+import { panelsVisible } from "../../checks/split-plan.ts";
 import { precedentLines } from "../../lib/precedent.ts";
 import { readArc, readJsonl, suggestionsFileOf, workspaceOf, writeJsonl } from "../../lib/workstream.ts";
-import { RECORD_VERSION, SUGGESTION_ID, SUGGESTION_STATES, cardId, cardName, suggestionFaults, type Suggestion } from "../../lib/workstream-schema.ts";
+import { RECORD_VERSION, SUGGESTION_ID, SUGGESTION_STATES, cardFaults, cardId, cardName, suggestionFaults, type Card, type Suggestion } from "../../lib/workstream-schema.ts";
 import { arcNamed, refuseFlags, workstreamNamed } from "./_shared.ts";
 
 export const describe = "a suggestion, raised the moment it is raised and moved on as it is shaped, decided, parked or dropped";
@@ -59,15 +63,34 @@ function add(args: string[]): number {
   refuseFlags(args, ["state"], () => "does not take `--state`: a suggestion is raised, and `suggestion state <workstream> S<n> <state>` moves it on.");
   refuseFlags(args, ["words"], () => "does not take `--words`: the words come beside a move, `suggestion state <workstream> S<n> <state> --words \"…\"`.");
   refuseFlags(args, ["title"], () => "does not take `--title`: the title is the second word, `suggestion add <workstream> \"<title>\"`.");
-  const words = readWords(args, { preview: VALUE });
-  const [ref, title, ...more] = words.paths;
+  const words = readWords(args, { preview: VALUE, file: VALUE });
+  const [ref, given, ...more] = words.paths;
+  // A suggestion MAY CARRY THE SAME CARD A QUESTION DOES (RULE.DEVEX.WORKSPACE.491); the title-only form stays for one raised without it.
+  const cardFile = words.value("file");
+  let card: (Card & { title?: string }) | null = null;
+  if (cardFile) {
+    try { card = JSON.parse(readFileSync(resolve(cardFile), "utf8")); } catch { throw new UsageFault(`reads no JSON at \`${cardFile}\`.`); }
+  }
+  const title = given ?? card?.title;
   if (!title?.trim() || more.length) throw new UsageFault("takes a workstream, or an arc as `<workstream>/N<nnn>`, and one title: `suggestion add <workstream>[/N<nnn>] \"<title>\" [--preview …]`.");
   const { file, records } = load(ref);
   const place = placeOf(ref);
   const running = runningWorkFault(place.ws, title);
   if (running) throw new UsageFault(running);
+  let kept: Card | null = null;
+  if (card) {
+    if (!place.arc) throw new UsageFault("takes a card against an arc, `suggestion add <workstream>/N<nnn> \"<title>\" --file card.json`: its fresh views are on record for that arc.");
+    const { title: _title, ...rest } = card;
+    const root = workspaceOf();
+    const shape = cardFaults(rest);
+    const raised = raiseFaults(place.ws, place.arc, rest, root);
+    if (shape.length || raised.faults.length) throw new UsageFault(`refuses a card with a part missing: ${[...shape, ...raised.faults].join("; ")}.`);
+    rest.signs = raised.signs;
+    kept = rest;
+    if (root && !panelsVisible(root) && rest.views.some((view) => view.made === "FRESH")) console.log(PANELS_BLIND);
+  }
   const next = Math.max(0, ...records.map((one) => Number(/^s(\d+)$/.exec(one.id)?.[1] ?? 0))) + 1;
-  const record: Suggestion = { v: RECORD_VERSION, id: `s${next}`, title, state: "raised", preview: words.value("preview"), words: null, arc: place.arc };
+  const record: Suggestion = { v: RECORD_VERSION, id: `s${next}`, title, state: "raised", preview: words.value("preview"), words: null, arc: place.arc, ...(kept ? { card: kept } : {}) };
   records.push(record);
   const saved = save(file, records, record);
   for (const line of precedentLines(workspaceOf(), title)) console.log(line);
@@ -133,7 +156,7 @@ function write(args: string[]): number {
 }
 
 export const actions: Record<string, Action> = {
-  add: { describe: "raise a suggestion: the next number, raised; it also prints the decisions and rules that already speak to its title", usage: "<workstream>[/N<nnn>] \"<title>\" [--preview …]", run: add },
+  add: { describe: "raise a suggestion: the next number, raised; it also prints the decisions and rules that already speak to its title", usage: "<workstream>[/N<nnn>] \"<title>\" [--preview …] [--file card.json]", run: add },
   state: { describe: "move it on: shaped, decided, parked or dropped, with the words beside the move", usage: "<workstream> S<n> <state> [--words \"…\"] [--arc N<nnn>]", run: state },
   edit: { describe: "change its title or its preview, never its state", usage: "<workstream> S<n> [--title …] [--preview …]", run: edit },
   write: { describe: "retired: refuses, and names the command that fits what it was typed with", usage: "<workstream> [S<n>] …", hidden: true, run: write },

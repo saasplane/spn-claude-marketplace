@@ -118,7 +118,7 @@ console.log("\n=== a preview's Open follows the records on every write");
 
 console.log("\n=== a card that asks how the work runs is refused at raise, unless the workstream changes the agent");
 {
-  const RUNS = { ...CARD, title: "Discard the develop baseline?", options: [{ key: "A", does: "Keep the baseline", costs: "little" }, { key: "B", does: "Take the baseline again", costs: "more" }] };
+  const RUNS = { ...CARD, title: "Discard the develop baseline?", options: [{ key: "A", does: "Keep the baseline", costs: "little", leaveIt: true }, { key: "B", does: "Take the baseline again", costs: "more" }] };
   // A workstream like 035: its arc reaches spn-x only, even in the builder's workspace.
   const plain = await dataWorkspace("questions-baseline");
   put(plain.root, "runs.json", JSON.stringify(RUNS));

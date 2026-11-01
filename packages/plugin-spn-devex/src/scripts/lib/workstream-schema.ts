@@ -1,4 +1,5 @@
 // RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § An arc is cut by what is reviewed and released together, and named for its domain · § The formats · § An arc's status is one of six, stored or worked out · § Questions are records, and every card is one rendered · § A suggestion is recorded the moment it is raised · § Ideation is kept as it happens
+//           RULE.DEVEX.WORKSPACE.491 and .492, a proposal starts from the construct that exists, and its views are fresh and on record; RULE.DEVEX.AGENT.168
 // The chapter is the source of truth; a rule change is edited there first, then here, in the same change.
 //
 // The one schema for every file a script owns in a workstream. `workstream state check` runs it, and
@@ -92,9 +93,18 @@ export type ArcData = {
 export type LogLine = { at: string; kind: string; row?: string | null; note?: string | null; [field: string]: unknown };
 export type Fact = { v?: number; id: string; fact: string; source: string; commit: string; readAt: string; usedBy: string[]; [field: string]: unknown };
 export type Suggestion = { v?: number; id: string; title: string; state: string; preview: string | null; words: string | null; [field: string]: unknown };
-export type View = { lens: string; text: string };
-export type Option = { key: string; does: string; costs: string };
-export type Card = { why: string; what: string; viewsLead: string; views: View[]; options: Option[]; recommended: { key: string; reason: string } };
+/** `made` and `words` are written on a card raised after RULE.DEVEX.WORKSPACE.492; a FRESH view's `words` is a file under the arc's `notes/N<nnn>/work/`. */
+export type View = { lens: string; text: string; made?: string; words?: string };
+export type Option = { key: string; does: string; costs: string; leaveIt?: boolean };
+/** The fields a card carries from RULE.DEVEX.WORKSPACE.491: all optional on read, all required when a card is raised or added (`raisedCardFaults`). */
+export type Card = {
+  why: string; what: string; viewsLead: string; views: View[]; options: Option[]; recommended: { key: string; reason: string; scope?: string };
+  nearest?: string; signs?: string[]; others?: string; noLeaveIt?: string;
+};
+/** The signs of complexity a card may declare (RULE.DEVEX.WORKSPACE.491), and how a view was made (RULE.DEVEX.WORKSPACE.492). */
+export const SIGNS = ["CROSSES_REPO", "CHANGES_PARTNER_SURFACE", "SETS_PATTERN"] as const;
+export const VIEW_MADE = ["FRESH", "SPOKEN"] as const;
+export const SCOPES = ["CORE", "PERIPHERY"] as const;
 export type Answer = { key?: string | null; words: string; at: string };
 /** `raisedBy` is the session id of the window that raised the card; a card raised before it was recorded has none. */
 export type Question = { v?: number; id: string; arc: string; title: string; state: string; raised: string; raisedBy?: string; shownIn: string[]; card: Card; answer: Answer | null; [field: string]: unknown };
@@ -312,6 +322,33 @@ export function cardFaults(card: unknown, where = "the card"): string[] {
   if (!isObject(recommended) || !text(recommended.key) || !text(recommended.reason)) out.push(`${where} has no \`recommended\` key and reason`);
   else if (!options.some((option) => isObject(option) && option.key === recommended.key))
     out.push(`${where} recommends \`${String(recommended.key)}\`, which is none of its options`);
+  return out;
+}
+
+/**
+ * What a card raised now must carry on top of `cardFaults` (RULE.DEVEX.WORKSPACE.491 and .492): its nearest construct, its signs, its
+ * others, a leave-it option or the reason for none, core or periphery, and how each view was made. APPLIED ONLY WHEN A CARD IS RAISED OR
+ * ADDED, never to a record read, so a card raised before it reads clean. The checks that need the workspace are `raiseFaults`.
+ */
+export function raisedCardFaults(card: unknown, where = "the card"): string[] {
+  if (!isObject(card)) return [`${where} is not a JSON object`];
+  const out: string[] = [];
+  const text = (value: unknown) => typeof value === "string" && value.trim().length > 0;
+  if (!text(card.nearest)) out.push(`${where} has no \`nearest\`: the path of the nearest existing construct of its kind, or \`"none"\``);
+  if (!Array.isArray(card.signs) || card.signs.some((sign) => !(SIGNS as readonly unknown[]).includes(sign)))
+    out.push(`${where}'s \`signs\` is not a list drawn from ${SIGNS.join(" · ")} (an empty list is whole)`);
+  if (!text(card.others)) out.push(`${where} has no \`others\`: the options considered and set aside`);
+  const options = Array.isArray(card.options) ? card.options : [];
+  if (!options.some((option) => isObject(option) && option.leaveIt === true) && !text(card.noLeaveIt))
+    out.push(`${where} has no option marked \`leaveIt: true\` and no \`noLeaveIt\` saying why leaving it does not apply`);
+  const recommended = card.recommended;
+  if (!isObject(recommended) || !(SCOPES as readonly unknown[]).includes(recommended.scope))
+    out.push(`${where}'s \`recommended.scope\` is not one of ${SCOPES.join(" · ")}`);
+  for (const [at, view] of (Array.isArray(card.views) ? card.views : []).entries()) {
+    if (!isObject(view)) continue;
+    if (!(VIEW_MADE as readonly unknown[]).includes(view.made)) out.push(`${where}'s view ${at + 1} has no \`made\`, and it is one of ${VIEW_MADE.join(" · ")}`);
+    else if (view.made === "FRESH" && !text(view.words)) out.push(`${where}'s view ${at + 1} is FRESH and names no \`words\` file under the arc's notes work folder`);
+  }
   return out;
 }
 

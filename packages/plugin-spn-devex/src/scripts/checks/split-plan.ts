@@ -1361,8 +1361,9 @@ export const panelsVisible = (root: string): boolean => telemetryDir(root) !== n
  * accepts a row of any part. Never throws.
  *
  * @param since  an ISO time, or null for any time
+ * @param lens   a lens the row must name (RULE.DEVEX.WORKSPACE.492), or null for any
  */
-export function panelOnRecord(root: string, workstream: string, arc: string, part: string | null, since: string | null = null): boolean {
+export function panelOnRecord(root: string, workstream: string, arc: string, part: string | null, since: string | null = null, lens: string | null = null): boolean {
   const from = since === null ? Number.NEGATIVE_INFINITY : Date.parse(since);
   for (const log of TELEMETRY_LOGS) {
     try {
@@ -1373,6 +1374,7 @@ export function panelOnRecord(root: string, workstream: string, arc: string, par
           try { row = JSON.parse(raw); } catch { continue; }
           if (row.v !== 1 || row.mtype !== SPDevExWorkspaceTelemetryRowType.PANEL || row.workstream !== workstream || row.arc !== arc) continue;
           if (row.verdict === SPDevExAgentPanelVerdictType.BLOCKED) continue;
+          if (lens !== null && row.lens !== lens) continue;
           if (part !== null && row.part !== null && row.part !== undefined && row.part !== part) continue;
           const at = Date.parse(String(row.at));
           if (!Number.isNaN(from) && (Number.isNaN(at) || at < from)) continue;
