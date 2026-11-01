@@ -89,6 +89,9 @@ same("[MKT.SCRIPTS.307] a plan with a follow-up part holds to its schema", goFau
 const followed = deriveGo(changed, { previous: landedAll });
 same("[MKT.SCRIPTS.307] a landed part's change that a follow-up part carries is not stale", staleEntries(followed.parts.find((p) => p.id === "code-lib-repo-1"), followed, changed), []);
 same("[MKT.SCRIPTS.307] a landed part's change that no part carries is stale", staleEntries(landedAll.parts.find((p) => p.id === "code-lib-repo-1"), landedAll, changed), ["N009/E2"]);
+const heldNow = { ...landedAll, parts: [{ ...landedAll.parts.find((p) => p.id === "code-lib-repo-1"), id: "code-lib-repo-0", signature: entryHash(changed[0].sheet.entries[1]) }, ...landedAll.parts] };
+same("[MKT.SCRIPTS.307] a landed part's change that an earlier landed part holds as it stands now is not stale", staleEntries(heldNow.parts.find((p) => p.id === "code-lib-repo-1"), heldNow, changed), []);
+same("[MKT.SCRIPTS.307] and go write adds no follow-up part for it", deriveGo(changed, { previous: heldNow }).parts.filter((p) => p.entries.includes("N009/E2")).map((p) => p.id), ["code-lib-repo-0", "code-lib-repo-1"]);
 const doneFirst = deriveGo([{ ...scope[0], landed: ["E2", "E3"] }]);
 same("[MKT.SCRIPTS.320] an entry a landed row holds is in no part", doneFirst.parts.flatMap((p) => p.entries), ["N009/E1"]);
 same("[MKT.SCRIPTS.320] a repository whose entries all landed gets no docs or code part", doneFirst.parts.filter((p) => p.repo === "lib-repo" && p.work !== "RELEASE").map((p) => p.id), []);
