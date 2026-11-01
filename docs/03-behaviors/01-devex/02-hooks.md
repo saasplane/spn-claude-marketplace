@@ -185,6 +185,8 @@ Every row below is declared and none is claimed: a run writes the last two cells
 | MKT.HOOKS.389 | Backend developer | be refused a process list that prints environments | `process-list` refuses `pgrep -f` and `ps` with `-f` or `-ww`, which print each process's environment, and names `pgrep -l` and `lsof`; those two pass | NEGATIVE | UNIT | PLANNED | — |
 | MKT.HOOKS.390 | Backend developer | be refused a publish outside the release, and a seat value printed to the log | `publish-lockstep` refuses `npm publish` and `pnpm publish` in a repository that has a release command and names that command (RULE.DEVEX.AGENT.109 · MUST, RULE.DEVEX.AGENT.110 · MUST); `seat-print` refuses a command that would print a value from the seat file and names the key to read by name | NEGATIVE | UNIT | PLANNED | — |
 | MKT.HOOKS.401 | Editor | be told when a book page cites one of this workspace's own workstreams | `doc-check` flags a book page that cites the id of a workstream of this workspace, and passes an approach page and a partner's own Q3 (RULE.DEVEX.WORKSPACE.484 · MUST) | NEGATIVE | UNIT | PLANNED | — |
+| MKT.HOOKS.404 | Backend developer | still be asked what only I can do, behind a card's label | A card's line passes with the Needs you label (bold or not) before its Q<n> or S<n>, and a label with no card number does not | POSITIVE | UNIT | PLANNED | — |
+| MKT.HOOKS.405 | Backend developer | still be asked about an act outside my standing grants | An ask that names a cloud apply, production, a teardown or destroy, or an act that cannot be undone passes how-it-runs, and the same ask without those words is sent back | POSITIVE | UNIT | PLANNED | — |
 
 ## Retired ids
 
