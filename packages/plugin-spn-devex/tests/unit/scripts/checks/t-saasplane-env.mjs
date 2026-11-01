@@ -58,4 +58,5 @@ for (const [label, ok] of [
   ["[MKT.SCRIPTS.380] the refusal asks the developer to type a secret in their own editor", said.includes("own editor")],
   ["[MKT.SCRIPTS.380] the refusal no longer sends the agent to `workspace status` for keys", !said.includes("keys-only door")],
 ]) { console.log(`  ${ok ? "PASS" : "FAIL"}  ${label}`); if (!ok) failed += 1; }
+console.log(failed ? `\n${failed} failed — saasplane-env` : `\nall ${cases.length + 4} passed — saasplane-env`);
 process.exit(failed ? 1 : 0);
