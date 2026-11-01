@@ -18,6 +18,7 @@ import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { type Action, FLAG, VALUE, UsageFault, readWords } from "../../../../../plugin-support-lib/src/lib/command.ts";
 import { logFiles, telemetryFolder } from "../../../../../plugin-support-lib/src/lib/debug-store.ts";
+import { workstreamsDir, type WorkstreamState } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { workspaceRoot } from "../../../../../plugin-support-lib/src/lib/timing.ts";
 import {
   SPDevExAgentHookVerdictType, SPDevExStageType, SPDevExWorkspaceTelemetryEventType, SPDevExWorkspaceTelemetryRowType, SPDevExWorkspaceTelemetryVersionType,
@@ -189,7 +190,7 @@ const span = (ms: number): string => (ms > 0 ? clock(ms) : "—");
 function workstreamOf(root: string, target: string): string | null {
   if (target === "all" || target.startsWith("window/") || target.includes("/")) return null;
   for (const state of ["open", "closed", "backlog"]) {
-    const dir = join(root, ".spndevex", "workstreams", state);
+    const dir = workstreamsDir(root, state as WorkstreamState);
     if (!existsSync(dir)) continue;
     const found = readdirSync(dir).find((name) => name === target || (/^\d{3}$/.test(target) && name.startsWith(`${target}-`)));
     if (found) return found;

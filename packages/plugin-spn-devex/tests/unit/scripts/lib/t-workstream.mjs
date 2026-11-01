@@ -287,6 +287,9 @@ console.log("\n=== the folder — what a script owns, and where a reference poin
   ok("the arc's name file beside its data is a script's", lib.scriptOwned(`${base}/arcs/N007/layout-model.md`)?.file === "arcs/N007/layout-model.md");
   ok("an arc's address is its row on the approach page", lib.arcAddress("N013") === "approach.html#N013" && lib.arcAddress("N013", "../../") === "../../approach.html#N013");
   const { root, ws } = await dataWorkspace("t-workstream-lib");
+  // SPN_WORKSPACE names the workspace a command reads before any root it is handed, and a suite run may set it,
+  // so these cases take it out to read the fixture.
+  delete process.env.SPN_WORKSPACE;
   ok("an arc named with its workstream resolves", lib.resolveArc("031/N001", root).ws === ws);
   ok("an arc named alone resolves where one workstream holds it", lib.resolveArc("N001", root).arc === "N001");
   let said = "";

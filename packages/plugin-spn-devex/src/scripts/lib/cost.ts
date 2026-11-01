@@ -15,6 +15,7 @@ import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { basename, dirname, join } from "node:path";
 import { UsageFault } from "../../../../plugin-support-lib/src/lib/command.ts";
 import { logFiles, sessionDir, telemetryFolder } from "../../../../plugin-support-lib/src/lib/debug-store.ts";
+import { workstreamsDir, type WorkstreamState } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import {
   SPDevExWorkspaceTelemetryRowType, SPDevExWorkspaceTelemetryVersionType, stageOf,
 } from "../../../../plugin-support-lib/src/lib/telemetry-values.ts";
@@ -192,7 +193,7 @@ const STATES = ["open", "closed", "backlog"] as const;
 /** The folder of a workstream, by its folder name, wherever it sits in the lifecycle; null with none. */
 function workstreamFolder(root: string, workstream: string): string | null {
   for (const state of STATES) {
-    const dir = join(root, ".spndevex", "workstreams", state, workstream);
+    const dir = join(workstreamsDir(root, state as WorkstreamState), workstream);
     if (existsSync(dir)) return dir;
   }
   return null;

@@ -1953,6 +1953,10 @@ console.log("\n=== stop — send-backs are written as they are said, the welcome
       && ["needs-you", "reply-shape", "cards", "handover", "how-it-runs", "partner-words", "page-path", "welcome", "window"].every((name) => payloadLib.REPLY_CHECKS.has(name)),
     JSON.stringify([...(payloadLib.REPLY_CHECKS ?? [])]));
 
+  // The suite runs with SPN_TELEMETRY=off (tests/run.mjs); these cases read the rows a hook writes, so they take it out
+  // for the hooks they spawn and put it back after.
+  const telemetryWas = process.env.SPN_TELEMETRY;
+  delete process.env.SPN_TELEMETRY;
   {
     const { root, ws } = await dataWorkspace("n015-sendback");
     editRows(ws, (data) => { data.rows[0].state = "landed"; });
@@ -1979,6 +1983,7 @@ console.log("\n=== stop — send-backs are written as they are said, the welcome
     const out = run("node", [HOOK], { cwd: root, session_id: "sb-held", last_assistant_message: PROMISE }, root);
     check("[MKT.HOOKS.341] a held finding writes none", !out.includes("[runnable]") && sendbacks(root).every((line) => line.check !== "runnable"), `${out.slice(0, 200)} · ${JSON.stringify(sendbacks(root))}`);
   }
+  if (telemetryWas === undefined) delete process.env.SPN_TELEMETRY; else process.env.SPN_TELEMETRY = telemetryWas;
 
   // THE WELCOME IS HELD TO THE WHOLE ONLY WHERE THE SESSION START SENT IT (s47).
   const cut = welcome("Dhruv", false).join("\n").replace(" · **Finance and business**.", "");
