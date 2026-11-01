@@ -11,7 +11,7 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { workspace } from "../../../helpers/fixture.mjs";
 
-const { RUN_BOUND_MS, applies, checkTestRun, isTestCommand, testRuns } = await import("../../../../src/scripts/checks/test-run.ts");
+const { RUN_BOUND_MS, applies, checkTestRun, isTestCommand, runNameOfCommand, testRuns } = await import("../../../../src/scripts/checks/test-run.ts");
 
 let total = 0, failed = 0;
 const ok = (label, condition, detail = "") => {
@@ -250,6 +250,40 @@ console.log("\n=== a whole suite runs only while a baseline or full run of the g
   const early = checkTestRun(bash(waiting, "node scripts/test-all.mjs"), NOW)?.deny ?? "";
   ok("[MKT.HOOKS.301] before the releases have landed it still names the full run, not the proof",
     !early.includes("proof-spn-x"), early);
+}
+
+console.log("\n=== a follow-up batch after a close runs its whole suite under followup-<NNN>-<n> (RULE.DEVEX.WORKSPACE.496)");
+{
+  const suggestions = (...states) => `${states.map((state, at) => JSON.stringify({ id: `s${at + 1}`, title: `t${at + 1}`, state, preview: null, words: null })).join("\n")}\n`;
+  const at = (name, files) => workspace(name, { "spn-x/README.md": "x\n", ...files });
+  const bash = (root, command) => ({ tool_name: "Bash", cwd: join(root, "spn-x"), tool_input: { command } });
+  const closedWith = (name, ...states) => at(name, { ".spndevex/workstreams/closed/036-probe/suggestions.jsonl": suggestions(...states) });
+  const ALL = [["`spnutils apps test`", (run) => `spnutils apps test unit ${run} api`], ["`node scripts/test-all.mjs`", (run) => `node scripts/test-all.mjs ${run}`]];
+
+  const decided = closedWith("followup-ok", "decided", "raised");
+  for (const [what, command] of ALL)
+    ok(`[MKT.HOOKS.437] green: a whole suite by ${what} under followup-036-1 passes while 036 is closed and holds a decided suggestion`,
+      checkTestRun(bash(decided, command("followup-036-1")), NOW) === null, JSON.stringify(checkTestRun(bash(decided, command("followup-036-1")), NOW)));
+  const open = at("followup-open", { ".spndevex/workstreams/open/036-probe/suggestions.jsonl": suggestions("decided") });
+  const none = closedWith("followup-none", "raised", "parked", "dropped");
+  for (const [what, command] of ALL) {
+    ok(`[MKT.HOOKS.437] red: the same name for an open workstream is refused (${what})`, verdictOf(checkTestRun(bash(open, command("followup-036-1")), NOW)) === "deny");
+    ok(`[MKT.HOOKS.437] red: and for a closed workstream with no decided suggestion (${what})`, verdictOf(checkTestRun(bash(none, command("followup-036-1")), NOW)) === "deny");
+    for (const odd of ["followup-36-1", "followup-036", "followup-036-1-x", "run-036-1", "Followup-036-1"])
+      ok(`[MKT.HOOKS.437] red: a name of another shape, ${odd}, is refused (${what})`, verdictOf(checkTestRun(bash(decided, command(odd)), NOW)) === "deny");
+  }
+  ok("[MKT.HOOKS.437] red: a closed workstream of another number is refused", verdictOf(checkTestRun(bash(decided, "spnutils apps test unit followup-037-1 api"), NOW)) === "deny");
+  ok("[MKT.HOOKS.437] the run name is the first plain word after the command's own", runNameOfCommand(reading("spnutils", "apps", "test", "unit followup-036-2 api")) === "followup-036-2"
+    && runNameOfCommand(reading("test-all.mjs", null, "followup-036-3", "")) === "followup-036-3" && runNameOfCommand(reading("test-all.mjs", null, null, "")) === null);
+
+  // The push check counts the stamped run by what it proved, not by how the run was started.
+  const { proofOf } = await import("../../../../src/scripts/checks/push-tiers.ts");
+  const node = join(decided, "spn-x", "packages", "api");
+  const runs = join(node, "tests", ".output", "unit", "runs");
+  mkdirSync(runs, { recursive: true });
+  writeFileSync(join(runs, "followup-036-1.json"), JSON.stringify({ run: "followup-036-1", tier: "unit", results: [{ id: "a", status: "SUCCESS" }] }), "utf8");
+  writeFileSync(join(runs, "followup-036-1.stamp.json"), JSON.stringify({ tier: "UNIT", narrowed: false, content: "abc" }), "utf8");
+  ok("[MKT.HOOKS.437] the push check counts a stamped followup run as it counts a full run's", proofOf(join(decided, "spn-x"), "packages/api", "unit", "abc").ok === true, JSON.stringify(proofOf(join(decided, "spn-x"), "packages/api", "unit", "abc")));
 }
 
 console.log(failed ? `\n  ${failed} of ${total} FAILED — test-run` : `\n  all ${total} passed — test-run`);

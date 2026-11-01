@@ -203,6 +203,7 @@ Every row below is declared and none is claimed: a run writes the last two cells
 | MKT.HOOKS.417 | Engineering leader | not converge a workstream's folder by mistake | A tool-call check refuses `spnutils workspace init`, `spnutils workspace agent-sync` and a plugin install or update run with the working folder (or a `cd`) inside `.spndevex/workstreams`, and names the scratchpad as the place for a probe | NEGATIVE | UNIT | PLANNED | — |
 | MKT.HOOKS.418 | Engineering leader | sync every member from the root | A tool-call check refuses `spnutils repo agent-sync` run in a workspace member or a worktree, and names `spnutils workspace agent-sync` | NEGATIVE | UNIT | PLANNED | — |
 | MKT.HOOKS.427 | Developer | have every proposal in chat recorded | A turn-end check sends back a reply that sets out lettered options (a table, or a list of A. / B. / bold-letter lines) and names no Q<n> or S<n> that holds a record in the window's workstream (RULE.DEVEX.WORKSPACE.493) | NEGATIVE | UNIT | PLANNED | — |
+| MKT.HOOKS.437 | Builder | run a follow-up batch's whole suite after a close | The whole-suite check lets a run through when its name is `followup-<NNN>-<n>` and workstream `<NNN>` is closed and holds a suggestion that reads decided, and refuses the same name for an open workstream, a closed one with no decided suggestion, and a name of another shape; the push check counts the stamped run as a full run's (RULE.DEVEX.WORKSPACE.496) | NEGATIVE | UNIT | PLANNED | — |
 
 ## Retired ids
 
