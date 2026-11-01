@@ -104,7 +104,7 @@ const ownCard = (n, decision) => card(n, decision).replace(/class="sds-(open|scr
 const dataArc = (id, status = "LANDED", rows = []) => `${JSON.stringify({ schemaVersion: 2, arc: id, subject: "the-arc",
   title: "the arc", goal: "it lands", status, reason: ["CARRIED", "DROPPED"].includes(status) ? "a reason" : null,
   preview: "preview.html", rows: rows.map(([rowId, repo, title, state, fields = {}]) =>
-    ({ id: rowId, parent: id, title, kind: "change", repo, altitude: "DOCS", state, ...fields })) }, null, 2)}\n`;
+    ({ id: rowId, parent: id, title, kind: "change", repo, work: "DOCS", state, ...fields })) }, null, 2)}\n`;
 // A line of an arc's `log.jsonl`.
 const logLine = (kind, note, row = null, at = "2026-09-29T14:32+05:30") => `${JSON.stringify({ at, kind, row, note })}\n`;
 // The workstream's question records, each answered in the developer's words.
@@ -808,7 +808,7 @@ console.log("\n=== split-plan — a page that holds its own copy of the styles")
   // a write under src/ or tests/ of that repository.
   const decided = (rows) => ({ "arcs/N2/state.json": dataArc("N2", "DECIDED", rows) });
   const code = (root) => ({ file_path: join(root, "probe-repo", "packages", "p", "src", "a.ts"), content: "export const a = 1;\n" });
-  const docsWaiting = [["1", "probe-repo", "write the documents", "waiting"], ["2", "probe-repo", "write the code", "waiting", { altitude: "CODE" }]];
+  const docsWaiting = [["1", "probe-repo", "write the documents", "waiting"], ["2", "probe-repo", "write the code", "waiting", { work: "CODE" }]];
   console.log("\n=== split-plan — documents first: a code write waits for the repository's documents row");
   {
     const root = buildArcs("m104-docs-waiting", docsWaiting, { extra: decided(docsWaiting) });
@@ -819,11 +819,11 @@ console.log("\n=== split-plan — a page that holds its own copy of the styles")
       tests, "deny", { says: "Land the documents first", parity: false, why: "the Python never read the arc's rows for a code write" });
   }
   {
-    const landed = [["1", "probe-repo", "write the documents", "landed"], ["2", "probe-repo", "write the code", "waiting", { altitude: "CODE" }]];
+    const landed = [["1", "probe-repo", "write the documents", "landed"], ["2", "probe-repo", "write the code", "waiting", { work: "CODE" }]];
     const root = buildArcs("m105-docs-landed", landed, { extra: decided(landed) });
     one("[MKT.HOOKS.105] a landed documents row lets the code be written", "documents-first", root, code(root), "silent",
       { parity: false, why: "the Python never read the arc's rows for a code write" });
-    const none = [["1", "probe-repo", "write the code", "waiting", { altitude: "CODE" }]];
+    const none = [["1", "probe-repo", "write the code", "waiting", { work: "CODE" }]];
     const bare = buildArcs("m105-no-docs-row", none, { extra: decided(none) });
     one("[MKT.HOOKS.105] a repository with no documents row is not held", "documents-first", bare, code(bare), "silent",
       { parity: false, why: "the Python never read the arc's rows for a code write" });
@@ -838,7 +838,7 @@ console.log("\n=== split-plan — a page that holds its own copy of the styles")
     callers: [], tiers: {}, docs: [], book: [] });
   const sheet = (ids) => `${JSON.stringify({ schemaVersion: 1, releaseChain: [], dependsOn: [], stack: null, entries: ids.map(entry) })}\n`;
   const plan = (state, entries = ["N2/E1"], signature = entryHash(entry("E1"))) => `${JSON.stringify({ schemaVersion: 1, lead: "N2", scope: ["N2"],
-    writtenAt: "2026-10-31T10:00:00.000Z", parts: [{ id: "code-probe-repo-1", repo: "probe-repo", pass: "CODE", entries, tests: [], minutes: null,
+    writtenAt: "2026-10-31T10:00:00.000Z", parts: [{ id: "code-probe-repo-1", repo: "probe-repo", work: "CODE", entries, tests: [], minutes: null,
       measuredFrom: null, waitsOn: [], model: "sonnet", signature, state }] })}\n`;
   const closing = (name, files) => buildArcs(name, ARC_LANDED, { page: true, extra: files });
   const shut = (root) => move(`.spndevex/${WORKSTREAMS}/open/001-a-subject`, `.spndevex/${WORKSTREAMS}/closed/`);

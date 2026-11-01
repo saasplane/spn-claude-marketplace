@@ -373,7 +373,7 @@ console.log("\n=== the landing gate reads the tree and names every fault — MKT
   const { put, cli } = await import("../../../helpers/workstream-fixture.mjs");
   const { execFileSync } = await import("node:child_process");
   const { contentHash } = await import("../../../../src/scripts/checks/push-tiers.ts");
-  const row = { id: "1", parent: "N001", title: "build it", kind: "change", repo: "spn-x", altitude: "CODE", blockedBy: [], touches: [], state: "ready", entries: ["E1"] };
+  const row = { id: "1", parent: "N001", title: "build it", kind: "change", repo: "spn-x", work: "CODE", blockedBy: [], touches: [], state: "ready", entries: ["E1"] };
   const w = await dataWorkspace("t-workstream-landing-tree", { rows: [row] });
   put(w.repo, "pkg/x.ts", "export const x = 1;\n");
   w.git(["add", "-A"]);
@@ -422,7 +422,7 @@ console.log("\n=== the landing gate reads the tree and names every fault — MKT
 
 console.log("\n=== a row that waits on something outside the window is never ready — MKT.HOOKS.322");
 {
-  const rows = (extra) => [{ id: "1", parent: "N001", title: "a release", kind: "change", repo: "spn-x", altitude: "CODE", blockedBy: [], touches: ["marketplace:b"], state: "waiting", ...extra }];
+  const rows = (extra) => [{ id: "1", parent: "N001", title: "a release", kind: "change", repo: "spn-x", work: "CODE", blockedBy: [], touches: ["marketplace:b"], state: "waiting", ...extra }];
   const idsOf = (data) => lib.readyRows("/nowhere", data, []).map((row) => row.id);
   const waits = arcData(rows({ waitingOn: "the 035 window" }));
   ok("[MKT.HOOKS.322] a waiting row with waitingOn and every blocker resolved is not in readyRows", idsOf(waits).length === 0, JSON.stringify(idsOf(waits)));
@@ -433,6 +433,26 @@ console.log("\n=== a row that waits on something outside the window is never rea
   ok("[MKT.HOOKS.322] waitingOn is taken as text by the row's field rules", schema.arcFaults(waits).length === 0, schema.arcFaults(waits).join("; "));
   const bad = arcData(rows({ waitingOn: 3 }));
   ok("[MKT.HOOKS.322] a waitingOn that is not words fails", /waitingOn/.test(schema.arcFaults(bad).join("; ")), schema.arcFaults(bad).join("; "));
+}
+
+console.log("\n=== work replaces altitude and pass — MKT.SCRIPTS.326");
+{
+  const base = arcData();
+  const rowOf = (extra) => ({ ...base, rows: [{ ...base.rows[0], ...extra }] });
+  ok("[MKT.SCRIPTS.326] a row's work inside the copy holds", schema.arcFaults(rowOf({ work: "CODE" })).length === 0, schema.arcFaults(rowOf({ work: "CODE" })).join("; "));
+  ok("[MKT.SCRIPTS.326] red: a row's work outside the copy is refused", /work/.test(schema.arcFaults(rowOf({ work: "WANDER" })).join("; ")), schema.arcFaults(rowOf({ work: "WANDER" })).join("; "));
+  const entry = { id: "E1", op: "edit", file: "spn-x:a.ts", what: "w", decidedBy: [], facts: ["f1"], then: [], rules: [], callers: [], tiers: {}, docs: [], book: [] };
+  const sheet = (extra) => ({ schemaVersion: 1, releaseChain: [], dependsOn: [], stack: { folder: "x", dmo: "none", reset: "x" }, entries: [{ ...entry, ...extra }] });
+  ok("[MKT.SCRIPTS.326] an entry's work inside the copy holds", schema.sheetFaults(sheet({ work: "DOCS" })).length === 0, schema.sheetFaults(sheet({ work: "DOCS" })).join("; "));
+  ok("[MKT.SCRIPTS.326] red: an entry's work outside the copy is refused", /work/.test(schema.sheetFaults(sheet({ work: "WANDER" })).join("; ")), schema.sheetFaults(sheet({ work: "WANDER" })).join("; "));
+  const old = { id: "docs-x-1", pass: "BASELINE", altitude: "CODE" };
+  ok("[MKT.SCRIPTS.326] renameToWork: a part's pass BASELINE is renamed to work TEST", schema.renameToWork(old) === true && old.work === "CODE" && !("pass" in old) && !("altitude" in old), JSON.stringify(old));
+  const part = { id: "baseline-x", pass: "FULL_RUN" };
+  schema.renameToWork(part);
+  ok("[MKT.SCRIPTS.326] a FULL_RUN pass becomes TEST", part.work === "TEST" && !("pass" in part), JSON.stringify(part));
+  const data = { rows: [{ id: "1", altitude: "DOCS" }, { id: "2", work: "CODE" }], parts: [{ id: "p", pass: "BASELINE" }] };
+  ok("[MKT.SCRIPTS.326] renameDataToWork counts the records it renamed", schema.renameDataToWork(data) === 2 && data.rows[0].work === "DOCS" && data.parts[0].work === "TEST", JSON.stringify(data));
+  ok("[MKT.SCRIPTS.326] a second read changes nothing", schema.renameDataToWork(data) === 0 && schema.renameToWork(data.rows[0]) === false);
 }
 
 console.log(failed ? `\n  ${failed} of ${total} FAILED — workstream library` : `\n  all ${total} passed — workstream library`);

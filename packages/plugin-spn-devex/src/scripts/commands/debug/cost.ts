@@ -14,16 +14,19 @@
 // The classes are the 31 October measure's (`036-agent-follows-rules`, notes N010 `slowness-measure.md`): its MANAGE is managing, its
 // CHANGE and PROOF the same, its REFUSED and RETRY together refusals, and its READ is kept as reading, with no column.
 
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { type Action, FLAG, VALUE, UsageFault, readWords } from "../../../../../plugin-support-lib/src/lib/command.ts";
 import { logFiles, telemetryFolder } from "../../../../../plugin-support-lib/src/lib/debug-store.ts";
 import { workspaceRoot } from "../../../../../plugin-support-lib/src/lib/timing.ts";
+import {
+  SPDevExAgentHookVerdictType, SPDevExStageType, SPDevExWorkspaceTelemetryEventType, SPDevExWorkspaceTelemetryRowType, SPDevExWorkspaceTelemetryVersionType,
+} from "../../../../../plugin-support-lib/src/lib/telemetry-values.ts";
 import { TEST_RUNNERS } from "../../lib/command-reader.ts";
-import { type CostRow, readCost } from "../../lib/cost.ts";
+import { type CostRow, type GoBlock, NO_STAGE, type StageLine, type WindowLine, readCost, readTime } from "../../lib/cost.ts";
 import { MODEL_PRICES } from "../../lib/model-prices.ts";
 
-export const describe = "what a target cost, read from the telemetry: replies, tokens, the model's time, the model and the money, and a workstream's calls split into change, proof, managing, refusals and waiting";
+export const describe = "what a target cost, read from the telemetry: replies, tokens, the model's time, the model and the money, a workstream's calls split into change, proof, managing, refusals and waiting, and its time by stage, by go and by window";
 
 /** A count as a person reads it: millions and thousands with their letter. */
 function shown(n: number): string {
@@ -63,157 +66,80 @@ export type SplitScope = { from?: number; to?: number; lead?: boolean };
 
 /** A gap longer than this between two calls of a window is the window waiting, not working. */
 const WAIT_MS = 5 * 60_000;
-/** A refusal is retried by a call within this many calls of it (4 in the measure), a proof run within `PROOF_RETRY` of a land, test-run or push refusal. */
-const RETRY_CALLS = 4, PROOF_RETRY = 10;
 
 const text = (value: unknown): string | null => (typeof value === "string" && value ? value : null);
-
-/** The strongest wins: change over proof over managing over reading (the measure's order). */
-const STRENGTH: readonly Kind[] = ["reading", "managing", "proof", "change"];
-const stronger = (a: Kind | null, b: Kind): Kind => (a !== null && STRENGTH.indexOf(a) >= STRENGTH.indexOf(b) ? a : b);
 
 const GIT_MANAGING = /^(add|commit|push|pull|merge|rebase|checkout|switch|branch|worktree|stash|tag|fetch|reset|cherry-pick|status)$/;
 
 /**
- * What one program of a Bash command was, as the measure's `bashcls.py` classes a segment: a test run or a check of docs is
- * proof, the workstream CLI, `spnutils`, git and the process tools are managing, a write the generator makes or a git move
- * of a repo file is change, and anything else the hooks record is reading.
+ * What one command was, from the `call` its row keeps (program, group, action; never the arguments): a test run or a check of
+ * docs is proof, the workstream CLI, `spnutils`, git and the process tools are managing, a write the generator makes or a git
+ * mv, rm, restore or apply is change wherever it points (no argument is written), and anything else the hooks record is reading.
+ * A plugin command with a subgroup writes it into the action (`docs cycles write` is group `docs`, action `cycles write`).
  */
-function classOfCommand(line: Record<string, unknown>): Kind {
-  const script = text(line.script) ?? "", group = text(line.group) ?? "", sub = text(line.subgroup) ?? "", action = text(line.action) ?? "", args = text(line.args) ?? "";
-  if (TEST_RUNNERS.includes(script) || script === "nx" || group === "test") return "proof";
-  if (script === "git") {
-    if (/^(mv|rm|restore|apply)$/.test(action)) return args.includes(".spndevex") ? "managing" : "change";
-    return GIT_MANAGING.test(action) ? "managing" : "reading";
+function classOfCommand(call: Record<string, unknown>): Kind {
+  const program = text(call.program) ?? "", group = text(call.group) ?? "", action = text(call.action) ?? "";
+  const words = action.split(" ").filter(Boolean), sub = words.length > 1 ? words[0] : "";
+  if (TEST_RUNNERS.includes(program) || program === "nx" || group === "test") return "proof";
+  if (program === "git") {
+    const verb = group || action;
+    if (/^(mv|rm|restore|apply)$/.test(verb)) return "change";
+    return GIT_MANAGING.test(verb) ? "managing" : "reading";
   }
-  if (script === "spn-devex" || script.startsWith("spn-")) {
-    if (group === "restates" || group === "docs") return [sub, action].includes("write") ? (sub === "cycles" ? "managing" : "change") : "proof";
+  if (program === "spn-devex" || program.startsWith("spn-")) {
+    if (group === "restates" || group === "docs") return words.includes("write") ? (sub === "cycles" ? "managing" : "change") : "proof";
     return "managing";
   }
-  if (script === "spnutils") return /\b(test|verify|validate)\b/.test(`${group} ${sub} ${action}`) ? "proof" : "managing";
-  if (script === "gh" || script === "claude" || /^(lsof|pgrep|ps|kill|pkill)$/.test(script)) return "managing";
-  if (/^(test|verify|lint|typecheck|build)$/.test(action)) return "proof";
+  if (program === "spnutils") return /\b(test|verify|validate)\b/.test(`${group} ${action}`) ? "proof" : "managing";
+  if (program === "gh" || program === "claude" || /^(lsof|pgrep|ps|kill|pkill)$/.test(program)) return "managing";
+  if (/^(test|verify|lint|typecheck|build)$/.test(words.at(-1) ?? "")) return "proof";
   return "reading";
 }
 
-const WRITERS = /^(cp|mv|rm|mkdir|rmdir|touch|ln|tar)$/;
+type Call = { workstream: string | null; arc: string | null; part: string | null; kind: Kind; minutes: number; at: number; lead: boolean };
 
 /**
- * What a call was from the `program` and `pathKind` its record carries, the measure's way (`bashcls.py`, `classify.py`): a file or a
- * path of the workstream is managing, a write to a source or test file is change, a test runner or a `node` run of a test file is
- * proof, and a read or a write elsewhere is reading. Null where the record says nothing that settles it, or lacks both.
- */
-function classOfKind(tool: string | null, program: string | null, pathKind: string | null): Kind | null {
-  if (tool === "Bash") {
-    if (program && /^(vitest|tsc|eslint)$/.test(program)) return "proof";
-    if (program === "node" && pathKind === "TEST") return "proof";
-    if (program && WRITERS.test(program)) return pathKind === "WORKSTREAM" ? "managing" : pathKind === "SOURCE" || pathKind === "TEST" ? "change" : null;
-    return pathKind === "WORKSTREAM" ? "managing" : null;
-  }
-  if (!pathKind) return null;
-  if (pathKind === "WORKSTREAM") return "managing";
-  return tool === "Read" || pathKind === "OTHER" ? "reading" : "change";
-}
-
-/** A command of the plugin or `spnutils` that exited with a status is a refusal (the measure reads `usage:`, `Refused:` and `Denied:` from the output, which the log does not hold). */
-const refusedByExit = (line: Record<string, unknown>): boolean =>
-  (line.script === "spn-devex" || line.script === "spnutils") && typeof line.exit === "number" && line.exit !== 0;
-
-type Call = { workstream: string | null; arc: string | null; row: string | null; kind: Kind; minutes: number; at: number; lead: boolean };
-/** A window's line of calls, as the retry rule reads it. */
-type Stream = { at: number | null; commands: Kind[]; targets: string[]; bare: boolean; refused: boolean; check: string | null; index: number;
-  refusals: Refusal[] };
-/** A refusal a later call may retry; `open` is a refused Bash command (no text in the log) not yet followed by its retry. */
-type Refusal = { index: number; check: string; target: string; open: boolean };
-
-/**
- * Every call the hooks log holds, once, with the minutes since the stream's previous call. A stream is a window or one
- * child of it. A call is one Bash command that ran (`PostToolUse`, its programs giving the class), a Read, Edit or Write the
- * hooks saw before it ran, an `Agent` launch, or a call a check refused (`PreToolUse` with a `deny`). A refusal that
- * a call of the same kind repeats within a few calls is followed by a retry, and counts with the refusals. A gap past `WAIT_MS` is
- * a wait of its own.
- *
- * A record that carries `program` and `pathKind` (`callOf`) is classed from them (`classOfKind`). An older record lacks them, and
- * then the log cannot say what the measure's transcripts could: a Read, Edit or Write holds no path, so it is read by who made
- * it (a window's own Read, Edit or Write is its records, which the measure found were most of them; a child's Edit or Write is the change and its Read is reading); a Bash command
- * of a program the hooks do not record (`cat`, `sed`, `python`) holds no text, so it is reading, never a write in the repository or
- * a read of the workstream's files; a `sleep` or a `Monitor` is not seen, so waiting is the long gap alone; and a refusal by a
- * CLI is read from its exit status, not from the words it printed.
+ * Every call the hooks log holds, once, with the minutes since its stream's previous call. A stream is a window or one child of it.
+ * Only `v` 1 rows are read, by their `mtype`: a `COMMAND` row is a call (its class from its `call`; a plugin command that exited with a
+ * status, or a call that retries another, is a refusal), a `TEST` row is proof, and a `CHECK` row whose verdict is `DENY` under
+ * `PreToolUse` is a call a check refused. Any other row is skipped. A gap past `WAIT_MS` is a wait of its own.
  */
 function readCalls(root: string, scope: SplitScope = {}): Call[] {
   const calls: Call[] = [];
-  const streams = new Map<string, Stream>();
-  const stream = (key: string): Stream => {
-    let held = streams.get(key);
-    if (!held) { held = { at: null, commands: [], targets: [], bare: false, refused: false, check: null, index: 0, refusals: [] }; streams.set(key, held); }
-    return held;
-  };
+  const last = new Map<string, number>();
   for (const file of logFiles(join(telemetryFolder(root), "hooks.jsonl"))) {
     for (const raw of readFileSync(file, "utf8").split("\n")) {
       if (!raw.trim()) continue;
       try {
         const one = JSON.parse(raw) as Record<string, unknown>;
+        if (one.v !== SPDevExWorkspaceTelemetryVersionType.V1) continue;
         const at = Date.parse(text(one.at) ?? "");
         if (!Number.isFinite(at)) continue;
         if (scope.from !== undefined && at < scope.from) continue;
         if (scope.to !== undefined && at > scope.to) continue;
         const lead = !text(one.agent);
         if (scope.lead && !lead) continue;
-        const held = stream(`${text(one.session) ?? "-"}/${text(one.agent) ?? ""}`);
-        const event = text(one.event), tool = text(one.tool);
-        if (event === "command") {
-          held.commands.push(classOfCommand(one));
-          held.targets.push([one.script, one.group, one.action].filter((word) => typeof word === "string" && word).join(" "));
-          held.bare ||= one.script === "spn-devex" && !text(one.group) && !text(one.args);
-          if (refusedByExit(one)) { held.refused = true; held.check = `cli:${text(one.action) ?? ""}`; }
-          continue;
-        }
-        if (event === "PreToolUse" && one.verdict === "deny" && one.group !== "events") { held.check = text(one.group); continue; }
-        if (one.group !== "events" || one.script !== "spn-devex") continue;
-        let kind: Kind | null = null, refused = false;
-        if (event === "PreToolUse" && one.verdict === "deny") { refused = true; held.commands = []; held.targets = []; held.bare = false; }
-        else if (event === "PostToolUse" || event === "PostToolUseFailure") {
-          if (tool !== "Bash") continue;
-          kind = stronger(held.commands.reduce<Kind | null>(stronger, null), classOfKind("Bash", text(one.program), text(one.pathKind)) ?? "reading");
-          refused = held.refused;
-        }
-        else if (event === "PreToolUse" && tool === "Read") kind = classOfKind(tool, null, text(one.pathKind)) ?? (lead ? "managing" : "reading");
-        else if (event === "PreToolUse" && tool && /^(Edit|Write|NotebookEdit|MultiEdit)$/.test(tool)) kind = classOfKind(tool, null, text(one.pathKind)) ?? (lead ? "managing" : "change");
-        else if (event === "PreToolUse" && tool === "Agent") kind = "managing";
+        let kind: Kind;
+        const call = (one.call && typeof one.call === "object" ? one.call : {}) as Record<string, unknown>;
+        if (one.mtype === SPDevExWorkspaceTelemetryRowType.COMMAND) {
+          const program = text(call.program);
+          const refusedByExit = (program === "spn-devex" || program === "spnutils") && typeof one.exit === "number" && one.exit !== 0;
+          kind = refusedByExit || text(one.retryOf) ? "refusals" : classOfCommand(call);
+        } else if (one.mtype === SPDevExWorkspaceTelemetryRowType.TEST) kind = "proof";
+        else if (one.mtype === SPDevExWorkspaceTelemetryRowType.CHECK && one.event === SPDevExWorkspaceTelemetryEventType.PRE_TOOL_USE
+          && one.verdict === SPDevExAgentHookVerdictType.DENY) kind = "refusals";
         else continue;
-        const target = tool === "Bash" ? held.targets[0] ?? "Bash" : tool ?? "";
-        const bare = held.bare, check = held.check ?? "";
-        held.commands = []; held.targets = []; held.bare = false; held.refused = false; held.check = null;
-        if (refused) kind = "refusals";
-        else {
-          const first = held.refusals.find((past) => retries(past, held.index, target, tool === "Bash", bare, kind as Kind));
-          if (first) { first.open = false; kind = "refusals"; }
-        }
-        if (refused) held.refusals.push({ index: held.index, check, target, open: tool === "Bash" && event === "PreToolUse" });
-        held.index += 1;
-        const gap = held.at === null ? 0 : Math.max(0, at - held.at);
-        held.at = at;
-        const tags = { workstream: text(one.workstream), arc: text(one.arc), row: text(one.row), at, lead };
+        const stream = `${text(one.session) ?? "-"}/${text(one.agent) ?? ""}`;
+        const before = last.get(stream);
+        const gap = before === undefined ? 0 : Math.max(0, at - before);
+        last.set(stream, at);
+        const tags = { workstream: text(one.workstream), arc: text(one.arc), part: text(one.part), at, lead };
         if (gap > WAIT_MS) { calls.push({ ...tags, kind: "waiting", minutes: gap / 60_000 }); calls.push({ ...tags, kind, minutes: 0 }); }
         else calls.push({ ...tags, kind, minutes: gap / 60_000 });
       } catch { /* a torn last line is skipped */ }
     }
   }
   return calls;
-}
-
-/**
- * Whether a call retries a refusal, as the measure's `classify.py` reads one: the bare usage read a `usage-first` refusal asks
- * for, a proof run soon after a land, test-run, proof-run or push refusal, the call right after a command-shape refusal, or a call of
- * the same target within `RETRY_CALLS` (a refused Bash command has no text in the log, so the next Bash command stands for its retry).
- */
-function retries(past: Refusal, index: number, target: string, bash: boolean, bare: boolean, kind: Kind): boolean {
-  const distance = index - past.index;
-  if (distance > PROOF_RETRY) return false;
-  if (past.check === "usage-first" && distance <= 3 && bare) return true;
-  if (/^(test-run|proof-run|push-tiers|cli:land)$/.test(past.check) && kind === "proof") return true;
-  if (past.check === "command-shape" && distance <= 1) return true;
-  return distance <= RETRY_CALLS && (bash && past.open ? true : past.target !== "Bash" && past.target === target);
 }
 
 const empty = (key: string): SplitRow => ({ key, change: { calls: 0, minutes: 0 }, proof: { calls: 0, minutes: 0 }, managing: { calls: 0, minutes: 0 },
@@ -239,7 +165,7 @@ export function readSplit(root: string, target: string, scope: SplitScope = {}):
     if (!same(call.workstream) || !call.arc) continue;
     if (arcTarget && call.arc.toUpperCase() !== arcTarget[2].toUpperCase()) continue;
     if (!arcTarget) add(call.arc, call);
-    if (call.row) add(`${call.arc} · row ${call.row}`, call);
+    if (call.part) add(`${call.arc} · part ${call.part}`, call);
   }
   const keys = [...rows.keys()].sort((a, b) => a.localeCompare(b, "en", { numeric: true }));
   return keys.map((key) => {
@@ -254,6 +180,54 @@ function printSplit(rows: SplitRow[]): void {
   console.log("\n" + "Split".padEnd(width) + CLASSES.map((kind) => kind.padStart(16)).join(""));
   for (const row of rows)
     console.log(row.key.padEnd(width) + CLASSES.map((kind) => `${row[kind].calls} · ${row[kind].minutes}m`.padStart(16)).join(""));
+}
+
+/** A model time or a window's span as minutes and seconds, a dash for none. */
+const span = (ms: number): string => (ms > 0 ? clock(ms) : "—");
+
+/** The folder name of the workstream a target names (its whole name, or its number), or null where the target names none. */
+function workstreamOf(root: string, target: string): string | null {
+  if (target === "all" || target.startsWith("window/") || target.includes("/")) return null;
+  for (const state of ["open", "closed", "backlog"]) {
+    const dir = join(root, ".spndevex", "workstreams", state);
+    if (!existsSync(dir)) continue;
+    const found = readdirSync(dir).find((name) => name === target || (/^\d{3}$/.test(target) && name.startsWith(`${target}-`)));
+    if (found) return found;
+  }
+  return null;
+}
+
+function printStages(lines: StageLine[]): void {
+  const names = [...Object.values(SPDevExStageType)].filter((name) => lines.some((one) => one.stages[name]));
+  const width = Math.max(8, ...lines.map((one) => one.arc.length)) + 2;
+  console.log("\n" + "Stage".padEnd(width) + [...names, "No stage"].map((name) => name.padStart(11)).join("") + "Money".padStart(10));
+  for (const one of lines)
+    console.log(one.arc.padEnd(width) + [...names, NO_STAGE].map((name) => span(one.stages[name] ?? 0).padStart(11)).join("") + dollars(one.money).padStart(10));
+  const total = (name: string) => lines.reduce((sum, one) => sum + (one.stages[name] ?? 0), 0);
+  const money = lines.some((one) => one.money === null) ? null : lines.reduce((sum, one) => sum + (one.money ?? 0), 0);
+  console.log("All arcs".padEnd(width) + [...names, NO_STAGE].map((name) => span(total(name)).padStart(11)).join("") + dollars(money).padStart(10));
+}
+
+function printGoBlocks(blocks: GoBlock[]): void {
+  for (const block of blocks) {
+    const lines = [...block.lines, ...(block.noPart ? [block.noPart] : [])];
+    const title = `Go ${block.lead} · ${block.scope.join(", ")}`;
+    const width = Math.max(title.length, 8, ...lines.map((one) => one.label.length), 4) + 2;
+    console.log("\n" + title.padEnd(width) + "Parts".padStart(7) + "Helpers".padStart(9) + "Replies".padStart(9) + "Model time".padStart(12) + "Elapsed".padStart(9) + "Money".padStart(9));
+    const row = (one: GoBlock["leadLine"]) => `  ${one.label}`.padEnd(width) + (one.parts ? String(one.parts) : "—").padStart(7) +
+      (one.helpers ? String(one.helpers) : "—").padStart(9) + (one.replies ? String(one.replies) : "—").padStart(9) +
+      span(one.modelMs).padStart(12) + (one.elapsedMin === null ? "—" : `${one.elapsedMin}m`).padStart(9) + (one.money === null ? "—" : dollars(one.money)).padStart(9);
+    for (const one of block.lines) console.log(row(one));
+    console.log(row(block.leadLine));
+    if (block.noPart) console.log(row(block.noPart));
+  }
+}
+
+function printWindows(lines: WindowLine[]): void {
+  const width = Math.max(11, ...lines.map((one) => `${one.arc} · ${one.phase}`.length)) + 2;
+  console.log("\n" + "Window time".padEnd(width) + "Agent".padStart(10) + "Waiting on you".padStart(16) + "Waiting on a run".padStart(18));
+  for (const one of lines)
+    console.log(`${one.arc} · ${one.phase}`.padEnd(width) + clock(one.workingMs).padStart(10) + clock(one.waitingOnYouMs).padStart(16) + clock(one.waitingOnRunMs).padStart(18));
 }
 
 function show(args: string[]): number {
@@ -272,8 +246,11 @@ function show(args: string[]): number {
     scope[bound] = time;
   }
   const split = readSplit(root, target, scope);
+  const named = workstreamOf(root, target);
+  const time = named ? readTime(root, named) : null;
   if (words.given("json")) {
-    console.log(JSON.stringify({ target, earliest, pricesAsOf: MODEL_PRICES.asOf, estimate: true, rows, split }, null, 2));
+    console.log(JSON.stringify({ target, earliest, pricesAsOf: MODEL_PRICES.asOf, estimate: true, rows, split,
+      stages: time?.stages ?? [], goBlocks: time?.goBlocks ?? [], windows: time?.windows ?? [] }, null, 2));
     return 0;
   }
   if (!rows.length && split.length) { printSplit(split); return 0; }
@@ -283,6 +260,9 @@ function show(args: string[]): number {
   }
   print(rows);
   if (split.length) printSplit(split);
+  if (time?.stages.length) printStages(time.stages);
+  if (time?.goBlocks.length) printGoBlocks(time.goBlocks);
+  if (time?.windows.length) printWindows(time.windows);
   console.log(`\nTelemetry reaches back to ${earliest}. Money is an estimate: prices as of ${MODEL_PRICES.asOf}, cache writes at the 5-minute rate, and "unknown" for a model the table lacks.`);
   return 0;
 }

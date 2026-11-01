@@ -74,14 +74,14 @@ console.log("\n=== telemetry tags read the data's folders");
   const tags = tag(join(ws, "arcs", "N001", "state.json"));
   ok("arcs/N001/state.json names the arc", tags.arc === "N001" && tags.workstream === "031-probe", JSON.stringify(tags));
   const report = tag(join(ws, "notes", "N001", "orders", "57.report.md"));
-  ok("a report names its order, not a second one", report.order === "57", JSON.stringify(report));
-  ok("so does a ledger", tag(join(ws, "notes", "N001", "orders", "57.ledger.md")).order === "57");
+  ok("a report names its part, not a second one", report.part === "57", JSON.stringify(report));
+  ok("so does a ledger", tag(join(ws, "notes", "N001", "orders", "57.ledger.md")).part === "57");
 }
 
 console.log("\n=== the Stop hook refuses a turn while state check fails for this window");
 {
   const data = arcData();
-  data.rows.push({ id: "3", parent: "N001", title: "a row in a repository the page has not taken in", kind: "fix", repo: "spn-y", altitude: "CODE", state: "waiting" });
+  data.rows.push({ id: "3", parent: "N001", title: "a row in a repository the page has not taken in", kind: "fix", repo: "spn-y", work: "CODE", state: "waiting" });
   writeFileSync(join(arcs, "N001", "state.json"), JSON.stringify(data));
   const red = checkWorkstreamState(root, new Set(["031-probe"]));
   ok("red: this window's workstream behind its repositories is said", red.length === 1 && red[0].check === "state" && /N001's part on the approach page is behind its goal, title or repositories/.test(red[0].message), JSON.stringify(red));

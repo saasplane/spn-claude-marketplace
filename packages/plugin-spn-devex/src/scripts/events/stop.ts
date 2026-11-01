@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § The arc · § A step row says where, at what altitude, and how · § Say what you opened, and know when to wait for the answer · § Stopping in the middle is a handover · § A prompt while an arc runs
+// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § The arc · § A step row says where, what work, and how · § Say what you opened, and know when to wait for the answer · § Stopping in the middle is a handover · § A prompt while an arc runs
 //           docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § The approach document
 //           docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md § The reply while work runs shows what needs you, then what moved
 //           docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § A card is only for what the rules leave open
@@ -81,9 +81,9 @@ import { cyclesTableAt } from "../commands/docs/cycles.ts";
 import { TERMINAL } from "../checks/arc-status.ts";
 import { REPLY_CHECKS, eventWorkspace, workspaceRoot } from "../lib/payload.ts";
 import { DEVEX, isApproachPage, workstreamsDir } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
-import { recordSendBack, sessionDir } from "../../../../plugin-support-lib/src/lib/debug-store.ts";
+import { sessionDir } from "../../../../plugin-support-lib/src/lib/debug-store.ts";
 import { cacheState, goStandings, welcome } from "./orientation.ts";
-import { begin, span, end, tagsOf, utcNow } from "../../../../plugin-support-lib/src/lib/timing.ts";
+import { begin, span, end, settle, tagsOf } from "../../../../plugin-support-lib/src/lib/timing.ts";
 import { recordUsage, windowSize } from "../lib/usage.ts";
 import { arcsWrittenSince, fromWorkspace, named, readWindow, reposWritten, visitedWorkstreams, windowSet } from "../lib/window.ts";
 
@@ -624,7 +624,7 @@ export function checkRunnable(root: string, since: number, stepsAt: Record<strin
             `${claimed.join(" · ")}. If this sitting is on it, finish it and land it with its commit ` +
             `(\`spn-devex workstream row state ${arcRef(arc)} <row> landed\`), or write it \`stopped\` with what was ` +
             `done. If another window is on it, leave it and ask the developer, saying how long it has run ` +
-            `(02-workstream/01-workstream.md § A step row says where, at what altitude, and how).`),
+            `(02-workstream/01-workstream.md § A step row says where, what work, and how).`),
         });
       const steps = readyRowsOf(arc, questions);
       if (!steps.length) continue;
@@ -1777,26 +1777,6 @@ export function checkWindow(root: string, transcript: string, mine: Set<string>,
   return [{ check: "window", message }];
 }
 
-// ---------------------------------------------------------------------------- the send-backs
-
-/** The open workstream a message names, by its folder name; the empty text where it names none. */
-export function workstreamNamedIn(root: string, message: string): string {
-  let open: string[] = [];
-  try { open = readdirSync(workstreamsDir(root, "open")); } catch { /* none open */ }
-  return open.sort().find((name) => message.includes(name)) ?? "";
-}
-
-/**
- * One send-back line for each finding said, written as it is said: its check, the workstream its words name and the
- * first 12 hex of their sha1, never the words (`debug hooks show` judges each by the next Stop's span). A no-op while
- * telemetry is off.
- */
-function recordSaid(root: string, said: Warning[], session: string, agent: string | null): void {
-  for (const warning of said)
-    recordSendBack(root, { at: utcNow(), session, agent: agent ?? "main", event: "Stop", check: warning.check,
-      workstream: workstreamNamedIn(root, warning.message), finding: createHash("sha1").update(warning.message).digest("hex").slice(0, 12) });
-}
-
 // ---------------------------------------------------------------------------- the hook
 
 // MATCHES THE BUNDLED NAME TOO, BY EXACT BASENAME. This hook ships built as `dist/events/stop.mjs`,
@@ -1823,7 +1803,11 @@ if (argv1Base === "stop.ts" || argv1Base === "stop.mjs") {
   let event: { session_id?: string; transcript_path?: string; stop_hook_active?: boolean; agent_id?: string; cwd?: string } = {};
   try { event = JSON.parse(input || "{}") ?? {}; } catch { event = {}; }
   const session = String(event.session_id ?? "");
-  const facts = { script: "spn-devex", event: "Stop", tool: null, session: event.session_id ?? null, ...tagsOf(event),
+  // A Stop payload names no path, so its rows take the workstream from the window's own binding (`lib/window.ts`, written
+  // from the paths of the window's writes), where that binding is one workstream; with none or several it stays null.
+  const tags = tagsOf(event);
+  if (!tags.workstream) { const bound = [...windowSet(root, session)]; if (bound.length === 1) tags.workstream = bound[0]; }
+  const facts = { script: "spn-devex", event: "Stop", tool: null, session: event.session_id ?? null, ...tags,
                   process: { group: "events", action: "stop" } };
   begin(facts, root);
   // WHAT THE TURNS COST, written beside the timing log while recording is on, for `debug cost show`.
@@ -1903,8 +1887,9 @@ if (argv1Base === "stop.ts" || argv1Base === "stop.mjs") {
   // A page is named once in a session, so the pages named now join the ones named before.
   const ownCopyTold = [...new Set([...(baseline?.ownCopy ?? []),
     ...(said.some((warning) => warning.check === "own-copy") ? ownCopyPages(root, mine) : [])])];
+  // A hook DENY row stands only for a finding said; the rest become NOTE.
+  settle(said.map((w) => w.check));
   end();
-  if (inWorkspace) recordSaid(root, said, session, event.agent_id ?? null);
   // A HELD FINDING IS NOT STORED AS TEXT. A turn end that holds one leaves the baseline's marks where
   // they were, so the next turn end finds again what is still true. An arc new since then takes its
   // marks from now.

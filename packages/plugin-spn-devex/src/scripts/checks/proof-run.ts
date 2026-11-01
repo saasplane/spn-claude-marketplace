@@ -22,7 +22,7 @@ function proofRunning(root: string, session: string | undefined): boolean {
   for (const ws of workstreamsOf(root)) {
     if (!owned.has(ws.split("/").pop() ?? "")) continue;
     for (const arc of arcIdsOf(ws))
-      if (readArc(ws, arc)?.rows?.some((row) => row.altitude === "PROOF" && row.state === "running")) return true;
+      if (readArc(ws, arc)?.rows?.some((row) => row.work === "PROOF" && row.state === "running")) return true;
   }
   return false;
 }

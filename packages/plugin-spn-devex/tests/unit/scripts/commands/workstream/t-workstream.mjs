@@ -16,7 +16,7 @@ const ok = (label, condition, detail = "") => {
   console.log(`  FAIL  ${label}${detail ? `\n        ${detail}` : ""}`);
 };
 // An arc with no sheet lands a CODE row only on a run (MKT.SCRIPTS.231), so the default steps here are docs steps.
-const dataWorkspace = (name, opts = {}) => dataArc(name, { ...opts, rows: opts.rows ?? arcData().rows.map((one) => ({ ...one, altitude: "DOCS" })) });
+const dataWorkspace = (name, opts = {}) => dataArc(name, { ...opts, rows: opts.rows ?? arcData().rows.map((one) => ({ ...one, work: "DOCS" })) });
 const json = (path) => JSON.parse(readFileSync(path, "utf8"));
 const lines = (path) => (existsSync(path) ? readFileSync(path, "utf8") : "").split("\n").filter(Boolean).map((line) => JSON.parse(line));
 
@@ -54,23 +54,23 @@ console.log("\n=== arc edit and the row commands — open an arc, change its hea
   ok("its data holds the schema's header", second.schemaVersion === 2 && second.status === "PROPOSED" && second.preview === "preview.html" && second.rows.length === 0);
   const bare = cli(root, ["workstream", "arc", "edit", "031/N003"]);
   ok("red: an arc opened with no title is refused, exit 2", bare.code === 2 && bare.out.includes("opens N003 with `--title`, `--subject` and `--goal`: an arc opens only when all three are known, and until then its line stays in How (RULE.DEVEX.WORKSPACE.254)."), bare.out);
-  const added = cli(root, ["workstream", "row", "add", "031/N001", "check it", "--kind", "fix", "--repo", "spn-x", "--altitude", "DOCS", "--blocked-by", "2", "--touches", "marketplace:b,foundation:c"]);
+  const added = cli(root, ["workstream", "row", "add", "031/N001", "check it", "--kind", "fix", "--repo", "spn-x", "--work", "DOCS", "--blocked-by", "2", "--touches", "marketplace:b,foundation:c"]);
   ok("a row is added with the arc's next number, and the line prints it", added.code === 0 && /row 3 added/.test(added.out), added.out);
   const three = json(arcFile).rows.find((row) => row.id === "3");
-  ok("with its lists read at commas, its repo and altitude, and its state ready by default", three.state === "ready" && three.repo === "spn-x" && three.altitude === "DOCS" && three.touches.join() === "marketplace:b,foundation:c" && three.blockedBy.join() === "2");
+  ok("with its lists read at commas, its repo and work, and its state ready by default", three.state === "ready" && three.repo === "spn-x" && three.work === "DOCS" && three.touches.join() === "marketplace:b,foundation:c" && three.blockedBy.join() === "2");
   ok("a row added never puts the page behind", !/N001's part on the approach page is behind/.test(added.out), added.out);
   const moved = cli(root, ["workstream", "row", "state", "031/N001", "1", "running"]);
   ok("a row's state moves, the log says from where, and no status line follows: RUNNING is worked out", moved.code === 0 && lines(log).at(-1).kind === "running" && lines(log).at(-1).note === "waiting → running" && /N001 reads RUNNING/.test(moved.out), `${moved.out}${JSON.stringify(lines(log).slice(-2))}`);
-  const wrongKind = cli(root, ["workstream", "row", "add", "031/N001", "x", "--kind", "chore", "--repo", "spn-x", "--altitude", "CODE"]);
+  const wrongKind = cli(root, ["workstream", "row", "add", "031/N001", "x", "--kind", "chore", "--repo", "spn-x", "--work", "CODE"]);
   ok("red: a kind outside the set is refused with the set", wrongKind.code === 2 && wrongKind.out.includes("fix · change · question"), wrongKind.out);
-  const wrongWait = cli(root, ["workstream", "row", "add", "031/N001", "x", "--kind", "fix", "--repo", "spn-x", "--altitude", "CODE", "--blocked-by", "9"]);
+  const wrongWait = cli(root, ["workstream", "row", "add", "031/N001", "x", "--kind", "fix", "--repo", "spn-x", "--work", "CODE", "--blocked-by", "9"]);
   ok("red: a row waiting on a row the arc lacks is refused, and nothing is written", wrongWait.code === 2 && /waits on row 9/.test(wrongWait.out) && !json(arcFile).rows.some((row) => row.id === "4"), wrongWait.out);
   const mixed = cli(root, ["workstream", "arc", "edit", "031/N001", "--kind", "fix"]);
   ok("red: `arc edit` refuses a row's field and names `row edit`", mixed.code === 2 && mixed.out.includes("`row edit <workstream>/N<nnn> <row> --kind …`"), mixed.out);
-  const noRepo = cli(root, ["workstream", "row", "add", "031/N001", "no repo", "--altitude", "CODE"]);
-  ok("red: `row add` without --repo is refused, and nothing is added", noRepo.code === 2 && noRepo.out.includes("`--repo` and `--altitude`") && !json(arcFile).rows.some((row) => row.title === "no repo"), noRepo.out);
-  const noAltitude = cli(root, ["workstream", "row", "add", "031/N001", "no altitude", "--repo", "spn-x"]);
-  ok("red: `row add` without --altitude is refused, and nothing is added", noAltitude.code === 2 && noAltitude.out.includes("`--altitude` is missing") && !json(arcFile).rows.some((row) => row.title === "no altitude"), noAltitude.out);
+  const noRepo = cli(root, ["workstream", "row", "add", "031/N001", "no repo", "--work", "CODE"]);
+  ok("red: `row add` without --repo is refused, and nothing is added", noRepo.code === 2 && noRepo.out.includes("`--repo` and `--work`") && !json(arcFile).rows.some((row) => row.title === "no repo"), noRepo.out);
+  const noWork = cli(root, ["workstream", "row", "add", "031/N001", "no work", "--repo", "spn-x"]);
+  ok("red: `row add` without --work is refused, and nothing is added", noWork.code === 2 && noWork.out.includes("`--work` is missing") && !json(arcFile).rows.some((row) => row.title === "no work"), noWork.out);
   const ghostEdit = cli(root, ["workstream", "row", "edit", "031/N001", "99", "--title", "x"]);
   ok("red: `row edit` on a row the arc lacks is refused, naming `row add`", ghostEdit.code === 2 && ghostEdit.out.includes("finds no row 99") && ghostEdit.out.includes("row add"), ghostEdit.out);
   const ghostState = cli(root, ["workstream", "row", "state", "031/N001", "99", "landed"]);
@@ -92,7 +92,7 @@ console.log("\n=== arc edit and the row commands — open an arc, change its hea
   const modelOnly = cli(root, ["workstream", "arc", "edit", "031/N001", "--model", "Opus 5.5"]);
   ok("--model with no row sets the arc's model, a field the arc and its rows share", modelOnly.code === 0 && json(arcFile).model === "Opus 5.5", modelOnly.out);
   const usageText = cli(root, ["workstream", "row"]);
-  ok("the usage of the row commands prints the forms exactly", /row add <workstream>\/N<nnn> "<title>" --repo <repo> --altitude <altitude>/.test(usageText.out) && /row state <workstream>\/N<nnn> <row> <state> \[--on "<what it waits on>"\] \[--note …\] \[--run <name>\]/.test(usageText.out) && /row note <workstream>\/N<nnn> <row> "<text>"/.test(usageText.out) && /row edit <workstream>\/N<nnn> <row> \[--title …\]/.test(usageText.out) && /row discard <workstream>\/N<nnn> <row>/.test(usageText.out) && !usageText.out.includes("<arc>") && !usageText.out.includes("row write"), usageText.out);
+  ok("the usage of the row commands prints the forms exactly", /row add <workstream>\/N<nnn> "<title>" --repo <repo> --work <work>/.test(usageText.out) && /row state <workstream>\/N<nnn> <row> <state> \[--on "<what it waits on>"\] \[--note …\] \[--run <name>\]/.test(usageText.out) && /row note <workstream>\/N<nnn> <row> "<text>"/.test(usageText.out) && /row edit <workstream>\/N<nnn> <row> \[--title …\]/.test(usageText.out) && /row discard <workstream>\/N<nnn> <row>/.test(usageText.out) && !usageText.out.includes("<arc>") && !usageText.out.includes("row write"), usageText.out);
   const subjectAfter = cli(root, ["workstream", "031-probe", "row", "add", "--title", "x"]);
   ok("red: a subject placed after the group is refused, naming the right form", subjectAfter.code === 2 && subjectAfter.out.includes("spn-devex workstream row add 031-probe"), subjectAfter.out);
   const held = cli(root, ["workstream", "arc", "edit", "031/N001", "--status", "HELD"]);
@@ -108,7 +108,7 @@ console.log("\n=== arc edit and the row commands — open an arc, change its hea
 console.log("\n=== rows show — every row, the ready ones, the ones side by side, the tree");
 {
   cli(root, ["workstream", "row", "state", "031/N001", "1", "landed"]);
-  cli(root, ["workstream", "row", "add", "031/N001", "touches what 2 touches", "--kind", "fix", "--repo", "spn-x", "--altitude", "CODE", "--touches", "marketplace:b"]);
+  cli(root, ["workstream", "row", "add", "031/N001", "touches what 2 touches", "--kind", "fix", "--repo", "spn-x", "--work", "CODE", "--touches", "marketplace:b"]);
   const all = cli(root, ["workstream", "rows", "show", "031"]);
   ok("every row of every arc", all.code === 0 && /N001 1 +landed +write the book/.test(all.out) && /N001 4 /.test(all.out), all.out);
   const ready = cli(root, ["workstream", "rows", "show", "031", "--ready"]);
@@ -116,7 +116,7 @@ console.log("\n=== rows show — every row, the ready ones, the ones side by sid
   const side = cli(root, ["workstream", "rows", "show", "031", "--parallel", "--json"]);
   const ids = JSON.parse(side.out).map((row) => row.id);
   ok("--parallel: 2 and 5 both touch marketplace:b, so only one of them", ids.length === 1 && ids[0] === "2", side.out);
-  cli(root, ["workstream", "row", "add", "031/N001", "under four", "--kind", "fix", "--repo", "spn-x", "--altitude", "CODE", "--parent", "4"]);
+  cli(root, ["workstream", "row", "add", "031/N001", "under four", "--kind", "fix", "--repo", "spn-x", "--work", "CODE", "--parent", "4"]);
   const tree = cli(root, ["workstream", "rows", "show", "031/N001", "--tree"]);
   ok("--tree: a row under its parent is indented", /N001   4a/.test(tree.out), tree.out);
   ok("a row with a row under it loses its written state", !("state" in json(arcFile).rows.find((row) => row.id === "4")));
@@ -132,8 +132,8 @@ console.log("\n=== report write — a hand-back folded in from its front matter"
   const folded = cli(root, ["workstream", "report", "write", "031", "notes/N001/orders/2.report.md"]);
   ok("the line says where the arc stands, what was added and what is ready", folded.code === 0 && /^ok · N001 \d+\/\d+ · 2b added · 3 ready/.test(folded.out), folded.out);
   const two = json(arcFile).rows.find((row) => row.id === "2");
-  ok("the row takes the outcome, proof, commits, cost and its order", two.state === "landed" && two.proof === "unit 12 ✓" &&
-    two.commits["spn-x"][0] === "abc12345" && two.cost.tokens === 1500 && two.order === "orders/2.md", JSON.stringify(two));
+  ok("the row takes the outcome, proof, commits and its order, and a `cost:` line the report carries is not read", two.state === "landed" && two.proof === "unit 12 ✓" &&
+    two.commits["spn-x"][0] === "abc12345" && two.cost == null && two.order === "orders/2.md", JSON.stringify(two));
   const twoB = json(arcFile).rows.find((row) => row.id === "2b");
   ok("a follow-up becomes a row beside it, waiting", twoB?.state === "waiting" && twoB.title === "tidy the words" && twoB.repo === "spn-x");
   put(ws, "notes/N001/orders/3.report.md", "---\nrow: \"3\"\noutcome: finished\n---\n");
@@ -142,16 +142,16 @@ console.log("\n=== report write — a hand-back folded in from its front matter"
   const nowhere = cli(root, ["workstream", "report", "write", "031", "notes/N001/plan.md"]);
   ok("red: a file that is no report is refused", nowhere.code === 2 && nowhere.out.includes("notes/N<nnn>/orders/<row>.report.md"), nowhere.out);
 
-  // A REPORT WITH NO COST of its own takes the order's cost from the telemetry, as `debug cost show <workstream>/<arc>` reads it.
+  // A REPORT, AND A BRIEF, WITH NO `cost:` line: the part's cost is measured from the TURN rows of its part (MKT.SCRIPTS.326).
   const telemetry = join(root, ".spndevex", ".debug", "telemetry");
   mkdirSync(telemetry, { recursive: true });
-  const reply = (turn, order, ms) => JSON.stringify({ at: "2026-10-10T10:00:00Z", session: "s1", agent: "c1", workstream: basename(ws), arc: "N001", order, row: "3",
-    turn, model: "claude-sonnet-5-5", ms, input: 100, cache_read: 200, cache_write: 300, output: 50 });
+  const reply = (id, part, ms) => JSON.stringify({ v: 1, mtype: "TURN", id, at: "2026-10-10T10:00:00Z", ms, event: "SubagentStop", session: "s1", agent: "c1", workstream: basename(ws), arc: "N001", part,
+    skill: null, work: "CODE", retryOf: null, model: "claude-sonnet-5-5", tokens: { in: 100, cacheRead: 200, cacheWrite: 300, out: 50 } });
   writeFileSync(join(telemetry, "usage.jsonl"), [reply("a", "3", 90000), reply("b", "3", 30000), reply("b", "3", 30000), reply("c", "9", 600000)].join("\n") + "\n");
   put(ws, "notes/N001/orders/3.report.md", ["---", 'row: "3"', "outcome: landed", "---", "Body.", ""].join("\n"));
   const measured = cli(root, ["workstream", "report", "write", "031", "notes/N001/orders/3.report.md"]);
   const three = json(arcFile).rows.find((row) => row.id === "3");
-  ok("the order's cost is read from the telemetry: its tokens summed once for each reply, its minutes from the model's time, another order's left out",
+  ok("the part's cost is measured from the usage rows of its part: tokens summed once for each reply, minutes from the model's time, another part's left out",
     measured.code === 0 && three.cost?.tokens === 1300 && three.cost?.minutes === 2, `${measured.out} ${JSON.stringify(three.cost)}`);
 }
 
@@ -326,7 +326,7 @@ console.log("\n=== row state — RUNNING and LANDED are worked out from the step
   cli(followed.root, ["workstream", "row", "state", "031/N001", "1", "landed"]);
   const last = cli(followed.root, ["workstream", "row", "state", "031/N001", "2", "landed"]);
   ok("the last step landed reads LANDED, and asks for no write", last.out.includes("N001 reads LANDED") && !last.out.includes("--status LANDED") && json(file).status === "DECIDED", last.out);
-  const reopened = cli(followed.root, ["workstream", "row", "add", "031/N001", "one more thing", "--kind", "fix", "--repo", "spn-x", "--altitude", "CODE"]);
+  const reopened = cli(followed.root, ["workstream", "row", "add", "031/N001", "one more thing", "--kind", "fix", "--repo", "spn-x", "--work", "CODE"]);
   ok("red: a step is never added to a landed arc: its fix goes on the review-fixes arc", reopened.code === 2 && reopened.out.includes("a landed arc is never reopened") && !json(file).rows.some((row) => row.id === "3"), reopened.out);
   const stored = cli(followed.root, ["workstream", "arc", "edit", "031/N001", "--status", "LANDED", "--note", "the developer: done"]);
   ok("red: LANDED is stored only on the review-fixes arc", stored.code === 2 && stored.out.includes("only the review-fixes arc stores it"), stored.out);
@@ -345,11 +345,11 @@ console.log("\n=== row add and row state — steps may be written before the go,
   const second = join(plan.ws, "arcs", "N002", "state.json");
   const secondLog = join(plan.ws, "arcs", "N002", "log.jsonl");
   write("031/N002", "--title", "the second arc", "--subject", "second", "--goal", "the second outcome");
-  const given = row("add", "031/N002", "build the bar", "--kind", "change", "--repo", "spn-x", "--altitude", "CODE", "--state", "waiting");
+  const given = row("add", "031/N002", "build the bar", "--kind", "change", "--repo", "spn-x", "--work", "CODE", "--state", "waiting");
   ok("a step written on a PROPOSED arc keeps the kind typed, a build step", given.code === 0 && json(second).rows[0].kind === "change", given.out);
-  const bare = row("add", "031/N002", "draw the preview", "--altitude", "CODE");
+  const bare = row("add", "031/N002", "draw the preview", "--work", "CODE");
   ok("red: a step needs its repo", bare.code === 2 && bare.out.includes("`--repo` is missing"), bare.out);
-  const design = row("add", "031/N002", "read the code", "--kind", "design", "--repo", "spn-x", "--altitude", "CODE");
+  const design = row("add", "031/N002", "read the code", "--kind", "design", "--repo", "spn-x", "--work", "CODE");
   ok("red: the kind design no longer exists: reading is a planning job", design.code === 2 && design.out.includes("fix · change · question"), design.out);
   const early = row("state", "031/N002", "1", "running");
   ok("red: a step written running on a PROPOSED arc is refused, and its state stays",
@@ -409,7 +409,7 @@ console.log("\n=== arc edit --review-fixes — one arc takes every fix to a land
   ok("red: the review-fixes arc opens on the developer's words", silent.code === 2 && silent.out.includes("on the developer's words"), silent.out);
   const opened = write("031/N009", "--title", "review fixes", "--subject", "review-fixes", "--goal", "every fix to a landed arc", "--review-fixes", "--note", "the developer: fix the footer's gap");
   ok("it opens DECIDED on those words, marked as the review-fixes arc", opened.code === 0 && json(file).status === "DECIDED" && json(file).reviewFixes === true, opened.out);
-  cli(fixes.root, ["workstream", "row", "add", "031/N009", "N001: the footer's gap", "--kind", "fix", "--repo", "spn-x", "--altitude", "DOCS", "--state", "waiting"]);
+  cli(fixes.root, ["workstream", "row", "add", "031/N009", "N001: the footer's gap", "--kind", "fix", "--repo", "spn-x", "--work", "DOCS", "--state", "waiting"]);
   const fixed = cli(fixes.root, ["workstream", "row", "state", "031/N009", "1", "landed"]);
   ok("its steps all landed, it still reads RUNNING until the close", fixed.code === 0 && fixed.out.includes("N009 reads RUNNING"), fixed.out);
   const second = write("031/N010", "--title", "more fixes", "--subject", "more-fixes", "--goal", "more fixes", "--review-fixes", "--note", "the developer: fix it");
@@ -510,7 +510,7 @@ console.log("\n=== arc edit — an arc opens whole: its data, its preview, its W
 
 console.log("\n=== row discard — a row found invalid leaves the arc, in the developer's words (RULE.DEVEX.WORKSPACE.279)");
 {
-  const base = { kind: "change", repo: "spn-x", altitude: "CODE", blockedBy: [], touches: [] };
+  const base = { kind: "change", repo: "spn-x", work: "CODE", blockedBy: [], touches: [] };
   const gone = await dataWorkspace("commands-discard", { rows: [
     { ...base, id: "1", parent: "N001", title: "write the book", state: "landed" },
     { ...base, id: "2", parent: "N001", title: "a command nobody needs", state: "deferred" },
@@ -553,7 +553,7 @@ console.log("\n=== the change sheet — the opening write, and a row's entries")
   const sheetFile = join(ws, "arcs", "N070", "sheet.json");
   ok("the opening write writes the empty sheet beside state.json", opened.code === 0 && existsSync(sheetFile) &&
     JSON.stringify(json(sheetFile)) === JSON.stringify({ schemaVersion: 1, releaseChain: [], dependsOn: [], stack: null, entries: [] }), opened.out);
-  const added = cli(root, ["workstream", "row", "add", "031/N070", "build it", "--repo", "spn-x", "--altitude", "CODE", "--entries", "E1,E2"]);
+  const added = cli(root, ["workstream", "row", "add", "031/N070", "build it", "--repo", "spn-x", "--work", "CODE", "--entries", "E1,E2"]);
   ok("`row add --entries` names the entries on the row", added.code === 0 && json(join(ws, "arcs", "N070", "state.json")).rows[0].entries.join() === "E1,E2", added.out);
   const edited = cli(root, ["workstream", "row", "edit", "031/N070", "1", "--entries", "E3"]);
   ok("`row edit --entries` changes them", edited.code === 0 && /entries/.test(edited.out) && json(join(ws, "arcs", "N070", "state.json")).rows[0].entries.join() === "E3", edited.out);
@@ -565,7 +565,7 @@ console.log("\n=== the change sheet — the opening write, and a row's entries")
 
 console.log("\n=== landing on a run — a sheet arc holds the agent to the sheet");
 {
-  const row = (id, altitude, over = {}) => ({ id, parent: "N001", title: `row ${id}`, kind: "change", repo: "spn-x", altitude, blockedBy: [], touches: [], state: "ready", ...over });
+  const row = (id, work, over = {}) => ({ id, parent: "N001", title: `row ${id}`, kind: "change", repo: "spn-x", work, blockedBy: [], touches: [], state: "ready", ...over });
   const entry = (id, tiers) => ({ id, op: "edit", file: "spn-x:a.ts", what: `change ${id}`, decidedBy: [], facts: ["f1"], then: [], rules: [], callers: [], tiers, docs: [], book: [] });
   const sheetWith = (entries) => ({ schemaVersion: 1, releaseChain: [], dependsOn: [], stack: { folder: "x", dmo: "none", reset: "x" }, entries });
   const later = new Date(Date.now() + 3600e3).toISOString();
@@ -665,18 +665,18 @@ console.log("\n=== landing on a run — a sheet arc holds the agent to the sheet
 
 console.log("\n=== a code row of an arc with no sheet is refused with no run");
 {
-  const plain = await dataArc("nosheet", { rows: [{ id: "1", parent: "N001", title: "r", kind: "change", repo: "spn-x", altitude: "CODE", blockedBy: [], touches: [], state: "ready" }] });
+  const plain = await dataArc("nosheet", { rows: [{ id: "1", parent: "N001", title: "r", kind: "change", repo: "spn-x", work: "CODE", blockedBy: [], touches: [], state: "ready" }] });
   const stateFile = join(plain.ws, "arcs", "N001", "state.json");
   const landed = cli(plain.root, ["workstream", "row", "state", "031/N001", "1", "landed"]);
   ok("[MKT.SCRIPTS.231] a code row lands with no --run: refused, and the row stays", landed.code === 1 && landed.out.includes("--run") && json(stateFile).rows[0].state === "ready", landed.out);
-  const docs = await dataArc("nosheet-docs", { rows: [{ id: "1", parent: "N001", title: "r", kind: "change", repo: "spn-x", altitude: "DOCS", blockedBy: [], touches: [], state: "ready" }] });
+  const docs = await dataArc("nosheet-docs", { rows: [{ id: "1", parent: "N001", title: "r", kind: "change", repo: "spn-x", work: "DOCS", blockedBy: [], touches: [], state: "ready" }] });
   const docsLanded = cli(docs.root, ["workstream", "row", "state", "031/N001", "1", "landed"]);
   ok("[MKT.SCRIPTS.231] a docs row of the same kind of arc still lands", docsLanded.code === 0 && json(join(docs.ws, "arcs", "N001", "state.json")).rows[0].state === "landed", docsLanded.out);
 }
 
 console.log("\n=== the go is refused while the sheet has a finding");
 {
-  const rows = [{ id: "1", parent: "N001", title: "r", kind: "change", repo: "spn-x", altitude: "DOCS", blockedBy: [], touches: [], state: "waiting" }];
+  const rows = [{ id: "1", parent: "N001", title: "r", kind: "change", repo: "spn-x", work: "DOCS", blockedBy: [], touches: [], state: "waiting" }];
   const going = await dataArc("go", { rows });
   const file = join(going.ws, "arcs", "N001", "state.json");
   const data = json(file); data.status = "PROPOSED"; writeFileSync(file, JSON.stringify(data, null, 2));
@@ -696,7 +696,7 @@ console.log("\n=== an arc title is a topic name");
 console.log("\n=== a marketplace's own run file is found");
 {
   const entry = { id: "E1", op: "edit", file: "spn-x:a.ts", what: "change E1", decidedBy: [], facts: ["f1"], then: [], rules: [], callers: [], tiers: { unit: ["U.1"] }, docs: [], book: [] };
-  const row = { id: "1", parent: "N001", title: "r", kind: "change", repo: "spn-x", altitude: "CODE", blockedBy: [], touches: [], state: "ready", entries: ["E1"] };
+  const row = { id: "1", parent: "N001", title: "r", kind: "change", repo: "spn-x", work: "CODE", blockedBy: [], touches: [], state: "ready", entries: ["E1"] };
   const market = await dataArc("market", { rows: [row] });
   const sha = market.git(["rev-parse", "HEAD"]);
   const stateFile = join(market.ws, "arcs", "N001", "state.json");
@@ -733,8 +733,8 @@ console.log("\n=== fact write — pinned on the workstream's own branch");
 console.log("\n=== report write — a part's report lands the part, and the steps whose parts landed");
 {
   const rows = [
-    { id: "1", parent: "N001", title: "write the book", kind: "change", repo: "spn-x", altitude: "DOCS", blockedBy: [], touches: [], state: "waiting", entries: ["E1"] },
-    { id: "2", parent: "N001", title: "build it", kind: "change", repo: "spn-x", altitude: "CODE", blockedBy: ["1"], touches: [], state: "waiting", entries: ["E2"] },
+    { id: "1", parent: "N001", title: "write the book", kind: "change", repo: "spn-x", work: "DOCS", blockedBy: [], touches: [], state: "waiting", entries: ["E1"] },
+    { id: "2", parent: "N001", title: "build it", kind: "change", repo: "spn-x", work: "CODE", blockedBy: ["1"], touches: [], state: "waiting", entries: ["E2"] },
   ];
   const fold = await dataArc("fold", { rows });
   const entry = (id, file) => ({ id, op: "edit", file, what: `change ${id}`, decidedBy: ["q1"], facts: ["f1"], then: [], rules: [], callers: [], tiers: { unit: [`T.${id}.01`] }, docs: [], book: [] });
@@ -744,7 +744,8 @@ console.log("\n=== report write — a part's report lands the part, and the step
   cli(fold.root, ["workstream", "sheet", "write", "N001", "--file", sheetIn]);
   const written = cli(fold.root, ["workstream", "go", "write", "N001", "--scope", "N001"]);
   const plan = json(join(fold.ws, "arcs", "N001", "go.json"));
-  const part = (pass) => plan.parts.find((one) => one.pass === pass);
+  // A baseline and a full run are both TEST work, told apart by their ids.
+  const part = (slot) => plan.parts.find((one) => (slot === "FULL_RUN" ? one.work === "TEST" && !one.id.startsWith("baseline-") : one.work === slot));
   const stateOf = (id) => json(join(fold.ws, "arcs", "N001", "state.json")).rows.find((one) => one.id === id).state;
   const partState = (id) => json(join(fold.ws, "arcs", "N001", "go.json")).parts.find((one) => one.id === id).state;
   const sha = fold.git(["rev-parse", "HEAD"]);
@@ -780,7 +781,7 @@ console.log("\n=== a suggestion's stage follows the arc that carries it");
 
 console.log("\n=== state show — cost and rework of the running arc");
 {
-  const row = (id, over = {}) => ({ id, parent: "N001", title: `r${id}`, kind: "change", repo: "spn-x", altitude: "DOCS", blockedBy: [], touches: [], state: "ready", ...over });
+  const row = (id, over = {}) => ({ id, parent: "N001", title: `r${id}`, kind: "change", repo: "spn-x", work: "DOCS", blockedBy: [], touches: [], state: "ready", ...over });
   const cost = await dataWorkspace("cost", { rows: [row("1", { state: "landed", cost: { tokens: 200000, minutes: 3 } }), row("2", { cost: { tokens: 212000, minutes: 4 } }),
     row("3", { decisions: ["q5"] }), row("4"), row("5", { decisions: ["q2"] })] });
   const arcDir = join(cost.ws, "arcs", "N001");
@@ -847,6 +848,81 @@ console.log("\n=== row state waiting --on — a row waits on something outside t
   ok("any other state clears `waitingOn`", cleared.code === 0 && rowOne().state === "ready" && rowOne().waitingOn == null, cleared.out);
   const back = cli(one.root, ["workstream", "rows", "show", "031/N001", "--ready"]);
   ok("set to ready, the row is listed again", /N001 1 /.test(back.out), back.out);
+}
+
+console.log("\n=== work write — altitude and pass become work in every open workstream (MKT.SCRIPTS.326)");
+{
+  const old = await dataWorkspace("work-write");
+  const rowsOld = arcData().rows.map(({ work, ...rest }) => ({ ...rest, altitude: "DOCS" }));
+  const stateFile = join(old.ws, "arcs", "N001", "state.json");
+  writeFileSync(stateFile, JSON.stringify({ ...json(stateFile), rows: rowsOld }, null, 2));
+  const renamed = cli(old.root, ["workstream", "work", "write"]);
+  const after = json(stateFile).rows;
+  ok("[MKT.SCRIPTS.326] `work write` renames altitude to work in each row, and says how many", renamed.code === 0 && after.every((row) => row.work === "DOCS" && !("altitude" in row)) && /\d+ records? renamed to work/.test(renamed.out), renamed.out);
+  ok("[MKT.SCRIPTS.326] one `work` line is left in the arc's log", lines(join(old.ws, "arcs", "N001", "log.jsonl")).filter((line) => line.kind === "work").length === 1);
+  const again = cli(old.root, ["workstream", "work", "write"]);
+  ok("[MKT.SCRIPTS.326] run again it changes nothing and writes no second line", again.code === 0 && again.out.includes("no open workstream holds altitude or pass") && lines(join(old.ws, "arcs", "N001", "log.jsonl")).filter((line) => line.kind === "work").length === 1, again.out);
+  const target = cli(old.root, ["workstream", "work", "write", "031"]);
+  ok("red: `work write` takes no target", target.code === 2 && target.out.includes("takes no target"), target.out);
+}
+
+console.log("\n=== go start — a release part starts, a helper's part does not (MKT.SCRIPTS.326)");
+{
+  const rel = await dataArc("go-release", { rows: [{ id: "1", parent: "N001", title: "r", kind: "change", repo: "spn-x", work: "DOCS", blockedBy: [], touches: [], state: "ready", entries: ["E1"] }] });
+  const entry = { id: "E1", op: "edit", file: "spn-x:docs/a.md", what: "x", decidedBy: ["q1"], facts: [], then: [], rules: [], callers: [], tiers: {}, docs: [], book: [] };
+  writeFileSync(join(rel.ws, "arcs", "N001", "sheet.json"), JSON.stringify({ schemaVersion: 1, releaseChain: ["spn-x"], dependsOn: [], stack: null, entries: [entry] }));
+  cli(rel.root, ["workstream", "go", "write", "N001", "--scope", "N001"]);
+  const goFile = join(rel.ws, "arcs", "N001", "go.json");
+  const plan = json(goFile);
+  const release = plan.parts.find((one) => one.work === "RELEASE");
+  ok("[MKT.SCRIPTS.326] the go holds a RELEASE part, named by `work`", !!release && plan.parts.every((one) => !("pass" in one) && typeof one.work === "string"), JSON.stringify(plan.parts.map((one) => [one.id, one.work])));
+  const helper = plan.parts.find((one) => one.work === "DOCS");
+  const refusedHelper = cli(rel.root, ["workstream", "go", "start", "031/N001", helper.id]);
+  ok("[MKT.SCRIPTS.326] red: a helper's part is refused, and nothing changes", refusedHelper.code === 1 && /DOCS part/.test(refusedHelper.out) && json(goFile).parts.find((one) => one.id === helper.id).state === helper.state, refusedHelper.out);
+  const started = cli(rel.root, ["workstream", "go", "start", "031/N001", release.id]);
+  ok("[MKT.SCRIPTS.326] a ready release part starts: running, and the next step is the release", started.code === 0 && json(goFile).parts.find((one) => one.id === release.id).state === "running" && /Next: release spn-x/.test(started.out), started.out);
+  const twice = cli(rel.root, ["workstream", "go", "start", "031/N001", release.id]);
+  ok("[MKT.SCRIPTS.326] red: a release part already running is refused, not ready", twice.code === 1 && /not ready/.test(twice.out), twice.out);
+}
+
+console.log("\n=== workstream close — retro.json and the suggestions it raises; a part's red first is not counted (MKT.SCRIPTS.326, .332)");
+{
+  const retro = await dataWorkspace("retro");
+  const closedEarlier = join(retro.root, ".spndevex", "workstreams", "closed", "030-older");
+  mkdirSync(closedEarlier, { recursive: true });
+  const calm = { v: 1, workstream: "030-older", at: "2026-09-01T00:00:00Z", stages: {}, works: {}, outcomes: {}, parts: {}, shape: {}, ungated: [],
+    checks: { "test-run": { runs: 10, denies: 0, retried: 0 } }, commands: { "workstream row": { runs: 10, failed: 0, retried: 0, refused: 0 } } };
+  writeFileSync(join(closedEarlier, "retro.json"), JSON.stringify(calm));
+  const telemetry = join(retro.root, ".spndevex", ".debug", "telemetry");
+  mkdirSync(telemetry, { recursive: true });
+  const base = { v: 1, event: "PostToolUse", session: "s1", agent: null, workstream: "031-probe", arc: "N001", part: null, skill: null, work: null };
+  let n = 0;
+  const at = () => `2026-10-10T10:${String(n).padStart(2, "0")}:00Z`;
+  const check = (verdict, retryOf = null) => JSON.stringify({ ...base, mtype: "CHECK", id: `c${++n}`, at: at(), check: "test-run", verdict, retryOf });
+  const command = (call, exit, retryOf = null) => JSON.stringify({ ...base, mtype: "COMMAND", id: `m${++n}`, at: at(), call, exit, retryOf });
+  const own = { program: "spn-devex", group: "workstream", action: "row" };
+  const suite = { program: "spnutils", group: "apps", action: "test" };
+  writeFileSync(join(telemetry, "hooks.jsonl"), [
+    check("DENY"), check("DENY", "c1"), check("DENY", "c2"),
+    command(own, 2), command(own, 2, "m4"),
+    // a part's own red first: the suite fails, then passes inside the part
+    command(suite, 1), command(suite, 0, "m6"),
+  ].join("\n") + "\n");
+  writeFileSync(join(retro.ws, "arcs", "N001", "log.jsonl"), [
+    { at: "2026-10-01T10:00:00Z", kind: "header", row: null, note: "the panel overturned the first shape" },
+    { at: "2026-10-01T10:01:00Z", kind: "note", row: null, note: "the panel blocked it" },
+  ].map((one) => JSON.stringify(one)).join("\n") + "\n");
+  const closing = cli(retro.root, ["workstream", "close", "031"]);
+  const home = existsSync(join(retro.root, ".spndevex", "workstreams", "closed", "031-probe", "retro.json")) ? join(retro.root, ".spndevex", "workstreams", "closed", "031-probe") : retro.ws;
+  const record = existsSync(join(home, "retro.json")) ? json(join(home, "retro.json")) : null;
+  ok("[MKT.SCRIPTS.326] `close` with no arguments writes retro.json, a version 1 record of this workstream", !!record && record.v === 1 && record.workstream === "031-probe", closing.out);
+  ok("[MKT.SCRIPTS.326] the record tallies the checks and commands from the telemetry", record?.checks["test-run"]?.runs === 3 && record.checks["test-run"].denies === 3 && record.checks["test-run"].retried === 2 && record.commands["workstream row"]?.refused === 2, JSON.stringify(record?.checks) + JSON.stringify(record?.commands));
+  ok("[MKT.SCRIPTS.332] a part's red first is not counted: the suite runs are in no command tally", !!record && !Object.keys(record.commands).some((key) => key.includes("test")), JSON.stringify(record?.commands));
+  const raised = lines(join(home, "suggestions.jsonl")).map((one) => one.title);
+  ok("[MKT.SCRIPTS.326] it raises the check, the command and the shape that stand out against the earlier workstream", raised.some((t) => t.includes("check:test-run")) && raised.some((t) => t.includes("command:workstream row")) && raised.some((t) => t.includes("ideate:panel-overturned")), JSON.stringify(raised));
+  ok("[MKT.SCRIPTS.332] and none for the suite's red first", !raised.some((t) => /apps test|command:apps/.test(t)), JSON.stringify(raised));
+  ok("each suggestion is raised, not decided", lines(join(home, "suggestions.jsonl")).filter((one) => /^Retrospective/.test(one.title)).every((one) => one.state === "raised"));
+  ok("the close prints each one it raised", /retrospective · raised s\d+ Retrospective · check:test-run/.test(closing.out), closing.out);
 }
 
 console.log(failed ? `\n  ${failed} of ${total} FAILED — workstream commands` : `\n  all ${total} passed — workstream commands`);

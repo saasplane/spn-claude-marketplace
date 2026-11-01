@@ -3,12 +3,17 @@
 // The chapter is the source of truth; a rule change is edited there first, then here, in the same change.
 //
 //     spn-devex debug store show [--json]
+//     spn-devex debug store reset
 //
 // Each container of `.spndevex/.debug/`: its files, its bytes and its lifetime rule as the book's table states it.
 // Then the switch, which is not in `.debug/`: the `debug` node of `.spndevex/state.json`, or `.debug/switches.json`
 // until plugin migration 008 folds it in.
+//
+// `reset` removes the two telemetry logs, `usage.jsonl` and `hooks.jsonl`, and their `.1.jsonl` files at once, for a tidy
+// start; the writer would move an old log aside before its first append anyway. It removes nothing else. Its own
+// `COMMAND` row, written as the command ends, is the first of the new `hooks.jsonl` while telemetry is on.
 
-import { existsSync, readdirSync, statSync } from "node:fs";
+import { existsSync, readdirSync, rmSync, statSync } from "node:fs";
 import { dirname, join, relative, resolve, sep } from "node:path";
 import { type Action, FLAG, UsageFault, readWords } from "../../../../../plugin-support-lib/src/lib/command.ts";
 import { readSwitch, sessionDir, switchesFile, telemetryFolder, workspaceDir } from "../../../../../plugin-support-lib/src/lib/debug-store.ts";
@@ -67,6 +72,22 @@ function show(args: string[]): number {
   return 0;
 }
 
+/** The telemetry logs `reset` removes: the two logs, each with its rotated file, and nothing else in the folder. */
+const RESET_FILES = ["usage.jsonl", "usage.1.jsonl", "hooks.jsonl", "hooks.1.jsonl"] as const;
+
+function reset(args: string[]): number {
+  const words = readWords(args);
+  if (words.paths.length) throw new UsageFault("takes no target.");
+  const root = workspaceRoot(resolve(process.env.SPN_WORKSPACE ?? process.cwd()));
+  if (!root) throw new UsageFault("finds no workspace above this folder.");
+  const folder = telemetryFolder(root);
+  const removed = RESET_FILES.filter((name) => existsSync(join(folder, name)));
+  for (const name of removed) rmSync(join(folder, name), { force: true });
+  console.log(removed.length ? `removed ${removed.join(", ")} from ${relative(root, folder).split(sep).join("/")}` : "no usage or hooks log to remove");
+  return 0;
+}
+
 export const actions: Record<string, Action> = {
   show: { describe: "each container of the store: files, size, lifetime", usage: "[--json]", run: show },
+  reset: { describe: "remove usage.jsonl, hooks.jsonl and their .1 files, and nothing else", usage: "", run: reset },
 };

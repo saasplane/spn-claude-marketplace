@@ -18,7 +18,7 @@ import {
   strayLevels, strayNotes, suggestionsFileOf, readJson, workstreamsOf, previewWithStatus,
   localLinks, previewHrefOf, previewOwners, slotsIn, whatEntryOf, whatId, whatRange, workstreamName,
 } from "../lib/workstream.ts";
-import { ALTITUDES, DONE_STATES, arcFaults, factFaults, sheetFaults, logFaults, questionFaults, subjectFault, suggestionFaults, type ArcData, type Fact } from "../lib/workstream-schema.ts";
+import { WORK, DONE_STATES, arcFaults, factFaults, sheetFaults, logFaults, questionFaults, subjectFault, suggestionFaults, type ArcData, type Fact } from "../lib/workstream-schema.ts";
 
 export type Finding = { workstream: string; arc: string | null; check: string; message: string };
 
@@ -263,12 +263,12 @@ export function statusFindings(arc: string, data: ArcData): string[] {
   return out;
 }
 
-// The altitudes in the order they run (01-workstream.md § A step row).
-const ALTITUDE_ORDER: readonly string[] = ALTITUDES;
+// The kinds of work in the order WORK lists them (01-workstream.md § A step row says where, what work, and how).
+const WORK_ORDER: readonly string[] = WORK;
 
 /**
- * RULE.DEVEX.WORKSPACE.183: an arc's steps, each with a repository and an altitude, in chain order by repository,
- * the foundation first, then DOCS · CODE · GENERATED · RELEASE · PROOF inside each, read in the order the arc keeps
+ * RULE.DEVEX.WORKSPACE.183: an arc's steps, each with a repository and a kind of work, in chain order by repository,
+ * the foundation first, then the work in the order WORK lists it inside each, read in the order the arc keeps
  * them. A row whose repository is `—` changes none and takes no place in the chain. `arc edit` prints what this finds and never refuses on it: the chain between two
  * stack repositories is judgement.
  */
@@ -278,27 +278,27 @@ export function stepRowFindings(data: ArcData): string[] {
   const disorder: string[] = [];
   const seen = new Set<string>();
   let repo: string | null = null;
-  let lastAltitude = -1;
+  let lastWork = -1;
   for (const row of rows) {
     const rowRepo = typeof row.repo === "string" ? row.repo.trim() : "";
-    const altitude = ALTITUDE_ORDER.indexOf(typeof row.altitude === "string" ? row.altitude : "");
-    if (!rowRepo || altitude < 0) { bare.push(row.id); continue; }
+    const work = WORK_ORDER.indexOf(typeof row.work === "string" ? row.work : "");
+    if (!rowRepo || work < 0) { bare.push(row.id); continue; }
     if (NO_REPO.has(rowRepo)) continue;
     if (rowRepo !== repo) {
       if (seen.has(rowRepo)) disorder.push(`row ${row.id} returns to ${rowRepo} after ${repo}`);
       else if (/\bspn-foundation\b/.test(rowRepo) && seen.size) disorder.push(`row ${row.id} is spn-foundation after ${[...seen][0]} — the foundation comes first`);
       seen.add(rowRepo);
       repo = rowRepo;
-      lastAltitude = -1;
+      lastWork = -1;
     }
-    if (altitude < lastAltitude) disorder.push(`row ${row.id} is ${ALTITUDE_ORDER[altitude]} after ${ALTITUDE_ORDER[lastAltitude]} in ${rowRepo}`);
-    lastAltitude = Math.max(lastAltitude, altitude);
+    if (work < lastWork) disorder.push(`row ${row.id} is ${WORK_ORDER[work]} after ${WORK_ORDER[lastWork]} in ${rowRepo}`);
+    lastWork = Math.max(lastWork, work);
   }
-  const where = "(01-workstream.md § A step row says where, at what altitude, and how; RULE.DEVEX.WORKSPACE.183)";
+  const where = "(01-workstream.md § A step row says where, what work, and how; RULE.DEVEX.WORKSPACE.183)";
   const out: string[] = [];
-  if (bare.length) out.push(`${data.arc} row(s) ${bare.join(", ")} carry no repo, or no altitude from ${ALTITUDE_ORDER.join(" · ")} ${where}`);
+  if (bare.length) out.push(`${data.arc} row(s) ${bare.join(", ")} carry no repo, or no work from ${WORK_ORDER.join(" · ")} ${where}`);
   if (disorder.length) out.push(`${data.arc} rows out of chain order: ${disorder.join(" · ")} — rows run by repository, the foundation ` +
-    `first, then DOCS · CODE · GENERATED · RELEASE · PROOF inside each ${where}`);
+    `first, then ${WORK_ORDER.join(" · ")} inside each ${where}`);
   return out;
 }
 

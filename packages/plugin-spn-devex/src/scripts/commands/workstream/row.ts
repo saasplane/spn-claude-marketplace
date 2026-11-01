@@ -1,10 +1,10 @@
-// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § The commands · § The formats · § The life of an arc, and every file it touches · § A step row says where, at what altitude, and how
+// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § The commands · § The formats · § The life of an arc, and every file it touches · § A step row says where, what work, and how
 // The chapter is the source of truth; a rule change is edited there first, then here, in the same change.
 //
-//   spn-devex workstream row add <workstream>/N<nnn> "<title>" --repo <repo> --altitude <altitude> [--kind change] [--state ready] …
+//   spn-devex workstream row add <workstream>/N<nnn> "<title>" --repo <repo> --work <work> [--kind change] [--state ready] …
 //   spn-devex workstream row state <workstream>/N<nnn> <row> <state> [--on "<what it waits on>"] [--note "…"] [--run <name>]
 //   spn-devex workstream row note <workstream>/N<nnn> <row> "<text>"
-//   spn-devex workstream row edit <workstream>/N<nnn> <row> [--title …] [--kind …] [--repo …] [--altitude …] …
+//   spn-devex workstream row edit <workstream>/N<nnn> <row> [--title …] [--kind …] [--repo …] [--work …] …
 //   spn-devex workstream row discard <workstream>/N<nnn> <row> --note "<the developer's words>"
 //
 // One command per target: a positional word is the target and its one value, an option is named, and a required option left out is
@@ -13,8 +13,9 @@
 
 import { type Action, FLAG, VALUE, UsageFault, readWords, type Words } from "../../../../../plugin-support-lib/src/lib/command.ts";
 import { arcStatus, doneOf, landingFault, logEvent, readArc, readSheet, stateOfRow, stepsMayStart, writeArc } from "../../lib/workstream.ts";
-import { ALTITUDES, ROW_ID, ROW_KINDS, ROW_STATES, parentIds, type ArcData, type ArcRow } from "../../lib/workstream-schema.ts";
+import { WORK, ROW_ID, ROW_KINDS, ROW_STATES, parentIds, type ArcData, type ArcRow } from "../../lib/workstream-schema.ts";
 import { ARC_FLAGS, afterWrite, arcNamed, arcSignatures, listOf, refreshIfMoved, refuseFlags, typed } from "./_shared.ts";
+import { renameFirstRead } from "./sheet.ts";
 import { stepRowFindings } from "../../checks/workstream-state.ts";
 
 export const describe = "add a row, move its state, write a note on it, change its fields, or discard one found invalid";
@@ -24,7 +25,7 @@ const ROW_LISTS: Record<string, keyof ArcRow> = { "blocked-by": "blockedBy", tou
 
 /** What a row carries beyond its title, shared by `row add` and `row edit`. */
 const FIELDS = {
-  repo: VALUE, altitude: ALTITUDES, kind: ROW_KINDS, model: VALUE, "blocked-by": VALUE, touches: VALUE, position: VALUE,
+  repo: VALUE, work: WORK, kind: ROW_KINDS, model: VALUE, "blocked-by": VALUE, touches: VALUE, position: VALUE,
   parent: VALUE, mechanism: VALUE, acceptance: VALUE, decisions: VALUE, facts: VALUE, entries: VALUE, proof: VALUE, order: VALUE,
 } as const;
 const ADD_OPTIONS = { ...FIELDS, state: ROW_STATES, note: VALUE } as const;
@@ -37,7 +38,7 @@ function rowFields(row: ArcRow, words: Words): string[] {
     const value = words.value(name);
     if (value !== null && row[name] !== value) { row[name] = value; changed.push(name); }
   }
-  for (const name of ["kind", "altitude", "state"] as const) {
+  for (const name of ["kind", "work", "state"] as const) {
     const value = words.value(name);
     if (value !== null && row[name] !== value) { (row as Record<string, unknown>)[name] = value; changed.push(name); }
   }
@@ -72,6 +73,7 @@ function nextId(rows: readonly ArcRow[], parent: string | null): string {
 /** The arc as it is written, or a refusal that names `arc edit` where it is not. */
 function arcOf(ref: string | undefined): { ws: string; arc: string; data: ArcData } {
   const { ws, arc } = arcNamed(ref, true);
+  renameFirstRead(ws, arc);
   const data = readArc(ws, arc);
   if (!data) throw new UsageFault(`finds no ${arc} — open it first: \`arc edit ${ref} --title "…" --subject … --goal "…"\`.`);
   return { ws, arc, data };
@@ -83,7 +85,7 @@ function rowOf(ref: string | undefined, rowId: string | undefined): { ws: string
   const { ws, arc, data } = arcOf(ref);
   if (!ROW_ID.test(rowId)) throw new UsageFault(`reads \`${rowId}\` as no row id — a row is \`57\`, \`57b\` or \`3e.1\`.`);
   const row = data.rows.find((one) => one.id === rowId);
-  if (!row) throw new UsageFault(`finds no row ${rowId} in ${arc} — \`row add ${ref} "<title>" --repo <repo> --altitude <altitude>\` adds one and prints its number.`);
+  if (!row) throw new UsageFault(`finds no row ${rowId} in ${arc} — \`row add ${ref} "<title>" --repo <repo> --work <work>\` adds one and prints its number.`);
   return { ws, arc, data, row };
 }
 
@@ -111,9 +113,9 @@ function add(args: string[]): number {
   refuseFlags(args, ARC_FLAGS, (name) => `does not take \`--${name}\`: it is the arc's — \`arc edit <workstream>/N<nnn> --${name} …\` changes it.`);
   const words = readWords(args, ADD_OPTIONS);
   const [ref, title, ...more] = words.paths;
-  if (!title || more.length) throw new UsageFault("takes an arc and one title: `row add <workstream>/N<nnn> \"<title>\" --repo <repo> --altitude <altitude>`.");
-  for (const need of ["repo", "altitude"] as const)
-    if (!words.value(need)?.trim()) throw new UsageFault(`adds a row with \`--repo\` and \`--altitude\`: \`--${need}\` is missing, and a step says where it lands and at what altitude (RULE.DEVEX.WORKSPACE.183).`);
+  if (!title || more.length) throw new UsageFault("takes an arc and one title: `row add <workstream>/N<nnn> \"<title>\" --repo <repo> --work <work>`.");
+  for (const need of ["repo", "work"] as const)
+    if (!words.value(need)?.trim()) throw new UsageFault(`adds a row with \`--repo\` and \`--work\`: \`--${need}\` is missing, and a step says where it lands and what work (RULE.DEVEX.WORKSPACE.183).`);
   const place = placeOf(words);
   const { ws, arc, data } = arcOf(ref);
   const statusBefore = arcStatus(data);
@@ -202,7 +204,7 @@ function edit(args: string[]): number {
 /** Every option `row write` ever took, read loosely: the refusal needs the words, not their values. */
 const RETIRED = {
   title: VALUE, subject: VALUE, goal: VALUE, status: VALUE, reason: VALUE, wait: VALUE, start: FLAG, "review-fixes": FLAG, decides: VALUE, repos: VALUE, cycle: VALUE, follows: VALUE,
-  model: VALUE, parent: VALUE, kind: VALUE, repo: VALUE, altitude: VALUE, mechanism: VALUE, acceptance: VALUE, "blocked-by": VALUE, touches: VALUE, decisions: VALUE, facts: VALUE,
+  model: VALUE, parent: VALUE, kind: VALUE, repo: VALUE, work: VALUE, mechanism: VALUE, acceptance: VALUE, "blocked-by": VALUE, touches: VALUE, decisions: VALUE, facts: VALUE,
   state: VALUE, proof: VALUE, order: VALUE, note: VALUE, position: VALUE, preview: VALUE, under: VALUE,
 } as const;
 
@@ -219,7 +221,7 @@ function write(args: string[]): number {
     let known = true;
     try { known = !!arcOf(ref).data.rows.find((one) => one.id === rowId); } catch { known = true; }
     const rest = given.filter((name) => name !== "state" && name !== "note");
-    if (!known) fits = `row add ${arcRef} "<title>" --repo <repo> --altitude <altitude> ${flags(given.filter((name) => name !== "title" && name !== "repo" && name !== "altitude"))}`;
+    if (!known) fits = `row add ${arcRef} "<title>" --repo <repo> --work <work> ${flags(given.filter((name) => name !== "title" && name !== "repo" && name !== "work"))}`;
     else if (given.includes("state") && !rest.length) fits = `row state ${arcRef} ${rowId} ${words.value("state") ?? "<state>"}${given.includes("note") ? ' --note "…"' : ""}`;
     else if (given.length === 1 && given[0] === "note") fits = `row note ${arcRef} ${rowId} "<text>"`;
     else fits = `row edit ${arcRef} ${rowId} ${flags(rest)}${given.includes("state") ? `; then \`row state ${arcRef} ${rowId} ${words.value("state")}\`` : ""}`;
@@ -237,6 +239,7 @@ function discard(args: string[]): number {
   const note = words.value("note");
   if (!note?.trim()) throw new UsageFault(`discards row ${rowId} with \`--note\` carrying the developer's words, so nobody raises it again.`);
   const { ws, arc } = arcNamed(ref, true);
+  renameFirstRead(ws, arc);
   const data = readArc(ws, arc);
   if (!data) throw new UsageFault(`finds no ${arc}.`);
   const row = data.rows.find((one) => one.id === rowId);
@@ -265,7 +268,7 @@ function discard(args: string[]): number {
 export const actions: Record<string, Action> = {
   add: {
     describe: "add a row to an arc, taking the arc's next number and printing it",
-    usage: "<workstream>/N<nnn> \"<title>\" --repo <repo> --altitude <altitude> [--kind change] [--state ready] [--blocked-by …] [--touches …] [--entries E1,E2] [--position …] [--model …] [--note …]",
+    usage: "<workstream>/N<nnn> \"<title>\" --repo <repo> --work <work> [--kind change] [--state ready] [--blocked-by …] [--touches …] [--entries E1,E2] [--position …] [--model …] [--note …]",
     run: add,
   },
   state: {
@@ -280,7 +283,7 @@ export const actions: Record<string, Action> = {
   },
   edit: {
     describe: "change the fields of a row the arc holds; --proof names a carried row's successor; a row it lacks is refused, and `row add` is named",
-    usage: "<workstream>/N<nnn> <row> [--title …] [--kind …] [--repo …] [--altitude …] [--model …] [--blocked-by …] [--touches …] [--entries E1,E2] [--position …] [--proof …]",
+    usage: "<workstream>/N<nnn> <row> [--title …] [--kind …] [--repo …] [--work …] [--model …] [--blocked-by …] [--touches …] [--entries E1,E2] [--position …] [--proof …]",
     run: edit,
   },
   discard: {

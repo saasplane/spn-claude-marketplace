@@ -257,10 +257,10 @@ console.log("\n=== pretooluse — a source edit waits while a test run for that 
   const pending = join(root, ".spndevex", ".debug", "sessions", "s-run", "pending");
   mkdirSync(pending, { recursive: true });
   writeFileSync(join(pending, "toolu_run.json"), JSON.stringify({ at: Date.now() - 90_000, background: false,
-    found: [{ script: "spnutils", group: "apps", subgroup: null, action: "test", args: "contract r1 api", repo: "spn-x" }] }));
-  one("[MKT.HOOKS.31] the test-run refusal survives the chain, naming the run",
+    found: [{ repo: "spn-x", call: { program: "spnutils", group: "apps", action: "test" }, suite: true }] }));
+  one("[MKT.HOOKS.31] the test-run refusal survives the chain, naming the run's program, group and action (never its arguments)",
     { tool_name: "Edit", cwd: root, tool_input: { file_path: join(root, "spn-x/apps/api/src/a.ts"), old_string: "1", new_string: "2" } },
-    "deny", { says: "spnutils apps test contract r1 api", cwd: root, parity: false, why: "a new guard" });
+    "deny", { says: "spnutils apps test", cwd: root, parity: false, why: "a new guard" });
   one("[MKT.HOOKS.32] a write outside src and tests passes the same chain",
     { tool_name: "Write", cwd: root, tool_input: { file_path: join(root, "spn-x/notes.txt"), content: "x" } },
     "silent", { cwd: root, parity: false, why: "a new guard" });
@@ -470,7 +470,7 @@ console.log("\n=== pretooluse — a launch of an order is read through its row t
     writeFileSync(join(base, "arcs", name, "state.json"), JSON.stringify({ schemaVersion: 2, arc: name, subject: "probe", title: "t", goal: null, status: "DECIDED", reason: null, preview: "preview.html", rows }));
     if (sheet) writeFileSync(join(base, "arcs", name, "sheet.json"), JSON.stringify(sheet));
   };
-  const row = (id, altitude, entries) => ({ id, parent: "N002", title: `r${id}`, kind: "change", altitude, repo: "probe-repo", state: "ready", ...(entries ? { entries } : {}) });
+  const row = (id, altitude, entries) => ({ id, parent: "N002", title: `r${id}`, kind: "change", work: altitude, repo: "probe-repo", state: "ready", ...(entries ? { entries } : {}) });
   const entry = { id: "E1", op: "edit", file: "probe-repo:a.ts", what: "x", decidedBy: [], facts: ["f1"], then: [], rules: [], callers: [], tiers: {}, docs: [], book: [] };
   const sheet = { schemaVersion: 1, releaseChain: [], dependsOn: [], stack: null, entries: [entry] };
   arc("N002", [row("1", "CODE", ["E1", "E6"]), row("2", "CODE"), row("3", "DOCS"), row("4", "CODE", ["E1"])], sheet);
@@ -498,7 +498,7 @@ console.log("\n=== pretooluse — a helper is launched only from a part of the g
   writeFileSync(join(base, "arcs", "N004", "state.json"), JSON.stringify({ schemaVersion: 2, arc: "N004", subject: "probe", title: "t", goal: null, status: "DECIDED", reason: null, preview: "preview.html", rows: [] }));
   // E3 is written again after the plan, so the part that holds it no longer matches its signature.
   writeFileSync(join(base, "arcs", "N004", "sheet.json"), JSON.stringify({ schemaVersion: 1, releaseChain: [], dependsOn: [], stack: null, entries: [E1, E2, entry("E3", "changed")] }));
-  const part = (n, held, state) => ({ id: `code-probe-repo-${n}`, repo: "probe-repo", pass: "CODE", entries: [`N004/${held.id}`], tests: [], minutes: null,
+  const part = (n, held, state) => ({ id: `code-probe-repo-${n}`, repo: "probe-repo", work: "CODE", entries: [`N004/${held.id}`], tests: [], minutes: null,
     measuredFrom: null, waitsOn: [], model: "sonnet", signature: entryHash(held), state });
   const goFile = join(base, "arcs", "N004", "go.json");
   writeFileSync(goFile, JSON.stringify({ schemaVersion: 1, lead: "N004", scope: ["N004"], writtenAt: "2026-10-31T09:00+05:30",
@@ -575,15 +575,39 @@ console.log("\n=== pretooluse — a handover block written before the turn ends 
   one("[MKT.HOOKS.317] a helper's call is not told", { ...call("hl-5", after), agent_id: "child-1" }, "silent", waived);
 }
 
+console.log("\n=== pretooluse — a Skill call carries its skill's value and never its arguments (MKT.SCRIPTS.325, .330)");
+{
+  const { telemetryFolder, writeSwitch } = await import("../../../../../plugin-support-lib/src/lib/debug-store.ts");
+  writeSwitch(WORKSPACE, "telemetry", true);
+  const sub = (id, skill, args) => {
+    try { execFileSync("node", [`${HOOKS}/src/scripts/events/pretooluse.ts`], { input: JSON.stringify({ tool_name: "Skill", session_id: id, cwd: WORKSPACE,
+      tool_input: { skill, ...(args ? { args } : {}) } }), encoding: "utf8", cwd: WORKSPACE, env: { ...process.env, SPN_TELEMETRY: "on" } }); } catch { /* a refusal is not the point */ }
+  };
+  const mine = (id) => { try { return readFileSync(join(telemetryFolder(WORKSPACE), "hooks.jsonl"), "utf8").trim().split("\n").filter(Boolean).map((l) => JSON.parse(l)).filter((r) => r.session === id); } catch { return []; } };
+  const bare = (label, ok, detail = "") => { n += 1; if (!ok) failed += 1; console.log(`  ${ok ? "PASS" : "FAIL"}  ${label}${ok || !detail ? "" : `\n        ${String(detail).slice(0, 400)}`}`); };
+  // A Skill call carries its skill onto the rows of the window's checks, its own and the later ones.
+  const later = (id) => { try { execFileSync("node", [`${HOOKS}/src/scripts/events/pretooluse.ts`], { input: JSON.stringify({ tool_name: "Write", session_id: id, cwd: WORKSPACE,
+    tool_input: { file_path: join(PROBE_REPO, "src", "contract", "validators", "thing.ts"), content: "x" } }), encoding: "utf8", cwd: WORKSPACE, env: { ...process.env, SPN_TELEMETRY: "on" } }); } catch { /* the refusal is the row */ } };
+  sub("sk-1", "spn-devex:ideate", "SECRET-ARGUMENT-TEXT"); later("sk-1");
+  sub("sk-2", "spn-devex:execute"); later("sk-2");
+  sub("sk-3", "not-a-skill-we-ship"); later("sk-3");
+  const [r1, r2, r3] = [mine("sk-1"), mine("sk-2"), mine("sk-3")];
+  bare("[MKT.SCRIPTS.325] spn-devex:ideate with arguments carries skill DEVEX_IDEATE onto the window's rows", r1.length > 0 && r1.every((r) => r.skill === "DEVEX_IDEATE"), JSON.stringify(r1));
+  bare("[MKT.SCRIPTS.330] the arguments are written nowhere", !readFileSync(join(telemetryFolder(WORKSPACE), "hooks.jsonl"), "utf8").includes("SECRET-ARGUMENT-TEXT"));
+  bare("[MKT.SCRIPTS.325] spn-devex:execute carries skill DEVEX_EXECUTE", r2.length > 0 && r2.every((r) => r.skill === "DEVEX_EXECUTE"), JSON.stringify(r2));
+  bare("[MKT.SCRIPTS.325] a skill the copy does not hold is null", r3.length > 0 && r3.every((r) => r.skill === null), JSON.stringify(r3));
+}
+
 console.log("\n=== pretooluse — the chain's cost per call");
 // ---------------------------------------------------------------- the root and the send-back line (036 N015 E23, E24)
 {
   const { telemetryFolder, writeSwitch } = await import("../../../../../plugin-support-lib/src/lib/debug-store.ts");
-  const sendbacks = () => { try { return readFileSync(join(telemetryFolder(WORKSPACE), "sendbacks.jsonl"), "utf8").trim().split("\n").filter(Boolean).map((line) => JSON.parse(line)); } catch { return []; } };
+  // A send-back is a CHECK row with verdict DENY in hooks.jsonl; sendbacks.jsonl is gone.
+  const sendbacks = () => { try { return readFileSync(join(telemetryFolder(WORKSPACE), "hooks.jsonl"), "utf8").trim().split("\n").filter(Boolean).map((line) => JSON.parse(line)).filter((row) => row.mtype === "CHECK" && row.verdict === "DENY"); } catch { return []; } };
   const check = (label, ok, detail = "") => { n += 1; if (!ok) failed += 1; console.log(`  ${ok ? "PASS" : "FAIL"}  ${label}${ok || !detail ? "" : `\n        ${String(detail).slice(0, 400)}`}`); };
   const HOOK = `${HOOKS}/src/scripts/events/pretooluse.ts`;
   const call = (payload, cwd, env = {}) => {
-    try { return execFileSync("node", [HOOK], { input: JSON.stringify(payload), encoding: "utf8", cwd, env: { ...process.env, SPN_TELEMETRY: "off", ...env } }).trim(); }
+    try { return execFileSync("node", [HOOK], { input: JSON.stringify(payload), encoding: "utf8", cwd, env: { ...process.env, SPN_TELEMETRY: "on", ...env } }).trim(); }
     catch (e) { return String(e.stderr ?? e.message); }
   };
   const generated = (id, cwd) => ({ tool_name: "Write", session_id: id, cwd, tool_input: { file_path: join(PROBE_REPO, "src", "contract", "validators", "thing.ts"), content: "x" } });
@@ -591,9 +615,9 @@ console.log("\n=== pretooluse — the chain's cost per call");
   const before = sendbacks().length;
   const refused = call(generated("sb-pre-1", WORKSPACE), WORKSPACE);
   const lines = sendbacks().slice(before);
-  check("[MKT.HOOKS.343] a refusal the hook says writes one send-back line with the event and the check",
+  check("[MKT.HOOKS.343] a refusal the hook says writes one CHECK row, verdict DENY, with the event and the check",
     refused.includes("deny") && lines.length === 1 && lines[0].event === "PreToolUse" && lines[0].check === "generated-file"
-      && lines[0].session === "sb-pre-1" && /^[0-9a-f]{12}$/.test(lines[0].finding), `${refused.slice(0, 120)} · ${JSON.stringify(lines)}`);
+      && lines[0].session === "sb-pre-1" && lines[0].v === 1 && lines[0].mtype === "CHECK" && !("finding" in lines[0]), `${refused.slice(0, 120)} · ${JSON.stringify(lines)}`);
   const mid = sendbacks().length;
   call({ tool_name: "Bash", session_id: "sb-pre-2", cwd: WORKSPACE, tool_input: { command: "git status --short" } }, WORKSPACE);
   check("[MKT.HOOKS.343] a call let through writes none", sendbacks().length === mid);

@@ -8,8 +8,8 @@ import { join, resolve } from "node:path";
 import { PLUGIN } from "../../../helpers/harness.mjs";
 
 const lib = resolve(PLUGIN, "src", "scripts", "lib");
-const { deriveGo, readyParts, clearWaiting, markWaiting, ratesOf, boundOf, testFilesOf, entryHash, changedEntries, staleEntries } = await import(join(lib, "go-plan.ts"));
-const { goFaults, entryAltitude } = await import(join(lib, "workstream-schema.ts"));
+const { deriveGo, fullRunMinutes, readyParts, clearWaiting, markWaiting, ratesOf, boundOf, testFilesOf, entryHash, changedEntries, staleEntries } = await import(join(lib, "go-plan.ts"));
+const { goFaults, entryWork } = await import(join(lib, "workstream-schema.ts"));
 
 let total = 0, failed = 0;
 const same = (label, got, expected) => {
@@ -29,8 +29,8 @@ const plan = deriveGo(scope, { writtenAt: "2026-10-31T00:00:00Z" });
 const ids = plan.parts.map((p) => p.id);
 same("[MKT.SCRIPTS.300] passes run in release chain order, each repository's docs, baseline, code and full run in turn, the release last", ids,
   ["docs-lib-repo-1", "baseline-lib-repo", "code-lib-repo-1", "full-lib-repo", "baseline-app-repo", "code-app-repo-1", "full-app-repo", "release-lib-repo-1", "release-app-repo-1"]);
-same("[MKT.SCRIPTS.300] a part's pass is the enum and its entries are named across the scope", plan.parts.map((p) => [p.pass, p.entries]).slice(0, 3),
-  [["DOCS", ["N009/E3"]], ["BASELINE", []], ["CODE", ["N009/E2"]]]);
+same("[MKT.SCRIPTS.300] a part's work is the enum and its entries are named across the scope, a baseline being TEST work", plan.parts.map((p) => [p.work, p.entries]).slice(0, 3),
+  [["DOCS", ["N009/E3"]], ["TEST", []], ["CODE", ["N009/E2"]]]);
 same("[MKT.SCRIPTS.300] the plan names its lead, its whole scope and when it was written", [plan.lead, plan.scope, plan.writtenAt], ["N009", ["N009"], "2026-10-31T00:00:00Z"]);
 const waits = Object.fromEntries(plan.parts.map((p) => [p.id, p.waitsOn]));
 same("[MKT.SCRIPTS.300] a baseline waits on nothing and its code on it, a full run on the code, a repository's first pass on the docs before it", [waits["baseline-lib-repo"], waits["code-lib-repo-1"], waits["full-lib-repo"], waits["baseline-app-repo"]],
@@ -41,14 +41,14 @@ same("[MKT.SCRIPTS.300] a new plan is ready, never held", plan.parts.every((p) =
 same("[MKT.SCRIPTS.300] a plan holds to its schema", goFaults(plan), []);
 const docsFirst = deriveGo([{ arc: "N009", sheet: sheet([entry("E1", "app-repo:docs/x.md"), entry("E2", "lib-repo:docs/c.md"), entry("E3", "app-repo:src/a.ts")]) }]);
 same("[MKT.SCRIPTS.300] a repository's first pass waits on the docs of the repository before it", docsFirst.parts.find((p) => p.id === "docs-app-repo-1").waitsOn, ["docs-lib-repo-1"]);
-same("[MKT.SCRIPTS.300] a path says the kind of change where the entry names none", [entryAltitude(entry("E1", "r:src/dist/x.mjs")), entryAltitude(entry("E1", "r:refs/x.md")), entryAltitude(entry("E1", "r:src/x.ts")), entryAltitude({ ...entry("E1", "r:src/x.ts"), altitude: "PROOF" })],
+same("[MKT.SCRIPTS.300] a path says the kind of change where the entry names none", [entryWork(entry("E1", "r:src/dist/x.mjs")), entryWork(entry("E1", "r:refs/x.md")), entryWork(entry("E1", "r:src/x.ts")), entryWork({ ...entry("E1", "r:src/x.ts"), work: "PROOF" })],
   ["GENERATED", "DOCS", "CODE", "PROOF"]);
 
 // The bound: 45 over the rate, 8 where nothing is measured.
 const many = (n) => sheet(Array.from({ length: n }, (_, i) => entry(`E${i + 1}`, `lib-repo:src/f${i}.ts`)));
-const codeOf = (p) => p.pass === "CODE";
+const codeOf = (p) => p.work === "CODE";
 same("[MKT.SCRIPTS.301] unmeasured, a part holds eight entries", deriveGo([{ arc: "N009", sheet: many(10) }]).parts.filter(codeOf).map((p) => [p.id, p.entries.length]), [["code-lib-repo-1", 8], ["code-lib-repo-2", 2]]);
-const measures = [{ repo: "lib-repo", altitude: "CODE", entries: 2, minutes: 18 }, { repo: "lib-repo", altitude: "CODE", entries: 1, minutes: 9 }];
+const measures = [{ repo: "lib-repo", work: "CODE", entries: 2, minutes: 18 }, { repo: "lib-repo", work: "CODE", entries: 1, minutes: 9 }];
 const rates = ratesOf(measures);
 same("[MKT.SCRIPTS.301] the rate is minutes over entries of the landed rows", rates, { "lib-repo|CODE": 9 });
 same("[MKT.SCRIPTS.301] the bound is 45 over the rate", [boundOf(rates, "lib-repo", "CODE"), boundOf(rates, "lib-repo", "DOCS")], [5, 8]);
@@ -57,7 +57,7 @@ same("[MKT.SCRIPTS.302] a measured group splits at its bound and each part is pr
   [[5, 45, "cost of 2 landed CODE rows in lib-repo"], [2, 18, "cost of 2 landed CODE rows in lib-repo"]]);
 same("[MKT.SCRIPTS.302] an unmeasured part has no minutes and no source", deriveGo([{ arc: "N009", sheet: many(1) }]).parts.filter(codeOf).map((p) => [p.minutes, p.measuredFrom]), [[null, null]]);
 const timed = deriveGo(scope, { fullRunMinutes: 12.34 });
-same("[MKT.SCRIPTS.302] a baseline and a full run are priced from the last three full runs", timed.parts.filter((p) => p.pass === "BASELINE" || p.pass === "FULL_RUN").map((p) => [p.minutes, p.measuredFrom]).slice(0, 2),
+same("[MKT.SCRIPTS.302] a baseline and a full run are priced from the last three full runs", timed.parts.filter((p) => p.work === "TEST").map((p) => [p.minutes, p.measuredFrom]).slice(0, 2),
   [[12.3, "last 3 full runs"], [12.3, "last 3 full runs"]]);
 
 // Tests found by id, in the first directory that holds one.
@@ -91,18 +91,18 @@ same("[MKT.SCRIPTS.307] a landed part's change that a follow-up part carries is 
 same("[MKT.SCRIPTS.307] a landed part's change that no part carries is stale", staleEntries(landedAll.parts.find((p) => p.id === "code-lib-repo-1"), landedAll, changed), ["N009/E2"]);
 const doneFirst = deriveGo([{ ...scope[0], landed: ["E2", "E3"] }]);
 same("[MKT.SCRIPTS.320] an entry a landed row holds is in no part", doneFirst.parts.flatMap((p) => p.entries), ["N009/E1"]);
-same("[MKT.SCRIPTS.320] a repository whose entries all landed gets no docs or code part", doneFirst.parts.filter((p) => p.repo === "lib-repo" && p.pass !== "RELEASE").map((p) => p.id), []);
+same("[MKT.SCRIPTS.320] a repository whose entries all landed gets no docs or code part", doneFirst.parts.filter((p) => p.repo === "lib-repo" && p.work !== "RELEASE").map((p) => p.id), []);
 const rowsLanded = [{ ...changed[0], landed: ["E2", "E3"] }];
 same("[MKT.SCRIPTS.320] an entry that changed after its part landed gets a follow-up part, though a landed row holds it", deriveGo(rowsLanded, { previous: landedAll }).parts.filter((p) => p.entries.includes("N009/E2")).map((p) => [p.id, p.state]),
   [["code-lib-repo-1", "landed"], ["code-lib-repo-2", "ready"]]);
 same("[MKT.SCRIPTS.320] an unchanged entry of a landed row gets no follow-up", deriveGo(rowsLanded, { previous: landedAll }).parts.filter((p) => p.entries.includes("N009/E3")).map((p) => p.state), ["landed"]);
 const allLanded = { ...scope[0], landed: ["E1", "E2", "E3"] };
-same("[MKT.SCRIPTS.322] code landed and a proof owed: a full run and no baseline", deriveGo([{ ...allLanded, proofs: ["lib-repo"] }]).parts.filter((p) => p.pass !== "RELEASE").map((p) => p.id), ["full-lib-repo"]);
-same("[MKT.SCRIPTS.322] code landed and no proof owed: neither", deriveGo([allLanded]).parts.filter((p) => p.pass !== "RELEASE").map((p) => p.id), []);
+same("[MKT.SCRIPTS.322] code landed and a proof owed: a full run and no baseline", deriveGo([{ ...allLanded, proofs: ["lib-repo"] }]).parts.filter((p) => p.work !== "RELEASE").map((p) => p.id), ["full-lib-repo"]);
+same("[MKT.SCRIPTS.322] code landed and no proof owed: neither", deriveGo([allLanded]).parts.filter((p) => p.work !== "RELEASE").map((p) => p.id), []);
 same("[MKT.SCRIPTS.322] the full run for a proof owed waits on nothing of its own repository", deriveGo([{ ...allLanded, proofs: ["lib-repo"] }]).parts.find((p) => p.id === "full-lib-repo")?.waitsOn, []);
 same("[MKT.SCRIPTS.311] a part held twice fails the schema", goFaults({ ...plan, parts: [plan.parts[0], { ...plan.parts[0], id: "docs-lib-repo-9" }] }).length > 0, true);
 same("[MKT.SCRIPTS.311] a signature that misses an entry fails the schema", goFaults({ ...plan, parts: [{ ...plan.parts[0], signature: "a.b" }] }).length, 1);
-same("[MKT.SCRIPTS.311] a pass that is a number fails the schema", goFaults({ ...plan, parts: [{ ...plan.parts[0], pass: 1 }] }).length > 0, true);
+same("[MKT.SCRIPTS.311] a work that is a number fails the schema", goFaults({ ...plan, parts: [{ ...plan.parts[0], work: 1 }] }).length > 0, true);
 same("[MKT.SCRIPTS.303] a plan of another version fails the schema", goFaults({ ...plan, schemaVersion: 9 }).length, 1);
 
 const ready = (states) => readyParts({ ...plan, parts: plan.parts.map((p) => ({ ...p, state: states[p.id] ?? "ready" })) }).map((p) => p.id);
@@ -113,7 +113,7 @@ same("[MKT.SCRIPTS.304] a held or running part is never in the ready list", read
 // A part that waits on something outside the window is `waiting`, with a plain field naming what, and is never ready.
 const needing = [{ arc: "N009", sheet: { ...sheet([entry("E1", "app-repo:src/a.ts"), entry("E2", "lib-repo:src/b.ts")]), needsRelease: [{ repo: "app-repo", release: "lib-repo", command: "spnutils x run" }] } }];
 const needed = deriveGo(needing);
-const firstOfApp = needed.parts.find((p) => p.repo === "app-repo" && p.pass !== "RELEASE");
+const firstOfApp = needed.parts.find((p) => p.repo === "app-repo" && p.work !== "RELEASE");
 same("[MKT.HOOKS.322] a repository's first pass waits on the release that ships a command it needs (s23)", [firstOfApp.id, firstOfApp.state, firstOfApp.waitingOn], ["baseline-app-repo", "waiting", "the release of lib-repo that ships spnutils x run"]);
 same("[MKT.HOOKS.322] only that repository's first pass waits, and a plan with a waiting part holds to its schema", [needed.parts.filter((p) => p.state === "waiting").map((p) => p.id), goFaults(needed)], [["baseline-app-repo"], []]);
 same("[MKT.HOOKS.322] a waiting part is not ready, and what waits on it is not either", readyParts(needed).map((p) => p.id).filter((id) => id.endsWith("app-repo") || id.includes("app-repo-")), []);
@@ -125,9 +125,9 @@ same("[MKT.HOOKS.322] a wait marked by hand is kept when the plan is derived aga
 
 // A new code part in a repository whose full run has landed opens a second full run.
 const secondPlan = deriveGo(changed, { previous: landedAll });
-same("[MKT.HOOKS.324] a new code part in a repository whose full run landed opens full-<repo>-2", secondPlan.parts.filter((p) => p.pass === "FULL_RUN" && p.repo === "lib-repo").map((p) => [p.id, p.state]), [["full-lib-repo", "landed"], ["full-lib-repo-2", "ready"]]);
+same("[MKT.HOOKS.324] a new code part in a repository whose full run landed opens full-<repo>-2", secondPlan.parts.filter((p) => p.work === "TEST" && p.id.startsWith("full-") && p.repo === "lib-repo").map((p) => [p.id, p.state]), [["full-lib-repo", "landed"], ["full-lib-repo-2", "ready"]]);
 same("[MKT.HOOKS.324] the second full run waits on the repository's code", secondPlan.parts.find((p) => p.id === "full-lib-repo-2").waitsOn, ["code-lib-repo-1", "code-lib-repo-2"]);
-same("[MKT.HOOKS.324] with no new code part, no second full run", deriveGo(scope, { previous: landedAll }).parts.filter((p) => p.pass === "FULL_RUN").map((p) => p.id), ["full-lib-repo", "full-app-repo"]);
+same("[MKT.HOOKS.324] with no new code part, no second full run", deriveGo(scope, { previous: landedAll }).parts.filter((p) => p.work === "TEST" && p.id.startsWith("full-")).map((p) => p.id), ["full-lib-repo", "full-app-repo"]);
 same("[MKT.HOOKS.324] derived again, the second full run is made once", deriveGo(changed, { previous: secondPlan }).parts.filter((p) => p.id.startsWith("full-lib-repo")).map((p) => p.id), ["full-lib-repo", "full-lib-repo-2"]);
 
 // E67 · a hand-marked wait comes off
@@ -139,6 +139,25 @@ const blocked = { ...marked, parts: [...marked.parts.filter((one) => one.id !== 
 const stillWaiting = clearWaiting(blocked, "docs-lib-repo-1").parts.find((one) => one.id === "docs-lib-repo-1");
 same("[MKT.HOOKS.322] clearing a wait whose plan parts have not landed reads it waiting on them", [stillWaiting.state, stillWaiting.waitingOn.includes("code-nowhere-1")], ["waiting", true]);
 same("[MKT.HOOKS.322] clearing leaves the plan given unchanged", marked.parts.find((one) => one.id === "docs-lib-repo-1").state, "waiting");
+
+// MKT.SCRIPTS.326 · a baseline and a full run are both TEST parts, told apart by their ids; fullRunMinutes reads the test rows.
+const tests = plan.parts.filter((p) => p.work === "TEST");
+same("[MKT.SCRIPTS.326] a baseline and a full run are both TEST parts, and their ids keep the baseline- and full- prefixes", tests.map((p) => [p.id, p.work, p.id.split("-")[0]]),
+  [["baseline-lib-repo", "TEST", "baseline"], ["full-lib-repo", "TEST", "full"], ["baseline-app-repo", "TEST", "baseline"], ["full-app-repo", "TEST", "full"]]);
+same("[MKT.SCRIPTS.326] a plan whose test parts carry work TEST holds to its schema, and a part still holding pass or BASELINE work does not", [goFaults(plan), goFaults({ ...plan, parts: [{ ...plan.parts[1], work: "BASELINE" }] }).length > 0], [[], true]);
+const root = mkdtempSync(join(tmpdir(), "go-plan-root-"));
+mkdirSync(join(root, ".spndevex", ".debug", "telemetry"), { recursive: true });
+const row = (run, at, ms, part, status = "SUCCESS") => JSON.stringify({ v: 1, mtype: "TEST", id: `${run}-${at}`, event: "PostToolUse", part, status, at, ms, test: { run, tier: "unit", node: "n" } });
+same("[MKT.SCRIPTS.326] with no test rows, a full run takes no minutes", fullRunMinutes(root), null);
+writeFileSync(join(root, ".spndevex", ".debug", "telemetry", "hooks.jsonl"), [
+  row("r1", "2026-10-31T10:00:00.000Z", 120000, "full-lib-repo"),
+  row("r1", "2026-10-31T10:01:00.000Z", 120000, "full-lib-repo"),
+  row("r2", "2026-10-31T11:00:00.000Z", 60000, "baseline-lib-repo"),
+  row("r3", "2026-10-31T12:00:00.000Z", 600000, "full-lib-repo", "FAILURE"),
+  JSON.stringify({ v: 1, mtype: "COMMAND", id: "c", part: "full-lib-repo", at: "2026-10-31T13:00:00.000Z", ms: 999999 }),
+  "",
+].join("\n"));
+same("[MKT.SCRIPTS.326] fullRunMinutes is the span of a full run's TEST rows, from the earliest start to the latest end; a baseline, a red run and a row of another kind are left out", fullRunMinutes(root), 3);
 
 console.log(`\n${total - failed}/${total} passed`);
 process.exit(failed ? 1 : 0);

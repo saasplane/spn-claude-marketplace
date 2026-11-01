@@ -29,7 +29,7 @@ console.log("\n=== S7 — the stamp on each arc's Cycles row: its goal, title an
   const { root, ws } = await dataWorkspace("state-stamp");
   const file = join(ws, "arcs", "N001", "state.json");
   const data = arcData();
-  data.rows.push({ id: "3", parent: "N001", title: "a row the page has not taken in", kind: "change", repo: "spn-x", altitude: "CODE", state: "waiting" });
+  data.rows.push({ id: "3", parent: "N001", title: "a row the page has not taken in", kind: "change", repo: "spn-x", work: "CODE", state: "waiting" });
   writeFileSync(file, JSON.stringify(data, null, 2));
   ok("green: a row added inside the arc's repositories never puts the page behind", !has(checkWorkstream(ws), "stamp", /behind/), said(checkWorkstream(ws)));
   data.goal = "another outcome";
@@ -397,11 +397,11 @@ console.log("\n=== RULE.DEVEX.WORKSPACE.278 — the kind design is gone: reading
     !checkWorkstream(ws).some((one) => one.check === "status" || one.check === "schema"), said(checkWorkstream(ws)));
 }
 
-console.log("\n=== RULE.DEVEX.WORKSPACE.183 — an arc's build rows carry a repository and an altitude, in chain order");
+console.log("\n=== RULE.DEVEX.WORKSPACE.183 — an arc's build rows carry a repository and a kind of work, in chain order");
 {
   const { stepRowFindings } = await import("../../../../src/scripts/checks/workstream-state.ts");
-  const arcOf = (rows) => ({ ...arcData([]), rows: rows.map(([id, repo, altitude, kind = "change"]) =>
-    ({ id, parent: "N001", title: `row ${id}`, kind, repo, altitude, state: "waiting" })) });
+  const arcOf = (rows) => ({ ...arcData([]), rows: rows.map(([id, repo, work, kind = "change"]) =>
+    ({ id, parent: "N001", title: `row ${id}`, kind, repo, work, state: "waiting" })) });
   const rows = (...list) => stepRowFindings(arcOf(list));
   ok("rows in chain order, a `—` proof row last, find nothing",
     rows(["1", "spn-foundation", "DOCS"], ["2", "spn-support-ts", "DOCS"], ["3", "spn-support-ts", "CODE"], ["4", "—", "PROOF"]).length === 0);
@@ -411,11 +411,11 @@ console.log("\n=== RULE.DEVEX.WORKSPACE.183 — an arc's build rows carry a repo
     rows(["1", "spn-support-ts", "DOCS"], ["2", "spn-foundation", "DOCS"]).some((line) => /the foundation comes first/.test(line)));
   ok("known-bad: a repository that comes back after another is named",
     rows(["1", "spn-foundation", "DOCS"], ["2", "spn-support-ts", "DOCS"], ["3", "spn-foundation", "CODE"]).some((line) => /returns to spn-foundation/.test(line)));
-  ok("known-bad: a build row with no repository or no altitude is named, with the set",
-    rows(["1", "spn-foundation", null], ["2", null, "DOCS"]).some((line) => /row\(s\) 1, 2 carry no repo, or no altitude from DOCS · CODE/.test(line)));
+  ok("known-bad: a build row with no repository or no work is named, with the set",
+    rows(["1", "spn-foundation", null], ["2", null, "DOCS"]).some((line) => /row\(s\) 1, 2 carry no repo, or no work from DOCS · CODE/.test(line)));
   ok("a step that changes no repository, `—`, takes no place in the chain", rows(["1", "spn-foundation", "DOCS"], ["2", "—", "PROOF"]).length === 0);
   const { root, ws } = await dataWorkspace("state-chain");
-  const wrote = cli(root, ["workstream", "row", "add", "031/N001", "the book again", "--kind", "change", "--repo", "spn-foundation", "--altitude", "DOCS"]);
+  const wrote = cli(root, ["workstream", "row", "add", "031/N001", "the book again", "--kind", "change", "--repo", "spn-foundation", "--work", "DOCS"]);
   ok("known-bad: `row add` prints the finding in a note line after the write, and still writes",
     wrote.code === 0 && /note: N001 rows out of chain order: row 3 is spn-foundation after spn-x — the foundation comes first/.test(wrote.out)
       && JSON.parse(readFileSync(join(ws, "arcs", "N001", "state.json"), "utf8")).rows.some((row) => row.id === "3"), wrote.out);
