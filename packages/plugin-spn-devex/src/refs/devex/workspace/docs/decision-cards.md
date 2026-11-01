@@ -4,12 +4,12 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "The approach document — a workstream's, never a repository's",
-      "seen": "a4661902"
+      "seen": "d9a0d7ca"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "section": "A card is only for what the rules leave open",
-      "seen": "50102f94"
+      "seen": "4cf1e009"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
@@ -67,7 +67,11 @@ already answers costs the developer's attention for nothing.
 change, propose the constructs the ask needs and their patterns, correct on their own, and stop there.
 What they make possible later is one line, *later, not now*, never a construct or an option of its own.
 
-**Two steps come before a card is raised.** The agent searches this workstream's answers, suggestions and arc logs for an answer already given, and a card that sets a shape carries an *Others:* line saying how others solve it. Both are steps the agent takes, and neither is a refusal.
+**A proposal starts from the construct that already exists for its kind of problem** (`RULE.DEVEX.WORKSPACE.491` · MUST · check:questions). Before options are drafted, the agent names the kind of problem, finds the nearest existing construct of that kind by path, and drafts from it: the existing pattern and *leave it* are among the options, or the card says why one does not apply. The agent also searches this workstream's answers, suggestions and arc logs for an answer already given. A card or a suggestion records what this took: its nearest construct by a path that exists (or *none*, which in the builder's workspace links the suggestion that fills the gap), its signs of complexity, the options considered and set aside on an *Others:* line, and *core* or *periphery* on its recommendation. `question raise` and `suggestion add` refuse a new card that leaves one out; a card raised before this rule reads them as optional.
+
+**The views a card carries are the ones its signs call for, made fresh and on record** (`RULE.DEVEX.WORKSPACE.492` · MUST · check:questions). The repository sign is worked out from the paths the card cites, never taken from the agent. Two signs or more need that many fresh views, and the partner sign a Partner view among them. A view counts as fresh only when its whole words are in the arc's `work/` folder and a panel's launch for that lens is on record. A fresh view's brief is written from the card's why, what, nearest construct and signs, so it reads the problem before any proposal, and it is shown the proposals only after it has answered.
+
+**A proposal in chat ends as a card or a suggestion** (`RULE.DEVEX.WORKSPACE.493` · MUST · check:stop). A reply that sets out lettered options names the `Q<n>` or `S<n>` that records them, and the turn-end check sends back one whose number holds no record.
 
 **One kind of decision is taken out of that: a decision that sets a shape, a name, a member, a check
 or the direction of a dependency** (`RULE.DEVEX.WORKSPACE.239` · MUST · check:stop). Decide it alone where a rule

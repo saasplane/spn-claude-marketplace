@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/10-providers/ts/08-web.md",
-      "seen": "9cdafe9c"
+      "seen": "7b0d7abf"
     }
   ]
 }
@@ -26,7 +26,7 @@
 
 **Every web app declares the same scripts, and a separate preview script is not among them** — it was the start script under another name and is retired. **The test bundle is a flavour of the build, never a second script.**
 
-**The dev server accepts the host the estate serves it on**, because the name a browser reaches it by comes from the estate's coordinates rather than from localhost.
+**The dev server accepts the host the estate serves it on**, because the name a browser reaches it by comes from the estate's coordinates rather than from localhost. The estate settles the port and the hosts; the app's env file carries the copy under `<PREFIX>_UI_PORT` and `<PREFIX>_UI_ALLOWED_HOSTS`, the factory feeds both to server and preview `allowedHosts`, and `infra app up` refuses a copy that differs.
 
 **A stylesheet's asset paths are relative to the stylesheet**, not to the page that loads it.
 

@@ -2180,7 +2180,13 @@
       "chapter": "04-capabilities/01-devex/02-agent/04-plugins/01-plugins.md",
       "heading": "A release that changes how the agent proposes runs the proposal cases first",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/deliver/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.FUNCTION.007",
@@ -3262,6 +3268,11 @@
           "plugin": "spn-devex",
           "path": "skills/bootstrap/SKILL.md",
           "heading": "The acts, and their order is forced rather than chosen"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "The rules this step holds"
         },
         {
           "plugin": "spn-devex",

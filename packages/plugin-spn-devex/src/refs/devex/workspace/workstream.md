@@ -13,11 +13,11 @@
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/02-workstream.md",
-      "seen": "6dafd471"
+      "seen": "2a2107ee"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
-      "seen": "b3d715c4"
+      "seen": "2f1770dc"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -27,17 +27,17 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "section": "Closing a workstream is a check; closing a window is nothing",
-      "seen": "4840448a"
+      "seen": "3b41c9a4"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "section": "An order is one delegated execution, and every order follows the same rules",
-      "seen": "f7b59796"
+      "seen": "cc56fc94"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "section": "An arc carries its specification, or names the note that holds it",
-      "seen": "90b931b4"
+      "seen": "e287ffef"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -51,7 +51,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "seen": "9577be57"
+      "seen": "8c3c36e7"
     }
   ]
 }
@@ -333,6 +333,8 @@ The plan holds the release parts too, merged from the scope's sheets in chain or
 
 **A suggestion belongs to an arc, as a card does, and the arc's sheet cites it** (`RULE.DEVEX.WORKSPACE.488` · MUST · check:split-plan). It is raised against the arc it would change, `suggestion add <NNN>/N<nnn> "…"`, as `question raise` takes its arc, and `suggestion state <S> shaped --arc N<nnn>` moves it to the arc that takes it up. Before that arc's plan is written, an entry of its sheet cites the suggestion in `decidedBy`, as `S65`, and `go write` refuses a sheet that leaves a decided one out, naming it. Before the arc reads `LANDED`, every suggestion against it is decided and built, parked or dropped, and the last row's landing refuses while one is still raised or shaped. A suggestion raised with no arc yet sits against the workstream until an arc takes it up.
 
+**Follow-ups decided after a close run as small batches, with no arc** (`RULE.DEVEX.WORKSPACE.496` · MUST · check:test-run). When a closed workstream's suggestions are decided after its close, carry them out as small batches against that workstream, with no arc and no go. A whole suite then runs under a run named `followup-<NNN>-<n>`, which the test-run check lets through only while workstream `<NNN>` is closed and holds a decided suggestion, so it counts for the push like a full run. Each batch is released as any change is, and the batch's suggestions are the record of what it carried.
+
 **A workstream closes only once every suggestion is decided, parked or dropped** (`RULE.DEVEX.WORKSPACE.489` · MUST · check:split-plan). `workstream close` refuses while one still reads raised or shaped, and names each, before it stamps or moves anything.
 
 **A question is named `Q<n>` and a suggestion `S<n>`, with a capital letter, wherever a person reads it** (`RULE.DEVEX.WORKSPACE.486` · MUST · check:stop). That covers a reply, a page, a log line and every line a command prints. The record keeps its own id and a page keeps its `q<n>` anchor, because neither is read as words. A reply that names a card or a suggestion in lowercase is sent back with the capital form, so you meet one spelling for one thing.
@@ -585,7 +587,11 @@ them this way:
   ([`refs/devex/agent/lenses/`](../agent/lenses/README.md)).
 - **The Recommendation** cites what decides it, and may name the views it rests on.
 
-**Two steps come before a card is raised.** The agent searches this workstream's answers, suggestions and arc logs for an answer already given, and a card that sets a shape carries an *Others:* line saying how others solve it. Both are steps the agent takes, and neither is a refusal.
+**A proposal starts from the construct that already exists for its kind of problem** (`RULE.DEVEX.WORKSPACE.491` · MUST · check:questions). Before drafting options, name the kind of problem, find the nearest existing construct of that kind by path, and draft from it: the existing pattern and *leave it* are among the options, or the card says why one does not apply. Search this workstream's answers, suggestions and arc logs for an answer already given. A card or a suggestion records what this took: its nearest construct by a path that exists (or *none*, which in the builder's workspace links the suggestion that fills the gap), its signs of complexity, the options considered and set aside on an *Others:* line, and *core* or *periphery* on its recommendation. `question raise` and `suggestion add` refuse a new card that leaves one out; a card raised before this rule reads them as optional.
+
+**The views a card carries are the ones its signs call for, made fresh and on record** (`RULE.DEVEX.WORKSPACE.492` · MUST · check:questions). The repository sign is worked out from the paths the card cites, never taken from you. Two signs or more need that many fresh views, and the partner sign a Partner view among them. A view counts as fresh only when its whole words are in the arc's `work/` folder and a panel's launch for that lens is on record. Write a fresh view's brief from the card's why, what, nearest construct and signs, so it reads the problem before any proposal, and show it the proposals only after it has answered.
+
+**A proposal in chat ends as a card or a suggestion** (`RULE.DEVEX.WORKSPACE.493` · MUST · check:stop). A reply that sets out lettered options names the `Q<n>` or `S<n>` that records them, and the turn-end check sends back one whose number holds no record.
 
 **An answer lands in the card and the arc in the same turn, and in a preview only where the preview
 shows that card — MUST.** An answer to a card, or any point the developer makes in review, lands
@@ -1028,6 +1034,8 @@ cards, register rows and facts by id, and never copies a ruling or the developer
 launches no agent, the files it reads, and that its hand-back holds at most 8 lines. A brief
 that leaves one out lets an agent read the whole repository, spawn a child nobody is watching, or
 paste a report that drowns the next one.
+
+**A helper that meets a name, a shape or a construct no entry holds stops, and never invents it** (`RULE.DEVEX.WORKSPACE.495` · MUST · check:split-plan). Every order carries the line, whatever its form. The helper returns `needs-you` and lists what it met under the report's `unnamed:`, and `report write` refuses to land a part whose report lists one. A name a helper makes up becomes something every caller depends on.
 
 **Only judgement work longer than about 15 minutes gets an order** (`RULE.DEVEX.WORKSPACE.211` · MUST · short).
 The coordinator is the session that writes the orders and reads what comes back. **A mechanical row is
@@ -1536,7 +1544,7 @@ with their own icon — the first two lead with their icon, *Thank you* trails w
 one bullet per distinct thing, or a single line where there is only one thing to say. Measure every
 number from the arcs and the close report. Separate the heading and every section with a `&nbsp;`
 line, as the welcome does, and never put them in a quote block. Then ask, where there is something to ask. Before the folder moves, the
-page gets its closed masthead and a closing block in the same shape.
+page gets its closed masthead and a closing block in the same shape; `workstream close` refuses a page without the closing block, before it stamps or moves anything.
 
 ## Nothing is published unless the developer asks
 

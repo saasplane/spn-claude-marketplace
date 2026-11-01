@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/05-app/",
-      "seen": "97651525"
+      "seen": "7f1fd7db"
     }
   ]
 }
@@ -110,14 +110,14 @@ Everything composed into the build is present after the module phase. What diffe
 
 ### The module manager contract
 
-Plug a module into the application through a manager class. **A module offers two managers from one base — MUST**: a runtime manager for the service that mounts it, and a remote manager for a service that calls it in another service. Boot starts and stops both the same way, and asks the runtime questions only of a runtime manager, so a remote manager is never asked for tables or routes it does not have. Register the module as exactly one entry in the app's module list, and stop there — nothing else at the app root may know the module exists. The entry pairs a config with a manager: a mounted module's config says where its routes are served, and a remote module's config is its code alone.
+Plug a module into the application through a manager class. **A module offers two managers from one base — MUST**: a runtime manager for the service that mounts it, and a remote manager for a service that calls it in another service. Boot starts and stops both the same way, and asks the runtime questions only of a runtime manager, so a remote manager is never asked for tables or routes it does not have. Register the module as exactly one entry in the app's module list, and stop there — nothing else at the app root may know the module exists. The entry names a manager and nothing more, because the manager answers the module's config itself.
 
 ```ts
-{ config: { code: 'USER',  entry: { api: { basePath: '/iam' } } }, moduleManager: new UserRuntimeModuleManager() },  // mounted here
-{ config: { code: 'STOCK' }, moduleManager: new StockRemoteModuleManager() },                                      // lives in another service
+{ moduleManager: new UserRuntimeModuleManager() },   // mounted here, served at /user from its code
+{ moduleManager: new StockRemoteModuleManager() },   // lives in another service
 ```
 
-- **The pairing is typed — MUST.** A remote manager given a base path, or a runtime manager given no entry, does not build.
+- **A module names itself.** Its one code names its tables, permissions, labels, env keys, API path and CLI namespace, and is the code sent over the network when another service calls it. Boot derives the API path and the CLI namespace from the code, in lower case, so the start file cannot mount one module under two paths.
 - **The line names no service.** A remote module reads its address under its own prefix, and the service's settings write that key as a reference to the address the estate publishes, so moving a module to another service is a change of one settings line and no code.
 - **A service that has more than one address for a remote module refuses to boot**, and names the key.
 
@@ -125,7 +125,8 @@ What every manager answers:
 
 | Method | Returns | When it runs |
 | --- | --- | --- |
-| `initModule` | the module | boot phase 2 |
+| `moduleConfig` | the module's own config: its code, name and description | boot, before anything starts |
+| `initModule` | the module, built from the app alone | boot phase 2 |
 | `shutdownModule` | teardown | shutdown, reverse order |
 
 What a runtime manager also answers:
@@ -134,6 +135,8 @@ What a runtime manager also answers:
 | --- | --- | --- |
 | `getEntities` | ORM entities the module owns | database init (phase 1) |
 | `getMigrations` | schema migrations the module owns | the `MIGRATE` run mode |
+| `getMigrationContributions` | what the module hands to other modules' owners: permissions, roles, labels and the like | `MIGRATE` mode, step 3 |
+| `getMigrationContributionHooks` | the hooks that apply what other modules hand this one (validate, before, after); null for a module that accepts none | `MIGRATE` mode, steps 1 and 3 |
 | `getAPIControllers` | HTTP controllers, mounted under the module's API base path | HTTP entry start |
 | `getAPIRemoteServices` | the module's contract services: each one's name, its methods as data, and what implements it | HTTP entry start, for the remote route |
 | `getCLIControllers` | command surfaces the module contributes | CLI entry start |
@@ -149,13 +152,13 @@ What a remote manager also answers, which is one thing:
 
 **The app manager answers `getTransactionHandlers` too — MUST.** Boot hands every handler to the framework once: each module's, in boot order, then the app's. A manager with nothing to handle answers an empty list, so no manager leaves one out by accident.
 
-A remote manager is written by hand and is small, because its base does the work: it names every contract service the module has, no fewer and no more, it states no code because the module's line in the module list gives it, and the base reads where the module lives from the module's own settings and builds the proxies.
+A remote manager is written by hand and is small, because its base does the work: it names every contract service the module has, no fewer and no more, it declares the same `moduleConfig` the runtime manager does, because boot reads the code from the module and never from the start file, and the base reads where the module lives from the module's own settings and builds the proxies.
 
 The split of ignorance is the point: the boot manager never knows business domains, only the providers it built; the app manager never knows modules, only app-wide concerns; a module manager never knows other modules, only its own slice. Adding a domain costs one folder plus one line; deleting it is the reverse.
 
 **Entries MUST mount only after every module has initialized.** The HTTP entry mounts each mounted module's controllers, and registers its contract services to serve other services on the remote route, on a listener of its own; a remote module contributes no entry. An entry executes contract services, and nothing it invokes may still be assembling. Before the HTTP entry starts, boot collects every module's contract schemas and publishes each Command and State as a named OpenAPI component — the source the generated API clients read.
 
-**Migrations never run beside serving traffic.** They execute in a run mode of their own: boot phases 1 and 2 run identically, no entry starts, the runner merges every module's declared migrations, runs the pending ones over the migration connection — the only DDL-capable credential the application ever holds — then the process exits.
+**Migrations never run beside serving traffic.** They execute in a run mode of their own: boot phases 1 and 2 run identically, no entry starts, the run works over the migration connection — the only DDL-capable credential the application ever holds — in four steps: preflight (each owner validates the contributions it receives, checksums of frozen migrations are compared, all findings reported together), the pending migrations of every module, each owner applying its contributions (an owner held remotely receives them on the framework's `POST /remote-migration` route, never as a contract method), and a stamp of the contributions, which API boot compares and refuses on a mismatch. Then the process exits. **A module's code is 3 to 8 of A-Z and 0-9, starts with a letter and has no underscore — MUST**; boot refuses a code off the grammar and two managers that answer one code, `MIGRATE` included. A key that only the first run reads is named `{SPC}_PLATFORM_SEED_*` — MUST.
 
 ### Cross-module collaboration goes through contracts
 
@@ -215,7 +218,7 @@ Never build a second variant of the application for a second deployment shape. A
 | `ALL` | every declared serving entry — the default when no mode is configured |
 | `API` | the HTTP entry only |
 | `QUEUE` | the queue listeners only |
-| `MIGRATE` | no entries — pending migrations run, then the process exits |
+| `MIGRATE` | no entries — the run does its four steps (preflight, the pending migrations, the contributions, the stamp), then the process exits |
 | `CLI` | the CLI entry only — one command runs, then the process exits |
 
 **Two modes serve and two run-and-exit, and `ALL` never reaches the second pair.** `MIGRATE` and `CLI` are how an application is *invoked* rather than how it is *served*, so a mode activates them explicitly or not at all. **A run-and-exit act MUST NOT be folded into the mode that serves everything** — folding it in means a restart silently re-runs it. Running a migration therefore uses the same build that was tested, reached by a declared value rather than by a second image.

@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/03-module/",
-      "seen": "e1ae50e8"
+      "seen": "0a15e863"
     }
   ]
 }
@@ -197,7 +197,7 @@ A CLI controller declares one command per contract service method, its flags der
 
 ## Migrations travel with the module
 
-Treat `migrations/` as the module's only schema-change path — never run DDL by hand and never rely on ORM auto-sync, anywhere including local. Write files timestamped and **append-only**: once a migration has run anywhere, it is immutable, so write a correction as a new migration rather than editing an old one. The runner merges every module's migrations into one global ascending order by numeric version, deduplicated and tracked per application. Implement `up` on every migration, and implement `down` where the change is reversible. Runs happen over the migration connection only, the only DDL-capable credential the application ever holds, in a run mode that starts no entries.
+Treat `migrations/` as the module's only schema-change path — never run DDL by hand and never rely on ORM auto-sync, anywhere including local. Write files timestamped and **append-only**: once a migration has run anywhere, it is immutable, so write a correction as a new migration rather than editing an old one. The runner merges every module's migrations into one global ascending order by numeric version, ties by module code, tracked by module and version per application, so two modules that share a version both run. A migration writes only its own module's tables; rows that belong to another module (permissions, roles and enablements to IAM, labels and entity types to MDM) travel as a contribution that the owner applies, and a changed frozen migration stops the run at preflight. Implement `up` on every migration, and implement `down` where the change is reversible. Runs happen over the migration connection only, the only DDL-capable credential the application ever holds, in a run mode that starts no entries.
 
 ## Config is one namespace the module carries with it
 

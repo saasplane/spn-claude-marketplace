@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/02-workstream.md",
-      "seen": "6dafd471"
+      "seen": "2a2107ee"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
@@ -21,7 +21,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "section": "An arc's status is one of six, stored or worked out",
-      "seen": "a2049850"
+      "seen": "6433fcd7"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -535,6 +535,8 @@ one written `running` or `landed` on an arc not `DECIDED`, or holding a wait. **
 it carries the developer's words**: `arc edit <ws>/<arc> --status DECIDED --note "<the developer's words>"`,
 logged beside the move. A stored `PROPOSED` wins over the steps: a changed goal stops what was building until
 the next go. The review-fixes arc reads `RUNNING` until the word to close stores its `LANDED`.
+
+**When the shape is not settled, the first arc is an ideate arc, and it holds the overall proposal** (`RULE.DEVEX.WORKSPACE.494` · MUST · check:arc-status). The shape is not settled when no existing construct fits the kind of problem, or the change shows two signs of complexity or more. The ideate arc holds the read, the fresh views, one preview of the whole shape and its cards, and it proposes the build arcs, each opened from its decided preview and given its own go. It has no steps, because reading and drafting are planning jobs, so its status is worked out another way: it reads `LANDED` once its preview is decided and every build arc it proposed is opened. When the shape is settled, the work opens a build arc directly.
 
 **The status decides none of these three.** It does not carry **ordering**, which is the plan's
 business. It does not describe a **workstream**, whose state is the folder it sits in. It does not
