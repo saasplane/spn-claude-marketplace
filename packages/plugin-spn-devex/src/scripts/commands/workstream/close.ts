@@ -28,6 +28,23 @@ export const usage = "<workstream>";
 
 const refuse = (why: string): number => { console.log(`Refused: ${why}. Nothing was changed.`); return 1; };
 
+/** What a closed page carries as its closing block: what was delivered, what was learned and the thanks. */
+const CLOSING_PARTS: Array<[RegExp, string]> = [
+  [/What (?:was|we) delivered/i, "\"What was delivered\""], [/What (?:was|we) learned/i, "\"What was learned\""], [/Thank you/i, "\"Thank you\""],
+];
+
+/** The closing block's pieces an approach page lacks, named; none where it carries all. */
+export function missingClosingBlock(page: string): string[] {
+  return CLOSING_PARTS.filter(([pattern]) => !pattern.test(page)).map(([, name]) => name);
+}
+
+/** The refusal of a page without its closing block: the shape closed pages carry, the rule, and that nothing was changed. */
+const closingRefusal = (missing: string[]): string =>
+  `the approach page has no closing block (missing ${missing.join(", ")}). Write it under the masthead, in the shape closed pages carry: ` +
+  "a `<div class=\"sds-note\">` holding a 🚀 lead line, `<p>&nbsp;</p>`, `<p><strong>📦 What was delivered</strong></p>` and a list, " +
+  "`<p>&nbsp;</p>`, `<p><strong>🧠 What was learned</strong></p>` and a list, `<p>&nbsp;</p>`, then `<p><strong>Thank you 👍</strong></p>` and a line " +
+  "(RULE.DEVEX.WORKSPACE.206)";
+
 /** The page with its masthead status and its header block reading DONE. */
 function stamped(text: string): string {
   return text
@@ -253,6 +270,14 @@ export function run(args: string[]): number {
   if (!root) throw new UsageFault("runs inside a workspace.");
   const held = basename(dirname(ws));
   if (held === "closed") return refuse(`${basename(ws)} is already closed`);
+
+  // THE CLOSING BLOCK IS WRITTEN BEFORE THE CLOSE (RULE.DEVEX.WORKSPACE.206): a page found without it after its folder has moved has to be
+  // opened again, so a page without it refuses here, before anything is stamped, raised or moved.
+  const closingPage = approachOf(ws);
+  if (closingPage) {
+    const missing = missingClosingBlock(readFileSync(closingPage, "utf8"));
+    if (missing.length) return refuse(closingRefusal(missing));
+  }
 
   // Each go is read against its sheets first; the gate then reads the plan again for the parts that have not landed.
   for (const arc of arcIdsOf(ws)) {

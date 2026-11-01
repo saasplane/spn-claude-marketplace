@@ -2,7 +2,7 @@
 // close gate. Run as the agent types the commands, in a throwaway workspace.
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { cli, dataWorkspace } from "../../../../helpers/workstream-fixture.mjs";
+import { writeClosingBlock, cli, dataWorkspace } from "../../../../helpers/workstream-fixture.mjs";
 import { workspace } from "../../../../helpers/fixture.mjs";
 
 let total = 0, failed = 0;
@@ -76,9 +76,16 @@ console.log("\n=== close: an unfinished plan refuses it");
   ok("[MKT.SCRIPTS.320] an entry a landed row holds is planned in no part, and go check does not name it",
     planned.code === 0 && !partsHolding.length && checked.code === 0 && !checked.out.includes("held by no part"), `${partsHolding.join(", ")}\n${planned.out}\n${checked.out}`);
 
+  const noBlock = cli(root, ["workstream", "close", "031"]);
+  ok("[MKT.SCRIPTS.398] a page with no closing block refuses the close, naming the shape, the rule and that nothing was changed, before the go is read",
+    noBlock.code === 1 && noBlock.out.includes("no closing block") && noBlock.out.includes("What was delivered") && noBlock.out.includes("What was learned") && noBlock.out.includes("Thank you")
+      && noBlock.out.includes("sds-note") && noBlock.out.includes("RULE.DEVEX.WORKSPACE.206") && noBlock.out.includes("Nothing was changed") && !existsSync(closed) && existsSync(ws)
+      && readFileSync(join(ws, "approach.html"), "utf8") === before, noBlock.out);
+  writeClosingBlock(ws);
+  const withBlock = readFileSync(join(ws, "approach.html"), "utf8");
   const refused = cli(root, ["workstream", "close", "031"]);
   ok("[MKT.SCRIPTS.310] a plan with a part not landed refuses the close, and the folder stays", planned.code === 0 && refused.code === 1 && /go|part/.test(refused.out) && !existsSync(closed) && existsSync(ws), `${planned.out}\n${refused.out}`);
-  ok("[MKT.SCRIPTS.310] a refused close leaves the approach page as it was", readFileSync(join(ws, "approach.html"), "utf8") === before);
+  ok("[MKT.SCRIPTS.310] a refused close leaves the approach page as it was", readFileSync(join(ws, "approach.html"), "utf8") === withBlock);
 
   const plan = join(ws, "arcs", "N001", "go.json");
   const data = json(plan);

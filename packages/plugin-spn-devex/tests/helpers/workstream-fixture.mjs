@@ -3,7 +3,7 @@
 // block), one arc's `state.json` with its name file, its preview and its plan. Each case starts whole
 // and breaks one thing.
 import { execFileSync } from "node:child_process";
-import { mkdirSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { workspace } from "./fixture.mjs";
 import { PLUGIN } from "./harness.mjs";
@@ -106,4 +106,26 @@ export function cli(root, args, env = {}) {
 export function put(root, path, body) {
   mkdirSync(join(root, path, ".."), { recursive: true });
   writeFileSync(join(root, path), body, "utf8");
+}
+
+/** The closing block a closed approach page carries, in the shape closed pages hold (RULE.DEVEX.WORKSPACE.206). */
+export const CLOSING_BLOCK = `<div class="sds-note">
+  <p>&#x1F680; <strong>031 Probe has shipped.</strong> One arc, two steps.</p>
+  <p>&nbsp;</p>
+  <p><strong>&#x1F4E6; What was delivered</strong></p>
+  <ul><li>the probe</li></ul>
+  <p>&nbsp;</p>
+  <p><strong>&#x1F9E0; What was learned</strong></p>
+  <ul><li>it works</li></ul>
+  <p>&nbsp;</p>
+  <p><strong>Thank you &#x1F44D;</strong></p>
+  <p>Done.</p>
+</div>
+`;
+
+/** Writes the closing block into a workstream's approach page, under the masthead (or at the end where the page has none). */
+export function writeClosingBlock(ws) {
+  const page = join(ws, "approach.html");
+  const text = readFileSync(page, "utf8");
+  writeFileSync(page, text.includes("</header>") ? text.replace("</header>", `</header>\n${CLOSING_BLOCK}`) : `${text}\n${CLOSING_BLOCK}`);
 }

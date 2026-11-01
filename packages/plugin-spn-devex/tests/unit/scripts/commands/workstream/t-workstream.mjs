@@ -5,7 +5,7 @@ import { execFileSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { basename, join, resolve } from "node:path";
 import { PLUGIN } from "../../../../helpers/harness.mjs";
-import { CARD as BARE_CARD, arcData, cli, dataWorkspace as dataArc, put } from "../../../../helpers/workstream-fixture.mjs";
+import { CARD as BARE_CARD, arcData, cli, writeClosingBlock, dataWorkspace as dataArc, put } from "../../../../helpers/workstream-fixture.mjs";
 // A card's What cites what it read, or `question raise` refuses it (MKT.SCRIPTS.383).
 const CARD = { ...BARE_CARD, what: "The file is `a.ts:12`." };
 import { workspace } from "../../../../helpers/fixture.mjs";
@@ -927,6 +927,7 @@ console.log("\n=== workstream close — retro.json and the suggestions it raises
     { at: "2026-10-01T10:00:00Z", kind: "header", row: null, note: "the panel overturned the first shape" },
     { at: "2026-10-01T10:01:00Z", kind: "note", row: null, note: "the panel blocked it" },
   ].map((one) => JSON.stringify(one)).join("\n") + "\n");
+  writeClosingBlock(retro.ws);
   const closing = cli(retro.root, ["workstream", "close", "031"]);
   const home = existsSync(join(retro.root, ".spndevex", "workstreams", "closed", "031-probe", "retro.json")) ? join(retro.root, ".spndevex", "workstreams", "closed", "031-probe") : retro.ws;
   const record = existsSync(join(home, "retro.json")) ? json(join(home, "retro.json")) : null;
@@ -958,6 +959,7 @@ console.log("\n=== workstream close — the retrospective counts failed tests, t
   const testRow = (status, retryOf = null, extra = {}) => row({ mtype: "TEST", work: "TEST", status, retryOf, call: { program: "spnutils", group: "apps", action: "test" }, test: { node: "page-ts", tier: "UNIT", tests: { passed: 1, failed: status === "FAILED" ? 1 : 0, skipped: 0 } }, ...extra });
   const finish = (w, rows) => {
     writeFileSync(join(w.root, ".spndevex", ".debug", "telemetry", "hooks.jsonl"), rows.join("\n") + "\n");
+    writeClosingBlock(w.ws);
     const closing = cli(w.root, ["workstream", "close", "031"]);
     const home = existsSync(join(w.root, ".spndevex", "workstreams", "closed", "031-probe", "retro.json")) ? join(w.root, ".spndevex", "workstreams", "closed", "031-probe") : w.ws;
     return { record: json(join(home, "retro.json")), raised: existsSync(join(home, "suggestions.jsonl")) ? lines(join(home, "suggestions.jsonl")).map((one) => one.title) : [], out: closing.out };
