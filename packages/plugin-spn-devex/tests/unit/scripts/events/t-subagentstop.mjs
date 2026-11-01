@@ -139,6 +139,11 @@ console.log("\n=== a review panel's stop writes one PANEL row (RULE.DEVEX.WORKSP
   check("[MKT.HOOKS.402] and the main window's carried tags are left as they were",
     JSON.parse(readFileSync(join(d, ".spndevex", ".debug", "sessions", "sp", "tags.json"), "utf8")).main.arc === "N002");
 
+  const beside = (name, prompt) => setup(name, { prompt, reply: "Pass" }).rows[0]?.lens;
+  check("[MKT.HOOKS.410] the lens beside the word lens wins over an earlier lens word: \"lens: architect\", \"Lens ARCHITECT\", \"the architect lens\", \"through the infra lens\"",
+    beside("lens-a", "Read the lead arc 031/N001, lens: architect.") === "ARCHITECT" && beside("lens-b", "Read the data for 031/N001. Lens ARCHITECT") === "ARCHITECT"
+      && beside("lens-c", "The product work in 031/N001, through the infra lens.") === "INFRA" && beside("lens-d", "Support asks about 031/N001: the server dev lens please.") === "SERVER_DEV");
+  check("[MKT.HOOKS.410] with no lens beside the word lens, the earliest lens word stands", beside("lens-e", "Judge 031/N001 as ux, then as ui.") === "UX");
   const other = setup("panel-not", { type: "general-purpose", prompt: "Review 031/N001 as the architect.", reply: "Pass" });
   check("[MKT.HOOKS.403] a helper that is not the panel writes no PANEL row", other.rows.length === 0, JSON.stringify(other.rows));
   const unsure = setup("panel-unsure", { prompt: "Review 031/N001 as the architect.", reply: "Looks fine to me.\n\nPass" });

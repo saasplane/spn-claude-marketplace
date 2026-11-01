@@ -4,7 +4,7 @@
 // A review panel's verdict, read from the transcript of the helper that gave it, for `events/subagentstop.ts` to record.
 //
 // THE PANEL IS KNOWN BY ITS AGENT TYPE: the payload's `agent_type`, else the `agentType` of the `.meta.json` beside the
-// transcript, is `spn-devex:spn-panel` or ends in `spn-panel`. Its LENS is the first lens named in its first prompt, its
+// transcript, is `spn-devex:spn-panel` or ends in `spn-panel`. Its LENS is the one named beside the word "lens" in its first prompt, else the first lens word in it, its
 // VERDICT the first line of its last reply, and its WORK the workstream, arc and part its first prompt names, else the
 // main window's carried ones. A reply whose first line is none of the three verdicts writes no row.
 //
@@ -77,18 +77,26 @@ export function verdictOf(firstLine: string): string | null {
   return null;
 }
 
-/** A lens as the word a prompt writes it: `SERVER_DEV` also reads `server-dev` and `server dev`. */
-const wordOf = (lens: string): RegExp => new RegExp(`(?<![A-Za-z0-9])${lens.split("_").join("[-_ ]")}(?![A-Za-z0-9])`, "i");
+/** A lens as the pattern a prompt writes it: `SERVER_DEV` also reads `server-dev` and `server dev`. */
+const patternOf = (lens: string): string => lens.split("_").join("[-_ ]");
+/** A lens as a whole word of a prompt. */
+const wordOf = (lens: string): RegExp => new RegExp(`(?<![A-Za-z0-9])${patternOf(lens)}(?![A-Za-z0-9])`, "i");
+/** A lens named beside the word "lens": `lens: architect`, `Lens ARCHITECT`, `the architect lens`, `through the infra lens`. */
+const besideLens = (lens: string): RegExp => new RegExp(
+  `(?<![A-Za-z0-9])lens(?![A-Za-z0-9])[\\s:=\\u2014-]*(?:of\\s+|the\\s+)?${patternOf(lens)}(?![A-Za-z0-9])|(?<![A-Za-z0-9])${patternOf(lens)}\\s+lens(?![A-Za-z0-9])`, "i");
 
-/** The first lens a prompt names, as the contract's value, or null. The first match by position wins. */
-export function lensOf(prompt: string): string | null {
+/** The earliest lens a prompt names by `pattern`, as the contract's value, or null. */
+function earliest(prompt: string, pattern: (lens: string) => RegExp): string | null {
   let best: { at: number; lens: string } | null = null;
   for (const lens of Object.values(SPDevExAgentLensType)) {
-    const at = wordOf(lens).exec(prompt)?.index;
+    const at = pattern(lens).exec(prompt)?.index;
     if (at !== undefined && (!best || at < best.at)) best = { at, lens };
   }
   return best?.lens ?? null;
 }
+
+/** The lens a prompt names: the one beside the word "lens" first, else the earliest lens word. Null where it names none. */
+export const lensOf = (prompt: string): string | null => earliest(prompt, besideLens) ?? earliest(prompt, wordOf);
 
 /** A workstream number's folder name in an open or backlog workstream, else the name given. */
 function workstreamNamed(root: string, name: string): string | null {
