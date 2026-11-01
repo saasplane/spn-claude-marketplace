@@ -223,6 +223,13 @@ console.log("\n=== a decided arc's sheet is rewritten only on the developer's wo
     bare.code === 1 && bare.out.includes("--because") && bare.out.includes("Nothing was written") && readFileSync(sheetFile, "utf8") === before && lines(log).length === logged, bare.out);
   const said = sheet("write", "N001", "--file", file, "--because", "the developer: add E1 back");
   ok("[MKT.SCRIPTS.237] with --because it is written and the words are logged", said.code === 0 && json(sheetFile).entries.length === 2 && lines(log).at(-1).note.includes("add E1 back"), said.out);
+  const rowId = json(join(root, ".spndevex", "workstreams", "open", "031-probe", "arcs", "N001", "state.json")).rows.find((one) => one.state !== "landed")?.id;
+  const uncited = sheet("write", "N001", "--file", put("uncited.json", sheetOf([entry("E1"), entry("E2"), entry("E7")])), "--because", `row ${rowId}`);
+  ok("[MKT.SCRIPTS.415] a --because naming a row the arc has finishes it only if every new entry cites that row, and is refused naming the entry",
+    uncited.code === 1 && uncited.out.includes("E7") && uncited.out.includes(`row ${rowId}`), uncited.out);
+  const cited = sheet("write", "N001", "--file", put("cited.json", sheetOf([entry("E1"), entry("E2"), entry("E7", { decidedBy: [`row ${rowId}`] })])), "--because", `row ${rowId}`);
+  ok("[MKT.SCRIPTS.415] and with every new entry citing the row it is written with no card, the log saying which row it finishes",
+    cited.code === 0 && json(sheetFile).entries.some((one) => one.id === "E7") && lines(log).at(-1).note.includes(`finishes row ${rowId}`), cited.out);
   const opened = cli(root, ["workstream", "arc", "edit", "031-probe/N005", "--title", "empty sheet", "--subject", "empty-sheet", "--goal", "an empty sheet is written once"]);
   const flip = cli(root, ["workstream", "arc", "edit", "031-probe/N005", "--status", "DECIDED", "--note", "go"]);
   const empty = sheet("write", "N005", "--file", put("empty.json", sheetOf([])));

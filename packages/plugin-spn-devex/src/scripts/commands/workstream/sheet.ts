@@ -133,6 +133,15 @@ function deriveSteps(ws: string, arc: string, sheet: Sheet): number {
   return added;
 }
 
+/** The row of a decided arc that a `--because` names, as `3` or `row 3`, or null where it names none: then it is the developer's words. */
+export function finishedRow(ws: string, arc: string, because: string): { id: string } | null {
+  const data = readArc(ws, arc);
+  if (!data || data.status !== "DECIDED") return null;
+  const id = because.replace(/^row\s+/i, "").trim();
+  const row = data.rows.find((one) => one.id === id && one.state !== "landed");
+  return row ? { id: row.id } : null;
+}
+
 function write(args: string[]): number {
   const words = readWords(args, { file: VALUE, because: VALUE });
   const [ref, ...more] = words.paths;
@@ -148,12 +157,20 @@ function write(args: string[]): number {
   // A decided arc's sheet is what the work was cut from: a rewrite carries the developer's words that changed it, and an empty sheet is written once.
   const because = words.value("because")?.trim() ?? "";
   if (readArc(ws, arc)?.status === "DECIDED" && (readSheet(ws, arc)?.entries.length ?? 0) > 0 && !because)
-    faults.push(`${arc} is decided and its sheet holds entries — a rewrite carries \`--because "<the developer's words that changed it>"\``);
+    faults.push(`${arc} is decided and its sheet holds entries — a rewrite carries \`--because "<the developer's words that changed it>"\` (or, for a fix that finishes the arc's own row or proof, \`--because "<its row>"\`)`);
+  // A FIX THAT FINISHES A DECIDED ARC'S OWN ROW OR PROOF NEEDS NO CARD: --because names that row, and every new entry cites it (s55).
+  const finishes = finishedRow(ws, arc, because);
+  if (finishes) {
+    const known = new Set((readSheet(ws, arc)?.entries ?? []).map((one) => one.id));
+    for (const entry of Array.isArray((data as Sheet).entries) ? (data as Sheet).entries : [])
+      if (!known.has(entry?.id) && !(Array.isArray(entry?.decidedBy) && entry.decidedBy.some((cite) => cite === `row ${finishes.id}` || cite === `${arc}/${finishes.id}`)))
+        faults.push(`${entry?.id} is new, and \`--because "${because}"\` says it finishes row ${finishes.id} of ${arc}: it cites \`row ${finishes.id}\` in \`decidedBy\``);
+  }
   if (faults.length) return refused(faults);
   save(ws, arc, data as Sheet);
   const count = (data as Sheet).entries.length;
   const added = deriveSteps(ws, arc, data as Sheet);
-  logEvent(ws, arc, "sheet", null, `written · ${count} entries${because ? ` · because ${because}` : ""}`);
+  logEvent(ws, arc, "sheet", null, `written · ${count} entries${because ? ` · ${finishes ? `finishes row ${finishes.id}` : `because ${because}`}` : ""}`);
   console.log(`ok · ${arc} sheet written · ${count} entries${added ? ` · ${added} step${added === 1 ? "" : "s"} derived` : ""}`);
   return 0;
 }
