@@ -52,6 +52,11 @@ description: Decide what a node IS, and design a requirement inside that shape -
 - **RULE.DEVEX.FUNCTION.096** (`RULE.DEVEX.FUNCTION.096` · MUST · skill:spn-devex/ideate)
 - **RULE.DEVEX.FUNCTION.097** (`RULE.DEVEX.FUNCTION.097` · MUST · skill:spn-devex/ideate)
 - **A partner's or developer's idea is unfolded in one order, the one their own words lead** (`RULE.DEVEX.FUNCTION.098` · MUST · skill:spn-devex/ideate)
+- **RULE.DEVEX.FUNCTION.099** (`RULE.DEVEX.FUNCTION.099` · MUST · skill:spn-devex/ideate)
+- **RULE.DEVEX.FUNCTION.100** (`RULE.DEVEX.FUNCTION.100` · MUST · skill:spn-devex/ideate)
+- **RULE.DEVEX.FUNCTION.101** (`RULE.DEVEX.FUNCTION.101` · MUST · skill:spn-devex/ideate)
+- **RULE.DEVEX.FUNCTION.102** (`RULE.DEVEX.FUNCTION.102` · MUST · skill:spn-devex/ideate)
+- **RULE.DEVEX.FUNCTION.103** (`RULE.DEVEX.FUNCTION.103` · MUST · skill:spn-devex/ideate)
 - **RULE.DEVEX.WORKSPACE.006** (`RULE.DEVEX.WORKSPACE.006` · MUST · skill:spn-devex/ideate)
 - **A step acting on a set carries that set** (`RULE.DEVEX.WORKSPACE.064` · MUST · skill:spn-devex/ideate)
 - **`migrations/` earns you none either** (`RULE.DEVEX.WORKSPACE.086` · MUST · skill:spn-devex/ideate)
@@ -271,9 +276,27 @@ A first proposal starts where the book already stands, so the developer reads a 
 - **Propose a field only where a report the developer asked for reads it** (`RULE.DEVEX.FUNCTION.091` · MUST · skill:spn-devex/ideate). A field no report reads is cut, and a field a report does read is kept.
 - **Give each idea one name, in the construct that owns it** (`RULE.DEVEX.FUNCTION.092` · MUST · skill:spn-devex/ideate). A second word for an idea already named is replaced by the first, and a new type is named for its domain, its group and its attribute.
 - **Migrate only live records** (`RULE.DEVEX.FUNCTION.093` · MUST · skill:spn-devex/ideate). A record nothing reads again is left as it is, a log that holds only history is skipped by its readers, and no migration is planned for either.
+- **Take these checks before the options are written.** Each is one line, and `refs/devex/function/ideate.md` § *How a first proposal is shaped* holds each in full.
+  1. **Check the premise** (`RULE.DEVEX.FUNCTION.099` · MUST · skill:spn-devex/ideate). Ask first whether the thing is needed at all.
+  2. **Ask which side changes when a participant joins** (`RULE.DEVEX.FUNCTION.100` · MUST · skill:spn-devex/ideate). It is the one that holds the fact, or every one that reads it.
+  3. **Split trust** (`RULE.DEVEX.FUNCTION.101` · MUST · skill:spn-devex/ideate). Split it by app, by module and by write, and never offer it as one list.
+  4. **Offer a frame that moves where the thing lives** (`RULE.DEVEX.FUNCTION.102` · MUST · skill:spn-devex/ideate). At least one option places it somewhere else.
+  5. **Say how the laptop gets the fact** (`RULE.DEVEX.FUNCTION.103` · MUST · skill:spn-devex/ideate). Name how a local run gets the same fact the cloud holds.
 - **List every part beside the developer's words it serves, and cut what serves none** (`RULE.DEVEX.FUNCTION.096` · MUST · skill:spn-devex/ideate). Take this step before the first proposal is shown. A part that serves nothing is cut to one *later, not now* line, and the cut test asks which part could go with nothing failing. `refs/devex/function/ideate.md` § *How a first proposal is shaped* holds the step in full.
 - **Place the proposal where it is read** (`RULE.DEVEX.FUNCTION.097` · MUST · skill:spn-devex/ideate). Take this step before the first proposal is shown, after the list-and-cut step. The chat holds what the developer asked to see, whole; the approach page one line for each part in the *What*; the preview what the developer judges. Code shown anywhere uses today's names and real values, never placeholders. `refs/devex/function/ideate.md` § *How a first proposal is shaped* holds the step in full.
 - **Decide the figure while you write the What** (`RULE.DEVEX.WORKSPACE.497` · MUST · check:doc-check). A What past about 6,000 characters opens on a figure, or carries one line, `<!-- no figure: … -->`, that says why prose is clearer there; never leave it to a later pass.
 - **Explain the proposal in what the developer will see, before the code's own terms** (`RULE.DEVEX.FUNCTION.094` · MUST · skill:spn-devex/ideate). Lead with the printed output, the rows or the page the developer will read, and let the code's terms follow.
 - **Convene the proposal's panel before the proposal is called final** (`RULE.DEVEX.FUNCTION.095` · MUST · skill:spn-devex/ideate). The reader who did not write the proposal reads it first, and a block from that reader is answered in the proposal and not after it.
 - **Workspace plumbing is yours to resolve, and never a card** (`RULE.DEVEX.WORKSPACE.481` · MUST · skill:spn-devex/ideate). A stale checkout, tool output left uncommitted and a stash you name are yours to fix, and you say in one line what you did. A helper never stashes: the window that coordinates does.
+
+## Ideating an arc in code
+
+When the arc changes code, the idea is worked in the code itself, one connected batch at a time.
+
+1. **Read, change, validate, record.** Read the files the idea touches, make the change, validate it with one trace line, and record it with `sheet patch --trace --judged`. Validation here is typecheck and lint only; the suites run later, at the go.
+2. **Judged before the preview, mechanical after approval.** An entry whose change needs judgement is patched before the preview, so the preview shows its code; a mechanical entry is patched after the developer approves.
+3. **One helper per connected batch.** Send the contract first, then what depends on it. Size each batch by measured tokens, never by a guess.
+4. **Where an idea goes.** It joins the running arc only when that arc's goal needs it. Otherwise the developer chooses: its own arc, or the follow-ups.
+5. **A later change shows `sheet reach` first.** Run `sheet reach` and show what the change reaches before you change anything.
+6. **A proposal carries its preview.** It shows a code preview for apps code or a journey for a flow, as the agent chapter says ([`refs/devex/agent/agent.md`](../../refs/devex/agent/agent.md) § *A proposal shows its choice as a preview, and the first one follows eight rules*).
+7. **Shape a first proposal by the agent chapter's eight rules,** in the same section. They are stated there once; this step points at them and does not restate them.

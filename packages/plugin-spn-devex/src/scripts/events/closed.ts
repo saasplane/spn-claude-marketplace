@@ -38,7 +38,7 @@ import { eventWorkspace, isDir, readPayload, runAlone, workspaceRoot, type Paylo
 import { ARCS, SESSIONS, WORKSTREAM_STATES, WORKSTREAMS } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { HELD_STATE, closing, moves, stateOf, subjectFolders, subjectPages, workstreamPlan } from "../checks/split-plan.ts";
 import { begin, callOf, end, span, tagsOf } from "../../../../plugin-support-lib/src/lib/timing.ts";
-import { finishCommand } from "../lib/bash-timing.ts";
+import { finishCommand, finishFile } from "../lib/bash-timing.ts";
 
 const STRUCTURE = new Set<string>([WORKSTREAMS, SESSIONS, ARCS, ...WORKSTREAM_STATES, ""]);
 
@@ -114,6 +114,7 @@ if (runAlone("closed.ts")) {
     try { message = span({ group: "closed", action: "closed" }, () => closingMessage(payload)); } catch { message = null; }
   }
   const responded = finishCommand(payload, failed);
+  if (!failed) finishFile(payload);
   // A failed call runs no check, so it writes no hook row and no whole-run line.
   end(null, failed, { out: responded });
   if (message) console.log(JSON.stringify({ systemMessage: message }));

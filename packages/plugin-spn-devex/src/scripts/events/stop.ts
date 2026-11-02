@@ -18,7 +18,6 @@
 //              cards this window raised, or that no window recorded, count (`raisedBy` in the card's record)
 //   reply-shape a Needs you item is never a card or a suggestion by its number alone, and a reply holds no
 //              working detail (`lib/working-detail.ts`)
-//   cards      a reply names no card the window's pages do not carry, one answered, or one of another workstream
 //   notes      a note, once: an answered card a preview shows, whose arc's notes did not move
 //   carried    a proposed arc never carries a review point to a later row of itself
 //   handover   a reply that says a new window is needed carries the nine labelled lines, in one column,
@@ -31,13 +30,12 @@
 //              window's workstream (RULE.DEVEX.WORKSPACE.493)
 //   card-case  a reply that names a card as a lowercase q<n> or s<n> in its prose (outside code, links, URLs and paths) is sent back
 //              with each one and its capital form (RULE.DEVEX.WORKSPACE.486)
-//   go-next    a go of the window with a part ready and not started, or a report waiting to be folded,
-//              and no card open, is told its next step
+//   reply-shape also carries the next step: a go of the window with a part ready and not started, or a report waiting to be folded,
+//              and no card open, is told its next step on a reply-shape finding, and alone only where the reply names none
 //   page-stale an arc this window wrote left its workstream's page, or its preview's status, behind the arcs
 //   state      `workstream state check` fails for a workstream of this window: among its findings an arc
 //              the page does not carry, a workstream with no page, and a step running on an arc not decided
 //   migration  a migration the workspace's ledger lacks still finds old shapes, in any window
-//   own-copy   a page of this window's workstreams links no shared stylesheet; said once in a session
 //   welcome    a session's first turn opens with the welcome, word for word: the heading and its four lines
 //   corpus     the docs trees still answer the questions only a whole-corpus read can ask
 //
@@ -54,7 +52,7 @@
 // unfinished, and that window hears about it. A window bound to none hears nothing about them.
 //
 // WHILE A ROW IS IN PROGRESS, ONLY A FINDING ABOUT THE REPLY SENDS THE AGENT BACK (RULE.DEVEX.WORKSPACE.244):
-// `needs-you`, `reply-shape`, `cards`, `handover`, `how-it-runs`, `partner-words`, `page-path`, `close-message`, `card-case`, `proposal-record` and `welcome`. Every other finding is held, and the checks find
+// `needs-you`, `reply-shape`, `handover`, `how-it-runs`, `partner-words`, `page-path`, `close-message`, `card-case`, `proposal-record` and `welcome`. Every other finding is held, and the checks find
 // it again at the first turn end where no row is in progress (`splitFindings`).
 //
 // `corpus` is the newest and the odd one out: every other check here reads what the TURN wrote, and
@@ -72,7 +70,8 @@
 import { readFileSync, readdirSync, rmSync, statSync, mkdirSync, writeFileSync } from "node:fs";
 import { basename, dirname, join } from "node:path";
 import { createHash } from "node:crypto";
-import { checkCorpus } from "../checks/corpus.ts";
+import { CORPUS_MARKER, checkCorpus } from "../checks/corpus.ts";
+import { replayPanels } from "../lib/panel.ts";
 import { checkHowItRuns } from "../checks/how-it-runs.ts";
 import { checkPartnerWords } from "../checks/partner-words.ts";
 import { checkPagePath } from "../checks/page-path.ts";
@@ -80,10 +79,10 @@ import { checkWorkstream, heldByStop } from "../checks/workstream-state.ts";
 import { PREVIEW_FILE, approachOf, arcDataDir, arcStatus, stepsMayStart, arcIdsOf, leafRows, logLinesOf, notesDirOf, previewOf, readArc, readJsonl, readQuestions, readyRows, stateFileOf,
          suggestionsFileOf, workstreamsOf } from "../lib/workstream.ts";
 import { findWorkingDetail } from "../lib/working-detail.ts";
-import { cardName, type ArcData, type LogLine, type Question } from "../lib/workstream-schema.ts";
+import { ARC_ID, cardName, type ArcData, type LogLine, type Question } from "../lib/workstream-schema.ts";
 import { applyLine, standings } from "../lib/migration.ts";
 import { MIGRATIONS } from "../lib/migrations/index.ts";
-import { cardsOf, holdsOwnCopy, markAge, openWorkstreams, ownCopyLines, stateOf, workstreamPlan } from "../checks/split-plan.ts";
+import { cardsOf, holdsOwnCopy, markAge, openWorkstreams } from "../checks/split-plan.ts";
 import { cyclesRule, exemptWorkstream, headerRule, openHeadingRule } from "../checks/doc-check.ts";
 import { cyclesTableAt } from "../commands/docs/cycles.ts";
 import { TERMINAL } from "../checks/arc-status.ts";
@@ -111,8 +110,8 @@ const HANDOVER_LABEL_LINE = new RegExp(`^(${HANDOVER_LABELS.join("|")}):(.*)$`);
 // name a session, so a workstream and an arc are spelled one way for both events.
 /** A workstream folder's name, as a text writes it: three digits, a hyphen and the subject. */
 export const WORKSTREAM_NAME = /\b\d{3}-[a-z0-9][a-z0-9-]*/;
-/** An arc's number, as a text writes it: `N` and its digits. */
-export const ARC_NAME = /\bN\d+\b/;
+/** An arc's address, as a text writes it, read from `ARC_ID`: `N<nnn>`, `ideate` or `follow-ups`. */
+export const ARC_NAME = new RegExp(`\\b(?:${ARC_ID.source.slice(1, -1)})\\b`);
 
 /**
  * The labelled lines of a handover block, each with its value. A line that starts with whitespace
@@ -131,7 +130,7 @@ export function handoverLines(body: string): Map<string, string> {
 }
 
 // The column every value starts in, counted from 0: the longest label, `do not touch:`, and one space.
-const HANDOVER_COLUMN = Math.max(...HANDOVER_LABELS.map((label) => label.length)) + 2;
+export const HANDOVER_COLUMN = Math.max(...HANDOVER_LABELS.map((label) => label.length)) + 2;
 
 /**
  * The column each label's value starts in, counted from 0, in the block's order. A line that starts
@@ -235,8 +234,6 @@ const dataOf = (arc: string): ArcData | null => readArc(homeOf(arc), idOf(arc));
 /** An arc's status, or "" where it has no data. */
 /** An arc's status as it reads, from the one owner (RULE.DEVEX.WORKSPACE.307), or "" where its data does not read. */
 const statusOf = (arc: string): string => { const data = dataOf(arc); return data ? arcStatus(data) : ""; };
-/** The cards still open in a workstream's `questions.jsonl`. */
-const openQuestionsOf = (ws: string): Question[] => readQuestions(ws).filter((one) => one.state === "open");
 /** The way a command names an arc: the workstream's number and the arc, `<number>/N<nnn>`. */
 const arcRef = (arc: string): string => `${basename(homeOf(arc)).slice(0, 3)}/${idOf(arc)}`;
 
@@ -298,7 +295,8 @@ export function runningRows(arc: string, now = Date.now(), out: Set<string> = or
  * state is how a progress reply is told from a reply that waits.
  *
  * A row whose order is out with an agent counts here, though `runningRows` leaves it out: that agent
- * is the work that runs. An arc whose status is terminal does not count, because a row left running in
+ * is the work that runs, and so does an order of the arc with no report beside it, whatever its row
+ * reads (MKT.SCRIPTS.512). An arc whose status is terminal does not count, because a row left running in
  * a finished arc is history, and it would hide the open cards for as long as the arc stays open.
  *
  * @param mine  the workstreams this window works on; a row in any other is another window's work
@@ -306,7 +304,9 @@ export function runningRows(arc: string, now = Date.now(), out: Set<string> = or
 export function workRuns(root: string, mine: Set<string>): boolean {
   return openArcs(root, mine).some((arc) => {
     const data = dataOf(arc);
-    return !!data && !TERMINAL.has(arcStatus(data)) && leafRows(data).some((row) => row.state === "running");
+    if (!data || TERMINAL.has(arcStatus(data))) return false;
+    // A BACKGROUND HELPER WITH NO REPORT YET IS WORK THAT RUNS: its order sits in `orders/` with no report beside it (S73).
+    return ordersOut(arc).size > 0 || leafRows(data).some((row) => row.state === "running");
   });
 }
 
@@ -370,12 +370,12 @@ export function ordersOut(arc: string): Set<string> {
  */
 export type Baseline = { at: number; steps: Record<string, string>; fired?: string[];
                          cards?: string[]; arcs?: Record<string, ArcMark>;
-                         /** The pages this session was already told hold their own copy of the styles. */
-                         ownCopy?: string[];
                          /** `stepsMark` as it read when this session wrote a whole handover block. */
                          handover?: string;
                          /** The findings said and not yet gone, by check, as the hash of their words: an identical one is not said again. */
-                         told?: Record<string, string> };
+                         told?: Record<string, string>;
+                         /** The agent ids of the finished helper transcripts `replayPanels` has read, so a transcript is read once. */
+                         panels?: string[] };
 
 /**
  * What one arc looked like at a Stop, for the `notes` and `carried` checks: how many lines its
@@ -855,95 +855,6 @@ export function cardsByWorkstream(root: string, mine: Set<string>): Map<string, 
   return out;
 }
 
-/** Every card each given workstream carries, on its pages or in `questions.jsonl`, by key, with whether it is still open. */
-function cardsOfWorkstreams(folders: string[]): Map<CardKey, boolean> {
-  const out = new Map<CardKey, boolean>();
-  for (const folder of folders) {
-    const name = basename(folder);
-    for (const page of pagesOf(folder)) for (const card of cardsOf(page)) out.set(keyOf(name, card.number), !card.decided);
-    for (const one of readQuestions(folder)) out.set(keyOf(name, one.id), one.state === "open");
-  }
-  return out;
-}
-
-/** Whether the turn's prompt names a card, or a workstream by its folder name or its number. */
-function promptNames(prompt: string, card: string | null, workstream: string | null): boolean {
-  if (card && namesCard(prompt, card)) return true;
-  if (!workstream) return false;
-  return prompt.includes(workstream) || new RegExp(`\\b${workstream.slice(0, 3)}\\b`).test(prompt);
-}
-
-/**
- * The cards check (RULE.DEVEX.WORKSPACE.147 and .197): a reply names no card that no page of this window's
- * workstreams carries, none that belongs to another workstream, in its number, in words or on a handover's
- * `open:` line, unless the turn's prompt named that card or that workstream, and its **Needs you** puts
- * no card that is already answered. A window bound to no workstream is not read.
- *
- * @param prompt  the turn's prompt, as the developer wrote it; "" where it is not known
- */
-export function checkCardsNamed(reply: string, root: string, mine: Set<string>, prompt = ""): Warning[] {
-  if (!mine.size) return [];
-  const ownFolders = scoped(openWorkstreamFolders(root), mine);
-  if (!ownFolders.length) return [];
-  const ownNames = ownFolders.map((folder) => basename(folder));
-  const own = cardsOfWorkstreams(ownFolders);
-  const prose = unquoted(reply);
-  const named = [...new Set(prose.match(/\bQ\d+\b/g) ?? [])].map((card) => card.toUpperCase());
-  const part = needsYouPart(reply);
-  const out: Warning[] = [];
-  const ours = ownNames.join(", ");
-  const otherFolders = openWorkstreamFolders(root).filter((folder) => !mine.has(basename(folder)));
-  const otherNames = otherFolders.map((folder) => basename(folder));
-  const others = cardsOfWorkstreams(otherFolders);
-  const sent = new Set<string>();
-  for (const card of named) {
-    // A NUMBER IS EACH BOUND WORKSTREAM'S THAT HOLDS IT, unless the reply places it at one: a card is answered only
-    // when every card the number could mean is.
-    const holders = ownNames.filter((name) => own.has(keyOf(name, card)));
-    if (holders.length) {
-      if (namesCard(part, card)) {
-        const placed = placeCard(part, card, holders);
-        if (placed.length && placed.every((key) => own.get(key) === false)) {
-          const places = placed.map(keyWorkstream).join(" and ");
-          const many = placed.length > 1;
-          out.push({ check: "cards", message: `Needs you names ${card}, and ${places} ${many ? "have" : "has"} answered ${many ? "them" : "it"}. Leave a settled card out of Needs you.` });
-        }
-      }
-      continue;
-    }
-    const elsewhere = otherNames.find((name) => others.has(keyOf(name, card)));
-    if (elsewhere && promptNames(prompt, card, elsewhere)) continue;
-    sent.add(card);
-    out.push({ check: "cards", message: elsewhere
-      ? `This reply names ${card}, which belongs to ${elsewhere}, not to ${ours}. It belongs to the window that works there, and the developer did not ask about it. ` +
-        `Take the sentence out and change nothing else (RULE.DEVEX.WORKSPACE.197).`
-      : `This reply names ${card}, and no approach page of ${ours} carries it.` });
-  }
-  // ANOTHER WORKSTREAM'S CARDS IN WORDS: a sentence that names an open workstream of another window with "card", "question" or "open".
-  for (const name of otherNames) {
-    if (promptNames(prompt, null, name)) continue;
-    const number = new RegExp(`\\b${name.slice(0, 3)}\\b`);
-    const sentence = prose.split(/(?<=[.?!])\s+|\n+/).find((one) => (one.includes(name) || number.test(one)) && /\b(?:cards?|questions?|open)\b/i.test(one));
-    if (sentence) out.push({ check: "cards", message:
-      `This reply names the cards of another workstream: "${sentence.trim().slice(0, 120)}". ${name} belongs to the window that works there, and the developer did not ask about it. ` +
-      `Take the sentence out and change nothing else (RULE.DEVEX.WORKSPACE.197).` });
-  }
-  // THE HANDOVER'S OPEN LINE holds this workstream's cards only.
-  for (const fence of handoverFences(reply).filter((one) => !quotesTemplate(one))) {
-    const open = handoverLines(fence.body).get("open") ?? "";
-    const strange = [
-      ...(open.match(/\bQ\d+\b/g) ?? []).filter((card) => !sent.has(card) && !ownNames.some((name) => own.has(keyOf(name, card)))
-        && otherNames.some((name) => others.has(keyOf(name, card)) && !promptNames(prompt, card, name))),
-      ...otherNames.filter((name) => !promptNames(prompt, null, name)
-        && (open.includes(name) || new RegExp(`\\b${name.slice(0, 3)}\\b`).test(open))),
-    ];
-    if (strange.length) out.push({ check: "cards", message:
-      `The handover's \`open:\` line names ${[...new Set(strange)].join(" · ")}, which belongs to another workstream. The line holds only the cards of ${ours} ` +
-      `(RULE.DEVEX.WORKSPACE.197).` });
-  }
-  return out.slice(0, 3);
-}
-
 /**
  * Cards as a line that says which workstream each belongs to: `021-figma-design-standard: Q10 · Q8`. Where the
  * cards come from more than one workstream, each is named with its workstream as a reply writes it, `032 Q2 · 037 Q2`.
@@ -1004,6 +915,7 @@ const CLOSES = /\bworkstream close\b|\b(?:closed|closes|closing) (?:the |this )?
 export function openingOf(reply: string): string | null {
   const first = reply.split("\n").find((line) => line.trim() !== "") ?? "";
   if (/^\s*\|/.test(first)) return "a table";
+  if (shapeByTitle(reply)) return null;
   if (/^[ \t]{0,3}#{1,6}[ \t]/.test(first) && !NEEDS_YOU.test(first)) return "a heading";
   if (/^[ \t]{0,3}(?:[-*][ \t]+)?(?:\*\*)?\d[\d,]*(?:[ \t]+of[ \t]+\d+)?[ \t]+\p{L}/u.test(first)) return "a count";
   return null;
@@ -1019,7 +931,7 @@ export function openingOf(reply: string): string | null {
  *               counts as given, and a second block in this reply is the extra one
  */
 export function checkHandover(reply: string, root: string, mine: Set<string>, given = false, earlier: string[] = []): Warning[] {
-  const handing = passingOn(reply);
+  const handing = passingOn(reply) || shapeByTitle(reply, true)?.moment === "handover";
   if (!handing && !CLOSES.test(unquoted(reply))) return [];
   // A REPLY THAT PUTS A WHOLE CARD ASKS A QUESTION, AND HANDS NOTHING OVER, also when it offers the
   // next window for after the answer.
@@ -1101,7 +1013,13 @@ export function checkHandover(reply: string, root: string, mine: Set<string>, gi
   const next = lines.get("continue") ?? "";
   if (!WORKSTREAM_NAME.test(next) || !ARC_NAME.test(next))
     return [{ check: "handover", message: `the handover block's \`continue:\` line names no ${WORKSTREAM_NAME.test(next) ? "arc (\`N<n>\`)" : "workstream (\`NNN-subject\`)"}. The next window finds everything else from those two.` }];
-  return [];
+  // A REPLY THAT OPENS WITH THE HANDOVER'S HEADING IS HELD TO ITS SHAPE (S136): the title, the block between two \`&nbsp;\` lines, one closing paragraph.
+  const shape = shapeOf("handover");
+  if (shapeByTitle(reply, true)?.moment !== "handover") return [];
+  const problems = closingProblems(reply, shape);
+  if (!problems.length) return [];
+  return [{ check: "handover", message:
+    `This reply is the handover's message (RULE.DEVEX.WORKSPACE.206), and it leaves out or breaks: ${problems.join("; ")}. Write it as ${shapeText(shape)}.` }];
 }
 
 
@@ -1121,42 +1039,11 @@ function namesCard(text: string, card: string): boolean {
   return new RegExp(`\\b${card}\\b`, "i").test(text);
 }
 
-/** Whether a page carries at least one card in the card pattern, which is a `div.sds-open`. */
-function hasOpenCard(text: string): boolean {
-  return /<div\b[^>]*class="(?:[^"]*\s)?sds-open(?:\s[^"]*)?"/i.test(text);
-}
-
-/**
- * Whether the card pattern can be read from these pages. The pattern is a class of the shared
- * stylesheet, and no class is read of a page that holds its own copy of the styles.
- */
-function cardPatternReadable(pages: string[]): boolean {
-  return !pages.some(holdsOwnCopy);
-}
-
 /** The open workstreams that have a page, as subject → its pages. */
 function argued(root: string, mine: Set<string>): Array<[string, string[]]> {
   return [...openWorkstreams(root)].filter(([, pages]) => pages.length)
     .filter(([, pages]) => mine.has(basename(dirname(pages[0]))))
     .sort((a, b) => a[0].localeCompare(b[0]));
-}
-
-/**
- * Every open workstream whose plan records a stop while its page says nothing is open.
- *
- * THE THIRD SHAPE, AND THE WORST OF THE THREE. The other two put a question in the wrong file, where
- * a reader could still find it. Here the split plan knows a row waits on somebody and the one section
- * they read says nothing does, so the question is written nowhere at all.
- */
-export function stopsWithEmptyOpen(root: string, mine: Set<string>): Array<[string, string]> {
-  const out: Array<[string, string]> = [];
-  for (const [subject, pages] of argued(root, mine)) {
-    if (!cardPatternReadable(pages)) continue;
-    const text = pages.map(read).join(" ");
-    const waiting = workstreamPlan([dirname(pages[0])], pages).filter((row) => stateOf(row) === "stopped");
-    if (waiting.length && !hasOpenCard(text)) out.push([subject, waiting[0].label]);
-  }
-  return out;
 }
 
 // ---------------------------------------------------------------------------- reply-shape
@@ -1335,7 +1222,23 @@ function putsInFull(text: string, card: CardKey, several = false): boolean {
  *                 **Needs you** only when it is named with its workstream (`032 Q2`)
  */
 export function checkReplyShape(reply: string, open: CardKey[] = [], raised: CardKey[] = [],
-                                where: Map<string, CardKey[]> = new Map(), running = false, bound = where.size): Warning[] {
+                                where: Map<string, CardKey[]> = new Map(), running = false, bound = where.size, next: string[] = []): Warning[] {
+  const out = replyFindings(reply, open, raised, where, running, bound);
+  // THE NEXT STEP RIDES ON A FINDING THE REPLY EARNED, and stands alone only where the reply ended with no next step named (RULE.DEVEX.WORKSPACE.244, .471).
+  if (!next.length) return out;
+  const line = next.join("\n\n");
+  if (out.length) return [{ ...out[0], message: `${out[0].message}\n\n${line}` }, ...out.slice(1)];
+  return namesNextStep(reply) ? out : [{ check: "reply-shape", message: line }];
+}
+
+/** Whether a reply's closing words name a next step: a `Next:` line, or the words "next step" in its last paragraph. */
+function namesNextStep(reply: string): boolean {
+  const last = reply.trim().split(/\n\s*\n/).pop() ?? "";
+  return /(^|\n)\W*Next\W*:/i.test(last) || /\bnext step\b/i.test(last) || /(^|\n)\W*Next\W*:/i.test(reply.slice(-600));
+}
+
+/** The findings about the reply itself, before the next step is laid on. */
+function replyFindings(reply: string, open: CardKey[], raised: CardKey[], where: Map<string, CardKey[]>, running: boolean, bound: number): Warning[] {
   const several = bound > 1;
   const out: Warning[] = [];
   const fresh = open.filter((card) => raised.includes(card));
@@ -1393,36 +1296,25 @@ export function checkReplyShape(reply: string, open: CardKey[] = [], raised: Car
   return out;
 }
 
-/** The arc-to-page check, as warnings. */
-export function checkArcToPage(root: string, mine: Set<string>): Warning[] {
-  const stopped = stopsWithEmptyOpen(root, mine);
-  if (!stopped.length) return [];
-  return [{ check: "stopped-no-card", message:
-    `A row waiting on the developer while \`Open\` carries no card — ` +
-    stopped.slice(0, 4).map(([subject, row]) => `row ${row} in ${subject}`).join(" · ") +
-    `. A stop is an open item like any other, and a question the plan knows about while the page ` +
-    `says nothing is one nobody can answer. Write it as a \`Q<n>\` card in the page's \`Open\` ` +
-    `(refs/devex/workspace/docs/decision-cards.md).` }];
-}
-
 /**
- * A go of this window's workstreams with a part ready and not started, or a report waiting to be folded,
- * while no card is open: the turn is told the next step the plan gives. A note to the agent, never a block
- * on the developer: with a card open the agent waits on the answer.
+ * The next step of each go of this window's workstreams with a part ready and not started, or a report waiting to be folded,
+ * while no card is open, one line for each go. It is no check of its own: `checkReplyShape` lays it on a finding, or says it
+ * alone where the reply named none. A note to the agent, never a block on the developer: with a card open the agent waits on
+ * the answer.
  *
  * @param cards  the cards open on this window's pages (`cardsWaiting`)
  */
-export function checkGoNext(root: string, mine: Set<string>, cards: string[], started: Set<string> | null = null): Warning[] {
+export function goNextLines(root: string, mine: Set<string>, cards: string[], started: Set<string> | null = null): string[] {
   if (cards.length || !mine.size) return [];
   // A PART THAT WAITS ON SOMETHING OUTSIDE THE WINDOW IS SAID AS WAITING AND NEVER AS NEXT, and only beside a step that can be taken.
-  return goStandings(root, mine, started).filter((go) => go.ready.length || go.unfolded.length).map((go) => ({ check: "go-next", message:
+  return goStandings(root, mine, started).filter((go) => go.ready.length || go.unfolded.length).map((go) =>
     `The go of ${go.workstream}/${go.lead} has ` +
     [go.ready.length ? `${go.ready.length === 1 ? "a part" : `${go.ready.length} parts`} ready and not started (${go.ready.join(", ")})` : "",
      go.unfolded.length ? `${go.unfolded.length === 1 ? "a report" : `${go.unfolded.length} reports`} waiting to be folded (${go.unfolded.join(", ")})` : ""]
       .filter(Boolean).join(" and ") +
     `, and no card is open. ` +
     (go.waiting.length ? `${go.waiting.map((one) => `${one.id} is waiting on ${one.on}`).join("; ")}, so it is not the next step. ` : "") +
-    `Next: ${go.next}` }));
+    `Next: ${go.next}`);
 }
 
 // ---------------------------------------------------------------------------- the page and the arcs
@@ -1511,33 +1403,6 @@ export function checkMigrations(root: string): Warning[] {
   return [{ check: "migration", message:
     `a plugin migration is pending, and it runs before any other work: ${said.join(" · ")}. ` +
     "`spn-devex plugin migration show` lists each one and its steps." }];
-}
-
-// ---------------------------------------------------------------------------- a page with its own copy of the styles
-
-/**
- * The pages of the open workstreams this session reads that hold their own copy of the styles, each
- * as the line that names it: its path from the workspace, then `OWN_COPY`.
- */
-export function ownCopyPages(root: string, mine: Set<string>): string[] {
-  return argued(root, mine).flatMap(([, pages]) => ownCopyLines(root, pages));
-}
-
-/**
- * One warning for the pages that hold their own copy of the styles and were not named in this
- * session before. Such a page is read by its `id`s alone, so the checks on the shape of a card and on
- * the header's status say nothing about it, and this is where the developer is told why.
- *
- * @param told  the lines this session was given at an earlier Stop; a page is named once in a session
- */
-export function checkOwnCopy(root: string, mine: Set<string>, told: string[] = []): Warning[] {
-  const fresh = ownCopyPages(root, mine).filter((line) => !told.includes(line));
-  if (!fresh.length) return [];
-  return [{ check: "own-copy", message:
-    `[RULE] ${fresh.join("\n[RULE] ")}\n` +
-    `Until such a page links \`sds-docs.css\`, its cards are read by their \`id\`, and the shape of a card, ` +
-    `the header's status and the parts that \`docs cycles write\` writes are not checked. Each page is ` +
-    `named once in a session.` }];
 }
 
 // ---------------------------------------------------------------------------- welcome
@@ -1639,18 +1504,27 @@ export function toolResultsOf(transcript: string): string[] {
   let raw = "";
   try { raw = readFileSync(transcript, "utf8"); } catch { return []; }
   let results: string[] = [];
+  // A RESULT COUNTS ONLY WHERE THE COMMAND THAT MADE IT RAN: a Read, a grep or a cat shows text that quotes a result line and settles nothing.
+  const tools = new Map<string, { name?: string; command?: string }>();
   for (const line of raw.split("\n")) {
     if (!line.trim()) continue;
     let entry: { type?: string; isMeta?: boolean; isSidechain?: boolean; message?: { content?: unknown } };
     try { entry = JSON.parse(line); } catch { continue; }
-    if (promptTextOf(entry)) { results = []; continue; }
-    if (entry.type !== "user" || entry.isSidechain || !Array.isArray(entry.message?.content)) continue;
-    for (const part of entry.message.content as Array<{ type?: string; content?: unknown }>)
-      if (part.type === "tool_result") results.push(resultText(part.content));
+    if (promptTextOf(entry)) { results = []; tools.clear(); continue; }
+    if (entry.isSidechain || !Array.isArray(entry.message?.content)) continue;
+    for (const part of entry.message.content as Array<{ type?: string; id?: string; name?: string; input?: { command?: string }; tool_use_id?: string; content?: unknown }>) {
+      if (entry.type === "assistant" && part.type === "tool_use" && part.id) tools.set(part.id, { name: part.name, command: part.input?.command });
+      if (entry.type !== "user" || part.type !== "tool_result") continue;
+      const tool = part.tool_use_id ? tools.get(part.tool_use_id) : undefined;
+      if (tool && (tool.name !== "Bash" || SHOWS_TEXT.test(tool.command ?? ""))) continue;
+      results.push(resultText(part.content));
+    }
   }
   return results;
 }
 
+/** A command that only shows text: its result quotes lines and settles nothing. */
+const SHOWS_TEXT = /^\s*(?:cat|grep|egrep|rg|sed|head|tail|less|echo|printf|awk|jq)\b/;
 // ---------------------------------------------------------------------------- the card's capital letter
 
 /**
@@ -1721,34 +1595,145 @@ export function checkProposalRecorded(reply: string, root: string, mine: Set<str
 /** The success text of `workstream close`, which a turn's tool results hold when the close landed. */
 export const CLOSE_SUCCESS = "closed · approach page stamped DONE";
 
-/** The parts of a closing message, each with the pattern that finds it and the words that name it to the agent. */
-const CLOSING_PARTS: Array<[RegExp, string]> = [
-  [/^#{1,6}[ \t]*(?:🚀|✈️)/mu, "a heading with 🚀 or ✈️ after the #"],
-  [/What (?:we|was) delivered/i, "\"What we delivered\" (or \"What was delivered\")"],
-  [/What (?:we|was) learned/i, "\"What we learned\" (or \"What was learned\")"],
-  [/Thank you 👍/u, "\"Thank you 👍\""],
-  [/\bretired\b/i, "the word \"retired\", in the line that says the window can be retired"],
+const NBSP = "&nbsp;";
+const FENCE_MARK = "@@FENCE@@";
+
+/**
+ * One closing moment and the shape of its message, as the DevEx agent construct's § Closing moments states them. Typed here, one row
+ * per moment; nothing is read from a ref at run time. `size` is the title's `#` count and `sectionSize` the sections'.
+ */
+export type ClosingShape = {
+  moment: "row" | "release" | "arc" | "handover" | "window" | "workstream";
+  icon: string;
+  size: number;
+  /** The title as a template, written into a finding. */
+  title: string;
+  /** What a title reads after its icon. */
+  titleText: RegExp;
+  sectionSize: number;
+  sections: string[];
+  thanks: boolean;
+  retire: boolean;
+};
+
+/** The six closing moments, one row each. */
+export const CLOSING_SHAPES: readonly ClosingShape[] = [
+  { moment: "row", icon: "✅", size: 3, title: "<what landed>", titleText: /^\S/u, sectionSize: 4,
+    sections: ["📦 What landed", "🔭 What's next"], thanks: false, retire: false },
+  { moment: "release", icon: "🚢", size: 3, title: "<what shipped>", titleText: /^\S/u, sectionSize: 4,
+    sections: ["📦 What landed", "🔭 What's next"], thanks: false, retire: false },
+  { moment: "arc", icon: "🏁", size: 2, title: "<arc> (<title>) has landed", titleText: /^\S.* \(.+\) has landed$/u, sectionSize: 3,
+    sections: ["📦 What we delivered", "🧠 What we learned", "🔭 What's next"], thanks: false, retire: false },
+  { moment: "handover", icon: "✈️", size: 2, title: "Handing over <arc> (<title>)", titleText: /^Handing over \S.* \(.+\)$/u, sectionSize: 3,
+    sections: [], thanks: true, retire: true },
+  { moment: "window", icon: "🛬", size: 2, title: "This window's handover is done", titleText: /^This window's handover is done$/u, sectionSize: 3,
+    sections: ["📦 What we delivered", "🧠 What we learned"], thanks: true, retire: true },
+  { moment: "workstream", icon: "🚀", size: 1, title: "<workstream> (<title>) is closed", titleText: /^\S.* \(.+\) is closed$/u, sectionSize: 3,
+    sections: ["📦 What we delivered", "🧠 What we learned"], thanks: true, retire: true },
 ];
 
-/** The pieces of the closing message a reply leaves out. */
-export function missingClosing(reply: string): string[] {
-  return CLOSING_PARTS.filter(([pattern]) => !pattern.test(reply)).map(([, name]) => name);
+const shapeOf = (moment: ClosingShape["moment"]): ClosingShape => CLOSING_SHAPES.find((one) => one.moment === moment)!;
+
+/** The first line of a reply that is not blank, trimmed. */
+const firstLineOf = (reply: string): string => (reply.split("\n").find((line) => line.trim() !== "") ?? "").trim();
+
+/** The shape a reply's first line is the heading of, at the size that shape states; null where it opens with none. */
+function shapeByTitle(reply: string, anySize = false): ClosingShape | null {
+  const first = firstLineOf(reply);
+  return CLOSING_SHAPES.find((one) => new RegExp(`^#${anySize ? "{1,6}" : `{${one.size}}`}(?!#)[ \\t]+${one.icon}`, "u").test(first)) ?? null;
+}
+
+/** The shape written out, as a finding gives it. */
+function shapeText(shape: ClosingShape): string {
+  const head = `\`${"#".repeat(shape.size)} ${shape.icon} ${shape.title}\``;
+  if (shape.moment === "handover")
+    return `${head}, a line reading \`${NBSP}\`, the fenced handover block, a line reading \`${NBSP}\`, then one short paragraph that says where the next window picks up, says thanks and says this window can be retired`;
+  return [head, `a line reading \`${NBSP}\``, "one warm paragraph",
+    ...shape.sections.map((one) => `a line reading \`${NBSP}\` and \`${"#".repeat(shape.sectionSize)} ${one}\``),
+    ...(shape.thanks ? ["`Thank you 👍`", "one plain line that the window can be retired"] : ["no thanks and no retire line"])].join(", ");
+}
+
+/**
+ * What a reply's text gets wrong against a shape. Fences are set aside for the numbers and are one block for the layout; a table, a
+ * commit hash, a bare `N<n>`, `S<n>` or `Q<n>` with no title in parentheses, a row number and a part id are sent back in every shape.
+ */
+export function closingProblems(reply: string, shape: ClosingShape): string[] {
+  const out: string[] = [];
+  let flat = "", at = 0;
+  for (const fence of fencesOf(reply)) { flat += `${reply.slice(at, fence.start)}\n${FENCE_MARK}\n`; at = fence.end; }
+  flat += reply.slice(at);
+  const lines = flat.split("\n").map((line) => line.trimEnd()).filter((line) => line.trim() !== "");
+  const prose = withoutFences(reply);
+  const heading = new RegExp(`^#{${shape.size}}(?!#)[ \\t]+${shape.icon}[ \\t]+(.*)$`, "u").exec(lines[0] ?? "");
+  if (!heading || !shape.titleText.test(heading[1])) out.push(`a title \`${"#".repeat(shape.size)} ${shape.icon} ${shape.title}\``);
+  const isProse = (line: string | undefined): boolean => !!line && !/^#{1,6}[ \t]/.test(line) && line !== NBSP && line !== FENCE_MARK && !/^\s*\|/.test(line);
+  if (shape.moment === "handover") {
+    if (lines[1] !== NBSP) out.push(`a \`${NBSP}\` line under the title`);
+    if (lines[2] !== FENCE_MARK) out.push("the fenced handover block");
+    if (lines[3] !== NBSP) out.push(`a \`${NBSP}\` line after the block`);
+    const closing = lines.slice(4).join(" ");
+    if (!isProse(lines[4]) || !/\bthank/i.test(closing) || !/\bretire/i.test(closing)) out.push("one closing paragraph that says where the next window picks up, says thanks and says this window can be retired");
+  } else {
+    if (lines[1] !== NBSP) out.push(`a \`${NBSP}\` line under the title`);
+    if (!isProse(lines[2])) out.push("one warm paragraph under the title");
+    let from = 0;
+    for (const section of shape.sections) {
+      const want = `${"#".repeat(shape.sectionSize)} ${section}`;
+      const found = lines.findIndex((line, i) => i >= from && line.trim() === want);
+      if (found < 0) { out.push(`\`${want}\``); continue; }
+      if (lines[found - 1] !== NBSP) out.push(`a \`${NBSP}\` line before \`${want}\``);
+      from = found + 1;
+    }
+    if (shape.thanks) {
+      if (!/^Thank you 👍\s*$/mu.test(prose)) out.push("`Thank you 👍`");
+      if (!/\bretired\b/i.test(prose)) out.push("the word \"retired\", in the line that says the window can be retired");
+    } else {
+      if (/Thank you 👍/u.test(prose)) out.push("no `Thank you 👍` in this shape");
+      if (/\bretired\b/i.test(prose)) out.push("no retire line in this shape");
+    }
+  }
+  if (/^[ \t]*\|.*\|/m.test(prose)) out.push("no table");
+  if (/\b(?=[0-9a-f]*\d)(?=[0-9a-f]*[a-f])[0-9a-f]{7,40}\b/.test(prose)) out.push("no commit hash");
+  const bare = [...new Set([...prose.matchAll(/\b[NSQ]\d+\b(?!\s*\()/g)].map((one) => one[0]))];
+  if (bare.length) out.push(`each of ${bare.join(", ")} beside its title in parentheses, or named by what it does`);
+  const detail = findWorkingDetail(prose).filter((one) => one.kind === "row" || one.kind === "part");
+  if (detail.length) out.push("a row and a part named by what they do, never by number or id");
+  return out;
+}
+
+/** The success text of a command's result that owes an arc's message: `<arc> reads LANDED`. */
+const ARC_LANDED = /\S+ reads LANDED\b/;
+/** The result that owes a row's message: `<arc> <row> landed`. */
+const ROW_LANDED = /(?:^|[\s·])\S*N\d+ \S+ landed(?:\s|·|$)/m;
+
+/**
+ * Which moment's message a reply owes: the heading it opens with holds it to that shape whatever the results say; otherwise the highest
+ * moment the results of the turn settled (a workstream's close, then an arc's landing, then a row's), or null.
+ */
+function momentOwed(reply: string, results: readonly string[]): ClosingShape | null {
+  const opened = shapeByTitle(reply, true);
+  if (opened) return opened;
+  if (results.some((one) => one.includes(CLOSE_SUCCESS))) return shapeOf("workstream");
+  if (results.some((one) => ARC_LANDED.test(one))) return shapeOf("arc");
+  if (results.some((one) => ROW_LANDED.test(one))) return shapeOf("row");
+  return null;
 }
 
 /**
  * THE CLOSE-MESSAGE CHECK (RULE.DEVEX.WORKSPACE.206): a close is a milestone, and the agent writes its message right after the
- * close. A turn whose tool results hold the close's success text is sent back unless its reply carries every piece.
+ * moment. The moment is read from the result of the command that makes it (`toolResultsOf`), or from the heading the reply opens with;
+ * the reply is sent back unless it keeps that moment's shape (`CLOSING_SHAPES`). A handover's shape is held by `checkHandover`.
  *
  * @param results  the tool results of the turn (`toolResultsOf`)
  */
 export function checkCloseMessage(reply: string, results: readonly string[]): Warning[] {
-  if (!results.some((one) => one.includes(CLOSE_SUCCESS))) return [];
-  const missing = missingClosing(reply);
-  if (!missing.length) return [];
+  const shape = momentOwed(reply, results);
+  if (!shape || shape.moment === "handover") return [];
+  const problems = closingProblems(reply, shape);
+  if (!problems.length) return [];
   return [{ check: "close-message", message:
-    `The close landed, and a close is a milestone: this reply must be its closing message (RULE.DEVEX.WORKSPACE.206). It leaves out ${missing.join("; ")}. ` +
-    "Write it as a `# 🚀 <title>` heading, a line reading `&nbsp;`, `### 📦 What we delivered` with bullets, `### 🧠 What we learned` with bullets, " +
-    "`Thank you 👍`, and one plain line that the window can be retired." }];
+    `This reply is the ${shape.moment}'s closing message (RULE.DEVEX.WORKSPACE.206), and it leaves out or breaks: ${problems.join("; ")}. ` +
+    `Write it as ${shapeText(shape)}. A \`${NBSP}\` line sets apart the title and each section; numbers sit inside sentences, an arc and a card keep their number beside their title.` }];
 }
 
 /**
@@ -1773,7 +1758,7 @@ export function missingWelcome(text: string): string[] {
 }
 
 /**
- * A session's first turn that does not open with the whole welcome (02-agent/01-agent.md § The session opens on the ground).
+ * A session's first turn that does not open with the whole welcome (04-capabilities/01-devex/02-agent/01-agent/01-agent.md § It opens on the welcome and one status line).
  *
  * @param sent  which welcome the session start sent this window (the window's note): only where it sent the whole one
  *              is the first reply held to it. A short start, or a window with no note of it, owes nothing.
@@ -1824,7 +1809,8 @@ export function ownOnly(found: Warning[], root: string, mine: Set<string>, visit
 /**
  * An identical finding is said once, until its state changes. `told` holds each check's finding as a hash of its words;
  * a finding whose words are the same is left out, and a check that finds nothing is forgotten, so it is said again if it
- * returns. A finding about the reply is a new reply's own and is said every time.
+ * returns. A finding about the reply is a new reply's own and is said every time. A `corpus` finding is kept by the words above
+ * its marker line, so it is said again only when a finding joins the list or leaves it.
  *
  * @param told  what the window's baseline holds from the turn ends before
  */
@@ -1833,7 +1819,9 @@ export function sayOnce(found: Warning[], told: Record<string, string>): { said:
   const said: Warning[] = [];
   for (const warning of found) {
     if (REPLY_CHECKS.has(warning.check)) { said.push(warning); continue; }
-    const mark = createHash("sha1").update(warning.message).digest("hex").slice(0, 12);
+    // A corpus finding is kept by the words above its marker line; what is below it changes from turn to turn (RULE.DEVEX.WORKSPACE.471).
+    const words = warning.check === "corpus" ? warning.message.split(CORPUS_MARKER)[0] : warning.message;
+    const mark = createHash("sha1").update(words).digest("hex").slice(0, 12);
     now[warning.check] = mark;
     if (told[warning.check] !== mark) said.push(warning);
   }
@@ -1842,18 +1830,23 @@ export function sayOnce(found: Warning[], told: Record<string, string>): { said:
 
 // ---------------------------------------------------------------------------- the window's size
 
-// WHEN A NEW WINDOW IS OFFERED, in tokens of context, all three in this one place, in any phase of the
-// arc: at a clean point from CLEAN_POINT, always from ALWAYS_POINT. The offer is made once per window, and
-// never while a helper runs.
+// WHEN A NEW WINDOW IS OFFERED, in tokens of context, all in this one place, in any phase of the arc, as the workstream
+// chapter's RULE.DEVEX.AGENT.103 says: from CLEAN_POINT at a clean point the agent offers once, and again only after another
+// REOFFER; from HANDOVER_POINT it writes the handover at the next clean point unasked; from ALWAYS_POINT the offer is not left
+// to a clean point. Never while a helper runs.
 const CLEAN_POINT = 200_000;
+const HANDOVER_POINT = 300_000;
 const ALWAYS_POINT = 450_000;
+const REOFFER = 50_000;
 
 /**
  * THE WINDOW CHECK (RULE.DEVEX.AGENT.103): from 200k, at a clean point and in any phase, the turn is told to
- * offer a new window; past 450k it is told always. Clean is what can be computed: no row of this window's arcs
+ * offer a new window, and again after another 50k; past 300k it is told to write the handover at the next clean point
+ * unasked; past 450k it is told whatever the point. Clean is what can be computed: no row of this window's arcs
  * runs, no helper launched in the background is out, and `workstream state check` finds nothing for the
  * window's workstreams. That every open point is written first cannot be computed, so the message asks for it.
- * It reads the transcript and keeps no state: the offer is made once per window, and never while a helper runs.
+ * It reads the transcript and keeps no state: the size it last offered at is read from the hook's own feedback in it, and
+ * the offer is never made while a helper runs.
  *
  * @param mine     the workstreams this window works on
  * @param running  whether a row of this window's arcs is in progress (`workRuns`): the offer then waits
@@ -1875,8 +1868,9 @@ export function checkWindow(root: string, transcript: string, mine: Set<string>,
       if (entry.type === "user" && told) offered = Number(told[1]) * 1000;
     } catch { /* a torn line is skipped */ }
   }
-  // ONCE PER WINDOW: the offer was made, and the developer has it. A reply that ignored it is not asked again.
-  if (offered) return [];
+  // ONE OFFER PER 50k: the offer was made at `offered`, and the developer has it. A reply that ignored it is not asked again
+  // until the window has grown by another REOFFER (MKT.HOOKS.486).
+  if (offered && size < offered + REOFFER) return [];
   // NEVER WHILE A HELPER RUNS: a row of the window's arcs in progress, or a background helper that has not handed back.
   if (running) return [];
   const always = size >= ALWAYS_POINT;
@@ -1908,6 +1902,8 @@ export function checkWindow(root: string, transcript: string, mine: Set<string>,
   const small = "If the developer's ask is small (a question, a one-line change), say that each ask costs the window's whole size, and offer the new window then.";
   const message = always
     ? `This window is at ${size / 1000}k, past ${ALWAYS_POINT / 1000}k. ${written}Then say that the work moves to a new window, with its handover, whatever is running. ${person}${small}`
+    : size >= HANDOVER_POINT
+    ? `This window is at ${size / 1000}k, past ${HANDOVER_POINT / 1000}k, and the point is clean: no order running, \`workstream state check\` whole. ${written}Then write the handover now, unasked, and say that the work moves to a new window. ${person}${small}`
     : `This window is at ${size / 1000}k, past ${CLEAN_POINT / 1000}k, and the point is clean: no order running, \`workstream state check\` whole. ${written}Then end your reply with the offer of a new window and its handover. ${person}${small}`;
   return [{ check: "window", message }];
 }
@@ -1956,6 +1952,10 @@ if (argv1Base === "stop.ts" || argv1Base === "stop.mjs") {
   // A CHILD AGENT SHARES THE WINDOW'S session_id, so it keeps its own baseline file and never reads or
   // writes the window's: its view (no steps, no arcs) must not stand for the window's last turn.
   const baseline = readBaseline(root, session, event.agent_id ?? null);
+  // THE VERDICTS NO HOOK RECORDED, replayed silently from the window's finished helper transcripts before the checks run; the agent ids
+  // read are kept in the baseline so a finished transcript is read once (RULE.DEVEX.WORKSPACE.485). A child agent has none beside it.
+  const panelsRead = event.agent_id || !event.transcript_path ? baseline?.panels ?? []
+    : replayPanels(root, event.transcript_path, { script: "spn-devex", event: "Stop", tool: null, session: event.session_id ?? null }, baseline?.panels ?? []);
   const mine = windowSet(root, session);
   const touched = baseline ? arcsWrittenSince(root, session, baseline.at) : new Set<string>();
   // A CHECK THAT SPOKE AT THIS SESSION'S LAST STOP HAS HAD ITS ANSWER. `stop_hook_active` says this
@@ -1992,25 +1992,23 @@ if (argv1Base === "stop.ts" || argv1Base === "stop.mjs") {
   const found = [
     ...span({ group: "stop", action: "reply-shape" }, () => checkReplyShape(reply, ownCards,
       lastCards ? ownCards.filter((card) => !lastCards.includes(card)) : [], where, running,
-      scoped(openWorkstreamFolders(root), mine).length)),
+      scoped(openWorkstreamFolders(root), mine).length,
+      // THE NEXT STEP STAYS HELD WHILE A ROW IS IN PROGRESS (RULE.DEVEX.WORKSPACE.244).
+      running ? [] : goNextLines(root, mine, waiting, windowGoes(root, session)))),
     ...span({ group: "stop", action: "notes" }, () => checkNotesLanded(root, baseline?.arcs, wroteAnywhere, mine, visits)),
-    ...span({ group: "stop", action: "arc-to-page" }, () => checkArcToPage(root, mine)),
     ...span({ group: "stop", action: "page-stale" }, () => checkPageCurrent(wrote)),
     ...span({ group: "stop", action: "state" }, () => checkWorkstreamState(root, mine)),
     ...span({ group: "stop", action: "migration" }, () => checkMigrations(root)),
-    ...span({ group: "stop", action: "own-copy" }, () => checkOwnCopy(root, mine, baseline?.ownCopy ?? [])),
-    ...span({ group: "stop", action: "cards" }, () => checkCardsNamed(reply, root, mine, turn.prompt)),
     ...span({ group: "stop", action: "runnable" }, () => checkRunnable(root, baseline?.at ?? 0, baseline?.steps ?? {}, wrote, mine, reply)),
     ...span({ group: "stop", action: "close-message" }, () => checkCloseMessage(reply, event.transcript_path ? toolResultsOf(event.transcript_path) : [])),
     ...span({ group: "stop", action: "card-case" }, () => checkCardCase(reply)),
     ...span({ group: "stop", action: "proposal-record" }, () => checkProposalRecorded(reply, root, mine)),
-    ...span({ group: "stop", action: "go-next" }, () => checkGoNext(root, mine, waiting, windowGoes(root, session))),
     ...span({ group: "stop", action: "handover" }, () => checkHandover(reply, root, mine, given, turn.earlier)),
     ...span({ group: "stop", action: "how-it-runs" }, () => checkHowItRuns(withoutFences(reply), root)),
     ...span({ group: "stop", action: "partner-words" }, () => checkPartnerWords(withoutFences(reply), root, turn.prompt)),
     ...span({ group: "stop", action: "page-path" }, () => checkPagePath(withoutFences(reply))),
     ...span({ group: "stop", action: "welcome" }, () => checkWelcome(firstTurn, readWindow(root, session).welcome)),
-    ...span({ group: "stop", action: "corpus" }, () => checkCorpus(root, reposWritten(root, session))),
+    ...span({ group: "stop", action: "corpus" }, () => checkCorpus(root, reposWritten(root, session), mine)),
     // A MAIN WINDOW ONLY, AND NOT WHERE THE TURN CONTINUES BECAUSE A HOOK SPOKE: the offer is made once.
     ...span({ group: "stop", action: "window" }, () => {
       if (event.agent_id || event.stop_hook_active === true || !event.transcript_path) return [];
@@ -2022,9 +2020,6 @@ if (argv1Base === "stop.ts" || argv1Base === "stop.mjs") {
   const split = splitFindings(ownOnly(found, root, mine, visits).filter((warning) => !spoken.has(warning.check)), running);
   const once = sayOnce(split.said, baseline?.told ?? {});
   const said = once.said, held = split.held;
-  // A page is named once in a session, so the pages named now join the ones named before.
-  const ownCopyTold = [...new Set([...(baseline?.ownCopy ?? []),
-    ...(said.some((warning) => warning.check === "own-copy") ? ownCopyPages(root, mine) : [])])];
   // A hook DENY row stands only for a finding said; the rest become NOTE.
   settle(said.map((w) => w.check));
   end();
@@ -2041,8 +2036,8 @@ if (argv1Base === "stop.ts" || argv1Base === "stop.mjs") {
                                  fired: [...new Set([...spoken, ...said.map((warning) => warning.check)])],
                                  cards: waiting,
                                  arcs: kept ? { ...arcMarks(root), ...(kept.arcs ?? {}) } : arcMarks(root),
-                                 ownCopy: ownCopyTold,
                                  told: { ...Object.fromEntries(Object.entries(baseline?.told ?? {}).filter(([check]) => held.some((warning) => warning.check === check))), ...once.told },
+                                 panels: panelsRead,
                                  handover: givesHandover(reply) ? rowsNow : given ? baseline?.handover : undefined }, event.agent_id ?? null);
   if (said.length) {
     console.error(said.map((w) => `[${w.check}] ${w.message}`).join("\n\n"));

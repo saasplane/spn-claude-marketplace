@@ -5,8 +5,8 @@
 // The chapter is the source of truth; a rule change is edited there first, then here, in the same change.
 // Input takes either case (`q28`, `Q28`, `036/Q28`); a stored id stays lowercase and everything printed or logged names the card with the capital.
 //
-//   spn-devex workstream suggestion add <workstream>[/N<nnn>] "<title>" [--preview …]        raise the next one, against the arc it names
-//   spn-devex workstream suggestion state <workstream> S<n> <state> [--words "…"] [--arc N<nnn>]   move it on; shaped or decided with --arc sets or moves its arc
+//   spn-devex workstream suggestion add <workstream>[/<arc>] "<title>" [--preview …]        raise the next one, against the arc it names
+//   spn-devex workstream suggestion state <workstream> S<n> <state> [--words "…"] [--arc <arc>]   move it on; shaped or decided with --arc sets or moves its arc
 //   spn-devex workstream suggestion edit <workstream> S<n> [--title …] [--preview …]         change its title or its preview
 
 import { basename } from "node:path";
@@ -16,7 +16,7 @@ import { resolve } from "node:path";
 import { PANELS_BLIND, raiseFaults, runningWorkFault } from "../../checks/questions.ts";
 import { panelsVisible } from "../../checks/split-plan.ts";
 import { precedentLines } from "../../lib/precedent.ts";
-import { readArc, readJsonl, suggestionsFileOf, workspaceOf, writeJsonl } from "../../lib/workstream.ts";
+import { followUpArcOf, readArc, readJsonl, suggestionsFileOf, workspaceOf, writeJsonl } from "../../lib/workstream.ts";
 import { RECORD_VERSION, SUGGESTION_ID, SUGGESTION_STATES, cardFaults, cardId, cardName, suggestionFaults, type Card, type Suggestion } from "../../lib/workstream-schema.ts";
 import { arcNamed, refuseFlags, workstreamNamed } from "./_shared.ts";
 
@@ -28,13 +28,14 @@ const MOVES = SUGGESTION_STATES.filter((one) => one !== "raised");
 /** Every option `suggestion write` ever took, read loosely: the refusal needs the words, not their values. */
 const RETIRED = { title: VALUE, state: VALUE, preview: VALUE, words: VALUE } as const;
 
-/** The workstream a reference names, and the arc where it is `<workstream>/N<nnn>` (RULE.DEVEX.WORKSPACE.488); a suggestion raised against the workstream has none. */
+/** The workstream a reference names, and the arc where it is `<workstream>/<arc>` (RULE.DEVEX.WORKSPACE.488); a suggestion raised against the workstream alone belongs to its `follow-ups` arc where it holds that folder, else to none. */
 function placeOf(ref: string | undefined): { ws: string; arc: string | null } {
   if (ref && ref.includes("/")) {
     const { ws, arc } = arcNamed(ref);
     return { ws, arc };
   }
-  return { ws: workstreamNamed(ref), arc: null };
+  const ws = workstreamNamed(ref);
+  return { ws, arc: followUpArcOf(ws) };
 }
 
 function load(ref: string | undefined): { file: string; records: Suggestion[] } {
@@ -72,14 +73,14 @@ function add(args: string[]): number {
     try { card = JSON.parse(readFileSync(resolve(cardFile), "utf8")); } catch { throw new UsageFault(`reads no JSON at \`${cardFile}\`.`); }
   }
   const title = given ?? card?.title;
-  if (!title?.trim() || more.length) throw new UsageFault("takes a workstream, or an arc as `<workstream>/N<nnn>`, and one title: `suggestion add <workstream>[/N<nnn>] \"<title>\" [--preview …]`.");
+  if (!title?.trim() || more.length) throw new UsageFault("takes a workstream, or an arc as `<workstream>/<arc>`, and one title: `suggestion add <workstream>[/<arc>] \"<title>\" [--preview …]`.");
   const { file, records } = load(ref);
   const place = placeOf(ref);
   const running = runningWorkFault(place.ws, title);
   if (running) throw new UsageFault(running);
   let kept: Card | null = null;
   if (card) {
-    if (!place.arc) throw new UsageFault("takes a card against an arc, `suggestion add <workstream>/N<nnn> \"<title>\" --file card.json`: its fresh views are on record for that arc.");
+    if (!place.arc || !ref?.includes("/")) throw new UsageFault("takes a card against an arc, `suggestion add <workstream>/<arc> \"<title>\" --file card.json`: its fresh views are on record for that arc.");
     const { title: _title, ...rest } = card;
     const root = workspaceOf();
     const shape = cardFaults(rest);
@@ -156,8 +157,8 @@ function write(args: string[]): number {
 }
 
 export const actions: Record<string, Action> = {
-  add: { describe: "raise a suggestion: the next number, raised; it also prints the decisions and rules that already speak to its title", usage: "<workstream>[/N<nnn>] \"<title>\" [--preview …] [--file card.json]", run: add },
-  state: { describe: "move it on: shaped, decided, parked or dropped, with the words beside the move", usage: "<workstream> S<n> <state> [--words \"…\"] [--arc N<nnn>]", run: state },
+  add: { describe: "raise a suggestion: the next number, raised; it also prints the decisions and rules that already speak to its title", usage: "<workstream>[/<arc>] \"<title>\" [--preview …] [--file card.json]", run: add },
+  state: { describe: "move it on: shaped, decided, parked or dropped, with the words beside the move", usage: "<workstream> S<n> <state> [--words \"…\"] [--arc <arc>]", run: state },
   edit: { describe: "change its title or its preview, never its state", usage: "<workstream> S<n> [--title …] [--preview …]", run: edit },
   write: { describe: "retired: refuses, and names the command that fits what it was typed with", usage: "<workstream> [S<n>] …", hidden: true, run: write },
 };

@@ -1,15 +1,12 @@
 import { PLUGIN } from "../../../helpers/harness.mjs";
 // `release-go` — the check that refused a correct release, naming a version nobody typed.
 //
-// It guards the one act that cannot be taken back: a major release the developer never agreed to.
-// Minor and patch are the standing authorization in `N39`, so the check reads the bump size and
-// looks for the go of an arc in an open workstream whose words name the version (RULE.DEVEX.WORKSPACE.069).
-// The go is read as `confirmed.ts` reads it, from the arc's `state.json` and `log.jsonl`: the arc reads
-// `DECIDED`, `RUNNING` or `LANDED`, and its log holds the line that moved it out of `PROPOSED` with words.
+// It guards the one act that cannot be taken back: a release at a version nobody recorded. The agent records the version
+// in an arc's log before the go (`arc edit --note "release <repo> <version>: <why>"`), and the check reads the bump size and
+// that line (RULE.DEVEX.WORKSPACE.069): no line, or a stamped bump smaller than the recorded one, is refused; a bigger one is not.
 //
-// EVERY REFUSAL IS READ FOR WHAT IT ASKS. A refusal that still asks for the retired `- **<date> — go.**`
-// line in an arc's `## Log` sends the agent to write a form nothing reads, so a refused case passes only
-// when its message names the command that records a go, and never the old line.
+// EVERY REFUSAL IS READ FOR WHAT IT ASKS. A refused case passes only when its message names the command that records
+// the version, and never the retired go forms.
 //
 // IT HAD NO SUITE, and that is how the defect below survived. It was "proven against seven shapes"
 // by hand in the sitting that wrote it, and a hand proof runs once, from one directory.
@@ -63,108 +60,107 @@ const support = repo("spn-support-ts", "v1.2.67");
 const platform = repo("spn-platform-ts", "v0.1.0");
 const open = join(BASE, "ws", ".spndevex", WORKSTREAMS, "open");
 
-// The log lines the commands write, by the words `arc edit` puts in each.
-const AT = "2026-10-24T20:05+05:30";
-const opened = { at: AT, kind: "opened", row: null, note: "opened as PROPOSED" };
-const goFor = (version) => ({ at: AT, kind: "status", row: null, note: `PROPOSED → DECIDED · the developer, 24 Oct: 'go, and release it as ${version}'` });
-const runs = { at: AT, kind: "status", row: null, note: "DECIDED → RUNNING · row 1 running" };
-const reopened = { at: AT, kind: "status", row: null, note: "RUNNING → PROPOSED · rows 4 to 6 are new scope" };
-const noteNaming = (version) => ({ at: AT, kind: "note", row: null, note: `the release will be ${version}` });
-// An arc opened straight at DECIDED on the developer's words, as one go opens every step's arc (RULE.DEVEX.WORKSPACE.280).
-const openedOnAGoFor = (version) => ({ at: AT, kind: "opened", row: null, note: `decided on N001's go, the developer: 'release it as ${version}'` });
+// The log line `arc edit --note` writes for a release's recorded version.
+const AT = "2026-11-02T20:05+05:30";
+const recorded = (repo, version, at = AT) => ({ at, kind: "note", row: null, note: `release ${repo} ${version}: the wiring changes` });
+const unrelated = { at: AT, kind: "note", row: null, note: "the release will be 9.0.0" };
 
 /** An arc's data and log in an open workstream, as the `workstream` commands write them. */
-function arc(workstream, id, status, lines) {
+function arc(workstream, id, lines) {
   const dir = join(open, workstream, "arcs", id);
   mkdirSync(dir, { recursive: true });
-  // RUNNING is worked out from the steps, never stored: an arc that runs stores the developer's DECIDED, and a step runs.
-  const data = { schemaVersion: 2, arc: id, subject: "a-subject", title: "a subject", goal: null, status: status === "RUNNING" ? "DECIDED" : status, reason: null,
-    preview: "preview.html", rows: [{ id: "1", parent: id, title: "release it", kind: "change", state: status === "RUNNING" ? "running" : "waiting" }] };
+  const data = { schemaVersion: 2, arc: id, subject: "a-subject", title: "a subject", goal: null, status: "DECIDED", reason: null,
+    preview: "preview.html", rows: [{ id: "1", parent: id, title: "release it", kind: "change", state: "waiting" }] };
   writeFileSync(join(dir, "state.json"), `${JSON.stringify(data, null, 2)}\n`);
   writeFileSync(join(dir, "log.jsonl"), lines.map((line) => JSON.stringify(line)).join("\n") + "\n");
 }
-
-arc("008-x", "N001", "RUNNING", [opened, goFor("3.0.0"), runs]);                 // a go naming 3.0.0
-arc("008-x", "N002", "DECIDED", [openedOnAGoFor("5.0.0")]);                        // opened on a go naming 5.0.0
-arc("008-x", "N003", "PROPOSED", [opened, goFor("6.0.0"), runs, reopened]);      // the go is gone again
-arc("008-x", "N006", "PROPOSED", [opened, noteNaming("8.0.0")]);                  // a plan naming 8.0.0
-arc("008-x", "N004", "DECIDED", [opened, noteNaming("4.0.0")]);                   // DECIDED with no go in its log
-arc("008-x", "N005", "RUNNING", [opened, goFor("12.0.0"), runs]);                 // a go naming 12.0.0, not 2.0.0
-// The retired form, still on disk in an open workstream: a dated go line in an arc kept as Markdown.
-mkdirSync(join(open, "009-old", "arcs"), { recursive: true });
-writeFileSync(join(open, "009-old", "arcs", "N1-x.md"), "# N1\n\n## Log\n\n- **2026-09-23 — go.** Release this as 7.0.0.\n");
+/** The open workstreams hold exactly these arcs' logs: each is `[workstream, arc id, lines]`. */
+function logs(...arcs) {
+  rmSync(open, { recursive: true, force: true });
+  for (const [workstream, id, lines] of arcs) arc(workstream, id, lines);
+}
 
 const verdict = (command, cwd) => checkReleaseGo({ tool_name: "Bash", cwd: cwd, tool_input: { command: command } });
 const denied = (v) => typeof v?.deny === "string";
-// A refusal names the command that records a go, and never the line form the arcs left at N002.
-const RECORDS_A_GO = "workstream arc edit <ws>/<arc> --status DECIDED --note";
-const asksForTheCommand = (v) => denied(v) && v.deny.includes(RECORDS_A_GO) && !v.deny.includes("— go.**") && !v.deny.includes("## Log");
+// A refusal names the command that records the version, and never the retired go forms.
+const RECORDS_A_VERSION = "workstream arc edit <ws>/<arc> --note \"release ";
+const asksForTheCommand = (v) => denied(v) && v.deny.includes(RECORDS_A_VERSION) && !v.deny.includes("--status DECIDED") && !v.deny.includes("— go.**");
 
-// ── the bump rule, which is what the check is for ──
+// ── the recorded version, which is what the check reads ──
 
-one("a patch release passes, being the standing authorization",
+logs(["008-x", "N001", [unrelated]]);
+one("[MKT.HOOKS.489] a release with no recorded version line is refused, naming the command that records it",
+  asksForTheCommand(verdict("spnutils apps release 1.2.68", support)));
+one("[MKT.HOOKS.489] a note that only mentions a version, in no `release <repo> <version>:` form, records nothing",
+  asksForTheCommand(verdict("spnutils apps release 9.0.0", support)));
+
+logs(["008-x", "N001", [recorded("spn-support-ts", "1.2.68")]]);
+one("[MKT.HOOKS.489] a stamped version equal to the recorded one passes",
   !denied(verdict("spnutils apps release 1.2.68", support)));
-one("a minor release passes too",
-  !denied(verdict("spnutils apps release 1.3.0", support)));
-one("a major release with no recorded go is refused, and the refusal asks for the go's command",
-  asksForTheCommand(verdict("spnutils apps release 2.0.0", support)));
+one("[MKT.HOOKS.489] a stamped patch under a recorded patch passes, whatever the number",
+  !denied(verdict("spnutils apps release 1.2.69", support)));
+one("[MKT.HOOKS.489] a major stamped over a recorded patch passes: only a smaller bump is refused",
+  !denied(verdict("spnutils apps release 2.0.0", support)));
 
-// ── where the go is read: the arc's data, as `confirmed.ts` reads it ──
+logs(["008-x", "N001", [recorded("spn-support-ts", "1.3.0")]]);
+one("[MKT.HOOKS.489] a bump smaller than the recorded one is refused",
+  asksForTheCommand(verdict("spnutils apps release 1.2.68", support)));
 
-one("a major release under an arc whose log holds its go, naming the version, passes",
-  !denied(verdict("spnutils apps release 3.0.0", support)));
-one("an arc opened at DECIDED on words naming the version holds that go too",
-  !denied(verdict("spnutils apps release 5.0.0", support)));
-one("an arc moved back to PROPOSED holds no go, though its log once named the version",
-  asksForTheCommand(verdict("spnutils apps release 6.0.0", support)));
-one("a PROPOSED arc whose plan names the version holds no go",
-  asksForTheCommand(verdict("spnutils apps release 8.0.0", support)));
-one("DECIDED with no go in its log: a note naming the version is no go",
-  asksForTheCommand(verdict("spnutils apps release 4.0.0", support)));
-one("a go naming 12.0.0 is no go for 2.0.0",
-  asksForTheCommand(verdict("spnutils apps release 2.0.0", support)));
-one("a dated go line in an arc kept as Markdown counts for nothing",
-  asksForTheCommand(verdict("spnutils apps release 7.0.0", support)));
-one("an omitted version passes — the CLI increments and never bumps a major",
+logs(["008-x", "N001", [recorded("spn-support-ts", "2.0.0")]]);
+one("[MKT.HOOKS.489] a major the log records passes with no developer words anywhere",
+  !denied(verdict("spnutils apps release 2.0.0", support)));
+
+logs(["008-x", "N001", [recorded("spn-platform-ts", "1.0.0")]]);
+one("[MKT.HOOKS.489] a line recorded for another repository is no record for this one",
+  asksForTheCommand(verdict("spnutils apps release 1.2.68", support)));
+
+logs(["008-x", "N001", [recorded("spn-support-ts", "1.2.68", "2026-11-01T10:00+05:30")]], ["008-x", "N002", [recorded("spn-support-ts", "2.0.0", "2026-11-02T10:00+05:30")]]);
+one("[MKT.HOOKS.489] the newest recorded line wins over an older one",
+  !denied(verdict("spnutils apps release 2.0.0", support)) && asksForTheCommand(verdict("spnutils apps release 1.2.68", support)));
+
+logs(["008-x", "N001", [unrelated]]);
+one("[MKT.HOOKS.489] an omitted version passes: the CLI increments and never bumps a major",
   !denied(verdict("spnutils apps release", support)));
-one("a rehearsal passes, because it publishes nothing",
+one("[MKT.HOOKS.489] a rehearsal passes, because it publishes nothing",
   !denied(verdict("spnutils apps release 2.0.0 --dry-run", support)));
-one("an unrelated command is not this check's business",
+one("[MKT.HOOKS.489] an unrelated command is not this check's business",
   !denied(verdict("npx nx run utility-ts:build", support)));
 
 // ── which directory answers the question, which is where it was wrong ──
 
 // The regression. Standing in one checkout and releasing another is the ordinary case in a workspace
 // of seven, and it produced a refusal citing a repository the caller never named.
-one("REGRESSION: cd into a repo, and its OWN tags decide",
+logs(["008-x", "N001", [recorded("spn-support-ts", "1.2.68"), recorded("spn-platform-ts", "0.1.1")]]);
+one("[MKT.HOOKS.489] REGRESSION: cd into a repo, and its OWN tags decide",
   !denied(verdict(`cd ${support} && npx tsx apps/utility-ts/src/index.ts apps release 1.2.68`, platform)));
 
 // The untouched twin: the fix must not make the check blind. Against a repository that really is at
-// 0.1.0, 1.2.68 really is a major bump, and it must still be refused.
-one("and a real major bump is still refused after the cd",
-  denied(verdict(`cd ${platform} && spnutils apps release 1.2.68`, support)));
+// 0.1.0, 1.2.68 really is a major bump, where the log records a patch for it, and it must still be refused.
+logs(["008-x", "N001", [recorded("spn-platform-ts", "1.0.0")]]);
+one("[MKT.HOOKS.489] and a smaller bump than recorded is still refused after the cd, by that repo's own tags",
+  denied(verdict(`cd ${platform} && spnutils apps release 0.1.1`, support)));
 
-one("a relative cd resolves against the session, not the root",
+one("[MKT.HOOKS.489] a relative cd resolves against the session, not the root",
   commandCwd("cd spn-support-ts && spnutils apps release 1.2.68", join(BASE, "ws")) === support);
-one("an absolute cd is taken as it stands",
+one("[MKT.HOOKS.489] an absolute cd is taken as it stands",
   commandCwd(`cd ${support} && x`, platform) === support);
-one("a quoted path survives a space in it",
+one("[MKT.HOOKS.489] a quoted path survives a space in it",
   commandCwd(`cd '${support}' && x`, platform) === support);
-one("a semicolon separates as well as &&",
+one("[MKT.HOOKS.489] a semicolon separates as well as &&",
   commandCwd(`cd ${support}; x`, platform) === support);
 
 // Not every command starting with those two letters is a `cd`, and a command this cannot read must
 // fall back rather than guess — a wrong guess here reads the wrong repository's tags silently.
-one("no leading cd leaves the session's directory alone",
+one("[MKT.HOOKS.489] no leading cd leaves the session's directory alone",
   commandCwd("spnutils apps release 1.2.68", support) === support);
-one("a bare cd with no separator is not parsed",
+one("[MKT.HOOKS.489] a bare cd with no separator is not parsed",
   commandCwd("cdk deploy && x", support) === support);
 
 // ── the comparison itself ──
 
-one("a major bump is a higher first number, nothing else",
+one("[MKT.HOOKS.489] a major bump is a higher first number, nothing else",
   isMajorBump("2.0.0", "1.9.9") && !isMajorBump("1.9.9", "1.2.0") && !isMajorBump("1.2.68", "1.2.67"));
-one("a version it cannot read is not a major bump, because it cannot prove one",
+one("[MKT.HOOKS.489] a version it cannot read is not a major bump, because it cannot prove one",
   !isMajorBump("latest", "1.2.67") && !isMajorBump("2.0.0", "not-a-version"));
 
 // A repository with no tags at all has nothing to compare against, and a gate that refuses what it
@@ -172,8 +168,10 @@ one("a version it cannot read is not a major bump, because it cannot prove one",
 const fresh = join(BASE, "ws", "untagged");
 mkdirSync(fresh, { recursive: true });
 git(["init", "-q"], fresh);
-one("a repository with no release tag is not this check's call",
+one("[MKT.HOOKS.489] a repository with no release tag is not this check's call",
   !denied(verdict("spnutils apps release 9.0.0", fresh)));
+one("[MKT.HOOKS.489] a version it cannot read is not this check's call either",
+  !denied(verdict("spnutils apps release latest", support)));
 
 console.log(failed ? `\n  ${failed} FAILED` : `\n  all ${n} passed`);
 process.exit(failed ? 1 : 0);

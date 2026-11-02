@@ -29,8 +29,12 @@ console.log("=== each kind of working detail is found with its sentence");
   ok("[MKT.HOOKS.113] a named part of a go is found", kinds("Part code-spn-claude-marketplace-3 is running now.") !== "", kinds("Part code-spn-claude-marketplace-3 is running now."));
   ok("[MKT.HOOKS.113] an entry such as E7 is found", kinds("Entry E7 is landed.") !== "" && kinds("E7 is landed.") !== "", `${kinds("Entry E7 is landed.")} | ${kinds("E7 is landed.")}`);
   ok("[MKT.HOOKS.113] a path into an arc's notes work is found", kinds("The output is in notes/N010/work/proof.txt for later.") !== "", kinds("The output is in notes/N010/work/proof.txt for later."));
+  ok("[MKT.SCRIPTS.485] a path into the ideate arc's notes work is found", kinds("The output is in notes/ideate/work/proof.txt for later.") !== "", kinds("The output is in notes/ideate/work/proof.txt for later."));
+  ok("[MKT.SCRIPTS.485] a path into the follow-ups arc's notes orders is found", kinds("See notes/follow-ups/orders/brief.md for later.") !== "", kinds("See notes/follow-ups/orders/brief.md for later."));
   ok("[MKT.HOOKS.113] a path into an arc's notes orders is found", kinds("See notes/N010/orders/brief.md for later.") !== "", kinds("See notes/N010/orders/brief.md for later."));
   ok("[MKT.HOOKS.113] a path into an arc's notes scripts is found", kinds("It runs notes/N010/scripts/run.sh each time.") !== "", kinds("It runs notes/N010/scripts/run.sh each time."));
+  ok("[MKT.HOOKS.113] a sentence naming apply-spn-claude-marketplace is found as a part", kinds("The lead's apply-spn-claude-marketplace part is running now.") === "part", kinds("The lead's apply-spn-claude-marketplace part is running now."));
+  ok("[MKT.HOOKS.113] a path under notes/ideate/ or notes/follow-ups/ is found", kinds("See notes/ideate/work/proof.txt for later.") !== "" && kinds("It is in notes/follow-ups/orders/brief.md for later.") !== "", `${kinds("See notes/ideate/work/proof.txt for later.")} | ${kinds("It is in notes/follow-ups/orders/brief.md for later.")}`);
 }
 
 console.log("\n=== what passes");

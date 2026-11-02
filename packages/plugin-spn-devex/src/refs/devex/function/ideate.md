@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/03-ideate.md",
-      "seen": "df747909"
+      "seen": "9b44e684"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/01-function/03-ideate.md",
-      "seen": "69c26f93"
+      "seen": "98d27aa5"
     }
   ]
 }
@@ -107,7 +107,7 @@ The last row is the one that silently bakes a product decision into code. Settle
 
 ## How a first proposal is shaped
 
-A first proposal starts where the book already stands, so the developer reads a proposal that is mostly confirmed rather than invented. Eight rules carry that, and each extends one the book already holds.
+A first proposal starts where the book already stands, so the developer reads a proposal that is mostly confirmed rather than invented. These rules carry that, and each extends one the book already holds.
 
 - **A first proposal uses the vocabulary already written, and names the source of every name and value.** The book's constructs, the skills' step ids and the contract's `SP*Type` enums come first, and only a value no source holds is marked new (`RULE.DEVEX.FUNCTION.090` · MUST · skill:spn-devex/ideate). A name the developer used is the name, any other comes from the convention already written, a break in that convention gets a proposed fix, and the naming rules are cited only when another name is suggested. A name or a value with no source is the plausible invented detail that *a section is written, not filled* refuses.
 - **A field is proposed only where a report the developer asked for reads it.** A field no report reads is cut, and a field a report does read is kept (`RULE.DEVEX.FUNCTION.091` · MUST · skill:spn-devex/ideate). Sizing a proposal by what reads it never cuts a core fix: the book, the constructs, the shared libraries and the plugins. A field nothing reads is rework waiting to be done (`RULE.DEVEX.WORKSPACE.331` · MUST · skill:spn-devex/execute).
@@ -117,6 +117,11 @@ A first proposal starts where the book already stands, so the developer reads a 
 - **A proposal's panel is convened before the proposal is called final.** The reader who did not write the proposal reads it first, and a block from that reader is answered in the proposal and not after it (`RULE.DEVEX.FUNCTION.095` · MUST · skill:spn-devex/ideate). The panel reads a first proposal once, with the cut test, and later replies offer no more views.
 - **Every part a proposal adds is listed beside the developer's words it serves, and cut if it serves none.** A part that serves nothing is cut to one *later, not now* line. A rule that must hold, a check or a refusal names the failure it prevents and who meets it, and is guidance unless that failure is real. A proposal that sets a shape says how others solve it, marked verified or not verified. The cut test asks which part could go with nothing failing (`RULE.DEVEX.FUNCTION.096` · MUST · skill:spn-devex/ideate). It follows `RULE.DEVEX.WORKSPACE.194`, by which the agent proposes the constructs the ask needs and stops.
 - **A proposal is placed where it is read.** The chat holds what the developer asked to see, whole; the approach page holds one line for each part in the *What*; the preview holds what the developer judges, at the depth the preview rules already give: a sized unit whole at its smallest and largest size, a page as a skeleton at each screen size, a flow as its pages in order. Code shown anywhere uses today's names and real values, never placeholders (`RULE.DEVEX.FUNCTION.097` · MUST · skill:spn-devex/ideate). It follows `RULE.DEVEX.WORKSPACE.210`, that a preview holds what the developer judges.
+- **The premise is checked before the options are written.** The first question is whether the thing is needed at all (`RULE.DEVEX.FUNCTION.099` · MUST · skill:spn-devex/ideate). Options written over an unchecked premise only compare ways to build what may not be wanted. In Q32 of workstream 035, two rounds of two lenses tightened the credential list into pairs and never asked whether the list was needed.
+- **A new participant is followed to the side that changes.** The proposal asks which side changes when a new participant joins: the one that holds the fact, or every one that reads it (`RULE.DEVEX.FUNCTION.100` · MUST · skill:spn-devex/ideate). Where every reader changes, the cost grows with each participant added, and the question is what keeps it from growing. Without it the proposal prices only the first participant.
+- **Trust is split by app, by module and by write.** It is never offered as one list (`RULE.DEVEX.FUNCTION.101` · MUST · skill:spn-devex/ideate). One list hides that an app, a module and a write each trust a different set. In Q32 the list was tightened round after round, and nobody asked where trust belongs.
+- **One option moves where the thing lives.** A proposal offers at least one option that places the thing somewhere else, not only options that adjust it where it already stands (`RULE.DEVEX.FUNCTION.102` · MUST · skill:spn-devex/ideate). Options that all keep the placement leave its cost unexamined, as Q32's rounds did.
+- **The proposal says how the laptop gets the same fact as the cloud.** A fact the cloud holds has a stated way to reach a local run (`RULE.DEVEX.FUNCTION.103` · MUST · skill:spn-devex/ideate). A proposal that is silent here works in one place and fails in the other, and the developer finds the gap at the first local run.
 
 ## An idea is unfolded on day zero in one order
 

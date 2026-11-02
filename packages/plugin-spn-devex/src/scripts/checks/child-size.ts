@@ -9,8 +9,8 @@ import { workspaceRoot, type Payload, type Verdict } from "../lib/payload.ts";
 import { turnsIn } from "../lib/usage.ts";
 import { bashWrites } from "./doc-check.ts";
 
-/** An order's path as a brief names it: `notes/N<nnn>/orders/<n>-<subject>.md`, and never its `.report.md`. */
-const ORDER_PATH = /[^\s'"`()<>]*notes\/N\d+[a-z]?\/orders\/[^\s'"`()<>]+\.md/g;
+/** An order's path as a brief names it: `notes/<arc>/orders/<n>-<subject>.md` (`N<nnn>`, `ideate` or `follow-ups`), and never its `.report.md`. */
+const ORDER_PATH = /[^\s'"`()<>]*notes\/(?:N\d+[a-z]?|ideate|follow-ups)\/orders\/[^\s'"`()<>]+\.md/g;
 /** The head of a transcript is where the child's brief is, and the brief names the order. */
 const HEAD_BYTES = 64 * 1024;
 const WRITERS = new Set(["Write", "Edit", "MultiEdit"]);
@@ -25,6 +25,11 @@ export function entriesIn(order: string): number {
   return list.split(",").filter((one) => one.trim()).length;
 }
 
+/** The stop sized for a part that holds this many entries (RULE.DEVEX.WORKSPACE.478): `go.ts` writes it into each brief, `stopLine` reads it back. */
+export function sizedStop(entries: number): { context: number; turns: number } {
+  return { context: Math.max(LEAST.context, entries * PER_ENTRY.context), turns: Math.max(LEAST.turns, entries * PER_ENTRY.turns) };
+}
+
 /**
  * The line an order sets: its `Stop at …` sentence (tokens of context and turns, either of which may be absent),
  * and where it has none, a line sized from the entries the helper's part holds.
@@ -33,7 +38,7 @@ export function stopLine(order: string): { context: number | null; turns: number
   const line = order.split("\n").find((one) => /\bstop at\b/i.test(one));
   if (!line) {
     const entries = entriesIn(order);
-    return entries ? { context: Math.max(LEAST.context, entries * PER_ENTRY.context), turns: Math.max(LEAST.turns, entries * PER_ENTRY.turns) } : null;
+    return entries ? sizedStop(entries) : null;
   }
   const sentence = line.slice(line.search(/\bstop at\b/i));
   const context = /(\d[\d,.]*)\s*k\b[^.\n]{0,24}\bcontext/i.exec(sentence)?.[1];

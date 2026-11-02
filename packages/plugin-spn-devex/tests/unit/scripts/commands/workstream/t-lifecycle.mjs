@@ -47,20 +47,27 @@ console.log("=== open: a block with one of the six things missing is refused");
   ok("[MKT.SCRIPTS.402] the new page reads Why, What, How, Plan, Open, with the arcs table and the progress block in the Plan section after How",
     /<section id="arcs"[^>]*>\s*<div class="sds-section-head"><h2>Plan<\/h2><\/div>[\s\S]*<table>[\s\S]*spn:generated progress[\s\S]*<\/section>/.test(page) && !page.includes("<h3 id=\"h9\">Cycles")
       && page.indexOf("<h2>How</h2>") < page.indexOf("<h2>Plan</h2>") && page.indexOf("<h2>Plan</h2>") < page.indexOf("<h2>Open"), page.slice(page.indexOf("<h2>How")));
-  const arc = join(folder, "arcs", "N001");
-  ok("[MKT.SCRIPTS.309] the first arc is opened for what the developer wants to see first", existsSync(join(arc, "state.json")) && json(join(arc, "state.json")).title === BLOCK.seeFirst);
-  ok("[MKT.SCRIPTS.309] the developer's words are in the arc's log", existsSync(join(arc, "log.jsonl")) && readFileSync(join(arc, "log.jsonl"), "utf8").includes(WORDS));
+  const arc = join(folder, "arcs", "ideate");
+  ok("[MKT.SCRIPTS.483] the ideate arc is opened for what the developer wants to see first, with the title, subject and goal N001 had", existsSync(join(arc, "state.json")) && json(join(arc, "state.json")).title === BLOCK.seeFirst
+    && json(join(arc, "state.json")).subject === BLOCK.subject && json(join(arc, "state.json")).goal === BLOCK.seeFirst);
+  ok("[MKT.SCRIPTS.309] the developer's words are in the ideate arc's log", existsSync(join(arc, "log.jsonl")) && readFileSync(join(arc, "log.jsonl"), "utf8").includes(WORDS));
+  const followUps = join(folder, "arcs", "follow-ups");
+  const followData = existsSync(join(followUps, "state.json")) ? json(join(followUps, "state.json")) : {};
+  ok("[MKT.SCRIPTS.483] the follow-up arc is opened PROPOSED with its title, subject and goal, and no rows",
+    followData.title === "Follow-ups" && followData.subject === "follow-ups" && followData.status === "PROPOSED" && followData.rows?.length === 0
+      && followData.goal === "The workstream's one follow-up arc: it collects what the other arcs do not need, is reviewed once they have all landed, and builds what is kept.", JSON.stringify(followData).slice(0, 300));
+  ok("[MKT.SCRIPTS.483] no N001 is written, and no arc carries a stored kind", !existsSync(join(folder, "arcs", "N001")) && followData.kind === undefined && json(join(arc, "state.json")).kind === undefined);
 
   const again = open("--file", put("again.json", { ...BLOCK, subject: "second-one" }), "--note", WORDS);
   ok("[MKT.SCRIPTS.309] the next workstream takes the next number", again.code === 0 && existsSync(join(opened("open"), "042-second-one")) && json(join(root, ".spndevex", "state.json")).workstreams.lastNumber === 42, again.out);
 
   const ideate = open("--file", put("ideate.json", { ...BLOCK, subject: "shape-first" }), "--note", WORDS, "--kind", "ideate");
-  ok("[MKT.SCRIPTS.429] `workstream open --kind ideate` opens the first arc as an ideate arc", ideate.code === 0 && json(join(opened("open"), "043-shape-first", "arcs", "N001", "state.json")).kind === "ideate", ideate.out);
+  ok("[MKT.SCRIPTS.483] red: `workstream open` takes no `--kind`", ideate.code !== 0 && ideate.out.includes("--kind") && !existsSync(join(opened("open"), "043-shape-first")) && json(join(root, ".spndevex", "state.json")).workstreams.lastNumber === 42, ideate.out);
 
   const noBlocker = open("--file", put("third.json", { ...BLOCK, subject: "third-one" }), "--note", WORDS, "--backlog", " ");
-  ok("[MKT.SCRIPTS.309] a backlog workstream without its blocker is refused", noBlocker.code === 1 && noBlocker.out.includes("blocker") && !existsSync(join(opened("backlog"), "044-third-one")), noBlocker.out);
+  ok("[MKT.SCRIPTS.309] a backlog workstream without its blocker is refused", noBlocker.code === 1 && noBlocker.out.includes("blocker") && !existsSync(join(opened("backlog"), "043-third-one")), noBlocker.out);
   const parked = open("--file", put("third.json", { ...BLOCK, subject: "third-one" }), "--note", WORDS, "--backlog", "the partner contract is not signed");
-  ok("[MKT.SCRIPTS.309] a backlog workstream with its blocker is opened in backlog", parked.code === 0 && existsSync(join(opened("backlog"), "044-third-one", "approach.html")), parked.out);
+  ok("[MKT.SCRIPTS.309] a backlog workstream with its blocker is opened in backlog", parked.code === 0 && existsSync(join(opened("backlog"), "043-third-one", "approach.html")), parked.out);
 }
 
 console.log("\n=== close: an unfinished plan refuses it");
@@ -70,7 +77,7 @@ console.log("\n=== close: an unfinished plan refuses it");
   ];
   const { root, ws } = await dataWorkspace("lifecycle-close", { rows });
   const closed = join(root, ".spndevex", "workstreams", "closed", "031-probe");
-  const entry = { id: "E1", op: "edit", file: "spn-x:docs/a.md", what: "change E1", decidedBy: ["q1"], facts: ["f1"], then: [], rules: [], callers: [], tiers: { unit: ["T.E1.01"] }, docs: [], book: [] };
+  const entry = { id: "E1", op: "edit", file: "spn-x:docs/a.md", what: "change E1", decidedBy: ["q1"], facts: ["f1"], then: [], rules: [], callers: [], tiers: { unit: ["T.E1.01"] }, docs: [], book: [], trace: "why E1", judged: false };
   const sheetIn = join(root, "sheet-in.json");
   writeFileSync(sheetIn, JSON.stringify({ schemaVersion: 1, releaseChain: ["spn-x"], dependsOn: [], stack: { folder: "the spn-x checkout", dmo: "none", reset: "from empty" }, entries: [entry] }));
   cli(root, ["workstream", "fact", "write", "N001", "--source", "spn-x/a.ts", "--fact", "a is 1", "--used-by", "1"]);
@@ -94,11 +101,16 @@ console.log("\n=== close: an unfinished plan refuses it");
   suggest([{ id: "s1", title: "decided now", state: "decided" }, { id: "s2", title: "parked now", state: "parked" }, { id: "s3", title: "dropped now", state: "dropped" }, { id: "s4", title: "Retrospective · command:x fails", state: "decided" }]);
   const noBlock = cli(root, ["workstream", "close", "031"]);
   ok("[MKT.SCRIPTS.398] a page with no closing block refuses the close, naming the shape, the rule and that nothing was changed, before the go is read",
-    noBlock.code === 1 && noBlock.out.includes("no closing block") && noBlock.out.includes("What was delivered") && noBlock.out.includes("What was learned") && noBlock.out.includes("Thank you")
+    noBlock.code === 1 && noBlock.out.includes("no closing block") && noBlock.out.includes("What we delivered") && noBlock.out.includes("What we learned") && noBlock.out.includes("Thank you")
       && noBlock.out.includes("sds-note") && noBlock.out.includes("RULE.DEVEX.WORKSPACE.206") && noBlock.out.includes("Nothing was changed") && !existsSync(closed) && existsSync(ws)
       && readFileSync(join(ws, "approach.html"), "utf8") === before, noBlock.out);
   writeClosingBlock(ws);
   const withBlock = readFileSync(join(ws, "approach.html"), "utf8");
+  writeFileSync(join(ws, "approach.html"), withBlock.replace("What we delivered", "What was delivered").replace("What we learned", "What was learned"));
+  const oldWords = cli(root, ["workstream", "close", "031"]);
+  ok("[MKT.SCRIPTS.398] a page whose block reads `What was delivered` is refused as having no closing block, and the folder stays",
+    oldWords.code === 1 && oldWords.out.includes("no closing block") && !existsSync(closed) && existsSync(ws), oldWords.out);
+  writeFileSync(join(ws, "approach.html"), withBlock);
   const refused = cli(root, ["workstream", "close", "031"]);
   ok("[MKT.SCRIPTS.310] a plan with a part not landed refuses the close, and the folder stays", planned.code === 0 && refused.code === 1 && /go|part/.test(refused.out) && !existsSync(closed) && existsSync(ws), `${planned.out}\n${refused.out}`);
   ok("[MKT.SCRIPTS.310] a refused close leaves the approach page as it was", readFileSync(join(ws, "approach.html"), "utf8") === withBlock);
@@ -124,7 +136,7 @@ console.log("\n=== close: an unfinished plan refuses it");
   const page = existsSync(moved) ? readFileSync(moved, "utf8") : "";
   ok("[MKT.SCRIPTS.310] the approach page is stamped DONE", /sds-done">[^<]*DONE</.test(page) && !page.includes("PLANNING</span>"), page.slice(0, 600));
   ok("[MKT.SCRIPTS.394] the close ends with the line that asks for the closing message, naming its shape",
-    done.out.split("\n").some((line) => line.startsWith("Next: write the closing message now:") && ["🚀", "✈️", "&nbsp;", "What we delivered", "What we learned", "Thank you 👍", "retired", "RULE.DEVEX.WORKSPACE.206"].every((word) => line.includes(word)))
+    done.out.split("\n").some((line) => line.startsWith("Next: write the closing message now:") && ["# 🚀", "is closed", "&nbsp;", "What we delivered", "What we learned", "Thank you 👍", "retired", "RULE.DEVEX.WORKSPACE.206"].every((word) => line.includes(word)) && !line.includes("✈️"))
       && done.out.indexOf("approach page stamped DONE") < done.out.indexOf("Next: write the closing message"), done.out);
 }
 
@@ -134,7 +146,7 @@ console.log("\n=== go write: a release order line that is not a repository's nam
     { id: "1", parent: "N001", title: "write the book", kind: "change", repo: "spn-x", work: "DOCS", blockedBy: [], touches: ["spn-x:docs"], state: "ready", entries: ["E1"] },
   ];
   const { root, ws } = await dataWorkspace("lifecycle-chain", { rows });
-  const entry = { id: "E1", op: "edit", file: "spn-x:docs/a.md", what: "change E1", decidedBy: ["q1"], facts: ["f1"], then: [], rules: [], callers: [], tiers: {}, docs: [], book: [] };
+  const entry = { id: "E1", op: "edit", file: "spn-x:docs/a.md", what: "change E1", decidedBy: ["q1"], facts: ["f1"], then: [], rules: [], callers: [], tiers: {}, docs: [], book: [], trace: "why E1", judged: false };
   const sheetIn = join(root, "sheet-in.json");
   writeFileSync(sheetIn, JSON.stringify({ schemaVersion: 1, releaseChain: ["spn-x: one docs pull request into develop"], dependsOn: [], stack: { folder: "the spn-x checkout", dmo: "none", reset: "from empty" }, entries: [entry] }));
   cli(root, ["workstream", "fact", "write", "N001", "--source", "spn-x/a.ts", "--fact", "a is 1", "--used-by", "1"]);

@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/02-packages/01-manifests.md",
-      "seen": "06431e54"
+      "seen": "4aea48e0"
     }
   ]
 }

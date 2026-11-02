@@ -9,8 +9,8 @@ import { join, resolve } from "node:path";
 import { PLUGIN } from "../../../helpers/harness.mjs";
 
 const EVENT = resolve(PLUGIN, "src", "scripts", "events", "pretooluse.ts");
-const KEYS = ["v", "mtype", "id", "at", "ms", "event", "session", "agent", "workstream", "arc", "part", "skill", "work", "retryOf",
-  "check", "verdict", "out"];
+const KEYS = ["v", "mtype", "id", "at", "ms", "event", "session", "agent", "workstream", "arc", "part", "skill", "stage", "work", "retryOf",
+  "check", "verdict", "out", "pluginVersion"];
 
 let total = 0, failed = 0;
 const same = (label, got, expected) => {
@@ -24,7 +24,7 @@ const root = realpathSync(mkdtempSync(join(tmpdir(), "spn-apps-telemetry-")));
 process.on("exit", () => rmSync(root, { recursive: true, force: true }));
 const files = {
   ".spndevex/.debug/switches.json": "{\"telemetry\": true}\n",
-  ".spndevex/workstreams/open/008-plain-language/notes/N8/orders/2p-plugin.md": "# order\n",
+  ".spndevex/workstreams/open/008-plain-language/notes/N008/orders/2p-plugin.md": "# order\n",
   "spn-sample-ts/sprepo.json": JSON.stringify({ type: "APPS", name: "Sample", config: { mtype: "APPS", stack: "TS" } }),
 };
 for (const [path, body] of Object.entries(files)) {
@@ -39,7 +39,7 @@ console.log("=== spn-apps — every line carries its plugin and the call's work"
   const payload = {
     session_id: "sess-apps", agent_id: "lane-2p", tool_name: "Edit", cwd: join(root, "spn-sample-ts"),
     tool_input: { file_path: join(root, "spn-sample-ts", "apps", "api", "src", "a.ts"), old_string: "a",
-                  new_string: `// see ${root}/.spndevex/workstreams/open/008-plain-language/notes/N8/orders/2p-plugin.md` },
+                  new_string: `// see ${root}/.spndevex/workstreams/open/008-plain-language/notes/N008/orders/2p-plugin.md` },
   };
   execFileSync("node", [EVENT], { input: JSON.stringify(payload), env, encoding: "utf8", cwd: payload.cwd });
   const lines = readFileSync(join(root, ".spndevex", ".debug", "telemetry", "hooks.jsonl"), "utf8").trim().split("\n").map((l) => JSON.parse(l));

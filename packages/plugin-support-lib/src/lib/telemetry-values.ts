@@ -135,8 +135,17 @@ export const SPDevExWorkspaceTelemetryRowType = Object.freeze({
   COMMAND: 'COMMAND',
   TEST: 'TEST',
   PANEL: 'PANEL',
+  FILE: 'FILE',
 });
 export type SPDevExWorkspaceTelemetryRowType = (typeof SPDevExWorkspaceTelemetryRowType)[keyof typeof SPDevExWorkspaceTelemetryRowType];
+
+export const SPDevExWorkspaceTelemetryToolType = Object.freeze({
+  READ: 'READ',
+  EDIT: 'EDIT',
+  WRITE: 'WRITE',
+  MULTI_EDIT: 'MULTI_EDIT',
+});
+export type SPDevExWorkspaceTelemetryToolType = (typeof SPDevExWorkspaceTelemetryToolType)[keyof typeof SPDevExWorkspaceTelemetryToolType];
 
 export const SPDevExWorkspaceTelemetryVersionType = Object.freeze({
   V1: 1,
@@ -146,7 +155,7 @@ export type SPDevExWorkspaceTelemetryVersionType = (typeof SPDevExWorkspaceTelem
 
 /** The workstream, arc, part and retry patterns a row's free-text fields are held to; the first three are the contract's own. */
 export const WORKSTREAM_PATTERN = /^\d{3}-[a-z0-9][a-z0-9-]*$/;
-export const ARC_PATTERN = /^N\d{3}$/;
+export const ARC_PATTERN = /^(N\d{3}|ideate|follow-ups)$/;
 export const PART_PATTERN = /^[a-z0-9][a-z0-9-]*$/;
 /** A row's id, or the id of the row a retry points at: a message id or a short random id. */
 export const ID_PATTERN = /^[A-Za-z0-9_-]{1,64}$/;
@@ -174,10 +183,9 @@ export function skillValue(name: unknown): SPDevExAgentSkillType | null {
 }
 
 /**
- * The one mapping from a row's skill and work to a DevEx stage, read when rows are read and never stored (the
+ * The one mapping from a row's skill and work to a DevEx stage, written when the row is written (the
  * skills construct). A devex stage skill gives its own stage; a provider's NEW gives SCM, VERIFY TEST, IMPLEMENT,
- * REVIEW and RUN DEVELOP, RELEASE DELIVER, and SURFACE_DESIGN IDEATE; DEVEX_CHECK, DEVEX_REPORT and DEVEX_EXECUTE
- * take it from the work: DOCS, CODE and GENERATED are DEVELOP, TEST and PROOF are TEST, RELEASE is DELIVER; no
+ * REVIEW and RUN DEVELOP, RELEASE DELIVER, and SURFACE_DESIGN IDEATE; every other skill, and no skill, takes it from the work: DOCS, CODE and GENERATED are DEVELOP, TEST and PROOF are TEST, RELEASE is DELIVER; no
  * work, no stage.
  */
 export function stageOf(skill: string | null | undefined, work: string | null | undefined): SPDevExStageType | null {
@@ -196,14 +204,14 @@ export function stageOf(skill: string | null | undefined, work: string | null | 
     case "APPS_IMPLEMENT": case "INFRA_IMPLEMENT": case "APPS_REVIEW": case "INFRA_REVIEW": case "APPS_RUN": case "INFRA_RUN": return S.DEVELOP;
     case "APPS_RELEASE": case "INFRA_RELEASE": return S.DELIVER;
     case "SURFACE_DESIGN": return S.IDEATE;
-    case "DEVEX_CHECK": case "DEVEX_REPORT": case "DEVEX_EXECUTE": {
+    default: {
+      // A skill that gives no stage of its own (or none) takes it from the work.
       const W = SPDevExWorkstreamWorkType;
       if (work === W.DOCS || work === W.CODE || work === W.GENERATED) return S.DEVELOP;
       if (work === W.TEST || work === W.PROOF) return S.TEST;
       if (work === W.RELEASE) return S.DELIVER;
       return null;
     }
-    default: return null;
   }
 }
 
@@ -211,5 +219,5 @@ export function stageOf(skill: string | null | undefined, work: string | null | 
 export const TELEMETRY_VALUES = Object.freeze({
   SPDevExWorkstreamWorkType, SPDevExAgentHookVerdictType, SPDevExWorkspaceTelemetryEventType, SPDevExAgentSkillType,
   SPDevExAgentLensType, SPDevExAgentPanelVerdictType, SPDevExStageType, SPTestTierType, SPDocBehaviourStatusType,
-  SPDevExWorkspaceTelemetryRowType, SPDevExWorkspaceTelemetryVersionType,
+  SPDevExWorkspaceTelemetryRowType, SPDevExWorkspaceTelemetryToolType, SPDevExWorkspaceTelemetryVersionType,
 });

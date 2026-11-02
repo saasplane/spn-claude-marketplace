@@ -70,7 +70,7 @@ The suite runs `--runInBand` against a shared, stateful local DB (seeded platfor
 1. **Throwaway data (preferred)** — onboard a fresh org / create a fresh entity and mutate that.
 2. **Capture-and-restore** — capture the original in `beforeAll` (with a token captured **before** the mutation, so a policy that locks login can still be undone) and restore in `afterAll`.
 
-Never leave mutated: the platform org and its policies, org-TYPE/GLOBAL auth/data policies, seeded master data, system providers, DEFAULT notification configs, roles/apps, the platform owner, seeded app-sites. Do not rely on a later reset to clean up; a green run on a fresh DB does not prove hygiene — verify seed rows byte-identical before/after (dump, run, dump, diff).
+Never leave mutated: the platform org and its policies, the org-category auth and data policies, the GLOBAL pool's default policy, master data, org providers, DEFAULT notification configs, roles and apps, the platform owner, and the sites the first run wrote. Do not rely on a later reset to clean up; a green run on a fresh DB does not prove hygiene — verify seed rows byte-identical before/after (dump, run, dump, diff).
 
 ## Frontend journeys
 

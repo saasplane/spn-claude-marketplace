@@ -8,8 +8,8 @@
 // `git status --short` over the same paths for what the working tree holds uncommitted. One line per
 // repository: `nothing moved`, or the files that did.
 //
-// AN ARC KEPT AS DATA PINS ITS FACTS IN `arcs/N<nnn>/facts.jsonl` (01-workstream.md § Ideation is kept as it
-// happens). A plan at `notes/N<nnn>/plan.md` is read with them: each fact's source, from its commit.
+// AN ARC KEPT AS DATA PINS ITS FACTS IN `arcs/<arc>/facts.jsonl` (01-workstream.md § Ideation is kept as it
+// happens). A plan at `notes/<arc>/plan.md` is read with them: each fact's source, from its commit.
 //
 // AN ACTION OF NO SUBJECT, AND IT NEVER REFUSES. A plan going stale is something to read and act on,
 // not something this can judge, so the exit code is 0 whether anything moved or not. It never runs
@@ -20,6 +20,9 @@ import { existsSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { REQUIRED, onePath, readWords, scopeOf } from "../../../../../plugin-support-lib/src/lib/command.ts";
 import { workspaceRoot } from "../../lib/payload.ts";
+import { ARC_ID } from "../../lib/workstream-schema.ts";
+/** An arc's address as a pattern part, read from `ARC_ID`: `N<nnn>`, `ideate` or `follow-ups`. */
+const ARC_PART = ARC_ID.source.slice(1, -1);
 
 export type Pin = { repo: string; commit: string; paths: string[] };
 
@@ -70,9 +73,9 @@ export function movedFiles(repo: string, commit: string, paths: string[]): strin
   return [...moved].sort();
 }
 
-/** The facts an arc kept as data pinned, for a plan at `notes/N<nnn>/plan.md`, as pins of one path each. */
+/** The facts an arc kept as data pinned, for a plan at `notes/<arc>/plan.md`, as pins of one path each. */
 export function factPinsOf(plan: string): Array<Pin & { id: string }> {
-  const placed = /^(.*)\/notes\/(N\d+[a-z]?)\/plan\.md$/.exec(plan.split("\\").join("/"));
+  const placed = new RegExp(`^(.*)\\/notes\\/(${ARC_PART})\\/plan\\.md$`).exec(plan.split("\\").join("/"));
   if (!placed) return [];
   const file = join(placed[1], "arcs", placed[2], "facts.jsonl");
   if (!existsSync(file)) return [];

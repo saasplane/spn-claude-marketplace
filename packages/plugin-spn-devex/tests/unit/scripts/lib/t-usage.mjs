@@ -79,6 +79,26 @@ try {
   same("a prompt naming no order gives null", launchedWork(launched("c.jsonl", "fix the typo in the readme")), null);
   same("a transcript that is not there gives null", launchedWork(join(root, "none.jsonl")), null);
   same("and no transcript gives null", launchedWork(undefined), null);
+
+  console.log("\n=== the part the coordinating window carries");
+  const turnIn = (name, id, at) => { const file = join(root, name); writeFileSync(file, lines(user(at), reply(at.replace(":00.000", ":02.000"), id))); return file; };
+  const partOf = (id) => readFileSync(log, "utf8").split("\n").filter(Boolean).map((one) => JSON.parse(one)).find((row) => row.id === id)?.part;
+  const lead = { session: "w2", agent: null, workstream: "036-x", arc: "N016", part: "code-spn-claude-marketplace-4", skill: null };
+  recordUsage(root, lead, turnIn("d1.jsonl", "msg_d1", "2026-10-31T13:00:00.000Z"));
+  recordUsage(root, { ...lead, arc: "N017", part: null }, turnIn("d2.jsonl", "msg_d2", "2026-10-31T13:01:00.000Z"));
+  same("[MKT.SCRIPTS.456] the main window launches a part's brief, then runs a command naming another arc: the reply after it carries that part", [partOf("msg_d1"), partOf("msg_d2")], ["code-spn-claude-marketplace-4", "code-spn-claude-marketplace-4"]);
+  recordUsage(root, { ...lead, arc: "N017", part: "code-spn-claude-marketplace-5" }, turnIn("d3.jsonl", "msg_d3", "2026-10-31T13:02:00.000Z"));
+  recordUsage(root, { ...lead, arc: "N018", part: null }, turnIn("d4.jsonl", "msg_d4", "2026-10-31T13:03:00.000Z"));
+  same("[MKT.SCRIPTS.456] a later go start of another part moves it, and the next call naming other work keeps the new one", [partOf("msg_d3"), partOf("msg_d4")], ["code-spn-claude-marketplace-5", "code-spn-claude-marketplace-5"]);
+
+  console.log("\n=== the stage a row carries");
+  const rowOf = (id) => readFileSync(log, "utf8").split("\n").filter(Boolean).map((one) => JSON.parse(one)).find((row) => row.id === id);
+  recordUsage(root, { session: "w3", agent: "h1", workstream: "036-x", arc: "N016", part: "proof-spn-x", skill: null }, turnIn("e1.jsonl", "msg_e1", "2026-10-31T14:00:00.000Z"));
+  same("[MKT.SCRIPTS.472] a helper's turn for part 'proof-spn-x' with no skill is written with stage TEST and work PROOF", [rowOf("msg_e1")?.stage, rowOf("msg_e1")?.work], ["TEST", "PROOF"]);
+  recordUsage(root, { session: "w4", agent: null, workstream: "036-x", arc: "N016", part: null, skill: "DEVEX_IDEATE" }, turnIn("e2.jsonl", "msg_e2", "2026-10-31T14:01:00.000Z"));
+  recordUsage(root, { session: "w4", agent: null, workstream: "036-x", arc: "N016", part: null, skill: null }, turnIn("e3.jsonl", "msg_e3", "2026-10-31T14:02:00.000Z"));
+  same("[MKT.SCRIPTS.472] a lead turn in a window that carried DEVEX_IDEATE is written with stage IDEATE", [rowOf("msg_e2")?.stage, rowOf("msg_e3")?.stage], ["IDEATE", "IDEATE"]);
+  same("[MKT.SCRIPTS.472] every row written has the key stage", readFileSync(log, "utf8").split("\n").filter(Boolean).map((one) => "stage" in JSON.parse(one)), Array(readFileSync(log, "utf8").split("\n").filter(Boolean).length).fill(true));
 } finally { rmSync(root, { recursive: true, force: true }); }
 
 console.log(failed ? `\n  ${failed} of ${total} FAILED — usage` : `\n  all ${total} passed — usage`);

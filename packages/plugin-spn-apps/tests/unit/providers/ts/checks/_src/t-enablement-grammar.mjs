@@ -1,13 +1,20 @@
-// `enablement-grammar` — the four rules, each proven by a known-bad and an untouched.
+// `enablement-grammar` — the four rules, each proven by a known-bad and an untouched, read from a module's contributions.
 import { one, done, tree } from "../../../../../helpers/harness.mjs";
 
-const SEED = "packages/module-server-prj-api/src/migrations/001-prj-setup-a.ts";
+const SEED = "packages/module-server-prj-ts/src/migrations/contributions.ts";
+const OLD_SEED = "packages/module-server-prj-ts/src/migrations/001-prj-setup-a.ts";
+const DOC_SEED = "packages/module-server-doc-ts/src/migrations/contributions.ts";
 const AUTHZ = "packages/module-server-prj-api/src/app/utils/authz.ts";
 const SERVICE = "packages/module-server-prj-api/src/app/services/IAMOrgService.ts";
 const MIGRATION = "packages/module-server-prj-api/src/migrations/002-prj-data.ts";
 
 const seed = (code, extra = "") =>
   "export const PRJ_ENABLEMENT_SEED = [\n  {\n    code: '" + code + "',\n" +
+  "    orgTypes: [OrgType.PLATFORM],\n" + extra + "  },\n];\n";
+
+// A DOC module's definition, its own const naming the module, and the field type a definition carries.
+const docSeed = (code, extra = "") =>
+  "export const DOC_ENABLEMENT_SEED = [\n  {\n    code: " + code + ",\n" +
   "    orgTypes: [OrgType.PLATFORM],\n" + extra + "  },\n];\n";
 
 console.log("=== rule 1 PREFIX");
@@ -24,6 +31,19 @@ one("a code under its own module's prefix", {
   expect: "",
 });
 
+const PREFIX_OTHER = seed("NTF_MANAGE_CHANNELS");
+one("[MKT.PROVIDERS.33] a code under another module's prefix in a contribution is denied, and the denial says to add a selection key in its own contribution", {
+  script: "enablement-grammar", root: tree({ [SEED]: PREFIX_OTHER }),
+  input: { file_path: SEED, content: PREFIX_OTHER },
+  expect: "deny", says: "adds a selection key in its own contribution",
+});
+
+one("[MKT.PROVIDERS.33] a bad code in a file named *setup-a* is no longer watched", {
+  script: "enablement-grammar", root: tree({ [OLD_SEED]: PREFIX_OTHER }),
+  input: { file_path: OLD_SEED, content: PREFIX_OTHER },
+  expect: "",
+});
+
 console.log("\n=== rule 2 VERB");
 
 one("a verb that is not MANAGE", {
@@ -37,6 +57,43 @@ one("a code with only two segments", {
   input: { file_path: SEED, content: seed("PRJ_MANAGE") },
   expect: "deny", says: "[VERB]",
 });
+
+const LIMIT_OK = docSeed("'DOC_LIMIT_STORAGE_BYTES'", "    fieldType: 'NUMBER',\n");
+one("[MKT.PROVIDERS.33] a NUMBER definition DOC_LIMIT_STORAGE_BYTES", {
+  script: "enablement-grammar", root: tree({ [DOC_SEED]: LIMIT_OK }),
+  input: { file_path: DOC_SEED, content: LIMIT_OK },
+  expect: "",
+});
+
+const NUMBER_MANAGE = docSeed("'DOC_MANAGE_STORAGE'", "    fieldType: 'NUMBER',\n");
+one("[MKT.PROVIDERS.33] a NUMBER definition whose code reads DOC_MANAGE_STORAGE is denied [VERB]", {
+  script: "enablement-grammar", root: tree({ [DOC_SEED]: NUMBER_MANAGE }),
+  input: { file_path: DOC_SEED, content: NUMBER_MANAGE },
+  expect: "deny", says: "[VERB]",
+});
+
+const OTHER_LIMIT = docSeed("'DOC_LIMIT_FILES'", "    fieldType: 'BOOLEAN',\n");
+one("[MKT.PROVIDERS.33] a non-NUMBER definition whose code reads DOC_LIMIT_FILES is denied [VERB]", {
+  script: "enablement-grammar", root: tree({ [DOC_SEED]: OTHER_LIMIT }),
+  input: { file_path: DOC_SEED, content: OTHER_LIMIT },
+  expect: "deny", says: "[VERB]",
+});
+
+const MEMBER_LIMIT = docSeed("DOCEnablementType.LIMIT_STORAGE_BYTES", "    fieldType: IAMEnablementFieldType.NUMBER,\n");
+one("[MKT.PROVIDERS.33] the member form DOCEnablementType.LIMIT_STORAGE_BYTES with IAMEnablementFieldType.NUMBER", {
+  script: "enablement-grammar", root: tree({ [DOC_SEED]: MEMBER_LIMIT }),
+  input: { file_path: DOC_SEED, content: MEMBER_LIMIT },
+  expect: "",
+});
+
+// The VERB denial carries the two forms and no longer says "no amount form". Read in-process, since a case here can only look for words.
+{
+  const { verdict } = await import("../../../../../../src/providers/ts/scripts/checks/_src/enablement-grammar.ts");
+  const said = verdict(DOC_SEED, NUMBER_MANAGE, NUMBER_MANAGE)?.deny ?? "";
+  const ok = said.includes("[VERB]") && said.includes("`{MOD}_LIMIT_{NOUN}`") && !said.includes("no amount form");
+  console.log(`  ${ok ? "PASS" : "FAIL"}  [MKT.PROVIDERS.33] the VERB denial names the MANAGE and LIMIT forms and no longer holds the words 'no amount form'`);
+  if (!ok) { console.log(`        ${said.slice(0, 300)}`); process.exit(1); }
+}
 
 const AUTHZ_BAD = "const E = PRJEnablementType;\nexport const PRJ_AUTHZ = { list: E.VIEW_CHANNELS };\n";
 one("a gate member not beginning MANAGE_", {
@@ -73,6 +130,13 @@ one("a boolean may name the area", {
   script: "enablement-grammar", root: tree({ [SEED]: BOOL_AREA }),
   input: { file_path: SEED, content: BOOL_AREA },
   expect: "",
+});
+
+const MULTI_MEMBER_BAD = docSeed("'DOC_MANAGE_CUSTOMIZATION'", "    fieldType: IAMEnablementFieldType.SELECT_MULTI,\n");
+one("[MKT.PROVIDERS.33] a multi-value definition written IAMEnablementFieldType.SELECT_MULTI and named for its area is denied [NOUN]", {
+  script: "enablement-grammar", root: tree({ [DOC_SEED]: MULTI_MEMBER_BAD }),
+  input: { file_path: DOC_SEED, content: MULTI_MEMBER_BAD },
+  expect: "deny", says: "[NOUN]",
 });
 
 console.log("\n=== rule 4 ORG TYPE");
@@ -131,6 +195,11 @@ one("[MKT.PROVIDERS.33] a ceiling naming a category code, refused by name", {
   script: "enablement-grammar", root: tree({ [SEED]: CEILING_CATEGORY }),
   input: { file_path: SEED, content: CEILING_CATEGORY },
   expect: "deny", says: "CLINIC",
+});
+one("[MKT.PROVIDERS.33] the category-code ceiling refusal names Record<OrgType, …> as the form that passes", {
+  script: "enablement-grammar", root: tree({ [SEED]: CEILING_CATEGORY }),
+  input: { file_path: SEED, content: CEILING_CATEGORY },
+  expect: "deny", says: "Record<OrgType, …>",
 });
 
 const CEILING_QUOTED = CEILING_OK.replace("OrgType.PLATFORM", "'PATIENT'");

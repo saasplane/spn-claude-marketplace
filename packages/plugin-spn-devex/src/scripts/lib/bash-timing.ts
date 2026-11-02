@@ -21,17 +21,19 @@
 
 import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { homedir } from "node:os";
-import { join, resolve, sep } from "node:path";
+import { isAbsolute, join, relative, resolve, sep } from "node:path";
 import { appendLog, sessionDir } from "../../../../plugin-support-lib/src/lib/debug-store.ts";
-import { carryTags, rowId, tagsOf, telemetryDir, utcNow, workOfPart, type WorkTags } from "../../../../plugin-support-lib/src/lib/timing.ts";
+import { carryTags, repoOf, rowId, tagsOf, telemetryDir, utcNow, workOfPart, type WorkTags } from "../../../../plugin-support-lib/src/lib/timing.ts";
 import {
   ARC_PATTERN, ID_PATTERN, NODE_PATTERN, PART_PATTERN, WORKSTREAM_PATTERN, SPDevExAgentSkillType, SPDevExWorkspaceTelemetryEventType,
-  SPDevExWorkspaceTelemetryRowType, SPDevExWorkspaceTelemetryVersionType, SPDevExWorkstreamWorkType, SPDocBehaviourStatusType, SPTestTierType,
-  held, known,
+  SPDevExWorkspaceTelemetryRowType, SPDevExWorkspaceTelemetryToolType, SPDevExWorkspaceTelemetryVersionType, SPDevExWorkstreamWorkType, SPDocBehaviourStatusType, SPTestTierType,
+  SPDevExStageType, held, known,
 } from "../../../../plugin-support-lib/src/lib/telemetry-values.ts";
 import { isTestCommand } from "../checks/test-run.ts";
 import { loadPrograms, readCommand, type Reading } from "./command-reader.ts";
+import { readGo } from "./go-plan.ts";
 import { eventWorkspace, type Payload } from "./payload.ts";
+import { findWorkstream, readSheet } from "./workstream.ts";
 
 const PENDING = "pending";
 const MARKERS = "tests";
@@ -112,6 +114,35 @@ function bytesOfResponse(payload: Payload): number {
   try { return Buffer.byteLength(JSON.stringify(response)); } catch { return 0; }
 }
 
+/** The text a Bash call printed: the response's stdout and stderr, else the response string, else a failure's error text. */
+function outputOf(payload: Payload): string {
+  const response = payload.tool_response;
+  if (typeof response === "string") return response;
+  if (response && typeof response === "object") {
+    const shell = response as { stdout?: unknown; stderr?: unknown };
+    const text = [shell.stdout, shell.stderr].filter((one): one is string => typeof one === "string").join("\n");
+    if (text) return text;
+  }
+  return typeof payload.error === "string" ? payload.error : "";
+}
+
+/**
+ * The refusal a non-zero exit said: the first line of its output that starts `Refused:` or follows a usage line, else null.
+ * A zero exit has none.
+ */
+export function refusalOf(payload: Payload, exit: number | null): string | null {
+  if (exit === null || exit === 0) return null;
+  const lines = outputOf(payload).split("\n").map((line) => line.trim());
+  for (let i = 0; i < lines.length; i++) {
+    if (lines[i].startsWith("Refused:")) return lines[i].slice(0, 300);
+    if (/^usage:/i.test(lines[i])) {
+      const next = lines.slice(i + 1).find((line) => line !== "");
+      if (next) return next.slice(0, 300);
+    }
+  }
+  return null;
+}
+
 const callKey = (call: Call): string => `${call.program} ${call.group ?? ""} ${call.action ?? ""}`;
 
 /** The rows that failed and have not been retried, by call (or `TEST node tier`), kept per window and agent. */
@@ -149,7 +180,8 @@ function headOf(root: string, payload: Payload, tags: WorkTags): Record<string, 
   return {
     session, agent: tags.agent,
     workstream: held(work.workstream, WORKSTREAM_PATTERN), arc: held(work.arc, ARC_PATTERN), part,
-    skill: known(SPDevExAgentSkillType, work.skill), work: workOfPart(part) ?? null,
+    skill: known(SPDevExAgentSkillType, work.skill), stage: known(SPDevExStageType, (work as { stage?: string | null }).stage ?? null),
+    work: workOfPart(part) ?? null,
   };
 }
 
@@ -194,10 +226,60 @@ export function finishCommand(payload: Payload, failed: boolean): number {
     const was = retryOf(join(sessionDir(root, session), RETRIES), tags.agent, callKey(call), id, exit !== null && exit !== 0);
     appendLog(join(dir, HOOKS_LOG), JSON.stringify({
       ...COMMAND_ROW, id, at: utcNow(ms), ms, event: SPDevExWorkspaceTelemetryEventType.COMMAND, ...head,
-      retryOf: held(was, ID_PATTERN), call, exit,
+      retryOf: held(was, ID_PATTERN), call, exit, refusal: refusalOf(payload, exit),
     }));
   } catch { /* a tool never fails because timing failed */ }
   return out;
+}
+
+const FILE_TOOLS: Record<string, string> = {
+  Read: SPDevExWorkspaceTelemetryToolType.READ, Edit: SPDevExWorkspaceTelemetryToolType.EDIT,
+  Write: SPDevExWorkspaceTelemetryToolType.WRITE, MultiEdit: SPDevExWorkspaceTelemetryToolType.MULTI_EDIT,
+};
+
+/**
+ * `PostToolUse` on Read, Edit, Write or MultiEdit: write one `FILE` row with the file as `<repo>:<path>` (null outside a repository)
+ * and `ms` = the tool's own time (`duration_ms` where the payload carries it, else 0). `entry` is the sheet entry the file serves
+ * among the call's part's entries, else null. Never throws.
+ */
+/** The entry a file serves: among the entries of the part the call runs under, the one whose file it is, as the go names it (`N013/E3`). */
+function entryOf(root: string, head: Record<string, unknown>, file: string | null): string | null {
+  const { workstream, arc, part } = head;
+  if (!file || typeof workstream !== "string" || typeof arc !== "string" || typeof part !== "string") return null;
+  try {
+    const ws = findWorkstream(workstream, root);
+    if (!ws) return null;
+    for (const ref of readGo(ws, arc)?.parts.find((one) => one.id === part)?.entries ?? []) {
+      const [owner, id] = ref.split("/");
+      if (readSheet(ws, owner)?.entries.find((entry) => entry.id === id)?.file === file) return ref;
+    }
+  } catch { /* an unreadable plan serves no entry */ }
+  return null;
+}
+
+export function finishFile(payload: Payload): void {
+  try {
+    const tool = FILE_TOOLS[String(payload.tool_name)];
+    if (!tool) return;
+    const root = eventWorkspace(payload.cwd ?? process.cwd());
+    const dir = root ? telemetryDir(root) : null;
+    if (!root || !dir) return;
+    const raw = (payload.tool_input as { file_path?: unknown } | undefined)?.file_path;
+    let file: string | null = null;
+    if (typeof raw === "string" && raw) {
+      const abs = resolve(payload.cwd ?? process.cwd(), raw);
+      const repo = repoOf(root, abs);
+      const rel = repo ? relative(join(resolve(root), repo), abs) : "";
+      if (repo && rel && !rel.startsWith("..") && !isAbsolute(rel)) file = `${repo}:${rel.split(sep).join("/")}`;
+    }
+    const took = Number((payload as { duration_ms?: unknown }).duration_ms);
+    const ms = Number.isFinite(took) && took > 0 ? Math.round(took) : 0;
+    const head = headOf(root, payload, tagsOf(payload));
+    appendLog(join(dir, HOOKS_LOG), JSON.stringify({
+      v: SPDevExWorkspaceTelemetryVersionType.V1, mtype: SPDevExWorkspaceTelemetryRowType.FILE, id: rowId(), at: utcNow(ms), ms,
+      event: SPDevExWorkspaceTelemetryEventType.POST_TOOL_USE, ...head, tool, file, entry: entryOf(root, head, file),
+    }));
+  } catch { /* a tool never fails because timing failed */ }
 }
 
 const isTestRunCall = (call: Call): boolean => call.program === "spnutils" && call.group === "apps" && call.action === "test";

@@ -1,8 +1,8 @@
 // `checks/questions.ts` — every card on a page is its record rendered. The three checks each fail
 // once on a page that breaks them, and pass once the page is what the record renders.
-import { readFileSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { CARD, cli, dataWorkspace, put } from "../../../helpers/workstream-fixture.mjs";
+import { CARD, cli, dataWorkspace, put, writeRolePageParts } from "../../../helpers/workstream-fixture.mjs";
 
 const { cardsOn, cardsDiffer, checkQuestions, handMadeCards, openWithoutCard } = await import("../../../../src/scripts/checks/questions.ts");
 const { cardHtml, readQuestions, writePreviewStatus } = await import("../../../../src/scripts/lib/workstream.ts");
@@ -139,6 +139,28 @@ console.log("\n=== a card that asks how the work runs is refused at raise, unles
   put(outside.root, "runs.json", JSON.stringify(RUNS));
   const away = cli(outside.root, ["workstream", "question", "raise", "031/N001", "--file", "runs.json"], { SPN_DEVEX_AGENT_WORKSPACE: "" });
   ok("[MKT.HOOKS.312] the same arc outside the builder's workspace is still refused", away.code !== 0 && away.out.includes("it asks how the work runs"), away.out);
+}
+
+console.log("\n=== MKT.SCRIPTS.485 — the ideate arc's preview and work folder are read as a numbered arc's are");
+{
+  const role = await dataWorkspace("questions-ideate");
+  const { arcData, PREVIEW } = await import("../../../helpers/workstream-fixture.mjs");
+  const base = join(role.ws, "notes", "ideate");
+  mkdirSync(join(role.ws, "arcs", "ideate"), { recursive: true });
+  mkdirSync(join(base, "work"), { recursive: true });
+  writeFileSync(join(role.ws, "arcs", "ideate", "state.json"), JSON.stringify({ ...arcData(), arc: "ideate", subject: "ideate", title: "the ideate arc", status: "PROPOSED", rows: [] }, null, 2));
+  writeFileSync(join(base, "preview.html"), PREVIEW);
+  writeFileSync(join(base, "work", "architect.md"), "The architect's whole words.\n");
+  const forged = cardHtml({ id: "q99", title: "a card typed by hand", card: records[0].card }, "");
+  const content = `${PREVIEW}${forged}\n`;
+  const verdict = checkQuestions({ tool_name: "Write", cwd: role.root, tool_input: { file_path: join(base, "preview.html"), content } });
+  ok("red: [MKT.SCRIPTS.485] a card typed by hand into `notes/ideate/preview.html` is judged as an arc preview and refused", verdict?.deny?.includes("Q99 has no record"), JSON.stringify(verdict));
+  await writeRolePageParts(role.ws, ["ideate"]);
+  cli(role.root, ["docs", "cycles", "write", "031"]);
+  const fresh = { ...CARD, views: [{ lens: "Architect", text: "Keep it in one place.", made: "FRESH", words: "notes/ideate/work/architect.md" }] };
+  put(role.root, "fresh.json", JSON.stringify(fresh));
+  const raisedFresh = cli(role.root, ["workstream", "question", "raise", "031/ideate", "--file", "fresh.json"]);
+  ok("green: [MKT.SCRIPTS.485] a FRESH view's words file under `notes/ideate/work/` resolves", raisedFresh.code === 0 && /^Q1 · open/m.test(raisedFresh.out) && !/has no words file|words file .*(not found|resolves to nothing)/.test(raisedFresh.out), raisedFresh.out);
 }
 
 console.log(failed ? `\n  ${failed} of ${total} FAILED — questions` : `\n  all ${total} passed — questions`);

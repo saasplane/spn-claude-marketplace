@@ -18,7 +18,7 @@ import {
   strayLevels, strayNotes, suggestionsFileOf, readJson, readArc, workstreamsOf, previewWithStatus, builtOf,
   localLinks, previewHrefOf, previewOwners, slotsIn, whatEntryOf, whatId, whatRange, workstreamName,
 } from "../lib/workstream.ts";
-import { WORK, DONE_STATES, arcFaults, factFaults, sheetFaults, logFaults, questionFaults, cardName, subjectFault, suggestionFaults, type ArcData, type Fact } from "../lib/workstream-schema.ts";
+import { ARC_ID, WORK, DONE_STATES, arcFaults, factFaults, sheetFaults, logFaults, questionFaults, cardName, subjectFault, suggestionFaults, type ArcData, type Fact } from "../lib/workstream-schema.ts";
 
 export type Finding = { workstream: string; arc: string | null; check: string; message: string };
 
@@ -102,7 +102,7 @@ export function notesTreeFindings(ws: string, arc: string): string[] {
 const TITLE_WORDS_MAX = 5;
 
 /** The arc folder a path inside the workstream's `notes/` sits in, or null where it sits elsewhere. */
-const notesFolderOf = (ws: string, path: string): string | null => /^N\d+[a-z]?$/.exec(relative(join(ws, NOTES), path).split(/[\\/]/)[0])?.[0] ?? null;
+const notesFolderOf = (ws: string, path: string): string | null => ARC_ID.exec(relative(join(ws, NOTES), path).split(/[\\/]/)[0])?.[0] ?? null;
 
 /**
  * RULE.DEVEX.WORKSPACE.264 and .265: the arc's goal, its subject's length, and its data folder — the three
@@ -167,7 +167,7 @@ export function arcPreviewFindings(ws: string, arc: string, data: ArcData, owner
 
 /**
  * S7: the arc's row in Plan under its address, its stamp against its goal, title and repositories, and its own What
- * entry, `N<nnn>-what`, which links its preview and no other arc's (RULE.DEVEX.WORKSPACE.254).
+ * entry, `<arc>-what`, which links its preview and no other arc's (RULE.DEVEX.WORKSPACE.254).
  */
 export function pageFindings(ws: string, arc: string, data: ArcData, page: string | null, text: string, owners: ReadonlyMap<string, string> = previewOwners(ws)): string[] {
   if (!page) return [`${arc} has no approach page to stand on`];
@@ -408,13 +408,13 @@ export function checkWorkstream(ws: string): Finding[] {
     out.push(say(null, "views")(`the approach page's status card reads ${card.shows} and the arcs give ${card.gives} — \`spn-devex docs cycles write ${name.slice(0, 3)}\` writes it`));
   // A notes folder with no arc data is an arc the page cannot show.
   for (const arc of listdir(join(ws, NOTES)))
-    if (/^N\d+[a-z]?$/.test(arc) && !isFile(stateFileOf(ws, arc))) out.push(say(arc, "steps")(`\`${NOTES}/${arc}/\` has no \`arcs/${arc}/state.json\``));
+    if (ARC_ID.test(arc) && !isFile(stateFileOf(ws, arc))) out.push(say(arc, "steps")(`\`${NOTES}/${arc}/\` has no \`arcs/${arc}/state.json\``));
   // `notes/` and `arcs/` hold arc folders, and nothing else.
   for (const [entry, home] of strayLevels(ws, firstOpenArc(ws)))
-    out.push(say(null, "notes")(`\`${entry}\` is not an arc's folder — \`notes/\` and \`arcs/\` hold only \`N<nnn>/\` folders; it belongs in ${home}`));
+    out.push(say(null, "notes")(`\`${entry}\` is not an arc's folder — \`notes/\` and \`arcs/\` hold only arc folders: \`N<nnn>/\`, \`ideate/\` and \`follow-ups/\`; it belongs in ${home}`));
   // Every arc's notes folder holds the five, whether or not its data reads.
   for (const arc of listdir(join(ws, NOTES)))
-    if (/^N\d+[a-z]?$/.test(arc) && isDir(join(ws, NOTES, arc))) out.push(...notesTreeFindings(ws, arc).map(say(arc, "notes")));
+    if (ARC_ID.test(arc) && isDir(join(ws, NOTES, arc))) out.push(...notesTreeFindings(ws, arc).map(say(arc, "notes")));
   out.push(...linesFindings(suggestionsFileOf(ws), "suggestions.jsonl", suggestionFaults).map(say(null, "schema")));
   out.push(...carriedSuggestionFindings(ws).map(say(null, "suggestions")));
   const questionLines = linesFindings(questionsFileOf(ws), "questions.jsonl", questionFaults);

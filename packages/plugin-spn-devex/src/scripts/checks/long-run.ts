@@ -1,6 +1,7 @@
 #!/usr/bin/env node
-// Advice, not a rule from the book: a long command typed in the foreground costs the window more
-// than the same command started in the background and read when it ends.
+// RESTATES: spn-foundation docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md § Where work runs, by cost
+// A row of the agent chapter's table 'Where work runs, by cost', and advice rather than a rule with an id: a long command
+// typed in the foreground costs the window more than the same command started in the background and read when it ends.
 //
 // WHAT IT CATCHES. `pnpm test`, `pnpm run build`, `pnpm run build:plugins`, `spnutils workspace
 // agent-sync`, `spnutils apps check`, `spnutils apps test` and `spnutils apps release` each run long

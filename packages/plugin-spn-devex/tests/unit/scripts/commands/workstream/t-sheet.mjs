@@ -1,9 +1,10 @@
 // `commands/workstream/sheet.ts` — the change sheet as the arc's data: written whole from a file, one entry
 // edited or dropped, shown for a row, and checked against the rows and the cards. Run as the agent types
 // the commands, in a throwaway workspace.
+import { createHash } from "node:crypto";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { CARD, cli, dataWorkspace } from "../../../../helpers/workstream-fixture.mjs";
+import { CARD, cli, dataWorkspace, writeRoleArcs } from "../../../../helpers/workstream-fixture.mjs";
 
 let total = 0, failed = 0;
 const ok = (label, condition, detail = "") => {
@@ -22,7 +23,7 @@ const stateFile = join(ws, "arcs", "N001", "state.json");
 
 const entry = (id, over = {}) => ({
   id, op: "edit", file: `spn-x:packages/mod/src/app/services/Thing${id}.ts`, what: `change ${id}`, decidedBy: ["q1"], facts: ["f1"],
-  then: [], rules: [], callers: [], tiers: { unit: [`T.${id}.01`] }, docs: [], book: [], ...over,
+  then: [], rules: [], callers: [], tiers: { unit: [`T.${id}.01`] }, docs: [], book: [], trace: `why ${id}`, judged: false, ...over,
 });
 const sheetOf = (entries, over = {}) => ({
   schemaVersion: 1, releaseChain: ["merges with the pull request"], dependsOn: [],
@@ -243,40 +244,40 @@ console.log("\n=== a decided arc's sheet is rewritten only on the developer's wo
   const cited = sheet("write", "N001", "--file", put("cited.json", sheetOf([entry("E1"), entry("E2"), entry("E7", { decidedBy: [`row ${rowId}`] })])), "--because", `row ${rowId}`);
   ok("[MKT.SCRIPTS.415] and with every new entry citing the row it is written with no card, the log saying which row it finishes",
     cited.code === 0 && json(sheetFile).entries.some((one) => one.id === "E7") && lines(log).at(-1).note.includes(`finishes row ${rowId}`), cited.out);
-  const opened = cli(root, ["workstream", "arc", "edit", "031-probe/N005", "--title", "empty sheet", "--subject", "empty-sheet", "--goal", "an empty sheet is written once"]);
-  const flip = cli(root, ["workstream", "arc", "edit", "031-probe/N005", "--status", "DECIDED", "--note", "go"]);
-  const empty = sheet("write", "N005", "--file", put("empty.json", sheetOf([])));
+  const opened = cli(root, ["workstream", "arc", "edit", "031-probe/N002", "--title", "empty sheet", "--subject", "empty-sheet", "--goal", "an empty sheet is written once"]);
+  const flip = cli(root, ["workstream", "arc", "edit", "031-probe/N002", "--status", "DECIDED", "--note", "go"]);
+  const empty = sheet("write", "N002", "--file", put("empty.json", sheetOf([])));
   ok("[MKT.SCRIPTS.237] an empty sheet on a decided arc is written once, with no --because", opened.code === 0 && flip.code === 0 && empty.code === 0, `${opened.out}${flip.out}${empty.out}`);
 }
 
 console.log("\n=== an arc title is a short topic name");
 {
-  const open = (title) => cli(root, ["workstream", "arc", "edit", "031-probe/N006", "--title", title, "--subject", "short-title", "--goal", "a short title"]);
+  const open = (title) => cli(root, ["workstream", "arc", "edit", "031-probe/N003", "--title", title, "--subject", "short-title", "--goal", "a short title"]);
   const long = open("one two three four five six");
-  ok("[MKT.SCRIPTS.230] a title past five words is refused", long.code !== 0 && long.out.includes("five words") && !existsSync(join(ws, "arcs", "N006", "state.json")), long.out);
+  ok("[MKT.SCRIPTS.230] a title past five words is refused", long.code !== 0 && long.out.includes("five words") && !existsSync(join(ws, "arcs", "N003", "state.json")), long.out);
   const comma = open("a title, with a comma");
-  ok("[MKT.SCRIPTS.230] a title with a comma is refused", comma.code !== 0 && comma.out.includes("comma") && !existsSync(join(ws, "arcs", "N006", "state.json")), comma.out);
+  ok("[MKT.SCRIPTS.230] a title with a comma is refused", comma.code !== 0 && comma.out.includes("comma") && !existsSync(join(ws, "arcs", "N003", "state.json")), comma.out);
   const fine = open("a five word title now");
-  ok("[MKT.SCRIPTS.230] a title of five words opens", fine.code === 0 && existsSync(join(ws, "arcs", "N006", "state.json")), fine.out);
-  const retitle = cli(root, ["workstream", "arc", "edit", "031-probe/N006", "--title", "one two three four five six"]);
-  ok("[MKT.SCRIPTS.230] a long title on an existing arc is refused", retitle.code !== 0 && json(join(ws, "arcs", "N006", "state.json")).title === "a five word title now", retitle.out);
+  ok("[MKT.SCRIPTS.230] a title of five words opens", fine.code === 0 && existsSync(join(ws, "arcs", "N003", "state.json")), fine.out);
+  const retitle = cli(root, ["workstream", "arc", "edit", "031-probe/N003", "--title", "one two three four five six"]);
+  ok("[MKT.SCRIPTS.230] a long title on an existing arc is refused", retitle.code !== 0 && json(join(ws, "arcs", "N003", "state.json")).title === "a five word title now", retitle.out);
 }
 
 console.log("\n=== the go is refused while the sheet has a finding");
 {
   const stateOf = (arc) => join(ws, "arcs", arc, "state.json");
-  cli(root, ["workstream", "arc", "edit", "031-probe/N007", "--title", "go with finding", "--subject", "go-finding", "--goal", "the go waits for the sheet"]);
-  cli(root, ["workstream", "fact", "write", "N007", "--source", "spn-x/a.ts", "--fact", "a is 1", "--used-by", "1"]);
-  const written = sheet("write", "N007", "--file", put("n7.json", sheetOf([entry("E1")])));
-  const derivedRows = json(stateOf("N007"));
-  writeFileSync(stateOf("N007"), JSON.stringify({ ...derivedRows, rows: [] }, null, 2));
-  const go = cli(root, ["workstream", "arc", "edit", "031-probe/N007", "--status", "DECIDED", "--note", "go"]);
-  ok("[MKT.SCRIPTS.235] the go is refused with the findings and nothing written", written.code === 0 && go.code !== 0 && go.out.includes("E1") && json(stateOf("N007")).status === "PROPOSED", `${written.out}${go.out}`);
-  const rows = json(stateOf("N007"));
-  rows.rows = [{ id: "1", parent: "N007", title: "build it", kind: "change", repo: "spn-x", work: "CODE", entries: ["E1"], state: "waiting" }];
-  writeFileSync(stateOf("N007"), JSON.stringify(rows, null, 2));
-  const clean = cli(root, ["workstream", "arc", "edit", "031-probe/N007", "--status", "DECIDED", "--note", "go"]);
-  ok("[MKT.SCRIPTS.235] a sheet with no finding lets the go through", clean.code === 0 && json(stateOf("N007")).status === "DECIDED", clean.out);
+  cli(root, ["workstream", "arc", "edit", "031-probe/N004", "--title", "go with finding", "--subject", "go-finding", "--goal", "the go waits for the sheet"]);
+  cli(root, ["workstream", "fact", "write", "N004", "--source", "spn-x/a.ts", "--fact", "a is 1", "--used-by", "1"]);
+  const written = sheet("write", "N004", "--file", put("n7.json", sheetOf([entry("E1")])));
+  const derivedRows = json(stateOf("N004"));
+  writeFileSync(stateOf("N004"), JSON.stringify({ ...derivedRows, rows: [] }, null, 2));
+  const go = cli(root, ["workstream", "arc", "edit", "031-probe/N004", "--status", "DECIDED", "--note", "go"]);
+  ok("[MKT.SCRIPTS.235] the go is refused with the findings and nothing written", written.code === 0 && go.code !== 0 && go.out.includes("E1") && json(stateOf("N004")).status === "PROPOSED", `${written.out}${go.out}`);
+  const rows = json(stateOf("N004"));
+  rows.rows = [{ id: "1", parent: "N004", title: "build it", kind: "change", repo: "spn-x", work: "CODE", entries: ["E1"], state: "waiting" }];
+  writeFileSync(stateOf("N004"), JSON.stringify(rows, null, 2));
+  const clean = cli(root, ["workstream", "arc", "edit", "031-probe/N004", "--status", "DECIDED", "--note", "go"]);
+  ok("[MKT.SCRIPTS.235] a sheet with no finding lets the go through", clean.code === 0 && json(stateOf("N004")).status === "DECIDED", clean.out);
   ok("[MKT.SCRIPTS.315] the go ends by naming go write as the next step", /Next: .*go write/.test(clean.out), clean.out);
 }
 
@@ -289,70 +290,70 @@ console.log("\n=== carried suggestions, precedent, steps from the sheet");
   cli(root, ["help"]);
   mkdirSync(registers, { recursive: true });
   writeFileSync(join(registers, "decisions.md"), "### D7 — turnstile ledger rotation happens nightly\n");
-  const opened = cli(root, ["workstream", "arc", "edit", "031-probe/N008", "--title", "turnstile ledger", "--subject", "ledger", "--goal", "rotation of the turnstile ledger", "--carries", "s1,s2"]);
+  const opened = cli(root, ["workstream", "arc", "edit", "031-probe/N005", "--title", "turnstile ledger", "--subject", "ledger", "--goal", "rotation of the turnstile ledger", "--carries", "s1,s2"]);
   ok("[MKT.SCRIPTS.316] opening an arc prints the decisions that speak to its title and goal", opened.code === 0 && opened.out.includes("D7"), opened.out);
   // E28: the five earlier decisions an arc opens with are ranked by the title's words, not left in register order.
   writeFileSync(join(registers, "decisions.md"), `### D7 — turnstile ledger rotation happens nightly\n${Array.from({ length: 8 }, (_, at) => `### D${11 + at} — nightly rotation of ledgers number ${at}\n`).join("")}### D30 — quartz clock sync is monitored\n`);
-  const ranked = cli(root, ["workstream", "arc", "edit", "031-probe/N010", "--title", "quartz clock sync", "--subject", "quartz", "--goal", "nightly rotation of ledgers"]);
+  const ranked = cli(root, ["workstream", "arc", "edit", "031-probe/N006", "--title", "quartz clock sync", "--subject", "quartz", "--goal", "nightly rotation of ledgers"]);
   const listed = ranked.out.split("\n").filter((line) => /^  D\d+ · /.test(line));
   ok("[MKT.HOOKS.326] the earlier decisions are capped at five, and the count of the rest is said", ranked.code === 0 && listed.length === 5 && /and \d+ more/.test(ranked.out), ranked.out);
   ok("[MKT.HOOKS.326] the one that shares the title's words leads, though the register puts it last", listed[0]?.startsWith("  D30 · "), ranked.out);
   const states = () => Object.fromEntries(lines(sugg).map((one) => [one.id, one.state]));
-  ok("[MKT.SCRIPTS.317] a carried suggestion reads shaped", json(stateOf("N008")).carries?.join() === "s1,s2" && states().s1 === "shaped" && states().s2 === "shaped", JSON.stringify(states()));
-  cli(root, ["workstream", "arc", "edit", "031-probe/N008", "--status", "DECIDED", "--note", "go"]);
+  ok("[MKT.SCRIPTS.317] a carried suggestion reads shaped", json(stateOf("N005")).carries?.join() === "s1,s2" && states().s1 === "shaped" && states().s2 === "shaped", JSON.stringify(states()));
+  cli(root, ["workstream", "arc", "edit", "031-probe/N005", "--status", "DECIDED", "--note", "go"]);
   ok("[MKT.SCRIPTS.317] it reads decided at the arc's go", states().s1 === "decided" && states().s2 === "decided", JSON.stringify(states()));
-  cli(root, ["workstream", "arc", "edit", "031-probe/N008", "--status", "DROPPED", "--reason", "no longer", "--note", "drop it"]);
+  cli(root, ["workstream", "arc", "edit", "031-probe/N005", "--status", "DROPPED", "--reason", "no longer", "--note", "drop it"]);
   ok("[MKT.SCRIPTS.317] it reads dropped when the arc is dropped", states().s1 === "dropped", JSON.stringify(states()));
 
   // steps from the sheet
-  cli(root, ["workstream", "arc", "edit", "031-probe/N009", "--title", "derived steps", "--subject", "derived-steps", "--goal", "steps come from entries"]);
-  cli(root, ["workstream", "fact", "write", "N009", "--source", "spn-x/a.ts", "--fact", "a is 1", "--used-by", "1"]);
+  cli(root, ["workstream", "arc", "edit", "031-probe/N007", "--title", "derived steps", "--subject", "derived-steps", "--goal", "steps come from entries"]);
+  cli(root, ["workstream", "fact", "write", "N007", "--source", "spn-x/a.ts", "--fact", "a is 1", "--used-by", "1"]);
   const data = sheetOf([entry("E1"), entry("E2", { file: "spn-x:docs/guide.md" })], { releaseChain: ["spn-x releases"] });
-  const derived = sheet("write", "N009", "--file", put("n9.json", data));
-  const rows = json(stateOf("N009")).rows;
+  const derived = sheet("write", "N007", "--file", put("n9.json", data));
+  const rows = json(stateOf("N007")).rows;
   const code = rows.find((one) => one.work === "CODE" && one.repo === "spn-x");
   const docs = rows.find((one) => one.work === "DOCS" && one.repo === "spn-x");
   ok("[MKT.SCRIPTS.311] the sheet write derives a step for each repository and kind of change", derived.code === 0 && code?.entries?.join() === "E1" && docs?.entries?.join() === "E2", derived.out + JSON.stringify(rows));
   ok("[MKT.SCRIPTS.311] it derives the release and proof steps from the release order", rows.some((one) => one.work === "RELEASE") && rows.some((one) => one.work === "PROOF"), JSON.stringify(rows));
-  const again = sheet("write", "N009", "--file", put("n9.json", data));
-  ok("[MKT.SCRIPTS.311] writing the same sheet again adds no step", again.code === 0 && json(stateOf("N009")).rows.length === rows.length, again.out);
-  const added = cli(root, ["workstream", "row", "add", "031-probe/N009", "by hand", "--repo", "spn-x", "--work", "CODE"]);
-  ok("[MKT.SCRIPTS.311] a step added by hand to an arc that keeps a sheet is refused", added.code !== 0 && added.out.includes("sheet") && json(stateOf("N009")).rows.length === rows.length, added.out);
+  const again = sheet("write", "N007", "--file", put("n9.json", data));
+  ok("[MKT.SCRIPTS.311] writing the same sheet again adds no step", again.code === 0 && json(stateOf("N007")).rows.length === rows.length, again.out);
+  const added = cli(root, ["workstream", "row", "add", "031-probe/N007", "by hand", "--repo", "spn-x", "--work", "CODE"]);
+  ok("[MKT.SCRIPTS.311] a step added by hand to an arc that keeps a sheet is refused", added.code !== 0 && added.out.includes("sheet") && json(stateOf("N007")).rows.length === rows.length, added.out);
 
   // a follow-up written after every step landed
-  const held = json(stateOf("N009"));
+  const held = json(stateOf("N007"));
   for (const row of held.rows) row.state = "landed";
-  writeFileSync(stateOf("N009"), JSON.stringify(held, null, 2));
-  const follow = sheet("write", "N009", "--file", put("n9.json", sheetOf([...data.entries, entry("E3")], { releaseChain: ["spn-x releases"] })));
-  const after = json(stateOf("N009")).rows;
+  writeFileSync(stateOf("N007"), JSON.stringify(held, null, 2));
+  const follow = sheet("write", "N007", "--file", put("n9.json", sheetOf([...data.entries, entry("E3")], { releaseChain: ["spn-x releases"] })));
+  const after = json(stateOf("N007")).rows;
   const of = (work) => after.filter((one) => one.work === work);
   ok("[MKT.SCRIPTS.324] a landed step keeps the entries it landed", follow.code === 0 && of("CODE")[0]?.entries?.join() === "E1" && of("CODE")[0]?.state === "landed", follow.out + JSON.stringify(after));
   ok("[MKT.SCRIPTS.324] an entry written after its step landed gets a step of its own", of("CODE").length === 2 && of("CODE")[1]?.entries?.join() === "E3" && of("CODE")[1]?.state !== "landed", JSON.stringify(after));
   ok("[MKT.SCRIPTS.324] the follow-up gets its own release and proof steps", of("RELEASE").filter((one) => one.state !== "landed").length === 1 && of("PROOF").filter((one) => one.state !== "landed").length === 1, JSON.stringify(after));
   ok("[MKT.SCRIPTS.324] the docs repository with nothing new gets no step", of("DOCS").length === 1, JSON.stringify(after));
-  const twice = sheet("write", "N009", "--file", put("n9.json", sheetOf([...data.entries, entry("E3")], { releaseChain: ["spn-x releases"] })));
-  ok("[MKT.SCRIPTS.324] writing the follow-up again adds no step", twice.code === 0 && json(stateOf("N009")).rows.length === after.length, twice.out);
+  const twice = sheet("write", "N007", "--file", put("n9.json", sheetOf([...data.entries, entry("E3")], { releaseChain: ["spn-x releases"] })));
+  ok("[MKT.SCRIPTS.324] writing the follow-up again adds no step", twice.code === 0 && json(stateOf("N007")).rows.length === after.length, twice.out);
 }
 
 console.log("\n=== needsRelease: the release a repository's first part waits on (E66, MKT.HOOKS.322)");
 {
-  const sheetPath = join(ws, "arcs", "N009", "sheet.json");
+  const sheetPath = join(ws, "arcs", "N007", "sheet.json");
   const need = { repo: "spn-support-ts", release: "0.9.0", command: "spnutils apps gen-barrel" };
   const withNeed = sheetOf([entry("E1")], { releaseChain: ["spn-x releases"], needsRelease: [need] });
-  const wrote = sheet("write", "N009", "--file", put("n9-need.json", withNeed));
+  const wrote = sheet("write", "N007", "--file", put("n9-need.json", withNeed));
   ok("[MKT.HOOKS.322] E66 write keeps a whole needsRelease row", wrote.code === 0 && JSON.stringify(json(sheetPath).needsRelease) === JSON.stringify([need]), wrote.out);
-  const shown = sheet("show", "N009");
+  const shown = sheet("show", "N007");
   ok("[MKT.HOOKS.322] E66 show prints the row: repo, release and command", shown.code === 0 && /needs release/.test(shown.out) && shown.out.includes("spn-support-ts") && shown.out.includes("0.9.0") && shown.out.includes("spnutils apps gen-barrel"), shown.out);
   const before = readFileSync(sheetPath, "utf8");
-  const bad = sheet("write", "N009", "--file", put("n9-bad.json", sheetOf([entry("E1", { what: "" })], { releaseChain: ["spn-x releases"], needsRelease: [{ repo: "spn-support-ts", release: "0.9.0" }, "spn-x"] })));
+  const bad = sheet("write", "N007", "--file", put("n9-bad.json", sheetOf([entry("E1", { what: "" })], { releaseChain: ["spn-x releases"], needsRelease: [{ repo: "spn-support-ts", release: "0.9.0" }, "spn-x"] })));
   ok("[MKT.HOOKS.322] E66 a malformed row is refused in the one refusal, with the other faults, and nothing is written",
     bad.code === 1 && bad.out.startsWith("Refused: ") && bad.out.includes("Nothing was written.") && bad.out.includes("E1") && /needsRelease/.test(bad.out) && bad.out.includes("command") && bad.out.split("needsRelease").length > 2 && bad.out.includes(" · ")
       && readFileSync(sheetPath, "utf8") === before, bad.out);
-  const notList = sheet("write", "N009", "--file", put("n9-bad2.json", sheetOf([entry("E1")], { releaseChain: ["spn-x releases"], needsRelease: "spn-support-ts" })));
+  const notList = sheet("write", "N007", "--file", put("n9-bad2.json", sheetOf([entry("E1")], { releaseChain: ["spn-x releases"], needsRelease: "spn-support-ts" })));
   ok("[MKT.HOOKS.322] E66 a needsRelease that is no list is refused", notList.code === 1 && /needsRelease/.test(notList.out), notList.out);
   const held = json(sheetPath);
   writeFileSync(sheetPath, JSON.stringify({ ...held, needsRelease: [{ repo: "spn-support-ts", release: "", command: "x" }] }, null, 2));
-  const checked = sheet("check", "N009");
+  const checked = sheet("check", "N007");
   ok("[MKT.HOOKS.322] E66 check finds a malformed row already on the sheet", checked.code === 1 && /needsRelease/.test(checked.out) && checked.out.includes("release"), checked.out);
   writeFileSync(sheetPath, JSON.stringify(held, null, 2));
 }
@@ -370,15 +371,201 @@ console.log("\n=== a changed book file: its generated copies are named (MKT.SCRI
   const without = sheet("write", "N001", "--file", put("book-a.json", sheetOf([bookEntry])), "--because", "the developer: a book change");
   ok("[MKT.SCRIPTS.419] a sheet that changes a book file without its generated copies is refused, naming the restating ref and the rules index",
     without.code === 1 && without.out.includes(`${inRepo}/foo.md`) && without.out.includes("refs/rules.json") && without.out.includes("Nothing was written"), without.out);
-  const withCopies = sheet("write", "N001", "--file", put("book-b.json", sheetOf([bookEntry, entry("E2", { file: `spn-claude-marketplace:${inRepo}/foo.md` }), entry("E3", { file: `spn-claude-marketplace:${inRepo}/rules.json` })])), "--because", "the developer: a book change");
+  const withCopies = sheet("write", "N001", "--file", put("book-b.json", sheetOf([bookEntry, entry("E2", { file: `spn-claude-marketplace:${inRepo}/foo.md`, book: [`spn-foundation:${book}`] }), entry("E3", { file: `spn-claude-marketplace:${inRepo}/rules.json`, book: [`spn-foundation:${book}`] })])), "--because", "the developer: a book change");
   ok("[MKT.SCRIPTS.419] with an entry for each copy it is written", withCopies.code === 0, withCopies.out);
   const template = "docs/04-capabilities/01-devex/04-workspace/04-docs/templates/workstream/x-template.md";
   const tpl = sheet("write", "N001", "--file", put("book-c.json", sheetOf([entry("E1", { file: `spn-foundation:${template}` }), entry("E2", { file: `spn-claude-marketplace:${inRepo}/rules.json` })])), "--because", "the developer: a template");
   ok("[MKT.SCRIPTS.419] a template names the plugin's copy, its templates README and its index",
     tpl.code === 1 && ["docs/templates/workstream/x-template.md", "docs/templates/README.md", "docs/templates/index.md"].every((one) => tpl.out.includes(one)), tpl.out);
-  writeFileSync(sheetFile, JSON.stringify(sheetOf([bookEntry, entry("E2", { file: `spn-claude-marketplace:${inRepo}/foo.md` })]), null, 2));
+  writeFileSync(sheetFile, JSON.stringify(sheetOf([bookEntry, entry("E2", { file: `spn-claude-marketplace:${inRepo}/foo.md`, book: [`spn-foundation:${book}`] })]), null, 2));
   const check = sheet("check", "N001");
   ok("[MKT.SCRIPTS.419] sheet check names the copy still missing from a sheet already written", check.out.includes("generated copy") && check.out.includes("refs/rules.json") && !check.out.includes("refs/foo.md"), check.out);
+}
+
+console.log("\n=== show --part: only the entries one part of the go carries (MKT.SCRIPTS.446)");
+{
+  const rows = [
+    { id: "1", parent: "N001", title: "write the book", kind: "change", repo: "spn-x", work: "DOCS", blockedBy: [], touches: [], state: "waiting", entries: ["E1"] },
+    { id: "2", parent: "N001", title: "build it", kind: "change", repo: "spn-x", work: "CODE", blockedBy: ["1"], touches: [], state: "waiting", entries: ["E2", "E3"] },
+  ];
+  const part = await dataWorkspace("sheet-part", { rows });
+  const run = (...args) => cli(part.root, ["workstream", "sheet", ...args]);
+  cli(part.root, ["workstream", "fact", "write", "N001", "--source", "spn-x/a.ts", "--fact", "a is 1", "--used-by", "1"]);
+  writeFileSync(join(part.ws, "arcs", "N001", "sheet.json"), JSON.stringify(sheetOf([entry("E1", { file: "spn-x:docs/a.md" }), entry("E2", { file: "spn-x:src/b.ts" }), entry("E3", { file: "spn-x:src/c.ts" })], { releaseChain: ["spn-x"] }), null, 2));
+  const wrote = cli(part.root, ["workstream", "go", "write", "N001"]);
+  const plan = JSON.parse(readFileSync(join(part.ws, "arcs", "N001", "go.json"), "utf8"));
+  const code = plan.parts.find((one) => one.work === "CODE");
+  ok("[MKT.SCRIPTS.446] the go carries E2 and E3 in one code part", wrote.code === 0 && JSON.stringify(code?.entries) === '["N001/E2","N001/E3"]', wrote.out + JSON.stringify(plan.parts.map((one) => [one.id, one.entries])));
+  const shown = run("show", "N001", "--part", code.id);
+  ok("[MKT.SCRIPTS.446] `--part` prints that part's two entries and no other", shown.code === 0 && shown.out.includes(`part ${code.id} · 2 entries`) && shown.out.includes("E2 edit") && shown.out.includes("E3 edit") && !shown.out.includes("E1 edit"), shown.out);
+  const asJson = run("show", "N001", "--part", code.id, "--json");
+  ok("[MKT.SCRIPTS.446] `--json` prints the same two entries", asJson.code === 0 && JSON.stringify(JSON.parse(asJson.out).entries.map((one) => one.id)) === '["E2","E3"]', asJson.out);
+  const none = run("show", "N001", "--part", "code-nowhere-9");
+  ok("[MKT.SCRIPTS.446] a part no plan holds is refused, named", none.code !== 0 && none.out.includes("code-nowhere-9"), none.out);
+}
+
+console.log("\n=== a published surface an entry breaks: the consumers are named (MKT.SCRIPTS.448)");
+{
+  const pkg = "@saasplane/toolchain-ts";
+  const world = await dataWorkspace("sheet-consumers");
+  const run = (...args) => cli(world.root, ["workstream", "sheet", ...args]);
+  const at = (path, body) => { mkdirSync(join(world.root, path, ".."), { recursive: true }); writeFileSync(join(world.root, path), body); };
+  at("spn-pkg/packages/toolchain-ts/package.json", JSON.stringify({ name: pkg, version: "5.52.0", exports: { "./config": "./src/config.ts", "./boot": "./src/boot.ts" } }));
+  for (const file of ["config", "boot", "util", "internal"]) at(`spn-pkg/packages/toolchain-ts/src/${file}.ts`, `export const ${file} = 1;\n`);
+  at("spn-platform/package.json", JSON.stringify({ name: "platform", devDependencies: { [pkg]: "5.52.0" } }));
+  at("spn-platform/apps/web/package.json", JSON.stringify({ name: "web", dependencies: { [pkg]: "5.52.0" } }));
+  at("spn-other/package.json", JSON.stringify({ name: "other", dependencies: { left: "1.0.0" } }));
+  cli(world.root, ["workstream", "fact", "write", "N001", "--source", "spn-x/a.ts", "--fact", "a is 1", "--used-by", "1"]);
+  const sheetPath = join(world.ws, "arcs", "N001", "sheet.json");
+  const findings = (entries) => { writeFileSync(sheetPath, JSON.stringify(sheetOf(entries), null, 2)); return run("check", "N001").out; };
+  const src = (name) => `spn-pkg:packages/toolchain-ts/src/${name}.ts`;
+  const named = (out) => out.includes(pkg) && out.includes("spn-platform") && out.includes("5.52.0") && out.includes("2 files") && !out.includes("spn-other");
+  const table = [
+    ["a drop of an exported file", entry("E1", { op: "drop", file: src("config") }), true],
+    ["a rename of an exported file", entry("E1", { op: "rename", file: src("boot") }), true],
+    ["an entry that says an export is removed", entry("E1", { file: src("util"), what: "removes the export `./legacy` of the package" }), true],
+    ["an entry that says boot refuses without a key", entry("E1", { file: src("util"), what: "boot refuses without the SPN_KEY key" }), true],
+    ["a drop of a file nothing exports", entry("E1", { op: "drop", file: src("internal") }), false],
+    ["an edit of an exported file", entry("E1", { file: src("config") }), false],
+  ];
+  for (const [label, one, breaks] of table) {
+    const out = findings([one]);
+    ok(`[MKT.SCRIPTS.448] ${label} ${breaks ? "is named against the repository pinning the package, with its pin and file count, and not against one that does not" : "breaks no consumer"}`,
+      breaks ? named(out) && out.includes("moves that pin") : !out.includes("spn-platform"), out);
+  }
+  const moved = findings([entry("E1", { op: "drop", file: src("config") }), entry("E2", { file: "spn-platform:package.json" })]);
+  ok("[MKT.SCRIPTS.448] an entry that moves the pin clears the finding", !moved.includes("spn-platform pins"), moved);
+  cli(world.root, ["workstream", "fact", "write", "N001", "--source", "spn-x/a.ts", "--fact", `spn-platform keeps ${pkg} at 5.52.0, so the pin stays`, "--used-by", "1"]);
+  const stays = findings([entry("E1", { op: "drop", file: src("config"), facts: ["f1", "f2"] })]);
+  ok("[MKT.SCRIPTS.448] a fact the entry cites that the pin stays clears it too", !stays.includes("spn-platform pins"), stays);
+}
+
+console.log("\n=== patch: an entry's change kept as a diff (MKT.SCRIPTS.449)");
+{
+  const kept = await dataWorkspace("sheet-patch");
+  const run = (...args) => cli(kept.root, ["workstream", "sheet", ...args]);
+  cli(kept.root, ["workstream", "fact", "write", "N001", "--source", "spn-x/a.ts", "--fact", "a is 1", "--used-by", "1"]);
+  const pinned = JSON.parse(readFileSync(join(kept.ws, "arcs", "N001", "facts.jsonl"), "utf8").split("\n")[0]).commit;
+  const sheetPath = join(kept.ws, "arcs", "N001", "sheet.json");
+  writeFileSync(sheetPath, JSON.stringify(sheetOf([entry("E1", { file: "spn-x:a.ts" })]), null, 2));
+  const nothing = run("patch", "N001", "E1");
+  ok("[MKT.SCRIPTS.449] a file with no change is refused, nothing written", nothing.code === 1 && nothing.out.includes("Nothing was written") && !existsSync(join(kept.ws, "arcs", "N001", "patches", "E1.diff")), nothing.out);
+  const gone = run("patch", "N001", "E9");
+  ok("[MKT.SCRIPTS.449] an entry the sheet does not hold is refused", gone.code !== 0 && gone.out.includes("E9"), gone.out);
+  writeFileSync(join(kept.repo, "a.ts"), "export const a = 2;\n");
+  const done = run("patch", "N001", "E1");
+  const diffFile = join(kept.ws, "arcs", "N001", "patches", "E1.diff");
+  ok("[MKT.SCRIPTS.449] patch writes patches/E1.diff, the diff against the pinned commit", done.code === 0 && existsSync(diffFile) && readFileSync(diffFile, "utf8").includes("+export const a = 2;"), done.out);
+  ok("[MKT.SCRIPTS.449] the entry names its patch and its base", JSON.stringify(json(sheetPath).entries[0].patch) === JSON.stringify({ file: "patches/E1.diff", base: pinned }), JSON.stringify(json(sheetPath).entries[0]));
+  ok("[MKT.SCRIPTS.449] the file is reset in the checkout", readFileSync(join(kept.repo, "a.ts"), "utf8") === "export const a = 1;\n");
+  ok("[MKT.SCRIPTS.449] one log line says so", lines(join(kept.ws, "arcs", "N001", "log.jsonl")).at(-1).note.includes("E1 patched"));
+}
+
+console.log("\n=== a patch field off its shape is a sheet fault (MKT.SCRIPTS.449)");
+{
+  const own = await dataWorkspace("sheet-patch-shape");
+  const there = (...args) => cli(own.root, ["workstream", "sheet", ...args]);
+  const keep = (name, value) => { const path = join(own.root, name); writeFileSync(path, JSON.stringify(value, null, 2)); return path; };
+  cli(own.root, ["workstream", "fact", "write", "N001", "--source", "spn-x/a.ts", "--fact", "a is 1", "--used-by", "1"]);
+  const refusedWrite = there("write", "N001", "--file", keep("bad.json", sheetOf([entry("E1", { patch: { file: "E1.diff", base: "not a commit" } })])));
+  ok("[MKT.SCRIPTS.449] a patch whose file is not under patches/ or whose base is not a commit is refused, naming the patch", refusedWrite.code !== 0 && refusedWrite.out.includes("patch"), refusedWrite.out);
+  const wroteGood = there("write", "N001", "--file", keep("good.json", sheetOf([entry("E1", { patch: { file: "patches/E1.diff", base: "abcdef1" } })])));
+  ok("[MKT.SCRIPTS.449] a patch under patches/ against a commit is kept", wroteGood.code === 0 && json(join(own.ws, "arcs", "N001", "sheet.json")).entries[0].patch.file === "patches/E1.diff", wroteGood.out);
+}
+
+console.log("\n=== the three forms of an arc address: N<nnn>, ideate and follow-ups (Q33)");
+{
+  const forms = await dataWorkspace("sheet-forms");
+  writeRoleArcs(forms.ws);
+  const there = (...args) => cli(forms.root, ["workstream", "sheet", ...args]);
+  const name = forms.ws.split("/").pop();
+  for (const arc of ["N001", "ideate", "follow-ups"]) {
+    const shown = there("show", `${name}/${arc}`);
+    ok(`show reads \`${name}/${arc}\` as an arc: no sheet there, one line, exit 0`, shown.code === 0 && shown.out.includes("no sheet"), shown.out);
+  }
+  const unknown = there("show", `${name}/build`);
+  ok("an address that is none of the three is refused", unknown.code !== 0, unknown.out);
+}
+
+console.log("\n=== trace and judged (MKT.SCRIPTS.493, .494)");
+{
+  const bare = (id) => { const one = entry(id); delete one.trace; delete one.judged; return one; };
+  const before = existsSync(sheetFile) ? readFileSync(sheetFile, "utf8") : "";
+  const noTrace = sheet("write", "N001", "--file", put("t-a.json", sheetOf([bare("E7")])), "--because", "the developer: a rewrite");
+  ok("[MKT.SCRIPTS.493] write refuses a new entry with no trace and no judged, naming both", noTrace.code === 1 && noTrace.out.includes("E7") && noTrace.out.includes("trace") && noTrace.out.includes("judged") && noTrace.out.includes("Nothing was written"), noTrace.out);
+  ok("[MKT.SCRIPTS.493] nothing was written", (existsSync(sheetFile) ? readFileSync(sheetFile, "utf8") : "") === before);
+  const kept = sheet("write", "N001", "--file", put("t-b.json", sheetOf([entry("E1", { trace: "because q1", judged: true, patch: { file: "patches/E1.diff", base: "abcdef1" } }), entry("E2", { judged: false })])), "--because", "the developer: a rewrite");
+  ok("[MKT.SCRIPTS.493] an entry with a trace and a judged is written", kept.code === 0 && json(sheetFile).entries[0].judged === true && json(sheetFile).entries[0].trace === "because q1", kept.out);
+  const raw = sheetOf([entry("E1", { judged: true, patch: { file: "patches/E1.diff", base: "abcdef1" } }), entry("E2", { judged: true, trace: "" })]);
+  writeFileSync(sheetFile, JSON.stringify(raw, null, 2));
+  const flagged = sheet("check", "N001");
+  ok("[MKT.SCRIPTS.494] check names a judged entry with no patch", flagged.out.includes("E2 is judged and has no patch"), flagged.out);
+  ok("[MKT.SCRIPTS.494] check names a judged entry with no trace", flagged.out.includes("E2 is judged and has no trace"), flagged.out);
+  ok("[MKT.SCRIPTS.494] check does not name a judged entry that has a patch and a trace", !flagged.out.includes("E1 is judged"), flagged.out);
+  const traced = sheet("edit", "N001", "E2", "--trace", "the thinking");
+  ok("[MKT.SCRIPTS.494] edit --trace records the trace", traced.code === 0 && json(sheetFile).entries[1].trace === "the thinking", traced.out);
+  const mech = sheet("edit", "N001", "E2", "--mechanical");
+  ok("[MKT.SCRIPTS.494] edit --mechanical records judged false, and the entry is no longer flagged", mech.code === 0 && json(sheetFile).entries[1].judged === false && !sheet("check", "N001").out.includes("E2 is judged"), mech.out);
+  const judgedBack = sheet("edit", "N001", "E2", "--judged");
+  ok("[MKT.SCRIPTS.494] edit --judged records judged true", judgedBack.code === 0 && json(sheetFile).entries[1].judged === true, judgedBack.out);
+  const both = sheet("edit", "N001", "E2", "--judged", "--mechanical");
+  ok("[MKT.SCRIPTS.494] --judged with --mechanical is refused", both.code !== 0, both.out);
+}
+
+console.log("\n=== sheet reach (MKT.SCRIPTS.495)");
+{
+  const three = sheetOf([
+    entry("E1", { decidedBy: ["q1"], facts: ["f1"] }),
+    entry("E2", { decidedBy: ["q1"], facts: ["f1"] }),
+    entry("E3", { decidedBy: ["q9"], facts: ["f9"] }),
+  ]);
+  writeFileSync(sheetFile, JSON.stringify(three, null, 2));
+  const from1 = sheet("reach", "N001", "E1");
+  ok("[MKT.SCRIPTS.495] reach on a three-entry sheet counts the entries, files and sections reached", from1.code === 0 && from1.out.includes("E1 reaches 2 of 3 entries · 2 files · 1 section"), from1.out);
+  ok("[MKT.SCRIPTS.495] it names the reached entry and not the unrelated one", from1.out.includes("  E2  ") && !from1.out.includes("  E3  "), from1.out);
+  ok("[MKT.SCRIPTS.495] it names the sections and the one diff a re-patch rewrites", from1.out.includes("sections: q1") && from1.out.includes("patches/E1.diff"), from1.out);
+  const from3 = sheet("reach", "N001", "E3");
+  ok("[MKT.SCRIPTS.495] an entry that shares nothing reaches only itself", from3.out.includes("E3 reaches 1 of 3 entries"), from3.out);
+  const none = sheet("reach", "N001", "E9");
+  ok("[MKT.SCRIPTS.495] an entry the sheet lacks is refused", none.code !== 0 && none.out.includes("E9"), none.out);
+}
+
+console.log("\n=== show --part with no plan lists the parts (MKT.SCRIPTS.504, .505, .506 follows)");
+{
+  const none = sheet("show", "N001", "--part", "no-such-part");
+  ok("[MKT.SCRIPTS.504] a part no go plan holds is refused, saying no plan covers the arc and naming `go show`", none.code !== 0 && none.out.includes("no-such-part") && none.out.includes("no plan covers it") && none.out.includes("go show"), none.out);
+  const two = sheet("show", "N001", "N002");
+  ok("[MKT.SCRIPTS.505] a second arc is refused, naming the one read", two.code !== 0 && two.out.includes("N002"), two.out);
+}
+
+console.log("\n=== generated copies as missingCopies reads them today (MKT.SCRIPTS.506)");
+{
+  const book = "docs/04-capabilities/01-devex/bar.md";
+  const inRepo = "packages/plugin-spn-devex/src/refs", base = `spn-claude-marketplace/${inRepo}`;
+  mkdirSync(join(root, "spn-foundation", "docs/04-capabilities/01-devex"), { recursive: true });
+  mkdirSync(join(root, base), { recursive: true });
+  writeFileSync(join(root, "spn-foundation", book), "# Bar\n\nplain prose, no rule.\n");
+  writeFileSync(join(root, base, "bar.md"), `RESTATES spn-foundation ${book}\n# Bar\n`);
+  writeFileSync(join(root, base, "other.md"), "# Other\nnever cites the book file\n");
+  const bookEntry = entry("E1", { file: `spn-foundation:${book}` });
+  const without = sheet("write", "N001", "--file", put("c-a.json", sheetOf([bookEntry])), "--because", "the developer: a book change");
+  ok("[MKT.SCRIPTS.506] a copy whose RESTATES header cites the book path is named", without.code === 1 && without.out.includes(`${inRepo}/bar.md`), without.out);
+  ok("[MKT.SCRIPTS.506] a ref that does not cite the book file is not named", !without.out.includes("other.md"), without.out);
+  const covered = sheet("write", "N001", "--file", put("c-b.json", sheetOf([bookEntry, entry("E2", { file: `spn-claude-marketplace:${inRepo}/bar.md`, book: [`spn-foundation:${book}`] })])), "--because", "the developer: a book change");
+  ok("[MKT.SCRIPTS.506] with an entry for the named copy it is written", covered.code === 0, covered.out);
+  const unlisted = sheet("write", "N001", "--file", put("c-c.json", sheetOf([bookEntry, entry("E2", { file: `spn-claude-marketplace:${inRepo}/bar.md`, book: [] })])), "--because", "the developer: a book change");
+  ok("[MKT.SCRIPTS.506] a named copy whose entry's book line lacks the book file is refused", unlisted.code === 1 && unlisted.out.includes("book` line does not name"), unlisted.out);
+  const before = readFileSync(stateFile, "utf8");
+  const held = json(stateFile);
+  held.rows.push({ id: "99", parent: "N001", title: "the copy", kind: "change", repo: "spn-claude-marketplace", work: "GENERATED", blockedBy: [], touches: [], state: "landed", entries: ["E2"] });
+  writeFileSync(stateFile, JSON.stringify(held, null, 2));
+  const landedCopy = sheet("write", "N001", "--file", put("c-e.json", sheetOf([bookEntry, entry("E2", { file: `spn-claude-marketplace:${inRepo}/bar.md`, book: [] })])), "--because", "the developer: a book change");
+  writeFileSync(stateFile, before);
+  ok("[MKT.SCRIPTS.506] a landed row's copy entry is not asked for the book line: what landed stands", landedCopy.code === 0 && !landedCopy.out.includes("book` line does not name"), landedCopy.out);
+  const stamp = createHash("sha256").update("# Bar\n\nplain prose, no rule.", "utf8").digest("hex").slice(0, 8);
+  writeFileSync(join(root, base, "bar.md"), `<!-- spn:restates\n{ "docs": [ { "path": "spn-foundation/${book}", "seen": "${stamp}" } ] }\n-->\n# Bar\n`);
+  const current = sheet("write", "N001", "--file", put("c-d.json", sheetOf([bookEntry])), "--because", "the developer: a book change");
+  ok("[MKT.SCRIPTS.506] a copy whose stamp reads current is not asked for", current.code === 0 && !current.out.includes("bar.md"), current.out);
 }
 
 console.log(failed ? `\n  ${failed} of ${total} FAILED — sheet` : `\n  all ${total} passed — sheet`);

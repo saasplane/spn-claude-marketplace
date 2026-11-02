@@ -84,6 +84,41 @@ const BUDGET_MS = 10000;
 // fact worth refusing on rather than a reason to make every turn slow.
 const MAX_FILES = 20000;
 
+/** The fixed line that ends a finding warning's list: `sayOnce` marks the words above it, and what changes between turns follows it. */
+export const CORPUS_MARKER = "(the list ends here; what follows changes from turn to turn)";
+
+/**
+ * The docs trees a window that wrote under `repos` reads. A repository the window wrote under, and that a workstream holds a
+ * worktree of (`<root>/.worktrees/<workstream>/<repo>`, the shape `runPlaces` in lib/workstream.ts builds), is read in that
+ * worktree and not in the main checkout, which sits behind develop; a repository with no worktree is read in the main checkout.
+ * ONLY THE WORKTREE OF THE WINDOW'S OWN WORKSTREAM (`own`) IS READ, AND ONLY THE FOLDER NAMED EXACTLY FOR THE REPOSITORY:
+ * a `<repo>-release` checkout is never read. `null` for `repos` is every main tree, as the command run by hand reads them;
+ * `null` for `own` is every workstream's worktree.
+ */
+export function windowTrees(root: string, repos: Set<string> | null, own: Set<string> | null = null): string[] {
+  const main = docsTrees(root);
+  if (!repos) return main;
+  const sets = join(root, ".worktrees");
+  let workstreams: string[] = [];
+  try { workstreams = readdirSync(sets).filter((name) => !name.startsWith(".") && (!own || own.has(name))).sort(); } catch { /* no worktrees */ }
+  const out: string[] = [];
+  for (const tree of main) {
+    const repo = basename(dirname(tree));
+    if (!repos.has(repo)) continue;
+    const held: string[] = [];
+    for (const workstream of workstreams) {
+      let names: string[] = [];
+      try { names = readdirSync(join(sets, workstream)).filter((name) => name === repo).sort(); } catch { continue; }
+      for (const name of names) {
+        const place = join(sets, workstream, name);
+        if (existsSync(join(place, "sprepo.json")) && existsSync(join(place, "docs"))) held.push(join(place, "docs"));
+      }
+    }
+    out.push(...(held.length ? held : [tree]));
+  }
+  return out;
+}
+
 /** Every repository under the workspace that declares itself and carries a docs tree. */
 export function docsTrees(root: string): string[] {
   const out: string[] = [];
@@ -100,6 +135,19 @@ export function docsTrees(root: string): string[] {
     if (existsSync(tree)) out.push(tree);
   }
   return out;
+}
+
+/**
+ * A finding line of `docs` as the file it names and the rule it breaks: `<repo>:<file within the repository>` and the rule's name.
+ * A line that does not read as `<rule> <path>` is kept whole under the tool's label.
+ */
+export function parseFinding(line: string, label: string, repo: string): { file: string; rule: string } {
+  const match = /^(\S+)\s+(\S+\.[A-Za-z]+)(?:\s|$)/.exec(line);
+  if (!match) return { file: `${repo}:${line.split(" — ")[0].trim()}`, rule: label };
+  let path = match[2];
+  const at = path.lastIndexOf(`/${repo}/`);
+  if (at >= 0) path = path.slice(at + repo.length + 2); else if (path.startsWith(`${repo}/`)) path = path.slice(repo.length + 1);
+  return { file: `${repo}:${path}`, rule: match[1] };
 }
 
 /**
@@ -253,7 +301,7 @@ export type SubjectRun = { subject: string; source: Source | "skipped" | "not re
  * it. SKIPPING THE WORK IS THE POINT; skipping the VERDICT never was. The findings are stored with the
  * key and re-reported verbatim until the tree or the checker moves.
  */
-export function runCorpus(root: string, repos: Set<string> | null = null): { warnings: Warning[]; runs: SubjectRun[]; stopped?: string } {
+export function runCorpus(root: string, repos: Set<string> | null = null, own: Set<string> | null = null): { warnings: Warning[]; runs: SubjectRun[]; stopped?: string } {
   // NO HOME, NO STORE: the run stops with the line that names the command, and runs nothing. The Stop
   // hook ignores the line, since a hook says nothing when the home is missing.
   const stopped = storeMissingLine();
@@ -261,7 +309,7 @@ export function runCorpus(root: string, repos: Set<string> | null = null): { war
 
   // A WINDOW IS TOLD OF A REPOSITORY'S DOCS ONLY WHERE IT HAS WRITTEN UNDER IT (RULE.DEVEX.WORKSPACE.236).
   // `null` is every tree, and only the command run by hand asks for it; the Stop hook always passes the set.
-  const trees = docsTrees(root).filter((tree) => !repos || repos.has(basename(dirname(tree))));
+  const trees = windowTrees(root, repos, own);
   if (!trees.length) return { warnings: [], runs: [] };
 
   const deadline = Date.now() + BUDGET_MS;
@@ -269,14 +317,12 @@ export function runCorpus(root: string, repos: Set<string> | null = null): { war
   const findings: string[] = [];
   const broke: string[] = [];
   const runs: SubjectRun[] = [];
-  const replayed: string[] = [];
   let cutShort = false;
 
   const settle = (subject: string, key: string | null, compute: () => Computed): string[] => {
     if (!key) { const c = compute(); runs.push({ subject, source: "unshared" }); return c.findings; }
     const { verdict, source } = verdictFor(key, subject, compute, deadline);
     runs.push({ subject, source });
-    if ((source === "replayed" || source === "waited") && verdict.findings.length) replayed.push(subject);
     return verdict.findings;
   };
 
@@ -287,14 +333,21 @@ export function runCorpus(root: string, repos: Set<string> | null = null): { war
     const lines = settle(subject, hash && `${hash}.${checker}`, () => {
       const found: string[] = [];
       const ran: Computed["ran"] = [];
+      const byFile = new Map<string, string[]>();
       let complete = true, failed = false;
       for (const step of WIRED) {
         if (Date.now() > deadline) { complete = false; cutShort = true; break; }
         const { rule, broke: failure } = runOne(root, CLI, step.args(tree));
         ran.push({ tool: step.label, rule: rule.length });
         if (failure) { failed = true; broke.push(`\`${step.label}\` could not run over \`${subject}\` — ${failure}`); continue; }
-        for (const line of rule) found.push(`${basename(dirname(tree))} · ${step.label} · ${line}`);
+        for (const line of rule) {
+          const { file, rule: name } = parseFinding(line, step.label, basename(dirname(tree)));
+          const at = byFile.get(file);
+          if (!at) byFile.set(file, [name]); else if (!at.includes(name)) at.push(name);
+        }
       }
+      // ONE LINE FOR EACH FILE, `<repo>:<file> · <rule>`, the rules of a file joined: the reason is in the tool, not in the warning.
+      for (const [file, names] of byFile) found.push(`${file} · ${names.join(", ")}`);
       // A PARTIAL OR FAILED RUN IS NEVER STORED. Storing one would record the tree as checked when
       // part of it was not, and every later turn would replay that — the cached-green shape exactly.
       return { findings: found, ran, store: complete && !failed };
@@ -321,26 +374,20 @@ export function runCorpus(root: string, repos: Set<string> | null = null): { war
     warnings.push({ check: "corpus", message:
       `A corpus tool failed to run, which is not the same as finding nothing:\n  ${broke.join("\n  ")}\n\n${which}` });
   if (findings.length) {
+    const repoDirs = trees.map((tree) => dirname(tree));
     // A FINDING IN A FILE THAT IS CHANGED AND NOT COMMITTED IS WORK IN PROGRESS, and it says so: rows added
     // and not yet stamped, or a seat file edited whose page is not produced yet, clear when the work lands.
-    const marked = findings.map((line) => (isUncommitted(root, line) ? `${line} [uncommitted]` : line));
+    const marked = findings.map((line) => (isUncommitted(root, line, repoDirs) ? `${line} [uncommitted]` : line));
     const wip = marked.filter((line) => line.endsWith(" [uncommitted]")).length;
+    // THE WORDS END IN A FIXED MARKER LINE (RULE.DEVEX.WORKSPACE.471). Everything above it is the finding list in file order, which
+    // `sayOnce` marks; what changes from turn to turn (the `… and N more` tail, and the work-in-progress count) is below it. A finding is one line, `<repo>:<file> · <rule>`; the tools a run ran are printed by `docs audit`.
     warnings.push({ check: "corpus", message:
       `${findings.length} RULE finding(s) in the docs trees of ${[...new Set(trees.map((t) => `\`${basename(dirname(t))}\``))].join(" · ")}, ` +
       `the repositories this window wrote under:\n` +
       `  ${marked.slice(0, 12).join("\n  ")}` +
+      `\n${CORPUS_MARKER}` +
       (findings.length > 12 ? `\n  … and ${findings.length - 12} more` : "") +
-      (wip ? `\n\n${wip} of these sit in files that are changed and not committed: work in progress, to finish before the commit.` : "") +
-      // SAYING IT IS A REPLAY IS PART OF BEING HONEST ABOUT IT. A repeated finding that reads as a
-      // fresh run invites somebody to think the check keeps re-finding it, when the truth is simpler
-      // and more useful: nothing has changed since it was found, including the fault.
-      (replayed.length
-        ? `\n\nFrom ${replayed.map((s) => `\`${s}\``).join(" · ")}: no file under that tree, its repository's \`sprepo.json\` and ` +
-          `\`CONCEPT.md\`, the foundation's templates or the checker has changed since these were found, so the tools were not re-run — ` +
-          `this is the stored verdict. A change to the package sources or to a sibling repository that the tools also read is not part of ` +
-          `that test and would not show here.`
-        : "") +
-      `\n\n${which}` });
+      (wip ? `\n\n${wip} of these sit in files that are changed and not committed: work in progress, to finish before the commit.` : "") });
   }
   return { warnings, runs };
 }
@@ -351,8 +398,8 @@ export function runCorpus(root: string, repos: Set<string> | null = null): { war
  * Warns, never refuses — the `Stop` contract. A turn is already written by the time this runs, and a
  * refusal would only lose it.
  */
-export function checkCorpus(root: string, repos: Set<string>): Warning[] {
-  return runCorpus(root, repos).warnings;
+export function checkCorpus(root: string, repos: Set<string>, own: Set<string> | null = null): Warning[] {
+  return runCorpus(root, repos, own).warnings;
 }
 
 /**
@@ -360,15 +407,19 @@ export function checkCorpus(root: string, repos: Set<string>): Warning[] {
  * progress and not a fault of the committed tree. `false` where git cannot say: an unknown file is
  * read as committed, so a finding is never softened on a guess.
  */
-export function isUncommitted(root: string, finding: string): boolean {
-  const file = finding.match(/(?:^|\s)((?:[\w.@-]+\/)+[\w.@-]+\.(?:md|html|json|ts))/)?.[1];
-  if (!file) return false;
-  const repo = file.split("/")[0];
-  try {
-    const out = execFileSync("git", ["-C", join(root, repo), "status", "--porcelain", "--", file.slice(repo.length + 1)],
-      { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"], timeout: 5000 });
-    return out.trim() !== "";
-  } catch { return false; }
+export function isUncommitted(root: string, finding: string, repoDirs: string[] = []): boolean {
+  const named = /^([\w.@-]+):(\S+)/.exec(finding);
+  if (!named) return false;
+  const [, repo, file] = named;
+  const dirs = [...repoDirs.filter((dir) => basename(dir) === repo), join(root, repo)];
+  for (const dir of dirs) {
+    try {
+      const out = execFileSync("git", ["-C", dir, "status", "--porcelain", "--", file],
+        { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"], timeout: 5000 });
+      if (out.trim() !== "") return true;
+    } catch { /* this checkout cannot say */ }
+  }
+  return false;
 }
 
 if (process.argv[1] && basename(process.argv[1]) === "corpus.ts") {

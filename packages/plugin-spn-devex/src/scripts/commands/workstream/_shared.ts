@@ -18,7 +18,7 @@ export function typed<T>(read: () => T): T {
 }
 
 export const arcNamed = (ref: string | undefined, allowNew = false): { ws: string; arc: string } => {
-  if (!ref) throw new UsageFault("needs an arc, as `N<nnn>` or `<workstream>/N<nnn>`.");
+  if (!ref) throw new UsageFault("needs an arc, as `<arc>` or `<workstream>/<arc>`, the arc being `N<nnn>`, `ideate` or `follow-ups`.");
   return typed(() => resolveArc(ref, process.cwd(), allowNew));
 };
 

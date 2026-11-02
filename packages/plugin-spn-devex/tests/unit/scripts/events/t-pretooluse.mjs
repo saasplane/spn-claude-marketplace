@@ -425,11 +425,9 @@ console.log("\n=== pretooluse — a launch of a helper agent names its model, an
   const launch = (extra, tool = "Agent") => ({ tool_name: tool, session_id: "agent-model", cwd: WORKSPACE,
     tool_input: { description: "a helper", prompt: "Do the work.", ...extra } });
   const waived = { parity: false, why: "the Python has no Agent branch" };
-  one("agent-model: a launch with no model is refused", launch({ subagent_type: "general-purpose" }), "deny", { says: "model", ...waived });
-  one("agent-model: the same under the name Task", launch({}, "Task"), "deny", { says: "model", ...waived });
+  one("agent-model: a launch with no model runs, with the model filled in", launch({ subagent_type: "general-purpose" }), "note", waived);
+  one("agent-model: the same under the name Task", launch({}, "Task"), "note", waived);
   one("agent-model: a fork is refused", launch({ subagent_type: "fork", model: "sonnet" }), "deny", { says: "fork", ...waived });
-  one("agent-model: an order saying sonnet, launched on opus, is refused",
-    launch({ model: "opus", prompt: `Carry out the order at ${order} exactly.` }), "deny", { says: "sonnet", ...waived });
   one("agent-model: an order saying sonnet, launched on sonnet, is allowed",
     launch({ model: "sonnet", prompt: `Carry out the order at ${order} exactly.` }), "silent", waived);
   one("agent-model: a full model name in the same family is allowed",
@@ -440,12 +438,24 @@ console.log("\n=== pretooluse — a launch of a helper agent names its model, an
     const out = execFileSync("node", [`${HOOKS}/src/scripts/events/pretooluse.ts`], { input: JSON.stringify(payload), encoding: "utf8", cwd: WORKSPACE }).trim();
     return out ? JSON.parse(out.split("\n").filter(Boolean).at(-1)).hookSpecificOutput ?? {} : {};
   };
+  const sideOrders = join(WORKSPACE, ".spndevex", "workstreams", "open", "041-probe", "notes");
+  mkdirSync(join(sideOrders, "ideate", "orders"), { recursive: true });
+  mkdirSync(join(sideOrders, "follow-ups", "orders"), { recursive: true });
+  writeFileSync(join(sideOrders, "ideate", "orders", "01-the-thing.md"), '---\nmodel: sonnet\n---\n# Order\n');
+  writeFileSync(join(sideOrders, "follow-ups", "orders", "01-the-thing.md"), '---\nmodel: sonnet\n---\n# Order\n');
+  const sided = [join(sideOrders, "ideate", "orders", "01-the-thing.md"), join(sideOrders, "follow-ups", "orders", "01-the-thing.md")]
+    .map((path) => raw(launch({ subagent_type: "general-purpose", prompt: `Carry out the order at ${path} exactly.` })));
   const taken = raw(launch({ subagent_type: "general-purpose", prompt: `Carry out the order at ${order} exactly.` }));
+  const mismatched = raw(launch({ model: "opus", prompt: `Carry out the order at ${order} exactly.` }));
   for (const [label, ok] of [
     ["[MKT.HOOKS.325] agent-model: a launch of an order with no model is not refused", taken.permissionDecision !== "deny"],
     ["[MKT.HOOKS.325] agent-model: it takes the order's model: line", taken.updatedInput?.model === "sonnet"],
     ["[MKT.HOOKS.325] agent-model: and keeps the rest of the call", taken.updatedInput?.subagent_type === "general-purpose" && String(taken.updatedInput?.prompt).includes(order)],
+    ["[MKT.HOOKS.325] agent-model: an order saying sonnet, launched on opus, is allowed with the order's model", mismatched.permissionDecision === "allow" && mismatched.updatedInput?.model === "sonnet"],
+    ["[MKT.HOOKS.325] agent-model: the mismatch is told, naming the order's model", /sonnet/.test(mismatched.additionalContext ?? "")],
     ["[MKT.HOOKS.325] agent-model: a launch that names a model is left as it is", raw(launch({ model: "sonnet", prompt: `Carry out the order at ${order} exactly.` })).updatedInput === undefined],
+    ["[MKT.HOOKS.325] agent-model: Q33 an order under notes/ideate/ is read as an order, and its model is taken", sided[0].updatedInput?.model === "sonnet" && sided[0].permissionDecision !== "deny"],
+    ["[MKT.HOOKS.325] agent-model: Q33 an order under notes/follow-ups/ is read as an order, and its model is taken", sided[1].updatedInput?.model === "sonnet" && sided[1].permissionDecision !== "deny"],
   ]) { n += 1; if (!ok) failed += 1; console.log(`  ${ok ? "PASS" : "FAIL"}  ${label}${ok ? "" : `\n        ${JSON.stringify(taken)}`}`); }
 }
 
@@ -556,29 +566,6 @@ console.log("\n=== pretooluse — an order asks for no screenshot unless the dev
   one("order-picture: a report is not judged", write("03-look.report.md", "I took a screenshot.\n"), "silent", waived);
   one("order-picture: a file outside orders is not judged", { tool_name: "Write", session_id: "order-picture", cwd: WORKSPACE,
     tool_input: { file_path: join(WORKSPACE, "notes.md"), content: "take a screenshot\n" } }, "silent", waived);
-}
-
-console.log("\n=== pretooluse — a handover block written before the turn ends is told once (RULE.DEVEX.WORKSPACE.393)");
-{
-  const BLOCK = ["```text", "continue:      041-probe N001", "model:         opus", "read first:    approach.html", "pins:          none",
-    "state:         clean", "live now:      nothing", "done when:     the probe lands", "do not touch:  the main checkout", "open:          none", "```"].join("\n");
-  const entry = (type, content, extra = {}) => JSON.stringify({ type, message: { content }, ...extra });
-  const transcript = (name, lines) => { const file = join(WORKSPACE, `${name}.jsonl`); writeFileSync(file, `${lines.join("\n")}\n`); return file; };
-  const call = (session, file) => ({ tool_name: "Bash", session_id: session, cwd: WORKSPACE, transcript_path: file, tool_input: { command: "git status --short" } });
-  const waived = { parity: false, why: "a new check" };
-  const after = transcript("hl-after", [entry("user", "Carry on."), entry("assistant", [{ type: "text", text: `The state so far.\n\n${BLOCK}` }])]);
-  one("[MKT.HOOKS.317] known-bad: a tool call after a handover block in the turn is told the handover is the last message",
-    call("hl-1", after), "note", { says: "the turn's last message", ...waived });
-  one("[MKT.HOOKS.317] and the same turn is told once: the next call hears nothing", call("hl-1", after), "silent", waived);
-  one("[MKT.HOOKS.317] a tool call before any block hears nothing",
-    call("hl-2", transcript("hl-before", [entry("user", "Carry on."), entry("assistant", [{ type: "text", text: "Reading the page now." }])])), "silent", waived);
-  one("[MKT.HOOKS.317] a block of an earlier turn does not count: the developer's new prompt starts a new turn",
-    call("hl-3", transcript("hl-earlier", [entry("user", "Carry on."), entry("assistant", [{ type: "text", text: BLOCK }]),
-      entry("user", "Now the next thing."), entry("assistant", [{ type: "text", text: "On it." }])])), "silent", waived);
-  one("[MKT.HOOKS.317] a template with placeholders left is not a block",
-    call("hl-4", transcript("hl-template", [entry("user", "Carry on."), entry("assistant", [{ type: "text", text: BLOCK.replace("the probe lands", "{{done}}") }])])),
-    "silent", waived);
-  one("[MKT.HOOKS.317] a helper's call is not told", { ...call("hl-5", after), agent_id: "child-1" }, "silent", waived);
 }
 
 console.log("\n=== pretooluse — a Skill call carries its skill's value and never its arguments (MKT.SCRIPTS.325, .330)");

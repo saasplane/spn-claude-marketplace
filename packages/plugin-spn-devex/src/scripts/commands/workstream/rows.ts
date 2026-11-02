@@ -1,7 +1,7 @@
 // RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § The commands · § Orders name what they need by id, and a workflow runs the ready rows
 // The chapter is the source of truth; a rule change is edited there first, then here, in the same change.
 //
-//   spn-devex workstream rows show <workstream>[/N<nnn>] [--ready] [--parallel] [--tree] [--json]
+//   spn-devex workstream rows show <workstream>[/<arc>] [--ready] [--parallel] [--tree] [--json]
 //
 // `--ready` keeps the rows whose blockers have all resolved; `--parallel` keeps, of those, the ones
 // whose `touches` do not overlap; `--tree` draws each row under its parent.
@@ -9,11 +9,11 @@
 import { basename } from "node:path";
 import { type Action, FLAG, UsageFault, readAddress, readWords } from "../../../../../plugin-support-lib/src/lib/command.ts";
 import { arcIdsOf, parallelRows, readArc, readQuestions, readyRows, stateOfRow } from "../../lib/workstream.ts";
-import { type ArcData, type ArcRow } from "../../lib/workstream-schema.ts";
+import { ARC_ID, type ArcData, type ArcRow } from "../../lib/workstream-schema.ts";
 import { arcNamed, workstreamNamed } from "./_shared.ts";
 
 export const describe = "the rows of a workstream's arcs: every one, the ready ones, or those that can run side by side";
-/** `rows <workstream>[/N<nnn>]` means `rows show`. */
+/** `rows <workstream>[/<arc>]` means `rows show`. */
 export const bare = "show";
 
 type Listed = ArcRow & { arc: string; derived: string };
@@ -22,9 +22,9 @@ function show(args: string[]): number {
   const words = readWords(args, { ready: FLAG, parallel: FLAG, tree: FLAG, json: FLAG });
   const [target, ...more] = words.paths;
   if (more.length) throw new UsageFault("takes one workstream or arc.");
-  if (!target) throw new UsageFault("needs a workstream, or an arc as `<workstream>/N<nnn>`.");
+  if (!target) throw new UsageFault("needs a workstream, or an arc as `<workstream>/<arc>`.");
   const { id } = readAddress(target);
-  const { ws, arcs } = id && /^N\d+[a-z]?$/.test(id)
+  const { ws, arcs } = id && ARC_ID.test(id)
     ? (() => { const named = arcNamed(target); return { ws: named.ws, arcs: [named.arc] }; })()
     : (() => { const ws = workstreamNamed(target); return { ws, arcs: arcIdsOf(ws) }; })();
   const questions = readQuestions(ws);

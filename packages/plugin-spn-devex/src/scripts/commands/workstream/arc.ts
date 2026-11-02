@@ -1,14 +1,15 @@
 // RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § The approach page keeps up with its arcs · § The commands · § The formats · § The life of an arc, and every file it touches · § An arc's status is one of six, stored or worked out · § Shaping: arcs open as the plan becomes clear
 // The chapter is the source of truth; a rule change is edited there first, then here, in the same change.
 //
-//   spn-devex workstream arc edit <workstream>/N<nnn> [--kind ideate] [--proposes N<nnn>,…] [--title …] [--goal …] [--status …] [--wait …] [--reason …] [--start] [--review-fixes] [--subject …] [--under …] [--preview …] …
-//   spn-devex workstream arc stamp write <workstream>/N<nnn>
-//   spn-devex workstream arc delete <workstream>/N<nnn> --note "<the developer's words>"
+//   spn-devex workstream arc edit <workstream>/<arc> [--proposes <arc>,…] [--title …] [--goal …] [--status …] [--wait …] [--reason …] [--start] [--review-fixes] [--subject …] [--under …] [--preview …] …
+//   spn-devex workstream arc stamp write <workstream>/<arc>
+//   spn-devex workstream arc delete <workstream>/<arc> --note "<the developer's words>"
 //
 // `arc edit` is the one writer of an arc's header; a row's field is `row edit`'s. Given an arc that does not exist, it opens it as PROPOSED with
 // `--title`, `--subject` and `--goal`, and leaves the page whole (RULE.DEVEX.WORKSPACE.254). The stored status is the developer's words
 // (RULE.DEVEX.WORKSPACE.307, .311): every move of it, a wait and a start need `--note`. `stamp` is the stamp's only writer, and `delete` takes
-// out an arc never decided; one ever decided is dropped (RULE.DEVEX.WORKSPACE.311).
+// out an arc never decided; one ever decided is dropped (RULE.DEVEX.WORKSPACE.311). An arc's address is its kind: `N<nnn>` a build arc,
+// `ideate` the ideate arc and `follow-ups` the follow-up arc; no option names a kind, and a new numbered arc opens only at the next free number.
 
 import { readFileSync, rmSync, writeFileSync } from "node:fs";
 import { basename, resolve } from "node:path";
@@ -16,13 +17,13 @@ import { type Action, FLAG, VALUE, UsageFault, readWords, type Words } from "../
 import { STORED_STATUSES, raisedSuggestions } from "../../checks/arc-status.ts";
 import { stepRowFindings } from "../../checks/workstream-state.ts";
 import {
-  NOTES, PREVIEW_FILE, approachOf, arcDataDir, arcIdsOf, arcStamp, arcStatus, doneOf, everDecided, logEvent, logLinesOf, newArc, notesDirOf, previewFromTemplate, previewHrefOf, previewOf,
+  NOTES, PREVIEW_FILE, approachOf, arcDataDir, arcIdsOf, arcStamp, arcStatus, doneOf, everDecided, logEvent, logLinesOf, newArc, nextBuildArc, notesDirOf, previewFromTemplate, previewHrefOf, previewOf,
   previewPathFault, proposedLines, readArc, readJsonl, restamped, sheetFileOf, stampsOn, suggestionsFileOf, whatEntryOf, whatId, withEntryLink, withWhatEntry, workspaceOf, writeArc, writeJsonl, writeWhole,
 } from "../../lib/workstream.ts";
 import { isFile } from "../../lib/payload.ts";
 import { candidatesAt, precedentFor, wordsOf } from "../../lib/precedent.ts";
 import { refreshViews } from "../docs/cycles.ts";
-import { ARC_ID, ARC_KINDS, ROW_KINDS, SHEET_SCHEMA_VERSION, cardId, cardName, subjectFault, type ArcData } from "../../lib/workstream-schema.ts";
+import { ARC_ID, ROW_KINDS, SHEET_SCHEMA_VERSION, cardId, cardName, subjectFault, type ArcData } from "../../lib/workstream-schema.ts";
 import { sheetFindings } from "./sheet.ts";
 import { ROW_FLAGS, afterWrite, arcNamed, arcSignatures, listOf, refreshIfMoved, refuseFlags, typed } from "./_shared.ts";
 
@@ -32,7 +33,7 @@ const HEADER_TEXT = ["title", "subject", "goal", "reason", "decides", "cycle", "
 
 const OPTIONS = {
   title: VALUE, subject: VALUE, goal: VALUE, status: STORED_STATUSES, reason: VALUE, wait: VALUE, start: FLAG, "review-fixes": FLAG, decides: VALUE, repos: VALUE, cycle: VALUE, follows: VALUE,
-  model: VALUE, position: VALUE, preview: VALUE, under: VALUE, note: VALUE, carries: VALUE, kind: VALUE, proposes: VALUE,
+  model: VALUE, position: VALUE, preview: VALUE, under: VALUE, note: VALUE, carries: VALUE, proposes: VALUE,
 } as const;
 
 const TITLE_WORDS = 5;
@@ -83,9 +84,9 @@ function header(data: ArcData, words: Words): string[] {
   if (repos) { data.repos = repos; changed.push("repos"); }
   const proposes = listOf(words, "proposes");
   if (proposes) {
-    if (data.kind !== "ideate") throw new UsageFault(`takes \`--proposes\` only on an ideate arc, and ${data.arc} is a build arc: the build arcs an ideate arc proposes are named on it (RULE.DEVEX.WORKSPACE.494).`);
+    if (data.arc !== "ideate") throw new UsageFault(`takes \`--proposes\` only on the ideate arc, \`<workstream>/ideate\`, and ${data.arc} is not it: the arcs the ideate arc proposes are named on it (RULE.DEVEX.WORKSPACE.494).`);
     const odd = proposes.filter((id) => !ARC_ID.test(id));
-    if (odd.length) throw new UsageFault(`takes \`--proposes\` as arc ids, such as \`N002\`: \`${odd[0]}\` is none.`);
+    if (odd.length) throw new UsageFault(`takes \`--proposes\` as arc ids, such as \`N002\`, \`ideate\` or \`follow-ups\`: \`${odd[0]}\` is none.`);
     if (JSON.stringify(data.proposes ?? []) !== JSON.stringify(proposes)) { data.proposes = proposes; changed.push("proposes"); }
   }
   const carries = listOf(words, "carries")?.map(cardId);
@@ -101,7 +102,6 @@ function header(data: ArcData, words: Words): string[] {
     if (fault) throw new UsageFault(`takes \`--preview\` as the path from the workstream folder to the arc's preview, such as \`../030-next/notes/N002/${PREVIEW_FILE}\`: \`${preview}\` ${fault}.`);
     if (data.preview !== preview) { data.preview = preview; changed.push("preview"); }
   }
-  if (words.value("kind") !== null && data.kind !== "ideate" && words.value("kind") === "ideate") throw new UsageFault(`takes \`--kind\` when an arc is opened: ${data.arc} is open already.`);
   const status = words.value("status");
   if (status && status !== data.status) {
     data.status = status;
@@ -239,14 +239,14 @@ const movedWords = (ids: string[], to: string): string[] => (ids.length ? [`${id
 const shapedWords = (ws: string, ids: readonly string[]): string[] => movedWords(moveCarried(ws, ids, "shaped", "raised"), "shaped");
 
 function edit(args: string[]): number {
-  // `--kind` is the arc's own (build or ideate) and a row's too (fix, change, question): a row's word is refused and names `row edit`.
+  // An arc has no `--kind`: its address is its kind. A row's kind (fix, change, question) is refused and names `row edit`; any other `--kind` is an option the command does not take.
   const kindAt = args.findIndex((word) => word === "--kind" || word.startsWith("--kind="));
   const kindGiven = kindAt < 0 ? null : args[kindAt].includes("=") ? args[kindAt].slice(7) : args[kindAt + 1] ?? null;
-  const rowKind = kindGiven !== null && !(ARC_KINDS as readonly string[]).includes(kindGiven) && (ROW_KINDS as readonly string[]).includes(kindGiven);
+  const rowKind = kindGiven !== null && (ROW_KINDS as readonly string[]).includes(kindGiven);
   refuseFlags(args, rowKind ? ROW_FLAGS : ROW_FLAGS.filter((name) => name !== "kind"), (name) => `does not take \`--${name}\`: it is a row's field — \`row edit <workstream>/N<nnn> <row> --${name} …\` changes it, and \`row add\` adds the row.`);
   const words = readWords(args, OPTIONS);
   const [ref, ...more] = words.paths;
-  if (more.length) throw new UsageFault("takes one arc; a row is `row edit <workstream>/N<nnn> <row>`.");
+  if (more.length) throw new UsageFault("takes one arc; a row is `row edit <workstream>/<arc> <row>`.");
   const { ws, arc } = arcNamed(ref, true);
   const note = words.value("note");
   const subject = words.value("subject");
@@ -268,6 +268,8 @@ function edit(args: string[]): number {
 
   if (!data) {
     const title = words.value("title");
+    if (/^N\d/.test(arc) && arc !== nextBuildArc(ws))
+      throw new UsageFault(`opens a numbered arc only at the next free number, ${nextBuildArc(ws)}: \`${arc}\` is not it (MKT.SCRIPTS.486).`);
     if (!title || !subject || !words.value("goal")?.trim())
       throw new UsageFault(`opens ${arc} with \`--title\`, \`--subject\` and \`--goal\`: an arc opens only when all three are known, and until then its line stays in How (RULE.DEVEX.WORKSPACE.254).`);
     const reviewFixes = words.given("review-fixes");
@@ -277,12 +279,7 @@ function edit(args: string[]): number {
       if (!hasWords(note)) throw new UsageFault(`opens the review-fixes arc on the developer's words: \`--note "<their words>"\` (RULE.DEVEX.WORKSPACE.261).`);
     }
     data = newArc(arc, subject, title);
-    // `--kind ideate` opens an ideate arc (RULE.DEVEX.WORKSPACE.494): it holds the overall proposal and proposes the build arcs.
-    const kind = words.value("kind");
-    if (kind !== null) {
-      if (!(ARC_KINDS as readonly string[]).includes(kind)) throw new UsageFault(`takes \`--kind\` as one of ${ARC_KINDS.join(" · ")}: \`${kind}\` is none.`);
-      if (kind === "ideate") data.kind = "ideate";
-    }
+    // The folder is the kind (RULE.DEVEX.WORKSPACE.494): `ideate` holds the overall proposal and proposes the build arcs, `follow-ups` collects what no arc needs; nothing is stored.
     if (reviewFixes) { data.reviewFixes = true; data.status = "DECIDED"; }
     wordsGuard(arc, null, reviewFixes, words);
     header(data, words);
@@ -413,9 +410,9 @@ function remove(args: string[]): number {
 export const actions: Record<string, Action> = {
   edit: {
     describe: "open an arc, or change any field of its header and its status; --note writes a log line",
-    usage: "<workstream>/N<nnn> [--kind ideate] [--proposes N<nnn>,…] [--title …] [--goal …] [--status …] [--wait …] [--reason …] [--start] [--review-fixes] [--subject …] [--under …] [--preview …] [--decides …] [--repos …] [--cycle …] [--follows …] [--model …] [--position …] [--note …]",
+    usage: "<workstream>/<arc> [--proposes <arc>,…] [--title …] [--goal …] [--status …] [--wait …] [--reason …] [--start] [--review-fixes] [--subject …] [--under …] [--preview …] [--decides …] [--repos …] [--cycle …] [--follows …] [--model …] [--position …] [--note …]",
     run: edit,
   },
-  stamp: { describe: "write: restamp an arc's Plan row once its part of the page is current", usage: "write <workstream>/N<nnn>", run: stamp },
-  delete: { describe: "delete an arc never decided, on the developer's words", usage: "<workstream>/N<nnn> --note \"…\"", run: remove },
+  stamp: { describe: "write: restamp an arc's Plan row once its part of the page is current", usage: "write <workstream>/<arc>", run: stamp },
+  delete: { describe: "delete an arc never decided, on the developer's words", usage: "<workstream>/<arc> --note \"…\"", run: remove },
 };

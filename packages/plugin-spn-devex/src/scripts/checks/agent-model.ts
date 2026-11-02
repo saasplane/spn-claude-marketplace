@@ -2,21 +2,38 @@
 // RESTATES: spn-foundation docs/04-capabilities/01-devex/02-agent/04-plugins/01-plugins.md § The PreToolUse `agent-model`
 // check holds every launch to its model (RULE.DEVEX.AGENT.104).
 //
-// The one owner of the launch's model: refuses an Agent launch that names no model and no order names one either,
-// a launch of an order on a model other than the one its `model:` line names, and a fork, which runs on the window's
-// own model with its whole context. A launch that names no model but an order does is let through, and the event
-// fills the order's model in. Its fast path is the tool name.
+// The one owner of the launch's model: refuses a fork, which runs on the window's own model with its whole context. A launch that names no model but an
+// order does is let through, and so is one that names none at all: the event fills in the order's model, else the
+// agent kind's, else `sonnet` (`launchDefaultModel`). Its fast path is the tool name.
 //
 //   called by: events/pretooluse.ts `dispatch`, on an Agent or Task call
 
 import { readFileSync } from "node:fs";
-import { basename, resolve } from "node:path";
+import { dirname, join, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import { emit, readPayload, runAlone, workspaceRoot, type Payload, type Verdict } from "../lib/payload.ts";
 
-const ORDER_PATH = /[^\s'"`()<>]*notes\/N\d+[a-z]?\/orders\/[^\s'"`()<>]+\.md/g;
+const ORDER_PATH = /[^\s'"`()<>]*notes\/(?:N\d+[a-z]?|ideate|follow-ups)\/orders\/[^\s'"`()<>]+\.md/g;
 
 /** The three model families an order and a launch are compared by. */
 const FAMILY = /opus|sonnet|haiku/i;
+
+/** The model a launch gets where it names none and no order names one: the `model:` line of the agent file its `subagent_type` names, else `sonnet`, the model the book gives a written order (RULE.DEVEX.AGENT.104). */
+export function launchDefaultModel(payload: Payload): string {
+  const type = ((payload.tool_input ?? {}) as { subagent_type?: string }).subagent_type?.trim() ?? "";
+  const name = type.split(":").pop() ?? "";
+  if (name && name !== "fork" && /^[A-Za-z0-9._-]+$/.test(name)) {
+    const here = dirname(fileURLToPath(import.meta.url));
+    for (const folder of [join(here, "..", "..", "agents"), join(here, "..", "..", "..", "agents"), join(here, "..", "..", "..", "src", "agents")]) {
+      try {
+        const head = /^---\n([\s\S]*?)\n---/.exec(readFileSync(join(folder, `${name}.md`), "utf8"))?.[1] ?? "";
+        const found = FAMILY.exec(/^model:\s*(.*)$/m.exec(head)?.[1] ?? "")?.[0].toLowerCase();
+        if (found) return found;
+      } catch { /* try the next folder */ }
+    }
+  }
+  return "sonnet";
+}
 
 /** The model family an order's front matter names on its `model:` line, or null. */
 export function orderModel(text: string): string | null {
@@ -52,15 +69,7 @@ export function checkAgentModel(payload: Payload): Verdict {
   const input = (payload.tool_input ?? {}) as { model?: string; subagent_type?: string };
   if (input.subagent_type === "fork")
     return { deny: "A fork runs on this window's own model with its whole context (RULE.DEVEX.AGENT.104). Launch the agent with a `subagent_type` and the `model` its order names: `model: \"sonnet\"` for a written order." };
-  if (!input.model?.trim()) {
-    if (launchOrderModel(payload)) return null;
-    return { deny: "This launch names no `model` (RULE.DEVEX.AGENT.104). Add `model` to the call: `model: \"sonnet\"` for a written order, `model: \"opus\"` for design." };
-  }
-  const launched = FAMILY.exec(input.model)?.[0].toLowerCase();
-  for (const order of namedOrders(payload)) {
-    if (order.model && order.model !== launched)
-      return { deny: `The order ${basename(order.path)} names \`model: ${order.model}\` and this launch names \`${input.model}\`. Launch it with \`model: "${order.model}"\`, or change the order's \`model:\` line first (RULE.DEVEX.AGENT.104).` };
-  }
+  // A launch with no model runs on the order's, else its agent kind's, else `sonnet`: the event fills it in (`launchDefaultModel`).
   return null;
 }
 

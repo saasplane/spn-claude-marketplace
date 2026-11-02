@@ -16,6 +16,7 @@ import {
 } from "../../lib/workstream.ts";
 import { readGo } from "../../lib/go-plan.ts";
 import { cardName, type ArcData, type GoPlan } from "../../lib/workstream-schema.ts";
+import { HANDOVER_COLUMN } from "../../events/stop.ts";
 import { workstreamNamed } from "./_shared.ts";
 
 export const describe = "the handover block, written from the rows, the cards, the live orders and the pins into the arc's log, and printed";
@@ -49,8 +50,21 @@ export function liveOrders(ws: string, arcs: readonly string[]): string[] {
   return out;
 }
 
-/** The block's text: one label after another, each read from the workstream's data. */
-export function handoverBlock(ws: string, said: { continue?: string; doNotTouch?: string }): { lead: string; text: string } {
+/** One value after its label, the label padded so the value starts in `HANDOVER_COLUMN`, a long value wrapped at a word with each continuation indented to that column. */
+function blockLine(label: string, value: string): string {
+  const width = 100;
+  const pad = " ".repeat(HANDOVER_COLUMN);
+  const rows: string[] = [];
+  let row = "";
+  for (const word of value.split(" ")) {
+    if (row && row.length + 1 + word.length > width) { rows.push(row); row = word; } else row = row ? `${row} ${word}` : word;
+  }
+  rows.push(row);
+  return rows.map((one, at) => (at === 0 ? `${label}:`.padEnd(HANDOVER_COLUMN) : pad) + one).join("\n");
+}
+
+/** The block, as `text` (the one line the arc's log keeps) and `block` (the nine lines the agent pastes), each read from the workstream's data. */
+export function handoverBlock(ws: string, said: { continue?: string; doNotTouch?: string }): { lead: string; text: string; block: string } {
   const arcs = arcIdsOf(ws).map((arc) => readArc(ws, arc)).filter((one) => one !== null);
   const lead = runningArc(ws, arcs);
   if (!lead) throw new UsageFault(`finds no arc in ${basename(ws)} to write a handover in.`);
@@ -64,27 +78,28 @@ export function handoverBlock(ws: string, said: { continue?: string; doNotTouch?
   const unfinished = arcs.filter((arc) => arcStatus(arc) !== "LANDED").map((arc) => `${arc.arc} LANDED`);
   const leadData = arcs.find((arc) => arc.arc === lead);
   const date = new Date().toISOString().slice(0, 10);
-  const text = [
-    `HANDOVER, ${date}.`,
-    `continue: ${said.continue ?? OWED}`,
-    `model: ${leadData?.model ?? "unchanged"}.`,
-    `read first: approach.html#${whatId(lead)}; notes/${lead}/preview.html; arcs/${lead}/log.jsonl, its last lines.`,
-    `pins: ${pins.size ? [...pins].join("; ") : "none read"}.`,
-    `state: ${state.join("; ") || "no arc"}.`,
-    `live now: ${live.length ? live.join("; ") : "nothing running"}.`,
-    `done when: ${unfinished.length ? unfinished.join("; ") : "every arc is LANDED, and the workstream closes"}.`,
-    `do not touch: ${said.doNotTouch ?? OWED_TOUCH}`,
-    `open: ${open.length ? open.join(", ") : "none"}.`,
-  ].join(" ");
-  return { lead, text };
+  const values: Array<[string, string]> = [
+    ["continue", said.continue ?? OWED],
+    ["model", `${leadData?.model ?? "unchanged"}.`],
+    ["read first", `approach.html#${whatId(lead)}; notes/${lead}/preview.html; arcs/${lead}/log.jsonl, its last lines.`],
+    ["pins", `${pins.size ? [...pins].join("; ") : "none read"}.`],
+    ["state", `${state.join("; ") || "no arc"}.`],
+    ["live now", `${live.length ? live.join("; ") : "nothing running"}.`],
+    ["done when", `${unfinished.length ? unfinished.join("; ") : "every arc is LANDED, and the workstream closes"}.`],
+    ["do not touch", said.doNotTouch ?? OWED_TOUCH],
+    ["open", `${open.length ? open.join(", ") : "none"}.`],
+  ];
+  const text = [`HANDOVER, ${date}.`, ...values.map(([label, value]) => `${label}: ${value}`)].join(" ");
+  const block = values.map(([label, value]) => blockLine(label, value)).join("\n");
+  return { lead, text, block };
 }
 
 export function run(args: string[]): number {
   const words = readWords(args, { continue: VALUE, "do-not-touch": VALUE });
   if (words.paths.length > 1) throw new UsageFault("takes one workstream.");
   const ws = workstreamNamed(words.paths[0]);
-  const { lead, text } = handoverBlock(ws, { continue: words.value("continue") ?? undefined, doNotTouch: words.value("do-not-touch") ?? undefined });
+  const { lead, text, block } = handoverBlock(ws, { continue: words.value("continue") ?? undefined, doNotTouch: words.value("do-not-touch") ?? undefined });
   logEvent(ws, lead, "note", null, text);
-  console.log(text);
+  console.log(`\`\`\`text\n${block}\n\`\`\``);
   return 0;
 }

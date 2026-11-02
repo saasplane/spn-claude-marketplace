@@ -20,11 +20,11 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/03-platform/01-core/01-tenancy/03-people-access.md",
-      "seen": "b23c225e"
+      "seen": "429eccc0"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/03-module/01-server/01-contract/01-states.md",
-      "seen": "198b3283"
+      "seen": "38e6934b"
     }
   ]
 }

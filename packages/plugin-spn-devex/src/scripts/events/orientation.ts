@@ -363,7 +363,7 @@ function digest(path: string): string {
  * `RULE.DEVEX.AGENT.057` puts the handover on the tool that changes the wiring. This is the other end of the
  * same rule: the window that cannot adopt its own new wiring can at least say so on the way in.
  */
-function loadedBehind(): { plugin: string; loaded: string; newest: string } | null {
+function installOf(): { cacheRoot: string; market: string; plugin: string; version: string } | null {
   let here: string;
   try { here = fileURLToPath(import.meta.url).replace(/\\/g, "/"); }
   catch { return null; }
@@ -371,8 +371,22 @@ function loadedBehind(): { plugin: string; loaded: string; newest: string } | nu
   // knows where it lives, and deriving the root removes an assumption about where installs are kept.
   const at = /^(.*\/plugins\/cache)\/([^/]+)\/([^/]+)\/([^/]+)\//.exec(here);
   if (!at) return null;                                  // running from source
-  const [, cacheRoot, , plugin, loaded] = at;
-  const cached = join(cacheRoot, at[2], plugin);
+  return { cacheRoot: at[1], market: at[2], plugin: at[3], version: at[4] };
+}
+
+/**
+ * The plugin version this window loaded, read from the install path (`.../cache/<marketplace>/<plugin>/<version>/`), and null where
+ * the plugin runs from source. The SessionStart run writes it into its row as `pluginVersion`; no other event does (MKT.HOOKS.471).
+ */
+export function loadedVersion(): string | null {
+  return installOf()?.version ?? null;
+}
+
+function loadedBehind(): { plugin: string; loaded: string; newest: string } | null {
+  const install = installOf();
+  if (!install) return null;                             // running from source
+  const { cacheRoot, plugin, version: loaded } = install;
+  const cached = join(cacheRoot, install.market, plugin);
   // A directory carrying `.orphaned_at` is a previous install nothing loads, and reading one is how
   // a clock came to report a window behind a version that had been retired.
   const versions = listdir(cached).filter((v) => !isFile(join(cached, v, ".orphaned_at")));
@@ -441,7 +455,8 @@ type Repo = { name: string; path: string; world: string | null; stack: string | 
               pins: string[]; want: string[]; have: Set<string>; wired: boolean; nodes: number | null };
 
 /**
- * Which rung of the ladder the ground says you are on. The offer depends on it, so a partner in week
+ * Which rung of the ladder the ground says you are on: the book's four rows, 0 to 3, building being 3. A concept with
+ * few nodes below it is no different step and the plugin does nothing different on it (MKT.HOOKS.487). The offer depends on it, so a partner in week
  * one and a partner in month six get different sessions. Rungs past building need the machine store
  * and the network, so this stops where the workspace can answer.
  */
@@ -452,8 +467,7 @@ function rung(repos: Repo[]): [number, string] {
   const withoutConcept = apps.filter((r) => !isFile(join(r.path, "CONCEPT.md")));
   if (withoutConcept.length)
     return [2, "an APPS repo carries no CONCEPT.md — " + withoutConcept.map((r) => r.name).join(" ")];
-  if (apps.every((r) => (r.nodes ?? 0) < 3)) return [3, "concept present, very few nodes below it"];
-  return [4, "building — apps and packages present"];
+  return [3, "building — apps and packages present"];
 }
 
 /**
@@ -472,7 +486,8 @@ function developerName(): string | null {
 }
 
 /**
- * The welcome, word for word as it was approved. Only the heading varies: a first visit is a
+ * The welcome, word for word as the DevEx agent construct's § The welcome opens states it. The words are kept in this code, and the
+ * plugin reads no message at run time. Only the heading varies: a first visit is a
  * workspace with no workstream in any state, which the ground already says, so the plugin keeps no
  * state of its own to tell the two apart. With no name, the name's clause drops and nothing else.
  *
@@ -905,10 +920,9 @@ export function orient(root: string, cwd: string, whole = true): [message: strin
   const governed = repos.filter((r) => r.world);
   const streams = workstreams(root);
   const [level, why] = rung(governed);
-  // THE WELCOME IS THE AGENT'S OWN, AND IT IS TYPED HERE ON PURPOSE. Do not read it from a repo. This
-  // plugin runs in a partner's workspace, where the foundation book is not a member and absence is
-  // how access control works — so a banner sourced from that book would render empty for the reader
-  // who needs it most. Everything below the welcome is discovered, and the welcome alone is declared.
+  // THE WELCOME'S WORDS ARE KEPT IN THE CODE, as the DevEx agent construct's § The welcome opens states them, and the plugin reads
+  // no message from a repo or the book at run time: a partner's workspace holds no book, so a banner read from it would render
+  // empty for the reader who needs it most. Everything below the welcome is discovered, and the welcome alone is declared here.
   const greeting = welcome(who, streams.length === 0, isBuilderWorkspace(root));
   const clean = (lines: string[]) => lines.map((line) => line.replace(/[ \t]+$/, "")).join("\n");
 
@@ -972,8 +986,8 @@ export function orient(root: string, cwd: string, whole = true): [message: strin
     behind: behind ? `this window runs ${behind.plugin} ${behind.loaded}, ${behind.newest} is installed` : null,
     late: lateClauses(repos.flatMap((r) => lateBranch(r.name, r.path) ?? [])),
     left: setsLeftBehind(root, streams),
-    // Rung 4 is an ordinary session, and an ordinary session says nothing about its rung.
-    rung: level < 4 ? `rung ${level}: ${why}` : null,
+    // Building (rung 3) is an ordinary session, and an ordinary session says nothing about its rung.
+    rung: level < 3 ? `rung ${level}: ${why}` : null,
   };
   const message = whole ? clean([...greeting, WELCOME_SPACER, statusLine(ground)]) : statusLine(ground);
 
@@ -1105,6 +1119,8 @@ if (runAlone("orientation.ts")) {
   // times per check instead.
   const started = performance.now();
   begin({ script: "spn-devex", event: "SessionStart", tool: null, session: payload.session_id ?? null, ...tagsOf(payload),
+          // THE LOADED PLUGIN'S VERSION rides on this run's row alone (MKT.HOOKS.471); null where the plugin runs from source.
+          pluginVersion: loadedVersion(),
           process: { group: "events", action: "orientation" } }, cwd);
   let result: [string, string] | null = null;
   try {

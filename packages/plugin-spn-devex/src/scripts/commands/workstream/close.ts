@@ -35,7 +35,7 @@ const RETRO_PREFIX = "Retrospective · ";
 
 /** What a closed page carries as its closing block: what was delivered, what was learned and the thanks. */
 const CLOSING_PARTS: Array<[RegExp, string]> = [
-  [/What (?:was|we) delivered/i, "\"What was delivered\""], [/What (?:was|we) learned/i, "\"What was learned\""], [/Thank you/i, "\"Thank you\""],
+  [/What we delivered/i, "\"What we delivered\""], [/What we learned/i, "\"What we learned\""], [/Thank you/i, "\"Thank you\""],
 ];
 
 /** The closing block's pieces an approach page lacks, named; none where it carries all. */
@@ -46,8 +46,8 @@ export function missingClosingBlock(page: string): string[] {
 /** The refusal of a page without its closing block: the shape closed pages carry, the rule, and that nothing was changed. */
 const closingRefusal = (missing: string[]): string =>
   `the approach page has no closing block (missing ${missing.join(", ")}). Write it under the masthead, in the shape closed pages carry: ` +
-  "a `<div class=\"sds-note\">` holding a 🚀 lead line, `<p>&nbsp;</p>`, `<p><strong>📦 What was delivered</strong></p>` and a list, " +
-  "`<p>&nbsp;</p>`, `<p><strong>🧠 What was learned</strong></p>` and a list, `<p>&nbsp;</p>`, then `<p><strong>Thank you 👍</strong></p>` and a line " +
+  "a `<div class=\"sds-note\">` holding a 🚀 lead line, `<p>&nbsp;</p>`, `<p><strong>📦 What we delivered</strong></p>` and a list, " +
+  "`<p>&nbsp;</p>`, `<p><strong>🧠 What we learned</strong></p>` and a list, `<p>&nbsp;</p>`, then `<p><strong>Thank you 👍</strong></p>` and a line " +
   "(RULE.DEVEX.WORKSPACE.206)";
 
 /** The page with its masthead status and its header block reading DONE. */
@@ -76,12 +76,16 @@ type Retro = {
 
 const SPLIT_KINDS = ["change", "proof", "managing", "refusals", "waiting"] as const;
 
+/** A split row's refusals: the refused calls of every class, counted where each keeps its class (`debug cost`), with no minutes of their own. */
+export const refusalsOf = (row: SplitRow): { calls: number; minutes: number } =>
+  ({ calls: Object.entries(row).reduce((sum, [key, share]) => sum + (key === "key" ? 0 : (share as { refused?: number }).refused ?? 0), 0), minutes: 0 });
+
 /** The split of a workstream: its arcs' lines added together, and the ratio of managing to change by minutes. */
 export function splitOf(root: string, name: string): Pick<Retro, "split" | "managingToChange"> {
   const split = Object.fromEntries(SPLIT_KINDS.map((kind) => [kind, { calls: 0, minutes: 0 }])) as Retro["split"];
   for (const row of readSplit(root, name) as SplitRow[]) {
     if (row.key.includes(" · part ")) continue;
-    for (const kind of SPLIT_KINDS) { split[kind].calls += row[kind].calls; split[kind].minutes = Math.round((split[kind].minutes + row[kind].minutes) * 10) / 10; }
+    for (const kind of SPLIT_KINDS) { const share = kind === "refusals" ? refusalsOf(row) : row[kind]; split[kind].calls += share.calls; split[kind].minutes = Math.round((split[kind].minutes + share.minutes) * 10) / 10; }
   }
   return { split, managingToChange: split.change.minutes > 0 ? Math.round((split.managing.minutes / split.change.minutes) * 100) / 100 : null };
 }
@@ -347,7 +351,7 @@ export function run(args: string[]): number {
   renameSync(ws, target);
   console.log(`ok · ${basename(ws)} closed · approach page stamped DONE · moved from ${held}/ into closed/`);
   // A CLOSE IS A MILESTONE (RULE.DEVEX.WORKSPACE.206): the message is written right now, and the Stop hook sends back a reply that lacks it.
-  console.log("Next: write the closing message now: a `# 🚀 <title>` heading (or ✈️), a line reading `&nbsp;`, `### 📦 What we delivered` with bullets, " +
-    "`### 🧠 What we learned` with bullets, `Thank you 👍`, and one plain line that the window can be retired (RULE.DEVEX.WORKSPACE.206).");
+  console.log("Next: write the closing message now: a `# 🚀 <workstream> (<title>) is closed` heading, a line reading `&nbsp;`, one paragraph, " +
+    "`### 📦 What we delivered` with bullets, `### 🧠 What we learned` with bullets, `Thank you 👍`, and one sentence that this window is done and can be retired (RULE.DEVEX.WORKSPACE.206).");
   return 0;
 }

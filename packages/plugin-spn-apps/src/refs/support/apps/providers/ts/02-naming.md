@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/10-providers/ts/02-naming.md",
-      "seen": "7a247995"
+      "seen": "83322d82"
     }
   ]
 }
@@ -186,7 +186,7 @@ The field that tells the two kinds apart is `moduleType`, of `SPAppModuleType` (
 
 ### A module names itself
 
-A module's one code names its whole surface: its tables (`iam_`), its permissions (`IAM_*`), its labels, its env keys (`{APP}_IAM_*`), its API path (`/iam`), its CLI namespace (`iam`) and, over the network, the module a call is for. The service decides only whether a module is mounted here or held remotely. **A module's code is 3 to 8 of A–Z and 0–9, starting with a letter, with no underscore, and `IAM`, `ORG`, `MDM`, `NTF`, `CMP`, `DOC`, `LNG`, `JOB` and `ENT` are SaaS Plane's own, so a new module never takes one** (`RULE.SUPPORT.APPS.250` · MUST · skill:spn-apps/implement). The underscore is excluded because it separates the code from the rest of a permission or a table name.
+A module's one code names its whole surface: its tables (`iam_`), its permissions (`IAM_*`), its labels, its env keys (`{APP}_IAM_*`), its API path (`/iam`), its CLI namespace (`iam`) and, over the network, the module a call is for. The service decides only whether a module is mounted here or held remotely. **A new module never takes one of the nine codes SaaS Plane holds** (`IAM`, `ORG`, `MDM`, `NTF`, `CMP`, `DOC`, `LNG`, `JOB` and `ENT`) (`RULE.SUPPORT.APPS.250` · MUST · skill:spn-apps/implement). The code's grammar, 3 to 8 of A–Z and 0–9, starting with a letter, with no underscore, is stated once, in RULE.SUPPORT.APPS.253 of the lifecycle chapter. The underscore is excluded because it separates the code from the rest of a permission or a table name.
 
 - **The module declares its code and config in its own contract.** `<MOD>_MODULE_CODE` and `<MOD>_MODULE_CONFIG` sit in `src/contract/constants.ts`, as `DOC_MODULE_CODE = 'DOC'` and `DOC_MODULE_CONFIG` do. The config is `{ code, name, description }`.
 - **The manager answers with it.** Every manager, runtime or remote, declares `moduleConfig`, and `initModule(app)` takes no config. The start file's line names the manager only.
@@ -256,8 +256,6 @@ A field's name says whether it holds a person's data, as `_id` and `_at` say wha
 - **`spnutils apps gen-validators` refuses a contract field that ends with a personal word outside the forms**: `surname`, `familyName`, `forename`, `givenName`, `fullName`, `nickname`, `birthday`, `dob`, `dateOfBirth`, `mobile`, `mobileNumber`, `phoneNumber`, `telephone`, `mail`. The refusal names the form to use instead.
 
 **One matcher tests a key against the forms.** It is `isPersonalFieldName`, in `support-ts` (the universal core) in a file of its own, `utils/personal.ts`, so a service, a web app and the generator call the same function. The log redactor, the export, the erasure and `gen-validators` are the four callers.
-
-**A field that holds personal data but whose name is not one of these forms is marked on its contract with a `@personal` doc tag.** `spnutils apps gen-validators` writes the marked names into the generated validators, which register them with `markPersonalFieldNames` when they load, and `isPersonalFieldName` then answers for a name form or a marked name. A name once marked is personal in every state that uses it, because the redactor walks untyped data and knows only a key's name, and hiding too much is safer than hiding too little. For example, `/** The registration number. For a sole trader it is often a tax id. @personal */ registrationNumber: CDTString | null;`.
 
 ## Packages
 
@@ -329,7 +327,7 @@ A field's name says whether it holds a person's data, as `_id` and `_at` say wha
 | Input command | `{Action}{Entity}Command` | `CreateUserCommand` |
 | Enum | PascalCase + `Type` | `DSButtonType` |
 | Discriminator | `<noun>Type` and `<noun>_type` | `credentialType` |
-| Variance carrier | `{Host}{Role}` and `{Host}{Role}{Variant}` | `OrgAuthProviderConfigSAML` |
+| Variance carrier | `{Host}{Role}` and `{Host}{Role}{Variant}` | `OrgAppAuthProviderConfigSAML` |
 | Helper | `prepare*` | `prepareServiceAppConfigFromEnv` |
 | Id suffix | `Id` / `Ids` | `accountIds` |
 | Constant | `UPPER_SNAKE_CASE` | `DS_SIZE_ICON_SIZE_MAP` |

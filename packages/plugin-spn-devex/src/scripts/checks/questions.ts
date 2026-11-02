@@ -19,7 +19,7 @@ import {
 } from "../lib/workstream.ts";
 import { isBuilderWorkspace } from "../lib/builder.ts";
 import { runsTheWork } from "./how-it-runs.ts";
-import { SIGNS, cardName, raisedCardFaults, type Card, type Question, type Suggestion } from "../lib/workstream-schema.ts";
+import { ARC_ID, SIGNS, cardName, raisedCardFaults, type Card, type Question, type Suggestion } from "../lib/workstream-schema.ts";
 import { existsSync } from "node:fs";
 import { panelOnRecord, panelsVisible } from "./split-plan.ts";
 import { notesDirOf, readJsonl, suggestionsFileOf } from "../lib/workstream.ts";
@@ -177,7 +177,7 @@ export function raiseFaults(ws: string, arc: string, card: Card, root: string | 
   const seen = root ? panelsVisible(root) : false;
   for (const view of fresh) {
     const where = `the FRESH ${view.lens} view`;
-    const words = typeof view.words === "string" ? view.words.replace(/^notes\/N\d+[a-z]?\/work\//, "") : "";
+    const words = typeof view.words === "string" ? view.words.replace(new RegExp(`^notes/${ARC_ID.source.slice(1, -1)}/work/`), "") : "";
     const base = join(notesDirOf(ws, arc), "work");
     const file = words ? resolve(base, words) : "";
     if (!file || !file.startsWith(`${base}/`) || !existsSync(file)) faults.push(`${where}'s words file \`${view.words ?? ""}\` is not in ${arc}'s notes work folder`);
@@ -193,7 +193,7 @@ function judged(path: string): string | null {
   const ws = workstreamAround(path);
   if (!ws || !isDataLayout(ws)) return null;
   const name = basename(path);
-  if (name === "approach.html" || /\/notes\/N\d+[a-z]?\/preview\.html$/.test(resolve(path).split("\\").join("/"))) return ws;
+  if (name === "approach.html" || new RegExp(`/notes/${ARC_ID.source.slice(1, -1)}/preview\\.html$`).test(resolve(path).split("\\").join("/"))) return ws;
   return null;
 }
 

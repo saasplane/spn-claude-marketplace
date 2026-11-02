@@ -5,13 +5,16 @@
 //
 // THE PANEL IS KNOWN BY ITS AGENT TYPE: the payload's `agent_type`, else the `agentType` of the `.meta.json` beside the
 // transcript, is `spn-devex:spn-panel` or ends in `spn-panel`. Its LENS is the one named beside the word "lens" in its first prompt, else the first lens word in it, its
-// VERDICT the first line of its last reply, and its WORK the workstream, arc and part its first prompt names, else the
+// VERDICT the first line of its last reply that opens with a verdict, and its WORK the workstream, arc and part its first prompt names, else the
 // main window's carried ones. A reply whose first line is none of the three verdicts writes no row.
 //
-//   called by: events/subagentstop.ts
+//   called by: events/subagentstop.ts, and events/stop.ts through `replayPanels`
 
 import { existsSync, readFileSync, readdirSync } from "node:fs";
+import { basename, dirname, join } from "node:path";
 import { readFrom, contentText } from "./usage.ts";
+import { logFiles } from "../../../../plugin-support-lib/src/lib/debug-store.ts";
+import { telemetryDir, writePanel } from "../../../../plugin-support-lib/src/lib/timing.ts";
 import { WORKSTREAM_STATES, workstreamsDir } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { ARC_PATTERN, PART_PATTERN, WORKSTREAM_PATTERN, SPDevExAgentLensType, SPDevExAgentPanelVerdictType, held } from "../../../../plugin-support-lib/src/lib/telemetry-values.ts";
 
@@ -51,11 +54,19 @@ export function firstPrompt(transcript: string | undefined): string {
   return "";
 }
 
-/** The first line of a helper's last assistant text or handed-back report, markup and leading marks taken off. Empty where it wrote none. */
+/** The first line of a reply, markup and leading marks taken off. */
+const firstLineOf = (reply: string): string => (reply.split("\n").find((one) => one.trim()) ?? "").replace(/^[^A-Za-z]+/, "").trim();
+
+/**
+ * The first line of the last reply of a helper (assistant text or handed-back report) that opens with a verdict, markup and leading marks
+ * taken off. A panel briefed in two rounds ends on an answer that opens with none, so its first answer's line is the one read.
+ * Empty where no reply opens with a verdict.
+ */
 export function lastFirstLine(transcript: string | undefined): string {
   try {
     if (!transcript || !existsSync(transcript)) return "";
     let last = "";
+    const keep = (reply: string): void => { const first = firstLineOf(reply); if (verdictOf(first)) last = first; };
     for (const line of readFileSync(transcript, "utf8").split("\n")) {
       if (!line.includes('"assistant"')) continue;
       try {
@@ -63,20 +74,20 @@ export function lastFirstLine(transcript: string | undefined): string {
         if (entry.type !== "assistant" || !Array.isArray(entry.message?.content)) continue;
         // A panel run in the background ends by handing its report back, with no closing text, so that report is its last reply.
         for (const part of entry.message.content as Array<{ type?: string; text?: string; name?: string; input?: { message?: unknown } }>) {
-          if (part.type === "text" && part.text?.trim()) last = part.text;
-          else if (part.type === "tool_use" && part.name === "SubagentHandback" && typeof part.input?.message === "string" && part.input.message.trim()) last = part.input.message;
+          if (part.type === "text" && part.text?.trim()) keep(part.text);
+          else if (part.type === "tool_use" && part.name === "SubagentHandback" && typeof part.input?.message === "string" && part.input.message.trim()) keep(part.input.message);
         }
       } catch { /* a torn line is skipped */ }
     }
-    return (last.split("\n").find((one) => one.trim()) ?? "").replace(/^[^A-Za-z]+/, "").trim();
+    return last;
   } catch { return ""; }
 }
 
-/** The verdict a panel's last reply opens with, as the contract's value, or null where it opens with none of the three. */
+/** The verdict a panel's reply opens with, as the contract's value, or null where it opens with none of the three. `PASS_WITH_ADVICE` reads as "Pass with advice". */
 export function verdictOf(firstLine: string): string | null {
   const text = firstLine.toLowerCase();
   if (/^blocked\b/.test(text)) return SPDevExAgentPanelVerdictType.BLOCKED;
-  if (/^pass with advice\b/.test(text)) return SPDevExAgentPanelVerdictType.PASS_WITH_ADVICE;
+  if (/^pass[ _]with[ _]advice\b/.test(text)) return SPDevExAgentPanelVerdictType.PASS_WITH_ADVICE;
   if (/^pass\b/.test(text)) return SPDevExAgentPanelVerdictType.PASS;
   return null;
 }
@@ -111,8 +122,8 @@ function workstreamNamed(root: string, name: string): string | null {
   return null;
 }
 
-/** `<NNN-subject>/N<nnn>` or `<NNN>/N<nnn>`, and a go part id (`release-spn-foundation-1`), as a prompt names them. */
-const ARC_REF = /(?<![\w/.-])(\d{3}(?:-[a-z0-9][a-z0-9-]*)?)\/(N\d{3})(?![\w])/;
+/** `<NNN-subject>/<arc>` or `<NNN>/<arc>`, an arc being `N<nnn>`, `ideate` or `follow-ups`, and a go part id (`release-spn-foundation-1`), as a prompt names them. */
+const ARC_REF = /(?<![\w/.-])(\d{3}(?:-[a-z0-9][a-z0-9-]*)?)\/(N\d{3}|ideate|follow-ups)(?![\w])/;
 const PART_REF = /(?<![\w/-])((?:baseline|docs|code|full|generated|release|proof)-[a-z0-9][a-z0-9-]*[a-z0-9])(?![\w/-])/;
 
 /** The workstream, arc and part a panel's first prompt names; each is null where it names none. */
@@ -132,4 +143,53 @@ export function elapsedOf(transcript: string | undefined): number {
     const stamps = [...readFileSync(transcript, "utf8").matchAll(/"timestamp":"([^"]+)"/g)].map((one) => Date.parse(one[1])).filter((one) => !Number.isNaN(one));
     return stamps.length > 1 ? Math.max(0, Math.max(...stamps) - Math.min(...stamps)) : 0;
   } catch { return 0; }
+}
+
+/** The agent ids that already have a `PANEL` row in the workspace's log, rotated file included. Empty where recording is off. */
+function panelsOnRecord(root: string): Set<string> {
+  const known = new Set<string>();
+  try {
+    const dir = telemetryDir(root);
+    if (!dir) return known;
+    for (const file of logFiles(join(dir, "hooks.jsonl")))
+      for (const line of readFileSync(file, "utf8").split("\n")) {
+        if (!line.includes('"PANEL"')) continue;
+        try { const row = JSON.parse(line) as { mtype?: string; agent?: string | null }; if (row.mtype === "PANEL" && row.agent) known.add(row.agent); } catch { /* a torn line is skipped */ }
+      }
+  } catch { /* nothing read */ }
+  return known;
+}
+
+/**
+ * The verdicts no hook recorded, written from the finished helper transcripts beside the window's own (RULE.DEVEX.WORKSPACE.485).
+ * It lists `<window transcript without .jsonl>/subagents/agent-<id>.jsonl`, and for each one the panel agent gave, whose last reply
+ * `verdictOf` reads and whose agent id has no `PANEL` row yet, writes that row with the same `writePanel` call `recordPanel` uses.
+ * A transcript whose last reply has no verdict yet is left for the next turn end. Silent, and never throws.
+ *
+ * @param facts  the window's script, event, tool and session, as the row's head
+ * @param read   the agent ids an earlier turn end read; they are not read again
+ * @returns      `read` with each id this run settled (a row written, a row already there, or a helper that is not the panel)
+ */
+export function replayPanels(root: string, transcriptPath: string | undefined, facts: { script: string; event: string | null; tool: string | null; session: string | null },
+                             read: string[] = []): string[] {
+  const settled = new Set(read);
+  try {
+    if (!transcriptPath) return [...settled];
+    const folder = join(dirname(transcriptPath), basename(transcriptPath).replace(/\.jsonl$/, ""), "subagents");
+    const names = readdirSync(folder).filter((name) => /^agent-.+\.jsonl$/.test(name));
+    const recorded = panelsOnRecord(root);
+    for (const name of names) {
+      const agent = name.slice("agent-".length, -".jsonl".length);
+      if (settled.has(agent)) continue;
+      const transcript = join(folder, name);
+      if (!isPanel({ agent_transcript_path: transcript })) { if (existsSync(metaOf(transcript))) settled.add(agent); continue; }
+      if (recorded.has(agent)) { settled.add(agent); continue; }
+      const verdict = verdictOf(lastFirstLine(transcript));
+      if (!verdict) continue;
+      const prompt = firstPrompt(transcript);
+      writePanel(root, { ...facts, agent, ...namedWork(root, prompt) }, { lens: lensOf(prompt), verdict, ms: elapsedOf(transcript) });
+      settled.add(agent);
+    }
+  } catch { /* a turn end never fails because a verdict could not be replayed */ }
+  return [...settled];
 }

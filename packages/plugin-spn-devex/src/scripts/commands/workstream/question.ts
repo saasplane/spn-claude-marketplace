@@ -4,8 +4,8 @@
 // The chapter is the source of truth; a rule change is edited there first, then here, in the same change.
 // Input takes either case (`q28`, `Q28`, `036/Q28`); a stored id stays lowercase and everything printed or logged names the card with the capital.
 //
-//   spn-devex workstream question raise <workstream>/N<nnn> --file card.json
-//   spn-devex workstream question show Q<n> --in <notes/N<nnn>/preview.html>
+//   spn-devex workstream question raise <workstream>/<arc> --file card.json
+//   spn-devex workstream question show Q<n> --in <notes/<arc>/preview.html>
 //   spn-devex workstream question brief <workstream>/Q<n>
 //   spn-devex workstream question answer Q<n> --key A --words "…" [--entries E7,E9]
 //   spn-devex workstream question cite Q<n> --entries E7,E9|none
@@ -150,10 +150,10 @@ function show(args: string[]): number {
   if (more.length) throw new UsageFault("takes one question.");
   const { ws, records, record } = recordNamed(ref);
   const target = words.value("in");
-  if (!target) throw new UsageFault("needs `--in <notes/N<nnn>/preview.html>`.");
+  if (!target) throw new UsageFault("needs `--in <notes/<arc>/preview.html>`.");
   const path = isFile(resolve(target)) ? resolve(target) : resolve(ws, target);
   const rel = fromWorkstream(ws, path);
-  if (!/^notes\/N\d+[a-z]?\/preview\.html$/.test(rel) || !isFile(path)) throw new UsageFault(`shows a card on an arc's preview, \`notes/N<nnn>/preview.html\`, and \`${target}\` is none.`);
+  if (!/^notes\/(?:N\d+[a-z]?|ideate|follow-ups)\/preview\.html$/.test(rel) || !isFile(path)) throw new UsageFault(`shows a card on an arc's preview, \`notes/<arc>/preview.html\`, and \`${target}\` is none.`);
   if (record.state !== "open") throw new UsageFault(`shows an open card, and ${cardName(record.id)} is ${record.state}.`);
   if (!record.shownIn.includes(rel)) record.shownIn.push(rel);
   const lines = finish(ws, records);
@@ -264,9 +264,9 @@ function settle(args: string[], state: "answered" | "withdrawn"): number {
 }
 
 export const actions: Record<string, Action> = {
-  raise: { describe: "raise a card: the next number, the record, the card in the approach page's Open", usage: "<workstream>/N<nnn> --file card.json", run: raise },
+  raise: { describe: "raise a card: the next number, the record, the card in the approach page's Open", usage: "<workstream>/<arc> --file card.json", run: raise },
   brief: { describe: "print a fresh view's brief from the card: the problem and the constraints first, no options, the proposals to follow", usage: "<workstream>/Q<n>", run: brief },
-  show: { describe: "show an open card on an arc's preview, in its Open", usage: "Q<n> --in <notes/N<nnn>/preview.html>", run: show },
+  show: { describe: "show an open card on an arc's preview, in its Open", usage: "Q<n> --in <notes/<arc>/preview.html>", run: show },
   answer: { describe: "answer a card in your words; it leaves every Open; with --entries, folded into the What, cited, and the go written again", usage: "Q<n> --key <option> --words \"…\" [--entries E7,E9]", run: (args) => settle(args, "answered") },
   cite: { describe: "cite an answered card in entries of its arc's sheet, or record with none that it changes no repository file; the go written again", usage: "Q<n> --entries E7,E9|none", run: cite },
   withdraw: { describe: "withdraw a card in your words; it leaves every Open", usage: "Q<n> --words \"…\"", run: (args) => settle(args, "withdrawn") },

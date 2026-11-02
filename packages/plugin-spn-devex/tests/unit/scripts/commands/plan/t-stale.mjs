@@ -9,7 +9,7 @@ import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 
 const SCRIPTS = resolve(PLUGIN, "src", "scripts");
-const { movedFiles, pinsOf, run } = await import(join(SCRIPTS, "commands", "plan", "stale.ts"));
+const { factPinsOf, movedFiles, pinsOf, run } = await import(join(SCRIPTS, "commands", "plan", "stale.ts"));
 
 const BASE = mkdtempSync(join(tmpdir(), "t-plan-stale-"));
 process.on("exit", () => rmSync(BASE, { recursive: true, force: true }));
@@ -128,6 +128,25 @@ console.log("\n=== plan stale — `run`, over a plan naming several repositories
   ok("[MKT.SCRIPTS.178] the uncommitted repository names its file", /spn-x: README\.md/.test(result.said), result.said);
   ok("[MKT.SCRIPTS.178] the committed repository names its file", /spn-y: new\.md/.test(result.said), result.said);
   ok("[MKT.SCRIPTS.178] the untouched repository reports nothing moved", /spn-z: nothing moved/.test(result.said), result.said);
+}
+
+console.log("\n=== plan stale — a plan of the ideate arc reads the facts of arcs/ideate");
+{
+  const { ws, pinned } = withRepos("ideate-facts", ["spn-x"]);
+  const folder = join(ws, ".spndevex", "workstreams", "open", "035-org-shape");
+  mkdirSync(join(folder, "notes", "ideate"), { recursive: true });
+  mkdirSync(join(folder, "arcs", "ideate"), { recursive: true });
+  writeFileSync(join(folder, "arcs", "ideate", "facts.jsonl"), `${JSON.stringify({ id: "f1", source: "spn-x/README.md:1", commit: pinned["spn-x"] })}\n`, "utf8");
+  const plan = join(folder, "notes", "ideate", "plan.md");
+  writeFileSync(plan, "# ideate plan\n", "utf8");
+  const pins = factPinsOf(plan);
+  ok("[MKT.SCRIPTS.485] a plan at notes/ideate/plan.md reads the pins in arcs/ideate/facts.jsonl",
+    pins.length === 1 && pins[0].id === "f1" && pins[0].repo === "spn-x" && pins[0].paths[0] === "README.md", JSON.stringify(pins));
+  writeFileSync(join(ws, "spn-x", "README.md"), "changed\n", "utf8");
+  const result = captured(() => run([plan]));
+  ok("[MKT.SCRIPTS.485] a stale pin of the ideate arc is named", /f1 spn-x\/README\.md: moved since/.test(result.said), result.said);
+  const other = join(folder, "notes", "other", "plan.md");
+  ok("[MKT.SCRIPTS.485] a plan under notes/other/ reads no facts", factPinsOf(other).length === 0);
 }
 
 console.log("\n=== plan stale — through the entry, with the native grammar");

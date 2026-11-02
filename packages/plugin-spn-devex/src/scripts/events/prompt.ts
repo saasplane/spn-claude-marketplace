@@ -34,8 +34,13 @@ import { eventWorkspace, isDir, readPayload, runAlone, type Payload } from "../l
 import { ARCS, DEVEX, WORKSTREAM_STATES, workstreamsDir } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { sessionDir } from "../../../../plugin-support-lib/src/lib/debug-store.ts";
 import { begin, end, span, tagsOf } from "../../../../plugin-support-lib/src/lib/timing.ts";
-import { ARC_NAME, WORKSTREAM_NAME, handoverLines } from "./stop.ts";
+import { WORKSTREAM_NAME, handoverLines } from "./stop.ts";
 import { bindNamed, bindVisited, readWindow, windowSet } from "../lib/window.ts";
+import { ARC_ID } from "../lib/workstream-schema.ts";
+/** An arc's address as a pattern part, read from `ARC_ID`: `N<nnn>`, `ideate` or `follow-ups`. */
+const ARC_PART = ARC_ID.source.slice(1, -1);
+/** An arc as a handover text writes it: `N011`, `ideate` or `follow-ups`, not inside a longer word or a folder name. */
+const ARC_NAME = new RegExp(`(?<![\\w-])(?:${ARC_PART})(?![\\w-])`);
 import { goStandings } from "./orientation.ts";
 
 /** What a session is called, and which of the two forms the name has. */
@@ -120,7 +125,7 @@ function workstreamsNamed(text: string, root: string): string[] {
 }
 
 /**
- * The subject an arc carries: the `subject` of `arcs/N011/state.json`, such as `artifacts-by-domain`.
+ * The subject an arc carries: the `subject` of `arcs/<arc>/state.json` (`N011`, `ideate` or `follow-ups`), such as `artifacts-by-domain`.
  * Null where the arc has no such file or its subject is not a non-empty text.
  */
 function arcSubject(folder: string, arc: string): string | null {
@@ -189,8 +194,8 @@ export function bindingsOf(prompt: string, root: string, session: string): Array
   return named.length === 1 ? [{ name: named[0], by: "prompt" }] : [];
 }
 
-/** An arc named right after a workstream: `, N001`, `/N001`, ` · N001` or ` N001`. */
-const ARC_AFTER = /^\s*(?:[,/·]\s*|\s)?N\d{3}\b/;
+/** An arc named right after a workstream: `, N001`, `/ideate`, ` · follow-ups` or ` N001`. */
+const ARC_AFTER = new RegExp(`^\\s*(?:[,/·]\\s*|\\s)?${ARC_PART}(?![\\w-])`);
 
 /**
  * The workstreams a `continue:` line (before `also open:`) gives work to: the first it names, and each later one that
