@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/04-plugins/01-plugins.md",
-      "seen": "583e9aa2"
+      "seen": "2dfb9526"
     }
   ]
 }
@@ -239,6 +239,10 @@ A session reads the installed cache, so changed files and unchanged behaviour is
 **The sitting that changed the wiring finishes it before it offers a handover** (`RULE.DEVEX.AGENT.059` · MUST · skill:spn-devex/deliver). A handover can be complete and still point at wiring nobody installed, and the next window then opens on the previous generation.
 
 **A partner's form of this is shorter and the order is identical**: check whether a newer version is published, install it, run the syncs, take a fresh window.
+
+## A release that changes how the agent proposes runs the proposal cases first
+
+**A plugins release that changes the ideate skill, the panel or the card grammar runs the fixed proposal cases first, and does not ship on a failed one** (`RULE.DEVEX.AGENT.169` · MUST · skill:spn-devex/deliver). A check can prove a card is whole, never that its options are good, so the agent's judgment is proved the way a model is: on fixed cases, each run by a fresh agent that sees only the problem and its nearest constructs. The first three are kept from 1 November 2026. A migration contribution from a service that holds IAM remotely must be answered with the framework's route beside `/remote`, the pattern that already exists. A helper that meets a name no entry holds must stop with `needs-you`, once in code and once in docs. A case that fails holds the release and names what the fresh agent proposed instead. The cases, their expected outcomes and the runner live with the plugins' tests.
 
 ## A release carries its migration, and a window applies what is pending first
 

@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/06-modules/",
-      "seen": "42ee10a7"
+      "seen": "7c77a187"
     }
   ]
 }
@@ -201,7 +201,7 @@ Every resource key follows one shape, and the middle token names the **connectio
 - **The estate publishes two proxy counts beside a deployment's ports.** `{SPC}_API_TRUSTED_PROXIES` is `2` for a deployment that has a route (the load balancer, then the gateway) and `0` for an `INTERNAL` one. `{SPC}_API_REMOTE_TRUSTED_PROXIES` is `3`: the calling service, the internal load balancer, then the private gateway. A value a team authors for either key wins.
 - **A module held remotely reads the address under its own prefix**, `{SPC}_{MODULE}_REMOTE_ENDPOINTS`, and the service's own settings write that key as a reference: `DMO_IAM_REMOTE_ENDPOINTS=${DMO_REMOTE_SERVICE_API_ENDPOINTS}`. So moving a module to another service is a change of one settings line.
 - **The namespaces are `prd,plt,vnd`**, and the token's audience is `spn-remote`, so a token issued for anything else is refused.
-- **Locally the provider is `LOCAL`**, written in the service's own environment file with `{SPC}_REMOTE_CREDENTIAL_LOCAL_SERVICE`, the application's `kindCode`. `infra config render` writes each remote address as plain HTTP on the service's local host and remote port: `http://api.lc-spndemo.app:9200`.
+- **Locally the provider is `LOCAL`**, and the service goes by `{SPC}_DEPLOYMENT_KIND_CODE` from its own environment file; `{SPC}_REMOTE_CREDENTIAL_LOCAL_SERVICE` is gone. `infra config render` writes each remote address as plain HTTP on the service's local host and remote port: `http://api.lc-spndemo.app:9200`.
 
 **The gateway's rate limit store is published beside them** (`RULE.SUPPORT.INFRA.120` · MUST · skill:spn-infra/implement). A gateway counts a deployment's rate limit once across all its proxy pods, in the environment's own cache. The platform's world publishes three keys in the secret half of `/environments/{env}/vars`: `{SPC}_GATEWAY_RATE_LIMIT_STORE_URL` (the cache's address), `{SPC}_GATEWAY_RATE_LIMIT_STORE_AUTH` (the cache user the gateway counts as, with its password) and `{SPC}_GATEWAY_RATE_LIMIT_STORE_TLS` (whether the connection is encrypted). The gateway reads them and no service does. A deployment given the environment's settings receives them with the rest.
 

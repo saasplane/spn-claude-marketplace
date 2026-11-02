@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/10-providers/ts/06-service.md",
-      "seen": "1f6146cc"
+      "seen": "7c65f048"
     }
   ]
 }
@@ -57,11 +57,11 @@
 
 **A service reaches its repositories and its siblings through the module singleton at call time**, never through constructor wiring. That is what makes the pattern cycle-proof.
 
-**A module's runtime manager answers every method the interface names.** A module has a typed interface (`SPModule<MOD>`, extending `SPServiceAppRuntimeModule`, with a member of its own such as an SDK client declared on that type), a runtime manager `<MOD>RuntimeModuleManager` (`initModule`, `getEntities`, `getMigrations`, `getAPIControllers`, `getAPIRemoteServices`, `getQueueListeners`, `getCLIControllers`, `getContractSchemas`, `shutdownModule` — all nine mandatory), and a remote manager `<MOD>RemoteModuleManager` in `remote/`. A module with no CLI commands returns an empty list, stating the absence rather than omitting the key.
+**A module's runtime manager answers every method the interface names.** A module has a typed interface (`SPModule<MOD>`, extending `SPServiceAppRuntimeModule`, with a member of its own such as an SDK client declared on that type), a runtime manager `<MOD>RuntimeModuleManager` (`moduleConfig`, `initModule`, `getEntities`, `getMigrations`, `getMigrationContributions`, `getMigrationContributionHooks`, `getAPIControllers`, `getAPIRemoteServices`, `getQueueListeners`, `getCLIControllers`, `getContractSchemas`, `shutdownModule` — all mandatory), and a remote manager `<MOD>RemoteModuleManager` in `remote/`. A module with no CLI commands returns an empty list, stating the absence rather than omitting the key, and a module that accepts no contribution returns `null` from `getMigrationContributionHooks`. `moduleConfig` is the module's own `<MOD>_MODULE_CONFIG`, and `initModule(app)` takes no config.
 
 ### The three managers
 
-`support-server-service-ts` has three manager classes, each in its own file under `src/app/module/`. `SPServiceAppModuleManager<TModule>` is the base boot starts and stops (`initModule`, `shutdownModule`). `SPServiceAppRuntimeModuleManager<TModule>` is for a module mounted in this service, and its abstract methods are the nine above bar `shutdownModule`. `SPServiceAppRemoteModuleManager<TModule>` is for a module that lives in another service: it writes `getRemoteServices` alone, and its `initModule` and `shutdownModule` are written once in the class. It states no code: the module's code is the one its line in the start file gives, and each proxy sends that code. Boot asks the runtime questions only of a runtime manager, and tells the kinds apart by one type guard.
+`support-server-service-ts` has three manager classes, each in its own file under `src/app/module/`. `SPServiceAppModuleManager<TModule>` is the base boot starts and stops (`moduleConfig`, `initModule`, `shutdownModule`). `SPServiceAppRuntimeModuleManager<TModule>` is for a module mounted in this service, and its abstract methods are those above bar `moduleConfig` and `shutdownModule`. `SPServiceAppRemoteModuleManager<TModule>` is for a module that lives in another service: it writes `getRemoteServices` alone, and its `initModule` and `shutdownModule` are written once in the class. It states no code: the module's code is the one its line in the start file gives, and each proxy sends that code. Boot asks the runtime questions only of a runtime manager, and tells the kinds apart by one type guard.
 
 **The runtime manager lists the module's contract services** in `getAPIRemoteServices`, whether or not the service opens a remote listener. Each entry is `{ name, methods, impl }` — the service's name, its interface as data (`I<MOD><Entity>ServiceMethods`, produced) and what implements it — written `satisfies SPAPIRemoteService<I<MOD><Entity>Service>`, so a registration does not compile when the implementation does not fit the interface or the methods object misses or adds a method.
 
@@ -69,7 +69,7 @@
 
 **The proxy has one function for each method the contract lists**, and no other. Each parses the command with the method's validator, posts `{ module, service, method, command }` to `API_REMOTE_ROUTE_PATH`, and parses the reply with the result's validator; a refusal is turned back into the standard error and thrown. A call that gets no answer fails after `{CODE}_REMOTE_TIMEOUT_MS` (ten seconds unless set), with no second try, as `DOWNSTREAM_ERROR` (`ERROR.STD.504`) naming the module.
 
-**A line of a service's module list pairs a config with a manager**, typed by `SPServiceAppRuntimeBootModule` and `SPServiceAppRemoteBootModule`: `{ config: { code: 'DOC', entry: { api: { basePath: '/doc' } } }, moduleManager: new DOCRuntimeModuleManager() }` for a mounted module, and `{ config: { code: 'IAM' }, moduleManager: new IAMRemoteModuleManager() }` (imported from `…/remote`) for a held one. A caller writes the same line either way (`iamModule.services.contract.principalService…`), and one check of `moduleType` (`SPAppModuleType.RUNTIME` or `REMOTE`) tells the compiler whether `services.impl` exists.
+**A line of a service's module list names a manager and nothing else**: `{ moduleManager: new DOCRuntimeModuleManager() }` for a mounted module (served at `/doc`, from its code), and `{ moduleManager: new IAMRemoteModuleManager() }` (imported from `…/remote`) for a held one. The manager answers the module's code and config (`moduleConfig`), so the start file never repeats them. Boot derives the API path and the CLI namespace from the code, and it refuses a code off the grammar and two managers that answer one code, before anything starts, MIGRATE included. A remote module's address is its own setting. A caller writes the same line either way (`iamModule.services.contract.principalService…`), and one check of `moduleType` (`SPAppModuleType.RUNTIME` or `REMOTE`) tells the compiler whether `services.impl` exists.
 
 ## Controllers stay thin
 
@@ -96,10 +96,11 @@ A server app is given its sign-in support as one provider, `serviceApp.providers
 
 **Handlers.** `support-server-service-ts` cannot import the identity module, so each class is given a handler the app writes: `ISPAuthProviderIAMHandler` (`verifyAuthPassport`, which throws when refused; `getCaptchaConfig`), extended by `ISPAuthProviderIAMIssuerHandler` (`resolveAuthUserPrincipal`, `resolveAuthUserIdentity`) and `ISPAuthProviderIAMVerifierHandler` (`verifyAuthToken`). The Issuer's config is `{ jwtSecret, jwtSecretFallback, cachePrefix, cacheTTL, handler }`, the Verifier's `{ handler }`. The identity module's contract offers `verifyAuthToken` (it answers a state, `AuthTokenVerification`, whose `authSession` is the live session behind the token, or `null` when the token or the session is no longer good; the Verifier's handler reads that member), `verifyAuthPassport` (throws `COMMON_UNAUTHENTICATED` when the signature does not hold or the caller is no longer allowed; never answers nothing), `getCaptchaConfig` and `verifyCaptchaInput` on `IIAMSessionService`, and `getSystemAuthUser` on `IIAMPrincipalService`.
 
-**A signed passport** says the identity module confirmed this caller and nobody has changed it since. The proof is `SPIAMAuthPassportProof` (`issuedAt`, `evidenceId`, `sessionId`, `signature`); the passport types are `SPIAMAuthPassport` (base), `SPIAMAuthPassportPrincipal` (a caller acting in an organization) and `SPIAMAuthPassportIdentity` (the person alone), and `SPIAMAuthUserUnsigned` is a caller before its proof is signed. Nobody signed the system caller in, so it has no session to save: the Issuer signs it with `signAuthUser(authUser: SPIAMAuthUserUnsigned): SPIAMAuthUser`, which caches nothing and which only the identity module calls.
+**A signed passport** says the identity module confirmed this caller and nobody has changed it since. The proof is `SPIAMAuthPassportProof` (`issuedAt`, `evidenceId`, `sessionId`, `signature`); the passport types are `SPIAMAuthPassport` (base), `SPIAMAuthPassportPrincipal` (a caller acting in an organization: adds `principalId`, `orgId`, `orgCategoryCode`) and `SPIAMAuthPassportIdentity` (the person alone), and `SPIAMAuthUserUnsigned` is a caller before its proof is signed. Nobody signed the system caller in, so it has no session to save: the Issuer signs it with `signAuthUser(authUser: SPIAMAuthUserUnsigned): SPIAMAuthUser`, which caches nothing and which only the identity module calls.
 
 - **Only the identity module signs a passport and checks the signature — MUST**, with the secret it holds; no key goes to any other service.
 - **A proof is signed when a session is made**, at sign-in and when a person switches organization, not on every request; a renewal keeps the session's proof unless the cache entry is gone.
+- **The signed set names the pool, the category and the site, and not the org type.** The proof signs `identityPoolCode`, `orgCategoryCode` and `orgAppSiteId` with the identity and application ids. An org's category is fixed at birth and names one org type, so the signed category already pins the type, and the service that rebuilds the caller reads `orgType` from the org.
 - **A caller rebuilt from a passport keeps that passport's proof**, so a chain of work keeps the proof of the request that started it.
 - **A passport has no age limit.** Whether the person is still allowed is decided when the work runs. When the signing secret changes, the old secret stays accepted for as long as work can wait in a queue; an event with no proof is refused.
 - **The passport header is base64url JSON** (`formatAPIRemotePassport`, `parseAPIRemotePassport`), encoded and not encrypted.
@@ -186,7 +187,7 @@ A server app is given its sign-in support as one provider, `serviceApp.providers
 
 **Keep the vocabulary in one frozen per-module table** built from the module's permission enum. A gate has two terms: the permission term, a list of ways in of which one must hold, and the offer term, codes of which one must be enabled for the caller's organization type. Both must hold, and the offer sits on the gate rather than inside one way in.
 
-**A gate names a scope only to pin the platform master**, never to decide what an organization type may reach. A gate never names an application id, because an id is minted per install and would mean something different in every environment.
+**A gate names a scope only to pin the platform master**, never to decide what an organization type may reach. The values of `appScope` are four, and a gate on `ENTERPRISE` would admit every enterprise category's staff alike, so an organization's staff are narrowed by the permission codes of the app. A gate never names an application id, because an id is minted per install and would mean something different in every environment.
 
 **Tiers are cumulative, and the cumulativeness is encoded at the gate.** A view gate lists every code in the family, a manage gate lists manage and admin, an admin gate lists admin alone. Forgetting the higher tiers in a view gate silently locks out administrators.
 
@@ -204,6 +205,22 @@ A server app is given its sign-in support as one provider, `serviceApp.providers
 **Pin the scope inside the method, not in the gate.** An administrative gate accepts many scopes, so forgetting to resolve the scope turns manage your own organization into manage any organization.
 
 **The sudo gate requires a recent interactive authentication** on top of authorization, for the most sensitive self-service actions. A system actor can never satisfy it, so never put it on anything a queue or provisioning path must call.
+
+### What the session names
+
+A session names its membership, its org with the org's type and category, its pool, its app and its org app site. A partner's gate and handler read these fields:
+
+| Field | Holds |
+| --- | --- |
+| `orgType` | one of `PLATFORM`, `ENTERPRISE` and `CONSUMER` |
+| `orgCategoryCode` | the code of the org's category |
+| `identityPoolCode` | the code of the pool the person signed in through, such as `GLOBAL` or `PLATFORM_ENTERPRISE` |
+| `appScope` | one of `IDENTITY`, `PLATFORM`, `ENTERPRISE` and `CONSUMER` |
+| `orgAppSiteId` | the org app site the caller came in by, or `null` |
+
+The context's accessors follow the fields: `getContextOrgType()` returns one of three, and `getContextOrgCategoryCode()`, `getContextIdentityPoolCode()` and `tryContextOrgAppSiteId()` join it. The handler `verifyAuthPassport` builds the caller from these fields, and an offer is read by org and not by category.
+
+**A limit is checked with `await assertWithinLimit(code, { adding })`** (`RULE.SUPPORT.APPS.257` · MUST · skill:spn-apps/implement). The session already carries the limit for the code, and an absent or empty value sets no limit and asks nothing. Otherwise the method asks the usage provider, `providers.usage`, which the app manager names in `initApp` as it names the auth provider. It refuses with `COMMON_NOT_ENABLED`, naming the code, the limit, the usage, the org that can raise it and, for a monthly limit, when the next month starts. A limit that is stated while no usage provider is named fails by name.
 
 ## Transactions, cache and the decorator order
 

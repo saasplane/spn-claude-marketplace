@@ -832,6 +832,17 @@ console.log("\n=== split-plan — a page that holds its own copy of the styles")
       { file_path: join(other, "elsewhere", "src", "a.ts"), content: "x\n" }, "silent", { parity: false, why: "the Python never read the arc's rows for a code write" });
   }
 
+  {
+    // An arc no go builds holds no other arc's code once the workstream holds a go (RULE.DEVEX.WORKSPACE.320).
+    const goOf = (entries) => JSON.stringify({ schemaVersion: 1, lead: "N1", scope: ["N1"], parts: [{ id: "code-probe-repo-1", entries }] });
+    const outside = buildArcs("m443-outside-go", docsWaiting, { extra: { ...decided(docsWaiting), "arcs/N1/go.json": goOf(["N1/E1"]) } });
+    one("[MKT.HOOKS.443] a decided arc's waiting documents row does not hold the code while the workstream's go names none of its entries", "documents-first", outside,
+      code(outside), "silent", { parity: false, why: "the Python never read the arc's rows for a code write" });
+    const inside = buildArcs("m443-inside-go", docsWaiting, { extra: { ...decided(docsWaiting), "arcs/N1/go.json": goOf(["N1/E1", "N2/E4"]) } });
+    one("[MKT.HOOKS.443] it holds the code again once a go names one of its entries", "documents-first", inside,
+      code(inside), "deny", { says: "documents row of probe-repo", parity: false, why: "the Python never read the arc's rows for a code write" });
+  }
+
   // THE CLOSE WAITS ON THE GO: go check finds nothing and every part has landed.
   const { entryHash } = await import("../../../../src/scripts/lib/go-plan.ts");
   const entry = (id) => ({ id, op: "edit", file: "probe-repo:src/a.ts", what: "a change", decidedBy: [], facts: [], then: [], rules: [],

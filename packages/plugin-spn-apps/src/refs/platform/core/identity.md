@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/03-platform/01-core/02-identity.md",
-      "seen": "d1094941"
+      "seen": "5cef6bc2"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/03-platform/01-core/02-identity/",
-      "seen": "9964dbf3"
+      "seen": "c4b0c112"
     }
   ]
 }
@@ -19,25 +19,37 @@ What the platform already gives you: one sign-in hub for every application, a se
 
 ## The habit to unlearn
 
-The client never says who it is. A caller names one registered **app site** — a host bound to an application — and the server resolves everything else from it: the namespace a handle is looked up in, the organization a session will bind to, the branding a screen renders, and where to return. Nothing on the sign-in path is asserted by the caller. If a request could name its own organization, the platform would have to trust a claim it cannot verify; a named site is a registered fact it already holds.
+The client never says who it is. A caller names one registered **app site** — a host bound to an application — and the server resolves everything else from it: the pool a handle is looked up in, the organization a session will bind to, the branding a screen renders, and where to return. Nothing on the sign-in path is asserted by the caller. If a request could name its own organization, the platform would have to trust a claim it cannot verify; a named site is a registered fact it already holds.
 
-## Identity scope: what "the same person" means
+## Identity pool: what "the same person" means
 
-An identity lives in exactly one **scope**, and handle uniqueness is scoped to it rather than to the platform as a whole. The same email address can be five different people across five scopes, and never two people in one.
+An identity lives in exactly one **pool**, and handle uniqueness is scoped to it rather than to the platform as a whole. The same email address can be a different person in each pool, and never two people in one. A pool is a row, and each org category names the pool its people sign in to.
+
+A pool spans the whole platform, or it spans one parent at a time. A pool that spans a parent holds a separate set of people for each org of the parent category, and the org that owns those people is the pool's owner org. The span is closed, because the core branches on it and no partner adds a value.
 
 ```ts
-export enum IdentityScopeType {
-  GLOBAL = 'GLOBAL',                            // one person across the platform and every account
-  ACCOUNT_CONSUMER = 'ACCOUNT_CONSUMER',        // one account's own consumer customers
-  ACCOUNT_ENTERPRISE = 'ACCOUNT_ENTERPRISE',    // one account's own business customers
-  PLATFORM_CONSUMER = 'PLATFORM_CONSUMER',      // the marketplace's shoppers
-  PLATFORM_ENTERPRISE = 'PLATFORM_ENTERPRISE',  // the marketplace's sellers
+export enum IdentityPoolSpanType {
+  PLATFORM = 'PLATFORM',  // one set of people across the platform; the pool has no owner org
+  PARENT = 'PARENT',      // a separate set of people for each org of the parent category; the owner org is that org
 }
 ```
 
-`GLOBAL` is shared by the identity portal, the platform's own console, and every account's workspace — one person across the platform and every account they belong to. The four `ACCOUNT_*` and `PLATFORM_*` scopes are each their own namespace: two accounts can both have `jane@example.com` as a consumer, and those are two identities, invisible to each other. The scope is chosen by the server from the app site a visitor arrived on — never by the caller.
+The pools a platform ships, and the categories that name them, show what the span means. A partner's own pools work the same way.
 
-Never let a client assert its own scope, organization, or pool — MUST NOT. When you write a pre-authentication call, carry a single app-site id and let the server resolve it to the organization, application and scope a session will bind to.
+| Pool | Spans | Named by | The same address means |
+| --- | --- | --- | --- |
+| `GLOBAL` | the platform | Platform, Account | one person across the platform and every account |
+| `PLATFORM_ENTERPRISE` | the platform | Merchant | one merchant person across every merchant |
+| `PLATFORM_CONSUMER` | the platform | Shopper | one shopper across every merchant |
+| `ACCOUNT_ENTERPRISE` · `ACCOUNT_CONSUMER` | each account | Account Enterprise · Account Consumer | two unrelated people on two accounts' storefronts |
+
+The pool is chosen by the server from the app site a visitor arrived on — never by the caller. One resolver finds it: it reads the categories that name the site's app, and where the pool spans a parent it walks up from the site's anchor org to an org of the parent category. If the walk finds none, the request is refused, and a person is never written with no owner.
+
+Pools are separate by default and shared by choice. Each new category gets a pool of its own, unless the partner points it at an existing one when the category is created. Two categories may name one pool only where both sit under the same parent category or both span the platform. So a pool never spans two sellers, and a pool that staff sign in to never takes a consumer category.
+
+A category's pool is fixed once it has people (`RULE.PLATFORM.CORE.066` · MUST · skill:spn-apps/implement). It never changes once an org or an identity uses it, and the codes of categories and pools never change or get reused, because codes are signed into passports and used in cache keys. People who exist in a pool cannot be merged or split without breaking their accounts.
+
+Never let a client assert its own pool or organization — MUST NOT. When you write a pre-authentication call, carry a single app-site id and let the server resolve it to the organization, application and pool a session will bind to.
 
 ## One hub, and a callback everywhere else
 
@@ -47,7 +59,7 @@ The methods behind the hub are legs of one surface:
 
 | Method | How it works |
 | --- | --- |
-| Password | verified against the credential stored for the identity the site's scope resolves |
+| Password | verified against the credential stored for the identity the site's pool resolves |
 | OTP (one-time code) | requested for a handle, proved in a second call; issued and delivered in the same shape whether or not the handle exists, so the response never says who has an account |
 | Passkey | a device-held credential, proved through the browser's own ceremony — a **first** credential, never a second factor |
 | Provider (SSO / social) | one pair of calls serving a directory and a public brand alike; the provider row says which it is |
@@ -98,6 +110,8 @@ Pre-auth failures — wrong handle, wrong password, an unlinked social identity 
 
 A session's authentication requirement is read from the organization's own policy **at every mint**, never resolved once and cached. A sign-in is proof about a person; what that proof is worth is the organization's question, asked again every time — is this person a member here, is the sign-in fresh enough, does this organization accept how they signed in, and does it want a second factor. Asking once means an organization that tightens its policy has tightened it for sessions that do not exist yet, and for nobody already signed in; asking every time is what makes a policy change take effect the moment it is made.
 
+The credential policy is keyed by pool. Every pool has a default row, and a pool that spans a parent also takes an override per owner org, which wins where the owner wrote one. The owner writes its customer pools' override from its own app, under a permission its category grants, and the platform writes an owner's override too, for support. No other organization writes it.
+
 Two policies are read on the "does this organization accept how they signed in" question, not one: the **surface's**, which decides what the screen offers, and the **bound organization's**, which decides what that organization's own policy permits. They are the same organization on a staff surface and never the same on a customer surface. Reading only the bound organization produces a control that believes it is working — the button disappears from the screen while the endpoint goes on accepting the method.
 
 ## A session belongs to one place
@@ -110,7 +124,7 @@ Authorization checks a membership, never an identity — the same person is a di
 
 ## Custom domains and subdomains
 
-Never give a customer tier a subdomain of its own — MUST NOT. Only an organization that is a **destination** — an account, a marketplace seller — owns one; its own customer tiers ride that subdomain instead. A tier that owned a subdomain would be a second destination inside the first, and the lookup that resolves a visitor would have two answers with nothing to choose between them.
+Never give a customer org a subdomain of its own — MUST NOT. Only an org of the platform or enterprise type owns one, such as an account or a marketplace seller; the customers beneath an enterprise org ride its subdomain instead. A consumer org, such as a shopper, is a visitor rather than a destination and holds none. A customer org that owned a subdomain would be a second destination inside the first, and the lookup that resolves a visitor would have two answers with nothing to choose between them.
 
 A session's cookie scope follows the host that minted it — shared across the platform's own surfaces, and held alone by a tenant's own domain. A custom domain moves through a small state machine behind a swappable certificate provider:
 
@@ -154,7 +168,7 @@ Only a public provider (social) registers anybody new. A directory (SAML/OIDC) v
 
 ## What a console shows follows from the rights
 
-When you build an administration screen, treat a section an organization has no right to as absent, not disabled — MUST. A disabled control advertises a capability and then refuses it, which teaches a customer to ask for something they were never offered; absence says the same thing without the invitation. The sections follow the rights: a workforce directory shows wherever an organization employs people, on its own staff surface alone; public providers show only where it owns a customer relationship; and verified domains show wherever a directory appears.
+When you build an administration screen, treat a section an organization has no right to as absent, not disabled — MUST. A disabled control advertises a capability and then refuses it, which teaches a customer to ask for something they were never offered; absence says the same thing without the invitation. The sections follow the rights: a workforce directory shows wherever an organization employs people, on its own staff surface alone; public providers show only where it has customers beneath it; and verified domains show wherever a directory appears.
 
 A consumer application is not a second identity portal. Self-service is a corner of it, never its spine — the moment it becomes the spine, there are two places a person's identity is managed, and they drift apart.
 

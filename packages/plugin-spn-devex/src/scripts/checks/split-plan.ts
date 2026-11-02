@@ -860,15 +860,35 @@ function silent(payload: Payload, root: string, slot: string, finding: string, f
 /** A path under `src/` or `tests/` of a member repository: code, as the documents row must precede it. */
 const CODE_SEAT = /\/(?:src|tests)\//;
 
+/**
+ * The arcs a go of the workstream builds: each go's scope, and the arc of every entry its parts hold. Null where no arc
+ * holds a go, so a workstream that has none reads every decided or running arc as before.
+ */
+function arcsInGo(folder: string): Set<string> | null {
+  let built: Set<string> | null = null;
+  for (const arc of dataArcsOf(folder)) {
+    let go: { scope?: unknown; parts?: Array<{ entries?: unknown }> };
+    try { go = JSON.parse(readFileSync(join(folder, ARCS, arc, "go.json"), "utf8")); } catch { continue; }
+    built ??= new Set<string>();
+    if (Array.isArray(go.scope)) for (const one of go.scope) if (typeof one === "string") built.add(one);
+    for (const part of Array.isArray(go.parts) ? go.parts : []) {
+      for (const ref of Array.isArray(part?.entries) ? part.entries : []) if (typeof ref === "string") built.add(ref.split("/")[0]);
+    }
+  }
+  return built;
+}
+
 /** The row of an arc this window works on that makes a repository's code wait: its documents row, not landed. Null where none does. */
 function documentsPending(root: string, session: string | undefined, repo: string): string | null {
   for (const [subject] of [...ownWorkstreams(root, session)].sort((a, b) => a[0].localeCompare(b[0]))) {
     for (const folder of subjectFolders(root, subject, null)) {
+      const built = arcsInGo(folder);
       for (const arc of dataArcsOf(folder)) {
         const data = readArc(folder, arc);
         if (!data || !Array.isArray(data.rows)) continue;
         // An arc with no go builds nothing yet, and a carried or dropped arc builds nothing at all.
         if (!["DECIDED", "RUNNING"].includes(readArcStatus(data))) continue;
+        if (built && !built.has(arc)) continue;
         const parents = new Set(data.rows.map((row) => row.parent));
         const waiting = data.rows.find((row) => !parents.has(row.id) && row.work === "DOCS" && row.repo === repo
           && !["landed", "carried", "deferred", "replaced"].includes(row.state ?? ""));

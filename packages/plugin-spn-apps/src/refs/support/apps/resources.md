@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/04-resources/",
-      "seen": "27c076fd"
+      "seen": "c712d539"
     }
   ]
 }
@@ -80,9 +80,12 @@ Hold entity shape fixed across every table you write: a sortable, service-assign
 | --- | --- | --- |
 | Table | `{module}_{entity}`, snake_case | `ord_order` |
 | Column | snake_case | `tracking_code` |
-| Foreign key | `{referenced_entity}_id` | `order_id` |
+| Table whose rows belong to another row | `{module}_{owner}_{entity}`, the owner first | `ord_order_line` |
+| Foreign key | `{referenced table without its module code}_id`, with a role word in front where two references point at one table or the reference is the row's own parent | `order_id` · `parent_order_id` |
 | Enum type | `{module}_{concept}_type` | `ord_shipment_status_type` |
 | Index | `idx_{table}_{columns}`; unique `uq_{table}_{columns}` | `idx_ord_shipment_org_order` |
+
+Carry the module's prefix, in lower case, on every table, enum type, sequence, function and view, keep every name within 63 bytes (Postgres truncates a longer one silently), and hold a foreign key only to a table its owner publishes, reading everything else through the owner's contract service; the `MIGRATE` run reads the catalog and refuses a breach.
 
 Order a composite index you add with organization scope first, then parent keys in hierarchy order, then business filters, then the sorting timestamp last — match the query's own filter order. Add an index only against a measured, frequent query; never add one against a theoretical query by reflex.
 

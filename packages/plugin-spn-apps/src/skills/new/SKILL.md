@@ -91,6 +91,8 @@ spnutils apps scaffold kind client-api     -u sample        # → client-sample-
 
 A kind whose `config` is `null` — `TOOLCHAIN`, `SUPPORT_*`, `CLIENT_API` — **refuses `--code` by name** rather than ignoring it; so does the `repo` target, which is not a kind at all.
 
+**A new module never takes a code SaaS Plane's own modules hold.** A module's code is 3 to 8 of A–Z and 0–9, starting with a letter, with no underscore, and `IAM`, `ORG`, `MDM`, `NTF`, `CMP`, `DOC`, `LNG`, `JOB` and `ENT` are reserved. When the code you are asked for is one of the nine, refuse it and say it is held by a SaaS Plane module, then ask for another. The code names the module's whole surface (its tables, permissions, labels, env keys, API path and CLI namespace), so two modules on one code would collide everywhere at once.
+
 **Name grammar** (`RULE.SUPPORT.APPS.037` · MUST · skill:spn-apps/implement): every project name leads with its family token — `toolchain-{stack}` · `support{-usecase}-{stack}` · `support-server{-usecase}-{stack}` · `support-web{-usecase}-{stack}` · `module-server-{mod}-{stack}` · `module-web-{mod}-{stack}` · `service-{usecase}-{stack}` · `web-{usecase}-{stack}` · `utility{-usecase}-{stack}` · `client-{usecase}-api-{stack}`. The `APP` family is named by delivery form, `UNIVERSAL` is the unmarked runtime, and `{stack}` is appended by tooling and never typed. A downstream platform uses its own npm scope with the same folder grammar. **`domain-` and `ui-` are retired.**
 
 **Versioning** (DEC.SUPPORT.APPS.034): a scaffolded manifest carries the placeholder `0.0.0` and internal deps use `workspace:*`. The real version is stamped into the artifact at publish and the git tag is the source of truth — never edit a version into source.

@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/10-providers/ts/02-naming.md",
-      "seen": "d1882e93"
+      "seen": "7a247995"
     }
   ]
 }
@@ -169,7 +169,7 @@
 
 **Treat a trailing acronym as a word: `Id` and `Ids`, never `ID` or `IDs`.**
 
-**A module code stays fully uppercase** in class names, type names, init functions and file names — `MDMRuntimeModuleManager`, `initJOBModule`. The lowercase singleton instance is the only exception. **A state carries no module code in capitals** — `NtfTemplate`, `EntComment`, `Org`, `CaptchaConfig`; the module's own word in Pascal case (`Ntf`, `Ent`, `Doc`, `Job`) is part of a state's name where the module names its states so. A module code in capitals stands only on a constant (`IAMErrorCodeType`, `NTFEntityType`), a service (`INTFTemplateService`) and the module's internal classes (`IAMRoleController`) (`RULE.SUPPORT.APPS.205` · MUST · skill:spn-apps/implement).
+**A module code (the platform's own, and a partner's own) stays fully uppercase** in class names, type names, init functions and file names — `MDMRuntimeModuleManager`, `initJOBModule`. The lowercase singleton instance is the only exception. **A state carries no module code in capitals** — `NtfTemplate`, `EntComment`, `Org`, `CaptchaConfig`; the module's own word in Pascal case (`Ntf`, `Ent`, `Doc`, `Job`) is part of a state's name where the module names its states so. A module code in capitals stands only on a constant (`IAMErrorCodeType`, `NTFEntityType`), a service (`INTFTemplateService`) and the module's internal classes (`IAMRoleController`). One family of states is the exception: a migration contribution state and its items take the owning module's code in capitals, as `<MOD>Migration*` (`IAMMigrationContribution`, `IAMMigrationPermission`, `MDMMigrationLabel`), because the code says which owner reads them (`RULE.SUPPORT.APPS.205` · MUST · skill:spn-apps/implement).
 
 **A server module's wiring names** carry its code and kind. At the package root: `interface.ts` holds `SPModule<CODE>` (extends `SPServiceAppRuntimeModule`) and `SPModule<CODE>Config` (extends `SPServiceAppRuntimeModuleConfig`); `<CODE>RuntimeModuleManager.ts` holds class `<CODE>RuntimeModuleManager` (extends `SPServiceAppRuntimeModuleManager`); `index.ts` is the main door and re-exports only. The `remote/` folder is the second door, written by hand: `remote/interface.ts` holds `SPModule<CODE>Remote` (extends `SPServiceAppRemoteModule`), one member under `services.contract` for each contract interface, importing nothing from the module's own `interface.ts`; `remote/<CODE>RemoteModuleManager.ts` holds class `<CODE>RemoteModuleManager` (extends `SPServiceAppRemoteModuleManager`); `remote/<code>Module.ts` holds `<code>Module`, typed `SPModule<CODE>Remote`; `remote/index.ts` exports `contract/` and those three files.
 
@@ -180,10 +180,18 @@
 | the manager | `SPServiceAppModuleManager` | `SPServiceAppRuntimeModuleManager` | `SPServiceAppRemoteModuleManager` |
 | the module | `SPAppModule` | `SPAppModuleRuntime`, `SPServiceAppRuntimeModule` | `SPAppModuleRemote`, `SPServiceAppRemoteModule` |
 | the config | `SPAppModuleConfig` | `SPServiceAppRuntimeModuleConfig` | `SPServiceAppRemoteModuleConfig` |
-| a line of the module list | `SPServiceAppBootModule` | `SPServiceAppRuntimeBootModule` | `SPServiceAppRemoteBootModule` |
 | one module's own | | `IAMRuntimeModuleManager`, `SPModuleIAM` | `IAMRemoteModuleManager`, `SPModuleIAMRemote` |
 
 The field that tells the two kinds apart is `moduleType`, of `SPAppModuleType` (`RUNTIME` · `REMOTE`); a module's type is not a contract state, so the field takes the plain name and not `mtype`. The generated `contract/methods/I<MOD><Entity>Service.ts` holds const `I<MOD><Entity>ServiceMethods`, typed `SPServiceMethods<I<MOD><Entity>Service>`, written by `spnutils apps gen-validators` and never hand-edited; the folder follows `services/` file for file. A second service imports `@saasplane/module-server-iam-ts/remote` for a module held remotely.
+
+### A module names itself
+
+A module's one code names its whole surface: its tables (`iam_`), its permissions (`IAM_*`), its labels, its env keys (`{APP}_IAM_*`), its API path (`/iam`), its CLI namespace (`iam`) and, over the network, the module a call is for. The service decides only whether a module is mounted here or held remotely. **A module's code is 3 to 8 of A–Z and 0–9, starting with a letter, with no underscore, and `IAM`, `ORG`, `MDM`, `NTF`, `CMP`, `DOC`, `LNG`, `JOB` and `ENT` are SaaS Plane's own, so a new module never takes one** (`RULE.SUPPORT.APPS.250` · MUST · skill:spn-apps/implement). The underscore is excluded because it separates the code from the rest of a permission or a table name.
+
+- **The module declares its code and config in its own contract.** `<MOD>_MODULE_CODE` and `<MOD>_MODULE_CONFIG` sit in `src/contract/constants.ts`, as `DOC_MODULE_CODE = 'DOC'` and `DOC_MODULE_CONFIG` do. The config is `{ code, name, description }`.
+- **The manager answers with it.** Every manager, runtime or remote, declares `moduleConfig`, and `initModule(app)` takes no config. The start file's line names the manager only.
+- **The paths come from the code.** The API path and the CLI namespace are the code in lower case (`/doc`, `doc`). Boot refuses a code off the grammar and two managers that answer one code, and the refusal quotes `SP_MODULE_CODE_RULE`. The grammar is `SP_MODULE_CODE_PATTERN`, and `isModuleCode(value)` tests it; both live in `support-ts` under `src/app/`, in `constants.ts` and `utils.ts`.
+- **`apps validate` reads the source.** It checks the grammar, that no two modules in a repository share a code, that a module's server and web halves agree, and that its class names start with its code, as `DOCFileService` does.
 
 **Two spellings of one acronym make a symbol unsearchable.** That is the reason behind all of the above.
 
@@ -247,7 +255,9 @@ A field's name says whether it holds a person's data, as `_id` and `_at` say wha
 - **A value of a form's kind is personal wherever it sits.** A sender's `fromEmail` and a site's `supportPhone` are hidden from a log line too: hiding an organization's address costs a debugging line, and missing a person's costs a breach notice.
 - **`spnutils apps gen-validators` refuses a contract field that ends with a personal word outside the forms**: `surname`, `familyName`, `forename`, `givenName`, `fullName`, `nickname`, `birthday`, `dob`, `dateOfBirth`, `mobile`, `mobileNumber`, `phoneNumber`, `telephone`, `mail`. The refusal names the form to use instead.
 
-**One matcher tests a key against the forms.** It is `isPersonalFieldName`, in `support-ts` (the universal core) in a file of its own, `utils/personal.ts`, so a service, a web app and the generator call the same function. The log redactor, the export, the erasure and `gen-validators` are the four callers. There is no tag, no generated list and no merge at boot.
+**One matcher tests a key against the forms.** It is `isPersonalFieldName`, in `support-ts` (the universal core) in a file of its own, `utils/personal.ts`, so a service, a web app and the generator call the same function. The log redactor, the export, the erasure and `gen-validators` are the four callers.
+
+**A field that holds personal data but whose name is not one of these forms is marked on its contract with a `@personal` doc tag.** `spnutils apps gen-validators` writes the marked names into the generated validators, which register them with `markPersonalFieldNames` when they load, and `isPersonalFieldName` then answers for a name form or a marked name. A name once marked is personal in every state that uses it, because the redactor walks untyped data and knows only a key's name, and hiding too much is safer than hiding too little. For example, `/** The registration number. For a sole trader it is often a tax id. @personal */ registrationNumber: CDTString | null;`.
 
 ## Packages
 
@@ -291,6 +301,8 @@ A field's name says whether it holds a person's data, as `_id` and `_at` say wha
 ## SQL
 
 **The grammar is the book's data chapter; this stack instantiates it.** Tables are `{module}_{entity}`, columns `snake_case`, enum types `{module}_{concept}_type` with `UPPER_SNAKE_CASE` values, and indexes `idx_` or `uq_` plus the table and columns.
+
+**A reference column says what it points at, and a table whose rows belong to another row names its owner first** (`RULE.SUPPORT.APPS.251` · MUST · skill:spn-apps/implement). A reference column's name is the referenced table's name without its module's code, plus `_id`: `iam_org_category` gives `org_category_id`. Where a table holds two references to one table, or the reference is the row's own parent, a role word goes in front (`parent_org_id`, `parent_org_category_id`). A table whose rows belong to another row starts with its module's code, then the owner, then what the row is: a site belongs to an org and serves one of its apps, so it is `iam_org_app_site`, and a credential policy belongs to an identity pool, so it is `iam_identity_pool_auth_policy`. The entity (`OrgAppSite`), the state, the id field (`orgAppSiteId`), the service and the route (`/org/app/site/*`) carry the same words, so a reader who knows one layer finds every other by the same name. A catalog row that belongs to its module and to no other row keeps its plain name, such as `iam_app` or `iam_app_permission`. `mdm_entity_type` is the one reference column that stays off the rule, because it is keyed by its code and not by an id.
 
 **Realization types**: primary keys and every `*_id` or `*_by` column are `CHAR(26)` ULIDs, document columns are `JSONB`, timestamps are `TIMESTAMPTZ`, and the polymorphic triple is `entity_type` plus `entity_id` plus an optional `entity_name`.
 

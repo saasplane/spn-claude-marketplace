@@ -51,7 +51,7 @@ export function firstPrompt(transcript: string | undefined): string {
   return "";
 }
 
-/** The first line of a helper's last assistant text, markup and leading marks taken off. Empty where it wrote none. */
+/** The first line of a helper's last assistant text or handed-back report, markup and leading marks taken off. Empty where it wrote none. */
 export function lastFirstLine(transcript: string | undefined): string {
   try {
     if (!transcript || !existsSync(transcript)) return "";
@@ -61,7 +61,11 @@ export function lastFirstLine(transcript: string | undefined): string {
       try {
         const entry = JSON.parse(line) as { type?: string; message?: { content?: unknown } };
         if (entry.type !== "assistant" || !Array.isArray(entry.message?.content)) continue;
-        for (const part of entry.message.content as Array<{ type?: string; text?: string }>) if (part.type === "text" && part.text?.trim()) last = part.text;
+        // A panel run in the background ends by handing its report back, with no closing text, so that report is its last reply.
+        for (const part of entry.message.content as Array<{ type?: string; text?: string; name?: string; input?: { message?: unknown } }>) {
+          if (part.type === "text" && part.text?.trim()) last = part.text;
+          else if (part.type === "tool_use" && part.name === "SubagentHandback" && typeof part.input?.message === "string" && part.input.message.trim()) last = part.input.message;
+        }
       } catch { /* a torn line is skipped */ }
     }
     return (last.split("\n").find((one) => one.trim()) ?? "").replace(/^[^A-Za-z]+/, "").trim();
