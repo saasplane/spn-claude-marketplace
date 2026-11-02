@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "book": {
     "repository": "spn-foundation",
-    "commit": "c47a1a06"
+    "commit": "6939a00e"
   },
   "rules": [
     {
@@ -2181,6 +2181,11 @@
       "heading": "A release that changes how the agent proposes runs the proposal cases first",
       "decision": null,
       "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/agent/plugins.md",
+          "heading": "A release that changes how the agent proposes runs the proposal cases first"
+        },
         {
           "plugin": "spn-devex",
           "path": "skills/deliver/SKILL.md",
@@ -12216,6 +12221,11 @@
       "restated": [
         {
           "plugin": "spn-devex",
+          "path": "refs/devex/workspace/docs/doc-sets.md",
+          "heading": "The templates sit beside the chapters, in templates/"
+        },
+        {
+          "plugin": "spn-devex",
           "path": "refs/devex/workspace/docs/templates/README.md",
           "heading": "The templates, as a partner has them"
         }
@@ -12232,7 +12242,18 @@
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "A card is only for what the rules leave open",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/docs/decision-cards.md",
+          "heading": "A card is only for what the rules leave open"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/workstream.md",
+          "heading": "A card is only for what the rules leave open"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.492",
@@ -12246,6 +12267,16 @@
       "heading": "A card is only for what the rules leave open",
       "decision": null,
       "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/docs/decision-cards.md",
+          "heading": "A card is only for what the rules leave open"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/workstream.md",
+          "heading": "A card is only for what the rules leave open"
+        },
         {
           "plugin": "spn-devex",
           "path": "skills/ideate/SKILL.md",
@@ -12264,7 +12295,18 @@
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "A card is only for what the rules leave open",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/docs/decision-cards.md",
+          "heading": "A card is only for what the rules leave open"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/workstream.md",
+          "heading": "A card is only for what the rules leave open"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.494",
@@ -12277,7 +12319,13 @@
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "An arc is cut by what is reviewed and released together, and named for its domain",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/workspace.md",
+          "heading": "An arc carries a status, and it is one of six"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.495",
@@ -12291,6 +12339,11 @@
       "heading": "An order is one delegated execution, and every order follows the same rules",
       "decision": null,
       "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/workstream.md",
+          "heading": "An order is one delegated execution, and every order follows the same rules"
+        },
         {
           "plugin": "spn-devex",
           "path": "skills/execute/SKILL.md",
@@ -12309,7 +12362,13 @@
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "A suggestion is recorded the moment it is raised",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/workstream.md",
+          "heading": "After the go, every moment names the next step"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.497",
