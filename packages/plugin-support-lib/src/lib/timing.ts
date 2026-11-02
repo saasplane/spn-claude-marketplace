@@ -9,7 +9,7 @@
 //
 // ONE ROW FAMILY, READ BY ITS `mtype`: every row holds the base (`LINE_KEYS`, in this order) — `v` (1), `mtype`,
 // `id` (a short random id; a model turn's is its message id), `at` (UTC, ending in `Z`, when the thing started),
-// `ms`, `event`, then the head `session`, `agent`, `workstream`, `arc`, `part`, `skill`, `work`, `retryOf` — and
+// `ms`, `event`, then the head `session`, `agent`, `workstream`, `arc`, `part`, `skill`, `stage`, `work`, `retryOf` — and
 // its variant adds only what its kind needs. This library writes two variants: a hook check's run, `CHECK`
 // (`check`, `verdict` PASS, NOTE or DENY, `out`), and a command, `COMMAND` (`call` { program, group, action },
 // `exit`), and a review panel's verdict, `PANEL` (`lens`, `verdict`), written by `writePanel`. A model turn is `usage.ts`'s, a test run the test runner's. The values are the
@@ -51,14 +51,14 @@ import { isWorkspaceDevex, workstreamPrefixSource } from "./docs-tree.ts";
 import {
   ARC_PATTERN, CHECK_PATTERN, PART_PATTERN, WORKSTREAM_PATTERN, SPDevExAgentHookVerdictType, SPDevExAgentSkillType,
   SPDevExAgentLensType, SPDevExAgentPanelVerdictType, SPDevExWorkspaceTelemetryEventType, SPDevExWorkspaceTelemetryRowType,
-  SPDevExWorkspaceTelemetryVersionType, SPDevExWorkstreamWorkType, held, known,
+  SPDevExWorkspaceTelemetryVersionType, SPDevExWorkstreamWorkType, SPDevExStageType, held, known, stageOf,
 } from "./telemetry-values.ts";
 
 const DEVEX = ".spndevex", LOG = "hooks.jsonl";
 const CARRIED = "tags.json";
 
 /** Every key each row carries, in the order it is written; a variant adds its own after them. */
-export const LINE_KEYS = ["v", "mtype", "id", "at", "ms", "event", "session", "agent", "workstream", "arc", "part", "skill",
+export const LINE_KEYS = ["v", "mtype", "id", "at", "ms", "event", "session", "agent", "workstream", "arc", "part", "skill", "stage",
   "work", "retryOf"] as const;
 
 /** What a hook check decided: said nothing, added words to the context, or refused the call or held the turn. */
@@ -97,6 +97,8 @@ export type Facts = {
   program?: string | null;
   pathKind?: PathKind | null;
   process?: SpanName;
+  /** The plugin version the window loaded, read from its install path, or null when it runs from source; only the SessionStart run names it, and only a `CHECK` row holds it. */
+  pluginVersion?: string | null;
 };
 
 const state: { root: string | null; cwd: string | null; facts: Facts | null; spans: Entry[] } =
@@ -228,11 +230,11 @@ const IN_WORKSTREAM = new RegExp(`${workstreamPrefixSource()}(\\d{3}-[A-Za-z0-9-
 // Inside one: `arcs/N<n>…` names the arc, and so does an arc kept as data, `arcs/N<n>/state.json`;
 // `notes/N<n>/…` names it too (and so does a notes folder named past its arc, `notes/N<n>-<subject>/`),
 // and `notes/N<n>…/orders/<order>…` names the order as well, its report and its ledger with it.
-const ARC_FILE = /^\/arcs\/(N\d+[a-z]?)(?:[-./]|$)/i;
-const ARC_NOTES = /^\/notes\/(N\d+[a-z]?)(?:-[^/]*)?(?:\/|$)/i;
-const ORDER_FILE = /^\/notes\/N\d+[a-z]?(?:-[^/]*)?\/orders\/([^/]+?)(?:\.(?:report|ledger))?(?:\.md)?(?:\/|$)/i;
+const ARC_FILE = /^\/arcs\/(N\d{3}|ideate|follow-ups)(?:[-./]|$)/;
+const ARC_NOTES = /^\/notes\/(N\d{3}|ideate|follow-ups)(?:(?<=N\d{3})-[^/]*)?(?:\/|$)/;
+const ORDER_FILE = /^\/notes\/(?:N\d{3}(?:-[^/]*)?|ideate|follow-ups)\/orders\/([^/]+?)(?:\.(?:report|ledger))?(?:\.md)?(?:\/|$)/;
 // A relative path from inside a workstream folder, as a command run there spells it.
-const RELATIVE = /(?:^|[\s'"`=(])((?:arcs\/N\d+[a-z]?[^\s'"`)\]|;&<>]*)|(?:notes\/N\d+[a-z]?[^\s'"`)\]|;&<>]*))/gi;
+const RELATIVE = /(?:^|[\s'"`=(])((?:arcs\/(?:N\d{3}|ideate|follow-ups)[^\s'"`)\]|;&<>]*)|(?:notes\/(?:N\d{3}|ideate|follow-ups)[^\s'"`)\]|;&<>]*))/g;
 
 function stringsOf(value: unknown, out: string[] = []): string[] {
   if (typeof value === "string") out.push(value);
@@ -257,13 +259,13 @@ function orderStem(name: string): string {
 function tagsIn(workstream: string, rest: string): Place {
   const order = rest.match(ORDER_FILE)?.[1] ?? null;
   const arc = rest.match(ARC_FILE)?.[1] ?? rest.match(ARC_NOTES)?.[1] ?? null;
-  return { workstream, arc: arc ? arc.toUpperCase() : null, order: order ? orderStem(order) : null };
+  return { workstream, arc, order: order ? orderStem(order) : null };
 }
 
 const depth = (tags: Place) => (tags.order ? 3 : tags.arc ? 2 : 1);
 
 // A Bash call that starts a part names it: `workstream go start <ws>/N<nnn> <part>`; a bare `<NNN>` names no workstream folder.
-const GO_START = /\bworkstream\s+go\s+start\s+["']?(?:(\d{3}-[a-z0-9][a-z0-9-]*)|\d{3})\/(N\d{3})["']?\s+["']?([a-z0-9][a-z0-9-]*)/;
+const GO_START = /\bworkstream\s+go\s+start\s+["']?(?:(\d{3}-[a-z0-9][a-z0-9-]*)|\d{3})\/(N\d{3}|ideate|follow-ups)["']?\s+["']?([a-z0-9][a-z0-9-]*)/;
 
 /** The work a part's id stands for, from its prefix: `baseline-` and `full-` are TEST, and `docs-`, `code-`, `generated-`, `design-`, `release-` and `proof-` are their own. */
 export function workOfPart(part: string | null | undefined): SPDevExWorkstreamWorkType | null {
@@ -333,7 +335,7 @@ export function commandFacts(script: string, args: string[]): Facts {
            cwd: process.cwd(), process: { group, action: group ? action : null } };
 }
 
-type Work = { workstream: string | null; arc: string | null; part: string | null; skill: string | null };
+type Work = { workstream: string | null; arc: string | null; part: string | null; skill: string | null; stage?: string | null };
 type Carried = Record<string, Work>;
 
 /**
@@ -343,20 +345,24 @@ type Carried = Record<string, Work>;
  * - **A call that touches no workstream path inherits** the carried ids.
  * - **A call inside the carried work keeps what it does not name**: the same workstream, and the same
  *   arc where it names one, fills in the carried arc and part.
- * - **A call that names other work replaces them.**
+ * - **A call that names other work replaces the workstream and arc**, and the main window keeps its carried part: only a call
+ *   whose own tags carry a part (an order or report file it names, or a `workstream go start`) sets it. A helper's lane drops it.
+ * - **The stage is the skill's and the work's**: `stageOf` of the window's skill and its work (the facts' own, else the part's); where
+ *   that is null the window keeps the stage it last carried, the lead's window the same.
  * - **The skill is the window's**: the one a Skill call named last, carried across work; a helper with none of
  *   its own takes the one its main window runs under.
  *
  * The carried ids are written back whenever they change, in the window's own folder
  * (`sessions/<id>/tags.json`), keyed by agent (`main` for none), so a lane never lends its ids to the
  * main window or to another lane. With no session there is nothing to key on, and the call's own ids
- * stand. A part stays carried until the window names other work; this library cannot see a part land.
+ * stand. A part stays carried in the main window until a call names another part; this library cannot see a part land.
  */
 export function carryTags(root: string, facts: Partial<Facts>): Work {
   const agent = typeof facts.agent === "string" && facts.agent ? facts.agent : null;
   const own: Work = { workstream: facts.workstream ?? null, arc: facts.arc ?? null, part: facts.part ?? null, skill: facts.skill ?? null };
   const session = typeof facts.session === "string" && facts.session ? facts.session : null;
-  if (!session) return own;
+  const stageIn = (skill: string | null, part: string | null) => stageOf(skill, (facts as { work?: string | null }).work ?? workOfPart(held(part, PART_PATTERN)));
+  if (!session) return { ...own, stage: stageIn(own.skill, own.part) };
   const key = agent ?? "main";
   const path = join(sessionDir(root, session), CARRIED);
   let carried: Carried = {};
@@ -369,8 +375,11 @@ export function carryTags(root: string, facts: Partial<Facts>): Work {
   }
   else if (was && was.workstream === own.workstream && (!own.arc || own.arc === was.arc) && (!own.part || own.part === was.part))
     work = { workstream: own.workstream, arc: own.arc ?? was.arc, part: own.part ?? was.part ?? null, skill };
-  else work = { ...own, skill };
-  if ((work.workstream || work.skill) && (!was || was.workstream !== work.workstream || was.arc !== work.arc || (was.part ?? null) !== work.part
+  // The coordinating (main) window keeps the part it last launched, folded or started when a call names other work:
+  // only a call whose own tags carry a part sets it, so the lead's replies are charged to that part.
+  else work = { ...own, part: own.part ?? (agent ? null : was?.part ?? null), skill };
+  work.stage = stageIn(work.skill, work.part) ?? was?.stage ?? null;
+  if ((work.workstream || work.skill || work.stage) && (!was || (was.stage ?? null) !== work.stage || was.workstream !== work.workstream || was.arc !== work.arc || (was.part ?? null) !== work.part
       || (was.skill ?? null) !== work.skill)) {
     carried[key] = work;
     try { mkdirSync(dirname(path), { recursive: true }); writeFileSync(path, JSON.stringify(carried), "utf8"); }
@@ -408,12 +417,13 @@ export function write(root: string | null, facts: Facts, entries: Entry[], cwd?:
     if (!dir) return;
     const event = known(SPDevExWorkspaceTelemetryEventType, facts.event);
     if (!event) return;
-    let work = { workstream: facts.workstream ?? null, arc: facts.arc ?? null, part: facts.part ?? null, skill: facts.skill ?? null };
+    let work: Work = { workstream: facts.workstream ?? null, arc: facts.arc ?? null, part: facts.part ?? null, skill: facts.skill ?? null };
     try { if (root) work = carryTags(root, facts); } catch { /* the call's own ids stand */ }
     const head = {
       session: facts.session ?? null, agent: facts.agent ?? null,
       workstream: held(work.workstream, WORKSTREAM_PATTERN), arc: held(work.arc, ARC_PATTERN), part: held(work.part, PART_PATTERN),
-      skill: known(SPDevExAgentSkillType, work.skill), work: known(SPDevExWorkstreamWorkType, facts.work) ?? workOfPart(held(work.part, PART_PATTERN)),
+      skill: known(SPDevExAgentSkillType, work.skill), stage: known(SPDevExStageType, work.stage),
+      work: known(SPDevExWorkstreamWorkType, facts.work) ?? workOfPart(held(work.part, PART_PATTERN)),
       retryOf: null,
     };
     const lines = entries.flatMap((entry) => {
@@ -429,7 +439,8 @@ export function write(root: string | null, facts: Facts, entries: Entry[], cwd?:
         return [JSON.stringify({ ...base, ...head, call: { program: entry.script ?? facts.script ?? null, group: entry.group ?? null, action: entry.action ?? null },
                                 exit: entry.exit ?? null })];
       return [JSON.stringify({ ...base, ...head, check,
-                              verdict: VERDICTS[entry.verdict ?? "pass"], out: entry.out ?? null })];
+                              verdict: VERDICTS[entry.verdict ?? "pass"], out: entry.out ?? null,
+                              pluginVersion: event === "SessionStart" && typeof facts.pluginVersion === "string" ? facts.pluginVersion : null })];
     });
     if (lines.length) appendLog(join(dir, LOG), lines.join("\n"));
   } catch { /* a tool never fails because timing failed */ }
@@ -451,7 +462,7 @@ export function writePanel(root: string | null, facts: Facts, panel: { lens: str
     const lens = known(SPDevExAgentLensType, panel.lens);
     const verdict = known(SPDevExAgentPanelVerdictType, panel.verdict);
     if (!lens || !verdict) return;
-    let work = { workstream: facts.workstream ?? null, arc: facts.arc ?? null, part: facts.part ?? null, skill: facts.skill ?? null };
+    let work: Work = { workstream: facts.workstream ?? null, arc: facts.arc ?? null, part: facts.part ?? null, skill: facts.skill ?? null };
     if (!work.workstream) {
       try { work = carryTags(root, { session: facts.session, script: facts.script, event: facts.event, tool: null, arc: facts.arc, part: facts.part, skill: facts.skill }); }
       catch { /* the call's own ids stand */ }
@@ -463,7 +474,8 @@ export function writePanel(root: string | null, facts: Facts, panel: { lens: str
       event: SPDevExWorkspaceTelemetryEventType.SUBAGENT_STOP,
       session: facts.session ?? null, agent: facts.agent ?? null,
       workstream: held(work.workstream, WORKSTREAM_PATTERN), arc: held(work.arc, ARC_PATTERN), part,
-      skill: known(SPDevExAgentSkillType, work.skill), work: known(SPDevExWorkstreamWorkType, facts.work) ?? workOfPart(part), retryOf: null,
+      skill: known(SPDevExAgentSkillType, work.skill), stage: known(SPDevExStageType, work.stage),
+      work: known(SPDevExWorkstreamWorkType, facts.work) ?? workOfPart(part), retryOf: null,
       lens, verdict,
     };
     appendLog(join(dir, LOG), JSON.stringify(row));

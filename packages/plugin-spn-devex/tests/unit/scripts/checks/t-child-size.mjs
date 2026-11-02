@@ -5,7 +5,7 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { workspace, BASE } from "../../../helpers/fixture.mjs";
 
-const { checkChildSize, stopLine, childTranscript, entriesIn } = await import(join(CHECKS, "child-size.ts"));
+const { checkChildSize, stopLine, childTranscript, entriesIn, sizedStop } = await import(join(CHECKS, "child-size.ts"));
 
 let total = 0, failed = 0;
 const ok = (label, condition, detail = "") => {
@@ -59,6 +59,12 @@ console.log("\n=== the line is sized from the entries the part holds");
   ok("[MKT.HOOKS.325] a child of an eight-entry part is let through at 100k and stopped past its sized line",
     checkChildSize(call(transcript("sized-light", { turns: 5, held: 100000, brief }), "Bash", { command: "ls" })) === null
     && Boolean(checkChildSize(call(transcript("sized-heavy", { turns: 5, held: 400000, brief }), "Bash", { command: "ls" }))?.deny));
+  ok("[MKT.SCRIPTS.480] the Stop sentence a brief writes from sizedStop is read back by stopLine as the line an order with the same entries and no sentence gets", [1, 8].every((count) => {
+    const stop = sizedStop(count);
+    const written = `Stop at ${stop.context / 1000}k of context or ${stop.turns} turns, at the next whole step.`;
+    const sentence = JSON.stringify(stopLine(entries(count).replace("No line is set here.", written)));
+    return sentence === JSON.stringify(stopLine(entries(count))) && sentence === JSON.stringify(stop);
+  }), JSON.stringify([sizedStop(1), sizedStop(8)]));
 }
 
 console.log("\n=== refused: a child past its line");

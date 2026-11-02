@@ -124,6 +124,13 @@ console.log("\n=== RULE.DEVEX.WORKSPACE.262 — a write that would make a sixth 
   put(root, ".spndevex/workstreams/open/031-probe/notes/N001/old-note.md", "# old\n");
   const [existing] = hook({ tool_name: "Edit", cwd: root, tool_input: { file_path: join(notes, "old-note.md"), old_string: "# old", new_string: "# old, links rewritten" } }, root);
   ok("green: a stray already on disk can still be edited, so its links are rewritten before it is folded", existing !== "deny");
+  const [ideateNotes] = hook({ tool_name: "Bash", cwd: root, tool_input: { command: `mkdir -p ${join(ws, "notes", "ideate", "samples")}` } }, root);
+  ok("[MKT.SCRIPTS.485] green: a write that makes `notes/ideate/` passes", ideateNotes !== "deny");
+  const [followData] = hook({ tool_name: "Write", cwd: root, tool_input: { file_path: join(ws, "arcs", "follow-ups", "probe.json"), content: "{}" } }, root);
+  ok("[MKT.SCRIPTS.485] green: a write that makes `arcs/follow-ups/` is not refused as a stray level", levelRefusal(join(ws, "arcs", "follow-ups", "probe.json")) === null, String(followData));
+  const [otherNotes, otherWhy] = hook({ tool_name: "Bash", cwd: root, tool_input: { command: `mkdir -p ${join(ws, "notes", "other", "samples")}` } }, root);
+  ok("[MKT.SCRIPTS.485] red: a write that makes `notes/other/` is denied, and the message names `N<nnn>/`, `ideate/` and `follow-ups/`",
+    otherNotes === "deny" && otherWhy.includes("`N<nnn>/`") && otherWhy.includes("`ideate/`") && otherWhy.includes("`follow-ups/`"), `${otherNotes}: ${otherWhy.slice(0, 300)}`);
   const closed = join(root, ".spndevex", "workstreams", "closed", "020-done", "notes", "N001", "shots", "a.png");
   ok("green: a closed workstream is never judged", ownedRefusal(closed) === null && notesTreeRefusal(closed) === null);
 }

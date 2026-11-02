@@ -45,6 +45,6 @@ description: Carry out a go. Use the moment the developer gives the go on one ar
    A change from the developer mid-run: let what is running finish, `go check` to hold the parts it
    touches, update their entries and the preview and show it, then `go write` again before they run.
    A change that rewrites the approach page's What decides its figure in the same pass (`RULE.DEVEX.WORKSPACE.497` · MUST · check:doc-check): a figure, or the one `<!-- no figure: … -->` line.
-6. Full runs: `go start` each repository's full run; every code row lands on it.
+6. Full runs: `go start` each repository's full run, with the runner's reuse on, so only what changed runs; every code row lands on it.
 7. Generated files, then the release chain, in the order the sheets set.
 8. Close: `go check` prints nothing, and every row of the scope is LANDED; then `workstream close <workstream>`.

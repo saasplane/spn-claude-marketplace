@@ -1,7 +1,7 @@
 // `lib/timing.ts` — the one telemetry library every plugin bundles (RULE.DEVEX.WORKSPACE.185).
 //
 // One row family, read by its `mtype`: every row holds `v`, `mtype`, `id`, `at`, `ms`, `event` and the head
-// `session`, `agent`, `workstream`, `arc`, `part`, `skill`, `work`, `retryOf`. A hook check writes one `CHECK` row
+// `session`, `agent`, `workstream`, `arc`, `part`, `skill`, `stage`, `work`, `retryOf`. A hook check writes one `CHECK` row
 // (`check`, `verdict`, `out`) and the run as a whole writes none; a command writes one `COMMAND` row (`call`, `exit`).
 // The work comes from the paths the tool call touches, `agent` from the hook input, carried forward per session and agent.
 //
@@ -132,9 +132,12 @@ console.log("\n=== the row — one family, one row for each check");
   same("[MKT.SCRIPTS.330] every row holds the base and the head, in order, then the check's own keys", lines.map((l) => Object.keys(l).join(",")),
     lines.map(() => [...LINE_KEYS, "check", "verdict", "out"].join(",")));
   same("[MKT.SCRIPTS.330] the keys are the family's base and head", LINE_KEYS, ["v", "mtype", "id", "at", "ms", "event", "session", "agent",
-    "workstream", "arc", "part", "skill", "work", "retryOf"]);
+    "workstream", "arc", "part", "skill", "stage", "work", "retryOf"]);
   same("[MKT.SCRIPTS.330] a check's row is version 1, mtype CHECK, named by its action", [lines[0].v, lines[0].mtype, lines[0].check, lines[1].check],
     [1, "CHECK", "close", "saasplane-env"]);
+  same("[MKT.SCRIPTS.471] every written row holds `stage`, right after `skill`, in LINE_KEYS order", lines.map((l) => Object.keys(l).slice(0, LINE_KEYS.length).join(",")),
+    lines.map(() => LINE_KEYS.join(",")));
+  same("[MKT.SCRIPTS.471] and `stage` follows `skill` in LINE_KEYS", LINE_KEYS.indexOf("stage"), LINE_KEYS.indexOf("skill") + 1);
   same("[MKT.SCRIPTS.330] its event is the hook's", lines.map((l) => l.event), ["PreToolUse", "PreToolUse"]);
   same("[MKT.SCRIPTS.330] a row's id is short and its own", [lines.every((l) => /^[A-Za-z0-9_-]{1,64}$/.test(l.id)), lines[0].id !== lines[1].id], [true, true]);
   same("[MKT.SCRIPTS.330] `at` is UTC ending in Z", lines.every((l) => /^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\dZ$/.test(l.at)), true);
@@ -200,6 +203,31 @@ same("a secret option's value is written ***, spaced or with =",
   "set --token *** --api-key=*** --Password *** --client-secret=*** FOO");
 same("nothing typed reads null", argsText([]), null);
 same("a word with a space keeps its quotes", argsText(["-m", "two words"]), `-m "two words"`);
+
+console.log("\n=== stage — written with the row, from the skill and work, else the stage the window last carried");
+{
+  const root = workspace("e160-stage", ON);
+  const command = (session, agent, part, skill) => child(`
+    begin({ script: "spn-devex", event: "command", tool: null, session: ${JSON.stringify(session)}, agent: ${JSON.stringify(agent)},
+            workstream: "036-x", arc: "N017", part: ${JSON.stringify(part)}, skill: ${JSON.stringify(skill)}, process: { group: "cli", action: "cli" } }, ${JSON.stringify(root)});
+    end(0);`);
+  command("st1", "h1", "docs-spn-x-1", null);
+  command("st2", "h2", "release-spn-x-1", null);
+  command("st3", null, null, "DEVEX_IDEATE");
+  command("st3", null, null, null);
+  command("st4", null, null, null);
+  const bySession = (id) => logOf(root).filter((row) => row.session === id).map((row) => row.stage);
+  same("[MKT.SCRIPTS.470] a helper's COMMAND row with no skill and the part 'docs-spn-x-1' carries stage DEVELOP", bySession("st1"), ["DEVELOP"]);
+  same("[MKT.SCRIPTS.470] a release part gives DELIVER", bySession("st2"), ["DELIVER"]);
+  same("[MKT.SCRIPTS.470] a row with neither skill nor work, in a window that last carried IDEATE, carries IDEATE", bySession("st3"), ["IDEATE", "IDEATE"]);
+  same("[MKT.SCRIPTS.470] a fresh window with nothing carries null", bySession("st4"), [null]);
+  same("[MKT.SCRIPTS.471] the keys of every row written include `stage`", logOf(root).every((row) => "stage" in row), true);
+}
+
+console.log("\n=== the ideate and follow-up arcs — a path under notes/ideate/ or notes/follow-ups/");
+same("[MKT.SCRIPTS.470] an order under notes/ideate/orders/ names the arc `ideate` and its part; one under notes/follow-ups/ the arc `follow-ups`",
+  [tagsOf({ tool_input: { file_path: `${WS}/notes/ideate/orders/docs-spn-x-1.md` } }), tagsOf({ tool_input: { file_path: `${WS}/notes/follow-ups/plan.md` } })],
+  [tags("008-plain-language", "ideate", "docs-spn-x-1"), tags("008-plain-language", "follow-ups", null)]);
 
 console.log("\n=== 2o — the tags carry forward to a call that touches no workstream path");
 {

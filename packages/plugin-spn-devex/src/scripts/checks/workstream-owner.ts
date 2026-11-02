@@ -84,9 +84,9 @@ export function levelRefusal(path: string, makesFolder = false): string | null {
   if (folder && ARC_ID.test(entry)) return null;
   const home = level === NOTES
     ? "a section of the `plan.md` of the arc it belongs to, or of the workstream's first open arc where it names none"
-    : "nowhere by hand: the `workstream` commands write `arcs/N<nnn>/`";
+    : "nowhere by hand: the `workstream` commands write `arcs/<arc>/`";
   return `Denied: this write makes \`${level}/${entry}${folder ? "/" : ""}\`, and \`notes/\` and \`arcs/\` hold only arc folders, ` +
-    `\`N<nnn>/\` (01-workstream.md § The folder; RULE.DEVEX.WORKSPACE.262). It belongs in ${home}.`;
+    `\`N<nnn>/\`, \`ideate/\` and \`follow-ups/\` (01-workstream.md § The folder; RULE.DEVEX.WORKSPACE.262). It belongs in ${home}.`;
 }
 
 /** The folders a `mkdir` in a command makes, as written. */

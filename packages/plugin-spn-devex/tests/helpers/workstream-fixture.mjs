@@ -61,6 +61,26 @@ export function arcData(rows) {
   };
 }
 
+/**
+ * Writes the two role arcs every workstream has, `ideate` first and `follow-ups` last, under the workstream folder `ws`:
+ * no number, no stored kind, no rows. The ideate arc starts DECIDED and the follow-up arc PROPOSED, as `workstream open` writes them.
+ */
+export function writeRoleArcs(ws, { subject = "probe", title = "the probe", ideate = {}, followUps = {} } = {}) {
+  const arcs = {
+    ideate: { arc: "ideate", title, subject, goal: title, status: "DECIDED", ...ideate },
+    "follow-ups": {
+      arc: "follow-ups", title: "Follow-ups", subject: "follow-ups", status: "PROPOSED",
+      goal: "The workstream's one follow-up arc: it collects what the other arcs do not need, is reviewed once they have all landed, and builds what is kept.", ...followUps,
+    },
+  };
+  for (const [name, head] of Object.entries(arcs)) {
+    const data = { schemaVersion: 2, reason: null, decides: null, repos: [], cycle: null, follows: null, preview: "preview.html", ...head, rows: [] };
+    mkdirSync(join(ws, "arcs", name), { recursive: true });
+    writeFileSync(join(ws, "arcs", name, "state.json"), `${JSON.stringify(data, null, 2)}\n`);
+  }
+  return Object.keys(arcs);
+}
+
 /** A card a `question raise` takes, whole. */
 export const CARD = {
   title: "Which way the `probe` goes", why: "It blocks row 2.", what: "The file is `a.ts:12`.", viewsLead: "One view.",
@@ -115,10 +135,10 @@ export function put(root, path, body) {
 export const CLOSING_BLOCK = `<div class="sds-note">
   <p>&#x1F680; <strong>031 Probe has shipped.</strong> One arc, two steps.</p>
   <p>&nbsp;</p>
-  <p><strong>&#x1F4E6; What was delivered</strong></p>
+  <p><strong>&#x1F4E6; What we delivered</strong></p>
   <ul><li>the probe</li></ul>
   <p>&nbsp;</p>
-  <p><strong>&#x1F9E0; What was learned</strong></p>
+  <p><strong>&#x1F9E0; What we learned</strong></p>
   <ul><li>it works</li></ul>
   <p>&nbsp;</p>
   <p><strong>Thank you &#x1F44D;</strong></p>

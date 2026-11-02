@@ -8,7 +8,7 @@
 // ONE ROW IS ONE MODEL TURN, a `TURN` of the telemetry row family (the workspace construct's
 // `SPDevExWorkspaceTelemetryRow`): the base `v` (1), `mtype`, `id` (the reply's message id), `at` (when the
 // turn started, UTC to the second), `ms` (the model's own time before the reply), `event` (`Stop` or
-// `SubagentStop`), then the head `session`, `agent`, `workstream`, `arc`, `part`, `skill`, `work`, `retryOf`, and
+// `SubagentStop`), then the head `session`, `agent`, `workstream`, `arc`, `part`, `skill`, `stage`, `work`, `retryOf`, and
 // the turn's own `model` and `tokens` { in, out, cacheRead, cacheWrite }. A transcript streams one turn over
 // several lines, so a turn is counted once, by its id, with the counts of its last line and the `model` and
 // `ms` of its first.
@@ -24,7 +24,7 @@ import { appendLog, sessionDir } from "../../../../plugin-support-lib/src/lib/de
 import { carryTags, telemetryDir, workOfPart, type Facts } from "../../../../plugin-support-lib/src/lib/timing.ts";
 import {
   ARC_PATTERN, PART_PATTERN, WORKSTREAM_PATTERN, SPDevExAgentSkillType, SPDevExWorkspaceTelemetryEventType, SPDevExWorkspaceTelemetryRowType,
-  SPDevExWorkspaceTelemetryVersionType, SPDevExWorkstreamWorkType, held, known,
+  SPDevExWorkspaceTelemetryVersionType, SPDevExStageType, SPDevExWorkstreamWorkType, held, known, stageOf,
 } from "../../../../plugin-support-lib/src/lib/telemetry-values.ts";
 import { workstreamPrefixSource } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
 
@@ -130,13 +130,18 @@ export function recordUsage(root: string | null, facts: Facts, transcript: strin
     if (last !== null) offsets[`${transcript}@stamp`] = last;
     writeFileSync(marks, JSON.stringify(offsets), "utf8");
     if (!turns.length) return;
-    let tags = { workstream: facts.workstream ?? null, arc: facts.arc ?? null, part: facts.part ?? null, skill: facts.skill ?? null };
+    let tags: { workstream: string | null; arc: string | null; part: string | null; skill: string | null; stage?: string | null } =
+      { workstream: facts.workstream ?? null, arc: facts.arc ?? null, part: facts.part ?? null, skill: facts.skill ?? null };
     try { tags = carryTags(root, facts); } catch { /* the call's own tags stand */ }
     const part = held(tags.part, PART_PATTERN);
     const event = facts.agent ? SPDevExWorkspaceTelemetryEventType.SUBAGENT_STOP : SPDevExWorkspaceTelemetryEventType.STOP;
+    const skill = known(SPDevExAgentSkillType, tags.skill);
+    const work = known(SPDevExWorkstreamWorkType, facts.work) ?? workOfPart(part);
+    // The stage the skill and work give first, else the one the window last carried.
+    const stage = stageOf(skill, work) ?? known(SPDevExStageType, tags.stage) ?? null;
     const head = {
       session, agent: facts.agent ?? null, workstream: held(tags.workstream, WORKSTREAM_PATTERN), arc: held(tags.arc, ARC_PATTERN), part,
-      skill: known(SPDevExAgentSkillType, tags.skill), work: known(SPDevExWorkstreamWorkType, facts.work) ?? workOfPart(part), retryOf: null,
+      skill, stage, work, retryOf: null,
     };
     appendLog(join(dir, USAGE_LOG), turns.map((one) => {
       const ms = one.ms ?? 0;

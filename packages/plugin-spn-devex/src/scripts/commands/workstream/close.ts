@@ -35,7 +35,7 @@ const RETRO_PREFIX = "Retrospective · ";
 
 /** What a closed page carries as its closing block: what was delivered, what was learned and the thanks. */
 const CLOSING_PARTS: Array<[RegExp, string]> = [
-  [/What (?:was|we) delivered/i, "\"What was delivered\""], [/What (?:was|we) learned/i, "\"What was learned\""], [/Thank you/i, "\"Thank you\""],
+  [/What we delivered/i, "\"What we delivered\""], [/What we learned/i, "\"What we learned\""], [/Thank you/i, "\"Thank you\""],
 ];
 
 /** The closing block's pieces an approach page lacks, named; none where it carries all. */
@@ -46,8 +46,8 @@ export function missingClosingBlock(page: string): string[] {
 /** The refusal of a page without its closing block: the shape closed pages carry, the rule, and that nothing was changed. */
 const closingRefusal = (missing: string[]): string =>
   `the approach page has no closing block (missing ${missing.join(", ")}). Write it under the masthead, in the shape closed pages carry: ` +
-  "a `<div class=\"sds-note\">` holding a 🚀 lead line, `<p>&nbsp;</p>`, `<p><strong>📦 What was delivered</strong></p>` and a list, " +
-  "`<p>&nbsp;</p>`, `<p><strong>🧠 What was learned</strong></p>` and a list, `<p>&nbsp;</p>`, then `<p><strong>Thank you 👍</strong></p>` and a line " +
+  "a `<div class=\"sds-note\">` holding a 🚀 lead line, `<p>&nbsp;</p>`, `<p><strong>📦 What we delivered</strong></p>` and a list, " +
+  "`<p>&nbsp;</p>`, `<p><strong>🧠 What we learned</strong></p>` and a list, `<p>&nbsp;</p>`, then `<p><strong>Thank you 👍</strong></p>` and a line " +
   "(RULE.DEVEX.WORKSPACE.206)";
 
 /** The page with its masthead status and its header block reading DONE. */
@@ -347,7 +347,7 @@ export function run(args: string[]): number {
   renameSync(ws, target);
   console.log(`ok · ${basename(ws)} closed · approach page stamped DONE · moved from ${held}/ into closed/`);
   // A CLOSE IS A MILESTONE (RULE.DEVEX.WORKSPACE.206): the message is written right now, and the Stop hook sends back a reply that lacks it.
-  console.log("Next: write the closing message now: a `# 🚀 <title>` heading (or ✈️), a line reading `&nbsp;`, `### 📦 What we delivered` with bullets, " +
-    "`### 🧠 What we learned` with bullets, `Thank you 👍`, and one plain line that the window can be retired (RULE.DEVEX.WORKSPACE.206).");
+  console.log("Next: write the closing message now: a `# 🚀 <workstream> (<title>) is closed` heading, a line reading `&nbsp;`, one paragraph, " +
+    "`### 📦 What we delivered` with bullets, `### 🧠 What we learned` with bullets, `Thank you 👍`, and one sentence that this window is done and can be retired (RULE.DEVEX.WORKSPACE.206).");
   return 0;
 }

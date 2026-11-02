@@ -356,6 +356,51 @@ console.log("\n=== a window says when it loaded wiring older than what is instal
   check("running from source says nothing — a checkout IS the source",
     run("node", [`${HOOKS}/src/scripts/events/orientation.ts`, ROOT], ROOT),
     [], ["this window loaded"]);
+
+  // [MKT.HOOKS.471] THE SESSIONSTART ROW HOLDS THE VERSION THE WINDOW LOADED, read from the install path; a copy run from source and
+  // every other event hold null. Recording is on in this workspace, and the copy is made under a version of its own.
+  {
+    const marketCache = join(BASE, "pc2", "plugins", "cache", "spn-claude-marketplace", "spn-devex");
+    cpSync(join(HOOKS, "src", "scripts"), join(marketCache, "1.2.3", "scripts"), { recursive: true });
+    cpSync(join(HOOKS, "..", "plugin-support-lib", "src", "lib"), join(marketCache, "..", "plugin-support-lib", "src", "lib"), { recursive: true });
+    const RECORDED = join(BASE, "ws-recorded");
+    mkdirSync(join(RECORDED, ".spndevex", ".debug"), { recursive: true });
+    mkdirSync(join(RECORDED, "spn-infra"), { recursive: true });
+    writeFileSync(join(RECORDED, "spn-infra", "sprepo.json"), JSON.stringify({ type: "INFRA" }));
+    writeFileSync(join(RECORDED, ".spndevex", ".debug", "switches.json"), JSON.stringify({ telemetry: true }));
+    const env = { ...process.env, HOME: join(BASE, "home-recorded") };
+    delete env.SPN_TELEMETRY;
+    const start = (script, session) => execFileSync("node", [script, "--stdin"], {
+      input: JSON.stringify({ cwd: RECORDED, session_id: session }), encoding: "utf8", cwd: RECORDED, env, maxBuffer: 16 * 1024 * 1024 });
+    const rows = () => {
+      try {
+        return readFileSync(join(RECORDED, ".spndevex", ".debug", "telemetry", "hooks.jsonl"), "utf8").split("\n").filter(Boolean).map((line) => JSON.parse(line));
+      } catch { return []; }
+    };
+    const of = (session, event) => rows().filter((row) => row.session === session && row.event === event);
+    start(join(marketCache, "1.2.3", "scripts", "events", "orientation.ts"), "t-471-installed");
+    const installedRows = of("t-471-installed", "SessionStart");
+    n += 1;
+    const installedOk = installedRows.length > 0 && installedRows.every((row) => row.pluginVersion === "1.2.3");
+    if (!installedOk) failed += 1;
+    console.log(`  ${installedOk ? "PASS" : "FAIL"}  [MKT.HOOKS.471] the SessionStart row of a copy under .../cache/spn-claude-marketplace/spn-devex/1.2.3/ holds '1.2.3'`);
+    start(`${HOOKS}/src/scripts/events/orientation.ts`, "t-471-source");
+    const sourceRows = of("t-471-source", "SessionStart");
+    n += 1;
+    const sourceOk = sourceRows.length > 0 && sourceRows.every((row) => row.pluginVersion === null);
+    if (!sourceOk) failed += 1;
+    console.log(`  ${sourceOk ? "PASS" : "FAIL"}  [MKT.HOOKS.471] a copy run from source holds null`);
+    try {
+      execFileSync("node", [`${HOOKS}/src/scripts/events/pretooluse.ts`], {
+        input: JSON.stringify({ cwd: RECORDED, session_id: "t-471-pre", tool_name: "Bash", tool_input: { command: "ls" } }),
+        encoding: "utf8", cwd: RECORDED, env, maxBuffer: 16 * 1024 * 1024 });
+    } catch { /* a refusal is not the point; the row is */ }
+    const preRows = of("t-471-pre", "PreToolUse");
+    n += 1;
+    const preOk = preRows.length > 0 && preRows.every((row) => row.pluginVersion === null);
+    if (!preOk) failed += 1;
+    console.log(`  ${preOk ? "PASS" : "FAIL"}  [MKT.HOOKS.471] a PreToolUse row holds null`);
+  }
 }
 
 // ── the closing question is CONDITIONAL, and the hook cannot see the condition (N54) ──
@@ -511,10 +556,12 @@ console.log("\n=== orientation — the welcome word for word, and one status lin
     [`.spndevex/${WORKSTREAMS}/closed/041-finished/arcs/N1/state.json`]: "{}\n",
   });
   const plain = hook(busy, "Dhruv");
-  // Rung 3 here — the fixtures hold no nodes — so the rung clause is expected on the agent's ground line, never the status line.
+  // [MKT.HOOKS.487] The book's ladder has four rows. A concept with few nodes below it, as the fixtures here hold, is an ordinary session
+  // and prints no rung line.
   says("the status line names repos, open workstreams by number and the backlog; closed is not a part",
-    statusOf(plain.message) === "2 repos · 2 workstreams open (042, 044) · 1 in backlog"
-    && plain.context.includes(`${GROUND}rung 3: concept present, very few nodes below it.`));
+    statusOf(plain.message) === "2 repos · 2 workstreams open (042, 044) · 1 in backlog");
+  says("[MKT.HOOKS.487] APPS repos with a concept and fewer than three nodes read as an ordinary session and print no rung line",
+    !plain.context.includes("rung ") && !plain.context.includes("very few nodes"));
   says("a part at zero is dropped, and one of each reads in the singular",
     statusOf(hook(returning, null).message) === "1 repo");
   says("the closing question greets the developer by name, and drops the name's clause without one",
@@ -559,6 +606,12 @@ console.log("\n=== orientation — the welcome word for word, and one status lin
     ".spndevex/README.md": "state\n",
   });
   const lowerOut = hook(lower, null);
+  const emptyRoot = fixture("rung-0", {});
+  says("[MKT.HOOKS.487] the four rungs are the book's four rows: empty, estate only, a concept missing, and building (silent)",
+    run("node", [`${HOOKS}/src/scripts/events/orientation.ts`, emptyRoot], emptyRoot).includes("Day-0 mode")
+    && hook(fixture("rung-1", { "spn-infra/sprepo.json": repo("INFRA"), ".spndevex/README.md": "state\n" }), null).context.includes(`${GROUND}rung 1: estate only`)
+    && lowerOut.context.includes(`${GROUND}rung 2: an APPS repo carries no CONCEPT.md`)
+    && !hook(ordinary, null).context.includes("rung "));
   says("a lower rung is a clause of the agent's ground line, never the status line",
     statusOf(lowerOut.message) === "1 repo" && lowerOut.context.includes(`${GROUND}rung 2: an APPS repo carries no CONCEPT.md — spn-app-ts.`)
     && isWelcome(lowerOut.message, "# 👋 Welcome to SaaS Plane. Let's build something great."));
@@ -622,6 +675,15 @@ console.log("\n=== orientation — the welcome word for word, and one status lin
   // N116 row 8, F5: a handover window took over a row another window had marked in progress.
   says("the pick-up line has one shape, after the status line",
     offer.context.includes("under the status line, one line: *Picking up N<nn> — <the arc's title>, at row <n>: <what the row does>.*"));
+  // [MKT.HOOKS.482] The session-start note tells the agent to say the picking-up line and to name a model mismatch before acting.
+  says("[MKT.HOOKS.482] the note tells a handover window to say the picking-up line and to name a model mismatch before acting",
+    offer.context.includes("*Picking up N<nn> — <the arc's title>, at row <n>: <what the row does>.*")
+    && offer.context.includes("before any action, compare it with the model your system prompt names")
+    && offer.context.includes("On a mismatch, one line under the status line names both"));
+  // [MKT.HOOKS.485] A window started below the root is told its folder.
+  says("[MKT.HOOKS.485] a window started below the root prints the Rooted line",
+    hook(join(ordinary, "spn-app-ts"), null).context.includes("Rooted in `spn-app-ts`.")
+    && !offer.context.includes("Rooted in"));
   // Q380 A: a window picking up a handover checks its model against the block's `model:` line first.
   says("a pasted handover's model is compared with the window's own before any action, and a mismatch names /model",
     offer.context.includes("A handover block names a `model:`: before any action, compare it with the model your system prompt names")

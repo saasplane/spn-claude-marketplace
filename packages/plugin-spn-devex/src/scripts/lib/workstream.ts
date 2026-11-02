@@ -223,8 +223,31 @@ export function firstOpenArc(ws: string): string | null {
   return open.sort(arcOrder)[0] ?? null;
 }
 
-/** Arcs by number, then by the letter after it. */
+/** The next free build-arc id: one past the highest `N<nnn>` folder under `arcs/`, `N001` where there is none (Q33). */
+export function nextBuildArc(ws: string): string {
+  let top = 0;
+  for (const entry of listdir(join(ws, ARCS))) top = Math.max(top, Number(/^N(\d+)[a-z]?$/.exec(entry)?.[1] ?? 0));
+  return `N${String(top + 1).padStart(3, "0")}`;
+}
+
+/** An arc's kind from its address alone: `ideate` and `follow-ups` are the two role arcs, any other is a build arc; a stored `kind: ideate` is read only from closed data, as written (Q33). */
+export function arcKindOf(ws: string, arc: string): "build" | "ideate" | "follow-up" {
+  if (arc === "ideate") return "ideate";
+  if (arc === "follow-ups") return "follow-up";
+  return readArc(ws, arc)?.kind === "ideate" ? "ideate" : "build";
+}
+
+/** The workstream's follow-up arc: `follow-ups` where that folder exists, else null (Q33). */
+export function followUpArcOf(ws: string): string | null {
+  return isFile(stateFileOf(ws, "follow-ups")) ? "follow-ups" : null;
+}
+
+/** Where an arc stands in a workstream's order: `ideate` first, build arcs between, `follow-ups` last (Q33). */
+const roleRank = (arc: string): number => (arc === "ideate" ? 0 : arc === "follow-ups" ? 2 : 1);
+
+/** Arcs with `ideate` first and `follow-ups` last, the build arcs between them by number, then by the letter after it. */
 export function arcOrder(a: string, b: string): number {
+  if (roleRank(a) !== roleRank(b)) return roleRank(a) - roleRank(b);
   const [, an, al = ""] = /^N(\d+)([a-z]?)$/.exec(a) ?? [, "0", ""];
   const [, bn, bl = ""] = /^N(\d+)([a-z]?)$/.exec(b) ?? [, "0", ""];
   return Number(an) - Number(bn) || (al < bl ? -1 : al > bl ? 1 : 0);
@@ -297,7 +320,7 @@ export function resolveRef(ref: string, holds: (ws: string, id: string) => boole
 /** An arc reference resolved, where the arc's data exists or `allowNew` lets it be opened. */
 export function resolveArc(ref: string, from: string = process.cwd(), allowNew = false): { ws: string; arc: string } {
   const { ws, id } = resolveRef(ref, (folder, arc) => isFile(stateFileOf(folder, arc)), from);
-  if (!ARC_ID.test(id)) throw new Error(`reads \`${id}\` as no arc — an arc is \`N<nnn>\``);
+  if (!ARC_ID.test(id)) throw new Error(`reads \`${id}\` as no arc — an arc is \`N<nnn>\`, \`ideate\` or \`follow-ups\``);
   if (!allowNew && !isFile(stateFileOf(ws, id))) throw new Error(`finds no \`${ARCS}/${id}/${STATE_FILE}\` in ${basename(ws)}`);
   return { ws, arc: id };
 }
@@ -354,13 +377,15 @@ export function readArc(ws: string, arc: string): ArcData | null {
   const one = data as ArcData;
   // AN IDEATE ARC'S STATUS NEEDS THE WORKSPACE (RULE.DEVEX.WORKSPACE.494): whether each arc it proposes exists is read here, once, and carried
   // for `arcStatus` as `proposesOpened`. It is never written: `writeArc` leaves it out.
-  if (one.kind === "ideate") one.proposesOpened = (Array.isArray(one.proposes) ? one.proposes : []).every((id) => isFile(stateFileOf(ws, id)));
+  if (arc === "ideate" || one.kind === "ideate") one.proposesOpened = (Array.isArray(one.proposes) ? one.proposes : []).every((id) => isFile(stateFileOf(ws, id)));
+  // THE FOLLOW-UP ARC'S STATUS NEEDS THE SUGGESTIONS (Q33): whether every suggestion of the workstream is decided, parked or dropped is read here and carried, never written.
+  if (arc === "follow-ups") one.suggestionsSettled = suggestionsOf(ws).every((one) => !suggestionOpen(one));
   return one;
 }
 
 /** An arc's data as it is stored: without the fields a read adds. */
 const asStored = (data: ArcData): ArcData => {
-  const { proposesOpened: _carried, ...rest } = data;
+  const { proposesOpened: _carried, suggestionsSettled: _settled, ...rest } = data;
   return rest as ArcData;
 };
 
@@ -522,15 +547,23 @@ const STARTED: ReadonlySet<string> = new Set(["running", "stopped", "replaced", 
  * stores its `LANDED`. A stored `PROPOSED` wins over the steps. Every reader asks this, so no two disagree.
  * An ideate arc is the exception: it never needs rows.
  */
-export function arcStatus(data: Pick<ArcData, "status" | "rows" | "reviewFixes"> & { kind?: string; proposesOpened?: unknown }): Status {
-  const held = (STATUSES as readonly string[]).includes(data.status) ? data.status as Status : "PROPOSED";
-  if (held !== "DECIDED" || !Array.isArray(data.rows)) return held;
+export function arcStatus(data: Pick<ArcData, "status" | "rows" | "reviewFixes"> & { arc?: string; kind?: string; proposesOpened?: unknown; suggestionsSettled?: unknown }): Status {
+  let held = (STATUSES as readonly string[]).includes(data.status) ? data.status as Status : "PROPOSED";
+  if (!Array.isArray(data.rows)) return held;
+  // THE FOLLOW-UP ARC'S STATUS IS WORKED OUT, THE STORED ONE IGNORED (Q33): with no rows it is PROPOSED while a suggestion is unsettled and LANDED once all are;
+  // with rows it reads as any build arc, and is LANDED only once every suggestion is settled too.
+  const followUps = data.arc === "follow-ups" && held !== "CARRIED" && held !== "DROPPED";
+  if (followUps) {
+    if (!data.rows.length) return data.suggestionsSettled === true ? "LANDED" : "PROPOSED";
+    held = "DECIDED";
+  }
+  if (held !== "DECIDED") return held;
   // AN IDEATE ARC HAS NO STEPS (RULE.DEVEX.WORKSPACE.494): decided, it reads LANDED once every arc it proposes is opened, and DECIDED until then.
-  if (data.kind === "ideate") return data.proposesOpened === true ? "LANDED" : "DECIDED";
+  if (data.arc === "ideate" || data.kind === "ideate") return data.proposesOpened === true ? "LANDED" : "DECIDED";
   const leaves = leafRows(data as ArcData);
   if (!leaves.some((row) => STARTED.has(row.state ?? ""))) return "DECIDED";
   const counted = leaves.filter((row) => !UNCOUNTED.has(row.state ?? ""));
-  if (data.reviewFixes !== true && counted.length > 0 && counted.every((row) => row.state === "landed")) return "LANDED";
+  if (data.reviewFixes !== true && counted.length > 0 && counted.every((row) => row.state === "landed")) return followUps && data.suggestionsSettled !== true ? "RUNNING" : "LANDED";
   return "RUNNING";
 }
 
@@ -772,7 +805,8 @@ export function executionOrder<T extends ArcData>(ws: string, arcs: readonly T[]
   };
   const finished = new Map(arcs.filter((data) => group(data) === 0).map((data) => [data.arc, finishedAt(ws, data.arc)]));
   const position = (data: ArcData): number => (typeof data.position === "number" ? data.position : Number.MAX_SAFE_INTEGER);
-  return [...arcs].sort((left, right) => group(left) - group(right)
+  // THE TWO ENDS ARE PINNED (Q33): the ideate arc before every other, the follow-up arc after every other.
+  return [...arcs].sort((left, right) => roleRank(left.arc) - roleRank(right.arc) || group(left) - group(right)
     || (group(left) === 0 ? (finished.get(left.arc) ?? "").localeCompare(finished.get(right.arc) ?? "") : 0)
     || (group(left) === 2 ? position(left) - position(right) : 0)
     || left.arc.localeCompare(right.arc));
@@ -832,8 +866,11 @@ function arcChip(data: ArcData, ws: string, questions: readonly Question[]): str
     `log last moved: ${running.moved || "never"}`,
   ] : [];
   const word = status.toLowerCase();
-  const number = String(Number(data.arc.replace(/^N/, "")));
-  const name = escapeHtml(data.subject.replace(/-/g, " "));
+  // A ROLE ARC'S CHIP SHOWS ITS ROLE, WITH NO NUMBER; A BUILD ARC'S SHOWS ITS TITLE (Q33), so a moved role never keeps a stale label.
+  const role = data.arc === "ideate" ? "Ideate" : data.arc === "follow-ups" ? "Follow-ups" : null;
+  const number = role ? "" : String(Number(data.arc.replace(/^N/, "")));
+  const name = escapeHtml(role ?? data.title);
+  const called = role ? name : `${data.arc} ${name}`;
   const why = typeof data.wait === "string" && data.wait.trim() ? `wait: ${data.wait.trim()}` : data.reason ?? "";
   const reason = why ? `, ${escapeHtml(why)}` : "";
   const built = builtOf(data);
@@ -842,14 +879,14 @@ function arcChip(data: ArcData, ws: string, questions: readonly Question[]): str
   const count = building ? `${built.done}/${built.total}` : word;
   const width = building ? share(built.done, built.total) : 0;
   const said = `${built.done} of ${built.total} steps landed`;
-  const label = `${data.arc} ${name}, ${status}, ${said}${reason}${runningWords.length ? `, ${escapeHtml(runningWords.join(", "))}` : ""}`;
+  const label = `${called}, ${status}, ${said}${reason}${runningWords.length ? `, ${escapeHtml(runningWords.join(", "))}` : ""}`;
   const tip = `<span class="sds-tip"><span class="sds-badge sds-status sds-${word}">${escapeHtml(status)}</span><strong>${escapeHtml(data.title)}</strong><span>${said}</span>${why ? `<span>${escapeHtml(why)}</span>` : ""}${runningWords.map((words) => `<span>${escapeHtml(words)}</span>`).join("")}</span>`;
   // A chip whose arc has a preview opens it in a new tab, with an arrow after the count; one without keeps the jump to the arc's row.
   const opens = isFile(previewOf(ws, data.arc));
   const link = opens ? `href="${NOTES}/${data.arc}/${PREVIEW_FILE}" target="_blank" rel="noopener"` : `href="#${data.arc}"`;
   const chipLabel = opens ? `${label}, ${data.arc} preview, opens in a new tab` : label;
   return `      <a class="sds-chip sds-${word} sds-step-${step}" ${link} aria-label="${chipLabel}">`
-    + `<span class="sds-chip-line"><span class="sds-chip-name"><span class="sds-mono">${number}</span><span class="sds-chip-subject"> &middot; ${name}</span></span><span class="sds-arc-count">${count}${opens ? `<span class="sds-chip-open" aria-hidden="true"> &#8599;</span>` : ""}</span></span>`
+    + `<span class="sds-chip-line"><span class="sds-chip-name">${role ? `<span class="sds-chip-subject">${name}</span>` : `<span class="sds-mono">${number}</span><span class="sds-chip-subject"> &middot; ${name}</span>`}</span><span class="sds-arc-count">${count}${opens ? `<span class="sds-chip-open" aria-hidden="true"> &#8599;</span>` : ""}</span></span>`
     + `<span class="sds-chip-bar"><i style="width:${width}%"></i></span>${tip}</a>`;
 }
 
@@ -892,7 +929,9 @@ export function progressInside(ws: string, arcs: readonly ArcData[] = arcIdsOf(w
   const ordered = executionOrder(ws, arcs);
   const open = (data: ArcData): boolean => !TERMINAL.has(arcStatus(data));
   const running = (data: ArcData): boolean => arcStatus(data) === "RUNNING";
-  const lines = statusBar(ws, [...ordered.filter(running), ...ordered.filter((data) => open(data) && !running(data)), ...ordered.filter((data) => !open(data))], closed);
+  const grouped = [...ordered.filter(running), ...ordered.filter((data) => open(data) && !running(data)), ...ordered.filter((data) => !open(data))];
+  // The ideate arc's chip is the first and the follow-up arc's the last, whatever their status (Q33).
+  const lines = statusBar(ws, [...grouped.filter((data) => data.arc === "ideate"), ...grouped.filter((data) => data.arc !== "ideate" && data.arc !== "follow-ups"), ...grouped.filter((data) => data.arc === "follow-ups")], closed);
   return lines.length ? `${lines.join("\n")}\n` : "";
 }
 
@@ -1373,7 +1412,7 @@ function lastCommitOf(places: readonly string[], shas: readonly string[]): { at:
  * Whether a run file was taken on exactly the tree a commit holds: its stamp names the content hash of the node it ran
  * on, whole and not narrowed, and the commit holds the same content under that node. A run with no stamp is not one.
  */
-function ranOnTree(place: string, one: Run, sha: string): boolean {
+export function ranOnTree(place: string, one: Run, sha: string): boolean {
   try {
     const stamp = JSON.parse(readFileSync(join(place, one.from.replace(/\.json$/, ".stamp.json")), "utf8")) as { content?: string; narrowed?: boolean };
     if (stamp.narrowed !== false || typeof stamp.content !== "string") return false;
@@ -1388,6 +1427,16 @@ function ranOnTree(place: string, one: Run, sha: string): boolean {
     }
     return contentHash(entries, folder) === stamp.content;
   } catch { return false; }
+}
+
+/** The files a repository changed between the last commit made at or before `ranAt` and `sha`, or null where git cannot say. */
+function changedSince(place: string, sha: string, ranAt: string): string[] | null {
+  const git = (args: string[]): string => execFileSync("git", args, { cwd: place, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim();
+  try {
+    const from = git(["rev-list", "-1", `--before=${ranAt}`, sha]);
+    if (!from) return null;
+    return git(["diff", "--name-only", from, sha]).split("\n").filter(Boolean);
+  } catch { return null; }
 }
 
 const SHOWN: Record<string, string> = { FAILED: "FAILURE", PENDING: "PENDING", SUCCESS: "SUCCESS" };
@@ -1429,7 +1478,16 @@ export function landingFault(ws: string, arc: string, data: ArcData, row: ArcRow
   const ranAt = runs.map((one) => one.ranAt).filter(Boolean).sort()[0] ?? null;
   // A run of the commit's own tree lands whatever its clock says; a run with no stamp or another tree is judged by the clock.
   const sameTree = last !== null && runs.every((one) => ranOnTree(found[0].place, one, last.sha));
-  if (last && ranAt && !sameTree && Date.parse(ranAt) < last.at) faults.push(`${run} was taken before ${last.sha.slice(0, 8)}, row ${row.id}'s last commit`);
+  // A PROOF row lands on a full run of the same tree; where the tree has moved since the run, only the entries whose files changed since it are
+  // faulted, named as the entries to rerun, and the others are read from the earlier run. A CODE row is judged by the clock, as before.
+  let moved: Set<string> | null = null;
+  if (last && ranAt && !sameTree && Date.parse(ranAt) < last.at) {
+    const changed = row.work === "PROOF" ? changedSince(found[0].place, last.sha, ranAt) : null;
+    if (changed) {
+      moved = new Set(entries.filter((one) => one.file.startsWith(`${repo}:`) && changed.some((file) => file === one.file.slice(repo.length + 1) || file.startsWith(`${one.file.slice(repo.length + 1)}/`))).map((one) => one.id));
+      if (moved.size) faults.push(`${run} was taken before ${last.sha.slice(0, 8)}, row ${row.id}'s last commit, and the files of ${[...moved].join(", ")} changed since; rerun the tests of ${moved.size === 1 ? "that entry" : "those entries"}`);
+    } else faults.push(`${run} was taken before ${last.sha.slice(0, 8)}, row ${row.id}'s last commit`);
+  }
 
   const statusAt = (tier: string, id: string): string[] =>
     runs.flatMap((one) => one.results).filter((result) => result.id === id && String(result.tier).toLowerCase() === tier).map((result) => result.status);

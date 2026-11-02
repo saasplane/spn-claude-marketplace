@@ -84,6 +84,39 @@ const BUDGET_MS = 10000;
 // fact worth refusing on rather than a reason to make every turn slow.
 const MAX_FILES = 20000;
 
+/** The fixed line that ends a finding warning's list: `sayOnce` marks the words above it, and what changes between turns follows it. */
+export const CORPUS_MARKER = "(the list ends here; what follows changes from turn to turn)";
+
+/**
+ * The docs trees a window that wrote under `repos` reads. A repository the window wrote under, and that a workstream holds a
+ * worktree of (`<root>/.worktrees/<workstream>/<repo>`, the shape `runPlaces` in lib/workstream.ts builds), is read in that
+ * worktree and not in the main checkout, which sits behind develop; a repository with no worktree is read in the main checkout.
+ * `null` is every main tree, as the command run by hand reads them.
+ */
+export function windowTrees(root: string, repos: Set<string> | null): string[] {
+  const main = docsTrees(root);
+  if (!repos) return main;
+  const sets = join(root, ".worktrees");
+  let workstreams: string[] = [];
+  try { workstreams = readdirSync(sets).filter((name) => !name.startsWith(".")).sort(); } catch { /* no worktrees */ }
+  const out: string[] = [];
+  for (const tree of main) {
+    const repo = basename(dirname(tree));
+    if (!repos.has(repo)) continue;
+    const held: string[] = [];
+    for (const workstream of workstreams) {
+      let names: string[] = [];
+      try { names = readdirSync(join(sets, workstream)).filter((name) => name.startsWith(repo)).sort(); } catch { continue; }
+      for (const name of names) {
+        const place = join(sets, workstream, name);
+        if (existsSync(join(place, "sprepo.json")) && existsSync(join(place, "docs"))) held.push(join(place, "docs"));
+      }
+    }
+    out.push(...(held.length ? held : [tree]));
+  }
+  return out;
+}
+
 /** Every repository under the workspace that declares itself and carries a docs tree. */
 export function docsTrees(root: string): string[] {
   const out: string[] = [];
@@ -261,7 +294,7 @@ export function runCorpus(root: string, repos: Set<string> | null = null): { war
 
   // A WINDOW IS TOLD OF A REPOSITORY'S DOCS ONLY WHERE IT HAS WRITTEN UNDER IT (RULE.DEVEX.WORKSPACE.236).
   // `null` is every tree, and only the command run by hand asks for it; the Stop hook always passes the set.
-  const trees = docsTrees(root).filter((tree) => !repos || repos.has(basename(dirname(tree))));
+  const trees = windowTrees(root, repos);
   if (!trees.length) return { warnings: [], runs: [] };
 
   const deadline = Date.now() + BUDGET_MS;
@@ -325,10 +358,13 @@ export function runCorpus(root: string, repos: Set<string> | null = null): { war
     // and not yet stamped, or a seat file edited whose page is not produced yet, clear when the work lands.
     const marked = findings.map((line) => (isUncommitted(root, line) ? `${line} [uncommitted]` : line));
     const wip = marked.filter((line) => line.endsWith(" [uncommitted]")).length;
+    // THE WORDS END IN A FIXED MARKER LINE (RULE.DEVEX.WORKSPACE.471). Everything above it is the finding list in file order, which
+    // `sayOnce` marks; what changes from turn to turn (the `… and N more` tail, the work-in-progress count and the replay paragraph) is below it.
     warnings.push({ check: "corpus", message:
       `${findings.length} RULE finding(s) in the docs trees of ${[...new Set(trees.map((t) => `\`${basename(dirname(t))}\``))].join(" · ")}, ` +
       `the repositories this window wrote under:\n` +
       `  ${marked.slice(0, 12).join("\n  ")}` +
+      `\n${CORPUS_MARKER}` +
       (findings.length > 12 ? `\n  … and ${findings.length - 12} more` : "") +
       (wip ? `\n\n${wip} of these sit in files that are changed and not committed: work in progress, to finish before the commit.` : "") +
       // SAYING IT IS A REPLAY IS PART OF BEING HONEST ABOUT IT. A repeated finding that reads as a

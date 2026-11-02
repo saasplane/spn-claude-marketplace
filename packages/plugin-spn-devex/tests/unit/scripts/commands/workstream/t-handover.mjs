@@ -2,6 +2,7 @@
 // the live orders and the pins, run as the agent types it, in a throwaway workspace.
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
+import { givesHandover, handoverColumns, HANDOVER_COLUMN } from "../../../../../src/scripts/events/stop.ts";
 import { CARD, cli, dataWorkspace, put } from "../../../../helpers/workstream-fixture.mjs";
 
 let total = 0, failed = 0;
@@ -37,17 +38,34 @@ console.log("=== handover — the block is written from the data, with every lab
   const text = done.out;
   for (const label of ["continue:", "model:", "read first:", "pins:", "state:", "live now:", "done when:", "do not touch:", "open:"])
     ok(`[MKT.HOOKS.326] the printed block carries \`${label}\``, text.includes(label), text);
-  ok("[MKT.HOOKS.326] continue and do not touch are the agent's words", text.includes("continue: run the sheet") && text.includes("do not touch: 035's files"), text);
-  ok("[MKT.HOOKS.326] state is read from the rows", /state: [^.]*N001 [A-Z]+ 0\/\d+/.test(text), text);
-  ok("[MKT.HOOKS.326] the pins are the facts' repository and commit", /pins: [^.]*spn-x abc12345/.test(text), text);
-  ok("[MKT.HOOKS.326] live now names the order whose part runs and has no report, and not the one that has", /live now: [^.]*full-spn-x-3\b/.test(text) && !/live now: [^.]*full-spn-x-2\b/.test(text) && !/live now: [^.]*full-spn-x-4\b/.test(text), text);
-ok("[MKT.SCRIPTS.409] a brief whose part is not running is not live", !/live now: [^.]*full-spn-x-5\b/.test(text), text);
-  ok("[MKT.HOOKS.326] open names the open card", /open: [^.]*Q\d+/.test(text), text);
-  ok("[MKT.SCRIPTS.410] open also lists a suggestion still raised or shaped as S<n>, and not a decided one", /open: [^.]*S7/.test(text) && /open: [^.]*S8/.test(text) && !/open: [^.]*S9/.test(text), text);
+  ok("[MKT.HOOKS.326] continue and do not touch are the agent's words", /continue:\s+run the sheet/.test(text) && /do not touch:\s+035's files/.test(text), text);
+  ok("[MKT.HOOKS.326] state is read from the rows", /state:\s+[^.]*N001 [A-Z]+ 0\/\d+/.test(text), text);
+  ok("[MKT.HOOKS.326] the pins are the facts' repository and commit", /pins:\s+[^.]*spn-x abc12345/.test(text), text);
+  ok("[MKT.HOOKS.326] live now names the order whose part runs and has no report, and not the one that has", /live now:\s+[^.]*full-spn-x-3\b/.test(text) && !/live now:\s+[^.]*full-spn-x-2\b/.test(text) && !/live now:\s+[^.]*full-spn-x-4\b/.test(text), text);
+ok("[MKT.SCRIPTS.409] a brief whose part is not running is not live", !/live now:\s+[^.]*full-spn-x-5\b/.test(text), text);
+  ok("[MKT.HOOKS.326] open names the open card", /open:\s+[^.]*Q\d+/.test(text), text);
+  ok("[MKT.SCRIPTS.410] open also lists a suggestion still raised or shaped as S<n>, and not a decided one", /open:\s+[^.]*S7/.test(text) && /open:\s+[^.]*S8/.test(text) && !/open:\s+[^.]*S9/.test(text), text);
   const last = lines(join(ws, "arcs", "N001", "log.jsonl")).at(-1);
   ok("[MKT.HOOKS.326] the same block is the last line of the arc's log", last?.kind === "note" && /^HANDOVER, /.test(last.note ?? "") && (last.note ?? "").includes("pins:"), JSON.stringify(last));
   const bare = cli(root, ["workstream", "handover", "031"]);
-  ok("[MKT.HOOKS.326] with no words from the agent, the two labels still stand and say they are owed", bare.code === 0 && /continue: [^\n]*(owed|you)/i.test(bare.out) && /do not touch: [^\n]*(owed|you|nothing)/i.test(bare.out), bare.out);
+  ok("[MKT.HOOKS.326] with no words from the agent, the two labels still stand and say they are owed", bare.code === 0 && /continue:\s+[^\n]*(owed|you)/i.test(bare.out) && /do not touch:\s+[^\n]*(owed|you|nothing)/i.test(bare.out), bare.out);
+  const log = (done.out.match(/^```text\n([\s\S]*?)\n```$/m) ?? [])[1] ?? "";
+  ok("[MKT.SCRIPTS.409] the printed block sits in a text fence", done.out.startsWith("```text\n") && done.out.trimEnd().endsWith("```") && log !== "", done.out);
+  const labels = ["continue:", "model:", "read first:", "pins:", "state:", "live now:", "done when:", "do not touch:", "open:"];
+  ok("[MKT.SCRIPTS.409] each of the nine labels opens its own line", labels.every((label) => log.split("\n").some((line) => line.startsWith(label))), log);
+  ok("[MKT.SCRIPTS.409] no blank line sits inside the block", !log.split("\n").some((line) => line.trim() === ""), log);
+  const columns = [...handoverColumns(log).values()];
+  ok("[MKT.SCRIPTS.410] handoverColumns reads every value at column 14", HANDOVER_COLUMN === 14 && columns.length === 9 && columns.every((column) => column === 14), JSON.stringify([...handoverColumns(log)]));
+  ok("[MKT.HOOKS.326] givesHandover reads the printed block as whole", givesHandover(done.out), done.out);
+  const long = Array.from({ length: 30 }, (_, at) => `word${at}`).join(" ");
+  const wrapped = cli(root, ["workstream", "handover", "031", "--continue", long, "--do-not-touch", "nothing"]);
+  const wrappedLines = ((wrapped.out.match(/^```text\n([\s\S]*?)\n```$/m) ?? [])[1] ?? "").split("\n");
+  const at = wrappedLines.findIndex((line) => line.startsWith("continue:"));
+  ok("[MKT.SCRIPTS.409] a continue value over 100 characters wraps, each continuation line indented to column 14",
+    wrappedLines[at + 1]?.startsWith(" ".repeat(14) + "word") && !wrappedLines[at + 1].startsWith(" ".repeat(15)) && wrappedLines[at].length <= 14 + 100, wrappedLines.join("\n"));
+  ok("[MKT.HOOKS.326] a wrapped block is still read as whole", givesHandover(wrapped.out), wrapped.out);
+  const oneLine = lines(join(ws, "arcs", "N001", "log.jsonl")).filter((entry) => /^HANDOVER, /.test(entry.note ?? "")).at(-1);
+  ok("[MKT.SCRIPTS.478] the log's last handover is one line that starts HANDOVER and holds no newline", Boolean(oneLine) && !oneLine.note.includes("\n") && oneLine.note.includes("continue: word0"), JSON.stringify(oneLine));
   const none = cli(root, ["workstream", "handover"]);
   ok("[MKT.HOOKS.326] red: no workstream named is refused", none.code === 2 && none.out.includes("needs a workstream"), none.out);
 }

@@ -98,8 +98,8 @@ export function workstreamOfPath(root: string, path: string, cwd: string = root)
 }
 
 /**
- * The arc a path writes, as the arc's data folder `<workstream>/arcs/N<nnn>`, or null: a path inside
- * the arc's `arcs/N<nnn>/` or its `notes/N<nnn>/`, the folder itself included.
+ * The arc a path writes, as the arc's data folder `<workstream>/arcs/<arc>`, or null: a path inside
+ * the arc's `arcs/<arc>/` or its `notes/<arc>/`, the folder itself included.
  */
 function arcOfPath(folder: string, path: string): string | null {
   const within = relative(folder, path).split("/");
@@ -147,7 +147,7 @@ export function commandWrites(root: string, cwd: string, command: string): strin
         const report = named.at(-1);
         const ws = named.length > 1 ? workstreamNamed(root, cwd, named[0]) : null;
         const path = report ? resolve(ws ?? cwd, report) : null;
-        const arc = path ? /\/notes\/(N\d+[a-z]?)\//.exec(path.split(sep).join("/"))?.[1] : null;
+        const arc = path ? /\/notes\/(N\d+[a-z]?|ideate|follow-ups)\//.exec(path.split(sep).join("/"))?.[1] : null;
         const home = path ? workstreamOfPath(root, path, cwd)?.folder ?? null : null;
         if (arc && home) out.push(join(home, ARCS, arc, LOG_FILE));
         continue;

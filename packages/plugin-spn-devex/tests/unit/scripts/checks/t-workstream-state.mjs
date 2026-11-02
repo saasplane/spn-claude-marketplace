@@ -503,5 +503,36 @@ console.log("\n=== a suggestion an arc carries is never left raised");
   ok("red: [MKT.HOOKS.322] the arc that carries it, which `suggestion edit --arc` writes, still fails it at raised", has(checkWorkstream(ws), "suggestions", /s1 is still raised and N001 carries it/), said(checkWorkstream(ws)));
 }
 
+console.log("\n=== MKT.SCRIPTS.485 — the role folders `ideate/` and `follow-ups/` stand where a numbered arc stands");
+{
+  const { root, ws } = await dataWorkspace("state-roles");
+  const page = join(ws, "approach.html");
+  const whole = readFileSync(page, "utf8");
+  const roles = ["ideate", "follow-ups"];
+  const entry = (arc) => `  <h4 id="${arc}-what">The ${arc} arc</h4>\n  <p>Read the preview &rarr; <a href="notes/${arc}/preview.html">the ${arc}</a></p>\n`;
+  const openRole = (arc) => {
+    mkdirSync(join(ws, "arcs", arc), { recursive: true });
+    mkdirSync(join(ws, "notes", arc), { recursive: true });
+    writeFileSync(join(ws, "arcs", arc, "state.json"), JSON.stringify({ ...arcData(), arc, subject: arc, title: `the ${arc} arc`, status: "PROPOSED", rows: [] }, null, 2));
+    writeFileSync(join(ws, "notes", arc, "preview.html"), PREVIEW);
+  };
+  for (const arc of roles) openRole(arc);
+  writeFileSync(page, whole.replace("</section>\n<section id=\"s3\"", `${roles.map(entry).join("")}</section>\n<section id="s3"`));
+  cli(root, ["docs", "cycles", "write", "031"]);
+  for (const arc of roles) cli(root, ["workstream", "arc", "stamp", "write", `031/${arc}`]);
+  const green = checkWorkstream(ws);
+  ok("green: [MKT.SCRIPTS.485] `arcs/ideate/` and `arcs/follow-ups/` with notes folders, Plan rows and What entries are not named as stray or missing",
+    !green.some((one) => ["steps", "stamp"].includes(one.check) && /ideate|follow-ups/.test(one.message)) && !has(green, "notes", /is not an arc's folder/), said(green));
+
+  rmSync(join(ws, "arcs", "ideate"), { recursive: true });
+  const noData = checkWorkstream(ws);
+  ok("red: [MKT.SCRIPTS.485] `notes/ideate/` with no `arcs/ideate/state.json` is named", has(noData, "steps", /`notes\/ideate\/` has no `arcs\/ideate\/state.json`/), said(noData));
+
+  mkdirSync(join(ws, "notes", "other"), { recursive: true });
+  const stray = checkWorkstream(ws);
+  ok("red: [MKT.SCRIPTS.485] `notes/other/` is named as stray, with the three forms in the message",
+    has(stray, "notes", /`notes\/other\/` is not an arc's folder .*`N<nnn>\/`, `ideate\/` and `follow-ups\/`/), said(stray));
+}
+
 console.log(failed ? `\n  ${failed} of ${total} FAILED — workstream state check` : `\n  all ${total} passed — workstream state check`);
 process.exit(failed ? 1 : 0);

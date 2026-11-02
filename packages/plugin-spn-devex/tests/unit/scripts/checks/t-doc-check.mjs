@@ -852,6 +852,11 @@ console.log("\n=== doc-check — an approach page or a preview keeps nothing of 
   say("[MKT.HOOKS.130] red: a preview keeping three slots and a template comment is refused, by its name",
     slotted.length === 1 && slotted[0][0] === "RULE" && slotted[0][1].startsWith("notes/N001/preview.html still holds 3 template slots")
       && slotted[0][1].includes("keeps 1 of the template's comment"), JSON.stringify(slotted));
+  for (const role of ["ideate", "follow-ups"]) {
+    const roleSlotted = call("templateShape", join(ws, "notes", role, "preview.html"), page("<p>{{the overview}}</p>"), TEMPLATE);
+    say(`[MKT.SCRIPTS.485] red: a preview under notes/${role}/ is read as an arc's preview, so a slot it keeps is refused, by its name`,
+      roleSlotted.length === 1 && roleSlotted[0][0] === "RULE" && roleSlotted[0][1].startsWith(`notes/${role}/preview.html still holds 1 template slot`), JSON.stringify(roleSlotted));
+  }
   const extra = call("templateShape", preview, page("<p>The checks stop the agent.</p>", "<h2>Terms</h2><p>a word</p>\n"), TEMPLATE);
   say("[MKT.HOOKS.130] red: a section its template lacks is refused", extra.length === 1 && extra[0][1].includes("carries terms, a section its template does not have"), JSON.stringify(extra));
   const table = call("templateShape", preview, page("<table><tr><td>a</td></tr></table>"), TEMPLATE);
@@ -864,7 +869,7 @@ console.log("\n=== doc-check — an approach page or a preview keeps nothing of 
   const tpl = readFileSync(join(PLUGIN, "src", "refs", "devex", "workspace", "docs", "templates", "workstream", "approach-template.html"), "utf8");
   const under = tpl.slice(tpl.indexOf("</header>"));
   say("[MKT.SCRIPTS.399] the approach template carries the closing block's shape as a comment right under the masthead, saying it is written at the close and the close refuses without it",
-    /^<\/header>\s*<!-- spn:closing/.test(under) && ["sds-note", "What was delivered", "What was learned", "Thank you", "&nbsp;", "written at the close", "refuses a page without it"].every((word) => under.slice(0, 1500).includes(word)), under.slice(0, 300));
+    /^<\/header>\s*<!-- spn:closing/.test(under) && ["sds-note", "What we delivered", "What we learned", "Thank you", "&nbsp;", "written at the close", "refuses a page without it"].every((word) => under.slice(0, 1500).includes(word)), under.slice(0, 300));
   const onApproach = call("templateShape", approach, "<h2>Why</h2><p>{{why}}</p>", "");
   say("[MKT.HOOKS.130] red: an approach page keeping a slot is refused too", onApproach.length === 1 && onApproach[0][1].startsWith("approach.html still holds 1 template slot"), JSON.stringify(onApproach));
   const written = docCheck.check(preview, page("<p>{{the overview}}</p>"));

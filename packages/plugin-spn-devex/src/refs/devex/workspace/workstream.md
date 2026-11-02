@@ -17,7 +17,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
-      "seen": "8cd3cd71"
+      "seen": "66350752"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -27,7 +27,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "section": "Closing a workstream is a check; closing a window is nothing",
-      "seen": "3d7be2d2"
+      "seen": "14e1a136"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -51,7 +51,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "seen": "2469db3f"
+      "seen": "ad1523ed"
     }
   ]
 }
@@ -297,7 +297,7 @@ Refused: orders/code-plugins.md names no go, and 036's go has a plan.
 A helper is briefed from a part: run `workstream go show 036/N004` and launch the part's own brief.
 ```
 
-**A whole suite runs only in a baseline run, a full run or a proof run of the plan** (`RULE.DEVEX.WORKSPACE.458` · MUST · check:test-run). A part runs only its own test files. `workstream go start` marks a baseline or full run as running, and only then does the test-run check let the whole suite run:
+**A whole suite runs only in a baseline run, a full run or a proof run of the plan** (`RULE.DEVEX.WORKSPACE.458` · MUST · check:test-run). A part runs only its own test files. A full run keeps the runner's reuse, so a tier whose exact inputs a past green verdict covers stands in and says so (`RULE.SUPPORT.APPS.228`), and only what changed runs; `--no-reuse` is passed only for one package whose verdict there is a reason to distrust, never for a whole full run. `workstream go start` marks a baseline or full run as running, and only then does the test-run check let the whole suite run:
 
 ```text
 Refused: `node packages/plugin-spn-devex/tests/run.mjs` runs the whole suite, and no full run of 036's go is running.

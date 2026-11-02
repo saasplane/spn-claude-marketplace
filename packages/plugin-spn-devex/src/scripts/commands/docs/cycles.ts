@@ -87,8 +87,10 @@ export function statusWord(text: string): string | null {
   return BY_LENGTH.find((word) => new RegExp(`^${word}(?![A-Z-])`).test(head)) ?? null;
 }
 
-/** The order arcs run in: by number, then by the letter after it. */
+/** The order arcs run in: `ideate` first, `follow-ups` last, the build arcs between them by number and then by the letter after it (Q33). */
 function runOrder(a: Cycle, b: Cycle): number {
+  const rank = (id: string): number => (id === "ideate" ? 0 : id === "follow-ups" ? 2 : 1);
+  if (rank(a.id) !== rank(b.id)) return rank(a.id) - rank(b.id);
   const [, an, al] = /^N(\d+)([a-z]?)$/i.exec(a.id) ?? [, "0", ""];
   const [, bn, bl] = /^N(\d+)([a-z]?)$/i.exec(b.id) ?? [, "0", ""];
   if (Number(an) !== Number(bn)) return Number(an) - Number(bn);
@@ -97,7 +99,7 @@ function runOrder(a: Cycle, b: Cycle): number {
 
 /**
  * One arc kept as data, read into its Cycles row: the title and the line from its `state.json`, the
- * preview by its fixed name and each sample from `notes/N<nnn>/`, or from the folder the arc's
+ * preview by its fixed name and each sample from `notes/<arc>/`, or from the folder the arc's
  * `preview` path names where it carries one, and a reason as one of its facts.
  */
 export function cycleOfData(folder: string, arc: string): Cycle | null {

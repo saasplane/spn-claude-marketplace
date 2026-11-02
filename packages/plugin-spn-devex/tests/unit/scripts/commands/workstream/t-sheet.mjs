@@ -3,7 +3,7 @@
 // the commands, in a throwaway workspace.
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { CARD, cli, dataWorkspace } from "../../../../helpers/workstream-fixture.mjs";
+import { CARD, cli, dataWorkspace, writeRoleArcs } from "../../../../helpers/workstream-fixture.mjs";
 
 let total = 0, failed = 0;
 const ok = (label, condition, detail = "") => {
@@ -379,6 +379,111 @@ console.log("\n=== a changed book file: its generated copies are named (MKT.SCRI
   writeFileSync(sheetFile, JSON.stringify(sheetOf([bookEntry, entry("E2", { file: `spn-claude-marketplace:${inRepo}/foo.md` })]), null, 2));
   const check = sheet("check", "N001");
   ok("[MKT.SCRIPTS.419] sheet check names the copy still missing from a sheet already written", check.out.includes("generated copy") && check.out.includes("refs/rules.json") && !check.out.includes("refs/foo.md"), check.out);
+}
+
+console.log("\n=== show --part: only the entries one part of the go carries (MKT.SCRIPTS.446)");
+{
+  const rows = [
+    { id: "1", parent: "N001", title: "write the book", kind: "change", repo: "spn-x", work: "DOCS", blockedBy: [], touches: [], state: "waiting", entries: ["E1"] },
+    { id: "2", parent: "N001", title: "build it", kind: "change", repo: "spn-x", work: "CODE", blockedBy: ["1"], touches: [], state: "waiting", entries: ["E2", "E3"] },
+  ];
+  const part = await dataWorkspace("sheet-part", { rows });
+  const run = (...args) => cli(part.root, ["workstream", "sheet", ...args]);
+  cli(part.root, ["workstream", "fact", "write", "N001", "--source", "spn-x/a.ts", "--fact", "a is 1", "--used-by", "1"]);
+  writeFileSync(join(part.ws, "arcs", "N001", "sheet.json"), JSON.stringify(sheetOf([entry("E1", { file: "spn-x:docs/a.md" }), entry("E2", { file: "spn-x:src/b.ts" }), entry("E3", { file: "spn-x:src/c.ts" })], { releaseChain: ["spn-x"] }), null, 2));
+  const wrote = cli(part.root, ["workstream", "go", "write", "N001"]);
+  const plan = JSON.parse(readFileSync(join(part.ws, "arcs", "N001", "go.json"), "utf8"));
+  const code = plan.parts.find((one) => one.work === "CODE");
+  ok("[MKT.SCRIPTS.446] the go carries E2 and E3 in one code part", wrote.code === 0 && JSON.stringify(code?.entries) === '["N001/E2","N001/E3"]', wrote.out + JSON.stringify(plan.parts.map((one) => [one.id, one.entries])));
+  const shown = run("show", "N001", "--part", code.id);
+  ok("[MKT.SCRIPTS.446] `--part` prints that part's two entries and no other", shown.code === 0 && shown.out.includes(`part ${code.id} · 2 entries`) && shown.out.includes("E2 edit") && shown.out.includes("E3 edit") && !shown.out.includes("E1 edit"), shown.out);
+  const asJson = run("show", "N001", "--part", code.id, "--json");
+  ok("[MKT.SCRIPTS.446] `--json` prints the same two entries", asJson.code === 0 && JSON.stringify(JSON.parse(asJson.out).entries.map((one) => one.id)) === '["E2","E3"]', asJson.out);
+  const none = run("show", "N001", "--part", "code-nowhere-9");
+  ok("[MKT.SCRIPTS.446] a part no plan holds is refused, named", none.code !== 0 && none.out.includes("code-nowhere-9"), none.out);
+}
+
+console.log("\n=== a published surface an entry breaks: the consumers are named (MKT.SCRIPTS.448)");
+{
+  const pkg = "@saasplane/toolchain-ts";
+  const world = await dataWorkspace("sheet-consumers");
+  const run = (...args) => cli(world.root, ["workstream", "sheet", ...args]);
+  const at = (path, body) => { mkdirSync(join(world.root, path, ".."), { recursive: true }); writeFileSync(join(world.root, path), body); };
+  at("spn-pkg/packages/toolchain-ts/package.json", JSON.stringify({ name: pkg, version: "5.52.0", exports: { "./config": "./src/config.ts", "./boot": "./src/boot.ts" } }));
+  for (const file of ["config", "boot", "util", "internal"]) at(`spn-pkg/packages/toolchain-ts/src/${file}.ts`, `export const ${file} = 1;\n`);
+  at("spn-platform/package.json", JSON.stringify({ name: "platform", devDependencies: { [pkg]: "5.52.0" } }));
+  at("spn-platform/apps/web/package.json", JSON.stringify({ name: "web", dependencies: { [pkg]: "5.52.0" } }));
+  at("spn-other/package.json", JSON.stringify({ name: "other", dependencies: { left: "1.0.0" } }));
+  cli(world.root, ["workstream", "fact", "write", "N001", "--source", "spn-x/a.ts", "--fact", "a is 1", "--used-by", "1"]);
+  const sheetPath = join(world.ws, "arcs", "N001", "sheet.json");
+  const findings = (entries) => { writeFileSync(sheetPath, JSON.stringify(sheetOf(entries), null, 2)); return run("check", "N001").out; };
+  const src = (name) => `spn-pkg:packages/toolchain-ts/src/${name}.ts`;
+  const named = (out) => out.includes(pkg) && out.includes("spn-platform") && out.includes("5.52.0") && out.includes("2 files") && !out.includes("spn-other");
+  const table = [
+    ["a drop of an exported file", entry("E1", { op: "drop", file: src("config") }), true],
+    ["a rename of an exported file", entry("E1", { op: "rename", file: src("boot") }), true],
+    ["an entry that says an export is removed", entry("E1", { file: src("util"), what: "removes the export `./legacy` of the package" }), true],
+    ["an entry that says boot refuses without a key", entry("E1", { file: src("util"), what: "boot refuses without the SPN_KEY key" }), true],
+    ["a drop of a file nothing exports", entry("E1", { op: "drop", file: src("internal") }), false],
+    ["an edit of an exported file", entry("E1", { file: src("config") }), false],
+  ];
+  for (const [label, one, breaks] of table) {
+    const out = findings([one]);
+    ok(`[MKT.SCRIPTS.448] ${label} ${breaks ? "is named against the repository pinning the package, with its pin and file count, and not against one that does not" : "breaks no consumer"}`,
+      breaks ? named(out) && out.includes("moves that pin") : !out.includes("spn-platform"), out);
+  }
+  const moved = findings([entry("E1", { op: "drop", file: src("config") }), entry("E2", { file: "spn-platform:package.json" })]);
+  ok("[MKT.SCRIPTS.448] an entry that moves the pin clears the finding", !moved.includes("spn-platform pins"), moved);
+  cli(world.root, ["workstream", "fact", "write", "N001", "--source", "spn-x/a.ts", "--fact", `spn-platform keeps ${pkg} at 5.52.0, so the pin stays`, "--used-by", "1"]);
+  const stays = findings([entry("E1", { op: "drop", file: src("config"), facts: ["f1", "f2"] })]);
+  ok("[MKT.SCRIPTS.448] a fact the entry cites that the pin stays clears it too", !stays.includes("spn-platform pins"), stays);
+}
+
+console.log("\n=== patch: an entry's change kept as a diff (MKT.SCRIPTS.449)");
+{
+  const kept = await dataWorkspace("sheet-patch");
+  const run = (...args) => cli(kept.root, ["workstream", "sheet", ...args]);
+  cli(kept.root, ["workstream", "fact", "write", "N001", "--source", "spn-x/a.ts", "--fact", "a is 1", "--used-by", "1"]);
+  const pinned = JSON.parse(readFileSync(join(kept.ws, "arcs", "N001", "facts.jsonl"), "utf8").split("\n")[0]).commit;
+  const sheetPath = join(kept.ws, "arcs", "N001", "sheet.json");
+  writeFileSync(sheetPath, JSON.stringify(sheetOf([entry("E1", { file: "spn-x:a.ts" })]), null, 2));
+  const nothing = run("patch", "N001", "E1");
+  ok("[MKT.SCRIPTS.449] a file with no change is refused, nothing written", nothing.code === 1 && nothing.out.includes("Nothing was written") && !existsSync(join(kept.ws, "arcs", "N001", "patches", "E1.diff")), nothing.out);
+  const gone = run("patch", "N001", "E9");
+  ok("[MKT.SCRIPTS.449] an entry the sheet does not hold is refused", gone.code !== 0 && gone.out.includes("E9"), gone.out);
+  writeFileSync(join(kept.repo, "a.ts"), "export const a = 2;\n");
+  const done = run("patch", "N001", "E1");
+  const diffFile = join(kept.ws, "arcs", "N001", "patches", "E1.diff");
+  ok("[MKT.SCRIPTS.449] patch writes patches/E1.diff, the diff against the pinned commit", done.code === 0 && existsSync(diffFile) && readFileSync(diffFile, "utf8").includes("+export const a = 2;"), done.out);
+  ok("[MKT.SCRIPTS.449] the entry names its patch and its base", JSON.stringify(json(sheetPath).entries[0].patch) === JSON.stringify({ file: "patches/E1.diff", base: pinned }), JSON.stringify(json(sheetPath).entries[0]));
+  ok("[MKT.SCRIPTS.449] the file is reset in the checkout", readFileSync(join(kept.repo, "a.ts"), "utf8") === "export const a = 1;\n");
+  ok("[MKT.SCRIPTS.449] one log line says so", lines(join(kept.ws, "arcs", "N001", "log.jsonl")).at(-1).note.includes("E1 patched"));
+}
+
+console.log("\n=== a patch field off its shape is a sheet fault (MKT.SCRIPTS.449)");
+{
+  const own = await dataWorkspace("sheet-patch-shape");
+  const there = (...args) => cli(own.root, ["workstream", "sheet", ...args]);
+  const keep = (name, value) => { const path = join(own.root, name); writeFileSync(path, JSON.stringify(value, null, 2)); return path; };
+  cli(own.root, ["workstream", "fact", "write", "N001", "--source", "spn-x/a.ts", "--fact", "a is 1", "--used-by", "1"]);
+  const refusedWrite = there("write", "N001", "--file", keep("bad.json", sheetOf([entry("E1", { patch: { file: "E1.diff", base: "not a commit" } })])));
+  ok("[MKT.SCRIPTS.449] a patch whose file is not under patches/ or whose base is not a commit is refused, naming the patch", refusedWrite.code !== 0 && refusedWrite.out.includes("patch"), refusedWrite.out);
+  const wroteGood = there("write", "N001", "--file", keep("good.json", sheetOf([entry("E1", { patch: { file: "patches/E1.diff", base: "abcdef1" } })])));
+  ok("[MKT.SCRIPTS.449] a patch under patches/ against a commit is kept", wroteGood.code === 0 && json(join(own.ws, "arcs", "N001", "sheet.json")).entries[0].patch.file === "patches/E1.diff", wroteGood.out);
+}
+
+console.log("\n=== the three forms of an arc address: N<nnn>, ideate and follow-ups (Q33)");
+{
+  const forms = await dataWorkspace("sheet-forms");
+  writeRoleArcs(forms.ws);
+  const there = (...args) => cli(forms.root, ["workstream", "sheet", ...args]);
+  const name = forms.ws.split("/").pop();
+  for (const arc of ["N001", "ideate", "follow-ups"]) {
+    const shown = there("show", `${name}/${arc}`);
+    ok(`show reads \`${name}/${arc}\` as an arc: no sheet there, one line, exit 0`, shown.code === 0 && shown.out.includes("no sheet"), shown.out);
+  }
+  const unknown = there("show", `${name}/build`);
+  ok("an address that is none of the three is refused", unknown.code !== 0, unknown.out);
 }
 
 console.log(failed ? `\n  ${failed} of ${total} FAILED — sheet` : `\n  all ${total} passed — sheet`);

@@ -100,7 +100,7 @@ console.log("\n=== a review panel's stop writes one PANEL row (RULE.DEVEX.WORKSP
     mkdirSync(join(root, ".spndevex", "workstreams", "open", "031-probe"), { recursive: true });
     writeFileSync(join(root, ".spndevex", ".debug", "switches.json"), '{"telemetry": true}');
     const child = join(root, "agent-ad63e6e35a5b14a80.jsonl");
-    writeFileSync(child, [user(prompt), said("reading the work"), said(reply)].join("\n") + "\n");
+    writeFileSync(child, [user(prompt), said("reading the work"), ...[].concat(reply).map(said)].join("\n") + "\n");
     if (via === "meta") writeFileSync(join(root, "agent-ad63e6e35a5b14a80.meta.json"), JSON.stringify({ agentType: type, description: "panel" }));
     const payload = { cwd: root, session_id: "sp", agent_id: "ad63", agent_transcript_path: child, ...(via === "payload" ? { agent_type: type } : {}) };
     const out = stop(root, payload);
@@ -148,6 +148,16 @@ console.log("\n=== a review panel's stop writes one PANEL row (RULE.DEVEX.WORKSP
   check("[MKT.HOOKS.440] a helper that is not the panel writes no PANEL row", other.rows.length === 0, JSON.stringify(other.rows));
   const unsure = setup("panel-unsure", { prompt: "Review 031/N001 as the architect.", reply: "Looks fine to me.\n\nPass" });
   check("[MKT.HOOKS.440] a panel whose last reply opens with no verdict writes no row", unsure.rows.length === 0, JSON.stringify(unsure.rows));
+  const twoRounds = setup("panel-two-rounds", { prompt: "Review 031/N001 as the architect.", reply: ["Pass with advice\n\nRename the helper.", "Noted, nothing to add after the second round."] });
+  check("[MKT.HOOKS.439] a panel whose first answer opens 'Pass with advice' and whose second opens with no verdict is recorded PASS_WITH_ADVICE",
+    twoRounds.rows.length === 1 && twoRounds.rows[0].verdict === "PASS_WITH_ADVICE", JSON.stringify(twoRounds.rows));
+  const joined = setup("panel-joined", { prompt: "Review 031/N001 as the architect.", reply: "PASS_WITH_ADVICE\n\nRename the helper." });
+  check("[MKT.HOOKS.439] a panel whose answer opens 'PASS_WITH_ADVICE' is recorded PASS_WITH_ADVICE too", joined.rows.length === 1 && joined.rows[0].verdict === "PASS_WITH_ADVICE", JSON.stringify(joined.rows));
+  const noneTwice = setup("panel-none-twice", { prompt: "Review 031/N001 as the architect.", reply: ["Looking at the work now.", "Still reading; more soon."] });
+  check("[MKT.HOOKS.440] a panel whose replies open with no verdict writes no row", noneTwice.rows.length === 0, JSON.stringify(noneTwice.rows));
+  const ideate = setup("panel-ideate", { prompt: "Convene the lens architect on 031-probe/ideate.", reply: "Pass" });
+  check("[MKT.HOOKS.439] a prompt naming `<ws>/ideate` records the arc ideate, and `<ws>/follow-ups` records follow-ups",
+    ideate.rows[0]?.arc === "ideate" && setup("panel-followups", { prompt: "Convene the lens architect on 031-probe/follow-ups.", reply: "Pass" }).rows[0]?.arc === "follow-ups", JSON.stringify(ideate.rows));
   const lens = setup("panel-nolens", { prompt: "Review 031/N001, no view named.", reply: "Pass" });
   check("[MKT.HOOKS.440] a prompt that names no lens writes no row, since a row holds a lens of the contract", lens.rows.length === 0, JSON.stringify(lens.rows));
   const handback = (name, message) => {
@@ -174,6 +184,42 @@ console.log("\n=== a review panel's stop writes one PANEL row (RULE.DEVEX.WORKSP
   writeFileSync(join(off, "agent-o.meta.json"), JSON.stringify({ agentType: "spn-devex:spn-panel" }));
   stop(off, { cwd: off, session_id: "sp", agent_id: "o", agent_transcript_path: offChild });
   check("[MKT.HOOKS.439] with recording off nothing is written", !existsSync(join(off, ".spndevex", ".debug")));
+}
+
+console.log("\n=== a panel whose stop fired before its last reply was saved gets its PANEL row from `replayPanels` (RULE.DEVEX.WORKSPACE.485)");
+{
+  const { replayPanels } = await import(join(PLUGIN, "src", "scripts", "lib", "panel.ts"));
+  const user = (text) => JSON.stringify({ type: "user", message: { role: "user", content: text } });
+  const said = (text) => JSON.stringify({ type: "assistant", message: { id: `m-${text.length}`, role: "assistant", content: [{ type: "text", text }], usage: { input_tokens: 1, output_tokens: 1 } } });
+  const root = join(BASE, "replay");
+  mkdirSync(join(root, ".spndevex", ".debug"), { recursive: true });
+  mkdirSync(join(root, ".spndevex", "workstreams", "open", "031-probe"), { recursive: true });
+  writeFileSync(join(root, ".spndevex", ".debug", "switches.json"), '{"telemetry": true}');
+  const window = join(root, "window.jsonl");
+  writeFileSync(window, assistant("w1", 1) + "\n");
+  const folder = join(root, "window", "subagents");
+  mkdirSync(folder, { recursive: true });
+  const child = join(folder, "agent-pr1.jsonl");
+  writeFileSync(join(folder, "agent-pr1.meta.json"), JSON.stringify({ agentType: "spn-devex:spn-panel" }));
+  writeFileSync(child, [user("Convene the architect lens on 031-probe/N001 for the release part release-spn-foundation-1."), said("reading the work")].join("\n") + "\n");
+  const facts = { script: "spn-devex", event: "Stop", tool: null, session: "sr" };
+  const rowsOf = () => {
+    const log = join(root, ".spndevex", ".debug", "telemetry", "hooks.jsonl");
+    return existsSync(log) ? readFileSync(log, "utf8").trim().split("\n").filter(Boolean).map((line) => JSON.parse(line)).filter((row) => row.mtype === "PANEL") : [];
+  };
+  const early = replayPanels(root, window, facts, []);
+  check("[MKT.HOOKS.439] a panel whose last reply holds no verdict yet writes no row, and is left for the next turn end", rowsOf().length === 0 && !early.includes("pr1"), JSON.stringify({ rows: rowsOf(), early }));
+  appendLine(child, said("Pass with advice\n\nRename the helper."));
+  const later = replayPanels(root, window, facts, early);
+  const rows = rowsOf();
+  check("[MKT.HOOKS.439] once the reply is there it writes one PANEL row, the helper's own, with the lens and the verdict",
+    rows.length === 1 && rows[0].agent === "pr1" && rows[0].event === "Stop" && rows[0].session === "sr" && rows[0].lens === "ARCHITECT" && rows[0].verdict === "PASS_WITH_ADVICE", JSON.stringify(rows));
+  check("[MKT.HOOKS.439] the row carries the workstream, arc and part the prompt names, and work read from the part",
+    rows[0]?.workstream === "031-probe" && rows[0]?.arc === "N001" && rows[0]?.part === "release-spn-foundation-1" && rows[0]?.work === "RELEASE", JSON.stringify(rows[0]));
+  check("[MKT.HOOKS.439] the agent id is settled, so a later turn end does not read it again", later.includes("pr1"), JSON.stringify(later));
+  replayPanels(root, window, facts, []);
+  replayPanels(root, window, facts, later);
+  check("[MKT.HOOKS.439] a replay that has lost its record of reads still writes none twice for one agent id", rowsOf().length === 1, JSON.stringify(rowsOf()));
 }
 
 console.log("\n=== it is silent where there is nothing to log");

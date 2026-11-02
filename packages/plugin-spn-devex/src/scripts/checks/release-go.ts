@@ -16,17 +16,14 @@
 // asks nobody anything. It reads a decision that was taken before the work started, and refuses a
 // version nobody agreed to.
 //
-// WHAT A GO LOOKS LIKE. The go `confirmed.ts` reads, plus the version, because a blanket go for an arc
-// is not a go for an irreversible number (RULE.DEVEX.WORKSPACE.069). The go is the write that moves the arc
-// that needs the release out of `PROPOSED`, and the developer's words in it name the version:
+// WHAT THE AGENT RECORDS BEFORE THE GO. The version is decided while the arc is planned, and the agent writes it into the arc's log
+// as a line of its own, for the repository the release is of:
 //
-//     workstream arc edit <ws>/<arc> --status DECIDED --note "<the developer's words, naming 2.0.0>"
+//     spn-devex workstream arc edit <ws>/<arc> --note "release <repo> <version>: <why>"
 //
-// It is read from the arc's data by `confirmed.ts`'s own reader, so the two checks cannot disagree about
-// what a go is: the arc reads `DECIDED`, `RUNNING` or `LANDED`, its `log.jsonl` holds the line that moved
-// it out of `PROPOSED` with words, and here those words must name the version. A `PROPOSED` arc holds no
-// go, whatever its log says. Nothing else counts, for the reason `confirmed.ts` gives: a conversation is
-// not a record.
+// The guard waits on nobody. It reads that line, and refuses a release with none, or a stamped version whose bump (major, minor or
+// patch over the repository's newest tag) is smaller than the recorded one. A bigger bump than recorded is not refused. A major release is therefore agreed at planning, in the
+// log, and never at execution.
 //
 // EVERY OPEN WORKSTREAM, NOT THIS WINDOW'S. A version belongs to a repository rather than to a window,
 // so the go may sit in any open workstream (RULE.DEVEX.WORKSPACE.236 names this check among those that
@@ -42,11 +39,10 @@
 // understand is a gate somebody turns off, and this one guards the act that most needs to stay on.
 
 import { execFileSync } from "node:child_process";
-import { isAbsolute, join } from "node:path";
+import { basename, isAbsolute, join } from "node:path";
 import { isDir, listdir, workspaceRoot, type Payload, type Verdict } from "../lib/payload.ts";
-import { arcIdsOf, logLinesOf, readArc } from "../lib/workstream.ts";
+import { arcIdsOf, logLinesOf } from "../lib/workstream.ts";
 import { workstreamsDir } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
-import { arcGoWords } from "./confirmed.ts";
 
 /** `apps release 2.0.0` / `infra release 2.0.0`, however the CLI is spelled to get there. */
 const RELEASE = /\b(apps|infra)\s+release\b([^|;&]*)/;
@@ -112,25 +108,42 @@ export function isMajorBump(next: string, current: string): boolean {
   return Number(a[1]) > Number(b[1]);
 }
 
-/** Whether the words name this version as a version of its own: `2.0.0` is not named by `12.0.0` or `2.0.01`. */
-export function namesVersion(words: string, version: string): boolean {
-  const escaped = version.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  // nosemgrep: javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp -- pattern built from this script's own constants and escaped text, never outside input
-  return new RegExp(`(?<![\\d.])${escaped}(?!\\d)`).test(words);
+/** How large a bump `next` is over `current`: 3 a major, 2 a minor, 1 a patch, 0 none. Null where either cannot be read. */
+export function bumpOf(next: string, current: string): number | null {
+  const a = SEMVER.exec(next), b = SEMVER.exec(current);
+  if (!a || !b) return null;
+  if (Number(a[1]) !== Number(b[1])) return Number(a[1]) > Number(b[1]) ? 3 : 0;
+  if (Number(a[2]) !== Number(b[2])) return Number(a[2]) > Number(b[2]) ? 2 : 0;
+  return Number(a[3]) > Number(b[3]) ? 1 : 0;
 }
 
-/** Whether any arc in any open workstream holds the developer's go, and its words name this version. */
-export function goRecorded(root: string, version: string): boolean {
+/** The repository a release runs in, by the folder name of its checkout's top level. */
+function repositoryOf(cwd: string): string {
+  try {
+    const top = execFileSync("git", ["-C", cwd, "rev-parse", "--show-toplevel"], { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim();
+    return basename(top || cwd);
+  } catch { return basename(cwd); }
+}
+
+/** The version the agent recorded for a repository's release in the log of any arc of any open workstream: the newest line wins. Null where none. */
+export function recordedVersion(root: string, repository: string): string | null {
+  const escaped = repository.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  // nosemgrep: javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp -- pattern built from this script's own constants and escaped text, never outside input
+  const line = new RegExp(`(?:^|[\\s\u00b7])release ${escaped} (\\d+\\.\\d+\\.\\d+[^\\s:]*):`);
+  let newest: { at: string; version: string } | null = null;
   const open = workstreamsDir(root, "open");
   for (const subject of listdir(open)) {
     const ws = join(open, subject);
     if (!isDir(ws)) continue;
     for (const arc of arcIdsOf(ws)) {
-      const words = arcGoWords(readArc(ws, arc)?.status, logLinesOf(ws, arc));
-      if (words !== null && namesVersion(words, version)) return true;
+      for (const entry of logLinesOf(ws, arc) as Array<{ at?: unknown; note?: unknown }>) {
+        const found = typeof entry?.note === "string" ? line.exec(entry.note) : null;
+        const at = typeof entry?.at === "string" ? entry.at : "";
+        if (found && (!newest || at >= newest.at)) newest = { at, version: found[1] };
+      }
     }
   }
-  return false;
+  return newest?.version ?? null;
 }
 
 export function checkReleaseGo(payload: Payload): Verdict {
@@ -145,23 +158,33 @@ export function checkReleaseGo(payload: Payload): Verdict {
   const cwd = commandCwd(command, payload.cwd ?? process.cwd());
   const current = currentVersion(cwd);
   if (!current) return null;                       // nothing to compare against: not this check's call
-  if (!isMajorBump(version, current)) return null; // minor and patch are the standing authorization
+  const stamped = bumpOf(version, current);
+  if (stamped === null) return null;               // an uncomparable version is not this check's call
 
   const root = workspaceRoot(cwd) ?? cwd;
-  if (goRecorded(root, version)) return null;
-
-  return {
-    deny:
-      `Denied: \`${version}\` raises the major over \`${current}\`, and no arc records a go for it.\n` +
-      `A major release is agreed BEFORE the work starts, as a card on the arc that needs it, so ` +
-      `execution never stops to ask for one. Minor and patch releases need none of this — they are ` +
-      `the standing authorization in \`N39\`.\n\n` +
-      `What is missing is the go of the arc that needs it, with the developer's words naming the version:\n\n` +
-      `    spn-devex workstream arc edit <ws>/<arc> --status DECIDED --note "<the developer's words, naming ${version}>"\n\n` +
-      `It counts once the arc reads DECIDED, RUNNING or LANDED and its log holds that line. Write the card, ` +
-      `get it answered, then record the answer as the arc's go. A go that lives only in this window ends ` +
-      `with this window, which is why nothing else counts (RULE.DEVEX.WORKSPACE.069).`,
-  };
+  const repository = repositoryOf(cwd);
+  const recorded = recordedVersion(root, repository);
+  const record = `spn-devex workstream arc edit <ws>/<arc> --note "release ${repository} ${version}: <why>"`;
+  if (recorded === null)
+    return {
+      deny:
+        `Denied: no arc's log records the version of the \`${repository}\` release, and \`${version}\` over \`${current}\` is what is being stamped.\n` +
+        `The agent decides the version while the arc is planned and records it before the go, so execution never waits on anyone:\n\n` +
+        `    ${record}\n\n` +
+        `Record it, then run the release (RULE.DEVEX.WORKSPACE.069).`,
+    };
+  const agreed = bumpOf(recorded, current);
+  if (agreed !== null && stamped < agreed) {
+    const name = ["no bump", "a patch", "a minor", "a major"];
+    return {
+      deny:
+        `Denied: \`${version}\` is only ${name[stamped]} over \`${current}\`, and the log records \`${recorded}\` for \`${repository}\`, ${name[agreed]}.\n` +
+        `Stamp the recorded version, or record the new one first with its reason:\n\n` +
+        `    ${record}\n\n` +
+        `(RULE.DEVEX.WORKSPACE.069).`,
+    };
+  }
+  return null;
 }
 
 if (process.argv[1]?.endsWith("release-go.ts")) {

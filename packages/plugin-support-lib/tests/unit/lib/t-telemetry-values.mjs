@@ -95,6 +95,19 @@ console.log("\n=== a written row — off-pattern fields are null");
   same("[MKT.SCRIPTS.329] the first line carries `v`", rows[0].v, 1);
 }
 
+console.log("\n=== the arc field — N<nnn>, ideate and follow-ups");
+{
+  same("[MKT.SCRIPTS.491] ARC_PATTERN accepts N011, ideate and follow-ups", ["N011", "ideate", "follow-ups"].map((one) => ARC_PATTERN.test(one)), [true, true, true]);
+  same("[MKT.SCRIPTS.491] ARC_PATTERN refuses N11, Ideate, follow-up and 012", ["N11", "Ideate", "follow-up", "012"].map((one) => ARC_PATTERN.test(one)), [false, false, false, false]);
+  rmSync(logPath, { force: true });
+  for (const arc of ["ideate", "other"])
+    execFileSync("node", ["--input-type=module", "-e", `
+      import { begin, end } from ${JSON.stringify(join(LIB, "timing.ts"))};
+      begin({ script: "spn-devex", event: "PreToolUse", tool: "Bash", session: "s", arc: ${JSON.stringify(arc)} }, ${JSON.stringify(root)});
+      end();`], { env: env(), encoding: "utf8" });
+  same("[MKT.SCRIPTS.491] a row written with arc ideate holds it, and one with other holds null", logOf().map((row) => row.arc), ["ideate", null]);
+}
+
 console.log("\n=== the old log — a first line without `v` moves to .1.jsonl before the append");
 {
   const old = join(BASE, "old", "telemetry", "hooks.jsonl");

@@ -160,5 +160,36 @@ try {
   rmSync(root, { recursive: true, force: true });
 }
 
+// The size a check's output carries: its `out` bytes times the replies the same window (and agent) made after the row, counted from
+// `usage.jsonl` by session, agent and time (MKT.HOOKS.470).
+const carriedRoot = realpathSync(mkdtempSync(join(tmpdir(), "debug-hooks-carried-")));
+try {
+  console.log("\n=== the size a check's output carries");
+  const folder = join(carriedRoot, ".spndevex", ".debug", "telemetry");
+  mkdirSync(join(carriedRoot, ".spndevex", "workstreams"), { recursive: true });
+  mkdirSync(folder, { recursive: true });
+  const turn = (id, at, session = "c1", agent = null) => JSON.stringify({ v: 1, mtype: "TURN", id, at, ms: 0, event: "Stop", session, agent, workstream: null, arc: null,
+    part: null, skill: null, stage: null, work: null, retryOf: null, model: "claude-opus-5-5", tokens: { in: 1, out: 1, cacheRead: 0, cacheWrite: 0 } });
+  writeFileSync(join(folder, "hooks.jsonl"), [
+    check("carrier", "NOTE", 5, 1000, { session: "c1", at: "2026-10-10T10:00:10Z", event: "UserPromptSubmit" }),
+    check("helper-check", "NOTE", 5, 100, { session: "c1", agent: "h1", at: "2026-10-10T10:00:10Z", event: "SubagentStart" }),
+  ].join("\n") + "\n");
+  writeFileSync(join(folder, "usage.jsonl"), [
+    turn("u0", "2026-10-10T10:00:00Z"),
+    turn("u1", "2026-10-10T10:00:20Z"), turn("u2", "2026-10-10T10:00:30Z"), turn("u3", "2026-10-10T10:00:40Z"), turn("u4", "2026-10-10T10:00:50Z"),
+    turn("o1", "2026-10-10T10:00:30Z", "other"),
+    turn("h1", "2026-10-10T10:00:30Z", "c1", "h1"), turn("h2", "2026-10-10T10:00:40Z", "c1", "h1"),
+  ].join("\n") + "\n");
+  const shown = JSON.parse(typed(carriedRoot, "show", "--json").out);
+  const carrier = shown.checks.find((one) => one.check === "carrier"), helper = shown.checks.find((one) => one.check === "helper-check");
+  ok("[MKT.HOOKS.470] a check row with out 1000 followed by 4 turns of its window carries 4000", carrier?.carried === 4000, JSON.stringify(carrier));
+  ok("[MKT.HOOKS.470] and its event carries the same", shown.events.find((one) => one.event === "UserPromptSubmit")?.carried === 4000, JSON.stringify(shown.events));
+  ok("[MKT.HOOKS.470] a turn of another window, and one before the row, add nothing", carrier?.carried === 4000);
+  ok("[MKT.HOOKS.470] a helper's row counts only that helper's later replies", helper?.carried === 200, JSON.stringify(helper));
+  ok("[MKT.HOOKS.470] the printed form puts Carried beside Out bytes", /Out bytes\s+Carried/.test(typed(carriedRoot, "show").out));
+} finally {
+  rmSync(carriedRoot, { recursive: true, force: true });
+}
+
 console.log(failed ? `\n  ${failed} of ${total} FAILED — debug hooks` : `\n  all ${total} passed — debug hooks`);
 process.exit(failed ? 1 : 0);

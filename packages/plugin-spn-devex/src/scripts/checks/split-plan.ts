@@ -42,6 +42,7 @@
 import { readFileSync, readdirSync, statSync } from "node:fs";
 import { TERMINAL } from "./arc-status.ts";
 import { statusOfData } from "../lib/workstream.ts";
+import { ARC_ID } from "../lib/workstream-schema.ts";
 import { basename, dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 import { emit, isDir, isFile, listdir, read, readPayload, runAlone, unescape, workspaceRoot,
          type Payload, type Verdict } from "../lib/payload.ts";
@@ -213,10 +214,10 @@ const DATA_STATE: Record<string, string> = {
 };
 const CARD_BLOCKER = /^q\d+$/i;
 
-/** The arcs a workstream keeps as data: each `arcs/N<nnn>/` folder, by its id. */
+/** The arcs a workstream keeps as data: each `arcs/<arc>/` folder (`N<nnn>`, `ideate`, `follow-ups`), by its id. */
 export function dataArcsOf(folder: string): string[] {
   const dir = join(folder, "arcs");
-  return listdir(dir).filter((name) => /^N\d+[a-z]?$/.test(name) && isDir(join(dir, name)));
+  return listdir(dir).filter((name) => ARC_ID.test(name) && isDir(join(dir, name)));
 }
 
 /**
@@ -1173,7 +1174,7 @@ export function gateClose(payload: Payload): Verdict {
         deny:
           `Denied: \`${subject}\` cannot close while its go is unfinished.\n\n` +
           `${goLeft.slice(0, 10).map((line) => `  - ${line}`).join("\n")}${goLeft.length > 10 ? `\n  … and ${goLeft.length - 10} more` : ""}\n\n` +
-          `Run \`spn-devex workstream go check <workstream>/N<nnn>\` and read what it names; a part lands when its helper's report is in, ` +
+          `Run \`spn-devex workstream go check <workstream>/<arc>\` and read what it names; a part lands when its helper's report is in, ` +
           `and a plan that lost an entry is written again with \`go write\`.`,
       };
 
@@ -1246,7 +1247,7 @@ export function gateClose(payload: Payload): Verdict {
     const unfinished: string[] = [];
     const arcDirs = [...new Set([...folders, ...pages.map(dirname)].map((f) => join(f, "arcs")))];
     for (const dir of arcDirs.filter(isDir)) {
-      for (const arc of listdir(dir).filter((x) => /^N\d+[a-z]?$/.test(x))) {
+      for (const arc of listdir(dir).filter((x) => ARC_ID.test(x))) {
         const st = statusOfData(dirname(dir), arc);
         if (st && !TERMINAL.has(st)) unfinished.push(`  - ${arc} — ${st}`);
       }

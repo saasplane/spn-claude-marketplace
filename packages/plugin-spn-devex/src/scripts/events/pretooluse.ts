@@ -50,6 +50,9 @@ import { applies as questionsApply, checkQuestions } from "../checks/questions.t
 import { begin, carry, end, record, span, tagsOf, callOf, type SpanName } from "../../../../plugin-support-lib/src/lib/timing.ts";
 import { skillValue } from "../../../../plugin-support-lib/src/lib/telemetry-values.ts";
 import { startCommand } from "../lib/bash-timing.ts";
+import { ARC_ID } from "../lib/workstream-schema.ts";
+/** An arc's address as a pattern part, read from `ARC_ID`: `N<nnn>`, `ideate` or `follow-ups`. */
+const ARC_PART = ARC_ID.source.slice(1, -1);
 import { checkChildSize } from "../checks/child-size.ts";
 import { checkReadSize } from "../checks/read-size.ts";
 import { checkArcStatus } from "../checks/arc-status.ts";
@@ -66,7 +69,7 @@ import { checkReportAsked } from "../checks/report-asked.ts";
 import { applies as keptPathsApplies, checkKeptPaths } from "../checks/kept-paths.ts";
 import { applies as commitByPathApplies, checkCommitByPath } from "../checks/commit-by-path.ts";
 import { applies as commitStagedApplies, checkCommitStaged } from "../checks/commit-staged.ts";
-import { checkAgentModel, launchOrderModel } from "../checks/agent-model.ts";
+import { checkAgentModel, launchDefaultModel, launchOrderModel } from "../checks/agent-model.ts";
 import { applies as workstreamOpenApplies, checkWorkstreamOpen } from "../checks/workstream-open.ts";
 import { applies as memoryLessonApplies, checkMemoryLesson } from "../checks/memory-lesson.ts";
 import { applies as publishLockstepApplies, checkPublishLockstep } from "../checks/publish-lockstep.ts";
@@ -85,60 +88,6 @@ type Check = {
 };
 
 const PROSE_SUFFIXES = [".md", ".html"];
-
-// ---------------------------------------------------------------------------- a handover written before the turn ends
-
-// The lines a handover block is made of (`stop.ts` keeps the full list); a fenced block with three of them is read as one.
-const HANDOVER_LINE = /^(?:continue|model|read first|pins|live now|done when|do not touch|open):/gm;
-
-/**
- * Where in the transcript the current turn's handover block stands: the line of the turn's prompt when a text
- * message of the turn already holds a filled-in block, or null. The turn starts at the developer's last prompt of
- * their own text; a tool result and a Stop hook's feedback do not start one. A block still holding `{{` is a template.
- */
-export function handoverInTurn(transcript: string): string | null {
-  let raw = "";
-  try { raw = readFileSync(transcript, "utf8"); } catch { return null; }
-  // The fast path: every block carries this label, so a transcript without it holds none.
-  if (!raw.includes("do not touch:")) return null;
-  let turn = -1;
-  let found = false;
-  const lines = raw.split("\n");
-  for (let at = 0; at < lines.length; at += 1) {
-    if (!lines[at].trim()) continue;
-    let entry: { type?: string; isMeta?: boolean; isSidechain?: boolean; message?: { content?: unknown } };
-    try { entry = JSON.parse(lines[at]); } catch { continue; }
-    if (entry.isSidechain) continue;
-    const content = entry.message?.content;
-    if (entry.type === "user" && !entry.isMeta) {
-      const text = typeof content === "string" ? content
-        : Array.isArray(content) ? content.filter((part) => (part as { type?: string }).type === "text")
-            .map((part) => (part as { text?: string }).text ?? "").join("\n") : "";
-      if (text.trim() && !text.startsWith("Stop hook feedback:")) { turn = at; found = false; }
-      continue;
-    }
-    if (entry.type !== "assistant" || !Array.isArray(content)) continue;
-    for (const part of content as Array<{ type?: string; text?: string }>) {
-      if (part.type !== "text" || !part.text || !part.text.includes("do not touch:")) continue;
-      for (const fence of part.text.matchAll(/^ {0,3}(`{3,}|~{3,})[^\n]*\n([\s\S]*?)\n {0,3}\1/gm))
-        if (!fence[2].includes("{{") && (fence[2].match(HANDOVER_LINE)?.length ?? 0) >= 3) found = true;
-    }
-  }
-  return found ? `turn@${turn}` : null;
-}
-
-/** RULE.DEVEX.WORKSPACE.393: a text message of this turn already holds a handover block, so the agent is told once, and the tool still runs. */
-export function checkHandoverLast(payload: Payload & { transcript_path?: string }): Verdict {
-  if (payload.agent_id || !payload.transcript_path) return null;
-  const turn = handoverInTurn(payload.transcript_path);
-  if (!turn) return null;
-  const root = eventWorkspace(payload.cwd ?? process.cwd());
-  if (!root || alreadyTold(root, payload.session_id, "handover-last|turn", turn)) return null;
-  return { note:
-    "A handover block is written and this turn goes on. A handover is the turn's last message, after every read and write. " +
-    "Finish the work, then end with one line that says the block above stands, or with one block that replaces it. " +
-    "Never print both (RULE.DEVEX.WORKSPACE.393)." };
-}
 
 // Cheapest first: a path check before a file read, a file read before a workspace walk.
 //
@@ -195,8 +144,6 @@ const CHECKS: Check[] = [
     applies: (_path, command) => command.includes("workstream") && (command.includes("DECIDED") || command.includes("LANDED")) },
   { name: { group: "doc-check", action: "doc-check" }, run: checkDoc, needs: ["command", "file_path"],
     applies: (path, command) => PROSE_SUFFIXES.some((s) => path.endsWith(s) || command.includes(s)) },
-  // A note once a turn, after a handover block: it reads the transcript, and its fast path is the label every block carries.
-  { name: { group: "handover-last", action: "handover-last" }, run: checkHandoverLast, needs: ["any"], applies: () => true },
   // Round-1 writes: a closed workstream, a cache or a card-less estate edit is refused; a memory write is told once. Each
   // tests the path first, so an ordinary edit pays one comparison.
   { name: { group: "kept-paths", action: "kept-paths" }, run: checkKeptPaths, needs: ["file_path"],
@@ -412,10 +359,10 @@ function docFindingHeard(payload: Payload, path: string, finding: string): boole
 export function checkOrderEntries(payload: Payload): Verdict {
   const input = (payload.tool_input ?? {}) as { prompt?: string };
   const cwd = payload.cwd ?? process.cwd();
-  for (const named of (input.prompt ?? "").matchAll(/[^\s'"`()]*notes\/N\d+[a-z]?\/orders\/[^\s'"`()]+\.md/g)) {
+  for (const named of (input.prompt ?? "").matchAll(new RegExp(`[^\\s'"\`()]*notes\\/(?:${ARC_PART})\\/orders\\/[^\\s'"\`()]+\\.md`, "g"))) {
     try {
       const path = resolve(cwd, named[0]);
-      const placed = /^(.*)\/notes\/(N\d+[a-z]?)\/orders\/([^/]+)$/.exec(path.split("\\").join("/"));
+      const placed = new RegExp(`^(.*)\\/notes\\/(${ARC_PART})\\/orders\\/([^/]+)$`).exec(path.split("\\").join("/"));
       if (!placed || path.endsWith(".report.md")) continue;
       const [, ws, arc, file] = placed;
       const front = /^---\n([\s\S]*?)\n---/.exec(readFileSync(path, "utf8"))?.[1] ?? "";
@@ -446,10 +393,10 @@ export function checkOrderEntries(payload: Payload): Verdict {
 export function checkLaunch(payload: Payload): Verdict {
   const input = (payload.tool_input ?? {}) as { prompt?: string };
   const cwd = payload.cwd ?? process.cwd();
-  for (const named of (input.prompt ?? "").matchAll(/[^\s'"`()]*notes\/N\d+[a-z]?\/orders\/[^\s'"`()]+\.md/g)) {
+  for (const named of (input.prompt ?? "").matchAll(new RegExp(`[^\\s'"\`()]*notes\\/(?:${ARC_PART})\\/orders\\/[^\\s'"\`()]+\\.md`, "g"))) {
     try {
       const path = resolve(cwd, named[0]);
-      const placed = /^(.*)\/notes\/(N\d+[a-z]?)\/orders\/([^/]+)$/.exec(path.split("\\").join("/"));
+      const placed = new RegExp(`^(.*)\\/notes\\/(${ARC_PART})\\/orders\\/([^/]+)$`).exec(path.split("\\").join("/"));
       if (!placed || path.endsWith(".report.md")) continue;
       const [, ws, orderArc, file] = placed;
       const plans = arcIdsOf(ws).map((arc) => readGo(ws, arc)).filter((plan) => plan !== null);
@@ -495,9 +442,9 @@ const NO_PICTURE = /\b(never|no|not|don't|without|nothing)\b/i;
 /** The developer's ask, cited: the words, or a quoted ask with a time. */
 const CITED_ASK = /the developer asked to see|["“][^"”\n]+["”][^\n]*\b\d{4}-\d{2}-\d{2}[ T]\d{2}:\d{2}/i;
 
-/** Whether a path is an order's brief: `notes/N<nnn>/orders/*.md`, and not its `.report.md`. */
+/** Whether a path is an order's brief: `notes/<arc>/orders/*.md`, and not its `.report.md`. */
 export function isOrderBrief(path: string): boolean {
-  return /\/notes\/N\d+[a-z]?\/orders\/[^/]+\.md$/.test(path) && !path.endsWith(".report.md");
+  return new RegExp(`\\/notes\\/(?:${ARC_PART})\\/orders\\/[^/]+\\.md$`).test(path) && !path.endsWith(".report.md");
 }
 
 /**
@@ -629,12 +576,18 @@ try { verdict = dispatch(payload); } catch { verdict = null; }   // never take t
 if (!verdict?.deny) startCommand(payload);
 end();
 const launched = payload.tool_name === "Agent" || payload.tool_name === "Task";
-const taken = !verdict?.deny && launched && !(payload.tool_input as { model?: string } | undefined)?.model ? launchOrderModel(payload) : null;
+const launchedModel = (payload.tool_input as { model?: string } | undefined)?.model?.trim() ?? "";
+// A launch with no model and no order that names one takes its agent kind's model, else sonnet (`launchDefaultModel`), and runs rather than being refused.
+const orderTakes = !verdict?.deny && launched ? (launchOrderModel(payload) ?? (launchedModel ? null : launchDefaultModel(payload))) : null;
+// A launch with no model, or one of another family than its order's `model:` line, takes the order's model.
+const taken = orderTakes && (!launchedModel || !launchedModel.toLowerCase().includes(orderTakes)) ? orderTakes : null;
 if (taken) {
-  // A launch with no model takes the order's `model:` line, so the call runs instead of being refused and retried.
+  // The call runs on the order's model, so it is not refused and retried; a launch that named another model is told.
   const specific: Record<string, unknown> = { hookEventName: "PreToolUse", permissionDecision: "allow",
     updatedInput: { ...payload.tool_input, model: taken } };
-  if (verdict?.note) specific.additionalContext = verdict.note;
+  const told = launchedModel ? `This launch named \`${launchedModel}\` and its order names \`model: ${taken}\`; it runs on \`${taken}\` (RULE.DEVEX.AGENT.104).` : "";
+  const note = [verdict?.note, told].filter(Boolean).join("\n\n");
+  if (note) specific.additionalContext = note;
   console.log(JSON.stringify({ hookSpecificOutput: specific }));
 } else emit(verdict);
 process.exit(0);

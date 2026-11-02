@@ -28,7 +28,9 @@ const HOOKS_LOG = "hooks.jsonl";
  * A sheet of the scope, with its arc, the ids of the entries its landed rows hold, the repositories it still owes a proof in,
  * and the ids of the entries `sheet drop` took out with a logged note.
  */
-export type ScopeSheet = { arc: string; sheet: Sheet; landed?: readonly string[]; proofs?: readonly string[]; dropped?: readonly string[] };
+export type ScopeSheet = { arc: string; sheet: Sheet; landed?: readonly string[]; proofs?: readonly string[]; dropped?: readonly string[]; data?: ArcData | null };
+/** The repository that holds the book: outside every release chain, and first in a go (RULE.DEVEX.WORKSPACE.455). */
+export const BOOK_REPO = "spn-foundation";
 /** What a landed row took: entries done in a repository at a kind of change, in minutes. */
 export type Measure = { repo: string; work: string; entries: number; minutes: number };
 /** A `TEST` row of `hooks.jsonl`, as far as a full run is told apart. */
@@ -111,12 +113,17 @@ export function ratesOf(measures: readonly Measure[]): Record<string, number> {
 }
 
 /**
- * What the landed rows of the arcs took: the cost each row recorded, which `report write` measures from the usage rows of its
- * part. A row with no repository, kind of change or entries measures nothing.
+ * What the landed work took: the cost each landed part of the plan recorded (`report write` measures it from the usage rows of its part,
+ * and the part's repository and kind of work are the part's own), and the cost each landed row recorded where no part did. A part
+ * that holds no entry, and a row with no repository, kind of work or entries, measure nothing.
  */
-export function landedMeasures(root: string, workstream: string, arcs: readonly ArcData[]): Measure[] {
+export function landedMeasures(root: string, workstream: string, arcs: readonly ArcData[], plan: GoPlan | null = null): Measure[] {
   void root; void workstream;
   const out: Measure[] = [];
+  for (const part of plan?.parts ?? []) {
+    if (part.state !== "landed" || !part.entries.length || !(part.cost && part.cost.minutes > 0)) continue;
+    out.push({ repo: part.repo, work: part.work, entries: part.entries.length, minutes: part.cost.minutes });
+  }
   for (const data of arcs) {
     for (const row of data.rows) {
       if (row.state !== "landed" || !row.repo || !row.work || !row.entries?.length) continue;
@@ -190,7 +197,13 @@ export type DeriveOptions = {
   landedOrder?: readonly string[];
   /** A small follow-up the lead window carries out itself: each repository's new entries in ONE part with one report, no baseline and no new release (s22). */
   followUp?: boolean;
+  /** The other arcs of the workstream, outside the scope, with their sheets and data: what a `dependsOn` line or a DOCS row names there waits as a line. */
+  siblings?: readonly ScopeSheet[];
+  /** Whether an entry's patch applies on the repository's worktree (`git apply --3way --check`); a patch that does not loses its patch for this go. Absent, every patch stands. */
+  patchOk?: (arc: string, entry: SheetEntry) => boolean;
 };
+/** A derived plan, with the parts of every wait circle that runs through a release: `go write` refuses a plan that has one and never saves the field. */
+export type DerivedGo = GoPlan & { circles: string[][] };
 
 /** The ids of the parts that landed, oldest first, read from the `<part> landed` go lines of the lead arc's log. */
 export function landedOrder(ws: string, lead: string): string[] {
@@ -202,11 +215,28 @@ export function landedOrder(ws: string, lead: string): string[] {
   return rows.sort((a, b) => a.at - b.at).map((one) => one.id);
 }
 
-/** Entries to a part: the 45 minutes over the rate for a repository and kind of change, or 8 where it is unmeasured. */
-export function boundOf(rates: Record<string, number>, repo: string, work: string): number {
-  const rate = rates[`${repo}|${work}`];
-  return rate && rate > 0 ? Math.max(1, Math.floor(PART_MINUTES / rate)) : UNMEASURED_ENTRIES;
+/**
+ * The minutes for one entry in a repository and kind of work: the repository's own rate, else the rate of the same kind of work in
+ * another repository (`from` names it), else none (rate 0).
+ */
+export function rateOf(rates: Record<string, number>, repo: string, work: string): { rate: number; from: string | null } {
+  const own = rates[`${repo}|${work}`];
+  if (own > 0) return { rate: own, from: null };
+  for (const [key, rate] of Object.entries(rates)) {
+    const at = key.lastIndexOf("|");
+    if (rate > 0 && key.slice(at + 1) === work && key.slice(0, at) !== repo) return { rate, from: key.slice(0, at) };
+  }
+  return { rate: 0, from: null };
 }
+
+/** Entries to a part: the 45 minutes over the rate for a repository and kind of change, or that kind's rate in another repository, or 8 where no part of that kind has landed. */
+export function boundOf(rates: Record<string, number>, repo: string, work: string): number {
+  const { rate } = rateOf(rates, repo, work);
+  return rate > 0 ? Math.max(1, Math.floor(PART_MINUTES / rate)) : UNMEASURED_ENTRIES;
+}
+
+/** Whether a part is a repository's apply part, `apply-<repo>`: the patches and light entries the lead carries out itself. */
+export const isApplyPart = (part: Pick<GoPart, "id">): boolean => part.id.startsWith("apply-");
 
 /** The places a part has in a repository's run: a baseline and a full run are both TEST work, told apart by their ids. */
 type Slot = "DOCS" | "BASELINE" | "CODE" | "FULL_RUN" | "GENERATED" | "RELEASE" | "PROOF";
@@ -235,6 +265,30 @@ export function namedFiles(entry: SheetEntry, fields: ReadonlyArray<"callers" | 
   return out;
 }
 
+/** The decision an entry cites first: a preview section (`…#s3a`) or a card (`Q29`, `S70`), as the lower-case name a part is called by. */
+function decisionOf(entry: SheetEntry): { decision: string; preview: boolean } | null {
+  for (const text of Array.isArray(entry.decidedBy) ? entry.decidedBy : []) {
+    const section = /#(s\d+[a-z]?)\b/i.exec(text);
+    if (section) return { decision: section[1].toLowerCase(), preview: true };
+    const card = /^([QS]\d+)\b/i.exec(text.trim());
+    if (card) return { decision: card[1].toLowerCase(), preview: false };
+  }
+  return null;
+}
+
+/** The names an entry's `what` says it exports, declares or adds: a code-looking word after the verb, up to the clause's end. */
+export function exportedNames(entry: Pick<SheetEntry, "what">): string[] {
+  const out: string[] = [];
+  for (const clause of String(entry.what).matchAll(/\b(?:export(?:s|ing|ed)?|declar(?:es|ing|ed)?|add(?:s|ing|ed)?)\b([^.;]*)/gi))
+    for (const word of clause[1].matchAll(/`([^`]+)`|([A-Za-z_$][\w$]*)/g)) {
+      const name = word[1] ?? word[2];
+      if (word[1] || /[a-z][A-Z0-9]|_|^[A-Z]{2}/.test(name)) out.push(name);
+    }
+  return [...new Set(out)];
+}
+/** Whether a text names a name as a whole word, never as part of a longer one. */
+export const namesIn = (text: string, name: string): boolean => new RegExp(`(?<![\\w$])${name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}(?![\\w$])`).test(text);
+
 const numberOf = (part: GoPart): number => Number(part.id.slice(part.id.lastIndexOf("-") + 1)) || 0;
 
 /**
@@ -245,9 +299,9 @@ export function orderByUse(group: { refs: string[]; entries: SheetEntry[] }): vo
   const count = group.entries.length;
   const before: Set<number>[] = group.entries.map(() => new Set<number>());
   group.entries.forEach((maker, at) => {
-    if (maker.op !== "create") return;
-    const users = namedFiles(maker, ["callers", "then"]);
-    group.entries.forEach((user, other) => { if (other !== at && users.has(user.file)) before[other].add(at); });
+    const names = exportedNames(maker);
+    const users = maker.op === "create" ? namedFiles(maker, ["callers", "then"]) : new Set<string>();
+    group.entries.forEach((user, other) => { if (other !== at && (users.has(user.file) || names.some((name) => namesIn(user.what, name)))) before[other].add(at); });
   });
   // EACH ENTRY FOLLOWS WHAT IT BUILDS ON, placed just before its first user; ANY CYCLE KEEPS THE NUMBER ORDER, whole.
   let done: number[] = [];
@@ -275,7 +329,7 @@ export function orderByUse(group: { refs: string[]; entries: SheetEntry[] }): vo
  * and running parts stay as they were and the entries they hold are left out, except a landed part's entry that changed, which
  * gets a follow-up part; every other part is cut anew.
  */
-export function deriveGo(scope: readonly ScopeSheet[], options: DeriveOptions = {}): GoPlan {
+export function deriveGo(scope: readonly ScopeSheet[], options: DeriveOptions = {}): DerivedGo {
   const rates = options.rates ?? {};
   const chain: string[] = [];
   for (const { sheet } of scope) for (const repo of sheet.releaseChain ?? []) if (!chain.includes(repo)) chain.push(repo);
@@ -291,12 +345,26 @@ export function deriveGo(scope: readonly ScopeSheet[], options: DeriveOptions = 
   const done = new Set([...landedRefs(scope)].filter((ref) => !moved.has(ref)));
   const groups = new Map<string, { repo: string; pass: Slot; refs: string[]; entries: SheetEntry[] }>();
   const repos: string[] = [];
+  // A repository's APPLY entries: a code entry with a patch that applies, and a code entry with no tiers whose file no other entry of the scope edits.
+  const fileUse = new Map<string, number>();
+  for (const { sheet } of scope) for (const entry of sheet.entries) fileUse.set(entry.file, (fileUse.get(entry.file) ?? 0) + 1);
+  const applyGroups = new Map<string, { refs: string[]; entries: SheetEntry[] }>();
+  const appliesIn = (arc: string, entry: SheetEntry): boolean => {
+    if (options.followUp || entrySlot(entry) !== "CODE") return false;
+    if (entry.patch) return options.patchOk ? options.patchOk(arc, entry) : true;
+    return Object.values(entry.tiers ?? {}).flat().length === 0 && fileUse.get(entry.file) === 1;
+  };
   for (const { arc, sheet } of scope) {
     for (const entry of sheet.entries) {
       const ref = refOf(arc, entry);
       if (keptRefs.has(ref) || done.has(ref)) continue;
       const repo = repoOf(entry);
       if (!repos.includes(repo)) repos.push(repo);
+      if (appliesIn(arc, entry)) {
+        const apply = applyGroups.get(repo) ?? { refs: [], entries: [] };
+        apply.refs.push(ref); apply.entries.push(entry); applyGroups.set(repo, apply);
+        continue;
+      }
       const pass = entrySlot(entry);
       const group = groups.get(`${repo}|${pass}`) ?? { repo, pass, refs: [], entries: [] };
       group.refs.push(ref);
@@ -319,13 +387,16 @@ export function deriveGo(scope: readonly ScopeSheet[], options: DeriveOptions = 
   for (const part of kept) if (!repos.includes(part.repo) && slotOf(part) !== "RELEASE") repos.push(part.repo);
   const owed = new Set(scope.flatMap(({ proofs }) => proofs ?? []));
   for (const repo of owed) if (!repos.includes(repo)) repos.push(repo);
-  const rank = (repo: string) => { const at = chain.indexOf(repo); return at < 0 ? chain.length : at; };
+  const rank = (repo: string) => { const at = chain.indexOf(repo); return at >= 0 ? at : repo === BOOK_REPO ? -1 : chain.length; };
   repos.sort((a, b) => rank(a) - rank(b));
 
   const measuredOf = (repo: string, pass: Slot): string | null => {
-    const rate = rates[`${repo}|${pass}`];
+    const { rate, from } = rateOf(rates, repo, workOf(pass));
     if (!(rate > 0)) return null;
-    const count = (options.measures ?? []).filter((one) => one.repo === repo && one.work === workOf(pass) && one.entries > 0 && one.minutes > 0).length;
+    const there = from ?? repo;
+    const count = (options.measures ?? []).filter((one) => one.repo === there && one.work === workOf(pass) && one.entries > 0 && one.minutes > 0).length;
+    // The rate of the same kind of work in another repository is an estimate, and says so.
+    if (from) return `estimated from ${from} (${count} landed ${workOf(pass)} parts there)`;
     return `cost of ${count ? `${count} ` : ""}landed ${pass} rows in ${repo}`;
   };
   const full = typeof options.fullRunMinutes === "number" ? Math.round(options.fullRunMinutes * 10) / 10 : null;
@@ -336,7 +407,7 @@ export function deriveGo(scope: readonly ScopeSheet[], options: DeriveOptions = 
 
   const fresh: GoPart[] = [];
   for (const repo of repos) {
-    const hasCode = groups.has(`${repo}|CODE`) || kept.some((one) => one.repo === repo && slotOf(one) === "CODE");
+    const hasCode = groups.has(`${repo}|CODE`) || applyGroups.has(repo) || kept.some((one) => one.repo === repo && slotOf(one) === "CODE");
     for (const pass of SLOT_ORDER) {
       if (pass === "BASELINE" || pass === "FULL_RUN") {
         let id = `${pass === "BASELINE" ? "baseline" : "full"}-${repo}`;
@@ -352,7 +423,7 @@ export function deriveGo(scope: readonly ScopeSheet[], options: DeriveOptions = 
             const order = options.landedOrder ?? [];
             const lastFull = order.lastIndexOf(fulls.filter((one) => one.state === "landed").sort((a, b) => numberOf(b) - numberOf(a))[0]?.id ?? "");
             const lateCode = lastFull >= 0 && kept.some((one) => one.repo === repo && slotOf(one) === "CODE" && one.state === "landed" && order.lastIndexOf(one.id) > lastFull);
-            if (groups.has(`${repo}|CODE`) || lateCode) id = `${id}-${landedN + 1}`; else runs = false;
+            if (groups.has(`${repo}|CODE`) || applyGroups.has(repo) || lateCode) id = `${id}-${landedN + 1}`; else runs = false;
           }
         }
         if (runs && !keptIds.has(id)) fresh.push(part(id, repo, pass, [], [], {
@@ -360,20 +431,53 @@ export function deriveGo(scope: readonly ScopeSheet[], options: DeriveOptions = 
         }));
         continue;
       }
+      // THE APPLY PART is the repository's patched and light entries in one part the lead carries out, ahead of the helpers' code parts; a later one is apply-<repo>-<n>.
+      const apply = pass === "CODE" ? applyGroups.get(repo) : undefined;
+      if (apply) {
+        orderByUse(apply);
+        const before = kept.filter((one) => one.repo === repo && isApplyPart(one)).map((one) => numberOf(one) || 1);
+        fresh.push(part(before.length ? `apply-${repo}-${Math.max(...before) + 1}` : `apply-${repo}`, repo, pass, apply.refs, apply.entries, { model: "lead" }));
+      }
       const group = groups.get(`${repo}|${pass}`);
       if (!group) continue;
-      if (pass === "CODE") orderByUse(group);
+      const { rate } = rateOf(rates, repo, workOf(pass));
       const bound = options.followUp ? Number.POSITIVE_INFINITY : boundOf(rates, repo, pass);
-      const rate = rates[`${repo}|${pass}`];
-      let next = Math.max(0, ...kept.filter((one) => one.repo === repo && slotOf(one) === pass).map(numberOf)) + 1;
-      for (let at = 0; at < group.refs.length; at += bound) {
-        const refs = group.refs.slice(at, at + bound);
-        const held = group.entries.slice(at, at + bound);
-        const ids = held.flatMap((entry) => Object.values(entry.tiers ?? {}).flat());
-        fresh.push(part(`${pass.toLowerCase()}-${repo}-${next++}`, repo, pass, refs, held, {
-          tests: testFilesOf([...new Set(ids)], options.dirsOf?.(repo) ?? []), ...(options.followUp ? { model: "lead" } : {}),
-          minutes: rate > 0 ? Math.round(rate * refs.length * 10) / 10 : null, measuredFrom: measuredOf(repo, pass),
-        }));
+      // A DECISION'S ENTRIES FORM PARTS OF THEIR OWN: grouped by the first card or preview section cited, a preview section first, before the cut.
+      const subs = new Map<string, { decision: string; preview: boolean; refs: string[]; entries: SheetEntry[] }>();
+      const decisionOfFile = new Map<string, string>();
+      if (options.followUp) subs.set("", { decision: "", preview: false, refs: group.refs, entries: group.entries });
+      else group.entries.forEach((one, at) => {
+        const found = decisionOf(one);
+        const key = decisionOfFile.get(one.file) ?? found?.decision ?? "";
+        decisionOfFile.set(one.file, key);
+        const sub = subs.get(key) ?? { decision: key, preview: !!found?.preview && found.decision === key, refs: [], entries: [] };
+        if (found?.preview && found.decision === key) sub.preview = true;
+        sub.refs.push(group.refs[at]); sub.entries.push(one); subs.set(key, sub);
+      });
+      const ranked = [...subs.values()].sort((a, b) => (a.preview ? 0 : a.decision ? 1 : 2) - (b.preview ? 0 : b.decision ? 1 : 2));
+      for (const sub of ranked) {
+        if (pass === "CODE") orderByUse(sub);
+        // One file's entries stay in one part: the entries of a file are kept together, and a part is cut between files.
+        const chunks: Array<{ refs: string[]; entries: SheetEntry[] }> = [];
+        sub.entries.forEach((one, at) => {
+          const chunk = chunks.find((c) => c.entries[0].file === one.file) ?? (chunks.push({ refs: [], entries: [] }), chunks[chunks.length - 1]);
+          chunk.refs.push(sub.refs[at]); chunk.entries.push(one);
+        });
+        const cuts: Array<{ refs: string[]; entries: SheetEntry[] }> = [];
+        for (const chunk of chunks) {
+          const last = cuts[cuts.length - 1];
+          if (last && last.refs.length + chunk.refs.length <= bound) { last.refs.push(...chunk.refs); last.entries.push(...chunk.entries); }
+          else cuts.push({ refs: [...chunk.refs], entries: [...chunk.entries] });
+        }
+        const stem = `${pass.toLowerCase()}-${repo}-${sub.decision ? `${sub.decision}-` : ""}`;
+        let next = Math.max(0, ...kept.map((one) => (one.id.startsWith(stem) && /^\d+$/.test(one.id.slice(stem.length)) ? Number(one.id.slice(stem.length)) : 0))) + 1;
+        for (const cut of cuts) {
+          const ids = cut.entries.flatMap((entry) => Object.values(entry.tiers ?? {}).flat());
+          fresh.push(part(`${stem}${next++}`, repo, pass, cut.refs, cut.entries, {
+            tests: testFilesOf([...new Set(ids)], options.dirsOf?.(repo) ?? []), ...(options.followUp ? { model: "lead" } : {}),
+            minutes: rate > 0 ? Math.round(rate * cut.refs.length * 10) / 10 : null, measuredFrom: measuredOf(repo, pass),
+          }));
+        }
       }
     }
   }
@@ -410,6 +514,19 @@ export function deriveGo(scope: readonly ScopeSheet[], options: DeriveOptions = 
       if (sameFile || [...files].some((file) => sources.has(file))) one.waitsOn.push(q.id);
     }
   }
+  // AN ENTRY THAT EXPORTS A NAME HOLDS EVERY ENTRY OF THE SCOPE WHOSE WHAT NAMES IT behind its part.
+  const makers = scope.flatMap(({ arc, sheet }) => sheet.entries.map((entry) => ({ ref: refOf(arc, entry), names: exportedNames(entry) })).filter((one) => one.names.length));
+  for (const one of parts) {
+    if (keptIds.has(one.id) || !one.entries.length) continue;
+    for (const ref of one.entries) {
+      const text = held.get(ref)?.what ?? "";
+      for (const maker of makers) {
+        if (maker.ref === ref || !maker.names.some((name) => namesIn(text, name))) continue;
+        const holder = parts.find((other) => other.entries.includes(maker.ref));
+        if (holder && holder !== one && holder.state !== "landed" && !one.waitsOn.includes(holder.id) && !waitsFor(holder, one)) one.waitsOn.push(holder.id);
+      }
+    }
+  }
   // A repository's first pass waits on the release that ships a command it needs, which another go or window cuts: the part
   // is `waiting`, and it waits on no part of this plan, because the release it waits on is not one of them (s23).
   for (const { sheet } of scope) {
@@ -423,10 +540,19 @@ export function deriveGo(scope: readonly ScopeSheet[], options: DeriveOptions = 
     const old = (options.previous?.parts ?? []).find((was) => was.id === one.id);
     if (old?.state === "waiting" && !keptIds.has(one.id) && !one.waitingOn) { one.state = "waiting"; one.waitingOn = old.waitingOn; }
   }
-  const ending = parts.filter((one) => slotOf(one) === "GENERATED" || slotOf(one) === "FULL_RUN").map((one) => one.id);
   const releases: string[] = [];
   for (const { sheet } of scope) for (const repo of sheet.releaseChain ?? []) if (!releases.includes(repo)) releases.push(repo);
-  for (const repo of releases) {
+  // A release waits on its own repository's full run and generated parts (its docs where it has no full run), and on the release before it in the chain.
+  const endingOf = (repo: string): string[] => {
+    const mine = parts.filter((one) => one.repo === repo);
+    const ending = mine.filter((one) => slotOf(one) === "GENERATED" || slotOf(one) === "FULL_RUN");
+    return (mine.some((one) => slotOf(one) === "FULL_RUN") ? ending : [...mine.filter((one) => slotOf(one) === "DOCS"), ...ending]).map((one) => one.id);
+  };
+  const lastRelease = (repo: string): string[] => {
+    const ours = parts.filter((one) => one.repo === repo && slotOf(one) === "RELEASE").sort((a, b) => numberOf(a) - numberOf(b));
+    return ours.length ? [ours[ours.length - 1].id] : [];
+  };
+  for (const [at, repo] of releases.entries()) {
     // A RELEASE THAT LANDED SHIPPED WHAT WAS THEN: docs or code planned after it need the next release, release-<repo>-2 and so on (s38).
     const mine = kept.filter((one) => one.repo === repo && slotOf(one) === "RELEASE");
     parts.push(...mine);
@@ -434,8 +560,51 @@ export function deriveGo(scope: readonly ScopeSheet[], options: DeriveOptions = 
     const lastN = Math.max(0, ...mine.map(numberOf));
     const live = mine.some((one) => one.state === "running");
     const planned = fresh.some((one) => one.repo === repo && ENTRY_SLOTS.includes(slotOf(one)));
-    if (!mine.length) parts.push(part(`release-${repo}-1`, repo, "RELEASE", [], [], { waitsOn: ending }));
-    else if (!live && planned) parts.push(part(`release-${repo}-${lastN + 1}`, repo, "RELEASE", [], [], { waitsOn: ending }));
+    const before = at > 0 ? lastRelease(releases[at - 1]) : [];
+    const waitsOn = [...endingOf(repo), ...before];
+    if (!mine.length) parts.push(part(`release-${repo}-1`, repo, "RELEASE", [], [], { waitsOn }));
+    else if (!live && planned) parts.push(part(`release-${repo}-${lastN + 1}`, repo, "RELEASE", [], [], { waitsOn }));
+  }
+  // WHAT ANOTHER ARC OF THE WORKSTREAM MUST SHIP FIRST: a `dependsOn` line naming an arc makes the code parts of the sheet that carries it wait
+  // on that arc's release parts; the arc outside the scope is a line on the first such part, which waits.
+  const reposOf = (sheet: Sheet): string[] => [...new Set(sheet.entries.map(repoOf))];
+  const others = new Map((options.siblings ?? []).map((one) => [one.arc, one] as const));
+  for (const one of scope) others.delete(one.arc);
+  for (const { arc, sheet } of scope) {
+    for (const line of Array.isArray(sheet.dependsOn) ? sheet.dependsOn : []) {
+      for (const named of new Set(String(line).match(/\bN\d+[a-z]?\b/g) ?? [])) {
+        if (named === arc) continue;
+        const inScope = scope.find((one) => one.arc === named);
+        const target = inScope ?? others.get(named);
+        if (!target) continue;
+        const waiters = parts.filter((one) => slotOf(one) === "CODE" && !keptIds.has(one.id) && one.entries.some((ref) => ref.startsWith(`${arc}/`)));
+        if (inScope) {
+          const shipped = parts.filter((one) => slotOf(one) === "RELEASE" && reposOf(target.sheet).includes(one.repo)).map((one) => one.id);
+          for (const waiter of waiters) for (const id of shipped) if (!waiter.waitsOn.includes(id)) waiter.waitsOn.push(id);
+        } else if (waiters[0] && !waiters[0].waitingOn) {
+          waiters[0].state = "waiting"; waiters[0].waitingOn = `${named}'s release of ${reposOf(target.sheet).join(" and ")}`;
+        }
+      }
+    }
+  }
+  // A BASELINE WAITS ON THE PARTS HOLDING ITS REPOSITORY'S DOCS ROWS in every decided arc; an arc outside the scope is a line naming it.
+  for (const one of parts) {
+    if (slotOf(one) !== "BASELINE" || keptIds.has(one.id)) continue;
+    for (const { arc, data } of scope) {
+      if (data?.status !== "DECIDED") continue;
+      for (const row of data.rows) {
+        if (row.work !== "DOCS" || row.repo !== one.repo || row.state === "landed") continue;
+        for (const id of row.entries ?? []) {
+          const holder = parts.find((other) => slotOf(other) === "DOCS" && other.entries.includes(`${arc}/${id}`));
+          if (holder && !one.waitsOn.includes(holder.id)) one.waitsOn.push(holder.id);
+        }
+      }
+    }
+    for (const { arc, data } of others.values()) {
+      if (data?.status === "DECIDED" && data.rows.some((row) => row.work === "DOCS" && row.repo === one.repo && row.state !== "landed") && !one.waitingOn) {
+        one.state = "waiting"; one.waitingOn = `${arc}'s docs of ${one.repo}`;
+      }
+    }
   }
   // A proof still owed after the releases is its own step: the whole suites on what was released, once every release has landed.
   // A proof part that landed or is running stays as it was.
@@ -448,8 +617,23 @@ export function deriveGo(scope: readonly ScopeSheet[], options: DeriveOptions = 
   }
   return {
     schemaVersion: GO_SCHEMA_VERSION, lead: scope[0]?.arc ?? "", scope: scope.map((one) => one.arc),
-    writtenAt: options.writtenAt ?? new Date().toISOString(), parts,
+    writtenAt: options.writtenAt ?? new Date().toISOString(), parts, circles: releaseCircles(parts),
   };
+}
+
+/** The parts of each wait circle that runs through a release, each circle once: what `go write` refuses, naming them. */
+export function releaseCircles(parts: readonly GoPart[]): string[][] {
+  const byId = new Map(parts.map((one) => [one.id, one] as const));
+  const found = new Map<string, string[]>();
+  for (const release of parts.filter((one) => slotOf(one) === "RELEASE")) {
+    const walk = (id: string, path: string[]): void => {
+      if (id === release.id && path.length) { found.set([...path].sort().join("|"), [...path]); return; }
+      if (path.includes(id)) return;
+      for (const next of byId.get(id)?.waitsOn ?? []) walk(next, [...path, id]);
+    };
+    for (const next of release.waitsOn) walk(next, [release.id]);
+  }
+  return [...found.values()];
 }
 
 /** The entries of a part that are no longer as its signature says, by their refs: what `go check` names. */

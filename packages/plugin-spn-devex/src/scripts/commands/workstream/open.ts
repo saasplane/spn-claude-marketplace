@@ -5,8 +5,8 @@
 //
 // A workstream opens from the six things the agent must know before it exists: the subject, the goal, why now, what it
 // reaches, what the developer wants to see first, and the limits. A block with one missing is refused. Then the next
-// number is taken and recorded, the folder and the approach page are written from the block, the first arc is opened
-// for what the developer wants to see first, and the developer's words are logged on it.
+// number is taken and recorded, the folder and the approach page are written from the block, the ideate arc is opened
+// for what the developer wants to see first, with the developer's words logged on it, and then the follow-up arc, with no rows. No numbered arc is opened.
 
 import { existsSync, mkdirSync, readFileSync, readdirSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -17,7 +17,7 @@ import { escapeHtml, titleCase, workspaceOf, writeWhole } from "../../lib/workst
 import { subjectFault } from "../../lib/workstream-schema.ts";
 import { actions as arcActions } from "./arc.ts";
 
-export const describe = "open a workstream from the six-things block: the next number, its folder, its approach page and its first arc";
+export const describe = "open a workstream from the six-things block: the next number, its folder, its approach page, its ideate arc and its follow-up arc";
 export const usage = "--file <block.json> --note \"<the developer's words>\" [--backlog \"<the blocker>\"]";
 
 /** The six things, in the order the block names them, and the words a refusal calls each. */
@@ -26,6 +26,12 @@ const SIX = [
   ["seeFirst", "what the developer wants to see first"], ["limits", "the limits"],
 ] as const;
 type Block = Record<(typeof SIX)[number][0], string>;
+
+/** The follow-up arc every workstream opens with (Q33): its title, its subject and its goal. */
+const FOLLOW_UPS = {
+  title: "Follow-ups", subject: "follow-ups",
+  goal: "The workstream's one follow-up arc: it collects what the other arcs do not need, is reviewed once they have all landed, and builds what is kept.",
+} as const;
 
 const refuse = (why: string): number => { console.log(`Refused: ${why}. Nothing was written.`); return 1; };
 
@@ -114,7 +120,7 @@ function pageFrom(text: string, block: Block, number: string, workspace: string,
 }
 
 export function run(args: string[]): number {
-  const words = readWords(args, { file: VALUE, note: VALUE, backlog: VALUE, kind: VALUE });
+  const words = readWords(args, { file: VALUE, note: VALUE, backlog: VALUE });
   if (words.paths.length) throw new UsageFault("takes the block as `--file <block.json>`.");
   const file = words.value("file");
   const note = words.value("note")?.trim();
@@ -148,7 +154,9 @@ export function run(args: string[]): number {
   writeWhole(join(folder, "approach.html"), pageFrom(templateText(), block, number, workspace, blocker));
   console.log(`ok · ${name} opened in ${blocker ? "backlog" : "open"} · lastNumber ${next}`);
 
-  const kind = words.value("kind");
-  return arcActions.edit.run([`${name}/N001`, "--title", block.seeFirst, "--subject", block.subject, "--goal", block.seeFirst,
-    ...(kind ? ["--kind", kind] : []), "--note", blocker ? `${note} · backlog, blocked by: ${blocker}` : note]);
+  // The workstream's two arcs with no number (Q33): the ideate arc, for what the developer wants to see first, and the one follow-up arc, with no rows. No N001 is written.
+  const ideate = arcActions.edit.run([`${name}/ideate`, "--title", block.seeFirst, "--subject", block.subject, "--goal", block.seeFirst,
+    "--note", blocker ? `${note} · backlog, blocked by: ${blocker}` : note]);
+  if (ideate !== 0) return ideate;
+  return arcActions.edit.run([`${name}/follow-ups`, "--title", FOLLOW_UPS.title, "--subject", FOLLOW_UPS.subject, "--goal", FOLLOW_UPS.goal]);
 }

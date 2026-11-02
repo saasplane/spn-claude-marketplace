@@ -309,6 +309,19 @@ console.log("\n=== corpus — the trigger, against a known-bad corpus");
     again.out.includes("stored verdict") && again.out.includes("sprepo.json") && again.out.includes("sibling repository"), again.out.slice(0, 600));
 }
 
+// ---- THE WORDS END IN A FIXED MARKER LINE: THE FINDING LIST ABOVE IT, WHAT CHANGES FROM TURN TO TURN BELOW IT (RULE.DEVEX.WORKSPACE.471)
+{
+  emptyStore();
+  const marker = "(the list ends here; what follows changes from turn to turn)";
+  const root = fixture("window-marker", { "repo-a/docs/bad.md": BAD });
+  run(root, "--repos=repo-a");
+  const again = run(root, "--repos=repo-a");
+  const at = again.out.indexOf(marker);
+  check("the warning holds the marker line once", at >= 0 && again.out.indexOf(marker, at + 1) === -1, again.out.slice(0, 500));
+  check("the finding list sits above the marker", at > again.out.indexOf("repo-a/docs/bad.md") && again.out.indexOf("repo-a/docs/bad.md") >= 0, again.out.slice(0, 500));
+  check("the replay paragraph sits below the marker", again.out.indexOf("stored verdict") > at, again.out.slice(0, 700));
+}
+
 // ---- A FINDING IN A FILE THAT IS CHANGED AND NOT COMMITTED IS SAID TO BE WORK IN PROGRESS
 {
   emptyStore();
@@ -321,6 +334,36 @@ console.log("\n=== corpus — the trigger, against a known-bad corpus");
   const wip = run(root, "--repos=repo-a");
   check("a finding in a file that is changed and not committed says so",
     wip.out.includes("bad.md") && wip.out.includes("[uncommitted]") && wip.out.includes("work in progress"), wip.out.slice(0, 500));
+}
+
+// ---- A WINDOW THAT WROTE UNDER A WORKSTREAM'S WORKTREE SET IS TOLD OF THE WORKTREE'S PAGES, NOT THE MAIN CHECKOUT'S
+{
+  const worktree = (root, files = {}) => {
+    const place = join(root, ".worktrees", "035-org-shape", "repo-a");
+    mkdirSync(join(place, "docs"), { recursive: true });
+    writeFileSync(join(place, "sprepo.json"), `{ "world": "GENERAL", "name": "repo-a" }\n`, "utf8");
+    for (const [name, body] of Object.entries(files)) writeFileSync(join(place, "docs", name), body, "utf8");
+  };
+  emptyStore();
+  const behind = fixture("worktree-clean", { "repo-a/docs/bad.md": BAD });
+  worktree(behind);
+  const quiet = run(behind, "--repos=repo-a");
+  check("[MKT.HOOKS.28] a drifted page in the main checkout is not told to a window whose worktree holds the repository clean",
+    !quiet.warned && !quiet.out.includes("bad.md"), quiet.out.slice(0, 400));
+
+  emptyStore();
+  const drifted = fixture("worktree-drifted", { "repo-a/docs/bad.md": BAD });
+  worktree(drifted, { "bad.md": BAD });
+  const told = run(drifted, "--repos=repo-a");
+  check("[MKT.HOOKS.28] a page drifted in the worktree is named by its worktree path",
+    told.warned && told.out.includes(".worktrees/035-org-shape/repo-a/docs/bad.md"), told.out.slice(0, 400));
+  check("and the main checkout's page is not named", !told.out.includes("\n  repo-a/docs/bad.md") && !/ repo-a\/docs\/bad\.md/.test(told.out.replace(/\.worktrees\/035-org-shape\/repo-a\/docs\/bad\.md/g, "")), told.out.slice(0, 400));
+
+  emptyStore();
+  const plain = fixture("worktree-none", { "repo-a/docs/bad.md": BAD });
+  const main = run(plain, "--repos=repo-a");
+  check("[MKT.HOOKS.28] a window with no worktree for the repository reads the main checkout as before",
+    main.warned && main.out.includes("repo-a/docs/bad.md") && !main.out.includes(".worktrees"), main.out.slice(0, 400));
 }
 
 rmSync(BASE, { recursive: true, force: true });
