@@ -300,6 +300,25 @@ Every row below is declared and none is claimed: a run writes the last two cells
 | MKT.SCRIPTS.490 | Engineering leader | read the plan with the role arcs at its ends | The Plan table and the progress bar list Ideate first and Follow-ups last, and a role arc's chip shows its role where a build arc's shows its title | POSITIVE | UNIT | PLANNED | — |
 | MKT.SCRIPTS.491 | Engineering leader | have a telemetry row name its arc by one of three shapes | A telemetry row's arc takes `N<nnn>`, `ideate` or `follow-ups` and nothing else, and `debug cost show` prints Ideate, the build arcs, then Follow-ups | POSITIVE | UNIT | PLANNED | — |
 | MKT.SCRIPTS.492 | Engineering leader | write the follow-up arc's go like any arc | `go write <workstream>/follow-ups` writes the follow-up arc's go like any arc, and `--after-close` stays the lead window's one-part mode | POSITIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.493 | Engineering leader | have a sheet entry carry its trace and judged | An entry carries `trace` and `judged` | POSITIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.494 | Engineering leader | record a patch or an edit on an entry and have the check name a gap | `sheet patch` and `sheet edit` record them, and `sheet check` names a judged entry with no patch or trace | POSITIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.495 | Engineering leader | see the blast radius of a sheet | `sheet reach` prints the blast radius | POSITIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.496 | Engineering leader | read the preview drawn from the entries | The preview is drawn from the entries | POSITIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.497 | Engineering leader | have a stale patch refused by entry | A stale patch is refused by entry and loses its patch for the go | NEGATIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.498 | Engineering leader | have the baseline run the new cases on the base | The baseline runs the new cases on the base before the apply | POSITIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.499 | Engineering leader | count patches and file edits as change | `sheet patch` and file edits count as change, with reading and thinking columns by stage | POSITIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.500 | Engineering leader | have each read and edit leave a FILE row | A FILE row is written for each read and edit | POSITIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.501 | Engineering leader | keep the first line of a refused command | A refused command's row keeps its first line | POSITIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.502 | Engineering leader | see each scope and what it saves before a go | `go propose` prints each scope and what it saves | POSITIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.503 | Engineering leader | have a code part formatted before its proof | A code part formats before its proof | POSITIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.504 | Engineering leader | be told the way through a refusal | `sheet show` and `go write` refusals name their way through | POSITIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.505 | Engineering leader | have a script under a docs-named folder planned as code | A script under a docs-named folder plans as code | POSITIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.506 | Engineering leader | copy a file without a needless entry | A current copy needs no entry, and a copy names its book file | POSITIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.507 | Engineering leader | read the corpus check's refusal at a glance | The corpus check refuses with one line per file, naming the rule | NEGATIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.508 | Engineering leader | have the corpus check read only my own window's work | The corpus check reads only the window's own worktree | POSITIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.509 | Engineering leader | work in SaaS Plane's own workspace without the partner-words check | Partner-words stands down in the builder's workspace | POSITIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.510 | Engineering leader | see test time per package | The full run writes a TEST row per package | POSITIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.511 | Engineering leader | see whether an arc cost more than the arcs before it | Cost review compares an arc with the arcs before it | POSITIVE | UNIT | PLANNED | — |
 
 ## Retired ids
 
