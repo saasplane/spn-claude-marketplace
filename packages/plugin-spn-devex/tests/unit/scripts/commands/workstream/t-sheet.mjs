@@ -1,6 +1,7 @@
 // `commands/workstream/sheet.ts` — the change sheet as the arc's data: written whole from a file, one entry
 // edited or dropped, shown for a row, and checked against the rows and the cards. Run as the agent types
 // the commands, in a throwaway workspace.
+import { createHash } from "node:crypto";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { CARD, cli, dataWorkspace, writeRoleArcs } from "../../../../helpers/workstream-fixture.mjs";
@@ -370,13 +371,13 @@ console.log("\n=== a changed book file: its generated copies are named (MKT.SCRI
   const without = sheet("write", "N001", "--file", put("book-a.json", sheetOf([bookEntry])), "--because", "the developer: a book change");
   ok("[MKT.SCRIPTS.419] a sheet that changes a book file without its generated copies is refused, naming the restating ref and the rules index",
     without.code === 1 && without.out.includes(`${inRepo}/foo.md`) && without.out.includes("refs/rules.json") && without.out.includes("Nothing was written"), without.out);
-  const withCopies = sheet("write", "N001", "--file", put("book-b.json", sheetOf([bookEntry, entry("E2", { file: `spn-claude-marketplace:${inRepo}/foo.md` }), entry("E3", { file: `spn-claude-marketplace:${inRepo}/rules.json` })])), "--because", "the developer: a book change");
+  const withCopies = sheet("write", "N001", "--file", put("book-b.json", sheetOf([bookEntry, entry("E2", { file: `spn-claude-marketplace:${inRepo}/foo.md`, book: [`spn-foundation:${book}`] }), entry("E3", { file: `spn-claude-marketplace:${inRepo}/rules.json`, book: [`spn-foundation:${book}`] })])), "--because", "the developer: a book change");
   ok("[MKT.SCRIPTS.419] with an entry for each copy it is written", withCopies.code === 0, withCopies.out);
   const template = "docs/04-capabilities/01-devex/04-workspace/04-docs/templates/workstream/x-template.md";
   const tpl = sheet("write", "N001", "--file", put("book-c.json", sheetOf([entry("E1", { file: `spn-foundation:${template}` }), entry("E2", { file: `spn-claude-marketplace:${inRepo}/rules.json` })])), "--because", "the developer: a template");
   ok("[MKT.SCRIPTS.419] a template names the plugin's copy, its templates README and its index",
     tpl.code === 1 && ["docs/templates/workstream/x-template.md", "docs/templates/README.md", "docs/templates/index.md"].every((one) => tpl.out.includes(one)), tpl.out);
-  writeFileSync(sheetFile, JSON.stringify(sheetOf([bookEntry, entry("E2", { file: `spn-claude-marketplace:${inRepo}/foo.md` })]), null, 2));
+  writeFileSync(sheetFile, JSON.stringify(sheetOf([bookEntry, entry("E2", { file: `spn-claude-marketplace:${inRepo}/foo.md`, book: [`spn-foundation:${book}`] })]), null, 2));
   const check = sheet("check", "N001");
   ok("[MKT.SCRIPTS.419] sheet check names the copy still missing from a sheet already written", check.out.includes("generated copy") && check.out.includes("refs/rules.json") && !check.out.includes("refs/foo.md"), check.out);
 }
@@ -550,8 +551,14 @@ console.log("\n=== generated copies as missingCopies reads them today (MKT.SCRIP
   const without = sheet("write", "N001", "--file", put("c-a.json", sheetOf([bookEntry])), "--because", "the developer: a book change");
   ok("[MKT.SCRIPTS.506] a copy whose RESTATES header cites the book path is named", without.code === 1 && without.out.includes(`${inRepo}/bar.md`), without.out);
   ok("[MKT.SCRIPTS.506] a ref that does not cite the book file is not named", !without.out.includes("other.md"), without.out);
-  const covered = sheet("write", "N001", "--file", put("c-b.json", sheetOf([bookEntry, entry("E2", { file: `spn-claude-marketplace:${inRepo}/bar.md` })])), "--because", "the developer: a book change");
+  const covered = sheet("write", "N001", "--file", put("c-b.json", sheetOf([bookEntry, entry("E2", { file: `spn-claude-marketplace:${inRepo}/bar.md`, book: [`spn-foundation:${book}`] })])), "--because", "the developer: a book change");
   ok("[MKT.SCRIPTS.506] with an entry for the named copy it is written", covered.code === 0, covered.out);
+  const unlisted = sheet("write", "N001", "--file", put("c-c.json", sheetOf([bookEntry, entry("E2", { file: `spn-claude-marketplace:${inRepo}/bar.md`, book: [] })])), "--because", "the developer: a book change");
+  ok("[MKT.SCRIPTS.506] a named copy whose entry's book line lacks the book file is refused", unlisted.code === 1 && unlisted.out.includes("book` line does not name"), unlisted.out);
+  const stamp = createHash("sha256").update("# Bar\n\nplain prose, no rule.", "utf8").digest("hex").slice(0, 8);
+  writeFileSync(join(root, base, "bar.md"), `<!-- spn:restates\n{ "docs": [ { "path": "spn-foundation/${book}", "seen": "${stamp}" } ] }\n-->\n# Bar\n`);
+  const current = sheet("write", "N001", "--file", put("c-d.json", sheetOf([bookEntry])), "--because", "the developer: a book change");
+  ok("[MKT.SCRIPTS.506] a copy whose stamp reads current is not asked for", current.code === 0 && !current.out.includes("bar.md"), current.out);
 }
 
 console.log(failed ? `\n  ${failed} of ${total} FAILED — sheet` : `\n  all ${total} passed — sheet`);

@@ -10,6 +10,7 @@
 
 import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
+import { parse, sectionText, seenHash } from "./restates.ts";
 import { BOOK_TEMPLATES, PLUGIN_TEMPLATES } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
 
 /** The repository that holds the plugins. */
@@ -70,12 +71,45 @@ export function generatedCopiesOf(root: string, entryFile: string): string[] {
   return [...out];
 }
 
-/** Each generated copy of a sheet's changed book files that no entry of the sheet names, once, with the entries that move it. */
-export function missingCopies(root: string, entries: ReadonlyArray<{ id: string; file: string }>): string[] {
-  const named = new Set(entries.map((entry) => entry.file));
+/**
+ * Whether a copy's restates stamp already reads current for a book file: its `spn:restates` block cites the file, and every `seen` it
+ * carries for it (whole file or one section) is the hash of what the book holds now. A copy with no block, or a stamp that moved, is not.
+ */
+function stampReadsCurrent(root: string, copy: string, path: string): boolean {
+  try {
+    const [block] = parse(join(root, PLUGINS_REPO, copy));
+    const cited = [...(block?.docs ?? []), ...(block?.files ?? [])].filter((one) => one?.path === `${BOOK_REPO}/${path}`);
+    if (!cited.length) return false;
+    const text = readFileSync(join(root, BOOK_REPO, path), "utf8");
+    return cited.every((one) => {
+      const part = one.section ? sectionText(text, one.section) : text;
+      return part !== null && one.seen === seenHash(part);
+    });
+  } catch { return false; }
+}
+
+/**
+ * Each generated copy of a sheet's changed book files that no entry of the sheet names, once, with the entries that move it; a copy whose
+ * stamp already reads current is not asked for (S90). A copy the sheet does name, whose entry's `book` line does not name the book file
+ * it copies, is named too (S143).
+ */
+export function missingCopies(root: string, entries: ReadonlyArray<{ id: string; file: string; book?: unknown }>): string[] {
+  const named = new Map(entries.map((entry) => [entry.file, entry] as const));
   const by = new Map<string, string[]>();
-  for (const entry of entries)
-    for (const copy of generatedCopiesOf(root, entry.file))
-      if (!named.has(copy)) by.set(copy, [...(by.get(copy) ?? []), entry.id]);
-  return [...by].map(([copy, ids]) => `${ids.join(", ")} change${ids.length === 1 ? "s" : ""} a book file, and the sheet names no entry for its generated copy ${copy}`);
+  const unlisted: string[] = [];
+  for (const entry of entries) {
+    const at = entry.file.indexOf(":");
+    const path = entry.file.slice(at + 1);
+    for (const copy of generatedCopiesOf(root, entry.file)) {
+      const one = named.get(copy);
+      if (!one) {
+        if (!stampReadsCurrent(root, copy.slice(PLUGINS_REPO.length + 1), path)) by.set(copy, [...(by.get(copy) ?? []), entry.id]);
+      } else if (Array.isArray(one.book) && !one.book.includes(entry.file))
+        unlisted.push(`${one.id} names the generated copy ${copy}, and its \`book\` line does not name the book file it copies, ${entry.file}`);
+    }
+  }
+  return [
+    ...[...by].map(([copy, ids]) => `${ids.join(", ")} change${ids.length === 1 ? "s" : ""} a book file, and the sheet names no entry for its generated copy ${copy}`),
+    ...unlisted,
+  ];
 }
