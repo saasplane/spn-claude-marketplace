@@ -436,7 +436,7 @@ function consumerFindings(ws: string, entries: readonly SheetEntry[], held: read
     for (const repo of readdirSync(root).filter((one) => !one.startsWith(".") && one !== where.repo).sort()) {
       const { count, pins } = pinsOf(join(root, repo), pkg.name);
       if (!count) continue;
-      const moves = entries.some((one) => typeof one?.file === "string" && one.file.startsWith(`${repo}:`) && /(^|\/)package\.json$/.test(one.file));
+      const moves = entries.some((one) => typeof one?.file === "string" && one.file.startsWith(`${repo}:`) && /[:/]package\.json$/.test(one.file));
       const stays = (Array.isArray(entry.facts) ? entry.facts : []).some((id) => {
         const fact = held.find((one) => one?.id === id);
         return !!fact && fact.fact.includes(pkg.name) && fact.fact.includes(repo) && /\bstay(?:s|ed)?\b/i.test(fact.fact);

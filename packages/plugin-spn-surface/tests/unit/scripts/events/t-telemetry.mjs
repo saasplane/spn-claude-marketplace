@@ -9,8 +9,8 @@ import { join, resolve } from "node:path";
 import { PLUGIN } from "../../../helpers/harness.mjs";
 
 const EVENT = resolve(PLUGIN, "src", "scripts", "events", "pretooluse.ts");
-const KEYS = ["v", "mtype", "id", "at", "ms", "event", "session", "agent", "workstream", "arc", "part", "skill", "work", "retryOf",
-  "check", "verdict", "out"];
+const KEYS = ["v", "mtype", "id", "at", "ms", "event", "session", "agent", "workstream", "arc", "part", "skill", "stage", "work", "retryOf",
+  "check", "verdict", "out", "pluginVersion"];
 
 let total = 0, failed = 0;
 const same = (label, got, expected) => {

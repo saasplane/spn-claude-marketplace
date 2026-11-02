@@ -108,8 +108,8 @@ try {
     ...stopRun("12:01:01", "w", { runnable: "DENY" }), ...stopRun("12:01:10", "w", { runnable: "PASS" }),
     ...stopRun("12:08:01", "w", { runnable: "DENY" }), ...stopRun("12:08:10", "w", { runnable: "PASS" }),
     // a check about the reply: answered by its own next run passing, unanswered by a finding again; the last has no next run
-    ...stopRun("12:02:01", "r", { cards: "DENY" }), ...stopRun("12:02:10", "r", { cards: "PASS" }),
-    ...stopRun("12:03:01", "r", { cards: "DENY" }), ...stopRun("12:03:10", "r", { cards: "DENY" }),
+    ...stopRun("12:02:01", "r", { "reply-shape": "DENY" }), ...stopRun("12:02:10", "r", { "reply-shape": "PASS" }),
+    ...stopRun("12:03:01", "r", { "reply-shape": "DENY" }), ...stopRun("12:03:10", "r", { "reply-shape": "DENY" }),
     // a tool-call check: answered by its next run passing, unanswered by it refusing again
     ...callRun("12:04:01", "t", { "command-shape": "DENY" }), ...callRun("12:04:05", "t", { "command-shape": "PASS" }),
     ...callRun("12:05:01", "t", { "command-shape": "DENY" }), ...callRun("12:05:05", "t", { "command-shape": "DENY" }),
@@ -124,9 +124,9 @@ try {
   const of = (part, name) => part?.checks.find((one) => one.check === name);
   ok("[MKT.HOOKS.341] the turn end counts its send-backs against its Stop runs, per 100 replies", turn?.sent === 8 && turn.runs === 12 && turn.per100 === 66.7, JSON.stringify(turn));
   ok("the tool calls count theirs against the PreToolUse runs, per 100 calls", calls?.sent === 3 && calls.runs === 5 && calls.per100 === 60, JSON.stringify(calls));
-  ok("each check carries its sent-back count and its per 100", of(turn, "runnable")?.sent === 3 && of(turn, "runnable")?.per100 === 25 && of(turn, "cards")?.sent === 3 && of(turn, "cards")?.per100 === 25, JSON.stringify(turn?.checks));
+  ok("each check carries its sent-back count and its per 100", of(turn, "runnable")?.sent === 3 && of(turn, "runnable")?.per100 === 25 && of(turn, "reply-shape")?.sent === 3 && of(turn, "reply-shape")?.per100 === 25, JSON.stringify(turn?.checks));
   ok("a check about the work is answered by a tool call before the next Stop", of(turn, "runnable")?.judged === 3 && of(turn, "runnable")?.unanswered === 2, JSON.stringify(of(turn, "runnable")));
-  ok("a check about the reply is answered by its own span on the next Stop finding nothing", of(turn, "cards")?.judged === 2 && of(turn, "cards")?.unanswered === 1, JSON.stringify(of(turn, "cards")));
+  ok("a check about the reply is answered by its own span on the next Stop finding nothing", of(turn, "reply-shape")?.judged === 2 && of(turn, "reply-shape")?.unanswered === 1, JSON.stringify(of(turn, "reply-shape")));
   ok("a tool-call check is answered by its next judged call passing", of(calls, "command-shape")?.judged === 2 && of(calls, "command-shape")?.unanswered === 1, JSON.stringify(of(calls, "command-shape")));
   ok("where the log holds nothing to judge by, Unanswered is null", of(turn, "go-next")?.unanswered === null && of(turn, "window")?.unanswered === null);
   ok("Checks to fix lists the check with more than half unanswered, and not the one with exactly half",
@@ -142,7 +142,7 @@ try {
     && /Send-backs, tool calls: 3 of 5 calls refused, 60 per 100/.test(printed) && /Sent back/.test(printed) && /Refused/.test(printed) && /Unanswered/.test(printed), printed);
   ok("a check with nothing to judge by prints a dash", /go-next\s+1\s+8\.3\s+-\n/.test(printed), printed);
   const fixed = printed.split("Checks to fix")[1] ?? "";
-  ok("the printed form names the check to fix", /runnable/.test(fixed) && !/cards/.test(fixed) && !/command-shape/.test(fixed), printed);
+  ok("the printed form names the check to fix", /runnable/.test(fixed) && !/reply-shape/.test(fixed) && !/command-shape/.test(fixed), printed);
 } finally {
   rmSync(second, { recursive: true, force: true });
 }

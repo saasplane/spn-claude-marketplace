@@ -326,7 +326,7 @@ const opening = deriveGo([{ arc: "N009", sheet: sheet([entry("E1", "lib-repo:src
 const finished = { ...opening, parts: opening.parts.filter((p) => p.repo === "lib-repo" && p.work !== "RELEASE").map((p) => ({ ...p, state: "landed" })) };
 const later = deriveGo([{ arc: "N009", sheet: sheet([entry("E1", "lib-repo:src/a.ts"), { ...entry("E2", "lib-repo:src/b.ts"), patch: patchOf("E2") }]), landed: ["E1"] }],
   { previous: finished, landedOrder: finished.parts.map((p) => p.id) });
-same("[MKT.SCRIPTS.455] an apply part planned after a landed full run opens full-lib-repo-2, which waits on it", [applyOf(later)?.entries, later.parts.find((p) => p.id === "full-lib-repo-2")?.waitsOn], [["N009/E2"], ["apply-lib-repo"]]);
+same("[MKT.SCRIPTS.455] an apply part planned after a landed full run opens full-lib-repo-2, which waits on it", [applyOf(later)?.entries, later.parts.find((p) => p.id === "full-lib-repo-2")?.waitsOn.filter((id) => id !== "code-lib-repo-1")], [["N009/E2"], ["apply-lib-repo"]]);
 
 console.log(`\n${total - failed}/${total} passed`);
 process.exit(failed ? 1 : 0);

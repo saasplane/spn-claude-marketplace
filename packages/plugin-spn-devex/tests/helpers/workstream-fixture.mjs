@@ -81,6 +81,25 @@ export function writeRoleArcs(ws, { subject = "probe", title = "the probe", idea
   return Object.keys(arcs);
 }
 
+/**
+ * Gives the role arcs (or any arc folders already written under `ws`) their place on the approach page: a Plan row carrying
+ * `data-arc`, `id` and the arc's stamp, and a What entry, `<arc>-what`, linking the arc's own preview.
+ */
+export async function writeRolePageParts(ws, arcs = ["ideate", "follow-ups"]) {
+  const { arcStamp } = await import(resolve(PLUGIN, "src", "scripts", "lib", "workstream.ts"));
+  const page = join(ws, "approach.html");
+  let text = readFileSync(page, "utf8");
+  for (const arc of arcs) {
+    const data = JSON.parse(readFileSync(join(ws, "arcs", arc, "state.json"), "utf8"));
+    const row = `      <tr id="${arc}" data-arc="arcs/${arc}/state.json" data-arc-stamp="${arcStamp(data)}"><td><p><strong>${arc} &mdash; ${data.title}</strong></p><span class="sds-small">Preview: <a href="notes/${arc}/preview.html">preview.html</a></span></td><td><span class="sds-badge sds-status sds-${String(data.status).toLowerCase()}">${data.status}</span></td></tr>\n`;
+    const what = `  <h4 id="${arc}-what">The ${arc} arc</h4>\n  <p>Read the preview &rarr; <a href="notes/${arc}/preview.html">the ${arc}</a></p>\n`;
+    // `arc edit` already writes the What entry of an arc it opened, so each part is added only where the page lacks it
+    if (!text.includes(`data-arc="arcs/${arc}/state.json"`)) text = text.replace("    </tbody>", `${row}    </tbody>`);
+    if (!text.includes(`id="${arc}-what"`)) text = text.replace('</section>\n<section id="s3"', `${what}</section>\n<section id="s3"`);
+  }
+  writeFileSync(page, text);
+}
+
 /** A card a `question raise` takes, whole. */
 export const CARD = {
   title: "Which way the `probe` goes", why: "It blocks row 2.", what: "The file is `a.ts:12`.", viewsLead: "One view.",

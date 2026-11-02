@@ -573,7 +573,7 @@ one("[MKT.SCRIPTS.488] an empty follow-up arc whose suggestions are all decided 
   "silent", { parity: false, why: "the python gate is the old one and knows no role arc" });
 
 one("[MKT.SCRIPTS.431] the ideate arc in `arcs/ideate/` is read by the gate as a numbered one: left DECIDED, it refuses the close, naming it", "close",
-  build("sp-ideate-decided", { extra: { [`.spndevex/${WORKSTREAMS}/open/001-a-subject/arcs/ideate/state.json`]: dataArc("ideate", "DECIDED") } }),
+  build("sp-ideate-decided", { extra: { [`.spndevex/${WORKSTREAMS}/open/001-a-subject/arcs/ideate/state.json`]: `${JSON.stringify({ ...JSON.parse(dataArc("ideate", "DECIDED")), proposes: ["N9"] }, null, 2)}\n` } }),
   move(`.spndevex/${WORKSTREAMS}/open/001-a-subject`, `.spndevex/${WORKSTREAMS}/closed/`),
   "deny", { says: "ideate — DECIDED", parity: false, why: "the python gate is the old one and knows no role arc" });
 

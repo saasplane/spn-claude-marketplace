@@ -82,7 +82,7 @@ console.log("\n=== a TURN row says the model, the model's own time and the work 
   const log = join(root, ".spndevex", ".debug", "telemetry", "usage.jsonl");
   const lines = readFileSync(log, "utf8").trim().split("\n").map((line) => JSON.parse(line));
   check("a row's keys are in the book's order",
-    lines.every((line) => Object.keys(line).join(",") === "v,mtype,id,at,ms,event,session,agent,workstream,arc,part,skill,work,retryOf,model,tokens"), JSON.stringify(lines[0]));
+    lines.every((line) => Object.keys(line).join(",") === "v,mtype,id,at,ms,event,session,agent,workstream,arc,part,skill,stage,work,retryOf,model,tokens"), JSON.stringify(lines[0]));
   check("`model` is the reply's own", lines.map((line) => line.model).join() === "claude-sonnet-5-5,claude-sonnet-5-5", JSON.stringify(lines));
   check("`ms` runs from the line before the reply to the reply's first line", lines.map((line) => line.ms).join() === "3500,2250", JSON.stringify(lines));
   check("[MKT.SCRIPTS.326] a helper launched for docs-spn-support-ts-2 reading N014's folder: its rows carry arc N012, that part, work DOCS and event SubagentStop",
@@ -112,7 +112,7 @@ console.log("\n=== a review panel's stop writes one PANEL row (RULE.DEVEX.WORKSP
   check("[MKT.HOOKS.439] a panel known by the agentType in the meta file beside its transcript writes one PANEL row, the helper's own, v 1 and event SubagentStop",
     a.rows.length === 1 && a.rows[0].v === 1 && a.rows[0].event === "SubagentStop" && a.rows[0].agent === "ad63" && a.rows[0].session === "sp", JSON.stringify(a.rows));
   check("[MKT.HOOKS.439] it holds the head, then the lens and the verdict",
-    Object.keys(a.rows[0] ?? {}).join(",") === "v,mtype,id,at,ms,event,session,agent,workstream,arc,part,skill,work,retryOf,lens,verdict", JSON.stringify(a.rows[0]));
+    Object.keys(a.rows[0] ?? {}).join(",") === "v,mtype,id,at,ms,event,session,agent,workstream,arc,part,skill,stage,work,retryOf,lens,verdict", JSON.stringify(a.rows[0]));
   check("[MKT.HOOKS.439] the lens is the first one the prompt names, the verdict the first line of the last reply, and PASS_WITH_ADVICE is not PASS",
     a.rows[0]?.lens === "ARCHITECT" && a.rows[0]?.verdict === "PASS_WITH_ADVICE", JSON.stringify(a.rows[0]));
   check("[MKT.HOOKS.439] the workstream, arc and part are the ones the prompt names, and work is read from the part", a.rows[0]?.workstream === "031-probe" && a.rows[0]?.arc === "N001"
@@ -189,6 +189,10 @@ console.log("\n=== a review panel's stop writes one PANEL row (RULE.DEVEX.WORKSP
 console.log("\n=== a panel whose stop fired before its last reply was saved gets its PANEL row from `replayPanels` (RULE.DEVEX.WORKSPACE.485)");
 {
   const { replayPanels } = await import(join(PLUGIN, "src", "scripts", "lib", "panel.ts"));
+  // The replay runs in this process, so recording must not read as off here.
+  const switchWas = process.env.SPN_TELEMETRY;
+  delete process.env.SPN_TELEMETRY;
+  process.on("exit", () => { if (switchWas !== undefined) process.env.SPN_TELEMETRY = switchWas; });
   const user = (text) => JSON.stringify({ type: "user", message: { role: "user", content: text } });
   const said = (text) => JSON.stringify({ type: "assistant", message: { id: `m-${text.length}`, role: "assistant", content: [{ type: "text", text }], usage: { input_tokens: 1, output_tokens: 1 } } });
   const root = join(BASE, "replay");
@@ -212,8 +216,8 @@ console.log("\n=== a panel whose stop fired before its last reply was saved gets
   appendLine(child, said("Pass with advice\n\nRename the helper."));
   const later = replayPanels(root, window, facts, early);
   const rows = rowsOf();
-  check("[MKT.HOOKS.439] once the reply is there it writes one PANEL row, the helper's own, with the lens and the verdict",
-    rows.length === 1 && rows[0].agent === "pr1" && rows[0].event === "Stop" && rows[0].session === "sr" && rows[0].lens === "ARCHITECT" && rows[0].verdict === "PASS_WITH_ADVICE", JSON.stringify(rows));
+  check("[MKT.HOOKS.439] once the reply is there it writes one PANEL row, the helper's own, with the lens and the verdict (event SubagentStop, as support's contract types a PANEL row)",
+    rows.length === 1 && rows[0].agent === "pr1" && rows[0].event === "SubagentStop" && rows[0].session === "sr" && rows[0].lens === "ARCHITECT" && rows[0].verdict === "PASS_WITH_ADVICE", JSON.stringify(rows));
   check("[MKT.HOOKS.439] the row carries the workstream, arc and part the prompt names, and work read from the part",
     rows[0]?.workstream === "031-probe" && rows[0]?.arc === "N001" && rows[0]?.part === "release-spn-foundation-1" && rows[0]?.work === "RELEASE", JSON.stringify(rows[0]));
   check("[MKT.HOOKS.439] the agent id is settled, so a later turn end does not read it again", later.includes("pr1"), JSON.stringify(later));

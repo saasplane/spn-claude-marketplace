@@ -79,7 +79,7 @@ import { checkWorkstream, heldByStop } from "../checks/workstream-state.ts";
 import { PREVIEW_FILE, approachOf, arcDataDir, arcStatus, stepsMayStart, arcIdsOf, leafRows, logLinesOf, notesDirOf, previewOf, readArc, readJsonl, readQuestions, readyRows, stateFileOf,
          suggestionsFileOf, workstreamsOf } from "../lib/workstream.ts";
 import { findWorkingDetail } from "../lib/working-detail.ts";
-import { cardName, type ArcData, type LogLine, type Question } from "../lib/workstream-schema.ts";
+import { ARC_ID, cardName, type ArcData, type LogLine, type Question } from "../lib/workstream-schema.ts";
 import { applyLine, standings } from "../lib/migration.ts";
 import { MIGRATIONS } from "../lib/migrations/index.ts";
 import { cardsOf, holdsOwnCopy, markAge, openWorkstreams } from "../checks/split-plan.ts";
@@ -110,8 +110,8 @@ const HANDOVER_LABEL_LINE = new RegExp(`^(${HANDOVER_LABELS.join("|")}):(.*)$`);
 // name a session, so a workstream and an arc are spelled one way for both events.
 /** A workstream folder's name, as a text writes it: three digits, a hyphen and the subject. */
 export const WORKSTREAM_NAME = /\b\d{3}-[a-z0-9][a-z0-9-]*/;
-/** An arc's number, as a text writes it: `N` and its digits. */
-export const ARC_NAME = /\bN\d+\b/;
+/** An arc's address, as a text writes it, read from `ARC_ID`: `N<nnn>`, `ideate` or `follow-ups`. */
+export const ARC_NAME = new RegExp(`\\b(?:${ARC_ID.source.slice(1, -1)})\\b`);
 
 /**
  * The labelled lines of a handover block, each with its value. A line that starts with whitespace

@@ -1770,7 +1770,7 @@ console.log("\n=== stop — the checks the first round fixed or wired, and the g
     const alone = call("checkReplyShape", "The checks are green.", [], [], new Map(), false, 1, lineOf);
     check("[MKT.HOOKS.306] a reply that ends with no next step named gets the next-step line alone, under reply-shape",
       alone.length === 1 && alone[0].check === "reply-shape" && alone[0].message.includes("Next: launch the brief of code-spn-x-1"), JSON.stringify(alone));
-    const named = call("checkReplyShape", "The checks are green.\n\nNext: launch the brief of code-spn-x-1.", [], [], new Map(), false, 1, lineOf);
+    const named = call("checkReplyShape", "The checks are green.\n\nNext: launch the brief of the first code part.", [], [], new Map(), false, 1, lineOf);
     check("[MKT.HOOKS.306] a reply that names its next step is told nothing", named.length === 0, JSON.stringify(named));
     check("[MKT.HOOKS.306] the hook's own turn end says it under reply-shape and never as go-next", !JSON.stringify(call("checkReplyShape", "done", [], [], new Map(), false, 1, [])).includes("go-next"));
     // A FINDING NAMES ONLY THE WINDOW'S OWN WORKSTREAMS.
@@ -1980,7 +1980,7 @@ console.log("\n=== stop — send-backs are written as they are said, the welcome
 
     // THE SIX SHAPES: one row each, each passing, each with a known-bad variant.
     const shapes = stopModule.CLOSING_SHAPES;
-    check("[MKT.HOOKS.472] CLOSING_SHAPES has six rows, one per moment", Array.isArray(shapes) && shapes.length === 6 && new Set(shapes.map((one) => one.moment)).size === 6, JSON.stringify(shapes?.map?.((one) => one.moment)));
+    check("[MKT.HOOKS.472] CLOSING_SHAPES has six rows, one per moment, each the shape the construct's table gives (RULE.DEVEX.AGENT.170)", Array.isArray(shapes) && shapes.length === 6 && new Set(shapes.map((one) => one.moment)).size === 6, JSON.stringify(shapes?.map?.((one) => one.moment)));
     const sayRow = [ROW_LANDED], sayArc = [ARC_LANDED], none = [];
     const say = (reply, results) => stopModule.checkCloseMessage(reply, results);
     const table = [["row", rowShape, sayRow], ["release", releaseShape, none], ["arc", arcShape, sayArc], ["window", windowShape, none], ["workstream", closing, [SUCCESS]]];

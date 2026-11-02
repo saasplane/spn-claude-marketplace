@@ -15,9 +15,9 @@ import { workspace } from "../../../helpers/fixture.mjs";
 
 const EVENTS = resolve(PLUGIN, "src", "scripts", "events");
 // Every row of the family holds the base, in this order; a variant adds only what its kind needs.
-const BASE = ["v", "mtype", "id", "at", "ms", "event", "session", "agent", "workstream", "arc", "part", "skill", "work", "retryOf"];
+const BASE = ["v", "mtype", "id", "at", "ms", "event", "session", "agent", "workstream", "arc", "part", "skill", "stage", "work", "retryOf"];
 const COMMAND_KEYS = [...BASE, "call", "exit"];
-const CHECK_KEYS = [...BASE, "check", "verdict", "out"];
+const CHECK_KEYS = [...BASE, "check", "verdict", "out", "pluginVersion"];
 const TEST_KEYS = [...BASE, "call", "status", "test"];
 
 let total = 0, failed = 0;

@@ -418,7 +418,7 @@ export function arcStatus(root: string, subject: string, arc: string): string | 
         if (!(entry === subject || entry.startsWith(`${subject.slice(0, 3)}-`))) continue;
         const arcs = join(dir, entry, "arcs");
         if (!isDir(arcs)) continue;
-        const kept = statusOfData(dirname(arcs), arc.toUpperCase());
+        const kept = statusOfData(dirname(arcs), /^n\d/i.test(arc) ? arc.toUpperCase() : arc);
         if (kept) return kept;
       }
     }

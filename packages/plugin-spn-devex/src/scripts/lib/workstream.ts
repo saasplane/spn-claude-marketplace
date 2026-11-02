@@ -117,7 +117,7 @@ export function strayNotes(notesDir: string, skipPreviews = false): Array<[strin
 export function strayLevels(ws: string, firstOpen: string | null, markdownArcs = false): Array<[string, string]> {
   const out: Array<[string, string]> = [];
   const plan = (name: string): string => {
-    const named = /\bN\d{3}[a-z]?\b/.exec(name)?.[0];
+    const named = new RegExp(`\\b(?:${ARC_ID.source.slice(1, -1)})\\b`).exec(name)?.[0];
     const arc = named ?? firstOpen;
     return arc
       ? `a section of \`${NOTES}/${arc}/plan.md\`${named ? ", the arc it names" : ", the workstream's first open arc, since it names none"}`
@@ -724,7 +724,7 @@ export function arcStamp(data: Pick<ArcData, "goal" | "title" | "repos" | "rows"
 /** Every Plan row of a page that names an arc's data, with the stamp it carries. */
 export function stampsOn(text: string): Map<string, { stamp: string | null; at: number; tag: string }> {
   const out = new Map<string, { stamp: string | null; at: number; tag: string }>();
-  for (const found of text.matchAll(/<tr\b[^>]*\bdata-arc="(?:[^"]*\/)?(N\d+[a-z]?)\/state\.json"[^>]*>/g)) {
+  for (const found of text.matchAll(/<tr\b[^>]*\bdata-arc="(?:[^"]*\/)?((?:N\d+[a-z]?|ideate|follow-ups))\/state\.json"[^>]*>/g)) {
     const stamp = /\bdata-arc-stamp="([^"]*)"/.exec(found[0])?.[1] ?? null;
     out.set(found[1], { stamp, at: found.index!, tag: found[0] });
   }
@@ -1248,7 +1248,8 @@ export function previewFromTemplate(ws: string, data: Pick<ArcData, "arc" | "sub
     ["{{THE PREVIEW NAME}}", escapeHtml(data.title)],
     ["{{NNN}} - {{TITLE}}", title],
     ["{{NNN}}", number],
-    ["{{nnn}}", data.arc.slice(1)],
+    ["N{{nnn}}", data.arc],
+    ["{{arc}}", data.arc],
     ["{{arc status}}", data.status.toLowerCase()],
     ["{{THE ARC'S STATUS}}", data.status],
     ["{{date}}", now().slice(0, 10)],

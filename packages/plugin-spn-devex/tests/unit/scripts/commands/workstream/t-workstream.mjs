@@ -42,7 +42,7 @@ console.log("\n=== commandsRef — the plugin's own commands, one line each, fro
   const { commandsRef } = await import(resolve(PLUGIN, "src", "scripts", "cli.ts"));
   const ref = await commandsRef();
   ok("it opens with a heading that says it is generated", ref.startsWith("# spn-devex commands") && ref.includes("Never edited by hand"), ref.slice(0, 200));
-  ok("a line carries the bin, the words, the usage and what it does", ref.split("\n").some((line) => line.startsWith("spn-devex workstream row discard <workstream>/N<nnn> <row> --note") && line.includes(" — take a row found invalid")), ref);
+  ok("a line carries the bin, the words, the usage and what it does", ref.split("\n").some((line) => line.startsWith("spn-devex workstream row discard <workstream>/<arc> <row> --note") && line.includes(" — take a row found invalid")), ref);
   ok("the retired `row write` is in neither help nor the ref", !ref.includes("row write") && !cli(root, ["help"]).out.includes("row write"));
   const edit = ref.split("\n").find((line) => line.startsWith("spn-devex workstream row edit ")) ?? "";
   ok("[MKT.SCRIPTS.209] `row edit` names `--proof` in its usage, in the ref the build writes", edit.includes("[--proof …]"), edit);
@@ -143,7 +143,7 @@ console.log("\n=== report write — a hand-back folded in from its front matter"
   const bad = cli(root, ["workstream", "report", "write", "031", "notes/N001/orders/3.report.md"]);
   ok("red: an outcome outside the three is refused", bad.code === 2 && bad.out.includes("landed · stopped · needs-you"), bad.out);
   const nowhere = cli(root, ["workstream", "report", "write", "031", "notes/N001/plan.md"]);
-  ok("red: a file that is no report is refused", nowhere.code === 2 && nowhere.out.includes("notes/N<nnn>/orders/<row>.report.md"), nowhere.out);
+  ok("red: a file that is no report is refused", nowhere.code === 2 && nowhere.out.includes("notes/<arc>/orders/<row>.report.md"), nowhere.out);
 
   // A REPORT, AND A BRIEF, WITH NO `cost:` line: the part's cost is measured from the TURN rows of its part (MKT.SCRIPTS.326).
   const telemetry = join(root, ".spndevex", ".debug", "telemetry");
@@ -243,7 +243,7 @@ console.log("\n=== question — raise, show, answer, withdraw");
   ok("[MKT.SCRIPTS.383] a What with a path:line is taken, and the number is past every anchor the page carries", raised.code === 0 && raised.out.startsWith("Q8 · open · approach.html Open — Q8"), raised.out);
   ok("the card stands in the approach page's Open, under its heading", /<h2>Open &mdash; Q8<\/h2>/.test(readFileSync(page, "utf8")) && readFileSync(page, "utf8").includes('<h4 id="q8">'));
   const notPreview = cli(root, ["workstream", "question", "show", "031/q8", "--in", "notes/N001/plan.md"]);
-  ok("red: a card is shown only on an arc's preview", notPreview.code === 2 && notPreview.out.includes("notes/N<nnn>/preview.html"), notPreview.out);
+  ok("red: a card is shown only on an arc's preview", notPreview.code === 2 && notPreview.out.includes("notes/<arc>/preview.html"), notPreview.out);
   const shown = cli(root, ["workstream", "question", "show", "031/q8", "--in", "notes/N001/preview.html"]);
   const preview = readFileSync(join(ws, "notes", "N001", "preview.html"), "utf8");
   ok("shown on the preview, with the line back to the approach page", shown.code === 0 && preview.includes('<h4 id="q8">') && preview.includes('href="../../approach.html#s4"'), shown.out);
@@ -942,6 +942,8 @@ console.log("\n=== go start — a release part starts, a helper's part does not 
   const helper = plan.parts.find((one) => one.work === "DOCS");
   const refusedHelper = cli(rel.root, ["workstream", "go", "start", "031/N001", helper.id]);
   ok("[MKT.SCRIPTS.326] red: a helper's part is refused, and nothing changes", refusedHelper.code === 1 && /DOCS part/.test(refusedHelper.out) && json(goFile).parts.find((one) => one.id === helper.id).state === helper.state, refusedHelper.out);
+  // a release waits on its repository's parts (E3), so they have landed before it is ready
+  writeFileSync(goFile, JSON.stringify({ ...plan, parts: plan.parts.map((one) => (one.work === "RELEASE" || one.state === "landed" ? one : { ...one, state: "landed" })) }, null, 2));
   const started = cli(rel.root, ["workstream", "go", "start", "031/N001", release.id]);
   ok("[MKT.SCRIPTS.326] a ready release part starts: running, and the next step is the release", started.code === 0 && json(goFile).parts.find((one) => one.id === release.id).state === "running" && /Next: release spn-x/.test(started.out), started.out);
   const twice = cli(rel.root, ["workstream", "go", "start", "031/N001", release.id]);
@@ -1110,8 +1112,8 @@ console.log("\n=== the role arcs by their addresses: ideate and follow-ups (Q33)
   const role = await dataWorkspace("role-arcs", { rows: rowsOf });
   const run = (...args) => cli(role.root, ["workstream", ...args]);
   const openRole = (arc, subject) => run("arc", "edit", `031/${arc}`, "--title", `the ${arc}`, "--subject", subject, "--goal", "a role arc's goal");
+  ok("[MKT.SCRIPTS.484] `fact write <ws>/ideate` needs an ideate arc: none opened yet, the fact is refused", run("fact", "write", "031/ideate", "--source", "spn-x/a.ts", "--fact", "a is one").code !== 0 && !existsSync(join(role.ws, "arcs", "ideate")));
   const ideate = openRole("ideate", "the-shape");
-  ok("[MKT.SCRIPTS.484] `fact write <ws>/ideate` needs an ideate arc: none opened yet, the fact is refused", run("fact", "write", "031/ideate", "--source", "spn-x/a.ts", "--fact", "a is one").code !== 0);
   ok("[MKT.SCRIPTS.484] the ideate arc is opened by its address", ideate.code === 0 && existsSync(join(role.ws, "arcs", "ideate", "state.json")), ideate.out);
   const fact = run("fact", "write", "031/ideate", "--source", "spn-x/a.ts:1", "--fact", "a is one");
   ok("[MKT.SCRIPTS.484] a fact against `<ws>/ideate` goes to arcs/ideate/facts.jsonl", fact.code === 0 && lines(join(role.ws, "arcs", "ideate", "facts.jsonl")).length === 1, fact.out);

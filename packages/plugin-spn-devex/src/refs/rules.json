@@ -19152,6 +19152,11 @@
         },
         {
           "plugin": "spn-devex",
+          "path": "refs/devex/workspace/workstream.md",
+          "heading": "Once an arc is decided, a drift step runs, then four passes per repository"
+        },
+        {
+          "plugin": "spn-devex",
           "path": "skills/test/SKILL.md",
           "heading": "When a whole tier runs"
         }

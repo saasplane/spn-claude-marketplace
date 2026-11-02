@@ -367,6 +367,7 @@ console.log("\n=== a window says when it loaded wiring older than what is instal
     mkdirSync(join(RECORDED, ".spndevex", ".debug"), { recursive: true });
     mkdirSync(join(RECORDED, "spn-infra"), { recursive: true });
     writeFileSync(join(RECORDED, "spn-infra", "sprepo.json"), JSON.stringify({ type: "INFRA" }));
+    writeFileSync(join(RECORDED, ".spndevex", "README.md"), "# .spndevex\n");
     writeFileSync(join(RECORDED, ".spndevex", ".debug", "switches.json"), JSON.stringify({ telemetry: true }));
     const env = { ...process.env, HOME: join(BASE, "home-recorded") };
     delete env.SPN_TELEMETRY;
@@ -606,10 +607,10 @@ console.log("\n=== orientation — the welcome word for word, and one status lin
     ".spndevex/README.md": "state\n",
   });
   const lowerOut = hook(lower, null);
-  const emptyRoot = fixture("rung-0", {});
+  const emptyRoot = fixture("rung-0", { ".spndevex/README.md": "state\n" });
   says("[MKT.HOOKS.487] the four rungs are the book's four rows: empty, estate only, a concept missing, and building (silent)",
-    run("node", [`${HOOKS}/src/scripts/events/orientation.ts`, emptyRoot], emptyRoot).includes("Day-0 mode")
-    && hook(fixture("rung-1", { "spn-infra/sprepo.json": repo("INFRA"), ".spndevex/README.md": "state\n" }), null).context.includes(`${GROUND}rung 1: estate only`)
+    hook(emptyRoot, null).context.includes("Day-0 mode")
+    && hook(fixture("rung-1", { "spn-infra/sprepo.json": repo("INFRA"), ".spndevex/README.md": "state\n" }), null).context.includes("rung 1: estate only")
     && lowerOut.context.includes(`${GROUND}rung 2: an APPS repo carries no CONCEPT.md`)
     && !hook(ordinary, null).context.includes("rung "));
   says("a lower rung is a clause of the agent's ground line, never the status line",
@@ -1042,8 +1043,8 @@ console.log("\n=== orientation — the fetch, the behind-develop clause and the 
   const { commandsRef } = await import("../../../../src/scripts/cli.ts");
   const treeDebug = (await commandsRef()).split("\n").filter((one) => one.startsWith("spn-devex debug "));
   const shown = big.context.split("\n").filter((one) => one.startsWith("spn-devex debug "));
-  says(`the command tree renders the nine debug commands, ${treeDebug.length} lines`,
-    treeDebug.length === 9 && treeDebug.every((one) => /^spn-devex debug \w+ \w+/.test(one)), treeDebug.join("\n"));
+  says(`the command tree renders the ten debug commands, ${treeDebug.length} lines`,
+    treeDebug.length === 10 && treeDebug.every((one) => /^spn-devex debug \w+ \w+/.test(one)), treeDebug.join("\n"));
   says(`past the ceiling an ordinary start leaves the debug lines out first, ${shown.length} lines`,
     shown.length === 0 && big.context.length <= SESSION_START_CEILING + 200);
   says("and names `refs/commands.md` as read on asking",

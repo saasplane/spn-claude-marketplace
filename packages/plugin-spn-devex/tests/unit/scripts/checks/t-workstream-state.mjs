@@ -2,7 +2,7 @@
 // once on a fixture that breaks it, and to pass once the fixture is mended the way the agent would.
 import { mkdirSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { PREVIEW, arcData, cli, dataWorkspace, put } from "../../../helpers/workstream-fixture.mjs";
+import { PREVIEW, arcData, cli, dataWorkspace, put, writeRolePageParts } from "../../../helpers/workstream-fixture.mjs";
 import { workspace } from "../../../helpers/fixture.mjs";
 
 const { checkWorkstream, checkWorkspace, sectionText } = await import("../../../../src/scripts/checks/workstream-state.ts");
@@ -509,7 +509,6 @@ console.log("\n=== MKT.SCRIPTS.485 — the role folders `ideate/` and `follow-up
   const page = join(ws, "approach.html");
   const whole = readFileSync(page, "utf8");
   const roles = ["ideate", "follow-ups"];
-  const entry = (arc) => `  <h4 id="${arc}-what">The ${arc} arc</h4>\n  <p>Read the preview &rarr; <a href="notes/${arc}/preview.html">the ${arc}</a></p>\n`;
   const openRole = (arc) => {
     mkdirSync(join(ws, "arcs", arc), { recursive: true });
     mkdirSync(join(ws, "notes", arc), { recursive: true });
@@ -517,7 +516,7 @@ console.log("\n=== MKT.SCRIPTS.485 — the role folders `ideate/` and `follow-up
     writeFileSync(join(ws, "notes", arc, "preview.html"), PREVIEW);
   };
   for (const arc of roles) openRole(arc);
-  writeFileSync(page, whole.replace("</section>\n<section id=\"s3\"", `${roles.map(entry).join("")}</section>\n<section id="s3"`));
+  await writeRolePageParts(ws, roles);
   cli(root, ["docs", "cycles", "write", "031"]);
   for (const arc of roles) cli(root, ["workstream", "arc", "stamp", "write", `031/${arc}`]);
   const green = checkWorkstream(ws);

@@ -27,7 +27,7 @@ import { carryTags, rowId, tagsOf, telemetryDir, utcNow, workOfPart, type WorkTa
 import {
   ARC_PATTERN, ID_PATTERN, NODE_PATTERN, PART_PATTERN, WORKSTREAM_PATTERN, SPDevExAgentSkillType, SPDevExWorkspaceTelemetryEventType,
   SPDevExWorkspaceTelemetryRowType, SPDevExWorkspaceTelemetryVersionType, SPDevExWorkstreamWorkType, SPDocBehaviourStatusType, SPTestTierType,
-  held, known,
+  SPDevExStageType, held, known,
 } from "../../../../plugin-support-lib/src/lib/telemetry-values.ts";
 import { isTestCommand } from "../checks/test-run.ts";
 import { loadPrograms, readCommand, type Reading } from "./command-reader.ts";
@@ -149,7 +149,8 @@ function headOf(root: string, payload: Payload, tags: WorkTags): Record<string, 
   return {
     session, agent: tags.agent,
     workstream: held(work.workstream, WORKSTREAM_PATTERN), arc: held(work.arc, ARC_PATTERN), part,
-    skill: known(SPDevExAgentSkillType, work.skill), work: workOfPart(part) ?? null,
+    skill: known(SPDevExAgentSkillType, work.skill), stage: known(SPDevExStageType, (work as { stage?: string | null }).stage ?? null),
+    work: workOfPart(part) ?? null,
   };
 }
 

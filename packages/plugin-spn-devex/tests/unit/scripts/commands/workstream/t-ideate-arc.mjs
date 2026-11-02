@@ -1,7 +1,7 @@
 // The ideate arc (RULE.DEVEX.WORKSPACE.494): opened by its address, `<ws>/ideate`, with no `--kind`, it has no steps and its status is worked out from the build arcs it proposes.
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { PREVIEW, cli, dataWorkspace } from "../../../../helpers/workstream-fixture.mjs";
+import { PREVIEW, cli, dataWorkspace, writeRolePageParts } from "../../../../helpers/workstream-fixture.mjs";
 
 const { arcStatus, readArc, statusOfData } = await import("../../../../../src/scripts/lib/workstream.ts");
 const gate = await import("../../../../../src/scripts/checks/split-plan.ts");
@@ -60,6 +60,10 @@ console.log("\n=== where it is read");
 {
   // The ideate arc's one preview is filled once it is decided.
   writeFileSync(join(ws, "notes", "ideate", "preview.html"), PREVIEW);
+  // the follow-up arc reads LANDED once every suggestion is settled (none is raised), so its preview is filled too; both role arcs have their Plan row and What entry
+  writeFileSync(join(ws, "notes", "follow-ups", "preview.html"), PREVIEW);
+  await writeRolePageParts(ws, ["ideate", "follow-ups"]);
+  for (const arc of ["ideate", "follow-ups"]) cli(root, ["workstream", "arc", "stamp", "write", `031/${arc}`]);
   cli(root, ["docs", "cycles", "write", "031"]);
   ok("[MKT.SCRIPTS.431] the close gate reads it through the same owner: LANDED is terminal", gate.arcStatus(root, "031-probe", "ideate") === "LANDED", String(gate.arcStatus(root, "031-probe", "ideate")));
   const check = cli(root, ["workstream", "state", "check", "031"]);

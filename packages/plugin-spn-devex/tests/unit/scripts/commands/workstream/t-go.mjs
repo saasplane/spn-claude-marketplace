@@ -74,19 +74,19 @@ console.log("\n=== write: the plan and the briefs");
   ok("[MKT.SCRIPTS.314] the plan records the go's scope and its lead", JSON.stringify(plan.scope) === '["N001"]' && plan.lead === "N001");
   ok("[MKT.SCRIPTS.314] the plan carries the scope's release part after every other part but the proof, which is last", plan.parts.at(-1)?.id === "proof-spn-x" && plan.parts.at(-2)?.id === "release-spn-x-1" && plan.parts.at(-2)?.work === "RELEASE" && plan.parts.slice(0, -2).every((p) => p.work !== "RELEASE"), JSON.stringify(plan.parts.map((p) => p.id)));
   ok("[MKT.SCRIPTS.303] every part with entries has a brief", plan.parts.filter((p) => p.entries.length).every((p) => existsSync(join(orders, `${p.id}.md`))), wrote.out);
-  const brief = existsSync(join(orders, "code-spn-x-1.md")) ? readFileSync(join(orders, "code-spn-x-1.md"), "utf8") : "";
-  ok("[MKT.SCRIPTS.303] a brief opens with the go, the part and its entries", brief.startsWith("---\n") && brief.includes('go: "N001"') && brief.includes('part: "code-spn-x-1"') && brief.includes("N001/E2"), brief.slice(0, 200));
+  const brief = existsSync(join(orders, "code-spn-x-q1-1.md")) ? readFileSync(join(orders, "code-spn-x-q1-1.md"), "utf8") : "";
+  ok("[MKT.SCRIPTS.303] a brief opens with the go, the part and its entries", brief.startsWith("---\n") && brief.includes('go: "N001"') && brief.includes('part: "code-spn-x-q1-1"') && brief.includes("N001/E2"), brief.slice(0, 200));
   ok("[MKT.SCRIPTS.306] a brief gives the report's front matter that report write folds, and asks for no cost", brief.includes("## Report") && brief.includes("outcome: landed · stopped · needs-you") && !brief.includes("cost:"), brief.slice(-500));
   ok("[MKT.SCRIPTS.315] write ends with the next step", lastLine(wrote.out).startsWith("Next:"), wrote.out);
-  ok("[MKT.SCRIPTS.446] a brief names `workstream sheet show <arc> --part <part>` for its entries, and no longer the whole sheet", brief.includes("`workstream sheet show N001 --part code-spn-x-1` prints them") && !brief.includes("prints it whole"), brief);
+  ok("[MKT.SCRIPTS.446] a brief names `workstream sheet show <arc> --part <part>` for its entries, and no longer the whole sheet", brief.includes("`workstream sheet show N001 --part code-spn-x-q1-1` prints them") && !brief.includes("prints it whole"), brief);
   ok("[MKT.SCRIPTS.306] a brief no longer asks for a saved report on a part that lands: the helper hands back at most 8 lines and runs `workstream report write <workstream>/<arc> <part-id> --run <name>`",
-    /workstream report write \S+\/N001 code-spn-x-1 --run/.test(brief) && brief.includes("at most 8 lines") && !brief.includes("save the report, at most 15 lines, beside this brief"), brief);
+    /workstream report write \S+\/N001 code-spn-x-q1-1 --run/.test(brief) && brief.includes("at most 8 lines") && !brief.includes("save the report, at most 15 lines, beside this brief"), brief);
   ok("[MKT.SCRIPTS.306] it asks for a saved report only to return `needs-you`, a follow-up or an `unnamed:` list, and the `## Report` block keeps the front matter shape",
     brief.includes("needs-you") && brief.includes("unnamed:") && brief.includes("## Report") && brief.includes("outcome: landed \u00b7 stopped \u00b7 needs-you"), brief.slice(-700));
   ok("[MKT.SCRIPTS.480] the Stop sentence comes from `sizedStop`, so it names the part's size of context and turns", /Stop at \d+k of context or \d+ turns/.test(brief), brief.slice(0, 900));
   ok("[MKT.SCRIPTS.480] the brief says to search with `grep` in Bash, since the helper has no Grep tool, and to read only the files below",
     brief.includes("Search with `grep` in Bash, since you have no Grep tool") && brief.includes("Read only the files below"), brief);
-  ok("[MKT.SCRIPTS.481] the heading reads `# Order <part>` as the template does", brief.includes("# Order code-spn-x-1") && !brief.includes("# Part code-spn-x-1"), brief.slice(0, 400));
+  ok("[MKT.SCRIPTS.481] the heading reads `# Order <part>` as the template does", brief.includes("# Order code-spn-x-q1-1") && !brief.includes("# Part code-spn-x-q1-1"), brief.slice(0, 400));
   const head = brief.split("\n---\n")[0];
   ok("[MKT.SCRIPTS.482] the front matter gains `touches` (repository:place), `decisions` (the cards `decidedBy` names) and `facts` (the fact ids)",
     /^touches:.*spn-x:src\/b\.ts/m.test(head) && /^decisions:.*q1/m.test(head) && /^facts:.*f1/m.test(head), head);
@@ -95,12 +95,12 @@ console.log("\n=== write: the plan and the briefs");
 console.log("\n=== show");
 {
   const shown = go("show", "N001");
-  ok("[MKT.SCRIPTS.304] show lists each part", shown.code === 0 && ["docs-spn-x-1", "baseline-spn-x", "code-spn-x-1", "full-spn-x", "release-spn-x-1"].every((id) => shown.out.includes(id)), shown.out);
+  ok("[MKT.SCRIPTS.304] show lists each part", shown.code === 0 && ["docs-spn-x-q1-1", "baseline-spn-x", "code-spn-x-q1-1", "full-spn-x", "release-spn-x-1"].every((id) => shown.out.includes(id)), shown.out);
   const line = (id) => shown.out.split("\n").find((one) => one.includes(id)) ?? "";
-  ok("[MKT.SCRIPTS.304] a part with nothing before it reads ready, one whose waits are open reads waiting", /ready/.test(line("docs-spn-x-1")) && /waiting/.test(line("code-spn-x-1")), shown.out);
-  ok("[MKT.SCRIPTS.304] show prints the entry and what it waits on", line("code-spn-x-1").includes("N001/E2") && line("code-spn-x-1").includes("baseline-spn-x"), line("code-spn-x-1"));
-  const one = go("show", "N001", "--part", "code-spn-x-1");
-  ok("[MKT.SCRIPTS.304] --part prints that part alone", one.code === 0 && one.out.includes("code-spn-x-1") && !one.out.split("\n").some((l) => l.startsWith("docs-spn-x-1")), one.out);
+  ok("[MKT.SCRIPTS.304] a part with nothing before it reads ready, one whose waits are open reads waiting", /ready/.test(line("docs-spn-x-q1-1")) && /waiting/.test(line("code-spn-x-q1-1")), shown.out);
+  ok("[MKT.SCRIPTS.304] show prints the entry and what it waits on", line("code-spn-x-q1-1").includes("N001/E2") && line("code-spn-x-q1-1").includes("baseline-spn-x"), line("code-spn-x-q1-1"));
+  const one = go("show", "N001", "--part", "code-spn-x-q1-1");
+  ok("[MKT.SCRIPTS.304] --part prints that part alone", one.code === 0 && one.out.includes("code-spn-x-q1-1") && !one.out.split("\n").some((l) => l.startsWith("docs-spn-x-q1-1")), one.out);
   const asJson = go("show", "N001", "--json");
   ok("[MKT.SCRIPTS.304] --json prints the plan", asJson.code === 0 && JSON.parse(asJson.out).parts.length === 6, asJson.out);
   ok("[MKT.SCRIPTS.315] show ends with the next step", lastLine(shown.out).startsWith("Next:"), shown.out);
@@ -118,29 +118,29 @@ console.log("\n=== check");
   cli(root, ["workstream", "sheet", "write", "N001", "--file", sheetIn, "--because", "E3 is not needed"]);
   cli(root, ["workstream", "sheet", "edit", "N001", "E2", "--what", "changed after the plan"]);
   const moved = go("check", "N001");
-  ok("[MKT.SCRIPTS.308] a part whose entry changed is named, exit 1", moved.code === 1 && moved.out.includes("code-spn-x-1") && moved.out.includes("N001/E2"), moved.out);
+  ok("[MKT.SCRIPTS.308] a part whose entry changed is named, exit 1", moved.code === 1 && moved.out.includes("code-spn-x-q1-1") && moved.out.includes("N001/E2"), moved.out);
   const states = Object.fromEntries(json(goFile).parts.map((p) => [p.id, p.state]));
-  ok("[MKT.SCRIPTS.308] check marks that part held and no other", states["code-spn-x-1"] === "held" && states["docs-spn-x-1"] === "ready", JSON.stringify(states));
+  ok("[MKT.SCRIPTS.308] check marks that part held and no other", states["code-spn-x-q1-1"] === "held" && states["docs-spn-x-q1-1"] === "ready", JSON.stringify(states));
   ok("[MKT.SCRIPTS.315] check ends with the next step", lastLine(moved.out).startsWith("Next:"), moved.out);
 }
 
 console.log("\n=== write again keeps the work done");
 {
   const plan = json(goFile);
-  writeFileSync(goFile, JSON.stringify({ ...plan, parts: plan.parts.map((p) => (p.id === "docs-spn-x-1" ? { ...p, state: "landed" } : p)) }, null, 2));
+  writeFileSync(goFile, JSON.stringify({ ...plan, parts: plan.parts.map((p) => (p.id === "docs-spn-x-q1-1" ? { ...p, state: "landed" } : p)) }, null, 2));
   const again = go("write", "N001");
   const parts = json(goFile).parts;
-  ok("[MKT.SCRIPTS.307] a landed part stays landed", again.code === 0 && parts.find((p) => p.id === "docs-spn-x-1")?.state === "landed", again.out);
-  ok("[MKT.SCRIPTS.307] a held part is derived again, ready", parts.find((p) => p.id === "code-spn-x-1")?.state === "ready", JSON.stringify(parts.map((p) => [p.id, p.state])));
+  ok("[MKT.SCRIPTS.307] a landed part stays landed", again.code === 0 && parts.find((p) => p.id === "docs-spn-x-q1-1")?.state === "landed", again.out);
+  ok("[MKT.SCRIPTS.307] a held part is derived again, ready", parts.find((p) => p.id === "code-spn-x-q1-1")?.state === "ready", JSON.stringify(parts.map((p) => [p.id, p.state])));
   ok("[MKT.SCRIPTS.305] the plan read again is whole", go("check", "N001").code === 0);
 }
 
 console.log("\n=== start");
 {
-  const code = go("start", "N001", "code-spn-x-1");
+  const code = go("start", "N001", "code-spn-x-q1-1");
   ok("[MKT.SCRIPTS.315] a code part is refused: only a baseline or a full run starts", code.code === 1 && code.out.includes("baseline"), code.out);
   const waiting = go("start", "N001", "full-spn-x");
-  ok("[MKT.SCRIPTS.315] a full run whose code has not landed is refused", waiting.code === 1 && waiting.out.includes("code-spn-x-1"), waiting.out);
+  ok("[MKT.SCRIPTS.315] a full run whose code has not landed is refused", waiting.code === 1 && waiting.out.includes("code-spn-x-q1-1"), waiting.out);
   const baseline = go("start", "N001", "baseline-spn-x");
   ok("[MKT.SCRIPTS.315] a ready baseline is marked running", baseline.code === 0 && json(goFile).parts.find((p) => p.id === "baseline-spn-x")?.state === "running", baseline.out);
   ok("[MKT.SCRIPTS.315] start ends with the next step", lastLine(baseline.out).startsWith("Next:"), baseline.out);
@@ -165,14 +165,14 @@ console.log("\n=== write: a proof still owed after the code landed");
 
 console.log("\n=== wait: a part waits on something outside the plan");
 {
-  const waited = go("wait", "N001", "code-spn-x-1", "--on", "the release of spn-support-ts");
-  const part = json(goFile).parts.find((p) => p.id === "code-spn-x-1");
+  const waited = go("wait", "N001", "code-spn-x-q1-1", "--on", "the release of spn-support-ts");
+  const part = json(goFile).parts.find((p) => p.id === "code-spn-x-q1-1");
   ok("[MKT.HOOKS.322] go wait marks the part waiting and keeps the reason", waited.code === 0 && part?.state === "waiting" && part?.waitingOn === "the release of spn-support-ts", waited.out);
   ok("[MKT.HOOKS.322] go wait ends with the next step", lastLine(waited.out).startsWith("Next:"), waited.out);
-  ok("[MKT.HOOKS.322] show reads that part as waiting", go("show", "N001", "--part", "code-spn-x-1").out.includes("waiting on the release of spn-support-ts"), "");
-  const landed = go("wait", "N001", "docs-spn-x-1", "--on", "a sign-in");
-  ok("[MKT.HOOKS.322] a landed part cannot wait, and the plan is unchanged", landed.code !== 0 && json(goFile).parts.find((p) => p.id === "docs-spn-x-1")?.state === "landed", landed.out);
-  const bare = go("wait", "N001", "code-spn-x-1");
+  ok("[MKT.HOOKS.322] show reads that part as waiting", go("show", "N001", "--part", "code-spn-x-q1-1").out.includes("waiting on the release of spn-support-ts"), "");
+  const landed = go("wait", "N001", "docs-spn-x-q1-1", "--on", "a sign-in");
+  ok("[MKT.HOOKS.322] a landed part cannot wait, and the plan is unchanged", landed.code !== 0 && json(goFile).parts.find((p) => p.id === "docs-spn-x-q1-1")?.state === "landed", landed.out);
+  const bare = go("wait", "N001", "code-spn-x-q1-1");
   ok("[MKT.HOOKS.322] go wait without --on is refused", bare.code !== 0 && bare.out.includes("--on"), bare.out);
 }
 
@@ -180,20 +180,20 @@ console.log("\n=== wait --clear: a hand-marked wait comes off (E67)");
 {
   const snapshot = readFileSync(goFile, "utf8");
   const stateOf = (id) => json(goFile).parts.find((p) => p.id === id);
-  const opened = go("wait", "N001", "code-spn-x-1", "--clear");
-  ok("[MKT.HOOKS.322] E67 clear reads a part waiting again, on the part not landed, when what it waits on has not landed", opened.code === 0 && stateOf("code-spn-x-1")?.state === "waiting" && String(stateOf("code-spn-x-1")?.waitingOn).includes("baseline-spn-x"), opened.out);
-  go("wait", "N001", "code-spn-x-1", "--on", "a sign-in");
+  const opened = go("wait", "N001", "code-spn-x-q1-1", "--clear");
+  ok("[MKT.HOOKS.322] E67 clear reads a part waiting again, on the part not landed, when what it waits on has not landed", opened.code === 0 && stateOf("code-spn-x-q1-1")?.state === "waiting" && String(stateOf("code-spn-x-q1-1")?.waitingOn).includes("baseline-spn-x"), opened.out);
+  go("wait", "N001", "code-spn-x-q1-1", "--on", "a sign-in");
   const plan = json(goFile);
   writeFileSync(goFile, JSON.stringify({ ...plan, parts: plan.parts.map((p) => (p.id === "baseline-spn-x" ? { ...p, state: "landed" } : p)) }, null, 2));
-  const cleared = go("wait", "N001", "code-spn-x-1", "--clear");
-  ok("[MKT.HOOKS.322] E67 clear reads the part ready again when what it waits on has landed, and drops the reason", cleared.code === 0 && stateOf("code-spn-x-1")?.state === "ready" && !stateOf("code-spn-x-1")?.waitingOn, cleared.out);
+  const cleared = go("wait", "N001", "code-spn-x-q1-1", "--clear");
+  ok("[MKT.HOOKS.322] E67 clear reads the part ready again when what it waits on has landed, and drops the reason", cleared.code === 0 && stateOf("code-spn-x-q1-1")?.state === "ready" && !stateOf("code-spn-x-q1-1")?.waitingOn, cleared.out);
   ok("[MKT.HOOKS.322] E67 clear ends with the next step", lastLine(cleared.out).startsWith("Next:"), cleared.out);
-  const again = go("wait", "N001", "code-spn-x-1", "--clear");
-  ok("[MKT.HOOKS.322] E67 clearing a part that is not waiting is refused, the plan unchanged", again.code !== 0 && again.out.includes("Refused") && stateOf("code-spn-x-1")?.state === "ready", again.out);
-  go("wait", "N001", "code-spn-x-1", "--on", "a sign-in");
+  const again = go("wait", "N001", "code-spn-x-q1-1", "--clear");
+  ok("[MKT.HOOKS.322] E67 clearing a part that is not waiting is refused, the plan unchanged", again.code !== 0 && again.out.includes("Refused") && stateOf("code-spn-x-q1-1")?.state === "ready", again.out);
+  go("wait", "N001", "code-spn-x-q1-1", "--on", "a sign-in");
   go("wait", "N001", "full-spn-x", "--on", "another window's hold");
   const stays = go("wait", "N001", "full-spn-x", "--clear");
-  ok("[MKT.HOOKS.322] E67 clear reads the part waiting again when what it waits on in the plan has not landed, and says on what (full run waits on the code)", stays.code === 0 && stateOf("full-spn-x")?.state === "waiting" && String(stateOf("full-spn-x")?.waitingOn).includes("code-spn-x-1"), stays.out + JSON.stringify(stateOf("full-spn-x")));
+  ok("[MKT.HOOKS.322] E67 clear reads the part waiting again when what it waits on in the plan has not landed, and says on what (full run waits on the code)", stays.code === 0 && stateOf("full-spn-x")?.state === "waiting" && String(stateOf("full-spn-x")?.waitingOn).includes("code-spn-x-q1-1"), stays.out + JSON.stringify(stateOf("full-spn-x")));
   const both = go("wait", "N001", "full-spn-x", "--clear", "--on", "x");
   ok("[MKT.HOOKS.322] E67 --clear with --on is refused", both.code !== 0, both.out);
   writeFileSync(goFile, snapshot);
@@ -416,9 +416,9 @@ console.log("\n=== another arc of the workstream outside the scope, and a circle
   const sibling = await twoArcs("go-sibling", { rows1, rows2: docs2, depends1: ["N002 ships first"], entries2 });
   const wrote = sibling.run("write", "N001");
   ok("[MKT.SCRIPTS.442] a go whose sheet depends on a sibling arc outside the scope is written", wrote.code === 0, wrote.out);
-  const shown = sibling.run("show", "N001", "--part", "code-spn-x-1");
+  const shown = sibling.run("show", "N001", "--part", "code-spn-x-q1-1");
   ok("[MKT.SCRIPTS.442] show prints the code part waiting on that arc's release of the repository",
-    sibling.plan().parts.find((p) => p.id === "code-spn-x-1")?.state === "waiting" && shown.out.includes("waiting on N002's release of spn-x"), shown.out);
+    sibling.plan().parts.find((p) => p.id === "code-spn-x-q1-1")?.state === "waiting" && shown.out.includes("waiting on N002's release of spn-x"), shown.out);
   const baseline = sibling.run("show", "N001", "--part", "baseline-spn-x");
   ok("[MKT.SCRIPTS.445] the plan reads the decided arc's DOCS row outside the scope: the baseline waits on that arc's docs of the repository", baseline.out.includes("waiting on N002's docs of spn-x"), baseline.out);
 
@@ -458,7 +458,11 @@ console.log("\n=== apply-<repo>: the patches applied in order, one commit, the p
   ok("[MKT.SCRIPTS.450] go write puts the two patched entries in one apply-spn-x part the lead carries, with no brief",
     wrote.code === 0 && JSON.stringify(applyPart()?.entries) === '["N001/E1","N001/E2"]' && applyPart()?.model === "lead" && !existsSync(join(world.ws, "notes", "N001", "orders", "apply-spn-x.md")), wrote.out);
   const commits = Number(inRepo(["rev-list", "--count", "HEAD"]).trim());
-  const started = cli(world.root, ["workstream", "go", "start", "N001", "apply-spn-x"]);
+  // the apply part waits on the repository's baseline (E19: ordered by the same waits), so the parts before it have landed
+  const planned = json(planFile);
+  writeFileSync(planFile, JSON.stringify({ ...planned, parts: planned.parts.map((p) => (/^(docs|baseline)-/.test(p.id) ? { ...p, state: "landed" } : p)) }, null, 2));
+  const identity = { GIT_AUTHOR_NAME: "t", GIT_AUTHOR_EMAIL: "t@t", GIT_COMMITTER_NAME: "t", GIT_COMMITTER_EMAIL: "t@t" };
+  const started = cli(world.root, ["workstream", "go", "start", "N001", "apply-spn-x"], identity);
   ok("[MKT.SCRIPTS.451] go start apply-spn-x applies both patches in the repository", started.code === 0 && readFileSync(join(world.repo, "src/a1.ts"), "utf8") === "export const a1 = 2;\n"
     && readFileSync(join(world.repo, "src/a2.ts"), "utf8") === "export const a2 = 2;\n", started.out);
   ok("[MKT.SCRIPTS.451] and makes one commit holding both files", Number(inRepo(["rev-list", "--count", "HEAD"]).trim()) === commits + 1
@@ -473,7 +477,7 @@ console.log("\n=== a brief's acceptance lists each test id beside its file (MKT.
   cli(world.root, ["workstream", "fact", "write", "N001", "--source", "spn-x/a.ts", "--fact", "a is 1", "--used-by", "1"]);
   writeFileSync(join(world.ws, "arcs", "N001", "sheet.json"), JSON.stringify(sheetOf([entry("E1", "spn-x:src/b.ts")]), null, 2));
   cli(world.root, ["workstream", "go", "write", "N001"]);
-  const brief = readFileSync(join(world.ws, "notes", "N001", "orders", "code-spn-x-1.md"), "utf8");
+  const brief = readFileSync(join(world.ws, "notes", "N001", "orders", "code-spn-x-q1-1.md"), "utf8");
   ok("[MKT.SCRIPTS.453] the acceptance reads `<ID> · node <file>`", brief.includes("`T.E1.01 · node tests/t-thing.mjs`"), brief.slice(brief.indexOf("## Acceptance"), brief.indexOf("## Report")));
 }
 
@@ -485,22 +489,22 @@ console.log("\n=== report write records a part's cost from the usage rows (MKT.S
   cli(world.root, ["workstream", "go", "write", "N001"]);
   const folder = telemetryFolder(world.root);
   mkdirSync(folder, { recursive: true });
-  const turn = (id, ms) => JSON.stringify({ v: 1, mtype: "TURN", id, at: "2026-11-02T10:00:00Z", ms, event: "Stop", session: "s", agent: null, workstream: basename(world.ws), arc: "N001", part: "code-spn-x-1", skill: null, work: "CODE", retryOf: null, model: "m", tokens: { in: 10, out: 20, cacheRead: 30, cacheWrite: 40 } });
+  const turn = (id, ms) => JSON.stringify({ v: 1, mtype: "TURN", id, at: "2026-11-02T10:00:00Z", ms, event: "Stop", session: "s", agent: null, workstream: basename(world.ws), arc: "N001", part: "code-spn-x-q1-1", skill: null, work: "CODE", retryOf: null, model: "m", tokens: { in: 10, out: 20, cacheRead: 30, cacheWrite: 40 } });
   appendFileSync(join(folder, "usage.jsonl"), `${turn("m1", 60000)}\n${turn("m2", 60000)}\n${turn("m1", 60000)}\n`);
-  put(world.ws, "notes/N001/orders/code-spn-x-1.report.md", ["---", 'go: "N001"', 'part: "code-spn-x-1"', "outcome: landed", "---", "Body.", ""].join("\n"));
-  cli(world.root, ["workstream", "report", "write", "031", "notes/N001/orders/code-spn-x-1.report.md"]);
-  const landed = json(join(world.ws, "arcs", "N001", "go.json")).parts.find((p) => p.id === "code-spn-x-1");
+  put(world.ws, "notes/N001/orders/code-spn-x-q1-1.report.md", ["---", 'go: "N001"', 'part: "code-spn-x-q1-1"', "outcome: landed", "---", "Body.", ""].join("\n"));
+  cli(world.root, ["workstream", "report", "write", "031", "notes/N001/orders/code-spn-x-q1-1.report.md"]);
+  const landed = json(join(world.ws, "arcs", "N001", "go.json")).parts.find((p) => p.id === "code-spn-x-q1-1");
   ok("[MKT.SCRIPTS.454] the landed part carries its measured cost: each reply once by its id, tokens summed and minutes from model time", landed?.state === "landed" && JSON.stringify(landed.cost) === JSON.stringify({ tokens: 200, minutes: 2 }), JSON.stringify(landed));
 }
 
 console.log("\n=== show: a landed part prints the cost its row recorded (MKT.SCRIPTS.477)");
 {
   const plan = json(goFile);
-  const measured = plan.parts.find((p) => p.id === "code-spn-x-1");
-  writeFileSync(goFile, JSON.stringify({ ...plan, parts: plan.parts.map((p) => (p.id === "code-spn-x-1" ? { ...p, state: "landed", minutes: null, measuredFrom: null, cost: { tokens: 5000, minutes: 3 } } : p.id === "docs-spn-x-1" ? { ...p, state: "ready", minutes: null, measuredFrom: null } : p)) }, null, 2));
-  const line = go("show", "N001", "--part", "code-spn-x-1").out.split("\n").find((l) => l.startsWith("code-spn-x-1")) ?? "";
+  const measured = plan.parts.find((p) => p.id === "code-spn-x-q1-1");
+  writeFileSync(goFile, JSON.stringify({ ...plan, parts: plan.parts.map((p) => (p.id === "code-spn-x-q1-1" ? { ...p, state: "landed", minutes: null, measuredFrom: null, cost: { tokens: 5000, minutes: 3 } } : p.id === "docs-spn-x-q1-1" ? { ...p, state: "ready", minutes: null, measuredFrom: null } : p)) }, null, 2));
+  const line = go("show", "N001", "--part", "code-spn-x-q1-1").out.split("\n").find((l) => l.startsWith("code-spn-x-q1-1")) ?? "";
   ok("[MKT.SCRIPTS.477] a part landed with cost { tokens: 5000, minutes: 3 } prints '3 min' and its tokens, never 'not measured'", measured !== undefined && line.includes("3 min") && line.includes("5000") && !line.includes("not measured"), line);
-  const open = go("show", "N001", "--part", "docs-spn-x-1").out.split("\n").find((l) => l.startsWith("docs-spn-x-1")) ?? "";
+  const open = go("show", "N001", "--part", "docs-spn-x-q1-1").out.split("\n").find((l) => l.startsWith("docs-spn-x-q1-1")) ?? "";
   ok("[MKT.SCRIPTS.477] an unlanded part with no estimate still prints 'not measured'", open.includes("not measured"), open);
 }
 
@@ -510,15 +514,22 @@ console.log("\n=== report write <ws>/<arc> <part-id> --run <name>: no file, the 
   const rep = await dataWorkspace("go-report-run", { rows: [row("1", "CODE", { entries: ["E1"] })] });
   cli(rep.root, ["workstream", "fact", "write", "N001", "--source", "spn-x/a.ts", "--fact", "a is 1", "--used-by", "1"]);
   writeFileSync(join(rep.ws, "arcs", "N001", "sheet.json"), JSON.stringify(sheetOf([entry("E1", "spn-x:src/b.ts")]), null, 2));
+  // the brief names the arc's worktree of the repository (`.worktrees/<workstream>/<repo>`), where the part's commits and run are read
+  const worktree = join(rep.root, ".worktrees", basename(rep.ws), "spn-x");
+  mkdirSync(join(worktree, ".."), { recursive: true });
+  rep.git(["worktree", "add", "-q", "-b", "the-arc", worktree]);
+  const inWorktree = (args) => execFileSync("git", args, { cwd: worktree, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim();
   cli(rep.root, ["workstream", "go", "write", "N001"]);
   const arcFile = join(rep.ws, "arcs", "N001", "state.json");
   const planned = json(join(rep.ws, "arcs", "N001", "go.json")).parts.find((p) => p.work === "CODE");
   // the helper's work: one commit in the repository after the brief was written, and a green run of the part's test
-  put(rep.root, "spn-x/src/b.ts", "export const b = 1;\n");
-  rep.git(["add", "-A"]);
-  rep.git(["-c", "user.email=t@t", "-c", "user.name=t", "commit", "-q", "-m", "the part's change"]);
-  const sha = rep.git(["rev-parse", "HEAD"]);
-  const runIn = (status) => put(rep.root, "spn-x/pkg/tests/.output/unit/runs/r1.json", JSON.stringify({ run: "r1", tier: "unit", ranAt: new Date(Date.now() + 3600e3).toISOString(), env: "local", results: [{ id: "T.E1.01", tier: "unit", status, title: "T.E1.01" }] }));
+  put(worktree, "src/b.ts", "export const b = 1;\n");
+  inWorktree(["add", "-A"]);
+  // dated after the brief, so the commit falls inside the part's window whatever the clock's second
+  const later = new Date(Date.now() + 60e3).toISOString();
+  execFileSync("git", ["-c", "user.email=t@t", "-c", "user.name=t", "commit", "-q", "-m", "the part's change"], { cwd: worktree, stdio: "ignore", env: { ...process.env, GIT_AUTHOR_DATE: later, GIT_COMMITTER_DATE: later } });
+  const sha = inWorktree(["rev-parse", "HEAD"]);
+  const runIn = (status) => put(worktree, "pkg/tests/.output/unit/runs/r1.json", JSON.stringify({ run: "r1", tier: "unit", ranAt: new Date(Date.now() + 3600e3).toISOString(), env: "local", results: [{ id: "T.E1.01", tier: "unit", status, title: "T.E1.01" }] }));
   runIn("SUCCESS");
   const landed = cli(rep.root, ["workstream", "report", "write", "031/N001", planned.id, "--run", "r1"]);
   const data = json(arcFile);
@@ -554,7 +565,8 @@ console.log("\n=== an arc is addressed as N<nnn>, ideate or follow-ups, and a sc
   const ideate = run("write", "031/ideate");
   ok("[MKT.SCRIPTS.442] `ideate` is read as an arc too: it is refused for having no sheet, as any arc without one, and nothing is written",
     ideate.code === 1 && ideate.out.includes("Nothing was written") && !existsSync(join(world.ws, "arcs", "ideate", "go.json")) && !/usage|not an arc/i.test(ideate.out), ideate.out);
-  const help = run("--help");
+  // the help lists each command with its describe, which holds the `--follow-up` sentence
+  const help = cli(world.root, ["help"]);
   ok("[MKT.SCRIPTS.442] the `--follow-up` help says it is not the follow-up arc", /not the follow-up arc/i.test(help.out), help.out);
 }
 

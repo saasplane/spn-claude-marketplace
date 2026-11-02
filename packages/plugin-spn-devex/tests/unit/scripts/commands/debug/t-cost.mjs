@@ -277,6 +277,7 @@ try {
 
   console.log("\n=== idle, waiting on you and waiting on a run (MKT.SCRIPTS.475)");
   {
+    mkdirSync(join(root, ".spndevex", "workstreams", "open", "045-idle", "arcs", "N001"), { recursive: true });
     const turn = (id, at) => reply({ turn: id, at, session: "w1", workstream: "045-idle", arc: "N001", part: null });
     writeFileSync(join(telemetry, "usage.jsonl"), [
       turn("i1", "2026-10-22T09:00:00Z"), turn("i2", "2026-10-22T12:01:00Z"), turn("i3", "2026-10-22T12:12:00Z"), turn("i4", "2026-10-22T13:00:00Z"),
@@ -293,6 +294,7 @@ try {
 
   console.log("\n=== the arcs in their order: Ideate, the build arcs, Follow-ups (the ideate and follow-up arcs)");
   {
+    mkdirSync(join(root, ".spndevex", "workstreams", "open", "046-arcs", "arcs"), { recursive: true });
     const turn = (id, arc, part) => reply({ turn: id, at: "2026-10-23T09:00:00Z", session: "w1", workstream: "046-arcs", arc, part });
     writeFileSync(join(telemetry, "usage.jsonl"), [
       turn("v1", "follow-ups", "docs-spn-x-1"), turn("v2", "N002", "code-spn-x-1"), turn("v3", "ideate", "docs-spn-x-2"), turn("v4", "N001", "code-spn-x-2"),

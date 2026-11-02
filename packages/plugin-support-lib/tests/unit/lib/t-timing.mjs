@@ -79,9 +79,9 @@ same("an order under an arc's orders folder names the arc and the part",
 same("a relative three-digit arc path, from inside the workstream, names the arc",
   tagsOf({ cwd: WS, tool_input: { command: "sed -n 1,20p arcs/N001-book-change.md" } }),
   tags("008-plain-language", "N001", null));
-same("a one-digit and a two-digit arc still name theirs",
+same("a one-digit and a two-digit arc are no arc: the closed values are N<nnn>, ideate and follow-ups",
   [tagsOf({ tool_input: { file_path: `${WS}/arcs/N1-a.md` } }).arc, tagsOf({ tool_input: { file_path: `${WS}/notes/N15/plan.md` } }).arc],
-  ["N1", "N15"]);
+  [null, null]);
 same("the approach page names the workstream alone",
   tagsOf({ tool_input: { file_path: `${WS}/plain-language-approach.html` } }),
   tags("008-plain-language", null, null));
@@ -89,14 +89,14 @@ same("a command is read for paths too, and the most specific wins",
   tagsOf({ tool_input: { command: `cat ${WS}/plain-language-approach.html '${WS}/arcs/N116-r2.md' && rg x ${WS}/notes/N116/orders/B5-state.md` } }),
   tags("008-plain-language", "N116", "B5-state"));
 same("backlog and closed are workstreams too",
-  tagsOf({ tool_input: { file_path: `/w/.spndevex/${WORKSTREAMS}/closed/003-cloud-day-0/arcs/N2-x.md` } }),
-  tags("003-cloud-day-0", "N2", null));
+  tagsOf({ tool_input: { file_path: `/w/.spndevex/${WORKSTREAMS}/closed/003-cloud-day-0/arcs/N002-x.md` } }),
+  tags("003-cloud-day-0", "N002", null));
 same("a relative arc path counts when the call runs inside a workstream",
   tagsOf({ cwd: WS, tool_input: { command: "sed -n 1,20p arcs/N116-r2-the-devex-release.md" } }),
   tags("008-plain-language", "N116", null));
 same("a relative order path in a notes folder named past its arc counts too",
-  tagsOf({ cwd: WS, tool_input: { command: "cat notes/N8-telemetry/orders/2p-plugin.md" } }),
-  tags("008-plain-language", "N8", "2p-plugin"));
+  tagsOf({ cwd: WS, tool_input: { command: "cat notes/N008-telemetry/orders/2p-plugin.md" } }),
+  tags("008-plain-language", "N008", "2p-plugin"));
 same("a relative arc path outside any workstream names nothing",
   tagsOf({ cwd: "/opt/work/saasplane/code/spn-foundation", tool_input: { command: "cat arcs/N116.md" } }),
   tags(null, null, null));
@@ -109,11 +109,11 @@ same("the agent comes from the hook input",
 same("an edit's strings are read as well as its path",
   tagsOf({ tool_input: { file_path: "/tmp/x.md", old_string: "a", new_string: `see ${WS}/notes/N116/orders/M7-x.md` } }),
   tags("008-plain-language", "N116", "M7-x"));
-same("a notes folder named past its arc (`notes/N8-telemetry/`) names the arc and the part",
-  tagsOf({ tool_input: { file_path: `${WS}/notes/N8-telemetry/orders/2p-plugin.md` } }),
-  tags("008-plain-language", "N8", "2p-plugin"));
-same("and its plan names the arc", tagsOf({ tool_input: { file_path: `${WS}/notes/N8-telemetry/plan.md` } }),
-  tags("008-plain-language", "N8", null));
+same("a notes folder named past its arc (`notes/N008-telemetry/`) names the arc and the part",
+  tagsOf({ tool_input: { file_path: `${WS}/notes/N008-telemetry/orders/2p-plugin.md` } }),
+  tags("008-plain-language", "N008", "2p-plugin"));
+same("and its plan names the arc", tagsOf({ tool_input: { file_path: `${WS}/notes/N008-telemetry/plan.md` } }),
+  tags("008-plain-language", "N008", null));
 same("no payload never throws", tagsOf(undefined), tags(null, null, null));
 
 console.log("\n=== the row — one family, one row for each check");
@@ -130,7 +130,7 @@ console.log("\n=== the row — one family, one row for each check");
   const lines = logOf(root);
   same("[MKT.SCRIPTS.330] one row for each check and no whole-run line", lines.length, 2);
   same("[MKT.SCRIPTS.330] every row holds the base and the head, in order, then the check's own keys", lines.map((l) => Object.keys(l).join(",")),
-    lines.map(() => [...LINE_KEYS, "check", "verdict", "out"].join(",")));
+    lines.map(() => [...LINE_KEYS, "check", "verdict", "out", "pluginVersion"].join(",")));
   same("[MKT.SCRIPTS.330] the keys are the family's base and head", LINE_KEYS, ["v", "mtype", "id", "at", "ms", "event", "session", "agent",
     "workstream", "arc", "part", "skill", "stage", "work", "retryOf"]);
   same("[MKT.SCRIPTS.330] a check's row is version 1, mtype CHECK, named by its action", [lines[0].v, lines[0].mtype, lines[0].check, lines[1].check],

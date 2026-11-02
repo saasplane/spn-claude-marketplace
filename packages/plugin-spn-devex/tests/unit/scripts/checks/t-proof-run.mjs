@@ -71,6 +71,7 @@ console.log("\n=== an nx run on an unchanged tree during a PROOF row (S129)");
   const built = async (name, content) => {
     const w = await dataWorkspace(name, { rows: [proofRow] });
     put(w.repo, "pkg/x.ts", "export const x = 1;\n");
+    put(w.repo, ".gitignore", "**/tests/.output/\n");
     w.git(["add", "-A"]);
     w.git(["-c", "user.email=t@t", "-c", "user.name=t", "commit", "-q", "-m", "second"]);
     const sha = w.git(["rev-parse", "HEAD"]);
@@ -81,15 +82,17 @@ console.log("\n=== an nx run on an unchanged tree during a PROOF row (S129)");
     writeFileSync(join(w.ws, "arcs", "N001", "state.json"), JSON.stringify(data, null, 2));
     put(w.repo, "pkg/tests/.output/unit/runs/r1.json", JSON.stringify({ run: "r1", tier: "unit", ranAt: "2020-01-01T00:00:00Z", env: "local", results: [{ id: "U.1", tier: "unit", status: "SUCCESS", title: "U.1" }] }));
     put(w.repo, "pkg/tests/.output/unit/runs/r1.stamp.json", JSON.stringify({ tier: "UNIT", narrowed: false, content: content ?? contentHash(tree, "pkg") }));
+    // the arc's log names its latest recorded run, as a landed step's line does
+    writeFileSync(join(w.ws, "arcs", "N001", "log.jsonl"), `${JSON.stringify({ at: "2020-01-01T00:00:00Z", kind: "landed", row: "0", note: "part code-spn-x-1 · run r1" })}\n`);
     bindOpen(w.root, "s1");
     return w;
   };
   const same = await built("proof-same-tree");
-  ok("[MKT.HOOKS.125] an nx run with no --skip-nx-cache passes while the tree equals the tree of the arc's latest recorded run", checkProofRun(bash(same.root, "nx run-many -t test")) === null, JSON.stringify(checkProofRun(bash(same.root, "nx run-many -t test"))));
+  ok("[MKT.HOOKS.125] an nx run with no --skip-nx-cache passes while the tree equals the tree of the arc's latest recorded run", checkProofRun(bash(same.repo, "nx run-many -t test")) === null, JSON.stringify(checkProofRun(bash(same.repo, "nx run-many -t test"))));
   const moved = await built("proof-moved-tree", "0".repeat(64));
-  const refused = checkProofRun(bash(moved.root, "nx run-many -t test"));
+  const refused = checkProofRun(bash(moved.repo, "nx run-many -t test"));
   ok("[MKT.HOOKS.125] on a moved tree the demand stays: the run without --skip-nx-cache is refused", verdictOf(refused) === "deny" && refused.deny.includes("--skip-nx-cache"), JSON.stringify(refused));
-  ok("[MKT.HOOKS.125] and the same run with --skip-nx-cache passes on the moved tree", checkProofRun(bash(moved.root, "nx run-many -t test --skip-nx-cache")) === null);
+  ok("[MKT.HOOKS.125] and the same run with --skip-nx-cache passes on the moved tree", checkProofRun(bash(moved.repo, "nx run-many -t test --skip-nx-cache")) === null);
 }
 
 console.log(failed ? `\n  ${failed} of ${total} FAILED — proof run` : `\n  all ${total} passed — proof run`);

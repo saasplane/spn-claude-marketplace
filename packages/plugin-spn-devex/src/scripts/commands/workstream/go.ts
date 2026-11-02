@@ -152,7 +152,7 @@ function brief(plan: GoPlan, part: GoPart, ws: string, root: string): string {
       ? ["**A follow-up: the lead window carries this out itself**, as one part with one report, and launches no helper.",
          `Run \`workstream report write ${ref} ${part.id} --run <name>\` when it lands; save a report file beside this brief as \`${part.id}.report.md\`, its front matter first, only to return \`needs-you\`, a follow-up or an \`unnamed:\` list.`, ""]
       : [`**Launch no agent.** Stop at ${Math.round(stop.context / 1000)}k of context or ${stop.turns} turns, at the next whole step, say what is left and hand back.`,
-         "**Read only** the files below; read further only where one of them sends you. **Search with `grep` in Bash**, since you have no Grep tool.",
+         "**Read only the files below**; read further only where one of them sends you. **Search with `grep` in Bash, since you have no Grep tool.**",
          "Commit nothing. Hand back at most 8 lines, and run " + `\`workstream report write ${ref} ${part.id} --run <name>\`, which writes and folds the report. ` +
          `Save a report file beside this brief as \`${part.id}.report.md\`, at most 15 lines, its front matter first, only to return \`needs-you\`, a follow-up or an \`unnamed:\` list.`, ""]),
     "**A name, a shape or a construct no entry holds is not yours to make up** (RULE.DEVEX.WORKSPACE.495): stop, return `needs-you`, and list what you met under `unnamed:` in the report.", "",

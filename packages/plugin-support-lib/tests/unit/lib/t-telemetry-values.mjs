@@ -56,7 +56,7 @@ console.log("\n=== skillValue and stageOf");
   same("[MKT.SCRIPTS.329] execute, check and report take the stage from the work",
     ["DOCS", "CODE", "GENERATED", "TEST", "PROOF", "RELEASE", "DESIGN", null].map((work) => stageOf("DEVEX_EXECUTE", work)),
     ["DEVELOP", "DEVELOP", "DEVELOP", "TEST", "TEST", "DELIVER", null, null]);
-  same("[MKT.SCRIPTS.329] no skill, no stage", [stageOf(null, "CODE"), stageOf("UNKNOWN", "CODE")], [null, null]);
+  same("[MKT.SCRIPTS.470] no skill takes the stage from the work, and no work gives none", [stageOf(null, "CODE"), stageOf("UNKNOWN", "CODE"), stageOf(null, null), stageOf("UNKNOWN", "DESIGN")], ["DEVELOP", "DEVELOP", null, null]);
   same("[MKT.SCRIPTS.329] the work values are the contract's seven", Object.values(SPDevExWorkstreamWorkType), ["DOCS", "CODE", "GENERATED", "DESIGN", "TEST", "RELEASE", "PROOF"]);
 }
 
@@ -102,8 +102,9 @@ console.log("\n=== the arc field — N<nnn>, ideate and follow-ups");
   rmSync(logPath, { force: true });
   for (const arc of ["ideate", "other"])
     execFileSync("node", ["--input-type=module", "-e", `
-      import { begin, end } from ${JSON.stringify(join(LIB, "timing.ts"))};
+      import { begin, end, record } from ${JSON.stringify(join(LIB, "timing.ts"))};
       begin({ script: "spn-devex", event: "PreToolUse", tool: "Bash", session: "s", arc: ${JSON.stringify(arc)} }, ${JSON.stringify(root)});
+      record({ group: "x", action: "split-plan" }, 1);
       end();`], { env: env(), encoding: "utf8" });
   same("[MKT.SCRIPTS.491] a row written with arc ideate holds it, and one with other holds null", logOf().map((row) => row.arc), ["ideate", null]);
 }
