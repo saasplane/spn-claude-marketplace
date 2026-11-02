@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "book": {
     "repository": "spn-foundation",
-    "commit": "f83d7338"
+    "commit": "7ed3619c"
   },
   "rules": [
     {
@@ -2260,6 +2260,19 @@
       "sentence": "Day zero opens with one question and runs nothing until it is answered",
       "chapter": "04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "heading": "Which rung you are on is read, never asked",
+      "decision": null,
+      "restated": []
+    },
+    {
+      "id": "RULE.DEVEX.AGENT.175",
+      "level": "MUST",
+      "params": {
+        "short": true
+      },
+      "class": "stated",
+      "sentence": "A card, a question and a handover are written once, in the turn's final message, and a message between steps is at most one short line of what is happening",
+      "chapter": "04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
+      "heading": "A closing moment has one shape, one icon and one title size",
       "decision": null,
       "restated": []
     },

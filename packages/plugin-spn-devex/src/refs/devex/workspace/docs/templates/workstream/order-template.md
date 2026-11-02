@@ -62,7 +62,8 @@ source and commit. In a sheet arc, the rules and the book lines are the part's e
 
 {{The part's acceptance: `spnutils apps check` on each node you touched, and the specs you changed or added, run
 narrowed under one fresh run name, each named id → `SUCCESS` read from the run file; an id the run does not name is
-*nothing proves this*. A case written to fail first only for new behaviour, one narrow run on the unchanged code.
+*nothing proves this*. A code part runs the formatter on the files it wrote before its proof. The
+go states one red check: the new cases run once against the base commit, before the patches apply, and each must fail there; then one full run per repository.
 Stamp with `spn-devex behaviours stamp write {{fresh run name}} {{repo}}`, never with `--reach repository`.}}
 
 ---

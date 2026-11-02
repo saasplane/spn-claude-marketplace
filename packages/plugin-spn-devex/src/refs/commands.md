@@ -20,6 +20,8 @@ spn-devex debug cost show <target> [--from <time>] [--to <time>] [--lead] [--jso
 
 spn-devex debug cost compare <version> <version> [--json] — the before-and-after of a release: what the windows of two plugin versions cost, with the difference
 
+spn-devex debug cost review <workstream>/N<nnn> [--json] — an arc's cells against the three arcs before it: a finding for each that rose past 25%
+
 spn-devex debug hooks show [--json] — every hook check's, then every event's, runs, time, bytes and the size they carried
 
 spn-devex debug store show [--json] — each container of the store: files, size, lifetime
@@ -140,6 +142,8 @@ spn-devex workstream fact write <workstream>/<arc> --source <repository>/<path>[
 
 spn-devex workstream go write <workstream>/<arc> --scope <arc>,… [--after-close] — after the go: derive the plan from the scope's sheets and the telemetry, and write every part's brief; run again it keeps landed and running parts; an arc is N<nnn>, ideate or follow-ups, and --scope takes a mixed list; --after-close makes the lead carry an after-close batch itself, as one part
 
+spn-devex workstream go propose <workstream> — before the go: print each proposed scope, the decided arcs that share a repository grouped in chain order, with the full runs and releases the grouping saves
+
 spn-devex workstream go show <workstream>/<arc> [--part <id>] [--json] — print the parts: their files, their tests, their measured time and what each waits on
 
 spn-devex workstream go check <workstream>/<arc> — read the plan against the sheets: an entry no part holds, or a part whose entries changed since the plan was written, which it marks held; exits 1 on any
@@ -182,13 +186,15 @@ spn-devex workstream rows show <workstream>[/N<nnn>] [--ready] [--parallel] [--t
 
 spn-devex workstream sheet write <workstream>/<arc> --file <sheet.json> — write the arc's whole sheet from a file, every entry validated and every fact one the arc holds
 
-spn-devex workstream sheet edit <workstream>/<arc> <E> [--what …] [--op …] [--file …] [--decided-by …] [--facts …] [--then …] [--rules …] [--callers …] [--docs …] [--book …] [--tiers unit=ID,ID;contract=ID] — change one entry of the sheet; a missing entry is refused, and `sheet write` is named
+spn-devex workstream sheet edit <workstream>/<arc> <E> [--what …] [--op …] [--file …] [--decided-by …] [--facts …] [--then …] [--rules …] [--callers …] [--docs …] [--book …] [--tiers unit=ID,ID;contract=ID] [--trace "…"] [--judged|--mechanical] — change one entry of the sheet; a missing entry is refused, and `sheet write` is named
 
 spn-devex workstream sheet drop <workstream>/<arc> <E> --note "…" — take an entry out of the sheet; --note carries why into its one log line
 
 spn-devex workstream sheet show <workstream>/<arc> [--row <id>] [--part <part>] [--json] — print the sheet, or one row's or one go part's entries; --json prints every field
 
-spn-devex workstream sheet patch <workstream>/<arc> <E> — keep an entry's change as a diff against the commit its facts pin, name it in the entry, and reset the file in the worktree
+spn-devex workstream sheet patch <workstream>/<arc> <E> [--trace "…"] [--judged|--mechanical] — keep an entry's change as a diff against the commit its facts pin, name it in the entry, and reset the file in the worktree; --trace and --judged/--mechanical are recorded with it
+
+spn-devex workstream sheet reach <workstream>/<arc> <E> — print the blast radius of one entry: the entries, files and preview sections a change to it reaches
 
 spn-devex workstream sheet check <workstream>/<arc> — read the sheet against the rows and the cards, one finding to a line; exits 1 on any
 
