@@ -1,7 +1,7 @@
 // `checks/partner-words.ts` — outside the builder's workspace a reply names what the partner can open. The failing
 // replies are shaped on ones that named the book, a rule id of ours or a hook to a partner; the passing ones are the
 // partner's own ids, their files, SaaS Plane by name, a code block, and a reply to a prompt that named the book.
-import { mkdtempSync, readFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { CHECKS } from "../../../helpers/harness.mjs";
@@ -64,6 +64,25 @@ inside();
 {
   ok("[MKT.HOOKS.313] the same book, rule id and hook pass in the builder's workspace",
     say("The book, RULE.DEVEX.WORKSPACE.467 and the stop hook conflict with the rules.").length === 0);
+}
+
+console.log("\n=== a workspace holding the book beside the plugins' source stands down with no key set");
+{
+  outside();
+  const bare = mkdtempSync(join(tmpdir(), "partner-words-bare-"));
+  const holding = mkdtempSync(join(tmpdir(), "partner-words-builder-"));
+  mkdirSync(join(holding, "spn-foundation"), { recursive: true });
+  writeFileSync(join(holding, "spn-foundation", "sprepo.json"), "{}\n", "utf8");
+  mkdirSync(join(holding, "spn-claude-marketplace", "packages", "plugin-spn-devex"), { recursive: true });
+  writeFileSync(join(holding, "spn-claude-marketplace", "sprepo.json"), "{}\n", "utf8");
+  const reply = "The book says a release needs a go, so I held it.";
+  ok("[MKT.SCRIPTS.509] a workspace holding spn-foundation and the plugins' source gives no finding with no key set",
+    checkPartnerWords(reply, holding, "").length === 0);
+  ok("[MKT.SCRIPTS.509] a workspace with neither still gives one", checkPartnerWords(reply, bare, "").length === 1);
+  const bookOnly = mkdtempSync(join(tmpdir(), "partner-words-book-"));
+  mkdirSync(join(bookOnly, "spn-foundation"), { recursive: true });
+  writeFileSync(join(bookOnly, "spn-foundation", "sprepo.json"), "{}\n", "utf8");
+  ok("[MKT.SCRIPTS.509] a workspace holding only the book still gives one", checkPartnerWords(reply, bookOnly, "").length === 1);
 }
 
 console.log("\n=== the builder test comes from the builder library, not from the session-start source");

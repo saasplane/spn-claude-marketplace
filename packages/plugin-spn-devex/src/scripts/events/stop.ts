@@ -2008,7 +2008,7 @@ if (argv1Base === "stop.ts" || argv1Base === "stop.mjs") {
     ...span({ group: "stop", action: "partner-words" }, () => checkPartnerWords(withoutFences(reply), root, turn.prompt)),
     ...span({ group: "stop", action: "page-path" }, () => checkPagePath(withoutFences(reply))),
     ...span({ group: "stop", action: "welcome" }, () => checkWelcome(firstTurn, readWindow(root, session).welcome)),
-    ...span({ group: "stop", action: "corpus" }, () => checkCorpus(root, reposWritten(root, session))),
+    ...span({ group: "stop", action: "corpus" }, () => checkCorpus(root, reposWritten(root, session), mine)),
     // A MAIN WINDOW ONLY, AND NOT WHERE THE TURN CONTINUES BECAUSE A HOOK SPOKE: the offer is made once.
     ...span({ group: "stop", action: "window" }, () => {
       if (event.agent_id || event.stop_hook_active === true || !event.transcript_path) return [];

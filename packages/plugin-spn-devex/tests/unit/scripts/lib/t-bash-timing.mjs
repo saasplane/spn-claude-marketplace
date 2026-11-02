@@ -16,7 +16,7 @@ import { workspace } from "../../../helpers/fixture.mjs";
 const EVENTS = resolve(PLUGIN, "src", "scripts", "events");
 // Every row of the family holds the base, in this order; a variant adds only what its kind needs.
 const BASE = ["v", "mtype", "id", "at", "ms", "event", "session", "agent", "workstream", "arc", "part", "skill", "stage", "work", "retryOf"];
-const COMMAND_KEYS = [...BASE, "call", "exit"];
+const COMMAND_KEYS = [...BASE, "call", "exit", "refusal"];
 const CHECK_KEYS = [...BASE, "check", "verdict", "out", "pluginVersion"];
 const TEST_KEYS = [...BASE, "call", "status", "test"];
 
@@ -62,7 +62,7 @@ console.log("=== a matched command, paired before and after");
   const lines = commands(root);
   same("PostToolUse writes one line", lines.length, 1);
   const line = lines[0] ?? {};
-  same("with every key, in the family's order: the base, then `call` and `exit`", Object.keys(line), COMMAND_KEYS);
+  same("with every key, in the family's order: the base, then `call`, `exit` and `refusal`", Object.keys(line), COMMAND_KEYS);
   same("[MKT.HOOKS.41] the row is a version 1 COMMAND of the command event", [line.v, line.mtype, line.event], [1, "COMMAND", "command"]);
   same("the call is the program, the group and the action, a plugin command's subgroup written into the action",
     line.call, { program: "spnutils", group: "infra", action: "platform up" });
@@ -208,6 +208,25 @@ console.log("\n=== a call made outside the workspace — MKT.HOOKS.340");
   same("[MKT.HOOKS.340] PreToolUse writes the start file under the workspace", existsSync(join(pendingOf(root), "toolu_out.json")), true);
   run("closed", { ...outside, hook_event_name: "PostToolUse", tool_response: {} });
   same("[MKT.HOOKS.340] the call is timed under the workspace's telemetry", commands(root).map((one) => one.call.action), ["platform up"]);
+}
+
+console.log("\n=== a failed call's refusal — MKT.SCRIPTS.501");
+{
+  const root = workspace("2p-refusal", ON);
+  const run = (id, payload) => {
+    const one = call(root, id, "git rev-parse --verify no-such-ref");
+    hook("pretooluse", { ...one, hook_event_name: "PreToolUse" });
+    hook("closed", payload(one));
+  };
+  run("toolu_f1", (one) => ({ ...one, hook_event_name: "PostToolUseFailure", error: "Exit code 2\nSome noise\nRefused: the go is not given\nmore" }));
+  run("toolu_f2", (one) => ({ ...one, hook_event_name: "PostToolUseFailure", error: "Exit code 2\nUsage: spnutils x <a>\n\nunknown option --b\nmore" }));
+  run("toolu_f3", (one) => ({ ...one, hook_event_name: "PostToolUseFailure", error: "Exit code 1\nfatal: bad ref" }));
+  run("toolu_f4", (one) => ({ ...one, hook_event_name: "PostToolUse", tool_response: { stdout: "Refused: said on a success\n" } }));
+  const rows = commands(root);
+  same("[MKT.SCRIPTS.501] a non-zero exit carries the first line that starts `Refused:`", rows[0].refusal, "Refused: the go is not given");
+  same("[MKT.SCRIPTS.501] or the line that follows a usage line", rows[1].refusal, "unknown option --b");
+  same("[MKT.SCRIPTS.501] a failure that says neither has a null refusal", rows[2].refusal, null);
+  same("[MKT.SCRIPTS.501] a zero exit has a null refusal", rows[3].refusal, null);
 }
 
 console.log("\n=== a retried call carries the failed row's id — MKT.SCRIPTS.328");

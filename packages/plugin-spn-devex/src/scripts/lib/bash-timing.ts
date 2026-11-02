@@ -112,6 +112,35 @@ function bytesOfResponse(payload: Payload): number {
   try { return Buffer.byteLength(JSON.stringify(response)); } catch { return 0; }
 }
 
+/** The text a Bash call printed: the response's stdout and stderr, else the response string, else a failure's error text. */
+function outputOf(payload: Payload): string {
+  const response = payload.tool_response;
+  if (typeof response === "string") return response;
+  if (response && typeof response === "object") {
+    const shell = response as { stdout?: unknown; stderr?: unknown };
+    const text = [shell.stdout, shell.stderr].filter((one): one is string => typeof one === "string").join("\n");
+    if (text) return text;
+  }
+  return typeof payload.error === "string" ? payload.error : "";
+}
+
+/**
+ * The refusal a non-zero exit said: the first line of its output that starts `Refused:` or follows a usage line, else null.
+ * A zero exit has none.
+ */
+export function refusalOf(payload: Payload, exit: number | null): string | null {
+  if (exit === null || exit === 0) return null;
+  const lines = outputOf(payload).split("\n").map((line) => line.trim());
+  for (let i = 0; i < lines.length; i++) {
+    if (lines[i].startsWith("Refused:")) return lines[i].slice(0, 300);
+    if (/^usage:/i.test(lines[i])) {
+      const next = lines.slice(i + 1).find((line) => line !== "");
+      if (next) return next.slice(0, 300);
+    }
+  }
+  return null;
+}
+
 const callKey = (call: Call): string => `${call.program} ${call.group ?? ""} ${call.action ?? ""}`;
 
 /** The rows that failed and have not been retried, by call (or `TEST node tier`), kept per window and agent. */
@@ -195,7 +224,7 @@ export function finishCommand(payload: Payload, failed: boolean): number {
     const was = retryOf(join(sessionDir(root, session), RETRIES), tags.agent, callKey(call), id, exit !== null && exit !== 0);
     appendLog(join(dir, HOOKS_LOG), JSON.stringify({
       ...COMMAND_ROW, id, at: utcNow(ms), ms, event: SPDevExWorkspaceTelemetryEventType.COMMAND, ...head,
-      retryOf: held(was, ID_PATTERN), call, exit,
+      retryOf: held(was, ID_PATTERN), call, exit, refusal: refusalOf(payload, exit),
     }));
   } catch { /* a tool never fails because timing failed */ }
   return out;

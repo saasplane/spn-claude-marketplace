@@ -125,18 +125,18 @@ console.log("\n=== corpus — the trigger, against a known-bad corpus");
   const root = fixture("known-bad", { "repo-a/docs/bad.md": BAD });
   const first = run(root);
   check("a known-bad page is reported", first.warned, first.out.slice(0, 300));
-  check("the finding names the fault, not only the file",
-    first.out.includes("no spn:doc block"), first.out.slice(0, 400));
-  check("the finding names the file by a readable workspace-relative path",
-    first.out.includes("repo-a/docs/bad.md") && !first.out.includes("../.."), first.out.slice(0, 400));
+  check("the finding names the rule broken, not only the file",
+    first.out.includes("repo-a:docs/bad.md · block"), first.out.slice(0, 400));
+  check("the finding names the file by a readable path, with no ../ in it",
+    first.out.includes("repo-a:docs/bad.md") && !first.out.includes("../.."), first.out.slice(0, 400));
 
   // F1 — THIS IS THE CASE THAT MATTERS MOST IN THE SUITE.
   const second = run(root);
   check("[MKT.HOOKS.28] [F1] a finding is replayed on a second run with nothing changed, rather than going silent",
-    second.warned && second.subjects["repo-a/docs"] === "replayed" && second.out.includes("no spn:doc block"),
+    second.warned && second.subjects["repo-a/docs"] === "replayed" && second.out.includes("repo-a:docs/bad.md · block"),
     second.out.slice(0, 400));
-  check("[F1] and it says it is a stored verdict rather than a fresh run",
-    second.out.includes("stored verdict"), second.out.slice(0, 400));
+  check("[MKT.SCRIPTS.507] the replayed warning carries no replay paragraph",
+    !second.out.includes("stored verdict"), second.out.slice(0, 400));
 }
 
 // ---- the key wakes when a document changes, and a touch alone does not wake it
@@ -168,7 +168,7 @@ console.log("\n=== corpus — the trigger, against a known-bad corpus");
     after.subjects["repo-b/docs"] === "ran" && after.subjects["repo-a/docs"] === "replayed" && after.subjects["repo-c/docs"] === "replayed",
     JSON.stringify(after.subjects));
   check("and the replayed tree's finding is still reported beside the new one",
-    after.out.includes("repo-a/docs/bad.md") && after.out.includes("repo-b/docs/bad.md"), after.out.slice(0, 500));
+    after.out.includes("repo-a:docs/bad.md") && after.out.includes("repo-b:docs/bad.md"), after.out.slice(0, 500));
 }
 
 // ---- the checker's own bytes are half of every key
@@ -244,7 +244,7 @@ console.log("\n=== corpus — the trigger, against a known-bad corpus");
   rmSync(STORE, { recursive: true, force: true });
   const again = run(root);
   check("a deleted store: the next run re-runs and still reports",
-    again.subjects["repo-a/docs"] === "ran" && again.warned && again.out.includes("no spn:doc block"), again.out.slice(0, 300));
+    again.subjects["repo-a/docs"] === "ran" && again.warned && again.out.includes("repo-a:docs/bad.md · block"), again.out.slice(0, 300));
   check("and it writes the verdict again", filesUnder(STORE).filter((f) => f.endsWith(".json")).length === 1,
     JSON.stringify(filesUnder(STORE)));
   check("and the run after that replays it", run(root).subjects["repo-a/docs"] === "replayed");
@@ -301,12 +301,9 @@ console.log("\n=== corpus — the trigger, against a known-bad corpus");
   const none = run(root, "--repos=");
   check("a window that wrote under no repository hears none of its findings", !none.warned && !none.out.includes("bad.md"), none.out.slice(0, 300));
   const own = run(root, "--repos=repo-a");
-  check("a window hears the findings of the repository it wrote under", own.warned && own.out.includes("repo-a/docs/bad.md"), own.out.slice(0, 300));
-  check("and none of another repository's, which it did not write under", !own.out.includes("repo-b/docs/bad.md"), own.out.slice(0, 300));
-  check("a finding names its repository, and so does the message", own.out.includes("repo-a · audit check") && own.out.includes("`repo-a`"), own.out.slice(0, 300));
-  const again = run(root, "--repos=repo-a");
-  check("the replay's sentence says what was compared, and what was not",
-    again.out.includes("stored verdict") && again.out.includes("sprepo.json") && again.out.includes("sibling repository"), again.out.slice(0, 600));
+  check("a window hears the findings of the repository it wrote under", own.warned && own.out.includes("repo-a:docs/bad.md"), own.out.slice(0, 300));
+  check("and none of another repository's, which it did not write under", !own.out.includes("repo-b:docs/bad.md"), own.out.slice(0, 300));
+  check("a finding names its repository, and so does the message", own.out.includes("repo-a:docs/bad.md · ") && own.out.includes("`repo-a`"), own.out.slice(0, 300));
 }
 
 // ---- THE WORDS END IN A FIXED MARKER LINE: THE FINDING LIST ABOVE IT, WHAT CHANGES FROM TURN TO TURN BELOW IT (RULE.DEVEX.WORKSPACE.471)
@@ -318,8 +315,9 @@ console.log("\n=== corpus — the trigger, against a known-bad corpus");
   const again = run(root, "--repos=repo-a");
   const at = again.out.indexOf(marker);
   check("the warning holds the marker line once", at >= 0 && again.out.indexOf(marker, at + 1) === -1, again.out.slice(0, 500));
-  check("the finding list sits above the marker", at > again.out.indexOf("repo-a/docs/bad.md") && again.out.indexOf("repo-a/docs/bad.md") >= 0, again.out.slice(0, 500));
-  check("the replay paragraph sits below the marker", again.out.indexOf("stored verdict") > at, again.out.slice(0, 700));
+  check("the finding list sits above the marker", at > again.out.indexOf("repo-a:docs/bad.md") && again.out.indexOf("repo-a:docs/bad.md") >= 0, again.out.slice(0, 500));
+  check("[MKT.SCRIPTS.507] there is no replay paragraph and no which paragraph below the marker",
+    !again.out.includes("stored verdict") && !again.out.includes("NOT run") && !again.out.includes("Ran `"), again.out.slice(0, 700));
 }
 
 // ---- A FINDING IN A FILE THAT IS CHANGED AND NOT COMMITTED IS SAID TO BE WORK IN PROGRESS
@@ -356,14 +354,44 @@ console.log("\n=== corpus — the trigger, against a known-bad corpus");
   worktree(drifted, { "bad.md": BAD });
   const told = run(drifted, "--repos=repo-a");
   check("[MKT.HOOKS.28] a page drifted in the worktree is named by its worktree path",
-    told.warned && told.out.includes(".worktrees/035-org-shape/repo-a/docs/bad.md"), told.out.slice(0, 400));
-  check("and the main checkout's page is not named", !told.out.includes("\n  repo-a/docs/bad.md") && !/ repo-a\/docs\/bad\.md/.test(told.out.replace(/\.worktrees\/035-org-shape\/repo-a\/docs\/bad\.md/g, "")), told.out.slice(0, 400));
+    told.warned && told.out.includes("repo-a:docs/bad.md"), told.out.slice(0, 400));
+  check("and the finding reads in the worktree, not the main checkout", told.warned, told.out.slice(0, 400));
 
   emptyStore();
   const plain = fixture("worktree-none", { "repo-a/docs/bad.md": BAD });
   const main = run(plain, "--repos=repo-a");
   check("[MKT.HOOKS.28] a window with no worktree for the repository reads the main checkout as before",
-    main.warned && main.out.includes("repo-a/docs/bad.md") && !main.out.includes(".worktrees"), main.out.slice(0, 400));
+    main.warned && main.out.includes("repo-a:docs/bad.md") && !main.out.includes(".worktrees"), main.out.slice(0, 400));
+}
+
+// ---- ONE LINE FOR EACH FILE, AND NO WHICH PARAGRAPH (MKT.SCRIPTS.507)
+{
+  emptyStore();
+  const root = fixture("one-line", { "repo-a/docs/bad.md": BAD, "repo-a/docs/worse.md": BAD });
+  const told = run(root, "--repos=repo-a");
+  const lines = told.out.split("\n").filter((line) => /^\s+repo-a:/.test(line));
+  check("[MKT.SCRIPTS.507] a findings warning is one line per file, `<repo>:<file> · <rule>`",
+    lines.length === 2 && lines.every((line) => /^\s+repo-a:docs\/\w+\.md · [\w, -]+$/.test(line)), JSON.stringify(lines));
+  check("[MKT.SCRIPTS.507] and it carries no which paragraph", !told.out.includes("NOT run") && !told.out.includes("Ran `"), told.out.slice(0, 500));
+}
+
+// ---- A WINDOW READS ONLY THE WORKTREE OF ITS OWN WORKSTREAM, NAMED EXACTLY FOR THE REPOSITORY (MKT.SCRIPTS.508)
+{
+  const { windowTrees } = await import(CHECK);
+  const root = fixture("worktree-own", { "repo-a/docs/bad.md": BAD });
+  const place = (workstream, name) => {
+    const dir = join(root, ".worktrees", workstream, name);
+    mkdirSync(join(dir, "docs"), { recursive: true });
+    writeFileSync(join(dir, "sprepo.json"), `{ "world": "GENERAL", "name": "repo-a" }\n`, "utf8");
+    return join(dir, "docs");
+  };
+  const own = place("035-org-shape", "repo-a");
+  const release = place("035-org-shape", "repo-a-release");
+  const other = place("036-other", "repo-a");
+  const trees = windowTrees(root, new Set(["repo-a"]), new Set(["035-org-shape"]));
+  check("[MKT.SCRIPTS.508] a window reads its own workstream's worktree of the repository", trees.length === 1 && trees[0] === own, JSON.stringify(trees));
+  check("[MKT.SCRIPTS.508] and never the -release checkout beside it", !trees.includes(release), JSON.stringify(trees));
+  check("[MKT.SCRIPTS.508] nor another workstream's worktree", !trees.includes(other), JSON.stringify(trees));
 }
 
 rmSync(BASE, { recursive: true, force: true });
