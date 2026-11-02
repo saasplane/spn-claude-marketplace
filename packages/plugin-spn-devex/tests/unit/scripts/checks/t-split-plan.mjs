@@ -556,6 +556,27 @@ one("a CARRIED arc closes too, because the work left and the status names where"
   move(`.spndevex/${WORKSTREAMS}/open/001-a-subject`, `.spndevex/${WORKSTREAMS}/closed/`),
   "silent");
 
+// THE FOLLOW-UP ARC IS READ BY THE GATE (Q33, MKT.SCRIPTS.488): its status is worked out from the suggestions, never the stored word.
+const followUps = (suggestions) => ({
+  [`.spndevex/${WORKSTREAMS}/open/001-a-subject/arcs/follow-ups/state.json`]: dataArc("follow-ups", "PROPOSED"),
+  ...(suggestions ? { [`.spndevex/${WORKSTREAMS}/open/001-a-subject/suggestions.jsonl`]: suggestions.map((state, at) => JSON.stringify({ id: `s${at + 1}`, title: "a suggestion", state })).join("\n") + "\n" } : {}),
+});
+
+one("[MKT.SCRIPTS.488] a follow-up arc with a suggestion still raised is PROPOSED, and the workstream cannot close", "close",
+  build("sp-follow-ups-open", { extra: followUps(["raised"]) }),
+  move(`.spndevex/${WORKSTREAMS}/open/001-a-subject`, `.spndevex/${WORKSTREAMS}/closed/`),
+  "deny", { says: "follow-ups — PROPOSED", parity: false, why: "the python gate is the old one and knows no role arc" });
+
+one("[MKT.SCRIPTS.488] an empty follow-up arc whose suggestions are all decided has landed with no move by hand, and the workstream closes", "close",
+  build("sp-follow-ups-settled", { extra: followUps(["decided", "dropped"]) }),
+  move(`.spndevex/${WORKSTREAMS}/open/001-a-subject`, `.spndevex/${WORKSTREAMS}/closed/`),
+  "silent", { parity: false, why: "the python gate is the old one and knows no role arc" });
+
+one("[MKT.SCRIPTS.431] the ideate arc in `arcs/ideate/` is read by the gate as a numbered one: left DECIDED, it refuses the close, naming it", "close",
+  build("sp-ideate-decided", { extra: { [`.spndevex/${WORKSTREAMS}/open/001-a-subject/arcs/ideate/state.json`]: `${JSON.stringify({ ...JSON.parse(dataArc("ideate", "DECIDED")), proposes: ["N9"] }, null, 2)}\n` } }),
+  move(`.spndevex/${WORKSTREAMS}/open/001-a-subject`, `.spndevex/${WORKSTREAMS}/closed/`),
+  "deny", { says: "ideate — DECIDED", parity: false, why: "the python gate is the old one and knows no role arc" });
+
 // ---------------------------------------------------------------- what `carried` is allowed to mean
 //
 // `carried` MEANS THE WORK LEAVES THIS WORKSTREAM (05-artifacts.md § The approach document). Before

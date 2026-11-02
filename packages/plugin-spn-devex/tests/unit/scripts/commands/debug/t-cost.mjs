@@ -2,7 +2,8 @@
 // RULE.DEVEX.WORKSPACE.323): the five targets, each reply once, the rotated log and the live one, money from the
 // price table and null for a model it lacks, and the window the command runs in found from its start file. Every row is a version 1
 // row read by its `mtype` (a TURN in usage.jsonl; a COMMAND, TEST or CHECK in hooks.jsonl); a row without v 1 is skipped. The time
-// is read by stage (from a row's skill and work), by go (a block by work, the lead apart) and by window (working, or waiting).
+// is read by stage (the stored stage, else the row's skill and work), by go (a block by work, the lead apart) and by window (working, waiting, or idle).
+// `compare` reads two plugin versions, each found from the `pluginVersion` of its windows' SessionStart rows.
 import { execFileSync } from "node:child_process";
 import { mkdirSync, mkdtempSync, realpathSync, rmSync, utimesSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -170,21 +171,60 @@ try {
     const split = json(root, "040-split").split;
     const arc = (split ?? []).find((one) => one.key === "N011");
     const calls = (kind) => arc?.[kind]?.calls;
-    ok("[MKT.HOOKS.321] a `workstream row state`, a docs cycles write and a commit are managing", calls("managing") === 3, JSON.stringify(arc));
-    ok("[MKT.HOOKS.321] a check's refusal, a retry, and a plugin command refused by its exit status are refusals; a passing check is no call", calls("refusals") === 3, JSON.stringify(arc));
+    ok("[MKT.HOOKS.321] a `workstream row state`, a docs cycles write and a commit are managing", calls("managing") === 6, JSON.stringify(arc));
+    ok("[MKT.HOOKS.321] a check's refusal, a retry, and a plugin command refused by its exit status are refusals; a passing check is no call", arc?.managing?.refused === 3, JSON.stringify(arc));
     ok("[MKT.HOOKS.321] a generated write, a git rm and a child's git mv are change", calls("change") === 3, JSON.stringify(arc));
     ok("[MKT.HOOKS.321] a test run's row is proof", calls("proof") === 1, JSON.stringify(arc));
     ok("[MKT.HOOKS.321] a git log and a command the hooks name no kind for are reading, never change", calls("reading") === 3, JSON.stringify(arc));
-    ok("[MKT.HOOKS.321] a gap of 20 minutes is one wait, apart from the work after it", calls("waiting") === 1 && Math.abs(arc.waiting.minutes - 20) < 0.2, JSON.stringify(arc?.waiting));
+    ok("[MKT.HOOKS.321] a gap of 20 minutes is one wait, apart from the work after it", calls("waiting") === 0 && Math.abs(arc.waiting.minutes - 20) < 0.2, JSON.stringify(arc?.waiting));
     ok("[MKT.HOOKS.321] each part of the arc is split too", (split ?? []).filter((one) => /^N011 · part (code|docs)-spn-x-1$/.test(one.key)).length === 2, JSON.stringify((split ?? []).map((one) => one.key)));
     const printed = typed(root, "show", "040-split").out;
-    ok("[MKT.HOOKS.321] the printed form names the five classes and no sixth", ["change", "proof", "managing", "refusals", "waiting"].every((word) => printed.includes(word)) && !/reading/.test(printed) && /N011 · part code-spn-x-1/.test(printed), printed);
+    ok("[MKT.HOOKS.321] the printed form names the six columns", ["Reading", "Thinking", "Changing", "Running", "Bookkeeping", "Waiting"].every((word) => printed.includes(word)) && /N011 · part code-spn-x-1/.test(printed), printed);
     const lead = (extra) => (JSON.parse(typed(root, "show", "040-split", "--json", ...extra).out).split ?? []).find((one) => one.key === "N011");
     ok("`--lead` leaves the child's calls out", lead(["--lead"])?.change.calls === 2 && lead([])?.change.calls === 3, JSON.stringify(lead(["--lead"])));
-    ok("`--from` and `--to` bound the split to a time", lead(["--to", "2026-10-31T10:04:00Z"])?.managing.calls === 2 && lead(["--from", "2026-10-31T10:20:00Z"])?.managing.calls === 1,
+    ok("`--from` and `--to` bound the split to a time", lead(["--to", "2026-10-31T10:04:00Z"])?.managing.calls === 4 && lead(["--from", "2026-10-31T10:20:00Z"])?.managing.calls === 1,
       JSON.stringify([lead(["--to", "2026-10-31T10:04:00Z"]), lead(["--from", "2026-10-31T10:20:00Z"])]));
     const bad = typed(root, "show", "040-split", "--from", "yesterday-ish");
     ok("a time that is none is refused with exit 2", bad.code === 2 && bad.out.includes("not one"), bad.out);
+  }
+
+  console.log("\n=== <workstream> — file rows and sheet patches in the split, and the labels under the largest cells");
+  {
+    const T0 = Date.parse("2026-11-01T10:00:00Z");
+    const stamp = (seconds) => new Date(T0 + seconds * 1000).toISOString().slice(0, 19) + "Z";
+    let n = 0;
+    const head = (mtype, seconds) => ({ v: 1, mtype, id: `f${(n += 1)}`, event: "PostToolUse", at: stamp(seconds), session: "f1", agent: null, workstream: "043-files", arc: "N001", part: "code-spn-x-1",
+      skill: null, work: null, retryOf: null });
+    const rows = [
+      { ...head("COMMAND", 0), call: { program: "spn-devex", group: "workstream", action: "sheet patch" }, ms: 120000, exit: 0 },
+      { ...head("FILE", 300), tool: "READ", file: "src/read-me.ts", ms: 60000 },
+      { ...head("FILE", 420), tool: "EDIT", file: "src/edit-me.ts", ms: 60000 },
+    ];
+    writeFileSync(join(telemetry, "hooks.jsonl"), rows.map((one) => JSON.stringify(one)).join("\n") + "\n");
+    const arc = (json(root, "043-files").split ?? []).find((one) => one.key === "N001");
+    ok("[MKT.SCRIPTS.499] a `workstream sheet patch` command and a file edit are Changing, two calls", arc?.change?.calls === 2, JSON.stringify(arc));
+    ok("[MKT.SCRIPTS.499] a file row with the tool READ is Reading", arc?.reading?.calls === 1, JSON.stringify(arc));
+    ok("[MKT.SCRIPTS.499] thinking is the gap since the previous row's at less that row's ms (3 minutes, then 1)", Math.abs((arc?.thinking?.minutes ?? 0) - 4) < 0.05, JSON.stringify(arc?.thinking));
+    const printed = typed(root, "show", "043-files").out;
+    ok("[MKT.SCRIPTS.499] the printed Work table appears", /^Work\s+Reading\s+Thinking\s+Changing/m.test(printed), printed);
+    ok("[MKT.SCRIPTS.499] under 'Largest cells' a label line prints its minutes", printed.includes("Largest cells") && printed.includes("\n    spn-devex workstream sheet patch: 2m\n"), printed);
+  }
+
+  console.log("\n=== <workstream> — review: a cell that rose against the three arcs before it");
+  {
+    const T0 = Date.parse("2026-11-02T10:00:00Z");
+    const stamp = (seconds) => new Date(T0 + seconds * 1000).toISOString().slice(0, 19) + "Z";
+    const rows = [];
+    let n = 0;
+    ["N001", "N002", "N003", "N004"].forEach((arc, index) => {
+      for (let k = 0; k < (arc === "N004" ? 3 : 1); k += 1)
+        rows.push({ v: 1, mtype: "COMMAND", id: `r${(n += 1)}`, event: "PostToolUse", at: stamp(index * 600 + k * 30), session: "r1", agent: null, workstream: "044-rise", arc, part: "code-spn-x-1",
+          skill: null, work: null, retryOf: null, call: { program: "spn-devex", group: "workstream", action: "row state" }, ms: 5, exit: 2 });
+    });
+    writeFileSync(join(telemetry, "hooks.jsonl"), rows.map((one) => JSON.stringify(one)).join("\n") + "\n");
+    const review = typed(root, "review", "044-rise/N004");
+    ok("[MKT.SCRIPTS.511] an arc whose refusals are about double the mean of the three before it prints the finding", review.code === 0
+      && review.out.split("\n").includes("Refusals rose from 1 to 3 against the last three arcs"), review.out);
   }
 
   console.log("\n=== <workstream> — a record of the old shape is not read as a call");
@@ -233,7 +273,7 @@ try {
       block?.lead === "N001" && by("Code")?.replies === 1 && by("Test · baseline")?.replies === 1 && by("Test · full")?.replies === 2 && by("Test · full").helpers === 1 && by("Test · full").parts === 1, JSON.stringify(block));
     ok("[MKT.SCRIPTS.326] every lead reply is on the Lead line, which has no parts", block?.leadLine.label === "Lead" && block.leadLine.replies === 3 && block.leadLine.modelMs === 180000 && block.leadLine.parts === 0 && block.noPart === null, JSON.stringify(block?.leadLine));
     ok("[MKT.SCRIPTS.326] a go log with a launched and a landed part shows its whole minutes as Elapsed, a started full run as well", by("Code")?.elapsedMin === 12 && by("Test · full")?.elapsedMin === 8, JSON.stringify(block?.lines.map((one) => [one.label, one.elapsedMin])));
-    ok("[MKT.SCRIPTS.326] a part with no launch shows none", by("Test · baseline")?.elapsedMin === null && block?.leadLine.elapsedMin === null, JSON.stringify(block?.lines.map((one) => [one.label, one.elapsedMin])));
+    ok("[MKT.SCRIPTS.474] a part with no launch shows none, and the Lead line shows the span its own turns cover (three turns of a minute, apart)", by("Test · baseline")?.elapsedMin === null && block?.leadLine.elapsedMin === 3, JSON.stringify(block?.lines.map((one) => [one.label, one.elapsedMin, block.leadLine.elapsedMin])));
     const planning = data.windows.find((one) => one.arc === "N001" && one.phase === "planning");
     ok("[MKT.SCRIPTS.327] a window's time is working, waiting on a run where a background run began in the gap, else waiting on you",
       planning?.workingMs === 120000 && planning.waitingOnYouMs === 540000 && planning.waitingOnRunMs === 4740000, JSON.stringify(data.windows));
@@ -242,6 +282,91 @@ try {
       /Stage/.test(text) && /All arcs/.test(text) && /Go N001/.test(text) && /Test · full/.test(text) && /Lead/.test(text) && /Window time/.test(text) && /Waiting on you/.test(text), text);
     ok("[MKT.SCRIPTS.325] `--json` carries stages, goBlocks and windows, and a target that is no workstream carries them empty",
       Array.isArray(data.stages) && Array.isArray(data.goBlocks) && Array.isArray(data.windows) && json(root, "all").stages.length === 0 && json(root, "all").windows.length === 0);
+  }
+
+  console.log("\n=== the stage a row stored, and the lead's part (MKT.SCRIPTS.473, MKT.SCRIPTS.474)");
+  {
+    const folder = join(root, ".spndevex", "workstreams", "open", "043-stage", "arcs", "N001");
+    mkdirSync(folder, { recursive: true });
+    writeFileSync(join(folder, "go.json"), JSON.stringify({ schemaVersion: 1, lead: "N001", scope: ["N001"], parts: [{ id: "release-spn-x", work: "RELEASE" }] }));
+    const turn = (id, at, extra) => reply({ turn: id, at, session: "w1", workstream: "043-stage", arc: "N001", part: null, ...extra });
+    writeFileSync(join(telemetry, "usage.jsonl"), [
+      turn("s1", "2026-10-21T09:00:00Z", { stage: "DELIVER" }),
+      turn("s2", "2026-10-21T09:05:00Z", { work: "CODE" }),
+      turn("s3", "2026-10-21T09:10:00Z", {}),
+      turn("s4", "2026-10-21T09:15:00Z", { stage: "OPERATE", skill: "DEVEX_IDEATE" }),
+      turn("r1", "2026-10-21T12:00:00Z", { part: "release-spn-x", work: "RELEASE", stage: "DELIVER" }),
+      turn("r2", "2026-10-21T12:01:00Z", { part: "release-spn-x", work: "RELEASE", stage: "DELIVER" }),
+      turn("r3", "2026-10-21T12:02:00Z", { agent: "h1", part: "release-spn-x", work: "RELEASE", stage: "DELIVER" }),
+    ].join("\n") + "\n");
+    writeFileSync(join(telemetry, "hooks.jsonl"), "");
+    const data = json(root, "043-stage");
+    const line = data.stages.find((one) => one.arc === "N001");
+    ok("[MKT.SCRIPTS.473] a turn with stage DELIVER and no skill prints under DELIVER, and a stored stage wins over the skill", line?.stages.DELIVER === 240000 && line.stages.OPERATE === 60000, JSON.stringify(line?.stages));
+    ok("[MKT.SCRIPTS.473] a row with work and no stage falls back to the work's stage", line?.stages.DEVELOP === 60000, JSON.stringify(line?.stages));
+    ok("[MKT.SCRIPTS.473] under No stage only a row with no stage, no work and no carried stage", line?.stages.none === 60000, JSON.stringify(line?.stages));
+    const printed = typed(root, "show", "043-stage").out;
+    ok("[MKT.SCRIPTS.473] the printed table holds the DELIVER column", /DELIVER/.test(printed) && /No stage/.test(printed), printed);
+    const block = data.goBlocks[0];
+    const release = block?.lines.find((one) => one.label === "Release");
+    ok("[MKT.SCRIPTS.474] a go with a release part whose rows have agent null shows that part's replies, model time and money", release?.replies === 3 && release.modelMs === 180000 && release.money !== null, JSON.stringify(release));
+    ok("[MKT.SCRIPTS.474] helpers still counts distinct agents", release?.helpers === 1, JSON.stringify(release));
+    ok("[MKT.SCRIPTS.474] the Lead line holds only the part-less rows and prints an Elapsed", block?.leadLine.replies === 4 && block.leadLine.elapsedMin === 4 && /Elapsed/.test(printed) && /Lead\s+—\s+—\s+4/.test(printed), JSON.stringify([block?.leadLine, printed]));
+  }
+
+  console.log("\n=== idle, waiting on you and waiting on a run (MKT.SCRIPTS.475)");
+  {
+    mkdirSync(join(root, ".spndevex", "workstreams", "open", "045-idle", "arcs", "N001"), { recursive: true });
+    const turn = (id, at) => reply({ turn: id, at, session: "w1", workstream: "045-idle", arc: "N001", part: null });
+    writeFileSync(join(telemetry, "usage.jsonl"), [
+      turn("i1", "2026-10-22T09:00:00Z"), turn("i2", "2026-10-22T12:01:00Z"), turn("i3", "2026-10-22T12:12:00Z"), turn("i4", "2026-10-22T13:00:00Z"),
+    ].join("\n") + "\n");
+    // A background test run began at 12:40, between the third and fourth replies.
+    writeFileSync(join(telemetry, "hooks.jsonl"), `${JSON.stringify({ v: 1, mtype: "TEST", id: "t9", event: "PostToolUse", at: "2026-10-22T12:40:00Z", session: "w1", agent: null, workstream: "045-idle", arc: "N001", part: null, skill: null, work: null, retryOf: null })}\n`);
+    const data = json(root, "045-idle");
+    const sum = (field) => data.windows.reduce((total, one) => total + one[field], 0);
+    ok("[MKT.SCRIPTS.475] a 3-hour gap after a turn is idle", sum("idleMs") === 10800000, JSON.stringify(data.windows));
+    ok("[MKT.SCRIPTS.475] a 10-minute gap is waiting on you", sum("waitingOnYouMs") === 600000, JSON.stringify(data.windows));
+    ok("[MKT.SCRIPTS.475] a gap with a background run since is waiting on a run, however long", sum("waitingOnRunMs") === 2820000, JSON.stringify(data.windows));
+    ok("[MKT.SCRIPTS.475] the printed form has the Idle column", /Idle/.test(typed(root, "show", "045-idle").out));
+  }
+
+  console.log("\n=== the arcs in their order: Ideate, the build arcs, Follow-ups (the ideate and follow-up arcs)");
+  {
+    mkdirSync(join(root, ".spndevex", "workstreams", "open", "046-arcs", "arcs"), { recursive: true });
+    const turn = (id, arc, part) => reply({ turn: id, at: "2026-10-23T09:00:00Z", session: "w1", workstream: "046-arcs", arc, part });
+    writeFileSync(join(telemetry, "usage.jsonl"), [
+      turn("v1", "follow-ups", "docs-spn-x-1"), turn("v2", "N002", "code-spn-x-1"), turn("v3", "ideate", "docs-spn-x-2"), turn("v4", "N001", "code-spn-x-2"),
+    ].join("\n") + "\n");
+    writeFileSync(join(telemetry, "hooks.jsonl"), "");
+    ok("a workstream's arcs read Ideate first, the build arcs by number, Follow-ups last, each by its address", json(root, "046-arcs").rows.map((one) => one.key).join(" ") === "ideate N001 N002 follow-ups",
+      json(root, "046-arcs").rows.map((one) => one.key).join(" "));
+    ok("its stage lines keep that order", json(root, "046-arcs").stages.map((one) => one.arc).join(" ") === "ideate N001 N002 follow-ups");
+    ok("`<workstream>/ideate` and `<workstream>/follow-ups` name an arc and give a line for each part",
+      json(root, "046-arcs/ideate").rows.map((one) => one.key).join() === "part docs-spn-x-2" && json(root, "046-arcs/follow-ups").rows.map((one) => one.key).join() === "part docs-spn-x-1");
+    ok("a word that is no arc's address names no arc", json(root, "046-arcs/follow-up").rows.length === 0 && json(root, "046-arcs/Ideate").rows.length === 0);
+  }
+
+  console.log("\n=== compare — two plugin versions, before and after (MKT.SCRIPTS.476)");
+  {
+    const turn = (id, session, extra = {}) => reply({ turn: id, at: "2026-10-24T09:00:00Z", session, workstream: "047-cmp", arc: "N001", part: "code-spn-x-1", work: "CODE", stage: "DEVELOP", ...extra });
+    writeFileSync(join(telemetry, "usage.jsonl"), [turn("c1", "sA"), turn("c2", "sA"), turn("c3", "sB"), turn("c4", "sB", { part: null, work: null, stage: null })].join("\n") + "\n");
+    const loaded = (id, session, pluginVersion) => JSON.stringify({ v: 1, mtype: "CHECK", id, event: "SessionStart", at: "2026-10-24T08:59:00Z", session, agent: null, workstream: null, arc: null,
+      part: null, skill: null, stage: null, work: null, retryOf: null, check: "orientation", verdict: "PASS", ms: 5, out: 2000, pluginVersion });
+    writeFileSync(join(telemetry, "hooks.jsonl"), [loaded("l1", "sA", "0.41.0"), loaded("l2", "sB", "0.42.0")].join("\n") + "\n");
+    const both = JSON.parse(typed(root, "compare", "0.41.0", "0.42.0", "--json").out);
+    const kind = (reading, key) => reading.parts.find((one) => one.key === key);
+    ok("[MKT.SCRIPTS.476] two versions that two sessions loaded print both, each with its windows", both.versions.join() === "0.41.0,0.42.0" && both.readings.every((one) => one.windows === 1), JSON.stringify(both.versions));
+    ok("[MKT.SCRIPTS.476] each reading holds the replies by kind of part, and the stage's model minutes", kind(both.readings[0], "CODE")?.replies === 2 && kind(both.readings[1], "CODE")?.replies === 1 && both.readings[0].stages.DEVELOP === 120000, JSON.stringify(both.readings));
+    const change = both.difference.parts.find((one) => one.key === "CODE");
+    ok("[MKT.SCRIPTS.476] the difference is the second less the first, in model time, tokens and money per kind of part", change?.modelMs === -60000 && change.tokens === -6400 && change.money < 0, JSON.stringify(both.difference.parts));
+    ok("[MKT.SCRIPTS.476] and in the hook bytes carried and in the stage minutes", both.difference.stagesMs.DEVELOP === -60000 && typeof both.difference.carried === "number", JSON.stringify(both.difference));
+    const printed = typed(root, "compare", "0.41.0", "0.42.0").out;
+    ok("[MKT.SCRIPTS.476] the printed form names both versions and the difference", /Plugin 0\.41\.0/.test(printed) && /Plugin 0\.42\.0/.test(printed) && /Difference, 0\.42\.0 less 0\.41\.0/.test(printed) && /Hook bytes carried/.test(printed), printed);
+    const refused = typed(root, "compare", "0.41.0", "9.9.9");
+    ok("[MKT.SCRIPTS.476] a version no window loaded is refused, naming it", refused.code === 2 && refused.out.includes("`9.9.9`"), refused.out);
+    const one = typed(root, "compare", "0.41.0");
+    ok("compare takes two versions", one.code === 2 && one.out.includes("takes two plugin versions"), one.out);
   }
 
   console.log("\n=== the words");

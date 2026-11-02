@@ -108,8 +108,8 @@ try {
     ...stopRun("12:01:01", "w", { runnable: "DENY" }), ...stopRun("12:01:10", "w", { runnable: "PASS" }),
     ...stopRun("12:08:01", "w", { runnable: "DENY" }), ...stopRun("12:08:10", "w", { runnable: "PASS" }),
     // a check about the reply: answered by its own next run passing, unanswered by a finding again; the last has no next run
-    ...stopRun("12:02:01", "r", { cards: "DENY" }), ...stopRun("12:02:10", "r", { cards: "PASS" }),
-    ...stopRun("12:03:01", "r", { cards: "DENY" }), ...stopRun("12:03:10", "r", { cards: "DENY" }),
+    ...stopRun("12:02:01", "r", { "reply-shape": "DENY" }), ...stopRun("12:02:10", "r", { "reply-shape": "PASS" }),
+    ...stopRun("12:03:01", "r", { "reply-shape": "DENY" }), ...stopRun("12:03:10", "r", { "reply-shape": "DENY" }),
     // a tool-call check: answered by its next run passing, unanswered by it refusing again
     ...callRun("12:04:01", "t", { "command-shape": "DENY" }), ...callRun("12:04:05", "t", { "command-shape": "PASS" }),
     ...callRun("12:05:01", "t", { "command-shape": "DENY" }), ...callRun("12:05:05", "t", { "command-shape": "DENY" }),
@@ -124,9 +124,9 @@ try {
   const of = (part, name) => part?.checks.find((one) => one.check === name);
   ok("[MKT.HOOKS.341] the turn end counts its send-backs against its Stop runs, per 100 replies", turn?.sent === 8 && turn.runs === 12 && turn.per100 === 66.7, JSON.stringify(turn));
   ok("the tool calls count theirs against the PreToolUse runs, per 100 calls", calls?.sent === 3 && calls.runs === 5 && calls.per100 === 60, JSON.stringify(calls));
-  ok("each check carries its sent-back count and its per 100", of(turn, "runnable")?.sent === 3 && of(turn, "runnable")?.per100 === 25 && of(turn, "cards")?.sent === 3 && of(turn, "cards")?.per100 === 25, JSON.stringify(turn?.checks));
+  ok("each check carries its sent-back count and its per 100", of(turn, "runnable")?.sent === 3 && of(turn, "runnable")?.per100 === 25 && of(turn, "reply-shape")?.sent === 3 && of(turn, "reply-shape")?.per100 === 25, JSON.stringify(turn?.checks));
   ok("a check about the work is answered by a tool call before the next Stop", of(turn, "runnable")?.judged === 3 && of(turn, "runnable")?.unanswered === 2, JSON.stringify(of(turn, "runnable")));
-  ok("a check about the reply is answered by its own span on the next Stop finding nothing", of(turn, "cards")?.judged === 2 && of(turn, "cards")?.unanswered === 1, JSON.stringify(of(turn, "cards")));
+  ok("a check about the reply is answered by its own span on the next Stop finding nothing", of(turn, "reply-shape")?.judged === 2 && of(turn, "reply-shape")?.unanswered === 1, JSON.stringify(of(turn, "reply-shape")));
   ok("a tool-call check is answered by its next judged call passing", of(calls, "command-shape")?.judged === 2 && of(calls, "command-shape")?.unanswered === 1, JSON.stringify(of(calls, "command-shape")));
   ok("where the log holds nothing to judge by, Unanswered is null", of(turn, "go-next")?.unanswered === null && of(turn, "window")?.unanswered === null);
   ok("Checks to fix lists the check with more than half unanswered, and not the one with exactly half",
@@ -142,7 +142,7 @@ try {
     && /Send-backs, tool calls: 3 of 5 calls refused, 60 per 100/.test(printed) && /Sent back/.test(printed) && /Refused/.test(printed) && /Unanswered/.test(printed), printed);
   ok("a check with nothing to judge by prints a dash", /go-next\s+1\s+8\.3\s+-\n/.test(printed), printed);
   const fixed = printed.split("Checks to fix")[1] ?? "";
-  ok("the printed form names the check to fix", /runnable/.test(fixed) && !/cards/.test(fixed) && !/command-shape/.test(fixed), printed);
+  ok("the printed form names the check to fix", /runnable/.test(fixed) && !/reply-shape/.test(fixed) && !/command-shape/.test(fixed), printed);
 } finally {
   rmSync(second, { recursive: true, force: true });
 }
@@ -158,6 +158,37 @@ try {
   ok("a target is refused", target.code === 2 && target.out.startsWith(USAGE) && target.out.includes("takes no target"), target.out);
 } finally {
   rmSync(root, { recursive: true, force: true });
+}
+
+// The size a check's output carries: its `out` bytes times the replies the same window (and agent) made after the row, counted from
+// `usage.jsonl` by session, agent and time (MKT.HOOKS.470).
+const carriedRoot = realpathSync(mkdtempSync(join(tmpdir(), "debug-hooks-carried-")));
+try {
+  console.log("\n=== the size a check's output carries");
+  const folder = join(carriedRoot, ".spndevex", ".debug", "telemetry");
+  mkdirSync(join(carriedRoot, ".spndevex", "workstreams"), { recursive: true });
+  mkdirSync(folder, { recursive: true });
+  const turn = (id, at, session = "c1", agent = null) => JSON.stringify({ v: 1, mtype: "TURN", id, at, ms: 0, event: "Stop", session, agent, workstream: null, arc: null,
+    part: null, skill: null, stage: null, work: null, retryOf: null, model: "claude-opus-5-5", tokens: { in: 1, out: 1, cacheRead: 0, cacheWrite: 0 } });
+  writeFileSync(join(folder, "hooks.jsonl"), [
+    check("carrier", "NOTE", 5, 1000, { session: "c1", at: "2026-10-10T10:00:10Z", event: "UserPromptSubmit" }),
+    check("helper-check", "NOTE", 5, 100, { session: "c1", agent: "h1", at: "2026-10-10T10:00:10Z", event: "SubagentStart" }),
+  ].join("\n") + "\n");
+  writeFileSync(join(folder, "usage.jsonl"), [
+    turn("u0", "2026-10-10T10:00:00Z"),
+    turn("u1", "2026-10-10T10:00:20Z"), turn("u2", "2026-10-10T10:00:30Z"), turn("u3", "2026-10-10T10:00:40Z"), turn("u4", "2026-10-10T10:00:50Z"),
+    turn("o1", "2026-10-10T10:00:30Z", "other"),
+    turn("h1", "2026-10-10T10:00:30Z", "c1", "h1"), turn("h2", "2026-10-10T10:00:40Z", "c1", "h1"),
+  ].join("\n") + "\n");
+  const shown = JSON.parse(typed(carriedRoot, "show", "--json").out);
+  const carrier = shown.checks.find((one) => one.check === "carrier"), helper = shown.checks.find((one) => one.check === "helper-check");
+  ok("[MKT.HOOKS.470] a check row with out 1000 followed by 4 turns of its window carries 4000", carrier?.carried === 4000, JSON.stringify(carrier));
+  ok("[MKT.HOOKS.470] and its event carries the same", shown.events.find((one) => one.event === "UserPromptSubmit")?.carried === 4000, JSON.stringify(shown.events));
+  ok("[MKT.HOOKS.470] a turn of another window, and one before the row, add nothing", carrier?.carried === 4000);
+  ok("[MKT.HOOKS.470] a helper's row counts only that helper's later replies", helper?.carried === 200, JSON.stringify(helper));
+  ok("[MKT.HOOKS.470] the printed form puts Carried beside Out bytes", /Out bytes\s+Carried/.test(typed(carriedRoot, "show").out));
+} finally {
+  rmSync(carriedRoot, { recursive: true, force: true });
 }
 
 console.log(failed ? `\n  ${failed} of ${total} FAILED — debug hooks` : `\n  all ${total} passed — debug hooks`);

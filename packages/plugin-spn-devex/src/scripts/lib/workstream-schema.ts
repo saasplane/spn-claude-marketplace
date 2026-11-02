@@ -33,8 +33,8 @@ export const QUESTION_STATES = ["open", "answered", "withdrawn"] as const;
 /** The outcomes a child's report may carry. */
 export const OUTCOMES = ["landed", "stopped", "needs-you"] as const;
 
-/** An arc's id, `N007`, with an optional letter. */
-export const ARC_ID = /^N\d+[a-z]?$/;
+/** An arc's address: `N007` with an optional letter for a build arc, and `ideate` and `follow-ups` for the two role arcs every workstream has (Q33). */
+export const ARC_ID = /^(?:N\d+[a-z]?|ideate|follow-ups)$/;
 /** The longest an arc's subject may be (RULE.DEVEX.WORKSPACE.265). */
 export const SUBJECT_MAX = 24;
 /** An arc's subject: one to three words in kebab-case, lower case letters and digits. */
@@ -87,7 +87,7 @@ export type ArcRow = {
 export const ARC_KINDS = ["build", "ideate"] as const;
 export type ArcData = {
   schemaVersion: number; arc: string; subject: string; title: string; goal?: string | null; status: string; reason: string | null;
-  /** `ideate` for an ideate arc; an arc with none is a build arc. */
+  /** An arc's kind is its address: `N<nnn>` a build arc, `ideate` the ideate arc, `follow-ups` the follow-up arc; no writer stores `kind`, and a header that carries one is read as written. */
   kind?: string;
   /** The build arcs an ideate arc proposes. Its status is worked out from them (`arcStatus`). */
   proposes?: string[];
@@ -383,6 +383,12 @@ export type SheetEntry = {
   rules: string[]; callers: string[]; tiers: Record<string, string[]>; docs: string[]; book: string[];
   /** The kind of work the entry is; a sheet written before it was added has none, and `entryWork` reads the file's kind. */
   work?: string | null;
+  /** The entry's change kept as a diff (`sheet patch`): the file under `patches/` and the commit it was diffed against. */
+  patch?: { file: string; base: string } | null;
+  /** The thinking behind the change, kept with its diff; required on a new entry, and read as "" on a sheet written before it. */
+  trace?: string;
+  /** Whether the change is a judgment (true) or mechanical (false); required on a new entry, and read as false on a sheet written before it. */
+  judged?: boolean;
   [field: string]: unknown;
 };
 export type Sheet = { schemaVersion: number; releaseChain: string[]; dependsOn: string[]; stack: SheetStack | null; entries: SheetEntry[]; [field: string]: unknown };
@@ -403,17 +409,19 @@ const ENTRY_FIELDS: Record<string, Rule> = {
   then: { kind: "strings", required: true }, rules: { kind: "strings", required: true }, callers: { kind: "strings", required: true },
   docs: { kind: "strings", required: true }, book: { kind: "strings", required: true },
   work: { kind: "enum", required: false, values: WORK, nullable: true },
+  // Required on a new entry only: `sheet write` demands them of an entry the stored sheet lacks, so an older sheet reads whole.
+  trace: { kind: "text", required: false }, judged: { kind: "boolean", required: false },
 };
 
 /**
  * An entry's kind of change, from which an arc's steps are derived: the one it names, else the kind of its file's path —
- * a dist bundle or a generated ref is GENERATED, a docs or refs file DOCS, and a source or test file CODE.
+ * a dist bundle or a generated ref is GENERATED, a file under the repository's own docs/ (or a plugin's refs/) or a .md file DOCS, and any other source or test file CODE.
  */
 export function entryWork(entry: Pick<SheetEntry, "file" | "work">): Work {
   if (typeof entry.work === "string" && WORK.includes(entry.work)) return entry.work;
   const path = entry.file.slice(entry.file.indexOf(":") + 1);
   if (/(^|\/)dist\//.test(path) || /generated/i.test(path)) return "GENERATED";
-  if (/(^|\/)(docs|refs)\//.test(path) || /\.md$/.test(path)) return "DOCS";
+  if (/^(docs|refs)\//.test(path) || /^packages\/[^/]+\/refs\//.test(path) || /\.md$/.test(path)) return "DOCS";
   return "CODE";
 }
 
@@ -435,6 +443,11 @@ export function sheetFaults(data: unknown, where = "sheet.json"): string[] {
     const label = typeof entry.id === "string" && entry.id ? entry.id : `entry ${at + 1}`;
     out.push(...fieldFaults(label, entry, ENTRY_FIELDS));
     if (typeof entry.id === "string") { if (seen.has(entry.id)) out.push(`${label} is written twice`); seen.add(entry.id); }
+    if (entry.patch !== undefined && entry.patch !== null) {
+      const patch = entry.patch;
+      if (!isObject(patch) || typeof patch.file !== "string" || !/^patches\/[^\s]+$/.test(patch.file) || typeof patch.base !== "string" || !/^[0-9a-f]{7,40}$/i.test(patch.base))
+        out.push(`${label}'s \`patch\` is not { file under patches/, base a commit }`);
+    }
     if (Array.isArray(entry.facts) && !entry.facts.length) out.push(`${label} names no fact`);
     if (entry.tiers === undefined) out.push(`${label} has no \`tiers\``);
     else if (!isObject(entry.tiers)) out.push(`${label}'s \`tiers\` is not an object from a tier to its behaviour ids`);
@@ -453,7 +466,7 @@ export const GO_SCHEMA_VERSION = 1;
 /** Where a part of a go stands. `waiting` is a part that waits on something outside the window, named in its `waitingOn`. */
 export const GO_PART_STATES = ["ready", "running", "held", "landed", "waiting"] as const;
 /** A part's id: its pass in lower case, its repository and its number, `code-spn-claude-marketplace-2`; a baseline or full run has no number. */
-export const GO_PART_ID = /^(baseline|docs|code|full|generated|release|proof)-\S+$/;
+export const GO_PART_ID = /^(baseline|docs|code|full|generated|release|proof|apply)-\S+$/;
 /** An entry as a go names it: its arc and its id, `N009/E14`. */
 export const GO_ENTRY = /^N\d+[a-z]?\/E\d+$/;
 
@@ -467,6 +480,8 @@ export type GoPart = {
   state: (typeof GO_PART_STATES)[number];
   /** What a `waiting` part waits on, in plain words: a release, a sign-in, another window's hold. */
   waitingOn?: string | null;
+  /** The { tokens, minutes } a landed part measured. */
+  cost?: Cost | null;
 };
 /** The plan of a go, written only by `go write` into the lead arc's folder: the arcs it covers and its parts in build order. */
 export type GoPlan = { schemaVersion: number; lead: string; scope: string[]; writtenAt: string; parts: GoPart[] };
@@ -499,6 +514,8 @@ export function goFaults(data: unknown, where = "go.json"): string[] {
     if (!isObject(part)) { out.push(`${where}'s part ${at + 1} is not an object`); continue; }
     const label = typeof part.id === "string" && part.id ? `part ${part.id}` : `part ${at + 1}`;
     out.push(...fieldFaults(label, part, GO_PART_FIELDS));
+    if (part.cost !== undefined && part.cost !== null && !(isObject(part.cost) && typeof part.cost.tokens === "number" && typeof part.cost.minutes === "number"))
+      out.push(`${label}'s \`cost\` is not { tokens, minutes }`);
     if (typeof part.id === "string") { if (ids.has(part.id)) out.push(`${label} is written twice`); ids.add(part.id); }
     if (Array.isArray(part.entries)) {
       const hashes = typeof part.signature === "string" && part.signature ? part.signature.split(".").length : 0;

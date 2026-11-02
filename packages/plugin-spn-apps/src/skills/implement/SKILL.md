@@ -85,11 +85,11 @@ description: THE requirement router for SaaS Plane TS repos. Use whenever the us
 - **A section an organization has no right to is absent, not disabled** (`RULE.PLATFORM.CORE.057` · MUST · skill:spn-apps/implement)
 - **A session's authentication requirement is read from the organization's own policy at every mint, and never resolved once and cached** (`RULE.PLATFORM.CORE.058` · MUST · skill:spn-apps/implement)
 - **A member with no value for a scope is not narrowed on it** (`RULE.PLATFORM.CORE.059` · MUST · skill:spn-apps/implement)
-- **RULE.PLATFORM.CORE.060** (`RULE.PLATFORM.CORE.060` · MUST · skill:spn-apps/implement)
+- **An org's parent is the org that sells to it** (`RULE.PLATFORM.CORE.060` · MUST · skill:spn-apps/implement)
 - **The tree records only who sells to whom** (`RULE.PLATFORM.CORE.061` · MUST · skill:spn-apps/implement)
 - **A category never has itself as an ancestor** (`RULE.PLATFORM.CORE.062` · MUST · skill:spn-apps/implement)
 - **No module knows how deep the tree is** (`RULE.PLATFORM.CORE.063` · MUST · skill:spn-apps/implement)
-- **RULE.PLATFORM.CORE.064** (`RULE.PLATFORM.CORE.064` · MUST · skill:spn-apps/implement)
+- **Every notification has one sender of record, which is the reader's seller, and every part of an email comes from that sender** (`RULE.PLATFORM.CORE.064` · MUST · skill:spn-apps/implement)
 - **Modules know org types and never know categories** (`RULE.PLATFORM.CORE.065` · MUST · skill:spn-apps/implement)
 - **A category's pool is fixed once it has people** (`RULE.PLATFORM.CORE.066` · MUST · skill:spn-apps/implement)
 - **An org's type, category and parent are fixed at birth** (`RULE.PLATFORM.CORE.067` · MUST · skill:spn-apps/implement)
@@ -100,7 +100,7 @@ description: THE requirement router for SaaS Plane TS repos. Use whenever the us
 - **A door for an org's own customers opens only with its legal profile** (`RULE.PLATFORM.CORE.072` · MUST · skill:spn-apps/implement)
 - **A module reads the platform's countries, currencies, languages and base labels; it never declares its own.** (`RULE.PLATFORM.MODULES.001` · MUST · skill:spn-apps/implement)
 - **A currency carries where its symbol sits, and a language carries which way it reads.** (`RULE.PLATFORM.MODULES.002` · MUST · skill:spn-apps/implement)
-- **A module registers its own entity types, and a registered type may opt only into capabilities the closed set names.** (`RULE.PLATFORM.MODULES.003` · MUST · skill:spn-apps/implement)
+- **A module registers its own entity types in its MDM contribution, and a registered type may opt only into capabilities the closed set names.** (`RULE.PLATFORM.MODULES.003` · MUST · skill:spn-apps/implement)
 - **Reference data depends on nothing else in the standard library, and nothing in the standard library may become a dependency of it.** (`RULE.PLATFORM.MODULES.004` · MUST · skill:spn-apps/implement)
 - **A label is translated once, for the whole platform. A record is translated by the organization that owns it.** (`RULE.PLATFORM.MODULES.005` · MUST · skill:spn-apps/implement)
 - **An entity translation holds a flat map of attribute names to text, and a write replaces the map rather than merging into it.** (`RULE.PLATFORM.MODULES.006` · MUST · skill:spn-apps/implement)
@@ -187,7 +187,7 @@ description: THE requirement router for SaaS Plane TS repos. Use whenever the us
 - **RULE.SUPPORT.APPS.078** (`RULE.SUPPORT.APPS.078` · MUST · skill:spn-apps/implement)
 - **A discriminator's literal is the member's value, never its name** (`RULE.SUPPORT.APPS.079` · MUST · skill:spn-apps/implement)
 - **What a route owes is read from the behaviour rows that claim it** (`RULE.SUPPORT.APPS.081` · MUST · skill:spn-apps/implement)
-- **A row is proven once per app-site TYPE** (`RULE.SUPPORT.APPS.082` · MUST · skill:spn-apps/implement)
+- **A row is proven once per app** (`RULE.SUPPORT.APPS.082` · MUST · skill:spn-apps/implement)
 - **A release gate is a named subset** (`RULE.SUPPORT.APPS.083` · MUST · skill:spn-apps/implement)
 - **RULE.SUPPORT.APPS.084** (`RULE.SUPPORT.APPS.084` · MUST · skill:spn-apps/implement)
 - **A behaviour's UI face is proven by the application that mounts it, and a web module owes unit tier only** (`RULE.SUPPORT.APPS.087` · MUST · skill:spn-apps/implement)
@@ -307,10 +307,10 @@ description: THE requirement router for SaaS Plane TS repos. Use whenever the us
 - **Files under `src/_shadcn/` are never edited by hand** (`RULE.SUPPORT.APPS.240` · MUST · skill:spn-apps/implement)
 - **A web prop is typed by a contract state, command or result as it is, or as a union narrowed with `in`, and never by `Partial`, `Pick`, `Omit` or an intersection of it** (`RULE.SUPPORT.APPS.243` · MUST · skill:spn-apps/implement)
 - **`spnutils apps format` is never run as a reflex: named files are formatted with `prettier`, and any formatting a change needs is its own commit** (`RULE.SUPPORT.APPS.245` · MUST · skill:spn-apps/implement)
-- **In `spn-platform-ts` the migration that owns a table is edited, instead of adding a migration or an `ALTER`, and the stack is reset clean before testing. A module's migrations write only its own tables, and what a module has for another module travels as a contribution that the owner applies** (`RULE.SUPPORT.APPS.246` · MUST · skill:spn-apps/implement)
+- **While the stage is ALPHA, the migration that owns a table is edited in every repository, instead of adding a migration or an `ALTER`, and the stack is reset clean before testing; the move to beta collapses a repository's migrations into one baseline before the first append-only migration. A module's migrations write only its own tables, and what a module has for another module travels as a contribution that the owner applies** (`RULE.SUPPORT.APPS.246` · MUST · skill:spn-apps/implement)
 - **A module's data is still reached through that module's contract** (`RULE.SUPPORT.APPS.247` · MUST · skill:spn-apps/implement)
 - **The integration tier reaches only what the local stack provides** (`RULE.SUPPORT.APPS.248` · MUST · skill:spn-apps/implement)
-- **A module's code is 3 to 8 of A–Z and 0–9, starting with a letter, with no underscore, and `IAM`, `ORG`, `MDM`, `NTF`, `CMP`, `DOC`, `LNG`, `JOB` and `ENT` are SaaS Plane's own, so a new module never takes one** (`RULE.SUPPORT.APPS.250` · MUST · skill:spn-apps/implement)
+- **RULE.SUPPORT.APPS.250** (`RULE.SUPPORT.APPS.250` · MUST · skill:spn-apps/implement)
 - **A reference column says what it points at, and a table whose rows belong to another row names its owner first** (`RULE.SUPPORT.APPS.251` · MUST · skill:spn-apps/implement)
 - **A key that only the first run reads is named `{SPC}_PLATFORM_SEED_*`** (`RULE.SUPPORT.APPS.252` · MUST · skill:spn-apps/implement)
 - **A module's code is 3 to 8 of A-Z and 0-9, starts with a letter, and has no underscore** (`RULE.SUPPORT.APPS.253` · MUST · skill:spn-apps/implement)
@@ -332,7 +332,7 @@ If the `ideate` skill ran, the design is already in the owning module's docs as 
 
 Gates before starting:
 
-- **Gate check.** Where the change adds or moves an authorization gate, settle what varies the answer before you write it. A rule that changes per person is a permission; per organization type, an enablement; per plan, billing. None substitutes for another, and an enablement never gates a read. `refs/platform/core/tenancy/permission-vs-enablement.md` in this plugin carries the question, the grammar and the traps; this plugin's `providers/ts/scripts/checks/_src/enablement-grammar.ts` refuses the checkable ones at write time.
+- **Gate check.** Where the change adds or moves an authorization gate, settle what varies the answer before you write it. A rule that changes per person is a permission. A rule that changes per org category is an enablement. A rule that changes per plan is billing. None substitutes for another, and an enablement never gates a read. `refs/platform/core/tenancy/permission-vs-enablement.md` in this plugin carries the question, the grammar and the traps. This plugin's enablement check refuses the mistakes it can see as you write them.
 - **Additive check.** If the change removes/renames/retypes a published field, changes a meaning, or tightens validation on an existing command field, it is **breaking**. Stop and reroute through the `ideate` skill (decision + versioning path). Additive by default is the rule, not a preference.
 - **Ownership check.** The change lands in the module that owns the capability (its package, or the app-owned module). Cross-module needs go through the other module's **contract** services — or a request queue for writes — never its internals.
 

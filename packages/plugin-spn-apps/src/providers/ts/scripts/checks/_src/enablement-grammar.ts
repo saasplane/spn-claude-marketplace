@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 // Refuse a write that breaks the enablement grammar, at the moment it is written.
 //
-// The construct: an enablement answers ONE question about one organization TYPE — what is this type
-// offered. A permission answers what a PERSON may do. The full reasoning, the placement rule and the
+// The construct: an enablement answers one question about one org category: what its orgs are offered.
+// A permission answers what a PERSON may do. The full reasoning, the placement rule and the
 // three traps this estate actually hit are named in the permission-versus-enablement rule
 // plugin. This checks only the part a check CAN check.
 //
@@ -10,8 +10,9 @@
 //
 //   1 PREFIX    an enablement code starts with its OWNING module's prefix — `{MOD}_MANAGE_…`.
 //               A code carrying another module's prefix collides in the shared catalog.
-//   2 VERB      the code's second segment is `MANAGE`. That position is the whole discriminator:
-//               a permission is `{MOD}_{FAMILY}_{TIER}`, so a new verb makes the two unreadable.
+//   2 VERB      the code's second segment is `MANAGE` for an offer and `LIMIT` for a `NUMBER` definition.
+//               That position is the whole discriminator: a permission is `{MOD}_{FAMILY}_{TIER}`,
+//               so a new verb makes the two unreadable.
 //   3 NOUN      a multi-value definition is named for its OPTIONS, never its area. Name it for the
 //               area and the console shows "Customization" holding a list of entity types.
 //   4 ORG TYPE  no hardcoded Set or array of `OrgType` values in a service. That is a product
@@ -25,7 +26,7 @@
 // Scope is by path, and the two halves differ because the shapes differ:
 //
 //   **/app/utils/authz.ts        rules 2 and 4 — the gate table names enum members, not codes
-//   **/migrations/*setup-a*.ts   rules 1, 2 and 3 — the seed carries the code literals
+//   **/migrations/contributions.ts   rules 1, 2 and 3, and the ceiling — the contribution carries the code literals
 //   **/app/services/*.ts         rule 4 only — a ceiling list in a MIGRATION is correct, and a
 //                                hardcoded org-type set in a SERVICE is the trap
 //
@@ -107,9 +108,7 @@ const slashed = (path: string) => path.split("\\").join("/");
 export const isAuthz = (path: string) => slashed(path).endsWith("/app/utils/authz.ts");
 
 export function isSeed(path: string): boolean {
-  const p = slashed(path);
-  const base = basename(p);
-  return p.includes("/migrations/") && base.endsWith(".ts") && base.includes("setup-a");
+  return slashed(path).endsWith("src/migrations/contributions.ts");
 }
 
 export function isService(path: string): boolean {
@@ -129,17 +128,14 @@ const MODULE_FROM_SOURCE = [
  * The module a file belongs to, by its own evidence first.
  *
  * The folder is the least reliable witness: the sample module lives in `src/modules/project/` and
- * its codes are prefixed `PRJ`. So the file's own symbols are read first, then the migration's name,
- * then the package folder.
+ * its codes are prefixed `PRJ`. So the file's own symbols are read first, then the
+ * package folder.
  */
 export function moduleOf(path: string, source: string): string | null {
   for (const pattern of MODULE_FROM_SOURCE) {
     const found = pattern.exec(source);
     if (found) return found[1];
   }
-  const base = basename(path);
-  const named = /^\d+-([a-z][a-z0-9]{1,7})-setup-/.exec(base);
-  if (named) return named[1].toUpperCase();
   const folder = /\/module-server-([a-z][a-z0-9]{1,7})-[a-z]+\//.exec(slashed(path));
   if (folder) return folder[1].toUpperCase();
   return null;
@@ -147,8 +143,10 @@ export function moduleOf(path: string, source: string): string | null {
 
 // ---------------------------------------------------------------- the four rules
 
-const CODE_LITERAL = /\bcode\s*:\s*['"]([A-Z][A-Z0-9_]*)['"]/g;
-const FIELD_MULTI = /\b(?:fieldType|mtype)\s*:\s*['"]([A-Z_]*_MULTI)['"]/;
+// A definition's code: a quoted literal, or a `<MOD>EnablementType` member as the contribution samples write it.
+const CODE_DEFINITION = /\bcode\s*:\s*(?:['"]([A-Z][A-Z0-9_]*)['"]|([A-Z][A-Z0-9]{1,7})EnablementType\s*\.\s*([A-Z][A-Z0-9_]*)\b)/g;
+const FIELD_MULTI = /\b(?:fieldType|mtype)\s*:\s*(?:['"]([A-Z_]*_MULTI)['"]|[A-Za-z]*EnablementFieldType\s*\.\s*(SELECT_MULTI|AUTOCOMPLETE_MULTI)\b)/;
+const FIELD_NUMBER = /\bfieldType\s*:\s*(?:['"]NUMBER['"]|[A-Za-z]*EnablementFieldType\s*\.\s*NUMBER\b)/;
 const ENABLEMENT_ALIAS = /\bconst\s+([A-Za-z_$][\w$]*)\s*=\s*([A-Z][A-Z0-9]{1,7}EnablementType)\b/g;
 const ENABLEMENT_TYPE = /\b([A-Z][A-Z0-9]{1,7}EnablementType)\b/g;
 const ORG_MEMBER = /\bOrgType\s*\.\s*([A-Z_]+)\b/g;
@@ -162,44 +160,48 @@ const finding = (rule: string, region: Region, message: string): Finding => ({ r
 const capitalize = (word: string) => word.slice(0, 1).toUpperCase() + word.slice(1).toLowerCase();
 
 /**
- * Rules 1, 2 and 3 — over the enablement definitions a seed migration carries.
+ * Rules 1, 2 and 3 — over the enablement definitions a module's contributions carry.
  *
  * A definition is told from a permission row by its own shape: the object holding the `code` also
  * holds `orgTypes`, the ceiling. Nothing else in these migrations carries both.
  */
 export function seedFindings(path: string, source: string, masked: string, module: string | null): Finding[] {
   const out: Finding[] = [];
-  for (const match of source.matchAll(CODE_LITERAL)) {
+  for (const match of source.matchAll(CODE_DEFINITION)) {
     if (inComment(masked, match.index)) continue;
     const obj = enclosingObject(masked, match.index);
     if (obj === null) continue;
     const body = source.slice(obj[0], obj[1]);
     const bodyMasked = masked.slice(obj[0], obj[1]);
     if (!/\borgTypes\s*:/.test(bodyMasked.split(COMMENT).join(" "))) continue;  // a permission row
-    const code = match[1];
-    const segments = code.split("_");
+    const member = match[1] === undefined;
+    const code = match[1] ?? `${match[2]}EnablementType.${match[3]}`;
+    // The segments after the module's prefix: a literal carries the prefix, a member's name does not.
+    const tokens = member ? match[3].split("_") : match[1].split("_").slice(1);
     const region: Region = [match.index, match.index + match[0].length];
+    const verb = FIELD_NUMBER.test(body) ? "LIMIT" : "MANAGE";
+    const owner = member ? match[2] : module;
 
-    if (module && !code.startsWith(`${module}_`)) {
+    if (module && (member ? match[2] !== module : !match[1].startsWith(`${module}_`))) {
       out.push(finding("PREFIX", region,
         `Enablement code \`${code}\` does not start with its own module's prefix \`${module}_\`. ` +
-        "A code carries the prefix of the module that OWNS the question. A module supplying an " +
-        "OPTION to another module's question appends to that definition's VALUES instead — it " +
+        "A code carries the prefix of the module that OWNS the question. A module that wants to offer an " +
+        "option to another module's question adds a selection key in its own contribution — it " +
         "never mints a code under someone else's prefix."));
-    } else if (segments.length < 3 || segments[1] !== "MANAGE") {
+    } else if (tokens.length < 2 || tokens[0] !== verb) {
       out.push(finding("VERB", region,
-        `Enablement code \`${code}\` does not read \`${module ?? "{MOD}"}_MANAGE_{NOUN}\`. ` +
-        "`MANAGE` in the second position is the whole discriminator: a permission is " +
-        "`{MOD}_{FAMILY}_{TIER}`, so a new verb makes the two unreadable and fragments the " +
-        "vocabulary. There is no amount form either — a quota is billing's, not an enablement's."));
+        `Enablement code \`${code}\` does not read \`${owner ?? "{MOD}"}_${verb}_{NOUN}\`. ` +
+        "The second segment is the whole discriminator: a permission is `{MOD}_{FAMILY}_{TIER}`, so a " +
+        "new verb makes the two unreadable and fragments the vocabulary. An offer reads " +
+        "`{MOD}_MANAGE_{NOUN}`, a limit is a `NUMBER` definition and reads `{MOD}_LIMIT_{NOUN}`."));
     }
 
     const multi = FIELD_MULTI.exec(body);
-    if (multi && segments.length && GENERIC.has(segments[segments.length - 1])) {
+    if (multi && tokens.length && GENERIC.has(tokens[tokens.length - 1])) {
       out.push(finding("NOUN", region,
-        `\`${code}\` is a multi-value definition (\`${multi[1]}\`) named after its AREA. ` +
+        `\`${code}\` is a multi-value definition (\`${multi[1] ?? multi[2]}\`) named after its AREA. ` +
         "A boolean names the area; a SELECTION names its options. Named this way the console " +
-        `shows "${capitalize(segments[segments.length - 1])}" holding a list of options, and ` +
+        `shows "${capitalize(tokens[tokens.length - 1])}" holding a list of options, and ` +
         "whoever flips the cell cannot tell what they are choosing. Name it for what it offers."));
     }
   }
@@ -215,7 +217,8 @@ export function seedFindings(path: string, source: string, masked: string, modul
       if (ORG_TYPES.has(name)) continue;
       out.push(finding("ORG TYPE", [match.index, region[1]],
         `The ceiling names \`${name}\`, which is not an organization type (PLATFORM, ENTERPRISE, CONSUMER). ` +
-        "A ceiling names org types; a category code belongs to a category cell, never to a ceiling."));
+        "A ceiling names org types; a category code belongs to a category cell, never to a ceiling. " +
+        "A ceiling that must cover every org type is written `Record<OrgType, …>`, which is exhaustive and passes."));
     }
   }
   return out;

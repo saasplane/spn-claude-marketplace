@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/03-platform/02-modules/README.md",
-      "seen": "9b6424f7"
+      "seen": "39a71611"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/03-platform/02-modules/",
-      "seen": "f9fa8bfc"
+      "seen": "bbf056c0"
     }
   ]
 }
@@ -62,7 +62,7 @@ The table above compresses each module to one commitment. Here is what actually 
 **Reference Data**
 - Read countries, currencies, languages and base labels from the catalog. Do not declare a second copy anywhere, even a small one.
 - A currency's symbol position and a language's reading direction are properties of the value, not of a screen. Do not hard-code either into a layout.
-- The entity-type registry is open — any module may register a type, naming itself as owner. The capability set a type may opt into is closed: `CUSTOM_FIELDS`, `TAGS` and `LOOKUP`, the last making the type a data source a field may pick from. Do not invent a new capability name to describe what a type accepts. Register a type when a feature uses it, and opt it only into what it supports.
+- The entity-type registry is open — any module may register a type, naming itself as owner. The capability set a type may opt into is closed: `CUSTOM_FIELDS`, `TAGS`, `LOOKUP` and `DATA_SCOPE`, `LOOKUP` making the type a data source a field may pick from and `DATA_SCOPE` letting its records narrow what one person sees. Do not invent a new capability name to describe what a type accepts. Register a type when a feature uses it, and opt it only into what it supports.
 - Reference Data depends on nothing else in the standard library, and nothing in the standard library may become a dependency of it. Do not add one, even a small one — it removes the bottom of every other module's dependency chain.
 
 **Translation**
@@ -74,7 +74,7 @@ The table above compresses each module to one commitment. Here is what actually 
 **Notifications**
 - Trigger a catalog action by name. Do not compose a message at the call site.
 - A configuration is drafted, then published, and only the published version renders. Do not let a draft take effect.
-- A locked action serves the platform's own wording to everybody, and that is the owning module's decision — independent of whether an organization's type is enabled for customization at all. Do not reword a locked action because customization happens to be on.
+- A locked action serves the platform's own wording to everybody, and that is the owning module's decision — independent of whether an organization's category is enabled for customization at all. Do not reword a locked action because customization happens to be on.
 - Reach every channel through the vendor seam. Do not call a vendor's own library.
 - Record a send through its delivery events — queued, sent, delivered, failed, bounced. Do not record only that it was sent.
 - A suppressed recipient is refused, not weighed as a preference. Do not write to a suppressed address for any reason on the list.

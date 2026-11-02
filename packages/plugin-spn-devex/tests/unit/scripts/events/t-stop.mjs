@@ -9,7 +9,7 @@ import { CARD as DATA_CARD, PREVIEW, cli, dataWorkspace, put } from "../../../he
 import { bindNamed, noteWelcome, recordWrites, windowSet } from "../../../../src/scripts/lib/window.ts";
 import { basename, resolve, join } from "node:path";
 import { WORKSTREAMS } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
-import { OWN_COPY, linesFor } from "../../../../../plugin-support-lib/src/lib/page-styles.ts";
+import { linesFor } from "../../../../../plugin-support-lib/src/lib/page-styles.ts";
 
 // Every workstream open in a fixture, as the set of a window that works on all of them. The checks take
 // the workstreams their window works on and read no others (RULE.DEVEX.WORKSPACE.236).
@@ -209,6 +209,17 @@ console.log("\n=== stop — an arc is read from its data: state.json, log.jsonl 
     check("a running row in a workstream that is not this window's is not this window's work", !workRuns(root, new Set()));
     editData(ws, (data) => { data.status = "DROPPED"; data.reason = "not wanted"; });
     check("a row left running in an arc that was dropped is history, not work that runs", !workRuns(root, everyone(root)));
+  }
+  {
+    const { root, ws } = await dataWorkspace("d17-helper-out");
+    check("[MKT.SCRIPTS.512] no row running and no order out: no work runs", !workRuns(root, everyone(root)));
+    const orders = join(ws, "notes", "N001", "orders");
+    mkdirSync(orders, { recursive: true });
+    writeFileSync(join(orders, "02-the-build.md"), "# Order 02 — the build\n");
+    check("[MKT.SCRIPTS.512] known-bad: a background helper with its order out and no report is work that runs, so no new-window offer", workRuns(root, everyone(root)));
+    check("[MKT.SCRIPTS.512] an order out in a workstream that is not this window's is not this window's work", !workRuns(root, new Set()));
+    writeFileSync(join(orders, "02-the-build.report.md"), "---\nrow: \"2\"\noutcome: landed\n---\n");
+    check("[MKT.SCRIPTS.512] once its report is beside the order, no work runs", !workRuns(root, everyone(root)));
   }
   {
     const { root, ws } = await dataWorkspace("d17-marks");
@@ -647,7 +658,7 @@ console.log("\n=== handover — the template's fields, and a fence that quotes t
     const template = readFileSync(resolve(PLUGIN, "src", "refs", "devex", "workspace", "docs", "templates", "workstream", "handover-template.md"), "utf8");
     const own = /```text\n([\s\S]*?)\n```/.exec(template)?.[1] ?? "";
     // Its placeholders filled in as the writer would, every value left where the template puts it.
-    const filled = own.replace(/\{\{next NNN-subject\}\}/g, "032-next").replace(/\{\{NNN-subject\}\}/g, "031-probe").replace(/N\{\{nnn\}\}/g, "N001").replace(/\{\{[^}]*\}\}/g, "x");
+    const filled = own.replace(/\{\{next NNN-subject\}\}/g, "032-next").replace(/\{\{NNN-subject\}\}/g, "031-probe").replace(/N\{\{nnn\}\}|\{\{arc\}\}/g, "N001").replace(/\{\{[^}]*\}\}/g, "x");
     const labelsOf = filled.split("\n").filter((line) => /^[a-z ]+:/.test(line)).map((line) => line.split(":")[0]);
     const passes = checkHandover(`Pick this up in a new window.\n\n\`\`\`text\n${filled}\n\`\`\``, ROOT, everyone(ROOT));
     const whole = labelsOf.join("|") === "continue|model|read first|pins|state|live now|done when|do not touch|open" && passes.length === 0;
@@ -1237,63 +1248,6 @@ ${tableOf(cyclesOf(folder))}
     move(built, "RUNNING", "waiting");
     check("[MKT.HOOKS.35] a page with no arcs table is not told to run the command", !/\[page-stale\]/.test(stop(built, "d-older")));
   }
-
-  console.log("\n=== stop — a page that holds its own copy of the styles");
-  const { checkOwnCopy, ownCopyPages } = await import("../../../../src/scripts/events/stop.ts");
-  // A page as it was written before the shared stylesheet: it links nothing, it carries a style block,
-  // and its classes have no prefix. Its one card is a `div.open`, the name its own copy uses.
-  const OLD_CARD = `  <div class="open">\n    <h4 id="q1">Q1 &middot; a real question</h4>\n    <div class="rec"><b>Recommended: A.</b> <b>Decision:</b> &mdash;</div>\n  </div>\n`;
-  const ownPageFor = (folder, status, glyph) => pageFor(folder, status, glyph)
-    .replace(STYLES, "<style>.eyebrow{font-size:.8rem} .open{border-left:2px solid orange}</style>").replace(/sds-/g, "")
-    .replace(`no card is open</h2></div>\n`, `no card is open</h2></div>\n${OLD_CARD}`);
-  const HALF = "stopped";
-  const buildOwn = (name, form = ownPageFor) => {
-    const built = build(name, "RUNNING", "waiting");
-    writeFileSync(built.page, form(join(built.root, A), "PLANNING", "&#x1F52E;"));
-    return built;
-  };
-  // KNOWN-BAD FOR A READER OF THE SHARED NAMES: a row is stopped, the header reads PLANNING over a
-  // running arc, and the page's only card is a `div.open`. Read by the shared names the page has no
-  // card, so `stopped-no-card` would speak; read as the page-stale check reads, its header is stale.
-  {
-    const built = buildOwn("n008-stop-own-copy");
-    const text = readFileSync(built.page, "utf8");
-    check("the fixture links no shared stylesheet and holds no shared name", !text.includes("sds-") && text.includes("<style>") && text.includes(`<div class="open">`));
-    const first = run("node", [HOOK], { cwd: built.root, last_assistant_message: "done", session_id: "o-own", transcript_path: built.transcript }, built.root);
-    check("a session that wrote nothing to the workstream is told nothing about its page", !/\[own-copy\]/.test(first), first);
-    move(built, "RUNNING", HALF);
-    const out = stop(built, "o-own");
-    check("[MKT.SCRIPTS.108] the Stop hook names a page with its own copy once, as a RULE line with what to do",
-      count(out, "[own-copy]") === 1 && count(out, OWN_COPY) === 1 && out.includes(`[RULE] \`${A}/approach.html\`: ${OWN_COPY}`), out);
-    check("[MKT.SCRIPTS.108] it reads no class of the page: it does not say that Open carries no card", !/\[stopped-no-card\]/.test(out), out);
-    check("[MKT.SCRIPTS.108] and it does not name the command that refuses such a page", !/\[page-stale\]/.test(out), out);
-    check("[MKT.SCRIPTS.108] the card of such a page is still read by its id, so the reply is still asked to open with Needs you",
-      /\[needs-you\] `001-a-subject`: Q1 /.test(out) && out.includes("does not open with **Needs you**"), out);
-    const again = stop(built, "o-own");
-    check("[MKT.SCRIPTS.108] the page is named once in a session: the next Stop does not name it again", !/\[own-copy\]/.test(again), again);
-    check("[MKT.SCRIPTS.108] another session that writes to the workstream is told once too",
-      (recordWrites(built.root, "o-other", built.root, [built.arc]),
-        count(run("node", [HOOK], { cwd: built.root, last_assistant_message: "done", session_id: "o-other" }, built.root), "[own-copy]")) === 1);
-  }
-  // UNTOUCHED: the same workstream with its page in the shared form, and the same card as a `div.sds-open`.
-  {
-    const shared = (folder, status, glyph) => pageFor(folder, status, glyph).replace(`no card is open</h2></div>\n`, `no card is open</h2></div>\n${CARD}\n`);
-    const built = buildOwn("n008-stop-shared-form", shared);
-    stop(built, "o-shared");
-    move(built, "RUNNING", HALF);
-    const out = stop(built, "o-shared");
-    check("[MKT.SCRIPTS.108] untouched: a page in the shared form is not named", !/\[own-copy\]/.test(out) && !out.includes(OWN_COPY), out);
-    check("[MKT.SCRIPTS.108] untouched: and it is read, so its stale header is said", count(out, "[page-stale]") === 1 && out.includes("the header's status"), out);
-    check("[MKT.SCRIPTS.108] untouched: its `div.sds-open` card is seen, so a stopped row is not reported as having no card", !/\[stopped-no-card\]/.test(out), out);
-  }
-  // The same reading, asked of the function: the lines it names, and the ones a session was told before.
-  {
-    const built = buildOwn("n008-stop-own-copy-lines");
-    const lines = ownCopyPages(built.root, everyone(built.root));
-    check("[MKT.SCRIPTS.108] the line is the page's path from the workspace, then OWN_COPY", lines.length === 1 && lines[0] === `\`${A}/approach.html\`: ${OWN_COPY}.`, JSON.stringify(lines));
-    check("[MKT.SCRIPTS.108] a workstream that is not this session's is not read", ownCopyPages(built.root, new Set(["002-b-subject"])).length === 0);
-    check("[MKT.SCRIPTS.108] a page the session was told about before draws no warning", checkOwnCopy(built.root, everyone(built.root), lines).length === 0 && checkOwnCopy(built.root, everyone(built.root), []).length === 1);
-  }
 }
 
 // ── while work runs, only a finding about the reply sends the agent back (RULE.DEVEX.WORKSPACE.244) ──
@@ -1401,7 +1355,7 @@ ${tableOf(cyclesOf(folder))}
   }
   {
     const ABOUT_THE_REPLY = ["needs-you", "reply-shape", "handover", "welcome", "how-it-runs", "partner-words"];
-    const THE_REST = ["notes", "carried", "stopped-no-card", "page-stale", "state", "own-copy", "runnable", "hold", "corpus"];
+    const THE_REST = ["notes", "carried", "page-stale", "state", "runnable", "hold", "corpus"];
     const all = [...ABOUT_THE_REPLY, ...THE_REST].map((name) => ({ check: name, message: `the ${name} finding, whole` }));
     const names = (list) => list.map((warning) => warning.check).join(" ");
     const split = typeof splitFindings === "function" ? splitFindings : () => ({ said: [], held: [] });
@@ -1570,7 +1524,10 @@ console.log("\n=== window — a new window is offered from 200k at a clean point
   const alwaysClean = await hear({ kilo: 460 });
   check("past 450k with no helper: the always-message asks for the same three things", asks(alwaysClean) && /past 450k/.test(alwaysClean) && /Write every open point first/.test(alwaysClean) && forThePerson(alwaysClean), alwaysClean);
   check("[MKT.HOOKS.322] the offer is said once per window: not again 28k later", !asks(await hear({ parts: [lines["bash-row-write"], sized(212, "msg_first"), feedback(212)], kilo: 240 })));
-  check("[MKT.HOOKS.322] the offer is said once per window: not again once the window has grown 50k", !asks(await hear({ parts: [lines["bash-row-write"], sized(212, "msg_first"), feedback(212)], kilo: 265 })));
+  check("[MKT.HOOKS.486] the offer is not said again until another 50k: not at 261k", !asks(await hear({ parts: [lines["bash-row-write"], sized(212, "msg_first"), feedback(212)], kilo: 261 })));
+  check("[MKT.HOOKS.486] and said again once the window has grown another 50k: at 265k", asks(await hear({ parts: [lines["bash-row-write"], sized(212, "msg_first"), feedback(212)], kilo: 265 })));
+  const handover = await hear({ kilo: 310 });
+  check("[MKT.HOOKS.486] past 300k at a clean point the turn is told to write the handover now, unasked", asks(handover) && /past 300k/.test(handover) && /write the handover now, unasked/.test(handover), handover);
   const waiting = await hear({ parts: [lines["bash-row-write"], lines["agent-background-pending"]], kilo: 220 });
   check("waits while a background Agent has no notification", !asks(waiting), waiting);
   const waitingAlways = await hear({ parts: [lines["bash-row-write"], lines["agent-background-pending"]], kilo: 470 });
@@ -1672,10 +1629,9 @@ console.log("\n=== stop — the checks the first round fixed or wired, and the g
     const { root, ws } = await dataWorkspace("n006-no-card");
     const wrote = cli(root, ["docs", "cycles", "write", "031-probe"]);
     const stale = call("checkPageCurrent", new Set([arcOf(ws)]));
-    const stopped = stopModule.checkArcToPage(root, everyone(root));
     check("[MKT.HOOKS.109] a workstream with no card ends a turn clean after `docs cycles write`",
-      wrote.code === 0 && stale.length === 0 && stopped.length === 0 && readFileSync(join(ws, "approach.html"), "utf8").includes("no card is open"),
-      `${wrote.out.slice(0, 200)} · ${JSON.stringify([...stale, ...stopped])}`);
+      wrote.code === 0 && stale.length === 0 && readFileSync(join(ws, "approach.html"), "utf8").includes("no card is open"),
+      `${wrote.out.slice(0, 200)} · ${JSON.stringify(stale)}`);
   }
   {
     const { root, ws } = await dataWorkspace("n006-promise");
@@ -1694,7 +1650,7 @@ console.log("\n=== stop — the checks the first round fixed or wired, and the g
       call("checkRunnable", root, 0, {}, new Set(), everyone(root), promise).length === 0);
   }
   {
-    // [MKT.HOOKS.322] A ROW THAT WAITS ON SOMETHING OUTSIDE THE WINDOW IS NEVER RUNNABLE, and an arc a go carries is go-next's to speak for.
+    // [MKT.HOOKS.322] A ROW THAT WAITS ON SOMETHING OUTSIDE THE WINDOW IS NEVER RUNNABLE, and an arc a go carries is the next-step line's to speak for.
     const { GO_SCHEMA_VERSION } = await import("../../../../src/scripts/lib/workstream-schema.ts");
     const { root, ws } = await dataWorkspace("n015-promise-waiting");
     editArc(ws, (data) => { data.rows[0].state = "landed"; data.rows[1].waitingOn = "the release of spn-y"; });
@@ -1707,9 +1663,9 @@ console.log("\n=== stop — the checks the first round fixed or wired, and the g
     const part = (id, state) => ({ id, repo: "spn-x", work: "CODE", entries: ["N001/E1"], tests: [], minutes: null, measuredFrom: null,
       waitsOn: [], model: "opus", signature: "abc12345", state });
     writeFileSync(join(arcOf(ws), "go.json"), `${JSON.stringify({ schemaVersion: GO_SCHEMA_VERSION, lead: "N001", scope: ["N001"], writtenAt: "2026-10-31T00:00:00Z", parts: [part("code-spn-x-1", "ready")] }, null, 2)}\n`);
-    check("[MKT.HOOKS.322] an arc in a go with a part not landed gets no runnable finding while go-next speaks",
-      call("checkRunnable", root, 0, {}, new Set(), everyone(root), promise).length === 0 && call("checkGoNext", root, everyone(root), []).length === 1,
-      JSON.stringify([call("checkRunnable", root, 0, {}, new Set(), everyone(root), promise), call("checkGoNext", root, everyone(root), [])]));
+    check("[MKT.HOOKS.322] an arc in a go with a part not landed gets no runnable finding while the next-step line speaks",
+      call("checkRunnable", root, 0, {}, new Set(), everyone(root), promise).length === 0 && call("goNextLines", root, everyone(root), []).length === 1,
+      JSON.stringify([call("checkRunnable", root, 0, {}, new Set(), everyone(root), promise), call("goNextLines", root, everyone(root), [])]));
   }
   {
     const bare = call("checkReplyShape", "## Needs you\n\n- S27 and S28\n- Q3\n\n## Progress\n\nThe checks are green.");
@@ -1725,43 +1681,6 @@ console.log("\n=== stop — the checks the first round fixed or wired, and the g
       JSON.stringify(detail));
     const plain = call("checkReplyShape", "N006 is decided, and Q3 · which way the probe goes is still open.");
     check("[MKT.HOOKS.113] an arc number and a card beside its words pass", plain.every((one) => !one.message.includes("working detail")), JSON.stringify(plain));
-  }
-  {
-    const { root, ws } = await dataWorkspace("n006-cards");
-    cardsAre(ws, [{ id: "q1", state: "answered", title: "Which way the probe goes" }, { id: "q2", state: "open", title: "Where it lands" }]);
-    put(root, ".spndevex/workstreams/open/032-other/questions.jsonl", `${JSON.stringify({ id: "q7", state: "open", title: "Another question" })}\n`);
-    const mine = new Set(["031-probe"]);
-    const none = call("checkCardsNamed", "Q12 is still open.", root, mine);
-    check("[MKT.HOOKS.115] known-bad: a card no page of the window carries is named",
-      none.length === 1 && none[0].check === "cards" && none[0].message.includes("Q12, and no approach page of 031-probe carries it"), JSON.stringify(none));
-    const other = call("checkCardsNamed", "Q7 is still open.", root, mine);
-    check("[MKT.HOOKS.115] known-bad: a card of another workstream is named as that workstream's",
-      other.length === 1 && other[0].message.includes("Q7, which belongs to 032-other"), JSON.stringify(other));
-    const answered = call("checkCardsNamed", "## Needs you\n\nQ1 · which way the probe goes — on the approach page.\n\n## Progress\n\nThe checks are green.", root, mine);
-    check("[MKT.HOOKS.115] known-bad: Needs you putting a card already answered is named",
-      answered.length === 1 && answered[0].message.includes("Needs you names Q1, and 031-probe has answered it"), JSON.stringify(answered));
-    check("[MKT.HOOKS.115] an open card of the window passes",
-      call("checkCardsNamed", "Q2 · where it lands is open.", root, mine).length === 0);
-    const withName = call("checkCardsNamed", "Q2 · where it lands is open, and Q7 of 032-other waits there.", root, mine);
-    check("[MKT.HOOKS.318] another workstream's card named with its workstream is sent back all the same",
-      withName.some((one) => one.message.includes("Q7, which belongs to 032-other")), JSON.stringify(withName));
-    const inWords = call("checkCardsNamed", "The release is done. 032-other has an open question about the plugins.", root, mine);
-    check("[MKT.HOOKS.318] another workstream's cards in words are sent back",
-      inWords.length === 1 && inWords[0].message.includes("names the cards of another workstream"), JSON.stringify(inWords));
-    const OPEN_LINE = (open) => ["Pick this up in a new window.", "", "```text", "continue:     workstream `031-probe`, arc `N001`, row 2", "open:         " + open, "```"].join("\n");
-    const onLine = call("checkCardsNamed", OPEN_LINE("Q7 — another question"), root, mine);
-    check("[MKT.HOOKS.318] another workstream's card on the open line is sent back",
-      onLine.length >= 1 && onLine.some((one) => one.message.includes("Q7")), JSON.stringify(onLine));
-    const lineByName = call("checkCardsNamed", OPEN_LINE("032-other has one"), root, mine);
-    check("[MKT.HOOKS.318] another workstream named on the open line is sent back", lineByName.length >= 1, JSON.stringify(lineByName));
-    check("[MKT.HOOKS.319] a reply to a prompt that names the card passes",
-      call("checkCardsNamed", "Q7 is still open.", root, mine, "what is Q7 about?").length === 0);
-    check("[MKT.HOOKS.319] a reply to a prompt that names the workstream passes, by number or by folder",
-      call("checkCardsNamed", "Q7 of 032-other waits there.", root, mine, "how is 032-other going?").length === 0
-        && call("checkCardsNamed", "032-other has an open question.", root, mine, "how is 032 going?").length === 0);
-    check("[MKT.HOOKS.319] and the open line passes where the prompt named that workstream",
-      call("checkCardsNamed", OPEN_LINE("Q7 — another question"), root, mine, "carry on with 032").length === 0);
-    check("[MKT.HOOKS.115] a report of an answered card outside Needs you passes", call("checkCardsNamed", "Q1 was answered A.", root, mine).length === 0);
   }
   {
     const ROOT = build("n006-handover");
@@ -1825,36 +1744,49 @@ console.log("\n=== stop — the checks the first round fixed or wired, and the g
     const planWith = (parts) => writeFileSync(join(arcOf(ws), "go.json"),
       `${JSON.stringify({ schemaVersion: GO_SCHEMA_VERSION, lead: "N001", scope: ["N001"], writtenAt: "2026-10-31T00:00:00Z", parts }, null, 2)}\n`);
     planWith([part("code-spn-x-1", "ready"), part("code-spn-x-2", "landed", { entries: ["N001/E2"] })]);
-    const ready = call("checkGoNext", root, everyone(root), []);
+    const ready = call("goNextLines", root, everyone(root), []);
     check("[MKT.HOOKS.306] known-bad: a turn ending with a part ready and not started is told the next step",
-      ready.length === 1 && ready[0].check === "go-next" && ready[0].message.includes("a part ready and not started (code-spn-x-1)")
-        && ready[0].message.includes("Next: launch the brief of code-spn-x-1"), JSON.stringify(ready));
+      ready.length === 1 && ready[0].includes("a part ready and not started (code-spn-x-1)")
+        && ready[0].includes("Next: launch the brief of code-spn-x-1"), JSON.stringify(ready));
     check("[MKT.HOOKS.306] with a card open the turn waits on the answer, and is told nothing",
-      call("checkGoNext", root, everyone(root), ["Q1"]).length === 0);
+      call("goNextLines", root, everyone(root), ["Q1"]).length === 0);
     planWith([part("code-spn-x-1", "running")]);
-    check("[MKT.HOOKS.306] a part running with no report back is nobody's next step yet", call("checkGoNext", root, everyone(root), []).length === 0);
+    check("[MKT.HOOKS.306] a part running with no report back is nobody's next step yet", call("goNextLines", root, everyone(root), []).length === 0);
     mkdirSync(join(ws, "notes", "N001", "orders"), { recursive: true });
     writeFileSync(join(ws, "notes", "N001", "orders", "code-spn-x-1.report.md"), "---\nrow: \"1\"\noutcome: landed\n---\n");
-    const unfolded = call("checkGoNext", root, everyone(root), []);
+    const unfolded = call("goNextLines", root, everyone(root), []);
     check("[MKT.HOOKS.306] known-bad: a report waiting to be folded is told the command that folds it",
-      unfolded.length === 1 && unfolded[0].message.includes("a report waiting to be folded (code-spn-x-1)")
-        && unfolded[0].message.includes("`spn-devex workstream report write 031-probe notes/N001/orders/code-spn-x-1.report.md`"), JSON.stringify(unfolded));
-    check("[MKT.HOOKS.306] a workstream that is not this window's is not read", call("checkGoNext", root, new Set(), []).length === 0);
-    check("[MKT.HOOKS.414] a go this window did not start is not its next step, though the workstream is its own", call("checkGoNext", root, everyone(root), [], new Set()).length === 0);
-    check("[MKT.HOOKS.414] a go this window started is its next step", call("checkGoNext", root, everyone(root), [], new Set(["031-probe/N001"])).length === 1);
-    check("[MKT.HOOKS.414] a go a handover gave the window is its next step", call("checkGoNext", root, everyone(root), [], new Set(["031-probe/*"])).length === 1);
+      unfolded.length === 1 && unfolded[0].includes("a report waiting to be folded (code-spn-x-1)")
+        && unfolded[0].includes("`spn-devex workstream report write 031-probe notes/N001/orders/code-spn-x-1.report.md`"), JSON.stringify(unfolded));
+    check("[MKT.HOOKS.306] a workstream that is not this window's is not read", call("goNextLines", root, new Set(), []).length === 0);
+    check("[MKT.HOOKS.414] a go this window did not start is not its next step, though the workstream is its own", call("goNextLines", root, everyone(root), [], new Set()).length === 0);
+    check("[MKT.HOOKS.414] a go this window started is its next step", call("goNextLines", root, everyone(root), [], new Set(["031-probe/N001"])).length === 1);
+    check("[MKT.HOOKS.414] a go a handover gave the window is its next step", call("goNextLines", root, everyone(root), [], new Set(["031-probe/*"])).length === 1);
     // A PART THAT WAITS ON SOMETHING OUTSIDE THE WINDOW IS NEVER THE NEXT STEP: it is said once, as waiting, with what it waits on.
     planWith([part("code-spn-x-1", "waiting", { waitingOn: "the release of spn-y that ships spnutils x run" }), part("code-spn-x-2", "ready", { entries: ["N001/E2"] })]);
-    const mixed = call("checkGoNext", root, everyone(root), []);
+    const mixed = call("goNextLines", root, everyone(root), []);
     check("[MKT.HOOKS.321] known-bad: a part waiting on a release is said as waiting with its reason, and never named as next",
-      mixed.length === 1 && mixed[0].message.includes("a part ready and not started (code-spn-x-2)")
-        && mixed[0].message.includes("code-spn-x-1 is waiting on the release of spn-y that ships spnutils x run")
-        && mixed[0].message.includes("Next: launch the brief of code-spn-x-2") && !mixed[0].message.includes("launch the brief of code-spn-x-1"), JSON.stringify(mixed));
+      mixed.length === 1 && mixed[0].includes("a part ready and not started (code-spn-x-2)")
+        && mixed[0].includes("code-spn-x-1 is waiting on the release of spn-y that ships spnutils x run")
+        && mixed[0].includes("Next: launch the brief of code-spn-x-2") && !mixed[0].includes("launch the brief of code-spn-x-1"), JSON.stringify(mixed));
     planWith([part("code-spn-x-1", "waiting", { waitingOn: "the release of spn-y that ships spnutils x run" })]);
-    check("[MKT.HOOKS.321] a go with only a waiting part sends the turn nowhere", call("checkGoNext", root, everyone(root), []).length === 0);
+    check("[MKT.HOOKS.321] a go with only a waiting part sends the turn nowhere", call("goNextLines", root, everyone(root), []).length === 0);
+    // THE NEXT STEP RIDES ON REPLY-SHAPE (RULE.DEVEX.WORKSPACE.244): on a finding the reply earned, alone only where the reply names no next step, held while a row runs.
+    planWith([part("code-spn-x-1", "ready")]);
+    const lineOf = call("goNextLines", root, everyone(root), []);
+    const missed = "## Needs you\n\n- Q3\n\n## Progress\n\nThe checks are green.";
+    const ridden = call("checkReplyShape", missed, [], [], new Map(), false, 1, lineOf);
+    check("[MKT.HOOKS.306] known-bad: the next-step line rides on the reply-shape finding the reply earned, and no finding of its own is added",
+      ridden.length >= 1 && ridden.every((one) => one.check === "reply-shape") && ridden[0].message.includes("Next: launch the brief of code-spn-x-1") && !ridden.some((one) => one.check === "go-next"), JSON.stringify(ridden));
+    const alone = call("checkReplyShape", "The checks are green.", [], [], new Map(), false, 1, lineOf);
+    check("[MKT.HOOKS.306] a reply that ends with no next step named gets the next-step line alone, under reply-shape",
+      alone.length === 1 && alone[0].check === "reply-shape" && alone[0].message.includes("Next: launch the brief of code-spn-x-1"), JSON.stringify(alone));
+    const named = call("checkReplyShape", "The checks are green.\n\nNext: launch the brief of the first code part.", [], [], new Map(), false, 1, lineOf);
+    check("[MKT.HOOKS.306] a reply that names its next step is told nothing", named.length === 0, JSON.stringify(named));
+    check("[MKT.HOOKS.306] the hook's own turn end says it under reply-shape and never as go-next", !JSON.stringify(call("checkReplyShape", "done", [], [], new Map(), false, 1, [])).includes("go-next"));
     // A FINDING NAMES ONLY THE WINDOW'S OWN WORKSTREAMS.
     mkdirSync(join(root, ".spndevex", WORKSTREAMS, "open", "032-other"), { recursive: true });
-    const aboutOther = [{ check: "state", message: "032-other has a row without its notes." }, { check: "cards", message: "Q1 belongs to 032-other, not to 031-probe." }, { check: "state", message: "031-probe has a row without its notes." }];
+    const aboutOther = [{ check: "state", message: "032-other has a row without its notes." }, { check: "handover", message: "Q1 belongs to 032-other, not to 031-probe." }, { check: "state", message: "031-probe has a row without its notes." }];
     check("[MKT.HOOKS.322] known-bad: a finding about another window's workstream is not said here, and the window's own and a finding about the reply are",
       JSON.stringify(call("ownOnly", aboutOther, root, new Set(["031-probe"])).map((w) => w.message.slice(0, 5))) === JSON.stringify(["Q1 be", "031-p"]), JSON.stringify(call("ownOnly", aboutOther, root, new Set(["031-probe"]))));
     // AN IDENTICAL FINDING IS SAID ONCE UNTIL ITS STATE CHANGES.
@@ -1868,6 +1800,14 @@ console.log("\n=== stop — the checks the first round fixed or wired, and the g
       [first.said.length, again.said.length, changedMsg.said.length, back.said.length].join() === "1,0,1,1", [first.said.length, again.said.length, changedMsg.said.length, back.said.length].join());
     check("[MKT.HOOKS.322] a finding about the reply is said every time it is found",
       (stopModule.sayOnce ? stopModule.sayOnce([{ check: "handover", message: "x" }], { handover: "x" }) : { said: [] }).said.length === 1);
+    // A CORPUS FINDING IS SAID ONCE BY THE WORDS ABOVE ITS MARKER LINE (RULE.DEVEX.WORKSPACE.471): what is below it changes from turn to turn.
+    const { CORPUS_MARKER } = await import("../../../../src/scripts/checks/corpus.ts");
+    const corpus = (list, tail) => [{ check: "corpus", message: `${list}\n${CORPUS_MARKER}\n${tail}` }];
+    const c1 = stopModule.sayOnce(corpus("- a.md: stale", "... and 3 more"), {});
+    const c2 = stopModule.sayOnce(corpus("- a.md: stale", "... and 4 more\n2 findings are in files changed and not committed."), c1.told);
+    const c3 = stopModule.sayOnce(corpus("- a.md: stale\n- b.md: stale", "... and 4 more"), c2.told);
+    check("[MKT.HOOKS.322] known-bad: a corpus finding whose tail changed is not said again, and one whose list gained a finding is",
+      [c1.said.length, c2.said.length, c3.said.length].join() === "1,0,1", [c1.said.length, c2.said.length, c3.said.length].join());
     // The send-backs are written as they are said (MKT.HOOKS.341), tested below; the transcript count went with its functions.
   }
 }
@@ -1894,28 +1834,6 @@ console.log("\n=== stop — a card is held with its workstream, so one number in
   const SHAPE = (body) => `## Needs you\n\n${body}\n\n## Progress\n\nThe checks are green.`;
   const hook = (root, session, reply) => { bindOpen(root, session); return run("node", [HOOK], { cwd: root, session_id: session, last_assistant_message: reply }, root); };
 
-  {
-    const root = two("n016-360");
-    const mine = mineOf(root);
-    const found = (body) => stopModule.checkCardsNamed(SHAPE(body), root, mine).filter((one) => one.message.includes("has answered it"));
-    check("[MKT.HOOKS.360] never be told an open card is answered because another workstream's card of that number is: `037's Q2`",
-      found("037's Q2 · where it lands — it is on the approach page.").length === 0, JSON.stringify(found("037's Q2 · where it lands")));
-    check("[MKT.HOOKS.360] `037 Q2` is placed at 037 too", found("037 Q2 · where it lands — it is on the approach page.").length === 0);
-    check("[MKT.HOOKS.360] and a Q2 in a line about 037 is placed at 037",
-      found("Q2 · where it lands in 037 — it is on the approach page.").length === 0);
-    check("[MKT.HOOKS.360] a Q2 named with 032 is still told answered there",
-      found("032 Q2 · where it lands — it is on the approach page.").length === 1);
-  }
-  {
-    const root = two("n016-361");
-    const mine = mineOf(root);
-    const bare = stopModule.checkCardsNamed(SHAPE("Q2 · where it lands — it is on the approach page."), root, mine);
-    check("[MKT.HOOKS.361] a bare Q2 that 032 has answered and 037 holds open is not told answered", bare.length === 0, JSON.stringify(bare));
-    const root2 = two("n016-361-both", { b2: false, b3: false });
-    const both = stopModule.checkCardsNamed(SHAPE("Q2 · where it lands — it is on the approach page."), root2, mineOf(root2));
-    check("[MKT.HOOKS.361] with both Q2s answered a bare Q2 draws the fault (the guard)",
-      both.length === 1 && both[0].message.includes("Needs you names Q2"), JSON.stringify(both));
-  }
   {
     const root = two("n016-362", { a2: true, b3: false, raised: { a: "window-other", b: "window-me" } });
     const out = hook(root, "window-me", "done");
@@ -1973,9 +1891,9 @@ console.log("\n=== stop — send-backs are written as they are said, the welcome
   const editRows = (ws, change) => { const data = JSON.parse(readFileSync(arcFile(ws), "utf8")); change(data); writeFileSync(arcFile(ws), `${JSON.stringify(data, null, 2)}\n`); };
   const PROMISE = "The page is written and its checks are green.\n\nNext I'll build it.";
 
-  check("[MKT.HOOKS.341] the twelve checks about the reply are one set in lib/payload.ts",
-    payloadLib.REPLY_CHECKS instanceof Set && payloadLib.REPLY_CHECKS.size === 12
-      && ["needs-you", "reply-shape", "cards", "handover", "how-it-runs", "partner-words", "page-path", "close-message", "card-case", "proposal-record", "welcome", "window"].every((name) => payloadLib.REPLY_CHECKS.has(name)),
+  check("[MKT.HOOKS.341] the eleven checks about the reply are one set in lib/payload.ts",
+    payloadLib.REPLY_CHECKS instanceof Set && payloadLib.REPLY_CHECKS.size === 11
+      && ["needs-you", "reply-shape", "handover", "how-it-runs", "partner-words", "page-path", "close-message", "card-case", "proposal-record", "welcome", "window"].every((name) => payloadLib.REPLY_CHECKS.has(name)),
     JSON.stringify([...(payloadLib.REPLY_CHECKS ?? [])]));
 
   // The suite runs with SPN_TELEMETRY=off (tests/run.mjs); these cases read the rows a hook writes, so they take it out
@@ -2031,26 +1949,38 @@ console.log("\n=== stop — send-backs are written as they are said, the welcome
   }
 
   // A CLOSE IS A MILESTONE: the reply that follows a close's success text is its closing message (RULE.DEVEX.WORKSPACE.206).
+  // Six moments, six shapes (S136): each is typed in stop.ts as one row of CLOSING_SHAPES.
   {
     const entry = (type, content) => JSON.stringify({ type, message: { role: type, content } });
     const SUCCESS = "ok · 031-probe closed · approach page stamped DONE · moved from open/ into closed/";
-    const closing = "# 🚀 The probe is answered\n\n&nbsp;\n\n### 📦 What we delivered\n\n- the probe\n\n### 🧠 What we learned\n\n- it works\n\nThank you 👍\n\nThis window can be retired.";
+    const ARC_LANDED = "ok · 031-probe/arcs/N011 9/9 · 031-probe/arcs/N011 reads LANDED";
+    const ROW_LANDED = "ok · lead part p landed · 031-probe/arcs/N011 R3 landed";
+    const NB = "&nbsp;";
+    const warm = "The probe is answered and it works.";
+    const closing = `# 🚀 031-probe (The probe) is closed\n\n${NB}\n\n${warm}\n\n${NB}\n\n### 📦 What we delivered\n\n- the probe\n\n${NB}\n\n### 🧠 What we learned\n\n- it works\n\n${NB}\n\nThank you 👍\n\nThis window can be retired.`;
+    const rowShape = `### ✅ The probe is in\n\n${NB}\n\n${warm}\n\n${NB}\n\n#### 📦 What landed\n\n- the probe\n\n${NB}\n\n#### 🔭 What's next\n\n- the page`;
+    const releaseShape = rowShape.replace("✅ The probe is in", "🚢 Version 1.2.0 shipped");
+    const arcShape = `## 🏁 N011 (Agent improvements) has landed\n\n${NB}\n\n${warm}\n\n${NB}\n\n### 📦 What we delivered\n\n- the probe\n\n${NB}\n\n### 🧠 What we learned\n\n- it works\n\n${NB}\n\n### 🔭 What's next\n\n- the page`;
+    const BLOCK = "```text\ncontinue:     workstream `031-probe`, arc `N011`, row 2\nmodel:        Opus 5.5, effort high\nread first:   `approach.html#N011`\npins:         spn-x abc1234\nstate:        row 1 landed\nlive now:     no reload\ndone when:    the suite passes\ndo not touch: the templates\nopen:         none\n```";
+    const handoverShape = `## ✈️ Handing over N011 (Agent improvements)\n\n${NB}\n\n${BLOCK}\n\n${NB}\n\nThe next window picks up at the page. Thank you, and this window can be retired.`;
+    const windowShape = `## 🛬 This window's handover is done\n\n${NB}\n\n${warm}\n\n${NB}\n\n### 📦 What we delivered\n\n- the probe\n\n${NB}\n\n### 🧠 What we learned\n\n- it works\n\n${NB}\n\nThank you 👍\n\nThis window can be retired.`;
     const closed = (name, results) => {
       const file = join(BASE, `${name}.jsonl`);
-      writeFileSync(file, [entry("user", "close it"), entry("assistant", [{ type: "tool_use", id: "t1", name: "Bash", input: {} }]),
+      writeFileSync(file, [entry("user", "close it"), entry("assistant", [{ type: "tool_use", id: "t1", name: "Bash", input: { command: "spn-devex workstream close 031-probe" } }]),
         entry("user", results.map((text) => ({ type: "tool_result", tool_use_id: "t1", content: text })))].join("\n") + "\n");
       return file;
     };
     const file = closed("close-turn", [SUCCESS]);
     check("[MKT.HOOKS.406] the turn's tool results are read from the transcript, after the last prompt", stopModule.toolResultsOf(file).join() === SUCCESS, JSON.stringify(stopModule.toolResultsOf(file)));
     const bare = stopModule.checkCloseMessage("Closed 031.", stopModule.toolResultsOf(file));
-    check("[MKT.HOOKS.406] a reply after a close that is not the closing message is sent back, naming every missing piece and the rule",
-      bare.length === 1 && bare[0].check === "close-message" && ["🚀 or ✈️", "What we delivered", "What we learned", "Thank you 👍", "retired", "RULE.DEVEX.WORKSPACE.206"].every((word) => bare[0].message.includes(word)), JSON.stringify(bare));
+    check("[MKT.HOOKS.406] a reply after a close that is not the closing message is sent back, naming the moment, its shape and the rule",
+      bare.length === 1 && bare[0].check === "close-message" && ["workstream", "# 🚀", "What we delivered", "What we learned", "Thank you 👍", "retired", "RULE.DEVEX.WORKSPACE.206"].every((word) => bare[0].message.includes(word)), JSON.stringify(bare));
     const part = stopModule.checkCloseMessage(closing.replace("Thank you 👍\n\n", ""), [SUCCESS]);
-    check("[MKT.HOOKS.406] a reply missing one piece is sent back naming only that piece", part.length === 1 && part[0].message.split("Write it as")[0].includes("Thank you 👍") && !part[0].message.split("Write it as")[0].includes("What we learned"), JSON.stringify(part));
-    check("[MKT.HOOKS.407] the whole closing message passes, with a ✈️ heading and the other wordings of the two headings",
+    check("[MKT.HOOKS.406] a reply missing one piece is sent back naming that piece", part.length === 1 && part[0].message.includes("Thank you 👍"), JSON.stringify(part));
+    check("[MKT.HOOKS.407] the whole closing message passes, and the `was` wordings and a wrong title size no longer do",
       stopModule.checkCloseMessage(closing, [SUCCESS]).length === 0
-        && stopModule.checkCloseMessage(closing.replace("🚀", "✈️").replace("we delivered", "was delivered").replace("we learned", "was learned"), [SUCCESS]).length === 0);
+        && stopModule.checkCloseMessage(closing.replace("we delivered", "was delivered").replace("we learned", "was learned"), [SUCCESS]).length === 1
+        && stopModule.checkCloseMessage(closing.replace("# 🚀", "## 🚀"), [SUCCESS]).length === 1);
     check("[MKT.HOOKS.407] a turn whose tool results hold no close success is never asked for the message", stopModule.checkCloseMessage("Done.", ["all 12 passed"]).length === 0 && stopModule.checkCloseMessage("Done.", []).length === 0);
     check("[MKT.HOOKS.406] the check is about the reply: it is said while a row runs", payloadLib.REPLY_CHECKS.has("close-message"));
     const root = build("close-message-hook");
@@ -2058,6 +1988,61 @@ console.log("\n=== stop — send-backs are written as they are said, the welcome
     const out = run("node", [HOOK], { cwd: root, session_id: "cm-1", transcript_path: file, last_assistant_message: "Closed 031." }, root);
     const ok = run("node", [HOOK], { cwd: root, session_id: "cm-2", transcript_path: file, last_assistant_message: closing }, root);
     check("[MKT.HOOKS.406] the hook sends the bare reply back and lets the closing message through", out.includes("[close-message]") && !ok.includes("[close-message]"), `${out.slice(0, 300)} | ${ok.slice(0, 300)}`);
+
+    // THE SIX SHAPES: one row each, each passing, each with a known-bad variant.
+    const shapes = stopModule.CLOSING_SHAPES;
+    check("[MKT.HOOKS.472] CLOSING_SHAPES has six rows, one per moment, each the shape the construct's table gives (RULE.DEVEX.AGENT.170)", Array.isArray(shapes) && shapes.length === 6 && new Set(shapes.map((one) => one.moment)).size === 6, JSON.stringify(shapes?.map?.((one) => one.moment)));
+    const sayRow = [ROW_LANDED], sayArc = [ARC_LANDED], none = [];
+    const say = (reply, results) => stopModule.checkCloseMessage(reply, results);
+    const table = [["row", rowShape, sayRow], ["release", releaseShape, none], ["arc", arcShape, sayArc], ["window", windowShape, none], ["workstream", closing, [SUCCESS]]];
+    for (const [name, sample, results] of table)
+      check(`[MKT.HOOKS.473] the ${name} shape passes`, say(sample, results).length === 0, JSON.stringify(say(sample, results)));
+    const handoverPass = stopModule.checkHandover(handoverShape, build("n011-handover-shape"), new Set(), true);
+    check("[MKT.HOOKS.473] the handover shape passes", handoverPass.length === 0, JSON.stringify(handoverPass));
+    const bad = (label, name, sample, results, change) => {
+      const found = say(change(sample), results);
+      check(`[MKT.HOOKS.474] known-bad: ${label}`, found.length === 1 && found[0].check === "close-message" && found[0].message.includes(name), JSON.stringify(found));
+    };
+    bad("a table row in the row shape", "row", rowShape, sayRow, (t) => t.replace("- the probe", "| the probe | landed |"));
+    bad("a commit hash in the release shape", "release", releaseShape, none, (t) => t.replace("- the probe", "- the probe in 4f3a9c1"));
+    bad("a bare N011 in the arc shape", "arc", arcShape, sayArc, (t) => t.replace("- the probe", "- N011 is whole"));
+    bad("a `row 8` in the row shape", "row", rowShape, sayRow, (t) => t.replace("- the probe", "- row 8 is whole"));
+    bad("the wrong title size in the arc shape", "arc", arcShape, sayArc, (t) => t.replace("## 🏁", "### 🏁"));
+    bad("`Thank you 👍` in the row shape", "row", rowShape, sayRow, (t) => `${t}\n\nThank you 👍`);
+    bad("`retired` in the release shape", "release", releaseShape, none, (t) => `${t}\n\nThis window can be retired.`);
+    bad("`Thank you 👍` in the arc shape", "arc", arcShape, sayArc, (t) => `${t}\n\nThank you 👍`);
+    bad("`retired` in the arc shape", "arc", arcShape, sayArc, (t) => `${t}\n\nThis window can be retired.`);
+    bad("no `&nbsp;` before a section of the window shape", "window", windowShape, none, (t) => t.replace(`${NB}\n\n### 🧠`, "### 🧠"));
+    bad("a bare Q3 in the workstream shape", "workstream", closing, [SUCCESS], (t) => t.replace("- it works", "- Q3 settled it"));
+    const badHandover = (label, change) => {
+      const found = stopModule.checkHandover(change(handoverShape), build("n011-handover-bad"), new Set(), true);
+      check(`[MKT.HOOKS.474] known-bad: ${label}`, found.length === 1 && found[0].check === "handover" && found[0].message.includes("✈️"), JSON.stringify(found));
+    };
+    badHandover("a handover with no `&nbsp;` lines", (t) => t.replaceAll(`${NB}\n\n`, ""));
+    badHandover("a handover with no closing paragraph", (t) => t.slice(0, t.lastIndexOf("The next window")));
+
+    // WHICH SHAPE IS OWED is read from the command's result, never from a Read.
+    check("[MKT.HOOKS.475] `<arc> reads LANDED` in the results owes the arc shape, and `<arc> <row> landed` the row shape",
+      say("Landed.", sayArc)[0]?.message.includes("arc") && say("Landed.", sayRow)[0]?.message.includes("row"), JSON.stringify([say("Landed.", sayArc), say("Landed.", sayRow)]));
+    check("[MKT.HOOKS.475] the highest moment wins: a close beats an arc, an arc beats a row",
+      say("Landed.", [ROW_LANDED, ARC_LANDED])[0]?.message.includes("the arc's") && say("Landed.", [ARC_LANDED, SUCCESS])[0]?.message.includes("the workstream's"), JSON.stringify(say("Landed.", [ROW_LANDED, ARC_LANDED])));
+    const readFile = join(BASE, "read-turn.jsonl");
+    writeFileSync(readFile, [entry("user", "what does close print?"), entry("assistant", [{ type: "tool_use", id: "r1", name: "Read", input: { file_path: "x" } }]),
+      entry("user", [{ type: "tool_result", tool_use_id: "r1", content: `${SUCCESS}\n${ARC_LANDED}\n${ROW_LANDED}` }])].join("\n") + "\n");
+    check("[MKT.HOOKS.475] the same text in a Read's result owes nothing", say("It prints that line.", stopModule.toolResultsOf(readFile)).length === 0, JSON.stringify(stopModule.toolResultsOf(readFile)));
+    check("[MKT.HOOKS.476] a shape inside a fence, shown as a sample, is not read as the moment",
+      say(`Here is the shape:\n\n\`\`\`text\n${rowShape}\n\`\`\``, none).length === 0 && say(`Here is the shape:\n\n\`\`\`text\n${releaseShape}\n\`\`\``, none).length === 0);
+    check("[MKT.HOOKS.476] a reply that opens with a moment's heading is held to its shape whatever the results say",
+      say(releaseShape.replace("#### 🔭 What's next", "#### 🔭 Later"), none).length === 1 && say(arcShape, [SUCCESS]).length === 0);
+    // THE OPENING: the moment's heading passes `handover`'s opening check, a status heading and a table do not.
+    const ROOT = build("n011-opening");
+    const opened = stopModule.checkHandover(`${handoverShape}\n`, ROOT, new Set(), true);
+    check("[MKT.HOOKS.116] a reply that opens `## ✈️ Handing over` draws no `handover` opening finding",
+      !opened.some((one) => /opens with/.test(one.message)), JSON.stringify(opened));
+    check("[MKT.HOOKS.116] a `# Status` heading and a table still draw it",
+      stopModule.checkHandover("# Status\n\nOpen a new window to carry on.", ROOT, new Set())[0]?.message.includes("opens with a heading")
+        && stopModule.checkHandover("| a | b |\n| - | - |\n\nOpen a new window to carry on.", ROOT, new Set())[0]?.message.includes("opens with a table"));
+    check("[MKT.HOOKS.477] HANDOVER_COLUMN is exported", stopModule.HANDOVER_COLUMN === 14, String(stopModule.HANDOVER_COLUMN));
   }
 
   // A CARD IS NAMED WITH A CAPITAL (RULE.DEVEX.WORKSPACE.486).

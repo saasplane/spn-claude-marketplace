@@ -1,21 +1,17 @@
 #!/usr/bin/env node
-// Every PostToolUse check that reads what a Bash call changed under the branch, in one process.
+// Every PostToolUse check on a Bash call's result, in one process.
 //
 // A check RETURNS a `Verdict` and only a `note` counts here: a command that has already run cannot be
 // refused, so what a check says reaches the agent alone, as `additionalContext`. A check that throws
 // is skipped.
 
 import { readPayload, runAlone, type Payload, type Verdict } from "../lib/payload.ts";
-import { checkRebaseMoved } from "../checks/rebase-moved.ts";
-import { checkMergeTold } from "../checks/merge-told.ts";
 import { checkOutputSize } from "../checks/output-size.ts";
 import { begin, end, span, tagsOf, type SpanName } from "../../../../plugin-support-lib/src/lib/timing.ts";
 
 type Check = { name: SpanName; run: (payload: Payload) => Verdict };
 
 const CHECKS: Check[] = [
-  { name: { group: "rebase-moved", action: "rebase-moved" }, run: checkRebaseMoved },
-  { name: { group: "merge-told", action: "merge-told" }, run: checkMergeTold },
   { name: { group: "output-size", action: "output-size" }, run: checkOutputSize },
 ];
 

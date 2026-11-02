@@ -7,11 +7,11 @@ description: Author an estate node - locate it, write the choices a person actua
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
-      "seen": "67376a1f"
+      "seen": "2fce1268"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/04-develop.md",
-      "seen": "dc4a1be7"
+      "seen": "4cd4f421"
     }
   ]
 }

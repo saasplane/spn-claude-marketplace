@@ -27,6 +27,8 @@ const arcState = (arc, subject) => JSON.stringify({ arc, subject });
 const files = {
   [`${DEVEX}/${WORKSTREAMS}/open/${THIS}/${ARCS}/N011/state.json`]: arcState("N011", "artifacts-by-domain"),
   [`${DEVEX}/${WORKSTREAMS}/open/${THIS}/${ARCS}/N012/state.json`]: arcState("N012", "session-names"),
+  [`${DEVEX}/${WORKSTREAMS}/open/${THIS}/${ARCS}/ideate/state.json`]: arcState("ideate", "shaping-the-subject"),
+  [`${DEVEX}/${WORKSTREAMS}/open/${THIS}/${ARCS}/follow-ups/state.json`]: arcState("follow-ups", "loose-ends"),
   [`${DEVEX}/${WORKSTREAMS}/backlog/${NEXT}/${ARCS}/N011/state.json`]: arcState("N011", "same-number"),
   // The old layout: an arc as a file. It names no subject, so the workstream form is given.
   [`${DEVEX}/${WORKSTREAMS}/closed/${DONE}/${ARCS}/N119-fresh-window.md`]: "# the arc\n\nStatus: **RUNNING**\n",
@@ -120,6 +122,12 @@ console.log("\n=== prompt");
     sessionName(bare("099 · N011 — row 1"), root), null);
   same("[MKT.HOOKS.49] the reload form written with numbers: the window takes the first-named workstream",
     sessionName(handover("open workstream 021; 020 N011 waits on it"), root), { name: NEXT, form: "workstream" });
+
+  // The two role arcs, by name.
+  same("[MKT.HOOKS.488] a `continue:` line that reads `<ws> · ideate` names the workstream's session and carries the arc's subject",
+    sessionName(handover(`${THIS} · ideate`), root), { name: "020-ideate shaping-the-subject", form: "arc" });
+  same("[MKT.HOOKS.488] a `continue:` line that reads `<ws>/follow-ups` does the same",
+    sessionName(handover(`${THIS}/follow-ups`), root), { name: "020-follow-ups loose-ends", form: "arc" });
 
   // KNOWN-BAD — a handover with no arc to start on gives the workstream form, never an arc form.
   same("[MKT.HOOKS.49] an arc with no file in the workstream's arcs/ gives the workstream form",

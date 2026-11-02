@@ -2,11 +2,11 @@
 //           RULE.DEVEX.WORKSPACE.488, a suggestion belongs to an arc, as a card does, and the arc's sheet cites it
 // The chapter is the source of truth; a rule change is edited there first, then here, in the same change.
 //
-//   spn-devex workstream row add <workstream>/N<nnn> "<title>" --repo <repo> --work <work> [--kind change] [--state ready] …
-//   spn-devex workstream row state <workstream>/N<nnn> <row> <state> [--on "<what it waits on>"] [--note "…"] [--run <name>]
-//   spn-devex workstream row note <workstream>/N<nnn> <row> "<text>"
-//   spn-devex workstream row edit <workstream>/N<nnn> <row> [--title …] [--kind …] [--repo …] [--work …] …
-//   spn-devex workstream row discard <workstream>/N<nnn> <row> --note "<the developer's words>"
+//   spn-devex workstream row add <workstream>/<arc> "<title>" --repo <repo> --work <work> [--kind change] [--state ready] …
+//   spn-devex workstream row state <workstream>/<arc> <row> <state> [--on "<what it waits on>"] [--note "…"] [--run <name>]
+//   spn-devex workstream row note <workstream>/<arc> <row> "<text>"
+//   spn-devex workstream row edit <workstream>/<arc> <row> [--title …] [--kind …] [--repo …] [--work …] …
+//   spn-devex workstream row discard <workstream>/<arc> <row> --note "<the developer's words>"
 //
 // One command per target: a positional word is the target and its one value, an option is named, and a required option left out is
 // refused (RULE.DEVEX.WORKSPACE.321). An arc's fields are `arc edit`'s. `row write` is retired and refuses, naming the command that fits.
@@ -84,7 +84,7 @@ function arcOf(ref: string | undefined): { ws: string; arc: string; data: ArcDat
 
 /** The row an existing-row command acts on, or a refusal that names `row add`. */
 function rowOf(ref: string | undefined, rowId: string | undefined): { ws: string; arc: string; data: ArcData; row: ArcRow } {
-  if (!rowId) throw new UsageFault("takes an arc and a row, as `<workstream>/N<nnn> <row>`.");
+  if (!rowId) throw new UsageFault("takes an arc and a row, as `<workstream>/<arc> <row>`.");
   const { ws, arc, data } = arcOf(ref);
   if (!ROW_ID.test(rowId)) throw new UsageFault(`reads \`${rowId}\` as no row id — a row is \`57\`, \`57b\` or \`3e.1\`.`);
   const row = data.rows.find((one) => one.id === rowId);
@@ -107,22 +107,22 @@ function mayStart(arc: string, data: ArcData, rowId: string, state: string | nul
 }
 
 /** The one line a row command ends on, then what the write left to say. */
-function finish(ws: string, arc: string, data: ArcData, before: ReturnType<typeof arcSignatures>, statusBefore: string, said: string[]): number {
+function finish(ws: string, arc: string, data: ArcData, before: ReturnType<typeof arcSignatures>, statusBefore: string, said: string[], last: string[] = []): number {
   const statusAfter = arcStatus(data);
   if (statusAfter !== statusBefore) said.push(`${arc} reads ${statusAfter}`);
   const refreshed = refreshIfMoved(ws, before);
   const { done, total } = doneOf(data);
-  console.log(`ok · ${arc} ${done}/${total} · ${[...said, ...refreshed.said].join(" · ")}`);
+  console.log(`ok · ${arc} ${done}/${total} · ${[...said, ...refreshed.said, ...last].join(" · ")}`);
   for (const line of [...refreshed.lines, ...afterWrite(ws)]) console.log(line);
   for (const line of stepRowFindings(data)) console.log(`note: ${line}`);
   return 0;
 }
 
 function add(args: string[]): number {
-  refuseFlags(args, ARC_FLAGS, (name) => `does not take \`--${name}\`: it is the arc's — \`arc edit <workstream>/N<nnn> --${name} …\` changes it.`);
+  refuseFlags(args, ARC_FLAGS, (name) => `does not take \`--${name}\`: it is the arc's — \`arc edit <workstream>/<arc> --${name} …\` changes it.`);
   const words = readWords(args, ADD_OPTIONS);
   const [ref, title, ...more] = words.paths;
-  if (!title || more.length) throw new UsageFault("takes an arc and one title: `row add <workstream>/N<nnn> \"<title>\" --repo <repo> --work <work>`.");
+  if (!title || more.length) throw new UsageFault("takes an arc and one title: `row add <workstream>/<arc> \"<title>\" --repo <repo> --work <work>`.");
   for (const need of ["repo", "work"] as const)
     if (!words.value(need)?.trim()) throw new UsageFault(`adds a row with \`--repo\` and \`--work\`: \`--${need}\` is missing, and a step says where it lands and what work (RULE.DEVEX.WORKSPACE.183).`);
   const place = placeOf(words);
@@ -152,7 +152,7 @@ function add(args: string[]): number {
 function state(args: string[]): number {
   const words = readWords(args, { note: VALUE, run: VALUE, on: VALUE });
   const [ref, rowId, next, ...more] = words.paths;
-  if (!rowId || !next || more.length) throw new UsageFault(`takes an arc, a row and the state: \`row state <workstream>/N<nnn> <row> <state>\`, one of ${ROW_STATES.join(" · ")}.`);
+  if (!rowId || !next || more.length) throw new UsageFault(`takes an arc, a row and the state: \`row state <workstream>/<arc> <row> <state>\`, one of ${ROW_STATES.join(" · ")}.`);
   if (!(ROW_STATES as readonly string[]).includes(next)) throw new UsageFault(`takes a state from ${ROW_STATES.join(" · ")}, and \`${next}\` is none of them.`);
   // `--on` says what a waiting row waits on outside the window (RULE.DEVEX.WORKSPACE.469); no other state takes it.
   const on = words.value("on");
@@ -182,22 +182,22 @@ function state(args: string[]): number {
   const waited = next === "waiting" && on !== null ? ` · waiting on ${on.trim()}` : "";
   typed(() => writeArc(ws, data));
   logEvent(ws, arc, next, rowId, `${words.value("note") ?? `${was} → ${next}${next === "landed" && run ? ` · run ${run}` : ""}`}${waited}`);
-  return finish(ws, arc, data, before, statusBefore, [`row ${rowId} · state`]);
+  return finish(ws, arc, data, before, statusBefore, [`row ${rowId} · state`], next === "landed" ? [`${arc} ${rowId} landed`] : []);
 }
 
 function note(args: string[]): number {
   const words = readWords(args);
   const [ref, rowId, text, ...more] = words.paths;
-  if (!rowId || !text?.trim() || more.length) throw new UsageFault("takes an arc, a row and the words: `row note <workstream>/N<nnn> <row> \"<text>\"`.");
+  if (!rowId || !text?.trim() || more.length) throw new UsageFault("takes an arc, a row and the words: `row note <workstream>/<arc> <row> \"<text>\"`.");
   const { ws, arc, data } = rowOf(ref, rowId);
   logEvent(ws, arc, "note", rowId, text);
   return finish(ws, arc, data, arcSignatures(ws), arcStatus(data), [`row ${rowId} · log line written`]);
 }
 
 function edit(args: string[]): number {
-  refuseFlags(args, ARC_FLAGS, (name) => `does not take \`--${name}\`: it is the arc's — \`arc edit <workstream>/N<nnn> --${name} …\` changes it.`);
-  refuseFlags(args, ["state"], () => "does not take `--state`: a row's state moves with `row state <workstream>/N<nnn> <row> <state>`.");
-  refuseFlags(args, ["note"], () => "does not take `--note`: a line on a row's log is `row note <workstream>/N<nnn> <row> \"<text>\"`.");
+  refuseFlags(args, ARC_FLAGS, (name) => `does not take \`--${name}\`: it is the arc's — \`arc edit <workstream>/<arc> --${name} …\` changes it.`);
+  refuseFlags(args, ["state"], () => "does not take `--state`: a row's state moves with `row state <workstream>/<arc> <row> <state>`.");
+  refuseFlags(args, ["note"], () => "does not take `--note`: a line on a row's log is `row note <workstream>/<arc> <row> \"<text>\"`.");
   const words = readWords(args, EDIT_OPTIONS);
   const [ref, rowId, ...more] = words.paths;
   if (more.length) throw new UsageFault("takes an arc and one row.");
@@ -230,7 +230,7 @@ function write(args: string[]): number {
   const [ref, rowId] = words.paths;
   const given = Object.keys(RETIRED).filter((name) => words.given(name));
   const flags = (names: string[]): string => names.map((name) => `--${name}${RETIRED[name as keyof typeof RETIRED] === FLAG ? "" : " …"}`).join(" ");
-  const arcRef = ref ?? "<workstream>/N<nnn>";
+  const arcRef = ref ?? "<workstream>/<arc>";
   let fits: string;
   if (rowId === undefined) fits = `arc edit ${arcRef} ${flags(given)}`;
   else {
@@ -251,7 +251,7 @@ const DISCARDABLE = new Set(["waiting", "ready", "deferred"]);
 function discard(args: string[]): number {
   const words = readWords(args, { note: VALUE });
   const [ref, rowId, ...more] = words.paths;
-  if (!rowId || more.length) throw new UsageFault("takes an arc and one row: `row discard <workstream>/N<nnn> <row> --note \"…\"`.");
+  if (!rowId || more.length) throw new UsageFault("takes an arc and one row: `row discard <workstream>/<arc> <row> --note \"…\"`.");
   const note = words.value("note");
   if (!note?.trim()) throw new UsageFault(`discards row ${rowId} with \`--note\` carrying the developer's words, so nobody raises it again.`);
   const { ws, arc } = arcNamed(ref, true);
@@ -284,32 +284,32 @@ function discard(args: string[]): number {
 export const actions: Record<string, Action> = {
   add: {
     describe: "add a row to an arc, taking the arc's next number and printing it",
-    usage: "<workstream>/N<nnn> \"<title>\" --repo <repo> --work <work> [--kind change] [--state ready] [--blocked-by …] [--touches …] [--entries E1,E2] [--position …] [--model …] [--note …]",
+    usage: "<workstream>/<arc> \"<title>\" --repo <repo> --work <work> [--kind change] [--state ready] [--blocked-by …] [--touches …] [--entries E1,E2] [--position …] [--model …] [--note …]",
     run: add,
   },
   state: {
     describe: "move a row to a state; --on names what a waiting row waits on outside the window, --note carries the words beside the move, and --run names the run a CODE or PROOF row of a sheet arc lands on",
-    usage: "<workstream>/N<nnn> <row> <state> [--on \"<what it waits on>\"] [--note …] [--run <name>]",
+    usage: "<workstream>/<arc> <row> <state> [--on \"<what it waits on>\"] [--note …] [--run <name>]",
     run: state,
   },
   note: {
     describe: "write one line on a row's log, and change nothing else",
-    usage: "<workstream>/N<nnn> <row> \"<text>\"",
+    usage: "<workstream>/<arc> <row> \"<text>\"",
     run: note,
   },
   edit: {
     describe: "change the fields of a row the arc holds; --proof names a carried row's successor; a row it lacks is refused, and `row add` is named",
-    usage: "<workstream>/N<nnn> <row> [--title …] [--kind …] [--repo …] [--work …] [--model …] [--blocked-by …] [--touches …] [--entries E1,E2] [--position …] [--proof …]",
+    usage: "<workstream>/<arc> <row> [--title …] [--kind …] [--repo …] [--work …] [--model …] [--blocked-by …] [--touches …] [--entries E1,E2] [--position …] [--proof …]",
     run: edit,
   },
   discard: {
     describe: "take a row found invalid or not needed out of the arc; --note carries the developer's words into its one log line",
-    usage: "<workstream>/N<nnn> <row> --note \"…\"",
+    usage: "<workstream>/<arc> <row> --note \"…\"",
     run: discard,
   },
   write: {
     describe: "retired: refuses, and names the command that fits what it was typed with",
-    usage: "<workstream>/N<nnn> [<row>] …",
+    usage: "<workstream>/<arc> [<row>] …",
     hidden: true,
     run: write,
   },

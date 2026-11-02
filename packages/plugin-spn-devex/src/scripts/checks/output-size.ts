@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+// RESTATES: spn-foundation docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md § The four token levers (a command's output)
 // A command whose output passed 10 KB is answered with the narrowed form to use next time. A call that has
 // already run cannot be refused, so this is a note for the agent alone, after the first overrun.
 

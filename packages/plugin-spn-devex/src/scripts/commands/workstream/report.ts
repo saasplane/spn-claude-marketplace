@@ -3,7 +3,13 @@
 //           RULE.DEVEX.WORKSPACE.488, a suggestion belongs to an arc, as a card does, and the arc's sheet cites it
 // The chapter is the source of truth; a rule change is edited there first, then here, in the same change.
 //
-//   spn-devex workstream report write [<workstream>] <notes/N<nnn>/orders/<row>.report.md>
+//   spn-devex workstream report write [<workstream>] <notes/<arc>/orders/<row>.report.md>
+//   spn-devex workstream report write <workstream>/<arc> <part-id> [--run <name>]
+//
+// The second form has no report file: it writes `<part-id>.report.md` itself and folds it. `go` and `part` come from the plan, `commits`
+// from the part's repository commits made since the part's `go start` (else since its brief was written) in the worktree the brief names,
+// `proof` from the named run, `outcome: landed` when that run is green and `stopped` when it is not, and `followUps` and `unnamed` are empty.
+// A helper's own report file, saved to return `needs-you`, a follow-up or an `unnamed:` list, is folded as the first form does.
 //
 // Folds a child's hand-back into its row from the report's front matter alone: the outcome as the
 // row's state, the proof, the commits and each follow-up as a new row. The cost is never read from the report: it is
@@ -14,19 +20,22 @@
 // A row it lands or leaves is printed with its split of change, proof, managing and refusals; every fault that
 // keeps a row is named at once. It ends with the next step.
 
-import { existsSync, readFileSync } from "node:fs";
+import { execFileSync } from "node:child_process";
+import { existsSync, readFileSync, statSync } from "node:fs";
 import { basename, join, resolve } from "node:path";
-import { type Action, UsageFault, readWords } from "../../../../../plugin-support-lib/src/lib/command.ts";
+import { type Action, UsageFault, VALUE, readWords } from "../../../../../plugin-support-lib/src/lib/command.ts";
 import { frontMatter } from "../../lib/front-matter.ts";
 import { readGo } from "../../lib/go-plan.ts";
-import { doneOf, landingFault, logEvent, suggestionLandingFault, notesDirOf, readArc, readQuestions, readyRows, workspaceOf, writeArc } from "../../lib/workstream.ts";
+import { doneOf, landingFault, logEvent, logFileOf, suggestionLandingFault, notesDirOf, readArc, readJsonl, readQuestions, readyRows, workspaceOf, writeArc, writeWhole } from "../../lib/workstream.ts";
 import { OUTCOMES, ROW_ID, type ArcRow, type Cost, type GoPart, type GoPlan } from "../../lib/workstream-schema.ts";
-import { afterWrite, arcSignatures, refreshIfMoved, typed, workstreamNamed } from "./_shared.ts";
+import { afterWrite, arcNamed, arcSignatures, refreshIfMoved, typed, workstreamNamed } from "./_shared.ts";
+import { namedRun, worst } from "../../../../../plugin-support-lib/src/lib/runs.ts";
 import { logFiles, telemetryFolder } from "../../../../../plugin-support-lib/src/lib/debug-store.ts";
 import { USAGE_LOG } from "../../lib/usage.ts";
 import { isFullRun, nextStep, renameGo, save } from "./go.ts";
 import { renameFirstRead } from "./sheet.ts";
 import { readSplit } from "../debug/cost.ts";
+import { refusalsOf } from "./close.ts";
 
 export const describe = "a child's hand-back, folded into its row from the report's front matter";
 
@@ -63,7 +72,10 @@ function splitLine(ws: string, arc: string, rowId: string): string | null {
     const root = workspaceOf(ws);
     if (!root) return null;
     const found = readSplit(root, `${basename(ws)}/${arc}`).find((one) => one.key === `${arc} · row ${rowId}`);
-    const share = (kind: "change" | "proof" | "managing" | "refusals"): string => `${kind} ${found ? `${found[kind].calls} · ${found[kind].minutes}m` : "0 · 0m"}`;
+    const share = (kind: "change" | "proof" | "managing" | "refusals"): string => {
+      const one = found ? (kind === "refusals" ? refusalsOf(found) : found[kind]) : null;
+      return `${kind} ${one ? `${one.calls} · ${one.minutes}m` : "0 · 0m"}`;
+    };
     return `row ${rowId} split: ${(["change", "proof", "managing", "refusals"] as const).map(share).join(" · ")}`;
   } catch { return null; }
 }
@@ -78,7 +90,10 @@ export function unnamedOf(matter: Record<string, unknown>): string[] {
 /** Folds a part's report: the part lands, and so does each step whose entries all sit in landed parts. */
 function foldPart(ws: string, lead: string, plan: GoPlan, part: GoPart, outcome: string, matter: Record<string, unknown>): number {
   const signatures = arcSignatures(ws);
-  const parts = plan.parts.map((one) => (one.id === part.id ? { ...one, state: outcome === "landed" ? "landed" as const : "ready" as const } : one));
+  // The part's measured cost, from the same usage rows a row's cost is read from, goes onto the part as it lands (MKT.SCRIPTS.454).
+  const cost = outcome === "landed" ? measuredCost(ws, lead, part.id) : null;
+  const parts = plan.parts.map((one) => (one.id === part.id
+    ? { ...one, state: outcome === "landed" ? "landed" as const : "ready" as const, ...(cost ? { cost } : {}) } : one));
   const next: GoPlan = { ...plan, parts };
   save(ws, lead, next);
   logEvent(ws, lead, "go", null, `${part.id} ${outcome}`);
@@ -122,15 +137,60 @@ function foldPart(ws: string, lead: string, plan: GoPlan, part: GoPart, outcome:
   return 0;
 }
 
+/** The commits a part's repository took since the part started, in the worktree its brief names: from its `go start` line, else from when its brief was written. */
+function commitsSince(ws: string, lead: string, part: GoPart, root: string): string[] {
+  const dir = join(root, ".worktrees", basename(ws), part.repo);
+  if (!existsSync(dir)) return [];
+  const started = readJsonl(logFileOf(ws, lead)).map((line) => line as { at?: string; kind?: string; note?: string } | undefined)
+    .filter((one) => one?.kind === "go" && one.note === `${part.id} started` && typeof one.at === "string").map((one) => one!.at as string).at(-1);
+  let since = started;
+  if (!since) { try { since = statSync(join(notesDirOf(ws, lead), "orders", `${part.id}.md`)).mtime.toISOString(); } catch { return []; } }
+  try {
+    return execFileSync("git", ["-C", dir, "log", `--since=${since}`, "--format=%H", "--reverse"], { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).split("\n").filter(Boolean);
+  } catch { return []; }
+}
+
+/**
+ * The report a part's `--run` writes for it where the helper saved none: the plan's go and part, the commits since the part started, the proof from the
+ * named run, `landed` when that run is all green and `stopped` when it is not. A part that names no run and owes no test lands on its commits.
+ */
+function composedReport(ws: string, lead: string, plan: GoPlan, part: GoPart, run: string | null): string {
+  const root = workspaceOf(ws) ?? process.cwd();
+  const commits = commitsSince(ws, lead, part, root);
+  let green = false;
+  let proof = "no run named";
+  if (run) {
+    const results = namedRun(join(root, ".worktrees", basename(ws), part.repo), run).runs.flatMap((one) => one.results);
+    green = results.length > 0 && worst(results.map((result) => result.status)) === "SUCCESS";
+    proof = results.length ? `run ${run} · ${results.length} ids · ${green ? "SUCCESS" : "not all SUCCESS"}` : `run ${run} is in no run file of ${part.repo}`;
+  } else green = part.tests.length === 0;
+  return ["---", `go: "${plan.lead}"`, `part: "${part.id}"`, `outcome: ${green ? "landed" : "stopped"}`, `proof: ${JSON.stringify(proof)}`,
+    ...(run ? [`run: ${JSON.stringify(run)}`] : []),
+    `commits: { ${commits.length ? `${part.repo}: [${commits.map((sha) => `"${sha}"`).join(", ")}]` : ""} }`, "followUps: []", "unnamed: []", "---", ""].join("\n");
+}
+
 function write(args: string[]): number {
-  const words = readWords(args);
+  const words = readWords(args, { run: VALUE });
   const [first, second, ...more] = words.paths;
-  if (more.length || !first) throw new UsageFault("takes a report, after its workstream where it is named from there.");
-  const ws0 = second ? workstreamNamed(first) : null;
-  const path = second ? (existsSync(resolve(second)) ? resolve(second) : join(ws0!, second)) : resolve(first);
+  if (more.length || !first) throw new UsageFault("takes a report, after its workstream where it is named from there, or an arc and a part: `report write <workstream>/<arc> <part-id> [--run <name>]`.");
+  // THE SECOND FORM NAMES A PART, NOT A FILE: with no report saved for it, the report is written here and folded.
+  const byPart = !!second && !second.endsWith(".md") && !existsSync(resolve(second));
+  let path: string;
+  if (byPart) {
+    const { ws, arc } = arcNamed(first);
+    renameGo(ws, arc);
+    const plan = typed(() => readGo(ws, arc));
+    const part = plan?.parts.find((one) => one.id === second);
+    if (!plan || !part) throw new UsageFault(`finds no part ${second} in ${arc}'s plan.`);
+    path = join(notesDirOf(ws, arc), "orders", `${part.id}.report.md`);
+    if (!existsSync(path)) writeWhole(path, composedReport(ws, arc, plan, part, words.value("run") ?? null));
+  } else {
+    const ws0 = second ? workstreamNamed(first) : null;
+    path = second ? (existsSync(resolve(second)) ? resolve(second) : join(ws0!, second)) : resolve(first);
+  }
   if (!existsSync(path)) throw new UsageFault(`finds no report at \`${second ?? first}\`.`);
-  const placed = /^(.*)\/notes\/(N\d+[a-z]?)\/orders\/([^/]+)\.report\.md$/.exec(path.split("\\").join("/"));
-  if (!placed) throw new UsageFault("reads a report at `notes/N<nnn>/orders/<row>.report.md`.");
+  const placed = /^(.*)\/notes\/(N\d+[a-z]?|ideate|follow-ups)\/orders\/([^/]+)\.report\.md$/.exec(path.split("\\").join("/"));
+  if (!placed) throw new UsageFault("reads a report at `notes/<arc>/orders/<row>.report.md`, the arc being `N<nnn>`, `ideate` or `follow-ups`.");
   const [, ws, arc, named] = placed;
   renameFirstRead(ws, arc);
   renameGo(ws, arc);
@@ -199,5 +259,5 @@ function write(args: string[]): number {
 }
 
 export const actions: Record<string, Action> = {
-  write: { describe: "fold a child's report into its row: state, proof, commits, follow-ups", usage: "[<workstream>] <report.md>", run: write },
+  write: { describe: "fold a child's report into its row: state, proof, commits, follow-ups; with an arc and a part id and no report file it writes the report itself from the plan, the commits since the part started and the named run", usage: "[<workstream>] <report.md> | <workstream>/<arc> <part-id> [--run <name>]", run: write },
 };

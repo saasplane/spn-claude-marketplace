@@ -3,7 +3,7 @@
      This file holds the structure of a preview page and states no rule: the rail, the masthead, the
      Overview as plain paragraphs, then Today, Proposed and Where it lands, each with its subsections, the slots
      an author fills, and the two lines that load the shared stylesheet and script. An arc has one preview, at
-     notes/N<nnn>/preview.html. Every question is a whole card on the approach page, in Open, and the card links
+     notes/<arc>/preview.html. Every question is a whole card on the approach page, in Open, and the card links
      the preview that shows its options. A preview may show the questions it raises in its own Open, which is the
      generated open block, rendered from the same record as the approach page's card, so a question card always
      looks the same; the question is answered on the approach page, the answer takes the card off both pages, and
@@ -13,7 +13,7 @@
      links a real file in the samples folder. The masthead's Progress fact (a short bar and `N of M landed`) is written
      by the arc's commands, never by hand, and is left out while the arc has no sheet. -->
 <meta charset="utf-8">
-<title>{{NNN}} · N{{nnn}} - {{THE ARC'S SUBJECT, IN TITLE CASE}}</title>
+<title>{{NNN}} · {{arc}} - {{THE ARC'S SUBJECT, IN TITLE CASE}}</title>
 <!-- spn:doc
 {"id": "ws-{{NNN}}-{{slug}}-{{preview-slug}}", "variant": "preview", "title": "{{THE PREVIEW NAME}}", "lenses": ["{{LENS}}"], "status": "PLANNING", "summary": "{{The Description's first sentence, word for word.}}", "keywords": ["{{…}}"]}
 -->
@@ -23,13 +23,13 @@
 <div class="sds-page">
 
 <nav class="sds-rail" id="rail">
-  <a class="sds-home" href="../../approach.html#N{{nnn}}-what">&larr; {{NNN}} - {{TITLE}}</a>
+  <a class="sds-home" href="../../approach.html#{{arc}}-what">&larr; {{NNN}} - {{TITLE}}</a>
   <div class="sds-rail-title">{{THE PREVIEW NAME}}</div>
 </nav>
 <div class="sds-wrap">
 
 <header class="sds-masthead">
-  <div class="sds-eyebrow"><span class="sds-line1">{{WORKSPACE}} &nbsp;|&nbsp; Workstream {{NNN}} &nbsp;|&nbsp; {{THE PREVIEW NAME}}</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Preview</span><span class="sds-separator">|</span><span class="sds-label">Arc:</span> <a class="sds-badge" href="../../approach.html#N{{nnn}}">N{{nnn}}</a><span class="sds-separator">|</span><span class="sds-label">Progress:</span> <span class="sds-progress sds-step-{{step}}"><span class="sds-chip-bar"><i style="width:{{pct}}%"></i></span> {{done}} of {{total}} landed</span><span class="sds-separator">|</span><span class="sds-label">Shown:</span> <span class="sds-badge">{{date}}</span><span class="sds-state"><span class="sds-label">Status:</span> <a class="sds-badge sds-status sds-{{arc status}}" href="../../approach.html#N{{nnn}}">{{THE ARC'S STATUS}}</a></span></span></div>
+  <div class="sds-eyebrow"><span class="sds-line1">{{WORKSPACE}} &nbsp;|&nbsp; Workstream {{NNN}} &nbsp;|&nbsp; {{THE PREVIEW NAME}}</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Preview</span><span class="sds-separator">|</span><span class="sds-label">Arc:</span> <a class="sds-badge" href="../../approach.html#{{arc}}">N{{nnn}}</a><span class="sds-separator">|</span><span class="sds-label">Progress:</span> <span class="sds-progress sds-step-{{step}}"><span class="sds-chip-bar"><i style="width:{{pct}}%"></i></span> {{done}} of {{total}} landed</span><span class="sds-separator">|</span><span class="sds-label">Shown:</span> <span class="sds-badge">{{date}}</span><span class="sds-state"><span class="sds-label">Status:</span> <a class="sds-badge sds-status sds-{{arc status}}" href="../../approach.html#{{arc}}">{{THE ARC'S STATUS}}</a></span></span></div>
   <h1>{{THE PREVIEW NAME}}</h1>
   <p class="sds-subtitle">{{THE SUBTITLE: what you are asked to decide from this page, one plain sentence.}}</p>
   <p class="sds-standfirst">{{THE DESCRIPTION, one paragraph: what this page shows, why you would look at it, and how the page runs.}}</p>
@@ -224,7 +224,7 @@
   <div class="sds-scroll"><table>
     <thead><tr><th>{{Each tier, and the tests that prove it}}</th></tr></thead>
     <tbody>
-      <tr><td><p><strong>{{Unit, repository}}</strong></p><ul><li><code>{{test file}}</code>: {{what it shows}}</li></ul><span class="sds-small">{{New cases: red first on the unchanged code}}</span></td></tr>
+      <tr><td><p><strong>{{Unit, repository}}</strong></p><ul><li><code>{{test file}}</code>: {{what it shows}}</li></ul><span class="sds-small">{{New cases: each fails once on the base before the patches apply, then the full run}}</span></td></tr>
       <tr><td><p><strong>{{Contract, integration, journey}}</strong></p><p>{{The tests, or None and why.}}</p><span class="sds-small">Owed: {{what is owed}}</span></td></tr>
     </tbody>
   </table></div>

@@ -31,10 +31,10 @@
        <div class="sds-note">
          <p>🚀 <strong>{{NNN}} {{TITLE}} has shipped.</strong> {{one line of measured numbers}}</p>
          <p>&nbsp;</p>
-         <p><strong>📦 What was delivered</strong></p>
+         <p><strong>📦 What we delivered</strong></p>
          <ul><li>{{one bullet for each distinct thing}}</li></ul>
          <p>&nbsp;</p>
-         <p><strong>🧠 What was learned</strong></p>
+         <p><strong>🧠 What we learned</strong></p>
          <ul><li>{{one bullet for each distinct thing}}</li></ul>
          <p>&nbsp;</p>
          <p><strong>Thank you 👍</strong></p>
@@ -65,6 +65,10 @@
   <p class="sds-standfirst">{{The decision in one line. Nothing outside these domains changes.}}</p>
   <h3 id="d1">{{Domain &mdash; e.g. DevEx &middot; Workspace}}</h3>
   <p class="sds-standfirst">{{What the heading would have said, as one sentence: the statement this subsection makes.}}</p>
+  <h4 id="ideate-what">{{The ideate arc's title}}</h4>
+  <p class="sds-standfirst">{{What the heading would have said, as one sentence: the statement this subsection makes.}}</p>
+  <p>{{The ideate arc's goal, as the write puts it: the shape proposed and the build arcs it opens}}</p>
+  <p>Read the preview &rarr; <a href="notes/ideate/preview.html">{{preview name}}</a></p>
   <h4 id="N001-what">{{The arc's title}}</h4>
   <p class="sds-standfirst">{{What the heading would have said, as one sentence: the statement this subsection makes.}}</p>
   <p>{{The arc's goal, as the write puts it}}</p>
@@ -75,6 +79,10 @@
   <p>{{The arc's goal, as the write puts it}}</p>
   <p>{{&hellip;}}</p>
   <p>Read the preview &rarr; <a href="notes/N002/preview.html">{{preview name}}</a></p>
+  <h4 id="follow-ups-what">{{The follow-up arc's title}}</h4>
+  <p class="sds-standfirst">{{What the heading would have said, as one sentence: the statement this subsection makes.}}</p>
+  <p>{{The follow-up arc's goal, as the write puts it: what the build arcs leave open}}</p>
+  <p>Read the preview &rarr; <a href="notes/follow-ups/preview.html">{{preview name}}</a></p>
   <h3 id="d2">{{Domain &mdash; proposed, if it does not exist yet}}</h3>
   <p class="sds-standfirst">{{What the heading would have said, as one sentence: the statement this subsection makes.}}</p>
   <p>{{&hellip;}}</p>
@@ -87,11 +95,11 @@
   <h3 id="h1">{{repository, or a place that is no repository}} &mdash; {{the kind of change}}</h3>
   <p class="sds-standfirst">{{What the heading would have said, as one sentence: the statement this subsection makes.}}</p>
   <p>{{What changes here, in a line or two. Ships: what is released, or nothing. The paths and what each file says live in the preview.}}</p>
-  <p><span class="sds-small">Arcs: N001 &middot; N002</span></p>
+  <p><span class="sds-small">Arcs: ideate &middot; N001 &middot; N002</span></p>
   <h3 id="h2">{{place}} &mdash; {{the kind of change}}</h3>
   <p class="sds-standfirst">{{What the heading would have said, as one sentence: the statement this subsection makes.}}</p>
   <p>{{&hellip; Ships: &hellip;}}</p>
-  <p><span class="sds-small">Arcs: N002</span></p>
+  <p><span class="sds-small">Arcs: N002 &middot; follow-ups</span></p>
 </section>
 
 <section id="arcs" data-block="sequence">
@@ -100,17 +108,21 @@
   <div class="sds-scroll"><table>
     <thead><tr><th>Arc</th><th class="sds-status-col">Status</th></tr></thead>
     <tbody>
+      <tr id="ideate" data-arc="arcs/ideate/state.json" data-arc-stamp="{{&hellip;}}"><td><p><strong>ideate &mdash; {{The ideate arc, first}}</strong></p><p>{{one line}}</p><span class="sds-small">Preview: <a href="notes/ideate/preview.html">preview.html</a></span></td><td><span class="sds-badge sds-status sds-landed">LANDED</span></td></tr>
       <tr id="N001" data-arc="arcs/N001/state.json" data-arc-stamp="{{the stamp `workstream arc stamp write` wrote}}"><td><p><strong>N001 &mdash; {{Arc, named for its domain}}</strong></p><p>{{one line}}</p><span class="sds-small">Preview: <a href="notes/N001/preview.html">preview.html</a> &middot; Sample: <a href="notes/N001/samples/{{file}}">{{file}}</a> &middot; {{for a wait, CARRIED and DROPPED, the developer's words or the reason as a fact}}</span></td><td><span class="sds-badge sds-status sds-proposed">PROPOSED</span></td></tr>
       <tr id="N002" data-arc="arcs/N002/state.json" data-arc-stamp="{{&hellip;}}"><td><p><strong>N002 &mdash; {{Arc}}</strong></p><p>{{&hellip;}}</p><span class="sds-small">Preview: <a href="notes/N002/preview.html">preview.html</a></span></td><td><span class="sds-badge sds-status sds-decided">DECIDED</span></td></tr>
+      <tr id="follow-ups" data-arc="arcs/follow-ups/state.json" data-arc-stamp="{{&hellip;}}"><td><p><strong>follow-ups &mdash; {{The follow-up arc, last}}</strong></p><p>{{one line}}</p><span class="sds-small">Preview: <a href="notes/follow-ups/preview.html">preview.html</a></span></td><td><span class="sds-badge sds-status sds-proposed">PROPOSED</span></td></tr>
     </tbody>
   </table></div>
   <!-- The badge class is the status word in lower case: sds-proposed, sds-decided, sds-running, sds-landed, sds-carried, sds-dropped.
-       Each row's id is the arc's number, so approach.html#N001 opens the arc; every link to an arc points there, never at its state.json.
-       The progress block holds the sticky card and nothing else: no overall line, bar or grid of tiles sits under this table. The card has one chip per arc from the arc's first row on, whatever its status, in the order the arcs run (done first, in the order they finished, then RUNNING, then DECIDED and PROPOSED by the arc's position); a chip's second and third classes are the status word, which colours its left stripe, and the progress step, sds-step-1 to sds-step-5 for 0-19 to 80-99 per cent of its steps landed and sds-step-done at 100, leaving out deferred, carried and replaced steps; an arc with no step yet shows its status word alone; the Overall section on the right counts the same steps, and carries the workstream's status word, which colours its left edge, and the step class too. -->
+       Each row's id is the arc's address, N<nnn>, ideate or follow-ups, so approach.html#N001 opens the arc; every link to an arc points there, never at its state.json.
+       The progress block holds the sticky card and nothing else: no overall line, bar or grid of tiles sits under this table. The card has one chip per arc from the arc's first row on, whatever its status, in the order the arcs run, ideate first and follow-ups last (done first, in the order they finished, then RUNNING, then DECIDED and PROPOSED by the arc's position); a chip's second and third classes are the status word, which colours its left stripe, and the progress step, sds-step-1 to sds-step-5 for 0-19 to 80-99 per cent of its steps landed and sds-step-done at 100, leaving out deferred, carried and replaced steps; an arc with no step yet shows its status word alone; the Overall section on the right counts the same steps, and carries the workstream's status word, which colours its left edge, and the step class too. -->
   <!-- spn:generated progress — do not edit inside these markers; `workstream progress write` writes it from the arcs -->
   <nav class="sds-footbar" aria-label="Workstream status">
     <div class="sds-footbar-chips">
-      <a class="sds-chip sds-running sds-step-3" href="#N001" aria-label="N001 {{subject as words}}, RUNNING, {{done}} of {{total}} steps landed"><span class="sds-chip-line"><span class="sds-chip-name"><span class="sds-mono">1</span><span class="sds-chip-subject"> &middot; {{subject as words}}</span></span><span class="sds-arc-count">{{done}}/{{total}}</span></span><span class="sds-chip-bar"><i style="width:{{share}}%"></i></span><span class="sds-tip"><span class="sds-badge sds-status sds-running">RUNNING</span><strong>{{the arc's full title}}</strong><span>{{done}} of {{total}} steps landed</span><span>{{the wait, or the reason for CARRIED and DROPPED}}</span></span></a>
+      <a class="sds-chip sds-landed sds-step-1" href="#ideate" aria-label="Ideate, LANDED"><span class="sds-chip-line"><span class="sds-chip-name">Ideate</span><span class="sds-arc-count">landed</span></span><span class="sds-chip-bar"><i style="width:0%"></i></span><span class="sds-tip"><span class="sds-badge sds-status sds-landed">LANDED</span><strong>{{the ideate arc's full title}}</strong></span></a>
+      <a class="sds-chip sds-running sds-step-3" href="#N001" aria-label="N001 {{the arc's title}}, RUNNING, {{done}} of {{total}} steps landed"><span class="sds-chip-line"><span class="sds-chip-name"><span class="sds-mono">1</span><span class="sds-chip-subject"> &middot; {{the arc's title}}</span></span><span class="sds-arc-count">{{done}}/{{total}}</span></span><span class="sds-chip-bar"><i style="width:{{share}}%"></i></span><span class="sds-tip"><span class="sds-badge sds-status sds-running">RUNNING</span><strong>{{the arc's full title}}</strong><span>{{done}} of {{total}} steps landed</span><span>{{the wait, or the reason for CARRIED and DROPPED}}</span></span></a>
+      <a class="sds-chip sds-proposed sds-step-1" href="#follow-ups" aria-label="Follow-ups, PROPOSED"><span class="sds-chip-line"><span class="sds-chip-name">Follow-ups</span><span class="sds-arc-count">proposed</span></span><span class="sds-chip-bar"><i style="width:0%"></i></span><span class="sds-tip"><span class="sds-badge sds-status sds-proposed">PROPOSED</span><strong>{{the follow-up arc's full title}}</strong></span></a>
     </div>
     <div class="sds-footbar-summary sds-implementing sds-step-3" tabindex="0" aria-label="Workstream IMPLEMENTING, {{done}} of {{total}} rows done, {{X}} of {{Y}} arcs closed">
       <span class="sds-chip-line"><span class="sds-chip-name">Overall</span><span class="sds-arc-count">{{done}}/{{total}}</span></span>

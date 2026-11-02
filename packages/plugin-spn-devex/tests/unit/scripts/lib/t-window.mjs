@@ -156,6 +156,12 @@ console.log("\n=== window — the arc a write records: a path inside its data or
   check("`report write` records the arc whose notes hold the report", wrote("report").join() === arcOf(B, "N002"), wrote("report").join());
   hook("pretooluse", { cwd: join(root, open(A)), session_id: "around", tool_name: "Bash", tool_input: { command: "spn-devex workstream fact write N001 --source spn-x/a.ts --fact \"a fact\"" } }, join(root, open(A)));
   check("a bare arc is read in the workstream the command stands in", wrote("around").join() === arcOf(A, "N001"), wrote("around").join());
+  pre(root, "role-data", { file_path: join(root, open(A), "arcs", "ideate", "log.jsonl"), content: "x" });
+  check("[MKT.SCRIPTS.485] a write to `arcs/ideate/log.jsonl` records the ideate arc by its data folder", wrote("role-data").join() === arcOf(A, "ideate"), wrote("role-data").join());
+  pre(root, "role-report", { command: `spn-devex workstream report write 001 notes/follow-ups/orders/1.report.md` });
+  check("[MKT.SCRIPTS.485] `report write` of `notes/follow-ups/orders/1.report.md` records the follow-up arc", wrote("role-report").join() === arcOf(A, "follow-ups"), wrote("role-report").join());
+  pre(root, "role-other", { file_path: join(root, open(A), "arcs", "other", "log.jsonl"), content: "x" });
+  check("[MKT.SCRIPTS.485] a path under `arcs/other/` records no arc", wrote("role-other").length === 0, wrote("role-other").join());
   pre(root, "reads", { command: "spn-devex workstream state check && spn-devex workstream rows show 002 --ready" });
   check("a command that only reads records nothing and binds nothing", wrote("reads").length === 0 && windowWorkstreams(root, "reads").length === 0);
   pre(root, "nowhere", { command: "spn-devex workstream arc edit N009 --note \"x\"" });

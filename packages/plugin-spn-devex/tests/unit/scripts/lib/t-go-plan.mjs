@@ -9,7 +9,7 @@ import { join, resolve } from "node:path";
 import { PLUGIN } from "../../../helpers/harness.mjs";
 
 const lib = resolve(PLUGIN, "src", "scripts", "lib");
-const { deriveGo, fullRunMinutes, readyParts, clearWaiting, markWaiting, ratesOf, boundOf, testFilesOf, entryHash, changedEntries, staleEntries } = await import(join(lib, "go-plan.ts"));
+const { deriveGo, fullRunMinutes, readyParts, clearWaiting, markWaiting, ratesOf, boundOf, testFilesOf, entryHash, changedEntries, staleEntries, proposeScopes, redCheckIds } = await import(join(lib, "go-plan.ts"));
 const { goFaults, entryWork } = await import(join(lib, "workstream-schema.ts"));
 
 let total = 0, failed = 0;
@@ -36,8 +36,8 @@ same("[MKT.SCRIPTS.300] the plan names its lead, its whole scope and when it was
 const waits = Object.fromEntries(plan.parts.map((p) => [p.id, p.waitsOn]));
 same("[MKT.SCRIPTS.300] a baseline waits on nothing and its code on it, a full run on the code, a repository's first pass on the docs before it", [waits["baseline-lib-repo"], waits["code-lib-repo-1"], waits["full-lib-repo"], waits["baseline-app-repo"]],
   [[], ["baseline-lib-repo"], ["code-lib-repo-1"], []]);
-same("[MKT.SCRIPTS.300] the release waits on every full run and generated part, and the models are sonnet or none", [waits["release-app-repo-1"], plan.parts.map((p) => p.model).filter((m, i, all) => all.indexOf(m) === i)],
-  [["full-lib-repo", "full-app-repo"], ["sonnet", "none"]]);
+same("[MKT.SCRIPTS.300] a release waits on its own repository's full run and the release before it in the chain, and the models are sonnet or none", [waits["release-app-repo-1"], plan.parts.map((p) => p.model).filter((m, i, all) => all.indexOf(m) === i)],
+  [["full-app-repo", "release-lib-repo-1"], ["sonnet", "none"]]);
 same("[MKT.SCRIPTS.300] a new plan is ready, never held", plan.parts.every((p) => p.state === "ready"), true);
 same("[MKT.SCRIPTS.300] a plan holds to its schema", goFaults(plan), []);
 const docsFirst = deriveGo([{ arc: "N009", sheet: sheet([entry("E1", "app-repo:docs/x.md"), entry("E2", "lib-repo:docs/c.md"), entry("E3", "app-repo:src/a.ts")]) }]);
@@ -219,9 +219,9 @@ same("[MKT.SCRIPTS.413] the signature follows the new order and the plan passes 
 // Two parts that edit one file never run together; a part waits for the parts that edit its sources.
 const same1 = entry("E1", "lib-repo:src/shared.ts"), same2 = entry("E2", "lib-repo:src/shared.ts"), apart = entry("E3", "lib-repo:src/apart.ts");
 const byOne = deriveGo([{ arc: "N009", sheet: sheet([same1, apart, same2]) }], { rates: { "lib-repo|CODE": 45 / 1 } });
-same("[MKT.SCRIPTS.414] two code parts that edit one file: the later waits on the earlier, and the one that edits another file does not",
-  Object.fromEntries(byOne.parts.filter((p) => p.id.startsWith("code-")).map((p) => [p.id, p.waitsOn.filter((id) => id.startsWith("code-"))])),
-  { "code-lib-repo-1": [], "code-lib-repo-2": [], "code-lib-repo-3": ["code-lib-repo-1"] });
+same("[MKT.SCRIPTS.447] one file's entries stay in one part though the bound is one entry, and the entry of another file has a part of its own",
+  Object.fromEntries(byOne.parts.filter((p) => p.id.startsWith("code-")).map((p) => [p.id, p.entries])),
+  { "code-lib-repo-1": ["N009/E1", "N009/E2"], "code-lib-repo-2": ["N009/E3"] });
 const gen = { ...entry("E4", "lib-repo:src/dist/rules.json"), work: "GENERATED", book: ["lib-repo:docs/book.md"] };
 const book = { ...entry("E5", "lib-repo:docs/book.md"), work: "DOCS" };
 const generated = deriveGo([{ arc: "N009", sheet: sheet([gen, book]) }]);
@@ -236,6 +236,118 @@ same("[MKT.SCRIPTS.416] a follow-up is one part with its entries of every kind, 
 const fuDocs = deriveGo([{ arc: "N009", sheet: sheet([entry("E1", "lib-repo:docs/a.md"), entry("E2", "lib-repo:docs/b.md")]) }], { followUp: true });
 same("[MKT.SCRIPTS.416] a follow-up of docs only has no full run", fuDocs.parts.map((p) => [p.id, p.entries.length]), [["docs-lib-repo-1", 2]]);
 same("[MKT.SCRIPTS.416] and both pass the schema", [goFaults(fu), goFaults(fuDocs)], [[], []]);
+
+// ---- Release 1: waits between arcs, releases, baselines and names
+const fe = (id, file, over = {}) => ({ ...entry(id, file), ...over });
+const rel = (p) => p.parts.filter((x) => x.work === "RELEASE").map((x) => [x.id, x.waitsOn]);
+const two = (dependsOn, n3 = true) => [
+  ...(n3 ? [{ arc: "N003", sheet: sheet([fe("E1", "sup:src/a.ts")], ["sup"]) }] : []),
+  { arc: "N004", sheet: { ...sheet([fe("E1", "plat:src/b.ts")], ["sup", "plat"]), dependsOn } },
+];
+const sib = [{ arc: "N003", sheet: sheet([fe("E1", "sup:src/a.ts")], ["sup"]) }];
+const dep = deriveGo(two(["N003 landed: its release of sup"]));
+same("[MKT.SCRIPTS.442] a dependsOn line naming an arc of the scope makes the code parts of the carrying sheet wait on the arc's release parts",
+  dep.parts.find((p) => p.id === "code-plat-1").waitsOn.includes("release-sup-1"), true);
+const depOut = deriveGo([two(["N003 landed: its release of sup"], false)[0]], { siblings: sib });
+const depFirst = depOut.parts.find((p) => p.id === "code-plat-1");
+same("[MKT.SCRIPTS.442] with the arc outside the scope the first part of the repository reads waiting on the arc's release of the repository",
+  [depFirst.state, depFirst.waitingOn], ["waiting", "N003's release of sup"]);
+const own = deriveGo([{ arc: "N003", sheet: sheet([fe("E1", "sup:src/a.ts"), fe("E2", "sup:src/gen/dist/x.js", { work: "GENERATED" })], ["sup", "plat"]) }, { arc: "N004", sheet: sheet([fe("E1", "plat:src/b.ts")], ["sup", "plat"]) }]);
+same("[MKT.SCRIPTS.443] a release waits on its own repository's full run and generated parts and on the release before it in the chain, and no other full run",
+  rel(own), [["release-sup-1", ["full-sup", "generated-sup-1"]], ["release-plat-1", ["full-plat", "release-sup-1"]]]);
+const loopPlan = deriveGo([{ arc: "N003", sheet: { ...sheet([fe("E1", "sup:src/a.ts")], ["sup"]), dependsOn: ["N004 needs plat"] } }, ...two(["N003 landed: its release of sup"], false)]);
+same("[MKT.SCRIPTS.443] a dependsOn wait that closes a circle through a release is returned with its parts", loopPlan.circles.some((c) => c.includes("release-sup-1") && c.includes("code-plat-1")), true);
+same("[MKT.SCRIPTS.443] and a plan with no circle returns none", own.circles, []);
+const fnd = deriveGo([{ arc: "N009", sheet: sheet([fe("E1", "lib-repo:docs/c.md"), fe("E2", "spn-foundation:docs/b.md"), fe("E3", "lib-repo:src/x.ts")]) }]);
+same("[MKT.SCRIPTS.444] the repository that holds the book comes first, though outside every release chain, and a copy waits on its docs",
+  [fnd.parts[0].id, fnd.parts.find((p) => p.id === "docs-lib-repo-1").waitsOn], ["docs-spn-foundation-1", ["docs-spn-foundation-1"]]);
+const rowsOf = (status) => ({ schemaVersion: 1, arc: "N009", status, rows: [{ id: "1", parent: "N009", repo: "lib-repo", work: "DOCS", entries: ["E3"], state: "ready" }] });
+const bs = (status) => deriveGo([{ arc: "N009", sheet: sheet([fe("E1", "lib-repo:src/x.ts"), fe("E3", "lib-repo:docs/c.md")]), data: rowsOf(status) }]).parts.find((p) => p.id === "baseline-lib-repo").waitsOn;
+same("[MKT.SCRIPTS.445] a baseline waits on the part holding a decided arc's DOCS row of its repository", bs("DECIDED"), ["docs-lib-repo-1"]);
+same("[MKT.SCRIPTS.445] and an undecided arc's DOCS row does not hold it", bs("OPEN"), []);
+const outDocs = deriveGo([{ arc: "N009", sheet: sheet([fe("E1", "lib-repo:src/x.ts")]) }], { siblings: [{ arc: "N003", sheet: sheet([fe("E1", "lib-repo:docs/z.md")]), data: { ...rowsOf("DECIDED"), arc: "N003", rows: [{ id: "1", parent: "N003", repo: "lib-repo", work: "DOCS", entries: ["E1"], state: "ready" }] } }] }).parts.find((p) => p.id === "baseline-lib-repo");
+same("[MKT.SCRIPTS.445] a decided arc outside the scope holds the baseline with a waiting line naming the arc", [outDocs.state, outDocs.waitingOn], ["waiting", "N003's docs of lib-repo"]);
+const exp = { ...fe("E255", "lib-repo:src/a.ts"), what: "exports readUIServing" }, usesA = { ...fe("E256", "lib-repo:src/b.ts"), what: "calls readUIServing" }, usesB = { ...fe("E257", "lib-repo:src/c.ts"), what: "wraps readUIServingNow, a longer word" };
+const exported = deriveGo([{ arc: "N009", sheet: sheet([usesA, usesB, exp]) }]);
+same("[MKT.SCRIPTS.413] E255 exporting readUIServing is built before E256 in one part, and a name only inside a longer word holds nothing",
+  exported.parts.find((p) => p.id === "code-lib-repo-1").entries, ["N009/E255", "N009/E256", "N009/E257"]);
+const exportedApart = deriveGo([{ arc: "N009", sheet: sheet([usesA, usesB, exp]) }], { rates: { "lib-repo|CODE": 45 / 1 } });
+const pt = (e) => exportedApart.parts.find((p) => p.entries.includes(`N009/${e}`));
+same("[MKT.SCRIPTS.413] across parts the part of E256 waits on the part of E255, and E257 does not",
+  [pt("E256").waitsOn.includes(pt("E255").id), pt("E257").waitsOn.includes(pt("E255").id)], [true, false]);
+const dec = deriveGo([{ arc: "N009", sheet: sheet([fe("E1", "lib-repo:src/a.ts", { decidedBy: ["Q29"] }), fe("E2", "lib-repo:src/b.ts", { decidedBy: ["notes/N009/preview.html#s3a"] }), fe("E3", "lib-repo:src/c.ts", { decidedBy: ["Q29"] }), fe("E4", "lib-repo:src/d.ts", { decidedBy: [] })]) }]);
+same("[MKT.SCRIPTS.447] a pass is grouped by the first card or preview section its entries cite, a preview section first, and each part is named for it",
+  dec.parts.filter((p) => p.work === "CODE").map((p) => [p.id, p.entries]),
+  [["code-lib-repo-s3a-1", ["N009/E2"]], ["code-lib-repo-q29-1", ["N009/E1", "N009/E3"]], ["code-lib-repo-1", ["N009/E4"]]]);
+const decKept = deriveGo([{ arc: "N009", sheet: sheet([fe("E1", "lib-repo:src/a.ts", { decidedBy: ["Q29"] }), fe("E2", "lib-repo:src/b.ts", { decidedBy: ["Q29"] })]) }],
+  { rates: { "lib-repo|CODE": 45 / 1 }, previous: { ...dec, parts: [{ ...dec.parts.find((p) => p.id === "code-lib-repo-q29-1"), entries: ["N009/E1"], signature: entryHash(fe("E1", "lib-repo:src/a.ts", { decidedBy: ["Q29"] })), state: "landed" }] } });
+same("[MKT.SCRIPTS.447] a new entry of a decision adds a part and renames no other", decKept.parts.filter((p) => p.work === "CODE").map((p) => p.id), ["code-lib-repo-q29-1", "code-lib-repo-q29-2"]);
+same("[MKT.SCRIPTS.447] and a plan with such names passes the schema", goFaults(dec), []);
+
+// ---- Release 2: the arc address and the part and cost fields (Q33)
+const { ARC_ID, ARC_KINDS } = await import(join(lib, "workstream-schema.ts"));
+same("[MKT.SCRIPTS.484] ARC_ID keeps N<nnn> and admits ideate and follow-ups, and no other word", ["N011", "N011a", "ideate", "follow-ups", "follow-up", "build", "N"].map((id) => ARC_ID.test(id)), [true, true, true, true, false, false, false]);
+same("[MKT.SCRIPTS.450] a go part may be apply-<repo> and carry a cost, and a cost that is not { tokens, minutes } fails",
+  [goFaults({ ...plan, parts: [{ ...plan.parts[0], id: "apply-lib-repo", cost: { tokens: 10, minutes: 2 } }] }), goFaults({ ...plan, parts: [{ ...plan.parts[0], cost: { tokens: "x" } }] }).length > 0], [[], true]);
+const ideatePlan = { ...plan, lead: "ideate", scope: ["ideate", "N009"] };
+same("[MKT.SCRIPTS.484] a plan may lead with the ideate arc", goFaults(ideatePlan), []);
+
+// ---- Release 2: the apply part and the pricing from landed parts
+const light = (id, file) => entry(id, file, {});
+const patchOf = (id) => ({ file: `patches/${id}.diff`, base: "abcdef1" });
+const applied = deriveGo([{ arc: "N009", sheet: sheet([{ ...entry("E1", "lib-repo:src/a.ts"), patch: patchOf("E1") }, { ...entry("E2", "lib-repo:src/b.ts"), patch: patchOf("E2") }, entry("E3", "lib-repo:src/c.ts")]) }]);
+const applyOf = (plan) => plan.parts.find((p) => p.id === "apply-lib-repo");
+same("[MKT.SCRIPTS.450] two patched entries form apply-lib-repo with the lead as model and no tests, and the helper's part keeps the rest",
+  [applyOf(applied)?.entries, applyOf(applied)?.model, applyOf(applied)?.tests, applied.parts.find((p) => p.id === "code-lib-repo-1")?.entries], [["N009/E1", "N009/E2"], "lead", [], ["N009/E3"]]);
+same("[MKT.SCRIPTS.450] the apply part is a code part: the full run waits on it, and the plan holds to its schema", [applied.parts.find((p) => p.id === "full-lib-repo").waitsOn.includes("apply-lib-repo"), goFaults(applied)], [true, []]);
+const failing = deriveGo([{ arc: "N009", sheet: sheet([{ ...entry("E1", "lib-repo:src/a.ts"), patch: patchOf("E1") }, { ...entry("E2", "lib-repo:src/b.ts"), patch: patchOf("E2") }]) }],
+  { patchOk: (_arc, one) => one.id !== "E2" });
+same("[MKT.SCRIPTS.450] an entry whose patch fails the check joins a code part on its prose",
+  [applyOf(failing)?.entries, failing.parts.find((p) => p.id === "code-lib-repo-1")?.entries], [["N009/E1"], ["N009/E2"]]);
+
+const lightPlan = deriveGo([{ arc: "N009", sheet: sheet([light("E1", "lib-repo:src/a.ts"), light("E2", "lib-repo:src/b.ts"), light("E3", "lib-repo:src/b.ts"), entry("E4", "lib-repo:src/d.ts")]) }]);
+same("[MKT.SCRIPTS.452] a one-file entry with no tiers joins the apply part, and entries whose file another entry edits do not, nor does one with tiers",
+  [applyOf(lightPlan)?.entries, lightPlan.parts.find((p) => p.id === "code-lib-repo-1")?.entries], [["N009/E1"], ["N009/E2", "N009/E3", "N009/E4"]]);
+
+// Priced from landed parts, and from another repository's where this one has none.
+const landedPart = (id, repo, cost, entries) => ({ id, repo, work: "CODE", entries, tests: [], minutes: null, measuredFrom: null, waitsOn: [], model: "sonnet", signature: entries.map(() => "x").join("."), state: "landed", cost });
+const { landedMeasures } = await import(join(lib, "go-plan.ts"));
+const fromParts = landedMeasures("", "ws", [], { schemaVersion: 1, lead: "N009", scope: ["N009"], writtenAt: "t", parts: [landedPart("code-lib-repo-1", "lib-repo", { tokens: 10, minutes: 18 }, ["N009/E1", "N009/E2"]), landedPart("code-lib-repo-2", "lib-repo", null, ["N009/E3"])] });
+same("[MKT.SCRIPTS.455] landed parts' cost is the measure: a part with no recorded cost measures nothing", fromParts, [{ repo: "lib-repo", work: "CODE", entries: 2, minutes: 18 }]);
+const abroad = ratesOf(fromParts);
+const estimated = deriveGo([{ arc: "N009", sheet: sheet([entry("E1", "app-repo:src/a.ts"), entry("E2", "app-repo:src/b.ts")]) }], { rates: abroad, measures: fromParts });
+same("[MKT.SCRIPTS.455] a repository with no landed part is priced at the other repository's rate and reads estimated from it",
+  estimated.parts.filter(codeOf).map((p) => [p.minutes, p.measuredFrom]), [[18, "estimated from lib-repo (1 landed CODE parts there)"]]);
+same("[MKT.SCRIPTS.455] the bound follows the other repository's rate, and eight entries only where no part of that kind has landed",
+  [boundOf(abroad, "app-repo", "CODE"), boundOf(abroad, "app-repo", "DOCS")], [5, 8]);
+
+// An apply part planned after the repository's full run landed opens the next full run.
+const opening = deriveGo([{ arc: "N009", sheet: sheet([entry("E1", "lib-repo:src/a.ts")]) }]);
+const finished = { ...opening, parts: opening.parts.filter((p) => p.repo === "lib-repo" && p.work !== "RELEASE").map((p) => ({ ...p, state: "landed" })) };
+const later = deriveGo([{ arc: "N009", sheet: sheet([entry("E1", "lib-repo:src/a.ts"), { ...entry("E2", "lib-repo:src/b.ts"), patch: patchOf("E2") }]), landed: ["E1"] }],
+  { previous: finished, landedOrder: finished.parts.map((p) => p.id) });
+same("[MKT.SCRIPTS.455] an apply part planned after a landed full run opens full-lib-repo-2, which waits on it", [applyOf(later)?.entries, later.parts.find((p) => p.id === "full-lib-repo-2")?.waitsOn.filter((id) => id !== "code-lib-repo-1")], [["N009/E2"], ["apply-lib-repo"]]);
+
+// A stale patch loses its patch for the go; the baseline stands before the apply part.
+const stale = deriveGo([{ arc: "N009", sheet: sheet([{ ...entry("E1", "lib-repo:src/a.ts"), patch: patchOf("E1") }]) }], { patchOk: () => false });
+same("[MKT.SCRIPTS.497] an entry whose patch is stale has no apply part and joins a code part on its prose",
+  [applyOf(stale), stale.parts.find((p) => p.id === "code-lib-repo-1")?.entries], [undefined, ["N009/E1"]]);
+const appliedIds = applied.parts.map((p) => p.id);
+same("[MKT.SCRIPTS.498] the baseline stands before the apply part",
+  appliedIds.indexOf("baseline-lib-repo") >= 0 && appliedIds.indexOf("baseline-lib-repo") < appliedIds.indexOf("apply-lib-repo"), true);
+
+// proposeScopes: arcs that share a repository are one scope.
+const chainOf = ["lib-repo", "app-repo"];
+const arcOf = (arc, ...files) => ({ arc, sheet: sheet(files.map((f, i) => entry(`E${i + 1}`, f)), chainOf) });
+const proposed = proposeScopes({ arcs: [arcOf("N003", "app-repo:src/c.ts"), arcOf("N002", "lib-repo:src/b.ts", "spn-foundation:docs/x.md"), arcOf("N001", "lib-repo:src/a.ts")], minutes: { "lib-repo": 10, "app-repo": 4 } });
+same("[MKT.SCRIPTS.502] arcs sharing a repository form one scope, priced once per extra arc, the book left out, and a later repository waits on the scope before it",
+  proposed, [{ arcs: ["N001", "N002"], repos: ["lib-repo"], waitsOn: null, savedMinutes: 10 }, { arcs: ["N003"], repos: ["app-repo"], waitsOn: 1, savedMinutes: 0 }]);
+const through = proposeScopes({ arcs: [arcOf("N001", "lib-repo:src/a.ts"), arcOf("N002", "app-repo:src/b.ts"), arcOf("N003", "lib-repo:src/c.ts", "app-repo:src/d.ts")], minutes: { "lib-repo": 10, "app-repo": 4 } });
+same("[MKT.SCRIPTS.502] arcs joined through another arc are one scope, repositories in chain order", through, [{ arcs: ["N001", "N002", "N003"], repos: ["lib-repo", "app-repo"], waitsOn: null, savedMinutes: 28 }]);
+const unmeasured = proposeScopes({ arcs: [arcOf("N001", "lib-repo:src/a.ts"), arcOf("N002", "lib-repo:src/b.ts", "app-repo:src/c.ts")], minutes: { "lib-repo": null, "app-repo": 4 } });
+same("[MKT.SCRIPTS.502] a repository with unmeasured minutes adds nothing to the saving", unmeasured.map((one) => one.savedMinutes), [4]);
+same("[MKT.SCRIPTS.502] redCheckIds lists the sorted unique test ids of the CODE parts' entries in a repository",
+  [redCheckIds(plan, scope, "lib-repo"), redCheckIds(plan, scope, "app-repo"), redCheckIds(plan, scope, "none")], [["MKT.SCRIPTS.300"], ["MKT.SCRIPTS.300"], []]);
 
 console.log(`\n${total - failed}/${total} passed`);
 process.exit(failed ? 1 : 0);

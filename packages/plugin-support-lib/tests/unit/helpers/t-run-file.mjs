@@ -3,6 +3,7 @@ import { execFileSync } from "node:child_process";
 import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { writeTest } from "../../../src/lib/timing.ts";
 import { RUNS_KEPT, resultsOf, reusedFromOf, runFilePath, writeRunFile } from "../../helpers/run-file.mjs";
 
 const kept = [];
@@ -91,6 +92,26 @@ console.log("=== the suite runner's run file");
   const second = JSON.parse(readFileSync(writeRunFile(root, "joined", "UNIT", RESULTS, true), "utf8"));
   ok("[MKT.SCRIPTS.420] a package that adds to the file keeps what it reuses", second.reusedFrom === "own" && second.results.length === 1 && first.endsWith("joined.json"), JSON.stringify(second));
   ok("[MKT.SCRIPTS.420] reusedFromOf reads the option from the caller's arguments", reusedFromOf(["full-1", "--write-status", "--reused-from=own"]) === "own" && reusedFromOf(["full-1"]) === null);
+}
+
+{
+  const root = repo();
+  mkdirSync(join(root, ".spndevex", ".debug"), { recursive: true });
+  writeFileSync(join(root, ".spndevex", "README.md"), "");
+  writeFileSync(join(root, ".spndevex", ".debug", "switches.json"), JSON.stringify({ telemetry: true }));
+  const was = process.env.SPN_TELEMETRY; delete process.env.SPN_TELEMETRY;
+  const call = { program: "test-all.mjs", group: null, action: "full-1001" };
+  const test = { node: "plugin-support-lib", run: "full-1001", tier: "UNIT", tests: { passed: 12, failed: 1, skipped: 2 } };
+  writeTest(root, { script: "test-all.mjs", event: "command", tool: null, session: null }, { call, status: "FAILURE", test, ms: 250 });
+  if (was !== undefined) process.env.SPN_TELEMETRY = was;
+  const logs = [];
+  const walk = (dir) => { for (const e of readdirSync(dir, { withFileTypes: true })) { const f = join(dir, e.name); if (e.isDirectory()) walk(f); else if (e.name === "hooks.jsonl") logs.push(f); } };
+  walk(join(root, ".spndevex"));
+  const row = logs.length ? JSON.parse(readFileSync(logs[0], "utf8").trim().split("\n").pop()) : null;
+  ok("[MKT.SCRIPTS.510] a package's suite run lands as one TEST row: the node, the run, the tier and the passed, failed and skipped counts",
+    !!row && row.mtype === "TEST" && row.work === "TEST" && row.status === "FAILED" && row.ms === 250 && row.call.program === "test-all.mjs"
+    && row.test.node === "plugin-support-lib" && row.test.run === "full-1001" && row.test.tier === "UNIT"
+    && row.test.tests.passed === 12 && row.test.tests.failed === 1 && row.test.tests.skipped === 2, JSON.stringify(row));
 }
 
 console.log(failed ? `\n  ${failed} of ${total} FAILED — run-file` : `\n  all ${total} passed — run-file`);

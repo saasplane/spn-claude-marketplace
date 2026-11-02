@@ -61,6 +61,45 @@ export function arcData(rows) {
   };
 }
 
+/**
+ * Writes the two role arcs every workstream has, `ideate` first and `follow-ups` last, under the workstream folder `ws`:
+ * no number, no stored kind, no rows. The ideate arc starts DECIDED and the follow-up arc PROPOSED, as `workstream open` writes them.
+ */
+export function writeRoleArcs(ws, { subject = "probe", title = "the probe", ideate = {}, followUps = {} } = {}) {
+  const arcs = {
+    ideate: { arc: "ideate", title, subject, goal: title, status: "DECIDED", ...ideate },
+    "follow-ups": {
+      arc: "follow-ups", title: "Follow-ups", subject: "follow-ups", status: "PROPOSED",
+      goal: "The workstream's one follow-up arc: it collects what the other arcs do not need, is reviewed once they have all landed, and builds what is kept.", ...followUps,
+    },
+  };
+  for (const [name, head] of Object.entries(arcs)) {
+    const data = { schemaVersion: 2, reason: null, decides: null, repos: [], cycle: null, follows: null, preview: "preview.html", ...head, rows: [] };
+    mkdirSync(join(ws, "arcs", name), { recursive: true });
+    writeFileSync(join(ws, "arcs", name, "state.json"), `${JSON.stringify(data, null, 2)}\n`);
+  }
+  return Object.keys(arcs);
+}
+
+/**
+ * Gives the role arcs (or any arc folders already written under `ws`) their place on the approach page: a Plan row carrying
+ * `data-arc`, `id` and the arc's stamp, and a What entry, `<arc>-what`, linking the arc's own preview.
+ */
+export async function writeRolePageParts(ws, arcs = ["ideate", "follow-ups"]) {
+  const { arcStamp } = await import(resolve(PLUGIN, "src", "scripts", "lib", "workstream.ts"));
+  const page = join(ws, "approach.html");
+  let text = readFileSync(page, "utf8");
+  for (const arc of arcs) {
+    const data = JSON.parse(readFileSync(join(ws, "arcs", arc, "state.json"), "utf8"));
+    const row = `      <tr id="${arc}" data-arc="arcs/${arc}/state.json" data-arc-stamp="${arcStamp(data)}"><td><p><strong>${arc} &mdash; ${data.title}</strong></p><span class="sds-small">Preview: <a href="notes/${arc}/preview.html">preview.html</a></span></td><td><span class="sds-badge sds-status sds-${String(data.status).toLowerCase()}">${data.status}</span></td></tr>\n`;
+    const what = `  <h4 id="${arc}-what">The ${arc} arc</h4>\n  <p>Read the preview &rarr; <a href="notes/${arc}/preview.html">the ${arc}</a></p>\n`;
+    // `arc edit` already writes the What entry of an arc it opened, so each part is added only where the page lacks it
+    if (!text.includes(`data-arc="arcs/${arc}/state.json"`)) text = text.replace("    </tbody>", `${row}    </tbody>`);
+    if (!text.includes(`id="${arc}-what"`)) text = text.replace('</section>\n<section id="s3"', `${what}</section>\n<section id="s3"`);
+  }
+  writeFileSync(page, text);
+}
+
 /** A card a `question raise` takes, whole. */
 export const CARD = {
   title: "Which way the `probe` goes", why: "It blocks row 2.", what: "The file is `a.ts:12`.", viewsLead: "One view.",
@@ -115,10 +154,10 @@ export function put(root, path, body) {
 export const CLOSING_BLOCK = `<div class="sds-note">
   <p>&#x1F680; <strong>031 Probe has shipped.</strong> One arc, two steps.</p>
   <p>&nbsp;</p>
-  <p><strong>&#x1F4E6; What was delivered</strong></p>
+  <p><strong>&#x1F4E6; What we delivered</strong></p>
   <ul><li>the probe</li></ul>
   <p>&nbsp;</p>
-  <p><strong>&#x1F9E0; What was learned</strong></p>
+  <p><strong>&#x1F9E0; What we learned</strong></p>
   <ul><li>it works</li></ul>
   <p>&nbsp;</p>
   <p><strong>Thank you &#x1F44D;</strong></p>

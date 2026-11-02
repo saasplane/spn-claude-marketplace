@@ -15,9 +15,9 @@ import { workspace } from "../../../helpers/fixture.mjs";
 
 const EVENTS = resolve(PLUGIN, "src", "scripts", "events");
 // Every row of the family holds the base, in this order; a variant adds only what its kind needs.
-const BASE = ["v", "mtype", "id", "at", "ms", "event", "session", "agent", "workstream", "arc", "part", "skill", "work", "retryOf"];
-const COMMAND_KEYS = [...BASE, "call", "exit"];
-const CHECK_KEYS = [...BASE, "check", "verdict", "out"];
+const BASE = ["v", "mtype", "id", "at", "ms", "event", "session", "agent", "workstream", "arc", "part", "skill", "stage", "work", "retryOf"];
+const COMMAND_KEYS = [...BASE, "call", "exit", "refusal"];
+const CHECK_KEYS = [...BASE, "check", "verdict", "out", "pluginVersion"];
 const TEST_KEYS = [...BASE, "call", "status", "test"];
 
 let total = 0, failed = 0;
@@ -62,7 +62,7 @@ console.log("=== a matched command, paired before and after");
   const lines = commands(root);
   same("PostToolUse writes one line", lines.length, 1);
   const line = lines[0] ?? {};
-  same("with every key, in the family's order: the base, then `call` and `exit`", Object.keys(line), COMMAND_KEYS);
+  same("with every key, in the family's order: the base, then `call`, `exit` and `refusal`", Object.keys(line), COMMAND_KEYS);
   same("[MKT.HOOKS.41] the row is a version 1 COMMAND of the command event", [line.v, line.mtype, line.event], [1, "COMMAND", "command"]);
   same("the call is the program, the group and the action, a plugin command's subgroup written into the action",
     line.call, { program: "spnutils", group: "infra", action: "platform up" });
@@ -210,6 +210,25 @@ console.log("\n=== a call made outside the workspace — MKT.HOOKS.340");
   same("[MKT.HOOKS.340] the call is timed under the workspace's telemetry", commands(root).map((one) => one.call.action), ["platform up"]);
 }
 
+console.log("\n=== a failed call's refusal — MKT.SCRIPTS.501");
+{
+  const root = workspace("2p-refusal", ON);
+  const run = (id, payload) => {
+    const one = call(root, id, "git rev-parse --verify no-such-ref");
+    hook("pretooluse", { ...one, hook_event_name: "PreToolUse" });
+    hook("closed", payload(one));
+  };
+  run("toolu_f1", (one) => ({ ...one, hook_event_name: "PostToolUseFailure", error: "Exit code 2\nSome noise\nRefused: the go is not given\nmore" }));
+  run("toolu_f2", (one) => ({ ...one, hook_event_name: "PostToolUseFailure", error: "Exit code 2\nUsage: spnutils x <a>\n\nunknown option --b\nmore" }));
+  run("toolu_f3", (one) => ({ ...one, hook_event_name: "PostToolUseFailure", error: "Exit code 1\nfatal: bad ref" }));
+  run("toolu_f4", (one) => ({ ...one, hook_event_name: "PostToolUse", tool_response: { stdout: "Refused: said on a success\n" } }));
+  const rows = commands(root);
+  same("[MKT.SCRIPTS.501] a non-zero exit carries the first line that starts `Refused:`", rows[0].refusal, "Refused: the go is not given");
+  same("[MKT.SCRIPTS.501] or the line that follows a usage line", rows[1].refusal, "unknown option --b");
+  same("[MKT.SCRIPTS.501] a failure that says neither has a null refusal", rows[2].refusal, null);
+  same("[MKT.SCRIPTS.501] a zero exit has a null refusal", rows[3].refusal, null);
+}
+
 console.log("\n=== a retried call carries the failed row's id — MKT.SCRIPTS.328");
 {
   const root = workspace("2p-retry", ON);
@@ -276,6 +295,42 @@ console.log("\n=== a background test run is written from its verdict — MKT.SCR
   run("pretooluse", { ...call(root, "toolu_again", "git status"), hook_event_name: "PreToolUse" });
   run("closed", { ...call(root, "toolu_again", "git status"), hook_event_name: "PostToolUse", tool_response: {} });
   same("[MKT.SCRIPTS.330] a verdict is written once, however many calls follow", logOf(root).filter((one) => one.mtype === "TEST").length, 2);
+}
+
+console.log("\n=== a file tool writes a FILE row — MKT.SCRIPTS.500");
+{
+  const root = workspace("2p-file", ON);
+  const edit = { session_id: "sess-2p", hook_event_name: "PostToolUse", tool_name: "Edit", tool_use_id: "toolu_e1", cwd: root,
+    tool_input: { file_path: join(root, "spn-infra-ts", "src", "a.ts"), old_string: "x", new_string: ".spndevex/workstreams/open/035-org-shape/arcs/N013/state.json" },
+    tool_response: {}, duration_ms: 12 };
+  hook("closed", edit);
+  hook("closed", { ...edit, tool_name: "Grep", tool_use_id: "toolu_g1" });
+  const rows = logOf(root).filter((line) => line.mtype === "FILE");
+  same("[MKT.SCRIPTS.500] an Edit call writes one FILE row, and a tool that is not a file tool writes none", rows.length, 1);
+  same("[MKT.SCRIPTS.500] the row names the tool, the file as <repo>:<path>, a null entry and the tool's own time", [rows[0]?.event, rows[0]?.tool, rows[0]?.file, rows[0]?.entry, rows[0]?.ms], ["PostToolUse", "EDIT", "spn-infra-ts:src/a.ts", null, 12]);
+  same("[MKT.SCRIPTS.500] the row carries the call's workstream and arc", [rows[0]?.workstream, rows[0]?.arc], ["035-org-shape", "N013"]);
+}
+
+console.log("\n=== a FILE row names the entry the file serves in the call's part — MKT.SCRIPTS.500");
+{
+  const root = workspace("2p-file-entry", ON);
+  const ws = join(root, ".spndevex", "workstreams", "open", "035-org-shape");
+  const part = (id, entries) => ({ id, repo: "spn-infra-ts", work: "CODE", entries, tests: [], minutes: null, measuredFrom: "", waitsOn: [],
+    model: "sonnet", signature: entries.map((_, at) => `h${at}`).join("."), state: "running" });
+  mkdirSync(join(ws, "arcs", "N011"), { recursive: true });
+  mkdirSync(join(ws, "arcs", "N013"), { recursive: true });
+  writeFileSync(join(ws, "arcs", "N011", "go.json"), JSON.stringify({ schemaVersion: 1, lead: "N011", scope: ["N011", "N013"],
+    writtenAt: "2026-11-03T00:00:00.000Z", parts: [part("code-spn-infra-ts-1", ["N013/E1", "N013/E2"])] }));
+  writeFileSync(join(ws, "arcs", "N013", "sheet.json"), JSON.stringify({ schemaVersion: 1, releaseChain: [], dependsOn: [], stack: null,
+    entries: [{ id: "E1", file: "spn-infra-ts:src/b.ts" }, { id: "E2", file: "spn-infra-ts:src/a.ts" }] }));
+  const order = join(ws, "notes", "N011", "orders", "code-spn-infra-ts-1.md");
+  const edit = (path, id) => ({ session_id: "sess-2p", hook_event_name: "PostToolUse", tool_name: "Edit", tool_use_id: id, cwd: root,
+    tool_input: { file_path: join(root, "spn-infra-ts", "src", path), old_string: "x", new_string: order }, tool_response: {}, duration_ms: 3 });
+  hook("closed", edit("a.ts", "toolu_e2"));
+  hook("closed", edit("c.ts", "toolu_e3"));
+  const rows = logOf(root).filter((line) => line.mtype === "FILE");
+  same("[MKT.SCRIPTS.500] a file one of the part's entries names carries that entry, and one no entry names carries null", rows.map((row) => [row.part, row.entry]),
+    [["code-spn-infra-ts-1", "N013/E2"], ["code-spn-infra-ts-1", null]]);
 }
 
 console.log(failed ? `\n  ${failed} of ${total} FAILED — bash timing` : `\n  all ${total} passed — bash timing`);

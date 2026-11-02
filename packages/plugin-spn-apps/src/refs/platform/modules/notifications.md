@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/03-platform/02-modules/03-notifications.md",
-      "seen": "b4a6ad1c"
+      "seen": "a9d3a02d"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/03-platform/02-modules/03-notifications/",
-      "seen": "7921272c"
+      "seen": "2605a2c2"
     }
   ]
 }
@@ -24,7 +24,7 @@
 
 ## The distinction people collapse
 
-**Whether a template is locked is not the same question as whether an organization type may customize at all.** One is about this template; the other is about what that type is offered. Answering the first when you were asked the second is how a customization arrives that nobody meant to grant.
+**Whether a template is locked is not the same question as whether an organization category may customize at all.** One is about this template; the other is about what that category is offered. Answering the first when you were asked the second is how a customization arrives that nobody meant to grant.
 
 ## When you reach for it
 

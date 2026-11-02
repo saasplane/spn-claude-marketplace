@@ -8,7 +8,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/06-tests/README.md",
-      "seen": "70f766c1"
+      "seen": "4c27ca12"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/06-tests/README.md",
@@ -28,7 +28,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/06-tests/README.md",
       "section": "Scope — where you stand decides what runs",
-      "seen": "2f2249e2"
+      "seen": "dd119739"
     }
   ]
 }

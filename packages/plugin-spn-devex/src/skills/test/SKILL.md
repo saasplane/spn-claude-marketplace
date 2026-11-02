@@ -7,7 +7,7 @@ description: What proves a behaviour, at which tier, and what a passing suite do
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
-      "seen": "67376a1f"
+      "seen": "2fce1268"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/05-test.md",
@@ -36,12 +36,12 @@ description: What proves a behaviour, at which tier, and what a passing suite do
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/06-tests/README.md",
       "section": "The selective loop — what runs while work is under way",
-      "seen": "ae6f8f25"
+      "seen": "a48ae7c9"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/10-providers/ts/13-tests.md",
       "section": "Coverage — how the model is rendered here",
-      "seen": "621a1a2c"
+      "seen": "53abf69c"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/02-packages/02-tests.md",
@@ -56,7 +56,7 @@ description: What proves a behaviour, at which tier, and what a passing suite do
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "section": "An order is one delegated execution, and every order follows the same rules",
-      "seen": "cc56fc94"
+      "seen": "dc15c9f4"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/06-tests/README.md",

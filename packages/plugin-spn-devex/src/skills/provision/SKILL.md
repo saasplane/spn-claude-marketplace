@@ -48,9 +48,10 @@ The layers are nouns — each has `plan`, `up`, `down`, and `status`; the app ha
 
 **A `--clean` teardown wipes the state that layer holds, and a local stack is frequently shared with other work on the same machine.** So:
 
-- It runs **only on an explicit instruction**, never as an inferred step toward something else.
+- It runs **only on an explicit instruction**, never as an inferred step toward something else. In alpha a local reset is the agent's to run, and elsewhere only on an explicit instruction.
 - It runs against a **named target**. If the request did not name one, ask — this app, this platform, or all — rather than choosing.
 - It runs **after** the code is known good. Regenerate and build to green first; resetting onto broken code wastes the whole cycle and produces a failure that says nothing.
+- A cloud change asks the developer each time, in alpha and after.
 
 ## Diagnosing
 

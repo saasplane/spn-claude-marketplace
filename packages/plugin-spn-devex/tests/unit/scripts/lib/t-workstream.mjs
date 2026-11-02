@@ -4,7 +4,7 @@
 // the record that keeps it.
 import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { basename, join } from "node:path";
 import { arcData, approachPage, dataWorkspace } from "../../../helpers/workstream-fixture.mjs";
 
 const schema = await import("../../../../src/scripts/lib/workstream-schema.ts");
@@ -120,8 +120,8 @@ console.log("\n=== the generated blocks — progress and open");
   const inside = lib.progressInside("/nowhere", [data]);
   ok("progress: the card alone — no Overall line, no long bar, no grid of tiles", !inside.includes("<p>") && !inside.includes('class="sds-bar"') && !inside.includes("sds-arcs") && inside.startsWith('  <nav class="sds-footbar"'), inside);
   ok("progress: a chip links its row on the page, never its data", inside.includes('href="#N001"') && inside.includes('style="width:50%"') && !inside.includes("state.json"), inside);
-  const words = lib.progressInside("/nowhere", [{ ...data, arc: "N002", subject: "workstream-data", status: "PROPOSED" }]);
-  ok("progress: a subject is shown as words", words.includes("<span class=\"sds-chip-subject\"> &middot; workstream data</span>") && words.includes('class="sds-chip sds-proposed '), words);
+  const words = lib.progressInside("/nowhere", [{ ...data, arc: "N002", subject: "workstream-data", title: "Workstream data", status: "PROPOSED" }]);
+  ok("[MKT.SCRIPTS.490] progress: a build arc's chip shows its title, not its subject, after the number", words.includes("<span class=\"sds-chip-subject\"> &middot; Workstream data</span>") && !words.includes("workstream data") && words.includes('class="sds-chip sds-proposed '), words);
   ok("progress: no arc, no card and nothing else", lib.progressInside("/nowhere", []) === "");
   {
     const order = (list) => lib.executionOrder("/nowhere", list).map((one) => one.arc).join(" ");
@@ -161,8 +161,8 @@ console.log("\n=== the generated blocks — progress and open");
   ok("progress: a sticky card closes the block — the arcs' chips on the left, then the overall chip, and no line along its top edge",
     inside.includes('<nav class="sds-footbar" aria-label="Workstream status">') && inside.indexOf('sds-footbar-chips') < inside.indexOf('sds-footbar-summary')
       && inside.includes('<span>0 of 1 arcs closed</span>') && !inside.includes("sds-footbar-line"), inside);
-  ok("progress: a chip is two lines — the number without the N and the name with done/total on the right, then the bar — its status in its class, its tooltip and its accessible name, and no badge",
-    /<a class="sds-chip sds-running sds-step-3" href="#N001" aria-label="N001 probe, RUNNING, 1 of 2 steps landed, in progress: none, next ready: row 2, build it, log last moved: never"><span class="sds-chip-line"><span class="sds-chip-name"><span class="sds-mono">1<\/span><span class="sds-chip-subject"> &middot; probe<\/span><\/span><span class="sds-arc-count">1\/2<\/span><\/span><span class="sds-chip-bar"><i style="width:50%"><\/i><\/span><span class="sds-tip"><span class="sds-badge sds-status sds-running">RUNNING<\/span><strong>the probe arc<\/strong><span>1 of 2 steps landed<\/span><span>in progress: none<\/span><span>next ready: row 2, build it<\/span><span>log last moved: never<\/span><\/span><\/a>/.test(inside) && !/sds-chip-line"><span class="sds-badge[^>]*>RUNNING/.test(inside), inside);
+  ok("progress: a chip is two lines — the number without the N and the arc's title with done/total on the right, then the bar — its status in its class, its tooltip and its accessible name, and no badge",
+    /<a class="sds-chip sds-running sds-step-3" href="#N001" aria-label="N001 the probe arc, RUNNING, 1 of 2 steps landed, in progress: none, next ready: row 2, build it, log last moved: never"><span class="sds-chip-line"><span class="sds-chip-name"><span class="sds-mono">1<\/span><span class="sds-chip-subject"> &middot; the probe arc<\/span><\/span><span class="sds-arc-count">1\/2<\/span><\/span><span class="sds-chip-bar"><i style="width:50%"><\/i><\/span><span class="sds-tip"><span class="sds-badge sds-status sds-running">RUNNING<\/span><strong>the probe arc<\/strong><span>1 of 2 steps landed<\/span><span>in progress: none<\/span><span>next ready: row 2, build it<\/span><span>log last moved: never<\/span><\/span><\/a>/.test(inside) && !/sds-chip-line"><span class="sds-badge[^>]*>RUNNING/.test(inside), inside);
   ok("progress: the summary is a highlighted section of two lines — Overall with steps landed, then its bar in the same step shade — with the workstream's status in its class, tooltip and accessible name",
     /<div class="sds-footbar-summary sds-implementing sds-step-3" tabindex="0" aria-label="Workstream IMPLEMENTING, 1 of 2 steps landed, 0 of 1 arcs closed">\s*<span class="sds-chip-line"><span class="sds-chip-name">Overall<\/span><span class="sds-arc-count">1\/2<\/span><\/span>\s*<span class="sds-chip-bar"><i style="width:50%"><\/i><\/span>\s*<span class="sds-tip"><span class="sds-badge sds-status sds-implementing">IMPLEMENTING<\/span><strong>Overall<\/strong><span>0 of 1 arcs closed<\/span><span>1 of 2 steps landed<\/span><\/span>\s*<\/div>/.test(inside), inside);
   {
@@ -509,6 +509,156 @@ console.log("\n=== versioned records — MKT.SCRIPTS.417");
   const last = lib.readJsonl(join(ws, "arcs", "N001", "log.jsonl")).at(-1);
   ok("[MKT.SCRIPTS.417] a new log line carries v 1", last?.v === 1 && last.note === "written now", JSON.stringify(last));
   void root;
+}
+
+console.log("\n=== a PROOF row on a moved tree is faulted only for the entries whose files changed — MKT.HOOKS.321");
+{
+  const { put } = await import("../../../helpers/workstream-fixture.mjs");
+  const { execFileSync } = await import("node:child_process");
+  const proofRow = { id: "1", parent: "N001", title: "prove it", kind: "change", repo: "spn-x", work: "PROOF", blockedBy: [], touches: [], state: "ready" };
+  const entryOf = (id, file, tests) => ({ id, op: "edit", file, what: `change ${id}`, decidedBy: [], facts: ["f1"], then: [], rules: [], callers: [], tiers: { unit: tests }, docs: [], book: [] });
+  // Two entries, E1 on pkg/a.ts and E2 on pkg/b.ts; the run is dated between the base commit and the commit that moves `changed`, and was taken on another tree.
+  const built = async (name, changed, results) => {
+    const w = await dataWorkspace(name, { rows: [proofRow] });
+    const commit = (when, message) => {
+      w.git(["add", "-A"]);
+      execFileSync("git", ["-c", "user.email=t@t", "-c", "user.name=t", "commit", "-q", "-m", message], { cwd: w.repo, env: { ...process.env, GIT_AUTHOR_DATE: when, GIT_COMMITTER_DATE: when }, stdio: "ignore" });
+      return w.git(["rev-parse", "HEAD"]);
+    };
+    put(w.repo, "pkg/a.ts", "export const a = 1;\n");
+    put(w.repo, "pkg/b.ts", "export const b = 1;\n");
+    commit("2021-01-01T00:00:00Z", "base");
+    put(w.repo, changed, "export const moved = 2;\n");
+    const sha = commit("2021-03-01T00:00:00Z", "moved");
+    const data = arcData([{ ...proofRow, commits: { "spn-x": [sha] } }]);
+    writeFileSync(join(w.ws, "arcs", "N001", "sheet.json"), JSON.stringify({ schemaVersion: 1, releaseChain: [], dependsOn: [], stack: { folder: "x", dmo: "none", reset: "x" },
+      entries: [entryOf("E1", "spn-x:pkg/a.ts", ["U.1"]), entryOf("E2", "spn-x:pkg/b.ts", ["U.2"])] }, null, 2));
+    put(w.repo, "pkg/tests/.output/unit/runs/r1.json", JSON.stringify({ run: "r1", tier: "unit", ranAt: "2021-02-01T00:00:00Z", env: "local", results: results.map(([id, status]) => ({ id, tier: "unit", status, title: id })) }));
+    put(w.repo, "pkg/tests/.output/unit/runs/r1.stamp.json", JSON.stringify({ tier: "UNIT", narrowed: false, content: "0".repeat(64) }));
+    return lib.landingFault(w.ws, "N001", data, data.rows[0], "r1");
+  };
+  const green = [["U.1", "SUCCESS"], ["U.2", "SUCCESS"]];
+  const entryMoved = await built("t-workstream-proof-moved", "pkg/a.ts", green) ?? "";
+  ok("[MKT.HOOKS.321] a PROOF row on a moved tree is faulted for the entry whose file changed since the run, named as the entry to rerun",
+    /was taken before/.test(entryMoved) && /files of E1 changed since/.test(entryMoved) && /rerun the tests of that entry/.test(entryMoved), entryMoved);
+  ok("[MKT.HOOKS.321] and the entry whose files did not change is not named", !/E2/.test(entryMoved), entryMoved);
+  const elsewhere = await built("t-workstream-proof-elsewhere", "pkg/other.ts", green);
+  ok("[MKT.HOOKS.321] a tree moved only where no entry's file is lands: the ids of the unchanged entries are read from the earlier run", elsewhere === null, String(elsewhere));
+  const failing = await built("t-workstream-proof-failing", "pkg/other.ts", [["U.1", "SUCCESS"], ["U.2", "FAILED"]]) ?? "";
+  ok("[MKT.HOOKS.321] an unchanged entry's id that reads FAILED in the earlier run is still a fault", /unit U\.2 reads FAILURE/.test(failing) && !/changed since/.test(failing), failing);
+}
+
+console.log("\n=== the ideate and follow-up arcs — MKT.SCRIPTS.484, .486, .488, .490");
+{
+  const { writeRoleArcs, put } = await import("../../../helpers/workstream-fixture.mjs");
+  const arcAt = (ws, id, over = {}) => {
+    mkdirSync(join(ws, "arcs", id), { recursive: true });
+    writeFileSync(join(ws, "arcs", id, "state.json"), `${JSON.stringify({ ...arcData(), arc: id, ...over }, null, 2)}\n`);
+  };
+  const w = await dataWorkspace("t-workstream-roles");
+  writeRoleArcs(w.ws);
+  ok("[MKT.SCRIPTS.484] arcIdsOf lists ideate first, the build arcs by number and follow-ups last",
+    lib.arcIdsOf(w.ws).join() === "ideate,N001,follow-ups", lib.arcIdsOf(w.ws).join());
+  ok("[MKT.SCRIPTS.484] arcOrder puts ideate before every build arc and follow-ups after, the number and then the letter between",
+    ["follow-ups", "N010", "N002", "ideate", "N002a"].sort(lib.arcOrder).join() === "ideate,N002,N002a,N010,follow-ups", ["follow-ups", "N010", "N002", "ideate", "N002a"].sort(lib.arcOrder).join());
+
+  // THE ADDRESS AND THE FOLDERS (MKT.SCRIPTS.484, .485)
+  {
+    const number = basename(w.ws).slice(0, 3);
+    ok("[MKT.SCRIPTS.484] resolveArc reads ideate and follow-ups, alone and with the workstream's number",
+      lib.resolveArc("ideate", w.root).arc === "ideate" && lib.resolveArc("follow-ups", w.root).arc === "follow-ups"
+        && lib.resolveArc(`${number}/ideate`, w.root).ws === w.ws && lib.resolveArc(`${number}/N001`, w.root).arc === "N001");
+    let refused = "";
+    try { lib.resolveArc(`${number}/other`, w.root); } catch (error) { refused = error.message; }
+    ok("[MKT.SCRIPTS.484] resolveArc refuses `other`, naming the three forms", /`N<nnn>`, `ideate` or `follow-ups`/.test(refused), refused);
+    mkdirSync(join(w.ws, "notes", "ideate"), { recursive: true });
+    mkdirSync(join(w.ws, "notes", "follow-ups"), { recursive: true });
+    mkdirSync(join(w.ws, "notes", "other"), { recursive: true });
+    const stray = lib.strayLevels(w.ws, null).map(([entry]) => entry);
+    ok("[MKT.SCRIPTS.485] strayLevels names notes/other/ and not notes/ideate/ or notes/follow-ups/",
+      stray.includes("notes/other/") && !stray.includes("notes/ideate/") && !stray.includes("notes/follow-ups/"), stray.join());
+  }
+
+  // THE NEXT BUILD ARC (MKT.SCRIPTS.486)
+  ok("[MKT.SCRIPTS.486] nextBuildArc is one past the highest N<nnn> folder, the role arcs not counted", lib.nextBuildArc(w.ws) === "N002", lib.nextBuildArc(w.ws));
+  arcAt(w.ws, "N004");
+  ok("[MKT.SCRIPTS.486] it goes by the highest folder, not by how many there are", lib.nextBuildArc(w.ws) === "N005", lib.nextBuildArc(w.ws));
+  const bare = mkdtempSync(join(tmpdir(), "no-arcs-"));
+  ok("[MKT.SCRIPTS.486] a workstream with no build arc opens at N001", lib.nextBuildArc(bare) === "N001", lib.nextBuildArc(bare));
+
+  // THE KIND IS THE ADDRESS (MKT.SCRIPTS.484)
+  ok("[MKT.SCRIPTS.484] arcKindOf reads ideate and follow-ups from the address and any other arc as a build arc",
+    lib.arcKindOf(w.ws, "ideate") === "ideate" && lib.arcKindOf(w.ws, "follow-ups") === "follow-up" && lib.arcKindOf(w.ws, "N001") === "build"
+      && lib.arcKindOf(w.ws, "N004") === "build");
+  arcAt(w.ws, "N006", { kind: "ideate" });
+  arcAt(w.ws, "N007", { kind: "follow-up" });
+  ok("[MKT.SCRIPTS.484] a stored `kind: ideate` is read only in closed data, as written; a stored follow-up kind on a numbered arc is no kind at all",
+    lib.arcKindOf(w.ws, "N006") === "ideate" && lib.arcKindOf(w.ws, "N007") === "build");
+  ok("[MKT.SCRIPTS.484] followUpArcOf returns follow-ups where that folder exists, and null with no numbered fallback", lib.followUpArcOf(w.ws) === "follow-ups" && lib.followUpArcOf(bare) === null);
+  const plain = await dataWorkspace("t-workstream-no-follow-ups");
+  arcAt(plain.ws, "N002", { kind: "follow-up" });
+  ok("[MKT.SCRIPTS.487] a workstream whose only look-alike is a numbered arc has no follow-up arc", lib.followUpArcOf(plain.ws) === null, String(lib.followUpArcOf(plain.ws)));
+
+  // THE FOLLOW-UP ARC'S STATUS (MKT.SCRIPTS.488)
+  const suggest = (list) => writeFileSync(join(w.ws, "suggestions.jsonl"), list.map(([id, state]) => JSON.stringify({ id, title: `suggestion ${id}`, state, preview: null, words: null })).join("\n") + (list.length ? "\n" : ""));
+  const settled = () => lib.readArc(w.ws, "follow-ups").suggestionsSettled;
+  ok("[MKT.SCRIPTS.488] readArc carries suggestionsSettled for the follow-up arc: true with no suggestion at all", settled() === true, String(settled()));
+  suggest([["s1", "raised"]]);
+  ok("[MKT.SCRIPTS.488] false while a suggestion reads raised", settled() === false, String(settled()));
+  suggest([["s1", "decided"], ["s2", "shaped"]]);
+  ok("[MKT.SCRIPTS.488] false while one reads shaped", settled() === false, String(settled()));
+  suggest([["s1", "decided"], ["s2", "parked"], ["s3", "dropped"]]);
+  ok("[MKT.SCRIPTS.488] true once every one is decided, parked or dropped", settled() === true, String(settled()));
+  ok("[MKT.SCRIPTS.488] no other arc carries it", lib.readArc(w.ws, "N001").suggestionsSettled === undefined && lib.readArc(w.ws, "ideate").suggestionsSettled === undefined);
+  let wrote = true;
+  try { lib.writeArc(w.ws, lib.readArc(w.ws, "follow-ups")); } catch (error) { wrote = String(error?.message ?? error); }
+  ok("[MKT.SCRIPTS.488] it is never written: a write of the arc leaves it out of state.json", wrote === true && !readFileSync(join(w.ws, "arcs", "follow-ups", "state.json"), "utf8").includes("suggestionsSettled"), String(wrote));
+
+  const landedRow = { id: "1", parent: "follow-ups", title: "build it", kind: "change", state: "landed" };
+  const statusOf = (over) => lib.arcStatus({ arc: "follow-ups", status: "PROPOSED", rows: [], ...over });
+  ok("[MKT.SCRIPTS.488] with no rows the follow-up arc is PROPOSED while a suggestion is unsettled", statusOf({ suggestionsSettled: false }) === "PROPOSED");
+  ok("[MKT.SCRIPTS.488] and LANDED once every suggestion is settled, with no move by hand", statusOf({ suggestionsSettled: true }) === "LANDED");
+  ok("[MKT.SCRIPTS.488] the stored word is ignored: a stored DECIDED with no rows reads the same", statusOf({ status: "DECIDED", suggestionsSettled: false }) === "PROPOSED" && statusOf({ status: "DECIDED", suggestionsSettled: true }) === "LANDED");
+  ok("[MKT.SCRIPTS.488] with rows it reads as a build arc, its stored status kept: a stored PROPOSED stays PROPOSED, a stored DECIDED with nothing started is DECIDED, a step running is RUNNING",
+    statusOf({ rows: [{ ...landedRow, state: "waiting" }], suggestionsSettled: true }) === "PROPOSED" && statusOf({ status: "DECIDED", rows: [{ ...landedRow, state: "waiting" }], suggestionsSettled: true }) === "DECIDED"
+      && statusOf({ status: "DECIDED", rows: [{ ...landedRow, state: "running" }], suggestionsSettled: true }) === "RUNNING");
+  ok("[MKT.SCRIPTS.488] a stored DECIDED with every step landed is LANDED only once the suggestions are settled too",
+    statusOf({ status: "DECIDED", rows: [landedRow], suggestionsSettled: true }) === "LANDED" && statusOf({ status: "DECIDED", rows: [landedRow], suggestionsSettled: false }) === "RUNNING");
+  ok("[MKT.SCRIPTS.488] a stored CARRIED or DROPPED is kept",
+    statusOf({ status: "CARRIED", suggestionsSettled: false }) === "CARRIED" && statusOf({ status: "DROPPED", suggestionsSettled: false }) === "DROPPED");
+  ok("[MKT.SCRIPTS.488] a numbered arc ignores suggestionsSettled, and the ideate arc reads its proposals as before",
+    lib.arcStatus({ arc: "N002", status: "PROPOSED", rows: [], suggestionsSettled: true }) === "PROPOSED"
+      && lib.arcStatus({ arc: "ideate", status: "DECIDED", rows: [], proposesOpened: true }) === "LANDED" && lib.arcStatus({ arc: "ideate", status: "DECIDED", rows: [], proposesOpened: false }) === "DECIDED");
+  suggest([["s1", "raised"]]);
+  ok("[MKT.SCRIPTS.488] statusOfData, which the close gate reads, works the follow-up arc out from the suggestions: PROPOSED while one is raised", lib.statusOfData(w.ws, "follow-ups") === "PROPOSED", String(lib.statusOfData(w.ws, "follow-ups")));
+  suggest([["s1", "decided"]]);
+  ok("[MKT.SCRIPTS.488] and LANDED once it is decided, though the stored word still says PROPOSED",
+    lib.statusOfData(w.ws, "follow-ups") === "LANDED" && JSON.parse(readFileSync(join(w.ws, "arcs", "follow-ups", "state.json"), "utf8")).status === "PROPOSED", String(lib.statusOfData(w.ws, "follow-ups")));
+
+  // THE PLAN AND THE BAR (MKT.SCRIPTS.490)
+  const arc = (id, status, over = {}) => ({ ...arcData(), arc: id, status, ...over });
+  const started = (id, over = {}) => ({ ...arc(id, "DECIDED", over), rows: arcData().rows.map((row, at) => ({ ...row, state: at ? "waiting" : "running" })) });
+  const order = lib.executionOrder("/nowhere", [arc("follow-ups", "PROPOSED", { rows: [], suggestionsSettled: true }), started("N002"), arc("N001", "LANDED"), arc("ideate", "PROPOSED", { rows: [] })]).map((one) => one.arc).join(" ");
+  ok("[MKT.SCRIPTS.490] executionOrder pins the ends: ideate first and follow-ups last, though follow-ups has landed and ideate has not", order === "ideate N001 N002 follow-ups", order);
+  const bar = lib.progressInside("/nowhere", [arc("follow-ups", "PROPOSED", { rows: [], suggestionsSettled: true }), started("N002", { title: "Build the thing" }), arc("ideate", "PROPOSED", { title: "stale words", rows: [] })]);
+  const hrefs = [...bar.matchAll(/<a class="sds-chip [^"]*" href="#([\w-]+)"/g)].map((one) => one[1]).join(" ");
+  ok("[MKT.SCRIPTS.490] the bar opens on the ideate chip and ends on the follow-ups chip, whatever their status", hrefs === "ideate N002 follow-ups", hrefs);
+  const nameOf = (id) => new RegExp(`<a class="sds-chip [^"]*" href="#${id}"[\\s\\S]*?<span class="sds-chip-name">([\\s\\S]*?)</span><span class="sds-arc-count"`).exec(bar)?.[1] ?? "";
+  ok("[MKT.SCRIPTS.490] the ideate chip's name is its role, Ideate, with no number, and never its stored title", nameOf("ideate") === '<span class="sds-chip-subject">Ideate</span>', nameOf("ideate"));
+  ok("[MKT.SCRIPTS.490] the follow-ups chip's name is Follow-ups, with no number", nameOf("follow-ups") === '<span class="sds-chip-subject">Follow-ups</span>', nameOf("follow-ups"));
+  ok("[MKT.SCRIPTS.490] a build arc's chip is its number and its title", nameOf("N002") === '<span class="sds-mono">2</span><span class="sds-chip-subject"> &middot; Build the thing</span>', nameOf("N002"));
+  ok("[MKT.SCRIPTS.490] a role chip's accessible name starts on its role, and a build chip's on its id and title",
+    bar.includes('aria-label="Ideate, ') && bar.includes('aria-label="Follow-ups, ') && bar.includes('aria-label="N002 Build the thing, '), bar);
+}
+
+{
+  const entry = (id, file, what, judged) => ({ id, op: "edit", file, what, judged });
+  const three = [entry("E1", "r:a.ts", "first <one>", false), entry("E2", "r:b.ts", "second", true), entry("E3", "r:c.ts", "third", false)];
+  const html = lib.previewFromEntries(three, (one) => (one.id === "E2" ? "+let x = 1 < 2;" : "+never read"));
+  const at = ["r:a.ts", "r:b.ts", "r:c.ts"].map((name) => html.indexOf(`<code>${name}</code>`));
+  ok("[MKT.SCRIPTS.496] a preview drawn from three entries holds the outline in connection order", html.startsWith("<ol>") && at[0] >= 0 && at[0] < at[1] && at[1] < at[2] && html.includes("first &lt;one&gt;"), html);
+  ok("[MKT.SCRIPTS.496] and a code block only for the judged one", html.split("<pre><code>").length === 2 && html.includes("+let x = 1 &lt; 2;") && !html.includes("never read"), html);
+  ok("[MKT.SCRIPTS.505] scripts/commands/docs/x.ts plans as CODE", schema.entryWork({ file: "r:packages/plugin-spn-devex/src/scripts/commands/docs/x.ts", work: null }) === "CODE", String(schema.entryWork({ file: "r:packages/plugin-spn-devex/src/scripts/commands/docs/x.ts", work: null })));
 }
 
 console.log(failed ? `\n  ${failed} of ${total} FAILED — workstream library` : `\n  all ${total} passed — workstream library`);

@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "book": {
     "repository": "spn-foundation",
-    "commit": "1c416bf4"
+    "commit": "7ed3619c"
   },
   "rules": [
     {
@@ -469,7 +469,7 @@
         "skill": "spn-devex/execute"
       },
       "class": "stated in a skill",
-      "sentence": "While work runs, the main agent plans, dispatches and reports, and a subagent does the long work",
+      "sentence": "While work runs, the main agent delegates by default, and a Sonnet helper does the work",
       "chapter": "04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "heading": "The front desk stays open while work runs",
       "decision": null,
@@ -684,6 +684,11 @@
         },
         {
           "plugin": "spn-devex",
+          "path": "refs/devex/agent/agent.md",
+          "heading": "A closing moment has one shape, one icon and one title size"
+        },
+        {
+          "plugin": "spn-devex",
           "path": "refs/devex/agent/lenses/architect.md",
           "heading": "Behaviour"
         },
@@ -709,9 +714,9 @@
         }
       ],
       "line": {
-        "text": "Below two signs, the one agent speaks from the view's lens file, in one sentence when there is no sign. From two signs up, each view is a fresh agent. Whenever a view's word is to count as a review that can block a gate, it is a fresh agent.",
-        "ref": "refs/devex/agent/lenses.md",
-        "heading": "How a view is made"
+        "text": "An open point is written as the question with the options named.",
+        "ref": "refs/devex/agent/agent.md",
+        "heading": "A closing moment has one shape, one icon and one title size"
       }
     },
     {
@@ -1164,11 +1169,6 @@
           "plugin": "spn-devex",
           "path": "refs/devex/agent/agent.md",
           "heading": "What every window carries before its first word is kept small"
-        },
-        {
-          "plugin": "spn-devex",
-          "path": "refs/devex/agent/agent.md",
-          "heading": "The four token levers are hooks that refuse, not lines of prose"
         }
       ]
     },
@@ -1292,16 +1292,11 @@
       "level": "GUIDE",
       "params": {},
       "class": "guidance",
-      "sentence": "Each lever that keeps a window's tokens down is a hook that refuses the call at its line",
+      "sentence": "Each lever that keeps a window's tokens down is a hook that refuses, or notes where the call has already run, at its line",
       "chapter": "04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
-      "heading": "The four token levers are hooks that refuse, not lines of prose",
+      "heading": "The four token levers are hooks that refuse or note, not lines of prose",
       "decision": null,
       "restated": [
-        {
-          "plugin": "spn-devex",
-          "path": "refs/devex/agent/agent.md",
-          "heading": "The four token levers are hooks that refuse, not lines of prose"
-        },
         {
           "plugin": "spn-devex",
           "path": "refs/devex/workspace/workstream.md",
@@ -1381,7 +1376,13 @@
       "chapter": "04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "heading": "A reply speaks as a teammate: the moment chooses its register, its icon and its shape",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/agent/agent.md",
+          "heading": "A reply speaks as a teammate: the moment chooses its register, its icon and its shape"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.AGENT.117",
@@ -1668,11 +1669,17 @@
       "level": "GUIDE",
       "params": {},
       "class": "guidance",
-      "sentence": "In alpha, a change to a standard still brings every existing file to it in the same change",
+      "sentence": "When the declared stage is ALPHA, a change to a standard still brings every existing file to it in the same change",
       "chapter": "04-capabilities/01-devex/02-agent/04-plugins/01-plugins.md",
       "heading": "A release carries its migration, and a window runs what is pending first",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/agent/plugins.md",
+          "heading": "A release carries its migration, and a window applies what is pending first"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.AGENT.138",
@@ -1727,7 +1734,7 @@
         "check": "comment-check"
       },
       "class": "checked",
-      "sentence": "In alpha, a change is made everywhere at once and leaves no legacy",
+      "sentence": "When the declared stage is ALPHA, a change is made everywhere at once and leaves no legacy",
       "chapter": "04-capabilities/01-devex/02-agent/04-plugins/01-plugins.md",
       "heading": "A release carries its migration, and a window runs what is pending first",
       "decision": null,
@@ -1789,7 +1796,7 @@
       "class": "stated",
       "sentence": "A text or a proposal you ask to see is shown whole, in the reply that answers you",
       "chapter": "04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
-      "heading": "A reply speaks as a teammate: the moment chooses its register, its icon and its shape",
+      "heading": "A closing moment has one shape, one icon and one title size",
       "decision": null,
       "restated": [
         {
@@ -1839,7 +1846,7 @@
       "class": "guidance",
       "sentence": "Every tree is drawn vertically, one entry per line with its comment on the same line, and never in two columns",
       "chapter": "04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
-      "heading": "A reply speaks as a teammate: the moment chooses its register, its icon and its shape",
+      "heading": "A closing moment has one shape, one icon and one title size",
       "decision": null,
       "restated": []
     },
@@ -2036,13 +2043,13 @@
       "class": "checked",
       "sentence": "In a partner's workspace, a reply speaks in the partner's product, and names no rule we ship, no chapter of the book and no part of the plugins",
       "chapter": "04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
-      "heading": "A reply speaks as a teammate: the moment chooses its register, its icon and its shape",
+      "heading": "A closing moment has one shape, one icon and one title size",
       "decision": null,
       "restated": [
         {
           "plugin": "spn-devex",
           "path": "refs/devex/agent/agent.md",
-          "heading": "A reply speaks as a teammate: the moment chooses its register, its icon and its shape"
+          "heading": "A closing moment has one shape, one icon and one title size"
         }
       ]
     },
@@ -2055,19 +2062,19 @@
       "class": "stated",
       "sentence": "Where what SaaS Plane ships and what a partner needs pull apart, the agent shows a product choice with its trade-off, and never says the ask conflicts with a rule",
       "chapter": "04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
-      "heading": "A reply speaks as a teammate: the moment chooses its register, its icon and its shape",
+      "heading": "A closing moment has one shape, one icon and one title size",
       "decision": null,
       "restated": [
         {
           "plugin": "spn-devex",
           "path": "refs/devex/agent/agent.md",
-          "heading": "A reply speaks as a teammate: the moment chooses its register, its icon and its shape"
+          "heading": "A closing moment has one shape, one icon and one title size"
         }
       ],
       "line": {
         "text": "Where what SaaS Plane ships and what a partner needs pull apart, the agent shows a product choice with its trade-off, and never says the ask conflicts with a rule.",
         "ref": "refs/devex/agent/agent.md",
-        "heading": "A reply speaks as a teammate: the moment chooses its register, its icon and its shape"
+        "heading": "A closing moment has one shape, one icon and one title size"
       }
     },
     {
@@ -2077,7 +2084,7 @@
       "class": "guidance",
       "sentence": "A command group's usage is learned from the CLI's own usage error, and no check refuses a first write for want of reading it",
       "chapter": "04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
-      "heading": "The four token levers are hooks that refuse, not lines of prose",
+      "heading": "The four token levers are hooks that refuse or note, not lines of prose",
       "decision": "DEC.DEVEX.AGENT.163",
       "restated": []
     },
@@ -2192,6 +2199,93 @@
           "heading": "The rules this step holds"
         }
       ]
+    },
+    {
+      "id": "RULE.DEVEX.AGENT.170",
+      "level": "MUST",
+      "params": {
+        "check": "stop"
+      },
+      "class": "checked",
+      "sentence": "Each closing moment is written in the shape the construct's table gives it",
+      "chapter": "04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
+      "heading": "A closing moment has one shape, one icon and one title size",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/agent/agent.md",
+          "heading": "A closing moment has one shape, one icon and one title size"
+        }
+      ]
+    },
+    {
+      "id": "RULE.DEVEX.AGENT.171",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
+      "sentence": "The closing question has one wording, and the offer to continue follows it",
+      "chapter": "04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
+      "heading": "It opens on the welcome and one status line, never a status dump",
+      "decision": null,
+      "restated": []
+    },
+    {
+      "id": "RULE.DEVEX.AGENT.172",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
+      "sentence": "A handover or a named arc is picked up in one line, and a handover is checked against the model",
+      "chapter": "04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
+      "heading": "It opens on the welcome and one status line, never a status dump",
+      "decision": null,
+      "restated": []
+    },
+    {
+      "id": "RULE.DEVEX.AGENT.173",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
+      "sentence": "The Go line is the one line that says what to do next",
+      "chapter": "04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
+      "heading": "It opens on the welcome and one status line, never a status dump",
+      "decision": null,
+      "restated": []
+    },
+    {
+      "id": "RULE.DEVEX.AGENT.174",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
+      "sentence": "Day zero opens with one question and runs nothing until it is answered",
+      "chapter": "04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
+      "heading": "Which rung you are on is read, never asked",
+      "decision": null,
+      "restated": []
+    },
+    {
+      "id": "RULE.DEVEX.AGENT.175",
+      "level": "MUST",
+      "params": {
+        "short": true
+      },
+      "class": "stated",
+      "sentence": "A card, a question and a handover are written once, in the turn's final message, and a message between steps is at most one short line of what is happening",
+      "chapter": "04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
+      "heading": "A closing moment has one shape, one icon and one title size",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/agent/agent.md",
+          "heading": "A closing moment has one shape, one icon and one title size"
+        }
+      ],
+      "line": {
+        "text": "A card, a question and a handover are written once, in the turn's final message, and a message between steps is at most one short line of what is happening.",
+        "ref": "refs/devex/agent/agent.md",
+        "heading": "A closing moment has one shape, one icon and one title size"
+      }
     },
     {
       "id": "RULE.DEVEX.FUNCTION.007",
@@ -3287,6 +3381,151 @@
       ]
     },
     {
+      "id": "RULE.DEVEX.FUNCTION.099",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-devex/ideate"
+      },
+      "class": "stated in a skill",
+      "sentence": null,
+      "chapter": "04-capabilities/01-devex/01-function/03-ideate.md",
+      "heading": "How a first proposal is shaped",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/function/ideate.md",
+          "heading": "How a first proposal is shaped"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "The rules this step holds"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "How a first proposal is shaped"
+        }
+      ]
+    },
+    {
+      "id": "RULE.DEVEX.FUNCTION.100",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-devex/ideate"
+      },
+      "class": "stated in a skill",
+      "sentence": null,
+      "chapter": "04-capabilities/01-devex/01-function/03-ideate.md",
+      "heading": "How a first proposal is shaped",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/function/ideate.md",
+          "heading": "How a first proposal is shaped"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "The rules this step holds"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "How a first proposal is shaped"
+        }
+      ]
+    },
+    {
+      "id": "RULE.DEVEX.FUNCTION.101",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-devex/ideate"
+      },
+      "class": "stated in a skill",
+      "sentence": null,
+      "chapter": "04-capabilities/01-devex/01-function/03-ideate.md",
+      "heading": "How a first proposal is shaped",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/function/ideate.md",
+          "heading": "How a first proposal is shaped"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "The rules this step holds"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "How a first proposal is shaped"
+        }
+      ]
+    },
+    {
+      "id": "RULE.DEVEX.FUNCTION.102",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-devex/ideate"
+      },
+      "class": "stated in a skill",
+      "sentence": null,
+      "chapter": "04-capabilities/01-devex/01-function/03-ideate.md",
+      "heading": "How a first proposal is shaped",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/function/ideate.md",
+          "heading": "How a first proposal is shaped"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "The rules this step holds"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "How a first proposal is shaped"
+        }
+      ]
+    },
+    {
+      "id": "RULE.DEVEX.FUNCTION.103",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-devex/ideate"
+      },
+      "class": "stated in a skill",
+      "sentence": null,
+      "chapter": "04-capabilities/01-devex/01-function/03-ideate.md",
+      "heading": "How a first proposal is shaped",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/function/ideate.md",
+          "heading": "How a first proposal is shaped"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "The rules this step holds"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "How a first proposal is shaped"
+        }
+      ]
+    },
+    {
       "id": "RULE.DEVEX.UTILS.004",
       "level": "MUST",
       "params": {
@@ -4141,11 +4380,16 @@
         "check": "workstream-state"
       },
       "class": "checked",
-      "sentence": "The agent releases a minor or patch bump without asking, and a major bump is agreed before execution starts",
+      "sentence": "The agent names a release's version from the change, and the arc's preview carries the version and the reason",
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
-      "heading": "A major release is agreed while the arc is planned",
-      "decision": null,
+      "heading": "A release's version is named from the change",
+      "decision": "DEC.DEVEX.WORKSPACE.069",
       "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/agent/agent.md",
+          "heading": "Who decides what"
+        },
         {
           "plugin": "spn-devex",
           "path": "refs/devex/workspace/workstream.md",
@@ -6580,7 +6824,7 @@
         "check": "workstream-state"
       },
       "class": "checked",
-      "sentence": "An arc is named by its number, `N<nnn>`, and its subject and title are fields of its data",
+      "sentence": "An arc is named by its number, `N<nnn>`, or is one of the two fixed arcs, `ideate` and `follow-ups`, and its subject and title are fields of its data",
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "An arc is cut by what is reviewed and released together, and named for its domain",
       "decision": null,
@@ -7817,11 +8061,6 @@
       "restated": [
         {
           "plugin": "spn-devex",
-          "path": "refs/devex/agent/plugins.md",
-          "heading": "A release carries its migration, and a window applies what is pending first"
-        },
-        {
-          "plugin": "spn-devex",
           "path": "refs/devex/workspace/workstream.md",
           "heading": "The life of an arc, and every file it touches"
         }
@@ -7986,7 +8225,7 @@
         "check": "workstream-state"
       },
       "class": "checked",
-      "sentence": "Every arc has an address on the approach page, `approach.html#N<nnn>`, and every link to an arc points there",
+      "sentence": "Every arc has an address on the approach page, `approach.html#<arc>`, and every link to an arc points there",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "Plan lists the arcs, and the arcs are the state",
       "decision": null,
@@ -9217,7 +9456,7 @@
         "check": "stop"
       },
       "class": "checked",
-      "sentence": "The agent never cites a step, an order, a part of a go or an entry of a sheet to you by its number, and never names a file of the arc's notes",
+      "sentence": "The agent never cites a step, an order, a part of a go or an entry of a sheet to you by its number, never writes a rule id, the file name of a check, or a suggestion by its number alone, and never names a file of the arc's notes",
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "You are told about arcs, never about steps",
       "decision": null,
@@ -9306,11 +9545,9 @@
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.317",
-      "level": "MUST",
-      "params": {
-        "check": "rebase-moved"
-      },
-      "class": "checked",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
       "sentence": "After a rebase, a merge or a pull from `develop`, the agent re-reads what moved underneath its arcs",
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "A workstream works on one branch per repository",
@@ -9411,7 +9648,7 @@
         "skill": "spn-devex/develop"
       },
       "class": "stated in a skill",
-      "sentence": "The `debug` group of the plugin reads the agent's own machinery, takes a target and no other option than `--json`, and every `show` takes `--json`",
+      "sentence": "The `debug` group of the plugin reads the agent's own machinery, takes a target and `--json`, and no other option except the time bounds and `--lead` of `cost show`; every `show` takes `--json`",
       "chapter": "04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "heading": "The cost of a window is read from telemetry, never from a transcript",
       "decision": null,
@@ -10271,7 +10508,7 @@
         "check": "workstream-owner"
       },
       "class": "checked",
-      "sentence": "`arcs/` and `notes/` hold arc folders, `N<nnn>/`, and nothing else",
+      "sentence": "`arcs/` and `notes/` hold arc folders, `N<nnn>/`, `ideate/` and `follow-ups/`, and nothing else",
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "The folder",
       "decision": null,
@@ -11861,12 +12098,10 @@
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.472",
-      "level": "MUST",
-      "params": {
-        "check": "merge-told"
-      },
-      "class": "checked",
-      "sentence": "The merge note and the take-up of a suggestion read only this window's arcs and the command that records them",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
+      "sentence": "A suggestion is taken up by an arc only through the command that records it",
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "A check at the end of a turn speaks once, and only about this window's work",
       "decision": null,
@@ -11883,7 +12118,13 @@
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "Stopping in the middle is a handover",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/workstream.md",
+          "heading": "A check at the end of a turn speaks once, and only about this window's work"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.474",
@@ -12157,7 +12398,7 @@
         "check": "doc-check"
       },
       "class": "checked",
-      "sentence": "After `How` comes a section of its own, *Plan*: one row per arc, in the order the arcs run",
+      "sentence": "After `How` comes a section of its own, *Plan*: one row per arc, in the order the arcs run, with `ideate` first and `follow-ups` last",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "Plan lists the arcs, and the arcs are the state",
       "decision": null,
@@ -12223,11 +12464,6 @@
           "plugin": "spn-devex",
           "path": "refs/devex/workspace/docs/doc-sets.md",
           "heading": "The templates sit beside the chapters, in templates/"
-        },
-        {
-          "plugin": "spn-devex",
-          "path": "refs/devex/workspace/docs/templates/README.md",
-          "heading": "The templates, as a partner has them"
         }
       ]
     },
@@ -12315,7 +12551,7 @@
         "check": "arc-status"
       },
       "class": "checked",
-      "sentence": "When the shape is not settled, the first arc is an ideate arc, and it holds the overall proposal",
+      "sentence": "Every workstream opens with its ideate arc and its follow-up arc, and the numbered build arcs sit between them",
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "An arc is cut by what is reviewed and released together, and named for its domain",
       "decision": null,
@@ -12358,7 +12594,7 @@
         "check": "test-run"
       },
       "class": "checked",
-      "sentence": "Follow-ups decided after a close run as small batches, with no arc",
+      "sentence": "Suggestions decided after a close run as after-close batches, with no arc",
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "A suggestion is recorded the moment it is raised",
       "decision": null,
@@ -12398,6 +12634,30 @@
           "heading": "How a first proposal is shaped"
         }
       ]
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.498",
+      "level": "MUST",
+      "params": {
+        "short": true
+      },
+      "class": "stated",
+      "sentence": "An answered card binds every later workstream",
+      "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
+      "heading": "A card is only for what the rules leave open",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/workstream.md",
+          "heading": "A card is only for what the rules leave open"
+        }
+      ],
+      "line": {
+        "text": "An answered card binds every later workstream.",
+        "ref": "refs/devex/workspace/workstream.md",
+        "heading": "A card is only for what the rules leave open"
+      }
     },
     {
       "id": "RULE.LAUNCHPAD.CONTROL_PLANE.001",
@@ -12794,7 +13054,7 @@
       "class": "guidance",
       "sentence": null,
       "chapter": "04-capabilities/03-platform/01-core/01-tenancy/03-people-access.md",
-      "heading": "Enablement: what an organization type is offered",
+      "heading": "Enablement: what an organization's category is offered",
       "decision": null,
       "restated": [
         {
@@ -12899,7 +13159,7 @@
       "class": "stated in a skill",
       "sentence": "No module gates by organization type on its own authority",
       "chapter": "04-capabilities/03-platform/01-core/01-tenancy/03-people-access.md",
-      "heading": "Enablement: what an organization type is offered",
+      "heading": "Enablement: what an organization's category is offered",
       "decision": null,
       "restated": [
         {
@@ -12952,7 +13212,7 @@
       "class": "stated in a skill",
       "sentence": "An enablement offers a surface and set-up, never a capability",
       "chapter": "04-capabilities/03-platform/01-core/01-tenancy/03-people-access.md",
-      "heading": "Enablement: what an organization type is offered",
+      "heading": "Enablement: what an organization's category is offered",
       "decision": null,
       "restated": [
         {
@@ -13489,7 +13749,7 @@
         "skill": "spn-apps/implement"
       },
       "class": "stated in a skill",
-      "sentence": null,
+      "sentence": "An org's parent is the org that sells to it",
       "chapter": "02-constructs/03-platform/01-core/01-tenancy.md",
       "heading": "The parent is the seller",
       "decision": null,
@@ -13585,7 +13845,7 @@
         "skill": "spn-apps/implement"
       },
       "class": "stated in a skill",
-      "sentence": null,
+      "sentence": "Every notification has one sender of record, which is the reader's seller, and every part of an email comes from that sender",
       "chapter": "02-constructs/03-platform/01-core/01-tenancy.md",
       "heading": "Notifications have one sender of record",
       "decision": "DEC.PLATFORM.CORE.064",
@@ -13819,7 +14079,7 @@
         "skill": "spn-apps/implement"
       },
       "class": "stated in a skill",
-      "sentence": "A module registers its own entity types, and a registered type may opt only into capabilities the closed set names.",
+      "sentence": "A module registers its own entity types in its MDM contribution, and a registered type may opt only into capabilities the closed set names.",
       "chapter": "04-capabilities/03-platform/02-modules/01-reference-data/01-reference-data.md",
       "heading": "The registry is open, and its capability set is closed",
       "decision": null,
@@ -15689,9 +15949,9 @@
         "skill": "spn-apps/implement"
       },
       "class": "stated in a skill",
-      "sentence": "A row is proven once per app-site TYPE",
+      "sentence": "A row is proven once per app",
       "chapter": "04-capabilities/02-support/02-apps/06-tests/README.md",
-      "heading": "A row is proven once per app-site type",
+      "heading": "A row is proven once per app",
       "decision": null,
       "restated": [
         {
@@ -18911,6 +19171,11 @@
         },
         {
           "plugin": "spn-devex",
+          "path": "refs/devex/workspace/workstream.md",
+          "heading": "Once an arc is decided, a drift step runs, then four passes per repository"
+        },
+        {
+          "plugin": "spn-devex",
           "path": "skills/test/SKILL.md",
           "heading": "When a whole tier runs"
         }
@@ -19227,7 +19492,7 @@
         "skill": "spn-apps/implement"
       },
       "class": "stated in a skill",
-      "sentence": "In `spn-platform-ts` the migration that owns a table is edited, instead of adding a migration or an `ALTER`, and the stack is reset clean before testing. A module's migrations write only its own tables, and what a module has for another module travels as a contribution that the owner applies",
+      "sentence": "While the stage is ALPHA, the migration that owns a table is edited in every repository, instead of adding a migration or an `ALTER`, and the stack is reset clean before testing; the move to beta collapses a repository's migrations into one baseline before the first append-only migration. A module's migrations write only its own tables, and what a module has for another module travels as a contribution that the owner applies",
       "chapter": "04-capabilities/02-support/02-apps/03-module/01-server/04-migrations/01-foundation.md",
       "heading": "The only schema-change path",
       "decision": null,
@@ -19313,7 +19578,7 @@
         "skill": "spn-apps/implement"
       },
       "class": "stated in a skill",
-      "sentence": "A module's code is 3 to 8 of A–Z and 0–9, starting with a letter, with no underscore, and `IAM`, `ORG`, `MDM`, `NTF`, `CMP`, `DOC`, `LNG`, `JOB` and `ENT` are SaaS Plane's own, so a new module never takes one",
+      "sentence": null,
       "chapter": "04-capabilities/02-support/02-apps/10-providers/ts/02-naming.md",
       "heading": "A module names itself",
       "decision": null,
@@ -21750,7 +22015,7 @@
         {
           "plugin": "spn-apps",
           "path": "refs/platform/core/surfaces.md",
-          "heading": "App sites: routing as data"
+          "heading": "Org app sites: routing as data"
         },
         {
           "plugin": "spn-infra",
@@ -22460,6 +22725,11 @@
       "heading": "A space's family lands under its own prefix",
       "decision": null,
       "restated": [
+        {
+          "plugin": "spn-infra",
+          "path": "refs/support/infra/modules.md",
+          "heading": "The published vocabulary"
+        },
         {
           "plugin": "spn-infra",
           "path": "skills/implement/SKILL.md",

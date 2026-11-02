@@ -94,6 +94,23 @@ try {
           "wait: waits on Q7"].join(" &middot; ") + "</span>", arcCell(byId.N10));
   }
 
+  console.log("\n=== docs cycles — the role arcs: ideate first, follow-ups last (MKT.SCRIPTS.490)");
+  {
+    const orders = [["follow-ups", "N003", "ideate", "N001"], ["N001", "N003", "ideate", "follow-ups"], ["N003", "follow-ups", "N001", "ideate"]];
+    const want = "ideate,N001,N003,follow-ups";
+    orders.forEach((order, at) => {
+      const home = join(TMP, ".spndevex", WORKSTREAMS, "backlog", `05${at}-roles`);
+      for (const id of order) putArc(home, id, { title: `the ${id} arc`, decides: "It decides.", status: "DECIDED" });
+      const cycles = cyclesOf(home);
+      const got = cycles.map((c) => c.id).join(",");
+      ok(`[MKT.SCRIPTS.490] arcs written as ${order.join(", ")} run in the order ${want}`, got === want, got);
+      const table = tableOf(cycles);
+      const rows = [...table.matchAll(/<tr id="([^"]+)" data-arc="([^"]+)"/g)].map((m) => `${m[1]}=${m[2]}`).join(",");
+      ok(`[MKT.SCRIPTS.490] the Plan table lists the rows in that order, each with its id and data-arc`,
+        rows === "ideate=arcs/ideate/state.json,N001=arcs/N001/state.json,N003=arcs/N003/state.json,follow-ups=arcs/follow-ups/state.json", rows);
+    });
+  }
+
   console.log("\n=== docs cycles — the table the approach template carries");
   {
     const cycles = cyclesOf(folder);

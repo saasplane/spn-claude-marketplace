@@ -56,7 +56,7 @@ console.log("\n=== skillValue and stageOf");
   same("[MKT.SCRIPTS.329] execute, check and report take the stage from the work",
     ["DOCS", "CODE", "GENERATED", "TEST", "PROOF", "RELEASE", "DESIGN", null].map((work) => stageOf("DEVEX_EXECUTE", work)),
     ["DEVELOP", "DEVELOP", "DEVELOP", "TEST", "TEST", "DELIVER", null, null]);
-  same("[MKT.SCRIPTS.329] no skill, no stage", [stageOf(null, "CODE"), stageOf("UNKNOWN", "CODE")], [null, null]);
+  same("[MKT.SCRIPTS.470] no skill takes the stage from the work, and no work gives none", [stageOf(null, "CODE"), stageOf("UNKNOWN", "CODE"), stageOf(null, null), stageOf("UNKNOWN", "DESIGN")], ["DEVELOP", "DEVELOP", null, null]);
   same("[MKT.SCRIPTS.329] the work values are the contract's seven", Object.values(SPDevExWorkstreamWorkType), ["DOCS", "CODE", "GENERATED", "DESIGN", "TEST", "RELEASE", "PROOF"]);
 }
 
@@ -93,6 +93,20 @@ console.log("\n=== a written row — off-pattern fields are null");
   same("[MKT.SCRIPTS.329] retryOf is null", rows[0].retryOf, null);
   same("[MKT.SCRIPTS.329] a check whose name is off its pattern writes no row, never check: null", rows.map((row) => row.check), ["split-plan"]);
   same("[MKT.SCRIPTS.329] the first line carries `v`", rows[0].v, 1);
+}
+
+console.log("\n=== the arc field — N<nnn>, ideate and follow-ups");
+{
+  same("[MKT.SCRIPTS.491] ARC_PATTERN accepts N011, ideate and follow-ups", ["N011", "ideate", "follow-ups"].map((one) => ARC_PATTERN.test(one)), [true, true, true]);
+  same("[MKT.SCRIPTS.491] ARC_PATTERN refuses N11, Ideate, follow-up and 012", ["N11", "Ideate", "follow-up", "012"].map((one) => ARC_PATTERN.test(one)), [false, false, false, false]);
+  rmSync(logPath, { force: true });
+  for (const arc of ["ideate", "other"])
+    execFileSync("node", ["--input-type=module", "-e", `
+      import { begin, end, record } from ${JSON.stringify(join(LIB, "timing.ts"))};
+      begin({ script: "spn-devex", event: "PreToolUse", tool: "Bash", session: "s", arc: ${JSON.stringify(arc)} }, ${JSON.stringify(root)});
+      record({ group: "x", action: "split-plan" }, 1);
+      end();`], { env: env(), encoding: "utf8" });
+  same("[MKT.SCRIPTS.491] a row written with arc ideate holds it, and one with other holds null", logOf().map((row) => row.arc), ["ideate", null]);
 }
 
 console.log("\n=== the old log — a first line without `v` moves to .1.jsonl before the append");

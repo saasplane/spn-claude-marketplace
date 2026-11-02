@@ -51,6 +51,9 @@ import { emit, readPayload, runAlone, unescape, workspaceRoot, type Payload, typ
 import { sentenceColumn } from "../lib/item-cells.ts";
 import { findWorkingDetail } from "../lib/working-detail.ts";
 import { isBuilderWorkspace } from "../lib/builder.ts";
+import { ARC_ID } from "../lib/workstream-schema.ts";
+/** An arc's address as a pattern part, read from `ARC_ID`: `N<nnn>`, `ideate` or `follow-ups`. */
+const ARC_PART = ARC_ID.source.slice(1, -1);
 import { findPartnerWords } from "./partner-words.ts";
 import { bookClassFaults, inPluginSource, knownHolders, ownMarketplace, pluginNameFaults } from "./book-classes.ts";
 import { GUIDE_PAGE_SUFFIX, APPROACH_SUFFIX, ARTIFACT, CONSTRUCT_PAGES, CONSTRUCT_PAGE_SUFFIX, HUB, OVERVIEW_PAGE_SUFFIX, PLUGIN_TEMPLATES, POCKET,
@@ -213,7 +216,7 @@ function pocketKind(parts: string[]): { place: string; suffix: string } | null {
 }
 const NODE_MANIFESTS = ["spkind.json", "spinfrapkg.json"];
 const SKIP = new Set(["node_modules", ".git", "dist", "build", "coverage", "tool-results", ".output", ".nx"]);
-/** An arc's one preview, `.spndevex/workstreams/<state>/<NNN>-<subject>/notes/N<nnn>/preview.html` (RULE.DEVEX.WORKSPACE.262). */
+/** An arc's one preview, `.spndevex/workstreams/<state>/<NNN>-<subject>/notes/<arc>/preview.html` (RULE.DEVEX.WORKSPACE.262). */
 const ARC_PREVIEW = new RegExp(`\\/${workstreamPrefixSource()}[^/]+\\/notes\\/N\\d+\\/preview\\.html$`);
 
 const MD_LINK = /!?\[([^\]]*)\]\([^)]*\)/g;
@@ -614,8 +617,8 @@ function workstreamTemplates(): string | null {
   return null;
 }
 
-/** An arc's preview, by its fixed name in `notes/N<nnn>/`. */
-const isArcPreview = (path: string): boolean => /[\\/]notes[\\/]N\d+[a-z]?[\\/]preview\.html$/.test(path);
+/** An arc's preview, by its fixed name in `notes/<arc>/` (`N<nnn>`, `ideate` or `follow-ups`). */
+const isArcPreview = (path: string): boolean => new RegExp(`[\\\\/]notes[\\\\/]${ARC_PART}[\\\\/]preview\\.html$`).test(path);
 
 // A comment every page keeps: the restated chapter, the page's `spn:doc` block, the approach page's `spn:closing` shape (replaced by the closing block at the close), the markers of a generated block, and the `no figure:` line that says why a long What has no figure.
 const KEPT_COMMENT = /^\s*(?:RESTATES:|spn:doc\b|spn:closing\b|\/?spn:generated\b|no figure:)/;
@@ -1390,8 +1393,8 @@ export function itemCellPage(path: string): boolean {
   const base = basename(path);
   if (isApproachPage(path) || base === HUB) return true;
   if (/-(overview|construct)\.html$/.test(base)) return true;
-  // An arc's preview, by its fixed name in `notes/N<nnn>/`, or a preview outside any workstream.
-  return /[\\/]notes[\\/]N\d+[a-z]?[\\/]preview\.html$/.test(path) || /-preview\.html$/.test(base);
+  // An arc's preview, by its fixed name in `notes/<arc>/` (`N<nnn>`, `ideate` or `follow-ups`), or a preview outside any workstream.
+  return new RegExp(`[\\\\/]notes[\\\\/]${ARC_PART}[\\\\/]preview\\.html$`).test(path) || /-preview\.html$/.test(base);
 }
 
 /**

@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/03-platform/01-core/01-tenancy.md",
-      "seen": "773a4221"
+      "seen": "1014f397"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/03-platform/01-core/01-tenancy/",
-      "seen": "50b842bb"
+      "seen": "1f30c24b"
     }
   ]
 }
@@ -64,7 +64,7 @@ Every rule on this page reads off what a type decides, and nothing more. Everyth
 
 A consumer org never resolves a directory before sign-in. The core draws that line by org type, because a directory vouches for a membership and is read before anyone signs in. Opening the directory to consumer orgs later is a change to the core that needs no major version.
 
-**The developer picks a business archetype by choosing which categories to name and where each sits, never by building a second model.** B2C names an Account category alone, as a household. B2B names the same Account category as a company. B2B2C adds an Account Consumer category; B2B2B adds an Account Enterprise category; a marketplace names Merchant and Shopper categories directly beneath the platform instead. Nothing forks to express any of them, and a platform that adds a second archetype later migrates nothing — it names a category the tree already had room for. Naming one is not a code branch: which customer org types an organization may open beneath it is a cell the developer fills on the platform console (see Enablement, below). When you scaffold a new customer shape, look for the category here before you propose a new table.
+**The developer picks a business archetype by choosing which categories to name and where each sits, never by building a second model.** B2C names an Account category alone, as a household. B2B names the same Account category as a company. B2B2C adds an Account Consumer category, and B2B2B adds an Account Enterprise category. A marketplace names Merchant and Shopper categories directly beneath the platform instead. Nothing forks to express any of them, and a platform that adds a second archetype later migrates nothing — it names a category the tree already had room for. Naming one is not a code branch: which customer org types an org may open beneath it is the `IAM_MANAGE_CUSTOMER_ORG_TYPES` cell on its category (see Enablement, below). When you scaffold a new customer shape, look for the category here before you propose a new table.
 
 Read an archetype label from the platform outward, never the other way — MUST. `B2B2B` and `B2B2C` are always platform → business → that business's own businesses or consumers, never read from the customer's own seat. An Account Enterprise is a downstream business of an Account, not a peer of it, and you get the tree wrong if you read the label from the customer's chair.
 
@@ -128,8 +128,8 @@ A **machine principal** is a principal with no person behind it. Every organizat
 
 | Role kind | Who may change it | What it is for |
 | --- | --- | --- |
-| `SYSTEM` | nobody — seeded at the organization's creation | the owner, user and non-human grants every organization gets; shown starred, never editable |
-| `DEFAULT` | the platform, centrally | shared cumulative tiers every organization inherits |
+| `SYSTEM` | nobody — seeded at the organization's creation | the app's three roles, `<APP>_OWNER`, `<APP>_SYSTEM` and `<APP>_USER`, named from the app's code; shown starred, never editable |
+| `DEFAULT` | the platform, centrally | a role a module ships in every app that carries the module |
 | `CUSTOM` | that organization's own administrators | one organization's own role, scoped to it alone |
 
 ```ts
@@ -148,23 +148,24 @@ Write the gate once, at the contract service method — MUST. Every transport th
 
 **Denial is the default.** A permission nobody declared is refused, not quietly allowed.
 
-Some questions are per-record rather than per-capability — *who may edit this one document*. Those are answered by relationship tuples `(entity, relation, subject)` — ReBAC — read at the same authorization point as the permission check, where the subject is a principal, a group or a role. RBAC gates the capability; ReBAC gates the object; neither substitutes for the other.
+Some questions are per-record rather than per-capability — *who may edit this one document*. Those are answered by relationship tuples `(entity, relation, subject)` — ReBAC — read at the same authorization point as the permission check, where the subject is a principal, a group or a role. RBAC gates the capability, and ReBAC gates the object. Neither stands in for the other.
 
 ## Enablement: what a type is offered, never what a person may do
 
 A permission answers what a person may do. An **enablement** answers which screens a person's organization is offered at all — a capability area's screens, and the create, update and delete behind them. The two refuse independently: a person can hold every permission in a family and still find a screen missing, because their organization was never offered that area, and no grant puts it back.
 
 ```ts
-export interface EnablementDefinition {
+export interface ModuleEnablementDefinition {
   code: CDTString;                 // `{MOD}_MANAGE_{NOUN}` — the owning module's mnemonic, the verb and the area
   module: CDTString;               // the module that registered it, and the only owner of what it means
+  fieldType: IAMEnablementFieldType;  // BOOLEAN, NUMBER, SELECT_MULTI or AUTOCOMPLETE_MULTI
   fieldConfig: SPDataFieldConfig;  // the field descriptor — a switch or a selection, with its options
   orgTypes: OrgType[];             // the ceiling: every organization type this may ever be set for
   isActive: CDTBoolean;            // whether the definition takes part in the effective read at all
 }
 
 export interface EffectiveEnablement {
-  orgType: OrgType;                    // the organization type of the org the values were resolved for
+  orgId: CDTString;                    // the org the values were resolved for
   values: EffectiveEnablementValue[];  // one value per active definition whose ceiling includes that type
 }
 
@@ -174,9 +175,9 @@ export interface EffectiveEnablementValue {
 }
 ```
 
-When you add a module, you **declare** — a code, a field descriptor, and a ceiling naming every organization type the question could ever sensibly apply to. You never decide on the module's own authority what a value is; you only say which cell exists. The developer then **authors** one value per category whose org type is inside that ceiling, on the platform console, seeing every category together. Every category inside a ceiling carries an authored row, the platform's own included: the platform's answers are values somebody wrote, never an exemption, because there is no exemption mechanism in this construct at all.
+When you add a module, you **declare** — a code, a field descriptor, and a ceiling naming every organization type the question could ever sensibly apply to. You never decide on the module's own authority what a value is; you only say which cell exists. IAM fills each cell from the default you state by org type. The platform's product module writes a cell only where a category differs from that default, so the value holds in every environment. A change made on a console holds in that one environment. Every category inside a ceiling carries an authored row, the platform's own included: the platform's answers are values somebody wrote, never an exemption, because there is no exemption mechanism in this construct at all.
 
-The grammar is one form: a code reads `{MOD}_MANAGE_{NOUN}` — the owning module's mnemonic, the verb, and the area. `MANAGE` in second position is what tells an enablement from a permission (`{MOD}_{FAMILY}_{TIER}`). There is no amount form — a quota is a commercial question, answered by a plan rather than an organization type.
+The grammar is two forms. An offer reads `{MOD}_MANAGE_{NOUN}`. A limit reads `{MOD}_LIMIT_{NOUN}` and is a `NUMBER` definition, such as `IAM_LIMIT_MEMBERS`. A value of 0 allows none, and an absent code sets no limit. A module checks a limit with `assertWithinLimit` where it creates. `MANAGE` or `LIMIT` in second position is what tells an enablement from a permission (`{MOD}_{FAMILY}_{TIER}`).
 
 Never gate a module by organization type on its own authority — MUST NOT. Enforce the platform's authored enablement instead — that is what keeps a type from meaning one thing in one module and another thing in the next.
 
@@ -213,7 +214,7 @@ When you implement a merge across this chain, state the direction per attribute 
 
 A promise about records — retention, privacy — takes no floor at all and **resolves whole**, because retention has no agreed direction: longer is stricter for an audit obligation, shorter for a privacy one. So a data policy stays with the org that made the promise rather than merging with the org above it.
 
-**Resolution is three-state at every level.** No row present inherits; a row present overrides; a row present and inactive means *none here*. Deleting a row and disabling it are different acts — one restores the inherited option, the other refuses it outright. **Seeing is not configuring** — an administration screen shows what an organization inherits and what its own owner authored as two separate lists; merging them makes ownership unanswerable exactly where it has to be obvious.
+**Resolution is three-state at every level.** No row means the org inherits. A row overrides. A row that is present and inactive means *none here*. Deleting a row and disabling it are different acts — one restores the inherited option, the other refuses it outright. **Seeing is not configuring** — an administration screen shows what an organization inherits and what its own owner authored as two separate lists; merging them makes ownership unanswerable exactly where it has to be obvious.
 
 ## What this replaces
 

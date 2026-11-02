@@ -95,7 +95,7 @@ description: The contract-first build loop - the order work is done in, what eac
 - **A feature of `type` `BACKDROP` stands its media behind its words and its actions, as `DSFeature` lays a backdrop** (`RULE.DEVEX.WORKSPACE.305` · MUST · skill:spn-devex/develop)
 - **The set is the folder `.worktrees/<NNN>-<subject>/` in the workspace root** (`RULE.DEVEX.WORKSPACE.315` · MUST · skill:spn-devex/develop)
 - **One command per target, and a positional word is the target and its one value** (`RULE.DEVEX.WORKSPACE.321` · MUST · skill:spn-devex/develop)
-- **The `debug` group of the plugin reads the agent's own machinery, takes a target and no other option than `--json`, and every `show` takes `--json`** (`RULE.DEVEX.WORKSPACE.323` · MUST · skill:spn-devex/develop)
+- **The `debug` group of the plugin reads the agent's own machinery, takes a target and `--json`, and no other option except the time bounds and `--lead` of `cost show`; every `show` takes `--json`** (`RULE.DEVEX.WORKSPACE.323` · MUST · skill:spn-devex/develop)
 - **`.spndevex/state.json` is the one file where the workspace's commands record what the tree cannot show, with one node for each owner and one writer for each node** (`RULE.DEVEX.WORKSPACE.324` · MUST · skill:spn-devex/develop)
 - **An open card headed with the id its row will take is where that id resolves until the card compresses to the row** (`RULE.DEVEX.WORKSPACE.334` · MUST · skill:spn-devex/develop)
 - **A hook keeps its notes in `.debug/` only inside a workspace it found, and a `.spndevex/` holding nothing but `.debug/` is no workspace** (`RULE.DEVEX.WORKSPACE.338` · MUST · skill:spn-devex/develop)
@@ -162,7 +162,7 @@ Edit the generator or its source when a generated file needs to be different. An
 
 ## The lines that hold
 
-- **A gate carries a permission and an enablement, so classify before you declare one.** A permission says which person may act. An enablement says what the caller's organization type is offered at all. Read the `spn-apps` plugin's `refs/platform/core/tenancy/permission-vs-enablement.md` before you write the gate. It settles the code's grammar, whether the term sits on the gate or in the service body, and why you never gate a read.
+- **A gate carries a permission and an enablement, so classify before you declare one.** A permission says which person may act. An enablement says what the caller's organization is offered at all, by its category. Read the `spn-apps` plugin's `refs/platform/core/tenancy/permission-vs-enablement.md` before you write the gate. It settles the code's grammar, whether the term sits on the gate or in the service body, and why you never gate a read.
 - **Contracts are additive.** A published field is never removed, retyped, or repurposed; new optional fields may be added at any time. A breaking change is a planned, versioned event with a migration path.
 - **Errors are contracts too.** Namespaced codes, each mapped once to a response class, retryability classified rather than guessed. A failure never discloses the existence of something the caller could not otherwise see.
 - **Reuse the shared primitives** — get, bulk get, key lookup, active toggle — before minting a bespoke command for a single identifier.

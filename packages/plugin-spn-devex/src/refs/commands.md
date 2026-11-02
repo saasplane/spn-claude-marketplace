@@ -18,7 +18,11 @@ spn-devex coverage measure [<path>] [--json] — the coverage report's measureme
 
 spn-devex debug cost show <target> [--from <time>] [--to <time>] [--lead] [--json] — what a target cost, a line for each part its breakdown names
 
-spn-devex debug hooks show [--json] — every hook check's, then every event's, runs, time and bytes
+spn-devex debug cost compare <version> <version> [--json] — the before-and-after of a release: what the windows of two plugin versions cost, with the difference
+
+spn-devex debug cost review <workstream>/N<nnn> [--json] — an arc's cells against the three arcs before it: a finding for each that rose past 25%
+
+spn-devex debug hooks show [--json] — every hook check's, then every event's, runs, time, bytes and the size they carried
 
 spn-devex debug store show [--json] — each container of the store: files, size, lifetime
 
@@ -126,37 +130,39 @@ spn-devex restates files check <book> — report each copy that is behind the bo
 
 spn-devex restates files write <book> — copy the book's templates into this plugin, and remove each copy the book no longer holds
 
-spn-devex workstream arc edit <workstream>/N<nnn> [--kind ideate] [--proposes N<nnn>,…] [--title …] [--goal …] [--status …] [--wait …] [--reason …] [--start] [--review-fixes] [--subject …] [--under …] [--preview …] [--decides …] [--repos …] [--cycle …] [--follows …] [--model …] [--position …] [--note …] — open an arc, or change any field of its header and its status; --note writes a log line
+spn-devex workstream arc edit <workstream>/<arc> [--proposes <arc>,…] [--title …] [--goal …] [--status …] [--wait …] [--reason …] [--start] [--review-fixes] [--subject …] [--under …] [--preview …] [--decides …] [--repos …] [--cycle …] [--follows …] [--model …] [--position …] [--note …] — open an arc, or change any field of its header and its status; --note writes a log line
 
-spn-devex workstream arc stamp write <workstream>/N<nnn> — write: restamp an arc's Plan row once its part of the page is current
+spn-devex workstream arc stamp write <workstream>/<arc> — write: restamp an arc's Plan row once its part of the page is current
 
-spn-devex workstream arc delete <workstream>/N<nnn> --note "…" — delete an arc never decided, on the developer's words
+spn-devex workstream arc delete <workstream>/<arc> --note "…" — delete an arc never decided, on the developer's words
 
 spn-devex workstream close <workstream> — close a workstream: run the close gate, stamp the approach page DONE, and move the folder into closed/
 
-spn-devex workstream fact write <workstream>/N<nnn> --source <repository>/<path>[:<line>] --fact "…" [--used-by …] — write one fact, the source's current commit pinned
+spn-devex workstream fact write <workstream>/<arc> --source <repository>/<path>[:<line>] --fact "…" [--used-by …] — write one fact, the source's current commit pinned
 
-spn-devex workstream go write <workstream>/N<nnn> --scope N<nnn>,… [--follow-up] — after the go: derive the plan from the scope's sheets and the telemetry, and write every part's brief; run again it keeps landed and running parts
+spn-devex workstream go write <workstream>/<arc> --scope <arc>,… [--after-close] — after the go: derive the plan from the scope's sheets and the telemetry, and write every part's brief; run again it keeps landed and running parts; an arc is N<nnn>, ideate or follow-ups, and --scope takes a mixed list; --after-close makes the lead carry an after-close batch itself, as one part
 
-spn-devex workstream go show <workstream>/N<nnn> [--part <id>] [--json] — print the parts: their files, their tests, their measured time and what each waits on
+spn-devex workstream go propose <workstream> — before the go: print each proposed scope, the decided arcs that share a repository grouped in chain order, with the full runs and releases the grouping saves
 
-spn-devex workstream go check <workstream>/N<nnn> — read the plan against the sheets: an entry no part holds, or a part whose entries changed since the plan was written, which it marks held; exits 1 on any
+spn-devex workstream go show <workstream>/<arc> [--part <id>] [--json] — print the parts: their files, their tests, their measured time and what each waits on
 
-spn-devex workstream go start <workstream>/N<nnn> <part> — mark a baseline, a full run or a release as running; only a baseline or a full run lets the test-run check open the whole suite
+spn-devex workstream go check <workstream>/<arc> — read the plan against the sheets: an entry no part holds, or a part whose entries changed since the plan was written, which it marks held; exits 1 on any
 
-spn-devex workstream go wait <workstream>/N<nnn> <part> (--on "…" | --clear) — mark a part waiting on something outside the plan (a release, a sign-in, another window's hold), with the reason in plain words; `--clear` takes the wait off, and the part reads ready when what it waits on in the plan has landed
+spn-devex workstream go start <workstream>/<arc> <part> — mark a baseline, a full run or a release as running; only a baseline or a full run lets the test-run check open the whole suite
+
+spn-devex workstream go wait <workstream>/<arc> <part> (--on "…" | --clear) — mark a part waiting on something outside the plan (a release, a sign-in, another window's hold), with the reason in plain words; `--clear` takes the wait off, and the part reads ready when what it waits on in the plan has landed
 
 spn-devex workstream handover <workstream> [--continue "…"] [--do-not-touch "…"] — the handover block, written from the rows, the cards, the live orders and the pins into the arc's log, and printed
 
-spn-devex workstream open --file <block.json> --note "<the developer's words>" [--backlog "<the blocker>"] — open a workstream from the six-things block: the next number, its folder, its approach page and its first arc
+spn-devex workstream open --file <block.json> --note "<the developer's words>" [--backlog "<the blocker>"] — open a workstream from the six-things block: the next number, its folder, its approach page, its ideate arc and its follow-up arc
 
 spn-devex workstream progress write <workstream> — regenerate the progress block in the approach page's Plan
 
-spn-devex workstream question raise <workstream>/N<nnn> --file card.json — raise a card: the next number, the record, the card in the approach page's Open
+spn-devex workstream question raise <workstream>/<arc> --file card.json — raise a card: the next number, the record, the card in the approach page's Open
 
 spn-devex workstream question brief <workstream>/Q<n> — print a fresh view's brief from the card: the problem and the constraints first, no options, the proposals to follow
 
-spn-devex workstream question show Q<n> --in <notes/N<nnn>/preview.html> — show an open card on an arc's preview, in its Open
+spn-devex workstream question show Q<n> --in <notes/<arc>/preview.html> — show an open card on an arc's preview, in its Open
 
 spn-devex workstream question answer Q<n> --key <option> --words "…" [--entries E7,E9] — answer a card in your words; it leaves every Open; with --entries, folded into the What, cited, and the go written again
 
@@ -164,37 +170,41 @@ spn-devex workstream question cite Q<n> --entries E7,E9|none — cite an answere
 
 spn-devex workstream question withdraw Q<n> --words "…" — withdraw a card in your words; it leaves every Open
 
-spn-devex workstream report write [<workstream>] <report.md> — fold a child's report into its row: state, proof, commits, follow-ups
+spn-devex workstream report write [<workstream>] <report.md> | <workstream>/<arc> <part-id> [--run <name>] — fold a child's report into its row: state, proof, commits, follow-ups; with an arc and a part id and no report file it writes the report itself from the plan, the commits since the part started and the named run
 
-spn-devex workstream row add <workstream>/N<nnn> "<title>" --repo <repo> --work <work> [--kind change] [--state ready] [--blocked-by …] [--touches …] [--entries E1,E2] [--position …] [--model …] [--note …] — add a row to an arc, taking the arc's next number and printing it
+spn-devex workstream row add <workstream>/<arc> "<title>" --repo <repo> --work <work> [--kind change] [--state ready] [--blocked-by …] [--touches …] [--entries E1,E2] [--position …] [--model …] [--note …] — add a row to an arc, taking the arc's next number and printing it
 
-spn-devex workstream row state <workstream>/N<nnn> <row> <state> [--on "<what it waits on>"] [--note …] [--run <name>] — move a row to a state; --on names what a waiting row waits on outside the window, --note carries the words beside the move, and --run names the run a CODE or PROOF row of a sheet arc lands on
+spn-devex workstream row state <workstream>/<arc> <row> <state> [--on "<what it waits on>"] [--note …] [--run <name>] — move a row to a state; --on names what a waiting row waits on outside the window, --note carries the words beside the move, and --run names the run a CODE or PROOF row of a sheet arc lands on
 
-spn-devex workstream row note <workstream>/N<nnn> <row> "<text>" — write one line on a row's log, and change nothing else
+spn-devex workstream row note <workstream>/<arc> <row> "<text>" — write one line on a row's log, and change nothing else
 
-spn-devex workstream row edit <workstream>/N<nnn> <row> [--title …] [--kind …] [--repo …] [--work …] [--model …] [--blocked-by …] [--touches …] [--entries E1,E2] [--position …] [--proof …] — change the fields of a row the arc holds; --proof names a carried row's successor; a row it lacks is refused, and `row add` is named
+spn-devex workstream row edit <workstream>/<arc> <row> [--title …] [--kind …] [--repo …] [--work …] [--model …] [--blocked-by …] [--touches …] [--entries E1,E2] [--position …] [--proof …] — change the fields of a row the arc holds; --proof names a carried row's successor; a row it lacks is refused, and `row add` is named
 
-spn-devex workstream row discard <workstream>/N<nnn> <row> --note "…" — take a row found invalid or not needed out of the arc; --note carries the developer's words into its one log line
+spn-devex workstream row discard <workstream>/<arc> <row> --note "…" — take a row found invalid or not needed out of the arc; --note carries the developer's words into its one log line
 
 spn-devex workstream rows show <workstream>[/N<nnn>] [--ready] [--parallel] [--tree] [--json] — print the rows of a workstream or an arc: --ready, --parallel, --tree; with --json, as data
 
-spn-devex workstream sheet write <workstream>/N<nnn> --file <sheet.json> — write the arc's whole sheet from a file, every entry validated and every fact one the arc holds
+spn-devex workstream sheet write <workstream>/<arc> --file <sheet.json> — write the arc's whole sheet from a file, every entry validated and every fact one the arc holds
 
-spn-devex workstream sheet edit <workstream>/N<nnn> <E> [--what …] [--op …] [--file …] [--decided-by …] [--facts …] [--then …] [--rules …] [--callers …] [--docs …] [--book …] [--tiers unit=ID,ID;contract=ID] — change one entry of the sheet; a missing entry is refused, and `sheet write` is named
+spn-devex workstream sheet edit <workstream>/<arc> <E> [--what …] [--op …] [--file …] [--decided-by …] [--facts …] [--then …] [--rules …] [--callers …] [--docs …] [--book …] [--tiers unit=ID,ID;contract=ID] [--trace "…"] [--judged|--mechanical] — change one entry of the sheet; a missing entry is refused, and `sheet write` is named
 
-spn-devex workstream sheet drop <workstream>/N<nnn> <E> --note "…" — take an entry out of the sheet; --note carries why into its one log line
+spn-devex workstream sheet drop <workstream>/<arc> <E> --note "…" — take an entry out of the sheet; --note carries why into its one log line
 
-spn-devex workstream sheet show <workstream>/N<nnn> [--row <id>] [--json] — print the sheet, or one row's entries; --json prints every field
+spn-devex workstream sheet show <workstream>/<arc> [--row <id>] [--part <part>] [--json] — print the sheet, or one row's or one go part's entries; --json prints every field
 
-spn-devex workstream sheet check <workstream>/N<nnn> — read the sheet against the rows and the cards, one finding to a line; exits 1 on any
+spn-devex workstream sheet patch <workstream>/<arc> <E> [--trace "…"] [--judged|--mechanical] — keep an entry's change as a diff against the commit its facts pin, name it in the entry, and reset the file in the worktree; --trace and --judged/--mechanical are recorded with it
+
+spn-devex workstream sheet reach <workstream>/<arc> <E> — print the blast radius of one entry: the entries, files and preview sections a change to it reaches
+
+spn-devex workstream sheet check <workstream>/<arc> — read the sheet against the rows and the cards, one finding to a line; exits 1 on any
 
 spn-devex workstream state show [<workstream>] [--json] — where each open and backlog workstream stands, in a line; with --json, as data
 
 spn-devex workstream state check [<workstream>] [--facts] [--json] — whether each open and backlog workstream is whole: its data, previews, samples, notes folders, stamps, cards and step files
 
-spn-devex workstream suggestion add <workstream>[/N<nnn>] "<title>" [--preview …] [--file card.json] — raise a suggestion: the next number, raised; it also prints the decisions and rules that already speak to its title
+spn-devex workstream suggestion add <workstream>[/<arc>] "<title>" [--preview …] [--file card.json] — raise a suggestion: the next number, raised; it also prints the decisions and rules that already speak to its title
 
-spn-devex workstream suggestion state <workstream> S<n> <state> [--words "…"] [--arc N<nnn>] — move it on: shaped, decided, parked or dropped, with the words beside the move
+spn-devex workstream suggestion state <workstream> S<n> <state> [--words "…"] [--arc <arc>] — move it on: shaped, decided, parked or dropped, with the words beside the move
 
 spn-devex workstream suggestion edit <workstream> S<n> [--title …] [--preview …] — change its title or its preview, never its state
 

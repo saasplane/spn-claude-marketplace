@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/10-providers/ts/08-web.md",
-      "seen": "7b0d7abf"
+      "seen": "e7f315ce"
     }
   ]
 }
@@ -65,7 +65,7 @@ None of these imports a router or reads `window.location`. The app hands them th
 | What | TypeScript | State |
 | --- | --- | --- |
 | The one small provider | `SPPlatformProvider`. The developer uses the name and has not ruled on it | the provider is decided; the name and the package are proposed |
-| What a partner passes | `sessionType`, `appSite?` and `onSignInRequired?`. With no `appSite` the provider finds the site by the host | proposed |
+| What a partner passes | `sessionType`, `orgAppSite?` and `onSignInRequired?`. With no `orgAppSite`, the provider finds the site by the host | proposed |
 | The service's client | not a prop. The app calls `initClient(config)` once at its start | proposed |
 | Where it stands | outside `DSApp` | proposed |
 | What a container and the app read | `usePlatformSession()`: the signed-in person or `null`, `isAuthenticated` and `authLoading`, with the `permissions`, the `enablements` and `handleUnauthenticated` the app passes to the design system's app context | proposed |

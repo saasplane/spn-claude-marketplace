@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/04-plugins/01-plugins.md",
-      "seen": "2dfb9526"
+      "seen": "82e57f00"
     }
   ]
 }
@@ -277,9 +277,9 @@ spn-devex plugin migration check                        exit 1 while one is pend
 spn-devex plugin migration write <id>… [--steps-done]   apply and record, in id order
 ```
 
-**Alpha does not change the retrofit rule.** A standard change still brings every existing open and backlog file to it in the same change (`RULE.DEVEX.WORKSPACE.255` · MUST · check:stop). The migration is how a workspace *elsewhere* — a partner's — gets that change when it takes the release: the builder's workspace is migrated before the cut, and its ledger says so.
+**When the declared stage is ALPHA, a change to a standard still brings every existing file to it in the same change** (`RULE.DEVEX.AGENT.137` · GUIDE). A migration does not replace that. It is how a workspace elsewhere, a partner's, gets the same change when it takes the release, once SaaS Plane is in beta. The builder's workspace is migrated before the release is cut, and its ledger records it. In beta, a partner's window applies it at its first start.
 
-**In alpha, a change is made everywhere at once and leaves no legacy** (`RULE.DEVEX.AGENT.142` · MUST · check:comment-check). No old name, alias, redirect, *formerly* or forward-only exception stays behind. The change removes what its decision made obsolete, and brings every existing file and chapter to the new form. A kept alias is a second answer every reader has to learn and nobody removes.
+**When the declared stage is ALPHA, a change is made everywhere at once and leaves no legacy** (`RULE.DEVEX.AGENT.142` · MUST · check:comment-check). No old name, alias, redirect, *formerly* or forward-only exception stays behind. The change removes what its decision made obsolete, and it brings every existing file and chapter to the new form. A kept alias is a second answer that every reader has to learn and nobody removes.
 
 ## What a hook runs, and where its cache lives
 
@@ -289,9 +289,9 @@ spn-devex plugin migration write <id>… [--steps-done]   apply and record, in i
 
 **A plugin script and its tests build a docs path through one layout module, never as a literal** (`RULE.DEVEX.AGENT.146` · GUIDE). When the docs tree moves a folder, one module changes and every script follows. A literal path breaks quietly, in whichever script nobody thought to search.
 
-**The Stop hook's `window` check offers a new window.** It reads the last call's context from the transcript. From 200k, at a clean point (no row running, no helper out, `workstream state check` whole), in any phase, it asks the turn to write every open point and offer a new window, and to tell the person in their own words why a new window helps, that the handover keeps every open point, and how to open one; past 450k it asks always, and again only after another 50k (`RULE.DEVEX.AGENT.103` · MUST · check:stop).
+**The Stop hook's `window` check offers a new window.** It reads the last call's context from the transcript. From 200k, at a clean point (no row running, no helper out, `workstream state check` whole), in any phase, it asks the turn to write every open point and offer a new window, and to tell the person in their own words why a new window helps, that the handover keeps every open point, and how to open one. The workstream chapter owns the tiers: from 200k at a clean point it offers once, and again only after another 50k; past 300k it writes the handover at the next clean point unasked; past 450k the offer is not left to a clean point (`RULE.DEVEX.AGENT.103` · MUST · check:stop).
 
-**The PreToolUse `agent-model` check holds every launch to its model.** It refuses a launch of the Agent tool that names no model, a launch of an order on a model other than its `model:` line names, and a fork (`RULE.DEVEX.AGENT.104` · MUST · check:agent-model).
+**The PreToolUse `agent-model` check holds every launch to its model.** It refuses a launch of the Agent tool that names no model and no order names one, and a fork (`RULE.DEVEX.AGENT.104` · MUST · check:agent-model). A launch of an order on another model takes the order's `model:` line.
 
 ## Where the Surface check sits among the hooks
 

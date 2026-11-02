@@ -4,12 +4,12 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "The approach document — a workstream's, never a repository's",
-      "seen": "d9a0d7ca"
+      "seen": "616ce7be"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "section": "A card is only for what the rules leave open",
-      "seen": "4cf1e009"
+      "seen": "9e9513e7"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
@@ -137,7 +137,7 @@ wherever it stands. The `workstream question` commands are the record's only wri
 | Command | What it does |
 | --- | --- |
 | `question raise <arc> --file card.json` | takes the next number from the record, writes the record, and puts the card in the approach page's `Open`. `card.json` is the card with its title, and a card with a part missing is refused, and so is a card whose What cites nothing it read: add the file and line, or a fact id, for what the card says about today, for example `scripts/commands/workstream/question.ts:68` or `f9` |
-| `question show <qN> --in notes/N<nnn>/preview.html` | shows the card in that preview's `Open`, with a line back to the approach page |
+| `question show <qN> --in notes/<arc>/preview.html` | shows the card in that preview's `Open`, with a line back to the approach page |
 | `question answer <qN> --key A --words "…"` | records the answer in the developer's words, and takes the card off every page |
 | `question withdraw <qN> --words "…"` | records the withdrawal, and takes the card off every page |
 
