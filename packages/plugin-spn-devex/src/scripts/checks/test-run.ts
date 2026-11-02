@@ -1,13 +1,13 @@
 #!/usr/bin/env node
-// RESTATES: spn-foundation RULE.DEVEX.WORKSPACE.496 — a follow-up batch after a close runs its whole suite under `followup-<NNN>-<n>`; RULE.DEVEX.WORKSPACE.207 — no source or test file changes while a test run for
+// RESTATES: spn-foundation RULE.DEVEX.WORKSPACE.496 — an after-close batch runs its whole suite under `after-close-<NNN>-<n>`; RULE.DEVEX.WORKSPACE.207 — no source or test file changes while a test run for
 // that repository is in flight, and a whole suite runs at the go's named points, never per change.
 //
 // Refuses a write under a repository's `src` or `tests` while a test command for that repository has
 // a start file under `.spndevex/.debug/sessions/<id>/pending/`, which `lib/bash-timing.ts` writes before a
 // timed Bash command. The design is in the hooks chapter, § A source edit waits while a test run is going.
 //
-// A whole suite run under the name `followup-<NNN>-<n>` passes while workstream `<NNN>` is closed and holds a decided suggestion: a follow-up
-// decided after a close runs as a small batch with no arc and no go (RULE.DEVEX.WORKSPACE.496).
+// A whole suite run under the name `after-close-<NNN>-<n>` passes while workstream `<NNN>` is closed and holds a decided suggestion: a suggestion
+// decided after a close runs as an after-close batch with no arc and no go (RULE.DEVEX.WORKSPACE.496).
 //
 // Refuses a whole suite, by any runner the repository uses, unless a baseline, full or proof run of a go is running for that
 // repository: `workstream go start` marks one running in the lead arc's `go.json`. A narrowed run always passes.
@@ -113,11 +113,11 @@ export function runNameOfCommand(found: Reading): string | null {
 }
 
 /**
- * Whether a run name is a follow-up batch's (RULE.DEVEX.WORKSPACE.496): `followup-<NNN>-<n>`, where workstream `<NNN>` sits in `closed/` and holds
+ * Whether a run name is an after-close batch's (RULE.DEVEX.WORKSPACE.496): `after-close-<NNN>-<n>`, where workstream `<NNN>` sits in `closed/` and holds
  * at least one suggestion that reads `decided`. The same name for an open workstream, a closed one with none decided, or a name of another shape is not.
  */
-export function followupRun(root: string, name: string | null): boolean {
-  const found = name === null ? null : /^followup-(\d{3})-(\d+)$/.exec(name);
+export function afterCloseRun(root: string, name: string | null): boolean {
+  const found = name === null ? null : /^after-close-(\d{3})-(\d+)$/.exec(name);
   if (!found) return false;
   const closed = workstreamsOf(root, ["closed"]).filter((ws) => basename(ws).startsWith(`${found[1]}-`));
   return closed.some((ws) => readJsonl(suggestionsFileOf(ws)).some((one) => (one as { state?: unknown } | undefined)?.state === "decided"));
@@ -166,7 +166,7 @@ export function checkWholeSuite(payload: Payload): Verdict {
   if (!root) return null;
   const whole = readCommand(command, cwd, loadPrograms(root), root).filter(isWholeSuite);
   if (!whole.length) return null;
-  if (whole.every((found) => followupRun(root, runNameOfCommand(found)))) return null;
+  if (whole.every((found) => afterCloseRun(root, runNameOfCommand(found)))) return null;
   const repo = whole.map((found) => found.repo).find(Boolean) ?? repoAt(root, cwd);
   const plans = openPlans(root);
   const forRepo = (part: GoPart): boolean => isSuitePart(part) && (!repo || part.repo === repo);

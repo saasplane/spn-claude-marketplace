@@ -2,7 +2,7 @@
 //           RULE.DEVEX.WORKSPACE.485, a go's first plan and each release part wait for a panel's verdict on record
 // The chapter is the source of truth; a rule change is edited there first, then here, in the same change.
 //
-//   spn-devex workstream go write <workstream>/<arc> [--scope <arc>,…] [--follow-up]
+//   spn-devex workstream go write <workstream>/<arc> [--scope <arc>,…] [--after-close]
 //   spn-devex workstream go show  <workstream>/<arc> [--part <id>] [--json]
 //   spn-devex workstream go check <workstream>/<arc>
 //   spn-devex workstream go start <workstream>/<arc> <part>
@@ -149,7 +149,7 @@ function brief(plan: GoPlan, part: GoPart, ws: string, root: string): string {
     `| **Repo** | \`${part.repo}\` · **Run from:** \`${join(root, ".worktrees", basename(ws), part.repo)}\` |`,
     `| **Work** | ${part.work} · ${workOf(part, true)} |`, "",
     ...(part.model === "lead"
-      ? ["**A follow-up: the lead window carries this out itself**, as one part with one report, and launches no helper.",
+      ? ["**An after-close batch: the lead window carries this out itself**, as one part with one report, and launches no helper.",
          `Run \`workstream report write ${ref} ${part.id} --run <name>\` when it lands; save a report file beside this brief as \`${part.id}.report.md\`, its front matter first, only to return \`needs-you\`, a follow-up or an \`unnamed:\` list.`, ""]
       : [`**Launch no agent.** Stop at ${Math.round(stop.context / 1000)}k of context or ${stop.turns} turns, at the next whole step, say what is left and hand back.`,
          "**Read only the files below**; read further only where one of them sends you. **Search with `grep` in Bash, since you have no Grep tool.**",
@@ -214,7 +214,7 @@ function patchApplies(ws: string, arc: string, entry: SheetEntry, root: string):
 }
 
 function write(args: string[]): number {
-  const words = readWords(args, { scope: VALUE, "follow-up": FLAG });
+  const words = readWords(args, { scope: VALUE, "after-close": FLAG });
   const [ref, ...more] = words.paths;
   if (more.length) throw new UsageFault("takes one arc.");
   const { ws, arc: lead } = arcNamed(ref);
@@ -241,7 +241,7 @@ function write(args: string[]): number {
   }
   const { circles, ...plan } = deriveGo(sheets.map((one) => ({ ...one, data: arcs.find((data) => data.arc === one.arc) ?? null })), {
     siblings,
-    rates: ratesOf(measures), measures, previous, fullRunMinutes: fullRunMinutes(root), landedOrder: landedOrder(ws, lead), followUp: words.given("follow-up"),
+    rates: ratesOf(measures), measures, previous, fullRunMinutes: fullRunMinutes(root), landedOrder: landedOrder(ws, lead), followUp: words.given("after-close"),
     dirsOf: (repo) => dirsIn(root, ws, repo),
     patchOk: (arc, entry) => patchApplies(ws, arc, entry, root),
   });
@@ -413,7 +413,7 @@ function wait(args: string[]): number {
 }
 
 export const actions: Record<string, Action> = {
-  write: { describe: "after the go: derive the plan from the scope's sheets and the telemetry, and write every part's brief; run again it keeps landed and running parts; an arc is N<nnn>, ideate or follow-ups, and --scope takes a mixed list; --follow-up makes the lead carry the fixes of a landed go itself, and is not the follow-up arc", usage: "<workstream>/<arc> --scope <arc>,… [--follow-up]", run: write },
+  write: { describe: "after the go: derive the plan from the scope's sheets and the telemetry, and write every part's brief; run again it keeps landed and running parts; an arc is N<nnn>, ideate or follow-ups, and --scope takes a mixed list; --after-close makes the lead carry an after-close batch itself, as one part", usage: "<workstream>/<arc> --scope <arc>,… [--after-close]", run: write },
   show: { describe: "print the parts: their files, their tests, their measured time and what each waits on", usage: "<workstream>/<arc> [--part <id>] [--json]", run: show },
   check: { describe: "read the plan against the sheets: an entry no part holds, or a part whose entries changed since the plan was written, which it marks held; exits 1 on any", usage: "<workstream>/<arc>", run: checkGo },
   start: { describe: "mark a baseline, a full run or a release as running; only a baseline or a full run lets the test-run check open the whole suite", usage: "<workstream>/<arc> <part>", run: start },

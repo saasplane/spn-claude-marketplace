@@ -13,11 +13,11 @@
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/02-workstream.md",
-      "seen": "668661a4"
+      "seen": "0808a899"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
-      "seen": "66350752"
+      "seen": "fd545dac"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -51,7 +51,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "seen": "ad1523ed"
+      "seen": "384f3a09"
     }
   ]
 }
@@ -335,7 +335,7 @@ The plan holds the release parts too, merged from the scope's sheets in chain or
 
 **A suggestion belongs to an arc, as a card does, and the arc's sheet cites it** (`RULE.DEVEX.WORKSPACE.488` · MUST · check:split-plan). It is raised against the arc it would change, `suggestion add <NNN>/<arc> "…"`, as `question raise` takes its arc, and `suggestion state <S> shaped --arc <arc>` moves it to the arc that takes it up. Before that arc's plan is written, an entry of its sheet cites the suggestion in `decidedBy`, as `S65`, and `go write` refuses a sheet that leaves a decided one out, naming it. Before the arc reads `LANDED`, every suggestion against it is decided and built, parked or dropped, as `RULE.DEVEX.WORKSPACE.435` asks of the ones it raised, and the last row's landing refuses while one is still raised or shaped. A suggestion raised with no arc goes to the workstream's `follow-ups` arc, where it stays until a build arc takes it up.
 
-**Follow-ups decided after a close run as small batches, with no arc** (`RULE.DEVEX.WORKSPACE.496` · MUST · check:test-run). When a closed workstream's suggestions are decided after its close, carry them out as small batches against that workstream, with no arc and no go. A whole suite then runs under a run named `followup-<NNN>-<n>`, which the test-run check lets through only while workstream `<NNN>` is closed and holds a decided suggestion, so it counts for the push like a full run. Each batch is released as any change is, and the batch's suggestions are the record of what it carried.
+**Suggestions decided after a close run as after-close batches, with no arc** (`RULE.DEVEX.WORKSPACE.496` · MUST · check:test-run). When a closed workstream's suggestions are decided after its close, carry them out as after-close batches against that workstream, with no arc and no go. `go write --after-close` is the lead window's one-part mode for such a batch. A whole suite then runs under a run named `after-close-<NNN>-<n>`, which the test-run check lets through only while workstream `<NNN>` is closed and holds a decided suggestion, so it counts for the push like a full run. Each batch is released as any change is, and the batch's suggestions are the record of what it carried.
 
 **A workstream closes only once every suggestion is decided, parked or dropped** (`RULE.DEVEX.WORKSPACE.489` · MUST · check:split-plan). `workstream close` refuses while one still reads raised or shaped, and names each, before it stamps or moves anything.
 

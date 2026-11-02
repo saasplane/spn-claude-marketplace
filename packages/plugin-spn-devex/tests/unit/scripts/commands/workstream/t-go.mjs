@@ -379,19 +379,19 @@ console.log("\n=== a decided suggestion against an arc is cited by its sheet, or
   ok("[MKT.SCRIPTS.405] cited as s65, the lowercase form, it counts too", cli(cited.root, ["workstream", "go", "write", "N001"]).code === 0);
 }
 
-console.log("\n=== write --follow-up: one part the lead carries out, with one report");
+console.log("\n=== write --after-close: one part the lead carries out, with one report");
 {
   const fu = await dataWorkspace("go-follow", { rows });
   const cliFu = (...args) => cli(fu.root, ["workstream", ...args]);
   cliFu("fact", "write", "N001", "--source", "spn-x/a.ts", "--fact", "a is 1", "--used-by", "1");
   writeFileSync(join(fu.root, "sheet-in.json"), JSON.stringify(sheetOf([entry("E1", "spn-x:docs/a.md"), entry("E2", "spn-x:src/b.ts")])));
   cliFu("sheet", "write", "N001", "--file", join(fu.root, "sheet-in.json"), "--because", "the developer added E2");
-  const wrote = cliFu("go", "write", "N001", "--follow-up");
+  const wrote = cliFu("go", "write", "N001", "--after-close");
   const plan = json(join(fu.ws, "arcs", "N001", "go.json"));
-  ok("[MKT.SCRIPTS.416] --follow-up plans the entries as one lead part, then the full run because code changed",
+  ok("[MKT.SCRIPTS.416] --after-close plans the entries as one lead part, then the full run because code changed",
     wrote.code === 0 && JSON.stringify(plan.parts.filter((p) => !p.id.startsWith("release") && !p.id.startsWith("proof")).map((p) => [p.id, p.entries.length, p.model])) === '[["code-spn-x-1",2,"lead"],["full-spn-x",0,"none"]]', wrote.out + JSON.stringify(plan.parts.map((p) => p.id)));
   const briefText = readFileSync(join(fu.ws, "notes", "N001", "orders", "code-spn-x-1.md"), "utf8");
-  ok("[MKT.SCRIPTS.416] its brief says the lead window carries it out itself, and the next step says so", briefText.includes("the lead window carries this out itself") && !briefText.includes("Launch no agent") && wrote.out.includes("carry out code-spn-x-1 yourself"), wrote.out);
+  ok("[MKT.SCRIPTS.416] its brief opens as an after-close batch, says the lead window carries it out itself, and the next step says so", briefText.includes("An after-close batch: the lead window carries this out itself") && !briefText.includes("Launch no agent") && wrote.out.includes("carry out code-spn-x-1 yourself"), wrote.out);
 }
 
 console.log("\n=== another arc of the workstream outside the scope, and a circle between two inside it");
@@ -565,9 +565,9 @@ console.log("\n=== an arc is addressed as N<nnn>, ideate or follow-ups, and a sc
   const ideate = run("write", "031/ideate");
   ok("[MKT.SCRIPTS.442] `ideate` is read as an arc too: it is refused for having no sheet, as any arc without one, and nothing is written",
     ideate.code === 1 && ideate.out.includes("Nothing was written") && !existsSync(join(world.ws, "arcs", "ideate", "go.json")) && !/usage|not an arc/i.test(ideate.out), ideate.out);
-  // the help lists each command with its describe, which holds the `--follow-up` sentence
+  // the help lists each command with its describe, which holds the `--after-close` sentence
   const help = cli(world.root, ["help"]);
-  ok("[MKT.SCRIPTS.442] the `--follow-up` help says it is not the follow-up arc", /not the follow-up arc/i.test(help.out), help.out);
+  ok("[MKT.SCRIPTS.442] the `--after-close` help names the flag and no longer speaks of the follow-up arc", /--after-close/.test(help.out) && !/not the follow-up arc/i.test(help.out), help.out);
 }
 
 console.log(`\n${total - failed}/${total} passed`);

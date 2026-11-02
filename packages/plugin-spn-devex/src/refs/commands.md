@@ -138,7 +138,7 @@ spn-devex workstream close <workstream> — close a workstream: run the close ga
 
 spn-devex workstream fact write <workstream>/<arc> --source <repository>/<path>[:<line>] --fact "…" [--used-by …] — write one fact, the source's current commit pinned
 
-spn-devex workstream go write <workstream>/<arc> --scope <arc>,… [--follow-up] — after the go: derive the plan from the scope's sheets and the telemetry, and write every part's brief; run again it keeps landed and running parts; an arc is N<nnn>, ideate or follow-ups, and --scope takes a mixed list; --follow-up makes the lead carry the fixes of a landed go itself, and is not the follow-up arc
+spn-devex workstream go write <workstream>/<arc> --scope <arc>,… [--after-close] — after the go: derive the plan from the scope's sheets and the telemetry, and write every part's brief; run again it keeps landed and running parts; an arc is N<nnn>, ideate or follow-ups, and --scope takes a mixed list; --after-close makes the lead carry an after-close batch itself, as one part
 
 spn-devex workstream go show <workstream>/<arc> [--part <id>] [--json] — print the parts: their files, their tests, their measured time and what each waits on
 
