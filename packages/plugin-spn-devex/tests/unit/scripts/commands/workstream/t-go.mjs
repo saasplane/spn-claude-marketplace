@@ -570,5 +570,72 @@ console.log("\n=== an arc is addressed as N<nnn>, ideate or follow-ups, and a sc
   ok("[MKT.SCRIPTS.442] the `--after-close` help names the flag and no longer speaks of the follow-up arc", /--after-close/.test(help.out) && !/not the follow-up arc/i.test(help.out), help.out);
 }
 
+console.log("\n=== E35: a stale patch, the format line, go propose, write refusals (MKT.SCRIPTS.497, .503, .502, .504)");
+{
+  const row = (id, work, over = {}) => ({ id, parent: "N001", kind: "change", repo: "spn-x", blockedBy: [], touches: [], state: "waiting", title: `row ${id}`, work, ...over });
+  const identity = { GIT_AUTHOR_NAME: "t", GIT_AUTHOR_EMAIL: "t@t", GIT_COMMITTER_NAME: "t", GIT_COMMITTER_EMAIL: "t@t" };
+  const fact = (world) => cli(world.root, ["workstream", "fact", "write", "N001", "--source", "spn-x/a.ts", "--fact", "a is 1", "--used-by", "1"]);
+
+  // .497: the file moved after the patch's base
+  const world = await dataWorkspace("go-stale", { rows: [row("1", "CODE", { entries: ["E1"] })] });
+  const inRepo = (args) => execFileSync("git", args, { cwd: world.repo, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] });
+  const commit = (m) => { inRepo(["add", "-A"]); inRepo(["-c", "user.email=t@t", "-c", "user.name=t", "commit", "-q", "-m", m]); };
+  put(world.root, "spn-x/src/s1.ts", "export const s1 = 1;\n");
+  commit("file");
+  const base = inRepo(["rev-parse", "HEAD"]).trim();
+  writeFileSync(join(world.repo, "src/s1.ts"), "export const s1 = 2;\n");
+  put(world.ws, "arcs/N001/patches/E1.diff", inRepo(["diff", "--", "src/s1.ts"]));
+  inRepo(["checkout", "HEAD", "--", "src/s1.ts"]);
+  fact(world);
+  writeFileSync(join(world.ws, "arcs", "N001", "sheet.json"), JSON.stringify(sheetOf([entry("E1", "spn-x:src/s1.ts", { patch: { file: "patches/E1.diff", base } })]), null, 2));
+  cli(world.root, ["workstream", "go", "write", "N001"]);
+  const planFile = join(world.ws, "arcs", "N001", "go.json");
+  const planned = json(planFile);
+  writeFileSync(planFile, JSON.stringify({ ...planned, parts: planned.parts.map((p) => (/^(docs|baseline)-/.test(p.id) ? { ...p, state: "landed" } : p)) }, null, 2));
+  writeFileSync(join(world.repo, "src/s1.ts"), "export const s1 = 9;\n");
+  commit("moved");
+  const stale = cli(world.root, ["workstream", "go", "start", "N001", "apply-spn-x"], identity);
+  ok("[MKT.SCRIPTS.497] a patch whose file moved since its base is refused by entry, with the `workstream sheet patch` text",
+    stale.code === 1 && stale.out.includes("N001/E1") && stale.out.includes("patch is stale") && stale.out.includes("src/s1.ts") && stale.out.includes("run `workstream sheet patch ") && stale.out.includes(" E1`"), stale.out);
+  ok("[MKT.SCRIPTS.497] and the file is left as committed, the part not landed", readFileSync(join(world.repo, "src/s1.ts"), "utf8") === "export const s1 = 9;\n" && json(planFile).parts.find((p) => p.id === "apply-spn-x")?.state !== "landed");
+
+  // .503: format line by repository type
+  const briefOf = async (name, type) => {
+    const w = await dataWorkspace(name, { rows: [row("1", "CODE", { entries: ["E1"] })] });
+    put(w.root, "spn-x/sprepo.json", JSON.stringify({ type }));
+    put(w.root, "spn-x/apps/billing/src/b.ts", "export const b = 1;\n");
+    execFileSync("git", ["add", "-A"], { cwd: w.repo });
+    execFileSync("git", ["-c", "user.email=t@t", "-c", "user.name=t", "commit", "-q", "-m", "x"], { cwd: w.repo });
+    fact(w);
+    writeFileSync(join(w.ws, "arcs", "N001", "sheet.json"), JSON.stringify(sheetOf([entry("E1", "spn-x:apps/billing/src/b.ts")]), null, 2));
+    const wrote = cli(w.root, ["workstream", "go", "write", "N001"]);
+    const code = json(join(w.ws, "arcs", "N001", "go.json")).parts.find((p) => p.work === "CODE");
+    const file = join(w.ws, "notes", "N001", "orders", `${code?.id}.md`);
+    return { wrote, text: existsSync(file) ? readFileSync(file, "utf8") : "" };
+  };
+  const apps = await briefOf("go-fmt-apps", "APPS");
+  ok("[MKT.SCRIPTS.503] an APPS repository's code brief carries `spnutils apps format billing`", apps.wrote.code === 0 && apps.text.includes("`spnutils apps format billing`"), apps.wrote.out + apps.text.slice(0, 600));
+  const general = await briefOf("go-fmt-general", "GENERAL");
+  ok("[MKT.SCRIPTS.503] a repository of another type gets no format line", general.wrote.code === 0 && general.text.length > 0 && !general.text.includes("apps format"), general.wrote.out);
+
+  // .502: go propose
+  const two = await dataWorkspace("go-propose", { rows: [row("1", "CODE", { entries: ["E1"] })] });
+  const second = { ...arcData([{ ...row("1", "CODE", { entries: ["E1"] }), parent: "N002" }]), arc: "N002", subject: "second", title: "the second arc", status: "DECIDED" };
+  mkdirSync(join(two.ws, "arcs", "N002"), { recursive: true });
+  writeFileSync(join(two.ws, "arcs", "N002", "state.json"), JSON.stringify(second, null, 2));
+  writeFileSync(join(two.ws, "arcs", "N001", "sheet.json"), JSON.stringify(sheetOf([entry("E1", "spn-x:src/p1.ts")]), null, 2));
+  writeFileSync(join(two.ws, "arcs", "N002", "sheet.json"), JSON.stringify(sheetOf([entry("E1", "spn-x:src/p2.ts")]), null, 2));
+  const proposed = cli(two.root, ["workstream", "go", "propose", "031"]);
+  ok("[MKT.SCRIPTS.502] go propose prints `scope 1 · N001, N002 · spn-x` for two arcs sharing a repository", proposed.code === 0 && /scope 1 · N001, N002 · spn-x/.test(proposed.out), proposed.out);
+  ok("[MKT.SCRIPTS.502] and the line `one whole run and one release for each of the 1, in place of 2`", proposed.out.includes("one whole run and one release for each of the 1, in place of 2"), proposed.out);
+
+  // .504: a write refusal ends with the command to run
+  const bad = await dataWorkspace("go-refuse", { rows: [row("1", "CODE", { entries: ["E1"] })] });
+  const badFile = join(bad.ws, "arcs", "N001", "state.json");
+  writeFileSync(badFile, JSON.stringify({ ...json(badFile), status: "PROPOSED" }, null, 2));
+  const refusedWrite = cli(bad.root, ["workstream", "go", "write", "N001"]);
+  ok("[MKT.SCRIPTS.504] a write refusal ends with `: run `workstream …`", refusedWrite.code === 1 && /: run `workstream arc edit [^`]*DECIDED`/.test(refusedWrite.out), refusedWrite.out);
+}
+
 console.log(`\n${total - failed}/${total} passed`);
 process.exit(failed ? 1 : 0);

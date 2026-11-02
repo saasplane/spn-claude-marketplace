@@ -14,16 +14,16 @@
 // Every command ends with the next step to run.
 
 import { execFileSync } from "node:child_process";
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { basename, dirname, join, resolve } from "node:path";
 import { type Action, FLAG, VALUE, UsageFault, readWords } from "../../../../../plugin-support-lib/src/lib/command.ts";
 import {
-  clearWaiting, deriveGo, fullRunMinutes, goFileOf, isApplyPart, landedEntries, landedOrder, landedMeasures, markWaiting, planScope, readGo, readyParts, ratesOf, staleEntries, testFilesOf, unheldEntries,
+  clearWaiting, deriveGo, fullRunMinutes, goFileOf, isApplyPart, landedEntries, landedOrder, landedMeasures, markWaiting, planScope, proposeScopes, readGo, readyParts, redCheckIds, ratesOf, staleEntries, testFilesOf, unheldEntries,
   type ScopeSheet,
 } from "../../lib/go-plan.ts";
 import { arcDataDir, arcIdsOf, logEvent, logFileOf, notesDirOf, readArc, readJson, readJsonl, readSheet, workspaceOf, writeWhole } from "../../lib/workstream.ts";
 import { DONE_STATES, renameDataToWork, type ArcData, type GoPart, type GoPlan, type SheetEntry } from "../../lib/workstream-schema.ts";
-import { arcNamed, listOf } from "./_shared.ts";
+import { arcNamed, listOf, workstreamNamed } from "./_shared.ts";
 import { sizedStop } from "../../checks/child-size.ts";
 import { panelOnRecord, panelsVisible } from "../../checks/split-plan.ts";
 import { renameFirstRead, sheetFindings } from "./sheet.ts";
@@ -77,17 +77,17 @@ function scopeOf(ws: string, scope: string[], lead: string): { sheets: ScopeShee
   const sheets: ScopeSheet[] = [];
   const arcs: ArcData[] = [];
   const faults: string[] = [];
-  if (scope[0] !== lead) faults.push(`\`--scope\` starts with \`${scope[0] ?? "nothing"}\`, and the lead is \`${lead}\`: the lead is the first arc of the scope`);
+  if (scope[0] !== lead) faults.push(`\`--scope\` starts with \`${scope[0] ?? "nothing"}\`, and the lead is \`${lead}\`: the lead is the first arc of the scope: run \`workstream go write ${basename(ws)}/${lead} --scope ${[lead, ...scope.filter((one) => one !== lead)].join(",")}\``);
   for (const arc of scope) {
     renameFirstRead(ws, arc);
     const data = readArc(ws, arc);
     const sheet = readSheet(ws, arc);
-    if (!data) { faults.push(`${arc} has no data`); continue; }
-    if (data.status !== "DECIDED") faults.push(`${arc} is ${data.status}, not DECIDED`);
-    if (!sheet) { faults.push(`${arc} keeps no sheet`); continue; }
-    for (const finding of sheetFindings(ws, arc)) faults.push(`${arc} sheet: ${finding}`);
+    if (!data) { faults.push(`${arc} has no data: run \`workstream arc edit ${basename(ws)}/${arc} --status DECIDED\``); continue; }
+    if (data.status !== "DECIDED") faults.push(`${arc} is ${data.status}, not DECIDED: run \`workstream arc edit ${basename(ws)}/${arc} --status DECIDED\``);
+    if (!sheet) { faults.push(`${arc} keeps no sheet: run \`workstream sheet write ${basename(ws)}/${arc} --file <sheet.json>\``); continue; }
+    for (const finding of sheetFindings(ws, arc)) faults.push(`${arc} sheet: ${finding}: run \`workstream sheet edit ${basename(ws)}/${arc} ${/^(E\d+)\b/.exec(finding)?.[1] ?? "<E>"} …\``);
     // A release part is named for its repository, so a line that is not one name would make a part no reader accepts.
-    for (const line of sheet.releaseChain) if (!/^\S+$/.test(line)) faults.push(`${arc} sheet: the release order line "${line}" is not a repository's name`);
+    for (const line of sheet.releaseChain) if (!/^\S+$/.test(line)) faults.push(`${arc} sheet: the release order line "${line}" is not a repository's name: run \`workstream sheet write ${basename(ws)}/${arc} --file <sheet.json>\``);
     // A proof step not landed owes its repository a full run; an arc that changes no repository lands its proof on its check's run.
     const proofs = data.rows.filter((row) => row.work === "PROOF" && !DONE_STATES.has(row.state) && row.repo && row.repo !== "none").map((row) => row.repo as string);
     sheets.push({ arc, sheet, landed: landedEntries(data), proofs: [...new Set(proofs)] });
@@ -136,6 +136,24 @@ function entriesHeld(part: GoPart, ws: string): { files: string[]; decisions: st
   return { files, decisions, facts };
 }
 
+/** A code part's format line (S153): in an APPS repository, one `spnutils apps format <folder>` for each project folder its files sit in, run before its proof. */
+function formatLines(part: GoPart, files: string[], ws: string, root: string): string[] {
+  if (part.work !== "CODE") return [];
+  const dir = repoDirOf(root, ws, part.repo);
+  let type = "";
+  try { type = dir ? String((JSON.parse(readFileSync(join(dir, "sprepo.json"), "utf8")) as { type?: unknown }).type) : ""; } catch { /* no sprepo.json: no format line */ }
+  if (type !== "APPS") return [];
+  const folders = [...new Set(files.map((file) => /:(?:apps|packages)\/([^/]+)\//.exec(file)?.[1]).filter((one): one is string => !!one))];
+  return folders.length ? ["## Format", "", ...folders.map((folder) => `Before its proof, run \`spnutils apps format ${folder}\`.`), ""] : [];
+}
+
+/** The baseline's red check: the new cases run once on the base commit and must fail there. */
+function redCheckLines(plan: GoPlan, part: GoPart, ws: string): string[] {
+  const ids = redCheckIds(plan, planScope(ws, plan), part.repo);
+  return ["## Red check", "", ...(ids.length ? ids.map((id) => `- \`${id}\``) : ["- the scope's code entries name no test id"]), "",
+    "Each new case runs once on the base commit and must fail there.", ""];
+}
+
 function brief(plan: GoPlan, part: GoPart, ws: string, root: string): string {
   const held = entriesHeld(part, ws);
   const stop = sizedStop(part.entries.length);
@@ -160,6 +178,8 @@ function brief(plan: GoPlan, part: GoPart, ws: string, root: string): string {
     ...[...new Set(part.entries.map((ref) => ref.split("/")[0]))].map((arc) =>
       `- ${part.entries.filter((ref) => ref.startsWith(`${arc}/`)).map((ref) => `\`${ref}\``).join(", ")}: \`workstream sheet show ${arc} --part ${part.id}\` prints them`), "",
     ...(held.files.length ? ["## The files", "", ...held.files.map((file) => `- \`${file}\``), ""] : []),
+    ...formatLines(part, held.files, ws, root),
+    ...(part.id === `baseline-${part.repo}` ? redCheckLines(plan, part, ws) : []),
     "## Acceptance", "",
     ...acceptanceOf(part, ws, root), "",
     "## Report", "",
@@ -206,10 +226,17 @@ const gitIn = (dir: string, args: string[]): string => execFileSync("git", ["-C"
 const repoDirOf = (root: string, ws: string, repo: string): string | undefined => dirsIn(root, ws, repo).find((one) => existsSync(one));
 const patchFileOf = (ws: string, arc: string, entry: SheetEntry): string => join(arcDataDir(ws, arc), entry.patch?.file ?? "");
 
+/** Whether a patch is stale: the file at its base differs from the file at the worktree's head (content, not ancestry). */
+function patchStale(dir: string, entry: SheetEntry): boolean {
+  const path = entry.file.slice(entry.file.indexOf(":") + 1);
+  const rev = (spec: string): string => { try { return gitIn(dir, ["rev-parse", spec]).trim(); } catch { return ""; } };
+  return rev(`${entry.patch?.base}:${path}`) !== rev(`HEAD:${path}`);
+}
+
 /** Whether an entry's patch applies on its repository's worktree, read with `git apply --3way --check`; a patch that does not is cut into a helper's part on the entry's prose. */
 function patchApplies(ws: string, arc: string, entry: SheetEntry, root: string): boolean {
   const dir = repoDirOf(root, ws, entry.file.slice(0, entry.file.indexOf(":")));
-  if (!dir || !entry.patch || !existsSync(patchFileOf(ws, arc, entry))) return false;
+  if (!dir || !entry.patch || !existsSync(patchFileOf(ws, arc, entry)) || patchStale(dir, entry)) return false;
   try { gitIn(dir, ["apply", "--3way", "--check", patchFileOf(ws, arc, entry)]); return true; } catch { return false; }
 }
 
@@ -246,7 +273,8 @@ function write(args: string[]): number {
     patchOk: (arc, entry) => patchApplies(ws, arc, entry, root),
   });
   if (circles.length) {
-    console.log(`Refused: the waits of the plan close a circle through a release: ${circles.map((one) => one.join(" -> ")).join(" · ")}. Nothing was written.`);
+    const held = plan.parts.find((one) => one.id === circles[0][0])?.entries[0] ?? `${lead}/<E>`;
+    console.log(`Refused: the waits of the plan close a circle through a release: ${circles.map((one) => one.join(" -> ")).join(" · ")}: run \`workstream sheet edit ${basename(ws)}/${held.replace("/", " ")} --then …\`. Nothing was written.`);
     return 1;
   }
   save(ws, lead, plan);
@@ -255,6 +283,30 @@ function write(args: string[]): number {
   logEvent(ws, lead, "go", null, `written · ${plan.parts.length} parts · scope ${scope.join(",")}`);
   console.log(`ok · ${lead} go written · ${plan.parts.length} parts over ${scope.join(", ")}`);
   console.log(nextStep(`${basename(ws)}/${lead}`, ws, plan));
+  return 0;
+}
+
+function propose(args: string[]): number {
+  const words = readWords(args, {});
+  const [ref, ...more] = words.paths;
+  if (more.length) throw new UsageFault("takes one workstream.");
+  const ws = workstreamNamed(ref);
+  const root = workspaceOf() ?? process.cwd();
+  const decided: ScopeSheet[] = [];
+  for (const arc of arcIdsOf(ws)) {
+    const data = readArc(ws, arc), sheet = readSheet(ws, arc);
+    if (data?.status === "DECIDED" && sheet) decided.push({ arc, sheet, data });
+  }
+  const minutes: Record<string, number | null> = {};
+  const run = fullRunMinutes(root);
+  for (const one of decided) for (const entry of one.sheet.entries) minutes[entry.file.slice(0, entry.file.indexOf(":"))] = run;
+  const scopes = proposeScopes({ arcs: decided, minutes });
+  if (!scopes.length) { console.log(`${basename(ws)} holds no decided arc with a sheet.`); return 0; }
+  scopes.forEach((one, at) => {
+    console.log(`scope ${at + 1} · ${one.arcs.join(", ")} · ${one.repos.join(", ")}`);
+    console.log(`          one whole run and one release for each of the ${one.repos.length}, in place of ${one.arcs.length} · about ${one.savedMinutes} min saved`);
+    if (one.waitsOn !== null) console.log(`scope ${at + 1} · ${one.arcs.join(", ")} · waits on scope ${one.waitsOn}'s releases`);
+  });
   return 0;
 }
 
@@ -335,6 +387,10 @@ function startApply(ws: string, arc: string, plan: GoPlan, part: GoPart, refuse:
   if (missing.length) return refuse(`${part.id} holds ${missing.join(", ")}, which no sheet holds`);
   const patched = entries.filter((one) => one.entry!.patch);
   for (const one of patched) {
+    if (patchStale(dir, one.entry!)) {
+      const path = one.entry!.file.slice(one.entry!.file.indexOf(":") + 1);
+      return refuse(`${one.ref}'s patch is stale: ${path} moved since ${one.entry!.patch!.base}; run \`workstream sheet patch ${basename(ws)}/${one.from} ${one.entry!.id}\` against the new head`);
+    }
     try { gitIn(dir, ["apply", "--3way", "--check", patchFileOf(ws, one.from, one.entry!)]); }
     catch (thrown) { return refuse(`${one.ref}'s patch does not apply in ${part.repo}: ${String((thrown as Error).message).split("\n").find((line) => line.trim()) ?? "git apply failed"}`); }
   }
@@ -414,6 +470,7 @@ function wait(args: string[]): number {
 
 export const actions: Record<string, Action> = {
   write: { describe: "after the go: derive the plan from the scope's sheets and the telemetry, and write every part's brief; run again it keeps landed and running parts; an arc is N<nnn>, ideate or follow-ups, and --scope takes a mixed list; --after-close makes the lead carry an after-close batch itself, as one part", usage: "<workstream>/<arc> --scope <arc>,… [--after-close]", run: write },
+  propose: { describe: "before the go: print each proposed scope, the decided arcs that share a repository grouped in chain order, with the full runs and releases the grouping saves", usage: "<workstream>", run: propose },
   show: { describe: "print the parts: their files, their tests, their measured time and what each waits on", usage: "<workstream>/<arc> [--part <id>] [--json]", run: show },
   check: { describe: "read the plan against the sheets: an entry no part holds, or a part whose entries changed since the plan was written, which it marks held; exits 1 on any", usage: "<workstream>/<arc>", run: checkGo },
   start: { describe: "mark a baseline, a full run or a release as running; only a baseline or a full run lets the test-run check open the whole suite", usage: "<workstream>/<arc> <part>", run: start },
