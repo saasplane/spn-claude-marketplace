@@ -9,7 +9,7 @@ import { join, resolve } from "node:path";
 import { PLUGIN } from "../../../helpers/harness.mjs";
 
 const lib = resolve(PLUGIN, "src", "scripts", "lib");
-const { deriveGo, fullRunMinutes, readyParts, clearWaiting, markWaiting, ratesOf, boundOf, testFilesOf, entryHash, changedEntries, staleEntries } = await import(join(lib, "go-plan.ts"));
+const { deriveGo, fullRunMinutes, readyParts, clearWaiting, markWaiting, ratesOf, boundOf, testFilesOf, entryHash, changedEntries, staleEntries, proposeScopes, redCheckIds } = await import(join(lib, "go-plan.ts"));
 const { goFaults, entryWork } = await import(join(lib, "workstream-schema.ts"));
 
 let total = 0, failed = 0;
@@ -327,6 +327,27 @@ const finished = { ...opening, parts: opening.parts.filter((p) => p.repo === "li
 const later = deriveGo([{ arc: "N009", sheet: sheet([entry("E1", "lib-repo:src/a.ts"), { ...entry("E2", "lib-repo:src/b.ts"), patch: patchOf("E2") }]), landed: ["E1"] }],
   { previous: finished, landedOrder: finished.parts.map((p) => p.id) });
 same("[MKT.SCRIPTS.455] an apply part planned after a landed full run opens full-lib-repo-2, which waits on it", [applyOf(later)?.entries, later.parts.find((p) => p.id === "full-lib-repo-2")?.waitsOn.filter((id) => id !== "code-lib-repo-1")], [["N009/E2"], ["apply-lib-repo"]]);
+
+// A stale patch loses its patch for the go; the baseline stands before the apply part.
+const stale = deriveGo([{ arc: "N009", sheet: sheet([{ ...entry("E1", "lib-repo:src/a.ts"), patch: patchOf("E1") }]) }], { patchOk: () => false });
+same("[MKT.SCRIPTS.497] an entry whose patch is stale has no apply part and joins a code part on its prose",
+  [applyOf(stale), stale.parts.find((p) => p.id === "code-lib-repo-1")?.entries], [undefined, ["N009/E1"]]);
+const appliedIds = applied.parts.map((p) => p.id);
+same("[MKT.SCRIPTS.498] the baseline stands before the apply part",
+  appliedIds.indexOf("baseline-lib-repo") >= 0 && appliedIds.indexOf("baseline-lib-repo") < appliedIds.indexOf("apply-lib-repo"), true);
+
+// proposeScopes: arcs that share a repository are one scope.
+const chainOf = ["lib-repo", "app-repo"];
+const arcOf = (arc, ...files) => ({ arc, sheet: sheet(files.map((f, i) => entry(`E${i + 1}`, f)), chainOf) });
+const proposed = proposeScopes({ arcs: [arcOf("N003", "app-repo:src/c.ts"), arcOf("N002", "lib-repo:src/b.ts", "spn-foundation:docs/x.md"), arcOf("N001", "lib-repo:src/a.ts")], minutes: { "lib-repo": 10, "app-repo": 4 } });
+same("[MKT.SCRIPTS.502] arcs sharing a repository form one scope, priced once per extra arc, the book left out, and a later repository waits on the scope before it",
+  proposed, [{ arcs: ["N001", "N002"], repos: ["lib-repo"], waitsOn: null, savedMinutes: 10 }, { arcs: ["N003"], repos: ["app-repo"], waitsOn: 1, savedMinutes: 0 }]);
+const through = proposeScopes({ arcs: [arcOf("N001", "lib-repo:src/a.ts"), arcOf("N002", "app-repo:src/b.ts"), arcOf("N003", "lib-repo:src/c.ts", "app-repo:src/d.ts")], minutes: { "lib-repo": 10, "app-repo": 4 } });
+same("[MKT.SCRIPTS.502] arcs joined through another arc are one scope, repositories in chain order", through, [{ arcs: ["N001", "N002", "N003"], repos: ["lib-repo", "app-repo"], waitsOn: null, savedMinutes: 28 }]);
+const unmeasured = proposeScopes({ arcs: [arcOf("N001", "lib-repo:src/a.ts"), arcOf("N002", "lib-repo:src/b.ts", "app-repo:src/c.ts")], minutes: { "lib-repo": null, "app-repo": 4 } });
+same("[MKT.SCRIPTS.502] a repository with unmeasured minutes adds nothing to the saving", unmeasured.map((one) => one.savedMinutes), [4]);
+same("[MKT.SCRIPTS.502] redCheckIds lists the sorted unique test ids of the CODE parts' entries in a repository",
+  [redCheckIds(plan, scope, "lib-repo"), redCheckIds(plan, scope, "app-repo"), redCheckIds(plan, scope, "none")], [["MKT.SCRIPTS.300"], ["MKT.SCRIPTS.300"], []]);
 
 console.log(`\n${total - failed}/${total} passed`);
 process.exit(failed ? 1 : 0);

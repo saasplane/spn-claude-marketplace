@@ -621,6 +621,65 @@ export function deriveGo(scope: readonly ScopeSheet[], options: DeriveOptions = 
   };
 }
 
+/** A scope `go propose` offers: its arcs, its repositories in chain order, the scope it waits on, and the minutes sharing one full run saves. */
+export type ProposedScope = { arcs: string[]; repos: string[]; waitsOn: number | null; savedMinutes: number };
+
+/** The repositories of an arc's entries, the book's left out. */
+const reposOfSheet = (sheet: Sheet): string[] => [...new Set(sheet.entries.map(repoOf))].filter((repo) => repo !== BOOK_REPO);
+
+/**
+ * Groups decided arcs into scopes: arcs that share a repository, directly or through another arc, are one scope. `minutes` is
+ * each repository's full-run time, null where unmeasured. Scopes are numbered from 1 in the chain rank of their first repository.
+ */
+export function proposeScopes(inputs: { arcs: readonly ScopeSheet[]; minutes: Record<string, number | null> }): ProposedScope[] {
+  const arcs = [...inputs.arcs].sort((a, b) => a.arc.localeCompare(b.arc));
+  const chain: string[] = [];
+  for (const { sheet } of arcs) for (const repo of sheet.releaseChain ?? []) if (!chain.includes(repo)) chain.push(repo);
+  const groups: { sheets: ScopeSheet[]; repos: Set<string> }[] = [];
+  for (const one of arcs) {
+    const mine = reposOfSheet(one.sheet);
+    const joined = groups.filter((group) => mine.some((repo) => group.repos.has(repo)));
+    const into = joined[0] ?? { sheets: [], repos: new Set<string>() };
+    if (!joined.length) groups.push(into);
+    for (const other of joined.slice(1)) {
+      into.sheets.push(...other.sheets); other.repos.forEach((repo) => into.repos.add(repo));
+      groups.splice(groups.indexOf(other), 1);
+    }
+    into.sheets.push(one); mine.forEach((repo) => into.repos.add(repo));
+  }
+  const rank = (repo: string) => { const at = chain.indexOf(repo); return at >= 0 ? at : chain.length; };
+  const ordered = groups.map((group) => {
+    const sheets = group.sheets.sort((a, b) => a.arc.localeCompare(b.arc));
+    const own: string[] = [];
+    for (const { sheet } of sheets) for (const repo of sheet.releaseChain ?? []) if (group.repos.has(repo) && !own.includes(repo)) own.push(repo);
+    const repos = [...own, ...[...group.repos].filter((repo) => !own.includes(repo)).sort()];
+    return { sheets, repos };
+  }).sort((a, b) => rank(a.repos[0] ?? "") - rank(b.repos[0] ?? "") || (a.sheets[0]?.arc ?? "").localeCompare(b.sheets[0]?.arc ?? ""));
+  return ordered.map((group) => {
+    let waitsOn: number | null = null;
+    for (const { sheet } of group.sheets) {
+      const order = sheet.releaseChain ?? [];
+      for (const repo of group.repos) {
+        const index = order.indexOf(repo);
+        if (index < 0) continue;
+        const before = new Set(order.slice(0, index));
+        ordered.forEach((other, number) => {
+          if (other !== group && other.repos.some((one) => before.has(one))) waitsOn = Math.max(waitsOn ?? 0, number + 1);
+        });
+      }
+    }
+    const sum = group.repos.reduce((total, repo) => total + (inputs.minutes[repo] ?? 0), 0);
+    return { arcs: group.sheets.map(({ arc }) => arc), repos: group.repos, waitsOn, savedMinutes: Math.round((group.sheets.length - 1) * sum) };
+  });
+}
+
+/** The test ids a baseline runs once on the base commit: every tier of the entries the plan's CODE parts in `repo` hold, sorted and unique. */
+export function redCheckIds(plan: GoPlan, scope: readonly ScopeSheet[], repo: string): string[] {
+  const held = new Set(plan.parts.filter((part) => part.repo === repo && part.work === "CODE").flatMap((part) => part.entries));
+  const ids = scope.flatMap(({ arc, sheet }) => sheet.entries.filter((entry) => held.has(refOf(arc, entry))).flatMap((entry) => Object.values(entry.tiers ?? {}).flat()));
+  return [...new Set(ids)].sort();
+}
+
 /** The parts of each wait circle that runs through a release, each circle once: what `go write` refuses, naming them. */
 export function releaseCircles(parts: readonly GoPart[]): string[][] {
   const byId = new Map(parts.map((one) => [one.id, one] as const));
