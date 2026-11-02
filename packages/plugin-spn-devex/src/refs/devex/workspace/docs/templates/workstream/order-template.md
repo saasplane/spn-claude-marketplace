@@ -1,7 +1,7 @@
 ---
-go: "N{{lead}}"                         # the go whose plan this order carries out
+go: "{{lead}}"                         # the go whose plan this order carries out; {{lead}} stands for the lead arc's whole address, N<nnn>, ideate or follow-ups
 part: "{{part}}"                        # the part; the file is orders/{{part}}.md, written by `workstream go write`
-entries: [{{N<nnn>/E<n>, …}}]           # the entries the part carries, across the go's scope
+entries: [{{<arc>/E<n>, …}}]           # the entries the part carries, across the go's scope
 model: {{sonnet}}                       # Sonnet for a written order; Opus only where the order designs, and says why; a launch that names no model takes this line
 blockedBy: ["{{part or q<n>}}"]          # what must land first; [] when nothing
 touches: ["{{repository:place}}"]       # what the part writes, so two orders never write one file
@@ -15,7 +15,7 @@ facts: [{{f<n>}}]                       # the facts it rests on, by id, from the
      A rule change is edited there first, then here, in the same change. Never add a rule here.
      restate-drift.ts reports this copy when its source moves. -->
 <!-- AN ORDER IS ONE DELEGATED EXECUTION: a child session in this workspace, or a window of its own in another
-     repository. Every path is absolute, so either can resolve it. It is saved as `notes/N<nnn>/orders/<part>.md`, and
+     repository. Every path is absolute, so either can resolve it. It is saved as `notes/<arc>/orders/<part>.md`, and
      the front matter above comes first, because the commands read it and never the prose below it. -->
 <!-- AN ORDER IS CUT PER REPOSITORY AND PASS (docs, code and tests, or the owed tiers), from the preview's file list, never per
      part. A row the preview does not pin is fixed in the preview first. -->
@@ -31,7 +31,7 @@ facts: [{{f<n>}}]                       # the facts it rests on, by id, from the
 | | |
 | --- | --- |
 | **Repo** | `{{repo}}` · **Run from:** `{{absolute path}}` |
-| **Arc** | `{{NNN-subject}}` [`N{{nnn}}`](../../../approach.html#N{{nnn}}), part {{part}} |
+| **Arc** | `{{NNN-subject}}` [`{{arc}}`](../../../approach.html#{{arc}}), part {{part}} |
 
 **Launch no agent.** Stop at {{the stop, sized from the entries of this part: tokens of context and turns}}, at the next whole step, save the report with what is left and
 hand back. **Read only** the files below; read further only where one of them sends you, and read a file over 20 KB in
@@ -39,9 +39,9 @@ parts. **Search with `grep` in Bash**, since you have no Grep tool. **Hand back*
 
 **A name, a shape or a construct no entry of this order holds is not yours to make up** (RULE.DEVEX.WORKSPACE.495): stop, return `needs-you`, and list each one under `unnamed:` in the report.
 
-<!-- IN AN ARC THAT KEEPS A CHANGE SHEET (arcs/N<nnn>/sheet.json), THE ORDER NAMES ITS PART AND NOTHING ELSE ABOUT THE WORK:
+<!-- IN AN ARC THAT KEEPS A CHANGE SHEET (arcs/<arc>/sheet.json), THE ORDER NAMES ITS PART AND NOTHING ELSE ABOUT THE WORK:
      the files, the rules, the callers, the tiers and the book lines come from the part's entries, read first with
-     `spn-devex workstream go show N{{lead}} --part {{part}}`, and never from prose here. The launch check refuses an
+     `spn-devex workstream go show {{lead}} --part {{part}}`, and never from prose here. The launch check refuses an
      order whose part names an entry the sheet does not hold. An arc with no sheet keeps the two sections below. -->
 ## The files
 

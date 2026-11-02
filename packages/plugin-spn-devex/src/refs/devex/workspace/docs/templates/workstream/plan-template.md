@@ -9,7 +9,7 @@
      so no row writes a plan and nothing waits on one. Keep only the sections this arc needs and delete the rest. It
      holds no question: a question is a card on the approach page. It holds no status: the arc's rows do. It holds no
      fact: each fact is pinned in the arc's facts.jsonl by `workstream fact write`. -->
-# N{{nnn}} — plan
+# {{arc}} — plan
 
 ## Traps — read before any row
 

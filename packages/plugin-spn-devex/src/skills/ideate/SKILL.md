@@ -52,6 +52,11 @@ description: Decide what a node IS, and design a requirement inside that shape -
 - **RULE.DEVEX.FUNCTION.096** (`RULE.DEVEX.FUNCTION.096` · MUST · skill:spn-devex/ideate)
 - **RULE.DEVEX.FUNCTION.097** (`RULE.DEVEX.FUNCTION.097` · MUST · skill:spn-devex/ideate)
 - **A partner's or developer's idea is unfolded in one order, the one their own words lead** (`RULE.DEVEX.FUNCTION.098` · MUST · skill:spn-devex/ideate)
+- **RULE.DEVEX.FUNCTION.099** (`RULE.DEVEX.FUNCTION.099` · MUST · skill:spn-devex/ideate)
+- **RULE.DEVEX.FUNCTION.100** (`RULE.DEVEX.FUNCTION.100` · MUST · skill:spn-devex/ideate)
+- **RULE.DEVEX.FUNCTION.101** (`RULE.DEVEX.FUNCTION.101` · MUST · skill:spn-devex/ideate)
+- **RULE.DEVEX.FUNCTION.102** (`RULE.DEVEX.FUNCTION.102` · MUST · skill:spn-devex/ideate)
+- **RULE.DEVEX.FUNCTION.103** (`RULE.DEVEX.FUNCTION.103` · MUST · skill:spn-devex/ideate)
 - **RULE.DEVEX.WORKSPACE.006** (`RULE.DEVEX.WORKSPACE.006` · MUST · skill:spn-devex/ideate)
 - **A step acting on a set carries that set** (`RULE.DEVEX.WORKSPACE.064` · MUST · skill:spn-devex/ideate)
 - **`migrations/` earns you none either** (`RULE.DEVEX.WORKSPACE.086` · MUST · skill:spn-devex/ideate)
@@ -271,6 +276,12 @@ A first proposal starts where the book already stands, so the developer reads a 
 - **Propose a field only where a report the developer asked for reads it** (`RULE.DEVEX.FUNCTION.091` · MUST · skill:spn-devex/ideate). A field no report reads is cut, and a field a report does read is kept.
 - **Give each idea one name, in the construct that owns it** (`RULE.DEVEX.FUNCTION.092` · MUST · skill:spn-devex/ideate). A second word for an idea already named is replaced by the first, and a new type is named for its domain, its group and its attribute.
 - **Migrate only live records** (`RULE.DEVEX.FUNCTION.093` · MUST · skill:spn-devex/ideate). A record nothing reads again is left as it is, a log that holds only history is skipped by its readers, and no migration is planned for either.
+- **Take these checks before the options are written.** Each is one line, and `refs/devex/function/ideate.md` § *How a first proposal is shaped* holds each in full.
+  1. **Check the premise** (`RULE.DEVEX.FUNCTION.099` · MUST · skill:spn-devex/ideate). Ask first whether the thing is needed at all.
+  2. **Ask which side changes when a participant joins** (`RULE.DEVEX.FUNCTION.100` · MUST · skill:spn-devex/ideate). It is the one that holds the fact, or every one that reads it.
+  3. **Split trust** (`RULE.DEVEX.FUNCTION.101` · MUST · skill:spn-devex/ideate). Split it by app, by module and by write, and never offer it as one list.
+  4. **Offer a frame that moves where the thing lives** (`RULE.DEVEX.FUNCTION.102` · MUST · skill:spn-devex/ideate). At least one option places it somewhere else.
+  5. **Say how the laptop gets the fact** (`RULE.DEVEX.FUNCTION.103` · MUST · skill:spn-devex/ideate). Name how a local run gets the same fact the cloud holds.
 - **List every part beside the developer's words it serves, and cut what serves none** (`RULE.DEVEX.FUNCTION.096` · MUST · skill:spn-devex/ideate). Take this step before the first proposal is shown. A part that serves nothing is cut to one *later, not now* line, and the cut test asks which part could go with nothing failing. `refs/devex/function/ideate.md` § *How a first proposal is shaped* holds the step in full.
 - **Place the proposal where it is read** (`RULE.DEVEX.FUNCTION.097` · MUST · skill:spn-devex/ideate). Take this step before the first proposal is shown, after the list-and-cut step. The chat holds what the developer asked to see, whole; the approach page one line for each part in the *What*; the preview what the developer judges. Code shown anywhere uses today's names and real values, never placeholders. `refs/devex/function/ideate.md` § *How a first proposal is shaped* holds the step in full.
 - **Decide the figure while you write the What** (`RULE.DEVEX.WORKSPACE.497` · MUST · check:doc-check). A What past about 6,000 characters opens on a figure, or carries one line, `<!-- no figure: … -->`, that says why prose is clearer there; never leave it to a later pass.

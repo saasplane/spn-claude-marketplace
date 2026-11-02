@@ -3,17 +3,17 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/03-platform/01-core/01-tenancy/03-people-access.md",
-      "seen": "b23c225e"
+      "seen": "429eccc0"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/03-platform/01-core/01-tenancy/03-people-access.md",
-      "section": "Enablement: what an organization type is offered",
-      "seen": "d4aafb5c"
+      "section": "Enablement: what an organization's category is offered",
+      "seen": "603ff955"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/10-providers/ts/06-service.md",
       "section": "`@SPAuthorize` + the module `_AUTHZ` table",
-      "seen": "49f2ea7c"
+      "seen": "6f3d3f50"
     }
   ]
 }
@@ -32,7 +32,7 @@ Ask what the answer varies by. That one question separates the three axes.
 | Does the answer vary… | Then it is |
 | --- | --- |
 | per **person** inside one organization | a **permission** |
-| per **organization type**, the same for everyone inside it | an **enablement** |
+| per **org category**, the same for every org of it | an **enablement** |
 | per **plan or subscription** | **neither** — that is billing, a separate axis that composes with org type and never overloads it |
 | …and does it gate a **read**? | then it is **never** an enablement |
 
@@ -48,7 +48,7 @@ Inside one `appPermissions` entry you may also narrow by `appScope` — which ap
 
 ## If it is an enablement
 
-**Enablement is a construct, and it is modelled where every construct is.** It lives at `02-constructs/<iam>/enablement.md`, beside permission, and it depends on authorization and on organization type. It is realized the way a permission is: a module **registers its enablement definitions** in its contract constants, the session carries `enablements` exactly as it carries `permissions`, and a module's services and screens read `session.enablements` to decide what to offer. The chapter states the rule; the construct states the model, and this file restates neither more than once.
+**Enablement is a construct, and it is modelled where every construct is.** It lives at `02-constructs/<iam>/enablement.md`, beside permission, and it depends on authorization and on organization type. It is realized the way a permission is: a module hands IAM its enablement definitions in its migration contributions (`src/migrations/contributions.ts`), as it hands its permissions. The session carries `enablements` as it carries `permissions`, and a module's services and screens read `session.enablements` to decide what to offer. The chapter states the rule; the construct states the model, and this file restates neither more than once.
 
 **A module states its ceilings and defaults by org type and never reads a category's code** (`RULE.PLATFORM.CORE.065` · MUST · skill:spn-apps/implement).
 
@@ -56,25 +56,26 @@ Inside one `appPermissions` entry you may also narrow by `appScope` — which ap
 
 ### Two answers means two codes
 
-Apply one operational test: **can you name a type whose answers differ?** Name one and you have two codes. Name none and you have one.
+Apply one operational test: **can you name a category whose answers differ?** Name one and you have two codes. Name none and you have one.
 
 Never widen an existing code to carry a second meaning. That is how a cell stops answering the question its console label asks, and no reader can tell which half is off.
 
 The test is not a count. IAM owns eight of the estate's codes, because IAM owns the organization record and every org-shaped question lands there. An earlier heuristic said four or more codes on one module means permissions in disguise. It was drawn from a sample of similar modules and does not hold.
 
-### The grammar is one form
+### The grammar is two forms
 
 ```
 {MOD}_MANAGE_{NOUN}        the offer. boolean names the area; selection names the options
+{MOD}_LIMIT_{NOUN}         a limit. a number
 {MOD}_{FAMILY}_{TIER}      a permission, for contrast
 ```
 
-`MANAGE` in the second position is what tells an enablement from a permission. Hold it and a reader classifies any code on sight.
+`MANAGE` or `LIMIT` in the second position is what tells an enablement from a permission. Hold it and a reader classifies any code on sight.
 
 - **A boolean names the area.** `IAM_MANAGE_MEMBERS` — on or off. A code is on when its value is a boolean that is true or a selection that is not empty.
-- **A selection names the options.** `NTF_MANAGE_CHANNELS` — a list of channels, narrowed per type.
+- **A selection names the options.** `NTF_MANAGE_CHANNELS` — a list of channels, set per category.
 - Name a selection after its area and the console shows *Customization* holding a list of entity types. Whoever flips that cell cannot tell what they are choosing.
-- **There is no amount form.** Seats, storage caps and retention limits are billing's, on the axis that composes with org type. A quota written as an enablement puts a plan decision in a cell the console cannot price.
+- **A limit is a number.** A `NUMBER` definition caps what an org may create, such as `DOC_LIMIT_STORAGE_BYTES`. Empty means no limit. A plan still decides the price; the limit is the cell the plan sets.
 
 The code's first segment is its owning module's prefix, always. That is what keeps two modules' codes from colliding in one catalog.
 
@@ -116,9 +117,9 @@ A module owns a question, or it contributes an option to someone else's. The two
 | The module… | Seeds |
 | --- | --- |
 | **owns** the question | its own definition, under its own prefix — the field config, the ceiling and every value |
-| **contributes** an option to another module's question | an **append** to that definition's values, from its own migration |
+| **contributes** an option to another module's question | a selection key in its own contribution: the definition's code and the key, which starts with its own code |
 
-**Append, never set.** Write the value flat and you clobber whatever another module contributed, and the next module clobbers you. Read-modify-write is what lets two app-owned modules land in either order. Address the other module's definition by its code, never by its seed id — a migration stays self-contained.
+**IAM merges the key; the module never writes the cell.** Two modules that add to one cell land in either order, and neither removes the other's key.
 
 ## What a hook checks, and what it cannot
 
@@ -175,22 +176,22 @@ const EXTENDABLE_ENTITY_TYPES = ['PRJ_PROJECT'];
 
 `ENT` is a foundation module and `PRJ_PROJECT` belongs to the sample product module. Naming it there points the dependency the wrong way. The layer everyone builds on now knows one product's vocabulary. A partner's module cannot be added without editing `ENT`.
 
-The fix seeds every cell empty and lets `PRJ` append itself, from `prj-setup-entity-type` running later. The options were never a list in the seed anyway — they resolve live from the entity-type registry, so registering the type is what makes it offerable at all. Only the value is the contributing module's to write.
+The fix leaves every cell empty in `ENT`'s definition. `PRJ` adds `PRJ_PROJECT` as a selection key in its own contribution, and IAM adds it to each category whose app carries both modules. The options were never a list in the seed anyway — they resolve live from the entity-type registry, so registering the type is what makes it offerable at all. Only the value is the contributing module's to write.
 
 ## The card
 
 | # | Check |
 | --- | --- |
-| 1 | The answer varies per person → permission; per org type → enablement; per plan → billing |
+| 1 | The answer varies per person → permission; per org category → enablement; per plan → billing |
 | 2 | No enablement term on a read gate, ever |
-| 3 | You can name a type whose answers differ — otherwise it is one code |
-| 4 | The code reads `{MOD}_MANAGE_{NOUN}`, prefixed by its owning module |
+| 3 | You can name a category whose answers differ — otherwise it is one code |
+| 4 | The code reads `{MOD}_MANAGE_{NOUN}` or `{MOD}_LIMIT_{NOUN}`, prefixed by its owning module |
 | 5 | A boolean names the area; a selection names the options, never the area |
-| 6 | No amount form — a quota is billing's |
+| 6 | A limit is a `NUMBER` definition, checked with `assertWithinLimit`; empty means no limit |
 | 7 | The term sits on a cohesive gate, or in the body where the gate is shared |
 | 8 | Every value-checked code has a matching narrowing on the surface |
 | 9 | The ceiling says *could this apply*, never *is this granted* |
 | 10 | `PLATFORM` carries an authored row wherever the question applies — no exemption branch |
 | 11 | `[]` is a legal answer and never a failure default |
-| 12 | An owned question gets its own definition; a contributed option is appended, never set |
+| 12 | An owned question gets its own definition; a contributed option is a selection key, merged by IAM |
 | 13 | No hardcoded set of organization types in a service |

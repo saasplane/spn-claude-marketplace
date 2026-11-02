@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-infra/06-modules.md",
-      "seen": "dd178ec1"
+      "seen": "8006d73d"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/06-modules/",
-      "seen": "7c77a187"
+      "seen": "6269561f"
     }
   ]
 }
@@ -40,7 +40,7 @@ A module consumes only the outputs published at the step it named, runs under it
 
 > Additive in its own world — always. Changing platform ground — never. Needing to — that is a blueprint feature rather than a module power.
 
-**The blueprint is also a library** — minting a resource, a database, a host; publishing a fact; applying the tag set are offered to module renderings as functions. A module composes them rather than reimplementing any of it. **But the library is scoped by the identity of whoever calls it: a module mints only into its own world, and no function it holds reaches platform ground — MUST NOT.** Nothing it does alters a platform schema, joins a default role group, overwrites an engine's published fact, or enters another module's world.
+**The blueprint is also a library.** A module rendering calls its functions to mint a resource, a database or a host, to publish a fact, and to apply the tag set. It composes them rather than reimplementing any of it. **But the library is scoped by the identity of whoever calls it: a module mints only into its own world, and no function it holds reaches platform ground — MUST NOT.** Nothing it does alters a platform schema, joins a default role group, overwrites an engine's published fact, or enters another module's world.
 
 **The consequence is detachability as a property somebody can check.** Removing the row removes exactly the module's tagged footprint and refuses its data the way every stateful teardown does. Any consumer still referring to a fact that is gone fails by name at the next render.
 
@@ -185,7 +185,7 @@ Every resource key follows one shape, and the middle token names the **connectio
 
 **Families are consumed by declaration, opted out by a present-but-empty marker** (`RULE.SUPPORT.INFRA.046` · MUST · skill:spn-infra/implement). An application's `connections` block names the families it opens; a family not stood publishes no record and no keys, so a missing key at boot names exactly what was never declared. **Worlds are per-need within a family** — a read-only database consumer declares no `MIGRATION` world and holds the `ro` pair alone. `SEAL` is one of the family tokens: an application whose estate row lists the `SEAL` grant receives the seal block, and its workload role receives the right to use the environment's key for stored secrets (`RULE.SUPPORT.INFRA.110` · MUST · skill:spn-infra/implement); an application whose row does not list it receives neither.
 
-**A space's family lands under its own prefix, one level further down** (`RULE.SUPPORT.INFRA.112` · MUST · skill:spn-infra/implement). The platform's prefix is `{SPC}_` and a space's is `{SPC}_{SPACE}_`: `DMO_RESOURCE_DB_APP_POSTGRESQL_HOST` for the platform `dmo`, `DMO_SAS_RESOURCE_DB_APP_POSTGRESQL_HOST` for its space `sas`. **A prefix is one word for a platform and two words for a space — MUST**; the blueprint refuses a key under a world's path that does not start with that world's prefix. The world token in a host name matches the prefix (`{spc}-{space}`), a space's code differs from the other spaces' of its platform, and a service in a space starts its own keys with the two-word code. An application bound to no space composes the platform's blocks; bound to a space, that space's; bound to a space with `"platform": true`, both, each under its own prefix. No other application reads across a world boundary by composition, because the derivation never offers it those keys.
+**A space's family lands under its own prefix, one level further down** (`RULE.SUPPORT.INFRA.112` · MUST · skill:spn-infra/implement). The platform's prefix is `{SPC}_` and a space's is `{SPC}_{SPACE}_`: `DMO_RESOURCE_DB_APP_POSTGRESQL_HOST` for the platform `dmo`, `DMO_SAS_RESOURCE_DB_APP_POSTGRESQL_HOST` for its space `sas`. **A prefix is one word for a platform and two for a space — MUST** (`RULE.SUPPORT.INFRA.127` · MUST · skill:spn-infra/implement). The blueprint refuses a key under a world's path that does not start with that world's prefix. The world token in a host name matches the prefix (`{spc}-{space}`), a space's code differs from the other spaces' of its platform, and a service in a space starts its own keys with the two-word code. An application bound to no space composes the platform's blocks; bound to a space, that space's; bound to a space with `"platform": true`, both, each under its own prefix. No other application reads across a world boundary by composition, because the derivation never offers it those keys.
 
 **The remote channel publishes three kinds of key** (`RULE.SUPPORT.INFRA.114` · MUST · skill:spn-infra/implement). A service that serves its modules' contracts to the other services of its platform listens a second time, on a remote port, and the services that call it need its address:
 
@@ -194,14 +194,15 @@ Every resource key follows one shape, and the middle token names the **connectio
 | `{SPC}_API_REMOTE_PORT` | the deployment's own `/vars` | one deployment's own, from `remotePort` on its row |
 | `{SPC}_REMOTE_SERVICE_{NAME}_ENDPOINTS` | `/environments/{env}/vars` | one for each deployment that declares a remote port; every calling service reads it |
 | `{SPC}_REMOTE_CREDENTIAL_PROVIDER` | `/environments/{env}/vars` | `KUBERNETES` in a cloud; one cluster issues every service's token |
-| `{SPC}_REMOTE_CREDENTIAL_KUBERNETES_TOKEN_PATH` · `_AUDIENCE` · `_NAMESPACES` · `_ISSUER` | `/environments/{env}/vars` | the token's file in the pod, what a token must be for, this platform's namespaces, and the cluster's issuer |
+| `{SPC}_REMOTE_CREDENTIAL_SERVICES` | `/environments/{env}/vars` | the `kindCode`s of the platform world's Platform server app rows, such as `api,observer`; rendered and never authored, and a service refuses a remote call from any other service |
+| `{SPC}_REMOTE_CREDENTIAL_KUBERNETES_TOKEN_PATH` · `_AUDIENCE` · `_NAMESPACES` · `_ISSUER` | `/environments/{env}/vars` | the token's file in the pod, what a token must be for, the namespaces of this platform, and the cluster's issuer; the same for every service of the platform in that environment |
 
 - **`{NAME}` is the application's `kindCode`.** An application has at most one deployment that declares a remote port, so the name is one address.
 - **In a cloud the address is `https://{env}-{app}-remote.internal.{spd}`**, with its scheme. `{app}` is the same `kindCode`, and the host is a route on the private gateway. A pod and an operator's machine read the same value.
 - **The estate publishes two proxy counts beside a deployment's ports.** `{SPC}_API_TRUSTED_PROXIES` is `2` for a deployment that has a route (the load balancer, then the gateway) and `0` for an `INTERNAL` one. `{SPC}_API_REMOTE_TRUSTED_PROXIES` is `3`: the calling service, the internal load balancer, then the private gateway. A value a team authors for either key wins.
 - **A module held remotely reads the address under its own prefix**, `{SPC}_{MODULE}_REMOTE_ENDPOINTS`, and the service's own settings write that key as a reference: `DMO_IAM_REMOTE_ENDPOINTS=${DMO_REMOTE_SERVICE_API_ENDPOINTS}`. So moving a module to another service is a change of one settings line.
 - **The namespaces are `prd,plt,vnd`**, and the token's audience is `spn-remote`, so a token issued for anything else is refused.
-- **Locally the provider is `LOCAL`**, and the service goes by `{SPC}_DEPLOYMENT_KIND_CODE` from its own environment file; `{SPC}_REMOTE_CREDENTIAL_LOCAL_SERVICE` is gone. `infra config render` writes each remote address as plain HTTP on the service's local host and remote port: `http://api.lc-spndemo.app:9200`.
+- **Locally the provider is `LOCAL`**, and the service goes by `{SPC}_DEPLOYMENT_KIND_CODE` from its own environment file. `infra config render` writes each remote address as plain HTTP on the service's local host and remote port: `http://api.lc-spndemo.app:9200`. It writes `{SPC}_REMOTE_CREDENTIAL_SERVICES` too, and a service whose row declares a `remotePort` carries a copy in its `envs/local.env`. The observer needs none.
 
 **The gateway's rate limit store is published beside them** (`RULE.SUPPORT.INFRA.120` · MUST · skill:spn-infra/implement). A gateway counts a deployment's rate limit once across all its proxy pods, in the environment's own cache. The platform's world publishes three keys in the secret half of `/environments/{env}/vars`: `{SPC}_GATEWAY_RATE_LIMIT_STORE_URL` (the cache's address), `{SPC}_GATEWAY_RATE_LIMIT_STORE_AUTH` (the cache user the gateway counts as, with its password) and `{SPC}_GATEWAY_RATE_LIMIT_STORE_TLS` (whether the connection is encrypted). The gateway reads them and no service does. A deployment given the environment's settings receives them with the rest.
 

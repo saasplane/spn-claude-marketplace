@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
-      "seen": "67376a1f"
+      "seen": "2fce1268"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/02-skills/01-skills.md",
@@ -51,7 +51,7 @@ packages/plugin-spn-infra/src/skills/implement/   →  INFRA_IMPLEMENT
 
 **The values are one fixed list, and the set is closed.** Devex reads in stage order with the three stage-less ones last: `DEVEX_CHECK`, `DEVEX_REPORT` and `DEVEX_EXECUTE`. Apps and infra share six words, so a reader who has learned one domain's surface has learned the other's. The surface plugin ships one more, `SURFACE_DESIGN` (folder `design`), because what a person sees and touches is the same for every stack: it designs a page or a flow from the blocks of the design system and draws it in Figma or as skeletons, so it serves `IDEATE`.
 
-**A skill is mapped to a stage, never named after one.** Proving a claim against the code is something every phase does, so `DEVEX_CHECK` belongs to no single phase, and neither do `DEVEX_REPORT` and `DEVEX_EXECUTE`: the first renders a report from a named template, the second crosses the build, the proof and the release of whatever the go covers — and naming every skill after a phase leaves that one nowhere to sit. Each provider skill serves one stage: `NEW` serves `SCM`, `VERIFY` serves `TEST`, and `IMPLEMENT`, `REVIEW` and `RUN` serve `DEVELOP`, and `RELEASE` serves `DELIVER`, which is what makes the standards for a request derivable from the skill invoked (`RULE.DEVEX.AGENT.017` · GUIDE). A row's stage is worked out when the row is read, by one mapping from its skill and its work, and no row stores it: the three stage-less skills take theirs from the row's work (`DOCS`, `CODE` and `GENERATED` are `DEVELOP`; `TEST` and `PROOF` are `TEST`; `RELEASE` is `DELIVER`), and a row with no work has no stage. The gain is that each list changes on its own clock.
+**A skill is mapped to a stage, never named after one.** Proving a claim against the code is something every phase does, so `DEVEX_CHECK` belongs to no single phase, and neither do `DEVEX_REPORT` and `DEVEX_EXECUTE`: the first renders a report from a named template, the second crosses the build, the proof and the release of whatever the go covers — and naming every skill after a phase leaves that one nowhere to sit. Each provider skill serves one stage: `NEW` serves `SCM`, `VERIFY` serves `TEST`, and `IMPLEMENT`, `REVIEW` and `RUN` serve `DEVELOP`, and `RELEASE` serves `DELIVER`, which is what makes the standards for a request derivable from the skill invoked (`RULE.DEVEX.AGENT.017` · GUIDE). A row's stage is worked out when the row is written, by one mapping from its skill and its work, and stored in the row's `stage`; a row written before this reads by the same mapping. The three stage-less skills take theirs from the row's work (`DOCS`, `CODE` and `GENERATED` are `DEVELOP`; `TEST` and `PROOF` are `TEST`; `RELEASE` is `DELIVER`). A row with no skill, or a skill the mapping does not list, takes its stage from its work by the same reading, and a row with neither takes the stage its window last carried, none before the window has had one. The gain is that each list changes on its own clock.
 
 ## What a skill may never do
 

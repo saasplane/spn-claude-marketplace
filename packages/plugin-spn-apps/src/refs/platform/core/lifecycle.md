@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/03-platform/01-core/05-lifecycle.md",
-      "seen": "a3e8d315"
+      "seen": "258dedf0"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/03-platform/01-core/05-lifecycle/",
-      "seen": "181524c5"
+      "seen": "f023c34c"
     }
   ]
 }
@@ -32,13 +32,13 @@ export enum RegistrationOutcomeType {
 
 Treat `EXISTING_FOUND` as a step in the flow, carried as a state the way a sign-in carries its own — MUST NOT answer a known arrival with a refusal. A platform that does sends somebody back to a form that cannot help them, and leaves the caller guessing whether it met a duplicate or hit a fault. `EXISTING_FOUND` is the member worth building deliberately for: it is easy to wire `CREATED` and skip the found-case entirely, and that is exactly the gap that turns an ordinary re-arrival into a support ticket.
 
-What varies between the create-an-organization and resolve-or-refuse flows is which organization type is created, whose child it is, and whether the person names it — the identity ref carries the stored decision (`OrgSignupModeType`) that says whether a given surface may create one at all. Read that ref before you wire a signup form; the two constructs share this one boundary and disagree nowhere.
+What varies between the create-an-organization and resolve-or-refuse flows is which category is created, whose child it is, and whether the person names it — the identity ref carries the stored decision (`OrgSignupModeType`) that says whether a given surface may create one at all. Read that ref before you wire a signup form; the two constructs share this one boundary and disagree nowhere.
 
 ## Reshaping is routine, not an exception
 
 Merges, splits and renames happen to real customers, and you build for that rather than treating it as a one-off migration project. An organization's **identity** — never its place in the tree — is what every other construct in this book references, which is why its position can change underneath without anything else needing to be rewritten. That is the payoff of the tenancy rule carried in the Tenancy ref: nothing is keyed to a node's position.
 
-The one thing reshaping cannot make cheap is a promise already made about records. A data policy stays with the tier that made it — retention has no agreed direction, so a merge would produce a promise neither organization made. Read the Data and Trust ref before you write a merge that touches retention or privacy settings.
+The one thing reshaping cannot make cheap is a promise already made about records. A data policy stays with the organization that made it — retention has no agreed direction, so a merge would produce a promise neither organization made. Read the Data and Trust ref before you write a merge that touches retention or privacy settings.
 
 Reshaping and export are promises this construct makes and, as of this writing, no shipped command yet keeps — onboarding has its own commands and outcomes; a merge, a split and an export do not. If you are asked to build one, you are building new ground rather than wiring an existing capability, and you should say so rather than search for a command that is not there.
 

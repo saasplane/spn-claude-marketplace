@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-infra/05-apps.md",
-      "seen": "b014e8fa"
+      "seen": "7abea2aa"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/05-apps/",
@@ -181,7 +181,7 @@ A service that serves its modules' contracts to the other services of its platfo
 | --- | --- | --- |
 | `{SPC}_API_REMOTE_PORT` | the deployment's own path | the remote listener's port, from `remotePort` |
 | `{SPC}_REMOTE_SERVICE_{NAME}_ENDPOINTS` | the environment's path | the remote address of the application whose `kindCode` is `{NAME}` |
-| `{SPC}_REMOTE_CREDENTIAL_*` | the environment's path | how a calling service proves itself: the provider's kind, and for the cluster's token its file, what it must be for, this platform's namespaces and the cluster's issuer |
+| `{SPC}_REMOTE_CREDENTIAL_*` | the environment's path | how a calling service proves itself and which of the platform's services a call is accepted from: the provider's kind, and for the cluster's token its file, what it must be for, the namespaces of this platform and the cluster's issuer |
 
 **In a cloud a remote port is reached at `https://{env}-{app}-remote.internal.{spd}`**, where `{app}` is the application's `kindCode`. The host sits in the platform domain's internal zone, whatever service domain the application's own hosts answer on. That address, with its scheme, is the published value, and a pod and an operator's machine use the same one.
 

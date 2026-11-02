@@ -102,10 +102,12 @@ The five answers name every account address, package scope, repository name and 
 .spndevex/workstreams/open/{NNN}-new-platform/
   approach.html                     the page the arc stands on, copied from the template the plugin ships
   arcs/
-    N001/                           the estate coordinates, written by the arc commands and nobody else
+    ideate/                         the workstream's first arc, opened with the folder
+    N001/                           the estate coordinates, the first build arc, written by the arc commands and nobody else
       state.json                    the arc, and one row per question
       log.jsonl                     every write, with each answer beside its row
       estate-coordinates.md         the arc's name file, which the commands write
+    follow-ups/                     the workstream's last arc, opened with the folder
   notes/
     N001/
       preview.html                  the coordinates as they stand, read back at act 4 for the go
@@ -125,10 +127,12 @@ It opens in `open/` because nothing blocks it — the developer is in front of y
 
 Write these at act 2, in this order, before the first question is asked. `{NNN}` is the number `workspace status` gave.
 
-1. **The page.** Copy the template to `approach.html` in the folder. Its masthead reads `{NNN} - New platform`, and its subtitle says it holds the estate's coordinates. Its Why is one paragraph: five answers name every account address, package scope, repository name and code prefix in this estate, permanently, and this workstream holds them until `CONCEPT.md` exists to carry them. Its What is one line: the coordinates are a record, not a choice, with `Read the preview →` linking `notes/N001/preview.html`. Keep the Plan section's arcs table, and take out every slot the walk does not fill, the sample card under Open and the row under Deferred among them.
-2. **The arc**, opened as `PROPOSED`:
+1. **The page.** Copy the template to `approach.html` in the folder. Its masthead reads `{NNN} - New platform`, and its subtitle says it holds the estate's coordinates. Its Why is one paragraph: five answers name every account address, package scope, repository name and code prefix in this estate, permanently, and this workstream holds them until `CONCEPT.md` exists to carry them. Its What is one line: the coordinates are a record, not a choice, with `Read the preview →` linking `notes/N001/preview.html`. Keep the Plan section's arcs table with its three arcs, `ideate`, `N001` and `follow-ups`, and take out every slot the walk does not fill, the sample card under Open and the row under Deferred among them.
+2. **The arcs.** Every workstream has its `ideate` arc first and its `follow-ups` arc last, and the numbered build arcs sit between them. `N001` is the estate-coordinates arc, the first build arc, opened as `PROPOSED`; `ideate` and `follow-ups` open beside it, each with a row in Plan's arcs table:
 
    ```sh
+   spn-devex workstream arc edit {NNN}/ideate
+   spn-devex workstream arc edit {NNN}/follow-ups
    spn-devex workstream arc edit {NNN}/N001 --title "The estate coordinates" --subject estate-coordinates \
      --goal "The answers that name every account address, package scope, repository name and code prefix in this estate, kept here until the platform's CONCEPT.md carries them."
    ```
@@ -192,7 +196,7 @@ Get these wrong and you rename accounts, package scopes and every code prefix af
 | It derives | From | The rule |
 | --- | --- | --- |
 | The category tree the platform declares | the business models | the table below, unioned, duplicates collapsed |
-| The apps, and so the surface set | the categories | one app per category that signs in, plus `IDENTITY`, plus `www` if they want one |
+| The apps, and so the surface set | the categories | one app per category that signs in, plus the `IDENTITY` app. `www` is a host the estate deploys, never an app row |
 | Both repository names | `{org}`, `{spc}` and the stack | `{org}-infra` and `{org}-{spc}-{stack}` |
 | `apps[].repo` and `apps[].kindCode` | the surfaces | declared data, which is why act 4 reads the names back |
 | `modules[].code`, `.layer`, `.after` | the service domains | the module set the domains imply |
@@ -209,7 +213,7 @@ The answer is a category tree. Each model is made from categories and the apps t
 
 | Business model | Categories it declares | Apps it opens |
 | --- | --- | --- |
-| B2C | Platform → Account, one person's workspace | account |
+| B2C | Platform → Account, one person's organization | account |
 | B2B | Platform → Account | account |
 | B2B2C | Platform → Account → Account Consumer | account, account-consumer |
 | B2B2B | Platform → Account → Account Enterprise | account, account-enterprise |
@@ -219,7 +223,7 @@ The answer is a category tree. Each model is made from categories and the apps t
 
 **Take the union and collapse the duplicates.** B2B with B2B2C and B2B2B declares `Account` once, then `Account Consumer` and `Account Enterprise` beside it.
 
-**The answer writes the partner's product module.** A platform has one app-owned product module, named by the platform's code, and it declares the pools, categories and apps the partner sells. Write it with only those, so nothing is switched off afterwards and no migration closes a door. Each app carries its kind code and its platform site's subdomain, and every declared app opens at the first run. `IDENTITY` joins them because business apps never implement login, and `www` joins if they asked for one. Adding a model later adds a category and an app to the product module.
+**The answer writes the partner's product module.** A platform has one app-owned product module, named by the platform's code, and it declares the pools, categories and apps the partner sells. Write it with only those, so nothing is switched off afterwards and no migration closes a door. Each app carries its kind code and its platform site's subdomain, and every declared app opens at the first run. `IDENTITY` joins them, because business apps never implement login. `www` is a host, not an app, so the product module declares no row for it; it is scaffolded only when they asked for a marketing site. Adding a model later adds a category and an app to the product module.
 
 **Marketplace composes on a different axis from the rest.** Every other model declares categories under the customer's own account. Marketplace declares merchants and shoppers beneath the platform itself. Choosing it beside B2B is not a contradiction, and it is what produces the widest set of apps.
 

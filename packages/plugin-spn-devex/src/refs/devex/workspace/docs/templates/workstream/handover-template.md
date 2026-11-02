@@ -2,7 +2,12 @@
      This file carries rules it does not own. The chapter above is the source of truth.
      A rule change is edited there first, then here, in the same change. Never add a rule here.
      restate-drift.ts reports this copy when its source moves. -->
-<!-- The handover: written into the arc's log AND given in the reply as a fenced block (02-workstream/01-workstream.md).
+<!-- The reply that hands over is `## ✈️ Handing over <arc> (<title>)`, a literal `&nbsp;` line, this block in a fence, a literal
+     `&nbsp;` line, then one short paragraph that says where the next window picks up, says thanks, and says this window can be
+     retired. The nine labels, their order (`open:` last), the column and the fenced block stay as they are. On `continue:`, a row
+     and a part are named by what they do, never by number. On `open:`, each card is named by its title in a few words, beside
+     its number.
+     The handover: written into the arc's log AND given in the reply as a fenced block (02-workstream/01-workstream.md).
      A window change the agent chooses is offered as the last line of a reply, and the block is given when the developer
      says yes; a forced stop gives it at once.
      The `open:` line is each open point written as the question, with the options considered named as weighed, never as its
@@ -10,18 +15,19 @@
      The handover's state and next steps are what `spn-devex workstream go show` prints, so in a go the `state:` line names that
      command rather than retyping them; the block keeps only what the data cannot say. Nine lowercase labels, in this order. Every value starts in the column `do not touch:` sets; a value longer than
      about 100 characters wraps, and each continuation line is indented to the value column. No blank lines inside.
+     `{{arc}}` stands for the arc's address, `N<nnn>`, `ideate` or `follow-ups`.
      The window that picks this up compares its own model and effort with `model:` before it acts, so name an exact model and an effort. -->
 ```text
-continue:     workstream `{{NNN-subject}}`, arc `N{{nnn}}`, in a `{{repository}}` window; where it stands: `spn-devex workstream go show N{{nnn}}`
+continue:     workstream `{{NNN-subject}}`, arc `{{arc}}`, in a `{{repository}}` window; where it stands: `spn-devex workstream go show {{arc}}`
               — or, after a plugin reload — open workstream `{{next NNN-subject}}`;
-              `{{NNN-subject}}` N{{nnn}} waits on it
+              `{{NNN-subject}}` {{arc}} waits on it
 model:        {{an exact model, such as Opus 5.5}}, effort {{low · medium · high · xhigh · max}}
-read first:   `{{absolute path}}/approach.html#N{{nnn}}` (the arc), `spn-devex workstream go show {{NNN}}/N{{nnn}}` (the parts and what each waits on),
-              `{{absolute path}}/notes/N{{nnn}}/plan.md` (§ Traps, § Commands), then
+read first:   `{{absolute path}}/approach.html#{{arc}}` (the arc), `spn-devex workstream go show {{NNN}}/{{arc}}` (the parts and what each waits on),
+              `{{absolute path}}/notes/{{arc}}/plan.md` (§ Traps, § Commands), then
               `{{the order or seat file being changed}}`
 pins:         {{repo}} {{short sha}} · {{repo}} {{short sha}} · {{package}} {{version}} released;
               re-run the plan's stale check first — `git -C {{repo}} log {{sha}}..HEAD -- {{paths}}`
-state:        `spn-devex workstream go show {{NNN}}/N{{nnn}}` — or, with no go, what every row reached:
+state:        `spn-devex workstream go show {{NNN}}/{{arc}}` — or, with no go, what every row reached:
               landed, stopped with what was and was not done, held on a card, or not started
 live now:     {{what is installed and live}} · waits for the window:
               {{what only a new window reads}} — or "no reload"

@@ -11,7 +11,7 @@
     },
     {
       "path": "spn-foundation/docs/05-guides/README.md",
-      "seen": "194f4a38"
+      "seen": "0ae4969f"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
@@ -69,7 +69,7 @@ The orientation ends with a telemetry line, printed only while the `debug` node'
 
 | # | Step | Where | Runs | Status |
 | --- | --- | --- | --- | --- |
-| 5 | Settle the coordinates, one question at a time, and read them back for a yes | Claude in VS Code | the `bootstrap` skill | 🚧 |
+| 5 | Settle the coordinates, one question at a time, and read them back for a yes, with the repository names, categories and apps they imply | Claude in VS Code | the `bootstrap` skill | 🚧 |
 | 6 | Bring the organization up — the machine's trust bootstrap, before any repository | Terminal | `spnutils infra organization up --apply` | ✅ |
 | 7 | Make the estate folder `<org>-infra`, start git in it, mint it as the estate and wire it; nothing is created in GitHub yet, because `repo create` reads the organization node | Terminal | `mkdir <org>-infra` · `git init` · `spnutils infra scaffold repo` · `spnutils workspace agent-sync` | ✅ |
 | 8 | Scaffold the organization node, then the platform node | Claude in VS Code (writes) · Terminal (runs) | `spnutils infra scaffold organization <org>` · `spnutils infra scaffold platform <spc> --ports <first>` | ✅ |
@@ -84,8 +84,8 @@ The orientation ends with a telemetry line, printed only while the `debug` node'
 | 12 | Create the platform repository from a new folder beside the estate; no pin exists yet, so the command takes `--from`, the estate node answering which organization's SCM (`package@version` or a path), then add `origin` and push | Terminal, led by the agent | `spnutils repo create <org>-<spc>-<stack> --from <organization package>@<version>` | ✅ |
 | 13 | Scaffold it against both pins, then wire | Claude in VS Code (asks) · Terminal (runs) | the `new` skill → `spnutils apps scaffold repo --stack <stack> --organization <ref> --platform <ref>` | 🚧 |
 | 14 | Decide what the platform is — `CONCEPT.md`: boundary, domains, surfaces, one agreed block at a time | Claude in VS Code | the `ideate` skill | 🚧 |
-| 15 | Scaffold the projects the concept implies | Claude in VS Code (asks) · Terminal (runs) | the `new` skill → `spnutils apps scaffold kind <kind>` | 🚧 |
-| 16 | Name the provider keys; the developer fills the saasplane env; confirm by name, never by value | Claude in VS Code · Terminal | `spnutils workspace status` | 🚧 |
+| 15 | Scaffold the projects the concept implies: an app for each category that signs in, identity, a public site if asked, a module for each service domain, and the platform's product module | Claude in VS Code (asks) · Terminal (runs) | the `new` skill → `spnutils apps scaffold kind <kind>` | 🚧 |
+| 16 | Name the provider keys, since the first run fails fast when a provider's type or key is missing (storage, email and SMS are required, and they seed the provider rows once); the developer fills the saasplane env; confirm by name, never by value | Claude in VS Code · Terminal | `spnutils workspace status` | 🚧 |
 | 17 | Bring the platform up locally | Terminal | `spnutils infra platform up <spc> --apply` | ✅ |
 | 18 | Register each app | Terminal, led by the agent | `spnutils infra app up <package>` | ✅ |
 | 19 | Run it, and say what should be seen — each app on `https://{label}.{local domain}` (label: the app row's `subdomains` entry; domain: `providers.local.domains.platform.domain`, `lc-spndemo.app` for the sample `dmo`), served on 443 with nothing added to `/etc/hosts`; the first sign-in at `https://identity.{local domain}/login`, landing on the identity dashboard; an empty console | Claude in VS Code | the `run` skill | 🚧 |

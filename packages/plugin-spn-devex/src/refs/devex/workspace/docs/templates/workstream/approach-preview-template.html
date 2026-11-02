@@ -3,7 +3,7 @@
      This file holds the structure of a preview page and states no rule: the rail, the masthead, the
      Overview as plain paragraphs, then Today, Proposed and Where it lands, each with its subsections, the slots
      an author fills, and the two lines that load the shared stylesheet and script. An arc has one preview, at
-     notes/N<nnn>/preview.html. Every question is a whole card on the approach page, in Open, and the card links
+     notes/<arc>/preview.html. Every question is a whole card on the approach page, in Open, and the card links
      the preview that shows its options. A preview may show the questions it raises in its own Open, which is the
      generated open block, rendered from the same record as the approach page's card, so a question card always
      looks the same; the question is answered on the approach page, the answer takes the card off both pages, and
@@ -13,7 +13,7 @@
      links a real file in the samples folder. The masthead's Progress fact (a short bar and `N of M landed`) is written
      by the arc's commands, never by hand, and is left out while the arc has no sheet. -->
 <meta charset="utf-8">
-<title>{{NNN}} · N{{nnn}} - {{THE ARC'S SUBJECT, IN TITLE CASE}}</title>
+<title>{{NNN}} · {{arc}} - {{THE ARC'S SUBJECT, IN TITLE CASE}}</title>
 <!-- spn:doc
 {"id": "ws-{{NNN}}-{{slug}}-{{preview-slug}}", "variant": "preview", "title": "{{THE PREVIEW NAME}}", "lenses": ["{{LENS}}"], "status": "PLANNING", "summary": "{{The Description's first sentence, word for word.}}", "keywords": ["{{…}}"]}
 -->
@@ -23,7 +23,7 @@
 <div class="sds-page">
 
 <nav class="sds-rail" id="rail">
-  <a class="sds-home" href="../../approach.html#N{{nnn}}-what">&larr; {{NNN}} - {{TITLE}}</a>
+  <a class="sds-home" href="../../approach.html#{{arc}}-what">&larr; {{NNN}} - {{TITLE}}</a>
   <div class="sds-rail-title">{{THE PREVIEW NAME}}</div>
 </nav>
 <div class="sds-wrap">

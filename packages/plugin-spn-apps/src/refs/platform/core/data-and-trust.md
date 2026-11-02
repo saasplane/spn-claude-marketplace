@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/03-platform/01-core/04-data-and-trust.md",
-      "seen": "f78083db"
+      "seen": "269df759"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/03-platform/01-core/04-data-and-trust/",
-      "seen": "05e5043f"
+      "seen": "5c6f43ae"
     }
   ]
 }
@@ -77,12 +77,12 @@ Reads of the trail are organization-scoped from the caller's own authorization c
 
 ## Retention and privacy are policies, not constants
 
-Retention and privacy are not platform-wide constants — they are one organization's own **data policy**, layered over a platform default per tenancy tier:
+Retention and privacy are not platform-wide constants — they are one organization's own **data policy**, layered over a platform default for its org category:
 
 | Layer | Scope |
 | --- | --- |
-| Platform default (one per tenancy tier) | seeded by the platform; complete — every section populated |
-| Organization override (one per organization) | partial — an unset section inherits the tier default |
+| Platform default (one per org category) | seeded by the platform; complete — every section populated |
+| Organization override (one per organization) | partial — an unset section inherits the category's default |
 
 | Section | Setting | Meaning |
 | --- | --- | --- |

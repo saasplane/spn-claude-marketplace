@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/06-tests/",
-      "seen": "57571fc1"
+      "seen": "a0baf3d1"
     }
   ]
 }
@@ -200,7 +200,7 @@ A percentage is not the answer — it moves when a case is added and says nothin
 | view components in a browser | a person | journey |
 | the published methods | another system, through the generated client | contract |
 
-**A row owes proof on each surface that exposes it.** A row proven on one surface alone says which, never that it is fully proven. **An absent action is a designed fact and owes its own row that reads *cannot*, in the same grammar as one that reads *can*** — without it, nothing distinguishes *this cannot be created by design* from *nobody has built create yet*. A refusal is a behaviour too, and it owes proof on both surfaces exactly as a permission does. **A row is proven once per app-site type — MUST**, on the tenant's own surface where one exists, since that resolves an organization and exercises more of the path than the platform-owned surface does.
+**A row owes proof on each surface that exposes it.** A row proven on one surface alone says which, never that it is fully proven. **An absent action is a designed fact and owes its own row that reads *cannot*, in the same grammar as one that reads *can*** — without it, nothing distinguishes *this cannot be created by design* from *nobody has built create yet*. A refusal is a behaviour too, and it owes proof on both surfaces exactly as a permission does. **A row is proven once per app — MUST**, on the tenant's own site where one exists, since that resolves an organization and exercises more of the path.
 
 **A release gate is a named subset of the rows — MUST.** Absent that name, every case blocks a release in principle, which in practice means a red is waved through on judgement and the gate means nothing. Two exclusions, each excluded for a stated reason: anything requiring a real vendor round trip, because a vendor's outage is not a regression in the code; and what only a person can complete, such as a proof-of-person challenge, kept as a short list that is never claimed empty. A skipped case still leaves its row `PENDING` — a run reports the rows it did not reach as well as the ones it did.
 

@@ -51,6 +51,7 @@ Run the gates cheapest-first so a failure stops the run early. **Never report a 
 
 ## What the version means
 
+- **The agent names the version from the change and writes it in the arc's log before the go.** A removed or renamed export, a new required config key or a new abstract member is major. An addition is minor. A fix is patch. The log line carries the version and the reason.
 - **Additive changes are additive.** New optional fields, new enum values, new methods — these do not break a consumer and are versioned accordingly.
 - **A breaking change is a planned, versioned event with a migration path.** It is never a silent edit, and it is the headline of the release rather than a line in it.
 - **Set the version from the release process, never by hand.** A hand-edited version is a claim nobody checked.

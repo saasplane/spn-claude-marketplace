@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "seen": "8c3c36e7"
+      "seen": "2469db3f"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
@@ -21,15 +21,15 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/03-tree.md",
-      "seen": "099bd2b4"
+      "seen": "a74daa78"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/02-document.md",
-      "seen": "858e131a"
+      "seen": "6a0aea96"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/04-docs.md",
-      "seen": "682267eb"
+      "seen": "1053e53f"
     },
     {
       "path": "spn-foundation/CONCEPT.md",
@@ -412,8 +412,8 @@ example and the poor ones for that kind, run the check below, and name the chang
 one line. Do not ask them to approve one. A Subtitle that exists today moves into place only if it
 already passes the plain rule; otherwise write it again. A preview page's Title is the preview's name,
 and its Subtitle says what the developer is asked to decide from the page. **A preview's tab names its
-workstream and its arc**: the `<title>` of `notes/N<nnn>/preview.html` reads the workstream's number,
-the arc's number and the arc's subject in title case, such as `025 · N023 - Small Improvements`, as an
+workstream and its arc**: the `<title>` of `notes/<arc>/preview.html` reads the workstream's number,
+the arc's address (`N<nnn>`, `ideate` or `follow-ups`) and the arc's subject in title case, such as `025 · N023 - Small Improvements`, as an
 approach page's reads `025 - Partner Web`. Its `h1`, its rail and its block's `title` stay the
 preview's name.
 
@@ -612,7 +612,7 @@ page; a link inside the content, *Where to go next* included, may open a markdow
 **A preview shows, and an approach page argues** (`RULE.DEVEX.WORKSPACE.233` · MUST · check:doc-check). A preview's
 sections are *Overview*, *Today*, *Proposed* and *Where it lands*, and an *Open* only for the questions it
 raises: the same cards as the approach page's, rendered from the same records by the `open` block
-(`RULE.DEVEX.WORKSPACE.253` · MUST · check:split-plan). An arc has one preview, `notes/N<nnn>/preview.html` (`RULE.DEVEX.WORKSPACE.254` · MUST · check:workstream-owner). *Overview* says what
+(`RULE.DEVEX.WORKSPACE.253` · MUST · check:split-plan). An arc has one preview, `notes/<arc>/preview.html` (`RULE.DEVEX.WORKSPACE.254` · MUST · check:workstream-owner). *Overview* says what
 the reader is asked to decide, what to look at first and what is not final. *Today* shows the thing as it is.
 *Proposed* shows it as it will be, with its options side by side where a decision is still open. *Where it
 lands* shows the files that change as one folder tree for each repository, with a link to the approach page's

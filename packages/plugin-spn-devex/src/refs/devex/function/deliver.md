@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/01-function/07-deliver.md",
-      "seen": "1759f186"
+      "seen": "32ed3c14"
     }
   ]
 }
@@ -23,6 +23,8 @@
 ## The thing to unlearn
 
 **A version is not a number somebody chooses.** It is stamped by the process, from a tree that has already passed its gates. A number chosen by hand is a claim nobody verified.
+
+The agent names the bump from the change, using the table of the book's *What a version means*. It writes the version and the reason in the arc's log before the go, and the preview shows the same line.
 
 **The count moves after the release, never before.** You release at the version the artifact carries, and the first edit after it increments. So the number names **what is published**, not what you are working on — which is what makes a stale cache findable.
 

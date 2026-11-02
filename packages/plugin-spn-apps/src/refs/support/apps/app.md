@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/02-apps/05-app.md",
-      "seen": "5f550ce6"
+      "seen": "f72cc999"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/05-app/",
-      "seen": "f09a48f3"
+      "seen": "86f1f9f1"
     }
   ]
 }
@@ -120,6 +120,7 @@ Plug a module into the application through a manager class. **A module offers tw
 - **A module names itself.** Its one code names its tables, permissions, labels, env keys, API path and CLI namespace, and is the code sent over the network when another service calls it. Boot derives the API path and the CLI namespace from the code, in lower case, so the start file cannot mount one module under two paths.
 - **The line names no service.** A remote module reads its address under its own prefix, and the service's settings write that key as a reference to the address the estate publishes, so moving a module to another service is a change of one settings line and no code.
 - **A service that has more than one address for a remote module refuses to boot**, and names the key.
+- **A service names itself and the callers it accepts.** `{CODE}_DEPLOYMENT_KIND_CODE` is the app row's kind code, which the estate renders and without which boot refuses to start, and `{CODE}_REMOTE_CREDENTIAL_SERVICES` lists the kind codes of the platform's server apps, so a call from any other service is refused.
 
 What every manager answers:
 
@@ -177,18 +178,20 @@ One application talks to one logical database, partitioned into schemas as owner
 | Schema | Owned by | Holds |
 | --- | --- | --- |
 | `platform` | the installed platform modules | platform capabilities' tables — one module prefix per module |
-| `product` | the application's own product modules | the product's business tables |
+| `product` | the application's own app-owned modules | the product's business tables |
 | `migration` | the migration runner | which versions ran, when, with what outcome |
 | *additional schemas* | the declaring application | embedded infrastructure, or a dataset with a different access profile |
 
-**Schemas are provisioned, never migrated.** A migration **MUST NOT** create or drop a schema — it creates tables inside schemas that provisioning already owns. Every table belongs to exactly one module, and every schema has exactly one owning side. Both platform and product modules mount on the same `default` connection, so cross-schema joins stay cheap; migrations **MUST** still name their schema explicitly rather than rely on the search path, which is what keeps a later extraction mechanical. A module **MAY** reference another module's rows by id only along a dependency its manifest declares — every write still goes through the owning module's own service.
+**Schemas are provisioned, never migrated.** A migration **MUST NOT** create or drop a schema — it creates tables inside schemas that provisioning already owns. Every table belongs to exactly one module, and every schema has exactly one owning side. Both platform and app-owned modules mount on the same `default` connection, so cross-schema joins stay cheap; migrations **MUST** still name their schema explicitly rather than rely on the search path, which is what keeps a later extraction mechanical. A module **MAY** reference another module's rows by id only along a dependency its manifest declares — every write still goes through the owning module's own service.
 
 Modules come in two flavors, distinguished by ownership and schema, never by API surface — the boot manager treats both identically:
 
 | Flavor | Ships from | Owns tables in |
 | --- | --- | --- |
 | Platform module | a platform-stack package, installed as a dependency | `platform` schema |
-| Product module | the product application itself | `product` schema |
+| App-owned module | the application itself | `product` schema |
+
+One app-owned module is the platform's product module, which declares the pools, categories and apps the platform sells.
 
 ## The commands a node answers, derived rather than listed
 
@@ -289,7 +292,7 @@ A web application asks the same two questions a server does — how does it come
 
 **Teardown is best-effort and cannot be awaited.** The exit signal fires both when a surface is closed and when it is navigated away and cached, so nothing may block on the work it starts. **A web surface never boots into a privileged state** — everything it can do it could do from a reload, so the guard is the server refusing the call, never the boot order.
 
-### The web build has two sources and two fates
+### The web build has two sources, and its output goes one of two ways
 
 A web project's tree carries two source folders, and the build treats them differently:
 

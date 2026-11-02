@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/10-providers/aws/08-environment.md",
-      "seen": "ec81a2e4"
+      "seen": "d2c0f7be"
     }
   ]
 }
@@ -55,7 +55,7 @@
 
 **Every config path ends in `/vars`.** `/config/environments/{env}/vars` holds the environment's published facts, `/config/environments/{env}/spaces/{space}/vars` a space's, and `/config/environments/{env}/apps/{app}/vars` dev-authored keys, which no blueprint writes. A layer's outputs are handed to the layer above by the driver, and nothing is written to a registry of parameters for them.
 
-**The environment publishes what a call between services needs** (`RULE.SUPPORT.INFRA.114` · MUST · skill:spn-infra/implement). The platform's world writes the credential block once: `{SPC}_REMOTE_CREDENTIAL_PROVIDER=KUBERNETES`, the cluster's issuer, the namespaces `plt,prd,vnd`, the audience `spn-remote` and the token's path. Each deployment that declares a remote port publishes `{SPC}_REMOTE_SERVICE_{NAME}_ENDPOINTS` as `https://{env}-{app}-remote.internal.{spd}`. The world also publishes the gateway's rate limit store in the secret half: `{SPC}_GATEWAY_RATE_LIMIT_STORE_URL`, `_AUTH` and `_TLS`.
+**The environment publishes what a call between services needs** (`RULE.SUPPORT.INFRA.114` · MUST · skill:spn-infra/implement). The platform's world writes the credential block once: `{SPC}_REMOTE_CREDENTIAL_PROVIDER=KUBERNETES`, the cluster's issuer, the namespaces `plt,prd,vnd`, the audience `spn-remote` and the token's path in a pod. The credential block also names the trusted services, `api,observer` today, from the Platform server app rows. Each deployment that declares a remote port publishes `{SPC}_REMOTE_SERVICE_{NAME}_ENDPOINTS` as `https://{env}-{app}-remote.internal.{spd}`. The world also publishes the gateway's rate limit store in the secret half: `{SPC}_GATEWAY_RATE_LIMIT_STORE_URL`, `_AUTH` and `_TLS`.
 
 **A deployment is placed by its `ns`, its code and its `expose`.** `PUBLIC` is a route on the public gateway, `PRIVATE` a route on the private one, and `INTERNAL` has no route; `NONE` is refused by name. A `gateway` block becomes the route's policy. A remote port gets a second route on the private gateway, whatever `expose` says, a network rule that admits this environment's namespaces and the private gateway's proxies alone, and every pod that is not a web deployment is given a token marked `spn-remote`. Each deployment is rendered `{PREFIX}_API_TRUSTED_PROXIES` (`2` behind a route, `0` for `INTERNAL`) and `{PREFIX}_API_REMOTE_TRUSTED_PROXIES` (`3`).
 

@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/03-platform/01-core/02-identity.md",
-      "seen": "5cef6bc2"
+      "seen": "75df7db7"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/03-platform/01-core/02-identity/",
@@ -34,7 +34,7 @@ export enum IdentityPoolSpanType {
 }
 ```
 
-The pools a platform ships, and the categories that name them, show what the span means. A partner's own pools work the same way.
+The dmo's product module declares five pools, and the categories that name them show what the span means. A partner's own pools work the same way.
 
 | Pool | Spans | Named by | The same address means |
 | --- | --- | --- | --- |
@@ -118,7 +118,7 @@ Two policies are read on the "does this organization accept how they signed in" 
 
 Name the membership, the organization, the application, and the site on every session you mint — MUST. A session that names only a person can be carried somewhere it was never granted; naming the place is what makes "where was this used" answerable, and what makes revoking one place possible without revoking a person everywhere.
 
-Two organizations reached from one authentication hold two separate sessions — that is correct, not wasteful. Each carries the permission codes of that membership and the offers of that organization's type, and each expires on its own organization's clock. Signing in to a second organization the same person belongs to is a **switch**, and a switch mints its own session rather than extending the first.
+Two organizations reached from one authentication hold two separate sessions — that is correct, not wasteful. Each carries the permission codes of that membership and the offers of that organization, and each expires on its own organization's clock. Signing in to a second organization the same person belongs to is a **switch**, and a switch mints its own session rather than extending the first.
 
 Authorization checks a membership, never an identity — the same person is a different subject in each organization they belong to.
 
@@ -129,7 +129,7 @@ Never give a customer org a subdomain of its own — MUST NOT. Only an org of th
 A session's cookie scope follows the host that minted it — shared across the platform's own surfaces, and held alone by a tenant's own domain. A custom domain moves through a small state machine behind a swappable certificate provider:
 
 ```ts
-export enum AppSiteDomainStatusType {
+export enum OrgAppSiteDomainStatusType {
   PENDING = 'PENDING',    // requested; waiting on the owner's DNS records
   ISSUING = 'ISSUING',    // the records are visible; the certificate is being issued and deployed
   ACTIVE = 'ACTIVE',      // issued and serving; the domain resolves like a platform-owned host
@@ -142,10 +142,10 @@ export enum AppSiteDomainStatusType {
 
 ## The registration boundary is a stored decision
 
-Whether a surface may create an organization at all is a **stored decision** the developer makes per organization and surface, from a closed vocabulary of two:
+Whether a surface may create an organization at all is a **stored decision** the developer makes per organization and app, from a closed vocabulary of two:
 
 ```ts
-export enum OrgSignupModeType {
+export enum OrgAppSignupModeType {
   CLOSED = 'CLOSED',  // no registration form here; an invitation or the parent's administrator creates a member
   OPEN = 'OPEN',      // the form renders; a stranger who proves a handle gets an organization and a session
 }
@@ -179,7 +179,7 @@ A consumer application is not a second identity portal. Self-service is a corner
 | a login form inside a business application | hand off to the identity hub and mount one callback route |
 | a client field naming which organization or tenant a sign-in targets | the app site the caller already named resolves it server-side |
 | an "MFA passed" flag the client asserts back to the server | there is no such claim — evidence is server-held and organization-judged |
-| a boolean "can this org type sign up here" | `OrgSignupModeType`, stored per organization and surface |
+| a boolean "can this org type sign up here" | `OrgAppSignupModeType`, stored per organization and app |
 | a second signup screen for "just create my profile" | self-service is a corner of the business app, never a parallel portal |
 
 ## Left out

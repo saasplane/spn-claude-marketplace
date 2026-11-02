@@ -4,7 +4,7 @@
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/01-agent.md",
       "section": "A warm line always",
-      "seen": "bd7e9c0f"
+      "seen": "ff5b2a2c"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
@@ -13,11 +13,11 @@
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/02-workstream.md",
-      "seen": "2a2107ee"
+      "seen": "668661a4"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
-      "seen": "2f1770dc"
+      "seen": "8cd3cd71"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -27,17 +27,17 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "section": "Closing a workstream is a check; closing a window is nothing",
-      "seen": "3b41c9a4"
+      "seen": "3d7be2d2"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "section": "An order is one delegated execution, and every order follows the same rules",
-      "seen": "cc56fc94"
+      "seen": "dc15c9f4"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "section": "An arc carries its specification, or names the note that holds it",
-      "seen": "e287ffef"
+      "seen": "49def630"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -51,7 +51,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "seen": "8c3c36e7"
+      "seen": "2469db3f"
     }
   ]
 }
@@ -108,7 +108,7 @@ conflicts are declared once.
 | Owner | Files |
 | --- | --- |
 | **you, by hand** | `approach.html`; each arc's `notes/N<nnn>/preview.html`, `samples/`, `plan.md`, `orders/`, `scripts/` and `work/` |
-| **the `spn-devex workstream` commands** | `suggestions.jsonl` and `questions.jsonl`; each arc's `arcs/N<nnn>/state.json`, `log.jsonl`, `facts.jsonl`, `sheet.json` and its name file `<subject>.md`; the `progress` and `open` blocks inside the pages |
+| **the `spn-devex workstream` commands** | `suggestions.jsonl` and `questions.jsonl`; each arc's `arcs/<arc>/state.json`, `log.jsonl`, `facts.jsonl`, `sheet.json` and its name file `<subject>.md`; the `progress` and `open` blocks inside the pages |
 
 **A file a command owns is never edited by hand**: the PreToolUse hook refuses a direct write to it, an
 edit that touches a `progress` or `open` block, and a hand edit of an arc's `data-arc-stamp`. A page you
@@ -199,7 +199,7 @@ files it writes, and a file a command owns is written only by that command.
 | release and land | the steps, by command, which work out `LANDED`; the book's rows; the references restated; *Plan* |
 | review fixes | `arc edit <ws>/<arc> --review-fixes --note "<their words>"` at the first fix after a landing; one step per fix, naming the arc it fixes |
 | carry, drop, delete | `CARRIED` or `DROPPED` and its reason, by command; an arc never decided, by `arc delete` |
-| close the workstream | on the developer's word, after the review links: the review-fixes arc's `LANDED`, by command; the close gate (`workstream close` runs it), which refuses an arc `PROPOSED` or `DECIDED`, any finding of `go check` and a part of the plan not landed (`RULE.DEVEX.WORKSPACE.463` · MUST · check:split-plan); once it passes, the command stamps the page `DONE` and the folder moves to `closed/` |
+| close the workstream | on the developer's word, after the review links: the review-fixes arc's `LANDED`, by command; the close gate (`workstream close` runs it), which refuses an arc `PROPOSED` or `DECIDED`, a `follow-ups` arc that has not landed, any finding of `go check` and a part of the plan not landed (`RULE.DEVEX.WORKSPACE.463` · MUST · check:split-plan); once it passes, the command stamps the page `DONE` and the folder moves to `closed/` |
 
 **Each fact you read while ideating is written as you read it, pinned to its commit — MUST**
 (`RULE.DEVEX.WORKSPACE.252` · MUST · short). Read your own knowledge first, then the plugin's references and the book,
@@ -251,13 +251,13 @@ developer as soon as the batch lands.
 
 ### An arc keeps a change sheet, and only its commands write it
 
-**Every arc keeps a change sheet as its data, `arcs/N<nnn>/sheet.json`, written only by the `workstream sheet` commands while the arc is ideated. Before the go, the sheet lists every file the arc will change** (`RULE.DEVEX.WORKSPACE.326` · MUST · check:workstream-state). It holds one entry for each file operation the arc makes: the change in a line, what the file drags with it, and the tests that prove it. You read the code once, while you ideate, and the sheet is where that reading goes, so an order never finds it out again. It sits beside the arc's rows and facts, the developer is never asked to review it, and the preview stays plain. The plan stays optional, for traps and moves.
+**Every arc keeps a change sheet as its data, `arcs/<arc>/sheet.json`, written only by the `workstream sheet` commands while the arc is ideated. Before the go, the sheet lists every file the arc will change** (`RULE.DEVEX.WORKSPACE.326` · MUST · check:workstream-state). It holds one entry for each file operation the arc makes: the change in a line, what the file drags with it, and the tests that prove it. You read the code once, while you ideate, and the sheet is where that reading goes, so an order never finds it out again. It sits beside the arc's rows and facts, the developer is never asked to review it, and the preview stays plain. The plan stays optional, for traps and moves.
 
 **An arc with no `sheet.json` is judged as it was before the sheet existed — MUST.** The write that opens an arc writes its sheet with an empty list of entries. An arc already running has none and needs no migration, and every refusal below is skipped for it.
 
 **In an arc that keeps a sheet, the steps are derived from the sheet and never added by hand.** `sheet write` writes one step for each repository and kind of change its entries name, and each entry names its kind: docs, code or generated. The release and proof steps come from the sheet's release order. A step that has landed keeps what it landed: an entry written into the sheet after it goes to a step of its own, and its repository gets a new release step and, for code, a new proof step. `fact write` pins a fact on the workstream's own branch where one exists, so a fact is read where the work is written.
 
-**An entry points at what was decided and never says it again, and it holds no code.** The sheet's header holds `releaseChain` (what releases, in what order, and the release slots of other workstreams it must follow), `dependsOn` (other repositories and workstreams' branches that merge first) and `stack` (the folder the tiers run from, the `dmo` version, how it is reset, the ports; none where the stack has no `dmo`). Each entry holds `id`, `op` (`create` · `edit` · `drop` · `rename`), `file` (`repository:path`), `what`, `decidedBy` (the cards or preview sections), `facts` (by id; the drift step reads their commits), `then` (the generators to run after it), `rules`, `callers` (found by search, by path), `tiers` (the named tests by tier, each a behaviour id, a new test marked red first) and `docs` and `book` (what it changes, and the book line it changes or must still agree with).
+**An entry points at what was decided and never says it again, and it holds no code.** The sheet's header holds `releaseChain` (what releases, in what order, and the release slots of other workstreams it must follow), `dependsOn` (other repositories and workstreams' branches that merge first; a line that names an arc of the same workstream by its id, such as `N003`, makes the plan wait on that arc's release) and `stack` (the folder the tiers run from, the `dmo` version, how it is reset, the ports; none where the stack has no `dmo`). Each entry holds `id`, `op` (`create` · `edit` · `drop` · `rename`), `file` (`repository:path`), `what`, `decidedBy` (the cards or preview sections), `facts` (by id; the drift step reads their commits), `then` (the generators to run after it), `rules`, `callers` (found by search, by path), `tiers` (the named tests by tier, each a behaviour id, a new test marked red first) `docs` and `book` (what it changes, and the book line it changes or must still agree with) and `patch` (`{file, base}`: the entry's diff, at `arcs/N<nnn>/patches/<E>.diff`, written against the commit its facts pin; an entry with no patch carries none).
 
 **A command validates each entry as it is written, so a gap is refused where it is made — MUST.** A field with nothing to say reads `[]` and is never left out, an entry with no tiers or no fact is refused, and a refused write writes nothing.
 
@@ -266,8 +266,9 @@ developer as soon as the batch lands.
 | `sheet write <arc> --file sheet.json` | the ideation write: every entry in one call, each validated |
 | `sheet edit <arc> <E> [--what …] [--tiers …] …` | one entry, as the drift step refreshes it |
 | `sheet drop <arc> <E> --note "…"` | an entry no longer needed |
-| `sheet show <arc> [--row <id>] [--json]` | what an order's child reads; `--row` prints only that row's entries |
-| `sheet check <arc>` | the sheet whole, and the rows and cards meeting it: a row with no entry, an entry no row names, a code row whose entries name no test, an answered card no entry cites and whose answer does not record `--entries none`. The go lists what it finds |
+| `sheet show <arc> [--row <id> \| --part <part>] [--json]` | what an order's child reads; `--row` prints only that row's entries and `--part` only the entries one part of the go's plan carries |
+| `sheet patch <arc> <E>` | take an entry's diff from the worktree |
+| `sheet check <arc>` | the sheet whole, and the rows and cards meeting it: a row with no entry, an entry no row names, a code row whose entries name no test, an answered card no entry cites and whose answer does not record `--entries none`, and each repository pinned to a package an entry breaks: an entry whose op is `drop` or `rename` on a file the package exports, or whose `what` says an export is removed or that boot refuses without a key, for which it asks for an entry that moves the pin or a fact that says the pin stays. The go lists what it finds |
 
 **A row names its entries, and a report names its run.** A step row gains `entries`, the ids of the entries it carries; a report's front matter gains `run`. Each is a field added and never repurposed.
 
@@ -279,12 +280,13 @@ developer as soon as the batch lands.
 
 | What `go write` settles | Read from |
 | --- | --- |
-| **The passes**: each repository's entries, grouped by pass, with the book first and the release last | the sheets' entries and each sheet's release order |
-| **The parts**: a pass split by files that do not overlap, so each part finishes within 45 measured minutes. Where nothing has been measured yet, a part holds at most eight entries | the files each entry names |
-| **The time of each part**: the same kind of work in the same repository. A full suite is priced from its last three timed runs | the timed commands and the cost of past orders |
+| **The passes**: each repository's entries, grouped by pass, with the book first and the release last. A repository that holds the book and releases nothing ranks first, so a copy of the book's line in another repository always becomes a wait | the sheets' entries and each sheet's release order |
+| **The waits**: a `dependsOn` line that names an arc of the same workstream by its id makes the code parts of that line's repository wait on the arc's release parts. A release waits only on its own repository's full run and generated part, and on the release before it in `releaseChain`; `go write` refuses a scope where a wait would close a circle through a release, and names the parts. A baseline waits on the parts that hold that repository's documents rows across every decided arc. An entry whose `what` says it exports, declares or adds a name waits on every entry whose `what` names it | the sheets' `dependsOn` and `releaseChain`, and each entry's `what` |
+| **The parts**: a pass split by files that do not overlap, so each part finishes within 45 measured minutes. A part holds eight entries only where no part of that kind ever landed. A repository's patched entries, and each entry with no tiers whose file no other entry edits, form one `apply-<repo>` part in their pass, carried by the lead with no brief and ordered by the same waits. Before it writes the plan, `go write` runs `git apply --3way --check` in the worktree, and an entry whose patch no longer applies loses it for this go and joins a helper's part on its prose. A pass's other entries are grouped by the first card or preview section in each entry's `decidedBy`, one file's entries stay in one part, and a part is named `<pass>-<repo>-<decision>-<n>`, the number counting only that decision's parts | the files each entry names, and each entry's `decidedBy` |
+| **The time of each part**: the cost that landed parts of the same kind of work in the same repository recorded, or, where this repository has none, the same kind of work in another repository, read as estimated from that repository. A full suite is priced from its last three timed runs | the timed commands and the cost of past orders |
 | **The tests each part runs**: only the test files whose cases carry the part's behaviour ids | each entry's tiers, and the ids in the test labels |
 | **The full runs**: one baseline run per repository before its code pass, and one full run at the end that every code change lands on. A repository whose code has all landed still gets its full run while an arc of the scope owes a proof there, and the proof of an arc that changes no repository lands on the named run its own check records in the arc's `work/` folder | the repositories the scope touches, and the proof steps that have not landed |
-| **Each helper's brief**: its files, its changes, the decisions behind them and its test commands, written from the order template | the part's entries |
+| **Each helper's brief**: its files, its changes, the decisions behind them and its test commands, written from the order template. The brief says a helper reads its own entries with `workstream sheet show <arc> --part <part>`, and its acceptance names each test id beside the file that holds it | the part's entries |
 
 **The plan is written only by `go write`, into the lead arc's `go.json`, and it never appears on a preview or on the approach page** (`RULE.DEVEX.WORKSPACE.456` · MUST · skill:spn-devex/execute). The lead arc is the lowest arc of the scope. The developer reviews the goal, the constructs and the files; how the work runs is the agent's job, and the agent adds nothing to a brief by hand.
 
@@ -331,7 +333,7 @@ Derive the plan again with `workstream go write 036/N004 --scope …`, then laun
 
 The plan holds the release parts too, merged from the scope's sheets in chain order, so no release is added on the side. A helper's report is named for its part, and folding the report lands the part.
 
-**A suggestion belongs to an arc, as a card does, and the arc's sheet cites it** (`RULE.DEVEX.WORKSPACE.488` · MUST · check:split-plan). It is raised against the arc it would change, `suggestion add <NNN>/N<nnn> "…"`, as `question raise` takes its arc, and `suggestion state <S> shaped --arc N<nnn>` moves it to the arc that takes it up. Before that arc's plan is written, an entry of its sheet cites the suggestion in `decidedBy`, as `S65`, and `go write` refuses a sheet that leaves a decided one out, naming it. Before the arc reads `LANDED`, every suggestion against it is decided and built, parked or dropped, and the last row's landing refuses while one is still raised or shaped. A suggestion raised with no arc yet sits against the workstream until an arc takes it up.
+**A suggestion belongs to an arc, as a card does, and the arc's sheet cites it** (`RULE.DEVEX.WORKSPACE.488` · MUST · check:split-plan). It is raised against the arc it would change, `suggestion add <NNN>/<arc> "…"`, as `question raise` takes its arc, and `suggestion state <S> shaped --arc <arc>` moves it to the arc that takes it up. Before that arc's plan is written, an entry of its sheet cites the suggestion in `decidedBy`, as `S65`, and `go write` refuses a sheet that leaves a decided one out, naming it. Before the arc reads `LANDED`, every suggestion against it is decided and built, parked or dropped, as `RULE.DEVEX.WORKSPACE.435` asks of the ones it raised, and the last row's landing refuses while one is still raised or shaped. A suggestion raised with no arc goes to the workstream's `follow-ups` arc, where it stays until a build arc takes it up.
 
 **Follow-ups decided after a close run as small batches, with no arc** (`RULE.DEVEX.WORKSPACE.496` · MUST · check:test-run). When a closed workstream's suggestions are decided after its close, carry them out as small batches against that workstream, with no arc and no go. A whole suite then runs under a run named `followup-<NNN>-<n>`, which the test-run check lets through only while workstream `<NNN>` is closed and holds a decided suggestion, so it counts for the push like a full run. Each batch is released as any change is, and the batch's suggestions are the record of what it carried.
 
@@ -341,7 +343,7 @@ The plan holds the release parts too, merged from the scope's sheets in chain or
 
 **A go's first plan and each release part wait for a panel's verdict on record** (`RULE.DEVEX.WORKSPACE.485` · MUST · check:split-plan). The design gate and a release are two of the three judgment gates, where the lenses that own the decision read the work fresh. `go write` writes an arc's first plan only once a panel has given its verdict on that arc. `go start` starts a release part only once a panel has given its verdict on the part's arc since that repository's last part landed. The verdict is on record when the panel stops: the hook that logs a helper's turns writes a panel row naming the workstream, the arc, the part, the lens and the verdict. A blocked verdict holds the gate until the work is changed and the panel reads it again. Deriving a plan again is never held, and with telemetry recording off the gate cannot see a verdict, so it says so and lets the work through. The closing retrospective reads the same rows, so a workstream that convened its panels has no ungated part to report.
 
-**A step lands once every entry it holds sits in a landed part, and a code step lands on the full run** (`RULE.DEVEX.WORKSPACE.461` · MUST · skill:spn-devex/execute). Every command's output ends with the next step. Each moment of the loop reads the plan and says one thing, which is what comes next.
+**A step lands once every entry it holds sits in a landed part, and a code step lands on the full run** (`RULE.DEVEX.WORKSPACE.461` · MUST · skill:spn-devex/execute). `go start <arc> apply-<repo>` applies the patches in plan order and commits them as one commit; the part lands on that commit with no report, and its tests run in the repository's full run. Every command's output ends with the next step. Each moment of the loop reads the plan and says one thing, which is what comes next.
 
 | The moment | What it says |
 | --- | --- |
@@ -369,7 +371,7 @@ The plan holds the release parts too, merged from the scope's sheets in chain or
 - **A merge into `develop` is told to every open workstream that holds the repository — MUST.** The window that merges writes one line into each open workstream whose set holds that repository, naming what changed. A breaking contract change names its cutover: what must land with it, and in what order. The line is for a window that has not fetched yet, and the window's own *behind `develop`* line below tells it that a rebase is owed. **The line lands as a `note` on the log of each running arc** in those workstreams, written with `workstream arc edit <arc> --note "…"` (the only writer of a log line); a hook reminds the agent after the merge, and the agent writes the line. The line names what changed, a dependency the merge added, and a breaking change's cutover.
 - **A window that opens names a branch that is behind `develop` — MUST.** It fetches every member in parallel and says, for each branch behind, how many commits it is behind and that a rebase comes before the next push.
 - **A conflict outside the arc's own files stops the agent — MUST.** The developer decides how a conflict in another arc's or another workstream's files resolves, because the agent does not own those files.
-- **After a rebase, a merge or a pull from `develop`, the agent re-reads what moved underneath its arcs** (`RULE.DEVEX.WORKSPACE.317` · MUST · check:rebase-moved). Two things count and no more: a file that `develop` changed since the old merge base and the branch also changed, and an open arc's pinned fact whose source moved, as `plan stale` names it. The agent re-checks both and tells the developer in one line what moved and what it re-checked. A window with no open arcs and no pinned facts says nothing. The push check keeps owning only stamped runs and is not widened to this, because a re-read is judgement and a stamp is not.
+- **After a rebase, a merge or a pull from `develop`, the agent re-reads what moved underneath its arcs** (`RULE.DEVEX.WORKSPACE.317` · GUIDE). Two things count and no more: a file that `develop` changed since the old merge base and the branch also changed, and an open arc's pinned fact whose source moved, as `plan stale` names it. The agent re-checks both and tells the developer in one line what moved and what it re-checked. A window with no open arcs and no pinned facts says nothing. An arc that has landed, been dropped or been carried is not read. The push check keeps owning only stamped runs and is not widened to this, because a re-read is judgement and a stamp is not.
 - **One worktree set serves the whole workstream, and its lanes take turns by repository** (`RULE.DEVEX.WORKSPACE.316` · MUST · check:pretooluse). Lanes that touch the same repository run one after another, because they share one branch in one checkout. Lanes in different repositories run side by side. An order names the repository it touches, and two orders that name the same one are not started together.
 
 **A page is checked by its computed values, once, in the arc's final re-check row, and a picture is
@@ -507,6 +509,8 @@ its plan, and runs from the first row not landed. Nothing that landed is done ag
 changes nothing under anybody's feet. The run reaches it later and follows the new text.
 
 ## A card is only for what the rules leave open
+
+**An answered card binds every later workstream** (`RULE.DEVEX.WORKSPACE.498` · MUST · short). Before the agent settles a doubt, or amends a register row to match what the code does, it searches the closed workstreams' `questions.jsonl` for the question. An answer found there stands. Code that drifted from an answer goes back to the answer, or comes to the developer as a card that cites it. A card the developer answered once is never asked again, and never quietly undone.
 
 **You decide what the book, the plugin references and the lenses settle — MUST**
 (`RULE.DEVEX.WORKSPACE.193` · MUST · short). While you work any request — shaping, iterating or executing — read what
@@ -736,7 +740,7 @@ on no workstream is held for none.
 swept whole fourteen days after its newest write. It lists the workstream folders the window has worked on,
 the time it last wrote each arc, and the last finding of each note it was told. No person reads it, and it never says which state a workstream is
 in: the folder tree says that. A window writes an arc when a write goes inside the arc's
-`arcs/N<nnn>/` or `notes/N<nnn>/`, or when it runs a `workstream` command that writes the arc's data:
+`arcs/<arc>/` or `notes/<arc>/`, or when it runs a `workstream` command that writes the arc's data:
 `arc edit`, `row add`, `row state`, `row note`, `row edit` or `row discard` on the arc, `fact write`, `arc stamp write`, `question raise` on it,
 `question show`, `answer` or `withdraw` on one of its cards, and `report write` with a report under its
 notes.
@@ -759,7 +763,7 @@ for the window that dispatched it, and the child hears no note about cards or pa
 
 **A hook speaks only of this window's workstreams, before a tool runs as well as at the end of a
 turn** (`RULE.DEVEX.WORKSPACE.236` · MUST · short). Some checks stay across the workspace on purpose, because
-they are not about a window: the listing at the start of a session, a major release's go (it names a
+they are not about a window: the listing at the start of a session, a release's version (it names a
 version), the close of a workstream (it names the folder the command moves), and the checks of one
 written file (they name the file). The check of the docs trees is not among them: a window is told of a
 docs finding only for a repository it has itself written under, by path. A finding in a file that is
@@ -785,6 +789,10 @@ MUST · check:stop). Every fact the block needs is read, and the arc's log line 
 block is given. A line found after that goes into the one block, never into a second. A block in an
 earlier message of the turn counts as given, and a second block is named as extra.
 
+**The block is written by `workstream handover` from the data, and the agent adds only the lines the data cannot say** (`RULE.DEVEX.WORKSPACE.473` · MUST · check:stop). `spn-devex workstream handover <workstream>` reads the rows, the cards, the live orders and the pins, writes the block into the arc's log and prints it. The agent pastes it and adds `continue:` and `do not touch:`. A block typed by hand is checked for its nine labels and rewritten when one is missing, which is the cost this rule removes. The command prints the block as aligned lines in a fence, each value wrapped under its label, and the log keeps the one line.
+
+**The reply that hands over is a shape**, which the agent's table of closing moments states. It opens on `## ✈️ Handing over <arc> (<title>)`, then a `&nbsp;` line, the fenced block, a `&nbsp;` line, and one short paragraph that says where the next window picks up, says thanks, and says this window can be retired.
+
 **A finding on a handover reply is answered without the block.** Fix what the finding names and point
 at the block above it. The check keeps the step rows it read when a whole block was written, and
 while those rows have not moved it asks for no second block. A new block is owed only when the work
@@ -805,7 +813,7 @@ or two plain lines, and none of them is a system report.
 | you decide something the rules settle | the decision and its reason, in one line |
 | you put a card to them | the choice, its recommendation, and what waits on it meanwhile — in full once, at the top of that reply, and in one line only in a reply that ends the work or stops it; the page keeps the same card |
 | you hand them a page | the full path to the file, to open in a browser; you publish nothing unless they ask |
-| you ask to close a workstream | a titled message first, with no table: *What was delivered*, *What was learned* and *Thank you* each their own heading with their own icon, bulleted where there is more than one thing. Then the question |
+| you ask to close a workstream | the close in the shape the agent's table of closing moments gives it, with no table: `# 🚀 <workstream> (<title>) is closed`, with *What we delivered*, *What we learned* and *Thank you*. Then the question |
 | a session ends | what landed, what is next, and thanks, with no handover unless they ask for one |
 
 A reply written as a list of tool output has stopped talking to the developer, and a reader who
@@ -1339,7 +1347,11 @@ the rows already say.
 **A preview costs nothing to throw away.** Code written first makes the decision feel already taken,
 and it turns a question into a fait accompli.
 
-**A major release is agreed while the arc is planned** (`RULE.DEVEX.WORKSPACE.069` · MUST · check:workstream-state). A minor or patch bump is released without asking. A major one is a card answered with the arc's other cards, and the answer is the arc's go, the developer's words in it naming the version (`arc edit <ws>/<arc> --status DECIDED --note "<their words, naming the version>"`), so execution reads the record instead of stopping to ask. `release-go` reads that go as the check of a repository write reads one (§ A go is written down, below), in every open workstream, and the words of the line that moved the arc out of `PROPOSED` must name the version. It refuses a major release no such arc names.
+**The agent names a release's version from the change, and the arc's preview carries the version and the reason** (`RULE.DEVEX.WORKSPACE.069` · MUST · check:workstream-state).
+
+The agent classifies the change by the versioning rules in the deliver chapter, and writes the version and the reason in the arc's log before the go: `workstream arc edit <ws>/<arc> --note "release <repo> <version>: <why>"`. The preview shows the same line, so the developer reads the version where they read the rest of the arc, and can overrule it there. The developer's go on the arc is the only go, and the release is made at that version. A log line outlives the window where a chat reply does not, and the version belongs to no one window. `release-go` reads every open workstream and refuses a release at a version the change does not support.
+
+**Asking during execution is the failure this avoids.** The question would arrive mid-wave, with the change already built and nothing else able to move until the developer replies. Named at planning, the version costs one line in the log, and execution reads the record instead of waiting for a person.
 
 ## A go is written down, or it did not happen
 
@@ -1433,7 +1445,7 @@ and every other `workstream` write refreshes (`RULE.DEVEX.WORKSPACE.250` · MUST
 which the `workstream question` commands write from `questions.jsonl`. The table has two columns: Arc,
 an item cell with the title, the line and one line of Key: value facts (the preview first, then each sample, by
 kind, linked, with no state; a CARRIED or DROPPED reason, or a decided arc's wait, as a fact), and Status, the word as its
-badge. Each row carries the arc's number as its id, `id="N<nnn>"`, then `data-arc="arcs/N<nnn>/state.json"`
+badge. Each row carries the arc's address as its id, `id="<arc>"`, then `data-arc="arcs/<arc>/state.json"`
 and the arc's stamp. **`How`'s places come from the rows' `repo`**: each repository the rows name has
 its `h3`, which the command adds where `How` has none, and a facts line `Arcs:` naming the arcs whose
 rows reach it. The one line under the heading, what changes there and what ships, is yours.
@@ -1442,7 +1454,7 @@ rows reach it. The one line under the heading, what changes there and what ships
 there** (`RULE.DEVEX.WORKSPACE.263` · MUST · check:workstream-state). The developer: *"no, this is approach.html, let's keep it like
 that, such that changing the arc number in the browser quickly opens"*. A preview's masthead links
 `../../approach.html#N013`; a plan links the same; an order `../../../approach.html#N013`; a report, a
-handover and a command's output name the address. Never link `arcs/N<nnn>/state.json`: it is data for the
+handover and a command's output name the address. Never link `arcs/<arc>/state.json`: it is data for the
 commands. Where `What` gives one arc a part of its own, that part's heading carries `id="N<nnn>-what"`.
 `docs cycles write` writes the ids, and `state check` names a row without one. The header's status
 reads `PLANNING` while no arc is past `DECIDED`, `IMPLEMENTING` once an arc runs or has landed, and
@@ -1453,7 +1465,7 @@ inside the `progress` or `open` block.
 **The progress block shows what is built** (`RULE.DEVEX.WORKSPACE.278` · MUST · short). Only build steps are
 recorded, so a chip counts its arc's steps, and an arc with no step yet shows its status word, with no bar
 to fill. The bottom bar shows the arcs still open first, the running ones and then the rest not closed, each group
-in the order the arcs run, and the closed arcs after them, so the open arcs are in view at the bar's
+in the order the arcs run, `ideate` first and `follow-ups` last, and the closed arcs after them, so the open arcs are in view at the bar's
 start without scrolling. A chip whose arc has a preview opens that preview in a new tab, marked with an
 arrow, and a chip whose arc has none keeps the jump to its row. *Overall*'s bar counts steps, and its word is the workstream's own, the one the page's header
 shows, so the two never disagree: `PLANNING` until the first step of any arc starts, then `IMPLEMENTING`,
@@ -1520,14 +1532,14 @@ copy. This is the coordinator's commit: an agent carrying out an order still com
 
 **An arc is named by its number, `N<nnn>`** (`RULE.DEVEX.WORKSPACE.203` · MUST · check:workstream-state): three digits, as a workstream's
 number has. Its subject, its title (the full phrase that names the cycle) and its goal are fields of its
-data. One number names its two folders, `arcs/N<nnn>/` and `notes/N<nnn>/`.
+data. One address names its two folders, `arcs/<arc>/` and `notes/<arc>/`.
 
 **An arc's subject is one to three words, at most 24 characters, in kebab-case — MUST**
 (`RULE.DEVEX.WORKSPACE.265` · MUST · check:workstream-state). A noun phrase a reader recognises, such as `layout-model` or `web-stack`,
 never a sentence. `arc edit --subject` refuses a longer one and `state check` names one. A long subject
 in another workspace is a finding for that workstream's own window, never renamed by guessing.
 
-**Each arc's data folder holds one name file, `arcs/N<nnn>/<subject>.md`, leading with the arc's goal**
+**Each arc's data folder holds one name file, `arcs/<arc>/<subject>.md`, leading with the arc's goal**
 (`RULE.DEVEX.WORKSPACE.264` · MUST · check:workstream-state). `goal` is one or two sentences of the outcome once the arc is done, in a
 reader's words; set it with `arc edit <arc> --goal "…"`, and `state check` names an arc without one. The
 file holds, in order, the title, the goal, the status with its reason, what the arc decides, its repos, and
@@ -1535,16 +1547,7 @@ links to `../../approach.html#N<nnn>`, the preview, the plan and the samples; no
 `report write` and `docs cycles write` write it, and rename it with the subject. Never write it by hand:
 the hook refuses it, and `state check` names a hand edit and a second `.md` in the folder.
 
-**A close is a milestone, and you write it before you ask, or right after the close on a standing grant** (`RULE.DEVEX.WORKSPACE.206` · MUST · check:split-plan). When
-you ask the developer to close a workstream, write the close as a titled message first, never a table. When you close on a standing grant, with
-nothing to ask, write the same message right after the close: `workstream close` names it as the next step, and a reply in that turn without it
-is sent back. Open with a titled line that names the workstream as shipped, led by a rocket or a plane rather than a party
-icon. Under it, *What was delivered*, *What was learned* and *Thank you* each get their own heading
-with their own icon — the first two lead with their icon, *Thank you* trails with 👍 — and each holds
-one bullet per distinct thing, or a single line where there is only one thing to say. Measure every
-number from the arcs and the close report. Separate the heading and every section with a `&nbsp;`
-line, as the welcome does, and never put them in a quote block. Then ask, where there is something to ask. Before the folder moves, the
-page gets its closed masthead and a closing block in the same shape; `workstream close` refuses a page without the closing block, before it stamps or moves anything.
+**A close is a milestone, and you write it before you ask, or right after the close on a standing grant** (`RULE.DEVEX.WORKSPACE.206` · MUST · check:split-plan). When you ask the developer to close a workstream, write the close first in the shape the agent's table of closing moments gives it, never a table: `# 🚀 <workstream> (<title>) is closed`, with *What we delivered*, *What we learned* and *Thank you*. When you close on a standing grant, with nothing to ask, write the same message right after the close: `workstream close` names it as the next step. Thanks and the retire sentence belong only to a workstream close, a window's handover done and a handover. Each section holds one bullet per distinct thing, or a single line where there is only one thing to say, and every number in them is measured from the arcs and the close report. The heading and every section are set apart by a `&nbsp;` line, as the welcome's lines are, so they read as blocks in the editor and never collapse into one run. Then ask, where there is something to ask. What we learned is kept in the closing block of the approach page. Before the folder moves, the page gets its closed masthead and a closing block in the same shape; `workstream close` refuses a page without the closing block, before it stamps or moves anything.
 
 ## Nothing is published unless the developer asks
 
@@ -1635,7 +1638,7 @@ Nothing above is enforced by good intentions. Every transition that can be check
 | each open and backlog workstream whole: its data, one preview per arc, each arc's `What` entry linking its own preview and no other, each arc's row in Plan and its stamp current with its goal, title and repositories, an approach page to stand on, a stored `LANDED` arc with every step landed, every card equal to its record, the report of each landed row with an order | `workstream state check`; the Stop hook refuses a turn while it fails for this window's workstream |
 | a step started before the go or against a wait, a stored status moved without the developer's words, `RUNNING` written, and a step added to an arc that reads `LANDED` | `workstream arc edit`, `row add` and `row state` refuses it; `workstream state check` names a step running on an arc not `DECIDED` or holding a wait |
 | an arc ever decided deleted, or one never decided dropped | `workstream arc delete` and `arc edit`, which name the other |
-| a close while an arc is `PROPOSED` or `DECIDED`, while `go check` finds anything, or while a part of the plan has not landed | `split-plan.ts --gate close` |
+| a close while an arc is `PROPOSED` or `DECIDED`, or before the `follow-ups` arc has landed, while `go check` finds anything, or while a part of the plan has not landed | `split-plan.ts --gate close` |
 | a close while the workstream's worktree set is on disk | `split-plan.ts --gate close` |
 | a running row of an arc the window wrote named with the age of its log line, never called runnable | `stop.ts`, when a turn ends |
 | a row waiting on a card open in `questions.jsonl` never called runnable | `stop.ts`, when a turn ends |

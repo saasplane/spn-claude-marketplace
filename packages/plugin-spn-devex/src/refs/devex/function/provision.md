@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/06-provision.md",
-      "seen": "0f82b44d"
+      "seen": "6b58ceba"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/01-function/06-provision.md",
@@ -37,6 +37,10 @@
 ## What is destructive, and what that obliges
 
 **`up` and `down` each take exactly one of `--plan` or `--apply`, and there is no default.** A command that plans when you forget a flag is a command doing another command's job, and a default would decide the direction of the mistake for you.
+
+**A teardown runs only on an explicit instruction**, never as an inferred step toward something else. In alpha a local reset, a bring up and a bring down are the agent's call, and the named target and the known-good code still hold.
+
+**A cloud mutation is never implicit.** Showing a plan reaches no account and changes nothing; performing one in a cloud takes an explicit approval. In alpha an apply, a cloud reset or teardown, and a push to spn-infra's main wait for the developer's approval, asked each time.
 
 **Estate caution stands everywhere.** Cloud mutation goes through the CLI's own doors. `tofu apply` and `tofu destroy` are never hand-run.
 

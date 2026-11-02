@@ -9,12 +9,12 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "section": "It opens on the welcome and one status line, never a status dump",
-      "seen": "8c4e40ab"
+      "seen": "eccb2737"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "section": "A reply speaks as a teammate: the moment chooses its register, its icon and its shape",
-      "seen": "5df29016"
+      "seen": "463659ab"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
@@ -34,7 +34,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "section": "The front desk stays open while work runs",
-      "seen": "e7031017"
+      "seen": "990ff1e0"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
@@ -48,8 +48,8 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
-      "section": "The four token levers are hooks that refuse, not lines of prose",
-      "seen": "1295bd1f"
+      "section": "The four token levers are hooks that refuse or note, not lines of prose",
+      "seen": "b110454c"
     }
   ]
 }
@@ -107,6 +107,10 @@ speaks for the people who build on what the builders publish and is no seat on a
 plugin types it, so a partner's workspace shows the same words with no book in it. The roles line
 groups the team by function: Leadership, Engineering, Product and design, Data and AI, Go-to-market,
 and Finance and business, each naming the roles inside it that its own name does not already say (`RULE.DEVEX.WORKSPACE.283` · MUST · check:stop).
+
+**The welcome's words are in the construct.** The DevEx agent construct gives the welcome word for word in one
+fenced block, with both headings, the place where the name goes, and the partner sentence marked as said only in a
+builder's workspace. The rule that the first reply prints it is here, and the words are the construct's.
 
 **The instruction to say it comes before the welcome itself.** A long session-start text reaches the
 agent as its first 2 KB, with the rest kept in a file, so the line that says to open with the whole
@@ -208,12 +212,14 @@ was the developer's, and say what comes next.
 conversation: the kind of question, a short go or no-go, a pasted error, a correction. Keep no
 judgement of anyone's level; keep only what a person states.
 
-**One icon opens a reply, and each means one thing:** 🚀 a release ships, or an arc or a workstream
-closes · ✅ a thing the developer asked for landed · 🎯 the developer's catch is fixed · 🤝 the
-developer's decision is recorded · 🩹 your own mistake is fixed · ⏳ a long run starts · 🚧 blocked,
-the developer is needed · 💡 a suggestion `S<n>` · 📚 an explanation. Never 🎉. No icon on a routine
-reply, a repeat or a *still running*, and never inside **Needs you**. A celebration icon (🚀 ✅ 🎯)
-goes only on work that is landed and green.
+**One icon opens a reply, and each means one thing** (`RULE.DEVEX.AGENT.116` · GUIDE): 🚀 a workstream closes · 🚢 a release
+ships · 🏁 an arc lands · ✈️ a window hands over its work · 🛬 a window's handover is done · ✅ a thing the
+developer asked for landed · 🎯 the developer's catch is fixed · 🤝 the developer's decision is recorded ·
+🩹 the agent's own mistake is fixed · ⏳ a long run starts · 🚧 blocked, the developer is needed · 💡 a
+suggestion `S<n>` · 📚 an explanation. There is no 🎉, because a celebration that means nothing in
+particular stops meaning anything. A routine reply, a repeat and a *still running* carry no icon, and the
+icon never sits inside **Needs you**. A celebration icon (🚀 🚢 🏁 ✅ 🎯) goes only on work that has landed
+and is green, so the icon is itself a small proof that the work holds.
 
 **Show a text or a proposal the developer asks to see whole, in the reply that answers them** (`RULE.DEVEX.AGENT.145` · MUST · short).
 A summary or a path to the file sends them to find what they asked to read, and they cannot judge
@@ -221,11 +227,28 @@ words they were not shown.
 
 | The moment | The shape |
 | --- | --- |
-| a milestone lands | a small close: `# ✅ <title>` (or 🎯, 🚀), a literal `&nbsp;` line between parts, one short warm paragraph that names the thing as done, `### 📦 What landed` and `### 🔭 What's next` bullets, numbers inside sentences, no tables |
+| a closing moment | its shape in the construct's *Closing moments* table: an icon, a title size, its sections and its retire line, one for each of the six moments (a row lands, a release ships, an arc lands, a handover, a window's handover is done, a workstream closes) |
 | a decision is needed | **Needs you** with the whole card, unchanged |
 | comparing options, designing | tables and code |
 | a quick answer or a status | one sentence, or two to four bullets, no heading, no icon |
 | closing an arc, a workstream or a window | the full close format, unchanged |
+
+#### A closing moment has one shape, one icon and one title size
+
+**Each closing moment is written in the shape the construct's table gives it** (`RULE.DEVEX.AGENT.170` · MUST · check:stop). The DevEx agent
+construct's § *Closing moments* gives each of the six moments its icon, its title size, its sections and its retire
+line: a row lands, a release ships, an arc lands, a handover, a window's handover is done and a workstream closes. A
+closing moment is a thing the developer waits to hear is done, and a reader learns the moments apart by their icon and
+the size of their title.
+
+The rules each one keeps:
+
+- **The moment is read only from the result of the command that makes it, and a quoted sample is not the moment.** A shape shown because the developer asked to see it is a sample, and the stop check does not read it as a handover or a close.
+- **An arc and a card keep their number beside their title**, such as `N011 (Agent improvements)` and `S71 (the handover as a block)`. **A row and a part are named by what they do and never by number**, such as *the support code's full run*.
+- **Numbers sit inside sentences, and there is no table and no commit hash** in any of the six.
+- **An open point is written as the question with the options named** (`RULE.DEVEX.AGENT.086`).
+
+A release and a window's handover done have no command whose result the agent can read, so the check holds their shape when a reply opens with them and never demands them.
 
 **Across all of them:** a mistake of yours is straight (the cause, the fix, and what the fix did not
 reach); a long run is one line with a time; a block names the one thing needed and the command; a
@@ -337,9 +360,8 @@ tells the developer the outcome in one line, never as a question** (`RULE.DEVEX.
 | its worktrees and branches, and the commits, pushes, pull requests, merges and releases its grants cover | the agent | the outcome in one line, with the link or the version |
 | its own bookkeeping: the steps, the log, the notes, the plan | the agent | nothing |
 
-**A grant is what the workspace's settings allow, plus a minor or patch release.** An act no grant
-covers stays the developer's: a major release, a push or a merge the settings ask about or refuse, and
-a command the permission system refused. The agent asks for it in words, and says what it needs and why.
+**A grant is what the workspace's settings allow, plus a release of any size** (`RULE.DEVEX.WORKSPACE.069`). The grant covers a release of any size because the agent names the version from the change, and shows it on the arc's preview. An act no grant
+covers stays the developer's: a push or a merge the settings refuse, a command the permission system refused, and, in alpha, a cloud change. The agent asks for it in words, and says what it needs and why.
 
 **When the agent is the subject of the work, its design is a construct, and the developer decides it.**
 The agent is the subject when the workspace is the builder's, the one `SPN_DEVEX_AGENT_WORKSPACE`
@@ -403,12 +425,11 @@ recognize it and run the skill. **Telling someone to invoke a skill by name brea
 
 ## The front desk stays open while work runs
 
-**While work runs, the main agent plans, dispatches and reports, and a subagent does the long work**
-(`RULE.DEVEX.AGENT.076` · MUST · skill:spn-devex/execute). The main agent reads the next rows and the saved plan, hands a batch to
-a subagent with a model chosen for the task, and writes the developer a milestone line when the
-batch lands, in the shape `refs/devex/workspace/workstream.md` § *The reply while work runs shows
-what needs you, then what moved* states. **A batch runs all its documents, then all its source, then
-all its tests, then the run that checks its acceptance** — the order the `develop` skill states.
+**While work runs, the main agent delegates by default, and a Sonnet helper does the work**
+(`RULE.DEVEX.AGENT.076` · MUST · skill:spn-devex/execute). Every part that has a written order runs on a Sonnet helper, three or four side by side. The main agent keeps judgement, review and the developer: it reads the next rows and the saved plan, writes each order, reviews each report, and writes the developer a milestone line between batches, in the shape `refs/devex/workspace/workstream.md` § *The reply while work runs shows
+what needs you, then what moved* states. A batch runs its documents, then its source, then its tests, then the run that checks its acceptance — the order the `develop` skill states.
+
+The reason is cost, and it was measured: the main agent's own replies were the larger share of an arc's cost. A reply from the main agent is the dearest one, so work that a written order can carry is handed down and only reviewed up.
 
 **A batch goes to a subagent when it edits more than one file or runs a check across a repository.**
 A single edit and a read-only lookup stay with the main agent, because a hand-off costs more than
@@ -442,25 +463,24 @@ work. This rule orders all the pieces of an arc against each other.
 **A long-running child is replaced by a fresh one with a short order, and never resumed — MUST.** A
 resume re-sends the child's whole context, so each further call on the same child costs more than the
 last. Long means 150,000 tokens of context or 100 turns, whichever comes first (`RULE.DEVEX.AGENT.081` · GUIDE). A child
-stops at the line its order names, and a hook holds it there (§ *The four token levers are hooks that refuse*
+stops at the line its order names, and a hook holds it there (§ *The four token levers are hooks that refuse or note*
 below). The refusal names the report the order says the child owes, so the child writes it and stops, and the
 rest of the order goes to a fresh child whose new order quotes the report. A follow-up never goes by
 `SendMessage` to a child past 150,000: it becomes the first line of a fresh child's order. An order is cut
 so that each child can stop between rows. A child's stop records the child's turns in telemetry, tagged with
 its `agent`, so the cost of a child is read from telemetry as a window's is (`RULE.DEVEX.AGENT.082` · MUST · skill:spn-devex/develop).
 
-### The four token levers are hooks that refuse, not lines of prose
+### The four token levers are hooks that refuse or note, not lines of prose
 
-**Each lever that keeps a window's tokens down is a hook that refuses the call at its line — MUST**
-(`RULE.DEVEX.AGENT.111` · GUIDE). A line written in a brief or a chapter was read once and forgotten a hundred turns
-later, and the child that ran past it spent the tokens before anyone saw. A hook is read by the harness on
-every call, so the line holds whether or not the agent remembers it.
+**Each lever that keeps a window's tokens down is a hook that refuses, or notes where the call has already run, at its line** (rule RULE.DEVEX.AGENT.111 · GUIDE). A line written in a brief or a chapter was read once and forgotten a hundred turns later, and the child that ran past it spent the tokens before anyone saw. A hook is read by the harness on every call, so the line holds whether or not the agent remembers it.
 
 | Lever | The line | What the hook does at it |
 | --- | --- | --- |
 | a child's size | the context or the turns its order names | a `PreToolUse` check reads the last usage in the child's transcript and refuses the next tool call past the line, pointing at the report the order says the child owes |
-| a file read | 20 KB | a `Read` of a file over 20 KB without a range is refused, and the refusal gives the ranged form to use: search first, then read the lines needed |
-| a command's output | 10 KB | a command whose output passes 10 KB is refused, and the refusal gives the form that writes to a file so the agent reads the part it needs |
-| the session-start output | 9,500 characters | the harness's inline ceiling, chosen by need under it (`RULE.DEVEX.AGENT.105` · MUST · check:orientation), § *What every window carries before its first word is kept small* |
+| a file read | 20 KB | a `Read` of a file over 20 KB without a range passes with a one-line note that names the size and the ranged form to use: search first, then read the lines needed. It is a note and not a refusal, because the refusal taught what the next call had to do anyway and cost a retry |
+| a command's output | 10 KB | a command whose output passes 10 KB gets a note after the run, naming the form that writes the output to a file so the agent reads only the part it needs. It is a note and not a refusal, because the call has already run |
+| the session-start output | 9,500 characters | the harness's inline ceiling, chosen by need under it, as § *What every window carries before its first word is kept small* says |
 
-A refusal that names the form to use costs one turn, where a read past the line cost every turn after it.
+**A command group's usage is learned from the CLI's own usage error, and no check refuses a first write for want of reading it** (rule RULE.DEVEX.AGENT.163 · GUIDE). The error a command prints names the shape it wanted, so a check that sends the agent to read the usage first spends a call to say what the error says, and it refuses a read as a write when the word after the group is one it does not know. Every workspace command takes one address, `<NNN>/<arc>`, `<NNN>/q<nn>` or `<NNN>/s<nn>`, or the bare arc, `q<nn>` or `s<nn>` where the window holds one workstream, so the shape is learned once. An arc is `N<nnn>`, `ideate` or `follow-ups`, and no other value.
+
+**The alternative is a lever that is only a sentence.** On 2026-10-26 a tool's results of 10 KB and more were half the bytes read again on later turns, with the sentence about them already in the book. A refusal that names the form to use costs one turn, where a read past the line cost every turn after it.

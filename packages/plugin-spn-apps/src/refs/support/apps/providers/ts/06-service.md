@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/10-providers/ts/06-service.md",
-      "seen": "7c65f048"
+      "seen": "faa108f4"
     }
   ]
 }
@@ -61,7 +61,7 @@
 
 ### The three managers
 
-`support-server-service-ts` has three manager classes, each in its own file under `src/app/module/`. `SPServiceAppModuleManager<TModule>` is the base boot starts and stops (`moduleConfig`, `initModule`, `shutdownModule`). `SPServiceAppRuntimeModuleManager<TModule>` is for a module mounted in this service, and its abstract methods are those above bar `moduleConfig` and `shutdownModule`. `SPServiceAppRemoteModuleManager<TModule>` is for a module that lives in another service: it writes `getRemoteServices` alone, and its `initModule` and `shutdownModule` are written once in the class. It states no code: the module's code is the one its line in the start file gives, and each proxy sends that code. Boot asks the runtime questions only of a runtime manager, and tells the kinds apart by one type guard.
+`support-server-service-ts` has three manager classes, each in its own file under `src/app/module/`. `SPServiceAppModuleManager<TModule>` is the base boot starts and stops (`moduleConfig`, `initModule`, `shutdownModule`). `SPServiceAppRuntimeModuleManager<TModule>` is for a module mounted in this service, and its abstract methods are those above bar `moduleConfig` and `shutdownModule`. `SPServiceAppRemoteModuleManager<TModule>` is for a module that lives in another service: it writes `getRemoteServices` alone, and its `initModule` and `shutdownModule` are written once in the class. It declares `moduleConfig` as the runtime manager does, and each proxy sends that code, so the two services name one module by one code. Boot asks the runtime questions only of a runtime manager, and tells the kinds apart by one type guard.
 
 **The runtime manager lists the module's contract services** in `getAPIRemoteServices`, whether or not the service opens a remote listener. Each entry is `{ name, methods, impl }` — the service's name, its interface as data (`I<MOD><Entity>ServiceMethods`, produced) and what implements it — written `satisfies SPAPIRemoteService<I<MOD><Entity>Service>`, so a registration does not compile when the implementation does not fit the interface or the methods object misses or adds a method.
 
@@ -92,9 +92,27 @@ A server app is given its sign-in support as one provider, `serviceApp.providers
 | `ISPAuthProvider` | `prepareAuthSession`, `authorize`, `prepareAuthPassport`, `prepareAuthUser`, optional `getCaptchaConfig` | every auth provider |
 | `ISPAuthSessionIssuer` | `saveAuthSession`, `clearAuthSession` | only a service that signs people in |
 
-**Which class a service builds — MUST:** a service that mounts the identity module, or signs people in, builds `SPAuthProviderIAMIssuer` (it verifies a token and reads the session cache itself, signs tokens and a passport's proof, and checks one); a service that holds the identity module remotely builds `SPAuthProviderIAMVerifier` (its `prepareAuthSession` asks the identity module, one remote call for each request that carries a token, and a request with no token asks nobody); a service with no identity module builds `SPAuthProviderDefault` (no session for any token); a service with an identity system of its own writes its own class. `SPAuthProviderIAM` is the abstract base both share. The Verifier has no method that saves or ends a session and its config has no place for a secret, so a service cannot be set up to sign by mistake; a service that mounts the identity module with any other provider refuses to start; a newly scaffolded service builds `SPAuthProviderDefault`, and the step that adds the identity module writes the Issuer or the Verifier in its place.
+**Which class a service builds — MUST.**
 
-**Handlers.** `support-server-service-ts` cannot import the identity module, so each class is given a handler the app writes: `ISPAuthProviderIAMHandler` (`verifyAuthPassport`, which throws when refused; `getCaptchaConfig`), extended by `ISPAuthProviderIAMIssuerHandler` (`resolveAuthUserPrincipal`, `resolveAuthUserIdentity`) and `ISPAuthProviderIAMVerifierHandler` (`verifyAuthToken`). The Issuer's config is `{ jwtSecret, jwtSecretFallback, cachePrefix, cacheTTL, handler }`, the Verifier's `{ handler }`. The identity module's contract offers `verifyAuthToken` (it answers a state, `AuthTokenVerification`, whose `authSession` is the live session behind the token, or `null` when the token or the session is no longer good; the Verifier's handler reads that member), `verifyAuthPassport` (throws `COMMON_UNAUTHENTICATED` when the signature does not hold or the caller is no longer allowed; never answers nothing), `getCaptchaConfig` and `verifyCaptchaInput` on `IIAMSessionService`, and `getSystemAuthUser` on `IIAMPrincipalService`.
+| The service | Builds |
+| --- | --- |
+| mounts the identity module, or signs people in | `SPAuthProviderIAMIssuer` |
+| holds the identity module remotely | `SPAuthProviderIAMVerifier` |
+| has no identity module | `SPAuthProviderDefault` |
+| has an identity system of its own | its own class |
+
+The Issuer verifies a token and reads the session cache itself. It signs tokens and a passport's proof, and it checks one. The Verifier's `prepareAuthSession` asks the identity module, one remote call for each request that carries a token. A request with no token asks nobody. `SPAuthProviderIAM` is the abstract base both share.
+
+The Verifier cannot save or end a session, and its config has no place for a secret, so no service signs by mistake. A service that mounts the identity module with any other provider refuses to start. A newly scaffolded service builds `SPAuthProviderDefault`, and the step that adds the identity module writes the Issuer or the Verifier in its place.
+
+**Handlers.** `support-server-service-ts` cannot import the identity module, so each class is given a handler the app writes. `ISPAuthProviderIAMHandler` holds `verifyAuthPassport`, which throws when refused, and `getCaptchaConfig`. `ISPAuthProviderIAMIssuerHandler` extends it with `resolveAuthUserPrincipal` and `resolveAuthUserIdentity`. `ISPAuthProviderIAMVerifierHandler` extends it with `verifyAuthToken`. The Issuer's config is `{ jwtSecret, jwtSecretFallback, cachePrefix, cacheTTL, handler }`. The Verifier's config is `{ handler }`.
+
+The identity module's contract offers these methods:
+
+- `verifyAuthToken` answers `AuthTokenVerification`. Its `authSession` is the live session behind the token, or `null` when the token or the session is no longer good. The Verifier's handler reads that member.
+- `verifyAuthPassport` throws `COMMON_UNAUTHENTICATED` when the signature fails or the caller is no longer allowed. It never answers nothing.
+- `getCaptchaConfig` and `verifyCaptchaInput` are on `IIAMSessionService`.
+- `getSystemAuthUser` is on `IIAMPrincipalService`.
 
 **A signed passport** says the identity module confirmed this caller and nobody has changed it since. The proof is `SPIAMAuthPassportProof` (`issuedAt`, `evidenceId`, `sessionId`, `signature`); the passport types are `SPIAMAuthPassport` (base), `SPIAMAuthPassportPrincipal` (a caller acting in an organization: adds `principalId`, `orgId`, `orgCategoryCode`) and `SPIAMAuthPassportIdentity` (the person alone), and `SPIAMAuthUserUnsigned` is a caller before its proof is signed. Nobody signed the system caller in, so it has no session to save: the Issuer signs it with `signAuthUser(authUser: SPIAMAuthUserUnsigned): SPIAMAuthUser`, which caches nothing and which only the identity module calls.
 
@@ -185,9 +203,9 @@ A server app is given its sign-in support as one provider, `serviceApp.providers
 
 **Authorize at the service method, never at the controller**, so a queue or internal caller passes through the same gate.
 
-**Keep the vocabulary in one frozen per-module table** built from the module's permission enum. A gate has two terms: the permission term, a list of ways in of which one must hold, and the offer term, codes of which one must be enabled for the caller's organization type. Both must hold, and the offer sits on the gate rather than inside one way in.
+**Keep the vocabulary in one frozen per-module table** built from the module's permission enum. A gate has two terms: the permission term, a list of ways in of which one must hold, and the offer term, codes of which one must be enabled for the caller's organization. Both must hold, and the offer sits on the gate rather than inside one way in.
 
-**A gate names a scope only to pin the platform master**, never to decide what an organization type may reach. The values of `appScope` are four, and a gate on `ENTERPRISE` would admit every enterprise category's staff alike, so an organization's staff are narrowed by the permission codes of the app. A gate never names an application id, because an id is minted per install and would mean something different in every environment.
+**A gate names a scope only to pin the platform master**, never to decide what an org category may reach. The values of `appScope` are four, and a gate on `ENTERPRISE` would admit every enterprise category's staff alike, so an organization's staff are narrowed by the permission codes of the app. A gate never names an application id, because an id is minted per install and would mean something different in every environment.
 
 **Tiers are cumulative, and the cumulativeness is encoded at the gate.** A view gate lists every code in the family, a manage gate lists manage and admin, an admin gate lists admin alone. Forgetting the higher tiers in a view gate silently locks out administrators.
 

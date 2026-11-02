@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/01-workspace.md",
-      "seen": "24d440ad"
+      "seen": "5497aced"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/02-workstream.md",
-      "seen": "2a2107ee"
+      "seen": "668661a4"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
@@ -31,7 +31,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md",
       "section": "Two dot-homes",
-      "seen": "00970647"
+      "seen": "459e6ccd"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md",
@@ -61,7 +61,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md",
       "section": "DevEx Workspace — One Window, Laws by Declaration",
-      "seen": "cf8fd0bb"
+      "seen": "9cb67276"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
@@ -238,14 +238,14 @@ The workspace folder carries two dot-homes: `.claude/` (settings — the marketp
         suggestions.jsonl                 each suggestion, from raised to decided, parked or dropped
         questions.jsonl                   each question card, open, answered or withdrawn
         arcs/
-          N<nnn>/
+          <arc>/                          N<nnn>, or the fixed ideate and follow-ups
             state.json                    the arc's header and every row
             log.jsonl                     one line per event
             facts.jsonl                   each fact read, pinned to its commit
             sheet.json                    the arc's change sheet: one entry for each file operation, written by the `workstream sheet` commands
             <subject>.md                  the arc's name: its goal, its status and its links, written by the commands
         notes/
-          N<nnn>/                         one arc's work order: at most these six entries, each made when the arc needs it
+          <arc>/                          the same three forms; one arc's work order: at most these six entries, each made when the arc needs it
             preview.html                  the arc's one preview, where something must be seen or worded to decide
             samples/                      real files of the kind the work produces, each in its own format
             plan.md                       what a row needs beside it: the traps, a set, a move table
@@ -264,7 +264,7 @@ The workspace folder carries two dot-homes: `.claude/` (settings — the marketp
 
 **`workstreams/` and `.debug/` are the only two containers, and `state.json` sits beside them.** `workstreams/` holds one folder per scope of work, `.debug/` holds what the machinery keeps and costs: its notes about each window and its logs, and `state.json` holds what the commands record that the tree cannot show. A leading dot hides `.debug/` from every reader of the workstreams, by a rule the corpus already carries. **`.debug/` holds three containers, and each has one lifetime rule — MUST.** `sessions/<session-id>/` is one folder for each Claude Code window, holding its notes (`name.json`, `window.json` for its bound workstreams, `stop.json` for the Stop baseline and `stop.<agent>.json` for each child's own, so a child and its window never write one file, `confirmed.json`, `mirror` for the mirrors already named to this window, one per line, `tags.json`, `usage-offsets.json` and `pending/`); it is swept whole, 14 days after the folder's newest write, at session start and by `debug window sweep`, and no store prunes on its own. `workspace/` is kept and holds what spans windows, `filter.json`. `telemetry/` holds `hooks.jsonl` and `usage.jsonl`; a log past 20 MB is renamed `<name>.1.jsonl`, replacing the previous one, and starts anew, a reader reads both, and `debug cost show` says the earliest time it covers. **The plugin is the only writer of `.debug/`.** The switch that starts the recording is not there: it is the `debug` node of `state.json`. Read it with `spn-devex debug cost show`, `debug hooks show`, `debug window show`, `debug window sweep`, `debug switch show|on|off` and `debug store show`. Beside them sits one file, `migrations.jsonl`: the ledger of the plugin migrations applied here, appended to only by `spn-devex plugin migration write` (`refs/devex/agent/plugins.md` § A release carries its migration, and a window applies what is pending first).
 
-**A telemetry row holds ids, times, counts and the names of things, never what was typed, and a field off its pattern is written as null** (`RULE.DEVEX.WORKSPACE.185` · MUST · skill:spn-devex/develop). Every line of `hooks.jsonl` and `usage.jsonl` is one `SPDevExWorkspaceTelemetryRow`, in the variant its `mtype` names: `TURN` (a model turn, in `usage.jsonl`, with its `model` and `tokens`), `CHECK` (a hook check's run, with `check`, `verdict` and `out`), `COMMAND` (`call` and `exit`), `TEST` (a test run, in place of its command's row, with `call`, `test` and `status`) or `PANEL` (`lens` and `verdict`). Every row holds the thirteen fields of the base: `v` (the one value `1`), `mtype`, `id`, `at`, `ms`, `session`, `agent`, then the tags `workstream`, `arc`, `part`, `skill`, `work` and `retryOf`; the variant adds its `event`. A command is written as its program, group and action and its exit, never its arguments. A reader skips a row whose `v` is not `1`, and the writer moves a log whose first line has no `v` to `<name>.1.jsonl` before it appends. A send-back is a `CHECK` row whose verdict is `DENY`, and no log of its own holds it.
+**A telemetry row holds ids, times, counts and the names of things, never what was typed, and a field off its pattern is written as null** (`RULE.DEVEX.WORKSPACE.185` · MUST · skill:spn-devex/develop). Every line of `hooks.jsonl` and `usage.jsonl` is one `SPDevExWorkspaceTelemetryRow`, in the variant its `mtype` names: `TURN` (a model turn, in `usage.jsonl`, with its `model` and `tokens`), `CHECK` (a hook check's run, with `check`, `verdict`, `out` and `pluginVersion`), `COMMAND` (`call` and `exit`), `TEST` (a test run, in place of its command's row, with `call`, `test` and `status`) or `PANEL` (`lens` and `verdict`). Every row holds the fourteen fields of the base: `v` (the one value `1`), `mtype`, `id`, `at`, `ms`, `session`, `agent`, then the tags `workstream`, `arc`, `part`, `skill`, `stage`, `work` and `retryOf`; the variant adds its `event`. `arc` holds `N<nnn>`, `ideate` or `follow-ups` and nothing else, and `stage` is a value of `SPDevExStageType` or `null`. A command is written as its program, group and action and its exit, never its arguments. A reader skips a row whose `v` is not `1`, and the writer moves a log whose first line has no `v` to `<name>.1.jsonl` before it appends. A send-back is a `CHECK` row whose verdict is `DENY`, and no log of its own holds it.
 
 **Workspace plumbing is the agent's own to resolve, and never a card** (`RULE.DEVEX.WORKSPACE.481` · MUST · skill:spn-devex/ideate). A stale checkout, tool output left uncommitted and a stash the agent names are the agent's to fix, and it says in one line what it did. A helper never stashes: the window that coordinates does.
 
@@ -314,14 +314,14 @@ A node joins the file only when the folder tree cannot show its fact — MUST; a
 files and each arc's folder under `arcs/` are written only by the `spn-devex workstream` commands, and the
 PreToolUse hook refuses a direct edit to them. The approach page, the preview, the samples, the plan and the
 orders are yours to write by hand, and no command writes them. Two marked regions of the page are the
-exception, each with one owner: the progress block and the `Open` block, which the commands write. An arc is
-named by its number, `N<nnn>`, and its short subject, its title and its goal are fields of its data; one
+exception, each with one owner: the progress block and the `Open` block, which the commands write. A build arc is
+named by its number, `N<nnn>`, and two arcs by a fixed word, `ideate` first and `follow-ups` last; its short subject, its title and its goal are fields of its data; one
 number names its two folders, and `notes/` and `arcs/` hold nothing but arc folders. Its address is its row
-on the approach page, `approach.html#N<nnn>`, and every link to an arc points there. The commands, the formats and the life of an arc are in [`workstream.md`](workstream.md). Anything a status file would hold is expressed by the tree, so a second copy only gives it somewhere to fall out of date. **The window is never part of the state of the work** — Claude Code owns window identity, and a subject outlives any window. Which workstream a window works on is context the agent holds from the conversation. The plugin keeps a note of its own for hooks, `window.json` in that window's folder under `.debug/sessions/`, and the note never says which state a workstream is in: the folder tree says that.
+on the approach page, `approach.html#<arc>`, where the address is `N<nnn>`, `ideate` or `follow-ups` and no other value, and every link to an arc points there. The commands, the formats and the life of an arc are in [`workstream.md`](workstream.md). Anything a status file would hold is expressed by the tree, so a second copy only gives it somewhere to fall out of date. **The window is never part of the state of the work** — Claude Code owns window identity, and a subject outlives any window. Which workstream a window works on is context the agent holds from the conversation. The plugin keeps a note of its own for hooks, `window.json` in that window's folder under `.debug/sessions/`, and the note never says which state a workstream is in: the folder tree says that.
 
 **A change to how something looks is made in the arc's preview first, as often as the developer likes, and built once in one order after their go** (`RULE.DEVEX.WORKSPACE.274` · MUST · check:workstream-state). A written order runs on Sonnet, shaping, cards and previews stay on the largest model, and every launch names its model (`RULE.DEVEX.AGENT.104` · MUST · check:agent-model). An order quotes the facts it needs, each with its commit, and points to the rules it follows (`RULE.DEVEX.WORKSPACE.276` · MUST · skill:spn-devex/execute). The log gets one note per milestone (`RULE.DEVEX.WORKSPACE.275` · MUST · check:confirmed).
 
-**Every arc stands on its workstream's approach page** (`RULE.DEVEX.WORKSPACE.263` · MUST · check:workstream-state). Its row in *Plan* is its address, `approach.html#N<nnn>`, so a subject with an arc and no page is a gap, and `workstream state check` names it. A page that argues nothing yet still carries the masthead and the Cycles row.
+**Every arc stands on its workstream's approach page** (`RULE.DEVEX.WORKSPACE.263` · MUST · check:workstream-state). Its row in *Plan* is its address, `approach.html#<arc>`, so a subject with an arc and no page is a gap, and `workstream state check` names it. A page that argues nothing yet still carries the masthead and the Cycles row.
 
 - **Scope belongs to the developer, and you only ever propose.** A workstream holds as much as they want it to hold. Widening is the default; splitting is the exception you raise, and never a folder you open on your own initiative.
 - **One release train at a time.** That is mechanical and it holds. Any number of arcs in one workstream is their judgement, and you do not overrule it.
@@ -536,7 +536,7 @@ it carries the developer's words**: `arc edit <ws>/<arc> --status DECIDED --note
 logged beside the move. A stored `PROPOSED` wins over the steps: a changed goal stops what was building until
 the next go. The review-fixes arc reads `RUNNING` until the word to close stores its `LANDED`.
 
-**When the shape is not settled, the first arc is an ideate arc, and it holds the overall proposal** (`RULE.DEVEX.WORKSPACE.494` · MUST · check:arc-status). The shape is not settled when no existing construct fits the kind of problem, or the change shows two signs of complexity or more. The ideate arc holds the read, the fresh views, one preview of the whole shape and its cards, and it proposes the build arcs, each opened from its decided preview and given its own go. It has no steps, because reading and drafting are planning jobs, so its status is worked out another way: it reads `LANDED` once its preview is decided and every build arc it proposed is opened. When the shape is settled, the work opens a build arc directly.
+**Every workstream opens with its ideate arc and its follow-up arc, and the numbered build arcs sit between them** (`RULE.DEVEX.WORKSPACE.494` · MUST · check:arc-status). The ideate arc is first and holds the read, the fresh views, one preview of the whole shape and its cards, and it proposes the build arcs, each opened from its decided preview and given its own go. The follow-up arc is last. The shape is settled when an existing construct fits the kind of problem and the change shows fewer than two signs of complexity, and a settled shape proposes the one build arc. The ideate arc has no steps, because reading and drafting are planning jobs, so its status is worked out another way: it reads `LANDED` once its preview is decided and every build arc it proposed is opened. An arc's address is closed to three values, `N<nnn>`, `ideate` and `follow-ups`, and the same three values are what a telemetry row's `arc` holds.
 
 **The status decides none of these three.** It does not carry **ordering**, which is the plan's
 business. It does not describe a **workstream**, whose state is the folder it sits in. It does not

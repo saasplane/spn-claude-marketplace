@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/03-platform/01-core/03-surfaces.md",
-      "seen": "d0e4a304"
+      "seen": "cc280f24"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/03-platform/01-core/03-surfaces/",
-      "seen": "9d9741b9"
+      "seen": "7b823ad7"
     }
   ]
 }
@@ -36,14 +36,14 @@ export enum AppScopeType {
 
 An app is a sign-in surface and nothing else. It owns its permission set, and an org category names the app that serves it, so the link runs one way and an app lists no categories. The categories an app serves are found by reading the categories that name it, and they all sit on the app scope's org type. An account's workspace, a merchant's portal and a shopper's storefront are three apps, two of them on `ENTERPRISE` and one on `CONSUMER`. A host such as `api`, `auth` or `www` is a host and not an app, so it has no row.
 
-`PLATFORM`, `ENTERPRISE` and `CONSUMER` each match an org type, and `IDENTITY` is the one that does not. The identity application serves no category of its own — generic self-service, never a governed business surface — and it is where authentication always happens. A business application hands a visitor off carrying its site, and gets back a session bound to what that site resolved. **A permission is per app; an enablement is per organization type** — the app catalog decides what a person may do inside a surface they can already reach, and enablement (in the tenancy model) decides whether their organization is offered that surface at all.
+`PLATFORM`, `ENTERPRISE` and `CONSUMER` each match an org type, and `IDENTITY` is the one that does not. The identity application serves no category of its own — generic self-service, never a governed business surface — and it is where authentication always happens. A business application hands a visitor off carrying its site, and gets back a session bound to what that site resolved. **A permission is per app. An enablement is per organization**: its category's cell, narrowed by every org above it. The app catalog decides what a person may do inside a surface they can already reach, and enablement (in the tenancy model) decides whether their organization is offered that surface at all.
 
-## App sites: routing as data
+## Org app sites: routing as data
 
-A host is only ever a string a caller sends. The **app site** is the one row of data that turns it into something meaningful:
+A host is only ever a string a caller sends. The **org app site** is the one row of data that turns it into something meaningful:
 
 ```ts
-export interface AppSite {
+export interface OrgAppSite {
   id: CDTString;            // the site itself — what a caller names, and what a minted session records
   host: CDTString;          // the address a browser or a client asks for; unique across the platform
   appId: CDTString;         // the application this host opens, which fixes the app scope it serves
@@ -56,11 +56,11 @@ Never read the anchor as the bound organization — MUST NOT. A site anchored to
 
 You resolve a request in two reads and no code: the host finds the site's application, its anchor and its branding; the site then carries that context into sign-in, where the server — never the client — resolves it to the organization, application and scope a session will bind to. A caller sends a host and nothing else about itself, which is what makes the site behave like a registered client identifier: nothing a caller asserts can put it on an organization its site does not name.
 
-**A new customer touchpoint is a row somebody adds, never a release somebody ships.** If the developer wants to onboard an organization onto its own branded domain, add that organization's app site, a row naming the host, the application, and the owning organization — no code changes, and no deploy. The host serves because the running platform writes its route — which environment and application it opens — through the edge seam, and never a DNS record (`RULE.SUPPORT.INFRA.105` · MUST · skill:spn-infra/run); deactivating the site deletes every host's route.
+**A new customer touchpoint is a row somebody adds, never a release somebody ships.** If the developer wants to onboard an organization onto its own branded domain, add that organization's org app site, a row naming the host, the application, and the owning organization — no code changes, and no deploy. The host serves because the running platform writes its route — which environment and application it opens — through the edge seam, and never a DNS record (`RULE.SUPPORT.INFRA.105` · MUST · skill:spn-infra/run); deactivating the site deletes every host's route.
 
 ## Custom domains
 
-An organization can bind its own domain to a site instead of using the platform's shared one. The domain is globally unique and first come, first served, and the binding moves through the same state machine carried in the Identity ref (`AppSiteDomainStatusType` — `PENDING` → `ISSUING` → `ACTIVE`, or `REMOVING` / `FAILED`), behind the edge seam, which issues, binds and routes. An `ACTIVE` domain serves through its route, the customer's own DNS points it at the platform, and teardown runs unroute, unbind, revoke, delete.
+An organization can bind its own domain to a site instead of using the platform's shared one. The domain is globally unique and first come, first served, and the binding moves through the same state machine carried in the Identity ref (`OrgAppSiteDomainStatusType` — `PENDING` → `ISSUING` → `ACTIVE`, or `REMOVING` / `FAILED`), behind the edge seam, which issues, binds and routes. An `ACTIVE` domain serves through its route, the customer's own DNS points it at the platform, and teardown runs unroute, unbind, revoke, delete.
 
 ## The coordinates an instance runs under
 
@@ -94,16 +94,16 @@ When you meet a new need, enter it at the cheapest rung, and descend only with j
 1. Use an existing platform capability as it ships.
 2. Extend it via configuration — auth policies, custom fields, tags, templates, providers.
 3. Generalize it into the platform's standard library, if the need recurs.
-4. Build it as a product module, only when the capability is genuinely domain-specific.
+4. Build it as an app-owned module, only when the capability is genuinely domain-specific.
 5. Write customer-specific code, only as a named, governed exception.
 
 If you catch yourself skipping a rung, price it honestly before you write the code — that is usually a need nobody priced honestly.
 
-### System providers: vendor access as configuration
+### Providers: vendor access as configuration
 
-Every core external integration — email, SMS, WhatsApp, storage, payments, model providers — is a configured provider record owned by an organization, not code. The platform organization carries one `DEFAULT` provider per category, seeded at setup (email, SMS and storage are mandatory at boot — platform setup fails fast if their type or keys are missing). Any account may register its own provider for a category (bring-your-own-key), and its traffic uses that instead of the platform default. Resolution is one rule: the acting organization's provider first, then the platform default. Credentials are write-only — normal reads return masked records, and only the server-side delivery path can read unmasked, through internal-only methods.
+Every core external integration is a configured provider record owned by an organization, not code. That covers email, SMS, WhatsApp, storage, payments and model providers. The first run gives the platform one `DEFAULT` provider of each category. Email, SMS and storage are required, so platform setup fails fast if their type or keys are missing. Any org may register its own provider for a category (bring-your-own-key), and its traffic uses that one instead of the platform default. The caller names the org to start from, and the resolver walks up from it to the nearest org with a provider of that category, then to the platform's. Credentials are write-only. Normal reads return masked records, and only the server-side delivery path can read them unmasked, through internal-only methods.
 
-Never call a vendor SDK directly from a product module you write — MUST NOT. Switching a vendor is a configuration change on the provider record, never a redeploy.
+Never call a vendor SDK directly from an app-owned module you write — MUST NOT. Switching a vendor is a configuration change on the provider record, never a redeploy.
 
 ## A public door pays for arriving a different way
 
@@ -132,12 +132,12 @@ An unreachable vendor refuses the request — the harsher of the two readings, a
 
 | If you are about to build | Stop — the platform already has it |
 | --- | --- |
-| a `?tenant=` query parameter or a frontend-parsed subdomain | an app-site row naming the host, the app, and the anchor organization |
+| a `?tenant=` query parameter or a frontend-parsed subdomain | an org app site naming the host, the app, and the anchor organization |
 | a hand-rolled rate limiter on a signup or OTP route | the public-door ladder — a rung the route declares, counted by the framework |
-| a direct call to an email/SMS/storage vendor SDK | the system-provider registry — a configured record the acting organization or the platform default resolves |
+| a direct call to an email/SMS/storage vendor SDK | the org provider registry — a configured record the acting organization or the platform default resolves |
 | a special-cased "dedicated instance" deployment | an ordinary environment row with its own setup label and a `PROD` workload |
 | a team-scoped "namespace" for access control | namespaces are blast-radius boundaries, never organizational ones — use roles and permissions for access |
 
 ## Left out
 
-The full DNS grammar for touchpoints (`{env}-{tenant}.{spd}`, pretty names as site entries, custom domains outside the zone) is left out — it is infra-plane realization detail that an integrator reads off the app-site row rather than composes by hand. The nine platform modules' individual dependency graph is left out beyond naming them; a module's own contract is the place to read what it exposes.
+The full DNS grammar for touchpoints (`{env}-{tenant}.{spd}`, pretty names as site entries, custom domains outside the zone) is left out — it is infra-plane realization detail that an integrator reads off the org app site rather than composes by hand. The nine platform modules' individual dependency graph is left out beyond naming them; a module's own contract is the place to read what it exposes.
