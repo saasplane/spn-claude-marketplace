@@ -49,7 +49,7 @@ import { randomBytes } from "node:crypto";
 import { appendLog, readSwitch, sessionDir, telemetryFolder } from "./debug-store.ts";
 import { isWorkspaceDevex, workstreamPrefixSource } from "./docs-tree.ts";
 import {
-  ARC_PATTERN, CHECK_PATTERN, PART_PATTERN, WORKSTREAM_PATTERN, SPDevExAgentHookVerdictType, SPDevExAgentSkillType,
+  ARC_PATTERN, CHECK_PATTERN, NODE_PATTERN, PART_PATTERN, SPDocBehaviourStatusType, SPTestTierType, WORKSTREAM_PATTERN, SPDevExAgentHookVerdictType, SPDevExAgentSkillType,
   SPDevExAgentLensType, SPDevExAgentPanelVerdictType, SPDevExWorkspaceTelemetryEventType, SPDevExWorkspaceTelemetryRowType,
   SPDevExWorkspaceTelemetryVersionType, SPDevExWorkstreamWorkType, SPDevExStageType, held, known, stageOf,
 } from "./telemetry-values.ts";
@@ -479,6 +479,42 @@ export function writePanel(root: string | null, facts: Facts, panel: { lens: str
       lens, verdict,
     };
     appendLog(join(dir, LOG), JSON.stringify(row));
+  } catch { /* a tool never fails because timing failed */ }
+}
+
+/**
+ * Append one `TEST` row to the workspace's log, if and only if recording is on: one package's suite run, in the shape
+ * `bash-timing.ts` writes for a background run (a `COMMAND` event, `work` TEST, the run's `call`, its `status` and its
+ * `test` of node, run, tier and counts). A node, run or tier the contract does not hold writes no row. Never throws.
+ *
+ * @param row  the `call` that ran it, whether it passed, the `test` it proved, and how long it took
+ */
+export function writeTest(root: string | null, facts: Facts, row: {
+  call: { program: string | null; group: string | null; action: string | null }; status: "SUCCESS" | "FAILURE";
+  test: { node: string; run: string; tier: string; tests: { passed: number; failed: number; skipped: number } }; ms?: number;
+}): void {
+  try {
+    const dir = telemetryDir(root);
+    if (!root || !dir) return;
+    const tier = known(SPTestTierType, row.test.tier);
+    const node = held(row.test.node, NODE_PATTERN);
+    const run = held(row.test.run, /^[A-Za-z0-9][A-Za-z0-9._-]{0,99}$/);
+    if (!tier || !node || !run) return;
+    let work: Work = { workstream: facts.workstream ?? null, arc: facts.arc ?? null, part: facts.part ?? null, skill: facts.skill ?? null };
+    try { work = carryTags(root, facts); } catch { /* the call's own ids stand */ }
+    const ms = Math.max(0, Math.round(row.ms ?? 0));
+    const count = (n: number) => Math.max(0, Math.round(Number(n) || 0));
+    const out = {
+      v: SPDevExWorkspaceTelemetryVersionType.V1, mtype: SPDevExWorkspaceTelemetryRowType.TEST, id: rowId(), at: utcNow(ms), ms,
+      event: SPDevExWorkspaceTelemetryEventType.COMMAND,
+      session: facts.session ?? null, agent: facts.agent ?? null,
+      workstream: held(work.workstream, WORKSTREAM_PATTERN), arc: held(work.arc, ARC_PATTERN), part: held(work.part, PART_PATTERN),
+      skill: known(SPDevExAgentSkillType, work.skill), stage: known(SPDevExStageType, work.stage),
+      work: SPDevExWorkstreamWorkType.TEST, retryOf: null,
+      call: row.call, status: row.status === "SUCCESS" ? SPDocBehaviourStatusType.SUCCESS : SPDocBehaviourStatusType.FAILED,
+      test: { node, run, tier, tests: { passed: count(row.test.tests.passed), failed: count(row.test.tests.failed), skipped: count(row.test.tests.skipped) } },
+    };
+    appendLog(join(dir, LOG), JSON.stringify(out));
   } catch { /* a tool never fails because timing failed */ }
 }
 

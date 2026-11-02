@@ -9,10 +9,11 @@
 // each runner adds what its package proved to the one run file under that name: the file is cleared
 // once here, so a reused name never keeps an older run's results.
 
-import { execFileSync } from "node:child_process";
+import { spawnSync } from "node:child_process";
 import { readdirSync, rmSync, statSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { workspaceRoot, writeTest } from "../packages/plugin-support-lib/src/lib/timing.ts";
 import { APPEND, runFilePath, runNameOf } from "../packages/plugin-support-lib/tests/helpers/run-file.mjs";
 
 const ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
@@ -33,12 +34,17 @@ let failed = 0;
 for (const runner of runners) {
   const label = runner.slice(PACKAGES.length + 1, -"/tests/run.mjs".length);
   console.log(`\n── ${label} ──────────────────────────────────────────`);
-  try {
-    execFileSync(process.execPath, [runner, ...process.argv.slice(2)],
-      { stdio: "inherit", env: { ...process.env, [APPEND]: runName === null ? "" : "1" } });
-  } catch {
-    failed += 1;
-  }
+  const started = Date.now();
+  const ran = spawnSync(process.execPath, [runner, ...process.argv.slice(2)],
+    { stdio: ["inherit", "pipe", "inherit"], encoding: "utf8", maxBuffer: 1 << 28, env: { ...process.env, [APPEND]: runName === null ? "" : "1" } });
+  process.stdout.write(ran.stdout ?? "");
+  const ok = ran.status === 0;
+  if (!ok) failed += 1;
+  const last = (word) => { const all = [...(ran.stdout ?? "").matchAll(new RegExp(`\\b(\\d+) ${word}\\b`, "g"))]; return all.length ? Number(all[all.length - 1][1]) : 0; };
+  writeTest(workspaceRoot(ROOT), { script: "test-all.mjs", event: "command", tool: null, session: process.env.CLAUDE_CODE_SESSION_ID || null },
+    { call: { program: "test-all.mjs", group: null, action: runName }, status: ok ? "SUCCESS" : "FAILURE",
+      test: { node: label.split("/")[0], run: runName, tier: "UNIT", tests: { passed: last("passed"), failed: last("failed"), skipped: last("skipped") } },
+      ms: Date.now() - started });
 }
 
 console.log(failed
