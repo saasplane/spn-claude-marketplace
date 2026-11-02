@@ -171,21 +171,60 @@ try {
     const split = json(root, "040-split").split;
     const arc = (split ?? []).find((one) => one.key === "N011");
     const calls = (kind) => arc?.[kind]?.calls;
-    ok("[MKT.HOOKS.321] a `workstream row state`, a docs cycles write and a commit are managing", calls("managing") === 3, JSON.stringify(arc));
-    ok("[MKT.HOOKS.321] a check's refusal, a retry, and a plugin command refused by its exit status are refusals; a passing check is no call", calls("refusals") === 3, JSON.stringify(arc));
+    ok("[MKT.HOOKS.321] a `workstream row state`, a docs cycles write and a commit are managing", calls("managing") === 6, JSON.stringify(arc));
+    ok("[MKT.HOOKS.321] a check's refusal, a retry, and a plugin command refused by its exit status are refusals; a passing check is no call", arc?.managing?.refused === 3, JSON.stringify(arc));
     ok("[MKT.HOOKS.321] a generated write, a git rm and a child's git mv are change", calls("change") === 3, JSON.stringify(arc));
     ok("[MKT.HOOKS.321] a test run's row is proof", calls("proof") === 1, JSON.stringify(arc));
     ok("[MKT.HOOKS.321] a git log and a command the hooks name no kind for are reading, never change", calls("reading") === 3, JSON.stringify(arc));
-    ok("[MKT.HOOKS.321] a gap of 20 minutes is one wait, apart from the work after it", calls("waiting") === 1 && Math.abs(arc.waiting.minutes - 20) < 0.2, JSON.stringify(arc?.waiting));
+    ok("[MKT.HOOKS.321] a gap of 20 minutes is one wait, apart from the work after it", calls("waiting") === 0 && Math.abs(arc.waiting.minutes - 20) < 0.2, JSON.stringify(arc?.waiting));
     ok("[MKT.HOOKS.321] each part of the arc is split too", (split ?? []).filter((one) => /^N011 · part (code|docs)-spn-x-1$/.test(one.key)).length === 2, JSON.stringify((split ?? []).map((one) => one.key)));
     const printed = typed(root, "show", "040-split").out;
-    ok("[MKT.HOOKS.321] the printed form names the five classes and no sixth", ["change", "proof", "managing", "refusals", "waiting"].every((word) => printed.includes(word)) && !/reading/.test(printed) && /N011 · part code-spn-x-1/.test(printed), printed);
+    ok("[MKT.HOOKS.321] the printed form names the six columns", ["Reading", "Thinking", "Changing", "Running", "Bookkeeping", "Waiting"].every((word) => printed.includes(word)) && /N011 · part code-spn-x-1/.test(printed), printed);
     const lead = (extra) => (JSON.parse(typed(root, "show", "040-split", "--json", ...extra).out).split ?? []).find((one) => one.key === "N011");
     ok("`--lead` leaves the child's calls out", lead(["--lead"])?.change.calls === 2 && lead([])?.change.calls === 3, JSON.stringify(lead(["--lead"])));
-    ok("`--from` and `--to` bound the split to a time", lead(["--to", "2026-10-31T10:04:00Z"])?.managing.calls === 2 && lead(["--from", "2026-10-31T10:20:00Z"])?.managing.calls === 1,
+    ok("`--from` and `--to` bound the split to a time", lead(["--to", "2026-10-31T10:04:00Z"])?.managing.calls === 4 && lead(["--from", "2026-10-31T10:20:00Z"])?.managing.calls === 1,
       JSON.stringify([lead(["--to", "2026-10-31T10:04:00Z"]), lead(["--from", "2026-10-31T10:20:00Z"])]));
     const bad = typed(root, "show", "040-split", "--from", "yesterday-ish");
     ok("a time that is none is refused with exit 2", bad.code === 2 && bad.out.includes("not one"), bad.out);
+  }
+
+  console.log("\n=== <workstream> — file rows and sheet patches in the split, and the labels under the largest cells");
+  {
+    const T0 = Date.parse("2026-11-01T10:00:00Z");
+    const stamp = (seconds) => new Date(T0 + seconds * 1000).toISOString().slice(0, 19) + "Z";
+    let n = 0;
+    const head = (mtype, seconds) => ({ v: 1, mtype, id: `f${(n += 1)}`, event: "PostToolUse", at: stamp(seconds), session: "f1", agent: null, workstream: "043-files", arc: "N001", part: "code-spn-x-1",
+      skill: null, work: null, retryOf: null });
+    const rows = [
+      { ...head("COMMAND", 0), call: { program: "spn-devex", group: "workstream", action: "sheet patch" }, ms: 120000, exit: 0 },
+      { ...head("FILE", 300), tool: "READ", file: "src/read-me.ts", ms: 60000 },
+      { ...head("FILE", 420), tool: "EDIT", file: "src/edit-me.ts", ms: 60000 },
+    ];
+    writeFileSync(join(telemetry, "hooks.jsonl"), rows.map((one) => JSON.stringify(one)).join("\n") + "\n");
+    const arc = (json(root, "043-files").split ?? []).find((one) => one.key === "N001");
+    ok("[MKT.SCRIPTS.499] a `workstream sheet patch` command and a file edit are Changing, two calls", arc?.change?.calls === 2, JSON.stringify(arc));
+    ok("[MKT.SCRIPTS.499] a file row with the tool READ is Reading", arc?.reading?.calls === 1, JSON.stringify(arc));
+    ok("[MKT.SCRIPTS.499] thinking is the gap since the previous row's at less that row's ms (3 minutes, then 1)", Math.abs((arc?.thinking?.minutes ?? 0) - 4) < 0.05, JSON.stringify(arc?.thinking));
+    const printed = typed(root, "show", "043-files").out;
+    ok("[MKT.SCRIPTS.499] the printed Work table appears", /^Work\s+Reading\s+Thinking\s+Changing/m.test(printed), printed);
+    ok("[MKT.SCRIPTS.499] under 'Largest cells' a label line prints its minutes", printed.includes("Largest cells") && printed.includes("\n    spn-devex workstream sheet patch: 2m\n"), printed);
+  }
+
+  console.log("\n=== <workstream> — review: a cell that rose against the three arcs before it");
+  {
+    const T0 = Date.parse("2026-11-02T10:00:00Z");
+    const stamp = (seconds) => new Date(T0 + seconds * 1000).toISOString().slice(0, 19) + "Z";
+    const rows = [];
+    let n = 0;
+    ["N001", "N002", "N003", "N004"].forEach((arc, index) => {
+      for (let k = 0; k < (arc === "N004" ? 3 : 1); k += 1)
+        rows.push({ v: 1, mtype: "COMMAND", id: `r${(n += 1)}`, event: "PostToolUse", at: stamp(index * 600 + k * 30), session: "r1", agent: null, workstream: "044-rise", arc, part: "code-spn-x-1",
+          skill: null, work: null, retryOf: null, call: { program: "spn-devex", group: "workstream", action: "row state" }, ms: 5, exit: 2 });
+    });
+    writeFileSync(join(telemetry, "hooks.jsonl"), rows.map((one) => JSON.stringify(one)).join("\n") + "\n");
+    const review = typed(root, "review", "044-rise/N004");
+    ok("[MKT.SCRIPTS.511] an arc whose refusals are about double the mean of the three before it prints the finding", review.code === 0
+      && review.out.split("\n").includes("Refusals rose from 1 to 3 against the last three arcs"), review.out);
   }
 
   console.log("\n=== <workstream> — a record of the old shape is not read as a call");
