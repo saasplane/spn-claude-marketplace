@@ -19,7 +19,7 @@ import { isDir, isFile, listdir, workspaceRoot } from "./payload.ts";
 import { APPROACH_PAGE, ARCS, PLUGIN_TEMPLATES, WORKSTREAM_STATES, isApproachPage, workstreamPrefixSource, workstreamsDir, type WorkstreamState } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import {
   ARC_ID, DONE_STATES, QUESTION_ID, SCHEMA_VERSION, VERSIONED_RECORDS, arcFaults, cardName, parentIds, recordVersionFault, versioned,
-  type ArcData, type ArcRow, type Card, type LogLine, type Question, type RowState, type Sheet,
+  type ArcData, type ArcRow, type Card, type LogLine, type Question, type RowState, type Sheet, type SheetEntry,
 } from "./workstream-schema.ts";
 
 // ---------------------------------------------------------------------------- the folder
@@ -1254,6 +1254,19 @@ export function previewFromTemplate(ws: string, data: Pick<ArcData, "arc" | "sub
   if (workspace) slots.push(["{{WORKSPACE}}", workspace]);
   for (const [slot, value] of slots) text = text.split(slot).join(value);
   return previewWithStatus(text, data.arc, data.status);
+}
+
+/**
+ * The preview's outline drawn from an arc's entries, in the order the sheet holds (connection order): an ordered list with one
+ * item for each entry, `repo:path` and its what, and a code block of the patch under an entry that is judged and whose patch reads.
+ */
+export function previewFromEntries(entries: SheetEntry[], readPatch: (entry: SheetEntry) => string | null): string {
+  const items = entries.map((entry) => {
+    const patch = entry.judged === true ? readPatch(entry) : null;
+    const block = patch ? `<pre><code>${escapeHtml(patch)}</code></pre>` : "";
+    return `<li><code>${escapeHtml(entry.file)}</code> ${escapeHtml(entry.what)}${block}</li>`;
+  });
+  return `<ol>${items.join("")}</ol>`;
 }
 
 /** The parts of an HTML text that are slots, `{{…}}`, each with its line, in order. */
