@@ -1043,8 +1043,8 @@ console.log("\n=== orientation — the fetch, the behind-develop clause and the 
   const { commandsRef } = await import("../../../../src/scripts/cli.ts");
   const treeDebug = (await commandsRef()).split("\n").filter((one) => one.startsWith("spn-devex debug "));
   const shown = big.context.split("\n").filter((one) => one.startsWith("spn-devex debug "));
-  says(`the command tree renders the ten debug commands, ${treeDebug.length} lines`,
-    treeDebug.length === 10 && treeDebug.every((one) => /^spn-devex debug \w+ \w+/.test(one)), treeDebug.join("\n"));
+  says(`the command tree renders the eleven debug commands, ${treeDebug.length} lines`,
+    treeDebug.length === 11 && treeDebug.every((one) => /^spn-devex debug \w+ \w+/.test(one)), treeDebug.join("\n"));
   says(`past the ceiling an ordinary start leaves the debug lines out first, ${shown.length} lines`,
     shown.length === 0 && big.context.length <= SESSION_START_CEILING + 200);
   says("and names `refs/commands.md` as read on asking",
