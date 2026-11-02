@@ -288,3 +288,15 @@ A first proposal starts where the book already stands, so the developer reads a 
 - **Explain the proposal in what the developer will see, before the code's own terms** (`RULE.DEVEX.FUNCTION.094` · MUST · skill:spn-devex/ideate). Lead with the printed output, the rows or the page the developer will read, and let the code's terms follow.
 - **Convene the proposal's panel before the proposal is called final** (`RULE.DEVEX.FUNCTION.095` · MUST · skill:spn-devex/ideate). The reader who did not write the proposal reads it first, and a block from that reader is answered in the proposal and not after it.
 - **Workspace plumbing is yours to resolve, and never a card** (`RULE.DEVEX.WORKSPACE.481` · MUST · skill:spn-devex/ideate). A stale checkout, tool output left uncommitted and a stash you name are yours to fix, and you say in one line what you did. A helper never stashes: the window that coordinates does.
+
+## Ideating an arc in code
+
+When the arc changes code, the idea is worked in the code itself, one connected batch at a time.
+
+1. **Read, change, validate, record.** Read the files the idea touches, make the change, validate it with one trace line, and record it with `sheet patch --trace --judged`. Validation here is typecheck and lint only; the suites run later, at the go.
+2. **Judged before the preview, mechanical after approval.** An entry whose change needs judgement is patched before the preview, so the preview shows its code; a mechanical entry is patched after the developer approves.
+3. **One helper per connected batch.** Send the contract first, then what depends on it. Size each batch by measured tokens, never by a guess.
+4. **Where an idea goes.** It joins the running arc only when that arc's goal needs it. Otherwise the developer chooses: its own arc, or the follow-ups.
+5. **A later change shows `sheet reach` first.** Run `sheet reach` and show what the change reaches before you change anything.
+6. **A proposal carries its preview.** It shows a code preview for apps code or a journey for a flow, as the agent chapter says ([`refs/devex/agent/agent.md`](../../refs/devex/agent/agent.md) § *A proposal shows its choice as a preview, and the first one follows eight rules*).
+7. **Shape a first proposal by the agent chapter's eight rules,** in the same section. They are stated there once; this step points at them and does not restate them.
