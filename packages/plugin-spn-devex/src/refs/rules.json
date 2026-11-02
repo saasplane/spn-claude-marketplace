@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "book": {
     "repository": "spn-foundation",
-    "commit": "6939a00e"
+    "commit": "1c416bf4"
   },
   "rules": [
     {
@@ -19307,6 +19307,25 @@
       ]
     },
     {
+      "id": "RULE.SUPPORT.APPS.250",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-apps/implement"
+      },
+      "class": "stated in a skill",
+      "sentence": "A module's code is 3 to 8 of A–Z and 0–9, starting with a letter, with no underscore, and `IAM`, `ORG`, `MDM`, `NTF`, `CMP`, `DOC`, `LNG`, `JOB` and `ENT` are SaaS Plane's own, so a new module never takes one",
+      "chapter": "04-capabilities/02-support/02-apps/10-providers/ts/02-naming.md",
+      "heading": "A module names itself",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "refs/support/apps/providers/ts/02-naming.md",
+          "heading": "A module names itself"
+        }
+      ]
+    },
+    {
       "id": "RULE.SUPPORT.APPS.251",
       "level": "MUST",
       "params": {
@@ -19348,6 +19367,19 @@
           "heading": "The rules this step holds"
         }
       ]
+    },
+    {
+      "id": "RULE.SUPPORT.APPS.253",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-apps/implement"
+      },
+      "class": "stated in a skill",
+      "sentence": "A module's code is 3 to 8 of A-Z and 0-9, starts with a letter, and has no underscore",
+      "chapter": "04-capabilities/02-support/02-apps/05-app/01-server/01-lifecycle.md",
+      "heading": "Migration execution",
+      "decision": "DEC.SUPPORT.APPS.253",
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.APPS.254",
@@ -19403,6 +19435,25 @@
           "plugin": "spn-apps",
           "path": "skills/implement/SKILL.md",
           "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.APPS.257",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-apps/implement"
+      },
+      "class": "stated in a skill",
+      "sentence": "A limit is checked with `await assertWithinLimit(code, { adding })`",
+      "chapter": "04-capabilities/02-support/02-apps/10-providers/ts/06-service.md",
+      "heading": "What the session names",
+      "decision": "DEC.SUPPORT.APPS.257",
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "refs/support/apps/providers/ts/06-service.md",
+          "heading": "What the session names"
         }
       ]
     },
