@@ -138,7 +138,7 @@ export enum OrgAppSiteDomainStatusType {
 }
 ```
 
-`REMOVING` exists because teardown is three confirmed calls — unbind, revoke, delete — and the first can succeed while the second fails. Without a state between them, the row would still read active while the edge had already stopped serving it.
+`REMOVING` exists because teardown is four confirmed calls — unroute, unbind, revoke, delete — and an early one can succeed while a later one fails. Without a state between them, the row would still read active while the edge had already stopped serving it.
 
 ## The registration boundary is a stored decision
 

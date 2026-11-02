@@ -140,7 +140,7 @@ Write these at act 2, in this order, before the first question is asked. `{NNN}`
 3. **One row per question**, rows 1 to 12, in the order of act 3's *What you ask*; the command takes each row's number and prints it. The title is the question, and the acceptance is what its answer decides:
 
    ```sh
-   spn-devex workstream row add {NNN}/N001 "The organization's code, its name, and the mail domain" --kind question --repo "—" --altitude DOCS \
+   spn-devex workstream row add {NNN}/N001 "The organization's code, its name, and the mail domain" --kind question --repo "—" --work DOCS \
      --acceptance "Every account address, the package scope, the repository names, the estate's root"
    ```
 
