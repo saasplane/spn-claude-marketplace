@@ -196,7 +196,7 @@ console.log("\n=== unit show — a unit beyond the core, from the repository's s
 
   const nowhere = run(FIXTURE, "unit", "show", "DSListDetai");
   ok("outside a repository with an index, the refusal says there is none and names the snapshot's closest",
-    nowhere.code === 1 && nowhere.out.includes("no symbol index here") && nowhere.out.includes("DSList"), nowhere.out);
+    nowhere.code === 1 && nowhere.out.includes("no symbol index in this workspace's repositories") && nowhere.out.includes("DSList"), nowhere.out);
 }
 
 console.log("\n=== unit show — from a workspace's root, the index of each repository in it");
