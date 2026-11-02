@@ -19322,6 +19322,11 @@
           "plugin": "spn-apps",
           "path": "refs/support/apps/providers/ts/02-naming.md",
           "heading": "A module names itself"
+        },
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -19379,7 +19384,13 @@
       "chapter": "04-capabilities/02-support/02-apps/05-app/01-server/01-lifecycle.md",
       "heading": "Migration execution",
       "decision": "DEC.SUPPORT.APPS.253",
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.SUPPORT.APPS.254",
@@ -19450,6 +19461,11 @@
       "heading": "What the session names",
       "decision": "DEC.SUPPORT.APPS.257",
       "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "providers/ts/skills/implement/steps/service.md",
+          "heading": "The rules this step holds"
+        },
         {
           "plugin": "spn-apps",
           "path": "refs/support/apps/providers/ts/06-service.md",
