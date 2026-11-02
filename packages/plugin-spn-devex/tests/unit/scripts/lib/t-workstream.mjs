@@ -619,10 +619,11 @@ console.log("\n=== the ideate and follow-up arcs — MKT.SCRIPTS.484, .486, .488
   ok("[MKT.SCRIPTS.488] with no rows the follow-up arc is PROPOSED while a suggestion is unsettled", statusOf({ suggestionsSettled: false }) === "PROPOSED");
   ok("[MKT.SCRIPTS.488] and LANDED once every suggestion is settled, with no move by hand", statusOf({ suggestionsSettled: true }) === "LANDED");
   ok("[MKT.SCRIPTS.488] the stored word is ignored: a stored DECIDED with no rows reads the same", statusOf({ status: "DECIDED", suggestionsSettled: false }) === "PROPOSED" && statusOf({ status: "DECIDED", suggestionsSettled: true }) === "LANDED");
-  ok("[MKT.SCRIPTS.488] with rows it reads as a build arc: nothing started is DECIDED, a step running is RUNNING",
-    statusOf({ rows: [{ ...landedRow, state: "waiting" }], suggestionsSettled: true }) === "DECIDED" && statusOf({ rows: [{ ...landedRow, state: "running" }], suggestionsSettled: true }) === "RUNNING");
-  ok("[MKT.SCRIPTS.488] with every step landed it is LANDED only once the suggestions are settled too",
-    statusOf({ rows: [landedRow], suggestionsSettled: true }) === "LANDED" && statusOf({ rows: [landedRow], suggestionsSettled: false }) === "RUNNING");
+  ok("[MKT.SCRIPTS.488] with rows it reads as a build arc, its stored status kept: a stored PROPOSED stays PROPOSED, a stored DECIDED with nothing started is DECIDED, a step running is RUNNING",
+    statusOf({ rows: [{ ...landedRow, state: "waiting" }], suggestionsSettled: true }) === "PROPOSED" && statusOf({ status: "DECIDED", rows: [{ ...landedRow, state: "waiting" }], suggestionsSettled: true }) === "DECIDED"
+      && statusOf({ status: "DECIDED", rows: [{ ...landedRow, state: "running" }], suggestionsSettled: true }) === "RUNNING");
+  ok("[MKT.SCRIPTS.488] a stored DECIDED with every step landed is LANDED only once the suggestions are settled too",
+    statusOf({ status: "DECIDED", rows: [landedRow], suggestionsSettled: true }) === "LANDED" && statusOf({ status: "DECIDED", rows: [landedRow], suggestionsSettled: false }) === "RUNNING");
   ok("[MKT.SCRIPTS.488] a stored CARRIED or DROPPED is kept",
     statusOf({ status: "CARRIED", suggestionsSettled: false }) === "CARRIED" && statusOf({ status: "DROPPED", suggestionsSettled: false }) === "DROPPED");
   ok("[MKT.SCRIPTS.488] a numbered arc ignores suggestionsSettled, and the ideate arc reads its proposals as before",

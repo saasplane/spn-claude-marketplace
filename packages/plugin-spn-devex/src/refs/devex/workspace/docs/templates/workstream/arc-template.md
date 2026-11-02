@@ -70,7 +70,7 @@ spn-devex workstream arc stamp write {{arc}}
       "acceptance": "{{`command` → before → after}}", "model": "{{sonnet}}",
       "blockedBy": [], "touches": ["{{repository:place}}"], "decisions": ["{{q<n>}}"], "facts": ["{{f<n>}}"],
       "state": "waiting", "order": "orders/{{1}}.md" },
-    { "id": "{{n}}", "parent": "N{{nnn}}", "title": "the final re-check, on clean trees, after the last write, cache off: run again what the rows above touched; the whole tiers of each touched node, the browser walks and the look, once for the arc; and the consumer install",
+    { "id": "{{n}}", "parent": "N{{nnn}}", "title": "the final re-check, on clean trees, after the last write, with the runner's reuse: run again what the rows above touched; the whole tiers of each touched node, the browser walks and the look, once for the arc; and the consumer install",
       "kind": "change", "repo": "—", "work": "PROOF", "mechanism": "command",
       "acceptance": "each gate → exit 0, and each named id → SUCCESS in that run's file", "state": "waiting" } ] }
 ```
@@ -108,6 +108,6 @@ notes/{{arc}}/
 ## Before the steps work out LANDED
 
 Every row is landed, replaced, carried or deferred, and none is stopped or waits on a card. The PROOF row's output is in its
-`proof`, run with the cache off. Every card this arc answered has left `Open`, and the page's `What` states its
+`proof`, run with the runner's reuse. Every card this arc answered has left `Open`, and the page's `What` states its
 result. The approach page's part for the arc is current, its stamp written, and its Plan row reads LANDED. The
 landing is committed.

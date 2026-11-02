@@ -548,15 +548,12 @@ const STARTED: ReadonlySet<string> = new Set(["running", "stopped", "replaced", 
  * An ideate arc is the exception: it never needs rows.
  */
 export function arcStatus(data: Pick<ArcData, "status" | "rows" | "reviewFixes"> & { arc?: string; kind?: string; proposesOpened?: unknown; suggestionsSettled?: unknown }): Status {
-  let held = (STATUSES as readonly string[]).includes(data.status) ? data.status as Status : "PROPOSED";
+  const held = (STATUSES as readonly string[]).includes(data.status) ? data.status as Status : "PROPOSED";
   if (!Array.isArray(data.rows)) return held;
-  // THE FOLLOW-UP ARC'S STATUS IS WORKED OUT, THE STORED ONE IGNORED (Q33): with no rows it is PROPOSED while a suggestion is unsettled and LANDED once all are;
-  // with rows it reads as any build arc, and is LANDED only once every suggestion is settled too.
+  // THE FOLLOW-UP ARC WITH NO ROWS HAS ITS STATUS WORKED OUT, THE STORED ONE IGNORED (Q33): PROPOSED while a suggestion is unsettled and LANDED once all are;
+  // with rows it reads as any build arc (its stored status, its rows starting only on the developer's go), and is LANDED only once every suggestion is settled too.
   const followUps = data.arc === "follow-ups" && held !== "CARRIED" && held !== "DROPPED";
-  if (followUps) {
-    if (!data.rows.length) return data.suggestionsSettled === true ? "LANDED" : "PROPOSED";
-    held = "DECIDED";
-  }
+  if (followUps && !data.rows.length) return data.suggestionsSettled === true ? "LANDED" : "PROPOSED";
   if (held !== "DECIDED") return held;
   // AN IDEATE ARC HAS NO STEPS (RULE.DEVEX.WORKSPACE.494): decided, it reads LANDED once every arc it proposes is opened, and DECIDED until then.
   if (data.arc === "ideate" || data.kind === "ideate") return data.proposesOpened === true ? "LANDED" : "DECIDED";

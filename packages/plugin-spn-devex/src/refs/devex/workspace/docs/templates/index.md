@@ -28,9 +28,9 @@ edited all move the same one hash.
 | `seat-files/construct-seat-template.md` | `af326a32` |
 | `seat-files/schema-template.sql` | `55df76e1` |
 | `seat-files/test-and-verify-template.md` | `72b7fa13` |
-| `workstream/approach-preview-template.html` | `c7f7428a` |
-| `workstream/approach-template.html` | `331a9b6e` |
-| `workstream/arc-template.md` | `15039298` |
-| `workstream/handover-template.md` | `e80f42e1` |
-| `workstream/order-template.md` | `4591545d` |
-| `workstream/plan-template.md` | `3dab9372` |
+| `workstream/approach-preview-template.html` | `56f83dfb` |
+| `workstream/approach-template.html` | `4737af7d` |
+| `workstream/arc-template.md` | `e98f5619` |
+| `workstream/handover-template.md` | `8d326f44` |
+| `workstream/order-template.md` | `2522a496` |
+| `workstream/plan-template.md` | `8cb6ae81` |
