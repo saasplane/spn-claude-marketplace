@@ -229,6 +229,7 @@ Every row below is declared and none is claimed: a run writes the last two cells
 | MKT.HOOKS.486 | Backend developer | be offered a new window at the right moments | The window offer comes once from 200k and again after another 50k, asks for the handover past 300k at a clean point, and asks at any point past 450k | POSITIVE | UNIT | PLANNED | — |
 | MKT.HOOKS.487 | Backend developer | see the book's rungs in the ladder | The rung ladder has the book's four rungs, and a concept with few nodes is an ordinary session | POSITIVE | UNIT | PLANNED | — |
 | MKT.HOOKS.488 | Backend developer | have an order in the ideate or follow-ups arc held to the order checks | An order under `notes/ideate/` or `notes/follow-ups/` passes the order checks like one under `notes/N<nnn>/`, and the prompt names the role arcs `ideate` and `follow-ups` beside the numbered ones | POSITIVE | UNIT | PLANNED | — |
+| MKT.HOOKS.489 | Builder | release at the version the arc recorded, with no wait on the developer | A release with no `release <repo> <version>:` line in the arc's log is refused, naming the command that records it; a stamped version whose bump is smaller than the recorded one is refused; an equal or larger bump, an omitted version and a rehearsal pass | NEGATIVE | UNIT | PLANNED | — |
 
 ## Retired ids
 

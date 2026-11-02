@@ -89,41 +89,41 @@ const asksForTheCommand = (v) => denied(v) && v.deny.includes(RECORDS_A_VERSION)
 // ── the recorded version, which is what the check reads ──
 
 logs(["008-x", "N001", [unrelated]]);
-one("a release with no recorded version line is refused, naming the command that records it",
+one("[MKT.HOOKS.489] a release with no recorded version line is refused, naming the command that records it",
   asksForTheCommand(verdict("spnutils apps release 1.2.68", support)));
-one("a note that only mentions a version, in no `release <repo> <version>:` form, records nothing",
+one("[MKT.HOOKS.489] a note that only mentions a version, in no `release <repo> <version>:` form, records nothing",
   asksForTheCommand(verdict("spnutils apps release 9.0.0", support)));
 
 logs(["008-x", "N001", [recorded("spn-support-ts", "1.2.68")]]);
-one("a stamped version equal to the recorded one passes",
+one("[MKT.HOOKS.489] a stamped version equal to the recorded one passes",
   !denied(verdict("spnutils apps release 1.2.68", support)));
-one("a stamped patch under a recorded patch passes, whatever the number",
+one("[MKT.HOOKS.489] a stamped patch under a recorded patch passes, whatever the number",
   !denied(verdict("spnutils apps release 1.2.69", support)));
-one("a major stamped over a recorded patch passes: only a smaller bump is refused",
+one("[MKT.HOOKS.489] a major stamped over a recorded patch passes: only a smaller bump is refused",
   !denied(verdict("spnutils apps release 2.0.0", support)));
 
 logs(["008-x", "N001", [recorded("spn-support-ts", "1.3.0")]]);
-one("a bump smaller than the recorded one is refused",
+one("[MKT.HOOKS.489] a bump smaller than the recorded one is refused",
   asksForTheCommand(verdict("spnutils apps release 1.2.68", support)));
 
 logs(["008-x", "N001", [recorded("spn-support-ts", "2.0.0")]]);
-one("a major the log records passes with no developer words anywhere",
+one("[MKT.HOOKS.489] a major the log records passes with no developer words anywhere",
   !denied(verdict("spnutils apps release 2.0.0", support)));
 
 logs(["008-x", "N001", [recorded("spn-platform-ts", "1.0.0")]]);
-one("a line recorded for another repository is no record for this one",
+one("[MKT.HOOKS.489] a line recorded for another repository is no record for this one",
   asksForTheCommand(verdict("spnutils apps release 1.2.68", support)));
 
 logs(["008-x", "N001", [recorded("spn-support-ts", "1.2.68", "2026-11-01T10:00+05:30")]], ["008-x", "N002", [recorded("spn-support-ts", "2.0.0", "2026-11-02T10:00+05:30")]]);
-one("the newest recorded line wins over an older one",
+one("[MKT.HOOKS.489] the newest recorded line wins over an older one",
   !denied(verdict("spnutils apps release 2.0.0", support)) && asksForTheCommand(verdict("spnutils apps release 1.2.68", support)));
 
 logs(["008-x", "N001", [unrelated]]);
-one("an omitted version passes: the CLI increments and never bumps a major",
+one("[MKT.HOOKS.489] an omitted version passes: the CLI increments and never bumps a major",
   !denied(verdict("spnutils apps release", support)));
-one("a rehearsal passes, because it publishes nothing",
+one("[MKT.HOOKS.489] a rehearsal passes, because it publishes nothing",
   !denied(verdict("spnutils apps release 2.0.0 --dry-run", support)));
-one("an unrelated command is not this check's business",
+one("[MKT.HOOKS.489] an unrelated command is not this check's business",
   !denied(verdict("npx nx run utility-ts:build", support)));
 
 // ── which directory answers the question, which is where it was wrong ──
@@ -131,36 +131,36 @@ one("an unrelated command is not this check's business",
 // The regression. Standing in one checkout and releasing another is the ordinary case in a workspace
 // of seven, and it produced a refusal citing a repository the caller never named.
 logs(["008-x", "N001", [recorded("spn-support-ts", "1.2.68"), recorded("spn-platform-ts", "0.1.1")]]);
-one("REGRESSION: cd into a repo, and its OWN tags decide",
+one("[MKT.HOOKS.489] REGRESSION: cd into a repo, and its OWN tags decide",
   !denied(verdict(`cd ${support} && npx tsx apps/utility-ts/src/index.ts apps release 1.2.68`, platform)));
 
 // The untouched twin: the fix must not make the check blind. Against a repository that really is at
 // 0.1.0, 1.2.68 really is a major bump, where the log records a patch for it, and it must still be refused.
 logs(["008-x", "N001", [recorded("spn-platform-ts", "1.0.0")]]);
-one("and a smaller bump than recorded is still refused after the cd, by that repo's own tags",
+one("[MKT.HOOKS.489] and a smaller bump than recorded is still refused after the cd, by that repo's own tags",
   denied(verdict(`cd ${platform} && spnutils apps release 0.1.1`, support)));
 
-one("a relative cd resolves against the session, not the root",
+one("[MKT.HOOKS.489] a relative cd resolves against the session, not the root",
   commandCwd("cd spn-support-ts && spnutils apps release 1.2.68", join(BASE, "ws")) === support);
-one("an absolute cd is taken as it stands",
+one("[MKT.HOOKS.489] an absolute cd is taken as it stands",
   commandCwd(`cd ${support} && x`, platform) === support);
-one("a quoted path survives a space in it",
+one("[MKT.HOOKS.489] a quoted path survives a space in it",
   commandCwd(`cd '${support}' && x`, platform) === support);
-one("a semicolon separates as well as &&",
+one("[MKT.HOOKS.489] a semicolon separates as well as &&",
   commandCwd(`cd ${support}; x`, platform) === support);
 
 // Not every command starting with those two letters is a `cd`, and a command this cannot read must
 // fall back rather than guess — a wrong guess here reads the wrong repository's tags silently.
-one("no leading cd leaves the session's directory alone",
+one("[MKT.HOOKS.489] no leading cd leaves the session's directory alone",
   commandCwd("spnutils apps release 1.2.68", support) === support);
-one("a bare cd with no separator is not parsed",
+one("[MKT.HOOKS.489] a bare cd with no separator is not parsed",
   commandCwd("cdk deploy && x", support) === support);
 
 // ── the comparison itself ──
 
-one("a major bump is a higher first number, nothing else",
+one("[MKT.HOOKS.489] a major bump is a higher first number, nothing else",
   isMajorBump("2.0.0", "1.9.9") && !isMajorBump("1.9.9", "1.2.0") && !isMajorBump("1.2.68", "1.2.67"));
-one("a version it cannot read is not a major bump, because it cannot prove one",
+one("[MKT.HOOKS.489] a version it cannot read is not a major bump, because it cannot prove one",
   !isMajorBump("latest", "1.2.67") && !isMajorBump("2.0.0", "not-a-version"));
 
 // A repository with no tags at all has nothing to compare against, and a gate that refuses what it
@@ -168,9 +168,9 @@ one("a version it cannot read is not a major bump, because it cannot prove one",
 const fresh = join(BASE, "ws", "untagged");
 mkdirSync(fresh, { recursive: true });
 git(["init", "-q"], fresh);
-one("a repository with no release tag is not this check's call",
+one("[MKT.HOOKS.489] a repository with no release tag is not this check's call",
   !denied(verdict("spnutils apps release 9.0.0", fresh)));
-one("a version it cannot read is not this check's call either",
+one("[MKT.HOOKS.489] a version it cannot read is not this check's call either",
   !denied(verdict("spnutils apps release latest", support)));
 
 console.log(failed ? `\n  ${failed} FAILED` : `\n  all ${n} passed`);
