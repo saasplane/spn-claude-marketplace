@@ -180,7 +180,7 @@ The grammar is one form: a code reads `{MOD}_MANAGE_{NOUN}` — the owning modul
 
 Never gate a module by organization type on its own authority — MUST NOT. Enforce the platform's authored enablement instead — that is what keeps a type from meaning one thing in one module and another thing in the next.
 
-Modules know org types and never know categories — MUST (`RULE.PLATFORM.CORE.065`). State a ceiling and a default by org type, and never branch on a category's code: a category is a partner's name, and a module that read it would break the first time a partner renamed one. An answer is read by org, and never by category alone, because an org's parent narrows it.
+Modules know org types and never know categories (`RULE.PLATFORM.CORE.065` · MUST · skill:spn-apps/implement). State a ceiling and a default by org type, and never branch on a category's code: a category is a partner's name, and a module that read it would break the first time a partner renamed one. An answer is read by org, and never by category alone, because an org's parent narrows it.
 
 Never let an enablement gate cover a read — MUST NOT. Every gated method you write is a create, update or delete. A search into an area a platform was never offered returns an empty list, never a refusal — a consumer with no audit screen still has audit rows written for it, and its files are still stored, because an empty cell hides a screen, never switches a module off.
 

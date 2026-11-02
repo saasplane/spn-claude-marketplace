@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/10-providers/ts/06-service.md",
-      "seen": "66ec14b5"
+      "seen": "7c65f048"
     }
   ]
 }
@@ -220,7 +220,7 @@ A session names its membership, its org with the org's type and category, its po
 
 The context's accessors follow the fields: `getContextOrgType()` returns one of three, and `getContextOrgCategoryCode()`, `getContextIdentityPoolCode()` and `tryContextOrgAppSiteId()` join it. The handler `verifyAuthPassport` builds the caller from these fields, and an offer is read by org and not by category.
 
-**A limit is checked with `await assertWithinLimit(code, { adding })`.** The session already carries the limit for the code, and an absent or empty value sets no limit and asks nothing. Otherwise the method asks the usage provider, `providers.usage`, which the app manager names in `initApp` as it names the auth provider. It refuses with `COMMON_NOT_ENABLED`, naming the code, the limit, the usage, the org that can raise it and, for a monthly limit, when the next month starts. A limit that is stated while no usage provider is named fails by name.
+**A limit is checked with `await assertWithinLimit(code, { adding })`** (`RULE.SUPPORT.APPS.257` · MUST · skill:spn-apps/implement). The session already carries the limit for the code, and an absent or empty value sets no limit and asks nothing. Otherwise the method asks the usage provider, `providers.usage`, which the app manager names in `initApp` as it names the auth provider. It refuses with `COMMON_NOT_ENABLED`, naming the code, the limit, the usage, the org that can raise it and, for a monthly limit, when the next month starts. A limit that is stated while no usage provider is named fails by name.
 
 ## Transactions, cache and the decorator order
 

@@ -50,7 +50,7 @@ Inside one `appPermissions` entry you may also narrow by `appScope` — which ap
 
 **Enablement is a construct, and it is modelled where every construct is.** It lives at `02-constructs/<iam>/enablement.md`, beside permission, and it depends on authorization and on organization type. It is realized the way a permission is: a module **registers its enablement definitions** in its contract constants, the session carries `enablements` exactly as it carries `permissions`, and a module's services and screens read `session.enablements` to decide what to offer. The chapter states the rule; the construct states the model, and this file restates neither more than once.
 
-**A module states its ceilings and defaults by org type and never reads a category's code** (`RULE.PLATFORM.CORE.065`).
+**A module states its ceilings and defaults by org type and never reads a category's code** (`RULE.PLATFORM.CORE.065` · MUST · skill:spn-apps/implement).
 
 **Enablement narrows and never widens** (`RULE.PLATFORM.CORE.070` · MUST · skill:spn-apps/implement). An org can pass on only what it holds, so a parent's answer caps its children's, and a child's cell is never read alone. The enablement console shows, beside a parent's cell, the child categories that lose the offer when it is switched off.
 

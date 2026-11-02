@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/10-providers/ts/02-naming.md",
-      "seen": "fe7a53f6"
+      "seen": "7a247995"
     }
   ]
 }
@@ -186,7 +186,7 @@ The field that tells the two kinds apart is `moduleType`, of `SPAppModuleType` (
 
 ### A module names itself
 
-A module's one code names its whole surface: its tables (`iam_`), its permissions (`IAM_*`), its labels, its env keys (`{APP}_IAM_*`), its API path (`/iam`), its CLI namespace (`iam`) and, over the network, the module a call is for. The service decides only whether a module is mounted here or held remotely. **A module's code is 3 to 8 of A–Z and 0–9, starting with a letter, with no underscore, and `IAM`, `ORG`, `MDM`, `NTF`, `CMP`, `DOC`, `LNG`, `JOB` and `ENT` are SaaS Plane's own, so a new module never takes one** (`RULE.SUPPORT.APPS.250` · MUST · check:apps validate). The underscore is excluded because it separates the code from the rest of a permission or a table name.
+A module's one code names its whole surface: its tables (`iam_`), its permissions (`IAM_*`), its labels, its env keys (`{APP}_IAM_*`), its API path (`/iam`), its CLI namespace (`iam`) and, over the network, the module a call is for. The service decides only whether a module is mounted here or held remotely. **A module's code is 3 to 8 of A–Z and 0–9, starting with a letter, with no underscore, and `IAM`, `ORG`, `MDM`, `NTF`, `CMP`, `DOC`, `LNG`, `JOB` and `ENT` are SaaS Plane's own, so a new module never takes one** (`RULE.SUPPORT.APPS.250` · MUST · skill:spn-apps/implement). The underscore is excluded because it separates the code from the rest of a permission or a table name.
 
 - **The module declares its code and config in its own contract.** `<MOD>_MODULE_CODE` and `<MOD>_MODULE_CONFIG` sit in `src/contract/constants.ts`, as `DOC_MODULE_CODE = 'DOC'` and `DOC_MODULE_CONFIG` do. The config is `{ code, name, description }`.
 - **The manager answers with it.** Every manager, runtime or remote, declares `moduleConfig`, and `initModule(app)` takes no config. The start file's line names the manager only.

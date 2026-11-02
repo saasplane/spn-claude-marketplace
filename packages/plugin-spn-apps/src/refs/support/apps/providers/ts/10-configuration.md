@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/10-providers/ts/10-configuration.md",
-      "seen": "982859e9"
+      "seen": "ed7498e4"
     }
   ]
 }
@@ -149,6 +149,8 @@ DMO_IAM_EDGE_CUSTOM_DOMAINS=${DMO_PLATFORM_INTEGRATION_EDGE_CUSTOM_DOMAINS}
 ```
 
 `envs/local.env` carries the module's own keys as literals, because no estate publishes an edge on a machine. The module's code reads `{CODE}_IAM_EDGE_*` in both files and never the published key.
+
+**An owner that accepts contributions names its senders in `{CODE}_{MOD}_MIGRATION_SENDERS`.** The value is the comma-separated kind codes of the services that may send it rows on `POST /remote-migration`. It is empty by default, and an empty key refuses every sender, so an owner receives nothing from another service until its senders are named. A service's kind code, such as `sample-api`, is the one its app row in the estate carries.
 
 ## The platform namespace
 
