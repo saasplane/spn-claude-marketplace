@@ -36,7 +36,7 @@ description: What proves a behaviour, at which tier, and what a passing suite do
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/06-tests/README.md",
       "section": "The selective loop — what runs while work is under way",
-      "seen": "ae6f8f25"
+      "seen": "a48ae7c9"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/10-providers/ts/13-tests.md",

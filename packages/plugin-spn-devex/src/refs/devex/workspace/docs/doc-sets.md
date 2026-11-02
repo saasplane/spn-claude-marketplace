@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "seen": "2469db3f"
+      "seen": "cbbcdc2d"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
@@ -614,7 +614,10 @@ sections are *Overview*, *Today*, *Proposed* and *Where it lands*, and an *Open*
 raises: the same cards as the approach page's, rendered from the same records by the `open` block
 (`RULE.DEVEX.WORKSPACE.253` · MUST · check:split-plan). An arc has one preview, `notes/<arc>/preview.html` (`RULE.DEVEX.WORKSPACE.254` · MUST · check:workstream-owner). *Overview* says what
 the reader is asked to decide, what to look at first and what is not final. *Today* shows the thing as it is.
-*Proposed* shows it as it will be, with its options side by side where a decision is still open. *Where it
+*Proposed* shows it as it will be, with its options side by side where a decision is still open. It is drawn
+from the sheet's entries: an outline in the order they connect, and a code block only for an entry marked
+`judged`, shown as the patch the sheet keeps for it. A section about a path, who speaks to whom, or the parts
+of one thing carries its figure. *Where it
 lands* shows the files that change as one folder tree for each repository, with a link to the approach page's
 own `How`. The
 reasoning stays on the approach page, so a preview carries no `Why`, `What` or `How`. A preview never frames a
@@ -631,7 +634,9 @@ names the repository and says what happens there. Then the repository is one `TR
 on each line, never two columns of entries, and a note in one column on the right that reads `new` or
 `changed` and then says what the change is. A folder with no note only holds what is under it. A deep path is
 drawn as folders on their own lines, so the note column stays near the names. A preview that is still proposed
-draws the folders and the files that are certain, and says which are not known yet. The tree is always drawn.
+draws the folders and the files that are certain, and says which are not known yet. Each file is one line,
+taken from the sheet's entries; a change to a file shows as a block only where its entry is marked `judged`,
+and a rename, a copy or a generated file stays that one line. The tree is always drawn.
 The section is a mix of blocks whose first job is to show the changes. After a repository's tree come the
 blocks that show its changes, such as a diff of one file, code, JSON or a figure. A code block that shows one
 file, or a part of one, stands in a `FILE` frame with the path from the repository's root as its title
