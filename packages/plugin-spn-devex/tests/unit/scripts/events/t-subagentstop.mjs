@@ -150,6 +150,23 @@ console.log("\n=== a review panel's stop writes one PANEL row (RULE.DEVEX.WORKSP
   check("[MKT.HOOKS.440] a panel whose last reply opens with no verdict writes no row", unsure.rows.length === 0, JSON.stringify(unsure.rows));
   const lens = setup("panel-nolens", { prompt: "Review 031/N001, no view named.", reply: "Pass" });
   check("[MKT.HOOKS.440] a prompt that names no lens writes no row, since a row holds a lens of the contract", lens.rows.length === 0, JSON.stringify(lens.rows));
+  const handback = (name, message) => {
+    const root = join(BASE, name);
+    mkdirSync(join(root, ".spndevex", ".debug"), { recursive: true });
+    writeFileSync(join(root, ".spndevex", ".debug", "switches.json"), '{"telemetry": true}');
+    const child = join(root, "agent-h.jsonl");
+    const handed = JSON.stringify({ type: "assistant", message: { id: "m-h", role: "assistant", content: [{ type: "tool_use", id: "t-h", name: "SubagentHandback", input: { message } }], usage: { input_tokens: 1, output_tokens: 1 } } });
+    writeFileSync(child, [user("Review 031/N001 through the lead lens."), said("reading the work"), handed].join("\n") + "\n");
+    writeFileSync(join(root, "agent-h.meta.json"), JSON.stringify({ agentType: "spn-devex:spn-panel" }));
+    stop(root, { cwd: root, session_id: "sp", agent_id: "h", agent_transcript_path: child });
+    const log = join(root, ".spndevex", ".debug", "telemetry", "hooks.jsonl");
+    return existsSync(log) ? readFileSync(log, "utf8").trim().split("\n").filter(Boolean).map((line) => JSON.parse(line)).filter((row) => row.mtype === "PANEL") : [];
+  };
+  const handed = handback("panel-handback", "Pass with advice\n\n**Lead:** the plan is the right size.");
+  check("[MKT.HOOKS.442] a panel that ends by handing its report back writes one PANEL row with the verdict the report opens with",
+    handed.length === 1 && handed[0].verdict === "PASS_WITH_ADVICE" && handed[0].lens === "LEAD", JSON.stringify(handed));
+  const handedNone = handback("panel-handback-none", "Read the plan; see below.\n\nPass");
+  check("[MKT.HOOKS.442] a handed-back report that opens with no verdict writes no row", handedNone.length === 0, JSON.stringify(handedNone));
   const off = join(BASE, "panel-off");
   mkdirSync(join(off, ".spndevex"), { recursive: true });
   const offChild = join(off, "agent-o.jsonl");
