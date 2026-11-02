@@ -36,15 +36,18 @@ description: Carry out a go. Use the moment the developer gives the go on one ar
 
 1. The scope: every arc the go covers is DECIDED and its sheet reads whole (`workstream sheet check`).
 2. Drift: `workstream state check --facts`, and `sheet edit` for each entry whose fact moved.
-3. The plan: `workstream go write <lead> --scope …`, then `go show` to read it.
+3. The plan: before a go, the lead runs `go propose` and puts the scope to the developer; then `workstream go write <lead> --scope …`, and `go show` to read it.
 4. Baselines: `go start` each repository's baseline, and record what already fails.
 5. The parts: launch each part's brief, a pass at a time; fold each report with `report write`.
    Run the parts three or four at a time, each on a Sonnet helper. Review, and the developer, stay with the main agent.
+   Apply each patch after its base check, then connect. The baseline runs the new cases on the base. A code part formats before its proof.
    A repository's apply part is the lead's own: make the light entries' edits, then `go start <lead> apply-<repo>` applies the patches and commits them. That part has no brief and no report.
    Each brief carries the line that a helper meeting a name, a shape or a construct no entry holds stops, returns `needs-you` and lists it under `unnamed:`; `report write` refuses `landed` while it lists one (`RULE.DEVEX.WORKSPACE.495` · MUST · check:split-plan).
    A change from the developer mid-run: let what is running finish, `go check` to hold the parts it
    touches, update their entries and the preview and show it, then `go write` again before they run.
    A change that rewrites the approach page's What decides its figure in the same pass (`RULE.DEVEX.WORKSPACE.497` · MUST · check:doc-check): a figure, or the one `<!-- no figure: … -->` line.
-6. Full runs: `go start` each repository's full run, with the runner's reuse on, so only what changed runs; every code row lands on it.
+6. Full runs: `go start` each repository's full run, once, with the runner's reuse on, so only what changed runs; every code row lands on it.
+   The fix pass reads each failure against its entry's trace and reruns only what the fix reaches.
 7. Generated files, then the release chain, in the order the sheets set.
 8. Close: `go check` prints nothing, and every row of the scope is LANDED; then `workstream close <workstream>`.
+   When an arc lands, the lead runs `debug cost review` and raises each finding as a suggestion.
