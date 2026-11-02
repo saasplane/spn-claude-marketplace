@@ -135,8 +135,17 @@ export const SPDevExWorkspaceTelemetryRowType = Object.freeze({
   COMMAND: 'COMMAND',
   TEST: 'TEST',
   PANEL: 'PANEL',
+  FILE: 'FILE',
 });
 export type SPDevExWorkspaceTelemetryRowType = (typeof SPDevExWorkspaceTelemetryRowType)[keyof typeof SPDevExWorkspaceTelemetryRowType];
+
+export const SPDevExWorkspaceTelemetryToolType = Object.freeze({
+  READ: 'READ',
+  EDIT: 'EDIT',
+  WRITE: 'WRITE',
+  MULTI_EDIT: 'MULTI_EDIT',
+});
+export type SPDevExWorkspaceTelemetryToolType = (typeof SPDevExWorkspaceTelemetryToolType)[keyof typeof SPDevExWorkspaceTelemetryToolType];
 
 export const SPDevExWorkspaceTelemetryVersionType = Object.freeze({
   V1: 1,
@@ -210,5 +219,5 @@ export function stageOf(skill: string | null | undefined, work: string | null | 
 export const TELEMETRY_VALUES = Object.freeze({
   SPDevExWorkstreamWorkType, SPDevExAgentHookVerdictType, SPDevExWorkspaceTelemetryEventType, SPDevExAgentSkillType,
   SPDevExAgentLensType, SPDevExAgentPanelVerdictType, SPDevExStageType, SPTestTierType, SPDocBehaviourStatusType,
-  SPDevExWorkspaceTelemetryRowType, SPDevExWorkspaceTelemetryVersionType,
+  SPDevExWorkspaceTelemetryRowType, SPDevExWorkspaceTelemetryToolType, SPDevExWorkspaceTelemetryVersionType,
 });

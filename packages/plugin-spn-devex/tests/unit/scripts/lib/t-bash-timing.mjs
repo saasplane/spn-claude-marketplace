@@ -297,5 +297,41 @@ console.log("\n=== a background test run is written from its verdict — MKT.SCR
   same("[MKT.SCRIPTS.330] a verdict is written once, however many calls follow", logOf(root).filter((one) => one.mtype === "TEST").length, 2);
 }
 
+console.log("\n=== a file tool writes a FILE row — MKT.SCRIPTS.500");
+{
+  const root = workspace("2p-file", ON);
+  const edit = { session_id: "sess-2p", hook_event_name: "PostToolUse", tool_name: "Edit", tool_use_id: "toolu_e1", cwd: root,
+    tool_input: { file_path: join(root, "spn-infra-ts", "src", "a.ts"), old_string: "x", new_string: ".spndevex/workstreams/open/035-org-shape/arcs/N013/state.json" },
+    tool_response: {}, duration_ms: 12 };
+  hook("closed", edit);
+  hook("closed", { ...edit, tool_name: "Grep", tool_use_id: "toolu_g1" });
+  const rows = logOf(root).filter((line) => line.mtype === "FILE");
+  same("[MKT.SCRIPTS.500] an Edit call writes one FILE row, and a tool that is not a file tool writes none", rows.length, 1);
+  same("[MKT.SCRIPTS.500] the row names the tool, the file as <repo>:<path>, a null entry and the tool's own time", [rows[0]?.event, rows[0]?.tool, rows[0]?.file, rows[0]?.entry, rows[0]?.ms], ["PostToolUse", "EDIT", "spn-infra-ts:src/a.ts", null, 12]);
+  same("[MKT.SCRIPTS.500] the row carries the call's workstream and arc", [rows[0]?.workstream, rows[0]?.arc], ["035-org-shape", "N013"]);
+}
+
+console.log("\n=== a FILE row names the entry the file serves in the call's part — MKT.SCRIPTS.500");
+{
+  const root = workspace("2p-file-entry", ON);
+  const ws = join(root, ".spndevex", "workstreams", "open", "035-org-shape");
+  const part = (id, entries) => ({ id, repo: "spn-infra-ts", work: "CODE", entries, tests: [], minutes: null, measuredFrom: "", waitsOn: [],
+    model: "sonnet", signature: entries.map((_, at) => `h${at}`).join("."), state: "running" });
+  mkdirSync(join(ws, "arcs", "N011"), { recursive: true });
+  mkdirSync(join(ws, "arcs", "N013"), { recursive: true });
+  writeFileSync(join(ws, "arcs", "N011", "go.json"), JSON.stringify({ schemaVersion: 1, lead: "N011", scope: ["N011", "N013"],
+    writtenAt: "2026-11-03T00:00:00.000Z", parts: [part("code-spn-infra-ts-1", ["N013/E1", "N013/E2"])] }));
+  writeFileSync(join(ws, "arcs", "N013", "sheet.json"), JSON.stringify({ schemaVersion: 1, releaseChain: [], dependsOn: [], stack: null,
+    entries: [{ id: "E1", file: "spn-infra-ts:src/b.ts" }, { id: "E2", file: "spn-infra-ts:src/a.ts" }] }));
+  const order = join(ws, "notes", "N011", "orders", "code-spn-infra-ts-1.md");
+  const edit = (path, id) => ({ session_id: "sess-2p", hook_event_name: "PostToolUse", tool_name: "Edit", tool_use_id: id, cwd: root,
+    tool_input: { file_path: join(root, "spn-infra-ts", "src", path), old_string: "x", new_string: order }, tool_response: {}, duration_ms: 3 });
+  hook("closed", edit("a.ts", "toolu_e2"));
+  hook("closed", edit("c.ts", "toolu_e3"));
+  const rows = logOf(root).filter((line) => line.mtype === "FILE");
+  same("[MKT.SCRIPTS.500] a file one of the part's entries names carries that entry, and one no entry names carries null", rows.map((row) => [row.part, row.entry]),
+    [["code-spn-infra-ts-1", "N013/E2"], ["code-spn-infra-ts-1", null]]);
+}
+
 console.log(failed ? `\n  ${failed} of ${total} FAILED — bash timing` : `\n  all ${total} passed — bash timing`);
 process.exit(failed ? 1 : 0);
