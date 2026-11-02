@@ -35,6 +35,7 @@ import { USAGE_LOG } from "../../lib/usage.ts";
 import { isFullRun, nextStep, renameGo, save } from "./go.ts";
 import { renameFirstRead } from "./sheet.ts";
 import { readSplit } from "../debug/cost.ts";
+import { refusalsOf } from "./close.ts";
 
 export const describe = "a child's hand-back, folded into its row from the report's front matter";
 
@@ -71,7 +72,10 @@ function splitLine(ws: string, arc: string, rowId: string): string | null {
     const root = workspaceOf(ws);
     if (!root) return null;
     const found = readSplit(root, `${basename(ws)}/${arc}`).find((one) => one.key === `${arc} · row ${rowId}`);
-    const share = (kind: "change" | "proof" | "managing" | "refusals"): string => `${kind} ${found ? `${found[kind].calls} · ${found[kind].minutes}m` : "0 · 0m"}`;
+    const share = (kind: "change" | "proof" | "managing" | "refusals"): string => {
+      const one = found ? (kind === "refusals" ? refusalsOf(found) : found[kind]) : null;
+      return `${kind} ${one ? `${one.calls} · ${one.minutes}m` : "0 · 0m"}`;
+    };
     return `row ${rowId} split: ${(["change", "proof", "managing", "refusals"] as const).map(share).join(" · ")}`;
   } catch { return null; }
 }

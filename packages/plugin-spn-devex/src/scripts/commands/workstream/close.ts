@@ -76,12 +76,16 @@ type Retro = {
 
 const SPLIT_KINDS = ["change", "proof", "managing", "refusals", "waiting"] as const;
 
+/** A split row's refusals: the refused calls of every class, counted where each keeps its class (`debug cost`), with no minutes of their own. */
+export const refusalsOf = (row: SplitRow): { calls: number; minutes: number } =>
+  ({ calls: Object.entries(row).reduce((sum, [key, share]) => sum + (key === "key" ? 0 : (share as { refused?: number }).refused ?? 0), 0), minutes: 0 });
+
 /** The split of a workstream: its arcs' lines added together, and the ratio of managing to change by minutes. */
 export function splitOf(root: string, name: string): Pick<Retro, "split" | "managingToChange"> {
   const split = Object.fromEntries(SPLIT_KINDS.map((kind) => [kind, { calls: 0, minutes: 0 }])) as Retro["split"];
   for (const row of readSplit(root, name) as SplitRow[]) {
     if (row.key.includes(" · part ")) continue;
-    for (const kind of SPLIT_KINDS) { split[kind].calls += row[kind].calls; split[kind].minutes = Math.round((split[kind].minutes + row[kind].minutes) * 10) / 10; }
+    for (const kind of SPLIT_KINDS) { const share = kind === "refusals" ? refusalsOf(row) : row[kind]; split[kind].calls += share.calls; split[kind].minutes = Math.round((split[kind].minutes + share.minutes) * 10) / 10; }
   }
   return { split, managingToChange: split.change.minutes > 0 ? Math.round((split.managing.minutes / split.change.minutes) * 100) / 100 : null };
 }

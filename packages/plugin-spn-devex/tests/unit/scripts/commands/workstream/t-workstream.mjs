@@ -582,7 +582,7 @@ console.log("\n=== the change sheet — the opening write, and a row's entries")
 console.log("\n=== landing on a run — a sheet arc holds the agent to the sheet");
 {
   const row = (id, work, over = {}) => ({ id, parent: "N001", title: `row ${id}`, kind: "change", repo: "spn-x", work, blockedBy: [], touches: [], state: "ready", ...over });
-  const entry = (id, tiers) => ({ id, op: "edit", file: "spn-x:a.ts", what: `change ${id}`, decidedBy: [], facts: ["f1"], then: [], rules: [], callers: [], tiers, docs: [], book: [] });
+  const entry = (id, tiers) => ({ id, op: "edit", file: "spn-x:a.ts", what: `change ${id}`, decidedBy: [], facts: ["f1"], then: [], rules: [], callers: [], tiers, docs: [], book: [], trace: "why", judged: false });
   const sheetWith = (entries) => ({ schemaVersion: 1, releaseChain: [], dependsOn: [], stack: { folder: "x", dmo: "none", reset: "x" }, entries });
   const later = new Date(Date.now() + 3600e3).toISOString();
   const runFile = (base, tier, results, { name = "r1", ranAt = later } = {}) => put(base, `pkg/tests/.output/${tier}/runs/${name}.json`,
@@ -703,7 +703,7 @@ console.log("\n=== a proof row lands on a full run of the same tree; on a moved 
   const results = [["U.1", "SUCCESS"], ["U.2", "SUCCESS"]].map(([id, status]) => ({ id, tier: "unit", status, title: id }));
   put(full.repo, "pkg/tests/.output/unit/runs/r2.json", JSON.stringify({ run: "r2", tier: "unit", ranAt: "2026-01-02T12:00:00Z", env: "local", results }));
   put(full.repo, "pkg/tests/.output/unit/runs/r2.stamp.json", JSON.stringify({ narrowed: false, content: contentAt(first) }));
-  const entry = (id, file, unit) => ({ id, op: "edit", file, what: `change ${id}`, decidedBy: [], facts: ["f1"], then: [], rules: [], callers: [], tiers: { unit }, docs: [], book: [] });
+  const entry = (id, file, unit) => ({ id, op: "edit", file, what: `change ${id}`, decidedBy: [], facts: ["f1"], then: [], rules: [], callers: [], tiers: { unit }, docs: [], book: [], trace: "why", judged: false });
   writeFileSync(join(full.ws, "arcs", "N001", "sheet.json"), JSON.stringify({ schemaVersion: 1, releaseChain: [], dependsOn: [], stack: { folder: "x", dmo: "none", reset: "x" }, entries: [entry("E1", "spn-x:pkg/a.ts", ["U.1"]), entry("E2", "spn-x:pkg/b.ts", ["U.2"])] }, null, 2));
   const data = json(arcPath);
   data.rows.find((one) => one.id === "1").commits = { "spn-x": [readme] };
@@ -751,7 +751,7 @@ console.log("\n=== an arc title is a topic name");
 
 console.log("\n=== a marketplace's own run file is found");
 {
-  const entry = { id: "E1", op: "edit", file: "spn-x:a.ts", what: "change E1", decidedBy: [], facts: ["f1"], then: [], rules: [], callers: [], tiers: { unit: ["U.1"] }, docs: [], book: [] };
+  const entry = { id: "E1", op: "edit", file: "spn-x:a.ts", what: "change E1", decidedBy: [], facts: ["f1"], then: [], rules: [], callers: [], tiers: { unit: ["U.1"] }, docs: [], book: [], trace: "why", judged: false };
   const row = { id: "1", parent: "N001", title: "r", kind: "change", repo: "spn-x", work: "CODE", blockedBy: [], touches: [], state: "ready", entries: ["E1"] };
   const market = await dataArc("market", { rows: [row] });
   const sha = market.git(["rev-parse", "HEAD"]);
@@ -793,7 +793,7 @@ console.log("\n=== report write — a part's report lands the part, and the step
     { id: "2", parent: "N001", title: "build it", kind: "change", repo: "spn-x", work: "CODE", blockedBy: ["1"], touches: [], state: "waiting", entries: ["E2"] },
   ];
   const fold = await dataArc("fold", { rows });
-  const entry = (id, file) => ({ id, op: "edit", file, what: `change ${id}`, decidedBy: ["q1"], facts: ["f1"], then: [], rules: [], callers: [], tiers: { unit: [`T.${id}.01`] }, docs: [], book: [] });
+  const entry = (id, file) => ({ id, op: "edit", file, what: `change ${id}`, decidedBy: ["q1"], facts: ["f1"], then: [], rules: [], callers: [], tiers: { unit: [`T.${id}.01`] }, docs: [], book: [], trace: "why", judged: false });
   const sheetIn = join(fold.root, "sheet-in.json");
   writeFileSync(sheetIn, JSON.stringify({ schemaVersion: 1, releaseChain: ["spn-x"], dependsOn: [], stack: { folder: "the spn-x checkout", dmo: "none", reset: "from empty" }, entries: [entry("E1", "spn-x:docs/a.md"), entry("E2", "spn-x:src/b.ts")] }));
   cli(fold.root, ["workstream", "fact", "write", "N001", "--source", "spn-x/a.ts", "--fact", "a is 1", "--used-by", "1"]);
@@ -860,7 +860,7 @@ console.log("\n=== question answer — a card settled in one call; addresses rea
 {
   const one = await dataWorkspace("settle");
   const sheetFile = join(one.ws, "arcs", "N001", "sheet.json");
-  const entry = (id) => ({ id, op: "edit", file: "spn-x:a.ts", what: "x", decidedBy: ["an earlier word"], facts: [], then: [], rules: [], callers: [], tiers: {}, docs: [], book: [] });
+  const entry = (id) => ({ id, op: "edit", file: "spn-x:a.ts", what: "x", decidedBy: ["an earlier word"], facts: [], then: [], rules: [], callers: [], tiers: {}, docs: [], book: [], trace: "why", judged: false });
   put(one.root, ".spndevex/workstreams/open/031-probe/arcs/N001/sheet.json", JSON.stringify({ schemaVersion: 1, releaseChain: [], dependsOn: [], stack: null, entries: [entry("E7"), entry("E9")] }));
   put(one.root, "card.json", JSON.stringify(CARD));
   const raised = cli(one.root, ["workstream", "question", "raise", "031/N001", "--file", "card.json"]);
@@ -932,7 +932,7 @@ console.log("\n=== work write — altitude and pass become work in every open wo
 console.log("\n=== go start — a release part starts, a helper's part does not (MKT.SCRIPTS.326)");
 {
   const rel = await dataArc("go-release", { rows: [{ id: "1", parent: "N001", title: "r", kind: "change", repo: "spn-x", work: "DOCS", blockedBy: [], touches: [], state: "ready", entries: ["E1"] }] });
-  const entry = { id: "E1", op: "edit", file: "spn-x:docs/a.md", what: "x", decidedBy: ["q1"], facts: [], then: [], rules: [], callers: [], tiers: {}, docs: [], book: [] };
+  const entry = { id: "E1", op: "edit", file: "spn-x:docs/a.md", what: "x", decidedBy: ["q1"], facts: [], then: [], rules: [], callers: [], tiers: {}, docs: [], book: [], trace: "why", judged: false };
   writeFileSync(join(rel.ws, "arcs", "N001", "sheet.json"), JSON.stringify({ schemaVersion: 1, releaseChain: ["spn-x"], dependsOn: [], stack: null, entries: [entry] }));
   cli(rel.root, ["workstream", "go", "write", "N001", "--scope", "N001"]);
   const goFile = join(rel.ws, "arcs", "N001", "go.json");
@@ -1067,7 +1067,7 @@ console.log("\n=== workstream close — the retrospective counts failed tests, t
     mkdirSync(old, { recursive: true });
     writeFileSync(join(old, "retro.json"), JSON.stringify({ v: 1, workstream: "030-older", at: "2026-09-01T00:00:00Z", stages: {}, works: {}, outcomes: {}, checks: {}, parts: {}, shape: {}, ungated: [], commands: {} }));
     mkdirSync(join(w.root, ".spndevex", ".debug", "telemetry"), { recursive: true });
-    const entry = { id: "E1", op: "edit", file: "spn-x:docs/a.md", what: "x", decidedBy: ["q1"], facts: [], then: [], rules: [], callers: [], tiers: {}, docs: [], book: [] };
+    const entry = { id: "E1", op: "edit", file: "spn-x:docs/a.md", what: "x", decidedBy: ["q1"], facts: [], then: [], rules: [], callers: [], tiers: {}, docs: [], book: [], trace: "why", judged: false };
     writeFileSync(join(w.ws, "arcs", "N001", "sheet.json"), JSON.stringify({ schemaVersion: 1, releaseChain: ["spn-x"], dependsOn: [], stack: null, entries: [entry] }));
     // rows of the arc's state are DOCS rows of repo spn-x already; the go derives a docs part and a release part
     cli(w.root, ["workstream", "go", "write", "N001", "--scope", "N001"]);
@@ -1087,7 +1087,7 @@ console.log("\n=== workstream close — the retrospective counts failed tests, t
     const gatedGo = async (name) => {
       const w = await dataArc(name, { rows: [{ id: "1", parent: "N001", title: "r", kind: "change", repo: "spn-x", work: "DOCS", blockedBy: [], touches: [], state: "ready", entries: ["E1"] }] });
       mkdirSync(join(w.root, ".spndevex", ".debug", "telemetry"), { recursive: true });
-      const entry = { id: "E1", op: "edit", file: "spn-x:docs/a.md", what: "x", decidedBy: ["q1"], facts: [], then: [], rules: [], callers: [], tiers: {}, docs: [], book: [] };
+      const entry = { id: "E1", op: "edit", file: "spn-x:docs/a.md", what: "x", decidedBy: ["q1"], facts: [], then: [], rules: [], callers: [], tiers: {}, docs: [], book: [], trace: "why", judged: false };
       writeFileSync(join(w.ws, "arcs", "N001", "sheet.json"), JSON.stringify({ schemaVersion: 1, releaseChain: ["spn-x"], dependsOn: [], stack: null, entries: [entry] }));
       cli(w.root, ["workstream", "go", "write", "N001", "--scope", "N001"]);
       return { w, release: json(join(w.ws, "arcs", "N001", "go.json")).parts.find((one) => one.work === "RELEASE") };
@@ -1178,7 +1178,7 @@ console.log("\n=== a go over a mixed scope: a numbered arc and the ideate arc (Q
   const mixed = await dataArc("mixed-scope", { rows });
   const run = (...args) => cli(mixed.root, ["workstream", ...args]);
   const sheetOf = (file) => JSON.stringify({ schemaVersion: 1, releaseChain: ["spn-x"], dependsOn: [], stack: { folder: "the spn-x checkout", dmo: "none", reset: "from empty" },
-    entries: [{ id: "E1", op: "edit", file, what: "change E1", decidedBy: ["q1"], facts: ["f1"], then: [], rules: [], callers: [], tiers: { unit: ["T.E1.01"] }, docs: [], book: [] }] });
+    entries: [{ id: "E1", op: "edit", file, what: "change E1", decidedBy: ["q1"], facts: ["f1"], then: [], rules: [], callers: [], tiers: { unit: ["T.E1.01"] }, docs: [], book: [], trace: "why", judged: false }] });
   writeFileSync(join(mixed.root, "sheet-n001.json"), sheetOf("spn-x:docs/a.md"));
   writeFileSync(join(mixed.root, "sheet-ideate.json"), sheetOf("spn-x:docs/b.md"));
   run("fact", "write", "N001", "--source", "spn-x/a.ts", "--fact", "a is 1", "--used-by", "1");
