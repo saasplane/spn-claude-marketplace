@@ -69,6 +69,13 @@ function writeFaults(ws: string, arc: string, sheet: Sheet, whole: boolean): str
   for (const entry of Array.isArray(sheet.entries) ? sheet.entries : [])
     if (typeof entry?.work === "string" && !ENTRY_WORK.includes(entry.work))
       out.push(`${entry.id} names work ${entry.work} — an entry's work is DOCS, CODE or GENERATED, or left out and read from its file`);
+  // A NEW ENTRY CARRIES ITS THINKING: `trace` as text and `judged` as true or false; an entry the stored sheet already holds is read as it was.
+  const stored = new Set((readSheet(ws, arc)?.entries ?? []).map((one) => one.id));
+  for (const entry of Array.isArray(sheet.entries) ? sheet.entries : []) {
+    if (stored.has(entry?.id)) continue;
+    if (typeof entry?.trace !== "string" || !entry.trace.trim()) out.push(`${entry?.id} is new and has no \`trace\`, the thinking behind the change`);
+    if (typeof entry?.judged !== "boolean") out.push(`${entry?.id} is new and has no \`judged\` (true for a judgment, false for a mechanical change)`);
+  }
   const held = new Set(readJsonl(factsFileOf(ws, arc)).map((line) => (line as Fact | undefined)?.id));
   for (const entry of Array.isArray(sheet.entries) ? sheet.entries : [])
     for (const id of Array.isArray(entry?.facts) ? entry.facts : [])
@@ -193,13 +200,19 @@ function tiersOf(text: string): Record<string, string[]> {
   return out;
 }
 
-const EDIT_LISTS: Record<string, keyof SheetEntry> = {
+/** `--judged` as true and `--mechanical` as false, null where neither was typed. */
+function judgedOf(words: { given: (name: string) => boolean }): boolean | null {
+  if (words.given("judged") && words.given("mechanical")) throw new UsageFault("takes `--judged` or `--mechanical`, not both.");
+  return words.given("judged") ? true : words.given("mechanical") ? false : null;
+}
+
+const EDIT_LISTS:Record<string, keyof SheetEntry> = {
   "decided-by": "decidedBy", facts: "facts", then: "then", rules: "rules", callers: "callers", docs: "docs", book: "book",
 };
 
 function edit(args: string[]): number {
   const words = readWords(args, {
-    what: VALUE, op: ENTRY_OPS, file: VALUE, "decided-by": VALUE, facts: VALUE, then: VALUE, rules: VALUE, callers: VALUE, docs: VALUE, book: VALUE, tiers: VALUE,
+    what: VALUE, op: ENTRY_OPS, file: VALUE, "decided-by": VALUE, facts: VALUE, then: VALUE, rules: VALUE, callers: VALUE, docs: VALUE, book: VALUE, tiers: VALUE, trace: VALUE, judged: FLAG, mechanical: FLAG,
   });
   const [ref, id, ...more] = words.paths;
   if (!id || more.length) throw new UsageFault("takes an arc and one entry: `sheet edit <workstream>/<arc> <E> [--what …] [--tiers …] …`.");
@@ -219,6 +232,10 @@ function edit(args: string[]): number {
   }
   const tiers = words.value("tiers");
   if (tiers !== null) { next.tiers = tiersOf(tiers); changed.push("tiers"); }
+  const trace = words.value("trace");
+  if (trace !== null) { next.trace = trace; changed.push("trace"); }
+  const judgement = judgedOf(words);
+  if (judgement !== null) { next.judged = judgement; changed.push("judged"); }
   if (!changed.length) throw new UsageFault("changes nothing: name a field to change.");
   const entries = sheet.entries.map((one, place) => (place === at ? next : one));
   const faults = writeFaults(ws, arc, { ...sheet, entries }, false);
@@ -262,9 +279,9 @@ const gitIn = (dir: string, args: string[]): string =>
  * for it, written to `patches/<E>.diff` beside the sheet, named by the entry's `patch`, and the file is reset in the worktree.
  */
 function patch(args: string[]): number {
-  const words = readWords(args);
+  const words = readWords(args, { trace: VALUE, judged: FLAG, mechanical: FLAG });
   const [ref, id, ...more] = words.paths;
-  if (!id || more.length) throw new UsageFault("takes an arc and one entry: `sheet patch <workstream>/<arc> <E>`.");
+  if (!id || more.length) throw new UsageFault("takes an arc and one entry: `sheet patch <workstream>/<arc> <E> [--trace \"…\"] [--judged|--mechanical]`.");
   const { ws, arc } = arcNamed(ref);
   const sheet = sheetOf(ws, arc);
   const at = sheet.entries.findIndex((one) => one.id === id);
@@ -281,6 +298,10 @@ function patch(args: string[]): number {
   if (!diff.trim()) return refused([`${where.rel} holds no change against ${pinned.commit} in ${where.dir}, so ${id} has nothing to keep`]);
   const file = `patches/${id}.diff`;
   const next: SheetEntry = { ...entry, patch: { file, base: pinned.commit } };
+  const traced = words.value("trace");
+  if (traced !== null) next.trace = traced;
+  const judgement = judgedOf(words);
+  if (judgement !== null) next.judged = judgement;
   const entries = sheet.entries.map((one, place) => (place === at ? next : one));
   const faults = writeFaults(ws, arc, { ...sheet, entries }, false);
   if (faults.length) return refused(faults);
@@ -317,7 +338,7 @@ function entryLine(entry: SheetEntry): { head: string; tail: string } {
 function show(args: string[]): number {
   const words = readWords(args, { row: VALUE, part: VALUE, json: FLAG });
   const [ref, ...more] = words.paths;
-  if (more.length) throw new UsageFault("takes one arc.");
+  if (more.length) throw new UsageFault(`takes one arc: it read ${ref} and not ${more.join(", ")}; run \`sheet show\` once for each arc.`);
   const { ws, arc } = arcNamed(ref);
   renameFirstRead(ws, arc);
   const sheet = readSheet(ws, arc);
@@ -327,13 +348,19 @@ function show(args: string[]): number {
   let entries = sheet.entries;
   if (partId !== null) {
     // The go plan that covers the arc holds the part: a plan's lead is its folder, and its scope names every arc it covers.
-    const part = arcIdsOf(ws).map((lead) => readGo(ws, lead)).filter((plan) => plan?.scope.includes(arc)).flatMap((plan) => plan!.parts).find((one) => one.id === partId);
-    if (!part) throw new UsageFault(`finds no part ${partId} in a go plan that covers ${arc}: \`go show ${arc}\` lists the parts.`);
+    const plans = arcIdsOf(ws).map((lead) => readGo(ws, lead)).filter((plan) => plan !== null && plan !== undefined);
+    const covering = plans.filter((plan) => plan!.scope.includes(arc));
+    const part = covering.flatMap((plan) => plan!.parts).find((one) => one.id === partId);
+    if (!part) {
+      const listed = (covering.length ? covering : plans).flatMap((plan) => plan!.parts).map((one) => one.id);
+      throw new UsageFault(`finds no part ${partId} in a go plan that covers ${arc}${covering.length ? "" : " (no plan covers it)"}; the plan${covering.length === 1 || (!covering.length && plans.length === 1) ? "'s" : "s'"} parts are ${listed.length ? listed.join(", ") : "none"}: \`go show ${arc}\` lists them.`);
+    }
     entries = entries.filter((one) => part.entries.includes(`${arc}/${one.id}`));
   }
   if (rowId !== null) {
-    const row = readArc(ws, arc)?.rows.find((one) => one.id === rowId);
-    if (!row) throw new UsageFault(`finds no row ${rowId} in ${arc}.`);
+    const all = readArc(ws, arc)?.rows ?? [];
+    const row = all.find((one) => one.id === rowId);
+    if (!row) throw new UsageFault(`finds no row ${rowId} in ${arc}; its rows are ${all.length ? all.map((one) => one.id).join(", ") : "none"}.`);
     entries = entries.filter((one) => row.entries?.includes(one.id));
   }
   if (words.given("json")) { console.log(JSON.stringify({ ...sheet, entries }, null, 2)); return 0; }
@@ -347,6 +374,35 @@ function show(args: string[]): number {
     for (const need of sheet.needsRelease as { repo: string; release: string; command: string }[])
       console.log(`needs release · ${need.repo} ${need.release} ships ${need.command}`);
   console.log("--json for every field");
+  return 0;
+}
+
+/**
+ * `sheet reach <arc> <E>`: the entries a change to E reaches, one step out — those that share a `decidedBy` card or section,
+ * a fact or the file, that E names in `callers`, or whose file E's `then` commands name — with their files and the preview
+ * sections E's and their `decidedBy` name. A re-patch rewrites only E's own diff.
+ */
+function reach(args: string[]): number {
+  const words = readWords(args);
+  const [ref, id, ...more] = words.paths;
+  if (!id || more.length) throw new UsageFault("takes an arc and one entry: `sheet reach <workstream>/<arc> <E>`.");
+  const { ws, arc } = arcNamed(ref);
+  const sheet = sheetOf(ws, arc);
+  const from = sheet.entries.find((one) => one.id === id);
+  if (!from) throw new UsageFault(`finds no entry ${id} in ${arc}'s sheet.`);
+  const shares = (a: readonly string[], b: readonly string[]): boolean => a.some((one) => b.includes(one));
+  const pathOf = (file: string): string => file.slice(file.indexOf(":") + 1);
+  const reached = sheet.entries.filter((one) => one.id !== id && (
+    shares(from.decidedBy, one.decidedBy) || shares(from.facts, one.facts) || one.file === from.file
+    || from.callers.some((caller) => pathOf(one.file).endsWith(caller) || caller.endsWith(pathOf(one.file)))
+    || from.then.some((command) => command.includes(pathOf(one.file)))));
+  const all = [from, ...reached];
+  const files = [...new Set(all.map((one) => one.file))];
+  const sections = [...new Set(all.flatMap((one) => one.decidedBy))];
+  console.log(`${id} reaches ${all.length} of ${sheet.entries.length} entries · ${files.length} file${files.length === 1 ? "" : "s"} · ${sections.length} section${sections.length === 1 ? "" : "s"}`);
+  for (const one of all) console.log(`  ${one.id}  ${one.file}`);
+  console.log(`sections: ${sections.join(", ") || "none"}`);
+  console.log(`a re-patch rewrites only patches/${id}.diff`);
   return 0;
 }
 
@@ -465,6 +521,11 @@ export function sheetFindings(ws: string, arc: string): string[] {
     if (!held.has(id)) out.push(`row ${row.id} names ${id}, which the sheet does not hold`);
   }
   for (const entry of entries) if (!named.has(entry.id)) out.push(`${entry.id} is named by no row`);
+  // A JUDGED ENTRY KEEPS ITS CHANGE AND ITS THINKING: a diff from `sheet patch` and a `trace`.
+  for (const entry of entries.filter((one) => one.judged === true)) {
+    if (!entry.patch) out.push(`${entry.id} is judged and has no patch: \`sheet patch ${arc} ${entry.id}\` keeps its change`);
+    if (typeof entry.trace !== "string" || !entry.trace.trim()) out.push(`${entry.id} is judged and has no trace: \`sheet edit ${arc} ${entry.id} --trace "…"\``);
+  }
   // A RELEASE or PROOF row names its files through no entry, so it is never this finding.
   for (const row of leaves.filter((one) => ["DOCS", "CODE", "GENERATED"].includes(one.work ?? "") && !(one.entries ?? []).length))
     out.push(`row ${row.id} names no entry`);
@@ -562,9 +623,10 @@ function check(args: string[]): number {
 
 export const actions: Record<string, Action> = {
   write: { describe: "write the arc's whole sheet from a file, every entry validated and every fact one the arc holds", usage: "<workstream>/<arc> --file <sheet.json>", run: write },
-  edit: { describe: "change one entry of the sheet; a missing entry is refused, and `sheet write` is named", usage: "<workstream>/<arc> <E> [--what …] [--op …] [--file …] [--decided-by …] [--facts …] [--then …] [--rules …] [--callers …] [--docs …] [--book …] [--tiers unit=ID,ID;contract=ID]", run: edit },
+  edit: { describe: "change one entry of the sheet; a missing entry is refused, and `sheet write` is named", usage: "<workstream>/<arc> <E> [--what …] [--op …] [--file …] [--decided-by …] [--facts …] [--then …] [--rules …] [--callers …] [--docs …] [--book …] [--tiers unit=ID,ID;contract=ID] [--trace \"…\"] [--judged|--mechanical]", run: edit },
   drop: { describe: "take an entry out of the sheet; --note carries why into its one log line", usage: "<workstream>/<arc> <E> --note \"…\"", run: drop },
   show: { describe: "print the sheet, or one row's or one go part's entries; --json prints every field", usage: "<workstream>/<arc> [--row <id>] [--part <part>] [--json]", run: show },
-  patch: { describe: "keep an entry's change as a diff against the commit its facts pin, name it in the entry, and reset the file in the worktree", usage: "<workstream>/<arc> <E>", run: patch },
+  patch: { describe: "keep an entry's change as a diff against the commit its facts pin, name it in the entry, and reset the file in the worktree; --trace and --judged/--mechanical are recorded with it", usage: "<workstream>/<arc> <E> [--trace \"…\"] [--judged|--mechanical]", run: patch },
+  reach: { describe: "print the blast radius of one entry: the entries, files and preview sections a change to it reaches", usage: "<workstream>/<arc> <E>", run: reach },
   check: { describe: "read the sheet against the rows and the cards, one finding to a line; exits 1 on any", usage: "<workstream>/<arc>", run: check },
 };

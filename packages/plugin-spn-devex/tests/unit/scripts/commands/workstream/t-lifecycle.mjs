@@ -77,7 +77,7 @@ console.log("\n=== close: an unfinished plan refuses it");
   ];
   const { root, ws } = await dataWorkspace("lifecycle-close", { rows });
   const closed = join(root, ".spndevex", "workstreams", "closed", "031-probe");
-  const entry = { id: "E1", op: "edit", file: "spn-x:docs/a.md", what: "change E1", decidedBy: ["q1"], facts: ["f1"], then: [], rules: [], callers: [], tiers: { unit: ["T.E1.01"] }, docs: [], book: [] };
+  const entry = { id: "E1", op: "edit", file: "spn-x:docs/a.md", what: "change E1", decidedBy: ["q1"], facts: ["f1"], then: [], rules: [], callers: [], tiers: { unit: ["T.E1.01"] }, docs: [], book: [], trace: "why E1", judged: false };
   const sheetIn = join(root, "sheet-in.json");
   writeFileSync(sheetIn, JSON.stringify({ schemaVersion: 1, releaseChain: ["spn-x"], dependsOn: [], stack: { folder: "the spn-x checkout", dmo: "none", reset: "from empty" }, entries: [entry] }));
   cli(root, ["workstream", "fact", "write", "N001", "--source", "spn-x/a.ts", "--fact", "a is 1", "--used-by", "1"]);
@@ -146,7 +146,7 @@ console.log("\n=== go write: a release order line that is not a repository's nam
     { id: "1", parent: "N001", title: "write the book", kind: "change", repo: "spn-x", work: "DOCS", blockedBy: [], touches: ["spn-x:docs"], state: "ready", entries: ["E1"] },
   ];
   const { root, ws } = await dataWorkspace("lifecycle-chain", { rows });
-  const entry = { id: "E1", op: "edit", file: "spn-x:docs/a.md", what: "change E1", decidedBy: ["q1"], facts: ["f1"], then: [], rules: [], callers: [], tiers: {}, docs: [], book: [] };
+  const entry = { id: "E1", op: "edit", file: "spn-x:docs/a.md", what: "change E1", decidedBy: ["q1"], facts: ["f1"], then: [], rules: [], callers: [], tiers: {}, docs: [], book: [], trace: "why E1", judged: false };
   const sheetIn = join(root, "sheet-in.json");
   writeFileSync(sheetIn, JSON.stringify({ schemaVersion: 1, releaseChain: ["spn-x: one docs pull request into develop"], dependsOn: [], stack: { folder: "the spn-x checkout", dmo: "none", reset: "from empty" }, entries: [entry] }));
   cli(root, ["workstream", "fact", "write", "N001", "--source", "spn-x/a.ts", "--fact", "a is 1", "--used-by", "1"]);

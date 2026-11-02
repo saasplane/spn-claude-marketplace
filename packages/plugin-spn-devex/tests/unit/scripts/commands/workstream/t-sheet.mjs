@@ -22,7 +22,7 @@ const stateFile = join(ws, "arcs", "N001", "state.json");
 
 const entry = (id, over = {}) => ({
   id, op: "edit", file: `spn-x:packages/mod/src/app/services/Thing${id}.ts`, what: `change ${id}`, decidedBy: ["q1"], facts: ["f1"],
-  then: [], rules: [], callers: [], tiers: { unit: [`T.${id}.01`] }, docs: [], book: [], ...over,
+  then: [], rules: [], callers: [], tiers: { unit: [`T.${id}.01`] }, docs: [], book: [], trace: `why ${id}`, judged: false, ...over,
 });
 const sheetOf = (entries, over = {}) => ({
   schemaVersion: 1, releaseChain: ["merges with the pull request"], dependsOn: [],
@@ -484,6 +484,74 @@ console.log("\n=== the three forms of an arc address: N<nnn>, ideate and follow-
   }
   const unknown = there("show", `${name}/build`);
   ok("an address that is none of the three is refused", unknown.code !== 0, unknown.out);
+}
+
+console.log("\n=== trace and judged (MKT.SCRIPTS.493, .494)");
+{
+  const bare = (id) => { const one = entry(id); delete one.trace; delete one.judged; return one; };
+  const before = existsSync(sheetFile) ? readFileSync(sheetFile, "utf8") : "";
+  const noTrace = sheet("write", "N001", "--file", put("t-a.json", sheetOf([bare("E7")])), "--because", "the developer: a rewrite");
+  ok("[MKT.SCRIPTS.493] write refuses a new entry with no trace and no judged, naming both", noTrace.code === 1 && noTrace.out.includes("E7") && noTrace.out.includes("trace") && noTrace.out.includes("judged") && noTrace.out.includes("Nothing was written"), noTrace.out);
+  ok("[MKT.SCRIPTS.493] nothing was written", (existsSync(sheetFile) ? readFileSync(sheetFile, "utf8") : "") === before);
+  const kept = sheet("write", "N001", "--file", put("t-b.json", sheetOf([entry("E1", { trace: "because q1", judged: true, patch: { file: "patches/E1.diff", base: "abcdef1" } }), entry("E2", { judged: false })])), "--because", "the developer: a rewrite");
+  ok("[MKT.SCRIPTS.493] an entry with a trace and a judged is written", kept.code === 0 && json(sheetFile).entries[0].judged === true && json(sheetFile).entries[0].trace === "because q1", kept.out);
+  const raw = sheetOf([entry("E1", { judged: true, patch: { file: "patches/E1.diff", base: "abcdef1" } }), entry("E2", { judged: true, trace: "" })]);
+  writeFileSync(sheetFile, JSON.stringify(raw, null, 2));
+  const flagged = sheet("check", "N001");
+  ok("[MKT.SCRIPTS.494] check names a judged entry with no patch", flagged.out.includes("E2 is judged and has no patch"), flagged.out);
+  ok("[MKT.SCRIPTS.494] check names a judged entry with no trace", flagged.out.includes("E2 is judged and has no trace"), flagged.out);
+  ok("[MKT.SCRIPTS.494] check does not name a judged entry that has a patch and a trace", !flagged.out.includes("E1 is judged"), flagged.out);
+  const traced = sheet("edit", "N001", "E2", "--trace", "the thinking");
+  ok("[MKT.SCRIPTS.494] edit --trace records the trace", traced.code === 0 && json(sheetFile).entries[1].trace === "the thinking", traced.out);
+  const mech = sheet("edit", "N001", "E2", "--mechanical");
+  ok("[MKT.SCRIPTS.494] edit --mechanical records judged false, and the entry is no longer flagged", mech.code === 0 && json(sheetFile).entries[1].judged === false && !sheet("check", "N001").out.includes("E2 is judged"), mech.out);
+  const judgedBack = sheet("edit", "N001", "E2", "--judged");
+  ok("[MKT.SCRIPTS.494] edit --judged records judged true", judgedBack.code === 0 && json(sheetFile).entries[1].judged === true, judgedBack.out);
+  const both = sheet("edit", "N001", "E2", "--judged", "--mechanical");
+  ok("[MKT.SCRIPTS.494] --judged with --mechanical is refused", both.code !== 0, both.out);
+}
+
+console.log("\n=== sheet reach (MKT.SCRIPTS.495)");
+{
+  const three = sheetOf([
+    entry("E1", { decidedBy: ["q1"], facts: ["f1"] }),
+    entry("E2", { decidedBy: ["q1"], facts: ["f1"] }),
+    entry("E3", { decidedBy: ["q9"], facts: ["f9"] }),
+  ]);
+  writeFileSync(sheetFile, JSON.stringify(three, null, 2));
+  const from1 = sheet("reach", "N001", "E1");
+  ok("[MKT.SCRIPTS.495] reach on a three-entry sheet counts the entries, files and sections reached", from1.code === 0 && from1.out.includes("E1 reaches 2 of 3 entries · 2 files · 1 section"), from1.out);
+  ok("[MKT.SCRIPTS.495] it names the reached entry and not the unrelated one", from1.out.includes("  E2  ") && !from1.out.includes("  E3  "), from1.out);
+  ok("[MKT.SCRIPTS.495] it names the sections and the one diff a re-patch rewrites", from1.out.includes("sections: q1") && from1.out.includes("patches/E1.diff"), from1.out);
+  const from3 = sheet("reach", "N001", "E3");
+  ok("[MKT.SCRIPTS.495] an entry that shares nothing reaches only itself", from3.out.includes("E3 reaches 1 of 3 entries"), from3.out);
+  const none = sheet("reach", "N001", "E9");
+  ok("[MKT.SCRIPTS.495] an entry the sheet lacks is refused", none.code !== 0 && none.out.includes("E9"), none.out);
+}
+
+console.log("\n=== show --part with no plan lists the parts (MKT.SCRIPTS.504, .505, .506 follows)");
+{
+  const none = sheet("show", "N001", "--part", "no-such-part");
+  ok("[MKT.SCRIPTS.504] a part no go plan holds is refused, saying no plan covers the arc and naming `go show`", none.code !== 0 && none.out.includes("no-such-part") && none.out.includes("no plan covers it") && none.out.includes("go show"), none.out);
+  const two = sheet("show", "N001", "N002");
+  ok("[MKT.SCRIPTS.505] a second arc is refused, naming the one read", two.code !== 0 && two.out.includes("N002"), two.out);
+}
+
+console.log("\n=== generated copies as missingCopies reads them today (MKT.SCRIPTS.506)");
+{
+  const book = "docs/04-capabilities/01-devex/bar.md";
+  const inRepo = "packages/plugin-spn-devex/src/refs", base = `spn-claude-marketplace/${inRepo}`;
+  mkdirSync(join(root, "spn-foundation", "docs/04-capabilities/01-devex"), { recursive: true });
+  mkdirSync(join(root, base), { recursive: true });
+  writeFileSync(join(root, "spn-foundation", book), "# Bar\n\nplain prose, no rule.\n");
+  writeFileSync(join(root, base, "bar.md"), `RESTATES spn-foundation ${book}\n# Bar\n`);
+  writeFileSync(join(root, base, "other.md"), "# Other\nnever cites the book file\n");
+  const bookEntry = entry("E1", { file: `spn-foundation:${book}` });
+  const without = sheet("write", "N001", "--file", put("c-a.json", sheetOf([bookEntry])), "--because", "the developer: a book change");
+  ok("[MKT.SCRIPTS.506] a copy whose RESTATES header cites the book path is named", without.code === 1 && without.out.includes(`${inRepo}/bar.md`), without.out);
+  ok("[MKT.SCRIPTS.506] a ref that does not cite the book file is not named", !without.out.includes("other.md"), without.out);
+  const covered = sheet("write", "N001", "--file", put("c-b.json", sheetOf([bookEntry, entry("E2", { file: `spn-claude-marketplace:${inRepo}/bar.md` })])), "--because", "the developer: a book change");
+  ok("[MKT.SCRIPTS.506] with an entry for the named copy it is written", covered.code === 0, covered.out);
 }
 
 console.log(failed ? `\n  ${failed} of ${total} FAILED — sheet` : `\n  all ${total} passed — sheet`);

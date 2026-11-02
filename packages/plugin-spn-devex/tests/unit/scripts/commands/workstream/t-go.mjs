@@ -24,7 +24,7 @@ const { root, ws } = await dataWorkspace("go", { rows });
 const goFile = join(ws, "arcs", "N001", "go.json");
 const orders = join(ws, "notes", "N001", "orders");
 const entry = (id, file, over = {}) => ({
-  id, op: "edit", file, what: `change ${id}`, decidedBy: ["q1"], facts: ["f1"], then: [], rules: [], callers: [], tiers: { unit: [`T.${id}.01`] }, docs: [], book: [], ...over,
+  id, op: "edit", file, what: `change ${id}`, decidedBy: ["q1"], facts: ["f1"], then: [], rules: [], callers: [], tiers: { unit: [`T.${id}.01`] }, docs: [], book: [], trace: `why ${id}`, judged: false, ...over,
 });
 const sheetOf = (entries) => ({
   schemaVersion: 1, releaseChain: ["spn-x"], dependsOn: [],

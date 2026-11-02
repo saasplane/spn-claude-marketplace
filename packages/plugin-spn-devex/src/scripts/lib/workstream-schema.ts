@@ -385,6 +385,10 @@ export type SheetEntry = {
   work?: string | null;
   /** The entry's change kept as a diff (`sheet patch`): the file under `patches/` and the commit it was diffed against. */
   patch?: { file: string; base: string } | null;
+  /** The thinking behind the change, kept with its diff; required on a new entry, and read as "" on a sheet written before it. */
+  trace?: string;
+  /** Whether the change is a judgment (true) or mechanical (false); required on a new entry, and read as false on a sheet written before it. */
+  judged?: boolean;
   [field: string]: unknown;
 };
 export type Sheet = { schemaVersion: number; releaseChain: string[]; dependsOn: string[]; stack: SheetStack | null; entries: SheetEntry[]; [field: string]: unknown };
@@ -405,17 +409,19 @@ const ENTRY_FIELDS: Record<string, Rule> = {
   then: { kind: "strings", required: true }, rules: { kind: "strings", required: true }, callers: { kind: "strings", required: true },
   docs: { kind: "strings", required: true }, book: { kind: "strings", required: true },
   work: { kind: "enum", required: false, values: WORK, nullable: true },
+  // Required on a new entry only: `sheet write` demands them of an entry the stored sheet lacks, so an older sheet reads whole.
+  trace: { kind: "text", required: false }, judged: { kind: "boolean", required: false },
 };
 
 /**
  * An entry's kind of change, from which an arc's steps are derived: the one it names, else the kind of its file's path —
- * a dist bundle or a generated ref is GENERATED, a docs or refs file DOCS, and a source or test file CODE.
+ * a dist bundle or a generated ref is GENERATED, a file under the repository's own docs/ (or a plugin's refs/) or a .md file DOCS, and any other source or test file CODE.
  */
 export function entryWork(entry: Pick<SheetEntry, "file" | "work">): Work {
   if (typeof entry.work === "string" && WORK.includes(entry.work)) return entry.work;
   const path = entry.file.slice(entry.file.indexOf(":") + 1);
   if (/(^|\/)dist\//.test(path) || /generated/i.test(path)) return "GENERATED";
-  if (/(^|\/)(docs|refs)\//.test(path) || /\.md$/.test(path)) return "DOCS";
+  if (/^(docs|refs)\//.test(path) || /^packages\/[^/]+\/refs\//.test(path) || /\.md$/.test(path)) return "DOCS";
   return "CODE";
 }
 
