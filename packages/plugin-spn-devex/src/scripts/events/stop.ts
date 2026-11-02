@@ -295,7 +295,8 @@ export function runningRows(arc: string, now = Date.now(), out: Set<string> = or
  * state is how a progress reply is told from a reply that waits.
  *
  * A row whose order is out with an agent counts here, though `runningRows` leaves it out: that agent
- * is the work that runs. An arc whose status is terminal does not count, because a row left running in
+ * is the work that runs, and so does an order of the arc with no report beside it, whatever its row
+ * reads (MKT.SCRIPTS.512). An arc whose status is terminal does not count, because a row left running in
  * a finished arc is history, and it would hide the open cards for as long as the arc stays open.
  *
  * @param mine  the workstreams this window works on; a row in any other is another window's work
@@ -303,7 +304,9 @@ export function runningRows(arc: string, now = Date.now(), out: Set<string> = or
 export function workRuns(root: string, mine: Set<string>): boolean {
   return openArcs(root, mine).some((arc) => {
     const data = dataOf(arc);
-    return !!data && !TERMINAL.has(arcStatus(data)) && leafRows(data).some((row) => row.state === "running");
+    if (!data || TERMINAL.has(arcStatus(data))) return false;
+    // A BACKGROUND HELPER WITH NO REPORT YET IS WORK THAT RUNS: its order sits in `orders/` with no report beside it (S73).
+    return ordersOut(arc).size > 0 || leafRows(data).some((row) => row.state === "running");
   });
 }
 

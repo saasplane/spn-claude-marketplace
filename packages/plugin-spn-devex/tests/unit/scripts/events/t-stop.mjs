@@ -211,6 +211,17 @@ console.log("\n=== stop — an arc is read from its data: state.json, log.jsonl 
     check("a row left running in an arc that was dropped is history, not work that runs", !workRuns(root, everyone(root)));
   }
   {
+    const { root, ws } = await dataWorkspace("d17-helper-out");
+    check("[MKT.SCRIPTS.512] no row running and no order out: no work runs", !workRuns(root, everyone(root)));
+    const orders = join(ws, "notes", "N001", "orders");
+    mkdirSync(orders, { recursive: true });
+    writeFileSync(join(orders, "02-the-build.md"), "# Order 02 — the build\n");
+    check("[MKT.SCRIPTS.512] known-bad: a background helper with its order out and no report is work that runs, so no new-window offer", workRuns(root, everyone(root)));
+    check("[MKT.SCRIPTS.512] an order out in a workstream that is not this window's is not this window's work", !workRuns(root, new Set()));
+    writeFileSync(join(orders, "02-the-build.report.md"), "---\nrow: \"2\"\noutcome: landed\n---\n");
+    check("[MKT.SCRIPTS.512] once its report is beside the order, no work runs", !workRuns(root, everyone(root)));
+  }
+  {
     const { root, ws } = await dataWorkspace("d17-marks");
     const before = rowsMark(JSON.parse(readFileSync(join(arcAt(ws), "state.json"), "utf8")));
     const mark = stepsMark(root, everyone(root));
