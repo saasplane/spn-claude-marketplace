@@ -555,6 +555,13 @@ console.log("\n=== generated copies as missingCopies reads them today (MKT.SCRIP
   ok("[MKT.SCRIPTS.506] with an entry for the named copy it is written", covered.code === 0, covered.out);
   const unlisted = sheet("write", "N001", "--file", put("c-c.json", sheetOf([bookEntry, entry("E2", { file: `spn-claude-marketplace:${inRepo}/bar.md`, book: [] })])), "--because", "the developer: a book change");
   ok("[MKT.SCRIPTS.506] a named copy whose entry's book line lacks the book file is refused", unlisted.code === 1 && unlisted.out.includes("book` line does not name"), unlisted.out);
+  const before = readFileSync(stateFile, "utf8");
+  const held = json(stateFile);
+  held.rows.push({ id: "99", parent: "N001", title: "the copy", kind: "change", repo: "spn-claude-marketplace", work: "GENERATED", blockedBy: [], touches: [], state: "landed", entries: ["E2"] });
+  writeFileSync(stateFile, JSON.stringify(held, null, 2));
+  const landedCopy = sheet("write", "N001", "--file", put("c-e.json", sheetOf([bookEntry, entry("E2", { file: `spn-claude-marketplace:${inRepo}/bar.md`, book: [] })])), "--because", "the developer: a book change");
+  writeFileSync(stateFile, before);
+  ok("[MKT.SCRIPTS.506] a landed row's copy entry is not asked for the book line: what landed stands", landedCopy.code === 0 && !landedCopy.out.includes("book` line does not name"), landedCopy.out);
   const stamp = createHash("sha256").update("# Bar\n\nplain prose, no rule.", "utf8").digest("hex").slice(0, 8);
   writeFileSync(join(root, base, "bar.md"), `<!-- spn:restates\n{ "docs": [ { "path": "spn-foundation/${book}", "seen": "${stamp}" } ] }\n-->\n# Bar\n`);
   const current = sheet("write", "N001", "--file", put("c-d.json", sheetOf([bookEntry])), "--because", "the developer: a book change");

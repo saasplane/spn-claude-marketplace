@@ -91,9 +91,9 @@ function stampReadsCurrent(root: string, copy: string, path: string): boolean {
 /**
  * Each generated copy of a sheet's changed book files that no entry of the sheet names, once, with the entries that move it; a copy whose
  * stamp already reads current is not asked for (S90). A copy the sheet does name, whose entry's `book` line does not name the book file
- * it copies, is named too (S143).
+ * it copies, is named too (S143), unless a landed row holds that entry: what landed stands as it landed, and the line is asked of new work.
  */
-export function missingCopies(root: string, entries: ReadonlyArray<{ id: string; file: string; book?: unknown }>): string[] {
+export function missingCopies(root: string, entries: ReadonlyArray<{ id: string; file: string; book?: unknown }>, landed: ReadonlySet<string> = new Set()): string[] {
   const named = new Map(entries.map((entry) => [entry.file, entry] as const));
   const by = new Map<string, string[]>();
   const unlisted: string[] = [];
@@ -104,7 +104,7 @@ export function missingCopies(root: string, entries: ReadonlyArray<{ id: string;
       const one = named.get(copy);
       if (!one) {
         if (!stampReadsCurrent(root, copy.slice(PLUGINS_REPO.length + 1), path)) by.set(copy, [...(by.get(copy) ?? []), entry.id]);
-      } else if (Array.isArray(one.book) && !one.book.includes(entry.file))
+      } else if (Array.isArray(one.book) && !one.book.includes(entry.file) && !landed.has(one.id))
         unlisted.push(`${one.id} names the generated copy ${copy}, and its \`book\` line does not name the book file it copies, ${entry.file}`);
     }
   }

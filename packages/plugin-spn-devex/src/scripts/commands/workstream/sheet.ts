@@ -63,6 +63,9 @@ export function renameFirstRead(ws: string, arc: string): void {
 const ENTRY_WORK: readonly string[] = ["DOCS", "CODE", "GENERATED"];
 
 /** Each fault of a sheet as the arc would hold it: its schema, and every fact an entry cites being one the arc's facts hold. */
+/** The entries the arc's landed rows hold. */
+const landedIds = (data: ArcData | null): Set<string> => new Set((data?.rows ?? []).filter((row) => row.state === "landed").flatMap((row) => row.entries ?? []));
+
 function writeFaults(ws: string, arc: string, sheet: Sheet, whole: boolean): string[] {
   const out = [...sheetFaults(sheet), ...needsReleaseFaults(sheet)];
   if (whole && sheet.stack === null) out.push("the sheet's `stack` is null — name the folder the tiers run from, the dmo version and the reset");
@@ -82,7 +85,7 @@ function writeFaults(ws: string, arc: string, sheet: Sheet, whole: boolean): str
       if (typeof id === "string" && !held.has(id)) out.push(`${entry.id} cites ${id}, which ${arc}'s facts do not hold`);
   // A CHANGED BOOK FILE MOVES ITS GENERATED COPIES: each the sheet does not name is a fault where the whole sheet is written (s59).
   const root = workspaceOf(ws);
-  if (whole && root && Array.isArray(sheet.entries)) out.push(...missingCopies(root, sheet.entries.filter((entry) => typeof entry?.file === "string" && entry.file.includes(":"))));
+  if (whole && root && Array.isArray(sheet.entries)) out.push(...missingCopies(root, sheet.entries.filter((entry) => typeof entry?.file === "string" && entry.file.includes(":")), landedIds(readArc(ws, arc))));
   return out;
 }
 
@@ -539,7 +542,7 @@ export function sheetFindings(ws: string, arc: string): string[] {
   for (const one of suggestionsOf(ws).filter((suggestion) => suggestion.arc === arc && suggestion.state === "decided"))
     if (!cites(entries, one.id)) out.push(`${cardName(one.id)} is decided against ${arc} and no entry cites it in \`decidedBy\` (as \`${cardName(one.id)}\`)`);
   const root = workspaceOf(ws);
-  if (root) out.push(...missingCopies(root, entries.filter((entry) => typeof entry?.file === "string" && entry.file.includes(":"))));
+  if (root) out.push(...missingCopies(root, entries.filter((entry) => typeof entry?.file === "string" && entry.file.includes(":")), landedIds(data)));
   out.push(...consumerFindings(ws, entries, readJsonl(factsFileOf(ws, arc)) as Fact[]));
   if (sheet.stack === null && leaves.some((row) => row.work === "CODE" || row.work === "PROOF"))
     out.push(`the sheet's stack is null, and ${arc} has a CODE or PROOF row`);
