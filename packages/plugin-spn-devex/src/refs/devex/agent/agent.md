@@ -14,7 +14,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "section": "A reply speaks as a teammate: the moment chooses its register, its icon and its shape",
-      "seen": "463659ab"
+      "seen": "2ff63e36"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
@@ -34,7 +34,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "section": "The front desk stays open while work runs",
-      "seen": "990ff1e0"
+      "seen": "0f25c6f3"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
@@ -249,6 +249,9 @@ The rules each one keeps:
 - **An open point is written as the question with the options named** (`RULE.DEVEX.AGENT.086`).
 
 A release and a window's handover done have no command whose result the agent can read, so the check holds their shape when a reply opens with them and never demands them.
+
+**A card, a question and a handover are written once, in the turn's final message, and a message between steps is at most one short line of what is happening** (`RULE.DEVEX.AGENT.175` · MUST · short).
+The editor keeps every message on screen, so one written between steps and again at the end is read twice.
 
 **Across all of them:** a mistake of yours is straight (the cause, the fix, and what the fix did not
 reach); a long run is one line with a time; a block names the one thing needed and the command; a
