@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/10-providers/ts/03-structure.md",
-      "seen": "e1b64cc7"
+      "seen": "4d786c96"
     }
   ]
 }
@@ -77,9 +77,10 @@ packages/module-server-iam-ts/
 ├── rollup.config.js                    one line that asks the toolchain for the build
 ├── remote/package.json                 three lines, for the type checker: its entry is ../src/remote/index.ts
 └── src/
-    ├── contract/                       data only: constants.ts, states/ and services/ by hand, validators/ and methods/ produced
+    ├── contract/                       data only: constants.ts (IAM_MODULE_CODE and IAM_MODULE_CONFIG: the module names itself), states/ (with migration.ts: IAMMigrationContribution, what other modules hand this one) and services/ by hand, validators/ and methods/ produced
     ├── remote/                         by hand: index.ts, interface.ts, IAMRemoteModuleManager.ts, iamModule.ts
-    ├── app/  entry/  migrations/
+    ├── app/  entry/
+    ├── migrations/                     contributions.ts (IAM_MIGRATION_CONTRIBUTIONS: what this module hands to others), and hooks.ts (the three hooks, for a module that owns tables others contribute to)
     ├── interface.ts  iamModule.ts
     ├── IAMRuntimeModuleManager.ts      extends the runtime manager; lists its contract services
     └── index.ts                        the main door
@@ -91,6 +92,7 @@ packages/module-server-iam-ts/
 - **A contract that uses another module's types imports them from that module's remote door**, never the main door.
 - **A module that may run in a service where another module is remote imports that module's `<code>Module` from its remote door.** There `services.impl` does not exist, so the compiler holds the rule that a module's inner services are reachable in the same process only.
 - **The scaffold gives a new server module its `remote/` folder and its door.**
+- **A module's contributions are three files.** `src/migrations/contributions.ts` holds what the module hands to other modules, `src/migrations/hooks.ts` is there only if the module owns tables that others contribute to, and the contribution state sits in `src/contract/states/migration.ts`, because the validator generator reads states only from `contract/states/`. `src/contract/constants.ts` holds `<MOD>_MODULE_CODE` and `<MOD>_MODULE_CONFIG`.
 - **The door is a folder** because a module's manifest carries no entry-point map and server code resolves a package by path: inside the repository it points at the source, in the published package at the built files. A package's dependencies belong to the package and not to a door, so a module's manifest lists the libraries the module imports and no others.
 
 **What each layer folder may hold is a rule, not a habit.**

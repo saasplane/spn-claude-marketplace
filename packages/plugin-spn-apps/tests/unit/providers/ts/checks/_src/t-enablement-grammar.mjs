@@ -77,43 +77,70 @@ one("a boolean may name the area", {
 
 console.log("\n=== rule 4 ORG TYPE");
 
-const SET_BAD = "const allowed = new Set([OrgType.PLATFORM, OrgType.ACCOUNT]);\n";
+const SET_BAD = "const allowed = new Set([OrgType.PLATFORM, OrgType.ENTERPRISE]);\n";
 one("a hardcoded Set in a service", {
   script: "enablement-grammar", root: tree({ [SERVICE]: SET_BAD }),
   input: { file_path: SERVICE, content: SET_BAD },
   expect: "deny", says: "[ORG TYPE]",
 });
 
-const ARRAY_BAD = "const allowed: OrgType[] = [OrgType.PLATFORM, OrgType.ACCOUNT];\n";
+const ARRAY_BAD = "const allowed: OrgType[] = [OrgType.PLATFORM, OrgType.ENTERPRISE];\n";
 one("a hardcoded annotated array", {
   script: "enablement-grammar", root: tree({ [SERVICE]: ARRAY_BAD }),
   input: { file_path: SERVICE, content: ARRAY_BAD },
   expect: "deny", says: "[ORG TYPE]",
 });
 
-const INLINE_BAD = "if ([OrgType.PLATFORM, OrgType.ACCOUNT].includes(org.orgType)) { return true; }\n";
+const INLINE_BAD = "if ([OrgType.PLATFORM, OrgType.ENTERPRISE].includes(org.orgType)) { return true; }\n";
 one("an inline list asked for membership", {
   script: "enablement-grammar", root: tree({ [SERVICE]: INLINE_BAD }),
   input: { file_path: SERVICE, content: INLINE_BAD },
   expect: "deny", says: "[ORG TYPE]",
 });
 
-const QUOTED_BAD = "const allowed = new Set(['PLATFORM', 'ACCOUNT']);\n";
+const QUOTED_BAD = "const allowed = new Set(['PLATFORM', 'ENTERPRISE']);\n";
 one("the same Set written with string literals", {
   script: "enablement-grammar", root: tree({ [SERVICE]: QUOTED_BAD }),
   input: { file_path: SERVICE, content: QUOTED_BAD },
   expect: "deny", says: "[ORG TYPE]",
 });
 
-const COMPLETE = "const every = new Set([OrgType.PLATFORM, OrgType.ACCOUNT, OrgType.PLATFORM_ENTERPRISE,\n" +
-  "  OrgType.ACCOUNT_ENTERPRISE, OrgType.PLATFORM_CONSUMER, OrgType.ACCOUNT_CONSUMER]);\n";
-one("a complete enumeration, which gates nothing", {
-  script: "enablement-grammar", root: tree({ [SERVICE]: COMPLETE }),
-  input: { file_path: SERVICE, content: COMPLETE },
+const THREE = "const every = new Set([OrgType.PLATFORM, OrgType.ENTERPRISE, OrgType.CONSUMER]);\n";
+one("[MKT.PROVIDERS.33] all three org types in a Set are still a hardcoded list", {
+  script: "enablement-grammar", root: tree({ [SERVICE]: THREE }),
+  input: { file_path: SERVICE, content: THREE },
+  expect: "deny", says: "[ORG TYPE]",
+});
+
+const PAIR = "const allowed = new Set([OrgType.ENTERPRISE, OrgType.CONSUMER]);\n";
+one("[MKT.PROVIDERS.33] a Set of ENTERPRISE and CONSUMER", {
+  script: "enablement-grammar", root: tree({ [SERVICE]: PAIR }),
+  input: { file_path: SERVICE, content: PAIR },
+  expect: "deny", says: "[ORG TYPE]",
+});
+
+const CEILING_OK = seed("PRJ_MANAGE_CHANNELS");
+one("[MKT.PROVIDERS.33] a ceiling of OrgType.PLATFORM", {
+  script: "enablement-grammar", root: tree({ [SEED]: CEILING_OK }),
+  input: { file_path: SEED, content: CEILING_OK },
   expect: "",
 });
 
-const RECORD = "const labels: Record<OrgType, string> = { PLATFORM: 'a', ACCOUNT: 'b' };\n";
+const CEILING_CATEGORY = CEILING_OK.replace("OrgType.PLATFORM", "OrgType.CLINIC");
+one("[MKT.PROVIDERS.33] a ceiling naming a category code, refused by name", {
+  script: "enablement-grammar", root: tree({ [SEED]: CEILING_CATEGORY }),
+  input: { file_path: SEED, content: CEILING_CATEGORY },
+  expect: "deny", says: "CLINIC",
+});
+
+const CEILING_QUOTED = CEILING_OK.replace("OrgType.PLATFORM", "'PATIENT'");
+one("[MKT.PROVIDERS.33] a quoted category code in a ceiling, refused by name", {
+  script: "enablement-grammar", root: tree({ [SEED]: CEILING_QUOTED }),
+  input: { file_path: SEED, content: CEILING_QUOTED },
+  expect: "deny", says: "PATIENT",
+});
+
+const RECORD = "const labels: Record<OrgType, string> = { PLATFORM: 'a', ENTERPRISE: 'b', CONSUMER: 'c' };\n";
 one("Record<OrgType, …>, exhaustive by the type system", {
   script: "enablement-grammar", root: tree({ [SERVICE]: RECORD }),
   input: { file_path: SERVICE, content: RECORD },
@@ -135,7 +162,7 @@ one("an ordinary source file, out of scope", {
   expect: "",
 });
 
-const COMMENTED = "// never write new Set([OrgType.PLATFORM, OrgType.ACCOUNT]) here\nexport const x = 1;\n";
+const COMMENTED = "// never write new Set([OrgType.PLATFORM, OrgType.ENTERPRISE]) here\nexport const x = 1;\n";
 one("the offending Set quoted in a comment", {
   script: "enablement-grammar", root: tree({ [SERVICE]: COMMENTED }),
   input: { file_path: SERVICE, content: COMMENTED },
@@ -153,7 +180,7 @@ one("an Edit that introduces the Set", {
   script: "enablement-grammar",
   root: tree({ [SERVICE]: "export const other = 1;\n" }),
   input: { file_path: SERVICE, old_string: "export const other = 1;",
-           new_string: "const allowed = new Set([OrgType.PLATFORM, OrgType.ACCOUNT]);" },
+           new_string: "const allowed = new Set([OrgType.PLATFORM, OrgType.ENTERPRISE]);" },
   expect: "deny", says: "[ORG TYPE]",
 });
 

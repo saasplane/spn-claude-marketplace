@@ -12,7 +12,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/03-platform/01-core/01-tenancy/02-organizations.md",
-      "seen": "ca20ffee"
+      "seen": "7cfd5631"
     }
   ]
 }

@@ -93,7 +93,7 @@ one("await-sequencing's refusal", {
 const SERVICE = "apps/api/src/app/services/IAMOrgService.ts";
 one("enablement-grammar's refusal", {
   root: tree({ ...REPO, ...APP }),
-  input: { file_path: SERVICE, content: "const a = new Set([OrgType.PLATFORM, OrgType.ACCOUNT]);\n" },
+  input: { file_path: SERVICE, content: "const a = new Set([OrgType.ENTERPRISE, OrgType.CONSUMER]);\n" },
   expect: "deny", says: "[ORG TYPE]",
 });
 

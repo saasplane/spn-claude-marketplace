@@ -43,11 +43,7 @@ import { emit, payload, runAlone } from "../../../../../../../plugin-support-lib
 import { inComment, mask, read, resultingText } from "../../../../../../../plugin-support-lib/src/lib/source.ts";
 import { filesUnder, introduced } from "../../../../../scripts/lib/source.ts";
 
-const ORG_TYPES = new Set([
-  "PLATFORM", "ACCOUNT",
-  "PLATFORM_ENTERPRISE", "ACCOUNT_ENTERPRISE",
-  "PLATFORM_CONSUMER", "ACCOUNT_CONSUMER",
-]);
+const ORG_TYPES = new Set(["PLATFORM", "ENTERPRISE", "CONSUMER"]);
 
 // A selection is named for what it offers. These five name the AREA instead, which is what the
 // boolean form is for — so a multi-value definition ending in one of them is rule 3.
@@ -156,7 +152,9 @@ const FIELD_MULTI = /\b(?:fieldType|mtype)\s*:\s*['"]([A-Z_]*_MULTI)['"]/;
 const ENABLEMENT_ALIAS = /\bconst\s+([A-Za-z_$][\w$]*)\s*=\s*([A-Z][A-Z0-9]{1,7}EnablementType)\b/g;
 const ENABLEMENT_TYPE = /\b([A-Z][A-Z0-9]{1,7}EnablementType)\b/g;
 const ORG_MEMBER = /\bOrgType\s*\.\s*([A-Z_]+)\b/g;
-const ORG_QUOTED = /['"](PLATFORM|ACCOUNT|PLATFORM_ENTERPRISE|ACCOUNT_ENTERPRISE|PLATFORM_CONSUMER|ACCOUNT_CONSUMER)['"]/g;
+const ORG_QUOTED = /['"](PLATFORM|ENTERPRISE|CONSUMER)['"]/g;
+const CEILING = /\borgTypes\s*:\s*\[/g;
+const CEILING_ENTRY = /\bOrgType\s*\.\s*([A-Z][A-Z0-9_]*)\b|['"]([A-Z][A-Z0-9_]*)['"]/g;
 
 const finding = (rule: string, region: Region, message: string): Finding => ({ rule, region, message });
 
@@ -205,6 +203,21 @@ export function seedFindings(path: string, source: string, masked: string, modul
         "whoever flips the cell cannot tell what they are choosing. Name it for what it offers."));
     }
   }
+
+  // A ceiling names org types only. A category code in it (`OrgType.CLINIC`, `'PATIENT'`) is refused
+  // by name: a category is a cell's key, never a ceiling's.
+  for (const match of masked.matchAll(CEILING)) {
+    if (inComment(masked, match.index)) continue;
+    const region = balanced(masked, match.index + match[0].length - 1, "[", "]");
+    if (region === null) continue;
+    for (const entry of source.slice(region[0], region[1]).matchAll(CEILING_ENTRY)) {
+      const name = entry[1] ?? entry[2];
+      if (ORG_TYPES.has(name)) continue;
+      out.push(finding("ORG TYPE", [match.index, region[1]],
+        `The ceiling names \`${name}\`, which is not an organization type (PLATFORM, ENTERPRISE, CONSUMER). ` +
+        "A ceiling names org types; a category code belongs to a category cell, never to a ceiling."));
+    }
+  }
   return out;
 }
 
@@ -235,14 +248,11 @@ export function authzFindings(path: string, source: string, masked: string): Fin
   return out;
 }
 
-const sameSet = (a: Set<string>, b: Set<string>) =>
-  a.size === b.size && [...a].every((value) => b.has(value));
-
 /**
  * Rule 4 — a hardcoded Set or array of `OrgType` values in a service or a gate table.
  *
- * Three shapes, all of them the same product decision written as code. A complete enumeration of
- * every type is left alone: it gates nothing. So is `Record<OrgType, …>`, which is exhaustive by the
+ * Three shapes, all of them the same product decision written as code. Every list of types is a chosen
+ * subset, the three together included. `Record<OrgType, …>` is left alone: it is exhaustive by the
  * type system rather than a subset somebody chose.
  */
 export function orgTypeFindings(path: string, source: string, masked: string): Finding[] {
@@ -259,7 +269,7 @@ export function orgTypeFindings(path: string, source: string, masked: string): F
 
   const report = (region: Region, found: Set<string>, shape: string): void => {
     const key = `${region[0]}:${region[1]}`;
-    if (seen.has(key) || !found.size || sameSet(found, ORG_TYPES)) return;
+    if (seen.has(key) || !found.size) return;
     seen.add(key);
     const listed = [...found].sort().join(", ");
     out.push(finding("ORG TYPE", region,
