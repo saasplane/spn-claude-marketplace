@@ -431,6 +431,10 @@ console.log("\n=== the change sheet — allowed in the arc's data, held to its s
   writeFileSync(join(ws, "arcs", "N001", "other.json"), "{}");
   ok("red: another file is still named, and the message lists `sheet.json`", has(checkWorkstream(ws), "name", /is not the arc's data.*`sheet.json`/), said(checkWorkstream(ws)));
   rmSync(join(ws, "arcs", "N001", "other.json"));
+  mkdirSync(join(ws, "arcs", "N001", "patches"), { recursive: true });
+  writeFileSync(join(ws, "arcs", "N001", "patches", "E1.diff"), "");
+  ok("[MKT.SCRIPTS.515] green: the `patches/` folder `sheet patch` writes is allowed in the arc's data", !has(checkWorkstream(ws), "name", /patches/), said(checkWorkstream(ws)));
+  rmSync(join(ws, "arcs", "N001", "patches"), { recursive: true });
   writeFileSync(sheetFile, JSON.stringify({ ...whole, entries: [{ id: "E1", op: "mangle" }] }, null, 2));
   ok("red: a sheet with a fault is reported under the schema", has(checkWorkstream(ws), "schema", /sheet\.json/) && has(checkWorkstream(ws), "schema", /E1/), said(checkWorkstream(ws)));
   writeFileSync(sheetFile, "{ not json");
