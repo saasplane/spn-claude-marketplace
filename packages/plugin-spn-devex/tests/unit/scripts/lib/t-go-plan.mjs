@@ -9,7 +9,7 @@ import { join, resolve } from "node:path";
 import { PLUGIN } from "../../../helpers/harness.mjs";
 
 const lib = resolve(PLUGIN, "src", "scripts", "lib");
-const { deriveGo, fullRunMinutes, readyParts, clearWaiting, markWaiting, ratesOf, boundOf, testFilesOf, entryHash, changedEntries, staleEntries, proposeScopes, redCheckIds } = await import(join(lib, "go-plan.ts"));
+const { deriveGo, releaseCircles, tangledParts, fullRunMinutes, readyParts, clearWaiting, markWaiting, ratesOf, boundOf, testFilesOf, entryHash, changedEntries, staleEntries, proposeScopes, redCheckIds } = await import(join(lib, "go-plan.ts"));
 const { goFaults, entryWork } = await import(join(lib, "workstream-schema.ts"));
 
 let total = 0, failed = 0;
@@ -256,8 +256,38 @@ const own = deriveGo([{ arc: "N003", sheet: sheet([fe("E1", "sup:src/a.ts"), fe(
 same("[MKT.SCRIPTS.443] a release waits on its own repository's full run and generated parts and on the release before it in the chain, and no other full run",
   rel(own), [["release-sup-1", ["full-sup", "generated-sup-1"]], ["release-plat-1", ["full-plat", "release-sup-1"]]]);
 const loopPlan = deriveGo([{ arc: "N003", sheet: { ...sheet([fe("E1", "sup:src/a.ts")], ["sup"]), dependsOn: ["N004 needs plat"] } }, ...two(["N003 landed: its release of sup"], false)]);
-same("[MKT.SCRIPTS.443] a dependsOn wait that closes a circle through a release is returned with its parts", loopPlan.circles.some((c) => c.includes("release-sup-1") && c.includes("code-plat-1")), true);
+same("[MKT.SCRIPTS.443] a dependsOn line naming an arc whose repository comes later in the chain adds no release wait, so two arcs naming each other close no circle",
+  [loopPlan.parts.find((p) => p.id === "code-sup-1").waitsOn.includes("release-plat-1"), loopPlan.parts.find((p) => p.id === "code-plat-1").waitsOn.includes("release-sup-1"), loopPlan.circles], [false, true, []]);
+const looped = [
+  { id: "code-sup-1", work: "CODE", repo: "sup", waitsOn: ["release-plat-1"] }, { id: "full-sup", work: "FULL_RUN", repo: "sup", waitsOn: ["code-sup-1"] },
+  { id: "release-sup-1", work: "RELEASE", repo: "sup", waitsOn: ["full-sup"] }, { id: "code-plat-1", work: "CODE", repo: "plat", waitsOn: ["release-sup-1"] },
+  { id: "full-plat", work: "FULL_RUN", repo: "plat", waitsOn: ["code-plat-1"] }, { id: "release-plat-1", work: "RELEASE", repo: "plat", waitsOn: ["full-plat", "release-sup-1"] },
+];
+same("[MKT.SCRIPTS.443] a wait circle through a release is returned with its parts", releaseCircles(looped).some((c) => c.includes("release-sup-1") && c.includes("code-sup-1") && c.includes("release-plat-1")), true);
 same("[MKT.SCRIPTS.443] and a plan with no circle returns none", own.circles, []);
+same("[MKT.SCRIPTS.514] the circle through a release is its shortest, one to each release, and tangledParts counts every part held in a circle",
+  [releaseCircles(looped).map((c) => c.length), tangledParts(looped).length, tangledParts(own.parts)], [[4], 6, []]);
+const wide = [{ id: "release-r-1", work: "RELEASE", repo: "r", waitsOn: ["full-r"] }, { id: "full-r", work: "FULL_RUN", repo: "r", waitsOn: Array.from({ length: 40 }, (_, i) => `code-r-${i}`) },
+  ...Array.from({ length: 40 }, (_, i) => ({ id: `code-r-${i}`, work: "CODE", repo: "r", waitsOn: [...Array.from({ length: 40 }, (_, j) => `code-r-${j}`).filter((_, j) => j !== i), "release-r-1"] }))];
+const started = Date.now();
+const wideCircles = releaseCircles(wide);
+same("[MKT.SCRIPTS.514] a plan of forty parts that all wait on each other and on the release is answered at once, with one circle",
+  [wideCircles.length, wideCircles[0].length, tangledParts(wide).length, Date.now() - started < 2000], [1, 3, 42, true]);
+const shared = deriveGo([
+  { arc: "N004", sheet: sheet([fe("E1", "sup:src/a.ts"), fe("E2", "plat:src/b.ts")], ["sup", "plat"]) },
+  { arc: "N005", sheet: { ...sheet([fe("E1", "plat:src/c.ts")], ["sup", "plat"]), dependsOn: ["N004 (IAM) entries landed first"] } },
+]);
+const n5 = shared.parts.find((p) => p.entries.includes("N005/E1"));
+const n4plat = shared.parts.find((p) => p.entries.includes("N004/E2"));
+same("[MKT.SCRIPTS.513] a dependsOn line naming an arc of the scope that shares the waiter's repository waits on that arc's parts there and the releases before it, never its own repository's release",
+  [n5.waitsOn.includes(n4plat.id) || n4plat === n5, n5.waitsOn.includes("release-sup-1"), n5.waitsOn.includes("release-plat-1"), shared.circles], [true, true, false, []]);
+const named = deriveGo([{ arc: "N004", sheet: sheet([
+  fe("E1", "spn-foundation:docs/iam.md", { what: "the chapter names IAMMigrationContribution" }),
+  fe("E2", "plat:src/contribution.ts", { what: "exports IAMMigrationContribution" }),
+  fe("E3", "plat:src/use.ts", { what: "reads IAMMigrationContribution" })], ["plat"]) }]);
+const holderOf = (ref) => named.parts.find((p) => p.entries.includes(ref));
+same("[MKT.SCRIPTS.513] a name is waited on only by a part that runs no earlier than its maker: the book's docs naming a platform type do not wait on its code, a later code part does",
+  [holderOf("N004/E1").waitsOn.includes(holderOf("N004/E2").id), holderOf("N004/E3") === holderOf("N004/E2") || holderOf("N004/E3").waitsOn.includes(holderOf("N004/E2").id), named.circles], [false, true, []]);
 const fnd = deriveGo([{ arc: "N009", sheet: sheet([fe("E1", "lib-repo:docs/c.md"), fe("E2", "spn-foundation:docs/b.md"), fe("E3", "lib-repo:src/x.ts")]) }]);
 same("[MKT.SCRIPTS.444] the repository that holds the book comes first, though outside every release chain, and a copy waits on its docs",
   [fnd.parts[0].id, fnd.parts.find((p) => p.id === "docs-lib-repo-1").waitsOn], ["docs-spn-foundation-1", ["docs-spn-foundation-1"]]);

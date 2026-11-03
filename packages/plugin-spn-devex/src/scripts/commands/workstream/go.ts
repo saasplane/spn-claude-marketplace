@@ -18,7 +18,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { basename, dirname, join, resolve } from "node:path";
 import { type Action, FLAG, VALUE, UsageFault, readWords } from "../../../../../plugin-support-lib/src/lib/command.ts";
 import {
-  clearWaiting, deriveGo, fullRunMinutes, goFileOf, isApplyPart, landedEntries, landedOrder, landedMeasures, markWaiting, planScope, proposeScopes, readGo, readyParts, redCheckIds, ratesOf, staleEntries, testFilesOf, unheldEntries,
+  clearWaiting, deriveGo, fullRunMinutes, goFileOf, isApplyPart, landedEntries, landedOrder, landedMeasures, markWaiting, planScope, proposeScopes, readGo, readyParts, redCheckIds, ratesOf, staleEntries, tangledParts, testFilesOf, unheldEntries,
   type ScopeSheet,
 } from "../../lib/go-plan.ts";
 import { arcDataDir, arcIdsOf, logEvent, logFileOf, notesDirOf, readArc, readJson, readJsonl, readSheet, workspaceOf, writeWhole } from "../../lib/workstream.ts";
@@ -274,7 +274,7 @@ function write(args: string[]): number {
   });
   if (circles.length) {
     const held = plan.parts.find((one) => one.id === circles[0][0])?.entries[0] ?? `${lead}/<E>`;
-    console.log(`Refused: the waits of the plan close a circle through a release: ${circles.map((one) => one.join(" -> ")).join(" · ")}: run \`workstream sheet edit ${basename(ws)}/${held.replace("/", " ")} --then …\`. Nothing was written.`);
+    console.log(`Refused: the waits of the plan close a circle through a release, ${tangledParts(plan.parts).length} parts held in circles; the shortest through each release: ${circles.map((one) => one.join(" -> ")).join(" · ")}: run \`workstream sheet edit ${basename(ws)}/${held.replace("/", " ")} --then …\`. Nothing was written.`);
     return 1;
   }
   save(ws, lead, plan);
