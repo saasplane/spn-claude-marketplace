@@ -78,5 +78,29 @@ console.log("\n=== registrations whose folder is gone");
   ok("[MKT.SCRIPTS.388] the same registration is read once its folder exists", /not at 1\.0\.0/.test(pluginLandedRefusal(dir, file) ?? ""));
 }
 
+console.log("\n=== registrations outside the workspace");
+{
+  const workspace = join(base, "workspace");
+  const inside = join(workspace, "member");
+  const outside = join(base, "another-window-scratchpad");
+  mkdirSync(inside, { recursive: true });
+  mkdirSync(outside, { recursive: true });
+  const dir = join(base, "outside-fixture");
+  PLUGINS.forEach((name) => {
+    const folder = join(dir, "packages", `plugin-${name}`, "src", ".claude-plugin");
+    mkdirSync(folder, { recursive: true });
+    writeFileSync(join(folder, "plugin.json"), JSON.stringify({ name, version: "1.0.0" }));
+  });
+  const file = join(dir, "installed_plugins.json");
+  writeFileSync(file, JSON.stringify({ version: 2, plugins: Object.fromEntries(PLUGINS.map((name) => [`${name}@saasplane`, [
+    { scope: "project", version: "1.0.0", projectPath: workspace }, { scope: "project", version: "1.0.0", projectPath: inside },
+    { scope: "project", version: "0.9.0", projectPath: outside }]])) }));
+  ok("[MKT.SCRIPTS.512] given the workspace, a registration behind outside it is not a place the plugin must land", pluginLandedRefusal(dir, file, workspace) === null, pluginLandedRefusal(dir, file, workspace) ?? "");
+  ok("[MKT.SCRIPTS.512] with no workspace named, the same registration is read", /not at 1\.0\.0/.test(pluginLandedRefusal(dir, file) ?? ""));
+  writeFileSync(file, JSON.stringify({ version: 2, plugins: Object.fromEntries(PLUGINS.map((name) => [`${name}@saasplane`, [
+    { scope: "project", version: "1.0.0", projectPath: workspace }, { scope: "project", version: "0.9.0", projectPath: inside }]])) }));
+  ok("[MKT.SCRIPTS.512] a registration behind inside the workspace is still refused", /not at 1\.0\.0/.test(pluginLandedRefusal(dir, file, workspace) ?? ""));
+}
+
 console.log(failed ? `\n  ${failed} of ${total} FAILED — plugin landed` : `\n  all ${total} passed — plugin landed`);
 process.exit(failed ? 1 : 0);

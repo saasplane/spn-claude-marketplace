@@ -171,7 +171,7 @@ function state(args: string[]): number {
     if (open) { console.log(`Refused: ${open}. Nothing was changed.`); return 1; }
     // A plugin change is landed once it is installed (RULE.DEVEX.AGENT.110): the check reads nothing for any other row.
     const files = (readSheet(ws, arc)?.entries ?? []).filter((entry) => (row.entries ?? []).includes(entry.id)).map((entry) => entry.file);
-    const unplugged = pluginLandedApplies(row.repo, next, [...files, ...(row.touches ?? [])]) ? pluginLandedRefusal(join(mainCheckoutOf(ws), row.repo!)) : null;
+    const unplugged = pluginLandedApplies(row.repo, next, [...files, ...(row.touches ?? [])]) ? pluginLandedRefusal(join(mainCheckoutOf(ws), row.repo!), undefined, mainCheckoutOf(ws)) : null;
     if (unplugged) { console.log(`Refused: ${unplugged}`); return 1; }
   }
   const statusBefore = arcStatus(data);
