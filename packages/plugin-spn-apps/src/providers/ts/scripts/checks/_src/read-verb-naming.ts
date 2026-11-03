@@ -71,7 +71,7 @@ const VERBS = new Set(("get set create update delete remove add read write find 
   "on handle submit confirm accept reject approve decline invite join leave lock unlock suspend resume restore archive " +
   "mount unmount focus blur scroll navigate redirect show hide expand collapse wait sleep delay schedule trigger fire " +
   "release acquire reserve allocate extract transform generate derive define declare require match test compare diff " +
-  "reconcile rebuild rename replace swap reorder commit rollback begin end finish complete abort stub spy").split(" "));
+  "reconcile rebuild rename replace swap reorder commit rollback begin end finish complete abort stub spy request shutdown provision").split(" "));
 
 // A boolean reads yes or no.
 const BOOLEAN_PREFIX = /^(?:is|has|can|should|does|did|will|are|was|were|must|needs|allows|supports|includes|contains)[A-Z]/;
