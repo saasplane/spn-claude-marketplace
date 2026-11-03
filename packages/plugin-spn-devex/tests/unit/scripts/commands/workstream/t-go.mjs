@@ -428,9 +428,10 @@ console.log("\n=== another arc of the workstream outside the scope, and a circle
   ok("[MKT.SCRIPTS.445] an undecided arc's DOCS row does not hold the baseline", held?.state === "ready" && !held?.waitingOn, JSON.stringify(held));
 
   const circle = await twoArcs("go-circle", { rows1: [entryRow("N001", "1", "CODE", ["E1", "E2"])], rows2: [entryRow("N002", "1", "CODE", ["E1"])], depends1: ["N002 ships first"], depends2: ["N001 ships first"], entries2: [entry("E1", "spn-x:src/z.ts")] });
-  const refused = circle.run("write", "N001", "--scope", "N001,N002");
-  ok("[MKT.SCRIPTS.443] go write refuses a plan whose waits close a circle through a release, names its parts and writes no go.json",
-    refused.code === 1 && refused.out.includes("circle") && refused.out.includes("release-spn-x") && refused.out.includes("code-spn-x") && refused.out.includes("Nothing was written") && !existsSync(join(circle.ws, "arcs", "N001", "go.json")), refused.out);
+  const shared = circle.run("write", "N001", "--scope", "N001,N002");
+  const sharedPlan = existsSync(join(circle.ws, "arcs", "N001", "go.json")) ? circle.plan() : { parts: [] };
+  ok("[MKT.SCRIPTS.513] two arcs of one repository whose dependsOn lines name each other are written as one plan: no code part waits on the repository's own release",
+    shared.code === 0 && !shared.out.includes("circle") && sharedPlan.parts.filter((p) => p.work === "CODE").every((p) => !p.waitsOn.some((id) => id.startsWith("release-spn-x"))), shared.out);
 }
 
 console.log("\n=== apply-<repo>: the patches applied in order, one commit, the part landed (MKT.SCRIPTS.451)");

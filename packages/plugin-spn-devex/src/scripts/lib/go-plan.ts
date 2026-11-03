@@ -514,8 +514,12 @@ export function deriveGo(scope: readonly ScopeSheet[], options: DeriveOptions = 
       if (sameFile || [...files].some((file) => sources.has(file))) one.waitsOn.push(q.id);
     }
   }
-  // AN ENTRY THAT EXPORTS A NAME HOLDS EVERY ENTRY OF THE SCOPE WHOSE WHAT NAMES IT behind its part.
-  const makers = scope.flatMap(({ arc, sheet }) => sheet.entries.map((entry) => ({ ref: refOf(arc, entry), names: exportedNames(entry) })).filter((one) => one.names.length));
+  // AN ENTRY THAT EXPORTS A NAME HOLDS EVERY ENTRY OF THE SCOPE WHOSE WHAT NAMES IT behind its part, where that part runs no earlier: a
+  // repository before the maker's in the go, or a pass before the maker's in its repository (the book's docs naming a platform type), says
+  // the name ahead of the code that exports it, and waiting there would close a circle through the release between them (s184).
+  const runsBefore = (one: GoPart, other: GoPart): boolean => repos.indexOf(one.repo) < repos.indexOf(other.repo)
+    || (one.repo === other.repo && SLOT_ORDER.indexOf(slotOf(one)) < SLOT_ORDER.indexOf(slotOf(other)));
+  const makers =scope.flatMap(({ arc, sheet }) => sheet.entries.map((entry) => ({ ref: refOf(arc, entry), names: exportedNames(entry) })).filter((one) => one.names.length));
   for (const one of parts) {
     if (keptIds.has(one.id) || !one.entries.length) continue;
     for (const ref of one.entries) {
@@ -523,7 +527,7 @@ export function deriveGo(scope: readonly ScopeSheet[], options: DeriveOptions = 
       for (const maker of makers) {
         if (maker.ref === ref || !maker.names.some((name) => namesIn(text, name))) continue;
         const holder = parts.find((other) => other.entries.includes(maker.ref));
-        if (holder && holder !== one && holder.state !== "landed" && !one.waitsOn.includes(holder.id) && !waitsFor(holder, one)) one.waitsOn.push(holder.id);
+        if (holder && holder !== one && holder.state !== "landed" && !runsBefore(one, holder) && !one.waitsOn.includes(holder.id) && !waitsFor(holder, one)) one.waitsOn.push(holder.id);
       }
     }
   }
@@ -566,7 +570,9 @@ export function deriveGo(scope: readonly ScopeSheet[], options: DeriveOptions = 
     else if (!live && planned) parts.push(part(`release-${repo}-${lastN + 1}`, repo, "RELEASE", [], [], { waitsOn }));
   }
   // WHAT ANOTHER ARC OF THE WORKSTREAM MUST SHIP FIRST: a `dependsOn` line naming an arc makes the code parts of the sheet that carries it wait
-  // on that arc's release parts; the arc outside the scope is a line on the first such part, which waits.
+  // on that arc's release parts; the arc outside the scope is a line on the first such part, which waits. An arc in the scope ships in the
+  // same release as the waiter's own repository, so there the waiter waits on the arc's parts in that repository instead (s184), and on the
+  // arc's releases of the repositories before its own in the chain only: a repository later in the chain is not one it consumes.
   const reposOf = (sheet: Sheet): string[] => [...new Set(sheet.entries.map(repoOf))];
   const others = new Map((options.siblings ?? []).map((one) => [one.arc, one] as const));
   for (const one of scope) others.delete(one.arc);
@@ -579,8 +585,15 @@ export function deriveGo(scope: readonly ScopeSheet[], options: DeriveOptions = 
         if (!target) continue;
         const waiters = parts.filter((one) => slotOf(one) === "CODE" && !keptIds.has(one.id) && one.entries.some((ref) => ref.startsWith(`${arc}/`)));
         if (inScope) {
-          const shipped = parts.filter((one) => slotOf(one) === "RELEASE" && reposOf(target.sheet).includes(one.repo)).map((one) => one.id);
-          for (const waiter of waiters) for (const id of shipped) if (!waiter.waitsOn.includes(id)) waiter.waitsOn.push(id);
+          const theirs = reposOf(target.sheet);
+          for (const waiter of waiters) {
+            const own = releases.indexOf(waiter.repo);
+            const shipped = parts.filter((one) => slotOf(one) === "RELEASE" && theirs.includes(one.repo) && one.repo !== waiter.repo
+              && (own < 0 || releases.indexOf(one.repo) < own));
+            const alongside = parts.filter((one) => one.repo === waiter.repo && slotOf(one) === "CODE" && one.state !== "landed"
+              && one.entries.some((ref) => ref.startsWith(`${named}/`)));
+            for (const one of [...shipped, ...alongside]) if (one !== waiter && !waiter.waitsOn.includes(one.id) && !waitsFor(one, waiter)) waiter.waitsOn.push(one.id);
+          }
         } else if (waiters[0] && !waiters[0].waitingOn) {
           waiters[0].state = "waiting"; waiters[0].waitingOn = `${named}'s release of ${reposOf(target.sheet).join(" and ")}`;
         }
@@ -680,19 +693,64 @@ export function redCheckIds(plan: GoPlan, scope: readonly ScopeSheet[], repo: st
   return [...new Set(ids)].sort();
 }
 
-/** The parts of each wait circle that runs through a release, each circle once: what `go write` refuses, naming them. */
+/**
+ * The shortest wait circle through each release that has one, each circle once: what `go write` refuses, naming them. One circle to a release,
+ * found breadth first, since every simple circle of a tangled plan is more than any run can list (s184).
+ */
 export function releaseCircles(parts: readonly GoPart[]): string[][] {
   const byId = new Map(parts.map((one) => [one.id, one] as const));
   const found = new Map<string, string[]>();
   for (const release of parts.filter((one) => slotOf(one) === "RELEASE")) {
-    const walk = (id: string, path: string[]): void => {
-      if (id === release.id && path.length) { found.set([...path].sort().join("|"), [...path]); return; }
-      if (path.includes(id)) return;
-      for (const next of byId.get(id)?.waitsOn ?? []) walk(next, [...path, id]);
-    };
-    for (const next of release.waitsOn) walk(next, [release.id]);
+    const from = new Map<string, string>();
+    const queue = [release.id];
+    let end: string | null = null;
+    while (queue.length && !end) {
+      const id = queue.shift() as string;
+      for (const next of byId.get(id)?.waitsOn ?? []) {
+        if (next === release.id) { end = id; break; }
+        if (!byId.has(next) || from.has(next)) continue;
+        from.set(next, id); queue.push(next);
+      }
+    }
+    if (!end) continue;
+    const circle = [end];
+    while (circle[circle.length - 1] !== release.id) circle.push(from.get(circle[circle.length - 1]) as string);
+    circle.reverse();
+    found.set([...circle].sort().join("|"), circle);
   }
   return [...found.values()];
+}
+
+/** The parts held in some wait circle, of every circle at once: what `go write` counts beside the circles it names. */
+export function tangledParts(parts: readonly GoPart[]): string[] {
+  const byId = new Map(parts.map((one) => [one.id, one] as const));
+  const index = new Map<string, number>(), low = new Map<string, number>(), stack: string[] = [], held = new Set<string>(), tangled: string[] = [];
+  let next = 0;
+  const visit = (start: string): void => {
+    // Tarjan's walk, kept on an explicit stack so a plan of any size cannot overflow the call stack.
+    const frames: Array<{ id: string; at: number }> = [{ id: start, at: 0 }];
+    index.set(start, next); low.set(start, next++); stack.push(start); held.add(start);
+    while (frames.length) {
+      const frame = frames[frames.length - 1];
+      const waits = (byId.get(frame.id)?.waitsOn ?? []).filter((id) => byId.has(id));
+      if (frame.at < waits.length) {
+        const to = waits[frame.at++];
+        if (!index.has(to)) { index.set(to, next); low.set(to, next++); stack.push(to); held.add(to); frames.push({ id: to, at: 0 }); }
+        else if (held.has(to)) low.set(frame.id, Math.min(low.get(frame.id)!, index.get(to)!));
+        continue;
+      }
+      frames.pop();
+      if (frames.length) low.set(frames[frames.length - 1].id, Math.min(low.get(frames[frames.length - 1].id)!, low.get(frame.id)!));
+      if (low.get(frame.id) === index.get(frame.id)) {
+        const group: string[] = [];
+        let id: string;
+        do { id = stack.pop() as string; held.delete(id); group.push(id); } while (id !== frame.id);
+        if (group.length > 1) tangled.push(...group);
+      }
+    }
+  };
+  for (const one of parts) if (!index.has(one.id)) visit(one.id);
+  return tangled;
 }
 
 /** The entries of a part that are no longer as its signature says, by their refs: what `go check` names. */
