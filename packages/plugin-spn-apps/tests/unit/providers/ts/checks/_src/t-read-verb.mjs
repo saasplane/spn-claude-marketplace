@@ -136,6 +136,14 @@ naming("a reference column not named <table>_id", ENTITY,
   klass("  orgRef!: string;"), "deny", "<table>_id");
 naming("a method that opens with a verb", SERVICE,
   klass("  readSession(): Promise<Session> {\n    return load();\n  }"), "");
+naming("a method that asks another party opens with request", SERVICE,
+  klass("  requestOrgAppSiteDomain(): Promise<void> {\n    return load();\n  }"), "");
+naming("a test request opens with request", SERVICE,
+  klass("  requestOrgAppAuthProviderTest(): Promise<void> {\n    return load();\n  }"), "");
+naming("a module's stop hook opens with shutdown", SERVICE,
+  klass("  shutdownModule(): Promise<void> {\n    return load();\n  }"), "");
+naming("a method that sets up a new org opens with provision", SERVICE,
+  klass("  provisionOrgChild(): Promise<void> {\n    return load();\n  }"), "");
 naming("a boolean that reads yes or no", SERVICE,
   klass("  isActive(): boolean {\n    return true;\n  }"), "");
 naming("an enum type that ends in _type", SERVICE,
