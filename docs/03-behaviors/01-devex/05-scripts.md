@@ -322,6 +322,7 @@ Every row below is declared and none is claimed: a run writes the last two cells
 | MKT.SCRIPTS.512 | Backend developer | not be held by an install outside the workspace | `plugin-landed`, given the workspace by `row state`, counts only the registrations in `installed_plugins.json` whose project folder is inside it, so another window's scratchpad is not a place the plugin must land | POSITIVE | UNIT | PLANNED | — |
 | MKT.SCRIPTS.513 | Engineering leader | have arcs that share a go wait without a circle | A `dependsOn` line naming an arc of the same scope makes the waiter's code wait on that arc's parts in its own repository rather than on its own repository's release, and a part waits on the maker of a name it says only where it runs no earlier than the maker | NEGATIVE | UNIT | PLANNED | — |
 | MKT.SCRIPTS.514 | Engineering leader | read a tangled plan's refusal at once | `go write` finds the shortest circle through each release breadth first and counts the parts held in circles, so a plan of any size is refused in one line rather than by listing every circle | NEGATIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.515 | Engineering leader | not be warned about the patches a sheet keeps | The state check allows `arcs/<arc>/patches/`, the folder `sheet patch` writes each entry's diff to, as the arc's data | POSITIVE | UNIT | PLANNED | — |
 
 ## Retired ids
 
