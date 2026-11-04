@@ -37,8 +37,8 @@
 //   state      `workstream state check` fails for a workstream of this window: among its findings an arc
 //              the page does not carry, a workstream with no page, and a step running on an arc not decided
 //   migration  a migration the workspace's ledger lacks still finds old shapes, in any window
-//   in-flight  a reply whose last paragraph waits on a run in flight, and does not say `Nothing unlocked is left:`, is sent back with
-//              the work a run does not lock (RULE.DEVEX.WORKSPACE.499)
+//   in-flight  a reply whose last paragraph waits on a run, while a background shell this window started has no completion notice
+//              yet, and does not say `Nothing unlocked is left:`, is sent back with the work a run does not lock (RULE.DEVEX.WORKSPACE.499)
 //   welcome    a session's first turn opens with the welcome, word for word: the heading and its four lines
 //   corpus     the docs trees still answer the questions only a whole-corpus read can ask
 //
@@ -1572,12 +1572,27 @@ export function waitsOnRun(reply: string): boolean {
   return WAITS_ON_RUN.test(last) && !WAITS_ON_YOU.test(last);
 }
 
+// A background shell the window started, as the harness answers it, and the notices that end one.
+const STARTED_IN_BACKGROUND = /(?:running in background with ID|moved to the background \(ID): ([A-Za-z0-9]+)/g;
+const ENDED_IN_BACKGROUND = /<task-id>([A-Za-z0-9]+)<\/task-id>.{0,600}?<status>(?!running)\w+<\/status>|Successfully stopped task: ([A-Za-z0-9]+)/g;
+
+/**
+ * The background shells a transcript started that no completion notice or stop has ended yet: the runs in flight. Read from the
+ * transcript's own text, so a script run in the background counts as much as a test command does.
+ */
+export function backgroundRunsOpen(transcript: string): string[] {
+  const started = [...transcript.matchAll(STARTED_IN_BACKGROUND)].map((found) => found[1]);
+  const ended = new Set([...transcript.matchAll(ENDED_IN_BACKGROUND)].map((found) => found[1] ?? found[2]));
+  return [...new Set(started)].filter((id) => !ended.has(id));
+}
+
 /**
  * THE IN-FLIGHT CHECK (RULE.DEVEX.WORKSPACE.499): a run in flight never ends the coordinator's turn while unlocked work is open. A reply
- * that ends waiting on a run is sent back with the work a run does not lock, unless it says in one line that nothing unlocked is left.
+ * that ends waiting on a run, while a run is in fact going, is sent back with the work a run does not lock, unless it says in one line that
+ * nothing unlocked is left. With no run going, the same words are a plan, and pass.
  */
-export function checkInFlight(reply: string): Warning[] {
-  if (!waitsOnRun(reply) || NOTHING_UNLOCKED.test(reply)) return [];
+export function checkInFlight(reply: string, runsOpen: string[]): Warning[] {
+  if (!runsOpen.length || !waitsOnRun(reply) || NOTHING_UNLOCKED.test(reply)) return [];
   return [{ check: "in-flight", message:
     "This reply ends waiting on a run that is going. A run in flight never ends the turn while unlocked work is open (RULE.DEVEX.WORKSPACE.499): " +
     "the repository's docs, another repository, the arc's notes, and the preparation of the next run. Take the next of these now; " +
@@ -2035,7 +2050,10 @@ if (argv1Base === "stop.ts" || argv1Base === "stop.mjs") {
     ...span({ group: "stop", action: "close-message" }, () => checkCloseMessage(reply, event.transcript_path ? toolResultsOf(event.transcript_path) : [])),
     ...span({ group: "stop", action: "card-case" }, () => checkCardCase(reply)),
     // A MAIN WINDOW ONLY: a helper's hand-back ends its run, and waits on nothing.
-    ...span({ group: "stop", action: "in-flight" }, () => event.agent_id ? [] : checkInFlight(reply)),
+    ...span({ group: "stop", action: "in-flight" }, () => {
+      if (event.agent_id || !event.transcript_path) return [];
+      try { return checkInFlight(reply, backgroundRunsOpen(readFileSync(event.transcript_path, "utf8"))); } catch { return []; }
+    }),
     ...span({ group: "stop", action: "proposal-record" }, () => checkProposalRecorded(reply, root, mine)),
     ...span({ group: "stop", action: "handover" }, () => checkHandover(reply, root, mine, given, turn.earlier)),
     ...span({ group: "stop", action: "how-it-runs" }, () => checkHowItRuns(withoutFences(reply), root)),
