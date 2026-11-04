@@ -154,6 +154,11 @@ const blocked = { ...marked, parts: [...marked.parts.filter((one) => one.id !== 
 const stillWaiting = clearWaiting(blocked, "docs-lib-repo-1").parts.find((one) => one.id === "docs-lib-repo-1");
 same("[MKT.HOOKS.322] clearing a wait whose plan parts have not landed reads it waiting on them", [stillWaiting.state, stillWaiting.waitingOn.includes("code-nowhere-1")], ["waiting", true]);
 same("[MKT.HOOKS.322] clearing leaves the plan given unchanged", marked.parts.find((one) => one.id === "docs-lib-repo-1").state, "waiting");
+const drawnBefore = { ...plan, parts: plan.parts.map((one) => (one.id === "docs-lib-repo-1" ? { ...one, state: "waiting", waitingOn: "code-nowhere-1, which has not landed" } : one)) };
+const handBefore = { ...plan, parts: plan.parts.map((one) => (one.id === "docs-lib-repo-1" ? { ...one, state: "waiting", waitingOn: "the developer's sign-in" } : one)) };
+same("[MKT.HOOKS.322] a reason drawn from the plan's own waits is not carried into the next plan, and a hand wait is (s188)",
+  [deriveGo(scope, { previous: drawnBefore }).parts.find((one) => one.id === "docs-lib-repo-1").waitingOn, deriveGo(scope, { previous: handBefore }).parts.find((one) => one.id === "docs-lib-repo-1").waitingOn],
+  [undefined, "the developer's sign-in"]);
 
 // MKT.SCRIPTS.326 · a baseline and a full run are both TEST parts, told apart by their ids; fullRunMinutes reads the test rows.
 const tests = plan.parts.filter((p) => p.work === "TEST");
@@ -330,6 +335,14 @@ const applyOf = (plan) => plan.parts.find((p) => p.id === "apply-lib-repo");
 same("[MKT.SCRIPTS.450] two patched entries form apply-lib-repo with the lead as model and no tests, and the helper's part keeps the rest",
   [applyOf(applied)?.entries, applyOf(applied)?.model, applyOf(applied)?.tests, applied.parts.find((p) => p.id === "code-lib-repo-1")?.entries], [["N009/E1", "N009/E2"], "lead", [], ["N009/E3"]]);
 same("[MKT.SCRIPTS.450] the apply part is a code part: the full run waits on it, and the plan holds to its schema", [applied.parts.find((p) => p.id === "full-lib-repo").waitsOn.includes("apply-lib-repo"), goFaults(applied)], [true, []]);
+const applyShared = deriveGo([
+  { arc: "N004", sheet: sheet([entry("E1", "plat:src/a.ts"), { ...entry("E2", "plat:src/b.ts"), patch: patchOf("E2") }], ["sup", "plat"]) },
+  { arc: "N005", sheet: { ...sheet([{ ...entry("E1", "plat:src/c.ts"), patch: patchOf("E1") }], ["sup", "plat"]), dependsOn: ["N004 entries landed first"] } },
+]);
+const sharedApply = applyShared.parts.find((p) => p.id.startsWith("apply-plat"));
+const n4Helper = applyShared.parts.find((p) => p.entries.includes("N004/E1"));
+same("[MKT.SCRIPTS.513] the apply part, carrying every arc's patched entries, never waits on another arc's helper code part for a dependsOn line (s188)",
+  [!!sharedApply, sharedApply?.waitsOn.includes(n4Helper?.id), applyShared.circles], [true, false, []]);
 const failing = deriveGo([{ arc: "N009", sheet: sheet([{ ...entry("E1", "lib-repo:src/a.ts"), patch: patchOf("E1") }, { ...entry("E2", "lib-repo:src/b.ts"), patch: patchOf("E2") }]) }],
   { patchOk: (_arc, one) => one.id !== "E2" });
 same("[MKT.SCRIPTS.450] an entry whose patch fails the check joins a code part on its prose",

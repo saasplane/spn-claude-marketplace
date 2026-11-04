@@ -542,7 +542,10 @@ export function deriveGo(scope: readonly ScopeSheet[], options: DeriveOptions = 
   // A wait marked by hand outlives a new derivation.
   for (const one of parts) {
     const old = (options.previous?.parts ?? []).find((was) => was.id === one.id);
-    if (old?.state === "waiting" && !keptIds.has(one.id) && !one.waitingOn) { one.state = "waiting"; one.waitingOn = old.waitingOn; }
+    // A hand wait is carried; a reason `go wait --clear` drew from the plan's own waits is not, since the new plan draws its own (s188).
+    if (old?.state === "waiting" && !keptIds.has(one.id) && !one.waitingOn && !isDrawnFromPlan(old.waitingOn)) {
+      one.state = "waiting"; one.waitingOn = old.waitingOn;
+    }
   }
   const releases: string[] = [];
   for (const { sheet } of scope) for (const repo of sheet.releaseChain ?? []) if (!releases.includes(repo)) releases.push(repo);
@@ -590,7 +593,9 @@ export function deriveGo(scope: readonly ScopeSheet[], options: DeriveOptions = 
             const own = releases.indexOf(waiter.repo);
             const shipped = parts.filter((one) => slotOf(one) === "RELEASE" && theirs.includes(one.repo) && one.repo !== waiter.repo
               && (own < 0 || releases.indexOf(one.repo) < own));
-            const alongside = parts.filter((one) => one.repo === waiter.repo && slotOf(one) === "CODE" && one.state !== "landed"
+            // The apply part carries entries of every arc and runs ahead of the helpers' code parts, so it never waits on
+            // them for another arc's line; it still waits on the releases before its repository (s188).
+            const alongside = isApplyPart(waiter) ? [] : parts.filter((one) => one.repo === waiter.repo && slotOf(one) === "CODE" && one.state !== "landed"
               && one.entries.some((ref) => ref.startsWith(`${named}/`)));
             for (const one of [...shipped, ...alongside]) if (one !== waiter && !waiter.waitsOn.includes(one.id) && !waitsFor(one, waiter)) waiter.waitsOn.push(one.id);
           }
@@ -795,13 +800,17 @@ export function markWaiting(plan: GoPlan, partId: string, reason: string): GoPla
  * on in the plan has landed, else `waiting` again, on those parts. The plan given is not changed; a part that is not
  * waiting, or not in the plan, is refused.
  */
+/** The ending of a waiting reason `clearWaiting` draws from the plan's own waits, which a later plan draws again rather than carries. */
+const DRAWN_FROM_PLAN = ", which has not landed";
+const isDrawnFromPlan = (reason: string | undefined): boolean => !!reason && reason.endsWith(DRAWN_FROM_PLAN);
+
 export function clearWaiting(plan: GoPlan, partId: string): GoPlan {
   const one = plan.parts.find((part) => part.id === partId);
   if (!one) throw new Error(`${partId} is not a part of the plan`);
   if (one.state !== "waiting") throw new Error(`${partId} is ${one.state}, not waiting`);
   const open = one.waitsOn.filter((id) => plan.parts.find((part) => part.id === id)?.state !== "landed");
   const { waitingOn: _held, ...rest } = one;
-  const next: GoPart = open.length ? { ...rest, state: "waiting", waitingOn: `${open.join(", ")}, which has not landed` } : { ...rest, state: "ready" };
+  const next: GoPart = open.length ? { ...rest, state: "waiting", waitingOn: `${open.join(", ")}${DRAWN_FROM_PLAN}` } : { ...rest, state: "ready" };
   return { ...plan, parts: plan.parts.map((part) => (part.id === partId ? next : part)) };
 }
 
