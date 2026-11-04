@@ -263,6 +263,8 @@ same("[MKT.SCRIPTS.443] a release waits on its own repository's full run and gen
 const loopPlan = deriveGo([{ arc: "N003", sheet: { ...sheet([fe("E1", "sup:src/a.ts")], ["sup"]), dependsOn: ["N004 needs plat"] } }, ...two(["N003 landed: its release of sup"], false)]);
 same("[MKT.SCRIPTS.443] a dependsOn line naming an arc whose repository comes later in the chain adds no release wait, so two arcs naming each other close no circle",
   [loopPlan.parts.find((p) => p.id === "code-sup-1").waitsOn.includes("release-plat-1"), loopPlan.parts.find((p) => p.id === "code-plat-1").waitsOn.includes("release-sup-1"), loopPlan.circles], [false, true, []]);
+same("[MKT.SCRIPTS.443] that dependsOn line is named among the lines it ignored, and go write prints it (s186)",
+  [loopPlan.ignored.length, /N003's dependsOn names N004, whose plat comes later in the chain than sup/.test(loopPlan.ignored[0] ?? ""), own.ignored], [1, true, []]);
 const looped = [
   { id: "code-sup-1", work: "CODE", repo: "sup", waitsOn: ["release-plat-1"] }, { id: "full-sup", work: "FULL_RUN", repo: "sup", waitsOn: ["code-sup-1"] },
   { id: "release-sup-1", work: "RELEASE", repo: "sup", waitsOn: ["full-sup"] }, { id: "code-plat-1", work: "CODE", repo: "plat", waitsOn: ["release-sup-1"] },

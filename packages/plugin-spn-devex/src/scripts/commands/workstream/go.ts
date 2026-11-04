@@ -266,7 +266,7 @@ function write(args: string[]): number {
     const sheet = readSheet(ws, other);
     if (sheet) siblings.push({ arc: other, sheet, data: readArc(ws, other) });
   }
-  const { circles, ...plan } = deriveGo(sheets.map((one) => ({ ...one, data: arcs.find((data) => data.arc === one.arc) ?? null })), {
+  const { circles, ignored, ...plan } = deriveGo(sheets.map((one) => ({ ...one, data: arcs.find((data) => data.arc === one.arc) ?? null })), {
     siblings,
     rates: ratesOf(measures), measures, previous, fullRunMinutes: fullRunMinutes(root), landedOrder: landedOrder(ws, lead), followUp: words.given("after-close"),
     dirsOf: (repo) => dirsIn(root, ws, repo),
@@ -282,6 +282,7 @@ function write(args: string[]): number {
   for (const part of plan.parts) if (part.entries.length && !isApplyPart(part) && part.state !== "landed" && part.state !== "running") writeWhole(briefOf(ws, lead, part), brief(plan, part, ws, root));
   logEvent(ws, lead, "go", null, `written · ${plan.parts.length} parts · scope ${scope.join(",")}`);
   console.log(`ok · ${lead} go written · ${plan.parts.length} parts over ${scope.join(", ")}`);
+  for (const line of ignored) console.log(`note · ${line}`);
   console.log(nextStep(`${basename(ws)}/${lead}`, ws, plan));
   return 0;
 }

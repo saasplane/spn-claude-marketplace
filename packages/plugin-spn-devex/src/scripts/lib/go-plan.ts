@@ -203,7 +203,8 @@ export type DeriveOptions = {
   patchOk?: (arc: string, entry: SheetEntry) => boolean;
 };
 /** A derived plan, with the parts of every wait circle that runs through a release: `go write` refuses a plan that has one and never saves the field. */
-export type DerivedGo = GoPlan & { circles: string[][] };
+/** `ignored` names each `dependsOn` line that adds no wait: an arc of the scope whose repositories all come later in the chain (s186). */
+export type DerivedGo = GoPlan & { circles: string[][]; ignored: string[] };
 
 /** The ids of the parts that landed, oldest first, read from the `<part> landed` go lines of the lead arc's log. */
 export function landedOrder(ws: string, lead: string): string[] {
@@ -579,6 +580,7 @@ export function deriveGo(scope: readonly ScopeSheet[], options: DeriveOptions = 
   const reposOf = (sheet: Sheet): string[] => [...new Set(sheet.entries.map(repoOf))];
   const others = new Map((options.siblings ?? []).map((one) => [one.arc, one] as const));
   for (const one of scope) others.delete(one.arc);
+  const ignored: string[] = [];
   for (const { arc, sheet } of scope) {
     for (const line of Array.isArray(sheet.dependsOn) ? sheet.dependsOn : []) {
       for (const named of new Set(String(line).match(/\bN\d+[a-z]?\b/g) ?? [])) {
@@ -598,6 +600,9 @@ export function deriveGo(scope: readonly ScopeSheet[], options: DeriveOptions = 
             const alongside = isApplyPart(waiter) ? [] : parts.filter((one) => one.repo === waiter.repo && slotOf(one) === "CODE" && one.state !== "landed"
               && one.entries.some((ref) => ref.startsWith(`${named}/`)));
             for (const one of [...shipped, ...alongside]) if (one !== waiter && !waiter.waitsOn.includes(one.id) && !waitsFor(one, waiter)) waiter.waitsOn.push(one.id);
+            const later = theirs.filter((repo) => repo !== waiter.repo && own >= 0 && releases.indexOf(repo) > own);
+            const note = `${arc}'s dependsOn names ${named}, whose ${later.join(" and ")} comes later in the chain than ${waiter.repo}: ${waiter.id} does not wait on it`;
+            if (!shipped.length && !alongside.length && later.length && !ignored.includes(note)) ignored.push(note);
           }
         } else if (waiters[0] && !waiters[0].waitingOn) {
           waiters[0].state = "waiting"; waiters[0].waitingOn = `${named}'s release of ${reposOf(target.sheet).join(" and ")}`;
@@ -635,7 +640,7 @@ export function deriveGo(scope: readonly ScopeSheet[], options: DeriveOptions = 
   }
   return {
     schemaVersion: GO_SCHEMA_VERSION, lead: scope[0]?.arc ?? "", scope: scope.map((one) => one.arc),
-    writtenAt: options.writtenAt ?? new Date().toISOString(), parts, circles: releaseCircles(parts),
+    writtenAt: options.writtenAt ?? new Date().toISOString(), parts, circles: releaseCircles(parts), ignored,
   };
 }
 
