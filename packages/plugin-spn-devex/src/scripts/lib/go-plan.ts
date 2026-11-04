@@ -638,9 +638,11 @@ export function deriveGo(scope: readonly ScopeSheet[], options: DeriveOptions = 
     if (old) parts.push(old);
     else if (owed.has(repo)) parts.push(part(id, repo, "PROOF", [], [], { waitsOn: released }));
   }
+  // A circle is looked for among the parts not yet landed: a landed part's recorded waits hold nothing, so a circle made only of
+  // landed parts, as an old plan's kept parts can make, refuses no plan.
   return {
     schemaVersion: GO_SCHEMA_VERSION, lead: scope[0]?.arc ?? "", scope: scope.map((one) => one.arc),
-    writtenAt: options.writtenAt ?? new Date().toISOString(), parts, circles: releaseCircles(parts), ignored,
+    writtenAt: options.writtenAt ?? new Date().toISOString(), parts, circles: releaseCircles(parts.filter((one) => one.state !== "landed")), ignored,
   };
 }
 
@@ -767,7 +769,11 @@ export function tangledParts(parts: readonly GoPart[]): string[] {
 export function changedEntries(part: GoPart, scope: readonly ScopeSheet[]): string[] {
   const hashes = part.signature.split(".");
   const now = new Map(scope.flatMap(({ arc, sheet }) => sheet.entries.map((entry) => [refOf(arc, entry), entry] as const)));
+  // An entry of an arc outside the plan's scope is another plan's to judge: an old plan whose parts held other arcs' entries before
+  // its scope narrowed would otherwise read them as changed for ever (035's N003, at the close).
+  const inScope = new Set(scope.map(({ arc }) => arc));
   return part.entries.filter((ref, at) => {
+    if (!inScope.has(ref.split("/")[0])) return false;
     const entry = now.get(ref);
     return !entry || (hashes[at] !== entryHash(entry) && hashes[at] !== signedWhole(entry));
   });
