@@ -32,7 +32,7 @@ one("a code under its own module's prefix", {
 });
 
 const PREFIX_OTHER = seed("NTF_MANAGE_CHANNELS");
-one("[MKT.PROVIDERS.33] a code under another module's prefix in a contribution is denied, and the denial says to add a selection key in its own contribution", {
+one("[MKT.PROVIDERS.14] a code under another module's prefix in a contribution is denied, and the denial says to add a selection key in its own contribution", {
   script: "enablement-grammar", root: tree({ [SEED]: PREFIX_OTHER }),
   input: { file_path: SEED, content: PREFIX_OTHER },
   expect: "deny", says: "adds a selection key in its own contribution",
