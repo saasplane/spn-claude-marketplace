@@ -1054,6 +1054,13 @@ The coordinator is the session that writes the orders and reads what comes back.
 yours**: a pin move, a rename, a prop swap the brief could list. Do it directly, with no child, no brief
 and no report. An order carries 10 to 20 minutes of fixed cost before any of the work is done.
 
+**A run in flight never ends your turn while unlocked work is open** (`RULE.DEVEX.WORKSPACE.499` · MUST · check:stop).
+Start a run of about 15 minutes or more in the background, or send it to a helper by order, and carry on
+with what the run does not lock: the repository's docs, another repository, the arc's notes, and the
+preparation of the next run. End the turn while it goes only where none of these is left, and say so in
+one line that opens `Nothing unlocked is left:` with the reason. The Stop hook sends back a reply that
+ends waiting on a run and says neither.
+
 **Where a change must be seen to be judged, show one real before-and-after on the arc's preview and
 wait for a yes before any order goes out — MUST.** Take one real piece of the code the orders will
 change, and show it as it is now and as it will be, in a section of the
