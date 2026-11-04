@@ -638,9 +638,11 @@ export function deriveGo(scope: readonly ScopeSheet[], options: DeriveOptions = 
     if (old) parts.push(old);
     else if (owed.has(repo)) parts.push(part(id, repo, "PROOF", [], [], { waitsOn: released }));
   }
+  // A circle is looked for among the parts not yet landed: a landed part's recorded waits hold nothing, so a circle made only of
+  // landed parts, as an old plan's kept parts can make, refuses no plan.
   return {
     schemaVersion: GO_SCHEMA_VERSION, lead: scope[0]?.arc ?? "", scope: scope.map((one) => one.arc),
-    writtenAt: options.writtenAt ?? new Date().toISOString(), parts, circles: releaseCircles(parts), ignored,
+    writtenAt: options.writtenAt ?? new Date().toISOString(), parts, circles: releaseCircles(parts.filter((one) => one.state !== "landed")), ignored,
   };
 }
 

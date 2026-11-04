@@ -272,6 +272,9 @@ const looped = [
 ];
 same("[MKT.SCRIPTS.443] a wait circle through a release is returned with its parts", releaseCircles(looped).some((c) => c.includes("release-sup-1") && c.includes("code-sup-1") && c.includes("release-plat-1")), true);
 same("[MKT.SCRIPTS.443] and a plan with no circle returns none", own.circles, []);
+const landedLoop = deriveGo([{ arc: "N003", sheet: sheet([fe("E1", "sup:src/a.ts")], ["sup"]) }], {
+  previous: { schemaVersion: 1, lead: "N003", scope: ["N003"], writtenAt: "2026-10-31T00:00:00Z", parts: looped.map((p) => ({ entries: [], tests: [], signature: "", ...p, state: "landed" })) } });
+same("[MKT.SCRIPTS.443] a circle made only of landed parts, kept from an earlier plan, refuses no plan", landedLoop.circles, []);
 same("[MKT.SCRIPTS.514] the circle through a release is its shortest, one to each release, and tangledParts counts every part held in a circle",
   [releaseCircles(looped).map((c) => c.length), tangledParts(looped).length, tangledParts(own.parts)], [[4], 6, []]);
 const wide = [{ id: "release-r-1", work: "RELEASE", repo: "r", waitsOn: ["full-r"] }, { id: "full-r", work: "FULL_RUN", repo: "r", waitsOn: Array.from({ length: 40 }, (_, i) => `code-r-${i}`) },
