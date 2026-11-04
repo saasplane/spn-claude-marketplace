@@ -769,7 +769,11 @@ export function tangledParts(parts: readonly GoPart[]): string[] {
 export function changedEntries(part: GoPart, scope: readonly ScopeSheet[]): string[] {
   const hashes = part.signature.split(".");
   const now = new Map(scope.flatMap(({ arc, sheet }) => sheet.entries.map((entry) => [refOf(arc, entry), entry] as const)));
+  // An entry of an arc outside the plan's scope is another plan's to judge: an old plan whose parts held other arcs' entries before
+  // its scope narrowed would otherwise read them as changed for ever (035's N003, at the close).
+  const inScope = new Set(scope.map(({ arc }) => arc));
   return part.entries.filter((ref, at) => {
+    if (!inScope.has(ref.split("/")[0])) return false;
     const entry = now.get(ref);
     return !entry || (hashes[at] !== entryHash(entry) && hashes[at] !== signedWhole(entry));
   });
