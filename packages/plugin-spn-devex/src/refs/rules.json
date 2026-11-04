@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "book": {
     "repository": "spn-foundation",
-    "commit": "5451d453"
+    "commit": "7294be1e"
   },
   "rules": [
     {
@@ -12660,6 +12660,25 @@
       }
     },
     {
+      "id": "RULE.DEVEX.WORKSPACE.499",
+      "level": "MUST",
+      "params": {
+        "check": "stop"
+      },
+      "class": "checked",
+      "sentence": "A run in flight never ends the coordinator's turn while unlocked work is open",
+      "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
+      "heading": "An order is one delegated execution, and every order follows the same rules",
+      "decision": "DEC.DEVEX.WORKSPACE.499",
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/workstream.md",
+          "heading": "An order is one delegated execution, and every order follows the same rules"
+        }
+      ]
+    },
+    {
       "id": "RULE.LAUNCHPAD.CONTROL_PLANE.001",
       "level": "MUST",
       "params": {
@@ -13735,6 +13754,11 @@
       "heading": "A person's data scope: what narrows one member",
       "decision": null,
       "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "refs/platform/core/tenancy/README.md",
+          "heading": "Enablement: what a type is offered, never what a person may do"
+        },
         {
           "plugin": "spn-apps",
           "path": "skills/implement/SKILL.md",

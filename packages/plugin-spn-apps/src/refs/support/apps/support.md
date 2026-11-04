@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/02-support/",
-      "seen": "de642b84"
+      "seen": "a82e36be"
     }
   ]
 }
@@ -69,7 +69,7 @@ src/
 
 - **Make the capability interface complete.** Put every operation, message shape, and result a consumer needs on the interface and its contract states, so no caller has to reach around it. A consumer should be able to name the interface and nothing past it — never an implementation, never a branch on which one is active, and it should never learn which one it got.
 - **Make each implementation complete on its own** — never write a shared base carrying half the behaviour. A partial implementation makes the seam a lie: swapping engines would then swap whatever the base already decided for every implementation.
-- **Never leak vendor detail through the seam** — no vendor error shapes, no vendor identifiers in signatures, no vendor configuration objects as parameters. Where a capability is organization-facing (email, SMS, storage), check the platform's system-provider registry too — platform defaults with per-account overrides, credentials held write-only.
+- **Never leak vendor detail through the seam** — no vendor error shapes, no vendor identifiers in signatures, no vendor configuration objects as parameters. Where a capability is organization-facing (email, SMS, storage), check the platform's provider registry too — platform defaults with per-account overrides, credentials held write-only.
 - **Make selection an `mtype`-valued configuration from a closed `Type` vocabulary, never a branch in code.** Fail at boot on an unknown selector value, naming the group and the value you did not recognize — never fall back silently to a default engine. Add a vendor additively: one new enum value, one new implementation, one new configuration variant, and leave every consumer unchanged. Load a vendor dependency only when its value is selected, and if it is missing, fail at the point of selection, naming both the dependency and the selector that asked for it.
 - **Quarantine vendor code** in the integrations group (organization-facing vendors) or the providers group (infrastructure engines) — never inline it in a module, and never import a vendor SDK from one. Scope vendor credentials to the constructor: construct an implementation with its decrypted credentials and register it; never pass credentials per call, and never read them from storage the implementation does not own.
 - **Classify retriability as part of the result**, never as a thrown vendor-shaped error. Classify a provider-rejected outcome (invalid input, a refused request) non-retriable; classify a transport failure, timeout, or upstream server error retriable. Branch callers on the classification, never on vendor-specific error shapes. Extend the shared result base for a typed payload (a provider message id, a stored object handle) — never return an untyped vendor blob.

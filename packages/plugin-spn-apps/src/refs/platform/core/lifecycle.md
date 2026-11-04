@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/03-platform/01-core/05-lifecycle.md",
-      "seen": "258dedf0"
+      "seen": "ab5c5ec0"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/03-platform/01-core/05-lifecycle/",
@@ -15,7 +15,7 @@
 
 # Lifecycle
 
-What the platform already gives you: self-serve onboarding with no person required, a tenancy model where reshaping a real customer is an ordinary write, and a governed principal — the operating agent — for acting inside a running platform without a person watching. Do not build a manual onboarding queue, a bespoke merge script that hand-copies rows between organizations, or a service account with ambient access for your own automation — read this before you reach for any of them.
+What the platform already gives you: self-serve onboarding with no person required, a tenancy model where an org's place in the tree never changes, so a rename is an ordinary write and a merge or a split is a new org, and a governed principal — the operating agent — for acting inside a running platform without a person watching. Do not build a manual onboarding queue, a bespoke merge script that hand-copies rows between organizations, or a service account with ambient access for your own automation — read this before you reach for any of them.
 
 ## Onboarding is self-serve by design
 
@@ -36,7 +36,7 @@ What varies between the create-an-organization and resolve-or-refuse flows is wh
 
 ## Reshaping is routine, not an exception
 
-Merges, splits and renames happen to real customers, and you build for that rather than treating it as a one-off migration project. An organization's **identity** — never its place in the tree — is what every other construct in this book references, which is why its position can change underneath without anything else needing to be rewritten. That is the payoff of the tenancy rule carried in the Tenancy ref: nothing is keyed to a node's position.
+Merges, splits and renames happen to real customers, and you build for that rather than treating it as a one-off migration project. An organization's **identity** — never its place in the tree — is what every other construct in this book references, and the position itself never moves: an org's parent, path and depth are written once, when it is created, so a merge, a split or a move is a new org through that product's door, and one person then holds a membership in each. Nothing is keyed to position, so nothing has to be rewritten. That is the payoff of the tenancy rule carried in the Tenancy ref: nothing is keyed to a node's position.
 
 The one thing reshaping cannot make cheap is a promise already made about records. A data policy stays with the organization that made it — retention has no agreed direction, so a merge would produce a promise neither organization made. Read the Data and Trust ref before you write a merge that touches retention or privacy settings.
 
