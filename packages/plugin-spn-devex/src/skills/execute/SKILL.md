@@ -2,6 +2,20 @@
 name: execute
 description: Carry out a go. Use the moment the developer gives the go on one arc or several - it derives the plan from the change sheets, briefs every helper from it, runs the full suites once per repository, and releases in chain order.
 ---
+<!-- spn:restates
+{
+  "docs": [
+    {
+      "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
+      "seen": "2fce1268"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
+      "seen": "632da84b"
+    }
+  ]
+}
+-->
 
 ## The rules this step holds
 

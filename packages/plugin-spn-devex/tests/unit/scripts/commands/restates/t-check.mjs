@@ -184,7 +184,7 @@ console.log("\n=== a finding is exit 1, whatever the count, and a typing fault i
   writeFileSync(join(market, "packages", "plugin-spn-devex", "refs", "second.md"),
     `<!-- spn:restates\n{\n  "docs": [\n    { "path": "spn-foundation/docs/${SEAT.constructs}/01-thing.md", "seen": "deadbeef" }\n  ]\n}\n-->\n\n# Second — quick reference\n`);
   const two = run([book], market);
-  one("[MKT.SCRIPTS.167] known-bad: two drifted stamps are reported, and `restates check` exits 1, never the count",
+  one("[MKT.REFS.14] known-bad: two drifted stamps are reported, and `restates check` exits 1, never the count",
     /\b2 drift\b/.test(two.out) && two.code === 1);
   for (const kind of ["docs", "decisions"]) {
     const narrow = typed([kind, "check", book], market);
