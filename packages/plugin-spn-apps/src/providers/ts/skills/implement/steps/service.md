@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/03-module/01-server/02-app/01-services.md",
-      "seen": "5d99ba90"
+      "seen": "f32edaed"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/03-module/01-server/02-app/02-repositories.md",
@@ -11,11 +11,11 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/10-providers/ts/06-service.md",
-      "seen": "7c65f048"
+      "seen": "faa108f4"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/10-providers/ts/07-data.md",
-      "seen": "c578a405"
+      "seen": "52db4067"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/10-providers/ts/03-structure.md",

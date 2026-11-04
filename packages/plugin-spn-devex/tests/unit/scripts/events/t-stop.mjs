@@ -1891,9 +1891,9 @@ console.log("\n=== stop — send-backs are written as they are said, the welcome
   const editRows = (ws, change) => { const data = JSON.parse(readFileSync(arcFile(ws), "utf8")); change(data); writeFileSync(arcFile(ws), `${JSON.stringify(data, null, 2)}\n`); };
   const PROMISE = "The page is written and its checks are green.\n\nNext I'll build it.";
 
-  check("[MKT.HOOKS.341] the eleven checks about the reply are one set in lib/payload.ts",
-    payloadLib.REPLY_CHECKS instanceof Set && payloadLib.REPLY_CHECKS.size === 11
-      && ["needs-you", "reply-shape", "handover", "how-it-runs", "partner-words", "page-path", "close-message", "card-case", "proposal-record", "welcome", "window"].every((name) => payloadLib.REPLY_CHECKS.has(name)),
+  check("[MKT.HOOKS.341] the twelve checks about the reply are one set in lib/payload.ts",
+    payloadLib.REPLY_CHECKS instanceof Set && payloadLib.REPLY_CHECKS.size === 12
+      && ["needs-you", "reply-shape", "handover", "how-it-runs", "partner-words", "page-path", "close-message", "card-case", "in-flight", "proposal-record", "welcome", "window"].every((name) => payloadLib.REPLY_CHECKS.has(name)),
     JSON.stringify([...(payloadLib.REPLY_CHECKS ?? [])]));
 
   // The suite runs with SPN_TELEMETRY=off (tests/run.mjs); these cases read the rows a hook writes, so they take it out
@@ -2043,6 +2043,39 @@ console.log("\n=== stop — send-backs are written as they are said, the welcome
       stopModule.checkHandover("# Status\n\nOpen a new window to carry on.", ROOT, new Set())[0]?.message.includes("opens with a heading")
         && stopModule.checkHandover("| a | b |\n| - | - |\n\nOpen a new window to carry on.", ROOT, new Set())[0]?.message.includes("opens with a table"));
     check("[MKT.HOOKS.477] HANDOVER_COLUMN is exported", stopModule.HANDOVER_COLUMN === 14, String(stopModule.HANDOVER_COLUMN));
+  }
+
+  // A RUN IN FLIGHT NEVER ENDS THE TURN (RULE.DEVEX.WORKSPACE.499).
+  {
+    const waits = [
+      "The narrowed full run is going in the background. When it finishes I'll fold the report and release.",
+      "Started the journeys. Once the suite ends I read its failures.",
+      "Contract is running; I'm waiting for its completion notice.",
+    ];
+    const going = ["bcfbnqr4d"];
+    const sent = waits.map((text) => stopModule.checkInFlight(text, going));
+    check("[MKT.HOOKS.490] a reply whose last paragraph waits on a run in flight is sent back with the work a run does not lock and the rule",
+      sent.every((found) => found.length === 1 && found[0].check === "in-flight" && found[0].message.includes("RULE.DEVEX.WORKSPACE.499")
+        && found[0].message.includes("docs") && found[0].message.includes("another repository") && found[0].message.includes("Nothing unlocked is left:")), JSON.stringify(sent));
+    check("[MKT.HOOKS.490] the check is about the reply: it is said while a row runs", payloadLib.REPLY_CHECKS.has("in-flight"));
+    const quiet = (text) => stopModule.checkInFlight(text, going).length === 0;
+    check("[MKT.HOOKS.491] a reply that waits on a run and says nothing unlocked is left passes",
+      quiet("The release waits on the full run.\n\nNothing unlocked is left: docs, notes and the other repositories are landed. When it finishes I fold the report."));
+    check("[MKT.HOOKS.491] a reply that waits on the developer, names no run, or waits on a run only in an earlier paragraph passes",
+      quiet("When you give the go, the run starts.") && quiet("The run passed, 352 of 352. I fold the report now.")
+        && quiet("When the run finishes it writes its file.\n\nThe report is folded and the part landed."));
+    check("[MKT.HOOKS.491] a fenced block that quotes a wait is left alone", quiet("Done.\n\n```\nwhen it finishes\n```"));
+    check("[MKT.HOOKS.491] with no run in flight, the same words are a plan and pass", stopModule.checkInFlight(waits[0], []).length === 0);
+    const transcript = [
+      '{"content":"Command running in background with ID: aaa111. Output is being written to"}',
+      '{"content":"Command did not complete within its 120s timeout and was moved to the background (ID: bbb222). Output"}',
+      '{"content":"Command running in background with ID: ccc333."}',
+      '{"content":"<task-id>aaa111</task-id>\\n<tool-use-id>t</tool-use-id>\\n<status>completed</status>"}',
+      '{"content":"Successfully stopped task: bbb222 (sleep)"}',
+      '{"content":"<task-id>ccc333</task-id>\\n<status>running</status>"}',
+    ].join("\n");
+    check("[MKT.HOOKS.490] a run is in flight while its background shell has no completion notice and no stop",
+      JSON.stringify(stopModule.backgroundRunsOpen(transcript)) === JSON.stringify(["ccc333"]), JSON.stringify(stopModule.backgroundRunsOpen(transcript)));
   }
 
   // A CARD IS NAMED WITH A CAPITAL (RULE.DEVEX.WORKSPACE.486).

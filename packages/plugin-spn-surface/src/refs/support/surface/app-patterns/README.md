@@ -3,7 +3,7 @@
   "files": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/01-common/app-patterns",
-      "seen": "3457b99c"
+      "seen": "c4fc8dc0"
     }
   ]
 }

@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/08-operate/",
-      "seen": "67ec6181"
+      "seen": "563a34e4"
     }
   ]
 }
@@ -129,7 +129,7 @@ Routing is data: a new customer surface is a row, never a release. **A customer'
 | --- | --- |
 | the estate | the zones, the edge certificates, one record per `{env}-{app}` host, the zone's `*` record, the tenant edge and the route store |
 | the service publisher | one private record per exposed deployment |
-| the running platform | `sites/{host}` — the route `{env, app, orgCode, orgName}` |
+| the running platform | `sites/{host}` — the route `{env, app, orgCode, orgName}`, where `app` is the app row's kind code, which names the release that serves the site |
 | the deploy | `releases/{env}/{app}` — the release one application serves in one environment |
 
 Each writer's scope is disjoint, so nothing races on a name (`RULE.SUPPORT.INFRA.105` · MUST · skill:spn-infra/run). The runtime never writes `releases/` and the deploy never writes `sites/`, so a rollback cannot lose a tenant and a signup cannot repoint a release. **No infrastructure change per customer, and none per customer-owned domain.**

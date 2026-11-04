@@ -246,7 +246,7 @@ The rules each one keeps:
 - **The moment is read only from the result of the command that makes it, and a quoted sample is not the moment.** A shape shown because the developer asked to see it is a sample, and the stop check does not read it as a handover or a close.
 - **An arc and a card keep their number beside their title**, such as `N011 (Agent improvements)` and `S71 (the handover as a block)`. **A row and a part are named by what they do and never by number**, such as *the support code's full run*.
 - **Numbers sit inside sentences, and there is no table and no commit hash** in any of the six.
-- **An open point is written as the question with the options named** (`RULE.DEVEX.AGENT.086`).
+- **An open point is written as the question with the options named** (`RULE.DEVEX.AGENT.086` · MUST · short).
 
 A release and a window's handover done have no command whose result the agent can read, so the check holds their shape when a reply opens with them and never demands them.
 
@@ -363,7 +363,7 @@ tells the developer the outcome in one line, never as a question** (`RULE.DEVEX.
 | its worktrees and branches, and the commits, pushes, pull requests, merges and releases its grants cover | the agent | the outcome in one line, with the link or the version |
 | its own bookkeeping: the steps, the log, the notes, the plan | the agent | nothing |
 
-**A grant is what the workspace's settings allow, plus a release of any size** (`RULE.DEVEX.WORKSPACE.069`). The grant covers a release of any size because the agent names the version from the change, and shows it on the arc's preview. An act no grant
+**A grant is what the workspace's settings allow, plus a release of any size** (`RULE.DEVEX.WORKSPACE.069` · MUST · check:workstream-state). The grant covers a release of any size because the agent names the version from the change, and shows it on the arc's preview. An act no grant
 covers stays the developer's: a push or a merge the settings refuse, a command the permission system refused, and, in alpha, a cloud change. The agent asks for it in words, and says what it needs and why.
 
 **When the agent is the subject of the work, its design is a construct, and the developer decides it.**

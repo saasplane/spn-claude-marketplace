@@ -5,6 +5,7 @@
 //           docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § A card is only for what the rules leave open
 //           RULE.DEVEX.WORKSPACE.486, a question is named Q<n> and a suggestion S<n>, with a capital letter, wherever a person reads it
 //           RULE.DEVEX.WORKSPACE.206, a close is a milestone, and the agent writes its message before it asks, or right after it closes on a standing grant
+//           RULE.DEVEX.WORKSPACE.499, a run in flight never ends the coordinator's turn while unlocked work is open
 // The chapters are the source of truth. A rule change is edited there first, then here, in the same change.
 //
 // The Stop checks. They read what the turn is about to leave behind, and warn — never refuse, because
@@ -36,6 +37,8 @@
 //   state      `workstream state check` fails for a workstream of this window: among its findings an arc
 //              the page does not carry, a workstream with no page, and a step running on an arc not decided
 //   migration  a migration the workspace's ledger lacks still finds old shapes, in any window
+//   in-flight  a reply whose last paragraph waits on a run, while a background shell this window started has no completion notice
+//              yet, and does not say `Nothing unlocked is left:`, is sent back with the work a run does not lock (RULE.DEVEX.WORKSPACE.499)
 //   welcome    a session's first turn opens with the welcome, word for word: the heading and its four lines
 //   corpus     the docs trees still answer the questions only a whole-corpus read can ask
 //
@@ -52,7 +55,7 @@
 // unfinished, and that window hears about it. A window bound to none hears nothing about them.
 //
 // WHILE A ROW IS IN PROGRESS, ONLY A FINDING ABOUT THE REPLY SENDS THE AGENT BACK (RULE.DEVEX.WORKSPACE.244):
-// `needs-you`, `reply-shape`, `handover`, `how-it-runs`, `partner-words`, `page-path`, `close-message`, `card-case`, `proposal-record` and `welcome`. Every other finding is held, and the checks find
+// `needs-you`, `reply-shape`, `handover`, `how-it-runs`, `partner-words`, `page-path`, `close-message`, `card-case`, `in-flight`, `proposal-record` and `welcome`. Every other finding is held, and the checks find
 // it again at the first turn end where no row is in progress (`splitFindings`).
 //
 // `corpus` is the newest and the odd one out: every other check here reads what the TURN wrote, and
@@ -1552,6 +1555,50 @@ export function checkCardCase(reply: string): Warning[] {
     "A question is named Q<n> and a suggestion S<n>, with a capital letter, wherever a person reads it (RULE.DEVEX.WORKSPACE.486). Say it again with the capital." }];
 }
 
+// ---------------------------------------------------------------------------- a run in flight never ends the turn
+
+// A wait on a run, in the reply's last paragraph: the turn would end and idle until the run's notice.
+// nosemgrep: javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp -- pattern built from this script's own constants, never outside input
+const WAITS_ON_RUN = new RegExp([
+  String.raw`\b(?:when|once|after|as soon as)\s+(?:it|they|that|this|the\s+(?:\w+[\s-]+){0,2}(?:run|runs|suite|suites|tests?|tiers?|journeys?|build|job))\s+(?:finish(?:es)?|ends?|completes?|is\s+done|are\s+done|lands?|comes?\s+back|returns?)`,
+  String.raw`\b(?:wait(?:ing)?\s+(?:for|on)|until)\s+(?:its|the|that)\s+(?:\w+\s+){0,2}(?:completion|notification|notice|result|results|verdict)`,
+].join("|"), "i");
+const NOTHING_UNLOCKED = /\bNothing unlocked is left:/i;
+
+/** Whether the reply's last paragraph, fences set aside, waits on a run that is going. */
+export function waitsOnRun(reply: string): boolean {
+  const paragraphs = withoutFences(reply).split(/\n\s*\n/).map((one) => one.trim()).filter(Boolean);
+  const last = paragraphs[paragraphs.length - 1] ?? "";
+  return WAITS_ON_RUN.test(last) && !WAITS_ON_YOU.test(last);
+}
+
+// A background shell the window started, as the harness answers it, and the notices that end one.
+const STARTED_IN_BACKGROUND = /(?:running in background with ID|moved to the background \(ID): ([A-Za-z0-9]+)/g;
+const ENDED_IN_BACKGROUND = /<task-id>([A-Za-z0-9]+)<\/task-id>.{0,600}?<status>(?!running)\w+<\/status>|Successfully stopped task: ([A-Za-z0-9]+)/g;
+
+/**
+ * The background shells a transcript started that no completion notice or stop has ended yet: the runs in flight. Read from the
+ * transcript's own text, so a script run in the background counts as much as a test command does.
+ */
+export function backgroundRunsOpen(transcript: string): string[] {
+  const started = [...transcript.matchAll(STARTED_IN_BACKGROUND)].map((found) => found[1]);
+  const ended = new Set([...transcript.matchAll(ENDED_IN_BACKGROUND)].map((found) => found[1] ?? found[2]));
+  return [...new Set(started)].filter((id) => !ended.has(id));
+}
+
+/**
+ * THE IN-FLIGHT CHECK (RULE.DEVEX.WORKSPACE.499): a run in flight never ends the coordinator's turn while unlocked work is open. A reply
+ * that ends waiting on a run, while a run is in fact going, is sent back with the work a run does not lock, unless it says in one line that
+ * nothing unlocked is left. With no run going, the same words are a plan, and pass.
+ */
+export function checkInFlight(reply: string, runsOpen: string[]): Warning[] {
+  if (!runsOpen.length || !waitsOnRun(reply) || NOTHING_UNLOCKED.test(reply)) return [];
+  return [{ check: "in-flight", message:
+    "This reply ends waiting on a run that is going. A run in flight never ends the turn while unlocked work is open (RULE.DEVEX.WORKSPACE.499): " +
+    "the repository's docs, another repository, the arc's notes, and the preparation of the next run. Take the next of these now; " +
+    "only where none is left, say so in one line that opens `Nothing unlocked is left:` with the reason." }];
+}
+
 // ---------------------------------------------------------------------------- a proposal in chat ends as a record
 
 /** A list of lettered options: two lines or more opening `A.`, `B)`, `**A**`, `- A:` and so on, with different letters. */
@@ -2002,6 +2049,11 @@ if (argv1Base === "stop.ts" || argv1Base === "stop.mjs") {
     ...span({ group: "stop", action: "runnable" }, () => checkRunnable(root, baseline?.at ?? 0, baseline?.steps ?? {}, wrote, mine, reply)),
     ...span({ group: "stop", action: "close-message" }, () => checkCloseMessage(reply, event.transcript_path ? toolResultsOf(event.transcript_path) : [])),
     ...span({ group: "stop", action: "card-case" }, () => checkCardCase(reply)),
+    // A MAIN WINDOW ONLY: a helper's hand-back ends its run, and waits on nothing.
+    ...span({ group: "stop", action: "in-flight" }, () => {
+      if (event.agent_id || !event.transcript_path) return [];
+      try { return checkInFlight(reply, backgroundRunsOpen(readFileSync(event.transcript_path, "utf8"))); } catch { return []; }
+    }),
     ...span({ group: "stop", action: "proposal-record" }, () => checkProposalRecorded(reply, root, mine)),
     ...span({ group: "stop", action: "handover" }, () => checkHandover(reply, root, mine, given, turn.earlier)),
     ...span({ group: "stop", action: "how-it-runs" }, () => checkHowItRuns(withoutFences(reply), root)),
