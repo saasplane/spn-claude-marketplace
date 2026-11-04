@@ -1,5 +1,5 @@
 // `checks/plugin-landed.ts` — a plugin row lands only when the four versions and the install record agree.
-import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { CHECKS } from "../../../helpers/harness.mjs";
@@ -100,6 +100,10 @@ console.log("\n=== registrations outside the workspace");
   writeFileSync(file, JSON.stringify({ version: 2, plugins: Object.fromEntries(PLUGINS.map((name) => [`${name}@saasplane`, [
     { scope: "project", version: "1.0.0", projectPath: workspace }, { scope: "project", version: "0.9.0", projectPath: inside }]])) }));
   ok("[MKT.SCRIPTS.512] a registration behind inside the workspace is still refused", /not at 1\.0\.0/.test(pluginLandedRefusal(dir, file, workspace) ?? ""));
+  // The workspace named through a link, as /tmp names /private/tmp: the registration behind it is still inside (s186).
+  const linked = join(base, "workspace-link");
+  symlinkSync(workspace, linked);
+  ok("[MKT.SCRIPTS.512] a workspace named through a link still holds the registration recorded at its real path", /not at 1\.0\.0/.test(pluginLandedRefusal(dir, file, linked) ?? ""));
 }
 
 console.log(failed ? `\n  ${failed} of ${total} FAILED — plugin landed` : `\n  all ${total} passed — plugin landed`);

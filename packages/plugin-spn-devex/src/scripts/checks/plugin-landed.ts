@@ -9,7 +9,7 @@
 //
 //   called by: commands/workstream/row.ts, when a row is set landed
 
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync, realpathSync } from "node:fs";
 import { homedir } from "node:os";
 import { join, relative, isAbsolute } from "node:path";
 
@@ -39,10 +39,19 @@ const versionOf = (file: string): string | null => {
 /** A registration counts only where its project folder is still on disk; one whose folder is gone is not a place the plugin must land. A registration naming no folder (a user install) counts. */
 const folderExists = (place: { projectPath?: string }): boolean => !place.projectPath || existsSync(place.projectPath);
 
-/** A registration counts only inside the workspace, where one is named; a registration naming no folder (a user install) counts. */
+/** A path as the disk resolves it, so `/tmp` and `/private/tmp` read as one place; the path as written where it cannot be resolved. */
+const resolved = (path: string): string => {
+  try {
+    return realpathSync(path);
+  } catch {
+    return path;
+  }
+};
+
+/** A registration counts only inside the workspace, where one is named; a registration naming no folder (a user install) counts. Both sides are compared resolved (s186). */
 const insideOf = (workspace: string | null) => (place: { projectPath?: string }): boolean => {
   if (!workspace || !place.projectPath) return true;
-  const path = relative(workspace, place.projectPath);
+  const path = relative(resolved(workspace), resolved(place.projectPath));
   return path === "" || (!path.startsWith("..") && !isAbsolute(path));
 };
 
