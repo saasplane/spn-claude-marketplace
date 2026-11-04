@@ -17,7 +17,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
-      "seen": "0f5133cc"
+      "seen": "632da84b"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -32,7 +32,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "section": "An order is one delegated execution, and every order follows the same rules",
-      "seen": "dc15c9f4"
+      "seen": "8e727620"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -298,7 +298,7 @@ Refused: orders/code-plugins.md names no go, and 036's go has a plan.
 A helper is briefed from a part: run `workstream go show 036/N004` and launch the part's own brief.
 ```
 
-**A whole suite runs only in a baseline run, a full run or a proof run of the plan** (`RULE.DEVEX.WORKSPACE.458` · MUST · check:test-run). A part runs only its own test files. A full run keeps the runner's reuse, so a tier whose exact inputs a past green verdict covers stands in and says so (`RULE.SUPPORT.APPS.228`), and only what changed runs; `--no-reuse` is passed only for one package whose verdict there is a reason to distrust, never for a whole full run. `workstream go start` marks a baseline or full run as running, and only then does the test-run check let the whole suite run:
+**A whole suite runs only in a baseline run, a full run or a proof run of the plan** (`RULE.DEVEX.WORKSPACE.458` · MUST · check:test-run). A part runs only its own test files. A full run keeps the runner's reuse, so a tier whose exact inputs a past green verdict covers stands in and says so (`RULE.SUPPORT.APPS.228` · MUST · skill:spn-apps/implement), and only what changed runs; `--no-reuse` is passed only for one package whose verdict there is a reason to distrust, never for a whole full run. `workstream go start` marks a baseline or full run as running, and only then does the test-run check let the whole suite run:
 
 ```text
 Refused: `node packages/plugin-spn-devex/tests/run.mjs` runs the whole suite, and no full run of 036's go is running.
@@ -1053,6 +1053,13 @@ paste a report that drowns the next one.
 The coordinator is the session that writes the orders and reads what comes back. **A mechanical row is
 yours**: a pin move, a rename, a prop swap the brief could list. Do it directly, with no child, no brief
 and no report. An order carries 10 to 20 minutes of fixed cost before any of the work is done.
+
+**A run in flight never ends your turn while unlocked work is open** (`RULE.DEVEX.WORKSPACE.499` · MUST · check:stop).
+Start a run of about 15 minutes or more in the background, or send it to a helper by order, and carry on
+with what the run does not lock: the repository's docs, another repository, the arc's notes, and the
+preparation of the next run. End the turn while it goes only where none of these is left, and say so in
+one line that opens `Nothing unlocked is left:` with the reason. The Stop hook sends back a reply that
+ends waiting on a run and says neither.
 
 **Where a change must be seen to be judged, show one real before-and-after on the arc's preview and
 wait for a yes before any order goes out — MUST.** Take one real piece of the code the orders will

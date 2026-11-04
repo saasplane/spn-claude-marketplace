@@ -7,11 +7,11 @@ description: How infrastructure appears for development - the layer order, what 
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
-      "seen": "67376a1f"
+      "seen": "2fce1268"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/06-provision.md",
-      "seen": "0f82b44d"
+      "seen": "6b58ceba"
     }
   ]
 }
@@ -48,10 +48,10 @@ The layers are nouns — each has `plan`, `up`, `down`, and `status`; the app ha
 
 **A `--clean` teardown wipes the state that layer holds, and a local stack is frequently shared with other work on the same machine.** So:
 
-- It runs **only on an explicit instruction**, never as an inferred step toward something else. In alpha a local reset is the agent's to run, and elsewhere only on an explicit instruction.
+- It runs **only on an explicit instruction**, never as an inferred step toward something else. In alpha a local reset, a bring up and a bring down are the agent's call, with the named target and the known-good code still holding; elsewhere only on an explicit instruction.
 - It runs against a **named target**. If the request did not name one, ask — this app, this platform, or all — rather than choosing.
 - It runs **after** the code is known good. Regenerate and build to green first; resetting onto broken code wastes the whole cycle and produces a failure that says nothing.
-- A cloud change asks the developer each time, in alpha and after.
+- A cloud change asks the developer each time, in alpha and after: in alpha an apply, a cloud reset or teardown, and a push to spn-infra's main wait for the developer's approval, asked each time.
 
 ## Diagnosing
 

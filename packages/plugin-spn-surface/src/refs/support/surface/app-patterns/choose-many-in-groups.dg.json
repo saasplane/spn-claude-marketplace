@@ -30,7 +30,7 @@
    "viewport": "DESKTOP",
    "page": {
     "item": {
-     "title": "Enterprise",
+     "title": "Account",
      "description": "What it is offered"
     },
     "back": true
@@ -150,7 +150,7 @@
    "viewport": "TABLET",
    "page": {
     "item": {
-     "title": "Enterprise",
+     "title": "Account",
      "description": "What it is offered"
     },
     "back": true
@@ -270,7 +270,7 @@
    "viewport": "MOBILE",
    "page": {
     "item": {
-     "title": "Enterprise",
+     "title": "Account",
      "description": "What it is offered"
     },
     "back": true

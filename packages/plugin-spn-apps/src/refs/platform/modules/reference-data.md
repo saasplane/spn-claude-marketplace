@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/03-platform/02-modules/01-reference-data/",
-      "seen": "9ba0a197"
+      "seen": "879fd52b"
     }
   ]
 }
@@ -22,9 +22,9 @@
 
 ## The rule that decides how you extend it
 
-**The registry itself is not a fixed list, and the capabilities are.** New reference types are expected and adding one is ordinary. What each type can *do* is the closed part, `CUSTOM_FIELDS`, `TAGS` and `LOOKUP`, so a type cannot invent a behaviour, and every type behaves the way every other one does. `LOOKUP` means the type's records are a list a field may pick from: the type is a data source.
+**The registry itself is not a fixed list, and the capabilities are.** New reference types are expected and adding one is ordinary. What each type can *do* is the closed part, `CUSTOM_FIELDS`, `TAGS`, `LOOKUP` and `DATA_SCOPE`, so a type cannot invent a behaviour, and every type behaves the way every other one does. `LOOKUP` means the type's records are a list a field may pick from: the type is a data source. `DATA_SCOPE` means the type's records can narrow what one person sees.
 
-**A type is registered when a feature uses it, as a data source or for customization, and a registered type opts only into what it supports.** A row with no capability is a record nobody answers for.
+**A module registers its own entity types in its MDM contribution, and a type is registered when a feature uses it, as a data source or for customization, and a registered type opts only into what it supports.** A row with no capability is a record nobody answers for.
 
 ## When you reach for it
 
