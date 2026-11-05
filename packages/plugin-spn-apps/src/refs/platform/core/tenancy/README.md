@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/03-platform/01-core/01-tenancy.md",
-      "seen": "1d7b1658"
+      "seen": "070ce942"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/03-platform/01-core/01-tenancy/",
@@ -70,7 +70,7 @@ Read an archetype label from the platform outward, never the other way — MUST.
 
 ## The account is the isolation boundary
 
-`Account` and `Organization` name the same node from two directions: **organization** is the structural word, **account** is what that node is called when the point is billing and data ownership, and it is also the name a platform commonly gives the category of those nodes. The account is where isolation actually holds — data belongs to one account, is queried within one, and crosses to another only through an explicit, audited surface, never a join a query planner is free to take.
+`Account` and `Organization` name the same node from two directions: **organization** is the structural word, **account** is what that node is called when the point is billing and data ownership, and it is also the name a platform commonly gives the category of those nodes. The account is where isolation actually holds — data belongs to one account, is queried within one, and reaches another only by data reach, the closed list of ways a call reaches a record from its owner (see Data and Trust), never a join a query planner is free to take.
 
 Before you write a query, a cache key or a lock name, check what it names. Key it to a node's identity, never to its position in the tree — MUST NOT. An org's place in the tree never changes, so a rename is an ordinary write, and a merge or a split is a new org rather than a migration of an old one, because nothing anywhere holds "the third child of node X" as a fact worth keeping.
 

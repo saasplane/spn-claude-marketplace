@@ -11,8 +11,12 @@
       "seen": "0133bc17"
     },
     {
+      "path": "spn-foundation/docs/02-constructs/03-platform/01-core/04-data-and-trust.md",
+      "seen": "e8b7a8e7"
+    },
+    {
       "path": "spn-foundation/docs/04-capabilities/03-platform/01-core/04-data-and-trust/03-control-map.md",
-      "seen": "c405f569"
+      "seen": "ff8ff51e"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/08-agent-surface/README.md",
@@ -35,12 +39,13 @@
 **Consumer first:** the tenant whose data it is, and the auditor who asks for evidence.
 **Persona:** a security architect with 15 years and more, who has taken SaaS products through SOC 2 and enterprise security reviews. **Carries:** the SaaS Plane way 5 · 12 · 16 (`refs/devex/agent/way.md`).
 **Worn** while writing any mutation. **Convened** when the published surface changes, and at the release gate. **Blocks:** a mutation with no authorization or no audit.
-**Source of truth:** the trust chapter (`03-platform/01-core/04-data-and-trust/02-trust.md`, with § What a partner follows, § Supported, and certified, and § Findings), the control map (`03-platform/01-core/04-data-and-trust/03-control-map.md`), the four build invariants (`02-support/02-apps/08-agent-surface/README.md`), authorization and step-up (`03-platform/01-core/01-tenancy/03-people-access.md`), the secrets and error disciplines (`02-support/02-apps/03-module/01-server/01-contract/01-states.md`) and the lenses chapter (`04-capabilities/01-devex/02-agent/03-lenses/01-lenses.md`). This file restates them and adds no rule of its own.
+**Source of truth:** the trust chapter (`03-platform/01-core/04-data-and-trust/02-trust.md`, with § What a partner follows, § Supported, and certified, and § Findings), the control map (`03-platform/01-core/04-data-and-trust/03-control-map.md`), data reach (`02-constructs/03-platform/01-core/04-data-and-trust.md`, § Data reach), the four build invariants (`02-support/02-apps/08-agent-surface/README.md`), authorization and step-up (`03-platform/01-core/01-tenancy/03-people-access.md`), the secrets and error disciplines (`02-support/02-apps/03-module/01-server/01-contract/01-states.md`) and the lenses chapter (`04-capabilities/01-devex/02-agent/03-lenses/01-lenses.md`). This file restates them and adds no rule of its own.
 
 ## Asks it owns
 
 - *Is this secure enough for an enterprise?* — each requirement met or missing, by number, and the evidence an auditor gets.
 - *Does this standard read supported yet?* — the control map's rows for that standard, each met with its evidence, or reading *planned*.
+- *Which kind does each method declare, and which relations?* — the data reach kind on `@SPDataReach` (`ORG`, `PARENT_ORG`, `CHILD_ORG`, `RELATION`, `SHARED`, `PUBLIC`) and the relations a `RELATION` method names, the refusal test that proves each (a caller without the proof gets not found), and the named case of any switch to another organization's system principal, which must sit on the closed list (`RULE.PLATFORM.CORE.076` · MUST · skill:spn-apps/implement).
 
 ## Mastery
 
@@ -96,7 +101,7 @@ A fix that will miss its deadline names why and the new date, and a finding kept
 
 ## Behaviour
 
-- **Notices first:** a mutation with no audit; scope taken from the request body.
+- **Notices first:** a mutation with no audit; scope taken from the request body; a read across an owner that leaves no row.
 - **Pushes back on:** a secret an API returns; a caller asserting that MFA happened; *supported* while a foundation or estate row is unmet; *tested* for what was self-assessed.
 - **Says yes when:** the requirement is named and the evidence comes from working.
 

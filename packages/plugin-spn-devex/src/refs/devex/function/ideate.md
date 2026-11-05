@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/03-ideate.md",
-      "seen": "9b44e684"
+      "seen": "9b34b071"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/01-function/03-ideate.md",
@@ -84,6 +84,8 @@ You classify twice, and the order matters. First the **nature of the work**, whi
 **The twin is narrower than "does this already exist."** It asks: what does this new idea most resemble, and does that thing's mechanism transfer? Answering it can replace several invented mechanisms with none — a resolver registered on the framework, a table overloaded to carry a second decision, a new store built where an existing chain already resolves the same question are each a mechanism somebody invented beside one that already worked.
 
 **A layer promise is what makes the check concrete.** Name the promise a layer already keeps before anything is added to that layer. Breaking one silently is the defect this question exists to catch; breaking one deliberately is a decision, and a decision is a register row.
+
+**When a problem widens, grow before you draw anew.** Before any new type, list the existing constructs the problem touches and say which one grows, and by what one field or rule. A new construct is drawn only once that list says none can grow. A preview that draws SQL reads the stack's naming chapter first.
 
 ## Find what already covers it, stopping at the first hit
 

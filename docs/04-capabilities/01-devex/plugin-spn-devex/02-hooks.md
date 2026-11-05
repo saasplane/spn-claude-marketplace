@@ -298,6 +298,12 @@
 **What** — a write of a guide that holds an `npx` or `pnpm` command is refused, and the message names the `spnutils` command that does the job.
 **How** — `packages/plugin-spn-devex/src/scripts/checks/guide-commands.ts`.
 
+### SQL in a preview follows the grammar
+
+**Why** — *a table drawn in a preview becomes the table the migration writes*, so a plural name, a missing schema or an index named by habit is cheapest to refuse where it is first drawn.
+**What** — a write of a workstream's `notes/N*/preview.html` or `samples/` that holds SQL is refused, by rule name, where a table is not `{prefix}_{entity}`, snake_case and singular, or names no schema; sits outside its owner's schema; carries an enum not ending `_type`, an index not starting `idx_{table}_`, a unique constraint not `uq_{table}_` or a JSON column not ending `_json`; or is a business table whose tail is not `created_at`, `updated_at`, `created_by`, `updated_by`. This half does not cover two things. A preview names no module for the check to read, so the module prefix is judged only in a migration, by the apps half, and at `MIGRATE`'s catalog check. And the audit tail accepts any in-order subset that holds `created_at`, because the book does not fix which pairs a shape drops.
+**How** — `packages/plugin-spn-devex/src/scripts/checks/sql-sample.ts`, beside the page checks that already read these writes; the four rules are written once in `packages/plugin-support-lib/src/lib/sql-grammar.ts`.
+
 ### A page title is a topic name
 
 **Why** — *a heading that runs on is a sentence that belongs under it*.

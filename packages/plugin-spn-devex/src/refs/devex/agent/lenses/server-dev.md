@@ -28,6 +28,7 @@
 ## Asks it owns
 
 - *How do I write this contract, service, queue or error?* — the loop, the error codes, the installed methods to call.
+- **On a new table, ask which one module owns it, in which schema, and on which connection.** Read the SQL naming grammar first (`02-support/02-apps/04-resources/01-server/02-database.md`, § SQL naming grammar), which the check cannot ask for you. The consumer's writer commits on one connection, so the answer also says whether the table commits on that one.
 
 ## Mastery
 

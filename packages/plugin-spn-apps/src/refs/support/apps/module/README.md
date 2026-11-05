@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/02-apps/03-module.md",
-      "seen": "19020a0a"
+      "seen": "de3ce560"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/03-module/",
-      "seen": "a734e7fe"
+      "seen": "bf5c3712"
     }
   ]
 }
@@ -136,11 +136,22 @@ Declare one discriminator, `mtype`, on a polymorphic family's base, typed as the
 
 **Route every write to a module's storage through the owning service** — that is what keeps authorization, invariants, cache invalidation, audit and events from being skipped. Never list a repository in a contract, and never call one from an entry or from another module — only the owning module's own services call it.
 
-**A handler is called for every transaction the framework closes** (`RULE.SUPPORT.APPS.224` · MUST · skill:spn-apps/implement). Work that belongs to every transaction, such as recording what changed, needs no call site: a module or the app registers handlers once, at boot, through `getTransactionHandlers`, and the framework calls them for every transaction it closes. Each module's handlers run in boot order, then the app's, so the app acts on what the modules left. A producer never names its handler: it collects what it wants handled under a typed key, and a handler takes what it handles from the transaction by that key, so a module mounted here, remote or absent changes no producer. A handler runs inside the transaction before it commits, and its throw rolls the transaction back; work that must follow the outcome uses the transaction's hooks.
+**A handler is called for every transaction the framework closes** (`RULE.SUPPORT.APPS.224` · MUST · skill:spn-apps/implement). Work that belongs to every transaction, such as recording what changed, needs no call site: a module or the app registers handlers once, at boot, through `getTransactionHandlers`, and the framework calls them for every transaction it closes. Each module's handlers run in boot order, then the app's, so the app acts on what the modules left. A producer never names its handler: it collects what it wants handled under a typed key, and a handler takes what it handles from the transaction by that key, so a module mounted here, remote or absent changes no producer. Work collected under a key is handled by a keyed handler, which a manager answers through `getTransactionCollectHandlers` in the same way. A handler runs inside the transaction before it commits, and its throw rolls the transaction back. Work that may be lost, such as clearing a cache, uses the transaction's hooks; work that must not be lost uses a key with the phase `AFTER_COMMIT`.
+
+Work that is part of the save and work that must follow it are told apart by one question: must this succeed for the save to succeed? **A collect key fixes its phase, `BEFORE_COMMIT` or `AFTER_COMMIT`, and one keyed handler per key does the work** (`RULE.SUPPORT.APPS.224` · MUST · skill:spn-apps/implement). A `BEFORE_COMMIT` key is performed before the commit, and a throw rolls the save back. An `AFTER_COMMIT` key is kept with the transaction, performed after the commit, and retried until it succeeds. One handler shape serves both, so there is no second kind of handler for kept work. Eight rules hold it (`RULE.SUPPORT.APPS.260` · MUST · skill:spn-apps/implement):
+
+1. **The key fixes the phase.** A producer reads at its call site what it is promised, and a key's phase is the same in every service.
+2. **Kept work is data, never a function.** Only a key and an item can be stored and found again by a process that never saw the transaction.
+3. **A key with no handler fails the save.** The framework's handler throws before commit, so nothing collected vanishes unseen.
+4. **A module's handler for a key outranks the app's.** The module mounted beside the producer writes in the transaction, and the app's handler is the fallback. Two handlers at one level are refused at boot.
+5. **After-commit work is safe to do twice.** It is done at least once: in the request, then by the restart pass and the timer, each claim leased.
+6. **A kept item is a stored format.** A row written by one release is done by the next, so an item only gains fields, and a key is never renamed. A breaking change takes a new key.
+7. **There is no order between items.** The queue promises none, so nothing kept needs a version.
+8. **The store is the app's.** Kept items live in `platform.{app}_transaction_bound_write`, made by the `MIGRATE` run. The store's owner is the app code, not the service, so services that share an app code share its one table, and a key name is unique within an app. A service drops a key's handler only once that key's rows are gone or parked, and a pass parks every row past the default maximum age whatever its key. This is the one stated exception to every table belonging to one module, and to the module prefix every schema object carries (`RULE.SUPPORT.APPS.254`), because the table and its enum start with the app's code.
 
 **A transaction of its own is for a write that must outlive its caller — SHOULD** (`RULE.SUPPORT.APPS.229` · MUST · skill:spn-apps/implement). It runs before the caller's transaction opens and never inside it, and a write that must never run inside a transaction declares `NEVER`.
 
-When you write a service method, compose the same seven steps, in order, each one declared line rather than hand-written control flow: gate → cached read or transaction open → repository work → cache invalidation → post-commit publish → audit → canonical re-read. Omit the steps a method does not need; never reorder them.
+When you write a service method, compose the same nine steps, in order, each one declared line rather than hand-written control flow: gate → transaction open (writes) → data reach (the kind the method declares with `@SPDataReach`; a method that declares nothing is `ORG`) → cached read (reads) → repository work → cache invalidation → post-commit publish (work that must not be lost is kept with the transaction by key; only work that may be lost uses a plain after-commit function) → audit → canonical re-read. Omit the steps a method does not need; never reorder them.
 
 **What leaves this layer — exactly two exceptions**, named here so you do not have to decide case by case:
 
@@ -210,7 +221,7 @@ Treat cross-module composition as service composition. Ask the owning module's c
 Two narrow exceptions let data cross the boundary without a service call:
 
 - **Declared entity joins.** You may reference another module's rows by id, and join them in a read, only along a dependency your own manifest declares. Never join into a module you do not depend on, and route every *write* through the owning module's contract services regardless.
-- **Asynchronous events.** Send a cross-module write request as a queue event carrying an idempotency key, so at-least-once delivery is safe to act on. The queue carries events only, never Commands or States, and you publish post-commit — rolled-back work emits nothing.
+- **Asynchronous events.** Send a cross-module write request as a queue event carrying an idempotency key, so at-least-once delivery is safe to act on. The queue carries events only, never Commands or States, and you publish post-commit — rolled-back work emits nothing. Work that must not be lost after commit is kept with the transaction by key.
 
 Hold both paths to the same discipline as a direct call: route every read and write on the asynchronous path through services, so you never skip a guarantee just because the call crossed a queue instead of a method signature.
 

@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/03-platform/01-core/04-data-and-trust.md",
-      "seen": "269df759"
+      "seen": "e8b7a8e7"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/03-platform/01-core/04-data-and-trust/",
-      "seen": "5c6f43ae"
+      "seen": "719f34ad"
     }
   ]
 }
@@ -27,9 +27,41 @@ The owner of a piece of data is a node on the tenancy tree — nothing else, and
 | an account's | everything a customer organization creates — business records, documents, usage | the account, and its descendants |
 | a person's | an identity's own profile, preferences and consent | the person, across every organization they act in |
 
-When you query, query inside one owner's level; that needs no reference at all. The moment a read crosses levels — an audit process reading account data, a support tool reading a person's profile — it becomes a **cross-schema reference**, and it MUST go through a governed surface the caller reaches for on purpose, never a join a query planner is free to take on its own.
+When you query, query inside one owner's level; that needs no reference at all. The moment a read crosses levels — an audit process reading account data, a support tool reading a person's profile — it becomes a **cross-schema reference**, and it MUST go through a governed surface the caller reaches for on purpose, never a join a query planner is free to take on its own. The platform's own reads across owners are recorded (see Data reach, below).
 
 Personal data follows the person rather than any organization — that is what lets a data-subject request follow somebody wherever they went, while every action they took is still recorded against the organization they acted in at the time.
+
+## Data reach: the closed list of ways a call reaches a record
+
+Every record has one owning organization. **A call reaches a record only by a kind its method declares, from the owning organization, and a kind outside the list does not exist** (`RULE.PLATFORM.CORE.076` · MUST · skill:spn-apps/implement). A service method declares its kind with `@SPDataReach`, beside `@SPAuthorize`; a method that declares nothing is `ORG`, the owner-only filter every method already had.
+
+| Kind | Who gets in |
+| --- | --- |
+| `ORG` | members of the owning organization |
+| `PARENT_ORG` | an organization above the owner: the platform over every organization, or the owner's parent; writes only through named operator commands |
+| `CHILD_ORG` | an organization below the owner that the record is about; being a child alone is not enough, and it writes only its own acts |
+| `RELATION` | an organization outside the owner's line, through one of the module's named relations, while it is live; writes only the acts the relation names |
+| `SHARED` | any signed-in organization, on a record its owner opened to all; never written by the reader |
+| `PUBLIC` | anyone signed out, on the site's organization's published records; an update only through a token it declares |
+
+A new kind is a major release with a migration. Ten rules hold every kind, so a module that declares one writes none of them again:
+
+1. Each audience has its own method; the owner's method never gains a flag that opens it.
+2. Each audience's method returns its own result, and `SHARED` and `PUBLIC` never carry a personal field.
+3. The service names relations; the repository owns its columns, writes its own `WHERE` with a switch over every kind, and uses `1 = 0` for each kind the entity is not reached by. A refusal test proves each `1 = 0`.
+4. A refusal answers not found, whether the row is missing, out of reach or its relation ended.
+5. A relation or child is checked when its organization is written onto a record, and ended by the act that ends it, in the same transaction.
+6. An act runs as the caller. A `PUBLIC` update has no caller, so it runs as the owner organization's system principal, only in a case on the closed list below, under a `PUBLIC` frame that declares a proof.
+7. A `PUBLIC` method is safe to expose: one that declares no proof only reads, and its route declares a rate limit or the call is refused.
+8. Nothing is copied to give access; a file follows the reach of the record that names it.
+9. A cache serves `ORG` only.
+10. Each crossing method ships a refusal test: a caller without the proof gets not found.
+
+Each method reaches by its own kind, and the scope never travels into a method that is gated: a gated method enters a fresh frame, and one that declares nothing is `ORG` on the caller.
+
+**The platform's reads across owners are recorded.** Under `PARENT_ORG`, one row per call, a list's as well as a record's, lands in the platform's trail before the result leaves the service. It names the operator, the method, the kind, the command as sent, each record returned and its owning organization. A record that fails fails the call, no copy goes into the owner's trail, and no other read is recorded, since a relation's or a child's reads are covered by the write that opened them.
+
+**Work switches to another organization's system principal only for a case on a closed list of eleven**, and each switch names its case where it switches and where it asks for the system user: `INVITATION_ACCEPTED`, `PUBLIC_UPDATE`, `ORG_PROVISIONING`, `NOTIFICATION_DELIVERY`, `FILE_PROCESSING`, `PRIVACY_REQUEST`, `SIGN_IN_CODE_SENT`, `AUDIT_WRITE`, `OBSERVER_WRITE`, `OWNERSHIP_TRANSFER` and `MEMBER_AUTO_ONBOARDING`. A case not on the list is not a reason to cross.
 
 ## Classification
 

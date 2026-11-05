@@ -17,6 +17,10 @@
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/03-module/01-server/01-contract/01-states.md",
       "seen": "38e6934b"
+    },
+    {
+      "path": "spn-foundation/docs/02-constructs/03-platform/01-core/04-data-and-trust.md",
+      "seen": "e8b7a8e7"
     }
   ]
 }
@@ -34,6 +38,7 @@ The question it holds: *could someone build against this without reading the cod
 ## Asks it owns
 
 - *Will this break someone who built on it?* — additive or breaking; the version and the migration path.
+- *Which kind does each method reach by, and what proves it?* — the data reach kind and relations each method declares, the refusal test that proves it, and the named case of any switch to a system principal. A new kind is a major release with a migration; the partner reads it as a breaking change.
 
 ## Mastery
 
