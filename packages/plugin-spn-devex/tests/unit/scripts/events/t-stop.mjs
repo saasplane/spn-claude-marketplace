@@ -1994,7 +1994,7 @@ console.log("\n=== stop — send-backs are written as they are said, the welcome
     check("[MKT.HOOKS.472] CLOSING_SHAPES has six rows, one per moment, each the shape the construct's table gives (RULE.DEVEX.AGENT.170)", Array.isArray(shapes) && shapes.length === 6 && new Set(shapes.map((one) => one.moment)).size === 6, JSON.stringify(shapes?.map?.((one) => one.moment)));
     const sayRow = [ROW_LANDED], sayArc = [ARC_LANDED], none = [];
     const say = (reply, results) => stopModule.checkCloseMessage(reply, results);
-    const table = [["row", rowShape, sayRow], ["release", releaseShape, none], ["arc", arcShape, sayArc], ["window", windowShape, none], ["workstream", closing, [SUCCESS]]];
+    const table = [["row", rowShape, sayRow], ["release", releaseShape, sayRow], ["arc", arcShape, sayArc], ["window", windowShape, sayRow], ["workstream", closing, [SUCCESS]]];
     for (const [name, sample, results] of table)
       check(`[MKT.HOOKS.473] the ${name} shape passes`, say(sample, results).length === 0, JSON.stringify(say(sample, results)));
     const handoverPass = stopModule.checkHandover(handoverShape, build("n011-handover-shape"), new Set(), true);
@@ -2004,15 +2004,15 @@ console.log("\n=== stop — send-backs are written as they are said, the welcome
       check(`[MKT.HOOKS.474] known-bad: ${label}`, found.length === 1 && found[0].check === "close-message" && found[0].message.includes(name), JSON.stringify(found));
     };
     bad("a table row in the row shape", "row", rowShape, sayRow, (t) => t.replace("- the probe", "| the probe | landed |"));
-    bad("a commit hash in the release shape", "release", releaseShape, none, (t) => t.replace("- the probe", "- the probe in 4f3a9c1"));
+    bad("a commit hash in the release shape", "release", releaseShape, sayRow, (t) => t.replace("- the probe", "- the probe in 4f3a9c1"));
     bad("a bare N011 in the arc shape", "arc", arcShape, sayArc, (t) => t.replace("- the probe", "- N011 is whole"));
     bad("a `row 8` in the row shape", "row", rowShape, sayRow, (t) => t.replace("- the probe", "- row 8 is whole"));
     bad("the wrong title size in the arc shape", "arc", arcShape, sayArc, (t) => t.replace("## 🏁", "### 🏁"));
     bad("`Thank you 👍` in the row shape", "row", rowShape, sayRow, (t) => `${t}\n\nThank you 👍`);
-    bad("`retired` in the release shape", "release", releaseShape, none, (t) => `${t}\n\nThis window can be retired.`);
+    bad("`retired` in the release shape", "release", releaseShape, sayRow, (t) => `${t}\n\nThis window can be retired.`);
     bad("`Thank you 👍` in the arc shape", "arc", arcShape, sayArc, (t) => `${t}\n\nThank you 👍`);
     bad("`retired` in the arc shape", "arc", arcShape, sayArc, (t) => `${t}\n\nThis window can be retired.`);
-    bad("no `&nbsp;` before a section of the window shape", "window", windowShape, none, (t) => t.replace(`${NB}\n\n### 🧠`, "### 🧠"));
+    bad("no `&nbsp;` before a section of the window shape", "window", windowShape, sayRow, (t) => t.replace(`${NB}\n\n### 🧠`, "### 🧠"));
     bad("a bare Q3 in the workstream shape", "workstream", closing, [SUCCESS], (t) => t.replace("- it works", "- Q3 settled it"));
     const badHandover = (label, change) => {
       const found = stopModule.checkHandover(change(handoverShape), build("n011-handover-bad"), new Set(), true);
@@ -2032,8 +2032,44 @@ console.log("\n=== stop — send-backs are written as they are said, the welcome
     check("[MKT.HOOKS.475] the same text in a Read's result owes nothing", say("It prints that line.", stopModule.toolResultsOf(readFile)).length === 0, JSON.stringify(stopModule.toolResultsOf(readFile)));
     check("[MKT.HOOKS.476] a shape inside a fence, shown as a sample, is not read as the moment",
       say(`Here is the shape:\n\n\`\`\`text\n${rowShape}\n\`\`\``, none).length === 0 && say(`Here is the shape:\n\n\`\`\`text\n${releaseShape}\n\`\`\``, none).length === 0);
-    check("[MKT.HOOKS.476] a reply that opens with a moment's heading is held to its shape whatever the results say",
-      say(releaseShape.replace("#### 🔭 What's next", "#### 🔭 Later"), none).length === 1 && say(arcShape, [SUCCESS]).length === 0);
+    check("[MKT.HOOKS.476] a reply that opens with a moment's heading is held to that shape when the results settled a moment",
+      say(releaseShape.replace("#### 📦 What landed", "#### 📦 Done"), sayRow).length === 1 && say(arcShape, [SUCCESS]).length === 0);
+    check("[MKT.HOOKS.478] a reply that opens with a moment's heading and has no moment-making result owes nothing",
+      say(rowShape.replace("#### 📦 What landed", "#### 📦 Done"), none).length === 0 && say(`### ✅ Status\n\nIt is fine.`, none).length === 0
+        && say(`### ✅ Status\n\nIt is fine.`, sayRow).length === 1);
+    // WHAT'S NEXT IS OPTIONAL (Q17): a row, release or arc message passes without it, and keeps its place when it is there.
+    const noNext = (t) => t.replace(/\n\n&nbsp;\n\n#{3,4} 🔭 What's next\n\n- the page/, "");
+    check("[MKT.HOOKS.480] a row and a release closing message without `What's next` pass",
+      noNext(rowShape) !== rowShape && say(noNext(rowShape), sayRow).length === 0 && say(noNext(releaseShape), sayRow).length === 0, JSON.stringify([say(noNext(rowShape), sayRow), say(noNext(releaseShape), sayRow)]));
+    check("[MKT.HOOKS.480] an arc closing message without `What's next` passes, and with it still passes",
+      noNext(arcShape) !== arcShape && say(noNext(arcShape), sayArc).length === 0 && say(arcShape, sayArc).length === 0);
+    check("[MKT.HOOKS.480] a `What's next` that is present keeps its place and its `&nbsp;` line, and the other sections stay required",
+      say(arcShape.replace(`${NB}\n\n### 🔭 What's next`, "### 🔭 What's next"), sayArc).length === 1
+        && say(rowShape.replace("#### 📦 What landed", "#### 📦 Done"), sayRow).length === 1
+        && !say(noNext(rowShape).replace("#### 📦 What landed", "#### 📦 Done"), sayRow)[0]?.message.split(" Write it as")[0].includes("What's next"));
+    // THE MOMENT COMES FROM THE COMMAND THAT MAKES IT: a log read by any other command shows the line and settles nothing.
+    const LOG_LINE = "N003 08:42 landed part docs-spn-claude-marketplace-s4b-1";
+    const turnOfCommand = (name, command, text) => {
+      const file = join(BASE, `${name}.jsonl`);
+      writeFileSync(file, [entry("user", "go"), entry("assistant", [{ type: "tool_use", id: "c1", name: "Bash", input: { command } }]),
+        entry("user", [{ type: "tool_result", tool_use_id: "c1", content: text }])].join("\n") + "\n");
+      return file;
+    };
+    const logRead = turnOfCommand("log-read-turn", "cd arcs/N003 && cat log.jsonl | tail -20 | python3 -c 'import sys'", LOG_LINE);
+    check("[MKT.HOOKS.478] a turn whose only result is a log read holding `N003 08:42 landed part ...` owes nothing",
+      say("The log shows the timing.", stopModule.toolResultsOf(logRead)).length === 0 && stopModule.toolResultsOf(logRead).length === 0, JSON.stringify(stopModule.toolResultsOf(logRead)));
+    check("[MKT.HOOKS.478] a `go show` listing and a grep that names a row command settle nothing",
+      stopModule.toolResultsOf(turnOfCommand("go-show-turn", "spn-devex workstream go show 031-probe/N011", ROW_LANDED)).length === 0
+        && stopModule.toolResultsOf(turnOfCommand("grep-turn", "grep -r 'spn-devex workstream row' docs", ROW_LANDED)).length === 0);
+    check("[MKT.HOOKS.478] the result of a row command, a report write and a go part still settles the moment",
+      ["spn-devex workstream row state 031-probe/N011 3 landed", "cd /x && spn-devex workstream report write 031-probe notes/N011/orders/a.report.md", "spn-devex workstream go start 031-probe/N011 p1"]
+        .every((command, i) => stopModule.toolResultsOf(turnOfCommand(`maker-${i}`, command, ROW_LANDED)).length === 1));
+    const queued = { type: "attachment", attachment: { type: "queued_command", prompt: [{ type: "text", text: "and one more thing" }], origin: { kind: "human" } } };
+    const midTurn = join(BASE, "mid-turn.jsonl");
+    writeFileSync(midTurn, [entry("user", "go"), entry("assistant", [{ type: "tool_use", id: "m1", name: "Bash", input: { command: "spn-devex workstream row state 031-probe/N011 3 landed" } }]),
+      entry("user", [{ type: "tool_result", tool_use_id: "m1", content: ROW_LANDED }]), JSON.stringify(queued)].join("\n") + "\n");
+    check("[MKT.HOOKS.479] a message of the developer's surfaced inside the running turn starts the turn: results before it owe nothing after it",
+      stopModule.toolResultsOf(midTurn).length === 0, JSON.stringify(stopModule.toolResultsOf(midTurn)));
     // THE OPENING: the moment's heading passes `handover`'s opening check, a status heading and a table do not.
     const ROOT = build("n011-opening");
     const opened = stopModule.checkHandover(`${handoverShape}\n`, ROOT, new Set(), true);
