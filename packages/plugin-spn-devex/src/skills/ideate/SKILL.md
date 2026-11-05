@@ -11,7 +11,7 @@ description: Decide what a node IS, and design a requirement inside that shape -
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/03-ideate.md",
-      "seen": "9b44e684"
+      "seen": "9b34b071"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
@@ -267,11 +267,12 @@ A first proposal starts where the book already stands, so the developer reads a 
 - **Unfold an idea in the order their own words lead** (`RULE.DEVEX.FUNCTION.098` · MUST · skill:spn-devex/ideate). Take this step where the idea is first taken in, before the first proposal is shaped; each step waits for the one before it:
   1. **The idea, in their words**, quoted, and what it proves for them.
   2. **The trade before the constructs.** The actors in the trade's own words, then the modules and the states by name, then the day-zero flow, and only then the cut of how deep the first version goes. Fields come when they ask for them.
-  3. **The existing twin before a new construct.** Each part names the construct the book or the platform already holds for it, and a new construct is proposed only where none fits.
+  3. **The existing twin before a new construct.** Each part names the construct the book or the platform already holds for it, and a new construct is proposed only where none fits. When a problem widens, before any new type, list the constructs it touches and say which one grows, and by what one field or rule; a new construct is drawn only once that list says none can grow.
   4. **Several modules are planned with a split test and one table.** The test says why the modules split where they do, and one module table holds the set, which the developer decides and names.
   5. **Open asks stay few.** A *settled so far* table holds what is agreed, and no more than three asks are open at once.
   6. **Each new term is defined once,** where it first appears, and used the same way after.
   7. **The preview follows their spine,** the order in which they told the idea, and not the order of the book's chapters.
+  8. **A preview that draws SQL reads the stack's naming chapter first.**
 - **Name the source of every name and value** (`RULE.DEVEX.FUNCTION.090` · MUST · skill:spn-devex/ideate). The book's constructs, the skills' step ids and the contract's `SP*Type` enums come first, and only a value no source holds is marked new. A name or a value with no source is the plausible invented detail a section that is written, not filled, refuses.
 - **Propose a field only where a report the developer asked for reads it** (`RULE.DEVEX.FUNCTION.091` · MUST · skill:spn-devex/ideate). A field no report reads is cut, and a field a report does read is kept.
 - **Give each idea one name, in the construct that owns it** (`RULE.DEVEX.FUNCTION.092` · MUST · skill:spn-devex/ideate). A second word for an idea already named is replaced by the first, and a new type is named for its domain, its group and its attribute.

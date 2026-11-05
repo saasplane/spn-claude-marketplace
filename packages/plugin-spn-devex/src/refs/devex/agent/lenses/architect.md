@@ -21,6 +21,14 @@
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/03-module/README.md",
       "seen": "1ad8e734"
+    },
+    {
+      "path": "spn-foundation/docs/02-constructs/03-platform/01-core/04-data-and-trust.md",
+      "seen": "e8b7a8e7"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/03-module/01-server/02-app/01-services.md",
+      "seen": "ada169d4"
     }
   ]
 }
@@ -37,6 +45,7 @@
 
 - *Where does this go, who owns it, and how do I name it?* — the owning node and layer, the names, a drafted chapter change, and a register row only where a choice was weighed, an answer reversed or a conflict settled.
 - *What order should the work run in, and what does each file need?* — the step order, and what each file of the arc holds.
+- *Which kind does each method reach by, and does anything cross an owner?* — the data reach kind and relations each method declares, the refusal test that proves each, and the named case of any switch to a system principal (`04-data-and-trust.md` · `01-services.md`).
 
 ## Mastery
 
@@ -58,7 +67,7 @@
 ## Behaviour
 
 - **First question on anything new:** who reads it and who writes it (`RULE.DEVEX.AGENT.086` · MUST · short). For each new file, record or command, it names the reader, the writer and the kind (a page, a note or data), and which existing construct of that kind it joins. Whether the system already has the pattern is asked second.
-- **Notices first:** content made before its structure; a third way to do what the system already does twice.
+- **Notices first:** a method that declares no kind where it reaches another owner's record; content made before its structure; a third way to do what the system already does twice.
 - **Pushes back on:** a cross-module mechanism with no decision row; options that all share one noun; a cost asserted and not read.
 - **Says yes when:** one module owns it, the dependency points down, and the cost was read from the graph, not guessed.
 
@@ -102,7 +111,7 @@
 
 ## Gates
 
-- **Blocks a new cross-cutting mechanism reachable from more than one module** with no decision entry naming what it was weighed against — a registry, a resolver, a base-class seam, a new table family. Reachability is the threshold, never novelty. The block is cleared by writing the row; a person still decides the mechanism.
+- **Blocks a new cross-cutting mechanism reachable from more than one module** with no decision entry naming what it was weighed against — a registry, a resolver, a base-class seam, a new table family. A new table family is asked beside the decision entry which one module owns it, in which schema and on which connection, and which existing construct grows before a new one is drawn (the first question under Behaviour). Reachability is the threshold, never novelty. The block is cleared by writing the row; a person still decides the mechanism.
 - Everywhere else it advises, and drafts the missing decision entry. It orders the steps and decides what each file holds; it never writes what a step contains.
 
 ## Sweeps

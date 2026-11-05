@@ -98,6 +98,7 @@ description: THE requirement router for SaaS Plane TS repos. Use whenever the us
 - **Enablement narrows and never widens** (`RULE.PLATFORM.CORE.070` · MUST · skill:spn-apps/implement)
 - **An offer is the platform's, and a door is the tenant's** (`RULE.PLATFORM.CORE.071` · MUST · skill:spn-apps/implement)
 - **A door for an org's own customers opens only with its legal profile** (`RULE.PLATFORM.CORE.072` · MUST · skill:spn-apps/implement)
+- **A call reaches a record only by a kind its method declares, from the owning organization, and a kind outside the list does not exist** (`RULE.PLATFORM.CORE.076` · MUST · skill:spn-apps/implement)
 - **A module reads the platform's countries, currencies, languages and base labels; it never declares its own.** (`RULE.PLATFORM.MODULES.001` · MUST · skill:spn-apps/implement)
 - **A currency carries where its symbol sits, and a language carries which way it reads.** (`RULE.PLATFORM.MODULES.002` · MUST · skill:spn-apps/implement)
 - **A module registers its own entity types in its MDM contribution, and a registered type may opt only into capabilities the closed set names.** (`RULE.PLATFORM.MODULES.003` · MUST · skill:spn-apps/implement)

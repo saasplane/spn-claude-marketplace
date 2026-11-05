@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "book": {
     "repository": "spn-foundation",
-    "commit": "35b7a389"
+    "commit": "88c802a4"
   },
   "rules": [
     {
@@ -14059,6 +14059,35 @@
       ]
     },
     {
+      "id": "RULE.PLATFORM.CORE.076",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-apps/implement"
+      },
+      "class": "stated in a skill",
+      "sentence": "A call reaches a record only by a kind its method declares, from the owning organization, and a kind outside the list does not exist",
+      "chapter": "02-constructs/03-platform/01-core/04-data-and-trust.md",
+      "heading": "Data reach",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "refs/platform/core/data-and-trust.md",
+          "heading": "Data reach: the closed list of ways a call reaches a record"
+        },
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/agent/lenses/trust.md",
+          "heading": "Asks it owns"
+        }
+      ]
+    },
+    {
       "id": "RULE.PLATFORM.MODULES.001",
       "level": "MUST",
       "params": {
@@ -19079,6 +19108,11 @@
         },
         {
           "plugin": "spn-apps",
+          "path": "refs/support/apps/module/README.md",
+          "heading": "What only this module sees — the app layer"
+        },
+        {
+          "plugin": "spn-apps",
           "path": "refs/support/apps/resources.md",
           "heading": "Database — the record of truth"
         },
@@ -19693,6 +19727,11 @@
       "heading": "SQL naming grammar",
       "decision": null,
       "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "refs/support/apps/module/README.md",
+          "heading": "What only this module sees — the app layer"
+        },
         {
           "plugin": "spn-apps",
           "path": "skills/implement/SKILL.md",
