@@ -1662,6 +1662,8 @@ export type ClosingShape = {
   titleText: RegExp;
   sectionSize: number;
   sections: string[];
+  /** Sections that may be left out, written after the required ones; where present they keep their place and their `&nbsp;` line. */
+  optional?: string[];
   thanks: boolean;
   retire: boolean;
 };
@@ -1669,11 +1671,11 @@ export type ClosingShape = {
 /** The six closing moments, one row each. */
 export const CLOSING_SHAPES: readonly ClosingShape[] = [
   { moment: "row", icon: "✅", size: 3, title: "<what landed>", titleText: /^\S/u, sectionSize: 4,
-    sections: ["📦 What landed", "🔭 What's next"], thanks: false, retire: false },
+    sections: ["📦 What landed"], optional: ["🔭 What's next"], thanks: false, retire: false },
   { moment: "release", icon: "🚢", size: 3, title: "<what shipped>", titleText: /^\S/u, sectionSize: 4,
-    sections: ["📦 What landed", "🔭 What's next"], thanks: false, retire: false },
+    sections: ["📦 What landed"], optional: ["🔭 What's next"], thanks: false, retire: false },
   { moment: "arc", icon: "🏁", size: 2, title: "<arc> (<title>) has landed", titleText: /^\S.* \(.+\) has landed$/u, sectionSize: 3,
-    sections: ["📦 What we delivered", "🧠 What we learned", "🔭 What's next"], thanks: false, retire: false },
+    sections: ["📦 What we delivered", "🧠 What we learned"], optional: ["🔭 What's next"], thanks: false, retire: false },
   { moment: "handover", icon: "✈️", size: 2, title: "Handing over <arc> (<title>)", titleText: /^Handing over \S.* \(.+\)$/u, sectionSize: 3,
     sections: [], thanks: true, retire: true },
   { moment: "window", icon: "🛬", size: 2, title: "This window's handover is done", titleText: /^This window's handover is done$/u, sectionSize: 3,
@@ -1700,6 +1702,7 @@ function shapeText(shape: ClosingShape): string {
     return `${head}, a line reading \`${NBSP}\`, the fenced handover block, a line reading \`${NBSP}\`, then one short paragraph that says where the next window picks up, says thanks and says this window can be retired`;
   return [head, `a line reading \`${NBSP}\``, "one warm paragraph",
     ...shape.sections.map((one) => `a line reading \`${NBSP}\` and \`${"#".repeat(shape.sectionSize)} ${one}\``),
+    ...(shape.optional ?? []).map((one) => `optionally a line reading \`${NBSP}\` and \`${"#".repeat(shape.sectionSize)} ${one}\``),
     ...(shape.thanks ? ["`Thank you 👍`", "one plain line that the window can be retired"] : ["no thanks and no retire line"])].join(", ");
 }
 
@@ -1727,10 +1730,10 @@ export function closingProblems(reply: string, shape: ClosingShape): string[] {
     if (lines[1] !== NBSP) out.push(`a \`${NBSP}\` line under the title`);
     if (!isProse(lines[2])) out.push("one warm paragraph under the title");
     let from = 0;
-    for (const section of shape.sections) {
+    for (const section of [...shape.sections, ...shape.optional ?? []]) {
       const want = `${"#".repeat(shape.sectionSize)} ${section}`;
       const found = lines.findIndex((line, i) => i >= from && line.trim() === want);
-      if (found < 0) { out.push(`\`${want}\``); continue; }
+      if (found < 0) { if (shape.sections.includes(section)) out.push(`\`${want}\``); continue; }
       if (lines[found - 1] !== NBSP) out.push(`a \`${NBSP}\` line before \`${want}\``);
       from = found + 1;
     }

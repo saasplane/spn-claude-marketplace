@@ -2033,10 +2033,20 @@ console.log("\n=== stop — send-backs are written as they are said, the welcome
     check("[MKT.HOOKS.476] a shape inside a fence, shown as a sample, is not read as the moment",
       say(`Here is the shape:\n\n\`\`\`text\n${rowShape}\n\`\`\``, none).length === 0 && say(`Here is the shape:\n\n\`\`\`text\n${releaseShape}\n\`\`\``, none).length === 0);
     check("[MKT.HOOKS.476] a reply that opens with a moment's heading is held to that shape when the results settled a moment",
-      say(releaseShape.replace("#### 🔭 What's next", "#### 🔭 Later"), sayRow).length === 1 && say(arcShape, [SUCCESS]).length === 0);
+      say(releaseShape.replace("#### 📦 What landed", "#### 📦 Done"), sayRow).length === 1 && say(arcShape, [SUCCESS]).length === 0);
     check("[MKT.HOOKS.478] a reply that opens with a moment's heading and has no moment-making result owes nothing",
-      say(rowShape.replace("#### 🔭 What's next", "#### 🔭 Later"), none).length === 0 && say(`### ✅ Status\n\nIt is fine.`, none).length === 0
+      say(rowShape.replace("#### 📦 What landed", "#### 📦 Done"), none).length === 0 && say(`### ✅ Status\n\nIt is fine.`, none).length === 0
         && say(`### ✅ Status\n\nIt is fine.`, sayRow).length === 1);
+    // WHAT'S NEXT IS OPTIONAL (Q17): a row, release or arc message passes without it, and keeps its place when it is there.
+    const noNext = (t) => t.replace(/\n\n&nbsp;\n\n#{3,4} 🔭 What's next\n\n- the page/, "");
+    check("[MKT.HOOKS.480] a row and a release closing message without `What's next` pass",
+      noNext(rowShape) !== rowShape && say(noNext(rowShape), sayRow).length === 0 && say(noNext(releaseShape), sayRow).length === 0, JSON.stringify([say(noNext(rowShape), sayRow), say(noNext(releaseShape), sayRow)]));
+    check("[MKT.HOOKS.480] an arc closing message without `What's next` passes, and with it still passes",
+      noNext(arcShape) !== arcShape && say(noNext(arcShape), sayArc).length === 0 && say(arcShape, sayArc).length === 0);
+    check("[MKT.HOOKS.480] a `What's next` that is present keeps its place and its `&nbsp;` line, and the other sections stay required",
+      say(arcShape.replace(`${NB}\n\n### 🔭 What's next`, "### 🔭 What's next"), sayArc).length === 1
+        && say(rowShape.replace("#### 📦 What landed", "#### 📦 Done"), sayRow).length === 1
+        && !say(noNext(rowShape).replace("#### 📦 What landed", "#### 📦 Done"), sayRow)[0]?.message.split(" Write it as")[0].includes("What's next"));
     // THE MOMENT COMES FROM THE COMMAND THAT MAKES IT: a log read by any other command shows the line and settles nothing.
     const LOG_LINE = "N003 08:42 landed part docs-spn-claude-marketplace-s4b-1";
     const turnOfCommand = (name, command, text) => {
