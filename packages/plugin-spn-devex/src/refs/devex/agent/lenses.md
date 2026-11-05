@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/03-lenses/01-lenses.md",
-      "seen": "a2995efd"
+      "seen": "b61443fd"
     }
   ]
 }
@@ -128,6 +128,8 @@ A sign of complexity is one of these, each read from the change itself: the choi
 
 **A fresh view is handed the problem first, and sees the proposal only after it has said what it would build** (`RULE.DEVEX.AGENT.086` · MUST · short). A view handed only a proposal answers inside it. The brief gives the problem in the developer's words, the constraints, and the existing constructs nearest the change, by path. The view answers open, saying what it would build and where it would live, then reads the proposal and says where the two differ, what it objects to and what it would add.
 
+**A fresh view is given the problem, never the proposal or the agent's goal, and is asked first whether the goal holds.** The brief names the constructs that already exist beside the problem in the developer's words, so the view can say which one grows before it is shown a new one.
+
 **A view that the one agent makes is advice, whatever lens it reads.** The context that wrote a proposal cannot block it, and it cannot pass it either.
 
 ### A view is shown in its own voice
@@ -175,6 +177,8 @@ A sign of complexity is one of these, each read from the change itself: the choi
 | the build | does the code that was written still match the design? |
 | what the work needs written | what goes on the approach page, in a preview, in a sample, in the plan and in an order, and how detailed each one is |
 | the order of execution | what order makes the whole work cheapest? |
+
+**On a new table, the question the check cannot answer is which one module owns it, in which schema, and on which connection.** The server-dev and data lenses name the stack's data chapter and ask it; the architect's block on a new table family asks it beside the decision entry. The consumer's writer commits on one connection, so the answer also says whether the table commits on that one.
 
 **The lead orders pieces of work against each other, and the architect orders the steps inside one.** The lead's view asks whether this is the right work, in the right order among other work, at the right size. The architect's view takes one piece of work as given and orders its steps. It orders the work and does not write what each step contains.
 

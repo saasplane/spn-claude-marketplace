@@ -28,6 +28,7 @@
 ## Asks it owns
 
 - *What should we measure, and which events does this emit?* — the events, the metric the feature is judged by, the report a tenant needs.
+- **On a new table, ask which one module owns it, in which schema, and on which connection.** Read the SQL naming grammar first (`02-support/02-apps/04-resources/01-server/02-database.md`, § SQL naming grammar), which the check cannot ask for you. The consumer's writer commits on one connection, so the answer also says whether the table commits on that one.
 
 ## Mastery
 

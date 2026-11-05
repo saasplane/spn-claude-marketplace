@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/03-platform/01-core/03-surfaces.md",
-      "seen": "d1286c08"
+      "seen": "f0167c70"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/03-platform/01-core/03-surfaces/",
@@ -123,6 +123,8 @@ Never put verification inside the framework layer — MUST NOT. The seam runs be
 Boot-check that a route asking for a protection has one wired — MUST. Write the route so it refuses to boot when the application never wired the protection it asks for, so you find the gap at start-up rather than from an invoice.
 
 Nothing in the challenge exchange is a secret — it carries which vendor and the public material that vendor expects, and a solution names its own kind, because a service that inferred the verifier from whatever is configured right now would reject a solution to a challenge issued a minute before a vendor change.
+
+**A public update proves the caller holds what it acts on, and a public route always declares a limit.** A public command that writes declares `proof: true` — MUST — and its command carries a token that the module checks in its own query on every call; a refusal answers not-found, and the module's refusal test is the evidence. Every PUBLIC route declares a rate limit — MUST — and a call through a route that declares none is refused. The server resolves the site from the request's `Origin`, a browser fact a script can forge, so a command whose `orgAppSiteId` names another site than the request's `Origin` answers not-found. The site narrows what a visitor is shown and never keeps anything secret: it is never the only thing between a visitor and an unpublished or token-guarded row.
 
 **A threshold is set for the crowd behind one address.** Both rungs bucket on the caller's address. If you tune a rung as though somebody were alone behind it, the threshold locks out the building — a whole office, or a mobile carrier's region, reaches a public door through one address.
 

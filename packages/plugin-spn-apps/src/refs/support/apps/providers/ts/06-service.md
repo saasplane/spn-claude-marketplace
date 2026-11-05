@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/10-providers/ts/06-service.md",
-      "seen": "faa108f4"
+      "seen": "8417826d"
     }
   ]
 }
@@ -256,7 +256,7 @@ The context's accessors follow the fields: `getContextOrgType()` returns one of 
 
 ## Queues
 
-**Publish after commit.** Never emit a cross-module event for work that may still roll back, and never block the request on a slow broker. A broker failure is logged and dropped, because the transaction is already durable.
+**Publish after commit.** Never emit a cross-module event for work that may still roll back, and never block the request on a slow broker. The publish is kept with the transaction, done after commit and retried until it succeeds, so a broker failure delays the event and does not lose it.
 
 **A module never calls another module's service to make it write.** It publishes a request event on a platform queue and the owning module consumes it. The producer gets fire-and-forget; the consumer owns the record.
 
@@ -323,7 +323,7 @@ The context's accessors follow the fields: `getContextOrgType()` returns one of 
 - Create takes no purge; update and delete purge the exact key.
 - Search: the repository returns ids and a total, the service hydrates in that order.
 - Authorize every contract method, and give a pre-auth method no gate at all.
-- Decorator order: authorize, sudo, cache, transaction.
+- Decorator order: authorize, sudo, cache purge, transaction, data reach; a cache build or get sits beneath data reach.
 - Cross-module writes ride the request queues with key-based idempotency, published on commit.
 - Toggle active rather than deleting; null skips in a partial update; a junction set is replaced wholesale.
 - Repositories take and return entities, scope first, throwing bulk gets, no service calls.

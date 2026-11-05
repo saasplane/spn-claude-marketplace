@@ -11,7 +11,7 @@ description: Design a page of a SaaS Plane app from the blocks of the design sys
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/03-ideate.md",
-      "seen": "9b44e684"
+      "seen": "9b34b071"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/",

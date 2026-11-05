@@ -35,6 +35,7 @@ Every row below is declared and none is claimed: a run writes the last two cells
 | MKT.PROVIDERS.31 | Backend developer | be refused an exclude that gives no reason | The check denies a new `coveragePathIgnorePatterns` or `coverage.exclude` entry with no comment beside it | NEGATIVE | UNIT | PLANNED | — |
 | MKT.PROVIDERS.32 | Web developer | be warned of a journey assertion written over several lines with a trailing comma and no message | The trailing comma is not counted as a message, so the assertion gets the note a bare assertion gets | NEGATIVE | UNIT | PLANNED | — |
 | MKT.PROVIDERS.33 | Backend developer | be refused a category code in an enablement ceiling | The check names the code and says a ceiling names org types; a ceiling of `OrgType.PLATFORM` passes | NEGATIVE | UNIT | PLANNED | — |
+| MKT.PROVIDERS.34 | Backend developer | be refused a table, enum, index or JSON name in a migration that breaks the naming grammar | The check reads `**/migrations/*.ts` and refuses a `CREATE TABLE` not named `{prefix}_{entity}` in singular snake_case, one with no schema or in the `migration` schema, an enum not ending `_type`, an index not starting `idx_{table}_`, a unique constraint not `uq_{table}_`, a JSON column not ending `_json`, and a business table not ending `created_at, updated_at, created_by, updated_by`; each denial names its rule, and migrations that already follow the grammar pass | NEGATIVE | UNIT | PLANNED | — |
 
 ## Retired ids
 
