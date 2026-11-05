@@ -97,6 +97,13 @@ one("enablement-grammar's refusal", {
   expect: "deny", says: "[ORG TYPE]",
 });
 
+const MIGRATION = "packages/module-server-ent-ts/src/migrations/002-ent-data.ts";
+one("[MKT.PROVIDERS.34] sql-grammar's refusal, a migration write that breaks a rule", {
+  root: tree({ ...REPO, ...APP }),
+  input: { file_path: MIGRATION, content: "export const up = `\nCREATE TABLE platform.job_project (id uuid, created_at timestamptz, updated_at timestamptz, created_by uuid, updated_by uuid);\n`;\n" },
+  expect: "deny", says: "[TABLE]",
+});
+
 const SPEC = "apps/api/tests/journeys/signin.spec.ts";
 one("host-assertion's refusal", {
   root: tree({ ...REPO, ...APP }),
