@@ -80,6 +80,7 @@ const SCRIPTS: Array<[plugin: string, script: string, args: string[]]> = [
   ["spn-apps", "coverage.ts", ["--check", "spec-restore", "."]],
   ["spn-apps", "coverage.ts", ["--check", "foreign-double", "."]],
   ["spn-apps", "enablement-grammar.ts", ["."]],
+  ["spn-apps", "sql-grammar.ts", ["."]],
   ["spn-apps", "host-assertion.ts", ["."]],
   ["spn-apps", "read-verb-naming.ts", ["."]],
   ["spn-apps", "await-sequencing.ts", ["."]],

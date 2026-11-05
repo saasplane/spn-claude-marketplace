@@ -23,6 +23,7 @@ import type { ToolInput, Verdict } from "../../../../../../plugin-support-lib/sr
 import { resultingText } from "../../../../../../plugin-support-lib/src/lib/source.ts";
 import { verdict as readVerbNaming, watched as readVerbWatched } from "./_src/read-verb-naming.ts";
 import { verdict as enablementGrammar, watched as enablementWatched } from "./_src/enablement-grammar.ts";
+import { verdict as sqlGrammar, watched as sqlGrammarWatched } from "./_src/sql-grammar.ts";
 import { verdict as awaitSequencing, watched as awaitWatched } from "./_src/await-sequencing.ts";
 import { verdict as appStyle, watched as appStyleWatched } from "./_src/app-style.ts";
 import { verdict as contractCycle, watched as contractCycleWatched } from "./_src/contract-cycle.ts";
@@ -37,6 +38,7 @@ type Bound = { name: string; watched: (path: string) => boolean; verdict: (path:
 export const RULES: Bound[] = [
   { name: "read-verb-naming", watched: readVerbWatched, verdict: readVerbNaming },
   { name: "enablement-grammar", watched: (path) => path.endsWith(".ts") && enablementWatched(path), verdict: enablementGrammar },
+  { name: "sql-grammar", watched: sqlGrammarWatched, verdict: sqlGrammar },
   { name: "await-sequencing", watched: awaitWatched, verdict: awaitSequencing },
   { name: "contract-cycle", watched: contractCycleWatched, verdict: contractCycle },
   { name: "app-style", watched: appStyleWatched, verdict: appStyle },

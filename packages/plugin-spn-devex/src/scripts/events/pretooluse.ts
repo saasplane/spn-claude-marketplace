@@ -64,6 +64,7 @@ import { applies as noHistoryApplies, checkNoHistory } from "../checks/no-histor
 import { checkFigureSpacing } from "../checks/figure-spacing.ts";
 import { applies as guideCommandsApply, checkGuideCommands } from "../checks/guide-commands.ts";
 import { applies as pageTitleApplies, checkPageTitle } from "../checks/page-title.ts";
+import { applies as sqlSampleApplies, checkSqlSample } from "../checks/sql-sample.ts";
 import { checkRestatesFirst } from "../checks/restates-first.ts";
 import { checkReportAsked } from "../checks/report-asked.ts";
 import { applies as keptPathsApplies, checkKeptPaths } from "../checks/kept-paths.ts";
@@ -158,6 +159,7 @@ const CHECKS: Check[] = [
   { name: { group: "no-history", action: "no-history" }, run: checkNoHistory, needs: ["file_path"], applies: (path) => noHistoryApplies(path) },
   { name: { group: "guide-commands", action: "guide-commands" }, run: checkGuideCommands, needs: ["file_path"], applies: (path) => guideCommandsApply(path) },
   { name: { group: "page-title", action: "page-title" }, run: checkPageTitle, needs: ["file_path"], applies: (path) => pageTitleApplies(path) },
+  { name: { group: "sql-sample", action: "sql-sample" }, run: checkSqlSample, needs: ["file_path"], applies: (path) => sqlSampleApplies(path) },
   { name: { group: "report-asked", action: "report-asked" }, run: checkReportAsked, needs: ["file_path"], applies: () => true },
   { name: { group: "figure-spacing", action: "figure-spacing" }, run: checkFigureSpacing, needs: ["file_path"],
     applies: (path) => PROSE_SUFFIXES.some((s) => path.endsWith(s)) },
