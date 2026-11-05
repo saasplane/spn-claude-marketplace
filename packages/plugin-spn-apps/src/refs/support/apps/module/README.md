@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/03-module/",
-      "seen": "bf5c3712"
+      "seen": "e437861f"
     }
   ]
 }
@@ -147,7 +147,7 @@ Work that is part of the save and work that must follow it are told apart by one
 5. **After-commit work is safe to do twice.** It is done at least once: in the request, then by the restart pass and the timer, each claim leased.
 6. **A kept item is a stored format.** A row written by one release is done by the next, so an item only gains fields, and a key is never renamed. A breaking change takes a new key.
 7. **There is no order between items.** The queue promises none, so nothing kept needs a version.
-8. **The store is the app's.** Kept items live in `platform.{app}_transaction_bound_write`, made by the `MIGRATE` run. The store's owner is the app code, not the service, so services that share an app code share its one table, and a key name is unique within an app. A service drops a key's handler only once that key's rows are gone or parked, and a pass parks every row past the default maximum age whatever its key. This is the one stated exception to every table belonging to one module, and to the module prefix every schema object carries (`RULE.SUPPORT.APPS.254`), because the table and its enum start with the app's code.
+8. **The store is the app's.** Kept items live in `platform.{app}_transaction_bound_write`, made by the `MIGRATE` run. The store's owner is the app code, not the service, so services that share an app code share its one table, and a key name is unique within an app. A service drops a key's handler only once that key's rows are gone or parked, and a pass parks every row past the default maximum age whatever its key. This is the one stated exception to every table belonging to one module, and to the module prefix every schema object carries (`RULE.SUPPORT.APPS.254` · MUST · skill:spn-apps/implement), because the table and its enum start with the app's code.
 
 **A transaction of its own is for a write that must outlive its caller — SHOULD** (`RULE.SUPPORT.APPS.229` · MUST · skill:spn-apps/implement). It runs before the caller's transaction opens and never inside it, and a write that must never run inside a transaction declares `NEVER`.
 
