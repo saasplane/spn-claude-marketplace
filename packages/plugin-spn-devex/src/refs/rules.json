@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "book": {
     "repository": "spn-foundation",
-    "commit": "88c802a4"
+    "commit": "07bbc965"
   },
   "rules": [
     {
@@ -19798,6 +19798,35 @@
           "plugin": "spn-apps",
           "path": "refs/support/apps/providers/ts/06-service.md",
           "heading": "What the session names"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.APPS.260",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-apps/implement"
+      },
+      "class": "stated in a skill",
+      "sentence": "The store of kept work is the one exception to \"every table belongs to one module\".",
+      "chapter": "04-capabilities/02-support/02-apps/04-resources/01-server/02-database.md",
+      "heading": "Rules",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "refs/support/apps/module/README.md",
+          "heading": "What only this module sees — the app layer"
+        },
+        {
+          "plugin": "spn-apps",
+          "path": "refs/support/apps/resources.md",
+          "heading": "Database — the record of truth"
+        },
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
         }
       ]
     },
