@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "book": {
     "repository": "spn-foundation",
-    "commit": "07bbc965"
+    "commit": "c767fb87"
   },
   "rules": [
     {
@@ -19823,6 +19823,25 @@
           "path": "refs/support/apps/resources.md",
           "heading": "Database — the record of truth"
         },
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.APPS.261",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-apps/implement"
+      },
+      "class": "stated in a skill",
+      "sentence": "A route names a state and an operation on it, and never who calls it",
+      "chapter": "04-capabilities/02-support/02-apps/03-module/01-server/03-entry/01-api.md",
+      "heading": "The API grammar",
+      "decision": null,
+      "restated": [
         {
           "plugin": "spn-apps",
           "path": "skills/implement/SKILL.md",

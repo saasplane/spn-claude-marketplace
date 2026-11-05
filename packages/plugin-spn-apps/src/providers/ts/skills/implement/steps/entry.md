@@ -24,6 +24,7 @@ A `run mode` that executes commands rather than serving traffic still goes throu
 
 - **GET is every read** (command query-encoded, plus a cache-busting `timestamp`); **POST is every write AND every search** (command = JSON body). No PUT/PATCH/DELETE. No `:id` path params — every input travels in the command. No `/api/v{n}` prefix — versioning is a contract concern.
 - Never plural nouns: cardinality is `/all` (whole collection in scope), `/bulk` (by ids), or a list inside the command.
+- A route never names who calls it: no `/platform/` or audience segment. The gate behind the route decides who may call, and a parent acting on its child calls the child's routes, the platform included.
 - Create is `POST /<mod>/<x>` (the base path, never `/create`). Mutations: `/<x>/update`, `/<x>/active` (soft toggle), `/<x>/delete` (hard). Junction sets: `/<x>/<rel>` assign, `/<x>/<rel>/delete` remove.
 - Read levels share the entity path with a suffix: `/<x>` · `/<x>/bulk` · `/<x>/meta[/bulk]` · `/<x>/info[/bulk]` · `/<x>/all` · `/<x>/details` · `POST /<x>/search` · `POST /<x>/info/search`. Key lookups: `/<x>/by-code`, `/by-token`, `/by-host`; bulk `/<x>/bulk/by-codes`.
 - Authz altitude on the surface: details + State search → `<MOD>_<FAMILY>_VIEW`; create/update/active/junctions → `_MANAGE`; hard delete → `_ADMIN`; other reads authenticated. **Generate only what the entity needs** — a method joins the surface when a frontend or another service uses it.
