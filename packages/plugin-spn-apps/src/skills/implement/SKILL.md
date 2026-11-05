@@ -318,6 +318,7 @@ description: THE requirement router for SaaS Plane TS repos. Use whenever the us
 - **Every schema object carries its module's prefix, and no name is over 63 bytes** (`RULE.SUPPORT.APPS.254` · MUST · skill:spn-apps/implement)
 - **A module holds a foreign key only to a table its owner publishes** (`RULE.SUPPORT.APPS.255` · MUST · skill:spn-apps/implement)
 - **A contribution for an owner held in another service travels on a route of the framework's own, and is never a contract method** (`RULE.SUPPORT.APPS.256` · MUST · skill:spn-apps/implement)
+- **The store of kept work is the one exception to "every table belongs to one module".** (`RULE.SUPPORT.APPS.260` · MUST · skill:spn-apps/implement)
 
 **Read `refs/devex/workspace/workstream.md` (spn-devex) before acting.** It holds the loop this skill runs inside: how a prompt is read, where a new ask goes, what a prompt does to a running arc, and how a reply closes.
 

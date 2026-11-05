@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/04-resources/",
-      "seen": "20570774"
+      "seen": "0183af9f"
     }
   ]
 }
@@ -93,7 +93,7 @@ Order a composite index you add with organization scope first, then parent keys 
 
 **Ask for a transaction by the standard's names, in every stack** (`RULE.SUPPORT.APPS.224` · MUST · skill:spn-apps/implement). A call states the options it needs and takes the default for the rest: the connection (`default`), the propagation (`REQUIRED`), the isolation (the database's own), read-only (off), a time limit in milliseconds (none) and the error codes that leave work committed (none). The propagations are `REQUIRED`, `REQUIRES_NEW`, `NESTED` (a real savepoint on the same connection), `SUPPORTS`, `MANDATORY`, `NOT_SUPPORTED` and `NEVER`, and the isolations are the SQL standard's four, `READ_UNCOMMITTED`, `READ_COMMITTED`, `REPEATABLE_READ` and `SERIALIZABLE`. `REQUIRES_NEW` is for the rare write that must outlive its caller, run before the caller opens its own transaction and never inside it, because a nested one holds a second connection while the first is held and a burst of callers can deadlock the pool; a write that must never run inside a transaction declares `NEVER` (`RULE.SUPPORT.APPS.229` · MUST · skill:spn-apps/implement). A join asks for no more than the open transaction holds, and an option an engine cannot honour is refused by name, never rounded and never ignored. Four hooks run code around the outcome, each added by an exported function and refused by name outside a transaction: `runBeforeTransactionCommit` runs inside the transaction, and a throw rolls it back; `runOnTransactionCommit`, `runOnTransactionRollback` and `runOnTransactionComplete` run after it. A module or the app registers handlers that are called for every transaction the framework closes. The four hooks are for work that may be lost, such as clearing a cache or counting a metric. Work that must not be lost after the commit goes through a keyed handler on a key with the phase `AFTER_COMMIT`, which the module construct states, and is kept with the transaction. The limit is that a transaction's scope is the call chain that opened it, so two parallel calls that each open a transaction of their own inside one are not supported; joins are safe.
 
-**The store of kept work is the one exception to "every table belongs to one module".** `platform.{app}_transaction_bound_write` belongs to the app code, and the services that share an app code share it. It is also the one stated exception to the module prefix of `RULE.SUPPORT.APPS.254`, because its table and enum start with the app's code, and the `MIGRATE` run that enforces that rule leaves it out. It is made by the `MIGRATE` run, as the migration tracker is, so migrations stay the only schema-change path.
+**The store of kept work is the one exception to "every table belongs to one module".** (`RULE.SUPPORT.APPS.260` · MUST · skill:spn-apps/implement) `platform.{app}_transaction_bound_write` belongs to the app code, and the services that share an app code share it. It is also the one stated exception to the module prefix of `RULE.SUPPORT.APPS.254`, because its table and enum start with the app's code, and the `MIGRATE` run that enforces that rule leaves it out. It is made by the `MIGRATE` run, as the migration tracker is, so migrations stay the only schema-change path.
 
 ### Cache — never the only copy
 
