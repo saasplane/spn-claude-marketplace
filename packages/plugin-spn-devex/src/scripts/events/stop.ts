@@ -1500,34 +1500,37 @@ function resultText(content: unknown): string {
 }
 
 /**
- * Every tool result of the turn the Stop hook ends, from the transcript: the text of each `tool_result` block after the last
- * prompt of the developer's own, read as `turnOf` reads the turn. A helper's side chain is left out.
+ * Every tool result of the turn the Stop hook ends that a command making a closing moment produced, from the transcript. The turn
+ * starts at the last prompt of the developer's own, and also at a message of theirs that Claude Code surfaces inside the running turn
+ * (a queued prompt): results from before either settle nothing for the reply after it. A helper's side chain is left out.
  */
 export function toolResultsOf(transcript: string): string[] {
   let raw = "";
   try { raw = readFileSync(transcript, "utf8"); } catch { return []; }
   let results: string[] = [];
-  // A RESULT COUNTS ONLY WHERE THE COMMAND THAT MADE IT RAN: a Read, a grep or a cat shows text that quotes a result line and settles nothing.
+  // A RESULT COUNTS ONLY WHERE THE COMMAND THAT MAKES THE MOMENT RAN: a Read, a cat, a grep or a listing shows text that quotes a result line and settles nothing.
   const tools = new Map<string, { name?: string; command?: string }>();
   for (const line of raw.split("\n")) {
     if (!line.trim()) continue;
-    let entry: { type?: string; isMeta?: boolean; isSidechain?: boolean; message?: { content?: unknown } };
+    let entry: { type?: string; isMeta?: boolean; isSidechain?: boolean; message?: { content?: unknown }; attachment?: { type?: string; origin?: { kind?: string } } };
     try { entry = JSON.parse(line); } catch { continue; }
-    if (promptTextOf(entry)) { results = []; tools.clear(); continue; }
+    if (promptTextOf(entry) || (entry.type === "attachment" && !entry.isSidechain && entry.attachment?.type === "queued_command" && entry.attachment.origin?.kind === "human")) { results = []; tools.clear(); continue; }
     if (entry.isSidechain || !Array.isArray(entry.message?.content)) continue;
     for (const part of entry.message.content as Array<{ type?: string; id?: string; name?: string; input?: { command?: string }; tool_use_id?: string; content?: unknown }>) {
       if (entry.type === "assistant" && part.type === "tool_use" && part.id) tools.set(part.id, { name: part.name, command: part.input?.command });
       if (entry.type !== "user" || part.type !== "tool_result") continue;
       const tool = part.tool_use_id ? tools.get(part.tool_use_id) : undefined;
-      if (tool && (tool.name !== "Bash" || SHOWS_TEXT.test(tool.command ?? ""))) continue;
-      results.push(resultText(part.content));
+      if (tool?.name === "Bash" && MAKES_MOMENT.test(tool.command ?? "")) results.push(resultText(part.content));
     }
   }
   return results;
 }
 
-/** A command that only shows text: its result quotes lines and settles nothing. */
-const SHOWS_TEXT = /^\s*(?:cat|grep|egrep|rg|sed|head|tail|less|echo|printf|awk|jq)\b/;
+/**
+ * A command that makes a closing moment: a row's state, a report written, a go's part, a close. It starts a shell segment, so a
+ * `cat`, a `grep` or a listing that merely names it is not one; `go show`, `go propose` and `go check` only read.
+ */
+const MAKES_MOMENT = /(?:^|[;&|]\s*|\n\s*)(?:\S*\/)?spn-devex\s+workstream\s+(?:row\b|report\s+write\b|go\s+(?!show\b|propose\b|check\b)|close\b)/;
 // ---------------------------------------------------------------------------- the card's capital letter
 
 /**
@@ -1754,21 +1757,19 @@ const ARC_LANDED = /\S+ reads LANDED\b/;
 const ROW_LANDED = /(?:^|[\s·])\S*N\d+ \S+ landed(?:\s|·|$)/m;
 
 /**
- * Which moment's message a reply owes: the heading it opens with holds it to that shape whatever the results say; otherwise the highest
- * moment the results of the turn settled (a workstream's close, then an arc's landing, then a row's), or null.
+ * Which moment's message a reply owes: the highest moment the results of the turn settled (a workstream's close, then an arc's landing,
+ * then a row's), or null. A heading the reply opens with only picks the shape of a moment that is owed; it never creates the debt.
  */
 function momentOwed(reply: string, results: readonly string[]): ClosingShape | null {
-  const opened = shapeByTitle(reply, true);
-  if (opened) return opened;
-  if (results.some((one) => one.includes(CLOSE_SUCCESS))) return shapeOf("workstream");
-  if (results.some((one) => ARC_LANDED.test(one))) return shapeOf("arc");
-  if (results.some((one) => ROW_LANDED.test(one))) return shapeOf("row");
-  return null;
+  const settled = results.some((one) => one.includes(CLOSE_SUCCESS)) ? shapeOf("workstream")
+    : results.some((one) => ARC_LANDED.test(one)) ? shapeOf("arc")
+    : results.some((one) => ROW_LANDED.test(one)) ? shapeOf("row") : null;
+  return settled && (shapeByTitle(reply, true) ?? settled);
 }
 
 /**
  * THE CLOSE-MESSAGE CHECK (RULE.DEVEX.WORKSPACE.206): a close is a milestone, and the agent writes its message right after the
- * moment. The moment is read from the result of the command that makes it (`toolResultsOf`), or from the heading the reply opens with;
+ * moment. The moment is read only from the result of the command that makes it (`toolResultsOf`); the heading the reply opens with picks its shape;
  * the reply is sent back unless it keeps that moment's shape (`CLOSING_SHAPES`). A handover's shape is held by `checkHandover`.
  *
  * @param results  the tool results of the turn (`toolResultsOf`)
