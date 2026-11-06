@@ -23,9 +23,6 @@
 - **A skeleton is drawn for one level: the app, a layout with its body, navigation and content, the page level, a container, a widget or a card, or a component. It shows where that level's primary sub-components are placed, each with its own component's name, and sample values fill the rest** (`RULE.DEVEX.WORKSPACE.230` · MUST · skill:spn-surface/design)
 - **A page's skeleton stands in its layout and draws every level: the window, the layout's body, navigation and content, the page level, the containers, the widgets and cards, and the components** (`RULE.DEVEX.WORKSPACE.260` · MUST · skill:spn-surface/design)
 - **A mock of a layout is a `SKELETON` figure drawn by its helper, with a flow file ordering the pages and each page drawn once** (`RULE.DEVEX.WORKSPACE.454` · MUST · skill:spn-surface/design)
-- **RULE.SUPPORT.SURFACE.003** (`RULE.SUPPORT.SURFACE.003` · MUST · skill:spn-surface/design)
-- **RULE.SUPPORT.SURFACE.089** (`RULE.SUPPORT.SURFACE.089` · MUST · skill:spn-surface/design)
-- **RULE.SUPPORT.SURFACE.090** (`RULE.SUPPORT.SURFACE.090` · MUST · skill:spn-surface/design)
 - **A vertical item line spaces its text by its level** (`RULE.SUPPORT.SURFACE.228` · MUST · skill:spn-surface/design)
 
 Read this step when the developer asks for a mock of a page or a flow, or asks to see the design where the window holds no Figma connector. **A mock is the tree this skill already wrote, drawn as skeletons.** It is no second design: every decision in it is made in steps 0 to 5, and a change of mind goes into the tree first, and then into the mock. In a designer's words it is a mock; in the book's it is a skeleton, a mock of a layout.
