@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/10-providers/ts/02-naming.md",
-      "seen": "83322d82"
+      "seen": "8168900a"
     }
   ]
 }
@@ -83,6 +83,8 @@
 | an entity or contract shape | PascalCase, no `I` | `User` |
 | a constructor config | `{Class}Config`, no `I` | `SPHttpClientAxiosConfig` |
 | an input command | `{Action}{Entity}Command` | `CreateUserCommand` |
+
+**Code follows this naming chapter, and a name that departs from it is renamed without asking** (`RULE.SUPPORT.APPS.232` · MUST · check:read-verb-naming). A unit takes its state's name and casing, a method starts with an action verb, and a boolean reads as yes or no, such as `isActive`; the module chapter's section *Fields: how a state names and types them* (`module/README.md`) says how a state names and types them. An enum type ends in `_type`, a reference column is `<table>_id`, and no alias is a single letter. A stray name costs every later reader, so the rename is made at once.
 
 ### Decorators
 

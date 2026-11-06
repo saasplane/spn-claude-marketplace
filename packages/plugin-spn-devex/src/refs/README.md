@@ -17,6 +17,10 @@
 | [`devex/utils/`](devex/utils/) | the CLI — what it is, and every command it answers |
 | [`devex/workspace/`](devex/workspace/) | the workspace, the workstream, what a repository declares, and the doc rules |
 
+## What a window reads first
+
+**Two refs are read before the work starts.** [`devex/agent/work-map.md`](devex/agent/work-map.md) is the work map: one row for each kind of work, naming the skill that covers it, the references to read first and where in the repositories to look. The precedent lookup, `spn-devex precedent find "<subject>" --work <kind> --code`, answers what is already decided, written or built for a subject, and `spn-devex precedent map <kind>` prints a kind's row with its references resolved to paths.
+
 ## What is authored, and what is not
 
 **Everything here is authored** — read from a chapter and rewritten in this ref's own words, stamped with the version it was read at. A drift check compares those stamps against the book and reports what moved.

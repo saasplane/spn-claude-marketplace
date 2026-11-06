@@ -13,6 +13,8 @@
 
 ## Traps — read before any row
 
+**Read first:** {{one line for each kind of work the arc's rows do: `<kind>` — the references `spn-devex precedent find "<subject>" --work <kind>` prints for it}}
+
 - **{{the trap}}.** {{What happens if you walk into it, and what to do instead.}}
 
 ## Commands, and what green looks like

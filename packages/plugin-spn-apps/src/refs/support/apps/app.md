@@ -7,7 +7,12 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/05-app/",
-      "seen": "2e95f73e"
+      "seen": "03bbaf41"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/03-module/02-web/03-entry/01-pages.md",
+      "section": "The address of a screen",
+      "seen": "d88d12e6"
     }
   ]
 }
@@ -305,6 +310,28 @@ public/   copies verbatim → dist root     stable names — the author's chrome
 `_assets/` is reserved so the cache contract can depend on only hashed names living there; `public/` is chrome — well-known files and small media — never product content, which belongs to the platform's own document store.
 
 **The bundle carries its environment.** It is built once per environment, and the two addresses a page needs are build-time values: one committed file per environment, holding no credentials, which a value from the shell or the pipeline overrides. **Everything built in is public by definition**, so a secret never reaches the bundle. A required value that is missing stops the page at start and names the key, rather than falling back to a plausible default. The cost is stated in `DEC.SUPPORT.APPS.063`: the bundle that passed non-production is not the bundle production runs. A deployed web application builds no image at all: its artifact is the bundle, whole, delivered as a copy into the environment's release store and a pointer move — never a second horizontal-scaling decision, because static serving scales by the host rather than by the app.
+
+### The public pages of a web app are its own pages
+
+**A public page is a third kind of page, beside work and setup. It is the app's own page under `RULE.SUPPORT.APPS.204`, and one table decides any page's address from who it is for and whether it is signed in.**
+
+| The page is for | Signed in? | Its address |
+| --- | --- | --- |
+| A person of the organization, every day | Yes | `/<name>/<rest>`, a page of work |
+| A person who sets the module up | Yes | `/settings/<name>/<rest>`, a page of setup |
+| Anyone, found by a search engine or a shared link | No | `/<plain word of the site>/<rest>`, the app's own page |
+
+A public address differs from a module's signed-in route in one way: the signed-in route begins with the module's name, and a public address begins with the site's own plain word. Its words come from the site's information architecture, and it uses a module's units (its states, reads and components). A module keeps its name (`RULE.SUPPORT.APPS.204`), an address never carries its menu place (`RULE.SUPPORT.APPS.192`), and a changed address answers with a redirect (`RULE.SUPPORT.APPS.193`).
+
+**You state the site's hierarchy and the use case first, and you propose an address only after.** Name the site's levels, such as portal, collection, record; name what a person is doing there (browsing, searching, following a link); decide which levels earn a page; and only then choose the words. The public-sites chapter of the web app seat covers six uses, each with its own hierarchy and addresses: a job portal, a careers site on a company's own host, an ecommerce store, a marketplace, a content or help site, and a directory of listings.
+
+- **An id stays out of a public address; a code is its stable key.** An address ends in `-<code>`, only the code is looked up, a changed title never breaks the address, and the code is lower case. Segments are nouns, plural for a collection, with hyphens between words. A category or place that earns its own page goes in the path; a filter or a sort stays in the query.
+- **A page has one canonical address,** and every other address answers with a redirect to it or names it. A changed address answers with a permanent server redirect, `301` or `308`, and what must never change is the code.
+- **Each page carries a distinct title and description,** and the four share-preview properties `og:title`, `og:type`, `og:image` and `og:url`, where `og:url` is the canonical address.
+- **Structured data follows the kind:** `JobPosting` for a job, `Product` with an `Offer` for a product, and the markup matches the visible page.
+- **A sitemap lists the canonical addresses.** robots.txt controls crawling and `noindex` controls indexing, and the two are not used on one address. A demo site, a preview environment and any signed-in page are never indexed.
+- **A closed job** carries a past `validThrough` or answers 404 or 410; **a sold-out item that will return** stays with `OutOfStock`; **one that will not return** answers 410 or redirects to its nearest page, never the home page.
+- **How the app serves the page to a crawler is not settled.** A web app is a static bundle with one `index.html`, one title and one description for every address, so a public page that must carry its own title, markup and status needs a server answer that the deployment chapter does not provide yet. The choice between pre-rendering at build, a rendering edge and a rendering service is the product's to make.
 
 ## What an application owns that a module never does
 
