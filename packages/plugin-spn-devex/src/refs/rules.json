@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "book": {
     "repository": "spn-foundation",
-    "commit": "c767fb87"
+    "commit": "0cadfc64"
   },
   "rules": [
     {
@@ -123,11 +123,6 @@
           "plugin": "spn-devex",
           "path": "refs/devex/function/ideate.md",
           "heading": "Classify the altitude before you classify the change"
-        },
-        {
-          "plugin": "spn-devex",
-          "path": "skills/ideate/SKILL.md",
-          "heading": "The rules this step holds"
         },
         {
           "plugin": "spn-devex",
@@ -839,17 +834,17 @@
         {
           "plugin": "spn-devex",
           "path": "skills/ideate/SKILL.md",
+          "heading": "The views that take part"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "The views that take part"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
           "heading": "The rules this step holds"
-        },
-        {
-          "plugin": "spn-devex",
-          "path": "skills/ideate/SKILL.md",
-          "heading": "The views that take part"
-        },
-        {
-          "plugin": "spn-devex",
-          "path": "skills/ideate/SKILL.md",
-          "heading": "The views that take part"
         }
       ]
     },
@@ -1016,17 +1011,17 @@
         {
           "plugin": "spn-devex",
           "path": "skills/ideate/SKILL.md",
-          "heading": "The rules this step holds"
-        },
-        {
-          "plugin": "spn-devex",
-          "path": "skills/ideate/SKILL.md",
-          "heading": "The rules this step holds"
+          "heading": "ideate — decide the shape, one agreed section at a time"
         },
         {
           "plugin": "spn-devex",
           "path": "skills/ideate/SKILL.md",
           "heading": "Before the gates — the industry brief, on a partner platform"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -1255,11 +1250,6 @@
           "plugin": "spn-devex",
           "path": "refs/devex/agent/plugins.md",
           "heading": "Two install modes, and the place you are standing decides"
-        },
-        {
-          "plugin": "spn-devex",
-          "path": "skills/deliver/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -2117,7 +2107,7 @@
       "sentence": "The book names no workstream, no arc and no window",
       "chapter": "04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "heading": "Three classes of rule",
-      "decision": null,
+      "decision": "DEC.DEVEX.AGENT.165",
       "restated": []
     },
     {
@@ -2307,12 +2297,12 @@
         {
           "plugin": "spn-devex",
           "path": "skills/ideate/SKILL.md",
-          "heading": "The rules this step holds"
+          "heading": "Mode: design — a requirement becomes rows in the docs that own it"
         },
         {
           "plugin": "spn-devex",
           "path": "skills/ideate/SKILL.md",
-          "heading": "Mode: design — a requirement becomes rows in the docs that own it"
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -2392,13 +2382,7 @@
       "chapter": "02-constructs/01-devex/01-function/03-ideate.md",
       "heading": "Both ends are named",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-devex",
-          "path": "skills/ideate/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.DEVEX.FUNCTION.035",
@@ -2422,13 +2406,7 @@
       "chapter": "05-guides/README.md",
       "heading": "The machine",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-devex",
-          "path": "skills/bootstrap/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.DEVEX.FUNCTION.051",
@@ -2465,13 +2443,7 @@
       "chapter": "02-constructs/01-devex/01-function/04-develop.md",
       "heading": "What each layer may do",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-devex",
-          "path": "skills/develop/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.DEVEX.FUNCTION.060",
@@ -2494,11 +2466,6 @@
           "plugin": "spn-devex",
           "path": "refs/devex/agent/lenses/lead.md",
           "heading": "Produces to"
-        },
-        {
-          "plugin": "spn-devex",
-          "path": "skills/scm/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -2517,12 +2484,12 @@
         {
           "plugin": "spn-devex",
           "path": "skills/ideate/SKILL.md",
-          "heading": "The rules this step holds"
+          "heading": "One skill, three modes — and plan is not a fourth"
         },
         {
           "plugin": "spn-devex",
           "path": "skills/ideate/SKILL.md",
-          "heading": "One skill, three modes — and plan is not a fourth"
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -2562,12 +2529,12 @@
         {
           "plugin": "spn-apps",
           "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
+          "heading": "3. Walk the steps"
         },
         {
           "plugin": "spn-apps",
           "path": "skills/implement/SKILL.md",
-          "heading": "3. Walk the steps"
+          "heading": "The rules this step holds"
         },
         {
           "plugin": "spn-apps",
@@ -2612,11 +2579,6 @@
           "plugin": "spn-devex",
           "path": "refs/devex/agent/lenses/infra.md",
           "heading": "Produces to"
-        },
-        {
-          "plugin": "spn-devex",
-          "path": "skills/scm/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -2669,13 +2631,7 @@
       "chapter": "04-capabilities/01-devex/01-function/02-scm.md",
       "heading": "The branching and promotion standard",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-devex",
-          "path": "skills/scm/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.DEVEX.FUNCTION.069",
@@ -2697,12 +2653,12 @@
         {
           "plugin": "spn-devex",
           "path": "skills/scm/SKILL.md",
-          "heading": "The rules this step holds"
+          "heading": "Branches, promotion and releases"
         },
         {
           "plugin": "spn-devex",
           "path": "skills/scm/SKILL.md",
-          "heading": "Branches, promotion and releases"
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -2751,11 +2707,6 @@
           "plugin": "spn-devex",
           "path": "refs/devex/workspace/workstream.md",
           "heading": "A workstream works on one branch per repository"
-        },
-        {
-          "plugin": "spn-devex",
-          "path": "skills/scm/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -2992,13 +2943,7 @@
       "chapter": "04-capabilities/01-devex/01-function/02-scm.md",
       "heading": "Repo tasks",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-devex",
-          "path": "skills/scm/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.DEVEX.FUNCTION.084",
@@ -3011,13 +2956,7 @@
       "chapter": "04-capabilities/01-devex/01-function/02-scm.md",
       "heading": "Repo tasks",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-devex",
-          "path": "skills/scm/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.DEVEX.FUNCTION.085",
@@ -3030,13 +2969,7 @@
       "chapter": "04-capabilities/01-devex/01-function/02-scm.md",
       "heading": "Repo tasks",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-devex",
-          "path": "skills/scm/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.DEVEX.FUNCTION.086",
@@ -3049,13 +2982,7 @@
       "chapter": "04-capabilities/01-devex/01-function/02-scm.md",
       "heading": "Repo tasks",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-devex",
-          "path": "skills/scm/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.DEVEX.FUNCTION.087",
@@ -3068,13 +2995,7 @@
       "chapter": "04-capabilities/01-devex/01-function/02-scm.md",
       "heading": "Repo tasks",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-devex",
-          "path": "skills/scm/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.DEVEX.FUNCTION.088",
@@ -3087,13 +3008,7 @@
       "chapter": "04-capabilities/01-devex/01-function/02-scm.md",
       "heading": "Repo tasks",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-devex",
-          "path": "skills/scm/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.DEVEX.FUNCTION.089",
@@ -3106,13 +3021,7 @@
       "chapter": "04-capabilities/01-devex/01-function/02-scm.md",
       "heading": "Repo tasks",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-devex",
-          "path": "skills/scm/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.DEVEX.FUNCTION.090",
@@ -3130,11 +3039,6 @@
           "plugin": "spn-devex",
           "path": "refs/devex/function/ideate.md",
           "heading": "How a first proposal is shaped"
-        },
-        {
-          "plugin": "spn-devex",
-          "path": "skills/ideate/SKILL.md",
-          "heading": "The rules this step holds"
         },
         {
           "plugin": "spn-devex",
@@ -3163,11 +3067,6 @@
         {
           "plugin": "spn-devex",
           "path": "skills/ideate/SKILL.md",
-          "heading": "The rules this step holds"
-        },
-        {
-          "plugin": "spn-devex",
-          "path": "skills/ideate/SKILL.md",
           "heading": "How a first proposal is shaped"
         }
       ]
@@ -3188,11 +3087,6 @@
           "plugin": "spn-devex",
           "path": "refs/devex/function/ideate.md",
           "heading": "How a first proposal is shaped"
-        },
-        {
-          "plugin": "spn-devex",
-          "path": "skills/ideate/SKILL.md",
-          "heading": "The rules this step holds"
         },
         {
           "plugin": "spn-devex",
@@ -3221,11 +3115,6 @@
         {
           "plugin": "spn-devex",
           "path": "skills/ideate/SKILL.md",
-          "heading": "The rules this step holds"
-        },
-        {
-          "plugin": "spn-devex",
-          "path": "skills/ideate/SKILL.md",
           "heading": "How a first proposal is shaped"
         }
       ]
@@ -3246,11 +3135,6 @@
           "plugin": "spn-devex",
           "path": "refs/devex/function/ideate.md",
           "heading": "How a first proposal is shaped"
-        },
-        {
-          "plugin": "spn-devex",
-          "path": "skills/ideate/SKILL.md",
-          "heading": "The rules this step holds"
         },
         {
           "plugin": "spn-devex",
@@ -3279,11 +3163,6 @@
         {
           "plugin": "spn-devex",
           "path": "skills/ideate/SKILL.md",
-          "heading": "The rules this step holds"
-        },
-        {
-          "plugin": "spn-devex",
-          "path": "skills/ideate/SKILL.md",
           "heading": "How a first proposal is shaped"
         }
       ]
@@ -3308,11 +3187,6 @@
         {
           "plugin": "spn-devex",
           "path": "skills/ideate/SKILL.md",
-          "heading": "The rules this step holds"
-        },
-        {
-          "plugin": "spn-devex",
-          "path": "skills/ideate/SKILL.md",
           "heading": "How a first proposal is shaped"
         }
       ]
@@ -3333,11 +3207,6 @@
           "plugin": "spn-devex",
           "path": "refs/devex/function/ideate.md",
           "heading": "How a first proposal is shaped"
-        },
-        {
-          "plugin": "spn-devex",
-          "path": "skills/ideate/SKILL.md",
-          "heading": "The rules this step holds"
         },
         {
           "plugin": "spn-devex",
@@ -3371,12 +3240,12 @@
         {
           "plugin": "spn-devex",
           "path": "skills/ideate/SKILL.md",
-          "heading": "The rules this step holds"
+          "heading": "How a first proposal is shaped"
         },
         {
           "plugin": "spn-devex",
           "path": "skills/ideate/SKILL.md",
-          "heading": "How a first proposal is shaped"
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -3396,11 +3265,6 @@
           "plugin": "spn-devex",
           "path": "refs/devex/function/ideate.md",
           "heading": "How a first proposal is shaped"
-        },
-        {
-          "plugin": "spn-devex",
-          "path": "skills/ideate/SKILL.md",
-          "heading": "The rules this step holds"
         },
         {
           "plugin": "spn-devex",
@@ -3429,11 +3293,6 @@
         {
           "plugin": "spn-devex",
           "path": "skills/ideate/SKILL.md",
-          "heading": "The rules this step holds"
-        },
-        {
-          "plugin": "spn-devex",
-          "path": "skills/ideate/SKILL.md",
           "heading": "How a first proposal is shaped"
         }
       ]
@@ -3454,11 +3313,6 @@
           "plugin": "spn-devex",
           "path": "refs/devex/function/ideate.md",
           "heading": "How a first proposal is shaped"
-        },
-        {
-          "plugin": "spn-devex",
-          "path": "skills/ideate/SKILL.md",
-          "heading": "The rules this step holds"
         },
         {
           "plugin": "spn-devex",
@@ -3487,11 +3341,6 @@
         {
           "plugin": "spn-devex",
           "path": "skills/ideate/SKILL.md",
-          "heading": "The rules this step holds"
-        },
-        {
-          "plugin": "spn-devex",
-          "path": "skills/ideate/SKILL.md",
           "heading": "How a first proposal is shaped"
         }
       ]
@@ -3516,11 +3365,6 @@
         {
           "plugin": "spn-devex",
           "path": "skills/ideate/SKILL.md",
-          "heading": "The rules this step holds"
-        },
-        {
-          "plugin": "spn-devex",
-          "path": "skills/ideate/SKILL.md",
           "heading": "How a first proposal is shaped"
         }
       ]
@@ -3541,11 +3385,6 @@
           "plugin": "spn-devex",
           "path": "refs/devex/utils/spnutils.md",
           "heading": "The derivation laws"
-        },
-        {
-          "plugin": "spn-devex",
-          "path": "skills/develop/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -3560,13 +3399,7 @@
       "chapter": "02-constructs/01-devex/03-utils/01-spnutils.md",
       "heading": "repo",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-devex",
-          "path": "skills/develop/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.DEVEX.UTILS.018",
@@ -3579,13 +3412,7 @@
       "chapter": "02-constructs/01-devex/03-utils/01-spnutils.md",
       "heading": "Four command groups",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-devex",
-          "path": "skills/develop/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.DEVEX.UTILS.019",
@@ -3598,13 +3425,7 @@
       "chapter": "04-capabilities/01-devex/03-utils/01-spnutils/02-delivery.md",
       "heading": "One public marketplace",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-devex",
-          "path": "skills/deliver/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.DEVEX.UTILS.027",
@@ -4129,13 +3950,7 @@
       "chapter": "04-capabilities/README.md",
       "heading": "Capabilities — What the Foundation Provides",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-devex",
-          "path": "skills/ideate/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.009",
@@ -4181,13 +3996,7 @@
       "chapter": "04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md",
       "heading": "DevEx Workspace — One Window, Laws by Declaration",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-devex",
-          "path": "skills/bootstrap/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.024",
@@ -4454,13 +4263,7 @@
       "chapter": "02-constructs/01-devex/04-workspace/04-docs.md",
       "heading": "Guides are steps",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-apps",
-          "path": "skills/new/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.075",
@@ -4508,11 +4311,6 @@
           "plugin": "spn-apps",
           "path": "refs/support/apps/agent-surface.md",
           "heading": "The one rule that governs all four"
-        },
-        {
-          "plugin": "spn-devex",
-          "path": "skills/develop/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -4560,7 +4358,7 @@
         {
           "plugin": "spn-devex",
           "path": "skills/ideate/SKILL.md",
-          "heading": "The rules this step holds"
+          "heading": "ideate — decide the shape, one agreed section at a time"
         },
         {
           "plugin": "spn-devex",
@@ -4585,11 +4383,6 @@
           "plugin": "spn-devex",
           "path": "refs/devex/function/develop.md",
           "heading": "What each layer may do, and never do"
-        },
-        {
-          "plugin": "spn-devex",
-          "path": "skills/develop/SKILL.md",
-          "heading": "The rules this step holds"
         },
         {
           "plugin": "spn-devex",
@@ -4841,13 +4634,7 @@
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/02-document.md",
       "heading": "Metadata",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-devex",
-          "path": "skills/develop/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.098",
@@ -5448,13 +5235,7 @@
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "Docs per change: each kind of change owes the documents its own share",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-devex",
-          "path": "skills/execute/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.127",
@@ -5741,13 +5522,7 @@
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/01-corpus.md",
       "heading": "What a concept is made of",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-devex",
-          "path": "skills/ideate/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.146",
@@ -5820,17 +5595,17 @@
         {
           "plugin": "spn-devex",
           "path": "skills/report/SKILL.md",
-          "heading": "The rules this step holds"
-        },
-        {
-          "plugin": "spn-devex",
-          "path": "skills/report/SKILL.md",
-          "heading": "The rules this step holds"
+          "heading": "report — where one repository stands, at one moment"
         },
         {
           "plugin": "spn-devex",
           "path": "skills/report/SKILL.md",
           "heading": "The five report types"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/report/SKILL.md",
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -5914,13 +5689,7 @@
       "chapter": "04-capabilities/02-support/02-apps/04-resources/01-server/02-database.md",
       "heading": "Database — Schemas, Entities, and Tenancy",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.158",
@@ -6041,13 +5810,7 @@
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/06-registers.md",
       "heading": "The identifier",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-devex",
-          "path": "skills/develop/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.167",
@@ -6082,13 +5845,7 @@
       "chapter": "04-capabilities/02-support/02-apps/01-shape/02-packaging.md",
       "heading": "What a node root holds",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-devex",
-          "path": "skills/ideate/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.171",
@@ -6101,13 +5858,7 @@
       "chapter": "04-capabilities/01-devex/01-function/03-ideate.md",
       "heading": "Classify the altitude before you classify the change",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-devex",
-          "path": "skills/ideate/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.172",
@@ -6232,12 +5983,7 @@
         {
           "plugin": "spn-devex",
           "path": "skills/test/SKILL.md",
-          "heading": "The rules this step holds"
-        },
-        {
-          "plugin": "spn-devex",
-          "path": "skills/test/SKILL.md",
-          "heading": "The rules this step holds"
+          "heading": "test — proof, at the tier that means something"
         },
         {
           "plugin": "spn-infra",
@@ -6544,11 +6290,6 @@
         {
           "plugin": "spn-devex",
           "path": "skills/report/SKILL.md",
-          "heading": "The rules this step holds"
-        },
-        {
-          "plugin": "spn-devex",
-          "path": "skills/report/SKILL.md",
           "heading": "Coverage — how much is written, built and proved?"
         }
       ]
@@ -6573,12 +6314,12 @@
         {
           "plugin": "spn-devex",
           "path": "skills/report/SKILL.md",
-          "heading": "The rules this step holds"
+          "heading": "The header"
         },
         {
           "plugin": "spn-devex",
           "path": "skills/report/SKILL.md",
-          "heading": "The header"
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -6957,12 +6698,12 @@
         {
           "plugin": "spn-devex",
           "path": "skills/report/SKILL.md",
-          "heading": "The rules this step holds"
+          "heading": "Records — list items, never a table — MUST"
         },
         {
           "plugin": "spn-devex",
           "path": "skills/report/SKILL.md",
-          "heading": "Records — list items, never a table — MUST"
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -8579,11 +8320,6 @@
           "plugin": "spn-devex",
           "path": "refs/devex/workspace/workstream.md",
           "heading": "Work is sized by its kind, and fixes gather into a round"
-        },
-        {
-          "plugin": "spn-devex",
-          "path": "skills/execute/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -8983,11 +8719,6 @@
           "plugin": "spn-devex",
           "path": "refs/devex/workspace/docs/blocks.md",
           "heading": "skeleton — a mock of a layout, and nothing about how it looks"
-        },
-        {
-          "plugin": "spn-devex",
-          "path": "skills/develop/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -12277,12 +12008,12 @@
         {
           "plugin": "spn-devex",
           "path": "skills/ideate/SKILL.md",
-          "heading": "The rules this step holds"
+          "heading": "How a first proposal is shaped"
         },
         {
           "plugin": "spn-devex",
           "path": "skills/ideate/SKILL.md",
-          "heading": "How a first proposal is shaped"
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -12398,7 +12129,7 @@
         "check": "doc-check"
       },
       "class": "checked",
-      "sentence": "After `How` comes a section of its own, *Plan*: one row per arc, in the order the arcs run, with `ideate` first and `follow-ups` last",
+      "sentence": "After `How` comes a section of its own, *Plan*: one row per arc, in the arc order (`ideate` first, the build arcs by number and letter, `follow-ups` last), the same order the status bar follows",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "Plan lists the arcs, and the arcs are the state",
       "decision": null,
@@ -12583,7 +12314,7 @@
         {
           "plugin": "spn-devex",
           "path": "skills/execute/SKILL.md",
-          "heading": "The rules this step holds"
+          "heading": ""
         }
       ]
     },
@@ -12626,7 +12357,7 @@
         {
           "plugin": "spn-devex",
           "path": "skills/execute/SKILL.md",
-          "heading": "The rules this step holds"
+          "heading": ""
         },
         {
           "plugin": "spn-devex",
@@ -12746,13 +12477,7 @@
       "chapter": "04-capabilities/03-platform/README.md",
       "heading": "The SaaS Model — What a Multi-Tenant Platform Is Made Of",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.PLATFORM.CORE.003",
@@ -12825,13 +12550,7 @@
       "chapter": "04-capabilities/02-support/02-apps/03-module/01-server/01-contract/01-states.md",
       "heading": "Enums, permissions, and error codes",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-apps",
-          "path": "providers/ts/skills/implement/steps/contract.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.PLATFORM.CORE.016",
@@ -12844,13 +12563,7 @@
       "chapter": "04-capabilities/03-platform/01-core/01-tenancy/03-people-access.md",
       "heading": "Provider ownership: who configures sign-in",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.PLATFORM.CORE.017",
@@ -12863,13 +12576,7 @@
       "chapter": "04-capabilities/03-platform/01-core/01-tenancy/03-people-access.md",
       "heading": "Where a surface's options come from",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.PLATFORM.CORE.018",
@@ -12920,13 +12627,7 @@
       "chapter": "02-constructs/03-platform/01-core/01-tenancy.md",
       "heading": "Who configures what",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.PLATFORM.CORE.021",
@@ -12939,13 +12640,7 @@
       "chapter": "02-constructs/03-platform/01-core/01-tenancy.md",
       "heading": "Who configures what",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.PLATFORM.CORE.022",
@@ -12958,13 +12653,7 @@
       "chapter": "04-capabilities/03-platform/01-core/01-tenancy/03-people-access.md",
       "heading": "Policy is governed by the same two rights as providers",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.PLATFORM.CORE.023",
@@ -12977,13 +12666,7 @@
       "chapter": "02-constructs/03-platform/01-core/02-identity.md",
       "heading": "One hub and callbacks",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.PLATFORM.CORE.024",
@@ -12996,13 +12679,7 @@
       "chapter": "02-constructs/03-platform/01-core/02-identity.md",
       "heading": "One hub and callbacks",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.PLATFORM.CORE.025",
@@ -13015,13 +12692,7 @@
       "chapter": "02-constructs/03-platform/01-core/02-identity.md",
       "heading": "A stored boundary",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.PLATFORM.CORE.026",
@@ -13039,11 +12710,6 @@
           "plugin": "spn-apps",
           "path": "refs/platform/core/tenancy/README.md",
           "heading": "The resolution chain"
-        },
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -13104,11 +12770,6 @@
           "plugin": "spn-apps",
           "path": "refs/platform/core/data-and-trust.md",
           "heading": "A secret you must read back is stored sealed"
-        },
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -13142,13 +12803,7 @@
       "chapter": "04-capabilities/03-platform/01-core/03-surfaces/03-service-namespaces.md",
       "heading": "Service Namespaces — Product, Platform, and Vendor",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.PLATFORM.CORE.032",
@@ -13161,13 +12816,7 @@
       "chapter": "04-capabilities/02-support/03-infra/01-shape/02-coordinates.md",
       "heading": "A platform owns one tenancy root, and any number of faces",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.PLATFORM.CORE.033",
@@ -13205,11 +12854,6 @@
       "heading": "@SPAuthorize + the module _AUTHZ table",
       "decision": null,
       "restated": [
-        {
-          "plugin": "spn-apps",
-          "path": "providers/ts/skills/implement/steps/service.md",
-          "heading": "The rules this step holds"
-        },
         {
           "plugin": "spn-apps",
           "path": "providers/ts/skills/implement/steps/service.md",
@@ -13271,13 +12915,7 @@
       "chapter": "04-capabilities/03-platform/01-core/01-tenancy/03-people-access.md",
       "heading": "Where a surface's options come from",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.PLATFORM.CORE.038",
@@ -13290,13 +12928,7 @@
       "chapter": "04-capabilities/03-platform/01-core/03-surfaces/01-apps-surfaces.md",
       "heading": "Where an organization registers",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.PLATFORM.CORE.039",
@@ -13328,13 +12960,7 @@
       "chapter": "04-capabilities/03-platform/01-core/03-surfaces/01-apps-surfaces.md",
       "heading": "How a session travels across apps",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.PLATFORM.CORE.041",
@@ -13434,11 +13060,6 @@
           "plugin": "spn-apps",
           "path": "refs/platform/core/data-and-trust.md",
           "heading": "Supported, certified, and the control map"
-        },
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
         },
         {
           "plugin": "spn-devex",
@@ -13545,11 +13166,6 @@
           "plugin": "spn-apps",
           "path": "refs/platform/core/data-and-trust.md",
           "heading": "Supported, certified, and the control map"
-        },
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -13569,11 +13185,6 @@
           "plugin": "spn-apps",
           "path": "refs/platform/core/data-and-trust.md",
           "heading": "Each person's rights are controls your module answers"
-        },
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -14706,13 +14317,7 @@
       "chapter": "04-capabilities/02-support/02-apps/01-shape/02-packaging.md",
       "heading": "Artifact kinds — the prefix grammar",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.APPS.002",
@@ -14744,13 +14349,7 @@
       "chapter": "04-capabilities/02-support/02-apps/10-providers/ts/03-structure.md",
       "heading": "The rules",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-apps",
-          "path": "providers/ts/skills/implement/steps/service.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.APPS.005",
@@ -14763,13 +14362,7 @@
       "chapter": "04-capabilities/02-support/02-apps/03-module/01-server/03-entry/README.md",
       "heading": "Entry — One Adapter per Transport, and No Guarantees",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.APPS.006",
@@ -14791,12 +14384,12 @@
         {
           "plugin": "spn-apps",
           "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
+          "heading": "Write code the capability generator can read"
         },
         {
           "plugin": "spn-apps",
           "path": "skills/implement/SKILL.md",
-          "heading": "Write code the capability generator can read"
+          "heading": "The rules this step holds"
         },
         {
           "plugin": "spn-apps",
@@ -14840,13 +14433,7 @@
       "chapter": "04-capabilities/02-support/02-apps/08-agent-surface/01-symbols.md",
       "heading": "The shape — a flat symbol index",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.APPS.009",
@@ -14897,13 +14484,7 @@
       "chapter": "04-capabilities/02-support/02-apps/03-module/01-server/02-app/01-services.md",
       "heading": "Asynchronous re-entry",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-apps",
-          "path": "providers/ts/skills/implement/steps/service.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.APPS.013",
@@ -14916,13 +14497,7 @@
       "chapter": "04-capabilities/02-support/02-apps/08-agent-surface/01-symbols.md",
       "heading": "Generated at build, carried in the package",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.APPS.014",
@@ -14935,13 +14510,7 @@
       "chapter": "04-capabilities/02-support/02-apps/10-providers/ts/11-generation.md",
       "heading": "Generated Files",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.APPS.015",
@@ -14954,13 +14523,7 @@
       "chapter": "02-constructs/02-support/02-apps/01-shape.md",
       "heading": "Kinds and their answers",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.APPS.016",
@@ -14973,13 +14536,7 @@
       "chapter": "04-capabilities/02-support/02-apps/08-agent-surface/01-symbols.md",
       "heading": "The symbol role set and reachability",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.APPS.017",
@@ -14992,13 +14549,7 @@
       "chapter": "04-capabilities/02-support/02-apps/06-tests/README.md",
       "heading": "Rules card",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.APPS.018",
@@ -15011,13 +14562,7 @@
       "chapter": "02-constructs/02-support/02-apps/08-agent-surface.md",
       "heading": "Labels and symbols",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.APPS.019",
@@ -15030,13 +14575,7 @@
       "chapter": "04-capabilities/02-support/02-apps/08-agent-surface/README.md",
       "heading": "The Generated Surface — Derived, Never Hand-Written",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.APPS.021",
@@ -15049,13 +14588,7 @@
       "chapter": "04-capabilities/02-support/02-apps/06-tests/README.md",
       "heading": "The tier ladder",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.APPS.022",
@@ -15073,11 +14606,6 @@
           "plugin": "spn-apps",
           "path": "refs/support/apps/shape.md",
           "heading": "The ten kinds"
-        },
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -15097,11 +14625,6 @@
           "plugin": "spn-apps",
           "path": "refs/support/apps/ships.md",
           "heading": "One capability, described once at each altitude"
-        },
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -15116,13 +14639,7 @@
       "chapter": "02-constructs/02-support/02-apps/09-ships.md",
       "heading": "One capability per altitude",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.APPS.027",
@@ -15136,11 +14653,6 @@
       "heading": "The rules",
       "decision": null,
       "restated": [
-        {
-          "plugin": "spn-apps",
-          "path": "providers/ts/skills/implement/steps/service.md",
-          "heading": "The rules this step holds"
-        },
         {
           "plugin": "spn-apps",
           "path": "skills/new/SKILL.md",
@@ -15159,13 +14671,7 @@
       "chapter": "04-capabilities/02-support/02-apps/10-providers/ts/03-structure.md",
       "heading": "The rules",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-apps",
-          "path": "providers/ts/skills/implement/steps/service.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.APPS.029",
@@ -15212,11 +14718,6 @@
           "plugin": "spn-apps",
           "path": "refs/support/apps/shape.md",
           "heading": "Kind-fixed skeletons versus a library's own groups"
-        },
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -15231,13 +14732,7 @@
       "chapter": "04-capabilities/02-support/02-apps/03-module/01-server/02-app/README.md",
       "heading": "What leaves this layer",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.APPS.033",
@@ -15250,13 +14745,7 @@
       "chapter": "04-capabilities/02-support/02-apps/05-app/01-server/02-deployment.md",
       "heading": "Entry activation — deployment shape is configuration",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.APPS.034",
@@ -15307,13 +14796,7 @@
       "chapter": "04-capabilities/02-support/02-apps/08-agent-surface/01-symbols.md",
       "heading": "The symbol role set and reachability",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.APPS.037",
@@ -15355,11 +14838,6 @@
           "plugin": "spn-apps",
           "path": "refs/support/apps/resources.md",
           "heading": "Both runtimes ask the same question"
-        },
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -15412,13 +14890,7 @@
       "chapter": "04-capabilities/02-support/02-apps/02-support/02-web/01-groups.md",
       "heading": "Why the split holds",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.APPS.043",
@@ -15469,13 +14941,7 @@
       "chapter": "04-capabilities/02-support/02-apps/03-module/01-server/02-app/01-services.md",
       "heading": "Service and repository responsibilities",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-apps",
-          "path": "providers/ts/skills/implement/steps/service.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.APPS.049",
@@ -15493,11 +14959,6 @@
           "plugin": "spn-apps",
           "path": "refs/support/apps/agent-surface.md",
           "heading": "Generated at build, merged on install"
-        },
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -15517,11 +14978,6 @@
           "plugin": "spn-apps",
           "path": "refs/support/apps/agent-surface.md",
           "heading": "The one rule that governs all four"
-        },
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -15541,11 +14997,6 @@
           "plugin": "spn-apps",
           "path": "refs/support/apps/agent-surface.md",
           "heading": "The role set is closed"
-        },
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -15560,13 +15011,7 @@
       "chapter": "02-constructs/02-support/02-apps/02-support.md",
       "heading": "Seams are earned",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.APPS.056",
@@ -15579,13 +15024,7 @@
       "chapter": "04-capabilities/02-support/02-apps/03-module/01-server/05-config/01-env.md",
       "heading": "The configuration grammar",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.APPS.057",
@@ -15603,11 +15042,6 @@
           "plugin": "spn-apps",
           "path": "refs/support/apps/shape.md",
           "heading": "Modules that live inside an application"
-        },
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -15622,13 +15056,7 @@
       "chapter": "02-constructs/02-support/02-apps/07-comments.md",
       "heading": "Seams are earned",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.APPS.059",
@@ -15641,13 +15069,7 @@
       "chapter": "04-capabilities/02-support/02-apps/07-comments/01-intent.md",
       "heading": "One comment, three parts",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.APPS.060",
@@ -15679,13 +15101,7 @@
       "chapter": "04-capabilities/02-support/02-apps/10-providers/ts/10-configuration.md",
       "heading": "{CODE}_HEALTH_PORT (the health listener)",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.APPS.062",
@@ -15736,13 +15152,7 @@
       "chapter": "02-constructs/02-support/02-apps/03-module.md",
       "heading": "Rules for the link",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.APPS.069",
@@ -15755,13 +15165,7 @@
       "chapter": "02-constructs/01-devex/04-workspace/03-repos.md",
       "heading": "Worlds and their grants",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.APPS.070",
@@ -15817,13 +15221,7 @@
       "chapter": "04-capabilities/02-support/03-infra/04-resources/01-resources.md",
       "heading": "Where an engine runs is a separate question from how big it is",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.APPS.073",
@@ -15836,13 +15234,7 @@
       "chapter": "04-capabilities/02-support/03-infra/08-operate/01-deployments.md",
       "heading": "Deployments — Derived, Promoted, and Served",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.APPS.074",
@@ -15855,13 +15247,7 @@
       "chapter": "02-constructs/02-support/02-apps/04-resources.md",
       "heading": "Engine is never surface",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.APPS.075",
@@ -15879,11 +15265,6 @@
           "plugin": "spn-apps",
           "path": "refs/support/apps/resources.md",
           "heading": "Queue — at-least-once, so every consumer is idempotent"
-        },
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -15898,13 +15279,7 @@
       "chapter": "04-capabilities/02-support/02-apps/10-providers/ts/01-kinds.md",
       "heading": "Scaffold targets",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.APPS.077",
@@ -15930,13 +15305,7 @@
       "chapter": "04-capabilities/02-support/02-apps/03-module/01-server/03-entry/01-api.md",
       "heading": "Public routes declare their own defenses",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.APPS.079",
@@ -15968,13 +15337,7 @@
       "chapter": "04-capabilities/02-support/02-apps/10-providers/ts/06-service.md",
       "heading": "Public routes — rateLimit and captcha on the route",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-apps",
-          "path": "providers/ts/skills/implement/steps/service.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.APPS.081",
@@ -16044,13 +15407,7 @@
       "chapter": "04-capabilities/02-support/02-apps/06-tests/README.md",
       "heading": "The behaviours join is checked in both directions",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.APPS.085",
@@ -16124,11 +15481,6 @@
       "heading": "Where a case lives",
       "decision": null,
       "restated": [
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
-        },
         {
           "plugin": "spn-devex",
           "path": "refs/devex/agent/lenses/qa.md",
@@ -16255,11 +15607,6 @@
       "decision": null,
       "restated": [
         {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
-        },
-        {
           "plugin": "spn-devex",
           "path": "refs/devex/agent/lenses/qa.md",
           "heading": "Produces to"
@@ -16278,11 +15625,6 @@
       "heading": "Data and isolation",
       "decision": null,
       "restated": [
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
-        },
         {
           "plugin": "spn-devex",
           "path": "refs/devex/agent/lenses/qa.md",
@@ -16327,11 +15669,6 @@
       "decision": null,
       "restated": [
         {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
-        },
-        {
           "plugin": "spn-devex",
           "path": "refs/devex/agent/lenses/qa.md",
           "heading": "Produces to"
@@ -16349,13 +15686,7 @@
       "chapter": "04-capabilities/02-support/02-apps/06-tests/README.md",
       "heading": "Reading a result honestly",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.APPS.102",
@@ -16387,13 +15718,7 @@
       "chapter": "04-capabilities/02-support/02-apps/06-tests/README.md",
       "heading": "The tier ladder",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.APPS.104",
@@ -16463,13 +15788,7 @@
       "chapter": "04-capabilities/02-support/02-apps/10-providers/ts/13-tests.md",
       "heading": "Coverage — how the model is rendered here",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.APPS.109",
@@ -16482,13 +15801,7 @@
       "chapter": "04-capabilities/02-support/02-apps/06-tests/README.md",
       "heading": "Rules card",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.APPS.111",
@@ -16501,13 +15814,7 @@
       "chapter": "04-capabilities/02-support/02-apps/10-providers/ts/08-web.md",
       "heading": "Served on its own name",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.APPS.112",
@@ -16559,11 +15866,6 @@
       "heading": "Kind decides the tier",
       "decision": null,
       "restated": [
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
-        },
         {
           "plugin": "spn-devex",
           "path": "refs/devex/agent/lenses/qa.md",
@@ -16694,11 +15996,6 @@
       "decision": null,
       "restated": [
         {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
-        },
-        {
           "plugin": "spn-devex",
           "path": "refs/devex/agent/lenses/infra.md",
           "heading": "Produces to"
@@ -16721,13 +16018,7 @@
       "chapter": "02-constructs/02-support/02-apps/01-shape.md",
       "heading": "One declaring file",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.APPS.123",
@@ -16740,13 +16031,7 @@
       "chapter": "04-capabilities/02-support/02-apps/06-tests/README.md",
       "heading": "Kind decides the tier",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.APPS.124",
@@ -16778,13 +16063,7 @@
       "chapter": "02-constructs/02-support/02-apps/01-shape.md",
       "heading": "Kinds and their answers",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.APPS.126",
@@ -16816,13 +16095,7 @@
       "chapter": "02-constructs/02-support/02-apps/08-agent-surface.md",
       "heading": "Roles and groups",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.APPS.128",
@@ -16835,13 +16108,7 @@
       "chapter": "02-constructs/02-support/02-apps/08-agent-surface.md",
       "heading": "What one symbol carries",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.APPS.130",
@@ -16854,13 +16121,7 @@
       "chapter": "02-constructs/02-support/02-apps/04-resources.md",
       "heading": "Resource families",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.APPS.131",
@@ -16873,13 +16134,7 @@
       "chapter": "04-capabilities/02-support/02-apps/07-comments/README.md",
       "heading": "A file you edit leaves with its comments in standard",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.APPS.132",
@@ -16960,11 +16215,6 @@
           "plugin": "spn-apps",
           "path": "refs/support/apps/tests.md",
           "heading": "Kind decides the tier"
-        },
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -16980,11 +16230,6 @@
       "heading": "Kind decides the tier",
       "decision": null,
       "restated": [
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
-        },
         {
           "plugin": "spn-devex",
           "path": "refs/devex/agent/lenses/qa.md",
@@ -17013,11 +16258,6 @@
           "plugin": "spn-apps",
           "path": "refs/support/apps/providers/ts/10-configuration.md",
           "heading": "The envs/ convention"
-        },
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -17037,11 +16277,6 @@
           "plugin": "spn-apps",
           "path": "refs/support/apps/comments.md",
           "heading": "Required on every published declaration; short where a name already carries it"
-        },
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -17056,13 +16291,7 @@
       "chapter": "04-capabilities/02-support/01-surface/README.md",
       "heading": "One folder for each construct",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.APPS.140",
@@ -17337,11 +16566,6 @@
       "decision": null,
       "restated": [
         {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
-        },
-        {
           "plugin": "spn-surface",
           "path": "refs/support/surface/architecture-layouts.md",
           "heading": "The spacing — 🔮"
@@ -17378,13 +16602,7 @@
       "chapter": "04-capabilities/02-support/01-surface/04-architecture-names/01-common/01-names.md",
       "heading": "A hook names its context",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.APPS.155",
@@ -17414,13 +16632,7 @@
       "chapter": "04-capabilities/02-support/01-surface/10-architecture-app/01-common/01-contexts.md",
       "heading": "A service call goes through one gate",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.APPS.157",
@@ -17591,13 +16803,7 @@
       "chapter": "02-constructs/02-support/02-apps/05-app.md",
       "heading": "One repository and version",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.APPS.166",
@@ -17630,11 +16836,6 @@
           "plugin": "spn-apps",
           "path": "refs/support/apps/resources.md",
           "heading": "Seal — it stores nothing, and it opens a value only where it belongs"
-        },
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -17649,13 +16850,7 @@
       "chapter": "04-capabilities/02-support/02-apps/01-shape/03-architecture.md",
       "heading": "The choices on the server",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.APPS.168",
@@ -17668,13 +16863,7 @@
       "chapter": "04-capabilities/02-support/02-apps/01-shape/03-architecture.md",
       "heading": "The rule for every stack",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.APPS.169",
@@ -17692,11 +16881,6 @@
           "plugin": "spn-apps",
           "path": "refs/support/apps/module/module-changes.md",
           "heading": "The generation chain"
-        },
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -17711,13 +16895,7 @@
       "chapter": "04-capabilities/02-support/02-apps/03-module/01-server/03-entry/01-api.md",
       "heading": "The remote route",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.APPS.171",
@@ -17806,13 +16984,7 @@
       "chapter": "04-capabilities/02-support/02-apps/10-providers/ts/03-structure.md",
       "heading": "One server module, one package, two doors",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-apps",
-          "path": "providers/ts/skills/implement/steps/service.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.APPS.176",
@@ -17849,13 +17021,7 @@
       "chapter": "04-capabilities/02-support/02-apps/03-module/01-server/03-entry/01-api.md",
       "heading": "Public routes declare their own defenses",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.APPS.178",
@@ -17893,11 +17059,6 @@
           "plugin": "spn-apps",
           "path": "refs/support/apps/resources.md",
           "heading": "Queue — at-least-once, so every consumer is idempotent"
-        },
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -18275,6 +17436,11 @@
       "restated": [
         {
           "plugin": "spn-apps",
+          "path": "refs/support/apps/app.md",
+          "heading": "The public pages of a web app are its own pages"
+        },
+        {
+          "plugin": "spn-apps",
           "path": "refs/support/apps/module/README.md",
           "heading": "A page, its route and its address"
         },
@@ -18297,6 +17463,11 @@
       "heading": "The address of a screen",
       "decision": null,
       "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "refs/support/apps/app.md",
+          "heading": "The public pages of a web app are its own pages"
+        },
         {
           "plugin": "spn-apps",
           "path": "refs/support/apps/module/README.md",
@@ -18593,6 +17764,11 @@
       "restated": [
         {
           "plugin": "spn-apps",
+          "path": "refs/support/apps/app.md",
+          "heading": "The public pages of a web app are its own pages"
+        },
+        {
+          "plugin": "spn-apps",
           "path": "refs/support/apps/module/README.md",
           "heading": "A page, its route and its address"
         },
@@ -18624,11 +17800,6 @@
           "plugin": "spn-apps",
           "path": "refs/support/apps/providers/ts/02-naming.md",
           "heading": "Acronyms and codes"
-        },
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -18653,11 +17824,6 @@
           "plugin": "spn-apps",
           "path": "refs/support/apps/providers/ts/02-naming.md",
           "heading": "Units of a web module"
-        },
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -18682,11 +17848,6 @@
           "plugin": "spn-apps",
           "path": "refs/support/apps/providers/ts/02-naming.md",
           "heading": "Units of a web module"
-        },
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
         },
         {
           "plugin": "spn-surface",
@@ -18733,11 +17894,6 @@
       "restated": [
         {
           "plugin": "spn-apps",
-          "path": "providers/ts/skills/implement/steps/service.md",
-          "heading": "The rules this step holds"
-        },
-        {
-          "plugin": "spn-apps",
           "path": "refs/support/apps/providers/ts/03-structure.md",
           "heading": "Interiors that differ"
         }
@@ -18755,11 +17911,6 @@
       "heading": "App Internals",
       "decision": null,
       "restated": [
-        {
-          "plugin": "spn-apps",
-          "path": "providers/ts/skills/implement/steps/service.md",
-          "heading": "The rules this step holds"
-        },
         {
           "plugin": "spn-apps",
           "path": "refs/support/apps/providers/ts/03-structure.md",
@@ -18781,11 +17932,6 @@
       "restated": [
         {
           "plugin": "spn-apps",
-          "path": "providers/ts/skills/implement/steps/service.md",
-          "heading": "The rules this step holds"
-        },
-        {
-          "plugin": "spn-apps",
           "path": "refs/support/apps/providers/ts/03-structure.md",
           "heading": "An app's own styles"
         }
@@ -18803,11 +17949,6 @@
       "heading": "An app's own styles",
       "decision": null,
       "restated": [
-        {
-          "plugin": "spn-apps",
-          "path": "providers/ts/skills/implement/steps/service.md",
-          "heading": "The rules this step holds"
-        },
         {
           "plugin": "spn-apps",
           "path": "refs/support/apps/providers/ts/03-structure.md",
@@ -18836,11 +17977,6 @@
           "plugin": "spn-apps",
           "path": "refs/support/apps/providers/ts/05-code.md",
           "heading": "Contract types"
-        },
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -19038,13 +18174,7 @@
       "chapter": "04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
       "heading": "A node's own lifecycle",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.APPS.222",
@@ -19057,13 +18187,7 @@
       "chapter": "04-capabilities/02-support/02-apps/06-tests/README.md",
       "heading": "When a whole tier runs",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.APPS.223",
@@ -19115,11 +18239,6 @@
           "plugin": "spn-apps",
           "path": "refs/support/apps/resources.md",
           "heading": "Database — the record of truth"
-        },
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -19137,13 +18256,13 @@
       "restated": [
         {
           "plugin": "spn-apps",
-          "path": "refs/support/apps/providers/ts/02-naming.md",
-          "heading": "Personal name forms"
+          "path": "refs/support/apps/module/README.md",
+          "heading": "Fields: how a state names and types them"
         },
         {
           "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
+          "path": "refs/support/apps/providers/ts/02-naming.md",
+          "heading": "Personal name forms"
         }
       ]
     },
@@ -19163,11 +18282,6 @@
           "plugin": "spn-apps",
           "path": "refs/support/apps/providers/ts/10-configuration.md",
           "heading": "The bootstrap variables"
-        },
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -19187,11 +18301,6 @@
           "plugin": "spn-apps",
           "path": "refs/support/apps/providers/ts/02-naming.md",
           "heading": "Decorators"
-        },
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -19260,11 +18369,6 @@
           "plugin": "spn-apps",
           "path": "refs/support/apps/resources.md",
           "heading": "Database — the record of truth"
-        },
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -19289,11 +18393,6 @@
           "plugin": "spn-apps",
           "path": "refs/support/apps/resources.md",
           "heading": "Seal — it stores nothing, and it opens a value only where it belongs"
-        },
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -19332,7 +18431,13 @@
       "chapter": "04-capabilities/02-support/02-apps/10-providers/ts/02-naming.md",
       "heading": "Code Naming",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "refs/support/apps/providers/ts/02-naming.md",
+          "heading": "Code"
+        }
+      ]
     },
     {
       "id": "RULE.SUPPORT.APPS.233",
@@ -19645,11 +18750,6 @@
           "plugin": "spn-apps",
           "path": "refs/support/apps/providers/ts/02-naming.md",
           "heading": "A module names itself"
-        },
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -19811,7 +18911,7 @@
       "sentence": "The store of kept work is the one exception to \"every table belongs to one module\".",
       "chapter": "04-capabilities/02-support/02-apps/04-resources/01-server/02-database.md",
       "heading": "Rules",
-      "decision": null,
+      "decision": "DEC.SUPPORT.APPS.260",
       "restated": [
         {
           "plugin": "spn-apps",
@@ -19865,11 +18965,6 @@
           "plugin": "spn-infra",
           "path": "refs/support/infra/providers/local/01-realization.md",
           "heading": "The boundary"
-        },
-        {
-          "plugin": "spn-infra",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -19884,13 +18979,7 @@
       "chapter": "01-purpose/02-what.md",
       "heading": "The stage chain",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-infra",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.INFRA.003",
@@ -19903,13 +18992,7 @@
       "chapter": "01-purpose/02-what.md",
       "heading": "The stage chain",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-infra",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.INFRA.005",
@@ -19922,13 +19005,7 @@
       "chapter": "02-constructs/02-support/02-apps/09-ships.md",
       "heading": "The stage it sits in",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-infra",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.INFRA.006",
@@ -19941,13 +19018,7 @@
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/06-registers.md",
       "heading": "Which nodes earn one",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-infra",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.INFRA.007",
@@ -19979,13 +19050,7 @@
       "chapter": "02-constructs/02-support/03-infra/02-packages.md",
       "heading": "Outside the kind system",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-infra",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.INFRA.010",
@@ -19998,13 +19063,7 @@
       "chapter": "04-capabilities/02-support/03-infra/02-packages/01-manifests.md",
       "heading": "Generated, never authored",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-infra",
-          "path": "skills/release/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.INFRA.011",
@@ -20017,13 +19076,7 @@
       "chapter": "02-constructs/02-support/03-infra/02-packages.md",
       "heading": "One repository per company",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-infra",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.INFRA.012",
@@ -20103,13 +19156,7 @@
       "chapter": "04-capabilities/02-support/03-infra/01-shape/02-coordinates.md",
       "heading": "A name decides nothing",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-infra",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.INFRA.016",
@@ -20122,13 +19169,7 @@
       "chapter": "04-capabilities/02-support/03-infra/08-operate/01-deployments.md",
       "heading": "Promotion is declared, not inferred",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-infra",
-          "path": "skills/run/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.INFRA.017",
@@ -20146,11 +19187,6 @@
           "plugin": "spn-infra",
           "path": "refs/support/infra/blueprints.md",
           "heading": "The governance tree"
-        },
-        {
-          "plugin": "spn-infra",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -20175,11 +19211,6 @@
           "plugin": "spn-infra",
           "path": "refs/support/infra/providers/local/01-realization.md",
           "heading": "Realization is a target, not a command group"
-        },
-        {
-          "plugin": "spn-infra",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -20213,13 +19244,7 @@
       "chapter": "02-constructs/01-devex/02-agent/04-plugins.md",
       "heading": "The four plugins",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-infra",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.INFRA.021",
@@ -20232,13 +19257,7 @@
       "chapter": "02-constructs/02-support/03-infra/02-packages.md",
       "heading": "What a company declares",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-infra",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.INFRA.022",
@@ -20304,11 +19323,6 @@
           "plugin": "spn-infra",
           "path": "refs/support/infra/providers/local/09-deployments.md",
           "heading": "What runs, and what does not"
-        },
-        {
-          "plugin": "spn-infra",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -20328,11 +19342,6 @@
           "plugin": "spn-infra",
           "path": "refs/support/infra/packages.md",
           "heading": "Two files per node"
-        },
-        {
-          "plugin": "spn-infra",
-          "path": "skills/release/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -20352,11 +19361,6 @@
           "plugin": "spn-infra",
           "path": "refs/support/infra/apps.md",
           "heading": "An application runs because a row grants it — MUST"
-        },
-        {
-          "plugin": "spn-infra",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -20409,13 +19413,7 @@
       "chapter": "04-capabilities/02-support/03-infra/03-blueprints/01-layers.md",
       "heading": "The governance tree",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-infra",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.INFRA.030",
@@ -20447,13 +19445,7 @@
       "chapter": "01-purpose/04-way.md",
       "heading": "How the system is shaped",
       "decision": "DEC.SUPPORT.INFRA.031",
-      "restated": [
-        {
-          "plugin": "spn-infra",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.INFRA.032",
@@ -20466,13 +19458,7 @@
       "chapter": "04-capabilities/02-support/03-infra/02-packages/01-manifests.md",
       "heading": "One packages declaration; the registry derives",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-infra",
-          "path": "skills/release/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.INFRA.033",
@@ -20485,13 +19471,7 @@
       "chapter": "02-constructs/02-support/03-infra/01-shape.md",
       "heading": "The resource name grammar",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-infra",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.INFRA.034",
@@ -20504,13 +19484,7 @@
       "chapter": "04-capabilities/02-support/03-infra/01-shape/02-coordinates.md",
       "heading": "The name grammar",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-infra",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.INFRA.035",
@@ -20547,11 +19521,6 @@
           "plugin": "spn-infra",
           "path": "refs/support/infra/modules.md",
           "heading": "Additive in its own world, never platform ground"
-        },
-        {
-          "plugin": "spn-infra",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -20566,13 +19535,7 @@
       "chapter": "04-capabilities/02-support/03-infra/08-operate/02-reconciliation.md",
       "heading": "The actor may change; the artifact may not",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-infra",
-          "path": "skills/run/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.INFRA.039",
@@ -20647,13 +19610,7 @@
       "chapter": "04-capabilities/02-support/03-infra/02-packages/01-manifests.md",
       "heading": "What each type documents",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-infra",
-          "path": "skills/release/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.INFRA.043",
@@ -20671,11 +19628,6 @@
           "plugin": "spn-infra",
           "path": "refs/support/infra/README.md",
           "heading": "1 · Machines write the environment rung only"
-        },
-        {
-          "plugin": "spn-infra",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -20709,13 +19661,7 @@
       "chapter": "04-capabilities/02-support/03-infra/06-modules/02-config.md",
       "heading": "The published vocabulary",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-infra",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.INFRA.046",
@@ -20872,11 +19818,6 @@
           "plugin": "spn-infra",
           "path": "refs/support/infra/resources.md",
           "heading": "A module owns its own world"
-        },
-        {
-          "plugin": "spn-infra",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -20964,11 +19905,6 @@
           "plugin": "spn-infra",
           "path": "refs/support/infra/shape/naming.md",
           "heading": "The DNS grammar — uniform {env}, no bare hostnames ever"
-        },
-        {
-          "plugin": "spn-infra",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -21007,11 +19943,6 @@
           "plugin": "spn-infra",
           "path": "refs/support/infra/modules.md",
           "heading": "The rungs — every path ends in /vars"
-        },
-        {
-          "plugin": "spn-infra",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -21045,13 +19976,7 @@
       "chapter": "04-capabilities/02-support/03-infra/06-modules/02-config.md",
       "heading": "The published vocabulary",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-infra",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.INFRA.062",
@@ -21113,12 +20038,12 @@
         {
           "plugin": "spn-infra",
           "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
+          "heading": "2 · Edit — a person writes choices, and nothing else"
         },
         {
           "plugin": "spn-infra",
           "path": "skills/implement/SKILL.md",
-          "heading": "2 · Edit — a person writes choices, and nothing else"
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -21219,17 +20144,17 @@
         {
           "plugin": "spn-infra",
           "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
-        },
-        {
-          "plugin": "spn-infra",
-          "path": "skills/implement/SKILL.md",
           "heading": "2 · Edit — a person writes choices, and nothing else"
         },
         {
           "plugin": "spn-infra",
           "path": "skills/implement/SKILL.md",
           "heading": "4 · The identity-only manifest"
+        },
+        {
+          "plugin": "spn-infra",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
         },
         {
           "plugin": "spn-infra",
@@ -21254,13 +20179,7 @@
       "chapter": "02-constructs/02-support/03-infra/02-packages.md",
       "heading": "Releases and pins",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-infra",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.INFRA.068",
@@ -21278,11 +20197,6 @@
           "plugin": "spn-infra",
           "path": "refs/support/infra/packages.md",
           "heading": "Two files per node"
-        },
-        {
-          "plugin": "spn-infra",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -21302,11 +20216,6 @@
           "plugin": "spn-infra",
           "path": "refs/support/infra/trust.md",
           "heading": "What a cloud act needs, and how it refuses"
-        },
-        {
-          "plugin": "spn-infra",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -21326,11 +20235,6 @@
           "plugin": "spn-infra",
           "path": "refs/support/infra/blueprints.md",
           "heading": "The five layers"
-        },
-        {
-          "plugin": "spn-infra",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -21350,11 +20254,6 @@
           "plugin": "spn-infra",
           "path": "refs/support/infra/blueprints.md",
           "heading": "The five layers"
-        },
-        {
-          "plugin": "spn-infra",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -21374,11 +20273,6 @@
           "plugin": "spn-infra",
           "path": "refs/support/infra/trust.md",
           "heading": "Guardrails deny; they MUST NOT grant"
-        },
-        {
-          "plugin": "spn-infra",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -21398,11 +20292,6 @@
           "plugin": "spn-infra",
           "path": "refs/support/infra/packages.md",
           "heading": "Locator rules"
-        },
-        {
-          "plugin": "spn-infra",
-          "path": "skills/release/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -21422,11 +20311,6 @@
           "plugin": "spn-infra",
           "path": "refs/support/infra/blueprints.md",
           "heading": "The governance tree"
-        },
-        {
-          "plugin": "spn-infra",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -21441,13 +20325,7 @@
       "chapter": "02-constructs/02-support/03-infra/02-packages.md",
       "heading": "The company registry",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-infra",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.INFRA.076",
@@ -21460,13 +20338,7 @@
       "chapter": "02-constructs/02-support/03-infra/02-packages.md",
       "heading": "What a product declares",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-infra",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.INFRA.077",
@@ -21508,11 +20380,6 @@
           "plugin": "spn-infra",
           "path": "refs/support/infra/providers/local/10-library.md",
           "heading": "Each module brings its own local rendering"
-        },
-        {
-          "plugin": "spn-infra",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -21542,11 +20409,6 @@
           "plugin": "spn-infra",
           "path": "refs/support/infra/shape/naming.md",
           "heading": "The DNS grammar — uniform {env}, no bare hostnames ever"
-        },
-        {
-          "plugin": "spn-infra",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -21585,13 +20447,7 @@
       "chapter": "04-capabilities/02-support/02-apps/04-resources/01-server/05-storage.md",
       "heading": "Storage — Objects, Keys, and Access",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-infra",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.INFRA.082",
@@ -21614,11 +20470,6 @@
           "plugin": "spn-infra",
           "path": "refs/support/infra/providers/local/11-conformance.md",
           "heading": "What only a local run proves"
-        },
-        {
-          "plugin": "spn-infra",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -21633,13 +20484,7 @@
       "chapter": "04-capabilities/02-support/02-apps/04-resources/02-web/03-transport.md",
       "heading": "The credential rides the transport, not the code",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-infra",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.INFRA.084",
@@ -21681,11 +20526,6 @@
           "plugin": "spn-infra",
           "path": "refs/support/infra/resources.md",
           "heading": "Resource spaces — the second extension axis"
-        },
-        {
-          "plugin": "spn-infra",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -21758,13 +20598,7 @@
       "chapter": "04-capabilities/02-support/03-infra/01-shape/02-coordinates.md",
       "heading": "The name grammar",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-infra",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.INFRA.089",
@@ -21820,13 +20654,7 @@
       "chapter": "04-capabilities/02-support/03-infra/10-providers/aws/02-ground.md",
       "heading": "M3 — Decide account email aliasing",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-infra",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.INFRA.093",
@@ -21844,11 +20672,6 @@
           "plugin": "spn-infra",
           "path": "refs/support/infra/packages.md",
           "heading": "The shapes that get edited"
-        },
-        {
-          "plugin": "spn-infra",
-          "path": "skills/release/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -21888,11 +20711,6 @@
           "plugin": "spn-infra",
           "path": "refs/support/infra/trust.md",
           "heading": "What a cloud act needs, and how it refuses"
-        },
-        {
-          "plugin": "spn-infra",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
         },
         {
           "plugin": "spn-infra",
@@ -21941,11 +20759,6 @@
           "plugin": "spn-infra",
           "path": "refs/support/infra/blueprints.md",
           "heading": "What proves an estate change"
-        },
-        {
-          "plugin": "spn-infra",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -21970,11 +20783,6 @@
           "plugin": "spn-infra",
           "path": "refs/support/infra/packages.md",
           "heading": "The shapes that get edited"
-        },
-        {
-          "plugin": "spn-infra",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -21994,11 +20802,6 @@
           "plugin": "spn-infra",
           "path": "refs/support/infra/packages.md",
           "heading": "The four types"
-        },
-        {
-          "plugin": "spn-infra",
-          "path": "skills/release/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -22018,11 +20821,6 @@
           "plugin": "spn-infra",
           "path": "refs/support/infra/packages.md",
           "heading": "The shapes that get edited"
-        },
-        {
-          "plugin": "spn-infra",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -22047,11 +20845,6 @@
           "plugin": "spn-infra",
           "path": "refs/support/infra/packages.md",
           "heading": "The four types"
-        },
-        {
-          "plugin": "spn-infra",
-          "path": "skills/release/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -22137,11 +20930,6 @@
           "plugin": "spn-infra",
           "path": "refs/support/infra/providers/aws/08-environment.md",
           "heading": "The order is what makes it work"
-        },
-        {
-          "plugin": "spn-infra",
-          "path": "skills/run/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -22205,11 +20993,6 @@
           "plugin": "spn-infra",
           "path": "refs/support/infra/blueprints.md",
           "heading": "What proves an estate change"
-        },
-        {
-          "plugin": "spn-infra",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -22273,11 +21056,6 @@
           "plugin": "spn-infra",
           "path": "refs/support/infra/trust.md",
           "heading": "Evidence is a by-product"
-        },
-        {
-          "plugin": "spn-infra",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -22307,11 +21085,6 @@
           "plugin": "spn-infra",
           "path": "refs/support/infra/shape/naming.md",
           "heading": "The published vocabulary — one format, in the shape the app opens (RULE.SUPPORT.INFRA.043)"
-        },
-        {
-          "plugin": "spn-infra",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -22390,11 +21163,6 @@
           "plugin": "spn-infra",
           "path": "refs/support/infra/resources.md",
           "heading": "Resource spaces — the second extension axis"
-        },
-        {
-          "plugin": "spn-infra",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -22419,11 +21187,6 @@
           "plugin": "spn-infra",
           "path": "refs/support/infra/modules.md",
           "heading": "Composition is derived, never declared"
-        },
-        {
-          "plugin": "spn-infra",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -22458,11 +21221,6 @@
           "plugin": "spn-infra",
           "path": "refs/support/infra/providers/aws/08-environment.md",
           "heading": "The order is what makes it work"
-        },
-        {
-          "plugin": "spn-infra",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -22492,11 +21250,6 @@
           "plugin": "spn-infra",
           "path": "refs/support/infra/providers/aws/08-environment.md",
           "heading": "The order is what makes it work"
-        },
-        {
-          "plugin": "spn-infra",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -22521,11 +21274,6 @@
           "plugin": "spn-infra",
           "path": "refs/support/infra/operate.md",
           "heading": "How a deployment is exposed"
-        },
-        {
-          "plugin": "spn-infra",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -22560,11 +21308,6 @@
           "plugin": "spn-infra",
           "path": "refs/support/infra/shape/README.md",
           "heading": "What an environment's row writes"
-        },
-        {
-          "plugin": "spn-infra",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -22589,11 +21332,6 @@
           "plugin": "spn-infra",
           "path": "refs/support/infra/operate.md",
           "heading": "How a deployment is exposed"
-        },
-        {
-          "plugin": "spn-infra",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -22681,13 +21419,7 @@
       "chapter": "04-capabilities/02-support/02-apps/04-resources/02-web/01-security.md",
       "heading": "What the page may load",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-infra",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.INFRA.122",
@@ -22705,11 +21437,6 @@
           "plugin": "spn-infra",
           "path": "refs/support/infra/resources.md",
           "heading": "Every family has one default engine, and a declaration lists the rest"
-        },
-        {
-          "plugin": "spn-infra",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -22782,11 +21509,6 @@
           "plugin": "spn-infra",
           "path": "refs/support/infra/resources.md",
           "heading": "Every family has one default engine, and a declaration lists the rest"
-        },
-        {
-          "plugin": "spn-infra",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -22816,11 +21538,6 @@
           "plugin": "spn-infra",
           "path": "refs/support/infra/shape/naming.md",
           "heading": "The published vocabulary — one format, in the shape the app opens (RULE.SUPPORT.INFRA.043)"
-        },
-        {
-          "plugin": "spn-infra",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -23182,13 +21899,7 @@
       "chapter": "02-constructs/02-support/README.md",
       "heading": "Support — What You Build With, What You Stand On, And What A Person Sees",
       "decision": "DEC.SUPPORT.SURFACE.001",
-      "restated": [
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.SURFACE.002",
@@ -23220,13 +21931,7 @@
       "chapter": "02-constructs/02-support/01-surface/06-architecture-components.md",
       "heading": "The groups",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/steps/mock.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.SURFACE.004",
@@ -23239,13 +21944,7 @@
       "chapter": "04-capabilities/02-support/01-surface/12-delivery-showcase/01-common/01-showcase.md",
       "heading": "The layers, the groups and the units",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.SURFACE.005",
@@ -23263,11 +21962,6 @@
           "plugin": "spn-surface",
           "path": "refs/support/surface/providers.md",
           "heading": "What every provider delivers — 🔮"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -23282,13 +21976,7 @@
       "chapter": "02-constructs/02-support/01-surface/13-providers.md",
       "heading": "Figma is not a provider",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.SURFACE.007",
@@ -23301,13 +21989,7 @@
       "chapter": "04-capabilities/02-support/01-surface/04-architecture-names/01-common/01-names.md",
       "heading": "The three shared names",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.SURFACE.008",
@@ -23330,11 +22012,6 @@
           "plugin": "spn-surface",
           "path": "refs/support/surface/architecture-core.md",
           "heading": "The scale — ✅"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -23349,13 +22026,7 @@
       "chapter": "04-capabilities/02-support/01-surface/04-architecture-names/01-common/01-names.md",
       "heading": "CUSTOM is the one way a page sets a colour of its own",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.SURFACE.010",
@@ -23387,13 +22058,7 @@
       "chapter": "02-constructs/02-support/01-surface/12-delivery-showcase.md",
       "heading": "The tags a unit declares",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.SURFACE.012",
@@ -23558,13 +22223,7 @@
       "chapter": "04-capabilities/02-support/01-surface/12-delivery-showcase/01-common/01-showcase.md",
       "heading": "The opening of a main page",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.SURFACE.021",
@@ -23615,13 +22274,7 @@
       "chapter": "02-constructs/02-support/01-surface/11-delivery-library.md",
       "heading": "The gaps",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.SURFACE.024",
@@ -23734,13 +22387,7 @@
       "chapter": "04-capabilities/02-support/01-surface/11-delivery-library/02-figma/02-managed.md",
       "heading": "How the connector's work is carried out",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/steps/writer-brief.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.SURFACE.030",
@@ -23753,13 +22400,7 @@
       "chapter": "04-capabilities/02-support/01-surface/11-delivery-library/02-figma/04-drawing.md",
       "heading": "What a library file holds",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/steps/writer-brief.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.SURFACE.031",
@@ -23772,13 +22413,7 @@
       "chapter": "04-capabilities/02-support/01-surface/11-delivery-library/02-figma/04-drawing.md",
       "heading": "How an agent changes a library file through the connector",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/steps/writer-brief.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.SURFACE.032",
@@ -23867,13 +22502,7 @@
       "chapter": "04-capabilities/02-support/01-surface/11-delivery-library/02-figma/04-drawing.md",
       "heading": "What a library file owes of a unit",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/steps/writer-brief.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.SURFACE.037",
@@ -23886,13 +22515,7 @@
       "chapter": "04-capabilities/02-support/01-surface/11-delivery-library/01-common/01-library.md",
       "heading": "The files",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.SURFACE.038",
@@ -23910,11 +22533,6 @@
           "plugin": "spn-surface",
           "path": "refs/support/surface/delivery-library.md",
           "heading": "Which property is a variant and which is a case"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/steps/writer-brief.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -23953,13 +22571,7 @@
       "chapter": "04-capabilities/02-support/01-surface/04-architecture-names/01-common/01-names.md",
       "heading": "A prop that takes a vocabulary is stated with its values",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.SURFACE.041",
@@ -24034,13 +22646,7 @@
       "chapter": "02-constructs/02-support/01-surface/11-delivery-library.md",
       "heading": "The gaps",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.SURFACE.045",
@@ -24053,13 +22659,7 @@
       "chapter": "04-capabilities/02-support/01-surface/10-architecture-app/01-common/01-contexts.md",
       "heading": "Theming, and the theme's lifecycle",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.SURFACE.046",
@@ -24077,11 +22677,6 @@
           "plugin": "spn-surface",
           "path": "refs/support/surface/standards-patterns.md",
           "heading": "The groups, smallest scope first — 🔮"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/steps/given-design.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -24255,11 +22850,6 @@
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
           "heading": "Choose in four steps, with a block last"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/steps/given-design.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -24304,11 +22894,6 @@
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
           "heading": "Choose in four steps, with a block last"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/steps/given-design.md",
-          "heading": "The rules this step holds"
         },
         {
           "plugin": "spn-surface",
@@ -24534,11 +23119,6 @@
           "plugin": "spn-surface",
           "path": "refs/support/surface/standards-core.md",
           "heading": "The rules of content — 🔮"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -24568,11 +23148,6 @@
           "plugin": "spn-surface",
           "path": "refs/support/surface/standards-core.md",
           "heading": "The rules of content — 🔮"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -24619,11 +23194,6 @@
           "plugin": "spn-surface",
           "path": "refs/support/surface/standards-core.md",
           "heading": "The rules of content — 🔮"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -24865,12 +23435,12 @@
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
+          "heading": "Choose in four steps, with a block last"
         },
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "Choose in four steps, with a block last"
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -24904,12 +23474,12 @@
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
+          "heading": "4. Choose the pattern for each task"
         },
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "4. Choose the pattern for each task"
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -24967,12 +23537,12 @@
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
+          "heading": "5. Then the blocks"
         },
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "5. Then the blocks"
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -25178,12 +23748,12 @@
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
+          "heading": "3. Decide the panels"
         },
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "3. Decide the panels"
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -25249,7 +23819,7 @@
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
+          "heading": "design — a page, from its layout down to its blocks"
         },
         {
           "plugin": "spn-surface",
@@ -25288,12 +23858,12 @@
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
+          "heading": "7. Draw it in Figma — only where the window holds the connector"
         },
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "7. Draw it in Figma — only where the window holds the connector"
+          "heading": "The rules this step holds"
         },
         {
           "plugin": "spn-surface",
@@ -25378,12 +23948,12 @@
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
+          "heading": "5. Then the blocks"
         },
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "5. Then the blocks"
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -25412,12 +23982,12 @@
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
+          "heading": "5. Then the blocks"
         },
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "5. Then the blocks"
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -25488,13 +24058,7 @@
       "chapter": "02-constructs/02-support/01-surface/06-architecture-components.md",
       "heading": "The groups",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/steps/mock.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.SURFACE.090",
@@ -25507,13 +24071,7 @@
       "chapter": "02-constructs/02-support/01-surface/06-architecture-components.md",
       "heading": "The groups",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/steps/mock.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.SURFACE.091",
@@ -25535,12 +24093,12 @@
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
+          "heading": "3. Decide the panels"
         },
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "3. Decide the panels"
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -25564,12 +24122,12 @@
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
+          "heading": "3. Decide the panels"
         },
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "3. Decide the panels"
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -25598,12 +24156,12 @@
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
+          "heading": "4. Choose the pattern for each task"
         },
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "4. Choose the pattern for each task"
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -25642,12 +24200,12 @@
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
+          "heading": "5. Then the blocks"
         },
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "5. Then the blocks"
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -25718,12 +24276,12 @@
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
+          "heading": "5. Then the blocks"
         },
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "5. Then the blocks"
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -25767,12 +24325,12 @@
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
+          "heading": "5. Then the blocks"
         },
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "5. Then the blocks"
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -25797,11 +24355,6 @@
           "plugin": "spn-surface",
           "path": "refs/support/surface/architecture-widgets.md",
           "heading": "What makes a unit a widget — 🔮"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -25860,17 +24413,17 @@
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
+          "heading": "7. Draw it in Figma — only where the window holds the connector"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/SKILL.md",
+          "heading": "7. Draw it in Figma — only where the window holds the connector"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/SKILL.md",
           "heading": "The rules this step holds"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "7. Draw it in Figma — only where the window holds the connector"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "7. Draw it in Figma — only where the window holds the connector"
         },
         {
           "plugin": "spn-surface",
@@ -25909,12 +24462,12 @@
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
+          "heading": "5. Then the blocks"
         },
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "5. Then the blocks"
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -26010,12 +24563,12 @@
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
+          "heading": "5. Then the blocks"
         },
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "5. Then the blocks"
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -26078,12 +24631,12 @@
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
+          "heading": "5. Then the blocks"
         },
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "5. Then the blocks"
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -26127,17 +24680,17 @@
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
+          "heading": "5. Then the blocks"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/SKILL.md",
+          "heading": "5. Then the blocks"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/SKILL.md",
           "heading": "The rules this step holds"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "5. Then the blocks"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "5. Then the blocks"
         }
       ]
     },
@@ -26200,12 +24753,12 @@
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
+          "heading": "3. Decide the panels"
         },
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "3. Decide the panels"
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -26253,12 +24806,12 @@
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
+          "heading": "5. Then the blocks"
         },
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "5. Then the blocks"
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -26319,17 +24872,17 @@
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
+          "heading": "5. Then the blocks"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/SKILL.md",
+          "heading": "5. Then the blocks"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/SKILL.md",
           "heading": "The rules this step holds"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "5. Then the blocks"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "5. Then the blocks"
         }
       ]
     },
@@ -26363,12 +24916,12 @@
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
+          "heading": "3. Decide the panels"
         },
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "3. Decide the panels"
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -26513,12 +25066,12 @@
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
+          "heading": "3. Decide the panels"
         },
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "3. Decide the panels"
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -26705,11 +25258,6 @@
           "plugin": "spn-surface",
           "path": "refs/support/surface/providers.md",
           "heading": "What a page writes for each unit"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -26733,12 +25281,12 @@
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
+          "heading": "5. Then the blocks"
         },
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "5. Then the blocks"
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -26838,12 +25386,12 @@
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
+          "heading": "5. Then the blocks"
         },
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "5. Then the blocks"
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -26925,12 +25473,12 @@
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
+          "heading": "5. Then the blocks"
         },
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "5. Then the blocks"
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -26959,12 +25507,12 @@
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
+          "heading": "5. Then the blocks"
         },
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "5. Then the blocks"
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -26988,12 +25536,12 @@
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
+          "heading": "5. Then the blocks"
         },
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "5. Then the blocks"
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -27117,11 +25665,6 @@
           "plugin": "spn-surface",
           "path": "refs/support/surface/delivery-library.md",
           "heading": "Drawing a block"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -27179,12 +25722,12 @@
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
+          "heading": "1. Pick the layout"
         },
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "1. Pick the layout"
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -27676,12 +26219,12 @@
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
+          "heading": "1. Pick the layout"
         },
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "1. Pick the layout"
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -27803,11 +26346,6 @@
           "plugin": "spn-surface",
           "path": "refs/support/surface/architecture-layouts.md",
           "heading": "The three parts — 🔮"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -27852,11 +26390,6 @@
           "plugin": "spn-surface",
           "path": "refs/support/surface/architecture-layouts.md",
           "heading": "The three parts — 🔮"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -27876,11 +26409,6 @@
           "plugin": "spn-surface",
           "path": "refs/support/surface/architecture-core.md",
           "heading": "The type steps and icons — ✅"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -27900,11 +26428,6 @@
           "plugin": "spn-surface",
           "path": "refs/support/surface/architecture-layouts.md",
           "heading": "Attached and sticky — 🔮"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -28040,12 +26563,12 @@
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
+          "heading": "5. Then the blocks"
         },
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "5. Then the blocks"
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -28099,11 +26622,6 @@
           "plugin": "spn-surface",
           "path": "refs/support/surface/providers.md",
           "heading": "What a page writes for each unit"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
         },
         {
           "plugin": "spn-surface",
@@ -28195,12 +26713,12 @@
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
+          "heading": "3. Decide the panels"
         },
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "3. Decide the panels"
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -28345,12 +26863,12 @@
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
+          "heading": "5. Then the blocks"
         },
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "5. Then the blocks"
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -28370,11 +26888,6 @@
           "plugin": "spn-surface",
           "path": "refs/support/surface/architecture-components.md",
           "heading": "The mark"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -28418,17 +26931,17 @@
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
+          "heading": "5. Then the blocks"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/SKILL.md",
+          "heading": "5. Then the blocks"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/SKILL.md",
           "heading": "The rules this step holds"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "5. Then the blocks"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "5. Then the blocks"
         }
       ]
     },
@@ -28508,12 +27021,12 @@
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
+          "heading": "5. Then the blocks"
         },
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "5. Then the blocks"
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -28678,11 +27191,6 @@
           "plugin": "spn-surface",
           "path": "refs/support/surface/architecture-components.md",
           "heading": "The choice table of DSDrawer"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -29065,12 +27573,12 @@
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
+          "heading": "1. Pick the layout"
         },
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "1. Pick the layout"
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -29100,11 +27608,6 @@
           "plugin": "spn-surface",
           "path": "refs/support/surface/architecture-components.md",
           "heading": "The choice table of DSIcon"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -29229,11 +27732,6 @@
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
           "heading": "Choose in four steps, with a block last"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/steps/given-design.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -29299,12 +27797,12 @@
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
+          "heading": "Before the first layout — say what the page is for"
         },
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "Before the first layout — say what the page is for"
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -29328,12 +27826,12 @@
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
+          "heading": "Start from the spec of the pattern"
         },
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "Start from the spec of the pattern"
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -29545,12 +28043,12 @@
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
+          "heading": "5. Then the blocks"
         },
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "5. Then the blocks"
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -29707,11 +28205,6 @@
           "plugin": "spn-surface",
           "path": "refs/support/surface/architecture-components.md",
           "heading": "The tabs by level"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -29753,13 +28246,7 @@
       "chapter": "04-capabilities/02-support/01-surface/06-architecture-components/01-common/01-components.md",
       "heading": "The item line",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.SURFACE.223",
@@ -29810,12 +28297,12 @@
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
+          "heading": "5. Then the blocks"
         },
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "5. Then the blocks"
+          "heading": "The rules this step holds"
         },
         {
           "plugin": "spn-surface",
@@ -30005,11 +28492,6 @@
           "plugin": "spn-surface",
           "path": "refs/support/surface/architecture-widgets.md",
           "heading": "What makes a unit a widget — 🔮"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -30029,11 +28511,6 @@
           "plugin": "spn-surface",
           "path": "refs/support/surface/architecture-containers.md",
           "heading": "The parts — 🔮"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -30101,12 +28578,12 @@
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
+          "heading": "5. Then the blocks"
         },
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "5. Then the blocks"
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -30174,12 +28651,12 @@
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
+          "heading": "5. Then the blocks"
         },
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "5. Then the blocks"
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -30393,17 +28870,17 @@
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
+          "heading": "5. Then the blocks"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/SKILL.md",
+          "heading": "5. Then the blocks"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/SKILL.md",
           "heading": "The rules this step holds"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "5. Then the blocks"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "5. Then the blocks"
         },
         {
           "plugin": "spn-surface",
@@ -30438,11 +28915,6 @@
           "plugin": "spn-surface",
           "path": "refs/support/surface/architecture-components.md",
           "heading": "The choice table of DSDrawer"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -30467,11 +28939,6 @@
           "plugin": "spn-surface",
           "path": "refs/support/surface/architecture-components.md",
           "heading": "The form of the bar"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -30505,12 +28972,12 @@
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
+          "heading": "5. Then the blocks"
         },
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "5. Then the blocks"
+          "heading": "The rules this step holds"
         },
         {
           "plugin": "spn-surface",
@@ -30559,12 +29026,12 @@
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
+          "heading": "5. Then the blocks"
         },
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "5. Then the blocks"
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -30628,11 +29095,6 @@
           "plugin": "spn-surface",
           "path": "refs/support/surface/architecture-components.md",
           "heading": "The overlays, and the two confirmations"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -30656,12 +29118,12 @@
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
+          "heading": "5. Then the blocks"
         },
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "5. Then the blocks"
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -30748,12 +29210,12 @@
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
+          "heading": "5. Then the blocks"
         },
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "5. Then the blocks"
+          "heading": "The rules this step holds"
         },
         {
           "plugin": "spn-surface",
@@ -30840,12 +29302,12 @@
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
+          "heading": "1. Pick the layout"
         },
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "1. Pick the layout"
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -30869,12 +29331,12 @@
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
+          "heading": "1. Pick the layout"
         },
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "1. Pick the layout"
+          "heading": "The rules this step holds"
         },
         {
           "plugin": "spn-surface",
@@ -30928,12 +29390,12 @@
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
+          "heading": "5. Then the blocks"
         },
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "5. Then the blocks"
+          "heading": "The rules this step holds"
         },
         {
           "plugin": "spn-surface",
@@ -31031,12 +29493,12 @@
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
+          "heading": "3. Decide the panels"
         },
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "3. Decide the panels"
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -31085,12 +29547,12 @@
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
+          "heading": "3. Decide the panels"
         },
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "3. Decide the panels"
+          "heading": "The rules this step holds"
         },
         {
           "plugin": "spn-surface",
@@ -31129,12 +29591,12 @@
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
+          "heading": "3. Decide the panels"
         },
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "3. Decide the panels"
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -31284,12 +29746,12 @@
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
+          "heading": "5. Then the blocks"
         },
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "5. Then the blocks"
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -31407,11 +29869,6 @@
           "plugin": "spn-surface",
           "path": "refs/support/surface/architecture-components.md",
           "heading": "Binds"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -31431,11 +29888,6 @@
           "plugin": "spn-surface",
           "path": "refs/support/surface/architecture-components.md",
           "heading": "The level and the form"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -31464,12 +29916,12 @@
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
+          "heading": "5. Then the blocks"
         },
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "5. Then the blocks"
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -31489,11 +29941,6 @@
           "plugin": "spn-surface",
           "path": "refs/support/surface/architecture-components.md",
           "heading": "The items, the actions and the facts"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -31513,11 +29960,6 @@
           "plugin": "spn-surface",
           "path": "refs/support/surface/architecture-app.md",
           "heading": "The theme — 🔮"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -31551,12 +29993,12 @@
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
+          "heading": "5. Then the blocks"
         },
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "5. Then the blocks"
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -31581,11 +30023,6 @@
           "plugin": "spn-surface",
           "path": "refs/support/surface/architecture-components.md",
           "heading": "The item line"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -31735,11 +30172,6 @@
           "plugin": "spn-surface",
           "path": "refs/support/surface/architecture-components.md",
           "heading": "DSFeature"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -31764,11 +30196,6 @@
           "plugin": "spn-surface",
           "path": "refs/support/surface/architecture-components.md",
           "heading": "The motion of an icon — 🔮"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -31798,11 +30225,6 @@
           "plugin": "spn-surface",
           "path": "refs/support/surface/standards-core.md",
           "heading": "The words of a page, by what it is for — 🔮"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
         },
         {
           "plugin": "spn-surface",
@@ -31903,11 +30325,6 @@
           "plugin": "spn-surface",
           "path": "refs/support/surface/delivery-showcase.md",
           "heading": "The layers, the groups and the units — 🔮"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -31931,12 +30348,12 @@
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
+          "heading": "5. Then the blocks"
         },
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "5. Then the blocks"
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -31985,11 +30402,6 @@
           "plugin": "spn-surface",
           "path": "refs/support/surface/architecture-components.md",
           "heading": "What a list's rows carry — 🔮"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -32053,11 +30465,6 @@
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
           "heading": "5. Then the blocks"
         },
         {
@@ -32083,11 +30490,6 @@
           "plugin": "spn-surface",
           "path": "refs/support/surface/architecture-components.md",
           "heading": "What a list's rows carry — 🔮"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -32107,11 +30509,6 @@
           "plugin": "spn-surface",
           "path": "refs/support/surface/delivery-library.md",
           "heading": "Changing the library"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -32155,11 +30552,6 @@
           "plugin": "spn-surface",
           "path": "refs/support/surface/architecture-core.md",
           "heading": "Boundary"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -32232,13 +30624,7 @@
       "chapter": "04-capabilities/02-support/01-surface/10-architecture-app/01-common/02-settings-and-theme.md",
       "heading": "The whole theme",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.SURFACE.301",
@@ -32313,12 +30699,12 @@
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
+          "heading": "5. Then the blocks"
         },
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "5. Then the blocks"
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -32352,12 +30738,12 @@
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
+          "heading": "5. Then the blocks"
         },
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "5. Then the blocks"
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -32399,11 +30785,6 @@
           "plugin": "spn-surface",
           "path": "refs/support/surface/architecture-components.md",
           "heading": "DSComparison"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -32536,11 +30917,6 @@
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
           "heading": "5. Then the blocks"
         }
       ]
@@ -32604,13 +30980,7 @@
       "chapter": "02-constructs/02-support/01-surface/08-architecture-containers.md",
       "heading": "Overview",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.SURFACE.313",
@@ -32638,11 +31008,6 @@
           "plugin": "spn-surface",
           "path": "refs/support/surface/providers.md",
           "heading": "What a page writes for each unit"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
         },
         {
           "plugin": "spn-surface",
@@ -32720,12 +31085,12 @@
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
+          "heading": "5. Then the blocks"
         },
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "5. Then the blocks"
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -32754,12 +31119,12 @@
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
+          "heading": "5. Then the blocks"
         },
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "5. Then the blocks"
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -32793,17 +31158,17 @@
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
+          "heading": "0. Name who the app is for, and the flow the page is a step of"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/SKILL.md",
+          "heading": "0. Name who the app is for, and the flow the page is a step of"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/SKILL.md",
           "heading": "The rules this step holds"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "0. Name who the app is for, and the flow the page is a step of"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "0. Name who the app is for, and the flow the page is a step of"
         }
       ]
     },
@@ -32827,12 +31192,12 @@
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
+          "heading": "0. Name who the app is for, and the flow the page is a step of"
         },
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "0. Name who the app is for, and the flow the page is a step of"
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -32881,17 +31246,17 @@
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
+          "heading": "Choose in four steps, with a block last"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/SKILL.md",
+          "heading": "Choose in four steps, with a block last"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/SKILL.md",
           "heading": "The rules this step holds"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "Choose in four steps, with a block last"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "Choose in four steps, with a block last"
         }
       ]
     },
@@ -32935,17 +31300,17 @@
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
           "heading": "0. Name who the app is for, and the flow the page is a step of"
         },
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
           "heading": "Choose in four steps, with a block last"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/SKILL.md",
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -32979,12 +31344,12 @@
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
+          "heading": "0. Name who the app is for, and the flow the page is a step of"
         },
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "0. Name who the app is for, and the flow the page is a step of"
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -33009,11 +31374,6 @@
           "plugin": "spn-surface",
           "path": "refs/support/surface/standards-core.md",
           "heading": "The words of a page, by what it is for — 🔮"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
         },
         {
           "plugin": "spn-surface",
@@ -33053,11 +31413,6 @@
           "plugin": "spn-surface",
           "path": "refs/support/surface/site-patterns.md",
           "heading": "The kinds of page, by level — 🔮"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -33245,11 +31600,6 @@
           "plugin": "spn-surface",
           "path": "refs/support/surface/flow-patterns.md",
           "heading": "The flow patterns, by name — 🔮"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -33432,12 +31782,12 @@
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
+          "heading": "Choose in four steps, with a block last"
         },
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "Choose in four steps, with a block last"
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -33749,12 +32099,12 @@
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
+          "heading": "5. Then the blocks"
         },
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "5. Then the blocks"
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -33783,12 +32133,12 @@
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
+          "heading": "5. Then the blocks"
         },
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "5. Then the blocks"
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -34222,11 +32572,6 @@
           "plugin": "spn-surface",
           "path": "refs/support/surface/delivery-library.md",
           "heading": "The snapshot"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -34273,11 +32618,6 @@
           "plugin": "spn-surface",
           "path": "refs/support/surface/standards-patterns.md",
           "heading": "The groups, smallest scope first — 🔮"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/steps/given-design.md",
-          "heading": "The rules this step holds"
         },
         {
           "plugin": "spn-surface",
@@ -34512,12 +32852,12 @@
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
+          "heading": "Choose in four steps, with a block last"
         },
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "Choose in four steps, with a block last"
+          "heading": "The rules this step holds"
         }
       ]
     },

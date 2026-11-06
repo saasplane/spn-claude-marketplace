@@ -17,6 +17,8 @@ import {
 } from "../../lib/workstream.ts";
 import { type ArcData, type LogLine, type Suggestion } from "../../lib/workstream-schema.ts";
 import { workstreamNamed } from "./_shared.ts";
+import { correctionsOf, type Corrections } from "./correction.ts";
+import { decisionsOf } from "./decision.ts";
 
 export const describe = "where a workstream stands, and whether it is whole";
 
@@ -25,6 +27,8 @@ export type Standing = {
   arcs: Array<{ arc: string; status: string; reason: string | null; done: number; total: number; running: string[];
     orders: number; tokens: number; rework: { missed: number; fromAnswers: number } }>;
   openCards: string[]; suggestions: Record<string, number>;
+  /** What the developer corrected that something already answered, by what answered it, and the calls the agent decided with their reversal. */
+  corrections: Corrections; decisions: Array<{ said: string; reverse: string }>;
 };
 
 /** The briefs of an arc's orders: `notes/N<nnn>/orders/*.md`, never the `.report.md` files. */
@@ -51,7 +55,7 @@ function reworkOf(ws: string, data: ArcData): { missed: number; fromAnswers: num
 /** One workstream's standing, read from its data. */
 export function standingOf(ws: string): Standing {
   const name = basename(ws);
-  if (markdownArcsOf(ws).length) return { workstream: name, moved: false, arcs: [], openCards: [], suggestions: {} };
+  if (markdownArcsOf(ws).length) return { workstream: name, moved: false, arcs: [], openCards: [], suggestions: {}, corrections: { total: 0, book: 0, code: 0, review: 0, none: 0 }, decisions: [] };
   const arcs = arcIdsOf(ws).map((arc) => readArc(ws, arc)).filter((data) => data !== null).map((data) => ({
     arc: data!.arc, status: arcStatus(data!), reason: data!.wait ? `wait: ${data!.wait}` : data!.reason, ...doneOf(data!),
     orders: ordersOf(ws, data!.arc), tokens: data!.rows.reduce((sum, row) => sum + (row.cost?.tokens ?? 0), 0), rework: reworkOf(ws, data!),
@@ -61,7 +65,8 @@ export function standingOf(ws: string): Standing {
   const suggestions: Record<string, number> = {};
   for (const line of readJsonl(suggestionsFileOf(ws)) as Suggestion[])
     if (line && typeof line.state === "string") suggestions[line.state] = (suggestions[line.state] ?? 0) + 1;
-  return { workstream: name, moved: true, arcs, openCards: readQuestions(ws).filter((one) => one.state === "open").map((one) => one.id), suggestions };
+  return { workstream: name, moved: true, arcs, openCards: readQuestions(ws).filter((one) => one.state === "open").map((one) => one.id), suggestions,
+    corrections: correctionsOf(ws), decisions: decisionsOf(ws).map((line) => ({ said: String(line.note), reverse: String(line.reverse) })) };
 }
 
 /** The standing as the one line `show` prints: `025 · N007 18/19 · 57b running · N010 proposed · 0 open cards · 1 suggestion shaped`. */
@@ -86,6 +91,9 @@ export function standingLine(standing: Standing): string {
   parts.push(`${standing.openCards.length} open card${standing.openCards.length === 1 ? "" : "s"}`);
   for (const state of ["raised", "shaped"])
     if (standing.suggestions[state]) parts.push(`${standing.suggestions[state]} suggestion${standing.suggestions[state] === 1 ? "" : "s"} ${state}`);
+  const { corrections } = standing;
+  if (corrections.total) parts.push(`corrections ${corrections.total} (${(["book", "code", "review"] as const).filter((by) => corrections[by]).map((by) => `${by} ${corrections[by]}`).join(", ")})`);
+  if (standing.decisions.length) parts.push(`${standing.decisions.length} call${standing.decisions.length === 1 ? "" : "s"} decided by the agent`);
   return parts.join(" · ");
 }
 
@@ -101,7 +109,10 @@ function show(args: string[]): number {
   if (words.paths.length > 1) throw new UsageFault("takes one workstream.");
   const standings = chosen(words.paths[0]).map(standingOf);
   if (words.given("json")) console.log(JSON.stringify(standings, null, 2));
-  else for (const standing of standings) console.log(standingLine(standing));
+  else for (const standing of standings) {
+    console.log(standingLine(standing));
+    for (const call of standing.decisions) console.log(`  decided: ${call.said} (reverse: ${call.reverse})`);
+  }
   return 0;
 }
 

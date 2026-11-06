@@ -7,6 +7,7 @@
     "docs": "allow",
     "plan": "allow",
     "plugin": "allow",
+    "precedent": "allow",
     "report": "allow",
     "restates": "allow",
     "workstream": "allow"

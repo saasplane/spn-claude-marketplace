@@ -1,7 +1,10 @@
 <!-- spn:restates
 {
   "docs": [
-    { "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/10-providers/ts/14-libraries.md", "seen": "ee6981a8" }
+    {
+      "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/10-providers/ts/14-libraries.md",
+      "seen": "ab5efe62"
+    }
   ]
 }
 -->
@@ -29,3 +32,7 @@
 **Depend on a published name, never on a path into a sibling checkout.** A path resolves only for somebody holding both repositories, and a partner holds one.
 
 <!-- /spn:generated -->
+
+## The shared contract types are searched before a field is written
+
+**`support-contract-ts` holds the contract types every module shares, in `src/contract/states/global` (14 files: address, currency, country, language, date, number, reach and others), and the folder is searched before a field is written.** A field of the same meaning as one of them takes its type, as the module chapter's section *Fields: how a state names and types them* (`module/README.md`) rules, and a second type for an address or a currency is not made.

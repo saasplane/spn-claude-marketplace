@@ -285,14 +285,17 @@ ${linesFor("1.0.0").script}
     ok("[MKT.SCRIPTS.79] a second `write` changes no byte, and the file's time does not move",
       again.code === 0 && readFileSync(page, "utf8") === after && statSync(page).mtimeMs === writtenAt && /current/.test(again.out), again.out);
 
-    // UNTOUCHED: a page that is already current, with its rows in the order a person chose.
-    const current = after.replace(/(<tbody>\n)(\s*<tr\b[^\n]*\n)(\s*<tr\b[^\n]*\n)/, "$1$3$2");
-    ok("the fixture really holds the same rows in another order", current !== after && cyclesRule(page, current).length === 0);
-    writeFileSync(page, current);
+    // REWRITTEN: a page whose rows are out of arc order is put in it, and the same page in arc order is left alone.
+    const swapped = after.replace(/(<tbody>\n)(\s*<tr\b[^\n]*\n)(\s*<tr\b[^\n]*\n)/, "$1$3$2");
+    ok("the fixture really holds the same rows in another order", swapped !== after);
+    writeFileSync(page, swapped);
+    const reordered = await capture(["docs", "cycles", "write", page]);
+    ok("[MKT.SCRIPTS.524] a page whose rows are out of arc order is rewritten into it",
+      reordered.code === 0 && readFileSync(page, "utf8") === after && cyclesRule(page, after).length === 0, reordered.out);
     const currentAt = stamp(page);
     const untouched = await capture(["docs", "cycles", "write", page]);
     ok("[MKT.SCRIPTS.79] a page that is already current is not written",
-      untouched.code === 0 && readFileSync(page, "utf8") === current && statSync(page).mtimeMs === currentAt, untouched.out);
+      untouched.code === 0 && readFileSync(page, "utf8") === after && statSync(page).mtimeMs === currentAt, untouched.out);
 
     // With no card open the heading has one form.
     const quiet = build("open", "051-quiet", PAGE({ status: "IMPLEMENTING", glyph: "&#x1F6A7;", cyclesBody: PLAN(OLD_TABLE), open: "Open &mdash; Q9 &middot; Q10" }));
@@ -310,14 +313,14 @@ ${linesFor("1.0.0").script}
       blankWrote.code === 0 && blankText.includes("<h2>Open &mdash; no card is open</h2>") && openHeadingRule(join(blank, "approach.html"), blankText).length === 0,
       `${blankWrote.code} ${blankWrote.out} ${blankWrote.err}`);
 
-    // The rows keep the order the page lists them in: N2 first here, and its stale status is what is written.
+    // The rows follow the arc order: N2 is listed first here, and is written after N1.
     const N2_FIRST = OLD_TABLE.replace("<tbody><tr>", `<tbody><tr><td><strong>N2 &mdash; the check</strong><br><a class="sds-small" href="arcs/N2-the-check.md">arcs/N2-the-check.md</a></td>` +
       `<td>A check reads the new shape.</td><td>PROPOSED</td><td>&mdash;</td></tr>\n  <tr>`);
     const ordered = build("open", "056-ordered", PAGE({ status: "IMPLEMENTING", glyph: "&#x1F6A7;", cyclesBody: PLAN(N2_FIRST) }));
     await capture(["docs", "cycles", "write", ordered]);
     const orderedText = readFileSync(join(ordered, "approach.html"), "utf8");
-    ok("[MKT.SCRIPTS.79] the rows keep the order the page lists them in",
-      cyclesRule(join(ordered, "approach.html"), orderedText).length === 0 && orderedText.indexOf("<strong>N2 &mdash;") < orderedText.indexOf("<strong>N1 &mdash;") &&
+    ok("[MKT.SCRIPTS.524] the rows follow the arc order, whatever order the page lists them in",
+      cyclesRule(join(ordered, "approach.html"), orderedText).length === 0 && orderedText.indexOf("<strong>N2 &mdash;") > orderedText.indexOf("<strong>N1 &mdash;") &&
       orderedText.indexOf("<strong>N2 &mdash;") > 0, orderedText.slice(orderedText.indexOf("<tbody>"), orderedText.indexOf("</tbody>")));
 
     // UNTOUCHED: a page in closed/ keeps the table it closed with.

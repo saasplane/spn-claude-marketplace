@@ -27,6 +27,9 @@ console.log("\n=== reading the stream");
 ok("[MKT.SCRIPTS.434] the result event's text is the final text", lib.finalTextOf(stream("the answer")) === "the answer");
 ok("[MKT.SCRIPTS.434] with no result event the last assistant text is", lib.finalTextOf(JSON.stringify({ type: "assistant", message: { content: [{ type: "text", text: "last words" }] } })) === "last words");
 ok("[MKT.SCRIPTS.434] a torn line is skipped", lib.finalTextOf(`{not json\n${stream("whole")}`) === "whole");
+const assistant = (text) => JSON.stringify({ type: "assistant", message: { content: [{ type: "text", text }] } });
+ok("[MKT.SCRIPTS.434] a case reads every assistant message, not only a hook's rewrite", lib.answerOf([assistant("the proposal"), assistant("one reworded line"), JSON.stringify({ type: "result", result: "one reworded line" })].join("\n")).includes("the proposal"));
+ok("[MKT.SCRIPTS.434] with no assistant message the answer is the final text", lib.answerOf(JSON.stringify({ type: "result", result: "only this" })) === "only this");
 
 console.log("\n=== the prompt holds only the problem and the nearest constructs");
 {

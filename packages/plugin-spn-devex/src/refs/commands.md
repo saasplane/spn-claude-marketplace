@@ -112,6 +112,10 @@ spn-devex plugin partner check [--keep] — run every hook in a fixture that hol
 
 spn-devex plugin paths check [<path>] — name each plugin path, in the plugin files under the path, that resolves to no shipped file
 
+spn-devex precedent find "<subject>" [--work <kind>] [--code] [--json] — what is already decided, written or built for a subject: the work's row first, then the matches by kind with file and line
+
+spn-devex precedent map [<kind>] [--json] — the work map's kinds of work, or one row with its references resolved to absolute paths
+
 spn-devex report refresh check <page> — measure a coverage or a tests report again and print each number a write would put on its page, beside the one the page holds
 
 spn-devex report refresh write <page> — measure a coverage or a tests report again and write the numbers into its page
@@ -130,7 +134,7 @@ spn-devex restates files check <book> — report each copy that is behind the bo
 
 spn-devex restates files write <book> — copy the book's templates into this plugin, and remove each copy the book no longer holds
 
-spn-devex workstream arc edit <workstream>/<arc> [--proposes <arc>,…] [--title …] [--goal …] [--status …] [--wait …] [--reason …] [--start] [--review-fixes] [--subject …] [--under …] [--preview …] [--decides …] [--repos …] [--cycle …] [--follows …] [--model …] [--position …] [--note …] — open an arc, or change any field of its header and its status; --note writes a log line
+spn-devex workstream arc edit <workstream>/<arc> [--proposes <arc>,…] [--title …] [--goal …] [--status …] [--wait …] [--reason …] [--start] [--review-fixes] [--subject …] [--under …] [--preview …] [--decides …] [--repos …] [--cycle …] [--follows …] [--model …] [--note …] — open an arc, or change any field of its header and its status; --note writes a log line
 
 spn-devex workstream arc stamp write <workstream>/<arc> — write: restamp an arc's Plan row once its part of the page is current
 
@@ -138,7 +142,19 @@ spn-devex workstream arc delete <workstream>/<arc> --note "…" — delete an ar
 
 spn-devex workstream close <workstream> — close a workstream: run the close gate, stamp the approach page DONE, and move the folder into closed/
 
+spn-devex workstream correction write <workstream>/<arc> --said "…" --answered-by book|code|review|none --ref <file[:line]> --work <kind> — log a correction you made on something already answered, and print the map row or reference to amend
+
+spn-devex workstream decision write <workstream>/<arc> --said "…" --because rule|book|code|purpose --ref <file[:line]> --reverse "…" — log an engineering call the agent decided, with what settles it and the one line that reverses it
+
+spn-devex workstream decision show <workstream>/<arc> [--json] — print the calls the agent decided on an arc
+
 spn-devex workstream fact write <workstream>/<arc> --source <repository>/<path>[:<line>] --fact "…" [--used-by …] — write one fact, the source's current commit pinned
+
+spn-devex workstream finding write <workstream>/<arc> --file findings.json — save a review's findings from a file as open records
+
+spn-devex workstream finding decide <workstream>/<arc> F<n> --carried E1,E2 | --decided Q<n> | --dropped "<reason>" — answer a finding: carried into entries that exist, decided on a card that exists, or dropped with a reason
+
+spn-devex workstream finding show <workstream>/<arc> [--open] [--json] — print an arc's findings, with --open only those not answered
 
 spn-devex workstream go write <workstream>/<arc> --scope <arc>,… [--after-close] — after the go: derive the plan from the scope's sheets and the telemetry, and write every part's brief; run again it keeps landed and running parts; an arc is N<nnn>, ideate or follow-ups, and --scope takes a mixed list; --after-close makes the lead carry an after-close batch itself, as one part
 
@@ -158,7 +174,7 @@ spn-devex workstream open --file <block.json> --note "<the developer's words>" [
 
 spn-devex workstream progress write <workstream> — regenerate the progress block in the approach page's Plan
 
-spn-devex workstream question raise <workstream>/<arc> --file card.json — raise a card: the next number, the record, the card in the approach page's Open
+spn-devex workstream question raise <workstream>/<arc> --file card.json (the card holds why, what, viewsLead, views, options, recommended, nearest, signs, others, about, preview and settled) — raise a card: the next number, the record, the card in the approach page's Open
 
 spn-devex workstream question brief <workstream>/Q<n> — print a fresh view's brief from the card: the problem and the constraints first, no options, the proposals to follow
 
@@ -202,7 +218,7 @@ spn-devex workstream state show [<workstream>] [--json] — where each open and 
 
 spn-devex workstream state check [<workstream>] [--facts] [--json] — whether each open and backlog workstream is whole: its data, previews, samples, notes folders, stamps, cards and step files
 
-spn-devex workstream suggestion add <workstream>[/<arc>] "<title>" [--preview …] [--file card.json] — raise a suggestion: the next number, raised; it also prints the decisions and rules that already speak to its title
+spn-devex workstream suggestion add <workstream>[/<arc>] "<title>" [--preview …] [--about CODE|FLOW|OTHER] [--file card.json] — raise a suggestion: the next number, raised; it also prints the decisions and rules that already speak to its title
 
 spn-devex workstream suggestion state <workstream> S<n> <state> [--words "…"] [--arc <arc>] — move it on: shaped, decided, parked or dropped, with the words beside the move
 

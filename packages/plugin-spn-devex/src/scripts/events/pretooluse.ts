@@ -51,6 +51,7 @@ import { begin, carry, end, record, span, tagsOf, callOf, type SpanName } from "
 import { skillValue } from "../../../../plugin-support-lib/src/lib/telemetry-values.ts";
 import { startCommand } from "../lib/bash-timing.ts";
 import { ARC_ID } from "../lib/workstream-schema.ts";
+import { mapRows, resolvedRow, rowsFor, type MapRow, type Trigger } from "../lib/work-map.ts";
 /** An arc's address as a pattern part, read from `ARC_ID`: `N<nnn>`, `ideate` or `follow-ups`. */
 const ARC_PART = ARC_ID.source.slice(1, -1);
 import { checkChildSize } from "../checks/child-size.ts";
@@ -484,12 +485,63 @@ function refusedBy(check: string, verdict: Verdict, unspanned = false): Verdict 
   return verdict;
 }
 
+/** The most a work note says, in bytes: it is read once for each kind of work, so it stays short. */
+export const NOTE_BYTES = 1500;
+/** A write that can open a row: a path in a workstream's notes or under a layer folder of a repository. Past it the map is not read. */
+const LAYER_PATH = /\/(?:notes|src|contract|migrations|entry|app|ui|config)\//;
+const GIT_WORK = /(?:^|[\s;&|(])(?:git(?:\s+-C\s+\S+)?\s+commit|gh\s+pr\s+create)\b/;
+
+/** What a call opens in the map: a skill opening, a file written (with the layers a preview names), or a commit or pull request. */
+export function triggersOf(payload: Payload): Trigger[] {
+  const supplied = (payload.tool_input ?? {}) as { skill?: unknown; file_path?: string; command?: string; content?: string; new_string?: string };
+  if (payload.tool_name === "Skill") return typeof supplied.skill === "string" ? [{ skill: supplied.skill }] : [];
+  if (supplied.command) return GIT_WORK.test(supplied.command) ? [{ command: /gh\s+pr\s+create/.test(supplied.command) ? "gh pr create" : "git commit" }] : [];
+  const path = supplied.file_path ? resolve(payload.cwd ?? process.cwd(), supplied.file_path) : "";
+  if (!path || !LAYER_PATH.test(path)) return [];
+  const triggers: Trigger[] = [{ write: path }];
+  const text = `${supplied.content ?? ""}\n${supplied.new_string ?? ""}`;
+  for (const layer of new Set([...text.matchAll(/\bdata-layer="([a-z][a-z-]*)"/g)].map((found) => found[1]))) triggers.push({ layer });
+  return triggers;
+}
+
+/**
+ * The work note: the map's row for what this call starts, once for each kind of work in a window and again when the layers a preview
+ * draws change. It names what to read (each reference resolved to a path, a row that resolves to nothing dropped), where to search,
+ * and what past corrections taught. IT NEVER DENIES, and a call it has nothing to say about gets null.
+ */
+export function workNote(payload: Payload): string | null {
+  const triggers = triggersOf(payload);
+  if (!triggers.length) return null;
+  const rows = mapRows();
+  const opened: MapRow[] = [];
+  for (const trigger of triggers) for (const row of rowsFor(rows, trigger)) if (!opened.includes(row)) opened.push(row);
+  if (!opened.length) return null;
+  const cwd = payload.cwd ?? process.cwd();
+  const root = eventWorkspace(cwd);
+  const layers = triggers.map((trigger) => trigger.layer).filter(Boolean).sort().join(",");
+  const fresh = opened.filter((row) => !(root && payload.session_id && alreadyTold(root, payload.session_id, `work|${row.work}`, row.work === "preview" ? layers : "")));
+  if (!fresh.length) return null;
+  const lines = [`Work: ${fresh.map((row) => row.work).join(", ")}. Read before the next edit; this is said once for each kind of work in a window.`];
+  for (const row of fresh) {
+    for (const ref of resolvedRow(row, { checkout: root }).found.slice(0, 4)) lines.push(`  read ${ref.file}`);
+    if (row.lookIn) lines.push(`  look in (${row.work}): ${row.lookIn.slice(0, 140)}`);
+    if (row.learned) lines.push(`  learned (${row.work}): ${row.learned.slice(0, 140)}`);
+  }
+  const subject = fresh.find((row) => row.work !== "preview") ?? fresh[0];
+  const tail = [`Search first: spn-devex precedent find "<the nouns you use>" --work ${subject.work}${/^server-/.test(subject.work) ? " --code" : ""}`];
+  if (fresh.some((row) => row.work === "preview")) tail.push("Every block with a name or a value ends with a Reads line: the file and line it comes from.");
+  // The note stays under its budget: the middle lines go first, from the end; the first line and the tail stay.
+  while (Buffer.byteLength([...lines, ...tail].join("\n")) > NOTE_BYTES && lines.length > 1) lines.pop();
+  lines.push(...tail);
+  return lines.join("\n");
+}
+
 export function dispatch(payload: Payload): Verdict {
   // A SKILL CALL RUNS NO CHECK, so it writes no CHECK row (a CHECK row is one hook check's run): it only carries the skill onto the
   // window's later rows, and its arguments are written nowhere.
   if (payload.tool_name === "Skill") {
     carry();
-    return null;
+    try { const note = workNote(payload); return note ? { note } : null; } catch { return null; }
   }
   // A LAUNCH OF A HELPER AGENT has no path or command, so nothing below has anything to read in it.
   if (payload.tool_name === "Agent" || payload.tool_name === "Task") {
@@ -557,6 +609,8 @@ export function dispatch(payload: Payload): Verdict {
     if (verdict.note && check.run === checkDoc && docFindingHeard(payload, path, verdict.note)) continue;
     if (verdict.note) notes.push(verdict.note);
   }
+  // THE WORK NOTE only advises: it is added after every check has passed and never refuses.
+  try { const work = workNote(payload); if (work) notes.push(work); } catch { /* a note that cannot be made is a window that hears less */ }
   return notes.length ? { note: notes.join("\n\n") } : null;
 }
 

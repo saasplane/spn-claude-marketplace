@@ -7,6 +7,7 @@ import { CARD, cli, dataWorkspace, put } from "../../../helpers/workstream-fixtu
 
 const { questionFaults } = await import("../../../../src/scripts/lib/workstream-schema.ts");
 const { readQuestions } = await import("../../../../src/scripts/lib/workstream.ts");
+const questionsOf = readQuestions;
 
 let total = 0, failed = 0;
 const ok = (label, condition, detail = "") => {
@@ -44,7 +45,8 @@ console.log("\n=== nearest resolves");
   const gone = raise({ ...CARD, nearest: "spn-x/nowhere/at-all.ts" });
   ok("[MKT.SCRIPTS.422] red: a nearest path that does not exist is refused", gone.code !== 0 && gone.out.includes("no path that exists"), gone.out);
   put(root, "spn-x/pattern.ts", "export {};\n");
-  const there = raise({ ...CARD, nearest: "spn-x/pattern.ts:1" });
+  const coded = CARD.options.map((option) => ({ ...option, code: "export const probe = 1;" }));
+  const there = raise({ ...CARD, nearest: "spn-x/pattern.ts:1", options: coded, preview: { reason: "The options differ in one line." } });
   ok("[MKT.SCRIPTS.422] green: a path that exists, with its line, passes", there.code === 0, there.out);
   const none = raise({ ...CARD, nearest: "none" });
   ok("[MKT.SCRIPTS.422] green: `none` passes outside the builder's workspace", none.code === 0, none.out);
@@ -96,6 +98,14 @@ console.log("\n=== a suggestion carries the same card");
   ok("[MKT.SCRIPTS.424] green: a whole card is kept on the record", whole.code === 0 && kept.card?.nearest === "spn-x" && kept.arc === "N001", whole.out);
   const noArc = added(CARD, "031");
   ok("[MKT.SCRIPTS.424] red: a card needs the arc whose fresh views it rests on", noArc.code !== 0 && noArc.out.includes("against an arc"), noArc.out);
+  const codeBare = cli(root, ["workstream", "suggestion", "add", "031/N001", "a code thing", "--about", "CODE"]);
+  ok("[MKT.SCRIPTS.527] red: a suggestion about CODE with no settled block is refused, naming the answers", codeBare.code !== 0 && codeBare.out.includes("settled") && codeBare.out.includes("refuses"), codeBare.out);
+  const codeNoPreview = added({ ...CARD, nearest: "spn-x/packages/job/src/contract/states/job.ts" });
+  ok("[MKT.SCRIPTS.527] red: a card whose nearest is a .ts file and a preview of none is refused, saying what to show", codeNoPreview.code !== 0 && codeNoPreview.out.includes("preview"), codeNoPreview.out);
+  put(root, "spn-x/packages/job/src/contract/states/job.ts", "export {};\n");
+  put(root, "s.json", JSON.stringify({ ...CARD, nearest: "spn-x/packages/job/src/contract/states/job.ts", options: CARD.options.map((option) => ({ ...option, code: "isActive: CDTBoolean;" })), preview: { reason: "r" } }));
+  const codeWithPreview = cli(root, ["workstream", "suggestion", "add", "031/N001", "a code card with its fragment", "--file", "s.json"]);
+  ok("[MKT.SCRIPTS.527] green: the same card with the fragment in its preview is taken and the record keeps about and preview", codeWithPreview.code === 0 && (() => { const last = readFileSync(join(ws, "suggestions.jsonl"), "utf8").trim().split("\n").map((line) => JSON.parse(line)).at(-1); return last.about === "CODE" && last.preview.includes("isActive: CDTBoolean;"); })(), codeWithPreview.out);
 }
 
 console.log("\n=== an old record reads clean");
@@ -113,6 +123,43 @@ console.log("\n=== a fresh view's brief comes from the record");
   ok("[MKT.SCRIPTS.426] and holds no option, and ends by saying the proposals come after the view answers",
     !/does: |one way|the other/.test(brief.out) && /The proposals are not in this brief/.test(brief.out.trim().split("\n").at(-1)), brief.out);
   ok("[MKT.SCRIPTS.426] and sends the view's words to the arc's work folder", brief.out.includes("notes/N001/work/"), brief.out);
+  ok("[MKT.SCRIPTS.530] and tells each panel to answer first whether the premise is true and what would make the question unnecessary", /premise true/.test(brief.out) && /unnecessary/.test(brief.out) && brief.out.indexOf("premise") < brief.out.indexOf("what you would build"), brief.out);
+}
+
+console.log("\n=== a card about code carries code, and a card holds the three answers it was raised on");
+{
+  const { raisedCardFaults, suggestionFaults, suggestionRaisedFaults, cardAbout, nearestIsCode } = await import("../../../../src/scripts/lib/workstream-schema.ts");
+  const coded = CARD.options.map((option) => ({ ...option, code: "isActive: CDTBoolean;" }));
+  put(root, "spn-x/packages/job/src/contract/states/job.ts", "export {};\n");
+  const job = raise({ ...CARD, nearest: "spn-x/packages/job/src/contract/states/job.ts" });
+  ok("[MKT.SCRIPTS.522] red: a card whose nearest is a .ts file is about CODE, and none of its options carrying code is refused, saying what to show",
+    job.code !== 0 && job.out.includes("about CODE") && job.out.includes("a few lines of code") && job.out.includes("Today"), job.out);
+  const flow = raise({ ...CARD, about: "FLOW", nearest: "spn-x" });
+  ok("[MKT.SCRIPTS.522] green: a card about a flow needs no code on its options", flow.code === 0, flow.out);
+  ok("[MKT.SCRIPTS.522] the nearest of a .ts, .tsx or .sql file or a path under /src/ is code, and a folder or none is not",
+    ["a/b.ts", "a/b.tsx:3", "m/1-x.sql", "pkg/src/x"].every(nearestIsCode) && !["spn-x", "none", "docs/a.md"].some(nearestIsCode) && cardAbout({ about: "FLOW", nearest: "a/b.ts" }) === "CODE" && cardAbout({}) === "OTHER");
+  ok("[MKT.SCRIPTS.522] red: an option's code with no preview reason is refused", raisedCardFaults({ ...CARD, about: "CODE", options: coded }).some((fault) => fault.includes("preview.reason")));
+  ok("[MKT.SCRIPTS.522] green: a code card with code on each option and a reason has no fault", raisedCardFaults({ ...CARD, about: "CODE", options: coded, preview: { reason: "r" } }).length === 0);
+  ok("[MKT.SCRIPTS.522] red: an about outside CODE, FLOW and OTHER is refused", raisedCardFaults({ ...CARD, about: "WHATEVER" }).some((fault) => fault.includes("about")));
+  const noSettled = raise(drop("settled"));
+  ok("[MKT.SCRIPTS.528] red: a card with no `settled` block is refused, naming the three answers and the command for an engineering call", noSettled.code !== 0 && noSettled.out.includes("settled") && noSettled.out.includes("decision write"), noSettled.out);
+  for (const field of ["answered", "premise"]) {
+    const empty = raise({ ...CARD, settled: { ...CARD.settled, [field]: " " } });
+    ok(`[MKT.SCRIPTS.528] red: an empty \`settled.${field}\` is refused`, empty.code !== 0 && empty.out.includes(`settled.${field}`), empty.out);
+  }
+  const wrongChange = raise({ ...CARD, settled: { ...CARD.settled, changes: "COLOUR" } });
+  ok("[MKT.SCRIPTS.528] red: `settled.changes` outside PRODUCT, BOUNDARY, PROMISE and TRADE_OFF is refused", wrongChange.code !== 0 && wrongChange.out.includes("PRODUCT"), wrongChange.out);
+  ok("[MKT.SCRIPTS.528] the refusal prints the lookup's findings first, so what is already answered is the command's finding", wrongChange.out.indexOf("already decided, written or built") >= 0 && wrongChange.out.indexOf("already decided, written or built") < wrongChange.out.indexOf("refuses a card"), wrongChange.out.slice(0, 300));
+  const kept = readQuestions(ws).at(-1).card;
+  ok("[MKT.SCRIPTS.528] a card raised whole keeps its settled block, its about and its option code in the record", kept.settled?.changes === "TRADE_OFF" && kept.about === "FLOW");
+  const oldCard = { ...questionsOf(ws)[0], card: { ...questionsOf(ws)[0].card, settled: undefined, about: undefined } };
+  ok("[MKT.SCRIPTS.528] a card already stored without the new fields reads clean: a record is never judged again", questionFaults({ ...oldCard, card: { ...oldCard.card } }, "q1").every((fault) => !fault.includes("settled") && !fault.includes("about")));
+  ok("[MKT.SCRIPTS.527] a suggestion about code with an empty preview is refused, and one with a fragment or a link is taken",
+    suggestionFaults({ id: "s1", title: "t", state: "raised", preview: "", words: null, about: "CODE" }, "S1").length === 1 &&
+    suggestionFaults({ id: "s1", title: "t", state: "raised", preview: "isActive: CDTBoolean;", words: null, about: "CODE" }, "S1").length === 0 &&
+    suggestionFaults({ id: "s1", title: "t", state: "raised", preview: "notes/N001/preview.html#s3a", words: null, about: "CODE" }, "S1").length === 0);
+  ok("[MKT.SCRIPTS.527] a suggestion stored before the field, with no about and no preview, reads clean", suggestionFaults({ id: "s1", title: "t", state: "raised", preview: null, words: null }, "S1").length === 0);
+  ok("[MKT.SCRIPTS.527] a suggestion added now needs its settled block", suggestionRaisedFaults({ id: "s2", title: "t" }).length > 0 && suggestionRaisedFaults({ id: "s2", settled: CARD.settled }).length === 0);
 }
 
 console.log(`\n${total - failed}/${total} passed`);

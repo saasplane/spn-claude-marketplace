@@ -92,6 +92,45 @@
   <div class="sds-section-head"><h2>Proposed</h2></div>
   <p class="sds-standfirst">{{The thing as it will be, in one line. Where a decision is still open, its options sit side by side.}}</p>
 
+
+  <!-- PROPOSED HOLDS THE LAYERS THAT CHANGE (RULE.DEVEX.WORKSPACE.233). Shape first, then Server, Web, Surface, Plugins and Estate, each only
+       for a layer the change touches: a layer that does not change has no section and no line. A layer section carries a data-layer
+       mark, which the hook reads to tell which kinds of work a write draws. Inside a layer, one subsection for each module, named by the
+       book's own seats. Every block opens with a For and Layer line, shows a new file whole and a change as today's code beside the
+       proposed, and ends with a Reads line naming the file and line each name and value comes from. Before a block is written, read the
+       work map's row for its kind of work (refs/devex/agent/work-map.md). Delete the sections the preview does not need. -->
+
+  <h3 id="s3-shape">Shape</h3>
+
+  <p class="sds-standfirst">{{No code: categories, relations, modules, flows; a state diagram when states are new or changed.}}</p>
+
+  <h3 id="s3-server" data-layer="server">Server</h3>
+
+  <p class="sds-standfirst">{{One subsection for each module: Contract (states, services), App (services, repositories, entities, support, utils), Entry (API, queue, CLI), Config, Migrations.}}</p>
+  <h4 id="s3-server-contract" data-layer="server-contract">{{Module}} &middot; Contract</h4>
+  <p class="sds-small">For: {{who reads it}} &middot; Layer: server contract</p>
+  <figure class="sds-file">
+    <figcaption><span class="sds-file-path">{{path of the file}}</span><span class="sds-file-lang">ts</span></figcaption>
+    <pre data-lang="ts">{{a new file whole, or today's code beside the proposed}}</pre>
+  </figure>
+  <p class="sds-small">Reads: {{the file and line each name and value comes from}}</p>
+
+  <h3 id="s3-web" data-layer="web">Web</h3>
+
+  <p class="sds-standfirst">{{One subsection for each module: Contract and App (full form only), Entry (ui): pages, containers, components, hooks, utils, widgets.}}</p>
+
+  <h3 id="s3-surface" data-layer="surface">Surface</h3>
+
+  <p class="sds-standfirst">{{Only when a block must change: Standards, Names, Core, Components, Widgets, Containers, Layouts, App, Delivery.}}</p>
+
+  <h3 id="s3-plugins" data-layer="plugins">Plugins</h3>
+
+  <p class="sds-standfirst">{{A change to the agent's plugins and tools, shown as journeys and outcomes, never as code: what changes for the agent and for you, before and after. The file detail stays in the sheet and the plan.}}</p>
+
+  <h3 id="s3-estate" data-layer="estate">Estate</h3>
+
+  <p class="sds-standfirst">{{Services, hosts, config, secrets.}}</p>
+
   <h3 id="s3a">{{A topic name, at most five words, no comma}}</h3>
 
   <p class="sds-standfirst">{{What the heading would have said, as one sentence: the statement this subsection makes.}}</p>
@@ -191,6 +230,7 @@
 
   <p class="sds-standfirst">{{What the heading would have said, as one sentence: the statement this subsection makes.}}</p>
   <p>{{Each repository is drawn as its own folder tree. The note on the right says whether the entry is new or changed, and what the change is. A folder with no note only holds the entries under it. Where the preview is still proposed, say here which folders and files are not known yet.}}</p>
+  <!-- A repository's Docs, the book pages and the repository's own pages that explain the change, are drawn inside its tree under a docs/ folder, with their own notes. -->
   <!-- One repository is one line, its tree, and then the blocks that explain its changes. Repeat the three for each
        repository, in the order the work runs. The tree is always drawn: one folder or file on each line, a deep path
        as folders on their own lines, and the notes in one column (RULE.DEVEX.WORKSPACE.238). -->
@@ -220,7 +260,7 @@
   <h3 id="s4b">{{What proves it}}</h3>
 
   <p class="sds-standfirst">{{What the heading would have said, as one sentence: the statement this subsection makes.}}</p>
-  <p>{{The tests by tier, each repository and node named. A tier the change owes nothing at says "None" and why.}}</p>
+  <p>{{Each repository in the same order as Every change, by repository, and under each its tiers, tests and case ids. A tier the change owes nothing at says "None" and why.}}</p>
   <div class="sds-scroll"><table>
     <thead><tr><th>{{Each tier, and the tests that prove it}}</th></tr></thead>
     <tbody>

@@ -36,7 +36,7 @@ import { basename, dirname, join, posix, relative, resolve } from "node:path";
 import { STATUSES, TERMINAL } from "../../checks/arc-status.ts";
 import { cardsIn, mastheadStatus } from "../../checks/split-plan.ts";
 import { isDir, isFile, listdir, read, unescape, workspaceRoot } from "../../lib/payload.ts";
-import { NO_REPO, PREVIEW_FILE, approachOf, arcIdsOf, arcStatus, blockAt, previewHrefOf, readArc, stampsOn, workstreamWord, writeNameFile, writeOpenBlocks, writePreviewStatus } from "../../lib/workstream.ts";
+import { NO_REPO, PREVIEW_FILE, approachOf, arcIdsOf, arcOrder, arcStatus, blockAt, previewHrefOf, readArc, stampsOn, workstreamWord, writeNameFile, writeOpenBlocks, writePreviewStatus } from "../../lib/workstream.ts";
 import { ARCS, WORKSTREAM_STATES, isApproachPage, workstreamsDir } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { OWN_COPY, linksSharedStyles } from "../../../../../plugin-support-lib/src/lib/page-styles.ts";
 import { type Action, FLAG, UsageFault, readWords } from "../../../../../plugin-support-lib/src/lib/command.ts";
@@ -87,16 +87,6 @@ export function statusWord(text: string): string | null {
   return BY_LENGTH.find((word) => new RegExp(`^${word}(?![A-Z-])`).test(head)) ?? null;
 }
 
-/** The order arcs run in: `ideate` first, `follow-ups` last, the build arcs between them by number and then by the letter after it (Q33). */
-function runOrder(a: Cycle, b: Cycle): number {
-  const rank = (id: string): number => (id === "ideate" ? 0 : id === "follow-ups" ? 2 : 1);
-  if (rank(a.id) !== rank(b.id)) return rank(a.id) - rank(b.id);
-  const [, an, al] = /^N(\d+)([a-z]?)$/i.exec(a.id) ?? [, "0", ""];
-  const [, bn, bl] = /^N(\d+)([a-z]?)$/i.exec(b.id) ?? [, "0", ""];
-  if (Number(an) !== Number(bn)) return Number(an) - Number(bn);
-  return al < bl ? -1 : al > bl ? 1 : 0;
-}
-
 /**
  * One arc kept as data, read into its Cycles row: the title and the line from its `state.json`, the
  * preview by its fixed name and each sample from `notes/<arc>/`, or from the folder the arc's
@@ -125,7 +115,7 @@ export function cycleOfData(folder: string, arc: string): Cycle | null {
 
 /** Every arc of a workstream folder kept as data, as Cycles rows in run order. A folder with no `arcs/` has none. */
 export function cyclesOf(folder: string): Cycle[] {
-  return arcIdsOf(folder).map((arc) => cycleOfData(folder, arc)).filter((cycle): cycle is Cycle => cycle !== null).sort(runOrder);
+  return arcIdsOf(folder).map((arc) => cycleOfData(folder, arc)).filter((cycle): cycle is Cycle => cycle !== null).sort((a, b) => arcOrder(a.id, b.id));
 }
 
 /** The Arc cell as a person reads it: `N12 — the name`. */
@@ -271,8 +261,8 @@ function arcsByKey(cycles: Cycle[]): Map<string, Cycle> {
 
 /**
  * What a page's Cycles table says that its arcs do not: the arcs with no row, the rows naming no arc,
- * and one line for each row that differs from its arc. Rows are matched by arc and never by position,
- * so a page may list the arcs in the order a person chooses. A closed workstream's page stays as it
+ * and one line for each row that differs from its arc. Rows are matched by arc and never by position;
+ * `producedPage` rewrites a table whose rows are not in arc order. A closed workstream's page stays as it
  * closed, and is not compared.
  */
 export function tableDifferences(table: string, cycles: Cycle[]): { missing: string[]; unknown: string[]; stale: string[] } {
@@ -591,14 +581,13 @@ export function producedPage(folder: string, text: string, cycles: Cycle[] = cyc
   const table = cyclesTableAt(out)!;
   const current = out.slice(table.from, table.to);
   const differences = tableDifferences(current, cycles);
-  if (tableColumns(current) !== headerOf(CYCLES_COLUMNS)
+  const inArcs = arcsByKey(cycles);
+  const listed = [...tableRows(current).keys()].filter((key) => inArcs.has(key));
+  const inOrder = listed.every((key, at) => at === 0 || arcOrder(inArcs.get(listed[at - 1])!.id, inArcs.get(key)!.id) <= 0);
+  if (tableColumns(current) !== headerOf(CYCLES_COLUMNS) || !inOrder
       || differences.missing.length || differences.unknown.length || differences.stale.length) {
-    // The rows keep the order the page lists them in, which is the order a person chose. An arc the
-    // page does not list yet is added after them, in the order of the arc numbers.
-    const inArcs = arcsByKey(cycles);
-    const listed = [...tableRows(current).keys()].filter((key) => inArcs.has(key));
-    const ordered = [...listed.map((key) => inArcs.get(key)!),
-                     ...[...inArcs].filter(([key]) => !listed.includes(key)).map(([, cycle]) => cycle)];
+    // The rows follow the arc order: ideate first, the build arcs by number and letter, follow-ups last.
+    const ordered = [...inArcs.values()].sort((a, b) => arcOrder(a.id, b.id));
     splice(table, tableOf(ordered, stampsOn(current)).replace(/^\s*<div class="sds-scroll">/, "").replace(/<\/div>$/, ""));
     wrote.push(PRODUCED_PARTS.table);
   }

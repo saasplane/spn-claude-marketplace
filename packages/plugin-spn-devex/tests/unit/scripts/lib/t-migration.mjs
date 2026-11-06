@@ -196,7 +196,7 @@ console.log("\n=== a check that finds nothing → recorded without work");
   const [one] = standings(root, MIGRATIONS);
   ok("001 has nothing to do where the workstream is kept as data", one.state === "nothing to do", one.state);
   ok("the window's start says so in one line, naming the command that records it",
-    windowStartLines(root, MIGRATIONS).join("\n") === "- 001, 002, 003, 004, 005, 006, 007, 008, 009, 010, 011: the check finds nothing in the old shape — `spn-devex plugin migration write 001 002 003 004 005 006 007 008 009 010 011` records it, with nothing to do.",
+    windowStartLines(root, MIGRATIONS).join("\n") === "- 001, 002, 003, 004, 005, 006, 007, 008, 009, 010, 011, 012: the check finds nothing in the old shape — `spn-devex plugin migration write 001 002 003 004 005 006 007 008 009 010 011 012` records it, with nothing to do.",
     windowStartLines(root, MIGRATIONS).join("\n"));
   const applied = applyMigrations(root, MIGRATIONS, ["001"]);
   const line = JSON.parse(readFileSync(ledgerOf(root), "utf8").trim());
@@ -548,6 +548,28 @@ console.log("\n=== 011 — the arcs table moves out of How's Cycles subsection i
     wrote.length === 2 && read("open/031-probe/approach.html") === page(true).replace("<h2>Plan</h2>", "<h2>Plan</h2>"), wrote.join(" | ") + read("open/031-probe/approach.html"));
   ok("[MKT.SCRIPTS.401] a page already in the new shape and a closed page are left as they were", read("open/033-new/approach.html") === page(true) && read("closed/020-done/approach.html") === page(false));
   ok("[MKT.SCRIPTS.401] green: a second run writes nothing, and the check finds nothing", m011.script(root).length === 0 && m011.check(root).length === 0);
+}
+
+console.log("\n=== 012 — an arc's position is dropped from its state file, and a closed workstream stays");
+{
+  const m012 = MIGRATIONS.find((one) => one.id === "012");
+  ok("[MKT.SCRIPTS.526] the plugin ships 012 after 011, at 0.112.0, with a script and no steps",
+    MIGRATIONS[11]?.id === "012" && m012?.version === "0.112.0" && m012.changed.endsWith(".") && typeof m012.script === "function" && !m012.steps?.length);
+  const WS = ".spndevex/workstreams";
+  const state = (arc, extra) => `${JSON.stringify({ schemaVersion: 2, arc, subject: "probe", title: "t", goal: "g", status: "PROPOSED", wait: null, reason: null, rows: [], ...extra }, null, 2)}\n`;
+  const root = workspace("m012", {
+    [`${WS}/open/031-probe/arcs/N001/state.json`]: state("N001", { position: 2 }),
+    [`${WS}/open/031-probe/arcs/N002/state.json`]: state("N002", {}),
+    [`${WS}/closed/020-done/arcs/N001/state.json`]: state("N001", { position: 1 }),
+  }, [], { migrated: false });
+  const found = m012.check(root);
+  ok("[MKT.SCRIPTS.526] red: 012 names the open arc that holds a position, and not the one without nor the closed one",
+    found.length === 1 && found[0].startsWith("open/031-probe/arcs/N001"), found.join(" | "));
+  const wrote = m012.script(root);
+  const read = (path) => readFileSync(join(root, WS, path), "utf8");
+  ok("[MKT.SCRIPTS.526] its script drops the field and keeps every other; the closed state file is left as it closed",
+    wrote.length === 1 && read("open/031-probe/arcs/N001/state.json") === state("N001", {}) && read("closed/020-done/arcs/N001/state.json") === state("N001", { position: 1 }), wrote.join(" | "));
+  ok("[MKT.SCRIPTS.526] green: a second run writes nothing, and the check finds nothing", m012.script(root).length === 0 && m012.check(root).length === 0);
 }
 
 console.log("\n=== the preview template's masthead carries Progress between Arc and Shown, as the writer writes it");

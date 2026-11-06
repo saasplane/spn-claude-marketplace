@@ -100,6 +100,7 @@ function render(found: Library[], bookSeen: string): string {
   out += `| Package | Version | What it is |\n| --- | --- | --- |\n`;
   for (const library of found) out += `| \`${library.name}\` | \`${library.version}\` | ${library.description} |\n`;
   out += `\n**Depend on a published name, never on a path into a sibling checkout.** A path resolves only for somebody holding both repositories, and a partner holds one.\n`;
+  out += `\n## The shared contract types are searched before a field is written\n\n**\`support-contract-ts\` holds the contract types every module shares, in \`src/contract/states/global\` (14 files: address, currency, country, language, date, number, reach and others), and the folder is searched before a field is written.** A field of the same meaning as one of them takes its type, as the module chapter's section *Fields: how a state names and types them* (\`module/README.md\`) rules, and a second type for an address or a currency is not made.\n`;
   out += `\n<!-- /spn:generated -->\n`;
   return out;
 }

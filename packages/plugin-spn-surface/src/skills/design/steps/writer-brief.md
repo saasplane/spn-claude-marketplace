@@ -20,11 +20,6 @@
 
 - **The agent changes the library through the Figma connector, and in no other way** (`RULE.SUPPORT.SURFACE.027` · MUST · skill:spn-surface/design)
 - **SaaS Plane's design library is managed by its builder, and a partner is given the published library and does not change it** (`RULE.SUPPORT.SURFACE.028` · MUST · skill:spn-surface/design)
-- **RULE.SUPPORT.SURFACE.029** (`RULE.SUPPORT.SURFACE.029` · MUST · skill:spn-surface/design)
-- **RULE.SUPPORT.SURFACE.030** (`RULE.SUPPORT.SURFACE.030` · MUST · skill:spn-surface/design)
-- **RULE.SUPPORT.SURFACE.031** (`RULE.SUPPORT.SURFACE.031` · MUST · skill:spn-surface/design)
-- **RULE.SUPPORT.SURFACE.036** (`RULE.SUPPORT.SURFACE.036` · MUST · skill:spn-surface/design)
-- **RULE.SUPPORT.SURFACE.038** (`RULE.SUPPORT.SURFACE.038` · MUST · skill:spn-surface/design)
 - **A vocabulary whose every value names one set of tokens is a mode, and the page level is one: the collection Level, whose modes are the six values of `DSPageLevelType`** (`RULE.SUPPORT.SURFACE.296` · MUST · skill:spn-surface/design)
 - **The agent never hands the developer a Figma step to draw, rebind, delete or tick** (`RULE.SUPPORT.SURFACE.400` · MUST · skill:spn-surface/design)
 

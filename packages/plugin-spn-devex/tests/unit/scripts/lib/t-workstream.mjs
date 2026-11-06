@@ -124,24 +124,16 @@ console.log("\n=== the generated blocks — progress and open");
   ok("[MKT.SCRIPTS.490] progress: a build arc's chip shows its title, not its subject, after the number", words.includes("<span class=\"sds-chip-subject\"> &middot; Workstream data</span>") && !words.includes("workstream data") && words.includes('class="sds-chip sds-proposed '), words);
   ok("progress: no arc, no card and nothing else", lib.progressInside("/nowhere", []) === "");
   {
-    const order = (list) => lib.executionOrder("/nowhere", list).map((one) => one.arc).join(" ");
     const arc = (id, status, position) => ({ ...arcData(), arc: id, status, ...(position === undefined ? {} : { position }) });
     // RUNNING and LANDED are worked out from the steps: a decided arc with a step started runs, and one with every step landed has landed.
     const started = (id) => ({ ...arc(id, "DECIDED"), rows: arcData().rows.map((row, at) => ({ ...row, state: at ? "waiting" : "running" })) });
     const done = (id) => ({ ...arc(id, "DECIDED"), rows: arcData().rows.map((row) => ({ ...row, state: "landed" })) });
-    ok("progress order: the done arcs, then RUNNING, then DECIDED and PROPOSED by position, an arc without one last, the number breaking a tie",
-      order([arc("N009", "PROPOSED"), arc("N008", "DECIDED", 5), arc("N004", "DECIDED", 2), started("N003"), done("N001"), started("N010"), arc("N011", "PROPOSED", 4), arc("N002", "CARRIED")]) === "N001 N002 N003 N010 N004 N011 N008 N009",
-      order([arc("N009", "PROPOSED"), arc("N008", "DECIDED", 5), arc("N004", "DECIDED", 2), started("N003"), done("N001"), started("N010"), arc("N011", "PROPOSED", 4), arc("N002", "CARRIED")]));
-    const folder = mkdtempSync(join(tmpdir(), "order-"));
-    const written = [["N005", "2026-10-12T10:00+05:30"], ["N006", "2026-10-11T10:00+05:30"]];
-    for (const [id, at] of written) { const dir = join(folder, "arcs", id); mkdirSync(dir, { recursive: true }); writeFileSync(join(dir, "log.jsonl"), `${JSON.stringify({ at, kind: "landed", row: "1", note: "waiting → landed" })}\n`); }
-    ok("progress order: done arcs are in the order they finished, by their log, not by number", lib.executionOrder(folder, [done("N005"), done("N006")]).map((one) => one.arc).join(" ") === "N006 N005");
     {
-      // The bar opens on what is still open: the running arcs, then every other arc not closed, then the closed ones, each in run order.
+      // THE BAR FOLLOWS arcOrder, the Plan table's order: ideate first, the build arcs by number and letter, follow-ups last, whatever the status or a stored position.
       const chipIds = (html) => [...html.matchAll(/<a class="sds-chip [^"]*" href="[^"]*"/g)].map((one) => /N\d+/.exec(one[0])?.[0] ?? /notes\/(N\d+)/.exec(one[0])?.[1]).join(" ");
       const bar = lib.progressInside("/nowhere", [done("N001"), arc("N002", "CARRIED"), started("N003"), arc("N009", "PROPOSED"), arc("N004", "DECIDED", 2), started("N010")]);
-      ok("[MKT.SCRIPTS.385] progress: with closed arcs run first, the running arcs' chips come first, the decided and proposed next, and the closed last in their run order",
-        chipIds(bar) === "N003 N010 N004 N009 N001 N002", chipIds(bar));
+      ok("[MKT.SCRIPTS.524] progress: the chips follow arcOrder, by number, whatever the status or a stored position",
+        chipIds(bar) === "N001 N002 N003 N004 N009 N010", chipIds(bar));
       ok("progress: Overall counts every arc whatever the chips' order", bar.includes("2 of 6 arcs closed"), bar);
       // A chip whose arc has a preview opens it in a new tab; one without keeps the jump to its row.
       const withPreview = mkdtempSync(join(tmpdir(), "chip-preview-"));
@@ -156,7 +148,7 @@ console.log("\n=== the generated blocks — progress and open");
       ok("[MKT.SCRIPTS.387] progress: a chip of an arc with no preview links #N002, with no arrow and no new tab",
         plain !== "" && !plain.includes("_blank") && !plain.includes("sds-chip-open") && !plain.includes("opens in a new tab"), linked);
     }
-    ok("progress: an arc's position is a whole number the schema accepts", schema.arcFaults({ ...arcData(), position: 3 }).length === 0 && schema.arcFaults({ ...arcData(), position: "x" }).length > 0);
+    ok("[MKT.SCRIPTS.526] progress: a state file that still holds a position is read clean, and the schema no longer judges it", schema.arcFaults({ ...arcData(), position: 3 }).length === 0 && schema.arcFaults({ ...arcData(), position: "x" }).length === 0);
   }
   ok("progress: a sticky card closes the block — the arcs' chips on the left, then the overall chip, and no line along its top edge",
     inside.includes('<nav class="sds-footbar" aria-label="Workstream status">') && inside.indexOf('sds-footbar-chips') < inside.indexOf('sds-footbar-summary')
@@ -638,8 +630,6 @@ console.log("\n=== the ideate and follow-up arcs — MKT.SCRIPTS.484, .486, .488
   // THE PLAN AND THE BAR (MKT.SCRIPTS.490)
   const arc = (id, status, over = {}) => ({ ...arcData(), arc: id, status, ...over });
   const started = (id, over = {}) => ({ ...arc(id, "DECIDED", over), rows: arcData().rows.map((row, at) => ({ ...row, state: at ? "waiting" : "running" })) });
-  const order = lib.executionOrder("/nowhere", [arc("follow-ups", "PROPOSED", { rows: [], suggestionsSettled: true }), started("N002"), arc("N001", "LANDED"), arc("ideate", "PROPOSED", { rows: [] })]).map((one) => one.arc).join(" ");
-  ok("[MKT.SCRIPTS.490] executionOrder pins the ends: ideate first and follow-ups last, though follow-ups has landed and ideate has not", order === "ideate N001 N002 follow-ups", order);
   const bar = lib.progressInside("/nowhere", [arc("follow-ups", "PROPOSED", { rows: [], suggestionsSettled: true }), started("N002", { title: "Build the thing" }), arc("ideate", "PROPOSED", { title: "stale words", rows: [] })]);
   const hrefs = [...bar.matchAll(/<a class="sds-chip [^"]*" href="#([\w-]+)"/g)].map((one) => one[1]).join(" ");
   ok("[MKT.SCRIPTS.490] the bar opens on the ideate chip and ends on the follow-ups chip, whatever their status", hrefs === "ideate N002 follow-ups", hrefs);
@@ -659,6 +649,23 @@ console.log("\n=== the ideate and follow-up arcs — MKT.SCRIPTS.484, .486, .488
   ok("[MKT.SCRIPTS.496] a preview drawn from three entries holds the outline in connection order", html.startsWith("<ol>") && at[0] >= 0 && at[0] < at[1] && at[1] < at[2] && html.includes("first &lt;one&gt;"), html);
   ok("[MKT.SCRIPTS.496] and a code block only for the judged one", html.split("<pre><code>").length === 2 && html.includes("+let x = 1 &lt; 2;") && !html.includes("never read"), html);
   ok("[MKT.SCRIPTS.505] scripts/commands/docs/x.ts plans as CODE", schema.entryWork({ file: "r:packages/plugin-spn-devex/src/scripts/commands/docs/x.ts", work: null }) === "CODE", String(schema.entryWork({ file: "r:packages/plugin-spn-devex/src/scripts/commands/docs/x.ts", work: null })));
+}
+
+console.log("\n=== a card's preview is drawn in Open after the recommendation");
+{
+  const card = { why: "w", what: "The column is `org_types VARCHAR(30)[]`.", viewsLead: "v", views: [{ lens: "Server dev", text: "x" }],
+    options: [{ key: "A", does: "keep it", costs: "nothing", code: "org_types VARCHAR(30)[] NOT NULL," }, { key: "B", does: "the enum", costs: "one cast", code: "org_types iam_org_type[] NOT NULL," }],
+    recommended: { key: "B", reason: "closed set" }, about: "CODE", preview: { today: "org_types VARCHAR(30)[] NOT NULL,", reason: "only the lines that differ" } };
+  const html = lib.cardHtml({ id: "q42", title: "A definition's list of org types", card });
+  const at = (text) => html.indexOf(text);
+  ok("[MKT.SCRIPTS.523] the Preview follows the recommendation, today first and then each option's code", at("Recommended: B") > 0 && at("Recommended: B") < at(">Preview<") && at(">Preview<") < at(">Today<") && at(">Today<") < at("Option A") && at("Option A") < at("Option B"), html);
+  ok("[MKT.SCRIPTS.523] the recommended option is marked and the code is escaped", html.includes("Option B (recommended)") && !html.includes("Option A (recommended)") && html.includes("<pre><code>org_types iam_org_type[] NOT NULL,</code></pre>"));
+  const { code: _a, ...noCodeA } = card.options[0];
+  const bare = lib.cardHtml({ id: "q1", title: "t", card: { ...card, options: [noCodeA, { ...card.options[1], code: undefined }], preview: undefined } });
+  ok("[MKT.SCRIPTS.523] a card with no preview and no option code draws exactly what it drew before", !bare.includes("Preview") && !bare.includes("<pre>"));
+  const fresh = lib.cardHtml({ id: "q2", title: "t", card: { ...card, preview: { reason: "new code has no Today" } } });
+  ok("[MKT.SCRIPTS.523] new code has no Today block", !fresh.includes(">Today<") && fresh.includes("Option A"));
+  ok("[MKT.SCRIPTS.523] a finding file has a path of its own beside the arc's other data", lib.findingsFileOf("/w", "N001") === "/w/arcs/N001/findings.jsonl" && lib.DATA_FILES.includes("findings.jsonl"));
 }
 
 console.log(failed ? `\n  ${failed} of ${total} FAILED — workstream library` : `\n  all ${total} passed — workstream library`);

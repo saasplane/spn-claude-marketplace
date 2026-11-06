@@ -150,6 +150,7 @@ export const lensKey = (lens: string): string => lens.trim().toUpperCase().repla
 
 /**
  * What a card raised now (or a suggestion added with a card) must hold on top of its shape (RULE.DEVEX.WORKSPACE.491 and .492, .168): the
+ * `settled` block holds the three answers (raisedCardFaults), a card about code carries code, the
  * nearest construct exists, the repository sign follows the paths the What cites, the fresh views its signs call for are made and on
  * record, a leave-it is there, and in the builder's workspace a gap links the suggestion that fills it. NEVER RUN ON A RECORD READ, so a
  * card raised before it turns no workstream red. Returns the faults and the signs the card carries once the repository sign is added.

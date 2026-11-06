@@ -144,6 +144,9 @@ export const arcDataDir = (ws: string, arc: string): string => join(ws, ARCS, ar
 export const stateFileOf = (ws: string, arc: string): string => join(arcDataDir(ws, arc), STATE_FILE);
 export const logFileOf = (ws: string, arc: string): string => join(arcDataDir(ws, arc), LOG_FILE);
 export const factsFileOf = (ws: string, arc: string): string => join(arcDataDir(ws, arc), FACTS_FILE);
+/** An arc's review findings, written only by `workstream finding`. */
+export const FINDINGS_FILE = "findings.jsonl";
+export const findingsFileOf = (ws: string, arc: string): string => join(arcDataDir(ws, arc), FINDINGS_FILE);
 export const sheetFileOf = (ws: string, arc: string): string => join(arcDataDir(ws, arc), SHEET_FILE);
 export const notesDirOf = (ws: string, arc: string): string => join(ws, NOTES, arc);
 export const previewOf = (ws: string, arc: string): string => join(notesDirOf(ws, arc), PREVIEW_FILE);
@@ -167,7 +170,7 @@ export const questionsFileOf = (ws: string): string => join(ws, QUESTIONS_FILE);
 /** The arc's name file beside its data, named for its subject (RULE.DEVEX.WORKSPACE.264). */
 export const nameFileOf = (ws: string, arc: string, subject: string): string => join(arcDataDir(ws, arc), `${subject}.md`);
 /** The data files of an arc's folder, and the `patches/` folder `sheet patch` writes (s178); with the one name file, `arcs/N<nnn>/` holds these and nothing else. */
-export const DATA_FILES: readonly string[] = [STATE_FILE, LOG_FILE, FACTS_FILE, SHEET_FILE, "go.json", "patches"];
+export const DATA_FILES: readonly string[] = [STATE_FILE, LOG_FILE, FACTS_FILE, SHEET_FILE, FINDINGS_FILE, "go.json", "patches"];
 
 /**
  * The arc's address on the approach page: its Plan row, by its number (RULE.DEVEX.WORKSPACE.263).
@@ -467,9 +470,9 @@ export function writeNameFile(ws: string, data: ArcData): boolean {
 /** The instant a record carries: the local date and time with its offset. */
 export const now = (): string => withOffset(new Date());
 
-/** One event on an arc's log. */
-export function logEvent(ws: string, arc: string, kind: string, row: string | null, note: string | null): void {
-  const line = JSON.stringify(versioned({ at: now(), kind, row, note }));
+/** One event on an arc's log; `extra` names the fields a kind of line adds, such as a correction's `answeredBy`. */
+export function logEvent(ws: string, arc: string, kind: string, row: string | null, note: string | null, extra: Record<string, unknown> = {}): void {
+  const line = JSON.stringify(versioned({ at: now(), kind, row, note, ...extra }));
   appendJsonl(logFileOf(ws, arc), JSON.parse(line));
   commitWrites(ws, line);
   // A command may write its pages after its log line; whatever is left is committed under the same line when the run ends.
@@ -783,32 +786,6 @@ export function inline(text: string): string {
 
 const share = (done: number, total: number): number => (total ? Math.round((done / total) * 100) : 0);
 
-/** When an arc finished: its last landed or status line on its log, else its last line of any kind; "" where it has none. */
-function finishedAt(ws: string, arc: string): string {
-  const lines = readJsonl(logFileOf(ws, arc)).filter((line): line is LogLine => !!line && typeof line === "object" && typeof (line as LogLine).at === "string");
-  const marks = lines.filter((line) => line.kind === "landed" || line.kind === "status");
-  return (marks.length ? marks : lines).map((line) => line.at).sort().at(-1) ?? "";
-}
-
-/**
- * The arcs in the order they run: the done ones first, in the order they finished (`CARRIED` and `DROPPED` at the
- * time they closed); then `RUNNING`; then `DECIDED` and `PROPOSED` in the planned sequence, which is the arc's
- * `position`, an arc without one after the others. The number breaks every tie. Read with the status worked out.
- */
-export function executionOrder<T extends ArcData>(ws: string, arcs: readonly T[]): T[] {
-  const group = (data: ArcData): number => {
-    const status = arcStatus(data);
-    return TERMINAL.has(status) ? 0 : status === "RUNNING" ? 1 : 2;
-  };
-  const finished = new Map(arcs.filter((data) => group(data) === 0).map((data) => [data.arc, finishedAt(ws, data.arc)]));
-  const position = (data: ArcData): number => (typeof data.position === "number" ? data.position : Number.MAX_SAFE_INTEGER);
-  // THE TWO ENDS ARE PINNED (Q33): the ideate arc before every other, the follow-up arc after every other.
-  return [...arcs].sort((left, right) => roleRank(left.arc) - roleRank(right.arc) || group(left) - group(right)
-    || (group(left) === 0 ? (finished.get(left.arc) ?? "").localeCompare(finished.get(right.arc) ?? "") : 0)
-    || (group(left) === 2 ? position(left) - position(right) : 0)
-    || left.arc.localeCompare(right.arc));
-}
-
 /**
  * A workstream's own word, which its page's header shows and *Overall* takes (05-artifacts.md § How ends in
  * Cycles): `DONE` for a workstream in `closed/`, `IMPLEMENTING` once the first step of any arc has started, which an
@@ -918,17 +895,13 @@ function statusBar(ws: string, arcs: readonly ArcData[], closed: number): string
 }
 
 /**
- * The inside of the progress block: the sticky card alone. Its chips open on the running arcs, then every other arc not
- * closed, then the closed arcs, each group in the order the arcs run. Progress shows nowhere else on the page.
+ * The inside of the progress block: the sticky card alone. Its chips follow `arcOrder`, the order of the Plan table, and each chip
+ * shows its arc's state. Progress shows nowhere else on the page.
  */
 export function progressInside(ws: string, arcs: readonly ArcData[] = arcIdsOf(ws).map((arc) => readArc(ws, arc)!).filter(Boolean)): string {
   const closed = arcs.filter((data) => TERMINAL.has(arcStatus(data))).length;
-  const ordered = executionOrder(ws, arcs);
-  const open = (data: ArcData): boolean => !TERMINAL.has(arcStatus(data));
-  const running = (data: ArcData): boolean => arcStatus(data) === "RUNNING";
-  const grouped = [...ordered.filter(running), ...ordered.filter((data) => open(data) && !running(data)), ...ordered.filter((data) => !open(data))];
-  // The ideate arc's chip is the first and the follow-up arc's the last, whatever their status (Q33).
-  const lines = statusBar(ws, [...grouped.filter((data) => data.arc === "ideate"), ...grouped.filter((data) => data.arc !== "ideate" && data.arc !== "follow-ups"), ...grouped.filter((data) => data.arc === "follow-ups")], closed);
+  // The chips follow the Plan table's order, `arcOrder`: ideate first, the build arcs by number and letter, follow-ups last. Each chip shows its own state.
+  const lines = statusBar(ws, [...arcs].sort((a, b) => arcOrder(a.arc, b.arc)), closed);
   return lines.length ? `${lines.join("\n")}\n` : "";
 }
 
@@ -1056,6 +1029,23 @@ export function writePreviewStatus(ws: string): string[] {
   return wrote;
 }
 
+/**
+ * The Preview of a card, drawn after the recommendation: the Today block first where real code exists, then each option's code
+ * with the recommended option marked. A card that has no preview and no option code draws nothing.
+ */
+export function previewHtml(card: Card): string[] {
+  const coded = card.options.filter((option) => typeof option.code === "string" && option.code.trim());
+  const today = typeof card.preview?.today === "string" && card.preview.today.trim() ? card.preview.today : null;
+  if (!coded.length && !today) return [];
+  const block = (label: string, code: string): string[] => [`  <span class="sds-key">${inline(label)}</span>`, `  <pre><code>${escapeHtml(code.trimEnd())}</code></pre>`];
+  return [
+    `  <span class="sds-key">Preview</span>`,
+    ...(card.preview?.reason ? [`  <p>${inline(card.preview.reason)}</p>`] : []),
+    ...(today ? block("Today", today) : []),
+    ...coded.flatMap((option) => block(`Option ${option.key}${option.key === card.recommended.key ? " (recommended)" : ""}`, option.code!)),
+  ];
+}
+
 /** One question rendered as the approach template's card. */
 export function cardHtml(question: Pick<Question, "id" | "title"> & { card: Card }, indent = "  "): string {
   const number = question.id.replace(/^q/, "Q");
@@ -1078,6 +1068,7 @@ export function cardHtml(question: Pick<Question, "id" | "title"> & { card: Card
     `    </tbody>`,
     `  </table></div>`,
     `  <div class="sds-recommended"><b>Recommended: ${inline(card.recommended.key)}.</b> ${inline(card.recommended.reason)}</div>`,
+    ...previewHtml(card),
     `</div>`,
   ];
   return lines.map((line) => `${indent}${line}`).join("\n");

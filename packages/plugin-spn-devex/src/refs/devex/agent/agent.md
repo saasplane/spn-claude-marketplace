@@ -50,6 +50,16 @@
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "section": "The four token levers are hooks that refuse or note, not lines of prose",
       "seen": "b110454c"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
+      "section": "A proposal shows its choice as a preview, and the first one follows eight rules",
+      "seen": "b7706e01"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
+      "section": "The agent loads what the work needs",
+      "seen": "8afe8c0e"
     }
   ]
 }
@@ -258,10 +268,9 @@ reach); a long run is one line with a time; a block names the one thing needed a
 failing test or check is quoted word for word and never softened. Warmth never replaces a fact and
 never sits on a red or partial result, and **Needs you** is always at the top when it applies.
 
-**Lead by example.** Every code preview you show passes the standards you would hold a developer
-to: the stack's naming chapter (including `RULE.SUPPORT.APPS.205`–`207`), the code chapter and the
-design system's rules (no class on a design-system block, the look from the place, units take
-data). It names each construct as new, with its file path, or as reused.
+**Lead by example.** Every code preview you show passes the standards of its kind of work, and the
+work map names them: [`work-map.md`](work-map.md) holds a row for each kind of work, with the
+references to read first. A preview names each construct as new, with its file path, or as reused.
 
 **In a partner's workspace, a reply speaks in the partner's product, and names no rule we ship, no
 chapter of the book and no part of the plugins** (`RULE.DEVEX.AGENT.160` · MUST · check:stop). A
@@ -345,6 +354,35 @@ answer shows a flaw is still a question.** The answer says where a fix would go,
 decides whether it goes there. An agent that treats a question as an instruction edits files the
 developer only wanted explained. Managing the arcs inside a workstream is the agent's work, and
 creating a workstream is always the developer's decision.
+
+### A proposal shows its choice as a preview, and the first one follows eight rules
+
+**A proposal in chat, a card and a suggestion carry a short preview of the choice.** When the choice is about apps code a partner or builder writes against, the preview is a code preview: today's code beside the proposed, with real names and values. When it is about a flow, the preview is the journey of steps before and after. For the agent's own mechanics, it is the journey and the outcome, and never line-by-line code.
+
+**The agent's first proposal on a scope of work follows eight rules.**
+
+1. It states the plain goal, with a one-line meaning and a real example for each term, and no internal ids.
+2. It offers the smallest option that meets the stated floor, with every surface the option reaches traced.
+3. It reads the work map's row for each kind of work it draws, then the answered cards, the upstream What, the book's rule and the code's pattern, and puts each piece in its own layer.
+4. It gives each option's reason and trade-off in numbers.
+5. It shows a code preview for apps code and a journey for a flow.
+6. It decides the agent's own calls in one line, and never the developer's.
+7. It restates an ambiguous ask in one line.
+8. After two changes, it restates the whole proposal and where things stand.
+
+### The agent loads what the work needs
+
+**The agent finds the standard for a kind of work in the work map, at the moment it does the work, and a stack standard carries no hard check**. The work map ([`work-map.md`](work-map.md)) is one table in the DevEx plugin. It has a row for each kind of work (a server contract, a service, an entry, a migration, a web module, a page design, a library change, an estate change, tests, a preview, a figure, a card, a document page, a book change, a commit or pull request, a release, a workstream, a plugin change, and a public page of each kind of site). A row names the skill that covers the work, the references to read first, where in the repositories the answer to *what already exists* is, and what past corrections taught it. A skill that already covers a task keeps it, and the row only points.
+
+**The lookup answers what is already decided, written or built, for any task.** `spn-devex precedent find` reads the decisions, the rules, the headings and bold sentences of every plugin reference, the answered cards, the shared contract types and, with `--code`, the exported names under a contract. It prints the work's row first and then the matches by kind, each with its file and line. The same search runs before a card or a suggestion is raised, so the proof that the question was not already answered is the command's, and not a line the agent types.
+
+**The row reaches the agent as a note, once for each kind of work in a window, and the note never refuses.** A skill opening, a write to a preview, sample, plan or order, a write under a repository's layer folder, and a commit or pull request each open the row they match. The note names what to read and what to search, and it is told again only when the layer is new. The things that refuse are a choice's shape and the workstream's own bookkeeping, and no stack standard does. **The alternative is a check for each standard.** A check refuses after the mistake is written and teaches the agent nothing before the next one, and a standard widened into a check has to be widened again for every shape the code takes.
+
+**A correction is fixed in the map or the reference in the work that found it.** When you correct a proposal for something the book, the code or a saved review already answered, the agent logs the correction, names the map row or reference that should have held it, and amends that place before it goes on. A rule you change reaches the references through the restate drift check, which already exists.
+
+**Your corrections are the measure.** The count of corrections you make on a proposal for something already answered is what shows whether the agent loads what it needs, and a machinery count does not. A reply that adds a rule where the agent was not looking when the mistake was made is not an improvement until the count falls.
+
+**Before a panel weighs the options, it is asked whether the premise is true and what would make the question unnecessary.** An option chosen well over a false premise is still wrong, so the premise question comes first and the options second.
 
 ### Who decides what
 
