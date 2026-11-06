@@ -127,8 +127,8 @@ const MODULE_FROM_SOURCE = [
 /**
  * The module a file belongs to, by its own evidence first.
  *
- * The folder is the least reliable witness: the sample module lives in `src/modules/project/` and
- * its codes are prefixed `PRJ`. So the file's own symbols are read first, then the
+ * The folder is the least reliable witness: the sample module lives in `src/modules/workspace/` and
+ * its codes are prefixed `WSP`. So the file's own symbols are read first, then the
  * package folder.
  */
 export function moduleOf(path: string, source: string): string | null {
@@ -227,7 +227,7 @@ export function seedFindings(path: string, source: string, masked: string, modul
 /**
  * Rule 2 at the gate site — an enablement enum MEMBER begins `MANAGE_`.
  *
- * The gate table names members through an alias (`const E = PRJEnablementType`), so the aliases are
+ * The gate table names members through an alias (`const E = WSPEnablementType`), so the aliases are
  * resolved from the file rather than assumed.
  */
 export function authzFindings(path: string, source: string, masked: string): Finding[] {
