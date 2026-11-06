@@ -65,6 +65,25 @@ export function finalTextOf(stream) {
 }
 
 /**
+ * Every assistant message of a run, in order. A Stop hook can make the agent rewrite one line after its answer, which
+ * leaves that line as the final text, so a case is judged on the whole answer: what it must say, and what it must not.
+ */
+export function answerOf(stream) {
+  const texts = [];
+  for (const raw of stream.split("\n")) {
+    if (!raw.trim()) continue;
+    let event;
+    try { event = JSON.parse(raw); } catch { continue; }
+    if (event.type !== "assistant") continue;
+    const text = (event.message?.content ?? []).filter((part) => part.type === "text").map((part) => part.text).join("\n");
+    if (text) texts.push(text);
+  }
+  const final = finalTextOf(stream);
+  if (final && !texts.includes(final)) texts.push(final);
+  return texts.join("\n\n");
+}
+
+/**
  * The real session runner: one fresh `claude -p` per case, in plan mode with prompts denied and nothing kept, run from the workspace
  * root (the shape the fresh-window proof uses). Returns the stream it printed.
  */
@@ -79,7 +98,7 @@ export function claudeSession(prompt, cwd) {
 export function runCases(cases, session) {
   return cases.map((one) => {
     let text = "";
-    try { text = finalTextOf(session(promptOf(one))); } catch (error) { return { id: one.id, passed: false, failures: [`the session did not run: ${error.message}`], text }; }
+    try { text = answerOf(session(promptOf(one))); } catch (error) { return { id: one.id, passed: false, failures: [`the session did not run: ${error.message}`], text }; }
     const failures = judge(one, text);
     return { id: one.id, passed: failures.length === 0, failures, text };
   });
