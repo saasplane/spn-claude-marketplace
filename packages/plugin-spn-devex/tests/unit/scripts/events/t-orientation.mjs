@@ -1156,7 +1156,7 @@ console.log("\n=== orientation — parked suggestions that change how you work")
     suggestion("s10", "marked and then decided", "decided", { changesWork: true }),
   ])));
   const shown = marked.split("\n").filter((line) => line.startsWith("Parked, changes your work"));
-  says("[MKT.HOOKS.500] the start adds one line for a suggestion parked with the mark, with its workstream, number and title",
+  says("[MKT.HOOKS.500] (RULE.DEVEX.WORKSPACE.503) the start adds one line for a suggestion parked with the mark, with its workstream, number and title",
     shown.length === 1 && shown[0].includes("037 S8") && shown[0].includes("show parked work at the start"), shown.join(" | "));
   says("[MKT.HOOKS.500] a parked suggestion without the mark and a marked one no longer parked are not shown", !marked.includes("S9") && !marked.includes("S10"));
   const [, many] = orient(...Array(2).fill(rooted("parked-many", Array.from({ length: 40 }, (_, at) =>

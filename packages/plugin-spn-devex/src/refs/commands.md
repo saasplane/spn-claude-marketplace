@@ -202,13 +202,15 @@ spn-devex workstream rows show <workstream>[/N<nnn>] [--ready] [--parallel] [--t
 
 spn-devex workstream sheet write <workstream>/<arc> --file <sheet.json> — write the arc's whole sheet from a file, every entry validated and every fact one the arc holds
 
-spn-devex workstream sheet edit <workstream>/<arc> <E> [--what …] [--op …] [--file …] [--decided-by …] [--facts …] [--then …] [--rules …] [--callers …] [--docs …] [--book …] [--tiers unit=ID,ID;contract=ID] [--trace "…"] [--judged|--mechanical] — change one entry of the sheet; a missing entry is refused, and `sheet write` is named
+spn-devex workstream sheet edit <workstream>/<arc> <E> [--what …] [--op …] [--file …] [--decided-by …] [--facts …] [--then …] [--rules …] [--callers …] [--docs …] [--book …] [--tiers unit=ID,ID;contract=ID] [--trace "…"] [--judged|--mechanical] [--kind change|step] [--command "…"] [--proof "…"] — change one entry of the sheet; a missing entry is refused, and `sheet write` is named
 
 spn-devex workstream sheet drop <workstream>/<arc> <E> --note "…" — take an entry out of the sheet; --note carries why into its one log line
 
 spn-devex workstream sheet show <workstream>/<arc> [--row <id>] [--part <part>] [--json] — print the sheet, or one row's or one go part's entries; --json prints every field
 
 spn-devex workstream sheet patch <workstream>/<arc> <E> [--trace "…"] [--judged|--mechanical] — keep an entry's change as a diff against the commit its facts pin, name it in the entry, and reset the file in the worktree; --trace and --judged/--mechanical are recorded with it
+
+spn-devex workstream sheet stack <workstream>/<arc> <E> — apply the arc's kept patches that stand ahead of an entry in the sheet's order, each in its repository's worktree, so the entry is written on top of them
 
 spn-devex workstream sheet reach <workstream>/<arc> <E> — print the blast radius of one entry: the entries, files and preview sections a change to it reaches
 
@@ -220,7 +222,7 @@ spn-devex workstream state check [<workstream>] [--facts] [--json] — whether e
 
 spn-devex workstream suggestion add <workstream>[/<arc>] "<title>" [--preview …] [--about CODE|FLOW|OTHER] [--file card.json] — raise a suggestion: the next number, raised; it also prints the decisions and rules that already speak to its title
 
-spn-devex workstream suggestion state <workstream> S<n> <state> [--words "…"] [--arc <arc>] — move it on: shaped, decided, parked or dropped, with the words beside the move
+spn-devex workstream suggestion state <workstream> S<n> <state> [--words "…"] [--arc <arc>] [--changes-work] — move it on: shaped, decided, parked or dropped, with the words beside the move
 
 spn-devex workstream suggestion edit <workstream> S<n> [--title …] [--preview …] — change its title or its preview, never its state
 

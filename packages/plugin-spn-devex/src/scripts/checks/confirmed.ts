@@ -178,9 +178,9 @@ export function worktreeWrite(root: string, path: string): WorktreeWrite | null 
  */
 export function workstreamNamingFile(root: string, session: string | undefined, write: WorktreeWrite): string | null {
   const own = new Set(windowWorkstreams(root, session));
-  const open = openWorkstreams(root).filter((folder) => !own.size || own.has(basename(folder)));
+  const mine = openWorkstreams(root).filter((folder) => !own.size || own.has(basename(folder)));
   const file = `${write.repo}:${write.rel}`;
-  return open.find((folder) => basename(folder) === write.workstream
+  return mine.find((folder) => basename(folder) === write.workstream
     && arcIdsOf(folder).some((arc) => (readSheet(folder, arc)?.entries ?? []).some((entry) => entry?.file === file))) ?? null;
 }
 

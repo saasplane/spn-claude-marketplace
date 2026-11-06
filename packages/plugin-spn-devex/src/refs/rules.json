@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "book": {
     "repository": "spn-foundation",
-    "commit": "0cadfc64"
+    "commit": "8894ed19"
   },
   "rules": [
     {
@@ -2276,6 +2276,19 @@
         "ref": "refs/devex/agent/agent.md",
         "heading": "A closing moment has one shape, one icon and one title size"
       }
+    },
+    {
+      "id": "RULE.DEVEX.AGENT.176",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-devex/ideate"
+      },
+      "class": "stated in a skill",
+      "sentence": "Ideation writes each change as a patch from the moment you ask for an arc or a preview to be prepared, and never while a shape is only discussed",
+      "chapter": "04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
+      "heading": "Every prompt is read before anything moves",
+      "decision": null,
+      "restated": []
     },
     {
       "id": "RULE.DEVEX.FUNCTION.007",
@@ -12410,6 +12423,82 @@
       ]
     },
     {
+      "id": "RULE.DEVEX.WORKSPACE.500",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-devex/ideate"
+      },
+      "class": "stated in a skill",
+      "sentence": "Patches begin at the ask, and `sheet stack` writes each one on top of those before it",
+      "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
+      "heading": "An arc keeps a change sheet, and only its commands write it",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/workstream.md",
+          "heading": "An arc keeps a change sheet, and only its commands write it"
+        }
+      ]
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.501",
+      "level": "MUST",
+      "params": {
+        "check": "pretooluse"
+      },
+      "class": "checked",
+      "sentence": "Ideation writes a patch only in the workstream's worktree, and only on a file an entry of the sheet names",
+      "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
+      "heading": "An arc keeps a change sheet, and only its commands write it",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/workstream.md",
+          "heading": "An arc keeps a change sheet, and only its commands write it"
+        }
+      ]
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.502",
+      "level": "MUST",
+      "params": {
+        "check": "split-plan"
+      },
+      "class": "checked",
+      "sentence": "An entry is a change or a step, and the go refuses one of either kind that is incomplete",
+      "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
+      "heading": "An arc keeps a change sheet, and only its commands write it",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/workstream.md",
+          "heading": "An arc keeps a change sheet, and only its commands write it"
+        }
+      ]
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.503",
+      "level": "MUST",
+      "params": {
+        "check": "orientation"
+      },
+      "class": "checked",
+      "sentence": "A suggestion parked with a mark that it changes how you work is shown once at the next window's start",
+      "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
+      "heading": "A suggestion is recorded the moment it is raised",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/workstream.md",
+          "heading": "After the go, every moment names the next step"
+        }
+      ]
+    },
+    {
       "id": "RULE.LAUNCHPAD.CONTROL_PLANE.001",
       "level": "MUST",
       "params": {
@@ -13679,7 +13768,7 @@
       "sentence": "A call reaches a record only by a kind its method declares, from the owning organization, and a kind outside the list does not exist",
       "chapter": "02-constructs/03-platform/01-core/04-data-and-trust.md",
       "heading": "Data reach",
-      "decision": null,
+      "decision": "DEC.PLATFORM.CORE.076",
       "restated": [
         {
           "plugin": "spn-apps",
@@ -13695,6 +13784,30 @@
           "plugin": "spn-devex",
           "path": "refs/devex/agent/lenses/trust.md",
           "heading": "Asks it owns"
+        }
+      ]
+    },
+    {
+      "id": "RULE.PLATFORM.CORE.077",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-apps/implement"
+      },
+      "class": "stated in a skill",
+      "sentence": "A limit is checked with `PlatformService.assertWithinLimit` or `PlatformService.assertValueWithinLimit`, and the module that owns it states how it is counted",
+      "chapter": "04-capabilities/03-platform/01-core/01-tenancy/03-people-access.md",
+      "heading": "Checking a limit",
+      "decision": "DEC.PLATFORM.CORE.077",
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "refs/platform/core/tenancy/README.md",
+          "heading": "Checking a limit"
+        },
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -14305,6 +14418,19 @@
           "heading": "The rules this step holds"
         }
       ]
+    },
+    {
+      "id": "RULE.PLATFORM.MODULES.033",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-apps/implement"
+      },
+      "class": "stated in a skill",
+      "sentence": "A sending module hands NTF its own group, its actions and their default emails, and NTF applies them; no module's migration writes NTF's tables.",
+      "chapter": "04-capabilities/03-platform/02-modules/03-notifications/01-notifications.md",
+      "heading": "The catalog is filled by the modules that send",
+      "decision": null,
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.APPS.001",
@@ -18840,25 +18966,6 @@
       ]
     },
     {
-      "id": "RULE.SUPPORT.APPS.255",
-      "level": "MUST",
-      "params": {
-        "skill": "spn-apps/implement"
-      },
-      "class": "stated in a skill",
-      "sentence": "A module holds a foreign key only to a table its owner publishes",
-      "chapter": "04-capabilities/02-support/02-apps/04-resources/01-server/02-database.md",
-      "heading": "SQL naming grammar",
-      "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
-        }
-      ]
-    },
-    {
       "id": "RULE.SUPPORT.APPS.256",
       "level": "MUST",
       "params": {
@@ -18874,30 +18981,6 @@
           "plugin": "spn-apps",
           "path": "skills/implement/SKILL.md",
           "heading": "The rules this step holds"
-        }
-      ]
-    },
-    {
-      "id": "RULE.SUPPORT.APPS.257",
-      "level": "MUST",
-      "params": {
-        "skill": "spn-apps/implement"
-      },
-      "class": "stated in a skill",
-      "sentence": "A limit is checked with `await assertWithinLimit(code, { adding })`",
-      "chapter": "04-capabilities/02-support/02-apps/10-providers/ts/06-service.md",
-      "heading": "What the session names",
-      "decision": "DEC.SUPPORT.APPS.257",
-      "restated": [
-        {
-          "plugin": "spn-apps",
-          "path": "providers/ts/skills/implement/steps/service.md",
-          "heading": "The rules this step holds"
-        },
-        {
-          "plugin": "spn-apps",
-          "path": "refs/support/apps/providers/ts/06-service.md",
-          "heading": "What the session names"
         }
       ]
     },

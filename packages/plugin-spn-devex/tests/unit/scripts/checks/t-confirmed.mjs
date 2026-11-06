@@ -120,7 +120,7 @@ one("[MKT.HOOKS.100] a go on an arc that names no repository does not cover the 
 // only where an entry of an arc of the window's workstreams names that file.
 const NAMED = sheet("N001", "spn-support-ts:src/probe.ts");
 const WORKTREE = `.worktrees/${OWN}/spn-support-ts/src/probe.ts`;
-one("[MKT.HOOKS.498] a worktree file an entry names is written before the go", { sheets: NAMED, path: WORKTREE }, "silent");
+one("[MKT.HOOKS.498] (RULE.DEVEX.WORKSPACE.501) a worktree file an entry names is written before the go", { sheets: NAMED, path: WORKTREE }, "silent");
 one("[MKT.HOOKS.498] a worktree file an entry of a sibling arc names is written before the go", { sibling: { status: "PROPOSED", lines: [opened] }, sheets: sheet("N002", "spn-support-ts:src/probe.ts"), path: WORKTREE }, "silent");
 one("[MKT.HOOKS.499] the same file in the main checkout is still refused", { sheets: NAMED, path: "spn-support-ts/src/probe.ts" }, "deny");
 one("[MKT.HOOKS.499] a worktree file no entry names is still refused", { sheets: NAMED, path: `.worktrees/${OWN}/spn-support-ts/src/other.ts` }, "deny");

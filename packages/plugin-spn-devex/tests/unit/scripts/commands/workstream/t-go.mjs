@@ -647,7 +647,7 @@ console.log("\n=== write: a change with no patch and a step with no command or p
   const withKinds = (one, two) => writeFileSync(sheetFile, JSON.stringify(sheetOf([entry("E1", "spn-x:src/k1.ts", one), entry("E2", "spn-x:src/k2.ts", two)]), null, 2));
   withKinds({ kind: "change" }, { kind: "step", command: "gen", proof: "matches" });
   const noPatch = cli(world.root, ["workstream", "go", "write", "N001"]);
-  ok("[MKT.SCRIPTS.532] a change with no patch is refused by name, and nothing is written",
+  ok("[MKT.SCRIPTS.532] (RULE.DEVEX.WORKSPACE.502) a change with no patch is refused by name, and nothing is written",
     noPatch.code === 1 && noPatch.out.includes("Refused") && noPatch.out.includes("E1 is a change with no patch") && noPatch.out.includes("Nothing was written") && !existsSync(join(world.ws, "arcs", "N001", "go.json")), noPatch.out);
   withKinds({ kind: "change", judged: true }, { kind: "step", command: "gen" });
   const judged = cli(world.root, ["workstream", "go", "write", "N001"]);
