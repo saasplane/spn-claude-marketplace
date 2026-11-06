@@ -5,10 +5,9 @@
 
 import { readdirSync, readFileSync } from "node:fs";
 import { join, relative } from "node:path";
-import { fileURLToPath } from "node:url";
 import { WORKSTREAM_STATES, decisionsRegister, docsOf, workstreamsDir } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import type { RuleEntry } from "../../../../plugin-support-lib/src/lib/rule-mark.ts";
-import { PLUGIN_OF, refRoots, type Places } from "./work-map.ts";
+import { PLUGIN_OF, refFile, refRoots, type Places } from "./work-map.ts";
 
 /** The kinds of precedent, in the order a lookup prints them. */
 export const KINDS = ["type", "export", "ref", "card", "decision", "rule"] as const;
@@ -206,7 +205,7 @@ export function candidatesAt(root: string | null, options: { all?: boolean; code
     try { out.push(...decisionsIn(readFileSync(register, "utf8"), `${repo}/${relative(join(root!, repo), register)}`)); } catch { /* a repository with no register */ }
   }
   try {
-    const index = JSON.parse(readFileSync(fileURLToPath(new URL("../../refs/rules.json", import.meta.url)), "utf8")) as { rules?: RuleEntry[] };
+    const index = JSON.parse(readFileSync(refFile("rules.json"), "utf8")) as { rules?: RuleEntry[] };
     out.push(...rulesIn(index.rules ?? []));
   } catch { /* the index is written by the build; without it only the registers speak */ }
   if (options.all) out.push(...refStatements(root, options.places), ...answeredCards(root), ...contractNames(root, options.code === true));

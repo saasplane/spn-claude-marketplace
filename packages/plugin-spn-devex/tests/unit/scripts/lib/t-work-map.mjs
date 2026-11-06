@@ -88,5 +88,15 @@ console.log("\n=== the shipped map names a skill and references that exist");
   ok("[MKT.REFS.09] every mark is a skill, write, layer or command mark", rows.every((row) => row.seenWhen.every((mark) => /^(skill|write|layer|command):\S/.test(mark))));
 }
 
+// The shipped bundle sits at another depth than the source, so the map is read through the built command too.
+{
+  const { spawnSync } = await import("node:child_process");
+  const { resolve: at } = await import("node:path");
+  const bundle = at(import.meta.dirname, "../../../../src/dist/commands/precedent/map.mjs");
+  const cli = at(import.meta.dirname, "../../../../src/dist/cli.mjs");
+  const out = spawnSync(process.execPath, [cli, "precedent", "map"], { encoding: "utf8" });
+  ok("[MKT.REFS.09] the built command reads the map from the bundle", /server-contract/.test(out.stdout), `${bundle} printed: ${out.stdout}${out.stderr}`.slice(0, 200));
+}
+
 console.log(failed ? `\n  ${failed} of ${total} FAILED — work map` : `\n  all ${total} passed — work map`);
 process.exit(failed ? 1 : 0);
