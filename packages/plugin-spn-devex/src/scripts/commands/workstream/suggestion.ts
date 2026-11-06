@@ -6,11 +6,11 @@
 // Input takes either case (`q28`, `Q28`, `036/Q28`); a stored id stays lowercase and everything printed or logged names the card with the capital.
 //
 //   spn-devex workstream suggestion add <workstream>[/<arc>] "<title>" [--preview …]        raise the next one, against the arc it names
-//   spn-devex workstream suggestion state <workstream> S<n> <state> [--words "…"] [--arc <arc>]   move it on; shaped or decided with --arc sets or moves its arc
+//   spn-devex workstream suggestion state <workstream> S<n> <state> [--words "…"] [--arc <arc>] [--changes-work]   move it on; shaped or decided with --arc sets or moves its arc; parked with --changes-work marks that it changes how you work
 //   spn-devex workstream suggestion edit <workstream> S<n> [--title …] [--preview …]         change its title or its preview
 
 import { basename } from "node:path";
-import { type Action, VALUE, UsageFault, readWords } from "../../../../../plugin-support-lib/src/lib/command.ts";
+import { type Action, FLAG, VALUE, UsageFault, readWords } from "../../../../../plugin-support-lib/src/lib/command.ts";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { PANELS_BLIND, raiseFaults, runningWorkFault } from "../../checks/questions.ts";
@@ -119,7 +119,7 @@ function add(args: string[]): number {
 
 function state(args: string[]): number {
   refuseFlags(args, ["title", "preview"], (name) => `does not take \`--${name}\`: it is the suggestion's own — \`suggestion edit <workstream> S<n> --${name} …\` changes it.`);
-  const words = readWords(args, { words: VALUE, arc: VALUE });
+  const words = readWords(args, { words: VALUE, arc: VALUE, "changes-work": FLAG });
   const [ref, id, to, ...more] = words.paths;
   if (!id || !to || more.length) throw new UsageFault(`takes a workstream, a suggestion and a state: \`suggestion state <workstream> S<n> <${MOVES.join(" · ")}> [--words "…"]\`.`);
   if (!(MOVES as readonly string[]).includes(to)) throw new UsageFault(`reads \`${to}\` as no state to move to — one of ${MOVES.join(" · ")}. (A suggestion is raised by \`suggestion add\`.)`);
@@ -132,6 +132,11 @@ function state(args: string[]): number {
     const named = arcNamed(`${basename(placeOf(ref).ws)}/${arc}`);
     if (!readArc(named.ws, named.arc)) throw new UsageFault(`finds no arc ${arc} in ${basename(named.ws)}.`);
     record.arc = named.arc;
+  }
+  // PARKING TAKES THE MARK (035 Q34): `--changes-work` says the suggestion changes how the developer works, and the next window's start shows it until it is decided or dropped.
+  if (words.given("changes-work")) {
+    if (to !== "parked") throw new UsageFault(`takes \`--changes-work\` only with \`parked\`: ${cardName(record.id)} moves to ${to}, and the mark is what a parked suggestion carries to the next window's start.`);
+    record.changesWork = true;
   }
   record.state = to as Suggestion["state"];
   const said = words.value("words");
@@ -177,7 +182,7 @@ function write(args: string[]): number {
 
 export const actions: Record<string, Action> = {
   add: { describe: "raise a suggestion: the next number, raised; it also prints the decisions and rules that already speak to its title", usage: "<workstream>[/<arc>] \"<title>\" [--preview …] [--about CODE|FLOW|OTHER] [--file card.json]", run: add },
-  state: { describe: "move it on: shaped, decided, parked or dropped, with the words beside the move", usage: "<workstream> S<n> <state> [--words \"…\"] [--arc <arc>]", run: state },
+  state: { describe: "move it on: shaped, decided, parked or dropped, with the words beside the move", usage: "<workstream> S<n> <state> [--words \"…\"] [--arc <arc>] [--changes-work]", run: state },
   edit: { describe: "change its title or its preview, never its state", usage: "<workstream> S<n> [--title …] [--preview …]", run: edit },
   write: { describe: "retired: refuses, and names the command that fits what it was typed with", usage: "<workstream> [S<n>] …", hidden: true, run: write },
 };

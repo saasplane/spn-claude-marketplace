@@ -123,7 +123,7 @@ export function nameFindings(ws: string, arc: string, data: ArcData): string[] {
   for (const other of markdown.filter((one) => one !== name))
     out.push(`\`arcs/${arc}/${other}\` is a second Markdown file — an arc's data folder holds one, \`${name}\`, which the commands write`);
   for (const entry of listdir(arcDataDir(ws, arc)).filter((one) => !one.endsWith(".md") && !DATA_FILES.includes(one) && !one.startsWith(".")))
-    out.push(`\`arcs/${arc}/${entry}\` is not the arc's data — \`arcs/${arc}/\` holds \`state.json\`, \`log.jsonl\`, \`facts.jsonl\`, \`sheet.json\` and \`${name}\``);
+    out.push(`\`arcs/${arc}/${entry}\` is not the arc's data — \`arcs/${arc}/\` holds \`state.json\`, \`log.jsonl\`, \`facts.jsonl\`, \`sheet.json\`, \`patches/\` and \`${name}\``);
   let current: string | null = null;
   try { current = readFileSync(nameFileOf(ws, arc, data.subject), "utf8"); } catch { /* absent */ }
   if (current === null) out.push(`${arc} has no name file \`arcs/${arc}/${name}\` — \`spn-devex docs cycles write\` writes it`);
