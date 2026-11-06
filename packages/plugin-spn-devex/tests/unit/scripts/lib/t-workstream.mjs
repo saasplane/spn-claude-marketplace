@@ -647,7 +647,10 @@ console.log("\n=== the ideate and follow-up arcs — MKT.SCRIPTS.484, .486, .488
   const html = lib.previewFromEntries(three, (one) => (one.id === "E2" ? "+let x = 1 < 2;" : "+never read"));
   const at = ["r:a.ts", "r:b.ts", "r:c.ts"].map((name) => html.indexOf(`<code>${name}</code>`));
   ok("[MKT.SCRIPTS.496] a preview drawn from three entries holds the outline in connection order", html.startsWith("<ol>") && at[0] >= 0 && at[0] < at[1] && at[1] < at[2] && html.includes("first &lt;one&gt;"), html);
-  ok("[MKT.SCRIPTS.496] and a code block only for the judged one", html.split("<pre><code>").length === 2 && html.includes("+let x = 1 &lt; 2;") && !html.includes("never read"), html);
+  ok("[MKT.SCRIPTS.535] and a code block for each patch that reads, judged or not", html.split("<pre data-entry=").length === 4 && html.includes("+let x = 1 &lt; 2;") && html.includes("+never read"), html);
+  ok("[MKT.SCRIPTS.535] each block names its entry, so the sheet check can compare it with its patch", html.includes('<pre data-entry="E2"><code>+let x = 1 &lt; 2;</code></pre>') && html.includes('<pre data-entry="E1">'), html);
+  const noPatch = lib.previewFromEntries(three, (one) => (one.id === "E3" ? null : "+shown"));
+  ok("[MKT.SCRIPTS.535] an entry whose patch does not read draws no block", noPatch.split("<pre data-entry=").length === 3, noPatch);
   ok("[MKT.SCRIPTS.505] scripts/commands/docs/x.ts plans as CODE", schema.entryWork({ file: "r:packages/plugin-spn-devex/src/scripts/commands/docs/x.ts", work: null }) === "CODE", String(schema.entryWork({ file: "r:packages/plugin-spn-devex/src/scripts/commands/docs/x.ts", work: null })));
 }
 

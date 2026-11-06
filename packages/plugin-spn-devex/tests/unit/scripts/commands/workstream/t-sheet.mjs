@@ -3,6 +3,7 @@
 // the commands, in a throwaway workspace.
 import { createHash } from "node:crypto";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { execFileSync } from "node:child_process";
 import { join } from "node:path";
 import { CARD, cli, dataWorkspace, writeRoleArcs } from "../../../../helpers/workstream-fixture.mjs";
 
@@ -32,6 +33,14 @@ const sheetOf = (entries, over = {}) => ({
 });
 const put = (name, value) => { const path = join(root, name); writeFileSync(path, JSON.stringify(value, null, 2)); return path; };
 const sheet = (...args) => cli(root, ["workstream", "sheet", ...args]);
+// the arc's worktree of spn-x, where the workstream's changes are made: `.worktrees/<workstream>/<repo>`
+const worktreeOf = (w) => {
+  const dir = join(w.root, ".worktrees", "031-probe", "spn-x");
+  mkdirSync(join(w.root, ".worktrees", "031-probe"), { recursive: true });
+  execFileSync("git", ["-C", w.repo, "worktree", "add", "-q", "-b", "feat/031-probe", dir], { stdio: "ignore" });
+  return dir;
+};
+const gitAt = (dir, ...args) => execFileSync("git", ["-C", dir, ...args], { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] });
 
 // the arc has one fact, f1
 console.log("=== help lists the five commands");
@@ -452,12 +461,19 @@ console.log("\n=== patch: an entry's change kept as a diff (MKT.SCRIPTS.449)");
   ok("[MKT.SCRIPTS.449] a file with no change is refused, nothing written", nothing.code === 1 && nothing.out.includes("Nothing was written") && !existsSync(join(kept.ws, "arcs", "N001", "patches", "E1.diff")), nothing.out);
   const gone = run("patch", "N001", "E9");
   ok("[MKT.SCRIPTS.449] an entry the sheet does not hold is refused", gone.code !== 0 && gone.out.includes("E9"), gone.out);
-  writeFileSync(join(kept.repo, "a.ts"), "export const a = 2;\n");
+  const nowhere = run("patch", "N001", "E1");
+  ok("[MKT.SCRIPTS.536] an arc with no worktree is refused, and the main checkout is never read", nowhere.code === 1 && nowhere.out.includes("worktree") && nowhere.out.includes("Nothing was written"), nowhere.out);
+  const tree = worktreeOf(kept);
+  writeFileSync(join(kept.repo, "a.ts"), "export const a = 9;\n");
+  const fromMain = run("patch", "N001", "E1");
+  ok("[MKT.SCRIPTS.536] a change in the main checkout alone is no patch", fromMain.code === 1 && !existsSync(join(kept.ws, "arcs", "N001", "patches", "E1.diff")), fromMain.out);
+  gitAt(kept.repo, "checkout", "-q", "--", "a.ts");
+  writeFileSync(join(tree, "a.ts"), "export const a = 2;\n");
   const done = run("patch", "N001", "E1");
   const diffFile = join(kept.ws, "arcs", "N001", "patches", "E1.diff");
   ok("[MKT.SCRIPTS.449] patch writes patches/E1.diff, the diff against the pinned commit", done.code === 0 && existsSync(diffFile) && readFileSync(diffFile, "utf8").includes("+export const a = 2;"), done.out);
   ok("[MKT.SCRIPTS.449] the entry names its patch and its base", JSON.stringify(json(sheetPath).entries[0].patch) === JSON.stringify({ file: "patches/E1.diff", base: pinned }), JSON.stringify(json(sheetPath).entries[0]));
-  ok("[MKT.SCRIPTS.449] the file is reset in the checkout", readFileSync(join(kept.repo, "a.ts"), "utf8") === "export const a = 1;\n");
+  ok("[MKT.SCRIPTS.449] the file is reset in the worktree", readFileSync(join(tree, "a.ts"), "utf8") === "export const a = 1;\n");
   ok("[MKT.SCRIPTS.449] one log line says so", lines(join(kept.ws, "arcs", "N001", "log.jsonl")).at(-1).note.includes("E1 patched"));
 }
 
@@ -566,6 +582,121 @@ console.log("\n=== generated copies as missingCopies reads them today (MKT.SCRIP
   writeFileSync(join(root, base, "bar.md"), `<!-- spn:restates\n{ "docs": [ { "path": "spn-foundation/${book}", "seen": "${stamp}" } ] }\n-->\n# Bar\n`);
   const current = sheet("write", "N001", "--file", put("c-d.json", sheetOf([bookEntry])), "--because", "the developer: a book change");
   ok("[MKT.SCRIPTS.506] a copy whose stamp reads current is not asked for", current.code === 0 && !current.out.includes("bar.md"), current.out);
+}
+
+console.log("\n=== a created file and a rename are kept (MKT.SCRIPTS.536, .537)");
+{
+  const w = await dataWorkspace("sheet-created");
+  const run = (...args) => cli(w.root, ["workstream", "sheet", ...args]);
+  writeFileSync(join(w.repo, "d.ts"), "export const one = 1;\nexport const two = 2;\nexport const three = 3;\nexport const four = 4;\n");
+  w.git(["add", "-A"]);
+  w.git(["-c", "user.email=t@t", "-c", "user.name=t", "commit", "-q", "-m", "d"]);
+  const tree = worktreeOf(w);
+  cli(w.root, ["workstream", "fact", "write", "N001", "--source", "spn-x/a.ts", "--fact", "a is 1", "--used-by", "1"]);
+  const sheetPath = join(w.ws, "arcs", "N001", "sheet.json");
+  writeFileSync(sheetPath, JSON.stringify(sheetOf([entry("E1", { op: "create", file: "spn-x:b.ts" }), entry("E2", { op: "rename", file: "spn-x:e.ts" })]), null, 2));
+  writeFileSync(join(tree, "b.ts"), "export const b = 1;\n");
+  const made = run("patch", "N001", "E1");
+  const diffOne = join(w.ws, "arcs", "N001", "patches", "E1.diff");
+  ok("[MKT.SCRIPTS.536] a created file is patched, and the diff holds the whole new file", made.code === 0 && existsSync(diffOne) && readFileSync(diffOne, "utf8").includes("new file mode") && readFileSync(diffOne, "utf8").includes("+export const b = 1;"), made.out);
+  ok("[MKT.SCRIPTS.536] the reset removes the created file", !existsSync(join(tree, "b.ts")) && gitAt(tree, "status", "--porcelain").trim() === "", gitAt(tree, "status", "--porcelain"));
+  gitAt(tree, "mv", "d.ts", "e.ts");
+  writeFileSync(join(tree, "e.ts"), "export const one = 1;\nexport const two = 2;\nexport const three = 3;\nexport const four = 4;\nexport const more = 5;\n");
+  const moved = run("patch", "N001", "E2");
+  const diffTwo = join(w.ws, "arcs", "N001", "patches", "E2.diff");
+  const text = existsSync(diffTwo) ? readFileSync(diffTwo, "utf8") : "";
+  ok("[MKT.SCRIPTS.537] a rename that changes a shape is patched as one rename over both paths", moved.code === 0 && text.includes("rename from d.ts") && text.includes("rename to e.ts") && text.includes("+export const more = 5;"), moved.out + text);
+  ok("[MKT.SCRIPTS.537] the reset puts the old path back and removes the new one", existsSync(join(tree, "d.ts")) && !existsSync(join(tree, "e.ts")) && gitAt(tree, "status", "--porcelain").trim() === "", gitAt(tree, "status", "--porcelain"));
+}
+
+console.log("\n=== stack: the kept patches ahead of an entry, in the sheet's order (MKT.SCRIPTS.534)");
+{
+  const w = await dataWorkspace("sheet-stack");
+  const run = (...args) => cli(w.root, ["workstream", "sheet", ...args]);
+  const tree = worktreeOf(w);
+  cli(w.root, ["workstream", "fact", "write", "N001", "--source", "spn-x/a.ts", "--fact", "a is 1", "--used-by", "1"]);
+  const sheetPath = join(w.ws, "arcs", "N001", "sheet.json");
+  writeFileSync(sheetPath, JSON.stringify(sheetOf([entry("E1", { file: "spn-x:a.ts" }), entry("E2", { op: "create", file: "spn-x:b.ts" }), entry("E3", { file: "spn-x:a.ts" })]), null, 2));
+  writeFileSync(join(tree, "a.ts"), "export const a = 2;\n");
+  run("patch", "N001", "E1");
+  writeFileSync(join(tree, "b.ts"), "export const b = 1;\n");
+  run("patch", "N001", "E2");
+  const none = run("stack", "N001", "E1");
+  ok("[MKT.SCRIPTS.534] the first entry has nothing ahead of it", none.code === 0 && none.out.includes("0 patches") && readFileSync(join(tree, "a.ts"), "utf8") === "export const a = 1;\n", none.out);
+  const stacked = run("stack", "N001", "E3");
+  ok("[MKT.SCRIPTS.534] the patches ahead of E3 are applied in the worktree, the created file included", stacked.code === 0 && stacked.out.includes("2 patches") && readFileSync(join(tree, "a.ts"), "utf8") === "export const a = 2;\n" && readFileSync(join(tree, "b.ts"), "utf8") === "export const b = 1;\n", stacked.out);
+  const again = run("stack", "N001", "E3");
+  ok("[MKT.SCRIPTS.534] a second stack applies nothing twice", again.code === 0 && again.out.includes("0 patches") && readFileSync(join(tree, "a.ts"), "utf8") === "export const a = 2;\n", again.out);
+  const unknown = run("stack", "N001", "E9");
+  ok("[MKT.SCRIPTS.534] an entry the sheet does not hold is refused", unknown.code !== 0 && unknown.out.includes("E9"), unknown.out);
+  const bare = await dataWorkspace("sheet-stack-bare");
+  writeFileSync(join(bare.ws, "arcs", "N001", "sheet.json"), JSON.stringify(sheetOf([entry("E1", { file: "spn-x:a.ts", patch: { file: "patches/E1.diff", base: "abcdef1" } }), entry("E2", { file: "spn-x:a.ts" })]), null, 2));
+  const refused = cli(bare.root, ["workstream", "sheet", "stack", "N001", "E2"]);
+  ok("[MKT.SCRIPTS.534] an arc with no worktree is refused", refused.code === 1 && refused.out.includes("worktree"), refused.out);
+}
+
+console.log("\n=== kinds: a change or a step (MKT.SCRIPTS.531, .533)");
+{
+  const w = await dataWorkspace("sheet-kinds");
+  cli(w.root, ["workstream", "fact", "write", "N001", "--source", "spn-x/a.ts", "--fact", "a is 1", "--used-by", "1"]);
+  const sheetPath = join(w.ws, "arcs", "N001", "sheet.json");
+  const check = (entries) => { writeFileSync(sheetPath, JSON.stringify(sheetOf(entries), null, 2)); return cli(w.root, ["workstream", "sheet", "check", "N001"]); };
+  const server = "spn-x:packages/mod/src/app/services/Thing.ts";
+  const patched = { patch: { file: "patches/E1.diff", base: "abcdef1" } };
+  const old = check([entry("E1", { file: server }), entry("E2", { file: "spn-x:docs/a.md" })]);
+  ok("[MKT.SCRIPTS.531] a sheet with no kind reads as before: no patch is no finding", !old.out.includes("has no patch") && !old.out.includes("warning"), old.out);
+  const change = check([entry("E1", { file: server, kind: "change" })]);
+  ok("[MKT.SCRIPTS.531] a hand-written change with no patch is a finding that names the command", change.out.includes("E1 is a change and has no patch: `sheet patch N001 E1` keeps it") && !change.out.includes("warning ·"), change.out);
+  const docs = check([entry("E1", { file: "spn-x:docs/a.md", kind: "change" })]);
+  ok("[MKT.SCRIPTS.531] a book or docs change is held to the same", docs.out.includes("E1 is a change and has no patch") && !docs.out.includes("warning ·"), docs.out);
+  const kept = check([entry("E1", { file: server, kind: "change", ...patched })]);
+  ok("[MKT.SCRIPTS.531] a change with a patch is no finding", !kept.out.includes("E1 is a change"), kept.out);
+  for (const file of ["spn-x:packages/mod-web/src/Page.tsx", "spn-x:packages/mod/tests/unit/t-thing.mjs", "spn-x:apps/web/src/a.ts"]) {
+    const warned = check([entry("E1", { file, kind: "change" })]);
+    ok(`[MKT.SCRIPTS.531] ${file.split(":")[1]} with no patch is a warning, never a finding`, warned.out.includes("warning · E1 is a change and has no patch") && !warned.out.split("\n").some((line) => line.startsWith("E1 is a change")), warned.out);
+  }
+  const bareStep = check([entry("E1", { file: server, kind: "step" })]);
+  ok("[MKT.SCRIPTS.531] a step with no command and no proof is a finding", bareStep.out.includes("E1 is a step and has no command or no proof"), bareStep.out);
+  const noProof = check([entry("E1", { file: server, kind: "step", command: "spnutils apps codegen" })]);
+  ok("[MKT.SCRIPTS.531] a step with a command and no proof is a finding", noProof.out.includes("E1 is a step and has no command or no proof"), noProof.out);
+  const wholeStep = check([entry("E1", { file: server, kind: "step", command: "spnutils apps codegen", proof: "the client file now matches" })]);
+  ok("[MKT.SCRIPTS.531] a step with a command and a proof is whole", !wholeStep.out.includes("E1 is a step"), wholeStep.out);
+  const generated = "spn-x:packages/mod/src/generated/client.ts";
+  const asChange = check([entry("E1", { file: generated, kind: "change" })]);
+  ok("[MKT.SCRIPTS.533] a generated file as a change is a finding that says to run its generator as a step", asChange.out.includes("E1 is a generated file") && asChange.out.includes("step"), asChange.out);
+  const asStep = check([entry("E1", { file: generated, kind: "step", command: "spnutils apps codegen", proof: "the client file now matches" })]);
+  ok("[MKT.SCRIPTS.533] a generated file as a step needs no patch", !asStep.out.includes("E1 is a"), asStep.out);
+  const judgedOnly = check([entry("E1", { file: server, kind: "change", judged: true })]);
+  ok("[MKT.SCRIPTS.531] a judged change with no patch is named once", judgedOnly.out.split("\n").filter((line) => line.startsWith("E1 is ") && line.includes("no patch")).length === 1, judgedOnly.out);
+  const edited = cli(w.root, ["workstream", "sheet", "edit", "N001", "E1", "--kind", "step", "--command", "spnutils apps codegen", "--proof", "the client matches"]);
+  const back = JSON.parse(readFileSync(sheetPath, "utf8")).entries[0];
+  ok("[MKT.SCRIPTS.531] edit records the kind, the command and the proof", edited.code === 0 && back.kind === "step" && back.command === "spnutils apps codegen" && back.proof === "the client matches", edited.out);
+  const badKind = cli(w.root, ["workstream", "sheet", "edit", "N001", "E1", "--kind", "idea"]);
+  ok("[MKT.SCRIPTS.531] a kind other than change or step is refused", badKind.code !== 0 && badKind.out.includes("idea"), badKind.out);
+}
+
+console.log("\n=== a shown block that differs from its patch (MKT.SCRIPTS.535)");
+{
+  const w = await dataWorkspace("sheet-block");
+  const sheetPath = join(w.ws, "arcs", "N001", "sheet.json");
+  const dir = join(w.ws, "arcs", "N001", "patches");
+  mkdirSync(dir, { recursive: true });
+  writeFileSync(join(dir, "E1.diff"), "-const a = 1;\n+const a = 2 < 3;\n");
+  writeFileSync(sheetPath, JSON.stringify(sheetOf([entry("E1", { file: "spn-x:a.ts", judged: true, patch: { file: "patches/E1.diff", base: "abcdef1" } })]), null, 2));
+  const previewPath = join(w.ws, "notes", "N001", "preview.html");
+  const page = (body) => `<html><body>${body}</body></html>`;
+  const check = () => cli(w.root, ["workstream", "sheet", "check", "N001"]);
+  writeFileSync(previewPath, page('<pre data-entry="E1">-const a = 1;\n+const a = 2 &lt; 3;</pre>'));
+  ok("[MKT.SCRIPTS.535] a block that is its patch is no finding", !check().out.includes("differs"), check().out);
+  writeFileSync(previewPath, page('<pre data-entry="E1"><code>-const a = 1;\n+const a = 2 &lt; 3;\n</code></pre>'));
+  ok("[MKT.SCRIPTS.535] the outline's own block, inside code, is its patch too", !check().out.includes("differs"), check().out);
+  writeFileSync(previewPath, page('<pre data-entry="E1">-const a = 1;\n+const a = 3;</pre>'));
+  const differs = check();
+  ok("[MKT.SCRIPTS.535] a block typed off its patch is a finding that names both", differs.code === 1 && differs.out.includes("the preview's block for E1 differs from patches/E1.diff"), differs.out);
+  writeFileSync(previewPath, page("<pre>no entry named here</pre>"));
+  ok("[MKT.SCRIPTS.535] a block that names no entry is never compared", !check().out.includes("differs"), check().out);
+  writeFileSync(previewPath, page('<pre data-entry="E1">-const a = 1;\n+const a = 2 &lt; 3;</pre><pre data-entry="E9">y</pre>'));
+  ok("[MKT.SCRIPTS.535] a block for an entry with no patch is not compared", !check().out.includes("block for E9"), check().out);
 }
 
 console.log(failed ? `\n  ${failed} of ${total} FAILED — sheet` : `\n  all ${total} passed — sheet`);

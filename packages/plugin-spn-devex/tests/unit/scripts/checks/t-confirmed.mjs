@@ -42,8 +42,15 @@ function arc(folder, status, lines, { id = "N001", repos } = {}) {
   };
 }
 
-function build(name, { status, lines, repos, other, sibling }) {
+/** An arc's change sheet, naming the files its entries change as `repo:path`. */
+const sheet = (id, ...files) => ({
+  [`.spndevex/${WORKSTREAMS}/open/${OWN}/arcs/${id}/sheet.json`]: `${JSON.stringify({ schemaVersion: 1, releaseChain: [], dependsOn: [], stack: null,
+    entries: files.map((file, at) => ({ id: `E${at + 1}`, op: "edit", file, what: "x", decidedBy: [], facts: [], then: [], rules: [], callers: [], tiers: {}, docs: [], book: [] })) }, null, 2)}\n`,
+});
+
+function build(name, { status, lines, repos, other, sibling, sheets }) {
   return workspace(name, {
+    ...(sheets ?? {}),
     ...arc(OWN, status, lines, { repos }),
     ...(sibling ? arc(OWN, sibling.status, sibling.lines, { id: "N002", repos: sibling.repos }) : {}),
     ...(other ? arc(OTHER, other.status, other.lines) : {}),
@@ -73,9 +80,9 @@ const RETIRED_LINE = "— go.**";
 const asksForTheCommand = (text) => text.includes(RECORDS_A_GO) && !text.includes(RETIRED_LINE);
 
 let n = 0, failed = 0;
-function one(label, { status = "PROPOSED", lines = [opened], repos, sibling, other, own, path = "spn-support-ts/src/probe.ts", tool = "Write", names }, expect) {
+function one(label, { status = "PROPOSED", lines = [opened], repos, sibling, other, own, sheets, path = "spn-support-ts/src/probe.ts", tool = "Write", names }, expect) {
   n += 1;
-  const root = build(`confirmed-${n}`, { status, lines, repos, sibling, other });
+  const root = build(`confirmed-${n}`, { status, lines, repos, sibling, other, sheets });
   const session = `s${n}`;
   // A window that works on one workstream is bound to it, as a prompt naming it binds it (RULE.DEVEX.WORKSPACE.236).
   if (own) bindNamed(root, session, own, "prompt");
@@ -109,6 +116,16 @@ one("[MKT.HOOKS.100] a go on the arc for another repository licenses nothing her
 one("[MKT.HOOKS.100] a go on an arc that names no repository does not cover the arc that names this one",
   { status: "PROPOSED", lines: [opened], repos: ["spn-support-ts"],
     sibling: { status: "RUNNING", lines: [opened, go, runs] }, names: `${OWN}/N001` }, "deny");
+// THE WORKTREE. A write under `.worktrees/<workstream>/<repo>/` is read as the repository and the file, and passes before a go
+// only where an entry of an arc of the window's workstreams names that file.
+const NAMED = sheet("N001", "spn-support-ts:src/probe.ts");
+const WORKTREE = `.worktrees/${OWN}/spn-support-ts/src/probe.ts`;
+one("[MKT.HOOKS.498] a worktree file an entry names is written before the go", { sheets: NAMED, path: WORKTREE }, "silent");
+one("[MKT.HOOKS.498] a worktree file an entry of a sibling arc names is written before the go", { sibling: { status: "PROPOSED", lines: [opened] }, sheets: sheet("N002", "spn-support-ts:src/probe.ts"), path: WORKTREE }, "silent");
+one("[MKT.HOOKS.499] the same file in the main checkout is still refused", { sheets: NAMED, path: "spn-support-ts/src/probe.ts" }, "deny");
+one("[MKT.HOOKS.499] a worktree file no entry names is still refused", { sheets: NAMED, path: `.worktrees/${OWN}/spn-support-ts/src/other.ts` }, "deny");
+one("[MKT.HOOKS.499] a worktree file of another repository than the entry's is still refused", { sheets: NAMED, path: `.worktrees/${OWN}/spn-platform-ts/src/probe.ts` }, "deny");
+one("[MKT.HOOKS.499] a worktree of another workstream than the sheet's is still refused", { sheets: NAMED, path: `.worktrees/${OTHER}/spn-support-ts/src/probe.ts` }, "deny");
 // UNTOUCHED — the go that covers the write is there.
 one("a DECIDED arc whose log holds the go with the developer's words", { status: "DECIDED", lines: [opened, go] }, "silent");
 one("a RUNNING arc, decided with words and then started", { status: "RUNNING", lines: [opened, go, runs] }, "silent");
