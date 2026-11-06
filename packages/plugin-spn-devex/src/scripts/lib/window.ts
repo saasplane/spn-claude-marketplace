@@ -278,6 +278,15 @@ export function noteWelcome(root: string, session: string | undefined, form: Wel
   save(root, session, note);
 }
 
+/** Clears what the window was told, so a note said before a compaction or a resume is said again. Never throws. */
+export function clearTold(root: string, session: string | undefined): void {
+  if (!windowFile(root, session)) return;
+  const note = readWindow(root, session);
+  if (!Object.keys(note.told).length) return;
+  note.told = {};
+  save(root, session, note);
+}
+
 /**
  * Record a workstream a handover's `also open:` names as one this window only visits. A workstream
  * the window already holds keeps its tie, so an owned one is never turned into a visit.

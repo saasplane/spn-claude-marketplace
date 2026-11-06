@@ -72,7 +72,7 @@ export const PLUGIN_SUBJECTS: Record<string, Record<string, string[]>> = {
     plugin: ["migration", "partner", "paths"],
     report: ["refresh"],
     restates: ["decisions", "docs", "files"],
-    workstream: ["arc", "fact", "go", "progress", "question", "report", "row", "rows", "sheet", "state", "suggestion", "work"],
+    workstream: ["arc", "correction", "decision", "fact", "finding", "go", "progress", "question", "report", "row", "rows", "sheet", "state", "suggestion", "work"],
   },
   "spn-surface": {},
   "spn-apps": { library: ["catalogue"] },

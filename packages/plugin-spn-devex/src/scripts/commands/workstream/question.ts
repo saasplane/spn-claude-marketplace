@@ -30,6 +30,7 @@ import { isFile } from "../../lib/payload.ts";
 import { PANELS_BLIND, raiseFaults, runningWorkFault } from "../../checks/questions.ts";
 import { panelsVisible } from "../../checks/split-plan.ts";
 import { QUESTION_ID, RECORD_VERSION, cardFaults, cardId, cardName, type Card, type Question } from "../../lib/workstream-schema.ts";
+import { precedentLines } from "../../lib/precedent.ts";
 import { afterWrite, arcNamed, arcSignatures, listOf, refreshIfMoved, typed } from "./_shared.ts";
 import { actions as goActions } from "./go.ts";
 
@@ -85,7 +86,10 @@ function raise(args: string[]): number {
   if (!CITATION.test(card.what ?? "")) throw new UsageFault(UNCITED);
   // A CARD RAISED NOW CARRIES THE FIELDS OF RULES 491 AND 492; a record read never needs them.
   const root = workspaceOf();
+  // THE LOOKUP RUNS HERE, so what is already answered is the command's finding and never a line the agent types.
+  const found = precedentLines(root, [card.title, card.what].filter(Boolean).join(" "), 5, true);
   const raised = raiseFaults(ws, arc, card, root);
+  if (raised.faults.length) for (const line of found) console.log(line);
   if (raised.faults.length) throw new UsageFault(`refuses a card that leaves out what a proposal starts from: ${raised.faults.join("; ")}.`);
   card.signs = raised.signs;
   if (root && !panelsVisible(root) && card.views.some((view) => view.made === "FRESH")) console.log(PANELS_BLIND);
@@ -100,7 +104,8 @@ function raise(args: string[]): number {
   const raiser = (process.env.CLAUDE_CODE_SESSION_ID ?? "").trim();
   const record: Question = { v: RECORD_VERSION, id, arc, title: title!, state: "open", raised: now(), ...(raiser ? { raisedBy: raiser } : {}), shownIn: [],
     card: { why: rest.why, what: rest.what, viewsLead: rest.viewsLead, views: rest.views, options: rest.options, recommended: rest.recommended,
-      nearest: rest.nearest, signs: rest.signs, others: rest.others, ...(rest.noLeaveIt ? { noLeaveIt: rest.noLeaveIt } : {}) }, answer: null };
+      nearest: rest.nearest, signs: rest.signs, others: rest.others, ...(rest.noLeaveIt ? { noLeaveIt: rest.noLeaveIt } : {}),
+      ...(rest.about ? { about: rest.about } : {}), ...(rest.preview ? { preview: rest.preview } : {}), ...(rest.settled ? { settled: rest.settled } : {}) }, answer: null };
   records.push(record);
   const lines = finish(ws, records);
   if (readArc(ws, arc)) logEvent(ws, arc, "question", null, `${cardName(id)} raised · ${title}`);
@@ -128,6 +133,8 @@ export function briefOf(workstream: string, record: Question): string {
     "",
     `The nearest existing construct: ${card.nearest ?? "none named"}`,
     `Signs of complexity: ${signs}`,
+    "",
+    "Answer first, before anything else: is the premise true, and what would make the question unnecessary? Say where you checked in the code or the book.",
     "",
     "Say from your lens and the construct above what you would build and where it would live. Write your whole words, then keep them in " +
       `${workstream}/notes/${record.arc}/work/.`,
@@ -264,7 +271,7 @@ function settle(args: string[], state: "answered" | "withdrawn"): number {
 }
 
 export const actions: Record<string, Action> = {
-  raise: { describe: "raise a card: the next number, the record, the card in the approach page's Open", usage: "<workstream>/<arc> --file card.json", run: raise },
+  raise: { describe: "raise a card: the next number, the record, the card in the approach page's Open", usage: "<workstream>/<arc> --file card.json (the card holds why, what, viewsLead, views, options, recommended, nearest, signs, others, about, preview and settled)", run: raise },
   brief: { describe: "print a fresh view's brief from the card: the problem and the constraints first, no options, the proposals to follow", usage: "<workstream>/Q<n>", run: brief },
   show: { describe: "show an open card on an arc's preview, in its Open", usage: "Q<n> --in <notes/<arc>/preview.html>", run: show },
   answer: { describe: "answer a card in your words; it leaves every Open; with --entries, folded into the What, cited, and the go written again", usage: "Q<n> --key <option> --words \"…\" [--entries E7,E9]", run: (args) => settle(args, "answered") },

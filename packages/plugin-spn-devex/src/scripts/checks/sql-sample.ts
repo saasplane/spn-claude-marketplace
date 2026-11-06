@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // The SQL a design draws follows the book's grammar before the developer reads it. A workstream's
 // `notes/N*/preview.html` and the files under its `samples/` are read for TABLE, SCHEMA, ENUM · INDEX · JSON
-// and AUDIT TAIL, each named in its denial. The rules are the shared ones (plugin-support-lib sql-grammar.ts);
+// and AUDIT TAIL, each named in its note. The rules are the shared ones (plugin-support-lib sql-grammar.ts);
 // this half supplies the page text, and reads only what the write supplies, never a page already written.
 
 import { DEVEX_WORKSTREAMS } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
@@ -33,8 +33,9 @@ export function checkSqlSample(payload: Payload): Verdict {
 
   const found = sqlFindings(readable(path, supplied.content ?? supplied.new_string ?? ""), { module: null });
   if (!found.length) return null;
-  return { deny:
-    `Denied: the SQL in this ${path.endsWith("preview.html") ? "preview" : "sample"} breaks the SQL grammar. ` +
+  // A NOTE, NEVER A DENY: a stack standard reaches the agent as words, and no stack standard is a hard check.
+  return { note:
+    `The SQL in this ${path.endsWith("preview.html") ? "preview" : "sample"} departs from the SQL naming chapter. ` +
     `${found.length} finding(s):\n\n` +
     `${found.slice(0, SHOWN).map((item) => `  [${item.rule}] ${item.message}`).join("\n")}` +
     (found.length > SHOWN ? `\n  and ${found.length - SHOWN} more` : "") +

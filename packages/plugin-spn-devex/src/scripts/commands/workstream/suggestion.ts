@@ -17,7 +17,7 @@ import { PANELS_BLIND, raiseFaults, runningWorkFault } from "../../checks/questi
 import { panelsVisible } from "../../checks/split-plan.ts";
 import { precedentLines } from "../../lib/precedent.ts";
 import { followUpArcOf, readArc, readJsonl, suggestionsFileOf, workspaceOf, writeJsonl } from "../../lib/workstream.ts";
-import { RECORD_VERSION, SUGGESTION_ID, SUGGESTION_STATES, cardFaults, cardId, cardName, suggestionFaults, type Card, type Suggestion } from "../../lib/workstream-schema.ts";
+import { ABOUT, RECORD_VERSION, SUGGESTION_ID, SUGGESTION_STATES, cardAbout, cardFaults, cardId, cardName, suggestionFaults, suggestionRaisedFaults, type Card, type Suggestion } from "../../lib/workstream-schema.ts";
 import { arcNamed, refuseFlags, workstreamNamed } from "./_shared.ts";
 
 export const describe = "a suggestion, raised the moment it is raised and moved on as it is shaped, decided, parked or dropped";
@@ -64,11 +64,11 @@ function add(args: string[]): number {
   refuseFlags(args, ["state"], () => "does not take `--state`: a suggestion is raised, and `suggestion state <workstream> S<n> <state>` moves it on.");
   refuseFlags(args, ["words"], () => "does not take `--words`: the words come beside a move, `suggestion state <workstream> S<n> <state> --words \"…\"`.");
   refuseFlags(args, ["title"], () => "does not take `--title`: the title is the second word, `suggestion add <workstream> \"<title>\"`.");
-  const words = readWords(args, { preview: VALUE, file: VALUE });
+  const words = readWords(args, { preview: VALUE, file: VALUE, about: VALUE });
   const [ref, given, ...more] = words.paths;
   // A suggestion MAY CARRY THE SAME CARD A QUESTION DOES (RULE.DEVEX.WORKSPACE.491); the title-only form stays for one raised without it.
   const cardFile = words.value("file");
-  let card: (Card & { title?: string }) | null = null;
+  let card: (Card & { title?: string; preview?: unknown }) | null = null;
   if (cardFile) {
     try { card = JSON.parse(readFileSync(resolve(cardFile), "utf8")); } catch { throw new UsageFault(`reads no JSON at \`${cardFile}\`.`); }
   }
@@ -79,22 +79,41 @@ function add(args: string[]): number {
   const running = runningWorkFault(place.ws, title);
   if (running) throw new UsageFault(running);
   let kept: Card | null = null;
+  // THE CHOICE A SUGGESTION SHOWS follows a card's shape (RULE.DEVEX.WORKSPACE.491): the lookup runs and prints what it finds before any refusal,
+  // a suggestion about code needs its preview (the fragment of each option, or a link), and one that carries a card or names what it is about
+  // needs its `settled` block. A title alone stays a thought, as it was.
+  const about = words.value("about");
+  if (about !== null && !(ABOUT as readonly string[]).includes(about)) throw new UsageFault(`takes \`--about\` as one of ${ABOUT.join(" · ")}: \`${about}\` is none.`);
+  const found = precedentLines(workspaceOf(), [title, card?.what].filter(Boolean).join(" "), 5, !!card || about !== null);
+  const shown = (): void => { for (const line of found) console.log(line); };
+  const settled = card?.settled;
+  const derived = card ? cardAbout({ about: about ?? card.about, nearest: card.nearest }) : about;
   if (card) {
     if (!place.arc || !ref?.includes("/")) throw new UsageFault("takes a card against an arc, `suggestion add <workstream>/<arc> \"<title>\" --file card.json`: its fresh views are on record for that arc.");
     const { title: _title, ...rest } = card;
+    if (typeof rest.preview === "string") delete rest.preview;
     const root = workspaceOf();
     const shape = cardFaults(rest);
     const raised = raiseFaults(place.ws, place.arc, rest, root);
-    if (shape.length || raised.faults.length) throw new UsageFault(`refuses a card with a part missing: ${[...shape, ...raised.faults].join("; ")}.`);
+    const unsettled = suggestionRaisedFaults({ settled });
+    if (shape.length || raised.faults.length || unsettled.length) { shown(); throw new UsageFault(`refuses a card with a part missing: ${[...shape, ...raised.faults, ...unsettled].join("; ")}.`); }
     rest.signs = raised.signs;
     kept = rest;
     if (root && !panelsVisible(root) && rest.views.some((view) => view.made === "FRESH")) console.log(PANELS_BLIND);
+  } else if (about !== null) {
+    shown();
+    throw new UsageFault(`refuses a suggestion about ${about} with no \`settled\` block: ${suggestionRaisedFaults({}, "it").join("; ")}.`);
   }
+  // THE PREVIEW is the fragment of each option, a link to the page that shows it, or the card's option code set side by side.
+  const optionCode = (card?.options ?? []).filter((option) => option.code?.trim()).map((option) => `${option.key}: ${option.code!.trim()}`).join("\n");
+  const preview = words.value("preview") ?? (typeof card?.preview === "string" ? card.preview : optionCode || null);
   const next = Math.max(0, ...records.map((one) => Number(/^s(\d+)$/.exec(one.id)?.[1] ?? 0))) + 1;
-  const record: Suggestion = { v: RECORD_VERSION, id: `s${next}`, title, state: "raised", preview: words.value("preview"), words: null, arc: place.arc, ...(kept ? { card: kept } : {}) };
+  const record: Suggestion = { v: RECORD_VERSION, id: `s${next}`, title, state: "raised", preview, words: null, arc: place.arc, ...(derived && derived !== "OTHER" ? { about: derived } : {}), ...(settled ? { settled } : {}), ...(kept ? { card: kept } : {}) };
   records.push(record);
+  const faults = suggestionFaults(record, cardName(record.id));
+  if (faults.length) shown();
   const saved = save(file, records, record);
-  for (const line of precedentLines(workspaceOf(), title)) console.log(line);
+  if (!faults.length) shown();
   return saved;
 }
 
@@ -157,7 +176,7 @@ function write(args: string[]): number {
 }
 
 export const actions: Record<string, Action> = {
-  add: { describe: "raise a suggestion: the next number, raised; it also prints the decisions and rules that already speak to its title", usage: "<workstream>[/<arc>] \"<title>\" [--preview …] [--file card.json]", run: add },
+  add: { describe: "raise a suggestion: the next number, raised; it also prints the decisions and rules that already speak to its title", usage: "<workstream>[/<arc>] \"<title>\" [--preview …] [--about CODE|FLOW|OTHER] [--file card.json]", run: add },
   state: { describe: "move it on: shaped, decided, parked or dropped, with the words beside the move", usage: "<workstream> S<n> <state> [--words \"…\"] [--arc <arc>]", run: state },
   edit: { describe: "change its title or its preview, never its state", usage: "<workstream> S<n> [--title …] [--preview …]", run: edit },
   write: { describe: "retired: refuses, and names the command that fits what it was typed with", usage: "<workstream> [S<n>] …", hidden: true, run: write },
