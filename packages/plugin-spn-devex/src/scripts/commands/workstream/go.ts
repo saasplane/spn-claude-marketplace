@@ -18,7 +18,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { basename, dirname, join, resolve } from "node:path";
 import { type Action, FLAG, VALUE, UsageFault, readWords } from "../../../../../plugin-support-lib/src/lib/command.ts";
 import {
-  clearWaiting, deriveGo, fullRunMinutes, goFileOf, isApplyPart, landedEntries, landedOrder, landedMeasures, markWaiting, planScope, proposeScopes, readGo, readyParts, redCheckIds, ratesOf, staleEntries, tangledParts, testFilesOf, unheldEntries,
+  clearWaiting, deriveGo, workflowOf, fullRunMinutes, goFileOf, isApplyPart, landedEntries, landedOrder, landedMeasures, markWaiting, planScope, proposeScopes, readGo, readyParts, redCheckIds, ratesOf, staleEntries, tangledParts, testFilesOf, unheldEntries,
   type ScopeSheet,
 } from "../../lib/go-plan.ts";
 import { arcDataDir, arcIdsOf, logEvent, logFileOf, notesDirOf, readArc, readJson, readJsonl, readSheet, workspaceOf, writeWhole } from "../../lib/workstream.ts";
@@ -26,11 +26,13 @@ import { DONE_STATES, renameDataToWork, type ArcData, type GoPart, type GoPlan, 
 import { arcNamed, listOf, workstreamNamed } from "./_shared.ts";
 import { sizedStop } from "../../checks/child-size.ts";
 import { panelOnRecord, panelsVisible } from "../../checks/split-plan.ts";
-import { renameFirstRead, sheetFindings } from "./sheet.ts";
+import { patchOwed, renameFirstRead, sheetFindings, stepIsWhole } from "./sheet.ts";
 
 export const describe = "the plan of a go: derive it from the scope's sheets and write each part's brief, show it, check it against the sheets, start a baseline, a full run or a release";
 
 export const save = (ws: string, lead: string, plan: GoPlan): void => writeWhole(goFileOf(ws, lead), `${JSON.stringify(plan, null, 2)}\n`);
+/** The workflow the go makes from its plan, kept beside it. */
+const workflowFileOf = (ws: string, lead: string): string => join(arcDataDir(ws, lead), "go.workflow.mjs");
 const briefOf = (ws: string, lead: string, part: GoPart): string => join(notesDirOf(ws, lead), "orders", `${part.id}.md`);
 
 /** Whether a TEST part is the repository's proof run, after the releases: told apart by its id. */
@@ -73,7 +75,7 @@ export function nextStep(ref: string, ws: string, plan: GoPlan): string {
 }
 
 /** The sheets of the scope, or the lines that refuse it. */
-function scopeOf(ws: string, scope: string[], lead: string): { sheets: ScopeSheet[]; arcs: ArcData[]; faults: string[] } {
+function scopeOf(ws: string, scope: string[], lead: string, root: string): { sheets: ScopeSheet[]; arcs: ArcData[]; faults: string[] } {
   const sheets: ScopeSheet[] = [];
   const arcs: ArcData[] = [];
   const faults: string[] = [];
@@ -85,7 +87,19 @@ function scopeOf(ws: string, scope: string[], lead: string): { sheets: ScopeShee
     if (!data) { faults.push(`${arc} has no data: run \`workstream arc edit ${basename(ws)}/${arc} --status DECIDED\``); continue; }
     if (data.status !== "DECIDED") faults.push(`${arc} is ${data.status}, not DECIDED: run \`workstream arc edit ${basename(ws)}/${arc} --status DECIDED\``);
     if (!sheet) { faults.push(`${arc} keeps no sheet: run \`workstream sheet write ${basename(ws)}/${arc} --file <sheet.json>\``); continue; }
-    for (const finding of sheetFindings(ws, arc)) faults.push(`${arc} sheet: ${finding}: run \`workstream sheet edit ${basename(ws)}/${arc} ${/^(E\d+)\b/.exec(finding)?.[1] ?? "<E>"} …\``);
+    // THE GO REFUSES, BY ENTRY: a change with no patch (web and tests excepted), a step with no command or proof, and a patch that no longer applies.
+    const landed = new Set(landedEntries(data));
+    const kindFaults: string[] = [];
+    for (const entry of sheet.entries) {
+      if (landed.has(entry.id)) continue;
+      const fix = (command: string): string => `: run \`workstream sheet ${command} ${basename(ws)}/${arc} ${entry.id}${command === "edit" ? " --command \"…\" --proof \"…\"" : ""}\``;
+      if (entry.kind === "step" && !stepIsWhole(entry)) kindFaults.push(`${entry.id} is a step with no command or proof${fix("edit")}`);
+      else if (patchOwed(entry) === "refuse") kindFaults.push(`${entry.id} is a change with no patch${fix("patch")}`);
+      else if (entry.kind === "change" && entry.patch && !patchApplies(ws, arc, entry, root)) kindFaults.push(`${entry.id} is a change whose patch no longer applies: patch it again against the new head${fix("patch")}`);
+    }
+    faults.push(...kindFaults);
+    const named = new Set(kindFaults.map((line) => line.split(" ")[0]));
+    for (const finding of sheetFindings(ws, arc).filter((line) => !(named.has(line.split(" ")[0]) && /^E\d+ is (a change and has no patch|a step and has no command|judged and has no patch)/.test(line)))) faults.push(`${arc} sheet: ${finding}: run \`workstream sheet edit ${basename(ws)}/${arc} ${/^(E\d+)\b/.exec(finding)?.[1] ?? "<E>"} …\``);
     // A release part is named for its repository, so a line that is not one name would make a part no reader accepts.
     for (const line of sheet.releaseChain) if (!/^\S+$/.test(line)) faults.push(`${arc} sheet: the release order line "${line}" is not a repository's name: run \`workstream sheet write ${basename(ws)}/${arc} --file <sheet.json>\``);
     // A proof step not landed owes its repository a full run; an arc that changes no repository lands its proof on its check's run.
@@ -246,7 +260,7 @@ function write(args: string[]): number {
   if (more.length) throw new UsageFault("takes one arc.");
   const { ws, arc: lead } = arcNamed(ref);
   const scope = listOf(words, "scope") ?? [lead];
-  const { sheets, arcs, faults } = scopeOf(ws, scope, lead);
+  const { sheets, arcs, faults } = scopeOf(ws, scope, lead, workspaceOf() ?? process.cwd());
   if (faults.length) { console.log(`Refused: ${faults.join(" · ")}. Nothing was written.`); return 1; }
   const root = workspaceOf() ?? process.cwd();
   // THE FIRST PLAN WAITS FOR A PANEL; deriving an existing plan again never does.
@@ -278,10 +292,13 @@ function write(args: string[]): number {
     return 1;
   }
   save(ws, lead, plan);
+  // ONE WORKFLOW FOR THE GO: every part of the plan across the arcs it covers, each after the parts it waits on.
+  writeWhole(workflowFileOf(ws, lead), workflowOf(plan, sheets));
   // The lead carries an apply part out itself: it has no brief.
   for (const part of plan.parts) if (part.entries.length && !isApplyPart(part) && part.state !== "landed" && part.state !== "running") writeWhole(briefOf(ws, lead, part), brief(plan, part, ws, root));
   logEvent(ws, lead, "go", null, `written · ${plan.parts.length} parts · scope ${scope.join(",")}`);
   console.log(`ok · ${lead} go written · ${plan.parts.length} parts over ${scope.join(", ")}`);
+  console.log(`workflow · ${basename(workflowFileOf(ws, lead))} beside the plan`);
   for (const line of ignored) console.log(`note · ${line}`);
   console.log(nextStep(`${basename(ws)}/${lead}`, ws, plan));
   return 0;

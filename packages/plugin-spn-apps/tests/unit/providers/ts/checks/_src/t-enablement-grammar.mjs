@@ -9,7 +9,7 @@ const SERVICE = "packages/module-server-prj-api/src/app/services/IAMOrgService.t
 const MIGRATION = "packages/module-server-prj-api/src/migrations/002-prj-data.ts";
 
 const seed = (code, extra = "") =>
-  "export const PRJ_ENABLEMENT_SEED = [\n  {\n    code: '" + code + "',\n" +
+  "export const WSP_ENABLEMENT_SEED = [\n  {\n    code: '" + code + "',\n" +
   "    orgTypes: [OrgType.PLATFORM],\n" + extra + "  },\n];\n";
 
 // A DOC module's definition, its own const naming the module, and the field type a definition carries.
@@ -26,8 +26,8 @@ one("a code under another module's prefix", {
 });
 
 one("a code under its own module's prefix", {
-  script: "enablement-grammar", root: tree({ [SEED]: seed("PRJ_MANAGE_CHANNELS") }),
-  input: { file_path: SEED, content: seed("PRJ_MANAGE_CHANNELS") },
+  script: "enablement-grammar", root: tree({ [SEED]: seed("WSP_MANAGE_CHANNELS") }),
+  input: { file_path: SEED, content: seed("WSP_MANAGE_CHANNELS") },
   expect: "",
 });
 
@@ -47,14 +47,14 @@ one("[MKT.PROVIDERS.33] a bad code in a file named *setup-a* is no longer watche
 console.log("\n=== rule 2 VERB");
 
 one("a verb that is not MANAGE", {
-  script: "enablement-grammar", root: tree({ [SEED]: seed("PRJ_ALLOW_CHANNELS") }),
-  input: { file_path: SEED, content: seed("PRJ_ALLOW_CHANNELS") },
+  script: "enablement-grammar", root: tree({ [SEED]: seed("WSP_ALLOW_CHANNELS") }),
+  input: { file_path: SEED, content: seed("WSP_ALLOW_CHANNELS") },
   expect: "deny", says: "[VERB]",
 });
 
 one("a code with only two segments", {
-  script: "enablement-grammar", root: tree({ [SEED]: seed("PRJ_MANAGE") }),
-  input: { file_path: SEED, content: seed("PRJ_MANAGE") },
+  script: "enablement-grammar", root: tree({ [SEED]: seed("WSP_MANAGE") }),
+  input: { file_path: SEED, content: seed("WSP_MANAGE") },
   expect: "deny", says: "[VERB]",
 });
 
@@ -95,14 +95,14 @@ one("[MKT.PROVIDERS.33] the member form DOCEnablementType.LIMIT_STORAGE_BYTES wi
   if (!ok) { console.log(`        ${said.slice(0, 300)}`); process.exit(1); }
 }
 
-const AUTHZ_BAD = "const E = PRJEnablementType;\nexport const PRJ_AUTHZ = { list: E.VIEW_CHANNELS };\n";
+const AUTHZ_BAD = "const E = WSPEnablementType;\nexport const WSP_AUTHZ = { list: E.VIEW_CHANNELS };\n";
 one("a gate member not beginning MANAGE_", {
   script: "enablement-grammar", root: tree({ [AUTHZ]: AUTHZ_BAD }),
   input: { file_path: AUTHZ, content: AUTHZ_BAD },
   expect: "deny", says: "does not begin `MANAGE_`",
 });
 
-const AUTHZ_OK = "const E = PRJEnablementType;\nexport const PRJ_AUTHZ = { list: E.MANAGE_CHANNELS };\n";
+const AUTHZ_OK = "const E = WSPEnablementType;\nexport const WSP_AUTHZ = { list: E.MANAGE_CHANNELS };\n";
 one("a gate member through an alias, named correctly", {
   script: "enablement-grammar", root: tree({ [AUTHZ]: AUTHZ_OK }),
   input: { file_path: AUTHZ, content: AUTHZ_OK },
@@ -111,21 +111,21 @@ one("a gate member through an alias, named correctly", {
 
 console.log("\n=== rule 3 NOUN");
 
-const MULTI_BAD = seed("PRJ_MANAGE_CUSTOMIZATION", "    fieldType: 'STRING_MULTI',\n");
+const MULTI_BAD = seed("WSP_MANAGE_CUSTOMIZATION", "    fieldType: 'STRING_MULTI',\n");
 one("a multi-value definition named for its area", {
   script: "enablement-grammar", root: tree({ [SEED]: MULTI_BAD }),
   input: { file_path: SEED, content: MULTI_BAD },
   expect: "deny", says: "[NOUN]",
 });
 
-const MULTI_OK = seed("PRJ_MANAGE_ENTITY_TYPES", "    fieldType: 'STRING_MULTI',\n");
+const MULTI_OK = seed("WSP_MANAGE_ENTITY_TYPES", "    fieldType: 'STRING_MULTI',\n");
 one("a multi-value definition named for its options", {
   script: "enablement-grammar", root: tree({ [SEED]: MULTI_OK }),
   input: { file_path: SEED, content: MULTI_OK },
   expect: "",
 });
 
-const BOOL_AREA = seed("PRJ_MANAGE_CUSTOMIZATION");
+const BOOL_AREA = seed("WSP_MANAGE_CUSTOMIZATION");
 one("a boolean may name the area", {
   script: "enablement-grammar", root: tree({ [SEED]: BOOL_AREA }),
   input: { file_path: SEED, content: BOOL_AREA },
@@ -183,7 +183,7 @@ one("[MKT.PROVIDERS.33] a Set of ENTERPRISE and CONSUMER", {
   expect: "deny", says: "[ORG TYPE]",
 });
 
-const CEILING_OK = seed("PRJ_MANAGE_CHANNELS");
+const CEILING_OK = seed("WSP_MANAGE_CHANNELS");
 one("[MKT.PROVIDERS.33] a ceiling of OrgType.PLATFORM", {
   script: "enablement-grammar", root: tree({ [SEED]: CEILING_OK }),
   input: { file_path: SEED, content: CEILING_OK },

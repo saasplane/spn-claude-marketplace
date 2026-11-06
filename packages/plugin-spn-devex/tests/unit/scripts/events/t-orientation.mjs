@@ -1138,5 +1138,34 @@ console.log("\n=== orientation — the short welcome, and the whole one for ever
   says("[MKT.HOOKS.326] a hand run shows the whole welcome and records nothing", hand.includes("DevEx agent") && !existsSync(mark), hand.slice(0, 200));
 }
 
+// ── the session start shows a parked suggestion that changes how the developer works (032 N003) ──
+console.log("\n=== orientation — parked suggestions that change how you work");
+{
+  const says = (label, ok, detail = "") => { n += 1; if (!ok) failed += 1; console.log(`  ${ok ? "PASS" : "FAIL"}  ${label}${ok || !detail ? "" : `\n        ${String(detail).slice(0, 400)}`}`); };
+  const suggestion = (id, title, state, extra = {}) => JSON.stringify({ v: 1, id, title, state, preview: null, words: null, ...extra });
+  const rooted = (name, records) => fixture(name, {
+    "spn-app-ts/sprepo.json": repo("APPS", { stack: "TS" }),
+    "spn-app-ts/CONCEPT.md": "# concept\n",
+    "spn-app-ts/.claude/settings.json": JSON.stringify({ enabledPlugins: { "spn-devex@saasplane": true } }),
+    [`.spndevex/${WORKSTREAMS}/open/037-probe/arcs/N001/state.json`]: "{}\n",
+    [`.spndevex/${WORKSTREAMS}/open/037-probe/suggestions.jsonl`]: records.join("\n") + "\n",
+  });
+  const [, marked] = orient(...Array(2).fill(rooted("parked-marked", [
+    suggestion("s8", "show parked work at the start", "parked", { changesWork: true }),
+    suggestion("s9", "parked but changes nothing for you", "parked"),
+    suggestion("s10", "marked and then decided", "decided", { changesWork: true }),
+  ])));
+  const shown = marked.split("\n").filter((line) => line.startsWith("Parked, changes your work"));
+  says("[MKT.HOOKS.500] (RULE.DEVEX.WORKSPACE.503) the start adds one line for a suggestion parked with the mark, with its workstream, number and title",
+    shown.length === 1 && shown[0].includes("037 S8") && shown[0].includes("show parked work at the start"), shown.join(" | "));
+  says("[MKT.HOOKS.500] a parked suggestion without the mark and a marked one no longer parked are not shown", !marked.includes("S9") && !marked.includes("S10"));
+  const [, many] = orient(...Array(2).fill(rooted("parked-many", Array.from({ length: 40 }, (_, at) =>
+    suggestion(`s${at + 1}`, `a change to how you work, number ${at + 1} ${"x".repeat(200)}`, "parked", { changesWork: true })))));
+  says("[MKT.HOOKS.500] forty marked suggestions stay inside the start's ceiling: three named, the rest counted",
+    many.split("\n").filter((line) => line.startsWith("Parked, changes your work")).length === 3 && many.includes("And 37 more parked") && many.length <= SESSION_START_CEILING, String(many.length));
+  const [, none] = orient(...Array(2).fill(rooted("parked-none", [suggestion("s1", "only raised", "raised", { changesWork: true })])));
+  says("[MKT.HOOKS.500] with nothing parked the start says nothing of it", !none.includes("Parked, changes your work"));
+}
+
 console.log(failed ? `\n  ${failed} FAILED` : `\n  all ${n} passed`);
 process.exit(failed ? 1 : 0);

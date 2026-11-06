@@ -41,7 +41,7 @@ The range is laid out the same way on every platform, in whole hundreds, counted
 | `+400`–`449` | modules and vendors | in module-row order from `+400` |
 | `+450`–`499` | kept free | not assigned |
 
-On `dmo`: the platform's database `9000`; the space `sas`, its database and cache `9010`, `9011`; the platform's service `api` `9100`, health `9150`, remote `9200`; the sample service `sample-api`, in the space `sas`, `9101`, health `9151`; the observer `9102`, health `9152`; the web applications from `9300`; the module `idp` `9400`.
+On `dmo`: the platform's database `9000`; the space `sas`, its database and cache `9010`, `9011`; the platform's service `api` `9100`, health `9150`, remote `9200`; the sample service `sample-api`, in the space `sas`, `9101`, health `9151`; the hiring service `9102`, health `9152`; the web applications from `9300`; the module `idp` `9400`.
 
 **A space has no band of its own.** Its ports are engines and nothing else, so they sit with the engines. An application that belongs to a space takes a service's port or a web application's port like any other application. **The layout is about one machine**, where every service shares one address; in the cloud each service has an address of its own, so the number only has to be the same in both places.
 

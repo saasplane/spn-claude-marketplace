@@ -238,6 +238,9 @@ Every row below is declared and none is claimed: a run writes the last two cells
 | MKT.HOOKS.495 | Engineering leader | be told the row a commit belongs to | A commit gives its row as a note | POSITIVE | UNIT | PLANNED | — |
 | MKT.HOOKS.496 | Engineering leader | not be told a note twice | A row already told gives no note again | POSITIVE | UNIT | PLANNED | — |
 | MKT.HOOKS.497 | Engineering leader | never be stopped by a note | No trigger of these notes ever denies the call | NEGATIVE | UNIT | PLANNED | — |
+| MKT.HOOKS.498 | Engineering leader | write an entry's file in the arc's worktree before the go | A write inside the workstream's worktree passes when an entry of an arc of this window's workstreams names that file, and the documents-first gate lets it through while no go part of the arc has started | POSITIVE | UNIT | PLANNED | — |
+| MKT.HOOKS.499 | Engineering leader | still be refused in a main checkout and on a file no entry names | A write in a main checkout, or on a file no entry names, is refused until the go, as before | NEGATIVE | UNIT | PLANNED | — |
+| MKT.HOOKS.500 | Engineering leader | be shown a parked suggestion that changes how I work | A suggestion parked with the mark that it changes how I work adds one line to the window's start, with its number and title, until it is decided or dropped, inside the start's ceiling | POSITIVE | UNIT | PLANNED | — |
 
 ## Retired ids
 

@@ -61,7 +61,7 @@ Each method reaches by its own kind, and the scope never travels into a method t
 
 **The platform's reads across owners are recorded.** Under `PARENT_ORG`, one row per call, a list's as well as a record's, lands in the platform's trail before the result leaves the service. It names the operator, the method, the kind, the command as sent, each record returned and its owning organization. A record that fails fails the call, no copy goes into the owner's trail, and no other read is recorded, since a relation's or a child's reads are covered by the write that opened them.
 
-**Work switches to another organization's system principal only for a case on a closed list of eleven**, and each switch names its case where it switches and where it asks for the system user: `INVITATION_ACCEPTED`, `PUBLIC_UPDATE`, `ORG_PROVISIONING`, `NOTIFICATION_DELIVERY`, `FILE_PROCESSING`, `PRIVACY_REQUEST`, `SIGN_IN_CODE_SENT`, `AUDIT_WRITE`, `OBSERVER_WRITE`, `OWNERSHIP_TRANSFER` and `MEMBER_AUTO_ONBOARDING`. A case not on the list is not a reason to cross.
+**Work switches to another organization's system principal only for a case on a closed list of eleven**, and each switch names its case where it switches and where it asks for the system user: `INVITATION_ACCEPTED`, `PUBLIC_UPDATE`, `ORG_PROVISIONING`, `NOTIFICATION_DELIVERY`, `FILE_PROCESSING`, `PRIVACY_REQUEST`, `SIGN_IN_CODE_SENT`, `AUDIT_WRITE`, `HIRING_WRITE`, `OWNERSHIP_TRANSFER` and `MEMBER_AUTO_ONBOARDING`. A case not on the list is not a reason to cross.
 
 ## Classification
 

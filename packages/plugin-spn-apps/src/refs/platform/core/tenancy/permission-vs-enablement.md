@@ -75,7 +75,7 @@ The test is not a count. IAM owns eight of the estate's codes, because IAM owns 
 - **A boolean names the area.** `IAM_MANAGE_MEMBERS` — on or off. A code is on when its value is a boolean that is true or a selection that is not empty.
 - **A selection names the options.** `NTF_MANAGE_CHANNELS` — a list of channels, set per category.
 - Name a selection after its area and the console shows *Customization* holding a list of entity types. Whoever flips that cell cannot tell what they are choosing.
-- **A limit is a number.** A `NUMBER` definition caps what an org may create, such as `DOC_LIMIT_STORAGE_BYTES`. Empty means no limit. A plan still decides the price; the limit is the cell the plan sets.
+- **A limit is a number.** A `NUMBER` definition caps what an org may create, such as `HIR_LIMIT_OPEN_JOBS`. Empty means no limit. A plan still decides the price; the limit is the cell the plan sets.
 
 The code's first segment is its owning module's prefix, always. That is what keeps two modules' codes from colliding in one catalog.
 
@@ -102,7 +102,7 @@ The platform's category sits in every ceiling where the question applies, with a
 
 **Never write an exemption branch.** A resolver that answers on for one type carries a rule the console cannot show and the seed cannot state. The master gets one protection, and it is a refusal in `updateOrgTypeEnablement`. A `PLATFORM` boolean cannot be set to false. Provisioning runs with platform authority, so turning one off bricks onboarding.
 
-The rare type genuinely outside a ceiling is outside because the question does not apply. `PRJ_MANAGE_PROJECTS` excludes `PLATFORM` because the platform has no project screens.
+The rare type genuinely outside a ceiling is outside because the question does not apply. `HIR_MANAGE_JOBS` excludes `PLATFORM` because the platform has no job screens.
 
 ### `[]` means nothing granted, never resolution failed
 
@@ -159,24 +159,24 @@ The fix folded the method under `IAM_MANAGE_APP_SITES` and deleted the set. A pr
 `apps/service-platform-ts/src/modules/project/app/utils/authz.ts`:
 
 ```ts
-PROJECT_VIEW: anyOf([P.PROJECT_VIEW, P.PROJECT_MANAGE, P.PROJECT_ADMIN], [E.MANAGE_PROJECTS]),
+JOB_VIEW: anyOf([P.JOB_VIEW, P.JOB_MANAGE, P.JOB_ADMIN], [E.MANAGE_JOBS]),
 ```
 
-A read gate carrying an offer. Turn the cell off and the organization's existing projects stop resolving — for its own staff, and for any module reading a project on its behalf. The offer governs the screens and the writes behind them; it never stops a record already created from being read.
+A read gate carrying an offer. Turn the cell off and the organization's existing jobs stop resolving — for its own staff, and for any module reading a project on its behalf. The offer governs the screens and the writes behind them; it never stops a record already created from being read.
 
-Note where this one lived. `PRJ` is an **app-owned** module under `apps/…/src/modules/`, not under `packages/module-server-*`, so every sweep that globbed the packages directory missed it. When you sweep gates, glob both trees.
+Note where this one lived. `HIR` is an **app-owned** module under `apps/…/src/modules/`, not under `packages/module-server-*`, so every sweep that globbed the packages directory missed it. When you sweep gates, glob both trees.
 
 ### 3 · A foundation module hardcodes a sample module's identifier
 
 `packages/module-server-ent-ts/src/migrations/1784000007000-ent-setup-authz.ts` seeded its selection like this:
 
 ```ts
-const EXTENDABLE_ENTITY_TYPES = ['PRJ_PROJECT'];
+const EXTENDABLE_ENTITY_TYPES = ['HIR_JOB'];
 ```
 
-`ENT` is a foundation module and `PRJ_PROJECT` belongs to the sample product module. Naming it there points the dependency the wrong way. The layer everyone builds on now knows one product's vocabulary. A partner's module cannot be added without editing `ENT`.
+`ENT` is a foundation module and `HIR_JOB` belongs to the hiring module. Naming it there points the dependency the wrong way. The layer everyone builds on now knows one product's vocabulary. A partner's module cannot be added without editing `ENT`.
 
-The fix leaves every cell empty in `ENT`'s definition. `PRJ` adds `PRJ_PROJECT` as a selection key in its own contribution, and IAM adds it to each category whose app carries both modules. The options were never a list in the seed anyway — they resolve live from the entity-type registry, so registering the type is what makes it offerable at all. Only the value is the contributing module's to write.
+The fix leaves every cell empty in `ENT`'s definition. `HIR` adds `HIR_JOB` as a selection key in its own contribution, and IAM adds it to each category whose app carries both modules. The options were never a list in the seed anyway — they resolve live from the entity-type registry, so registering the type is what makes it offerable at all. Only the value is the contributing module's to write.
 
 ## The card
 

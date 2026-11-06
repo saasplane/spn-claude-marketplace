@@ -9,7 +9,7 @@ import { join, resolve } from "node:path";
 import { PLUGIN } from "../../../helpers/harness.mjs";
 
 const lib = resolve(PLUGIN, "src", "scripts", "lib");
-const { deriveGo, releaseCircles, tangledParts, fullRunMinutes, readyParts, clearWaiting, markWaiting, ratesOf, boundOf, testFilesOf, entryHash, changedEntries, staleEntries, proposeScopes, redCheckIds } = await import(join(lib, "go-plan.ts"));
+const { deriveGo, workflowOf, releaseCircles, tangledParts, fullRunMinutes, readyParts, clearWaiting, markWaiting, ratesOf, boundOf, testFilesOf, entryHash, changedEntries, staleEntries, proposeScopes, redCheckIds } = await import(join(lib, "go-plan.ts"));
 const { goFaults, entryWork } = await import(join(lib, "workstream-schema.ts"));
 
 let total = 0, failed = 0;
@@ -355,6 +355,25 @@ const failing = deriveGo([{ arc: "N009", sheet: sheet([{ ...entry("E1", "lib-rep
   { patchOk: (_arc, one) => one.id !== "E2" });
 same("[MKT.SCRIPTS.450] an entry whose patch fails the check joins a code part on its prose",
   [applyOf(failing)?.entries, failing.parts.find((p) => p.id === "code-lib-repo-1")?.entries], [["N009/E1"], ["N009/E2"]]);
+
+// MKT.SCRIPTS.538: a patched change is the lead's, a step is a part of its own, and the go is one workflow.
+const change = (id, file, over = {}) => ({ ...entry(id, file), kind: "change", ...over });
+const stepOf = (id, file, over = {}) => ({ ...entry(id, file, {}), kind: "step", command: "run it", proof: "it printed ok", ...over });
+const stalePatched = deriveGo([{ arc: "N009", sheet: sheet([change("E1", "lib-repo:src/a.ts", { patch: patchOf("E1") }), change("E2", "lib-repo:src/b.ts", { patch: patchOf("E2") })]) }],
+  { patchOk: () => false });
+same("[MKT.SCRIPTS.538] a patched change whose check fails stays in the apply part and is never cut into a helper's part",
+  [applyOf(stalePatched)?.entries, stalePatched.parts.find((p) => p.id === "code-lib-repo-1")?.entries], [["N009/E1", "N009/E2"], undefined]);
+const stepPlan = deriveGo([{ arc: "N009", sheet: sheet([stepOf("E1", "lib-repo:src/gen/a.ts"), stepOf("E2", "lib-repo:src/gen/b.ts"), change("E3", "lib-repo:src/c.ts", { patch: patchOf("E3") })]) }]);
+const stepParts = stepPlan.parts.filter((p) => p.id.startsWith("generated-"));
+same("[MKT.SCRIPTS.538] each step is a part of its own, and the plan holds to its schema",
+  [stepParts.map((p) => p.entries), applyOf(stepPlan)?.entries, goFaults(stepPlan)], [[["N009/E1"], ["N009/E2"]], ["N009/E3"], []]);
+same("[MKT.SCRIPTS.538] a step runs in the generated pass after the repository's full run, and the full run does not wait on it",
+  [stepParts.every((p) => p.waitsOn.includes("full-lib-repo")), stepPlan.parts.find((p) => p.id === "full-lib-repo").waitsOn.includes(stepParts[0].id)], [true, false]);
+const flow = workflowOf(stepPlan, [{ arc: "N009", sheet: sheet([stepOf("E1", "lib-repo:src/gen/a.ts"), stepOf("E2", "lib-repo:src/gen/b.ts"), change("E3", "lib-repo:src/c.ts", { patch: patchOf("E3") })]) }]);
+const flowParts = JSON.parse(/const PARTS = (\[[\s\S]*?\n\]);/.exec(flow)?.[1] ?? "null");
+same("[MKT.SCRIPTS.538] one workflow script holds every part of the plan, each with the waits the plan gives it",
+  [flow.startsWith("export const meta"), flowParts?.map((p) => [p.id, p.waitsOn]), flowParts?.find((p) => p.id === stepParts[0].id)?.prompt.includes("run it")],
+  [true, stepPlan.parts.map((p) => [p.id, p.waitsOn]), true]);
 
 const lightPlan = deriveGo([{ arc: "N009", sheet: sheet([light("E1", "lib-repo:src/a.ts"), light("E2", "lib-repo:src/b.ts"), light("E3", "lib-repo:src/b.ts"), entry("E4", "lib-repo:src/d.ts")]) }]);
 same("[MKT.SCRIPTS.452] a one-file entry with no tiers joins the apply part, and entries whose file another entry edits do not, nor does one with tiers",

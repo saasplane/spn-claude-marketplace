@@ -107,6 +107,22 @@ You classify twice, and the order matters. First the **nature of the work**, whi
 
 The last row is the one that silently bakes a product decision into code. Settle it here and the gate writes itself later.
 
+## How a partner's domain is mapped onto the constructs
+
+**The design step maps a partner's domain onto the constructs in a fixed order, and each step waits for the one before it.** The order is the category tree, the relations beside it, the states with their levels, the enums or records, the enablements, the flows, and then the pages.
+
+The hiring demo's mapping is the worked example:
+
+| Step | What the hiring demo writes there |
+| --- | --- |
+| The category tree | Platform, Company, Agency, Recruiter, Candidate and Job seeker, with who sells to whom |
+| The relations beside it | `HirAgencyEngagement`, keyed by both organizations and read through the `AGENCY` relation, since the tree records only who sells to whom |
+| The states and their levels | `HirJob` with the level a visitor reads, `HirJobPosting`, beside `HirJobMeta` |
+| The enums or records | the `HirJobCategory` rows the operator keeps |
+| The enablements | the open-jobs limit, the agencies limit and 30 applications a month |
+| The flows | Day 0 to Day 6: the first run, a Company arrives, a job is posted, people apply, the team works, an agency joins, the agency's own business |
+| The pages | `HirJobApplicationListPage` and the rest, each there because a step of a flow needs it |
+
 ## How a first proposal is shaped
 
 A first proposal starts where the book already stands, so the developer reads a proposal that is mostly confirmed rather than invented. These rules carry that, and each extends one the book already holds.

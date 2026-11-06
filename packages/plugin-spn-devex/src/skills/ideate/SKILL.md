@@ -229,7 +229,7 @@ The full text of all three is in [`refs/devex/workspace/workstream.md`](../../re
 When the arc changes code, the idea is worked in the code itself, one connected batch at a time.
 
 1. **Read, change, validate, record.** Read the files the idea touches, make the change, validate it with one trace line, and record it with `sheet patch --trace --judged`. Validation here is typecheck and lint only; the suites run later, at the go.
-2. **Judged before the preview, mechanical after approval.** An entry whose change needs judgement is patched before the preview, so the preview shows its code; a mechanical entry is patched after the developer approves.
+2. **No patch while a shape is discussed; the stack once an arc or a preview is asked for.** In chat you talk and change no file. When the developer asks for the arc or the preview to be prepared, write every change as a patch, in the workstream's worktree and only on a file an entry names, in release order and, inside a repository, in the order the work builds: the book and docs, config and env files, migrations, contract, server, client codegen, web, tests. `sheet patch` resets its file, so run `sheet stack` before each entry to apply the kept patches ahead of it. A generated file is a step that runs its generator and is kept as no patch. A step carries its `command` and its `proof`. The preview shows an outline of the changes and a code block only for an entry marked `judged`, drawn from its patch; tests are named by behaviour id, never as a range.
 3. **One helper per connected batch.** Send the contract first, then what depends on it. Size each batch by measured tokens, never by a guess.
 4. **Where an idea goes.** It joins the running arc only when that arc's goal needs it. Otherwise the developer chooses: its own arc, or the follow-ups.
 5. **A later change shows `sheet reach` first.** Run `sheet reach` and show what the change reaches before you change anything.
@@ -245,6 +245,7 @@ When the arc changes code, the idea is worked in the code itself, one connected 
 - **Each lens learns the partner's industry for its own discipline, from the internet, and maps it onto the constructs and the SaaS Plane way** (`RULE.DEVEX.AGENT.099` · MUST · skill:spn-devex/ideate)
 - **On a card, a view is one or two plain sentences** (`RULE.DEVEX.AGENT.122` · MUST · skill:spn-devex/ideate)
 - **The agent shortens a view's words for the card, and keeps its name and its meaning** (`RULE.DEVEX.AGENT.123` · MUST · skill:spn-devex/ideate)
+- **Ideation writes each change as a patch from the moment you ask for an arc or a preview to be prepared, and never while a shape is only discussed** (`RULE.DEVEX.AGENT.176` · MUST · skill:spn-devex/ideate)
 - **spec-first** (`RULE.DEVEX.FUNCTION.007` · MUST · skill:spn-devex/ideate)
 - **`IDEATE` decides the shape, and designing a requirement inside that shape is part of it** (`RULE.DEVEX.FUNCTION.016` · MUST · skill:spn-devex/ideate)
 - **The DevEx stages are eight — `BOOTSTRAP` · `SCM` · `IDEATE` · `DEVELOP` · `TEST` · `PROVISION` · `DELIVER` · `OPERATE` — and this phase covers both deciding a node's shape and designing a requirement inside it** (`RULE.DEVEX.FUNCTION.062` · MUST · skill:spn-devex/ideate)
@@ -274,6 +275,7 @@ When the arc changes code, the idea is worked in the code itself, one connected 
 - **While you are still ideating, the agent talks it through in chat** (`RULE.DEVEX.WORKSPACE.443` · MUST · skill:spn-devex/ideate)
 - **Conflicts land here — always** (`RULE.DEVEX.WORKSPACE.466` · MUST · skill:spn-devex/ideate)
 - **Workspace plumbing is the agent's own to resolve, and never a card** (`RULE.DEVEX.WORKSPACE.481` · MUST · skill:spn-devex/ideate)
+- **Patches begin at the ask, and `sheet stack` writes each one on top of those before it** (`RULE.DEVEX.WORKSPACE.500` · MUST · skill:spn-devex/ideate)
 - **Registering is optional, and the chain is complete without it.** (`RULE.LAUNCHPAD.CONTROL_PLANE.001` · MUST · skill:spn-devex/ideate)
 - **Launchpad is built at the partner stage, on the same backbone and with the same stack every adopter gets. It consumes the published packages rather than reading around them.** (`RULE.LAUNCHPAD.CONTROL_PLANE.002` · MUST · skill:spn-devex/ideate)
 - **Launchpad is a stage, not a sixth domain.** (`RULE.LAUNCHPAD.CONTROL_PLANE.003` · MUST · skill:spn-devex/ideate)
