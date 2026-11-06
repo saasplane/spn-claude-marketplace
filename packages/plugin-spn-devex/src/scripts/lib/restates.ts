@@ -687,11 +687,34 @@ export function skillBlocks(index: RulesIndex, marketplace: string): Map<string,
   return places;
 }
 
-/** One step's text with its block written, under the step's title, or replacing the block it already holds. */
-export function withRulesBlock(text: string, rules: RuleEntry[]): string {
-  const lines = rules.map((rule) => `- **${rule.sentence ?? rule.id}** ${formatMark(rule.id, rule.level, rule.params, "ref")}`);
+/** Whether a rule has words to show: a sentence that is more than its own id. An id-only line tells the agent nothing. */
+export const hasWords = (rule: Pick<RuleEntry, "id" | "sentence">): boolean => {
+  const sentence = (rule.sentence ?? "").trim();
+  return sentence.length > 0 && sentence !== rule.id && !/^RULE\.[A-Z_]+\.[A-Z_]+\.\d+$/.test(sentence);
+};
+
+/** The text without its rules block: from the block's heading to the end of its list. */
+function withoutBlock(text: string): string {
+  const at = text.indexOf(`${BLOCK_HEADING}\n`);
+  if (at < 0) return text;
+  const rest = text.slice(at).split("\n");
+  let end = 1;
+  while (end < rest.length && (rest[end] === "" || rest[end] === BLOCK_NOTE)) end += 1;
+  while (end < rest.length && rest[end].startsWith("- ")) end += 1;
+  return text.slice(0, at) + rest.slice(end).join("\n").replace(/^\n+/, "");
+}
+
+/**
+ * One file's text with its block written. A rule is written only when it has words, and a file with no such rule holds no block.
+ * The block of a skill's `SKILL.md` follows the last step (`atEnd`); a step's block sits under the step's title, or replaces the block it already holds.
+ */
+export function withRulesBlock(text: string, rules: RuleEntry[], atEnd = false): string {
+  const shown = rules.filter(hasWords);
+  const lines = shown.map((rule) => `- **${rule.sentence}** ${formatMark(rule.id, rule.level, rule.params, "ref")}`);
   const block = [BLOCK_HEADING, "", BLOCK_NOTE, "", ...lines, ""].join("\n");
   const at = text.indexOf(`${BLOCK_HEADING}\n`);
+  if (!shown.length) return withoutBlock(text);
+  if (atEnd) return `${withoutBlock(text).replace(/\s+$/, "")}\n\n${block}`;
   if (at >= 0) {
     // The block runs from its heading to the end of its list, and the step's own text resumes after it.
     const rest = text.slice(at).split("\n");
@@ -722,6 +745,6 @@ export function writeRulesIndex(book: string, marketplace: string): { commit: st
     written.push(path.slice(marketplace.length + 1));
   };
   put(join(marketplace, "packages", "plugin-spn-devex", "src", "refs", "rules.json"), JSON.stringify(index, null, 2) + "\n");
-  for (const [path, rules] of skillBlocks(index, marketplace)) put(path, withRulesBlock(read(path), rules));
+  for (const [path, rules] of skillBlocks(index, marketplace)) put(path, withRulesBlock(read(path), rules, path.endsWith("/SKILL.md")));
   return { commit, rules: index.rules.length, faults, written };
 }

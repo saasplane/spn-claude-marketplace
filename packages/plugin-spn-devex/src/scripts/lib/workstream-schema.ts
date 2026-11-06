@@ -92,20 +92,33 @@ export type ArcData = {
   /** The build arcs an ideate arc proposes. Its status is worked out from them (`arcStatus`). */
   proposes?: string[];
   wait?: string | null; reviewFixes?: boolean;
-  carries?: string[]; decides?: string | null; repos?: string[]; cycle?: string | null; follows?: string | null; model?: string | null; position?: number | null;
+  carries?: string[]; decides?: string | null; repos?: string[]; cycle?: string | null; follows?: string | null; model?: string | null;
   preview: string; rows: ArcRow[];
   [field: string]: unknown;
 };
 export type LogLine = { at: string; kind: string; row?: string | null; note?: string | null; [field: string]: unknown };
 export type Fact = { v?: number; id: string; fact: string; source: string; commit: string; readAt: string; usedBy: string[]; [field: string]: unknown };
-export type Suggestion = { v?: number; id: string; title: string; state: string; preview: string | null; words: string | null; [field: string]: unknown };
+export type Suggestion = {
+  v?: number; id: string; title: string; state: string; preview: string | null; words: string | null;
+  about?: About; settled?: Settled; [field: string]: unknown;
+};
+/** What a choice is about (§ Questions are records): code, a flow, or anything else. A record that names none reads as `OTHER`. */
+export const ABOUT = ["CODE", "FLOW", "OTHER"] as const;
+export type About = (typeof ABOUT)[number];
+/** What the answer to a choice changes, the third answer of `settled`. */
+export const CHANGES = ["PRODUCT", "BOUNDARY", "PROMISE", "TRADE_OFF"] as const;
+/** The three answers held before a card or a suggestion is raised: what the lookup found, why the premise stands, and what the answer changes. */
+export type Settled = { answered: string; premise: string; changes: (typeof CHANGES)[number] };
+/** A card's preview: the Today block where real code exists and an option changes it, and why the options are shown as they are. */
+export type CardPreview = { today?: string | null; reason: string };
 /** `made` and `words` are written on a card raised after RULE.DEVEX.WORKSPACE.492; a FRESH view's `words` is a file under the arc's `notes/N<nnn>/work/`. */
 export type View = { lens: string; text: string; made?: string; words?: string };
-export type Option = { key: string; does: string; costs: string; leaveIt?: boolean };
+export type Option = { key: string; does: string; costs: string; leaveIt?: boolean; code?: string };
 /** The fields a card carries from RULE.DEVEX.WORKSPACE.491: all optional on read, all required when a card is raised or added (`raisedCardFaults`). */
 export type Card = {
   why: string; what: string; viewsLead: string; views: View[]; options: Option[]; recommended: { key: string; reason: string; scope?: string };
   nearest?: string; signs?: string[]; others?: string; noLeaveIt?: string;
+  about?: About; preview?: CardPreview; settled?: Settled;
 };
 /** The signs of complexity a card may declare (RULE.DEVEX.WORKSPACE.491), and how a view was made (RULE.DEVEX.WORKSPACE.492). */
 export const SIGNS = ["CROSSES_REPO", "CHANGES_PARTNER_SURFACE", "SETS_PATTERN"] as const;
@@ -115,6 +128,21 @@ export const SCOPES = ["CORE", "PERIPHERY"] as const;
 export type Answer = { key?: string | null; words: string; at: string; entries?: string[] };
 /** `raisedBy` is the session id of the window that raised the card; a card raised before it was recorded has none. */
 export type Question = { v?: number; id: string; arc: string; title: string; state: string; raised: string; raisedBy?: string; shownIn: string[]; card: Card; answer: Answer | null; [field: string]: unknown };
+
+/** A saved review's finding, answered by a sheet entry, a card or a drop with a reason (`finding decide`). */
+export const FINDING_STATES = ["open", "carried", "decided", "dropped"] as const;
+export const FINDING_ID = /^F\d+$/;
+export type Finding = {
+  v?: number; id: string; view: string; number: number; text: string; state: (typeof FINDING_STATES)[number];
+  carried?: string[]; decided?: string | null; reason?: string | null; [field: string]: unknown;
+};
+/** What answered a correction: the book, the code, a saved review, or nothing (which does not count). */
+export const ANSWERED_BY = ["book", "code", "review", "none"] as const;
+/** What settled an engineering call the agent decided. */
+export const BECAUSE = ["rule", "book", "code", "purpose"] as const;
+/** The log kinds the work-loading arc adds: a correction the developer made, and a call the agent decided. */
+export const CORRECTION_KIND = "correction";
+export const DECIDED_KIND = "decided";
 
 // ---------------------------------------------------------------------------- the field rules
 
@@ -180,7 +208,6 @@ const ARC_FIELDS: Record<string, Rule> = {
   follows: { kind: "text", required: false },
   carries: { kind: "strings", required: false, pattern: SUGGESTION_ID },
   model: { kind: "text", required: false },
-  position: { kind: "number", required: false },
   preview: { kind: "string", required: true },
   kind: { kind: "enum", required: false, values: ARC_KINDS },
   proposes: { kind: "strings", required: false, pattern: ARC_ID },
@@ -294,6 +321,7 @@ const SUGGESTION_FIELDS: Record<string, Rule> = {
   preview: { kind: "text", required: true }, words: { kind: "text", required: true },
   // The arc a suggestion belongs to (RULE.DEVEX.WORKSPACE.488); a record raised before it has none, read as null.
   arc: { kind: "text", required: false },
+  about: { kind: "enum", required: false, values: ABOUT },
 };
 const QUESTION_FIELDS: Record<string, Rule> = {
   id: { kind: "string", required: true, pattern: QUESTION_ID }, arc: { kind: "string", required: true, pattern: ARC_ID },
@@ -305,8 +333,51 @@ export const logFaults = (line: unknown, where: string): string[] =>
   isObject(line) ? fieldFaults(where, line, LOG_FIELDS) : [`${where} is not a JSON object`];
 export const factFaults = (line: unknown, where: string): string[] =>
   isObject(line) ? fieldFaults(where, line, FACT_FIELDS) : [`${where} is not a JSON object`];
-export const suggestionFaults = (line: unknown, where: string): string[] =>
-  isObject(line) ? fieldFaults(where, line, SUGGESTION_FIELDS) : [`${where} is not a JSON object`];
+export function suggestionFaults(line: unknown, where: string): string[] {
+  if (!isObject(line)) return [`${where} is not a JSON object`];
+  const out = fieldFaults(where, line, SUGGESTION_FIELDS);
+  // A suggestion about code holds the fragment, or a link to the page that shows it: an empty preview is refused (RULE.DEVEX.WORKSPACE.491).
+  if (line.about === "CODE" && !(typeof line.preview === "string" && line.preview.trim().length > 0))
+    out.push(`${where} is about CODE and its preview is empty: put the fragment in the preview, a few lines for each option, or a link to the page that shows it`);
+  return out;
+}
+
+/** The `settled` block a card or suggestion raised now must hold: each answer filled, and `changes` one of the four. NEVER RUN ON A RECORD READ. */
+export function settledFaults(settled: unknown, where = "the card"): string[] {
+  const text = (value: unknown) => typeof value === "string" && value.trim().length > 0;
+  if (!isObject(settled)) return [`${where} has no \`settled\` block: say what the lookup found and why it does not settle the question (\`answered\`), what would make it unnecessary and where in the code you checked (\`premise\`), and what your answer changes (\`changes\`: ${CHANGES.join(", ")}). An engineering call with a clear recommendation is yours: \`spn-devex workstream decision write\``];
+  const out: string[] = [];
+  if (!text(settled.answered)) out.push(`${where}'s \`settled.answered\` is empty: say what the lookup found and why it does not settle the question`);
+  if (!text(settled.premise)) out.push(`${where}'s \`settled.premise\` is empty: say what would make the question unnecessary and where in the code you checked`);
+  if (!(CHANGES as readonly unknown[]).includes(settled.changes)) out.push(`${where}'s \`settled.changes\` is not one of ${CHANGES.join(" · ")}`);
+  return out;
+}
+
+/** What a suggestion added now must hold beyond its shape: the `settled` block. */
+export const suggestionRaisedFaults = (record: unknown, where = "the suggestion"): string[] =>
+  isObject(record) ? settledFaults(record.settled, where) : [`${where} is not a JSON object`];
+
+/** Whether a nearest construct is code: a `.ts`, `.tsx` or `.sql` file, or a path under `/src/`. */
+export const nearestIsCode = (nearest: unknown): boolean =>
+  typeof nearest === "string" && /(?:\.(?:ts|tsx|sql)(?::\d+)?$|(?:^|\/)src\/)/.test(nearest.trim());
+
+/** What a card is about: `CODE` where its nearest construct is code, whatever it says, else what it says, else `OTHER`. */
+export const cardAbout = (card: { about?: unknown; nearest?: unknown }): About =>
+  nearestIsCode(card.nearest) ? "CODE" : (ABOUT as readonly unknown[]).includes(card.about) ? (card.about as About) : "OTHER";
+
+/** The faults of one finding record, for `finding write` and the state check. */
+export function findingFaults(line: unknown, where: string): string[] {
+  if (!isObject(line)) return [`${where} is not a JSON object`];
+  const out: string[] = [];
+  if (typeof line.id !== "string" || !FINDING_ID.test(line.id)) out.push(`${where} has no id \`F<n>\``);
+  if (typeof line.view !== "string" || !line.view.trim()) out.push(`${where} names no view`);
+  if (typeof line.text !== "string" || !line.text.trim()) out.push(`${where} has no text`);
+  if (!(FINDING_STATES as readonly unknown[]).includes(line.state)) out.push(`${where}'s state is not one of ${FINDING_STATES.join(" · ")}`);
+  if (line.state === "carried" && !(Array.isArray(line.carried) && line.carried.length)) out.push(`${where} is carried and names no entry`);
+  if (line.state === "decided" && !(typeof line.decided === "string" && line.decided)) out.push(`${where} is decided and names no card`);
+  if (line.state === "dropped" && !(typeof line.reason === "string" && line.reason.trim())) out.push(`${where} is dropped and gives no reason`);
+  return out;
+}
 
 /**
  * Each part a card is missing: why, what, the views' lead and the views, at least two options each
@@ -353,6 +424,14 @@ export function raisedCardFaults(card: unknown, where = "the card"): string[] {
   const recommended = card.recommended;
   if (!isObject(recommended) || !(SCOPES as readonly unknown[]).includes(recommended.scope))
     out.push(`${where}'s \`recommended.scope\` is not one of ${SCOPES.join(" · ")}`);
+  if (card.about !== undefined && !(ABOUT as readonly unknown[]).includes(card.about)) out.push(`${where}'s \`about\` is not one of ${ABOUT.join(" · ")}`);
+  if (cardAbout(card) === "CODE") {
+    const bare = options.filter((option) => isObject(option) && !text(option.code));
+    if (bare.length)
+      out.push(`${where} is about CODE${nearestIsCode(card.nearest) ? ` (its nearest names ${String(card.nearest)})` : ""} and ${bare.length === options.length ? "none" : "not every one"} of its options carries code: show each option as a few lines of code, only what differs, and add a Today block (\`preview.today\`) only if real code exists today and an option changes it`);
+    if (!isObject(card.preview) || !text(card.preview.reason)) out.push(`${where} is about CODE and has no \`preview.reason\`: say why the options are shown as they are`);
+  }
+  out.push(...settledFaults(card.settled, where));
   for (const [at, view] of (Array.isArray(card.views) ? card.views : []).entries()) {
     if (!isObject(view)) continue;
     if (!(VIEW_MADE as readonly unknown[]).includes(view.made)) out.push(`${where}'s view ${at + 1} has no \`made\`, and it is one of ${VIEW_MADE.join(" · ")}`);

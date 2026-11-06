@@ -107,6 +107,7 @@ export const CARD = {
   options: [{ key: "A", does: "one way", costs: "little", leaveIt: true }, { key: "B", does: "the other", costs: "more" }],
   recommended: { key: "A", reason: "It costs less.", scope: "CORE" },
   nearest: "spn-x", signs: [], others: "A third way, set aside: it costs more than B.",
+  settled: { answered: "The lookup found nothing that settles it.", premise: "The need is real: a.ts:12 holds it today.", changes: "TRADE_OFF" },
 };
 
 /**
