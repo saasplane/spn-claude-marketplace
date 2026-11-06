@@ -37,6 +37,8 @@ facts: [{{f<n>}}]                       # the facts it rests on, by id, from the
 hand back. **Read only** the files below; read further only where one of them sends you, and read a file over 20 KB in
 parts. **Search with `grep` in Bash**, since you have no Grep tool. **Hand back** at most 8 lines; save the report, at most 15 lines, as `orders/{{part}}.report.md` beside this order, its front matter first.
 
+**Read first:** {{the references of the order's kind of work, as `spn-devex precedent find "<subject>" --work <kind>` prints them: `<plugin> <path>` · …}}
+
 **A name, a shape or a construct no entry of this order holds is not yours to make up** (RULE.DEVEX.WORKSPACE.495): stop, return `needs-you`, and list each one under `unnamed:` in the report.
 
 <!-- IN AN ARC THAT KEEPS A CHANGE SHEET (arcs/<arc>/sheet.json), THE ORDER NAMES ITS PART AND NOTHING ELSE ABOUT THE WORK:
