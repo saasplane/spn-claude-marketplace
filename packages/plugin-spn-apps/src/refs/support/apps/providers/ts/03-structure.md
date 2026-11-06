@@ -144,7 +144,7 @@ apps/<app>-ts/src/
 
 **Bootstrap files sit at the top of `src/`, and everything else is a module.** A service app's modules mirror the package triad, as `src/modules/<module>/{interface.ts, <module>Module.ts, <Module>RuntimeModuleManager.ts, app/, contract/, entry/, migrations/}`. An app-local module is mounted in its own app and published by no package, so it has no second door. A web app's shell is `modules/boot/`, holding the router, the app root, session and auth hooks, client construction and the shell's own screens — never at the source root.
 
-**Every application declares its own `interface.ts`**, and the app-structure names follow the app-code grammar: `<CODE>App`, `<CODE>AppConfig`, `<CODE>AppManager`, and the typed singleton `<code>App`. A code that is a mnemonic of two to four letters stays in capitals (`DMOAppManager`, `dmoApp`), and a longer code is written as a word (`ObserverAppManager`, `observerApp`). Codes are unique, so these names never collide the way descriptive ones do. Consuming a shared type directly in the entry point leaves the app with no extension point.
+**Every application declares its own `interface.ts`**, and the app-structure names follow the app-code grammar: `<CODE>App`, `<CODE>AppConfig`, `<CODE>AppManager`, and the typed singleton `<code>App`. A code that is a mnemonic of two to four letters stays in capitals (`DMOAppManager`, `dmoApp`), and a longer code is written as a word (`HiringAppManager`, `hiringApp`). Codes are unique, so these names never collide the way descriptive ones do. Consuming a shared type directly in the entry point leaves the app with no extension point.
 
 ## The one barrel
 
