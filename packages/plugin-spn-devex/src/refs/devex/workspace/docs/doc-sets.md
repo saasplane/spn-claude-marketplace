@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "seen": "cbbcdc2d"
+      "seen": "fcc5c4cd"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
@@ -614,12 +614,20 @@ sections are *Overview*, *Today*, *Proposed* and *Where it lands*, and an *Open*
 raises: the same cards as the approach page's, rendered from the same records by the `open` block
 (`RULE.DEVEX.WORKSPACE.253` · MUST · check:split-plan). An arc has one preview, `notes/<arc>/preview.html` (`RULE.DEVEX.WORKSPACE.254` · MUST · check:workstream-owner). *Overview* says what
 the reader is asked to decide, what to look at first and what is not final. *Today* shows the thing as it is.
-*Proposed* shows it as it will be, with its options side by side where a decision is still open. It is drawn
+*Proposed* shows it as it will be, with its options side by side where a decision is still open. It opens
+with *Shape*, which holds no code, and then holds one section for each layer set that changes, *Server*,
+*Web*, *Surface*, *Plugins* and *Estate*, each with its layers and, inside a layer, one subsection for each
+module; a layer that does not change has no section and no line. Each layer section carries a `data-layer`
+mark. Each block opens with a For and Layer line, shows a new file whole, shows a change as today's code
+beside the proposed, and ends with a Reads line naming the file and line each name and value comes from.
+*Plugins* shows a change to the agent's own mechanics as journeys and outcomes, never as code. It is drawn
 from the sheet's entries: an outline in the order they connect, and a code block only for an entry marked
 `judged`, shown as the patch the sheet keeps for it. A section about a path, who speaks to whom, or the parts
 of one thing carries its figure. *Where it
-lands* shows the files that change as one folder tree for each repository, with a link to the approach page's
-own `How`. The
+lands* shows the files that change as one folder tree for each repository, with the repository's Docs, the
+book pages and the repository's own pages that explain the change, inside its tree, then *What proves it*,
+which lists each repository in the order of the trees with its tiers, tests and case ids, and *How it ships*,
+with a link to the approach page's own `How`. The
 reasoning stays on the approach page, so a preview carries no `Why`, `What` or `How`. A preview never frames a
 sample file: it shows a thing with the page's own blocks, and links a real file in the arc's `samples/`
 folder. Its masthead names its arc, as a badge after the type that links the arc's row, then the arc's
@@ -629,7 +637,8 @@ work's own file, never a page built with the page template; only a sample of a b
 carries a masthead, its `Type` naming the page kind or its name the template it copies (`RULE.DEVEX.WORKSPACE.267` · MUST · check:workstream-state).
 
 **`Where it lands` is one folder tree for each repository** (`RULE.DEVEX.WORKSPACE.238` · GUIDE). The
-section is grouped by repository, in the order the work runs, and it is never a table of file paths. One line
+section is grouped by repository, in the order the work runs, and a repository's Docs, the book pages and the
+repository's own pages that explain the change, sit inside its tree. It is never a table of file paths. One line
 names the repository and says what happens there. Then the repository is one `TREE` block: one folder or file
 on each line, never two columns of entries, and a note in one column on the right that reads `new` or
 `changed` and then says what the change is. A folder with no note only holds what is under it. A deep path is

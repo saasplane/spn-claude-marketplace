@@ -8,6 +8,11 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/03-lenses/01-lenses.md",
       "seen": "b61443fd"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
+      "section": "The agent loads what the work needs",
+      "seen": "8afe8c0e"
     }
   ]
 }
@@ -60,6 +65,8 @@
 | tests | `QA`, worn while writing | each case made to fail once |
 | docs and words | `VOICE`, worn while writing | the doc hooks at write time |
 | a release | `LEAD` · `INFRA` · `PARTNER` | convened at the release gate |
+
+**A panel is asked first whether the card's premise is true and what would make the question unnecessary, checked against the code, before it weighs the options.** An option chosen well over a false premise is still wrong, so the premise question comes first and the options second (the agent chapter's section *The agent loads what the work needs*).
 
 **A panel reports; the writing context acts.** It names the consumer and the stage first, speaks as the lens's persona, does not edit, and does not decide what happens next. **A panel never invents a rule.** A finding with no owning chapter behind it is a suggestion, reported as one, and a gap the book does not cover becomes a drafted book change the developer decides.
 

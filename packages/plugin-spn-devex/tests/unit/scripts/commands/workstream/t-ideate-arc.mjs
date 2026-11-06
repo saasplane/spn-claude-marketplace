@@ -32,6 +32,8 @@ console.log("\n=== opening");
   ok("[MKT.SCRIPTS.486] `arc edit <ws>/N002` opens, a build arc that records no kind", build.code === 0 && stateOf("N002").kind === undefined, build.out);
   const third = open("N003");
   ok("[MKT.SCRIPTS.486] and the number after it opens in turn", third.code === 0 && existsSync(join(ws, "arcs", "N003", "state.json")), third.out);
+  const placed = open("N003", "--position", "2");
+  ok("[MKT.SCRIPTS.526] red: `arc edit --position` is refused as unknown, and no position is stored", placed.code !== 0 && placed.out.includes("position") && stateOf("N003").position === undefined, placed.out);
   const kindOpen = open("N004", "--kind", "ideate");
   ok("[MKT.SCRIPTS.487] red: `--kind` is an option `arc edit` does not take, when an arc is opened", kindOpen.code !== 0 && kindOpen.out.includes("does not take `--kind`") && !existsSync(join(ws, "arcs", "N004")), kindOpen.out);
   const kindEdit = cli(root, ["workstream", "arc", "edit", "031/N002", "--kind", "ideate"]);

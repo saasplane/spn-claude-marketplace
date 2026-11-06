@@ -17,7 +17,12 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
-      "seen": "632da84b"
+      "seen": "fbac6daf"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
+      "section": "A review's findings and the developer's corrections are records",
+      "seen": "577cf383"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -32,7 +37,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "section": "An order is one delegated execution, and every order follows the same rules",
-      "seen": "8e727620"
+      "seen": "8943136e"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -51,7 +56,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "seen": "cbbcdc2d"
+      "seen": "fcc5c4cd"
     }
   ]
 }
@@ -150,7 +155,7 @@ name, so `workstream arc stamp write` is the group `workstream`, the subject `ar
 | `state show [<workstream>]` | where everything stands, in a line: `025 · N007 18/19 · 57b running · N010 proposed · 0 open cards · 1 suggestion shaped` |
 | `state check [<workstream>] [--facts]` | whether each open and backlog workstream is whole; exits 1 on a finding. `--facts` also names each pinned fact whose source moved, as a note |
 | `rows show <workstream>[/<arc>] [--ready] [--parallel] [--tree]` | the rows; the ready ones; of those, the ones whose `touches` do not overlap |
-| `arc edit <arc> [--title …] [--goal …] [--status …] [--wait …] [--reason …] [--start] [--review-fixes] [--subject …] [--under …] [--preview …] …` | opens an arc as `PROPOSED` (`--title`, `--subject`, and `--goal`), as many as the plan needs, or changes any field of its header and its stored status, writing the arc's name file with its data; an arc field is written nowhere else. A `--subject` over three words or 24 characters is refused; `--position <n>` sets the arc's place in the planned sequence, which orders the arcs still `DECIDED` or `PROPOSED` on the approach page's sticky card; `--note` writes a log line. `--status` stores the developer's words, `PROPOSED`, `DECIDED`, `CARRIED` or `DROPPED`, and `LANDED` only on the review-fixes arc at the close; every move needs `--note` with their words. The go, `--status DECIDED`, lists each line of the preview that still says proposed. `--wait "<their words>"` holds a decided arc and `--start --note "…"` clears it; `--review-fixes` opens the review-fixes arc, `DECIDED` on their words. A move back to `PROPOSED` stops the arc's running steps. `DROPPED` is refused on an arc never decided. A row's field is refused, and `row edit` is named |
+| `arc edit <arc> [--title …] [--goal …] [--status …] [--wait …] [--reason …] [--start] [--review-fixes] [--subject …] [--under …] [--preview …] …` | opens an arc as `PROPOSED` (`--title`, `--subject`, and `--goal`), as many as the plan needs, or changes any field of its header and its stored status, writing the arc's name file with its data; an arc field is written nowhere else. A `--subject` over three words or 24 characters is refused; An arc has no position of its own: the order the work runs in is set by `dependsOn` and the sheet, and the approach page's Plan table and status bar list the arcs in the same order, `ideate` first, the build arcs by number and letter, `follow-ups` last; `--note` writes a log line. `--status` stores the developer's words, `PROPOSED`, `DECIDED`, `CARRIED` or `DROPPED`, and `LANDED` only on the review-fixes arc at the close; every move needs `--note` with their words. The go, `--status DECIDED`, lists each line of the preview that still says proposed. `--wait "<their words>"` holds a decided arc and `--start --note "…"` clears it; `--review-fixes` opens the review-fixes arc, `DECIDED` on their words. A move back to `PROPOSED` stops the arc's running steps. `DROPPED` is refused on an arc never decided. A row's field is refused, and `row edit` is named |
 | `row add <arc> "<title>" --repo <repo> --work <work> [--kind change] [--state ready] [--blocked-by …] [--touches …] [--position …] [--model …] [--note …]` | adds a row, takes the arc's next number and prints it; refused without `--repo` or `--work`. A step written `running` or `landed` on an arc not `DECIDED`, or holding a wait, is refused, and a step is never added to an arc that reads `LANDED` |
 | `row state <arc> <row> <state> [--note …]` | the everyday call: moves a row to a state, and the log line says from where; a row the arc does not hold is refused, and `row add` is named |
 | `row note <arc> <row> "<text>"` | writes one line on a row's log and changes nothing else |
@@ -164,6 +169,9 @@ name, so `workstream arc stamp write` is the group `workstream`, the subject `ar
 | `suggestion state <workstream> <sN> <state> [--words "…"]` | moves it on: shaped, decided, parked or dropped, with the words beside the move |
 | `suggestion edit <workstream> <sN> [--title …] [--preview …]` | changes its title or its preview, never its state |
 | `question raise · show · answer · cite · withdraw` | a card from raised to answered, and `cite` for one answered earlier (`--entries none` where it changes no repository file); [`docs/decision-cards.md`](docs/decision-cards.md) states them |
+| `finding write · decide · show` | a saved review's findings as records in the arc's `findings.jsonl`, each naming its view and number; `finding decide <arc> <Fn>` answers one with `--carried` (sheet entries that exist), `--decided` (a card that exists) or `--dropped "<reason>"`; `show --open` lists the unanswered |
+| `correction write <arc> --said "…" --answered-by <book\|code\|review\|none> --ref <file:line> --work <kind>` | logs a correction made on something already answered and prints the map row or reference to amend; `none` is recorded and does not count |
+| `decision write · show` | logs an engineering call the agent decided, with `--reverse "<the one line that undoes it>"`; `state show` lists it |
 | `progress write <workstream>` | regenerates the progress block; every other write calls it |
 
 An arc is typed `<workstream>/N<nnn>`, or `N<nnn>` alone from inside its workstream or where one open or
@@ -512,6 +520,10 @@ its plan, and runs from the first row not landed. Nothing that landed is done ag
 changes nothing under anybody's feet. The run reaches it later and follows the new text.
 
 ## A card is only for what the rules leave open
+
+**A review's findings and the developer's corrections are records.** Each finding of a saved review is a record, and the proposal is not shown while one is open. `finding write` saves the numbered findings as open records in the arc's `findings.jsonl`, and a finding is answered in one of three ways: carried into sheet entries that exist (`finding decide --carried`), decided on a card that exists (`--decided`), or dropped with a reason (`--dropped`). `workstream state check` is silent when every finding is answered, and names the open ids and the three ways when an arc that is not terminal holds open findings and its preview has no slot left. It is the workstream's own bookkeeping and reads no code. A correction the developer makes on something already answered is one log line, counted: `correction write` logs what was said, what answered it (`book`, `code`, `review` or `none`), the file and line and the kind of work, and prints the map row or reference that should have held the answer, which the agent amends in the same work. `none` does not count. `state show` counts the corrections by answer, and at a workstream's close the chat is scanned for the ones left unlogged. The count is the measure of the agent loading what the work needs (`refs/devex/agent/agent.md`).
+
+**Before a card or a suggestion is raised, three questions are asked** (see `refs/devex/workspace/docs/decision-cards.md`): is it already answered, is the premise true, and does the answer change what a person sees or pays for, a boundary, a promise or a real trade-off. An engineering call with a clear recommendation is the agent's, logged by `workstream decision write` and reported in one line the developer can reverse.
 
 **An answered card binds every later workstream** (`RULE.DEVEX.WORKSPACE.498` · MUST · short). Before the agent settles a doubt, or amends a register row to match what the code does, it searches the closed workstreams' `questions.jsonl` for the question. An answer found there stands. Code that drifted from an answer goes back to the answer, or comes to the developer as a card that cites it. A card the developer answered once is never asked again, and never quietly undone.
 
@@ -1067,6 +1079,8 @@ change, and show it as it is now and as it will be, in a section of the
 [preview](#anything-the-developer-has-not-reviewed-preview-confirm-record-then-code) the developer
 decides at the go. An order never makes a preview of its own. A change described in words is read
 differently by each agent, and the work is then done twice.
+
+**An order's Read first line is filled from the work map.** The line lists the references of the kind of work the order does, as `spn-devex precedent map <kind>` prints them, so the child opens the same files the coordinator would, and not a list typed from memory.
 
 **A brief is in the light form: the files to change, the one rule they follow, and the row's
 acceptance — MUST.** That is every order's default form. It lists nothing to read first beyond those

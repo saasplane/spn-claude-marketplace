@@ -9,16 +9,17 @@ import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 import { basename, dirname, join, relative, resolve } from "node:path";
 import { cardsDiffer, openWithoutCard } from "./questions.ts";
+import { TERMINAL } from "./arc-status.ts";
 import { cyclesOf, headerStatusRule, tableStatuses } from "../commands/docs/cycles.ts";
 import { isDir, isFile, listdir } from "../lib/payload.ts";
 import { linksSharedStyles } from "../../../../plugin-support-lib/src/lib/page-styles.ts";
 import {
-  DATA_FILES, FACTS_FILE, SHEET_FILE, LOG_FILE, NOTES, PREVIEW_FILE, approachOf, arcStatus, stepsMayStart, arcDataDir, arcIdsOf, factsFileOf, sheetFileOf, readSheet, firstOpenArc, leafRows, isDataLayout, logFileOf, markdownArcsOf,
+  DATA_FILES, FACTS_FILE, findingsFileOf, SHEET_FILE, LOG_FILE, NOTES, PREVIEW_FILE, approachOf, arcStatus, stepsMayStart, arcDataDir, arcIdsOf, factsFileOf, sheetFileOf, readSheet, firstOpenArc, leafRows, isDataLayout, logFileOf, markdownArcsOf,
   NO_REPO, arcStamp, markdownIn, nameFileHolds, nameFileOf, notesDirOf, previewOf, questionsFileOf, readJsonl, readQuestions, stampsOn, stateFileOf,
   strayLevels, strayNotes, suggestionsFileOf, readJson, readArc, workstreamsOf, previewWithStatus, builtOf,
   localLinks, previewHrefOf, previewOwners, slotsIn, whatEntryOf, whatId, whatRange, workstreamName,
 } from "../lib/workstream.ts";
-import { ARC_ID, WORK, DONE_STATES, arcFaults, factFaults, sheetFaults, logFaults, questionFaults, cardName, subjectFault, suggestionFaults, type ArcData, type Fact } from "../lib/workstream-schema.ts";
+import { ARC_ID, WORK, DONE_STATES, arcFaults, factFaults, findingFaults, type Finding as ReviewFinding, sheetFaults, logFaults, questionFaults, cardName, subjectFault, suggestionFaults, type ArcData, type Fact } from "../lib/workstream-schema.ts";
 
 export type Finding = { workstream: string; arc: string | null; check: string; message: string };
 
@@ -163,6 +164,19 @@ export function arcPreviewFindings(ws: string, arc: string, data: ArcData, owner
   if (slots.length && !["PROPOSED", "CARRIED", "DROPPED"].includes(status))
     out.push(`${arc} is ${status} and its preview still holds ${slots.length} slot(s), \`{{…}}\`, the first at \`${href}:${slots[0].line}\` — a decided arc's preview is filled; a slot is expected only while the arc is PROPOSED`);
   return out;
+}
+
+/**
+ * The findings line: an arc that is not terminal, holds open findings of a saved review and has a preview with no slot left is named
+ * with the open ids and the three ways to answer. An arc with no findings, or with all of them answered, passes, and so does one whose
+ * preview still has a slot, because a review is still being read. This is the workstream's own bookkeeping and reads no code.
+ */
+export function findingsFindings(ws: string, arc: string, data: ArcData): string[] {
+  const open = readJsonl(findingsFileOf(ws, arc)).filter((one): one is ReviewFinding => !!one && typeof one === "object" && (one as ReviewFinding).state === "open");
+  if (!open.length || TERMINAL.has(arcStatus(data))) return [];
+  const preview = previewOf(ws, arc);
+  if (!isFile(preview) || slotsIn(readFileSync(preview, "utf8")).length) return [];
+  return [`${open.length} review finding${open.length === 1 ? " is" : "s are"} open (${open.map((one) => one.id).join(", ")}): carry each into a sheet entry, decide it on a card, or drop it with a reason, before the preview is shown (\`workstream finding decide\`)`];
 }
 
 /**
@@ -386,6 +400,7 @@ export function checkWorkstream(ws: string): Finding[] {
     out.push(...faults.map(say(arc, "schema")));
     out.push(...linesFindings(logFileOf(ws, arc), `arcs/${arc}/${LOG_FILE}`, logFaults).map(say(arc, "schema")));
     out.push(...linesFindings(factsFileOf(ws, arc), `arcs/${arc}/${FACTS_FILE}`, factFaults).map(say(arc, "schema")));
+    out.push(...linesFindings(findingsFileOf(ws, arc), `arcs/${arc}/findings.jsonl`, findingFaults).map(say(arc, "schema")));
     const sheetRaw = existsSync(sheetFileOf(ws, arc)) ? readJson(sheetFileOf(ws, arc)) : undefined;
     if (sheetRaw !== undefined)
       out.push(...(sheetRaw === null ? [`arcs/${arc}/${SHEET_FILE} is not JSON`] : sheetFaults(sheetRaw, `arcs/${arc}/${SHEET_FILE}`).map((fault) => fault.startsWith("arcs/") ? fault : `arcs/${arc}/${SHEET_FILE}: ${fault}`)).map(say(arc, "schema")));
@@ -399,6 +414,7 @@ export function checkWorkstream(ws: string): Finding[] {
     out.push(...nameFindings(ws, arc, data).map(say(arc, "name")));
     out.push(...stepFindings(ws, arc, data).map(say(arc, "steps")));
     out.push(...statusFindings(arc, data).map(say(arc, "status")));
+    out.push(...findingsFindings(ws, arc, data).map(say(arc, "findings")));
   }
   // A preview linked from What outside its arc's entry belongs to no arc's check.
   out.push(...whatLinkFindings(ws, page, text, owners).map(say(null, "stamp")));

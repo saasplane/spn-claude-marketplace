@@ -17,7 +17,7 @@ const WS = "/work/.spndevex/workstreams/open/037-probe";
 const PREVIEW = `${WS}/notes/N003/preview.html`;
 const SAMPLE = `${WS}/notes/N003/samples/store.sql`;
 const write = (file_path, content, tool_name = "Write") => ({ tool_name, tool_input: { file_path, content } });
-const kind = (verdict) => (verdict?.deny ? "deny" : "silent");
+const kind = (verdict) => (verdict?.deny ? "deny" : verdict?.note ? "note" : "silent");
 
 const TAIL = "created_at timestamptz, updated_at timestamptz, created_by uuid, updated_by uuid";
 const table = (name, extra = "", schema = "platform") => `CREATE TABLE ${schema}.${name} (id uuid PRIMARY KEY, ${extra}${extra ? ", " : ""}${TAIL});`;
@@ -37,7 +37,7 @@ ok("N002's store sample with updated_by in its tail", kind(checkSqlSample(write(
   `CREATE TABLE platform.svc_transaction_bound_write (id uuid PRIMARY KEY, payload_json jsonb, ${TAIL});\nCREATE TABLE platform.svc_transaction_bound_record_version (id uuid PRIMARY KEY, ${TAIL});`))) === "silent");
 ok("a preview with no SQL", kind(checkSqlSample(write(PREVIEW, "<h1>Plan</h1><p>No tables here.</p>"))) === "silent");
 
-console.log("\n=== a draft that breaks it is denied, naming its rule");
+console.log("\n=== a draft that breaks it is told, naming its rule");
 {
   const cases = [
     ["TABLE", table("ent_fields")],
@@ -49,23 +49,25 @@ console.log("\n=== a draft that breaks it is denied, naming its rule");
   ];
   for (const [rule, sql] of cases) {
     const v = checkSqlSample(write(PREVIEW, page(sql)));
-    ok(`${rule}: a preview is denied, naming [${rule}]`, kind(v) === "deny" && v.deny.includes(`[${rule}]`) && v.deny.includes("preview"), JSON.stringify(v));
+    ok(`${rule}: a preview is told, naming [${rule}]`, kind(v) === "note" && v.note.includes(`[${rule}]`) && v.note.includes("preview"), JSON.stringify(v));
   }
   const sample = checkSqlSample(write(SAMPLE, "CREATE TABLE platform.ent_field (id uuid, created_at timestamptz, name text);"));
-  ok("a sample is denied and called a sample", kind(sample) === "deny" && sample.deny.includes("this sample") && sample.deny.includes("[AUDIT TAIL]"), JSON.stringify(sample));
-  ok("the denial cites the book's rules", checkSqlSample(write(PREVIEW, page(table("ent_fields")))).deny.includes("RULE.SUPPORT.APPS.254"));
+  ok("a sample is told and called a sample", kind(sample) === "note" && sample.note.includes("this sample") && sample.note.includes("[AUDIT TAIL]"), JSON.stringify(sample));
+  ok("the note cites the book's rules", checkSqlSample(write(PREVIEW, page(table("ent_fields")))).note.includes("RULE.SUPPORT.APPS.254"));
 }
+
+ok("[E78] no draft is ever denied: a break gives a note and no deny", ["TABLE", "AUDIT TAIL"].every((_, i) => !("deny" in (checkSqlSample(write(PREVIEW, page(i ? "CREATE TABLE platform.ent_field (id uuid, name text);" : table("ent_fields")))) ?? {}))));
 
 console.log("\n=== the page text is read as a reader sees it");
 ok("tags inside the SQL are dropped, so a highlighted pre still reads", kind(checkSqlSample(write(PREVIEW,
-  "<pre><span class=k>CREATE TABLE</span> platform.<b>ent_fields</b> (id uuid, " + TAIL + ");</pre>"))) === "deny");
-ok("an Edit's new_string is read too", kind(checkSqlSample({ tool_name: "Edit", tool_input: { file_path: SAMPLE, new_string: table("ent_fields") } })) === "deny");
+  "<pre><span class=k>CREATE TABLE</span> platform.<b>ent_fields</b> (id uuid, " + TAIL + ");</pre>"))) === "note");
+ok("an Edit's new_string is read too", kind(checkSqlSample({ tool_name: "Edit", tool_input: { file_path: SAMPLE, new_string: table("ent_fields") } })) === "note");
 
 console.log("\n=== a long list is cut");
 {
   const many = Array.from({ length: 6 }, (_, i) => table(`ent_thing${i}s`)).join("\n");
   const v = checkSqlSample(write(SAMPLE, many));
-  ok("more than four findings show four and count the rest", kind(v) === "deny" && v.deny.includes("and 2 more"), JSON.stringify(v));
+  ok("more than four findings show four and count the rest", kind(v) === "note" && v.note.includes("and 2 more"), JSON.stringify(v));
 }
 
 console.log(failed ? `\n  ${failed} of ${total} FAILED — sql-sample` : `\n  all ${total} passed — sql-sample`);

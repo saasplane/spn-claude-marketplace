@@ -33,7 +33,7 @@ const HEADER_TEXT = ["title", "subject", "goal", "reason", "decides", "cycle", "
 
 const OPTIONS = {
   title: VALUE, subject: VALUE, goal: VALUE, status: STORED_STATUSES, reason: VALUE, wait: VALUE, start: FLAG, "review-fixes": FLAG, decides: VALUE, repos: VALUE, cycle: VALUE, follows: VALUE,
-  model: VALUE, position: VALUE, preview: VALUE, under: VALUE, note: VALUE, carries: VALUE, proposes: VALUE,
+  model: VALUE, preview: VALUE, under: VALUE, note: VALUE, carries: VALUE, proposes: VALUE,
 } as const;
 
 const TITLE_WORDS = 5;
@@ -91,11 +91,6 @@ function header(data: ArcData, words: Words): string[] {
   }
   const carries = listOf(words, "carries")?.map(cardId);
   if (carries) { data.carries = carries; changed.push("carries"); }
-  const position = words.value("position");
-  if (position !== null) {
-    if (!/^[1-9]\d*$/.test(position)) throw new UsageFault(`takes \`--position\` as a whole number from 1, the arc's place in the planned sequence: \`${position}\` is not one.`);
-    if (data.position !== Number(position)) { data.position = Number(position); changed.push("position"); }
-  }
   const preview = words.value("preview");
   if (preview !== null) {
     const fault = previewPathFault(preview);
@@ -410,7 +405,7 @@ function remove(args: string[]): number {
 export const actions: Record<string, Action> = {
   edit: {
     describe: "open an arc, or change any field of its header and its status; --note writes a log line",
-    usage: "<workstream>/<arc> [--proposes <arc>,…] [--title …] [--goal …] [--status …] [--wait …] [--reason …] [--start] [--review-fixes] [--subject …] [--under …] [--preview …] [--decides …] [--repos …] [--cycle …] [--follows …] [--model …] [--position …] [--note …]",
+    usage: "<workstream>/<arc> [--proposes <arc>,…] [--title …] [--goal …] [--status …] [--wait …] [--reason …] [--start] [--review-fixes] [--subject …] [--under …] [--preview …] [--decides …] [--repos …] [--cycle …] [--follows …] [--model …] [--note …]",
     run: edit,
   },
   stamp: { describe: "write: restamp an arc's Plan row once its part of the page is current", usage: "write <workstream>/<arc>", run: stamp },

@@ -222,10 +222,10 @@ function onceForAFile(shown) {
     "note", { says: "is the mirror of `src/app/`", cwd: root,
               parity: false, why: "step 7 is new work, and the Python dispatcher never carried it" });
 
-  one("an edit under a src/ no mirror governs stays silent",
+  one("an edit under a src/ no mirror governs gets the work note and no mirror nudge",
     { tool_name: "Edit", cwd: root, session_id: "m2",
       tool_input: { file_path: `${root}/pkg/src/migrations/001.ts`, new_string: "x" } },
-    "silent", { cwd: root });
+    "note", { says: "Work: server-data", cwd: root, parity: false, why: "the work note is new" });
 }
 
 {
@@ -289,9 +289,9 @@ console.log("\n=== pretooluse — a push waits for a whole run of its tree, and 
   one("[MKT.HOOKS.63] a Bash call that is not a push or a commit passes the same chain",
     { tool_name: "Bash", cwd: repo, tool_input: { command: "git status" } },
     "silent", { cwd: root, parity: false, why: "a new guard" });
-  one("[MKT.HOOKS.70] a commit on the workstream's branch passes the same chain",
+  one("[MKT.HOOKS.70] a commit on the workstream's branch passes the same chain, with the commit note and no refusal",
     { tool_name: "Bash", cwd: repo, tool_input: { command: "git commit -m x -- pkg/src/a.ts" } },
-    "silent", { cwd: root, parity: false, why: "a new guard" });
+    "note", { says: "Work: commit-pr", cwd: root, parity: false, why: "a new guard" });
   git("checkout", "-q", "-b", "develop");
   one("[MKT.HOOKS.69] a commit on develop is refused by the chain, naming the pull request",
     { tool_name: "Bash", cwd: repo, tool_input: { command: "git commit -m x -- pkg/src/a.ts" } },
@@ -619,6 +619,59 @@ console.log("\n=== pretooluse — the chain's cost per call");
   check("[MKT.HOOKS.343] a refusal in a run outside the workspace, the project directory at it, lands its line in the workspace",
     outside.includes("deny") && sendbacks().slice(mid).some((line) => line.session === "sb-pre-3"), outside.slice(0, 160));
   rmSync(away, { recursive: true, force: true });
+}
+
+{
+  // THE WORK NOTE (MKT.HOOKS.493 to .497): the map's row for what a call starts, once for each kind of work in a window, and never a refusal.
+  console.log("\n=== the work note");
+  const why = "the work note is new";
+  const room = workspace("dispatch-work-note", { "packages/m/src/contract/states/job.ts": "export {};\n", "readme.txt": "x\n" });
+  const preview = join(room, ".spndevex", "workstreams", "open", "041-probe", "notes", "N001", "preview.html");
+  const at = { cwd: room };
+  const skill = { tool_name: "Skill", session_id: "w493", cwd: room, tool_input: { skill: "spn-devex:ideate" } };
+  one("[MKT.HOOKS.493] a skill opening gives the note of its kind of work, with the search to run", skill, "note", { says: "precedent find", parity: false, why, ...at });
+  one("[MKT.HOOKS.496] the same skill opened again in the window gives none: a told row is told once", skill, "silent", { parity: false, why, ...at });
+  const layered = { tool_name: "Write", session_id: "w494", cwd: room, tool_input: { file_path: preview,
+    content: '<section id="s3"><h2>Proposed</h2><h3 id="s3-server" data-layer="server-contract">Server</h3><p>x</p></section>' } };
+  one("[MKT.HOOKS.494] a write to a preview that draws a server contract gives the preview note and the server-contract note", layered, "note", { says: "Work: preview, server-contract", parity: false, why, ...at });
+  const again = run("node", [`${HOOKS}/src/scripts/events/pretooluse.ts`], layered, room);
+  n += 1;
+  if (again[1].includes("Work:")) failed += 1;
+  console.log(`  ${again[1].includes("Work:") ? "FAIL" : "PASS"}  [MKT.HOOKS.496] the second write carries no \`Work:\` line\n        ${again[1].slice(0, 120)}`);
+  const widened = run("node", [`${HOOKS}/src/scripts/events/pretooluse.ts`], { ...layered, tool_input: { ...layered.tool_input, content: '<h3 data-layer="server-contract">a</h3><h3 data-layer="web-module">b</h3>' } }, room);
+  n += 1;
+  if (!widened[1].includes("Work: preview, web-module")) failed += 1;
+  console.log(`  ${widened[1].includes("Work: preview, web-module") ? "PASS" : "FAIL"}  [MKT.HOOKS.494] a layer the preview did not draw before is told, and the row already told is not\n        ${widened[1].slice(0, 120)}`);
+  one("[MKT.HOOKS.495] a commit gives the commit row", { tool_name: "Bash", session_id: "w495", cwd: room, tool_input: { command: "git commit -m x -- a.ts" } }, "note", { says: "Work: commit-pr", parity: false, why, ...at });
+  one("[MKT.HOOKS.495] and a pull request gives it too, in another window", { tool_name: "Bash", session_id: "w495b", cwd: room, tool_input: { command: "gh pr create --title x" } }, "note", { says: "Work: commit-pr", parity: false, why, ...at });
+  {
+    // THE TOLD MARK clears after a compaction or a resume (E79): the session start continues the window and the note is said again.
+    const sid = "w496r";
+    const first = { tool_name: "Skill", session_id: sid, cwd: room, tool_input: { skill: "spn-devex:ideate" } };
+    const said = (payload) => run("node", [`${HOOKS}/src/scripts/events/pretooluse.ts`], payload, room)[1].includes("Work:");
+    const sequence = [said(first), said(first)];
+    run("node", [`${HOOKS}/src/scripts/events/orientation.ts`, "--stdin"], { session_id: sid, cwd: room, source: "compact" }, room);
+    sequence.push(said(first), said(first));
+    n += 1;
+    const right = sequence.join() === "true,false,true,false";
+    if (!right) failed += 1;
+    console.log(`  ${right ? "PASS" : "FAIL"}  [MKT.HOOKS.496] after a compaction the told note is told again, once: ${sequence.join(" ")}`);
+  }
+  one("[MKT.HOOKS.497] a write that opens no row gives no note", { tool_name: "Write", session_id: "w497", cwd: room, tool_input: { file_path: join(room, "readme.txt"), content: "x" } }, "silent", { parity: false, why, ...at });
+  const contract = { tool_name: "Edit", session_id: "w497c", cwd: room, tool_input: { file_path: join(room, "packages", "m", "src", "contract", "states", "job.ts"), new_string: "isActive: CDTBoolean;" } };
+  one("[MKT.HOOKS.494] a write under a contract's states folder opens the server-contract row", contract, "note", { says: "Work: server-contract", parity: false, why, ...at });
+  const triggers = [{ ...skill, session_id: "d0" }, { ...layered, session_id: "d1" }, { ...skill, session_id: "d2", tool_input: { skill: "spn-apps:implement" } },
+    { ...contract, session_id: "d3" }, { tool_name: "Bash", session_id: "d4", cwd: room, tool_input: { command: "git commit -m x -- a.ts" } },
+    { tool_name: "Bash", session_id: "d5", cwd: room, tool_input: { command: "gh pr create" } }, { ...skill, session_id: "d6", tool_input: { skill: "spn-apps:release" } }];
+  const verdicts = triggers.map((payload) => run("node", [`${HOOKS}/src/scripts/events/pretooluse.ts`], payload, room));
+  n += 1;
+  const denied = verdicts.filter(([kind]) => kind === "deny");
+  if (denied.length) failed += 1;
+  console.log(`  ${denied.length ? "FAIL" : "PASS"}  [MKT.HOOKS.497] no trigger ever denies: ${triggers.length} triggers, ${verdicts.map(([kind]) => kind).join(" ")}\n        ${denied.map(([, said]) => said.slice(0, 200)).join(" | ")}`);
+  n += 1;
+  const sizes = verdicts.filter((_, index) => triggers[index].tool_name !== "Write").map(([, said]) => Buffer.byteLength(said));
+  if (sizes.some((size) => size > 1500)) failed += 1;
+  console.log(`  ${sizes.some((size) => size > 1500) ? "FAIL" : "PASS"}  [MKT.HOOKS.497] a note stays within 1,500 bytes: ${sizes.join(", ")}`);
 }
 
 {

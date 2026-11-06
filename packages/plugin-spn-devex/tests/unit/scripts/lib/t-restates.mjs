@@ -118,5 +118,20 @@ console.log("\n=== the nearest book up");
     findBook(undefined, lonely) === null && noBookReason(lonely).includes(lonely));
 }
 
+console.log("\n=== the rules block writes a rule only when it has words, and follows the last step");
+{
+  const rule = (id, sentence) => ({ id, level: "MUST", params: { skill: "spn-devex/ideate" }, class: "skill", sentence, chapter: "c.md", heading: "h", decision: null, restated: [] });
+  const rules = [rule("RULE.DEVEX.FUNCTION.090", "RULE.DEVEX.FUNCTION.090"), rule("RULE.DEVEX.FUNCTION.091", null), rule("RULE.DEVEX.FUNCTION.092", "Give each idea one name")];
+  ok("[MKT.SCRIPTS.525] a rule whose sentence is its own id, or none, has no words", !restates.hasWords(rules[0]) && !restates.hasWords(rules[1]) && restates.hasWords(rules[2]));
+  const step = "# ideate\n\nThe first step.\n\n## Last step\n\nDone.\n";
+  const atEnd = restates.withRulesBlock(step, rules, true);
+  ok("[MKT.SCRIPTS.525] the block lists only the rule with words, and follows the last step", atEnd.includes("Give each idea one name") && !atEnd.includes("FUNCTION.090") && !atEnd.includes("FUNCTION.091") && atEnd.indexOf("Done.") < atEnd.indexOf("## The rules this step holds"), atEnd);
+  const again = restates.withRulesBlock(atEnd, rules, true);
+  ok("[MKT.SCRIPTS.525] writing it again changes nothing, and a block at the top is moved to the end", again === atEnd && restates.withRulesBlock(restates.withRulesBlock(step, rules, false), rules, true) === atEnd);
+  ok("[MKT.SCRIPTS.525] a file whose rules all have no words holds no block", !restates.withRulesBlock(atEnd, [rules[0], rules[1]], true).includes("The rules this step holds"));
+  const under = restates.withRulesBlock(step, rules, false);
+  ok("[MKT.SCRIPTS.525] a step's block still sits under its title", under.indexOf("## The rules this step holds") < under.indexOf("The first step."));
+}
+
 console.log(failed ? `\n  ${failed} of ${total} FAILED — restates` : `\n  all ${total} passed — restates`);
 process.exit(failed ? 1 : 0);

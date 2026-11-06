@@ -54,7 +54,7 @@ import { basename, dirname, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { commandWords, usageLine } from "../../../../plugin-support-lib/src/lib/command.ts";
 import { isDir, isFile, listdir, read, readPayload, runAlone, type Payload } from "../lib/payload.ts";
-import { noteWelcome } from "../lib/window.ts";
+import { clearTold, noteWelcome } from "../lib/window.ts";
 import { ARCS, DEVEX, SESSIONS, WORKSTREAM_STATES, isApproachPage, isWorkspaceDevex, legacyWorkstreamsDir, workstreamsDir } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { isBuilderWorkspace } from "../lib/builder.ts";
 import { arcIdsOf, notesDirOf } from "../lib/workstream.ts";
@@ -1132,6 +1132,8 @@ if (runAlone("orientation.ts")) {
     result = orient(root, cwd, whole);
     // WHICH WELCOME WENT OUT, noted in the window so the Stop hook holds the first reply to the whole one only where it was sent.
     if (stdinMode) noteWelcome(root, payload.session_id, whole ? "whole" : "short");
+    // A COMPACTION OR A RESUME DROPS WHAT THE WINDOW HAD READ, so the told mark clears and a note said before it is said again (MKT.HOOKS.496).
+    if (stdinMode && !welcomeDue((payload as Payload & { source?: string }).source)) clearTold(root, payload.session_id);
   }
   catch (err) {
     if (!stdinMode) console.error(`orientation unavailable: ${err}`);

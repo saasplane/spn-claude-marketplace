@@ -4,17 +4,27 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "The approach document — a workstream's, never a repository's",
-      "seen": "616ce7be"
+      "seen": "ead74d80"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "section": "A card is only for what the rules leave open",
-      "seen": "9e9513e7"
+      "seen": "cb832528"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "section": "The reply while work runs shows what needs you, then what moved",
       "seen": "303f59ac"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
+      "section": "A proposal shows its choice as a preview, and the first one follows eight rules",
+      "seen": "b7706e01"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
+      "section": "Questions are records, and every card is one rendered",
+      "seen": "bff98e0c"
     }
   ]
 }
@@ -98,6 +108,8 @@ is written, and anything still open becomes the page's next `Q<n>` card, in the 
 | **information is missing** | a fact that no reading and no measurement can supply |
 | **the choice is people's** | priority, taste, business direction |
 
+**Before a card or a suggestion is raised, three questions are asked and their answers are held in the record.** Is it already answered, in the book, a reference, a register, a closed card or the code? Is the premise true, and what would make the question unnecessary? Does the answer change what a person sees or pays for, a boundary, a promise, or a real trade-off nothing settles? `question raise` and `suggestion add` run the lookup (`spn-devex precedent find`) themselves, show what it finds, and refuse a record whose `settled` block is empty: `answered` says what was found and why it does not settle the question, `premise` says what would make it unnecessary and where in the code it was checked, and `changes` is `PRODUCT`, `BOUNDARY`, `PROMISE` or `TRADE_OFF`. **An engineering call with a clear recommendation is the agent's.** It decides it, logs it with `workstream decision write` and the one line that reverses it, and reports it in one line. A card or a suggestion already stored is never judged again. A panel is asked the premise question before it weighs the options (`refs/devex/agent/lenses.md`).
+
 **No `Needs you` line, no ask a reply ends on, and no card or suggestion puts to the developer how the work runs**
 (`RULE.DEVEX.WORKSPACE.467` · MUST · check:stop) and in no card or suggestion (`RULE.DEVEX.WORKSPACE.468` · MUST · check:questions). What the agent
 chapter gives the agent, it decides, does, and reports in one line. A `Needs you` line holds a card's question, a page to look
@@ -116,7 +128,9 @@ workspace, a workstream that changes the agent may raise one, because there the 
 | **Views** | Short. One line says who spoke, why those views, and how each was made. Then each view has its name in bold and its reason in one or two plain sentences that a developer can follow without opening the code. A view says only what Why and What do not already say. It names no option by its letter, because the options come after it. A harder question may take a sentence or two more. Views with nothing to add are named together in one line. Two views that disagree still stand as two lines. Such as: **Views** — four fresh views: the architect, the server developer, the partner and product. **Architect:** The job module finds a schedule only by its exact key. If the version is in the key, the module must remember every key it has used. **Product:** A person never sees the request key, so a version kept there tells them nothing. **Server developer and Partner:** No objection. You shorten a view's words for the card, and keep its name and its meaning. Keep what a fresh view wrote in full in the arc's notes, `notes/N<nnn>/work/`, and do not link it from the card. The voice is unchanged: a colleague speaking, in short full sentences, never a slogan, and never a summary of what "the views" thought (`RULE.DEVEX.AGENT.090` · MUST · skill:spn-devex/ideate). The agent picks the views from what is being decided and their number from the signs of complexity (`refs/devex/agent/lenses.md`). On the page the part is required: the check that runs when the page is written reports a card in `Open` without it. A card or a suggestion in chat carries it too, and no check reads it there |
 | **Options** | A **table**: lettered, trade-off in its own column. *"Leave it"* is a real option wherever viable, with its cost stated |
 | **→ Recommendation** | One option, carrying the reason it wins, and citing what decides it. It names the subject's place, core or periphery, and calls an option that only moves the problem a deferral. It may name the views it rests on, in a clause |
-| **Preview** | Where the decision is a shape — an outline, a tree, a sample row, a code fragment — inline. A reader who must ask *"show me"* was handed an undecidable card. Where a page shows the options, the card links that preview page; the question is asked and answered in the card on the approach page; the preview may show the questions it raises in its own `Open`, which is the same card rendered from the same record (`question show`). A code fragment is written to its stack's own naming and code standards (`RULE.DEVEX.WORKSPACE.235` · MUST · short) |
+| **Preview** | Where the decision is a shape — an outline, a tree, a sample row, a code fragment — inline. A reader who must ask *"show me"* was handed an undecidable card. Where a page shows the options, the card links that preview page; the question is asked and answered in the card on the approach page; the preview may show the questions it raises in its own `Open`, which is the same card rendered from the same record (`question show`). A code fragment is written to its stack's own naming and code standards (`RULE.DEVEX.WORKSPACE.235` · MUST · short). Its shape is stated once, in *The preview of a choice* below |
+
+**The preview of a choice has one shape in the three places a choice is put to the developer.** A card carries what it is about, `CODE`, `FLOW` or `OTHER`, and each option's code with the recommended option marked. It carries a Today block only where real code exists and an option changes it, and then only the lines that differ; a flow's card shows the journey in steps, before and after. A suggestion's preview carries the same block, or a link only where a page already shows it. A recommendation in chat or in a report carries the same short block, at most about 15 lines, with real names and a name not yet defined marked as proposed. **Agent mechanics are the exception:** they show as a journey and an outcome, never as line-by-line plugin code. **A code card or a code suggestion with no preview is refused** at `question raise` and `suggestion add`; a card whose nearest construct is a `.ts`, `.tsx` or `.sql` file or a path under `/src/` is a `CODE` card whatever it says, and a card already stored is never judged again. The preview is the smallest fragment that shows the idea and how the options differ: a few lines for each option, only what differs, elided with `...`, never the whole change the option would make. The full change lives on the arc's preview and its sheet. The card record carries `about`, `preview` (`today` and `reason`, the reason the recommended option is shown as it is) and `settled`. A question reaches the developer only if it changes what a person sees or pays for, a boundary or a promise, or a real trade-off nothing settles.
 
 **The parts come in that order** (`RULE.DEVEX.WORKSPACE.242` · MUST · check:doc-check): the number and summary, Why, What,
 Views, Options, the recommendation, and the preview. Every page already runs Why, What, How, so a card

@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/03-module/",
-      "seen": "dc432464"
+      "seen": "e9d33695"
     }
   ]
 }
@@ -57,6 +57,18 @@ The states seat holds Commands, States, Events, enums and constants, and it MUST
 A state **MUST** be a single structured object — one consistent shape for success, failure and effects, never a bare scalar and never a shape that varies by code path. A state **MAY** list its effects (events emitted, notifications queued, tasks scheduled) so a caller sees the whole consequence of a command.
 
 A command **MUST** carry the caller's intent only. Never write context the runtime already authenticated — the caller's own identity, their organization — into the command body; read it from the execution context instead. Write commands carry ids, never codes. Command handling **MUST** be idempotent, so retrying the same command yields the same outcome.
+
+### Fields: how a state names and types them
+
+**A field that is on or off is a boolean that reads yes or no, such as `isActive`, and a status enum never stands in for it.** The job module's schedule says it in code: "Pause/disable is carried by `isActive`, so there is no separate CANCELLED state" (`module-server-job-ts/src/contract/states/schedule.ts`). The naming rule is `RULE.SUPPORT.APPS.232`.
+
+**A field that may be absent is `T | null`, and never optional.**
+
+**A shared shape is read before a field is written.** An address is `SPAddress`, or `SPAddressRegion` where a country and a city are all it holds; a currency is `SPCurrencyCodeType`, a country `SPCountryCodeType`, a language `SPLanguageCodeType`. They sit in `support-contract-ts/src/contract/states/global`, and a field of the same meaning takes their type.
+
+**A value that comes in kinds is a base plus `mtype` plus one carrier for each kind**, such as a fee that is a percent (`CDTDecimal`) or a fixed amount (an amount and `SPCurrencyCodeType`), and never two nullable fields.
+
+**A field that holds a person's data ends in one of the closed forms** (`RULE.SUPPORT.APPS.225`), and **an audit actor is never null**: the service chapter converts only when `createdBy` and `updatedBy` are both set.
 
 ### The read ladder — one entity at four richnesses
 
