@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "book": {
     "repository": "spn-foundation",
-    "commit": "8894ed19"
+    "commit": "ff54f11b"
   },
   "rules": [
     {
@@ -2288,7 +2288,13 @@
       "chapter": "04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "heading": "Every prompt is read before anything moves",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.FUNCTION.007",
@@ -12438,6 +12444,11 @@
           "plugin": "spn-devex",
           "path": "refs/devex/workspace/workstream.md",
           "heading": "An arc keeps a change sheet, and only its commands write it"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -14430,7 +14441,13 @@
       "chapter": "04-capabilities/03-platform/02-modules/03-notifications/01-notifications.md",
       "heading": "The catalog is filled by the modules that send",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.SUPPORT.APPS.001",
