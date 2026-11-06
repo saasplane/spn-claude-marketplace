@@ -129,7 +129,7 @@ writing a word into either.
 
 ## Target: app-module
 
-A module owned by one app, such as `PRJ` — a scaffold target rather than a workspace project, but **still a node**. It carries its own `spkind.json`, so it is documented, validated and scaffolded exactly like the packaged form (`RULE.SUPPORT.APPS.029` · MUST · skill:spn-apps/implement). Living inside an app is a packaging decision, not a different kind of thing. The platform's product module, named by the platform's code, is one of these, and it is the only module that declares pools, categories and apps.
+A module owned by one app, such as `WSP` — a scaffold target rather than a workspace project, but **still a node**. It carries its own `spkind.json`, so it is documented, validated and scaffolded exactly like the packaged form (`RULE.SUPPORT.APPS.029` · MUST · skill:spn-apps/implement). Living inside an app is a packaging decision, not a different kind of thing. The platform's product module, named by the platform's code, is one of these, and it is the only module that declares pools, categories and apps.
 
 - **Backend**: `apps/<service-app>/src/modules/<code>/` mirroring the module skeleton — `spkind.json`, `interface.ts`, `<code>Module.ts`, `<CODE>ModuleManager.ts`, `contract/` (states, services, validators, constants), `app/` (entities, repositories, services, support, utils), `entry/api/controllers/`, `migrations/`. Add **one line** to the app manager's module list to register it.
 - **Frontend** (if it has a surface): `apps/<web-app>/src/modules/<code>/entry/ui/` with `components/hooks/pages`, its own vite `manualChunks` claim, literal route strings in `nav.ts` (no URL-helper package).
