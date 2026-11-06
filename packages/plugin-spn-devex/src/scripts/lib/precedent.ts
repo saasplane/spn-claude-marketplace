@@ -6,7 +6,7 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
-import { decisionsRegister, docsOf } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
+import { WORKSTREAM_STATES, decisionsRegister, docsOf, workstreamsDir } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import type { RuleEntry } from "../../../../plugin-support-lib/src/lib/rule-mark.ts";
 import { PLUGIN_OF, refRoots, type Places } from "./work-map.ts";
 
@@ -178,13 +178,13 @@ export function contractNames(root: string | null, code: boolean): Precedent[] {
 export function answeredCards(root: string | null): Precedent[] {
   const out: Precedent[] = [];
   if (!root) return out;
-  for (const state of ["open", "backlog", "closed"]) {
-    const base = join(root, ".spndevex", "workstreams", state);
+  for (const state of WORKSTREAM_STATES) {
+    const base = workstreamsDir(root, state);
     let names: string[] = [];
     try { names = readdirSync(base).sort(); } catch { continue; }
     for (const name of names) {
       const file = join(base, name, "questions.jsonl");
-      try { out.push(...answeredCardsIn(readFileSync(file, "utf8"), name.split("-")[0], `.spndevex/workstreams/${state}/${name}/questions.jsonl`)); } catch { /* none */ }
+      try { out.push(...answeredCardsIn(readFileSync(file, "utf8"), name.split("-")[0], relative(root, join(base, name, "questions.jsonl")))); } catch { /* none */ }
     }
   }
   return out;
