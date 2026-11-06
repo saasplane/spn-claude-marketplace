@@ -114,6 +114,12 @@
 
 **A record's item line is `<State>Item`, and its words and facts come from `prepare<State>ItemProps()` in the module's `utils/<state>.ts`** (`RULE.SUPPORT.APPS.218` · MUST · skill:spn-apps/implement). `RoleItem` draws a role, as `RoleAutocomplete` chooses one, and it sits beside it, in `components/<area>/RoleItem.tsx`. The function takes the record, the place's `IDSItemPlacementProps` and `translate`, and returns the props of `DSItem`; the Item draws what it returns, and a card's head or row spreads the same props, so the two show one line. The function lives in the utils file so the component file keeps its single export: `prepareRoleItemProps` in `utils/role.ts`.
 
+**A record read by several audiences has one `<State>Item`, taking each level whose fields it reads.** `HirJobItem` takes `HirJobMeta | HirJobPosting`. There is no public Item, and a unit is never named for its audience or its level.
+
+**A richer unit is named by its block or its place, never by its audience or its level.** `HirJobApplicationPipelineContainer` and `HirJobApplicationStagesWidget` are named by where they stand, and neither is `Candidate…Card` nor `Public…Item`. It draws the line through `<State>Item`: a card spreads `prepare<State>ItemProps()`, and a widget heads with the Item.
+
+**One record read two ways is two states and two endpoints, with two permissions, and not two units.** The hiring team's read and a Candidate's read of an application are separate endpoints, each asking its own permission, and each person state extends the same Info level, so every audience draws one `HirJobApplicationItem`.
+
 **A form's own state is `I<what it edits>FormState`** (`RULE.SUPPORT.APPS.220` · MUST · skill:spn-apps/implement): `IRoleFormState`, `IOrgAuthPolicyFormState`. It is the shape a form holds while a person fills it in, and its fields take the command's own types. The name says which unit holds it, the form, as `IRoleFormProps` does, and keeps the word *state* apart from a contract state, which is a record the server returns. `EntryState` and `Draft` are not used.
 
 **A suffix names where a unit is placed: `App`, `Layout`, `Container`, `Widget`.** A widget stands beside others or in a sidebar, inside a container or not. A block built for one task and placed nowhere in particular is a component and carries none, as the design system's `DSDataTable` does. **The list of pattern words is not closed.** A module that follows a pattern the stack already names uses that name. A plain component is raw: it has no layer to say. The props interface follows the unit's name, as `IRoleListContainerProps`.
@@ -159,7 +165,7 @@
 | `_` | prefix | folders, files, functions, methods | private to its parent |
 | `Internal` | suffix | a symbol beside its public sibling in the same file | the ungated twin of a public member |
 
-**The underscore is the mechanism, not a label** — the generated barrel skips every path holding one, at any depth. **The `Internal` suffix keeps a pair adjacent** wherever names are sorted, so you see both and pick deliberately.
+**The underscore is the mechanism, not a label** — the generated barrel skips every path holding one, at any depth. **The `Internal` suffix keeps a pair adjacent** wherever names are sorted, so you see both and pick deliberately. An `Internal` method may also be the ungated read that a limit's counter calls, with no public twin: `getFileSizeBytesTotalByOrgInternal`, or `get<X>Count…ByOrgInternal` in general.
 
 ### CSS custom properties
 

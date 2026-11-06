@@ -49,6 +49,7 @@ import { emit, isDir, isFile, listdir, read, readPayload, runAlone, unescape, wo
 import { APPROACH_SUFFIX, ARCS, DEVEX, SESSIONS, WORKSTREAM_STATES, WORKSTREAMS, isApproachPage, legacyWorkstreamsDir, workstreamsDir,
          type WorkstreamState } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { OWN_COPY, linksSharedStyles } from "../../../../plugin-support-lib/src/lib/page-styles.ts";
+import { workstreamNamingFile, worktreeWrite } from "./confirmed.ts";
 import { alreadyTold, fromWorkspace, named, windowSet } from "../lib/window.ts";
 import { logLinesOf, arcStatus as readArcStatus, readArc, readQuestions } from "../lib/workstream.ts";
 import { planScope, readGo, staleEntries, unheldEntries } from "../lib/go-plan.ts";
@@ -879,6 +880,16 @@ function arcsInGo(folder: string): Set<string> | null {
   return built;
 }
 
+/** Whether any part of a go of the workstream has started: a part that runs or has landed. A go that is recorded and not begun has none. */
+function goPartStarted(folder: string): boolean {
+  for (const arc of dataArcsOf(folder)) {
+    let go: { parts?: Array<{ state?: unknown }> };
+    try { go = JSON.parse(readFileSync(join(folder, ARCS, arc, "go.json"), "utf8")); } catch { continue; }
+    if ((Array.isArray(go.parts) ? go.parts : []).some((part) => part?.state === "running" || part?.state === "landed")) return true;
+  }
+  return false;
+}
+
 /** The row of an arc this window works on that makes a repository's code wait: its documents row, not landed. Null where none does. */
 function documentsPending(root: string, session: string | undefined, repo: string): string | null {
   for (const [subject] of [...ownWorkstreams(root, session)].sort((a, b) => a[0].localeCompare(b[0]))) {
@@ -911,8 +922,12 @@ export function gateDocumentsFirst(payload: Payload): Verdict {
   const root = workspaceRoot(cwd);
   if (codeWrite && code !== null) {
     const seatRoot = workspaceRoot(code) ?? root;
-    const repo = seatRoot ? repoOf(seatRoot, code) : null;
-    const held = seatRoot && repo ? documentsPending(seatRoot, payload.session_id, repo) : null;
+    // A WORKTREE PATH IS A REPOSITORY AND A FILE, not a repository named `.worktrees`. A file a sheet names passes while no go part
+    // has started (MKT.HOOKS.498); any other file waits on its repository's documents row as a main checkout does (MKT.HOOKS.499).
+    const inWorktree = seatRoot ? worktreeWrite(seatRoot, code) : null;
+    const named = seatRoot && inWorktree ? workstreamNamingFile(seatRoot, payload.session_id, inWorktree) : null;
+    const repo = inWorktree ? inWorktree.repo : seatRoot ? repoOf(seatRoot, code) : null;
+    const held = named && !goPartStarted(named) ? null : seatRoot && repo ? documentsPending(seatRoot, payload.session_id, repo) : null;
     if (held) return { deny: held };
   }
   if (root && plan) {

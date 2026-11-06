@@ -6,6 +6,7 @@
 //   spn-devex workstream sheet edit  <workstream>/<arc> <E> [--what …] [--op …] [--file …] [--decided-by …] [--facts …] [--then …] …
 //   spn-devex workstream sheet drop  <workstream>/<arc> <E> --note "…"
 //   spn-devex workstream sheet patch <workstream>/<arc> <E>
+//   spn-devex workstream sheet stack <workstream>/<arc> <E>
 //   spn-devex workstream sheet show  <workstream>/<arc> [--row <id>] [--part <part>] [--json]
 //   spn-devex workstream sheet check <workstream>/<arc>
 //
@@ -15,13 +16,13 @@
 // judged as it was before sheets, so `show` and `check` say so and exit 0, and `write` creates the file.
 
 import { execFileSync } from "node:child_process";
-import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync, rmSync, statSync } from "node:fs";
 import { basename, dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { type Action, FLAG, VALUE, UsageFault, readWords } from "../../../../../plugin-support-lib/src/lib/command.ts";
 import { workspaceRoot } from "../../../../../plugin-support-lib/src/lib/timing.ts";
 import { readGo } from "../../lib/go-plan.ts";
-import { arcIdsOf, logEvent, readArc, readJson, workspaceOf, readJsonl, readQuestions, readSheet, factsFileOf, sheetFileOf, stateFileOf, suggestionsOf, writeArc, writeWhole } from "../../lib/workstream.ts";
+import { arcIdsOf, logEvent, previewOf, readArc, readJson, workspaceOf, readJsonl, readQuestions, readSheet, factsFileOf, sheetFileOf, stateFileOf, suggestionsOf, writeArc, writeWhole } from "../../lib/workstream.ts";
 import { ENTRY_OPS, cardName, entryWork, parentIds, renameDataToWork, sheetFaults, type ArcData, type ArcRow, type Fact, type Question, type Sheet, type SheetEntry } from "../../lib/workstream-schema.ts";
 import { missingCopies } from "../../lib/generated-copies.ts";
 import { arcNamed, listOf, typed } from "./_shared.ts";
@@ -61,6 +62,9 @@ export function renameFirstRead(ws: string, arc: string): void {
 
 /** The kinds of work a sheet entry may name: a sheet entry changes docs, code or generated output, never the rest. */
 const ENTRY_WORK: readonly string[] = ["DOCS", "CODE", "GENERATED"];
+
+/** An entry is a change, which a patch carries, or a step, which is prose for the agent: what to run and what proves it. A sheet written before kinds has none. */
+export const ENTRY_KINDS = ["change", "step"] as const;
 
 /** Each fault of a sheet as the arc would hold it: its schema, and every fact an entry cites being one the arc's facts hold. */
 /** The entries the arc's landed rows hold. */
@@ -215,7 +219,7 @@ const EDIT_LISTS:Record<string, keyof SheetEntry> = {
 
 function edit(args: string[]): number {
   const words = readWords(args, {
-    what: VALUE, op: ENTRY_OPS, file: VALUE, "decided-by": VALUE, facts: VALUE, then: VALUE, rules: VALUE, callers: VALUE, docs: VALUE, book: VALUE, tiers: VALUE, trace: VALUE, judged: FLAG, mechanical: FLAG,
+    what: VALUE, op: ENTRY_OPS, file: VALUE, "decided-by": VALUE, facts: VALUE, then: VALUE, rules: VALUE, callers: VALUE, docs: VALUE, book: VALUE, tiers: VALUE, trace: VALUE, judged: FLAG, mechanical: FLAG, kind: ENTRY_KINDS, command: VALUE, proof: VALUE,
   });
   const [ref, id, ...more] = words.paths;
   if (!id || more.length) throw new UsageFault("takes an arc and one entry: `sheet edit <workstream>/<arc> <E> [--what …] [--tiers …] …`.");
@@ -239,6 +243,10 @@ function edit(args: string[]): number {
   if (trace !== null) { next.trace = trace; changed.push("trace"); }
   const judgement = judgedOf(words);
   if (judgement !== null) { next.judged = judgement; changed.push("judged"); }
+  for (const name of ["kind", "command", "proof"] as const) {
+    const value = words.value(name);
+    if (value !== null) { next[name] = value; changed.push(name); }
+  }
   if (!changed.length) throw new UsageFault("changes nothing: name a field to change.");
   const entries = sheet.entries.map((one, place) => (place === at ? next : one));
   const faults = writeFaults(ws, arc, { ...sheet, entries }, false);
@@ -278,8 +286,38 @@ const gitIn = (dir: string, args: string[]): string =>
   execFileSync("git", ["-C", dir, ...args], { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"], maxBuffer: 64 * 1024 * 1024 });
 
 /**
+ * The arc's worktree for an entry's file: `.worktrees/<workstream>/<repo>` and the path in it. Null where the file reads as no
+ * `<repo>:<path>`, or where that folder is absent or is a plain checkout rather than a worktree (its git folder is its common one),
+ * because a patch is made from the worktree and never from a main checkout.
+ */
+export function worktreeOf(ws: string, file: string): { dir: string; rel: string; repo: string } | null {
+  const root = workspaceOf(ws);
+  const at = file.indexOf(":");
+  if (!root || at < 0) return null;
+  const repo = file.slice(0, at);
+  const dir = join(root, ".worktrees", basename(ws), repo);
+  if (!existsSync(dir)) return null;
+  try {
+    const own = gitIn(dir, ["rev-parse", "--path-format=absolute", "--git-dir"]).trim();
+    const common = gitIn(dir, ["rev-parse", "--path-format=absolute", "--git-common-dir"]).trim();
+    if (own === common) return null;
+  } catch { return null; }
+  return { dir, rel: file.slice(at + 1), repo };
+}
+
+const noWorktree = (id: string, file: string, ws: string): string =>
+  `${id}'s file \`${file}\` has no worktree at \`.worktrees/${basename(ws)}/${file.slice(0, Math.max(file.indexOf(":"), 0))}\`: a patch is made there and never in a main checkout`;
+
+/** Whether a path exists in a commit. */
+function existsIn(dir: string, commit: string, rel: string): boolean {
+  try { gitIn(dir, ["cat-file", "-e", `${commit}:${rel}`]); return true; } catch { return false; }
+}
+
+/**
  * Keeps an entry's change as a diff: the file read in the arc's worktree is diffed against the commit the entry's facts pin
  * for it, written to `patches/<E>.diff` beside the sheet, named by the entry's `patch`, and the file is reset in the worktree.
+ * A file the commit lacks is a created file: it is added with `git add -N` so the diff holds it whole, with `-M` over its old
+ * path too where it was renamed from one, and the reset removes it and puts the old path back.
  */
 function patch(args: string[]): number {
   const words = readWords(args, { trace: VALUE, judged: FLAG, mechanical: FLAG });
@@ -290,15 +328,32 @@ function patch(args: string[]): number {
   const at = sheet.entries.findIndex((one) => one.id === id);
   if (at < 0) throw new UsageFault(`finds no entry ${id} in ${arc}'s sheet.`);
   const entry = sheet.entries[at];
-  const where = checkoutOf(ws, entry.file);
-  if (!where) throw new UsageFault(`reads ${id}'s file \`${entry.file}\` as no \`<repo>:<path>\` in this workspace.`);
+  if (!entry.file.includes(":")) throw new UsageFault(`reads ${id}'s file \`${entry.file}\` as no \`<repo>:<path>\` in this workspace.`);
+  const where = worktreeOf(ws, entry.file);
+  if (!where) return refused([noWorktree(id, entry.file, ws)]);
   const held = readJsonl(factsFileOf(ws, arc)) as Fact[];
-  const pinned = entry.facts.map((one) => held.find((fact) => fact?.id === one)).find((fact) => fact && String(fact.source).replace(/:\d+$/, "") === `${where.repo}/${where.rel}`);
+  const cited = entry.facts.map((one) => held.find((fact) => fact?.id === one));
+  // A created file has no fact of its own: the commit a fact of the same repository pins is what it is diffed against, and the file is absent from it.
+  const pinned = cited.find((fact) => fact && String(fact.source).replace(/:\d+$/, "") === `${where.repo}/${where.rel}`)
+    ?? cited.find((fact) => fact?.commit && String(fact.source).startsWith(`${where.repo}/`) && !existsIn(where.dir, fact.commit, where.rel));
   if (!pinned?.commit) return refused([`${id}'s facts pin no commit for \`${entry.file}\`: a fact whose source is that file is what the diff is made against`]);
+  const created = !existsIn(where.dir, pinned.commit, where.rel) && existsSync(join(where.dir, where.rel));
+  let paths = [where.rel];
   let diff: string;
-  try { diff = gitIn(where.dir, ["diff", pinned.commit, "--", where.rel]); }
-  catch (thrown) { return refused([`${id}'s diff against ${pinned.commit} could not be made in ${where.dir}: ${String((thrown as Error).message).split("\n")[0]}`]); }
-  if (!diff.trim()) return refused([`${where.rel} holds no change against ${pinned.commit} in ${where.dir}, so ${id} has nothing to keep`]);
+  try {
+    if (created) {
+      gitIn(where.dir, ["add", "-N", "--", where.rel]);
+      const renamed = gitIn(where.dir, ["diff", "-M", "--name-status", pinned.commit]).split("\n")
+        .map((line) => line.split("\t")).find((cols) => /^R\d*$/.test(cols[0]) && cols[2] === where.rel);
+      if (renamed) paths = [renamed[1], where.rel];
+    }
+    diff = gitIn(where.dir, ["diff", "-M", pinned.commit, "--", ...paths]);
+  } catch (thrown) {
+    if (created) try { gitIn(where.dir, ["reset", "-q", "--", where.rel]); } catch { /* the entry stays as it was */ }
+    return refused([`${id}'s diff against ${pinned.commit} could not be made in ${where.dir}: ${String((thrown as Error).message).split("\n")[0]}`]);
+  }
+  const undo = (): void => { if (created) try { gitIn(where.dir, ["reset", "-q", "--", where.rel]); } catch { /* nothing was staged */ } };
+  if (!diff.trim()) { undo(); return refused([`${where.rel} holds no change against ${pinned.commit} in ${where.dir}, so ${id} has nothing to keep`]); }
   const file = `patches/${id}.diff`;
   const next: SheetEntry = { ...entry, patch: { file, base: pinned.commit } };
   const traced = words.value("trace");
@@ -307,12 +362,51 @@ function patch(args: string[]): number {
   if (judgement !== null) next.judged = judgement;
   const entries = sheet.entries.map((one, place) => (place === at ? next : one));
   const faults = writeFaults(ws, arc, { ...sheet, entries }, false);
-  if (faults.length) return refused(faults);
+  if (faults.length) { undo(); return refused(faults); }
   writeWhole(join(dirname(sheetFileOf(ws, arc)), file), diff);
   save(ws, arc, { ...sheet, entries });
-  gitIn(where.dir, ["checkout", "HEAD", "--", where.rel]);
+  if (created) {
+    gitIn(where.dir, ["reset", "-q", "--", ...paths]);
+    rmSync(join(where.dir, where.rel), { force: true });
+    if (paths.length > 1) gitIn(where.dir, ["checkout", "HEAD", "--", paths[0]]);
+  } else gitIn(where.dir, ["checkout", "HEAD", "--", where.rel]);
   logEvent(ws, arc, "sheet", null, `${id} patched · ${file} against ${pinned.commit}`);
-  console.log(`ok · ${arc} sheet · ${id} patched · ${file} against ${pinned.commit} · ${where.rel} reset`);
+  console.log(`ok · ${arc} sheet · ${id} patched · ${file} against ${pinned.commit} · ${paths.join(" and ")} reset`);
+  return 0;
+}
+
+/**
+ * Applies the arc's kept patches that stand ahead of an entry in the sheet's order, each in its own repository's worktree, so
+ * the entry is written against the code the ones before it changed. A patch already applied is left alone.
+ */
+function stack(args: string[]): number {
+  const words = readWords(args);
+  const [ref, id, ...more] = words.paths;
+  if (!id || more.length) throw new UsageFault("takes an arc and one entry: `sheet stack <workstream>/<arc> <E>`.");
+  const { ws, arc } = arcNamed(ref);
+  const sheet = sheetOf(ws, arc);
+  const at = sheet.entries.findIndex((one) => one.id === id);
+  if (at < 0) throw new UsageFault(`finds no entry ${id} in ${arc}'s sheet.`);
+  const ahead = sheet.entries.slice(0, at).filter((one) => one.patch);
+  const folder = dirname(sheetFileOf(ws, arc));
+  const faults: string[] = [];
+  const todo: Array<{ id: string; dir: string; diff: string }> = [];
+  for (const one of ahead) {
+    const where = worktreeOf(ws, one.file);
+    const diff = join(folder, one.patch!.file);
+    if (!where) faults.push(noWorktree(one.id, one.file, ws));
+    else if (!existsSync(diff)) faults.push(`${one.id}'s patch \`${one.patch!.file}\` is not in ${arc}'s folder`);
+    else todo.push({ id: one.id, dir: where.dir, diff });
+  }
+  if (faults.length) return refused(faults);
+  let applied = 0;
+  for (const one of todo) {
+    try { gitIn(one.dir, ["apply", "-R", "--check", one.diff]); continue; } catch { /* not applied yet */ }
+    try { gitIn(one.dir, ["apply", one.diff]); applied += 1; }
+    catch (thrown) { console.log(`Refused: ${one.id}'s patch does not apply in ${one.dir}: ${String((thrown as Error).message).split("\n").find((line) => line.trim() && !line.startsWith("Command failed")) ?? ""}. ${applied} applied before it.`); return 1; }
+  }
+  logEvent(ws, arc, "sheet", null, `stack ahead of ${id} · ${applied} applied`);
+  console.log(`ok · ${arc} sheet · stack ahead of ${id} · ${applied} patch${applied === 1 ? "" : "es"} applied of ${ahead.length} kept`);
   return 0;
 }
 
@@ -507,6 +601,71 @@ function consumerFindings(ws: string, entries: readonly SheetEntry[], held: read
   return out;
 }
 
+/** The kind an entry declares, or null for a sheet written before kinds: such an entry is judged as it was. */
+export function entryKind(entry: Pick<SheetEntry, "kind">): "change" | "step" | null {
+  return entry.kind === "change" || entry.kind === "step" ? entry.kind : null;
+}
+
+/** Whether a file is web or test code: a `web` or `*-web` folder, a tests folder, a test or spec file. Such a change with no patch is warned, not refused. */
+export function isWebOrTest(file: string): boolean {
+  const path = file.slice(file.indexOf(":") + 1);
+  return /(^|\/)(web|tests?|__tests__)(\/|$)|(^|\/)[^/]*-web(\/|$)|\.(test|spec)\.[cm]?[jt]sx?$|(^|\/)t-[^/]+\.mjs$/.test(path);
+}
+
+/** A step is whole with a command and a proof, each a line of words. */
+export const stepIsWhole = (entry: Pick<SheetEntry, "command" | "proof">): boolean =>
+  typeof entry.command === "string" && !!entry.command.trim() && typeof entry.proof === "string" && !!entry.proof.trim();
+
+/**
+ * What a patch owes an entry of a declared kind: "refuse" for a hand-written change outside web and tests, "warn" for web and tests,
+ * and null where it owes none (it has a patch, it is a step, it has no kind, or it is a generated file, which is a finding of its own).
+ */
+export function patchOwed(entry: SheetEntry): "refuse" | "warn" | null {
+  if (entryKind(entry) !== "change" || entry.patch || entryWork(entry) === "GENERATED") return null;
+  return isWebOrTest(entry.file) ? "warn" : "refuse";
+}
+
+/** The findings of the entry kinds. A judged change with no patch is named once, by the judged line. */
+function kindFindings(arc: string, entries: readonly SheetEntry[]): string[] {
+  const out: string[] = [];
+  for (const entry of entries) {
+    const kind = entryKind(entry);
+    if (!kind) continue;
+    if (kind === "step" && !stepIsWhole(entry)) out.push(`${entry.id} is a step and has no command or no proof: \`sheet edit ${arc} ${entry.id} --command "…" --proof "…"\``);
+    if (kind === "change" && !entry.patch && entryWork(entry) === "GENERATED") out.push(`${entry.id} is a generated file and a change: make it a step that runs its generator, with its command and proof`);
+    if (patchOwed(entry) === "refuse" && entry.judged !== true) out.push(`${entry.id} is a change and has no patch: \`sheet patch ${arc} ${entry.id}\` keeps it`);
+  }
+  return out;
+}
+
+/** What `sheet check` warns of and the go does not refuse: a web or test change with no patch, until the patches are shown to pay. */
+export function sheetWarnings(ws: string, arc: string): string[] {
+  const sheet = readSheet(ws, arc);
+  if (!sheet || !Array.isArray(sheet.entries)) return [];
+  return sheet.entries.filter((entry) => patchOwed(entry) === "warn" && entry.judged !== true)
+    .map((entry) => `${entry.id} is a change and has no patch: \`sheet patch ${arc} ${entry.id}\` keeps it`);
+}
+
+const NAMED_BLOCK = /<pre\b[^>]*\bdata-entry="(E\d+)"[^>]*>([\s\S]*?)<\/pre>/g;
+const textOfBlock = (html: string): string =>
+  html.replace(/<[^>]*>/g, "").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&#0?39;/g, "'").replace(/&amp;/g, "&").trim();
+
+/** A block the preview shows for an entry, `<pre data-entry="E12">`, is the entry's patch; one that is not is a finding that holds back the go. */
+function blockFindings(ws: string, arc: string, entries: readonly SheetEntry[]): string[] {
+  const page = previewOf(ws, arc);
+  if (!existsSync(page)) return [];
+  const folder = dirname(sheetFileOf(ws, arc));
+  const out: string[] = [];
+  for (const found of readFileSync(page, "utf8").matchAll(NAMED_BLOCK)) {
+    const entry = entries.find((one) => one.id === found[1]);
+    if (!entry?.patch) continue;
+    const file = join(folder, entry.patch.file);
+    if (!existsSync(file)) continue;
+    if (textOfBlock(found[2]) !== readFileSync(file, "utf8").trim()) out.push(`the preview's block for ${entry.id} differs from ${entry.patch.file}`);
+  }
+  return out;
+}
+
 /** What `sheet check` prints, and what the go lists: the sheet read against the arc's rows and cards. Empty where the arc keeps no sheet. */
 export function sheetFindings(ws: string, arc: string): string[] {
   renameFirstRead(ws, arc);
@@ -524,6 +683,8 @@ export function sheetFindings(ws: string, arc: string): string[] {
     if (!held.has(id)) out.push(`row ${row.id} names ${id}, which the sheet does not hold`);
   }
   for (const entry of entries) if (!named.has(entry.id)) out.push(`${entry.id} is named by no row`);
+  out.push(...kindFindings(arc, entries));
+  out.push(...blockFindings(ws, arc, entries));
   // A JUDGED ENTRY KEEPS ITS CHANGE AND ITS THINKING: a diff from `sheet patch` and a `trace`.
   for (const entry of entries.filter((one) => one.judged === true)) {
     if (!entry.patch) out.push(`${entry.id} is judged and has no patch: \`sheet patch ${arc} ${entry.id}\` keeps its change`);
@@ -617,6 +778,7 @@ function check(args: string[]): number {
   const root = workspaceRoot(resolve(process.env.SPN_WORKSPACE ?? process.cwd()));
   const measured = root ? budgetLines(root, readSheet(ws, arc) as Sheet) : { lines: [], findings: [] };
   for (const line of measured.lines) console.log(line);
+  for (const line of sheetWarnings(ws, arc)) console.log(`warning · ${line}`);
   const findings = [...sheetFindings(ws, arc), ...measured.findings];
   if (!findings.length) { console.log(`${arc} sheet whole`); return 0; }
   for (const line of findings) console.log(line);
@@ -626,10 +788,11 @@ function check(args: string[]): number {
 
 export const actions: Record<string, Action> = {
   write: { describe: "write the arc's whole sheet from a file, every entry validated and every fact one the arc holds", usage: "<workstream>/<arc> --file <sheet.json>", run: write },
-  edit: { describe: "change one entry of the sheet; a missing entry is refused, and `sheet write` is named", usage: "<workstream>/<arc> <E> [--what …] [--op …] [--file …] [--decided-by …] [--facts …] [--then …] [--rules …] [--callers …] [--docs …] [--book …] [--tiers unit=ID,ID;contract=ID] [--trace \"…\"] [--judged|--mechanical]", run: edit },
+  edit: { describe: "change one entry of the sheet; a missing entry is refused, and `sheet write` is named", usage: "<workstream>/<arc> <E> [--what …] [--op …] [--file …] [--decided-by …] [--facts …] [--then …] [--rules …] [--callers …] [--docs …] [--book …] [--tiers unit=ID,ID;contract=ID] [--trace \"…\"] [--judged|--mechanical] [--kind change|step] [--command \"…\"] [--proof \"…\"]", run: edit },
   drop: { describe: "take an entry out of the sheet; --note carries why into its one log line", usage: "<workstream>/<arc> <E> --note \"…\"", run: drop },
   show: { describe: "print the sheet, or one row's or one go part's entries; --json prints every field", usage: "<workstream>/<arc> [--row <id>] [--part <part>] [--json]", run: show },
   patch: { describe: "keep an entry's change as a diff against the commit its facts pin, name it in the entry, and reset the file in the worktree; --trace and --judged/--mechanical are recorded with it", usage: "<workstream>/<arc> <E> [--trace \"…\"] [--judged|--mechanical]", run: patch },
+  stack: { describe: "apply the arc's kept patches that stand ahead of an entry in the sheet's order, each in its repository's worktree, so the entry is written on top of them", usage: "<workstream>/<arc> <E>", run: stack },
   reach: { describe: "print the blast radius of one entry: the entries, files and preview sections a change to it reaches", usage: "<workstream>/<arc> <E>", run: reach },
   check: { describe: "read the sheet against the rows and the cards, one finding to a line; exits 1 on any", usage: "<workstream>/<arc>", run: check },
 };

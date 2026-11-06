@@ -220,6 +220,16 @@ A promise about records — retention, privacy — takes no floor at all and **r
 
 **Resolution is three-state at every level.** No row means the org inherits. A row overrides. A row that is present and inactive means *none here*. Deleting a row and disabling it are different acts — one restores the inherited option, the other refuses it outright. **Seeing is not configuring** — an administration screen shows what an organization inherits and what its own owner authored as two separate lists; merging them makes ownership unanswerable exactly where it has to be obvious.
 
+## Checking a limit
+
+A limit is a number on a `{MOD}_LIMIT_{NOUN}` code, empty by default, which means no limit; a value of 0 allows none. The module that owns the limit checks it, and states how it is counted (`RULE.PLATFORM.CORE.077` · MUST · skill:spn-apps/implement).
+
+- **`PlatformService.assertWithinLimit(code, { adding })`** checks a counted total: the usage plus what the write adds, against the limit.
+- **`PlatformService.assertValueWithinLimit(code, value)`** compares one value with the limit and needs no counter.
+- **`getLimitCounters()`** in the module manager states each counter, as a call to an `Internal` method of the module's own service and never to a repository, because only a service touches its repository. One `PlatformLimitProvider` counts it, local or remote alike, and asks IAM only for the counting window.
+
+The session already carries the limit for the code, and an absent or empty value sets no limit and asks nothing. A refusal is `COMMON_NOT_ENABLED`, naming the code, the limit, the usage, the seller who sells more and, for a monthly limit, when the next month starts. A limit with no counter fails by name when it is checked, and a unit case for each module proves its counters.
+
 ## What this replaces
 
 | If you are about to build | Stop — the platform already has it |

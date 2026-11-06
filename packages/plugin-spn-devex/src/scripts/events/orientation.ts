@@ -902,6 +902,37 @@ export function goLines(root: string, named: number = GOS_NAMED): string[] {
   return [...lines, ""];
 }
 
+/** How many parked suggestions the start names; the rest are counted, so the lines stay inside the start's ceiling. */
+const PARKED_NAMED = 3;
+/** The longest title the start shows for a parked suggestion. */
+const PARKED_TITLE = 60;
+
+/**
+ * One line for each suggestion parked with the mark that it changes how the developer works (035 Q34), in the workstreams
+ * that are open, until it is decided or dropped. A suggestion without the mark is not shown.
+ */
+export function parkedLines(root: string, named: number = PARKED_NAMED): string[] {
+  const found: string[] = [];
+  let base: string;
+  try { base = workstreamsDir(root, "open"); } catch { return []; }
+  for (const folder of listdir(base)) {
+    let text = "";
+    try { text = readFileSync(join(base, folder, "suggestions.jsonl"), "utf8"); } catch { continue; }
+    for (const line of text.split("\n")) {
+      if (!line.trim()) continue;
+      let one: Record<string, unknown>;
+      try { one = JSON.parse(line); } catch { continue; }
+      if (one.state !== "parked" || one.changesWork !== true) continue;
+      const title = String(one.title ?? "").replace(/\s+/g, " ").trim();
+      found.push(`Parked, changes your work: ${numbered(folder)[0] || folder} S${String(one.id).replace(/^s/, "")} "${title.length > PARKED_TITLE ? `${title.slice(0, PARKED_TITLE - 1)}…` : title}"`);
+    }
+  }
+  if (!found.length) return [];
+  const lines = found.slice(0, named);
+  if (found.length > named) lines.push(`And ${found.length - named} more parked, each in its workstream's suggestions.jsonl.`);
+  return [...lines, ""];
+}
+
 /**
  * The session's opening, as two strings: `message` is the developer's pane — the welcome and one
  * status line — and `context` is what the agent reads — the same, then the tables, the closing
@@ -1003,6 +1034,7 @@ export function orient(root: string, cwd: string, whole = true): [message: strin
   if (resolve(cwd) !== root) lines.push(`Rooted in \`${relative(root, resolve(cwd))}\`.`, "");
   lines.push(...migrationLines(root));
   lines.push(...goLines(root, whole ? GOS_NAMED : 1));
+  if (whole) lines.push(...parkedLines(root));
   lines.push(...closingLines(streams, others, who));
   const note = "\n---\nThe ground is read on asking: run `spnutils workspace status` for *where are we?*. " +
     "Ask the closing question ONLY when the first message does not say what to do. A handover block, an arc name, " +

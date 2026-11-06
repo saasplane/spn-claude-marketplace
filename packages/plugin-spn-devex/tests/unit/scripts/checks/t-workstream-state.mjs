@@ -430,6 +430,7 @@ console.log("\n=== the change sheet — allowed in the arc's data, held to its s
   ok("green: `sheet.json` is allowed in the arc's data", checkWorkstream(ws).length === 0, said(checkWorkstream(ws)));
   writeFileSync(join(ws, "arcs", "N001", "other.json"), "{}");
   ok("red: another file is still named, and the message lists `sheet.json`", has(checkWorkstream(ws), "name", /is not the arc's data.*`sheet.json`/), said(checkWorkstream(ws)));
+  ok("[MKT.SCRIPTS.536] red: the message names the `patches/` folder with the data files", has(checkWorkstream(ws), "name", /is not the arc's data.*`patches\/`/), said(checkWorkstream(ws)));
   rmSync(join(ws, "arcs", "N001", "other.json"));
   mkdirSync(join(ws, "arcs", "N001", "patches"), { recursive: true });
   writeFileSync(join(ws, "arcs", "N001", "patches", "E1.diff"), "");

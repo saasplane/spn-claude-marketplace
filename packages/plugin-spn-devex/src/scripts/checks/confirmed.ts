@@ -41,7 +41,7 @@
 
 import { basename, isAbsolute, join, relative, resolve } from "node:path";
 import { windowWorkstreams } from "../lib/window.ts";
-import { arcIdsOf, arcRepos, logLinesOf, moveOf, readArc } from "../lib/workstream.ts";
+import { arcIdsOf, arcRepos, logLinesOf, moveOf, readArc, readSheet } from "../lib/workstream.ts";
 import type { LogLine } from "../lib/workstream-schema.ts";
 import { DEVEX, workstreamsDir } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { emit, isDir, listdir, readPayload, runAlone, workspaceRoot,
@@ -159,9 +159,34 @@ function isRepoWrite(root: string, path: string): boolean {
   return head !== "" && head !== "." && head !== DEVEX && head !== ".claude";
 }
 
-/** The member repository a write lands in: the first folder of its path from the workspace. */
+/** The folder a workstream's worktrees sit in, under the workspace: `.worktrees/<workstream>/<repo>/`. */
+const WORKTREES = ".worktrees";
+
+/** A write inside a workstream's worktree, read as the workstream, the repository and the file in it. */
+export type WorktreeWrite = { workstream: string; repo: string; rel: string };
+
+/** A path under `.worktrees/<workstream>/<repo>/<file>` as its three parts, or null where it is no such path (a main checkout, for one). */
+export function worktreeWrite(root: string, path: string): WorktreeWrite | null {
+  const parts = relative(root, resolve(path)).split(/[\\/]/);
+  if (parts[0] !== WORKTREES || parts.length < 4 || parts.slice(1, 4).some((part) => !part || part === "..")) return null;
+  return { workstream: parts[1], repo: parts[2], rel: parts.slice(3).join("/") };
+}
+
+/**
+ * The folder of the open workstream, among this window's, whose arcs hold an entry that names this worktree file as
+ * `<repo>:<file>`; null where none does. A file no entry names, and a worktree of a workstream the window does not work on, name none.
+ */
+export function workstreamNamingFile(root: string, session: string | undefined, write: WorktreeWrite): string | null {
+  const own = new Set(windowWorkstreams(root, session));
+  const mine = openWorkstreams(root).filter((folder) => !own.size || own.has(basename(folder)));
+  const file = `${write.repo}:${write.rel}`;
+  return mine.find((folder) => basename(folder) === write.workstream
+    && arcIdsOf(folder).some((arc) => (readSheet(folder, arc)?.entries ?? []).some((entry) => entry?.file === file))) ?? null;
+}
+
+/** The member repository a write lands in: the first folder of its path from the workspace, or the repository of a worktree. */
 function repoOfWrite(root: string, path: string): string {
-  return relative(root, path).split(/[\\/]/)[0];
+  return worktreeWrite(root, path)?.repo ?? relative(root, path).split(/[\\/]/)[0];
 }
 
 // The tools whose `file_path` names a file they change.
@@ -186,6 +211,10 @@ export function checkConfirmed(payload: Payload): Verdict {
     const open = openWorkstreams(root);
     const workstreams = own.size ? open.filter((folder) => own.has(basename(folder))) : open;
     if (!workstreams.length) return null;
+    // A WORKTREE FILE A SHEET NAMES is written before the go: ideation keeps its change as a patch (MKT.HOOKS.498).
+    // A main checkout, and a file no entry names, wait for the go as before (MKT.HOOKS.499).
+    const inWorktree = worktreeWrite(root, target);
+    if (inWorktree && workstreamNamingFile(root, payload.session_id, inWorktree)) return null;
     const repo = repoOfWrite(root, target);
     const arcs = arcsOf(workstreams);
     const naming = arcs.filter((one) => one.repos.includes(repo));

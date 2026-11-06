@@ -23,7 +23,7 @@
 - **Application-managed columns are not null and take no SQL default.**
 - **Every schema object carries its module's prefix, in lower case with an underscore, and no name is over 63 bytes**, because Postgres truncates a longer one silently and two names could then collide.
 - **A reference column is named for the table it points at** (`org_category_id`, `parent_org_id`), and **a table whose rows belong to another row names its owner first** (`iam_org_app_site`).
-- **A module joins only to a table its owner publishes through `getReferenceableTables()`**, by a foreign key to its primary key. Everything else it reads through the owner's contract service and never by SQL. The `MIGRATE` run reads the Postgres catalog after the migrations and before the contributions apply, and reports each object that breaks either rule.
+- **The `MIGRATE` run reads the Postgres catalog after the migrations and before the contributions apply, and reports each object that breaks the naming rule.**
 
 **Column order runs id, tenant scope, entity reference, business fields, lifecycle, then the audit tail.** An immutable table carries only the creation stamp; an assignment table may carry only the creation pair.
 

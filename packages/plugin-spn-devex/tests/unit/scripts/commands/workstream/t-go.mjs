@@ -638,5 +638,25 @@ console.log("\n=== E35: a stale patch, the format line, go propose, write refusa
   ok("[MKT.SCRIPTS.504] a write refusal ends with `: run `workstream …`", refusedWrite.code === 1 && /: run `workstream arc edit [^`]*DECIDED`/.test(refusedWrite.out), refusedWrite.out);
 }
 
+console.log("\n=== write: a change with no patch and a step with no command or proof are refused (MKT.SCRIPTS.532)");
+{
+  const row = { id: "1", parent: "N001", title: "build", kind: "change", repo: "spn-x", work: "CODE", blockedBy: [], touches: [], state: "waiting", entries: ["E1", "E2"] };
+  const world = await dataWorkspace("go-kinds", { rows: [row] });
+  cli(world.root, ["workstream", "fact", "write", "N001", "--source", "spn-x/a.ts", "--fact", "a is 1", "--used-by", "1"]);
+  const sheetFile = join(world.ws, "arcs", "N001", "sheet.json");
+  const withKinds = (one, two) => writeFileSync(sheetFile, JSON.stringify(sheetOf([entry("E1", "spn-x:src/k1.ts", one), entry("E2", "spn-x:src/k2.ts", two)]), null, 2));
+  withKinds({ kind: "change" }, { kind: "step", command: "gen", proof: "matches" });
+  const noPatch = cli(world.root, ["workstream", "go", "write", "N001"]);
+  ok("[MKT.SCRIPTS.532] (RULE.DEVEX.WORKSPACE.502) a change with no patch is refused by name, and nothing is written",
+    noPatch.code === 1 && noPatch.out.includes("Refused") && noPatch.out.includes("E1 is a change with no patch") && noPatch.out.includes("Nothing was written") && !existsSync(join(world.ws, "arcs", "N001", "go.json")), noPatch.out);
+  withKinds({ kind: "change", judged: true }, { kind: "step", command: "gen" });
+  const judged = cli(world.root, ["workstream", "go", "write", "N001"]);
+  ok("[MKT.SCRIPTS.532] a judged change with no patch is refused the same way, and a step with no proof by name",
+    judged.code === 1 && judged.out.includes("E1 is a change with no patch") && judged.out.includes("E2 is a step with no command or proof"), judged.out);
+  withKinds({}, {});
+  const plain = cli(world.root, ["workstream", "go", "write", "N001"]);
+  ok("[MKT.SCRIPTS.532] entries with no kind read as before: no kind refusal", !plain.out.includes("is a change with no patch") && !plain.out.includes("is a step with no command"), plain.out);
+}
+
 console.log(`\n${total - failed}/${total} passed`);
 process.exit(failed ? 1 : 0);

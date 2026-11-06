@@ -79,7 +79,7 @@ console.log("\n=== the shipped map names a skill and references that exist");
   }
   // A skill that is not one of the four plugins' is named as the host lists it.
   const OUTSIDE = new Set(["artifact-diagramming"]);
-  ok("[MKT.REFS.09] the map holds a row for each of the 25 kinds of work", rows.length === 25 && new Set(rows.map((row) => row.work)).size === 25, String(rows.length));
+  ok("[MKT.REFS.09] the map holds a row for each of the 26 kinds of work", rows.length === 26 && new Set(rows.map((row) => row.work)).size === 26, String(rows.length));
   const unknownSkill = rows.filter((row) => row.skill && !SKILLS.has(row.skill) && !OUTSIDE.has(row.skill)).map((row) => `${row.work}: ${row.skill}`);
   ok("[MKT.REFS.09] every row's skill is a skill of the plugins, or one the host lists", unknownSkill.length === 0, unknownSkill.join("; "));
   const dropped = rows.flatMap((row) => resolvedRow(row, { installed: null, checkout: workspaceDir }).missing.map((ref) => `${row.work}: ${ref.text}`));

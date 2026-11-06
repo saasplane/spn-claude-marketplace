@@ -194,7 +194,7 @@ Every resource key follows one shape, and the middle token names the **connectio
 | `{SPC}_API_REMOTE_PORT` | the deployment's own `/vars` | one deployment's own, from `remotePort` on its row |
 | `{SPC}_REMOTE_SERVICE_{NAME}_ENDPOINTS` | `/environments/{env}/vars` | one for each deployment that declares a remote port; every calling service reads it |
 | `{SPC}_REMOTE_CREDENTIAL_PROVIDER` | `/environments/{env}/vars` | `KUBERNETES` in a cloud; one cluster issues every service's token |
-| `{SPC}_REMOTE_CREDENTIAL_SERVICES` | `/environments/{env}/vars` | the `kindCode`s of the platform world's Platform server app rows, such as `api,observer`; rendered and never authored, and a service refuses a remote call from any other service |
+| `{SPC}_REMOTE_CREDENTIAL_SERVICES` | `/environments/{env}/vars` | the `kindCode`s of the platform world's Platform server app rows, such as `api,hiring`; rendered and never authored, and a service refuses a remote call from any other service |
 | `{SPC}_REMOTE_CREDENTIAL_KUBERNETES_TOKEN_PATH` · `_AUDIENCE` · `_NAMESPACES` · `_ISSUER` | `/environments/{env}/vars` | the token's file in the pod, what a token must be for, the namespaces of this platform, and the cluster's issuer; the same for every service of the platform in that environment |
 
 - **`{NAME}` is the application's `kindCode`.** An application has at most one deployment that declares a remote port, so the name is one address.

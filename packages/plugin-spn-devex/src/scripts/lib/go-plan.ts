@@ -253,7 +253,11 @@ const slotOf = (part: Pick<GoPart, "id" | "work">): Slot =>
   part.work === "TEST" ? (part.id.startsWith("baseline-") ? "BASELINE" : part.id.startsWith("proof-") ? "PROOF" : "FULL_RUN") : part.work as Slot;
 const workOf = (slot: Slot): Work => (slot === "BASELINE" || slot === "FULL_RUN" || slot === "PROOF" ? "TEST" : slot);
 
+/** A step is an entry of kind `step`: prose for the agent, a command and its proof, and a part of its own. A sheet written before kinds has none. */
+const isStep = (entry: SheetEntry): boolean => entry.kind === "step";
+
 const entrySlot = (entry: SheetEntry): Slot => {
+  if (isStep(entry)) return "GENERATED";
   const work = entryWork(entry);
   return work === "DOCS" || work === "GENERATED" ? work : "CODE";
 };
@@ -350,8 +354,11 @@ export function deriveGo(scope: readonly ScopeSheet[], options: DeriveOptions = 
   const fileUse = new Map<string, number>();
   for (const { sheet } of scope) for (const entry of sheet.entries) fileUse.set(entry.file, (fileUse.get(entry.file) ?? 0) + 1);
   const applyGroups = new Map<string, { refs: string[]; entries: SheetEntry[] }>();
+  const stepGroups = new Map<string, Array<{ arc: string; ref: string; entry: SheetEntry }>>();
   const appliesIn = (arc: string, entry: SheetEntry): boolean => {
     if (options.followUp || entrySlot(entry) !== "CODE") return false;
+    // A PATCHED CHANGE IS THE LEAD'S: one that no longer applies is refused by `go write`, never cut into a helper's part on its prose.
+    if (entry.kind === "change" && entry.patch) return true;
     if (entry.patch) return options.patchOk ? options.patchOk(arc, entry) : true;
     return Object.values(entry.tiers ?? {}).flat().length === 0 && fileUse.get(entry.file) === 1;
   };
@@ -361,6 +368,11 @@ export function deriveGo(scope: readonly ScopeSheet[], options: DeriveOptions = 
       if (keptRefs.has(ref) || done.has(ref)) continue;
       const repo = repoOf(entry);
       if (!repos.includes(repo)) repos.push(repo);
+      if (isStep(entry)) {
+        const mine = stepGroups.get(repo) ?? [];
+        mine.push({ arc, ref, entry }); stepGroups.set(repo, mine);
+        continue;
+      }
       if (appliesIn(arc, entry)) {
         const apply = applyGroups.get(repo) ?? { refs: [], entries: [] };
         apply.refs.push(ref); apply.entries.push(entry); applyGroups.set(repo, apply);
@@ -438,6 +450,11 @@ export function deriveGo(scope: readonly ScopeSheet[], options: DeriveOptions = 
         orderByUse(apply);
         const before = kept.filter((one) => one.repo === repo && isApplyPart(one)).map((one) => numberOf(one) || 1);
         fresh.push(part(before.length ? `apply-${repo}-${Math.max(...before) + 1}` : `apply-${repo}`, repo, pass, apply.refs, apply.entries, { model: "lead" }));
+      }
+      // A STEP IS A PART OF ITS OWN, in its repository's generated pass.
+      if (pass === "GENERATED") for (const one of stepGroups.get(repo) ?? []) {
+        const id = `generated-${repo}-${one.arc.toLowerCase()}-${one.entry.id.toLowerCase()}`;
+        if (!keptIds.has(id)) fresh.push(part(id, repo, pass, [one.ref], [one.entry]));
       }
       const group = groups.get(`${repo}|${pass}`);
       if (!group) continue;
@@ -829,4 +846,31 @@ export function clearWaiting(plan: GoPlan, partId: string): GoPlan {
 export function readyParts(plan: GoPlan): GoPart[] {
   const landed = new Set(plan.parts.filter((one) => one.state === "landed").map((one) => one.id));
   return plan.parts.filter((one) => one.state === "ready" && one.waitsOn.every((id) => landed.has(id)));
+}
+
+/**
+ * The go as one workflow script, made from the plan across every arc it covers: each part is one agent, and a part starts once
+ * the parts the plan says it waits on have landed, so independent parts run together and the waits are the plan's own.
+ * The lead's apply parts and a step are told what to run; any other part reads its brief.
+ */
+export function workflowOf(plan: GoPlan, scope: readonly ScopeSheet[]): string {
+  const held = new Map(scope.flatMap(({ arc, sheet }) => sheet.entries.map((entry) => [refOf(arc, entry), entry] as const)));
+  const ref = `${plan.lead}`;
+  const parts = plan.parts.map((one) => {
+    const steps = one.entries.flatMap((entryRef) => { const entry = held.get(entryRef); return entry && isStep(entry) ? [`${entryRef}: run \`${String(entry.command ?? "")}\`; it is done when ${String(entry.proof ?? "")}`] : []; });
+    const prompt = steps.length ? `Carry out the step of part ${one.id} in ${one.repo}'s worktree. ${steps.join(" ")} Commit nothing, launch no agent, and report what the command printed.`
+      : isApplyPart(one) ? `Run \`spn-devex workstream go start ${ref} ${one.id}\` from the workspace, which applies the part's patches in order, and report what it printed.`
+      : `Read the order for part ${one.id} (${ref}'s orders folder, ${one.id}.md) and carry it out as it says.`;
+    return { id: one.id, repo: one.repo, work: one.work, waitsOn: one.waitsOn, prompt };
+  });
+  return [
+    `export const meta = { name: ${JSON.stringify(`go-${plan.lead}`)}, description: ${JSON.stringify(`The go of ${plan.scope.join(", ")}: ${plan.parts.length} parts, each after the parts it waits on`)}, phases: [{ title: "Go", detail: "apply, steps and tests, in the plan's order" }] }`,
+    `const PARTS = ${JSON.stringify(parts, null, 2)};`,
+    "const byId = Object.fromEntries(PARTS.map((one) => [one.id, one]));",
+    "const started = {};",
+    "const run = (one) => (started[one.id] ??= Promise.all(one.waitsOn.filter((id) => byId[id]).map((id) => run(byId[id]))).then(() => agent(one.prompt, { label: one.id, phase: \"Go\" })));",
+    "phase(\"Go\");",
+    "return await Promise.all(PARTS.map(run));",
+    "",
+  ].join("\n");
 }

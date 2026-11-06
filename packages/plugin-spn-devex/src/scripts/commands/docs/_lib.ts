@@ -117,8 +117,8 @@ export const OUTLINE: Partial<Record<Variant, { order: string[]; optional: strin
     optional: ["Binds", "Proof"],
   },
   approach: {
-    order: ["Terms", "Why", "What", "How", "Open", "Deferred"],
-    optional: ["Terms"],
+    order: ["Terms", "Why", "What", "How", "Plan", "Open", "Deferred"],
+    optional: ["Terms", "Plan"],
   },
   // WHAT A MIGRATION KNOWS, AND NOTHING ELSE (03-tree.md, RULE.DEVEX.WORKSPACE.134). A data model defines no
   // term; the words are the constructs' `Terms` tables. What seeds and what must run first is

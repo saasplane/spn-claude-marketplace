@@ -1249,12 +1249,13 @@ export function previewFromTemplate(ws: string, data: Pick<ArcData, "arc" | "sub
 
 /**
  * The preview's outline drawn from an arc's entries, in the order the sheet holds (connection order): an ordered list with one
- * item for each entry, `repo:path` and its what, and a code block of the patch under an entry that is judged and whose patch reads.
+ * item for each entry, `repo:path` and its what, and a code block of the patch under every entry whose patch reads, named by its
+ * `data-entry` so `sheet check` can hold the block to the patch.
  */
 export function previewFromEntries(entries: SheetEntry[], readPatch: (entry: SheetEntry) => string | null): string {
   const items = entries.map((entry) => {
-    const patch = entry.judged === true ? readPatch(entry) : null;
-    const block = patch ? `<pre><code>${escapeHtml(patch)}</code></pre>` : "";
+    const patch = readPatch(entry);
+    const block = patch ? `<pre data-entry="${escapeHtml(entry.id)}"><code>${escapeHtml(patch)}</code></pre>` : "";
     return `<li><code>${escapeHtml(entry.file)}</code> ${escapeHtml(entry.what)}${block}</li>`;
   });
   return `<ol>${items.join("")}</ol>`;
