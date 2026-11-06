@@ -23,8 +23,9 @@ description: Carry out a go. Use the moment the developer gives the go on one ar
 4. Baselines: `go start` each repository's baseline, and record what already fails.
 5. The parts: launch each part's brief, a pass at a time; fold each report with `report write`.
    Run the parts three or four at a time, each on a Sonnet helper. Review, and the developer, stay with the main agent.
-   Apply each patch after its base check, then connect. The baseline runs the new cases on the base. A code part formats before its proof.
-   A repository's apply part is the lead's own: make the light entries' edits, then `go start <lead> apply-<repo>` applies the patches and commits them. That part has no brief and no report.
+   The go is one workflow, generated from the plan across every arc it covers: patches apply, steps run, independent parts run side by side, and the waits come from the plan.
+   Apply each patch after its base check, then connect. The baseline runs the new cases on the base, and each must fail. A code part formats before its proof.
+   A repository's apply part is the lead's own and holds every code change: `go start <lead> apply-<repo>` applies the patches and commits them. That part has no brief and no report. A patched change is never cut into a helper's part; `go write` refuses a change whose patch no longer applies, by name, and it is patched again against the new head. A step is a part of its own: run its command and check its proof.
    Each brief carries the line that a helper meeting a name, a shape or a construct no entry holds stops, returns `needs-you` and lists it under `unnamed:`; `report write` refuses `landed` while it lists one (`RULE.DEVEX.WORKSPACE.495` · MUST · check:split-plan).
    A change from the developer mid-run: let what is running finish, `go check` to hold the parts it
    touches, update their entries and the preview and show it, then `go write` again before they run.

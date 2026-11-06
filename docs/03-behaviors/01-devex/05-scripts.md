@@ -338,6 +338,14 @@ Every row below is declared and none is claimed: a run writes the last two cells
 | MKT.SCRIPTS.528 | Engineering leader | see what is already settled when I raise a card or add a suggestion | `card raise` and `suggestion add` run the lookup and show it, an empty settled block is refused, and a stored card reads clean | NEGATIVE | UNIT | PLANNED | — |
 | MKT.SCRIPTS.529 | Engineering leader | have an engineering call logged and found again with its reversal | `decision write` logs an engineering call, and `state show` lists it with its one-line reversal | POSITIVE | UNIT | PLANNED | — |
 | MKT.SCRIPTS.530 | Engineering leader | have the panel ask the premise question first | The panel brief asks the premise question first | POSITIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.531 | Engineering leader | be told of a hand-written change with no patch, and warned for web and tests | `sheet check` names a change in a hand-written file with no patch as a finding, and gives the same line as a warning when the change is in web or tests | POSITIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.532 | Engineering leader | have the go refuse a change with no patch, and a step with no command or proof | `go write` prints `Refused` with the entry's name and writes nothing, and `arc edit --status DECIDED` is refused on the same findings | NEGATIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.533 | Engineering leader | have a generated file run as a step | A generated file is never a change that wants a patch: it is a step that runs its generator, and no finding asks for its patch | POSITIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.534 | Engineering leader | have an entry patched on top of the ones before it | `sheet stack` applies the arc's kept patches ahead of an entry in the sheet's order, so the entry is written against the code before it | POSITIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.535 | Engineering leader | be told when a preview block differs from its patch | `sheet check` prints that the preview's block for an entry differs from its patch file, and that finding holds back the go | POSITIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.536 | Engineering leader | have a created file patched | `sheet patch` keeps the diff of a created file against nothing and resets it by removing the file, and the state check's message names `patches/` | POSITIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.537 | Engineering leader | have a rename that changes a shape patched | `sheet patch` keeps a rename over the old and the new path, so a changed shape reaches the preview as code | POSITIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.538 | Engineering leader | have no patched change cut into a helper's part, and one workflow for the go | `go write` refuses a patch that no longer applies by name, the lead's apply part holds every code entry, and the go makes one workflow from its plan across its arcs | POSITIVE | UNIT | PLANNED | — |
 
 ## Retired ids
 
