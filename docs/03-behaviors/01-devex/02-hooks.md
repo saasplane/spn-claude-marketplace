@@ -233,6 +233,11 @@ Every row below is declared and none is claimed: a run writes the last two cells
 | MKT.HOOKS.490 | Engineering leader | never find the coordinator idle while a run goes and work is open | A reply whose last paragraph waits on a run (when it finishes, once the suite ends, the notice), while a background shell the window started has no completion notice yet, is sent back with the work a run does not lock and RULE.DEVEX.WORKSPACE.499, and it is said while a row runs | NEGATIVE | UNIT | PLANNED | — |
 | MKT.HOOKS.491 | Engineering leader | let a turn end on a run when nothing else is open | A reply that waits on a run and says `Nothing unlocked is left:` passes, and a reply that waits on the developer, names no run, or speaks while no run is in flight, passes | POSITIVE | UNIT | PLANNED | — |
 | MKT.HOOKS.492 | Backend developer | be refused SQL in a preview or a sample that breaks the naming grammar | The SQL check reads the SQL in a workstream's `notes/N*/preview.html` and `samples/` beside the page checks, and refuses a table, schema, enum, index, JSON or audit-tail name that breaks the grammar, each denial naming its rule; a draft that follows the grammar passes | NEGATIVE | UNIT | PLANNED | — |
+| MKT.HOOKS.493 | Engineering leader | be told the note for a skill when I open it, once | A skill opening gives its note once per window | POSITIVE | UNIT | PLANNED | — |
+| MKT.HOOKS.494 | Engineering leader | be told the note for a preview when I write one in layers | A layered preview write gives its note once per window | POSITIVE | UNIT | PLANNED | — |
+| MKT.HOOKS.495 | Engineering leader | be told the row a commit belongs to | A commit gives its row as a note | POSITIVE | UNIT | PLANNED | — |
+| MKT.HOOKS.496 | Engineering leader | not be told a note twice | A row already told gives no note again | POSITIVE | UNIT | PLANNED | — |
+| MKT.HOOKS.497 | Engineering leader | never be stopped by a note | No trigger of these notes ever denies the call | NEGATIVE | UNIT | PLANNED | — |
 
 ## Retired ids
 

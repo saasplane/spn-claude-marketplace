@@ -28,6 +28,7 @@ Every row below is declared and none is claimed: a run writes the last two cells
 | MKT.REFS.06 | Editor | be caught naming a source in prose and leaving it out of the block | The file's own source line is read and compared against what the block declares | NEGATIVE | UNIT | PLANNED | — |
 | MKT.REFS.07 | Architect | tell an unstamped file from one that fell behind | Undeclared, unstamped and unread are reported as different findings | POSITIVE | UNIT | PLANNED | — |
 | MKT.REFS.08 | Backend developer | have both comparisons read a block the same way | One parser is a library file, and neither check owns it | POSITIVE | UNIT | PLANNED | — |
+| MKT.REFS.09 | Architect | have the work map stay true as plugins move files | Every row of the work map names a skill, a ref and a path that exist | NEGATIVE | UNIT | PLANNED | — |
 
 ## Retired ids
 
