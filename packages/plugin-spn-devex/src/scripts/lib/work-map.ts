@@ -10,7 +10,7 @@
 
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { homedir } from "node:os";
-import { basename, join } from "node:path";
+import { basename, dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 /** One kind of work: its row of the map. */
@@ -70,7 +70,19 @@ export function parseMap(text: string): MapRow[] {
 }
 
 /** The map the plugin carries, or `[]` where it cannot be read. */
-export function mapRows(file = fileURLToPath(new URL("../../refs/devex/agent/work-map.md", import.meta.url))): MapRow[] {
+/** A file under the plugin's refs, found by walking up from this code: source and each bundle sit at different depths. */
+export function refFile(path: string): string {
+  let dir = dirname(fileURLToPath(import.meta.url));
+  for (;;) {
+    const found = join(dir, "refs", path);
+    if (existsSync(found)) return found;
+    const up = dirname(dir);
+    if (up === dir) return join("refs", path);
+    dir = up;
+  }
+}
+
+export function mapRows(file = refFile("devex/agent/work-map.md")): MapRow[] {
   try { return parseMap(readFileSync(file, "utf8")); } catch { return []; }
 }
 
