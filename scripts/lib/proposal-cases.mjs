@@ -78,7 +78,9 @@ export function answerOf(stream) {
     const text = (event.message?.content ?? []).filter((part) => part.type === "text").map((part) => part.text).join("\n");
     if (text) texts.push(text);
   }
-  return texts.length ? texts.join("\n\n") : finalTextOf(stream);
+  const final = finalTextOf(stream);
+  if (final && !texts.includes(final)) texts.push(final);
+  return texts.join("\n\n");
 }
 
 /**
