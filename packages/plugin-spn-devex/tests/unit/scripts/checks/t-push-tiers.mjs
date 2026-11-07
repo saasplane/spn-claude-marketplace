@@ -181,6 +181,47 @@ console.log("\n=== a touched node without a whole, green run on this content is 
     denial(refused).includes("proved nothing") && denial(refused).includes("spnutils apps test unit commit-unit pkg"), denial(refused));
 }
 
+console.log("\n=== a node that owes a tier and carries no case of it yet passes on a whole run, with a warning");
+{
+  // An APP_WEB node whose component folder is kept by `.gitkeep` alone, as an app with no screen to mount leaves it.
+  const repo = repository("no-case-yet", {
+    "app/spkind.json": JSON.stringify({ kind: "APP_WEB", name: "App", config: { mtype: "APP_WEB" } }),
+    "app/package.json": JSON.stringify({ name: "app", private: true }),
+    "app/src/a.ts": "export const a = 1;\n",
+    "app/tests/component/.gitkeep": "",
+  });
+  write(repo, { "app/package.json": JSON.stringify({ name: "app", private: true, version: "0.0.2" }) });
+  land(repo, "app/package.json");
+  ok("[MKT.HOOKS.501] with no run at all the push is still refused", denial(checkPushTiers(push(repo))).includes("`app`, component: no run file"), denial(checkPushTiers(push(repo))));
+
+  const emptyRun = (at) => {
+    leaveRun(at, "app", "component", { content: indexHash(at, "app") });
+    writeFileSync(join(at, "app", "tests", ".output", "component", "runs", "r1.json"),
+      JSON.stringify({ run: "r1", tier: "COMPONENT", phase: null, ranAt: "2026-11-07T11:00:00Z", env: "local", results: [] }), "utf8");
+  };
+  emptyRun(repo);
+  const warned = checkPushTiers(push(repo));
+  ok("[MKT.HOOKS.501] a whole run on this content that ran no case passes with a warning, not a refusal", verdictOf(warned) === "note", JSON.stringify(warned));
+  ok("[MKT.HOOKS.501] the warning names the node and the tier, and the rule that makes it a warning",
+    (warned?.note ?? "").includes("`app` owes the component tier and carries no case of it yet") && (warned?.note ?? "").includes("RULE.SUPPORT.APPS.114"), warned?.note);
+
+  const narrowedEmpty = repository("no-case-yet-narrowed", {
+    "app/spkind.json": JSON.stringify({ kind: "APP_WEB", name: "App", config: { mtype: "APP_WEB" } }),
+    "app/package.json": JSON.stringify({ name: "app", private: true }),
+    "app/tests/component/.gitkeep": "",
+  });
+  write(narrowedEmpty, { "app/package.json": JSON.stringify({ name: "app", private: true, version: "0.0.2" }) });
+  land(narrowedEmpty, "app/package.json");
+  leaveRun(narrowedEmpty, "app", "component", { content: indexHash(narrowedEmpty, "app"), narrowed: true });
+  ok("[MKT.HOOKS.501] a narrowed run is refused even where the node carries no case", denial(checkPushTiers(push(narrowedEmpty))).includes("narrowed"), denial(checkPushTiers(push(narrowedEmpty))));
+
+  write(repo, { "app/tests/component/a.ct.spec.tsx": "test('a', () => {});\n" });
+  land(repo, "app/tests/component/a.ct.spec.tsx");
+  emptyRun(repo);
+  ok("[MKT.HOOKS.501] once the folder holds a case file, a run that ran no case is refused as before",
+    denial(checkPushTiers(push(repo))).includes("it ran no case, so it proved nothing"), denial(checkPushTiers(push(repo))));
+}
+
 console.log("\n=== a whole green stamped run on exactly this content passes");
 {
   const repo = appsRepo("green");
