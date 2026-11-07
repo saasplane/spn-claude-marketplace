@@ -116,8 +116,8 @@ ok("the shared script holds the keyword lists", /\bSELECT FROM WHERE\b/.test(SCR
 // MKT.SCRIPTS.539: the approach page's status bar keeps each arc on one line, and its cells fill the row.
 const SOURCE = readFileSync(resolve(HERE, "src", "styles", "sds-docs.src.css"), "utf8");
 const ruleOf = (selector) => new RegExp(`\\${selector}\\{([^}]*)\\}`).exec(SOURCE)?.[1] ?? "";
-ok("an arc's count never wraps", /flex:none/.test(ruleOf(".sds-arc-count")) && /white-space:nowrap/.test(ruleOf(".sds-arc-count")));
-ok("the status bar's cells fill the row", /flex:1 0 auto/.test(ruleOf(".sds-chip")));
+ok("[MKT.SCRIPTS.539] an arc's count never wraps", /flex:none/.test(ruleOf(".sds-arc-count")) && /white-space:nowrap/.test(ruleOf(".sds-arc-count")));
+ok("[MKT.SCRIPTS.539] the status bar's cells fill the row", /flex:1 0 auto/.test(ruleOf(".sds-chip")));
 
 console.log(`\n${total - failed}/${total} passed`);
 process.exit(failed ? 1 : 0);
