@@ -188,9 +188,21 @@ export function tiersTouched(relativePath: string, owed: Tier[]): Tier[] {
 }
 
 /**
- * Whether a tier of a node has a run that proves exactly this content, or why its newest run does not.
+ * Whether a node's committed tree holds a case file of a tier: any file under `tests/<tier>/` whose name does not
+ * start with a dot, so a folder kept by `.gitkeep` alone holds none. A helper or a fixture there counts as a case
+ * file, which keeps the empty-run allowance to a folder with nothing in it.
  */
-export function proofOf(top: string, folder: string, tier: Tier, content: string): { ok: true } | { ok: false; reason: string } {
+export function carriesCase(blobs: Map<string, string>, folder: string, tier: Tier): boolean {
+  const prefix = `${folder === "." ? "" : `${folder}/`}tests/${tier}/`;
+  return [...blobs.keys()].some((path) => path.startsWith(prefix) && !basename(path).startsWith("."));
+}
+
+/**
+ * Whether a tier of a node has a run that proves exactly this content, or why its newest run does not. A node that
+ * carries no case of the tier still needs a whole run stamped on this content, and that run, which ran no case,
+ * passes with a warning: proof not yet written is a warning and never an error (RULE.SUPPORT.APPS.114).
+ */
+export function proofOf(top: string, folder: string, tier: Tier, content: string, hasCase = true): { ok: true; warning?: string } | { ok: false; reason: string } {
   const runs = join(top, folder, "tests", ".output", tier, "runs");
   let files: string[];
   try { files = readdirSync(runs).filter((name) => name.endsWith(".json") && !/\.(stamp|runner)\.json$/.test(name)); }
@@ -199,15 +211,19 @@ export function proofOf(top: string, folder: string, tier: Tier, content: string
   const newestFirst = files.map((name) => ({ name, at: statSync(join(runs, name)).mtimeMs })).sort((left, right) => right.at - left.at);
   let newestReason = "";
   for (const { name } of newestFirst) {
-    const reason = refusalOf(join(runs, name), tier, content);
+    const reason = refusalOf(join(runs, name), tier, content, hasCase);
     if (reason === null) return { ok: true };
+    if (reason === NO_CASE_YET) return { ok: true, warning: `owes the ${tier} tier and carries no case of it yet, so nothing proves it` };
     newestReason ||= `\`${name}\`: ${reason}`;
   }
   return { ok: false, reason: newestReason };
 }
 
-/** Why one run file is no proof, or null where it is. */
-function refusalOf(runFile: string, tier: Tier, content: string): string | null {
+/** What `refusalOf` returns for a whole run on this content that ran no case where the node holds none: no refusal, a warning. */
+const NO_CASE_YET = "no case yet";
+
+/** Why one run file is no proof, `NO_CASE_YET` where it proves only that the node has no case, or null where it is. */
+function refusalOf(runFile: string, tier: Tier, content: string, hasCase: boolean): string | null {
   let run: { results?: Array<{ status?: string }> };
   try { run = JSON.parse(read(runFile)); } catch { return "the run file cannot be read"; }
   let stamp: { content?: string; narrowed?: boolean; tier?: string };
@@ -215,7 +231,7 @@ function refusalOf(runFile: string, tier: Tier, content: string): string | null 
   if (stamp.tier && stamp.tier.toLowerCase() !== tier) return `its stamp is for the ${stamp.tier} tier`;
   if (stamp.narrowed !== false) return "the run was narrowed by files, names or a phase";
   if (stamp.content !== content) return "it ran on other content than the tree this push carries";
-  if (!Array.isArray(run.results) || run.results.length === 0) return "it ran no case, so it proved nothing";
+  if (!Array.isArray(run.results) || run.results.length === 0) return hasCase ? "it ran no case, so it proved nothing" : NO_CASE_YET;
   // A skipped case reports PENDING: an opt-in live case, which the offline tier does not owe (02-scm.md § Push).
   if (run.results.some((result) => result?.status !== "SUCCESS" && result?.status !== "PENDING")) return "its results are not all green";
   if (!run.results.some((result) => result?.status === "SUCCESS")) return "every case it ran was skipped, so it proved nothing";
@@ -265,6 +281,7 @@ export function checkPushTiers(payload: Payload): Verdict {
   const command = payload.tool_input?.command ?? "";
   if (!applies("", command)) return null;
   const gaps: Gap[] = [];
+  const warnings: string[] = [];
   const unformatted: string[] = [];
   let prettierMissing = false;
   let repo = "";
@@ -287,10 +304,12 @@ export function checkPushTiers(payload: Payload): Verdict {
     }
     for (const [folder, { manifest, tiers }] of touched) {
       if (!tiers.size) continue;
-      const content = contentHash(carried.blobsUnder(folder), folder);
+      const blobs = carried.blobsUnder(folder);
+      const content = contentHash(blobs, folder);
       for (const tier of TIERS.filter((one) => tiers.has(one as Tier)) as Tier[]) {
-        const proof = proofOf(carried.top, folder, tier, content);
+        const proof = proofOf(carried.top, folder, tier, content, carriesCase(blobs, folder, tier));
         if (!proof.ok) { gaps.push({ folder, manifest, tier, reason: proof.reason }); repo = basename(carried.top); }
+        else if (proof.warning) warnings.push(`- \`${folder}\` ${proof.warning}.`);
       }
     }
   }
@@ -307,7 +326,12 @@ export function checkPushTiers(payload: Payload): Verdict {
       `${unformatted.map((file) => `- \`${file}\``).join("\n")}\n` +
       `Run \`pnpm exec prettier --write ${quoted.join(" ")}\`, commit the result, then push again.`);
   }
-  if (!gaps.length) return refusals.length ? { deny: refusals.join("\n\n") } : null;
+  if (!gaps.length) {
+    if (refusals.length) return { deny: refusals.join("\n\n") };
+    return warnings.length
+      ? { note: `This push carries nodes that owe a tier and carry no case of it yet; a whole run on this tree stands in, and proof is still to write (RULE.SUPPORT.APPS.114).\n${warnings.join("\n")}` }
+      : null;
+  }
   const lines: string[] = [];
   const infraDone = new Set<string>();
   for (const gap of gaps) {
