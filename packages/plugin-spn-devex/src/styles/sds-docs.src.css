@@ -597,7 +597,7 @@
   .sds-footbar-chips{@apply flex overflow-x-auto overflow-y-hidden; gap:0; padding:0; scroll-snap-type:x proximity; scroll-padding:0; scrollbar-width:none; overscroll-behavior-x:contain; min-width:0;
     -webkit-mask-image:linear-gradient(to right,transparent 0,#000 .5rem,#000 calc(100% - .5rem),transparent 100%); mask-image:linear-gradient(to right,transparent 0,#000 .5rem,#000 calc(100% - .5rem),transparent 100%)}
   .sds-footbar-chips::-webkit-scrollbar{display:none}
-  .sds-chip{@apply flex flex-col bg-card no-underline text-title; --sds-arc:var(--sds-step-1); flex:0 0 auto; width:12rem; min-width:0; scroll-snap-align:start; gap:3px; justify-content:center; border-left:3px solid var(--sds-rule); border-right:1px solid var(--sds-rule); border-radius:0; padding:.1rem .45rem}
+  .sds-chip{@apply flex flex-col bg-card no-underline text-title; --sds-arc:var(--sds-step-1); flex:1 0 auto; width:12rem; min-width:0; scroll-snap-align:start; gap:3px; justify-content:center; border-left:3px solid var(--sds-rule); border-right:1px solid var(--sds-rule); border-radius:0; padding:.1rem .45rem}
   .sds-chip.sds-proposed{border-left-color:var(--sds-yellow)}
   .sds-chip.sds-decided{border-left-color:var(--sds-info)}
   .sds-chip.sds-running{border-left-color:var(--sds-orange)}
@@ -623,7 +623,7 @@
   }
   .sds-chip-bar{@apply block bg-rule overflow-hidden; flex:none; height:4px; border-radius:999px}
   .sds-chip-bar i{@apply block h-full; background:var(--sds-arc)}
-  .sds-arc-count{@apply font-mono text-xs text-fact; font-variant-numeric:tabular-nums}
+  .sds-arc-count{@apply font-mono text-xs text-fact; font-variant-numeric:tabular-nums; flex:none; white-space:nowrap}
   .sds-chip-open{@apply no-underline; color:inherit}
   .sds-eyebrow .sds-progress{@apply inline-flex items-center; --sds-arc:var(--sds-step-1); gap:.4rem}
   .sds-eyebrow .sds-progress .sds-chip-bar{width:4.5rem; height:.5rem}
