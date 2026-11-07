@@ -241,6 +241,7 @@ Every row below is declared and none is claimed: a run writes the last two cells
 | MKT.HOOKS.498 | Engineering leader | write an entry's file in the arc's worktree before the go | A write inside the workstream's worktree passes when an entry of an arc of this window's workstreams names that file, and the documents-first gate lets it through while no go part of the arc has started | POSITIVE | UNIT | PLANNED | — |
 | MKT.HOOKS.499 | Engineering leader | still be refused in a main checkout and on a file no entry names | A write in a main checkout, or on a file no entry names, is refused until the go, as before | NEGATIVE | UNIT | PLANNED | — |
 | MKT.HOOKS.500 | Engineering leader | be shown a parked suggestion that changes how I work | A suggestion parked with the mark that it changes how I work adds one line to the window's start, with its number and title, until it is decided or dropped, inside the start's ceiling | POSITIVE | UNIT | PLANNED | — |
+| MKT.HOOKS.501 | Backend developer | push a node that owes a tier and carries no case of it yet | A whole run stamped on exactly the pushed content that ran no case passes with a warning naming the node and the tier when the node's `tests/<tier>/` folder at HEAD holds no case file, since proof not yet written is a warning and never an error (RULE.SUPPORT.APPS.114 · MUST), and is refused as before when the folder holds one — proven in `tests/unit/scripts/checks/t-push-tiers.mjs` | POSITIVE | UNIT | PLANNED | — |
 
 ## Retired ids
 
