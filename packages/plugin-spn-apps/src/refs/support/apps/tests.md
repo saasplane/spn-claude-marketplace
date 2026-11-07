@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/02-apps/06-tests.md",
-      "seen": "4322e8b8"
+      "seen": "3549dcb8"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/06-tests/",
-      "seen": "c9358711"
+      "seen": "caf51475"
     }
   ]
 }
@@ -34,8 +34,11 @@ Five tiers, each buying something the others cannot. When you place a case, pick
 | `JOURNEY` | a person completing an outcome through a real entry | which rule failed when it fails | a quiesced running stack |
 
 ```text
-SPTestTierType  UNIT · INTEGRATION · CONTRACT · COMPONENT · JOURNEY
+SPTestTierType      UNIT · INTEGRATION · CONTRACT · COMPONENT · JOURNEY
+SPTestNegativeType  REFUSAL · BAD_INPUT · ABSENT_ROW · CONFLICT · LIMIT
 ```
+
+`SPTestNegativeType` is the refusal kind: one of five ways a case names a refusal, the same on every platform. The toolchain publishes it beside the mutation scopes, so no platform writes the set again.
 
 **No tier substitutes for another.** A green unit suite over broken wiring is a passing build of a broken product; a passing journey over untested rules is a change nobody checked where it was decided. **A static gate is not a test at all** — structural validation, type checking and lint prove shape, never behaviour, and a green run at one **MUST NOT** be read as passing another. **A test runner is not the runtime that ships.** It may load source under a different module system than the published artifact meets, so anything reading its own module identity passes under the runner and breaks on the first install. No tier above proves that, because every one of them runs source rather than the published artifact — that claim is proven by running what is published, installed the way a consumer installs it.
 
@@ -74,6 +77,21 @@ Decide where a case belongs with one rule, and read the node's kind to see which
 | an application | the runtime | no doubles at all |
 
 A support package that creates runtimes proves that one can be created with it — the proof is doing it, never unit-testing the parts and inferring the whole.
+
+## What a partner tests
+
+**A partner tests what they build, on the same tiers, and never the modules they take.** It works the way a repository uses its ORM: you test your functions and not the ORM. A partner owes the tiers their own nodes owe, on their own modules, screens and journeys. A journey that passes through a published module on its way to the partner's own screen proves nothing about that module, and the module's rows stay proved by the node that owns them. The one thing a partner proves about a module they take is the wiring: one journey for each module, showing their category's enablement, their roles and their grants reach their screen, and one contract case in its place for a module with no screens. SaaS Plane ships no test cases for a partner to run (`RULE.SUPPORT.APPS.262` · MUST · skill:spn-apps/implement).
+
+**Test support ships as code only when a partner's own journey needs it** (`RULE.SUPPORT.APPS.263` · MUST · skill:spn-apps/implement). Two questions decide each helper: is its answer the same for every partner, and does a partner's own journey need it to reach or drive their own screen? A helper that passes both ships, with the package it drives: the helpers that drive the design system come with the design system, and signing a person in comes with the identity module, each as a `./test` door released with that package. A set of names every platform must read the same, such as the refusal kinds, ships in the toolchain.
+
+| A helper | Ships? |
+| --- | --- |
+| drives a package's controls, or signs a person in through a module's screens | yes, as a `./test` door on the package it drives |
+| names a set every platform must read the same | yes, in the toolchain |
+| tests a module's own screens, such as enrolling a second factor or resetting a password | never: a partner does not test those screens, and the helper stays with the platform that owns the module |
+| reads a platform's own routes, seed, tables or hosts | never: the answer differs for each partner, and their agent writes its own from the plugin's steps |
+
+**A published helper takes values and never a choice about how the partner is built.** A host, a credential and a secret are values; an organization category, an enablement cell and a persona are choices. What follows a partner's choices does not ship as code: their agent writes that setup from the plugin's steps, after reading how they built.
 
 ## Scope: the folder decides what a run collects
 
