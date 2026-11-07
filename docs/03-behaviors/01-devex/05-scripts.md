@@ -346,6 +346,7 @@ Every row below is declared and none is claimed: a run writes the last two cells
 | MKT.SCRIPTS.536 | Engineering leader | have a created file patched | `sheet patch` keeps the diff of a created file against nothing and resets it by removing the file, and the state check's message names `patches/` | POSITIVE | UNIT | PLANNED | — |
 | MKT.SCRIPTS.537 | Engineering leader | have a rename that changes a shape patched | `sheet patch` keeps a rename over the old and the new path, so a changed shape reaches the preview as code | POSITIVE | UNIT | PLANNED | — |
 | MKT.SCRIPTS.538 | Engineering leader | have no patched change cut into a helper's part, and one workflow for the go | `go write` refuses a patch that no longer applies by name, the lead's apply part holds every code entry, and the go makes one workflow from its plan across its arcs | POSITIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.539 | Editor | read the approach page's status bar on one line | An arc's count stays on the line of its title, and the bar's cells fill the row, so no cell sits lower than another and no blank stretch stands before Overall | POSITIVE | UNIT | PLANNED | — |
 
 ## Retired ids
 
