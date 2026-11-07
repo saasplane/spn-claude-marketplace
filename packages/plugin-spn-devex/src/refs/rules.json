@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "book": {
     "repository": "spn-foundation",
-    "commit": "ff54f11b"
+    "commit": "b6ac3312"
   },
   "rules": [
     {
@@ -19045,6 +19045,93 @@
         {
           "plugin": "spn-apps",
           "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.APPS.262",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-apps/implement"
+      },
+      "class": "stated in a skill",
+      "sentence": null,
+      "chapter": "02-constructs/02-support/02-apps/06-tests.md",
+      "heading": "What a partner tests",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "providers/ts/skills/implement/steps/test.md",
+          "heading": "A partner's setup — written from how they built"
+        },
+        {
+          "plugin": "spn-apps",
+          "path": "refs/support/apps/tests.md",
+          "heading": "What a partner tests"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/agent/lenses/qa.md",
+          "heading": "Produces to"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.APPS.263",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-apps/implement"
+      },
+      "class": "stated in a skill",
+      "sentence": null,
+      "chapter": "02-constructs/02-support/02-apps/06-tests.md",
+      "heading": "What a partner tests",
+      "decision": "DEC.SUPPORT.APPS.263",
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "providers/ts/skills/implement/steps/test.md",
+          "heading": "A partner's setup — written from how they built"
+        },
+        {
+          "plugin": "spn-apps",
+          "path": "refs/support/apps/tests.md",
+          "heading": "What a partner tests"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/agent/lenses/qa.md",
+          "heading": "Produces to"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.APPS.264",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-apps/run"
+      },
+      "class": "stated in a skill",
+      "sentence": "A local app starts only through `spnutils apps dev`, run from the main checkout, and never from a worktree or through raw `nx`",
+      "chapter": "04-capabilities/02-support/02-apps/10-providers/ts/12-toolchain.md",
+      "heading": "Workspace Conventions (Nx + pnpm)",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "refs/support/apps/providers/ts/12-toolchain.md",
+          "heading": "Toolchain — what builds, links and lints it"
+        },
+        {
+          "plugin": "spn-apps",
+          "path": "skills/run/SKILL.md",
+          "heading": "The form — read this before you type a command"
+        },
+        {
+          "plugin": "spn-apps",
+          "path": "skills/run/SKILL.md",
           "heading": "The rules this step holds"
         }
       ]

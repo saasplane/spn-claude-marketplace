@@ -480,8 +480,10 @@ export function placesOf(folder: string): Place[] {
 
 /** The facts value of a place: its arcs, separated by middots as the page writes them. */
 const arcsValue = (place: Place): string => place.arcs.join(" &middot; ");
-/** A place's `Arcs:` fact as a page holds it: the arc numbers, separated by middots, and nothing after them. */
-const ARCS_FACT = /Arcs:[ \t]*(?:N\d+[a-z]?(?:[ \t]*(?:&middot;|·)[ \t]*N\d+[a-z]?)*)?/;
+/** A place's `Arcs:` fact as a page holds it: the arc names (a build arc's number, `ideate`, `follow-ups`), separated by middots, and nothing after them. */
+const ARC_NAME = "(?:N\\d+[a-z]?|ideate|follow-ups)";
+// nosemgrep: javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp -- pattern built from this script's own constants, never outside input
+const ARCS_FACT = new RegExp(`Arcs:[ \\t]*(?:${ARC_NAME}(?:[ \\t]*(?:&middot;|·)[ \\t]*${ARC_NAME})*)?`);
 
 /** Whether an `h3`'s text names a place: it starts with the repository's name, and the name ends there. */
 const namesPlace = (heading: string, repo: string): boolean =>

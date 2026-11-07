@@ -30,6 +30,7 @@ Every row below is declared and none is claimed: a run writes the last two cells
 | MKT.SKILLS.08 | Engineering leader | ask in plain words and reach the skill written for it, without typing its name | Every skill of the four plugins opens with its frontmatter, so the session is offered it; one that opens with anything else fails the suite | POSITIVE | UNIT | PLANNED | — |
 | MKT.SKILLS.09 | Architect | follow the ideate skill without a pointer that lands on nothing | The ideate skill holds no pointer to a section its refs do not have, and no rule line that shows only its id | NEGATIVE | UNIT | PLANNED | — |
 | MKT.SKILLS.10 | Engineering leader | have patches start only when I ask for an arc or a preview | The ideate skill writes no patch while a shape is discussed in chat, and writes the stack in order once an arc or a preview is asked for | POSITIVE | UNIT | PLANNED | — |
+| MKT.SKILLS.28 | Web developer | ask my agent to set up tests and get a setup written from the plugin's steps alone, with one wiring journey that goes green | The setup names the version of the steps it came from, sits beside the app's `playwright.config.ts`, and carries no case on a module's own rows; the steps name no `DMO_` setting and no platform host | POSITIVE | JOURNEY | PLANNED | — |
 
 ## Retired ids
 
