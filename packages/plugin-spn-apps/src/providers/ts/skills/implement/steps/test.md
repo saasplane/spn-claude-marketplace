@@ -14,6 +14,21 @@ Three habits, in the order you need them. Each replaces reading you would otherw
 
 **And every journey assertion says why it might have failed.** `expect(editors, 'the content page rendered no channel editor at all — the session may lack NTF_CONFIG_MANAGE').toHaveCount(1)` has diagnosed itself. Its neighbour reporting `expected > 0, received 0` costs the next reader an investigation. Playwright takes that message on `expect`, `expect.soft` and `expect.poll`, and a write-time check warns you when one is missing. Jest takes no such argument, so a contract case carries the same thinking in its title and in the comment above the assertion.
 
+## A partner's setup — written from how they built
+
+**A partner tests what they build** — their own modules, screens and journeys, and never the modules they take (`RULE.SUPPORT.APPS.262` · MUST · skill:spn-apps/implement). SaaS Plane ships no test cases for a partner to run. What it ships is the code a journey needs, as a `./test` door on the package that drives the screen, and these steps for the setup that follows the partner's own choices (`RULE.SUPPORT.APPS.263` · MUST · skill:spn-apps/implement). Write the setup after you read how the partner built, in this order.
+
+1. **Read how they built.** Read the platform manifest, the service's modules and the web app's routes. A partner who does not use the design system gets the toolchain's doors and writes journeys on Playwright alone.
+2. **Write what the stack needs.** Which services start, on which resources, with what data; the hosts a seat needs, read from the partner's own manifest and never copied from another platform; and the switch that makes a build emit seats. A build that emits none fails once and names the switch to set.
+3. **Write the partner's own personas and seed helpers** in the app's `tests/helpers/`, beside its `playwright.config.ts`, on the doors. For each persona write its org category, its enablement cells and, where the org asks for a second factor at sign-in, its second-factor secret. The secret is a value the seed writes and hands to the test.
+4. **Write the cases.** Cases go on the partner's own rows, and one wiring journey for each module they take. A wiring journey signs in as a persona, opens the partner's screen that uses the module and reads one thing the module answered. Write no case on a module's own rows. A module with no screens gets one contract case in its place.
+5. **Capture and restore a cell for the partner's own offer.** A gate that is never seen to refuse proves nothing, so a partner who registers an offer gets the capture-and-restore of that cell, as in State hygiene above. Enablement of a platform's modules stays with the platform, because it reads the platform's hosts and its stored secret.
+6. **Name the version of these steps in the setup you write,** so the partner can see when it is stale and ask their agent to write it again.
+
+- **Import from the doors, and write nothing a door holds.** The design system's door drives a form and opens a page; the identity module's door signs a person in and answers a second factor on the way in; the toolchain's doors hold the seat a test reads and the refusal kinds. Enrolling a second factor, resetting a password and the page probe are not on a door, because a partner does not test those screens.
+- **A helper takes values.** Pass a host, a credential or a secret in. A choice about how the partner is built is yours to write in the setup, never the door's.
+- **A failed sign-in names the step it stopped on.** Read that step before you read the case.
+
 ## Unit tests
 
 - Put `tests/unit/*.spec.ts` in the owning project (jest for node projects, vitest for web). Cover the service rules you just wrote: guards (`_assert*` throwing), null-skip update behavior, mapper ladders, error codes/categories.
