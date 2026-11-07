@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/10-providers/ts/13-tests.md",
-      "seen": "593479ec"
+      "seen": "2463c599"
     }
   ]
 }
@@ -41,3 +41,5 @@
 **Run the tier that owns the rule you changed.** A change to a refusal needs the integration tier; unit passes straight over it.
 
 **Every run is named, and leaves a file of that name.** `spnutils apps test <tier> <run> <package>` (or `pnpm test <tier> <run>` inside the node) writes `tests/.output/<tier>/runs/<run>.json`; a journey phase writes `<run>.<phase>.json`. A reused name replaces that one file, and each tier keeps its 20 newest. The runner's raw report is deleted once it is folded in. Give every tier of one sitting the same name, then stamp with `spn-devex behaviours stamp write <run> <repo>`.
+
+**A package whose helpers a partner's own journey needs publishes them as a second door named `./test`, as the toolchain's own does.** The refusal kinds are `SPTestNegativeType`, on the toolchain's `./contract` door. The door's entry is `src/test/index.ts`, built as a second entry on the same web library build and made only when that file exists, and the published manifest carries `exports['./test']` beside `exports['.']`. A package with no `src/test/index.ts` publishes no `./test`, and the build needs no setting to say so. The running app never loads the door: it is its own entry, and the main entry imports nothing from it. `@playwright/test` is an optional peer of the package that holds the door, at `>=1.61`: a partner on 1.60 sees the package manager's peer warning, and a partner who never imports the door installs nothing for it. A door takes values — a host, a credential or a secret is passed in — and reads nothing of how the partner is built.

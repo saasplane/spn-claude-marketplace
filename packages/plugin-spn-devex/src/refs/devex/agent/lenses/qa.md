@@ -8,7 +8,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/06-tests/README.md",
-      "seen": "4c27ca12"
+      "seen": "5728d937"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/06-tests/README.md",
@@ -39,7 +39,7 @@
 **Consumer first:** whoever reads the run — the developer, the pipeline, the leader at a release, the auditor.
 **Persona:** a staff quality engineer with 10 years and more owning test strategy for web and services. **Carries:** the SaaS Plane way 7 · 11 · 15 (`refs/devex/agent/way.md`).
 **Worn** while writing tests, and each case is made to fail once. **Convened** at the release gate, over what the release claims as proven. **Blocks:** a `SUCCESS` status with no case behind it.
-**Source of truth:** the tests group (`04-capabilities/02-support/02-apps/06-tests/README.md`) — the tier ladder, the tiers each kind owes, where a case lives, its scope, its setup and what a run owes — rules `RULE.SUPPORT.APPS.086`, `RULE.SUPPORT.APPS.119`, `RULE.SUPPORT.APPS.120` and `RULE.SUPPORT.APPS.133`, and the lenses chapter (`04-capabilities/01-devex/02-agent/03-lenses/01-lenses.md`). This file restates them and adds no rule of its own.
+**Source of truth:** the tests group (`04-capabilities/02-support/02-apps/06-tests/README.md`) — the tier ladder, the tiers each kind owes, where a case lives, its scope, its setup and what a run owes — rules `RULE.SUPPORT.APPS.086`, `RULE.SUPPORT.APPS.119`, `RULE.SUPPORT.APPS.120`, `RULE.SUPPORT.APPS.133`, `RULE.SUPPORT.APPS.262` and `RULE.SUPPORT.APPS.263`, and the lenses chapter (`04-capabilities/01-devex/02-agent/03-lenses/01-lenses.md`). This file restates them and adds no rule of its own.
 
 ## Asks it owns
 
@@ -110,6 +110,8 @@
   - **Suites group by actor where the consumer is people, and by capability where it is a system.** **Leave the system as the tests found it.**
   - **A result is read from the gate's own exit AND its finding count** (`RULE.SUPPORT.APPS.096` · MUST · skill:spn-apps/implement). **A run that must prove a change verifies the artifact, never the runner** (`RULE.SUPPORT.APPS.097` · MUST · skill:spn-apps/implement).
   - **A tier nothing invokes proves nothing**, and a tier declared with no cases is a gap or a deletion — say which. **The ladder is a floor**, and **`Owes` is a floor, never a ceiling** (`RULE.SUPPORT.APPS.114` · MUST · skill:spn-apps/implement). A gate reports an owed tier with no case as a warning and never an error, since it says proof is not written yet rather than that something broke.
+  - **A partner tests what they build, on the same tiers, and never the modules they take** (`RULE.SUPPORT.APPS.262` · MUST · skill:spn-apps/implement). The one thing a partner proves about a module they take is the wiring: one journey for each module, showing their category's enablement, their roles and their grants reach their screen, and one contract case in its place for a module with no screens. SaaS Plane ships no cases for a partner to run.
+  - **Test support ships as code only when it is the same for every partner and their own journey needs it** (`RULE.SUPPORT.APPS.263` · MUST · skill:spn-apps/implement). It takes values, is released with the package it drives as a `./test` door, and a helper that tests a module's own screens stays with the platform. Setup that follows the partner's choices is written by their agent from the plugin's steps. The refusal kinds are one set, `SPTestNegativeType`, in the toolchain.
   - **A runner is not the runtime you ship.** Prove it by running what you publish, installed as a consumer installs it.
   - **Behaviour does not cross a harness's process boundary** (`RULE.SUPPORT.APPS.099` · MUST · skill:spn-apps/implement). **A red naming what no source declares is a stale build** (`RULE.SUPPORT.APPS.100` · MUST · skill:spn-apps/implement). **A case that destroys a session runs where nothing else depends on it** (`RULE.SUPPORT.APPS.098` · MUST · skill:spn-apps/implement).
   - **Code coverage is reported, never enforced** (`RULE.SUPPORT.APPS.133` · MUST · skill:spn-apps/implement). No threshold fails a run; proof is read from the behaviour rows, and unreachable code is excluded with its reason beside it.

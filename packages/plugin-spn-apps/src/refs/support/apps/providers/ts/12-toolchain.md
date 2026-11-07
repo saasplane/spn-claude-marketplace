@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/10-providers/ts/12-toolchain.md",
-      "seen": "4ecd052c"
+      "seen": "09668f5b"
     }
   ]
 }
@@ -29,3 +29,5 @@
 **A kind, tier, phase or mutation scope is named from `@saasplane/toolchain-ts/contract`, never typed as a string.** The toolchain declares the five vocabularies once, as frozen enums; the CLI restates them as TypeScript enums and a drift test holds the two together.
 
 **Root scripts are the repository's and are a different surface from a node's commands.** Reach for `spnutils apps check · test · format` before any `npx` or `pnpm` invocation.
+
+**A local app starts only through `spnutils apps dev`, run from the main checkout, and never from a worktree or through raw `nx`** (`RULE.SUPPORT.APPS.264` · MUST · skill:spn-apps/run). A worktree holds work in progress and never the running stack. The design system is built by `spnutils apps build support-web-ds-ts`, and the showcase is started by `spnutils apps dev web-surface-ts`, as node commands and not as root scripts.
