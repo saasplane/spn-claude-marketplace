@@ -48,6 +48,8 @@ failure — a `MODULE_SERVER` has no `start` because it serves nothing, and a no
 second name for a target that already exists, it hides which project does the work, and it is the
 shape an agent copies next. Call the owning project's target.
 
+**Apps start with `spnutils apps dev`, run from the main checkout, never raw `nx` and never from a worktree** (`RULE.SUPPORT.APPS.264` · MUST · skill:spn-apps/run). `nx run <project>:dev` and `nx run-many -t dev` are not ways to start an app. A build, a check or a test still goes through its target.
+
 ## A SCRIPT and a TARGET are different things, and this is where people trip
 
 **A node declares one script per command, and nx carries a target per tier.** Both are real and they
@@ -114,11 +116,12 @@ development bundle from a production one instead of guessing.
 | You want to | Command |
 | --- | --- |
 | see what a project can do | `npx nx show project <p> --json` |
-| start the service | `npx nx run <service>:dev` |
+| start the service | `spnutils apps dev <service>` |
 | migrate a fresh schema | `pnpm --filter <service> migrate up` |
-| start one web app | `npx nx run <web>:dev` |
+| start one web app | `spnutils apps dev <web>` |
 | **prepare a browser run** | `npx nx run-many -t build -p 'web-*'` then `pnpm --filter <web> build test` for the one under test |
-| **serve it** | `npx nx run-many -t start -p 'web-*'` |
+| **serve it** | `spnutils apps start <web>` for each web app |
+| stop what dev or start left running | `spnutils apps stop <package>` |
 | unit tests, one project | `npx nx run <p>:test:unit` |
 | unit tests, everywhere | `npx nx run-many -t test:unit --all` |
 | check everything | `npx nx run-many -t check --all` |
@@ -239,8 +242,8 @@ means a build value was missing and threw at boot, naming the key.
 2. **Platform layer**: `spnutils infra platform up <spc> --apply` — this platform's container group (database, cache, queue, and each installed module's local rendering) from the pinned declaration. `<spc>` is the platform code `sprepo.json` pins, and a different one is refused (`RULE.DEVEX.UTILS.072` · MUST · skill:spn-devex/develop). Check with `spnutils infra platform status <spc>`.
 3. **App layer** (per app, if not yet registered): `spnutils infra app up <app>` — schemas, per-schema roles, local TLS certificate, hosts entry, ingress vhost. No containers of its own.
 4. **Hosted-vendor modules** need no step of their own — a vendor you run is a module row in the platform declaration, and its local rendering comes up with the platform layer. There is no vendor command.
-5. **Start the service app**: `npx nx run <service>:dev`. It loads `local.env`, and its port and API-docs path come from the repo's own app env — read them rather than assume. On a fresh schema run `pnpm --filter <service> migrate up` first; it needs the platform-owner env variables sourced.
-6. **Start web apps** as needed: `npx nx run-many -t dev -p '<pattern>'`, on the ports each app declares in its own manifest. For a browser suite run `start` instead, over a `build test` bundle — never `dev`.
+5. **Start the service app**: `spnutils apps dev <service>`. It loads `local.env`, and its port and API-docs path come from the repo's own app env — read them rather than assume. On a fresh schema run `pnpm --filter <service> migrate up` first; it needs the platform-owner env variables sourced.
+6. **Start web apps** as needed: `spnutils apps dev <web>` for each, on the ports each app declares in its own manifest. For a browser suite run `start` instead, over a `build test` bundle — never `dev`.
 
 Stop here — this mode starts things; it does not test or verify them. Hand off to the `verify` skill for health checks. Report what is up and on which ports/hosts.
 
