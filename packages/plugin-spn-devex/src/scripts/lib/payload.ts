@@ -47,8 +47,8 @@ export type Payload = {
   prompt?: string;
 };
 
-/** What a check decided. `deny` refuses the call; `note` is advice the turn reads. */
-export type Verdict = { deny?: string; note?: string } | null;
+/** What a check decided. `deny` refuses the call; `ask` puts it to the developer; `note` is advice the turn reads. */
+export type Verdict = { deny?: string; ask?: string; note?: string } | null;
 
 // The named entities this corpus actually writes, plus every numeric form. An entity nobody here
 // uses is LEFT ALONE rather than blanked, which is what Python's `html.unescape` does — blanking it
@@ -142,6 +142,9 @@ export function emit(verdict: Verdict): void {
   if (verdict.deny) {
     specific.permissionDecision = "deny";
     specific.permissionDecisionReason = verdict.deny;
+  } else if (verdict.ask) {
+    specific.permissionDecision = "ask";
+    specific.permissionDecisionReason = verdict.ask;
   }
   const output: Record<string, unknown> = { hookSpecificOutput: specific };
   if (verdict.deny) output.systemMessage = verdict.deny;

@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "book": {
     "repository": "spn-foundation",
-    "commit": "b6ac3312"
+    "commit": "65d28871"
   },
   "rules": [
     {
@@ -3491,7 +3491,7 @@
         "skill": "spn-devex/develop"
       },
       "class": "stated in a skill",
-      "sentence": "Nothing long-lived is stored anywhere, planned command or not",
+      "sentence": "Nothing long-lived is stored anywhere",
       "chapter": "04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
       "heading": "login — the cloud session",
       "decision": null,
@@ -12914,7 +12914,7 @@
       "class": "stated in a skill",
       "sentence": null,
       "chapter": "04-capabilities/02-support/03-infra/01-shape/02-coordinates.md",
-      "heading": "A platform owns one tenancy root, and any number of faces",
+      "heading": "The organization registers every domain, and a platform names its home",
       "decision": null,
       "restated": []
     },
@@ -19214,7 +19214,7 @@
         "skill": "spn-infra/implement"
       },
       "class": "stated in a skill",
-      "sentence": "SCM and CLOUD are the only two a company brings",
+      "sentence": "SCM and CLOUD are the two ports a blueprint library fills",
       "chapter": "04-capabilities/02-support/03-infra/01-shape/03-providers.md",
       "heading": "Two categories",
       "decision": null,
@@ -19410,7 +19410,7 @@
       "class": "stated in a skill",
       "sentence": "Keeping the marketing site off `{spd}` is a security property, not a preference",
       "chapter": "04-capabilities/02-support/03-infra/01-shape/02-coordinates.md",
-      "heading": "A platform owns one tenancy root, and any number of faces",
+      "heading": "The organization registers every domain, and a platform names its home",
       "decision": null,
       "restated": [
         {
@@ -20706,7 +20706,7 @@
       "class": "stated in a skill",
       "sentence": null,
       "chapter": "04-capabilities/02-support/03-infra/01-shape/02-coordinates.md",
-      "heading": "A platform owns one tenancy root, and any number of faces",
+      "heading": "The organization registers every domain, and a platform names its home",
       "decision": null,
       "restated": [
         {
@@ -20839,7 +20839,7 @@
       "class": "stated in a skill",
       "sentence": null,
       "chapter": "04-capabilities/02-support/03-infra/10-providers/aws/02-ground.md",
-      "heading": "M3 — Decide account email aliasing",
+      "heading": "M1 — Hold the domain and stand its mailbox",
       "decision": null,
       "restated": []
     },
@@ -21690,7 +21690,7 @@
       "sentence": null,
       "chapter": "04-capabilities/02-support/02-apps/04-resources/01-server/05-storage.md",
       "heading": "The default store and the named stores",
-      "decision": null,
+      "decision": "DEC.SUPPORT.INFRA.125",
       "restated": [
         {
           "plugin": "spn-infra",
@@ -21709,7 +21709,7 @@
       "sentence": null,
       "chapter": "04-capabilities/02-support/03-infra/03-blueprints/02-parity.md",
       "heading": "What CLUSTER stands",
-      "decision": null,
+      "decision": "DEC.SUPPORT.INFRA.126",
       "restated": [
         {
           "plugin": "spn-apps",
@@ -21738,7 +21738,7 @@
       "sentence": "A prefix is one word for a platform and two words for a space",
       "chapter": "04-capabilities/02-support/03-infra/06-modules/02-config.md",
       "heading": "A space's family lands under its own prefix",
-      "decision": null,
+      "decision": "DEC.SUPPORT.INFRA.127",
       "restated": [
         {
           "plugin": "spn-infra",
@@ -22066,6 +22066,63 @@
       "sentence": "Where a rule reaches both realizations it is written once and rendered twice, and never left to a configuration file both read",
       "chapter": "04-capabilities/02-support/03-infra/10-providers/01-providers.md",
       "heading": "Doctrine is rendered twice, never configured",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-infra",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.INFRA.145",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-infra/implement"
+      },
+      "class": "stated in a skill",
+      "sentence": "The acting role trusts the estate repository's pipeline role by name, and no other principal becomes it",
+      "chapter": "02-constructs/02-support/03-infra/07-trust.md",
+      "heading": "Who may become the acting role",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-infra",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.INFRA.146",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-infra/implement"
+      },
+      "class": "stated in a skill",
+      "sentence": "The deployments layer is applied by the pipeline alone, from a push, by digest",
+      "chapter": "02-constructs/02-support/03-infra/07-trust.md",
+      "heading": "Who may become the acting role",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-infra",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.INFRA.147",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-infra/implement"
+      },
+      "class": "stated in a skill",
+      "sentence": "The organization owns every domain, registered once, and a domain outlives any platform",
+      "chapter": "04-capabilities/02-support/03-infra/01-shape/02-coordinates.md",
+      "heading": "The organization registers every domain, and a platform names its home",
       "decision": null,
       "restated": [
         {

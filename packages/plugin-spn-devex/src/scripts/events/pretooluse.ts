@@ -44,6 +44,7 @@ import { applies as testRunApplies, checkTestRun } from "../checks/test-run.ts";
 import { applies as permanentBranchApplies, checkPermanentBranch } from "../checks/permanent-branch.ts";
 import { applies as pushTiersApplies, checkPushTiers } from "../checks/push-tiers.ts";
 import { applies as longRunApplies, checkLongRun } from "../checks/long-run.ts";
+import { applies as cloudFlagApplies, checkCloudFlag } from "../checks/cloud-flag.ts";
 import { applies as commandShapeApplies, checkCommandShape } from "../checks/command-shape.ts";
 import { applies as ownerApplies, checkOwner } from "../checks/workstream-owner.ts";
 import { applies as questionsApply, checkQuestions } from "../checks/questions.ts";
@@ -115,6 +116,9 @@ const CHECKS: Check[] = [
     applies: (path, command) => testRunApplies(path, command) },
   // A `note`, never a `deny`, so its cost is one regular expression over the command — cheaper than
   // any refusal above it, and it still runs this early because a Bash call pays no other check here.
+  // A cloud command is asked on, wherever its flag sits; a permission pattern matches a prefix and cannot.
+  { name: { group: "cloud-flag", action: "cloud-flag" }, run: checkCloudFlag, needs: ["command"],
+    applies: (path, command) => cloudFlagApplies(path, command) },
   { name: { group: "long-run", action: "long-run" }, run: checkLongRun, needs: ["command"],
     applies: (path, command) => longRunApplies(path, command) },
   // Three refusals whose whole cost is a regular expression or two over the command, and no file read.
@@ -596,6 +600,7 @@ export function dispatch(payload: Payload): Verdict {
   const path = supplied.file_path ?? "";
   const command = supplied.command ?? "";
   const notes: string[] = [];
+  let asked = "";
   for (const check of CHECKS) {
     if (!check.applies(path, command)) continue;
     if (!check.needs.some((key) => key === "any" || supplied[key])) continue;
@@ -606,11 +611,13 @@ export function dispatch(payload: Payload): Verdict {
     catch { continue; }                             // a check that throws is skipped, never fatal
     if (!verdict) continue;
     if (verdict.deny) return refusedBy(check.name, verdict);   // the first refusal is the answer
+    if (verdict.ask && !asked) asked = verdict.ask;            // the first ask is kept; a later refusal still wins
     if (verdict.note && check.run === checkDoc && docFindingHeard(payload, path, verdict.note)) continue;
     if (verdict.note) notes.push(verdict.note);
   }
   // THE WORK NOTE only advises: it is added after every check has passed and never refuses.
   try { const work = workNote(payload); if (work) notes.push(work); } catch { /* a note that cannot be made is a window that hears less */ }
+  if (asked) return { ask: asked, ...(notes.length ? { note: notes.join("\n\n") } : {}) };
   return notes.length ? { note: notes.join("\n\n") } : null;
 }
 

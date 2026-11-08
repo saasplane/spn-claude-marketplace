@@ -3,15 +3,15 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-infra/01-shape.md",
-      "seen": "3e62c8db"
+      "seen": "755af7d6"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
-      "seen": "8857c838"
+      "seen": "c5d64d24"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/03-blueprints/01-layers.md",
-      "seen": "02b318f4"
+      "seen": "0bd0494c"
     }
   ]
 }
