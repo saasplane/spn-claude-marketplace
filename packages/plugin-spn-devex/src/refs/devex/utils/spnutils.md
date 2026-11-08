@@ -3,16 +3,16 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/03-utils/01-spnutils.md",
-      "seen": "6f15f604"
+      "seen": "990fe6b0"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
-      "seen": "8857c838"
+      "seen": "c5d64d24"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
       "section": "`infra` — the estate",
-      "seen": "b1cddf91"
+      "seen": "b50811a1"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",

@@ -11,7 +11,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
-      "seen": "8857c838"
+      "seen": "c5d64d24"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -66,7 +66,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
       "section": "Five regions, one writer each",
-      "seen": "5a52ebad"
+      "seen": "9febe2e6"
     }
   ]
 }

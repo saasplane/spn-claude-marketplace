@@ -97,7 +97,7 @@ A change is not done when it compiles. It is done when three things hold. The do
 - **A book file that a check reads as data lands in the same commit as the code that reads it** (`RULE.DEVEX.FUNCTION.081` · MUST · skill:spn-devex/develop)
 - **it is addressed by coordinate** (`RULE.DEVEX.UTILS.027` · MUST · skill:spn-devex/develop)
 - **A stack-agnostic command reads SPN manifests and nothing else** (`RULE.DEVEX.UTILS.041` · MUST · skill:spn-devex/develop)
-- **Nothing long-lived is stored anywhere, planned command or not** (`RULE.DEVEX.UTILS.042` · MUST · skill:spn-devex/develop)
+- **Nothing long-lived is stored anywhere** (`RULE.DEVEX.UTILS.042` · MUST · skill:spn-devex/develop)
 - **Every `APP_UTILITY` answers `help` and `help --json`** (`RULE.DEVEX.UTILS.050` · MUST · skill:spn-devex/develop)
 - **The platform layer is named by its spc, always and first** (`RULE.DEVEX.UTILS.072` · MUST · skill:spn-devex/develop)
 - **Locally, `organization up` installs the root door only when it is missing or out of date, and asks for the password once** (`RULE.DEVEX.UTILS.073` · MUST · skill:spn-devex/develop)
