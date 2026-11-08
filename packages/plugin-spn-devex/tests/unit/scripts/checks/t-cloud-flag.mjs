@@ -73,11 +73,34 @@ console.log("\n=== what it leaves alone");
   ok("[MKT.HOOKS.92] a local layer command passes", checkCloudFlag(bash("spnutils infra platform up lpd --local --apply")) === null);
   ok("[MKT.HOOKS.92] a command of another group passes", checkCloudFlag(bash("spnutils apps test unit api --cloud")) === null);
   ok("[MKT.HOOKS.92] a command that only contains the words passes", checkCloudFlag(bash("echo spnutils infra logs --cloud")) === null);
-  ok("[MKT.HOOKS.92] a second command after && is not read as the first", checkCloudFlag(bash("ls && spnutils infra logs lpd --cloud")) === null);
+  ok("[MKT.HOOKS.92] a quoted line that names a cloud command passes", checkCloudFlag(bash('git commit -m "a; spnutils infra logs lpd --cloud"')) === null);
+  ok("[MKT.HOOKS.92] a redirected output is not a separator", checkCloudFlag(bash("spnutils infra release pkg --local 2>&1")) === null);
   ok("[MKT.HOOKS.92] a non-Bash call passes", checkCloudFlag({ tool_name: "Edit", tool_input: { command: "spnutils login" } }) === null);
   ok("[MKT.HOOKS.92] a payload with no command passes", checkCloudFlag({ tool_name: "Bash", tool_input: {} }) === null);
   ok("[MKT.HOOKS.92] it never denies", CLOUD.every((command) => kind(checkCloudFlag(bash(`${command} --cloud`))) !== "deny"));
 }
+
+console.log("\n=== wherever the command sits in the line");
+for (const command of [
+  "ls && spnutils infra logs lpd --cloud",
+  "cd /tmp; spnutils infra platform up lpd --cloud",
+  "cat x | spnutils infra platform up lpd --cloud",
+  "ls\nspnutils infra platform up lpd --cloud",
+  "(spnutils infra platform up lpd --cloud)",
+  "FOO=1 spnutils infra platform up lpd --cloud",
+  "npx spnutils infra platform up lpd --cloud",
+  "pnpm exec spnutils infra platform up lpd --cloud",
+  "bash -c 'spnutils infra platform up lpd --cloud'",
+  "/some/bin/spnutils infra platform up lpd --cloud",
+  "spnutils infra platform --cloud up lpd",
+  "spnutils infra --cloud platform up lpd",
+  "echo hi && spnutils login",
+  "bash -c 'spnutils login'",
+  "ls && spnutils infra release pkg",
+]) {
+  ok(`[MKT.HOOKS.92] \`${command.replace("\n", " ")}\` is asked`, kind(checkCloudFlag(bash(command))) === "ask");
+}
+ok("[MKT.HOOKS.92] a release after && with --local passes", checkCloudFlag(bash("ls && spnutils infra release pkg --local")) === null);
 
 console.log("\n=== the dispatcher's fast path");
 {

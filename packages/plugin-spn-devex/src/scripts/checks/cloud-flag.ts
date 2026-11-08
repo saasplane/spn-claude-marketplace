@@ -4,7 +4,8 @@
 // WHY A HOOK AND NOT A PERMISSION RULE. A permission pattern matches a command PREFIX, so allowing
 // `spnutils infra platform up` allows its `--cloud` form too, and no deny can take that back: the flag has
 // no fixed position, and `--env dev --cloud` defeats any pattern keyed to one position. Only a check that
-// reads the whole command can ask on the flag wherever it sits. The tier note beside the command table in
+// reads the whole line can ask on the flag wherever it sits, in any simple command of the line, through an
+// environment prefix, a runner such as `npx`, or a shell's `-c` text. The tier note beside the command table in
 // spnutils (`SPNUTILS_COMMAND_TIERS`) says the same and points here.
 //
 // WHAT IT ASKS ON. The cloud-capable commands of the `infra` group (a layer noun's `up`, `down` and
@@ -17,7 +18,6 @@
 // `--cloud` pass, because the laptop's own stack is allowed.
 
 import { emit, readPayload, runAlone, type Payload, type Verdict } from "../lib/payload.ts";
-import { afterCd } from "./long-run.ts";
 
 /** The `infra` words that open a command which can be given `--cloud`: a noun with a verb, or a group with its verb. */
 const INFRA_CLOUD_COMMANDS: Record<string, readonly string[] | null> = {
@@ -30,33 +30,74 @@ const INFRA_CLOUD_COMMANDS: Record<string, readonly string[] | null> = {
   logs: null,
 };
 
-/** The first simple command of a line: what stands before the first `&&`, `||`, `;` or `|`. */
-function firstCommand(command: string): string {
-  return afterCd(command).split(/&&|\|\||;|\|/)[0].trim();
-}
-
-/** The words after `spnutils`, or null when the command is not one. */
-export function spnutilsWords(command: string): string[] | null {
-  const words = firstCommand(command).split(/\s+/).filter(Boolean);
-  const at = words.findIndex((word) => word === "spnutils" || word.endsWith("/spnutils"));
-  return at === -1 || at > 0 ? null : words.slice(at + 1);
-}
-
-/** What asking would be about, or null when the command is not a cloud one. */
-export function cloudCommand(command: string): string | null {
-  const words = spnutilsWords(command);
-  if (words === null || words.length === 0) return null;
-  if (words[0] === "login") return "spnutils login";
-  if (words[0] !== "infra") return null;
-  const group = words[1];
-  if (group === "release") {
-    return words.slice(2).some((word) => word === "--local") ? null : "spnutils infra release";
+/** The simple commands of a line: split at `&&`, `||`, `;`, `|`, `&`, a newline and a parenthesis, outside quotes. */
+function simpleCommands(command: string): string[] {
+  const commands: string[] = [];
+  let current = "";
+  let quote = "";
+  for (let at = 0; at < command.length; at += 1) {
+    const char = command[at];
+    if (quote !== "") {
+      if (char === quote) quote = "";
+      current += char;
+    } else if (char === "'" || char === '"') {
+      quote = char;
+      current += char;
+    } else if (";|\n()".includes(char) || (char === "&" && command[at - 1] !== ">" && command[at + 1] !== ">")) {
+      commands.push(current);
+      current = "";
+    } else {
+      current += char;
+    }
   }
-  if (group === undefined || !(group in INFRA_CLOUD_COMMANDS)) return null;
+  commands.push(current);
+  return commands.map((one) => one.trim()).filter(Boolean);
+}
+
+/** What may stand before the program itself: an assignment, or a runner that starts it. */
+const BEFORE_PROGRAM = /^(?:[A-Za-z_]\w*=\S*\s+|npx\s+|pnpm\s+(?:exec|dlx)\s+|command\s+|exec\s+|env\s+|time\s+|nohup\s+)/;
+
+/** A shell handed its command as text: `bash -c '…'`. */
+const SHELL_TEXT = /^(?:ba|z)?sh\s+-l?c\s+(['"])([\s\S]*)\1$/;
+
+/** The words after `spnutils` in one simple command, or null when it runs something else. */
+export function spnutilsWords(command: string): string[] | null {
+  let rest = command;
+  while (BEFORE_PROGRAM.test(rest)) rest = rest.replace(BEFORE_PROGRAM, "");
+  const words = rest.split(/\s+/).filter(Boolean);
+  return words[0] === "spnutils" || words[0]?.endsWith("/spnutils") ? words.slice(1) : null;
+}
+
+/** What asking about one spnutils command would be about, or null. Its flags may sit anywhere among its words. */
+function cloudWords(words: string[]): string | null {
+  const named = words.filter((word) => !word.startsWith("-"));
+  if (named[0] === "login") return "spnutils login";
+  if (named[0] !== "infra") return null;
+  const rest = named.slice(1);
+  const at = rest.findIndex((word) => word === "release" || word in INFRA_CLOUD_COMMANDS);
+  if (at === -1) return null;
+  const group = rest[at];
+  if (group === "release") return words.includes("--local") ? null : "spnutils infra release";
   const verbs = INFRA_CLOUD_COMMANDS[group];
-  if (verbs !== null && !verbs.includes(words[2] ?? "")) return null;
-  const flagged = words.slice(2).some((word) => word === "--cloud" || word.startsWith("--cloud="));
-  return flagged ? `spnutils ${words.slice(0, verbs === null ? 2 : 3).join(" ")} --cloud` : null;
+  const verb = verbs === null ? undefined : rest.slice(at + 1).find((word) => verbs.includes(word));
+  if (verbs !== null && verb === undefined) return null;
+  const flagged = words.some((word) => word === "--cloud" || word.startsWith("--cloud="));
+  return flagged ? `spnutils infra ${group}${verb === undefined ? "" : ` ${verb}`} --cloud` : null;
+}
+
+function cloudOf(one: string): string | null {
+  const words = spnutilsWords(one);
+  return words === null ? null : cloudWords(words);
+}
+
+/** What asking would be about, for the first cloud command anywhere in the line, or null when it holds none. */
+export function cloudCommand(command: string): string | null {
+  for (const one of simpleCommands(command)) {
+    const shell = SHELL_TEXT.exec(one);
+    const named = shell !== null ? cloudCommand(shell[2]) : cloudOf(one);
+    if (named !== null) return named;
+  }
+  return null;
 }
 
 /** Whether this check could have an opinion: a `Bash` call whose command names `spnutils`. */
