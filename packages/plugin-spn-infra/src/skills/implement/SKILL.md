@@ -105,7 +105,6 @@ Use the `release` skill (bump `version` in `spinfrapkg.json` → `spnutils infra
 - **A capability is either typed and created by SaaS Plane, or it sits outside the estate completely. There is no third answer** (`RULE.SUPPORT.INFRA.012` · MUST · skill:spn-infra/implement)
 - **shipped, not authored** (`RULE.SUPPORT.INFRA.013` · MUST · skill:spn-infra/implement)
 - **There is no architecture template, and no syntax for one** (`RULE.SUPPORT.INFRA.014` · MUST · skill:spn-infra/implement)
-- **Keeping the marketing site off `{spd}` is a security property, not a preference** (`RULE.SUPPORT.INFRA.019` · MUST · skill:spn-infra/implement)
 - **You write choices, and you never write an identifier** (`RULE.SUPPORT.INFRA.022` · MUST · skill:spn-infra/implement)
 - **A layer boundary earns itself only where the two sides differ in blast radius or in cadence** (`RULE.SUPPORT.INFRA.023` · MUST · skill:spn-infra/implement)
 - **The estate declaration keeps only the choices a person makes** (`RULE.SUPPORT.INFRA.027` · MUST · skill:spn-infra/implement)
