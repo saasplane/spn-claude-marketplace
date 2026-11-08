@@ -9,17 +9,17 @@
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/02-packages/01-manifests.md",
       "section": "Intent and resolved state",
-      "seen": "ee4a7d32"
+      "seen": "c3394f8f"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/02-packages/01-manifests.md",
       "section": "Providers are a pattern, at both scopes",
-      "seen": "8a3bd6ce"
+      "seen": "c3ad2ce6"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/02-packages/01-manifests.md",
       "section": "One packages declaration; the registry derives",
-      "seen": "31d2a806"
+      "seen": "a17e6df7"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/04-resources/02-vendors.md",
