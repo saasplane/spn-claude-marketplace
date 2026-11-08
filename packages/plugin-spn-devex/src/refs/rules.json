@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "book": {
     "repository": "spn-foundation",
-    "commit": "65d28871"
+    "commit": "f3ee79b3"
   },
   "rules": [
     {
@@ -19398,25 +19398,6 @@
           "plugin": "spn-infra",
           "path": "refs/support/infra/providers/local/01-realization.md",
           "heading": "Realization is a target, not a command group"
-        }
-      ]
-    },
-    {
-      "id": "RULE.SUPPORT.INFRA.019",
-      "level": "MUST",
-      "params": {
-        "skill": "spn-infra/implement"
-      },
-      "class": "stated in a skill",
-      "sentence": "Keeping the marketing site off `{spd}` is a security property, not a preference",
-      "chapter": "04-capabilities/02-support/03-infra/01-shape/02-coordinates.md",
-      "heading": "The organization registers every domain, and a platform names its home",
-      "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-infra",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
