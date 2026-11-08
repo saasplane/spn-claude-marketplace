@@ -19060,7 +19060,23 @@
       "chapter": "02-constructs/02-support/02-apps/06-tests.md",
       "heading": "What a partner tests",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "providers/ts/skills/implement/steps/test.md",
+          "heading": "A partner's setup — written from how they built"
+        },
+        {
+          "plugin": "spn-apps",
+          "path": "refs/support/apps/tests.md",
+          "heading": "What a partner tests"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/agent/lenses/qa.md",
+          "heading": "Produces to"
+        }
+      ]
     },
     {
       "id": "RULE.SUPPORT.APPS.263",
@@ -19073,7 +19089,23 @@
       "chapter": "02-constructs/02-support/02-apps/06-tests.md",
       "heading": "What a partner tests",
       "decision": "DEC.SUPPORT.APPS.263",
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "providers/ts/skills/implement/steps/test.md",
+          "heading": "A partner's setup — written from how they built"
+        },
+        {
+          "plugin": "spn-apps",
+          "path": "refs/support/apps/tests.md",
+          "heading": "What a partner tests"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/agent/lenses/qa.md",
+          "heading": "Produces to"
+        }
+      ]
     },
     {
       "id": "RULE.SUPPORT.APPS.264",
@@ -19086,7 +19118,23 @@
       "chapter": "04-capabilities/02-support/02-apps/10-providers/ts/12-toolchain.md",
       "heading": "Workspace Conventions (Nx + pnpm)",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "refs/support/apps/providers/ts/12-toolchain.md",
+          "heading": "Toolchain — what builds, links and lints it"
+        },
+        {
+          "plugin": "spn-apps",
+          "path": "skills/run/SKILL.md",
+          "heading": "The form — read this before you type a command"
+        },
+        {
+          "plugin": "spn-apps",
+          "path": "skills/run/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.SUPPORT.INFRA.001",
@@ -22038,7 +22086,13 @@
       "chapter": "02-constructs/02-support/03-infra/07-trust.md",
       "heading": "Who may become the acting role",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-infra",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.SUPPORT.INFRA.146",
@@ -22051,7 +22105,13 @@
       "chapter": "02-constructs/02-support/03-infra/07-trust.md",
       "heading": "Who may become the acting role",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-infra",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.SUPPORT.INFRA.147",
@@ -22064,7 +22124,13 @@
       "chapter": "04-capabilities/02-support/03-infra/01-shape/02-coordinates.md",
       "heading": "The organization registers every domain, and a platform names its home",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-infra",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.SUPPORT.SURFACE.001",
