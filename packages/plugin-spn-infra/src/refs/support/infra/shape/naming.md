@@ -3,12 +3,12 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/01-shape/02-coordinates.md",
-      "seen": "b27ace3a"
+      "seen": "8c10c544"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/06-modules/02-config.md",
       "section": "The published vocabulary",
-      "seen": "ceefc789"
+      "seen": "b5f87f55"
     },
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-infra/06-modules.md",
