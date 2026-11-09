@@ -140,7 +140,7 @@ DMO_RESOURCE_DB_APP_POSTGRESQL_PASSWORD_RO=
 DMO_RESOURCE_DB_APP_POSTGRESQL_PASSWORD_RW=
 
 # Platform Owner
-DMO_PLATFORM_OWNER_EMAIL=
+DMO_PLATFORM_SEED_OWNER_EMAIL=
 ```
 
 **A note about a key goes on the line above it, never beside it.** A trailing comment is part of the value's line, and a parser reading the value has to strip it. A comment above travels with the key when the region is re-rendered.
