@@ -21,13 +21,13 @@ console.log("=== MKT.HOOKS.400 published-keys - known-bad");
 {
   const refused = validate(BLUEPRINT, 'output "k" { value = { DMO_IAM_EDGE_TARGET = aws_cloudfront_distribution.edge.domain_name } }');
   ok("a published key spelling the identity module is refused", Boolean(refused?.deny), JSON.stringify(refused));
-  ok("the refusal names the corrected form", Boolean(refused?.deny) && refused.deny.includes("DMO_PLATFORM_INTEGRATION_EDGE_TARGET"), JSON.stringify(refused));
+  ok("the refusal names the corrected form", Boolean(refused?.deny) && refused.deny.includes("DMO_PLATFORM_EDGE_TARGET"), JSON.stringify(refused));
   ok("the refusal names the rule", Boolean(refused?.deny) && refused.deny.includes("RULE.SUPPORT.INFRA.111"));
   ok("a platform layer file is read as well", Boolean(validate(PLATFORM, '{"SPN_IAM_EDGE_DISTRIBUTION_ID": "E1"}')?.deny));
 }
 
 console.log("\n=== MKT.HOOKS.400 published-keys - what it must allow");
-ok("the owner's published key", validate(BLUEPRINT, 'DMO_PLATFORM_INTEGRATION_EDGE_TARGET = "x"') === null);
+ok("the owner's published key", validate(BLUEPRINT, 'DMO_PLATFORM_EDGE_TARGET = "x"') === null);
 ok("a file that publishes nothing: a module's own settings", validate("/repo/packages/infra-module-idp/src/settings.json", '{"DMO_IAM_EDGE_TARGET": "ref"}') === null);
 ok("an unrelated key in a blueprint", validate(BLUEPRINT, 'DMO_PLATFORM_DOMAIN = "x"') === null);
 ok("a markdown file in a blueprint package", validate("/repo/packages/infra-blueprints/src/README.md", "DMO_IAM_EDGE_TARGET") === null);

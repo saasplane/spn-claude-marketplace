@@ -26,7 +26,7 @@
 // Scope is by path, and the two halves differ because the shapes differ:
 //
 //   **/app/utils/authz.ts        rules 2 and 4 — the gate table names enum members, not codes
-//   **/migrations/contributions.ts   rules 1, 2 and 3, and the ceiling — the contribution carries the code literals
+//   **/migrations/support/contributions.ts   rules 1, 2 and 3, and the ceiling — the contribution carries the code literals
 //   **/app/services/*.ts         rule 4 only — a ceiling list in a MIGRATION is correct, and a
 //                                hardcoded org-type set in a SERVICE is the trap
 //
@@ -108,7 +108,7 @@ const slashed = (path: string) => path.split("\\").join("/");
 export const isAuthz = (path: string) => slashed(path).endsWith("/app/utils/authz.ts");
 
 export function isSeed(path: string): boolean {
-  return slashed(path).endsWith("src/migrations/contributions.ts");
+  return slashed(path).endsWith("src/migrations/support/contributions.ts");
 }
 
 export function isService(path: string): boolean {
