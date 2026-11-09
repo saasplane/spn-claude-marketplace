@@ -184,6 +184,7 @@ Three more that decide whether a symbol appears at all:
 - **A door for an org's own customers opens only with its legal profile** (`RULE.PLATFORM.CORE.072` · MUST · skill:spn-apps/implement)
 - **A call reaches a record only by a kind its method declares, from the owning organization, and a kind outside the list does not exist** (`RULE.PLATFORM.CORE.076` · MUST · skill:spn-apps/implement)
 - **A limit is checked with `PlatformService.assertWithinLimit` or `PlatformService.assertValueWithinLimit`, and the module that owns it states how it is counted** (`RULE.PLATFORM.CORE.077` · MUST · skill:spn-apps/implement)
+- **A module records beside its real send, and one audited read returns the value once** (`RULE.PLATFORM.CORE.078` · MUST · skill:spn-apps/implement)
 - **A module reads the platform's countries, currencies, languages and base labels; it never declares its own.** (`RULE.PLATFORM.MODULES.001` · MUST · skill:spn-apps/implement)
 - **A currency carries where its symbol sits, and a language carries which way it reads.** (`RULE.PLATFORM.MODULES.002` · MUST · skill:spn-apps/implement)
 - **A module registers its own entity types in its MDM contribution, and a registered type may opt only into capabilities the closed set names.** (`RULE.PLATFORM.MODULES.003` · MUST · skill:spn-apps/implement)

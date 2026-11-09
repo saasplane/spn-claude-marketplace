@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "book": {
     "repository": "spn-foundation",
-    "commit": "f3ee79b3"
+    "commit": "e0d72e7d"
   },
   "rules": [
     {
@@ -12510,6 +12510,64 @@
       ]
     },
     {
+      "id": "RULE.DEVEX.WORKSPACE.504",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-devex/ideate"
+      },
+      "class": "stated in a skill",
+      "sentence": "A proposal shown in chat is laid out by a preview's layers, and its flow shows its steps",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "heading": "The approach document — a workstream's, never a repository's",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/docs/doc-sets.md",
+          "heading": "What an overview and a hub hold, section by section"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "How a first proposal is shaped"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.505",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-devex/ideate"
+      },
+      "class": "stated in a skill",
+      "sentence": "A change agreed on an arc reaches that arc's preview before any handover",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "heading": "The approach document — a workstream's, never a repository's",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/docs/doc-sets.md",
+          "heading": "What an overview and a hub hold, section by section"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "How a first proposal is shaped"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
       "id": "RULE.LAUNCHPAD.CONTROL_PLANE.001",
       "level": "MUST",
       "params": {
@@ -13815,6 +13873,25 @@
           "path": "refs/platform/core/tenancy/README.md",
           "heading": "Checking a limit"
         },
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.PLATFORM.CORE.078",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-apps/implement"
+      },
+      "class": "stated in a skill",
+      "sentence": "A module records beside its real send, and one audited read returns the value once",
+      "chapter": "02-constructs/03-platform/01-core/02-identity.md",
+      "heading": "A test reads the code",
+      "decision": "DEC.PLATFORM.CORE.078",
+      "restated": [
         {
           "plugin": "spn-apps",
           "path": "skills/implement/SKILL.md",
