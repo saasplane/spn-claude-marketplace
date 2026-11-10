@@ -22,9 +22,9 @@ const PLATFORM_HOST = /\bhttps?:\/\/\S+|\b[a-z0-9-]+(?:\.[a-z0-9-]+)*\.localhost
 
 console.log("=== MKT.SKILLS.28 the setup steps name no platform of their own");
 
-ok("the steps file is read and holds the partner's setup section", text.includes("## A partner's setup"), STEPS);
-ok("the steps name no DMO_ setting", !DMO_SETTING.test(text), (text.match(DMO_SETTING) ?? []).join(", "));
-ok("the steps name no platform host", !PLATFORM_HOST.test(text), (text.match(PLATFORM_HOST) ?? []).join(", "));
+ok("[MKT.SKILLS.28] the steps file is read and holds the partner's setup section", text.includes("## A partner's setup"), STEPS);
+ok("[MKT.SKILLS.28] the steps name no DMO_ setting", !DMO_SETTING.test(text), (text.match(DMO_SETTING) ?? []).join(", "));
+ok("[MKT.SKILLS.28] the steps name no platform host", !PLATFORM_HOST.test(text), (text.match(PLATFORM_HOST) ?? []).join(", "));
 
 // The proof of a check: it must refuse what it is meant to refuse.
 ok("the setting pattern refuses a DMO_ setting", /\bDMO_[A-Z0-9_]+/.test("set DMO_IAM_EDGE_TYPE first"));
