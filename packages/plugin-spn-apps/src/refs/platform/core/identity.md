@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/03-platform/01-core/02-identity.md",
-      "seen": "41351525"
+      "seen": "2eee8871"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/03-platform/01-core/02-identity/",
@@ -183,6 +183,10 @@ A consumer application is not a second identity portal. Self-service is a corner
 | an "MFA passed" flag the client asserts back to the server | there is no such claim — evidence is server-held and organization-judged |
 | a boolean "can this org type sign up here" | `OrgAppSignupModeType`, stored per organization and app |
 | a second signup screen for "just create my profile" | self-service is a corner of the business app, never a parallel portal |
+
+## A test signs in as its own person
+
+The first run makes the Test operator, a second person in the platform organization who holds the owner role and signs in by an address and a password from the environment, so a test signs in as that person and never as the real owner. It is made under the same guard as the owner, and the organization keeps its one owner.
 
 ## Left out
 
