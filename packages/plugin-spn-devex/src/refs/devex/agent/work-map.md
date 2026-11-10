@@ -32,7 +32,7 @@ One row for each kind of work: which skill covers it, which references to read f
 | surface-library | — | spn-surface:design | surface delivery-library.md · delivery-showcase.md | the Figma library files | — |
 | estate | layer:estate | spn-infra:implement | infra blueprints.md · packages.md · modules.md | the spn-infra and spn-support-infra manifests | — |
 | tests | — | spn-devex:test | apps tests.md · providers/ts/13-tests.md | the sibling module's test tree | — |
-| preview | skill:spn-devex:ideate · write:**/notes/N*/preview.html · write:**/notes/N*/plan.md | spn-devex:ideate | devex workspace/docs/doc-sets.md · workspace/docs/blocks.md | the pinned code of every construct drawn | every code block carries a Reads line |
+| preview | skill:spn-devex:ideate · write:**/notes/N*/preview.html · write:**/notes/N*/plan.md | spn-devex:ideate | devex workspace/docs/doc-sets.md · workspace/docs/blocks.md | the pinned code of every construct drawn | every code block carries a Reads line; a chat proposal follows the preview's layers; a change agreed on an arc reaches the preview before any handover |
 | figure | — | artifact-diagramming | devex workspace/docs/blocks.md | a page of the same kind that already carries one | — |
 | card | — | spn-devex:ideate | devex workspace/docs/decision-cards.md · agent/lenses.md | every workstream's answered cards and the decisions register | a card or a suggestion about code shows each option as a few lines of code, only what differs |
 | doc-page | — | — | devex workspace/docs/doc-sets.md · workspace/docs/blocks.md | the sibling pages of the same set | — |

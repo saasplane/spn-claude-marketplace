@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "seen": "fcc5c4cd"
+      "seen": "5c0d3a6b"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
@@ -635,6 +635,17 @@ folder. Its masthead names its arc, as a badge after the type that links the arc
 (`RULE.DEVEX.WORKSPACE.266` · MUST · check:workstream-state). A sample is the
 work's own file, never a page built with the page template; only a sample of a book page the work produces
 carries a masthead, its `Type` naming the page kind or its name the template it copies (`RULE.DEVEX.WORKSPACE.267` · MUST · check:workstream-state).
+
+**A proposal shown in chat is laid out by a preview's layers, and its flow shows its steps**
+(`RULE.DEVEX.WORKSPACE.504` · MUST · skill:spn-devex/ideate). The agent answers a request for a proposal in the order
+the preview will read: *Shape* first, then the layers that change (*Server* by module, *Web*, *Surface*, *Plugins*,
+*Estate*). Each block names its file, shows today's code beside the proposed, and ends with where its names and values
+come from. A flow is drawn as a figure with its steps, one line for each actor's turn, and is never told as prose alone.
+
+**A change agreed on an arc reaches that arc's preview before any handover**
+(`RULE.DEVEX.WORKSPACE.505` · MUST · skill:spn-devex/ideate). When a change is settled in discussion, the agent applies
+it to the arc's preview first, then writes any handover or asks for a new window. A handover names what the preview
+shows, so a new window starts from a page that is true; a saved note the preview does not carry is not enough.
 
 **`Where it lands` is one folder tree for each repository** (`RULE.DEVEX.WORKSPACE.238` · GUIDE). The
 section is grouped by repository, in the order the work runs, and a repository's Docs, the book pages and the

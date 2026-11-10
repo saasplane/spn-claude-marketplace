@@ -1,9 +1,9 @@
 // `enablement-grammar` — the four rules, each proven by a known-bad and an untouched, read from a module's contributions.
 import { one, done, tree } from "../../../../../helpers/harness.mjs";
 
-const SEED = "packages/module-server-prj-ts/src/migrations/contributions.ts";
+const SEED = "packages/module-server-prj-ts/src/migrations/support/contributions.ts";
 const OLD_SEED = "packages/module-server-prj-ts/src/migrations/001-prj-setup-a.ts";
-const DOC_SEED = "packages/module-server-doc-ts/src/migrations/contributions.ts";
+const DOC_SEED = "packages/module-server-doc-ts/src/migrations/support/contributions.ts";
 const AUTHZ = "packages/module-server-prj-api/src/app/utils/authz.ts";
 const SERVICE = "packages/module-server-prj-api/src/app/services/IAMOrgService.ts";
 const MIGRATION = "packages/module-server-prj-api/src/migrations/002-prj-data.ts";
