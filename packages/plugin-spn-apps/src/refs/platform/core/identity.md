@@ -184,6 +184,10 @@ A consumer application is not a second identity portal. Self-service is a corner
 | a boolean "can this org type sign up here" | `OrgAppSignupModeType`, stored per organization and app |
 | a second signup screen for "just create my profile" | self-service is a corner of the business app, never a parallel portal |
 
+## A test signs in as its own person
+
+The first run makes the Test operator, a second person in the platform organization who holds the owner role and signs in by an address and a password from the environment, so a test signs in as that person and never as the real owner. It is made under the same guard as the owner, and the organization keeps its one owner.
+
 ## Left out
 
 The step-by-step MFA sequence diagram, the full authentication-surface method table (`loginWithPassword`, `requestSessionOTP`, and the rest), and the provider-ownership resolution chain for SSO/social are left out of this file. They are implementation detail behind the states and the stored decisions carried above — an integrator calls the generated client and follows the state it returns, and does not need the ceremony's wire shape to avoid rebuilding it.
