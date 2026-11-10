@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/02-apps/01-shape.md",
-      "seen": "fc6cbaef"
+      "seen": "f69db644"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/01-shape/",
@@ -150,6 +150,8 @@ Check each level on its own — folders are what is standardized, never the file
 Kinds divide in two by how you decide their `src/` interior. Where the **layer model fixes the folder set** (`MODULE_SERVER`, `MODULE_WEB`, `APP_SERVER`, `APP_WEB`, `APP_UTILITY`, `CLIENT_API`), every node of the kind gets the same folders — start a new node from the scaffold's own tree, and treat a scaffold asset as bound by its kind's rules exactly as a built node is. Scaffold a `MODULE_SERVER` with `contract/{states,validators,services,methods}`, `app/{entities,repositories,services,support,utils}`, `entry/api/controllers`, `migrations/`, its second door, and a `tests/` folder per tier it owes. The second door is two folders: `src/remote/`, which holds what another service takes to call the module's contract, and `remote/` at the root, which is the door's own entry. Scaffold a `MODULE_WEB` with only `entry/ui/{components,hooks,pages,utils}` — **the browser is a transport, so you put a web module's surface under an entry** (`RULE.SUPPORT.APPS.031` · MUST · skill:spn-apps/implement). Give `APP_SERVER` and `APP_WEB` the same `modules/` folder at the source root, and add `public/`, `src/assets/styles/` for its stylesheets, and a component harness for the web kind. Build `APP_UTILITY` like a module, entering it only through `entry/cli/`. Scaffold `CLIENT_API` like any package, and leave its `src/` empty until you generate the client into it.
 
 Where the rule is instead **one folder per group** (`TOOLCHAIN`, `SUPPORT_*`), the groups belong to the package and you grow them as it grows — a `TOOLCHAIN` publishes one folder per configuration area (`eslint/`, `jest/`, `vite/`, …) and no barrel at all; a `SUPPORT_*` library publishes one folder per capability it offers (`cache/`, `queue/`, `auth/`, …). Read each tree you find here as an example rather than a standard — the groups are the library's own to name.
+
+A `CLIENT_API` is scaffolded like any other package, and its generated source stays empty until the client is generated into it. A client may also carry a handwritten `src/test` beside the generated folder, the test steps that drive its calls (the sign-in as a test person, an organization made only if missing, the address of a host). It is published as the client's `./test` door, and each step takes values and makes no choice about how the partner is built.
 
 ### Modules that live inside an application
 
