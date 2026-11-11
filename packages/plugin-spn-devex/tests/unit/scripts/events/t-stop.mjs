@@ -1708,6 +1708,20 @@ console.log("\n=== stop — the checks the first round fixed or wired, and the g
     const twice = call("checkHandover", `${BLOCK}\n\n${PASS_ON}`, ROOT, mine, false, [BLOCK]);
     check("[MKT.HOOKS.316] known-bad: a second block is named as the extra one",
       twice.length === 1 && twice[0].message.includes("two handover blocks") && twice[0].message.includes("The second is the extra one"), JSON.stringify(twice));
+    // A BLOCK THAT CHANGES IS GIVEN AGAIN WHOLE (the developer, 2026-11-11): the corrected block is the answer, and a
+    // line or two sent to put in place of the block's own lines is refused.
+    const CORRECTED = BLOCK.replace("model:        Opus 5.5, effort high", "model:        Opus 5.5, effort max");
+    const fixed = call("checkHandover", `${CORRECTED}\n\n${PASS_ON}`, ROOT, mine, false, [BLOCK]);
+    check("a corrected block, given again whole in the same turn, is not named as the extra one",
+      !fixed.some((warning) => warning.message.includes("two handover blocks")), JSON.stringify(fixed));
+    const FRAGMENT = "Use this line in place of the old one:\n\n```\ncontinue:     workstream `001-a-subject`, arc `N001`, step 2\n```\n\nThis window is done and can be retired.";
+    const piece = call("checkHandover", FRAGMENT, ROOT, mine, true, []);
+    check("known-bad: a line of a block sent to replace the given block's line is refused, and the whole block is asked for",
+      piece.length === 1 && piece[0].message.includes("part of a handover block") && piece[0].message.includes("Send the whole block again"), JSON.stringify(piece));
+    const NO_WORKSTREAM = BLOCK.replace("continue:     workstream `001-a-subject`, arc `N001`, step 1", "continue:     arc `N001`, step 1");
+    const unnamed = call("checkHandover", `${NO_WORKSTREAM}\n\n${PASS_ON}`, ROOT, mine);
+    check("a finding on a block's line asks for the whole block again, never the line alone",
+      unnamed.some((warning) => warning.message.includes("names no workstream") && warning.message.includes("Send the whole block again")), JSON.stringify(unnamed));
     // turnOf reads the prompt and every earlier text message of the turn from the transcript.
     const transcript = join(ROOT, "turn.jsonl");
     const entry = (type, content) => JSON.stringify({ type, message: { content } });

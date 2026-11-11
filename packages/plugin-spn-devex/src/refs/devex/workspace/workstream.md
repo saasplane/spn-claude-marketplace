@@ -817,8 +817,11 @@ earlier message of the turn counts as given, and a second block is named as extr
 
 **The reply that hands over is a shape**, which the agent's table of closing moments states. It opens on `## ✈️ Handing over <arc> (<title>)`, then a `&nbsp;` line, the fenced block, a `&nbsp;` line, and one short paragraph that says where the next window picks up, says thanks, and says this window can be retired.
 
-**A finding on a handover reply is answered without the block.** Fix what the finding names and point
-at the block above it. The check keeps the step rows it read when a whole block was written, and
+**A block that changes is given again whole.** When a finding on a handover reply, or a fact found
+after it, changes any line of the block, answer with the whole block once more, corrected and ready to
+paste, never a line or a field to put in place of another: the developer copies the block, and a
+fragment leaves them merging two messages. A finding that changes no line of the block is answered
+without it: fix what the finding names and point at the block above it. The check keeps the step rows it read when a whole block was written, and
 while those rows have not moved it asks for no second block. A new block is owed only when the work
 has moved since. **A card that is open at a handover is one line, never the card in full**: name it
 on the block's `open:` line with its number and its question. The full card is on the approach page,
