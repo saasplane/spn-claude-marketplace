@@ -31,6 +31,7 @@ description: Carry out a go. Use the moment the developer gives the go on one ar
    touches, update their entries and the preview and show it, then `go write` again before they run.
    A change that rewrites the approach page's What decides its figure in the same pass (`RULE.DEVEX.WORKSPACE.497` · MUST · check:doc-check): a figure, or the one `<!-- no figure: … -->` line.
 6. Full runs: `go start` each repository's full run, once, with the runner's reuse on, so only what changed runs; every code row lands on it.
+   A code or proof row that names `provedBy` runs no tiers here: `go write` lists it as waiting on that arc, and it lands on that arc's proof run. A repository whose open code rows all name a later arc is released on its code alone, ahead of that proof, which the named arc's proof run supplies before the workstream closes.
    The fix pass reads each failure against its entry's trace and reruns only what the fix reaches.
 7. Generated files, then the release chain, in the order the sheets set.
 8. Close: `go check` prints nothing, and every row of the scope is LANDED; then `workstream close <workstream>`.
