@@ -249,6 +249,8 @@ A web module carries the same three layers, but expect most modules to never ear
 
 `entry/ui/` holds `pages` (routes and composition), `containers` (the framed parts a page is assembled from), `components` (props in, events out, no data fetching of their own), `hooks` (the only layer that calls the generated client, one hook per concern) and `utils` (pure presentational helpers — label lookups, formatting, never a business rule). It holds `widgets` where the module ships embeddable units.
 
+**A module's shared list and record page take the app's own additions: columns on a list, sections on a record page** (`RULE.SUPPORT.APPS.265` · MUST · skill:spn-apps/implement). The module draws an addition after its own fields and never drops one of its own, and it never learns which module an addition comes from: the app passes it in as props. A stored extra field stays a custom field of the platform's extensible-records module.
+
 ### A page, its route and its address
 
 A page owns one screen and is the only thing a route lands on. It reads the address, places containers, and carries no business logic. Hold a page to these rules. A rule marked proposed is one the developer has not confirmed.
@@ -264,6 +266,7 @@ A page owns one screen and is the only thing a route lands on. It reads the addr
 - **A route gives its kind and the rest of its path, and never a whole address — MUST.** The function that builds an address puts the name in front, and the word `settings` in front of that for a page of setup. `settings` is a fixed word, and no module takes it as its name.
 - **A check compares every address of a module with the name the module declares — MUST.** An app that joins two modules with one name is refused when it starts.
 - **An app's own page, such as Home, takes a plain word of the app's own.** It may not use the name of a module it has mounted, or `settings` followed by such a name.
+- **A Home is the app's own page, and a module takes no part in it beyond the reads it exports as hooks.** The app draws the page from them.
 - **The first word of an address is the module's, and an address does not carry its place in the menu** (`RULE.SUPPORT.APPS.192` · MUST · skill:spn-apps/implement). An entry of the menu names a route by its key, so it may stand in any group. A menu can then be arranged again, and no address changes.
 - **An address that changes answers with a redirect** (`RULE.SUPPORT.APPS.193` · MUST · skill:spn-apps/implement). The redirect is the app's own, in the router of the app that had the address.
 - **On a page of groups and their items, the swap of the items for the groups changes the address** (`RULE.SUPPORT.SURFACE.079` · MUST · skill:spn-surface/design).
