@@ -176,6 +176,20 @@ console.log("\n=== wait: a part waits on something outside the plan");
   ok("[MKT.HOOKS.322] go wait without --on is refused", bare.code !== 0 && bare.out.includes("--on"), bare.out);
 }
 
+console.log("\n=== drop: a part the developer decided will not run");
+{
+  const snapshot = readFileSync(goFile, "utf8");
+  const dropped = go("drop", "N001", "full-spn-x", "--words", "drop the full run");
+  const part = json(goFile).parts.find((p) => p.id === "full-spn-x");
+  ok("[MKT.HOOKS.308] go drop marks the part dropped and keeps the developer's words", dropped.code === 0 && part?.state === "dropped" && part?.droppedWords === "drop the full run", dropped.out);
+  ok("[MKT.HOOKS.308] go drop ends with the next step", lastLine(dropped.out).startsWith("Next:"), dropped.out);
+  const landed = go("drop", "N001", "docs-spn-x-q1-1", "--words", "drop it");
+  ok("[MKT.HOOKS.308] a landed part cannot be dropped, and the plan is unchanged", landed.code !== 0 && json(goFile).parts.find((p) => p.id === "docs-spn-x-q1-1")?.state === "landed", landed.out);
+  const bare = go("drop", "N001", "code-spn-x-q1-1");
+  ok("[MKT.HOOKS.308] go drop without --words is refused", bare.code !== 0 && bare.out.includes("--words"), bare.out);
+  writeFileSync(goFile, snapshot);
+}
+
 console.log("\n=== wait --clear: a hand-marked wait comes off (E67)");
 {
   const snapshot = readFileSync(goFile, "utf8");

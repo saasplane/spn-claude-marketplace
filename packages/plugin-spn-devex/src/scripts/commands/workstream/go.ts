@@ -18,11 +18,11 @@ import { existsSync, readFileSync } from "node:fs";
 import { basename, dirname, join, resolve } from "node:path";
 import { type Action, FLAG, VALUE, UsageFault, readWords } from "../../../../../plugin-support-lib/src/lib/command.ts";
 import {
-  clearWaiting, deriveGo, workflowOf, fullRunMinutes, goFileOf, isApplyPart, landedEntries, landedOrder, landedMeasures, markWaiting, planScope, proposeScopes, readGo, readyParts, redCheckIds, ratesOf, staleEntries, tangledParts, testFilesOf, unheldEntries,
+  clearWaiting, deriveGo, workflowOf, fullRunMinutes, goFileOf, isApplyPart, landedEntries, landedOrder, landedMeasures, markDropped, markWaiting, planScope, proposeScopes, readGo, readyParts, redCheckIds, ratesOf, staleEntries, tangledParts, testFilesOf, unheldEntries,
   type ScopeSheet,
 } from "../../lib/go-plan.ts";
 import { arcDataDir, arcIdsOf, logEvent, logFileOf, notesDirOf, readArc, readJson, readJsonl, readSheet, workspaceOf, writeWhole } from "../../lib/workstream.ts";
-import { DONE_STATES, renameDataToWork, type ArcData, type GoPart, type GoPlan, type SheetEntry } from "../../lib/workstream-schema.ts";
+import { DONE_STATES, GO_PART_SETTLED, renameDataToWork, type ArcData, type GoPart, type GoPlan, type SheetEntry } from "../../lib/workstream-schema.ts";
 import { arcNamed, listOf, workstreamNamed } from "./_shared.ts";
 import { sizedStop } from "../../checks/child-size.ts";
 import { panelOnRecord, panelsVisible } from "../../checks/split-plan.ts";
@@ -71,7 +71,7 @@ export function nextStep(ref: string, ws: string, plan: GoPlan): string {
   }
   const running = plan.parts.filter((one) => one.state === "running");
   if (running.length) return `Next: wait for ${running.map((one) => one.id).join(", ")}, then \`workstream report write\` on its report.`;
-  return plan.parts.every((one) => one.state === "landed") ? `Next: \`workstream close ${ref}\`.` : `Next: \`workstream go show ${ref}\`.`;
+  return plan.parts.every((one) => GO_PART_SETTLED.has(one.state)) ? `Next: \`workstream close ${ref}\`.` : `Next: \`workstream go show ${ref}\`.`;
 }
 
 /** The sheets of the scope, or the lines that refuse it. */
@@ -486,11 +486,29 @@ function wait(args: string[]): number {
   return 0;
 }
 
+function drop(args: string[]): number {
+  const words = readWords(args, { words: VALUE });
+  const [ref, id, ...more] = words.paths;
+  const said = words.value("words");
+  if (!id || more.length || !said?.trim()) throw new UsageFault("takes an arc, one part and the developer's words: `go drop <workstream>/<arc> <part> --words \"…\"`.");
+  const { ws, arc } = arcNamed(ref);
+  const plan = planOf(ws, arc);
+  let next: GoPlan;
+  try { next = markDropped(plan, id, said); } catch (thrown) { console.log(`Refused: ${(thrown as Error).message}. Nothing was changed.`); return 1; }
+  save(ws, arc, next);
+  logEvent(ws, arc, "go", null, `${id} dropped · ${said.trim()}`);
+  const waiters = next.parts.filter((one) => one.waitsOn.includes(id) && !GO_PART_SETTLED.has(one.state)).map((one) => one.id);
+  console.log(`ok · ${arc} ${id} dropped${waiters.length ? ` · ${waiters.join(", ")} still wait${waiters.length === 1 ? "s" : ""} on it` : ""}`);
+  console.log(nextStep(`${basename(ws)}/${arc}`, ws, next));
+  return 0;
+}
+
 export const actions: Record<string, Action> = {
   write: { describe: "after the go: derive the plan from the scope's sheets and the telemetry, and write every part's brief; run again it keeps landed and running parts; an arc is N<nnn>, ideate or follow-ups, and --scope takes a mixed list; --after-close makes the lead carry an after-close batch itself, as one part", usage: "<workstream>/<arc> --scope <arc>,… [--after-close]", run: write },
   propose: { describe: "before the go: print each proposed scope, the decided arcs that share a repository grouped in chain order, with the full runs and releases the grouping saves", usage: "<workstream>", run: propose },
   show: { describe: "print the parts: their files, their tests, their measured time and what each waits on", usage: "<workstream>/<arc> [--part <id>] [--json]", run: show },
   check: { describe: "read the plan against the sheets: an entry no part holds, or a part whose entries changed since the plan was written, which it marks held; exits 1 on any", usage: "<workstream>/<arc>", run: checkGo },
   start: { describe: "mark a baseline, a full run or a release as running; only a baseline or a full run lets the test-run check open the whole suite", usage: "<workstream>/<arc> <part>", run: start },
+  drop: { describe: "mark a part that has not landed and is not running `dropped`, with the developer's words as they typed them: a run, a release or a proof they decided will not happen; the close reads it as accounted for, and a part that waits on it is dropped by its own command", usage: "<workstream>/<arc> <part> --words \"…\"", run: drop },
   wait: { describe: "mark a part waiting on something outside the plan (a release, a sign-in, another window's hold), with the reason in plain words; `--clear` takes the wait off, and the part reads ready when what it waits on in the plan has landed", usage: "<workstream>/<arc> <part> (--on \"…\" | --clear)", run: wait },
 };

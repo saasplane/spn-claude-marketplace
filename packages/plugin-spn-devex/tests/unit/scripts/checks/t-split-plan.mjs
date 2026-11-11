@@ -884,6 +884,9 @@ console.log("\n=== split-plan — a page that holds its own copy of the styles")
   one("[MKT.HOOKS.308] a part whose entry changed since the plan refuses the close", "close",
     closing("m308-moved", { "arcs/N2/sheet.json": sheet(["E1"]), "arcs/N2/go.json": plan("landed", ["N2/E1"], "00000000") }), shut(), "deny",
     { says: "N2/E1", parity: false, why: "the Python knows no go" });
+  one("[MKT.HOOKS.308] a part the developer dropped is accounted for, and the go closes", "close",
+    closing("m308-dropped", { "arcs/N2/sheet.json": sheet(["E1"]), "arcs/N2/go.json": plan("dropped") }), shut(), "silent",
+    { parity: false, why: "the Python knows no go" });
   one("[MKT.HOOKS.308] a go whole, every part landed, closes", "close",
     closing("m308-whole", { "arcs/N2/sheet.json": sheet(["E1"]), "arcs/N2/go.json": plan("landed") }), shut(), "silent",
     { parity: false, why: "the Python knows no go" });
