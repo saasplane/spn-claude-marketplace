@@ -11,11 +11,11 @@ description: Design a page of a SaaS Plane app from the blocks of the design sys
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/03-ideate.md",
-      "seen": "9b34b071"
+      "seen": "d876e4c4"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/",
-      "seen": "73f93d32"
+      "seen": "fa3496a3"
     }
   ]
 }
@@ -574,7 +574,6 @@ Wear the spn-devex plugin's `refs/devex/agent/lenses/ux.md` while you place the 
 - **A navigation unit takes every size, `DSSizeType` from `XS` to `XL`, as every unit does** (`RULE.SUPPORT.SURFACE.256` · MUST · skill:spn-surface/design)
 - **`TOPNAV` and `DOCK` take the width of the bar's items as `barWidth` in their config, and the theme holds none** (`RULE.SUPPORT.SURFACE.257` · MUST · skill:spn-surface/design)
 - **The header stands before the content in every layout, and what it holds stands in the body's box, as the footer's does** (`RULE.SUPPORT.SURFACE.258` · MUST · skill:spn-surface/design)
-- **The notice is the layout's one pinned place, and it stands before the header** (`RULE.SUPPORT.SURFACE.410` · MUST · skill:spn-surface/design)
 - **A grid of features under a heading is `DSFeatureGridSectionContainer`, and it takes `section`, and can take a `heading` and a `grid`** (`RULE.SUPPORT.SURFACE.259` · MUST · skill:spn-surface/design)
 - **The columns of a grid are one shape, `IDSGridColumns`, and a page sets them per screen class** (`RULE.SUPPORT.SURFACE.260` · MUST · skill:spn-surface/design)
 - **The paint of every frame is an `IDSFrameSurface` that went through `prepareFrameSurface`** (`RULE.SUPPORT.SURFACE.261` · MUST · skill:spn-surface/design)
@@ -631,3 +630,4 @@ Wear the spn-devex plugin's `refs/devex/agent/lenses/ux.md` while you place the 
 - **A form shows each default as its real value, marked Default, and never as a faded placeholder** (`RULE.SUPPORT.SURFACE.405` · MUST · skill:spn-surface/design)
 - **A Figma file is named `DS <n>-<Name>`, with a hyphen and no middle dot, and its theme collections are named the same way** (`RULE.SUPPORT.SURFACE.407` · MUST · skill:spn-surface/design)
 - **Every new prop of the design system ships with a showcase case that shows it** (`RULE.SUPPORT.SURFACE.408` · MUST · skill:spn-surface/design)
+- **The notice stands before the header, and it is the layout's one pinned place** (`RULE.SUPPORT.SURFACE.410` · MUST · skill:spn-surface/design)
