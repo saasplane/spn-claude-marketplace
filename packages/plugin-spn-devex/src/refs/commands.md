@@ -190,13 +190,13 @@ spn-devex workstream question withdraw Q<n> --words "…" — withdraw a card in
 
 spn-devex workstream report write [<workstream>] <report.md> | <workstream>/<arc> <part-id> [--run <name>] — fold a child's report into its row: state, proof, commits, follow-ups; with an arc and a part id and no report file it writes the report itself from the plan, the commits since the part started and the named run
 
-spn-devex workstream row add <workstream>/<arc> "<title>" --repo <repo> --work <work> [--kind change] [--state ready] [--blocked-by …] [--touches …] [--entries E1,E2] [--position …] [--model …] [--note …] — add a row to an arc, taking the arc's next number and printing it
+spn-devex workstream row add <workstream>/<arc> "<title>" --repo <repo> --work <work> [--kind change] [--state ready] [--blocked-by …] [--touches …] [--entries E1,E2] [--position …] [--model …] [--proved-by N<nnn>] [--note …] — add a row to an arc, taking the arc's next number and printing it
 
 spn-devex workstream row state <workstream>/<arc> <row> <state> [--on "<what it waits on>"] [--note …] [--run <name>] — move a row to a state; --on names what a waiting row waits on outside the window, --note carries the words beside the move, and --run names the run a CODE or PROOF row of a sheet arc lands on
 
 spn-devex workstream row note <workstream>/<arc> <row> "<text>" — write one line on a row's log, and change nothing else
 
-spn-devex workstream row edit <workstream>/<arc> <row> [--title …] [--kind …] [--repo …] [--work …] [--model …] [--blocked-by …] [--touches …] [--entries E1,E2] [--position …] [--proof …] — change the fields of a row the arc holds; --proof names a carried row's successor; a row it lacks is refused, and `row add` is named
+spn-devex workstream row edit <workstream>/<arc> <row> [--title …] [--kind …] [--repo …] [--work …] [--model …] [--blocked-by …] [--touches …] [--entries E1,E2] [--position …] [--proof …] [--proved-by N<nnn>|none] — change the fields of a row the arc holds; --proof names a carried row's successor; --proved-by names the later arc whose proof run lands a CODE or PROOF row, `none` clears it; a row it lacks is refused, and `row add` is named
 
 spn-devex workstream row discard <workstream>/<arc> <row> --note "…" — take a row found invalid or not needed out of the arc; --note carries the developer's words into its one log line
 

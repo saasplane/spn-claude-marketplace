@@ -18,7 +18,7 @@ import { withOffset } from "./clock.ts";
 import { isDir, isFile, listdir, workspaceRoot } from "./payload.ts";
 import { APPROACH_PAGE, ARCS, PLUGIN_TEMPLATES, WORKSTREAM_STATES, isApproachPage, workstreamPrefixSource, workstreamsDir, type WorkstreamState } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import {
-  ARC_ID, DONE_STATES, QUESTION_ID, SCHEMA_VERSION, VERSIONED_RECORDS, arcFaults, cardName, parentIds, recordVersionFault, versioned,
+  ARC_ID, BUILD_ARC_ID, DONE_STATES, QUESTION_ID, SCHEMA_VERSION, VERSIONED_RECORDS, arcFaults, cardName, parentIds, recordVersionFault, versioned,
   type ArcData, type ArcRow, type Card, type LogLine, type Question, type RowState, type Sheet, type SheetEntry,
 } from "./workstream-schema.ts";
 
@@ -1445,6 +1445,55 @@ function changedSince(place: string, sha: string, ranAt: string): string[] | nul
 const SHOWN: Record<string, string> = { FAILED: "FAILURE", PENDING: "PENDING", SUCCESS: "SUCCESS" };
 
 /**
+ * What is wrong with a row's `provedBy` (RULE.DEVEX.WORKSPACE.328), or null where it is sound or absent: it sits on a CODE or a
+ * PROOF row only, and names another build arc of the same workstream that exists.
+ */
+export function provedByFault(ws: string, arc: string, row: ArcRow): string | null {
+  const by = row.provedBy;
+  if (by === undefined || by === null) return null;
+  if (row.work !== "CODE" && row.work !== "PROOF") return `row ${row.id} is a ${row.work ?? "no-work"} row, and only a CODE or a PROOF row names \`provedBy\``;
+  if (typeof by !== "string" || !BUILD_ARC_ID.test(by)) return `row ${row.id}'s \`provedBy\` \`${String(by)}\` names no build arc, \`N<nnn>\``;
+  if (by === arc) return `row ${row.id}'s \`provedBy\` names its own arc, ${arc}; a row proved at its own go names none`;
+  if (!arcIdsOf(ws).includes(by)) return `row ${row.id}'s \`provedBy\` names ${by}, which is no arc of ${basename(ws)}`;
+  return null;
+}
+
+/**
+ * The run a landed row landed on: its `proof` written as `run <name>`, else the run its last landing log line names, read only from
+ * the exact line `row state` writes, `<was> → landed · run <name>`, so a note that merely holds "run x" is no run; null where neither says.
+ */
+export function landedRunOf(ws: string, arc: string, row: ArcRow): string | null {
+  const own = typeof row.proof === "string" ? /^run (\S+)$/.exec(row.proof.trim())?.[1] : undefined;
+  if (own) return own;
+  const lines = (logLinesOf(ws, arc) as Array<{ kind?: unknown; row?: unknown; note?: unknown }>)
+    .filter((line) => line && line.kind === "landed" && line.row === row.id);
+  for (const line of lines.reverse()) {
+    const named = /^[a-z]+ → landed · run (\S+)$/.exec(String(line.note ?? ""))?.[1];
+    if (named) return named;
+  }
+  return null;
+}
+
+/**
+ * The refusal of a row proved in a later arc (RULE.DEVEX.WORKSPACE.328), or null where it may be judged on its run: the named arc
+ * holds a landed PROOF row for the row's repository, and the run is the one that row landed on.
+ */
+function laterProofFault(ws: string, arc: string, row: ArcRow, run: string | null): string | null {
+  const by = String(row.provedBy);
+  const repo = row.repo ?? "";
+  const proofs = (readArc(ws, by)?.rows ?? []).filter((one) => one.work === "PROOF" && one.repo === repo);
+  const landed = proofs.find((one) => one.state === "landed");
+  if (!landed)
+    return `row ${row.id} is proved by ${by}, and ${proofs.length ? `${by}'s proof row ${proofs.map((one) => one.id).join(", ")} for ${repo} has not landed` : `${by} has no proof row for ${repo || "the row's repository"}`}; `
+      + "it lands on that proof row's run once it has";
+  const theirs = landedRunOf(ws, by, landed);
+  if (!run || (theirs && run !== theirs))
+    return `row ${row.id} is proved by ${by}, and lands on the run ${by}'s proof row ${landed.id} landed on${theirs ? `, ${theirs}` : ""}: `
+      + `\`workstream row state ${arc} ${row.id} landed --run ${theirs ?? "<run>"}\``;
+  return null;
+}
+
+/**
  * Whether a row may land on a run (RULE.DEVEX.WORKSPACE.326–.331): null where it may, else the words of the refusal.
  * A row that is neither CODE nor PROOF gets null; a CODE or PROOF row is judged by its work alone, with a sheet or without one.
  */
@@ -1452,6 +1501,9 @@ export function landingFault(ws: string, arc: string, data: ArcData, row: ArcRow
   const sheet = readSheet(ws, arc);
   if (row.work !== "CODE" && row.work !== "PROOF") return null;
   const entries = sheet && Array.isArray(sheet.entries) ? sheet.entries : [];
+  // A ROW PROVED IN A LATER ARC lands only on that arc's landed proof run of its repository, then is judged on it as any row is.
+  const later = typeof row.provedBy === "string" && row.provedBy !== "" ? laterProofFault(ws, arc, row, run) : null;
+  if (later) return later;
   if (!run)
     return `row ${row.id} is a ${row.work} row of an arc that keeps a sheet; it lands on a run of its entries' tests.\n`
       + `Name the run: \`workstream row state ${arc} ${row.id} landed --run <name>\`.`;
@@ -1459,7 +1511,7 @@ export function landingFault(ws: string, arc: string, data: ArcData, row: ArcRow
   const mine = entries.filter((one) => (row.entries ?? []).includes(one.id));
   // Every fault the gate can judge is gathered and named in one refusal; only a run it cannot find ends the judging early.
   const faults: string[] = [];
-  if (row.work === "CODE" && !mine.some((one) => Object.values(one.tiers ?? {}).some((ids) => ids.length)))
+  if (row.work === "CODE" && !row.provedBy && !mine.some((one) => Object.values(one.tiers ?? {}).some((ids) => ids.length)))
     faults.push(`row ${row.id} is a CODE row and its entries name no test; \`workstream sheet check ${arc}\` lists what is missing`);
   // An arc that changes no repository has no runner and no commits: its proof lands on the run its check records in the work folder.
   if (row.work === "PROOF" && (!repo || repo === "none")) {

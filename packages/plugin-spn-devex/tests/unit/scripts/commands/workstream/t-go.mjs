@@ -163,6 +163,46 @@ console.log("\n=== write: a proof still owed after the code landed");
   ok("[MKT.SCRIPTS.322] and no baseline, with no code left to compare", !ids.includes("baseline-spn-x"), JSON.stringify(ids));
 }
 
+console.log("\n=== write: code proved in a later arc runs no tiers at this go");
+{
+  const open = (over) => ({ parent: "N001", kind: "change", repo: "spn-x", blockedBy: [], touches: [], state: "ready", ...over });
+  const later = await dataWorkspace("go-proved-later", { rows: [
+    open({ id: "1", title: "write the book", work: "DOCS", entries: ["E1"] }),
+    open({ id: "2", title: "build it", work: "CODE", entries: ["E2"], provedBy: "N002" }),
+    open({ id: "3", title: "release spn-x", work: "RELEASE" }),
+    open({ id: "4", title: "prove spn-x", work: "PROOF", provedBy: "N002" }),
+  ] });
+  put(later.ws, "arcs/N002/state.json", `${JSON.stringify({ ...arcData([]), arc: "N002", title: "the proof arc", status: "PROPOSED" }, null, 2)}\n`);
+  cli(later.root, ["workstream", "fact", "write", "N001", "--source", "spn-x/a.ts", "--fact", "a is 1", "--used-by", "1"]);
+  writeFileSync(join(later.ws, "arcs", "N001", "sheet.json"), JSON.stringify(sheetOf([entry("E1", "spn-x:docs/a.md"), entry("E2", "spn-x:src/b.ts", { tiers: {} })]), null, 2));
+  const wrote = cli(later.root, ["workstream", "go", "write", "031-probe/N001"]);
+  const plan = existsSync(join(later.ws, "arcs", "N001", "go.json")) ? json(join(later.ws, "arcs", "N001", "go.json")) : { parts: [] };
+  const ids = plan.parts.map((p) => p.id);
+  ok("[MKT.SCRIPTS.542] go write gives a repository whose code a later arc proves no baseline, no full run and no proof part",
+    wrote.code === 0 && ids.some((id) => /^(code|apply)-spn-x/.test(id)) && !ids.some((id) => /^(baseline|full|proof)-spn-x/.test(id)), wrote.out + JSON.stringify(ids));
+  ok("[MKT.SCRIPTS.542] it lists the row as waiting on that arc", wrote.out.includes("note · N001 row 2 (spn-x) waits on N002"), wrote.out);
+  const release = plan.parts.find((p) => p.id.startsWith("release-spn-x"));
+  ok("[MKT.SCRIPTS.542] and the release waits on the code itself", !!release && release.waitsOn.some((id) => /^(code|apply)-spn-x/.test(id)), JSON.stringify(release));
+}
+
+console.log("\n=== write: one open code row with no provedBy keeps the repository's baseline and full run");
+{
+  const open = (over) => ({ parent: "N001", kind: "change", repo: "spn-x", blockedBy: [], touches: [], state: "ready", ...over });
+  const mixed = await dataWorkspace("go-proved-mixed", { rows: [
+    open({ id: "1", title: "write the book", work: "DOCS", entries: ["E1"] }),
+    open({ id: "2", title: "build it, proved later", work: "CODE", entries: ["E2"], provedBy: "N002" }),
+    open({ id: "3", title: "build it, proved now", work: "CODE", entries: ["E3"] }),
+    open({ id: "4", title: "release spn-x", work: "RELEASE" }),
+  ] });
+  put(mixed.ws, "arcs/N002/state.json", `${JSON.stringify({ ...arcData([]), arc: "N002", title: "the proof arc", status: "PROPOSED" }, null, 2)}\n`);
+  cli(mixed.root, ["workstream", "fact", "write", "N001", "--source", "spn-x/a.ts", "--fact", "a is 1", "--used-by", "1"]);
+  writeFileSync(join(mixed.ws, "arcs", "N001", "sheet.json"), JSON.stringify(sheetOf([entry("E1", "spn-x:docs/a.md"), entry("E2", "spn-x:src/b.ts", { tiers: {} }), entry("E3", "spn-x:src/c.ts")]), null, 2));
+  const wrote = cli(mixed.root, ["workstream", "go", "write", "031-probe/N001"]);
+  const ids = existsSync(join(mixed.ws, "arcs", "N001", "go.json")) ? json(join(mixed.ws, "arcs", "N001", "go.json")).parts.map((p) => p.id) : [];
+  ok("[MKT.SCRIPTS.549] go write keeps the baseline and the full run of a repository that holds an open code row proved now beside one proved later",
+    wrote.code === 0 && ids.includes("baseline-spn-x") && ids.includes("full-spn-x"), wrote.out + JSON.stringify(ids));
+}
+
 console.log("\n=== wait: a part waits on something outside the plan");
 {
   const waited = go("wait", "N001", "code-spn-x-q1-1", "--on", "the release of spn-support-ts");
