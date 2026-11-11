@@ -887,6 +887,29 @@ function handoverFences(reply: string): Fence[] {
 }
 
 /**
+ * The fenced blocks of a reply that carry some of a handover's nine labels and not all of them: a line or two of a
+ * block sent to put in place of the lines of another. The developer copies the block into the next window, so a
+ * fragment leaves them merging two messages by hand (the developer, 2026-11-11).
+ */
+function handoverFragments(reply: string): Fence[] {
+  return fencesOf(reply).filter((fence) => {
+    if (fence.info === "diff") return false;
+    const size = handoverLines(fence.body).size;
+    return size > 0 && size < HANDOVER_LABELS.length;
+  });
+}
+
+/** What a finding on a block's lines asks for: the whole block again, never a line to swap in (RULE.DEVEX.WORKSPACE.393). */
+const WHOLE_AGAIN =
+  " Send the whole block again in the reply, corrected and ready to paste, and write it into the arc's log: never a " +
+  "line or a field to put in place of another, because the developer copies the block and a fragment leaves them " +
+  "merging two messages (RULE.DEVEX.WORKSPACE.393).";
+
+/** A block's body as two blocks are compared: its labelled lines, each value with its spaces folded. */
+const blockText = (body: string): string =>
+  [...handoverLines(body)].map(([label, value]) => `${label}: ${value.replace(/\s+/g, " ")}`).join("\n");
+
+/**
  * Whether the reply holds a handover block that is filled in and carries all nine labels. The hook
  * keeps this, so the block is asked for once (RULE.DEVEX.WORKSPACE.189).
  */
@@ -934,6 +957,13 @@ export function openingOf(reply: string): string | null {
  *               counts as given, and a second block in this reply is the extra one
  */
 export function checkHandover(reply: string, root: string, mine: Set<string>, given = false, earlier: string[] = []): Warning[] {
+  // A FRAGMENT OF A BLOCK IS NEVER AN ANSWER, also in a reply that hands nothing over on its own words: a line or two
+  // of a block sent to replace the lines of the one above leaves the developer merging two messages to paste one.
+  const fragment = given || earlier.some((text) => givesHandover(text)) ? handoverFragments(reply)[0] : undefined;
+  if (fragment)
+    return [{ check: "handover", message:
+      `This reply carries part of a handover block — ${[...handoverLines(fragment.body).keys()].map((label) => `\`${label}:\``).join(" · ")} — ` +
+      `and not the other lines.` + WHOLE_AGAIN }];
   const handing = passingOn(reply) || shapeByTitle(reply, true)?.moment === "handover";
   if (!handing && !CLOSES.test(unquoted(reply))) return [];
   // A REPLY THAT PUTS A WHOLE CARD ASKS A QUESTION, AND HANDS NOTHING OVER, also when it offers the
@@ -953,10 +983,14 @@ export function checkHandover(reply: string, root: string, mine: Set<string>, gi
   // so does the reply that answers a finding on the handover reply. A block printed again is still read.
   const shaped = handoverFences(reply);
   const earlierGiven = earlier.some((text) => givesHandover(text));
-  if (earlierGiven && shaped.some((fence) => !quotesTemplate(fence)))
+  // A SECOND BLOCK IS EXTRA ONLY WHEN IT SAYS THE SAME. A block that changed is given again whole, and the second one
+  // is then the corrected block, checked below as the block (RULE.DEVEX.WORKSPACE.393).
+  const earlierBlocks = earlier.flatMap((text) => handoverFences(text).map((fence) => blockText(fence.body)));
+  if (earlierGiven && shaped.some((fence) => !quotesTemplate(fence) && earlierBlocks.includes(blockText(fence.body))))
     return [{ check: "handover", message:
-      `This turn holds two handover blocks: one in an earlier message and one in this reply. The second is the extra one. ` +
-      `A handover is given once, as the turn's last message (RULE.DEVEX.WORKSPACE.393). Say in one line that the block above stands.` }];
+      `This turn holds two handover blocks that say the same: one in an earlier message and one in this reply. The second is the extra one. ` +
+      `A handover is given once, as the turn's last message, and again whole only when a line of it changes (RULE.DEVEX.WORKSPACE.393). ` +
+      `Say in one line that the block above stands.` }];
   if ((given || earlierGiven) && !shaped.length) return [];
 
   // AN OPEN CARD IS NAMED IN ONE LINE, NEVER PUT IN FULL (RULE.DEVEX.WORKSPACE.189). The next window must
@@ -1001,21 +1035,21 @@ export function checkHandover(reply: string, root: string, mine: Set<string>, gi
   const labels = HANDOVER_LABELS.map((label) => `${label}:`).join(" · ");
   const block = shaped.find((fence) => !quotesTemplate(fence));
   if (!block && shaped.length)
-    return [{ check: "handover", message: `the handover block still holds \`{{…}}\` placeholders. Fill in every one — ${labels} — and write the same block into the arc's log.` }];
+    return [{ check: "handover", message: `the handover block still holds \`{{…}}\` placeholders. Fill in every one — ${labels}.` + WHOLE_AGAIN }];
   if (!block)
     return [{ check: "handover", message: `this reply passes work on to another session and carries no handover block. Fill in the handover template in a fenced block — ${labels}, one per line, each value starting in the column \`do not touch:\` sets — with no \`{{…}}\` left, and write the same block into the arc's log.` }];
   const lines = handoverLines(block.body);
   const missing = HANDOVER_LABELS.filter((label) => !lines.has(label));
   if (missing.length)
-    return [{ check: "handover", message: `the handover block is missing ${missing.map((label) => `\`${label}:\``).join(" · ")}. Each label opens its own line, lowercase, in this order: ${labels}. The next window starts from that block and has nothing else.` }];
+    return [{ check: "handover", message: `the handover block is missing ${missing.map((label) => `\`${label}:\``).join(" · ")}. Each label opens its own line, lowercase, in this order: ${labels}. The next window starts from that block and has nothing else.` + WHOLE_AGAIN }];
   // THE LABELS FORM ONE COLUMN, so a missing line is visible and the next window can scan the block.
   // Every label is present here, so only where each value starts is left to read.
   const ragged = [...handoverColumns(block.body)].filter(([, column]) => column !== HANDOVER_COLUMN);
   if (ragged.length)
-    return [{ check: "handover", message: `the handover block's values do not start in one column — ${ragged.map(([label, column]) => `\`${label}:\` starts its value in column ${column}`).join(" · ")}. Each value starts in column ${HANDOVER_COLUMN}, counted from 0, which is the column \`do not touch:\` sets with one space after it. Pad each shorter label with spaces, and indent a wrapped line to the same column.` }];
+    return [{ check: "handover", message: `the handover block's values do not start in one column — ${ragged.map(([label, column]) => `\`${label}:\` starts its value in column ${column}`).join(" · ")}. Each value starts in column ${HANDOVER_COLUMN}, counted from 0, which is the column \`do not touch:\` sets with one space after it. Pad each shorter label with spaces, and indent a wrapped line to the same column.` + WHOLE_AGAIN }];
   const next = lines.get("continue") ?? "";
   if (!WORKSTREAM_NAME.test(next) || !ARC_NAME.test(next))
-    return [{ check: "handover", message: `the handover block's \`continue:\` line names no ${WORKSTREAM_NAME.test(next) ? "arc (\`N<n>\`)" : "workstream (\`NNN-subject\`)"}. The next window finds everything else from those two.` }];
+    return [{ check: "handover", message: `the handover block's \`continue:\` line names no ${WORKSTREAM_NAME.test(next) ? "arc (\`N<n>\`)" : "workstream (\`NNN-subject\`)"}. The next window finds everything else from those two.` + WHOLE_AGAIN }];
   // A REPLY THAT OPENS WITH THE HANDOVER'S HEADING IS HELD TO ITS SHAPE (S136): the title, the block between two \`&nbsp;\` lines, one closing paragraph.
   const shape = shapeOf("handover");
   if (shapeByTitle(reply, true)?.moment !== "handover") return [];
