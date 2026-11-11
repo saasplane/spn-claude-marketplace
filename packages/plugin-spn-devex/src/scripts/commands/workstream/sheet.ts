@@ -22,7 +22,7 @@ import { fileURLToPath } from "node:url";
 import { type Action, FLAG, VALUE, UsageFault, readWords } from "../../../../../plugin-support-lib/src/lib/command.ts";
 import { workspaceRoot } from "../../../../../plugin-support-lib/src/lib/timing.ts";
 import { readGo } from "../../lib/go-plan.ts";
-import { arcIdsOf, logEvent, previewOf, readArc, readJson, workspaceOf, readJsonl, readQuestions, readSheet, factsFileOf, sheetFileOf, stateFileOf, suggestionsOf, writeArc, writeWhole } from "../../lib/workstream.ts";
+import { arcIdsOf, logEvent, previewOf, provedByFault, readArc, readJson, workspaceOf, readJsonl, readQuestions, readSheet, factsFileOf, sheetFileOf, stateFileOf, suggestionsOf, writeArc, writeWhole } from "../../lib/workstream.ts";
 import { ENTRY_OPS, cardName, entryWork, parentIds, renameDataToWork, sheetFaults, type ArcData, type ArcRow, type Fact, type Question, type Sheet, type SheetEntry } from "../../lib/workstream-schema.ts";
 import { missingCopies } from "../../lib/generated-copies.ts";
 import { arcNamed, listOf, typed } from "./_shared.ts";
@@ -693,7 +693,9 @@ export function sheetFindings(ws: string, arc: string): string[] {
   // A RELEASE or PROOF row names its files through no entry, so it is never this finding.
   for (const row of leaves.filter((one) => ["DOCS", "CODE", "GENERATED"].includes(one.work ?? "") && !(one.entries ?? []).length))
     out.push(`row ${row.id} names no entry`);
-  for (const row of leaves.filter((one) => one.work === "CODE" && (one.entries ?? []).length)) {
+  // A ROW PROVED IN A LATER ARC owes no test of its own here (RULE.DEVEX.WORKSPACE.328); the arc it names must be one of the workstream's own.
+  for (const row of data.rows) { const fault = provedByFault(ws, arc, row); if (fault) out.push(fault); }
+  for (const row of leaves.filter((one) => one.work === "CODE" && (one.entries ?? []).length && !one.provedBy)) {
     const tested = (row.entries ?? []).some((id) => Object.values(held.get(id)?.tiers ?? {}).some((ids) => ids.length));
     if (!tested) out.push(`row ${row.id} is a CODE row and its entries name no test`);
   }

@@ -290,6 +290,30 @@ console.log("\n=== the go is refused while the sheet has a finding");
   ok("[MKT.SCRIPTS.315] the go ends by naming go write as the next step", /Next: .*go write/.test(clean.out), clean.out);
 }
 
+console.log("\n=== a row proved in a later arc owes no test of its own to the sheet or the go");
+{
+  const p = await dataWorkspace("sheet-proved-by");
+  const arcPath = join(p.ws, "arcs", "N001", "state.json");
+  const row = (id, work, over = {}) => ({ id, parent: "N001", title: `row ${id}`, kind: "change", repo: "spn-x", work, blockedBy: [], touches: [], state: "waiting", ...over });
+  const setRows = (rows) => writeFileSync(arcPath, JSON.stringify({ ...json(arcPath), status: "PROPOSED", rows }, null, 2));
+  mkdirSync(join(p.ws, "arcs", "N002"), { recursive: true });
+  writeFileSync(join(p.ws, "arcs", "N002", "state.json"), JSON.stringify({ ...json(arcPath), arc: "N002", title: "the proof arc", rows: [] }, null, 2));
+  writeFileSync(join(p.ws, "arcs", "N001", "sheet.json"), JSON.stringify(sheetOf([entry("1", { file: "spn-x:docs/a.md", tiers: {} }), entry("2", { tiers: {} })].map((one, at) => ({ ...one, id: `E${at + 1}` }))), null, 2));
+  const check = () => cli(p.root, ["workstream", "sheet", "check", "N001"]).out;
+  setRows([row("1", "DOCS", { entries: ["E1"] }), row("2", "CODE", { entries: ["E2"], provedBy: "N002" }), row("3", "PROOF", { provedBy: "N002" })]);
+  const exempt = check();
+  ok("[MKT.SCRIPTS.541] a CODE row that names a later arc as its proof is not found for naming no test", !exempt.includes("row 2 is a CODE row") && !exempt.includes("provedBy"), exempt);
+  setRows([row("1", "DOCS", { entries: ["E1"], provedBy: "N002" }), row("2", "CODE", { entries: ["E2"], provedBy: "N009" }), row("3", "PROOF", { provedBy: "N001" })]);
+  const wrong = check();
+  ok("[MKT.SCRIPTS.541] red: a provedBy on a DOCS row, naming no arc of the workstream, or naming its own arc is found",
+    wrong.includes("row 1 is a DOCS row, and only a CODE or a PROOF row") && wrong.includes("N009, which is no arc") && wrong.includes("row 3's `provedBy` names its own arc"), wrong);
+  const refused = cli(p.root, ["workstream", "arc", "edit", "031-probe/N001", "--status", "DECIDED", "--note", "go"]);
+  ok("[MKT.SCRIPTS.541] red: and the go is refused on it", refused.code !== 0 && refused.out.includes("N009") && json(arcPath).status === "PROPOSED", refused.out);
+  setRows([row("1", "DOCS", { entries: ["E1"] }), row("2", "CODE", { entries: ["E2"], provedBy: "N002" }), row("3", "PROOF", { provedBy: "N002" })]);
+  const go = cli(p.root, ["workstream", "arc", "edit", "031-probe/N001", "--status", "DECIDED", "--note", "go"]);
+  ok("[MKT.SCRIPTS.541] the go goes through for code whose tests run in the later arc", go.code === 0 && json(arcPath).status === "DECIDED", go.out);
+}
+
 console.log("\n=== carried suggestions, precedent, steps from the sheet");
 {
   const stateOf = (arc) => join(ws, "arcs", arc, "state.json");

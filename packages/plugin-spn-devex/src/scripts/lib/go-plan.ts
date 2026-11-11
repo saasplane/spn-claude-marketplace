@@ -12,7 +12,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { logFiles, telemetryFolder } from "../../../../plugin-support-lib/src/lib/debug-store.ts";
 import {
-  entryWork, goFaults, GO_SCHEMA_VERSION,
+  DONE_STATES, entryWork, goFaults, GO_SCHEMA_VERSION,
   type ArcData, type GoPart, type GoPlan, type Sheet, type SheetEntry, type Work,
 } from "./workstream-schema.ts";
 import { arcDataDir, logLinesOf, readArc, readSheet } from "./workstream.ts";
@@ -204,7 +204,22 @@ export type DeriveOptions = {
 };
 /** A derived plan, with the parts of every wait circle that runs through a release: `go write` refuses a plan that has one and never saves the field. */
 /** `ignored` names each `dependsOn` line that adds no wait: an arc of the scope whose repositories all come later in the chain (s186). */
-export type DerivedGo = GoPlan & { circles: string[][]; ignored: string[] };
+/** `later` names each CODE row of the scope proved in a later arc (RULE.DEVEX.WORKSPACE.328), which waits on that arc and runs no tiers here. */
+export type DerivedGo = GoPlan & { circles: string[][]; ignored: string[]; later: string[] };
+
+/**
+ * The repositories whose open CODE rows across the scope all name a later arc as their proof, and a line for each such row
+ * (RULE.DEVEX.WORKSPACE.328). A repository with one open CODE row proved at this go runs its tiers as before.
+ */
+export function laterProofs(scope: readonly ScopeSheet[]): { repos: Set<string>; lines: string[] } {
+  const rows = scope.flatMap(({ arc, data }) => (data?.rows ?? [])
+    .filter((row) => row.work === "CODE" && !DONE_STATES.has(row.state ?? "") && !!row.repo).map((row) => ({ arc, row })));
+  const repos = new Set(rows.filter(({ row }) => row.provedBy).map(({ row }) => row.repo as string));
+  for (const { row } of rows) if (!row.provedBy) repos.delete(row.repo as string);
+  const lines = rows.filter(({ row }) => row.provedBy)
+    .map(({ arc, row }) => `${arc} row ${row.id} (${row.repo}) waits on ${row.provedBy}: it runs no tiers at this go, and lands on ${row.provedBy}'s proof run of ${row.repo}`);
+  return { repos, lines };
+}
 
 /** The ids of the parts that landed, oldest first, read from the `<part> landed` go lines of the lead arc's log. */
 export function landedOrder(ws: string, lead: string): string[] {
@@ -401,6 +416,8 @@ export function deriveGo(scope: readonly ScopeSheet[], options: DeriveOptions = 
   for (const part of kept) if (!repos.includes(part.repo) && slotOf(part) !== "RELEASE") repos.push(part.repo);
   const owed = new Set(scope.flatMap(({ proofs }) => proofs ?? []));
   for (const repo of owed) if (!repos.includes(repo)) repos.push(repo);
+  // A REPOSITORY WHOSE CODE IS PROVED IN A LATER ARC gets no baseline and no full run here, unless a proof is still owed in it.
+  const provedLater = laterProofs(scope);
   const rank = (repo: string) => { const at = chain.indexOf(repo); return at >= 0 ? at : repo === BOOK_REPO ? -1 : chain.length; };
   repos.sort((a, b) => rank(a) - rank(b));
 
@@ -424,6 +441,7 @@ export function deriveGo(scope: readonly ScopeSheet[], options: DeriveOptions = 
     const hasCode = groups.has(`${repo}|CODE`) || applyGroups.has(repo) || kept.some((one) => one.repo === repo && slotOf(one) === "CODE");
     for (const pass of SLOT_ORDER) {
       if (pass === "BASELINE" || pass === "FULL_RUN") {
+        if (provedLater.repos.has(repo) && !owed.has(repo)) continue;
         let id = `${pass === "BASELINE" ? "baseline" : "full"}-${repo}`;
         // A proof still owed needs the repository's full run once its code has landed; a baseline needs code to compare.
         let runs = (hasCode && !(options.followUp && pass === "BASELINE")) || (pass === "FULL_RUN" && owed.has(repo));
@@ -576,7 +594,9 @@ export function deriveGo(scope: readonly ScopeSheet[], options: DeriveOptions = 
   const endingOf = (repo: string): string[] => {
     const mine = parts.filter((one) => one.repo === repo);
     const ending = mine.filter((one) => slotOf(one) === "GENERATED" || slotOf(one) === "FULL_RUN");
-    return (mine.some((one) => slotOf(one) === "FULL_RUN") ? ending : [...mine.filter((one) => slotOf(one) === "DOCS"), ...ending]).map((one) => one.id);
+    // Code proved in a later arc has no full run to wait on, so its release waits on the code itself.
+    const before = mine.filter((one) => slotOf(one) === "DOCS" || (provedLater.repos.has(repo) && slotOf(one) === "CODE"));
+    return (mine.some((one) => slotOf(one) === "FULL_RUN") ? ending : [...before, ...ending]).map((one) => one.id);
   };
   const lastRelease = (repo: string): string[] => {
     const ours = parts.filter((one) => one.repo === repo && slotOf(one) === "RELEASE").sort((a, b) => numberOf(a) - numberOf(b));
@@ -664,7 +684,7 @@ export function deriveGo(scope: readonly ScopeSheet[], options: DeriveOptions = 
   // landed parts, as an old plan's kept parts can make, refuses no plan.
   return {
     schemaVersion: GO_SCHEMA_VERSION, lead: scope[0]?.arc ?? "", scope: scope.map((one) => one.arc),
-    writtenAt: options.writtenAt ?? new Date().toISOString(), parts, circles: releaseCircles(parts.filter((one) => one.state !== "landed")), ignored,
+    writtenAt: options.writtenAt ?? new Date().toISOString(), parts, circles: releaseCircles(parts.filter((one) => one.state !== "landed")), ignored, later: provedLater.lines,
   };
 }
 

@@ -103,7 +103,8 @@ function scopeOf(ws: string, scope: string[], lead: string, root: string): { she
     // A release part is named for its repository, so a line that is not one name would make a part no reader accepts.
     for (const line of sheet.releaseChain) if (!/^\S+$/.test(line)) faults.push(`${arc} sheet: the release order line "${line}" is not a repository's name: run \`workstream sheet write ${basename(ws)}/${arc} --file <sheet.json>\``);
     // A proof step not landed owes its repository a full run; an arc that changes no repository lands its proof on its check's run.
-    const proofs = data.rows.filter((row) => row.work === "PROOF" && !DONE_STATES.has(row.state) && row.repo && row.repo !== "none").map((row) => row.repo as string);
+    // A proof step that names a later arc as its proof owes none at this go: that arc's run proves it (RULE.DEVEX.WORKSPACE.328).
+    const proofs = data.rows.filter((row) => row.work === "PROOF" && !row.provedBy && !DONE_STATES.has(row.state) && row.repo && row.repo !== "none").map((row) => row.repo as string);
     sheets.push({ arc, sheet, landed: landedEntries(data), proofs: [...new Set(proofs)] });
     arcs.push(data);
   }
@@ -280,7 +281,7 @@ function write(args: string[]): number {
     const sheet = readSheet(ws, other);
     if (sheet) siblings.push({ arc: other, sheet, data: readArc(ws, other) });
   }
-  const { circles, ignored, ...plan } = deriveGo(sheets.map((one) => ({ ...one, data: arcs.find((data) => data.arc === one.arc) ?? null })), {
+  const { circles, ignored, later, ...plan } = deriveGo(sheets.map((one) => ({ ...one, data: arcs.find((data) => data.arc === one.arc) ?? null })), {
     siblings,
     rates: ratesOf(measures), measures, previous, fullRunMinutes: fullRunMinutes(root), landedOrder: landedOrder(ws, lead), followUp: words.given("after-close"),
     dirsOf: (repo) => dirsIn(root, ws, repo),
@@ -300,6 +301,7 @@ function write(args: string[]): number {
   console.log(`ok · ${lead} go written · ${plan.parts.length} parts over ${scope.join(", ")}`);
   console.log(`workflow · ${basename(workflowFileOf(ws, lead))} beside the plan`);
   for (const line of ignored) console.log(`note · ${line}`);
+  for (const line of later) console.log(`note · ${line}`);
   console.log(nextStep(`${basename(ws)}/${lead}`, ws, plan));
   return 0;
 }

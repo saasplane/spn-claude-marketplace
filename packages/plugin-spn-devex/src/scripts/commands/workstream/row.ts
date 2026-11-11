@@ -5,7 +5,7 @@
 //   spn-devex workstream row add <workstream>/<arc> "<title>" --repo <repo> --work <work> [--kind change] [--state ready] …
 //   spn-devex workstream row state <workstream>/<arc> <row> <state> [--on "<what it waits on>"] [--note "…"] [--run <name>]
 //   spn-devex workstream row note <workstream>/<arc> <row> "<text>"
-//   spn-devex workstream row edit <workstream>/<arc> <row> [--title …] [--kind …] [--repo …] [--work …] …
+//   spn-devex workstream row edit <workstream>/<arc> <row> [--title …] [--kind …] [--repo …] [--work …] [--proved-by N<nnn>|none] …
 //   spn-devex workstream row discard <workstream>/<arc> <row> --note "<the developer's words>"
 //
 // One command per target: a positional word is the target and its one value, an option is named, and a required option left out is
@@ -14,7 +14,7 @@
 
 import { type Action, FLAG, VALUE, UsageFault, readWords, type Words } from "../../../../../plugin-support-lib/src/lib/command.ts";
 import { basename, dirname, join } from "node:path";
-import { arcStatus, doneOf, landingFault, logEvent, suggestionLandingFault, readArc, readSheet, stateOfRow, stepsMayStart, writeArc } from "../../lib/workstream.ts";
+import { arcStatus, doneOf, landingFault, logEvent, provedByFault, suggestionLandingFault, readArc, readSheet, stateOfRow, stepsMayStart, writeArc } from "../../lib/workstream.ts";
 import { WORK, ROW_ID, ROW_KINDS, ROW_STATES, parentIds, type ArcData, type ArcRow } from "../../lib/workstream-schema.ts";
 import { ARC_FLAGS, afterWrite, arcNamed, arcSignatures, listOf, refreshIfMoved, refuseFlags, typed } from "./_shared.ts";
 import { renameFirstRead } from "./sheet.ts";
@@ -30,6 +30,7 @@ const ROW_LISTS: Record<string, keyof ArcRow> = { "blocked-by": "blockedBy", tou
 const FIELDS = {
   repo: VALUE, work: WORK, kind: ROW_KINDS, model: VALUE, "blocked-by": VALUE, touches: VALUE, position: VALUE,
   parent: VALUE, mechanism: VALUE, acceptance: VALUE, decisions: VALUE, facts: VALUE, entries: VALUE, proof: VALUE, order: VALUE,
+  "proved-by": VALUE,
 } as const;
 const ADD_OPTIONS = { ...FIELDS, state: ROW_STATES, note: VALUE } as const;
 const EDIT_OPTIONS = { ...FIELDS, title: VALUE } as const;
@@ -49,7 +50,17 @@ function rowFields(row: ArcRow, words: Words): string[] {
     const list = listOf(words, option);
     if (list) { (row as Record<string, unknown>)[field] = list; changed.push(field as string); }
   }
+  // `--proved-by N<nnn>` names the later arc whose proof run lands the row, and `--proved-by none` clears it (RULE.DEVEX.WORKSPACE.328).
+  const by = words.value("proved-by")?.trim();
+  if (by === "none") { if (row.provedBy !== undefined) { delete row.provedBy; changed.push("provedBy"); } }
+  else if (by && row.provedBy !== by) { row.provedBy = by; changed.push("provedBy"); }
   return changed;
+}
+
+/** Throws where a row's `provedBy` is not one it may carry: a CODE or PROOF row, naming another build arc of the workstream. */
+function provedByGuard(ws: string, arc: string, row: ArcRow): void {
+  const fault = provedByFault(ws, arc, row);
+  if (fault) throw new UsageFault(`keeps row ${row.id} as it was: ${fault} (RULE.DEVEX.WORKSPACE.328).`);
 }
 
 /** `--position` as a place in the arc's rows, counted from 1. */
@@ -137,6 +148,7 @@ function add(args: string[]): number {
   const rowId = nextId(data.rows, parent);
   const row: ArcRow = { id: rowId, parent: arc, title, kind: words.value("kind") ?? "change", state: words.value("state") ?? "ready" };
   rowFields(row, words);
+  provedByGuard(ws, arc, row);
   mayStart(arc, data, rowId, row.state);
   const before = arcSignatures(ws);
   if (place === null) data.rows.push(row);
@@ -177,6 +189,9 @@ function state(args: string[]): number {
   const statusBefore = arcStatus(data);
   const before = arcSignatures(ws);
   row.state = next;
+  // A row landed on a run keeps it, as `report write` records it, so a row proved by this one can read the run it lands on. A carried, deferred
+  // or replaced row that holds a `proof` keeps it: it names the row's successor (`row edit --proof`), which the close gate reads.
+  if (next === "landed" && run && !(row.proof && (was === "carried" || was === "deferred" || was === "replaced"))) row.proof = `run ${run}`;
   // Any other state clears the wait: a row that is no longer waiting waits on nothing.
   if (next === "waiting" && on !== null) row.waitingOn = on.trim(); else delete row.waitingOn;
   const waited = next === "waiting" && on !== null ? ` · waiting on ${on.trim()}` : "";
@@ -206,6 +221,7 @@ function edit(args: string[]): number {
   const statusBefore = arcStatus(data);
   const before = arcSignatures(ws);
   const changed = rowFields(row, words);
+  provedByGuard(ws, arc, row);
   if (place !== null) {
     const at = data.rows.indexOf(row);
     const to = Math.min(place - 1, data.rows.length - 1);
@@ -284,7 +300,7 @@ function discard(args: string[]): number {
 export const actions: Record<string, Action> = {
   add: {
     describe: "add a row to an arc, taking the arc's next number and printing it",
-    usage: "<workstream>/<arc> \"<title>\" --repo <repo> --work <work> [--kind change] [--state ready] [--blocked-by …] [--touches …] [--entries E1,E2] [--position …] [--model …] [--note …]",
+    usage: "<workstream>/<arc> \"<title>\" --repo <repo> --work <work> [--kind change] [--state ready] [--blocked-by …] [--touches …] [--entries E1,E2] [--position …] [--model …] [--proved-by N<nnn>] [--note …]",
     run: add,
   },
   state: {
@@ -298,8 +314,8 @@ export const actions: Record<string, Action> = {
     run: note,
   },
   edit: {
-    describe: "change the fields of a row the arc holds; --proof names a carried row's successor; a row it lacks is refused, and `row add` is named",
-    usage: "<workstream>/<arc> <row> [--title …] [--kind …] [--repo …] [--work …] [--model …] [--blocked-by …] [--touches …] [--entries E1,E2] [--position …] [--proof …]",
+    describe: "change the fields of a row the arc holds; --proof names a carried row's successor; --proved-by names the later arc whose proof run lands a CODE or PROOF row, `none` clears it; a row it lacks is refused, and `row add` is named",
+    usage: "<workstream>/<arc> <row> [--title …] [--kind …] [--repo …] [--work …] [--model …] [--blocked-by …] [--touches …] [--entries E1,E2] [--position …] [--proof …] [--proved-by N<nnn>|none]",
     run: edit,
   },
   discard: {

@@ -70,6 +70,8 @@ export const QUESTION_ID = /^q\d+$/;
 export const cardName = (id: string): string => id.replace(/^([qs])(\d+)$/, (_, kind: string, number: string) => `${kind.toUpperCase()}${number}`);
 /** A card's id as typed, in either case, as it is stored: `Q28` and `q28` both read `q28`; a leading `<workstream>/` is kept. */
 export const cardId = (typed: string): string => typed.replace(/(^|\/)([QSqs])(\d+)$/, (_, lead: string, kind: string, number: string) => `${lead}${kind.toLowerCase()}${number}`);
+/** A build arc's address, the only kind of arc a row's `provedBy` names: `N007`, with an optional letter. */
+export const BUILD_ARC_ID = /^N\d+[a-z]?$/;
 /** What a row may wait on: a row of its arc, a card, or an arc or a row of another arc (`N011`, `N011/3`). */
 export const BLOCKER = /^(?:\d+[a-z]?(?:\.\d+[a-z]?)*|q\d+|N\d+[a-z]?(?:\/\d+[a-z]?(?:\.\d+[a-z]?)*)?)$/i;
 
@@ -81,6 +83,8 @@ export type ArcRow = {
   state?: RowState | null; proof?: string | null; cost?: Cost | null; commits?: Record<string, string[]> | null; order?: string | null;
   /** What a `waiting` row waits on outside the window, in plain words: a release, a sign-in, another window's hold. */
   waitingOn?: string | null;
+  /** The later build arc of the workstream whose proof run lands a CODE or PROOF row (RULE.DEVEX.WORKSPACE.328); absent, the row is proved at its own go. */
+  provedBy?: string | null;
   [field: string]: unknown;
 };
 /** What an arc is for (RULE.DEVEX.WORKSPACE.494): a `build` arc has steps; an `ideate` arc holds the read, the fresh views and the one preview, and proposes the build arcs. */
@@ -232,6 +236,7 @@ const ROW_FIELDS: Record<string, Rule> = {
   proof: { kind: "text", required: false },
   order: { kind: "text", required: false },
   waitingOn: { kind: "text", required: false },
+  provedBy: { kind: "text", required: false },
 };
 
 /** The row ids that have rows under them. */

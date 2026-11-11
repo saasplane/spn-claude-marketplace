@@ -579,6 +579,37 @@ console.log("\n=== the change sheet — the opening write, and a row's entries")
   ok("red: `arc edit` refuses `--entries`, a row's field", arcSide.code !== 0 && arcSide.out.includes("row edit"), arcSide.out);
 }
 
+console.log("\n=== a row names a later arc as its proof — `row edit --proved-by`");
+{
+  const row = (id, work) => ({ id, parent: "N001", title: `row ${id}`, kind: "change", repo: "spn-x", work, blockedBy: [], touches: [], state: "ready" });
+  const later = await dataWorkspace("proved-by", { rows: [row("1", "DOCS"), row("2", "CODE"), row("3", "PROOF")] });
+  put(later.ws, "arcs/N002/state.json", `${JSON.stringify({ ...arcData([]), arc: "N002", title: "the proof arc" }, null, 2)}\n`);
+  const arcPath = join(later.ws, "arcs", "N001", "state.json");
+  const edit = (...more) => cli(later.root, ["workstream", "row", "edit", "031/N001", ...more]);
+  const by = (id) => json(arcPath).rows.find((one) => one.id === id).provedBy;
+
+  const code = edit("2", "--proved-by", "N002");
+  ok("[MKT.SCRIPTS.539] `row edit --proved-by N002` names the later arc that proves a CODE row", code.code === 0 && by("2") === "N002" && code.out.includes("provedBy"), code.out);
+  const proof = edit("3", "--proved-by", "N002");
+  ok("[MKT.SCRIPTS.539] and a PROOF row", proof.code === 0 && by("3") === "N002", proof.out);
+  const cleared = edit("3", "--proved-by", "none");
+  ok("[MKT.SCRIPTS.539] `--proved-by none` clears it", cleared.code === 0 && by("3") === undefined, cleared.out);
+  const check = cli(later.root, ["workstream", "state", "check", "031"]);
+  ok("[MKT.SCRIPTS.539] the arc's data still holds to the schema", !/\[data\]/.test(check.out), check.out);
+
+  const nowhere = edit("2", "--proved-by", "N009");
+  ok("[MKT.SCRIPTS.540] red: an arc the workstream does not hold is refused, and the row keeps what it named", nowhere.code === 2 && nowhere.out.includes("N009, which is no arc") && by("2") === "N002", nowhere.out);
+  const own = edit("2", "--proved-by", "N001");
+  ok("[MKT.SCRIPTS.540] red: the row's own arc is refused", own.code === 2 && own.out.includes("its own arc") && by("2") === "N002", own.out);
+  const role = edit("2", "--proved-by", "follow-ups");
+  ok("[MKT.SCRIPTS.540] red: an arc that is no build arc is refused", role.code === 2 && role.out.includes("names no build arc") && by("2") === "N002", role.out);
+  const docs = edit("1", "--proved-by", "N002");
+  ok("[MKT.SCRIPTS.540] red: a row that is neither CODE nor PROOF is refused", docs.code === 2 && docs.out.includes("only a CODE or a PROOF row") && by("1") === undefined, docs.out);
+  const added = cli(later.root, ["workstream", "row", "add", "031/N001", "built later", "--repo", "spn-x", "--work", "CODE", "--proved-by", "N002"]);
+  const made = json(arcPath).rows.find((one) => one.title === "built later");
+  ok("[MKT.SCRIPTS.548] `row add --proved-by N002` sets it as the row is added", added.code === 0 && made?.provedBy === "N002", added.out);
+}
+
 console.log("\n=== landing on a run — a sheet arc holds the agent to the sheet");
 {
   const row = (id, work, over = {}) => ({ id, parent: "N001", title: `row ${id}`, kind: "change", repo: "spn-x", work, blockedBy: [], touches: [], state: "ready", ...over });
@@ -677,6 +708,101 @@ console.log("\n=== landing on a run — a sheet arc holds the agent to the sheet
   put(hold.ws, "notes/N001/orders/4.report.md", ["---", 'row: "4"', "outcome: landed", "run: r1", `commits: { spn-x: [${sha}] }`, "---", "Body.", ""].join("\n"));
   const withRun = cli(hold.root, ["workstream", "report", "write", "031", "notes/N001/orders/4.report.md"]);
   ok("a landed report with a good `run:` lands the row", withRun.code === 0 && stateOf("4") === "landed", withRun.out);
+}
+
+console.log("\n=== a row proved in a later arc lands only on that arc's proof run");
+{
+  const row = (arc, id, work, over = {}) => ({ id, parent: arc, title: `row ${id}`, kind: "change", repo: "spn-x", work, blockedBy: [], touches: [], state: "ready", ...over });
+  const w = await dataWorkspace("proved-later", { rows: [row("N001", "1", "CODE", { entries: ["E1"], provedBy: "N002" }), row("N001", "2", "PROOF", { provedBy: "N002" })] });
+  const sha = w.git(["rev-parse", "HEAD"]);
+  const arcPath = join(w.ws, "arcs", "N001", "state.json");
+  const laterPath = join(w.ws, "arcs", "N002", "state.json");
+  const data = json(arcPath);
+  data.rows[0].commits = { "spn-x": [sha] };
+  writeFileSync(arcPath, JSON.stringify(data, null, 2));
+  writeFileSync(join(w.ws, "arcs", "N001", "sheet.json"), JSON.stringify({ schemaVersion: 1, releaseChain: [], dependsOn: [], stack: { folder: "x", dmo: "none", reset: "x" },
+    entries: [{ id: "E1", op: "edit", file: "spn-x:a.ts", what: "change E1", decidedBy: [], facts: ["f1"], then: [], rules: [], callers: [], tiers: {}, docs: [], book: [], trace: "why", judged: false }] }, null, 2));
+  put(w.ws, "arcs/N002/state.json", `${JSON.stringify({ ...arcData([row("N002", "1", "PROOF")]), arc: "N002", title: "the proof arc" }, null, 2)}\n`);
+  const later = new Date(Date.now() + 3600e3).toISOString();
+  for (const name of ["p1", "p2"]) put(w.root, `spn-x/pkg/tests/.output/unit/runs/${name}.json`,
+    JSON.stringify({ run: name, tier: "unit", ranAt: later, env: "local", results: [{ id: "P.1", tier: "unit", status: "SUCCESS", title: "P.1" }] }));
+  const land = (rowId, ...more) => cli(w.root, ["workstream", "row", "state", "031/N001", rowId, "landed", ...more]);
+  const stateOf = (rowId) => json(arcPath).rows.find((one) => one.id === rowId).state;
+
+  const early = land("1", "--run", "p1");
+  ok("[MKT.SCRIPTS.543] red: a row proved by N002 is refused while N002's proof row has not landed, naming the arc and its proof row",
+    early.code === 1 && early.out.includes("proved by N002") && early.out.includes("proof row 1 for spn-x has not landed") && stateOf("1") === "ready", early.out);
+  const elsewhereData = json(laterPath);
+  Object.assign(elsewhereData.rows[0], { repo: "spn-y", state: "landed", proof: "run p1" });
+  writeFileSync(laterPath, JSON.stringify(elsewhereData, null, 2));
+  const elsewhere = land("1", "--run", "p1");
+  ok("[MKT.SCRIPTS.546] red: a landed proof row of the named arc for another repository does not prove the row, and the refusal says N002 has none for spn-x",
+    elsewhere.code === 1 && elsewhere.out.includes("N002 has no proof row for spn-x") && stateOf("1") === "ready", elsewhere.out);
+  const laterData = json(laterPath);
+  Object.assign(laterData.rows[0], { repo: "spn-x", state: "landed", proof: "run p1" });
+  writeFileSync(laterPath, JSON.stringify(laterData, null, 2));
+  const other = land("1", "--run", "p2");
+  ok("[MKT.SCRIPTS.543] red: on a run that is not that proof row's it is refused, naming the run it lands on", other.code === 1 && other.out.includes("--run p1") && stateOf("1") === "ready", other.out);
+  const bare = land("1");
+  ok("[MKT.SCRIPTS.543] red: with no run named, the refusal names the proof row's run", bare.code === 1 && bare.out.includes("--run p1") && stateOf("1") === "ready", bare.out);
+
+  // THE PROOF ROW'S RUN IS READ FROM ITS `proof`, ELSE FROM THE LINE `row state` WROTE; A NOTE THAT MERELY HOLDS "run x" IS NO RUN.
+  const logPath = join(w.ws, "arcs", "N002", "log.jsonl");
+  const bare2 = (note) => { writeFileSync(logPath, `${JSON.stringify({ at: later, kind: "landed", row: "1", note })}\n`); return land("1"); };
+  const noProof = json(laterPath);
+  delete noProof.rows[0].proof;
+  writeFileSync(laterPath, JSON.stringify(noProof, null, 2));
+  const noted = bare2("held back; waits on run p9 of the platform");
+  ok("[MKT.SCRIPTS.547] a landing log note that merely holds `run p9` is not read as the proof row's run", noted.code === 1 && !noted.out.includes("p9") && noted.out.includes("--run <run>") && stateOf("1") === "ready", noted.out);
+  const written = bare2("ready \u2192 landed \u00b7 run p1");
+  ok("[MKT.SCRIPTS.547] and the line `row state` writes is, when the row kept no proof", written.code === 1 && written.out.includes("--run p1") && stateOf("1") === "ready", written.out);
+
+  // A RUN TAKEN BEFORE THE ROW'S LAST COMMIT DOES NOT LAND IT, THOUGH THE NAMED ARC'S PROOF ROW LANDED ON IT: THE ORDER IS THE GATE'S CLOCK.
+  put(w.root, "spn-x/pkg/tests/.output/unit/runs/pold.json",
+    JSON.stringify({ run: "pold", tier: "unit", ranAt: "2020-01-01T00:00:00Z", env: "local", results: [{ id: "P.1", tier: "unit", status: "SUCCESS", title: "P.1" }] }));
+  Object.assign(noProof.rows[0], { proof: "run pold" });
+  writeFileSync(laterPath, JSON.stringify(noProof, null, 2));
+  const older = land("1", "--run", "pold");
+  ok("[MKT.SCRIPTS.545] red: a row is refused on the run N002's proof row landed on when that run is older than the row's last commit", older.code === 1 && older.out.includes(`pold was taken before ${sha.slice(0, 8)}, row 1's last commit`) && stateOf("1") === "ready", older.out);
+  Object.assign(noProof.rows[0], { proof: "run p1" });
+  writeFileSync(laterPath, JSON.stringify(noProof, null, 2));
+
+  const code = land("1", "--run", "p1");
+  ok("[MKT.SCRIPTS.544] a CODE row proved by N002 lands on N002's proof run, though its entries name no test", code.code === 0 && stateOf("1") === "landed", code.out);
+  ok("[MKT.SCRIPTS.544] and the row keeps the run it landed on", json(arcPath).rows[0].proof === "run p1");
+  const proof = land("2", "--run", "p1");
+  ok("[MKT.SCRIPTS.544] a PROOF row proved by N002 lands on the same run", proof.code === 0 && stateOf("2") === "landed", proof.out);
+}
+
+console.log("\n=== row state landed --run keeps the successor a carried row names");
+{
+  const row = (id) => ({ id, parent: "N001", title: `row ${id}`, kind: "change", repo: "spn-x", work: "DOCS", blockedBy: [], touches: [], state: "ready" });
+  const w = await dataWorkspace("carried-proof", { rows: [row("1"), row("2")] });
+  const arcPath = join(w.ws, "arcs", "N001", "state.json");
+  const proofOf = (id) => json(arcPath).rows.find((one) => one.id === id).proof;
+  const step = (...more) => cli(w.root, ["workstream", "row", ...more.slice(0, 1), "031/N001", ...more.slice(1)]);
+  step("state", "1", "carried", "--note", "the successor takes it");
+  step("edit", "1", "--proof", "\u2192 002-a-successor");
+  const carried = step("state", "1", "landed", "--run", "r1");
+  ok("[MKT.SCRIPTS.552] a carried row that lands on a run keeps the `proof` that names its successor", carried.code === 0 && proofOf("1") === "\u2192 002-a-successor", carried.out + String(proofOf("1")));
+  const plain = step("state", "2", "landed", "--run", "r1");
+  ok("[MKT.SCRIPTS.552] and a row with no such mark lands with `proof: run r1`", plain.code === 0 && proofOf("2") === "run r1", plain.out + String(proofOf("2")));
+}
+
+console.log("\n=== workstream close — an arc whose provedBy row never landed holds the close; a carried one does not");
+{
+  const row = (id, over = {}) => ({ id, parent: "N001", title: `row ${id}`, kind: "change", repo: "spn-x", work: "CODE", blockedBy: [], touches: [], state: "landed", ...over });
+  const w = await dataWorkspace("close-proved-by", { rows: [row("1"), row("2", { provedBy: "N002", state: "ready" })] });
+  put(w.ws, "arcs/N002/state.json", `${JSON.stringify({ ...arcData([]), arc: "N002", title: "the proof arc", status: "LANDED" }, null, 2)}\n`);
+  mkdirSync(join(w.root, ".spndevex", "workstreams", "backlog", "002-a-successor"), { recursive: true });
+  writeClosingBlock(w.ws);
+  const closed = join(w.root, ".spndevex", "workstreams", "closed", "031-probe");
+  const refused = cli(w.root, ["workstream", "close", "031"]);
+  ok("[MKT.SCRIPTS.550] red: an arc whose provedBy row never landed cannot close, and the folder stays", refused.code === 1 && refused.out.includes("N001 \u2014 RUNNING") && !existsSync(closed) && existsSync(w.ws), refused.out);
+  cli(w.root, ["workstream", "row", "state", "031/N001", "2", "carried", "--note", "the successor takes it"]);
+  cli(w.root, ["workstream", "row", "edit", "031/N001", "2", "--proof", "\u2192 002-a-successor"]);
+  const carried = cli(w.root, ["workstream", "close", "031"]);
+  ok("[MKT.SCRIPTS.551] a provedBy row carried to a successor that exists closes as carried", carried.code === 0 && existsSync(closed) && !existsSync(w.ws), carried.out);
 }
 
 console.log("\n=== a proof row lands on a full run of the same tree; on a moved tree the refusal names only the entries whose files changed");
@@ -819,6 +945,28 @@ console.log("\n=== report write — a part's report lands the part, and the step
   put(fold.root, "spn-x/pkg/tests/.output/unit/runs/r1.json", JSON.stringify({ run: "r1", tier: "unit", ranAt: new Date(Date.now() + 3600e3).toISOString(), env: "local", results: [{ id: "T.E2.01", tier: "unit", status: "SUCCESS", title: "T.E2.01" }] }));
   const full = report(part("FULL_RUN").id, "run: r1");
   ok("[MKT.SCRIPTS.313] the full run lands the code step", partState(part("FULL_RUN").id) === "landed" && stateOf("2") === "landed", full.out);
+}
+
+console.log("\n=== report write keeps the successor a carried row names");
+{
+  const rows = [{ id: "1", parent: "N001", title: "write the book", kind: "change", repo: "spn-x", work: "DOCS", blockedBy: [], touches: [], state: "ready", entries: ["E1"] }];
+  const kept = await dataArc("fold-carried", { rows });
+  const sheetIn = join(kept.root, "sheet-in.json");
+  writeFileSync(sheetIn, JSON.stringify({ schemaVersion: 1, releaseChain: ["spn-x"], dependsOn: [], stack: { folder: "the spn-x checkout", dmo: "none", reset: "from empty" },
+    entries: [{ id: "E1", op: "edit", file: "spn-x:docs/a.md", what: "change E1", decidedBy: ["q1"], facts: ["f1"], then: [], rules: [], callers: [], tiers: { unit: ["T.E1.01"] }, docs: [], book: [], trace: "why", judged: false }] }));
+  cli(kept.root, ["workstream", "fact", "write", "N001", "--source", "spn-x/a.ts", "--fact", "a is 1", "--used-by", "1"]);
+  cli(kept.root, ["workstream", "sheet", "write", "N001", "--file", sheetIn]);
+  cli(kept.root, ["workstream", "go", "write", "N001", "--scope", "N001"]);
+  const arcPath = join(kept.ws, "arcs", "N001", "state.json");
+  const carriedData = json(arcPath);
+  Object.assign(carriedData.rows[0], { state: "carried", proof: "\u2192 002-a-successor" });
+  writeFileSync(arcPath, JSON.stringify(carriedData, null, 2));
+  const partId = json(join(kept.ws, "arcs", "N001", "go.json")).parts.find((one) => one.work === "DOCS").id;
+  const sha = kept.git(["rev-parse", "HEAD"]);
+  put(kept.ws, `notes/N001/orders/${partId}.report.md`, ["---", 'row: "1"', "outcome: landed", `commits: { spn-x: [${sha}] }`, "run: r1", "---", "Body.", ""].join("\n"));
+  const folded = cli(kept.root, ["workstream", "report", "write", "031", `notes/N001/orders/${partId}.report.md`]);
+  const after = json(arcPath).rows[0];
+  ok("[MKT.SCRIPTS.553] a report that lands a carried row on a run keeps the `proof` that names its successor", folded.code === 0 && after.state === "landed" && after.proof === "\u2192 002-a-successor", folded.out + JSON.stringify(after));
 }
 
 console.log("\n=== a suggestion's stage follows the arc that carries it");
