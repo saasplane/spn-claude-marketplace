@@ -9,7 +9,7 @@ import { join, resolve } from "node:path";
 import { PLUGIN } from "../../../helpers/harness.mjs";
 
 const lib = resolve(PLUGIN, "src", "scripts", "lib");
-const { deriveGo, workflowOf, releaseCircles, tangledParts, fullRunMinutes, readyParts, clearWaiting, markWaiting, ratesOf, boundOf, testFilesOf, entryHash, changedEntries, staleEntries, proposeScopes, redCheckIds } = await import(join(lib, "go-plan.ts"));
+const { deriveGo, workflowOf, releaseCircles, tangledParts, fullRunMinutes, readyParts, clearWaiting, markDropped, markWaiting, ratesOf, boundOf, testFilesOf, entryHash, changedEntries, staleEntries, proposeScopes, redCheckIds } = await import(join(lib, "go-plan.ts"));
 const { goFaults, entryWork } = await import(join(lib, "workstream-schema.ts"));
 
 let total = 0, failed = 0;
@@ -405,6 +405,22 @@ same("[MKT.SCRIPTS.497] an entry whose patch is stale has no apply part and join
 const appliedIds = applied.parts.map((p) => p.id);
 same("[MKT.SCRIPTS.498] the baseline stands before the apply part",
   appliedIds.indexOf("baseline-lib-repo") >= 0 && appliedIds.indexOf("baseline-lib-repo") < appliedIds.indexOf("apply-lib-repo"), true);
+
+// A step that changed after its part landed gets a follow-up of its own (026 N007/E27), and a dropped part is kept.
+const stepEntry = (over = {}) => ({ ...entry("E5", "lib-repo:src/gen.ts", {}), kind: "step", command: "gen", proof: "matches", ...over });
+const stepScope = [{ arc: "N009", sheet: sheet([entry("E2", "lib-repo:src/b.ts"), stepEntry()]) }];
+const stepLanded = { ...deriveGo(stepScope), parts: deriveGo(stepScope).parts.map((p) => ({ ...p, state: "landed" })) };
+const stepChanged = [{ arc: "N009", sheet: sheet([entry("E2", "lib-repo:src/b.ts"), stepEntry({ tiers: { unit: ["MKT.SCRIPTS.300"] } })]) }];
+const stepFollowed = deriveGo(stepChanged, { previous: stepLanded });
+same("[MKT.SCRIPTS.307] a step that changed after its part landed gets a follow-up part of its own, numbered -2", stepFollowed.parts.filter((p) => p.entries.includes("N009/E5")).map((p) => [p.id, p.state]),
+  [["generated-lib-repo-n009-e5", "landed"], ["generated-lib-repo-n009-e5-2", "ready"]]);
+same("[MKT.SCRIPTS.307] and the landed step part is no longer stale", staleEntries(stepFollowed.parts.find((p) => p.id === "generated-lib-repo-n009-e5"), stepFollowed, stepChanged), []);
+same("[MKT.SCRIPTS.307] an unchanged landed step gets no follow-up", deriveGo(stepScope, { previous: stepLanded }).parts.filter((p) => p.entries.includes("N009/E5")).map((p) => p.id), ["generated-lib-repo-n009-e5"]);
+const dropped = markDropped(plan, "release-app-repo-1", "drop the release");
+same("[MKT.HOOKS.308] a part is dropped with the developer's words", dropped.parts.filter((p) => p.id === "release-app-repo-1").map((p) => [p.state, p.droppedWords]), [["dropped", "drop the release"]]);
+same("[MKT.HOOKS.308] a dropped part holds to its schema", goFaults(dropped), []);
+same("[MKT.HOOKS.308] a dropped part is kept as it is when the plan is derived again", deriveGo(scope, { previous: dropped }).parts.filter((p) => p.id === "release-app-repo-1").map((p) => p.state), ["dropped"]);
+same("[MKT.HOOKS.308] a landed part cannot be dropped, nor a part with no words", [landedAll, plan].map((one, at) => { try { markDropped(one, "docs-lib-repo-1", at ? " " : "x"); return "no error"; } catch { return "refused"; } }), ["refused", "refused"]);
 
 // proposeScopes: arcs that share a repository are one scope.
 const chainOf = ["lib-repo", "app-repo"];
