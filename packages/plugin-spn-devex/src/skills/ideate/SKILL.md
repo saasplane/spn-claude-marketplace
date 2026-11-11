@@ -11,7 +11,7 @@ description: Decide what a node IS, and design a requirement inside that shape -
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/03-ideate.md",
-      "seen": "9b34b071"
+      "seen": "d876e4c4"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
