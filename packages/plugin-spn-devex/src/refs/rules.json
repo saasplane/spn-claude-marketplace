@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "book": {
     "repository": "spn-foundation",
-    "commit": "f7d859ba"
+    "commit": "c0b14298"
   },
   "rules": [
     {
@@ -12568,6 +12568,19 @@
       ]
     },
     {
+      "id": "RULE.DEVEX.WORKSPACE.506",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-devex/develop"
+      },
+      "class": "stated in a skill",
+      "sentence": "`spndesk/` at the workspace root is that place, with one folder for each app that takes a file, and the first command that writes into it makes it",
+      "chapter": "04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md",
+      "heading": "The desk",
+      "decision": null,
+      "restated": []
+    },
+    {
       "id": "RULE.LAUNCHPAD.CONTROL_PLANE.001",
       "level": "MUST",
       "params": {
@@ -24828,7 +24841,7 @@
         "skill": "spn-surface/design"
       },
       "class": "stated in a skill",
-      "sentence": "A type step sets the size and the weight of a text, and nothing else",
+      "sentence": "A type step sets the size, the weight and the line of a text, and nothing else",
       "chapter": "04-capabilities/02-support/01-surface/05-architecture-core/01-common/01-tokens.md",
       "heading": "The type steps",
       "decision": null,

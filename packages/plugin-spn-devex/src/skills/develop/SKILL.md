@@ -169,3 +169,4 @@ A change is not done when it compiles. It is done when three things hold. The do
 - **A refusal to land, to write a sheet or to write the plan names every fault it finds, and a run lands a row when its tree is the commit's tree** (`RULE.DEVEX.WORKSPACE.476` · MUST · skill:spn-devex/develop)
 - **The managing ratio is printed at each landing and at the close** (`RULE.DEVEX.WORKSPACE.477` · MUST · skill:spn-devex/develop)
 - **The plugins keep a copy of the contract's telemetry values beside the writer, in the contract's structure, and `toolchain-ts` holds it to the contract enum for enum** (`RULE.DEVEX.WORKSPACE.482` · MUST · skill:spn-devex/develop)
+- **`spndesk/` at the workspace root is that place, with one folder for each app that takes a file, and the first command that writes into it makes it** (`RULE.DEVEX.WORKSPACE.506` · MUST · skill:spn-devex/develop)
