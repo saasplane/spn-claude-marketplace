@@ -166,6 +166,8 @@ spn-devex workstream go check <workstream>/<arc> — read the plan against the s
 
 spn-devex workstream go start <workstream>/<arc> <part> — mark a baseline, a full run or a release as running; only a baseline or a full run lets the test-run check open the whole suite
 
+spn-devex workstream go drop <workstream>/<arc> <part> --words "…" — mark a part that has not landed and is not running `dropped`, with the developer's words as they typed them: a run, a release or a proof they decided will not happen; the close reads it as accounted for, and a part that waits on it is dropped by its own command
+
 spn-devex workstream go wait <workstream>/<arc> <part> (--on "…" | --clear) — mark a part waiting on something outside the plan (a release, a sign-in, another window's hold), with the reason in plain words; `--clear` takes the wait off, and the part reads ready when what it waits on in the plan has landed
 
 spn-devex workstream handover <workstream> [--continue "…"] [--do-not-touch "…"] — the handover block, written from the rows, the cards, the live orders and the pins into the arc's log, and printed

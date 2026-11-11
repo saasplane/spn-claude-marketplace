@@ -59,6 +59,7 @@ import { ARCS, DEVEX, SESSIONS, WORKSTREAM_STATES, isApproachPage, isWorkspaceDe
 import { isBuilderWorkspace } from "../lib/builder.ts";
 import { arcIdsOf, notesDirOf } from "../lib/workstream.ts";
 import { readGo, readyParts } from "../lib/go-plan.ts";
+import { GO_PART_SETTLED } from "../lib/workstream-schema.ts";
 import type { RulesIndex } from "../../../../plugin-support-lib/src/lib/rule-mark.ts";
 import { begin, end, record, tagsOf } from "../../../../plugin-support-lib/src/lib/timing.ts";
 import { sweepSessions } from "../../../../plugin-support-lib/src/lib/debug-store.ts";
@@ -858,7 +859,7 @@ export function goStandings(root: string, only: Set<string> | null = null, start
       let plan;
       if (started && !started.has(`${name}/${lead}`) && !started.has(`${name}/*`)) continue;
       try { plan = readGo(ws, lead); } catch { continue; }
-      if (!plan || plan.parts.every((part) => part.state === "landed")) continue;
+      if (!plan || plan.parts.every((part) => GO_PART_SETTLED.has(part.state))) continue;
       const orders = join(notesDirOf(ws, lead), "orders");
       const ids = (state: string) => plan.parts.filter((part) => part.state === state).map((part) => part.id);
       const running = ids("running");

@@ -338,7 +338,8 @@ export function deriveGo(scope: readonly ScopeSheet[], options: DeriveOptions = 
   const rates = options.rates ?? {};
   const chain: string[] = [];
   for (const { sheet } of scope) for (const repo of sheet.releaseChain ?? []) if (!chain.includes(repo)) chain.push(repo);
-  const kept = (options.previous?.parts ?? []).filter((part) => part.state === "landed" || part.state === "running");
+  // A DROPPED PART IS KEPT AS IT IS: the developer's word that it will not run outlives the plan being derived again.
+  const kept = (options.previous?.parts ?? []).filter((part) => part.state === "landed" || part.state === "running" || part.state === "dropped");
   const keptIds = new Set(kept.map((part) => part.id));
   const moved = new Set<string>();
   const keptRefs = new Set(kept.flatMap((part) => {
@@ -453,7 +454,11 @@ export function deriveGo(scope: readonly ScopeSheet[], options: DeriveOptions = 
       }
       // A STEP IS A PART OF ITS OWN, in its repository's generated pass.
       if (pass === "GENERATED") for (const one of stepGroups.get(repo) ?? []) {
-        const id = `generated-${repo}-${one.arc.toLowerCase()}-${one.entry.id.toLowerCase()}`;
+        // A STEP THAT CHANGED AFTER ITS PART LANDED gets a follow-up of its own, `-2` and on: under the landed part's own id
+        // `keptIds` would skip it, and `go check` would name the change for ever (026 N007/E27).
+        const base = `generated-${repo}-${one.arc.toLowerCase()}-${one.entry.id.toLowerCase()}`;
+        let id = base;
+        for (let n = 2; keptIds.has(id) && moved.has(one.ref); n += 1) id = `${base}-${n}`;
         if (!keptIds.has(id)) fresh.push(part(id, repo, pass, [one.ref], [one.entry]));
       }
       const group = groups.get(`${repo}|${pass}`);
@@ -821,6 +826,19 @@ export function markWaiting(plan: GoPlan, partId: string, reason: string): GoPla
   if (one.state === "landed" || one.state === "running") throw new Error(`${partId} is ${one.state}, so it cannot be marked waiting`);
   if (!reason.trim()) throw new Error(`${partId} needs the reason it waits, in plain words`);
   return { ...plan, parts: plan.parts.map((part) => (part.id === partId ? { ...part, state: "waiting", waitingOn: reason.trim() } : part)) };
+}
+
+/**
+ * The plan with one part marked `dropped` on the developer's words (`go drop <part> --words "…"`): a run, a release or a proof
+ * the developer decided will not happen. A landed or running part, or a part not in the plan, is refused (RULE.DEVEX.WORKSPACE.463).
+ */
+export function markDropped(plan: GoPlan, partId: string, words: string): GoPlan {
+  const one = plan.parts.find((part) => part.id === partId);
+  if (!one) throw new Error(`${partId} is not a part of the plan`);
+  if (one.state === "landed" || one.state === "running" || one.state === "dropped") throw new Error(`${partId} is ${one.state}, so it cannot be dropped`);
+  if (!words.trim()) throw new Error(`${partId} needs the developer's words that drop it`);
+  const { waitingOn: _waiting, ...rest } = one;
+  return { ...plan, parts: plan.parts.map((part) => (part.id === partId ? { ...rest, state: "dropped", droppedWords: words.trim() } : part)) };
 }
 
 /**

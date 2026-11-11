@@ -42,7 +42,7 @@
 import { readFileSync, readdirSync, statSync } from "node:fs";
 import { TERMINAL } from "./arc-status.ts";
 import { statusOfData } from "../lib/workstream.ts";
-import { ARC_ID } from "../lib/workstream-schema.ts";
+import { ARC_ID, GO_PART_SETTLED } from "../lib/workstream-schema.ts";
 import { basename, dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 import { emit, isDir, isFile, listdir, read, readPayload, runAlone, unescape, workspaceRoot,
          type Payload, type Verdict } from "../lib/payload.ts";
@@ -1100,7 +1100,8 @@ function goFindings(folders: string[]): string[] {
       for (const part of plan.parts) {
         const moved = staleEntries(part, plan, scope);
         if (moved.length) out.push(`part ${part.id}: entries ${moved.join(" and ")} changed after the plan was written`);
-        if (part.state !== "landed") out.push(`part ${part.id} of ${arc} has not landed (${part.state})`);
+        // A PART THE DEVELOPER DROPPED is accounted for, as a discarded row is (RULE.DEVEX.WORKSPACE.463).
+        if (!GO_PART_SETTLED.has(part.state)) out.push(`part ${part.id} of ${arc} has not landed (${part.state})`);
       }
     }
   }

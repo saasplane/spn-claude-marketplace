@@ -542,8 +542,13 @@ export function sheetFaults(data: unknown, where = "sheet.json"): string[] {
 
 /** The version of `go.json` this plugin reads and writes. */
 export const GO_SCHEMA_VERSION = 1;
-/** Where a part of a go stands. `waiting` is a part that waits on something outside the window, named in its `waitingOn`. */
-export const GO_PART_STATES = ["ready", "running", "held", "landed", "waiting"] as const;
+/**
+ * Where a part of a go stands. `waiting` is a part that waits on something outside the window, named in its `waitingOn`;
+ * `dropped` is a part the developer decided will not run, with their words in `droppedWords` (RULE.DEVEX.WORKSPACE.463).
+ */
+export const GO_PART_STATES = ["ready", "running", "held", "landed", "waiting", "dropped"] as const;
+/** The part states that owe nothing more: done, or dropped on the developer's word. */
+export const GO_PART_SETTLED: ReadonlySet<string> = new Set(["landed", "dropped"]);
 /** A part's id: its pass in lower case, its repository and its number, `code-spn-claude-marketplace-2`; a baseline or full run has no number. */
 export const GO_PART_ID = /^(baseline|docs|code|full|generated|release|proof|apply)-\S+$/;
 /** An entry as a go names it: its arc and its id, `N009/E14`. */
@@ -559,6 +564,8 @@ export type GoPart = {
   state: (typeof GO_PART_STATES)[number];
   /** What a `waiting` part waits on, in plain words: a release, a sign-in, another window's hold. */
   waitingOn?: string | null;
+  /** The developer's words that dropped a `dropped` part, as they typed them. */
+  droppedWords?: string | null;
   /** The { tokens, minutes } a landed part measured. */
   cost?: Cost | null;
 };
@@ -576,7 +583,7 @@ const GO_PART_FIELDS: Record<string, Rule> = {
   minutes: { kind: "number", required: true, nullable: true }, measuredFrom: { kind: "text", required: true },
   waitsOn: { kind: "strings", required: true }, model: { kind: "string", required: true },
   signature: { kind: "text", required: true }, state: { kind: "enum", required: true, values: GO_PART_STATES },
-  waitingOn: { kind: "text", required: false },
+  waitingOn: { kind: "text", required: false }, droppedWords: { kind: "text", required: false },
 };
 
 /** Every fault of a go plan, read as JSON already. Empty where it holds to the schema. */
