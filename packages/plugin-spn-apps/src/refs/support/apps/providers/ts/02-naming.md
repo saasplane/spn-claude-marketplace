@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/10-providers/ts/02-naming.md",
-      "seen": "8168900a"
+      "seen": "4e8c437c"
     }
   ]
 }
@@ -163,9 +163,11 @@
 | Marker | Position | Applies to | Means |
 | --- | --- | --- | --- |
 | `_` | prefix | folders, files, functions, methods | private to its parent |
-| `Internal` | suffix | a symbol beside its public sibling in the same file | the ungated twin of a public member |
+| `Internal` | suffix | a symbol beside its public sibling in the same file | the ungated twin of a public member; on a module's contract it is served by no route |
 
 **The underscore is the mechanism, not a label** — the generated barrel skips every path holding one, at any depth. **The `Internal` suffix keeps a pair adjacent** wherever names are sorted, so you see both and pick deliberately. An `Internal` method may also be the ungated read that a limit's counter calls, with no public twin: `getFileSizeBytesTotalByOrgInternal`, or `get<X>Count…ByOrgInternal` in general.
+
+An `Internal` method on a module's contract is served by no route, and the module that calls it proves reach first. An `Internal` write writes one record of the caller's, after the caller's own checks. The suffix is what tells a reader that the trust moved to the caller.
 
 ### CSS custom properties
 

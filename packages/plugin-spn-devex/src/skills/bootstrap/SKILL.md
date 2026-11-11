@@ -71,7 +71,7 @@ Two repositories come out of this, and the estate one comes first. It carries a 
 - **Act 1 also writes the saasplane env, `~/.spnenv`.** The command writes the file's **shape** — its markers, its managed defaults and an empty keep region. **It derives no key**, so a fresh partner file has nothing to fill in yet. A key arrives later, when you build what needs it, and you ask them for the value. Their own keys go in `spnutils:dev`, which no run reads or writes. Never print a value back — `refs/devex/workspace/workspace.md` § The saasplane env carries the rule.
 - **Unfold the partner's idea in the order their own words lead** (`RULE.DEVEX.FUNCTION.098` · MUST · skill:spn-devex/ideate). Take this step when the idea is first taken in, before act 10 hands it to `ideate`; each step waits for the one before it:
   1. **The idea, in their words**, quoted, and what it proves for them.
-  2. **The trade before the constructs.** The actors in the trade's own words, then the modules and the states by name, then the day-zero flow, and only then the cut of how deep the first version goes. Fields come when they ask for them.
+  2. **The trade before the constructs.** The actors in the trade's own words, then the modules and the states by name, then the day-zero flow, and only then the cut of how deep the first version goes. Fields come when they ask for them, and each category's journey asks them once the category tree is derived.
   3. **The existing twin before a new construct.** Each part names the construct the book or the platform already holds for it, and a new construct is proposed only where none fits.
   4. **Several modules are planned with a split test and one table.** The test says why the modules split where they do, and one module table holds the set, which the developer decides and names.
   5. **Open asks stay few.** A *settled so far* table holds what is agreed, and no more than three asks are open at once.
@@ -219,6 +219,28 @@ The answer is a category tree. Each model is made from categories and the apps t
 
 **Marketplace composes on a different axis from the rest.** Every other model declares categories under the customer's own account. Marketplace declares merchants and shoppers beneath the platform itself. Choosing it beside B2B is not a contradiction, and it is what produces the widest set of apps.
 
+### Each category's journey, asked once the tree is derived
+
+**Walk each derived category through its journey, one question at a time, and write each answer down before the next.** The questions are not coordinates, and the partner answers in their own words. `Platform` is never asked about. Where a category has no people of its own, say so and go on.
+
+| What you ask of each category | What the answer lands as |
+| --- | --- |
+| How they arrive: register themselves, are invited or are created by the parent; vetted or not | the registration door and the vetting (migration) |
+| What the org must tell us, and when: at registration or later | a catalog field in the product module's MDM `fields`, assigned to the category by IAM `categoryFields` (migration) |
+| Who joins it, and with which roles by default | default roles, an IAM contribution (migration) |
+| What each person must tell us, and when; how sensitive; who sees it; whether they edit their own | a catalog field, assigned per category as above (migration) |
+| What the org is offered | enablement defaults (migration); an operator's change later (console) |
+| Who sees which part of its data | data scopes offered (migration); each person's values (console) |
+| How they sign in | policy defaults (migration); provider secrets (estate config); an org's own policy (console) |
+| What they are told at each step | notification actions and templates (migration) |
+| Which groups they segment by | product tags (migration); a tenant's own tags (console) |
+| What a demo or test environment needs to show | sample records, a per-environment seed |
+| May its parent add fields of its own for it? | the enablement `IAM_MANAGE_CHILD_CATEGORY_FIELDS` on the parent's category (migration) |
+
+**The answer decides where it lands, by the rule of the ideate chapter.** What the product's code, flows or tests rely on is a migration contribution, the same in every environment. What differs per environment is the estate's declaration. A tenant's own choice is the console, at runtime. Sample records are a per-environment seed. Tenants' own fields and tags stay ENT's and are never asked here.
+
+**The answers write three things.** The product module's MDM contribution `fields` (key, target, fieldConfig, sensitivity), the IAM contribution `categoryFields` (categoryCode, fieldKey, required, collectAt, viewPermissions, editableBySubject, displayOrder), and one journey for each category in the arc's notes (arrive, set up the org, add people, sign in, what each step asks and tells). Each journey becomes that category's journey tests.
+
 ### How to ask
 
 - **Ask one question and stop.** A numbered list of all of them arrives as a form, and a form gets one careless pass.
@@ -226,7 +248,7 @@ The answer is a category tree. Each model is made from categories and the apps t
 - **Never fill an answer in for them.** A code you invented becomes the account address, the scope and the prefix, and it is expensive to take back. The legal entity, the owner's name and the cloud region are the ones an agent is most tempted to guess.
 - **The cloud region mapping is a choice, not a derivation.** `ap-south-1` does not follow from `in` by any rule this estate states. Somebody decided it, so somebody has to say it.
 - **The closest twin is the one people skip, and it earns the most.** A twin tells you which mechanisms transfer wholesale. Where this is their first platform there is no twin, and saying so beats inventing one.
-- **The questions are the rows of the coordinates table above, and nothing else.** Its *What it decides* column says what consumes each answer. Do not walk a partner through every coordinate a platform will ever carry: the rest is settled inside the concept at act 10 and in the declarations after that.
+- **The estate questions are the rows of the coordinates table above, and the category questions are the journey table's.** Its *What it decides* column says what consumes each answer. Do not walk a partner through every coordinate a platform will ever carry: the rest is settled inside the concept at act 10 and in the declarations after that.
 
 ## Act 4 — read back what they said, and what follows from it
 
@@ -239,6 +261,7 @@ Show every answered row as it now stands, and then show what you derived from it
 | The answers, as given | They correct their own typing before anything derives from it |
 | **The two repository names** | They are declared data rather than convenience, and a rename moves every path a pin resolves against |
 | **The app set, and the categories it came from** | A wrong business model shows up here as a missing app, which is cheap, rather than at boot, which is not |
+| Each category's journey | The fields it asks and when are written into migrations, and a wrong one costs a reset |
 
 **The names are derived and read back, never typed.** `{spc}` is permanent — three lowercase letters, never renamed — and the repository name inherits that permanence. Showing it is how a wrong `{spc}` gets caught while it still costs nothing.
 
