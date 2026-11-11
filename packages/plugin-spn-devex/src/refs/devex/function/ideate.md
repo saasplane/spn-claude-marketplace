@@ -109,13 +109,14 @@ The last row is the one that silently bakes a product decision into code. Settle
 
 ## How a partner's domain is mapped onto the constructs
 
-**The design step maps a partner's domain onto the constructs in a fixed order, and each step waits for the one before it.** The order is the category tree, the relations beside it, the states with their levels, the enums or records, the enablements, the flows, and then the pages.
+**The design step maps a partner's domain onto the constructs in a fixed order, and each step waits for the one before it.** The order is the category tree, each category's journey, the relations beside it, the states with their levels, the enums or records, the enablements, the flows, and then the pages.
 
 The hiring demo's mapping is the worked example:
 
 | Step | What the hiring demo writes there |
 | --- | --- |
 | The category tree | Platform, Company, Agency, Recruiter, Candidate and Job seeker, with who sells to whom |
+| Each category's journey | Company: registers itself; `company_size` at registration, required. Its people: `job_title` at invite, required and editable by the person, and `employee_number`, seen by admins only. Agency: created by a Company; `licence_number`, required, and `specialisms`. Recruiter: registers itself; `licence_number` and `specialisms`, both required, so the platform's check has evidence. Job seeker: `notice_period` and `expected_salary` on the profile, the salary sensitive and seen by the person only. Candidate: none, the candidate profile holds the rest. One journey for each, which becomes its journey tests |
 | The relations beside it | `HirAgencyEngagement`, keyed by both organizations and read through the `AGENCY` relation, since the tree records only who sells to whom |
 | The states and their levels | `HirJob` with the level a visitor reads, `HirJobPosting`, beside `HirJobMeta` |
 | The enums or records | the `HirJobCategory` rows the operator keeps |
@@ -147,7 +148,7 @@ A first proposal starts where the book already stands, so the developer reads a 
 A partner's or developer's idea is unfolded in the order their own words lead (`RULE.DEVEX.FUNCTION.098` · MUST · skill:spn-devex/ideate). The bootstrap and ideate skills take it in this order, and each step waits for the one before it:
 
 1. **The idea, in their words**, quoted, and what it proves for them.
-2. **The trade before the constructs.** The actors in the trade's own words, then the modules and the states by name, then the day-zero flow, and only then the cut of how deep the first version goes. Fields come when they ask for them.
+2. **The trade before the constructs.** The actors in the trade's own words, then the modules and the states by name, then the day-zero flow, and only then the cut of how deep the first version goes. Fields come when they ask for them, and each category's journey asks them once the category tree is derived.
 3. **The existing twin before a new construct.** Each part names the construct the book or the platform already holds for it, and a new construct is proposed only where none fits.
 4. **Several modules are planned with a split test and one table.** The test says why the modules split where they do, and one module table holds the set, which the developer decides and names.
 5. **Open asks stay few.** A *settled so far* table holds what is agreed, and no more than three asks are open at once.
