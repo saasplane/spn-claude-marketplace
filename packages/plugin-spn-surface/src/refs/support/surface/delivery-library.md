@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/11-delivery-library/",
-      "seen": "1697bcd0"
+      "seen": "77916c96"
     }
   ]
 }
@@ -166,6 +166,8 @@ The inventory says things in Figma's words. The Surface domain says them in its 
 | The library says | The Surface domain says | Why |
 | --- | --- | --- |
 | `radius/base`, in the collection `Theme-Radius` | `theme.app.radius` | the rule for slashes does not find it, and a stack holds it as one value |
+| `height/SM` and `scaleSizeIcon/XS`, in the collection `Scale` | `scale.height.SM` and `scale.scaleSizeIcon.XS` | the drawing page names Scale's variables by column and step, and the row reads Scale alone, since Mark-Shape holds a `radius/XS` of its own |
+| a text style's line height of `110` percent | the type step's `lineHeight`, `1.1` | the book writes a line height as a ratio, and Figma keeps it as a percent |
 | `disabled`, type `VARIANT`, values `false` and `true` | the prop `disabled`, kind flag | Figma draws a boolean as a variant with two values |
 | `withStartIcon`, type `BOOLEAN` | no prop: the presence of the content prop `startIcon` | it is a switch that shows or hides a part |
 | `state`, values `rest` and `hover` | a shown state, never a prop | a shown state has a picture and no prop |
@@ -427,226 +429,313 @@ Read this list before you work in a library file by the connector. Each is a fac
 
 ## What a library file holds
 
-A library file is read by people and by scripts. A person reads the grid of a set to see every case at once. A script reads the label of a set to learn how the grid is laid out, and reads the top left of a set to learn its default. So each rule below keeps one thing true that a script or a person relies on.
+A library file is read by people and by scripts. A person reads the grid of a set to see every case at once. A script reads the label of a set to learn how the grid is laid out, and reads the top left of a set to learn its default. So each rule below keeps one thing true that a script or a person relies on (`RULE.SUPPORT.SURFACE.030` · MUST · skill:spn-surface/design).
 
-**The Figma library holds a unit's properties, values, defaults and states rather than its pixels, and it draws the values of each property once** (`RULE.SUPPORT.SURFACE.401` · GUIDE). The showcase shows every combination, so a library that drew them all would hold one picture many times.
+### A unit is one section
 
-### A file's pages are the showcase's groups, and a unit is one section
+A person who opens a page reads it as a tree: the page, then one section for each unit, then what the unit holds. The files states which pages a file has. This part states what stands on a page and how. In this page a section is the Figma section that holds one unit, and it is a different thing from a block of the design system, which a unit's set draws.
 
-A person who opens a page reads it as a tree: the page, then one section for each unit, then what the unit holds. A page of a file that holds units is one group of the showcase, so a person who knows the showcase finds the same groups in the file, in the same order.
-
-- **A page's name MUST be its group's name in the showcase, without the `Component - ` that starts the name of a group of components, and the pages MUST stand in the showcase's order.** The group `Component - Actions` is the page Actions. The group `Data Entry - Fields` is the page Data entry · Fields, and its two sisters are Data entry · Pickers and Data entry · Composites. A file does not order its pages by its own rule.
-- **A published file MUST have a cover as its page 0, which Figma shows as the file's thumbnail, and the plugin MUST draw it from the CONSTRUCT snapshot.** The cover names the file, its layer and the book's commit the file was built from. It holds no unit, and it is the one page of a file that is no group of the showcase.
-- **The Core file's pages, after its cover, MUST be the showcase's Core entries that show tokens: Colour, Type, Scale, Icons and States.** The file holds no component, so its section holds a group of tokens with its specimens and not a unit. The showcase's Core entries Primitives, Patterns and Inline alignment show components, so they have no page in this file and stay in the showcase. "A section of the Core file" states what such a section holds. The Scale page holds Control sizes and The layout's measures as the showcase does, and States is drawn from tokens only, one row for each state. The pages of the Widgets, Containers and Layouts files are Widgets, Containers and Layouts.
-- **A page that is no group of the showcase MUST NOT be kept, but for the cover.** What it holds goes to the page of the unit it serves, and what serves no unit is removed.
-- **A page MUST hold one section for each unit of its group, named exactly as the unit, such as `DSInput`, and nothing else at its top level.** No level stands between a page and its units. A label or a usage that stood loose on the page would be parted from its unit the next time the unit moves, so every thing a unit owns sits inside the unit's section.
-- **The sections MUST stand in the showcase's order of the group's units, in one column down the page.** A person who knows the showcase then finds a unit where the showcase lists it. A unit that the showcase lists and the page has no node for gets no section, and the agent reports it.
-- **A unit's section MUST hold these, from the top down, in this order: the header, the set with its row and column labels, the usage, the cases and the parts.** A person sees what a unit is for before every switch on it, as the page of the unit in the showcase opens with its Usage. A band the unit has nothing for is left out with its label, and a top-level unit always has its Usage. A unit whose column draws nothing once and no mode, text or swap owes no sheet of cases. A top-level unit owes a usage of its primary use whatever else it draws, as "What a library file owes of a unit" states.
+- **A page holds one section for each unit of its group, named exactly as the unit, such as `DSInput`, and nothing else at its top level.** A label or a usage that stood loose on the page would be parted from its unit the next time the unit moves, so every thing a unit owns sits inside the unit's section.
+- **The sections stand in the showcase's order of the group's units, in one column down the page.** A person who knows the showcase then finds a unit where the showcase lists it. A unit that the showcase lists and the page has no node for gets no section, and the agent reports it.
+- **A unit's section holds these, from the top down, in this order: where it lives, the header, then the bands Usage, Variations, Cases and Parts, each under its label.** A person sees what a unit is for before every switch on it, as the page of the unit in the showcase opens with its Usage. A band the unit has nothing for is left out with its label, and a top-level unit always has its Usage. A unit whose column draws nothing once and no boolean, text or swap owes no sheet of cases, and a unit with no set has no Variations. A unit the book lists owes a usage of its primary use whatever else it draws, as what a library file owes of a unit states.
 
 | Piece | What it is |
 | --- | --- |
-| The header | one text, named `header · ` and the unit's name. It reads the unit's name, ` — `, what the unit is in one line, then the layout, with its rows and its columns |
-| The set | the unit's set, unchanged, with its column labels above it and its row labels in one column on its left |
-| The usage | a text `label · Usage`, and under it each usage of the unit with the caption that names it |
-| The cases | a text `label · Cases`, and under it the unit's sheets of cases and its loose case components |
-| The parts | a text `label · Parts`, and under it one section for each part, named as the part and built the same way |
+| Where it lives | one text, named `path · ` and the unit's name. It reads the library file, then each level of the page's group, parent first, joined by ` > `, such as `Components > Data entry > Pickers`. A level that repeats the one above it is left out |
+| The header | one text, named `header · ` and the unit's name. It reads the unit's name, and on the line under it what the unit is in one line, then the `behaviour:` note where the unit has one |
+| Usage | a text `label · Usage`, and under it each usage of the unit with the caption that names it |
+| Variations | a text `label · Variations`, and under it the unit's tables: the set's table with its labels, then its mode tables, as a set and its layout states |
+| Cases | a text `label · Cases`, and under it the unit's sheet of cases and its loose case components |
+| Parts | a text `label · Parts`, and under it one section for each part, named as the part and built the same way |
 
-- **The header's one line MUST come from the set's own description, its first sentence, and its rows and columns from the set's own grid.** A header written from memory would be a second statement of what the set already says. The header is the unit's one header label: it carries the layout in the form that "The form of a label" states, and a unit has no second header text beside it. A header label that was drawn before, with the unit's name and a layout, is replaced by the header, and the layer name and the one line are the header's only additions.
-- **A part is a set or a lone component that serves another unit and that the showcase does not list on its own, and it MUST sit in the section of the unit that owns it.** The owner is the unit whose source uses the part, read from the stack and never guessed from the name. A name that starts with a dot is always a part. A part that two or more units on the page use sits in a last section of the page, named `Shared parts`, built the same way.
-- **A label or a usage of a unit MUST sit in that unit's section, even when it was drawn on another page.** One that is found on the page of another unit moves to its unit's page and into its section. A thing whose unit is not in the file, or that serves no unit, is removed, and the agent reports each one it removes with what it was.
+- **The header's one line is the first sentence of the set's own description, and the set's Figma description is that one line.** A header written from memory would be a second statement of what the set already says. The header is the unit's one header label, and a unit has no second header text beside it. The layout is never written on the canvas: it is kept as plugin data on the section, for the plugin, the tool and the connector, which read it there and never from a label. A header that was drawn before with a layout in its text is replaced by the header, and its layout moves to the plugin data.
+- **A part is a set or a lone component that serves another unit and that the showcase does not list on its own, and it sits in the section of the unit that owns it.** The owner is the unit whose source uses the part, read from the stack and never guessed from the name. A name that starts with a dot is always a part. A part that two or more units on the page use sits in a last section of the page, named `Shared parts`, built the same way.
+- **A label or a usage of a unit sits in that unit's section, even when it was drawn on another page.** One that is found on the page of another unit moves to its unit's page and into its section. A thing whose unit is not in the file, or that serves no unit, is removed, and the agent reports each one it removes with what it was.
 
 The distances are fixed, so that every section reads the same. They are in pixels, in the section's own coordinates.
 
 | What | Distance |
 | --- | --- |
 | Padding between the section's edge and its content | 80 on every side, the header at the top left |
-| From the header to the top of the column labels | 48 |
-| From the bottom of a column label to the top of the set | 16, the label's left edge at its column's left |
-| From the row labels' right edge to the set | 24, the column as wide as its widest label, each label centred on its row |
+| From the header to the first band's label | 48 |
+| From a column group's title to its column labels | 16, the title's left edge at its first column's left |
+| From a column label to its table | 24 to the table's edge, the label's left edge at its column's left |
+| From the row labels' right edge to the table | 24, the labels' column as wide as its widest label, each label centred on its row |
+| Between two columns of a table, and between two rows | 16, each column as wide as the wider of its label and its widest version, with the label and every version at its left edge |
+| From a row group's title to its first row | 16, the title's right edge at the row labels' right edge |
+| From a row group's last row to the next group's title | 24 |
+| Between two tables of Variations | 48, one under the other |
+| An instance's inset in a cell or a case | 8, lying outside the left edge of the cell's words |
 | Between two bands | 80 |
 | From a band's label to its content | 24 |
-| Between things in one band | 48, standing left to right and wrapping under after 4,000 wide |
+| Between things in one band | 48, standing left to right and wrapping under after 1,920 wide, or after the width of the section's widest table where that is wider |
 | Between two sections of a page | 240, the first at the top left of the page |
 
 The section is as large as its content and its padding, and it holds each of them: a section neither clips nor resizes what is in it by itself.
 
-- **Moving a set into a section, or to another page, MUST change nothing of the unit.** Its key, its versions' keys, its name, its size, its default and its properties stay as they were, and an instance keeps its main component. An agent reads them before the move and after it, and reports both, as it does for a default.
-- **Size stays a property of a unit, and a set keeps a version for each value of the size of the web.** A value that is only a colour, a corner, a height, a padding or a text size is carried by a variable and never by a version. Which other properties of the unit are properties of its set, and which are drawn as cases, "Which property is a variant and which is a case" states.
-- **A unit that the showcase lists and that is drawn only as a sheet of cases MUST have a section with its header and its sheet.** It has no set of versions. Its header's layout clause reads `no set of versions, shown as cases`. The sheet's label stands above the sheet in the band of cases, its layer named `label · ` and its text, and it is never the unit's header.
-- **A thing MUST be given room for what it draws, and "nothing meets" and "inside its section" MUST be judged by what a thing draws as well as by its box.** An open select in a usage draws a popup outside its box, and a shadow reaches past its box. Each of them stays clear of its neighbours and inside its section.
-- **The layers panel MUST read from the top in the page's order, and inside a section in the order of its pieces.** A person who reads the panel reads the page.
-- **A section MUST take the fill that its page's content stood on.** The unit then reads on the ground it was drawn on.
-- **A usage's layer and its caption MUST begin `usage · ` and the unit's name, with no comma straight after the unit.** The unit's name is then read the same way in every usage.
-- **A row label MUST be centred on its row's band.**
+- **Moving a set into a section, or to another page, changes nothing of the unit.** Its key, its versions' keys, its name, its size, its default and its properties stay as they were, and an instance keeps its main component. An agent reads them before the move and after it, and reports both, as it does for a default.
+- **Size stays a property of a unit, and a set keeps a version for each value of the size of the web.** A value that is only a colour, a corner, a height, a padding or a text size is carried by a variable and never by a version. Which other properties of the unit are properties of its set, and which are drawn as cases, is stated below.
 
+- **A unit that the showcase lists and that is drawn only as a sheet of cases has a section with its header and its sheet.** It has no set of versions. Its layout, kept as plugin data, reads `no set of versions, shown as cases`. The sheet's label stands above the sheet in the band of cases, its layer named `label · ` and its text, and it is never the unit's header.
+- **A thing is given room for what it draws, and "nothing meets" and "inside its section" are judged by what a thing draws as well as by its box.** An open select in a usage draws a popup outside its box, and a shadow reaches past its box. Each of them stays clear of its neighbours and inside its section.
+- **The layers panel reads from the top in the page's order, and inside a section in the order of its pieces.** A person who reads the panel reads the page.
+- **A section takes the fill that its page's content stood on.** The unit then reads on the ground it was drawn on.
+- **A usage's layer and its caption begin `usage · ` and the unit's name, with no comma straight after the unit.** The unit's name is then read the same way in every usage.
+- **A row label is centred on its row's band.**
 ### A section of the Core file
 
 The Core file holds no component set, so a section there holds a group of tokens and not a unit. It is named as the group, such as `Control sizes`, and holds these, from the top: the header, an optional label with the rest of the description, and one frame of specimens.
 
 - **The header is named `header · ` and the group's name, and it reads the group's name, ` — `, and one line.** The label that follows holds what the line cannot.
-- **The frame of specimens MUST draw each specimen from the file's variables and text styles, with no value typed in.** A specimen then changes when a variable changes.
-- **A frame of specimens that sets a variable mode MUST be moved whole, and a specimen MUST NOT be taken out of the frame that gives it its mode.** A specimen outside its frame reads in the wrong mode.
+- **The frame of specimens draws each specimen from the file's variables and text styles, with no value typed in.** A specimen then changes when a variable changes.
+- **A frame of specimens that sets a variable mode is moved whole, and a specimen is never taken out of the frame that gives it its mode.** A specimen outside its frame reads in the wrong mode.
+
+The sections of each page of the Core file are these. This is the one place the book lists them, and the showcase points here.
+
+| Page | Its sections, from the top |
+| --- | --- |
+| Colour | Ramps · Roles · Hue · Scrim and focus · Treatment |
+| Type | Font family · Text styles · The text of a control at each size |
+| Scale | Size steps · Control sizes · Scale sizes · The layout's measures · Corner radius · Container look · Stacking order · Opacity · Mark-Shape |
+| Icons | Icons |
+| States | Rest · Hover · Focus · Error · Disabled · Selected |
+
+### The variables of a collection
+
+A collection of the library holds a variable only where the book gives it a value in each mode, and the plugin draws no value that the CONSTRUCT snapshot does not hold.
+
+- **Mode is made before Color, and every value of Color is an alias of a variable of Mode.** A hue's shade then follows the mode of light and dark. The values of Mode are the colours of the roles, in the form `#rrggbbaa`.
+- **Tone, Treatment, Mark-Shape and Frame take their variables from the modes of the collections.** The tables there give each variable a value in each mode, and a value is a role, a shade of Color, no paint, or a number.
+- **Scale is one collection with one mode, `Default`, and a variable for each step of each column of the scale, named by the column and the step, such as `height/SM`.** The columns are the height, the padding, the padding at the sides and above and below, the gap between blocks, the gap between the parts of a control, the radius, the icon and the box, and the page gap is the gap between blocks. A second family of variables holds the icon and the mark of each scale size from `XXS` to `XXL5`, named `scaleSizeIcon/` and `scaleSizeMark/` and the step. A text style of Type holds a line height from the type steps' last column.
+- **Surface, Strength and the four theme collections hold their modes and no variable.** A surface's fill derives from the seed and the ramps by a formula the plugin does not hold, and a theme collection takes the modes the theme lists at the point of use. A designer sets their modes, and the stack's own code gives their values.
 
 ### A set and its layout
 
-- **A set's versions MUST sit in a grid inside the set. No version sits outside the set's box, and no two versions meet.** A version outside its set belongs to no set when a person looks, and two versions that meet hide each other.
-- **A set's header label MUST state which property runs on the rows, which runs on the columns, and in which order the values of each run, and the set MUST be laid out as its label says.** The label is the one place a layout is written, so a script and a person read the same layout. The one thing a label does not decide is the default version, which the next heading decides, and that rule always wins over a label.
-- **A layout MUST be changed by changing the label and the set together.** A set laid out in a new way under an old label, or a label rewritten over an old layout, leaves the two saying different things.
-- **A set whose label states no layout MUST NOT be laid out again by an agent.** An agent that chose a layout for it would be choosing for the designer, and the choice could not be checked against anything. The agent reports the set, so that a label can be written.
+- **A set's versions sit in a grid inside the set. No version sits outside the set's box, and no two versions meet.** A version outside its set belongs to no set when a person looks, and two versions that meet hide each other.
+- **Variations is one or more tables, and the section's plugin data states each one: its row groups, its column groups, and in which order the values of each run. The set is laid out as the plugin data says.** The plugin data is the one place a layout is written, so a script and a person read the same layout. The one thing it does not decide is the default version, which the next rule decides, and that rule always wins over the plugin data.
+- **Inside a table, every row group crosses every column group, and nothing crosses between tables.** A person reads a table as a grid, and a picture outside a crossing would stand where no row and no column names it.
+- **The set's table comes first. Its rows are the sizes, and its columns are groups side by side: the states first, on the other props' defaults, then each other crossed prop in its default state.** A group changes one thing from the default, so groups are never multiplied, and a group never splits, and the set's table never wraps: a table wider than 1,920 makes its section that wide. Every cell of the set's table is a version.
+- **A mode gets a table of its own only where it crosses a column group by a direct alias or by a pair the book states.** `color` crosses `variant`, because `Treatment` draws each variant from `Color`. `surface.color` crosses `surface.strength`, because together they give a card its fill, as the tokens state. A level crosses only the forms the rule on the page level lets it change, and never the size. A cell of a mode table is an instance of the default size with its mode set, and a pair the book does not allow is left empty.
+- **Every other mode, and `raised`, `bordered`, `rounded` and `frames`, stands in one table at the default version, with one row group for each.** A value that no mode draws, such as `CUSTOM` of `color`, is named in its row and not drawn. A mode prop whose default is not its collection's first mode sets that mode on the set, so a placed `DSStepper` draws `PRIMARY` and not the first mode of `Color`.
+- **Each group is titled with its property, a column group above its column labels and a row group above its row labels.** A row label and a column label then name a value and no property, as the form of a label states.
+- **A layout is changed by changing the plugin data and the set together.** A set laid out in a new way under an old layout, or a layout rewritten over an old set, leaves the two saying different things.
+- **A set whose section holds no layout is never laid out again by an agent.** An agent that chose a layout for it would be choosing for the designer, and the choice could not be checked against anything. The agent reports the set, so that a layout can be written.
 
 ### The default version is the stack's default, and the label tells the truth about it
 
-In Figma, the default version of a set is the version at its top left. So the layout of a set decides its default, and moving versions can change the default without anyone seeing it. The default of a unit is what a stack gives it when no prop is passed. A stack states it, the library follows it, and the library does not state a second default of its own.
+In Figma, the default version of a set is the version at its top left. So the layout of a set decides its default, and moving versions can change the default without anyone seeing it.
 
-- **The version at the top left of a set MUST carry the stack's default value of every property.** Then the row and the column that hold the default come first.
-- **The header label of the set MUST name that default.**
-- **Where a label and the stack differ on the default, the stack decides, and the label is corrected first. A label is never followed to a different default.** A default the library holds under a label's word would become the default of every instance placed from it, and no stack builds it. A label states a default as a claim, and a claim is checked against the stack, never the other way.
+The default of a unit is what a stack gives it when no prop is passed. A stack states it, the library follows it, and the library does not state a second default of its own.
 
-These three rules and the layout rules above do not conflict, because they cover two different questions. A set follows its label for which property runs on the rows and which on the columns, and in which order. It does not follow a label for which version comes first: the row and the column that hold the default come first whatever an old label says, and the label is corrected to say so. A set whose label states no layout is not moved, and if its default version is not the stack's, the agent reports it and does not move it.
+- **The version at the top left of a set carries the stack's default value of every property.** Then the row and the column that hold the default come first.
+- **The layout in the section's plugin data names that default.**
+- **Where the layout and the stack differ on the default, the stack decides, and the layout is corrected first. A layout is never followed to a different default.** A default the library holds under a layout's word would become the default of every instance placed from it, and no stack builds it. A layout states a default as a claim, and a claim is checked against the stack, never the other way.
 
-- **Anything that moves versions MUST read the default version of each set it touches before it moves them and after, and report both.** A default that changed is then seen on the day it changes, and not found later in a file that others have built on. The evidence is a layout done from labels that still named a default the stack did not give: seventeen sets were laid out as their labels said, and each one's default moved from the stack's default to another size.
+These three rules and the layout rules above do not conflict, because they cover two different questions. A set follows its layout for which property runs on the rows and which on the columns, and in which order. It does not follow a layout for which version comes first: the row and the column that hold the default come first whatever an old layout says, and the layout is corrected to say so. A set whose section holds no layout is not moved, and if its default version is not the stack's, the agent reports it and does not move it.
+
+- **Anything that moves versions reads the default version of each set it touches before it moves them and after, and reports both.** A default that changed is then seen on the day it changes, and not found later in a file that others have built on. The evidence is a layout done from labels that still named a default the stack did not give: seventeen sets were laid out as their labels said, and each one's default moved from the stack's default to another size.
 
 ### Versions that are added are laid out
 
-- **Whatever adds versions to a set MUST place them in the grid as the label's order gives, and MUST prove that no version is outside the set and no two versions meet.** A copy of a version lands on top of the one it was made from, and a set with stacked or outside versions reads as one case. The connector's facts state that combined versions sit on one another.
-- **Before a property or a value is added to a set, work out how many versions the set will hold after it, and say so.** A property multiplies the versions of a set, and one more property multiplies them again, so the product is not seen until it is worked out. A property that is not the size, a state or the shared `variant` is not added to the set at all, because it is drawn as a case, as "Which property is a variant and which is a case" states.
-- **The default value of a property that is added MUST draw what the set draws now.** The versions that stand are then the look of the default, only the other values are new drawings, and no instance already placed changes.
-- **A set MUST NOT be grown past 1,000 versions.** A set of thousands of versions cannot be laid out or read. One change that added three properties to one unit made 2,040 versions at once, and nobody saw the product until the work had run for 87 minutes.
-- **A property of the web unit that is not the size, a state, the shared `variant`, a look drawn once, a prop of forms of the block itself or a property a named unit keeps crossed is drawn as a case on the unit's sheet, and not as a property of the unit.** The sheet holds one component for each case, so the set stays small, and the case is the unit with its prop values set and is not a unit of its own.
+- **Whatever adds versions to a set places them in the set's table as the layout's order gives, and proves that no version is outside the set and no two versions meet.** A copy of a version lands on top of the one it was made from, and a set with stacked or outside versions reads as one case. The connector's facts state that combined versions sit on one another.
+- **Before a property or a value is added to a set, the agent works out how many versions the set will hold after it, and says so.** A property multiplies the versions of a set, and one more property multiplies them again, so the product is not seen until it is worked out. A property that is not the size, a state or the shared `variant` is not added to the set at all, because it is drawn as a case.
+- **The default value of a property that is added draws what the set draws now.** The versions that stand are then the look of the default, only the other values are new drawings, and no instance already placed changes.
+- **A mode table's cells are instances, never versions.** A mode adds no version, so a mode table costs the set nothing, and an instance keeps its main component when the set is built again.
+- **A set is never grown past 1,000 versions.** A set of thousands of versions cannot be laid out or read. One change that added three properties to one unit made 2,040 versions at once, and nobody saw the product until the work had run for 87 minutes.
+- **A property of the web unit that is not the size, a state, the shared `variant`, a look drawn once, a property that takes a vocabulary of forms of the block itself, or a property that a named unit keeps crossed is drawn as a case, and is never crossed.** A case is a boolean, a text or an instance swap property of the set, which a designer sets on a placed unit, or a look drawn once as a version of its own. Each case stands on the unit's sheet as an instance of the default version with its property set, so the set stays small, and the case is the unit with its prop values set and is not a unit of its own. How a placed unit reaches each prop states the whole of it. The part on variants and cases places each property.
 
 ### A label
 
-A set, a lone component and a sheet each have a header label. A row of a set may have a row label.
+A unit's section has one header and one line of where it lives. Each table of Variations has its groups' titles, a column label for each column and a row label for each row, and a sheet of cases has its label.
 
-- **A label MUST name its unit in a form a script can read: its layer is named `label · ` followed by its text, or `header · ` followed by the unit's name for a header, and the text takes one of the three forms stated below.** The unit's name is the name the book gives it. A script then finds the unit that a label belongs to by reading the label, and not by guessing from where it sits. A label's layer name equals `label · ` and the label's whole text, so a change to the text changes the name in the same call. A row label and a column label name the values their row or column holds, and a script finds the unit by the row or column the label sits beside.
-- **A label MUST sit inside its unit's section, on the unit's own page, and move when the unit moves.** A label left behind when its set moves names nothing near it. A label outside its unit's section, or on a page other than its unit's, is a defect, and an agent that finds one reports it. "A file's pages are the showcase's groups, and a unit is one section" states where in the section each label stands.
+- **A label names its unit in a form a script can read: its layer is named `label · ` followed by its text, `header · ` followed by the unit's name for a header, or `path · ` followed by the unit's name for where it lives, and the text takes one of the forms stated below.** The unit's name is the name the book gives it. A script then finds the unit that a label belongs to by reading the label, and not by guessing from where it sits. A label's layer name equals `label · ` and the label's whole text, so a change to the text changes the name in the same call. A row label and a column label name the values their row or column holds, and a script finds the unit by the row or column the label sits beside.
+- **A label sits inside its unit's section, on the unit's own page, and move when the unit moves.** A label left behind when its set moves names nothing near it. A label outside its unit's section, or on a page other than its unit's, is a defect, and an agent that finds one reports it. The unit's section states where in it each label stands.
 
 ### The form of a label
 
-The layer of a row label and of a column label is named `label · ` followed by the label's text, and the layer of a header is named `header · ` followed by the unit's name, so the name and the text say the same thing about the unit. A label has one of three forms.
+The layer of a row label, a column label and a group's title is named `label · ` followed by its text, and the layer of a header is named `header · ` followed by the unit's name, so the name and the text say the same thing about the unit. A label has one of these forms.
 
 | Label | Its text |
 | --- | --- |
-| Header | the unit's name, then ` — `, then what the unit is in one line, then ` · `, then the layout, with notes if there are any |
-| Row | the values of the row, in the order of the axes, joined by ` · ` |
-| Column | the values of the column, in the order of the axes, joined by ` · ` |
+| Where it lives | the library file, then each level of the page's group, joined by ` > ` |
+| Header | the unit's name; on the line under it, what the unit is in one line; then `behaviour: ` and the names of the properties that change only how the unit behaves, joined by `, `, where the unit has any |
+| A group's title | the property the group runs, such as `size` or `color`, and `states` for the group of the states |
+| Row, column | the one value the row or the column holds |
 
-- **The layout of a header is `rows: <axis>` and `columns: <axis>`, in either order, joined by ` · `.** An axis that is left out is one row or one column, and `one row` and `one column` say it in words. Where the unit is one component with no grid it reads `one component`. Where the unit has no set of versions and is shown only as a sheet of cases, it reads `no set of versions, shown as cases`. A note may stand before or after the layout, each after ` · `, and after `one component` it may follow a comma. A script finds the layout by its words and reads no note, except the one clause that names behaviour. That clause is a note of its own, `behaviour: ` followed by the names of the properties, joined by `, `, such as `behaviour: collapsible, sticky`. It names each property of the unit that changes only how the unit behaves, as "What a library file owes of a unit" states, and a unit with no such property has no clause.
-- **An axis is a list of cells in the order they run from the top left, joined by `, `.** A cell is `<property>=<value>`, or only `<value>` when its property is the property of the cell before it. Two properties that multiply, the outer one first, are joined by ` x `, so `variant=SOLID (default), SUBTLE x size=SM (default), XS` gives every size under each variant.
-- **A cell names a value in whole, or by the part of it before its first `: `.** For the value `address: the row goes to an address` the cell is `case=address (default)`. A value that is long, or that holds `: `, is then written short, and a script reads both forms.
-- **A grid whose rows hold different cases is written with one cell for each row, and its columns read `the other cases of that kind`.** `DSFormats` stands for five formatters, one in each row, and a row's cells are that formatter's own cases, so no one property runs across the columns. Its rows axis names what each row holds, such as `case=currency USD (default), date US_STANDARD`, and a note after the layout may say what the set stands for.
-- **The default is marked ` (default)`, written once after the one value of each property that the stack's default version carries.** That value comes first in its list, because the version at the top left carries the default.
-- **A row label and a column label name values and no property.** The header names the property, and the label is read against it. `SOLID (default) · SM (default)` is the row of the default variant at the default size.
+- **A row label and a column label name a value and no property.** The group's title names the property, and the label is read against it. `SOLID` under the title `variant` is the column of the variant `SOLID`.
+- **The default is marked ` (default)`, written once after the value that the stack's default version carries.** That value comes first in its group, because the version at the top left carries the default.
+- **A label names a value in whole, or by the part of it before its first `: `.** For the value `address: the row goes to an address` the label is `address (default)`. A value that is long, or that holds `: `, is then written short, and a script reads both forms.
+- **A table whose rows hold different cases names each row by the case it holds, and its column group reads `the other cases of that kind`.** `DSFormats` stands for five formatters, one in each row, and a row's cells are that formatter's own cases.
+- **The `behaviour: ` note is the one note a script reads on the canvas.** It names each property of the unit that changes only how the unit behaves, as what a library file owes of a unit states, so a script tells a property of behaviour from a property that nothing draws.
 
-Two headers follow, written in this form: the one for `DSDataUnit` and the one for `DSList.Item`. Each set crosses its size with its states and nothing else, as "Which property is a variant and which is a case" states.
+### The layout, kept as plugin data
 
-```text
-header · DSDataUnit — a label and its value · rows: size=SM (default), XS, MD, LG, XL · columns: state=filled (default), empty
-header · DSList.Item — one row of a list · rows: size=SM (default), XS, MD, LG, XL · columns: state=rest (default), hover, disabled=true · divided is off
+The section of a unit holds its layout as shared plugin data, in the namespace `saasplane` under the key `layout`, as one JSON object. Figma shows it to no one, and the plugin, the tool and the connector read it. The layout is system information: a person reads the tables, and a script reads the plugin data that lays them out.
+
+| Field | What it holds |
+| --- | --- |
+| `shape` | `set`, `one component`, or `no set of versions, shown as cases` |
+| `tables` | each table of Variations, in order: its `caption`, its `rowGroups` and its `columnGroups`, each group a `prop` and its `values` in the order they run, the default first |
+| `default` | the stack's default value of each property of the set, which the version at the top left carries |
+| `cases` | each case: the property, the value it shows, and how a placed unit reaches it, `boolean`, `text`, `swap` or `once` |
+| `behaviour` | the names of the properties that change only how the unit behaves |
+
+- **A script reads the layout from the plugin data and never from a label's text.** A label's text is written for a person and may be worded for one, so a layout read from it would break the day the wording changes.
+- **The plugin writes the plugin data each time it builds a section, and an agent that changes a set by hand writes it in the same call.** A layout and a set that are changed apart say different things, as a set and its layout states.
+
+The layout of `DSButton`, whose set crosses its size with its states and its variants, and whose colours cross its variants in a table of their own:
+
+```json
+{ "shape": "set",
+  "tables": [ { "caption": "the set",
+                "rowGroups": [ { "prop": "size", "values": ["SM", "XS", "MD", "LG", "XL"] } ],
+                "columnGroups": [ { "prop": "state", "values": ["rest", "focus", "disabled"] },
+                                  { "prop": "variant", "values": ["SOLID", "QUIET", "SUBTLE", "SUBTLE_OUTLINE", "GHOST", "LINK"] } ] },
+              { "caption": "color × variant",
+                "rowGroups": [ { "prop": "color", "values": ["DEFAULT", "PRIMARY", "INFO", "SUCCESS", "WARNING", "ERROR"] } ],
+                "columnGroups": [ { "prop": "variant", "values": ["OUTLINE", "SOLID", "QUIET", "SUBTLE", "SUBTLE_OUTLINE", "GHOST", "LINK"] } ] } ],
+  "default": { "size": "SM", "state": "rest", "variant": "OUTLINE", "color": "DEFAULT" },
+  "cases": [ { "prop": "loading", "value": "true", "reached": "boolean" },
+             { "prop": "count", "value": "shown", "reached": "boolean" },
+             { "prop": "authzDenied", "value": "DISABLE", "reached": "once" },
+             { "prop": "label", "value": "Label", "reached": "text" },
+             { "prop": "startIcon", "value": "an icon", "reached": "swap" },
+             { "prop": "endIcon", "value": "an icon", "reached": "swap" } ],
+  "behaviour": [] }
 ```
+
+The set's first column group, the states, holds the default column, so the variants' group lists the other variants and not `OUTLINE`.
 
 ### A sheet of cases, and a case
 
-- **A sheet of cases MUST sit in its unit's section, in the band of cases under the unit's usage, and its name MUST be the unit's name followed by `cases`, such as `DSInput cases`.** The section then shows the unit and its cases in one place, and a script finds the sheet from the unit's name.
-- **A case MUST be the unit with its prop values set, placed as instances of the unit, and never drawn as a new look.** A case drawn as a new look would be a second look for the same unit. A case is named for what it shows, under one property named `case`, because Figma names the property `Property 1` when the components it combines are not named `property=value`. A case's name holds no comma, and the connector's facts state why.
-- **A case is not a unit and is never published as one.** A case is one drawing of a unit with some of its property values set, and it is named by the values it shows, as cells `property=value` joined by `, `. A name is unique on its sheet, and no cell holds a second `=` or a comma. A comparison never counts a case as a unit. A case MUST NOT take, in the file, a form that publishes it as a component of the library. A published case would appear among the units a stack imports, so a stack would be offered units the book never named, one for each case of each sheet.
+- **A sheet of cases sits in its unit's section, in the band of cases under the unit's usage, and its name is the unit's name followed by `cases`, such as `DSInput cases`.** The section then shows the unit and its cases in one place, and a script finds the sheet from the unit's name.
+- **A case is the unit with its prop values set, placed as instances of the unit, and never drawn as a new look.** A case drawn as a new look would be a second look for the same unit. A case is named for what it shows, under one property named `case`, because Figma names the property `Property 1` when the components it combines are not named `property=value`. A case's name holds no comma, and the connector's facts state why.
+- **A case is not a unit and is never published as one.** A case is one drawing of a unit with some of its property values set, and it is named by the values it shows, as cells `property=value` joined by `, `. A name is unique on its sheet, and no cell holds a second `=` or a comma. A comparison never counts a case as a unit. A case never takes, in the file, a form that publishes it as a component of the library. A published case would appear among the units a stack imports, so a stack would be offered units the book never named, one for each case of each sheet.
 
-How the library keeps to the last rule is stated as far as the book can state it today. The form a case takes in the file must not publish it as a component of the library. The files that hold cases are brought to this by their own change, and until that change lands a case that is still a component is a recorded difference from this rule, never a form to copy.
+How the library keeps to the last rule is stated here as far as the book can state it today. The form a case takes in the file must not publish it as a component of the library. The files that hold cases are brought to this by their own change, and until that change lands a case that is still a component is a recorded difference from this rule, never a form to copy.
 
 ### A usage
 
-- **A usage is a node in the section of the unit it shows, in the band of Usage, and its name is `usage · ` followed by what it shows.** It is an instance, a frame of instances, or the text that captions one. It shows a unit in a use that the grid of its set cannot hold, such as a select open, a pair of arrows both on, or a dialog over its backdrop.
+- **A usage is a node in the section of the unit it shows, in the band of Usage, and its name is `usage · ` followed by what it shows.** It is an instance, a frame of instances, or the text that captions one. It shows a unit in a use that the grid of its set cannot hold, such as a select open, a pair of arrows both on, or a dialog over its backdrop. A usage the column states in words that place no instance, such as a select open in a form, shows those words in its cell, and the plugin's run names it a cut until the unit's look can compose it.
 - **A usage is not a unit and is not a stray.** It is no component, holds no version and is never published. It belongs to the unit it shows, so the scan before a publish does not list it as a stray. Like every other thing in a section it sits clear of the things beside it, at the distance the section states.
 
 ### What a library file owes of a unit
 
-A showcase is the running catalogue that a stack proves its realization with, and a showcase is proven against the library. A unit's set, its cases and its usage are read from its column, *The library draws*, in the components chapter: the usage is the unit's primary use, named by the units it stands with, and the plugin composes it from instances; the cases are what the column draws once, its modes, its texts and its swaps. Nothing of a unit's section is taken from the showcase, which may show more (`RULE.SUPPORT.SURFACE.026` · MUST · skill:spn-surface/design). A property that a unit has, and that nothing on its page draws, leaves nothing to prove a stack against. So the page draws what a person sees of each unit.
+A showcase is the running catalogue that a stack proves its realization with (the showcase chapter), and a showcase is proven against the library. A unit's set, its cases and its usage are read from its column, *The library draws*, in the components chapter: the usage is the unit's primary use, named by the units it stands with, and the plugin composes it from instances; Variations is the set's table and its mode tables, read from the column's bold part; the cases are what the column draws once, its booleans, its texts and its swaps. Nothing of a unit's section is taken from the showcase, which may show more (RULE.SUPPORT.SURFACE.026). A property that a unit has, and that nothing on its page draws, leaves nothing to prove the showcase against. A person who opens the file cannot see what the web supports, and a stack cannot show that it built it. So the page draws what a person sees of each unit (`RULE.SUPPORT.SURFACE.036` · MUST · skill:spn-surface/design).
 
-- **A top-level unit MUST have a usage of its primary use.** A top-level unit is a unit the book lists, in a group table or in one line under its own heading, and its column names its usage. A part owes no usage, because it serves another unit and the usage of that unit shows it. The usage stands in the band of Usage and takes the name that "A usage" states.
-- **A property that changes what is visibly there MUST be drawn.** An icon, a heading, a footer, a clear button and an open menu are such properties. "Which property is a variant and which is a case" places each of them. A version of the set draws a property only where the property is the size, a state, the shared `variant` or a look drawn once, and a case named `<property>=<value>` on the version where the property draws it in every other kind. A property whose default is on is drawn by its off case. A property that draws only on one version is drawn by a case on that version, and not by a case on the default.
-- **The test is what a person can see, at rest or in any state the unit can be in, and a state a unit can be in MUST be drawn.** A state is a visible change: open (a select's popup, a menu, a dialog), hover, focus, pressed, selected, checked, filled, invalid with its message, disabled, loading and empty. The library chapter already requires a drawing for every state that changes what a person sees, and makes the state a property of the set, `state=…`, with a shown state drawn as a picture and no prop. This rule includes both and restates neither.
-- **A property of behaviour changes nothing a person can see in any state, so it has nothing to draw, and the unit's header MUST name it.** It decides when or how something happens, and not what is there. A late-loading image (`lazy`), a callback, the delay before a tooltip shows, whether a menu closes when an item is chosen, the step of a number, the limit on a value and the `name` of a field are such properties. The header names each one in the clause `behaviour: ` that "The form of a label" states, so a script tells a property of behaviour from a property that nothing draws.
-- **A property that lets a unit reach a state is drawn by that state.** `collapsible` lets a panel be shut, and the shut panel is a state, so it is drawn. `sticky` holds a header in place while a page scrolls, and a case draws one scroll place, as "A unit with no look of its own" states for a still picture of behaviour. A property is named in the `behaviour:` clause only when no state it leads to looks different.
+- **A top-level unit has a usage of its primary use.** A top-level unit is a unit the book lists, in a group table or in one line under its own heading, and its column names its usage. A part owes no usage, because it serves another unit and the usage of that unit shows it. The usage stands in the band of Usage and takes the name that a usage states.
+- **A property that changes what is visibly there is drawn.** An icon, a heading, a footer, a clear button and an open menu are such properties. The part on variants and cases places each of them. A version of the set draws a property only where the property is the size, a state, the shared `variant` or a look drawn once, and a case named `<property>=<value>` on the version where the property draws it in every other kind. A property whose default is on is drawn by its off case. A property that draws only on one version is drawn by a case on that version, and not by a case on the default.
+- **The test is what a person can see, at rest or in any state the unit can be in, and a state a unit can be in is drawn.** A state is a visible change: open (a select's popup, a menu, a dialog), hover, focus, pressed, selected, checked, filled, invalid with its message, disabled, loading and empty. The library chapter already requires a drawing for every state that changes what a person sees, and it makes the state a property of the set, `state=…`, with a shown state drawn as a picture and no prop. This rule includes both and restates neither.
+- **A property of behaviour changes nothing a person can see in any state, so it has nothing to draw, and the unit's header names it.** It decides when or how something happens, and not what is there. A late-loading image (`lazy`), a callback, the delay before a tooltip shows, whether a menu closes when an item is chosen, the step of a number, the limit on a value and the `name` of a field are such properties. The header names each one in the clause `behaviour: ` that the form of a label states, so a script tells a property of behaviour from a property that nothing draws.
+- **A property that lets a unit reach a state is drawn by that state.** `collapsible` lets a panel be shut, and the shut panel is a state, so it is drawn. `validationType` lets an entry control reach Error: it has one value, `ERROR`, and unset draws no error, so Error is a column of the control's states, the property is not crossed, and the default version draws no error. `sticky` holds a header in place while a page scrolls, and a case draws one scroll place, as a unit with no look of its own states for a still picture of behaviour. A property is named in the `behaviour:` clause only when no state it leads to looks different.
 - **Example, `DSSelect`.** `open` is drawn, because the popup is there to see. `disabled` is drawn, and so is a start icon. Whether the popup closes when a choice is made is behaviour, and the header names it.
-- **A property whose value is a token MUST be shown as a mode, by one case with the mode set on the instance.** A hue, light or dark, a border, a radius and a shadow are such properties. A variable carries each of their values, so a version for each value would draw the same unit again and again. Size and the scale size are the properties of this kind that stay versions, as the rule on size states, and the page level is a mode, as "Which property is a variant and which is a case" states.
-- **A unit that the library draws as cases alone, having no look of its own, MUST say why in the label of its sheet.** A person who reads the sheet then learns that the unit has no set because the unit has no look, and not because a set is missing.
-- **The duty MUST run one way: a showcase may show more than the library, and a library MUST NOT lack a case its column names.** A library that lacks one is at fault, and the showcase is not.
+- **A property whose value is a token is shown as a mode, by a row group of Variations whose cells are instances with the mode set.** A hue, light or dark, a border, a radius and a shadow are such properties. A variable carries each of their values, so a version for each value would draw the same unit again and again. Size and the scale size are the properties of this kind that stay versions, as the rule on size states, and the page level is a mode, as the next part states.
+- **A unit that the library draws as cases alone, having no look of its own, says why in the label of its sheet.** A person who reads the sheet then learns that the unit has no set because the unit has no look, and not because a set is missing.
+- **The duty runs one way: a showcase may show more than the library, and a library never lacks a case its column names.** The showcase chapter lets a showcase hold more than the library holds. A library that lacks one is at fault, and the showcase is not.
 
 ### Which property is a variant and which is a case
 
-A set holds one version for each pair of values that its writer crossed, so each property that is crossed multiplies the set. `DSInput` crossed eight properties and held 850 versions, and a person who opens it cannot find the version they want. A case costs one component for one property, whether the set is crossed or not. So this part states which properties a set crosses and which are drawn as cases, and it takes the answer from the unit's column, *The library draws*, which the book keeps by the rules below (`RULE.SUPPORT.SURFACE.038` · MUST · skill:spn-surface/design). The showcase names its section of choices a caller makes with a prop Cases, and the library's sheet of cases carries the same word (`RULE.SUPPORT.SURFACE.039` · MUST · skill:spn-surface/design).
+A set holds one version for each pair of values that its writer crossed, so each property that is crossed multiplies the set. `DSInput` crossed eight properties and held 850 versions, and a person who opens it cannot find the version they want. A case costs one component for one property, whether the set is crossed or not. So this part states which properties a set crosses and which are drawn as cases, and it takes the answer from the unit's column, The library draws, which the book keeps by the rules below (`RULE.SUPPORT.SURFACE.038` · MUST · skill:spn-surface/design). The showcase names its section of choices a caller makes with a prop Cases, and the library's sheet of cases carries the same word (RULE.SUPPORT.SURFACE.039).
 
-- **The library MUST follow the unit's column.** Each property is drawn as the column says: crossed, once, as a mode, as a text or a swap, or not at all, and the table below says what each part of the column is in Figma. A stack is proven against the library, and its showcase may show more.
-- **A set MUST cross its size, its states and the shared `variant`, and it MAY cross two more kinds of property, which are stated below. It MUST NOT cross any other property.** A designer who picks a unit picks a size, a state and a look, and every pair of them is a picture that someone will place. So the set crosses the shared `variant` with the size and the states. A property that a designer does not pick together with these only multiplies the versions that hold nothing new.
-- **`disabled` MUST stay a property of its own and MUST NOT be a value of `state`.** A caller sets `disabled`, and a person or the system puts the unit in a state.
-- **Each prop the column draws once, each mode, each text and each swap MUST be one case on the unit's sheet of cases.** A case is one picture a person can find.
-- **Colors MUST be a mode, shown by one case.** The case sets the mode on the instance, and the instance shows every variant.
-- **A vocabulary whose every value names one set of tokens MUST be a mode, and the page level is one: the collection Level, whose modes are the six values of `DSPageLevelType`** (`RULE.SUPPORT.SURFACE.296` · MUST · skill:spn-surface/design). A designer sets a frame's level once, and every unit inside takes that level's sizes, its items one level down, so a level costs no version. A form that a level changes MUST stay a crossed vocabulary, and a set MUST draw only the pairs the book allows: the type of a feature, the size of a button, the level a feature gives its items and the corner of a mark.
-- **A set MAY cross a prop that takes a vocabulary whose values are forms of the block itself.** `type` of `DSTimePicker`, `attached` of `DSToggleGroup` and `sort` of a table's header cell are such props, and the library carries each under the same name and the same values as the web.
-- **A set MAY cross a property that a named unit keeps crossed, and the book names that property for the unit, with its reason.** The reason is always that the values combine into forms a person must see together. The property is crossed for its own unit only; on any other unit it is a case. "A property a named unit keeps crossed" lists them.
-- **A look that no property can produce MUST be a version drawn once, crossed with nothing, and its case MUST be an instance of that version.** `type` of `DSSkeleton` has six values and each is a look that no other property can draw, so the set holds six versions and a version for each pair with the size would draw the same look again.
-- **A pair of values that the web cannot be in MUST be left out, and a pair MUST keep a version only where it draws something that neither value draws alone.** A disabled row of a list is not under the pointer, so `DSList.Item` has no hover version for it. A checked radio that is disabled shows a mark in the disabled look, so `DSRadio` keeps that pair.
-- **Usage MUST stay the usage, and Props MUST draw nothing.**
-- **An agent MUST place each property in the unit's column by the rules of this part, read from the stack's source, never from the property's name**, and the column then decides the set. A first list that sorted the properties of 93 sets by name alone left 32 names that only a reading of the source could place.
+- **The library follows the unit's column.** Each property is drawn as the column says: crossed, once, as a mode, as a text or a swap, or not at all, and the table below says what each part of the column is in Figma. A stack is proven against the library, and its showcase may show more.
+- **A set crosses its size, its states and the shared `variant`, and it can cross two more kinds of property, which are stated below. It never crosses any other property.** A designer who picks a unit picks a size, a state and a look, and every pair of them is a picture that someone will place. So the set crosses the shared `variant` with the size and the states. A property that a designer does not pick together with these only multiplies the versions that hold nothing new.
+- **A set can cross a prop that takes a vocabulary whose values are forms of the block itself.** The values of such a prop are the block in different forms, and a person picks the form first, as they pick a look. `type` of `DSTimePicker` takes the twelve-hour and the twenty-four-hour clock, `attached` of `DSToggleGroup` takes whether the buttons touch, and `sort` of a table's header cell takes the sort it shows. Each of these is a vocabulary that the names chapter states with its values, and the library carries it under the same name and the same values as the web.
+- **A set can cross a property that a named unit keeps crossed, and the book names that property for the unit, with its reason.** The reason is always that the values of the property combine into forms that a person must see together. A property is crossed for its own unit only, so the same property on another unit is a case until the book names it for that unit as well. The part below lists them.
+- **`disabled` stays a property of its own and is never a value of `state`.** A caller sets `disabled`, and a person or the system puts the unit in a state. The two are named apart in the names chapter, and a disabled unit is drawn for the values it can be in. In the CONSTRUCT snapshot `disabled` is one of the set's `states`, after `rest`, when the column names it as a shared state, and the plugin draws that version from the list and sets no prop. The prop `disabled` itself stays the stack's.
+- **Each prop the column draws once, each boolean, each text and each swap is one case on the unit's sheet of cases, and each mode is a row group of Variations.** A case is one picture a person can find, and a mode's rows show every mode at once.
+- **Focus and disabled become a mode of the state once Lab shows that the ring and the opacity bind to variables.** Until then they stay columns of the states group, drawn as versions.
+- **Colors are a mode, shown as a row group of Variations.** Each row is one mode of `Color`. Where `Treatment` draws the variants from `Color`, the colours cross the variants in a table of their own, as the showcase's Colors tabs show every variant in each colour; elsewhere they stand at the default version. A unit whose colour defaults to a mode other than the first, such as `PRIMARY`, sets that mode on its set, and `CUSTOM`, a value that no mode draws, is named in its row and not drawn. A version for each hue would multiply every picture of the unit, as color is a mode states.
+- **A vocabulary whose every value names one set of tokens is a mode, and the page level is one: the collection Level, whose modes are the six values of `DSPageLevelType`** (`RULE.SUPPORT.SURFACE.296` · MUST · skill:spn-surface/design). A designer sets a frame's level once, and every unit inside takes that level's sizes, its items one level down, so a level costs no version. A form that a level changes stays a crossed vocabulary, and a set draws only the pairs the book allows: the type of a feature, the size of a button, the level a feature gives its items and the corner of a mark. The item line's picture is no such form: Level holds its box for a title alone and for a title with lines under it, and the set binds the box its content matches, so nothing is crossed for it. `size` and `scaleSize` stay versions, as the rule on size states.
+- **A look that no property can produce is a version drawn once, crossed with nothing, and its case is an instance of that version.** `type` of `DSSkeleton` has six values and each is a look that no other property can draw. So the set holds six versions, one for each value, and a version for each pair with the size would draw the same look again.
+- **A pair of values that the web cannot be in is left out, and a pair keeps a version only where it draws something that neither value draws alone.** A disabled row of a list is not under the pointer, so `DSList.Item` has no hover version for it. A checked radio that is disabled shows a mark in the disabled look, which a checked radio and a disabled radio do not show alone, so `DSRadio` keeps that pair.
+- **Usage stays the usage, and Props draws nothing.** The Usage band shows the one use that an app would really have, as what a library file owes of a unit states. The props table lists what the unit takes, and everything in it is drawn by one of the sections above, so the section adds no picture of its own.
+- **An agent places each property in the unit's column by the rules of this part, read from the stack's source, never from the property's name**, and the column then decides the set. A name does not say which section shows a property: a first list that sorted the properties of 93 sets by name alone left 32 names that only a reading of the source could place.
 
 | Part of the column | In Figma | Versions it adds |
 | --- | --- | --- |
-| crossed | versions of the set | a product |
+| crossed | versions of the set's table | a product |
 | once | one version each | one per value |
-| colour | a mode of Color | none |
-| light and dark | a mode of Mode | none |
-| page level | a mode of Level | none |
-| text, swap | a text or swap property | none |
+| colour | a mode of Color, a row group of Variations | none |
+| light and dark | a mode of Mode, one case | none |
+| page level | a mode of Level, a row group of Variations | none |
+| a flag that shows or hides a part, or content that is there or not | a boolean property | none |
+| text, swap | a text or instance swap property | none |
 | usage | the Usage band, composed from instances | none |
 
-The column places a property, and a short list of questions then decides only how its case is carried. A question is asked of a property that is drawn as a case, in this order, and the first yes decides.
+A property is not placed by a list of questions. The column places it, and a short list of questions then decides only how its case is carried. A question is asked of a property that is drawn as a case, in this order, and the first yes decides.
 
 | Question | The case is carried by | Example |
 | --- | --- | --- |
-| Is its value a token, such as a hue, light or dark, a border, a radius or a shadow? | a mode on the instance | `Color=WARNING` of `DSBadge`, and `Mode=DARK` of `DSCodeBlockView` |
-| Does it show or hide one part? | a yes-or-no property | `withClose=true` of `DSBadge` |
-| Is it words, a number that is shown, a picture or a nested node? | a text property, or a swap of the node | `title=AL` of `DSAvatar`, and `startIcon=BELL` of `DSBadge` |
+| Is its value a token, such as a hue, light or dark, a border, a radius or a shadow? | a mode on the instance, in a row of Variations | `Color=WARNING` of `DSBadge`, and `Mode=DARK` of `DSCodeBlockView` |
+| Does it show or hide one part? | a boolean property of the set | `withClose=true` of `DSBadge` |
+| Is it words, a number that is shown, a picture or a nested node? | a text property, or an instance swap property | `title=AL` of `DSAvatar`, and `startIcon=BELL` of `DSBadge` |
 | Is it a free number? | the property on the instance, set to one value | `maxHeight=160` of `DSCodeBlockView` |
 
-A property that changes nothing a person can see in any state is drawn by no case, and the unit's header names it in the clause `behaviour: `.
+A property that changes nothing a person can see in any state is drawn by no case, and the unit's header names it in the clause `behaviour: `, as what a library file owes of a unit states.
 
 #### A property a named unit keeps crossed
 
-No unit keeps such a property today. A part's `flush` and a frame's `frames` are modes, and the forms a person picks first are crossed by the rule on a vocabulary of forms, so neither is an exception. A property that a unit needs crossed for another reason joins this part first, as a row of a table that names the unit, the property and the reason.
+No unit keeps such a property today. A part's `flush` and a frame's `frames` are modes, and the forms a person picks first are crossed by the rule on a vocabulary of forms, so neither is an exception. A property that a unit needs crossed for another reason joins this part first, as a row of a table that names the unit, the property and the reason, and the page scan then counts it as an exception and not as a finding (RULE.SUPPORT.SURFACE.038).
+
+### How a placed unit reaches each prop
+
+A designer who places a unit on a page sets its props on the instance, and every prop the column draws is reached there at no cost in versions. The surface agent reads this part when it lays out a page.
+
+| The column draws it | On a placed unit |
+| --- | --- |
+| crossed | the property of the same name, for the versions the set draws |
+| a mode | the mode of its collection, set on the instance or on its frame |
+| a text | a text property of the set |
+| a swap | an instance swap property of the set |
+| once, a flag that shows or hides a part | a boolean property of the set, such as `loading` or `clearable` |
+| once, content that is there or not | a boolean property for whether it is there, such as `count` |
+| once, a choice whose values are sets of tokens | a mode |
+| once, any other look | the version drawn once, named as not combined |
+| nothing | nothing: the header's `behaviour:` note names it |
+
+- **Each component property is tied to the layer it changes.** A boolean shows or hides its layer, a text property fills its text layer, and a swap property swaps its instance, so a placed unit changes only what the property names.
+- **A pair the set draws no version for is reached by a property or a mode, or named.** `DSStepper`'s `type` with its task state is such a pair. An agent that cannot reach a pair refuses to draw it and names it, and never draws a new look for it.
 
 ### A unit with no look of its own
 
-- **A unit with no look of its own MUST be shown on a sheet that is composed from library units, and the sheet's label MUST say that the unit is not drawn.** A unit that places or watches another unit draws nothing, so a drawing of it would be a look the web does not have. The sheet shows what a person sees when the unit is used, and the label says what the unit is.
+- **A unit with no look of its own is shown on a sheet that is composed from library units, and the sheet's label says that the unit is not drawn.** A unit that places or watches another unit draws nothing, so a drawing of it would be a look the web does not have. The sheet shows what a person sees when the unit is used, and the label says what the unit is.
 
 ### A unit that cannot hold the web's case
 
-- **When a unit cannot hold a case of the web, the case MUST show what the unit can hold, the sheet's label MUST say what is cut, and the cut MUST be recorded as a difference between the unit and the web, to be closed in the unit.** A sheet that shows less than the web without saying so reads as the whole case. The difference is closed by changing the unit, so that the sheet can later show the whole case. It is never closed by redrawing the case.
+- **When a unit cannot hold a case of the web, the case shows what the unit can hold, the sheet's label says what is cut, and the cut is recorded as a difference between the unit and the web, to be closed in the unit.** A sheet that shows less than the web without saying so reads as the whole case. The difference is closed by changing the unit, so that the sheet can later show the whole case. It is never closed by redrawing the case.
 
 ### A new set, sheet or page takes the form of its neighbours
 
-- **A new set, sheet or page MUST take the form of its neighbours: the ground of a set, a label, a place clear of every other node, and the background of its page.** The ground of a set is its fill and its stroke, bound to the same variables the neighbouring sets bind. A new unit is made in a section of its own, named as the unit, and the section stands at the end of its group's page, 240 below the last section, in the place the showcase's order gives it. A new page has the editor's own background and not the library's. A new set with no ground shows dark text on a dark page, and a page with another background makes the same unit look different from its neighbours.
+- **A new set, sheet or page takes the form of its neighbours: the ground of a set, a label, a place clear of every other node, and the background of its page.** The ground of a set is its fill and its stroke, bound to the same variables the neighbouring sets bind. A set with no neighbour, such as the first set of a new file, takes the fill `surface` and the stroke `surface-border`, the ground of the content it stands for. A new unit is made in a section of its own, named as the unit, and the section stands at the end of its group's page, 240 below the last section, in the place the showcase's order gives it. A new page has the editor's own background and not the library's. A new set with no ground shows dark text on a dark page, and a page with another background makes the same unit look different from its neighbours.
 
 ## How an agent changes a library file through the connector
 
-The rules under "Before a connector writes" and "How the connector's work is carried out" state what the agent says before it writes, the named version a person saves first, and how the connector's work is carried out. The rules below add to them and repeat none of them.
+The management page states what the agent says before it writes, the named version a person saves first, and how the connector's work is carried out. The rules below add to it (`RULE.SUPPORT.SURFACE.031` · MUST · skill:spn-surface/design).
+
+**The agent never hands the developer a Figma step to draw, rebind, delete or tick** (`RULE.SUPPORT.SURFACE.400` · MUST · skill:spn-surface/design). The developer's part is to publish and to run the plugin, and the agent fixes the rest, because a step handed back costs the time the connector was there to save.
 
 ### Before the change
 
-- **An order MUST be checked against the live file before it runs.** An order that was written from a reading MUST name the time of that reading. Before a change, the agent reads the live file for what the order assumes: that each unit exists, that it is a set or a lone component, and what its properties are. It corrects the order and says what it corrected. A file changes between a reading and a change, and an order written from the older reading names counts that are wrong and units that are not there.
-- **An order MUST name the web's file and line for each thing it makes, and where the order and the web differ, the agent takes the web and says so in its report.** The library follows the web, and an order written from memory can name a trigger or a count the web does not have.
+- **An order is checked against the live file before it runs.** An order that was written from a reading names the time of that reading. Before a change, the agent reads the live file for what the order assumes: that each unit exists, that it is a set or a lone component, and what its properties are. It corrects the order and says what it corrected. A file changes between a reading and a change, and an order written from the older reading names counts that are wrong and units that are not there.
+- **An order names the web's file and line for each thing it makes, and where the order and the web differ, the agent takes the web and says so in its report.** The library follows the web, and an order written from memory can name a trigger or a count the web does not have.
 
 ### During the change
 
-- **A script that changes a file MUST change only the nodes it names.** It is given the nodes it may touch. Before it moves anything it checks that the change leaves no version outside its set, no two versions meeting and no two top-level nodes meeting, and if the change would, it moves nothing. A change outside the named nodes is a defect and is reported, never kept quiet, because a node moved outside the order is a change nobody approved and nobody will look for.
+- **A script that changes a file changes only the nodes it names.** It is given the nodes it may touch. Before it moves anything it checks that the change leaves no version outside its set, no two versions meeting and no two top-level nodes meeting, and if the change would, it moves nothing. A change outside the named nodes is a defect and is reported, never kept quiet, because a node moved outside the order is a change nobody approved and nobody will look for.
 
 ### What the agent reads and keeps
 
-- **An inventory MUST hold, for each page: its id, name and background.** For each set and each lone component it holds the id, the box, the properties with their values, the count of versions, the default version and the ground. For each sheet it holds the id, the box and the cases. For each label it holds the id, the full text, the box and the unit it names. It holds every other top-level node too, and the time it was read. A label's text is in it because without the text the next agent reads the file again to learn what a label says, and the inventory is read once to avoid that. The rule that an inventory is read once and handed on is stated above; this rule states what it holds for the agent's own work. "The inventory" states what the same inventory holds for the snapshot, so no fact is stated twice.
-- **A picture that is taken MUST be looked at, and the report MUST say which pictures were looked at and what each one showed.** A picture that nobody looked at proves nothing, and the cost of taking it is paid for nothing.
+- **An inventory holds, for each page: its id, name and background.** For each set and each lone component it holds the id, the box, the properties with their values, the count of versions, the default version and the ground. For each sheet it holds the id, the box and the cases. For each label it holds the id, the full text, the box and the unit it names, and for each section the layout its plugin data holds. It holds every other top-level node too, and the time it was read. A label's text is in it because without the text the next agent reads the file again to learn what a label says, and the inventory is read once to avoid that. The management page states that an inventory is read once and handed on. This rule states what it holds for the agent's own work. It is the one inventory of the file, and the reading page states what the same inventory holds for the snapshot, so no fact is stated twice.
+- **A picture that is taken is looked at, and the report says which pictures were looked at and what each one showed.** A picture that nobody looked at proves nothing, and the cost of taking it is paid for nothing.
 
 ### Before a publish
 
-- **Before the agent says that a file may be published, it MUST scan the whole file and report each of these:** versions outside a set; pairs of versions that meet; top-level nodes that meet; a top-level node that is no unit's section; things inside a section that meet; strays, which are nodes that belong to no unit, no sheet and no usage; a property left with the editor's default name; a set whose properties cannot be read; labels outside their unit's section or on a page other than their unit's; a direct child of a section that lies outside its section; a top-level unit with no usage; a property that nothing draws and that the header does not name as behaviour; and each set whose default version is not the one its label names. A person publishes after the agent's word, and a file that is published with one of these shows it to every stack that reads the library.
+- **Before the agent says that a file may be published, it scans the whole file and reports each of these:** versions outside a set; pairs of versions that meet; top-level nodes that meet; a top-level node that is no unit's section; things inside a section that meet; strays, which are nodes that belong to no unit, no sheet and no usage; a property left with the editor's default name; a set whose properties cannot be read; labels outside their unit's section or on a page other than their unit's; a direct child of a section that lies outside its section; a top-level unit with no usage; a property that nothing draws and that the header does not name as behaviour; and each set whose default version is not the one its label names. A person publishes after the agent's word, and a file that is published with one of these shows it to every stack that reads the library.
+
+---
+
+<!-- book-nav -->
+📖 ← reading · ↑ delivery library · showcase →
 
 ## Drawing a block
 

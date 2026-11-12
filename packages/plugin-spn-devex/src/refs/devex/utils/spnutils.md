@@ -7,17 +7,17 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
-      "seen": "c5d64d24"
+      "seen": "799e85f1"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
       "section": "`infra` — the estate",
-      "seen": "b50811a1"
+      "seen": "b974b050"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
       "section": "The machine's own layout",
-      "seen": "d1a23ca7"
+      "seen": "844a13da"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md",
@@ -210,7 +210,8 @@ name is a label, and nothing checks a row against its run file after the stamp.
 
 ## `infra` — the estate
 
-Layer nouns are the vocabulary: `organization` · `platform` · `environment` · `app`. **There is no
+Layer nouns are the vocabulary: `organization` · `platform` · `environment` · `app`, and in the cloud alone
+`deployments`, which a person may plan and read and only the pipeline's identity applies, by image digest. **There is no
 whole-estate command**, because *all layers* of an unstated subject is a context nothing can resolve.
 
 **A command names its platform as an argument, always and first — never through the environment**
@@ -331,7 +332,8 @@ line that names the `spnutils` command that makes it, and a hook says nothing: t
 **The tool's home folder is the tool's own** (`RULE.DEVEX.UTILS.075` · MUST · skill:spn-devex/develop). A developer and an agent are
 never asked to add or change a file in `~/.saasplane`. What the tool needs from outside is taken in by a
 command, which checks the file and copies it into place, so a file is prepared elsewhere and never left
-in the folder by hand.
+in the folder by hand. A file written for a person to pick up goes the other way, into the desk,
+`spndesk/` at the workspace root, and never into the home.
 
 **The browser profile is yours to drive, and the developer's Chrome never is.** Chrome refuses
 automation on a person's default profile, so `infra organization up` provisions this separate one. It
