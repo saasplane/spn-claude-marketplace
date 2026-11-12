@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/03-platform/01-core/02-identity.md",
-      "seen": "2eee8871"
+      "seen": "acf63ad8"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/03-platform/01-core/02-identity/",
@@ -170,7 +170,9 @@ Only a public provider (social) registers anybody new. A directory (SAML/OIDC) v
 
 When you build an administration screen, treat a section an organization has no right to as absent, not disabled — MUST. A disabled control advertises a capability and then refuses it, which teaches a customer to ask for something they were never offered; absence says the same thing without the invitation. The sections follow the rights: a workforce directory shows wherever an organization employs people, on its own staff surface alone; public providers show only where it has customers beneath it; and verified domains show wherever a directory appears.
 
-Customers is one section, driven by the organization's child categories rather than written per category. It holds one list and one detail, and the menu has one entry for each child category, labelled from the category's row and narrowed by the organization's `IAM_MANAGE_CUSTOMER_ORG_TYPES` cell. The list sits at `/customers/:category` and a customer's detail at `/customers/:category/:id`. Reading the list takes `ORG_CHILD_VIEW`; on the detail, renaming a customer and moving its onboarding take `ORG_CHILD_MANAGE`, and deactivating or verifying it takes `ORG_CHILD_ADMIN`, so with view alone the detail offers no act. A partner's new category gets its Customers pages with no web release.
+Customers is one section, driven by the organization's child categories rather than written per category. It holds one list and one detail, and the menu has one entry for each child category, labelled from the category's row and narrowed by the organization's `IAM_MANAGE_CUSTOMER_ORG_TYPES` cell. The list sits at `/customers/:category` and a customer's detail at `/customers/:category/:id`. Reading the list takes `ORG_CHILD_VIEW`; on the detail, renaming a customer and moving its onboarding take `ORG_CHILD_MANAGE`, and deactivating or verifying it takes `ORG_CHILD_ADMIN`, so with view alone the detail offers no act. An app's own module may add a section to the detail for a category its app owns: the app passes that section in (`renderAppSection`), so the module never learns where it comes from (`RULE.SUPPORT.APPS.265`, in the web module's components chapter). A partner's new category gets its Customers pages with no web release.
+
+An organization sets which fields its own child categories are asked, on top of the platform's. **An org chooses only fields of the product's catalog, and it never edits or removes a platform row** (`RULE.PLATFORM.CORE.079` · MUST · skill:spn-apps/implement). A platform row is written by migration and is asked of every org of the category, under every parent. An org's row is written at runtime and is asked only of its own children, so a field keeps one key across every org. An org never sets fields for its own category, and a field the platform already asks of the category is never asked twice. The platform's fields are asked first and the org's after, each at its own step. The offer is the enablement `IAM_MANAGE_CHILD_CATEGORY_FIELDS`, set by migration on the parent's category.
 
 A consumer application is not a second identity portal. Self-service is a corner of it, never its spine — the moment it becomes the spine, there are two places a person's identity is managed, and they drift apart.
 

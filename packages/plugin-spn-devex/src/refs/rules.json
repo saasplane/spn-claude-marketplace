@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "book": {
     "repository": "spn-foundation",
-    "commit": "c0b14298"
+    "commit": "c898a44c"
   },
   "rules": [
     {
@@ -12577,8 +12577,14 @@
       "sentence": "`spndesk/` at the workspace root is that place, with one folder for each app that takes a file, and the first command that writes into it makes it",
       "chapter": "04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md",
       "heading": "The desk",
-      "decision": null,
-      "restated": []
+      "decision": "DEC.DEVEX.WORKSPACE.506",
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/develop/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.LAUNCHPAD.CONTROL_PLANE.001",
@@ -13905,6 +13911,30 @@
       "heading": "A test reads the code",
       "decision": "DEC.PLATFORM.CORE.078",
       "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.PLATFORM.CORE.079",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-apps/implement"
+      },
+      "class": "stated in a skill",
+      "sentence": "An org chooses only fields of the product's catalog, and it never edits or removes a platform row",
+      "chapter": "02-constructs/03-platform/01-core/02-identity.md",
+      "heading": "Console follows rights",
+      "decision": "DEC.PLATFORM.CORE.079",
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "refs/platform/core/identity.md",
+          "heading": "What a console shows follows from the rights"
+        },
         {
           "plugin": "spn-apps",
           "path": "skills/implement/SKILL.md",
@@ -19222,6 +19252,30 @@
         {
           "plugin": "spn-apps",
           "path": "skills/run/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.APPS.265",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-apps/implement"
+      },
+      "class": "stated in a skill",
+      "sentence": "A module's shared list and record page take the app's own additions: columns on a list, sections on a record page",
+      "chapter": "04-capabilities/02-support/02-apps/03-module/02-web/03-entry/02-components.md",
+      "heading": "A shared screen takes the app's additions",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "refs/support/apps/module/README.md",
+          "heading": "The web module — the same layers, a person as the transport"
+        },
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
           "heading": "The rules this step holds"
         }
       ]
@@ -29633,7 +29687,7 @@
         "skill": "spn-surface/design"
       },
       "class": "stated in a skill",
-      "sentence": "The header stands directly under the bar, and what it holds stands in the body's box, as the footer's does",
+      "sentence": "The header stands before the content in every layout, and what it holds stands in the body's box, as the footer's does",
       "chapter": "04-capabilities/02-support/01-surface/09-architecture-layouts/01-common/01-layout.md",
       "heading": "The four layouts",
       "decision": null,
@@ -33245,6 +33299,35 @@
           "plugin": "spn-surface",
           "path": "refs/support/surface/architecture-components.md",
           "heading": "DSStepper"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.410",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "The notice stands before the header, and it is the layout's one pinned place",
+      "chapter": "04-capabilities/02-support/01-surface/09-architecture-layouts/01-common/01-layout.md",
+      "heading": "The four layouts",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/architecture-layouts.md",
+          "heading": "Built from the navigation — 🔮"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/SKILL.md",
+          "heading": "1. Pick the layout"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/SKILL.md",
+          "heading": "The rules this step holds"
         }
       ]
     }

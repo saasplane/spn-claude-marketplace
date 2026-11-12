@@ -185,6 +185,7 @@ Three more that decide whether a symbol appears at all:
 - **A call reaches a record only by a kind its method declares, from the owning organization, and a kind outside the list does not exist** (`RULE.PLATFORM.CORE.076` · MUST · skill:spn-apps/implement)
 - **A limit is checked with `PlatformService.assertWithinLimit` or `PlatformService.assertValueWithinLimit`, and the module that owns it states how it is counted** (`RULE.PLATFORM.CORE.077` · MUST · skill:spn-apps/implement)
 - **A module records beside its real send, and one audited read returns the value once** (`RULE.PLATFORM.CORE.078` · MUST · skill:spn-apps/implement)
+- **An org chooses only fields of the product's catalog, and it never edits or removes a platform row** (`RULE.PLATFORM.CORE.079` · MUST · skill:spn-apps/implement)
 - **A module reads the platform's countries, currencies, languages and base labels; it never declares its own.** (`RULE.PLATFORM.MODULES.001` · MUST · skill:spn-apps/implement)
 - **A currency carries where its symbol sits, and a language carries which way it reads.** (`RULE.PLATFORM.MODULES.002` · MUST · skill:spn-apps/implement)
 - **A module registers its own entity types in its MDM contribution, and a registered type may opt only into capabilities the closed set names.** (`RULE.PLATFORM.MODULES.003` · MUST · skill:spn-apps/implement)
@@ -322,3 +323,4 @@ Three more that decide whether a symbol appears at all:
 - **A contribution for an owner held in another service travels on a route of the framework's own, and is never a contract method** (`RULE.SUPPORT.APPS.256` · MUST · skill:spn-apps/implement)
 - **The store of kept work is the one exception to "every table belongs to one module".** (`RULE.SUPPORT.APPS.260` · MUST · skill:spn-apps/implement)
 - **A route names a state and an operation on it, and never who calls it** (`RULE.SUPPORT.APPS.261` · MUST · skill:spn-apps/implement)
+- **A module's shared list and record page take the app's own additions: columns on a list, sections on a record page** (`RULE.SUPPORT.APPS.265` · MUST · skill:spn-apps/implement)

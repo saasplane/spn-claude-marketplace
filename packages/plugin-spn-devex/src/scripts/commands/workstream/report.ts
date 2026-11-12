@@ -122,8 +122,10 @@ function foldPart(ws: string, lead: string, plan: GoPlan, part: GoPart, outcome:
         const split = splitLine(ws, arc, row.id);
         if (split) splits.push(split);
         if (fault) { refused.push(`${arc} ${row.id} stays: ${fault}`); continue; }
+        const was = row.state;
         row.state = "landed";
-        if (run) row.proof = `run ${run}`;
+        // A carried, deferred or replaced row that holds a `proof` keeps it: it names the row's successor (`row edit --proof`), which the close gate reads.
+        if (run && !(row.proof && (was === "carried" || was === "deferred" || was === "replaced"))) row.proof = `run ${run}`;
         said.push(`${arc} ${row.id} landed`);
         logEvent(ws, arc, "landed", row.id, `part ${part.id}${run ? ` · run ${run}` : ""}`);
       }
