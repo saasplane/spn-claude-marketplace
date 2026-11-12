@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/10-providers/aws/06-organization.md",
-      "seen": "3105d62f"
+      "seen": "64915573"
     }
   ]
 }
@@ -26,7 +26,7 @@
 | 2 | Raise the account quota | the default quota is smaller than the tree the estate builds, and the raise is not instant — ask early or the run stalls on somebody else's queue |
 | 3 | The OU tree and its accounts | the isolation boundaries, created from the declaration's coordinates rather than named by hand |
 | 4 | Policies | the guardrails, attached to OUs rather than to accounts, so an account added later inherits them rather than needing them |
-| 5 | Identity | who may reach which account, and the end of the bootstrap profile from `M2` |
+| 5 | Identity | who may reach which account: Identity Center takes the organization's mail host as its identity source, so people arrive from the company directory over SCIM and sign in with their company account; the layer creates the groups and permission sets from the declaration, the directory supplies the people and the declaration says which group each sits in. It also ends the bootstrap profile from `M2` |
 
 **A policy attached to an account instead of its OU is the commonest mistake here**, and it fails silently: the account is governed today and the next account beside it is not.
 

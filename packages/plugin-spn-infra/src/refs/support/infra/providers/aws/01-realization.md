@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/10-providers/aws/01-realization.md",
-      "seen": "1f2b8c4d"
+      "seen": "e3477516"
     }
   ]
 }
@@ -27,7 +27,7 @@
 | Layer | What it renders | State |
 | --- | --- | --- |
 | `GROUND` | validates what the company brought, and discovers its coordinates | 🔮 planned |
-| `ORGANIZATION` | the AWS Organization, its OUs, accounts, guardrails and the output store | 🔮 planned |
+| `ORGANIZATION` | the AWS Organization, its OUs, accounts and guardrails; the output store is the ground's | 🔮 planned |
 | `PLATFORM` | one platform's estate — accounts, runners, zones, certificates, observability | 🔮 planned |
 | `ENVIRONMENT` | one environment — the network, then the resources, then the compute, in that order | 🔮 planned |
 | `DEPLOYMENTS` | what actually runs. **Apps register through `infra app`, and never get a layer noun of their own** | 🔮 planned |

@@ -1,7 +1,10 @@
 <!-- spn:restates
 {
   "docs": [
-    { "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/10-providers/aws/05-tagging.md", "seen": "874ec303" }
+    {
+      "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/10-providers/aws/05-tagging.md",
+      "seen": "25d2b6a5"
+    }
   ]
 }
 -->
@@ -13,18 +16,23 @@
 
 **An auditor, an incident responder and a finance lead all ask the same three questions about a resource**: whose is this, what is it for, and what data does it hold. Tags are how a resource answers without anybody being paged.
 
-## The mandatory set, on every taggable resource
+## The twelve required tags, on every taggable resource
 
 **Keys are PascalCase and values are lowercase.** No exceptions, because a mixed-case value is a value that silently fails every filter written against it.
 
 | Tag | What it answers | Format |
 | --- | --- | --- |
-| `Name` | the resource's full derived name | `{env}-{cloud-service}-{name}` — `in-uat-alb-public` |
-| `Team` | who owns it, for cost and for paging | a lowercase team code — `platform`, `product`, `devops` |
+| `Name` | the resource's full derived name | `{org}-{spc}-{env}-{cloud-service}[-{name}]` — `spn-dmo-in-dev-rds-main` |
+| `Org` | cost totals across the whole company | `{org}` — `spn` |
+| `Platform` | cost totals for one product | `{spc}` — `dmo` |
+| `Environment` | the full environment coordinate, for cost allocation and the teardown proof | `{env}` = `{region}-{setup}` — `in-dev` |
 | `Region` | the **governance** region, where the data may legally live | `{region}` as ISO 3166-1 alpha-2 — `in`, `us`, `eu` |
 | `Setup` | the deployment's lifecycle purpose | `dev` · `uat` · `stg` · `prod` · `demo`, or a customer-dedicated code |
-| `Env` | the full environment coordinate | `{region}-{setup}` — `in-uat` |
 | `Workload` | which isolation boundary, and therefore which account | `prod` · `np` · `stg` |
+| `Ns` | grouping by blast radius, per namespace | `{ns}`: `prd` · `plt` · `vnd` |
+| `App` | the owning unit, for per-app cost and incident reach | a kind code, or a module code in `vnd` |
+| `Layer` | which provisioning layer created this | the layer, lowercase — `environment` |
+| `Category` | which step owns it, for drift and inventory by step | the step — `resources` |
 | `DataClass` | what the resource holds | one of the values below |
 
 ## `Region` is the jurisdiction, never the provider's region

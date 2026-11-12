@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-infra/03-blueprints.md",
-      "seen": "48c99c5b"
+      "seen": "0ff5a6f6"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/03-blueprints/",
-      "seen": "613f2b67"
+      "seen": "49e1697f"
     }
   ]
 }
@@ -121,7 +121,7 @@ A provider entry always names a real provider. **The local realization binds non
 | which components exist at all | the blueprint |
 | what is always true of them | the invariants — every environment, no exception |
 | what posture each gets | the workload |
-| how much capacity | the size, read within the workload |
+| how much capacity | the size: machines, the same in both workloads |
 | where its engines run | the hosting — non-production only |
 
 **Invariants reach every environment, with no exception anywhere — MUST.** Encryption at rest, transport security, no publicly readable data stores, no long-lived credentials, mandatory tagging, audit trails, the application firewall — all of them, from the first apply. There is no *harden it before production* phase, and no template that varies any of it (`RULE.SUPPORT.INFRA.014` · MUST · skill:spn-infra/implement): anything a template would vary is either a workload concern or a security control that must not be optional anywhere. A control exercised only in production is a control nobody has tested.
@@ -138,13 +138,17 @@ A provider entry always names a real provider. **The local realization binds non
 
 An environment names the workload it belongs to; nothing else about it — not its name, not its size, not who created it — selects posture.
 
-**Size is a profile read inside a workload, never an absolute scale.** A small production database has several zones, is replicated, and can be recovered to a point in time — small, not degraded. A small non-production database is a single instance. Look a profile up as the pair `(workload, size)`; every pair has a rendering.
+**A size is machines, and the posture is safety** (`RULE.SUPPORT.INFRA.148` · MUST · skill:spn-infra/implement). A size does not decide how safe a thing is. It names machines alone — a pod's CPU and memory, a node class, a database, cache and broker class — and means the same machines under both workloads. The posture adds the safety: a medium production database is the same machine as a medium non-production one, spread over three zones, replicated and recoverable to a point in time. It is medium, not safer.
 
 ```text
-XS · SM · MD · LG · XL
+XS · SM · MD · LG · XL · 2XL · 3XL
 ```
 
-Five rungs rather than three, because a three-rung ladder collapses production-at-launch and production-at-scale into one letter, which is exactly the moment a product needs room to grow. **A size is a profile name, not a number** — what a letter resolves to is a provider rendering, and retuning it changes no declaration anywhere.
+Seven sizes, one ladder for both workloads — seven rather than three, because a three-rung ladder collapses production-at-launch and production-at-scale into one letter, which is exactly the moment a product needs room to grow. **A size is a name, not a number** — the library ships what each one means, the organization may change that or add a size of its own in its catalog, and retuning a size changes no platform's declaration (`RULE.SUPPORT.INFRA.150` · MUST · skill:spn-infra/implement: the organization owns the catalog, each platform chooses from it).
+
+**A burstable size is refused in production, by name** (`RULE.SUPPORT.INFRA.149` · MUST · skill:spn-infra/implement). `XS` and `SM` are burstable machines, so production refuses them.
+
+**An environment's size is the default for everything it holds, and the floor for its nodes** (`RULE.SUPPORT.INFRA.151` · MUST · skill:spn-infra/implement). A server deployment or a data service may choose its own size, and a deployment also chooses how many copies run and what brings more. The environment's nodes are raised to hold the biggest pod chosen.
 
 **Hosting is where an engine runs, and it is a separate question from size.** A managed service charges for existing rather than for being used, so a non-production environment may declare `CLUSTER` instead and run the same engines as workloads in its own namespace. Size is untouched by the choice: it still resolves to instance classes under `MANAGED`, and to requests, limits and volume sizes under `CLUSTER`.
 
@@ -178,7 +182,7 @@ Five rungs rather than three, because a three-rung ladder collapses production-a
 | an acting account holding the audit record | the trail is curated by what it audits |
 | an invariant disabled in one environment | a control exists that nobody has tested |
 | a difference expressible as neither workload nor size | a special environment was invented |
-| a size letter compared across workloads | an absolute scale was assumed where none exists |
+| a size used to decide safety, or a burstable size in production | the posture was folded into the size, or a refused machine got through |
 | a component present in one environment and absent in its sibling | parity was broken by omission rather than by declaration |
 
 Try it: `spnutils infra platform up dmo --plan` — a plan reaches no account, so it runs before any cloud credential exists.

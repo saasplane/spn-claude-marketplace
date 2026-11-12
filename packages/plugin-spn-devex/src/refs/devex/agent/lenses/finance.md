@@ -8,7 +8,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/10-providers/aws/05-tagging.md",
-      "seen": "874ec303"
+      "seen": "25d2b6a5"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/03-platform/01-core/01-tenancy/02-organizations.md",
@@ -66,7 +66,7 @@
 ## Produces to
 
 - **Cost attribution and the account** — held by the tag policy and the estate guard.
-  - **Every resource carries the mandatory tags, emitted from manifest coordinates**, so cost is attributed by team, workload and data class, and nobody types a tag.
+  - **Every resource carries the twelve required tags, emitted from manifest coordinates**, so cost is attributed by organization, platform, app, workload and data class, and nobody types a tag.
   - **Cost resolves to the account**, the organization the platform bills, which is the boundary billing scopes to. Any organization node may wear the Account face, so billing and entitlement lookups resolve to the nearest face along the path and never at a fixed depth (`RULE.PLATFORM.CORE.014` · GUIDE).
   - **A design option names its cost** before it is chosen (principle 15).
 

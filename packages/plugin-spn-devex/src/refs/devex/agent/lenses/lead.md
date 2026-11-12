@@ -16,11 +16,11 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/03-platform/01-core/03-surfaces/03-service-namespaces.md",
-      "seen": "4792ed51"
+      "seen": "0e774ffc"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/01-function/02-scm.md",
-      "seen": "67eb1dcf"
+      "seen": "50a0552c"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/01-function/02-scm.md",

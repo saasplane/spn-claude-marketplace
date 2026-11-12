@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-infra/04-resources.md",
-      "seen": "03e7fa16"
+      "seen": "0c96921e"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/04-resources/",
-      "seen": "22301782"
+      "seen": "a0adff05"
     }
   ]
 }
@@ -101,7 +101,9 @@ A module's resources are its own engine instances, in its own world, under the m
 
 ## Hosting and size are independent axes
 
-**Hosting selects the rendering family; the pair of workload and size selects the capacity inside it.** A large cluster-hosted database and an extra-small managed one are both expressible, because how much an engine must carry and where it runs are unrelated questions. Cluster hosting exists because a managed service charges for existing rather than for being used — a control plane, a broker floor, an instance hour all arrive before the first query. **Cluster hosting is refused under the `PROD` workload rather than overridden.** The refusal governs the engine families, not everything that runs: a module's own workload is pods in every environment, which is what a hosted vendor has always been.
+**Hosting selects the rendering family; the size selects the machines inside it, and the posture adds the safety.** A large cluster-hosted database and an extra-small managed one are both expressible, because how much an engine must carry and where it runs are unrelated questions. Cluster hosting exists because a managed service charges for existing rather than for being used — a control plane, a broker floor, an instance hour all arrive before the first query. **Cluster hosting is refused under the `PROD` workload rather than overridden.** The refusal governs the engine families, not everything that runs: a module's own workload is pods in every environment, which is what a hosted vendor has always been.
+
+**Each data service takes its environment's size unless its row chooses its own** (`RULE.SUPPORT.INFRA.153` · MUST · skill:spn-infra/implement). A database or a cache may choose a size and a replica count per workload, a queue a size alone, each with an `envs` overlay for one environment, read in that order as `scale` on the service's row. A queue never chooses replicas, because its brokers are the posture's: two in `NP` and three in `PROD`, one for each zone, and a replica count on a queue is refused by name. The production posture's floors hold whatever is chosen: a production database or cache keeps at least one replica and recovery to a point in time.
 
 ## A version is written the way its provider names it
 
