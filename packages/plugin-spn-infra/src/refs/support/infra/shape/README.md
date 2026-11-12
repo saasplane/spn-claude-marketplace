@@ -3,15 +3,15 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-infra/01-shape.md",
-      "seen": "806b41f4"
+      "seen": "1c0907f9"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
-      "seen": "799e85f1"
+      "seen": "b927c1cb"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/03-blueprints/01-layers.md",
-      "seen": "0bd0494c"
+      "seen": "b8dfd7ed"
     }
   ]
 }
@@ -54,6 +54,8 @@ Two lists sit at the top of every declaration, because a declaration has to say 
 
 An environment declares very little: its `setup`, `region` and `networkIndex`, then its `workload`, `size`, `hosting` and `deploy` trigger. `env` and the cloud's own region are computed at resolve and never declared.
 
+**A size is machines alone, and the posture is safety** (`RULE.SUPPORT.INFRA.148` · MUST · skill:spn-infra/implement). There are seven sizes, `XS` to `3XL`, one ladder that reads the same under `PROD` and `NP`; the posture adds the zones, replicas, backups and deletion protection. The environment's size is the default for everything it holds, and its nodes are raised to hold the biggest pod chosen. The organization owns what each size's machines are, in `providers.cloud.sizes` keyed by size code, and a platform only chooses among them.
+
 **The row holds nothing for the web firewall** (`RULE.SUPPORT.INFRA.117` · MUST · skill:spn-infra/implement). The blueprint builds one on every cluster's public load balancer, as it builds the two gateways and the two load balancers. So an environment has nothing to choose, and no environment stands without one.
 
 ## What a company brings, and what is created for it
@@ -75,7 +77,7 @@ The layers are nouns; each takes `up · down · status`, and `--plan` on `up` or
 
 **Every provisioning run names its mode, and there is no default** (`RULE.SUPPORT.INFRA.094` · MUST · skill:spn-infra/implement). `up` and `down` each take exactly one of `--plan` or `--apply`. A command that plans when you forget a flag is a command doing another command's job, and a default would decide the direction of the mistake for you.
 
-Beside the layers: `logs <spc> [service]` · `show <spc>` (resolution per layer, incl. **PINNED @ version or a path**) · `trust-ca` (trust the machine's own CA — what the local `organization up` does as part of its bootstrap) · `domain register <spc> <host>|unregister` (register a host with the local proxy, `--app <kind code>`, needing no privilege and writing no `/etc/hosts` — what the local edge provider calls for every route, and what a test calls for its own `lc-test` domain) · the `config` commands (`set · get · list · export · import · diff · render` — the app plane only, never the ledger) · `web deploy|rollback <spc> <env> <app>` (a built bundle into the platform's own storage engine, and a landed release back onto the route — no separate store) · `scaffold repo|organization|platform|module` · `validate` · `test` · `release`.
+Beside the layers: `logs <spc> [service]` · `show <spc>` (resolution per layer, incl. **PINNED @ version or a path**) · `trust-ca` (trust the machine's own CA — what the local `organization up` does as part of its bootstrap) · `domain register <spc> <host>|unregister` (register a host with the local proxy, `--app <kind code>`, needing no privilege and writing no `/etc/hosts` — what the local edge provider calls for every route, and what a test calls for its own `lc-test` domain) · the `config` commands (`set · get · list · export · import · diff · render` — the app plane only, never the ledger) · `web deploy|rollback <spc> <env> <app>` (a built bundle into the platform's own storage engine, and a landed release back onto the route — no separate store) · `web configure <spc> <env> <app> --out <file>` (a web app's build values for one environment, as `VITE_*` lines, written before each web build so a bundle carries its environment) · `bases publish <version> --repository <host/repository>` (the release's stack base and runtime base, pushed to the organization's base repository by the estate's bases workflow) · `scaffold repo|organization|platform|module` · `validate` · `test` · `release`.
 
 ## Doors — who may run what, where
 
@@ -112,4 +114,5 @@ The commands divide by **what is being changed**, never by who runs them. Each g
 | a release version already present in the registry pair | a published version is immutable — bump instead, never re-publish; the machine store keeps the same rule |
 | an unlisted scope on release | `scopes` routes everything; refused by name |
 | a silent default | everything contextual derives — stack from the repo's claim, estate from pins or tree, registry from the organization, project from the cwd; a flag may override, absence of both refuses by name |
+| a burstable size (`XS` or `SM`) on a `PROD` environment, or on a deployment or data service in one (`RULE.SUPPORT.INFRA.149` · MUST · skill:spn-infra/implement) | those sizes run on burstable machines that slow down under steady load; validation refuses them by name rather than warning |
 | `CLUSTER` hosting under the `PROD` workload | the platform's engine families are managed in production; a module's own workload is pods everywhere |

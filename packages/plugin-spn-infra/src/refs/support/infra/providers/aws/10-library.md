@@ -1,7 +1,10 @@
 <!-- spn:restates
 {
   "docs": [
-    { "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/10-providers/aws/10-library.md", "seen": "c8840176" }
+    {
+      "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/10-providers/aws/10-library.md",
+      "seen": "208bf5f9"
+    }
   ]
 }
 -->
@@ -18,7 +21,7 @@ The AWS half of the blueprint package carries a folder for each layer the declar
 | Folder | Renders |
 | --- | --- |
 | `ground/` | what the declaration validates and discovers before any layer runs |
-| `organization/` | the account tree, the guardrails on it, the output store |
+| `organization/` | the account tree and the guardrails on it; the output store is the ground's |
 | `platform/` | one platform's own estate — registries, state, zones, certificates |
 | `environment/` | one environment — the network, then the resources, then the compute |
 | `deployments/` | what actually runs, which apps register into |

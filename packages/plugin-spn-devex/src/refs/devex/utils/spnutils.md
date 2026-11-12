@@ -3,16 +3,16 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/03-utils/01-spnutils.md",
-      "seen": "990fe6b0"
+      "seen": "efafb465"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
-      "seen": "799e85f1"
+      "seen": "b927c1cb"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
       "section": "`infra` — the estate",
-      "seen": "b974b050"
+      "seen": "cea20733"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
@@ -229,7 +229,8 @@ account the estate **declared** — nothing in the driver names a vendor.
 
 ## `login` and `help`
 
-`login` is one sign-in: a cloud session plus a short-lived token per registry endpoint. `help`
+`login` is one sign-in: a cloud session plus a short-lived token per registry endpoint, started through
+the sign-in portal the organization declaration holds, `providers.cloud.signIn`. `help`
 lists every runnable command, and `--json` gives each one as data: its path, intent, signature,
 arguments and options. `-v` prints this build and the standards range it implements.
 

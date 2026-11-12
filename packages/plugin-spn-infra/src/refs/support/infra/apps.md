@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-infra/05-apps.md",
-      "seen": "7abea2aa"
+      "seen": "d014f355"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/05-apps/",
-      "seen": "5fd45532"
+      "seen": "db84be4b"
     }
   ]
 }
@@ -33,23 +33,26 @@ export interface SPEstateApp {
   repo: CDTString;                         // one of the repositories the platform declared
   space: CDTString | null;                 // a binding: which space holds its data; absent is the platform's resources
   platform: CDTBoolean | null;             // a binding: the platform's settings beside its space's; absent is false
-  serviceDomain: CDTString | null;         // a binding: which face; absent is the platform domain
+  domain: CDTString;                       // a binding, required: which domain its hosts root at, by the code the organization registered
+  localOnly: CDTBoolean | null;            // true stands the app on a laptop only; the cloud leaves it out; absent is false
   grants: SPEstateAppGrantType[] | null;   // the cloud services its runtime may call as itself; absent is none
   deployments: SPEstateAppDeployment[];    // the scheduled units this application runs
 }
 ```
 
+**An app with `localOnly` true stands on a laptop and nowhere else.** An environment does not choose its apps, so this is a yes or no for the whole cloud, and not a list per environment. It is for what is not part of the product, such as a sample. The cloud plan and the deploy workflow leave the row out, and a row that stands in the cloud cannot bind a space that is `localOnly`. `null` reads as false.
+
 **Names derive, engines are declared once elsewhere, and everything else is refused by shape.** No hostname, no schema, no topic, no prefix and no secret name ever appears in a row — the name grammar owns the hostnames, the migrations own the schemas and topics, the coordinates own the prefixes.
 
 ## A row reads in two parts: bindings and grants — MUST tell them apart
 
-The optional keys on a row are of two kinds, and telling them apart is what keeps a review honest.
+The keys on a row besides its code and repository are of two kinds, and telling them apart is what keeps a review honest.
 
-| | A binding (`space`, `platform`, `serviceDomain`) | A grant (`grants`) |
+| | A binding (`space`, `platform`, `domain`) | A grant (`grants`) |
 | --- | --- | --- |
 | Says | which settings the deployment is given, and which face it answers on | which cloud services the runtime may call as itself |
 | Names | a row the platform already declared | a value from a closed list in the contract |
-| Absent means | the platform's resources, and the platform domain | no grant |
+| Absent means | the platform's resources; `domain` is never absent | no grant |
 
 A code the platform never declared is refused when the declaration is checked. A face bound on a row that registers no host is refused as one nothing would read. **Reading a grant as a binding makes a missing dependency look like a typo; reading a binding as a grant makes a plan quietly create a second copy of something the estate already had.**
 
@@ -79,7 +82,7 @@ A database, a cache and a queue are reached with a user and a password, which ar
 | `SEAL` | use the environment's key for stored secrets, so the application seals secrets of its own in its own rows |
 | `EDGE` | bind a tenant's own domain: request its certificate and write its route |
 
-- **Each value comes from a closed list in the contract** (`SPEstateAppGrantType`). A manifest that names anything else is refused; a further cloud service is one more value. The contract states no other key for a grant, and a manifest that writes one is refused.
+- **Each value comes from a closed list in the contract** (`SPEstateAppGrantType`). A manifest that names anything else is refused; a further cloud service is one more value. Mail is not one of them: a platform that sends mail brings its own provider, or attaches an estate module that stands the sender and publishes its values. The contract states no other key for a grant, and a manifest that writes one is refused.
 - **A grant is not restricted by `space`.** An application that lists one is granted it, on the platform or in a space.
 - **A workload that lists no grant holds none**, so a permission problem surfaces because a declaration was missing rather than because a role was guessed too narrow. `EDGE` is true for the application that owns identity and for no other.
 - **A service lists `SEAL` only when a module it mounts stores secrets.** A service that holds that module remotely receives the opened value from it and never touches the seal.
@@ -127,7 +130,7 @@ export interface SPEstateAppDeploymentApi extends SPEstateAppDeployment {
   port: CDTInt;
   healthPort: CDTInt | null;       // the probe's own port, when it differs from the serving port
   websocket: CDTBoolean;
-  size: SPEstateSizeType | null;   // null takes the environment's own capacity profile
+  scale: SPEstateAppDeploymentScale | null;  // its size, copies and signals per workload; null takes the environment's size, fixed copies
   subdomains: CDTString[];         // every label it answers on, first is primary
   remotePort: CDTInt | null;       // the remote listener's port; null serves no contract to other services
   gateway: SPEstateAppDeploymentGateway | null;  // what it asks of its route; null takes the gateway's defaults
@@ -148,7 +151,7 @@ export interface SPEstateAppDeploymentWeb extends SPEstateAppDeployment {
 
 **A publicly exposed web deployment is a bundle** — assets behind an edge, no process of its own, no port, no workload. **A privately exposed one is not** — it is a process serving files behind the internal zone and needs a workload like anything else. A server-rendered application binds a port in every environment exactly as a service does; without a declared port, local port discovery falls back to pattern-matching the application's own configuration, which stops matching the moment the number becomes a constant or the key gets renamed, and the first sign is an error naming nothing.
 
-A background worker (`SPEstateAppDeploymentProcessor`) declares its capacity and nothing else — **the absence of a subdomain is the statement**: it has no inbound surface to name, and resolve refuses anything but `INTERNAL` exposure on it.
+A background worker (`SPEstateAppDeploymentProcessor`) declares its scale and nothing else — **the absence of a subdomain is the statement**: it has no inbound surface to name, and resolve refuses anything but `INTERNAL` exposure on it.
 
 **Every port a deployment declares sits inside the five hundred local ports its platform declares** (`RULE.SUPPORT.INFRA.062` · MUST · skill:spn-infra/implement). The offsets count from the range's first port.
 
@@ -201,7 +204,7 @@ An environment has one pair for each reach, however many services it holds (`RUL
 - **The two gateways are kept apart**, so a wrong route cannot make a private surface answer on the internet.
 - **HTTPS ends at the load balancer**, with the zone's certificate, for both reaches.
 - **A service in the cluster reaches a remote port by the same private HTTPS host an operator's machine uses.**
-- **One cluster serves one environment**, with three namespaces named for what they hold: `prd`, `plt` and `vnd`.
+- **A production environment has a cluster of its own, and the non-production environments of a platform share one per region**, with three namespaces named for what they hold: `prd`, `plt` and `vnd`.
 - **`MANAGED` and `CLUSTER` say who runs a data engine** and do not change this.
 
 **The estate tells each listener how many proxies stand in front of it**, because a service finds the caller's address by counting back from the right of the forwarded-address header (`RULE.SUPPORT.APPS.176` · MUST · skill:spn-apps/implement):
@@ -248,10 +251,40 @@ The gateway's limit counts calls to the whole deployment from one address and st
 
 The internet-facing load balancer of every cluster carries one web firewall, covering every public deployment behind it — MUST (`RULE.SUPPORT.INFRA.117` · MUST · skill:spn-infra/implement).
 
-- **The blueprint builds it, as it builds the two gateways and the two load balancers.** It stands in every environment, and no estate file declares it: an environment's row holds nothing for it. So no environment can stand an unguarded public load balancer, and two environments never differ in it.
+- **The blueprint builds it, as it builds the two gateways and the two load balancers.** A production environment has a cluster of its own, the non-production environments of a platform share one per region, and the firewall is one for each cluster's public load balancer. It stands in every environment, and no estate file declares it: an environment's row holds nothing for it. So no environment can stand an unguarded public load balancer, and two environments never differ in it.
 - **It holds three of the cloud's rule groups** (common rules, known bad inputs, address reputation), **and it counts only.** Each match is recorded with the rule's name and the request is let through. Nothing in an estate file makes the firewall refuse a request.
 - **One deployment is treated differently by a rule limited to its host**, inside the one firewall.
 - **Nothing is attached to the internal load balancer**, and a public web application is not covered, because it is a bundle served from the edge.
+
+### How big, and how many
+
+A server deployment chooses its own size, how many copies of it run, and what brings more (`RULE.SUPPORT.INFRA.152` · MUST · skill:spn-infra/implement). An API and a processor each carry a `scale`; a web deployment carries none, because a bundle has no copies and a private web server runs one.
+
+```ts
+export interface SPEstateAppDeploymentScaleSignals {
+  API: CDTInt | null;    // requests a second one copy carries; an API deployment only
+  QUEUE: CDTInt | null;  // messages waiting that one copy carries; a processor only
+  CPU: CDTInt | null;    // percent of the pod's CPU request
+}
+
+export interface SPEstateAppDeploymentScaleWorkload {
+  size: CDTString | null;  // a size code from the catalog; null takes the environment's
+  min: CDTInt | null;      // null: 1 in NP, 3 in PROD
+  max: CDTInt | null;      // null: min
+  signals: SPEstateAppDeploymentScaleSignals | null;  // null runs min copies, fixed
+}
+
+export interface SPEstateAppDeploymentScale {
+  np: SPEstateAppDeploymentScaleWorkload | null;
+  prod: SPEstateAppDeploymentScaleWorkload | null;
+  envs: Record<CDTString, SPEstateAppDeploymentScaleWorkload> | null;  // one environment that differs
+}
+```
+
+- **A signal is a number one copy carries.** `API` is requests a second, `QUEUE` is messages waiting behind the deployment's consumer group, and `CPU` is a percent of the pod's request.
+- **Several signals ask together, and the largest ask wins**, between `min` and `max`. A copy comes when any signal is over its number, and goes when every one is under it, after a few calmer minutes.
+- **One environment may differ.** A value for an environment is read from its `envs` entry, then its workload's block, then the defaults.
+- **The estate refuses what cannot mean anything, by name**: `scale` on a web deployment, `API` on a processor, `QUEUE` on an API, `min` above `max`, an undeclared size code or environment, and a burstable size in production.
 
 ## Locally, only the ports are read
 

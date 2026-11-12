@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/08-operate/",
-      "seen": "3ec72d60"
+      "seen": "2395d5d3"
     }
   ]
 }
@@ -119,6 +119,8 @@ Because a setup name is a label and nothing derives from it, no central table co
 
 A branch **MUST** be claimed by at most one environment per platform — otherwise a merge fans out and *what is running where* stops having an answer. A tag carries no such limit, which is how one approved release reaches every production region at once. A tag whose digest is not already running in the environment it promotes from **MUST** be refused: **there is no path to production that skips a rung**, and an urgent fix travels the same rungs, only faster.
 
+**Production is gated by a tag, and the gate is a ruleset** (`RULE.SUPPORT.INFRA.156` · MUST · skill:spn-infra/run). A `v*` tag deploys an environment whose trigger is an approved tag, and the repository host's tag ruleset lets only the platform's reviewing teams create one. Required reviewers are an enterprise-plan feature the estate does not depend on.
+
 ## The serving contract is dynamic
 
 Routing is data: a new customer surface is a row, never a release. **A customer's hostname is issued and bound when the request to serve it arrives, through the edge seam, and never by an apply** (`RULE.SUPPORT.INFRA.084` · MUST · skill:spn-infra/implement). The application that owns identity lists the `EDGE` grant on its row, in `grants`, and the estate grants it a scoped identity at the edge. The serving layer's certificate set changes as hosts are bound, not as infrastructure is applied. A customer subdomain rides the declared domain's wildcard certificate; a customer's own domain rides the certificate the seam issued for it. A domain is active only when it is serving: a provider that terminates traffic itself binds the host at issuance, one that only issues certificates binds it on the second call, and the records an owner publishes are the union of what both steps ask for, each carrying its purpose.
@@ -136,7 +138,7 @@ Each writer's scope is disjoint, so nothing races on a name (`RULE.SUPPORT.INFRA
 
 **One tenant edge per platform serves every environment's tenant hosts** (`RULE.SUPPORT.INFRA.104` · MUST · skill:spn-infra/implement). The platform layer stands it with the alias `*.{spd}`, the zone's `*` record and one route store. Its function reads `sites/{host}` → `{env, app}`, then `releases/{env}/{app}`, and switches its origin to that environment's store; any miss answers 404. An environment's own distribution serves only its `{env}-{app}` hosts, because a wildcard alias can sit on one distribution only. **Not yet proven on an account** — the origin switch across environments and one store read by several distributions have not been run. Locally the same routes become ingress registrations (`RULE.SUPPORT.INFRA.106` · MUST · skill:spn-infra/implement). Every declared domain stands its own pair of zones (`RULE.SUPPORT.INFRA.086` · MUST · skill:spn-infra/implement), and the private zone is always the child name, never the apex.
 
-**Observability is not something anybody opts into.** An application is observable because it was deployed — the collectors were installed by a layer, and nothing depends on somebody remembering to wire one in.
+**Observability is not something anybody opts into** (`RULE.SUPPORT.INFRA.155` · MUST · skill:spn-infra/run). An application is observable because it was deployed, and nothing depends on somebody remembering to wire it. Each workload's stack, `{org}-{spc}-{workload}-obs`, stands before the first environment, in non-production and production alike: Loki, Mimir, Tempo and Grafana, behind one gateway address. A collector in every cluster ships lines, numbers and traces to its workload's stack over a peering, with no provider's log service on the path. Grafana signs people in with the company account on a private name reached from `operatorCidrs`; its ten dashboards sit in three folders (Apps, Environment, Evidence) under one set of filters, and a team's role reaches its folders. It reports what the system says about itself, never what customers do and never a number about a person. Alerts sit on the same labels and go to the platform owner. A laptop runs the same Grafana from the same blueprints.
 
 ## Web delivery is a store and a pointer
 

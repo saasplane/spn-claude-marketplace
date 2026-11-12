@@ -94,3 +94,4 @@ When a layer will not come up, `show` first: a path ref that resolves on one mac
 - **A binding is supplied explicitly or not at all** (`RULE.SUPPORT.INFRA.089` · MUST · skill:spn-infra/run)
 - **An application on a developer's machine is its own tree, and the estate is not consulted** (`RULE.SUPPORT.INFRA.132` · MUST · skill:spn-infra/run)
 - **A cloud act's check reads the provider the estate declared, expects that provider's session values, and refuses by naming that provider when they are absent** (`RULE.SUPPORT.INFRA.141` · MUST · skill:spn-infra/run)
+- **Production is gated by a tag, and the gate is a ruleset** (`RULE.SUPPORT.INFRA.156` · MUST · skill:spn-infra/run)

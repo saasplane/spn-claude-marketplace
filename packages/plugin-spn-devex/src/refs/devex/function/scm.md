@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/01-function/02-scm.md",
-      "seen": "67eb1dcf"
+      "seen": "50a0552c"
     }
   ]
 }
@@ -168,6 +168,8 @@ A check runs at the first step that can run it and at no later one.
 | Back-merge pull request into `develop` | develop's checks | GitHub Actions |
 | Promotion | nothing; the pull request's head already passed its checks on `develop` | `spnutils repo promote` |
 | Release | the clean tree, the tree at `origin/main` and the release gate's full pass | the release command |
+
+**Which runners carry those checks depends on the repository** (RULE.DEVEX.FUNCTION.104). A platform's application repository runs every workflow job on the build runner pool the platform layer stands in the platform's control account, so its checks spend none of the host's included minutes. Every other repository runs on the host's own runners, and the organization's Actions budget for paid minutes is zero, so a check that would bill stops instead.
 
 ## Where a branch deploys, and what promotes
 
