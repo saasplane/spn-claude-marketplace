@@ -87,6 +87,7 @@ The book states a unit, the library draws it, and a stack builds it. You change 
 - Change nothing that your order does not name. Write a fault you meet in your report, and leave it.
 - Try nothing out in a library file. If you must learn how the API behaves and a read cannot tell you, stop that unit and report the question.
 - Draw nothing of a pattern, and no unit that a stack provides on its own.
+- **Draw no unit's look by hand.** A look is read from the stack into the CONSTRUCT snapshot and the plugin draws it. A unit whose look is not read yet stays a stand-in whose label says so, and a value the stack writes with no variable is a difference for your report, never a variable you bind.
 - Change no script: fill its inputs and pass the rest as it is.
 
 ## Your proof, and your report

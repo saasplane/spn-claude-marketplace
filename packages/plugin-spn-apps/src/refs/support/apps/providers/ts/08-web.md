@@ -22,6 +22,8 @@
 
 **A name is the book's, and TypeScript adds only its form.** The Surface construct states the name of a component, of a prop and of a closed value. This stack adds the form and nothing else: `DS` + PascalCase for a component, `I` + that name + `Props` for its props, a `Type` suffix for an enum, and `DS_` + UPPER_SNAKE for a constant map. A prop the book renames takes the book's name.
 
+**A unit composes its classes from its look.** A unit the library draws as a set declares its look as a local constant, `DS_<UNIT>_LOOK`, `as const satisfies IDSLook`: each layer and the token each of its thirteen properties reads, by size and by state, or a typed value where the stack has no token yet. The exported component carries it as `.look`, and the build writes every look to `dist/generated/spn-looks.json`, which the library is drawn from. The classes stay fixed and read `--look-*` variables that `prepareDSLookStyle` sets, because Tailwind makes only the classes written in the source. A unit not moved yet composes its classes from the constant maps.
+
 **A hook names its context.** A hook of the design system reads as `useDS` + the context + the value, such as `useDSSize` and `useDSOverlayConfirm`. The spn-surface plugin's entry ref, `refs/support/surface/README.md`, routes to the rule and to the contexts realized — the app context, the design-system context, the size context and the page-level context, the default size and the tokens a component may consume — which this package's own interior realizes.
 
 **Every web app declares the same scripts, and a separate preview script is not among them** — it was the start script under another name and is retired. **The test bundle is a flavour of the build, never a second script.**
