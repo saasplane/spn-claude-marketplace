@@ -17,7 +17,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
-      "seen": "e475a0f1"
+      "seen": "c5371a1a"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -56,7 +56,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "seen": "5c0d3a6b"
+      "seen": "38401651"
     }
   ]
 }
@@ -1504,11 +1504,12 @@ its number. With no card open it reads `Open — no card is open`. The PreToolUs
 inside the `progress` or `open` block.
 
 **The progress block shows what is built** (`RULE.DEVEX.WORKSPACE.278` · MUST · short). Only build steps are
-recorded, so a chip counts its arc's steps, and an arc with no step yet shows its status word, with no bar
-to fill. The bottom bar shows the arcs still open first, the running ones and then the rest not closed, each group
+recorded, so a chip counts its arc's steps, `0/0` for an arc with no step yet, with no bar to fill, and never
+shows a status word: the chip's left edge, its tooltip and its accessible name say the status. The bottom bar shows the arcs still open first, the running ones and then the rest not closed, each group
 in the order the arcs run, `ideate` first and `follow-ups` last, and the closed arcs after them, so the open arcs are in view at the bar's
-start without scrolling. A chip whose arc has a preview opens that preview in a new tab, marked with an
-arrow, and a chip whose arc has none keeps the jump to its row. *Overall*'s bar counts steps, and its word is the workstream's own, the one the page's header
+start without scrolling. A chip whose arc has a preview opens that preview in a new tab, with no arrow on
+the chip: its tooltip and its accessible name say so, so the number, the title and the count keep one line
+and every chip's bar stands at one height. A chip whose arc has none keeps the jump to its row. *Overall*'s bar counts steps, and its word is the workstream's own, the one the page's header
 shows, so the two never disagree: `PLANNING` until the first step of any arc starts, then `IMPLEMENTING`,
 which says *waiting for your review* once every arc has landed, and `DONE` on the word to close. The done
 colour appears only when the arc's steps work out `LANDED`.

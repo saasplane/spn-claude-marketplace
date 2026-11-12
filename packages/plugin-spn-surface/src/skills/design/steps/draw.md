@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/11-delivery-library/",
-      "seen": "1697bcd0"
+      "seen": "77916c96"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/04-architecture-names/",
@@ -61,6 +61,15 @@ The design library holds one file for each layer of the design system that is dr
 | The page | one top frame, named as the page. It holds the theme: light or dark, and the look of the panels |
 | A block | an instance of the library component of the same name |
 | A prop with a closed set of values | the property of the same name, set to the same value. The values are the vocabulary's, as `architecture-names.md` states them: a clock, a placement, an alignment or a format is never drawn under a name or a switch of the designer's own. An alignment is `DSHorizontalAlignType` (`START`, `CENTER`, `END`) or `DSVerticalAlignType` (`TOP`, `CENTER`, `BOTTOM`) on every unit that takes one (`RULE.SUPPORT.SURFACE.249` · MUST · skill:spn-surface/design) |
+| A prop the set crosses (`size`, `variant`, a state) | the property of the same name, for the versions the set draws |
+| A prop the column draws as a mode (`color`, a level, a tone, the look of a surface) | the mode of its collection, set on the instance or on its frame; it costs no version |
+| A flag that shows or hides a part, or content that is there or not (`loading`, `clearable`, `count`) | the boolean property of the set, tied to the layer it shows or hides |
+| A text the unit shows (`label`) | the text property of the set, tied to its text layer |
+| A unit placed inside the unit (`startIcon`, `endIcon`) | the instance swap property of the set, tied to the instance it swaps |
+| A look drawn once (`authzDenied` `DISABLE`) | the version drawn once, named as not combined |
+| Focus and disabled | a column of the set's states group, drawn as a version; they become a mode of the state only once Lab shows the ring and the opacity bind to variables |
+| A combination the set draws no version for, and no property or mode reaches (`DSStepper`'s `type` with a task state) | refuse to draw it, and name it to the developer; never draw a new look for it |
+| A prop that changes only how the unit behaves | nothing: the header's `behaviour:` note names it |
 | `color` | a variable mode, set on the instance itself and read by its name from the `Color` collection; light or dark is a mode of the `Mode` collection |
 | The look of a container or a card | a mode of the theme's collections, for `frames` and for the keys `raised`, `elevation`, `bordered` and `rounded` of its `surface` |
 | `unframed` on a container | the parts it lists are drawn with no frame, whatever the mode of `frames` on the top frame gives. The rest of the container keeps the look of the theme |

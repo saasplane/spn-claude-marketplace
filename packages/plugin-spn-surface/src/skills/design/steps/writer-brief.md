@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/11-delivery-library/02-figma/04-drawing.md",
-      "seen": "ac8a64d7"
+      "seen": "785094d1"
     }
   ]
 }
@@ -73,9 +73,9 @@ The book states a unit, the library draws it, and a stack builds it. You change 
 
 ## A section, a label, a case
 
-1. A unit's section holds, in this order: the header, the set with its row and column labels, the usage, the cases, the parts.
-2. The header is one text, in the layer `header · <Unit>`: the unit's name, ` — `, what the unit is in one line, ` · `, the layout as `rows: <axis> · columns: <axis>`. An axis is cells joined by `, `. A cell is `property=value`, or the value alone when its property is that of the cell before. ` x ` joins two properties that multiply. ` (default)` follows each default, which comes first. A property that changes nothing a person sees is named in ` · behaviour: a, b`. When the set gains a property, the header names it.
-3. A row or column label is a text whose layer is `label · ` and its whole text. Set the text and the layer's name in one step. A right-aligned label keeps its right edge when its text changes, so set `x` again.
+1. A unit's section holds, in this order: where it lives (`path · <Unit>`), the header, then the bands Usage, Variations, Cases and Parts, each under its label. Variations is the unit's tables: the set's table with its group titles and labels, then its mode tables.
+2. The header is one text, in the layer `header · <Unit>`: the unit's name; on the line under it, what the unit is in one line; then `behaviour: ` and the properties that change only how the unit behaves, where it has any. It holds no layout. The layout is the section's shared plugin data, namespace `saasplane`, key `layout`: `{ shape, tables, default, cases, behaviour }`, each table a `caption`, `rowGroups` and `columnGroups`, each group a `prop` and its `values`, the default first. Read it there, never from a label, and write it in the same call that changes the set. When the set gains a property, the layout names it.
+3. A row or column label names one value, and a group's title names the property, `states` for the states; ` (default)` follows the default's value, once. Each is a text whose layer is `label · ` and its whole text. Set the text and the layer's name in one step. A right-aligned label keeps its right edge when its text changes, so set `x` again.
 4. A case is a component on the unit's sheet `<Unit> cases`. It holds an instance of the unit with its values set, and it is named `property=value`, with `, ` between two cells. The sheet's label names its cases.
 5. A copy of a label or a case lands on the page's top level. Append it to its section or its sheet, and set its place again.
 6. Grow the set, its section and its sheet so that nothing inside the section meets. Move no other section: write a section that now reaches its neighbour in your report.

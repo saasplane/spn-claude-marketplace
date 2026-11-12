@@ -204,6 +204,25 @@ await guard(async () => {
 
 // ---- the tokens ---------------------------------------------------------------------------------
 
+await guard(async () => {
+  // As the plugin draws it: the set stands in the section named for its unit, which keeps the layout as plugin data.
+  const layout = { shape: "set", tables: [{ caption: "the set", rowGroups: [{ prop: "size", values: ["MD", "SM"] }], columnGroups: [] }], default: { size: "MD" }, cases: [], behaviour: [] };
+  const sectionOf = (name, children, kept) => {
+    const section = { id: `S:${name}`, name, type: "SECTION", x: 0, y: 0, width: 800, height: 600, children };
+    for (const child of children) child.parent = section;
+    section.getSharedPluginData = (namespace, key) => (namespace === "saasplane" && key === "layout" && kept ? JSON.stringify(kept) : "");
+    return section;
+  };
+  const kept = sectionOf("DSBox", [boxSet()], layout);
+  const elsewhere = sectionOf("Other", [setNode("6:set", "DSSet", [versionNode("6:v", "a=1")])], layout);
+  const figma = figmaFile("DS Test", [pageNode("2:1", "Boxes", [kept, elsewhere])]);
+  const answer = await run("inventory.js", { pageId: "2:1" }, figma);
+  same("[MKT.SCRIPTS.557] a unit carries the layout its own section keeps as plugin data, and null where it stands in a section named for another",
+    answer.units.map((unit) => [unit.name, unit.layout]), [["DSBox", layout], ["DSSet", null]]);
+  const loose = await run("inventory.js", { pageId: "2:1" }, figmaFile("DS Test", [pageNode("2:1", "Boxes", [boxSet()])]));
+  same("a unit that stands in no section carries no layout", loose.units[0].layout, null);
+});
+
 console.log("\n=== tokens.js — the variables and the styles");
 const mode = (modeId, name) => ({ modeId, name });
 const variableOf = (id, name, collection, resolvedType, valuesByMode) => ({ id, key: `key-${id}`, name, variableCollectionId: collection, resolvedType, valuesByMode });

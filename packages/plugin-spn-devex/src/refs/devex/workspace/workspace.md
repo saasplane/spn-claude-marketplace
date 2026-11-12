@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/01-workspace.md",
-      "seen": "bc5db3d9"
+      "seen": "5c27fadb"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/02-workstream.md",
@@ -11,7 +11,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
-      "seen": "c5d64d24"
+      "seen": "799e85f1"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -31,7 +31,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md",
       "section": "Two dot-homes",
-      "seen": "459e6ccd"
+      "seen": "41837c3f"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md",
@@ -61,7 +61,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md",
       "section": "DevEx Workspace — One Window, Laws by Declaration",
-      "seen": "9cb67276"
+      "seen": "39f4f93f"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
@@ -214,6 +214,8 @@ The workspace folder carries two dot-homes: `.claude/` (settings — the marketp
 | a link, for each other member | to the member's main checkout, so a sibling path such as `../spn-infra` still resolves |
 | `.spndevex` | a link to the workspace's one store, so every window reads the same workstreams |
 | `.claude/settings.json` | written by the writer `workspace init` uses |
+
+**Once a command has written a file for you to handle, the folder also carries the desk, `spndesk/`, which is no home and no member (`RULE.DEVEX.WORKSPACE.506` · MUST · skill:spn-devex/develop).** A file a person picks up in another app needs a place they can see: an app's file dialog hides a dot-folder, and an allowed reset can empty the machine home. The desk has one folder for each app that takes a file, and the first command that writes into it makes it. `spndesk/<app>/plugin/` is written by the command that owns it, in place, so the path the app remembers keeps working; `spndesk/<app>/import/` holds what the agent prepares for a person to take into the app, never a value that belongs in the book; `spndesk/<app>/export/` holds what a person saves out of the app, and no command rewrites it. Today one app has a folder, `spndesk/figma/`, which holds the library plugin. The desk is not the front desk: that is the agent's role, and this is a folder.
 
 - **The set holds no `CLAUDE.md` — MUST NOT.** A window in the set reads the workspace's own as an ancestor, and a second copy would load the same text twice on every turn.
 - **The set is not a member — MUST.** A member is a folder directly under the root holding `sprepo.json` or `.git`, and `.worktrees/` holds neither. So `workspace status` and the plugin list the same members with or without a set, and the leading dot keeps the folder out of every reader that skips one.

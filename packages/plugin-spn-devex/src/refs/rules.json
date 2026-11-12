@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "book": {
     "repository": "spn-foundation",
-    "commit": "024338a9"
+    "commit": "a89a0668"
   },
   "rules": [
     {
@@ -12568,6 +12568,30 @@
       ]
     },
     {
+      "id": "RULE.DEVEX.WORKSPACE.506",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-devex/develop"
+      },
+      "class": "stated in a skill",
+      "sentence": "`spndesk/` at the workspace root is that place, with one folder for each app that takes a file, and the first command that writes into it makes it",
+      "chapter": "04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md",
+      "heading": "The desk",
+      "decision": "DEC.DEVEX.WORKSPACE.506",
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/workspace.md",
+          "heading": "The workspace's working state — .spndevex/"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/develop/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
       "id": "RULE.LAUNCHPAD.CONTROL_PLANE.001",
       "level": "MUST",
       "params": {
@@ -22678,11 +22702,6 @@
       "restated": [
         {
           "plugin": "spn-surface",
-          "path": "refs/support/surface/delivery-library.md",
-          "heading": "What a library file owes of a unit"
-        },
-        {
-          "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
           "heading": "The rules this step holds"
         }
@@ -22750,7 +22769,13 @@
       "chapter": "04-capabilities/02-support/01-surface/11-delivery-library/02-figma/04-drawing.md",
       "heading": "What a library file holds",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/delivery-library.md",
+          "heading": "What a library file holds"
+        }
+      ]
     },
     {
       "id": "RULE.SUPPORT.SURFACE.031",
@@ -22763,7 +22788,13 @@
       "chapter": "04-capabilities/02-support/01-surface/11-delivery-library/02-figma/04-drawing.md",
       "heading": "How an agent changes a library file through the connector",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/delivery-library.md",
+          "heading": "How an agent changes a library file through the connector"
+        }
+      ]
     },
     {
       "id": "RULE.SUPPORT.SURFACE.032",
@@ -22852,7 +22883,13 @@
       "chapter": "04-capabilities/02-support/01-surface/11-delivery-library/02-figma/04-drawing.md",
       "heading": "What a library file owes of a unit",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/delivery-library.md",
+          "heading": "What a library file owes of a unit"
+        }
+      ]
     },
     {
       "id": "RULE.SUPPORT.SURFACE.037",
@@ -22898,11 +22935,6 @@
       "heading": "The sections of a main page",
       "decision": null,
       "restated": [
-        {
-          "plugin": "spn-surface",
-          "path": "refs/support/surface/delivery-library.md",
-          "heading": "Which property is a variant and which is a case"
-        },
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
@@ -24876,7 +24908,7 @@
         "skill": "spn-surface/design"
       },
       "class": "stated in a skill",
-      "sentence": "A type step sets the size and the weight of a text, and nothing else",
+      "sentence": "A type step sets the size, the weight and the line of a text, and nothing else",
       "chapter": "04-capabilities/02-support/01-surface/05-architecture-core/01-common/01-tokens.md",
       "heading": "The type steps",
       "decision": null,
@@ -33100,6 +33132,11 @@
       "restated": [
         {
           "plugin": "spn-surface",
+          "path": "refs/support/surface/delivery-library.md",
+          "heading": "How an agent changes a library file through the connector"
+        },
+        {
+          "plugin": "spn-surface",
           "path": "skills/design/steps/writer-brief.md",
           "heading": "The rules this step holds"
         },
@@ -33119,13 +33156,7 @@
       "chapter": "04-capabilities/02-support/01-surface/11-delivery-library/01-common/01-library.md",
       "heading": "How a block is drawn",
       "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-surface",
-          "path": "refs/support/surface/delivery-library.md",
-          "heading": "What a library file holds"
-        }
-      ]
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.SURFACE.402",

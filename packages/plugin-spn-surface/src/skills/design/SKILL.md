@@ -464,7 +464,7 @@ Wear the spn-devex plugin's `refs/devex/agent/lenses/ux.md` while you place the 
 - **`size` says how dense a control is, and `scaleSize` says how large a thing that is shown is drawn** (`RULE.SUPPORT.SURFACE.100` · MUST · skill:spn-surface/design)
 - **An icon, a mark and an avatar are drawn at the pixels of this table for their scale size** (`RULE.SUPPORT.SURFACE.101` · MUST · skill:spn-surface/design)
 - **Title runs from `TITLE_XXS` to `TITLE_XXL5`, and Heading from `HEADING_XXS` to `HEADING_XXL5`** (`RULE.SUPPORT.SURFACE.102` · MUST · skill:spn-surface/design)
-- **A type step sets the size and the weight of a text, and nothing else** (`RULE.SUPPORT.SURFACE.103` · MUST · skill:spn-surface/design)
+- **A type step sets the size, the weight and the line of a text, and nothing else** (`RULE.SUPPORT.SURFACE.103` · MUST · skill:spn-surface/design)
 - **Beside a title, an icon, a mark and an avatar take the scale size of the title's own step name** (`RULE.SUPPORT.SURFACE.104` · MUST · skill:spn-surface/design)
 - **The initials of an avatar are a title step of about four tenths of the avatar** (`RULE.SUPPORT.SURFACE.105` · MUST · skill:spn-surface/design)
 - **The heading element of a title follows its level, and it changes no style** (`RULE.SUPPORT.SURFACE.106` · MUST · skill:spn-surface/design)
