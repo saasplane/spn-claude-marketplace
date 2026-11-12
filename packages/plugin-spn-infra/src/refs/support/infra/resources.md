@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-infra/04-resources.md",
-      "seen": "03e7fa16"
+      "seen": "0c96921e"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/04-resources/",
-      "seen": "22301782"
+      "seen": "a0adff05"
     }
   ]
 }
@@ -91,7 +91,7 @@ A prefix is one word for a platform and two words for a space. A space's code mu
 
 **On a machine, a space's engines take their ports from the five hundred the platform declares, and nobody writes them** (`RULE.SUPPORT.INFRA.062` · MUST · skill:spn-infra/implement). The first hundred of the range holds the engines, ten ports for each world: the platform's own take the first ten, and space *i*, counting from one in declaration order, takes the ten ports from `+10 × i`, with each family at the same offset it has in the platform's own engines. So a platform stands at most nine spaces locally. A space has engines and nothing else; an application that belongs to a space takes a service's port or a web application's port like any other.
 
-**A space is one of two independent extension axes, and they never couple** (`RULE.SUPPORT.INFRA.085` · MUST · skill:spn-infra/implement). A space extends by **data**; a service domain (bound by `serviceDomain`) extends by **face**. An application takes either, both or neither.
+**A space is one of two independent extension axes, and they never couple** (`RULE.SUPPORT.INFRA.085` · MUST · skill:spn-infra/implement). A space extends by **data**; a face (an app row's `domain` naming another of the organization's domains) extends by **face**. An application takes either, both or neither.
 
 **The platform's own resources are a preset composition of the same blueprint functions a space composes** — database, schema, user, topic, bucket. There is no privileged path a space cannot take, and no capability the baseline has that a space cannot ask for.
 
@@ -101,7 +101,9 @@ A module's resources are its own engine instances, in its own world, under the m
 
 ## Hosting and size are independent axes
 
-**Hosting selects the rendering family; the pair of workload and size selects the capacity inside it.** A large cluster-hosted database and an extra-small managed one are both expressible, because how much an engine must carry and where it runs are unrelated questions. Cluster hosting exists because a managed service charges for existing rather than for being used — a control plane, a broker floor, an instance hour all arrive before the first query. **Cluster hosting is refused under the `PROD` workload rather than overridden.** The refusal governs the engine families, not everything that runs: a module's own workload is pods in every environment, which is what a hosted vendor has always been.
+**Hosting selects the rendering family; the size selects the machines inside it, and the posture adds the safety.** A large cluster-hosted database and an extra-small managed one are both expressible, because how much an engine must carry and where it runs are unrelated questions. Cluster hosting exists because a managed service charges for existing rather than for being used — a control plane, a broker floor, an instance hour all arrive before the first query. **Cluster hosting is refused under the `PROD` workload rather than overridden.** The refusal governs the engine families, not everything that runs: a module's own workload is pods in every environment, which is what a hosted vendor has always been.
+
+**Each data service takes its environment's size unless its row chooses its own** (`RULE.SUPPORT.INFRA.153` · MUST · skill:spn-infra/implement). A database or a cache may choose a size and a replica count per workload, a queue a size alone, each with an `envs` overlay for one environment, read in that order as `scale` on the service's row. A queue never chooses replicas, because its brokers are the posture's: two in `NP` and three in `PROD`, one for each zone, and a replica count on a queue is refused by name. The production posture's floors hold whatever is chosen: a production database or cache keeps at least one replica and recovery to a point in time.
 
 ## A version is written the way its provider names it
 

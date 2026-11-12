@@ -4,17 +4,17 @@
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-infra/06-modules.md",
       "section": "The rungs",
-      "seen": "3dcae51d"
+      "seen": "e413471c"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/02-packages/01-manifests.md",
       "section": "Intent and resolved state",
-      "seen": "c3394f8f"
+      "seen": "abb5fef1"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/02-packages/01-manifests.md",
       "section": "Providers are a pattern, at both scopes",
-      "seen": "8f75c6c1"
+      "seen": "4477c076"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/02-packages/01-manifests.md",
@@ -40,13 +40,17 @@ The estate's keys — the `{SPC}_ORG_*` · `{SPC}_PLATFORM_*` · `{SPC}_RESOURCE
 
 ```text
 /organization/vars
+/organization/modules/{code}/vars
 /platform/vars
+/platform/modules/{code}/vars
 /environments/{env}/vars
 /environments/{env}/spaces/{code}/vars
 /environments/{env}/modules/{code}/vars
 /environments/{env}/apps/{app}/vars
 /environments/{env}/apps/{app}/deployments/{deployment}/vars
 ```
+
+A module runs at one of three levels — the organization, a platform, or each environment — and its settings sit at the matching `modules/{code}/vars` seat. **An application is given a module's seat only when its row names the module** (`RULE.SUPPORT.INFRA.157` · MUST · skill:spn-infra/implement), because those settings may hold credentials; nothing else reaches it.
 
 The app plane — an application's own rung and the deployment seats beneath it — is **dev-authored; nothing lands there by machine**, with one composed exception: the deploy render supplies the published health-port default into the composition (`RULE.SUPPORT.INFRA.048` · MUST · skill:spn-infra/implement).
 
@@ -70,7 +74,7 @@ An environment states its `setup` and its `region` and stops there. It declares 
 
 ## 4 · Provider strings live only inside a cloud entry
 
-Write the provider region in exactly one place — the cloud entry's `regions` mapping (`{ "code": "in", "region": "ap-south-1" }`); capacity classes only in its `profiles`. A region name or instance class anywhere else makes the estate unportable by spelling.
+Write the provider region in exactly one place — the cloud entry's `regions` mapping (`{ "code": "in", "region": "ap-south-1" }`); machine sizes only in its `sizes` catalog. A region name or instance class anywhere else makes the estate unportable by spelling.
 
 > Defect: a provider string outside a cloud entry — a derivation was bypassed, already drifting.
 

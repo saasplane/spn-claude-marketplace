@@ -8,15 +8,15 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/03-platform/01-core/04-data-and-trust/02-trust.md",
-      "seen": "0133bc17"
+      "seen": "bd0c9602"
     },
     {
       "path": "spn-foundation/docs/02-constructs/03-platform/01-core/04-data-and-trust.md",
-      "seen": "e8b7a8e7"
+      "seen": "3abfe989"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/03-platform/01-core/04-data-and-trust/03-control-map.md",
-      "seen": "ff8ff51e"
+      "seen": "ded24dbe"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/08-agent-surface/README.md",
@@ -24,11 +24,11 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/03-platform/01-core/01-tenancy/03-people-access.md",
-      "seen": "429eccc0"
+      "seen": "1fca736a"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/03-module/01-server/01-contract/01-states.md",
-      "seen": "38e6934b"
+      "seen": "8d3f6cdb"
     }
   ]
 }

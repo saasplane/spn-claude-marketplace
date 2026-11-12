@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "book": {
     "repository": "spn-foundation",
-    "commit": "e83e1676"
+    "commit": "b4097920"
   },
   "rules": [
     {
@@ -3385,6 +3385,25 @@
           "plugin": "spn-devex",
           "path": "skills/ideate/SKILL.md",
           "heading": "How a first proposal is shaped"
+        }
+      ]
+    },
+    {
+      "id": "RULE.DEVEX.FUNCTION.104",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-devex/scm"
+      },
+      "class": "stated in a skill",
+      "sentence": "A platform's repository runs its checks on the platform's own build runners",
+      "chapter": "04-capabilities/01-devex/01-function/02-scm.md",
+      "heading": "Where each check runs",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/scm/SKILL.md",
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -22255,6 +22274,236 @@
       "heading": "The organization registers every domain, and a platform names its home",
       "decision": null,
       "restated": [
+        {
+          "plugin": "spn-infra",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.INFRA.148",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-infra/implement"
+      },
+      "class": "stated in a skill",
+      "sentence": null,
+      "chapter": "04-capabilities/02-support/03-infra/03-blueprints/02-parity.md",
+      "heading": "A size is machines; the posture is safety",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-infra",
+          "path": "refs/support/infra/blueprints.md",
+          "heading": "An environment is derived — three things may vary"
+        },
+        {
+          "plugin": "spn-infra",
+          "path": "refs/support/infra/shape/README.md",
+          "heading": "What an environment's row writes"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.INFRA.149",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-infra/implement"
+      },
+      "class": "stated in a skill",
+      "sentence": "A burstable size is refused in production",
+      "chapter": "04-capabilities/02-support/03-infra/03-blueprints/02-parity.md",
+      "heading": "A size is machines; the posture is safety",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-infra",
+          "path": "refs/support/infra/blueprints.md",
+          "heading": "An environment is derived — three things may vary"
+        },
+        {
+          "plugin": "spn-infra",
+          "path": "refs/support/infra/shape/README.md",
+          "heading": "The refusals — every one is a gate, not a bug"
+        },
+        {
+          "plugin": "spn-infra",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.INFRA.150",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-infra/implement"
+      },
+      "class": "stated in a skill",
+      "sentence": "The organization owns the catalog, and each platform chooses from it",
+      "chapter": "04-capabilities/02-support/03-infra/03-blueprints/02-parity.md",
+      "heading": "A size is machines; the posture is safety",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-infra",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.INFRA.151",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-infra/implement"
+      },
+      "class": "stated in a skill",
+      "sentence": "An environment's size is the default and the floor",
+      "chapter": "04-capabilities/02-support/03-infra/03-blueprints/02-parity.md",
+      "heading": "A size is machines; the posture is safety",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-infra",
+          "path": "refs/support/infra/blueprints.md",
+          "heading": "An environment is derived — three things may vary"
+        },
+        {
+          "plugin": "spn-infra",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.INFRA.152",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-infra/implement"
+      },
+      "class": "stated in a skill",
+      "sentence": null,
+      "chapter": "02-constructs/02-support/03-infra/05-apps.md",
+      "heading": "How big, and how many",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-infra",
+          "path": "refs/support/infra/apps.md",
+          "heading": "How big, and how many"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.INFRA.153",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-infra/implement"
+      },
+      "class": "stated in a skill",
+      "sentence": null,
+      "chapter": "02-constructs/02-support/03-infra/04-resources.md",
+      "heading": "Each data service its own size",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-infra",
+          "path": "refs/support/infra/resources.md",
+          "heading": "Hosting and size are independent axes"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.INFRA.154",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-infra/implement"
+      },
+      "class": "stated in a skill",
+      "sentence": "A deployment is told who it is and where its traces go",
+      "chapter": "04-capabilities/02-support/03-infra/06-modules/02-config.md",
+      "heading": "The published vocabulary",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-infra",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.INFRA.155",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-infra/run"
+      },
+      "class": "stated in a skill",
+      "sentence": null,
+      "chapter": "04-capabilities/02-support/03-infra/08-operate/01-deployments.md",
+      "heading": "Observability is not opt-in",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-infra",
+          "path": "refs/support/infra/operate.md",
+          "heading": "The serving contract is dynamic"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.INFRA.156",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-infra/run"
+      },
+      "class": "stated in a skill",
+      "sentence": "Production is gated by a tag, and the gate is a ruleset",
+      "chapter": "04-capabilities/02-support/03-infra/08-operate/01-deployments.md",
+      "heading": "Promotion is declared, not inferred",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-infra",
+          "path": "refs/support/infra/operate.md",
+          "heading": "Promotion is declared, not worked out"
+        },
+        {
+          "plugin": "spn-infra",
+          "path": "skills/run/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.INFRA.157",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-infra/implement"
+      },
+      "class": "stated in a skill",
+      "sentence": "An application is given a module's settings only when its row names the module",
+      "chapter": "02-constructs/02-support/03-infra/06-modules.md",
+      "heading": "Given only to the apps that name it",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-infra",
+          "path": "refs/support/infra/README.md",
+          "heading": "1 · Machines write the environment rung only"
+        },
+        {
+          "plugin": "spn-infra",
+          "path": "refs/support/infra/modules.md",
+          "heading": "A module runs at one of three levels"
+        },
+        {
+          "plugin": "spn-infra",
+          "path": "refs/support/infra/shape/naming.md",
+          "heading": "The published vocabulary — one format, in the shape the app opens (RULE.SUPPORT.INFRA.043)"
+        },
         {
           "plugin": "spn-infra",
           "path": "skills/implement/SKILL.md",

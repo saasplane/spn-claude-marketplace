@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-infra/06-modules.md",
-      "seen": "03b1bbc7"
+      "seen": "5eb9c330"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/06-modules/",
-      "seen": "ba50910f"
+      "seen": "d3338e59"
     }
   ]
 }
@@ -33,6 +33,18 @@ export interface SPEstateModule {
 ```
 
 **The module defines its variables and the declaring row values them — MUST.** That is what lets a company add a warehouse or a search engine without the vocabulary an application reads ever widening.
+
+## A module runs at one of three levels
+
+| Declared in | Layer | Instances | Settings seat |
+| --- | --- | --- | --- |
+| the organization's manifest | `GROUND`, `ORGANIZATION` | one for the company | `/organization/modules/{code}/vars` |
+| a platform's manifest | `PLATFORM` | one for the platform | `/platform/modules/{code}/vars` |
+| a platform's manifest | `ENVIRONMENT`, `DEPLOYMENTS` | one in each environment | `/environments/{env}/modules/{code}/vars` |
+
+**An application is given a module's settings only when its row names the module — MUST** (`RULE.SUPPORT.INFRA.157` · MUST · skill:spn-infra/implement). A row lists the modules it is given, `"modules": ["mail", "idp"]`, and nothing else reaches it, because a module's settings may hold credentials. Refused by name: a row that names a module no level declares, a module whose layer does not match the file that declares it, two modules with one code in one scope, and a product's name used as a code.
+
+**A module is named and addressed like an application.** Its package is `@{scope}/infra-module-{purpose}`, never a product's name, and its row's code is the purpose word. On a laptop its local project is `{org}-{spc}-mod-{code}` and its address `{code}.{local domain}`. In a cloud it answers at `{env}-{code}.internal.{spd}` for an environment, `{code}.internal.{spd}` for a platform and `{code}.internal.{company domain}` for the organization. A further surface is `{code}-{surface}`. It publishes `{SPC}_{CODE}_{FACT}`, and it is always private.
 
 ## Additive in its own world, never platform ground
 
@@ -123,6 +135,7 @@ An environment's configuration is either a fact the estate discovered or a choic
 /organization/vars
 /organization/modules/{code}/vars
 /platform/vars
+/platform/modules/{code}/vars
 /environments/{env}/vars
 /environments/{env}/spaces/{code}/vars
 /environments/{env}/modules/{code}/vars
@@ -132,7 +145,7 @@ An environment's configuration is either a fact the estate discovered or a choic
 
 **Every rung ends in the same leaf segment `/vars`, and that is what makes the tree enumerable — MUST.** A rung that ended at the thing it described worked only while it was a leaf, and an application is not one — it carries a seat per deployment beneath it, so its path would have to be both a value and a parent of values, which is a collision in a store shaped as a hierarchy. Moving every value one level down leaves the path above it free to branch.
 
-Each path exists as a plain half and a secret half. **Identity follows residency, which is why no path carries the platform's own token.** An environment's subtree is written by an apply bound to that environment's workload account; the organization and platform rungs by one bound to the platform's control account (`RULE.SUPPORT.INFRA.059` · MUST · skill:spn-infra/implement). The organization apply **writes** the organization's facts into each platform's store — platforms stay self-contained, a re-apply propagates, and nothing reads across an account at the moment of composition. **A module's seat sits at the rung its `layer` puts it on** — an environment-scope module publishes at `/environments/{env}/modules/{code}`, an organization-scope one at `/organization/modules/{code}` — admitted only for what is org-singular by nature (`RULE.SUPPORT.INFRA.065` · MUST · skill:spn-infra/implement).
+Each path exists as a plain half and a secret half. **Identity follows residency, which is why no path carries the platform's own token.** An environment's subtree is written by an apply bound to that environment's workload account; the organization and platform rungs by one bound to the platform's control account (`RULE.SUPPORT.INFRA.059` · MUST · skill:spn-infra/implement). The organization apply **writes** the organization's facts into each platform's store — platforms stay self-contained, a re-apply propagates, and nothing reads across an account at the moment of composition. **A module's seat sits at the rung its `layer` puts it on** — an environment-scope module publishes at `/environments/{env}/modules/{code}`, an organization-scope one at `/organization/modules/{code}`, a platform-scope one at `/platform/modules/{code}` — admitted only for what is org-singular by nature (`RULE.SUPPORT.INFRA.065` · MUST · skill:spn-infra/implement).
 
 **Keys are open; paths are fixed.** SaaS Plane fixes the prefixes and defines nothing beneath them — a value nobody predicted is a write inside a prefix that already exists, never an estate edit, a blueprint change or a foundation release. A check can only ever test **placement**: is this write inside a prefix this writer may write, and is a credential being pinned into a manifest. The foundation has no vocabulary for which keys ought to exist, and does not pretend to.
 
@@ -141,10 +154,13 @@ Each path exists as a plain half and a secret half. **Identity follows residency
 ```text
 the standard block
   → /organization/vars
-    → /platform/vars
-      → the application's world rungs — the platform's, the bound space's, or both
-        → /environments/{env}/apps/{app}/vars
-          → /environments/{env}/apps/{app}/deployments/{deployment}/vars
+    → /organization/modules/{code}/vars       — each organization module the row names
+      → /platform/vars
+        → /platform/modules/{code}/vars       — each platform module the row names
+          → the application's world rungs — the platform's, the bound space's, or both
+            → /environments/{env}/modules/{code}/vars   — each environment module the row names
+              → /environments/{env}/apps/{app}/vars
+                → /environments/{env}/apps/{app}/deployments/{deployment}/vars
 ```
 
 **Later rungs win — MUST.** A team's value overrides a standard default by construction, and no deployment lists a path anywhere; the coordinate is the whole address. **The sequence can never be declared** (`RULE.SUPPORT.INFRA.054` · MUST · skill:spn-infra/implement): extending it is a change to this rule in its chapter, with a register row only where a choice was weighed, an answer reversed or a conflict settled, uniformly — a space's own rung entered exactly that way. The sanctioned ways to reach around it are to promote a value up a rung, to write a `${…}` reference, to author in the application plane, or to use a module's own seat. The narrowest rung is the deployment's own, and it is last because two deployments of one application differ in exactly the values that make them different deployments.
@@ -156,12 +172,13 @@ Which world rungs a deployment is given follows from its application's row (`RUL
 | Path | On the platform | Space only | The platform and a space |
 | --- | --- | --- | --- |
 | `/organization/vars` · `/platform/vars` | yes | yes | yes |
+| a module's seat, at any level | when the row names it | when the row names it | when the row names it |
 | `/environments/{env}/vars` | yes | no | yes |
 | `/environments/{env}/spaces/{code}/vars` | no | yes | yes |
 | `/environments/{env}/apps/{app}/vars` | yes | yes | yes |
 | `/environments/{env}/apps/{app}/deployments/{deployment}/vars` | yes | yes | yes |
 
-The secret half is taken from every path below `/platform/vars` that the deployment is given, because the organization's and the platform's facts are plain. A later path wins where two hold the same key, and the two world rungs cannot hold the same key, because every key under a world's rung starts with that world's prefix, which the blueprint refuses otherwise. **Nothing is merged and nothing is given a second name**: the deployment loads both layers as they are, and the application's own settings join them, as a second queue connection that points at the platform's queue by reference.
+The secret half is taken from the module seats the row names and the last three rows, because the organization's and the platform's facts are plain. A later path wins where two hold the same key, and the two world rungs cannot hold the same key, because every key under a world's rung starts with that world's prefix, which the blueprint refuses otherwise. **Nothing is merged and nothing is given a second name**: the deployment loads both layers as they are, and the application's own settings join them, as a second queue connection that points at the platform's queue by reference.
 
 **A fact is published once, at the path that describes it, and never copied to the consumers that read it.** Many applications on one database read one entry, and rotating it is one write; copying a fact per application turns every rotation into a fan-out and every staleness into a quiet defect nothing connects to the others.
 

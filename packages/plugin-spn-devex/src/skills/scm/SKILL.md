@@ -154,6 +154,7 @@ Wear `refs/devex/agent/lenses/lead.md` when shaping repo standards and process �
 - **A check that cannot fail is not written** (`RULE.DEVEX.FUNCTION.074` · MUST · skill:spn-devex/scm)
 - **Every action is pinned by its commit and every image by its digest, with its release written beside it** (`RULE.DEVEX.FUNCTION.075` · MUST · skill:spn-devex/scm)
 - **The workflows a repository already runs follow the same pinning rule** (`RULE.DEVEX.FUNCTION.076` · MUST · skill:spn-devex/scm)
+- **A platform's repository runs its checks on the platform's own build runners** (`RULE.DEVEX.FUNCTION.104` · MUST · skill:spn-devex/scm)
 - **Identity is carried by a manifest per system, and each is read by exactly one** (`RULE.DEVEX.WORKSPACE.398` · MUST · skill:spn-devex/scm)
 - **Only a repository whose world has a realization carries claims; every other world writes its configuration as empty** (`RULE.DEVEX.WORKSPACE.399` · MUST · skill:spn-devex/scm)
 - **Every package reference uses one grammar, whatever it points at** (`RULE.DEVEX.WORKSPACE.400` · MUST · skill:spn-devex/scm)

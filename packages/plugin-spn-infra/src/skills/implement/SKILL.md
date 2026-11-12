@@ -154,3 +154,8 @@ Use the `release` skill (bump `version` in `spinfrapkg.json` → `spnutils infra
 - **The acting role trusts the estate repository's pipeline role by name, and no other principal becomes it** (`RULE.SUPPORT.INFRA.145` · MUST · skill:spn-infra/implement)
 - **The deployments layer is applied by the pipeline alone, from a push, by digest** (`RULE.SUPPORT.INFRA.146` · MUST · skill:spn-infra/implement)
 - **The organization owns every domain, registered once, and a domain outlives any platform** (`RULE.SUPPORT.INFRA.147` · MUST · skill:spn-infra/implement)
+- **A burstable size is refused in production** (`RULE.SUPPORT.INFRA.149` · MUST · skill:spn-infra/implement)
+- **The organization owns the catalog, and each platform chooses from it** (`RULE.SUPPORT.INFRA.150` · MUST · skill:spn-infra/implement)
+- **An environment's size is the default and the floor** (`RULE.SUPPORT.INFRA.151` · MUST · skill:spn-infra/implement)
+- **A deployment is told who it is and where its traces go** (`RULE.SUPPORT.INFRA.154` · MUST · skill:spn-infra/implement)
+- **An application is given a module's settings only when its row names the module** (`RULE.SUPPORT.INFRA.157` · MUST · skill:spn-infra/implement)

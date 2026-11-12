@@ -8,12 +8,12 @@
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/06-modules/02-config.md",
       "section": "The published vocabulary",
-      "seen": "b5f87f55"
+      "seen": "c2d51a6d"
     },
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-infra/06-modules.md",
       "section": "The rungs",
-      "seen": "3dcae51d"
+      "seen": "e413471c"
     }
   ]
 }
@@ -55,10 +55,11 @@ tenant             {env}-{tenant}.{spd}         canonical; a pretty name is a si
 custom domain      customer-owned               outside the zone, its own certificate
 ```
 
-- **`{domain}` is the zone an app's row binds** — the platform domain `{spd}` unless the row carries a `serviceDomain` key naming one of the platform's service domains. Engine records, the documents host and the storage API belong to a **world**, and a world has no domain: they stay on `{spd}` however many service domains the platform declares.
+- **`{domain}` is the zone an app's row binds** — `{spd}` unless the row's required `domain` code names another of the organization's domains. Engine records, the documents host and the storage API belong to a **world**, and a world has no domain: they stay on `{spd}` however many service domains the platform declares.
 - **Every declared domain stands a public zone `{domain}` and a private zone `internal.{domain}`, and the private zone is always a child name — never the apex** (`RULE.SUPPORT.INFRA.086` · MUST · skill:spn-infra/implement). A private zone takes precedence for its whole namespace inside every network it joins, so a private zone on the apex would make the platform's own public hosts unresolvable from inside the cluster.
 - **One world-marking rule covers every service hostname class** (`RULE.SUPPORT.INFRA.052` · MUST · skill:spn-infra/implement): the world token is the platform's `{spc}`, a space's code, or a module's code — **no unmarked default world exists**. A space that stands its own engine gets its own records (`in-dev-sas-database…`), which is why unmarked records would be ambiguous, not merely inconsistent. The world token always matches the key prefix of the facts carrying the hostname.
 - **Locally** (`RULE.SUPPORT.INFRA.079` · MUST · skill:spn-infra/implement): `{world}-{service}.{lc-domain}` for every service, engines included — `dmo-docs` · `dmo-sas-docs` · `idp-auth` · `dmo-database.lc-spndemo.app:9000` · `dmo-sas-cache.lc-spndemo.app:9011`. The machine's resolver answers the host with `127.0.0.1`, so nothing is proxied and no engine protocol is intercepted. The port still tells transports apart, and the hostname carries the world. Each port comes from the five hundred the platform declares (`RULE.SUPPORT.INFRA.062` · MUST · skill:spn-infra/implement); see `../providers/local/04-addressing.md`. Server certificates are minted per `{world}-{family}`, so an engine presents a certificate for the name you dial.
+- **A module is addressed like an application**: its row's code is the purpose word, and it answers at `{env}-{code}.internal.{spd}` in an environment, `{code}.internal.{spd}` for a platform and `{code}.internal.{company domain}` for the organization; a further surface is `{code}-{surface}` in the same places. Locally its compose project is `{org}-{spc}-mod-{code}` and its main address `{code}.{local domain}`.
 - **Module namespaces are validated** (`RULE.SUPPORT.INFRA.056` · MUST · skill:spn-infra/implement): no kindCode may equal a declared module code or begin with one plus a hyphen.
 - **Two labels belong to the grammar and never to a deployment** (`RULE.SUPPORT.INFRA.119` · MUST · skill:spn-infra/implement): `gateway`, which is each gateway's own host, and any label that ends `-remote`, which is an application's remote port. `spnutils infra validate` refuses a deployment whose `subdomains` hold either, and names the row; the blueprint refuses a deployment label `gateway` as well, because it would take the record every route's host points at.
 - **Engine records**: the environment apply writes them into the private zone, pointing at whatever the hosting rendered. Use these names in published endpoint facts, **never provider hostnames** — an engine swap flips a record, and every consumer follows.
@@ -67,10 +68,13 @@ custom domain      customer-owned               outside the zone, its own certif
 
 ## The published vocabulary — one format, in the shape the app opens (RULE.SUPPORT.INFRA.043)
 
-Written by blueprints into each **resource world's own seat**. **Every configuration rung ends in the same leaf segment, `vars`** (`RULE.SUPPORT.INFRA.054` · MUST · skill:spn-infra/implement) — the platform world at `/environments/{env}/vars`, a space at `/environments/{env}/spaces/{code}/vars`, a module's private seat at `/environments/{env}/modules/{code}/vars`, with `/organization/vars` and `/platform/vars` above them. The app plane — `/environments/{env}/apps/{app}/vars` and one seat per deployment beneath it at `/environments/{env}/apps/{app}/deployments/{deployment}/vars` — is dev-authored (`RULE.SUPPORT.INFRA.054` · MUST · skill:spn-infra/implement). Identity facts flat; resources as connection blocks the support shell reads directly. **Plus each installed module's purpose code** — `DMO_IDP_URL` names the purpose as the environment stands it, never the product that renders it.
+Written by blueprints into each **resource world's own seat**. **Every configuration rung ends in the same leaf segment, `vars`** (`RULE.SUPPORT.INFRA.054` · MUST · skill:spn-infra/implement) — the platform world at `/environments/{env}/vars`, a space at `/environments/{env}/spaces/{code}/vars`, a module's private seat at `/environments/{env}/modules/{code}/vars` (a platform-scope module's at `/platform/modules/{code}/vars`, an organization-scope one's at `/organization/modules/{code}/vars`), with `/organization/vars` and `/platform/vars` above them. **A deployment is given a module's seat only when its application's row names the module** (`RULE.SUPPORT.INFRA.157` · MUST · skill:spn-infra/implement), in the order organization, platform, environment, each after its own level's settings. The app plane — `/environments/{env}/apps/{app}/vars` and one seat per deployment beneath it at `/environments/{env}/apps/{app}/deployments/{deployment}/vars` — is dev-authored (`RULE.SUPPORT.INFRA.054` · MUST · skill:spn-infra/implement). Identity facts flat; resources as connection blocks the support shell reads directly. **Plus each installed module's purpose code** — `DMO_IDP_URL` names the purpose as the environment stands it, never the product that renders it.
 
 ```text
 {SPC}_DEPLOYMENT_KIND_CODE                          the app a deployment belongs to: its estate app row's kindCode, rendered into the deployment's environment, never authored in a seat; on a laptop the app's env file carries a copy of the row's kindCode, checked by `infra app up`
+{SPC}_DEPLOYMENT_SPACE                              the resource space the deployment's app is bound to; blank for the platform's world — rendered, never authored (`RULE.SUPPORT.INFRA.154` · MUST · skill:spn-infra/implement)
+{SPC}_DEPLOYMENT_VERSION                            what is running: the commit on a push, the tag on a promotion; blank on a laptop
+{SPC}_PLATFORM_OBSERVABILITY_TRACES_ENDPOINT        the OTLP/HTTP address of the collector in the deployment's own cluster, published in each environment's store by the platform's world; on a laptop it points at the local observability module when it runs
 {SPC}_ORG_LEGAL_*                                   {SPC}_PLATFORM_CODE · _NAME · _DOMAIN · _ENV · _APPS_{APP}_SUBDOMAIN · _OWNER_*
 {SPC}_RESOURCE_{FAM}_{WORLD}_ENDPOINTS              per connection block (RULE.SUPPORT.INFRA.055): DB_APP · DB_MIGRATION ·
                                                     DB_{SCHEMA} · CACHE_{NAME} · QUEUE_{NAME} · STORAGE_{NAME}
