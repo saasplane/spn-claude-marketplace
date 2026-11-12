@@ -1,11 +1,11 @@
 // Carries out one unit's spec on its set: moves the placed instances, removes the versions that go,
-// takes the dropped properties out of the names, and writes the header's layout clause.
+// takes the dropped properties out of the names, and writes the spec's layout into the section's plugin data.
 //
 // Passed to the Figma connector's `use_figma` as it is. A plain script with top-level `await` and
 // `return`, no wrapper. Fill INPUTS, change nothing else. DRY IS THE DEFAULT: with `dryRun: true` it
 // changes nothing and returns what it would do. A spec is one unit's JSON file (the file `check-specs.mjs`
-// reads); pass it whole as `spec`: its `unit`, `setId`, `keep` or `remove`, `dropProps`, `move`, `header`
-// and `expect`.
+// reads); pass it whole as `spec`: its `unit`, `setId`, `keep` or `remove`, `dropProps`, `move`, `layout`
+// and `expect`. `layout` is the object the section keeps as shared plugin data, as `layout.js` reads it.
 //
 //   pageId  the page this call works on; null is the set's own page. The connector works on one page
 //           in a call, so a unit placed on other pages gets one "move" call for each of them first.
@@ -16,8 +16,9 @@
 //                    an instance on this page is a problem and stays.
 //           rename   the cell of each property in `dropProps` is taken out of every version's name.
 //                    Refused while a version that goes is still in the set.
-//           header   the clauses `rows:`, `columns:`, `one row`, `one column` of the unit's header are
-//                    replaced by the spec's `header`.
+//           header   the spec's `layout` is written as the set's section's shared plugin data (namespace
+//                    `saasplane`, key `layout`). The header's text holds no layout and is not touched here:
+//                    `header.js` writes its `behaviour:` note.
 // Before anything changes it checks that the set is the spec's unit and that the versions that stay
 // are `expect.versionsAfterRemoval`; if not, it changes nothing and says why. It stops by itself after
 // `maxSeconds` and returns `more: true`: send the same call again, it goes on where it stopped.
@@ -124,33 +125,18 @@ if (INPUTS.steps.includes("rename") && !done.more && !renamed && drop.length > 0
   }
 }
 
-if (INPUTS.steps.includes("header") && !done.more && spec.header && onSetPage) {
+if (INPUTS.steps.includes("header") && !done.more && spec.layout && onSetPage) {
   const home = set.parent;
-  const header = home.children.find((child) => child.type === "TEXT" && child.characters.startsWith(spec.unit + " — "));
-  if (!header) {
-    problem("no header text found beside the set");
+  const SHAPES = ["set", "one component", "no set of versions, shown as cases"];
+  if (home.type !== "SECTION") {
+    problem("the set stands in no section, and only a section keeps a layout");
+  } else if (typeof spec.layout !== "object" || !SHAPES.includes(spec.layout.shape) || !Array.isArray(spec.layout.tables)) {
+    problem(`the spec's layout is not of the book's form: a shape of ${SHAPES.join(", ")}, and its tables`);
   } else {
-    // The unit and ` — ` come first, so the first clause is the one after them (`rows: ...` of `DSButton — rows: ...`).
-    const prefix = spec.unit + " — ";
-    // `one row` and `one column` are a layout clause only when they are the whole clause: a description
-    // may begin with the same words (`one row of a DSList: …`).
-    const isLayout = (clause) => /^(rows: |columns: )/.test(clause) || /^(one row|one column)$/.test(clause.trim());
-    const clauses = header.characters.slice(prefix.length).split(" · ");
-    const first = clauses.findIndex(isLayout);
-    let last = first;
-    while (last + 1 < clauses.length && isLayout(clauses[last + 1])) last += 1;
-    if (first < 0) {
-      problem("the header holds no layout clause to replace");
-    } else {
-      const start = prefix.length + (first === 0 ? 0 : clauses.slice(0, first).join(" · ").length + 3);
-      const end = prefix.length + clauses.slice(0, last + 1).join(" · ").length;
-      done.header = { was: header.characters.slice(start, end), now: spec.header };
-      if (!INPUTS.dryRun && done.header.was !== spec.header) {
-        for (const segment of header.getStyledTextSegments(["fontName"])) await figma.loadFontAsync(segment.fontName);
-        header.insertCharacters(end, spec.header, "BEFORE");
-        header.deleteCharacters(start, end);
-      }
-    }
+    const was = home.getSharedPluginData("saasplane", "layout") || null;
+    const now = JSON.stringify(spec.layout);
+    done.header = { was, now };
+    if (!INPUTS.dryRun && was !== now) home.setSharedPluginData("saasplane", "layout", now);
   }
 }
 

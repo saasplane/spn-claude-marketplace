@@ -39,7 +39,8 @@
 //            `oldSetBox` as read) for each set whose versions' names or count change.
 //   check    reads after.json and says, for each set read, whether every version that stood keeps its key under
 //            the name the operations give it, whether the new versions are exactly the copies, whether the
-//            default carries the header's defaults, and whether the header holds the layout and the notes.
+//            default carries the header's defaults, whether the section keeps the layout as its plugin data,
+//            and whether the header's `behaviour:` line names each note's props.
 //            Exit 1 when any set has a fault.
 //
 // A saved answer is the call's answer as returned, `{ script, runs, of, stopped, answers }`.
@@ -138,7 +139,8 @@ const operationsOf = (draw, leftOut) => {
 };
 
 // A variant property that a unit's copies bring in and that no version holds yet is first added to every
-// version by a `names` fold, at the value the decisions give, and the unit's header states it, in the rows.
+// version by a `names` fold, at the value the decisions give, and the layout states it: a column group of its own
+// in the set's table, its other values after the default, since groups are never multiplied.
 const withAddedProperties = (unitName, spec, operations, faultsFound, remarks) => {
   const firstCopy = operations.findIndex((operation) => operation.op === "copy");
   if (firstCopy < 0 || !spec.setId) return operations;
@@ -161,17 +163,20 @@ const withAddedProperties = (unitName, spec, operations, faultsFound, remarks) =
   next.splice(firstCopy, 0, { op: "names", lines: [], why: `adds ${Object.keys(set).join(", ")} to every version before the copies`, fold: [{ match: {}, set }] });
   const header = next.find((operation) => operation.op === "header");
   if (header) {
-    for (const [property, values] of valuesOf) {
-      const clause = [`${property}=${decided[property]} (default)`, ...values.filter((value) => value !== decided[property])].join(", ");
-      const parts = String(header.layout).split(" · ");
-      const rows = parts.findIndex((part) => part.startsWith("rows: ") || part === "one row");
-      if (rows < 0) { faultsFound.push(`${unitName}: the header's layout has no rows clause to state ${property} in`); continue; }
-      parts[rows] = parts[rows] === "one row" ? `rows: ${clause}` : `rows: ${clause} x ${parts[rows].slice("rows: ".length)}`;
-      header.layout = parts.join(" · ");
-      header.defaults = { ...(header.defaults ?? {}), [property]: decided[property] };
+    const table = header.layout && typeof header.layout === "object" ? (header.layout.tables ?? []).find((one) => one?.caption === "the set") : null;
+    if (!table) faultsFound.push(`${unitName}: the header's layout has no table captioned \`the set\` to state ${[...valuesOf.keys()].join(", ")} in`);
+    else {
+      const layout = { ...header.layout, default: { ...(header.layout.default ?? {}) }, tables: header.layout.tables.map((one) => (one === table ? { ...one, columnGroups: [...one.columnGroups] } : one)) };
+      const grown = layout.tables.find((one) => one.caption === "the set");
+      for (const [property, values] of valuesOf) {
+        grown.columnGroups.push({ prop: property, values: values.filter((value) => value !== decided[property]) });
+        layout.default[property] = decided[property];
+        header.defaults = { ...(header.defaults ?? {}), [property]: decided[property] };
+      }
+      header.layout = layout;
     }
   }
-  remarks.push(`${unitName}: ${Object.entries(set).map(([property, value]) => `${property}=${value}`).join(", ")} is added to every version before the copies, and the header states it: ${header?.layout ?? "no header"}`);
+  remarks.push(`${unitName}: ${Object.entries(set).map(([property, value]) => `${property}=${value}`).join(", ")} is added to every version before the copies, and the layout states it: ${header?.layout ? JSON.stringify(header.layout.tables?.find((one) => one.caption === "the set")?.columnGroups ?? []) : "no header"}`);
   return next;
 };
 
@@ -466,8 +471,13 @@ if (stage === "check") {
         found.push(`UNPROVEN: the keys of the ${want.stood.length} versions that stood cannot be told from the hash beside ${want.copies.length} copies; read the set with \`listVersions: true\``);
       }
       if (want.defaultAfter !== null && answer.default !== want.defaultAfter) found.push(`the default is [${answer.default}], not [${want.defaultAfter}]`);
-      if (want.layout !== null && (!answer.header || !answer.header.includes(want.layout))) found.push("the header does not hold the layout clause");
-      for (const note of want.notes) if (answer.header && !answer.header.includes(note)) found.push(`the header does not hold the note [${note}]`);
+      if (want.layout !== null && answer.layout !== JSON.stringify(want.layout)) found.push("the section does not keep the layout as its plugin data");
+      // The header's `behaviour:` line, its last, names each note's props.
+      const named = (answer.header ?? "").split("\n").filter((line) => line.trim().startsWith("behaviour: ")).flatMap((line) => line.trim().slice("behaviour: ".length).split(", "));
+      for (const note of want.notes) {
+        const props = String(note).startsWith("behaviour: ") ? String(note).slice("behaviour: ".length).split(", ") : [String(note)];
+        if (answer.header && props.some((prop) => !named.includes(prop))) found.push(`the header's behaviour line does not name [${note}]`);
+      }
     }
     faults += found.length > 0 ? 1 : 0;
     console.log(`${found.length > 0 ? "FAULT" : "whole"} ${want.unit}: ${found.length > 0 ? found.join("; ") : `${answer.count} versions, each that stood under its key; default [${answer.default}]`}`);

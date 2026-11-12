@@ -25,6 +25,8 @@
 //                   a corner radius above 0. The distinct answers, false before true
 //   text            the distinct text case and text decoration of the text layers, sorted
 //   measures        per version, the first layer whose field is a number, with the variable bound to it
+// and of every unit, its `layout`: the layout the section named for the unit keeps as shared plugin data, the contract's
+// `SPSurfaceInventoryLayout`, or null where it stands in no such section or the section keeps none.
 
 const INPUTS = {
   pageId: null,
@@ -177,7 +179,15 @@ async function readVersion(version, wantMeasures) {
   return { name: version.name, w: version.width, h: version.height, frame, layers, measures };
 }
 
-// One unit: its props, its version count and default, how it is drawn, and its versions when asked for.
+// The layout of the section named for the unit, as its shared plugin data keeps it (namespace `saasplane`, key
+// `layout`), or null where the unit stands in no such section, or the section keeps none or none that reads.
+function layoutOfUnit(node) {
+  const section = node.parent;
+  if (!section || section.type !== "SECTION" || section.name !== node.name) return null;
+  try { return JSON.parse(section.getSharedPluginData("saasplane", "layout") || "null"); } catch { return null; }
+}
+
+// One unit: its props, its version count and default, how it is drawn, its versions when asked for, and its layout.
 async function readUnit(node, wantMeasures) {
   const isSet = node.type === "COMPONENT_SET";
   const versionNodes = isSet ? node.children.filter((child) => child.type === "COMPONENT") : [node];
@@ -205,6 +215,7 @@ async function readUnit(node, wantMeasures) {
       text: { case: distinct(textLayers.map((layer) => layer.text.case)), decoration: distinct(textLayers.map((layer) => layer.text.decoration)) },
     },
     versions: wantMeasures ? versions.map((version) => ({ name: version.name, w: version.w, h: version.h, measures: version.measures })) : null,
+    layout: layoutOfUnit(node),
   };
 }
 

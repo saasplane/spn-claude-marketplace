@@ -3139,7 +3139,7 @@
     color: var(--sds-text-title);
     text-decoration-line: none;
     --sds-arc: var(--sds-step-1);
-    flex: 0 0 auto;
+    flex: 1 0 auto;
     width: 12rem;
     min-width: 0;
     scroll-snap-align: start;
@@ -3268,6 +3268,8 @@
     font-size: var(--sds-xs);
     color: var(--sds-text-fact);
     font-variant-numeric: tabular-nums;
+    flex: none;
+    white-space: nowrap;
   }
   .sds-chip-open {
     text-decoration-line: none;

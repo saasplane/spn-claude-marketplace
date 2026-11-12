@@ -1,5 +1,6 @@
-// Reads one set, and changes nothing: its box, its default, its grid's padding and gap, its header, and a
-// hash of its versions' keys and names.
+// Reads one set, and changes nothing: its box, its default, its grid's padding and gap, its header, the layout its
+// section keeps as shared plugin data (namespace `saasplane`, key `layout`, as JSON text, or null), and a hash of its
+// versions' keys and names.
 //
 // Passed to the Figma connector's `use_figma` through `bundle.mjs`, one run for each set of a page. The
 // hash is the FNV-1a hash of the lines `key=name` of the set's versions, sorted by key and joined by a
@@ -43,7 +44,12 @@ const freeBetween = (axis, size) => {
   return least;
 };
 const home = set.parent;
-const header = home.children.find((child) => child.type === "TEXT" && child.characters.startsWith(set.name + " — "));
+// The header: its layer is `header · ` and the unit's name, or its first line is the unit's name (an older header begins
+// with the name and ` — `).
+const header = home.children.find((child) => child.type === "TEXT" && (child.name === `header · ${set.name}` ||
+  child.characters.split("\n")[0].trim() === set.name || child.characters.startsWith(set.name + " — ")));
+let layout = null;
+try { layout = home.type === "SECTION" ? home.getSharedPluginData("saasplane", "layout") || null : null; } catch { layout = null; }
 // What `layout.js` may move out of the way of a set that grows: everything else in the section but the
 // header and the row and column labels of the set (those `labels.js` finds beside the set as it stands).
 const middleY = (node) => node.y + node.height / 2;
@@ -53,7 +59,8 @@ const BAND_LABELS = ["label · Usage", "label · Cases", "label · Parts"];
 const isSetLabel = (node) => node.type === "TEXT" && node.name.startsWith("label · ") && !BAND_LABELS.includes(node.name) && !node.name.includes(" cases — ") && (
   (node.x + node.width <= set.x && middleY(node) >= set.y && middleY(node) <= set.y + set.height) ||
   (node.y + node.height <= set.y && node.y >= set.y - 80 && node.x >= set.x - 1 && node.x <= set.x + set.width));
-const mayMove = home.type === "SECTION" ? home.children.filter((node) => node.id !== set.id && node !== header && !isSetLabel(node)).map((node) => node.id) : [];
+// The plugin's frame of the set's labels, `table · the set`, encloses the set and is never moved out of its way.
+const mayMove = home.type === "SECTION" ? home.children.filter((node) => node.id !== set.id && node !== header && !isSetLabel(node) && node.name !== "table · the set").map((node) => node.id) : [];
 let defaultName = null;
 try { defaultName = set.defaultVariant ? set.defaultVariant.name : null; } catch (error) { defaultName = null; }
 
@@ -69,6 +76,7 @@ return {
   padding: versions.length > 0 ? [Math.min(...versions.map((version) => version.x)), Math.min(...versions.map((version) => version.y))] : null,
   gap: freeBetween("x", "width") ?? freeBetween("y", "height") ?? 60,
   header: header ? header.characters : null,
+  layout,
   mayMove,
   setLabels: home.type === "SECTION" ? home.children.filter((node) => node !== header && isSetLabel(node)).map((node) => node.id) : [],
   labels: home.children.filter((child) => child.type === "TEXT" && child.name.startsWith("label · ")).length,

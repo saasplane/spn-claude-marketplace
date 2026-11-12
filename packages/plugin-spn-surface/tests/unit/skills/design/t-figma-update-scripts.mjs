@@ -195,8 +195,11 @@ console.log("\n=== apply-spec.js — one unit's spec carried out on its set");
 const spec = {
   unit: "DSBtn", setId: "9:1", remove: [{ authzDenied: "DISABLE" }], dropProps: ["authzDenied"],
   move: [{ from: { authzDenied: "DISABLE" }, set: { authzDenied: "ENABLE" } }],
-  defaults: { size: "SM" }, header: "rows: size=SM (default), MD", expect: { versionsAfterRemoval: 2 },
+  defaults: { size: "SM" }, expect: { versionsAfterRemoval: 2 },
+  // the layout the section keeps once the spec is carried out, as the drawing page's plugin data states it
+  layout: { shape: "set", tables: [{ caption: "the set", rowGroups: [{ prop: "size", values: ["SM", "MD"] }], columnGroups: [] }], default: { size: "SM" }, cases: [], behaviour: ["loading"] },
 };
+const OLD_LAYOUT = JSON.stringify({ shape: "set", tables: [{ caption: "the set", rowGroups: [{ prop: "size", values: ["SM", "MD", "LG"] }], columnGroups: [{ prop: "authzDenied", values: ["ENABLE", "DISABLE"] }] }], default: { size: "SM", authzDenied: "ENABLE" }, cases: [], behaviour: ["loading"] });
 const specPage = () => {
   const versions = [
     version("5:0", "size=SM, authzDenied=ENABLE", "k0"), version("5:1", "size=MD, authzDenied=ENABLE", "k1"),
@@ -204,7 +207,7 @@ const specPage = () => {
   ];
   const set = componentSet("9:1", "DSBtn", "kset", versions);
   const header = node("4:0", "header · DSBtn", "TEXT", {
-    characters: "DSBtn — rows: size=SM (default), MD, LG · columns: authzDenied=ENABLE, DISABLE · behaviour: loading",
+    characters: "DSBtn\na button\nbehaviour: loading",
     getStyledTextSegments: () => [{ fontName: { family: "Inter", style: "Regular" } }],
   });
   header.insertCharacters = (index, text) => { header.characters = header.characters.slice(0, index) + text + header.characters.slice(index); };
@@ -213,16 +216,19 @@ const specPage = () => {
   instance.swapped = null;
   instance.swapComponent = (target) => { instance.swapped = target.name; };
   const section = node("3:1", "Section", "SECTION", {}, [header, set, instance]);
-  return { page: pageNode("2:1", "Actions", [section]), set, header, instance, versions };
+  section.plugin = { "saasplane:layout": OLD_LAYOUT };
+  section.getSharedPluginData = (namespace, key) => section.plugin[`${namespace}:${key}`] ?? "";
+  section.setSharedPluginData = (namespace, key, value) => { section.plugin[`${namespace}:${key}`] = value; };
+  return { page: pageNode("2:1", "Actions", [section]), set, header, instance, versions, section };
 };
 await guard(async () => {
   const made = specPage();
   const figma = figmaFile([made.page]);
   const answer = await run("apply-spec.js", { spec }, figma);
   same("dry is the default: it counts what it would do and changes nothing", [answer.dryRun, answer.before, answer.stay, answer.go, answer.moved, answer.removed, answer.renamed, answer.after], [true, 4, 2, 2, 1, 2, 2, 4]);
-  same("dry: the header is named as it would change, and the instance, the set and the names are as they were",
-    [answer.header, made.instance.swapped, made.set.children.map((one) => one.name), made.header.characters.slice(0, 20), answer.properties],
-    [{ was: "rows: size=SM (default), MD, LG · columns: authzDenied=ENABLE, DISABLE", now: "rows: size=SM (default), MD" }, null, ["size=SM, authzDenied=ENABLE", "size=MD, authzDenied=ENABLE", "size=SM, authzDenied=DISABLE", "size=MD, authzDenied=DISABLE"], "DSBtn — rows: size=S", null]);
+  same("dry: the section's layout is named as it would change, and the instance, the set, the names and the layout are as they were",
+    [answer.header, made.instance.swapped, made.set.children.map((one) => one.name), made.section.plugin["saasplane:layout"], answer.properties],
+    [{ was: OLD_LAYOUT, now: JSON.stringify(spec.layout) }, null, ["size=SM, authzDenied=ENABLE", "size=MD, authzDenied=ENABLE", "size=SM, authzDenied=DISABLE", "size=MD, authzDenied=DISABLE"], OLD_LAYOUT, null]);
 });
 await guard(async () => {
   const made = specPage();
@@ -230,7 +236,7 @@ await guard(async () => {
   const answer = await run("apply-spec.js", { spec, dryRun: false }, figma);
   same("applied: the instance moves to the version its rule leads to, and the versions that go are removed", [made.instance.swapped, answer.moved, answer.removed, answer.problems], ["size=SM, authzDenied=ENABLE", 1, 2, []]);
   same("applied: the dropped property is out of every name, in the set that is left", [made.set.children.map((one) => one.name), answer.renamed], [["size=SM", "size=MD"], 2]);
-  same("applied: the header's layout clause is replaced and the rest of it stays", made.header.characters, "DSBtn — rows: size=SM (default), MD · behaviour: loading");
+  same("[MKT.SCRIPTS.557] applied: the spec's layout is the section's plugin data, and the header's text is not touched", [made.section.plugin["saasplane:layout"], made.header.characters], [JSON.stringify(spec.layout), "DSBtn\na button\nbehaviour: loading"]);
   same("applied: the answer gives the default and the properties after", [answer.after, answer.defaultVersion, answer.setKey, answer.properties], [2, "size=SM", "kset", []]);
 });
 await guard(async () => {
@@ -240,10 +246,13 @@ await guard(async () => {
   ok("a spec whose expected count is not what would stay is refused, with nothing changed", /2 versions would stay, the spec expects 3/.test(refused.refused ?? "") && made.set.children.length === 4, JSON.stringify(refused));
   const wrong = await run("apply-spec.js", { spec: { ...spec, unit: "DSOther" } }, figma);
   ok("a set that is not the spec's unit is refused", /is not the set DSOther/.test(wrong.refused ?? ""), JSON.stringify(wrong));
-  const described = specPage();
-  described.header.characters = "DSBtn — one row of a list: a content · one row · columns: size=SM (default), MD · behaviour: loading";
-  await run("apply-spec.js", { spec, dryRun: false, steps: ["header"] }, figmaFile([described.page]));
-  same("a description that begins with `one row` is no layout clause: it stays, and the clauses after it are replaced", described.header.characters, "DSBtn — one row of a list: a content · rows: size=SM (default), MD · behaviour: loading");
+  const loose = specPage();
+  loose.section.type = "FRAME";
+  const unkept = await run("apply-spec.js", { spec, dryRun: false, steps: ["header"] }, figmaFile([loose.page]));
+  ok("a set that stands in no section keeps no layout: the header step is a problem, and nothing is written", /stands in no section/.test(unkept.problems[0] ?? "") && loose.section.plugin["saasplane:layout"] === OLD_LAYOUT, JSON.stringify(unkept.problems));
+  const badLayout = specPage();
+  const malformed = await run("apply-spec.js", { spec: { ...spec, layout: { shape: "grid", tables: [] } }, dryRun: false, steps: ["header"] }, figmaFile([badLayout.page]));
+  ok("a spec's layout that is not of the book's form is a problem, and nothing is written", /not of the book's form/.test(malformed.problems[0] ?? "") && badLayout.section.plugin["saasplane:layout"] === OLD_LAYOUT, JSON.stringify(malformed.problems));
   const unmoved = specPage();
   const noRule =await run("apply-spec.js", { spec: { ...spec, move: [] }, dryRun: false, steps: ["move", "remove"] }, figmaFile([unmoved.page]));
   ok("an instance with no rule is a problem: it stays, and the version it stands on is not removed", noRule.problems.length === 2 && noRule.removed === 1 && unmoved.set.children.length === 3, JSON.stringify([noRule.problems, noRule.removed]));
@@ -319,7 +328,7 @@ await guard(async () => {
   runNode("bundle.mjs", ["--script", "apply-spec.js", "--inputs", join(folder, "real.json"), "--out", join(folder, "real")]);
   const realPage = specPage();
   const real = await sendBundle(join(folder, "real.js"), fileOf(realPage));
-  same("a real run in a bundle changes the file as the script alone does", [real.answers[0].removed, realPage.set.children.map((one) => one.name), realPage.header.characters], [2, ["size=SM", "size=MD"], "DSBtn — rows: size=SM (default), MD · behaviour: loading"]);
+  same("a real run in a bundle changes the file as the script alone does", [real.answers[0].removed, realPage.set.children.map((one) => one.name), realPage.section.plugin["saasplane:layout"]], [2, ["size=SM", "size=MD"], JSON.stringify(spec.layout)]);
   const small = runNode("bundle.mjs", ["--script", "apply-spec.js", "--inputs", join(folder, "dry.json"), "--out", join(folder, "cut"), "--max", String(readFileSync(join(folder, "real.js"), "utf8").length + 40)]);
   ok("inputs that do not fit the limit are cut into files to send in order", small.exit === 0 && /cut-1\.js: runs 0 to 0/.test(small.said) && /cut-2\.js: runs 1 to 1/.test(small.said), small.said);
   // a second run on another page must not switch again
@@ -367,13 +376,17 @@ await guard(async () => {
   writeFileSync(join(specs, "DSBtn.json"), JSON.stringify({ ...spec, expect: { versionsAfterRemoval: 4 } }));
   const count = runNode("check-specs.mjs", ["--specs", specs, "--readings", readings, "DSBtn"]);
   ok("a unit named on the command line is checked alone, and a wrong expected count is named", count.exit === 1 && /2 versions stay, the spec expects 4/.test(count.said), count.said);
-  writeFileSync(join(specs, "DSBtn.json"), JSON.stringify({ ...spec, header: "rows: size=SM (default), MD drawn once" }));
-  const prose = runNode("check-specs.mjs", ["--specs", specs, "--readings", readings]);
-  ok("a header that words a value as `layout.js` cannot read it is named, exit 1", prose.exit === 1 && /\[size=MD\] holds `size=MD`, which the header does not state/.test(prose.said), prose.said);
-  writeFileSync(join(specs, "DSBtn.json"), JSON.stringify({ ...spec, header: "one row · one column" }));
-  const unnamed = runNode("check-specs.mjs", ["--specs", specs, "--readings", readings]);
-  ok("a header that does not name a property the set holds is named, exit 1", unnamed.exit === 1 && /the header names `size` 0 times/.test(unnamed.said), unnamed.said);
-  writeFileSync(join(specs, "DSBtn.json"), JSON.stringify({ ...spec, defaults: { size: "XL" } }));
+  const tableOf = (rowGroups, columnGroups = []) => ({ ...spec.layout, tables: [{ caption: "the set", rowGroups, columnGroups }] });
+  writeFileSync(join(specs, "DSBtn.json"), JSON.stringify({ ...spec, layout: tableOf([{ prop: "size", values: ["SM"] }]) }));
+  const short = runNode("check-specs.mjs", ["--specs", specs, "--readings", readings]);
+  ok("[MKT.SCRIPTS.557] a version that stays and has no cell in the layout's set table is named, exit 1", short.exit === 1 && /\[size=MD\] has no cell in the layout's set table/.test(short.said), short.said);
+  writeFileSync(join(specs, "DSBtn.json"), JSON.stringify({ ...spec, layout: tableOf([{ prop: "size", values: ["SM", "MD"] }], [{ prop: "tone", values: ["a"] }]) }));
+  const unheld = runNode("check-specs.mjs", ["--specs", specs, "--readings", readings]);
+  ok("a layout that names a prop the set does not hold after the removal is named, exit 1", unheld.exit === 1 && /the layout names `tone`, which the set does not hold after the removal/.test(unheld.said), unheld.said);
+  writeFileSync(join(specs, "DSBtn.json"), JSON.stringify({ ...spec, header: "rows: size=SM (default), MD", layout: undefined }));
+  const old = runNode("check-specs.mjs", ["--specs", specs, "--readings", readings]);
+  ok("[MKT.SCRIPTS.557] a spec that still gives a `header` and no `layout` is named, exit 1", old.exit === 1 && /the spec gives no `layout`/.test(old.said), old.said);
+  writeFileSync(join(specs, "DSBtn.json"), JSON.stringify({ ...spec, defaults: { size: "XL" }, layout: { ...spec.layout, default: { size: "XL" } } }));
   const noDefault = runNode("check-specs.mjs", ["--specs", specs, "--readings", readings]);
   ok("defaults that no version that stays carries are named, exit 1", noDefault.exit === 1 && /no version that stays carries every default/.test(noDefault.said), noDefault.said);
   writeFileSync(join(specs, "DSBtn.json"), JSON.stringify({ ...spec, defaults: { size: "XL" }, layoutDefaults: { size: "SM" } }));
@@ -447,68 +460,90 @@ await guard(async () => {
 
 // ---- labels.js -----------------------------------------------------------------------------------
 
-console.log("\n=== labels.js — the row and column labels written again from the grid");
+console.log("\n=== labels.js — the row and column labels and the groups' titles written again from the grid");
 let copies = 0;
-const labelsPage = () => {
+const BUTTON_LAYOUT = { shape: "set", tables: [{ caption: "the set", rowGroups: [{ prop: "size", values: ["SM", "MD"] }], columnGroups: [{ prop: "state", values: ["rest", "hover"] }] }], default: { size: "SM", state: "rest" }, cases: [], behaviour: [] };
+const labelsPage = (layout = BUTTON_LAYOUT) => {
   const cells = [["SM", "rest", 20, 20], ["SM", "hover", 140, 20], ["MD", "rest", 20, 100], ["MD", "hover", 140, 100]];
   const versions = cells.map(([size, state, x, y], at) => version(`5:${at}`, `size=${size}, state=${state}`, `k${at}`, 100, 40));
   versions.forEach((one, at) => { one.x = cells[at][2]; one.y = cells[at][3]; });
   const set = componentSet("9:1", "DSBtn", "kset", versions);
   set.x = 200; set.y = 100; set.width = 300; set.height = 200;
-  const home = node("3:1", "Section", "SECTION", {}, []);
+  const home = node("3:1", "DSBtn", "SECTION", { x: 0, y: 0 }, []);
+  home.getSharedPluginData = (namespace, key) => (namespace === "saasplane" && key === "layout" && layout ? JSON.stringify(layout) : "");
   home.appendChild = (child) => { child.parent = home; home.children.push(child); };
   const text = (id, name, characters, x, y) => {
     const made = node(id, name, "TEXT", { characters, x, y, width: 80, height: 20 });
     made.getStyledTextSegments = () => [{ fontName: { family: "Inter", style: "Regular" } }];
-    made.remove = () => { home.children = home.children.filter((child) => child !== made); };
-    // as in Figma, a copy of a text lands on the page and not in the section of the text it copies
+    made.remove = () => { made.parent.children = made.parent.children.filter((child) => child !== made); };
+    // as in Figma, a copy of a text lands on the page and not in the frame of the text it copies
     made.clone = () => { copies += 1; const copy = text(`${id}c${copies}`, made.name, made.characters, made.x, made.y); copy.parent = null; return copy; };
     return made;
   };
-  // the header's layer is named as a label, as older headers are
-  const header = text("4:0", "label · DSBtn", "DSBtn — rows: size=SM (default), MD · columns: state=rest (default), hover", 200, 60);
-  for (const one of [header, set, text("4:1", "label · size=SM (default)", "size=SM (default)", 100, 120), text("4:2", "label · size=MD", "size=MD", 100, 200), text("4:3", "label · state=rest (default)", "state=rest (default)", 220, 70), text("4:4", "label · state=hover", "state=hover", 340, 70)]) { one.parent = home; home.children.push(one); }
-  return { page: pageNode("2:1", "Actions", [home]), home, header };
+  const header = text("4:0", "header · DSBtn", "DSBtn\nA button that runs one action.", 200, -40);
+  const labels = [
+    text("4:1", "label · SM (default)", "SM (default)", 96, 130), text("4:2", "label · MD", "MD", 96, 210),
+    text("4:3", "label · rest (default)", "rest (default)", 220, 56), text("4:4", "label · hover", "hover", 340, 56),
+    text("4:5", "label · size", "size", 96, 84), text("4:6", "label · states", "states", 220, 20),
+  ];
+  for (const one of [header, set, ...labels]) { one.parent = home; home.children.push(one); }
+  return { page: pageNode("2:1", "Actions", [home]), home, header, text };
 };
+const written = (home, header) => home.children.filter((child) => child.type === "TEXT" && child !== header).map((label) => [label.characters, label.x, label.y]);
 await guard(async () => {
   const made = labelsPage();
   const figma = figmaFile([made.page]);
   const dry = await run("labels.js", { setId: "9:1" }, figma);
-  same("dry is the default: the labels it would write are listed with the old ones it would remove, and the header is no label",
-    [dry.dryRun, dry.removed, dry.rows, dry.columns, dry.problems], [true, ["size=SM (default)", "size=MD", "state=rest (default)", "state=hover"], ["size=SM (default)", "size=MD"], ["state=rest (default)", "state=hover"], []]);
-  same("dry: nothing is changed", made.home.children.length, 6);
+  same("dry is the default: the labels and titles it would write are listed with the old ones it would remove, and the header is no label",
+    [dry.dryRun, dry.removed, dry.rows, dry.columns, dry.titles, dry.problems],
+    [true, ["SM (default)", "MD", "rest (default)", "hover", "size", "states"], ["SM (default)", "MD"], ["rest (default)", "hover"], ["size", "states"], []]);
+  same("dry: nothing is changed", made.home.children.length, 8);
   const applied = await run("labels.js", { setId: "9:1", dryRun: false }, figma);
-  const labels = made.home.children.filter((child) => child.type === "TEXT" && child !== made.header);
-  same("applied: the four labels stand where the book puts them: a row label ends 24 left of the set and is centred on its row, a column label stands 16 above, at its column's left",
-    labels.map((label) => [label.characters, label.x, label.y]), [["size=SM (default)", 96, 130], ["size=MD", 96, 210], ["state=rest (default)", 220, 64], ["state=hover", 340, 64]]);
-  same("applied: the header stays, the old labels are gone and the new ones are named for their text", [made.home.children.includes(made.header), applied.made.length, labels.map((label) => label.name)], [true, 4, ["label · size=SM (default)", "label · size=MD", "label · state=rest (default)", "label · state=hover"]]);
+  same("[MKT.SCRIPTS.557] applied: a label names a value read from the section's layout, and a title its group's prop, where the book puts them: a row label ends 24 left of the set, a column label stands 24 above it, a title 16 above its labels",
+    written(made.home, made.header), [["SM (default)", 96, 130], ["MD", 96, 210], ["rest (default)", 220, 56], ["hover", 340, 56], ["size", 96, 84], ["states", 220, 20]]);
+  same("applied: the header stays, the old labels are gone and the new ones are named for their text",
+    [made.home.children.includes(made.header), applied.made.length, made.home.children.filter((child) => child.type === "TEXT" && child !== made.header).map((label) => label.name)],
+    [true, 6, ["label · SM (default)", "label · MD", "label · rest (default)", "label · hover", "label · size", "label · states"]]);
 });
 await guard(async () => {
-  const made = labelsPage();
-  made.header.characters = "DSBtn — rows: size=SM (default), MD · columns: tone=a, b";
-  const odd = await run("labels.js", { setId: "9:1", dryRun: false }, figmaFile([made.page]));
-  ok("a named property the versions do not share one value for refuses the writing, and nothing is changed", odd.problems.length > 0 && made.home.children.length === 6, JSON.stringify(odd.problems));
-  const bare = labelsPage();
-  bare.header.characters = "DSBtn — one component";
+  const bare = labelsPage(null);
   const none = await run("labels.js", { setId: "9:1" }, figmaFile([bare.page]));
-  same("a header that names no layout leaves no label to write", [none.rows, none.columns], [[], []]);
+  ok("[MKT.SCRIPTS.557] a section that holds no layout is refused, whatever its header says, and nothing is changed",
+    /holds no layout/.test(none.refused ?? "") && bare.home.children.length === 8, JSON.stringify(none));
+  const odd = labelsPage({ ...BUTTON_LAYOUT, tables: [{ caption: "the set", rowGroups: [{ prop: "size", values: ["SM", "MD"] }], columnGroups: [{ prop: "tone", values: ["a", "b"] }] }] });
+  const refused = await run("labels.js", { setId: "9:1", dryRun: false }, figmaFile([odd.page]));
+  ok("a column whose versions move no group's prop to one value refuses the writing, and nothing is changed", refused.problems.length > 0 && odd.home.children.length === 8, JSON.stringify(refused.problems));
   const lost = labelsPage();
-  lost.home.children = lost.home.children.filter((child) => !child.name.startsWith("label · size"));
+  lost.home.children = lost.home.children.filter((child) => !["4:1", "4:2"].includes(child.id));
   const borrowed = await run("labels.js", { setId: "9:1", dryRun: false }, figmaFile([lost.page]));
-  const rowLabels = lost.home.children.filter((child) => child.type === "TEXT" && child.characters.startsWith("size="));
-  same("a side that had no label takes the style of the other side's and names its property (seen on DSAnchorContainer, whose one property moved from the rows to the columns)",
-    [borrowed.problems, borrowed.rows, rowLabels.map((label) => [label.characters, label.x, label.y])], [[], ["size=SM (default)", "size=MD"], [["size=SM (default)", 96, 130], ["size=MD", 96, 210]]]);
+  same("a side that had no label takes the style of the other side's",
+    [borrowed.problems, borrowed.rows, written(lost.home, lost.header).filter(([words]) => ["SM (default)", "MD"].includes(words))], [[], ["SM (default)", "MD"], [["SM (default)", 96, 130], ["MD", 96, 210]]]);
   const bareSides = labelsPage();
-  bareSides.home.children = bareSides.home.children.filter((child) => !child.name.startsWith("label · s"));
+  bareSides.home.children = bareSides.home.children.filter((child) => !child.name.startsWith("label · "));
   const styleless = await run("labels.js", { setId: "9:1", dryRun: false }, figmaFile([bareSides.page]));
-  ok("with no label on either side to take the style from it is told, and nothing is changed", styleless.problems.some((text) => /no label stood on either side/.test(text)) && bareSides.home.children.length === 2, JSON.stringify(styleless.problems));
+  ok("with no label on either side to take the style from it is told, and nothing is changed", styleless.problems.some((words) => /no label stood on either side/.test(words)) && bareSides.home.children.length === 2, JSON.stringify(styleless.problems));
   // the set was laid out again and is now shorter than the rows its old labels stood beside
   const shrunk = labelsPage();
   shrunk.home.children.find((child) => child.id === "9:1").height = 60;
   const short = await run("labels.js", { setId: "9:1" }, figmaFile([shrunk.page]));
   const whole = await run("labels.js", { setId: "9:1", oldSetBox: [200, 100, 300, 200] }, figmaFile([shrunk.page]));
   same("a set that shrank: `oldSetBox` finds the labels of the rows it no longer reaches, and without it they would be left standing",
-    [short.removed.includes("size=MD"), whole.removed], [false, ["size=SM (default)", "size=MD", "state=rest (default)", "state=hover"]]);
+    [short.removed.includes("MD"), whole.removed], [false, ["SM (default)", "MD", "rest (default)", "hover", "size", "states"]]);
+});
+await guard(async () => {
+  // As the plugin draws it: the labels stand in the frame `table · the set`, which stands at (80, 0) in the section.
+  const drawn = labelsPage();
+  const inFrame = drawn.home.children.filter((child) => child.type === "TEXT" && child !== drawn.header);
+  const frame = node("6:1", "table · the set", "FRAME", { x: 80, y: 0, width: 600, height: 400 }, []);
+  frame.appendChild = (child) => { child.parent = frame; frame.children.push(child); };
+  frame.findAll = (test) => frame.children.filter(test);
+  for (const one of inFrame) { one.x -= 80; one.parent = frame; frame.children.push(one); }
+  drawn.home.children = [drawn.header, drawn.home.children.find((child) => child.id === "9:1"), frame];
+  frame.parent = drawn.home;
+  const applied = await run("labels.js", { setId: "9:1", dryRun: false }, figmaFile([drawn.page]));
+  same("[MKT.SCRIPTS.557] labels the plugin drew in its frame are found there and written there, in the frame's own coordinates",
+    [applied.problems, frame.children.map((label) => [label.characters, label.x + 80, label.y]), drawn.home.children.length],
+    [[], [["SM (default)", 96, 130], ["MD", 96, 210], ["rest (default)", 220, 56], ["hover", 340, 56], ["size", 96, 84], ["states", 220, 20]], 3]);
 });
 
 // ---- the stand-in of a tree that clones, appends and removes ------------------------------------
@@ -705,8 +740,8 @@ await guard(async () => {
 
 // ---- header.js -----------------------------------------------------------------------------------
 
-console.log("\n=== header.js — the layout clauses of a header and its notes");
-const headerPage = (characters = "DSBtn — a button · rows: size=SM (default), MD · columns: state=rest (default) · behaviour: loading", withSet = true) => {
+console.log("\n=== header.js — the section's layout as plugin data, and the header's behaviour note");
+const headerPage = (characters = "DSBtn\na button\nbehaviour: loading", withSet = true, layout = null) => {
   const text = (id, chars) => {
     const made = node(id, "header · DSBtn", "TEXT", { characters: chars, getStyledTextSegments: () => [{ fontName: { family: "Inter", style: "Regular" } }] });
     made.insertCharacters = (index, added) => { made.characters = made.characters.slice(0, index) + added + made.characters.slice(index); };
@@ -716,42 +751,48 @@ const headerPage = (characters = "DSBtn — a button · rows: size=SM (default),
   const header = text("4:0", characters);
   const set = treeSet([treeVersion("5:0", "size=SM", "k0", 20, 20, [])]);
   const section = node("3:1", "DSBtn", "SECTION", {}, withSet ? [header, set] : [header]);
+  section.plugin = layout === null ? {} : { "saasplane:layout": JSON.stringify(layout) };
+  section.getSharedPluginData = (namespace, key) => section.plugin[`${namespace}:${key}`] ?? "";
+  section.setSharedPluginData = (namespace, key, value) => { section.plugin[`${namespace}:${key}`] = value; };
   return { page: pageNode("2:1", "Actions", [section]), header, section, text };
 };
-const layoutNew = "rows: size=SM (default), MD, LG · columns: state=rest (default)";
+const layoutNew = { shape: "set", tables: [{ caption: "the set", rowGroups: [{ prop: "size", values: ["SM", "MD", "LG"] }], columnGroups: [{ prop: "state", values: ["rest"] }] }], default: { size: "SM", state: "rest" }, cases: [], behaviour: ["loading", "filter"] };
 const headerNotes = ["behaviour: loading", "behaviour: filter"];
 await guard(async () => {
   const made = headerPage();
   const dry = await run("header.js", { unit: "DSBtn", setId: "9:1", layout: layoutNew, notes: headerNotes }, figmaFile([made.page]));
-  same("dry is the default: the header as it is and as it would be, and the text is not changed", [dry.dryRun, dry.was, dry.now, dry.stood, made.header.characters === dry.was],
-    [true, "DSBtn — a button · rows: size=SM (default), MD · columns: state=rest (default) · behaviour: loading", "DSBtn — a button · rows: size=SM (default), MD, LG · columns: state=rest (default) · behaviour: loading · behaviour: filter", false, true]);
+  same("dry is the default: the header and the layout as they are and as they would be, and nothing is changed",
+    [dry.dryRun, dry.was, dry.now, dry.layoutWas, dry.layoutNow, dry.stood, made.header.characters === dry.was, made.section.plugin],
+    [true, "DSBtn\na button\nbehaviour: loading", "DSBtn\na button\nbehaviour: loading, filter", null, JSON.stringify(layoutNew), false, true, {}]);
   const applied = await run("header.js", { unit: "DSBtn", setId: "9:1", layout: layoutNew, notes: headerNotes, dryRun: false }, figmaFile([made.page]));
-  same("applied: the layout clauses are replaced, a note the header held is not written again, a new one ends it", made.header.characters, "DSBtn — a button · rows: size=SM (default), MD, LG · columns: state=rest (default) · behaviour: loading · behaviour: filter");
+  same("[MKT.SCRIPTS.557] applied: the layout is the section's plugin data, and the header gains only the behaviour it did not name",
+    [made.section.getSharedPluginData("saasplane", "layout"), made.header.characters, applied.now], [JSON.stringify(layoutNew), "DSBtn\na button\nbehaviour: loading, filter", "DSBtn\na button\nbehaviour: loading, filter"]);
   const again = await run("header.js", { unit: "DSBtn", setId: "9:1", layout: layoutNew, notes: headerNotes, dryRun: false }, figmaFile([made.page]));
-  same("sent twice: the header stands as it is", [again.stood, made.header.characters === applied.now], [true, true]);
+  same("sent twice: the header and the layout stand as they are", [again.stood, made.header.characters === applied.now], [true, true]);
 });
 await guard(async () => {
-  const notes = headerPage();
-  await run("header.js", { unit: "DSBtn", setId: "9:1", notes: ["tone: left to the developer"], dryRun: false }, figmaFile([notes.page]));
-  same("with no layout only the notes are written, as the last clauses", notes.header.characters, "DSBtn — a button · rows: size=SM (default), MD · columns: state=rest (default) · behaviour: loading · tone: left to the developer");
-  const lone = headerPage("DSBtn — one row of a list: a content · one row · behaviour: loading", false);
-  await run("header.js", { unit: "DSBtn", setId: null, pageId: "2:1", layout: "one column", notes: [], dryRun: false }, figmaFile([lone.page]));
-  same("a unit with no set is found by the section of the page named as the unit, and a description that begins with `one row` is no layout clause", lone.header.characters, "DSBtn — one row of a list: a content · one column · behaviour: loading");
+  const old = headerPage("DSBtn — a button · rows: size=SM (default), MD · columns: state=rest (default) · behaviour: loading", true, layoutNew);
+  await run("header.js", { unit: "DSBtn", setId: "9:1", notes: [], dryRun: false }, figmaFile([old.page]));
+  same("[MKT.SCRIPTS.557] a header in the old form is written in the book's form: its line and its behaviour kept, its layout clauses dropped, the layout left as the plugin data holds it",
+    [old.header.characters, old.section.getSharedPluginData("saasplane", "layout")], ["DSBtn\na button\nbehaviour: loading", JSON.stringify(layoutNew)]);
+  const lone = headerPage("DSBtn\none row of a list: a content", false);
+  await run("header.js", { unit: "DSBtn", setId: null, pageId: "2:1", layout: { ...layoutNew, shape: "one component", tables: [] }, notes: [], dryRun: false }, figmaFile([lone.page]));
+  same("a unit with no set is found by the section of the page named as the unit, and a line that begins with `one row` is its line", [lone.header.characters, JSON.parse(lone.section.plugin["saasplane:layout"]).shape], ["DSBtn\none row of a list: a content", "one component"]);
   const refuse = async (changes, characters) => {
     const fresh = headerPage(characters);
     const answer = await run("header.js", { unit: "DSBtn", setId: "9:1", layout: layoutNew, notes: [], dryRun: false, ...changes }, figmaFile([fresh.page]));
     return { answer, fresh };
   };
-  const noLayout = await refuse({}, "DSBtn — a button · one component");
-  ok("a header with no layout clause to replace refuses, and the text stays", /holds no layout clause/.test(noLayout.answer.problems[0] ?? "") && noLayout.fresh.header.characters === "DSBtn — a button · one component", JSON.stringify(noLayout.answer));
-  const notLayout = await refuse({ layout: "rows: size=SM · behaviour: loading" });
-  ok("a layout that holds a clause that is no layout clause refuses", /is no layout clause/.test(notLayout.answer.problems[0] ?? ""), JSON.stringify(notLayout.answer));
-  const dotted = await refuse({ notes: ["a · b"] });
-  ok("a note that holds ` · ` refuses", /holds ·/.test(dotted.answer.problems[0] ?? ""), JSON.stringify(dotted.answer));
+  const badShape = await refuse({ layout: { ...layoutNew, shape: "grid" } });
+  ok("a layout of a shape the book does not name refuses, and nothing is written", /shape is none of/.test(badShape.answer.problems[0] ?? "") && Object.keys(badShape.fresh.section.plugin).length === 0, JSON.stringify(badShape.answer));
+  const badGroup = await refuse({ layout: { ...layoutNew, tables: [{ caption: "the set", rowGroups: [{ prop: "size", values: [] }], columnGroups: [] }] } });
+  ok("a group with no values refuses", /group's prop or values/.test(badGroup.answer.problems[0] ?? ""), JSON.stringify(badGroup.answer));
+  const other = await refuse({ notes: ["tone: left to the developer"] });
+  ok("a note that is no `behaviour:` note refuses: a header holds no other", /is no `behaviour:` note/.test(other.answer.problems[0] ?? ""), JSON.stringify(other.answer));
   const two = headerPage();
-  two.section.children.push(two.text("4:9", "DSBtn — another"));
+  two.section.children.push(two.text("4:9", "DSBtn\nanother"));
   const doubled = await run("header.js", { unit: "DSBtn", setId: "9:1", layout: layoutNew, dryRun: false }, figmaFile([two.page]));
-  ok("two headers refuse", /2 headers begin with/.test(doubled.problems[0] ?? "") && two.header.characters.includes("rows: size=SM (default), MD ·"), JSON.stringify(doubled));
+  ok("two headers refuse", /2 headers name DSBtn/.test(doubled.problems[0] ?? "") && Object.keys(two.section.plugin).length === 0, JSON.stringify(doubled));
   const wrong = await run("header.js", { unit: "DSOther", setId: "9:1", layout: layoutNew }, figmaFile([headerPage().page]));
   ok("a set that is not the unit is refused", /is not the set DSOther/.test(wrong.refused ?? ""), JSON.stringify(wrong));
 });
@@ -847,12 +888,15 @@ const newCasesPage = () => {
     size: { type: "VARIANT", defaultValue: "SM", variantOptions: ["SM"] },
     "loading#1:0": { type: "BOOLEAN", defaultValue: false },
     "label#1:2": { type: "TEXT", defaultValue: "x" },
+    "endIcon#1:3": { type: "INSTANCE_SWAP", defaultValue: "7:0" },
   });
   const old = plantTree(node("4:1", "old=lone", "COMPONENT", { key: "oldkey", x: 20, y: 0, width: 100, height: 40 }, [plantTree(node("4:5", "frame", "FRAME"))]));
   const sheet = plantTree(node("4:0", "DSBtn cases", "FRAME", { width: 300, height: 40, layoutMode: "HORIZONTAL" }, [old]));
   const placed = node("6:1", "placed", "INSTANCE", { explicitVariableModes: { "VariableCollectionId:k/8:1": "8:2" } });
+  // the icons a swap may name: one by a name no other component bears, and two that share a name
+  const icons = node("7:9", "Icons", "SECTION", {}, [node("7:1", "DSIcon / SETTINGS", "COMPONENT"), node("7:2", "DSIcon / CLOSE", "COMPONENT"), node("7:3", "DSIcon / CLOSE", "COMPONENT")]);
   const section = node("3:1", "Section", "SECTION", {}, [set, sheet, placed]);
-  const figma = figmaFile([pageNode("2:1", "Actions", [section])]);
+  const figma = figmaFile([pageNode("2:1", "Actions", [section, icons])]);
   figma.variables = { getVariableCollectionByIdAsync: async (id) => (id === "VariableCollectionId:k/8:1" ? { id, name: "Hue", modes: [{ name: "DEFAULT", modeId: "8:2" }, { name: "SUCCESS", modeId: "8:5" }] } : null) };
   const components = [];
   figma.createComponent = () => { const component = plantTree(node(`c${components.length}`, "", "COMPONENT", { x: 0, y: 0, width: 80, height: 30 })); components.push(component); return component; };
@@ -888,8 +932,19 @@ await guard(async () => {
   same("a text property is set by its name, with its full key, together with the other properties", [text.instances[0].set, texted.problems], [{ "loading#1:0": true, "label#1:2": "Open file" }, []]);
   const notText = await run("cases.js", { spec: oneCase({ text: { loading: "x" } }) }, newCasesPage().figma);
   ok("a `text` that names a property that is no text is a problem", /not a text/.test(notText.problems[0] ?? ""), JSON.stringify(notText));
-  const swapped = await run("cases.js", { spec: oneCase({ swap: { endIcon: "DSIcon / SETTINGS" } }) }, newCasesPage().figma);
-  ok("a non-empty `swap` is a problem and the case is not made; an empty one is no problem", /swap is set by hand/.test(swapped.problems[0] ?? "") && swapped.made.length === 0, JSON.stringify(swapped));
+  const swap = newCasesPage();
+  const swapped = await run("cases.js", { spec: oneCase({ text: { label: "Open file" }, swap: { endIcon: "DSIcon / SETTINGS" } }), dryRun: false }, swap.figma);
+  same("[MKT.SCRIPTS.556] a case sets its boolean, text and swap properties together: a swap names its component, which the property takes by id",
+    [swap.instances[0].set, swapped.problems], [{ "loading#1:0": true, "label#1:2": "Open file", "endIcon#1:3": "7:1" }, []]);
+  const byId = newCasesPage();
+  await run("cases.js", { spec: oneCase({ swap: { endIcon: "7:2" } }), dryRun: false }, byId.figma);
+  same("[MKT.SCRIPTS.556] a swap may name its component by its node id", byId.instances[0].set["endIcon#1:3"], "7:2");
+  const twin = await run("cases.js", { spec: oneCase({ swap: { endIcon: "DSIcon / CLOSE" } }) }, newCasesPage().figma);
+  ok("[MKT.SCRIPTS.556] a name two components bear is a problem, and the case is not made", /2 components are named "DSIcon \/ CLOSE"/.test(twin.problems[0] ?? "") && twin.made.length === 0, JSON.stringify(twin));
+  const nowhere = await run("cases.js", { spec: oneCase({ swap: { endIcon: "DSIcon / NONE" } }) }, newCasesPage().figma);
+  ok("a swap that names no component is a problem", /no component is "DSIcon \/ NONE"/.test(nowhere.problems[0] ?? ""), JSON.stringify(nowhere));
+  const notSwap = await run("cases.js", { spec: oneCase({ swap: { loading: "7:1" } }) }, newCasesPage().figma);
+  ok("a `swap` that names a property that is no swap is a problem", /is a BOOLEAN property, not a swap/.test(notSwap.problems[0] ?? ""), JSON.stringify(notSwap));
   const emptied = await run("cases.js", { spec: oneCase({ swap: {}, text: {}, modes: {} }) }, newCasesPage().figma);
   same("an empty `swap`, `text` and `modes` change nothing about a case", [emptied.problems, emptied.made.map((one) => one[0])], [[], ["loading=true"]]);
 });
@@ -1033,7 +1088,7 @@ await guard(async () => {
   const heading = headerPage();
   const headerRuns = bundled("header.js", [{ unit: "DSBtn", setId: "9:1", layout: layoutNew }, { unit: "DSBtn", setId: "9:1", layout: layoutNew, dryRun: false }], "header-two");
   const headerAnswer = await send(headerRuns.path, withFile(heading.page));
-  same("header.js in a bundle: dry then real", [headerAnswer.answers[0].now === headerAnswer.answers[1].now, heading.header.characters.includes("MD, LG")], [true, true]);
+  same("header.js in a bundle: dry then real", [headerAnswer.answers[0].layoutNow === headerAnswer.answers[1].layoutNow, heading.section.getSharedPluginData("saasplane", "layout").includes("\"LG\"")], [true, true]);
   const sheeting = sheetPage();
   const sheetRuns = bundled("sheet.js", [sheetInputs, { ...sheetInputs, dryRun: false }], "sheet-two");
   const sheetFigma = sheetFile(sheeting);
@@ -1057,7 +1112,7 @@ await guard(async () => {
     const copy = band.clone(); copy.id = id; copy.name = name; copy.characters = name.slice(8); copy.x = 40; copy.y = y; copy.parent = made.home; made.home.children.push(copy);
   }
   const dry = await run("labels.js", { setId: "9:1" }, figmaFile([made.page]));
-  same("a band label and a sheet's own label beside the set are no row label, and are not removed", dry.removed, ["size=SM (default)", "size=MD", "state=rest (default)", "state=hover"]);
+  same("a band label and a sheet's own label beside the set are no row label, and are not removed", dry.removed, ["SM (default)", "MD", "rest (default)", "hover", "size", "states"]);
   await run("labels.js", { setId: "9:1", dryRun: false }, figmaFile([made.page]));
   same("after the real call they still stand", ["label · Usage", "label · Cases", "label · DSBtn cases — size=SM"].map((name) => made.home.children.some((child) => child.name === name)), [true, true, true]);
 });
@@ -1104,6 +1159,9 @@ await guard(async () => {
 
 // ---- operations-calls.mjs, operations-check.mjs and operations-versions.mjs ---------------------
 
+// The layout a header operation gives: `size` down, `state` across, as the section's plugin data keeps it.
+const OPS_LAYOUT = (sizes) => ({ shape: "set", tables: [{ caption: "the set", rowGroups: [{ prop: "size", values: sizes }], columnGroups: [{ prop: "state", values: ["idle"] }] }], default: { size: "SM", state: "idle" }, cases: [], behaviour: ["loading"] });
+
 console.log("\n=== the operations of a page — operations-calls.mjs, operations-check.mjs, operations-versions.mjs");
 const operationsFixture = () => {
   const root = join(scratch, `operations-${++folderCount}`);
@@ -1123,7 +1181,7 @@ const operationsFixture = () => {
     { op: "property", lines: [2], name: "loading", type: "BOOLEAN", default: false, layer: "spinner", ties: "visible" },
     { op: "sheet", lines: [3] },
     { op: "case", lines: [3], name: "loading=true", proves: "Content: loading", base: { size: "SM" }, props: { loading: true }, replaces: "the lone component `loading=true` that stands on the sheet today is replaced by this instance" },
-    { op: "header", layout: "rows: state=idle (default) · columns: size=SM (default), MD, LG", notes: ["behaviour: loading"] },
+    { op: "header", layout: OPS_LAYOUT(["SM", "MD", "LG"]), notes: ["behaviour: loading"] },
   ], choices: [], compose: [], nothing: [{ lines: [4], why: "the set holds it already" }] }));
   writeFileSync(join(root, "ops", "DSTag.json"), JSON.stringify({ unit: "DSTag", setId: "9:2", ops: [
     { op: "case", lines: [0], name: "tone=b", proves: "Content: tone", base: { tone: "a" }, props: { tone: "b" }, replaces: "the one on the sheet is swapped for this, whatever it is" },
@@ -1162,16 +1220,16 @@ const hashOfLines = (lines) => fnv([...lines].sort().join("\n"));
   ok("layout stops on a set that is not the state the calls expect, and writes nothing", changed.exit === 1 && /FAULT DSBtn/.test(changed.said) && /nothing written/.test(changed.said), changed.said);
 
   // check: a true after-read passes, a wrong key is named
-  const afterAnswer = (versions, overrides = {}) => JSON.stringify({ script: "read-sets.js", runs: 1, of: 1, stopped: null, answers: [{ setId: "9:1", count: 3, default: "size=SM, state=idle", header: "DSBtn — rows: state=idle (default) · columns: size=SM (default), MD, LG · behaviour: loading", versions, ...overrides }] });
+  const afterAnswer = (versions, overrides = {}) => JSON.stringify({ script: "read-sets.js", runs: 1, of: 1, stopped: null, answers: [{ setId: "9:1", count: 3, default: "size=SM, state=idle", header: "DSBtn\na button\nbehaviour: loading", layout: JSON.stringify(OPS_LAYOUT(["SM", "MD", "LG"])), versions, ...overrides }] });
   writeFileSync(join(page, "after.json"), afterAnswer([["k0", "size=SM, state=idle"], ["k2", "size=MD, state=idle"], ["n1", "size=LG, state=idle"]]));
   const whole = runNode("operations-calls.mjs", callsArguments(root, "check", "Actions"));
   ok("check passes a true after-read, new keys included", whole.exit === 0 && /whole DSBtn: 3 versions/.test(whole.said), whole.said);
   writeFileSync(join(page, "after.json"), afterAnswer([["kX", "size=SM, state=idle"], ["k2", "size=MD, state=idle"], ["n1", "size=LG, state=idle"]]));
   const wrongKey = runNode("operations-calls.mjs", callsArguments(root, "check", "Actions"));
   ok("check names a version that stood and is not under its key", wrongKey.exit === 1 && /FAULT DSBtn: 1 versions that stood are not under their key and name, first k0=size=SM, state=idle/.test(wrongKey.said), wrongKey.said);
-  writeFileSync(join(page, "after.json"), afterAnswer([["k0", "size=SM, state=idle"], ["k2", "size=MD, state=idle"], ["n1", "size=LG, state=idle"]], { default: "size=MD, state=idle", header: "DSBtn — rows: x" }));
+  writeFileSync(join(page, "after.json"), afterAnswer([["k0", "size=SM, state=idle"], ["k2", "size=MD, state=idle"], ["n1", "size=LG, state=idle"]], { default: "size=MD, state=idle", layout: JSON.stringify(OPS_LAYOUT(["SM", "MD"])), header: "DSBtn\na button" }));
   const wrongDefault = runNode("operations-calls.mjs", callsArguments(root, "check", "Actions"));
-  ok("check names a wrong default and a header without the layout clause", wrongDefault.exit === 1 && /the default is \[size=MD, state=idle\], not \[size=SM, state=idle\]/.test(wrongDefault.said) && /the header does not hold the layout clause/.test(wrongDefault.said), wrongDefault.said);
+  ok("[MKT.SCRIPTS.557] check names a wrong default, a section that does not keep the layout, and a behaviour the header does not name", wrongDefault.exit === 1 && /the default is \[size=MD, state=idle\], not \[size=SM, state=idle\]/.test(wrongDefault.said) && /the section does not keep the layout as its plugin data/.test(wrongDefault.said) && /behaviour line does not name \[behaviour: loading\]/.test(wrongDefault.said), wrongDefault.said);
 }
 {
   const root = operationsFixture();
@@ -1218,7 +1276,7 @@ const hashOfLines = (lines) => fnv([...lines].sort().join("\n"));
   broken.ops[1].from = { size: "XL" };
   broken.ops[2].type = "NUMBER";
   broken.ops[4].modes = { Hue: "PURPLE" };
-  broken.ops[5].layout = "rows: state=idle (default) · columns: size=SM (default), MD";
+  broken.ops[5].layout = OPS_LAYOUT(["SM", "MD"]);
   broken.nothing = [];
   writeFileSync(buttons, JSON.stringify(broken));
   const modes = join(root, "modes.json");
@@ -1229,10 +1287,15 @@ const hashOfLines = (lines) => fnv([...lines].sort().join("\n"));
   ok("without --modes a mode is not checked", !/has no mode/.test(withoutModes.said), withoutModes.said);
   writeFileSync(buttons, JSON.stringify(sound));
   const late = JSON.parse(JSON.stringify(sound));
-  late.ops[5].layout = "rows: state=idle (default) · columns: size=SM (default), MD";
+  late.ops[5].layout = OPS_LAYOUT(["SM", "MD"]);
   writeFileSync(buttons, JSON.stringify(late));
   const header = runNode("operations-check.mjs", ["--ops", join(root, "ops"), "--specs", join(root, "specs"), "--readings", join(root, "readings"), "DSBtn"]);
-  ok("operations-check names a version the header does not state", header.exit === 1 && /header: \[size=LG, state=idle\] holds `size=LG`, which it does not state/.test(header.said), header.said);
+  ok("[MKT.SCRIPTS.557] operations-check names a version that has no cell in the header operation's layout", header.exit === 1 && /header: \[size=LG, state=idle\] has no cell in the layout's set table/.test(header.said), header.said);
+  const worded = JSON.parse(JSON.stringify(sound));
+  worded.ops[5].layout = "rows: state=idle (default) · columns: size=SM (default), MD, LG";
+  writeFileSync(buttons, JSON.stringify(worded));
+  const old = runNode("operations-check.mjs", ["--ops", join(root, "ops"), "--specs", join(root, "specs"), "--readings", join(root, "readings"), "DSBtn"]);
+  ok("[MKT.SCRIPTS.557] a header operation that still words its layout as clauses is named", old.exit === 1 && /header: the `layout` is no layout of the shape `set`/.test(old.said), old.said);
   rmSync(buttons);
   const missing = runNode("operations-check.mjs", ["--ops", join(root, "ops"), "--specs", join(root, "specs"), "--readings", join(root, "readings"), "DSBtn"]);
   ok("a unit with lines owed and no file is named", missing.exit === 1 && /DSBtn.json: NO FILE, 5 lines owed/.test(missing.said), missing.said);

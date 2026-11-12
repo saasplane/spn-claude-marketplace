@@ -9,8 +9,8 @@
 // the spec names it, that holds one instance of the unit with the case's `props` set. A case whose name
 // already stands on the sheet is left as it is (`stood`), so the script is safe to send twice. On a sheet
 // with no auto layout the new cases stand in a row of their own under the cases that are there. What this
-// script does not do, and reports in `problems`: make a sheet where the unit has none (`sheet.js` does),
-// set a swap property, and write the sheet's label.
+// script does not do, and reports in `problems`: make a sheet where the unit has none (`sheet.js` does), and
+// write the sheet's label.
 //
 //   spec    the spec's `unit`, `setId` and `cases`. A case holds `name`, `base`, `props`, `stands` and,
 //           optionally:
@@ -32,7 +32,11 @@
 //                     one that another case of the call replaces too, is a problem and that case is not made. Every
 //                     `replaced` entry ends with what the component held and with `rename`, `keep` or
 //                     `rebuild`, so a dry answer shows what a real call would remove
-//           swap      a non-empty one is a problem and the case is not made
+//           swap      { "<property>": "<component>" }: instance swap properties of the set, each set to a component
+//                     named by its node id, or by its exact name where one component of the page bears it. A case
+//                     is the unit with its props set: a boolean shows or hides its layer, a text fills its text
+//                     layer, and a swap swaps its instance, as the drawing page's part "How a placed unit
+//                     reaches each prop" states
 //         With `setId` null the spec holds `loneId`, the lone component that each case is an instance of;
 //         the case's `props` are then that component's own properties and its `base` is not read.
 //
@@ -155,6 +159,13 @@ const isRight = async (component, plan) => {
   return Object.entries(plan.values).every(([key, value]) => held[key] && held[key].value === value);
 };
 
+// The components a swap may name by its name: every component of the page, read once.
+let targets = null;
+const swapTargets = () => {
+  if (targets === null) targets = page.findAllWithCriteria({ types: ["COMPONENT"] });
+  return targets;
+};
+
 // Work out every case first: the base, the values to set, the modes, and the component a case replaces.
 const plans = [];
 const claimed = new Set();
@@ -165,7 +176,6 @@ for (const one of wanted) {
   const modes = [];
   let unknown = null;
   if (!base) unknown = "no version matches its base";
-  else if (one.swap && Object.keys(one.swap).length > 0) unknown = "a swap is set by hand, which this script does not do";
   for (const [property, value] of Object.entries(unknown ? {} : one.props || {})) {
     const key = keyOf(property);
     if (!key) { unknown = `the unit holds no property \`${property}\``; break; }
@@ -177,6 +187,16 @@ for (const one of wanted) {
     if (!key) { unknown = `the unit holds no property \`${property}\``; break; }
     if (definitions[key].type !== "TEXT") { unknown = `\`${property}\` is a ${definitions[key].type} property, not a text`; break; }
     values[key] = String(text);
+  }
+  for (const [property, named] of Object.entries(unknown ? {} : one.swap || {})) {
+    const key = keyOf(property);
+    if (!key) { unknown = `the unit holds no property \`${property}\``; break; }
+    if (definitions[key].type !== "INSTANCE_SWAP") { unknown = `\`${property}\` is a ${definitions[key].type} property, not a swap`; break; }
+    const byId = String(named).includes(":") ? await figma.getNodeByIdAsync(String(named)) : null;
+    const byName = byId ? [] : swapTargets().filter((candidate) => candidate.name === String(named));
+    const component = byId && byId.type === "COMPONENT" ? byId : byName.length === 1 ? byName[0] : null;
+    if (!component) { unknown = `\`${property}\`: ${byName.length > 1 ? `${byName.length} components are named` : "no component is"} "${named}"`; break; }
+    values[key] = component.id;
   }
   for (const [collectionName, modeName] of Object.entries(unknown ? {} : one.modes || {})) {
     const collection = collections.get(collectionName);

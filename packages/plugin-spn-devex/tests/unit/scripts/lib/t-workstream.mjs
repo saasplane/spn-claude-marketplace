@@ -141,9 +141,9 @@ console.log("\n=== the generated blocks — progress and open");
       writeFileSync(join(withPreview, "notes", "N001", "preview.html"), "<p>preview</p>\n");
       const linked = lib.progressInside(withPreview, [started("N001"), started("N002")]);
       const one = /<a class="sds-chip [^"]*" href="notes\/N001\/preview.html"[^>]*>[\s\S]*?<\/a>/.exec(linked)?.[0] ?? "";
-      ok("[MKT.SCRIPTS.387] progress: a chip of an arc with a preview links the preview in a new tab, with an arrow after the count and its label",
-        one.includes('target="_blank" rel="noopener"') && /<span class="sds-arc-count">[^<]*<span class="sds-chip-open"[^>]*> &#8599;<\/span><\/span>/.test(one)
-          && one.includes("N001 preview, opens in a new tab"), one);
+      ok("[MKT.SCRIPTS.387] progress: a chip of an arc with a preview links the preview in a new tab, with no arrow on the chip, and its label and its tooltip say so",
+        one.includes('target="_blank" rel="noopener"') && /<span class="sds-arc-count">\d+\/\d+<\/span><\/span>/.test(one) && !one.includes("sds-chip-open") && !one.includes("&#8599;")
+          && one.includes("N001 preview, opens in a new tab") && one.includes("<span>opens its preview in a new tab</span>"), one);
       const plain = /<a class="sds-chip [^"]*" href="#N002"[^>]*>[\s\S]*?<\/a>/.exec(linked)?.[0] ?? "";
       ok("[MKT.SCRIPTS.387] progress: a chip of an arc with no preview links #N002, with no arrow and no new tab",
         plain !== "" && !plain.includes("_blank") && !plain.includes("sds-chip-open") && !plain.includes("opens in a new tab"), linked);
@@ -164,8 +164,10 @@ console.log("\n=== the generated blocks — progress and open");
     const chipOf = (html, id) => new RegExp(`<a class="sds-chip [^"]*" href="#${id}"[\\s\\S]*?</a>`).exec(html)?.[0] ?? "";
     const summaryOf = (html) => /<div class="sds-footbar-summary[\s\S]*?<\/div>/.exec(html)?.[0] ?? "";
     const shaped = lib.progressInside("/nowhere", [arc("N001", "PROPOSED", [])]);
-    ok("progress: an arc with no step yet says its status, with no bar to fill",
-      chipOf(shaped, "N001").includes('<span class="sds-arc-count">proposed</span>') && chipOf(shaped, "N001").includes('style="width:0%"') && !shaped.includes("sds-step-done"), shaped);
+    ok("[MKT.SCRIPTS.558] progress: an arc with no step yet counts 0/0, with no bar to fill, and its status is in its edge, its tooltip and its name, never in its count",
+      chipOf(shaped, "N001").includes('<span class="sds-arc-count">0/0</span>') && !chipOf(shaped, "N001").includes(">proposed<") && chipOf(shaped, "N001").includes('class="sds-chip sds-proposed ')
+        && /aria-label="[^"]*PROPOSED/.test(chipOf(shaped, "N001")) && chipOf(shaped, "N001").includes('sds-badge sds-status sds-proposed">PROPOSED')
+        && chipOf(shaped, "N001").includes('style="width:0%"') && !shaped.includes("sds-step-done"), shaped);
     const partBuilt = lib.progressInside("/nowhere", [arc("N002", "DECIDED", [build("3", "landed"), build("4", "running")])]);
     ok("progress: a part-built arc reads RUNNING and counts its steps",
       /class="sds-chip sds-running sds-step-3"/.test(chipOf(partBuilt, "N002")) && chipOf(partBuilt, "N002").includes('<span class="sds-arc-count">1/2</span>') && chipOf(partBuilt, "N002").includes('style="width:50%"'), partBuilt);
