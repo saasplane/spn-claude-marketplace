@@ -46,74 +46,60 @@ const LABEL_PREFIX = "label · ";
 const HEADER_PREFIX = "header · ";
 const USAGE_PREFIX = "usage · ";
 const UNIT_SEPARATOR = " — ";
-const CLAUSE_SEPARATOR = " · ";
-const FACTOR_SEPARATOR = " x ";
-const DEFAULT_MARK = /\s+\(default\)$/;
+const BEHAVIOUR_PREFIX = "behaviour: ";
+const LAYOUT_NAMESPACE = "saasplane";
+const LAYOUT_KEY = "layout";
+const LAYOUT_SHAPES = ["set", "one component", "no set of versions, shown as cases"];
+const OLD_LAYOUT_CLAUSE = /(^|· )(rows: |columns: |one row$|one row ·|one column$|one column ·|one component)/;
 const MARK_TEXT = /^(.*?)\s*\(default(?: at the top)?\)$/;
-const MARK_SPLIT = /, | · | x |=|each with /;
+const MARK_SPLIT = /, | · |=/;
 const UNIT_LIKE = /^\.?[A-Z][A-Za-z0-9.]*[a-z][A-Za-z0-9.]*( cases)?$/;
 
-// An axis is factors joined by ` x `; a factor is cells joined by `, `; a cell is `property=value` or only
-// `value`, taking the property of the cell before it; ` (default)` after a value marks the default.
-function parseAxis(text) {
-  const factors = [];
-  for (const piece of text.split(FACTOR_SEPARATOR)) {
-    const cells = [];
-    let property = null;
-    for (const raw of piece.split(", ")) {
-      const cut = raw.indexOf("=");
-      if (cut > 0) property = raw.slice(0, cut).trim();
-      const marked = DEFAULT_MARK.test(cut > 0 ? raw.slice(cut + 1) : raw);
-      const value = (cut > 0 ? raw.slice(cut + 1) : raw).replace(DEFAULT_MARK, "").trim();
-      if (property === null) return { error: `the cell "${raw.trim()}" names no property, and no cell stands before it` };
-      if (value.length === 0) return { error: `the cell "${raw.trim()}" holds no value` };
-      cells.push({ property, value, isDefault: marked });
-    }
-    factors.push({ cells });
-  }
-  return { factors };
-}
-
-// A header: the unit, ` — `, then clauses joined by ` · `. A clause is `rows: <axis>`, `columns: <axis>`,
-// `one row`, `one column`, `one component` (a comma may follow it), or a note. Returns { unit, layout, error }
-// where layout is { rows, columns, oneComponent } (an axis left out is [], one line) or null.
+// A header, in the book's form: the unit's name; on the line under it, what the unit is in one line; then
+// `behaviour: ` and the props that change only how the unit behaves. A header holds no layout: a header that still
+// carries the old layout clauses (`<unit> — <line> · rows: …`) is reported, and nothing is read from them. A Core
+// file's header reads `<group> — <line>`, with no layout. Returns { unit, line, behaviour, error }.
 function parseHeader(text) {
-  const cut = text.indexOf(UNIT_SEPARATOR);
-  if (cut <= 0) return { unit: null, layout: null, error: "the text holds no unit before ' — '" };
-  const unit = text.slice(0, cut);
-  let rows = null;
-  let columns = null;
-  let oneComponent = false;
-  let stated = 0;
-  for (const clause of text.slice(cut + UNIT_SEPARATOR.length).split(CLAUSE_SEPARATOR).map((part) => part.trim())) {
-    if (clause === "one row" || clause === "one column") {
-      const side = clause === "one row" ? "rows" : "columns";
-      if ((side === "rows" ? rows : columns) !== null) return { unit, layout: null, error: `the label states the ${side} twice` };
-      if (side === "rows") rows = []; else columns = [];
-    } else if (clause === "one component" || clause.startsWith("one component,")) {
-      oneComponent = true;
-    } else if (clause.startsWith("rows: ") || clause.startsWith("columns: ")) {
-      const side = clause.startsWith("rows: ") ? "rows" : "columns";
-      if ((side === "rows" ? rows : columns) !== null) return { unit, layout: null, error: `the label states the ${side} twice` };
-      const axis = parseAxis(clause.slice(side.length + 2));
-      if (axis.error) return { unit, layout: null, error: `the ${side} clause: ${axis.error}` };
-      if (side === "rows") rows = axis.factors; else columns = axis.factors;
-    } else {
-      continue;
-    }
-    stated += 1;
+  const lines = text.split("\n").map((line) => line.trim()).filter((line) => line.length > 0);
+  if (lines.length === 0) return { unit: null, line: null, behaviour: [], error: "the header is empty" };
+  const cut = lines[0].indexOf(UNIT_SEPARATOR);
+  const unit = cut > 0 ? lines[0].slice(0, cut) : lines[0];
+  const rest = cut > 0 ? [lines[0].slice(cut + UNIT_SEPARATOR.length), ...lines.slice(1)] : lines.slice(1);
+  if (rest.some((line) => OLD_LAYOUT_CLAUSE.test(line))) {
+    return { unit, line: null, behaviour: [], error: "the header states a layout: a header holds the unit's name, its one line and its `behaviour:` note, and the layout is the section's plugin data" };
   }
-  if (stated === 0) return { unit, layout: null, error: "the label states no layout (rows, columns, one row, one column or one component)" };
-  if (oneComponent && (rows !== null || columns !== null)) return { unit, layout: null, error: "the label says one component and also states rows or columns" };
-  return { unit, layout: { rows: rows ?? [], columns: columns ?? [], oneComponent }, error: null };
+  const note = rest.find((line) => line.startsWith(BEHAVIOUR_PREFIX));
+  const behaviour = note ? note.slice(BEHAVIOUR_PREFIX.length).split(", ").map((name) => name.trim()).filter((name) => name.length > 0) : [];
+  return { unit, line: rest.find((line) => !line.startsWith(BEHAVIOUR_PREFIX)) ?? null, behaviour, error: null };
 }
 
-// The values a text marks as the default: each is the candidates for the value before the mark, the whole
+// The layout a unit's section keeps as shared plugin data (`saasplane`, `layout`): { shape, tables, default, cases,
+// behaviour }, each table a `caption`, `rowGroups` and `columnGroups`, each group a `prop` and its `values` in the
+// order they run, the default first. A script reads the layout here and never from a label's text. Returns
+// { layout, error }, where a section that holds none answers `layout: null` and says so.
+function layoutOf(section) {
+  let data = null;
+  try { data = JSON.parse(section.getSharedPluginData(LAYOUT_NAMESPACE, LAYOUT_KEY) || "null"); } catch { return { layout: null, error: "the section's layout is not JSON" }; }
+  if (data === null) return { layout: null, error: "the section holds no layout" };
+  if (typeof data !== "object" || !LAYOUT_SHAPES.includes(data.shape)) return { layout: null, error: `the layout's shape is none of ${LAYOUT_SHAPES.join(", ")}` };
+  const tables = Array.isArray(data.tables) ? data.tables : [null];
+  const bad = (group) => typeof group?.prop !== "string" || !Array.isArray(group.values) || group.values.length === 0;
+  if (tables.some((table) => typeof table?.caption !== "string" || !Array.isArray(table.rowGroups) || !Array.isArray(table.columnGroups) || [...table.rowGroups, ...table.columnGroups].some(bad))) {
+    return { layout: null, error: "a table of the layout lacks its caption, a group, or a group's prop or values" };
+  }
+  return { layout: { shape: data.shape, tables, default: data.default ?? {}, cases: data.cases ?? [], behaviour: data.behaviour ?? [] }, error: null };
+}
+
+// The set's table of a layout: the first table, captioned `the set`. Its cells are versions; a mode table's are instances.
+function setTableOf(layout) {
+  return layout.tables.find((table) => table.caption === "the set") ?? null;
+}
+
+// The values a label marks as the default: each is the candidates for the value before the mark, the whole
 // piece and its last word (an older label wrote `size SM (default)`). Never the word before the value.
 function defaultMarksOf(text) {
   const marks = [];
-  // A clause word (`rows: `, `columns: `) is no part of a value, and a `: ` after a cell's `=` is inside its value.
-  for (const piece of text.replace(/(^|· )(rows|columns): /g, "$1").split(MARK_SPLIT)) {
+  for (const piece of text.split(MARK_SPLIT)) {
     const found = MARK_TEXT.exec(piece.trim());
     if (!found || found[1].trim().length === 0) continue;
     const value = found[1].trim();
@@ -184,14 +170,18 @@ for (const { node } of placed) {
   if (isSheet(node)) { unitNames.add(node.name); unitNames.add(node.name.slice(0, -SHEET_SUFFIX.length)); }
 }
 
-// A text is a header when it names a unit before ` — ` and says a layout or names a unit by its shape. A
-// caption such as `usage · DSImagePicker open — more` and a value such as `none — follows the hue` is not.
+// A text is a header when its first line names a unit and a line follows it (the unit's one line), or when it names a
+// unit before ` — ` (a Core file's header, a sheet's label, or an older header that still states a layout). A caption
+// such as `usage · DSImagePicker open — more`, a band's label such as `Usage`, and a value such as `none — follows the
+// hue` is not.
 function isHeaderText(text) {
   if (text.startsWith(USAGE_PREFIX)) return false;
-  const cut = text.indexOf(UNIT_SEPARATOR);
-  if (cut <= 0) return false;
-  const head = text.slice(0, cut);
-  return UNIT_LIKE.test(head) || unitNames.has(head) || parseHeader(text).layout !== null;
+  const first = text.split("\n")[0].trim();
+  const cut = first.indexOf(UNIT_SEPARATOR);
+  const head = cut > 0 ? first.slice(0, cut) : first;
+  const names = UNIT_LIKE.test(head) || unitNames.has(head);
+  if (cut > 0) return names || OLD_LAYOUT_CLAUSE.test(first.slice(cut + UNIT_SEPARATOR.length));
+  return names && text.trim().includes("\n");
 }
 
 function isUsage(node) {
@@ -265,12 +255,16 @@ function readLabel(entry) {
   const named = entry.node.name.startsWith(HEADER_PREFIX);
   if (named || isHeaderText(text)) {
     const parsed = parseHeader(text);
-    const cut = text.indexOf(UNIT_SEPARATOR);
-    const head = cut > 0 ? text.slice(0, cut) : entry.node.name.slice(HEADER_PREFIX.length);
+    const head = parsed.unit ?? entry.node.name.slice(HEADER_PREFIX.length);
     const forSheet = head.endsWith(SHEET_SUFFIX);
     const unit = forSheet ? head.slice(0, -SHEET_SUFFIX.length) : head;
-    const form = forSheet ? "sheet" : parsed.error ? "cannot say" : parsed.layout.oneComponent ? "one component" : "grid";
-    return { text, part: forSheet ? "sheet" : "header", unit, via: "text", onPage: unitNames.has(head) || unitNames.has(unit), setId: null, form, reason: forSheet ? null : parsed.error };
+    // The layout is the header's section's plugin data, never the header's text: `grid` for a set, `one component`,
+    // `cases` for a unit shown as cases alone, `no layout` where the section keeps none, `cannot say` where it cannot be read.
+    const home = entry.node.parent && entry.node.parent.type === "SECTION" ? entry.node.parent : null;
+    const kept = home ? layoutOf(home) : { layout: null, error: "the section holds no layout" };
+    const form = forSheet ? "sheet" : parsed.error ? "cannot say" : kept.layout === null ? (kept.error === "the section holds no layout" ? "no layout" : "cannot say")
+      : kept.layout.shape === "set" ? "grid" : kept.layout.shape === "one component" ? "one component" : "cases";
+    return { text, part: forSheet ? "sheet" : "header", unit, via: "text", onPage: unitNames.has(head) || unitNames.has(unit), setId: null, form, reason: forSheet ? null : (parsed.error ?? kept.error) };
   }
   if (entry.node.name.startsWith(LABEL_PREFIX) && BAND_LABELS.includes(text)) {
     return { text, part: "band", unit: null, via: null, onPage: true, setId: null, form: null, reason: null };

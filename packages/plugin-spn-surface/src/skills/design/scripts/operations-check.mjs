@@ -16,9 +16,10 @@
 //   - a `case` and a `default` name a version that is there after the names and the copies
 //   - a case's mode is one of the modes the file can set, where `--modes` gives them: a JSON object of
 //     `{ "<collection>": ["<mode>", …] }` read from the library's core file. Without it the modes are not checked.
-//   - where the unit has an operation that changes its set, a `header` in the strict form names every property
-//     once and every version has a place of its own in it (a property added by a choice is allowed when the
-//     header says so)
+//   - where the unit has an operation that changes its set, a `header` operation gives the `layout` the section
+//     will keep as plugin data, in the book's form, and every version has a cell of its own in its set table:
+//     the row of the row group whose prop it moves from the default and the column of the column group whose prop
+//     it moves, every other prop at the default
 // Prints one line for each fault and one line of counts for each unit; a last line of totals. Exit 1 on a
 // fault or on a unit with lines owed and no file, 2 on a wrong call.
 
@@ -121,32 +122,29 @@ for (const file of files) {
   const changesSet = (draw.ops ?? []).some((operation) => ["names", "copy", "default"].includes(operation.op));
   if (changesSet && !header) faults.push("the set changes and no `header` operation says its layout");
   if (header && spec.setId && (draw.choices ?? []).length === 0) {
-    const stated = [];
-    for (const clause of String(header.layout ?? "").split(" · ").map((part) => part.trim())) {
-      const side = clause.startsWith("rows: ") ? "rows" : clause.startsWith("columns: ") ? "columns" : null;
-      if (side === null) { if (!["one row", "one column"].includes(clause)) faults.push(`header: the clause "${clause.slice(0, 40)}" is no layout clause`); continue; }
-      for (const piece of clause.slice(side.length + 2).split(" x ")) {
-        let property = null;
-        const values = [];
-        for (const raw of piece.split(", ")) {
-          const cut = raw.indexOf("=");
-          if (cut > 0) property = raw.slice(0, cut).trim();
-          values.push((cut > 0 ? raw.slice(cut + 1) : raw).replace(/\s+\(default\)$/, "").trim());
-        }
-        stated.push({ property, values });
+    const layout = header.layout;
+    const table = layout && typeof layout === "object" ? (layout.tables ?? []).find((one) => one?.caption === "the set") : null;
+    if (!layout || typeof layout !== "object" || layout.shape !== "set") faults.push("header: the `layout` is no layout of the shape `set`, as the section's plugin data keeps it");
+    else if (!table || !Array.isArray(table.rowGroups) || !Array.isArray(table.columnGroups)) faults.push("header: the layout holds no table captioned `the set`");
+    else {
+      const groups = [...table.rowGroups, ...table.columnGroups];
+      const properties = Object.keys(versions[0] ?? {});
+      const defaults = Object.fromEntries(Object.entries({ ...(layout.default ?? {}), ...(header.defaults ?? {}) }).map(([property, value]) => [property, String(value)]));
+      for (const group of groups) if (!properties.includes(group.prop)) faults.push(`header: names \`${group.prop}\`, which the set does not hold after the operations`);
+      const lineOf = (cells, side) => side.length === 0 ? "one" : side.flatMap((group) => group.values.map((value) => [group.prop, String(value)]))
+        .find(([prop, value]) => cells[prop] === value && side.every((other) => other.prop === prop || cells[other.prop] === defaults[other.prop]))?.join("=") ?? null;
+      const places = new Set();
+      for (const cells of versions) {
+        const ungrouped = properties.filter((property) => !groups.some((group) => group.prop === property) && cells[property] !== defaults[property]);
+        const row = lineOf(cells, table.rowGroups);
+        const column = lineOf(cells, table.columnGroups);
+        if (row === null || column === null || ungrouped.length > 0) { faults.push(`header: [${nameOf(cells)}] has no cell in the layout's set table`); continue; }
+        if (places.has(`${row} ${column}`)) faults.push(`header: two versions take the cell of [${nameOf(cells)}]`);
+        places.add(`${row} ${column}`);
       }
     }
-    const properties = Object.keys(versions[0] ?? {});
-    for (const property of properties) {
-      const times = stated.filter((factor) => factor.property === property).length;
-      if (times !== 1) faults.push(`header: names \`${property}\` ${times} times`);
-    }
-    for (const factor of stated) if (!properties.includes(factor.property)) faults.push(`header: names \`${factor.property}\`, which the set does not hold after the operations`);
-    for (const cells of versions) {
-      const outside = stated.find((factor) => properties.includes(factor.property) && !factor.values.includes(cells[factor.property]));
-      if (outside) faults.push(`header: [${nameOf(cells)}] holds \`${outside.property}=${cells[outside.property]}\`, which it does not state`);
-    }
   }
+
 
   totals.choices += (draw.choices ?? []).length; totals.compose += (draw.compose ?? []).length; totals.nothing += (draw.nothing ?? []).length;
   for (const fault of [...new Set(faults)].slice(0, 12)) console.log(`${file}: ${fault}`);

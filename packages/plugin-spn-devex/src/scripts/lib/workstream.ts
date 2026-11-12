@@ -850,17 +850,20 @@ function arcChip(data: ArcData, ws: string, questions: readonly Question[]): str
   const built = builtOf(data);
   const building = built.total > 0;
   const step = building ? progressStep(built.done, built.total) : "1";
-  const count = building ? `${built.done}/${built.total}` : word;
+  // The cell counts its arc's steps, 0/0 before any, and never shows a status word: its left edge, its tooltip and its
+  // accessible name say the status (S18), so the number, the title and the count keep one line.
+  const count = `${built.done}/${built.total}`;
   const width = building ? share(built.done, built.total) : 0;
   const said = `${built.done} of ${built.total} steps landed`;
   const label = `${called}, ${status}, ${said}${reason}${runningWords.length ? `, ${escapeHtml(runningWords.join(", "))}` : ""}`;
-  const tip = `<span class="sds-tip"><span class="sds-badge sds-status sds-${word}">${escapeHtml(status)}</span><strong>${escapeHtml(data.title)}</strong><span>${said}</span>${why ? `<span>${escapeHtml(why)}</span>` : ""}${runningWords.map((words) => `<span>${escapeHtml(words)}</span>`).join("")}</span>`;
-  // A chip whose arc has a preview opens it in a new tab, with an arrow after the count; one without keeps the jump to the arc's row.
+  // A chip whose arc has a preview opens it in a new tab, which its tooltip and its accessible name say, with no arrow on
+  // the chip; one without keeps the jump to the arc's row.
   const opens = isFile(previewOf(ws, data.arc));
+  const tip = `<span class="sds-tip"><span class="sds-badge sds-status sds-${word}">${escapeHtml(status)}</span><strong>${escapeHtml(data.title)}</strong><span>${said}</span>${why ? `<span>${escapeHtml(why)}</span>` : ""}${runningWords.map((words) => `<span>${escapeHtml(words)}</span>`).join("")}${opens ? "<span>opens its preview in a new tab</span>" : ""}</span>`;
   const link = opens ? `href="${NOTES}/${data.arc}/${PREVIEW_FILE}" target="_blank" rel="noopener"` : `href="#${data.arc}"`;
   const chipLabel = opens ? `${label}, ${data.arc} preview, opens in a new tab` : label;
   return `      <a class="sds-chip sds-${word} sds-step-${step}" ${link} aria-label="${chipLabel}">`
-    + `<span class="sds-chip-line"><span class="sds-chip-name">${role ? `<span class="sds-chip-subject">${name}</span>` : `<span class="sds-mono">${number}</span><span class="sds-chip-subject"> &middot; ${name}</span>`}</span><span class="sds-arc-count">${count}${opens ? `<span class="sds-chip-open" aria-hidden="true"> &#8599;</span>` : ""}</span></span>`
+    + `<span class="sds-chip-line"><span class="sds-chip-name">${role ? `<span class="sds-chip-subject">${name}</span>` : `<span class="sds-mono">${number}</span><span class="sds-chip-subject"> &middot; ${name}</span>`}</span><span class="sds-arc-count">${count}</span></span>`
     + `<span class="sds-chip-bar"><i style="width:${width}%"></i></span>${tip}</a>`;
 }
 

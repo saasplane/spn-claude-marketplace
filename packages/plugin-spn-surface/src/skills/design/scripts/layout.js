@@ -1,4 +1,4 @@
-// The layout of one set: its versions placed in the grid its own label states.
+// The layout of one set: its versions placed in the set's table that its section's plugin data states.
 //
 // Passed to the Figma connector's `use_figma` as it is. A plain script with top-level `await` and
 // `return`, no wrapper. Fill INPUTS, change nothing else.
@@ -7,22 +7,22 @@
 // DEFAULT: with `dryRun: true` it changes nothing and returns what would move. Set `dryRun: false`
 // only after a dry run came back with `mode: "dry"` and a plan the developer's order allows.
 //
-// The home. A set stands in a section, or on the page itself in the old form. Its home is that section or that
-// page: the header and the labels are found among the home's own children, and the set is checked against the
-// other children of the home, in the home's coordinates, which are the set's own.
+// The home. A set stands in its unit's section, and its layout is that section's shared plugin data (namespace
+// `saasplane`, key `layout`), as the drawing page's part "The layout, kept as plugin data" states. A script reads the
+// layout there and never from a label's text, so a header that still carries layout clauses lays nothing out. A set
+// whose section holds no layout is reported, not laid out, and so is a set on a page with no section.
 //
-// The label. The set's header label is the text in the home whose text begins with the set's name and ` — `
-// (its layer is named `header · ` and the unit's name, or `label · ` and the text in the old form; a header
-// whose layer name is neither is still the header). After that, clauses are separated by ` · `, in the book's form:
+// The set's table is the layout's table captioned `the set`. Its row groups stand one under the other and its column
+// groups side by side, each group a prop and its values, the default first: a version takes the row of the row group
+// whose prop it moves from the default, and the column of the column group whose prop it moves, every other prop at
+// the default. So the version at the default of every prop stands in the first row and the first column. The mode
+// tables are instances, never versions, and this script leaves them. A version the table holds no cell for lays out
+// nothing: it returns `mode: "refused"` with the reason.
 //
-//   rows: variant=SOLID, OUTLINE x size=MD, XS, SM       the first factor runs slowest; ` x ` joins factors
-//   columns: case=text, block, new tab, disabled         a bare value takes the property before it
-//   one row   |   one column                             a single line on that side (an axis left out is one too)
-//   one component                                        a unit with no grid: a set is refused
-//
-// A cell is `property=value`, and ` (default)` after a value marks the default. A note may stand before or
-// after the layout. A label the form cannot say lays out nothing: it returns `mode: "refused"` with the
-// reason. This script lays out an axis only when every cell of one factor names one property.
+// Each column is as wide as the wider of its label and its widest version, as the plugin lays it out: a column's
+// label is the text named `label · ` and the value, with ` (default)` after the default, in the section's frame
+// `table · the set`. The versions stand at their column's left edge, centred in their row, `padding` from the set's
+// edge and `gap` apart (16 and 16, the plugin's own).
 //
 // `ignore` is a list of node ids of the home that the check of nodes that meet leaves out: a pair is left out
 // when EITHER of its two nodes is ignored. It is for the set's old row and column labels, which `labels.js`
@@ -40,8 +40,8 @@ const INPUTS = {
   setId: "",
   dryRun: true,
   defaults: {},
-  padding: null,
-  gap: null,
+  padding: 16,
+  gap: 16,
   resize: true,
   mayMove: [],
   ignore: [],
@@ -54,74 +54,60 @@ const LABEL_PREFIX = "label · ";
 const HEADER_PREFIX = "header · ";
 const USAGE_PREFIX = "usage · ";
 const UNIT_SEPARATOR = " — ";
-const CLAUSE_SEPARATOR = " · ";
-const FACTOR_SEPARATOR = " x ";
-const DEFAULT_MARK = /\s+\(default\)$/;
+const BEHAVIOUR_PREFIX = "behaviour: ";
+const LAYOUT_NAMESPACE = "saasplane";
+const LAYOUT_KEY = "layout";
+const LAYOUT_SHAPES = ["set", "one component", "no set of versions, shown as cases"];
+const OLD_LAYOUT_CLAUSE = /(^|· )(rows: |columns: |one row$|one row ·|one column$|one column ·|one component)/;
 const MARK_TEXT = /^(.*?)\s*\(default(?: at the top)?\)$/;
-const MARK_SPLIT = /, | · | x |=|each with /;
+const MARK_SPLIT = /, | · |=/;
 const UNIT_LIKE = /^\.?[A-Z][A-Za-z0-9.]*[a-z][A-Za-z0-9.]*( cases)?$/;
 
-// An axis is factors joined by ` x `; a factor is cells joined by `, `; a cell is `property=value` or only
-// `value`, taking the property of the cell before it; ` (default)` after a value marks the default.
-function parseAxis(text) {
-  const factors = [];
-  for (const piece of text.split(FACTOR_SEPARATOR)) {
-    const cells = [];
-    let property = null;
-    for (const raw of piece.split(", ")) {
-      const cut = raw.indexOf("=");
-      if (cut > 0) property = raw.slice(0, cut).trim();
-      const marked = DEFAULT_MARK.test(cut > 0 ? raw.slice(cut + 1) : raw);
-      const value = (cut > 0 ? raw.slice(cut + 1) : raw).replace(DEFAULT_MARK, "").trim();
-      if (property === null) return { error: `the cell "${raw.trim()}" names no property, and no cell stands before it` };
-      if (value.length === 0) return { error: `the cell "${raw.trim()}" holds no value` };
-      cells.push({ property, value, isDefault: marked });
-    }
-    factors.push({ cells });
-  }
-  return { factors };
-}
-
-// A header: the unit, ` — `, then clauses joined by ` · `. A clause is `rows: <axis>`, `columns: <axis>`,
-// `one row`, `one column`, `one component` (a comma may follow it), or a note. Returns { unit, layout, error }
-// where layout is { rows, columns, oneComponent } (an axis left out is [], one line) or null.
+// A header, in the book's form: the unit's name; on the line under it, what the unit is in one line; then
+// `behaviour: ` and the props that change only how the unit behaves. A header holds no layout: a header that still
+// carries the old layout clauses (`<unit> — <line> · rows: …`) is reported, and nothing is read from them. A Core
+// file's header reads `<group> — <line>`, with no layout. Returns { unit, line, behaviour, error }.
 function parseHeader(text) {
-  const cut = text.indexOf(UNIT_SEPARATOR);
-  if (cut <= 0) return { unit: null, layout: null, error: "the text holds no unit before ' — '" };
-  const unit = text.slice(0, cut);
-  let rows = null;
-  let columns = null;
-  let oneComponent = false;
-  let stated = 0;
-  for (const clause of text.slice(cut + UNIT_SEPARATOR.length).split(CLAUSE_SEPARATOR).map((part) => part.trim())) {
-    if (clause === "one row" || clause === "one column") {
-      const side = clause === "one row" ? "rows" : "columns";
-      if ((side === "rows" ? rows : columns) !== null) return { unit, layout: null, error: `the label states the ${side} twice` };
-      if (side === "rows") rows = []; else columns = [];
-    } else if (clause === "one component" || clause.startsWith("one component,")) {
-      oneComponent = true;
-    } else if (clause.startsWith("rows: ") || clause.startsWith("columns: ")) {
-      const side = clause.startsWith("rows: ") ? "rows" : "columns";
-      if ((side === "rows" ? rows : columns) !== null) return { unit, layout: null, error: `the label states the ${side} twice` };
-      const axis = parseAxis(clause.slice(side.length + 2));
-      if (axis.error) return { unit, layout: null, error: `the ${side} clause: ${axis.error}` };
-      if (side === "rows") rows = axis.factors; else columns = axis.factors;
-    } else {
-      continue;
-    }
-    stated += 1;
+  const lines = text.split("\n").map((line) => line.trim()).filter((line) => line.length > 0);
+  if (lines.length === 0) return { unit: null, line: null, behaviour: [], error: "the header is empty" };
+  const cut = lines[0].indexOf(UNIT_SEPARATOR);
+  const unit = cut > 0 ? lines[0].slice(0, cut) : lines[0];
+  const rest = cut > 0 ? [lines[0].slice(cut + UNIT_SEPARATOR.length), ...lines.slice(1)] : lines.slice(1);
+  if (rest.some((line) => OLD_LAYOUT_CLAUSE.test(line))) {
+    return { unit, line: null, behaviour: [], error: "the header states a layout: a header holds the unit's name, its one line and its `behaviour:` note, and the layout is the section's plugin data" };
   }
-  if (stated === 0) return { unit, layout: null, error: "the label states no layout (rows, columns, one row, one column or one component)" };
-  if (oneComponent && (rows !== null || columns !== null)) return { unit, layout: null, error: "the label says one component and also states rows or columns" };
-  return { unit, layout: { rows: rows ?? [], columns: columns ?? [], oneComponent }, error: null };
+  const note = rest.find((line) => line.startsWith(BEHAVIOUR_PREFIX));
+  const behaviour = note ? note.slice(BEHAVIOUR_PREFIX.length).split(", ").map((name) => name.trim()).filter((name) => name.length > 0) : [];
+  return { unit, line: rest.find((line) => !line.startsWith(BEHAVIOUR_PREFIX)) ?? null, behaviour, error: null };
 }
 
-// The values a text marks as the default: each is the candidates for the value before the mark, the whole
+// The layout a unit's section keeps as shared plugin data (`saasplane`, `layout`): { shape, tables, default, cases,
+// behaviour }, each table a `caption`, `rowGroups` and `columnGroups`, each group a `prop` and its `values` in the
+// order they run, the default first. A script reads the layout here and never from a label's text. Returns
+// { layout, error }, where a section that holds none answers `layout: null` and says so.
+function layoutOf(section) {
+  let data = null;
+  try { data = JSON.parse(section.getSharedPluginData(LAYOUT_NAMESPACE, LAYOUT_KEY) || "null"); } catch { return { layout: null, error: "the section's layout is not JSON" }; }
+  if (data === null) return { layout: null, error: "the section holds no layout" };
+  if (typeof data !== "object" || !LAYOUT_SHAPES.includes(data.shape)) return { layout: null, error: `the layout's shape is none of ${LAYOUT_SHAPES.join(", ")}` };
+  const tables = Array.isArray(data.tables) ? data.tables : [null];
+  const bad = (group) => typeof group?.prop !== "string" || !Array.isArray(group.values) || group.values.length === 0;
+  if (tables.some((table) => typeof table?.caption !== "string" || !Array.isArray(table.rowGroups) || !Array.isArray(table.columnGroups) || [...table.rowGroups, ...table.columnGroups].some(bad))) {
+    return { layout: null, error: "a table of the layout lacks its caption, a group, or a group's prop or values" };
+  }
+  return { layout: { shape: data.shape, tables, default: data.default ?? {}, cases: data.cases ?? [], behaviour: data.behaviour ?? [] }, error: null };
+}
+
+// The set's table of a layout: the first table, captioned `the set`. Its cells are versions; a mode table's are instances.
+function setTableOf(layout) {
+  return layout.tables.find((table) => table.caption === "the set") ?? null;
+}
+
+// The values a label marks as the default: each is the candidates for the value before the mark, the whole
 // piece and its last word (an older label wrote `size SM (default)`). Never the word before the value.
 function defaultMarksOf(text) {
   const marks = [];
-  // A clause word (`rows: `, `columns: `) is no part of a value, and a `: ` after a cell's `=` is inside its value.
-  for (const piece of text.replace(/(^|· )(rows|columns): /g, "$1").split(MARK_SPLIT)) {
+  for (const piece of text.split(MARK_SPLIT)) {
     const found = MARK_TEXT.exec(piece.trim());
     if (!found || found[1].trim().length === 0) continue;
     const value = found[1].trim();
@@ -169,27 +155,6 @@ function defaultVersionName(set) {
   try { return set.defaultVariant?.name ?? null; } catch { return null; }
 }
 
-// The label's layout as lists of factors, each { property, values }, or { error }.
-function parseLabel(text) {
-  const parsed = parseHeader(text);
-  if (parsed.error) return { error: parsed.error };
-  if (parsed.layout.oneComponent) return { error: "the label says one component, and a set is not one component" };
-  const factorsOf = (side, factors) => {
-    const lists = [];
-    for (const factor of factors) {
-      const properties = [...new Set(factor.cells.map((cell) => cell.property))];
-      if (properties.length !== 1) return { error: `the ${side} clause has cells of ${properties.join(" and ")} in one run, which this script does not lay out` };
-      lists.push({ property: properties[0], values: factor.cells.map((cell) => cell.value) });
-    }
-    return { lists };
-  };
-  const rows = factorsOf("rows", parsed.layout.rows);
-  if (rows.error) return rows;
-  const columns = factorsOf("columns", parsed.layout.columns);
-  if (columns.error) return columns;
-  return { rows: rows.lists, columns: columns.lists };
-}
-
 function refusal(reasons, extra = {}) {
   return { mode: "refused", dryRun: INPUTS.dryRun, refused: reasons, ...extra };
 }
@@ -209,64 +174,83 @@ const identity = { set: { id: set.id, name: set.name }, page: { id: page.id, nam
 
 if (versions.length === 0) return refusal([`the set ${set.id} holds no version`], identity);
 
-// 1. The label, and what it says.
-const labels = home.children.filter((node) =>
-  node.type === "TEXT" && !node.name.startsWith(USAGE_PREFIX) && node.characters.startsWith(set.name + UNIT_SEPARATOR));
-if (labels.length !== 1) {
-  return refusal([labels.length === 0
-    ? `no label in ${home.type === "PAGE" ? "this page" : `the section ${home.name}`} names ${set.name}: a set whose label states no layout is reported, not laid out`
-    : `${labels.length} labels name ${set.name}`], identity);
-}
-const label = labels[0];
-const parsed = parseLabel(label.characters);
-if (parsed.error) return refusal([`the label cannot be laid out: ${parsed.error}`], { ...identity, label: { id: label.id, text: label.characters } });
+// 1. The layout, read from the section's plugin data.
+if (home.type !== "SECTION") return refusal([`the set ${set.id} stands in no section, so no layout is kept for it: it is reported, not laid out`], identity);
+const kept = layoutOf(home);
+if (kept.layout === null) return refusal([`${kept.error}: a set whose section holds no layout is reported, not laid out`], identity);
+if (kept.layout.shape !== "set") return refusal([`the layout's shape is \`${kept.layout.shape}\`, and a set is laid out only from the shape \`set\``], identity);
+const table = setTableOf(kept.layout);
+if (table === null) return refusal(["the layout holds no table captioned `the set`"], identity);
+const understood = { rows: table.rowGroups, columns: table.columnGroups, default: kept.layout.default };
 
 // 2. Every version into its cell.
-const understood = { rows: parsed.rows, columns: parsed.columns };
 const reasons = [];
-const stated = [...parsed.rows, ...parsed.columns];
 const properties = versions.length > 0 ? Object.keys(parseVersionName(versions[0].name)) : [];
-for (const property of properties) {
-  const count = stated.filter((factor) => factor.property === property).length;
-  if (count !== 1) reasons.push(`the label names ${property} ${count} times; it must name it once`);
-}
-for (const factor of stated) {
-  if (!properties.includes(factor.property)) reasons.push(`the label names ${factor.property}, which the set does not have`);
+const grouped = [...table.rowGroups, ...table.columnGroups].map((group) => group.prop);
+for (const prop of grouped) {
+  if (!properties.includes(prop)) reasons.push(`the layout's set table names ${prop}, which the set does not have`);
 }
 for (const property of Object.keys(INPUTS.defaults)) {
   if (!properties.includes(property)) reasons.push(`defaults names ${property}, which the set does not have`);
 }
 for (const property of properties) {
   if (!(property in INPUTS.defaults)) reasons.push(`no default is given for ${property}`);
+  // The stack decides the default: a layout that names another is corrected first, never followed.
+  else if (property in kept.layout.default && kept.layout.default[property] !== INPUTS.defaults[property]) {
+    reasons.push(`the layout names ${property}=${kept.layout.default[property]} as the default and the stack ${property}=${INPUTS.defaults[property]}: correct the layout first`);
+  }
 }
 if (INPUTS.padding === null || INPUTS.gap === null) reasons.push("padding and gap are not given");
+if (reasons.length > 0) return refusal(reasons, { ...identity, understood });
 
-const keyOf = (values, factors) => factors.map((factor) => values[factor.property]).join("\u0000");
-const tuplesOf = (factors) => factors.reduce(
-  (tuples, factor) => tuples.flatMap((tuple) => factor.values.map((value) => [...tuple, value])), [[]]);
-const rowKeys = tuplesOf(parsed.rows).map((tuple) => tuple.join("\u0000"));
-const columnKeys = tuplesOf(parsed.columns).map((tuple) => tuple.join("\u0000"));
-
+// A line of a side: each group's values in order, the line naming the one prop it moves from the default.
+const linesOf = (groups) => groups.length === 0 ? [{ prop: null, value: null }]
+  : groups.flatMap((group) => group.values.map((value) => ({ prop: group.prop, value })));
+const rowLines = linesOf(table.rowGroups);
+const columnLines = linesOf(table.columnGroups);
+// The line a version takes: the first whose prop it holds at that value, every other prop of the side's groups at
+// the default; a version at the default of all of them takes the line of the default, which the first group holds.
+function lineOf(values, lines, groups) {
+  const atDefault = (prop) => values[prop] === INPUTS.defaults[prop];
+  for (let at = 0; at < lines.length; at += 1) {
+    const line = lines[at];
+    if (line.prop === null) return at;
+    if (values[line.prop] !== line.value) continue;
+    if (groups.every((group) => group.prop === line.prop || atDefault(group.prop))) return at;
+  }
+  return -1;
+}
 const cells = new Map();
 for (const version of versions) {
   const values = parseVersionName(version.name);
-  const rowKey = keyOf(values, parsed.rows);
-  const columnKey = keyOf(values, parsed.columns);
-  if (!rowKeys.includes(rowKey) || !columnKeys.includes(columnKey)) {
-    reasons.push(`version ${version.id} (${version.name}) holds a value the label does not state`);
+  const ungrouped = properties.filter((property) => !grouped.includes(property) && values[property] !== INPUTS.defaults[property]);
+  const row = lineOf(values, rowLines, table.rowGroups);
+  const column = lineOf(values, columnLines, table.columnGroups);
+  if (row < 0 || column < 0 || ungrouped.length > 0) {
+    reasons.push(`version ${version.id} (${version.name}) holds a value the layout's set table has no cell for`);
     continue;
   }
-  const cell = `${rowKeys.indexOf(rowKey)}:${columnKeys.indexOf(columnKey)}`;
-  if (cells.has(cell)) reasons.push(`versions ${cells.get(cell).id} and ${version.id} take the same place in the label's grid`);
+  const cell = `${row}:${column}`;
+  if (cells.has(cell)) reasons.push(`versions ${cells.get(cell).id} and ${version.id} take the same cell of the layout's set table`);
   else cells.set(cell, version);
 }
 if (reasons.length > 0) return refusal(reasons, { ...identity, understood });
+
+// A column's label, measured where the plugin wrote it: the text `label · <value>` in the frame `table · the set`.
+const labelFrame = home.children.find((node) => node.name === "table · the set" && "findAll" in node) ?? null;
+function labelWidthOf(line) {
+  if (labelFrame === null || line.prop === null) return 0;
+  const words = line.value + (INPUTS.defaults[line.prop] === line.value ? " (default)" : "");
+  const found = labelFrame.findAll((node) => node.type === "TEXT" && node.name === LABEL_PREFIX + words);
+  return found.reduce((widest, node) => Math.max(widest, node.width), 0);
+}
 
 // 3. The plan: rows and columns that hold no version take no room.
 const usedRows = [...new Set([...cells.keys()].map((cell) => Number(cell.split(":")[0])))].sort((first, second) => first - second);
 const usedColumns = [...new Set([...cells.keys()].map((cell) => Number(cell.split(":")[1])))].sort((first, second) => first - second);
 const columnWidth = new Map(usedColumns.map((column) => [column, 0]));
 const rowHeight = new Map(usedRows.map((row) => [row, 0]));
+for (const column of usedColumns) columnWidth.set(column, labelWidthOf(columnLines[column]));
 for (const [cell, version] of cells) {
   const [row, column] = cell.split(":").map(Number);
   columnWidth.set(column, Math.max(columnWidth.get(column), version.width));
@@ -285,7 +269,7 @@ const plannedSet = INPUTS.resize ? [set.x, set.y, plannedWidth, plannedHeight] :
 const placements = [];
 for (const [cell, version] of cells) {
   const [row, column] = cell.split(":").map(Number);
-  placements.push({ version, box: [columnX.get(column), rowY.get(row), version.width, version.height] });
+  placements.push({ version, box: [columnX.get(column), rowY.get(row) + (rowHeight.get(row) - version.height) / 2, version.width, version.height] });
 }
 
 // A node of the home that may move, and that would meet the planned set, goes to its right.
@@ -306,7 +290,8 @@ const outside = placements.filter((placement) =>
   .map((placement) => placement.version.id);
 const versionPairs = pairsThatMeet(placements.map((placement) => ({ id: placement.version.id, box: placement.box })));
 // A pair with an ignored node in it is left out: that node is about to be removed, so what it meets does not matter.
-const isIgnored = (id) => INPUTS.ignore.includes(id);
+// The frame of the set's labels encloses the set by design, as the plugin draws it, so it is never a node that meets it.
+const isIgnored = (id) => INPUTS.ignore.includes(id) || (labelFrame !== null && id === labelFrame.id);
 const withoutIgnored = (pairs) => pairs.filter(([first, second]) => !isIgnored(first) && !isIgnored(second));
 const topLevelPairs = withoutIgnored(pairsThatMeet([...topLevel.map((entry) => ({ id: entry.id, box: entry.box })), { id: set.id, box: plannedSet }]));
 const plannedTopLeft = topLeftOf(placements.map((placement) => ({ name: placement.version.name, x: placement.box[0], y: placement.box[1] })));
@@ -329,7 +314,7 @@ if (wrongDefaults.length > 0) failed.push(`the top-left version ${plannedTopLeft
 const moves = placements.filter((placement) => placement.version.x !== placement.box[0] || placement.version.y !== placement.box[1]);
 const summary = {
   ...identity,
-  label: { id: label.id, text: label.characters },
+  layoutFrom: { section: home.id },
   understood,
   setBoxPlanned: plannedSet,
   defaultPlanned: plannedTopLeft.name,
