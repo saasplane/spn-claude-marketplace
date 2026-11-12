@@ -91,7 +91,7 @@ A prefix is one word for a platform and two words for a space. A space's code mu
 
 **On a machine, a space's engines take their ports from the five hundred the platform declares, and nobody writes them** (`RULE.SUPPORT.INFRA.062` · MUST · skill:spn-infra/implement). The first hundred of the range holds the engines, ten ports for each world: the platform's own take the first ten, and space *i*, counting from one in declaration order, takes the ten ports from `+10 × i`, with each family at the same offset it has in the platform's own engines. So a platform stands at most nine spaces locally. A space has engines and nothing else; an application that belongs to a space takes a service's port or a web application's port like any other.
 
-**A space is one of two independent extension axes, and they never couple** (`RULE.SUPPORT.INFRA.085` · MUST · skill:spn-infra/implement). A space extends by **data**; a service domain (bound by `serviceDomain`) extends by **face**. An application takes either, both or neither.
+**A space is one of two independent extension axes, and they never couple** (`RULE.SUPPORT.INFRA.085` · MUST · skill:spn-infra/implement). A space extends by **data**; a face (an app row's `domain` naming another of the organization's domains) extends by **face**. An application takes either, both or neither.
 
 **The platform's own resources are a preset composition of the same blueprint functions a space composes** — database, schema, user, topic, bucket. There is no privileged path a space cannot take, and no capability the baseline has that a space cannot ask for.
 
