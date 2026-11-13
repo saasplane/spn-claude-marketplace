@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/11-delivery-library/",
-      "seen": "77916c96"
+      "seen": "11745a8f"
     }
   ]
 }
@@ -17,6 +17,8 @@ Its provenance is the foundation book's design library chapter. Apply this resta
 ## What the library draws, and what it does not
 
 - **The library draws the core units, which are the ones the book names** (`RULE.SUPPORT.SURFACE.082` · MUST · skill:spn-surface/design). A change of the surface is stated in the book first, drawn in the library second and built in a stack third, and that order binds a core unit and its props. Heading: "Changing the library".
+- **A design change is a proposal in Lab, and the library files are drawn again only after the web has it.** A designer, or you through the connector, changes a unit in Lab; the comparison lists it as held by the library and lacked by the stack; the web is built to it, released, and the showcase shows it; the next Run reads the showcase and draws the library files again, so the library and the web match. A run never draws an old look over a proposal. Heading: "Changing the library".
+- **Never draw a unit's look by hand** (`RULE.SUPPORT.SURFACE.411` · MUST · skill:spn-surface/design). The look is read from the running showcase into the stack's snapshot, and the plugin draws only the look the snapshot holds. After a Run, read each unit back through the connector against what the showcase renders, and fix only what the plugin reports and does not own. Heading: "A unit's look".
 - **Never draw a unit that a stack provides on its own as a published component.** The book does not name it, so the library does not draw it, and the order does not bind it. Where an order asks for one, stop and report it. A stack's own unit that every stack should build joins the book first, and the library draws it then.
 - **Never put a page or a pattern into a library file** (`RULE.SUPPORT.SURFACE.099` · MUST · skill:spn-surface/design). The library draws the core units with their properties and their cases, the icons, and the places of the layout, and nothing else. It holds no task pattern, no app pattern, no skeleton and no sample page. A pattern is built from units, so it is composed on request from the published library, in a file that is not a library file. Heading: "Three kinds of work".
 - **Name a unit so that its name says where it is placed** (`RULE.SUPPORT.SURFACE.229` · MUST · skill:spn-surface/design). A suffix is `App`, `Layout`, `Container` or `Widget`. A component, a composite included, takes none, and no block carries a letter for its layer before its name. A name that belongs to a unit keeps the unit's whole name first: `DSFilterBarField` is the item of `DSFilterBar`, and `.DSDataTableEmpty` is a private part of `DSDataTable`.
