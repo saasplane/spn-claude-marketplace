@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/11-delivery-library/02-figma/04-drawing.md",
-      "seen": "785094d1"
+      "seen": "58a16934"
     }
   ]
 }
@@ -22,6 +22,7 @@
 - **SaaS Plane's design library is managed by its builder, and a partner is given the published library and does not change it** (`RULE.SUPPORT.SURFACE.028` · MUST · skill:spn-surface/design)
 - **A vocabulary whose every value names one set of tokens is a mode, and the page level is one: the collection Level, whose modes are the six values of `DSPageLevelType`** (`RULE.SUPPORT.SURFACE.296` · MUST · skill:spn-surface/design)
 - **The agent never hands the developer a Figma step to draw, rebind, delete or tick** (`RULE.SUPPORT.SURFACE.400` · MUST · skill:spn-surface/design)
+- **A unit's look is read from the running showcase into the stack's snapshot, and the plugin draws only the look the snapshot holds** (`RULE.SUPPORT.SURFACE.411` · MUST · skill:spn-surface/design)
 
 Read this step when you are an agent started by another and your order is to change one page of a library file through the Figma connector. **It is all you read before your own order.** It stands in place of the long steps: `connector-rules.md`, `change-library.md` and `operations-and-composing.md` in this folder, and "The connector's facts" in `refs/support/surface/delivery-library.md`. Every line here restates a line of theirs. Open one of them only when you are stuck: when you meet a thing this brief does not cover, or when a call fails in a way you cannot explain. Read the fact there before you try anything, and say in your report which step you opened and why.
 
@@ -87,7 +88,7 @@ The book states a unit, the library draws it, and a stack builds it. You change 
 - Change nothing that your order does not name. Write a fault you meet in your report, and leave it.
 - Try nothing out in a library file. If you must learn how the API behaves and a read cannot tell you, stop that unit and report the question.
 - Draw nothing of a pattern, and no unit that a stack provides on its own.
-- **Draw no unit's look by hand.** A look is read from the stack into the CONSTRUCT snapshot and the plugin draws it. A unit whose look is not read yet stays a stand-in whose label says so, and a value the stack writes with no variable is a difference for your report, never a variable you bind.
+- **Draw no unit's look by hand.** A look is read from the running showcase into the stack's snapshot, and the plugin draws only the look the snapshot holds (`RULE.SUPPORT.SURFACE.411`). A unit whose look is not read yet stays a stand-in whose label says so, and a value the stack writes with no variable is a difference for your report, never a variable you bind.
 - Change no script: fill its inputs and pass the rest as it is.
 
 ## Your proof, and your report

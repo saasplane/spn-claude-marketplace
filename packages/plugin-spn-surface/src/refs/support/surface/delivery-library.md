@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/11-delivery-library.md",
-      "seen": "3ca7a909"
+      "seen": "0b7a0ef9"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/11-delivery-library/",
-      "seen": "77916c96"
+      "seen": "11745a8f"
     }
   ]
 }
@@ -273,7 +273,7 @@ The folder is `~/.saasplane/state/surface/`. It holds what the tool takes in and
 
 ## Changing the library
 
-The library is the baseline, and a stack is brought to it; this turned on 2026-10-10, when all five library files were published. A set of the library is built by the plugin from the CONSTRUCT snapshot, and no model draws a set (`RULE.SUPPORT.SURFACE.295` · MUST · skill:spn-surface/design). A change of the surface is stated in the construct first, drawn in the library second and built in the web or a native stack third, and an improvement is taken in the same order. So the library never draws what the book does not name, and a stack never builds a core unit that the library does not draw. **This order binds the core units, which are the ones the book names. It does not bind a unit that a stack provides on its own** (`RULE.SUPPORT.SURFACE.082` · MUST · skill:spn-surface/design). The book does not name a stack's own unit, so the library does not draw it as a published component. A stack's own unit that every stack should build joins the book first, and the library draws it then. **The library MUST NOT draw a task pattern, an app pattern, a skeleton or a sample page** (`RULE.SUPPORT.SURFACE.099` · MUST · skill:spn-surface/design). A pattern is a way to use the units and not a unit, so a drawing of one would be a second place where a page is decided, and it would fall behind the book. The book states each pattern with its skeleton, and a page is built from the units the library draws. The agent changes the library through the Figma connector and in no other way.
+The library is the baseline, and a stack is brought to it; this turned on 2026-10-10, when all five library files were published. A set of the library is built by the plugin from the CONSTRUCT snapshot, and no model draws a set (`RULE.SUPPORT.SURFACE.295` · MUST · skill:spn-surface/design). The look the plugin draws each unit in is read from the running showcase, so the library is the baseline for a decision while its drawing is read from what ships (`RULE.SUPPORT.SURFACE.411` · MUST · skill:spn-surface/design). A design change runs in four steps: a unit is changed in Lab as a proposal, the comparison lists it as held by the library and lacked by the stack, the web is built to it and released, and the next run of the plugin reads the showcase and draws the library files again. A change of the surface is stated in the construct first, drawn in the library second and built in the web or a native stack third, and an improvement is taken in the same order. So the library never draws what the book does not name, and a stack never builds a core unit that the library does not draw. **This order binds the core units, which are the ones the book names. It does not bind a unit that a stack provides on its own** (`RULE.SUPPORT.SURFACE.082` · MUST · skill:spn-surface/design). The book does not name a stack's own unit, so the library does not draw it as a published component. A stack's own unit that every stack should build joins the book first, and the library draws it then. **The library MUST NOT draw a task pattern, an app pattern, a skeleton or a sample page** (`RULE.SUPPORT.SURFACE.099` · MUST · skill:spn-surface/design). A pattern is a way to use the units and not a unit, so a drawing of one would be a second place where a page is decided, and it would fall behind the book. The book states each pattern with its skeleton, and a page is built from the units the library draws. The agent changes the library through the Figma connector and in no other way.
 
 | Step | What happens |
 | --- | --- |
@@ -786,6 +786,7 @@ This ref states what the library draws, how its files are layered, and what stay
 | `RULE.SUPPORT.SURFACE.033` | the Core file's pages and its sections of tokens, a unit drawn only as cases, the forms a header meets in practice, the pages of the Widgets, Containers and Layouts files, and the six sentences that complete `.032`: room for what a thing draws, the layers panel in the page's order, a section's fill, a usage's name, and a row label centred on its band |
 | `RULE.SUPPORT.SURFACE.036` | a library file draws what the showcase is proven against: a usage of its primary use for every top-level unit, a drawing of every property that changes what is visibly there, a header note for a property of behaviour, a mode with one case for a property whose value is a token, and a scan that reports a property nothing draws |
 | `RULE.SUPPORT.SURFACE.295` | the plugin builds the library's sets from the CONSTRUCT snapshot alone, and the tool writes the snapshot from the book and writes the plugin out |
+| `RULE.SUPPORT.SURFACE.411` | a unit's look is read from the running showcase into the stack's snapshot, and the plugin draws only the look the snapshot holds |
 | `RULE.SUPPORT.SURFACE.392` | spn-surface carries the CONSTRUCT snapshot of each release's book, the one snapshot a repository holds, and what reads it in the plugin reads that copy alone |
 | `RULE.SUPPORT.SURFACE.296` | the page level is a mode of the collection Level, and a form a level changes stays crossed with the allowed pairs only |
 | `RULE.SUPPORT.SURFACE.037` | how a library file is organised holds for any library, the builder's and a partner's own, and the division into files is its owner's: the builder's for its design system, a partner's for its own library, which uses the builder's published library and never edits it |
