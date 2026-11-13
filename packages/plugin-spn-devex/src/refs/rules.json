@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "book": {
     "repository": "spn-foundation",
-    "commit": "b4097920"
+    "commit": "a3382648"
   },
   "rules": [
     {
@@ -33584,6 +33584,64 @@
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
           "heading": "1. Pick the layout"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.411",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "A unit's look is read from the running showcase into the stack's snapshot, and the plugin draws only the look the snapshot holds",
+      "chapter": "04-capabilities/02-support/01-surface/11-delivery-library/02-figma/04-drawing.md",
+      "heading": "A unit's look",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/delivery-library.md",
+          "heading": "Changing the library"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/change-library.md",
+          "heading": "What the library draws, and what it does not"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/writer-brief.md",
+          "heading": "The rules this step holds"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/writer-brief.md",
+          "heading": "What you do not do"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.412",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "Each case a unit's column names can be opened in the unit's Playground by its prop values in the address, in light and in dark, so the library's reader can open it",
+      "chapter": "04-capabilities/02-support/01-surface/12-delivery-showcase/01-common/01-showcase.md",
+      "heading": "The pages of a unit",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/delivery-showcase.md",
+          "heading": "The rule — 🔮"
         },
         {
           "plugin": "spn-surface",

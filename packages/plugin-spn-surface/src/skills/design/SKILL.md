@@ -631,3 +631,4 @@ Wear the spn-devex plugin's `refs/devex/agent/lenses/ux.md` while you place the 
 - **A Figma file is named `DS <n>-<Name>`, with a hyphen and no middle dot, and its theme collections are named the same way** (`RULE.SUPPORT.SURFACE.407` · MUST · skill:spn-surface/design)
 - **Every new prop of the design system ships with a showcase case that shows it** (`RULE.SUPPORT.SURFACE.408` · MUST · skill:spn-surface/design)
 - **The notice stands before the header, and it is the layout's one pinned place** (`RULE.SUPPORT.SURFACE.410` · MUST · skill:spn-surface/design)
+- **Each case a unit's column names can be opened in the unit's Playground by its prop values in the address, in light and in dark, so the library's reader can open it** (`RULE.SUPPORT.SURFACE.412` · MUST · skill:spn-surface/design)

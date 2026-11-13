@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/12-delivery-showcase.md",
-      "seen": "9f1deb02"
+      "seen": "1ac51801"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/12-delivery-showcase/",
-      "seen": "637b829f"
+      "seen": "06846e63"
     }
   ]
 }
@@ -22,7 +22,7 @@ Read this before you add a unit to a showcase, or before you judge whether one i
 ## The rule — 🔮
 
 1. A showcase's sidebar opens on one page, Home, then holds six sections in one order: Core, App, Layout, Container, Widget and Components. Beside the sidebar stands the showcase's site, three pages written as a small website, Overview, Get started and the folder Sample apps. The site's pages and the sample apps are no entry of the sidebar; each opens by its own address and stands full page with no sidebar, and Home and every unit page keep the sidebar. Core is the ground every group stands on, and App, Layout, Container, Widget and Components are the Surface standard's groups, from the whole app inwards, each a section of its own and none nested inside another. A group of units sits in a section, belongs to one layer of the design system, and opens with its Overview.
-2. A unit has a main page and a Playground, and other pages where its showcase layout calls for them.
+2. A unit has a main page and a Playground, and other pages where its showcase layout calls for them. Each case a unit's column names can be opened in its Playground by its prop values in the address, in light and in dark, because the design library's look of a unit is read from the running showcase (`RULE.SUPPORT.SURFACE.412`).
 3. A main page opens the same way on every unit, and then holds sections in one order.
 4. A unit declares its tags: its group, its category, its showcase layout and what it has. Its page is derived from them, so no page is laid out by hand.
 5. A section is one container. Its header holds a `DSItem` with the title and one line, and the section's actions as plain siblings. Its content is one card that holds the tabs, the preview and the code as one object. Its footer holds the actions that follow from the section.
