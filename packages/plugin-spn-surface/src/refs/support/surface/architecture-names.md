@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/04-architecture-names/",
-      "seen": "af87c320"
+      "seen": "38583e20"
     }
   ]
 }
@@ -92,6 +92,7 @@ These yes-or-no props each belong to one block or two. Each is no when it is not
 | `DSColorPicker` | `showValue` | the code of the colour is shown beside the swatch, in a field a person may type in. Yes by default |
 | `DSColorPicker` | `clearable` | an action that empties the picker is offered while it holds a colour. Yes by default |
 | `DSColorView` | `swatchOnly` | the swatch is drawn alone, with no value beside it |
+| `DSStatusActiveView` | `active` | whether the record is active. The unit draws Active or Inactive, or the page's own labels. Required |
 
 ## A prop that takes a vocabulary is stated with its values — ✅
 
@@ -177,6 +178,9 @@ A design and its code agree on a prop only when they agree on what it takes. Wit
 | `DSScrollArea` | `direction` | `VERTICAL` · `HORIZONTAL` · `BOTH`, `VERTICAL` when unset | `DSScrollDirectionType` |
 | `DSDrawer` | `placement` | `LEFT` · `RIGHT` · `TOP` · `BOTTOM`, `BOTTOM` when unset | `DSDrawerPlacementType` |
 | `DSSheet` | `placement` | `LEFT` · `RIGHT` · `TOP` · `BOTTOM`, `RIGHT` when unset | `DSSheetPlacementType` |
+| `DSEntryOverlay` | `entrySize` (how much room the entry asks for: a dialog at `MD` for `SMALL`, a sheet at the right at `MD` for `MEDIUM`) | `SMALL` · `MEDIUM`. Required | `DSEntrySizeType` |
+| `DSListDetail` | `listWidth` (how wide the list's column is at a desktop) | `COMPACT` · `NARROW` · `WIDE`, `WIDE` when unset | `DSListDetailListWidthType` |
+| A unit of `units`, on `DSDataUnitGroup` | `span` (how many columns of the group the unit takes. A span wider than the columns of the device is cut to them) | a whole number, 1 to 4. 1 when unset | none |
 | `DSPopover` · `DSHoverCard` · `DSTooltip` · `DSDropdownMenu` · `DSConfirmPopover` | `placement` (`DSPopover` requires it; the others open at `BOTTOM`, `TOP`, `BOTTOM_LEFT` and `BOTTOM_RIGHT` when unset, in that order) | `LEFT` · `RIGHT` · `TOP` · `BOTTOM` · `TOP_LEFT` · `TOP_RIGHT` · `BOTTOM_LEFT` · `BOTTOM_RIGHT` · `RIGHT_TOP` · `RIGHT_BOTTOM` · `LEFT_TOP` · `LEFT_BOTTOM` | `DSPlacementType` |
 | `DSContextMenu` | `placement` | `LEFT` · `RIGHT`, `LEFT` when unset | `DSPlacementHorizontalType` |
 | `DSPopover` | `trigger` | `HOVER` · `CLICK`, `HOVER` when unset | `DSTriggerType` |
