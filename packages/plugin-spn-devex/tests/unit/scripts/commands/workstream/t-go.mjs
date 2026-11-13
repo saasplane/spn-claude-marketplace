@@ -712,5 +712,57 @@ console.log("\n=== write: a change with no patch and a step with no command or p
   ok("[MKT.SCRIPTS.532] entries with no kind read as before: no kind refusal", !plain.out.includes("is a change with no patch") && !plain.out.includes("is a step with no command"), plain.out);
 }
 
+console.log("\n=== write: an entry a landed apply part holds is not refused for a moved base (MKT.SCRIPTS.559)");
+{
+  const row = (id, work, over = {}) => ({ id, parent: "N001", kind: "change", repo: "spn-x", blockedBy: [], touches: [], state: "waiting", title: `row ${id}`, work, ...over });
+  const identity = { GIT_AUTHOR_NAME: "t", GIT_AUTHOR_EMAIL: "t@t", GIT_COMMITTER_NAME: "t", GIT_COMMITTER_EMAIL: "t@t" };
+  const world = await dataWorkspace("go-landed-apply", { rows: [row("1", "CODE", { entries: ["E1"] })] });
+  const inRepo = (args) => execFileSync("git", args, { cwd: world.repo, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] });
+  const commit = (m) => { inRepo(["add", "-A"]); inRepo(["-c", "user.email=t@t", "-c", "user.name=t", "commit", "-q", "-m", m]); };
+  put(world.root, "spn-x/src/l1.ts", "export const l1 = 1;\n");
+  commit("file");
+  const base = inRepo(["rev-parse", "HEAD"]).trim();
+  writeFileSync(join(world.repo, "src/l1.ts"), "export const l1 = 2;\n");
+  put(world.ws, "arcs/N001/patches/E1.diff", inRepo(["diff", "--", "src/l1.ts"]));
+  inRepo(["checkout", "HEAD", "--", "src/l1.ts"]);
+  cli(world.root, ["workstream", "fact", "write", "N001", "--source", "spn-x/a.ts", "--fact", "a is 1", "--used-by", "1"]);
+  const sheetFile = join(world.ws, "arcs", "N001", "sheet.json");
+  writeFileSync(sheetFile, JSON.stringify(sheetOf([entry("E1", "spn-x:src/l1.ts", { kind: "change", patch: { file: "patches/E1.diff", base } })]), null, 2));
+  const first = cli(world.root, ["workstream", "go", "write", "N001"]);
+  const planFile = join(world.ws, "arcs", "N001", "go.json");
+  const planned = existsSync(planFile) ? json(planFile) : { parts: [] };
+  writeFileSync(planFile, JSON.stringify({ ...planned, parts: planned.parts.map((p) => (/^(docs|baseline)-/.test(p.id) ? { ...p, state: "landed" } : p)) }, null, 2));
+  const applied = cli(world.root, ["workstream", "go", "start", "N001", "apply-spn-x"], identity);
+  ok("[MKT.SCRIPTS.559] the apply part lands its patch first", first.code === 0 && applied.code === 0 && json(planFile).parts.find((p) => p.id === "apply-spn-x")?.state === "landed", first.out + applied.out);
+  const again = cli(world.root, ["workstream", "go", "write", "N001"]);
+  ok("[MKT.SCRIPTS.559] derived again, the landed part's entry is not refused as a patch that no longer applies",
+    again.code === 0 && !again.out.includes("no longer applies") && json(planFile).parts.find((p) => p.id === "apply-spn-x")?.state === "landed", again.out);
+  writeFileSync(sheetFile, JSON.stringify(sheetOf([entry("E1", "spn-x:src/l1.ts", { kind: "change", what: "moved after landing", patch: { file: "patches/E1.diff", base } })]), null, 2));
+  const moved = cli(world.root, ["workstream", "go", "write", "N001"]);
+  ok("[MKT.SCRIPTS.559] an entry that changed after its part landed is checked again, and refused while its patch is stale",
+    moved.code === 1 && moved.out.includes("E1 is a change whose patch no longer applies"), moved.out);
+}
+
+console.log("\n=== start: a wait on a dropped part is settled (MKT.SCRIPTS.560)");
+{
+  const { readyParts, clearWaiting } = await import("../../../../../src/scripts/lib/go-plan.ts");
+  const part = (id, state, waitsOn = [], over = {}) => ({ id, work: "RELEASE", repo: "spn-x", state, waitsOn, entries: [], tests: [], model: "none", minutes: null, measuredFrom: null, signature: "", ...over });
+  const plan = { lead: "N001", scope: ["N001"], parts: [part("gen", "dropped"), part("full", "landed"), part("release", "ready", ["full", "gen"]), part("later", "waiting", ["gen"], { waitingOn: "gen, which has not landed" })] };
+  ok("[MKT.SCRIPTS.560] readyParts reads a dropped wait as settled, as a landed one", readyParts(plan).map((one) => one.id).join() === "release", JSON.stringify(readyParts(plan).map((one) => one.id)));
+  ok("[MKT.SCRIPTS.560] clearWaiting makes a part that waits only on a dropped one ready", clearWaiting(plan, "later").parts.find((one) => one.id === "later")?.state === "ready");
+  const world = await dataWorkspace("go-dropped-wait", { rows: [{ id: "1", parent: "N001", kind: "change", repo: "spn-x", blockedBy: [], touches: [], state: "waiting", title: "row 1", work: "CODE", entries: ["E1"] }] });
+  cli(world.root, ["workstream", "fact", "write", "N001", "--source", "spn-x/a.ts", "--fact", "a is 1", "--used-by", "1"]);
+  writeFileSync(join(world.ws, "arcs", "N001", "sheet.json"), JSON.stringify(sheetOf([entry("E1", "spn-x:src/d1.ts")]), null, 2));
+  cli(world.root, ["workstream", "go", "write", "N001"]);
+  const planFile = join(world.ws, "arcs", "N001", "go.json");
+  const written = json(planFile);
+  const release = written.parts.find((one) => one.work === "RELEASE");
+  // the plan's code part is dropped by the developer's words, and the release waits on it alone
+  const code = written.parts.find((one) => one.work === "CODE");
+  writeFileSync(planFile, JSON.stringify({ ...written, parts: written.parts.map((one) => (one.id === release?.id ? { ...one, waitsOn: [code.id] } : one.id === code?.id ? { ...one, state: "dropped", droppedWords: "not wanted" } : one)) }, null, 2));
+  const started = release ? cli(world.root, ["workstream", "go", "start", "N001", release.id], { SPN_TELEMETRY: "off" }) : { code: 1, out: "no release part" };
+  ok("[MKT.SCRIPTS.560] go start lets a release through whose only wait was dropped", started.code === 0 && !started.out.includes("has not landed"), started.out);
+}
+
 console.log(`\n${total - failed}/${total} passed`);
 process.exit(failed ? 1 : 0);

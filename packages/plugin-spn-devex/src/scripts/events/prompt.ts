@@ -35,10 +35,8 @@ import { ARCS, DEVEX, WORKSTREAM_STATES, workstreamsDir } from "../../../../plug
 import { sessionDir } from "../../../../plugin-support-lib/src/lib/debug-store.ts";
 import { begin, end, span, tagsOf } from "../../../../plugin-support-lib/src/lib/timing.ts";
 import { WORKSTREAM_NAME, handoverLines } from "./stop.ts";
+import { ARC_AFTER, ARC_PART, opensWithWorkstream, workstreamFolder, workstreamOfNumber, workstreamsOfLine } from "../lib/handover-continue.ts";
 import { bindNamed, bindVisited, readWindow, windowSet } from "../lib/window.ts";
-import { ARC_ID } from "../lib/workstream-schema.ts";
-/** An arc's address as a pattern part, read from `ARC_ID`: `N<nnn>`, `ideate` or `follow-ups`. */
-const ARC_PART = ARC_ID.source.slice(1, -1);
 /** An arc as a handover text writes it: `N011`, `ideate` or `follow-ups`, not inside a longer word or a folder name. */
 const ARC_NAME = new RegExp(`(?<![\\w-])(?:${ARC_PART})(?![\\w-])`);
 import { goStandings } from "./orientation.ts";
@@ -50,40 +48,7 @@ const STATE_FILE = "state.json";
 
 const everyWorkstreamName = (): RegExp => new RegExp(WORKSTREAM_NAME.source, "g");
 
-/** The folder of the workstream with this name, in whichever state holds it, or null where none does. */
-function workstreamFolder(root: string, name: string): string | null {
-  for (const state of WORKSTREAM_STATES) {
-    const folder = join(workstreamsDir(root, state), name);
-    if (isDir(folder)) return folder;
-  }
-  return null;
-}
 
-/** The one folder whose name begins `NNN-`, in whichever state holds it, or null where none or several do. */
-function workstreamOfNumber(root: string, number: string): string | null {
-  const found = new Set<string>();
-  for (const state of WORKSTREAM_STATES) {
-    let entries: string[];
-    try { entries = readdirSync(workstreamsDir(root, state)); } catch { continue; }
-    for (const entry of entries) if (entry.startsWith(`${number}-`) && isDir(join(workstreamsDir(root, state), entry))) found.add(entry);
-  }
-  return found.size === 1 ? [...found][0] : null;
-}
-
-/**
- * The workstreams a `continue:` line names, in the order it names them, each with where it stands in
- * the line: by its folder's name, or by a standalone three-digit number. `name` is null where the
- * folder or the number matches no folder.
- */
-function workstreamsOfLine(line: string, root: string): Array<{ name: string | null; index: number; end: number; whole: boolean }> {
-  const either = new RegExp(`${WORKSTREAM_NAME.source}|\\b\\d{3}\\b(?!-)`, "g");
-  return [...line.matchAll(either)].map((found) => ({
-    name: found[0].length > 3 ? (workstreamFolder(root, found[0]) ? found[0] : null) : workstreamOfNumber(root, found[0]),
-    index: found.index ?? 0,
-    end: (found.index ?? 0) + found[0].length,
-    whole: found[0].length > 3,
-  }));
-}
 
 /** Where a handover names the other open workstreams, as a line of its own or inside `continue:`. */
 const ALSO_OPEN = /\balso open\s*:/i;
@@ -194,14 +159,15 @@ export function bindingsOf(prompt: string, root: string, session: string): Array
   return named.length === 1 ? [{ name: named[0], by: "prompt" }] : [];
 }
 
-/** An arc named right after a workstream: `, N001`, `/ideate`, ` · follow-ups` or ` N001`. */
-const ARC_AFTER = new RegExp(`^\\s*(?:[,/·]\\s*|\\s)?${ARC_PART}(?![\\w-])`);
 
 /**
  * The workstreams a `continue:` line (before `also open:`) gives work to: the first it names, and each later one that
  * is joined to the one before by "and" or named with an arc of its own. Null names (no folder) are left out.
  */
 function ownedOf(line: string, root: string): string[] {
+  // A handover owns the workstream its line opens with; one named later is cited, so a line that opens on no
+  // workstream owns none (RULE.DEVEX.WORKSPACE.236).
+  if (!opensWithWorkstream(line, root)) return [];
   const named = workstreamsOfLine(line, root);
   const owned = named.filter((found, at) => {
     if (at === 0) return true;

@@ -12,7 +12,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { logFiles, telemetryFolder } from "../../../../plugin-support-lib/src/lib/debug-store.ts";
 import {
-  DONE_STATES, entryWork, goFaults, GO_SCHEMA_VERSION,
+  DONE_STATES, entryWork, goFaults, GO_PART_SETTLED, GO_SCHEMA_VERSION,
   type ArcData, type GoPart, type GoPlan, type Sheet, type SheetEntry, type Work,
 } from "./workstream-schema.ts";
 import { arcDataDir, logLinesOf, readArc, readSheet } from "./workstream.ts";
@@ -874,7 +874,7 @@ export function clearWaiting(plan: GoPlan, partId: string): GoPlan {
   const one = plan.parts.find((part) => part.id === partId);
   if (!one) throw new Error(`${partId} is not a part of the plan`);
   if (one.state !== "waiting") throw new Error(`${partId} is ${one.state}, not waiting`);
-  const open = one.waitsOn.filter((id) => plan.parts.find((part) => part.id === id)?.state !== "landed");
+  const open = one.waitsOn.filter((id) => !GO_PART_SETTLED.has(plan.parts.find((part) => part.id === id)?.state ?? ""));
   const { waitingOn: _held, ...rest } = one;
   const next: GoPart = open.length ? { ...rest, state: "waiting", waitingOn: `${open.join(", ")}${DRAWN_FROM_PLAN}` } : { ...rest, state: "ready" };
   return { ...plan, parts: plan.parts.map((part) => (part.id === partId ? next : part)) };
@@ -882,8 +882,9 @@ export function clearWaiting(plan: GoPlan, partId: string): GoPlan {
 
 /** The parts a helper may be launched for: `ready`, and every part they wait on landed. A `waiting` part is never one. */
 export function readyParts(plan: GoPlan): GoPart[] {
-  const landed = new Set(plan.parts.filter((one) => one.state === "landed").map((one) => one.id));
-  return plan.parts.filter((one) => one.state === "ready" && one.waitsOn.every((id) => landed.has(id)));
+  // A DROPPED PART IS SETTLED: the developer's word that it will not run never holds the parts that wait on it.
+  const settled = new Set(plan.parts.filter((one) => GO_PART_SETTLED.has(one.state)).map((one) => one.id));
+  return plan.parts.filter((one) => one.state === "ready" && one.waitsOn.every((id) => settled.has(id)));
 }
 
 /**
