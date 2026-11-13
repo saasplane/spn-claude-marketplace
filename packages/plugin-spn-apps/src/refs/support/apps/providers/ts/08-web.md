@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/10-providers/ts/08-web.md",
-      "seen": "2052bebb"
+      "seen": "305b4c41"
     }
   ]
 }
@@ -58,7 +58,7 @@ None of these imports a router or reads `window.location`. The app hands them th
 | --- | --- | --- |
 | Shown through the overlay context | `DSOverlayContext.showComponent(component)`. It hands back the function that removes what it showed (`RULE.SUPPORT.APPS.195` · MUST · skill:spn-apps/implement) | decided |
 | Shown while the address matches | `useDSOverlayRoute(match, renderer, onClose)`. It shows the overlay while `match` is not `null`, removes it when `match` turns to `null`, and calls `onClose` when the person closes it (`RULE.SUPPORT.APPS.196` · MUST · skill:spn-apps/implement). The match comes from the app's own router | proposed |
-| The part after `#` | the app's own `navigate`: an address that begins with `#` goes to the router's reader of that part (`RULE.SUPPORT.APPS.197` · MUST · skill:spn-apps/implement) | proposed |
+| The part after `#` | the app's own `navigate`: an address that begins with `#/` goes to the router's reader of that part, a fragment with no slash, such as `#company-app`, names a place on the page and the browser jumps to it, and every other address goes to its reader of the path (`RULE.SUPPORT.APPS.197` · MUST · skill:spn-apps/implement) | proposed |
 
 **An edit container's callback after a save** is the prop `onSaved?`. It is proposed (`RULE.SUPPORT.APPS.184` · MUST · skill:spn-apps/implement). The Platform's entry containers take `onSaved` as a required prop, so the page that places one always decides the next move.
 
