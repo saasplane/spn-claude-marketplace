@@ -428,6 +428,8 @@ console.log("\n=== the change sheet — allowed in the arc's data, held to its s
   const whole = { schemaVersion: 1, releaseChain: [], dependsOn: [], stack: null, entries: [] };
   writeFileSync(sheetFile, JSON.stringify(whole, null, 2));
   ok("green: `sheet.json` is allowed in the arc's data", checkWorkstream(ws).length === 0, said(checkWorkstream(ws)));
+  writeFileSync(join(ws, "arcs", "N001", "go.workflow.mjs"), "export default {};\n");
+  ok("[MKT.SCRIPTS.561] green: `go.workflow.mjs`, the workflow `go write` keeps beside the plan, is allowed in the arc's data", checkWorkstream(ws).length === 0, said(checkWorkstream(ws)));
   writeFileSync(join(ws, "arcs", "N001", "other.json"), "{}");
   ok("red: another file is still named, and the message lists `sheet.json`", has(checkWorkstream(ws), "name", /is not the arc's data.*`sheet.json`/), said(checkWorkstream(ws)));
   ok("[MKT.SCRIPTS.536] red: the message names the `patches/` folder with the data files", has(checkWorkstream(ws), "name", /is not the arc's data.*`patches\/`/), said(checkWorkstream(ws)));

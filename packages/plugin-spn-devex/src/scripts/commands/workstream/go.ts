@@ -18,7 +18,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { basename, dirname, join, resolve } from "node:path";
 import { type Action, FLAG, VALUE, UsageFault, readWords } from "../../../../../plugin-support-lib/src/lib/command.ts";
 import {
-  clearWaiting, deriveGo, workflowOf, fullRunMinutes, goFileOf, isApplyPart, landedEntries, landedOrder, landedMeasures, markDropped, markWaiting, planScope, proposeScopes, readGo, readyParts, redCheckIds, ratesOf, staleEntries, tangledParts, testFilesOf, unheldEntries,
+  changedEntries, clearWaiting, deriveGo, workflowOf, fullRunMinutes, goFileOf, isApplyPart, landedEntries, landedOrder, landedMeasures, markDropped, markWaiting, planScope, proposeScopes, readGo, readyParts, redCheckIds, ratesOf, staleEntries, tangledParts, testFilesOf, unheldEntries,
   type ScopeSheet,
 } from "../../lib/go-plan.ts";
 import { arcDataDir, arcIdsOf, logEvent, logFileOf, notesDirOf, readArc, readJson, readJsonl, readSheet, workspaceOf, writeWhole } from "../../lib/workstream.ts";
@@ -76,6 +76,9 @@ export function nextStep(ref: string, ws: string, plan: GoPlan): string {
 
 /** The sheets of the scope, or the lines that refuse it. */
 function scopeOf(ws: string, scope: string[], lead: string, root: string): { sheets: ScopeSheet[]; arcs: ArcData[]; faults: string[] } {
+  // The plan written before, read as it stands; one that fails its schema before its first read is renamed holds no landed part here.
+  let previous: GoPlan | null = null;
+  try { previous = readGo(ws, lead); } catch { previous = null; }
   const sheets: ScopeSheet[] = [];
   const arcs: ArcData[] = [];
   const faults: string[] = [];
@@ -88,7 +91,15 @@ function scopeOf(ws: string, scope: string[], lead: string, root: string): { she
     if (data.status !== "DECIDED") faults.push(`${arc} is ${data.status}, not DECIDED: run \`workstream arc edit ${basename(ws)}/${arc} --status DECIDED\``);
     if (!sheet) { faults.push(`${arc} keeps no sheet: run \`workstream sheet write ${basename(ws)}/${arc} --file <sheet.json>\``); continue; }
     // THE GO REFUSES, BY ENTRY: a change with no patch (web and tests excepted), a step with no command or proof, and a patch that no longer applies.
+    // An entry a landed row holds is done, and so is one a landed part of the previous plan holds unchanged: its patch is in the tree,
+    // so its base no longer matches the head, and `deriveGo` keeps that part as it is (040's N008, E491-E495 after apply-spn-platform-ts).
     const landed = new Set(landedEntries(data));
+    const scoped: ScopeSheet[] = [{ arc, sheet }];
+    for (const part of previous?.parts ?? []) {
+      if (part.state !== "landed") continue;
+      const changed = changedEntries(part, scoped);
+      for (const ref of part.entries) if (ref.startsWith(`${arc}/`) && !changed.includes(ref)) landed.add(ref.slice(arc.length + 1));
+    }
     const kindFaults: string[] = [];
     for (const entry of sheet.entries) {
       if (landed.has(entry.id)) continue;
@@ -440,7 +451,8 @@ function start(args: string[]): number {
   const refuse = (why: string): number => { console.log(`Refused: ${why}. Nothing was changed.`); return 1; };
   if (part.work !== "TEST" && part.work !== "RELEASE" && !isApplyPart(part)) return refuse(`${id} is a ${part.work} part: only a baseline, a full run, a release or an apply part starts here, and a helper's part is launched from its brief`);
   if (part.state !== "ready") return refuse(`${id} is ${part.state}, not ready`);
-  const open = part.waitsOn.filter((wait) => plan.parts.find((one) => one.id === wait)?.state !== "landed");
+  // A wait on a dropped part is settled, as a landed one is: the developer dropped it, so nothing will ever land it.
+  const open = part.waitsOn.filter((wait) => !GO_PART_SETTLED.has(plan.parts.find((one) => one.id === wait)?.state ?? ""));
   if (open.length) return refuse(`${id} waits on ${open.join(", ")}, which has not landed`);
   // A full run, and the proof run after the releases, are taken on a tree that is not about to change, so the repository holds no uncommitted file.
   if (part.work === "RELEASE") {

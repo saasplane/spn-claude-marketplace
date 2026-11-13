@@ -91,6 +91,7 @@ import { cyclesTableAt } from "../commands/docs/cycles.ts";
 import { TERMINAL } from "../checks/arc-status.ts";
 import { REPLY_CHECKS, eventWorkspace, workspaceRoot } from "../lib/payload.ts";
 import { DEVEX, isApproachPage, workstreamsDir } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
+import { WORKSTREAM_NAME, continueRefusal } from "../lib/handover-continue.ts";
 import { sessionDir } from "../../../../plugin-support-lib/src/lib/debug-store.ts";
 import { cacheState, goStandings, welcome } from "./orientation.ts";
 import { begin, span, end, settle, tagsOf } from "../../../../plugin-support-lib/src/lib/timing.ts";
@@ -111,8 +112,8 @@ const HANDOVER_LABEL_LINE = new RegExp(`^(${HANDOVER_LABELS.join("|")}):(.*)$`);
 // `continue:` must carry the workstream (`008-plain-language`) and the arc (`N119`), because the next
 // window finds everything else from those two. `events/prompt.ts` reads the same two patterns to
 // name a session, so a workstream and an arc are spelled one way for both events.
-/** A workstream folder's name, as a text writes it: three digits, a hyphen and the subject. */
-export const WORKSTREAM_NAME = /\b\d{3}-[a-z0-9][a-z0-9-]*/;
+/** A workstream folder's name, as a text writes it: kept with the other `continue:` patterns, and exported from here as before. */
+export { WORKSTREAM_NAME };
 /** An arc's address, as a text writes it, read from `ARC_ID`: `N<nnn>`, `ideate` or `follow-ups`. */
 export const ARC_NAME = new RegExp(`\\b(?:${ARC_ID.source.slice(1, -1)})\\b`);
 
@@ -1047,9 +1048,11 @@ export function checkHandover(reply: string, root: string, mine: Set<string>, gi
   const ragged = [...handoverColumns(block.body)].filter(([, column]) => column !== HANDOVER_COLUMN);
   if (ragged.length)
     return [{ check: "handover", message: `the handover block's values do not start in one column — ${ragged.map(([label, column]) => `\`${label}:\` starts its value in column ${column}`).join(" · ")}. Each value starts in column ${HANDOVER_COLUMN}, counted from 0, which is the column \`do not touch:\` sets with one space after it. Pad each shorter label with spaces, and indent a wrapped line to the same column.` + WHOLE_AGAIN }];
-  const next = lines.get("continue") ?? "";
-  if (!WORKSTREAM_NAME.test(next) || !ARC_NAME.test(next))
-    return [{ check: "handover", message: `the handover block's \`continue:\` line names no ${WORKSTREAM_NAME.test(next) ? "arc (\`N<n>\`)" : "workstream (\`NNN-subject\`)"}. The next window finds everything else from those two.` + WHOLE_AGAIN }];
+  // THE LINE OPENS WITH ITS WORKSTREAM AND ITS ARC: the next window is bound to the workstream \`continue:\` opens with
+  // (RULE.DEVEX.WORKSPACE.236), so a line that opens on an arc alone binds it to whichever workstream it names first.
+  const refusal = continueRefusal(lines.get("continue") ?? "");
+  if (refusal)
+    return [{ check: "handover", message: `the handover block's \`continue:\` line cannot start the next window: ${refusal}. Open it with the workstream folder and its arc, as \`continue:     <NNN-subject>/<arc> — <what the next window does>\`. The next window finds everything else from those two.` + WHOLE_AGAIN }];
   // A REPLY THAT OPENS WITH THE HANDOVER'S HEADING IS HELD TO ITS SHAPE (S136): the title, the block between two \`&nbsp;\` lines, one closing paragraph.
   const shape = shapeOf("handover");
   if (shapeByTitle(reply, true)?.moment !== "handover") return [];

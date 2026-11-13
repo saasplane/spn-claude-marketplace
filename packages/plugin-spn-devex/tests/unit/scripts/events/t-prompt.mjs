@@ -163,6 +163,10 @@ console.log("\n=== prompt");
     bindingsOf(bare(`workstream ${THIS}: N011 row 3; later checks waits for 021`), root, "sess-owns"), [{ name: THIS, by: "handover" }]);
   same("[MKT.HOOKS.310] a first workstream named by its number is still owned",
     bindingsOf(bare("020 · N011, then 021 waits on it"), root, "sess-owns"), [{ name: THIS, by: "handover" }]);
+  same("[MKT.HOOKS.310] a handover whose line opens on an arc owns nothing, though a workstream is named later in it",
+    bindingsOf(bare("N011's run, stack half; carried: the launchpad journeys (021)"), root, "sess-owns"), []);
+  same("[MKT.HOOKS.310] a handover whose line opens with the workstream and its arc owns that workstream",
+    bindingsOf(bare(`${THIS}/N011 — row 3, then 021 waits on it`), root, "sess-owns"), [{ name: THIS, by: "handover" }]);
   same("[MKT.HOOKS.310] two workstreams named by their whole folder names are both owned",
     bindingsOf(bare(`workstreams ${THIS} and ${NEXT}: N011`), root, "sess-owns"), [{ name: THIS, by: "handover" }, { name: NEXT, by: "handover" }]);
 }
