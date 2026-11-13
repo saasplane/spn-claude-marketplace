@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/07-architecture-widgets/",
-      "seen": "e34ccd2d"
+      "seen": "3c3a9cae"
     }
   ]
 }
@@ -45,7 +45,7 @@ A widget is built for one purpose. It is not a set of components a page composes
 | Its parts | `parts`, a list in which each part is of one kind | each part in the order given |
 | Its footer | `footer`, any node | the node in the footer of the card. A card with no `footer` has no footer part |
 
-**The library draws** the widget composed from `DSCard`: `size`; `divided`, `headerActions` and `footer` once each; each kind of part once; `opacity` `TRANSLUCENT` once; `frames` and the `surface` keys as modes; and, as its usage, a dashboard's recent orders.
+**The library draws** the widget composed from `DSCard`: `size`; `surface.color` × `surface.strength`; `divided`, `footer` and `headerActions` as booleans; each kind of part once; `opacity` `TRANSLUCENT` once; `frames` and the `surface` keys as modes; and, as its usage, a dashboard's recent orders.
 
 - **`DSCardWidget` MUST take each group of its settings as the props of the unit that draws it, whole** (`RULE.SUPPORT.SURFACE.127` · MUST · skill:spn-surface/design). Its head and the small head of a part are the props of `DSItem`. An item of a part is the props of `DSItem`, and a row of a part is the props of `DSList.Item`. A page that knows those units knows the widget. So the picture of a head or of an item is the `media` of `DSItem`, given as data of one kind.
 

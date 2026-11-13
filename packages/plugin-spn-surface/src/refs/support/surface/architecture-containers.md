@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/08-architecture-containers/",
-      "seen": "36949f42"
+      "seen": "f25d1bb6"
     }
   ]
 }
@@ -41,7 +41,7 @@ Read this before you frame a part of a page, or before you draw or build the pan
 
 A panel is an optional block. A page uses one when a part of it has a header, content and a footer as one unit.
 
-**The library draws `DSPanelContainer`:** `size`; `fullPage` and `opacity` `TRANSLUCENT` once each; `frames` and the `surface` keys as modes; the parts `.Header`, `.Content` and `.Footer`, each with `flush` as a mode, and the footer with `sticky` once; and, as its usage, a settings page's part with its title at `CONTAINER`. **It draws `DSDataTablePanelContainer`** composed from `DSPanelContainer` with a `DSDataTable`, and, as its usage, a page that is one listing.
+**The library draws `DSPanelContainer`:** `size`; `surface.color` × `surface.strength`; `fullPage` and `opacity` `TRANSLUCENT` once each; `frames` and the `surface` keys as modes; the parts `.Header`, `.Content` and `.Footer`, each with `flush` as a mode, and the footer with `sticky` once; and, as its usage, a settings page's part with its title at `CONTAINER`. **It draws `DSDataTablePanelContainer`** composed from `DSPanelContainer` with a `DSDataTable`, and, as its usage, a page that is one listing.
 
 The unit is `DSPanelContainer`, the head, content and foot unit, and *container* is the layer's word, never the unit's, and its look is the theme's `container.panel` (`RULE.SUPPORT.SURFACE.231` · MUST · skill:spn-surface/design). `DSDataTablePanelContainer` is built on it, for a data table, and takes the panel's props as `panel`. **A level of a page is a position and not a unit:** `CONTAINER` of `DSPageLevelType` names where a full-width section stands, whatever unit fills it, and it does not make that unit a `DSPanelContainer`. Only `DSPanelContainer` reads `theme.container.panel`; a card reads `theme.component.card` alone.
 

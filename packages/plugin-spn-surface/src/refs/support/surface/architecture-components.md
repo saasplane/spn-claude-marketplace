@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/06-architecture-components.md",
-      "seen": "4fec3d84"
+      "seen": "3d238fe0"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/06-architecture-components/",
-      "seen": "784fa610"
+      "seen": "13f5c14c"
     }
   ]
 }
@@ -49,16 +49,16 @@ Twelve groups, each answering one need of a surface. The list holds the core uni
 | Group | Answers | Blocks |
 | --- | --- | --- |
 | Actions | the ways a person asks for something | `DSButton` · `DSButtonGroup` · `DSToolbar` |
-| Data display | how records and values are shown | `DSAccordion` · `DSAccordionGroup` · `DSAddressView` · `DSAvatar` · `DSAvatarGroup` · `DSBadge` · `DSCard` · `DSCarousel` · `DSCodeBlockView` · `DSColorView` · `DSDataFieldView` · `DSDataUnit` · `DSItem` · `DSItemCard` · `DSItemFacts` · `DSJSONView` · `DSList` · `DSTable` |
+| Data display | how records and values are shown | `DSAccordion` · `DSAccordionGroup` · `DSActorView` · `DSAddressView` · `DSAvatar` · `DSAvatarGroup` · `DSBadge` · `DSCard` · `DSCarousel` · `DSCodeBlockView` · `DSColorView` · `DSDataFieldView` · `DSDataUnit` · `DSDataUnitGroup` · `DSItem` · `DSItemCard` · `DSItemFacts` · `DSJSONView` · `DSList` · `DSStatusActiveView` · `DSTable` |
 | Data entry · Fields | every input a form is built from | `DSInput` · `DSInputNumber` · `DSInputOTP` · `DSInputPhone` · `DSTextarea` · `DSLabel` · `DSCheckbox` · `DSCheckboxGroup` · `DSRadio` · `DSRadioGroup` · `DSSwitch` · `DSToggle` · `DSToggleGroup` · `DSToggleGroupMulti` · `DSSlider` · `DSSliderRange` · `DSTagGroup` |
 | Data entry · Pickers | choosing from a set, a date or a time | `DSSelect` · `DSSelectMulti` · `DSAutocomplete` · `DSAutocompleteMulti` · `DSCommand` · `DSCommandPalette` · `DSDatePicker` · `DSDateRangePicker` · `DSTimePicker` · `DSDateTimePicker` · `DSCalendar` · `DSColorPicker` |
-| Data entry · Compound fields | the form frame, and inputs built from other inputs | `DSForm` · `DSAddressForm` · `DSAttachment` · `DSAttachmentMulti` · `DSJSONControl` · `DSDataFieldForm` · `DSDataFieldBuilder` · `DSImagePicker` |
+| Data entry · Compound fields | the form frame, and inputs built from other inputs | `DSForm` · `DSAddressForm` · `DSAttachment` · `DSAttachmentMulti` · `DSJSONControl` · `DSDataFieldForm` · `DSDataFieldBuilder` · `DSImagePicker` · `DSThemeForm` |
 | Composites | blocks built from components that carry one task end to end and that no other component is built from | `DSDataTable` · `DSFilterBar` · `DSComparison` · `DSFeature` |
 | Feedback | what a surface says while it works, and when it fails | `DSAlert` · `DSSpinner` · `DSToast` · `DSProgress` · `DSProgressCircle` · `DSSkeleton` · `DSEmpty` |
 | Structure | the small blocks that divide, scroll or fold a part of a page, or stand it on a fill | `DSCollapsible` · `DSHScroll` · `DSScrollArea` · `DSSeparator` · `DSSurface` |
 | Media | images and icons | `DSAspectRatio` · `DSIcon` · `DSMark` · `DSImage` |
 | Navigation | moving between places | `DSBreadcrumb` · `DSMenubar` · `DSNavList` · `DSNavMenu` · `DSNavBarSide` · `DSNavBarTop` · `DSNavEntry` · `DSPagination` · `DSTabs` · `DSStepper` · `DSLink` · `DSAnchor` |
-| Overlays | interruption | `DSDialog` · `DSConfirmDialog` · `DSDrawer` · `DSSheet` · `DSBackdrop` |
+| Overlays | interruption | `DSDialog` · `DSConfirmDialog` · `DSDrawer` · `DSSheet` · `DSEntryOverlay` · `DSBackdrop` |
 | Popovers | more, shown beside the block that asked for it | `DSContextMenu` · `DSDropdownMenu` · `DSHoverCard` · `DSPopover` · `DSConfirmPopover` · `DSTooltip` |
 | Typography | text | `DSText` · `DSKbd` |
 | Utility | blocks with a behaviour and little or no look: they format, gate, place or observe another block, stated by their behaviour and their feedback | `DSFormatCurrency` · `DSFormatDate` · `DSFormatDateTime` · `DSFormatNumber` · `DSFormatTime` · `DSAuthz` · `DSAnchorContainer` · `DSElementObserver` · `DSEmbed` · `DSSticky` |
@@ -66,6 +66,17 @@ Twelve groups, each answering one need of a surface. The list holds the core uni
 A designer reads a block in the design library, so each table of the book also says what the library draws of it, in the column *The library draws*. A block outside a table carries the same words in one line under its heading. The column names, in this order, what the block's set crosses; what it draws once; its modes; its texts and its swaps; and last its usage, its primary use with the blocks it stands with. A prop the column does not name is the stack's behaviour, and the library never draws it.
 
 The library draws a sheet for each block of Utility whose behaviour a person feels: a sheet of states for `DSAuthz` (allowed, denied, fallback), `DSSticky` (in flow, stuck) and `DSAnchorContainer`, and one sheet of formats for the formatters. `DSAnchor` of Navigation has a small sheet of states, and `DSAspectRatio` of Media has one sheet of ratios. `DSElementObserver` has an entry with its description and no states. `DSPortal`, a block of the web alone, is the stack's own: the book does not list it and the library does not draw it. The composites are stated under Composites below. The widget, the container and the layout sit one layer up and each have a construct of their own: `architecture-widgets.md`, `architecture-containers.md`, `architecture-layouts.md`.
+
+Six units joined the groups with their own rows in the book:
+
+| Unit | Group | What it does |
+| --- | --- | --- |
+| `DSActorView` | Data display | shows who did a thing and when, read-only: the name, and under it the date and time in the muted tone, with a small avatar before them where a picture is given. It is the value of a reading such as Created or Updated, and it draws no link |
+| `DSDataUnitGroup` | Data display | the readings of one record as a grid of `DSDataUnit`, three across at a desktop, two at a tablet and one on a phone unless the page says otherwise. A unit may take more than one column through `span`, 1 to 4, and every unit takes the size of the group |
+| `DSStatusActiveView` | Data display | shows whether a record is active, the same way on every page: a badge in the success colour with the word Active, or in the default colour with the word Inactive. The page may give its own words |
+| `DSThemeForm` | Data entry · Compound fields | the form that edits the theme an app chooses: five layers of choices, each with its own reset, and a reset of every choice. It applies nothing and keeps nothing: the page holds the theme and hands each change back |
+| `DSEntryOverlay` | Overlays | the overlay an entry opens in, over the page it belongs to: a dialog for a small entry and a sheet at the right for a medium one, both 480 px wide. The caller draws the entry with the overlay's parts |
+| `DSListDetail` | the web stack's own composite | places a list beside the detail of its chosen row |
 
 **A prop that takes a vocabulary is marked in the book's rows of props.** Beside the prop, the row names the vocabulary, as `type` (`DSTimePickerType`) of `DSTimePicker` or `format` (`SPDateFormatType`) of `DSDatePicker`. The values, and for the design system's own vocabularies the default, are in the tables of `architecture-names.md`. A shared vocabulary of the platform, one named `SP…Type`, is stated in the second of those tables. `variant`, `color` and `size` name no vocabulary in a row, because they take the three shared names and their vocabularies.
 
@@ -136,7 +147,7 @@ Every core unit with a closed prop has its table in this ref, under its unit whe
 | Group | The units |
 | --- | --- |
 | Data entry · Compound fields | `DSForm` · `DSDataFieldForm` · `DSAddressForm` · `DSAttachment` · `DSAttachmentMulti` |
-| Data display | `DSList` · `DSDataUnit` · `DSDataFieldView` · `DSTable` |
+| Data display | `DSList` · `DSDataUnit` · `DSDataUnitGroup` · `DSActorView` · `DSDataFieldView` · `DSTable` |
 | Feedback | `DSEmpty` |
 | Data entry · Fields | `DSInputNumber` · `DSSwitch` · `DSTextarea` · `DSInputPhone` · `DSCheckbox` · `DSCheckboxGroup` · `DSLabel` · `DSSlider` · `DSSliderRange` · `DSTagGroup` |
 | Data entry · Pickers | `DSSelect` · `DSAutocomplete` · `DSSelectMulti` · `DSAutocompleteMulti` · `DSColorPicker` · `DSCommand` · `DSCommandPalette` |
@@ -408,6 +419,27 @@ A confirm popover is chosen by a small act a person confirms where they pressed 
 | `color` | `ERROR` · `PRIMARY` · `DEFAULT` | each by its case. `DEFAULT` is the unit's own default |
 | `color` | `INFO` · `SUCCESS` · `WARNING` · `CUSTOM` | no case written yet: its colour is its action's (`RULE.SUPPORT.SURFACE.384` · GUIDE) |
 | `placement` | `LEFT` to `LEFT_BOTTOM` | the room the trigger leaves: under it where there is room, else over it, else beside it; the unit turns to the side with room. `BOTTOM_RIGHT` is the unit's own default |
+
+#### The choice table of `DSEntryOverlay`
+
+An entry is opened in an overlay by how much room it asks for, and the room is the same on every page: a dialog for a small entry and a sheet at the right for a medium one. The unit draws as a `DSDialog` at `MD` for `SMALL` and as a `DSSheet` at `RIGHT` for `MEDIUM`, both 480 px wide, and the caller draws the entry with the overlay's parts.
+
+**The cases**, read from the top; the first that matches wins.
+
+| The entry holds | Where it stands | `entrySize` | The page writes | Rule |
+| --- | --- | --- | --- | --- |
+| a small entry: up to about five fields in one group | over the page it belongs to | `SMALL` | the size, the title and the entry | `RULE.SUPPORT.SURFACE.075` |
+| a medium entry: one column, a few groups, up to about a dozen fields | at the side of the page it belongs to | `MEDIUM` | the size, the title and the entry | `RULE.SUPPORT.SURFACE.075` |
+| a large entry: sections, a part that repeats, or records of its own | — | not this unit: a page of its own | — | `RULE.SUPPORT.SURFACE.078` |
+
+**The limits across a view.** An entry over a page is a view of its own, and holds its own main action (`RULE.SUPPORT.SURFACE.370` · GUIDE).
+
+**The index by value.**
+
+| Prop | Value | Its cases |
+| --- | --- | --- |
+| `entrySize` | `SMALL` | a small entry, a dialog at `MD`. Not drawn: the library draws the dialog |
+| `entrySize` | `MEDIUM` | a medium entry, a sheet at the right at `MD`. Not drawn: the library draws the sheet |
 
 ### The tabs by level
 
@@ -970,6 +1002,41 @@ A feature is chosen by the level it stands at and by what proves its claim: a pi
 | `actionsPlacement` | `BEFORE_ITEMS` | a hero whose actions lead its proofs |
 | `factsPlacement` | `AFTER_DESCRIPTION` | every case but a plan's price. It is the unit's own default |
 | `factsPlacement` | `AFTER_TITLE` | facts that say what the feature is before its sentence (`RULE.SUPPORT.SURFACE.242` · GUIDE) |
+
+### DSListDetail
+
+`DSListDetail` places a list beside the detail of its chosen row. It is the web stack's own composite, and the book states its props and its choice table. A page gives it the list, the detail where a row is chosen, and the address of the list; the unit holds no data and does not know which row is chosen.
+
+| Setting | The page gives | What the composite draws |
+| --- | --- | --- |
+| `list` | any node | the list, in a column at the start at a desktop; on its own where the page gives no `detail`, on every screen |
+| `detail` | any node, where a row is chosen | the detail beside the list at a desktop; alone below a desktop, with `backAnchor` as the way back |
+| `backAnchor` | the address of the list | nothing of its own: the `DSPanelContainer.Header` in the detail draws it as its way back below a desktop |
+| `listWidth` | `DSListDetailListWidthType`, `WIDE` where left out | the width of the list's column at a desktop |
+
+- **`DSListDetail` never navigates itself, and it reads the chosen row from nothing.** The page reads the address and passes `detail` or not. Below a desktop it shows the detail alone where there is one, else the list alone.
+
+#### The choice table of `DSListDetail`
+
+A list beside a detail is chosen by what the rows say and by how much room the detail needs.
+
+**The cases**, read from the top; the first that matches wins.
+
+| The list holds | Where it stands | `listWidth` | The page writes | Rule |
+| --- | --- | --- | --- | --- |
+| rows of a few words, such as a version and its state | a page whose detail needs the room | `COMPACT` | the width | this table |
+| short rows beside a detail that needs the room | a page of a record's parts | `NARROW` | the width | this table |
+| rows with a title and a line under it | a page of a record's parts | `WIDE` (the unit's) | nothing | this table |
+
+**The limits across a view.** The unit holds none of its own.
+
+**The index by value.**
+
+| Prop | Value | Its cases |
+| --- | --- | --- |
+| `listWidth` | `WIDE` | rows with a title and a line under it. It is the unit's own default |
+| `listWidth` | `NARROW` | short rows beside a detail that needs the room |
+| `listWidth` | `COMPACT` | rows of a few words |
 
 ## The item line, the badge and the mark — 🔮
 
@@ -1671,6 +1738,27 @@ A group of avatars is chosen by the people of one set, sized by the words it sta
 | --- | --- | --- |
 | `scaleSize` | `XXS` to `XXL5` | the step of the words beside it |
 | `size` | `XS` to `XL` | the place's. A page sizes the group by `scaleSize` |
+
+#### The choice table of `DSStatusActiveView`
+
+A record's state, active or not, is drawn by this unit alone, so every page says it in the same badge. The unit shows a `DSBadge` at `SUBTLE` in the success colour with the word Active, or in the default colour with the word Inactive. The words are the domain's only where it says something else, such as Enabled and Disabled.
+
+**The cases**, read from the top; the first that matches wins.
+
+| The state | Where it stands | `size` | The page writes | Rule |
+| --- | --- | --- | --- | --- |
+| whether a record is active, in the words Active and Inactive | a row, a cell or a reading of a record | `XS` (the unit's) | the state | this table |
+| whether a record is active, in the domain's own words, such as Enabled | a row, a cell or a reading of a record | `XS` (the unit's) | the state and the two labels | this table |
+| a status of one kind of record, with values of its own | — | not this unit: a `DSBadge` of that page | — | this table |
+
+**The limits across a view.** The unit holds none of its own.
+
+**The index by value.**
+
+| Prop | Value | Its cases |
+| --- | --- | --- |
+| `size` | `XS` | every case. It is the unit's own default |
+| `size` | `SM` to `XL` | no case written yet: the state stands beside a title as a small badge, and a larger badge draws more than the row needs |
 
 #### The choice table of `DSItemFacts`
 
