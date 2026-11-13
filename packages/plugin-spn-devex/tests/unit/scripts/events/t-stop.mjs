@@ -682,8 +682,9 @@ console.log("\n=== handover — the template's fields, and a fence that quotes t
 
   // `continue:` CARRIES THE WORKSTREAM AND THE ARC.
   for (const [what, from, to, says] of [
-    ["no arc", "arc `N116`, ", "", /names no arc/],
-    ["no workstream", "workstream `008-plain-language`, ", "", /names no workstream/],
+    ["no arc", "arc `N116`, ", "", /no arc right after it/],
+    ["no workstream", "workstream `008-plain-language`, ", "", /does not open with a workstream/],
+    ["an arc first, and a workstream only later in the line", "workstream `008-plain-language`, arc `N116`, ", "N116's run, carried to 008-plain-language, ", /does not open with a workstream/],
   ]) {
     n += 1;
     const got = checkHandover(`Pick this up in a new window.\n\n${FILLED.replace(from, to)}`, ROOT, everyone(ROOT));
@@ -1068,7 +1069,7 @@ console.log("\n=== handover — the labels are read as one column, the one `do n
   const check = (label, ok, detail = "") => { n += 1; if (!ok) failed += 1; console.log(`  ${ok ? "PASS" : "FAIL"}  ${label}${ok || !detail ? "" : `\n        ${detail}`}`); };
   const LABELS = ["continue", "model", "read first", "pins", "state", "live now", "done when", "do not touch", "open"];
   const block = (lines) => "I am handing this over.\n\n```text\n" + lines.join("\n") + "\n```\n";
-  const value = (at) => `value ${at} 020-agent-workstream-improvements N006`;
+  const value = (at) => `020-agent-workstream-improvements N006 value ${at}`;
   const aligned = LABELS.map((label, at) => `${`${label}:`.padEnd(14)}${value(at)}`);
 
   // KNOWN-BAD: nine label lines, every label present, whose values start in different columns.
@@ -1721,7 +1722,7 @@ console.log("\n=== stop — the checks the first round fixed or wired, and the g
     const NO_WORKSTREAM = BLOCK.replace("continue:     workstream `001-a-subject`, arc `N001`, step 1", "continue:     arc `N001`, step 1");
     const unnamed = call("checkHandover", `${NO_WORKSTREAM}\n\n${PASS_ON}`, ROOT, mine);
     check("a finding on a block's line asks for the whole block again, never the line alone",
-      unnamed.some((warning) => warning.message.includes("names no workstream") && warning.message.includes("Send the whole block again")), JSON.stringify(unnamed));
+      unnamed.some((warning) => warning.message.includes("does not open with a workstream") && warning.message.includes("Send the whole block again")), JSON.stringify(unnamed));
     // turnOf reads the prompt and every earlier text message of the turn from the transcript.
     const transcript = join(ROOT, "turn.jsonl");
     const entry = (type, content) => JSON.stringify({ type, message: { content } });

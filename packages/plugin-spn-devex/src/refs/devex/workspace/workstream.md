@@ -17,7 +17,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
-      "seen": "c5371a1a"
+      "seen": "7235dee7"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -771,7 +771,7 @@ notes.
 
 | What the window did | Tie |
 | --- | --- |
-| Sent a first prompt that names exactly one workstream folder, or a handover | **owns** the one folder the prompt names, or the workstream the handover's `continue:` line opens with. A handover also owns each other workstream its line gives work to: one joined to the one before by *and*, or named with an arc of its own. A workstream the line only waits on or cites, as in *raised by 032-hiring-demo*, is visited, and a bare number after the first, as in *waits for 035*, is a mention and binds nothing |
+| Sent a first prompt that names exactly one workstream folder, or a handover | **owns** the one folder the prompt names, or the workstream the handover's `continue:` line opens with. A line that opens with no workstream, as *N008's run*, owns none, whatever it names later. A handover also owns each other workstream its line gives work to: one joined to the one before by *and*, or named with an arc of its own. A workstream the line only waits on or cites, as in *raised by 032-hiring-demo*, is visited, and a bare number after the first, as in *waits for 035*, is a mention and binds nothing |
 | Wrote a file inside a workstream folder, or ran a `workstream` command that writes an arc's data there, in its own turn or in a child's call, owning none yet and nothing having named one | **owns** it: the first one it writes inside |
 | Wrote a file inside a workstream folder when it already owns another | **visits** it; a visit never becomes ownership by itself |
 | Read a file, wrote text that only names another workstream, or sent a prompt naming two workstreams with no handover | nothing |
@@ -813,7 +813,7 @@ MUST · check:stop). Every fact the block needs is read, and the arc's log line 
 block is given. A line found after that goes into the one block, never into a second. A block in an
 earlier message of the turn counts as given, and a second block is named as extra.
 
-**The block is written by `workstream handover` from the data, and the agent adds only the lines the data cannot say** (`RULE.DEVEX.WORKSPACE.473` · MUST · check:stop). `spn-devex workstream handover <workstream>` reads the rows, the cards, the live orders and the pins, writes the block into the arc's log and prints it. The agent pastes it and adds `continue:` and `do not touch:`. A block typed by hand is checked for its nine labels and rewritten when one is missing, which is the cost this rule removes. The command prints the block as aligned lines in a fence, each value wrapped under its label, and the log keeps the one line.
+**The block is written by `workstream handover` from the data, and the agent adds only the lines the data cannot say** (`RULE.DEVEX.WORKSPACE.473` · MUST · check:stop). `spn-devex workstream handover <workstream>` reads the rows, the cards, the live orders and the pins, writes the block into the arc's log and prints it. The agent pastes it and adds `continue:` and `do not touch:`. The `continue:` line opens with the workstream and its arc, as `040-hiring-demo-ready/N008`, because the next window is bound to the workstream it opens with, and the stop check sends back a block whose line opens on neither. A block typed by hand is checked for its nine labels and rewritten when one is missing, which is the cost this rule removes. The command prints the block as aligned lines in a fence, each value wrapped under its label, and the log keeps the one line.
 
 **The reply that hands over is a shape**, which the agent's table of closing moments states. It opens on `## ✈️ Handing over <arc> (<title>)`, then a `&nbsp;` line, the fenced block, a `&nbsp;` line, and one short paragraph that says where the next window picks up, says thanks, and says this window can be retired.
 

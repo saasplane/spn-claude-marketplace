@@ -363,6 +363,9 @@ Every row below is declared and none is claimed: a run writes the last two cells
 | MKT.SCRIPTS.553 | Quality engineer | keep a carried row's successor when a part's report lands it | `report write` leaves the `proof` that names a carried, deferred or replaced row's successor when it lands the row on a run, as `row state` does | POSITIVE | UNIT | PLANNED | — |
 | MKT.SCRIPTS.554 | Editor | read the approach page's status bar on one line | An arc's count stays on the line of its title, and the bar's cells fill the row, so no cell sits lower than another and no blank stretch stands before Overall | POSITIVE | UNIT | PLANNED | — |
 | MKT.SCRIPTS.558 | Engineering leader | read an arc with no step yet in the approach page's bottom bar | Its chip counts `0/0`, with no bar to fill, and never shows its status word: the left edge, the tooltip and the accessible name say the status | POSITIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.559 | Engineering leader | derive a go again after an apply part landed and its entries' files moved on | `go write` reads an entry a landed part holds unchanged as done and never refuses its patch as one that no longer applies; an entry that changed after its part landed is still checked | NEGATIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.560 | Engineering leader | start a part whose wait was dropped by the developer's words | `go start` and `go show` read a dropped wait as settled, as a landed one: the part starts once its other waits land, and is never held for ever by a part that will not run | POSITIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.561 | Engineering leader | keep the go's workflow beside its plan with the state check whole | `workstream state check` reads `go.workflow.mjs`, which `go write` writes beside `go.json`, as the arc's data, and names any other stray file as before | POSITIVE | UNIT | PLANNED | — |
 
 ## Retired ids
 

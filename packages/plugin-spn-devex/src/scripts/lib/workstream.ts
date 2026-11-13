@@ -170,7 +170,8 @@ export const questionsFileOf = (ws: string): string => join(ws, QUESTIONS_FILE);
 /** The arc's name file beside its data, named for its subject (RULE.DEVEX.WORKSPACE.264). */
 export const nameFileOf = (ws: string, arc: string, subject: string): string => join(arcDataDir(ws, arc), `${subject}.md`);
 /** The data files of an arc's folder, and the `patches/` folder `sheet patch` writes (s178); with the one name file, `arcs/N<nnn>/` holds these and nothing else. */
-export const DATA_FILES: readonly string[] = [STATE_FILE, LOG_FILE, FACTS_FILE, SHEET_FILE, FINDINGS_FILE, "go.json", "patches"];
+// `go.workflow.mjs` is the workflow `go write` keeps beside `go.json`, made from the plan, so it is the go's data too.
+export const DATA_FILES: readonly string[] = [STATE_FILE, LOG_FILE, FACTS_FILE, SHEET_FILE, FINDINGS_FILE, "go.json", "go.workflow.mjs", "patches"];
 
 /**
  * The arc's address on the approach page: its Plan row, by its number (RULE.DEVEX.WORKSPACE.263).
