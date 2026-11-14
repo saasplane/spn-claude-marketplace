@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/05-architecture-core/",
-      "seen": "3d23c077"
+      "seen": "8acd26e2"
     }
   ]
 }
@@ -75,6 +75,14 @@ The neutral shades keep these rules (`RULE.SUPPORT.SURFACE.141` · MUST · skill
 - **The shades of the variants MUST be these** (`RULE.SUPPORT.SURFACE.154` · MUST · skill:spn-surface/design). Every tint is a wash of the hue's step 500 into transparency, at a share for each hue and a larger one under the pointer (`RULE.SUPPORT.SURFACE.183` · MUST · skill:spn-surface/design): `SUBTLE` and `SUBTLE_OUTLINE` at the least share that stands `0.04` of lightness from the page, a card and a dialog, and `QUIET` at the share that keeps its designed step from the page. `SUBTLE` of the default hue is the text colour mixed into transparency, `6` percent and `11` under the pointer. The text on a tint reads at 4.5 to 1 on it, step 900 on a tint of primary. The line of `OUTLINE` and `SUBTLE_OUTLINE` is step 300, and `surface-border-strong` for the default hue. In dark the light tint of every hue is its step 500 at 18 percent, 24 under the pointer, with the hue's step 400 for the text on it, step 300 for primary (`RULE.SUPPORT.SURFACE.188` · MUST · skill:spn-surface/design), the quiet tint keeps its own share and its text step 200, and the line is step 700, and `surface-border-strong` for the default hue. A tint inverts between modes.
 - **A chosen row of a list and the row in view of a table draw the subtle tint of primary. A pressed toggle draws `QUIET` of its hue.**
 - **Muted words on a hovered or a chosen row MUST step to the quiet tone** (`RULE.SUPPORT.SURFACE.166` · MUST · skill:spn-surface/design), because the muted tone falls to 3.76 to 1 there.
+
+## The surface roles, and the collections Surface and Strength
+
+A surface has a hue, `color`, and a shade, `strength`. The hue is `BASE` (the page itself), `DEFAULT` or `PRIMARY`; the shade is `SUBTLE`, `QUIET` or `SOLID`, with `SUBTLE` the default. Each pair of `DEFAULT` and `PRIMARY` with a shade gives three roles, a fill, the text on it and a line: `surface-default-quiet`, `on-surface-default-quiet` and `surface-default-quiet-line`, and so on for `solid` and for `PRIMARY` at `subtle`, `quiet` and `solid`. `DEFAULT` at `SUBTLE` reads `surface-sunken` and `surface-border`.
+
+- **`DEFAULT` at `QUIET` is a medium grey and at `SOLID` near black, never black.** In dark `QUIET` is a dark grey of 17% lightness and `SOLID` one of 14.5%.
+- **`PRIMARY` is the brand in three tints: the faintest at `SUBTLE`, a medium tint at `QUIET`, and the brand itself at `SOLID`.** `SOLID`'s fill is the seed, held at or under the lightness of brand 900, with white text on it; its value in the library is that formula's result at the default seed. In dark each tint is the seed's hue at a low lightness, at 30%, 50% and 70% of its chroma.
+- **The collection Surface holds a variable for each shade's fill, text and line** (`subtle`, `on-subtle`, `subtle-line`, and the same for `quiet` and `solid`), with a column for each of `BASE`, `DEFAULT` and `PRIMARY`. `BASE`'s fills are no paint, and its text and lines are the page's. **The collection Strength holds `fill`, `text` and `line`**, each an alias of the variable of Surface that its shade names, so a card reads its hue from Surface and its shade from Strength. A cell of a surface table sets both modes.
 
 ## The scale — ✅
 
