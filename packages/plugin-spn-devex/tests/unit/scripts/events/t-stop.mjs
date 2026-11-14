@@ -378,7 +378,7 @@ one("a card with every part is silent",
 // check read that as putting a decision. A fenced block is a quotation, not an ask.
 one("a handover block naming an open card's recommendation is not an ask",
   build("stop-reply-handover", { pageOpts: { cards: CARD } }),
-  "silent", { reply: NEEDS + "This session is retiring.\n\n```text\ncontinue:     workstream `008-x`, arc `N69`, step 1\nopen:         `Q259` — how much of the book the plugins must restate; the recommendation is D then A.\n```\n\nBoth releases are done." });
+  "silent", { reply: NEEDS + "This session is retiring.\n\n```text\ncontinue:     workstream `008-x`, arc `N69`, step 1\nmodel:        unchanged\nread first:   `approach.html#N69-what`\npins:         spn-x abc1234\nstate:        N69 RUNNING 0/1\nlive now:     nothing running\ndone when:    the step lands\ndo not touch: the templates folder\nopen:         `Q259` — how much of the book the plugins must restate; the recommendation is D then A.\n```\n\nBoth releases are done." });
 
 // The other half, and it is what stops the fix being a hole: an ask in PROSE, with a fence elsewhere
 // in the reply, still fires.
@@ -1719,6 +1719,29 @@ console.log("\n=== stop — the checks the first round fixed or wired, and the g
     const piece = call("checkHandover", FRAGMENT, ROOT, mine, true, []);
     check("known-bad: a line of a block sent to replace the given block's line is refused, and the whole block is asked for",
       piece.length === 1 && piece[0].message.includes("part of a handover block") && piece[0].message.includes("Send the whole block again"), JSON.stringify(piece));
+    // A CHANGED HANDOVER IS GIVEN WHOLE, ALSO ONCE THE WORK HAS MOVED (the developer, 2026-11-14): `given` is false then,
+    // and a line or two sent alone, fenced or said in prose, still leaves the developer merging two messages.
+    const TWO_LINES = "The run moved on:\n\n```\nstate:        N012 RUNNING 7/15\nopen:         none\n```";
+    const moved = call("checkHandover", TWO_LINES, ROOT, mine, false, []);
+    check("[MKT.HOOKS.364] known-bad: two lines of a block in a fence, with no block above, are sent back for the whole block",
+      moved.length === 1 && moved[0].message.includes("part of a handover block") && moved[0].message.includes("Send the whole block again"), JSON.stringify(moved));
+    const SAID = "One change since the block above: replace the `open:` line with Q70, the Candidates columns.";
+    const said = call("checkHandover", SAID, ROOT, mine, false, []);
+    check("[MKT.HOOKS.364] known-bad: a line to swap in, said in prose, is sent back for the whole block",
+      said.length === 1 && said[0].message.includes("change a line of a handover block") && said[0].message.includes("Send the whole block again"), JSON.stringify(said));
+    const READS = "Small fix: the `state:` line now reads N012 RUNNING 7/15.";
+    const reads = call("checkHandover", READS, ROOT, mine, false, []);
+    check("[MKT.HOOKS.364] known-bad: a line said to read differently now is sent back for the whole block", reads.length === 1, JSON.stringify(reads));
+    const WHOLE_WITH_NOTE = `${CORRECTED}\n\nI changed the \`model:\` line to effort max. ${PASS_ON}`;
+    const whole = call("checkHandover", WHOLE_WITH_NOTE, ROOT, mine, false, []);
+    check("[MKT.HOOKS.364] a whole block given again, with a word on the line that changed, is not sent back as a fragment",
+      !whole.some((warning) => warning.message.includes("part of a handover block") || warning.message.includes("change a line of a handover block")), JSON.stringify(whole));
+    const EXPLAINED = "The hook now catches a reply that says to replace the `open:` line in place of giving the block.";
+    const explained = call("checkHandover", EXPLAINED, ROOT, mine, false, []);
+    check("[MKT.HOOKS.364] a sentence about the check directs nobody, and is not sent back", explained.length === 0, JSON.stringify(explained));
+    const ONE_LINE_CODE = "The config reads:\n\n```yaml\nmodel:        opus\n```";
+    const code = call("checkHandover", ONE_LINE_CODE, ROOT, mine, false, []);
+    check("a single labelled line in a fence, with no block above, is not read as a fragment", code.length === 0, JSON.stringify(code));
     const NO_WORKSTREAM = BLOCK.replace("continue:     workstream `001-a-subject`, arc `N001`, step 1", "continue:     arc `N001`, step 1");
     const unnamed = call("checkHandover", `${NO_WORKSTREAM}\n\n${PASS_ON}`, ROOT, mine);
     check("a finding on a block's line asks for the whole block again, never the line alone",
@@ -1861,7 +1884,7 @@ console.log("\n=== stop — a card is held with its workstream, so one number in
   {
     const root = two("n016-363", { a2: true, b2: true, a3: false, b3: false });
     const mine = mineOf(root);
-    const handover = (open) => ["Pick this up in a new window.", "", "```text", "continue:     workstream `037-other-demo`, arc `N001`, row 2", `open:         ${open}`, "```"].join("\n");
+    const handover = (open) => ["Pick this up in a new window.", "", "```text", "continue:     workstream `037-other-demo`, arc `N001`, row 2", "model:        unchanged", "read first:   `approach.html#N001-what`", "pins:         spn-x abc1234", "state:        N001 RUNNING 1/3", "live now:     nothing running", "done when:    row 3 lands", "do not touch: the templates folder", `open:         ${open}`, "```"].join("\n");
     const unnamed = (found) => found.filter((one) => one.check === "handover" && one.message.includes("does not name"));
     const bareLine = unnamed(stopModule.checkHandover(handover("Q2 — where it lands"), root, mine));
     check("[MKT.HOOKS.363] with two workstreams bound, a handover whose open line names a bare Q2 is told to name 032 Q2 and 037 Q2",
