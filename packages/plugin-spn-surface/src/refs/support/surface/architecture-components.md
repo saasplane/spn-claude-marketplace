@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/06-architecture-components/",
-      "seen": "13f5c14c"
+      "seen": "77ca5f32"
     }
   ]
 }
@@ -162,6 +162,8 @@ Every realization — the design library's drawing, and each stack's build — g
 ## A block drawn from data — 🔮
 
 Some blocks are drawn from data: a select from its options, a menu from its nodes, a table from its columns. The **host** takes the data; the **item** is the unit the host draws once for each entry. A field that is drawn (such as `label`, `startIcon`) sits as a property of the item under its own name; the kind of a node sits in one property, `type`; a field that is not drawn (`key`, `data`, `anchor`, `permissions`) and the data shape as a whole stay in the book, in words. **One item serves every host that takes one data shape** — the three menus (dropdown menu, context menu, menubar) take one shape and draw one item; a host whose data differs declares its own item. The same node is drawn differently by where it sits: a group is a section at the top of a menu and a flyout deeper down.
+
+A unit that is drawn from data shows each trait its data takes, and a column of its table names the host's data as `its <prop>, their traits across the <crossed prop>s`. The traits are the keys of the item's type, read from the unit's own interface: `label` and `disabled` are drawn by every unit, and `startIcon` and `endIcon` by some. **A trait the type takes and the unit does not draw is written `type only, not drawn` in the unit's column**, so the library lists the trait and draws nothing for it, and a drawing never shows what the web does not. The key tables of each host's items stay in the book, in `01-common/02-data-driven.md`.
 
 ## What a table's rows answer — 🔮
 

@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/11-delivery-library/",
-      "seen": "491d5782"
+      "seen": "7ed3b612"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/04-architecture-names/",
@@ -115,7 +115,7 @@ The design library holds one file for each layer of the design system that is dr
 - **A sheet that is not modal is drawn beside the page, with no `DSBackdrop`.** That is `modal` set to no on `DSSheet`.
 - **A popup or an overlay that a block opens is a private part of that block, shown by the switch `open`.** It is never a block a designer places on a page of its own.
 - **A value that only changes which published block sits in a slot is no variant.** The slot already makes that choice, so a variant for it would repeat the choice and need a new version for each block that may sit there.
-- **A set crosses its size, its states and the shared `variant`, and may cross a prop that takes a vocabulary of forms of the block itself (`type` of `DSTimePicker`, `attached` of `DSToggleGroup`, `sort` of a table's header cell) and a property that the book names for its unit with a reason.** Every other property of the web unit is placed in the unit's column, *The library draws*, in the components chapter, read from the stack's source and never from the property's name: a prop drawn once is a case on the unit's sheet, and a prop that shows or hides a part, or is content there or not, is a boolean property of the set, a hue, light or dark and the page level are modes, and text and swaps are properties. No unit keeps a crossed property today, until the book names one; a look that no property can produce is a version drawn once. `skills/design/steps/change-library.md` carries the walk.
+- **A set crosses its size, its states and the shared `variant`, and may cross a prop that takes a vocabulary of forms of the block itself (`type` of `DSTimePicker`, `attached` of `DSToggleGroup`, `sort` of a table's header cell) and a property that the book names for its unit with a reason.** Every other property of the web unit is placed in the unit's column, *The library draws*, in the components chapter, read from the stack's source and never from the property's name: a prop drawn once is a case on the unit's sheet, and a prop that shows or hides a part, or is content there or not, is a boolean property of the set, a hue, light or dark and the page level are modes, and text and swaps are properties. No unit keeps a crossed property today, until the book names one; a look that no property can produce is a version drawn once. A unit drawn from data has each version take the traits of its data that no earlier version has shown, several at once where they combine, until each trait appears once; a trait its column writes as `type only, not drawn` is listed and never drawn, and the level table's cells carry the default data and no trait. `skills/design/steps/change-library.md` carries the walk.
 
 ## When the library does not hold a block
 
