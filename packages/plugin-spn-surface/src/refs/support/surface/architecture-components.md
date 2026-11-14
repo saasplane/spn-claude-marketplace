@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/06-architecture-components.md",
-      "seen": "3d238fe0"
+      "seen": "b838ddb1"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/06-architecture-components/",
-      "seen": "2aca4a04"
+      "seen": "45606d34"
     }
   ]
 }
@@ -898,6 +898,17 @@ A node a page hands in ends in `Node`, so the node of art is `mediaNode` and `me
 
 - **A small media MUST stand in a square of the level's box, on step 1 of the surface, with `MEDIA_TOP` at `GROUP` and below.** At `PAGE`, `CONTAINER` and `WIDGET` the media is drawn as given.
 - **The side of a small picture MUST be one box per level, whatever lines the feature has** (`RULE.SUPPORT.SURFACE.274` · MUST · skill:spn-surface/design), which replaces the sizing of (`RULE.SUPPORT.SURFACE.253` · MUST · skill:spn-surface/design). The picture is a mark, an avatar, a group of avatars or a bare icon. It stands above or beside a column of words in every type, never on the words' own line, so the lines under the title do not size it: it is 80, 64, 56, 44, 32 and 28px at `PAGE`, `CONTAINER`, `WIDGET`, `GROUP`, `CONTENT` and `INLINE`. A bare icon is the step nearest half the side, and a tie goes to the larger step: 40, 32, 32, 24, 16 and 14px. No form of the text picks a size; the vertical `DSItem` takes one box per level too (`RULE.SUPPORT.SURFACE.278` · MUST · skill:spn-surface/design). A `mediaNode` is art and is not sized by it.
+- **A small picture MUST stand close to its words, and art MUST keep the level's gap** (`RULE.SUPPORT.SURFACE.414` · MUST · skill:spn-surface/design). `media` with no `mediaNode`, the small picture in the level's box, stands a quarter of its box from the words over or under it, rounded to the 4px scale, and one 4px step more beside them. `mediaNode` keeps the level's gap, "Words to media" in the table below, in every `DSFeatureType`. Where a split folds on a phone, a box that stood beside the words takes the over-or-under gap.
+
+| Level | Box | Over or under the words | Beside the words | Art (`mediaNode`), the level's gap |
+| --- | --- | --- | --- | --- |
+| `PAGE` | 80px | 20px | 24px | 64px |
+| `CONTAINER` | 64px | 16px | 20px | 48px |
+| `WIDGET` | 56px | 12px | 16px | 24px |
+| `GROUP` | 44px | 12px | 16px | 16px |
+| `CONTENT` | 32px | 8px | 12px | 12px |
+| `INLINE` | 28px | 8px | 12px | 12px |
+
 - **`BACKDROP` MUST keep the words readable.** The words stand over the media where `textAlign` puts them, on a scrim of the surface's own fill, and on a phone the scrim covers the whole width. From the tablet up the scrim follows the words: with `START` it is full at the start of the reading direction and clear at its end, so a right-to-left page has it on the right; with `END` it is the mirror, full at the end; with `CENTER` it is an even wash across the whole feature.
 - **In `ITEMS_SPLIT_END` and `ITEMS_SPLIT_START` the words MUST stand across the feature, and `textAlign` MUST line up the words alone** (`RULE.SUPPORT.SURFACE.233` · MUST · skill:spn-surface/design) (`RULE.SUPPORT.SURFACE.248` · MUST · skill:spn-surface/design). The eyebrow, the title, the description, the facts and the actions before the items stand across; the items, or a `contentNode`, and the actions after them stand at the start of their column beside the media. The columns are `1.1fr` to `1fr` from the tablet up, mirrored for the start. With no items and no `contentNode` nothing is split, and the feature draws as `SPLIT_END` or `SPLIT_START`.
 - **A split MUST stand its two columns by `verticalAlign`: `TOP`, `CENTER` or `BOTTOM`, `CENTER` when unset** (`RULE.SUPPORT.SURFACE.248` · MUST · skill:spn-surface/design). It is read in `SPLIT_END`, `SPLIT_START`, `ITEMS_SPLIT_END` and `ITEMS_SPLIT_START`, and nowhere else. The row is as tall as its taller column, so one value moves the shorter one.
@@ -2933,6 +2944,7 @@ This ref states which components exist, in which group, and what every one must 
 | `RULE.SUPPORT.SURFACE.273` | a feature's frame pads by the room before the actions |
 | `RULE.SUPPORT.SURFACE.274` | the picture of a feature is one box per level, whatever lines the feature has |
 | `RULE.SUPPORT.SURFACE.275` | the room between a feature's items is the frame padding of the level the items are drawn at |
+| `RULE.SUPPORT.SURFACE.414` | a feature's small picture stands a quarter of its box from the words over or under it and one 4px step more beside them, and art keeps the level's gap in every form |
 | `RULE.SUPPORT.SURFACE.278` | the picture of a vertical item line takes one box per level, the box of a title with a description |
 | `RULE.SUPPORT.SURFACE.181` | the comparison is a core composite that compares subjects across the same settings, draws every value through the data field view, marks a differing value and keeps the label column pinned |
 | `RULE.SUPPORT.SURFACE.299` | a control's value is the type of the attribute it edits, so a form casts nothing |

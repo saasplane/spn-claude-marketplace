@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "book": {
     "repository": "spn-foundation",
-    "commit": "f66a9e99"
+    "commit": "3f4d2afb"
   },
   "rules": [
     {
@@ -33676,6 +33676,25 @@
           "plugin": "spn-surface",
           "path": "skills/design/steps/writer-brief.md",
           "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.414",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": null,
+      "chapter": "02-constructs/02-support/01-surface/06-architecture-components.md",
+      "heading": "DSFeature",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/architecture-components.md",
+          "heading": "The level and the form"
         }
       ]
     }
