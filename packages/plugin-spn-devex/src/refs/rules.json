@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "book": {
     "repository": "spn-foundation",
-    "commit": "e9b054c5"
+    "commit": "df870ee9"
   },
   "rules": [
     {
@@ -32573,6 +32573,11 @@
         {
           "plugin": "spn-surface",
           "path": "refs/support/surface/architecture-components.md",
+          "heading": "The choice table of DSEntryOverlay"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/architecture-components.md",
           "heading": "The phone and the frame"
         },
         {
@@ -33646,6 +33651,30 @@
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.413",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "Surface and Strength take their variables from [the modes of the collections](../../05-architecture-core/01-common/01-tokens.md#the-modes-of-the-collections), as Treatment and Color do: a cell of a surface table sets both modes. `PRIMARY`'s `SOLID` fill holds the result of the brand formula at the default seed. The four theme collections hold their modes and no variable, and a designer sets them",
+      "chapter": "04-capabilities/02-support/01-surface/11-delivery-library/02-figma/04-drawing.md",
+      "heading": "The variables of a collection",
+      "decision": "DEC.SUPPORT.SURFACE.413",
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/delivery-library.md",
+          "heading": "The variables of a collection"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/writer-brief.md",
           "heading": "The rules this step holds"
         }
       ]
