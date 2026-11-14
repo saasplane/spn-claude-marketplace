@@ -587,7 +587,6 @@ Wear the spn-devex plugin's `refs/devex/agent/lenses/ux.md` while you place the 
 - **`DSCard` takes no height of its own, and `fullHeight`, a yes-or-no prop that is no by default, fills a place with a set height** (`RULE.SUPPORT.SURFACE.270` · MUST · skill:spn-surface/design)
 - **The columns follow the screen class, and never a measured width** (`RULE.SUPPORT.SURFACE.271` · MUST · skill:spn-surface/design)
 - **The side of a small picture is one box per level, whatever lines the feature has** (`RULE.SUPPORT.SURFACE.274` · MUST · skill:spn-surface/design)
-- **A small picture stands close to its words, and art keeps the level's gap** (`RULE.SUPPORT.SURFACE.414` · MUST · skill:spn-surface/design)
 - **A framed feature takes each key of its `surface` left out from `FEATURE_SURFACE_DEFAULT`, and the theme holds no feature look and never reaches a feature** (`RULE.SUPPORT.SURFACE.277` · MUST · skill:spn-surface/design)
 - **A unit's look stands in the theme only where the unit frames by default and repeats across an app** (`RULE.SUPPORT.SURFACE.279` · MUST · skill:spn-surface/design)
 - **A showcase's sidebar opens on one page, Home, then holds six sections in this order: Core, App, Layout, Container, Widget and Components.** (`RULE.SUPPORT.SURFACE.280` · MUST · skill:spn-surface/design)
