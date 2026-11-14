@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "book": {
     "repository": "spn-foundation",
-    "commit": "df870ee9"
+    "commit": "ab37a132"
   },
   "rules": [
     {
@@ -13965,6 +13965,19 @@
           "heading": "The rules this step holds"
         }
       ]
+    },
+    {
+      "id": "RULE.PLATFORM.CORE.080",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-apps/implement"
+      },
+      "class": "stated in a skill",
+      "sentence": "A customer of every child category always opens on a details page of its own, in every console",
+      "chapter": "04-capabilities/03-platform/01-core/01-tenancy/02-organizations.md",
+      "heading": "Platform archetypes are category choices",
+      "decision": "DEC.PLATFORM.CORE.080",
+      "restated": []
     },
     {
       "id": "RULE.PLATFORM.MODULES.001",
