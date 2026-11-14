@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/10-providers/ts/06-service.md",
-      "seen": "0bb20870"
+      "seen": "34049ec1"
     }
   ]
 }
@@ -198,6 +198,8 @@ The identity module's contract offers these methods:
 **Seeded platform rows are created and maintained only by migrations.** The API authors the tenant-scoped tier alone, and a guard rejects a write to any other tier — on every write path, including the active toggle. A seeded row is shared across tenants, so letting one mutate it is a cross-tenant leak.
 
 **One service owns each entity's writes.** Nobody else calls that repository's save, update or delete, so the owning method's purge always fires. A trusted internal writer may write through a dedicated method, and must still purge the affected prefix.
+
+**A migration that writes what a cached reader serves clears that reader's family once its writes commit** (`RULE.SUPPORT.APPS.266` · MUST · skill:spn-apps/implement). A migration hook is a writer like a service: after its last write it calls `ctx.bootState.providers.caches.default.clear('<namespace>:<prefix>:')`. A deploy migrates under services still running, and one may rebuild an entry from rows read before the commit, so a cache a migration rewrites keeps a TTL that bounds that race: a read made on every session mint takes the tenant minute, never the master-data hour.
 
 ## Authorization
 
