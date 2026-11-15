@@ -16252,12 +16252,16 @@
         },
         {
           "mtype": "ONCE",
-          "name": "monospaced",
-          "kind": "flag",
-          "values": null,
-          "default": false,
+          "name": "family",
+          "kind": "choice",
+          "values": [
+            "TEXT",
+            "DISPLAY",
+            "CODE"
+          ],
+          "default": null,
           "once": [
-            true
+            "CODE"
           ]
         },
         {
@@ -16326,10 +16330,10 @@
         },
         {
           "kind": "ONCE",
-          "prop": "monospaced",
-          "value": true,
+          "prop": "family",
+          "value": "CODE",
           "collection": null,
-          "name": "monospaced=true",
+          "name": "family=CODE",
           "rule": null
         },
         {

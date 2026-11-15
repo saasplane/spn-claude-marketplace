@@ -117,7 +117,19 @@ function versionsIn(styles: string): Record<string, Record<string, string>> | st
 
 // ---------------------------------------------------------------------------- cut
 
-/** Copy the three built files into the version's folder, and list the version with each file's hash. */
+/** The folder of font files beside the built stylesheet, in the styles folder and in every version's folder. */
+const FONTS_FOLDER = "fonts";
+
+/** Copy the font files, one level, from the styles folder into the version's folder; nothing where there are none. */
+function copyFonts(from: string, to: string): void {
+  if (!isDir(from)) return;
+  mkdirSync(to, { recursive: true });
+  for (const name of readdirSync(from)) {
+    if (isFile(join(from, name))) writeFileSync(join(to, name), readFileSync(join(from, name)));
+  }
+}
+
+/** Copy the three built files, and the fonts beside them, into the version's folder, and list the version with each file's hash. */
 function cut(version: string, root: string | null): number {
   if (!VERSION.test(version)) return refuse("cut", `\`${version}\` is not a version. A version is three numbers, such as \`1.1.0\``);
   const home = marketplaceFrom(root);
@@ -145,6 +157,8 @@ function cut(version: string, root: string | null): number {
     hashes[name] = createHash("sha256").update(bytes).digest("hex");
     pinned[name] = sha384Of(bytes);
   }
+  // THE FONTS SIT BESIDE THE STYLESHEET: its @font-face urls are relative to it, so the version's folder holds `fonts/` too.
+  copyFonts(join(styles, FONTS_FOLDER), join(folder, FONTS_FOLDER));
   writeFileSync(join(styles, VERSIONS_FILE), `${JSON.stringify({ ...versions, [version]: hashes }, null, 2)}\n`, "utf8");
   // THE INTEGRITY HASH IS RECORDED WITH THE VERSION AND NEVER CHANGES: a page links it beside the address.
   writeFileSync(join(styles, INTEGRITY_FILE), `${JSON.stringify({ ...integrityTable(styles), [version]: pinned }, null, 2)}\n`, "utf8");

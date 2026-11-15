@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/04-architecture-names.md",
-      "seen": "2e8468bd"
+      "seen": "60b5288a"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/04-architecture-names/",
-      "seen": "38583e20"
+      "seen": "7d4a3504"
     }
   ]
 }
@@ -113,6 +113,7 @@ A design and its code agree on a prop only when they agree on what it takes. Wit
 | `DSText` | `typography` | `HEADING_XXL5` to `HEADING_XXS` · `TITLE_XXL5` to `TITLE_XXS` · `CONTENT_XXL5` to `CONTENT_XXS` | `DSTypographyType` |
 | `DSLink` · `DSText` | `underline` | `SOLID` · `DOTTED` · `DASHED` | `DSTextUnderlineType` |
 | `DSText` | `format` | `UPPERCASE` · `LOWERCASE` · `CAPITALIZE` | `DSTextFormatType` |
+| `DSText` | `family` | `TEXT` · `DISPLAY` · `CODE` | `DSFontFamilyType` |
 | `DSLink` · `DSText` · `DSIcon` | `tone` | `DEFAULT` · `QUIET` · `MUTED` · `SUBTLE` · `INVERSE` | `DSToneType` |
 | `DSImage`, `DSImagePicker`'s `image` | `shape` | `NONE` · `FILM` · `WIDE` · `SQUARE` · `CIRCLE` | `DSImageShapeType` |
 | `DSMark` · `DSAvatar` | `shape` (the outline of the background the icon, the symbol or the picture stands on; one type for both units) | `CIRCLE` · `ROUNDED` · `SQUARE`, `CIRCLE` when unset | `DSMarkShapeType` |
@@ -209,7 +210,7 @@ A format prop that is not set takes the person's preference from the app context
 | Components | the smallest blocks, and the composites: blocks built from components for one task | core |
 | Widgets | units placed beside others or in a sidebar | components and core |
 | Containers | the containers | components and core |
-| Layouts | the layout | every layer before it |
+| Layouts | the layout, and `DSSiteLayout`, the wrapper of a site's page | every layer before it |
 | App | the root block `DSApp`, the app's contract and the theme | every layer before it |
 
 A layer uses only the layers named before it, so the direction between two blocks is never an argument: the block in the later layer is the one that depends. The vocabulary is `CORE` · `COMPONENTS` · `WIDGETS` · `CONTAINERS` · `LAYOUTS` · `APP`.
@@ -225,7 +226,7 @@ A suffix names where a unit is placed: `App`, `Layout`, `Container` and `Widget`
 | Nowhere in particular: a component, a composite included | no word | `DSButton` · `DSTable` · `DSDataTable` · `DSFilterBar` · `DSFeature` |
 | Beside others, or in a sidebar, inside a container or not | `Widget` | `DSCardWidget` |
 | Around a part of a page | `Container`, with the box it draws before it when it draws one | `DSPanelContainer` · `DSDataTablePanelContainer` · `DSSectionContainer` · `DSFeatureGridSectionContainer` |
-| Around a page | `Layout` | `DSLayout` |
+| Around a page | `Layout` | `DSLayout` · `DSSiteLayout` |
 | Around an app | `App` | `DSApp` |
 
 - **A suffix MUST name where a unit is placed: `App`, `Layout`, `Container` or `Widget`** (`RULE.SUPPORT.SURFACE.229` · MUST · skill:spn-surface/design). A reader then tells where a block stands from its name alone, in the book, in the design library and in every stack.
