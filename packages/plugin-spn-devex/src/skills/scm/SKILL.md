@@ -160,3 +160,4 @@ Wear `refs/devex/agent/lenses/lead.md` when shaping repo standards and process �
 - **Every package reference uses one grammar, whatever it points at** (`RULE.DEVEX.WORKSPACE.400` · MUST · skill:spn-devex/scm)
 - **A repository declares its world, and *no claim* is itself a value rather than a missing file** (`RULE.DEVEX.WORKSPACE.464` · MUST · skill:spn-devex/scm)
 - **A root's shape and its documentation seats derive from the world it declares, and a node's from its own manifest** (`RULE.DEVEX.WORKSPACE.465` · MUST · skill:spn-devex/scm)
+- **Where teams build their own services in their own repositories, each service is known to the others by its published client and its events, never by its source** (`RULE.DEVEX.WORKSPACE.513` · MUST · skill:spn-devex/scm)

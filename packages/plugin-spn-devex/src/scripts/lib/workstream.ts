@@ -170,8 +170,7 @@ export const questionsFileOf = (ws: string): string => join(ws, QUESTIONS_FILE);
 /** The arc's name file beside its data, named for its subject (RULE.DEVEX.WORKSPACE.264). */
 export const nameFileOf = (ws: string, arc: string, subject: string): string => join(arcDataDir(ws, arc), `${subject}.md`);
 /** The data files of an arc's folder, and the `patches/` folder `sheet patch` writes (s178); with the one name file, `arcs/N<nnn>/` holds these and nothing else. */
-// `go.workflow.mjs` is the workflow `go write` keeps beside `go.json`, made from the plan, so it is the go's data too.
-export const DATA_FILES: readonly string[] = [STATE_FILE, LOG_FILE, FACTS_FILE, SHEET_FILE, FINDINGS_FILE, "go.json", "go.workflow.mjs", "patches"];
+export const DATA_FILES: readonly string[] = [STATE_FILE, LOG_FILE, FACTS_FILE, SHEET_FILE, FINDINGS_FILE, "go.json", "patches"];
 
 /**
  * The arc's address on the approach page: its Plan row, by its number (RULE.DEVEX.WORKSPACE.263).
@@ -1022,15 +1021,32 @@ export function writePreviewStatus(ws: string): string[] {
   const wrote: string[] = [];
   const questions = readQuestions(ws);
   for (const arc of arcIdsOf(ws)) {
-    const data = readArc(ws, arc);
+    const next = previewTextOf(ws, arc, questions);
     const path = previewOf(ws, arc);
-    if (!data || typeof data.status !== "string" || !isFile(path)) continue;
-    const text = readFileSync(path, "utf8");
-    const built = builtOf(data);
-    const next = previewWithOpen(ws, path, previewWithStatus(text, arc, arcStatus(data), built.done, built.total), questions);
-    if (next !== text) { writeFileSync(path, next, "utf8"); wrote.push(fromWorkstream(ws, path)); }
+    if (next === null || next === readFileSync(path, "utf8")) continue;
+    writeFileSync(path, next, "utf8"); wrote.push(fromWorkstream(ws, path));
   }
   return wrote;
+}
+
+/**
+ * The text `writePreviewStatus` would leave an arc's preview holding, or null where it writes nothing: a closed workstream, an arc with
+ * no status in its data, or no preview. It reads and writes nothing.
+ */
+export function previewTextOf(ws: string, arc: string, questions: ReturnType<typeof readQuestions> = readQuestions(ws)): string | null {
+  if (basename(dirname(resolve(ws))) === "closed") return null;
+  const data = readArc(ws, arc);
+  const path = previewOf(ws, arc);
+  if (!data || typeof data.status !== "string" || !isFile(path)) return null;
+  const text = readFileSync(path, "utf8");
+  const built = builtOf(data);
+  return previewWithOpen(ws, path, previewWithStatus(text, arc, arcStatus(data), built.done, built.total), questions);
+}
+
+/** Whether `writePreviewStatus` would change an arc's preview: false for a closed workstream, as the writer returns []. */
+export function previewWouldChange(ws: string, arc: string): boolean {
+  const next = previewTextOf(ws, arc);
+  return next !== null && next !== readFileSync(previewOf(ws, arc), "utf8");
 }
 
 /**

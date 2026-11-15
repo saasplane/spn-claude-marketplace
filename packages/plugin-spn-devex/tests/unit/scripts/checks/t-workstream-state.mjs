@@ -414,10 +414,22 @@ console.log("\n=== RULE.DEVEX.WORKSPACE.183 — an arc's build rows carry a repo
   ok("known-bad: a build row with no repository or no work is named, with the set",
     rows(["1", "spn-foundation", null], ["2", null, "DOCS"]).some((line) => /row\(s\) 1, 2 carry no repo, or no work from DOCS · CODE/.test(line)));
   ok("a step that changes no repository, `—`, takes no place in the chain", rows(["1", "spn-foundation", "DOCS"], ["2", "—", "PROOF"]).length === 0);
-  const { root, ws } = await dataWorkspace("state-chain");
+  // the workspace map's order: the map, not the order the rows first appear in, says what comes first
+  const mapOrder = ["spn-foundation", "spn-infra", "spn-platform"];
+  const before = (...ids) => ({ rows: new Map(ids.map((id) => [id, "waiting"])), order: ids });
+  ok("[MKT.SCRIPTS.571] rows that follow the map's order, added as decided and held in `before`, find nothing",
+    stepRowFindings(arcOf([["1", "spn-foundation", "DOCS"], ["2", "spn-infra", "DOCS"], ["3", "spn-platform", "CODE"]]), before("1", "2", "3"), mapOrder).length === 0);
+  const outOfOrder = stepRowFindings(arcOf([["1", "spn-platform", "CODE"], ["2", "spn-infra", "DOCS"], ["3", "spn-foundation", "DOCS"]]), before("1", "2"), mapOrder);
+  ok("[MKT.SCRIPTS.573] a row added out of the map's order is named, `row N is <repo> after <repo>`", outOfOrder.some((line) => /row 3 is spn-foundation after spn-platform/.test(line)), outOfOrder.join(" | "));
+  ok("[MKT.SCRIPTS.573] an untouched out-of-order row in the same arc is not named", !outOfOrder.some((line) => /row 2 is/.test(line)), outOfOrder.join(" | "));
+  const { root, ws } = await dataWorkspace("state-chain", { placed: true });
+  // The workspace map orders the repositories (MKT.SCRIPTS.571): spn-foundation is placed beside spn-x, and the map puts it first.
+  mkdirSync(join(root, "spn-foundation"), { recursive: true });
+  writeFileSync(join(root, "spn-foundation", "sprepo.json"), JSON.stringify({ type: "FOUNDATION", config: {} }));
+  writeFileSync(join(root, "spn-foundation", "package.json"), JSON.stringify({ name: "spn-foundation" }));
   const wrote = cli(root, ["workstream", "row", "add", "031/N001", "the book again", "--kind", "change", "--repo", "spn-foundation", "--work", "DOCS"]);
   ok("known-bad: `row add` prints the finding in a note line after the write, and still writes",
-    wrote.code === 0 && /note: N001 rows out of chain order: row 3 is spn-foundation after spn-x — the foundation comes first/.test(wrote.out)
+    wrote.code === 0 && /note: N001 rows out of chain order: row 3 is spn-foundation after spn-x, which the workspace map puts after it/.test(wrote.out)
       && JSON.parse(readFileSync(join(ws, "arcs", "N001", "state.json"), "utf8")).rows.some((row) => row.id === "3"), wrote.out);
 }
 
@@ -429,7 +441,12 @@ console.log("\n=== the change sheet — allowed in the arc's data, held to its s
   writeFileSync(sheetFile, JSON.stringify(whole, null, 2));
   ok("green: `sheet.json` is allowed in the arc's data", checkWorkstream(ws).length === 0, said(checkWorkstream(ws)));
   writeFileSync(join(ws, "arcs", "N001", "go.workflow.mjs"), "export default {};\n");
-  ok("[MKT.SCRIPTS.561] green: `go.workflow.mjs`, the workflow `go write` keeps beside the plan, is allowed in the arc's data", checkWorkstream(ws).length === 0, said(checkWorkstream(ws)));
+  ok("[MKT.SCRIPTS.577] red: a `go.workflow.mjs` under `arcs/` is a stray file, named as not the arc's data", has(checkWorkstream(ws), "name", /`arcs\/N001\/go\.workflow\.mjs` is not the arc's data/), said(checkWorkstream(ws)));
+  rmSync(join(ws, "arcs", "N001", "go.workflow.mjs"));
+  mkdirSync(join(ws, "notes", "N001", "work"), { recursive: true });
+  writeFileSync(join(ws, "notes", "N001", "work", "go.workflow.mjs"), "export default {};\n");
+  ok("[MKT.SCRIPTS.577] green: the same file under `notes/N001/work/`, where `go write` keeps it, is whole", checkWorkstream(ws).length === 0, said(checkWorkstream(ws)));
+  rmSync(join(ws, "notes", "N001", "work"), { recursive: true });
   writeFileSync(join(ws, "arcs", "N001", "other.json"), "{}");
   ok("red: another file is still named, and the message lists `sheet.json`", has(checkWorkstream(ws), "name", /is not the arc's data.*`sheet.json`/), said(checkWorkstream(ws)));
   ok("[MKT.SCRIPTS.536] red: the message names the `patches/` folder with the data files", has(checkWorkstream(ws), "name", /is not the arc's data.*`patches\/`/), said(checkWorkstream(ws)));

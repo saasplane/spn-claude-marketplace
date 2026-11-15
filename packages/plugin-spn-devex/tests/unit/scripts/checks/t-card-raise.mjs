@@ -21,6 +21,8 @@ const { root, ws } = await dataWorkspace("card-raise");
 const name = basename(ws);
 const raise = (card, env = {}) => { put(root, "c.json", JSON.stringify(card)); return cli(root, ["workstream", "question", "raise", "031/N001", "--file", "c.json"], env); };
 const { title, ...bare } = CARD;
+// A card that shows names in its options' code cites the chapter it read (E2232): `settled.answered` holds a docs/ path or a RULE id.
+const cited = { ...CARD.settled, answered: "Read docs/workspace/workstream.md: nothing there settles it." };
 const drop = (field) => { const { [field]: _gone, ...rest } = CARD; return rest; };
 
 console.log("\n=== a card raised now carries the new fields");
@@ -46,7 +48,7 @@ console.log("\n=== nearest resolves");
   ok("[MKT.SCRIPTS.422] red: a nearest path that does not exist is refused", gone.code !== 0 && gone.out.includes("no path that exists"), gone.out);
   put(root, "spn-x/pattern.ts", "export {};\n");
   const coded = CARD.options.map((option) => ({ ...option, code: "export const probe = 1;" }));
-  const there = raise({ ...CARD, nearest: "spn-x/pattern.ts:1", options: coded, preview: { reason: "The options differ in one line." } });
+  const there = raise({ ...CARD, nearest: "spn-x/pattern.ts:1", options: coded, preview: { reason: "The options differ in one line." }, settled: cited });
   ok("[MKT.SCRIPTS.422] green: a path that exists, with its line, passes", there.code === 0, there.out);
   const none = raise({ ...CARD, nearest: "none" });
   ok("[MKT.SCRIPTS.422] green: `none` passes outside the builder's workspace", none.code === 0, none.out);
@@ -103,7 +105,7 @@ console.log("\n=== a suggestion carries the same card");
   const codeNoPreview = added({ ...CARD, nearest: "spn-x/packages/job/src/contract/states/job.ts" });
   ok("[MKT.SCRIPTS.527] red: a card whose nearest is a .ts file and a preview of none is refused, saying what to show", codeNoPreview.code !== 0 && codeNoPreview.out.includes("preview"), codeNoPreview.out);
   put(root, "spn-x/packages/job/src/contract/states/job.ts", "export {};\n");
-  put(root, "s.json", JSON.stringify({ ...CARD, nearest: "spn-x/packages/job/src/contract/states/job.ts", options: CARD.options.map((option) => ({ ...option, code: "isActive: CDTBoolean;" })), preview: { reason: "r" } }));
+  put(root, "s.json", JSON.stringify({ ...CARD, nearest: "spn-x/packages/job/src/contract/states/job.ts", options: CARD.options.map((option) => ({ ...option, code: "isActive: CDTBoolean;" })), preview: { reason: "r" }, settled: cited }));
   const codeWithPreview = cli(root, ["workstream", "suggestion", "add", "031/N001", "a code card with its fragment", "--file", "s.json"]);
   ok("[MKT.SCRIPTS.527] green: the same card with the fragment in its preview is taken and the record keeps about and preview", codeWithPreview.code === 0 && (() => { const last = readFileSync(join(ws, "suggestions.jsonl"), "utf8").trim().split("\n").map((line) => JSON.parse(line)).at(-1); return last.about === "CODE" && last.preview.includes("isActive: CDTBoolean;"); })(), codeWithPreview.out);
 }
@@ -139,7 +141,7 @@ console.log("\n=== a card about code carries code, and a card holds the three an
   ok("[MKT.SCRIPTS.522] the nearest of a .ts, .tsx or .sql file or a path under /src/ is code, and a folder or none is not",
     ["a/b.ts", "a/b.tsx:3", "m/1-x.sql", "pkg/src/x"].every(nearestIsCode) && !["spn-x", "none", "docs/a.md"].some(nearestIsCode) && cardAbout({ about: "FLOW", nearest: "a/b.ts" }) === "CODE" && cardAbout({}) === "OTHER");
   ok("[MKT.SCRIPTS.522] red: an option's code with no preview reason is refused", raisedCardFaults({ ...CARD, about: "CODE", options: coded }).some((fault) => fault.includes("preview.reason")));
-  ok("[MKT.SCRIPTS.522] green: a code card with code on each option and a reason has no fault", raisedCardFaults({ ...CARD, about: "CODE", options: coded, preview: { reason: "r" } }).length === 0);
+  ok("[MKT.SCRIPTS.522] green: a code card with code on each option and a reason has no fault", raisedCardFaults({ ...CARD, about: "CODE", options: coded, preview: { reason: "r" }, settled: cited }).length === 0);
   ok("[MKT.SCRIPTS.522] red: an about outside CODE, FLOW and OTHER is refused", raisedCardFaults({ ...CARD, about: "WHATEVER" }).some((fault) => fault.includes("about")));
   const noSettled = raise(drop("settled"));
   ok("[MKT.SCRIPTS.528] red: a card with no `settled` block is refused, naming the three answers and the command for an engineering call", noSettled.code !== 0 && noSettled.out.includes("settled") && noSettled.out.includes("decision write"), noSettled.out);

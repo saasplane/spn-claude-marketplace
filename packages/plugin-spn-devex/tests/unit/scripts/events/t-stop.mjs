@@ -1231,6 +1231,8 @@ ${tableOf(cyclesOf(folder))}
   // UNTOUCHED: another session's workstream, whose page is stale, while this session wrote its own arc.
   {
     const built = build("n006-stop-page-other-workstream");
+    // The session's own page is one the writer leaves as it is (N013 E2285: the check reads `producedPage`), so only the other workstream is behind.
+    writeFileSync(built.page, producedPage(join(built.root, A), readFileSync(built.page, "utf8")).text);
     const other = join(built.root, B);
     mkdirSync(join(other, "arcs", "N001"), { recursive: true });
     writeFileSync(join(other, "arcs", "N001", "state.json"), arcText("DECIDED"));
@@ -1622,6 +1624,8 @@ console.log("\n=== stop — the checks the first round fixed or wired, and the g
       found.length === 1 && found[0].message.includes("The preview of N001 reads PROPOSED and its arc is DECIDED")
         && found[0].message.includes("`spn-devex docs cycles write 031-probe`"), JSON.stringify(found));
     writeFileSync(join(ws, "notes", "N001", "preview.html"), previewShowing("DECIDED"));
+    // N013 E2256: the check asks `previewWouldChange`, so a preview current is one the writer leaves as it is: the writer draws the rest of the header, and the status it shows is DECIDED.
+    cli(root, ["docs", "cycles", "write", "031-probe"]);
     check("[MKT.HOOKS.108] a preview showing its arc's status is not named",
       call("checkPageCurrent", new Set([arcOf(ws)])).every((one) => !one.message.includes("The preview of")));
     void root;
@@ -1633,6 +1637,24 @@ console.log("\n=== stop — the checks the first round fixed or wired, and the g
     check("[MKT.HOOKS.109] a workstream with no card ends a turn clean after `docs cycles write`",
       wrote.code === 0 && stale.length === 0 && readFileSync(join(ws, "approach.html"), "utf8").includes("no card is open"),
       `${wrote.out.slice(0, 200)} · ${JSON.stringify(stale)}`);
+  }
+  {
+    // [MKT.HOOKS.503] THE CHECK READS THE PAGE THROUGH `producedPage` AND THE PREVIEW THROUGH `previewWouldChange`: a page and a preview the writer would leave as they are are not behind.
+    const { root, ws } = await dataWorkspace("e2256-page-current");
+    writeFileSync(join(ws, "notes", "N001", "preview.html"), previewShowing("PROPOSED"));
+    const wrote = cli(root, ["docs", "cycles", "write", "031-probe"]);
+    const page = readFileSync(join(ws, "approach.html"), "utf8");
+    const current = call("checkPageCurrent", new Set([arcOf(ws)]));
+    check("[MKT.HOOKS.503] a touched arc whose page the writer leaves unchanged and whose preview is current returns no warning",
+      wrote.code === 0 && page.includes("no card is open") && current.length === 0, `${wrote.out.slice(0, 200)} · ${JSON.stringify(current)}`);
+    editArc(ws, (data) => { data.rows[0].state = "landed"; });
+    const behind = call("checkPageCurrent", new Set([arcOf(ws)]));
+    check("[MKT.HOOKS.503] the same arc with its Plan table behind returns the existing message, naming the workstream and the command",
+      behind.length === 1 && behind[0].check === "page-stale" && behind[0].message.includes("An arc you wrote this turn left its page behind")
+        && behind[0].message.includes("`spn-devex docs cycles write 031-probe`"), JSON.stringify(behind));
+    const mended = cli(root, ["docs", "cycles", "write", "031-probe"]);
+    check("[MKT.HOOKS.503] and after `docs cycles write` the warning is gone",
+      mended.code === 0 && call("checkPageCurrent", new Set([arcOf(ws)])).length === 0, `${mended.out.slice(0, 200)}`);
   }
   {
     const { root, ws } = await dataWorkspace("n006-promise");

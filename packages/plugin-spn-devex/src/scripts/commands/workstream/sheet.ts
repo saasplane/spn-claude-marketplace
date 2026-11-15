@@ -23,7 +23,7 @@ import { type Action, FLAG, VALUE, UsageFault, readWords } from "../../../../../
 import { workspaceRoot } from "../../../../../plugin-support-lib/src/lib/timing.ts";
 import { readGo } from "../../lib/go-plan.ts";
 import { arcIdsOf, logEvent, previewOf, provedByFault, readArc, readJson, workspaceOf, readJsonl, readQuestions, readSheet, factsFileOf, sheetFileOf, stateFileOf, suggestionsOf, writeArc, writeWhole } from "../../lib/workstream.ts";
-import { ENTRY_OPS, cardName, entryWork, parentIds, renameDataToWork, sheetFaults, type ArcData, type ArcRow, type Fact, type Question, type Sheet, type SheetEntry } from "../../lib/workstream-schema.ts";
+import { ENTRY_OPS, PLACEHOLDER, cardName, entryWork, parentIds, renameDataToWork, sheetFaults, type ArcData, type ArcRow, type Fact, type Question, type Sheet, type SheetEntry } from "../../lib/workstream-schema.ts";
 import { missingCopies } from "../../lib/generated-copies.ts";
 import { arcNamed, listOf, typed } from "./_shared.ts";
 
@@ -87,6 +87,8 @@ function writeFaults(ws: string, arc: string, sheet: Sheet, whole: boolean): str
   for (const entry of Array.isArray(sheet.entries) ? sheet.entries : [])
     for (const id of Array.isArray(entry?.facts) ? entry.facts : [])
       if (typeof id === "string" && !held.has(id)) out.push(`${entry.id} cites ${id}, which ${arc}'s facts do not hold`);
+  // A NEW ENTRY NAMES ONLY WHAT IS FILLED: the findings a sheet check prints, run on the entries the stored sheet does not hold yet.
+  out.push(...unnamedFindings((Array.isArray(sheet.entries) ? sheet.entries : []).filter((entry) => entry && !stored.has(entry.id)), readJsonl(factsFileOf(ws, arc)) as Fact[]));
   // A CHANGED BOOK FILE MOVES ITS GENERATED COPIES: each the sheet does not name is a fault where the whole sheet is written (s59).
   const root = workspaceOf(ws);
   if (whole && root && Array.isArray(sheet.entries)) out.push(...missingCopies(root, sheet.entries.filter((entry) => typeof entry?.file === "string" && entry.file.includes(":")), landedIds(readArc(ws, arc))));
@@ -632,6 +634,35 @@ function kindFindings(arc: string, entries: readonly SheetEntry[]): string[] {
   return out;
 }
 
+/** The lists of an entry that name something, each item of which must be filled. */
+const NAMING_LISTS = ["rules", "callers", "then", "docs", "book"] as const;
+/** What a rule id looks like: `RULE.` and dotted upper-case parts, as in `refs/rules.json`. */
+const RULE_ID = /^RULE\.[A-Z0-9]+(?:\.[A-Z0-9]+)+$/;
+/** A token in an entry's `what` that stands where a field, a column or a name was not filled in. */
+const UNFILLED_TOKEN = /<\.\.\.>|\{\{\.\.\.\}\}|\bTBD\b|\bTODO\b|\?\?\?|(?:^|\s)\.\.\.(?=\s|$)/;
+
+/** The findings of an entry that names nothing: a blank or placeholder item in a list, a rule item that is no rule id, a `what` that leaves a token unfilled, a cited fact whose read is blank. */
+export function unnamedFindings(entries: readonly SheetEntry[], facts: readonly Fact[] = []): string[] {
+  const out: string[] = [];
+  const blank = (text: unknown): boolean => typeof text !== "string" || !text.trim();
+  for (const entry of entries) {
+    for (const list of NAMING_LISTS) {
+      for (const item of Array.isArray(entry[list]) ? entry[list] as unknown[] : []) {
+        if (blank(item)) out.push(`${entry.id} names a ${list} item that is blank`);
+        else if (PLACEHOLDER.test((item as string).trim())) out.push(`${entry.id} names a ${list} item that is a placeholder ("${(item as string).trim()}")`);
+        else if (list === "rules" && !RULE_ID.test((item as string).trim())) out.push(`${entry.id} names rule "${(item as string).trim()}", which is no rule id`);
+      }
+    }
+    const token = typeof entry.what === "string" ? UNFILLED_TOKEN.exec(entry.what)?.[0].trim() : undefined;
+    if (token) out.push(`${entry.id}'s what leaves a field, column or name unfilled ("${token}")`);
+    for (const id of Array.isArray(entry.facts) ? entry.facts : []) {
+      const fact = facts.find((one) => one?.id === id);
+      if (fact && [fact.source, fact.fact].some((read) => blank(read) || PLACEHOLDER.test(String(read).trim()))) out.push(`${entry.id} cites ${id}, whose read is blank or a placeholder`);
+    }
+  }
+  return out;
+}
+
 const NAMED_BLOCK = /<pre\b[^>]*\bdata-entry="(E\d+)"[^>]*>([\s\S]*?)<\/pre>/g;
 const textOfBlock = (html: string): string =>
   html.replace(/<[^>]*>/g, "").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&#0?39;/g, "'").replace(/&amp;/g, "&").trim();
@@ -670,6 +701,7 @@ export function sheetFindings(ws: string, arc: string): string[] {
   }
   for (const entry of entries) if (!named.has(entry.id)) out.push(`${entry.id} is named by no row`);
   out.push(...kindFindings(arc, entries));
+  out.push(...unnamedFindings(entries, readJsonl(factsFileOf(ws, arc)) as Fact[]));
   out.push(...blockFindings(ws, arc, entries));
   // A JUDGED ENTRY KEEPS ITS CHANGE AND ITS THINKING: a diff from `sheet patch` and a `trace`.
   for (const entry of entries.filter((one) => one.judged === true)) {

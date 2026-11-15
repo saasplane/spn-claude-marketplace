@@ -222,6 +222,67 @@ console.log("\n=== a node that owes a tier and carries no case of it yet passes 
     denial(checkPushTiers(push(repo))).includes("it ran no case, so it proved nothing"), denial(checkPushTiers(push(repo))));
 }
 
+console.log("\n=== a node a later arc proves, and a go's full run (E2229, E2230)");
+{
+  // A WORKSPACE of its own for each case: the repository `spn-probe` sits in it, beside an open workstream `050-probe` holding arc N001.
+  const workspaceWith = (name, { rows = [], entries = [], go = null }) => {
+    const root = join(BASE, name);
+    const arc = join(root, ".spndevex", "workstreams", "open", "050-probe", "arcs", "N001");
+    mkdirSync(arc, { recursive: true });
+    writeFileSync(join(arc, "state.json"), JSON.stringify({ schemaVersion: 2, arc: "N001", subject: "probe", title: "t", goal: null, status: "DECIDED", reason: null, preview: "preview.html", rows }), "utf8");
+    writeFileSync(join(arc, "sheet.json"), JSON.stringify({ schemaVersion: 1, releaseChain: [], dependsOn: [], stack: null, entries }), "utf8");
+    if (go) writeFileSync(join(arc, "go.json"), JSON.stringify(go), "utf8");
+    const repo = repository(`${name}/spn-probe`, {
+      "pkg/spkind.json": JSON.stringify({ kind: "SUPPORT_WEB", name: "Pkg", config: { mtype: "SUPPORT_WEB" } }),
+      "pkg/package.json": JSON.stringify({ name: "pkg", private: true }),
+      "pkg/src/a.ts": "export const a = 1;\n",
+      "pkg/src/b.ts": "export const b = 1;\n",
+      "pkg/src/c.ts": "export const c = 1;\n",
+    });
+    return repo;
+  };
+  const entry = (id, path) => ({ id, op: "edit", file: `spn-probe:${path}`, what: "x", decidedBy: [], facts: ["f1"], then: [], rules: [], callers: [], tiers: {}, docs: [], book: [] });
+  const row = (state, extra = {}) => ({ id: "1", parent: "N001", title: "code", kind: "change", work: "CODE", repo: "spn-probe", state, entries: ["E1", "E2"], provedBy: "N002", ...extra });
+  const entries = [entry("E1", "pkg/src/a.ts"), entry("E2", "pkg/src/b.ts")];
+  const change = (repo, ...paths) => { write(repo, Object.fromEntries(paths.map((path) => [path, `export const x = 2;\n`]))); land(repo, ...paths); };
+
+  const proved = workspaceWith("ws504", { rows: [row("ready")], entries });
+  change(proved, "pkg/src/a.ts", "pkg/src/b.ts");
+  const passed = checkPushTiers(push(proved));
+  ok("[MKT.HOOKS.504] a push of a node whose changed paths are all entries of CODE rows naming provedBy passes with a note",
+    verdictOf(passed) === "note" && (passed?.note ?? "").includes("`pkg`: proved by N002, as the landing gate reads it"), JSON.stringify(passed));
+
+  const outside = workspaceWith("ws504-outside", { rows: [row("ready")], entries });
+  change(outside, "pkg/src/a.ts", "pkg/src/c.ts");
+  ok("[MKT.HOOKS.504] a node with one changed path outside those entries is refused as before",
+    denial(checkPushTiers(push(outside))).includes("`pkg`, unit: no run file"), JSON.stringify(checkPushTiers(push(outside))));
+
+  const landed = workspaceWith("ws504-done", { rows: [row("landed")], entries });
+  change(landed, "pkg/src/a.ts", "pkg/src/b.ts");
+  ok("[MKT.HOOKS.504] a row that is done proves nothing later, so its node is refused as before",
+    verdictOf(checkPushTiers(push(landed))) === "deny", JSON.stringify(checkPushTiers(push(landed))));
+
+  const unnamed = workspaceWith("ws504-unnamed", { rows: [row("ready", { provedBy: null })], entries });
+  change(unnamed, "pkg/src/a.ts", "pkg/src/b.ts");
+  ok("[MKT.HOOKS.504] a row that names no provedBy proves nothing later, so its node is refused as before",
+    verdictOf(checkPushTiers(push(unnamed))) === "deny", JSON.stringify(checkPushTiers(push(unnamed))));
+
+  const fullPart = (state) => ({ id: "full-spn-probe", repo: "spn-probe", work: "TEST", entries: [], tests: [], minutes: null, measuredFrom: null, waitsOn: [], model: "sonnet", signature: "", state });
+  const planOf = (state) => ({ schemaVersion: 1, lead: "N001", scope: ["N001"], writtenAt: "2026-11-14T09:00+05:30", parts: [fullPart(state)] });
+  const full = workspaceWith("ws505", { go: planOf("ready") });
+  change(full, "pkg/src/a.ts");
+  const refused = denial(checkPushTiers(push(full)));
+  ok("[MKT.HOOKS.505] a refused push in a repository whose open go holds an unlanded full-<repo> part names the go's start command",
+    refused.includes("workstream go start 050/N001 full-spn-probe"), refused);
+  ok("[MKT.HOOKS.505] and not the per-node commands", !refused.includes("spnutils apps test") && refused.includes("`pkg`, unit: no run file"), refused);
+
+  const finished = workspaceWith("ws505-landed", { go: planOf("landed") });
+  change(finished, "pkg/src/a.ts");
+  const perNode = denial(checkPushTiers(push(finished)));
+  ok("[MKT.HOOKS.505] a full part that has landed is no run to start: the per-node commands stand",
+    perNode.includes("spnutils apps test unit commit-unit") && !perNode.includes("workstream go start"), perNode);
+}
+
 console.log("\n=== a whole green stamped run on exactly this content passes");
 {
   const repo = appsRepo("green");

@@ -13,11 +13,11 @@
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/02-workstream.md",
-      "seen": "7fb606ed"
+      "seen": "532a328b"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
-      "seen": "7235dee7"
+      "seen": "9313588a"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -27,7 +27,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "section": "A step row says where, what work, and how",
-      "seen": "0ae8fa01"
+      "seen": "2997f5d4"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -37,12 +37,12 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "section": "An order is one delegated execution, and every order follows the same rules",
-      "seen": "8943136e"
+      "seen": "f7f191d7"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "section": "An arc carries its specification, or names the note that holds it",
-      "seen": "84564a67"
+      "seen": "191f4f32"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -132,9 +132,8 @@ step starts, `running` while it runs, with the log line that moved it there sayi
 reached), and what its report
 folded in: `proof`, `cost`, `commits`, `order`. **Every row is a build step**: reading and drafting are
 planning jobs, which record no step (`RULE.DEVEX.WORKSPACE.278` · MUST · short). A step's `state` is `waiting`, `ready`,
-`running`, `stopped`, `replaced`, `landed`, `deferred` or `carried`. Steps run in chain order, by repository with the foundation first, then by work. After each
-write the `row` commands name, in a `note:` line, a build row with no `repo` or no `work` and a row out of
-chain order; it reports and never refuses (`RULE.DEVEX.WORKSPACE.183` · MUST · check:workstream-state).
+`running`, `stopped`, `replaced`, `landed`, `deferred` or `carried`. Steps run in the workspace map's order by repository, then by work (`RULE.DEVEX.WORKSPACE.357` · MUST · check:workstream-state): a repository comes after every repository its files say it consumes inside the workspace, as § *The workspace map* derives. After each
+write the `row` commands name, in a `note:` line, a build row with no `repo` or no `work` and a row added or moved out of the map's order; they speak only when a row is added or moved out of that order, and stay silent on an arc whose rows already follow the map. It reports and never refuses, and a repository the map cannot read is a finding (`RULE.DEVEX.WORKSPACE.183` · MUST · check:workstream-state).
 
 `work` is one value of `SPDevExWorkstreamWorkType` (`DOCS` · `CODE` · `GENERATED` · `DESIGN` · `TEST` · `RELEASE` · `PROOF`), the kind of work a row, a sheet entry, a go part or a telemetry row stands for, and each place takes the values that fit it: a sheet entry `DOCS`, `CODE` or `GENERATED`; a row of an arc every value but `TEST`; a go part every value; a telemetry row every value, or null where no part was started. A baseline run, a part's own tests and a full run are all `TEST`, told apart by the part's id.
 
@@ -265,7 +264,7 @@ developer as soon as the batch lands.
 
 **In an arc that keeps a sheet, the steps are derived from the sheet and never added by hand.** `sheet write` writes one step for each repository and kind of change its entries name, and each entry names its kind: docs, code or generated. The release and proof steps come from the sheet's release order. A step that has landed keeps what it landed: an entry written into the sheet after it goes to a step of its own, and its repository gets a new release step and, for code, a new proof step. `fact write` pins a fact on the workstream's own branch where one exists, so a fact is read where the work is written.
 
-**An entry points at what was decided and never says it again, and it holds no code.** The sheet's header holds `releaseChain` (what releases, in what order, and the release slots of other workstreams it must follow), `dependsOn` (other repositories and workstreams' branches that merge first; a line that names an arc of the same workstream by its id, such as `N003`, makes the plan wait on that arc's release) and `stack` (the folder the tiers run from, the `dmo` version, how it is reset, the ports; none where the stack has no `dmo`). Each entry holds `id`, `op` (`create` · `edit` · `drop` · `rename`), `file` (`repository:path`), `what`, `decidedBy` (the cards or preview sections), `facts` (by id; the drift step reads their commits), `then` (the generators to run after it), `rules`, `callers` (found by search, by path), `tiers` (the named tests by tier, each a behaviour id; a new test is named by the `baseline-<repo>` part, which runs the new cases once on the base, where each must fail), `trace` (one line: how the change moves the arc's problem toward solved), `judged` (true where the developer judges the change on the preview, which shows a code block for it; every other change is patched too, and stays in the sheet), `docs` and `book` (what it changes, and the book line it changes or must still agree with), `kind`, `command` and `proof` (`change` or `step`: a change is a real patch; a step is prose for the agent, the `command` to run and the `proof` that it worked, such as a regenerated client, a codegen run, synced generated rules, named tests or a moved pin; an exit code alone is not a proof, and a behaviour id in a run file, or a file that now matches, is) and `patch` (`{file, base}`: the entry's diff, at `arcs/N<nnn>/patches/<E>.diff`, written against the commit its facts pin; a step carries none, and a generated file is a step that runs its generator).
+**An entry points at what was decided and never says it again, and it holds no code.** The sheet's header holds `releaseChain` (what releases, in what order, and the release slots of other workstreams it must follow), `dependsOn` (other repositories and workstreams' branches that merge first; where the other repository is in the workspace, the map orders it, and a downstream entry names, in its `then`, the upstream entry it reads) and `stack` (the folder the tiers run from, the `dmo` version, how it is reset, the ports; none where the stack has no `dmo`). Each entry holds `id`, `op` (`create` · `edit` · `drop` · `rename`), `file` (`repository:path`), `what`, `decidedBy` (the cards or preview sections), `facts` (by id; the drift step reads their commits), `then` (the generators to run after it), `rules`, `callers` (found by search, by path), `tiers` (the named tests by tier, each a behaviour id; a new test is named by its behaviour id, its tier and the words of what it proves, and its code is written in the test passes once the names are final; each new case is shown failing on the base before the code it proves, § *Red-first tests*), `trace` (one line: how the change moves the arc's problem toward solved), `judged` (true where the developer judges the change on the preview, which shows a code block for it; every other change is patched too, and stays in the sheet), `docs` and `book` (what it changes, and the book line it changes or must still agree with), `kind`, `command` and `proof` (`change` or `step`: a change is a real patch; a step is prose for the agent, the `command` to run and the `proof` that it worked, such as a regenerated client, a codegen run, synced generated rules, named tests or a moved pin; an exit code alone is not a proof, and a behaviour id in a run file, or a file that now matches, is) and `patch` (`{file, base}`: the entry's diff, at `arcs/N<nnn>/patches/<E>.diff`, written against the commit its facts pin; a step carries none, and a generated file is a step that runs its generator).
 
 **A command validates each entry as it is written, so a gap is refused where it is made — MUST.** A field with nothing to say reads `[]` and is never left out, an entry with no tiers or no fact is refused, and a refused write writes nothing.
 
@@ -284,25 +283,85 @@ developer as soon as the batch lands.
 
 **Ideation writes a patch only in the workstream's worktree, and only on a file an entry of the sheet names** (`RULE.DEVEX.WORKSPACE.501` · MUST · check:pretooluse). The worktree is one set for the workstream, shared by its arcs: a kept patch resets its file, so arcs do not collide, and an arc ideating waits while another arc's go runs in the same repository. Before a go, the guard reads a path in `.worktrees/<workstream>/<repository>/` as `<repository>:<file>`, not as a write into a repository named `.worktrees`, and lets it through when an entry of an arc of this window's workstreams names that file. The documents-first gate lets the same write through while no go part of the arc has started. A write in a main checkout, or on a file no entry names, is refused until the go. **The alternative is a guard that lets a patch through only because some other arc holds a go,** which left a workstream with none, such as 037 at its close, refused on the patches its own sheet asked for.
 
-**An entry is a change or a step, and the go refuses one of either kind that is incomplete** (`RULE.DEVEX.WORKSPACE.502` · MUST · check:split-plan). `go write` prints `Refused: E7 is a change with no patch` or `Refused: E9 is a step with no command or no proof` and writes nothing, and `arc edit --status DECIDED` is refused on the same findings. The refusal covers every hand-written file: the book and docs, config and env files, migrations, contract and server. A web or test change with no patch gets a warning from `sheet check` until an arc shows the patches pay, and then the refusal extends to them. In N001 of this workstream no patch existed at the go and 11 were written after it, and 774 of the 816 lines the go added matched the preview, which is the cost of code typed twice.
+**An entry is a change or a step, and the go refuses one of either kind that is incomplete** (`RULE.DEVEX.WORKSPACE.502` · MUST · check:split-plan). `go write` prints `Refused: E7 is a change with no patch` or `Refused: E9 is a step with no command or no proof` and writes nothing, and `arc edit --status DECIDED` is refused on the same findings. The refusal covers every hand-written file: the book and docs, config and env files, migrations, contract, server, web and tests. A change marked judged is one whose patch ideation wrote with judgment, and it still carries its patch. In N001 of this workstream no patch existed at the go and 11 were written after it, and 774 of the 816 lines the go added matched the preview, which is the cost of code typed twice. In 040's N012 about 500 changes went to the go as prose, and the work had to be reconciled against the code to know what was left. That is the evidence that settled it, so no warning stands in place of the refusal.
+
+**The go applies the patches in passes and runs every tier once** (`RULE.DEVEX.WORKSPACE.507` · MUST · check:split-plan). Each repository's patches are applied as one pass, in release order. A helper is briefed only to re-cut a patch that no longer applies, and it edits and type-checks and never runs a test tier. Between passes nothing runs but what a repository's commit or push hook refuses without, and every tier runs once, in the full run. The developer decided it on 2026-11-14: the go on a preview prepares the batches, and the patches are applied in phases, with no escape. **The alternative is a helper that writes a change from its prose and runs a spec between passes,** which typed the code twice and ran a tier at every step.
 
 **A row names its entries, and a report names its run.** A step row gains `entries`, the ids of the entries it carries; a report's front matter gains `run`. Each is a field added and never repurposed.
 
-### Once an arc is decided, a drift step runs, then four passes per repository
+### The workspace map
 
-**Once an arc is decided, a drift step refreshes the entries whose facts moved. Then each repository runs one docs pass, book first, one code-and-test pass, and the named tests of its entries at every tier, contract and journey included, on the stack the sheet names. Then the release chain runs in its order** (`RULE.DEVEX.WORKSPACE.320` · MUST · check:workstream-state). The drift step is `workstream state check --facts`, which names each pinned fact whose source moved and the entries that cite it, so only those are read again and refreshed with `sheet edit`. The docs pass writes the book and the node documents from every entry's `docs` and `book` lines. The code-and-test pass writes the source and the specs, and each order reads only the entries of its row. The tiers pass runs the tests the entries name, at the tier each names, on the stack the sheet plans, so a contract or journey test a change breaks shows there and not at a final proof. Each repository's whole tiers run once as a baseline before its code pass, so a surprise that would have shown at the gate shows first, while the fix is still cheap. The release chain runs last, in the order the sheet's header sets.
+**A go plans from a map of the workspace's own repositories, derived from their files on every plan and kept nowhere** (`RULE.DEVEX.WORKSPACE.508` · MUST · skill:spn-devex/execute).
 
-**The go's scope runs as one set of passes, derived by `workstream go write` from the scope's sheets and the measured times** (`RULE.DEVEX.WORKSPACE.455` · MUST · skill:spn-devex/execute). The scope is every arc the go covers, and each of them has its preview filled and its sheet whole. The command groups the entries by repository, in chain order, and then by pass. Each pass splits into parts, and a part is what one helper carries out. Parts in the same pass run side by side, because no two of them touch the same file.
+| What the map reads | From | Gives |
+| --- | --- | --- |
+| Its world | the `type` in its `sprepo.json`: `FOUNDATION` states the standards, `APPS` realizes them in one stack, `INFRA` provisions an estate or its shared material, and `GENERAL` holds plugins and their docs | which passes it has, and which plugin serves it |
+| Its nodes | each `APPS` project's kind in `spkind.json` and each estate node's type in `spinfrapkg.json` with `src/spestate.json` | the passes inside it, and whether it has a surface to design |
+| What it consumes | its package pins, including other services' clients, its estate couplings, and the book text it restates | which repositories are upstream of it, inside or outside the workspace |
+
+The map is workspace state and never a rule. It is rebuilt from these files on every plan, so it cannot drift from the code, and it is written to no file, since a fact the tree already shows is not stored. A repository whose world or consumption cannot be read is reported as a finding and is never placed by a guess.
+
+**SaaS Plane's own workspace.** The book sits upstream of everything. The plugins restate it, so the marketplace repository follows the book. Support and the platform are both `APPS` repositories, ordered by the platform pinning Support's `@saasplane/support-*` packages. The platform couples to `@spn/infra-organization` and `@spn/infra-platform-dmo`, and Launchpad to `@spn/infra-platform-lpd`, so the estate precedes them. Every one of those edges is read from a file: a `sprepo.json` coupling, a `package.json` pin or a `RESTATES` header.
+
+**A partner's workspace.** A partner holds their platform and their estate, and may add their own book, app libraries, services and infra support. What SaaS Plane ships reaches them released: Support and estate packages from the registry, and the SaaS Plane book and plugins from the marketplace. Those are pins in a go and never waits. A partner's own book, if they keep one, is upstream inside their workspace, so it is a wait like ours. The same rule gives each workspace its own map.
+
+| What the agent helps a partner manage | Served by |
+| --- | --- |
+| Surface: the design system's units their platform uses, and any they add | the surface plugin |
+| Figma and designs: their pages' looks, decided before a go, and their library file, drawn from their book beside the code | the surface plugin, with the Figma connector |
+| Apps: their platform, their services, and their own app libraries if they have them | the apps plugin, for their stack |
+| Infra: their estate, and their own infra support if they have it | the infra plugin |
+| Their book, if they keep one: a `FOUNDATION` repository for what spans their repositories, first in their workspace | the devex plugin |
+
+### Drift and the passes
+
+**Once an arc is decided, a drift step refreshes the entries whose facts moved. Then each repository runs the passes its world declares, in order, and the release chain runs in the map's order** (`RULE.DEVEX.WORKSPACE.320` · MUST · check:workstream-state). The drift step is `workstream state check --facts`, which names each pinned fact whose source moved and the entries that cite it, so only those are read again and refreshed with `sheet edit`. The docs pass writes the book and the node documents from every entry's `docs` and `book` lines. A repository's whole suite runs once on the base before anything changes, and records what already fails. No tier runs between passes: each repository's every tier runs once, in its full run, and a red case is fixed and rerun on only what its fix reaches. A contract or journey test a change breaks shows in that run. The release chain runs in the map's order, each downstream repository taking the upstream release right before the pass that reads it.
+
+| World | Its passes, in order |
+| --- | --- |
+| `FOUNDATION` | the book, then the docs checks once, then the release |
+| `GENERAL` | plugin text restated from the book, then plugin source, then plugin tests, then the commit, the full run, the release and the install |
+| `APPS` | baseline, book, pins, then the stack's layers in dependency order, then server tests, web tests, the commit, the full run and the release. Where its book holds design-system units, the library's draw runs beside the code passes and its publish beside the release |
+| `INFRA` | book, pins, then estate nodes in the order they name each other (`SUPPORT`, `MODULE`, `ORGANIZATION`, `PLATFORM`), then their tests, the commit, validate and the test tiers once, and the release. A cloud apply only on the developer's approval |
+
+**The devex plugin stays stack-agnostic: it asks the plugin that serves each repository's world for that world's passes** (`RULE.DEVEX.WORKSPACE.509` · MUST · skill:spn-devex/execute). A new stack brings its own passes and the plan needs no change. A pass with no entries in a go does not run. A step runs in the pass whose layer it builds: a validator or a barrel right after its source, and codegen as the client pass. A pass splits into parts by files that do not overlap, so its parts still run side by side.
+
+**The go's scope runs as one set of passes, derived by `workstream go write` from the scope's sheets and the measured times** (`RULE.DEVEX.WORKSPACE.455` · MUST · skill:spn-devex/execute). The scope is every arc the go covers, and each of them has its preview filled and its sheet whole. The command groups the entries by repository, in the map's order, and then by pass. Each pass splits into parts, and a part is what one helper carries out. Parts in the same pass run side by side, because no two of them touch the same file.
 
 | What `go write` settles | Read from |
 | --- | --- |
-| **The passes**: each repository's entries, grouped by pass, with the book first and the release last. A repository that holds the book and releases nothing ranks first, so a copy of the book's line in another repository always becomes a wait | the sheets' entries and each sheet's release order |
-| **The waits**: a `dependsOn` line that names an arc of the same workstream by its id makes the code parts of that line's repository wait on the arc's release parts. A release waits only on its own repository's full run and generated part, and on the release before it in `releaseChain`; `go write` refuses a scope where a wait would close a circle through a release, and names the parts. A baseline waits on the parts that hold that repository's documents rows across every decided arc. An entry whose `what` says it exports, declares or adds a name waits on every entry whose `what` names it | the sheets' `dependsOn` and `releaseChain`, and each entry's `what` |
-| **The parts**: a pass split by files that do not overlap, so each part finishes within 45 measured minutes. A part holds eight entries only where no part of that kind ever landed. A repository's changes form one `apply-<repo>` part in their pass, carried by the lead with no brief and ordered by the same waits, and a step is a part of its own. A patched change never becomes a helper's part. Before it writes the plan, `go write` runs `git apply --3way --check` in the worktree, and an entry whose patch no longer applies is refused by name, with the word to patch it again against the new head. The apply part compares each patch's base with the worktree head, and a stale patch is redone against the new head. A go is one workflow, generated from the plan across every arc it covers: patches apply, steps run, independent parts run side by side, and the waits come from the plan. A connect step follows the apply. The `baseline-<repo>` part runs the new cases once on the base, and each must fail. Proof is by reach: a part's proof runs only the nodes and tiers its changed files reach through the dependency graph, with one whole run per repository per release batch. A rerun after a fix reruns only what the fix reaches, and a node whose content is unchanged keeps its green verdict. The code pass runs the formatter before its proof. Releases go by scope: `go propose <workstream>` proposes each go's scope, arcs that share repositories run as one go with one baseline, one full run and one release per repository, and it states the full runs and releases it saves. A pass's other entries are grouped by the first card or preview section in each entry's `decidedBy`, one file's entries stay in one part, and a part is named `<pass>-<repo>-<decision>-<n>`, the number counting only that decision's parts | the files each entry names, and each entry's `decidedBy` |
+| **The passes**: each repository's entries in the passes its world declares, and inside an APPS or INFRA repository by its nodes' kinds in dependency order; the plugin that serves the repository's world declares them. A step runs in the pass whose layer it builds | the sheets' entries, the workspace map and each plugin's declared passes |
+| **The waits**: read from the workspace map. A downstream entry that reads an upstream change names that entry. The downstream pins pass waits on the upstream release and sits right before the first pass holding such an entry; the passes before it run while the upstream repository runs its full run and release. An upstream outside the workspace is a published version and no wait. Nothing releases between one repository's passes. A release waits only on its own repository's full run and generated part, and on the release before it in `releaseChain`; `go write` refuses a scope where a wait would close a circle through a release, and names the parts. A baseline waits on the parts that hold that repository's documents rows across every decided arc. An entry whose `what` says it exports, declares or adds a name waits on every entry whose `what` names it | the workspace map, and each entry's `what` |
+| **The parts**: a pass split by files that do not overlap, so each part finishes within 45 measured minutes. A part holds eight entries only where no part of that kind ever landed. A repository's changes form one `apply-<repo>` part in their pass, carried by the lead with no brief and ordered by the same waits, and a step is a part of its own. A patched change never becomes a helper's part. Before it writes the plan, `go write` runs `git apply --3way --check` in the worktree, and an entry whose patch no longer applies is refused by name, with the word to patch it again against the new head. The apply part compares each patch's base with the worktree head, and a stale patch is redone against the new head. A go is one workflow, generated from the plan across every arc it covers: patches apply, steps run, independent parts run side by side, and the waits come from the plan. A connect step follows the apply. The `baseline-<repo>` part runs the repository's suite on the base once and records what already fails. After the web tests pass, a worktree at the base holding only the new test files runs each new case on a name the base has, and each must fail at its assertion; a case on a name new to the base is red by that name's absence. A part's proof is the one its pass names, the type-check of every project it touched, and the tiers run once per repository in the full run. A rerun after a fix reruns only what the fix reaches, and a node whose content is unchanged keeps its green verdict. The code pass runs the formatter before its proof. Releases go by scope: `go propose <workstream>` proposes each go's scope, arcs that share repositories run as one go with one baseline, one full run and one release per repository, and it states the full runs and releases it saves. | the files each entry names |
 | **The time of each part**: the cost that landed parts of the same kind of work in the same repository recorded, or, where this repository has none, the same kind of work in another repository, read as estimated from that repository. A full suite is priced from its last three timed runs | the timed commands and the cost of past orders |
-| **The tests each part runs**: only the test files whose cases carry the part's behaviour ids | each entry's tiers, and the ids in the test labels |
+| **The tests each part runs**: none. A part edits and type-checks; every tier runs once, in the full run | the pass's proof, and the full runs below |
 | **The full runs**: one baseline run per repository before its code pass, and one full run at the end that every code change lands on. A repository whose code has all landed still gets its full run while an arc of the scope owes a proof there, and the proof of an arc that changes no repository lands on the named run its own check records in the arc's `work/` folder | the repositories the scope touches, and the proof steps that have not landed |
 | **Each helper's brief**: its files, its changes, the decisions behind them and its test commands, written from the order template. The brief says a helper reads its own entries with `workstream sheet show <arc> --part <part>`, and its acceptance names each test id beside the file that holds it | the part's entries |
+
+### Red-first tests
+
+**The sheet holds what each case proves, and its code is written in the test passes, once the names are final** (`RULE.DEVEX.WORKSPACE.510` · MUST · skill:spn-devex/execute). An entry for a test file keeps the case's words, its tier and its behaviour id, and carries no patch. In one workstream, 63 of 105 test entries touched names that moved after planning, while the 7 test patches written up front still applied because their names had settled. So planning keeps what each case proves, and the code waits for the test passes.
+
+**Every new case is shown failing on the base before the code it proves, and it fails for the right reason** (`RULE.DEVEX.WORKSPACE.511` · MUST · skill:spn-devex/execute).
+
+| A new case | How it shows red |
+| --- | --- |
+| On a name the base already has | after the web tests pass, a worktree at the base holding only the new test files runs it once, and it fails at its assertion |
+| On a name new to the base | it cannot compile there and needs no run; the red is the name's absence |
+
+### Design beside the code
+
+**A page's or a unit's look is decided on the arc's preview before the go, and the Figma library is drawn from the book beside the code passes, never from the built code after them** (`RULE.DEVEX.WORKSPACE.512` · MUST · skill:spn-surface/design).
+
+| Design work | Where it runs |
+| --- | --- |
+| A page's or a unit's look | decided on the arc's preview before the go, with the design skill, in words, a mock or Figma drawn from the published library; in the go it is never a pass |
+| The library's units | drawn by the plugin from the book's construct snapshot, so the draw starts right after the book pass and runs side by side with the code passes, then is read back against the snapshot. It runs in the repository whose book holds the units: Support for SaaS Plane's design system, a partner's own library or platform for units they add |
+| The library's publish | the developer's click in Figma, once that repository's full run is green, beside its release, so the published library and the released code agree |
+
+A fix in the full run that changes a unit changes the book first, so the draw follows it, and the publish waits until the run is green.
+
+The track runs only once the library is in sync with the book and its drawing tool has landed; until then a go plans no design work.
 
 **The plan is written only by `go write`, into the lead arc's `go.json`, and it never appears on a preview or on the approach page** (`RULE.DEVEX.WORKSPACE.456` · MUST · skill:spn-devex/execute). The lead arc is the lowest arc of the scope. The developer reviews the goal, the constructs and the files; how the work runs is the agent's job, and the agent adds nothing to a brief by hand.
 
@@ -313,7 +372,7 @@ Refused: orders/code-plugins.md names no go, and 036's go has a plan.
 A helper is briefed from a part: run `workstream go show 036/N004` and launch the part's own brief.
 ```
 
-**A whole suite runs only in a baseline run, a full run or a proof run of the plan** (`RULE.DEVEX.WORKSPACE.458` · MUST · check:test-run). A part runs only its own test files. A full run keeps the runner's reuse, so a tier whose exact inputs a past green verdict covers stands in and says so (`RULE.SUPPORT.APPS.228` · MUST · skill:spn-apps/implement), and only what changed runs; `--no-reuse` is passed only for one package whose verdict there is a reason to distrust, never for a whole full run. `workstream go start` marks a baseline or full run as running, and only then does the test-run check let the whole suite run:
+**A whole suite runs only in a baseline run, a full run or a proof run of the plan** (`RULE.DEVEX.WORKSPACE.458` · MUST · check:test-run). A part runs no test. A full run keeps the runner's reuse, so a tier whose exact inputs a past green verdict covers stands in and says so (`RULE.SUPPORT.APPS.228` · MUST · skill:spn-apps/implement), and only what changed runs; `--no-reuse` is passed only for one package whose verdict there is a reason to distrust, never for a whole full run. `workstream go start` marks a baseline or full run as running, and only then does the test-run check let the whole suite run:
 
 ```text
 Refused: `node packages/plugin-spn-devex/tests/run.mjs` runs the whole suite, and no full run of 036's go is running.
@@ -369,7 +428,7 @@ The plan holds the release parts too, merged from the scope's sheets in chain or
 | --- | --- |
 | **Between windows** | `go show` prints the handover's state and next steps, so they are never written by hand. A handover keeps only what the data cannot say |
 | **A window opens** | the session start names each running go in one line: its parts running, held and ready, and the next step. A new window needs no handover to know where the work stands |
-| **The developer writes while work runs** | the message comes with a reminder to the agent. It reads the message for what it changes, and if it changes running work, it follows the five steps in § Once an arc is decided. The reminder comes only while a go has a part running or ready |
+| **The developer writes while work runs** | the message comes with a reminder to the agent. It reads the message for what it changes, and if it changes running work, it follows the five steps in § Drift and the passes. The reminder comes only while a go has a part running or ready |
 | **A test runs** | every runner the test-run check knows is timed, a repository's own included, so the plan prices a full run from real times |
 | **The turn ends** | the next step, as the rule below says |
 
@@ -387,7 +446,7 @@ The plan holds the release parts too, merged from the scope's sheets in chain or
 
 - **One pull request per repository, opened at the first push — MUST.** It stays open for the workstream and targets `develop`. The checks workflow runs on it.
 - **The pull request is rebase-merged into `develop` each time an arc lands a group of rows — MUST.** Each row's commit stays as it was written. The branch is not deleted then, because the workstream goes on using it.
-- **The branch takes `develop` at three moments, and in each repository the moment touches** (`RULE.DEVEX.FUNCTION.071` · MUST · skill:spn-devex/scm). At the start of each pass (§ *Once an arc is decided, a drift step runs, then four passes per repository*) the agent fetches, and where `develop` moved it rebases the branch. Before each push and each pull request it rebases again, so the pull request merges clean. Git drops the commits already upstream, so the push carries only what `develop` does not hold. After that rebase the owed tiers run again only where it changed a node's content, because the stamp's content hash already says which, and a node whose content did not change keeps its stamp.
+- **The branch takes `develop` at three moments, and in each repository the moment touches** (`RULE.DEVEX.FUNCTION.071` · MUST · skill:spn-devex/scm). At the start of each pass (§ *Drift and the passes*) the agent fetches, and where `develop` moved it rebases the branch. Before each push and each pull request it rebases again, so the pull request merges clean. Git drops the commits already upstream, so the push carries only what `develop` does not hold. After that rebase the owed tiers run again only where it changed a node's content, because the stamp's content hash already says which, and a node whose content did not change keeps its stamp.
 - **A merge into `develop` is told to every open workstream that holds the repository — MUST.** The window that merges writes one line into each open workstream whose set holds that repository, naming what changed. A breaking contract change names its cutover: what must land with it, and in what order. The line is for a window that has not fetched yet, and the window's own *behind `develop`* line below tells it that a rebase is owed. **The line lands as a `note` on the log of each running arc** in those workstreams, written with `workstream arc edit <arc> --note "…"` (the only writer of a log line); a hook reminds the agent after the merge, and the agent writes the line. The line names what changed, a dependency the merge added, and a breaking change's cutover.
 - **A window that opens names a branch that is behind `develop` — MUST.** It fetches every member in parallel and says, for each branch behind, how many commits it is behind and that a rebase comes before the next push.
 - **A conflict outside the arc's own files stops the agent — MUST.** The developer decides how a conflict in another arc's or another workstream's files resolves, because the agent does not own those files.
@@ -450,6 +509,17 @@ repository's own concept names its domains; where a concept names none, ask.
 4. A fix to your machinery, a plugin or the design system outside the goal's domains goes to the workstream
    that owns it, or where the developer says, and the reply links where it went. In a partner's workspace,
    where nobody owns the plugin, it becomes an issue you draft for SaaS Plane's public marketplace repository.
+
+### New work by arc state
+
+**Each arc state says what a new piece of work does, so no fix lands outside an arc** (`RULE.DEVEX.WORKSPACE.516` · MUST · skill:spn-devex/ideate).
+
+| Arc state | What new work does |
+| --- | --- |
+| `PROPOSED` | joins the sheet |
+| `DECIDED` | a sheet edit, then the preview |
+| `RUNNING` | the five steps of a change mid-run (`RULE.DEVEX.WORKSPACE.459`); a small decided fix joins the running arc's go as an entry, on the developer's words |
+| `LANDED` | a step on the `follow-ups` arc, the arc that closes the workstream, named by its role |
 
 ### The kinds of go, and the other words that move things
 
@@ -1112,6 +1182,8 @@ writing one file lose one agent's work without a signal.
 release, or run `apps format`, which rewrites whole nodes. The coordinator commits, by explicit
 path, once it has read the report.
 
+**Five things an order never does, and every brief says so** (`RULE.DEVEX.WORKSPACE.515` · MUST · skill:spn-devex/execute). An agent never rewrites a file with `sed -i`; it changes a file with the edit tool. It never runs `git stash`, because a stash takes the shared checkout's work from whoever is writing in it, and only the coordinator names one (`RULE.DEVEX.WORKSPACE.481`). It never commits: the coordinator commits by explicit path, so one agent's commit never carries another agent's file. It never formats a generated file, since a generated file is changed only by running the command that writes it. It starts a demo app only from the main checkout, through `spnutils apps dev` (`RULE.SUPPORT.APPS.264`), never from a worktree.
+
 **An agent runs only the gates its order names, and never a writer.** A gate that rewrites
 generated files, such as `restates … write`, a plugin build or a register edit, changes files
 that other agents are reading. Register row text goes into the report, and the coordinator writes
@@ -1143,13 +1215,8 @@ Neither pastes a diff, because the coordinator reads it from git in one command.
 report artifact: it has no template, no header and no sections, and no rule of the `report` skill
 applies to it.
 
-**An order's gates are `spnutils apps check` on each node it touched and the specs it changed or
-added, run narrowed** (`RULE.DEVEX.WORKSPACE.207` · MUST · check:doc-check). The loop is fixed. Documents come first, and
-then source. Then run those specs, and run them again until they pass. One run with a fresh name, over
-the same specs, comes last, and you stamp the behaviour rows from that run; the stamp writes `Updated
-at` only on a status change (`RULE.DEVEX.WORKSPACE.306` · MUST · skill:spn-devex/execute). A case written to fail first is only for new
-behaviour: one narrow run on the unchanged code. Run no whole tier, no browser walk and no probe
-inside an order: those run once, in the arc's `PROOF` row. No source or test file changes while a test
+**An order's gate is `spnutils apps check` on each node it touched, and a part runs no test** (`RULE.DEVEX.WORKSPACE.207` · MUST · check:doc-check). The loop is fixed. Documents come first, and
+then source. Then type-check each node you touched and stop. Run no spec, no whole tier, no browser walk and no probe, because a tier run between passes repeats minutes of work for each defect it shows; every tier runs once, in the repository's full run, and a new case is shown red as § *Red-first tests* says. The arc's `PROOF` row keeps its place as the final re-check. No source or test file changes while a test
 run for that repository is in flight.
 
 **The loop is selective, and these are its parts.** The `test` skill, § The selective loop, states
@@ -1164,10 +1231,9 @@ each one in full.
 | the stamp | `spn-devex behaviours stamp write <run> <repo>` from the freshly named run. It writes only the rows whose status changed, and leaves a row the run does not name as it is. Never pass `--reach repository` for a selective run |
 
 **An order states its acceptance as named behaviour ids, and never as a count of a whole tier —
-MUST.** The order names the ids its change must prove, and the selection that runs their cases. Read
-each id as `SUCCESS` from the run file. An exit code is not acceptance, because the runner exits clean
+MUST.** The order names the ids its change must prove. A part runs no test, so read the ids as `SUCCESS` from the repository's full run; the part's own proof is the type-check its pass names. An exit code is not acceptance, because the runner exits clean
 when a selection matches no case. A count of a whole tier is not acceptance either, because only a
-whole run can meet it. Report a selection that matched no case in these words: *nothing proves this*.
+whole run can meet it. Report an id the full run does not name in these words: *nothing proves this*.
 
 **A whole tier runs before a commit, in an arc's `PROOF` row, before a release, or in one of five
 named cases** (`RULE.DEVEX.WORKSPACE.245` · GUIDE). Before a commit, each tier a change touches runs whole

@@ -537,6 +537,36 @@ console.log("\n=== pretooluse — a helper is launched only from a part of the g
   n += 1;
   if (!marked) failed += 1;
   console.log(`  ${marked ? "PASS" : "FAIL"}  [MKT.HOOKS.302] and the launched part is marked running, the others as they were\n        ${JSON.stringify(states)}`);
+
+  // AN ORDER THAT NAMES NO `go:` OR `part:` IS READ THROUGH ITS `entries:` LINE to the part of the plan that holds them (E2225).
+  const G1 = entry("E1"), G2 = entry("E2"), G3 = entry("E3");
+  mkdirSync(join(base, "arcs", "N006"), { recursive: true });
+  mkdirSync(join(base, "notes", "N006", "orders"), { recursive: true });
+  writeFileSync(join(base, "arcs", "N006", "state.json"), JSON.stringify({ schemaVersion: 2, arc: "N006", subject: "probe", title: "t", goal: null, status: "DECIDED", reason: null, preview: "preview.html", rows: [] }));
+  writeFileSync(join(base, "arcs", "N006", "sheet.json"), JSON.stringify({ schemaVersion: 1, releaseChain: [], dependsOn: [], stack: null, entries: [G1, G2, G3] }));
+  const together = { id: "code-probe-repo-pair", repo: "probe-repo", work: "CODE", entries: ["N006/E1", "N006/E2"], tests: [], minutes: null,
+    measuredFrom: null, waitsOn: [], model: "sonnet", signature: `${entryHash(G1)}.${entryHash(G2)}`, state: "ready" };
+  const alone = { id: "code-probe-repo-single", repo: "probe-repo", work: "CODE", entries: ["N006/E3"], tests: [], minutes: null,
+    measuredFrom: null, waitsOn: [], model: "sonnet", signature: entryHash(G3), state: "ready" };
+  const entriesGo = join(base, "arcs", "N006", "go.json");
+  writeFileSync(entriesGo, JSON.stringify({ schemaVersion: 1, lead: "N006", scope: ["N006"], writtenAt: "2026-10-31T09:00+05:30", parts: [together, alone] }));
+  const briefOf = (name, front) => { const path = join(base, "notes", "N006", "orders", name); writeFileSync(path, `---\n${front}\nmodel: sonnet\n---\n# Part\n`); return path; };
+  const partStates = () => Object.fromEntries(JSON.parse(readFileSync(entriesGo, "utf8")).parts.map((one) => [one.id, one.state]));
+  one("[MKT.HOOKS.502] an order with no go or part, whose entries all sit in one ready part, is allowed with the 'Launched from part' note",
+    launch(briefOf("by-entries.md", 'entries: ["N006/E1", "N006/E2"]')), "note", { says: "Launched from part code-probe-repo-pair of N006", ...waived });
+  const byEntries = partStates();
+  const running = byEntries["code-probe-repo-pair"] === "running" && byEntries["code-probe-repo-single"] === "ready";
+  n += 1;
+  if (!running) failed += 1;
+  console.log(`  ${running ? "PASS" : "FAIL"}  [MKT.HOOKS.502] and that part is marked running, the other as it was\n        ${JSON.stringify(byEntries)}`);
+  one("[MKT.HOOKS.502] an order whose entries no part holds is refused with the plan has no part for this pass",
+    launch(briefOf("no-part.md", 'entries: ["N006/E1", "N006/E3"]')), "deny", { says: "the plan has no part for this pass", ...waived });
+  one("[MKT.HOOKS.502] an order whose entries are not in the sheet at all is refused the same way",
+    launch(briefOf("unknown.md", 'entries: ["N006/E9"]')), "deny", { says: "carries entries no part of 042's go holds (N006/E9)", ...waived });
+  one("[MKT.HOOKS.502] an order naming go and part is judged as before: its part is launched with no note",
+    launch(briefOf("named.md", 'go: "N006"\npart: "code-probe-repo-single"\nentries: ["N006/E1"]')), "silent", waived);
+  one("[MKT.HOOKS.502] an order naming only a part is refused as before",
+    launch(briefOf("half.md", 'part: "code-probe-repo-single"')), "deny", { says: "A helper is briefed from a part", ...waived });
 }
 
 console.log("\n=== pretooluse — an order asks for no screenshot unless the developer asked to see a look");

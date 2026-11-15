@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/11-delivery-library/",
-      "seen": "7ed3b612"
+      "seen": "c199c64b"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/04-architecture-names/",
@@ -11,11 +11,11 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/08-architecture-containers/",
-      "seen": "f25d1bb6"
+      "seen": "f140d30f"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/09-architecture-layouts/",
-      "seen": "399b90f8"
+      "seen": "8cfa20d2"
     }
   ]
 }
@@ -71,10 +71,10 @@ The design library holds one file for each layer of the design system that is dr
 | A combination the set draws no version for, and no property or mode reaches (`DSStepper`'s `type` with a task state) | refuse to draw it, and name it to the developer; never draw a new look for it |
 | A prop that changes only how the unit behaves | nothing: the header's `behaviour:` note names it |
 | `color` | a variable mode, set on the instance itself and read by its name from the `Color` collection; light or dark is a mode of the `Mode` collection |
-| The look of a container or a card | a mode of the theme's collections, for `frames` and for the keys `raised`, `elevation`, `bordered` and `rounded` of its `surface` |
+| The look of a container or a card | a mode of the theme's collections, for `frames` and for the keys `raised`, `elevation`, `bordered` and `rounded` of its `surface`. Which props of the panel the library draws, as `PART`, `MODE`, `CASE` or `NOT_DRAWN`, is read from the one props table of the panel, where every prop of the look and every key of `surface` is a row |
 | `unframed` on a container | the parts it lists are drawn with no frame, whatever the mode of `frames` on the top frame gives. The rest of the container keeps the look of the theme |
 | The layout | one instance of `DSLayout` in its type, filling the top frame. The `width` of the body, and the `attached` of the navigation and of the content, are set on it as properties of the same names |
-| A part of a layout | the body, the navigation or the content of that instance. The navigation holds `startNode`, the entries of `nav`, `actionsNode` and `endNode`; the content holds the page. `headerNode`, in a dock or a top nav, is the header directly under the bar, what it holds standing in the body's box, and the content's box starts under it; `footerNode` is the place at the page's end |
+| A part of a layout | the body, the navigation or the content of that instance. The navigation holds `startNode`, the entries of `nav`, `actionsNode` and `endNode`; the content holds the page. `header`, in every layout, is the place directly before the content, under the bar in a dock or a top nav, what it holds standing in the body's box, and the content's box starts under it; `footer` is the place at the page's end; each takes `{ node, sticky? }`, and `DSLayout` takes no `footerNode` prop |
 | The level of a frame | a variable mode of the `Level` collection, set once on the frame, whose six modes are the values of `DSPageLevelType`. It costs no version of any unit |
 | The page level | the head of the page, first in the content: `DSPageLevel` at `PAGE` as its `HEADER`, or the header of a `DSPanelContainer` with `fullPage`. A `DSItem` holds the title and the description, the actions follow it as one group at the end, and `backAnchor` is the way back at the start of the title's line |
 | A part of a block, or a named place | the part of the instance that carries that name. The blocks of the tree go inside it |
@@ -95,8 +95,8 @@ The design library holds one file for each layer of the design system that is dr
 - **Draw each part of a container with what the tree puts in it.** The header holds the title of the container at its start and its actions after it, as one group at the end; the actions write no size and no variant, because their place gives both (`RULE.SUPPORT.SURFACE.178` · MUST · skill:spn-surface/design). The footer holds what closes its work, such as the paging of a listing or the two actions of an entry. The action of one part of the content stands at the end of that part's title.
 - **Draw the actions that close the work of an entry in their one place and order.** Over the page, in a dialog, a sheet, a drawer or a popover, they stand at the end of the footer: the action that leaves the work first, and the main action last. In an entry that is a page of its own they stand at the start of the footer, the main action first, and the footer takes `sticky` so they stay in view on a long form (`RULE.SUPPORT.SURFACE.367` · MUST · skill:spn-surface/design). A value changed in place keeps its two actions beside the box, the one that saves first. The main action is a solid button, and the action that leaves is an outline button.
 - **Draw a part named in `unframed` flat.** It takes no frame in any theme, so a change of the top frame's look leaves it as it is. One such part is a header that is the header of the page.
-- **Draw the header, `headerNode`, in any layout, and only where the tree fills it.** It stands after the notice and before the content, and what it holds stands in the body's box, as the footer's does, with no fill or line of the layout's own: the body's colours stand behind it. A hero that needs the whole window is a section placed in it (`RULE.SUPPORT.SURFACE.258` · MUST · skill:spn-surface/design).
-- **Draw the footer of a layout only where the tree fills it.** It is an optional place that closes the page, the place at its end as the top bar is at its start. It runs the window's width, and beside a rail the area's, and what it holds stands in the body's box, lined up with the bar's items and the page. Where the content is short it stands at the window's bottom, and where the content is long it stands after the content.
+- **Draw the header, `header`, in any layout, and only where the tree fills it.** It stands after the notice and before the content, and what it holds stands in the body's box, as the footer's does, with no fill or line of the layout's own: the body's colours stand behind it. A hero that needs the whole window is a section placed in it (`RULE.SUPPORT.SURFACE.258` · MUST · skill:spn-surface/design). The header and the footer each take one shape, `{ node, sticky? }` (`RULE.SUPPORT.SURFACE.417` · MUST · skill:spn-surface/design).
+- **Draw the footer of a layout only where the tree fills it, as a swap.** The library draws `footer` as a swap, and `DSLayout` takes no `footerNode` prop. It is an optional place that closes the page, the place at its end as the top bar is at its start. It runs the window's width, and beside a rail the area's, and what it holds stands in the body's box, lined up with the bar's items and the page. Where the content is short it stands at the window's bottom, and where the content is long it stands after the content.
 - **Draw the layout as its three parts.** The top frame's fill is the body's, and below `FULL` the body's box is the width, centred, with the body showing on both sides. An attached navigation meets the window's edge: a rail the left, the window's height, and a top bar the top, its fill across the window and its items in the box. An attached content is the box itself, from the navigation, or the window's top, to the bottom, with square corners; beside a rail it is centred in the area beside the rail. A part that is not attached is a rounded container in the box, `--layout-space` from the window and from the part beside it. A raised content beside a navigation that is not raised stands above it, so its shadow falls on the navigation; where both are raised, the navigation stands above. On a phone every part attaches, and the layout draws its bar: the menu at its start, or the way back where a dock has `backTo`, then the nodes `phone` puts in the bar, and the account's avatar at its end.
 - **Draw a card at the level of a widget.** A `DSCard`, a `DSItemCard` or a card of `DSCardWidget` stands in a container's content or on the page. Its title is at `WIDGET`, a part of it at `GROUP`, and its item lines at `CONTENT`.
 - **Draw a section of a website as `DSSectionContainer`, not as a container.** A section is one part of a page with a fill of its own and the room above and below that its `size` gives, and it holds one child and frames nothing: no header, no footer, no frame (`RULE.SUPPORT.SURFACE.243` · MUST · skill:spn-surface/design) (`RULE.SUPPORT.SURFACE.247` · MUST · skill:spn-surface/design). It reaches the edges of its place, as the layout marks it (`RULE.SUPPORT.SURFACE.254` · MUST · skill:spn-surface/design). A grid of features under a heading is `DSFeatureGridSectionContainer`, drawn as a section whose child is a feature at `CONTAINER` over the grid (`RULE.SUPPORT.SURFACE.259` · MUST · skill:spn-surface/design). The book states them before the library draws them, so a section the library lacks is handled as *When the library does not hold a block* says. What stands in a section takes its depth from what it holds and does for the visitor, and the section never frames itself (`RULE.SUPPORT.SURFACE.293` · MUST · skill:spn-surface/design). A part with a title and actions stays a `DSPanelContainer`.

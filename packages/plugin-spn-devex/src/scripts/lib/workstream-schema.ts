@@ -315,6 +315,8 @@ const LOG_FIELDS: Record<string, Rule> = {
   at: { kind: "string", required: true }, kind: { kind: "string", required: true },
   row: { kind: "text", required: false }, note: { kind: "text", required: false },
 };
+/** A word that stands where a value was not filled in, matched on a whole item and never on a longer text. */
+export const PLACEHOLDER = /^(?:TBD|TODO|XXX|\?{1,3}|\.{3}|…|n\/a|none|unknown|<\.\.\.>|\{\{\.\.\.\}\})$/i;
 const FACT_FIELDS: Record<string, Rule> = {
   id: { kind: "string", required: true, pattern: FACT_ID }, fact: { kind: "string", required: true },
   source: { kind: "string", required: true }, commit: { kind: "string", required: true },
@@ -336,8 +338,16 @@ const QUESTION_FIELDS: Record<string, Rule> = {
 
 export const logFaults = (line: unknown, where: string): string[] =>
   isObject(line) ? fieldFaults(where, line, LOG_FIELDS) : [`${where} is not a JSON object`];
-export const factFaults = (line: unknown, where: string): string[] =>
-  isObject(line) ? fieldFaults(where, line, FACT_FIELDS) : [`${where} is not a JSON object`];
+export const factFaults = (line: unknown, where: string): string[] => {
+  if (!isObject(line)) return [`${where} is not a JSON object`];
+  const out = fieldFaults(where, line, FACT_FIELDS);
+  // A READ IS NEVER BLANK: a fact or its source that is empty or a placeholder says nothing was read.
+  for (const field of ["fact", "source"] as const) {
+    const value = line[field];
+    if (typeof value === "string" && (!value.trim() || PLACEHOLDER.test(value.trim()))) out.push(`${where} has a blank or placeholder ${field}`);
+  }
+  return out;
+};
 export function suggestionFaults(line: unknown, where: string): string[] {
   if (!isObject(line)) return [`${where} is not a JSON object`];
   const out = fieldFaults(where, line, SUGGESTION_FIELDS);
@@ -358,9 +368,24 @@ export function settledFaults(settled: unknown, where = "the card"): string[] {
   return out;
 }
 
+/**
+ * A card or suggestion about CODE or FLOW that shows names in its options' code cites the chapter that was read: `settled.answered`
+ * holds a path ending `.md` under `docs/` or a `RULE.` id. NEVER RUN ON A RECORD READ.
+ */
+export function namesCitedFaults(card: unknown, where = "the card"): string[] {
+  if (!isObject(card)) return [];
+  const about = cardAbout(card);
+  if (about !== "CODE" && about !== "FLOW") return [];
+  const shows = (Array.isArray(card.options) ? card.options : []).some((option) => isObject(option) && typeof option.code === "string" && option.code.trim().length > 0);
+  if (!shows) return [];
+  const answered = isObject(card.settled) && typeof card.settled.answered === "string" ? card.settled.answered : "";
+  if (/docs\/\S*\.md\b/.test(answered) || /\bRULE\.[A-Z0-9]+(?:\.[A-Z0-9]+)+/.test(answered)) return [];
+  return [`${where} shows names in its options' code, and settled.answered cites no chapter or rule: read the book's chapter for each field, column, route or doc and cite it beside the name`];
+}
+
 /** What a suggestion added now must hold beyond its shape: the `settled` block. */
 export const suggestionRaisedFaults = (record: unknown, where = "the suggestion"): string[] =>
-  isObject(record) ? settledFaults(record.settled, where) : [`${where} is not a JSON object`];
+  isObject(record) ? [...settledFaults(record.settled, where), ...namesCitedFaults(record, where)] : [`${where} is not a JSON object`];
 
 /** Whether a nearest construct is code: a `.ts`, `.tsx` or `.sql` file, or a path under `/src/`. */
 export const nearestIsCode = (nearest: unknown): boolean =>
@@ -436,7 +461,7 @@ export function raisedCardFaults(card: unknown, where = "the card"): string[] {
       out.push(`${where} is about CODE${nearestIsCode(card.nearest) ? ` (its nearest names ${String(card.nearest)})` : ""} and ${bare.length === options.length ? "none" : "not every one"} of its options carries code: show each option as a few lines of code, only what differs, and add a Today block (\`preview.today\`) only if real code exists today and an option changes it`);
     if (!isObject(card.preview) || !text(card.preview.reason)) out.push(`${where} is about CODE and has no \`preview.reason\`: say why the options are shown as they are`);
   }
-  out.push(...settledFaults(card.settled, where));
+  out.push(...settledFaults(card.settled, where), ...namesCitedFaults(card, where));
   for (const [at, view] of (Array.isArray(card.views) ? card.views : []).entries()) {
     if (!isObject(view)) continue;
     if (!(VIEW_MADE as readonly unknown[]).includes(view.made)) out.push(`${where}'s view ${at + 1} has no \`made\`, and it is one of ${VIEW_MADE.join(" · ")}`);
@@ -555,9 +580,9 @@ export const GO_PART_STATES = ["ready", "running", "held", "landed", "waiting", 
 /** The part states that owe nothing more: done, or dropped on the developer's word. */
 export const GO_PART_SETTLED: ReadonlySet<string> = new Set(["landed", "dropped"]);
 /** A part's id: its pass in lower case, its repository and its number, `code-spn-claude-marketplace-2`; a baseline or full run has no number. */
-export const GO_PART_ID = /^(baseline|docs|code|full|generated|release|proof|apply)-\S+$/;
-/** An entry as a go names it: its arc and its id, `N009/E14`. */
-export const GO_ENTRY = /^N\d+[a-z]?\/E\d+$/;
+export const GO_PART_ID = /^(baseline|docs|code|book|pins|universal|server|client|web|server-tests|web-tests|full|generated|release|proof|apply|draw|publish|red|commit|docs-check|install|restates|source|tests|validate-and-tiers|module|organization|platform|support|cloud-apply)-\S+$/;
+/** An entry as a go names it: its arc (`N009`, `ideate` or `follow-ups`) and its id, `N009/E14`, `follow-ups/E3026`. */
+export const GO_ENTRY = /^(?:N\d+[a-z]?|ideate|follow-ups)\/E\d+$/;
 
 /**
  * One part of a go: what one helper carries out. `signature` is the entries' hashes joined by `.`, in the order of
@@ -567,6 +592,8 @@ export type GoPart = {
   id: string; repo: string; work: Work; entries: string[]; tests: string[];
   minutes: number | null; measuredFrom: string | null; waitsOn: string[]; model: string; signature: string;
   state: (typeof GO_PART_STATES)[number];
+  /** The declared pass the part stands in; required on a part this plugin writes, read as "" on a plan written before it (as `trace` is on an old entry). */
+  pass?: string;
   /** What a `waiting` part waits on, in plain words: a release, a sign-in, another window's hold. */
   waitingOn?: string | null;
   /** The developer's words that dropped a `dropped` part, as they typed them. */
@@ -588,6 +615,7 @@ const GO_PART_FIELDS: Record<string, Rule> = {
   minutes: { kind: "number", required: true, nullable: true }, measuredFrom: { kind: "text", required: true },
   waitsOn: { kind: "strings", required: true }, model: { kind: "string", required: true },
   signature: { kind: "text", required: true }, state: { kind: "enum", required: true, values: GO_PART_STATES },
+  pass: { kind: "text", required: false },
   waitingOn: { kind: "text", required: false }, droppedWords: { kind: "text", required: false },
 };
 
@@ -610,7 +638,7 @@ export function goFaults(data: unknown, where = "go.json"): string[] {
     if (typeof part.id === "string") { if (ids.has(part.id)) out.push(`${label} is written twice`); ids.add(part.id); }
     if (Array.isArray(part.entries)) {
       const hashes = typeof part.signature === "string" && part.signature ? part.signature.split(".").length : 0;
-      if (!part.entries.length && part.work !== "TEST" && part.work !== "RELEASE") out.push(`${label} holds no entry`);
+      if (!part.entries.length && part.work !== "TEST" && part.work !== "RELEASE" && !/^(draw|publish)-/.test(String(part.id))) out.push(`${label} holds no entry`);
       if (typeof part.signature === "string" && hashes !== part.entries.length)
         out.push(`${label}'s \`signature\` holds ${hashes} hashes, and the part holds ${part.entries.length} entries`);
       for (const entry of part.entries) {

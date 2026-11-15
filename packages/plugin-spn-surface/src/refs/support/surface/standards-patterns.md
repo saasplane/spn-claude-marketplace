@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/03-standards-patterns.md",
-      "seen": "2bb43eb4"
+      "seen": "8eead5ab"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/",
@@ -52,6 +52,8 @@ Read this to build a page from patterns a person already knows, or to review a p
 | Flow patterns | a path across pages to one outcome, built from the app and site patterns that exist | on every kind of app | `flow-patterns.md` |
 
 Task and flow patterns hold on every kind of app. App and site patterns are chosen by the kind of app, as the book already chooses a layout by an app's job: an app's screens take app patterns, and a site's pages take site patterns. A page follows one app or site pattern, and each task on that page follows its task pattern. A listing page follows the app pattern Find in a list, and the search inside it runs by the task pattern Find.
+
+**A site's page MUST be a sequence of sections, and each MUST own its room and its fill** (`RULE.SUPPORT.SURFACE.414` · MUST · skill:spn-surface/design). The layout's box gives the side room, so the words of every section and the bar's items share one edge at every width; what a section holds adds no room unless it is framed, and a frame insets its own words. A footer's list of links keeps its words on the column's edge, with rows that are not pressed whole, each holding a link that marks itself under the pointer. A menu's panel is as wide as what it holds: a few short entries stand as a compact list, and a wide panel is for entries that carry content of their own.
 
 **A rule about how a page is designed and uses a unit is guidance, and it says its reason** (`RULE.SUPPORT.SURFACE.394` · MUST · skill:spn-surface/design). So the rules here read as advice wherever they say which pattern or unit a page picks, where a part stands, which value, variant, colour or size a page writes, how many of a thing a view shows, and the words a page uses. MUST is kept for four things: what the design system and a stack must build, the floor a person is owed whatever the design, the process of the library and the showcase, and true claims. A true claim is a number on a marketing page, read from the real system and never made up. A bold rule below with no MUST is advice, and a partner's choice against it stands.
 
@@ -609,6 +611,7 @@ This ref states the four groups of the surface patterns, which task pattern cove
 | `RULE.SUPPORT.SURFACE.093` | a sheet that is not modal stands beside the page and draws no scrim |
 | `RULE.SUPPORT.APPS.159` | an alert and a toast draw one picture |
 | `RULE.SUPPORT.SURFACE.046` | the surface patterns in groups by scope, smallest first: task, app, site and flow patterns |
+| `RULE.SUPPORT.SURFACE.414` | a site's page is a sequence of sections, each owning its room and its fill |
 | `RULE.SUPPORT.SURFACE.047` | how a thing is shown follows from the data and from the person who uses it. It is advice |
 | `RULE.SUPPORT.SURFACE.048` | an app pattern is built from blocks that exist, and is never a block of its own |
 | `RULE.SUPPORT.SURFACE.049` | an app pattern fixes the arrangement, and not which block fills a part. It is advice |
