@@ -67,3 +67,8 @@ description: Carry out a go. Use the moment the developer gives the go on one ar
 - **A part or a row that waits on something outside the window reads waiting on, and is never named as ready** (`RULE.DEVEX.WORKSPACE.469` · MUST · skill:spn-devex/execute)
 - **A code part added after a repository's full run has landed opens a second full run** (`RULE.DEVEX.WORKSPACE.470` · MUST · skill:spn-devex/execute)
 - **Closing a workstream runs a retrospective that raises a suggestion for each pattern it finds** (`RULE.DEVEX.WORKSPACE.483` · MUST · skill:spn-devex/execute)
+- **A go plans from a map of the workspace's own repositories, derived from their files on every plan and kept nowhere** (`RULE.DEVEX.WORKSPACE.508` · MUST · skill:spn-devex/execute)
+- **The devex plugin stays stack-agnostic: it asks the plugin that serves each repository's world for that world's passes** (`RULE.DEVEX.WORKSPACE.509` · MUST · skill:spn-devex/execute)
+- **The sheet holds what each case proves, and its code is written in the test passes, once the names are final** (`RULE.DEVEX.WORKSPACE.510` · MUST · skill:spn-devex/execute)
+- **Every new case is shown failing on the base before the code it proves, and it fails for the right reason** (`RULE.DEVEX.WORKSPACE.511` · MUST · skill:spn-devex/execute)
+- **Five things an order never does, and every brief says so** (`RULE.DEVEX.WORKSPACE.515` · MUST · skill:spn-devex/execute)

@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "book": {
     "repository": "spn-foundation",
-    "commit": "4362769e"
+    "commit": "466d78a4"
   },
   "rules": [
     {
@@ -6684,7 +6684,7 @@
         "check": "doc-check"
       },
       "class": "checked",
-      "sentence": "An order's gates are `spnutils apps check` on each node it touched and the specs it changed or added, run narrowed",
+      "sentence": "An order's gate is `spnutils apps check` on each node it touched, and a part runs no test",
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "An order is one delegated execution, and every order follows the same rules",
       "decision": null,
@@ -9083,11 +9083,6 @@
         },
         {
           "plugin": "spn-devex",
-          "path": "refs/devex/workspace/workstream.md",
-          "heading": "An order is one delegated execution, and every order follows the same rules"
-        },
-        {
-          "plugin": "spn-devex",
           "path": "skills/execute/SKILL.md",
           "heading": "The rules this step holds"
         },
@@ -9368,15 +9363,15 @@
         "check": "workstream-state"
       },
       "class": "checked",
-      "sentence": "Once an arc is decided, a drift step refreshes the entries whose facts moved. Then each repository runs one docs pass, book first, one code-and-test pass, and the named tests of its entries at every tier, contract and journey included, on the stack the sheet names. Then the release chain runs in its order",
+      "sentence": "Once an arc is decided, a drift step refreshes the entries whose facts moved. Then each repository runs the passes its world declares, in order, and the release chain runs in the map's order",
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
-      "heading": "Once an arc is decided, a drift step runs, then four passes per repository",
+      "heading": "Drift and the passes",
       "decision": "DEC.DEVEX.WORKSPACE.320",
       "restated": [
         {
           "plugin": "spn-devex",
           "path": "refs/devex/workspace/workstream.md",
-          "heading": "Once an arc is decided, a drift step runs, then four passes per repository"
+          "heading": "Drift and the passes"
         }
       ]
     },
@@ -9516,7 +9511,7 @@
         {
           "plugin": "spn-devex",
           "path": "refs/devex/workspace/workstream.md",
-          "heading": "Once an arc is decided, a drift step runs, then four passes per repository"
+          "heading": "Design beside the code"
         },
         {
           "plugin": "spn-devex",
@@ -9577,13 +9572,13 @@
       "class": "stated in a skill",
       "sentence": "Before a pull request, each entry that changes behaviour has its book line read against the landed code, and the verdict goes in the tiers pass's report",
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
-      "heading": "Once an arc is decided, a drift step runs, then four passes per repository",
+      "heading": "Design beside the code",
       "decision": "DEC.DEVEX.WORKSPACE.330",
       "restated": [
         {
           "plugin": "spn-devex",
           "path": "refs/devex/workspace/workstream.md",
-          "heading": "Once an arc is decided, a drift step runs, then four passes per repository"
+          "heading": "Design beside the code"
         },
         {
           "plugin": "spn-devex",
@@ -10004,11 +9999,17 @@
         "check": "workstream-state"
       },
       "class": "checked",
-      "sentence": "Rows run in chain order by repository, and then by work inside each repository",
+      "sentence": "Rows run in the workspace map's order by repository, and then by work inside each repository",
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "A step row says where, what work, and how",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/workstream.md",
+          "heading": "The workstream is kept as data, and every file has one owner"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.358",
@@ -10051,7 +10052,7 @@
       "class": "stated in a skill",
       "sentence": "A surprise in the tiers comes back to you as a card, with the rows it holds, and is never fixed quietly in code",
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
-      "heading": "Once an arc is decided, a drift step runs, then four passes per repository",
+      "heading": "Design beside the code",
       "decision": null,
       "restated": [
         {
@@ -11205,7 +11206,7 @@
       "class": "guidance",
       "sentence": "A pass is done right once, and a file is finished in it",
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
-      "heading": "Once an arc is decided, a drift step runs, then four passes per repository",
+      "heading": "Design beside the code",
       "decision": null,
       "restated": []
     },
@@ -11527,13 +11528,13 @@
       "class": "stated in a skill",
       "sentence": "The go's scope runs as one set of passes, derived by `workstream go write` from the scope's sheets and the measured times",
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
-      "heading": "Once an arc is decided, a drift step runs, then four passes per repository",
+      "heading": "Drift and the passes",
       "decision": null,
       "restated": [
         {
           "plugin": "spn-devex",
           "path": "refs/devex/workspace/workstream.md",
-          "heading": "Once an arc is decided, a drift step runs, then four passes per repository"
+          "heading": "Drift and the passes"
         },
         {
           "plugin": "spn-devex",
@@ -11551,13 +11552,13 @@
       "class": "stated in a skill",
       "sentence": "The plan is written only by `go write`, into the lead arc's `go.json`, and it never appears on a preview or on the approach page",
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
-      "heading": "Once an arc is decided, a drift step runs, then four passes per repository",
+      "heading": "Design beside the code",
       "decision": null,
       "restated": [
         {
           "plugin": "spn-devex",
           "path": "refs/devex/workspace/workstream.md",
-          "heading": "Once an arc is decided, a drift step runs, then four passes per repository"
+          "heading": "Design beside the code"
         },
         {
           "plugin": "spn-devex",
@@ -11575,13 +11576,13 @@
       "class": "checked",
       "sentence": "A helper is briefed only from a part of the plan",
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
-      "heading": "Once an arc is decided, a drift step runs, then four passes per repository",
+      "heading": "Design beside the code",
       "decision": null,
       "restated": [
         {
           "plugin": "spn-devex",
           "path": "refs/devex/workspace/workstream.md",
-          "heading": "Once an arc is decided, a drift step runs, then four passes per repository"
+          "heading": "Design beside the code"
         }
       ]
     },
@@ -11594,13 +11595,13 @@
       "class": "checked",
       "sentence": "A whole suite runs only in a baseline run, a full run or a proof run of the plan",
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
-      "heading": "Once an arc is decided, a drift step runs, then four passes per repository",
+      "heading": "Design beside the code",
       "decision": null,
       "restated": [
         {
           "plugin": "spn-devex",
           "path": "refs/devex/workspace/workstream.md",
-          "heading": "Once an arc is decided, a drift step runs, then four passes per repository"
+          "heading": "Design beside the code"
         }
       ]
     },
@@ -11613,13 +11614,18 @@
       "class": "stated in a skill",
       "sentence": "A change to what is being built runs as five steps, and the plan never carries on with work you have just changed",
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
-      "heading": "Once an arc is decided, a drift step runs, then four passes per repository",
+      "heading": "Design beside the code",
       "decision": null,
       "restated": [
         {
           "plugin": "spn-devex",
           "path": "refs/devex/workspace/workstream.md",
-          "heading": "Once an arc is decided, a drift step runs, then four passes per repository"
+          "heading": "Design beside the code"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/workstream.md",
+          "heading": "New work by arc state"
         },
         {
           "plugin": "spn-devex",
@@ -11637,13 +11643,13 @@
       "class": "checked",
       "sentence": "A held part is refused by the launch check until the plan is derived again",
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
-      "heading": "Once an arc is decided, a drift step runs, then four passes per repository",
+      "heading": "Design beside the code",
       "decision": null,
       "restated": [
         {
           "plugin": "spn-devex",
           "path": "refs/devex/workspace/workstream.md",
-          "heading": "Once an arc is decided, a drift step runs, then four passes per repository"
+          "heading": "Design beside the code"
         }
       ]
     },
@@ -12042,6 +12048,11 @@
           "plugin": "spn-devex",
           "path": "refs/devex/workspace/workspace.md",
           "heading": "The workspace's working state — .spndevex/"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/workstream.md",
+          "heading": "An order is one delegated execution, and every order follows the same rules"
         },
         {
           "plugin": "spn-devex",
@@ -12506,6 +12517,11 @@
           "plugin": "spn-devex",
           "path": "refs/devex/workspace/workstream.md",
           "heading": "An arc keeps a change sheet, and only its commands write it"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/execute/SKILL.md",
+          "heading": ""
         }
       ]
     },
@@ -12621,7 +12637,239 @@
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "An arc keeps a change sheet, and only its commands write it",
       "decision": "DEC.DEVEX.WORKSPACE.507",
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/workstream.md",
+          "heading": "An arc keeps a change sheet, and only its commands write it"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/execute/SKILL.md",
+          "heading": ""
+        }
+      ]
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.508",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-devex/execute"
+      },
+      "class": "stated in a skill",
+      "sentence": "A go plans from a map of the workspace's own repositories, derived from their files on every plan and kept nowhere",
+      "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
+      "heading": "The workspace map",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/workstream.md",
+          "heading": "The workspace map"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/execute/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.509",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-devex/execute"
+      },
+      "class": "stated in a skill",
+      "sentence": "The devex plugin stays stack-agnostic: it asks the plugin that serves each repository's world for that world's passes",
+      "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
+      "heading": "Drift and the passes",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/workstream.md",
+          "heading": "Drift and the passes"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/execute/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.510",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-devex/execute"
+      },
+      "class": "stated in a skill",
+      "sentence": "The sheet holds what each case proves, and its code is written in the test passes, once the names are final",
+      "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
+      "heading": "Red-first tests",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/workstream.md",
+          "heading": "Red-first tests"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/execute/SKILL.md",
+          "heading": ""
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/execute/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.511",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-devex/execute"
+      },
+      "class": "stated in a skill",
+      "sentence": "Every new case is shown failing on the base before the code it proves, and it fails for the right reason",
+      "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
+      "heading": "Red-first tests",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/workstream.md",
+          "heading": "Red-first tests"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/execute/SKILL.md",
+          "heading": ""
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/execute/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.512",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "A page's or a unit's look is decided on the arc's preview before the go, and the Figma library is drawn from the book beside the code passes, never from the built code after them",
+      "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
+      "heading": "Design beside the code",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/workstream.md",
+          "heading": "Design beside the code"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.513",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-devex/scm"
+      },
+      "class": "stated in a skill",
+      "sentence": "Where teams build their own services in their own repositories, each service is known to the others by its published client and its events, never by its source",
+      "chapter": "04-capabilities/01-devex/04-workspace/03-repos/01-repos.md",
+      "heading": "Services across repositories",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/scm/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.514",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-apps/implement"
+      },
+      "class": "stated in a skill",
+      "sentence": "Support, the platform and a partner's TS platform or service run the same passes, each holding only the kinds that repository has, and no pass runs a test tier",
+      "chapter": "04-capabilities/02-support/02-apps/10-providers/ts/03-structure.md",
+      "heading": "TS repository passes",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "providers/ts/skills/implement/steps/service.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.515",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-devex/execute"
+      },
+      "class": "stated in a skill",
+      "sentence": "Five things an order never does, and every brief says so",
+      "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
+      "heading": "An order is one delegated execution, and every order follows the same rules",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/workstream.md",
+          "heading": "An order is one delegated execution, and every order follows the same rules"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/execute/SKILL.md",
+          "heading": ""
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/execute/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.516",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-devex/ideate"
+      },
+      "class": "stated in a skill",
+      "sentence": "Each arc state says what a new piece of work does, so no fix lands outside an arc",
+      "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
+      "heading": "New work by arc state",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/workstream.md",
+          "heading": "New work by arc state"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.LAUNCHPAD.CONTROL_PLANE.001",
@@ -13995,6 +14243,11 @@
           "plugin": "spn-apps",
           "path": "skills/implement/SKILL.md",
           "heading": "The rules this step holds"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/agent/lenses/business.md",
+          "heading": "Produces to"
         }
       ]
     },
@@ -18673,7 +18926,7 @@
         {
           "plugin": "spn-devex",
           "path": "refs/devex/workspace/workstream.md",
-          "heading": "Once an arc is decided, a drift step runs, then four passes per repository"
+          "heading": "Design beside the code"
         },
         {
           "plugin": "spn-devex",
@@ -19329,6 +19582,11 @@
           "plugin": "spn-apps",
           "path": "skills/run/SKILL.md",
           "heading": "The rules this step holds"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/workstream.md",
+          "heading": "An order is one delegated execution, and every order follows the same rules"
         }
       ]
     },
@@ -33775,6 +34033,11 @@
         },
         {
           "plugin": "spn-surface",
+          "path": "refs/support/surface/standards-patterns.md",
+          "heading": "The groups, smallest scope first — 🔮"
+        },
+        {
+          "plugin": "spn-surface",
           "path": "skills/design/steps/given-design.md",
           "heading": "The rules this step holds"
         }
@@ -33792,6 +34055,11 @@
       "heading": "How a unit is sorted for the library",
       "decision": null,
       "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/architecture-containers.md",
+          "heading": "The section of a page"
+        },
         {
           "plugin": "spn-surface",
           "path": "skills/design/steps/mock.md",
@@ -33813,6 +34081,11 @@
       "restated": [
         {
           "plugin": "spn-surface",
+          "path": "refs/support/surface/architecture-containers.md",
+          "heading": "The section of a page"
+        },
+        {
+          "plugin": "spn-surface",
           "path": "skills/design/steps/mock.md",
           "heading": "The rules this step holds"
         }
@@ -33830,6 +34103,21 @@
       "heading": "How a unit is sorted for the library",
       "decision": null,
       "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/agent/lenses/ux.md",
+          "heading": "Produces to"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/architecture-layouts.md",
+          "heading": "Built from the navigation — 🔮"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/draw.md",
+          "heading": "How each line of the tree is drawn"
+        },
         {
           "plugin": "spn-surface",
           "path": "skills/design/steps/mock.md",
@@ -33850,6 +34138,16 @@
       "decision": null,
       "restated": [
         {
+          "plugin": "spn-devex",
+          "path": "refs/devex/agent/lenses/ux.md",
+          "heading": "Produces to"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/architecture-layouts.md",
+          "heading": "Built from the navigation — 🔮"
+        },
+        {
           "plugin": "spn-surface",
           "path": "skills/design/steps/mock.md",
           "heading": "The rules this step holds"
@@ -33869,6 +34167,16 @@
       "decision": null,
       "restated": [
         {
+          "plugin": "spn-devex",
+          "path": "refs/devex/agent/lenses/ux.md",
+          "heading": "Produces to"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/architecture-layouts.md",
+          "heading": "Built from the navigation — 🔮"
+        },
+        {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
           "heading": "The rules this step holds"
@@ -33886,7 +34194,13 @@
       "chapter": "02-constructs/02-support/01-surface/13-providers.md",
       "heading": "A change reaches every layer at once",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/providers.md",
+          "heading": "What every provider delivers — 🔮"
+        }
+      ]
     },
     {
       "id": "RULE.SUPPORT.SURFACE.421",
