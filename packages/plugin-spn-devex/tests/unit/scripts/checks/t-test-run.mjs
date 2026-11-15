@@ -252,6 +252,41 @@ console.log("\n=== a whole suite runs only while a baseline or full run of the g
     !early.includes("proof-spn-x"), early);
 }
 
+console.log("\n=== a stamped spnutils run is admitted at every point of a go that holds a suite part (RULE.DEVEX.WORKSPACE.281)");
+{
+  const OPEN = ".spndevex/workstreams/open/036-probe";
+  // A go plan holding the given [id, work, state] parts, all of `spn-x`.
+  const goOf = (parts) => ({
+    [`${OPEN}/arcs/N004/state.json`]: `${JSON.stringify({ schemaVersion: 2, arc: "N004", subject: "probe", title: "t", goal: null, status: "DECIDED", reason: null, preview: "preview.html", rows: [] })}\n`,
+    [`${OPEN}/arcs/N004/go.json`]: `${JSON.stringify({ schemaVersion: 1, lead: "N004", scope: ["N004"], writtenAt: "2026-10-31T09:00+05:30", parts: parts.map(([id, work, state]) =>
+      ({ id, repo: "spn-x", work, entries: [], tests: [], minutes: null, measuredFrom: null, waitsOn: [], model: "sonnet", signature: "", state })) })}\n`,
+  });
+  const at = (name, files = {}) => workspace(name, { "spn-x/README.md": "x\n", "spn-y/README.md": "y\n", ...files });
+  const bash = (root, command, dir = "spn-x") => ({ tool_name: "Bash", cwd: join(root, dir), tool_input: { command } });
+  const STAMPED = "spnutils apps test unit commit-unit api";
+  const NX = "npx nx run-many -t test";
+
+  for (const state of ["ready", "running", "landed"]) {
+    const root = at(`test-run-stamped-${state}`, goOf([["full-spn-x", "TEST", state]]));
+    ok(`[MKT.HOOKS.506] a stamped \`spnutils apps test unit commit-unit <node>\` passes while the go's suite part is ${state}`,
+      checkTestRun(bash(root, STAMPED), NOW) === null, JSON.stringify(checkTestRun(bash(root, STAMPED), NOW)));
+  }
+  const mixed = at("test-run-stamped-mixed", goOf([["baseline-spn-x", "TEST", "landed"], ["full-spn-x", "TEST", "ready"]]));
+  ok("[MKT.HOOKS.506] and with a landed baseline beside a ready full run alike", checkTestRun(bash(mixed, STAMPED), NOW) === null);
+
+  const none = at("test-run-stamped-no-go");
+  ok("[MKT.HOOKS.506] the same command with no go is refused", verdictOf(checkTestRun(bash(none, STAMPED), NOW)) === "deny");
+
+  const idle = at("test-run-stamped-idle", goOf([["baseline-spn-x", "TEST", "landed"], ["full-spn-x", "TEST", "ready"]]));
+  ok("[MKT.HOOKS.506] an `nx run-many` is refused while no suite part runs, though the stamped run passes", verdictOf(checkTestRun(bash(idle, NX), NOW)) === "deny");
+  const running = at("test-run-stamped-nx-running", goOf([["full-spn-x", "TEST", "running"]]));
+  ok("[MKT.HOOKS.506] and the `nx run-many` is allowed while a suite part runs", checkTestRun(bash(running, NX), NOW) === null);
+
+  const dropped = at("test-run-stamped-dropped", goOf([["baseline-spn-x", "TEST", "dropped"], ["full-spn-x", "TEST", "dropped"]]));
+  ok("[MKT.HOOKS.506] a repository whose suite parts are all dropped is never admitted", verdictOf(checkTestRun(bash(dropped, STAMPED), NOW)) === "deny");
+  ok("[MKT.HOOKS.506] a suite part of another repository does not admit this one", verdictOf(checkTestRun(bash(running, STAMPED, "spn-y"), NOW)) === "deny");
+}
+
 console.log("\n=== an after-close batch after a close runs its whole suite under after-close-<NNN>-<n> (RULE.DEVEX.WORKSPACE.496)");
 {
   const suggestions = (...states) => `${states.map((state, at) => JSON.stringify({ id: `s${at + 1}`, title: `t${at + 1}`, state, preview: null, words: null })).join("\n")}\n`;

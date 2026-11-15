@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/09-architecture-layouts.md",
-      "seen": "a279b06c"
+      "seen": "af05b130"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/09-architecture-layouts/",
-      "seen": "399b90f8"
+      "seen": "8cfa20d2"
     }
   ]
 }
@@ -31,8 +31,8 @@ Read this before you choose a layout for an app, or before you build or draw a l
 | Attached | `attached` — a part meets the window's edge; not attached, it floats, the layout's space in, as a rounded container |
 | Sticky | `sticky` — the top bar stays in the window while the page scrolls |
 | Bordered · Raised | `bordered` · `raised` — a part draws a line at its edges · a part draws a shadow |
-| Layout space | `--layout-space` — the one spacing of a layout, from the theme's size: the page's padding and every gap between its parts |
-| Place | where a layout puts what a page gives it, named by where it stands: `startNode`, `endNode`, `actionsNode`, `notice`, `headerNode` and `footerNode` |
+| Layout space | `--layout-space` — the one spacing of a layout, from the device and the theme's size: the page's padding and every gap between its parts |
+| Place | where a layout puts what a page gives it, named by where it stands: `startNode`, `endNode`, `actionsNode`, `notice`, `header` and `footer` |
 | Bar width | `barWidth` — how wide the bar's items stand in a top nav and a dock: the body's width where it is left out, and wider where it says so |
 | Place of a section | the element a section reaches the edges of, which the layout marks: the window, the header, the footer or the content part |
 | Entry kind | `DSNavEntryType` — `SOLID` · `QUIET` · `SUBTLE` · `LINE` · `PLAIN` |
@@ -46,7 +46,7 @@ Read this before you choose a layout for an app, or before you build or draw a l
 | `TOPNAV` | a bar across the top, with the content below it | a website, with the few entries that fit on one line |
 | `CANVAS` | none: the body alone | a sign-in, a marketing page or a page of an error |
 
-**The library draws `DSLayout`:** each `DSLayoutType` (`RAIL`, `DOCK`, `TOPNAV`, `CANVAS`) once, and on a narrow screen once; `footerNode` as a swap; and, as its usage, an app's page, its rail, its bar and the content.
+**The library draws `DSLayout`:** each `DSLayoutType` (`RAIL`, `DOCK`, `TOPNAV`, `CANVAS`) once, and on a narrow screen once; `footer` as a swap; and, as its usage, an app's page, its rail, its bar and the content.
 
 - **A layout is chosen by the job of the app, as the table says, and not by how it looks** (`RULE.SUPPORT.SURFACE.206` · GUIDE). The page chooses its layout, and the theme does not. One app may hold two: an admin app in `RAIL` signs a person in on `CANVAS` and opens their profile in `DOCK`.
 
@@ -103,7 +103,7 @@ A layout has three parts for its look, whatever its type. Each part owns one thi
 
 ## The spacing — 🔮
 
-- **The layout keeps one spacing, `--layout-space`, from the theme's `size`, with no setting of its own** (`RULE.SUPPORT.SURFACE.200` · MUST · skill:spn-surface/design). It is 16 px at `XS` and `SM`, 24 at `MD`, 32 at `LG` and `XL`, and 16 on a phone at every size. There is no gutter type and no gutter.
+- **The layout keeps one spacing, `--layout-space`, from the device and the theme's `size`, with no setting of its own** (`RULE.SUPPORT.SURFACE.200` · MUST · skill:spn-surface/design). On a phone it is 16 px at every size; on a tablet 24 px at `XS`, `SM` and `MD` and 32 px at `LG` and `XL`; on a desktop 32 px at every size. There is no gutter type and no gutter.
 - **`--layout-space` is the page's padding and every gap of the layout:** the padding inside the content, the gap between a floating navigation and the window and the content, the gap around a floating content, the gap between the dock's column and the page, and the gap above the header under a floating bar.
 - **Where two parts both float, the space between them is one `--layout-space`, never two.**
 - **A top navigation holds the few entries that fit, on one line, and moves none of them** (`RULE.SUPPORT.SURFACE.173` · MUST · skill:spn-surface/design). `DSNavBarTop` keeps every label to one line, and its start node, its list and its end node never shrink. An app with many sections takes `RAIL` or `DOCK`. Below `md` the entries stand in the drawer.
@@ -118,8 +118,8 @@ A layout has three parts for its look, whatever its type. Each part owns one thi
 | `actionsNode` | the actions of the frame: the foot of a rail above `endNode`, and before `endNode` in a top bar | `RAIL` · `DOCK` · `TOPNAV` |
 | `endNode` | the end of the navigation: the foot of a rail, the end of a top bar | `RAIL` · `DOCK` · `TOPNAV` |
 | `notice` | the one pinned place: under the bar in a dock and a top nav, at the content's top in a rail, at the window's top in a canvas, and under the phone bar on a phone. Its look is `notice.surface` | every type |
-| `headerNode` | the header, before the content, for a hero, a slideshow, or the head of an account or a project. What it holds stands in the body's box, as the footer's does, and the content's box starts under it | every type |
-| `footerNode` | the footer that closes the page, the place at its end | every type |
+| `header` | `{ node, sticky? }`: the header, before the content, for a hero, a slideshow, or the head of an account or a project. What it holds stands in the body's box, as the footer's does, and the content's box starts under it | every type |
+| `footer` | `{ node, sticky? }`: the footer that closes the page, the place at its end; with `sticky`, at the window's bottom | every type |
 | the children | the content | every type |
 
 A place has a short form for where its room is short: `startNodeCollapsed`, `actionsNodeCollapsed` and `endNodeCollapsed`.
@@ -133,15 +133,18 @@ A place has a short form for where its room is short: `startNodeCollapsed`, `act
 | Layout type | Its navigation is built from |
 | --- | --- |
 | `RAIL` | `DSNavBarSide` at the edge, which folds to icons, with `startNode` in its head, the entries scrolling, and `actionsNode` above `endNode` in its foot |
-| `DOCK` | a top bar with `startNode` at its start, and `actionsNode` then `endNode` at its end. Under it, the notice, the header `headerNode`, then the content's box, which holds `DSNavBarSide` inline in the page, with the way back as its start, beside the content |
-| `TOPNAV` | `DSNavBarTop`, with `startNode` at its start, and `actionsNode` then `endNode` at its end. Under it, the notice, the header `headerNode`, then the content's box |
-| `CANVAS` | nothing: the body, with the notice, the header `headerNode`, the page's children and `footerNode` |
+| `DOCK` | a top bar with `startNode` at its start, and `actionsNode` then `endNode` at its end. Under it, the notice, the header, then the content's box, which holds `DSNavBarSide` inline in the page, with the way back as its start, beside the content |
+| `TOPNAV` | `DSNavBarTop`, with `startNode` at its start, and `actionsNode` then `endNode` at its end. Under it, the notice, the header, then the content's box |
+| `CANVAS` | nothing: the body, with the notice, the header, the page's children and the footer |
 
 - **A layout MUST build its navigation from the navigation units** (`architecture-components.md`, `RULE.SUPPORT.SURFACE.157`).
 - **A rail has a fixed head, entries that scroll, and a fixed foot, and the sidebar keeps the window's full height.** The notice and the header stand at the top of the content, the notice pinned. The page draws its own head, trail, title and actions in its first block.
 - **The column of a dock is a rounded panel beside the page, as tall as its entries, with its top edge on the same line as the page's first block** (`RULE.SUPPORT.SURFACE.157` · MUST · skill:spn-surface/design) (`RULE.SUPPORT.SURFACE.199` · MUST · skill:spn-surface/design). With the content attached, the column stands inside the box at its left, on the content's fill, wearing the navigation's whole look, its fill, line and shadow. With the content floating, the column stands on the body beside the sheet wearing the navigation's whole look. The header is above both.
-- **The header MUST stand before the content in every layout, and what it holds MUST stand in the body's box, as the footer's does** (`RULE.SUPPORT.SURFACE.258` · MUST · skill:spn-surface/design). The place runs the window's width and scrolls with the page; it is not sticky. Under a floating bar it starts one `--layout-space` below it. The layout draws no fill, line or padding for it. A hero that needs the whole window is a section placed in it, with `flush` or `mediaNode`: the section's fill reaches the window's edges and its words stay in the box, so a section behaves the same in the header, the page and the footer.
+- **The header MUST stand before the content in every layout, and what it holds MUST stand in the body's box, as the footer's does, and each MUST take one shape, `{ node, sticky? }`** (`RULE.SUPPORT.SURFACE.258` · MUST · skill:spn-surface/design). The place runs the window's width and scrolls with the page; it is not sticky. Under a floating bar it starts one `--layout-space` below it. The layout draws no fill, line or padding for it. A hero that needs the whole window is a section placed in it, with `flush` or `mediaNode`: the section's fill reaches the window's edges and its words stay in the box, so a section behaves the same in the header, the page and the footer.
 - **The notice MUST stand before the header, and it is the layout's one pinned place** (`RULE.SUPPORT.SURFACE.410` · MUST · skill:spn-surface/design). It is always pinned. In `TOPNAV` and `DOCK` it pins with the bar when `navigation.sticky` is set, and alone at the window's top when it is not. In `RAIL` it pins at the content's top, in `CANVAS` at the window's top, and on a phone under the phone bar. Its look is `notice.surface`, a DSSurface's own props, with the padding in the app's `className`, and the theme holds none.
+- **The header and the footer MUST each take one shape, `{ node, sticky? }`** (`RULE.SUPPORT.SURFACE.417` · MUST · skill:spn-surface/design). `IDSLayoutConfig` holds `header?: IDSLayoutPlace` and `footer?: IDSLayoutPlace`, where `IDSLayoutPlace` is `{ node: ReactNode; sticky?: boolean }`, and `DSLayout` takes no `footerNode` prop. `node` is what the place holds; `sticky` keeps the place in the window while the page scrolls and while the page in it changes, on the body's fill, one layer under the notice, and is off where it is left out. A sticky header stands under the bar and the notice in `TOPNAV` and `DOCK`, under the notice at the content's top in `RAIL`, and under the notice at the window's top in `CANVAS`; a sticky footer stands at the window's bottom, the content's width beside a rail. There is no second way to give either place a node.
+- **A top bar and a dock MUST stand one size step above the app's size where the config gives none** (`RULE.SUPPORT.SURFACE.418` · MUST · skill:spn-surface/design). `XS` takes `SM`, `SM` takes `MD`, `MD` takes `LG`, and `LG` and `XL` take `XL`, so their entries read above the page's text; a rail keeps the app's size. The config's `size` wins.
+- **The notice MUST stand flush in its place** (`RULE.SUPPORT.SURFACE.419` · MUST · skill:spn-surface/design). No padding above it and no inset; it is square, attached to the window in `RAIL` and `CANVAS` and under the bar in `TOPNAV` and `DOCK`, and the bar's own shadow falls over it.
 - **The bar of a dock is drawn only when it holds `startNode`, `actionsNode` or `endNode`;** on a phone a bar is still drawn. A top nav always draws its bar.
 
 ## The bar's width and the navigation's size — 🔮
@@ -228,8 +231,11 @@ This ref states what a layout owns, its types and its places, the units it is bu
 | `RULE.SUPPORT.SURFACE.199` | each part that draws a fill gives its surface, and the dock's column and header stand by the content |
 | `RULE.SUPPORT.SURFACE.255` | each layout marks one size container for each place a section stands in, carrying no padding: the window in `TOPNAV` and `CANVAS`, the header and the footer, the content part in `RAIL` and `DOCK` |
 | `RULE.SUPPORT.SURFACE.257` | `TOPNAV` and `DOCK` take `barWidth`, and `RAIL`, `DOCK` and `TOPNAV` take `size`, in their config, the bar's height, the dock column's and the open rail's width following the step |
-| `RULE.SUPPORT.SURFACE.258` | `headerNode` stands before the content in every layout, in the body's box, as `footerNode` does |
+| `RULE.SUPPORT.SURFACE.258` | the header stands before the content in every layout, in the body's box, as the footer does, and each takes one shape, `{ node, sticky? }` |
 | `RULE.SUPPORT.SURFACE.410` | the notice is the layout's one pinned place: with the bar when `navigation.sticky` is set in `TOPNAV` and `DOCK`, alone at the window's top when it is not, at the content's top in `RAIL`, at the window's top in `CANVAS`, under the phone bar on a phone |
+| `RULE.SUPPORT.SURFACE.417` | the header and the footer each take one shape, `{ node, sticky? }` |
+| `RULE.SUPPORT.SURFACE.418` | a top bar and a dock stand one size step above the app's size where the config gives none |
+| `RULE.SUPPORT.SURFACE.419` | the notice stands flush in its place, with no padding above it and no inset |
 | `RULE.SUPPORT.SURFACE.281` | `XWIDE` stands at most 1400 px, the widest step that still leaves a margin on a 1440 laptop |
 | `RULE.SUPPORT.SURFACE.300` | the default theme draws the open entry of the navigation as `SUBTLE` |
 | `RULE.SUPPORT.SURFACE.200` | a layout has three parts, the body, the navigation and the content; attached and sticky, the one spacing, no overlay, and one drawer on a phone |

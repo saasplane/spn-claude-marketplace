@@ -16,7 +16,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/03-platform/01-core/01-tenancy/02-organizations.md",
-      "seen": "24589c48"
+      "seen": "1a4e4fd3"
     }
   ],
   "decisions": []
@@ -77,6 +77,7 @@
   - **The account is the unit that pays.** The organization is the tenancy boundary, and billing and entitlements scope to the organization the platform bills, which wears the Account face. Anything metered, limited or invoiced resolves to an account — never to a user or a session. Any organization node may wear the Account face (a subsidiary that begins paying gains one in place, keeping its id, people, history and position), so billing and entitlement lookups resolve to the nearest face along the path, never at a fixed depth (`RULE.PLATFORM.CORE.014` · GUIDE).
   - **A limit that exists is enforced and observable.** A quota with no enforcement is a promise broken silently; an enforced quota with no counter is one nobody can support a customer through.
   - **Nothing traps a customer.** A capability that produces data gives its owner a way to get that data out, and a subscription that starts has a stated path to stopping.
+  - **A customer is a page, not a row.** A customer of every child category (a Company's Agencies and Candidates, and the platform's own customer kinds) always opens on a details page of its own, in every console, and never as a sheet over the list; the sheet stays only for creating one. What a module sells or does for a customer plugs into that page through ORG's app section, a header-actions slot, and a listener on ORG's customer-created event, so the commercial view of a customer lives in one place (`RULE.PLATFORM.CORE.080` · MUST · skill:spn-apps/implement).
   - **The commercial vocabulary matches the product's.** What the interface calls a plan, an add-on or a seat is what the invoice, the docs and the support article call it.
 
 ## Gates

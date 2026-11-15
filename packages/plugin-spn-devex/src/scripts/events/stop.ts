@@ -79,15 +79,15 @@ import { checkHowItRuns } from "../checks/how-it-runs.ts";
 import { checkPartnerWords } from "../checks/partner-words.ts";
 import { checkPagePath } from "../checks/page-path.ts";
 import { checkWorkstream, heldByStop } from "../checks/workstream-state.ts";
-import { PREVIEW_FILE, approachOf, arcDataDir, arcStatus, stepsMayStart, arcIdsOf, leafRows, logLinesOf, notesDirOf, previewOf, readArc, readJsonl, readQuestions, readyRows, stateFileOf,
+import { PREVIEW_FILE, approachOf, arcDataDir, arcStatus, stepsMayStart, arcIdsOf, leafRows, logLinesOf, notesDirOf, previewOf, previewWouldChange, readArc, readJsonl, readQuestions, readyRows, stateFileOf,
          suggestionsFileOf, workstreamsOf } from "../lib/workstream.ts";
 import { findWorkingDetail } from "../lib/working-detail.ts";
 import { ARC_ID, cardName, type ArcData, type LogLine, type Question } from "../lib/workstream-schema.ts";
 import { applyLine, standings } from "../lib/migration.ts";
 import { MIGRATIONS } from "../lib/migrations/index.ts";
 import { cardsOf, holdsOwnCopy, markAge, openWorkstreams } from "../checks/split-plan.ts";
-import { cyclesRule, exemptWorkstream, headerRule, openHeadingRule } from "../checks/doc-check.ts";
-import { cyclesTableAt } from "../commands/docs/cycles.ts";
+import { exemptWorkstream } from "../checks/doc-check.ts";
+import { cyclesTableAt, producedPage } from "../commands/docs/cycles.ts";
 import { TERMINAL } from "../checks/arc-status.ts";
 import { REPLY_CHECKS, eventWorkspace, workspaceRoot } from "../lib/payload.ts";
 import { DEVEX, isApproachPage, workstreamsDir } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
@@ -1415,9 +1415,9 @@ export function checkPageCurrent(touched: Set<string> | null): Warning[] {
     for (const page of pagesOf(folder)) {
       const text = read(page);
       if (exemptWorkstream(page) || holdsOwnCopy(page) || !cyclesTableAt(text)) continue;
-      if (cyclesRule(page, text).length) parts.add("the Plan table");
-      if (headerRule(page, text).length) parts.add("the header's status");
-      if (openHeadingRule(page, text).length) parts.add("the heading of `Open`");
+      // THE PAGE IS BEHIND ONLY WHERE `docs cycles write` would write it: the state the writer reads, never the doc check's rules.
+      const produced = producedPage(folder, text);
+      if (produced !== null && produced.text !== text) for (const part of produced.wrote) parts.add(part);
     }
     if (parts.size) behind.push({ workstream: basename(folder), parts: [...parts] });
   }
@@ -1425,9 +1425,11 @@ export function checkPageCurrent(touched: Set<string> | null): Warning[] {
   const previews: Array<{ workstream: string; line: string }> = [];
   for (const arc of [...touched].sort()) {
     const data = dataOf(arc);
+    if (!data || exemptWorkstream(arc) || !previewWouldChange(homeOf(arc), idOf(arc))) continue;
     const shows = previewStatusOf(read(previewOf(homeOf(arc), idOf(arc))));
-    if (!data || !shows || exemptWorkstream(arc) || shows === arcStatus(data)) continue;
-    previews.push({ workstream: basename(homeOf(arc)), line: `The preview of ${idOf(arc)} reads ${shows} and its arc is ${arcStatus(data)}` });
+    previews.push({ workstream: basename(homeOf(arc)), line: shows
+      ? `The preview of ${idOf(arc)} reads ${shows} and its arc is ${arcStatus(data)}`
+      : `The preview of ${idOf(arc)} is behind its arc, which is ${arcStatus(data)}` });
   }
   const said = previews.map((one) =>
     `${one.line}. Run \`spn-devex docs cycles write ${one.workstream}\`, which writes each preview's status from its arc ` +

@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/03-platform/02-modules/05-entities.md",
-      "seen": "2588fba7"
+      "seen": "f67d7076"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/03-platform/02-modules/05-entities/",
@@ -26,7 +26,13 @@
 
 **A custom field that picks from a list names a registered type.** Its source is the code of a registered entity type that opted into `LOOKUP`, as the contract spells it, and the type's records are the list. The custom-field form chooses the records through the owning module's `<State>Autocomplete` and its `use<State>OptionSource`, which a type that opts into `LOOKUP` owes its web module. The module refuses a source on create and on edit when the type is not registered or did not opt in. A stored field whose type later leaves the registry is kept and reads as a source that is unavailable. Whether a saved value's ids still exist in the list is not checked yet.
 
-**A custom field is an organization declaring that a record type has an extra field**: its name, its type, how it renders, whether it is required. That is a customer's declaration, not a schema change.
+**A custom field is an organization declaring that a record type has an extra field**: its name, its type, how it renders, whether it is required. That is a customer's declaration, not a schema change. A definition also says where it is asked, as codes of the moments its record type declares in the registry; who answers follows from who acts at each moment, and a field asked at no moment is edited on the record's page by staff. A partner's module declares its own moments, as a clinic's `CHECK_IN` by the patient or a shipment's `DISPATCH` by staff.
+
+## A record carries its fields through its host
+
+**Entities owns the definitions; the host module owns each record's values, and nothing reaches a value except through that host.** The record's full read carries every stored value of an active field, in display order, built with the record in one batched read and cached with the row, so a single read, every line of a search and a save's answer agree. A create and an update carry the fields they change: each replaces its own value, every other value is kept, and the whole set is written in the save's own transaction. A moment's own save also checks the fields required at it.
+
+The definitions are the module's catalog, read once per record type. Each caller's copy is narrowed to the fields that caller may see, on the way out of the cache, so a restricted value never leaves the server and a save merges with the stored values, never losing a field the caller cannot see. The rule is `EntCustomFieldValue` (MUST): a record's values travel only through its host, on its full read, cached with it, written with its own save.
 
 ## The distinction that matters
 

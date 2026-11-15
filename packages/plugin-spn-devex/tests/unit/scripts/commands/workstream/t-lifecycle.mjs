@@ -2,8 +2,11 @@
 // close gate. Run as the agent types the commands, in a throwaway workspace.
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { writeClosingBlock, cli, dataWorkspace } from "../../../../helpers/workstream-fixture.mjs";
+import { writeClosingBlock, cli, ownPlugins, dataWorkspace } from "../../../../helpers/workstream-fixture.mjs";
 import { workspace } from "../../../../helpers/fixture.mjs";
+
+// `go write` finds the passes through installed_plugins.json: this repository's own refs speak, never the installed copy.
+const putBackConfig = ownPlugins();
 
 let total = 0, failed = 0;
 const ok = (label, condition, detail = "") => {
@@ -75,7 +78,7 @@ console.log("\n=== close: an unfinished plan refuses it");
   const rows = [
     { id: "1", parent: "N001", title: "write the book", kind: "change", repo: "spn-x", work: "DOCS", blockedBy: [], touches: ["spn-x:docs"], state: "landed", entries: ["E1"] },
   ];
-  const { root, ws } = await dataWorkspace("lifecycle-close", { rows });
+  const { root, ws } = await dataWorkspace("lifecycle-close", { rows, placed: true });
   const closed = join(root, ".spndevex", "workstreams", "closed", "031-probe");
   const entry = { id: "E1", op: "edit", file: "spn-x:docs/a.md", what: "change E1", decidedBy: ["q1"], facts: ["f1"], then: [], rules: [], callers: [], tiers: { unit: ["T.E1.01"] }, docs: [], book: [], trace: "why E1", judged: false };
   const sheetIn = join(root, "sheet-in.json");
@@ -145,7 +148,7 @@ console.log("\n=== go write: a release order line that is not a repository's nam
   const rows = [
     { id: "1", parent: "N001", title: "write the book", kind: "change", repo: "spn-x", work: "DOCS", blockedBy: [], touches: ["spn-x:docs"], state: "ready", entries: ["E1"] },
   ];
-  const { root, ws } = await dataWorkspace("lifecycle-chain", { rows });
+  const { root, ws } = await dataWorkspace("lifecycle-chain", { rows, placed: true });
   const entry = { id: "E1", op: "edit", file: "spn-x:docs/a.md", what: "change E1", decidedBy: ["q1"], facts: ["f1"], then: [], rules: [], callers: [], tiers: {}, docs: [], book: [], trace: "why E1", judged: false };
   const sheetIn = join(root, "sheet-in.json");
   writeFileSync(sheetIn, JSON.stringify({ schemaVersion: 1, releaseChain: ["spn-x: one docs pull request into develop"], dependsOn: [], stack: { folder: "the spn-x checkout", dmo: "none", reset: "from empty" }, entries: [entry] }));
@@ -157,4 +160,5 @@ console.log("\n=== go write: a release order line that is not a repository's nam
 }
 
 console.log(`\n${total - failed}/${total} passed`);
+putBackConfig();
 process.exit(failed ? 1 : 0);

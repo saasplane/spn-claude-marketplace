@@ -11,29 +11,31 @@ description: Carry out a go. Use the moment the developer gives the go on one ar
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
-      "seen": "7235dee7"
+      "seen": "9313588a"
     }
   ]
 }
 -->
 
-1. The scope: every arc the go covers is DECIDED and its sheet reads whole (`workstream sheet check`).
+1. The scope: every arc the go covers is DECIDED and its sheet reads whole (`workstream sheet check`). The go refuses an entry that is incomplete, a change with no patch or a step with no command or no proof, in every hand-written file, the book, config, migrations, contract, server, web and tests included, and no warning stands in place of the refusal; a change marked judged still carries its patch (`RULE.DEVEX.WORKSPACE.502` · MUST · check:split-plan).
 2. Drift: `workstream state check --facts`, and `sheet edit` for each entry whose fact moved.
-3. The plan: before a go, the lead runs `go propose` and puts the scope to the developer; then `workstream go write <lead> --scope …`, and `go show` to read it.
-4. Baselines: `go start` each repository's baseline, and record what already fails.
+3. The plan: before a go, the lead runs `go propose` and puts the scope to the developer; then `workstream go write <lead> --scope …`, and `go show` to read it. The plan is derived from the workspace map, rebuilt from the repositories' files on every plan, and from the passes each repository's world declares, which the plugin that serves that world supplies (`RULE.DEVEX.WORKSPACE.508`, `RULE.DEVEX.WORKSPACE.509` · MUST · skill:spn-devex/execute).
+4. Baselines: `go start` each repository's baseline, its whole suite on the base, once, and record what already fails.
 5. The parts: launch each part's brief, a pass at a time; fold each report with `report write`.
    Run the parts three or four at a time, each on a Sonnet helper. Review, and the developer, stay with the main agent.
    The go is one workflow, generated from the plan across every arc it covers: patches apply, steps run, independent parts run side by side, and the waits come from the plan.
-   Apply each patch after its base check, then connect. The baseline runs the new cases on the base, and each must fail. A code part formats before its proof.
+   The go applies the patches in passes and runs every tier once (`RULE.DEVEX.WORKSPACE.507` · MUST · check:split-plan). Apply each repository's patches as one pass, in release order, each after its base check, then connect. A helper is briefed only to re-cut a patch that no longer applies, and it edits and type-checks and never runs a test tier. Between passes nothing runs but what a repository's commit or push hook refuses without, and every tier runs once, in the full run. A part's proof is the type-check its pass names, and a code part formats before its proof.
+   A new case is shown failing on the base before the code it proves, and it fails for the right reason (`RULE.DEVEX.WORKSPACE.511` · MUST · skill:spn-devex/execute): after the web tests pass, a worktree at the base holding only the new test files runs each case on a name the base has, and it fails at its assertion; a case on a name new to the base is red by that name's absence. The sheet holds what each case proves and its code is written in the test passes, once the names are final (`RULE.DEVEX.WORKSPACE.510` · MUST · skill:spn-devex/execute).
    A repository's apply part is the lead's own and holds every code change: `go start <lead> apply-<repo>` applies the patches and commits them. That part has no brief and no report. A patched change is never cut into a helper's part; `go write` refuses a change whose patch no longer applies, by name, and it is patched again against the new head. A step is a part of its own: run its command and check its proof.
+   Each brief says the five things an order never does (`RULE.DEVEX.WORKSPACE.515` · MUST · skill:spn-devex/execute): `sed -i`, `git stash`, a commit, formatting a generated file, and starting a demo app from anywhere but the main checkout.
    Each brief carries the line that a helper meeting a name, a shape or a construct no entry holds stops, returns `needs-you` and lists it under `unnamed:`; `report write` refuses `landed` while it lists one (`RULE.DEVEX.WORKSPACE.495` · MUST · check:split-plan).
    A change from the developer mid-run: let what is running finish, `go check` to hold the parts it
    touches, update their entries and the preview and show it, then `go write` again before they run.
    A change that rewrites the approach page's What decides its figure in the same pass (`RULE.DEVEX.WORKSPACE.497` · MUST · check:doc-check): a figure, or the one `<!-- no figure: … -->` line.
-6. Full runs: `go start` each repository's full run, once, with the runner's reuse on, so only what changed runs; every code row lands on it.
+6. Full runs: `go start` each repository's full run, once, with the runner's reuse on, so only what changed runs; every tier runs once, here, and every code row lands on it. A red case is fixed and rerun on only what its fix reaches.
    A code or proof row that names `provedBy` runs no tiers here: `go write` lists it as waiting on that arc, and it lands on that arc's proof run. A repository whose open code rows all name a later arc is released on its code alone, ahead of that proof, which the named arc's proof run supplies before the workstream closes.
    The fix pass reads each failure against its entry's trace and reruns only what the fix reaches.
-7. Generated files, then the release chain, in the order the sheets set.
+7. Generated files, then the release chain, in the order the workspace map gives and the sheets set.
 8. Close: `go check` prints nothing, and every row of the scope is LANDED; then `workstream close <workstream>`.
    When an arc lands, the lead runs `debug cost review` and raises each finding as a suggestion.
 
@@ -65,3 +67,8 @@ description: Carry out a go. Use the moment the developer gives the go on one ar
 - **A part or a row that waits on something outside the window reads waiting on, and is never named as ready** (`RULE.DEVEX.WORKSPACE.469` · MUST · skill:spn-devex/execute)
 - **A code part added after a repository's full run has landed opens a second full run** (`RULE.DEVEX.WORKSPACE.470` · MUST · skill:spn-devex/execute)
 - **Closing a workstream runs a retrospective that raises a suggestion for each pattern it finds** (`RULE.DEVEX.WORKSPACE.483` · MUST · skill:spn-devex/execute)
+- **A go plans from a map of the workspace's own repositories, derived from their files on every plan and kept nowhere** (`RULE.DEVEX.WORKSPACE.508` · MUST · skill:spn-devex/execute)
+- **The devex plugin stays stack-agnostic: it asks the plugin that serves each repository's world for that world's passes** (`RULE.DEVEX.WORKSPACE.509` · MUST · skill:spn-devex/execute)
+- **The sheet holds what each case proves, and its code is written in the test passes, once the names are final** (`RULE.DEVEX.WORKSPACE.510` · MUST · skill:spn-devex/execute)
+- **Every new case is shown failing on the base before the code it proves, and it fails for the right reason** (`RULE.DEVEX.WORKSPACE.511` · MUST · skill:spn-devex/execute)
+- **Five things an order never does, and every brief says so** (`RULE.DEVEX.WORKSPACE.515` · MUST · skill:spn-devex/execute)

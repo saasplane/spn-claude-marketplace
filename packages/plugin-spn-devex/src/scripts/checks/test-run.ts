@@ -171,10 +171,11 @@ export function checkWholeSuite(payload: Payload): Verdict {
   const plans = openPlans(root);
   const forRepo = (part: GoPart): boolean => isSuitePart(part) && (!repo || part.repo === repo);
   if (plans.some(({ plan }) => plan.parts.some((part) => forRepo(part) && part.state === "running"))) return null;
-  // Once the repository's full run has landed, a commit made after it still owes the push check a stamped run of that
-  // commit, and only `spnutils` leaves the stamp (RULE.DEVEX.WORKSPACE.281).
-  const landed = plans.some(({ plan }) => plan.parts.some((part) => forRepo(part) && isFullRun(part) && part.state === "landed"));
-  if (landed && whole.every((found) => found.script === "spnutils")) return null;
+  // A stamped spnutils run is read by one rule at every point of a go: it is admitted for a repository whose go holds any suite part
+  // that is not dropped (running, ready, waiting or landed alike), since only `spnutils` leaves the stamp the push check reads
+  // (RULE.DEVEX.WORKSPACE.281). A run through nx or a repository's own runner is admitted only while a suite part runs, above.
+  const stamped = whole.every((found) => found.script === "spnutils");
+  if (stamped && plans.some(({ plan }) => plan.parts.some((part) => forRepo(part) && part.state !== "dropped"))) return null;
   const own = new Set(windowWorkstreams(root, payload.session_id));
   const named = plans.find(({ ws }) => own.has(basename(ws))) ?? plans[0];
   const quoted = command.trim().length > 120 ? `${command.trim().slice(0, 117)}…` : command.trim();

@@ -10,7 +10,10 @@ import { execFileSync, spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { existsSync, readdirSync, statSync } from "node:fs";
 import { basename, dirname, join, relative, resolve, sep } from "node:path";
-import { emit, read, readPayload, runAlone, type Payload, type Verdict } from "../lib/payload.ts";
+import { emit, read, readPayload, runAlone, workspaceRoot, type Payload, type Verdict } from "../lib/payload.ts";
+import { arcIdsOf, readArc, readSheet, workstreamsOf } from "../lib/workstream.ts";
+import { DONE_STATES } from "../lib/workstream-schema.ts";
+import { readGo } from "../lib/go-plan.ts";
 import { segments } from "../lib/command-reader.ts";
 
 /** The tiers a push asks for: the ones that need nothing running. */
@@ -142,12 +145,27 @@ export function contentHash(entries: Map<string, string>, folder: string): strin
 }
 
 /** The manifest that makes a folder a node, or null. An apps node is a project, so its `spkind.json` stands beside a `package.json`. */
-function manifestOf(folder: string): string | null {
+export function manifestOf(folder: string): string | null {
   for (const manifest of MANIFESTS) {
     const project = manifest !== "spkind.json" || existsSync(join(folder, "package.json"));
     if (project && existsSync(join(folder, manifest))) return manifest;
   }
   return null;
+}
+
+/** The kind of the node a folder is, read as `owedTiers` reads it, so the workspace map and the push check read a node's kind one way; null where no manifest holds one. */
+export function nodeKindOf(folder: string): { manifest: string; kind: string } | null {
+  const manifest = manifestOf(folder);
+  if (!manifest) return null;
+  try {
+    if (manifest === "spkind.json") {
+      const kind = JSON.parse(read(join(folder, manifest))).kind;
+      return typeof kind === "string" ? { manifest, kind } : null;
+    }
+    const estate = JSON.parse(read(join(folder, "src", "spestate.json")));
+    const kind = estate.type ?? estate.config?.mtype;
+    return typeof kind === "string" ? { manifest, kind } : null;
+  } catch { return null; }
 }
 
 /**
@@ -274,6 +292,56 @@ export function formatFindingOf(carried: Carried): FormatFinding {
   return bad.size ? { files: [...bad] } : null;
 }
 
+/**
+ * The arc that proves a node's changes later, or null: the open workstreams' CODE rows of this repository that are not done and
+ * name `provedBy` hold entries, and every changed path of the node belongs to one of those entries' files, as the landing gate
+ * reads a row proved in a later arc (RULE.DEVEX.WORKSPACE.328).
+ */
+function provedLater(top: string, folder: string, changed: string[]): string | null {
+  try {
+    const root = workspaceRoot(top);
+    if (!root) return null;
+    const repo = basename(top);
+    const proof = new Map<string, string>();
+    for (const ws of workstreamsOf(root, ["open"])) {
+      for (const arc of arcIdsOf(ws)) {
+        const rows = (readArc(ws, arc)?.rows ?? []).filter((row) =>
+          row.work === "CODE" && row.repo === repo && !DONE_STATES.has(String(row.state)) && typeof row.provedBy === "string" && row.provedBy);
+        const entries = readSheet(ws, arc)?.entries ?? [];
+        for (const row of rows)
+          for (const entry of entries.filter((one) => (row.entries ?? []).includes(one.id))) {
+            const [name, ...path] = entry.file.split(":");
+            if (name === repo) proof.set(path.join(":"), String(row.provedBy));
+          }
+      }
+    }
+    const mine = changed.filter((path) => { const node = nodeOf(top, path); return node ? node.folder === folder : false; });
+    if (!mine.length || !mine.every((path) => proof.has(path))) return null;
+    return [...new Set(mine.map((path) => proof.get(path)))].join(", ");
+  } catch { return null; }
+}
+
+/**
+ * The `full-<repo>` part of an open workstream's go that holds the push's repository and has not landed, as the command that
+ * starts it, or null where no go holds one.
+ */
+function fullRunOf(top: string): string | null {
+  try {
+    const root = workspaceRoot(top);
+    if (!root) return null;
+    const repo = basename(top);
+    for (const ws of workstreamsOf(root, ["open"])) {
+      const number = /^\d+/.exec(basename(ws))?.[0] ?? basename(ws);
+      for (const arc of arcIdsOf(ws)) {
+        const plan = readGo(ws, arc);
+        const part = plan?.parts.find((one) => one.repo === repo && one.id.startsWith("full-") && one.state !== "landed" && one.state !== "dropped");
+        if (plan && part) return `spn-devex workstream go start ${number}/${plan.lead} ${part.id}`;
+      }
+    }
+  } catch { /* no plan is read: the per-node lines stand */ }
+  return null;
+}
+
 /** One finding: a node, a tier and why no run covers it. */
 type Gap = { folder: string; manifest: string; tier: Tier; reason: string };
 
@@ -282,6 +350,8 @@ export function checkPushTiers(payload: Payload): Verdict {
   if (!applies("", command)) return null;
   const gaps: Gap[] = [];
   const warnings: string[] = [];
+  const proved: string[] = [];
+  let fullRun: string | null = null;
   const unformatted: string[] = [];
   let prettierMissing = false;
   let repo = "";
@@ -304,11 +374,13 @@ export function checkPushTiers(payload: Payload): Verdict {
     }
     for (const [folder, { manifest, tiers }] of touched) {
       if (!tiers.size) continue;
+      const later = provedLater(carried.top, folder, carried.changed);
+      if (later) { proved.push(`- \`${folder}\`: proved by ${later}, as the landing gate reads it.`); continue; }
       const blobs = carried.blobsUnder(folder);
       const content = contentHash(blobs, folder);
       for (const tier of TIERS.filter((one) => tiers.has(one as Tier)) as Tier[]) {
         const proof = proofOf(carried.top, folder, tier, content, carriesCase(blobs, folder, tier));
-        if (!proof.ok) { gaps.push({ folder, manifest, tier, reason: proof.reason }); repo = basename(carried.top); }
+        if (!proof.ok) { gaps.push({ folder, manifest, tier, reason: proof.reason }); repo = basename(carried.top); fullRun = fullRunOf(carried.top); }
         else if (proof.warning) warnings.push(`- \`${folder}\` ${proof.warning}.`);
       }
     }
@@ -328,9 +400,11 @@ export function checkPushTiers(payload: Payload): Verdict {
   }
   if (!gaps.length) {
     if (refusals.length) return { deny: refusals.join("\n\n") };
-    return warnings.length
-      ? { note: `This push carries nodes that owe a tier and carry no case of it yet; a whole run on this tree stands in, and proof is still to write (RULE.SUPPORT.APPS.114).\n${warnings.join("\n")}` }
-      : null;
+    const notes = [
+      ...(warnings.length ? [`This push carries nodes that owe a tier and carry no case of it yet; a whole run on this tree stands in, and proof is still to write (RULE.SUPPORT.APPS.114).\n${warnings.join("\n")}`] : []),
+      ...(proved.length ? [`This push carries nodes whose changed rows a later arc proves.\n${proved.join("\n")}`] : []),
+    ];
+    return notes.length ? { note: notes.join("\n\n") } : null;
   }
   const lines: string[] = [];
   const infraDone = new Set<string>();
@@ -340,16 +414,19 @@ export function checkPushTiers(payload: Payload): Verdict {
       if (infraDone.has(gap.folder)) continue;
       infraDone.add(gap.folder);
       const tiers = gaps.filter((one) => one.folder === gap.folder).map((one) => one.tier).join(", ");
-      lines.push(`- \`${gap.folder}\` (${tiers}): ${gap.reason}. Run \`spnutils infra test commit ${name}\`.`);
+      lines.push(`- \`${gap.folder}\` (${tiers}): ${gap.reason}.${fullRun ? "" : ` Run \`spnutils infra test commit ${name}\`.`}`);
     } else {
-      lines.push(`- \`${gap.folder}\`, ${gap.tier}: ${gap.reason}. Run \`spnutils apps test ${gap.tier} commit-${gap.tier} ${name}\`.`);
+      lines.push(`- \`${gap.folder}\`, ${gap.tier}: ${gap.reason}.${fullRun ? "" : ` Run \`spnutils apps test ${gap.tier} commit-${gap.tier} ${name}\`.`}`);
     }
   }
   return {
     deny: [
       `Denied: this push carries changes to a node whose offline tiers have no whole, green run on the tree at HEAD ` +
       `(RULE.DEVEX.WORKSPACE.281).\n${lines.join("\n")}\n` +
-      `Run each command from \`${repo}\`, then push again. A run narrowed by files, names or a phase, a run with no stamp ` +
+      (fullRun
+        ? `Run the go's full run: \`${fullRun}\`, whose stamped runs on this tree prove every node named above. A run `
+        : `Run each command from \`${repo}\`, then push again. A run `) +
+      `narrowed by files, names or a phase, a run with no stamp ` +
       `file and a run made on other content do not count; a file another window left in the node changes the content too.`,
       ...refusals,
     ].join("\n\n"),

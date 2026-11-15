@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/10-providers/ts/03-structure.md",
-      "seen": "9d4e11cb"
+      "seen": "4a055f3c"
     }
   ]
 }
@@ -198,6 +198,47 @@ apps/<app>-ts/src/
 | a domain service in a backend app | that app's `modules/<module>/app/services/`, with its interface in `contract/services/` |
 | a framework-level backend addition | the server service support package |
 | a new package or app | scaffold it, and declare its kind |
+
+## TS repository passes
+
+**Support, the platform and a partner's TS platform or service run the same passes, each holding only the kinds that repository has, and no pass runs a test tier** (rule RULE.DEVEX.WORKSPACE.514 · MUST · skill:spn-apps/implement).
+
+| Pass | What it holds | Its proof |
+| --- | --- | --- |
+| 0 Baseline | the repository's full suite on the base, once, recording what already fails | its own run |
+| 1 Book | the repository's own docs entries | the docs checks the hooks demand |
+| 2 Pins | every pin an upstream release moves; it sits right before the first pass that reads the upstream change | `pnpm install --frozen-lockfile` |
+| 3 Universal | `TOOLCHAIN` and `SUPPORT_UNIVERSAL` | type-check |
+| 4 Server source | `SUPPORT_SERVER`, `MODULE_SERVER`, `APP_SERVER` and `APP_UTILITY`: contract, entities, migrations, services, routes, then validators and barrels | type-check of every server project touched |
+| 5 Client | `CLIENT_API`: codegen from the worktree's own service, then the clients' barrels | client type-check; the document came from the worktree |
+| 6 Web source | `SUPPORT_WEB`, `MODULE_WEB` and `APP_WEB`, on the regenerated client, then web barrels | type-check of every web project touched |
+| 7 Server tests | unit, integration, and the clients' contract specs | type-check |
+| 8 Web tests | unit, component, and a journey for each new page, tab, section and sheet | type-check, then each new case's red first |
+| 9 Commit | one commit per repository | none |
+| 10 Full run | a clean reset, then every tier once; a red case is fixed and rerun on only what its fix reaches | the run |
+| 11 Release | files generated from the run, then the repository's release | the release's own gate |
+
+The plan reads the same passes from the declaration below, by its header names (U23): each row's `Holds` names the kinds or the
+work it takes, `After` the pass it follows.
+
+| Pass | World | Holds | Proof | After | Runs with | Waits on |
+| --- | --- | --- | --- | --- | --- | --- |
+| baseline | APPS | — | its own run | — | — | — |
+| book | APPS | book | the docs checks the hooks demand | baseline | — | — |
+| pins | APPS | pins | `pnpm install --frozen-lockfile` | book | — | the upstream release it reads |
+| universal | APPS | TOOLCHAIN · SUPPORT_UNIVERSAL | type-check | pins | — | — |
+| server | APPS | SUPPORT_SERVER · MODULE_SERVER · APP_SERVER · APP_UTILITY | type-check of every server project touched | universal | — | — |
+| client | APPS | CLIENT_API | client type-check; the document came from the worktree | server | the worktree's own service | — |
+| web | APPS | SUPPORT_WEB · MODULE_WEB · APP_WEB | type-check of every web project touched | client | — | — |
+| server-tests | APPS | server tests | type-check | web | — | — |
+| web-tests | APPS | web tests | type-check, then each new case's red first | server-tests | — | — |
+| commit | APPS | — | none | web-tests | — | — |
+| full | APPS | — | the run | commit | a clean reset | — |
+| release | APPS | generated | the release's own gate | full | — | — |
+
+A step runs in the pass whose layer it builds: a validator or a barrel right after its source, and codegen as the client pass (the code generation chapter). A pass splits into parts by files that do not overlap, so its parts still run side by side. Design is not one of these passes: it runs beside them, from the book.
+
+The apps plugin declares these passes for this stack; a repository holds only the kinds it has, and a pass with no entries does not run.
 
 ## Proof
 

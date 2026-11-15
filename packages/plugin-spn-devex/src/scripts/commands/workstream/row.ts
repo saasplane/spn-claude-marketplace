@@ -19,6 +19,7 @@ import { WORK, ROW_ID, ROW_KINDS, ROW_STATES, parentIds, type ArcData, type ArcR
 import { ARC_FLAGS, afterWrite, arcNamed, arcSignatures, listOf, refreshIfMoved, refuseFlags, typed } from "./_shared.ts";
 import { renameFirstRead } from "./sheet.ts";
 import { stepRowFindings } from "../../checks/workstream-state.ts";
+import { mapOrderOf } from "../../lib/go-plan.ts";
 import { applies as pluginLandedApplies, pluginLandedRefusal } from "../../checks/plugin-landed.ts";
 
 export const describe = "add a row, move its state, write a note on it, change its fields, or discard one found invalid";
@@ -125,7 +126,7 @@ function finish(ws: string, arc: string, data: ArcData, before: ReturnType<typeo
   const { done, total } = doneOf(data);
   console.log(`ok · ${arc} ${done}/${total} · ${[...said, ...refreshed.said, ...last].join(" · ")}`);
   for (const line of [...refreshed.lines, ...afterWrite(ws)]) console.log(line);
-  for (const line of stepRowFindings(data)) console.log(`note: ${line}`);
+  for (const line of stepRowFindings(data, before.get(arc), mapOrderOf(mainCheckoutOf(ws)))) console.log(`note: ${line}`);
   return 0;
 }
 

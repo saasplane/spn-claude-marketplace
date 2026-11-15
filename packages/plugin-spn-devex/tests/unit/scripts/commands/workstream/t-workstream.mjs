@@ -6,10 +6,13 @@ import { createHash } from "node:crypto";
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { basename, join, resolve } from "node:path";
 import { PLUGIN } from "../../../../helpers/harness.mjs";
-import { CARD as BARE_CARD, arcData, cli, writeClosingBlock, dataWorkspace as dataArc, put } from "../../../../helpers/workstream-fixture.mjs";
+import { CARD as BARE_CARD, arcData, cli, ownPlugins, writeClosingBlock, dataWorkspace as bareArc, put } from "../../../../helpers/workstream-fixture.mjs";
 // A card's What cites what it read, or `question raise` refuses it (MKT.SCRIPTS.383).
 const CARD = { ...BARE_CARD, what: "The file is `a.ts:12`." };
 import { workspace } from "../../../../helpers/fixture.mjs";
+
+// `go write` finds the passes through installed_plugins.json: this repository's own refs speak, never the installed copy.
+const putBackConfig = ownPlugins();
 
 let total = 0, failed = 0;
 const ok = (label, condition, detail = "") => {
@@ -19,6 +22,8 @@ const ok = (label, condition, detail = "") => {
   console.log(`  FAIL  ${label}${detail ? `\n        ${detail}` : ""}`);
 };
 // An arc with no sheet lands a CODE row only on a run (MKT.SCRIPTS.231), so the default steps here are docs steps.
+// `go write` refuses a repository it cannot place (MKT.SCRIPTS.566): spn-x is placed in every fixture here.
+const dataArc = (name, opts = {}) => bareArc(name, { placed: true, ...opts });
 const dataWorkspace = (name, opts = {}) => dataArc(name, { ...opts, rows: opts.rows ?? arcData().rows.map((one) => ({ ...one, work: "DOCS" })) });
 const json = (path) => JSON.parse(readFileSync(path, "utf8"));
 const lines = (path) => (existsSync(path) ? readFileSync(path, "utf8") : "").split("\n").filter(Boolean).map((line) => JSON.parse(line));
@@ -964,7 +969,7 @@ console.log("\n=== report write — a part's report lands the part, and the step
 console.log("\n=== report write keeps the successor a carried row names");
 {
   const rows = [{ id: "1", parent: "N001", title: "write the book", kind: "change", repo: "spn-x", work: "DOCS", blockedBy: [], touches: [], state: "ready", entries: ["E1"] }];
-  const kept = await dataArc("fold-carried", { rows });
+  const kept = await dataArc("fold-carried", { rows, placed: true });
   const sheetIn = join(kept.root, "sheet-in.json");
   writeFileSync(sheetIn, JSON.stringify({ schemaVersion: 1, releaseChain: ["spn-x"], dependsOn: [], stack: { folder: "the spn-x checkout", dmo: "none", reset: "from empty" },
     entries: [{ id: "E1", op: "edit", file: "spn-x:docs/a.md", what: "change E1", decidedBy: ["q1"], facts: ["f1"], then: [], rules: [], callers: [], tiers: { unit: ["T.E1.01"] }, docs: [], book: [], trace: "why", judged: false }] }));
@@ -1100,7 +1105,7 @@ console.log("\n=== go start — a release part starts, a helper's part does not 
   const goFile = join(rel.ws, "arcs", "N001", "go.json");
   const plan = json(goFile);
   const release = plan.parts.find((one) => one.work === "RELEASE");
-  ok("[MKT.SCRIPTS.326] the go holds a RELEASE part, named by `work`", !!release && plan.parts.every((one) => !("pass" in one) && typeof one.work === "string"), JSON.stringify(plan.parts.map((one) => [one.id, one.work])));
+  ok("[MKT.SCRIPTS.326] the go holds a RELEASE part, named by `work`", !!release && plan.parts.every((one) => !("altitude" in one) && typeof one.work === "string" && typeof one.pass === "string"), JSON.stringify(plan.parts.map((one) => [one.id, one.work])));
   const helper = plan.parts.find((one) => one.work === "DOCS");
   const refusedHelper = cli(rel.root, ["workstream", "go", "start", "031/N001", helper.id]);
   ok("[MKT.SCRIPTS.326] red: a helper's part is refused, and nothing changes", refusedHelper.code === 1 && /DOCS part/.test(refusedHelper.out) && json(goFile).parts.find((one) => one.id === helper.id).state === helper.state, refusedHelper.out);
@@ -1358,4 +1363,5 @@ console.log("\n=== a go over a mixed scope: a numbered arc and the ideate arc (Q
 }
 
 console.log(failed ? `\n  ${failed} of ${total} FAILED — workstream commands` : `\n  all ${total} passed — workstream commands`);
+putBackConfig();
 process.exit(failed ? 1 : 0);

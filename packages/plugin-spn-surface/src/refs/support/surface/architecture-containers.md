@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/08-architecture-containers.md",
-      "seen": "11e8446d"
+      "seen": "5fc4e69c"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/08-architecture-containers/",
-      "seen": "f25d1bb6"
+      "seen": "f140d30f"
     }
   ]
 }
@@ -97,23 +97,34 @@ Here is how the parts serve the pages most apps have.
 
 ## The look — 🔮
 
-The look of a panel is the props `frames`, `surface` and `unframed`. A **frame** is the drawn edge and fill of a panel. The `surface` is the paint of the frame in one prop, an `IDSFrameSurface`, and a panel, a card, a feature and a card widget take the same one.
+The look of a panel is the props `frames`, `surface` and `unframed`, set out in the table below. A **frame** is the drawn edge and fill of a panel. The `surface` is the paint of the frame in one prop, an `IDSFrameSurface`, and a panel, a card, a feature and a card widget take the same one.
 
-| Prop | Values | What it decides |
-| --- | --- | --- |
-| `frames` | a list: any of `HEADER`, `CONTENT`, `FOOTER` | which parts the frame holds. Two listed parts next to each other share one frame. A part that is not listed sits flat on the page. An empty list is no frame |
-| `surface` | `IDSFrameSurface`, its keys below | how the frame is painted. A key left out takes `theme.container.panel`'s |
-| `unframed` | a list: any of `HEADER`, `CONTENT`, `FOOTER` | the parts that take no frame, whatever `frames` and the theme give. A part listed here sits flat on the page |
-| `divided` | yes or no, or a list: any of `CONTENT`, `FOOTER` | the lines inside a bordered frame. Yes, where left out, a line between every two parts; no, none, so the frame reads as one; a list, a line above each part named: `CONTENT` between two content parts (the header stays with the first), `FOOTER` above the footer. A frame with no border draws none |
+| prop | type | default | what it does and when to use it | library |
+| --- | --- | --- | --- | --- |
+| `children` | `ReactNode`: the parts | required | the parts of the panel, in one order: `.Header`, `.Content`, `.Footer`; each part is a named place the look of the panel reaches | PART |
+| ↳ `Header.flush` | `boolean` | `false` | what the part holds fills it from edge to edge, with no inset | MODE |
+| ↳ `Header.backAnchor` | `IDSBaseAnchor` | none | a way back, a ghost icon button with an arrow at the start of the title line; with none, the one a `DSListDetail` above offers; drawn as a boolean | CASE · ACTIONS |
+| ↳ `Content.flush` | `boolean` | `false` | what the part holds fills it from edge to edge, with no inset | MODE |
+| ↳ `Footer.flush` | `boolean` | `false` | what the part holds fills it from edge to edge, with no inset | MODE |
+| ↳ `Footer.sticky` | `boolean` | `false` | the footer stays at the bottom of the screen while its panel is on screen; once. Not drawn: it is scroll behaviour | NOT_DRAWN |
+| `frames` | `DSBoxPartType[]`: `HEADER` · `CONTENT` · `FOOTER` | the theme's `container.panel.frames` | which parts the frame holds. Two listed parts next to each other share one frame; a part not listed sits flat on the page; an empty list is no frame | MODE |
+| `unframed` | `DSBoxPartType[]` | none | the parts that take no frame, whatever `frames` and the theme give; a part listed here sits flat on the page | CASE · FRAME |
+| `surface` | `IDSFrameSurface`: `color` · `strength` · `gradient` · `raised` · `elevation` · `bordered` · `rounded` | the theme's `container.panel` | the paint of the frame, in one prop; a key left out takes the theme's | — |
+| ↳ `surface.color` | `DSSurfaceColorType`: `BASE`, `DEFAULT`, `PRIMARY` | `BASE` | the colour of the fill of the frame; `BASE` leaves the fill to `raised`; × `surface.strength` | — |
+| ↳ `surface.strength` | `DSSurfaceStrengthType`: `SUBTLE`, `QUIET`, `SOLID` | `SUBTLE` | how strong the fill of a hue is; `BASE` takes none; × `surface.color` | — |
+| ↳ `surface.gradient` | `IDSSurfaceGradient` | flat | a gradient fill; waits on the surface chapter's gradient cases | MODE |
+| ↳ `surface.raised` | `boolean` | the theme's | fills the frame with the raised surface and lifts it on a shadow | MODE |
+| ↳ `surface.elevation` | `DSSizeType`: `XS` to `XL` | `SM` | how far a raised frame stands off the page, from the tokens `--shadow-elevation-xs` to `--shadow-elevation-xl`; read only where `raised`; in dark each level from `MD` up also lightens the fill and adds a faint ring | MODE |
+| ↳ `surface.bordered` | `boolean` | the theme's | draws the edge of the frame; inside a bordered frame a line divides each two parts | MODE |
+| ↳ `surface.rounded` | `boolean` | the theme's | rounds the corners of the frame; how much comes from the size step of the panel | MODE |
+| `divided` | `boolean \| DSBoxPartType[]` | `true` | the lines inside a bordered frame: `true` a line between every two parts, `false` none, a list a line above each part it names (`CONTENT`, `FOOTER`) | CASE · FRAME |
+| `opacity` | `DSSurfaceOpacityType`: `OPAQUE` · `TRANSLUCENT` | `OPAQUE` | whether a person sees through the frame's fill where content passes behind it; `TRANSLUCENT` once | CASE · FRAME |
+| `className` | `string` | none | a class of the app that paints this one panel through the paint tokens, on its root | NOT_DRAWN |
+| `size` | `DSSizeType`: `XS` to `XL` | the size of its place | the size step; the panel gives it to every block inside | — |
+| `fullPage` | `boolean` | `false` | says this panel is the whole page: its header is the page head, the title takes the `h1`, and its content and footer stand at `PAGE`; once | CASE · FRAME |
+| `testData` | `IDSTestData` | none | from `IDSBaseProps` | NOT_DRAWN |
 
-| Key of `surface` | Values | What it decides |
-| --- | --- | --- |
-| `color` | `DSSurfaceColorType`: `BASE`, `DEFAULT` or `PRIMARY` | the colour of the fill of the frame, as the shell and the content take it. `BASE` is the default, and it leaves the fill to `raised` |
-| `strength` | `DSSurfaceStrengthType`: `SUBTLE`, `QUIET` or `SOLID` | how strong the fill of a hue is. `BASE` takes none |
-| `raised` | yes or no | whether the frame is filled with the raised surface and lifted |
-| `elevation` | `DSSizeType`: `XS` to `XL`. `SM` when left out | how far a raised frame stands off the page, from the tokens `--shadow-elevation-xs` to `--shadow-elevation-xl`; `SM` is the shadow it always had. Read only where `raised` is true. In dark each level from `MD` up also lightens the fill and adds a faint ring |
-| `bordered` | yes or no | whether the frame has a border. Inside a bordered frame, a line divides each two parts the frame holds |
-| `rounded` | yes or no | whether the corners of the frame are rounded. How much comes from the size step of the panel |
+Every prop of the look, and every key of `surface`, is a row of this one table; the library column says how the library draws it (`PART`, `MODE`, `CASE`, `NOT_DRAWN`).
 
 The values of `frames` are the three parts of a box, one closed set, `DSBoxPartType`, that every stack spells the same way. A card names its parts with it too, and so do a dialog, a sheet, a drawer, a popover and the page's head, and so does the place that tells a block which part it stands in.
 
@@ -176,6 +187,8 @@ A section is one part of a page, set apart from the next by a fill of its own an
 | `XL` | 128px · 72px | 48px · 32px | the hero |
 
 - **A section MUST reach the edges of its place and no further** (`RULE.SUPPORT.SURFACE.254` · MUST · skill:spn-surface/design). The place is the window in TOPNAV and CANVAS and in the header and the footer of every layout (in TOPNAV the content, where the content draws a frame of its own), and the content part in RAIL and DOCK, as `architecture-layouts.md` marks it. The section's fill, its `mediaNode` and the child of a `flush` section run from one edge of the place to the other, and the section's words stay in the body's box. The child of a `flush` section lines its own words up with the box by `--section-box-inset`. In an app the fill stops at the navigation, and a content drawn bordered, raised or floating keeps its line, its corners and its shadow. Where the browser's scrollbar takes width from the window, the section adds no sideways scroll. A page does not put a section inside a panel, a card, an overlay or the nav column, since a section sets a part of a page apart and frames nothing; that part is advice.
+- **A section's fill MAY be a gradient of its own colour** (`RULE.SUPPORT.SURFACE.415` · MUST · skill:spn-surface/design). A surface's fill is one shape everywhere it is painted, `IDSSurfaceFillProps` (`color`, `strength`, `gradient`), declared once and taken by `DSSurface`, `DSSectionContainer`, the panel container, the card and the feature; a navigation bar takes no gradient. A gradient is `LINEAR` or `RADIAL`; its `origin` is a `DSPlacementType` (left out, a radial is centred and a linear runs from the top; a linear from a corner runs to the opposite corner); its `end` is the same colour softer, toward the page, by 15, 30, 45 or 60%, or stronger by 15 or 30%, and clear where left out; its `reach` is 25, 50, 75 or 100% of the way, flat beyond. Every value keeps the section's words readable across the whole band in both modes, so no value changes the words' colour. `BASE`, `painted` and an app's own fill stay flat, and `mediaNode` draws over the gradient.
+- **Sections MUST be told apart by a change of fill, never by a line** (`RULE.SUPPORT.SURFACE.416` · MUST · skill:spn-surface/design). Two sections side by side never share a tinted fill, and a site's page carries its brand fill at most three times: its opening, one pause mid-page and its closing call. A section whose words have no media beside them stands centred, its head and its items; a section with media beside its words stands at the start, where every start-aligned section's words share one edge with the bar's first item.
 - **A partner MAY paint one section with a class of their own, through the paint token** (`RULE.SUPPORT.SURFACE.192` · MUST · skill:spn-surface/design). The class sets `--surface-fill`, a colour, in light and in `[data-mode='dark']`, and the section draws that colour from edge to edge of its place in place of its `color`. A section that takes a dark colour in a light page, or a light one in a dark page, names the mode of that colour with `painted`, so that what it holds takes that mode's tokens and its text.
 
 **The section stands beside `DSPanelContainer` and takes none of its job.** The panel container frames a part of a page that a person reads or saves as a whole, with a title above it and actions in its header. The section frames nothing: it sets one part of a page apart from the next. A section is for the pages of a website and for a strip that opens an app's page, and an app part with a title and actions is a panel container. The theme holds no look for a section: a page alternates its sections on purpose, and the rhythm is in the stylesheet's tokens.
@@ -294,11 +307,12 @@ An entry is a form a person fills in to add or change something. A small or a me
 
 | The entry | At a desktop and a tablet | On a phone |
 | --- | --- | --- |
-| Small: up to about five fields in one group | a dialog over the page, `DSDialog` | a sheet from the bottom of the screen |
-| Medium: one column with a few groups, up to about a dozen fields | a sheet at the side, `DSSheet`, with the page still in view beside it | the full screen |
-| Large: sections, a part that repeats, or records of its own inside it | a page of its own, as a large form | a page of its own |
+| Short and fixed: one to four fields | a dialog over the page, `DSDialog`, 480 px | a sheet from the bottom of the screen |
+| One column, with more fields or a part that grows: category fields, sections, a list of people | a sheet at the side, `DSSheet`, 480 px (extent `MD`), with the page still in view beside it | the full screen |
+| Fields side by side: a form laid in two columns | a sheet at the side, `DSSheet`, 560 px (extent `LG`), asked with `columns` 2 on the entry overlay | the full screen |
+| A customer or another large record: sections, a part that repeats, or records of its own inside it | a page of its own, as a large form | a page of its own |
 
-- **A page chooses what an entry opens as by its size, from the table** (`RULE.SUPPORT.SURFACE.075` · GUIDE). A large entry has more to hold than a dialog or a sheet has room for. The two numbers, about five and about a dozen, are proposed and not yet confirmed.
+- **A page chooses what an entry opens as by its size, from the table** (`RULE.SUPPORT.SURFACE.075` · GUIDE). A form with fields side by side asks for the wider sheet with the entry overlay's `columns?: 1 | 2`, `columns` 2. An entry that opens over its page lets the person keep their place, and a large entry has more to hold than a dialog or a sheet has room for.
 - **A dialog on a phone MUST become a sheet from the bottom** (`RULE.SUPPORT.SURFACE.076` · MUST · skill:spn-surface/design). A phone has no room around a dialog. `DSDialog` already opens this way on a phone: it stands at the bottom of the screen and takes its full width. So a page writes nothing for it.
 - **A medium entry MUST take the full screen on a phone.** No part of the page would stay in view beside it.
 - **An entry is one panel, placed inside the dialog or the sheet** (`RULE.SUPPORT.SURFACE.077` · GUIDE). Its title and the action that closes it stand in its header. Its fields are its content. Its actions stand in its footer.
@@ -351,6 +365,8 @@ This ref states what frames a part of a page, what that frame looks like, and wh
 | `RULE.SUPPORT.SURFACE.260` | how the cells of a grid stand is `IDSGrid`, the columns required and the lines `NONE` where left out, and any unit that draws a grid of cells takes it whole |
 | `RULE.SUPPORT.SURFACE.247` | a section takes its room above and below from its size, and hands that size to what it holds |
 | `RULE.SUPPORT.SURFACE.254` | a section reaches the edges of its place; that a page does not put it in a panel, a card, an overlay or the nav column is advice |
+| `RULE.SUPPORT.SURFACE.415` | a section's fill may be a gradient of its own colour, in the one fill shape every surface takes |
+| `RULE.SUPPORT.SURFACE.416` | sections are told apart by a change of fill, never by a line |
 | `RULE.SUPPORT.SURFACE.261` | the paint of a frame is the one prop `surface`, an `IDSFrameSurface`, every frame is drawn by one drawer, and one resolver keeps the theme's value for a key left out |
 | `RULE.SUPPORT.SURFACE.282` | a raised frame takes `elevation`, a section takes `inset`, and the grid section takes `reveal`, which plays once |
 | `RULE.SUPPORT.SURFACE.293` | what a section holds takes its depth from what it does for the visitor, and a section never frames itself. It is advice |
