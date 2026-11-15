@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/13-providers.md",
-      "seen": "aabdbffa"
+      "seen": "438c3513"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/13-providers/",
@@ -23,7 +23,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/08-architecture-containers/",
-      "seen": "f25d1bb6"
+      "seen": "f140d30f"
     }
   ]
 }
@@ -51,6 +51,8 @@ A provider holds one design-system package and one showcase, `ts` today and `nat
 - A provider **MUST NOT** give a core unit a second name, and **MUST NOT** restate a rule. The name of a core unit and a rule belong to the book, once; a provider that invents either has made a second standard nobody else reads.
 - A unit's name and props are the standard's; what a stack builds the unit from is the stack's own and private. A stack **MAY** replace a primitive under a unit, and no page that uses the unit changes.
 - A provider **MAY** hold units of its own that help build apps, beside the core units (`RULE.SUPPORT.SURFACE.081` · MUST · skill:spn-surface/design). It names them and states them in its own docs, and each one keeps the rules of the book, as `architecture-components.md` states. Its showcase shows them marked as its own. They are no part of what every provider owes.
+
+- **A change to what a surface draws MUST be one change across four layers, and MUST be planned as one** (`RULE.SUPPORT.SURFACE.420` · MUST · skill:spn-surface/design): the book's construct that states the unit, the capability page that says how the stack realizes it, the showcase that shows it, and the code. A change that touches one layer names the others it moves, or says in a sentence why it moves none of them. This holds for every builder's UI library, a partner's own design system and showcase included, so a library never drifts from its book or its showcase from its code. The library's projects are read from each repository's declarations, never named.
 
 ## The claim that picks a provider — 🔮
 

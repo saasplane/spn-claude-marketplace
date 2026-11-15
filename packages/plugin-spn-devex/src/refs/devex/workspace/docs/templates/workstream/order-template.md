@@ -8,7 +8,7 @@ touches: ["{{repository:place}}"]       # what the part writes, so two orders ne
 decisions: [{{q<n>}}]                   # the cards the part rests on, by id
 facts: [{{f<n>}}]                       # the facts it rests on, by id, from the arc's facts.jsonl
 ---
-<!-- RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § A workstream works on one branch per repository · § Once an arc is decided, it runs in three passes per repository · § The arc · § An arc carries its specification, or names the note that holds it · § An order is one delegated execution, and every order follows the same rules · § The formats · § Orders name what they need by id, and a workflow runs the ready rows · § Work is sized by its kind, and fixes gather into a round
+<!-- RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § A workstream works on one branch per repository · § Drift and the passes · § The arc · § An arc carries its specification, or names the note that holds it · § An order is one delegated execution, and every order follows the same rules · § Five things an order never does, and every brief says so · § The formats · § Orders name what they need by id, and a workflow runs the ready rows · § Work is sized by its kind, and fixes gather into a round
      and docs/04-capabilities/02-support/02-apps/06-tests/README.md § The selective loop — what runs while work is under way
      and docs/04-capabilities/01-devex/01-function/02-scm.md § A workstream's branch, and its promotion
      This file carries rules it does not own. The chapters above are the source of truth.
@@ -41,6 +41,8 @@ parts. **Search with `grep` in Bash**, since you have no Grep tool. **Hand back*
 
 **A name, a shape or a construct no entry of this order holds is not yours to make up** (RULE.DEVEX.WORKSPACE.495): stop, return `needs-you`, and list each one under `unnamed:` in the report.
 
+**Never, in this order:** `sed -i`; `git stash`; a commit by anything but an explicit path, which only the coordinator makes; formatting a generated file; starting a demo app from anywhere but the main checkout.
+
 <!-- IN AN ARC THAT KEEPS A CHANGE SHEET (arcs/<arc>/sheet.json), THE ORDER NAMES ITS PART AND NOTHING ELSE ABOUT THE WORK:
      the files, the rules, the callers, the tiers and the book lines come from the part's entries, read first with
      `spn-devex workstream go show {{lead}} --part {{part}}`, and never from prose here. The launch check refuses an
@@ -62,10 +64,10 @@ source and commit. In a sheet arc, the rules and the book lines are the part's e
 
 ## Acceptance
 
-{{The part's acceptance: `spnutils apps check` on each node you touched, and the specs you changed or added, run
-narrowed under one fresh run name, each named id → `SUCCESS` read from the run file; an id the run does not name is
+{{The part's acceptance: `spnutils apps check` on each node you touched. You run no test: every tier runs once, in
+the repository's full run, which reads each named id → `SUCCESS`; an id it does not name is
 *nothing proves this*. A code part runs the formatter on the files it wrote before its proof. The
-go states one red check: the new cases run once against the base commit, before the patches apply, and each must fail there; then one full run per repository.
+go shows each new case red once, after the web tests pass, on a worktree at the base holding only the new test files; then one full run per repository.
 Stamp with `spn-devex behaviours stamp write {{fresh run name}} {{repo}}`, never with `--reach repository`.}}
 
 ---

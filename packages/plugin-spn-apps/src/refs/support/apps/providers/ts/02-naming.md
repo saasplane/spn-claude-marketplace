@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/10-providers/ts/02-naming.md",
-      "seen": "4e8c437c"
+      "seen": "3755478f"
     }
   ]
 }
@@ -84,7 +84,7 @@
 | a constructor config | `{Class}Config`, no `I` | `SPHttpClientAxiosConfig` |
 | an input command | `{Action}{Entity}Command` | `CreateUserCommand` |
 
-**Code follows this naming chapter, and a name that departs from it is renamed without asking** (`RULE.SUPPORT.APPS.232` · MUST · check:read-verb-naming). A unit takes its state's name and casing, a method starts with an action verb, and a boolean reads as yes or no, such as `isActive`; the module chapter's section *Fields: how a state names and types them* (`module/README.md`) says how a state names and types them. An enum type ends in `_type`, a reference column is `<table>_id`, and no alias is a single letter. A stray name costs every later reader, so the rename is made at once.
+**Code follows this naming chapter, and a name that departs from it is renamed without asking** (`RULE.SUPPORT.APPS.232` · MUST · check:read-verb-naming). A unit takes its state's name and casing, a method starts with an action verb, and a yes or no is one of three kinds: a field describing a state reads `is`, `has` or `can` plus the word (`isLocked`, `hasLegalDetails`, `canInvite`), and its column is the snake_case of the field (`is_locked`, `has_legal_details`); a field that is an instruction stays a verb phrase (`keepSignedIn`, `notifyCandidate`, `showSalary`, `requireDigits`), its column the snake_case of it; and the lifecycle is the column `active`, read as the contract field `isActive`, as `created_at` and `updated_at` are fixed names. So `hidden` becomes `isHidden`, `consentConfirmed` becomes `isConsentConfirmed`, and a `locked` column becomes `is_locked`; the module chapter's section *Fields: how a state names and types them* (`module/README.md`) says how a state names and types them. An enum type ends in `_type`, a reference column is `<table>_id`, and no alias is a single letter. A stray name costs every later reader, so the rename is made at once.
 
 ### Decorators
 
