@@ -638,7 +638,8 @@ export function goFaults(data: unknown, where = "go.json"): string[] {
     if (typeof part.id === "string") { if (ids.has(part.id)) out.push(`${label} is written twice`); ids.add(part.id); }
     if (Array.isArray(part.entries)) {
       const hashes = typeof part.signature === "string" && part.signature ? part.signature.split(".").length : 0;
-      if (!part.entries.length && part.work !== "TEST" && part.work !== "RELEASE" && !/^(draw|publish)-/.test(String(part.id))) out.push(`${label} holds no entry`);
+      // A pins part reading an upstream release holds no entry of its own (E2207): it moves the pins that release ships.
+      if (!part.entries.length && part.work !== "TEST" && part.work !== "RELEASE" && !/^(draw|publish|pins)-/.test(String(part.id))) out.push(`${label} holds no entry`);
       if (typeof part.signature === "string" && hashes !== part.entries.length)
         out.push(`${label}'s \`signature\` holds ${hashes} hashes, and the part holds ${part.entries.length} entries`);
       for (const entry of part.entries) {
@@ -668,6 +669,8 @@ export function renameToWork(record: unknown): boolean {
   for (const old of ["altitude", "pass"] as const) {
     if (!(old in record)) continue;
     const value = record[old];
+    // A part's declared pass (`book`, `server-tests`) is the field it now records, never an old name of its work (`BASELINE`, `CODE`): it stays.
+    if (old === "pass" && !(typeof value === "string" && /^[A-Z_]+$/.test(value))) continue;
     if (record.work === undefined) record.work = typeof value === "string" ? (OLD_WORK[value] ?? value) : value;
     delete record[old];
     changed = true;
