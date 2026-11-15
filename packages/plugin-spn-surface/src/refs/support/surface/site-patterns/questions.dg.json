@@ -1,7 +1,7 @@
 {
  "kind": "skeleton",
  "title": "Questions",
- "caption": "A DSSectionContainer, color BASE, holds one DSFeature at CONTAINER, START: its title and description, and its contentNode a bordered DSAccordionGroup of three to eight questions, the first one open over its short answer. The accordion runs by the task pattern Disclose. On a phone it stands as it is.",
+ "caption": "A DSSectionContainer, color BASE, holds one DSFeature at CONTAINER, START: its title and description, and its contentNode a bordered DSAccordionGroup of three to eight questions, the first one open over its short answer. The accordion runs by the task pattern Disclose. On a phone it stands as it is. The page that holds this section is wrapped once in DSSiteLayout.",
  "layout": {
   "type": "TOPNAV",
   "body": {

@@ -1,7 +1,7 @@
 {
  "kind": "skeleton",
  "title": "Hero, the picture beside",
- "caption": "A DSSectionContainer at size LG, color BASE, holds one DSFeature at pageLevel PAGE. From a tablet up it splits, as SPLIT_END does: at the start the words, a BADGE eyebrow for the page's state, the title, the description and up to four BADGE facts for the stack, then the one SOLID primary and one OUTLINE action; at the end the one picture the title names, as mediaNode. The picture keeps the frame of its kind: a product is frames MEDIA, surface raised, elevation LG. On a phone the words, the facts and the buttons come first, one button under the other, then the picture.",
+ "caption": "A DSSectionContainer at size LG, color BASE, holds one DSFeature at pageLevel PAGE. From a tablet up it splits, as SPLIT_END does: at the start the words, a BADGE eyebrow for the page's state, the title, the description and up to four BADGE facts for the stack, then the one SOLID primary and one OUTLINE action; at the end the one picture the title names, as mediaNode. The picture keeps the frame of its kind: a product is frames MEDIA, surface raised, elevation LG. On a phone the words, the facts and the buttons come first, one button under the other, then the picture. The page that holds this section is wrapped once in DSSiteLayout.",
  "layout": {
   "type": "TOPNAV",
   "body": {

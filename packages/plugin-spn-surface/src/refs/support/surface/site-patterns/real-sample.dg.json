@@ -1,7 +1,7 @@
 {
  "kind": "skeleton",
  "title": "Real sample, the code beside",
- "caption": "A DSSectionContainer at size MD, color DEFAULT with inset, since code read closely is another kind of reading than its neighbours', holds one DSFeature. Its mediaNode is a DSCodeBlockView titled with its file, flat in its own frame and never raised. Short, tall code stands beside the words, as SPLIT_END does, and verticalAlign TOP stands the words at the top of their column. The lines are the file's own, with … where lines are cut. Size LG is for a sample that is the page's argument. On a phone the words, then the code.",
+ "caption": "A DSSectionContainer at size MD, color DEFAULT with inset, since code read closely is another kind of reading than its neighbours', holds one DSFeature. Its mediaNode is a DSCodeBlockView titled with its file, flat in its own frame and never raised. Short, tall code stands beside the words, as SPLIT_END does, and verticalAlign TOP stands the words at the top of their column. The lines are the file's own, with … where lines are cut. Size LG is for a sample that is the page's argument. On a phone the words, then the code. The page that holds this section is wrapped once in DSSiteLayout.",
  "layout": {
   "type": "TOPNAV",
   "body": {

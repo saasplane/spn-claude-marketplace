@@ -399,5 +399,23 @@ console.log("=== docs sds repoint — the hash moves with the version");
   writeFileSync(join(STYLES, "versions.json"), `${JSON.stringify(listed, null, 2)}\n`);
 }
 
+console.log("=== docs sds cut — the fonts sit beside the stylesheet");
+{
+  const market = join(SCRATCH, "fonts-marketplace");
+  const styles = join(market, "packages", "plugin-spn-devex", "src", "styles");
+  for (const [name, body] of Object.entries(BUILT)) put(join(styles, name), body);
+  put(join(styles, "versions.json"), "{}\n");
+  mkdirSync(join(market, "public"), { recursive: true });
+  const woff = Buffer.from([0x77, 0x4f, 0x46, 0x32, 0x00, 0xff]);
+  put(join(styles, "fonts", "Geist-Variable.woff2"), woff);
+  put(join(styles, "fonts", "OFL.txt"), "OFL");
+  const run = sds("cut", "2.0.0", "--root", market);
+  const folder = join(market, "public", "assets", "docs", "2.0.0");
+  ok("[MKT.SCRIPTS.98] cut copies the fonts folder beside the stylesheet, byte for byte, and lists no font in the hashes",
+    run.code === 0 && readFileSync(join(folder, "fonts", "Geist-Variable.woff2")).equals(woff)
+      && readFileSync(join(folder, "fonts", "OFL.txt"), "utf8") === "OFL"
+      && JSON.stringify(Object.keys(cutVersions(styles)["2.0.0"]).sort()) === JSON.stringify(Object.keys(BUILT).sort()), run.out);
+}
+
 console.log(failed ? `\n  ${failed} of ${total} FAILED — t-sds` : `\n  all ${total} passed — t-sds`);
 process.exit(failed ? 1 : 0);

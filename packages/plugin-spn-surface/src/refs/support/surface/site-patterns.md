@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/01-common/03-site-patterns.md",
-      "seen": "0886952e"
+      "seen": "a76fc31f"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/02-web/03-site-patterns.md",
@@ -36,6 +36,7 @@ Read this before you design or review a page of a site. A site's page is a run o
 **A site pattern says: for this kind of content, show the section this way** (`RULE.SUPPORT.SURFACE.340` · MUST · skill:spn-surface/design). It is an arrangement of units the design system already has, and the design system builds nothing for one.
 
 - **A section of a site's page follows one of the site patterns below, and is built from `DSSectionContainer`, `DSFeature` and `DSFeatureGridSectionContainer` and their props** (`RULE.SUPPORT.SURFACE.340` · MUST · skill:spn-surface/design). A pattern names no component of one site's own. A partner's agent has the design system and this plugin, and never another site's code, so a look stated in a site's own component is a look it cannot build.
+- **A page whose sections follow site patterns MUST be wrapped once in `DSSiteLayout`** (`RULE.SUPPORT.SURFACE.196` · MUST · skill:spn-surface/design). The wrapper marks the page as a site's, a marketing page or a page of docs in a web app, so its display steps draw in the theme's display family; a page that follows an app pattern or a task pattern is never wrapped, a public sign-in page included.
 - **A section's pattern and its look follow from what the section holds, and not from where it stands on the page** (`RULE.SUPPORT.SURFACE.343` · MUST · skill:spn-surface/design). Every partner builds around their own content, so a rule by position, such as *every second section is filled*, fits nobody's page.
 - **Every pattern names the kinds of person it serves in its For line** (`RULE.SUPPORT.SURFACE.332` · MUST · skill:spn-surface/design). A site's page is read by a Visitor, who is deciding, or a Learner, who came to learn or to get a thing working (`standards-core.md`, *Who an app is for*).
 

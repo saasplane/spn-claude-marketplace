@@ -8,7 +8,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/",
-      "seen": "73f93d32"
+      "seen": "9571fe16"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/11-delivery-library/01-common/01-library.md",
@@ -23,7 +23,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/10-architecture-app/01-common/02-settings-and-theme.md",
       "section": "The theme",
-      "seen": "aa375042"
+      "seen": "d0267dc8"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/01-common/01-task-patterns.md",

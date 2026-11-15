@@ -1,7 +1,7 @@
 {
  "kind": "skeleton",
  "title": "Doors",
- "caption": "A DSSectionContainer, color BASE, holds one DSFeature whose items are doors: boxed and raised on the fill that stands off the section, items.surface color DEFAULT, raised, elevation MD. Each door opens a page of its own, so its picture is a mark, media MARK, and it ends on ARROW_RIGHT inside the site or ARROW_UP_RIGHT where it leaves it. The GRID's columns follow the count, as for Points: 3/2/1 for three. A door never stands on a filled section. On a phone one door under another.",
+ "caption": "A DSSectionContainer, color BASE, holds one DSFeature whose items are doors: boxed and raised on the fill that stands off the section, items.surface color DEFAULT, raised, elevation MD. Each door opens a page of its own, so its picture is a mark, media MARK, and it ends on ARROW_RIGHT inside the site or ARROW_UP_RIGHT where it leaves it. The GRID's columns follow the count, as for Points: 3/2/1 for three. A door never stands on a filled section. On a phone one door under another. The page that holds this section is wrapped once in DSSiteLayout.",
  "layout": {
   "type": "TOPNAV",
   "body": {
