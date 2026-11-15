@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/03-platform/02-modules/README.md",
-      "seen": "39a71611"
+      "seen": "69e26146"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/03-platform/02-modules/",
-      "seen": "bbf056c0"
+      "seen": "483f7569"
     }
   ]
 }
@@ -41,6 +41,10 @@ The seven are numbered in dependency order in the foundation's own construct cha
 
 Tenancy, Identity, Data and Trust and Surfaces are platform core, not part of this set — named here only because a module reads one of them. This ref does not restate what they are.
 
+Beside the seven the platform ships one domain module, HIR (hiring). It is the platform's one product module: it sells something, so it is not part of the standard library, and a platform composes it only when its product is hiring. It depends on Entities and names it, as any module names what it reads.
+
+**A module powers a platform feature and makes it filterable, and gets no copy of a platform screen** (`RULE.PLATFORM.MODULES.034` · SHOULD · skill:spn-apps/implement). The audit log, files, notifications and schedules stay the platform's own screens unless a partner asks for a copy. A module's data shows on the platform's screen through a filter the server already takes (record type, person, date), and no module-specific page is built for it. Two screens over one record drift apart. The audit log is the worked example: it takes record type, person and date filters on the one audit screen, and hiring has no Activity > Hiring page.
+
 ## What adopting one commits the platform to
 
 Adopting a module is not free of obligation. You inherit each one's rule the moment the platform depends on its package, and here is the cost if you write code that routes around it instead of following it.
@@ -73,6 +77,7 @@ The table above compresses each module to one commitment. Here is what actually 
 
 **Notifications**
 - Trigger a catalog action by name. Do not compose a message at the call site.
+- A sending module hands Notifications its own group, its actions and their default emails, and Notifications applies them (`RULE.PLATFORM.MODULES.033` · MUST · skill:spn-apps/implement). Do not write Notifications' tables from a module's migration, and do not expect Notifications to seed a catalog for a product. Today the contribution type is empty and Notifications refuses anything else; the hook grows to accept a group, actions and default templates. A contribution is applied once for each module and version, so a repeat changes nothing, and a module in another service sends it through the remote-migration route, the same way for HIR, IAM, ORG and a partner's module.
 - A configuration is drafted, then published, and only the published version renders. Do not let a draft take effect.
 - A locked action serves the platform's own wording to everybody, and that is the owning module's decision — independent of whether an organization's category is enabled for customization at all. Do not reword a locked action because customization happens to be on.
 - Reach every channel through the vendor seam. Do not call a vendor's own library.
@@ -115,7 +120,7 @@ Every module leaves exactly one door open for you to extend it through, and it i
 
 **You may:**
 - register a new entity type in the Reference Data registry, naming the owning module, and opt it into the closed set of cross-cutting patterns
-- add a new catalog action to Notifications, and decide whether the owning module locks its wording against organization override
+- add a new catalog action to Notifications, handed over as the module's own group, actions and default emails, and decide whether the owning module locks its wording against organization override
 - declare custom field definitions and tag definitions for a record type once that type has opted in, through Entities
 - schedule jobs against their own destinations and retry policies, through Jobs
 - configure which vendor provider a channel or a store uses, per organization — that is estate configuration, never code

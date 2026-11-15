@@ -529,11 +529,14 @@ console.log("\n=== a brief's acceptance lists each test id beside its file (MKT.
 {
   const world = await dataWorkspace("go-acceptance", { rows: [{ id: "1", parent: "N001", title: "build it", kind: "change", repo: "spn-x", work: "CODE", blockedBy: [], touches: [], state: "waiting", entries: ["E1"] }] });
   put(world.root, "spn-x/tests/t-thing.mjs", "// proves [T.E1.01]\n");
+  put(world.root, "spn-x/package.json", "{}");
   cli(world.root, ["workstream", "fact", "write", "N001", "--source", "spn-x/a.ts", "--fact", "a is 1", "--used-by", "1"]);
   writeFileSync(join(world.ws, "arcs", "N001", "sheet.json"), JSON.stringify(sheetOf([entry("E1", "spn-x:src/b.ts")]), null, 2));
   cli(world.root, ["workstream", "go", "write", "N001"]);
   const brief = readFileSync(join(world.ws, "notes", "N001", "orders", "code-spn-x-q1-1.md"), "utf8");
-  ok("[MKT.SCRIPTS.453] the acceptance reads `<ID> · node <file>`", brief.includes("`T.E1.01 · node tests/t-thing.mjs`"), brief.slice(brief.indexOf("## Acceptance"), brief.indexOf("## Report")));
+  const acceptance = brief.slice(brief.indexOf("## Acceptance"), brief.indexOf("## Report"));
+  ok("[MKT.SCRIPTS.562] (RULE.DEVEX.WORKSPACE.507) the acceptance is a type check of the touched package, and carries no spec run",
+    acceptance.includes("pnpm exec tsc --noEmit -p .") && acceptance.includes("tiers run once, in the full run") && !acceptance.includes("node tests/t-thing.mjs") && !acceptance.includes("never a whole suite"), acceptance);
 }
 
 console.log("\n=== report write records a part's cost from the usage rows (MKT.SCRIPTS.454)");
@@ -707,6 +710,12 @@ console.log("\n=== write: a change with no patch and a step with no command or p
   const judged = cli(world.root, ["workstream", "go", "write", "N001"]);
   ok("[MKT.SCRIPTS.532] a judged change with no patch is refused the same way, and a step with no proof by name",
     judged.code === 1 && judged.out.includes("E1 is a change with no patch") && judged.out.includes("E2 is a step with no command or proof"), judged.out);
+  for (const file of ["spn-x:packages/mod-web/src/Page.tsx", "spn-x:packages/mod/tests/unit/t-thing.mjs", "spn-x:apps/web/src/a.ts"]) {
+    writeFileSync(sheetFile, JSON.stringify(sheetOf([entry("E1", file, { kind: "change" }), entry("E2", "spn-x:src/k2.ts", { kind: "step", command: "gen", proof: "matches" })]), null, 2));
+    const refused = cli(world.root, ["workstream", "go", "write", "N001"]);
+    ok(`[MKT.SCRIPTS.562] (RULE.DEVEX.WORKSPACE.502) ${file.split(":")[1]} with no patch is refused by go write, with no warning in its place`,
+      refused.code === 1 && refused.out.includes("E1 is a change with no patch") && !existsSync(join(world.ws, "arcs", "N001", "go.json")), refused.out);
+  }
   withKinds({}, {});
   const plain = cli(world.root, ["workstream", "go", "write", "N001"]);
   ok("[MKT.SCRIPTS.532] entries with no kind read as before: no kind refusal", !plain.out.includes("is a change with no patch") && !plain.out.includes("is a step with no command"), plain.out);

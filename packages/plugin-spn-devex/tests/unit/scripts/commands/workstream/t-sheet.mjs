@@ -677,7 +677,7 @@ console.log("\n=== kinds: a change or a step (MKT.SCRIPTS.531, .533)");
   ok("[MKT.SCRIPTS.531] a change with a patch is no finding", !kept.out.includes("E1 is a change"), kept.out);
   for (const file of ["spn-x:packages/mod-web/src/Page.tsx", "spn-x:packages/mod/tests/unit/t-thing.mjs", "spn-x:apps/web/src/a.ts"]) {
     const warned = check([entry("E1", { file, kind: "change" })]);
-    ok(`[MKT.SCRIPTS.531] ${file.split(":")[1]} with no patch is a warning, never a finding`, warned.out.includes("warning · E1 is a change and has no patch") && !warned.out.split("\n").some((line) => line.startsWith("E1 is a change")), warned.out);
+    ok(`[MKT.SCRIPTS.562] ${file.split(":")[1]} with no patch is refused as a finding, never a warning`, warned.out.split("\n").some((line) => line.startsWith("E1 is a change and has no patch")) && !warned.out.includes("warning ·"), warned.out);
   }
   const bareStep = check([entry("E1", { file: server, kind: "step" })]);
   ok("[MKT.SCRIPTS.531] a step with no command and no proof is a finding", bareStep.out.includes("E1 is a step and has no command or no proof"), bareStep.out);
@@ -691,7 +691,7 @@ console.log("\n=== kinds: a change or a step (MKT.SCRIPTS.531, .533)");
   const asStep = check([entry("E1", { file: generated, kind: "step", command: "spnutils apps codegen", proof: "the client file now matches" })]);
   ok("[MKT.SCRIPTS.533] a generated file as a step needs no patch", !asStep.out.includes("E1 is a"), asStep.out);
   const judgedOnly = check([entry("E1", { file: server, kind: "change", judged: true })]);
-  ok("[MKT.SCRIPTS.531] a judged change with no patch is named once", judgedOnly.out.split("\n").filter((line) => line.startsWith("E1 is ") && line.includes("no patch")).length === 1, judgedOnly.out);
+  ok("[MKT.SCRIPTS.562] a judged change with no patch is a finding, named once", judgedOnly.out.split("\n").filter((line) => line.startsWith("E1 is ") && line.includes("no patch")).length === 1, judgedOnly.out);
   const edited = cli(w.root, ["workstream", "sheet", "edit", "N001", "E1", "--kind", "step", "--command", "spnutils apps codegen", "--proof", "the client matches"]);
   const back = JSON.parse(readFileSync(sheetPath, "utf8")).entries[0];
   ok("[MKT.SCRIPTS.531] edit records the kind, the command and the proof", edited.code === 0 && back.kind === "step" && back.command === "spnutils apps codegen" && back.proof === "the client matches", edited.out);

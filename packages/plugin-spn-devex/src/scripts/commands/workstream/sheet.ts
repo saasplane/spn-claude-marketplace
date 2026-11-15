@@ -606,26 +606,20 @@ export function entryKind(entry: Pick<SheetEntry, "kind">): "change" | "step" | 
   return entry.kind === "change" || entry.kind === "step" ? entry.kind : null;
 }
 
-/** Whether a file is web or test code: a `web` or `*-web` folder, a tests folder, a test or spec file. Such a change with no patch is warned, not refused. */
-export function isWebOrTest(file: string): boolean {
-  const path = file.slice(file.indexOf(":") + 1);
-  return /(^|\/)(web|tests?|__tests__)(\/|$)|(^|\/)[^/]*-web(\/|$)|\.(test|spec)\.[cm]?[jt]sx?$|(^|\/)t-[^/]+\.mjs$/.test(path);
-}
-
 /** A step is whole with a command and a proof, each a line of words. */
 export const stepIsWhole = (entry: Pick<SheetEntry, "command" | "proof">): boolean =>
   typeof entry.command === "string" && !!entry.command.trim() && typeof entry.proof === "string" && !!entry.proof.trim();
 
 /**
- * What a patch owes an entry of a declared kind: "refuse" for a hand-written change outside web and tests, "warn" for web and tests,
+ * What a patch owes an entry of a declared kind: "refuse" for every hand-written change, web and tests included (RULE.DEVEX.WORKSPACE.502),
  * and null where it owes none (it has a patch, it is a step, it has no kind, or it is a generated file, which is a finding of its own).
  */
-export function patchOwed(entry: SheetEntry): "refuse" | "warn" | null {
+export function patchOwed(entry: SheetEntry): "refuse" | null {
   if (entryKind(entry) !== "change" || entry.patch || entryWork(entry) === "GENERATED") return null;
-  return isWebOrTest(entry.file) ? "warn" : "refuse";
+  return "refuse";
 }
 
-/** The findings of the entry kinds. A judged change with no patch is named once, by the judged line. */
+/** The findings of the entry kinds. A change with no patch is named here, judged or mechanical. */
 function kindFindings(arc: string, entries: readonly SheetEntry[]): string[] {
   const out: string[] = [];
   for (const entry of entries) {
@@ -633,17 +627,9 @@ function kindFindings(arc: string, entries: readonly SheetEntry[]): string[] {
     if (!kind) continue;
     if (kind === "step" && !stepIsWhole(entry)) out.push(`${entry.id} is a step and has no command or no proof: \`sheet edit ${arc} ${entry.id} --command "…" --proof "…"\``);
     if (kind === "change" && !entry.patch && entryWork(entry) === "GENERATED") out.push(`${entry.id} is a generated file and a change: make it a step that runs its generator, with its command and proof`);
-    if (patchOwed(entry) === "refuse" && entry.judged !== true) out.push(`${entry.id} is a change and has no patch: \`sheet patch ${arc} ${entry.id}\` keeps it`);
+    if (patchOwed(entry)) out.push(`${entry.id} is a change and has no patch: \`sheet patch ${arc} ${entry.id}\` keeps it`);
   }
   return out;
-}
-
-/** What `sheet check` warns of and the go does not refuse: a web or test change with no patch, until the patches are shown to pay. */
-export function sheetWarnings(ws: string, arc: string): string[] {
-  const sheet = readSheet(ws, arc);
-  if (!sheet || !Array.isArray(sheet.entries)) return [];
-  return sheet.entries.filter((entry) => patchOwed(entry) === "warn" && entry.judged !== true)
-    .map((entry) => `${entry.id} is a change and has no patch: \`sheet patch ${arc} ${entry.id}\` keeps it`);
 }
 
 const NAMED_BLOCK = /<pre\b[^>]*\bdata-entry="(E\d+)"[^>]*>([\s\S]*?)<\/pre>/g;
@@ -687,7 +673,7 @@ export function sheetFindings(ws: string, arc: string): string[] {
   out.push(...blockFindings(ws, arc, entries));
   // A JUDGED ENTRY KEEPS ITS CHANGE AND ITS THINKING: a diff from `sheet patch` and a `trace`.
   for (const entry of entries.filter((one) => one.judged === true)) {
-    if (!entry.patch) out.push(`${entry.id} is judged and has no patch: \`sheet patch ${arc} ${entry.id}\` keeps its change`);
+    if (!entry.patch && !patchOwed(entry)) out.push(`${entry.id} is judged and has no patch: \`sheet patch ${arc} ${entry.id}\` keeps its change`);
     if (typeof entry.trace !== "string" || !entry.trace.trim()) out.push(`${entry.id} is judged and has no trace: \`sheet edit ${arc} ${entry.id} --trace "…"\``);
   }
   // A RELEASE or PROOF row names its files through no entry, so it is never this finding.
@@ -780,7 +766,6 @@ function check(args: string[]): number {
   const root = workspaceRoot(resolve(process.env.SPN_WORKSPACE ?? process.cwd()));
   const measured = root ? budgetLines(root, readSheet(ws, arc) as Sheet) : { lines: [], findings: [] };
   for (const line of measured.lines) console.log(line);
-  for (const line of sheetWarnings(ws, arc)) console.log(`warning · ${line}`);
   const findings = [...sheetFindings(ws, arc), ...measured.findings];
   if (!findings.length) { console.log(`${arc} sheet whole`); return 0; }
   for (const line of findings) console.log(line);

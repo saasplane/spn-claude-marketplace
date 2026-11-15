@@ -11,7 +11,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/03-module/01-server/01-contract/01-states.md",
-      "seen": "38e6934b"
+      "seen": "3443fda0"
     }
   ]
 }
@@ -32,6 +32,7 @@ A contract is a chain of six constructs: **Contract** → **Services** → **Met
 - **Context the runtime already authenticated never rides the command body.** The caller's organization and the caller's own identity come from the auth context. (Deliberate system-path exceptions — where the full actor rides the command — are documented at the contract, not assumed.)
 
 - **A command carries the caller's intent only — never the entity's stored configuration shape.** Server-derived data (masked displays, provider selection, minted secrets and their parameters) is computed server-side and never appears on a command. A client stubbing placeholder values for such fields is the signal the command shape is wrong. Where the input varies by variant, the command family itself is discriminated, each variant carrying only that operation's fields. Shapes designed as pure write input (input types; authored configurations whose secrets ride the write-only half) may embed.
+- **A state names and types its fields by a few set forms.** A field that is on or off is a boolean read `is`, `has` or `can` plus the word, and a status enum never stands in for it (`RULE.SUPPORT.APPS.232`, in the naming chapter); the job schedule's `isActive` carries pause, so it has no CANCELLED state. A field that may be absent is `T | null`, never optional. A shared shape is read before a field is written: `SPAddress` or `SPAddressRegion`, `SPCurrencyCodeType`, `SPCountryCodeType`, `SPLanguageCodeType`, from `support-contract-ts/src/contract/states/global`. A value that comes in kinds is a base plus `mtype` plus one carrier for each kind, never two nullable fields. A field that holds a person's data ends in one of the closed forms (`RULE.SUPPORT.APPS.225`), and an audit actor is never null.
 - **States are backward-compatible.** Once published, a field is never removed, retyped, or repurposed. New optional fields may be added at any time. Keep one consistent shape for success, failure, and effects.
 - **Events are immutable, minimal, append-only.** Past-tense names (`<Concern>Event`); identifiers, timestamps, type, correlation — never a snapshot, which is wrong the moment its source changes. Write corrections as new events. The queue carries events only — never commands, never states.
 - **Enums are stable and additive.** New values may be added; existing values are never renamed or reused; consumers tolerate unknown values from a newer producer.
