@@ -56,7 +56,7 @@ description: What proves a behaviour, at which tier, and what a passing suite do
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "section": "An order is one delegated execution, and every order follows the same rules",
-      "seen": "8943136e"
+      "seen": "f7f191d7"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/06-tests/README.md",
@@ -188,6 +188,10 @@ A **double** stands in for a collaborator and belongs to the unit tier only; a *
 
 **While work is under way, run the cases of what you touched, and no whole tier** (`RULE.DEVEX.WORKSPACE.207` · MUST · check:doc-check). A whole tier answers a question about every row a node holds, and a change to one module asks about a few of them. At the end of the step the tiers it touched run whole for the nodes it touched, once, and the push is refused without them. The loop holds for unit, component, contract and integration, in every kind. Journeys stay outside it, because they need a quiesced running stack.
 
+**An order's gate is `spnutils apps check` on each node it touched, and a part runs no test** (rule RULE.DEVEX.WORKSPACE.207 · MUST · check:doc-check). Documents come first, and then source. Then the agent type-checks each node it touched and stops. It runs no spec, no whole tier, no browser walk and no probe, because a tier run between passes repeats minutes of work for each defect it shows; every tier runs once, in the repository's full run, and a new case is shown red as the workstream chapter's Red-first tests section says. The arc's `PROOF` row keeps its place as the final re-check.
+
+**Five things an order never does, and every brief says so** (rule RULE.DEVEX.WORKSPACE.515 · MUST · skill:spn-devex/execute). An agent never rewrites a file with `sed -i`; it changes a file with the edit tool. It never runs `git stash`, because a stash takes the shared checkout's work from whoever is writing in it, and only the coordinator names one (`RULE.DEVEX.WORKSPACE.481`). It never commits: the coordinator commits by explicit path, so one agent's commit never carries another agent's file. It never formats a generated file, since a generated file is changed only by running the command that writes it. It starts a demo app only from the main checkout, through `spnutils apps dev` (`RULE.SUPPORT.APPS.264`), never from a worktree.
+
 **Count what you touched in behaviour rows, never in folders.** The capability page that claims the changed code names the rows it realizes, and each row names its cases through the id in their titles.
 
 | What changed | What it touched |
@@ -214,7 +218,7 @@ Everything after `--` reaches the runner unchanged, so the words are the runner'
 
 **Stamp from the freshly named run, and never with `--reach repository`.** The stamp writes the rows that run names whose status changed, and leaves every other row as it is: a row the run only confirms keeps its `Updated at` (`RULE.DEVEX.WORKSPACE.306` · MUST · skill:spn-devex/execute). `--reach repository` says the run was the whole of its tiers, and it sets every row the run did not name back to `PLANNED`. So a `SUCCESS` row says that its own case passed when that case last ran, and `Updated at` says when it reached that status.
 
-**State acceptance as named behaviour ids, read as `SUCCESS` from the run file.** It is never an exit code: the runner exits clean when a selection matches no case, so a mistyped selection passes. It is never a count of a whole tier, which only a whole run can meet. **Report a selection that matched no case as *nothing proves this*.**
+**State acceptance as named behaviour ids, read as `SUCCESS` from the run file** (rule RULE.DEVEX.WORKSPACE.368 · MUST · skill:spn-devex/execute). The order names the ids its change must prove. A part runs no test, so the ids are read as `SUCCESS` from the repository's full run, and the part's own proof is the type-check its pass names. It is never an exit code: the runner exits clean when a selection matches no case, so a mistyped selection passes. It is never a count of a whole tier, which only a whole run can meet. **Report an id the full run does not name as *nothing proves this*.**
 
 ## When a whole tier runs
 

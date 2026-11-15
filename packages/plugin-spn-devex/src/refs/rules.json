@@ -12063,6 +12063,11 @@
           "plugin": "spn-devex",
           "path": "skills/ideate/SKILL.md",
           "heading": "The rules this step holds"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/test/SKILL.md",
+          "heading": "The selective loop: run the cases of what you touched"
         }
       ]
     },
@@ -19587,6 +19592,11 @@
           "plugin": "spn-devex",
           "path": "refs/devex/workspace/workstream.md",
           "heading": "An order is one delegated execution, and every order follows the same rules"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/test/SKILL.md",
+          "heading": "The selective loop: run the cases of what you touched"
         }
       ]
     },

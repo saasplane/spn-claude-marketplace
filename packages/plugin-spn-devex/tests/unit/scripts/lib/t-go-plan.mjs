@@ -561,5 +561,62 @@ const entriesPlan = (refs) => goFaults({ ...casePlan, parts: [{ ...casePlan.part
 same("[MKT.SCRIPTS.585] a plan whose parts name follow-ups/E3026 and ideate/E4 holds to the schema", entriesPlan(["follow-ups/E3026", "ideate/E4"]), []);
 same("[MKT.SCRIPTS.585] an entry follow-ups/X1 still fails the schema", entriesPlan(["follow-ups/X1"]).length, 1);
 
+// A plan shaped like 040's follow-ups (plugins 0.132.0): the book, a GENERAL marketplace with no pins pass that restates it, an APPS·TS
+// library and an APPS·TS platform whose table runs its baseline before its book and puts the generated files in its release.
+const tsPasses = [pass("baseline", []), pass("book", ["book"], ["baseline"]), pass("pins", ["pins"], ["book"]), pass("universal", ["TOOLCHAIN", "SUPPORT_UNIVERSAL"], ["pins"]),
+  pass("server", ["SUPPORT_SERVER", "MODULE_SERVER", "APP_SERVER", "APP_UTILITY"], ["universal"]), pass("client", ["CLIENT_API"], ["server"]), pass("web", ["SUPPORT_WEB", "MODULE_WEB", "APP_WEB"], ["client"]),
+  pass("server-tests", ["server tests"], ["web"]), pass("web-tests", ["web tests"], ["server-tests"]), pass("commit", [], ["web-tests"]), pass("full", [], ["commit"]), pass("release", ["generated"], ["full"])];
+const generalPasses = [pass("restates", ["book"]), pass("source", ["source"], ["restates"]), pass("tests", ["tests"], ["source"]), pass("commit", ["source"], ["tests"]),
+  pass("full", ["source", "tests"], ["commit"]), pass("release", ["source", "tests"], ["full"]), pass("install", ["source", "tests"], ["release"])];
+const bookPasses = [pass("book", ["book"]), pass("docs-check", ["book"], ["book"]), pass("release", ["book"], ["docs-check"])];
+const fuMap = { order: ["spn-foundation", "mkt", "lib", "plat"], unplaced: [], repos: [
+  { repo: "spn-foundation", world: "FOUNDATION", stack: null, nodes: [], consumes: [], unread: null },
+  { repo: "mkt", world: "GENERAL", stack: null, nodes: [], consumes: [{ repo: "spn-foundation", because: "it restates spn-foundation/docs/a.md" }], unread: null },
+  { ...libRow, consumes: [] }, { ...platRow, consumes: [{ repo: "lib", because: "it depends on @x/lib" }] }] };
+const fuPasses = (repo) => (repo === "spn-foundation" ? bookPasses : repo === "mkt" ? generalPasses : tsPasses);
+const patched = { patch: { file: "patches/x.diff", base: "abc" } };
+const fuEntries = [mapEntry("E1", "spn-foundation:docs/a.md"),
+  mapEntry("E2", "mkt:packages/p/refs/a.md", { then: ["E1"] }), mapEntry("E3", "mkt:packages/p/src/x.ts", { then: ["E1"], ...patched }), mapEntry("E4", "mkt:package.json", { then: ["E1"], ...patched }),
+  mapEntry("E5", "mkt:packages/p/tests/t-x.mjs", { op: "create" }),
+  mapEntry("E6", "lib:packages/a/src/y.ts", patched),
+  mapEntry("E7", "plat:docs/b.md"), mapEntry("E8", "plat:docs/c.md", { decidedBy: ["Q2"] }), mapEntry("E9", "plat:apps/s/src/a.ts", { then: ["E6", "E1"], ...patched }),
+  mapEntry("E10", "plat:apps/w/tests/b.test.tsx", { op: "create" }), mapEntry("E11", "plat:apps/s/src/generated/z.ts", { decidedBy: ["Q2"], then: ["E9"] }), mapEntry("E12", "plat:apps/s/src/generated/w.ts")];
+const fuRows = [{ id: "1", work: "DOCS", repo: "spn-foundation", state: "landed", entries: ["E1"] }, { id: "2", work: "DOCS", repo: "plat", state: "waiting", entries: ["E7", "E8"] },
+  { id: "3", work: "DOCS", repo: "mkt", state: "waiting", entries: ["E2"] }, { id: "4", work: "PROOF", repo: "mkt", state: "waiting", entries: [] }];
+const fuScope = [{ arc: "follow-ups", sheet: mapSheet(fuEntries, ["lib", "plat"]), landed: ["E1"], proofs: ["mkt"], data: { status: "DECIDED", rows: fuRows } }];
+const fuPlan = deriveGo(fuScope, { map: fuMap, passes: fuPasses });
+const fuIds = fuPlan.parts.map((one) => one.id);
+const fuWaits = Object.fromEntries(fuPlan.parts.map((one) => [one.id, one.waitsOn]));
+const fuPart = (id) => fuPlan.parts.find((one) => one.id === id);
+
+same("[MKT.SCRIPTS.568] a GENERAL repository, whose world declares no pins pass, plans no pins part though its entries read the book's, and an APPS repository reading the book plans none for it",
+  [fuIds.filter((id) => id.startsWith("pins-")), fuWaits["pins-plat"]], [["pins-plat"], ["book-plat-q2-1", "book-plat-1", "release-lib-1"]]);
+same("[MKT.SCRIPTS.568] a pins entry in a world with no pins pass is planned in its last source pass, and `later` says so",
+  [fuPart("apply-mkt").entries.includes("follow-ups/E4"), fuPlan.later.some((line) => line.startsWith("E4 (mkt:package.json) has no pass that holds pins"))], [true, true]);
+same("[MKT.SCRIPTS.568] the pins part that reads an upstream release holds no entry and holds to its schema, and so does the plan around it", [fuPart("pins-plat").entries, goFaults(fuPlan), goFaults(pinPlan)], [[], [], []]);
+
+same("[MKT.SCRIPTS.567] a table that declares its baseline before its book plans one baseline for the repository, in the table's place",
+  [fuIds.filter((id) => id === "baseline-plat").length, fuIds.indexOf("baseline-plat") < fuIds.indexOf("book-plat-1"), fuIds.filter((id) => id === "baseline-mkt").length], [1, true, 1]);
+same("[MKT.SCRIPTS.567] the book waits on that baseline and the baseline waits on no book part, so no circle holds a part; where the baseline follows the book it waits on the docs rows' parts",
+  [fuWaits["baseline-plat"], fuWaits["book-plat-1"], tangledParts(fuPlan.parts), fuWaits["baseline-mkt"]], [[], ["baseline-plat"], [], ["restates-mkt-1"]]);
+same("[MKT.SCRIPTS.567] the generated files a table puts in its release pass are a GENERATED part named for its work, never a second release part",
+  [fuPlan.parts.filter((one) => one.repo === "plat" && one.pass === "release").map((one) => [one.id, one.work]), fuPlan.parts.filter((one) => one.work === "RELEASE").map((one) => one.id)],
+  [[["generated-plat-q2-1", "GENERATED"], ["generated-plat-1", "GENERATED"], ["release-plat-1", "RELEASE"]], ["release-lib-1", "release-plat-1"]]);
+
+const reaches = (from, to, seen = new Set()) => from === to || (!seen.has(from) && (seen.add(from), (fuWaits[from] ?? []).some((id) => reaches(id, to, seen))));
+same("[MKT.SCRIPTS.564] every part but each repository's first waits on the passes before it: book before the code, the code after the baseline, the pins after the upstream release",
+  [fuIds.filter((id) => !fuWaits[id].length), fuWaits["apply-plat"], reaches("apply-plat", "book-plat-1"), reaches("apply-plat", "baseline-plat"), fuWaits["apply-mkt"], fuWaits["pins-plat"].includes("release-lib-1")],
+  [["restates-mkt-1", "baseline-lib", "baseline-plat"], ["pins-plat"], true, true, ["baseline-mkt"], true]);
+same("[MKT.SCRIPTS.564] the full run follows the code and the red proof, the generated files and the release follow the full run, and every proof follows every release",
+  [reaches("full-plat", "apply-plat"), reaches("full-plat", "red-plat"), reaches("full-mkt", "tests-mkt-1"), reaches("generated-plat-q2-1", "full-plat"), fuWaits["release-plat-1"].includes("full-plat"), reaches("release-plat-1", "generated-plat-1"),
+    fuWaits["release-plat-1"].includes("release-lib-1"), fuWaits["proof-mkt"]],
+  [true, true, true, true, true, true, true, ["release-lib-1", "release-plat-1"]]);
+
+// The first read of a plan renames an old part's pass to its work, and keeps a declared pass, which the waits are derived from.
+const { renameToWork } = await import(join(lib, "workstream-schema.ts"));
+const readBack = JSON.parse(JSON.stringify(fuPart("apply-plat")));
+same("[MKT.SCRIPTS.567] a part's declared pass outlives the first read; an old part's BASELINE still becomes its work", [renameToWork(readBack), readBack.pass, (() => { const old = { id: "x", pass: "BASELINE" }; renameToWork(old); return [old.work, "pass" in old]; })()],
+  [false, fuPart("apply-plat").pass, ["TEST", false]]);
+
 console.log(`\n${total - failed}/${total} passed`);
 process.exit(failed ? 1 : 0);

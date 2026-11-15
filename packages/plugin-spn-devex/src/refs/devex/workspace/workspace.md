@@ -7,16 +7,16 @@
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/02-workstream.md",
-      "seen": "7fb606ed"
+      "seen": "532a328b"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
-      "seen": "b927c1cb"
+      "seen": "702c16d3"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "section": "The agent is updated first, and reloaded before anything runs",
-      "seen": "35c186cc"
+      "seen": "fe0f7078"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -421,7 +421,7 @@ When a window opens, surface what is stale — a subject untouched across sittin
 
 ### The producer sweep — steps 1 to 4 are ours, and a partner performs none of them
 
-**Producer only.** These four edit the foundation, the deterministic tool and the plugin source. A partner holds none of the three, and extends by adding rather than by editing what they installed.
+**Producer only.** These four edit the foundation, the deterministic tool and the plugin source. A partner holds none of the three, and extends by adding rather than by editing what they installed. A partner may keep a `FOUNDATION` repository of their own for what spans their repositories: their platform's concept and domains, which service owns which domain and client, and their own standards. It adds rules of its own and never edits or restates SaaS Plane's, citing a SaaS Plane rule by its id.
 
 | Step | What it covers | Live yet? |
 | --- | --- | --- |
@@ -498,7 +498,7 @@ Both read one thing: the **split plan**, which is the step rows of every arc rea
 
 ## An arc is the unit of cross-repo change
 
-Plan one change across repos as an **arc**: ordered rows, one per step, each carrying **Repo · Work · What · Mechanism · Acceptance · State**. The rows run in chain order by repository, then by work (`DOCS` · `CODE` · `GENERATED` · `DESIGN` · `RELEASE` · `PROOF`). Each step also has a **depth**, which decides where it runs.
+Plan one change across repos as an **arc**: ordered rows, one per step, each carrying **Repo · Work · What · Mechanism · Acceptance · State**. The rows run in the map's order by repository, then by work, a repository coming after what it consumes in the workspace (`DOCS` · `CODE` · `GENERATED` · `DESIGN` · `RELEASE` · `PROOF`). Each step also has a **depth**, which decides where it runs.
 
 | Step is… | Execute |
 | --- | --- |

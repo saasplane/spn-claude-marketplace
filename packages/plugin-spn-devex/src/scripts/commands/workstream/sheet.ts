@@ -701,7 +701,10 @@ export function sheetFindings(ws: string, arc: string): string[] {
   }
   for (const entry of entries) if (!named.has(entry.id)) out.push(`${entry.id} is named by no row`);
   out.push(...kindFindings(arc, entries));
-  out.push(...unnamedFindings(entries, readJsonl(factsFileOf(ws, arc)) as Fact[]));
+  // AN ENTRY ALREADY SETTLED IS HISTORY: one that holds its patch, or that a landed row holds, quoted what it changed as it stood,
+  // and an ellipsis in that quote is no unfilled name. The check reads only what is still to be written (E2219).
+  const landed = new Set(data.rows.filter((row) => row.state === "landed").flatMap((row) => row.entries ?? []));
+  out.push(...unnamedFindings(entries.filter((entry) => !entry.patch && !landed.has(entry.id)), readJsonl(factsFileOf(ws, arc)) as Fact[]));
   out.push(...blockFindings(ws, arc, entries));
   // A JUDGED ENTRY KEEPS ITS CHANGE AND ITS THINKING: a diff from `sheet patch` and a `trace`.
   for (const entry of entries.filter((one) => one.judged === true)) {

@@ -428,10 +428,11 @@ export function passOf(entry: SheetEntry, passes: readonly Pass[], nodeKinds: Re
     const last = roles.source ?? roles.ordered[roles.ordered.length - 1]?.id ?? "source";
     return { pass: last, later: `${entry.id} (${entry.file}) has no pass that holds ${what}: it is planned in ${last}` };
   };
-  if (isStep(entry)) return /^\s*pnpm install\b/.test(String(entry.command ?? "")) ? { pass: roles.pins ?? "pins", later: null } : planned(roles.generated, "generated work");
+  // A PINS ENTRY GOES TO THE PINS PASS ONLY WHERE THE WORLD DECLARES ONE: elsewhere it is planned like any entry no row holds, and `later` says so.
+  if (isStep(entry)) return /^\s*pnpm install\b/.test(String(entry.command ?? "")) ? planned(roles.pins, "pins") : planned(roles.generated, "generated work");
   if (entryWork(entry) === "GENERATED") return planned(roles.generated, "generated files");
   if (/^docs\//.test(path) || /\.md$/.test(path)) return planned(roles.book, "the book");
-  if (["package.json", "pnpm-lock.yaml", "sprepo.json"].includes(base)) return { pass: roles.pins ?? "pins", later: null };
+  if (["package.json", "pnpm-lock.yaml", "sprepo.json"].includes(base)) return planned(roles.pins, "pins");
   const kind = nodeKindAt(path, nodeKinds);
   if (/(^|\/)tests\//.test(path)) {
     const k = kind ? norm(kind) : "";
@@ -443,18 +444,21 @@ export function passOf(entry: SheetEntry, passes: readonly Pass[], nodeKinds: Re
 }
 
 /**
- * The step ids of a repository in the order they run: its pass ids in table order, a `baseline` after the book pass, a `red` before the `full` run
- * (which the table's own row places, else comes before the generated pass or last), and `pins` where the table puts it or, when an entry reads an
- * upstream change, immediately before the first pass that holds one.
+ * The step ids of a repository in the order they run: its pass ids in table order, a `baseline` where the table places it (after the book pass
+ * where it places none), a `red` before the `full` run (which the table's own row places, else comes before the generated pass or last), and the
+ * declared `pins` where the table puts it or, when an entry reads an upstream change, immediately before the first pass that holds one.
  */
-function sequenceOf(passes: readonly Pass[], pinsBefore: string | null, withPins: boolean): string[] {
+function sequenceOf(passes: readonly Pass[], pinsBefore: string | null): string[] {
   const roles = rolesOf(passes);
   const ids = roles.ordered.map((one) => one.id);
-  const pinsId = roles.pins ?? "pins";
-  if (pinsBefore && pinsBefore !== pinsId) { const at = ids.indexOf(pinsId); if (at >= 0) ids.splice(at, 1); ids.splice(ids.indexOf(pinsBefore), 0, pinsId); }
-  else if (withPins && !ids.includes(pinsId)) ids.splice(ids.indexOf(roles.book ?? "") + 1, 0, pinsId);
-  const afterBook = roles.book && ids.includes(roles.book) ? ids.indexOf(roles.book) + 1 : 0;
-  ids.splice(afterBook, 0, "baseline");
+  // A WORLD THAT DECLARES NO PINS PASS HAS NONE: nothing is installed there, so no step is made up for it.
+  const pinsId = roles.pins;
+  if (pinsId && pinsBefore && pinsBefore !== pinsId) { ids.splice(ids.indexOf(pinsId), 1); ids.splice(ids.indexOf(pinsBefore), 0, pinsId); }
+  // A TABLE THAT DECLARES ITS BASELINE PLACES IT; only a table without one gets it after the book pass, so a repository has one baseline.
+  if (!ids.includes("baseline")) {
+    const afterBook = roles.book && ids.includes(roles.book) ? ids.indexOf(roles.book) + 1 : 0;
+    ids.splice(afterBook, 0, "baseline");
+  }
   if (!ids.includes("full")) { const at = roles.generated && ids.includes(roles.generated) ? ids.indexOf(roles.generated) : ids.length; ids.splice(at, 0, "full"); }
   ids.splice(ids.indexOf("full"), 0, "red");
   return ids;
@@ -571,10 +575,12 @@ export function deriveGo(scope: readonly ScopeSheet[], options: DeriveOptions = 
     return ordered;
   };
   const nodeKindsOf = (repo: string): Map<string, string> => new Map((map?.repos.find((one) => one.repo === repo)?.nodes ?? []).map((node) => [node.folder, node.kind] as const));
-  const workOf = (pass: string, repo: string): Work => {
+  // `entries` says the part holds entries: the generated files a table puts in its release pass are GENERATED work there, never a release.
+  const workOf = (pass: string, repo: string, entries = false): Work => {
     if (pass === "baseline" || pass === "full" || pass === "proof" || pass === "red") return "TEST";
-    if (pass === "release") return "RELEASE";
     const roles = rolesOf(passesOf(repo));
+    if (entries && pass === roles.generated) return "GENERATED";
+    if (pass === "release") return "RELEASE";
     return pass === roles.book ? "DOCS" : pass === roles.generated ? "GENERATED" : "CODE";
   };
   const pinsIdOf = (repo: string): string => rolesOf(passesOf(repo)).pins ?? "pins";
@@ -658,6 +664,9 @@ export function deriveGo(scope: readonly ScopeSheet[], options: DeriveOptions = 
       if (!target || !upEntry) continue;
       const up = repoOf(upEntry), above = map.order.indexOf(up), below = map.order.indexOf(down);
       if (up === down || above < 0 || below < 0 || above >= below) continue;
+      // A READ MOVES A PIN ONLY WHERE THERE IS ONE TO MOVE: the reader's world declares a pins pass, and the upstream is not the book, which
+      // stands outside every release chain and is read, never installed (RULE.DEVEX.WORKSPACE.455).
+      if (!rolesOf(passesOf(down)).pins || up === BOOK_REPO || map.repos.find((one) => one.repo === up)?.world === "FOUNDATION") continue;
       reads.push({ down, up, toArc, toRef: `${toArc}/${found[2]}`, target, inScope: scope.some((one) => one.arc === toArc), pass });
     }
   }
@@ -666,9 +675,9 @@ export function deriveGo(scope: readonly ScopeSheet[], options: DeriveOptions = 
     const hit = sequences.get(repo);
     if (hit) return hit;
     const mine = reads.filter((one) => one.down === repo);
-    const plain = sequenceOf(passesOf(repo), null, false);
+    const plain = sequenceOf(passesOf(repo), null);
     const first = mine.length ? [...mine].sort((a, b) => plain.indexOf(a.pass) - plain.indexOf(b.pass))[0].pass : null;
-    const seq = sequenceOf(passesOf(repo), first, groups.has(`${repo}|${pinsIdOf(repo)}`) || (stepGroups.get(repo) ?? []).some((one) => one.pass === pinsIdOf(repo)) || mine.length > 0);
+    const seq = sequenceOf(passesOf(repo), first);
     sequences.set(repo, seq);
     return seq;
   };
@@ -680,17 +689,17 @@ export function deriveGo(scope: readonly ScopeSheet[], options: DeriveOptions = 
   };
 
   const measuredOf = (repo: string, pass: string): string | null => {
-    const { rate, from } = rateOf(rates, repo, workOf(pass, repo));
+    const { rate, from } = rateOf(rates, repo, workOf(pass, repo, true));
     if (!(rate > 0)) return null;
     const there = from ?? repo;
-    const count = (options.measures ?? []).filter((one) => one.repo === there && one.work === workOf(pass, repo) && one.entries > 0 && one.minutes > 0).length;
+    const count = (options.measures ?? []).filter((one) => one.repo === there && one.work === workOf(pass, repo, true) && one.entries > 0 && one.minutes > 0).length;
     // The rate of the same kind of work in another repository is an estimate, and says so.
-    if (from) return `estimated from ${from} (${count} landed ${workOf(pass, repo)} parts there)`;
+    if (from) return `estimated from ${from} (${count} landed ${workOf(pass, repo, true)} parts there)`;
     return `cost of ${count ? `${count} ` : ""}landed ${pass} rows in ${repo}`;
   };
   const full = typeof options.fullRunMinutes === "number" ? Math.round(options.fullRunMinutes * 10) / 10 : null;
   const part = (id: string, repo: string, pass: string, refs: string[], held: SheetEntry[], extra: Partial<GoPart> = {}): GoPart => ({
-    id, repo, work: workOf(pass, repo), entries: refs, tests: [], minutes: null, measuredFrom: null, waitsOn: [],
+    id, repo, work: workOf(pass, repo, held.length > 0), entries: refs, tests: [], minutes: null, measuredFrom: null, waitsOn: [],
     model: held.length ? "sonnet" : "none", signature: held.map(entryHash).join("."), state: "ready", pass, ...extra,
   });
   const isCodePart = (one: GoPart): boolean => one.work === "CODE" && !["draw", "publish", "pins"].includes(partPass(one));
@@ -769,8 +778,8 @@ export function deriveGo(scope: readonly ScopeSheet[], options: DeriveOptions = 
         && !fresh.some((one) => one.repo === repo && partPass(one) === pass)) fresh.push(part(`${pass}-${repo}`, repo, pass, [], []));
       const group = groups.get(`${repo}|${pass}`);
       if (!group) continue;
-      const { rate } = rateOf(rates, repo, workOf(pass, repo));
-      const bound = options.followUp ? Number.POSITIVE_INFINITY : boundOf(rates, repo, workOf(pass, repo));
+      const { rate } = rateOf(rates, repo, workOf(pass, repo, true));
+      const bound = options.followUp ? Number.POSITIVE_INFINITY : boundOf(rates, repo, workOf(pass, repo, true));
       // A DECISION'S ENTRIES FORM PARTS OF THEIR OWN: grouped by the first card or preview section cited, a preview section first, before the cut.
       const subs = new Map<string, { decision: string; preview: boolean; refs: string[]; entries: SheetEntry[] }>();
       const decisionOfFile = new Map<string, string>();
@@ -798,7 +807,10 @@ export function deriveGo(scope: readonly ScopeSheet[], options: DeriveOptions = 
           if (last && last.refs.length + chunk.refs.length <= bound) { last.refs.push(...chunk.refs); last.entries.push(...chunk.entries); }
           else cuts.push({ refs: [...chunk.refs], entries: [...chunk.entries] });
         }
-        const stem = `${pass}-${repo}-${sub.decision ? `${sub.decision}-` : ""}`;
+        // A PART OF ENTRIES IN A PASS WHOSE NAME A RUN OR A RELEASE OWNS (the generated files a table puts in `release`) is named for its work,
+        // `generated-<repo>-…`: `release-<repo>-<n>` stays the release's own, and the two never share an id.
+        const named = ASIDE.has(pass) && workOf(pass, repo, true) === "GENERATED" ? "generated" : pass;
+        const stem = `${named}-${repo}-${sub.decision ? `${sub.decision}-` : ""}`;
         let next = Math.max(0, ...kept.map((one) => (one.id.startsWith(stem) && /^\d+$/.test(one.id.slice(stem.length)) ? Number(one.id.slice(stem.length)) : 0))) + 1;
         for (const cut of cuts) {
           // A PART RUNS NO TESTS: its cases are written, and the full run lists the ids.
@@ -1003,7 +1015,9 @@ export function deriveGo(scope: readonly ScopeSheet[], options: DeriveOptions = 
         if (row.work !== "DOCS" || row.repo !== one.repo || row.state === "landed") continue;
         for (const id of row.entries ?? []) {
           const holder = parts.find((other) => other.work === "DOCS" && other.entries.includes(`${arc}/${id}`));
-          if (holder && !one.waitsOn.includes(holder.id)) one.waitsOn.push(holder.id);
+          // A table that runs its baseline before the book (APPS: baseline, book, pins, …) has the book wait on the baseline: waiting
+          // back would close a circle that no part could leave, so that wait is not added.
+          if (holder && !one.waitsOn.includes(holder.id) && !waitsFor(holder, one)) one.waitsOn.push(holder.id);
         }
       }
     }

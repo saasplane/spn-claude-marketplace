@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/10-providers/ts/11-generation.md",
-      "seen": "e1a7595b"
+      "seen": "db6a0c48"
     }
   ]
 }
@@ -41,4 +41,4 @@
 
 **The stack is never typed on an `apps` command.** The node's own manifest declares it, and a flag that repeats a declaration is a second source for it.
 
-**The API client is the one generation somebody types**, because it needs the service running to read its published surface. Each client names the service it is the client of: the command loads the node's own `openapi-ts.config.ts` and fetches the address its `input` names, or the one passed after the target as `--url <address>`. It names no service, port or variable of its own, so a client with neither is refused. Everything else is derived from files already on disk.
+**The API client is the one generation somebody types**, because it needs a service running to read its published surface: one already up, or the worktree's own, which `--start <package>`, passed after the target, stands up in API mode for the run and stops after it. Each client names the service it is the client of: the command loads the node's own `openapi-ts.config.ts` and fetches the address its `input` names, or the one passed after the target as `--url <address>`. It names no service, port or variable of its own, so a client with neither is refused. In a workstream's worktree the service is not started by hand: `--start <package>` reads its document from the client's `input` address, and is refused where that address already answers from a service it did not start, so the client is generated from the worktree's change and no running app goes down. Everything else is derived from files already on disk.
