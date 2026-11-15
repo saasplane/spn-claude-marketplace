@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/01-function/02-scm.md",
-      "seen": "50a0552c"
+      "seen": "09bade2b"
     }
   ]
 }
@@ -107,13 +107,13 @@ feat/NNN-subject · fix/* · chore/*  ──►  develop  ──►  qa  ──�
 Protection rules are not conventions a team agrees to follow. They are protection rules the repository host enforces on every branch, applied as state a command converges rather than as a habit somebody remembers.
 
 - Every change **MUST** arrive by pull request, with at least one approval and its code owner's review, and new commits **MUST** dismiss stale approvals. There are no direct pushes.
-- Every check the repository's world requires **MUST** pass before a pull request merges. Each check is bound to GitHub Actions, so only a job can meet it, never a status somebody posts.
+- Every check the repository's world requires **MUST** pass before a pull request merges. Each check is bound to GitHub Actions, so only a job can meet it, never a status somebody posts. On `develop` and on `main` alike, a feature pull request **MUST** merge only once the checks jobs ran green; the one merge that meets them without running them is a promotion, whose head already passed its checks on `develop`.
 - A permanent branch **MUST** take a merge only from a permanent branch below it, from the one directly above it in a merge down, or from a hotfix, each of the same repository, and each promotion goes by the path chosen for it. A required job, `promotion-source`, holds the rule on every pull request: it reads the head from the event and refuses any other head into `qa`, `uat` or `main`, a fork's included, naming `spnutils repo promote`. Into `develop` it passes every head. Which of `qa` and `uat` a change passes through is the developer's release decision.
 - Each promotion **MUST** merge by a merge commit, and `main` **MUST** take merge commits from `develop`, `qa`, `uat` or a `hotfix/*`, never from a feature branch.
 - A permanent branch **MUST NOT** be deleted or force-pushed.
 - A `hotfix/<subject>` **MUST** be cut from `main` for production, or from `uat` or `qa` where only that environment needs the fix, never from `develop`, because `develop` may hold work still in the pipeline. It **MUST** be tested in its own pull request back into the branch it came from, and merged by a merge commit. `spnutils repo backmerge <branch>` **MUST** then merge the fixed branch into each permanent branch below it, in order, down to `develop`, skipping one that already holds the fix. Skip the merge down and the next change promoted from `develop` quietly removes the fix — the outage returns with no sign of why.
 
-**Two access tiers exist, and nothing between them.** `git-admin` grants write access, and may bypass review only by merging a pull request (`bypass_mode: pull_request`), never by pushing; the host records every bypass. `git-dev` grants write access with no bypass at all, for everyone doing ordinary work. **Neither tier bypasses a required check — MUST.** A middle tier would be a way to be partly exempt, which is a state nobody can reason about during an incident.
+**Two access tiers exist, and nothing between them.** `git-admin` grants write access, and may bypass review only by merging a pull request (`bypass_mode: pull_request`), never by pushing; the host records every bypass. `git-dev` grants write access with no bypass at all, for everyone doing ordinary work. **Neither tier bypasses a required check — MUST.** The checks jobs are required on `develop` and on `main` and are never bypassed, except for a promotion whose head already passed them on `develop`. The review bypass stays for a solo merge until beta. A middle tier would be a way to be partly exempt, which is a state nobody can reason about during an incident.
 
 **Each branch carries two rulesets, because a bypass actor reaches every rule in its ruleset.** `<branch>-protection` holds review and the branch rules (on `main`, that only `develop`, `qa`, `uat` and a `hotfix/*` merge into it), and `git-admin` may bypass it by pull request. `<branch>-checks` holds the required checks and has no bypass actor, so a failing check blocks the merge for every caller, administrators included. Review keeps its bypass because GitHub never lets an author approve their own pull request: with one member, a review nobody may bypass would block every merge. A solo merge still arrives by pull request, passes every check and is recorded, and review becomes real the day a second member joins, with no change to any ruleset.
 

@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/03-repos/01-repos.md",
-      "seen": "5aad09a7"
+      "seen": "d686e31c"
     }
   ]
 }
@@ -136,6 +136,19 @@ You change a pin by editing this one file, and the one-line difference is the wh
 
 A root's documentation seats derive from its world, and a node's from its own manifest — the same dispatch this file has described throughout, applied to one more consumer. A repository that declared one world and carries another's shape is a repository whose declaration nobody is reading.
 
+## Services across repositories
+
+**Where teams build their own services in their own repositories, each service is known to the others by its published client and its events, never by its source** (rule RULE.DEVEX.WORKSPACE.513 · MUST · skill:spn-devex/scm).
+
+| How one service's repository knows another's | What it is | In the workspace map |
+| --- | --- | --- |
+| Its client | each service publishes a `CLIENT_API` package generated from its own contract. A consumer pins a version of it, and a breaking change is a new major version, through the contract review gate | an edge from the pin |
+| Its events | the events a service publishes are contract artifacts, and a client carries the published API | no edge of its own: the map reads edges from pins and couplings only |
+| The organization's book | where several teams build on one platform, a `FOUNDATION` repository states what spans them: the platform's concept and domains, which service owns which domain and client, and the shared standards. Each service's own detail stays in its repository's concept and docs | upstream of every repository |
+| The estate | the platform node names the apps and modules that run, and where | an edge from each coupling |
+
+A team's workspace then holds its own service, and usually the organization's book. Every other team's service is a pinned client from the registry, so a change across teams is the upstream team releasing its client and the downstream team taking it in its pins pass. The map needs no knowledge of the organization beyond what each repository's files say.
+
 ## What breaks if you skip this
 
 | If you… | Then |
@@ -147,3 +160,4 @@ A root's documentation seats derive from its world, and a node's from its own ma
 | use a path package reference in a pipeline | it resolves only where the sibling checkout exists, which a pipeline does not have |
 | run an `apps` or `infra` command against a `GENERAL` repository | it refuses by name — that repository grants no nodes for the command to act on |
 | carry a value from one identity manifest into another | each is read by exactly one system, and a value the wrong system reads means nothing there |
+| read a service through another service's source rather than its published client | the two repositories cannot change or release alone |

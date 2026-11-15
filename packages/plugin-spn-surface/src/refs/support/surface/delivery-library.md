@@ -338,6 +338,7 @@ Read this list before you work in a library file by the connector. Each is a fac
 | Every call | A child agent cannot read the connector's own skill resource | the plugin's skill carries the rules a child needs, and the child is given that file |
 | Every call | The permission check refuses a call that changes a library when the order did not name the change | a writer does only what its order names, and reports the rest |
 | Every call | An answer over 20,480 bytes is refused with "Return value exceeds the 20480-byte limit", and the refusal says that the call's changes to the canvas were not kept; this was seen once, on a read of 68,507 bytes | it returns ids, counts and hashes from a call that changes the file and never a whole read, and it takes a large read in parts |
+| Every call | The connector runs on Figma's servers and sees no font installed on a person's machine, so it reads a text whose family is installed only there, such as `DSThemeSans`, as a missing font | it checks the font with `spnutils workspace status`, never through the connector |
 | Pages | A call starts on the file's first page, every time | a script does not assume the page it worked on before |
 | Pages | Moving to a page is an async call, and a switch loads the file again | a script switches page once and never inside a loop over pages |
 | Pages | Work on several pages is several calls | it sends one call for each page, and calls that only read may be sent together |

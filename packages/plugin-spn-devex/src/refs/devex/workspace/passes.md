@@ -13,5 +13,5 @@ Read by table header, never by position. FOUNDATION: the book, then the docs che
 | tests | GENERAL | tests | the cases are written, none run | source | — | — |
 | commit | GENERAL | source | the commit by path | tests | — | — |
 | full | GENERAL | source · tests | the full run, once | commit | — | — |
-| release | GENERAL | source · tests | the release lands | full | — | — |
+| release | GENERAL | source · tests · generated | the release lands | full | — | — |
 | install | GENERAL | source · tests | the plugin is installed | release | — | — |
