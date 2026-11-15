@@ -556,8 +556,8 @@ console.log("\n=== a brief's acceptance lists each test id beside its file (MKT.
   cli(world.root, ["workstream", "go", "write", "N001"]);
   const brief = readFileSync(join(world.ws, "notes", "N001", "orders", `${json(join(world.ws, "arcs", "N001", "go.json")).parts.find((p) => p.entries.includes("N001/E1")).id}.md`), "utf8");
   const acceptance = brief.slice(brief.indexOf("## Acceptance"), brief.indexOf("## Report"));
-  ok("[MKT.SCRIPTS.562] (RULE.DEVEX.WORKSPACE.507) the acceptance is a type check of the touched package, and carries no spec run",
-    acceptance.includes("pnpm exec tsc --noEmit -p .") && acceptance.includes("tiers run once, in the full run") && !acceptance.includes("node tests/t-thing.mjs") && !acceptance.includes("never a whole suite"), acceptance);
+  ok("[MKT.SCRIPTS.562] (RULE.DEVEX.WORKSPACE.507) the acceptance is the proof of the part's pass in the repository's table (GENERAL: the change reads back whole; a pass with no proof falls back to a type check of the touched package), and carries no spec run",
+    acceptance.includes("the change reads back whole") && acceptance.includes("tiers run once, in the full run") && !acceptance.includes("node tests/t-thing.mjs") && !acceptance.includes("never a whole suite"), acceptance);
 }
 
 console.log("\n=== report write records a part's cost from the usage rows (MKT.SCRIPTS.454)");
@@ -682,7 +682,7 @@ console.log("\n=== E35: a stale patch, the format line, go propose, write refusa
   // .503: format line by repository type
   const briefOf = async (name, type) => {
     const w = await dataWorkspace(name, { rows: [row("1", "CODE", { entries: ["E1"] })] });
-    put(w.root, "spn-x/sprepo.json", JSON.stringify({ type }));
+    put(w.root, "spn-x/sprepo.json", JSON.stringify({ type, config: type === "APPS" ? { stack: "TS" } : {} }));
     put(w.root, "spn-x/apps/billing/src/b.ts", "export const b = 1;\n");
     execFileSync("git", ["add", "-A"], { cwd: w.repo });
     execFileSync("git", ["-c", "user.email=t@t", "-c", "user.name=t", "commit", "-q", "-m", "x"], { cwd: w.repo });

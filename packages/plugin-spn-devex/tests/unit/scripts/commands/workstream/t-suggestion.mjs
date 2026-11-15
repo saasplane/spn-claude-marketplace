@@ -11,7 +11,7 @@ const ok = (label, condition, detail = "") => {
   failed += 1;
   console.log(`  FAIL  ${label}${detail ? `\n        ${detail}` : ""}`);
 };
-const { suggestionFaults, namesCitedFaults } = await import("../../../../src/scripts/lib/workstream-schema.ts");
+const { suggestionFaults, namesCitedFaults } = await import("../../../../../src/scripts/lib/workstream-schema.ts");
 const lines = (path) => (existsSync(path) ? readFileSync(path, "utf8") : "").split("\n").filter(Boolean).map((line) => JSON.parse(line));
 
 const { root, ws } = await dataWorkspace("suggestion");

@@ -115,7 +115,8 @@ export const CARD = {
  * A workspace holding one open workstream, `031-probe`, kept as data and whole, and a git checkout
  * `spn-x` beside it. The stamp on the page is the arc's own unless `stamp` says otherwise.
  */
-export async function dataWorkspace(name, { stamp = null, rows = undefined } = {}) {
+/** `placed` puts spn-x on the workspace map as a GENERAL repository (sprepo.json, package.json): `go write` refuses a repository it cannot place (MKT.SCRIPTS.566). */
+export async function dataWorkspace(name, { stamp = null, rows = undefined, placed = false } = {}) {
   const { arcStamp, writeNameFile } = await import(resolve(PLUGIN, "src", "scripts", "lib", "workstream.ts"));
   const data = arcData(rows);
   const ws = `.spndevex/workstreams/open/031-probe`;
@@ -125,6 +126,7 @@ export async function dataWorkspace(name, { stamp = null, rows = undefined } = {
     [`${ws}/notes/N001/preview.html`]: PREVIEW,
     [`${ws}/notes/N001/plan.md`]: "# N001 plan\n",
     "spn-x/a.ts": "export const a = 1;\n",
+    ...(placed ? { "spn-x/sprepo.json": JSON.stringify({ type: "GENERAL", config: {} }), "spn-x/package.json": JSON.stringify({ name: "spn-x" }) } : {}),
   });
   writeNameFile(join(root, ws), data);
   const repo = join(root, "spn-x");

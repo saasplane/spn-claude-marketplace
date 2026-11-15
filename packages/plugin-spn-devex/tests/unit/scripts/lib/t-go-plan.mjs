@@ -64,7 +64,7 @@ same("[MKT.SCRIPTS.301] the rate is minutes over entries of the landed rows", ra
 same("[MKT.SCRIPTS.301] the bound is 45 over the rate", [boundOf(rates, "lib-repo", "CODE"), boundOf(rates, "lib-repo", "DOCS")], [5, 8]);
 const priced = derive([{ arc: "N009", sheet: many(7) }], { rates, measures });
 same("[MKT.SCRIPTS.302] a measured group splits at its bound and each part is priced and says from what", priced.parts.filter(codeOf).map((p) => [p.entries.length, p.minutes, p.measuredFrom]),
-  [[5, 45, "cost of 2 landed CODE rows in lib-repo"], [2, 18, "cost of 2 landed CODE rows in lib-repo"]]);
+  [[5, 45, "cost of 2 landed code rows in lib-repo"], [2, 18, "cost of 2 landed code rows in lib-repo"]]);
 same("[MKT.SCRIPTS.302] an unmeasured part has no minutes and no source", derive([{ arc: "N009", sheet: many(1) }]).parts.filter(codeOf).map((p) => [p.minutes, p.measuredFrom]), [[null, null]]);
 const timed = derive(scope, { fullRunMinutes: 12.34 });
 same("[MKT.SCRIPTS.302] a full run is priced from the last three full runs, and a baseline, which is another kind of work, is not", timed.parts.filter((p) => p.work === "TEST").map((p) => [p.id, p.minutes, p.measuredFrom]).slice(0, 2),

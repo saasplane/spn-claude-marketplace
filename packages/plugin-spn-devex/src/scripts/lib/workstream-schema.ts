@@ -580,7 +580,7 @@ export const GO_PART_STATES = ["ready", "running", "held", "landed", "waiting", 
 /** The part states that owe nothing more: done, or dropped on the developer's word. */
 export const GO_PART_SETTLED: ReadonlySet<string> = new Set(["landed", "dropped"]);
 /** A part's id: its pass in lower case, its repository and its number, `code-spn-claude-marketplace-2`; a baseline or full run has no number. */
-export const GO_PART_ID = /^(baseline|book|pins|universal|server|client|web|server-tests|web-tests|full|generated|release|proof|apply|draw|publish|red|commit|docs-check|install|restates|source|tests|validate-and-tiers|module|organization|platform|support|cloud-apply)-\S+$/;
+export const GO_PART_ID = /^(baseline|docs|code|book|pins|universal|server|client|web|server-tests|web-tests|full|generated|release|proof|apply|draw|publish|red|commit|docs-check|install|restates|source|tests|validate-and-tiers|module|organization|platform|support|cloud-apply)-\S+$/;
 /** An entry as a go names it: its arc (`N009`, `ideate` or `follow-ups`) and its id, `N009/E14`, `follow-ups/E3026`. */
 export const GO_ENTRY = /^(?:N\d+[a-z]?|ideate|follow-ups)\/E\d+$/;
 
@@ -638,7 +638,7 @@ export function goFaults(data: unknown, where = "go.json"): string[] {
     if (typeof part.id === "string") { if (ids.has(part.id)) out.push(`${label} is written twice`); ids.add(part.id); }
     if (Array.isArray(part.entries)) {
       const hashes = typeof part.signature === "string" && part.signature ? part.signature.split(".").length : 0;
-      if (!part.entries.length && part.work !== "TEST" && part.work !== "RELEASE") out.push(`${label} holds no entry`);
+      if (!part.entries.length && part.work !== "TEST" && part.work !== "RELEASE" && !/^(draw|publish)-/.test(String(part.id))) out.push(`${label} holds no entry`);
       if (typeof part.signature === "string" && hashes !== part.entries.length)
         out.push(`${label}'s \`signature\` holds ${hashes} hashes, and the part holds ${part.entries.length} entries`);
       for (const entry of part.entries) {

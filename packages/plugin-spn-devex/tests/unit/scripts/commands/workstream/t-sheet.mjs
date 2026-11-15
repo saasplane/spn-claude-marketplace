@@ -424,7 +424,7 @@ console.log("\n=== show --part: only the entries one part of the go carries (MKT
     { id: "1", parent: "N001", title: "write the book", kind: "change", repo: "spn-x", work: "DOCS", blockedBy: [], touches: [], state: "waiting", entries: ["E1"] },
     { id: "2", parent: "N001", title: "build it", kind: "change", repo: "spn-x", work: "CODE", blockedBy: ["1"], touches: [], state: "waiting", entries: ["E2", "E3"] },
   ];
-  const part = await dataWorkspace("sheet-part", { rows });
+  const part = await dataWorkspace("sheet-part", { rows, placed: true });
   const run = (...args) => cli(part.root, ["workstream", "sheet", ...args]);
   cli(part.root, ["workstream", "fact", "write", "N001", "--source", "spn-x/a.ts", "--fact", "a is 1", "--used-by", "1"]);
   writeFileSync(join(part.ws, "arcs", "N001", "sheet.json"), JSON.stringify(sheetOf([entry("E1", { file: "spn-x:docs/a.md" }), entry("E2", { file: "spn-x:src/b.ts" }), entry("E3", { file: "spn-x:src/c.ts" })], { releaseChain: ["spn-x"] }), null, 2));

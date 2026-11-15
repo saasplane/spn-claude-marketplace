@@ -21,6 +21,7 @@ import {
   changedEntries, clearWaiting, deriveGo, workflowOf, fullRunMinutes, goFileOf, isApplyPart, landedEntries, landedOrder, landedMeasures, markDropped, markWaiting, planScope, proposeScopes, readGo, readyParts, newCasesOf, ratesOf, workspaceMapOf, staleEntries, tangledParts, unheldEntries,
   type ScopeSheet,
 } from "../../lib/go-plan.ts";
+import { PLUGIN_TEMPLATES } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { passFindingOf, passTableOf } from "../../lib/passes.ts";
 import { refFile } from "../../lib/work-map.ts";
 import { arcDataDir, arcIdsOf, logEvent, logFileOf, notesDirOf, readArc, readJson, readJsonl, readSheet, workspaceOf, writeWhole } from "../../lib/workstream.ts";
@@ -212,7 +213,7 @@ function tierIdsOf(plan: GoPlan, part: GoPart, ws: string): string[] {
   return [...ids].sort();
 }
 
-const ORDER_TEMPLATE = "devex/workspace/docs/templates/workstream/order-template.md";
+const ORDER_TEMPLATE = `${PLUGIN_TEMPLATES.slice("refs/".length)}/workstream/order-template.md`;
 
 /** The fixed don'ts every brief carries, read from the order template's `**Never, in this order:**` line so the brief and the template carry one text; none where the template is not there. */
 function dontLines(): string[] {

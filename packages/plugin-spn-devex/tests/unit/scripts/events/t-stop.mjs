@@ -1231,6 +1231,8 @@ ${tableOf(cyclesOf(folder))}
   // UNTOUCHED: another session's workstream, whose page is stale, while this session wrote its own arc.
   {
     const built = build("n006-stop-page-other-workstream");
+    // The session's own page is one the writer leaves as it is (N013 E2285: the check reads `producedPage`), so only the other workstream is behind.
+    writeFileSync(built.page, producedPage(join(built.root, A), readFileSync(built.page, "utf8")).text);
     const other = join(built.root, B);
     mkdirSync(join(other, "arcs", "N001"), { recursive: true });
     writeFileSync(join(other, "arcs", "N001", "state.json"), arcText("DECIDED"));
@@ -1622,6 +1624,8 @@ console.log("\n=== stop — the checks the first round fixed or wired, and the g
       found.length === 1 && found[0].message.includes("The preview of N001 reads PROPOSED and its arc is DECIDED")
         && found[0].message.includes("`spn-devex docs cycles write 031-probe`"), JSON.stringify(found));
     writeFileSync(join(ws, "notes", "N001", "preview.html"), previewShowing("DECIDED"));
+    // N013 E2256: the check asks `previewWouldChange`, so a preview current is one the writer leaves as it is: the writer draws the rest of the header, and the status it shows is DECIDED.
+    cli(root, ["docs", "cycles", "write", "031-probe"]);
     check("[MKT.HOOKS.108] a preview showing its arc's status is not named",
       call("checkPageCurrent", new Set([arcOf(ws)])).every((one) => !one.message.includes("The preview of")));
     void root;

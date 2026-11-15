@@ -422,10 +422,14 @@ console.log("\n=== RULE.DEVEX.WORKSPACE.183 — an arc's build rows carry a repo
   const outOfOrder = stepRowFindings(arcOf([["1", "spn-platform", "CODE"], ["2", "spn-infra", "DOCS"], ["3", "spn-foundation", "DOCS"]]), before("1", "2"), mapOrder);
   ok("[MKT.SCRIPTS.573] a row added out of the map's order is named, `row N is <repo> after <repo>`", outOfOrder.some((line) => /row 3 is spn-foundation after spn-platform/.test(line)), outOfOrder.join(" | "));
   ok("[MKT.SCRIPTS.573] an untouched out-of-order row in the same arc is not named", !outOfOrder.some((line) => /row 2 is/.test(line)), outOfOrder.join(" | "));
-  const { root, ws } = await dataWorkspace("state-chain");
+  const { root, ws } = await dataWorkspace("state-chain", { placed: true });
+  // The workspace map orders the repositories (MKT.SCRIPTS.571): spn-foundation is placed beside spn-x, and the map puts it first.
+  mkdirSync(join(root, "spn-foundation"), { recursive: true });
+  writeFileSync(join(root, "spn-foundation", "sprepo.json"), JSON.stringify({ type: "FOUNDATION", config: {} }));
+  writeFileSync(join(root, "spn-foundation", "package.json"), JSON.stringify({ name: "spn-foundation" }));
   const wrote = cli(root, ["workstream", "row", "add", "031/N001", "the book again", "--kind", "change", "--repo", "spn-foundation", "--work", "DOCS"]);
   ok("known-bad: `row add` prints the finding in a note line after the write, and still writes",
-    wrote.code === 0 && /note: N001 rows out of chain order: row 3 is spn-foundation after spn-x — the foundation comes first/.test(wrote.out)
+    wrote.code === 0 && /note: N001 rows out of chain order: row 3 is spn-foundation after spn-x, which the workspace map puts after it/.test(wrote.out)
       && JSON.parse(readFileSync(join(ws, "arcs", "N001", "state.json"), "utf8")).rows.some((row) => row.id === "3"), wrote.out);
 }
 
