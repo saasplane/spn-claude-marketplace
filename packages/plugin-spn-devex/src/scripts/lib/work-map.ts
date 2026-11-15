@@ -47,23 +47,33 @@ export function referencesOf(cell: string): Reference[] {
   return out;
 }
 
-/** The rows of the map's table, read by the header's names and never by position. */
-export function parseMap(text: string): MapRow[] {
+/**
+ * The rows of the table whose header starts with `firstHeader`, each as its cells by the header's names in lower case and never by
+ * position; an empty cell and a lone dash read as "". Where the text holds no such table, `[]`.
+ */
+export function tableRowsOf(text: string, firstHeader: string): Array<Record<string, string>> {
   const lines = text.split("\n");
-  const head = lines.findIndex((line) => /^\s*\|\s*Work\s*\|/.test(line));
+  const head = lines.findIndex((line) => new RegExp(`^\\s*\\|\\s*${firstHeader}\\s*\\|`, "i").test(line));
   if (head < 0) return [];
   const names = cells(lines[head]).map((name) => name.toLowerCase());
-  const rows: MapRow[] = [];
+  const rows: Array<Record<string, string>> = [];
   for (const line of lines.slice(head + 2)) {
     if (!/^\s*\|/.test(line)) break;
     const row = cells(line);
-    const get = (name: string): string => { const cell = row[names.indexOf(name)] ?? ""; return cell === "—" ? "" : cell; };
-    const work = get("work");
-    if (!work) continue;
+    rows.push(Object.fromEntries(names.map((name, at) => [name, row[at] === "—" ? "" : (row[at] ?? "")])));
+  }
+  return rows;
+}
+
+/** The rows of the map's table, read by the header's names and never by position. */
+export function parseMap(text: string): MapRow[] {
+  const rows: MapRow[] = [];
+  for (const row of tableRowsOf(text, "Work")) {
+    if (!row.work) continue;
     rows.push({
-      work,
-      seenWhen: get("seen when").split(/\s+·\s+/).map((one) => one.trim()).filter((one) => one && one !== "—"),
-      skill: get("skill"), readFirst: referencesOf(get("read first")), lookIn: get("look in"), learned: get("learned"),
+      work: row.work,
+      seenWhen: (row["seen when"] ?? "").split(/\s+·\s+/).map((one) => one.trim()).filter((one) => one && one !== "—"),
+      skill: row.skill ?? "", readFirst: referencesOf(row["read first"] ?? ""), lookIn: row["look in"] ?? "", learned: row.learned ?? "",
     });
   }
   return rows;
@@ -140,7 +150,7 @@ export function refRoots(plugin: string, places: Places = {}): string[] {
 }
 
 /** A file under `dir` whose path ends with `tail`, by a walk that skips dot folders and `node_modules`; the first in sorted order. */
-function findUnder(dir: string, tail: string, depth = 0): string | null {
+export function findUnder(dir: string, tail: string, depth = 0): string | null {
   if (depth > 9) return null;
   let names: string[] = [];
   try { names = readdirSync(dir).sort(); } catch { return null; }

@@ -5,7 +5,10 @@ import { createHash } from "node:crypto";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { execFileSync } from "node:child_process";
 import { join } from "node:path";
-import { CARD, cli, dataWorkspace, writeRoleArcs } from "../../../../helpers/workstream-fixture.mjs";
+import { CARD, cli, ownPlugins, dataWorkspace, writeRoleArcs } from "../../../../helpers/workstream-fixture.mjs";
+
+// `go write` finds the passes through installed_plugins.json: this repository's own refs speak, never the installed copy.
+const putBackConfig = ownPlugins();
 
 let total = 0, failed = 0;
 const ok = (label, condition, detail = "") => {
@@ -723,5 +726,45 @@ console.log("\n=== a shown block that differs from its patch (MKT.SCRIPTS.535)")
   ok("[MKT.SCRIPTS.535] a block for an entry with no patch is not compared", !check().out.includes("block for E9"), check().out);
 }
 
+console.log("\n=== an entry that names nothing: a blank or placeholder is a finding (MKT.SCRIPTS.570, .574)");
+{
+  const w = await dataWorkspace("sheet-unnamed", { rows: [{ id: "1", parent: "N001", title: "build it", kind: "change", repo: "spn-x", work: "CODE", blockedBy: [], touches: [], state: "waiting", entries: ["E1"] }] });
+  cli(w.root, ["workstream", "fact", "write", "N001", "--source", "spn-x/a.ts", "--fact", "a is 1", "--used-by", "1"]);
+  const sheetPath = join(w.ws, "arcs", "N001", "sheet.json");
+  const factsPath = join(w.ws, "arcs", "N001", "facts.jsonl");
+  const wholeSheet = (over = {}) => ({ ...sheetOf([entry("E1", { file: "spn-x:src/b.ts", ...over })]), releaseChain: ["spn-x"], stack: { folder: "the spn-x checkout", dmo: "none", reset: "from empty" } });
+  const check = (over) => { writeFileSync(sheetPath, JSON.stringify(wholeSheet(over), null, 2)); return cli(w.root, ["workstream", "sheet", "check", "N001"]); };
+  const goWrite = () => cli(w.root, ["workstream", "go", "write", "N001"]);
+  const goFile = join(w.ws, "arcs", "N001", "go.json");
+
+  const blank = check({ rules: [""] });
+  ok("[MKT.SCRIPTS.570] an entry whose `rules` holds \"\" is named by id and exits 1", blank.code === 1 && blank.out.includes("E1 names a rules item that is blank"), blank.out);
+  const filled = check({ rules: ["RULE.DEVEX.WORKSPACE.508"] });
+  ok("[MKT.SCRIPTS.570] the same sheet with the rule filled prints `sheet whole` and exits 0", filled.code === 0 && filled.out.includes("N001 sheet whole"), filled.out);
+
+  const tbd = check({ rules: ["TBD"] });
+  ok("[MKT.SCRIPTS.574] a rule id `TBD` is refused by name", tbd.code === 1 && tbd.out.includes('E1 names a rules item that is a placeholder ("TBD")'), tbd.out);
+  const unfilled = check({ what: "fill <...> in the table" });
+  ok("[MKT.SCRIPTS.574] a `what` leaving a field, column or name unfilled (`<...>`) is refused by name", unfilled.code === 1 && unfilled.out.includes('E1\'s what leaves a field, column or name unfilled ("<...>")'), unfilled.out);
+  const named = check({ what: "add the <column> to the table" });
+  ok("[MKT.SCRIPTS.574] a `what` that names a `<column>` of its own is no finding: a placeholder token is only `<...>` or `...`", !named.out.includes("leaves a field, column or name unfilled"), named.out);
+
+  const facts = readFileSync(factsPath, "utf8").split("\n").filter(Boolean).map((line) => JSON.parse(line));
+  writeFileSync(factsPath, `${facts.map((fact) => JSON.stringify({ ...fact, source: "..." })).join("\n")}\n`);
+  const bare = check({});
+  ok("[MKT.SCRIPTS.574] a fact whose `source` is `...` is refused by name, with the entry that cites it", bare.code === 1 && bare.out.includes("E1 cites f1, whose read is blank or a placeholder"), bare.out);
+  const refused = (over) => { writeFileSync(sheetPath, JSON.stringify(wholeSheet(over), null, 2)); return goWrite(); };
+  const refusedRule = refused({ rules: ["TBD"] });
+  ok("[MKT.SCRIPTS.574] `go write` over the scope refuses on the placeholder rule, naming it, and writes nothing", refusedRule.code === 1 && refusedRule.out.includes('E1 names a rules item that is a placeholder ("TBD")') && !existsSync(goFile), refusedRule.out);
+  const refusedWhat = refused({ what: "fill <...> in the table" });
+  ok("[MKT.SCRIPTS.574] and on the unfilled `what`", refusedWhat.code === 1 && refusedWhat.out.includes("leaves a field, column or name unfilled") && !existsSync(goFile), refusedWhat.out);
+  const refusedFact = refused({});
+  ok("[MKT.SCRIPTS.574] and on the fact with the placeholder source", refusedFact.code === 1 && refusedFact.out.includes("E1 cites f1, whose read is blank or a placeholder") && !existsSync(goFile), refusedFact.out);
+  writeFileSync(factsPath, `${facts.map((fact) => JSON.stringify(fact)).join("\n")}\n`);
+  const mended = refused({});
+  ok("[MKT.SCRIPTS.574] each filled, the go write no longer names a placeholder", !/placeholder|unfilled|blank/.test(mended.out), mended.out);
+}
+
 console.log(failed ? `\n  ${failed} of ${total} FAILED — sheet` : `\n  all ${total} passed — sheet`);
+putBackConfig();
 process.exit(failed ? 1 : 0);

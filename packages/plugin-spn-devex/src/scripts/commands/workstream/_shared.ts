@@ -7,7 +7,7 @@ import { basename } from "node:path";
 import { UsageFault, type Words } from "../../../../../plugin-support-lib/src/lib/command.ts";
 import { checkWorkstream } from "../../checks/workstream-state.ts";
 import { refreshViews } from "../docs/cycles.ts";
-import { arcIdsOf, arcStatus, findWorkstream, readArc, resolveArc, stateOfRow, workspaceOf, writePreviewStatus, writeProgress } from "../../lib/workstream.ts";
+import { arcIdsOf, arcStatus, findWorkstream, leafRows, readArc, resolveArc, stateOfRow, workspaceOf, writePreviewStatus, writeProgress } from "../../lib/workstream.ts";
 
 /** A library call whose plain error is a fault in what was typed. */
 export function typed<T>(read: () => T): T {
@@ -48,12 +48,12 @@ export function afterWrite(ws: string): string[] {
 }
 
 /** Where each arc stands: its status, and the state of each row by id. Taken before a write, to see what it moved. */
-export function arcSignatures(ws: string): Map<string, { status: string; rows: Map<string, string> }> {
-  const out = new Map<string, { status: string; rows: Map<string, string> }>();
+export function arcSignatures(ws: string): Map<string, { status: string; rows: Map<string, string>; order: string[] }> {
+  const out = new Map<string, { status: string; rows: Map<string, string>; order: string[] }>();
   for (const arc of arcIdsOf(ws)) {
     const data = readArc(ws, arc);
     // The status as read, worked out from the steps, with any wait: a write that moves either moves a view.
-    if (data) out.set(arc, { status: `${arcStatus(data)}${data.wait ? " · wait" : ""}`, rows: new Map(data.rows.map((row) => [row.id, stateOfRow(data.rows, row)])) });
+    if (data) out.set(arc, { status: `${arcStatus(data)}${data.wait ? " · wait" : ""}`, rows: new Map(data.rows.map((row) => [row.id, stateOfRow(data.rows, row)])), order: leafRows(data).map((row) => row.id) });
   }
   return out;
 }

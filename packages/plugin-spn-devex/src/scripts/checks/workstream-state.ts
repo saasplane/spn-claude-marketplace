@@ -19,7 +19,7 @@ import {
   strayLevels, strayNotes, suggestionsFileOf, readJson, readArc, workstreamsOf, previewWithStatus, builtOf,
   localLinks, previewHrefOf, previewOwners, slotsIn, whatEntryOf, whatId, whatRange, workstreamName,
 } from "../lib/workstream.ts";
-import { ARC_ID, WORK, DONE_STATES, arcFaults, factFaults, findingFaults, type Finding as ReviewFinding, sheetFaults, logFaults, questionFaults, cardName, subjectFault, suggestionFaults, type ArcData, type Fact } from "../lib/workstream-schema.ts";
+import { ARC_ID, WORK, DONE_STATES, arcFaults, factFaults, findingFaults, type Finding as ReviewFinding, sheetFaults, logFaults, questionFaults, cardName, subjectFault, suggestionFaults, type ArcData, type ArcRow, type Fact } from "../lib/workstream-schema.ts";
 
 export type Finding = { workstream: string; arc: string | null; check: string; message: string };
 
@@ -287,26 +287,37 @@ const WORK_ORDER: readonly string[] = WORK;
  * them. A row whose repository is `—` changes none and takes no place in the chain. `arc edit` prints what this finds and never refuses on it: the chain between two
  * stack repositories is judgement.
  */
-export function stepRowFindings(data: ArcData): string[] {
+export function stepRowFindings(
+  data: ArcData,
+  before?: { rows: Map<string, string>; order: string[] } | null,
+  mapOrder?: readonly string[],
+): string[] {
   const rows = leafRows(data);
   const bare: string[] = [];
   const disorder: string[] = [];
   const seen = new Set<string>();
+  // ONLY A ROW THE WRITE ADDED OR MOVED IS NAMED: an untouched row out of order was named when it was written. No `before` reads every row as added.
+  const touched = (row: ArcRow, at: number): boolean => !before || !before.rows.has(row.id) || before.order.indexOf(row.id) !== at;
+  const rankOf = (repo: string): number => mapOrder?.indexOf(repo) ?? -1;
   let repo: string | null = null;
   let lastWork = -1;
-  for (const row of rows) {
+  for (const [at, row] of rows.entries()) {
     const rowRepo = typeof row.repo === "string" ? row.repo.trim() : "";
     const work = WORK_ORDER.indexOf(typeof row.work === "string" ? row.work : "");
     if (!rowRepo || work < 0) { bare.push(row.id); continue; }
     if (NO_REPO.has(rowRepo)) continue;
     if (rowRepo !== repo) {
-      if (seen.has(rowRepo)) disorder.push(`row ${row.id} returns to ${rowRepo} after ${repo}`);
-      else if (/\bspn-foundation\b/.test(rowRepo) && seen.size) disorder.push(`row ${row.id} is spn-foundation after ${[...seen][0]} — the foundation comes first`);
+      if (mapOrder) {
+        // The map, not the order the repositories first appear in, says what comes first: a row is out where its repository ranks before an earlier row's.
+        const earlier = [...seen].find((one) => rankOf(one) >= 0 && rankOf(rowRepo) >= 0 && rankOf(rowRepo) < rankOf(one));
+        if (earlier && touched(row, at)) disorder.push(`row ${row.id} is ${rowRepo} after ${earlier}, which the workspace map puts after it`);
+      } else if (seen.has(rowRepo)) { if (touched(row, at)) disorder.push(`row ${row.id} returns to ${rowRepo} after ${repo}`); }
+      else if (/\bspn-foundation\b/.test(rowRepo) && seen.size && touched(row, at)) disorder.push(`row ${row.id} is spn-foundation after ${[...seen][0]} — the foundation comes first`);
       seen.add(rowRepo);
       repo = rowRepo;
       lastWork = -1;
     }
-    if (work < lastWork) disorder.push(`row ${row.id} is ${WORK_ORDER[work]} after ${WORK_ORDER[lastWork]} in ${rowRepo}`);
+    if (work < lastWork && touched(row, at)) disorder.push(`row ${row.id} is ${WORK_ORDER[work]} after ${WORK_ORDER[lastWork]} in ${rowRepo}`);
     lastWork = Math.max(lastWork, work);
   }
   const where = "(01-workstream.md § A step row says where, what work, and how; RULE.DEVEX.WORKSPACE.183)";

@@ -2,8 +2,11 @@
 // close gate. Run as the agent types the commands, in a throwaway workspace.
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { writeClosingBlock, cli, dataWorkspace } from "../../../../helpers/workstream-fixture.mjs";
+import { writeClosingBlock, cli, ownPlugins, dataWorkspace } from "../../../../helpers/workstream-fixture.mjs";
 import { workspace } from "../../../../helpers/fixture.mjs";
+
+// `go write` finds the passes through installed_plugins.json: this repository's own refs speak, never the installed copy.
+const putBackConfig = ownPlugins();
 
 let total = 0, failed = 0;
 const ok = (label, condition, detail = "") => {
@@ -157,4 +160,5 @@ console.log("\n=== go write: a release order line that is not a repository's nam
 }
 
 console.log(`\n${total - failed}/${total} passed`);
+putBackConfig();
 process.exit(failed ? 1 : 0);

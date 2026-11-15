@@ -18,9 +18,11 @@ import { existsSync, readFileSync } from "node:fs";
 import { basename, dirname, join, resolve } from "node:path";
 import { type Action, FLAG, VALUE, UsageFault, readWords } from "../../../../../plugin-support-lib/src/lib/command.ts";
 import {
-  changedEntries, clearWaiting, deriveGo, workflowOf, fullRunMinutes, goFileOf, isApplyPart, landedEntries, landedOrder, landedMeasures, markDropped, markWaiting, planScope, proposeScopes, readGo, readyParts, redCheckIds, ratesOf, staleEntries, tangledParts, unheldEntries,
+  changedEntries, clearWaiting, deriveGo, workflowOf, fullRunMinutes, goFileOf, isApplyPart, landedEntries, landedOrder, landedMeasures, markDropped, markWaiting, planScope, proposeScopes, readGo, readyParts, newCasesOf, ratesOf, workspaceMapOf, staleEntries, tangledParts, unheldEntries,
   type ScopeSheet,
 } from "../../lib/go-plan.ts";
+import { passFindingOf, passTableOf } from "../../lib/passes.ts";
+import { refFile } from "../../lib/work-map.ts";
 import { arcDataDir, arcIdsOf, logEvent, logFileOf, notesDirOf, readArc, readJson, readJsonl, readSheet, workspaceOf, writeWhole } from "../../lib/workstream.ts";
 import { DONE_STATES, GO_PART_SETTLED, renameDataToWork, type ArcData, type GoPart, type GoPlan, type SheetEntry } from "../../lib/workstream-schema.ts";
 import { arcNamed, listOf, workstreamNamed } from "./_shared.ts";
@@ -31,8 +33,8 @@ import { patchOwed, renameFirstRead, sheetFindings, stepIsWhole } from "./sheet.
 export const describe = "the plan of a go: derive it from the scope's sheets and write each part's brief, show it, check it against the sheets, start a baseline, a full run or a release";
 
 export const save = (ws: string, lead: string, plan: GoPlan): void => writeWhole(goFileOf(ws, lead), `${JSON.stringify(plan, null, 2)}\n`);
-/** The workflow the go makes from its plan, kept beside it. */
-const workflowFileOf = (ws: string, lead: string): string => join(arcDataDir(ws, lead), "go.workflow.mjs");
+/** The workflow the go makes from its plan: a working file under the arc's notes, beside the agent's other working files, never in the arc's data. */
+const workflowFileOf = (ws: string, lead: string): string => join(notesDirOf(ws, lead), "work", "go.workflow.mjs");
 const briefOf = (ws: string, lead: string, part: GoPart): string => join(notesDirOf(ws, lead), "orders", `${part.id}.md`);
 
 /** Whether a TEST part is the repository's proof run, after the releases: told apart by its id. */
@@ -125,8 +127,21 @@ function scopeOf(ws: string, scope: string[], lead: string, root: string): { she
 /** The directories a repository's test files are looked for in: the workstream's worktree first, then the checkout. */
 const dirsIn = (root: string, ws: string, repo: string): string[] => [join(root, ".worktrees", basename(ws), repo), join(root, repo)];
 
-/** A brief's acceptance: a type check of each package the part touches; no test tier runs between passes, every tier runs once in the full run. */
-function acceptanceOf(part: GoPart, files: readonly string[], ws: string, root: string): string[] {
+/** The `Proof` the repository's declared pass states for a part, or null where the part stands in no declared pass or the table has no such row. */
+function proofOfPass(part: GoPart, root: string): string | null {
+  if (!part.pass) return null;
+  const at = workspaceMapOf(root).repos.find((one) => one.repo === part.repo);
+  return passTableOf(at?.world ?? null, at?.stack ?? null).find((one) => one.id === part.pass)?.proof || null;
+}
+
+/** A brief's acceptance: the `Proof` of the part's pass from the repository's table, and for a full run every tier id; no test tier runs between passes, and no test file is run by name. */
+function acceptanceOf(plan: GoPlan, part: GoPart, files: readonly string[], ws: string, root: string): string[] {
+  const proof = proofOfPass(part, root);
+  if (part.id.startsWith("full-")) {
+    const ids = tierIdsOf(plan, part, ws);
+    return ["- Run the repository's whole suite once; every tier id the scope names runs in it:", ...(ids.length ? ids.map((id) => `  - \`${id}\``) : ["  - the scope names no tier id"])];
+  }
+  if (proof && part.work !== "TEST") return [`- ${proof}`, "- Run no test and no suite here: the tiers run once, in the full run (RULE.DEVEX.WORKSPACE.507)."];
   const dirs = new Set<string>();
   for (const file of files) {
     const path = file.slice(file.indexOf(":") + 1);
@@ -174,11 +189,39 @@ function formatLines(part: GoPart, files: string[], ws: string, root: string): s
   return folders.length ? ["## Format", "", ...folders.map((folder) => `Before its proof, run \`spnutils apps format ${folder}\`.`), ""] : [];
 }
 
-/** The baseline's red check: the new cases run once on the base commit and must fail there. */
+/** The `red-<repo>` part's check, from the cases the scope adds: a case on a name the base holds is run once on the base and must fail at its assertion; a case on a new name is red by the name's absence. */
 function redCheckLines(plan: GoPlan, part: GoPart, ws: string): string[] {
-  const ids = redCheckIds(plan, planScope(ws, plan), part.repo);
-  return ["## Red check", "", ...(ids.length ? ids.map((id) => `- \`${id}\``) : ["- the scope's code entries name no test id"]), "",
-    "Each new case runs once on the base commit and must fail there.", ""];
+  const { onKnownName, onNewName } = newCasesOf(plan, planScope(ws, plan), part.repo);
+  const ids = (list: readonly string[]): string[] => list.map((id) => `- \`${id}\``);
+  return ["## Red check", "",
+    ...(onKnownName.length ? ["In a worktree at the base commit holding only the new test files, run each case once; it must fail at its assertion.", "", ...ids(onKnownName), ""] : []),
+    ...(onNewName.length ? ["These cases name something the base lacks: they are red by the name's absence and need no run.", "", ...ids(onNewName), ""] : []),
+    ...(onKnownName.length || onNewName.length ? [] : ["- the scope's code entries name no test case", ""])];
+}
+
+/** The baseline's one run: the repository's whole suite on the base commit, recording what already fails. */
+const baselineLines = (): string[] => ["## Baseline", "", "Run the repository's whole suite on the base once and record what already fails.", ""];
+
+/** Every tier id the scope's entries in a repository name, sorted and unique: what the full run lists. */
+function tierIdsOf(plan: GoPlan, part: GoPart, ws: string): string[] {
+  const ids = new Set<string>();
+  for (const one of planScope(ws, plan)) for (const entry of one.sheet.entries) {
+    if (entry.file.slice(0, entry.file.indexOf(":")) !== part.repo) continue;
+    for (const list of Object.values(entry.tiers ?? {})) for (const id of list as string[]) ids.add(id);
+  }
+  return [...ids].sort();
+}
+
+const ORDER_TEMPLATE = "devex/workspace/docs/templates/workstream/order-template.md";
+
+/** The fixed don'ts every brief carries, read from the order template's `**Never, in this order:**` line so the brief and the template carry one text; none where the template is not there. */
+function dontLines(): string[] {
+  let text = "";
+  try { text = readFileSync(refFile(ORDER_TEMPLATE), "utf8"); } catch { return []; }
+  const line = text.split("\n").find((one) => one.startsWith("**Never, in this order:**"));
+  if (!line) return [];
+  const items = line.slice("**Never, in this order:**".length).split(";").map((one) => one.trim().replace(/\.$/, "")).filter(Boolean);
+  return items.length ? ["**Never, in this order:**", "", ...items.map((one) => `- ${one}`), ""] : [];
 }
 
 function brief(plan: GoPlan, part: GoPart, ws: string, root: string): string {
@@ -200,15 +243,17 @@ function brief(plan: GoPlan, part: GoPart, ws: string, root: string): string {
          "**Read only the files below**; read further only where one of them sends you. **Search with `grep` in Bash, since you have no Grep tool.**",
          "Commit nothing. Hand back at most 8 lines, and run " + `\`workstream report write ${ref} ${part.id} --run <name>\`, which writes and folds the report. ` +
          `Save a report file beside this brief as \`${part.id}.report.md\`, at most 15 lines, its front matter first, only to return \`needs-you\`, a follow-up or an \`unnamed:\` list.`, ""]),
+    ...dontLines(),
     "**A name, a shape or a construct no entry holds is not yours to make up** (RULE.DEVEX.WORKSPACE.495): stop, return `needs-you`, and list what you met under `unnamed:` in the report.", "",
     "## The entries", "",
     ...[...new Set(part.entries.map((ref) => ref.split("/")[0]))].map((arc) =>
       `- ${part.entries.filter((ref) => ref.startsWith(`${arc}/`)).map((ref) => `\`${ref}\``).join(", ")}: \`workstream sheet show ${arc} --part ${part.id}\` prints them`), "",
     ...(held.files.length ? ["## The files", "", ...held.files.map((file) => `- \`${file}\``), ""] : []),
     ...formatLines(part, held.files, ws, root),
-    ...(part.id === `baseline-${part.repo}` ? redCheckLines(plan, part, ws) : []),
+    ...(part.id === `baseline-${part.repo}` ? baselineLines() : []),
+    ...(part.id === `red-${part.repo}` ? redCheckLines(plan, part, ws) : []),
     "## Acceptance", "",
-    ...acceptanceOf(part, held.files, ws, root), "",
+    ...acceptanceOf(plan, part, held.files, ws, root), "",
     "## Report", "",
     "The front matter a saved report keeps, for the case that needs it; `workstream report write` folds it into the plan:", "",
     "```text", "---", `go: "${plan.lead}"`, `part: "${part.id}"`, "outcome: landed · stopped · needs-you",
@@ -293,8 +338,22 @@ function write(args: string[]): number {
     const sheet = readSheet(ws, other);
     if (sheet) siblings.push({ arc: other, sheet, data: readArc(ws, other) });
   }
-  const { circles, ignored, later, ...plan } = deriveGo(sheets.map((one) => ({ ...one, data: arcs.find((data) => data.arc === one.arc) ?? null })), {
-    siblings,
+  // THE MAP: where each repository stands, read from its own files; a repository of the scope that cannot be placed refuses the write.
+  const map = workspaceMapOf(root);
+  const worldOf = (repo: string) => map.repos.find((one) => one.repo === repo);
+  const reasonOf = (repo: string): string | null => {
+    const at = worldOf(repo);
+    if (map.unplaced.includes(repo) || !at) return at?.unread ?? "no sprepo.json names it";
+    return passFindingOf(at.world, at.stack);
+  };
+  const inScope = new Set(sheets.flatMap((one) => one.sheet.entries.map((entry) => entry.file.slice(0, entry.file.indexOf(":")))));
+  const unplacedFaults = [...inScope].filter((repo) => reasonOf(repo) !== null)
+    .map((repo) => `${repo} is not placed: ${reasonOf(repo)} (its sprepo.json type / consumption cannot be read): fix ${repo}/sprepo.json`);
+  if (unplacedFaults.length) { console.log(`Refused: ${unplacedFaults.join(" · ")}. Nothing was written.`); return 1; }
+  const mapNotes = map.unplaced.filter((repo) => !inScope.has(repo)).map((repo) => `${repo} is not placed: ${worldOf(repo)?.unread ?? "no reason read"}`);
+  const { circles, ignored, later, unplaced: _unplaced, notes, ...plan } = deriveGo(sheets.map((one) => ({ ...one, data: arcs.find((data) => data.arc === one.arc) ?? null })), {
+    siblings, map,
+    passes: (repo: string) => { const at = worldOf(repo); return passTableOf(at?.world ?? null, at?.stack ?? null); },
     rates: ratesOf(measures), measures, previous, fullRunMinutes: fullRunMinutes(root), landedOrder: landedOrder(ws, lead), followUp: words.given("after-close"),
     dirsOf: (repo) => dirsIn(root, ws, repo),
     patchOk: (arc, entry) => patchApplies(ws, arc, entry, root),
@@ -311,9 +370,11 @@ function write(args: string[]): number {
   for (const part of plan.parts) if (part.entries.length && !isApplyPart(part) && part.state !== "landed" && part.state !== "running") writeWhole(briefOf(ws, lead, part), brief(plan, part, ws, root));
   logEvent(ws, lead, "go", null, `written · ${plan.parts.length} parts · scope ${scope.join(",")}`);
   console.log(`ok · ${lead} go written · ${plan.parts.length} parts over ${scope.join(", ")}`);
-  console.log(`workflow · ${basename(workflowFileOf(ws, lead))} beside the plan`);
+  console.log(`workflow · notes/${lead}/work/go.workflow.mjs`);
+  for (const line of mapNotes) console.log(`note · ${line}`);
   for (const line of ignored) console.log(`note · ${line}`);
   for (const line of later) console.log(`note · ${line}`);
+  for (const line of notes) console.log(line.startsWith("note · ") ? line : `note · ${line}`);
   console.log(nextStep(`${basename(ws)}/${lead}`, ws, plan));
   return 0;
 }
@@ -332,7 +393,9 @@ function propose(args: string[]): number {
   const minutes: Record<string, number | null> = {};
   const run = fullRunMinutes(root);
   for (const one of decided) for (const entry of one.sheet.entries) minutes[entry.file.slice(0, entry.file.indexOf(":"))] = run;
-  const scopes = proposeScopes({ arcs: decided, minutes });
+  // Scopes are ordered by the workspace map's order, which stands in each sheet's release chain here.
+  const order = workspaceMapOf(root).order;
+  const scopes = proposeScopes({ arcs: order.length ? decided.map((one) => ({ ...one, sheet: { ...one.sheet, releaseChain: order } })) : decided, minutes });
   if (!scopes.length) { console.log(`${basename(ws)} holds no decided arc with a sheet.`); return 0; }
   scopes.forEach((one, at) => {
     console.log(`scope ${at + 1} · ${one.arcs.join(", ")} · ${one.repos.join(", ")}`);
@@ -342,12 +405,34 @@ function propose(args: string[]): number {
   return 0;
 }
 
-function partLine(part: GoPart, waiting: boolean): string {
+/** What a part's worktree holds of it: `state` and the count of the part's distinct files (repository prefix stripped) that appear among the worktree's uncommitted files. */
+export type Written = { state: "written" | "partly written" | "not written"; done: number; total: number };
+
+/** Whether a part is read against the worktree: it holds entries and is neither landed nor dropped. */
+const isWritable = (part: GoPart): boolean => part.entries.length > 0 && part.state !== "landed" && part.state !== "dropped";
+
+/** A part's state read from the worktree: how many of its files `changed` (the repository's uncommitted files) holds. */
+export function writtenOf(ws: string, part: GoPart, changed: readonly string[]): Written {
+  const files = new Set(entriesHeld(part, ws).files.map((file) => file.slice(file.indexOf(":") + 1)));
+  const total = files.size;
+  const done = [...files].filter((file) => changed.includes(file)).length;
+  return { state: done === total && total > 0 ? "written" : done === 0 ? "not written" : "partly written", done, total };
+}
+
+/** A part's worktree read, or null where the part holds no entries or has landed or dropped, and `"none"` where its repository has no worktree for this workstream. */
+function worktreeOf(ws: string, part: GoPart, root: string): Written | "none" | null {
+  if (!isWritable(part)) return null;
+  if (!existsSync(join(root, ".worktrees", basename(ws), part.repo))) return "none";
+  return writtenOf(ws, part, uncommitted(ws, part.repo));
+}
+
+function partLine(part: GoPart, waiting: boolean, worktree: Written | "none" | null = null): string {
   const state = part.state === "ready" && waiting ? "waiting" : part.state;
   const time = workOf(part, false);
+  const written = worktree === null ? [] : worktree === "none" ? ["no worktree"] : [worktree.state, `${worktree.done}/${worktree.total} files changed`];
   const tail = [part.entries.length ? part.entries.join(" ") : "", part.tests.length ? `tests ${part.tests.join(" ")}` : "", part.waitsOn.length ? `waits on ${part.waitsOn.join(", ")}` : "",
     part.state === "waiting" && part.waitingOn ? `waiting on ${part.waitingOn}` : ""].filter(Boolean);
-  return [`${part.id}  ${part.work}  ${state}  ${time}`, ...tail].join(" · ");
+  return [[part.id, part.work, state, ...written, time].join("  "), ...tail].join(" · ");
 }
 
 function show(args: string[]): number {
@@ -359,10 +444,15 @@ function show(args: string[]): number {
   const id = words.value("part");
   const parts = id === null ? plan.parts : plan.parts.filter((one) => one.id === id);
   if (id !== null && !parts.length) throw new UsageFault(`finds no part ${id} in ${arc}'s plan.`);
-  if (words.given("json")) { console.log(JSON.stringify({ ...plan, parts }, null, 2)); return 0; }
+  const root = workspaceOf() ?? process.cwd();
+  if (words.given("json")) {
+    const read = parts.map((one) => { const at = worktreeOf(ws, one, root); return at === null ? one : { ...one, worktree: at === "none" ? null : { state: at.state, done: at.done, total: at.total } }; });
+    console.log(JSON.stringify({ ...plan, parts: read }, null, 2));
+    return 0;
+  }
   const ready = new Set(readyParts(plan).map((one) => one.id));
   console.log([arc, `scope ${plan.scope.join(",")}`, `${plan.parts.length} parts`, `written ${plan.writtenAt}`].join(" · "));
-  for (const part of parts) console.log(partLine(part, !ready.has(part.id)));
+  for (const part of parts) console.log(partLine(part, !ready.has(part.id), worktreeOf(ws, part, root)));
   console.log(nextStep(`${basename(ws)}/${arc}`, ws, plan));
   return 0;
 }
@@ -429,7 +519,9 @@ function startApply(ws: string, arc: string, plan: GoPlan, part: GoPart, refuse:
   let commit: string;
   try {
     for (const one of patched) gitIn(dir, ["apply", "--3way", patchFileOf(ws, one.from, one.entry!)]);
-    gitIn(dir, ["add", "--", ...entries.map((one) => one.entry!.file.slice(one.entry!.file.indexOf(":") + 1))]);
+    // `git apply --3way` already staged a deleted path: only the paths still in the tree are added.
+    const rels = entries.map((one) => one.entry!.file.slice(one.entry!.file.indexOf(":") + 1)).filter((rel) => existsSync(join(dir, rel)));
+    if (rels.length) gitIn(dir, ["add", "--", ...rels]);
     gitIn(dir, ["commit", "-m", `${part.id}: ${patched.length} patch${patched.length === 1 ? "" : "es"} and ${entries.length - patched.length} light edit${entries.length - patched.length === 1 ? "" : "s"} (${basename(ws)}/${arc} ${entries.map((one) => one.ref).join(", ")})`]);
     commit = gitIn(dir, ["rev-parse", "HEAD"]).trim();
   } catch (thrown) { return refuse(`${part.id} could not be committed in ${part.repo}: ${String((thrown as Error).message).split("\n").find((line) => line.trim()) ?? "git failed"}`); }

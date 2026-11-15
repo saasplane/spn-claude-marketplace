@@ -16,6 +16,7 @@ import { basename, resolve } from "node:path";
 import { type Action, FLAG, VALUE, UsageFault, readWords, type Words } from "../../../../../plugin-support-lib/src/lib/command.ts";
 import { STORED_STATUSES, raisedSuggestions } from "../../checks/arc-status.ts";
 import { stepRowFindings } from "../../checks/workstream-state.ts";
+import { mapOrderOf } from "../../lib/go-plan.ts";
 import {
   NOTES, PREVIEW_FILE, approachOf, arcDataDir, arcIdsOf, arcStamp, arcStatus, doneOf, everDecided, logEvent, logLinesOf, newArc, nextBuildArc, notesDirOf, previewFromTemplate, previewHrefOf, previewOf,
   previewPathFault, proposedLines, readArc, readJsonl, restamped, sheetFileOf, stampsOn, suggestionsFileOf, whatEntryOf, whatId, withEntryLink, withWhatEntry, workspaceOf, writeArc, writeJsonl, writeWhole,
@@ -338,7 +339,7 @@ function edit(args: string[]): number {
   console.log(`ok · ${bare ? arc : `${arc} ${done}/${total}`} · ${[...said, ...refreshed.said].join(" · ")}`);
   if (opened) for (const line of openingLines(data, opened)) console.log(line);
   for (const line of [...refreshed.lines, ...afterWrite(ws)]) console.log(line);
-  for (const line of stepRowFindings(data)) console.log(`note: ${line}`);
+  for (const line of stepRowFindings(data, before.get(arc), mapOrderOf(workspaceOf()))) console.log(`note: ${line}`);
   if (goes) for (const line of previewProposals(ws, arc)) console.log(line);
   for (const line of precedent) console.log(line);
   if (goes) console.log(`Next: \`workstream go write ${basename(ws)}/${arc} --scope ${arc}\`.`);

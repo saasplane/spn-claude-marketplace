@@ -1635,6 +1635,24 @@ console.log("\n=== stop — the checks the first round fixed or wired, and the g
       `${wrote.out.slice(0, 200)} · ${JSON.stringify(stale)}`);
   }
   {
+    // [MKT.HOOKS.503] THE CHECK READS THE PAGE THROUGH `producedPage` AND THE PREVIEW THROUGH `previewWouldChange`: a page and a preview the writer would leave as they are are not behind.
+    const { root, ws } = await dataWorkspace("e2256-page-current");
+    writeFileSync(join(ws, "notes", "N001", "preview.html"), previewShowing("PROPOSED"));
+    const wrote = cli(root, ["docs", "cycles", "write", "031-probe"]);
+    const page = readFileSync(join(ws, "approach.html"), "utf8");
+    const current = call("checkPageCurrent", new Set([arcOf(ws)]));
+    check("[MKT.HOOKS.503] a touched arc whose page the writer leaves unchanged and whose preview is current returns no warning",
+      wrote.code === 0 && page.includes("no card is open") && current.length === 0, `${wrote.out.slice(0, 200)} · ${JSON.stringify(current)}`);
+    editArc(ws, (data) => { data.rows[0].state = "landed"; });
+    const behind = call("checkPageCurrent", new Set([arcOf(ws)]));
+    check("[MKT.HOOKS.503] the same arc with its Plan table behind returns the existing message, naming the workstream and the command",
+      behind.length === 1 && behind[0].check === "page-stale" && behind[0].message.includes("An arc you wrote this turn left its page behind")
+        && behind[0].message.includes("`spn-devex docs cycles write 031-probe`"), JSON.stringify(behind));
+    const mended = cli(root, ["docs", "cycles", "write", "031-probe"]);
+    check("[MKT.HOOKS.503] and after `docs cycles write` the warning is gone",
+      mended.code === 0 && call("checkPageCurrent", new Set([arcOf(ws)])).length === 0, `${mended.out.slice(0, 200)}`);
+  }
+  {
     const { root, ws } = await dataWorkspace("n006-promise");
     editArc(ws, (data) => { data.rows[0].state = "landed"; });
     const promise = "The book is written and its checks are green.\n\nNext I'll build it.";

@@ -3,7 +3,8 @@
 // block), one arc's `state.json` with its name file, its preview and its plan. Each case starts whole
 // and breaks one thing.
 import { execFileSync } from "node:child_process";
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { workspace } from "./fixture.mjs";
 import { PLUGIN } from "./harness.mjs";
@@ -171,4 +172,25 @@ export function writeClosingBlock(ws) {
   const page = join(ws, "approach.html");
   const text = readFileSync(page, "utf8");
   writeFileSync(page, text.includes("</header>") ? text.replace("</header>", `</header>\n${CLOSING_BLOCK}`) : `${text}\n${CLOSING_BLOCK}`);
+}
+
+/**
+ * A plugin's tests read the plugin's own refs, never the copy installed on the machine: its full run comes before its install.
+ * Points CLAUDE_CONFIG_DIR at a temporary folder whose plugins/installed_plugins.json lists the devex, apps, infra and surface plugins
+ * with their installPath at this repository's own packages/plugin-spn-<name>/src, the shape `refRoots` reads. Returns the function
+ * that puts the variable back and removes the folder.
+ */
+export function ownPlugins() {
+  const before = process.env.CLAUDE_CONFIG_DIR;
+  const dir = mkdtempSync(join(tmpdir(), "spn-config-"));
+  const plugins = {};
+  for (const name of ["devex", "apps", "infra", "surface"])
+    plugins[`spn-${name}@spn-claude-marketplace`] = [{ scope: "user", installPath: resolve(PLUGIN, "..", `plugin-spn-${name}`, "src"), version: "0.0.0" }];
+  mkdirSync(join(dir, "plugins"), { recursive: true });
+  writeFileSync(join(dir, "plugins", "installed_plugins.json"), JSON.stringify({ version: 2, plugins }, null, 2));
+  process.env.CLAUDE_CONFIG_DIR = dir;
+  return () => {
+    if (before === undefined) delete process.env.CLAUDE_CONFIG_DIR; else process.env.CLAUDE_CONFIG_DIR = before;
+    rmSync(dir, { recursive: true, force: true });
+  };
 }

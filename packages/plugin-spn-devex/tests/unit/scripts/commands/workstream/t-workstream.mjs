@@ -6,10 +6,13 @@ import { createHash } from "node:crypto";
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { basename, join, resolve } from "node:path";
 import { PLUGIN } from "../../../../helpers/harness.mjs";
-import { CARD as BARE_CARD, arcData, cli, writeClosingBlock, dataWorkspace as dataArc, put } from "../../../../helpers/workstream-fixture.mjs";
+import { CARD as BARE_CARD, arcData, cli, ownPlugins, writeClosingBlock, dataWorkspace as dataArc, put } from "../../../../helpers/workstream-fixture.mjs";
 // A card's What cites what it read, or `question raise` refuses it (MKT.SCRIPTS.383).
 const CARD = { ...BARE_CARD, what: "The file is `a.ts:12`." };
 import { workspace } from "../../../../helpers/fixture.mjs";
+
+// `go write` finds the passes through installed_plugins.json: this repository's own refs speak, never the installed copy.
+const putBackConfig = ownPlugins();
 
 let total = 0, failed = 0;
 const ok = (label, condition, detail = "") => {
@@ -1358,4 +1361,5 @@ console.log("\n=== a go over a mixed scope: a numbered arc and the ideate arc (Q
 }
 
 console.log(failed ? `\n  ${failed} of ${total} FAILED — workstream commands` : `\n  all ${total} passed — workstream commands`);
+putBackConfig();
 process.exit(failed ? 1 : 0);
