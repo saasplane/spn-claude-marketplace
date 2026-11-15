@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/11-delivery-library/",
-      "seen": "7ed3b612"
+      "seen": "784bb636"
     }
   ]
 }
@@ -26,7 +26,7 @@ Its provenance is the foundation book's design library chapter. Apply this resta
 
 ## The walk, in order
 
-**Before the first connector write, run `spnutils workspace status`.** If it says `DSThemeSans` is not installed, name the setup row to the developer (the guide's "The accounts and tokens", row 5: the font's files in the design system package's `assets/fonts/figma/`, installed with Font Book, or shared by a Figma admin) and draw nothing until it is installed. The connector runs on Figma's servers and sees no font on the machine, so its reading of a text as a missing font is never the check.
+**Before the first connector write, read the `Theme-Font` variables `text`, `display` and `code` of the core file, and read `figma.listAvailableFontsAsync()` for the three families they name.** A family whose font Figma hosts (Geist, Geist Mono and Schibsted Grotesk) needs nothing. A brand font that Figma does not host is uploaded by the person under its own name, in Figma's account settings, and the variable is set to that name; if anything is missing, or anything else of the setup is, read `skills/design/steps/setup-figma.md` and run it with the person. Draw nothing until all three families are listed. The connector sees the fonts Figma hosts and the fonts uploaded to the person's Figma account, and none installed only on the machine, so its list is the check.
 
 1. **Read the file once, by passing `skills/design/scripts/page.js` to the connector as it is with its inputs filled, or take the inventory you were handed, and write the time of the reading on it; where the inventory is for the tool, read the file with `skills/design/scripts/inventory.js` (the list of pages first, then one call for each page) and `skills/design/scripts/tokens.js`, save each answer as a file in one folder, put them together with `node skills/design/scripts/assemble.mjs --answers <folder> --out <inventory>`, and take that in with `spnutils apps surface library --file <inventory>`; before you take it in, prove each unit by a hash: send the same script again inside a function with its body unchanged, have it return an eight-character hash for each unit, compute the same hash from the answer file, and compare by program.** Headings: "The inventory", "How the connector's work is carried out", and "What the agent reads and keeps".
    - **`page.js` stops by its byte limit on a large page.** It answers what fits under `maxBytes` and names where to go on in `next`: at `maxBytes` 15000 to 16000 one answer held 49 to 70 nodes, of pages of 88 to 367. Read the rest with a short read-only script of your own, limited to the section you work in, and do not send `page.js` for range after range. `page.js` gives no key, no mode and no binding, so the same short script reads those.

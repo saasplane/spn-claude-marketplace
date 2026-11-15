@@ -1,7 +1,7 @@
 {
  "kind": "skeleton",
  "title": "Show it, the picture beside",
- "caption": "It stands under a top bar, in the window's full width: a site's section reaches the window. The section is a DSSectionContainer, and inside it one DSFeature. From a tablet up the feature splits, as SPLIT_END does, for one picture the title names that reads at half width: the words at the start, with the head packed as one block (the eyebrow in small capitals over the title, the description under it, and its facts as badges under that), two points as a LIST and one action; the picture at the end, as mediaNode, about half the width, framed by its kind: a product is frames MEDIA, surface raised, elevation MD. On a phone the words come first, then the points, then the picture.",
+ "caption": "It stands under a top bar, in the window's full width: a site's section reaches the window. The section is a DSSectionContainer, and inside it one DSFeature. From a tablet up the feature splits, as SPLIT_END does, for one picture the title names that reads at half width: the words at the start, with the head packed as one block (the eyebrow in small capitals over the title, the description under it, and its facts as badges under that), two points as a LIST and one action; the picture at the end, as mediaNode, about half the width, framed by its kind: a product is frames MEDIA, surface raised, elevation MD. On a phone the words come first, then the points, then the picture. The page that holds this section is wrapped once in DSSiteLayout.",
  "layout": {
   "type": "TOPNAV",
   "body": {

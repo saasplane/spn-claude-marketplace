@@ -1,5 +1,19 @@
 /*! tailwindcss v4.3.3 | MIT License | https://tailwindcss.com */
 @layer properties;
+@font-face {
+  font-family: SDSText;
+  src: url("fonts/Geist-Variable.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: SDSCode;
+  src: url("fonts/GeistMono-Variable.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
 @layer theme, components, utilities;
 @layer utilities {
   .col-span-1 {
@@ -1258,8 +1272,8 @@
     --sds-ok-soft: #dcece8;
     --sds-fail: #a63d3d;
     --sds-fail-soft: #f6e1e1;
-    --sds-ui: ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
-    --sds-mono: ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+    --sds-ui: SDSText,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    --sds-mono: SDSCode,ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
     --sds-xs: 0.76rem;
     --sds-sm: 0.85rem;
     --sds-md: 0.97rem;

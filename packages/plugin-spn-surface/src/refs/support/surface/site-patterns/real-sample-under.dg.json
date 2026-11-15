@@ -1,7 +1,7 @@
 {
  "kind": "skeleton",
  "title": "Real sample, the code under",
- "caption": "The same sample as MEDIA_BOTTOM, because a line runs past about seventy characters: the words across the section, and under them the DSCodeBlockView titled with its file, flat in its own frame. On a tablet and a phone the code keeps its width and scrolls sideways, cut at the column's end with the mark of the cut; it never wraps.",
+ "caption": "The same sample as MEDIA_BOTTOM, because a line runs past about seventy characters: the words across the section, and under them the DSCodeBlockView titled with its file, flat in its own frame. On a tablet and a phone the code keeps its width and scrolls sideways, cut at the column's end with the mark of the cut; it never wraps. The page that holds this section is wrapped once in DSSiteLayout.",
  "layout": {
   "type": "TOPNAV",
   "body": {

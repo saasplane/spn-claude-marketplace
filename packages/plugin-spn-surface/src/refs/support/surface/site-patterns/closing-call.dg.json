@@ -1,7 +1,7 @@
 {
  "kind": "skeleton",
  "title": "Closing call",
- "caption": "A DSSectionContainer at size SM, color PRIMARY, strength SUBTLE, with inset, holds one DSFeature with textAlign CENTER and words alone, never framed: the one SOLID primary, and at most one OUTLINE that opens a page no door above it opens. A site whose brand reads as a solid band takes strength SOLID, with its buttons coloured DEFAULT. On a phone the words, then the buttons, one under another.",
+ "caption": "A DSSectionContainer at size SM, color PRIMARY, strength SUBTLE, with inset, holds one DSFeature with textAlign CENTER and words alone, never framed: the one SOLID primary, and at most one OUTLINE that opens a page no door above it opens. A site whose brand reads as a solid band takes strength SOLID, with its buttons coloured DEFAULT. On a phone the words, then the buttons, one under another. The page that holds this section is wrapped once in DSSiteLayout.",
  "layout": {
   "type": "TOPNAV",
   "body": {

@@ -7,7 +7,12 @@
 
    This is the file a person or an agent edits. `node scripts/build-styles.mjs` builds `sds-docs.css`
    beside it, with @tailwindcss/cli 4.3.3, and `spn-devex docs sds cut <version>` serves a build as a
-   version that never changes. */
+   version that never changes.
+
+   The pages read in Geist and Geist Mono, which sit in `fonts/` beside the built stylesheet in every version's
+   folder, so the urls below are relative to the stylesheet. No display font. The system stacks stay after them. */
+@font-face{font-family:SDSText;src:url("fonts/Geist-Variable.woff2") format("woff2");font-weight:100 900;font-style:normal;font-display:swap}
+@font-face{font-family:SDSCode;src:url("fonts/GeistMono-Variable.woff2") format("woff2");font-weight:100 900;font-style:normal;font-display:swap}
 @layer theme, components, utilities;
 
 /* TAILWIND. Its theme and its utilities are loaded; its reset is not, because the page's base rules are
@@ -132,8 +137,8 @@
     --sds-text-heading-card:#080c10; --sds-text-title-card:#1a222b; --sds-text-description-card:#424c5a; --sds-text-fact-card:#566170;
     --sds-rule:#d2d9e0; --sds-accent:#2f4e7a; --sds-accent-soft:#e0e8f4; --sds-gap:#8f5714; --sds-gap-soft:#f7ecda;
     --sds-ok:#2a6459; --sds-ok-soft:#dcece8; --sds-fail:#a63d3d; --sds-fail-soft:#f6e1e1;
-    --sds-ui:ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
-    --sds-mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace; --sds-xs:0.76rem; --sds-sm:0.85rem;
+    --sds-ui:SDSText,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    --sds-mono:SDSCode,ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace; --sds-xs:0.76rem; --sds-sm:0.85rem;
     --sds-md:0.97rem; --sds-lg:1.32rem; --sds-xl:1.62rem; --sds-xxl:2.5rem; --sds-tk-k:#6d3a9c; --sds-tk-s:#2a6459;
     --sds-tk-c:#7c8794; --sds-tk-t:#2f4e7a; --sds-tk-n:#8f5714; --sds-tk-add:#2a6459; --sds-tk-del:#a63d3d;
     --sds-violet:#6d3a9c; --sds-violet-soft:#ece3f5; --sds-cyan:#1b6a86; --sds-cyan-soft:#dbeef4; --sds-pink:#a0366d;

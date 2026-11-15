@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/09-architecture-layouts/",
-      "seen": "8cfa20d2"
+      "seen": "fc865e4d"
     }
   ]
 }
@@ -168,6 +168,11 @@ A section reaches the edges of its place and no further (`RULE.SUPPORT.SURFACE.2
 - **Each layout MUST mark one element for each place a section can stand in as a size container, and the marked element MUST carry no padding at its sides** (`RULE.SUPPORT.SURFACE.255` · MUST · skill:spn-surface/design). The marked element is the window's root in `TOPNAV` and `CANVAS` (in `TOPNAV` the content, where the content is bordered, raised or floating), the header and the footer in every layout that has them, and the content part in `RAIL` and `DOCK`. On the web it takes `container-type: inline-size`, so `100cqw` inside it is the width of the place.
 - **No size container MUST stand between a place and a section in it.** A section reads the nearest one, so a size container of any other block would become the section's place.
 - **A section MUST NOT stand in the nav column, a panel, a card or an overlay.** The nav column is the navigation's, and the others frame what they hold. `architecture-containers.md` states the section.
+
+## The wrapper of a site's page — 🔮
+
+- **`DSSiteLayout` MUST wrap one site's page, and it is the only thing that marks a page as a site's** (`RULE.SUPPORT.SURFACE.196` · MUST · skill:spn-surface/design). It is a unit of the Layouts layer, so its name ends in `Layout` (`RULE.SUPPORT.SURFACE.229` · MUST · skill:spn-surface/design). It renders `<div data-ds-page="SITE">` around the page's run of sections and draws nothing else: no navigation, no fill and no room, and it stands inside the app's `DSLayout` content. Inside it `--font-heading` is `var(--font-display)`, so the display steps draw in the theme's display family; outside it they draw in the text family.
+- **A marketing page, and a page of docs in a web app built from the design system, count as a site's page.** A page a person works on, sign-in and onboarding included, is never wrapped, though it is public. The generated pages of `docs/artifacts/`, the construct pages and the approach pages are not the design system's and are not wrapped.
 
 ## The phone and the tablet — 🔮
 

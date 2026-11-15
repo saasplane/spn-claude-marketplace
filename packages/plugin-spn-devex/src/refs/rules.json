@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "book": {
     "repository": "spn-foundation",
-    "commit": "9f752b7c"
+    "commit": "c463ed51"
   },
   "rules": [
     {
@@ -23302,7 +23302,7 @@
         "skill": "spn-surface/design"
       },
       "class": "stated in a skill",
-      "sentence": "SaaS Plane's design library is managed by its builder, and a partner is given the published library and does not change it",
+      "sentence": "SaaS Plane's design library is managed by its builder, and a partner is given the published library, as a copy from the Community page of each Support release, and does not change it",
       "chapter": "04-capabilities/02-support/01-surface/11-delivery-library/02-figma/02-managed.md",
       "heading": "A builder manages the library, and a partner uses it",
       "decision": null,
@@ -28320,9 +28320,9 @@
         "skill": "spn-surface/design"
       },
       "class": "stated in a skill",
-      "sentence": "The theme holds no font family; the typeface is the app's font file, bound to `DSThemeSans` with `@font-face`",
-      "chapter": "04-capabilities/02-support/01-surface/10-architecture-app/01-common/02-settings-and-theme.md",
-      "heading": "The typeface",
+      "sentence": "`DSSiteLayout` wraps one site's page, and it is the only thing that marks a page as a site's",
+      "chapter": "04-capabilities/02-support/01-surface/09-architecture-layouts/01-common/01-layout.md",
+      "heading": "The wrapper of a site's page",
       "decision": null,
       "restated": [
         {
@@ -28333,7 +28333,27 @@
         {
           "plugin": "spn-surface",
           "path": "refs/support/surface/architecture-app.md",
+          "heading": "The theme — 🔮"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/architecture-app.md",
           "heading": "The whole theme — 🔮"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/architecture-layouts.md",
+          "heading": "The wrapper of a site's page — 🔮"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/site-patterns.md",
+          "heading": "A site pattern — 🔮"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/SKILL.md",
+          "heading": "Choose in four steps, with a block last"
         },
         {
           "plugin": "spn-surface",
@@ -29389,6 +29409,11 @@
           "plugin": "spn-devex",
           "path": "refs/devex/agent/lenses/ui.md",
           "heading": "Produces to"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/architecture-layouts.md",
+          "heading": "The wrapper of a site's page — 🔮"
         },
         {
           "plugin": "spn-surface",
@@ -34257,7 +34282,7 @@
         "skill": "spn-surface/design"
       },
       "class": "stated in a skill",
-      "sentence": "The library's text styles carry the theme's sans family, `DSThemeSans` in Lab, and never a stand-in font",
+      "sentence": "The library's text styles bind to the theme's typefaces and never name a stand-in font",
       "chapter": "04-capabilities/02-support/01-surface/05-architecture-core/01-common/01-tokens.md",
       "heading": "The type steps",
       "decision": null,

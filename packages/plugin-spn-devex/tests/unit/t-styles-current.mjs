@@ -39,9 +39,16 @@ ok("every folder under public/assets/docs is a version the list holds, and every
   JSON.stringify(folders) === JSON.stringify(Object.keys(versions).sort()),
   `folders: ${folders.join(", ")} · listed: ${Object.keys(versions).join(", ")}`);
 for (const [version, files] of Object.entries(versions)) {
-  ok(`${version} serves the three files and no other`,
+  // From 1.12.0 a version also holds `fonts/`, the Geist files the stylesheet's @font-face rules name by a relative url.
+  const withFonts = existsSync(join(SERVED, version, "fonts"));
+  ok(`${version} serves the three files and no other${withFonts ? ", and the fonts folder beside them" : ""}`,
     JSON.stringify(Object.keys(files).sort()) === JSON.stringify(FILES)
-      && JSON.stringify(readdirSync(join(SERVED, version)).sort()) === JSON.stringify(FILES));
+      && JSON.stringify(readdirSync(join(SERVED, version)).sort()) === JSON.stringify((withFonts ? [...FILES, "fonts"] : FILES).sort()));
+  if (withFonts) {
+    ok(`${version}/fonts holds the two Geist files and their licence, the bytes the styles folder holds`,
+      JSON.stringify(readdirSync(join(SERVED, version, "fonts")).sort()) === JSON.stringify(["Geist-Variable.woff2", "GeistMono-Variable.woff2", "OFL.txt"].sort())
+        && readdirSync(join(SERVED, version, "fonts")).every((name) => sha(join(SERVED, version, "fonts", name)) === sha(join(STYLES, "fonts", name))));
+  }
   for (const [name, hash] of Object.entries(files))
     ok(`${version}/${name} holds the bytes it was cut with`, sha(join(SERVED, version, name)) === hash);
 }

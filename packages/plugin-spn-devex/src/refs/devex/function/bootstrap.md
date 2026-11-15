@@ -11,11 +11,11 @@
     },
     {
       "path": "spn-foundation/docs/05-guides/README.md",
-      "seen": "2ba71bab"
+      "seen": "a3fc59a5"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
-      "seen": "702c16d3"
+      "seen": "49abb7b6"
     }
   ]
 }

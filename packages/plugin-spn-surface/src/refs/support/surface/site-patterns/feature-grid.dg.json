@@ -1,7 +1,7 @@
 {
  "kind": "skeleton",
  "title": "Feature grid",
- "caption": "A DSFeatureGridSectionContainer with section color BASE, size MD, its heading with its action under it, and grid by count, 3/2/1. Each cell is a DSFeature at pageLevel WIDGET with media MARK, an eyebrow for the family the cells share and facts for the count. A cell that opens nothing is boxed and flat, frames TEXT, surface bordered; a cell with an anchor is a door, surface raised, elevation MD, on DEFAULT. Shown features, a directory, plans and quotes are uses of this grid. On a phone the heading and its button, then one cell under another.",
+ "caption": "A DSFeatureGridSectionContainer with section color BASE, size MD, its heading with its action under it, and grid by count, 3/2/1. Each cell is a DSFeature at pageLevel WIDGET with media MARK, an eyebrow for the family the cells share and facts for the count. A cell that opens nothing is boxed and flat, frames TEXT, surface bordered; a cell with an anchor is a door, surface raised, elevation MD, on DEFAULT. Shown features, a directory, plans and quotes are uses of this grid. On a phone the heading and its button, then one cell under another. The page that holds this section is wrapped once in DSSiteLayout.",
  "layout": {
   "type": "TOPNAV",
   "body": {
