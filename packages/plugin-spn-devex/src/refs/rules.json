@@ -33772,6 +33772,11 @@
           "plugin": "spn-surface",
           "path": "refs/support/surface/architecture-components.md",
           "heading": "The level and the form"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/given-design.md",
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -33786,7 +33791,13 @@
       "chapter": "02-constructs/02-support/01-surface/06-architecture-components.md",
       "heading": "How a unit is sorted for the library",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/mock.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.SUPPORT.SURFACE.416",
@@ -33799,7 +33810,13 @@
       "chapter": "02-constructs/02-support/01-surface/06-architecture-components.md",
       "heading": "How a unit is sorted for the library",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/mock.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.SUPPORT.SURFACE.417",
@@ -33812,7 +33829,13 @@
       "chapter": "02-constructs/02-support/01-surface/06-architecture-components.md",
       "heading": "How a unit is sorted for the library",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/mock.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.SUPPORT.SURFACE.418",
@@ -33825,7 +33848,13 @@
       "chapter": "02-constructs/02-support/01-surface/06-architecture-components.md",
       "heading": "How a unit is sorted for the library",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/mock.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.SUPPORT.SURFACE.419",
@@ -33838,7 +33867,13 @@
       "chapter": "02-constructs/02-support/01-surface/09-architecture-layouts.md",
       "heading": "The content",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.SUPPORT.SURFACE.420",
@@ -33864,7 +33899,13 @@
       "chapter": "04-capabilities/02-support/01-surface/11-delivery-library/02-figma/04-drawing.md",
       "heading": "Which property is a variant and which is a case",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/writer-brief.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.SUPPORT.SURFACE.422",
@@ -33877,7 +33918,13 @@
       "chapter": "04-capabilities/02-support/01-surface/11-delivery-library/02-figma/04-drawing.md",
       "heading": "A unit's look",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/writer-brief.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.SUPPORT.SURFACE.423",
@@ -33890,7 +33937,13 @@
       "chapter": "04-capabilities/02-support/01-surface/05-architecture-core/01-common/01-tokens.md",
       "heading": "The type steps",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     }
   ]
 }
