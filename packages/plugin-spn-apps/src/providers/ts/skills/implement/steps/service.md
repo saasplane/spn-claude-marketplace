@@ -11,7 +11,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/10-providers/ts/06-service.md",
-      "seen": "0bb20870"
+      "seen": "34049ec1"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/10-providers/ts/07-data.md",
@@ -59,7 +59,7 @@ Repo returns `{ total, entityIds }` (mode-split TOTAL/RECORDS/BOTH, ids-only sel
 - **`@SPCachePurge` on writes**: exact keys reproduced from the write command (`[[0,'id']]`), wildcard clears the suffix family. When the cache key isn't on the command (list-keyed caches), route the write through a private `_save<X>`/`_delete<X>` carrying the purge keyed off the **entity**. Wildcard-clearing an org prefix from an id-only mutation is a smell.
 - **Active toggle, not delete**: `update<X>Active(SPUpdateActiveCommand)`; hard delete only for junction/owned-child rows. Junction sets are replaced **wholesale** (delete-all-then-insert for plain rows; diff add/deactivate for rows with history); validate every incoming id against the caller's scope (anti-enumeration) and dedupe.
 - **Migration-seeded SYSTEM/DEFAULT rows are API-immutable** — service hardcodes `CUSTOM` on create; an `_assertMutable` guard sits on **every** write path including active toggles.
-- **Single-writer rule**: one service owns each entity's save/update/delete; cross-module writes go through the owning contract service or a request queue. Trusted internal writers (schedulers, listeners) use dedicated `*Internal` repo methods and must still purge.
+- **Single-writer rule**: one service owns each entity's save/update/delete; cross-module writes go through the owning contract service or a request queue. Trusted internal writers (schedulers, listeners) use dedicated `*Internal` repo methods and must still purge. A migration hook is a writer too: when its rows feed a cached read it clears that family once its writes commit (`ctx.bootState.providers.caches.default.clear('<namespace>:<prefix>:')`), and a cache a deploy may rewrite under running services keeps a TTL that bounds the rebuild race — a read made on every session mint takes the tenant minute (`RULE.SUPPORT.APPS.266` · MUST · skill:spn-apps/implement).
 
 ## Cross-cutting
 

@@ -867,6 +867,20 @@ console.log("\n=== the go is refused while the sheet has a finding");
   ok("[MKT.SCRIPTS.235] the go is refused, names the finding, and the status stays PROPOSED", go.code === 1 && go.out.includes("row 1 names no entry") && go.out.includes("Nothing was written") && json(file).status === "PROPOSED", go.out);
 }
 
+console.log("\n=== the go is refused on a web, test or judged change with no patch (MKT.SCRIPTS.562)");
+{
+  for (const [name, file, judged] of [["web", "spn-x:packages/mod-web/src/Page.tsx", false], ["test", "spn-x:packages/mod/tests/unit/t-thing.mjs", false], ["judged", "spn-x:packages/mod/src/Thing.ts", true]]) {
+    const rows = [{ id: "1", parent: "N001", title: "r", kind: "change", repo: "spn-x", work: "CODE", blockedBy: [], touches: [], state: "waiting", entries: ["E1"] }];
+    const going = await dataArc(`nopatch-${name}`, { rows });
+    const stateFile = join(going.ws, "arcs", "N001", "state.json");
+    const data = json(stateFile); data.status = "PROPOSED"; writeFileSync(stateFile, JSON.stringify(data, null, 2));
+    const one = { id: "E1", op: "edit", file, what: "change E1", decidedBy: [], facts: ["f1"], then: [], rules: [], callers: [], tiers: { unit: ["U.1"] }, docs: [], book: [], trace: "why", judged, kind: "change" };
+    writeFileSync(join(going.ws, "arcs", "N001", "sheet.json"), JSON.stringify({ schemaVersion: 1, releaseChain: [], dependsOn: [], stack: null, entries: [one] }));
+    const go = cli(going.root, ["workstream", "arc", "edit", "031/N001", "--status", "DECIDED", "--note", "the developer: go"]);
+    ok(`[MKT.SCRIPTS.562] (RULE.DEVEX.WORKSPACE.502) a ${name} change with no patch refuses the go on the arc, and the status stays PROPOSED`, go.code === 1 && go.out.includes("E1 is a change and has no patch") && json(stateFile).status === "PROPOSED", go.out);
+  }
+}
+
 console.log("\n=== an arc title is a topic name");
 {
   const long = cli(root, ["workstream", "arc", "edit", "031/N001", "--title", "one two three four five six"]);

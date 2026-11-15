@@ -186,6 +186,7 @@ Three more that decide whether a symbol appears at all:
 - **A limit is checked with `PlatformService.assertWithinLimit` or `PlatformService.assertValueWithinLimit`, and the module that owns it states how it is counted** (`RULE.PLATFORM.CORE.077` · MUST · skill:spn-apps/implement)
 - **A module records beside its real send, and one audited read returns the value once** (`RULE.PLATFORM.CORE.078` · MUST · skill:spn-apps/implement)
 - **An org chooses only fields of the product's catalog, and it never edits or removes a platform row** (`RULE.PLATFORM.CORE.079` · MUST · skill:spn-apps/implement)
+- **A customer of every child category always opens on a details page of its own, in every console** (`RULE.PLATFORM.CORE.080` · MUST · skill:spn-apps/implement)
 - **A module reads the platform's countries, currencies, languages and base labels; it never declares its own.** (`RULE.PLATFORM.MODULES.001` · MUST · skill:spn-apps/implement)
 - **A currency carries where its symbol sits, and a language carries which way it reads.** (`RULE.PLATFORM.MODULES.002` · MUST · skill:spn-apps/implement)
 - **A module registers its own entity types in its MDM contribution, and a registered type may opt only into capabilities the closed set names.** (`RULE.PLATFORM.MODULES.003` · MUST · skill:spn-apps/implement)

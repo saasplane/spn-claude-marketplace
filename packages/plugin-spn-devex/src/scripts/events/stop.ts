@@ -900,6 +900,32 @@ function handoverFragments(reply: string): Fence[] {
   });
 }
 
+// A LINE TO SWAP INTO A BLOCK, SAID IN PROSE: "replace the `open:` line with …", "add to `do not touch:` …",
+// "the `state:` line now reads …". It is a fragment as much as a fenced one, and the hook never sees the block it
+// would go into once the work has moved, so it is caught on its own words (the developer, 2026-11-14).
+const LABEL_SPAN = `\`(?:${HANDOVER_LABELS.join("|")}):?\``;
+const SWAPS_A_LINE = new RegExp(
+  String.raw`\b(?:replace|swap|change|update|add|append|put|use|merge|edit|amend)\b[^.?!\n]{0,80}${LABEL_SPAN}` +
+    String.raw`|${LABEL_SPAN}(?:\s+(?:line|field))?\s+(?:now\s+)?(?:reads|becomes|should\s+read|changes\s+to|is\s+now)\b`,
+  "i");
+const ABOUT_A_FRAGMENT = /\b(?:hook|check|checks|caught|catch(?:es)?|fragments?|such as|for example|e\.g\.|like)\b/i;
+
+/**
+ * Whether the reply's own words hand over part of a block: a line to swap in, said in prose, or two or more of the
+ * block's labelled lines outside a fence. Quotations, block quotes and fenced blocks are left out, so a reply that
+ * quotes the check, or explains it, is not read as one.
+ */
+export function swapsALine(reply: string): boolean {
+  const prose = withoutFences(reply)
+    .replace(/^[ \t]{0,3}>.*$/gm, " ")
+    .replace(/"[^"\n]*"/g, " ")
+    .replace(/“[^”\n]*”/g, " ");
+  // A sentence about the check, or one giving an example of what it catches, directs nobody.
+  const sentences = prose.split(/(?<=[.?!])\s+|\n/).filter((sentence) => !ABOUT_A_FRAGMENT.test(sentence));
+  if (sentences.some((sentence) => SWAPS_A_LINE.test(sentence))) return true;
+  return prose.split("\n").filter((line) => HANDOVER_LABEL_LINE.test(line.trim())).length >= 2;
+}
+
 /** What a finding on a block's lines asks for: the whole block again, never a line to swap in (RULE.DEVEX.WORKSPACE.393). */
 const WHOLE_AGAIN =
   " Send the whole block again in the reply, corrected and ready to paste, and write it into the arc's log: never a " +
@@ -960,11 +986,22 @@ export function openingOf(reply: string): string | null {
 export function checkHandover(reply: string, root: string, mine: Set<string>, given = false, earlier: string[] = []): Warning[] {
   // A FRAGMENT OF A BLOCK IS NEVER AN ANSWER, also in a reply that hands nothing over on its own words: a line or two
   // of a block sent to replace the lines of the one above leaves the developer merging two messages to paste one.
-  const fragment = given || earlier.some((text) => givesHandover(text)) ? handoverFragments(reply)[0] : undefined;
+  // A few of a block's labels in one fence are a fragment whatever came before: the work may have moved since the
+  // block above, so `given` is false, and that is just when a changed line is tempting to send alone. A fence with
+  // most of the labels is a block missing lines, and the missing-label finding below names them.
+  const blockAbove = given || earlier.some((text) => givesHandover(text));
+  const few = (fence: Fence): boolean => {
+    const size = handoverLines(fence.body).size;
+    return size >= 2 && size <= Math.floor(HANDOVER_LABELS.length / 2);
+  };
+  const fragment = handoverFragments(reply).find((fence) => blockAbove || few(fence));
   if (fragment)
     return [{ check: "handover", message:
       `This reply carries part of a handover block — ${[...handoverLines(fragment.body).keys()].map((label) => `\`${label}:\``).join(" · ")} — ` +
       `and not the other lines.` + WHOLE_AGAIN }];
+  if (!givesHandover(reply) && swapsALine(reply))
+    return [{ check: "handover", message:
+      `This reply tells the developer to change a line of a handover block in place of giving the block.` + WHOLE_AGAIN }];
   const handing = passingOn(reply) || shapeByTitle(reply, true)?.moment === "handover";
   if (!handing && !CLOSES.test(unquoted(reply))) return [];
   // A REPLY THAT PUTS A WHOLE CARD ASKS A QUESTION, AND HANDS NOTHING OVER, also when it offers the

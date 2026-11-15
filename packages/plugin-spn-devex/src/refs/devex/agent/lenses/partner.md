@@ -16,11 +16,11 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/03-module/01-server/01-contract/01-states.md",
-      "seen": "38e6934b"
+      "seen": "3443fda0"
     },
     {
       "path": "spn-foundation/docs/02-constructs/03-platform/01-core/04-data-and-trust.md",
-      "seen": "e8b7a8e7"
+      "seen": "3abfe989"
     }
   ]
 }
@@ -38,7 +38,7 @@ The question it holds: *could someone build against this without reading the cod
 ## Asks it owns
 
 - *Will this break someone who built on it?* — additive or breaking; the version and the migration path.
-- *Which kind does each method reach by, and what proves it?* — the data reach kind and relations each method declares, the refusal test that proves it, and the named case of any switch to a system principal. A new kind is a major release with a migration; the partner reads it as a breaking change.
+- *Which kind does each method reach by, and what proves it?* — the data reach kind and relations each method declares, the refusal test that proves it, and the named case of any switch to a system principal (the hiring service's own writes are `HIRING_WRITE`, which replaces `OBSERVER_WRITE` in the closed list). A new kind is a major release with a migration; the partner reads it as a breaking change.
 
 ## Mastery
 
@@ -81,6 +81,7 @@ The question it holds: *could someone build against this without reading the cod
   - **First, is it published?** The classification governs the published surface only — released as a package, or deployed where another team can call it. A draft surface, never released or deployed to a shared setup, may change freely; a long-lived branch is still a draft. Once published, "no known consumer" is never evidence of no consumer.
   - **The evolution classification, on the artifact, not the ask.** Additive ships in place: new optional fields, states, methods, enum values, error codes, loosened validation. Breaking stops the work: remove, rename or retype a published field, tighten validation, flip optional to required, remove or reuse an enum value, permission code or error code, change an error's category. Read the diff — breaks ride along unannounced.
   - **The semantic break, which no diff shows**: a field whose shape is unchanged but whose meaning moved. A meaning that must change gets a new name, and the old one is deprecated.
+  - **A field names and types itself by the states standard's forms**: a yes or no is a boolean read `is`, `has` or `can`, never a status enum (`RULE.SUPPORT.APPS.232`); a field that may be absent is `T | null`, never optional; a value that comes in kinds is a base plus `mtype` plus one carrier for each kind, never two nullable fields; a field of the same meaning takes the shared `SP` type; a field holding a person's data ends in a closed form (`RULE.SUPPORT.APPS.225`) and an audit actor is never null. A field a partner reads that breaks these is a finding.
   - **Descriptions good enough to build against.** Every operation and every Command member carries its comment.
   - **Every route is registered with its command schema** — an unregistered route is invisible to every outside consumer.
   - **A breaking change that must happen is a planned, versioned event**: the version, the migration path and the decision entry are the headline of the plan.

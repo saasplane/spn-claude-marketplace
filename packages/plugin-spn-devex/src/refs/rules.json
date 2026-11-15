@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "book": {
     "repository": "spn-foundation",
-    "commit": "3f4d2afb"
+    "commit": "4362769e"
   },
   "rules": [
     {
@@ -12611,6 +12611,19 @@
       ]
     },
     {
+      "id": "RULE.DEVEX.WORKSPACE.507",
+      "level": "MUST",
+      "params": {
+        "check": "split-plan"
+      },
+      "class": "checked",
+      "sentence": "The go applies the patches in passes and runs every tier once",
+      "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
+      "heading": "An arc keeps a change sheet, and only its commands write it",
+      "decision": "DEC.DEVEX.WORKSPACE.507",
+      "restated": []
+    },
+    {
       "id": "RULE.LAUNCHPAD.CONTROL_PLANE.001",
       "level": "MUST",
       "params": {
@@ -13967,6 +13980,25 @@
       ]
     },
     {
+      "id": "RULE.PLATFORM.CORE.080",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-apps/implement"
+      },
+      "class": "stated in a skill",
+      "sentence": "A customer of every child category always opens on a details page of its own, in every console",
+      "chapter": "04-capabilities/03-platform/01-core/01-tenancy/02-organizations.md",
+      "heading": "Platform archetypes are category choices",
+      "decision": "DEC.PLATFORM.CORE.080",
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
       "id": "RULE.PLATFORM.MODULES.001",
       "level": "MUST",
       "params": {
@@ -14586,6 +14618,11 @@
       "heading": "The catalog is filled by the modules that send",
       "decision": null,
       "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "refs/platform/modules/README.md",
+          "heading": "What each module requires, not just what it costs to skip"
+        },
         {
           "plugin": "spn-apps",
           "path": "skills/implement/SKILL.md",
@@ -16651,7 +16688,7 @@
       "class": "stated in a skill",
       "sentence": "Every realization declares `DSButton`'s `variant`, `color` and `size` under the three shared names",
       "chapter": "04-capabilities/02-support/01-surface/06-architecture-components/01-common/01-components.md",
-      "heading": "Actions",
+      "heading": "DSButton",
       "decision": null,
       "restated": [
         {
@@ -16729,7 +16766,7 @@
       "class": "stated in a skill",
       "sentence": "A panel holds one or more content parts. It can hold one header and one footer",
       "chapter": "04-capabilities/02-support/01-surface/08-architecture-containers/01-common/01-container.md",
-      "heading": "The panel",
+      "heading": "DSPanelContainer",
       "decision": null,
       "restated": [
         {
@@ -17026,7 +17063,7 @@
       "class": "stated in a skill",
       "sentence": "Inside a bordered frame, a line divides each two parts the frame holds, unless `divided` says otherwise",
       "chapter": "04-capabilities/02-support/01-surface/08-architecture-containers/01-common/01-container.md",
-      "heading": "The panel",
+      "heading": "DSPanelContainer",
       "decision": null,
       "restated": [
         {
@@ -18548,8 +18585,18 @@
         },
         {
           "plugin": "spn-apps",
+          "path": "refs/support/apps/module/module-changes.md",
+          "heading": "States and commands discipline"
+        },
+        {
+          "plugin": "spn-apps",
           "path": "refs/support/apps/providers/ts/02-naming.md",
           "heading": "Personal name forms"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/agent/lenses/partner.md",
+          "heading": "Produces to"
         }
       ]
     },
@@ -18723,6 +18770,11 @@
           "plugin": "spn-apps",
           "path": "refs/support/apps/providers/ts/02-naming.md",
           "heading": "Code"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/agent/lenses/partner.md",
+          "heading": "Produces to"
         }
       ]
     },
@@ -23835,7 +23887,7 @@
       "class": "guidance",
       "sentence": "A page gives the parts of an item line to these props, and the block places them in one order",
       "chapter": "04-capabilities/02-support/01-surface/06-architecture-components/01-common/01-components.md",
-      "heading": "The item line",
+      "heading": "DSItem",
       "decision": null,
       "restated": [
         {
@@ -24597,7 +24649,7 @@
       "class": "stated in a skill",
       "sentence": "The line of facts is given to `facts`, and the block places it after the title and the description",
       "chapter": "04-capabilities/02-support/01-surface/06-architecture-components/01-common/01-components.md",
-      "heading": "The item line",
+      "heading": "DSItem",
       "decision": null,
       "restated": [
         {
@@ -24805,7 +24857,7 @@
       "class": "stated in a skill",
       "sentence": "The `pageLevel` of an item line alone decides the type of its title, its description and its facts, the size of a badge among its facts, and the size of its picture",
       "chapter": "04-capabilities/02-support/01-surface/06-architecture-components/01-common/01-components.md",
-      "heading": "The item line",
+      "heading": "DSItem",
       "decision": "DEC.SUPPORT.SURFACE.094",
       "restated": [
         {
@@ -24881,7 +24933,7 @@
       "class": "stated in a skill",
       "sentence": "A fact is given in one of four forms, and the block draws each form the same way on every line",
       "chapter": "04-capabilities/02-support/01-surface/06-architecture-components/01-common/01-components.md",
-      "heading": "The item line",
+      "heading": "DSItem",
       "decision": null,
       "restated": [
         {
@@ -25236,7 +25288,7 @@
       "class": "stated in a skill",
       "sentence": "The heading element of a title follows its level, and it changes no style",
       "chapter": "04-capabilities/02-support/01-surface/06-architecture-components/01-common/01-components.md",
-      "heading": "The item line",
+      "heading": "DSItem",
       "decision": null,
       "restated": [
         {
@@ -25280,7 +25332,7 @@
       "class": "stated in a skill",
       "sentence": "A title in the header of a box takes the level its box gives, where the page names none",
       "chapter": "04-capabilities/02-support/01-surface/06-architecture-components/01-common/01-components.md",
-      "heading": "The item line",
+      "heading": "DSItem",
       "decision": null,
       "restated": [
         {
@@ -25363,7 +25415,7 @@
       "class": "stated in a skill",
       "sentence": "An item line that is a title starts where what stands under it starts",
       "chapter": "04-capabilities/02-support/01-surface/06-architecture-components/01-common/01-components.md",
-      "heading": "The item line",
+      "heading": "DSItem",
       "decision": "DEC.SUPPORT.SURFACE.109",
       "restated": [
         {
@@ -25426,7 +25478,7 @@
       "class": "stated in a skill",
       "sentence": "An item line cuts nothing it draws, and the page decides what its words say",
       "chapter": "04-capabilities/02-support/01-surface/06-architecture-components/01-common/01-components.md",
-      "heading": "The item line",
+      "heading": "DSItem",
       "decision": "DEC.SUPPORT.SURFACE.111",
       "restated": [
         {
@@ -26088,7 +26140,7 @@
       "class": "stated in a skill",
       "sentence": "The picture of an item line is given to `media` as data of one kind, and never as a block the page has sized. The item owns its size, and `DSItem` takes no `startIcon` beside `media`",
       "chapter": "04-capabilities/02-support/01-surface/06-architecture-components/01-common/01-components.md",
-      "heading": "The item line",
+      "heading": "DSItem",
       "decision": "DEC.SUPPORT.SURFACE.130",
       "restated": [
         {
@@ -26122,7 +26174,7 @@
       "class": "stated in a skill",
       "sentence": "`DSItem` takes the data at its end as `endNode`, a node, and it takes no prop named `actions`",
       "chapter": "04-capabilities/02-support/01-surface/06-architecture-components/01-common/01-components.md",
-      "heading": "The item line",
+      "heading": "DSItem",
       "decision": "DEC.SUPPORT.SURFACE.131",
       "restated": [
         {
@@ -26236,7 +26288,7 @@
       "class": "stated in a skill",
       "sentence": "The description stands directly under the title, and the line of facts 4px under whatever stands above it, at every level and in either orientation",
       "chapter": "04-capabilities/02-support/01-surface/06-architecture-components/01-common/01-components.md",
-      "heading": "The item line",
+      "heading": "DSItem",
       "decision": "DEC.SUPPORT.SURFACE.135",
       "restated": [
         {
@@ -26492,7 +26544,7 @@
       "class": "stated in a skill",
       "sentence": "An icon-only button that opens a menu keeps its tooltip while the pointer rests on it",
       "chapter": "04-capabilities/02-support/01-surface/06-architecture-components/01-common/01-components.md",
-      "heading": "Actions",
+      "heading": "DSButton",
       "decision": null,
       "restated": [
         {
@@ -27318,7 +27370,7 @@
       "class": "stated in a skill",
       "sentence": "An item line draws only its content, and the place it stands in gives it its room and its highlight. Where a trigger stands on a line, its highlight reaches past the line",
       "chapter": "04-capabilities/02-support/01-surface/06-architecture-components/01-common/01-components.md",
-      "heading": "The item line",
+      "heading": "DSItem",
       "decision": "DEC.SUPPORT.SURFACE.175",
       "restated": [
         {
@@ -27718,7 +27770,7 @@
       "class": "stated in a skill",
       "sentence": "The description of an item line at `PAGE` is `CONTENT_LG`, 16px, and a default mark draws its icon in the muted tone and its ring in the colour of its icon",
       "chapter": "04-capabilities/02-support/01-surface/06-architecture-components/01-common/01-components.md",
-      "heading": "The item line",
+      "heading": "DSItem",
       "decision": null,
       "restated": [
         {
@@ -27949,7 +28001,7 @@
       "class": "stated in a skill",
       "sentence": "A mark among the item line's pictures takes its default variant from the level: `QUIET` at `PAGE` and `CONTAINER`, and `SUBTLE` at `WIDGET`, `GROUP`, `CONTENT` and `INLINE`",
       "chapter": "04-capabilities/02-support/01-surface/06-architecture-components/01-common/01-components.md",
-      "heading": "The item line",
+      "heading": "DSItem",
       "decision": null,
       "restated": [
         {
@@ -28724,7 +28776,7 @@
       "class": "guidance",
       "sentence": "A `DSItem` can stand vertical, with `orientation` `VERTICAL`",
       "chapter": "04-capabilities/02-support/01-surface/06-architecture-components/01-common/01-components.md",
-      "heading": "The item line",
+      "heading": "DSItem",
       "decision": null,
       "restated": [
         {
@@ -28795,7 +28847,7 @@
       "class": "guidance",
       "sentence": "A `DSItem` can align its end node, with `endAlign`",
       "chapter": "04-capabilities/02-support/01-surface/06-architecture-components/01-common/01-components.md",
-      "heading": "The item line",
+      "heading": "DSItem",
       "decision": null,
       "restated": [
         {
@@ -28875,7 +28927,7 @@
       "class": "stated in a skill",
       "sentence": null,
       "chapter": "04-capabilities/02-support/01-surface/06-architecture-components/01-common/01-components.md",
-      "heading": "The item line",
+      "heading": "DSItem",
       "decision": null,
       "restated": []
     },
@@ -28888,7 +28940,7 @@
       "class": "stated in a skill",
       "sentence": "An item line at `INLINE` with a title and facts and no description draws its facts on the title's line, after a dot",
       "chapter": "04-capabilities/02-support/01-surface/06-architecture-components/01-common/01-components.md",
-      "heading": "The item line",
+      "heading": "DSItem",
       "decision": null,
       "restated": [
         {
@@ -29135,7 +29187,7 @@
       "class": "stated in a skill",
       "sentence": null,
       "chapter": "04-capabilities/02-support/01-surface/08-architecture-containers/01-common/01-container.md",
-      "heading": "The panel",
+      "heading": "DSPanelContainer",
       "decision": null,
       "restated": [
         {
@@ -29380,7 +29432,7 @@
       "class": "stated in a skill",
       "sentence": "The description of an item line at `GROUP` is `CONTENT_MD`, 14px",
       "chapter": "04-capabilities/02-support/01-surface/06-architecture-components/01-common/01-components.md",
-      "heading": "The item line",
+      "heading": "DSItem",
       "decision": null,
       "restated": [
         {
@@ -29436,7 +29488,7 @@
       "class": "guidance",
       "sentence": "A `DSItem` can take an `eyebrow`, one `IDSItemFact`, and a `TEXT` fact can take a `color`",
       "chapter": "04-capabilities/02-support/01-surface/06-architecture-components/01-common/01-components.md",
-      "heading": "The item line",
+      "heading": "DSItem",
       "decision": null,
       "restated": [
         {
@@ -29954,6 +30006,11 @@
       "heading": "The four layouts",
       "decision": null,
       "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/agent/lenses/ux.md",
+          "heading": "Produces to"
+        },
         {
           "plugin": "spn-surface",
           "path": "refs/support/surface/architecture-layouts.md",
@@ -31314,7 +31371,7 @@
       "class": "stated in a skill",
       "sentence": "An icon takes `tone` as a text does, and `tone` wins over `color`",
       "chapter": "04-capabilities/02-support/01-surface/06-architecture-components/01-common/01-components.md",
-      "heading": "The item line",
+      "heading": "DSItem",
       "decision": null,
       "restated": [
         {
@@ -31348,7 +31405,7 @@
       "class": "stated in a skill",
       "sentence": "A bare icon of an item line that the page gives no `color` and no `tone` draws in the muted tone, as a default mark's icon does",
       "chapter": "04-capabilities/02-support/01-surface/06-architecture-components/01-common/01-components.md",
-      "heading": "The item line",
+      "heading": "DSItem",
       "decision": null,
       "restated": [
         {
@@ -31561,7 +31618,7 @@
       "class": "stated in a skill",
       "sentence": "A bare icon is drawn at the size of its level, and it stands in the middle of the title's first line",
       "chapter": "04-capabilities/02-support/01-surface/06-architecture-components/01-common/01-components.md",
-      "heading": "The item line",
+      "heading": "DSItem",
       "decision": null,
       "restated": [
         {
@@ -32431,7 +32488,7 @@
       "class": "stated in a skill",
       "sentence": "A part of a panel can take the prop `flush`, and the footer can also take `sticky`. A part never takes any other prop",
       "chapter": "04-capabilities/02-support/01-surface/08-architecture-containers/01-common/01-container.md",
-      "heading": "The panel",
+      "heading": "DSPanelContainer",
       "decision": null,
       "restated": [
         {
@@ -32539,6 +32596,11 @@
           "plugin": "spn-apps",
           "path": "skills/verify/SKILL.md",
           "heading": "Mode: app — health checks on what is running"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/agent/lenses/ux.md",
+          "heading": "Produces to"
         },
         {
           "plugin": "spn-surface",
@@ -32753,7 +32815,7 @@
       "class": "stated in a skill",
       "sentence": "A button with no `variant` draws `OUTLINE` outside a header or a footer",
       "chapter": "04-capabilities/02-support/01-surface/06-architecture-components/01-common/01-components.md",
-      "heading": "Actions",
+      "heading": "DSButton",
       "decision": "DEC.SUPPORT.SURFACE.376",
       "restated": [
         {
@@ -32834,7 +32896,7 @@
       "class": "guidance",
       "sentence": "A page's button is `SOLID`, `OUTLINE`, `GHOST` or `LINK`, and the tints `QUIET`, `SUBTLE` and `SUBTLE_OUTLINE` are the place's",
       "chapter": "04-capabilities/02-support/01-surface/06-architecture-components/01-common/01-components.md",
-      "heading": "Actions",
+      "heading": "DSButton",
       "decision": null,
       "restated": [
         {
@@ -32956,7 +33018,7 @@
       "class": "guidance",
       "sentence": "A button's colour says what its act does: `PRIMARY` the main action, `ERROR` a main action that deletes or ends something, and `DEFAULT` every other",
       "chapter": "04-capabilities/02-support/01-surface/06-architecture-components/01-common/01-components.md",
-      "heading": "Actions",
+      "heading": "DSButton",
       "decision": null,
       "restated": [
         {
@@ -33581,6 +33643,11 @@
       "decision": null,
       "restated": [
         {
+          "plugin": "spn-devex",
+          "path": "refs/devex/agent/lenses/ux.md",
+          "heading": "Produces to"
+        },
+        {
           "plugin": "spn-surface",
           "path": "refs/support/surface/architecture-layouts.md",
           "heading": "Built from the navigation — 🔮"
@@ -33604,11 +33671,16 @@
         "skill": "spn-surface/design"
       },
       "class": "stated in a skill",
-      "sentence": "A unit's look is read from the running showcase into the stack's snapshot, and the plugin draws only the look the snapshot holds",
+      "sentence": "A unit's look is read from the running showcase into the stack's snapshot, which names the cells to capture and is what a drawn cell is checked against",
       "chapter": "04-capabilities/02-support/01-surface/11-delivery-library/02-figma/04-drawing.md",
       "heading": "A unit's look",
       "decision": null,
       "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/agent/lenses/ux.md",
+          "heading": "Produces to"
+        },
         {
           "plugin": "spn-surface",
           "path": "refs/support/surface/delivery-library.md",
@@ -33643,6 +33715,11 @@
       "heading": "The pages of a unit",
       "decision": null,
       "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/agent/lenses/ux.md",
+          "heading": "Produces to"
+        },
         {
           "plugin": "spn-surface",
           "path": "refs/support/surface/delivery-showcase.md",
@@ -33686,15 +33763,185 @@
         "skill": "spn-surface/design"
       },
       "class": "stated in a skill",
-      "sentence": null,
-      "chapter": "02-constructs/02-support/01-surface/06-architecture-components.md",
-      "heading": "DSFeature",
+      "sentence": "A site's page is a sequence of sections, and each owns its room and its fill.",
+      "chapter": "02-constructs/02-support/01-surface/03-standards-patterns.md",
+      "heading": "Site patterns",
       "decision": null,
       "restated": [
         {
           "plugin": "spn-surface",
           "path": "refs/support/surface/architecture-components.md",
           "heading": "The level and the form"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/given-design.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.415",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "Every prop of a unit is sorted into exactly one kind",
+      "chapter": "02-constructs/02-support/01-surface/06-architecture-components.md",
+      "heading": "How a unit is sorted for the library",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/mock.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.416",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "Each `CASE` prop names the part it changes",
+      "chapter": "02-constructs/02-support/01-surface/06-architecture-components.md",
+      "heading": "How a unit is sorted for the library",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/mock.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.417",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "The library draws coverage, and never combinations",
+      "chapter": "02-constructs/02-support/01-surface/06-architecture-components.md",
+      "heading": "How a unit is sorted for the library",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/mock.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.418",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "A unit's usage is one primary use, at the unit's widest use, in light and in dark",
+      "chapter": "02-constructs/02-support/01-surface/06-architecture-components.md",
+      "heading": "How a unit is sorted for the library",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/mock.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.419",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "The notice stands flush in its place.",
+      "chapter": "02-constructs/02-support/01-surface/09-architecture-layouts.md",
+      "heading": "The content",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.420",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": null,
+      "chapter": "02-constructs/02-support/01-surface/13-providers.md",
+      "heading": "A change reaches every layer at once",
+      "decision": null,
+      "restated": []
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.421",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "A case prop whose look an instance cannot reach, a layout change such as an alignment, a placement of parts or a column count, is a look drawn once: one version for each value other than the default, on the default version only, crossed with nothing, named `prop=value`, and the case is an instance of that version",
+      "chapter": "04-capabilities/02-support/01-surface/11-delivery-library/02-figma/04-drawing.md",
+      "heading": "Which property is a variant and which is a case",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/writer-brief.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.422",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "Each planned cell is captured from the running showcase into Figma, so the web lays it out, and the plugin, the tool and the agent only arrange the captures by the plan",
+      "chapter": "04-capabilities/02-support/01-surface/11-delivery-library/02-figma/04-drawing.md",
+      "heading": "A unit's look",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/writer-brief.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.423",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "The library's text styles carry the theme's sans family, `DSThemeSans` in Lab, and never a stand-in font",
+      "chapter": "04-capabilities/02-support/01-surface/05-architecture-core/01-common/01-tokens.md",
+      "heading": "The type steps",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/SKILL.md",
+          "heading": "The rules this step holds"
         }
       ]
     }

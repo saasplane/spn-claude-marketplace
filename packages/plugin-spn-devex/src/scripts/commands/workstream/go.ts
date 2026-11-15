@@ -18,7 +18,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { basename, dirname, join, resolve } from "node:path";
 import { type Action, FLAG, VALUE, UsageFault, readWords } from "../../../../../plugin-support-lib/src/lib/command.ts";
 import {
-  changedEntries, clearWaiting, deriveGo, workflowOf, fullRunMinutes, goFileOf, isApplyPart, landedEntries, landedOrder, landedMeasures, markDropped, markWaiting, planScope, proposeScopes, readGo, readyParts, redCheckIds, ratesOf, staleEntries, tangledParts, testFilesOf, unheldEntries,
+  changedEntries, clearWaiting, deriveGo, workflowOf, fullRunMinutes, goFileOf, isApplyPart, landedEntries, landedOrder, landedMeasures, markDropped, markWaiting, planScope, proposeScopes, readGo, readyParts, redCheckIds, ratesOf, staleEntries, tangledParts, unheldEntries,
   type ScopeSheet,
 } from "../../lib/go-plan.ts";
 import { arcDataDir, arcIdsOf, logEvent, logFileOf, notesDirOf, readArc, readJson, readJsonl, readSheet, workspaceOf, writeWhole } from "../../lib/workstream.ts";
@@ -105,7 +105,7 @@ function scopeOf(ws: string, scope: string[], lead: string, root: string): { she
       if (landed.has(entry.id)) continue;
       const fix = (command: string): string => `: run \`workstream sheet ${command} ${basename(ws)}/${arc} ${entry.id}${command === "edit" ? " --command \"…\" --proof \"…\"" : ""}\``;
       if (entry.kind === "step" && !stepIsWhole(entry)) kindFaults.push(`${entry.id} is a step with no command or proof${fix("edit")}`);
-      else if (patchOwed(entry) === "refuse") kindFaults.push(`${entry.id} is a change with no patch${fix("patch")}`);
+      else if (patchOwed(entry)) kindFaults.push(`${entry.id} is a change with no patch${fix("patch")}`);
       else if (entry.kind === "change" && entry.patch && !patchApplies(ws, arc, entry, root)) kindFaults.push(`${entry.id} is a change whose patch no longer applies: patch it again against the new head${fix("patch")}`);
     }
     faults.push(...kindFaults);
@@ -125,19 +125,20 @@ function scopeOf(ws: string, scope: string[], lead: string, root: string): { she
 /** The directories a repository's test files are looked for in: the workstream's worktree first, then the checkout. */
 const dirsIn = (root: string, ws: string, repo: string): string[] => [join(root, ".worktrees", basename(ws), repo), join(root, repo)];
 
-/** A brief's acceptance: each test id the part's entries name in their tiers, beside the file that holds it, `<ID> · node <file>`. */
-function acceptanceOf(part: GoPart, ws: string, root: string): string[] {
-  const ids: string[] = [];
-  for (const ref of part.entries) {
-    const [arc, id] = ref.split("/");
-    const entry = readSheet(ws, arc)?.entries.find((one) => one.id === id);
-    for (const test of Object.values(entry?.tiers ?? {}).flat()) if (!ids.includes(test)) ids.push(test);
+/** A brief's acceptance: a type check of each package the part touches; no test tier runs between passes, every tier runs once in the full run. */
+function acceptanceOf(part: GoPart, files: readonly string[], ws: string, root: string): string[] {
+  const dirs = new Set<string>();
+  for (const file of files) {
+    const path = file.slice(file.indexOf(":") + 1);
+    for (const base of dirsIn(root, ws, part.repo)) {
+      let at = dirname(path);
+      while (at !== "." && at !== "/" && !existsSync(join(base, at, "package.json"))) at = dirname(at);
+      if (existsSync(join(base, at, "package.json"))) { dirs.add(at); break; }
+    }
   }
-  const lines = ids.flatMap((id) => {
-    const files = testFilesOf([id], dirsIn(root, ws, part.repo));
-    return files.length ? files.map((file) => `- \`${id} · node ${file}\`, run directly, never a whole suite`) : [`- \`${id}\`: no test file holds it yet, and this part's test entry writes it`];
-  });
-  return lines.length ? lines : part.tests.length ? part.tests.map((file) => `- \`node ${file}\`, run directly, never a whole suite`) : ["- the part names no test file of its own"];
+  const checks = [...dirs].sort().map((dir) => `- \`pnpm exec tsc --noEmit -p ${dir}\``);
+  return [...(checks.length ? checks : ["- `pnpm exec tsc --noEmit -p <each package you touched>`"]),
+    "- Run no test and no suite here: the tiers run once, in the full run (RULE.DEVEX.WORKSPACE.507)."];
 }
 
 /** What a part's time reads: for a landed part the cost its row recorded (minutes and tokens), else the plan's estimate, else "not measured". */
@@ -207,7 +208,7 @@ function brief(plan: GoPlan, part: GoPart, ws: string, root: string): string {
     ...formatLines(part, held.files, ws, root),
     ...(part.id === `baseline-${part.repo}` ? redCheckLines(plan, part, ws) : []),
     "## Acceptance", "",
-    ...acceptanceOf(part, ws, root), "",
+    ...acceptanceOf(part, held.files, ws, root), "",
     "## Report", "",
     "The front matter a saved report keeps, for the case that needs it; `workstream report write` folds it into the plan:", "",
     "```text", "---", `go: "${plan.lead}"`, `part: "${part.id}"`, "outcome: landed · stopped · needs-you",
