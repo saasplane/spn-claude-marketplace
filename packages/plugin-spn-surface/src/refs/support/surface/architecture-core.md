@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/05-architecture-core/",
-      "seen": "8acd26e2"
+      "seen": "2a7ef95a"
     }
   ]
 }
@@ -82,7 +82,7 @@ A surface has a hue, `color`, and a shade, `strength`. The hue is `BASE` (the pa
 
 - **`DEFAULT` at `QUIET` is a medium grey and at `SOLID` near black, never black.** In dark `QUIET` is a dark grey of 17% lightness and `SOLID` one of 14.5%.
 - **`PRIMARY` is the brand in three tints: the faintest at `SUBTLE`, a medium tint at `QUIET`, and the brand itself at `SOLID`.** `SOLID`'s fill is the seed, held at or under the lightness of brand 900, with white text on it; its value in the library is that formula's result at the default seed. In dark each tint is the seed's hue at a low lightness, at 30%, 50% and 70% of its chroma.
-- **The collection Surface holds a variable for each shade's fill, text and line** (`subtle`, `on-subtle`, `subtle-line`, and the same for `quiet` and `solid`), with a column for each of `BASE`, `DEFAULT` and `PRIMARY`. `BASE`'s fills are no paint, and its text and lines are the page's. **The collection Strength holds `fill`, `text` and `line`**, each an alias of the variable of Surface that its shade names, so a card reads its hue from Surface and its shade from Strength. A cell of a surface table sets both modes.
+- **The collection Surface holds a variable for each shade's fill, text and line** (`subtle`, `on-subtle`, `subtle-line`, and the same for `quiet` and `solid`), with a column for each of `BASE`, `DEFAULT` and `PRIMARY`. `BASE`'s fills are no paint, and its text and lines are the page's. **The collection Strength holds `fill`, `text` and `line`**, each an alias of the variable of Surface that its shade names, so a card reads its hue from Surface and its shade from Strength. A cell of a surface table sets both modes. **Strength also holds `entry-fg`, `primary-subtle`, `on-primary-subtle` and `primary-line`**: at `SUBTLE` and `QUIET` each is the page's own (`primary-fg`, `primary-subtle`, `on-primary-subtle`, `primary-line`), and at `SOLID` each aliases a variable of Surface (`solid-entry-fg`, `solid-primary-subtle`, `solid-on-primary-subtle`, `solid-primary-line`) that the `SOLID` fill re-points, so the brand as text or a line, and the tint, words and line of a `PRIMARY` outline button, stay readable on a near-black or brand fill. A brand-coloured word or button inside a surface binds them, as the card's words bind `text`.
 
 ## The scale — ✅
 

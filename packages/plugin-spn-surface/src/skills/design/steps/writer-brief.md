@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/11-delivery-library/02-figma/04-drawing.md",
-      "seen": "c1f30b69"
+      "seen": "527e77eb"
     }
   ]
 }
@@ -22,8 +22,10 @@
 - **SaaS Plane's design library is managed by its builder, and a partner is given the published library and does not change it** (`RULE.SUPPORT.SURFACE.028` · MUST · skill:spn-surface/design)
 - **A vocabulary whose every value names one set of tokens is a mode, and the page level is one: the collection Level, whose modes are the six values of `DSPageLevelType`** (`RULE.SUPPORT.SURFACE.296` · MUST · skill:spn-surface/design)
 - **The agent never hands the developer a Figma step to draw, rebind, delete or tick** (`RULE.SUPPORT.SURFACE.400` · MUST · skill:spn-surface/design)
-- **A unit's look is read from the running showcase into the stack's snapshot, and the plugin draws only the look the snapshot holds** (`RULE.SUPPORT.SURFACE.411` · MUST · skill:spn-surface/design)
+- **A unit's look is read from the running showcase into the stack's snapshot, which names the cells to capture and is what a drawn cell is checked against** (`RULE.SUPPORT.SURFACE.411` · MUST · skill:spn-surface/design)
 - **Surface and Strength take their variables from [the modes of the collections](../../05-architecture-core/01-common/01-tokens.md#the-modes-of-the-collections), as Treatment and Color do: a cell of a surface table sets both modes. `PRIMARY`'s `SOLID` fill holds the result of the brand formula at the default seed. The four theme collections hold their modes and no variable, and a designer sets them** (`RULE.SUPPORT.SURFACE.413` · MUST · skill:spn-surface/design)
+- **A case prop whose look an instance cannot reach, a layout change such as an alignment, a placement of parts or a column count, is a look drawn once: one version for each value other than the default, on the default version only, crossed with nothing, named `prop=value`, and the case is an instance of that version** (`RULE.SUPPORT.SURFACE.421` · MUST · skill:spn-surface/design)
+- **Each planned cell is captured from the running showcase into Figma, so the web lays it out, and the plugin, the tool and the agent only arrange the captures by the plan** (`RULE.SUPPORT.SURFACE.422` · MUST · skill:spn-surface/design)
 
 Read this step when you are an agent started by another and your order is to change one page of a library file through the Figma connector. **It is all you read before your own order.** It stands in place of the long steps: `connector-rules.md`, `change-library.md` and `operations-and-composing.md` in this folder, and "The connector's facts" in `refs/support/surface/delivery-library.md`. Every line here restates a line of theirs. Open one of them only when you are stuck: when you meet a thing this brief does not cover, or when a call fails in a way you cannot explain. Read the fact there before you try anything, and say in your report which step you opened and why.
 
@@ -78,7 +80,7 @@ The book states a unit, the library draws it, and a stack builds it. You change 
 1. A unit's section holds, in this order: where it lives (`path · <Unit>`), the header, then the bands Usage, Variations, Cases and Parts, each under its label. Variations is the unit's tables: the set's table with its group titles and labels, then its mode tables. A table of one column names each value above its version, which keeps the width it takes in use. A unit is drawn at the space it takes in use, never scaled: `PAGE` or `CONTAINER` the content's full width, `WIDGET` three side by side, `GROUP`, `CONTENT` or `INLINE` four. A unit whose widest use is `PAGE` or `CONTAINER` draws its cases and its mode tables but the level table at `WIDGET`, three to a row, and the caption names that level.
 2. The header is one text, in the layer `header · <Unit>`: the unit's name; on the line under it, what the unit is in one line; then `behaviour: ` and the properties that change only how the unit behaves, where it has any. It holds no layout. The layout is the section's shared plugin data, namespace `saasplane`, key `layout`: `{ shape, tables, default, cases, behaviour }`, each table a `caption`, `rowGroups` and `columnGroups`, each group a `prop` and its `values`, the default first. Read it there, never from a label, and write it in the same call that changes the set. When the set gains a property, the layout names it.
 3. A row or column label names one value, and a group's title names the property, `states` for the states; ` (default)` follows the default's value, once. Each is a text whose layer is `label · ` and its whole text. Set the text and the layer's name in one step. A right-aligned label keeps its right edge when its text changes, so set `x` again.
-4. A case is a component on the unit's sheet `<Unit> cases`. It holds an instance of the unit with its values set, and it is named `property=value`, with `, ` between two cells. The sheet's label names its cases.
+4. A case is a component on the unit's sheet `<Unit> cases`. It holds an instance of the unit with its values set, and it is named `property=value`, with `, ` between two cells. The sheet's label names its cases. A unit drawn from data shows each trait of its data across its versions until each appears once, and it draws every trait its data's type carries. A case that draws the same picture as a version or the usage is left out, and the plan names the one it repeats.
 5. A copy of a label or a case lands on the page's top level. Append it to its section or its sheet, and set its place again.
 6. Grow the set, its section and its sheet so that nothing inside the section meets. Move no other section: write a section that now reaches its neighbour in your report.
 
