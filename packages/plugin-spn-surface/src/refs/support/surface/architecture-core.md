@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/05-architecture-core.md",
-      "seen": "dac770bd"
+      "seen": "6402c851"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/05-architecture-core/",
-      "seen": "31fa4490"
+      "seen": "4c2e1945"
     }
   ]
 }
@@ -144,13 +144,14 @@ A pitch is sized by the level of the page it stands at, and the sizes must not b
 
 | Level | Display step | On a desktop | On a phone | Gap | Before the actions | Words to media | Inset |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| `PAGE` | `HEADING_XXL3` | 64px | 44px | 24px | 40px | 64px | 64px |
+| `PAGE` | `HEADING_XXL2` | 56px | 40px | 24px | 40px | 64px | 64px |
 | `CONTAINER` | `HEADING_XL` | 40px | 32px | 16px | 32px | 48px | 48px |
 | `WIDGET` | `HEADING_SM` | 22px | 22px | 12px | 24px | 24px | 32px |
 | `GROUP` | `HEADING_XS` | 18px | 18px | 8px | 16px | 16px | 24px |
 
 - **A unit MUST read the title through the type step.** `--level-<level>-title` names the type step's own size token, which carries its phone value, so the phone size follows with nothing written. A unit that sizes its title by a level token never asks what the device is.
 - **The side of a small picture MUST NOT be a level token** (`RULE.SUPPORT.SURFACE.253` · MUST · skill:spn-surface/design). It is one box for each level whatever lines the feature has, so it is read from the scale sizes of the item line (`architecture-components.md`), and a level holds no `-box` token.
+- **A `PAGE` title MUST be one step larger only on the page that leads** (`RULE.SUPPORT.SURFACE.424` · MUST · skill:spn-surface/design). A `PAGE` title in a section of size `XL`, such as a site's home, takes `HEADING_XXL3`, 64px and 44px on a phone; the feature reads the size its section hands down, and a section of any other size leaves the level's `HEADING_XXL2`, 56px, two steps above its sections' 40px. So only the home's title is 64px.
 - **A page MUST NOT write a level token.** A level is a position, and a theme that wants another rhythm changes the token once.
 - **The words of a feature's items MUST be 14px or larger under a `PAGE`, a `CONTAINER` or a `WIDGET` feature** (`RULE.SUPPORT.SURFACE.239` · MUST · skill:spn-surface/design). A `PAGE` or a `CONTAINER` feature draws its items at `WIDGET`, a title of 16px over a description of 14px, and a `WIDGET` feature draws them at `GROUP`, 14px over 14px, so the 14px floor of a website holds for every item line from `GROUP` up. Under a `GROUP` or a `CONTENT` feature the items are at `CONTENT`, 13px over 13px, and under an `INLINE` feature at `INLINE`, 12px over 12px: the one waiver, since items there are seldom used.
 
@@ -195,6 +196,7 @@ This ref names every role, every step of the scale, every scale size, and the fa
 | `RULE.SUPPORT.SURFACE.225` | Content runs to `CONTENT_XXL5`, in five steps above `CONTENT_XL` |
 | `RULE.SUPPORT.SURFACE.227` | a website's words are 14px or larger, and only data and code shown inside a demo may be smaller |
 | `RULE.SUPPORT.SURFACE.238` | each level from `PAGE` to `GROUP` holds one set of level tokens, and a unit reads a title through the type step so the phone size follows |
+| `RULE.SUPPORT.SURFACE.424` | a `PAGE` title takes the step above its level's in a section of size `XL`, the page that leads, and its level's step everywhere else |
 | `RULE.SUPPORT.SURFACE.239` | the words of a feature's items are 14px or larger under a `PAGE`, a `CONTAINER` or a `WIDGET` feature, and a smaller feature's items are the one waiver |
 | `RULE.SUPPORT.SURFACE.249` | a unit that aligns a part takes `DSHorizontalAlignType` or `DSVerticalAlignType` and defines no alignment vocabulary of its own |
 | `RULE.SUPPORT.SURFACE.260` | how the cells of a grid stand is `IDSGrid`, beside `DSGridBorderType` in the core |

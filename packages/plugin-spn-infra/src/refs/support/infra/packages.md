@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-infra/02-packages.md",
-      "seen": "5cf429b6"
+      "seen": "a67aaf81"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/02-packages/01-manifests.md",
-      "seen": "96f9eadf"
+      "seen": "162cac89"
     }
   ]
 }
@@ -48,7 +48,7 @@ Every estate node is a package. **Find its root by `spinfrapkg.json`; read its t
 | Type | Package name | `config` | `src/` |
 | --- | --- | --- | --- |
 | `SUPPORT` | `@saasplane/infra-<group>` — `infra-blueprints` first | `mtype` · `name` — a readable name and nothing else; it builds estates and declares none (`RULE.SUPPORT.INFRA.099` · MUST · skill:spn-infra/release) | `spestate.json` + renderings, **seam, then provider, then layer, then step** (`RULE.SUPPORT.INFRA.101` · MUST · skill:spn-infra/release) |
-| `ORGANIZATION` | `@{org}/infra-organization` — at most one per repo | `name` · `org` · `blueprint` pin · `packages` · `legal` · `regions` · `providers` (with `domains` and `mail`) · `modules` | the manifest alone |
+| `ORGANIZATION` | `@{org}/infra-organization` — at most one per repo | `name` · `org` · `blueprint` pin · `packages` · `legal` · `regions` · `providers` (with `domains` and `email`) · `modules` | the manifest alone |
 | `PLATFORM` | `@{org}/infra-platform-{spc}` | `org` · `spc` · `name` · `domain` (a code from the organization's `providers.domains`: the `{spd}` every host derives from, never the marketing domain; a platform declares no records) · `owner` · `network` · **declaration**: `resources` (`platform` + `spaces[]`) · `apps` · `modules` · **realization**: `providers` (scm · cloud environments · local) — DEC.SUPPORT.INFRA.051 | the manifest alone |
 | `MODULE` | `@{org}/infra-module-{code}` — **purpose code, never a product** (`idp`, not a vendor name) | `mtype` · `name` — identity only; usage stays on the referencing `modules[]` row | `spestate.json` + `aws/` + `local/` renderings — a rendering ships iff its folder exists |
 
@@ -80,7 +80,7 @@ Organization config, the essentials:
   "regions": [{ "code": "in", "networkIndex": 0 }],                                 // R — appended forever, never reused
   "providers": { "domains": [{ "code": "company", "domain": "example.com",          // every domain, registered once, by code
                                "mtype": "AWS_ROUTE53", "records": [] }],
-                 "mail": { "mtype": "GOOGLE_WORKSPACE", "domain": "company" },     // every account address derives from its domain
+                 "email": { "mtype": "GOOGLE_WORKSPACE", "domain": "company" },     // every account address derives from its domain
                  "scm": { "mtype": "GITHUB", "org": "saasplane" },                  // the one account every platform's repositories live under
                  "cloud": { "mtype": "AWS", "home": "in",
                             "regions": [{ "code": "in", "region": "ap-south-1" }],  // the ONLY place a provider region is spelled

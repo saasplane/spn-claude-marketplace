@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "book": {
     "repository": "spn-foundation",
-    "commit": "e1b6e23a"
+    "commit": "4a0523ad"
   },
   "rules": [
     {
@@ -2295,6 +2295,19 @@
           "heading": "The rules this step holds"
         }
       ]
+    },
+    {
+      "id": "RULE.DEVEX.AGENT.177",
+      "level": "MUST",
+      "params": {
+        "check": "prompt"
+      },
+      "class": "checked",
+      "sentence": "The area a request touches brings its views and its skill before the agent answers it, in chat as well as on a card",
+      "chapter": "04-capabilities/01-devex/02-agent/03-lenses/01-lenses.md",
+      "heading": "Which views speak, and how many",
+      "decision": null,
+      "restated": []
     },
     {
       "id": "RULE.DEVEX.FUNCTION.007",
@@ -19625,6 +19638,32 @@
       ]
     },
     {
+      "id": "RULE.SUPPORT.APPS.267",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-apps/implement"
+      },
+      "class": "stated in a skill",
+      "sentence": "A date a service writes for a business record is the request's trusted simulated time, or the real time when there is none",
+      "chapter": "04-capabilities/02-support/02-apps/03-module/01-server/02-app/01-services.md",
+      "heading": "Simulated time",
+      "decision": "DEC.SUPPORT.APPS.267",
+      "restated": []
+    },
+    {
+      "id": "RULE.SUPPORT.APPS.268",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-apps/implement"
+      },
+      "class": "stated in a skill",
+      "sentence": "The API entry honours `x-spn-simulate-at` only where the deployment is non-production and trusts it",
+      "chapter": "04-capabilities/02-support/02-apps/03-module/01-server/03-entry/01-api.md",
+      "heading": "Simulated time",
+      "decision": null,
+      "restated": []
+    },
+    {
       "id": "RULE.SUPPORT.INFRA.001",
       "level": "MUST",
       "params": {
@@ -22830,6 +22869,19 @@
           "heading": "The rules this step holds"
         }
       ]
+    },
+    {
+      "id": "RULE.SUPPORT.INFRA.158",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-infra/implement"
+      },
+      "class": "stated in a skill",
+      "sentence": "The estate publishes whether an environment is production, and only a non-production one may let a request simulate time",
+      "chapter": "04-capabilities/02-support/03-infra/06-modules/02-config.md",
+      "heading": "The published vocabulary",
+      "decision": null,
+      "restated": []
     },
     {
       "id": "RULE.SUPPORT.SURFACE.001",

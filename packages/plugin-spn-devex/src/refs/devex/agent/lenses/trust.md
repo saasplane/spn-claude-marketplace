@@ -16,7 +16,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/03-platform/01-core/04-data-and-trust/03-control-map.md",
-      "seen": "ded24dbe"
+      "seen": "7a184682"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/08-agent-surface/README.md",
@@ -133,6 +133,7 @@ A fix that will miss its deadline names why and the new date, and a finding kept
   - **A verified browser exists only because somebody asked for one**, and a recovery code may never write one.
   - **A session is per app site, renewed the one way its host allows** (`RULE.SUPPORT.APPS.090` · MUST · skill:spn-apps/implement).
   - **The four build invariants hold**: reachable via contract, authorized and audited at the service layer, routes registered with schemas, forms bound to validators.
+- **A feature made for non-production cannot run in production**, such as a simulated time: the service refuses to boot with `PROD` beside the setting on, and the API entry ignores the header under `PROD` (`RULE.SUPPORT.APPS.268`). Its control-map row is foundation + estate and reads *planned* until a boot test and a contract case have seen it refuse.
 - **The control map** — a change that adds, meets or breaks a control moves that control's row in the same change: its evidence, its Met mark, and the word *planned* it no longer needs.
 
 ## Gates

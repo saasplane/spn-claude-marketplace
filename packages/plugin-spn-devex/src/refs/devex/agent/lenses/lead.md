@@ -8,7 +8,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/README.md",
-      "seen": "0da977f2"
+      "seen": "f33adc21"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/01-corpus.md",

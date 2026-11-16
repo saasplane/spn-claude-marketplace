@@ -24,11 +24,11 @@
     },
     {
       "path": "spn-foundation/docs/02-constructs/03-platform/01-core/04-data-and-trust.md",
-      "seen": "e8b7a8e7"
+      "seen": "3abfe989"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/03-module/01-server/02-app/01-services.md",
-      "seen": "16c1e29c"
+      "seen": "0028f659"
     }
   ]
 }
@@ -44,6 +44,7 @@
 ## Asks it owns
 
 - *Where does this go, who owns it, and how do I name it?* — the owning node and layer, the names, a drafted chapter change, and a register row only where a choice was weighed, an answer reversed or a conflict settled.
+- *Which writes follow a request's simulated time, and which never do?* — a date a service writes for a business record is the trusted simulated time, or the real time when there is none; what grants, limits, bills or proves access, and every audit row, stays on the real clock (`01-services.md`).
 - *What order should the work run in, and what does each file need?* — the step order, and what each file of the arc holds.
 - *Which kind does each method reach by, and does anything cross an owner?* — the data reach kind and relations each method declares, the refusal test that proves each, and the named case of any switch to a system principal (`04-data-and-trust.md` · `01-services.md`).
 

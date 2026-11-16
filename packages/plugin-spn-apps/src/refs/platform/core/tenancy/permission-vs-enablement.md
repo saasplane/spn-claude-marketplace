@@ -3,12 +3,12 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/03-platform/01-core/01-tenancy/03-people-access.md",
-      "seen": "429eccc0"
+      "seen": "1fca736a"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/03-platform/01-core/01-tenancy/03-people-access.md",
       "section": "Enablement: what an organization's category is offered",
-      "seen": "603ff955"
+      "seen": "2b960cfd"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/10-providers/ts/06-service.md",
@@ -75,7 +75,7 @@ The test is not a count. IAM owns eight of the estate's codes, because IAM owns 
 - **A boolean names the area.** `IAM_MANAGE_MEMBERS` — on or off. A code is on when its value is a boolean that is true or a selection that is not empty.
 - **A selection names the options.** `NTF_MANAGE_CHANNELS` — a list of channels, set per category.
 - Name a selection after its area and the console shows *Customization* holding a list of entity types. Whoever flips that cell cannot tell what they are choosing.
-- **A limit is a number.** A `NUMBER` definition caps what an org may create, such as `HIR_LIMIT_OPEN_JOBS`. Empty means no limit. A plan still decides the price; the limit is the cell the plan sets.
+- **A limit is a number.** A `NUMBER` definition caps what an org may create, such as `HIR_LIMIT_OPEN_JOBS`. Empty means no limit. The module that owns it checks it with `assertWithinLimit` for a counted total or `assertValueWithinLimit` for one value, and states how it is counted. A plan still decides the price; the limit is the cell the plan sets.
 
 The code's first segment is its owning module's prefix, always. That is what keeps two modules' codes from colliding in one catalog.
 
@@ -187,7 +187,7 @@ The fix leaves every cell empty in `ENT`'s definition. `HIR` adds `HIR_JOB` as a
 | 3 | You can name a category whose answers differ — otherwise it is one code |
 | 4 | The code reads `{MOD}_MANAGE_{NOUN}` or `{MOD}_LIMIT_{NOUN}`, prefixed by its owning module |
 | 5 | A boolean names the area; a selection names the options, never the area |
-| 6 | A limit is a `NUMBER` definition, checked with `assertWithinLimit`; empty means no limit |
+| 6 | A limit is a `NUMBER` definition, checked with `assertWithinLimit` for a counted total or `assertValueWithinLimit` for one value; empty means no limit |
 | 7 | The term sits on a cohesive gate, or in the body where the gate is shared |
 | 8 | Every value-checked code has a matching narrowing on the surface |
 | 9 | The ceiling says *could this apply*, never *is this granted* |

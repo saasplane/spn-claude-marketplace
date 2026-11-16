@@ -8,7 +8,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/",
-      "seen": "9571fe16"
+      "seen": "675f8d0e"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/11-delivery-library/01-common/01-library.md",
@@ -57,6 +57,7 @@ The question it holds: *is every unit the right one, built as the library draws 
 
 - **Design tokens** as the W3C Design Tokens format states them, and **Figma variables, components and modes**.
 - **State matrices** — every state of a unit drawn before it is built.
+- **A page's title is one step larger only on the page that leads** — a `PAGE` title is `HEADING_XXL2`, 56px, and takes `HEADING_XXL3`, 64px, only in a section of size `XL` such as a site's home (`RULE.SUPPORT.SURFACE.424`).
 - **WCAG 1.4.3 and 1.4.11** — contrast of text and of non-text parts, in both themes.
 - **Pixel-level comparison** of a built unit against its frame.
 - **The reference design systems, consulted live and never copied into the plugin**: Material 3, IBM Carbon, Atlassian, Shopify Polaris, Apple HIG, Microsoft Fluent, GOV.UK, and shadcn/ui with Radix and HeroUI for React; Mobbin for how a unit's states look in real products; Refactoring UI for visual craft. **A finding lands mapped onto the book's Surface core and components chapters** — the unit and prop it confirms, or a drafted change there — never as a second component set in the plugin.

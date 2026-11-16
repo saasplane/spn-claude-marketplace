@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/10-providers/ts/08-web.md",
-      "seen": "305b4c41"
+      "seen": "d28c5404"
     }
   ]
 }
@@ -30,7 +30,7 @@
 
 **The dev server accepts the host the estate serves it on**, because the name a browser reaches it by comes from the estate's coordinates rather than from localhost. The estate settles the port and the hosts; the app's env file carries the copy under `<PREFIX>_UI_PORT` and `<PREFIX>_UI_ALLOWED_HOSTS`, the factory feeds both to server and preview `allowedHosts`, and `infra app up` refuses a copy that differs.
 
-**A stylesheet's asset paths are relative to the stylesheet**, not to the page that loads it.
+**A stylesheet's asset paths are relative to the stylesheet**, not to the page that loads it. The design system's own fonts (Geist, Geist Mono and Schibsted Grotesk, each a variable `woff2` file) are reached this way by the `@font-face` rules of `DSDefaultText`, `DSDefaultDisplay` and `DSDefaultCode`, so an app importing the design system's styles serves those files beside them.
 
 **A web app has no asset origin to configure.** It serves its own files from its own hostname, and no asset-base key exists. A component writes a root-relative path, never an origin. The design system's `transformImageUrl` seam is where an app would write another origin for its images, if one were ever needed.
 

@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/06-architecture-components/",
-      "seen": "eb1e4331"
+      "seen": "bc3057cc"
     }
   ]
 }
@@ -916,7 +916,7 @@ A node a page hands in ends in `Node`, so the node of art is `mediaNode` and `me
 
 | Level | Title: step, desktop · phone | Description | Eyebrow, and facts after the title | To the description | To facts below | Before the actions | Words to media | Inset, framed | Box of a small media | Buttons | Items at | An item: title over description | Between two items | `STATS`: number over label |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| `PAGE` | `HEADING_XXL3`, 64 · 44px | `CONTENT_XXL`, 20px | 8px | 8px | 12px | 40px | 64px | 40px | 80px | `LG` | `WIDGET` | 16px over 14px, `h3` | 24px | 40px over 18px |
+| `PAGE` | `HEADING_XXL2`, 56 · 40px; `HEADING_XXL3`, 64 · 44px in an `XL` section (RULE.SUPPORT.SURFACE.424) | `CONTENT_XXL`, 20px | 8px | 8px | 12px | 40px | 64px | 40px | 80px | `LG` | `WIDGET` | 16px over 14px, `h3` | 24px | 40px over 18px |
 | `CONTAINER` | `HEADING_XL`, 40 · 32px | `CONTENT_XL`, 18px | 8px | 8px | 12px | 32px | 48px | 32px | 64px | `LG` | `WIDGET` | 16px over 14px, `h3` | 24px | 22px over 16px |
 | `WIDGET` | `HEADING_SM`, 22px | `CONTENT_LG`, 16px | 2px | 2px | 2px | 24px | 24px | 24px | 56px | `MD` | `GROUP` | 14px over 14px, `h4` | 16px | 18px over 14px |
 | `GROUP` | `HEADING_XS`, 18px | `CONTENT_MD`, 14px | 2px | 2px | 2px | 16px | 16px | 16px | 44px | `SM` | `CONTENT` | 13px over 13px, no tag | 12px | 13px over 13px |
