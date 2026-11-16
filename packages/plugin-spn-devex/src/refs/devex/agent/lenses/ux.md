@@ -8,7 +8,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/",
-      "seen": "675f8d0e"
+      "seen": "d2783d3b"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/09-architecture-layouts/01-common/01-layout.md",
