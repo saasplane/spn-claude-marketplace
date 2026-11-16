@@ -82,6 +82,7 @@ import { checkWorkstream, heldByStop } from "../checks/workstream-state.ts";
 import { PREVIEW_FILE, approachOf, arcDataDir, arcStatus, stepsMayStart, arcIdsOf, leafRows, logLinesOf, notesDirOf, previewOf, previewWouldChange, readArc, readJsonl, readQuestions, readyRows, stateFileOf,
          suggestionsFileOf, workstreamsOf } from "../lib/workstream.ts";
 import { findWorkingDetail } from "../lib/working-detail.ts";
+import { readAreas, type AreaViews } from "../lib/areas.ts";
 import { ARC_ID, cardName, type ArcData, type LogLine, type Question } from "../lib/workstream-schema.ts";
 import { applyLine, standings } from "../lib/migration.ts";
 import { MIGRATIONS } from "../lib/migrations/index.ts";
@@ -1692,11 +1693,23 @@ export function setsOutOptions(reply: string): boolean {
 }
 
 /**
- * A PROPOSAL IN CHAT ENDS AS A CARD OR A SUGGESTION (RULE.DEVEX.WORKSPACE.493): a reply that sets out lettered options is sent back unless
- * it names a `Q<n>` or `S<n>` that has a record in the window's workstream. Seen on Q22: a table of options with no number, so no record.
+ * Whether a reply's closing paragraph asks the reader to pick between two things, as a question with an "or" in it: "keep the
+ * header, or carry it in the event?". "Or not" and "or so" pick nothing. Fences are set aside.
+ */
+export function asksEitherOr(reply: string): boolean {
+  const paragraphs = withoutFences(reply).split(/\n\s*\n/).map((one) => one.trim()).filter(Boolean);
+  const last = paragraphs[paragraphs.length - 1] ?? "";
+  return last.split(/(?<=[.!?])\s+/).some((sentence) =>
+    sentence.endsWith("?") && /\S\s+or\s+(?!not\b|so\b)\S/i.test(sentence));
+}
+
+/**
+ * A PROPOSAL IN CHAT ENDS AS A CARD OR A SUGGESTION (RULE.DEVEX.WORKSPACE.493): a reply that sets out lettered options, or ends asking the
+ * reader to pick one thing or another (S49), is sent back unless it names a `Q<n>` or `S<n>` that has a record in the window's workstream.
+ * Seen on Q22: a table of options with no number, so no record. A suggestion may be put in chat; a question is a card on the approach page.
  */
 export function checkProposalRecorded(reply: string, root: string, mine: Set<string>): Warning[] {
-  if (!setsOutOptions(reply)) return [];
+  if (!setsOutOptions(reply) && !asksEitherOr(reply)) return [];
   const named = [...new Set(withoutFences(reply).match(/\b[QSqs]\d+\b/g) ?? [])].map((one) => one.toLowerCase());
   const folders = scoped(openWorkstreamFolders(root), mine);
   const held = new Set<string>();
@@ -1714,6 +1727,24 @@ export function checkProposalRecorded(reply: string, root: string, mine: Set<str
   if (missing.length === named.length)
     return [{ check: "proposal-record", message: `This reply sets out lettered options, and ${missing.map(cardName).join(", ")} ${missing.length > 1 ? "hold" : "holds"} no record in this window's workstream. ${fix}` }];
   return [];
+}
+
+/** Whether a reply proposes a shape: it sets out options, or it recommends or proposes one. Fences are set aside. */
+const PROPOSES = /\b(?:I propose|I recommend|my recommendation|recommended|the proposal|proposed shape)\b/i;
+
+/**
+ * A SHAPE PROPOSED FOR AN AREA NAMES THE AREA'S VIEWS (S48, RULE.DEVEX.AGENT.177): where the window's last prompt touched an area, a
+ * reply that proposes a shape and names none of the views the prompt event named for it is sent back, in chat as on a card.
+ */
+export function checkAreaViews(reply: string, areas: AreaViews[]): Warning[] {
+  if (!areas.length) return [];
+  const text = withoutFences(reply);
+  if (!setsOutOptions(text) && !PROPOSES.test(text)) return [];
+  const views = [...new Set(areas.flatMap((one) => one.views))];
+  if (views.some((view) => new RegExp(`\\b${view.replace(/_/g, "[_ ]")}\\b`, "i").test(text))) return [];
+  return [{ check: "reply-shape", message:
+    `This reply proposes a shape for ${areas.map((one) => one.area).join(" and ")} and names none of its views. ` +
+    `Bring ${views.join(", ")} (and ${[...new Set(areas.map((one) => one.skill))].join(", ")}), each named, before the proposal (RULE.DEVEX.AGENT.177).` }];
 }
 
 // ---------------------------------------------------------------------------- the closing message
@@ -2135,6 +2166,7 @@ if (argv1Base === "stop.ts" || argv1Base === "stop.mjs") {
       try { return checkInFlight(reply, backgroundRunsOpen(readFileSync(event.transcript_path, "utf8"))); } catch { return []; }
     }),
     ...span({ group: "stop", action: "proposal-record" }, () => checkProposalRecorded(reply, root, mine)),
+    ...span({ group: "stop", action: "area-views" }, () => checkAreaViews(reply, readAreas(root, session))),
     ...span({ group: "stop", action: "handover" }, () => checkHandover(reply, root, mine, given, turn.earlier)),
     ...span({ group: "stop", action: "how-it-runs" }, () => checkHowItRuns(withoutFences(reply), root)),
     ...span({ group: "stop", action: "partner-words" }, () => checkPartnerWords(withoutFences(reply), root, turn.prompt)),
