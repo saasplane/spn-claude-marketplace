@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "seen": "5c0d3a6b"
+      "seen": "014d539f"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
@@ -33,7 +33,7 @@
     },
     {
       "path": "spn-foundation/CONCEPT.md",
-      "seen": "9de8ad98"
+      "seen": "58566134"
     }
   ],
   "decisions": [
@@ -436,7 +436,7 @@ kind: a good example beside a poor one shows the difference faster than the rule
 | Page kind | Title | Subtitle | Description |
 | --- | --- | --- | --- |
 | **construct** — the workstream | *The Workstream* | *Your work stays together in one folder, even after you close the window you started it in.* | *A workstream is a folder that holds one piece of work, from the first idea until you close it. Read this before you start a change that will take more than one working session. The page explains how the folder is named, how it moves between waiting, open and closed, and what is checked before you can close it.* |
-| **hub** — the foundation's | *Your team's time belongs to your product.* | *The AI-native, DevEx-first Foundation for Building and Launching Secure, Scalable, Compliance-ready SaaS Platforms.* | *SaaS Plane is a set of standards, tools and code libraries for building software that customers use over the internet. Read this page first to see how the parts fit together before you open any of them. Each area below links to the page that explains it in full.* |
+| **hub** — the foundation's | *Scale your engineering on standards every team keeps.* | *The AI-native, DevEx-first Foundation for Building and Launching Secure, Scalable, Compliance-ready SaaS Platforms.* | *SaaS Plane is a set of standards, tools and code libraries for building software that customers use over the internet. Read this page first to see how the parts fit together before you open any of them. Each area below links to the page that explains it in full.* |
 | **concept overview** — `concept-devex-agent-overview.html` | *The agent is a member of the team, not a tool beside it.* | *The SaaS Plane DevEx Agent: what it is, what you can ask it to do, and how it works in your folder.* | *This page explains the coding agent that works with you in this workspace. Read it before you install the agent or ask it for anything. The pages below cover how a session opens, the skills it runs, and the roles it looks through.* |
 | **repository overview** — `spn-support-ts` | *Every app starts from the same shape.* | *The TypeScript backbone every SaaS Plane app is built on.* | *This repository holds the TypeScript libraries and the command-line tool that every SaaS Plane application is built from. Read this page to find the part you need before you open its code. Each area below links to its own page.* |
 | **approach** — `plain-language-approach.html` | *Plain Language* | *Decides how every page in the book opens, and how the agent talks to you.* | *This page plans a change to how the book's pages open and to what the agent says when you open a new window. Read it before you review the work it lists. Why comes first, then what changes, then how the work runs.* |
@@ -718,8 +718,12 @@ repoint` moves the hash with the version. A line with no hash still loads, and t
   spacing, size, type, borders, corners and overflow, and the colours of our tokens, such as `flex`,
   `gap-4`, `mt-2`, `text-sm`, `text-faint` and `bg-accent-soft`. Use a named class first, and a
   utility only where no class fits. A utility outside the set has no effect on a page.
-- **A version is a folder that never changes.** `docs sds cut <version>` writes it, and it refuses a
-  version that exists. A change to the styles is a new version, and
+- **A version is a folder that never changes.** `docs sds cut <version>` writes it, with a `fonts/`
+  folder beside the stylesheet and the scripts, and it refuses a version that exists. The pages read in
+  Geist and Geist Mono (`RULE.DEVEX.WORKSPACE.214`): `sds-docs.css` declares `@font-face` for `SDSText`
+  and `SDSCode` on the two files in `fonts/`, by urls relative to the stylesheet, and each keeps the
+  system stack after it, so a page whose fonts did not load still reads. A bundled copy of a page
+  carries no font file. A change to the styles is a new version, and
   `docs sds repoint <version> <folder>` moves every page under a folder to it.
 - **That address is the one hosted address a page may hold.** Every link from one page to another
   stays relative.

@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/03-platform/02-modules/03-notifications.md",
-      "seen": "a9d3a02d"
+      "seen": "e59707bb"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/03-platform/02-modules/03-notifications/",
-      "seen": "2605a2c2"
+      "seen": "414e8cad"
     }
   ]
 }
@@ -21,6 +21,10 @@
 **Compose each message by hand inside the module that triggers it** and every rebrand becomes a code change, every channel becomes a vendor call, and a message that never arrived leaves no record anywhere.
 
 **So a module raises an event and this module composes and delivers it.** The trigger knows what happened; it does not know how it reaches anybody.
+
+## The catalog is filled by the modules that send
+
+**A sending module hands NTF its own group, its actions and their default emails, and NTF applies them; no module's migration writes NTF's tables** (`RULE.PLATFORM.MODULES.033` · MUST · skill:spn-apps/implement). The contribution is an `NTFMigrationContribution`, which NTF applies in its own migration hook once for each module and version, so a repeat changes nothing. A module in another service sends it through the platform's one remote-migration route. NTF names no product's actions itself, so a partner's module adds its own the way HIR does.
 
 ## The distinction people collapse
 

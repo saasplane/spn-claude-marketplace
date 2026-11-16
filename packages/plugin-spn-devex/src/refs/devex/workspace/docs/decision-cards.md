@@ -4,12 +4,12 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "The approach document — a workstream's, never a repository's",
-      "seen": "bf3cba7f"
+      "seen": "51e07b42"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "section": "A card is only for what the rules leave open",
-      "seen": "cb832528"
+      "seen": "ca6d2fed"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
@@ -81,7 +81,7 @@ What they make possible later is one line, *later, not now*, never a construct o
 
 **The views a card carries are the ones its signs call for, made fresh and on record** (`RULE.DEVEX.WORKSPACE.492` · MUST · check:questions). The repository sign is worked out from the paths the card cites, never taken from the agent. Two signs or more need that many fresh views, and the partner sign a Partner view among them. A view counts as fresh only when its whole words are in the arc's `work/` folder and a panel's launch for that lens is on record. A fresh view's brief is written from the card's why, what, nearest construct and signs, so it reads the problem before any proposal, and it is shown the proposals only after it has answered.
 
-**A proposal in chat ends as a card or a suggestion** (`RULE.DEVEX.WORKSPACE.493` · MUST · check:stop). A reply that sets out lettered options names the `Q<n>` or `S<n>` that records them, and the turn-end check sends back one whose number holds no record.
+**A proposal in chat ends as a card or a suggestion** (`RULE.DEVEX.WORKSPACE.493` · MUST · check:stop). A suggestion may be put in chat with its `S<n>`. A question put to the developer is a card, raised on the approach page before the reply ends, and the reply names its `Q<n>`. The turn-end check sends back a reply that puts a choice to the developer without an open `Q<n>` or a recorded `S<n>`, a choice being lettered options or a question between ways, and one that names a number no record holds.
 
 **One kind of decision is taken out of that: a decision that sets a shape, a name, a member, a check
 or the direction of a dependency** (`RULE.DEVEX.WORKSPACE.239` · MUST · check:stop). Decide it alone where a rule

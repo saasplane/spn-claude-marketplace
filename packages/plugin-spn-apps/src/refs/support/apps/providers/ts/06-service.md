@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/10-providers/ts/06-service.md",
-      "seen": "34049ec1"
+      "seen": "40d8a0ec"
     }
   ]
 }
@@ -187,6 +187,8 @@ The identity module's contract offers these methods:
 
 **An update or delete purges the exact key.** Where the cache key is not on the command, load the entity first and hand it to a private save or delete method that carries the purge, so the decorator reads the natural key off the entity's own fields. Wildcard-clearing a whole scope prefix from an id-only mutation is a smell.
 
+**A service sets the dates it writes for a business record from the trusted simulated time, or the real time when there is none** (`RULE.SUPPORT.APPS.267` · MUST · skill:spn-apps/implement). A create sets `createdAt` and `updatedAt` from `resolveContextSimulatedAt()`, an update sets `updatedAt` from it, and the repository saves them and decides no date. The reader never throws and is never null; `tryContextSimulation()` is the raw read, `null` when the request is not simulating. `SPAppExecutionContextSimulation` is `{ at: Date }`, held by the execution context beside its preferences, and no contract state carries it. `publishQueueOnTransactionCommit` carries the trace and the simulation as the message's headers on its own, and a publisher that calls the queue directly passes `prepareQueueHeaders()`. A date is never set from `new Date()`.
+
 **Every mutation returns through the fresh read**, never by mapping the saved entity. The client then cache-fills with canonical data, and denormalized and actor fields are correct.
 
 **Null means leave unchanged in a partial update.** Never spread a command into an entity. This makes null unusable as a clear-this-field signal, so a clearable field needs an explicit sentinel or its own command.
@@ -321,6 +323,7 @@ The context's accessors follow the fields: `getContextOrgType()` returns one of 
 - An entity-backed state is never polymorphic; variance goes in its nested carrier.
 - A mutation returns through the fresh read, never through the saved entity.
 - Create takes no purge; update and delete purge the exact key.
+- A business date is set from `resolveContextSimulatedAt()`, never from `new Date()`.
 - Search: the repository returns ids and a total, the service hydrates in that order.
 - Authorize every contract method, and give a pre-auth method no gate at all.
 - Decorator order: authorize, sudo, cache purge, transaction, data reach; a cache build or get sits beneath data reach.

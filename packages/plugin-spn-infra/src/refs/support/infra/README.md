@@ -14,7 +14,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/02-packages/01-manifests.md",
       "section": "Providers are a pattern, at both scopes",
-      "seen": "4477c076"
+      "seen": "39ae767e"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/02-packages/01-manifests.md",

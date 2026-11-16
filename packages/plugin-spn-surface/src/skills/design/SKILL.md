@@ -15,7 +15,7 @@ description: Design a page of a SaaS Plane app from the blocks of the design sys
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/",
-      "seen": "9571fe16"
+      "seen": "d2783d3b"
     }
   ]
 }
@@ -637,3 +637,4 @@ Wear the spn-devex plugin's `refs/devex/agent/lenses/ux.md` while you place the 
 - **Each case a unit's column names can be opened in the unit's Playground by its prop values in the address, in light and in dark, so the library's reader can open it** (`RULE.SUPPORT.SURFACE.412` · MUST · skill:spn-surface/design)
 - **The notice stands flush in its place.** (`RULE.SUPPORT.SURFACE.419` · MUST · skill:spn-surface/design)
 - **The library's text styles bind to the theme's typefaces and never name a stand-in font** (`RULE.SUPPORT.SURFACE.423` · MUST · skill:spn-surface/design)
+- **A page's title is one step larger only on the page that leads.** (`RULE.SUPPORT.SURFACE.424` · MUST · skill:spn-surface/design)

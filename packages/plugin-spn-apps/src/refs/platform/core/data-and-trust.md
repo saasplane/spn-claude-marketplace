@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/03-platform/01-core/04-data-and-trust.md",
-      "seen": "e8b7a8e7"
+      "seen": "3abfe989"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/03-platform/01-core/04-data-and-trust/",
-      "seen": "719f34ad"
+      "seen": "74d372c0"
     }
   ]
 }
@@ -167,11 +167,12 @@ A fixed list of security standards would be wrong for most partners, so the answ
 
 **A standard reads supported only once every foundation and estate row asking for it is met** (`RULE.PLATFORM.CORE.045` · MUST · skill:spn-apps/implement). A control is met once a test or a check has seen it refuse something, and an estate control once it is deployed. A company row never decides the claim, and only an outside auditor makes a standard certified.
 
-Three more rules travel with the map:
+More rules travel with the map:
 
 - **A breach of personal data is reported within 72 hours** (`RULE.PLATFORM.CORE.047` · MUST · skill:spn-apps/implement). As controller, your platform tells the supervisory authority and each person affected; SaaS Plane, as processor, tells you without undue delay.
 - **Every finding is rated with CVSS v4.0 and fixed within its deadline** (`RULE.PLATFORM.CORE.046` · MUST · skill:spn-apps/implement): 7 days for critical, 30 for high, 90 for medium, 180 for low. A self-assessment is never read as a test.
 - **Production promises an RPO of 15 minutes and an RTO of 4 hours**, proven by a restore once a year (`RULE.PLATFORM.CORE.048` · MUST · skill:spn-apps/implement).
+- **A feature made for non-production, such as a simulated time, cannot run in production.** It is a row of the control map, carried by the service's boot refusal and the API entry's gate.
 
 ## The five pre-ship questions
 

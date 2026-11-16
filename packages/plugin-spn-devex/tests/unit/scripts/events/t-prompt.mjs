@@ -12,7 +12,7 @@ import { join, resolve } from "node:path";
 import { PLUGIN } from "../../../helpers/harness.mjs";
 import { workspace } from "../../../helpers/fixture.mjs";
 import { ARCS, DEVEX, WORKSTREAMS } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
-import { alsoOpenOf, bindingsOf, citedOf, nameToGive, readRecord, recordFile, sessionName } from "../../../../src/scripts/events/prompt.ts";
+import { alsoOpenOf, areaReminder, areasOf, bindingsOf, citedOf, nameToGive, readRecord, recordFile, sessionName } from "../../../../src/scripts/events/prompt.ts";
 
 const SCRIPT = resolve(PLUGIN, "src", "scripts", "events", "prompt.ts");
 const EVENT = "UserPromptSubmit";
@@ -388,6 +388,18 @@ console.log("\n=== prompt — the mid-run reminder, while a go of the window has
     reminderOf(hook(event(held, "sess-305-held", `On ${THIS}: the drawer should open on the left.`), held)), null);
   same("[MKT.HOOKS.305] a window bound to no workstream hears nothing",
     reminderOf(hook(event(running, "sess-305-unbound", "What time is it?"), running)), null);
+}
+
+// S48: the area a prompt touches brings its views and its skill (RULE.DEVEX.AGENT.177).
+{
+  const site = areasOf("make the topic page's band read better");
+  same("[MKT.HOOKS.507] a prompt touching a site page names UX, UI, VOICE, MARKETING and spn-surface:design",
+    site.find((one) => one.area === "a site page"), { area: "a site page", views: ["UX", "UI", "VOICE", "MARKETING"], skill: "spn-surface:design" });
+  same("[MKT.HOOKS.507] one touching docs names VOICE and the prose rewriter",
+    areasOf("tidy the guide's wording").find((one) => one.area === "docs"), { area: "docs", views: ["VOICE"], skill: "spn-devex:spn-prose-rewriter" });
+  same("[MKT.HOOKS.507] a prompt that touches no area names none", areasOf("What time is it?"), []);
+  same("[MKT.HOOKS.507] the reminder names each view, the skill and the rule",
+    /UX, UI, VOICE, MARKETING and spn-surface:design/.test(areaReminder(site)) && /RULE\.DEVEX\.AGENT\.177/.test(areaReminder(site)), true);
 }
 
 console.log(failed ? `  ${failed} FAILED` : `  all ${n} passed`);

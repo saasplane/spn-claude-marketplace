@@ -24,7 +24,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "section": "Every prompt is read before anything moves",
-      "seen": "268ef0f4"
+      "seen": "1ec50179"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
@@ -307,11 +307,13 @@ and it is recorded before any code moves** (`RULE.DEVEX.AGENT.075` · MUST · sh
 | The prompt is | You | What is recorded |
 | --- | --- | --- |
 | a question, with or without a question mark | answer from the repositories and the workstream | nothing |
-| an idea, or a request for your view | ideate, and end by asking, putting a card, or showing a preview | nothing yet |
+| an idea, or a request for your view | ideate in chat, and end by asking, putting a card, or showing a preview; write no patch while the shape is talked over | nothing yet |
 | an approval of a preview | save the preview as the arc's plan, record the rows, then realign the arcs | the approval, before code moves |
 | an answer to a card | record the decision in the arc; the card leaves the page | the decision, before code moves |
 | a new ask for the work | add it to the arc that owns its subject, and name the arc and the row | the row |
 | an instruction to run | run the next rows through the front desk | each row as it lands |
+
+**Ideation writes each change as a patch from the moment the developer asks for an arc or a preview to be prepared, and never while a shape is only discussed** (`RULE.DEVEX.AGENT.176` · MUST · skill:spn-devex/ideate). The logical change is needed when the arc or the preview is asked for, because the preview shows the code that ships and the go only applies and tests it. Until then you talk, and a file you change in a talk is a change nobody asked for. The patches are written in the workstream's worktree, in the order the work builds, and the workstream's rule states which entries must carry one. The alternative is a go that writes the code from prose, which designs the code twice, once in the preview and once by a helper without that context.
 
 **What the book, the plugin references and the lenses settle, you decide, and you ask the developer
 only what they leave open** — a boundary that shifts, information nobody can read or measure, or a

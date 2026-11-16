@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-infra/06-modules.md",
-      "seen": "5eb9c330"
+      "seen": "ffa7fe80"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/06-modules/",
-      "seen": "d3338e59"
+      "seen": "43cdf226"
     }
   ]
 }
@@ -240,7 +240,8 @@ A setting the estate does not publish stays the module's own and is written as a
 
 - **The CORS origin regex is an authored key, never a derived formula** — no formula from the platform domain can say which origins an API admits.
 - **Identity facts (`{SPC}_ORG_*`, `{SPC}_PLATFORM_*`) are SaaS-construct facts** — an independent application adopting no SaaS construct composes an environment without them, and that absence is blessed, not a gap.
-- **The routing facts publish into every environment's store**, so a loading application reads what the blueprint generated: `{SPC}_PLATFORM_DOMAIN` (the one key for the platform domain), `{SPC}_PLATFORM_ENV` (the host prefix — never blank in the cloud, blank locally), `{SPC}_PLATFORM_APPS_{APP}_SUBDOMAIN` (the bare label), and the tenant edge's six facts, `{SPC}_PLATFORM_EDGE_TYPE` · `_ROUTE_STORE_ARN` · `_TARGET` · `_DISTRIBUTION_ID` · `_CERTIFICATE_REGION` · `_CUSTOM_DOMAINS`. `infra config render {spc} {env} {app}` produces the routing block locally, with the same spellings. No cloud edge stands on a machine and nothing publishes one there, so the local rendering writes the edge block as the identity module's own keys, `{SPC}_IAM_EDGE_*`, as literals. Two of them are settings the cloud never publishes: `{SPC}_IAM_EDGE_DEBUG` (selects the local edge provider — a deployment cannot ask for it by type, only by this flag) and `{SPC}_IAM_EDGE_ROUTE_DIR` (the machine path the local edge provider reads and writes its routes under).
+- **The routing facts publish into every environment's store**, so a loading application reads what the blueprint generated: `{SPC}_PLATFORM_DOMAIN` (the one key for the platform domain), `{SPC}_PLATFORM_ENV` (the host prefix — never blank in the cloud, blank locally), `{SPC}_PLATFORM_APPS_{APP}_SUBDOMAIN` (the bare label), `{SPC}_PLATFORM_WORKLOAD` (`PROD` or `NP`, derived from the environment's declared workload and never typed), and the tenant edge's six facts, `{SPC}_PLATFORM_EDGE_TYPE` · `_ROUTE_STORE_ARN` · `_TARGET` · `_DISTRIBUTION_ID` · `_CERTIFICATE_REGION` · `_CUSTOM_DOMAINS`. `infra config render {spc} {env} {app}` produces the routing block locally, with the same spellings. No cloud edge stands on a machine and nothing publishes one there, so the local rendering writes the edge block as the identity module's own keys, `{SPC}_IAM_EDGE_*`, as literals. Two of them are settings the cloud never publishes: `{SPC}_IAM_EDGE_DEBUG` (selects the local edge provider — a deployment cannot ask for it by type, only by this flag) and `{SPC}_IAM_EDGE_ROUTE_DIR` (the machine path the local edge provider reads and writes its routes under).
+- **The estate publishes whether an environment is production, and only a non-production one may let a request simulate time** (`RULE.SUPPORT.INFRA.158` · MUST · skill:spn-infra/implement). `{SPC}_PLATFORM_WORKLOAD` is `PROD` or `NP`, and a `PROD` environment never publishes `NP`. A developer machine belongs to no workload account, so `infra config render` writes `NP` locally. `{SPC}_API_SIMULATION_TRUSTED` is a deployment's own setting, beside its proxy counts, and `false` unless set; locally the render writes it `true`, and in the cloud it is `true` only where no tenant's real data lives, such as a shared demo. `infra config set` and `infra config import` refuse it `true` on any rung but a non-production environment's own, and the service's own boot refusal stays as the second wall.
 - **The health port is `{CODE}_HEALTH_PORT`** — unset or empty means no health server, and local runs opt in. A deployed environment receives a **published default of `8010`, supplied by the deploy render** — a published default, never a code default, so the composed environment states everything true of the running application.
 
 **A dev-authored value may cite a fact; a fact is always a literal.** `${…}` references resolve one pass against the *composed* rungs, so a reference sees exactly what the application would see. An unknown reference refuses by name at the comparison and at the render, never expanding quietly to nothing. An expansion pulling in a credential materializes on the secret path. That is what makes a published endpoint written once: an engine swap flips a record, and every value referencing it follows at the next render.

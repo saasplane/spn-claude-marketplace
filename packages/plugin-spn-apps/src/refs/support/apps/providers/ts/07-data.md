@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/10-providers/ts/07-data.md",
-      "seen": "eb3c5925"
+      "seen": "5d502296"
     }
   ]
 }
@@ -17,7 +17,7 @@
 ## Entities
 
 - **A primary key is a `CHAR(26)` sortable id assigned in the service**, not by the database.
-- **Audit columns are timestamps with a timezone**, and the actor columns are ids referencing the principal table.
+- **Audit columns are plain `timestamptz` columns with a `now()` default**, never `@CreateDateColumn` or `@UpdateDateColumn`: the service sets `created_at` and `updated_at` on every save, a business record's from `resolveContextSimulatedAt()`, and a decorator would overwrite the date it set. The actor columns are ids referencing the principal table.
 - **An org-scoped table carries its tenant column, and that column leads every index.**
 - **Every business table carries an active flag, and no table anywhere carries a deleted-at column.** A hard delete is for a junction or owned-child row and for wholesale set replacement.
 - **Application-managed columns are not null and take no SQL default.**
