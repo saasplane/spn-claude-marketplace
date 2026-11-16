@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "book": {
     "repository": "spn-foundation",
-    "commit": "4a0523ad"
+    "commit": "c2dd238b"
   },
   "rules": [
     {
@@ -2291,6 +2291,11 @@
       "restated": [
         {
           "plugin": "spn-devex",
+          "path": "refs/devex/agent/agent.md",
+          "heading": "Every prompt is read before anything moves"
+        },
+        {
+          "plugin": "spn-devex",
           "path": "skills/ideate/SKILL.md",
           "heading": "The rules this step holds"
         }
@@ -2307,7 +2312,13 @@
       "chapter": "04-capabilities/01-devex/02-agent/03-lenses/01-lenses.md",
       "heading": "Which views speak, and how many",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/agent/lenses.md",
+          "heading": "Which views speak, and how many"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.FUNCTION.007",
@@ -6888,6 +6899,11 @@
       "heading": "One stylesheet, served in versions",
       "decision": null,
       "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/docs/doc-sets.md",
+          "heading": "Every page links one shared stylesheet, in one version"
+        },
         {
           "plugin": "spn-devex",
           "path": "refs/devex/workspace/docs/doc-sets.md",
@@ -14259,6 +14275,11 @@
       "restated": [
         {
           "plugin": "spn-apps",
+          "path": "refs/platform/core/tenancy/README.md",
+          "heading": "The tree a platform sells into"
+        },
+        {
+          "plugin": "spn-apps",
           "path": "skills/implement/SKILL.md",
           "heading": "The rules this step holds"
         },
@@ -14893,6 +14914,11 @@
           "plugin": "spn-apps",
           "path": "refs/platform/modules/README.md",
           "heading": "What each module requires, not just what it costs to skip"
+        },
+        {
+          "plugin": "spn-apps",
+          "path": "refs/platform/modules/notifications.md",
+          "heading": "The catalog is filled by the modules that send"
         },
         {
           "plugin": "spn-apps",
@@ -19648,7 +19674,23 @@
       "chapter": "04-capabilities/02-support/02-apps/03-module/01-server/02-app/01-services.md",
       "heading": "Simulated time",
       "decision": "DEC.SUPPORT.APPS.267",
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "providers/ts/skills/implement/steps/service.md",
+          "heading": "The rules this step holds"
+        },
+        {
+          "plugin": "spn-apps",
+          "path": "refs/support/apps/module/README.md",
+          "heading": "How the outside reaches it — entry"
+        },
+        {
+          "plugin": "spn-apps",
+          "path": "refs/support/apps/providers/ts/06-service.md",
+          "heading": "Mutations"
+        }
+      ]
     },
     {
       "id": "RULE.SUPPORT.APPS.268",
@@ -19661,7 +19703,28 @@
       "chapter": "04-capabilities/02-support/02-apps/03-module/01-server/03-entry/01-api.md",
       "heading": "Simulated time",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "refs/support/apps/module/README.md",
+          "heading": "How the outside reaches it — entry"
+        },
+        {
+          "plugin": "spn-apps",
+          "path": "refs/support/apps/providers/ts/10-configuration.md",
+          "heading": "The app-shell namespaces"
+        },
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/agent/lenses/trust.md",
+          "heading": "Produces to"
+        }
+      ]
     },
     {
       "id": "RULE.SUPPORT.INFRA.001",
@@ -22881,7 +22944,18 @@
       "chapter": "04-capabilities/02-support/03-infra/06-modules/02-config.md",
       "heading": "The published vocabulary",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-infra",
+          "path": "refs/support/infra/modules.md",
+          "heading": "The app plane is authored"
+        },
+        {
+          "plugin": "spn-infra",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.SUPPORT.SURFACE.001",
@@ -34339,6 +34413,35 @@
       "heading": "The type steps",
       "decision": null,
       "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.424",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "A page's title is one step larger only on the page that leads.",
+      "chapter": "02-constructs/02-support/01-surface/05-architecture-core.md",
+      "heading": "The type steps",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/agent/lenses/ui.md",
+          "heading": "Mastery"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/architecture-core.md",
+          "heading": "The level tokens"
+        },
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
