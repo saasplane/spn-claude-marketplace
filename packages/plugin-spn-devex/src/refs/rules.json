@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "book": {
     "repository": "spn-foundation",
-    "commit": "c463ed51"
+    "commit": "e1b6e23a"
   },
   "rules": [
     {
@@ -19568,10 +19568,10 @@
         "skill": "spn-apps/run"
       },
       "class": "stated in a skill",
-      "sentence": "A local app starts only through `spnutils apps dev`, run from the main checkout, and never from a worktree or through raw `nx`",
+      "sentence": "A local app starts only through `spnutils apps dev`, and never through raw `nx`, from its one default env, the app's own `envs/local.env`; `--override KEY=VALUE` sets a value over that default for one run, and `--name <name>` runs the app as a second server beside the demo from any checkout, a worktree included",
       "chapter": "04-capabilities/02-support/02-apps/10-providers/ts/12-toolchain.md",
       "heading": "Workspace Conventions (Nx + pnpm)",
-      "decision": null,
+      "decision": "DEC.SUPPORT.APPS.264",
       "restated": [
         {
           "plugin": "spn-apps",
