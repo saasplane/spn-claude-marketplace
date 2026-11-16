@@ -7,12 +7,12 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/05-app/",
-      "seen": "03bbaf41"
+      "seen": "d54f2eab"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/03-module/02-web/03-entry/01-pages.md",
       "section": "The address of a screen",
-      "seen": "d88d12e6"
+      "seen": "7f7295cb"
     }
   ]
 }
@@ -294,7 +294,7 @@ A web application asks the same two questions a server does — how does it come
 
 **Presentation is a boot phase, and only here** — style layers resolve by load order, so a correct set loaded in the wrong sequence is wrong in a way no single layer's own test catches. There is no migration step, because a web application owns no schema. There is **no module registration** — a web surface's modules are composed by its router, so composition happens at navigation rather than at startup. And configuration is already resolved when it starts, arriving as build-time values rather than being read — which is why a web surface cannot be reconfigured without rebuilding it.
 
-**Assembly is import order, not a phased boot.** The app manager assembles the typed app config and the web providers (logger, auth) at page load — the two addresses it needs (`apiBaseUrl`, `authHubUrl`) are built into the bundle, so nothing is fetched first. **Composition by import**: the app composes UI module packages by importing their pages and their routes, the router mounts module screens lazily, each at the address its route gives, and registering a module is an import plus a route entry — nothing else in the app knows it exists. **The shell is a module too** — the router, the composition root, the app context and navigation live in the application's own `boot` module, so the `src` root stays the frame. **One client**: every data call flows through the API client; a web app never hand-writes an HTTP client and never talks to storage directly. Sessions arrive through the platform's session transport; the app consumes it and never implements it.
+**Assembly is import order, not a phased boot.** The app manager assembles the typed app config and the web providers (logger, auth) at page load — the values its app declares are built into the bundle, so nothing is fetched first. **Composition by import**: the app composes UI module packages by importing their pages and their routes, the router mounts module screens lazily, each at the address its route gives, and registering a module is an import plus a route entry — nothing else in the app knows it exists. **The shell is a module too** — the router, the composition root, the app context and navigation live in the application's own `boot` module, so the `src` root stays the frame. **One client**: every data call flows through the API client; a web app never hand-writes an HTTP client and never talks to storage directly. Sessions arrive through the platform's session transport; the app consumes it and never implements it.
 
 **Teardown is best-effort and cannot be awaited.** The exit signal fires both when a surface is closed and when it is navigated away and cached, so nothing may block on the work it starts. **A web surface never boots into a privileged state** — everything it can do it could do from a reload, so the guard is the server refusing the call, never the boot order.
 
@@ -309,7 +309,7 @@ public/   copies verbatim → dist root     stable names — the author's chrome
 
 `_assets/` is reserved so the cache contract can depend on only hashed names living there; `public/` is chrome — well-known files and small media — never product content, which belongs to the platform's own document store.
 
-**The bundle carries its environment.** It is built once per environment, and the two addresses a page needs are build-time values: one committed file per environment, holding no credentials, which a value from the shell or the pipeline overrides. **Everything built in is public by definition**, so a secret never reaches the bundle. A required value that is missing stops the page at start and names the key, rather than falling back to a plausible default. The cost is stated in `DEC.SUPPORT.APPS.063`: the bundle that passed non-production is not the bundle production runs. A deployed web application builds no image at all: its artifact is the bundle, whole, delivered as a copy into the environment's release store and a pointer move — never a second horizontal-scaling decision, because static serving scales by the host rather than by the app.
+**The bundle carries its environment.** It is built once per environment, and the values its app declares are build-time values. A module states what it needs when an app uses it, and the app declares those values in its own config; the platform's modules need three, `apiBaseUrl` (the surface's backend), `authBaseUrl` (the platform's auth service) and `authHubUrl` (the platform's auth hub). They sit in one committed file per environment, holding no credentials, which a value from the shell or the pipeline overrides. **Everything built in is public by definition**, so a secret never reaches the bundle. A required value that is missing, whether the platform's or one a module states, stops the page at start and names the key, rather than falling back to a plausible default. The cost is stated in `DEC.SUPPORT.APPS.063`: the bundle that passed non-production is not the bundle production runs. A deployed web application builds no image at all: its artifact is the bundle, whole, delivered as a copy into the environment's release store and a pointer move — never a second horizontal-scaling decision, because static serving scales by the host rather than by the app.
 
 ### The public pages of a web app are its own pages
 
@@ -321,7 +321,7 @@ public/   copies verbatim → dist root     stable names — the author's chrome
 | A person who sets the module up | Yes | `/settings/<name>/<rest>`, a page of setup |
 | Anyone, found by a search engine or a shared link | No | `/<plain word of the site>/<rest>`, the app's own page |
 
-A public address differs from a module's signed-in route in one way: the signed-in route begins with the module's name, and a public address begins with the site's own plain word. Its words come from the site's information architecture, and it uses a module's units (its states, reads and components). A module keeps its name (`RULE.SUPPORT.APPS.204`), an address never carries its menu place (`RULE.SUPPORT.APPS.192`), and a changed address answers with a redirect (`RULE.SUPPORT.APPS.193`).
+A public address differs from a module's signed-in route in one way: the signed-in route begins with the module's name, and a public address begins with the site's own plain word, so its first word may not be the name of a module the app mounts: an app that mounts the JOB module takes another word than `jobs`. Its words come from the site's information architecture, and it uses a module's units (its states, reads and components). A module keeps its name (`RULE.SUPPORT.APPS.204` · MUST · skill:spn-apps/implement), an address never carries its menu place (`RULE.SUPPORT.APPS.192` · MUST · skill:spn-apps/implement), and a changed address answers with a redirect (`RULE.SUPPORT.APPS.193` · MUST · skill:spn-apps/implement).
 
 **You state the site's hierarchy and the use case first, and you propose an address only after.** Name the site's levels, such as portal, collection, record; name what a person is doing there (browsing, searching, following a link); decide which levels earn a page; and only then choose the words. The public-sites chapter of the web app seat covers six uses, each with its own hierarchy and addresses: a job portal, a careers site on a company's own host, an ecommerce store, a marketplace, a content or help site, and a directory of listings.
 
@@ -336,6 +336,7 @@ A public address differs from a module's signed-in route in one way: the signed-
 ## What an application owns that a module never does
 
 - **A running process (or, on the web, a mounted page).** A module ships no shell; it is composed into one.
+- **Its Home.** A Home is the app's own page, and a module takes no part in it beyond the reads it exports as hooks; the app draws the page from them.
 - **Every provider.** Infrastructure is app-wide by definition; a module reaches it, never provisions it.
 - **The boot and shutdown order**, and the entries that boot's last phase mounts.
 - **Its full entry set and its deployment shapes.** Which entries wake up is a deployment's selection over one build a module cannot make on its own.
