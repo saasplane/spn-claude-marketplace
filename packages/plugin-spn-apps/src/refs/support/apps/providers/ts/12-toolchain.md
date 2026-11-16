@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/10-providers/ts/12-toolchain.md",
-      "seen": "09668f5b"
+      "seen": "ba3b3f37"
     }
   ]
 }
@@ -30,4 +30,4 @@
 
 **Root scripts are the repository's and are a different surface from a node's commands.** Reach for `spnutils apps check · test · format` before any `npx` or `pnpm` invocation.
 
-**A local app starts only through `spnutils apps dev`, run from the main checkout, and never from a worktree or through raw `nx`** (`RULE.SUPPORT.APPS.264` · MUST · skill:spn-apps/run). A worktree holds work in progress and never the running stack. The design system is built by `spnutils apps build support-web-ds-ts`, and the showcase is started by `spnutils apps dev web-surface-ts`, as node commands and not as root scripts.
+**A local app starts only through `spnutils apps dev`, and never through raw `nx`, from its one default env, the app's own `envs/local.env`; `--override KEY=VALUE` sets a value over that default for one run, and `--name <name>` runs the app as a second server beside the demo from any checkout, a worktree included** (`RULE.SUPPORT.APPS.264` · MUST · skill:spn-apps/run). An override lives only in that run's environment, for every kind, so everything not set still matches the estate, and nothing is written; `APP_ENV` is never overridden, because it would replace the default. A named server runs beside the app's usual one under a run record of its own, on ports its command sets with `--override`: the port keys its estate row gives, one for a web app, and for a service its port and the health and remote ports the row declares. Each must be set and free, and the command refuses a missing or a held one, naming it. It is plain HTTP on loopback, with no host and no certificate of its own. A named server never migrates, because the local stack keeps one database; whether a named service may run beside the demo's is the agent's call before it starts one. `spnutils apps stop <package> --name <name>` stops it, and removing a worktree stops every server that runs from it. The demo runs from the main checkout. The design system is built by `spnutils apps build support-web-ds-ts`, and the showcase is started by `spnutils apps dev web-surface-ts`, as node commands and not as root scripts.

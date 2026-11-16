@@ -15,7 +15,7 @@ description: THE requirement router for SaaS Plane TS repos. Use whenever the us
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/",
-      "seen": "edc0e7a8"
+      "seen": "44b8e5e5"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/07-architecture-widgets/",
@@ -325,3 +325,4 @@ Three more that decide whether a symbol appears at all:
 - **The store of kept work is the one exception to "every table belongs to one module".** (`RULE.SUPPORT.APPS.260` · MUST · skill:spn-apps/implement)
 - **A route names a state and an operation on it, and never who calls it** (`RULE.SUPPORT.APPS.261` · MUST · skill:spn-apps/implement)
 - **A module's shared list and record page take the app's own additions: columns on a list, sections on a record page** (`RULE.SUPPORT.APPS.265` · MUST · skill:spn-apps/implement)
+- **The API entry honours `x-spn-simulate-at` only where the deployment is non-production and trusts it** (`RULE.SUPPORT.APPS.268` · MUST · skill:spn-apps/implement)

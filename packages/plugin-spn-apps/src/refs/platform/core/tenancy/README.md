@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/03-platform/01-core/01-tenancy.md",
-      "seen": "070ce942"
+      "seen": "b3131740"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/03-platform/01-core/01-tenancy/",
-      "seen": "1f30c24b"
+      "seen": "30ec19d3"
     }
   ]
 }
@@ -67,6 +67,8 @@ A consumer org never resolves a directory before sign-in. The core draws that li
 **The developer picks a business archetype by choosing which categories to name and where each sits, never by building a second model.** B2C names an Account category alone, as a household. B2B names the same Account category as a company. B2B2C adds an Account Consumer category, and B2B2B adds an Account Enterprise category. A marketplace names Merchant and Shopper categories directly beneath the platform instead. Nothing forks to express any of them, and a platform that adds a second archetype later migrates nothing — it names a category the tree already had room for. Naming one is not a code branch: which customer org types an org may open beneath it is the `IAM_MANAGE_CUSTOMER_ORG_TYPES` cell on its category (see Enablement, below). When you scaffold a new customer shape, look for the category here before you propose a new table.
 
 Read an archetype label from the platform outward, never the other way — MUST. `B2B2B` and `B2B2C` are always platform → business → that business's own businesses or consumers, never read from the customer's own seat. An Account Enterprise is a downstream business of an Account, not a peer of it, and you get the tree wrong if you read the label from the customer's chair.
+
+**A customer of every child category always opens on a details page of its own, in every console** (`RULE.PLATFORM.CORE.080` · MUST · skill:spn-apps/implement). A Company's Agencies and Candidates, and the platform's own customer kinds, open on a page of their own and never as a sheet over the list; the sheet stays only for creating one. A module's engagement with a customer plugs into the customer's page through ORG's app section, a header-actions slot, and a listener on ORG's customer-created event.
 
 ## The account is the isolation boundary
 

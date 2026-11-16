@@ -17,6 +17,11 @@
 // the `continue:` value. Those are recorded as visited, never owned, so the window is not asked to carry
 // another window's cards; only what `continue:` names before it is this window's own.
 //
+// THE AREA A PROMPT TOUCHES brings its views and its skill before the agent answers (S48, RULE.DEVEX.AGENT.177): a site
+// page, docs, apps code, the estate or the direction of the work each name the lens map's views and the skill to bring
+// (`areasOf`), said to the agent with the prompt and kept for the window, so the reply check can send back a shape proposed
+// without them.
+//
 // WHILE A GO RUNS, every prompt also carries the mid-run reminder to the agent (`midRunReminder`): a go of the
 // window's workstreams with a part running or ready.
 //
@@ -40,6 +45,7 @@ import { bindNamed, bindVisited, readWindow, windowSet } from "../lib/window.ts"
 /** An arc as a handover text writes it: `N011`, `ideate` or `follow-ups`, not inside a longer word or a folder name. */
 const ARC_NAME = new RegExp(`(?<![\\w-])(?:${ARC_PART})(?![\\w-])`);
 import { goStandings } from "./orientation.ts";
+import { areasFile, type AreaViews } from "../lib/areas.ts";
 
 /** What a session is called, and which of the two forms the name has. */
 export type SessionName = { name: string; form: "workstream" | "arc" };
@@ -239,7 +245,13 @@ export function answerFor(payload: Payload, start: string): string {
     for (const bound of bindingsOf(prompt, root, session)) bindNamed(root, session, bound.name, bound.by);
     for (const visited of [...citedOf(prompt, root), ...alsoOpenOf(prompt, root)]) bindVisited(root, session, visited);
   } catch { /* a binding that cannot be written is a window that hears less */ }
-  const reminder = midRunReminder(root, windowSet(root, session));
+  const areas = areasOf(prompt);
+  const areaFile = areasFile(root, session);
+  if (areaFile) {
+    try { mkdirSync(dirname(areaFile), { recursive: true }); writeFileSync(areaFile, JSON.stringify(areas), "utf8"); } catch { /* a window that cannot keep them is checked without them */ }
+  }
+  // The mid-run reminder leads: while a go runs, what a message changes is read first.
+  const reminder = [midRunReminder(root, windowSet(root, session)), areaReminder(areas)].filter(Boolean).join("\n\n");
   const file = recordFile(root, session);
   let give = file ? nameToGive(sessionName(prompt, root), readRecord(file)) : null;
   if (file && give) {
@@ -248,6 +260,31 @@ export function answerFor(payload: Payload, start: string): string {
   if (!give && !reminder) return "";
   return JSON.stringify({ hookSpecificOutput: { hookEventName: "UserPromptSubmit",
     ...(give ? { sessionTitle: give.name } : {}), ...(reminder ? { additionalContext: reminder } : {}) } });
+}
+
+const AREAS: Array<AreaViews & { pattern: RegExp }> = [
+  { area: "a site page", views: ["UX", "UI", "VOICE", "MARKETING"], skill: "spn-surface:design",
+    pattern: /\b(?:site|website|web ?page|landing|home ?page|topic page|launchpad|www)\b/i },
+  { area: "docs", views: ["VOICE"], skill: "spn-devex:spn-prose-rewriter",
+    pattern: /\b(?:docs?|chapter|the book|guide|readme|wording|words)\b/i },
+  { area: "apps code", views: ["ARCHITECT", "SERVER_DEV", "WEB_DEV"], skill: "spn-apps:implement",
+    pattern: /\b(?:service|endpoint|contract|module|screen|component|header|queue|listener|migration|api)\b/i },
+  { area: "the estate", views: ["INFRA", "TRUST"], skill: "spn-infra:implement",
+    pattern: /\b(?:infra|estate|cloud|deploy(?:ment)?|environment|terraform|tofu)\b/i },
+  { area: "the direction of the work", views: ["LEAD", "PRODUCT", "PARTNER"], skill: "spn-devex:ideate",
+    pattern: /\b(?:should we|scope|priorit(?:y|ise|ize)|roadmap|strategy|pricing|what to build)\b/i },
+];
+
+/** The areas a prompt touches, in the map's order, each once. A prompt that touches none brings none. */
+export function areasOf(prompt: string): AreaViews[] {
+  return AREAS.filter((one) => one.pattern.test(prompt)).map(({ area, views, skill }) => ({ area, views, skill }));
+}
+
+/** What the agent is told: each area with its views and its skill, to bring before it answers. Empty for none. */
+export function areaReminder(areas: AreaViews[]): string {
+  if (!areas.length) return "";
+  return `This prompt touches ${areas.map((one) => `${one.area} (bring ${one.views.join(", ")} and ${one.skill})`).join("; ")}. ` +
+    "Bring those views, each named, and the skill before you answer, in chat as on a card (RULE.DEVEX.AGENT.177).";
 }
 
 /**

@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/03-platform/01-core/03-surfaces/",
-      "seen": "7b823ad7"
+      "seen": "b4e6a83f"
     }
   ]
 }
@@ -85,7 +85,7 @@ These four coordinates are estate declarations, read from the platform's own man
 | Platform | the shared standard library every product service builds on | SaaS Plane |
 | Vendor | an external capability consumed behind a governed seam | shared — engineering integrates, the vendor operates |
 
-The namespace token a scheduled deployment declares is a **blast-radius and exposure boundary, never an organizational one** — teams do not get namespaces. A vendor is reached only through a seam it does not define, which is what makes it replaceable without a rewrite when it fails. A service namespace is not a service domain: a service domain is an additional DNS apex the estate manages, with its own zones and certificates — nothing about a namespace decides DNS, and nothing about a domain decides ownership.
+The namespace token a scheduled deployment declares is a **blast-radius and exposure boundary, never an organizational one** — teams do not get namespaces. A vendor is reached only through a seam it does not define, which is what makes it replaceable without a rewrite when it fails. A service namespace is not a service domain: a service domain is an additional DNS apex the estate manages, with its own zones and certificates, declared in the organization's `providers.domains` by code and bound by an app row's `domain` code — nothing about a namespace decides DNS, and nothing about a domain decides ownership.
 
 The platform namespace's core is nine shipped modules — MDM, IAM, ORG, CMP, DOC, ENT, NTF, JOB, LNG — each a strict module with its own contract, implementation, entries and migrations, independently removable, each declaring its own upstream dependencies. **One test draws the boundary between platform and product: if a second product would need it, it is platform.**
 
@@ -142,4 +142,4 @@ An unreachable vendor refuses the request — the harsher of the two readings, a
 
 ## Left out
 
-The full DNS grammar for touchpoints (`{env}-{tenant}.{spd}`, pretty names as site entries, custom domains outside the zone) is left out — it is infra-plane realization detail that an integrator reads off the org app site rather than composes by hand. The nine platform modules' individual dependency graph is left out beyond naming them; a module's own contract is the place to read what it exposes.
+The full DNS grammar for touchpoints (`{env}-{tenant}.{spd}`, pretty names as site entries, custom domains outside the zone) is left out — it is infra-plane realization detail that an integrator reads off the org app site rather than composes by hand. A platform should own two domains, the marketing site on its own (`RULE.SUPPORT.INFRA.019` · SHOULD); an organization with one domain may put its home there, at the costs the infra coordinates name. The nine platform modules' individual dependency graph is left out beyond naming them; a module's own contract is the place to read what it exposes.

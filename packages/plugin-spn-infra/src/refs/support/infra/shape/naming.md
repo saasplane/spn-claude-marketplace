@@ -8,7 +8,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/06-modules/02-config.md",
       "section": "The published vocabulary",
-      "seen": "c2d51a6d"
+      "seen": "0eb9aa8a"
     },
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-infra/06-modules.md",
@@ -75,7 +75,7 @@ Written by blueprints into each **resource world's own seat**. **Every configura
 {SPC}_DEPLOYMENT_SPACE                              the resource space the deployment's app is bound to; blank for the platform's world — rendered, never authored (`RULE.SUPPORT.INFRA.154` · MUST · skill:spn-infra/implement)
 {SPC}_DEPLOYMENT_VERSION                            what is running: the commit on a push, the tag on a promotion; blank on a laptop
 {SPC}_PLATFORM_OBSERVABILITY_TRACES_ENDPOINT        the OTLP/HTTP address of the collector in the deployment's own cluster, published in each environment's store by the platform's world; on a laptop it points at the local observability module when it runs
-{SPC}_ORG_LEGAL_*                                   {SPC}_PLATFORM_CODE · _NAME · _DOMAIN · _ENV · _APPS_{APP}_SUBDOMAIN · _OWNER_*
+{SPC}_ORG_LEGAL_*                                   {SPC}_PLATFORM_CODE · _NAME · _DOMAIN · _ENV · _WORKLOAD (`PROD` or `NP`, derived from the environment's declared workload) · _APPS_{APP}_SUBDOMAIN · _OWNER_*
 {SPC}_RESOURCE_{FAM}_{WORLD}_ENDPOINTS              per connection block (RULE.SUPPORT.INFRA.055): DB_APP · DB_MIGRATION ·
                                                     DB_{SCHEMA} · CACHE_{NAME} · QUEUE_{NAME} · STORAGE_{NAME}
                                                     (one block per engine, `APP` the default; a `PUBLIC` store adds _PUBLIC_ENDPOINTS)

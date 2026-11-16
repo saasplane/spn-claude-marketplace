@@ -159,3 +159,4 @@ Use the `release` skill (bump `version` in `spinfrapkg.json` → `spnutils infra
 - **An environment's size is the default and the floor** (`RULE.SUPPORT.INFRA.151` · MUST · skill:spn-infra/implement)
 - **A deployment is told who it is and where its traces go** (`RULE.SUPPORT.INFRA.154` · MUST · skill:spn-infra/implement)
 - **An application is given a module's settings only when its row names the module** (`RULE.SUPPORT.INFRA.157` · MUST · skill:spn-infra/implement)
+- **The estate publishes whether an environment is production, and only a non-production one may let a request simulate time** (`RULE.SUPPORT.INFRA.158` · MUST · skill:spn-infra/implement)

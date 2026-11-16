@@ -17,7 +17,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
-      "seen": "9313588a"
+      "seen": "e02f4215"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -56,7 +56,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "seen": "38401651"
+      "seen": "014d539f"
     }
   ]
 }
@@ -689,7 +689,7 @@ them this way:
 
 **The views a card carries are the ones its signs call for, made fresh and on record** (`RULE.DEVEX.WORKSPACE.492` · MUST · check:questions). The repository sign is worked out from the paths the card cites, never taken from you. Two signs or more need that many fresh views, and the partner sign a Partner view among them. A view counts as fresh only when its whole words are in the arc's `work/` folder and a panel's launch for that lens is on record. Write a fresh view's brief from the card's why, what, nearest construct and signs, so it reads the problem before any proposal, and show it the proposals only after it has answered.
 
-**A proposal in chat ends as a card or a suggestion** (`RULE.DEVEX.WORKSPACE.493` · MUST · check:stop). A reply that sets out lettered options names the `Q<n>` or `S<n>` that records them, and the turn-end check sends back one whose number holds no record.
+**A proposal in chat ends as a card or a suggestion** (`RULE.DEVEX.WORKSPACE.493` · MUST · check:stop). A suggestion may be put in chat with its `S<n>`. A question put to the developer is a card, raised on the approach page before the reply ends, and the reply names its `Q<n>`. The turn-end check sends back a reply that puts a choice to the developer without an open `Q<n>` or a recorded `S<n>`, a choice being lettered options or a question between ways, and one that names a number no record holds.
 
 **An answer lands in the card and the arc in the same turn, and in a preview only where the preview
 shows that card — MUST.** An answer to a card, or any point the developer makes in review, lands
@@ -1619,7 +1619,7 @@ page; a link inside the content, *Where to go next* included, may open a markdow
 **The page links one version of the shared stylesheet and script as its base, and holds no copy of
 them** (`RULE.DEVEX.WORKSPACE.214` · MUST · check:doc-check). An approach page and a preview keep the two lines their template
 has. One links `sds-docs.css` by the version's address, and the other loads `sds-docs.js` from the
-same version. A page that holds a copy of its styles keeps the faults of the day it was written, and
+same version, and the version's folder carries the Geist and Geist Mono fonts the stylesheet reads, in a `fonts/` folder beside it. A page that holds a copy of its styles keeps the faults of the day it was written, and
 a shared file is fixed once for every page. Use the shared classes first. Where the page has a case
 they do not cover, reach for a utility of the standard set, such as `flex` or `text-faint`. Where no
 utility fits either, add one `<style>` block of its own after the stylesheet's line; a class it

@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/04-resources/",
-      "seen": "0183af9f"
+      "seen": "5fa46574"
     }
   ]
 }
@@ -74,7 +74,7 @@ Hold secrets at rest to the same zero-tolerance rule everywhere: persist a crede
 
 The rule that matters most: **one schema per service; reach your own tables and join another's only on a declared key.**
 
-Hold entity shape fixed across every table you write: a sortable, service-assigned 26-character `id` you assign yourself, never database-generated; audit stamps `created_at`/`updated_at`/`created_by`/`updated_by`; lifecycle as an `active` boolean — **never add a soft-delete column**, and reserve hard delete for junction and owned-child rows; put semi-structured data in `{purpose}_json` columns with `camelCase` keys; denormalize a polymorphic document's discriminator to an indexable `{noun}_type` column alongside it; store a value that must never be read back under an `internal` sub-object or in a column with no read mapping. Once the seal is built, a value the service itself must read back is stored sealed, so the column holds one sealed string and never the value.
+Hold entity shape fixed across every table you write: a sortable, service-assigned 26-character `id` you assign yourself, never database-generated; audit stamps `created_at`/`updated_at`/`created_by`/`updated_by`, where the service sets `created_at` and `updated_at` on every save (a business row's from the request's trusted simulated time) and the database's default only fills a column a write left empty; lifecycle as an `active` boolean — **never add a soft-delete column**, and reserve hard delete for junction and owned-child rows; put semi-structured data in `{purpose}_json` columns with `camelCase` keys; denormalize a polymorphic document's discriminator to an indexable `{noun}_type` column alongside it; store a value that must never be read back under an `internal` sub-object or in a column with no read mapping. Once the seal is built, a value the service itself must read back is stored sealed, so the column holds one sealed string and never the value.
 
 | Object | Grammar | Sample |
 | --- | --- | --- |
@@ -85,7 +85,7 @@ Hold entity shape fixed across every table you write: a sortable, service-assign
 | Enum type | `{module}_{concept}_type` | `ord_shipment_status_type` |
 | Index | `idx_{table}_{columns}`; unique `uq_{table}_{columns}` | `idx_ord_shipment_org_order` |
 
-Carry the module's prefix, in lower case, on every table, enum type, sequence, function and view, keep every name within 63 bytes (Postgres truncates a longer one silently), and hold a foreign key only to a table its owner publishes, reading everything else through the owner's contract service; the `MIGRATE` run reads the catalog and refuses a breach.
+Carry the module's prefix, in lower case, on every table, enum type, sequence, function and view, keep every name within 63 bytes (Postgres truncates a longer one silently), and prefer the owner's contract service to a join: a module reads another module's data through the owner's contract service and peer-depends on the owner, and where it must hold a foreign key, the key points at the primary key of a stable table (guidance, not a rule). The `MIGRATE` run reads the catalog and refuses a name that breaks the prefix or the length.
 
 Order a composite index you add with organization scope first, then parent keys in hierarchy order, then business filters, then the sorting timestamp last — match the query's own filter order. Add an index only against a measured, frequent query; never add one against a theoretical query by reflex.
 

@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/03-module/01-server/02-app/01-services.md",
-      "seen": "16c1e29c"
+      "seen": "0028f659"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/03-module/01-server/02-app/02-repositories.md",
@@ -11,15 +11,15 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/10-providers/ts/06-service.md",
-      "seen": "34049ec1"
+      "seen": "40d8a0ec"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/10-providers/ts/07-data.md",
-      "seen": "eb3c5925"
+      "seen": "5d502296"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/10-providers/ts/03-structure.md",
-      "seen": "4d786c96"
+      "seen": "4a055f3c"
     }
   ]
 }
@@ -37,6 +37,7 @@
 - **A file holds one component and only what its name says, so an interface file holds types only** (`RULE.SUPPORT.APPS.237` · MUST · skill:spn-apps/implement)
 - **A script is written in the stack's language and kept in a folder the tree names** (`RULE.SUPPORT.APPS.241` · MUST · skill:spn-apps/implement)
 - **A repository narrows by data scope only through `SPRepository`'s `applyDataScope` and `filterByDataScope`, on the column it opts in, and never with a predicate of its own** (`RULE.SUPPORT.APPS.249` · MUST · skill:spn-apps/implement)
+- **A date a service writes for a business record is the request's trusted simulated time, or the real time when there is none** (`RULE.SUPPORT.APPS.267` · MUST · skill:spn-apps/implement)
 
 Use one template for every module service — **this template is the standard**. The method families it fills in are the foundation book's, closed and stack-agnostic (`01-services.md` · `02-repositories.md`, the method-families sections). The TypeScript rendering and the fuller skeleton are the service-patterns and database-patterns chapters of the provider set. Layer rule: `app/services`, `app/repositories`, `app/entities` hold classes only — helpers go to `app/utils/` or `app/support/` (see `02-structure.md`).
 
@@ -55,8 +56,8 @@ Repo returns `{ total, entityIds }` (mode-split TOTAL/RECORDS/BOTH, ids-only sel
 
 ## Mutations
 
-- **Create**: `entity.id = ulid()` (service-assigned, never DB-generated), `orgId` from context, `createdBy`/`updatedBy` from `getContextPrincipalId()` (IAM tables: identity id) — **no purge**; return via `get<X>ById(saved.id)`.
-- **Update**: load entity → **null-skip** (`if (command.name !== null) { … }`; never spread the command) → save → **write-then-fresh-read**: return via `get<X>ById` after the purge marked keys dirty.
+- **Create**: `entity.id = ulid()` (service-assigned, never DB-generated), `orgId` from context, `createdBy`/`updatedBy` from `getContextPrincipalId()` (IAM tables: identity id), and `createdAt`/`updatedAt` from `resolveContextSimulatedAt()` — **no purge**; return via `get<X>ById(saved.id)`.
+- **Update**: load entity → **null-skip** (`if (command.name !== null) { … }`; never spread the command) → set `updatedAt` from `resolveContextSimulatedAt()` → save → **write-then-fresh-read**: return via `get<X>ById` after the purge marked keys dirty.
 - **`@SPCachePurge` on writes**: exact keys reproduced from the write command (`[[0,'id']]`), wildcard clears the suffix family. When the cache key isn't on the command (list-keyed caches), route the write through a private `_save<X>`/`_delete<X>` carrying the purge keyed off the **entity**. Wildcard-clearing an org prefix from an id-only mutation is a smell.
 - **Active toggle, not delete**: `update<X>Active(SPUpdateActiveCommand)`; hard delete only for junction/owned-child rows. Junction sets are replaced **wholesale** (delete-all-then-insert for plain rows; diff add/deactivate for rows with history); validate every incoming id against the caller's scope (anti-enumeration) and dedupe.
 - **Migration-seeded SYSTEM/DEFAULT rows are API-immutable** — service hardcodes `CUSTOM` on create; an `_assertMutable` guard sits on **every** write path including active toggles.
@@ -89,5 +90,5 @@ Repo returns `{ total, entityIds }` (mode-split TOTAL/RECORDS/BOTH, ids-only sel
 ## Repository + schema summary
 
 - Repos: thin `EntityManager` classes; entities in/out (never CDT states); **never call services or read context**; tenant-scope param **first** on every method — the by-id read filters by it too. Bulk `get<E>sByIds` **throws** EntityNotFound on any missing id; the single delegates. `search<E>s` returns `{ total, entityIds }` only. Parameter-bind everything; enum sorts via exhaustive switch. Use nullable reads only for genuinely-optional lookups (`getByRequestKey`).
-- Schema: `CHAR(26)` ulid PKs; `snake_case` module-prefixed tables (`iam_org`); every schema object carries the module prefix in lower case and no name is over 63 bytes, a reference column is named for the table it points at. Columns ordered id → org_id → entity refs/parents (grandparent before parent) → business → jsonb → lifecycle → audit tail; `org_id` leads every index. `active BOOLEAN` — **no `deleted_at`**, no soft-delete columns; discriminator `<noun>_type` column kept in sync with `config.mtype` (index the column, never the JSON); prefer NOT NULL; no views/stored functions.
+- Schema: `CHAR(26)` ulid PKs; `snake_case` module-prefixed tables (`iam_org`); every schema object carries the module prefix in lower case and no name is over 63 bytes, a reference column is named for the table it points at. Columns ordered id → org_id → entity refs/parents (grandparent before parent) → business → jsonb → lifecycle → audit tail; the audit columns are plain `timestamptz` columns with a `now()` default, never `@CreateDateColumn` / `@UpdateDateColumn`, because the service sets them; `org_id` leads every index. `active BOOLEAN` — **no `deleted_at`**, no soft-delete columns; discriminator `<noun>_type` column kept in sync with `config.mtype` (index the column, never the JSON); prefer NOT NULL; no views/stored functions.
 - Migrations: pure and self-contained (inline env via `getEnv*`, never raw `process.env`; only seed-ID constant imports). `version` = epoch-ms, and must exceed everything it depends on. **DDL and seed data in separate migrations** — seeds in FK order, higher versions, and each `down` deletes only its own rows, and a migration writes only its own module's tables (rows that belong to IAM or MDM travel as the module's migration contributions, which the owner applies after the migrations). Add a required field to a jsonb-persisted type by updating every migration literal + runtime builder + fixture **in the same change**, then verify on a clean reset (prefer `| null`).

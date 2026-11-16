@@ -2213,6 +2213,26 @@ console.log("\n=== stop — send-backs are written as they are said, the welcome
     check("[MKT.HOOKS.427] green: a reply with no lettered options owes no number", check1("The page is written and the checks are green. See A. Smith's note.").length === 0);
     check("[MKT.HOOKS.427] green: a fenced list is a quotation and sets out nothing", check1("The block:\n\n```\nA. one\nB. two\n```").length === 0);
     check("[MKT.HOOKS.427] the check is about the reply", payloadLib.REPLY_CHECKS.has("proposal-record"));
+    // S49: a choice put as an either-or question is a card too.
+    const either = "The shape is settled, but one point is open.\n\nShould the queue carry it in the headers, or as a field on every event?";
+    check("[MKT.HOOKS.509] red: a reply that ends asking the reader to pick one thing or another, naming no Q<n> or S<n>, is sent back",
+      check1(either).length === 1 && check1(either)[0].check === "proposal-record", JSON.stringify(check1(either)));
+    check("[MKT.HOOKS.509] green: the same choice naming the card that records it passes", check1(`Q1 asks it.\n\n${either}`).length === 0);
+    check("[MKT.HOOKS.509] green: a question with no second thing to pick, or one that asks \"or not\", passes",
+      check1("The release is out.\n\nShall I go on?").length === 0 && check1("The release is out.\n\nShall I go on, or not?").length === 0);
+  }
+
+  // A SHAPE PROPOSED FOR AN AREA NAMES THE AREA'S VIEWS (S48, RULE.DEVEX.AGENT.177).
+  {
+    const site = [{ area: "a site page", views: ["UX", "UI", "VOICE", "MARKETING"], skill: "spn-surface:design" }];
+    const bare = "The band has two buttons.\n\nI recommend the shorter heading, so the band reads in one line.";
+    const viewed = "UX and VOICE read the band.\n\nI recommend the shorter heading, so the band reads in one line.";
+    const red = stopModule.checkAreaViews(bare, site);
+    check("[MKT.HOOKS.508] red: a reply that proposes a shape for the area the prompt touched and names none of its views is sent back, naming the views, the skill and the rule",
+      red.length === 1 && red[0].check === "reply-shape" && red[0].message.includes("UX, UI, VOICE, MARKETING") && red[0].message.includes("spn-surface:design") && red[0].message.includes("RULE.DEVEX.AGENT.177"), JSON.stringify(red));
+    check("[MKT.HOOKS.508] green: the same proposal naming the views passes", stopModule.checkAreaViews(viewed, site).length === 0);
+    check("[MKT.HOOKS.508] green: a reply that proposes nothing, or a window whose prompt touched no area, owes no view",
+      stopModule.checkAreaViews("The band is drawn and the checks are green.", site).length === 0 && stopModule.checkAreaViews(bare, []).length === 0);
   }
 
   // A RUN OUTSIDE THE WORKSPACE, WITH THE PROJECT DIRECTORY AT IT, READS THE WORKSPACE (s43).
