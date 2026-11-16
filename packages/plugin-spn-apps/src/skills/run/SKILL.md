@@ -48,7 +48,17 @@ failure — a `MODULE_SERVER` has no `start` because it serves nothing, and a no
 second name for a target that already exists, it hides which project does the work, and it is the
 shape an agent copies next. Call the owning project's target.
 
-**Apps start with `spnutils apps dev`, run from the main checkout, never raw `nx` and never from a worktree** (`RULE.SUPPORT.APPS.264` · MUST · skill:spn-apps/run). `nx run <project>:dev` and `nx run-many -t dev` are not ways to start an app. A build, a check or a test still goes through its target.
+**The demo starts with `spnutils apps dev`, run from the main checkout, never through raw `nx`, and an app may also run as a named server from any checkout, a worktree included, with `spnutils apps dev <package> --name <name>`** (`RULE.SUPPORT.APPS.264` · MUST · skill:spn-apps/run). `nx run <project>:dev` and `nx run-many -t dev` are not ways to start an app. A build, a check or a test still goes through its target.
+
+**`--override KEY=VALUE`** sets a value over the app's one default env, its own `envs/local.env`, for that run only, on any server; `APP_ENV` is never overridden: read the comment beside each key in that file, set only what the run needs, and never pass a secret, because a command line can be seen.
+
+**A named server** shows a worktree's own code beside the demo. Run it inside that worktree, after building what changed there, and name it for what it shows, such as the arc, and set its ports yourself: `spnutils apps dev web-surface-ts --name n011 --override DMO_UI_PORT=9450 --override VITE_TEST_DATA_DEBUG=true`. A web app needs its `<PREFIX>_UI_PORT`; a service needs its `<PREFIX>_API_PORT`, and its health and remote port keys where its estate row declares them. Pick ports that are free and sit in the platform's range away from its declared ones, such as from 9450 up on `dmo`; spnutils refuses a missing port key, and a port another server holds or something listens on, naming it. Give the developer both addresses, the demo's and the named server's. `spnutils apps stop <package> --name <name>` stops it, and so does removing its worktree.
+
+**A named service is your call, made before you start it.** It shares the demo's one database and queues, so start one only when all of these hold, and otherwise swap the demo's service on its own port, one window at a time:
+1. The worktree's migrations for that service equal `develop`'s, so its schema is the demo's: `git diff origin/develop -- <service>/**/migrations` prints nothing.
+2. It runs with `--mode API`, so it takes no queue message from the demo's, unless the change is in a queue handler, which is a swap.
+3. Whatever should call it is pointed at it by an override: a web app's API address, and the service's own CORS origins for that web app's address.
+A named server never migrates: spnutils refuses `--mode MIGRATE` with `--name`. `--mode` is a service's only, as for any server: a web app takes none.
 
 ## A SCRIPT and a TARGET are different things, and this is where people trip
 
