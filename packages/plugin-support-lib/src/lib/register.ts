@@ -34,11 +34,14 @@ export type Columns = {
   updated: number;
 };
 
-/** A table line's cells, whatever the table's width, with their padding kept. Null for a line that is not one. */
+/**
+ * A table line's cells, whatever the table's width, with their padding kept. Null for a line that is not one. An escaped pipe, `\|`,
+ * is part of its cell, as a markdown table reads it, so a row whose words hold one keeps its width and the rows after it are read.
+ */
 export const cellsOf = (line: string): string[] | null => {
   const trimmed = line.trim();
-  if (!(trimmed.startsWith("|") && trimmed.endsWith("|") && trimmed.length > 1)) return null;
-  return trimmed.slice(1, -1).split("|");
+  if (!(trimmed.startsWith("|") && trimmed.endsWith("|") && !trimmed.endsWith("\\|") && trimmed.length > 1)) return null;
+  return trimmed.slice(1, -1).split(/(?<!\\)\|/);
 };
 
 /** Where each named column sits, or null when this line is not a register's header. */

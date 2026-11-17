@@ -1,5 +1,5 @@
 // The plugin's templates are the book's, copied by the build (RULE.DEVEX.WORKSPACE.490): with a book beside this checkout, every file of
-// the book's `04-docs/templates/` folder is in `refs/devex/workspace/docs/templates/` byte for byte, and the build script copies, reports and
+// the book's `04-docs/templates/` folder but its own `index.md` is in `refs/devex/workspace/docs/templates/` byte for byte, and the build script copies, reports and
 // keeps as it says. With no book beside, the copy stays as committed and the run says so.
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -33,9 +33,11 @@ console.log("=== the plugin's templates are the book's, byte for byte");
   if (book === null) ok("[MKT.SCRIPTS.407] no book beside this checkout: the plugin's copy is what is committed, and there is nothing to compare", true);
   else {
     const from = join(book, BOOK_TEMPLATES);
-    const files = filesUnder(from);
+    // The folder's own index.md, which records each template's hash, stays in the book; the plugin keeps its README.md instead.
+    const files = filesUnder(from).filter((file) => file !== "index.md");
     const differing = files.filter((file) => !existsSync(join(COPY, file)) || !readFileSync(join(COPY, file)).equals(readFileSync(join(from, file))));
-    ok("[MKT.SCRIPTS.407] every file of the book's templates folder is in the plugin's, equal byte for byte", files.length > 0 && differing.length === 0, differing.join(", "));
+    ok("[MKT.SCRIPTS.407] every template of the book's templates folder is in the plugin's, equal byte for byte", files.length > 0 && differing.length === 0, differing.join(", "));
+    ok("[MKT.SCRIPTS.407] the book's own index of its templates is not copied into the plugin", !existsSync(join(COPY, "index.md")));
   }
 }
 
