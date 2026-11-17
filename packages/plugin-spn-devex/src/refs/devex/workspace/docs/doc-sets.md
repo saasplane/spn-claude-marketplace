@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "seen": "c0d927f1"
+      "seen": "bb41a4c5"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
@@ -422,7 +422,7 @@ preview's name.
 fixed term that breaks if it is cut, such as *Identity and Access Management*: four words warn, five words or a
 sentence are refused. A dash, a `·`, a section's number and a workstream's number are not words. It holds on every
 page of a repository's artifacts and on an open workstream's approach page and previews, so an arc's title is
-written short too. A guide and each of its steps are named by their imperative: *Run Launchpad locally*.
+written short too. A seat file never drawn as a page, a behaviour's or a capability's, keeps its title. A guide and each of its steps are named by their imperative: *Run Launchpad locally*.
 
 **An approach page's masthead carries no project shorthand either** — an arc number, a question
 number or a release name, such as *N116* or *R2*, that the same sentence does not explain. The
