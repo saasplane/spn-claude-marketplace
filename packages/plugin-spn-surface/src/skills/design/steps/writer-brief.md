@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/11-delivery-library/02-figma/04-drawing.md",
-      "seen": "96b306e7"
+      "seen": "3373442a"
     }
   ]
 }
@@ -77,6 +77,7 @@ The book states a unit, the library draws it, and a stack builds it. You change 
 
 ## A section, a label, a case
 
+0. A unit written in the page-model form is drawn from its chapter's samples block and props table: Figma draws its Main page, a page for each type and its Screens, each cell an instance of the unit with its props set from the sample the chapter names, and no unit whose block has none. The rest of this part is for a unit not yet converted.
 1. A unit's section holds, in this order: where it lives (`path · <Unit>`), the header, then the bands Usage, Variations, Cases and Parts, each under its label. Variations is the unit's tables: the set's table with its group titles and labels, then its mode tables. A table of one column names each value above its version, which keeps the width it takes in use. A unit is drawn at the space it takes in use, never scaled: `PAGE` or `CONTAINER` the content's full width, `WIDGET` three side by side, `GROUP`, `CONTENT` or `INLINE` four. A unit whose widest use is `PAGE` or `CONTAINER` draws its cases and its mode tables but the level table at `WIDGET`, three to a row, and the caption names that level.
 2. The header is one text, in the layer `header · <Unit>`: the unit's name; on the line under it, what the unit is in one line; then `behaviour: ` and the properties that change only how the unit behaves, where it has any. It holds no layout. The layout is the section's shared plugin data, namespace `saasplane`, key `layout`: `{ shape, tables, default, cases, behaviour }`, each table a `caption`, `rowGroups` and `columnGroups`, each group a `prop` and its `values`, the default first. Read it there, never from a label, and write it in the same call that changes the set. When the set gains a property, the layout names it.
 3. A row or column label names one value, and a group's title names the property, `states` for the states; ` (default)` follows the default's value, once. Each is a text whose layer is `label · ` and its whole text. Set the text and the layer's name in one step. A right-aligned label keeps its right edge when its text changes, so set `x` again.

@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/09-architecture-layouts/",
-      "seen": "fc865e4d"
+      "seen": "b79bec08"
     }
   ]
 }
@@ -46,7 +46,7 @@ Read this before you choose a layout for an app, or before you build or draw a l
 | `TOPNAV` | a bar across the top, with the content below it | a website, with the few entries that fit on one line |
 | `CANVAS` | none: the body alone | a sign-in, a marketing page or a page of an error |
 
-**The library draws `DSLayout`:** each `DSLayoutType` (`RAIL`, `DOCK`, `TOPNAV`, `CANVAS`) once, and on a narrow screen once; `footer` as a swap; and, as its usage, an app's page, its rail, its bar and the content.
+**The library draws `DSLayout`** from its props table and its samples block (`architecture-components.md`, *The page model*). Its showcase layout is Full screen, so each cell is a whole screen at the width of a device. As its usage it draws a workspace's dashboard in the type `RAIL`, on a desktop window. A layout has no page of its own for a sizing: it has Overview, Main, Playground, one page for each value of `config.mtype` (`RAIL`, `DOCK`, `TOPNAV`, `CANVAS`), each holding Main's sections with that type fixed and its tabs from the unit's `types` list, and Screens. The one state it lists is Open, `open`, on the rail, which is shut at rest. On the web a type page adds a row of controls so a developer can try a look on every tab; the library draws none. `DSSiteLayout` is the layout's second unit, a wrapper that draws nothing of its own, with the pages Overview, Main and Playground.
 
 - **A layout is chosen by the job of the app, as the table says, and not by how it looks** (`RULE.SUPPORT.SURFACE.206` · GUIDE). The page chooses its layout, and the theme does not. One app may hold two: an admin app in `RAIL` signs a person in on `CANVAS` and opens their profile in `DOCK`.
 

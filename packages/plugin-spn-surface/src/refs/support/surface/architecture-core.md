@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/05-architecture-core/",
-      "seen": "4c2e1945"
+      "seen": "9b1de6c1"
     }
   ]
 }
@@ -176,7 +176,7 @@ The core also carries two closed sets and two shapes beside the vocabularies abo
 | `DSBoxPartType` | `HEADER` · `CONTENT` · `FOOTER` | the parts of any box: a panel, a card, a dialog, a sheet, a drawer, a popover or the page's head |
 
 - **How the cells of a grid stand is `IDSGrid`, beside `DSGridBorderType`** (`RULE.SUPPORT.SURFACE.260` · MUST · skill:spn-surface/design): the columns, required, and the lines of `DSGridBorderType`, `NONE` where left out. A unit that draws a grid of cells takes it whole.
-- **The paint of a frame is `IDSFrameSurface`, typed once in the core** (`RULE.SUPPORT.SURFACE.261` · MUST · skill:spn-surface/design): its `color`, `strength`, `raised`, `elevation`, `bordered` and `rounded`, each optional, a key left out taking the theme's. `elevation` is a `DSSizeType` from `XS` to `XL`, how far a raised frame stands off the page, read only where `raised` is true, and `SM` is today's shadow. A unit that draws a frame takes it as its `surface`.
+- **The paint of a frame is `IDSFrameSurface`, typed once in the core** (`RULE.SUPPORT.SURFACE.261` · MUST · skill:spn-surface/design): its `color`, `strength`, `raised`, `elevation`, `bordered` and `rounded`, each optional, a key left out taking the theme's. `elevation` is a `DSSizeType` from `XS` to `XL`, how far a raised frame stands off the page, read only where `raised` is true, and `SM` is the default lift. Each step is a two-layer shadow, a tight contact shadow and a soft ambient one that grows with the step, so `XS` is a hint and `XL` is a dialog's; a bordered frame keeps its border, raised or not; in dark the same two layers are drawn in black at a higher strength, from 30% to 50%; elevation is the shadow alone and never changes the fill of a frame or its parts; and a popover, a menu and a dropdown take `MD`. A unit that draws a frame takes it as its `surface`.
 - **The parts of any box are `DSBoxPartType`, one closed set of the core** (`RULE.SUPPORT.SURFACE.266` · MUST · skill:spn-surface/design).
 - **How a unit moves into place the first time it scrolls into view is `DSMotionType`, a set of the core** (`RULE.SUPPORT.SURFACE.282` · MUST · skill:spn-surface/design): `NONE`, `FADE`, `RISE`, `SLIDE` and `ZOOM`, beside `DSMotionSpeedType` and `DSIconMotionType`.
 

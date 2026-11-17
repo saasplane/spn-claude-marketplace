@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/06-architecture-components.md",
-      "seen": "ea518f15"
+      "seen": "af3d3be0"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/06-architecture-components/",
-      "seen": "bc3057cc"
+      "seen": "805243e4"
     }
   ]
 }
@@ -140,6 +140,8 @@ The table is a guide. A case says where a value fits and who writes it, and a pa
 - **A rule about how a page uses a prop of a unit is written as guidance with its cases: it names no `never` value, it says no `MUST`, and no check refuses it** (`RULE.SUPPORT.SURFACE.398` · MUST · skill:spn-surface/design). A prop is there to be used, and its cases tell a page when each value fits.
 - **A mock is a skeleton, and it names units and never their props.** A designer's mock of a page or a flow is drawn as the skeleton the docs draw: one for each page, a view for each task state, and a flow file that lists the pages in order (`standards-patterns.md`, *The specs a screen starts from*). It shows where each block stands and which unit it is, and the choice table gives that unit its props when the page is built.
 
+The choice table says which value a page writes. The library and the showcase need a second reading of the same props: where each one stands on the unit's page, and how it is drawn. That reading is the prop's category, written in the library column of its props table (`RULE.SUPPORT.SURFACE.437` · MUST · skill:spn-surface/design), and *The page model* below states it. Every unit of the design system is written this way: the components, the widgets, the containers, the layouts and the app.
+
 Every core unit with a closed prop has its table in this ref, under its unit where the ref gives the unit a section of its own, and otherwise in *The choice tables of the other units* below; `DSCardWidget`'s is in `architecture-widgets.md`.
 
 ### Their size from the place, a field's check from its DSForm.Field
@@ -154,6 +156,165 @@ Every core unit with a closed prop has its table in this ref, under its unit whe
 | Navigation | `DSPagination` · `DSNavList` · `DSNavMenu` · `DSNavBarTop` · `DSNavEntry` |
 | Composites | `DSComparison` · `DSFilterBar` |
 | Typography | `DSKbd` |
+
+## The page model — 🔮
+
+Two readers draw one unit, the showcase and the library, and they must draw one page. One model says which pages a unit has, which sections a page holds, and what each section draws; the web showcase, the design library and any other stack all draw from it. **A page holds sections, a section holds subsections and a subsection holds cells.** A **cell** is the unit with its props set, drawn from a named sample, at a width, in light or in dark. The web draws a subsection as a tab and Figma stacks the subsections down the page. A section a unit has nothing for is never drawn, and neither is an empty subsection.
+
+### The categories
+
+**Every prop of a unit MUST be sorted into exactly one category, and the category MUST stand in the library column of its props table** (`RULE.SUPPORT.SURFACE.437` · MUST · skill:spn-surface/design). The library and the showcase read the same tag, and the book writes nothing else about how a prop is drawn. How Figma builds a prop (a variant, a boolean, a text, a swap, a mode or a slot) follows from the category and the prop's type in the code, the same way for every unit, so it is never written. A unit whose table still shows the old kinds is not yet converted and keeps the old reading until it is.
+
+| Category | What the prop is | Section | Subsection | Cells |
+| --- | --- | --- | --- | --- |
+| `SIZE` | the unit's one size axis: `size`, `scaleSize` or `widthStep` | Sizes | one grid, a row for each value | the unit at rest, one for each variant or shape in each row |
+| `LEVEL` | the page level, `pageLevel` | Levels | one for each level | the unit at that level |
+| `COLOR` | the colour with its variant: `color`, `variant`, `customColor` | Colors | one grid, a row for each colour, `CUSTOM` last | one for each variant in each row |
+| `LOOK` | any other value that changes the form: `placement`, `bordered`, `type`, `orientation`, `extent`, `shape`, `frames`, `surface`, `divided`, `inline`, `fullWidth` | Looks | one for each prop | one for each value, the default first |
+| `WORDS` | words the page gives: `title`, `label`, `description`, `placeholder` | Content | Words | given, left out, long |
+| `MEDIA` | an icon or an image the page gives: `startIcon`, `endIcon`, `image`, `src` | Content | Media | with, without |
+| `ACTIONS` | an action the unit adds: `closable`, `clearable`, `footer`, `headerActions`, `copyable` | Content | Actions | with, without |
+| `SLOT` | another unit the page puts inside: `children`, `trigger`, `fallback`, `endNode` | Content | Slots | one sample in each slot |
+| `ITEMS` | the list or tree the unit is drawn from and the fields of each item: `options`, `nodes`, `items`, `dataSource` | Data | one for each kind of item | one for each trait of the item, then one for each value of each closed prop of the items; a value the kind does not read is left out |
+| `FORMAT` | how a value is written: `dateFormat`, `timeFormat`, `units`, `language` | Data | Formats | a table of the value and what it shows |
+| `LIMIT` | a bound that changes what is shown: `max`, `maxFiles`, `maxSize`, `itemsAfterCollapse` | Data | Limits | within, at the limit, past it |
+| `VALUE` | the value the unit holds: `valueLink`, `value`, `expandedKeys` | States | Value | one for each value state, the first value read from the sample |
+| `STATE` | a prop that sets a state: `disabled`, `validationType`, `loading`, `expanded`, `open`, `selected`, `authzDenied` | States | its group | one for each state |
+| `PART` | a part the unit owns, such as `DSToolbar.Item` | Parts | one for each part | the part's own sections, nested |
+| `BEHAVIOUR` | what changes over time or on an action: callbacks, `autoplay`, `speed`, motion | Behaviour, on the web only | one for each behaviour | a live demo |
+| `WIRING` | what the code needs and no one sees: `testData`, `id`, `aria*`, `permissions`, `zIndex`, and a class | the header, one line | none | none |
+
+A prop that fits no category is a finding, and the book gains a category that every unit then follows; a single unit never gets a section of its own. A showcase tab that varies a prop the table does not list means the table is missing that prop, and it is added so Figma draws it too. Only the page of a structure primitive with no room of its own, `DSSurface` and `DSScrollArea`, may write a class in a set, to give the room its page shows.
+
+**The library MUST draw coverage and never combinations** (`RULE.SUPPORT.SURFACE.435` · MUST · skill:spn-surface/design). Each value of each prop is shown once. Case props that change different parts share a cell, named with each value, and props on the same part stay apart. A boolean that adds an element hides nothing, so it joins any cell that draws its part; two values of enums on the same part stay apart.
+
+**A unit's usage MUST be one primary use, at the width one cell of its row takes, in light and in dark** (`RULE.SUPPORT.SURFACE.436` · MUST · skill:spn-surface/design). It is taken from the scene the showcase's main story opens with. The usage of a unit at the `PAGE` level stands in a screen frame of 1,440 with its content at its level's width.
+
+### A unit's pages
+
+**A unit MUST have its pages in one order, and each page exists only when the unit has something for it** (`RULE.SUPPORT.SURFACE.425` · MUST · skill:spn-surface/design). No page a unit has is dropped when it is written in this form, and the unit's chapter names each one on its **Pages** line, exactly as the showcase exports them.
+
+| # | Page | The unit has it | Who draws it |
+| --- | --- | --- | --- |
+| 1 | Overview | when it is a unit of the App, Layout, Container or Widget layer, or a composite; a component has only its group's | the web |
+| 2 | Main | always | the web and Figma |
+| 3 | Playground | when a person can set a prop of the unit | the web |
+| 4 | A page for each type | when the values of one prop each change the whole unit, as the layout types do; each page holds Main's sections with that value fixed | the web and Figma |
+| 5 | A scenario page, by name | when several units share one state, or a flow runs over time | the web |
+| 6 | Screens | when a cell is a whole page of an app at the width of a device | the web and Figma |
+
+A choice that one prop makes stays a subsection of Main, and a sizing never gets a page.
+
+### The sections of the Main page
+
+**The Main page MUST hold these sections in this order, each in one format** (`RULE.SUPPORT.SURFACE.426` · MUST · skill:spn-surface/design). The subsections stand in the order of the props table, and the values of a prop in the order of their type, the default first, except a yes-or-no prop, which shows yes first.
+
+| Section | Subsections | Format |
+| --- | --- | --- |
+| Header | the name, its line, its path | words |
+| Usage | one: the unit in its primary use, never stretched past one cell's width, in light and in dark | a frame; in the library two, each filled with its mode's page fill and an eyebrow, LIGHT or DARK; on the web one, in the mode the theme bar sets |
+| Sizes | one grid of every size | a grid: sizes as rows, variants or shapes as columns |
+| Levels | one for each level | a row |
+| Colors | one grid of every colour | a grid: colours as rows, `CUSTOM` last, variants as columns |
+| Looks | one for each `LOOK` prop | a row |
+| Content | Words, Media, Actions, Slots | a row |
+| Data | one for each kind of item, then Formats, then Limits | a row; Formats is a table |
+| States | one: rest, then the groups below at the default size | a row, rest once and each group under a band naming it; no size axis |
+| Parts | one for each part | each part holds the sections it has, nested |
+| Behaviour, web only | one for each behaviour | live demos |
+| Props, web only | the props table, a row for each prop and its category | a table |
+
+- **How wide a cell is, how many stand in a row, whether Sizes and Colors are one grid and where the code stands all follow from the unit's `layout`.** No unit sets any of them by hand on the web or in Figma.
+- **States crosses no size.** A state looks the same at every size, so it is drawn at the default size; a unit whose state draws differently at another size adds that size as a second row and says so in its lines.
+- **Every section, tab and subsection is titled in plain words, never by a prop's name.** A prop carries a short plain label beside its category in the library cell, `CATEGORY · Plain label`, and a yes-or-no prop may name its no cell after a slash. A cell is titled the same way, the default marked ` (default)`, and a cell of a grid is named by its row and column. A value of a closed vocabulary keeps its own name wherever it heads a row or a column.
+- **What a person reaches by using a unit is drawn held only in the library.** An open list, menu or picker, the Open group of States, hover and pressed are drawn in Figma, which cannot press anything; the web leaves them out because its unit opens when pressed. Focus stays a cell on both.
+- **The code under a grid is one cell's.** It shows the default cell first and the cell a person clicks after, and its caption names the cell.
+- **The web may offer a section's props as a row of controls, and a control names only a prop of its own section.** A language and a direction are the web's Behaviour and no Main section holds them.
+
+**Every value a unit accepts MUST be shown once, a prop with kinds or parts included, and a variation finds its place by what it varies** (`RULE.SUPPORT.SURFACE.433` · MUST · skill:spn-surface/design). A simple closed prop is one cell for each value in the prop's subsection. A prop with kinds or parts writes each choice as a row of its own in the props table by its nested name, and each value of each row is one cell in the parent prop's subsection. A combination with a rule of its own is one cell, named by the rule, only where the unit's chapter states it, never every combination. A unit in a place, such as a title that starts where a form's fields start, is not a variation and so not on Main: the Overview's Placement shows it. Levels draws each level as it stands in its usual place, from the `levels` of the samples block, at the width of that place; a unit that repeats side by side where it stands states it in a **By level** table of its chapter. The chapter's index by value is the check: a value with no cell is a gap the check names. No example a unit shows today is dropped when it moves to this form; one that fits no place is named in its chapter with the reason it goes.
+
+### How a unit is shown
+
+**Every unit MUST state how its examples are shown, in two facts, and every page of the showcase and of the library MUST be laid out from them** (`RULE.SUPPORT.SURFACE.431` · MUST · skill:spn-surface/design). They stand as `layout` in the unit's samples block.
+
+| Fact | Values | What it says |
+| --- | --- | --- |
+| `display` | `HUG` · `FIELD` · `FILL` · `SCREEN` | the frame an example is shown in: as wide as its contents, a field's 28 rem, one column of the row, or a whole screen at the width of a device |
+| `across` | `1` to `4` | how many examples stand side by side; written on every unit, never left to a default |
+
+`HUG` and `FIELD` show Sizes and Colors as one grid and States as one row that wraps, a lone example at its own width, and the code beside it. `FILL` shows a tab for each size or colour, its examples in rows of `across`, a lone example as one column of the row, and the code beside it where `across` is more than 1 and below it otherwise. `SCREEN` shows a tab for each size or colour with one example in a row, a lone example in the frame of a device, at 1,440 for a `PAGE` unit's Usage, and the code below. A `HUG` unit stands the cells of every other section as States does, as many as fit in a row, each titled above it.
+
+- **The facts say how the showcase and the library show a unit, never how it behaves in an app.** A full-screen modal is a whole screen here.
+- **An overlay is shown as what opens it.** A dialog, sheet, drawer, popover, menu, tooltip and toast are `HUG`, shown as the control that opens them; the library alone draws the overlay open, as a part.
+- **`across` is the unit's own.** A widget usually stands three; a container, a layout and a unit of the App one; a component or composite as many as its width allows, from a band of a page at one to a line of a sidebar at four. `HUG` and `FIELD` are `1`.
+- **A section of several examples has one code view under it, on a narrow screen every example stands alone in its row, and every example stands at the start edge, as a page reads.** Where examples stand one in a row a line across the section parts them; where several stand in a row a wide gutter does, 48 px between columns and 40 px between rows.
+
+### The states
+
+**The States section MUST have its groups in one order, always, each named by what sets its states** (`RULE.SUPPORT.SURFACE.427` · MUST · skill:spn-surface/design). A unit has a group only when it has a state in it.
+
+| # | Group | Set by | The states |
+| --- | --- | --- | --- |
+| 1 | Interaction | the person | `hover`, `focus`, `pressed` |
+| 2 | Value | the value | `filled` for an entry, `on` and `mixed` for a choice, `selected` for an item |
+| 3 | Open | the unit's own open state | `open` |
+| 4 | Availability | a prop | `disabled`, `read only`, `error` |
+| 5 | Task | the data or an outcome | the task states the book names: `WORKING`, `DONE`, `FAILED`, `EMPTY`, `DENIED` |
+
+Rest is the unit's default and the grid's first column, drawn once; a group lists only the states that differ from rest. Every state has one name, so what was Unchecked and Checked, Off and On, or Empty and Filled becomes `rest` with `on`, `selected` or `filled`.
+
+**A unit's states MUST be listed in its samples block, each with how it is made, and the showcase and the library MUST draw exactly that list** (`RULE.SUPPORT.SURFACE.432` · MUST · skill:spn-surface/design). The list is `states`, one key for each group the unit has, in the order above, and each state is written with these keys.
+
+| Key | Means |
+| --- | --- |
+| `held` | the state is drawn by holding what a person does, on the first thing in the unit a person can point at or tab to: `hover`, `focus`, `pressed`, `open` |
+| `sample` | the named set of the same block it is drawn on; left out, the usage sample |
+| `props` | props a page sets, by their names in the props table, laid over the sample |
+
+A held state that needs something to hold, such as a row that is a link, names the sample that has it. A `DENIED` state is drawn as a person who lacks the permission the props name. Rest is the list's first entry only where it is not the usage sample as it stands. A unit lists only its own states, never those of a block it holds, and a unit with no state has no `states` key and no States section. The web draws every state but those a pointer makes, `hover`, `pressed` and the Open group; the library draws all of them, marks the element in the state with the annotation highlight and the state's name, and may show a state of a part highlighted on that part. The chapter's States line is the same list in words.
+
+### The other pages
+
+**The other pages MUST hold fixed sections too, read from the book and drawn in this order** (`RULE.SUPPORT.SURFACE.428` · MUST · skill:spn-surface/design). A section a unit has nothing for is not drawn.
+
+| Page | Sections |
+| --- | --- |
+| Overview | What it is (one paragraph, then Use it for and Not for, each Not for naming the unit to use instead), What it is for (one point for each idea a page needs), Anatomy (one skeleton with numbered parts beside a table of each part and the prop that fills it), Variants (one row for each dimension that matters), Placement (where the unit stands on a page and how wide), Gallery (only where the unit has one, live), then any section the unit adds, then Cases (one line for each section of Main and each other page, with a link). It holds words and skeletons, and no live unit outside Gallery |
+| Playground | Live, then one control group for each of Main's sections the unit has: Sizes, Levels, Colors, Looks, Content, Data, States; one control for each prop of the section, the live unit beside its controls |
+| A page for each type | Main's sections with the type's prop fixed at its value, that prop's subsection of Looks left out; where the samples block lists `types`, one section named for the type, with one tab for each name the list gives |
+| A scenario page | Usage (the scenario running, light and dark), Steps (one for each change that reaches the neighbouring behaviour, in order), States (the groups the scenario passes through) |
+| Screens | one section for each screen, with one cell for each device the screen names, narrowest first: Phone (390), Tablet (820), Desktop (1,280) |
+
+A type page drawn under `types` has its sections and tabs from the book, and the web adds a row of controls so a developer can try a look on every tab; the controls name only a prop of the unit, a tab a control cannot reach greys with the reason, and the library draws no controls.
+
+**The agent MUST write a unit's Overview from the unit's chapter, and the Overview MUST change with it** (`RULE.SUPPORT.SURFACE.430` · MUST · skill:spn-surface/design). What it is comes from the chapter's opening line and its Usage, the parts and the props that fill them from its props table, Variants from its look props, and Placement from its level and place. No word of the page is made up, and the rule sentences and their numbers stay in the book: the Overview tells a developer the unit and does not restate the standard. A change to the chapter updates its Overview in the same change, and review reads the Overview against the chapter.
+
+### The samples
+
+**A unit's samples MUST stand in one fenced `json` block in its chapter, under `#### The samples of` and the unit's name, and a cell MUST be its own props laid over the one set it names** (`RULE.SUPPORT.SURFACE.429` · MUST · skill:spn-surface/design). The block holds the named data sets the cells are drawn from. Its keys are these, and the plugin copies no unit's block.
+
+| Key | What it holds |
+| --- | --- |
+| `unit` | the unit's name |
+| `layout` | `display` and `across`, as above |
+| `states` | the unit's states, one key for each group, each state with `held`, `sample` or `props` |
+| `levels` | for each level the unit takes, the sets its row draws, each written for that level |
+| `types` | for each value of the type prop, its tabs: a name, which draws the type's base set, or a tab with its own `sample` and `props` |
+| `sections` | the set each section takes, or one set for each subsection or cell; `Usage` names the set that shows the unit whole, and a section left out takes it |
+| `values` | the values a prop's cells draw, one cell each, in order |
+| `samples` | the named sets, each a bag of prop values |
+
+- **A field is a name in the props table, and nothing else but `company`,** the words that stand before and after the unit in its usual company, which only the Usage cell draws. A nested name is written as a nested field, a check refuses a field the table does not list, and the table writes a nested row only for a key a cell varies.
+- **Words are written in the book's language.** A partner's book may add a set in its own words and never edits one of ours.
+- **A `VALUE` prop's first value is set in the sample,** so the web and Figma start with the same choice.
+- **A slot is written as a unit with its props,** and a callback is never written in the block: the stack gives it. Where a unit takes its children as data, the set writes that data.
+- **A value JSON cannot hold is written in its JSON form,** a date as its ISO text and a time as `"14:30"`, and the stack builds the value from it. A service the unit calls is written as what it answers, never as a function.
+- **A task state that a callback's outcome sets, and no prop does, is drawn under that callback in Behaviour,** and the `states` key lists only what a prop holds.
+- **A cell is its own props laid over one set,** never two sets. The props its subsection names win over the same prop in the set, so a unit writes a base set and another only where the data differs, never one for each size, colour or state. A cell that names no set takes the Usage set, and a cell whose value needs data of its own names its set under its subsection.
+- **Every cell's content comes from one place in the block, and the reader never invents one.** `WORDS` given takes the Words set and left out unsets the prop; long takes the set named `long`. `MEDIA`, `ACTIONS` and a slot take the set `sections` names for them, with and without; a slot's cell keeps only its own slot, except the trigger of an overlay, which every cell keeps. `ITEMS` takes the set for Data, a closed prop inside the items draws one cell for each value, and a list whose items carry no trait draws one cell for each count `values` lists. A part takes the set `sections` names under Parts. An open `LOOK`, a `LIMIT` and a `FORMAT` take the values `values` lists, a limit listing within, at the limit and past it. A level takes the sets `levels` names, and `CUSTOM` colour one row for each value `values` lists, or one from the base set. A value that is a list or an object is written with its name, and its cell is named by that label.
+- **A section about one part of the unit names, in `sections`, a set that holds only that part,** so the items, the words or the media are not read under every other part.
+- **A live demo stands in Behaviour,** on the web only.
+- **Each target writes its page by hand to the plan the reader derives, and nothing generates a page.** The showcase and the library each draw every planned cell, from its set, in its order, laid out in their own medium. A target may add a cell its medium needs, named with its reason. It never drops a planned cell and never draws one from another set. The reader refuses a cell the block cannot fill, naming the unit and the cell, and the Usage, Pages and States lines agree with the block.
 
 ## The contract every component supports — 🔮
 
@@ -203,7 +364,7 @@ Each rule below is of one block or one prop. The props, their values and their d
 | `DSTable` | **A data cell MAY be `marked`.** A marked cell is the one that stands out in its row, such as the name of a record. Its text is drawn in the medium weight and the default text colour. No cell is marked by default |
 | `DSList` | **A list takes its columns and its lines as one `grid`, an `IDSGrid`** (`RULE.SUPPORT.SURFACE.271` · MUST · skill:spn-surface/design): the columns at each screen class and `borderType`, `NONE` where left out, `GRID` for a line between the cells and none around the outside, `EDGE` for the lines between them and one around the outside, rounded with the theme's corners. **A list of several columns with no lines draws its own gap** (`RULE.SUPPORT.SURFACE.177` · GUIDE): wide between the columns and narrow between the rows. A list of one column draws none. A list with lines stands its rows in a grid with no gap, at one column too: each cell draws its own line at its end and its bottom, in the grid's line colour, so a short last row keeps its lines, and a row's hover and chosen fill reach its lines and stop there. A row of such a list fills its cell, which the tallest row of its line sets, so its hover and chosen fill reach the cell's edges, and its content stands at the top (025 N023 row 42) |
 | `DSTable`, `DSList` | **A fixed ordered set MAY reorder, through `reorder`** (`RULE.SUPPORT.SURFACE.182` · GUIDE). `reorder` is `IDSReorder`, with one function, `onReorder`, which takes a move: the `id` of the row, its `toIndex` and the full order `ids`. A row of the table body or an item of the list takes `reorderId`. A row with a `reorderId` in a block with `reorder` draws a handle, in a first cell of its own in a table (the head row has an empty cell for it) and at the start of the item in a list. A person moves it by dragging the handle, or with Alt and the up or down arrow on the focused handle, one place; a polite live region says the new place, a line at the drop place in the focus colour shows where the row lands, and Escape cancels. A row with no `reorderId` has no handle and does not move. The block calls `onReorder` once for a move, shows the new order at once and keeps no order of its own: the page holds the order and draws its rows in it, and when `onReorder` answers `false` or fails the block shows the order it had before. The drag is the browser's own. It is for a set whose order is the meaning and that is small enough to show whole; `DSDataTableWidget`, ordered by its viewer's sort, never takes it |
-| `DSCard` | **A card MAY hold the parts `DSCard.Header`, `DSCard.Content` and `DSCard.Footer`.** A part pads itself, from the size of the card. Each part takes `flush`, which drops that padding so that what the part holds reaches the edge of the card, and no other prop. The title of a card is an item line in its header, and it starts where what the card holds starts. `divided` draws a line between each two parts, from edge to edge. It is a prop of the card that the page writes, and it is no by default. A card takes each key of its `surface` from its own prop where the prop is given, else from the card look of the theme, and the parts its frame holds from its `frames` (`architecture-app.md`). A pressed card is pressed whole, its flat header with it. A part not listed in `frames` stands flat outside the frame, half the card's gap from the frame beside it (`RULE.SUPPORT.SURFACE.262` · MUST · skill:spn-surface/design). **A panel or a card that holds parts, or more than one content part, has a title:** an item line in its header, at the level its box gives, `CONTAINER` for a panel and `WIDGET` for a card. A card that is one plain block of content needs none. A card takes no height of its own (`RULE.SUPPORT.SURFACE.270` · MUST · skill:spn-surface/design): in a block it is as tall as what it holds, and in a grid or a row every card stands as tall as the tallest, so the cards of one row end on one line. `fullHeight` makes the card fill the height of a place with a set height. A content part of a card is never shorter than what it holds, and only the last content part grows to fill the card, so the footer stands at the end. What then tells a card from a panel is in `architecture-containers.md` |
+| `DSCard` | **A card's size MUST set its own spacing and reach no block it holds** (`RULE.SUPPORT.SURFACE.114` · MUST · skill:spn-surface/design). The size pads the card's parts and sets the gaps between them; a block inside, a button, a badge, a row's words and its chevron, takes the size of the place above the card, so a large card is roomier and what it holds is drawn as it is anywhere else (`architecture-containers.md` states it for every box). **A card MAY hold the parts `DSCard.Header`, `DSCard.Content` and `DSCard.Footer`.** A part pads itself, from the size of the card. Each part takes `flush`, which drops that padding so that what the part holds reaches the edge of the card, and no other prop. The title of a card is an item line in its header, and it starts where what the card holds starts. `divided` draws a line between each two parts, from edge to edge. It is a prop of the card that the page writes, and it is no by default. A card takes each key of its `surface` from its own prop where the prop is given, else from the card look of the theme, and the parts its frame holds from its `frames` (`architecture-app.md`). A pressed card is pressed whole, its flat header with it. A part not listed in `frames` stands flat outside the frame, half the card's gap from the frame beside it (`RULE.SUPPORT.SURFACE.262` · MUST · skill:spn-surface/design). **A panel or a card that holds parts, or more than one content part, has a title:** an item line in its header, at the level its box gives, `CONTAINER` for a panel and `WIDGET` for a card. A card that is one plain block of content needs none. A card takes no height of its own (`RULE.SUPPORT.SURFACE.270` · MUST · skill:spn-surface/design): in a block it is as tall as what it holds, and in a grid or a row every card stands as tall as the tallest, so the cards of one row end on one line. `fullHeight` makes the card fill the height of a place with a set height. A content part of a card is never shorter than what it holds, and only the last content part grows to fill the card, so the footer stands at the end. What then tells a card from a panel is in `architecture-containers.md` |
 | `DSItem` | **A `DSItem` draws its picture, its text and its end node, and nothing around them** (`RULE.SUPPORT.SURFACE.175` · MUST · skill:spn-surface/design). It takes no padding, no border and no fill under the pointer, at any level and at any size, and no `bleed`. Its `anchor` stays: one link that covers the item, with its end node outside the link and a focus ring. The place it stands in gives it its room and its highlight. A row of `DSList.Item` pads by its size and lights up under the pointer where the row or the item it holds is a link. A row in a `flush` part keeps the padding of its size above and below and takes the inset of its place at its two sides, so its text lines up with a title in a part that insets and its band runs from edge to edge. A data table's list, a card widget's rows, the header and the parts of a panel and of a card, the header of an overlay and the trigger of a menu that wraps an item line give that room the same way |
 | `DSColorView` | **Shows a stored colour that a person reads:** a small swatch, and the value beside it as text. With no colour it shows a dash, or the words of `emptyLabel`. `swatchOnly` draws the swatch alone. A colour that is part of a block's own look, such as a badge drawn in its colour, is not shown through this block |
 | `DSCarousel` | **A carousel MUST mark every slide that is not in view `inert` and `aria-hidden`** (`RULE.SUPPORT.SURFACE.311` · MUST · skill:spn-surface/design). It is the standard carousel pattern. A slide out of view can then be neither reached by the keyboard nor read by a screen reader, and a carousel that shows several slides keeps all of them readable, so a carousel of features adds no `h1` for each slide to the page |
@@ -898,7 +1059,7 @@ A node a page hands in ends in `Node`, so the node of art is `mediaNode` and `me
 
 - **A small media MUST stand in a square of the level's box, on step 1 of the surface, with `MEDIA_TOP` at `GROUP` and below.** At `PAGE`, `CONTAINER` and `WIDGET` the media is drawn as given.
 - **The side of a small picture MUST be one box per level, whatever lines the feature has** (`RULE.SUPPORT.SURFACE.274` · MUST · skill:spn-surface/design), which replaces the sizing of (`RULE.SUPPORT.SURFACE.253` · MUST · skill:spn-surface/design). The picture is a mark, an avatar, a group of avatars or a bare icon. It stands above or beside a column of words in every type, never on the words' own line, so the lines under the title do not size it: it is 80, 64, 56, 44, 32 and 28px at `PAGE`, `CONTAINER`, `WIDGET`, `GROUP`, `CONTENT` and `INLINE`. A bare icon is the step nearest half the side, and a tie goes to the larger step: 40, 32, 32, 24, 16 and 14px. No form of the text picks a size; the vertical `DSItem` takes one box per level too (`RULE.SUPPORT.SURFACE.278` · MUST · skill:spn-surface/design). A `mediaNode` is art and is not sized by it.
-- **A small picture MUST stand close to its words, and art MUST keep the level's gap** (`RULE.SUPPORT.SURFACE.414` · MUST · skill:spn-surface/design). `media` with no `mediaNode`, the small picture in the level's box, stands a quarter of its box from the words over or under it, rounded to the 4px scale, and one 4px step more beside them. `mediaNode` keeps the level's gap, "Words to media" in the table below, in every `DSFeatureType`. Where a split folds on a phone, a box that stood beside the words takes the over-or-under gap.
+- **A small picture MUST stand close to its words, and art MUST keep the level's gap** (`RULE.SUPPORT.SURFACE.434` · MUST · skill:spn-surface/design). `media` with no `mediaNode`, the small picture in the level's box, stands a quarter of its box from the words over or under it, rounded to the 4px scale, and one 4px step more beside them. `mediaNode` keeps the level's gap, "Words to media" in the table below, in every `DSFeatureType`. Where a split folds on a phone, a box that stood beside the words takes the over-or-under gap.
 
 | Level | Box | Over or under the words | Beside the words | Art (`mediaNode`), the level's gap |
 | --- | --- | --- | --- | --- |
@@ -2944,7 +3105,19 @@ This ref states which components exist, in which group, and what every one must 
 | `RULE.SUPPORT.SURFACE.273` | a feature's frame pads by the room before the actions |
 | `RULE.SUPPORT.SURFACE.274` | the picture of a feature is one box per level, whatever lines the feature has |
 | `RULE.SUPPORT.SURFACE.275` | the room between a feature's items is the frame padding of the level the items are drawn at |
-| `RULE.SUPPORT.SURFACE.414` | a feature's small picture stands a quarter of its box from the words over or under it and one 4px step more beside them, and art keeps the level's gap in every form |
+| `RULE.SUPPORT.SURFACE.434` | a feature's small picture stands a quarter of its box from the words over or under it and one 4px step more beside them, and art keeps the level's gap in every form |
+| `RULE.SUPPORT.SURFACE.435` | the library draws coverage and not combinations: each value once, and case props on different parts sharing a cell |
+| `RULE.SUPPORT.SURFACE.436` | a unit's usage is one primary use at the width one cell of its row takes, in light and in dark, and a `PAGE` unit's stands in a 1,440 screen frame |
+| `RULE.SUPPORT.SURFACE.437` | every prop of a unit is sorted into exactly one category, written in the library column, and the category decides its section, its subsection and its cell |
+| `RULE.SUPPORT.SURFACE.425` | a unit has its pages in one order, Overview, Main, Playground, a page for each type, its scenario pages, then Screens, each only when the unit has something for it, and none a unit has is dropped |
+| `RULE.SUPPORT.SURFACE.426` | the Main page holds its sections in one order, each in one format, with the width of a cell read from the unit's place and an empty section never drawn |
+| `RULE.SUPPORT.SURFACE.427` | the States section has its groups in one order, Interaction, Value, Open, Availability and Task, and one name for each state |
+| `RULE.SUPPORT.SURFACE.428` | the Overview, the Playground, a type page, a scenario page and Screens hold fixed sections and subsections |
+| `RULE.SUPPORT.SURFACE.430` | the agent writes a unit's Overview from the unit's chapter, makes up no word of it and keeps the rule sentences in the book, and a change to the chapter updates its Overview in the same change |
+| `RULE.SUPPORT.SURFACE.429` | a unit's samples stand in one `json` block of its chapter, with fields from the props table alone, and a cell is its own props over the one set it names |
+| `RULE.SUPPORT.SURFACE.431` | every unit states how its examples are shown, `display` and `across`, in its samples block, and every page of the showcase and of the library is laid out from them |
+| `RULE.SUPPORT.SURFACE.432` | a unit's states are listed in its samples block, each with how it is made, only the unit's own, and the showcase and the library draw exactly that list |
+| `RULE.SUPPORT.SURFACE.433` | every value a unit accepts is shown once, a prop with kinds or parts included, each kind of variation in its one place, the index by value the check, and no example a unit shows today dropped when it moves to the page model |
 | `RULE.SUPPORT.SURFACE.278` | the picture of a vertical item line takes one box per level, the box of a title with a description |
 | `RULE.SUPPORT.SURFACE.181` | the comparison is a core composite that compares subjects across the same settings, draws every value through the data field view, marks a differing value and keeps the label column pinned |
 | `RULE.SUPPORT.SURFACE.299` | a control's value is the type of the attribute it edits, so a form casts nothing |

@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/08-architecture-containers.md",
-      "seen": "2188de55"
+      "seen": "5853faec"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/08-architecture-containers/",
-      "seen": "f140d30f"
+      "seen": "0ec6be60"
     }
   ]
 }
@@ -41,7 +41,7 @@ Read this before you frame a part of a page, or before you draw or build the pan
 
 A panel is an optional block. A page uses one when a part of it has a header, content and a footer as one unit.
 
-**The library draws `DSPanelContainer`:** `size`; `surface.color` × `surface.strength`; `fullPage` and `opacity` `TRANSLUCENT` once each; `frames` and the `surface` keys as modes; the parts `.Header`, `.Content` and `.Footer`, each with `flush` as a mode, and the footer with `sticky` once; and, as its usage, a settings page's part with its title at `CONTAINER`. **It draws `DSDataTablePanelContainer`** composed from `DSPanelContainer` with a `DSDataTable`, and, as its usage, a page that is one listing.
+**The library draws `DSPanelContainer`** from the category in the library column of its props table (`RULE.SUPPORT.SURFACE.437` · MUST · skill:spn-surface/design): `size` is its `SIZE`, `surface.color` and `surface.strength` its `COLOR`, the parts its `PART`, the sticky footer its `BEHAVIOUR`, and `frames`, `surface`, `divided`, `opacity`, `fullPage` and each `flush` its `LOOK`. As its usage it draws a settings page's billing part, a header with its title and an action, the contact, the invoices in a `flush` part and a footer with its actions. A panel has no state of its own, and its pages are Overview, Main, Playground, a scenario page for a listing, a form and a dashboard, and Screens. **It draws `DSDataTablePanelContainer`** composed from `DSPanelContainer` with a `DSDataTable`, and, as its usage, a page that is one listing.
 
 The unit is `DSPanelContainer`, the head, content and foot unit, and *container* is the layer's word, never the unit's, and its look is the theme's `container.panel` (`RULE.SUPPORT.SURFACE.231` · MUST · skill:spn-surface/design). `DSDataTablePanelContainer` is built on it, for a data table, and takes the panel's props as `panel`. **A level of a page is a position and not a unit:** `CONTAINER` of `DSPageLevelType` names where a full-width section stands, whatever unit fills it, and it does not make that unit a `DSPanelContainer`. Only `DSPanelContainer` reads `theme.container.panel`; a card reads `theme.component.card` alone.
 
@@ -101,30 +101,34 @@ The look of a panel is the props `frames`, `surface` and `unframed`, set out in 
 
 | prop | type | default | what it does and when to use it | library |
 | --- | --- | --- | --- | --- |
-| `children` | `ReactNode`: the parts | required | the parts of the panel, in one order: `.Header`, `.Content`, `.Footer`; each part is a named place the look of the panel reaches | PART |
-| ↳ `Header.flush` | `boolean` | `false` | what the part holds fills it from edge to edge, with no inset | MODE |
-| ↳ `Header.backAnchor` | `IDSBaseAnchor` | none | a way back, a ghost icon button with an arrow at the start of the title line; with none, the one a `DSListDetail` above offers; drawn as a boolean | CASE · ACTIONS |
-| ↳ `Content.flush` | `boolean` | `false` | what the part holds fills it from edge to edge, with no inset | MODE |
-| ↳ `Footer.flush` | `boolean` | `false` | what the part holds fills it from edge to edge, with no inset | MODE |
-| ↳ `Footer.sticky` | `boolean` | `false` | the footer stays at the bottom of the screen while its panel is on screen; once. Not drawn: it is scroll behaviour | NOT_DRAWN |
-| `frames` | `DSBoxPartType[]`: `HEADER` · `CONTENT` · `FOOTER` | the theme's `container.panel.frames` | which parts the frame holds. Two listed parts next to each other share one frame; a part not listed sits flat on the page; an empty list is no frame | MODE |
-| `unframed` | `DSBoxPartType[]` | none | the parts that take no frame, whatever `frames` and the theme give; a part listed here sits flat on the page | CASE · FRAME |
-| `surface` | `IDSFrameSurface`: `color` · `strength` · `gradient` · `raised` · `elevation` · `bordered` · `rounded` | the theme's `container.panel` | the paint of the frame, in one prop; a key left out takes the theme's | — |
-| ↳ `surface.color` | `DSSurfaceColorType`: `BASE`, `DEFAULT`, `PRIMARY` | `BASE` | the colour of the fill of the frame; `BASE` leaves the fill to `raised`; × `surface.strength` | — |
-| ↳ `surface.strength` | `DSSurfaceStrengthType`: `SUBTLE`, `QUIET`, `SOLID` | `SUBTLE` | how strong the fill of a hue is; `BASE` takes none; × `surface.color` | — |
-| ↳ `surface.gradient` | `IDSSurfaceGradient` | flat | a gradient fill; waits on the surface chapter's gradient cases | MODE |
-| ↳ `surface.raised` | `boolean` | the theme's | fills the frame with the raised surface and lifts it on a shadow | MODE |
-| ↳ `surface.elevation` | `DSSizeType`: `XS` to `XL` | `SM` | how far a raised frame stands off the page, from the tokens `--shadow-elevation-xs` to `--shadow-elevation-xl`; read only where `raised`; in dark each level from `MD` up also lightens the fill and adds a faint ring | MODE |
-| ↳ `surface.bordered` | `boolean` | the theme's | draws the edge of the frame; inside a bordered frame a line divides each two parts | MODE |
-| ↳ `surface.rounded` | `boolean` | the theme's | rounds the corners of the frame; how much comes from the size step of the panel | MODE |
-| `divided` | `boolean \| DSBoxPartType[]` | `true` | the lines inside a bordered frame: `true` a line between every two parts, `false` none, a list a line above each part it names (`CONTENT`, `FOOTER`) | CASE · FRAME |
-| `opacity` | `DSSurfaceOpacityType`: `OPAQUE` · `TRANSLUCENT` | `OPAQUE` | whether a person sees through the frame's fill where content passes behind it; `TRANSLUCENT` once | CASE · FRAME |
-| `className` | `string` | none | a class of the app that paints this one panel through the paint tokens, on its root | NOT_DRAWN |
-| `size` | `DSSizeType`: `XS` to `XL` | the size of its place | the size step; the panel gives it to every block inside | — |
-| `fullPage` | `boolean` | `false` | says this panel is the whole page: its header is the page head, the title takes the `h1`, and its content and footer stand at `PAGE`; once | CASE · FRAME |
-| `testData` | `IDSTestData` | none | from `IDSBaseProps` | NOT_DRAWN |
+| `children` | `ReactNode`: the parts | required | the parts of the panel, in one order: `.Header`, `.Content`, `.Footer`; each part is a named place the look of the panel reaches | PART · Parts |
+| ↳ `Header.flush` | `boolean` | `false` | what the part holds fills it from edge to edge, with no inset | LOOK · Flush header |
+| ↳ `Header.backAnchor` | `IDSBaseAnchor` | none | a way back, a ghost icon button with an arrow at the start of the title line; with none, the one a `DSListDetail` above offers | ACTIONS · Back link |
+| ↳ `Content.flush` | `boolean` | `false` | what the part holds fills it from edge to edge, with no inset | LOOK · Flush content |
+| ↳ `Footer.flush` | `boolean` | `false` | what the part holds fills it from edge to edge, with no inset | LOOK · Flush footer |
+| ↳ `Footer.sticky` | `boolean` | `false` | the footer stays at the bottom of the screen while its panel is on screen. Scroll behaviour, so it is not drawn. | BEHAVIOUR |
+| `frames` | `DSBoxPartType[]`: `HEADER` · `CONTENT` · `FOOTER` | the theme's `container.panel.frames` | which parts the frame holds. Two listed parts next to each other share one frame; a part not listed sits flat on the page; an empty list is no frame | LOOK · Frames |
+| `unframed` | `DSBoxPartType[]` | none | the parts that take no frame, whatever `frames` and the theme give; a part listed here sits flat on the page | LOOK · Unframed parts |
+| `surface` | `IDSFrameSurface`: `color` · `strength` · `gradient` · `raised` · `elevation` · `bordered` · `rounded` | the theme's `container.panel` | the paint of the frame, in one prop; a key left out takes the theme's | LOOK · Surface |
+| ↳ `surface.color` | `DSSurfaceColorType`: `BASE`, `DEFAULT`, `PRIMARY` | `BASE` | the colour of the fill of the frame; `BASE` leaves the fill to `raised`; × `surface.strength` | COLOR |
+| ↳ `surface.strength` | `DSSurfaceStrengthType`: `SUBTLE`, `QUIET`, `SOLID` | `SUBTLE` | how strong the fill of a hue is; `BASE` takes none; × `surface.color` | COLOR |
+| ↳ `surface.gradient` | `IDSSurfaceGradient`: `type` · `origin` · `end` · `reach` | flat | a gradient drawn over the fill, from the fill's own shades at its strength; `BASE` ignores it | LOOK · Gradient |
+| ↳ `surface.gradient.type` | `DSSurfaceGradientType`: `LINEAR` · `RADIAL` | required in a gradient | the kind of gradient | LOOK · Gradient kind |
+| ↳ `surface.gradient.origin` | `DSPlacementType`: the sides and the corners, `TOP_LEFT` and the others | `RADIAL` centred, `LINEAR` from `TOP` | where the gradient starts; a corner and its pair (`TOP_LEFT`, `LEFT_TOP`) draw the same; `LEFT` and `RIGHT` do not flip in right-to-left | LOOK · Gradient start |
+| ↳ `surface.gradient.end` | `DSSurfaceGradientEndType`: `SOFTER_15` · `SOFTER_30` · `SOFTER_45` · `SOFTER_60` · `STRONGER_15` · `STRONGER_30` | clear, the page's own fill | what the gradient ends in, a step softer or stronger than its start | LOOK · Gradient end |
+| ↳ `surface.gradient.reach` | `DSSurfaceGradientReachType`: `REACH_25` · `REACH_50` · `REACH_75` · `REACH_100` | `REACH_100` | how far the gradient reaches: the whole surface for `LINEAR`, a share of the longer side as the radius for `RADIAL` | LOOK · Gradient reach |
+| ↳ `surface.raised` | `boolean` | the theme's | fills the frame with the raised surface and lifts it on a shadow | LOOK · Raised |
+| ↳ `surface.elevation` | `DSSizeType`: `XS` to `XL` | `SM` | how far a raised frame stands off the page, by the tokens `--shadow-elevation-xs` to `--shadow-elevation-xl`, each a two-layer shadow; read only where `raised`; a bordered frame keeps its border; in dark the same shadow is drawn stronger; elevation never changes the fill | LOOK · Elevation |
+| ↳ `surface.bordered` | `boolean` | the theme's | draws the edge of the frame; inside a bordered frame a line divides each two parts | LOOK · Bordered |
+| ↳ `surface.rounded` | `boolean` | the theme's | rounds the corners of the frame; how much comes from the size step of the panel | LOOK · Rounded |
+| `divided` | `boolean \| DSBoxPartType[]` | `true` | the lines inside a bordered frame: `true` a line between every two parts, `false` none, a list a line above each part it names (`CONTENT`, `FOOTER`) | LOOK · Divided |
+| `opacity` | `DSSurfaceOpacityType`: `OPAQUE` · `TRANSLUCENT` | `OPAQUE` | whether a person sees through the frame's fill where content passes behind it | LOOK · Opacity |
+| `className` | `string` | none | a class of the app that paints this one panel through the paint tokens, on its root | WIRING |
+| `size` | `DSSizeType`: `XS` to `XL` | the size of its place | the size step; the panel gives it to every block inside | SIZE |
+| `fullPage` | `boolean` | `false` | says this panel is the whole page: its header is the page head, the title takes the `h1`, and its content and footer stand at `PAGE`; once | LOOK · Whole page |
+| `testData` | `IDSTestData` | none | from `IDSBaseProps` | WIRING |
 
-Every prop of the look, and every key of `surface`, is a row of this one table; the library column says how the library draws it (`PART`, `MODE`, `CASE`, `NOT_DRAWN`).
+Every prop of the look, and every key of `surface`, is a row of this one table; the library column holds its category (`RULE.SUPPORT.SURFACE.437` · MUST · skill:spn-surface/design), which says which section, subsection and cell the library and the showcase draw it in (`architecture-components.md`, *The page model*).
 
 The values of `frames` are the three parts of a box, one closed set, `DSBoxPartType`, that every stack spells the same way. A card names its parts with it too, and so do a dialog, a sheet, a drawer, a popover and the page's head, and so does the place that tells a block which part it stands in.
 
@@ -167,13 +171,23 @@ A container takes no background color, no padding value, no margin, no container
 
 A section is one part of a page, set apart from the next by a fill of its own and its own room above and below: the hero of a website, a row of three pillars, the strip behind a closing call, a tinted greeting that opens an app's page. `DSSectionContainer` is the unit (`RULE.SUPPORT.SURFACE.243` · MUST · skill:spn-surface/design), and it draws a `<section>`. It has no header, no footer, no frame and no parts. It holds one child. What stands in it sets its own level: a pitch on a website is a `DSFeature` placed in the section, with its own `pageLevel`, and the section hands down no level. It takes a `color` (`BASE` when unset), a `strength` (`SUBTLE` when unset) and `painted`, as a surface does, a `className`, a `size` (the app's when unset), `flush`, a `mediaNode` and an `id`.
 
-| Prop | Takes | What it decides |
-| --- | --- | --- |
-| `size` | `DSSizeType`. The app's size when unset | the room above and below, and the size every block inside the section takes |
-| `flush` | yes or no. No by default | whether the section draws no room of its own on any side, above, below or at the sides, so that the child runs to the edges of the section's place. It means here what it means on a card part, a panel part and `DSList`: it draws no padding of its own (`RULE.SUPPORT.SURFACE.313` · MUST · skill:spn-surface/design) |
-| `mediaNode` | a node | art drawn behind the child from one edge of the place to the other: a picture, a gradient, a video, a canvas |
-| `inset` | yes or no. No by default | an inner shadow along the section's top and bottom edges, over its fill and its `mediaNode`, from `--shadow-inset`; it sets the section apart from its neighbours |
-| `id` | a string | the anchor a page's own links land on. The section lands below a sticky bar, never under it |
+| prop | type | default | what it does and when to use it | library |
+| --- | --- | --- | --- | --- |
+| `children` | `ReactNode`: one child | required | what the section holds; it holds one child, which sets its own level, and the section hands down none | SLOT · Child |
+| `color` | `DSSurfaceColorType` | `BASE` | the colour of the fill of the section | COLOR |
+| `strength` | `DSSurfaceStrengthType` | `SUBTLE` | how strong the fill of a hue is. `BASE` takes none | COLOR |
+| `gradient` | `IDSSurfaceGradient`: `type` · `origin` · `end` · `reach` | flat | a gradient drawn over the fill, from the fill's own shades at its strength; `BASE` ignores it | LOOK · Gradient |
+| ↳ `gradient.type` | `DSSurfaceGradientType`: `LINEAR` · `RADIAL` | required in a gradient | the kind of gradient | LOOK · Gradient kind |
+| ↳ `gradient.origin` | `DSPlacementType`: the sides and the corners, `TOP_LEFT` and the others | `RADIAL` centred, `LINEAR` from `TOP` | where the gradient starts; a corner and its pair (`TOP_LEFT`, `LEFT_TOP`) draw the same | LOOK · Gradient start |
+| ↳ `gradient.end` | `DSSurfaceGradientEndType`: `SOFTER_15` · `SOFTER_30` · `SOFTER_45` · `SOFTER_60` · `STRONGER_15` · `STRONGER_30` | clear, the page's own fill | what the gradient ends in, a step softer or stronger than its start | LOOK · Gradient end |
+| ↳ `gradient.reach` | `DSSurfaceGradientReachType`: `REACH_25` · `REACH_50` · `REACH_75` · `REACH_100` | `REACH_100` | how far the gradient reaches | LOOK · Gradient reach |
+| `painted` | `DSThemeModeType` | none | that the section stands on a picture the page paints, as `DSSurface` states | LOOK · Painted on |
+| `className` | `string` | none | that the app paints this one section: the class sets the paint token `--surface-fill`, a colour, in light and in `[data-mode='dark']`, and the section's fill is it. Nothing else a class sets on the section is supported | WIRING |
+| `size` | `DSSizeType` | the app's size | the room above and below, and the size every block inside the section takes | SIZE |
+| `flush` | `boolean` | `false` | whether the section draws no room of its own on any side, above, below or at the sides, so that the child runs to the edges of the section's place. It means here what it means on a card part, a panel part and `DSList`: it draws no padding of its own (rule RULE.SUPPORT.SURFACE.313 · MUST · skill:spn-surface/design) | LOOK · Flush |
+| `mediaNode` | `ReactNode` | none | art drawn behind the child from one edge of the place to the other: a picture, a gradient, a video, a canvas | SLOT · Art behind |
+| `inset` | `boolean` | `false` | an inner shadow along the section's top and bottom edges, over its fill and its `mediaNode`, from the one token `--shadow-inset`. It sets the section apart from the sections above and below it | LOOK · Inset |
+| `id` | `string` | none | the anchor a page's own links land on. The section lands below a sticky bar, never under it | WIRING |
 
 - **A section of a page MUST be `DSSectionContainer`, and it MUST be the only unit that gives a part of a page its fill and its room** (`RULE.SUPPORT.SURFACE.243` · MUST · skill:spn-surface/design). The room above and below comes from the section's size and the sides are the layout's space, `--layout-space` (`RULE.SUPPORT.SURFACE.200` · MUST · skill:spn-surface/design), so a page writes no padding, no maximum width and no gutter for a section. A section that is `flush` draws no room of its own on any side (`RULE.SUPPORT.SURFACE.313` · MUST · skill:spn-surface/design). It takes no header, no footer, no frame and no parts, and `DSPanelContainer` takes no section's job.
 - **A section MUST take its room above and below from its size, and hand that size to what it holds** (`RULE.SUPPORT.SURFACE.247` · MUST · skill:spn-surface/design). The size is the app's where it is unset, and every block inside the section takes it, as the blocks in a panel container take the panel's. Each value is a token, `--section-<step>-room` and `--section-<step>-gap`, with a smaller value under the layouts' phone width, and a partner overrides the tokens once for the whole site.
@@ -210,18 +224,30 @@ A media follows its kind, named before its art exists: the product (a screen, a 
 
 ### The grid section
 
-**The library draws `DSSectionContainer`:** `size`; `painted` `DARK`, `flush` and `inset` once each; `color` and `strength` as modes; `mediaNode` as a swap; and, as its usage, a website's band. **It draws `DSFeatureGridSectionContainer`** composed from `DSSectionContainer` with a `DSFeature` grid, and, as its usage, a website's band of features.
+**The library draws `DSSectionContainer`** from the category in the library column of its props table: `size` is its `SIZE`, `color` and `strength` its `COLOR`, `painted`, `flush`, `inset` and the gradient its `LOOK`, and `mediaNode` and the child its `SLOT`. As its usage it draws a website's band, an `XL` section of the brand's colour holding the hero at `PAGE`. A section has no state of its own. **It draws `DSFeatureGridSectionContainer`** composed from `DSSectionContainer` with a `DSFeature` grid, and, as its usage, a website's band of features.
 
 A grid of features under a heading is `DSFeatureGridSectionContainer` (`RULE.SUPPORT.SURFACE.259` · MUST · skill:spn-surface/design). A section holds one child, so a heading over a few cells has no place in it: the heading would become a cell of the grid, or a second section above it. The grid section gives the heading and the cells one home, and a page writes it where it writes a section. The data decides when a section is a grid section: it holds a set of features that are each a thing of their own, such as the integrations or the component groups of a product, under one heading, while a `DSFeature` with items holds its own parts or points under its own heading, description, facts and actions, with media or without, so media alone decides neither. `site-patterns.md` states when a section of a site's page is a grid section, and its uses: shown features, a directory, plans and quotes. It draws a `DSSectionContainer` from `section`, and its one child is a `DSFeature` at `CONTAINER` that holds the grid where its items stand. A set of modules is such a grid: each cell has its mark, its kind as a fact, and the page it opens as its `anchor`, so it is a door, `frames` `TEXT` with `surface` `DEFAULT`, raised, `elevation` `MD`. Points of one subject, each a title and one line, are not a grid section: they are the items of one `DSFeature`.
 
-| Prop | Takes | What it decides |
-| --- | --- | --- |
-| `section` | `IDSFeatureGridSectionContainerSectionProps`: every prop of `DSSectionContainer` but its child, `flush` and its test data | the section it draws. A key left out takes the section's own default |
-| `heading` | `IDSFeatureGridSectionContainerHeadingProps`: `eyebrow`, `title`, `description`, `facts`, `factsPlacement`, `actions` and `textAlign` of `IDSFeatureProps` | the heading over the grid, a `DSFeature` at `CONTAINER`. Left out, the grid stands alone. `title` is required, as a feature's is |
-| `grid` | `IDSGrid`. Left out, 3 columns on a desktop, 2 on a tablet and 1 on a phone, with no lines | how the cells stand: the columns at each screen class, and the lines between them |
-| `reveal` | `heading` (`NONE`, `FADE` or `RISE`) and `grid` (`NONE`, `FADE`, `RISE` or `ZOOM`) | how the heading and then the cells move into place the first time they scroll into view. Left out, nothing moves. It plays once, the heading first, then the cells row by row |
-| `children` | the cells, each a `DSFeature` | the cells of the grid |
-| `testData` | the unit's own | handed to the section's root |
+| prop | type | default | what it does and when to use it | library |
+| --- | --- | --- | --- | --- |
+| `section` | `IDSFeatureGridSectionContainerSectionProps`: every prop of `DSSectionContainer` but its child, `flush` and its test data | the section's own | the section it draws. A key left out takes the section's own default, so `size`, `color`, `strength`, `painted`, `mediaNode` and `id` work as on any section, and are drawn on [the page of `DSSectionContainer`](#dssectioncontainer) | LOOK · Section |
+| ↳ `section.size` | `DSSizeType`: `XS` · `SM` · `MD` · `LG` · `XL` | the app's size | the room above and below the grid | SIZE |
+| ↳ `section.color` | `DSSurfaceColorType`: `BASE` · `DEFAULT` · `PRIMARY` | `BASE` | the colour of the fill of the section; × `section.strength` | COLOR |
+| ↳ `section.strength` | `DSSurfaceStrengthType`: `SUBTLE` · `QUIET` · `SOLID` | `SUBTLE` | how strong the fill of a hue is; `BASE` takes none; × `section.color` | COLOR |
+| ↳ `section.inset` | `boolean` | `false` | the soft inner shadow along the section's top and bottom edges | LOOK · Inset |
+| `heading` | `IDSFeatureGridSectionContainerHeadingProps`: `eyebrow`, `title`, `description`, `facts`, `factsPlacement`, `actions` and `textAlign` of `IDSFeatureProps` | none | the heading over the grid, a `DSFeature` at `CONTAINER`. Left out, the grid stands alone. `title` is required, as a feature's is | WORDS · Heading |
+| ↳ `heading.actions` | `IDSFeatureProps['actions']` | none | the actions of the heading; they stand under it, above the grid | ACTIONS · Heading actions |
+| ↳ `heading.facts` | `IDSFeatureProps['facts']` | none | the facts of the heading, one quiet line under the description | ITEMS · Heading facts |
+| ↳ `heading.factsPlacement` | `DSItemFactsPlacementType`: `AFTER_DESCRIPTION` · `AFTER_TITLE` | the feature's, `AFTER_DESCRIPTION` | where the facts stand; its values are drawn on the page of `DSFeature` | LOOK · Facts placement |
+| ↳ `heading.textAlign` | `DSHorizontalAlignType`: `START` · `CENTER` · `END` | `START` | where the heading's words line up | LOOK · Heading alignment |
+| `grid` | `IDSGrid`. Left out, 3 columns on a desktop, 2 on a tablet and 1 on a phone, with no lines | the default columns | how the cells stand: the columns at each screen class, and the lines between them | LOOK · Grid |
+| ↳ `grid.desktop`, `grid.tablet`, `grid.mobile` | `number`, from 1 to 4 | 3, 2 and 1 | the columns at each screen class | LOOK · Columns |
+| ↳ `grid.borderType` | `DSGridBorderType`: `NONE` · `GRID` · `EDGE` | `NONE` | the lines of the grid | LOOK · Lines of the grid |
+| `reveal` | `IDSFeatureGridSectionContainerRevealProps` | none | how the heading and then the cells move into place the first time they scroll into view. Left out, nothing moves. It plays once, the heading first and then the cells row by row | BEHAVIOUR |
+| ↳ `reveal.heading` | `DSMotionType`: `FADE` or `RISE` | none | how the heading moves in | BEHAVIOUR |
+| ↳ `reveal.grid` | `DSMotionType`: `FADE`, `RISE` or `ZOOM` | none | how the cells move in | BEHAVIOUR |
+| `children` | the cells, each a `DSFeature` | required | the cells of the grid | SLOT · Cells |
+| `testData` | the unit's own | none | handed to the section's root | WIRING |
 
 - **A grid of features under a heading MUST be `DSFeatureGridSectionContainer`, and it MUST take `section`, and MAY take a `heading` and a `grid`.** `DSFeature` is not changed for it.
 - **The actions of the heading MUST stand under it, above the grid.** The unit passes `DSFeatureActionsPlacementType.BEFORE_ITEMS` and does not offer `actionsPlacement`. A feature frames nothing by default, so the heading is not framed.
@@ -253,11 +279,11 @@ The card, `DSCard`, stays a separate block beside the panel, taking `surface` an
 | Pressed as a whole | never | it may be, with `anchor`, and a pressed card is pressed whole, its flat header with it |
 | Its level | `CONTAINER`, and `PAGE` with `fullPage` | `WIDGET` |
 | A block inside it | reacts to a `flush` part | reacts to a `flush` part of the card, in the same way. A `flush` part of a panel around the card does not reach it, because a card starts a frame of its own |
-| Its size | sets the density of every block inside it | the same. A card hands its size to what it holds |
+| Its size | sets the density of every block inside it | a card's size sets its own spacing and reaches no block it holds |
 
 - **A card MAY hold the parts `DSCard.Header`, `DSCard.Content` and `DSCard.Footer`, and it MUST still frame one thing** (`RULE.SUPPORT.SURFACE.091` · MUST · skill:spn-surface/design). The parts give the one thing a title, a body and what closes it, such as its action. `divided` draws a line between each two parts. A part of a page that has a title, actions and data of its own stays a panel.
 - **A part of a card MUST pad itself, from the size of the card, and `flush` on a part MUST drop that padding.** A page then writes no padding of its own around what a card holds. A part whose content reaches the edge of the card, such as a list or a picture, takes `flush`. A part takes no other prop.
-- **A card MUST hand its size to what it holds, as a panel does** (`RULE.SUPPORT.SURFACE.114` · MUST · skill:spn-surface/design). A block inside a card that reads the size of its place reads the size of the card. A row of a list and a title in a `flush` part are such blocks: each takes the inset of the card's size, so it starts where the card's own parts start their content. A card that states no size hands on the size it stands in.
+- **A card's size MUST set its own spacing and reach no block it holds** (`RULE.SUPPORT.SURFACE.114` · MUST · skill:spn-surface/design). The size pads the card's parts and sets the gaps between them; a block inside, a button, a badge, a row's words and its chevron, takes the size of the place above the card, so a large card is roomier and what it holds is drawn as it is anywhere else. A row of a list and a title in a `flush` part still take the inset of the card's size at their sides, because that inset is spacing, so each starts where the card's own parts start their content. A card that states no size pads by the size it stands in.
 - **A `flush` part of a card MUST say so to what it holds, as a `flush` part of a panel does.** The header, the content and the footer of a card all do this.
 - **The card MUST take `surface` and `frames` for its look, and the paint of its frame MUST come from the theme's `component.card`** (`RULE.SUPPORT.SURFACE.261` · MUST · skill:spn-surface/design). `surface` is an `IDSFrameSurface`, and its keys mean on a card what they mean on a panel.
 - **A card MAY take `frames`, `DSBoxPartType[]`, and its default MUST be `HEADER`, `CONTENT` and `FOOTER`** (`RULE.SUPPORT.SURFACE.262` · MUST · skill:spn-surface/design). Two listed parts next to each other share one frame, and a part not listed sits flat, half the card's gap from the frame beside it. A header takes the same room at a size whether it stands in the frame or flat, so two cards of one size side by side line their headers up. So a dashboard tile may stand its title flat above a framed body by listing `CONTENT` alone. `DSCardWidget` takes `frames` and hands them to its card.
@@ -386,7 +412,7 @@ This ref states what frames a part of a page, what that frame looks like, and wh
 | `RULE.SUPPORT.APPS.149` | a frame is drawn once, and which blocks pass a size and the frame setting on |
 | `RULE.SUPPORT.SURFACE.074` | what a page puts in the header, the content and the footer of a panel. It is advice |
 | `RULE.SUPPORT.SURFACE.095` | where the actions that close the work of an entry stand, and in what order. It is advice |
-| `RULE.SUPPORT.SURFACE.114` | a card hands its size to what it holds, as a panel does |
+| `RULE.SUPPORT.SURFACE.114` | a card's size sets its own spacing and reaches no block it holds, which takes the size of the place above |
 | `RULE.SUPPORT.SURFACE.116` | a page uses one panel for each thing a person reads or saves as a whole |
 | `RULE.SUPPORT.SURFACE.107` | the level a box gives the title in its header: `CONTAINER` for a panel, `PAGE` for a listing that is the page, `WIDGET` for a card |
 | `RULE.SUPPORT.SURFACE.179` | a panel that is the whole page says so with the boolean `fullPage`, and its header, content and footer then take the level `PAGE` as their place |

@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/12-delivery-showcase.md",
-      "seen": "b341ef4b"
+      "seen": "cafbd95a"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/12-delivery-showcase/",
-      "seen": "06846e63"
+      "seen": "9f3c7fbd"
     }
   ]
 }
@@ -22,7 +22,7 @@ Read this before you add a unit to a showcase, or before you judge whether one i
 ## The rule — 🔮
 
 1. A showcase's sidebar opens on one page, Home, then holds six sections in one order: Core, App, Layout, Container, Widget and Components. Beside the sidebar stands the showcase's site, three pages written as a small website, Overview, Get started and the folder Sample apps. The site's pages and the sample apps are no entry of the sidebar; each opens by its own address and stands full page with no sidebar, and Home and every unit page keep the sidebar. Core is the ground every group stands on, and App, Layout, Container, Widget and Components are the Surface standard's groups, from the whole app inwards, each a section of its own and none nested inside another. A group of units sits in a section, belongs to one layer of the design system, and opens with its Overview.
-2. A unit has a main page and a Playground, and other pages where its showcase layout calls for them. Each case a unit's column names can be opened in its Playground by its prop values in the address, in light and in dark, because the design library's look of a unit is read from the running showcase (`RULE.SUPPORT.SURFACE.412` · MUST · skill:spn-surface/design).
+2. A unit has its pages in one order, the one the page model states (`RULE.SUPPORT.SURFACE.425` · MUST · skill:spn-surface/design): an Overview, a main page, a Playground, a page for each type, a page for each scenario and its Screens, each when the unit has something for it. Each case a unit's column names can be opened in its Playground by its prop values in the address, in light and in dark, because the design library's look of a unit is read from the running showcase (`RULE.SUPPORT.SURFACE.412` · MUST · skill:spn-surface/design).
 3. A main page opens the same way on every unit, and then holds sections in one order.
 4. A unit declares its tags: its group, its category, its showcase layout and what it has. Its page is derived from them, so no page is laid out by hand.
 5. A section is one container. Its header holds a `DSItem` with the title and one line, and the section's actions as plain siblings. Its content is one card that holds the tabs, the preview and the code as one object. Its footer holds the actions that follow from the section.
@@ -83,7 +83,7 @@ The theme is not a page. A floating theme bar on every page is the one place it 
 
 The tool's chrome keeps only what a reader of the public site uses (`RULE.SUPPORT.SURFACE.212` · MUST · skill:spn-surface/design): the search, the sidebar, a way back to the site at the toolbar's start, which the site's bar names Showcase (`RULE.SUPPORT.SURFACE.302` · MUST · skill:spn-surface/design), the device as one group of icon toggles (Desktop, Phone, Tablet portrait and Tablet landscape, each named, the chosen one pressed, kept between pages) and the code toggle, one icon toggle in the same look, in the toolbar, a link to the page, and on a component page the controls and the accessibility checks. The sidebar opens with every section and folder expanded down to the units, each unit closed until the reader opens it, and keeps a reader's own choices. A tool or menu that serves the people who build a component goes, by the tool's configuration where it has a setting and by its stylesheet only where it has none. The public site is a static build: every page comes from code at build time, and nothing in a browser creates, changes or saves a story, an argument or a source file. The site's pages (Overview, Get started and Sample apps) show no toolbar, and on a phone no bottom bar with the page's path; Home and a unit's pages keep their toolbar (`RULE.SUPPORT.SURFACE.289` · MUST · skill:spn-surface/design).
 
-Home, the site with its sample apps, and Core hold pages, and every other group holds units. Core holds the pages Colour, Type, Scale, Icons, States, Motion, Primitives, Page levels, Patterns and Inline alignment. App holds three units, `DSApp`, `DSContext` and `DSAppContext`, each with exactly three pages: its Overview, its main page and its Playground. A group of units opens with its Overview, also when it has one unit, and a unit sits in exactly one group. Every layer matches a library file: Core to Layouts are DS 1-core to DS 5-Layouts, and App is DS 6-App.
+Home, the site with its sample apps, and Core hold pages, and every other group holds units. Core holds the pages Colour, Type, Scale, Icons, States, Motion, Primitives, Page levels, Patterns and Inline alignment. App holds three units, `DSApp`, `DSContext` and `DSAppContext`, each with exactly three pages: its Overview, its main page and its Playground. A group of units opens with its Overview, also when it has one unit, and a unit sits in exactly one group. Every layer but App matches a library file: Core to Layouts are DS 1-core to DS 5-Layouts. App has no file of its own: the theme's choices are variables of Core, and the rest of the app's contract stays in words.
 
 The table of units below lists the core units, the ones the constructs name, and every stack's showcase holds them all.
 
@@ -115,16 +115,19 @@ Each unit below is listed with its category, its showcase layout and what it has
 | Components/Utility | Display · Content · a table of types: `DSFormatCurrency` content · `DSFormatDate` none · `DSFormatDateTime` content · `DSFormatNumber` none · `DSFormatTime` none. Utility · Content: `DSAuthz` content · `DSAnchorContainer` states, content, opener · `DSElementObserver` content · `DSSticky` states, content |
 | Widget | `DSCardWidget` Composite · Content · sizes, content |
 | Container | `DSPanelContainer` Composite · Full width · sizes; scenario pages Listing, Form, Dashboard |
-| Layout | `DSLayout` Screen · Full screen · content, data · no Playground; one page for each layout type: Rail, Dock, Top nav, Canvas |
+| Layout | `DSLayout` Screen · Full screen · content, data · a Playground, and a page for each layout type: Rail, Dock, Top nav, Canvas |
 
 ## The pages of a unit — 🔮
 
 | What you see | How many | Where |
 | --- | --- | --- |
 | A group's Overview | one for each group of units | first under its group |
-| A unit's main page | one for each unit | first under its unit |
-| The Playground | one for each unit, except a unit whose showcase layout is Full screen | after the main page |
-| A scenario page | one for each scenario of a Full width unit, and one for each type of a Full screen unit | after the Playground |
+| A unit's Overview: what it is, its rules, its parts and the units it pairs with | one for each unit of the App, Layout, Container and Widget layers, and for each composite; a component has only its group's | first under its unit |
+| A unit's main page | one for each unit | after its Overview |
+| The Playground: the props of the main page's sections as controls | one for each unit that has a prop a person can set | after the main page |
+| A page for each type | one for each value of the prop that makes the unit's types, where the unit has one | after the Playground |
+| A scenario page | one for each scenario of a unit, where it has one | after the type pages |
+| Screens | one section for each whole page of an app a cell shows, at the width of its device | last |
 
 **A scenario is a section or a tab, unless the showcase layout is Full width or Full screen.**
 
@@ -133,7 +136,7 @@ Each unit below is listed with its category, its showcase layout and what it has
 | Inline | a main page and a Playground | a section or a tab | in the card, beside the preview | as the cells of one grid, with the name of each state at the top of its cell |
 | Content | a main page and a Playground | a section or a tab | in the card, beside the preview; under the unit and its State panel where the unit writes a value | as tabs, one state in each |
 | Full width | a short main page of Usage and Props, a Playground, and one page for each scenario | a page | in the card, under the preview | on the scenario pages |
-| Full screen | a short main page of Usage and Props, and one page for each type of the screen; no Playground | a page | in the card, under the embedded screen | on the page of each type |
+| Full screen | a short main page of Usage and Props, a Playground, and one page for each type of the screen | a page | in the card, under the embedded screen | on the page of each type |
 
 - The main page of a Full width or a Full screen unit ends with a link to each of its other pages, each with a few words that say what the page shows.
 - **A size is a tab, and never a page of its own.** The sizes of a unit are tabs of the page or the section that shows the unit, so a developer sees a whole use at each size. No unit has a scenario page for its sizes alone, whatever its showcase layout. The sizes of an Inline or a Content unit are the tabs of its section Sizes. The sizes of a Full width or a Full screen unit are tabs of a scenario page, or of a section of its main page. The sizes of the form are the tabs of *All controls*, and every control of the form follows the open tab.
@@ -212,7 +215,7 @@ A unit sits in one category, placed by what a developer mostly does with it. The
 
 ## Sections, and the card of a section — 🔮
 
-A main page holds its sections in one order: Usage, Sizes, Levels, Colors, Cases, States, then Props. Usage is first and Props is last. A section appears only when the unit has something for it. A unit's own sections, where it has any, stand between States and Props.
+A subsection is a tab and a cell is a card with its code, which stands beside a narrow cell and under a wide one by the width the page model reads from the unit's place. For a unit in the new form the order of a main page is the page model's (`architecture-components.md`, *The sections of the Main page*), whose sections hold the props by their category; the order below is the one for a unit not yet converted. A main page holds its sections in one order: Usage, Sizes, Levels, Colors, Cases, States, then Props. Usage is first and Props is last. A section appears only when the unit has something for it. A unit's own sections, where it has any, stand between States and Props.
 
 | Section | Appears when the unit has | What it holds |
 | --- | --- | --- |

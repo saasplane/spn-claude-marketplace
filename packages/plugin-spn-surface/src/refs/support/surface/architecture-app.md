@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/10-architecture-app.md",
-      "seen": "ba090b86"
+      "seen": "181759db"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/10-architecture-app/",
-      "seen": "57d73a67"
+      "seen": "5c57ac0f"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/10-providers/ts/08-web.md",
@@ -47,7 +47,7 @@ Exactly two contexts cross between an app and its design system, one direction e
 
 A conforming design system answers a fixed set of groups (`architecture-components.md`). The set sits in six layers, on every stack (`architecture-names.md`): core, components, widgets, containers, layouts and app. A layer uses only the layers named before it.
 
-**App is the sixth and last layer.** It holds the root block `DSApp`, the app's contract and the theme. It may use every layer before it, and no block of another layer uses the root block: a block only reads what the root block hands down.
+**App is the sixth and last layer.** It holds the root block `DSApp`, the app's contract and the theme. It may use every layer before it, and no block of another layer uses the root block: a block only reads what the root block hands down. The layer has three units: `DSApp` mounts the roots, `DSContext` is what every block reads about the screen, and `DSAppContext` is what the app hands the surface. None draws a look of its own, each is data and behaviour, and each has the pages Overview, Main and Playground, with `DSApp` adding Screens.
 
 ## The theme — 🔮
 
@@ -194,10 +194,10 @@ the app's own setting
 | Setting | Who sets it for the blocks inside | How far it travels |
 | --- | --- | --- |
 | Color | a block with a surface treatment | to its own text and icons |
-| Size | whoever composes a region: a container, a card, an overlay, a widget or a composite, written from its `size`, or the page by writing `size` on the box that holds the region | all the way down, until a block that passes its size on sets another |
+| Size | whoever composes a region: the app, a container, an overlay or a composite, written from its `size`, or the page by writing `size` on the box that holds the region | all the way down, until a block that passes its size on sets another |
 | Frame | a part of a container or of a card that has `flush` | to the block that uses it. A card and an overlay stop the setting that comes from outside them |
 
-Only these blocks pass their size on: `DSPanelContainer` to every block inside it, and where none did the theme's size stands; `DSCard` to every block inside it, and a card that states no size hands on the size it stands in; a widget or a composite to its own parts (a data table to its table and its pager, a form to its fields, a button group to its buttons, a filter bar to its controls). No other block passes its size on — a dialog, a drawer, a sheet, an alert, tabs, a tooltip, a menu, a popover and a collapsible do not. A popover draws its own surface: the fill, the edge, the radius and the shadow. A frame is drawn once on any part of a page (`architecture-containers.md`); a block reacts to one thing only: sitting in a `flush` part, of a panel or of a card. A `flush` part of a card sets the frame setting again for what that part holds.
+Only these blocks pass their size on: `DSPanelContainer` to every block inside it, and where none did the theme's size stands; a composite to its own parts (a data table to its table and its pager, a form to its fields, a button group to its buttons, a filter bar to its controls). No other block passes its size on. A card and a widget do not: their size sets their own spacing alone (`architecture-containers.md`, the card). A dialog, a drawer, a sheet, an alert, tabs, a tooltip, a menu, a popover and a collapsible do not. A popover draws its own surface: the fill, the edge, the radius and the shadow. A frame is drawn once on any part of a page (`architecture-containers.md`); a block reacts to one thing only: sitting in a `flush` part, of a panel or of a card. A `flush` part of a card sets the frame setting again for what that part holds.
 
 ## What only a browser needs — ✅
 
