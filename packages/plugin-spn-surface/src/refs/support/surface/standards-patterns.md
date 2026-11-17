@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/03-standards-patterns.md",
-      "seen": "ce4fe9d7"
+      "seen": "95513e78"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/",
-      "seen": "16ecb5b1"
+      "seen": "5c324a2a"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
@@ -38,6 +38,7 @@ Read this to build a page from patterns a person already knows, or to review a p
 | Task pattern | the pattern for one task intent: one way to run that task, stated in the six parts of `standards-interaction.md` |
 | App pattern | the arrangement of a whole screen of an app, chosen by the data the screen holds and by the person who reads it |
 | Site pattern | the shape of a section of a site's page, marketing or docs |
+| Design language | the set of choices that gives a whole site or app one look, which its pages follow: how sections part, how emphasis shows, how pictures are framed, how much room a section takes |
 | Flow pattern | a path across pages to one outcome, built from the app and site patterns that exist |
 
 ## The groups, smallest scope first — 🔮
@@ -54,6 +55,8 @@ Read this to build a page from patterns a person already knows, or to review a p
 Task and flow patterns hold on every kind of app. App and site patterns are chosen by the kind of app, as the book already chooses a layout by an app's job: an app's screens take app patterns, and a site's pages take site patterns. A page follows one app or site pattern, and each task on that page follows its task pattern. A listing page follows the app pattern Find in a list, and the search inside it runs by the task pattern Find.
 
 **A site's page MUST be a sequence of sections, and each MUST own its room and its fill** (`RULE.SUPPORT.SURFACE.414` · MUST · skill:spn-surface/design). The layout's box gives the side room, so the words of every section and the bar's items share one edge at every width; what a section holds adds no room unless it is framed, and a frame insets its own words. A footer's list of links keeps its words on the column's edge, with rows that are not pressed whole, each holding a link that marks itself under the pointer. A menu's panel is as wide as what it holds: a few short entries stand as a compact list, and a wide panel is for entries that carry content of their own.
+
+The site patterns decide where emphasis goes, and the site's design language decides how it looks. A section takes a test for each kind of emphasis, such as a highlight, a gradient or the shape of a picture, and the design language says how that emphasis is drawn on this site. A design language stands beside the theme and never inside it: the theme says which colours and corners, and the design language says how the pages are built and how they look and move. Because it is only choices, any brand's theme recolours it. `design-languages.md` states what one holds and how one is made.
 
 **A rule about how a page is designed and uses a unit is guidance, and it says its reason** (`RULE.SUPPORT.SURFACE.394` · MUST · skill:spn-surface/design). So the rules here read as advice wherever they say which pattern or unit a page picks, where a part stands, which value, variant, colour or size a page writes, how many of a thing a view shows, and the words a page uses. MUST is kept for four things: what the design system and a stack must build, the floor a person is owed whatever the design, the process of the library and the showcase, and true claims. A true claim is a number on a marketing page, read from the real system and never made up. A bold rule below with no MUST is advice, and a partner's choice against it stands.
 
@@ -612,6 +615,13 @@ This ref states the four groups of the surface patterns, which task pattern cove
 | `RULE.SUPPORT.APPS.159` | an alert and a toast draw one picture |
 | `RULE.SUPPORT.SURFACE.046` | the surface patterns in groups by scope, smallest first: task, app, site and flow patterns |
 | `RULE.SUPPORT.SURFACE.414` | a site's page is a sequence of sections, each owning its room and its fill |
+| `RULE.SUPPORT.SURFACE.438` | a site's section takes one emphasis and never two. It is advice |
+| `RULE.SUPPORT.SURFACE.439` | the agent writes each section of a site's page one case line: each answer, the test that decided it, and what the other answer would cost. It is advice |
+| `RULE.SUPPORT.SURFACE.440` | a site or an app follows one design language, which its pages read before any choice of their own. It is advice |
+| `RULE.SUPPORT.SURFACE.441` | an outside site is read and never copied: only techniques reach an app, each mapped to a choice of its design language |
+| `RULE.SUPPORT.SURFACE.442` | a technique no choice of the design language covers is a gap for the design system, and is never styled by hand on a page. It is advice |
+| `RULE.SUPPORT.SURFACE.443` | the brand at the start of a bar and in a footer links to the home of what it names, and a sign-in step draws it without the link. It is advice |
+| `RULE.SUPPORT.SURFACE.444` | a backdrop may move, and stands still for a visitor who asked for reduced motion and for the app's own motion setting |
 | `RULE.SUPPORT.SURFACE.047` | how a thing is shown follows from the data and from the person who uses it. It is advice |
 | `RULE.SUPPORT.SURFACE.048` | an app pattern is built from blocks that exist, and is never a block of its own |
 | `RULE.SUPPORT.SURFACE.049` | an app pattern fixes the arrangement, and not which block fills a part. It is advice |
