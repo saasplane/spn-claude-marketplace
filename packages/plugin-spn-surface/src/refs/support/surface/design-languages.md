@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/01-common/05-design-languages.md",
-      "seen": "52d3039b"
+      "seen": "a7ceab9d"
     }
   ]
 }
@@ -87,7 +87,7 @@ The plugin ships these as data with a sample each, in `refs/support/surface/desi
 | Daylight | a light, warm ground, soft fills, room around each section and an open highlight |
 | A dense technical one | a close, quiet ground, more on a screen, lines and a grid behind the diagrams, code and the product up front |
 
-Three suit three kinds of reader: engineers weigh product, code and a calm, dense look; a hiring team weighs warmer frames, photos and more room.
+Each suits its own reader: Stone a reader who wants a calm, dark page, Daylight a hiring team that weighs warmer frames, photos and more room, and the dense technical one engineers who weigh product and code.
 
 ## What is not checked yet
 
