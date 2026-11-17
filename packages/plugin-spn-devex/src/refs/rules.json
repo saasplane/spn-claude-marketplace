@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "book": {
     "repository": "spn-foundation",
-    "commit": "c2dd238b"
+    "commit": "35c61458"
   },
   "rules": [
     {
@@ -12916,7 +12916,13 @@
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "The header — two lines, six fields, produced from the block",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/docs/doc-sets.md",
+          "heading": "Every page opens on a masthead of three levels"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.518",
@@ -12929,7 +12935,13 @@
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "The level rule — an overview covers one level",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/docs/doc-sets.md",
+          "heading": "What an overview and a hub hold, section by section"
+        }
+      ]
     },
     {
       "id": "RULE.LAUNCHPAD.CONTROL_PLANE.001",
