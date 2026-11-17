@@ -7,11 +7,11 @@ description: Stand up a new estate node or a new estate repository with spnutils
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
-      "seen": "2fce1268"
+      "seen": "7beac2a2"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/02-scm.md",
-      "seen": "451c0af5"
+      "seen": "93499a43"
     }
   ]
 }
