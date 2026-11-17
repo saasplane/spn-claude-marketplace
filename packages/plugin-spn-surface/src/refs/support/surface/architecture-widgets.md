@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/07-architecture-widgets.md",
-      "seen": "d24182f5"
+      "seen": "4c41364c"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/07-architecture-widgets/",
-      "seen": "3c3a9cae"
+      "seen": "452caa48"
     }
   ]
 }
@@ -29,7 +29,7 @@ A widget's task states are the task state of `standards-interaction.md`, and thi
 
 ## What makes a unit a widget — 🔮
 
-A widget is built for one purpose. It is not a set of components a page composes one at a time; it is one piece, and the widget itself places and wires the parts inside it. A widget takes one size, from its own prop or from the block above it, and **passes that size to every part inside it** — a page sets one size for the whole widget, and never dresses its parts separately.
+A widget is built for one purpose. It is not a set of components a page composes one at a time; it is one piece, and the widget itself places and wires the parts inside it. A widget takes one size, from its own prop or from the block above it, and **its size sets its own spacing, never the size of what it holds** — a page sets one size for the whole widget, and never dresses its parts separately.
 
 **Surface's core widget is the card widget `DSCardWidget`** (`RULE.SUPPORT.SURFACE.127` · MUST · skill:spn-surface/design). Every stack builds it, and the design library draws it. The data table, the filter bar and the comparison are not widgets: each is a composite, a component of its own group (`RULE.SUPPORT.SURFACE.230` · MUST · skill:spn-surface/design). A stack may provide further widgets of its own, as `architecture-components.md` states under the core units and a stack's own. This ref does not name them, and the library does not draw them.
 
@@ -45,7 +45,7 @@ A widget is built for one purpose. It is not a set of components a page composes
 | Its parts | `parts`, a list in which each part is of one kind | each part in the order given |
 | Its footer | `footer`, any node | the node in the footer of the card. A card with no `footer` has no footer part |
 
-**The library draws** the widget composed from `DSCard`: `size`; `surface.color` × `surface.strength`; `divided`, `footer` and `headerActions` as booleans; each kind of part once; `opacity` `TRANSLUCENT` once; `frames` and the `surface` keys as modes; and, as its usage, a dashboard's recent orders.
+**The library draws** the widget composed from `DSCard`, from the category in the library column of its props table (`RULE.SUPPORT.SURFACE.437` · MUST · skill:spn-surface/design): `size` is its `SIZE`, `surface.color` and `surface.strength` its `COLOR`, `divided`, `fullHeight`, `opacity`, `frames` and the other `surface` keys its `LOOK`, `header` and `footer` its slots and actions, and the kinds of its parts its `ITEMS`. As its usage it draws the email integrations of a workspace as one card. Its states are a chosen row, `selected`, and a part with no row, `EMPTY`, and its pages are Overview, Main and Playground.
 
 - **`DSCardWidget` MUST take each group of its settings as the props of the unit that draws it, whole** (`RULE.SUPPORT.SURFACE.127` · MUST · skill:spn-surface/design). Its head and the small head of a part are the props of `DSItem`. An item of a part is the props of `DSItem`, and a row of a part is the props of `DSList.Item`. A page that knows those units knows the widget. So the picture of a head or of an item is the `media` of `DSItem`, given as data of one kind.
 
@@ -67,7 +67,7 @@ A part states its kind in `mtype`, which takes `DSCardWidgetPartType`. Every par
 - **A built part.** From support 5.22.0 the web widget carries `frames` and `surface` in place of the four paint props, and its look at `theme.widget.card`. The library is owed.
 - **The widget MUST take `divided` from its own prop where the prop is given, else from the theme's `widget.card`** (`RULE.SUPPORT.SURFACE.128` · MUST · skill:spn-surface/design). `divided` draws the lines between the head, the parts and the footer of the card, and the default theme draws none.
 - **The rows of an `ITEMS` part and of a `LIST` part take `divided` from the prop of the part, else from `rowsDivided` of the theme's `widget.card`, yes by default. They take `hoverable` from the prop of the part, else from `rowsHoverable`, yes by default.** The widget keeps no value of its own for an unset theme. A prop that says no is given, so a part that says no wins over a theme that says yes.
-- **The widget MUST take one `size`, and MUST pass it to its head, its lists and its rows.**
+- **The widget MUST take one `size`, and that size MUST set the card's own spacing, the inset and the gaps of its parts, and reach no block it holds:** its head, its lists, its rows and their buttons take the size of the place above.
 - **The widget MUST NOT fold rows away.** A row that a page wants hidden, or shown in another way, is the page's to place, usually in a `FREE` part or in the footer.
 - **The widget has no paging, no search, and no working or failed state.** A set that needs them is a `DSDataTable`.
 - **The widget takes no `anchor` around the whole card, and no `style` or `minWidth`; its `className` and `opacity` paint the card and nothing else** (`RULE.SUPPORT.SURFACE.192` · MUST · skill:spn-surface/design). A class of the app on the widget sets the card's paint tokens and the widget hands it to the card it draws. A card that is one link, or that needs a style of its own, is a `DSCard` that the page writes.

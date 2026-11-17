@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/11-delivery-library.md",
-      "seen": "f5bba98a"
+      "seen": "882d58de"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/11-delivery-library/",
-      "seen": "784bb636"
+      "seen": "65112600"
     }
   ]
 }
@@ -87,7 +87,7 @@ A snapshot has four parts and three levels:
 | `tokens` | 2 | the ramps, the roles for light and for dark, the scale, the type steps and the theme |
 | `measures` | 3 | for each unit and each size: the height, paddings, gap, radii, border and text size, each as a value and, where the side can say it, the token it is bound to |
 
-A `MODE` entry names its `collection`, by the one name "Color is a mode" gives it; an entry without it fails the schema. `levelForms` lists a unit's allowed pairs of a level and a form, read from the book. `cases` and `usage` are read from the unit's column, and a unit with a choice table takes both from its table (`RULE.SUPPORT.SURFACE.375` · MUST · skill:spn-surface/design): the cases are what it draws once, its modes, its texts and its swaps, and a choice table's cases are among them; the usage is the table's first case that draws the unit, and names the instances the plugin places, with their props.
+A `MODE` entry names its `collection`, by the one name "Color is a mode" gives it; an entry without it fails the schema. `levelForms` lists a unit's allowed pairs of a level and a form, read from the book. `cases` and `usage` are read from the unit's column, and a unit with a choice table takes both from its table (`RULE.SUPPORT.SURFACE.375` · MUST · skill:spn-surface/design): the cases are what it draws once, its modes, its texts and its swaps, and a choice table's cases are among them; the usage is the table's first case that draws the unit, and names the instances the plugin places, with their props. The plugin lays a unit's page out from the `layout` and draws the `states` of the unit's samples block (`architecture-components.md`, *The samples*), and it draws no unit whose block has none. A state's frame marks the element in the state with the annotation highlight and the state's name, as the page model says.
 
 Level 1 finds most gaps. Level 2 finds a value that differs. Level 3 is read only for the units that levels 1 and 2 flag, because it is the largest. The category, the showcase layout and what a unit has are tags of the showcase only: they are never in a snapshot and never a gap.
 
@@ -454,6 +454,8 @@ A person who opens a page reads it as a tree: the page, then one section for eac
 | Cases | a text `label · Cases`, and under it the unit's sheet of cases and its loose case components |
 | Parts | a text `label · Parts`, and under it one section for each part, named as the part and built the same way |
 
+- **What a section holds is the page model's, and this ref keeps only how Figma lays it out** (`RULE.SUPPORT.SURFACE.426` · MUST · skill:spn-surface/design). Figma draws a unit's Main page, the page for each of its types, and its Screens; the Overview, the Playground and the scenario pages are the web's, and Figma draws none. The sections of the Main page stand in the four bands: Usage is the Usage band; Sizes, Levels, Colors and States are the tables of Variations, with the size, the level or the colour as their rows or columns; Looks, Content and Data are the sheet of cases; Parts are the Parts band. Figma stacks the subsections of a section down the page, where the web draws them as tabs.
+- **A cell is an instance of the unit with its props set, from the sample the unit's chapter names, and a cell of Screens is a frame at the width of its device.** A section the unit has nothing for is not drawn, and neither is an empty subsection, so no label stands over nothing. A unit in the new form needs no sorting of its props by hand: the category in its library column says which section a prop stands in (`RULE.SUPPORT.SURFACE.437` · MUST · skill:spn-surface/design), and Figma's drawing follows from the category and the prop's type. The rest of this part is for a unit not yet converted, and for the drawing itself.
 - **The header's one line is the first sentence of the set's own description, and the set's Figma description is that one line.** A header written from memory would be a second statement of what the set already says. The header is the unit's one header label, and a unit has no second header text beside it. The layout is never written on the canvas: it is kept as plugin data on the section, for the plugin, the tool and the connector, which read it there and never from a label. A header that was drawn before with a layout in its text is replaced by the header, and its layout moves to the plugin data.
 - **A part is a set or a lone component that serves another unit and that the showcase does not list on its own, and it sits in the section of the unit that owns it.** The owner is the unit whose source uses the part, read from the stack and never guessed from the name. A name that starts with a dot is always a part. A part that two or more units on the page use sits in a last section of the page, named `Shared parts`, built the same way.
 - **A label or a usage of a unit sits in that unit's section, even when it was drawn on another page.** One that is found on the page of another unit moves to its unit's page and into its section. A thing whose unit is not in the file, or that serves no unit, is removed, and the agent reports each one it removes with what it was.

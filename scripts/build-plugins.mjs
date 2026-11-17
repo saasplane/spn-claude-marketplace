@@ -169,6 +169,8 @@ async function writeRules() {
 const BOOK_TEMPLATES = join("docs", "04-capabilities", "01-devex", "04-workspace", "04-docs", "templates");
 /** Where spn-devex carries its copy. */
 const PLUGIN_TEMPLATES = join(PACKAGES, "plugin-spn-devex", "src", "refs", "devex", "workspace", "docs", "templates");
+/** The book's own index of its templates. It stays in the book, as `restates files` holds it (`bookOwn`), and the plugin keeps its own `README.md`. */
+const BOOK_TEMPLATES_INDEX = "index.md";
 
 /** Every file under a folder, as paths relative to it, sorted; nothing where the folder is absent. */
 function filesUnder(folder) {
@@ -193,7 +195,8 @@ function copyTemplates(book) {
   if (book === null) return null;
   const from = join(book, BOOK_TEMPLATES);
   const written = [];
-  for (const file of filesUnder(from)) {
+  const copied = filesUnder(from).filter((file) => file !== BOOK_TEMPLATES_INDEX);
+  for (const file of copied) {
     const source = readFileSync(join(from, file));
     const target = join(PLUGIN_TEMPLATES, file);
     if (isFile(target) && readFileSync(target).equals(source)) continue;
@@ -201,7 +204,7 @@ function copyTemplates(book) {
     writeFileSync(target, source);
     written.push(join("packages", "plugin-spn-devex", "src", "refs", "devex", "workspace", "docs", "templates", file));
   }
-  const held = new Set(filesUnder(from));
+  const held = new Set(copied);
   return { written, pluginOnly: filesUnder(PLUGIN_TEMPLATES).filter((file) => !held.has(file)) };
 }
 

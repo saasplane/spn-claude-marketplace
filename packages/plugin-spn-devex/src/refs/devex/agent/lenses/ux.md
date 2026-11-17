@@ -8,17 +8,17 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/",
-      "seen": "d2783d3b"
+      "seen": "4ffb4a61"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/09-architecture-layouts/01-common/01-layout.md",
       "section": "The layout",
-      "seen": "856eafe7"
+      "seen": "36c0a44c"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/08-architecture-containers/01-common/01-container.md",
       "section": "The panel",
-      "seen": "5e634f4e"
+      "seen": "810bad93"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/02-standards-interaction/01-common/01-interaction.md",

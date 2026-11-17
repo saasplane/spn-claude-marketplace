@@ -7,7 +7,7 @@ import { join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 
 const HERE = resolve(import.meta.dirname, "..", "..", "..");
-const { declaredRows, idsIn } = await import(pathToFileURL(resolve(HERE, "src", "lib", "register.ts")).href);
+const { declaredRows, idsIn, registerRows, cellValue } = await import(pathToFileURL(resolve(HERE, "src", "lib", "register.ts")).href);
 
 let total = 0, failed = 0;
 const ok = (label, condition, detail = "") => {
@@ -57,6 +57,20 @@ console.log("\n=== an id that more than one row declares");
   } finally {
     rmSync(root, { recursive: true, force: true });
   }
+}
+
+console.log("\n=== a cell that holds an escaped pipe");
+{
+  const table = [
+    "| Id | Who | Does | Sees | Type | Tier | Status | Updated at |",
+    "| --- | --- | --- | --- | --- | --- | --- | --- |",
+    "| WEB.PIPE.01 | a developer | reads a choice | `LIGHT \\| DARK` is one value of the Sees cell | POSITIVE | UNIT | PLANNED | — |",
+    "| WEB.PIPE.02 | a developer | reads the next row | the row after a pipe is still read | POSITIVE | UNIT | PLANNED | — |",
+  ].join("\n");
+  const rows = [...registerRows(table)];
+  ok("[MKT.SCRIPTS.586] a cell's escaped pipe splits nothing, and every row after it is still read",
+    rows.length === 2 && cellValue(rows[1], "id") === "WEB.PIPE.02" && cellValue(rows[0], "sees").includes("LIGHT \\| DARK"),
+    JSON.stringify(rows.map((row) => row.cells.length)));
 }
 
 console.log(failed ? `\n  ${failed} of ${total} FAILED — register` : `\n  all ${total} passed — register`);
