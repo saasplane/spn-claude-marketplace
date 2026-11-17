@@ -12957,6 +12957,11 @@
       "restated": [
         {
           "plugin": "spn-devex",
+          "path": "refs/devex/workspace/workstream.md",
+          "heading": "How arcs are cut"
+        },
+        {
+          "plugin": "spn-devex",
           "path": "skills/ideate/SKILL.md",
           "heading": "While the shape is discussed, a find stays on the ideate arc"
         },
@@ -12979,6 +12984,11 @@
       "restated": [
         {
           "plugin": "spn-devex",
+          "path": "refs/devex/workspace/workstream.md",
+          "heading": "Anything the developer has not reviewed: preview, confirm, record, then code"
+        },
+        {
+          "plugin": "spn-devex",
           "path": "skills/ideate/SKILL.md",
           "heading": "While the shape is discussed, a find stays on the ideate arc"
         }
@@ -12993,7 +13003,13 @@
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/03-tree.md",
       "heading": "How — guides: steps, and nothing proven",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/docs/doc-sets.md",
+          "heading": "What each seat holds"
+        }
+      ]
     },
     {
       "id": "RULE.LAUNCHPAD.CONTROL_PLANE.001",
@@ -34912,6 +34928,16 @@
       "decision": null,
       "restated": [
         {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "A page is built from the tree of its pattern"
+        },
+        {
+          "plugin": "spn-apps",
+          "path": "skills/verify/SKILL.md",
+          "heading": "Mode: app — health checks on what is running"
+        },
+        {
           "plugin": "spn-devex",
           "path": "refs/devex/agent/lenses/marketing.md",
           "heading": "Produces to"
@@ -34949,6 +34975,16 @@
       "decision": null,
       "restated": [
         {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "A page is built from the tree of its pattern"
+        },
+        {
+          "plugin": "spn-apps",
+          "path": "skills/verify/SKILL.md",
+          "heading": "Mode: app — health checks on what is running"
+        },
+        {
           "plugin": "spn-devex",
           "path": "refs/devex/agent/lenses/marketing.md",
           "heading": "Produces to"
@@ -34985,6 +35021,16 @@
       "heading": "A design language",
       "decision": null,
       "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "A page is built from the tree of its pattern"
+        },
+        {
+          "plugin": "spn-apps",
+          "path": "skills/verify/SKILL.md",
+          "heading": "Mode: app — health checks on what is running"
+        },
         {
           "plugin": "spn-devex",
           "path": "refs/devex/agent/lenses/marketing.md",
@@ -35057,6 +35103,16 @@
       "decision": null,
       "restated": [
         {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "A page is built from the tree of its pattern"
+        },
+        {
+          "plugin": "spn-apps",
+          "path": "skills/verify/SKILL.md",
+          "heading": "Mode: app — health checks on what is running"
+        },
+        {
           "plugin": "spn-devex",
           "path": "refs/devex/agent/lenses/ui.md",
           "heading": "Produces to"
@@ -35107,6 +35163,11 @@
       "heading": "The parts",
       "decision": null,
       "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/verify/SKILL.md",
+          "heading": "Mode: app — health checks on what is running"
+        },
         {
           "plugin": "spn-surface",
           "path": "refs/support/surface/design-languages.md",
