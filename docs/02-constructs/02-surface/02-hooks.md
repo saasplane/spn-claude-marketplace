@@ -2,7 +2,7 @@
 {
   "id": "surface-hooks",
   "variant": "construct",
-  "title": "Hooks — One Moment, For the Connector's Script",
+  "title": "Hooks",
   "subtitle": "One moment wired, because the one rule here is about a script about to run.",
   "lenses": ["ARCHITECT", "UX"],
   "status": "PLANNING",
@@ -12,7 +12,7 @@
 }
 -->
 
-# Hooks — One Moment, For the Connector's Script
+# Hooks
 
 `For: Architect · UX designer` · `Status: 🔮 PLANNING`
 
@@ -57,23 +57,23 @@ One moment, narrowed to one tool name, behind one command.
 
 ## Parts
 
-### One moment, and why the others are not claimed
+### One moment — One moment, and why the others are not claimed
 
 The moment a call is about to run is the only one that can still stop it, and a rule about a script's text has nothing to say at any other. A moment claimed for the sake of symmetry is an interpreter start-up on every call in a session, paid for an answer nobody asked for.
 
-### The matcher is the first and cheapest filter
+### Matcher — The matcher is the first and cheapest filter
 
 The entry narrows to the connector's script runner. Every other call a session makes never reaches this plugin at all, which is a filter the harness applies before any process of this plugin's starts.
 
-### The check refuses only what the text shows
+### Text refusal — The check refuses only what the text shows
 
 The connector check blanks comment and string bodies, then refuses a script that calls an API the connector does not support or one that throws there. It notes, and lets the call go, what the text cannot settle: a second page switch, and a call that passes no `skillNames`. It reads no file, calls no network and runs no command.
 
-### A check that throws is skipped, never fatal
+### Throwing checks — A check that throws is skipped, never fatal
 
 A gate that crashes the chain removes every other gate with it, which is worse than any single miss. The dispatcher treats a check that throws as silence.
 
-### The wiring names the plugin root, never a checkout
+### Plugin root — The wiring names the plugin root, never a checkout
 
 The command is written against the installed folder rather than against a path in this repository, so the entry works wherever the plugin was installed.
 

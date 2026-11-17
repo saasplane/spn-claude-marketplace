@@ -2,7 +2,7 @@
 {
   "id": "stack-skills",
   "variant": "construct",
-  "title": "Skills — The Commands an Apps Repository Answers To",
+  "title": "Skills",
   "subtitle": "The commands an apps repository can be asked to run, one folder each.",
   "lenses": ["SERVER_DEV", "WEB_DEV"],
   "status": "PLANNING",
@@ -12,7 +12,7 @@
 }
 -->
 
-# Skills — The Commands an Apps Repository Answers To
+# Skills
 
 `For: Backend developer · Web developer` · `Status: 🔮 PLANNING`
 
@@ -60,35 +60,35 @@ The ask is matched to a skill, the skill is narrowed by a mode, and the longest 
 
 ## Parts
 
-### One skill divides into steps, and the order is the rule
+### Steps — One skill divides into steps, and the order is the rule
 
 The contract comes first, and everything downstream is generated from it or written against it. A service written before its state is a service that will be rewritten. So the build skill is the only folder here that sequences steps at all, the order is fixed, and each step is read before that layer's code is written rather than after.
 
-### The skill names the step; the provider holds it
+### Provider steps — The skill names the step; the provider holds it
 
 A step file is written in a language, so it cannot live in a skill that serves every stack this domain may grow. The skill states the step names, their order and what each one settles, and composes the path `providers/{stack}/skills/implement/steps/{step}.md` from the nearest `sprepo.json`. A step file the declared stack does not ship is a step that stack does not walk, and nothing here stubs one.
 
-### The router classifies before it sequences
+### Router — The router classifies before it sequences
 
 The build skill first decides whether the ask touches the back end alone, the front end alone, or both, and that classification decides which steps apply. Sequencing every step for every ask would make the smallest change cost the largest walk.
 
-### A mode is an argument, not a second folder
+### Modes — A mode is an argument, not a second folder
 
 Two folders with almost the same description compete for the same match, and the matching gets worse as the pair grows. So a skill answering several close asks takes a mode, names its modes in the sentence a session matches against, and says which neighbouring skill an adjacent ask belongs to instead. A destructive mode says it is destructive in that same sentence rather than in the body it loads afterwards.
 
-### Each skill declares the one stage it serves
+### Stage — Each skill declares the one stage it serves
 
 A skill and a stage are separate closed sets mapped many to one, and the mapping is what makes *which standards apply to this request* derivable from the skill that was invoked. Scaffolding answers to the repository stage, proving answers to the test stage, and the build loop's skills answer to the develop stage. Flattening them derives nothing.
 
-### A skill carries a stamp, so a chapter it fell behind can say so
+### Skill stamp — A skill carries a stamp, so a chapter it fell behind can say so
 
 A skill is prose the agent loads, and prose drifts from the book silently because nothing compares it. Every skill here opens with a block naming the chapters it restates and the hash last read from each, so a drift run reads a skill exactly as it reads a ref.
 
-### The closing gate belongs to the skill
+### Closing gate — The closing gate belongs to the skill
 
 A contract change reviewed at the end of a session is reviewed by the context that wrote it. So the build skill closes with the suites and then hands the change to the review skill in its contract mode, and the hand-off is named in the description, so it happens even when nobody asks for it.
 
-### The absent skills, and where their material lives
+### Absent skills — The absent skills, and where their material lives
 
 Designing a page, a flow or a mock is the Surface domain's, and its skill ships in `spn-surface`: it states a page as a tree of named blocks. This plugin carries the build, and the build skill names the Surface refs, in `spn-surface`, for the rules of a page.
 

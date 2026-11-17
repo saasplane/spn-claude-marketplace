@@ -2,7 +2,7 @@
 {
   "id": "estate-tests",
   "variant": "construct",
-  "title": "Tests — How This Plugin Proves Its Own Gate",
+  "title": "Tests",
   "subtitle": "How this plugin proves the rules it refuses a bad file on.",
   "lenses": ["INFRA", "QA"],
   "status": "PLANNING",
@@ -12,7 +12,7 @@
 }
 -->
 
-# Tests — How This Plugin Proves Its Own Gate
+# Tests
 
 `For: DevOps / SRE · Quality engineer` · `Status: 🔮 PLANNING`
 
@@ -62,35 +62,35 @@ Two fixed folders and one file, and the shape of the path carries the meaning.
 
 ## Parts
 
-### What is proven, and both sides of every rule
+### What is proven — What is proven, and both sides of every rule
 
 One suite proves the estate laws — what each rule refuses, what it allows, and where the credential length boundary sits, stated as cases so nobody re-derives it from a regular expression. Another proves the subject resolution: each cloud's own spellings refused, each cloud's sanctioned homes still allowed, and the case that matters most — a region belonging to the **other** cloud caught as well, because a write-time gate cannot know which cloud the estate will resolve to.
 
-### The suite is proven load-bearing, not merely green
+### Load-bearing suite — The suite is proven load-bearing, not merely green
 
 A passing suite proves the code does what the suite says; it does not prove the suite would notice if the code stopped. So the discovery was tested by moving the Google provider folder aside: exactly the two Google cases went red and every other case stayed green, and restoring the folder returned the whole run. That is the difference between a suite that reads the tree and a suite that agrees with it.
 
-### The runner walks, and it judges on the exit code
+### Runner — The runner walks, and it judges on the exit code
 
 `run.mjs` finds every suite by walking the tree and taking each file whose name marks it as one, so a suite is discovered by where its source sits rather than by being added to a list. It reads each suite's own exit code as the verdict and uses the printed summary only for the count, because a suite that exits non-zero while printing a cheerful last line would otherwise read as green. Standard error is discarded rather than inherited, so a fixture's warnings do not appear in the run as this run's findings.
 
-### Nothing counts folders to find the code
+### Folder counting — Nothing counts folders to find the code
 
 Moving the suites once broke every one of them at the same moment, because each computed its own depth back to the plugin. So the harness exports the plugin root, found once; the runner walks; and a suite states only what it proves. **A suite that types a depth is a suite the next move breaks**, and nothing here types one.
 
-### A case runs the real process and reads the real verdict
+### Real verdict — A case runs the real process and reads the real verdict
 
 The harness writes a hook event to a fresh process on standard input and parses the decision back out, so what a case proves is what the harness would see rather than what a function returns. A case states the decision it expects and, for a refusal, a fragment the message must carry — which is how a rule that fires for the wrong reason is caught rather than counted as a pass.
 
-### What is absent, and the absence is the statement
+### Absences — What is absent, and the absence is the statement
 
 There is no `integration/` folder and no `setup/` folder. Nothing runs at that tier in this plugin, and the runner needs no fixture stood up before it starts. **An empty folder would teach a reader that the tier works**, so neither exists, which is the same rule a cloud with no validator follows.
 
-### The payload a case replays sits beside the suites, once per event
+### Replayed payloads — The payload a case replays sits beside the suites, once per event
 
 `tests/fixtures/payloads/pretooluse/` holds one recorded call for the one event this plugin wires, and a suite reads it rather than constructing its own. A payload is an input, never a generated answer, so a stale one is a fixture problem and never a passing case that stopped proving anything.
 
-### Two more cases prove the bundle, not one file
+### Bundle cases — Two more cases prove the bundle, not one file
 
 `unit/t-dist-current.mjs` and `unit/t-bundle-parity.mjs` sit at the tree's root rather than under any one mirror, because each proves a property of the whole plugin: the first recomputes a bundle's declared sources against the banner esbuild wrote into it, and the second runs a recorded payload through the source and through the committed bundle and asserts the two agree. Both call the one shared harness the foundation's plugins realization states, `packages/plugin-support-lib/tests/helpers/`, so the build and the check can never quietly disagree. This plugin ships no `commands/`, but `hooks.json` still runs a built `dist/events/pretooluse.mjs`, so it owes both cases exactly as its two siblings do.
 

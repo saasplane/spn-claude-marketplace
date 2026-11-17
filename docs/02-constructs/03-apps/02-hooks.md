@@ -2,7 +2,7 @@
 {
   "id": "apps-hooks",
   "variant": "construct",
-  "title": "Hooks — One Moment, Because Every Rule Here Is About a File",
+  "title": "Hooks",
   "subtitle": "One moment wired, because every rule here is about a file about to change.",
   "lenses": ["ARCHITECT", "SERVER_DEV"],
   "status": "PLANNING",
@@ -12,7 +12,7 @@
 }
 -->
 
-# Hooks — One Moment, Because Every Rule Here Is About a File
+# Hooks
 
 `For: Architect · Backend developer` · `Status: 🔮 PLANNING`
 
@@ -57,27 +57,27 @@ One moment, narrowed to two tool names, behind one command — and what that com
 
 ## Parts
 
-### One moment, and why the others are not claimed
+### One moment — One moment, and why the others are not claimed
 
 The moment a call is about to run is the only one that can still stop it, and a rule about a file's contents has nothing to say at any other. A moment claimed for the sake of symmetry is an interpreter start-up on every call in a session, paid for an answer nobody asked for.
 
-### The matcher is the first and cheapest filter
+### Matcher — The matcher is the first and cheapest filter
 
 The entry narrows to the two tool names that change a file. Everything else a session does never reaches this plugin at all, which is a filter the harness applies before any process of this plugin's starts.
 
-### One entry, and the saving that comes from it
+### One entry — One entry, and the saving that comes from it
 
 Several entries are several interpreter start-ups on every write, whatever language the scripts are written in, and on one measured edit the start-ups cost more than ten times the checking. So the wiring declares one entry and the dispatcher runs everything behind it. The saving lives in the registration rather than in the scripts.
 
-### The timeout is the plugin's promise back to the session
+### Timeout — The timeout is the plugin's promise back to the session
 
 The entry declares how long the whole chain may take. A gate that can hang is a gate somebody removes, so the budget is stated in the wiring rather than trusted to the scripts underneath it.
 
-### What runs is resolved per write, never listed
+### Per-write resolution — What runs is resolved per write, never listed
 
 The dispatcher does not hold a fixed set of rules. It reads the stack from the nearest `sprepo.json` and asks the provider for that stack, so one installed plugin serves whatever a node declares and a second stack joins by adding a folder. A repository declaring a stack this plugin ships nothing for is left alone rather than refused.
 
-### The wiring names the plugin root, never a checkout
+### Plugin root — The wiring names the plugin root, never a checkout
 
 The command is written against the installed folder rather than against a path in this repository, so the entry works wherever the plugin was installed.
 

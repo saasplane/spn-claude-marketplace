@@ -2,7 +2,7 @@
 {
   "id": "provider-set",
   "variant": "construct",
-  "title": "Providers — How a Plugin Is Extended Per Instance",
+  "title": "Providers",
   "subtitle": "Everything that changes with a stack or a cloud lives in one folder, and nowhere else.",
   "lenses": ["ARCHITECT", "LEAD"],
   "status": "PLANNING",
@@ -12,7 +12,7 @@
 }
 -->
 
-# Providers — How a Plugin Is Extended Per Instance
+# Providers
 
 `For: Architect · Engineering leader` · `Status: 🔮 PLANNING`
 
@@ -62,23 +62,23 @@ The thing to check first is whether any gate names an instance. A gate that spel
 
 ## Parts
 
-### A gate never names an instance
+### Instance names — A gate never names an instance
 
 The instance is read from the nearest `sprepo.json`, never typed on a command and never guessed from a file extension. A gate that could name an instance is a gate somebody edits to add the next one, and the edit is the thing this construct exists to remove.
 
-### The two halves, and what each holds
+### Two halves — The two halves, and what each holds
 
 The skills half holds a **procedure** — what to do, in order, when working in this instance. The scripts half holds a **parse and its rules** — what this instance's text looks like and what is true of it. A rule is an implementation detail of the check that runs it and lives beside it, not in a shared registry above it.
 
-### A private rule sits behind an underscore
+### Private rules — A private rule sits behind an underscore
 
 Where a subject's gate is one door and several rules stand behind it, the rules go under a folder whose name opens with an underscore and the door stays the only file at the top. A reader listing the folder then sees the subjects a gate dispatches over, and nothing that is only reachable through one of them.
 
-### A skills half is earned by changing the authoring stack
+### Skills half — A skills half is earned by changing the authoring stack
 
 The test is not whether an instance has a procedure yet; it is whether the instance **changes the language the work is written in**. Where the instance *is* the stack, it always does. Where the instance is a cloud and every rendering is written in the same engine against the same declaration, it never does — and that provider carries a scripts half alone. The asymmetry is a fact about the two domains rather than a gap in one of them.
 
-### A shared rule body is a factory, not a rule
+### Rule factory — A shared rule body is a factory, not a rule
 
 Where two instances genuinely need one rule, what they share is a function parameterized by each instance's own values, and it lives with the plugin's other shared code. It is not a rule folder: the moment a rule folder exists, rules drift into it that only one instance ever needed.
 

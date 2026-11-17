@@ -2,7 +2,7 @@
 {
   "id": "plugin-set",
   "variant": "construct",
-  "title": "The Plugin — Delivery Unit of the Marketplace",
+  "title": "The Plugin",
   "subtitle": "One folder holds everything a rule needs to reach a running session.",
   "lenses": ["ARCHITECT", "LEAD"],
   "status": "PLANNING",
@@ -12,7 +12,7 @@
 }
 -->
 
-# The Plugin — Delivery Unit of the Marketplace
+# The Plugin
 
 `For: Architect · Engineering leader` · `Status: 🔮 PLANNING`
 
@@ -64,7 +64,7 @@ The last arrow is the one to remember: a session reads the installed copy, so ed
 
 Each plugin folder carries one manifest at `.claude-plugin/plugin.json`, holding a `name`, a `version`, a `description` and an `author`. The description is long on purpose. It is matched against the work at hand rather than browsed by a person, so it states in full what the plugin carries.
 
-### The version names what is published
+### Version — The version names what is published
 
 This repository releases at the version a plugin already carries, then moves the number. So the field answers *which bytes are installed*, and not *what am I building*. The four plugins carry one version and move together: a release moves all four, changed or not (rule RULE.CLAUDE_MARKETPLACE.DEVEX.007).
 
@@ -72,11 +72,11 @@ This repository releases at the version a plugin already carries, then moves the
 
 One file at the repository root, `.claude-plugin/marketplace.json`, carries a `plugins` array. Each entry names the plugin, the relative `source` folder holding it, and a description a listing can show without opening the folder. Nothing generates the file: a generator would need a source, and that source would be a second list able to disagree with this one. The price of writing it by hand is that the two descriptions can drift, and one pair has.
 
-### The installed copy, and what a wired path names
+### Installed copy — The installed copy, and what a wired path names
 
 Installing reads an entry, copies that plugin's folder, and stores it where a session can read it. Everything a plugin wires names that folder through `CLAUDE_PLUGIN_ROOT` rather than through a path in this checkout, so a plugin works wherever it was installed. A command of the plugin is typed by the plugin's own name, because the plugin ships a launcher under that name in `bin/`, and no one types a path to the entry file. A plugin with a command line declares the tier of each command group in `tiers.json`.
 
-### What a plugin may hold, and what it owes
+### Contents — What a plugin may hold, and what it owes
 
 A plugin folder holds any mix of the constructs this domain names, and owes none of them. `spn-devex` carries every one except `providers/`, which is why it is the folder to open to see what a full plugin looks like. `spn-apps` and `spn-infra` each carry a `providers/` folder and no `agents/`. Each construct is named by its own page, and none of them is described here.
 

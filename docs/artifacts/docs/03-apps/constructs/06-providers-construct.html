@@ -1,22 +1,22 @@
 <meta charset="utf-8">
-<title>Providers — Where the Stack Is Allowed to Be Named</title>
+<title>Providers</title>
 <!-- spn:doc
-{"id":"apps-providers","variant":"construct","title":"Providers — Where the Stack Is Allowed to Be Named","subtitle":"The one folder where a language may be named at all.","lenses":["ARCHITECT","SERVER_DEV"],"status":"PLANNING","dependsOn":["provider-set","stack-skills","stack-checks"],"summary":"Providers is the one folder in this plugin allowed to name a language, holding everything that varies with the language a project is written in, one folder per stack.","keywords":["provider","instance","stack","steps","subject","private"]}
+{"id":"apps-providers","variant":"construct","title":"Providers","subtitle":"The one folder where a language may be named at all.","lenses":["ARCHITECT","SERVER_DEV"],"status":"PLANNING","dependsOn":["provider-set","stack-skills","stack-checks"],"summary":"Providers is the one folder in this plugin allowed to name a language, holding everything that varies with the language a project is written in, one folder per stack.","keywords":["provider","instance","stack","steps","subject","private"]}
 -->
 <!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
 <link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.css" integrity="sha384-EFi+bm+soztQp3Bg2oQPRtdkdyGkD/O1qSDL0QCFBIHQg2sNtFhUHlkwxArFA8dY" crossorigin="anonymous">
 <div class="sds-page">
 
 <nav class="sds-rail" id="rail">
-  <a class="sds-home" href="../apps-overview.html">&larr; spn-apps — The TypeScript Stack Domain</a>
-  <div class="sds-rail-title">Providers — Where the Stack Is Allowed to Be Named</div>
+  <a class="sds-home" href="../apps-overview.html">&larr; spn-apps</a>
+  <div class="sds-rail-title">Providers</div>
 </nav>
 <div class="sds-wrap">
 
 <header class="sds-masthead">
   <!-- Rendered from the spn:doc block by `docs.ts page`. Never typed: a header that disagreed with its block is what this removes. -->
-  <div class="sds-eyebrow"><span class="sds-line1">SaaS Plane &nbsp;|&nbsp; Claude Marketplace &nbsp;|&nbsp; Providers — Where the Stack Is Allowed to Be Named</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Construct</span><span class="sds-separator">|</span><span class="sds-label">For:</span> <span class="sds-audience"><span class="sds-badge sds-lens">Architect</span><span class="sds-badge sds-lens">Backend developer</span></span><span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-planning">&#x1F52E; PLANNING</span></span></span></div>
-  <h1>Providers — Where the Stack Is Allowed to Be Named</h1>
+  <div class="sds-eyebrow"><span class="sds-line1">SaaS Plane &nbsp;|&nbsp; Claude Marketplace &nbsp;|&nbsp; Providers</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Construct</span><span class="sds-separator">|</span><span class="sds-label">For:</span> <span class="sds-audience"><span class="sds-badge sds-lens">Architect</span><span class="sds-badge sds-lens">Backend developer</span></span><span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-planning">&#x1F52E; PLANNING</span></span></span></div>
+  <h1>Providers</h1>
   <p class="sds-subtitle">The one folder where a language may be named at all.</p>
   <p class="sds-standfirst">Providers is the one folder in this plugin allowed to name a language, holding everything that varies with the language a project is written in, one folder per stack. Read this page before you add a second stack, or when you want to know why adding one means adding a folder rather than editing a gate. It explains why this domain's provider always carries both halves, and how a skill and a gate each reach into it.</p>
 </header>
@@ -96,23 +96,23 @@
 <!-- 03 -->
 <section id="s3">
   <div class="sds-section-head"><h2>Parts</h2></div>
-  <h3 id="the-folder-mirrors-the-plugin-s-own-name">The folder mirrors the plugin's own names</h3>
+  <h3 id="mirrored-names-the-folder-mirrors-the-pl">Mirrored names — The folder mirrors the plugin's own names</h3>
   <p>A plugin holds <code>skills/</code> and <code>scripts/</code>; a provider contributes under the same two names. A contributor filling one has already read the folders it mirrors, so plugging in a stack needs no explanation. It is also why a provider folder holds markdown and TypeScript side by side while every other folder in a plugin holds one kind: the organizing axis here is <em>what changes</em>, and that is paid deliberately.</p>
-  <h3 id="the-build-steps-are-the-skills-half">The build steps are the skills half</h3>
+  <h3 id="build-steps-the-build-steps-are-the-skil">Build steps — The build steps are the skills half</h3>
   <p>The build skill names the steps and their order and holds none of them. Each step file settles one layer for this stack — the contract and its validators, the service shape, the thin entry, the queue listener and its consumption contract, the front end's plug-in points, how each test tier is run, and where an environment key goes in this stack's own files. A step this stack does not ship is a step this stack does not walk.</p>
-  <h3 id="a-folder-is-named-for-the-skill-not-for-">A folder is named for the skill, not for the plugin that ships it</h3>
+  <h3 id="skill-folder-a-folder-is-named-for-the-s">Skill folder — A folder is named for the skill, not for the plugin that ships it</h3>
   <p>One folder here serves a skill that lives in the core plugin: the part of deciding what a node is that only a language can answer — how ownership of a capability is read from what the repository actually composes, and where markdown may not go. It sits under the skill's own name, because what a reader needs to know is which skill loads it. This is the material that proves the shape works across plugins at all.</p>
-  <h3 id="the-subjects-are-two-and-they-line-up-wi">The subjects are two, and they line up with the paths the rules watch</h3>
+  <h3 id="two-subjects-the-subjects-are-two-and-th">Two subjects — The subjects are two, and they line up with the paths the rules watch</h3>
   <p>A write is asked about its source and about its tests, and nothing else. A third subject for contracts was a grouping that overlapped the first on every contract file: every contract rule watches a path under <code>src/</code>, so a contract file was read and masked twice, at write time, where a person is waiting. Which rules apply is decided by the path and the node's kind, never by a subject's name.</p>
-  <h3 id="a-door-parses-once-orders-the-answers-an">A door parses once, orders the answers, and survives a rule that throws</h3>
+  <h3 id="door-parsing-a-door-parses-once-orders-t">Door parsing — A door parses once, orders the answers, and survives a rule that throws</h3>
   <p>The file a gate imports is the only file in the subject that reads the source: it builds the resulting text once per write rather than once per rule. It keeps the first refusal, because a person fixes one thing at a time and several refusals for one edit read as a broken gate. It collects every note, because advice is advice and several pieces can be true at once. And it skips a rule that throws rather than losing the whole subject with it.</p>
-  <h3 id="a-rule-is-private-to-the-door-beside-it">A rule is private to the door beside it</h3>
+  <h3 id="private-rules-a-rule-is-private-to-the-d">Private rules — A rule is private to the door beside it</h3>
   <p>A rule is an implementation detail of the check that runs it, not an entry in a shared registry, so it sits behind an underscore folder named for its own subject. A listing of the checks folder therefore shows the doors and nothing else, and what a door runs is read by opening the folder beside it. Nothing outside a private folder imports into it.</p>
-  <h3 id="what-the-source-subject-refuses">What the source subject refuses</h3>
+  <h3 id="source-refusals-what-the-source-subject-">Source refusals — What the source subject refuses</h3>
   <p>Its rules read this stack's own syntax: an enablement code that is not prefixed by the module owning it, a read method returning a list type under a plural name, a chained continuation where the stack's own standard asks for a sequenced wait, and a contract state that would close a dependency cycle. Each names the chapter or the card holding its reasoning rather than restating it, because a check is the part a script can catch and a card is the part a person has to read.</p>
-  <h3 id="one-rule-is-written-twice-on-purpose-and">One rule is written twice on purpose, and says where the other copy is</h3>
+  <h3 id="twice-written-rule-one-rule-is-written-t">Twice-written rule — One rule is written twice on purpose, and says where the other copy is</h3>
   <p>The cycle rule is also in the command-line tool, and this copy exists because the failure it prevents lands at boot: a loop resolves to nothing at start-up, so the application comes up broken rather than failing to build, and a check that runs at review time runs after the damage. The header names the tool's own file as the single home of the rule, with the instruction that a change is made there first and here second, in the same change.</p>
-  <h3 id="what-the-tests-subject-refuses-and-what-">What the tests subject refuses, and what it only warns about</h3>
+  <h3 id="test-refusals-what-the-tests-subject-ref">Test refusals — What the tests subject refuses, and what it only warns about</h3>
   <p>A journey assertion whose host pattern could match inside a longer address is refused, because a pattern loose enough to match inside a string is a check that cannot fail — one agreed a browser was home while the screen was still a vendor's consent page. An assertion with nothing explaining an absence is refused for the same reason. The coverage findings warn instead, and under-report on purpose, because the model behind them belongs to an open argument and a refusal on an unsettled rule teaches people to work around the gate.</p>
   <h3 id="adding-a-stack">Adding a stack</h3>
   <p>Add a folder named for the stack, with a skills half for what a skill loads and a scripts half for what a gate imports, mirroring the folders those gates already have. No gate changes, and a listing of this folder is the coverage.</p>

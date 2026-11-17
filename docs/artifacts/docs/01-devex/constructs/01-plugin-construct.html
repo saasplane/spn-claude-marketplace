@@ -1,22 +1,22 @@
 <meta charset="utf-8">
-<title>The Plugin — Delivery Unit of the Marketplace</title>
+<title>The Plugin</title>
 <!-- spn:doc
-{"id":"plugin-set","variant":"construct","title":"The Plugin — Delivery Unit of the Marketplace","subtitle":"One folder holds everything a rule needs to reach a running session.","lenses":["ARCHITECT","LEAD"],"status":"PLANNING","dependsOn":[],"summary":"A plugin carries one of this repository's standards into a running session, in one folder: its manifest, its entry in the marketplace list, the installed copy a session actually reads, and the version field that names which bytes those are.","keywords":["plugin","marketplace","manifest","version","install","plugin root"]}
+{"id":"plugin-set","variant":"construct","title":"The Plugin","subtitle":"One folder holds everything a rule needs to reach a running session.","lenses":["ARCHITECT","LEAD"],"status":"PLANNING","dependsOn":[],"summary":"A plugin carries one of this repository's standards into a running session, in one folder: its manifest, its entry in the marketplace list, the installed copy a session actually reads, and the version field that names which bytes those are.","keywords":["plugin","marketplace","manifest","version","install","plugin root"]}
 -->
 <!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
 <link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.css" integrity="sha384-EFi+bm+soztQp3Bg2oQPRtdkdyGkD/O1qSDL0QCFBIHQg2sNtFhUHlkwxArFA8dY" crossorigin="anonymous">
 <div class="sds-page">
 
 <nav class="sds-rail" id="rail">
-  <a class="sds-home" href="../devex-overview.html">&larr; spn-devex — The Stack-Agnostic Domain</a>
-  <div class="sds-rail-title">The Plugin — Delivery Unit of the Marketplace</div>
+  <a class="sds-home" href="../devex-overview.html">&larr; spn-devex</a>
+  <div class="sds-rail-title">The Plugin</div>
 </nav>
 <div class="sds-wrap">
 
 <header class="sds-masthead">
   <!-- Rendered from the spn:doc block by `docs.ts page`. Never typed: a header that disagreed with its block is what this removes. -->
-  <div class="sds-eyebrow"><span class="sds-line1">SaaS Plane &nbsp;|&nbsp; Claude Marketplace &nbsp;|&nbsp; The Plugin — Delivery Unit of the Marketplace</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Construct</span><span class="sds-separator">|</span><span class="sds-label">For:</span> <span class="sds-audience"><span class="sds-badge sds-lens">Architect</span><span class="sds-badge sds-lens">Engineering leader</span></span><span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-planning">&#x1F52E; PLANNING</span></span></span></div>
-  <h1>The Plugin — Delivery Unit of the Marketplace</h1>
+  <div class="sds-eyebrow"><span class="sds-line1">SaaS Plane &nbsp;|&nbsp; Claude Marketplace &nbsp;|&nbsp; The Plugin</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Construct</span><span class="sds-separator">|</span><span class="sds-label">For:</span> <span class="sds-audience"><span class="sds-badge sds-lens">Architect</span><span class="sds-badge sds-lens">Engineering leader</span></span><span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-planning">&#x1F52E; PLANNING</span></span></span></div>
+  <h1>The Plugin</h1>
   <p class="sds-subtitle">One folder holds everything a rule needs to reach a running session.</p>
   <p class="sds-standfirst">A plugin carries one of this repository's standards into a running session, in one folder: its manifest, its entry in the marketplace list, the installed copy a session actually reads, and the version field that names which bytes those are. Read this page before you edit a manifest, or when a change does not seem to take effect. It names the three files involved, then walks through what each one holds and how they connect.</p>
 </header>
@@ -99,13 +99,13 @@
   <div class="sds-section-head"><h2>Parts</h2></div>
   <h3 id="the-manifest">The manifest</h3>
   <p>Each plugin folder carries one manifest at <code>.claude-plugin/plugin.json</code>, holding a <code>name</code>, a <code>version</code>, a <code>description</code> and an <code>author</code>. The description is long on purpose. It is matched against the work at hand rather than browsed by a person, so it states in full what the plugin carries.</p>
-  <h3 id="the-version-names-what-is-published">The version names what is published</h3>
+  <h3 id="version-the-version-names-what-is-publis">Version — The version names what is published</h3>
   <p>This repository releases at the version a plugin already carries, then moves the number. So the field answers <em>which bytes are installed</em>, and not <em>what am I building</em>. The four plugins carry one version and move together: a release moves all four, changed or not (rule RULE.CLAUDE_MARKETPLACE.DEVEX.007).</p>
   <h3 id="the-marketplace-entry">The marketplace entry</h3>
   <p>One file at the repository root, <code>.claude-plugin/marketplace.json</code>, carries a <code>plugins</code> array. Each entry names the plugin, the relative <code>source</code> folder holding it, and a description a listing can show without opening the folder. Nothing generates the file: a generator would need a source, and that source would be a second list able to disagree with this one. The price of writing it by hand is that the two descriptions can drift, and one pair has.</p>
-  <h3 id="the-installed-copy-and-what-a-wired-path">The installed copy, and what a wired path names</h3>
+  <h3 id="installed-copy-the-installed-copy-and-wh">Installed copy — The installed copy, and what a wired path names</h3>
   <p>Installing reads an entry, copies that plugin's folder, and stores it where a session can read it. Everything a plugin wires names that folder through <code>CLAUDE_PLUGIN_ROOT</code> rather than through a path in this checkout, so a plugin works wherever it was installed. A command of the plugin is typed by the plugin's own name, because the plugin ships a launcher under that name in <code>bin/</code>, and no one types a path to the entry file. A plugin with a command line declares the tier of each command group in <code>tiers.json</code>.</p>
-  <h3 id="what-a-plugin-may-hold-and-what-it-owes">What a plugin may hold, and what it owes</h3>
+  <h3 id="contents-what-a-plugin-may-hold-and-what">Contents — What a plugin may hold, and what it owes</h3>
   <p>A plugin folder holds any mix of the constructs this domain names, and owes none of them. <code>spn-devex</code> carries every one except <code>providers/</code>, which is why it is the folder to open to see what a full plugin looks like. <code>spn-apps</code> and <code>spn-infra</code> each carry a <code>providers/</code> folder and no <code>agents/</code>. Each construct is named by its own page, and none of them is described here.</p>
 </section>
 

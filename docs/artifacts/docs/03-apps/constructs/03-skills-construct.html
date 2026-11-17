@@ -1,22 +1,22 @@
 <meta charset="utf-8">
-<title>Skills — The Commands an Apps Repository Answers To</title>
+<title>Skills</title>
 <!-- spn:doc
-{"id":"stack-skills","variant":"construct","title":"Skills — The Commands an Apps Repository Answers To","subtitle":"The commands an apps repository can be asked to run, one folder each.","lenses":["SERVER_DEV","WEB_DEV"],"status":"PLANNING","dependsOn":["skill-set"],"summary":"A skill belongs to this domain when it describes work on a piece of an apps repository — scaffolding a project, building a capability, running the suites, proving a package, or publishing the repository.","keywords":["skill","steps","mode","classification","stage","absence"]}
+{"id":"stack-skills","variant":"construct","title":"Skills","subtitle":"The commands an apps repository can be asked to run, one folder each.","lenses":["SERVER_DEV","WEB_DEV"],"status":"PLANNING","dependsOn":["skill-set"],"summary":"A skill belongs to this domain when it describes work on a piece of an apps repository — scaffolding a project, building a capability, running the suites, proving a package, or publishing the repository.","keywords":["skill","steps","mode","classification","stage","absence"]}
 -->
 <!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
 <link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.css" integrity="sha384-EFi+bm+soztQp3Bg2oQPRtdkdyGkD/O1qSDL0QCFBIHQg2sNtFhUHlkwxArFA8dY" crossorigin="anonymous">
 <div class="sds-page">
 
 <nav class="sds-rail" id="rail">
-  <a class="sds-home" href="../apps-overview.html">&larr; spn-apps — The TypeScript Stack Domain</a>
-  <div class="sds-rail-title">Skills — The Commands an Apps Repository Answers To</div>
+  <a class="sds-home" href="../apps-overview.html">&larr; spn-apps</a>
+  <div class="sds-rail-title">Skills</div>
 </nav>
 <div class="sds-wrap">
 
 <header class="sds-masthead">
   <!-- Rendered from the spn:doc block by `docs.ts page`. Never typed: a header that disagreed with its block is what this removes. -->
-  <div class="sds-eyebrow"><span class="sds-line1">SaaS Plane &nbsp;|&nbsp; Claude Marketplace &nbsp;|&nbsp; Skills — The Commands an Apps Repository Answers To</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Construct</span><span class="sds-separator">|</span><span class="sds-label">For:</span> <span class="sds-audience"><span class="sds-badge sds-lens">Backend developer</span><span class="sds-badge sds-lens">Web developer</span></span><span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-planning">&#x1F52E; PLANNING</span></span></span></div>
-  <h1>Skills — The Commands an Apps Repository Answers To</h1>
+  <div class="sds-eyebrow"><span class="sds-line1">SaaS Plane &nbsp;|&nbsp; Claude Marketplace &nbsp;|&nbsp; Skills</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Construct</span><span class="sds-separator">|</span><span class="sds-label">For:</span> <span class="sds-audience"><span class="sds-badge sds-lens">Backend developer</span><span class="sds-badge sds-lens">Web developer</span></span><span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-planning">&#x1F52E; PLANNING</span></span></span></div>
+  <h1>Skills</h1>
   <p class="sds-subtitle">The commands an apps repository can be asked to run, one folder each.</p>
   <p class="sds-standfirst">A skill belongs to this domain when it describes work on a piece of an apps repository — scaffolding a project, building a capability, running the suites, proving a package, or publishing the repository. Read this page before you add a new skill here, or when you want to know why one is missing. It explains why the longest skills read their steps from elsewhere, why a mode is an argument rather than a second folder, and which skill is deliberately absent.</p>
 </header>
@@ -100,21 +100,21 @@
 <!-- 03 -->
 <section id="s3">
   <div class="sds-section-head"><h2>Parts</h2></div>
-  <h3 id="one-skill-divides-into-steps-and-the-ord">One skill divides into steps, and the order is the rule</h3>
+  <h3 id="steps-one-skill-divides-into-steps-and-t">Steps — One skill divides into steps, and the order is the rule</h3>
   <p>The contract comes first, and everything downstream is generated from it or written against it. A service written before its state is a service that will be rewritten. So the build skill is the only folder here that sequences steps at all, the order is fixed, and each step is read before that layer's code is written rather than after.</p>
-  <h3 id="the-skill-names-the-step-the-provider-ho">The skill names the step; the provider holds it</h3>
+  <h3 id="provider-steps-the-skill-names-the-step-">Provider steps — The skill names the step; the provider holds it</h3>
   <p>A step file is written in a language, so it cannot live in a skill that serves every stack this domain may grow. The skill states the step names, their order and what each one settles, and composes the path <code>providers/{stack}/skills/implement/steps/{step}.md</code> from the nearest <code>sprepo.json</code>. A step file the declared stack does not ship is a step that stack does not walk, and nothing here stubs one.</p>
-  <h3 id="the-router-classifies-before-it-sequence">The router classifies before it sequences</h3>
+  <h3 id="router-the-router-classifies-before-it-s">Router — The router classifies before it sequences</h3>
   <p>The build skill first decides whether the ask touches the back end alone, the front end alone, or both, and that classification decides which steps apply. Sequencing every step for every ask would make the smallest change cost the largest walk.</p>
-  <h3 id="a-mode-is-an-argument-not-a-second-folde">A mode is an argument, not a second folder</h3>
+  <h3 id="modes-a-mode-is-an-argument-not-a-second">Modes — A mode is an argument, not a second folder</h3>
   <p>Two folders with almost the same description compete for the same match, and the matching gets worse as the pair grows. So a skill answering several close asks takes a mode, names its modes in the sentence a session matches against, and says which neighbouring skill an adjacent ask belongs to instead. A destructive mode says it is destructive in that same sentence rather than in the body it loads afterwards.</p>
-  <h3 id="each-skill-declares-the-one-stage-it-ser">Each skill declares the one stage it serves</h3>
+  <h3 id="stage-each-skill-declares-the-one-stage-">Stage — Each skill declares the one stage it serves</h3>
   <p>A skill and a stage are separate closed sets mapped many to one, and the mapping is what makes <em>which standards apply to this request</em> derivable from the skill that was invoked. Scaffolding answers to the repository stage, proving answers to the test stage, and the build loop's skills answer to the develop stage. Flattening them derives nothing.</p>
-  <h3 id="a-skill-carries-a-stamp-so-a-chapter-it-">A skill carries a stamp, so a chapter it fell behind can say so</h3>
+  <h3 id="skill-stamp-a-skill-carries-a-stamp-so-a">Skill stamp — A skill carries a stamp, so a chapter it fell behind can say so</h3>
   <p>A skill is prose the agent loads, and prose drifts from the book silently because nothing compares it. Every skill here opens with a block naming the chapters it restates and the hash last read from each, so a drift run reads a skill exactly as it reads a ref.</p>
-  <h3 id="the-closing-gate-belongs-to-the-skill">The closing gate belongs to the skill</h3>
+  <h3 id="closing-gate-the-closing-gate-belongs-to">Closing gate — The closing gate belongs to the skill</h3>
   <p>A contract change reviewed at the end of a session is reviewed by the context that wrote it. So the build skill closes with the suites and then hands the change to the review skill in its contract mode, and the hand-off is named in the description, so it happens even when nobody asks for it.</p>
-  <h3 id="the-absent-skills-and-where-their-materi">The absent skills, and where their material lives</h3>
+  <h3 id="absent-skills-the-absent-skills-and-wher">Absent skills — The absent skills, and where their material lives</h3>
   <p>Designing a page, a flow or a mock is the Surface domain's, and its skill ships in <code>spn-surface</code>: it states a page as a tree of named blocks. This plugin carries the build, and the build skill names the Surface refs, in <code>spn-surface</code>, for the rules of a page.</p>
   <p>Deciding what a node is belongs to a skill that is the same in every world, and it lives once in the core plugin. What this plugin supplies is the part of that walk only a stack can answer, and it sits under the provider for that stack rather than under <code>skills/</code>.</p>
 </section>

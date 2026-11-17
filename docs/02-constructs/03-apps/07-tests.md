@@ -2,7 +2,7 @@
 {
   "id": "apps-tests",
   "variant": "construct",
-  "title": "Tests — The Stack's Own Folders, Without the Stack's Framework",
+  "title": "Tests",
   "subtitle": "How this plugin proves the rules it holds every other repository to.",
   "lenses": ["QA", "SERVER_DEV"],
   "status": "PLANNING",
@@ -12,7 +12,7 @@
 }
 -->
 
-# Tests — The Stack's Own Folders, Without the Stack's Framework
+# Tests
 
 `For: Quality engineer · Backend developer` · `Status: 🔮 PLANNING`
 
@@ -57,43 +57,43 @@ The tier comes first and the mirror second, because the tier answers *what kind 
 
 ## Parts
 
-### The tier is the first folder, and the mirror sits under it
+### Tier folder — The tier is the first folder, and the mirror sits under it
 
 Putting the mirror first would leave nowhere to file a second kind of proof for the same file. With the tier first, a wired proof of something a unit suite already covers lands under its own tier at the same path, and neither collides with the other.
 
-### A tier with nothing in it has no folder
+### Empty tiers — A tier with nothing in it has no folder
 
 There is no folder for a tier this plugin proves nothing at, and none for a setup the runner does not need. This is the same rule the gate already states about a realization that is absent: an empty folder teaches a reader that the thing works, where a missing one says what is true.
 
-### The mirror is exact, so a rule and its proof move together
+### Exact mirror — The mirror is exact, so a rule and its proof move together
 
 A suite sits at the path its subject sits at inside the plugin. A rule under a provider's private folder has its suite under the same provider's private folder, and a script under the shared folder has its suite under the shared folder. A runner that globbed one flat folder made a rule's proof, a structural proof and a tool's proof indistinguishable, and it is why moving a rule used to move its proof nowhere.
 
-### The runner walks, and judges on the exit code
+### Runner — The runner walks, and judges on the exit code
 
 The suites are found by walking rather than by a list, so a new one is picked up by existing. The verdict is each suite's exit code, and the summary line only says how many cases there were: judging on the printed text alone read a suite that fails while printing a cheerful summary as green, and a suite that passes in different words as red. A runner that can disagree with its own suites proves nothing.
 
-### A suite's own error output is discarded
+### Error output — A suite's own error output is discarded
 
 A suite exercising a gate prints that gate's findings, and inheriting them would put a fixture's warnings into this run's summary as though they were real. So the runner captures what a suite decided and drops what it wrote to the error stream.
 
-### Nothing counts its own depth
+### Depth counting — Nothing counts its own depth
 
 The suites sit at many depths because the mirror puts them there, so a relative hop from a suite to the plugin root would be a constant every move has to update — the defect the mirror exists to remove rather than introduce. The plugin root is found once and exported, the runner walks, and the search for a rule walks whatever folders a provider ships. Moving the suites once already broke all of them at the same moment, each having computed its own depth.
 
-### A case names the rule, never its folder
+### Case names — A case names the rule, never its folder
 
 The harness searches every provider folder for the file a case names, rather than looking in a folder it was told about. A harness that knew which stack to look in would be the one place in this plugin naming an instance. So a rule that moves between subjects or between providers breaks no suite, and a case stays about the rule.
 
-### A case runs the real process against a throwaway tree
+### Real process — A case runs the real process against a throwaway tree
 
 The harness writes a temporary tree, sends a real payload to the real script on standard input, and reads what came back — so what is proven is what a session would actually get, rather than what a function returns when called directly. The trees are removed when the run ends.
 
-### The payload a case replays sits beside the suites, once per event
+### Replayed payloads — The payload a case replays sits beside the suites, once per event
 
 `tests/fixtures/payloads/pretooluse/` holds one recorded call for the one event this plugin wires, and a suite reads it rather than constructing its own. A payload is an input, never a generated answer, so a stale one is a fixture problem and never a passing case that stopped proving anything.
 
-### Two more cases prove the bundle, not one file
+### Bundle cases — Two more cases prove the bundle, not one file
 
 `unit/t-dist-current.mjs` and `unit/t-bundle-parity.mjs` sit at the tree's root rather than under any one mirror, because each proves a property of the whole plugin: the first recomputes a bundle's declared sources against the banner esbuild wrote into it, and the second runs a recorded payload through the source and through the committed bundle and asserts the two agree. Both call the one shared harness the foundation's plugins realization states, `packages/plugin-support-lib/tests/helpers/`, so the build and the check can never quietly disagree.
 

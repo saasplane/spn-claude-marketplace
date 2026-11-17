@@ -2,7 +2,7 @@
 {
   "id": "apps-providers",
   "variant": "construct",
-  "title": "Providers — Where the Stack Is Allowed to Be Named",
+  "title": "Providers",
   "subtitle": "The one folder where a language may be named at all.",
   "lenses": ["ARCHITECT", "SERVER_DEV"],
   "status": "PLANNING",
@@ -12,7 +12,7 @@
 }
 -->
 
-# Providers — Where the Stack Is Allowed to Be Named
+# Providers
 
 `For: Architect · Backend developer` · `Status: 🔮 PLANNING`
 
@@ -57,39 +57,39 @@ The gate composes a path from the declaration and imports whatever is there. Not
 
 ## Parts
 
-### The folder mirrors the plugin's own names
+### Mirrored names — The folder mirrors the plugin's own names
 
 A plugin holds `skills/` and `scripts/`; a provider contributes under the same two names. A contributor filling one has already read the folders it mirrors, so plugging in a stack needs no explanation. It is also why a provider folder holds markdown and TypeScript side by side while every other folder in a plugin holds one kind: the organizing axis here is *what changes*, and that is paid deliberately.
 
-### The build steps are the skills half
+### Build steps — The build steps are the skills half
 
 The build skill names the steps and their order and holds none of them. Each step file settles one layer for this stack — the contract and its validators, the service shape, the thin entry, the queue listener and its consumption contract, the front end's plug-in points, how each test tier is run, and where an environment key goes in this stack's own files. A step this stack does not ship is a step this stack does not walk.
 
-### A folder is named for the skill, not for the plugin that ships it
+### Skill folder — A folder is named for the skill, not for the plugin that ships it
 
 One folder here serves a skill that lives in the core plugin: the part of deciding what a node is that only a language can answer — how ownership of a capability is read from what the repository actually composes, and where markdown may not go. It sits under the skill's own name, because what a reader needs to know is which skill loads it. This is the material that proves the shape works across plugins at all.
 
-### The subjects are two, and they line up with the paths the rules watch
+### Two subjects — The subjects are two, and they line up with the paths the rules watch
 
 A write is asked about its source and about its tests, and nothing else. A third subject for contracts was a grouping that overlapped the first on every contract file: every contract rule watches a path under `src/`, so a contract file was read and masked twice, at write time, where a person is waiting. Which rules apply is decided by the path and the node's kind, never by a subject's name.
 
-### A door parses once, orders the answers, and survives a rule that throws
+### Door parsing — A door parses once, orders the answers, and survives a rule that throws
 
 The file a gate imports is the only file in the subject that reads the source: it builds the resulting text once per write rather than once per rule. It keeps the first refusal, because a person fixes one thing at a time and several refusals for one edit read as a broken gate. It collects every note, because advice is advice and several pieces can be true at once. And it skips a rule that throws rather than losing the whole subject with it.
 
-### A rule is private to the door beside it
+### Private rules — A rule is private to the door beside it
 
 A rule is an implementation detail of the check that runs it, not an entry in a shared registry, so it sits behind an underscore folder named for its own subject. A listing of the checks folder therefore shows the doors and nothing else, and what a door runs is read by opening the folder beside it. Nothing outside a private folder imports into it.
 
-### What the source subject refuses
+### Source refusals — What the source subject refuses
 
 Its rules read this stack's own syntax: an enablement code that is not prefixed by the module owning it, a read method returning a list type under a plural name, a chained continuation where the stack's own standard asks for a sequenced wait, and a contract state that would close a dependency cycle. Each names the chapter or the card holding its reasoning rather than restating it, because a check is the part a script can catch and a card is the part a person has to read.
 
-### One rule is written twice on purpose, and says where the other copy is
+### Twice-written rule — One rule is written twice on purpose, and says where the other copy is
 
 The cycle rule is also in the command-line tool, and this copy exists because the failure it prevents lands at boot: a loop resolves to nothing at start-up, so the application comes up broken rather than failing to build, and a check that runs at review time runs after the damage. The header names the tool's own file as the single home of the rule, with the instruction that a change is made there first and here second, in the same change.
 
-### What the tests subject refuses, and what it only warns about
+### Test refusals — What the tests subject refuses, and what it only warns about
 
 A journey assertion whose host pattern could match inside a longer address is refused, because a pattern loose enough to match inside a string is a check that cannot fail — one agreed a browser was home while the screen was still a vendor's consent page. An assertion with nothing explaining an absence is refused for the same reason. The coverage findings warn instead, and under-report on purpose, because the model behind them belongs to an open argument and a refusal on an unsettled rule teaches people to work around the gate.
 

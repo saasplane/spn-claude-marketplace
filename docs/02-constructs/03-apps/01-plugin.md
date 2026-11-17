@@ -2,7 +2,7 @@
 {
   "id": "apps-plugin",
   "variant": "construct",
-  "title": "The Plugin — What spn-apps Is, and When a Session Loads It",
+  "title": "The Plugin",
   "subtitle": "The one folder that makes spn-apps its own plugin, separate from every other.",
   "lenses": ["ARCHITECT", "LEAD"],
   "status": "PLANNING",
@@ -12,7 +12,7 @@
 }
 -->
 
-# The Plugin — What spn-apps Is, and When a Session Loads It
+# The Plugin
 
 `For: Architect · Engineering leader` · `Status: 🔮 PLANNING`
 
@@ -56,23 +56,23 @@ A repository declares a world; the set of plugins it gets is derived from that d
 
 ## Parts
 
-### The identity is this plugin's own
+### Plugin identity — The identity is this plugin's own
 
 The manifest names this folder `spn-apps` and describes the apps domain before any language is chosen: the contract model a module publishes, the rules a contract state follows, and the worksheet a partner fills in to decide which shipped modules they adopt. The description is long deliberately, because it is matched against the work at hand rather than browsed by a person, and material nothing matches is material nothing reaches.
 
-### The world decides who gets it
+### Who gets it — The world decides who gets it
 
 A workspace never types a plugin name. Each repository declares its world in its own manifest, and the set of plugins it is entitled to load is derived from that declaration — which is why this plugin arrives in a repository that answers to the apps world and nowhere else. The derivation is the foundation's, and this page only says which side of it this plugin sits on.
 
-### The version is shared, and it is not a claim about this folder
+### Shared version — The version is shared, and it is not a claim about this folder
 
 Every plugin in this marketplace carries the same number, and a release moves all of them — a plugin with no change in it is released anyway, at the new number. The reason is that a reader cannot tell four numbers apart: the plugins are installed as one set by one command, so differing numbers cannot be told from one release that half-landed. One number answers *are you current?* and several only raise the question.
 
-### The count moves after a release, never before
+### Release count — The count moves after a release, never before
 
 The release happens at the number a manifest already carries, and the first edit after it moves the number. So the field names **what is published** rather than what somebody is working on. That is also what makes a stale cache findable: a cache directory is keyed by version, so a plugin edited without an increment installs over its own published bytes and nothing tells a reader which of the two is running.
 
-### What this plugin holds, and what it does not
+### Plugin contents — What this plugin holds, and what it does not
 
 This folder ships wiring, skills, scripts, refs, providers and tests. It ships no agents, because a persona and a reviewing viewpoint answer to no stack and live once in the core plugin — and the absence is a statement rather than a gap. Each folder it does ship has its own page, and none of them is described here.
 

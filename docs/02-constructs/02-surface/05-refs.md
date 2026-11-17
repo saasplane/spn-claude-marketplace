@@ -2,7 +2,7 @@
 {
   "id": "surface-refs",
   "variant": "construct",
-  "title": "Refs — The Surface Book, Restated Inside the Plugin",
+  "title": "Refs",
   "subtitle": "The foundation book's Surface rules, carried inside this plugin for a reader with no other copy.",
   "lenses": ["UX", "ARCHITECT"],
   "status": "PLANNING",
@@ -12,7 +12,7 @@
 }
 -->
 
-# Refs — The Surface Book, Restated Inside the Plugin
+# Refs
 
 `For: UX designer · Architect` · `Status: 🔮 PLANNING`
 
@@ -58,23 +58,23 @@ The book is the source. A ref is the copy that travels with the plugin, arranged
 
 ## Parts
 
-### One folder holds the whole domain, one file to a construct
+### Domain folder — One folder holds the whole domain, one file to a construct
 
 `refs/support/surface/` holds the standards of content and interaction, the patterns, the architecture of the design system with its names, layouts and widgets, the providers a design system needs, and the library and showcase deliveries. The path is the one the book's domain has, so a reader who knows the book finds the ref.
 
-### The specs are copies, owned by the book
+### Spec copies — The specs are copies, owned by the book
 
 The app patterns and the site patterns each have a folder of skeleton specs. They are byte-identical to the book's, an index in each folder lists them with the hash of their contents, and `restates files` writes and checks them. A builder changes a spec in the book, and the export carries it.
 
-### The CONSTRUCT snapshot sits beside the refs
+### Construct snapshot — The CONSTRUCT snapshot sits beside the refs
 
 `refs/support/surface/construct.snapshot.json` is the CONSTRUCT snapshot, written from the book alone with `spnutils apps surface construct --out` for each release of the plugin. It holds every unit's props, its usage, its cases, the index by value of each choice table and the units their place sizes, and its `source.readFrom` names the book's release it was written from. It is the one snapshot a repository holds, because it carries nothing of a machine. `unit show` reads it, with the restated tables beside it, and reads nothing else outside the plugin but the symbol index of the repository it runs in, or, from a workspace's root, of each repository in it, for a unit the snapshot does not hold.
 
-### The stack-specific half is the apps plugin's
+### Stack half — The stack-specific half is the apps plugin's
 
 How a block is built in TypeScript, and the layout of a web module, belong to the stack, so those refs sit in the apps plugin and a ref here points at them by name rather than by link.
 
-### A ref that fell behind says so
+### Stale refs — A ref that fell behind says so
 
 Every ref carries the chapters it restates and the hash last read from each. A drift run compares them and reports a ref whose chapter has moved.
 

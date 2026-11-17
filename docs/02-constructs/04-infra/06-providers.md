@@ -2,7 +2,7 @@
 {
   "id": "estate-providers",
   "variant": "construct",
-  "title": "Providers — One Folder per Cloud, Scripts Half Only",
+  "title": "Providers",
   "subtitle": "One folder per cloud, holding only what changes between them.",
   "lenses": ["INFRA", "ARCHITECT"],
   "status": "PLANNING",
@@ -12,7 +12,7 @@
 }
 -->
 
-# Providers — One Folder per Cloud, Scripts Half Only
+# Providers
 
 `For: DevOps / SRE · Architect` · `Status: 🔮 PLANNING`
 
@@ -59,23 +59,23 @@ The folder is the registration. Nothing names a cloud: the gate reads which fold
 
 ## Parts
 
-### The clouds this plugin ships a parse for
+### Shipped clouds — The clouds this plugin ships a parse for
 
 `providers/aws/` and `providers/gcp/` each hold `scripts/checks/manifest.ts` and `scripts/checks/rendering.ts`. **The rule is the domain's and the parse is the provider's**: a rule says *an account id is never pinned*, which holds on every cloud, while what a region or an instance class looks like belongs to the cloud and to nothing else. Each validator reads the text once and hands it to every rule that applies, so four rules are not four passes over the same text.
 
-### A cloud with no folder is a cloud with no parse, and it says so
+### Missing folder — A cloud with no folder is a cloud with no parse, and it says so
 
 `local` has no folder here. Its vocabulary is restated in the refs tree like every other cloud's, because those words are true whether or not code reads them — but no validator ships for it, and the absence is the statement rather than an oversight. A stub folder answering with silence would teach a reader that the write-time check works there.
 
-### The vocabulary is a fact, so it lives in refs rather than here
+### Vocabulary — The vocabulary is a fact, so it lives in refs rather than here
 
 What differs between clouds is what they call things, and a name is a fact. Each cloud's words are restated subject by subject under the refs tree, where a reader looking something up and a skill citing it both find them in one place. **`providers/` executes and `refs/` states**, and that line is what keeps a cloud's spellings out of a folder a gate dispatches into.
 
-### The gate discovers the clouds and runs every one of them
+### Cloud discovery — The gate discovers the clouds and runs every one of them
 
 The gate lists no cloud. It reads the folders the providers tree holds, sorted so the order is stable, and imports each one's validator per subject; a cloud shipping nothing for a subject simply contributes nothing there. **And it runs every cloud's validators rather than the declared one.** Running only the declared cloud's patterns would let an AWS region into a declaration whose cloud entry says Google — the mistake somebody makes while moving an estate between clouds, and the moment the gate is most worth having. A write-time gate cannot read a resolved estate anyway, because there may not be one yet.
 
-### A shared rule body is a factory, not a rule
+### Rule factory — A shared rule body is a factory, not a rule
 
 Where every cloud needs one rule, what they share is the judgement and what differs is the pattern. The provider-string rule is written as a function each cloud's validator feeds its own spellings to, and it lives with the plugin's other shared code rather than inside any cloud's folder. Inlining it would put one copy of the same rule in each cloud, which is the duplication the factory exists to prevent.
 

@@ -484,7 +484,7 @@ console.log("\n=== the domain's glossary lands on its overview too, in HTML (Q22
     `<h2>Overview</h2>\n<p>x</p>\n` +
     `<section id="s1" data-block="glossary">\n  <div class="${own ? "sec-head" : "sds-section-head"}"><h2>Glossary</h2></div>\n` +
     `  <p>The authored line above the table.</p>\n${inner}\n</section>\n` +
-    `<h2>Where to go next</h2>\n<p>x</p>`;
+    `<h2>Next — Where to go next</h2>\n<p>x</p>`;
   const table = (scroll) => `  <div class="${scroll}"><table>\n    <thead><tr><th>Term</th><th>What it means</th></tr></thead>\n` +
     '    <tbody><tr><td>sign-in</td><td>typed by hand</td></tr></tbody>\n  </table></div>';
   const curated = table("sds-scroll");

@@ -3,8 +3,8 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/01-agent.md",
-      "section": "A warm line always",
-      "seen": "ff5b2a2c"
+      "section": "Warm line — A warm line always",
+      "seen": "6f264d0f"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
@@ -13,7 +13,7 @@
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/02-workstream.md",
-      "seen": "532a328b"
+      "seen": "26fc3576"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -56,7 +56,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "seen": "014d539f"
+      "seen": "bb41a4c5"
     }
   ]
 }

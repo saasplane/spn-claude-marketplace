@@ -1,22 +1,22 @@
 <meta charset="utf-8">
-<title>Hooks — Code the Runtime Calls on Your Behalf</title>
+<title>Hooks</title>
 <!-- spn:doc
-{"id":"hook-set","variant":"construct","title":"Hooks — Code the Runtime Calls on Your Behalf","subtitle":"A hook is how a rule gets asked again, every single time, instead of trusted from memory.","lenses":["ARCHITECT","SERVER_DEV"],"status":"PLANNING","dependsOn":["plugin-set"],"summary":"A hook is code a plugin wires to a moment a session offers, so the runtime calls it and the rule is asked again on every single call.","keywords":["hook","hooks.json","moment","payload","verdict","dispatcher"]}
+{"id":"hook-set","variant":"construct","title":"Hooks","subtitle":"A hook is how a rule gets asked again, every single time, instead of trusted from memory.","lenses":["ARCHITECT","SERVER_DEV"],"status":"PLANNING","dependsOn":["plugin-set"],"summary":"A hook is code a plugin wires to a moment a session offers, so the runtime calls it and the rule is asked again on every single call.","keywords":["hook","hooks.json","moment","payload","verdict","dispatcher"]}
 -->
 <!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
 <link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.css" integrity="sha384-EFi+bm+soztQp3Bg2oQPRtdkdyGkD/O1qSDL0QCFBIHQg2sNtFhUHlkwxArFA8dY" crossorigin="anonymous">
 <div class="sds-page">
 
 <nav class="sds-rail" id="rail">
-  <a class="sds-home" href="../devex-overview.html">&larr; spn-devex — The Stack-Agnostic Domain</a>
-  <div class="sds-rail-title">Hooks — Code the Runtime Calls on Your Behalf</div>
+  <a class="sds-home" href="../devex-overview.html">&larr; spn-devex</a>
+  <div class="sds-rail-title">Hooks</div>
 </nav>
 <div class="sds-wrap">
 
 <header class="sds-masthead">
   <!-- Rendered from the spn:doc block by `docs.ts page`. Never typed: a header that disagreed with its block is what this removes. -->
-  <div class="sds-eyebrow"><span class="sds-line1">SaaS Plane &nbsp;|&nbsp; Claude Marketplace &nbsp;|&nbsp; Hooks — Code the Runtime Calls on Your Behalf</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Construct</span><span class="sds-separator">|</span><span class="sds-label">For:</span> <span class="sds-audience"><span class="sds-badge sds-lens">Architect</span><span class="sds-badge sds-lens">Backend developer</span></span><span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-planning">&#x1F52E; PLANNING</span></span></span></div>
-  <h1>Hooks — Code the Runtime Calls on Your Behalf</h1>
+  <div class="sds-eyebrow"><span class="sds-line1">SaaS Plane &nbsp;|&nbsp; Claude Marketplace &nbsp;|&nbsp; Hooks</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Construct</span><span class="sds-separator">|</span><span class="sds-label">For:</span> <span class="sds-audience"><span class="sds-badge sds-lens">Architect</span><span class="sds-badge sds-lens">Backend developer</span></span><span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-planning">&#x1F52E; PLANNING</span></span></span></div>
+  <h1>Hooks</h1>
   <p class="sds-subtitle">A hook is how a rule gets asked again, every single time, instead of trusted from memory.</p>
   <p class="sds-standfirst">A hook is code a plugin wires to a moment a session offers, so the runtime calls it and the rule is asked again on every single call. Read this page to learn the whole frame a hook works inside: the file that declares the wiring, the moments a session offers, and the shape a hook is handed and hands back. The last section states the two promises every hook keeps.</p>
 </header>
@@ -118,11 +118,11 @@
   <h3 id="the-window-opening">The window opening</h3>
   <p>One script runs when a session starts, resumes or is cleared, and what it prints is the first screen a developer reads. Nothing in that screen is typed: the script walks the workspace, reads each repository's own manifest for the world and the stack it claims, checks the wiring that claim implies, and lists every workstream in each of its states. A workspace holding no manifest at all is the case where there is nothing to read, and the script then asks instead of reporting, and points at the day-zero skill. Every read is wrapped, because a crash here is a window that opens on a stack trace.</p>
   <p>The same script puts the short rules in front of the agent, after the ground. They are ten plain lines about how a reply reads and who decides what, and each one ends with the reference and the heading that hold the rule whole. A line is a pointer and never a second copy of the rule. The agent reads the block and the developer's pane does not show it. The script reads no prompt, so no script judges whether a prompt opens a discussion.</p>
-  <h3 id="a-call-about-to-run">A call about to run</h3>
+  <h3 id="before-a-call-a-call-about-to-run">Before a call — A call about to run</h3>
   <p>One script, one matcher, and the whole chain of checks behind it. This is the only moment that may return a refusal, so every gate in the marketplace lives here or nowhere. Its matcher names the calls that could interest a check — reads, writes, edits, shell commands and searches.</p>
-  <h3 id="a-shell-command-that-finished">A shell command that finished</h3>
+  <h3 id="after-a-command-a-shell-command-that-fin">After a command — A shell command that finished</h3>
   <p>One script, matched to shell commands alone. It reads the command that just ran, and when that command actually moved a workstream folder into the closed state, it says what landed, counted from that workstream's own split plan. The congratulation comes after the move rather than before it, because the gate that could have refused the move runs earlier and speaks only to refuse.</p>
-  <h3 id="a-turn-about-to-end">A turn about to end</h3>
+  <h3 id="before-a-stop-a-turn-about-to-end">Before a stop — A turn about to end</h3>
   <p>One script, no matcher. By the time it runs the turn is already written, so a refusal would only lose it. What it does instead is warn: a turn ending while the running arc still has rows nothing blocks, an arc held against no live card, and a reply announcing a new window without the fields a handover owes.</p>
   <p>A warning makes the agent reply again, and the developer reads that reply. So the script asks first whether work runs, which it reads from the rows of the window's own arcs: work runs while one of them is marked in progress.</p>
   <ul>
@@ -130,12 +130,12 @@
     <li><strong>While work runs, only a finding about the reply sends the agent back.</strong> That is a card not put in full, a decision put with no whole card, a handover block that is missing or not whole, and a first reply with no welcome. Every other finding is held. At the first turn end where no row is in progress, each held finding that is still true is said whole, and one the agent fixed in between is not said.</li>
     <li><strong>A handover block is asked for once.</strong> After a reply that holds a whole block, a later reply that names the next window owes no second block while the rows of the window's arcs have not moved. Once they move, the old block no longer says where to start, and a block is owed again.</li>
   </ul>
-  <h3 id="the-payload-and-what-a-hook-reads-from-i">The payload, and what a hook reads from it</h3>
+  <h3 id="payload-the-payload-and-what-a-hook-read">Payload — The payload, and what a hook reads from it</h3>
   <p>The harness writes the event to standard input as JSON. <code>readPayload</code> parses it, and input it cannot parse is not a finding — the hook simply allows the call. What a check then reads is a small part of it: the path a write names, the shell command a call carries, and the text a write would add.</p>
-  <h3 id="the-verdict-is-a-return-value">The verdict is a return value</h3>
+  <h3 id="verdict-the-verdict-is-a-return-value">Verdict — The verdict is a return value</h3>
   <p>A check is a function returning <code>{ deny?, note? }</code> or nothing. The dispatcher calls it and reads the object, so there is no round trip a refusal can disappear in. A file can still be run on its own, and <code>emit</code> then prints the same decision JSON to the same stream. A refusal sets the decision and its reason; advice is set as context the agent reads, because a message put only in the developer's pane is invisible to the agent.</p>
   <p><strong>The developer is shown a refusal, and advice goes to the agent alone.</strong> A refusal stops a call, so the developer needs to know why the work stopped. Advice lets the call go on, and the agent is the one who can act on it, so nothing of it is put in the developer's pane. A soft finding of the doc standard is advice. The dispatcher says it once for a file in a window, and says it again when the finding changes, because it is then a different finding.</p>
-  <h3 id="one-process-and-the-order-inside-it">One process, and the order inside it</h3>
+  <h3 id="one-process-one-process-and-the-order-in">One process — One process, and the order inside it</h3>
   <p>The dispatcher imports every check and calls each in turn. Each check declares what it <code>applies</code> to, decided from the path or the command alone, and which fields it <code>needs</code>, so a call that cannot interest a check never reaches it. The order is a path test, then a file read, then a workspace walk. A check that throws is caught and passed over, and the rest still run.</p>
   <figure>
   <svg class="sds-drawing" viewBox="423 22 254 428" style="max-width:254px" role="img" aria-label="The verdict is returned rather than printed and parsed back, so a refusal cannot be lost.">
@@ -180,11 +180,11 @@
     { "from": "c", "to": "d", "label": "answers with" }
   ] }
   -->
-  <h3 id="the-dispatcher-s-own-refusal">The dispatcher's own refusal</h3>
+  <h3 id="dispatcher-refusal-the-dispatcher-s-own-">Dispatcher refusal — The dispatcher's own refusal</h3>
   <p>One guard is not a check in the list. Before the loop starts, the dispatcher asks whether any path this call would write is a file a generator owns — a generated validator, a build output folder, a generated route lock, or a file whose own header says a tool wrote it. That refusal is the dispatcher's own, and it runs first because it is the cheapest one there is and needs nothing read (rule RULE.CLAUDE_MARKETPLACE.DEVEX.002).</p>
-  <h3 id="measuring-what-a-run-cost">Measuring what a run cost</h3>
+  <h3 id="run-cost-measuring-what-a-run-cost">Run cost — Measuring what a run cost</h3>
   <p>Every check is timed. Whether any of it reaches disk is a switch the developer sets, and every path swallows its own errors, because a gate failing because timing failed is worse than a number nobody recorded.</p>
-  <h3 id="every-moment-exits-zero">Every moment exits zero</h3>
+  <h3 id="exit-zero-every-moment-exits-zero">Exit zero — Every moment exits zero</h3>
   <p>Whatever a script decides, it ends with a zero exit code. A refusal is the documented decision written to standard output, never a failure code. Two of these scripts also run by hand, printing the same text, so they can be read without opening a session at all.</p>
 </section>
 

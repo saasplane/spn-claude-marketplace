@@ -1,7 +1,7 @@
 <!-- spn:doc
 {
   "id": "spn-claude-marketplace-run-the-hooks-tests",
-  "title": "Run the Suites — And Read What They Wrote Down",
+  "title": "Run the Suites",
   "lenses": ["QA", "SERVER_DEV", "ARCHITECT"],
   "status": "DONE",
   "summary": "Running the plugins' own suites over the source, reading a result honestly rather than by its exit code, and the behaviour cells a run is allowed to write.",
@@ -9,7 +9,7 @@
 }
 -->
 
-# Run the Suites — And Read What They Wrote Down
+# Run the Suites
 
 `For: Quality engineer · Backend developer · Architect` · `Status: ✅ DONE`
 
@@ -17,7 +17,7 @@ Run these after any change to a hook, a check or a tool here. They exercise the 
 
 They also do a second job that no other repository's suites do. **This repository declares `GENERAL`, so `spnutils` serves it with its document commands alone and has no test runner for it.** There is no other program that could write this repository's behaviour rows, so these suites are that program too.
 
-## Run the whole set
+## Whole set — Run the whole set
 
 ```bash
 cd /opt/work/saasplane/code/spn-claude-marketplace
@@ -49,7 +49,7 @@ node packages/plugin-spn-devex/tests/unit/scripts/checks/t-doc-check.mjs
 
 On its own it prints every case — `PASS` or `FAIL`, then the title — under the heading of the behaviour being exercised. That is the level to work at while a check is moving, because the aggregate view drops everything but the last line.
 
-## Read the result honestly
+## Reading results — Read the result honestly
 
 **Read what a run says rather than its exit code.** The exit code is one bit, and these suites are built to tell you more than one bit.
 
@@ -64,7 +64,7 @@ On its own it prints every case — `PASS` or `FAIL`, then the title — under t
 
 **These suites are a builder's gate.** Several cases name real files in the surrounding workspace, because what they prove is that a check agrees with the corpus, and a corpus cannot be invented. Somebody holding the plugin without the workspace runs `spn-devex plugin partner check` instead, which needs nothing but the plugin itself.
 
-## What a run writes down
+## Run record — What a run writes down
 
 A named run writes `tests/.output/unit/runs/<run>.json` at the repository root, whether or not anything carried an id. It is the same file every stack's runner writes: the run's name, the tier, the instant and one result per id. An empty result set is itself a fact about the run, and an absent file would read as a run that never happened. A run that reuses a name replaces that one file and no other, and the tier keeps its 20 newest. Run the suites with no name and they still run, but nothing is written, because the row writer is always told which run to read.
 
@@ -89,7 +89,7 @@ The limits below keep that writer honest, and each one exists to stop a run sayi
 
 A row still reading `PLANNED` is left alone. It has never been proven, so a run that did not reach it changes nothing.
 
-### Where the rows stand today
+### Row standing — Where the rows stand today
 
 A case whose title carries an id, such as `[MKT.SCRIPTS.48]`, speaks for its row. A row no case names reads `PLANNED` in [`03-behaviors/`](../03-behaviors/README.md), which is true: it is declared rather than proven, until a case title carries its id.
 

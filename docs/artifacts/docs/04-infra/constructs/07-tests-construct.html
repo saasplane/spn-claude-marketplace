@@ -1,22 +1,22 @@
 <meta charset="utf-8">
-<title>Tests — How This Plugin Proves Its Own Gate</title>
+<title>Tests</title>
 <!-- spn:doc
-{"id":"estate-tests","variant":"construct","title":"Tests — How This Plugin Proves Its Own Gate","subtitle":"How this plugin proves the rules it refuses a bad file on.","lenses":["INFRA","QA"],"status":"PLANNING","dependsOn":["tests","estate-guard","estate-providers"],"summary":"This plugin proves its own gate — the rules that refuse a file — in a Tests folder arranged so moving a source file moves its test with it.","keywords":["test","tier","mirror","runner","harness","suite"]}
+{"id":"estate-tests","variant":"construct","title":"Tests","subtitle":"How this plugin proves the rules it refuses a bad file on.","lenses":["INFRA","QA"],"status":"PLANNING","dependsOn":["tests","estate-guard","estate-providers"],"summary":"This plugin proves its own gate — the rules that refuse a file — in a Tests folder arranged so moving a source file moves its test with it.","keywords":["test","tier","mirror","runner","harness","suite"]}
 -->
 <!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
 <link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.css" integrity="sha384-EFi+bm+soztQp3Bg2oQPRtdkdyGkD/O1qSDL0QCFBIHQg2sNtFhUHlkwxArFA8dY" crossorigin="anonymous">
 <div class="sds-page">
 
 <nav class="sds-rail" id="rail">
-  <a class="sds-home" href="../infra-overview.html">&larr; spn-infra — The Estate Domain</a>
-  <div class="sds-rail-title">Tests — How This Plugin Proves Its Own Gate</div>
+  <a class="sds-home" href="../infra-overview.html">&larr; spn-infra</a>
+  <div class="sds-rail-title">Tests</div>
 </nav>
 <div class="sds-wrap">
 
 <header class="sds-masthead">
   <!-- Rendered from the spn:doc block by `docs.ts page`. Never typed: a header that disagreed with its block is what this removes. -->
-  <div class="sds-eyebrow"><span class="sds-line1">SaaS Plane &nbsp;|&nbsp; Claude Marketplace &nbsp;|&nbsp; Tests — How This Plugin Proves Its Own Gate</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Construct</span><span class="sds-separator">|</span><span class="sds-label">For:</span> <span class="sds-audience"><span class="sds-badge sds-lens">DevOps / SRE</span><span class="sds-badge sds-lens">Quality engineer</span></span><span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-planning">&#x1F52E; PLANNING</span></span></span></div>
-  <h1>Tests — How This Plugin Proves Its Own Gate</h1>
+  <div class="sds-eyebrow"><span class="sds-line1">SaaS Plane &nbsp;|&nbsp; Claude Marketplace &nbsp;|&nbsp; Tests</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Construct</span><span class="sds-separator">|</span><span class="sds-label">For:</span> <span class="sds-audience"><span class="sds-badge sds-lens">DevOps / SRE</span><span class="sds-badge sds-lens">Quality engineer</span></span><span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-planning">&#x1F52E; PLANNING</span></span></span></div>
+  <h1>Tests</h1>
   <p class="sds-subtitle">How this plugin proves the rules it refuses a bad file on.</p>
   <p class="sds-standfirst">This plugin proves its own gate — the rules that refuse a file — in a Tests folder arranged so moving a source file moves its test with it. Read this page before you add a new rule, or when you want to know what a rule must be proven against. It explains why each rule is checked both against what it must refuse <strong>and</strong> against what it must let through, and how the folder finds the plugin root instead of counting hops to it.</p>
 </header>
@@ -99,21 +99,21 @@
 <!-- 03 -->
 <section id="s3">
   <div class="sds-section-head"><h2>Parts</h2></div>
-  <h3 id="what-is-proven-and-both-sides-of-every-r">What is proven, and both sides of every rule</h3>
+  <h3 id="what-is-proven-what-is-proven-and-both-s">What is proven — What is proven, and both sides of every rule</h3>
   <p>One suite proves the estate laws — what each rule refuses, what it allows, and where the credential length boundary sits, stated as cases so nobody re-derives it from a regular expression. Another proves the subject resolution: each cloud's own spellings refused, each cloud's sanctioned homes still allowed, and the case that matters most — a region belonging to the <strong>other</strong> cloud caught as well, because a write-time gate cannot know which cloud the estate will resolve to.</p>
-  <h3 id="the-suite-is-proven-load-bearing-not-mer">The suite is proven load-bearing, not merely green</h3>
+  <h3 id="load-bearing-suite-the-suite-is-proven-l">Load-bearing suite — The suite is proven load-bearing, not merely green</h3>
   <p>A passing suite proves the code does what the suite says; it does not prove the suite would notice if the code stopped. So the discovery was tested by moving the Google provider folder aside: exactly the two Google cases went red and every other case stayed green, and restoring the folder returned the whole run. That is the difference between a suite that reads the tree and a suite that agrees with it.</p>
-  <h3 id="the-runner-walks-and-it-judges-on-the-ex">The runner walks, and it judges on the exit code</h3>
+  <h3 id="runner-the-runner-walks-and-it-judges-on">Runner — The runner walks, and it judges on the exit code</h3>
   <p><code>run.mjs</code> finds every suite by walking the tree and taking each file whose name marks it as one, so a suite is discovered by where its source sits rather than by being added to a list. It reads each suite's own exit code as the verdict and uses the printed summary only for the count, because a suite that exits non-zero while printing a cheerful last line would otherwise read as green. Standard error is discarded rather than inherited, so a fixture's warnings do not appear in the run as this run's findings.</p>
-  <h3 id="nothing-counts-folders-to-find-the-code">Nothing counts folders to find the code</h3>
+  <h3 id="folder-counting-nothing-counts-folders-t">Folder counting — Nothing counts folders to find the code</h3>
   <p>Moving the suites once broke every one of them at the same moment, because each computed its own depth back to the plugin. So the harness exports the plugin root, found once; the runner walks; and a suite states only what it proves. <strong>A suite that types a depth is a suite the next move breaks</strong>, and nothing here types one.</p>
-  <h3 id="a-case-runs-the-real-process-and-reads-t">A case runs the real process and reads the real verdict</h3>
+  <h3 id="real-verdict-a-case-runs-the-real-proces">Real verdict — A case runs the real process and reads the real verdict</h3>
   <p>The harness writes a hook event to a fresh process on standard input and parses the decision back out, so what a case proves is what the harness would see rather than what a function returns. A case states the decision it expects and, for a refusal, a fragment the message must carry — which is how a rule that fires for the wrong reason is caught rather than counted as a pass.</p>
-  <h3 id="what-is-absent-and-the-absence-is-the-st">What is absent, and the absence is the statement</h3>
+  <h3 id="absences-what-is-absent-and-the-absence-">Absences — What is absent, and the absence is the statement</h3>
   <p>There is no <code>integration/</code> folder and no <code>setup/</code> folder. Nothing runs at that tier in this plugin, and the runner needs no fixture stood up before it starts. <strong>An empty folder would teach a reader that the tier works</strong>, so neither exists, which is the same rule a cloud with no validator follows.</p>
-  <h3 id="the-payload-a-case-replays-sits-beside-t">The payload a case replays sits beside the suites, once per event</h3>
+  <h3 id="replayed-payloads-the-payload-a-case-rep">Replayed payloads — The payload a case replays sits beside the suites, once per event</h3>
   <p><code>tests/fixtures/payloads/pretooluse/</code> holds one recorded call for the one event this plugin wires, and a suite reads it rather than constructing its own. A payload is an input, never a generated answer, so a stale one is a fixture problem and never a passing case that stopped proving anything.</p>
-  <h3 id="two-more-cases-prove-the-bundle-not-one-">Two more cases prove the bundle, not one file</h3>
+  <h3 id="bundle-cases-two-more-cases-prove-the-bu">Bundle cases — Two more cases prove the bundle, not one file</h3>
   <p><code>unit/t-dist-current.mjs</code> and <code>unit/t-bundle-parity.mjs</code> sit at the tree's root rather than under any one mirror, because each proves a property of the whole plugin: the first recomputes a bundle's declared sources against the banner esbuild wrote into it, and the second runs a recorded payload through the source and through the committed bundle and asserts the two agree. Both call the one shared harness the foundation's plugins realization states, <code>packages/plugin-support-lib/tests/helpers/</code>, so the build and the check can never quietly disagree. This plugin ships no <code>commands/</code>, but <code>hooks.json</code> still runs a built <code>dist/events/pretooluse.mjs</code>, so it owes both cases exactly as its two siblings do.</p>
 </section>
 

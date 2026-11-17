@@ -2,7 +2,7 @@
 {
   "id": "estate-plugin",
   "variant": "construct",
-  "title": "Plugin — spn-infra as a Delivery Unit",
+  "title": "Plugin",
   "subtitle": "The one folder that carries this repository's infrastructure rules into a working session.",
   "lenses": ["INFRA", "ARCHITECT"],
   "status": "PLANNING",
@@ -12,7 +12,7 @@
 }
 -->
 
-# Plugin — spn-infra as a Delivery Unit
+# Plugin
 
 `For: DevOps / SRE · Architect` · `Status: 🔮 PLANNING`
 
@@ -59,23 +59,23 @@ A session never reads this checkout. It reads an installed copy, found by the pl
 
 ## Parts
 
-### The four plugins carry one number, and every release moves all four
+### Shared number — The four plugins carry one number, and every release moves all four
 
 **A reader cannot tell four version numbers apart.** The plugins install as one set, by one command, and a session loads whichever of them its repository declares. Faced with four different numbers there is no way to tell from the outside whether that is four deliberate versions or one release that half-landed. So the four move together, and a plugin with nothing changed in it is released anyway at the new number. The cost is releasing an unchanged plugin, which costs nothing.
 
-### The number names what is published, not what somebody is working on
+### Published number — The number names what is published, not what somebody is working on
 
 **The release happens at the version the plugins already carry, and the count moves afterwards.** A published version ships, and the first edit after it increments the patch — for all four, not for the one that was touched. That is what makes a stale cache findable: a cache directory is keyed by version, so a plugin edited without an increment installs over its own published bytes and nothing tells a reader which of the two is running.
 
-### The description is this plugin's own, and it decides the load
+### Description — The description is this plugin's own, and it decides the load
 
 **A description is matched, not browsed.** It states in full what the plugin carries — the estate skills, the cards that hold the estate's vocabulary, the per-cloud material, and the refusal a write meets — because a session compares it against the work at hand rather than reading it for pleasure. The marketplace entry carries a second description for a listing to show, and the manifest is the current one wherever the two disagree.
 
-### It loads where a repository declares INFRA
+### INFRA loading — It loads where a repository declares INFRA
 
 **The world is read from the repository, never typed by a workspace.** A repository declaring `INFRA` gets this plugin, and that covers both the estate repository and the blueprint repository beside it, because both are edited under the estate's laws. A repository declaring another world never loads it, which is why the guard can be narrow: it only ever meets files that belong to an estate.
 
-### What this plugin holds, and what it leaves out
+### Plugin contents — What this plugin holds, and what it leaves out
 
 `spn-infra` ships `hooks/`, `skills/`, `scripts/`, `refs/`, `providers/` and `tests/`. **It ships no `agents/` folder, and the absence is the statement**: an agent brief convenes a reviewer over a change, and the estate's own review happens against a rendering through the tool's doors rather than against a diff. Each of the folders it does ship is named by its own page here.
 

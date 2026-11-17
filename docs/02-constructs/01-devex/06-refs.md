@@ -2,7 +2,7 @@
 {
   "id": "ref-set",
   "variant": "construct",
-  "title": "Refs — A Chapter, Restated and Stamped",
+  "title": "Refs",
   "subtitle": "A copy of a rule that says the moment it has fallen behind.",
   "lenses": ["VOICE", "ARCHITECT"],
   "status": "PLANNING",
@@ -12,7 +12,7 @@
 }
 -->
 
-# Refs — A Chapter, Restated and Stamped
+# Refs
 
 `For: Editor · Architect` · `Status: 🔮 PLANNING`
 
@@ -61,35 +61,61 @@ The comparison needs both trees, so it runs where the book is checked out beside
 
 ## Parts
 
-### The folder mirrors the book, and holds nothing else
+### Folder mirror — The folder mirrors the book, and holds nothing else
 
 A ref's path says which part of the book it restates, so `refs/` reads as a map of the chapters a plugin's readers need rather than as a pile of documents. Material that restates no chapter — a procedure a skill loads, a list of steps — is not a ref and does not belong there, whatever it happens to be about.
 
-### The block, and what it holds
+### The block — The block, and what it holds
 
 A comment carrying strict JSON: a list of chapters, each with a path, an optional section, and its hash; and optionally a list of register rows the file also depends on. It sits at the top of the file, in the position a document's metadata block would take, and a ref carries this rather than that. A skill's `SKILL.md` is the one exception: its frontmatter comes first and the block right after it, because a skill that opens with anything else is never offered to the session ([Skills](04-skills.md)).
 
-### A stamp is as precise as the sentence it replaces
+### Stamp precision — A stamp is as precise as the sentence it replaces
 
 Name a section and the hash covers that heading's own text; name only a path and it covers the whole file. The reason is measurable. One concept file runs to thousands of lines and many restatements cite it, so hashing the whole file re-stamps a viewpoint every time anything else in it moves — and a finding that is usually wrong teaches people to stop reading the run.
 
-### What the hash ignores, and what it does not
+### Hash ignores — What the hash ignores, and what it does not
 
 Trailing spaces and the blank lines around the cited text are invisible to a reader, so a change to them is not a change to the rule. Everything else counts, a reordering included, because a list of rules whose order changed is a list a restatement may now state wrongly.
 
-### The parser lives once because two checks read it
+### Shared parser — The parser lives once because two checks read it
 
 Comparing the foundation's own restatements inside one repository and comparing this repository's restatements against a book are different questions with the same parser. Writing that parser twice would be the defect this construct exists to stop, inside the instrument meant to catch it. So it is a library file, and neither check owns it.
 
-### A block used to get credit for what it left out
+### Block credit — A block used to get credit for what it left out
 
 A check that walks only the block can validate only what the file declared, so a source named in the file's own prose and omitted from the block was unreachable rather than unstamped, and both runs printed green over it. The check now reads the file's own source line and compares it against the block. The comparison is loose in one direction only: a name in prose counts as declared when some declared path contains it.
 
-### Three ways a restatement fails, and they are not the same finding
+### Restatement failures — Three ways a restatement fails, and they are not the same finding
 
 **Undeclared** is prose naming a source the block leaves out, which no run can see. **Unstamped** is a file saying what it restates and carrying no block at all, so nothing machine-readable exists to compare. **Unread** is a name no check can resolve to a file, which is an under-report rather than a hidden fault.
 
-### A source comment is not a stamp
+Follow one file through the checks and each finding falls out at its own question, which is why they are three findings and not one.
+
+```dg
+{ "kind": "flowchart",
+  "caption": "A file reaches the comparison only after it has a block, names nothing the block leaves out, and every name resolves to a file.",
+  "boxes": [
+    { "id": "file", "label": "A file that says what it restates", "shape": "terminator" },
+    { "id": "block", "label": "Does it carry a block?", "shape": "decision" },
+    { "id": "unstamped", "label": "Unstamped", "note": "nothing machine-readable to compare", "shape": "terminator" },
+    { "id": "prose", "label": "Does its prose name a source the block omits?", "shape": "decision" },
+    { "id": "undeclared", "label": "Undeclared", "note": "no run can see it", "shape": "terminator" },
+    { "id": "resolve", "label": "Does every name resolve to a file?", "shape": "decision" },
+    { "id": "unread", "label": "Unread", "note": "an under-report, not a hidden fault", "shape": "terminator" },
+    { "id": "hash", "label": "Compare the stamps", "note": "stamped and current, or drifted" }
+  ],
+  "links": [
+    { "from": "file", "to": "block" },
+    { "from": "block", "to": "unstamped", "label": "no" },
+    { "from": "block", "to": "prose", "label": "yes" },
+    { "from": "prose", "to": "undeclared", "label": "yes" },
+    { "from": "prose", "to": "resolve", "label": "no" },
+    { "from": "resolve", "to": "unread", "label": "no" },
+    { "from": "resolve", "to": "hash", "label": "yes" }
+  ] }
+```
+
+### Source comments — A source comment is not a stamp
 
 Every script here opens with a line naming the chapter it restates. That line carries no hash, so nothing compares it. It is deliberate, and it means something narrower: a change is made in the chapter first and in the code second, in the same change.
 
