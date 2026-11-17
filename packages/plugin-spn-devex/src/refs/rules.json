@@ -29,7 +29,7 @@
       "class": "guidance",
       "sentence": null,
       "chapter": "02-constructs/01-devex/02-agent/02-skills.md",
-      "heading": "Skills and step files",
+      "heading": "Step files — Skills and step files",
       "decision": null,
       "restated": []
     },
@@ -175,7 +175,7 @@
       "class": "guidance",
       "sentence": "A partner may add a gate and may never add a lens",
       "chapter": "02-constructs/01-devex/02-agent/03-lenses.md",
-      "heading": "What a lens may block",
+      "heading": "Lens blocks — What a lens may block",
       "decision": null,
       "restated": [
         {
@@ -207,7 +207,7 @@
       "class": "stated in a skill",
       "sentence": "A repository's plugin set derives from the world in its own `sprepo.json` alone, and the declared stack selects no plugin",
       "chapter": "02-constructs/01-devex/02-agent/04-plugins.md",
-      "heading": "The derived plugin set",
+      "heading": "Plugin set — The derived plugin set",
       "decision": "DEC.DEVEX.AGENT.039",
       "restated": [
         {
@@ -2410,7 +2410,7 @@
       "class": "guidance",
       "sentence": null,
       "chapter": "05-guides/README.md",
-      "heading": "Part 3 · Your platform",
+      "heading": "Part 3 · Platform — Your platform",
       "decision": null,
       "restated": []
     },
@@ -2423,7 +2423,7 @@
       "class": "stated in a skill",
       "sentence": null,
       "chapter": "02-constructs/01-devex/01-function/03-ideate.md",
-      "heading": "Both ends are named",
+      "heading": "Named ends — Both ends are named",
       "decision": null,
       "restated": []
     },
@@ -2484,7 +2484,7 @@
       "class": "stated in a skill",
       "sentence": null,
       "chapter": "02-constructs/01-devex/01-function/04-develop.md",
-      "heading": "What each layer may do",
+      "heading": "Layer limits — What each layer may do",
       "decision": null,
       "restated": []
     },
@@ -2762,7 +2762,7 @@
       "class": "stated in a skill",
       "sentence": "A `hotfix/<subject>` is cut from `main` for production, or from `uat` or `qa` where only that environment needs the fix, never from `develop`. It merges by a pull request back into the branch it came from, and `spnutils repo backmerge <branch>` then merges it into each permanent branch below that one, in order, down to `develop`",
       "chapter": "02-constructs/01-devex/01-function/02-scm.md",
-      "heading": "Rules that keep direction",
+      "heading": "Direction rules — Rules that keep direction",
       "decision": null,
       "restated": [
         {
@@ -4277,7 +4277,7 @@
       "class": "checked",
       "sentence": "One docs grammar serves every repository, dispatched from the manifests it already declares, and each document lives at the highest node that owns its scope",
       "chapter": "02-constructs/01-devex/04-workspace/03-repos.md",
-      "heading": "Docs follow the dispatch",
+      "heading": "Docs dispatch — Docs follow the dispatch",
       "decision": "DEC.DEVEX.WORKSPACE.070",
       "restated": []
     },
@@ -5964,7 +5964,7 @@
       "class": "guidance",
       "sentence": null,
       "chapter": "02-constructs/01-devex/04-workspace/03-repos.md",
-      "heading": "A value over not absence",
+      "heading": "Value, not absence — A value over not absence",
       "decision": null,
       "restated": [
         {
@@ -6149,7 +6149,7 @@
       "class": "stated in a skill",
       "sentence": "A telemetry row holds ids, times, counts and the names of things, never what was typed, and a field off its pattern is written as null",
       "chapter": "02-constructs/01-devex/04-workspace/01-workspace.md",
-      "heading": "The debug store's row",
+      "heading": "Debug row — The debug store's row",
       "decision": null,
       "restated": [
         {
@@ -12906,6 +12906,32 @@
       ]
     },
     {
+      "id": "RULE.DEVEX.WORKSPACE.517",
+      "level": "MUST",
+      "params": {
+        "check": "doc-check"
+      },
+      "class": "checked",
+      "sentence": "A short name is at most three words, and never a sentence",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "heading": "The header — two lines, six fields, produced from the block",
+      "decision": null,
+      "restated": []
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.518",
+      "level": "MUST",
+      "params": {
+        "check": "doc-check"
+      },
+      "class": "checked",
+      "sentence": "Every heading a rail shows reads as a name of at most three words before its dash",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "heading": "The level rule — an overview covers one level",
+      "decision": null,
+      "restated": []
+    },
+    {
       "id": "RULE.LAUNCHPAD.CONTROL_PLANE.001",
       "level": "MUST",
       "params": {
@@ -13160,7 +13186,7 @@
       "class": "stated in a skill",
       "sentence": null,
       "chapter": "02-constructs/03-platform/01-core/02-identity.md",
-      "heading": "One hub and callbacks",
+      "heading": "Hub — One hub and callbacks",
       "decision": null,
       "restated": []
     },
@@ -13173,7 +13199,7 @@
       "class": "stated in a skill",
       "sentence": null,
       "chapter": "02-constructs/03-platform/01-core/02-identity.md",
-      "heading": "One hub and callbacks",
+      "heading": "Hub — One hub and callbacks",
       "decision": null,
       "restated": []
     },
@@ -13882,7 +13908,7 @@
       "class": "stated in a skill",
       "sentence": "An org's parent is the org that sells to it",
       "chapter": "02-constructs/03-platform/01-core/01-tenancy.md",
-      "heading": "The parent is the seller",
+      "heading": "Parent seller — The parent is the seller",
       "decision": null,
       "restated": [
         {
@@ -13906,7 +13932,7 @@
       "class": "stated in a skill",
       "sentence": "The tree records only who sells to whom",
       "chapter": "02-constructs/03-platform/01-core/01-tenancy.md",
-      "heading": "The parent is the seller",
+      "heading": "Parent seller — The parent is the seller",
       "decision": "DEC.PLATFORM.CORE.061",
       "restated": [
         {
@@ -13930,7 +13956,7 @@
       "class": "stated in a skill",
       "sentence": "A category never has itself as an ancestor",
       "chapter": "02-constructs/03-platform/01-core/01-tenancy.md",
-      "heading": "The parent is the seller",
+      "heading": "Parent seller — The parent is the seller",
       "decision": "DEC.PLATFORM.CORE.062",
       "restated": [
         {
@@ -13954,7 +13980,7 @@
       "class": "stated in a skill",
       "sentence": "No module knows how deep the tree is",
       "chapter": "02-constructs/03-platform/01-core/01-tenancy.md",
-      "heading": "The parent is the seller",
+      "heading": "Parent seller — The parent is the seller",
       "decision": "DEC.PLATFORM.CORE.063",
       "restated": [
         {
@@ -14227,7 +14253,7 @@
       "class": "stated in a skill",
       "sentence": "A module records beside its real send, and one audited read returns the value once",
       "chapter": "02-constructs/03-platform/01-core/02-identity.md",
-      "heading": "A test reads the code",
+      "heading": "Test reads — A test reads the code",
       "decision": "DEC.PLATFORM.CORE.078",
       "restated": [
         {
@@ -15033,7 +15059,7 @@
       "class": "stated in a skill",
       "sentence": "A stack declares coverage, and answers *out of coverage* rather than skipping",
       "chapter": "02-constructs/02-support/02-apps/10-providers.md",
-      "heading": "What a stack is",
+      "heading": "Stack — What a stack is",
       "decision": null,
       "restated": [
         {
@@ -15142,7 +15168,7 @@
       "class": "stated in a skill",
       "sentence": null,
       "chapter": "02-constructs/02-support/02-apps/01-shape.md",
-      "heading": "Kinds and their answers",
+      "heading": "Kind answers — Kinds and their answers",
       "decision": null,
       "restated": []
     },
@@ -15220,7 +15246,7 @@
       "class": "stated in a skill",
       "sentence": null,
       "chapter": "02-constructs/02-support/02-apps/01-shape.md",
-      "heading": "Kinds and their answers",
+      "heading": "Kind answers — Kinds and their answers",
       "decision": null,
       "restated": [
         {
@@ -15239,7 +15265,7 @@
       "class": "stated in a skill",
       "sentence": null,
       "chapter": "02-constructs/02-support/02-apps/09-ships.md",
-      "heading": "One capability per altitude",
+      "heading": "Altitudes — One capability per altitude",
       "decision": null,
       "restated": [
         {
@@ -15258,7 +15284,7 @@
       "class": "stated in a skill",
       "sentence": null,
       "chapter": "02-constructs/02-support/02-apps/09-ships.md",
-      "heading": "One capability per altitude",
+      "heading": "Altitudes — One capability per altitude",
       "decision": null,
       "restated": []
     },
@@ -15771,7 +15797,7 @@
       "class": "stated in a skill",
       "sentence": null,
       "chapter": "02-constructs/02-support/02-apps/03-module.md",
-      "heading": "Rules for the link",
+      "heading": "Link rules — Rules for the link",
       "decision": null,
       "restated": []
     },
@@ -15784,7 +15810,7 @@
       "class": "stated in a skill",
       "sentence": null,
       "chapter": "02-constructs/01-devex/04-workspace/03-repos.md",
-      "heading": "Worlds and their grants",
+      "heading": "Grants — Worlds and their grants",
       "decision": null,
       "restated": []
     },
@@ -15821,7 +15847,7 @@
       "class": "stated in a skill",
       "sentence": "A contract schema is `STRICT` and a state never uses `?`; tolerating an absent key is the entry's responsibility and never the type's",
       "chapter": "02-constructs/01-devex/01-function/04-develop.md",
-      "heading": "What each layer may do",
+      "heading": "Layer limits — What each layer may do",
       "decision": "DEC.SUPPORT.APPS.071",
       "restated": [
         {
@@ -15866,7 +15892,7 @@
       "class": "stated in a skill",
       "sentence": null,
       "chapter": "02-constructs/02-support/02-apps/04-resources.md",
-      "heading": "Engine is never surface",
+      "heading": "Engine — Engine is never surface",
       "decision": null,
       "restated": []
     },
@@ -16099,7 +16125,7 @@
       "class": "stated in a skill",
       "sentence": null,
       "chapter": "02-constructs/02-support/02-apps/06-tests.md",
-      "heading": "Where a case lives",
+      "heading": "Case home — Where a case lives",
       "decision": null,
       "restated": [
         {
@@ -16682,7 +16708,7 @@
       "class": "stated in a skill",
       "sentence": null,
       "chapter": "02-constructs/02-support/02-apps/01-shape.md",
-      "heading": "Kinds and their answers",
+      "heading": "Kind answers — Kinds and their answers",
       "decision": null,
       "restated": []
     },
@@ -16727,7 +16753,7 @@
       "class": "stated in a skill",
       "sentence": null,
       "chapter": "02-constructs/02-support/02-apps/08-agent-surface.md",
-      "heading": "What one symbol carries",
+      "heading": "Symbol — What one symbol carries",
       "decision": null,
       "restated": []
     },
@@ -18706,7 +18732,7 @@
       "class": "stated in a skill",
       "sentence": "A record looks the same wherever a person meets it, so a module makes the item line specific for each record it owns, as `<State>Item`. Every record a person picks, lists or opens has one, and a place can only leave out its parts.",
       "chapter": "02-constructs/02-support/01-surface/06-architecture-components.md",
-      "heading": "Item line badge and mark",
+      "heading": "Item parts — Item line badge and mark",
       "decision": "DEC.SUPPORT.APPS.218",
       "restated": [
         {
@@ -19551,7 +19577,7 @@
       "class": "stated in a skill",
       "sentence": null,
       "chapter": "02-constructs/02-support/02-apps/06-tests.md",
-      "heading": "What a partner tests",
+      "heading": "Partner tests — What a partner tests",
       "decision": null,
       "restated": [
         {
@@ -19580,7 +19606,7 @@
       "class": "stated in a skill",
       "sentence": null,
       "chapter": "02-constructs/02-support/02-apps/06-tests.md",
-      "heading": "What a partner tests",
+      "heading": "Partner tests — What a partner tests",
       "decision": "DEC.SUPPORT.APPS.263",
       "restated": [
         {
@@ -19780,7 +19806,7 @@
       "class": "stated in a skill",
       "sentence": null,
       "chapter": "02-constructs/02-support/02-apps/09-ships.md",
-      "heading": "The stage it sits in",
+      "heading": "Stage — The stage it sits in",
       "decision": null,
       "restated": []
     },
@@ -19825,7 +19851,7 @@
       "class": "stated in a skill",
       "sentence": null,
       "chapter": "02-constructs/02-support/03-infra/02-packages.md",
-      "heading": "Outside the kind system",
+      "heading": "Outside kinds — Outside the kind system",
       "decision": null,
       "restated": []
     },
@@ -19851,7 +19877,7 @@
       "class": "stated in a skill",
       "sentence": null,
       "chapter": "02-constructs/02-support/03-infra/02-packages.md",
-      "heading": "One repository per company",
+      "heading": "Company repository — One repository per company",
       "decision": null,
       "restated": []
     },
@@ -19976,7 +20002,7 @@
       "class": "stated in a skill",
       "sentence": null,
       "chapter": "02-constructs/02-support/03-infra/03-blueprints.md",
-      "heading": "Realization is a target",
+      "heading": "Realization — Realization is a target",
       "decision": null,
       "restated": [
         {
@@ -20013,7 +20039,7 @@
       "class": "stated in a skill",
       "sentence": null,
       "chapter": "02-constructs/02-support/03-infra/02-packages.md",
-      "heading": "What a company declares",
+      "heading": "Company declares — What a company declares",
       "decision": null,
       "restated": []
     },
@@ -20026,7 +20052,7 @@
       "class": "stated in a skill",
       "sentence": "You write choices, and you never write an identifier",
       "chapter": "02-constructs/02-support/03-infra/02-packages.md",
-      "heading": "Intent and the rest",
+      "heading": "Intent — Intent and the rest",
       "decision": null,
       "restated": [
         {
@@ -20272,7 +20298,7 @@
       "class": "stated in a skill",
       "sentence": null,
       "chapter": "02-constructs/02-support/03-infra/06-modules.md",
-      "heading": "What a module may stand",
+      "heading": "Module limits — What a module may stand",
       "decision": null,
       "restated": [
         {
@@ -20569,7 +20595,7 @@
       "class": "stated in a skill",
       "sentence": null,
       "chapter": "02-constructs/02-support/03-infra/04-resources.md",
-      "heading": "A module's own world",
+      "heading": "Module world — A module's own world",
       "decision": null,
       "restated": [
         {
@@ -20857,7 +20883,7 @@
       "class": "stated in a skill",
       "sentence": "singular for the whole company",
       "chapter": "02-constructs/02-support/03-infra/06-modules.md",
-      "heading": "Where a module may attach",
+      "heading": "Attach points — Where a module may attach",
       "decision": null,
       "restated": [
         {
@@ -21094,7 +21120,7 @@
       "class": "stated in a skill",
       "sentence": null,
       "chapter": "02-constructs/02-support/03-infra/02-packages.md",
-      "heading": "What a product declares",
+      "heading": "Product declares — What a product declares",
       "decision": null,
       "restated": []
     },
@@ -21253,7 +21279,7 @@
       "class": "stated in a skill",
       "sentence": "A customer's hostname is issued and bound when the request to serve it arrives, through the edge seam, and never by an apply",
       "chapter": "02-constructs/02-support/03-infra/08-operate.md",
-      "heading": "The serving contract is dynamic",
+      "heading": "Serving contract — The serving contract is dynamic",
       "decision": null,
       "restated": [
         {
@@ -21442,7 +21468,7 @@
       "class": "stated in a skill",
       "sentence": null,
       "chapter": "02-constructs/02-support/03-infra/07-trust.md",
-      "heading": "What a cloud act needs",
+      "heading": "Cloud acts — What a cloud act needs",
       "decision": null,
       "restated": [
         {
@@ -21510,7 +21536,7 @@
       "class": "stated in a skill",
       "sentence": null,
       "chapter": "02-constructs/02-support/03-infra/03-blueprints.md",
-      "heading": "What proves an estate change",
+      "heading": "Estate proof — What proves an estate change",
       "decision": null,
       "restated": [
         {
@@ -21572,7 +21598,7 @@
       "class": "stated in a skill",
       "sentence": null,
       "chapter": "02-constructs/02-support/03-infra/02-packages.md",
-      "heading": "What a product declares",
+      "heading": "Product declares — What a product declares",
       "decision": null,
       "restated": [
         {
@@ -21637,7 +21663,7 @@
       "class": "stated in a skill",
       "sentence": "One tenant edge, stood by the platform layer, serves the customer hosts of every environment",
       "chapter": "02-constructs/02-support/03-infra/08-operate.md",
-      "heading": "The serving contract is dynamic",
+      "heading": "Serving contract — The serving contract is dynamic",
       "decision": null,
       "restated": [
         {
@@ -21957,7 +21983,7 @@
       "class": "stated in a skill",
       "sentence": null,
       "chapter": "02-constructs/02-support/03-infra/05-apps.md",
-      "heading": "Remote ports stay private",
+      "heading": "Remote ports — Remote ports stay private",
       "decision": null,
       "restated": [
         {
@@ -22020,7 +22046,7 @@
       "class": "stated in a skill",
       "sentence": null,
       "chapter": "02-constructs/02-support/03-infra/05-apps.md",
-      "heading": "What a route is asked",
+      "heading": "Route asks — What a route is asked",
       "decision": null,
       "restated": [
         {
@@ -22078,7 +22104,7 @@
       "class": "stated in a skill",
       "sentence": null,
       "chapter": "02-constructs/02-support/03-infra/05-apps.md",
-      "heading": "What a route is asked",
+      "heading": "Route asks — What a route is asked",
       "decision": null,
       "restated": [
         {
@@ -22655,7 +22681,7 @@
       "class": "stated in a skill",
       "sentence": "The acting role trusts the estate repository's pipeline role by name, and no other principal becomes it",
       "chapter": "02-constructs/02-support/03-infra/07-trust.md",
-      "heading": "Who may become the acting role",
+      "heading": "Acting role — Who may become the acting role",
       "decision": null,
       "restated": [
         {
@@ -22674,7 +22700,7 @@
       "class": "stated in a skill",
       "sentence": "The deployments layer is applied by the pipeline alone, from a push, by digest",
       "chapter": "02-constructs/02-support/03-infra/07-trust.md",
-      "heading": "Who may become the acting role",
+      "heading": "Acting role — Who may become the acting role",
       "decision": null,
       "restated": [
         {
@@ -22808,7 +22834,7 @@
       "class": "stated in a skill",
       "sentence": null,
       "chapter": "02-constructs/02-support/03-infra/05-apps.md",
-      "heading": "How big, and how many",
+      "heading": "Size and count — How big, and how many",
       "decision": null,
       "restated": [
         {
@@ -22827,7 +22853,7 @@
       "class": "stated in a skill",
       "sentence": null,
       "chapter": "02-constructs/02-support/03-infra/04-resources.md",
-      "heading": "Each data service its own size",
+      "heading": "Service sizes — Each data service its own size",
       "decision": null,
       "restated": [
         {
@@ -22908,7 +22934,7 @@
       "class": "stated in a skill",
       "sentence": "An application is given a module's settings only when its row names the module",
       "chapter": "02-constructs/02-support/03-infra/06-modules.md",
-      "heading": "Given only to the apps that name it",
+      "heading": "Named apps — Given only to the apps that name it",
       "decision": null,
       "restated": [
         {
@@ -23043,7 +23069,7 @@
       "class": "stated in a skill",
       "sentence": null,
       "chapter": "02-constructs/02-support/01-surface/13-providers.md",
-      "heading": "Figma is not a provider",
+      "heading": "Figma — Figma is not a provider",
       "decision": null,
       "restated": []
     },
@@ -23125,7 +23151,7 @@
       "class": "stated in a skill",
       "sentence": null,
       "chapter": "02-constructs/02-support/01-surface/12-delivery-showcase.md",
-      "heading": "The tags a unit declares",
+      "heading": "Unit tags — The tags a unit declares",
       "decision": null,
       "restated": []
     },
@@ -29494,7 +29520,7 @@
       "class": "stated in a skill",
       "sentence": "A vertical item line spaces its text by its level",
       "chapter": "02-constructs/02-support/01-surface/06-architecture-components.md",
-      "heading": "Item line badge and mark",
+      "heading": "Item parts — Item line badge and mark",
       "decision": null,
       "restated": [
         {
@@ -31396,7 +31422,7 @@
       "class": "guidance",
       "sentence": "Anything set one under another is a `DSList`",
       "chapter": "02-constructs/02-support/01-surface/06-architecture-components.md",
-      "heading": "Compose and never restyle",
+      "heading": "Compose only — Compose and never restyle",
       "decision": "DEC.SUPPORT.SURFACE.288",
       "restated": [
         {
@@ -33415,7 +33441,7 @@
       "class": "stated in a skill",
       "sentence": "One claim picks a provider: the stack claim of the repository the code stands in, `config.stack` in its `sprepo.json`",
       "chapter": "02-constructs/02-support/01-surface/13-providers.md",
-      "heading": "The claim picks a provider",
+      "heading": "Provider choice — The claim picks a provider",
       "decision": null,
       "restated": [
         {
@@ -34213,7 +34239,7 @@
       "class": "stated in a skill",
       "sentence": "Every prop of a unit is sorted into exactly one kind",
       "chapter": "02-constructs/02-support/01-surface/06-architecture-components.md",
-      "heading": "How a unit is sorted for the library",
+      "heading": "Library sorting — How a unit is sorted for the library",
       "decision": null,
       "restated": [
         {
@@ -34237,7 +34263,7 @@
       "class": "stated in a skill",
       "sentence": "Each `CASE` prop names the part it changes",
       "chapter": "02-constructs/02-support/01-surface/06-architecture-components.md",
-      "heading": "How a unit is sorted for the library",
+      "heading": "Library sorting — How a unit is sorted for the library",
       "decision": null,
       "restated": [
         {
@@ -34261,7 +34287,7 @@
       "class": "stated in a skill",
       "sentence": "The library draws coverage, and never combinations",
       "chapter": "02-constructs/02-support/01-surface/06-architecture-components.md",
-      "heading": "How a unit is sorted for the library",
+      "heading": "Library sorting — How a unit is sorted for the library",
       "decision": null,
       "restated": [
         {
@@ -34295,7 +34321,7 @@
       "class": "stated in a skill",
       "sentence": "A unit's usage is one primary use, at the unit's widest use, in light and in dark",
       "chapter": "02-constructs/02-support/01-surface/06-architecture-components.md",
-      "heading": "How a unit is sorted for the library",
+      "heading": "Library sorting — How a unit is sorted for the library",
       "decision": null,
       "restated": [
         {
@@ -34353,7 +34379,7 @@
       "class": "stated in a skill",
       "sentence": null,
       "chapter": "02-constructs/02-support/01-surface/13-providers.md",
-      "heading": "A change reaches every layer at once",
+      "heading": "Every layer — A change reaches every layer at once",
       "decision": null,
       "restated": [
         {
