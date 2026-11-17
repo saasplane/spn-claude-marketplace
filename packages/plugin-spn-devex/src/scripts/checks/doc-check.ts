@@ -1347,7 +1347,9 @@ export function check(path: string, text: string, fragment = false): Finding[] {
     out.push(...workingDetail(path, text), ...partnerWords(path, text));
   }
   if (isHtml && itemCellPage(path) && !inClosedWorkstream(path)) out.push(...columnRule(text));
-  if (isHtml && !fragment && inPocket(path)) out.push(...nameRule(text));
+  // A page of a repository's pocket, and a workstream's own pages (an approach page, a preview) while open.
+  if (isHtml && !fragment && (inPocket(path) || ((isApproach || /-?preview\.html$/.test(path)) && workstreamOf(path) !== null && !inClosedWorkstream(path))))
+    out.push(...nameRule(text));
 
   const sents = sentences(prose);
   if (!fragment || sents.length >= 5) out.push(...voice(prose, sents, kindOf(path), isOperative(path)));
@@ -1366,7 +1368,7 @@ const inPocket = (path: string): boolean => {
 };
 
 /** The words a list shows: tags dropped, entities read, and the part before a heading's dash. */
-const shown = (html: string): string => html.replace(/<[^>]+>/g, "").replace(/&mdash;/g, "—").replace(/&amp;/g, "&")
+const shown = (html: string): string => html.replace(/<span class="sds-number">[\s\S]*?<\/span>/g, "").replace(/<[^>]+>/g, "").replace(/&mdash;/g, "—").replace(/&amp;/g, "&")
   .replace(/&[a-z]+;|&#\d+;/g, " ").split(" — ")[0].trim();
 /** A word is a run that holds a letter or a digit; a dot, a dash or a `·` alone is not one. */
 const counted = (name: string): number => name.split(/\s+/).filter((one) => /[\p{L}\p{N}]/u.test(one)).length;
@@ -1383,6 +1385,8 @@ export function nameRule(text: string): Finding[] {
   const block = /<!--\s*spn:doc\s*(\{[\s\S]*?\})\s*-->/.exec(text);
   let title = "";
   if (block) { try { title = String((JSON.parse(block[1]) as { title?: unknown }).title ?? ""); } catch { title = ""; } }
+  // A workstream's number in front of its page's name is an address, not a word of the name: `040 - Hiring Demo Ready`.
+  title = title.replace(/^\d{3}\s*(?:·\s*\S+\s*)?-\s+/, "");
   // A fourth word is kept for one fixed term that breaks if cut, so four words warn and five refuse.
   const grade = (n: number): "RULE" | "SOFT" => (n > NAME_LIMIT + 1 ? "RULE" : "SOFT");
   if (title && !/\{\{/.test(title) && (counted(title) > NAME_LIMIT || /[.?!:]$/.test(title)))

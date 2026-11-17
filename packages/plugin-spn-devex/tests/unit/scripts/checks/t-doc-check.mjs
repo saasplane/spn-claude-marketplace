@@ -954,7 +954,7 @@ console.log("\n=== doc-check — a long What on an open approach page holds a fi
 
 {
   console.log("\n=== doc-check — a page's name and its rail entries are short names (RULE.DEVEX.WORKSPACE.517, .518)");
-  const { nameRule } = await import("../../../../src/scripts/checks/doc-check.ts");
+  const { nameRule, check } = await import("../../../../src/scripts/checks/doc-check.ts");
   const say = (label, ok, detail = "") => { n += 1; if (!ok) failed += 1; console.log(`  ${ok ? "PASS" : "FAIL"}  ${label}${ok || !detail ? "" : `\n        ${detail}`}`); };
   const page = (title, h2, h3) => `<!-- spn:doc\n{"id": "x", "variant": "construct", "title": "${title}"}\n-->\n` +
     `<section id="s1"><div class="sds-section-head"><h2>${h2}</h2></div>\n<h3 id="a">${h3}</h3></section>`;
@@ -969,6 +969,15 @@ console.log("\n=== doc-check — a long What on an open approach page holds a fi
     grades(page("Hiring", "Where a branch deploys and why", "Offers")).join() === "RULE:518");
   say("[MKT.HOOKS.511] green: a heading named before its dash draws nothing",
     nameRule(page("Hiring", "Next — Where to go next", "Candidate — The candidate, and what it keeps from the first application")).length === 0);
+  say("[MKT.HOOKS.510] a workstream's number in front of its page's name is not a word of it",
+    nameRule(page("040 - Hiring Demo", "Model", "Offers")).length === 0 && nameRule(page("040 · N016 - Docs Rail", "Model", "Offers")).length === 0);
+  say("[MKT.HOOKS.511] a section's number beside its heading is not a word of the rail entry",
+    nameRule(page("Hiring", '<span class="sds-number">3</span> Plan', "Offers")).length === 0);
+  const open = join(stream(TMP, "099-names", "open"), "notes", "N001", "preview.html");
+  const closed = join(stream(TMP, "098-names", "closed"), "notes", "N001", "preview.html");
+  const long = `${linesFor("1.0.0").stylesheet}\n` + page("Hiring", "Where a branch deploys and why", "Offers");
+  say("[MKT.HOOKS.511] an open workstream's preview is held to the rail rule, and a closed one is not",
+    check(open, long).some(([, message]) => message.includes("WORKSPACE.518")) && !check(closed, long).some(([, message]) => message.includes("WORKSPACE.518")));
   say("[MKT.HOOKS.511] a rail entry of four words is a warning, of five a refusal",
     grades(page("Hiring", "Model", "What a repository declares")).join() === "SOFT:518"
       && grades(page("Hiring", "Model", "What a repository declares to us")).join() === "RULE:518");
