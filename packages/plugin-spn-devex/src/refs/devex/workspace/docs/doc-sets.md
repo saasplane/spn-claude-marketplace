@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/README.md",
-      "seen": "d302cdc9"
+      "seen": "1599972e"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
@@ -488,7 +488,7 @@ kind: a good example beside a poor one shows the difference faster than the rule
 
 Every page somebody writes by hand is copied from a template, and the templates live in the docs domain's own `templates/` folder — beside the chapters that state their rules. **A template holds a page's shape — its sections, its slots and the two lines that load the shared stylesheet and script — and no rule**, so a rule is stated in one place only. **A seat may hold that one folder that is not documents.** It is unnumbered, because you consult a template rather than reading the set in order, and it is excluded from the document checks **by the folder rather than per file**: a per-file exemption is a hole, and a named folder is a rule. **Each template names the chapter sections that govern it**, at the top of the file; a change to a template's shape is edited in the template, and `restates files check` reports a plugin copy that has fallen behind it.
 
-**The plugins carry a copy built from these templates, never one edited on its own** (`RULE.DEVEX.WORKSPACE.490` · MUST · check:doc-check). The agent copies a page from the plugin's `refs/devex/workspace/docs/templates/`, because a partner holds the plugins and not the book. So the plugins' build copies every file of the book's templates folder into that one, and a template is changed in the book and nowhere else.
+**The plugins carry a copy built from these templates, never one edited on its own** (`RULE.DEVEX.WORKSPACE.490` · MUST · check:doc-check). The agent copies a page from the plugin's `refs/devex/workspace/docs/templates/`, because a partner holds the plugins and not the book. So the plugins' build copies every file of the book's templates folder into that one, and a template is changed in the book and nowhere else. The folder's own `index.md`, which records each template's hash, stays in the book: the plugin's copy keeps its own `README.md` instead.
 
 | Folder | Holds | Shapes |
 | --- | --- | --- |
