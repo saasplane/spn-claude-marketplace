@@ -12959,6 +12959,11 @@
           "plugin": "spn-devex",
           "path": "skills/ideate/SKILL.md",
           "heading": "While the shape is discussed, a find stays on the ideate arc"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -35033,6 +35038,11 @@
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
           "heading": "Choose in four steps, with a block last"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/SKILL.md",
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -35101,6 +35111,11 @@
           "plugin": "spn-surface",
           "path": "refs/support/surface/design-languages.md",
           "heading": "The parts — 🔮"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/SKILL.md",
+          "heading": "The rules this step holds"
         }
       ]
     }
