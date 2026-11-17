@@ -29,7 +29,7 @@ it here, before you publish — `node packages/plugin-spn-devex/src/dist/cli.mjs
 `spn-devex restates check`, once installed), which reads the `spn-foundation` of the workspace it runs in
 and names it on its first line, or takes a book's path as the one argument.
 
-## The domains it holds   `DRAFT`
+## Domains — The domains it holds   `DRAFT`
 
 **This repository is a monorepo of plugins, so it divides by plugin.** A monorepo divides by the
 thing it holds many of, and what this one holds many of is Claude plugins for SaaS Plane. Each is a
@@ -82,7 +82,7 @@ the skills that can only be said in its own words. **A skill that is stack-agnos
 what an estate is, and the estate's own vocabulary restated for a reader who may never open the
 book.
 
-## The world it declares   `DRAFT`
+## Declared world — The world it declares   `DRAFT`
 
 **This repository declares `GENERAL` in `sprepo.json`, which is a world with no stack in it.** A
 manifest declares which world a repository belongs to — `FOUNDATION`, `APPS`, `INFRA` or `GENERAL` —

@@ -2,7 +2,7 @@
 {
   "id": "hook-set",
   "variant": "construct",
-  "title": "Hooks — Code the Runtime Calls on Your Behalf",
+  "title": "Hooks",
   "subtitle": "A hook is how a rule gets asked again, every single time, instead of trusted from memory.",
   "lenses": ["ARCHITECT", "SERVER_DEV"],
   "status": "PLANNING",
@@ -12,7 +12,7 @@
 }
 -->
 
-# Hooks — Code the Runtime Calls on Your Behalf
+# Hooks
 
 `For: Architect · Backend developer` · `Status: 🔮 PLANNING`
 
@@ -81,15 +81,15 @@ One script runs when a session starts, resumes or is cleared, and what it prints
 
 The same script puts the short rules in front of the agent, after the ground. They are ten plain lines about how a reply reads and who decides what, and each one ends with the reference and the heading that hold the rule whole. A line is a pointer and never a second copy of the rule. The agent reads the block and the developer's pane does not show it. The script reads no prompt, so no script judges whether a prompt opens a discussion.
 
-### A call about to run
+### Before a call — A call about to run
 
 One script, one matcher, and the whole chain of checks behind it. This is the only moment that may return a refusal, so every gate in the marketplace lives here or nowhere. Its matcher names the calls that could interest a check — reads, writes, edits, shell commands and searches.
 
-### A shell command that finished
+### After a command — A shell command that finished
 
 One script, matched to shell commands alone. It reads the command that just ran, and when that command actually moved a workstream folder into the closed state, it says what landed, counted from that workstream's own split plan. The congratulation comes after the move rather than before it, because the gate that could have refused the move runs earlier and speaks only to refuse.
 
-### A turn about to end
+### Before a stop — A turn about to end
 
 One script, no matcher. By the time it runs the turn is already written, so a refusal would only lose it. What it does instead is warn: a turn ending while the running arc still has rows nothing blocks, an arc held against no live card, and a reply announcing a new window without the fields a handover owes.
 
@@ -99,17 +99,17 @@ A warning makes the agent reply again, and the developer reads that reply. So th
 - **While work runs, only a finding about the reply sends the agent back.** That is a card not put in full, a decision put with no whole card, a handover block that is missing or not whole, and a first reply with no welcome. Every other finding is held. At the first turn end where no row is in progress, each held finding that is still true is said whole, and one the agent fixed in between is not said.
 - **A handover block is asked for once.** After a reply that holds a whole block, a later reply that names the next window owes no second block while the rows of the window's arcs have not moved. Once they move, the old block no longer says where to start, and a block is owed again.
 
-### The payload, and what a hook reads from it
+### Payload — The payload, and what a hook reads from it
 
 The harness writes the event to standard input as JSON. `readPayload` parses it, and input it cannot parse is not a finding — the hook simply allows the call. What a check then reads is a small part of it: the path a write names, the shell command a call carries, and the text a write would add.
 
-### The verdict is a return value
+### Verdict — The verdict is a return value
 
 A check is a function returning `{ deny?, note? }` or nothing. The dispatcher calls it and reads the object, so there is no round trip a refusal can disappear in. A file can still be run on its own, and `emit` then prints the same decision JSON to the same stream. A refusal sets the decision and its reason; advice is set as context the agent reads, because a message put only in the developer's pane is invisible to the agent.
 
 **The developer is shown a refusal, and advice goes to the agent alone.** A refusal stops a call, so the developer needs to know why the work stopped. Advice lets the call go on, and the agent is the one who can act on it, so nothing of it is put in the developer's pane. A soft finding of the doc standard is advice. The dispatcher says it once for a file in a window, and says it again when the finding changes, because it is then a different finding.
 
-### One process, and the order inside it
+### One process — One process, and the order inside it
 
 The dispatcher imports every check and calls each in turn. Each check declares what it `applies` to, decided from the path or the command alone, and which fields it `needs`, so a call that cannot interest a check never reaches it. The order is a path test, then a file read, then a workspace walk. A check that throws is caught and passed over, and the rest still run.
 
@@ -129,15 +129,15 @@ The dispatcher imports every check and calls each in turn. Each check declares w
   ] }
 ```
 
-### The dispatcher's own refusal
+### Dispatcher refusal — The dispatcher's own refusal
 
 One guard is not a check in the list. Before the loop starts, the dispatcher asks whether any path this call would write is a file a generator owns — a generated validator, a build output folder, a generated route lock, or a file whose own header says a tool wrote it. That refusal is the dispatcher's own, and it runs first because it is the cheapest one there is and needs nothing read (rule RULE.CLAUDE_MARKETPLACE.DEVEX.002).
 
-### Measuring what a run cost
+### Run cost — Measuring what a run cost
 
 Every check is timed. Whether any of it reaches disk is a switch the developer sets, and every path swallows its own errors, because a gate failing because timing failed is worse than a number nobody recorded.
 
-### Every moment exits zero
+### Exit zero — Every moment exits zero
 
 Whatever a script decides, it ends with a zero exit code. A refusal is the documented decision written to standard output, never a failure code. Two of these scripts also run by hand, printing the same text, so they can be read without opening a session at all.
 

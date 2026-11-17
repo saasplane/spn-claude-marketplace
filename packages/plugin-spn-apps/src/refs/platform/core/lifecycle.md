@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/03-platform/01-core/05-lifecycle.md",
-      "seen": "ab5c5ec0"
+      "seen": "5ddd4535"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/03-platform/01-core/05-lifecycle/",

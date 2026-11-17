@@ -1,21 +1,21 @@
 <meta charset="utf-8">
-<title>Install the Plugins — And Prove They Loaded</title>
+<title>Install the Plugins</title>
 <!-- spn:doc
-{"id":"spn-claude-marketplace-install-the-plugins","variant":"guide","title":"Install the Plugins — And Prove They Loaded","lenses":["SERVER_DEV","WEB_DEV","ARCHITECT","INFRA"],"summary":"Putting the plugin set into a workspace from a directory or from git, the refresh that actually replaces the installed bytes, and the checks that tell you which version a session is really running.","keywords":["install","plugins","marketplace","agent-sync","scope","cache","refresh","verify"],"source":"docs/05-guides/01-install-the-plugins.md"}
+{"id":"spn-claude-marketplace-install-the-plugins","variant":"guide","title":"Install the Plugins","lenses":["SERVER_DEV","WEB_DEV","ARCHITECT","INFRA"],"summary":"Putting the plugin set into a workspace from a directory or from git, the refresh that actually replaces the installed bytes, and the checks that tell you which version a session is really running.","keywords":["install","plugins","marketplace","agent-sync","scope","cache","refresh","verify"],"source":"docs/05-guides/01-install-the-plugins.md"}
 -->
 <!-- Produced by `docs guide` from docs/05-guides/01-install-the-plugins.md. Never edit this page: change the guide, and produce the page again. -->
-<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.css" integrity="sha384-EFi+bm+soztQp3Bg2oQPRtdkdyGkD/O1qSDL0QCFBIHQg2sNtFhUHlkwxArFA8dY" crossorigin="anonymous">
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.12.0/sds-docs.css" integrity="sha384-WiniroKwtgBGQa/YuvtjywJOoLCqJRnD4v2OCINQys2XzhwipkthjfpJRU1RWSJn" crossorigin="anonymous">
 <div class="sds-page sds-guide">
 
 <nav class="sds-rail" id="rail">
   <a class="sds-home" href="../docs/concept-overview.html">&larr; spn-claude-marketplace</a>
-  <div class="sds-rail-title">Install the Plugins — And Prove They Loaded</div>
+  <div class="sds-rail-title">Install the Plugins</div>
 </nav>
 <div class="sds-wrap">
 
 <header class="sds-masthead">
-  <div class="sds-eyebrow"><span class="sds-line1">SaaS Plane &nbsp;|&nbsp; Claude Marketplace &nbsp;|&nbsp; Install the Plugins — And Prove They Loaded</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Guide</span><span class="sds-separator">|</span><span class="sds-label">For:</span> <span class="sds-audience"><span class="sds-badge sds-lens">Backend developer</span><span class="sds-badge sds-lens">Web developer</span><span class="sds-badge sds-lens">Architect</span><span class="sds-badge sds-lens">DevOps / SRE</span></span></span></div>
-  <h1>Install the Plugins — And Prove They Loaded</h1>
+  <div class="sds-eyebrow"><span class="sds-line1">SaaS Plane &nbsp;|&nbsp; Claude Marketplace &nbsp;|&nbsp; Install the Plugins</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Guide</span><span class="sds-separator">|</span><span class="sds-label">For:</span> <span class="sds-audience"><span class="sds-badge sds-lens">Backend developer</span><span class="sds-badge sds-lens">Web developer</span><span class="sds-badge sds-lens">Architect</span><span class="sds-badge sds-lens">DevOps / SRE</span></span></span></div>
+  <h1>Install the Plugins</h1>
   <p class="sds-standfirst">Putting the plugin set into a workspace from a directory or from git, the refresh that actually replaces the installed bytes, and the checks that tell you which version a session is really running.</p>
 </header>
 
@@ -28,7 +28,7 @@
 <section id="s1">
   <div class="sds-section-head"><h2>Steps</h2></div>
   <div class="sds-step">
-    <h3 id="know-which-source-you-are-installing-from">know which source you are installing from</h3>
+    <h3 id="install-source-know-which-source-you-are-installing-from">Install source — know which source you are installing from</h3>
     <p>A marketplace is either a folder on your machine or a repository you fetch, and which one you have decides almost everything that follows.</p>
     <div class="sds-scroll"><table>
       <thead><tr><th>Source</th><th>You are a</th><th>What installs</th></tr></thead>
@@ -44,7 +44,7 @@
     <pre data-lang="bash">claude plugin marketplace list</pre>
   </div>
   <div class="sds-step">
-    <h3 id="register-the-marketplace-once">register the marketplace, once</h3>
+    <h3 id="marketplace-register-the-marketplace-once">Marketplace — register the marketplace, once</h3>
     <p>A marketplace is registered before any plugin in it can be installed. <strong><code>spnutils workspace init</code> does this for you</strong> as part of minting a workspace, writing the entry into the workspace's <code>.claude/settings.local.json</code>. That is the path to prefer, because it also writes the permission tiers and the plugin union in the same pass.</p>
     <p>Registering by hand is the same act, one level lower:</p>
     <pre data-lang="bash"># from a directory on this machine
@@ -57,7 +57,7 @@ claude plugin marketplace add &lt;org&gt;/spn-claude-marketplace</pre>
     <pre data-lang="bash">claude plugin validate /opt/work/saasplane/code/spn-claude-marketplace</pre>
   </div>
   <div class="sds-step">
-    <h3 id="install-what-the-repository-declares">install what the repository declares</h3>
+    <h3 id="declared-plugins-install-what-the-repository-declares">Declared plugins — install what the repository declares</h3>
     <p><strong>Prefer the CLI command.</strong> It reads <code>sprepo.json</code>, derives which plugins that repository loads, installs them, writes the managed instruction block and the generated rules, and reinstalls any plugin that has drifted from its source:</p>
     <pre data-lang="bash">spnutils repo agent-sync          # this repository
 spnutils workspace agent-sync     # every member of the workspace, in one call</pre>
@@ -117,7 +117,7 @@ diff -rq "$LIVE/" "$REPO/packages/plugin-spn-devex/" | grep -v "__pycache__\|\.D
     <p><code>__pycache__</code>, <code>.DS_Store</code>, <code>.git</code> and <code>.in_use</code> are excluded because each exists in one copy for a reason of its own. <code>.in_use</code> is the awkward one: the CLI writes it into the installed copy, so a comparison that reads it reports drift on every single run.</p>
   </div>
   <div class="sds-step">
-    <h3 id="take-a-fresh-window">take a fresh window</h3>
+    <h3 id="fresh-window-take-a-fresh-window">Fresh window — take a fresh window</h3>
     <p>The order is load-bearing, and reversing it costs you a second reload:</p>
     <ol>
       <li>every edit you intend to make;</li>
@@ -132,4 +132,4 @@ diff -rq "$LIVE/" "$REPO/packages/plugin-spn-devex/" | grep -v "__pycache__\|\.D
 </div>
 </div>
 
-<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.js" integrity="sha384-MUUUVipJdxCmJyrxeNHKq8xMzGTvQ+TAsWDvN5w6TKPfuOUPtHk1E90wKCBZNRC7" crossorigin="anonymous"></script>
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.12.0/sds-docs.js" integrity="sha384-wCFcUN8WHuihR4yVBolwrWWQDsbdzAocPJ2ql89kWPohRUNkJI33uWvUy/t/RDQu" crossorigin="anonymous"></script>

@@ -1,22 +1,22 @@
 <meta charset="utf-8">
-<title>Plugin — spn-infra as a Delivery Unit</title>
+<title>Plugin</title>
 <!-- spn:doc
-{"id":"estate-plugin","variant":"construct","title":"Plugin — spn-infra as a Delivery Unit","subtitle":"The one folder that carries this repository's infrastructure rules into a working session.","lenses":["INFRA","ARCHITECT"],"status":"PLANNING","dependsOn":["plugin-set"],"summary":"This plugin carries this repository's estate standard — the rules for the infrastructure a product runs on — into a session that is working on one, in one folder.","keywords":["plugin","manifest","version","lockstep","description","INFRA"]}
+{"id":"estate-plugin","variant":"construct","title":"Plugin","subtitle":"The one folder that carries this repository's infrastructure rules into a working session.","lenses":["INFRA","ARCHITECT"],"status":"PLANNING","dependsOn":["plugin-set"],"summary":"This plugin carries this repository's estate standard — the rules for the infrastructure a product runs on — into a session that is working on one, in one folder.","keywords":["plugin","manifest","version","lockstep","description","INFRA"]}
 -->
 <!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
 <link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.css" integrity="sha384-EFi+bm+soztQp3Bg2oQPRtdkdyGkD/O1qSDL0QCFBIHQg2sNtFhUHlkwxArFA8dY" crossorigin="anonymous">
 <div class="sds-page">
 
 <nav class="sds-rail" id="rail">
-  <a class="sds-home" href="../infra-overview.html">&larr; spn-infra — The Estate Domain</a>
-  <div class="sds-rail-title">Plugin — spn-infra as a Delivery Unit</div>
+  <a class="sds-home" href="../infra-overview.html">&larr; spn-infra</a>
+  <div class="sds-rail-title">Plugin</div>
 </nav>
 <div class="sds-wrap">
 
 <header class="sds-masthead">
   <!-- Rendered from the spn:doc block by `docs.ts page`. Never typed: a header that disagreed with its block is what this removes. -->
-  <div class="sds-eyebrow"><span class="sds-line1">SaaS Plane &nbsp;|&nbsp; Claude Marketplace &nbsp;|&nbsp; Plugin — spn-infra as a Delivery Unit</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Construct</span><span class="sds-separator">|</span><span class="sds-label">For:</span> <span class="sds-audience"><span class="sds-badge sds-lens">DevOps / SRE</span><span class="sds-badge sds-lens">Architect</span></span><span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-planning">&#x1F52E; PLANNING</span></span></span></div>
-  <h1>Plugin — spn-infra as a Delivery Unit</h1>
+  <div class="sds-eyebrow"><span class="sds-line1">SaaS Plane &nbsp;|&nbsp; Claude Marketplace &nbsp;|&nbsp; Plugin</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Construct</span><span class="sds-separator">|</span><span class="sds-label">For:</span> <span class="sds-audience"><span class="sds-badge sds-lens">DevOps / SRE</span><span class="sds-badge sds-lens">Architect</span></span><span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-planning">&#x1F52E; PLANNING</span></span></span></div>
+  <h1>Plugin</h1>
   <p class="sds-subtitle">The one folder that carries this repository's infrastructure rules into a working session.</p>
   <p class="sds-standfirst">This plugin carries this repository's estate standard — the rules for the infrastructure a product runs on — into a session that is working on one, in one folder. Read this page to see what this plugin claims about itself and when a session loads it. It explains the manifest, the marketplace entry, and the version rule it shares with its two sibling plugins.</p>
 </header>
@@ -96,15 +96,15 @@
 <!-- 03 -->
 <section id="s3">
   <div class="sds-section-head"><h2>Parts</h2></div>
-  <h3 id="the-four-plugins-carry-one-number-and-ev">The four plugins carry one number, and every release moves all four</h3>
+  <h3 id="shared-number-the-four-plugins-carry-one">Shared number — The four plugins carry one number, and every release moves all four</h3>
   <p><strong>A reader cannot tell four version numbers apart.</strong> The plugins install as one set, by one command, and a session loads whichever of them its repository declares. Faced with four different numbers there is no way to tell from the outside whether that is four deliberate versions or one release that half-landed. So the four move together, and a plugin with nothing changed in it is released anyway at the new number. The cost is releasing an unchanged plugin, which costs nothing.</p>
-  <h3 id="the-number-names-what-is-published-not-w">The number names what is published, not what somebody is working on</h3>
+  <h3 id="published-number-the-number-names-what-i">Published number — The number names what is published, not what somebody is working on</h3>
   <p><strong>The release happens at the version the plugins already carry, and the count moves afterwards.</strong> A published version ships, and the first edit after it increments the patch — for all four, not for the one that was touched. That is what makes a stale cache findable: a cache directory is keyed by version, so a plugin edited without an increment installs over its own published bytes and nothing tells a reader which of the two is running.</p>
-  <h3 id="the-description-is-this-plugin-s-own-and">The description is this plugin's own, and it decides the load</h3>
+  <h3 id="description-the-description-is-this-plug">Description — The description is this plugin's own, and it decides the load</h3>
   <p><strong>A description is matched, not browsed.</strong> It states in full what the plugin carries — the estate skills, the cards that hold the estate's vocabulary, the per-cloud material, and the refusal a write meets — because a session compares it against the work at hand rather than reading it for pleasure. The marketplace entry carries a second description for a listing to show, and the manifest is the current one wherever the two disagree.</p>
-  <h3 id="it-loads-where-a-repository-declares-inf">It loads where a repository declares INFRA</h3>
+  <h3 id="infra-loading-it-loads-where-a-repositor">INFRA loading — It loads where a repository declares INFRA</h3>
   <p><strong>The world is read from the repository, never typed by a workspace.</strong> A repository declaring <code>INFRA</code> gets this plugin, and that covers both the estate repository and the blueprint repository beside it, because both are edited under the estate's laws. A repository declaring another world never loads it, which is why the guard can be narrow: it only ever meets files that belong to an estate.</p>
-  <h3 id="what-this-plugin-holds-and-what-it-leave">What this plugin holds, and what it leaves out</h3>
+  <h3 id="plugin-contents-what-this-plugin-holds-a">Plugin contents — What this plugin holds, and what it leaves out</h3>
   <p><code>spn-infra</code> ships <code>hooks/</code>, <code>skills/</code>, <code>scripts/</code>, <code>refs/</code>, <code>providers/</code> and <code>tests/</code>. <strong>It ships no <code>agents/</code> folder, and the absence is the statement</strong>: an agent brief convenes a reviewer over a change, and the estate's own review happens against a rendering through the tool's doors rather than against a diff. Each of the folders it does ship is named by its own page here.</p>
 </section>
 

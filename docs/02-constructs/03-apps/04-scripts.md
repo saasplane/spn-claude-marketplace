@@ -2,7 +2,7 @@
 {
   "id": "stack-checks",
   "variant": "construct",
-  "title": "Scripts — The Code This Plugin Runs",
+  "title": "Scripts",
   "subtitle": "Every file this plugin runs, sorted by what calls it and what stack it serves.",
   "lenses": ["SERVER_DEV", "WEB_DEV"],
   "status": "PLANNING",
@@ -12,7 +12,7 @@
 }
 -->
 
-# Scripts — The Code This Plugin Runs
+# Scripts
 
 `For: Backend developer · Web developer` · `Status: 🔮 PLANNING`
 
@@ -62,55 +62,80 @@ The folder has two halves that never meet. One is reached by the wiring and answ
 
 ## Parts
 
-### The gate names no stack, and that is what it is for
+### Stackless gate — The gate names no stack, and that is what it is for
 
 The file that names the subjects reads the stack from the nearest `sprepo.json` and imports the provider's own half by a path composed from that declaration. The import is composed rather than written, because a written one would be this file naming a stack — the one thing it may not do. A second stack joins by adding a folder and nothing here changes.
 
-### A repository the plugin has no provider for is left alone
+### Unprovided repository — A repository the plugin has no provider for is left alone
 
 A gate that refused what it cannot classify would refuse far more than it was asked to, and a stub that answered would teach a reader the realization works. So a declaration this plugin ships no folder for resolves to no subject, silently.
 
-### The subjects are ordered by what they cost
+### Subject order — The subjects are ordered by what they cost
 
 A subject that reads one file is asked before a subject that walks a tree, and a refusal above stops the walk below. Which rules apply is decided by the path and the node's kind rather than by the subject's name.
 
-### One process behind the entry
+### One process — One process behind the entry
 
 The wiring declares one entry and this file runs everything behind it, keeping the first refusal and joining the advice. Separate entries are separate interpreter start-ups whatever language the scripts are written in, and on one measured edit the start-ups cost more than ten times the checking itself.
 
-### The payload shape is copied, never imported
+### Payload shape — The payload shape is copied, never imported
 
 A plugin never depends on another plugin's internals. The two install separately and version separately, and a partner may hold one without the other on disk at all, so an import across them would work in this checkout and break in every install. This plugin keeps its own copy, named exactly as the core plugin names the same job, so learning one teaches you both.
 
-### A source file is read with the write already applied
+### Applied writes — A source file is read with the write already applied
 
 Reading what is on disk reports faults somebody else wrote and misses the one arriving now. So comments and string bodies are masked, the caller's pending text is laid over the file, and every rule reads that. The reading is shared rather than private to one rule, and it happens once per write rather than once per rule.
 
-### The stamp is computed here, and must agree with the other copy byte for byte
+### Stamp — The stamp is computed here, and must agree with the other copy byte for byte
 
 The hash behind a restatement's `seen` value is spelled once per plugin, because a plugin is installed alone and cannot read another plugin's files. Two plugins computing it differently would report drift against each other for files that agree, and a finding that is wrong teaches people to stop reading the run. A case in this plugin's own suite hashes a fixture with both copies and fails if they differ.
 
-### A register is found by its header, never by a path
+### Register header — A register is found by its header, never by a path
 
 A documents tree that moves must break no tool, and reading the header is the only way to be right in the layout a repository has today and in the one that follows it. So any table whose headings are the behaviour headings is a register. The headings and the row test are one exported pair read by every tool that touches a register, because two tools parsing a table differently means one writes rows the other cannot see.
 
-### Two cells are the run's and the rest are a person's
+### Run cells — Two cells are the run's and the rest are a person's
 
 The kind of behaviour and the tier that proves it are decisions somebody made. The status and the moment it was found are what the last run saw. The two were one cell until they disagreed quietly, and a row whose case had stopped running still read as proven. The writer touches those two and copies every other cell through untouched.
 
-### A run speaks only for the tiers it ran
+### Tiers run — A run speaks only for the tiers it ran
 
 A partial run that reset a whole register would make every status swing on every run, and nobody could read a red as new. So a run updates the rows declaring a tier it covered and leaves the rest exactly as it found them. That is why the tier is a person's cell to declare: it is what a run matches itself against, and a hand-checked row is never written over.
 
-### It reads the run's own artifact, never a specification
+### Run artifact — It reads the run's own artifact, never a specification
 
 A status derived from a specification reports a case that exists as a case that ran. Crossing a route with a surface, or scanning a source tree for case titles, cannot see a case that was skipped or filtered out. So the writer reads the file the runner produced, and a row whose case never reached the runner says so.
 
-### A row's gap is closed by the chain, not by a tool
+The figure follows one row of a register through the three sections above, from the run's start to what the writer leaves on it.
+
+```dg
+{ "kind": "flowchart",
+  "caption": "The writer changes a row only at the last step. At every earlier question the run cannot speak for the row, so the row is left exactly as it was.",
+  "boxes": [
+    { "id": "row", "label": "A row in a register", "shape": "terminator" },
+    { "id": "hand", "label": "Is it hand-checked?", "note": "MANUAL", "shape": "decision" },
+    { "id": "tier", "label": "Did the run cover its tier?", "shape": "decision" },
+    { "id": "left", "label": "Left as it was", "shape": "terminator" },
+    { "id": "reached", "label": "Did a case reach the runner with its id?", "shape": "decision" },
+    { "id": "says", "label": "The row says so", "note": "no case ran for it", "shape": "terminator" },
+    { "id": "write", "label": "Write the two run cells", "note": "status, and the moment it was found", "shape": "terminator" }
+  ],
+  "links": [
+    { "from": "row", "to": "hand" },
+    { "from": "hand", "to": "left", "label": "yes" },
+    { "from": "hand", "to": "tier", "label": "no" },
+    { "from": "tier", "to": "left", "label": "no" },
+    { "from": "tier", "to": "reached", "label": "yes" },
+    { "from": "reached", "to": "says", "label": "no" },
+    { "from": "reached", "to": "write", "label": "yes" }
+  ] }
+```
+
+### Row gaps — A row's gap is closed by the chain, not by a tool
 
 A behaviour enters the product through its row: the row is written first, a case cites it, and the run's artifact stamps it. So no tool here compares what a service publishes against the rows. Every stack declares its actions its own way, and a comparison per stack is not worth a permanent check; code written outside the chain is answered in review.
 
-### A generator writes a list nobody could keep by hand
+### Generators — A generator writes a list nobody could keep by hand
 
 A published set moves every release, so a hand-written list of it is stale the day after it is written and nothing reports that. One tool reads what the support repository publishes and writes the table, under a citation naming the command that produced it — so re-running the command is how a reader checks it. What it leaves out is the point: a package a partner cannot depend on is not something to list.
 

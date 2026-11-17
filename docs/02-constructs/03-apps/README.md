@@ -1,14 +1,14 @@
 <!-- spn:doc
 {
   "id": "spn-claude-marketplace-constructs-spn-apps",
-  "title": "spn-apps — The TypeScript Stack Domain",
+  "title": "spn-apps",
   "lenses": ["SERVER_DEV", "WEB_DEV"],
   "status": "PLANNING",
   "summary": "The model behind the apps world made concrete for TypeScript — the write-time rules only this stack has, the tools that read its own registers, the skills that build in it, and the planning layer it ships for a skill it does not own."
 }
 -->
 
-# spn-apps — The TypeScript Stack Domain
+# spn-apps
 
 `For: Backend developer · Web developer` · `Status: 🔮 PLANNING`
 

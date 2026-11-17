@@ -1,22 +1,22 @@
 <meta charset="utf-8">
-<title>Providers — How a Plugin Is Extended Per Instance</title>
+<title>Providers</title>
 <!-- spn:doc
-{"id":"provider-set","variant":"construct","title":"Providers — How a Plugin Is Extended Per Instance","subtitle":"Everything that changes with a stack or a cloud lives in one folder, and nowhere else.","lenses":["ARCHITECT","LEAD"],"status":"PLANNING","dependsOn":["plugin-set","skill-set","ref-set","checks"],"summary":"A provider is one folder per instance — one stack, or one cloud — holding everything about that instance that varies, inside a plugin that otherwise stays the same for every one of them.","keywords":["provider","instance","stack","cloud","gate","plugin","extension"]}
+{"id":"provider-set","variant":"construct","title":"Providers","subtitle":"Everything that changes with a stack or a cloud lives in one folder, and nowhere else.","lenses":["ARCHITECT","LEAD"],"status":"PLANNING","dependsOn":["plugin-set","skill-set","ref-set","checks"],"summary":"A provider is one folder per instance — one stack, or one cloud — holding everything about that instance that varies, inside a plugin that otherwise stays the same for every one of them.","keywords":["provider","instance","stack","cloud","gate","plugin","extension"]}
 -->
 <!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
 <link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.css" integrity="sha384-EFi+bm+soztQp3Bg2oQPRtdkdyGkD/O1qSDL0QCFBIHQg2sNtFhUHlkwxArFA8dY" crossorigin="anonymous">
 <div class="sds-page">
 
 <nav class="sds-rail" id="rail">
-  <a class="sds-home" href="../devex-overview.html">&larr; spn-devex — The Stack-Agnostic Domain</a>
-  <div class="sds-rail-title">Providers — How a Plugin Is Extended Per Instance</div>
+  <a class="sds-home" href="../devex-overview.html">&larr; spn-devex</a>
+  <div class="sds-rail-title">Providers</div>
 </nav>
 <div class="sds-wrap">
 
 <header class="sds-masthead">
   <!-- Rendered from the spn:doc block by `docs.ts page`. Never typed: a header that disagreed with its block is what this removes. -->
-  <div class="sds-eyebrow"><span class="sds-line1">SaaS Plane &nbsp;|&nbsp; Claude Marketplace &nbsp;|&nbsp; Providers — How a Plugin Is Extended Per Instance</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Construct</span><span class="sds-separator">|</span><span class="sds-label">For:</span> <span class="sds-audience"><span class="sds-badge sds-lens">Architect</span><span class="sds-badge sds-lens">Engineering leader</span></span><span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-planning">&#x1F52E; PLANNING</span></span></span></div>
-  <h1>Providers — How a Plugin Is Extended Per Instance</h1>
+  <div class="sds-eyebrow"><span class="sds-line1">SaaS Plane &nbsp;|&nbsp; Claude Marketplace &nbsp;|&nbsp; Providers</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Construct</span><span class="sds-separator">|</span><span class="sds-label">For:</span> <span class="sds-audience"><span class="sds-badge sds-lens">Architect</span><span class="sds-badge sds-lens">Engineering leader</span></span><span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-planning">&#x1F52E; PLANNING</span></span></span></div>
+  <h1>Providers</h1>
   <p class="sds-subtitle">Everything that changes with a stack or a cloud lives in one folder, and nowhere else.</p>
   <p class="sds-standfirst">A provider is one folder per instance — one stack, or one cloud — holding everything about that instance that varies, inside a plugin that otherwise stays the same for every one of them. Read this page before you add a new stack or a new cloud, or when you are deciding where a piece of stack-specific knowledge belongs. It explains the two halves a provider can contribute, and where the line sits between what a provider states and what it does.</p>
 </header>
@@ -98,15 +98,15 @@
 <!-- 03 -->
 <section id="s3">
   <div class="sds-section-head"><h2>Parts</h2></div>
-  <h3 id="a-gate-never-names-an-instance">A gate never names an instance</h3>
+  <h3 id="instance-names-a-gate-never-names-an-ins">Instance names — A gate never names an instance</h3>
   <p>The instance is read from the nearest <code>sprepo.json</code>, never typed on a command and never guessed from a file extension. A gate that could name an instance is a gate somebody edits to add the next one, and the edit is the thing this construct exists to remove.</p>
-  <h3 id="the-two-halves-and-what-each-holds">The two halves, and what each holds</h3>
+  <h3 id="two-halves-the-two-halves-and-what-each-">Two halves — The two halves, and what each holds</h3>
   <p>The skills half holds a <strong>procedure</strong> — what to do, in order, when working in this instance. The scripts half holds a <strong>parse and its rules</strong> — what this instance's text looks like and what is true of it. A rule is an implementation detail of the check that runs it and lives beside it, not in a shared registry above it.</p>
-  <h3 id="a-private-rule-sits-behind-an-underscore">A private rule sits behind an underscore</h3>
+  <h3 id="private-rules-a-private-rule-sits-behind">Private rules — A private rule sits behind an underscore</h3>
   <p>Where a subject's gate is one door and several rules stand behind it, the rules go under a folder whose name opens with an underscore and the door stays the only file at the top. A reader listing the folder then sees the subjects a gate dispatches over, and nothing that is only reachable through one of them.</p>
-  <h3 id="a-skills-half-is-earned-by-changing-the-">A skills half is earned by changing the authoring stack</h3>
+  <h3 id="skills-half-a-skills-half-is-earned-by-c">Skills half — A skills half is earned by changing the authoring stack</h3>
   <p>The test is not whether an instance has a procedure yet; it is whether the instance <strong>changes the language the work is written in</strong>. Where the instance <em>is</em> the stack, it always does. Where the instance is a cloud and every rendering is written in the same engine against the same declaration, it never does — and that provider carries a scripts half alone. The asymmetry is a fact about the two domains rather than a gap in one of them.</p>
-  <h3 id="a-shared-rule-body-is-a-factory-not-a-ru">A shared rule body is a factory, not a rule</h3>
+  <h3 id="rule-factory-a-shared-rule-body-is-a-fac">Rule factory — A shared rule body is a factory, not a rule</h3>
   <p>Where two instances genuinely need one rule, what they share is a function parameterized by each instance's own values, and it lives with the plugin's other shared code. It is not a rule folder: the moment a rule folder exists, rules drift into it that only one instance ever needed.</p>
   <h3 id="adding-an-instance">Adding an instance</h3>
   <p>Add <code>providers/&lt;instance&gt;/</code>, with a <code>skills/</code> half for what a skill loads and a <code>scripts/</code> half for what a gate runs, mirroring the folders those gates already have. No gate changes, and a listing of the folder is the coverage.</p>

@@ -1,22 +1,22 @@
 <meta charset="utf-8">
-<title>Hooks — One Moment, For the Connector's Script</title>
+<title>Hooks</title>
 <!-- spn:doc
-{"id":"surface-hooks","variant":"construct","title":"Hooks — One Moment, For the Connector's Script","subtitle":"One moment wired, because the one rule here is about a script about to run.","lenses":["ARCHITECT","UX"],"status":"PLANNING","dependsOn":["surface-plugin","hook-set"],"summary":"This plugin wires exactly one moment of a session, the point where the Figma connector is about to run a script, and one tool, because its one rule is about what that script says.","keywords":["hook","hooks.json","PreToolUse","matcher","entry","connector"]}
+{"id":"surface-hooks","variant":"construct","title":"Hooks","subtitle":"One moment wired, because the one rule here is about a script about to run.","lenses":["ARCHITECT","UX"],"status":"PLANNING","dependsOn":["surface-plugin","hook-set"],"summary":"This plugin wires exactly one moment of a session, the point where the Figma connector is about to run a script, and one tool, because its one rule is about what that script says.","keywords":["hook","hooks.json","PreToolUse","matcher","entry","connector"]}
 -->
 <!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
 <link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.css" integrity="sha384-EFi+bm+soztQp3Bg2oQPRtdkdyGkD/O1qSDL0QCFBIHQg2sNtFhUHlkwxArFA8dY" crossorigin="anonymous">
 <div class="sds-page">
 
 <nav class="sds-rail" id="rail">
-  <a class="sds-home" href="../surface-overview.html">&larr; spn-surface — The Surface Domain</a>
-  <div class="sds-rail-title">Hooks — One Moment, For the Connector's Script</div>
+  <a class="sds-home" href="../surface-overview.html">&larr; spn-surface</a>
+  <div class="sds-rail-title">Hooks</div>
 </nav>
 <div class="sds-wrap">
 
 <header class="sds-masthead">
   <!-- Rendered from the spn:doc block by `docs.ts page`. Never typed: a header that disagreed with its block is what this removes. -->
-  <div class="sds-eyebrow"><span class="sds-line1">SaaS Plane &nbsp;|&nbsp; Claude Marketplace &nbsp;|&nbsp; Hooks — One Moment, For the Connector's Script</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Construct</span><span class="sds-separator">|</span><span class="sds-label">For:</span> <span class="sds-audience"><span class="sds-badge sds-lens">Architect</span><span class="sds-badge sds-lens">UX designer</span></span><span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-planning">&#x1F52E; PLANNING</span></span></span></div>
-  <h1>Hooks — One Moment, For the Connector's Script</h1>
+  <div class="sds-eyebrow"><span class="sds-line1">SaaS Plane &nbsp;|&nbsp; Claude Marketplace &nbsp;|&nbsp; Hooks</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Construct</span><span class="sds-separator">|</span><span class="sds-label">For:</span> <span class="sds-audience"><span class="sds-badge sds-lens">Architect</span><span class="sds-badge sds-lens">UX designer</span></span><span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-planning">&#x1F52E; PLANNING</span></span></span></div>
+  <h1>Hooks</h1>
   <p class="sds-subtitle">One moment wired, because the one rule here is about a script about to run.</p>
   <p class="sds-standfirst">This plugin wires exactly one moment of a session, the point where the Figma connector is about to run a script, and one tool, because its one rule is about what that script says. Read this page to see why one moment and one tool are enough here, and what the entry does with a call. It explains the single wired entry and its dispatcher.</p>
 </header>
@@ -95,15 +95,15 @@
 <!-- 03 -->
 <section id="s3">
   <div class="sds-section-head"><h2>Parts</h2></div>
-  <h3 id="one-moment-and-why-the-others-are-not-cl">One moment, and why the others are not claimed</h3>
+  <h3 id="one-moment-one-moment-and-why-the-others">One moment — One moment, and why the others are not claimed</h3>
   <p>The moment a call is about to run is the only one that can still stop it, and a rule about a script's text has nothing to say at any other. A moment claimed for the sake of symmetry is an interpreter start-up on every call in a session, paid for an answer nobody asked for.</p>
-  <h3 id="the-matcher-is-the-first-and-cheapest-fi">The matcher is the first and cheapest filter</h3>
+  <h3 id="matcher-the-matcher-is-the-first-and-che">Matcher — The matcher is the first and cheapest filter</h3>
   <p>The entry narrows to the connector's script runner. Every other call a session makes never reaches this plugin at all, which is a filter the harness applies before any process of this plugin's starts.</p>
-  <h3 id="the-check-refuses-only-what-the-text-sho">The check refuses only what the text shows</h3>
+  <h3 id="text-refusal-the-check-refuses-only-what">Text refusal — The check refuses only what the text shows</h3>
   <p>The connector check blanks comment and string bodies, then refuses a script that calls an API the connector does not support or one that throws there. It notes, and lets the call go, what the text cannot settle: a second page switch, and a call that passes no <code>skillNames</code>. It reads no file, calls no network and runs no command.</p>
-  <h3 id="a-check-that-throws-is-skipped-never-fat">A check that throws is skipped, never fatal</h3>
+  <h3 id="throwing-checks-a-check-that-throws-is-s">Throwing checks — A check that throws is skipped, never fatal</h3>
   <p>A gate that crashes the chain removes every other gate with it, which is worse than any single miss. The dispatcher treats a check that throws as silence.</p>
-  <h3 id="the-wiring-names-the-plugin-root-never-a">The wiring names the plugin root, never a checkout</h3>
+  <h3 id="plugin-root-the-wiring-names-the-plugin-">Plugin root — The wiring names the plugin root, never a checkout</h3>
   <p>The command is written against the installed folder rather than against a path in this repository, so the entry works wherever the plugin was installed.</p>
 </section>
 

@@ -2,7 +2,7 @@
 {
   "id": "surface-tests",
   "variant": "construct",
-  "title": "Tests — The Plugin's Own Folders, Without a Framework",
+  "title": "Tests",
   "subtitle": "How this plugin proves the check and the scripts it ships.",
   "lenses": ["QA", "WEB_DEV"],
   "status": "PLANNING",
@@ -12,7 +12,7 @@
 }
 -->
 
-# Tests — The Plugin's Own Folders, Without a Framework
+# Tests
 
 `For: Quality engineer · Web developer` · `Status: 🔮 PLANNING`
 
@@ -56,19 +56,19 @@ The runner walks the tier, runs each suite in its own process, and reads the exi
 
 ## Parts
 
-### The mirror puts a test where its source is
+### Mirror — The mirror puts a test where its source is
 
 A test for `scripts/checks/figma-connector.ts` sits at `tests/unit/scripts/checks/t-figma-connector.mjs`. Moving a source file moves its test with it.
 
-### A suite is proven against the bundle as well as the source
+### Bundle proof — A suite is proven against the bundle as well as the source
 
 The bundle-parity suite runs the committed bundle and the source over the same recorded calls and requires the same answer, and the staleness suite refuses a bundle older than its sources, so a hook never runs a rule nobody wrote.
 
-### The launcher and the tiers file are held to the code
+### Launcher and tiers — The launcher and the tiers file are held to the code
 
 The launcher answers as the entry does from any folder, and the tiers file names exactly the groups the plugin ships.
 
-### The runner judges on an exit code
+### Exit code — The runner judges on an exit code
 
 A suite that prints a passing line and exits non-zero is red, and one that passes in different words is green. The runner never reads text to decide.
 

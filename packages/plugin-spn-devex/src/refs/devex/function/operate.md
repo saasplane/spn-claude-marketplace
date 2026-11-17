@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/08-operate.md",
-      "seen": "f2e63b1d"
+      "seen": "ae9c194e"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/01-function/08-operate.md",

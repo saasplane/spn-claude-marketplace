@@ -2,7 +2,7 @@
 {
   "id": "stack-refs",
   "variant": "construct",
-  "title": "Refs — The Book, Restated Inside the Plugin",
+  "title": "Refs",
   "subtitle": "The foundation book's rules, carried inside this plugin for a reader with no other copy.",
   "lenses": ["SERVER_DEV", "ARCHITECT"],
   "status": "PLANNING",
@@ -12,7 +12,7 @@
 }
 -->
 
-# Refs — The Book, Restated Inside the Plugin
+# Refs
 
 `For: Backend developer · Architect` · `Status: 🔮 PLANNING`
 
@@ -58,35 +58,35 @@ The book is the source. A ref is the copy that travels with the plugin, arranged
 
 ## Parts
 
-### The tree holds domain folders and nothing else
+### Domain folders — The tree holds domain folders and nothing else
 
 The top of this folder is one folder per book domain. A folder under a domain is a group, a file under a group is named for a construct the book states, and a construct needing more than one file becomes a folder named for it. Nothing else is allowed a place, which is what keeps the arrangement readable without a map.
 
-### A folder's face is that folder's own subject
+### Folder face — A folder's face is that folder's own subject
 
 Every folder carries a face, and the face is about the folder rather than a listing of what is inside it. A folder whose face is an index is a folder nobody can tell the subject of.
 
-### What this plugin restates, and in which domains
+### Restated domains — What this plugin restates, and in which domains
 
 One domain carries what a node is and everything it is built from — its shape, its packages, its modules, its resources, its apps, its tests, its comments, its agent surface and what it ships. A second carries the platform a partner adopts rather than rebuilds: tenancy, identity, surfaces, data and trust, lifecycle. A third carries one entry per module that ships, so the folder listing is the list.
 
-### A stack sits inside the domain, not beside it
+### Stack placement — A stack sits inside the domain, not beside it
 
 This plugin is the apps domain, and a stack is a realization of that domain rather than a domain of its own. So the stack entries sit under the domain folder, one folder per stack, and every stack answers the same questions under the same file names — which makes the folder listing the coverage. A stack with no capability for one of those questions writes the file anyway and says what to do instead.
 
-### A ref states what is true; it never says what to do
+### Ref statements — A ref states what is true; it never says what to do
 
 The stack entries say what a kind is, how a name is formed, what generation produces, which tiers a node owes and what conformance means. The procedure a skill walks in that stack is not here, because a ref restates a construct and a procedure restates none.
 
-### A leaf is self-contained, because the reader has no book
+### Self-contained leaf — A leaf is self-contained, because the reader has no book
 
 A ref does not link into the foundation and expect a reader to follow it. Everything it restates is written out, under a stamp naming the version it was read at. That is the cost of being installable alone, and it is paid deliberately.
 
-### One file is written by a command, and says so
+### Written file — One file is written by a command, and says so
 
 The list of published packages a node may depend on moves every release, so a hand-written one is stale the day after it is written and nothing reports it. That file carries a citation naming the command that produced it, and re-running the command is how a reader checks it. There is no construct per package, so nothing in the book lists them and a hand-written list would be wrong at the next release.
 
-### The module list is not generated, because the folder is the list
+### Module list — The module list is not generated, because the folder is the list
 
 One entry per module that ships means the listing already answers *which modules are there*. A generator over it would produce a second answer able to disagree with the first.
 

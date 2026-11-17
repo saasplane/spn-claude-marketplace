@@ -1,22 +1,22 @@
 <meta charset="utf-8">
-<title>Refs — The Surface Book, Restated Inside the Plugin</title>
+<title>Refs</title>
 <!-- spn:doc
-{"id":"surface-refs","variant":"construct","title":"Refs — The Surface Book, Restated Inside the Plugin","subtitle":"The foundation book's Surface rules, carried inside this plugin for a reader with no other copy.","lenses":["UX","ARCHITECT"],"status":"PLANNING","dependsOn":["ref-set"],"summary":"Refs carries, inside this plugin, the Surface rules a partner needs but has no checkout to read: the standards, the patterns, the architecture of the design system, its library and its delivery, and the specs a page starts from.","keywords":["ref","restatement","surface","stamp","patterns","specs"]}
+{"id":"surface-refs","variant":"construct","title":"Refs","subtitle":"The foundation book's Surface rules, carried inside this plugin for a reader with no other copy.","lenses":["UX","ARCHITECT"],"status":"PLANNING","dependsOn":["ref-set"],"summary":"Refs carries, inside this plugin, the Surface rules a partner needs but has no checkout to read: the standards, the patterns, the architecture of the design system, its library and its delivery, and the specs a page starts from.","keywords":["ref","restatement","surface","stamp","patterns","specs"]}
 -->
 <!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
 <link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.css" integrity="sha384-EFi+bm+soztQp3Bg2oQPRtdkdyGkD/O1qSDL0QCFBIHQg2sNtFhUHlkwxArFA8dY" crossorigin="anonymous">
 <div class="sds-page">
 
 <nav class="sds-rail" id="rail">
-  <a class="sds-home" href="../surface-overview.html">&larr; spn-surface — The Surface Domain</a>
-  <div class="sds-rail-title">Refs — The Surface Book, Restated Inside the Plugin</div>
+  <a class="sds-home" href="../surface-overview.html">&larr; spn-surface</a>
+  <div class="sds-rail-title">Refs</div>
 </nav>
 <div class="sds-wrap">
 
 <header class="sds-masthead">
   <!-- Rendered from the spn:doc block by `docs.ts page`. Never typed: a header that disagreed with its block is what this removes. -->
-  <div class="sds-eyebrow"><span class="sds-line1">SaaS Plane &nbsp;|&nbsp; Claude Marketplace &nbsp;|&nbsp; Refs — The Surface Book, Restated Inside the Plugin</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Construct</span><span class="sds-separator">|</span><span class="sds-label">For:</span> <span class="sds-audience"><span class="sds-badge sds-lens">UX designer</span><span class="sds-badge sds-lens">Architect</span></span><span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-planning">&#x1F52E; PLANNING</span></span></span></div>
-  <h1>Refs — The Surface Book, Restated Inside the Plugin</h1>
+  <div class="sds-eyebrow"><span class="sds-line1">SaaS Plane &nbsp;|&nbsp; Claude Marketplace &nbsp;|&nbsp; Refs</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Construct</span><span class="sds-separator">|</span><span class="sds-label">For:</span> <span class="sds-audience"><span class="sds-badge sds-lens">UX designer</span><span class="sds-badge sds-lens">Architect</span></span><span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-planning">&#x1F52E; PLANNING</span></span></span></div>
+  <h1>Refs</h1>
   <p class="sds-subtitle">The foundation book's Surface rules, carried inside this plugin for a reader with no other copy.</p>
   <p class="sds-standfirst">Refs carries, inside this plugin, the Surface rules a partner needs but has no checkout to read. Read this page to see what the folder holds, how it is arranged, and how a copy that has fallen behind the book is reported. It explains the folder and leaves each rule to the ref that states it.</p>
 </header>
@@ -97,15 +97,15 @@
 <!-- 03 -->
 <section id="s3">
   <div class="sds-section-head"><h2>Parts</h2></div>
-  <h3 id="one-folder-holds-the-whole-domain-one-fi">One folder holds the whole domain, one file to a construct</h3>
+  <h3 id="domain-folder-one-folder-holds-the-whole">Domain folder — One folder holds the whole domain, one file to a construct</h3>
   <p><code>refs/support/surface/</code> holds the standards of content and interaction, the patterns, the architecture of the design system with its names, layouts and widgets, the providers a design system needs, and the library and showcase deliveries. The path is the one the book's domain has, so a reader who knows the book finds the ref.</p>
-  <h3 id="the-specs-are-copies-owned-by-the-book">The specs are copies, owned by the book</h3>
+  <h3 id="spec-copies-the-specs-are-copies-owned-b">Spec copies — The specs are copies, owned by the book</h3>
   <p>The app patterns and the site patterns each have a folder of skeleton specs. They are byte-identical to the book's, an index in each folder lists them with the hash of their contents, and <code>restates files</code> writes and checks them. A builder changes a spec in the book, and the export carries it.</p>
-  <h3 id="the-construct-snapshot-sits-beside-the-r">The CONSTRUCT snapshot sits beside the refs</h3>
+  <h3 id="construct-snapshot-the-construct-snapsho">Construct snapshot — The CONSTRUCT snapshot sits beside the refs</h3>
   <p><code>refs/support/surface/construct.snapshot.json</code> is the CONSTRUCT snapshot, written from the book alone with <code>spnutils apps surface construct --out</code> for each release of the plugin. It holds every unit's props, its usage, its cases, the index by value of each choice table and the units their place sizes, and its <code>source.readFrom</code> names the book's release it was written from. It is the one snapshot a repository holds, because it carries nothing of a machine. <code>unit show</code> reads it, with the restated tables beside it, and reads nothing else outside the plugin but the symbol index of the repository it runs in, or, from a workspace's root, of each repository in it, for a unit the snapshot does not hold.</p>
-  <h3 id="the-stack-specific-half-is-the-apps-plug">The stack-specific half is the apps plugin's</h3>
+  <h3 id="stack-half-the-stack-specific-half-is-th">Stack half — The stack-specific half is the apps plugin's</h3>
   <p>How a block is built in TypeScript, and the layout of a web module, belong to the stack, so those refs sit in the apps plugin and a ref here points at them by name rather than by link.</p>
-  <h3 id="a-ref-that-fell-behind-says-so">A ref that fell behind says so</h3>
+  <h3 id="stale-refs-a-ref-that-fell-behind-says-s">Stale refs — A ref that fell behind says so</h3>
   <p>Every ref carries the chapters it restates and the hash last read from each. A drift run compares them and reports a ref whose chapter has moved.</p>
 </section>
 

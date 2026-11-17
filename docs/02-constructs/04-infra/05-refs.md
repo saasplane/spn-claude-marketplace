@@ -2,7 +2,7 @@
 {
   "id": "estate-refs",
   "variant": "construct",
-  "title": "Refs — This Domain's Vocabulary, Restated as Cards",
+  "title": "Refs",
   "subtitle": "This domain's own words, explained for a reader who has never opened the book.",
   "lenses": ["INFRA", "ARCHITECT"],
   "status": "PLANNING",
@@ -12,7 +12,7 @@
 }
 -->
 
-# Refs — This Domain's Vocabulary, Restated as Cards
+# Refs
 
 `For: DevOps / SRE · Architect` · `Status: 🔮 PLANNING`
 
@@ -62,27 +62,27 @@ A card sits between the book and the moment somebody needs a word, and it is rea
 
 ## Parts
 
-### The laws card is written to be read first
+### Laws card — The laws card is written to be read first
 
 A law is useful at the moment somebody is about to break it. A list of principles read afterwards explains a mistake rather than preventing one. So the laws card asks a reader to look for the checkable defect each law names and to raise it before doing anything else, and each law is numbered and states its own defect. The refusal messages a write meets point back at this card, so a denial and its reasoning are one hop apart.
 
-### A node is found by its manifest, never by its folder name
+### Node lookup — A node is found by its manifest, never by its folder name
 
 The folder name is checked against the manifest rather than trusted as one. Inferring a node's kind from where it sits is how a package comes to be treated as something it is not. The card states which files every estate node carries and which of them answers which question, and the path locator in the same card is what resolves a node from where you are standing.
 
-### The layers are read in order, and the order explains most failures
+### Layer order — The layers are read in order, and the order explains most failures
 
 A lower layer that is missing is the usual reason a higher one will not start, and that is a diagnosis rather than a rule. The card lists the layer nouns, gives each of them the same commands, and states the order they come up in. It names the tool's command realizing each act, so the card can be read beside a command that is already running.
 
-### A name that cannot be composed from coordinates is a defect
+### Composed names — A name that cannot be composed from coordinates is a defect
 
 A name derived from a label carries a meaning nobody can read back. The posture of an environment comes from the value it declares, never from a word inside its setup name. So the naming card gives the grammar and the closed vocabulary each part is drawn from, and states plainly that a provider's own region is a mapping on a cloud entry rather than a coordinate of the name.
 
-### Each cloud's vocabulary is a fact, so it is restated rather than executed
+### Cloud vocabulary — Each cloud's vocabulary is a fact, so it is restated rather than executed
 
 What differs between clouds is what they call things — how a region is spelled, what an account is named, which service realizes a store. That is a fact about a cloud rather than a procedure, so it sits here, one numbered entry per subject under a card of its own, and both a reader and a skill find it in the same place. A cloud the plugin ships no validator for still has its entries here, because the words are true whether or not anything checks them.
 
-### Every example uses one invented platform
+### Invented platform — Every example uses one invented platform
 
 A real coordinate in an example is a real coordinate published in a public repository. So the examples across all of these cards use one sample platform, and the sample exists for no other purpose.
 

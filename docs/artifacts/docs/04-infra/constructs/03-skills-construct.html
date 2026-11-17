@@ -1,22 +1,22 @@
 <meta charset="utf-8">
-<title>Skills — The Doors Infrastructure Is Changed Through</title>
+<title>Skills</title>
 <!-- spn:doc
-{"id":"estate-skills","variant":"construct","title":"Skills — The Doors Infrastructure Is Changed Through","subtitle":"The commands that change what a piece of infrastructure declares itself to be.","lenses":["INFRA","ARCHITECT"],"status":"PLANNING","dependsOn":["skill-set"],"summary":"The skills here are how an estate — the infrastructure a product runs on — gets changed: by editing what it declares itself to be, then letting a tool render and apply that declaration.","keywords":["skill","declare","plan","module","release","door"]}
+{"id":"estate-skills","variant":"construct","title":"Skills","subtitle":"The commands that change what a piece of infrastructure declares itself to be.","lenses":["INFRA","ARCHITECT"],"status":"PLANNING","dependsOn":["skill-set"],"summary":"The skills here are how an estate — the infrastructure a product runs on — gets changed: by editing what it declares itself to be, then letting a tool render and apply that declaration.","keywords":["skill","declare","plan","module","release","door"]}
 -->
 <!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
 <link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.css" integrity="sha384-EFi+bm+soztQp3Bg2oQPRtdkdyGkD/O1qSDL0QCFBIHQg2sNtFhUHlkwxArFA8dY" crossorigin="anonymous">
 <div class="sds-page">
 
 <nav class="sds-rail" id="rail">
-  <a class="sds-home" href="../infra-overview.html">&larr; spn-infra — The Estate Domain</a>
-  <div class="sds-rail-title">Skills — The Doors Infrastructure Is Changed Through</div>
+  <a class="sds-home" href="../infra-overview.html">&larr; spn-infra</a>
+  <div class="sds-rail-title">Skills</div>
 </nav>
 <div class="sds-wrap">
 
 <header class="sds-masthead">
   <!-- Rendered from the spn:doc block by `docs.ts page`. Never typed: a header that disagreed with its block is what this removes. -->
-  <div class="sds-eyebrow"><span class="sds-line1">SaaS Plane &nbsp;|&nbsp; Claude Marketplace &nbsp;|&nbsp; Skills — The Doors Infrastructure Is Changed Through</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Construct</span><span class="sds-separator">|</span><span class="sds-label">For:</span> <span class="sds-audience"><span class="sds-badge sds-lens">DevOps / SRE</span><span class="sds-badge sds-lens">Architect</span></span><span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-planning">&#x1F52E; PLANNING</span></span></span></div>
-  <h1>Skills — The Doors Infrastructure Is Changed Through</h1>
+  <div class="sds-eyebrow"><span class="sds-line1">SaaS Plane &nbsp;|&nbsp; Claude Marketplace &nbsp;|&nbsp; Skills</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Construct</span><span class="sds-separator">|</span><span class="sds-label">For:</span> <span class="sds-audience"><span class="sds-badge sds-lens">DevOps / SRE</span><span class="sds-badge sds-lens">Architect</span></span><span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-planning">&#x1F52E; PLANNING</span></span></span></div>
+  <h1>Skills</h1>
   <p class="sds-subtitle">The commands that change what a piece of infrastructure declares itself to be.</p>
   <p class="sds-standfirst">The skills here are how an estate — the infrastructure a product runs on — gets changed: by editing what it declares itself to be, then letting a tool render and apply that declaration. Read this page before you make a change, or when you want to know which skill covers which step. It covers saying what the estate is, reading a rendering before anyone approves it, writing a new piece for it to run, and publishing a finished piece.</p>
 </header>
@@ -97,17 +97,17 @@
 <!-- 03 -->
 <section id="s3">
   <div class="sds-section-head"><h2>Parts</h2></div>
-  <h3 id="declaring-is-a-manifest-edit-reviewed-li">Declaring is a manifest edit, reviewed line by line</h3>
+  <h3 id="declaring-declaring-is-a-manifest-edit-r">Declaring — Declaring is a manifest edit, reviewed line by line</h3>
   <p>A change to what the estate is should read as one line per choice. A diff mixing rendered output with declared intent hides the decision inside the consequence. So the declaring skill changes the manifest, validates it, and shows the difference in that shape. Authoring a new package and publishing one are explicitly not this skill, and its description names both neighbours so a wrong ask lands in the right folder.</p>
-  <h3 id="a-rendering-is-read-before-anything-is-a">A rendering is read before anything is approved</h3>
+  <h3 id="rendering-a-rendering-is-read-before-any">Rendering — A rendering is read before anything is approved</h3>
   <p>Approval is the last moment a wrong rendering is cheap. After it, the estate has changed. So one skill states what a rendering must name and what it must never contain, and it also answers the narrower question of whether a declaration change produced exactly what was intended and nothing more. It is convened before any approval, never after.</p>
-  <h3 id="authoring-a-module-names-what-is-not-a-m">Authoring a module names what is not a module</h3>
+  <h3 id="module-authoring-authoring-a-module-name">Module authoring — Authoring a module names what is not a module</h3>
   <p>A vendor reached over the network is application configuration behind a seam, and the estate never sees it. Treating one as a module builds infrastructure for something that does not exist. So the authoring skill covers a piece the platform actually runs, and rules the networked case out in the sentence a session matches against. It walks the whole path in one file, from the first scaffold to the pin flip.</p>
-  <h3 id="the-version-is-a-reviewed-edit-and-the-t">The version is a reviewed edit, and the tool's command does the rest</h3>
+  <h3 id="version-edit-the-version-is-a-reviewed-e">Version edit — The version is a reviewed edit, and the tool's command does the rest</h3>
   <p>A version typed into a build script is a second place the number lives. The package manifest is the one place. So the publishing skill edits that field as a reviewed change and then runs the release command, which stages and publishes. The same skill covers repointing a bespoke script at the release command, so the second place stops existing.</p>
-  <h3 id="standing-a-node-up-and-running-a-layer-a">Standing a node up and running a layer are doors, not journeys</h3>
+  <h3 id="standing-up-standing-a-node-up-and-runni">Standing up — Standing a node up and running a layer are doors, not journeys</h3>
   <p>Two of these folders open a command that already ships and had nothing fronting it. <strong><code>new</code> scaffolds an estate node</strong> — which type, where it goes, what its manifest must carry. <strong><code>run</code> brings a layer up or down and reports what is standing.</strong> Neither carries a walk of its own, because the command is the walk; what the skill adds is knowing which target to name and what the flags mean before you type one.</p>
-  <h3 id="a-skill-names-the-card-and-the-card-hold">A skill names the card, and the card holds the words</h3>
+  <h3 id="skill-and-card-a-skill-names-the-card-an">Skill and card — A skill names the card, and the card holds the words</h3>
   <p>None of these files defines the estate's vocabulary. Each names the card that does — which file declares what, which layer owns which act, how a name is composed — so a skill sequences the work and the card holds the words.</p>
 </section>
 
