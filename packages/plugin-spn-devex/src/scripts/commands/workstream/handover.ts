@@ -12,7 +12,7 @@ import { basename, join } from "node:path";
 import { VALUE, UsageFault, readWords } from "../../../../../plugin-support-lib/src/lib/command.ts";
 import {
   arcIdsOf, arcStatus, builtOf, factsFileOf, firstOpenArc, logEvent, notesDirOf, openQuestions, readArc, readJsonl, readQuestions,
-  suggestionOpen, suggestionsOf, whatId,
+  suggestionName, suggestionOpen, suggestionsOf, whatId,
 } from "../../lib/workstream.ts";
 import { readGo } from "../../lib/go-plan.ts";
 import { cardName, type ArcData, type GoPlan } from "../../lib/workstream-schema.ts";
@@ -50,6 +50,19 @@ export function liveOrders(ws: string, arcs: readonly string[]): string[] {
   return out;
 }
 
+/**
+ * RULE.DEVEX.WORKSPACE.519: while the ideate arc's preview is undecided, the finds still on it, each named, and never an arc for each find: no build arc
+ * opens until the ideate arc proposes it. A find is a suggestion no arc has taken. Null where the workstream has no ideate arc, the ideate arc is decided,
+ * or no find is open.
+ */
+export function ideateFinds(ws: string, arcs: readonly ArcData[]): string | null {
+  const ideate = arcs.find((one) => one.arc === "ideate");
+  if (!ideate || ideate.status === "DECIDED") return null;
+  const finds = suggestionsOf(ws).filter((one) => suggestionOpen(one) && (one.arc === null || one.arc === "ideate"));
+  if (!finds.length) return null;
+  return `finds still on the ideate arc: ${finds.map(suggestionName).join(" · ")}; the arcs they might become are proposed on the ideate preview, and no build arc opens until the ideate arc proposes it.`;
+}
+
 /** One value after its label, the label padded so the value starts in `HANDOVER_COLUMN`, a long value wrapped at a word with each continuation indented to that column. */
 function blockLine(label: string, value: string): string {
   const width = 100;
@@ -78,8 +91,10 @@ export function handoverBlock(ws: string, said: { continue?: string; doNotTouch?
   const unfinished = arcs.filter((arc) => arcStatus(arc) !== "LANDED").map((arc) => `${arc.arc} LANDED`);
   const leadData = arcs.find((arc) => arc.arc === lead);
   const date = new Date().toISOString().slice(0, 10);
+  const finds = ideateFinds(ws, arcs);
+  const continuing = said.continue ?? (finds ? `keep ideating: ${finds}` : OWED);
   const values: Array<[string, string]> = [
-    ["continue", said.continue ?? OWED],
+    ["continue", said.continue && finds ? `${said.continue} ${finds[0].toUpperCase()}${finds.slice(1)}` : continuing],
     ["model", `${leadData?.model ?? "unchanged"}.`],
     ["read first", `approach.html#${whatId(lead)}; notes/${lead}/preview.html; arcs/${lead}/log.jsonl, its last lines.`],
     ["pins", `${pins.size ? [...pins].join("; ") : "none read"}.`],

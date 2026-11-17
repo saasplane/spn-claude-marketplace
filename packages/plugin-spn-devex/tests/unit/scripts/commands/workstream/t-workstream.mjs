@@ -1300,7 +1300,7 @@ console.log("\n=== the role arcs by their addresses: ideate and follow-ups (Q33)
   ok("[MKT.SCRIPTS.484] red: a `--proposes` id that is none of the forms is refused", odd.code !== 0 && odd.out.includes("`later`"), odd.out);
   const skip = run("arc", "edit", "031/N005", "--title", "skipped", "--subject", "skipped", "--goal", "a number skipped");
   ok("[MKT.SCRIPTS.486] red: a numbered arc opens only at the next free number, and the refusal names it", skip.code !== 0 && skip.out.includes("N002") && !existsSync(join(role.ws, "arcs", "N005")), skip.out);
-  const next = run("arc", "edit", "031/N002", "--title", "the next", "--subject", "next", "--goal", "the next free number");
+  const next = run("arc", "edit", "031/N002", "--title", "the next", "--subject", "next", "--goal", "the next free number", "--note", "the developer: open N002");
   ok("[MKT.SCRIPTS.486] the next free number opens", next.code === 0 && existsSync(join(role.ws, "arcs", "N002", "state.json")), next.out);
   const withKind = run("arc", "edit", "031/N002", "--kind", "ideate");
   ok("[MKT.SCRIPTS.487] red: `--kind` is an option `arc edit` does not take", withKind.code !== 0 && withKind.out.includes("does not take `--kind`"), withKind.out);

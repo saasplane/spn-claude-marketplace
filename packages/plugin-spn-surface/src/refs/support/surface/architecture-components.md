@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/06-architecture-components/",
-      "seen": "805243e4"
+      "seen": "ce5df41f"
     }
   ]
 }
@@ -1034,7 +1034,9 @@ A row states its kind in `mtype`, which takes `DSComparisonRowType`: `FIELD` giv
 | `numbered` | yes or no. No by default | whether the numbers 1 to n stand before the titles, as text. `GRID` and `LIST` only |
 | `orientation` | `DSOrientationType`. Unset, `VERTICAL` for `GRID` and `HORIZONTAL` for `LIST` | how every item stands |
 | `borderType` | `DSGridBorderType`: `NONE` · `GRID` · `EDGE`. Unset, `GRID` for `LIST` and `NONE` for `GRID` and `STATS` | the lines between the items, and around them with `EDGE`. Not read where `surface` is set |
-| `surface` | `IDSFrameSurface`: `color` · `strength` · `raised` · `elevation` · `bordered` · `rounded`. A key left out takes the card's theme | each item in a frame of its own, the level's gap apart; a boxed item's room lies inside its frame (`RULE.SUPPORT.SURFACE.284` · MUST · skill:spn-surface/design) |
+| `surface` | `IDSFeatureSurface`: the frame's `IDSFrameSurface` (`color` · `strength` · `raised` · `elevation` · `bordered` · `rounded`) and the feature's own `lit`. A key left out takes the card's theme | each item in a frame of its own, the level's gap apart; a boxed item's room lies inside its frame (`RULE.SUPPORT.SURFACE.284` · MUST · skill:spn-surface/design) |
+| `surface.lit` | `boolean`. The design language's, else `false` | a thin lit line along the frame's edge, in the frame's own hue at a stronger step. It marks the one highlighted frame of a site's page, and draws only where `frames` name a part |
+| `mediaBackdrop` | `IDSFeatureMediaBackdrop`: `type` (`NONE` · `DOTS` · `GRID` · `GLOW` · `IMAGE`) · `src` · `moving`. The design language's, else `NONE` | what stands behind the media: a line grid, dots, a soft glow, or an image of the site's own at `src`, required for `IMAGE`. It fades into the ground at its edges. With `moving` true a grid drifts or a glow swells and fades, and it stands still for a visitor who asked for reduced motion |
 | `gridColumns` | `IDSGridColumns`: `desktop`, `tablet` and `mobile`, each from 1 to 4. Left out, the count of the items decides the desktop number: one for one item, two for two or four, three for any other count; the tablet is that number held to two, and a phone is one | how many columns a `GRID` and `STATS` stand in at each screen class. A `LIST` is one column |
 
 The level the feature gives its items is part of the prop's comment: `WIDGET` under `PAGE` and `CONTAINER`, `GROUP` under `WIDGET`, `CONTENT` under `GROUP` and `CONTENT`, `INLINE` under `INLINE`.
@@ -1120,7 +1122,7 @@ Each of these but the box of a small media is a token of the level (`architectur
 #### The phone and the frame
 
 - **A feature MUST fold its form on a phone by its type, and it MUST read no device** (`RULE.SUPPORT.SURFACE.237` · MUST · skill:spn-surface/design). `SPLIT_END` becomes `MEDIA_BOTTOM`, `SPLIT_START` becomes `MEDIA_TOP`, `ITEMS_SPLIT_END` becomes one column of the words, the items, then the media, `ITEMS_SPLIT_START` one column of the words, the media, then the items, and every other type keeps its shape. The size of the title on a phone is the phone value of its type step, and a page never chooses a smaller step for a phone.
-- **A feature MAY reveal its parts through `reveal`, and it MUST play once, the words first, then the media, then the items** (`RULE.SUPPORT.SURFACE.282` · MUST · skill:spn-surface/design). `reveal` is `IDSFeatureRevealProps`: `text` (`NONE`, `FADE`, `RISE`), `media` (adds `SLIDE`, `ZOOM`) and `items` (`NONE`, `FADE`, `RISE`, `ZOOM`), each a member of `DSMotionType`, and nothing moves when it is left out. Items come in 60 ms apart, and from the sixth on together. The words are in the page before any script runs.
+- **A feature MAY reveal its parts through `reveal`, and it MUST play once, the words first, then the media, then the items** (`RULE.SUPPORT.SURFACE.282` · MUST · skill:spn-surface/design). `reveal` is `IDSFeatureRevealProps`: `text` (`NONE`, `FADE`, `RISE`, `BLUR`), `media` (adds `SLIDE`, `ZOOM`, `BLUR`) and `items` (`NONE`, `FADE`, `RISE`, `ZOOM`, `BLUR`), each a member of `DSMotionType`, and left out it takes the site page's design language, else nothing moves. Items come in 60 ms apart, and from the sixth on together. The words are in the page before any script runs.
 - **A view holds at most one `SOLID` button, its main action** (`RULE.SUPPORT.SURFACE.370` · GUIDE), as *The button, and its choice table* states with the button's cases, and a feature's buttons are that rule's case for a feature.
 - **A feature's buttons follow its level, as the case of a feature for that rule** (`RULE.SUPPORT.SURFACE.287` · MUST · skill:spn-surface/design). The primary is the only `SOLID` in view, and an arrow stands only on a link that goes somewhere.
 

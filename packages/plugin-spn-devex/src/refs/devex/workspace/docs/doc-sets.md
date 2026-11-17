@@ -21,7 +21,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/03-tree.md",
-      "seen": "a74daa78"
+      "seen": "46682d86"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/02-document.md",
@@ -249,7 +249,7 @@ and a repository that cannot run a tier today may ship a runner tomorrow (`RULE.
 | `02-constructs` | the model — one file per construct, under a folder per domain | contract terms: what a thing is, what it is made of, what it depends on, what it refuses. **A construct never appears before one it depends on**, and the face carries the order, generated from the declared dependencies and the concept's own sequence |
 | `03-behaviors` | what a person can do — **one file of rows per topic**, beside the construct of the same number, with `personas.md` | in the foundation a **promise**: `Id · Who · Does · Sees · Type`, `Type` reading `PROMISE`, and **no status at all**, because this book ships no code that could write one. In a built repository the row is **proven** and carries the same cells plus `Where`, `Tier`, `Status` and `Updated at`, with a `Names` cell naming the promise it fulfils. `Updated at` is the instant the run finished, in UTC, then ` · ` and the run's name — `2026-09-30T18:54:19Z · full-1001`. The run's name is a label, and nothing checks the row against that run's file. Written in the consumer's own words. **A behaviour belongs to the domain that would have to change if the behaviour changed**, which is what its id's prefix names |
 | `04-capabilities` | what must exist for that to be possible — in this book the standard for one topic; in a built repository **one chapter per construct per package that realizes it** | engineering content in the one voice (`RULE.DEVEX.WORKSPACE.106` · MUST · check:doc-check), and **normative wherever a consumer can violate the statement** — the sequence, the guard, the reason a rule exists (`RULE.DEVEX.WORKSPACE.098` · MUST · check:book-classes) (`RULE.DEVEX.WORKSPACE.133` · GUIDE); see the altitude note below |
-| `05-guides` | how to use what was realized | task-shaped — install, mount, configure, run. It carries no id and nothing tests it; the face is the adoption path in phases, each naming the guides it takes |
+| `05-guides` | how to use what was realized | task-shaped — install, mount, configure, run. It carries no id and nothing tests it; the face is the adoption path in phases, each naming the guides it takes. **An app's design language guide is a page in that app's own docs, never the repository's** (`RULE.DEVEX.WORKSPACE.521` · GUIDE), because the apps of one repository serve different people; it says the pick in plain words, and the app's code holds the same pick as a data file |
 | `registers/` | the repository's own rules and decisions | lookup material, consulted rather than read start to end |
 | `artifacts/` | the overview and construct pages, and deliberate reports | authored source of truth. Nested folders allowed here and nowhere else; sub-folders carry no README |
 

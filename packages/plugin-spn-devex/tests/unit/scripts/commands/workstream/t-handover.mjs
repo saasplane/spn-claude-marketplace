@@ -70,5 +70,21 @@ ok("[MKT.SCRIPTS.409] a brief whose part is not running is not live", !/live now
   ok("[MKT.HOOKS.326] red: no workstream named is refused", none.code === 2 && none.out.includes("needs a workstream"), none.out);
 }
 
+console.log("=== handover — an undecided ideate arc names its finds (RULE.DEVEX.WORKSPACE.519)");
+{
+  const flat = (text) => text.replace(/\s+/g, " ");
+  const noIdeate = flat(cli(root, ["workstream", "handover", "031"]).out);
+  ok("[RULE.DEVEX.WORKSPACE.519] a workstream with no ideate arc keeps the owed continue line", !noIdeate.includes("finds still on the ideate arc"), noIdeate);
+  const opened = cli(root, ["workstream", "arc", "edit", "031/ideate", "--title", "the shape", "--subject", "probe", "--goal", "the shape is settled"]);
+  const bare = flat(cli(root, ["workstream", "handover", "031"]).out);
+  ok("[RULE.DEVEX.WORKSPACE.519] while the ideate preview is undecided, continue names each find still on it, a suggestion no arc has taken", opened.code === 0 && /continue: keep ideating: finds still on the ideate arc: S\d+/.test(bare) && bare.includes("raised one") && bare.includes("shaped one") && !bare.includes("decided\""), bare);
+  ok("[RULE.DEVEX.WORKSPACE.519] and says no build arc opens until the ideate arc proposes it, and tells no window to open an arc for each find", bare.includes("no build arc opens until the ideate arc proposes it") && !/open an arc for each find/.test(bare), bare);
+  const said = flat(cli(root, ["workstream", "handover", "031", "--continue", "run the sheet"]).out);
+  ok("[RULE.DEVEX.WORKSPACE.519] the agent's own continue words stand, with the finds after them", /continue: run the sheet Finds still on the ideate arc/.test(said), said);
+  cli(root, ["workstream", "arc", "edit", "031/ideate", "--status", "DECIDED", "--note", "the shape is settled"]);
+  const decided = flat(cli(root, ["workstream", "handover", "031"]).out);
+  ok("[RULE.DEVEX.WORKSPACE.519] once the ideate preview is decided, the finds are no longer named", !decided.includes("finds still on the ideate arc"), decided);
+}
+
 console.log(failed ? `\n  ${failed} of ${total} FAILED — handover` : `\n  all ${total} passed — handover`);
 process.exit(failed ? 1 : 0);

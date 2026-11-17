@@ -115,6 +115,19 @@ function header(data: ArcData, words: Words): string[] {
 const hasWords = (note: string | null): note is string => !!note?.trim();
 
 /**
+ * RULE.DEVEX.WORKSPACE.519: whether the ideate arc proposes `arc` from a preview the developer has decided. The ideate arc names it in
+ * `--proposes`, and its stored status is DECIDED (it then reads DECIDED, or LANDED once every arc it proposes is opened). A workstream with no ideate arc has
+ * no one to propose, so it is not held to this.
+ */
+function ideateProposes(ws: string, arc: string): boolean {
+  const ideate = readArc(ws, "ideate");
+  if (!ideate) return true; // a workstream opened before the ideate arc kept none, so no arc proposes the build arcs
+  if (!(ideate.proposes ?? []).includes(arc)) return false;
+  const status = arcStatus(ideate);
+  return status === "DECIDED" || status === "LANDED";
+}
+
+/**
  * RULE.DEVEX.WORKSPACE.307 and .311: the stored status is the developer's words. Throws where a write would store a
  * status, a wait or a start against them: any move of the stored status, a wait or a start without `--note`; a wait
  * or a start on an arc that is not DECIDED; a start with no wait; LANDED stored on any arc but the review-fixes arc;
@@ -266,6 +279,9 @@ function edit(args: string[]): number {
     const title = words.value("title");
     if (/^N\d/.test(arc) && arc !== nextBuildArc(ws))
       throw new UsageFault(`opens a numbered arc only at the next free number, ${nextBuildArc(ws)}: \`${arc}\` is not it (MKT.SCRIPTS.486).`);
+    // The developer's own words, quoted in `--note`, open an arc; otherwise only the ideate arc's decided proposal does (RULE.DEVEX.WORKSPACE.519).
+    if (/^N\d/.test(arc) && !hasWords(note) && !ideateProposes(ws, arc))
+      throw new UsageFault(`opens ${arc} only where the ideate arc proposes it from its decided preview (\`<workstream>/ideate --proposes ${arc}\`), or on the developer's own words in \`--note\`; until then its line stays in How, and a find is a section of the ideate preview (RULE.DEVEX.WORKSPACE.519).`);
     if (!title || !subject || !words.value("goal")?.trim())
       throw new UsageFault(`opens ${arc} with \`--title\`, \`--subject\` and \`--goal\`: an arc opens only when all three are known, and until then its line stays in How (RULE.DEVEX.WORKSPACE.254).`);
     const reviewFixes = words.given("review-fixes");

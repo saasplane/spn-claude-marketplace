@@ -3,7 +3,7 @@
   "files": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/01-common/site-patterns",
-      "seen": "695b8b9b"
+      "seen": "0199edf8"
     }
   ]
 }
@@ -33,6 +33,7 @@ above names the folder and not each file, so a spec the book adds is seen as wel
 | [`questions.dg.json`](questions.dg.json) |
 | [`real-sample-under.dg.json`](real-sample-under.dg.json) |
 | [`real-sample.dg.json`](real-sample.dg.json) |
+| [`show-it-highlight.dg.json`](show-it-highlight.dg.json) |
 | [`show-it-under.dg.json`](show-it-under.dg.json) |
 | [`show-it.dg.json`](show-it.dg.json) |
 | [`statement.dg.json`](statement.dg.json) |

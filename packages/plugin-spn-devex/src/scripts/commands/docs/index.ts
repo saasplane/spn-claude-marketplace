@@ -6,6 +6,10 @@
 //   spn-devex docs index check [<path>] [--out <file>]   compare the tree of the index with the pages
 //   spn-devex docs index write <path> [--out <file>]     write the index
 //
+// AN ARC'S SAMPLES ARE INDEXED THE SAME WAY (RULE.DEVEX.WORKSPACE.520). A path that is an arc's `notes/<arc>/samples/` folder, or sits in it, is read as
+// the pocket: the pages under it become the tree, grouped by the folder each sits in (the folder is the purpose: `drawn-on-an-app`, `read-from-a-reference`),
+// and `write` writes `samples/index.html`, in the same frame as a repository's artifacts index.
+//
 // A SUBJECT WITH TWO ACTIONS, AND A `tree` PATH. The path may be a repository, or any folder or file
 // inside one, and the command finds the repository from it. A repository has one index, so `write`
 // writes that one page, and `check` reports what it finds under the path.
@@ -223,12 +227,15 @@ export function groupsOf(artifacts: string): { groups: TreeNode[]; pages: string
   return { groups, pages: files, notes };
 }
 
+/** What an index says of itself in its head, where it is not a repository's artifacts index. */
+type Headed = { tab: string; id: string; title: string; summary: string };
+
 /** The index page: the template's shell, with its head and its slots filled and its tree written. */
-function indexPage(template: string, tree: Tree, where: { organisation: string; location: string; repository: string; hub: string }): string {
+function indexPage(template: string, tree: Tree, where: { organisation: string; location: string; repository: string; hub: string }, headed?: Headed): string {
   const shell = withHead(template, {
-    tab: `${where.location} Artifacts`,
-    block: { id: `${basename(where.repository)}-artifacts-index`, variant: "index", title: "Artifacts",
-      summary: `Every page of this repository's ${POCKET_PATH}, in one tree, opened in tabs.` },
+    tab: headed?.tab ?? `${where.location} Artifacts`,
+    block: { id: headed?.id ?? `${basename(where.repository)}-artifacts-index`, variant: "index", title: headed?.title ?? "Artifacts",
+      summary: headed?.summary ?? `Every page of this repository's ${POCKET_PATH}, in one tree, opened in tabs.` },
     produced: "Produced by `docs index` from the pages on disk. Never edit this page: produce it again.",
     version: newestCut(), script: INDEX_SCRIPT,
   });
@@ -288,10 +295,68 @@ function treeOf(path: string): string {
   return docsTreeOf(path);
 }
 
+/** An arc's samples folder, `<workstream>/notes/<arc>/samples`, where the path is that folder or sits in it; null where it is not. */
+export function samplesOf(path: string): string | null {
+  const parts = resolve(path).split(sep);
+  for (let at = parts.length - 1; at >= 2; at -= 1)
+    if (parts[at] === "samples" && parts[at - 2] === "notes") return parts.slice(0, at + 1).join(sep);
+  return null;
+}
+
+/**
+ * The groups of an arc's samples index (RULE.DEVEX.WORKSPACE.520), from the pages on disk. The folder a page sits in is the purpose it is grouped by,
+ * and a page directly in the samples folder stands in a group named Samples. A group and its pages stand in the order of their names, and a
+ * page the index itself is stays out of it.
+ */
+export function sampleGroupsOf(samples: string): { groups: TreeNode[]; pages: string[] } {
+  const index = join(samples, ARTIFACT_INDEX);
+  const files = pagesUnder(samples).filter((file) => file !== index);
+  const entry = (file: string): TreeNode => { const facts = factsOf(file); return { label: facts.title, kind: facts.kind, path: slashes(relative(samples, file)) }; };
+  const loose = files.filter((file) => dirname(file) === samples);
+  const folders = [...new Set(files.filter((file) => dirname(file) !== samples).map((file) => relative(samples, file).split(sep)[0]))].sort(byName);
+  const named = (folder: string): string => { const words = bare(folder).replace(/-/g, " "); return words.charAt(0).toUpperCase() + words.slice(1); };
+  const groups: TreeNode[] = [
+    ...(loose.length ? [{ label: "Samples", children: loose.map(entry) }] : []),
+    ...folders.map((folder): TreeNode => ({ label: named(folder), children: files.filter((file) => relative(samples, file).split(sep)[0] === folder).map(entry) })),
+  ];
+  return { groups, pages: files };
+}
+
+/** The action on an arc's samples folder: the index of its pages, written or compared with the pages on disk. */
+function runSamples(samples: string, write: boolean, out: string | null): number {
+  const workspace = resolveWorkspace();
+  const arc = basename(dirname(samples));
+  const stream = basename(dirname(dirname(dirname(samples))));
+  try {
+    const index = resolve(out ?? join(samples, ARTIFACT_INDEX));
+    const { groups, pages } = sampleGroupsOf(samples);
+    if (!pages.length) throw new Refusal(`${relative(workspace, samples)} holds no page, so there is nothing to list`);
+    const base = dirname(index) === samples ? "" : `${slashes(relative(dirname(index), samples))}/`;
+    const produce = (): string => indexPage(pageTemplate(templatesDir(workspace), TEMPLATE), { base, tabs: TAB_LIMIT, groups }, {
+      organisation: "SaaS Plane", location: `${stream} ${arc}`, repository: samples, hub: base + (groups.flatMap(entriesOf)[0]?.path ?? ""),
+    }, { tab: `${stream} ${arc} samples`, id: `${stream}-${arc}-samples-index`, title: "Samples", summary: `Every sample page of arc ${arc}, in one tree grouped by what each is for, opened in tabs.` });
+    if (write) return say(place(index, produce(), true, workspace, "index"), workspace) ? 1 : 0;
+    const found = compare(index, samples, pages);
+    if (!found.length) {
+      let current = true;
+      try { current = readFileSync(index, "utf8") === produce(); } catch { current = true; }
+      if (!current) found.push({ grade: "SOFT", check: "index", file: index, message: "the tree holds every page once, but this page is not what `docs index write` writes now: a name or a place changed" });
+      else console.log(`current  ${relative(workspace, index)}`);
+    }
+    return say(found, workspace) ? 1 : 0;
+  } catch (refused) {
+    if (!(refused instanceof Refusal)) throw refused;
+    console.error(`✗ ${refused.message}`);
+    return 1;
+  }
+}
+
 /** Both actions are one reading of the pages on disk; `write` is the one that puts the index there. */
 function run(args: string[], write: boolean): number {
   const words = readWords(args, OPTIONS);
   const path = onePath(scopeOf(words.paths, write ? REQUIRED : OPTIONAL));
+  const samples = samplesOf(path);
+  if (samples) return runSamples(samples, write, words.value("out"));
   const workspace = resolveWorkspace();
   const docs = treeOf(path);
   const repository = dirname(docs);

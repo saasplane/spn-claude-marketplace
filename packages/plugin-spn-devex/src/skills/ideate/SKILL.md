@@ -233,10 +233,19 @@ When the arc changes code, the idea is worked in the code itself, one connected 
 1. **Read, change, validate, record.** Read the files the idea touches, make the change, validate it with one trace line, and record it with `sheet patch --trace --judged`. Validation here is typecheck and lint only; the suites run later, at the go.
 2. **No patch while a shape is discussed; the stack once an arc or a preview is asked for.** In chat you talk and change no file. When the developer asks for the arc or the preview to be prepared, write every change as a patch, in the workstream's worktree and only on a file an entry names, in release order and, inside a repository, in the order the work builds: the book and docs, config and env files, migrations, contract, server, client codegen, web, tests. `sheet patch` resets its file, so run `sheet stack` before each entry to apply the kept patches ahead of it. A generated file is a step that runs its generator and is kept as no patch. A step carries its `command` and its `proof`. The preview shows an outline of the changes and a code block only for an entry marked `judged`, drawn from its patch; tests are named by behaviour id, never as a range.
 3. **One helper per connected batch.** Send the contract first, then what depends on it. Size each batch by measured tokens, never by a guess.
-4. **Where an idea goes.** It joins the running arc only when that arc's goal needs it. Otherwise the developer chooses: its own arc, or the follow-ups.
+4. **Where an idea goes.** It joins the running arc only when that arc's goal needs it. While the shape is discussed it is a find on the ideate arc and no build arc opens for it (see below). Otherwise the developer chooses: its own arc, or the follow-ups.
 5. **A later change shows `sheet reach` first.** Run `sheet reach` and show what the change reaches before you change anything.
 6. **A proposal carries its preview.** It shows a code preview for apps code or a journey for a flow, and its row of the work map says what the block holds ([`refs/devex/agent/work-map.md`](../../refs/devex/agent/work-map.md); the agent chapter's section *The agent loads what the work needs*).
 7. **Shape a first proposal by the agent chapter's eight rules,** in its section *A proposal shows its choice as a preview, and the first one follows eight rules*. They are stated there once; this step points at them and does not restate them.
+
+## While the shape is discussed, a find stays on the ideate arc
+
+**A find is a section of the ideate arc's preview, with its facts and its cards on the ideate arc, and no build arc opens until the ideate arc proposes it** (`RULE.DEVEX.WORKSPACE.519` · MUST · skill:spn-devex/ideate). `workstream arc edit` refuses a numbered arc the ideate arc has not proposed, unless the developer's own words in `--note` open it; its refusal says the line stays in How until then.
+
+- **Record each find the developer shares, and propose its fix.** A screenshot and a few words become one sample page under the ideate arc's samples index: the screenshot as it is, the proposed look drawn beside it, the code it changes and its case line. The next find adds a page, and nothing already reviewed is rewritten.
+- **Several drawn pages are samples under one index** (`RULE.DEVEX.WORKSPACE.520` · GUIDE). The index is `notes/<arc>/samples/index.html`, written by `spn-devex docs index write` from the pages on disk and never typed. The arc's preview links it once, says what each group holds and keeps the decisions. An arc of one page, or with no drawn page, keeps everything on its preview.
+- **Managing the samples is your job, never the developer's.** Write, name, group and retire the pages: the index groups them by what each is for (drawn on an app, read from a reference, how the agent works), and a page a decision has overtaken leaves it. A page is drawn with every change already decided on the arcs, never as today's code stands. Where a problem has options that each need a whole page, each option is a page; where they compare best side by side, one page holds them all.
+- **Group the finds by what you would review and release together, then ask once.** When the grouping is clear, propose the arcs on the ideate preview with `--proposes`. A handover written before then names the finds and the arcs they might become, and never tells the next window to open an arc for each find.
 
 ## The rules this step holds
 
@@ -281,6 +290,7 @@ When the arc changes code, the idea is worked in the code itself, one connected 
 - **A proposal shown in chat is laid out by a preview's layers, and its flow shows its steps** (`RULE.DEVEX.WORKSPACE.504` · MUST · skill:spn-devex/ideate)
 - **A change agreed on an arc reaches that arc's preview before any handover** (`RULE.DEVEX.WORKSPACE.505` · MUST · skill:spn-devex/ideate)
 - **Each arc state says what a new piece of work does, so no fix lands outside an arc** (`RULE.DEVEX.WORKSPACE.516` · MUST · skill:spn-devex/ideate)
+- **While the shape is discussed, a find stays on the ideate arc, and no build arc opens until the ideate arc proposes it** (`RULE.DEVEX.WORKSPACE.519` · MUST · skill:spn-devex/ideate)
 - **Registering is optional, and the chain is complete without it.** (`RULE.LAUNCHPAD.CONTROL_PLANE.001` · MUST · skill:spn-devex/ideate)
 - **Launchpad is built at the partner stage, on the same backbone and with the same stack every adopter gets. It consumes the published packages rather than reading around them.** (`RULE.LAUNCHPAD.CONTROL_PLANE.002` · MUST · skill:spn-devex/ideate)
 - **Launchpad is a stage, not a sixth domain.** (`RULE.LAUNCHPAD.CONTROL_PLANE.003` · MUST · skill:spn-devex/ideate)
