@@ -716,7 +716,7 @@ try {
   const GUIDE = `<!doctype html>\n${STYLES.stylesheet}\n<nav class="sds-rail" id="rail"></nav>\n<header class="sds-masthead">\n` +
     `  <div class="sds-eyebrow"><span class="sds-line1">SaaS Plane &nbsp;|&nbsp; Probe &nbsp;|&nbsp; Getting Started</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Guide</span></span></div>\n` +
     `  <h1>Getting Started</h1>\n  <p class="sds-standfirst">You go from a clone to a running service. Read it on your first day.</p>\n</header>\n` +
-    `<section id="s1"><div class="sds-section-head"><h2>The machine is ready</h2></div>\n  <p>You install the tools once, and you check them once.</p>\n` +
+    `<section id="s1"><div class="sds-section-head"><h2>Machine ready — The machine is ready</h2></div>\n  <p>You install the tools once, and you check them once.</p>\n` +
     `  <div class="sds-step"><h3 id="h1">Install the toolchain</h3><p>You need it before any other step.</p><pre>spnutils setup</pre><p>You see one line for each tool.</p></div>\n</section>\n${STYLES.script}\n`;
   const guidePage = join(guidePagesDir(PROBE_DOCS), "getting-started-guide.html");
   one("a guide page under artifacts/guides/ is in its place, and draws no finding", write(guidePage, GUIDE), "silent");
@@ -950,6 +950,28 @@ console.log("\n=== doc-check — a long What on an open approach page holds a fi
   say("[MKT.HOOKS.441] green: the reason line is kept as a comment the page may carry", !docCheck.check(open, page(`<!-- no figure: the argument is a single chain -->${prose}`)).some(([, m]) => m.includes("template") && m.includes("no figure")));
   say("[MKT.HOOKS.441] green: a short What passes", figures(open, page("<p>One short line.</p>")).length === 0);
   say("[MKT.HOOKS.441] green: a closed page is never read", figures(closed, page(prose)).length === 0);
+}
+
+{
+  console.log("\n=== doc-check — a page's name and its rail entries are short names (RULE.DEVEX.WORKSPACE.517, .518)");
+  const { nameRule } = await import("../../../../src/scripts/checks/doc-check.ts");
+  const say = (label, ok, detail = "") => { n += 1; if (!ok) failed += 1; console.log(`  ${ok ? "PASS" : "FAIL"}  ${label}${ok || !detail ? "" : `\n        ${detail}`}`); };
+  const page = (title, h2, h3) => `<!-- spn:doc\n{"id": "x", "variant": "construct", "title": "${title}"}\n-->\n` +
+    `<section id="s1"><div class="sds-section-head"><h2>${h2}</h2></div>\n<h3 id="a">${h3}</h3></section>`;
+  const grades = (text) => nameRule(text).map(([grade, message]) => `${grade}:${message.includes(".517") ? 517 : 518}`);
+  say("[MKT.HOOKS.510] green: a short name and short rail entries draw nothing",
+    nameRule(page("Enablement", "Model", "Offered kinds — What a category of organization is offered")).length === 0);
+  say("[MKT.HOOKS.510] red: a page named by a sentence is refused",
+    grades(page("Enablement — What a Category of Organization Is Offered", "Model", "Offers")).join() === "RULE:517", JSON.stringify(nameRule(page("Enablement — What a Category of Organization Is Offered", "Model", "Offers"))));
+  say("[MKT.HOOKS.510] a name of four words, kept for one fixed term, is a warning",
+    grades(page("Bring your own key", "Model", "Offers")).join() === "SOFT:517");
+  say("[MKT.HOOKS.511] red: a section heading inside its head block is read as the rail reads it, past the dash",
+    grades(page("Hiring", "Where a branch deploys and why", "Offers")).join() === "RULE:518");
+  say("[MKT.HOOKS.511] green: a heading named before its dash draws nothing",
+    nameRule(page("Hiring", "Next — Where to go next", "Candidate — The candidate, and what it keeps from the first application")).length === 0);
+  say("[MKT.HOOKS.511] a rail entry of four words is a warning, of five a refusal",
+    grades(page("Hiring", "Model", "What a repository declares")).join() === "SOFT:518"
+      && grades(page("Hiring", "Model", "What a repository declares to us")).join() === "RULE:518");
 }
 
 console.log(failed ? `\n  ${failed} FAILED` : `\n  all ${n} passed`);

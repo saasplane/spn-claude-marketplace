@@ -7,11 +7,11 @@ description: Write one of the five reports on a repository — coverage (how muc
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
-      "seen": "2fce1268"
+      "seen": "7beac2a2"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/05-report.md",
-      "seen": "df3535ad"
+      "seen": "f4053769"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
@@ -21,12 +21,12 @@ description: Write one of the five reports on a repository — coverage (how muc
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "Reports and templates",
-      "seen": "b89030ff"
+      "seen": "abcbbbca"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "The header — two lines, six fields, produced from the block",
-      "seen": "4d00be96"
+      "seen": "a040d4e8"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
@@ -122,7 +122,7 @@ Each section's `id` is `s0` to `s4` in page order.
 | 2 | **Findings** | the facts, by axis | the report type's own axis tables first, then **Repository → Apps → Packages** |
 | 3 | **Records** | what exactly do I fix? | list items in folded groups by cause |
 | 4 | **Measured** | how were these numbers produced? | **Scope**, **Measure again** and **Not looked at**, shown; the **Method** table, folded |
-| 5 | **Recommendations** | what closes the gaps? | **The agent closes these** · **The agent closes these and flags them** · **Needs you** |
+| 5 | **Recommendations** | what closes the gaps? | **Agent closes — The agent closes these** · **Agent flags — The agent closes these and flags them** · **Needs you** |
 
 Records and Recommendations are left out only when there is nothing to put in them.
 
@@ -178,7 +178,7 @@ The first two groups are a table of **# · Recommendation · Closes · Done when
 
 **No Decided by column and no Effort column**: the group heading says who decides, and Closes says what an action is worth.
 
-**Needs you is short cards**, headed with its count (*Needs you: 4 records, in 4 decisions*). Each card has a heading naming the decision as a question, then *Why it needs you*, *What* and the *Options*, in that order, and a closing line with the option you would take. A report's card reads Why first, as a card on the page does, because a card has one order. **You copy each card unchanged to a `Q<n>` card on the arc's page**, so write it as a card from the start (`refs/devex/workspace/docs/decision-cards.md`). A card on the page also carries a *Views* part, which is added when the card is copied. It sits after the card's Why and What and before its options: one line on who spoke and why, then each view's reason in one or two plain sentences, as a colleague would say it out loud, such as *"**Product:** A person never sees the request key, so a version kept there tells them nothing."*
+**Needs you is short cards**, headed with its count (*Needs you — 4 records, in 4 decisions*). Each card has a heading naming the decision as a question, then *Why it needs you*, *What* and the *Options*, in that order, and a closing line with the option you would take. A report's card reads Why first, as a card on the page does, because a card has one order. **You copy each card unchanged to a `Q<n>` card on the arc's page**, so write it as a card from the start (`refs/devex/workspace/docs/decision-cards.md`). A card on the page also carries a *Views* part, which is added when the card is copied. It sits after the card's Why and What and before its options: one line on who spoke and why, then each view's reason in one or two plain sentences, as a colleague would say it out loud, such as *"**Product:** A person never sees the request key, so a version kept there tells them nothing."*
 
 ## Who decides — MUST
 
@@ -285,7 +285,7 @@ Developers and leaders who have not learned the book's words read a report, so i
 | **Unit and states** | one check is one page. FAIL is a page with a RULE finding, WARN a page with SOFT findings only; the page says so once, because RULE and SOFT are the command's own words |
 | **Tiles** | Pages passed · Docs folders complete · Design topics done |
 | **Breakdown bar** | pages: PASS · WARN · FAIL |
-| **Findings** | **Standard by docs folder**: Docs folder · Pages · PASS · WARN · FAIL · **Status by docs folder**: Docs folder · Pages · DONE · IMPLEMENTING · PLANNING · No status — both in the docs tree's order (`01-purpose` → `02-constructs` → `03-behaviors` → `04-capabilities` → `05-guides` → `registers` → `artifacts` → `README.md`), not worst first · **Rules**: Rule · State · Pages. **No Repository, Apps or Packages tables** |
+| **Findings** | **Standards — Standard by docs folder**: Docs folder · Pages · PASS · WARN · FAIL · **Status — Status by docs folder**: Docs folder · Pages · DONE · IMPLEMENTING · PLANNING · No status — both in the docs tree's order (`01-purpose` → `02-constructs` → `03-behaviors` → `04-capabilities` → `05-guides` → `registers` → `artifacts` → `README.md`), not worst first · **Rules**: Rule · State · Pages. **No Repository, Apps or Packages tables** |
 | **Records** | level 1 the rule, FAIL rules first; level 2 the docs folder. An item is `page:line` and the finding |
 
 **A construct page counts at the status its behaviours work out to, and every other page at the status it states**; a report states none. A construct page stating another status than its behaviours work out to is the FAIL finding *status contradicts rows*. `docs audit` runs the same status check on each construct page it reads and writes nothing, so count that finding once.

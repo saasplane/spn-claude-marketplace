@@ -157,7 +157,7 @@ export const NAMED_KIND: Record<string, Variant> = { "data-model.md": "data_mode
 
 /** An overview's outline is borrowed, with one fixed opener and two fixed closers. */
 export const OVERVIEW_FIXED_FIRST = "Overview";
-export const OVERVIEW_FIXED_LAST = ["Glossary", "Where to go next"];
+export const OVERVIEW_FIXED_LAST = ["Glossary", "Next"];
 
 // ---------------------------------------------------------------------------- reading
 
@@ -1301,7 +1301,7 @@ export function checkOverviewSource(file: string, src: string, block: any, works
   // A DOMAIN OVERVIEW BORROWS FROM ITS DOMAIN, NOT FROM `CONCEPT.md` (Q228). The concept names a
   // domain and, in most repositories, nothing below it — so holding a domain overview to the
   // concept's headings left twelve pages in `spn-platform-ts` unable to borrow anything at all, and
-  // they carry `Overview → Glossary → Where to go next` with nothing between. The domain's own
+  // they carry `Overview → Glossary → Next` with nothing between. The domain's own
   // constructs are what it has sections for, in the reading order its face already computes.
   const domainDir = domainFaceFor(file, block, workspace);
   if (domainDir) {
@@ -3322,7 +3322,7 @@ export function walkKindOf(file: string, block: any): WalkKind | null {
  * Every page walks up one step, by the back link at the top of its rail; the top of a chain has none.
  *
  * A construct page goes back to the overview that links forward to it, an overview, a guide, a report
- * and an index to the hub, a preview to the approach page of its workstream. The hub and an approach
+ * and an index to the hub (an index by its head card), a preview to the approach page of its workstream. The hub and an approach
  * page carry none. Where the page a link should open is not there (a repository with no hub, a preview
  * outside a workstream), the page owes no link: a link is a promise a reader can follow. A back link
  * that opens a markdown file is the rail check's to refuse, so it is not said twice.
@@ -3331,7 +3331,8 @@ export function checkWayBack(file: string, src: string, block: any): Finding[] {
   if (!file.endsWith(".html") || inTemplates(file) || holdsOwnCopy(file, src)) return [];
   const kind = walkKindOf(file, block);
   if (!kind) return [];
-  const back = src.match(/<a class="sds-home" href="([^"]*)"/);
+  // The index's way back is its head card, which opens the hub; every other page's is the back link.
+  const back = src.match(/<a class="sds-home" href="([^"]*)"/) ?? (kind === "index" ? src.match(/<a class="sds-rail-brand" href="([^"]*)"/) : null);
   const rule = (message: string): Finding[] => [{ check: "rail", grade: "RULE", file, message }];
   if (kind === "hub" || kind === "approach")
     return back ? rule(`the way back opens \`${back[1]}\` — ${kind === "hub" ? "the hub is the top of a repository's chain" : "an approach page is the top of a workstream's chain"}, so it carries no way back`) : [];

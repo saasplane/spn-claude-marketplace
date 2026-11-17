@@ -158,7 +158,7 @@ const withAreas = () => repo({
     text.split("\n").filter((line) => line.includes("sds-")).slice(0, 2).join("\n"));
   ok("the page holds no slot, no footer and no note to an author of the template",
     !text.includes("{{") && !text.includes("<footer>") && !text.includes("RESTATES") && text.startsWith('<meta charset="utf-8">'), text.slice(0, 200));
-  ok("the side says the workspace and the repository's declared name", text.includes('<div class="sds-index-where">SaaS Plane &nbsp;|&nbsp; Sample</div>'));
+  ok("the head card says the workspace and the repository's declared name", text.includes('<span class="sds-rail-place">SaaS Plane · Sample</span>'));
   ok("the line shown with scripts off points at the hub", text.includes(`<a href="${ARTIFACT.docs}/${HUB}">the hub</a>`));
   ok("the page's own block says it is the index, and a line says the page is produced",
     text.includes('"variant":"index"') && text.includes("<!-- Produced by `docs index`"));
@@ -409,21 +409,23 @@ const withAreas = () => repo({
     uncut.code === 1 && uncut.out.includes("no version of the shared styles was cut") && !existsSync(join(root, INDEX)), uncut.out);
 }
 
-console.log("\n=== the index goes back to the hub, one step up the chain");
+console.log("\n=== the head card opens the hub");
 {
   const root = withAreas();
   index(["write", root]);
   const text = read(root, INDEX);
-  ok("the way back sits at the top of the side and opens the hub, named by the repository",
-    text.includes(`<aside class="sds-index-side" id="index-side">\n    <a class="sds-home" href="${ARTIFACT.docs}/${HUB}">&larr; ${basename(root)}</a>\n    <div class="sds-index-head">`));
+  ok("the head card sits at the top of the side and opens the hub, named by the repository",
+    text.includes(`<aside class="sds-index-side" id="index-side">\n    <div class="sds-rail-head">\n      <a class="sds-rail-brand" href="${ARTIFACT.docs}/${HUB}"`)
+      && text.includes(`<span class="sds-rail-name">${basename(root)}</span>`) && !text.includes("sds-home"));
   const away = join(BASE, "elsewhere-back", ARTIFACT_INDEX);
   mkdirSync(dirname(away));
   index(["write", root, "--out", away]);
-  ok("written elsewhere, the link is the hub's path from where the page sits",
-    readFileSync(away, "utf8").includes(`class="sds-home" href="${relative(dirname(away), join(root, POCKET_DOCS, HUB))}"`));
+  ok("written elsewhere, the head card opens the hub by its path from where the page sits",
+    readFileSync(away, "utf8").includes(`class="sds-rail-brand" href="${relative(dirname(away), join(root, POCKET_DOCS, HUB))}"`));
   const bare = repo({ [`${POCKET_DOCS}/${AGENT}/devex-agent-overview.html`]: overview("agent", "DevEx Agent"), [`${ARTIFACTS}/README.md`]: "# Artifacts\n" });
   index(["write", bare]);
-  ok("a repository with no hub gives the index no way back", !read(bare, INDEX).includes("sds-home"));
+  ok("a repository with no hub: the head card opens the first page of the tree, and no other way back is drawn",
+    !read(bare, INDEX).includes("sds-home") && read(bare, INDEX).includes(`class="sds-rail-brand" href="${ARTIFACT.docs}/${AGENT}/devex-agent-overview.html"`));
 }
 
 console.log(failed ? `\n  ${failed} of ${total} FAILED` : `\n  all ${total} passed`);
