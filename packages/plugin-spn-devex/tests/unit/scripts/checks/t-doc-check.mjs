@@ -953,7 +953,7 @@ console.log("\n=== doc-check — a long What on an open approach page holds a fi
 }
 
 {
-  console.log("\n=== doc-check — a page's name and its rail entries are short names (RULE.DEVEX.WORKSPACE.517, .518)");
+  console.log("\n=== doc-check — a page's name and its rail entries are short names (RULE.DEVEX.WORKSPACE.517, RULE.DEVEX.WORKSPACE.518)");
   const { nameRule, check } = await import("../../../../src/scripts/checks/doc-check.ts");
   const say = (label, ok, detail = "") => { n += 1; if (!ok) failed += 1; console.log(`  ${ok ? "PASS" : "FAIL"}  ${label}${ok || !detail ? "" : `\n        ${detail}`}`); };
   const page = (title, h2, h3) => `<!-- spn:doc\n{"id": "x", "variant": "construct", "title": "${title}"}\n-->\n` +
