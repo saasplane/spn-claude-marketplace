@@ -131,7 +131,7 @@ The figure follows one row of a register through the three sections above, from 
   ] }
 ```
 
-### Row gaps — A row's gap is closed by the chain, not by a tool
+### Closing a gap — A row's gap is closed by the chain, not by a tool
 
 A behaviour enters the product through its row: the row is written first, a case cites it, and the run's artifact stamps it. So no tool here compares what a service publishes against the rows. Every stack declares its actions its own way, and a comparison per stack is not worth a permanent check; code written outside the chain is answered in review.
 

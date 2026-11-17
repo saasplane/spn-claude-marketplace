@@ -21,12 +21,12 @@ description: Write one of the five reports on a repository — coverage (how muc
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "Reports and templates",
-      "seen": "abcbbbca"
+      "seen": "767752d2"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "The header — two lines, six fields, produced from the block",
-      "seen": "a040d4e8"
+      "seen": "71ff0306"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
@@ -122,7 +122,7 @@ Each section's `id` is `s0` to `s4` in page order.
 | 2 | **Findings** | the facts, by axis | the report type's own axis tables first, then **Repository → Apps → Packages** |
 | 3 | **Records** | what exactly do I fix? | list items in folded groups by cause |
 | 4 | **Measured** | how were these numbers produced? | **Scope**, **Measure again** and **Not looked at**, shown; the **Method** table, folded |
-| 5 | **Recommendations** | what closes the gaps? | **Agent closes — The agent closes these** · **Agent flags — The agent closes these and flags them** · **Needs you** |
+| 5 | **Recommendations** | what closes the gaps? | **Agent closes — The agent closes these** · **Closes and flags — The agent closes these and flags them** · **Needs you** |
 
 Records and Recommendations are left out only when there is nothing to put in them.
 

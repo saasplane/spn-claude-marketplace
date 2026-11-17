@@ -99,7 +99,7 @@ A bar set from what the corpus already averages moves every time the corpus does
 
 Nothing matches a tool against the work you are doing, so you reach one by naming its path. It reads the repository it was pointed at and answers with both a list and a number: findings a person reads, each carrying its grade, and an exit code a pipeline reads that counts only the refusals. That is why the grade is part of a finding rather than a judgement made at the end.
 
-### Check sharing — One file serves the write-time check and the sweep
+### Shared check — One file serves the write-time check and the sweep
 
 A rule answered one way while a file is written and another way in a sweep is two rules. The practical consequence is that the same file must read a document in both of its spellings — the markdown an author writes and the HTML a page is produced as — because reading only one of them once reported every hand-written page as missing every section it carried.
 

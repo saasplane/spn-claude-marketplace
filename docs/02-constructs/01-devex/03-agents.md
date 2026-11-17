@@ -99,7 +99,7 @@ The reader a document is written for and the reviewer who judges it are one list
 
 A lens is a ref, so it carries a stamp and adds no rule of its own. Each file names its own sources at the top and states that it restates them. Where a lens and the book disagree, the book wins and the lens is rewritten; a lens that starts deciding rules has become a second standard nobody audits.
 
-### Reviewers — A reviewer that edits has stopped reviewing
+### Reviewer never edits — A reviewer that edits has stopped reviewing
 
 Where a persona both finds a problem and fixes it, the finding and the fix arrive together and nobody can weigh one without the other. So the reviewing briefs report, the engineering brief advises, and exactly one brief is permitted to write — over the paragraphs it was handed, never over a whole file.
 
