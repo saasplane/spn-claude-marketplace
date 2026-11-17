@@ -1,14 +1,14 @@
 <!-- spn:doc
 {
   "id": "spn-claude-marketplace-constructs-spn-infra",
-  "title": "spn-infra — The Estate Domain",
+  "title": "spn-infra",
   "lenses": ["INFRA", "ARCHITECT"],
   "status": "PLANNING",
   "summary": "The model behind the plugin every estate repository loads — the single guard standing between an edit and an estate file, the skills that change what an estate is, and the cards holding the estate's own vocabulary."
 }
 -->
 
-# spn-infra — The Estate Domain
+# spn-infra
 
 `For: DevOps / SRE · Architect` · `Status: 🔮 PLANNING`
 

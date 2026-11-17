@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "seen": "014d539f"
+      "seen": "bb41a4c5"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
@@ -29,7 +29,7 @@
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/04-docs.md",
-      "seen": "1053e53f"
+      "seen": "175890dd"
     },
     {
       "path": "spn-foundation/CONCEPT.md",
@@ -417,6 +417,13 @@ the arc's address (`N<nnn>`, `ideate` or `follow-ups`) and the arc's subject in 
 approach page's reads `025 - Partner Web`. Its `h1`, its rail and its block's `title` stay the
 preview's name.
 
+**A short name is at most three words, and never a sentence** (`RULE.DEVEX.WORKSPACE.517` · MUST · check:doc-check):
+*Enablement*, never *Enablement — What a Category of Organization Is Offered*. A fourth word is kept only for one
+fixed term that breaks if it is cut, such as *Identity and Access Management*: four words warn, five words or a
+sentence are refused. A dash, a `·`, a section's number and a workstream's number are not words. It holds on every
+page of a repository's artifacts and on an open workstream's approach page and previews, so an arc's title is
+written short too. A seat file never drawn as a page, a behaviour's or a capability's, keeps its title. A guide and each of its steps are named by their imperative: *Run Launchpad locally*.
+
 **An approach page's masthead carries no project shorthand either** — an arc number, a question
 number or a release name, such as *N116* or *R2*, that the same sentence does not explain. The
 workstream's number that opens its `h1` comes from the folder's name, and it is not part of the
@@ -677,7 +684,11 @@ script colours the block when the page opens, from that tag. A block with no lan
 **The rail is built from the markup.** Every `<section id>` becomes an entry, named from its `h2` up
 to the em dash, and every `<h3 id>` inside it an entry under it, named the same way: *SEQUENCE — steps in
 order* is *SEQUENCE* in the rail, and the heading on the page keeps the rest (RULE.DEVEX.WORKSPACE.231,
-styles `1.2.0`). A heading with no `id` never reaches
+styles `1.2.0`). **So every heading the rail shows reads as a name of at most three words before its dash**
+(`RULE.DEVEX.WORKSPACE.518` · MUST · check:doc-check): a heading that is a sentence keeps its words after the dash
+and takes a name from the section's own words in front, *Candidate — The candidate, and what it keeps*. Join two
+parts with *and* or *or*, never a comma (*Export and erasure*, not *Export, erasure*); a contrast may keep its comma
+(*Steps, not rules*). A heading with no `id` never reaches
 the rail, which is why a template ships every section and subsection with one. **The side gutter is
 `8px` on every page, at every width, except a report at phone width (`40rem` and below), which takes
 `16px`.**

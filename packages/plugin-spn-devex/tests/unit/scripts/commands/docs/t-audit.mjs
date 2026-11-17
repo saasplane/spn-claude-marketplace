@@ -233,19 +233,19 @@ const overview = (sections) =>
 const CONCEPT_TREE = "# c\n\n## SaaS Plane — Foundation\n\nstage.\n\n### DevEx\n\nhow it runs.\n\n### Docs\n\nhow it is written.\n\n## Adoption\n\nlast.\n";
 {
   const root = repo({ "CONCEPT.md": CONCEPT_TREE,
-    [`${POCKET_DOCS}/o-overview.html`]: overview(["Overview", "DevEx", "Docs", "Glossary", "Where to go next"]) });
+    [`${POCKET_DOCS}/o-overview.html`]: overview(["Overview", "DevEx", "Docs", "Glossary", "Next — Where to go next"]) });
   one("a domain heading at `###` is a real heading, and the overview may borrow it",
     run(root, ["audit", "check", `${POCKET_DOCS}/o-overview.html`]), lacks("no counterpart"));
 }
 {
   const root = repo({ "CONCEPT.md": CONCEPT_TREE,
-    [`${POCKET_DOCS}/o-overview.html`]: overview(["Overview", "DevEx", "Invented", "Glossary", "Where to go next"]) });
+    [`${POCKET_DOCS}/o-overview.html`]: overview(["Overview", "DevEx", "Invented", "Glossary", "Next — Where to go next"]) });
   one("a heading the concept does not have anywhere is still a finding",
     run(root, ["audit", "check", `${POCKET_DOCS}/o-overview.html`]), has("Invented — an overview never invents"));
 }
 {
   const root = repo({ "CONCEPT.md": CONCEPT_TREE,
-    [`${POCKET_DOCS}/o-overview.html`]: overview(["Overview", "Docs", "DevEx", "Glossary", "Where to go next"]) });
+    [`${POCKET_DOCS}/o-overview.html`]: overview(["Overview", "Docs", "DevEx", "Glossary", "Next — Where to go next"]) });
   one("and the source's order still binds across depths",
     run(root, ["audit", "check", `${POCKET_DOCS}/o-overview.html`]), has("an overview holds its source's order"));
 }
@@ -253,7 +253,7 @@ const CONCEPT_TREE = "# c\n\n## SaaS Plane — Foundation\n\nstage.\n\n### DevEx
   // A concept that SHOWS an example page in a fenced block is not declaring those headings.
   const root = repo({
     "CONCEPT.md": CONCEPT_TREE + "\n```markdown\n## Fenced Heading\n```\n",
-    [`${POCKET_DOCS}/o-overview.html`]: overview(["Overview", "Fenced Heading", "Glossary", "Where to go next"]) });
+    [`${POCKET_DOCS}/o-overview.html`]: overview(["Overview", "Fenced Heading", "Glossary", "Next — Where to go next"]) });
   one("a heading inside a fence is not a heading the concept has",
     run(root, ["audit", "check", `${POCKET_DOCS}/o-overview.html`]), has("Fenced Heading — an overview never invents"));
 }
@@ -858,19 +858,19 @@ console.log("\n=== a domain overview borrows from its DOMAIN, not from the conce
   // no `<header>`, so `checkHeader` fires on it and a bare `lacks("✗")` was failing for a reason
   // that has nothing to do with the source of an overview's sections.
   one("a section per construct, in the face's reading order, is accepted",
-    audit(["Overview", "Gamma", "Beta", "Glossary", "Where to go next"]), lacks("name no construct"));
+    audit(["Overview", "Gamma", "Beta", "Glossary", "Next — Where to go next"]), lacks("name no construct"));
   one("and its order is not questioned either",
-    audit(["Overview", "Gamma", "Beta", "Glossary", "Where to go next"]), lacks("reading order"));
+    audit(["Overview", "Gamma", "Beta", "Glossary", "Next — Where to go next"]), lacks("reading order"));
   one("and the concept naming nothing below the domain no longer refuses it",
-    audit(["Overview", "Gamma", "Beta", "Glossary", "Where to go next"]), lacks("no counterpart"));
+    audit(["Overview", "Gamma", "Beta", "Glossary", "Next — Where to go next"]), lacks("no counterpart"));
   one("one section naming no construct is the connective one, and it is allowed",
-    audit(["Overview", "Gamma", "Beta", "The rules this path shares", "Glossary", "Where to go next"]),
+    audit(["Overview", "Gamma", "Beta", "The rules this path shares", "Glossary", "Next — Where to go next"]),
     lacks("name no construct"));
   one("two are refused, because the second is an argument the domain does not account for",
-    audit(["Overview", "Gamma", "Beta", "The rules", "Something else", "Glossary", "Where to go next"]),
+    audit(["Overview", "Gamma", "Beta", "The rules", "Something else", "Glossary", "Next — Where to go next"]),
     has("name no construct of this domain"));
   one("and the reading order is held, so the file order cannot be mistaken for it",
-    audit(["Overview", "Beta", "Gamma", "Glossary", "Where to go next"]),
+    audit(["Overview", "Beta", "Gamma", "Glossary", "Next — Where to go next"]),
     has("holds its face's reading order"));
 }
 
@@ -879,7 +879,7 @@ console.log("\n=== an HTML page links the HTML page, never the markdown seat (Q2
   const page = (href) =>
     `<meta charset="utf-8">\n<title>T</title>\n` +
     block({ id: "o", variant: "overview", parentId: "concept", title: "T", lenses: ["ARCHITECT"], summary: "s." }) +
-    `${LINES.stylesheet}\n<h2>Overview</h2>\n<p>See <a href="${href}">it</a>.</p>\n<h2>Glossary</h2>\n<p>x</p>\n<h2>Where to go next</h2>\n<p>x</p>`;
+    `${LINES.stylesheet}\n<h2>Overview</h2>\n<p>See <a href="${href}">it</a>.</p>\n<h2>Glossary</h2>\n<p>x</p>\n<h2>Next — Where to go next</h2>\n<p>x</p>`;
   const mk = (href) => repo({
     "CONCEPT.md": "# c\n\n## Core\n\nThe core.\n",
     [`docs/${SEAT.constructs}/01-core/thing.md`]: "# Thing\n",
@@ -906,7 +906,7 @@ console.log("\n=== the back link and the previous and next doors open a page; th
     `${LINES.stylesheet}\n<nav class="sds-rail" id="rail">\n  <a class="sds-home" href="${home}">&larr; Home</a>\n  <a href="#s1">Overview</a>\n</nav>\n` +
     `<section id="s1">\n  <div class="sds-section-head"><h2>Overview</h2></div>\n<p>See <a href="${inside}">a sample</a>.</p>\n</section>\n` +
     `<section id="s2">\n  <div class="sds-section-head"><h2>Glossary</h2></div>\n<p>x</p>\n</section>\n` +
-    `<section id="s3">\n  <div class="sds-section-head"><h2>Where to go next</h2></div>\n<ul><li><a href="${next}">next</a></li></ul>\n` +
+    `<section id="s3">\n  <div class="sds-section-head"><h2>Next — Where to go next</h2></div>\n<ul><li><a href="${next}">next</a></li></ul>\n` +
     `<div class="sds-nextnav">\n  <a class="sds-nextnav-card" href="${previous}"><span class="sds-direction">&larr; Previous</span><span class="sds-title">P</span></a>\n` +
     `  <a class="sds-nextnav-card sds-next" href="${door}"><span class="sds-direction">Next &rarr;</span><span class="sds-title">N</span></a>\n</div>\n</section>`;
   const FILE = `${POCKET_DOCS}/o-overview.html`;
@@ -1103,7 +1103,7 @@ console.log("\n=== a page's furniture is the shared files': a version that exist
     `<span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">${type}</span><span class="sds-separator">|</span>` +
     `<span class="sds-label">For:</span> <span class="sds-audience"><span class="sds-badge sds-lens">Architect</span></span></span></div>\n` +
     `<h1>Know where you are.</h1>\n<p class="sds-standfirst">This page covers the core.</p>\n</header>\n` +
-    ["Overview", "Glossary", "Where to go next"].map((name, at) =>
+    ["Overview", "Glossary", "Next — Where to go next"].map((name, at) =>
       `<section id="s${at}"><div class="sds-section-head"><h2>${name}</h2></div>\n<p>x</p></section>\n`).join("");
   const head = `<meta charset="utf-8">\n<title>Core</title>\n` + block(o);
   const shared = ({ link = LINES.stylesheet, own = "", type } = {}) => `${head}${link}\n${own}${content(type)}${LINES.script}\n`;

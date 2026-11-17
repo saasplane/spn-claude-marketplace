@@ -1,7 +1,7 @@
 <!-- spn:doc
 {
   "id": "spn-claude-marketplace-install-the-plugins",
-  "title": "Install the Plugins — And Prove They Loaded",
+  "title": "Install the Plugins",
   "lenses": ["SERVER_DEV", "WEB_DEV", "ARCHITECT", "INFRA"],
   "status": "DONE",
   "summary": "Putting the plugin set into a workspace from a directory or from git, the refresh that actually replaces the installed bytes, and the checks that tell you which version a session is really running.",
@@ -9,7 +9,7 @@
 }
 -->
 
-# Install the Plugins — And Prove They Loaded
+# Install the Plugins
 
 `For: Backend developer · Web developer · Architect · DevOps / SRE` · `Status: ✅ DONE`
 
@@ -17,7 +17,7 @@ By the end of this you have the plugins your repository declares, installed, cur
 
 Everything below is a terminal command. Run the `claude plugin` ones **from the workspace root**, because the install is recorded against the directory you ran it in.
 
-## Step 1 — know which source you are installing from
+## Step 1 — Install source — know which source you are installing from
 
 A marketplace is either a folder on your machine or a repository you fetch, and which one you have decides almost everything that follows.
 
@@ -40,7 +40,7 @@ You can ask the `claude` CLI the same question, and it answers from its own regi
 claude plugin marketplace list
 ```
 
-## Step 2 — register the marketplace, once
+## Step 2 — Marketplace — register the marketplace, once
 
 A marketplace is registered before any plugin in it can be installed. **`spnutils workspace init` does this for you** as part of minting a workspace, writing the entry into the workspace's `.claude/settings.local.json`. That is the path to prefer, because it also writes the permission tiers and the plugin union in the same pass.
 
@@ -62,7 +62,7 @@ Before you register a directory you are authoring, you can check that its manife
 claude plugin validate /opt/work/saasplane/code/spn-claude-marketplace
 ```
 
-## Step 3 — install what the repository declares
+## Step 3 — Declared plugins — install what the repository declares
 
 **Prefer the CLI command.** It reads `sprepo.json`, derives which plugins that repository loads, installs them, writes the managed instruction block and the generated rules, and reinstalls any plugin that has drifted from its source:
 
@@ -148,7 +148,7 @@ Silence means the installed bytes are the bytes you are reading. Any output mean
 
 `__pycache__`, `.DS_Store`, `.git` and `.in_use` are excluded because each exists in one copy for a reason of its own. `.in_use` is the awkward one: the CLI writes it into the installed copy, so a comparison that reads it reports drift on every single run.
 
-## Step 5 — take a fresh window
+## Step 5 — Fresh window — take a fresh window
 
 The order is load-bearing, and reversing it costs you a second reload:
 

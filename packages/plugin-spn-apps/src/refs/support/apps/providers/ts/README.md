@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/10-providers/ts/README.md",
-      "seen": "aab5234c"
+      "seen": "c245eab3"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/10-providers/02-contract.md",

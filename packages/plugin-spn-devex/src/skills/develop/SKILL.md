@@ -7,11 +7,11 @@ description: The contract-first build loop - the order work is done in, what eac
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
-      "seen": "2fce1268"
+      "seen": "7beac2a2"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/04-develop.md",
-      "seen": "4cd4f421"
+      "seen": "c57cb970"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/04-develop.md",

@@ -63,5 +63,10 @@
     "sds-docs.css": "sha384-WiniroKwtgBGQa/YuvtjywJOoLCqJRnD4v2OCINQys2XzhwipkthjfpJRU1RWSJn",
     "sds-docs.js": "sha384-wCFcUN8WHuihR4yVBolwrWWQDsbdzAocPJ2ql89kWPohRUNkJI33uWvUy/t/RDQu",
     "sds-index.js": "sha384-JSbNefjuPiIxV6gpGqh+2409hLobzkO4FVwNFtsDCVOEnxDFuttc3PVSSPF3m9Zz"
+  },
+  "1.13.0": {
+    "sds-docs.css": "sha384-i32pAQr3Ea9ijziU/EmymWO0fDR2jVojzqvZXbOM9/0ZPuyCYeWXfKcfIADB7hK1",
+    "sds-docs.js": "sha384-wCFcUN8WHuihR4yVBolwrWWQDsbdzAocPJ2ql89kWPohRUNkJI33uWvUy/t/RDQu",
+    "sds-index.js": "sha384-bLmDz4ycN7mvYZ8nlc97DO0rewAOFSYBaOUhHaI2UM6nOTc3FHTkt5D/xTfCUd7C"
   }
 }

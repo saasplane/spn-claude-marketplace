@@ -1,14 +1,14 @@
 <!-- spn:doc
 {
   "id": "spn-claude-marketplace-constructs-spn-surface",
-  "title": "spn-surface — The Surface Domain",
+  "title": "spn-surface",
   "lenses": ["UX", "WEB_DEV"],
   "status": "PLANNING",
   "summary": "The model behind what a person sees and touches made concrete for an agent: the one write-time rule over the Figma connector, the design skill, the Surface refs, and the proof the plugin owes."
 }
 -->
 
-# spn-surface — The Surface Domain
+# spn-surface
 
 `For: UX designer · Web developer` · `Status: 🔮 PLANNING`
 

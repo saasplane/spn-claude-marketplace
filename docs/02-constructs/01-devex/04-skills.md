@@ -2,7 +2,7 @@
 {
   "id": "skill-set",
   "variant": "construct",
-  "title": "Skills — A Stage's Steps, Loaded on Match",
+  "title": "Skills",
   "subtitle": "A skill only loads when the work in front of you actually matches it.",
   "lenses": ["ARCHITECT", "LEAD"],
   "status": "PLANNING",
@@ -12,7 +12,7 @@
 }
 -->
 
-# Skills — A Stage's Steps, Loaded on Match
+# Skills
 
 `For: Architect · Engineering leader` · `Status: 🔮 PLANNING`
 
@@ -61,17 +61,17 @@ A large skill therefore costs nothing on a turn that never needed it, which is w
 
 ## Parts
 
-### The file a session loads
+### Loaded file — The file a session loads
 
 A frontmatter block naming `name` and `description`, then instructions in markdown. The frontmatter carries those two fields and nothing more for a stack-agnostic skill. Everything a session decides about whether to read the file is decided from those first lines.
 
 **The frontmatter is the file's first line, and the stamp comes after it** (RULE.DEVEX.AGENT.108). The runtime reads frontmatter only at the start of the file. A skill that opens with anything else, its `spn:restates` stamp included, is still a command a person can type, but the session is never offered it, so no ask in plain words reaches it. A suite case reads every `SKILL.md` of the four plugins and fails on one whose first line is not `---`. It reads no partner's file.
 
-### A skill that outgrows one file
+### Outgrowing one file — A skill that outgrows one file
 
 A skill whose walk is long enough keeps its own file as the router — it classifies the ask and names which files to read in which order — and puts each part of the walk in its own step file. The router is read on every match; a step is read only once the router names it. No stack-agnostic skill here needs one, and one domain skill does.
 
-### A mode is an argument, never a second skill
+### Modes — A mode is an argument, never a second skill
 
 Two skills with almost the same description compete for the same match, and the matching gets worse as the pair grows. So a skill that answers several close asks takes a mode as an argument, names its modes in the description, and says which neighbouring skill an adjacent ask belongs to instead. A destructive mode says so in the sentence a session matches against, rather than only in the body loaded afterwards.
 
@@ -79,15 +79,15 @@ Two skills with almost the same description compete for the same match, and the 
 
 A skill is prose an agent reads and then follows, never a script the runtime executes. It is a document selected the way code is dispatched — by a match at the top rather than by a person opening the right file by hand.
 
-### A skill carries steps, and never a rule
+### Steps, not rules — A skill carries steps, and never a rule
 
 The moment a skill states a rule stated nowhere else, it has become a second source nothing audits. A skill names the chapter or the card that holds the rule and sequences the work around it. Where a step file does carry rules, it carries them under the same stamp a ref carries, so a drift run reads a step exactly as it reads a ref.
 
-### A step that varies by instance lives with the instance
+### Instance steps — A step that varies by instance lives with the instance
 
 Where a stack-agnostic skill needs a concrete step, the skill stays in one place and the step files sit under the provider folder for the realization that changes them. Copying the skill into each stack would put one rule in two folders, drifting, with nothing comparing them. The gate reads the realization from the repository's own manifest and resolves into that folder.
 
-### Some skills ask rather than read
+### Asking skills — Some skills ask rather than read
 
 A few answers cannot be derived from the ground, because they are decisions rather than readings. A skill of that kind works one agreed block at a time and runs no act on an answer nobody gave, and its description says so.
 

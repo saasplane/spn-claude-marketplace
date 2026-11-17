@@ -2,7 +2,7 @@
 {
   "id": "agent-set",
   "variant": "construct",
-  "title": "Agents — The Personas a Session Convenes, and the Viewpoints They Are Handed",
+  "title": "Agents",
   "subtitle": "A second reader, convened for just one turn, who holds only what its own file grants it.",
   "lenses": ["LEAD", "ARCHITECT"],
   "status": "PLANNING",
@@ -12,7 +12,7 @@
 }
 -->
 
-# Agents — The Personas a Session Convenes, and the Viewpoints They Are Handed
+# Agents
 
 `For: Engineering leader · Architect` · `Status: 🔮 PLANNING`
 
@@ -71,7 +71,7 @@ Most briefs are a fixed persona and read the same way on every convening. One is
 
 `name` and `description`, read the same way [a skill's](04-skills.md) are: the description is matched against the moment rather than browsed, and it decides whether this persona takes the reply. Two more fields are optional. `model` chooses which model runs the persona, and `tools` narrows what it may call. Leaving `tools` out grants every tool the session itself has.
 
-### Where a read-only promise is actually bound
+### Read-only promise — Where a read-only promise is actually bound
 
 A brief declaring `tools` is bound by it: the permission is a fact about the convening rather than an instruction the persona is asked to follow. A brief that declares no `tools` inherits everything the session has, and its promise not to write is prose (rule RULE.CLAUDE_MARKETPLACE.DEVEX.004). Both kinds exist here, and telling them apart matters when a reviewer's independence is what the brief is for.
 
@@ -83,27 +83,27 @@ A brief with no argument is one voice, always: an engineering lead, a prose rewr
 
 One brief here takes a viewpoint name as part of what it is convened over. It reads that viewpoint's own file before anything else, and the brief's own description lists the names a caller may pass, which is also what makes them discoverable. A brief for each viewpoint would be many copies of one procedure, drifting apart, each needing the same change — so the procedure lives in one file and the subject matter lives beside it.
 
-### What one lens file says
+### Lens file — What one lens file says
 
 A lens file opens by saying when the viewpoint is worn, when it is convened, and the one condition on which it blocks. Then it says what it checks. Everything below the stated threshold is advice, and the file says so plainly, because a reviewer who can block anything stops being a reviewer and the work stops on taste.
 
-### Wearing and convening are different acts
+### Wearing and convening — Wearing and convening are different acts
 
 Wearing a lens while writing makes the work better and is never a review, because the context that drafted something already agrees with its own reasoning. Convening is the other act: a reader who did not write the work, holding one file, reporting what that viewpoint found. A skill says which gate convenes which viewpoint.
 
-### The lens names are also the audience a document declares
+### Audience names — The lens names are also the audience a document declares
 
 The reader a document is written for and the reviewer who judges it are one list. Two lists would let a document declare an audience no reviewer could be convened as. The register that maps each value to its reader label lives in the documents tool, and a document declaring a value outside the set is refused.
 
-### A lens is regenerated, never argued with
+### Lens regeneration — A lens is regenerated, never argued with
 
 A lens is a ref, so it carries a stamp and adds no rule of its own. Each file names its own sources at the top and states that it restates them. Where a lens and the book disagree, the book wins and the lens is rewritten; a lens that starts deciding rules has become a second standard nobody audits.
 
-### A reviewer that edits has stopped reviewing
+### Reviewer never edits — A reviewer that edits has stopped reviewing
 
 Where a persona both finds a problem and fixes it, the finding and the fix arrive together and nobody can weigh one without the other. So the reviewing briefs report, the engineering brief advises, and exactly one brief is permitted to write — over the paragraphs it was handed, never over a whole file.
 
-### A brief points at a rule and never invents one
+### Briefs — A brief points at a rule and never invents one
 
 A persona stating a rule with no chapter behind it has produced a suggestion wearing the clothes of a finding, and the next reader cannot tell which they are holding. Each brief names where its standard lives: the reviewing brief's standard is the viewpoint file, and that file's standard is the book.
 

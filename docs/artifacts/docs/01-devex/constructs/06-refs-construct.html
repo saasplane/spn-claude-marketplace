@@ -1,22 +1,22 @@
 <meta charset="utf-8">
-<title>Refs — A Chapter, Restated and Stamped</title>
+<title>Refs</title>
 <!-- spn:doc
-{"id":"ref-set","variant":"construct","title":"Refs — A Chapter, Restated and Stamped","subtitle":"A copy of a rule that says the moment it has fallen behind.","lenses":["VOICE","ARCHITECT"],"status":"PLANNING","dependsOn":["plugin-set"],"summary":"A ref is a markdown restatement of one or more foundation chapters, carrying a hash of the exact text it last read.","keywords":["ref","spn:restates","seen","hash","drift","unstamped"]}
+{"id":"ref-set","variant":"construct","title":"Refs","subtitle":"A copy of a rule that says the moment it has fallen behind.","lenses":["VOICE","ARCHITECT"],"status":"PLANNING","dependsOn":["plugin-set"],"summary":"A ref is a markdown restatement of one or more foundation chapters, carrying a hash of the exact text it last read.","keywords":["ref","spn:restates","seen","hash","drift","unstamped"]}
 -->
 <!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
 <link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.css" integrity="sha384-EFi+bm+soztQp3Bg2oQPRtdkdyGkD/O1qSDL0QCFBIHQg2sNtFhUHlkwxArFA8dY" crossorigin="anonymous">
 <div class="sds-page">
 
 <nav class="sds-rail" id="rail">
-  <a class="sds-home" href="../devex-overview.html">&larr; spn-devex — The Stack-Agnostic Domain</a>
-  <div class="sds-rail-title">Refs — A Chapter, Restated and Stamped</div>
+  <a class="sds-home" href="../devex-overview.html">&larr; spn-devex</a>
+  <div class="sds-rail-title">Refs</div>
 </nav>
 <div class="sds-wrap">
 
 <header class="sds-masthead">
   <!-- Rendered from the spn:doc block by `docs.ts page`. Never typed: a header that disagreed with its block is what this removes. -->
-  <div class="sds-eyebrow"><span class="sds-line1">SaaS Plane &nbsp;|&nbsp; Claude Marketplace &nbsp;|&nbsp; Refs — A Chapter, Restated and Stamped</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Construct</span><span class="sds-separator">|</span><span class="sds-label">For:</span> <span class="sds-audience"><span class="sds-badge sds-lens">Editor</span><span class="sds-badge sds-lens">Architect</span></span><span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-planning">&#x1F52E; PLANNING</span></span></span></div>
-  <h1>Refs — A Chapter, Restated and Stamped</h1>
+  <div class="sds-eyebrow"><span class="sds-line1">SaaS Plane &nbsp;|&nbsp; Claude Marketplace &nbsp;|&nbsp; Refs</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Construct</span><span class="sds-separator">|</span><span class="sds-label">For:</span> <span class="sds-audience"><span class="sds-badge sds-lens">Editor</span><span class="sds-badge sds-lens">Architect</span></span><span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-planning">&#x1F52E; PLANNING</span></span></span></div>
+  <h1>Refs</h1>
   <p class="sds-subtitle">A copy of a rule that says the moment it has fallen behind.</p>
   <p class="sds-standfirst">A ref is a markdown restatement of one or more foundation chapters, carrying a hash of the exact text it last read. Read this page before you write a new ref, or when a drift check tells you one has fallen behind. It explains how the hash lets a run report a chapter that moved, and the three ways a restatement can fail to be comparable at all.</p>
 </header>
@@ -98,21 +98,86 @@
 <!-- 03 -->
 <section id="s3">
   <div class="sds-section-head"><h2>Parts</h2></div>
-  <h3 id="the-folder-mirrors-the-book-and-holds-no">The folder mirrors the book, and holds nothing else</h3>
+  <h3 id="folder-mirror-the-folder-mirrors-the-boo">Folder mirror — The folder mirrors the book, and holds nothing else</h3>
   <p>A ref's path says which part of the book it restates, so <code>refs/</code> reads as a map of the chapters a plugin's readers need rather than as a pile of documents. Material that restates no chapter — a procedure a skill loads, a list of steps — is not a ref and does not belong there, whatever it happens to be about.</p>
-  <h3 id="the-block-and-what-it-holds">The block, and what it holds</h3>
+  <h3 id="the-block-the-block-and-what-it-holds">The block — The block, and what it holds</h3>
   <p>A comment carrying strict JSON: a list of chapters, each with a path, an optional section, and its hash; and optionally a list of register rows the file also depends on. It sits at the top of the file, in the position a document's metadata block would take, and a ref carries this rather than that. A skill's <code>SKILL.md</code> is the one exception: its frontmatter comes first and the block right after it, because a skill that opens with anything else is never offered to the session (<a href="./04-skills-construct.html">Skills</a>).</p>
-  <h3 id="a-stamp-is-as-precise-as-the-sentence-it">A stamp is as precise as the sentence it replaces</h3>
+  <h3 id="stamp-precision-a-stamp-is-as-precise-as">Stamp precision — A stamp is as precise as the sentence it replaces</h3>
   <p>Name a section and the hash covers that heading's own text; name only a path and it covers the whole file. The reason is measurable. One concept file runs to thousands of lines and many restatements cite it, so hashing the whole file re-stamps a viewpoint every time anything else in it moves — and a finding that is usually wrong teaches people to stop reading the run.</p>
-  <h3 id="what-the-hash-ignores-and-what-it-does-n">What the hash ignores, and what it does not</h3>
+  <h3 id="hash-ignores-what-the-hash-ignores-and-w">Hash ignores — What the hash ignores, and what it does not</h3>
   <p>Trailing spaces and the blank lines around the cited text are invisible to a reader, so a change to them is not a change to the rule. Everything else counts, a reordering included, because a list of rules whose order changed is a list a restatement may now state wrongly.</p>
-  <h3 id="the-parser-lives-once-because-two-checks">The parser lives once because two checks read it</h3>
+  <h3 id="shared-parser-the-parser-lives-once-beca">Shared parser — The parser lives once because two checks read it</h3>
   <p>Comparing the foundation's own restatements inside one repository and comparing this repository's restatements against a book are different questions with the same parser. Writing that parser twice would be the defect this construct exists to stop, inside the instrument meant to catch it. So it is a library file, and neither check owns it.</p>
-  <h3 id="a-block-used-to-get-credit-for-what-it-l">A block used to get credit for what it left out</h3>
+  <h3 id="block-credit-a-block-used-to-get-credit-">Block credit — A block used to get credit for what it left out</h3>
   <p>A check that walks only the block can validate only what the file declared, so a source named in the file's own prose and omitted from the block was unreachable rather than unstamped, and both runs printed green over it. The check now reads the file's own source line and compares it against the block. The comparison is loose in one direction only: a name in prose counts as declared when some declared path contains it.</p>
-  <h3 id="three-ways-a-restatement-fails-and-they-">Three ways a restatement fails, and they are not the same finding</h3>
+  <h3 id="restatement-failures-three-ways-a-restat">Restatement failures — Three ways a restatement fails, and they are not the same finding</h3>
   <p><strong>Undeclared</strong> is prose naming a source the block leaves out, which no run can see. <strong>Unstamped</strong> is a file saying what it restates and carrying no block at all, so nothing machine-readable exists to compare. <strong>Unread</strong> is a name no check can resolve to a file, which is an under-report rather than a hidden fault.</p>
-  <h3 id="a-source-comment-is-not-a-stamp">A source comment is not a stamp</h3>
+  <p>Follow one file through the checks and each finding falls out at its own question, which is why they are three findings and not one.</p>
+  <figure>
+  <svg class="sds-drawing" viewBox="64 22 973 696" style="max-width:973px" role="img" aria-label="A file reaches the comparison only after it has a block, names nothing the block leaves out, and every name resolves to a file.">
+    <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
+    <rect class="sds-box" x="412" y="24" width="275" height="44" rx="22"/>
+    <text class="sds-label" x="434" y="50">A file that says what it restates</text>
+    <path class="sds-box" d="M550 124 L736 168 L550 212 L364 168 Z"/>
+    <text class="sds-label" x="473" y="172">Does it carry a block?</text>
+    <rect class="sds-box" x="66" y="296" width="217" height="76" rx="38"/>
+    <text class="sds-label" x="143" y="322">Unstamped</text>
+    <text class="sds-note" x="88" y="341">nothing machine-readable to</text>
+    <text class="sds-note" x="152" y="360">compare</text>
+    <path class="sds-box" d="M686 296 L1033 340 L686 384 L339 340 Z"/>
+    <text class="sds-label" x="529" y="344">Does its prose name a source the block omits?</text>
+    <rect class="sds-box" x="175" y="468" width="153" height="57" rx="28.5"/>
+    <text class="sds-label" x="217" y="494">Undeclared</text>
+    <text class="sds-note" x="197" y="513">no run can see it</text>
+    <path class="sds-box" d="M654 468 L924 512 L654 556 L384 512 Z"/>
+    <text class="sds-label" x="535" y="516">Does every name resolve to a file?</text>
+    <rect class="sds-box" x="285" y="640" width="230" height="76" rx="38"/>
+    <text class="sds-label" x="379" y="666">Unread</text>
+    <text class="sds-note" x="307" y="685">an under-report, not a hidden</text>
+    <text class="sds-note" x="384" y="704">fault</text>
+    <rect class="sds-box" x="571" y="640" width="243" height="57" rx="28.5"/>
+    <text class="sds-label" x="630" y="666">Compare the stamps</text>
+    <text class="sds-note" x="593" y="685">stamped and current, or drifted</text>
+    <path class="sds-connector" d="M550 68 V124" marker-end="url(#ar)"/>
+    <path class="sds-connector" d="M550 212 V240 H175 V296" marker-end="url(#ar)"/>
+    <path class="sds-connector" d="M550 212 V268 H686 V296" marker-end="url(#ar)"/>
+    <path class="sds-connector" d="M686 384 V412 H252 V468" marker-end="url(#ar)"/>
+    <path class="sds-connector" d="M686 384 V440 H654 V468" marker-end="url(#ar)"/>
+    <path class="sds-connector" d="M654 556 V584 H400 V640" marker-end="url(#ar)"/>
+    <path class="sds-connector" d="M654 556 V612 H693 V640" marker-end="url(#ar)"/>
+    <text class="sds-note" x="356" y="232">no</text>
+    <text class="sds-note" x="608" y="260">yes</text>
+    <text class="sds-note" x="459" y="404">yes</text>
+    <text class="sds-note" x="664" y="432">no</text>
+    <text class="sds-note" x="521" y="576">no</text>
+    <text class="sds-note" x="664" y="604">yes</text>
+  </svg>
+    <figcaption>A file reaches the comparison only after it has a block, names nothing the block leaves out, and every name resolves to a file.</figcaption>
+  </figure>
+  <!-- dg:source
+{ "kind": "flowchart",
+  "caption": "A file reaches the comparison only after it has a block, names nothing the block leaves out, and every name resolves to a file.",
+  "boxes": [
+    { "id": "file", "label": "A file that says what it restates", "shape": "terminator" },
+    { "id": "block", "label": "Does it carry a block?", "shape": "decision" },
+    { "id": "unstamped", "label": "Unstamped", "note": "nothing machine-readable to compare", "shape": "terminator" },
+    { "id": "prose", "label": "Does its prose name a source the block omits?", "shape": "decision" },
+    { "id": "undeclared", "label": "Undeclared", "note": "no run can see it", "shape": "terminator" },
+    { "id": "resolve", "label": "Does every name resolve to a file?", "shape": "decision" },
+    { "id": "unread", "label": "Unread", "note": "an under-report, not a hidden fault", "shape": "terminator" },
+    { "id": "hash", "label": "Compare the stamps", "note": "stamped and current, or drifted" }
+  ],
+  "links": [
+    { "from": "file", "to": "block" },
+    { "from": "block", "to": "unstamped", "label": "no" },
+    { "from": "block", "to": "prose", "label": "yes" },
+    { "from": "prose", "to": "undeclared", "label": "yes" },
+    { "from": "prose", "to": "resolve", "label": "no" },
+    { "from": "resolve", "to": "unread", "label": "no" },
+    { "from": "resolve", "to": "hash", "label": "yes" }
+  ] }
+  -->
+  <h3 id="source-comments-a-source-comment-is-not-">Source comments — A source comment is not a stamp</h3>
   <p>Every script here opens with a line naming the chapter it restates. That line carries no hash, so nothing compares it. It is deliberate, and it means something narrower: a change is made in the chapter first and in the code second, in the same change.</p>
 </section>
 

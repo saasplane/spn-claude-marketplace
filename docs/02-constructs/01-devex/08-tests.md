@@ -2,7 +2,7 @@
 {
   "id": "tests",
   "variant": "construct",
-  "title": "Tests — How This Plugin Proves Itself",
+  "title": "Tests",
   "subtitle": "A suite sits at the same path as the file it proves, so nothing has to be searched for.",
   "lenses": ["QA", "SERVER_DEV"],
   "status": "PLANNING",
@@ -12,7 +12,7 @@
 }
 -->
 
-# Tests — How This Plugin Proves Itself
+# Tests
 
 `For: Quality engineer · Backend developer` · `Status: 🔮 PLANNING`
 
@@ -61,39 +61,52 @@ The tree sits at the plugin's root rather than beside the source, so a suite is 
 
 ## Parts
 
-### What the folder holds, and the two tiers that are absent
+### Folder contents — What the folder holds, and the two tiers that are absent
 
 `tests/` holds the runner, a `helpers/` folder for what every suite imports, and one folder per tier. Only `unit/` exists. `integration/` is absent because nothing in these plugins runs at that tier, and `setup/` is absent because the runner needs none. **An absent folder says what is true; a folder standing empty to look complete teaches a reader that the tier works.**
 
-### The mirror repeats the source's own path
+### Mirror path — The mirror repeats the source's own path
 
 Under the tier, a suite sits at the path its source sits at inside the plugin. A check under `src/scripts/checks/` is proven under `unit/scripts/checks/`. A provider's rule is the one place the two paths differ: it lives under `src/providers/<instance>/scripts/checks/_<subject>/` and is proven under `unit/providers/<instance>/checks/_<subject>/`, without the provider's `scripts/` segment. Apart from that, nothing maps one to the other: the path is the map.
 
-### The folders are the convention; the framework is not
+### Folders and framework — The folders are the convention; the framework is not
 
 The authoring stack's own test step names a framework as well as a tree, and only the tree is adopted here. These suites drive real hook processes through standard input and assert on what comes back out, so a framework would wrap a subprocess harness in another harness and buy nothing. **The runner stays a plain `.mjs` file with no dependency**, which is also what lets a partner run it with nothing installed.
 
-### Nothing counts a `..` hop
+### Hop counting — Nothing counts a `..` hop
 
 A suite that types its own depth is a suite the next move breaks, and every suite broke at once the first time these folders changed. So the plugin root is resolved once, in the harness, and exported; the runner finds the tier by walking down from its own folder; and the helper that resolves a script's path walks whatever folders a provider's `checks/` actually holds. A suite imports those answers and computes none of them.
 
-### A suite is found by a walk, never by a list
+### Suite walk — A suite is found by a walk, never by a list
 
 The runner walks the tier and runs every file it finds. A list would be a second place a new suite has to be added, and the suite nobody added to it is the one that silently never runs.
 
-### A case that carries a behaviour id becomes that row's result
+### Behaviour ids — A case that carries a behaviour id becomes that row's result
 
 This repository declares no stack, so no stack runner writes its behaviour rows. The suites are the runner instead: a case whose title carries a row's id writes that row's result into the file of the run its caller named, and a tool told that run's name reads the file and fills the two cells a run owns. A row no case reached is left saying so.
 
-### What a suite proves is the shipping shape
+The figure below is that hand-off as one line, from a case's title to the row's cells.
+
+```dg
+{ "kind": "chain",
+  "caption": "The case cites the row and the tool only reads the file, so a row a case never reached is left saying so.",
+  "boxes": [
+    { "id": "case", "label": "A case", "note": "its title carries a row's id" },
+    { "id": "file", "label": "The run's file", "note": "written under the name the caller gave" },
+    { "id": "tool", "label": "The tool", "note": "told that run's name, reads the file" },
+    { "id": "row", "label": "The row", "note": "the two cells a run owns are filled", "em": true }
+  ] }
+```
+
+### Shipping shape — What a suite proves is the shipping shape
 
 A suite runs the script the way a moment runs it — as a process, handed a payload on standard input, read back from standard output — rather than importing a function and calling it. A gate that passes when imported and fails when spawned is a gate that has never been proven, and both spellings exist in the folder it is asked about.
 
-### The payload a case replays sits beside the suites, once per event
+### Replayed payloads — The payload a case replays sits beside the suites, once per event
 
 `tests/fixtures/payloads/<event>/` holds one recorded call per event this plugin wires — `orientation` · `pretooluse` · `closed` · `stop` — and a suite reads one rather than constructing its own. A payload is an input, never a generated answer, so a stale one is a fixture problem and never a passing case that stopped proving anything.
 
-### Two more cases prove the bundle, not one file
+### Bundle cases — Two more cases prove the bundle, not one file
 
 Once a plugin builds, `unit/t-dist-current.mjs` and `unit/t-bundle-parity.mjs` sit at the tree's root rather than under any one mirror, because each proves a property of the whole plugin: the first recomputes a bundle's declared sources against the banner esbuild wrote into it, and the second runs a recorded payload through the source and through the committed bundle and asserts the two agree. Both call the one shared harness the foundation's plugins realization states, `packages/plugin-support-lib/tests/helpers/`, so the build and the check can never quietly disagree.
 

@@ -1,22 +1,22 @@
 <meta charset="utf-8">
-<title>Tests — The Plugin's Own Folders, Without a Framework</title>
+<title>Tests</title>
 <!-- spn:doc
-{"id":"surface-tests","variant":"construct","title":"Tests — The Plugin's Own Folders, Without a Framework","subtitle":"How this plugin proves the check and the scripts it ships.","lenses":["QA","WEB_DEV"],"status":"PLANNING","dependsOn":["surface-scripts"],"summary":"This plugin ships a rule that runs on a person's design file, so it owes proof of its own: one tier, mirrored on its source, behind a runner that walks and judges on an exit code.","keywords":["tests","tier","mirror","runner","harness","bundle"]}
+{"id":"surface-tests","variant":"construct","title":"Tests","subtitle":"How this plugin proves the check and the scripts it ships.","lenses":["QA","WEB_DEV"],"status":"PLANNING","dependsOn":["surface-scripts"],"summary":"This plugin ships a rule that runs on a person's design file, so it owes proof of its own: one tier, mirrored on its source, behind a runner that walks and judges on an exit code.","keywords":["tests","tier","mirror","runner","harness","bundle"]}
 -->
 <!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
 <link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.css" integrity="sha384-EFi+bm+soztQp3Bg2oQPRtdkdyGkD/O1qSDL0QCFBIHQg2sNtFhUHlkwxArFA8dY" crossorigin="anonymous">
 <div class="sds-page">
 
 <nav class="sds-rail" id="rail">
-  <a class="sds-home" href="../surface-overview.html">&larr; spn-surface — The Surface Domain</a>
-  <div class="sds-rail-title">Tests — The Plugin's Own Folders, Without a Framework</div>
+  <a class="sds-home" href="../surface-overview.html">&larr; spn-surface</a>
+  <div class="sds-rail-title">Tests</div>
 </nav>
 <div class="sds-wrap">
 
 <header class="sds-masthead">
   <!-- Rendered from the spn:doc block by `docs.ts page`. Never typed: a header that disagreed with its block is what this removes. -->
-  <div class="sds-eyebrow"><span class="sds-line1">SaaS Plane &nbsp;|&nbsp; Claude Marketplace &nbsp;|&nbsp; Tests — The Plugin's Own Folders, Without a Framework</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Construct</span><span class="sds-separator">|</span><span class="sds-label">For:</span> <span class="sds-audience"><span class="sds-badge sds-lens">Quality engineer</span><span class="sds-badge sds-lens">Web developer</span></span><span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-planning">&#x1F52E; PLANNING</span></span></span></div>
-  <h1>Tests — The Plugin's Own Folders, Without a Framework</h1>
+  <div class="sds-eyebrow"><span class="sds-line1">SaaS Plane &nbsp;|&nbsp; Claude Marketplace &nbsp;|&nbsp; Tests</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Construct</span><span class="sds-separator">|</span><span class="sds-label">For:</span> <span class="sds-audience"><span class="sds-badge sds-lens">Quality engineer</span><span class="sds-badge sds-lens">Web developer</span></span><span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-planning">&#x1F52E; PLANNING</span></span></span></div>
+  <h1>Tests</h1>
   <p class="sds-subtitle">How this plugin proves the check and the scripts it ships.</p>
   <p class="sds-standfirst">This plugin ships a rule that runs on a person's design file, so it owes proof of its own. Read this page to see how the proof is arranged: one tier, mirrored on the source, behind a runner that walks the folder and judges each suite on its exit code.</p>
 </header>
@@ -93,13 +93,13 @@
 <!-- 03 -->
 <section id="s3">
   <div class="sds-section-head"><h2>Parts</h2></div>
-  <h3 id="the-mirror-puts-a-test-where-its-source-">The mirror puts a test where its source is</h3>
+  <h3 id="mirror-the-mirror-puts-a-test-where-its-">Mirror — The mirror puts a test where its source is</h3>
   <p>A test for <code>scripts/checks/figma-connector.ts</code> sits at <code>tests/unit/scripts/checks/t-figma-connector.mjs</code>. Moving a source file moves its test with it.</p>
-  <h3 id="a-suite-is-proven-against-the-bundle-as-">A suite is proven against the bundle as well as the source</h3>
+  <h3 id="bundle-proof-a-suite-is-proven-against-t">Bundle proof — A suite is proven against the bundle as well as the source</h3>
   <p>The bundle-parity suite runs the committed bundle and the source over the same recorded calls and requires the same answer, and the staleness suite refuses a bundle older than its sources, so a hook never runs a rule nobody wrote.</p>
-  <h3 id="the-launcher-and-the-tiers-file-are-held">The launcher and the tiers file are held to the code</h3>
+  <h3 id="launcher-and-tiers-the-launcher-and-the-">Launcher and tiers — The launcher and the tiers file are held to the code</h3>
   <p>The launcher answers as the entry does from any folder, and the tiers file names exactly the groups the plugin ships.</p>
-  <h3 id="the-runner-judges-on-an-exit-code">The runner judges on an exit code</h3>
+  <h3 id="exit-code-the-runner-judges-on-an-exit-c">Exit code — The runner judges on an exit code</h3>
   <p>A suite that prints a passing line and exits non-zero is red, and one that passes in different words is green. The runner never reads text to decide.</p>
 </section>
 

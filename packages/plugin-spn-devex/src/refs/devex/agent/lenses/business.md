@@ -8,7 +8,7 @@
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/03-lenses.md",
-      "seen": "dd50b3e4"
+      "seen": "af045435"
     },
     {
       "path": "spn-foundation/docs/03-behaviors/README.md",

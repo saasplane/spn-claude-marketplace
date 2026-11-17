@@ -1,14 +1,14 @@
 <!-- spn:doc
 {
   "id": "spn-claude-marketplace-constructs-spn-devex",
-  "title": "spn-devex — The Stack-Agnostic Domain",
+  "title": "spn-devex",
   "lenses": ["ARCHITECT", "SERVER_DEV"],
   "status": "PLANNING",
   "summary": "The model behind the plugin every SaaS Plane repository loads — the folder that delivers it, the code the runtime calls, the commands run by name, the page production, and the skills, restatements, viewpoints and personas a session reads."
 }
 -->
 
-# spn-devex — The Stack-Agnostic Domain
+# spn-devex
 
 `For: Architect · Backend developer` · `Status: 🔮 PLANNING`
 

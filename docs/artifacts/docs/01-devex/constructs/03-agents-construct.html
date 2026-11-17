@@ -1,22 +1,22 @@
 <meta charset="utf-8">
-<title>Agents — The Personas a Session Convenes, and the Viewpoints They Are Handed</title>
+<title>Agents</title>
 <!-- spn:doc
-{"id":"agent-set","variant":"construct","title":"Agents — The Personas a Session Convenes, and the Viewpoints They Are Handed","subtitle":"A second reader, convened for just one turn, who holds only what its own file grants it.","lenses":["LEAD","ARCHITECT"],"status":"PLANNING","dependsOn":["plugin-set","ref-set"],"summary":"An agent here is a named persona a session can call in the middle of a turn, for a second, independent read on a change.","keywords":["agent","brief","persona","lens","panel","authority"]}
+{"id":"agent-set","variant":"construct","title":"Agents","subtitle":"A second reader, convened for just one turn, who holds only what its own file grants it.","lenses":["LEAD","ARCHITECT"],"status":"PLANNING","dependsOn":["plugin-set","ref-set"],"summary":"An agent here is a named persona a session can call in the middle of a turn, for a second, independent read on a change.","keywords":["agent","brief","persona","lens","panel","authority"]}
 -->
 <!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
 <link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.css" integrity="sha384-EFi+bm+soztQp3Bg2oQPRtdkdyGkD/O1qSDL0QCFBIHQg2sNtFhUHlkwxArFA8dY" crossorigin="anonymous">
 <div class="sds-page">
 
 <nav class="sds-rail" id="rail">
-  <a class="sds-home" href="../devex-overview.html">&larr; spn-devex — The Stack-Agnostic Domain</a>
-  <div class="sds-rail-title">Agents — The Personas a Session Convenes, and the Viewpoints They Are Handed</div>
+  <a class="sds-home" href="../devex-overview.html">&larr; spn-devex</a>
+  <div class="sds-rail-title">Agents</div>
 </nav>
 <div class="sds-wrap">
 
 <header class="sds-masthead">
   <!-- Rendered from the spn:doc block by `docs.ts page`. Never typed: a header that disagreed with its block is what this removes. -->
-  <div class="sds-eyebrow"><span class="sds-line1">SaaS Plane &nbsp;|&nbsp; Claude Marketplace &nbsp;|&nbsp; Agents — The Personas a Session Convenes, and the Viewpoints They Are Handed</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Construct</span><span class="sds-separator">|</span><span class="sds-label">For:</span> <span class="sds-audience"><span class="sds-badge sds-lens">Engineering leader</span><span class="sds-badge sds-lens">Architect</span></span><span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-planning">&#x1F52E; PLANNING</span></span></span></div>
-  <h1>Agents — The Personas a Session Convenes, and the Viewpoints They Are Handed</h1>
+  <div class="sds-eyebrow"><span class="sds-line1">SaaS Plane &nbsp;|&nbsp; Claude Marketplace &nbsp;|&nbsp; Agents</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Construct</span><span class="sds-separator">|</span><span class="sds-label">For:</span> <span class="sds-audience"><span class="sds-badge sds-lens">Engineering leader</span><span class="sds-badge sds-lens">Architect</span></span><span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-planning">&#x1F52E; PLANNING</span></span></span></div>
+  <h1>Agents</h1>
   <p class="sds-subtitle">A second reader, convened for just one turn, who holds only what its own file grants it.</p>
   <p class="sds-standfirst">An agent here is a named persona a session can call in the middle of a turn, for a second, independent read on a change. Read this page before you write a new persona, or if you need to know what one is allowed to decide. It covers the file that decides when a persona answers, the authority its own file grants it, and the viewpoint — called a lens — it is handed when convened.</p>
 </header>
@@ -105,23 +105,23 @@
   <div class="sds-section-head"><h2>Parts</h2></div>
   <h3 id="the-frontmatter">The frontmatter</h3>
   <p><code>name</code> and <code>description</code>, read the same way <a href="./04-skills-construct.html">a skill's</a> are: the description is matched against the moment rather than browsed, and it decides whether this persona takes the reply. Two more fields are optional. <code>model</code> chooses which model runs the persona, and <code>tools</code> narrows what it may call. Leaving <code>tools</code> out grants every tool the session itself has.</p>
-  <h3 id="where-a-read-only-promise-is-actually-bo">Where a read-only promise is actually bound</h3>
+  <h3 id="read-only-promise-where-a-read-only-prom">Read-only promise — Where a read-only promise is actually bound</h3>
   <p>A brief declaring <code>tools</code> is bound by it: the permission is a fact about the convening rather than an instruction the persona is asked to follow. A brief that declares no <code>tools</code> inherits everything the session has, and its promise not to write is prose (rule RULE.CLAUDE_MARKETPLACE.DEVEX.004). Both kinds exist here, and telling them apart matters when a reviewer's independence is what the brief is for.</p>
   <h3 id="a-fixed-persona">A fixed persona</h3>
   <p>A brief with no argument is one voice, always: an engineering lead, a prose rewriter, a prose reviewer. Its whole authority is the words in its own file, read the same way each time it is called.</p>
   <h3 id="a-parameterized-reviewer">A parameterized reviewer</h3>
   <p>One brief here takes a viewpoint name as part of what it is convened over. It reads that viewpoint's own file before anything else, and the brief's own description lists the names a caller may pass, which is also what makes them discoverable. A brief for each viewpoint would be many copies of one procedure, drifting apart, each needing the same change — so the procedure lives in one file and the subject matter lives beside it.</p>
-  <h3 id="what-one-lens-file-says">What one lens file says</h3>
+  <h3 id="lens-file-what-one-lens-file-says">Lens file — What one lens file says</h3>
   <p>A lens file opens by saying when the viewpoint is worn, when it is convened, and the one condition on which it blocks. Then it says what it checks. Everything below the stated threshold is advice, and the file says so plainly, because a reviewer who can block anything stops being a reviewer and the work stops on taste.</p>
-  <h3 id="wearing-and-convening-are-different-acts">Wearing and convening are different acts</h3>
+  <h3 id="wearing-and-convening-wearing-and-conven">Wearing and convening — Wearing and convening are different acts</h3>
   <p>Wearing a lens while writing makes the work better and is never a review, because the context that drafted something already agrees with its own reasoning. Convening is the other act: a reader who did not write the work, holding one file, reporting what that viewpoint found. A skill says which gate convenes which viewpoint.</p>
-  <h3 id="the-lens-names-are-also-the-audience-a-d">The lens names are also the audience a document declares</h3>
+  <h3 id="audience-names-the-lens-names-are-also-t">Audience names — The lens names are also the audience a document declares</h3>
   <p>The reader a document is written for and the reviewer who judges it are one list. Two lists would let a document declare an audience no reviewer could be convened as. The register that maps each value to its reader label lives in the documents tool, and a document declaring a value outside the set is refused.</p>
-  <h3 id="a-lens-is-regenerated-never-argued-with">A lens is regenerated, never argued with</h3>
+  <h3 id="lens-regeneration-a-lens-is-regenerated-">Lens regeneration — A lens is regenerated, never argued with</h3>
   <p>A lens is a ref, so it carries a stamp and adds no rule of its own. Each file names its own sources at the top and states that it restates them. Where a lens and the book disagree, the book wins and the lens is rewritten; a lens that starts deciding rules has become a second standard nobody audits.</p>
-  <h3 id="a-reviewer-that-edits-has-stopped-review">A reviewer that edits has stopped reviewing</h3>
+  <h3 id="reviewer-never-edits-a-reviewer-that-edi">Reviewer never edits — A reviewer that edits has stopped reviewing</h3>
   <p>Where a persona both finds a problem and fixes it, the finding and the fix arrive together and nobody can weigh one without the other. So the reviewing briefs report, the engineering brief advises, and exactly one brief is permitted to write — over the paragraphs it was handed, never over a whole file.</p>
-  <h3 id="a-brief-points-at-a-rule-and-never-inven">A brief points at a rule and never invents one</h3>
+  <h3 id="briefs-a-brief-points-at-a-rule-and-neve">Briefs — A brief points at a rule and never invents one</h3>
   <p>A persona stating a rule with no chapter behind it has produced a suggestion wearing the clothes of a finding, and the next reader cannot tell which they are holding. Each brief names where its standard lives: the reviewing brief's standard is the viewpoint file, and that file's standard is the book.</p>
 </section>
 

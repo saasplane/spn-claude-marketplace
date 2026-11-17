@@ -7,20 +7,20 @@ description: What proves a behaviour, at which tier, and what a passing suite do
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
-      "seen": "2fce1268"
+      "seen": "7beac2a2"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/05-test.md",
-      "seen": "2ffa2fa3"
+      "seen": "225bbd97"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/05-test.md",
-      "section": "Which case carries an id",
+      "section": "Case ids — Which case carries an id",
       "seen": "62048c29"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/05-test.md",
-      "section": "What the phase owes",
+      "section": "Phase duty — What the phase owes",
       "seen": "630b9bd2"
     },
     {

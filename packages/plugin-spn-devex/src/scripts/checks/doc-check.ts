@@ -3,7 +3,9 @@
 // one voice; RULE.DEVEX.WORKSPACE.106, its reach and its measure; RULE.DEVEX.WORKSPACE.107, the three moves that reach the
 // reader), 04-discipline.md § Voice discipline, 05-artifacts.md (the masthead, the approach document,
 // and the Plan section after How, RULE.DEVEX.WORKSPACE.487), 01-workstream.md § A step row says where, what work, and how
-// (RULE.DEVEX.WORKSPACE.183), 05-artifacts.md § One stylesheet, served in versions (RULE.DEVEX.WORKSPACE.214)
+// (RULE.DEVEX.WORKSPACE.183), 05-artifacts.md § One stylesheet, served in versions (RULE.DEVEX.WORKSPACE.214),
+// § The header (a short name of at most three words, RULE.DEVEX.WORKSPACE.517) and § What an overview and a hub hold
+// (a rail entry of at most three words, RULE.DEVEX.WORKSPACE.518)
 // and 06-registers.md § Writing a row. The chapters are the source of truth: a rule change is edited
 // there first, then here, in the same change. This script checks only what a script CAN check; the
 // register itself is judgement.
@@ -1345,6 +1347,9 @@ export function check(path: string, text: string, fragment = false): Finding[] {
     out.push(...workingDetail(path, text), ...partnerWords(path, text));
   }
   if (isHtml && itemCellPage(path) && !inClosedWorkstream(path)) out.push(...columnRule(text));
+  // A page of a repository's pocket, and a workstream's own pages (an approach page, a preview) while open.
+  if (isHtml && !fragment && (inPocket(path) || ((isApproach || /-?preview\.html$/.test(path)) && workstreamOf(path) !== null && !inClosedWorkstream(path))))
+    out.push(...nameRule(text));
 
   const sents = sentences(prose);
   if (!fragment || sents.length >= 5) out.push(...voice(prose, sents, kindOf(path), isOperative(path)));
@@ -1353,6 +1358,47 @@ export function check(path: string, text: string, fragment = false): Finding[] {
   if (isRegister(path)) out.push(...rows(text)[0]);
   if (inBook(path)) out.push(...bookClassFaults(text, knownHolders(ownMarketplace())).map((f) => ["RULE", f] as Finding));
   if (inBook(path)) out.push(...workstreamCitations(path, text));
+  return out;
+}
+
+/** A page of a repository's artifacts pocket, other than its index. */
+const inPocket = (path: string): boolean => {
+  const parts = slashes(path).split("/");
+  return parts.includes(POCKET.artifacts) && parts.includes("docs") && basename(path) !== "index.html";
+};
+
+/** The words a list shows: tags dropped, entities read, and the part before a heading's dash. */
+const shown = (html: string): string => html.replace(/<span class="sds-number">[\s\S]*?<\/span>/g, "").replace(/<[^>]+>/g, "").replace(/&mdash;/g, "—").replace(/&amp;/g, "&")
+  .replace(/&[a-z]+;|&#\d+;/g, " ").split(" — ")[0].trim();
+/** A word is a run that holds a letter or a digit; a dot, a dash or a `·` alone is not one. */
+const counted = (name: string): number => name.split(/\s+/).filter((one) => /[\p{L}\p{N}]/u.test(one)).length;
+const NAME_LIMIT = 3;
+
+/**
+ * 05-artifacts.md § The header and § What an overview and a hub hold: a page's short name, the block's `title`, is
+ * at most three words and never a sentence (RULE.DEVEX.WORKSPACE.517), and each heading the page's rail shows, a
+ * section's `h2` and every `h3` with an id, reads as a name of at most three words before its dash
+ * (RULE.DEVEX.WORKSPACE.518). Both are read in a list, where a sentence cannot be told from its neighbours.
+ */
+export function nameRule(text: string): Finding[] {
+  const out: Finding[] = [];
+  const block = /<!--\s*spn:doc\s*(\{[\s\S]*?\})\s*-->/.exec(text);
+  let title = "";
+  if (block) { try { title = String((JSON.parse(block[1]) as { title?: unknown }).title ?? ""); } catch { title = ""; } }
+  // A workstream's number in front of its page's name is an address, not a word of the name: `040 - Hiring Demo Ready`.
+  title = title.replace(/^\d{3}\s*(?:·\s*\S+\s*)?-\s+/, "");
+  // A fourth word is kept for one fixed term that breaks if cut, so four words warn and five refuse.
+  const grade = (n: number): "RULE" | "SOFT" => (n > NAME_LIMIT + 1 ? "RULE" : "SOFT");
+  if (title && !/\{\{/.test(title) && (counted(title) > NAME_LIMIT || /[.?!:]$/.test(title)))
+    out.push([/[.?!:]$/.test(title) ? "RULE" : grade(counted(title)), `the page's name "${title}" is ${counted(title)} words or reads as a sentence — RULE.DEVEX.WORKSPACE.517: a short ` +
+      "name is at most three words, a fourth only for one fixed term that breaks if cut, and the `<h1>` carries the promise · name the page in the words it uses for its subject"]);
+  // The rail reads a section's first h2, wherever it sits inside it, and every h3 with an id (sds-docs.js).
+  const heads = [...text.matchAll(/<section id="[^"]+"[^>]*>(?:(?!<section\b|<\/section>)[\s\S])*?<h2[^>]*>([\s\S]*?)<\/h2>/g), ...text.matchAll(/<h3 id="[^"]+"[^>]*>([\s\S]*?)<\/h3>/g)]
+    .map((found) => shown(found[1])).filter((name) => name && !/\{\{/.test(name));
+  const long = heads.filter((name) => counted(name) > NAME_LIMIT);
+  if (long.length)
+    out.push([long.some((name) => counted(name) > NAME_LIMIT + 1) ? "RULE" : "SOFT", `${long.length} rail entr${long.length === 1 ? "y reads" : "ies read"} past three words (${long.slice(0, 3).map((name) => `"${name}"`).join(", ")}${long.length > 3 ? ", …" : ""}) — ` +
+      "RULE.DEVEX.WORKSPACE.518: a heading the rail shows is a name of at most three words before its dash, a fourth only for one fixed term · write `Name — <the heading's words>` at its source"]);
   return out;
 }
 
