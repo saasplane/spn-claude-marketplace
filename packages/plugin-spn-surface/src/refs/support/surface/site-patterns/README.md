@@ -33,6 +33,7 @@ above names the folder and not each file, so a spec the book adds is seen as wel
 | [`questions.dg.json`](questions.dg.json) |
 | [`real-sample-under.dg.json`](real-sample-under.dg.json) |
 | [`real-sample.dg.json`](real-sample.dg.json) |
+| [`show-it-highlight.dg.json`](show-it-highlight.dg.json) |
 | [`show-it-under.dg.json`](show-it-under.dg.json) |
 | [`show-it.dg.json`](show-it.dg.json) |
 | [`statement.dg.json`](statement.dg.json) |

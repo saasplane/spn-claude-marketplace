@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/09-architecture-layouts/",
-      "seen": "b79bec08"
+      "seen": "22235267"
     }
   ]
 }
@@ -125,6 +125,7 @@ A layout has three parts for its look, whatever its type. Each part owns one thi
 A place has a short form for where its room is short: `startNodeCollapsed`, `actionsNodeCollapsed` and `endNodeCollapsed`.
 
 - **A place MUST be named by where it stands, and never by what it holds** (`RULE.SUPPORT.SURFACE.157` · MUST · skill:spn-surface/design). A brand, an account or a search is what a page puts in a place.
+- **The brand at the start of a bar, and in a footer, links to the home of what it names** (`RULE.SUPPORT.SURFACE.443` · GUIDE). A person who has gone deep into a site or an app expects the brand to take them back to where it begins. The site's brand opens the site's home, and an app's brand opens that app's home. A sign-in step draws the brand without the link, because the step is a path the person is on, and the link would lead them off it.
 - **The places of the navigation sit in the config of a layout type that has a navigation, and the `mtype` of the config decides them.** So `CANVAS` refuses a place of the navigation by its type. Every type with a navigation takes the same places, so a page moves between them with nothing in its content changing.
 - **The footer is an optional place that closes the page, and every layout type places it the same way, at the end of the page, as the top bar is at its start.** It runs the window's width, and beside a rail the width of the area beside it; what it holds stands in the body's box, with the same layout space as the header and the bar, so it lines up with the bar's items and the page. It stands under the content's box, so its own fill or line runs the full width. Where the content is short it stands at the window's bottom, where long after the content. The layout draws no fill or line for it and pads it by the layout space above and below. At `FULL` the box is the window less the layout space; on a phone, the screen's width.
 
@@ -171,7 +172,8 @@ A section reaches the edges of its place and no further (`RULE.SUPPORT.SURFACE.2
 
 ## The wrapper of a site's page — 🔮
 
-- **`DSSiteLayout` MUST wrap one site's page, and it is the only thing that marks a page as a site's** (`RULE.SUPPORT.SURFACE.196` · MUST · skill:spn-surface/design). It is a unit of the Layouts layer, so its name ends in `Layout` (`RULE.SUPPORT.SURFACE.229` · MUST · skill:spn-surface/design). It renders `<div data-ds-page="SITE">` around the page's run of sections and draws nothing else: no navigation, no fill and no room, and it stands inside the app's `DSLayout` content. Inside it `--font-heading` is `var(--font-display)`, so the display steps draw in the theme's display family; outside it they draw in the text family.
+- **`DSSiteLayout` MUST wrap one site's page, and it is the only thing that marks a page as a site's** (`RULE.SUPPORT.SURFACE.196` · MUST · skill:spn-surface/design). It is a unit of the Layouts layer, so its name ends in `Layout` (`RULE.SUPPORT.SURFACE.229` · MUST · skill:spn-surface/design). It renders `<div data-ds-page="SITE">` around the page's run of sections and draws nothing else: no navigation and no fill, and its only room is the one it hands the sections through the design language's `sectionSize`. It stands inside the app's `DSLayout` content. Inside it `--font-heading` is `var(--font-display)`, so the display steps draw in the theme's display family; outside it they draw in the text family.
+- **`DSSiteLayout` carries the site's design language** (`RULE.SUPPORT.SURFACE.440` · GUIDE). Its sections and features read their look from it, so a page writes no class for a look the design language already holds. The `designLanguage` prop takes `sectionSize`, `parting`, `pattern`, `fadedEdges`, `lit`, `reveal` and `mediaBackdrop`, each where a section's or a feature's own prop is not given. `sectionSize` is `MD` where it sets none, so a site's section stands at a site's 96px and not at an app's 56px, and a hero sets its own `LG` or `XL`. A site that sets none keeps its look. `design-languages.md` states what a design language holds, and `architecture-containers.md` and `architecture-components.md` the props it fills.
 - **A marketing page, and a page of docs in a web app built from the design system, count as a site's page.** A page a person works on, sign-in and onboarding included, is never wrapped, though it is public. The generated pages of `docs/artifacts/`, the construct pages and the approach pages are not the design system's and are not wrapped.
 
 ## The phone and the tablet — 🔮
@@ -244,6 +246,7 @@ This ref states what a layout owns, its types and its places, the units it is bu
 | `RULE.SUPPORT.SURFACE.281` | `XWIDE` stands at most 1400 px, the widest step that still leaves a margin on a 1440 laptop |
 | `RULE.SUPPORT.SURFACE.300` | the default theme draws the open entry of the navigation as `SUBTLE` |
 | `RULE.SUPPORT.SURFACE.200` | a layout has three parts, the body, the navigation and the content; attached and sticky, the one spacing, no overlay, and one drawer on a phone |
+| `RULE.SUPPORT.SURFACE.443` | the brand at the start of a bar and in a footer links to the home of what it names, and a sign-in step draws it without the link |
 | `RULE.SUPPORT.SURFACE.206` | a layout is chosen by the job of the app: an admin app, a profile, a website or a sign-in. It is advice |
 
 ## Proof

@@ -8,7 +8,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/",
-      "seen": "4ffb4a61"
+      "seen": "263d59b8"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/11-delivery-library/01-common/01-library.md",
@@ -23,7 +23,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/10-architecture-app/01-common/02-settings-and-theme.md",
       "section": "The theme",
-      "seen": "d0267dc8"
+      "seen": "aa393230"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/01-common/01-task-patterns.md",
@@ -94,6 +94,9 @@ The question it holds: *is every unit the right one, built as the library draws 
 
 - **Core, components and names** — held by the stack's checks, `spnutils apps surface gaps`, and this lens worn.
   - **The look comes from the theme, and never from the page.** A colour, a padding, a margin, a radius or a gap set by hand is the finding; in a design, a colour bound to no variable, or a copy of a block that is no longer an instance (`RULE.SUPPORT.APPS.150` · MUST · skill:spn-apps/implement).
+  - **A site section's look follows the site patterns' tests and the app's design language.** Read the page beside the app's guide and its data: a section that takes two emphases, a highlight on the hero or two in a row, a gradient on a frame, or a picture cropped to its column is a finding, and so is a section with no case line that names each test's answer (`RULE.SUPPORT.SURFACE.438` · GUIDE) (`RULE.SUPPORT.SURFACE.439` · GUIDE) (`RULE.SUPPORT.SURFACE.440` · GUIDE).
+  - **A class written on a design-system unit is a gap, never a style.** Where the unit lacks a prop, or the design language lacks a choice, the finding is the missing prop or choice, recorded for the design system, and the class is not kept (`RULE.SUPPORT.SURFACE.442` · GUIDE).
+  - **A media drawing carries little text.** Each unit in it is a bare icon from the site's own set and a name, with no mark behind the icon; units in a row stand at one height, and the unit's detail stays on the page the drawing leads to.
   - **The page's fill and padding are the layout's.** The fill is `page-fill`, set by the theme's body colour (`BASE` where the app chose none); the layout keeps one spacing, `--layout-space`, as the page's padding and every gap; the width is the body's, `FULL` to `NARROW`, and a page of edge-to-edge bands takes `CANVAS` or `width: FULL` (`RULE.SUPPORT.APPS.160` · MUST · skill:spn-apps/implement) (`RULE.SUPPORT.SURFACE.200` · MUST · skill:spn-surface/design) (`RULE.SUPPORT.SURFACE.158` · MUST · skill:spn-surface/design) (`RULE.SUPPORT.SURFACE.200` · MUST · skill:spn-surface/design).
   - **A page that opens or closes on a section lets its fill meet the bar and the footer**, with no band of the page between, and a side line the content draws stands within the layout's space, so the words still start where the bar's start; `DOCK` keeps its page space (layout chapter, the page and the content).
   - **The theme styles the layout in three parts — body, navigation, content — in every layout type.** A look a page or one layout type writes is a finding; nothing stands over the content; an entry is drawn by the entry kind its look names; the layouts alone read the theme and hand the look down; a panel of navigation entries takes the navigation's look and a menu of actions does not; the defaults live once, in the default theme (`RULE.SUPPORT.SURFACE.139` · MUST · skill:spn-surface/design) (`RULE.SUPPORT.SURFACE.140` · MUST · skill:spn-surface/design) (`RULE.SUPPORT.SURFACE.155` · MUST · skill:spn-surface/design) (`RULE.SUPPORT.SURFACE.156` · MUST · skill:spn-surface/design) (`RULE.SUPPORT.SURFACE.161` · MUST · skill:spn-surface/design) (`RULE.SUPPORT.SURFACE.200` · MUST · skill:spn-surface/design).
