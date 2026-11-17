@@ -15,7 +15,7 @@ description: THE requirement router for SaaS Plane TS repos. Use whenever the us
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/",
-      "seen": "16ecb5b1"
+      "seen": "5c324a2a"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/07-architecture-widgets/",
@@ -23,7 +23,7 @@ description: THE requirement router for SaaS Plane TS repos. Use whenever the us
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/08-architecture-containers/",
-      "seen": "0ec6be60"
+      "seen": "ff7992e4"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/07-comments/01-intent.md",
@@ -96,6 +96,7 @@ The `ui` step follows this section for every page a change adds or rearranges. *
 - **Read the spec of the pattern for each screen class.** It shows where the parts sit at a desktop, at a tablet and on a phone. Its values are samples, and the page's own data takes their place.
 - **Keep the choice the tree made for each part.** A part whose query takes a page, a text or a filter is `DSDataTable`, in the layout the tree names. Send its search and its filters to the server, in the read the table asks for (`RULE.SUPPORT.SURFACE.070` · MUST · skill:spn-surface/design). Never filter in the page over the records already loaded.
 - **Keep a site section's eyebrows as its site pattern states.** A hero's state is a `PRIMARY` badge eyebrow and its stack is `OUTLINE` `DEFAULT` badge facts, a grid cell's eyebrow is its group or kind as text and a badge only when it says a state, and a plan holds one eyebrow, with a second word as a `PRIMARY` badge fact (`RULE.SUPPORT.SURFACE.371` · GUIDE) (`RULE.SUPPORT.SURFACE.372` · GUIDE) (`RULE.SUPPORT.SURFACE.373` · GUIDE).
+- **Read the app's design language before any choice of a site page's own, give each section one emphasis, and never style a gap by hand.** A site's page follows its app's design language (`RULE.SUPPORT.SURFACE.440` · GUIDE). Each section takes one emphasis and never two, and the agent writes its case line, which gives each answer, the test that decided it and what the other answer would cost (`RULE.SUPPORT.SURFACE.438` · GUIDE) (`RULE.SUPPORT.SURFACE.439` · GUIDE). A look no prop covers is a gap for the design system, and never a class on a unit (`RULE.SUPPORT.SURFACE.442` · GUIDE).
 - **Hold each small thing to its rule of content**, and each closed prop to its unit's choice table, through the entry ref's route 3. A state is a badge on the line of facts or at the end of the line, and the normal state shows none. The end of a line holds its actions, a badge, or both. A line that leads to a page shows the arrow where its end holds no action. A field a person enters is `DSForm.Field`, and a field a person reads is `DSDataUnit`.
 - **Style the page with the app's own styles rule** (`refs/support/apps/providers/ts/03-structure.md`, "An app's own styles"). A repeated pattern is a component of the app's own, values come from the design system's tokens, and no selector reaches the design system's insides.
 

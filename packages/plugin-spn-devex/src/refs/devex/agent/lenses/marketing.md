@@ -24,7 +24,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/01-common/03-site-patterns.md",
       "section": "What holds across",
-      "seen": "92df3611"
+      "seen": "cf7f9719"
     },
     {
       "path": "spn-foundation/docs/01-purpose/02-what.md",
@@ -100,6 +100,9 @@
   - **Its sections run in the order its reader asks their questions, and are never counted**; a page skips a question its reader does not ask. A site home asks what is it → what does today's way cost me → what do I get → is it real → where does each part live → what does it cost → what will I ask → how do I start (`RULE.SUPPORT.SURFACE.340` · MUST · skill:spn-surface/design).
   - **This lens calls which one or two sections take the page's emphasis.** Those sections take size `LG`, a hero `XL`, and a product picture in them is raised `LG` (site patterns § What holds across).
   - **The fill follows the reading, never the turn.** A section is `BASE`, and takes `DEFAULT` only where the kind of reading changes from its neighbours: a statement read whole, code read closely, offers compared. `PRIMARY` is the closing call's alone, and a hero takes no fill (`RULE.SUPPORT.SURFACE.341` · GUIDE).
+  - **The highlight sits on the claim that leads.** This lens names the one claim the page leans on, and the Highlight test puts the raised frame there, once besides the closing call, never on the hero and never two in a row; the gradient is the hero's and the closing call's alone (`RULE.SUPPORT.SURFACE.438` · GUIDE).
+  - **Each audience has its own design language.** Engineers get product, code and a calm dense look; a hiring team gets warmer frames, photos and more room. A site that serves two audiences with one look is a finding (`RULE.SUPPORT.SURFACE.440` · GUIDE).
+  - **The pictures and the titles make one argument.** A picture that shows another claim than its section's title, or a diagram whose units say more than the page leads to, is a finding. Each section's case line gives the answers, so the lens corrects an answer and the section follows (`RULE.SUPPORT.SURFACE.439` · GUIDE).
 - **The purpose part** — a claim on the site is a claim the book's purpose part already makes.
 
 ## Gates

@@ -17,7 +17,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
-      "seen": "e02f4215"
+      "seen": "90b22d70"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -42,7 +42,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "section": "An arc carries its specification, or names the note that holds it",
-      "seen": "191f4f32"
+      "seen": "103a339d"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -495,6 +495,13 @@ the run goes on. The step running now cannot, because a session is following it 
 The next section says what happens instead.
 
 ### How arcs are cut
+
+**While the shape is discussed, a find stays on the ideate arc, and no build arc opens until the ideate arc proposes it** (`RULE.DEVEX.WORKSPACE.519` · MUST · skill:spn-devex/ideate).
+A find is a section of the ideate arc's preview, with its facts and its cards on the ideate arc. When the finds group by
+what the developer would review and release together, propose the arcs on the ideate preview and ask once.
+`workstream arc edit` refuses a numbered arc the ideate arc has not proposed, unless the developer's own words in `--note`
+open it, and its refusal says the line stays in `How` until then. A handover written while the ideate preview is undecided
+names the finds and the arcs they might become, and never tells the next window to open an arc for each find.
 
 **The edge of an arc is what the developer reviews together and what releases together, and the domain
 gives it its name** (`RULE.DEVEX.WORKSPACE.309` · MUST · skill:spn-devex/ideate). Name it for the domain it lands in, as the
@@ -1369,6 +1376,14 @@ implies the design was decided. The badge links `../../approach.html#N<nnn>` wit
 files `1.8.0`), is read from `state.json`
 and is written by every `workstream` write and `docs cycles write`: never type it. Plugin migration 003
 writes it into the previews of every open and backlog workstream.
+
+**An arc that changes several pages of a surface, or gathers many finds shared as screenshots, keeps each page as a sample of its own under one index** (`RULE.DEVEX.WORKSPACE.520` · GUIDE).
+The index is `notes/<arc>/samples/index.html`, the same frame as a repository's artifacts index: a tree in a side panel, with
+pages opened in tabs, grouped by what each is for. The arc's preview links the index once, says what each group holds, and keeps
+the decisions and any detail that is the arc's alone. An arc of one page, or with no drawn page, keeps everything on its preview.
+Writing, naming, grouping and retiring the pages is the agent's job, and a page a decision has overtaken leaves the index.
+`spn-devex docs index write` writes the index from the pages on disk, so the tree is never typed. A sample draws the changes
+already decided on its arcs, and never today's code as it stands.
 
 **A sample is the work's own file, never a page built with the page template — MUST**
 (`RULE.DEVEX.WORKSPACE.267` · MUST · check:workstream-state). It keeps the format the work produces, and does not link the shared stylesheet

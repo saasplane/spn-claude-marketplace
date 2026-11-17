@@ -8,12 +8,12 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/",
-      "seen": "4ffb4a61"
+      "seen": "b24ba76d"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/09-architecture-layouts/01-common/01-layout.md",
       "section": "The layout",
-      "seen": "36c0a44c"
+      "seen": "85476cfe"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/08-architecture-containers/01-common/01-container.md",
@@ -119,7 +119,9 @@ Read the page itself, never a description of it — the frame, the preview, the 
   - **A finding on a proposed rule says that the rule is proposed** — the apps plugin's surface refs mark each one.
 - **Site patterns** — a doc and a marketing page take them, an app's screen takes an app pattern; held by this lens worn, beside `MARKETING` on a marketing page.
   - **Each section follows one site pattern, named by the content signals and never by where it stands**, asked in order and stopping at the first yes: the page's first words → Hero; its last call and nothing else → Closing call; words alone → Statement; real code read line by line → Real sample; a press changes what is shown → Choose to see; items each a thing of its own → Feature grid; items that open pages → Doors; an order the reader follows → Steps; numbers from the real system → Numbers; questions with answers → Questions; one picture the words introduce → Show it; none of these → Points (site patterns § How a site's section is chosen · `RULE.SUPPORT.SURFACE.340`, `.343`).
-  - **Then the five questions of look, in order.** Fill: `DEFAULT` only where the kind of reading changes from the neighbours, otherwise `BASE`, and `PRIMARY` for the closing call alone. Size: `LG` for the page's one or two strongest sections, which `MARKETING` calls. Media: framed by its kind, placed by its width and its panes, the words first on a phone. Alignment: centred only where nothing is scanned. Columns: set by the count, four at most, lines side by side one sentence each of about one length (site patterns § What holds across · `RULE.SUPPORT.SURFACE.341`–`.343`, `.346`).
+  - **Then the eight questions of look, in order.** Fill: `DEFAULT` only where the kind of reading changes from the neighbours, otherwise `BASE`, and `PRIMARY` for the closing call alone. Size: `LG` for the page's one or two strongest sections, which `MARKETING` calls. Highlight and Gradient: the one raised frame and the hero's or closing call's band, never both on one section. Media: framed by its kind, placed by its width and its panes, the words first on a phone. Shape: a picture keeps the shape it is made in. Alignment: centred only where nothing is scanned. Columns: set by the count, four at most, lines side by side one sentence each of about one length (site patterns § What holds across · `RULE.SUPPORT.SURFACE.341`–`.343`, `.346`).
+  - **The brand at the start of a bar, and in a footer, opens the home of what it names; a sign-in step draws it without the link** (`RULE.SUPPORT.SURFACE.443` · GUIDE). A brand that is only a picture is a finding: a person who has gone deep into a site expects it to take them back to where it begins.
+  - **A highlight never reads as a door.** A highlighted section is one raised frame in the fill that stands off its band, flat inside, with no arrow and no press; a door is boxed, raised and pressed whole (`RULE.SUPPORT.SURFACE.293` · MUST · skill:spn-surface/design). A highlight a visitor tries to press is a finding.
 - **Interaction** — held by this lens worn beside `WEB_DEV`.
   - **A block drawn from data shows every task state**: idle, working, done, failed, empty and denied, each with its own picture (interaction § The task states).
   - **Every action answers**: working as it starts, then done or failed, in a menu, a row or a dialog too (`RULE.SUPPORT.APPS.151` · MUST · skill:spn-surface/design).

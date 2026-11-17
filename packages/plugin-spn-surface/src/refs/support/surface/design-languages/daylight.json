@@ -1,0 +1,31 @@
+{
+  "name": "Daylight",
+  "for": "teams that weigh warmer frames, photos and more room",
+  "pageTemplates": {
+    "hero": "beside a product screen or a photo",
+    "proof": "the points beside the picture",
+    "order": ["Hero", "Points", "Show it", "Statement", "Steps", "Feature grid", "Questions", "Closing call", "Footer"]
+  },
+  "sectionStyle": {
+    "ground": "light",
+    "sectionSize": "MD",
+    "parting": "NONE",
+    "pattern": "NONE",
+    "fadedEdges": false,
+    "emphasis": "a soft tint on the hero and the closing call, never a heavy gradient",
+    "highlight": "open",
+    "lit": false
+  },
+  "interactionStyle": {
+    "door": "a small lift under the pointer",
+    "reveal": { "text": "RISE", "media": "RISE", "items": "RISE" },
+    "moving": "none"
+  },
+  "mediaStyle": {
+    "screen": "framed, raised, rounded",
+    "diagram": "flat, soft fills, one accent",
+    "photo": "flush and rounded",
+    "mediaBackdrop": { "type": "DOTS", "moving": false }
+  },
+  "density": "roomy: the hero at XL, an ordinary section at MD, shorter lines"
+}

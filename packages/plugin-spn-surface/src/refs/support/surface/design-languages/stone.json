@@ -1,0 +1,30 @@
+{
+  "name": "Stone",
+  "for": "engineers weighing product, code and a calm look",
+  "pageTemplates": {
+    "hero": "over a backdrop, the product screen beneath the words",
+    "proof": "the points under the picture",
+    "order": ["Hero", "Statement", "Show it", "Points", "Real sample", "Numbers", "Questions", "Closing call", "Footer"]
+  },
+  "sectionStyle": {
+    "ground": "dark",
+    "sectionSize": "MD",
+    "parting": "HAIRLINE",
+    "pattern": "NONE",
+    "fadedEdges": false,
+    "emphasis": "a gradient band on the hero and the closing call",
+    "highlight": "stage",
+    "lit": true
+  },
+  "interactionStyle": {
+    "door": "a lit edge under the pointer",
+    "reveal": { "text": "FADE", "media": "FADE", "items": "NONE" },
+    "moving": "none"
+  },
+  "mediaStyle": {
+    "screen": "framed, raised",
+    "diagram": "flat, thin line, one accent",
+    "mediaBackdrop": { "type": "GLOW", "moving": false }
+  },
+  "density": "calm: one claim a section, lines of about sixty characters"
+}

@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/08-architecture-containers/",
-      "seen": "0ec6be60"
+      "seen": "ff7992e4"
     }
   ]
 }
@@ -183,10 +183,13 @@ A section is one part of a page, set apart from the next by a fill of its own an
 | ↳ `gradient.reach` | `DSSurfaceGradientReachType`: `REACH_25` · `REACH_50` · `REACH_75` · `REACH_100` | `REACH_100` | how far the gradient reaches | LOOK · Gradient reach |
 | `painted` | `DSThemeModeType` | none | that the section stands on a picture the page paints, as `DSSurface` states | LOOK · Painted on |
 | `className` | `string` | none | that the app paints this one section: the class sets the paint token `--surface-fill`, a colour, in light and in `[data-mode='dark']`, and the section's fill is it. Nothing else a class sets on the section is supported | WIRING |
-| `size` | `DSSizeType` | the app's size | the room above and below, and the size every block inside the section takes | SIZE |
+| `size` | `DSSizeType` | the app's size | the room above and below, and the size every block inside the section takes. A section's room is `MD` under a design language that sets none | SIZE |
 | `flush` | `boolean` | `false` | whether the section draws no room of its own on any side, above, below or at the sides, so that the child runs to the edges of the section's place. It means here what it means on a card part, a panel part and `DSList`: it draws no padding of its own (rule RULE.SUPPORT.SURFACE.313 · MUST · skill:spn-surface/design) | LOOK · Flush |
 | `mediaNode` | `ReactNode` | none | art drawn behind the child from one edge of the place to the other: a picture, a gradient, a video, a canvas | SLOT · Art behind |
 | `inset` | `boolean` | `false` | an inner shadow along the section's top and bottom edges, over its fill and its `mediaNode`, from the one token `--shadow-inset`. It sets the section apart from the sections above and below it | LOOK · Inset |
+| `parting` | `DSSectionPartingType`: `NONE` · `HAIRLINE` | the design language's, else `NONE` | how the section is set apart from the next one: `HAIRLINE` draws one thin line along its lower edge, and `NONE` leaves the fill and the room to part them | LOOK · Parting |
+| `pattern` | `DSSectionPatternType`: `NONE` · `DOTS` · `LINES` · `GRID` | the design language's, else `NONE` | a pattern drawn behind the child, over the fill and under `mediaNode`, in the section's own hue at a low strength | LOOK · Pattern |
+| `fadedEdges` | `boolean` | the design language's, else `false` | whether the pattern fades into the ground at the section's edges, so it has no hard line where it stops. Read only where `pattern` is set | LOOK · Faded edges |
 | `id` | `string` | none | the anchor a page's own links land on. The section lands below a sticky bar, never under it | WIRING |
 
 - **A section of a page MUST be `DSSectionContainer`, and it MUST be the only unit that gives a part of a page its fill and its room** (`RULE.SUPPORT.SURFACE.243` · MUST · skill:spn-surface/design). The room above and below comes from the section's size and the sides are the layout's space, `--layout-space` (`RULE.SUPPORT.SURFACE.200` · MUST · skill:spn-surface/design), so a page writes no padding, no maximum width and no gutter for a section. A section that is `flush` draws no room of its own on any side (`RULE.SUPPORT.SURFACE.313` · MUST · skill:spn-surface/design). It takes no header, no footer, no frame and no parts, and `DSPanelContainer` takes no section's job.

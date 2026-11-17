@@ -428,5 +428,35 @@ console.log("\n=== the head card opens the hub");
     !read(bare, INDEX).includes("sds-home") && read(bare, INDEX).includes(`class="sds-rail-brand" href="${ARTIFACT.docs}/${AGENT}/devex-agent-overview.html"`));
 }
 
+console.log("\n=== an arc's samples index (RULE.DEVEX.WORKSPACE.520)");
+{
+  const samples = join(BASE, "samples-ws", "041-probe", "notes", "N001", "samples");
+  const page = (title) => `<!doctype html><title>${title}</title><p>${title}</p>`;
+  const put = (path, text) => { mkdirSync(dirname(join(samples, path)), { recursive: true }); writeFileSync(join(samples, path), text); };
+  put("drawn-on-an-app/landing-in-stone.html", page("Landing in Stone"));
+  put("drawn-on-an-app/landing-in-daylight.html", page("Landing in Daylight"));
+  put("read-from-a-reference/strand.html", page("Strand, read"));
+  put("how-the-agent-works.html", page("How the agent works"));
+  const written = index(["write", samples]);
+  const file = join(samples, ARTIFACT_INDEX);
+  const data = existsSync(file) ? JSON.parse(/<script type="application\/json" id="index-data">([\s\S]*?)<\/script>/.exec(readFileSync(file, "utf8"))?.[1] ?? "null") : null;
+  ok("[RULE.DEVEX.WORKSPACE.520] `docs index write` on an arc's samples folder writes samples/index.html from the pages on disk", written.code === 0 && existsSync(file) && data !== null, written.out);
+  same("[RULE.DEVEX.WORKSPACE.520] the tree groups the pages by the folder each sits in, the pages directly in samples/ first", (data?.groups ?? []).map((group) => [group.label, group.children.map((child) => child.path)]), [
+    ["Samples", ["how-the-agent-works.html"]],
+    ["Drawn on an app", ["drawn-on-an-app/landing-in-daylight.html", "drawn-on-an-app/landing-in-stone.html"]],
+    ["Read from a reference", ["read-from-a-reference/strand.html"]],
+  ]);
+  ok("[RULE.DEVEX.WORKSPACE.520] the page is named by its own title, and the index lists no page of itself", (data?.groups ?? []).flatMap((group) => group.children).map((child) => child.label).includes("Landing in Stone") && !JSON.stringify(data).includes(ARTIFACT_INDEX));
+  const check = index(["check", samples]);
+  ok("[RULE.DEVEX.WORKSPACE.520] `docs index check` reads the written index as current", check.code === 0 && check.out.includes("current"), check.out);
+  put("drawn-on-an-app/landing-in-slate.html", page("Landing in Slate"));
+  const stale = index(["check", samples]);
+  ok("[RULE.DEVEX.WORKSPACE.520] red: a page added since the index was written is reported, and `check` writes nothing", stale.code !== 0 && stale.out.includes("landing-in-slate.html") && !readFileSync(file, "utf8").includes("Slate"), stale.out);
+  const empty = join(BASE, "samples-ws", "042-probe", "notes", "N001", "samples");
+  mkdirSync(empty, { recursive: true });
+  const none = index(["write", empty]);
+  ok("[RULE.DEVEX.WORKSPACE.520] red: a samples folder with no page has nothing to list, and no index is written", none.code !== 0 && none.out.includes("holds no page") && !existsSync(join(empty, ARTIFACT_INDEX)), none.out);
+}
+
 console.log(failed ? `\n  ${failed} of ${total} FAILED` : `\n  all ${total} passed`);
 process.exit(failed ? 1 : 0);

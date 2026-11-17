@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/01-common/03-site-patterns.md",
-      "seen": "4824516f"
+      "seen": "64cb27af"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/02-web/03-site-patterns.md",
@@ -27,6 +27,7 @@ Read this before you design or review a page of a site. A site's page is a run o
 | --- | --- |
 | Site pattern | the shape of a section of a site's page, chosen by what the section holds |
 | Section | one part of a site's page: a `DSSectionContainer` with its fill and its room, holding one `DSFeature` or a `DSFeatureGridSectionContainer` |
+| Highlight | the one section of a page whose whole feature stands in one raised frame, in the form the design language sets |
 | Content signals | the twelve questions asked of a section, in order, whose first yes names its pattern |
 | Kind of page | a page's job at its level of the site, such as a site home or a part page, which sets the order of its sections |
 | The head across | a form of `DSFeature` for long words beside a picture that draws the items: the head across the full width, the split under it |
@@ -61,7 +62,7 @@ Then ask these questions of each section, in this order, and stop at the first y
 | 11 | Is there one picture the words introduce? | Show it |
 | 12 | None of these | Points |
 
-The order matters. A grid of things that each open a page is a Feature grid and not Doors, because question 6 comes first. A row of numbers in the order a reader follows is Steps, because question 8 comes before question 9. Once the pattern is named, the section answers the questions of its look, in the order *What holds across* gives: the fill, the size, the media, the alignment and the columns.
+The order matters. A grid of things that each open a page is a Feature grid and not Doors, because question 6 comes first. A row of numbers in the order a reader follows is Steps, because question 8 comes before question 9. Once the pattern is named, the section answers the questions of its look, in the order *What holds across* gives: the fill, the size, the highlight, the gradient, the media, the shape, the alignment and the columns. The footer is the exception: it ends every site's page, so no question chooses it.
 
 ## The kinds of page, by level — 🔮
 
@@ -101,6 +102,7 @@ Each section gives the question it answers, its **For** line, what calls for it,
 | Numbers | Does it work for teams like mine? | numbers read from the real system |
 | Questions | What do people ask before they start? | questions, each with a short answer |
 | Closing call | What do I do now? | the page's last words and its one call to act |
+| Footer | Where is everything else? Who is behind this? | the brand, the site's links and its legal line, at the foot of every page |
 
 ### Hero
 
@@ -129,6 +131,7 @@ Each section gives the question it answers, its **For** line, what calls for it,
 - **On a phone.** The words, then one point under another.
 - **Not when.** The items link: Doors. Each item is a thing of its own: Feature grid. The items run in an order: Steps. The items are numbers: Numbers.
 - **Spec.** `points.dg.json`.
+- **Before and after.** The old way against the new is Points, and never a table. Each point is a question the reader asks: its line is the new way's answer, and the old way is a text fact labelled *Today*. A data table is an app's reading unit and never draws a site's section (`RULE.SUPPORT.SURFACE.293` · MUST · skill:spn-surface/design).
 
 Readers scan points, and the eye comes back to a left edge; a centred point of two or three lines loses that edge. One column of points is the design system's list.
 
@@ -225,6 +228,16 @@ The data decides the unit. A set of things of their own is a grid section, and t
 
 One call is enough. A second button that opens a door the reader has just passed says the same thing twice.
 
+### Footer
+
+- **For** Visitor · Learner.
+- **Calls for it.** The foot of every page of a site: the brand, the places the site holds and its legal line. No content signal chooses it, because every site's page ends on one.
+- **Look.** `DSSectionContainer` `size` `SM`, with no line above it. In it, the brand linked to the site's home (`architecture-layouts.md`) and its one line; under them columns, each a `DSList` with its title and flush rows of quiet links, so the words keep the column's edge; last, one hairline above a legal bar of the legal line and its links.
+- **On a phone.** The brand and its line, then one column of links under another, then the legal bar.
+- **Not when.** The page is an app's screen or a sign-in step. The links duplicate a menu in a long list: keep the columns to the groups a visitor looks for at the foot.
+
+A footer has one shape, so two sites do not build two.
+
 ## What holds across — 🔮
 
 Every site pattern answers the same questions about its look, in this order (`RULE.SUPPORT.SURFACE.343` · MUST · skill:spn-surface/design).
@@ -233,12 +246,18 @@ Every site pattern answers the same questions about its look, in this order (`RU
 | --- | --- |
 | Fill | Does the kind of reading change from the neighbours? If it does, `DEFAULT`; if not, `BASE`. `PRIMARY` is for the closing call alone |
 | Size | Is this one of the page's one or two strongest sections? If it is, `LG`. The `MARKETING` lens makes that call |
+| Highlight | Is this the one claim the page leans on? Its whole feature stands in one raised frame, in the fill that stands off its band as a door's box does (`DEFAULT` on a `BASE` band, `BASE` on a `DEFAULT` band, flat or tinted as the design language sets, never a gradient). The band follows the fill rule, and what stands inside the frame is flat, its picture included, so there is one frame. One on a page besides the closing call, never on the hero, never two in a row. The design language sets its form: a stage, a frame made for a site, or open, with no frame, the section larger and a backdrop behind it; never an app's panel look |
+| Gradient | Is this the hero or the closing call? Its band takes the design language's emphasis, at most once besides the hero, and never on a frame. A highlighted section's band stays flat |
 | Media | The frame follows the media's kind, and the place follows its width and how many panes it has. On a phone, the words come first |
+| Shape | A picture keeps the shape it is made in and is never cropped to a column; `verticalAlign` stands the shorter column |
 | Alignment | Centre the words only when they stand alone with nothing to scan: a Statement, a Closing call, a hero with no picture |
 | Columns | The count of items sets them, four at most. Lines that stand side by side are one sentence each, of about one length |
 
+- **A section takes one emphasis and never two** (`RULE.SUPPORT.SURFACE.438` · GUIDE): the page's ground, its own fill where the kind of reading changes, the emphasis band of the hero or the closing call, or the one highlight.
+- **The patterns decide where emphasis goes, and the site's design language decides how it looks** (`design-languages.md`). A site that sets none keeps the look this ref states.
+- **For each section the agent writes one line, its case** (`RULE.SUPPORT.SURFACE.439` · GUIDE): each answer, the test that decided it, and what the other answer would cost. A reviewer then corrects a test's answer, and the section follows from it.
 - **A section is `BASE`, and takes `DEFAULT` only where the kind of reading changes from its neighbours** (`RULE.SUPPORT.SURFACE.341` · GUIDE). A statement read whole, code read closely and offers compared are such readings. Sections do not alternate their fills by turn. `PRIMARY` is the closing call's alone, and a hero takes no fill.
-- **Words stand on their section, not in a frame** (`RULE.SUPPORT.SURFACE.293` · MUST · skill:spn-surface/design). A statement, a hero's words and a closing call stand on their section, and only a picture or an item takes a frame.
+- **Words stand on their section, not in a frame**, but for a highlighted section, whose whole feature is framed (`RULE.SUPPORT.SURFACE.293` · MUST · skill:spn-surface/design). A statement, a hero's words and a closing call stand on their section, and only a picture or an item takes a frame.
 - **Media is framed by its kind** (`RULE.SUPPORT.SURFACE.293` · MUST · skill:spn-surface/design): the product framed and raised, an illustration or a diagram flat, a photo flush and rounded, code in its code frame and flat.
 - **Points stand flat, and doors stand boxed and raised** (`RULE.SUPPORT.SURFACE.293` · MUST · skill:spn-surface/design). A point is read and a door is pressed, so the look says which before a reader tries.
 - **A grid section is for items that are each a thing of their own** (`RULE.SUPPORT.SURFACE.259` · MUST · skill:spn-surface/design). The parts or points of one subject are a feature's items, because the data decides which, and media alone decides neither.
@@ -293,7 +312,7 @@ A door already reads as a door at rest, because it is boxed and raised and its p
 
 ## The specs a section starts from — 🔮
 
-**This plugin carries the book's 17 specs of the site patterns, in `refs/support/surface/site-patterns/`**: one for each of the twelve patterns, and a second for Hero, Show it, Real sample and Choose to see (`-under`) and for Closing call (`-beside`). Each is a skeleton of one section in the design system's units, with a view for a desktop, a tablet and a phone. Its `README.md` lists them.
+**This plugin carries 18 specs of the site patterns, in `refs/support/surface/site-patterns/`**: one for each of the twelve patterns, a second for Hero, Show it, Real sample and Choose to see (`-under`) and for Closing call (`-beside`), and a third for Show it, highlighted (`show-it-highlight.dg.json`), the section the Highlight test names. The hero and the closing call specs say in their captions where the emphasis band stands. Each is a skeleton of one section in the design system's units, with a view for a desktop, a tablet and a phone. Its `README.md` lists them.
 
 - **A section starts from the spec of its pattern.** Copy it and put the page's own words in its places; the words in a spec are placeholders that say what a heading or a point is for. Never start a section from an empty file.
 - **A spec is strict JSON.** Draw one with `spn-devex docs figure draw <spec>`.
@@ -320,6 +339,8 @@ This ref states which shape a section of a site's page takes, how it is chosen f
 | `RULE.SUPPORT.SURFACE.346` | every section of a site's page that holds items stands at the start |
 | `RULE.SUPPORT.SURFACE.347` | a menu's tile panel stands three across at most |
 | `RULE.SUPPORT.SURFACE.293` | a section's depth follows what each part holds: a point flat, a door boxed and raised, media framed by its kind, and a section never framed |
+| `RULE.SUPPORT.SURFACE.438` | a section takes one emphasis and never two |
+| `RULE.SUPPORT.SURFACE.439` | the agent writes one line for each section, its case |
 | `RULE.SUPPORT.SURFACE.371` | a hero's state is a `PRIMARY` badge eyebrow and its stack is `OUTLINE` `DEFAULT` badge facts |
 | `RULE.SUPPORT.SURFACE.372` | a grid cell's eyebrow is its group or kind as text, and a badge only when it says a state |
 | `RULE.SUPPORT.SURFACE.373` | a plan holds one eyebrow, and a second word is a `PRIMARY` badge fact |
