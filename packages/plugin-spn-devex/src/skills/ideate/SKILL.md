@@ -290,6 +290,7 @@ When the arc changes code, the idea is worked in the code itself, one connected 
 - **A proposal shown in chat is laid out by a preview's layers, and its flow shows its steps** (`RULE.DEVEX.WORKSPACE.504` · MUST · skill:spn-devex/ideate)
 - **A change agreed on an arc reaches that arc's preview before any handover** (`RULE.DEVEX.WORKSPACE.505` · MUST · skill:spn-devex/ideate)
 - **Each arc state says what a new piece of work does, so no fix lands outside an arc** (`RULE.DEVEX.WORKSPACE.516` · MUST · skill:spn-devex/ideate)
+- **While the shape is discussed, a find stays on the ideate arc, and no build arc opens until the ideate arc proposes it** (`RULE.DEVEX.WORKSPACE.519` · MUST · skill:spn-devex/ideate)
 - **Registering is optional, and the chain is complete without it.** (`RULE.LAUNCHPAD.CONTROL_PLANE.001` · MUST · skill:spn-devex/ideate)
 - **Launchpad is built at the partner stage, on the same backbone and with the same stack every adopter gets. It consumes the published packages rather than reading around them.** (`RULE.LAUNCHPAD.CONTROL_PLANE.002` · MUST · skill:spn-devex/ideate)
 - **Launchpad is a stage, not a sixth domain.** (`RULE.LAUNCHPAD.CONTROL_PLANE.003` · MUST · skill:spn-devex/ideate)
