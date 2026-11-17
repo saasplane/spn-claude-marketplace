@@ -24,10 +24,18 @@
 - **A page's skeleton stands in its layout and draws every level: the window, the layout's body, navigation and content, the page level, the containers, the widgets and cards, and the components** (`RULE.DEVEX.WORKSPACE.260` · MUST · skill:spn-surface/design)
 - **A mock of a layout is a `SKELETON` figure drawn by its helper, with a flow file ordering the pages and each page drawn once** (`RULE.DEVEX.WORKSPACE.454` · MUST · skill:spn-surface/design)
 - **A vertical item line spaces its text by its level** (`RULE.SUPPORT.SURFACE.228` · MUST · skill:spn-surface/design)
-- **Every prop of a unit is sorted into exactly one kind** (`RULE.SUPPORT.SURFACE.415` · MUST · skill:spn-surface/design)
-- **Each `CASE` prop names the part it changes** (`RULE.SUPPORT.SURFACE.416` · MUST · skill:spn-surface/design)
-- **The library draws coverage, and never combinations** (`RULE.SUPPORT.SURFACE.417` · MUST · skill:spn-surface/design)
-- **A unit's usage is one primary use, at the unit's widest use, in light and in dark** (`RULE.SUPPORT.SURFACE.418` · MUST · skill:spn-surface/design)
+- **A unit has its pages in one order, and each page exists only when the unit has something for it** (`RULE.SUPPORT.SURFACE.425` · MUST · skill:spn-surface/design)
+- **The Main page holds these sections in this order, each in one format** (`RULE.SUPPORT.SURFACE.426` · MUST · skill:spn-surface/design)
+- **The States section has its groups in one order, always, and each group is named by what sets its states** (`RULE.SUPPORT.SURFACE.427` · MUST · skill:spn-surface/design)
+- **The other pages hold fixed sections too, read from the book and drawn in this order** (`RULE.SUPPORT.SURFACE.428` · MUST · skill:spn-surface/design)
+- **A unit's samples stand in one fenced `json` block in its chapter, under `#### The samples of` and the unit's name** (`RULE.SUPPORT.SURFACE.429` · MUST · skill:spn-surface/design)
+- **The agent writes a unit's Overview from the unit's chapter, and the Overview changes with it** (`RULE.SUPPORT.SURFACE.430` · MUST · skill:spn-surface/design)
+- **Every unit states how its examples are shown, in two facts, and every page of the showcase and of the library is laid out from them** (`RULE.SUPPORT.SURFACE.431` · MUST · skill:spn-surface/design)
+- **A unit's states are listed in its samples block, each with how it is made, and the showcase and the library draw exactly that list** (`RULE.SUPPORT.SURFACE.432` · MUST · skill:spn-surface/design)
+- **Every value a unit accepts is shown once, a prop with kinds or parts included, and a variation finds its place by what it varies** (`RULE.SUPPORT.SURFACE.433` · MUST · skill:spn-surface/design)
+- **The library draws coverage, and never combinations** (`RULE.SUPPORT.SURFACE.435` · MUST · skill:spn-surface/design)
+- **A unit's usage is one primary use, at the width one cell of its row takes, in light and in dark** (`RULE.SUPPORT.SURFACE.436` · MUST · skill:spn-surface/design)
+- **Every prop of a unit is sorted into exactly one category, and the category stands in the library column of its props table** (`RULE.SUPPORT.SURFACE.437` · MUST · skill:spn-surface/design)
 
 Read this step when the developer asks for a mock of a page or a flow, or asks to see the design where the window holds no Figma connector. **A mock is the tree this skill already wrote, drawn as skeletons.** It is no second design: every decision in it is made in steps 0 to 5, and a change of mind goes into the tree first, and then into the mock. In a designer's words it is a mock; in the book's it is a skeleton, a mock of a layout.
 

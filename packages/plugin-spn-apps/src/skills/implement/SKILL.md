@@ -15,15 +15,15 @@ description: THE requirement router for SaaS Plane TS repos. Use whenever the us
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/",
-      "seen": "44b8e5e5"
+      "seen": "16ecb5b1"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/07-architecture-widgets/",
-      "seen": "3c3a9cae"
+      "seen": "452caa48"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/08-architecture-containers/",
-      "seen": "f140d30f"
+      "seen": "0ec6be60"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/07-comments/01-intent.md",

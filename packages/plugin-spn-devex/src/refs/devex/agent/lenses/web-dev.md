@@ -20,7 +20,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/10-architecture-app/01-common/01-contexts.md",
-      "seen": "c30807fc"
+      "seen": "93fddc0f"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/02-standards-interaction/01-common/01-interaction.md",

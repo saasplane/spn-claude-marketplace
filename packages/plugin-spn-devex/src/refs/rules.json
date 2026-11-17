@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "book": {
     "repository": "spn-foundation",
-    "commit": "dfea1fe9"
+    "commit": "510aa245"
   },
   "rules": [
     {
@@ -17072,7 +17072,7 @@
       "class": "stated in a skill",
       "sentence": "A layout owns the navigation and the content of a page, and never owns anything inside the content",
       "chapter": "04-capabilities/02-support/01-surface/09-architecture-layouts/01-common/01-layout.md",
-      "heading": "The layout",
+      "heading": "DSLayout",
       "decision": null,
       "restated": [
         {
@@ -23595,7 +23595,7 @@
       "class": "stated in a skill",
       "sentence": "`DSTable` takes `hoverable`, a yes-or-no prop",
       "chapter": "04-capabilities/02-support/01-surface/06-architecture-components/01-common/01-components.md",
-      "heading": "Data display",
+      "heading": "DSTable",
       "decision": null,
       "restated": [
         {
@@ -24348,7 +24348,7 @@
       "class": "stated in a skill",
       "sentence": "A badge always shows its word",
       "chapter": "04-capabilities/02-support/01-surface/06-architecture-components/01-common/01-components.md",
-      "heading": "The badge",
+      "heading": "DSBadge",
       "decision": null,
       "restated": [
         {
@@ -25113,7 +25113,7 @@
       "class": "guidance",
       "sentence": "A row of a list and an item line that lead somewhere can show an arrow at their end, with `showArrow`. It is drawn as the look-alike of an icon action",
       "chapter": "04-capabilities/02-support/01-surface/06-architecture-components/01-common/01-components.md",
-      "heading": "Data display",
+      "heading": "DSList",
       "decision": "DEC.SUPPORT.SURFACE.087",
       "restated": [
         {
@@ -25147,7 +25147,7 @@
       "class": "stated in a skill",
       "sentence": "`DSConfirmDialog` asks a person to confirm an act, and it stays open while the act runs",
       "chapter": "04-capabilities/02-support/01-surface/06-architecture-components/01-common/01-components.md",
-      "heading": "Overlays",
+      "heading": "DSConfirmDialog",
       "decision": null,
       "restated": [
         {
@@ -25409,7 +25409,7 @@
       "class": "stated in a skill",
       "sentence": "`DSList` takes `hoverable`, with the meaning it has on `DSTable`",
       "chapter": "04-capabilities/02-support/01-surface/06-architecture-components/01-common/01-components.md",
-      "heading": "Data display",
+      "heading": "DSList",
       "decision": null,
       "restated": [
         {
@@ -25696,7 +25696,7 @@
       "class": "stated in a skill",
       "sentence": "The initials of an avatar are a title step of about four tenths of the avatar",
       "chapter": "04-capabilities/02-support/01-surface/06-architecture-components/01-common/01-components.md",
-      "heading": "The avatar",
+      "heading": "DSAvatar",
       "decision": "DEC.SUPPORT.SURFACE.105",
       "restated": [
         {
@@ -25886,7 +25886,7 @@
       "class": "stated in a skill",
       "sentence": "An action at the end of a row that is a link never follows the link",
       "chapter": "04-capabilities/02-support/01-surface/06-architecture-components/01-common/01-components.md",
-      "heading": "Data display",
+      "heading": "DSList",
       "decision": null,
       "restated": [
         {
@@ -26008,7 +26008,7 @@
         "skill": "spn-surface/design"
       },
       "class": "stated in a skill",
-      "sentence": "A card hands its size to what it holds, as a panel does",
+      "sentence": "A card's size sets its own spacing and reaches no block it holds",
       "chapter": "04-capabilities/02-support/01-surface/08-architecture-containers/01-common/01-container.md",
       "heading": "The card",
       "decision": "DEC.SUPPORT.SURFACE.114",
@@ -26017,6 +26017,11 @@
           "plugin": "spn-devex",
           "path": "refs/devex/agent/lenses/ui.md",
           "heading": "Produces to"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/architecture-components.md",
+          "heading": "What single blocks answer — 🔮"
         },
         {
           "plugin": "spn-surface",
@@ -26037,6 +26042,11 @@
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
           "heading": "The rules this step holds"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/draw.md",
+          "heading": "How each line of the tree is drawn"
         }
       ]
     },
@@ -26258,9 +26268,9 @@
         "skill": "spn-surface/design"
       },
       "class": "stated in a skill",
-      "sentence": "A dialog, a drawer and a sheet announce their title once",
+      "sentence": "A drawer announces its title once",
       "chapter": "04-capabilities/02-support/01-surface/06-architecture-components/01-common/01-components.md",
-      "heading": "Overlays",
+      "heading": "DSDrawer",
       "decision": "DEC.SUPPORT.SURFACE.121",
       "restated": [
         {
@@ -26412,7 +26422,7 @@
       "class": "guidance",
       "sentence": "A row of the body of `DSTable` can be marked as the row in view, with `selected`. A data table marks it through `selectedRecordId`, apart from the records a person ticks",
       "chapter": "04-capabilities/02-support/01-surface/06-architecture-components/01-common/01-components.md",
-      "heading": "Data display",
+      "heading": "DSTable",
       "decision": "DEC.SUPPORT.SURFACE.125",
       "restated": [
         {
@@ -26640,7 +26650,7 @@
       "class": "stated in a skill",
       "sentence": "A row of a list holds one of three things: plain words, a line of facts, or an item line",
       "chapter": "04-capabilities/02-support/01-surface/06-architecture-components/01-common/01-components.md",
-      "heading": "Data display",
+      "heading": "DSList",
       "decision": "DEC.SUPPORT.SURFACE.132",
       "restated": [
         {
@@ -26749,7 +26759,7 @@
       "class": "stated in a skill",
       "sentence": "The badge of an avatar follows the scale size of the avatar",
       "chapter": "04-capabilities/02-support/01-surface/06-architecture-components/01-common/01-components.md",
-      "heading": "The avatar",
+      "heading": "DSAvatar",
       "decision": "DEC.SUPPORT.SURFACE.136",
       "restated": [
         {
@@ -27024,7 +27034,7 @@
       "class": "stated in a skill",
       "sentence": "A pressed toggle keeps its border in every colour, and a pressed toggle of the default hue takes a fill a person can see",
       "chapter": "04-capabilities/02-support/01-surface/06-architecture-components/01-common/01-components.md",
-      "heading": "Data entry · Fields",
+      "heading": "DSToggle",
       "decision": null,
       "restated": [
         {
@@ -27202,7 +27212,7 @@
       "class": "stated in a skill",
       "sentence": "A badge with no `variant` draws `SUBTLE`, the light tint",
       "chapter": "04-capabilities/02-support/01-surface/06-architecture-components/01-common/01-components.md",
-      "heading": "The badge",
+      "heading": "DSBadge",
       "decision": null,
       "restated": [
         {
@@ -27386,7 +27396,7 @@
       "class": "stated in a skill",
       "sentence": "With no drawing, the panel of a group is rows as tight as a menu bar's. A group can draw its own panel through `renderPanel`, and that drawing reaches the panel's edges",
       "chapter": "04-capabilities/02-support/01-surface/06-architecture-components/01-common/01-components.md",
-      "heading": "The navigation units",
+      "heading": "DSNavMenu",
       "decision": "DEC.SUPPORT.SURFACE.159",
       "restated": [
         {
@@ -27420,7 +27430,7 @@
       "class": "stated in a skill",
       "sentence": "A drawing places each entry as a `DSNavEntry`",
       "chapter": "04-capabilities/02-support/01-surface/06-architecture-components/01-common/01-components.md",
-      "heading": "The navigation units",
+      "heading": "DSNavEntry",
       "decision": null,
       "restated": [
         {
@@ -27609,7 +27619,7 @@
       "class": "stated in a skill",
       "sentence": "A switch takes its own `label`, drawn beside it as a checkbox draws its own, and no description; and a control with an edge steps that edge under the pointer",
       "chapter": "04-capabilities/02-support/01-surface/06-architecture-components/01-common/01-components.md",
-      "heading": "Overlays",
+      "heading": "DSSwitch",
       "decision": null,
       "restated": [
         {
@@ -27638,7 +27648,7 @@
       "class": "stated in a skill",
       "sentence": "The drop area of an attachment is neutral in every state, takes a `title` and a `description`, and in `mini` is as wide as its content",
       "chapter": "04-capabilities/02-support/01-surface/06-architecture-components/01-common/01-components.md",
-      "heading": "Overlays",
+      "heading": "DSAttachment",
       "decision": null,
       "restated": [
         {
@@ -27844,7 +27854,7 @@
       "class": "guidance",
       "sentence": "A cell of `DSTable`, head or data, can take `verticalAlignment`",
       "chapter": "04-capabilities/02-support/01-surface/06-architecture-components/01-common/01-components.md",
-      "heading": "Data display",
+      "heading": "DSTable",
       "decision": null,
       "restated": [
         {
@@ -28067,7 +28077,7 @@
       "class": "guidance",
       "sentence": "`DSTable` and `DSList` can reorder a fixed ordered set, through `reorder`",
       "chapter": "04-capabilities/02-support/01-surface/06-architecture-components/01-common/01-components.md",
-      "heading": "Data display",
+      "heading": "DSList",
       "decision": null,
       "restated": [
         {
@@ -28284,7 +28294,7 @@
       "class": "stated in a skill",
       "sentence": null,
       "chapter": "04-capabilities/02-support/01-surface/06-architecture-components/01-common/01-components.md",
-      "heading": "Overlays",
+      "heading": "DSDrawer",
       "decision": null,
       "restated": [
         {
@@ -28486,7 +28496,7 @@
       "class": "stated in a skill",
       "sentence": "`DSSiteLayout` wraps one site's page, and it is the only thing that marks a page as a site's",
       "chapter": "04-capabilities/02-support/01-surface/09-architecture-layouts/01-common/01-layout.md",
-      "heading": "The wrapper of a site's page",
+      "heading": "DSSiteLayout",
       "decision": null,
       "restated": [
         {
@@ -28535,7 +28545,7 @@
       "class": "stated in a skill",
       "sentence": "A group of avatars overlaps its avatars as the design library draws it, and an overlapped avatar centres its initials in what shows",
       "chapter": "04-capabilities/02-support/01-surface/06-architecture-components/01-common/01-components.md",
-      "heading": "The avatar",
+      "heading": "DSAvatar",
       "decision": null,
       "restated": [
         {
@@ -28559,7 +28569,7 @@
       "class": "stated in a skill",
       "sentence": "A slider shows its value on its handle",
       "chapter": "04-capabilities/02-support/01-surface/06-architecture-components/01-common/01-components.md",
-      "heading": "The avatar",
+      "heading": "DSSlider",
       "decision": null,
       "restated": [
         {
@@ -28826,7 +28836,7 @@
       "class": "guidance",
       "sentence": "A row that scrolls sideways is `DSHScroll`, and its arrows stand on the ground the row stands on",
       "chapter": "04-capabilities/02-support/01-surface/06-architecture-components/01-common/01-components.md",
-      "heading": "Structure",
+      "heading": "DSHScroll",
       "decision": null,
       "restated": [
         {
@@ -28877,7 +28887,7 @@
       "class": "guidance",
       "sentence": "A layout is chosen by the job of the app, as the table says, and not by how it looks",
       "chapter": "04-capabilities/02-support/01-surface/09-architecture-layouts/01-common/01-layout.md",
-      "heading": "The layout",
+      "heading": "DSLayout",
       "decision": null,
       "restated": [
         {
@@ -29979,7 +29989,7 @@
       "class": "stated in a skill",
       "sentence": "A section of a page is `DSSectionContainer`, and it is the only unit that gives a part of a page its fill and its room",
       "chapter": "04-capabilities/02-support/01-surface/08-architecture-containers/01-common/01-container.md",
-      "heading": "The section of a page",
+      "heading": "DSSectionContainer",
       "decision": null,
       "restated": [
         {
@@ -30038,7 +30048,7 @@
       "class": "stated in a skill",
       "sentence": null,
       "chapter": "04-capabilities/02-support/01-surface/06-architecture-components/01-common/01-components.md",
-      "heading": "Overlays",
+      "heading": "DSDrawer",
       "decision": null,
       "restated": [
         {
@@ -30091,7 +30101,7 @@
       "class": "stated in a skill",
       "sentence": "A section takes its room above and below from its size, and hands that size to what it holds",
       "chapter": "04-capabilities/02-support/01-surface/08-architecture-containers/01-common/01-container.md",
-      "heading": "The section of a page",
+      "heading": "DSSectionContainer",
       "decision": null,
       "restated": [
         {
@@ -30223,7 +30233,7 @@
       "class": "stated in a skill",
       "sentence": null,
       "chapter": "04-capabilities/02-support/01-surface/06-architecture-components/01-common/01-components.md",
-      "heading": "Overlays",
+      "heading": "DSDrawer",
       "decision": null,
       "restated": [
         {
@@ -30329,7 +30339,7 @@
       "class": "stated in a skill",
       "sentence": "A section reaches the edges of its place and no further",
       "chapter": "04-capabilities/02-support/01-surface/08-architecture-containers/01-common/01-container.md",
-      "heading": "The section of a page",
+      "heading": "DSSectionContainer",
       "decision": null,
       "restated": [
         {
@@ -30499,7 +30509,7 @@
       "class": "stated in a skill",
       "sentence": "A grid of features under a heading is `DSFeatureGridSectionContainer`, and it takes `section`, and can take a `heading` and a `grid`",
       "chapter": "04-capabilities/02-support/01-surface/08-architecture-containers/01-common/01-container.md",
-      "heading": "The grid section",
+      "heading": "DSFeatureGridSectionContainer",
       "decision": null,
       "restated": [
         {
@@ -30558,7 +30568,7 @@
       "class": "stated in a skill",
       "sentence": "The columns of a grid are one shape, `IDSGridColumns`, and a page sets them per screen class",
       "chapter": "04-capabilities/02-support/01-surface/08-architecture-containers/01-common/01-container.md",
-      "heading": "The grid section",
+      "heading": "DSFeatureGridSectionContainer",
       "decision": null,
       "restated": [
         {
@@ -30909,7 +30919,7 @@
       "class": "stated in a skill",
       "sentence": "`DSCard` takes no height of its own, and `fullHeight`, a yes-or-no prop that is no by default, fills a place with a set height",
       "chapter": "04-capabilities/02-support/01-surface/06-architecture-components/01-common/01-components.md",
-      "heading": "Data display",
+      "heading": "DSCard",
       "decision": null,
       "restated": [
         {
@@ -30938,7 +30948,7 @@
       "class": "stated in a skill",
       "sentence": "The columns follow the screen class, and never a measured width",
       "chapter": "04-capabilities/02-support/01-surface/08-architecture-containers/01-common/01-container.md",
-      "heading": "The grid section",
+      "heading": "DSFeatureGridSectionContainer",
       "decision": null,
       "restated": [
         {
@@ -31286,7 +31296,7 @@
       "class": "stated in a skill",
       "sentence": "`DSList` can take a `title`, and it starts where the words of the rows start",
       "chapter": "04-capabilities/02-support/01-surface/06-architecture-components/01-common/01-components.md",
-      "heading": "Data display",
+      "heading": "DSList",
       "decision": null,
       "restated": [
         {
@@ -31535,7 +31545,7 @@
       "class": "stated in a skill",
       "sentence": null,
       "chapter": "04-capabilities/02-support/01-surface/06-architecture-components/01-common/01-components.md",
-      "heading": "Data display",
+      "heading": "DSList",
       "decision": "DEC.SUPPORT.SURFACE.292",
       "restated": [
         {
@@ -31899,7 +31909,7 @@
       "class": "guidance",
       "sentence": "A page from another address, or a document the page wrote, is drawn through `DSEmbed`",
       "chapter": "04-capabilities/02-support/01-surface/06-architecture-components/01-common/01-components.md",
-      "heading": "An embedded page",
+      "heading": "DSEmbed",
       "decision": null,
       "restated": [
         {
@@ -32099,7 +32109,7 @@
       "class": "stated in a skill",
       "sentence": "`DSCarousel` marks every slide that is not in view `inert` and `aria-hidden`",
       "chapter": "04-capabilities/02-support/01-surface/06-architecture-components/01-common/01-components.md",
-      "heading": "Data display",
+      "heading": "DSCarousel",
       "decision": null,
       "restated": [
         {
@@ -32136,14 +32146,9 @@
       "class": "stated in a skill",
       "sentence": null,
       "chapter": "04-capabilities/02-support/01-surface/08-architecture-containers/01-common/01-container.md",
-      "heading": "The section of a page",
+      "heading": "DSSectionContainer",
       "decision": null,
       "restated": [
-        {
-          "plugin": "spn-surface",
-          "path": "refs/support/surface/architecture-containers.md",
-          "heading": "The section of a page"
-        },
         {
           "plugin": "spn-surface",
           "path": "refs/support/surface/architecture-containers.md",
@@ -32977,7 +32982,7 @@
       "class": "guidance",
       "sentence": "A badge that names a kind or a type draws `OUTLINE` in `DEFAULT`, with the icon its enum gives the value where it gives one",
       "chapter": "04-capabilities/02-support/01-surface/06-architecture-components/01-common/01-components.md",
-      "heading": "The badge",
+      "heading": "DSBadge",
       "decision": null,
       "restated": [
         {
@@ -32999,7 +33004,7 @@
       "class": "guidance",
       "sentence": "A badge that says a state takes the hue its meaning gives, from one table, at the `variant` its place gives",
       "chapter": "04-capabilities/02-support/01-surface/06-architecture-components/01-common/01-components.md",
-      "heading": "The badge",
+      "heading": "DSBadge",
       "decision": null,
       "restated": [
         {
@@ -33214,7 +33219,7 @@
       "class": "guidance",
       "sentence": "A badge over a picture is `SOLID`, and it says a state in that state's hue",
       "chapter": "04-capabilities/02-support/01-surface/06-architecture-components/01-common/01-components.md",
-      "heading": "The badge",
+      "heading": "DSBadge",
       "decision": null,
       "restated": [
         {
@@ -33304,7 +33309,7 @@
       "class": "guidance",
       "sentence": "A word with no fill is a fact in words, a `TEXT` fact, and a link is a `DSLink`",
       "chapter": "04-capabilities/02-support/01-surface/06-architecture-components/01-common/01-components.md",
-      "heading": "The badge",
+      "heading": "DSBadge",
       "decision": null,
       "restated": [
         {
@@ -33331,7 +33336,7 @@
       "class": "guidance",
       "sentence": "A badge is `SOLID` only over a picture",
       "chapter": "04-capabilities/02-support/01-surface/06-architecture-components/01-common/01-components.md",
-      "heading": "The badge",
+      "heading": "DSBadge",
       "decision": null,
       "restated": [
         {
@@ -33402,7 +33407,7 @@
       "class": "guidance",
       "sentence": "Several values of one set are each drawn by their own case, one size step smaller than their place",
       "chapter": "04-capabilities/02-support/01-surface/06-architecture-components/01-common/01-components.md",
-      "heading": "The badge",
+      "heading": "DSBadge",
       "decision": null,
       "restated": [
         {
@@ -33419,7 +33424,7 @@
       "class": "guidance",
       "sentence": "A label a person coloured is a `SUBTLE` badge in `CUSTOM`, with that colour in `customColor`",
       "chapter": "04-capabilities/02-support/01-surface/06-architecture-components/01-common/01-components.md",
-      "heading": "The badge",
+      "heading": "DSBadge",
       "decision": null,
       "restated": [
         {
@@ -33696,7 +33701,7 @@
       "class": "guidance",
       "sentence": "A badge in a table cell is `XS`, as is a state in an item line at `CONTENT` and `INLINE`. A badge on its own is `SM`, and a badge over a picture takes the size of its place",
       "chapter": "04-capabilities/02-support/01-surface/06-architecture-components/01-common/01-components.md",
-      "heading": "The badge",
+      "heading": "DSBadge",
       "decision": "DEC.SUPPORT.SURFACE.391",
       "restated": [
         {
@@ -33938,7 +33943,7 @@
         "skill": "spn-surface/design"
       },
       "class": "stated in a skill",
-      "sentence": "Playground is the last page of a unit, and every new unit joins the `storySort` order",
+      "sentence": "Playground follows the main page, as the page model orders a unit's pages, and every new unit joins the `storySort` order",
       "chapter": "04-capabilities/02-support/01-surface/12-delivery-showcase/01-common/01-showcase.md",
       "heading": "The pages of a unit",
       "decision": null,
@@ -34223,13 +34228,8 @@
       "sentence": "A site's page is a sequence of sections, and each owns its room and its fill.",
       "chapter": "02-constructs/02-support/01-surface/03-standards-patterns.md",
       "heading": "Site patterns",
-      "decision": null,
+      "decision": "DEC.SUPPORT.SURFACE.414",
       "restated": [
-        {
-          "plugin": "spn-surface",
-          "path": "refs/support/surface/architecture-components.md",
-          "heading": "The level and the form"
-        },
         {
           "plugin": "spn-surface",
           "path": "refs/support/surface/standards-patterns.md",
@@ -34249,10 +34249,10 @@
         "skill": "spn-surface/design"
       },
       "class": "stated in a skill",
-      "sentence": "Every prop of a unit is sorted into exactly one kind",
-      "chapter": "02-constructs/02-support/01-surface/06-architecture-components.md",
-      "heading": "Library sorting — How a unit is sorted for the library",
-      "decision": null,
+      "sentence": "A section's fill may be a gradient of its own colour.",
+      "chapter": "02-constructs/02-support/01-surface/08-architecture-containers.md",
+      "heading": "Page section — The section of a page",
+      "decision": "DEC.SUPPORT.SURFACE.415",
       "restated": [
         {
           "plugin": "spn-surface",
@@ -34261,7 +34261,7 @@
         },
         {
           "plugin": "spn-surface",
-          "path": "skills/design/steps/mock.md",
+          "path": "skills/design/SKILL.md",
           "heading": "The rules this step holds"
         }
       ]
@@ -34273,10 +34273,10 @@
         "skill": "spn-surface/design"
       },
       "class": "stated in a skill",
-      "sentence": "Each `CASE` prop names the part it changes",
-      "chapter": "02-constructs/02-support/01-surface/06-architecture-components.md",
-      "heading": "Library sorting — How a unit is sorted for the library",
-      "decision": null,
+      "sentence": "Sections are told apart by a change of fill, never by a line.",
+      "chapter": "02-constructs/02-support/01-surface/08-architecture-containers.md",
+      "heading": "Page section — The section of a page",
+      "decision": "DEC.SUPPORT.SURFACE.416",
       "restated": [
         {
           "plugin": "spn-surface",
@@ -34285,7 +34285,7 @@
         },
         {
           "plugin": "spn-surface",
-          "path": "skills/design/steps/mock.md",
+          "path": "skills/design/SKILL.md",
           "heading": "The rules this step holds"
         }
       ]
@@ -34297,10 +34297,10 @@
         "skill": "spn-surface/design"
       },
       "class": "stated in a skill",
-      "sentence": "The library draws coverage, and never combinations",
-      "chapter": "02-constructs/02-support/01-surface/06-architecture-components.md",
-      "heading": "Library sorting — How a unit is sorted for the library",
-      "decision": null,
+      "sentence": "The header and the footer each take one shape, `{ node, sticky? }`.",
+      "chapter": "02-constructs/02-support/01-surface/09-architecture-layouts.md",
+      "heading": "The types",
+      "decision": "DEC.SUPPORT.SURFACE.417",
       "restated": [
         {
           "plugin": "spn-devex",
@@ -34314,13 +34314,13 @@
         },
         {
           "plugin": "spn-surface",
-          "path": "skills/design/steps/draw.md",
-          "heading": "How each line of the tree is drawn"
+          "path": "skills/design/SKILL.md",
+          "heading": "The rules this step holds"
         },
         {
           "plugin": "spn-surface",
-          "path": "skills/design/steps/mock.md",
-          "heading": "The rules this step holds"
+          "path": "skills/design/steps/draw.md",
+          "heading": "How each line of the tree is drawn"
         }
       ]
     },
@@ -34331,9 +34331,9 @@
         "skill": "spn-surface/design"
       },
       "class": "stated in a skill",
-      "sentence": "A unit's usage is one primary use, at the unit's widest use, in light and in dark",
-      "chapter": "02-constructs/02-support/01-surface/06-architecture-components.md",
-      "heading": "Library sorting — How a unit is sorted for the library",
+      "sentence": "A top bar and a dock stand one size step above the app's size where the config gives none.",
+      "chapter": "02-constructs/02-support/01-surface/09-architecture-layouts.md",
+      "heading": "The content",
       "decision": null,
       "restated": [
         {
@@ -34348,7 +34348,7 @@
         },
         {
           "plugin": "spn-surface",
-          "path": "skills/design/steps/mock.md",
+          "path": "skills/design/SKILL.md",
           "heading": "The rules this step holds"
         }
       ]
@@ -34483,6 +34483,358 @@
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.425",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "A unit has its pages in one order, and each page exists only when the unit has something for it",
+      "chapter": "02-constructs/02-support/01-surface/06-architecture-components.md",
+      "heading": "A unit's pages",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/architecture-components.md",
+          "heading": "A unit's pages"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/delivery-showcase.md",
+          "heading": "The rule — 🔮"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/mock.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.426",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "The Main page holds these sections in this order, each in one format",
+      "chapter": "02-constructs/02-support/01-surface/06-architecture-components.md",
+      "heading": "The sections of the Main page",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/architecture-components.md",
+          "heading": "The sections of the Main page"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/delivery-library.md",
+          "heading": "A unit is one section"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/mock.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.427",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "The States section has its groups in one order, always, and each group is named by what sets its states",
+      "chapter": "02-constructs/02-support/01-surface/06-architecture-components.md",
+      "heading": "The states",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/architecture-components.md",
+          "heading": "The states"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/mock.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.428",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "The other pages hold fixed sections too, read from the book and drawn in this order",
+      "chapter": "02-constructs/02-support/01-surface/06-architecture-components.md",
+      "heading": "The other pages",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/architecture-components.md",
+          "heading": "The other pages"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/mock.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.429",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "A unit's samples stand in one fenced `json` block in its chapter, under `#### The samples of` and the unit's name",
+      "chapter": "02-constructs/02-support/01-surface/06-architecture-components.md",
+      "heading": "The samples",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/architecture-components.md",
+          "heading": "The samples"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/mock.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.430",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "The agent writes a unit's Overview from the unit's chapter, and the Overview changes with it",
+      "chapter": "02-constructs/02-support/01-surface/06-architecture-components.md",
+      "heading": "The other pages",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/architecture-components.md",
+          "heading": "The other pages"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/mock.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.431",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "Every unit states how its examples are shown, in two facts, and every page of the showcase and of the library is laid out from them",
+      "chapter": "02-constructs/02-support/01-surface/06-architecture-components.md",
+      "heading": "How a unit is shown",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/architecture-components.md",
+          "heading": "How a unit is shown"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/mock.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.432",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "A unit's states are listed in its samples block, each with how it is made, and the showcase and the library draw exactly that list",
+      "chapter": "02-constructs/02-support/01-surface/06-architecture-components.md",
+      "heading": "The states",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/architecture-components.md",
+          "heading": "The states"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/mock.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.433",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "Every value a unit accepts is shown once, a prop with kinds or parts included, and a variation finds its place by what it varies",
+      "chapter": "02-constructs/02-support/01-surface/06-architecture-components.md",
+      "heading": "How a prop's variations are shown",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/architecture-components.md",
+          "heading": "The sections of the Main page"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/mock.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.434",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": null,
+      "chapter": "02-constructs/02-support/01-surface/06-architecture-components.md",
+      "heading": "DSFeature",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/architecture-components.md",
+          "heading": "The level and the form"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.435",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "The library draws coverage, and never combinations",
+      "chapter": "02-constructs/02-support/01-surface/06-architecture-components.md",
+      "heading": "Library sorting — How a unit is sorted for the library",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/architecture-components.md",
+          "heading": "The categories"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/mock.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.436",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "A unit's usage is one primary use, at the width one cell of its row takes, in light and in dark",
+      "chapter": "02-constructs/02-support/01-surface/06-architecture-components.md",
+      "heading": "Library sorting — How a unit is sorted for the library",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/architecture-components.md",
+          "heading": "The categories"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/mock.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.437",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "Every prop of a unit is sorted into exactly one category, and the category stands in the library column of its props table",
+      "chapter": "02-constructs/02-support/01-surface/06-architecture-components.md",
+      "heading": "The categories",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/architecture-components.md",
+          "heading": "A unit's choice table — 🔮"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/architecture-components.md",
+          "heading": "The categories"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/architecture-containers.md",
+          "heading": "The parts — 🔮"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/architecture-containers.md",
+          "heading": "The look — 🔮"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/architecture-widgets.md",
+          "heading": "DSCardWidget — 🔮"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/delivery-library.md",
+          "heading": "A unit is one section"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/change-library.md",
+          "heading": "The walk, in order"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/draw.md",
+          "heading": "How a block is drawn"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/mock.md",
           "heading": "The rules this step holds"
         }
       ]

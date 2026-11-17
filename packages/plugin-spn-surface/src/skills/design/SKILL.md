@@ -15,7 +15,7 @@ description: Design a page of a SaaS Plane app from the blocks of the design sys
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/",
-      "seen": "d2783d3b"
+      "seen": "4ffb4a61"
     }
   ]
 }
@@ -477,10 +477,10 @@ Wear the spn-devex plugin's `refs/devex/agent/lenses/ux.md` while you place the 
 - **An action at the end of a row that is a link never follows the link** (`RULE.SUPPORT.SURFACE.110` · MUST · skill:spn-surface/design)
 - **An item line cuts nothing it draws, and the page decides what its words say** (`RULE.SUPPORT.SURFACE.111` · MUST · skill:spn-surface/design)
 - **A block that draws itself by its place on a page takes `pageLevel` for that place, with the vocabulary `DSPageLevelType`** (`RULE.SUPPORT.SURFACE.113` · MUST · skill:spn-surface/design)
-- **A card hands its size to what it holds, as a panel does** (`RULE.SUPPORT.SURFACE.114` · MUST · skill:spn-surface/design)
+- **A card's size sets its own spacing and reaches no block it holds** (`RULE.SUPPORT.SURFACE.114` · MUST · skill:spn-surface/design)
 - **In a `flush` part, the tabs place their first tab and their panel by the inset of their place** (`RULE.SUPPORT.SURFACE.118` · MUST · skill:spn-surface/design)
 - **On a page of groups and their items, the part that holds the groups can be narrow, and a named choice says so** (`RULE.SUPPORT.SURFACE.119` · MUST · skill:spn-surface/design)
-- **A dialog, a drawer and a sheet announce their title once** (`RULE.SUPPORT.SURFACE.121` · MUST · skill:spn-surface/design)
+- **A drawer announces its title once** (`RULE.SUPPORT.SURFACE.121` · MUST · skill:spn-surface/design)
 - **A mark takes `variant` with the shared vocabulary, `DSVariantType`** (`RULE.SUPPORT.SURFACE.124` · MUST · skill:spn-surface/design)
 - **A table takes `striped` and `hoverable` from its own prop where the prop is given, else from the theme's `component.table`** (`RULE.SUPPORT.SURFACE.126` · MUST · skill:spn-surface/design)
 - **A card drawn from data is one core widget, `DSCardWidget`. It takes each group of its settings as the props of the unit that draws it, whole** (`RULE.SUPPORT.SURFACE.127` · MUST · skill:spn-surface/design)
@@ -628,13 +628,17 @@ Wear the spn-devex plugin's `refs/devex/agent/lenses/ux.md` while you place the 
 - **A unit or a prop of the library goes construct, then Figma, then stack, then showcase, and its work starts from the domain and the user's goals** (`RULE.SUPPORT.SURFACE.397` · MUST · skill:spn-surface/design)
 - **A rule about how a page uses a prop of a unit is written as guidance with its cases: it names no `never` value, it says no `MUST`, and no check refuses it** (`RULE.SUPPORT.SURFACE.398` · MUST · skill:spn-surface/design)
 - **After a change to the design system, the showcase is restarted with its cache cleared, and the served bundle is proved newer than the change before any page is shown** (`RULE.SUPPORT.SURFACE.399` · MUST · skill:spn-surface/design)
-- **Playground is the last page of a unit, and every new unit joins the `storySort` order** (`RULE.SUPPORT.SURFACE.402` · MUST · skill:spn-surface/design)
+- **Playground follows the main page, as the page model orders a unit's pages, and every new unit joins the `storySort` order** (`RULE.SUPPORT.SURFACE.402` · MUST · skill:spn-surface/design)
 - **A Figma task starts at the design skill's own walk, its shipped scripts and the cached surface status, and never at the connector's generic discovery calls or a script made during the run** (`RULE.SUPPORT.SURFACE.403` · MUST · skill:spn-surface/design)
 - **A form shows each default as its real value, marked Default, and never as a faded placeholder** (`RULE.SUPPORT.SURFACE.405` · MUST · skill:spn-surface/design)
 - **A Figma file is named `DS <n>-<Name>`, with a hyphen and no middle dot, and its theme collections are named the same way** (`RULE.SUPPORT.SURFACE.407` · MUST · skill:spn-surface/design)
 - **Every new prop of the design system ships with a showcase case that shows it** (`RULE.SUPPORT.SURFACE.408` · MUST · skill:spn-surface/design)
 - **The notice stands before the header, and it is the layout's one pinned place** (`RULE.SUPPORT.SURFACE.410` · MUST · skill:spn-surface/design)
 - **Each case a unit's column names can be opened in the unit's Playground by its prop values in the address, in light and in dark, so the library's reader can open it** (`RULE.SUPPORT.SURFACE.412` · MUST · skill:spn-surface/design)
+- **A section's fill may be a gradient of its own colour.** (`RULE.SUPPORT.SURFACE.415` · MUST · skill:spn-surface/design)
+- **Sections are told apart by a change of fill, never by a line.** (`RULE.SUPPORT.SURFACE.416` · MUST · skill:spn-surface/design)
+- **The header and the footer each take one shape, `{ node, sticky? }`.** (`RULE.SUPPORT.SURFACE.417` · MUST · skill:spn-surface/design)
+- **A top bar and a dock stand one size step above the app's size where the config gives none.** (`RULE.SUPPORT.SURFACE.418` · MUST · skill:spn-surface/design)
 - **The notice stands flush in its place.** (`RULE.SUPPORT.SURFACE.419` · MUST · skill:spn-surface/design)
 - **The library's text styles bind to the theme's typefaces and never name a stand-in font** (`RULE.SUPPORT.SURFACE.423` · MUST · skill:spn-surface/design)
 - **A page's title is one step larger only on the page that leads.** (`RULE.SUPPORT.SURFACE.424` · MUST · skill:spn-surface/design)
