@@ -46,8 +46,8 @@
 //
 // Boxes are [x, y, width, height], in the page's coordinates (a node's own x and y plus the origins of the
 // sections above it). A node is one of: a section, a set, a component, a sheet (a frame named `<unit> cases`), a
-// label (a text that is a header, a row label, a column label or a band's label), a usage (`usage · ...`), a
-// reference frame (a frame on a page that holds no set and no component), or other. Only `other` is a stray.
+// label (a text that is a header, a row label, a column label or a section's label), a usage (`usage · ...`), a
+// wrapper (a frame of the arranged form: `body · `, `section · `, `sub · `, `row · `, `cell · ` or `set · `, which the walk goes through), a reference frame (a frame on a page that holds no set and no component), or other. Only `other` is a stray.
 
 const INPUTS = {
   pageId: null,
@@ -179,14 +179,20 @@ function readSet(set) {
 // The walk goes down through sections (and sections inside sections, for parts) and no further. A unit is a set, or a
 // lone component that is no case.
 const placed = [];
-function collect(parent) {
+// A frame of the arranged form (`body · `, `section · `, `sub · `, `row · `, `cell · `, `set · `) inside a section is walked through, and a
+// component in a `cell · ` is a case, never a unit.
+// These names are the book's table of the arranged form (`04-drawing.md`, "The arranged form"). A script is passed to the connector as it is and cannot import, so each scan keeps its own copy, and `t-figma-scripts.mjs` fails unless the copies are identical.
+const ARRANGED = /^(body|section|sub|row|cell|set) · /;
+const isArranged = (node) => node.type === "FRAME" && ARRANGED.test(node.name);
+function collect(parent, insideSection) {
   for (const node of parent.children) {
     placed.push(node);
-    if (isSection(node)) collect(node);
+    if (isSection(node)) collect(node, true);
+    else if (insideSection && isArranged(node)) collect(node, true);
   }
 }
-collect(page);
-const unitEntries = placed.filter((node) => node.type === "COMPONENT_SET" || (node.type === "COMPONENT" && !CASE_NAME.test(node.name)));
+collect(page, false);
+const unitEntries = placed.filter((node) => node.type === "COMPONENT_SET" || (node.type === "COMPONENT" && !CASE_NAME.test(node.name) && !node.parent.name.startsWith("cell · ")));
 const form = page.children.length === 0 ? "empty" : page.children.some((node) => isSection(node)) ? "sections" : "flat";
 
 // ---- the references of a set's versions
