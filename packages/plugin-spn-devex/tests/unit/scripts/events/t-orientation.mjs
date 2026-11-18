@@ -1138,6 +1138,48 @@ console.log("\n=== orientation — the short welcome, and the whole one for ever
   says("[MKT.HOOKS.326] a hand run shows the whole welcome and records nothing", hand.includes("DevEx agent") && !existsSync(mark), hand.slice(0, 200));
 }
 
+// ── the developer's clock: one line under the status line of a whole welcome (041 N009) ──
+console.log("\n=== orientation — the clock line under the status line");
+{
+  const { utimesSync } = await import("node:fs");
+  const says = (label, ok, detail = "") => { n += 1; if (!ok) failed += 1; console.log(`  ${ok ? "PASS" : "FAIL"}  ${label}${ok || !detail ? "" : `\n        ${String(detail).slice(0, 400)}`}`); };
+  const files = {
+    "spn-app-ts/sprepo.json": repo("APPS", { stack: "TS" }),
+    "spn-app-ts/CONCEPT.md": "# concept\n",
+    "spn-app-ts/.claude/settings.json": JSON.stringify({ enabledPlugins: { "spn-devex@saasplane": true } }),
+  };
+  const developer = { timezone: "Asia/Kolkata", usualHours: { from: "10:30", to: "04:00" } };
+  const clockRoot = (name, node = developer) => fixture(name, { ...files, ...(node ? { ".spndevex/state.json": JSON.stringify({ workspace: { name: "w" }, workstreams: { lastNumber: 1 }, developer: node }) } : {}) });
+  const at = (stamp) => Date.parse(stamp);
+  const lineAt = (root, stamp) => { const [message, context] = orient(root, root, true, at(stamp)); return { message, context }; };
+  const base = (r) => r.message.split("\n").filter(Boolean);
+  const late = lineAt(clockRoot("clock-late"), "2026-11-18T02:00:00+05:30");
+  says("clock line: at 02:00 for the developer it names the hour and calls it a late one, under the status line", base(late).at(-1) === "It's 2 a.m. for you, a late one." && /\b1 repo\b/.test(base(late).at(-2)), late.message.slice(-300));
+  const morning = lineAt(clockRoot("clock-morning"), "2026-11-18T11:00:00+05:30");
+  says("clock line: at 11:00 it is Morning with the developer's name left out where none is known", /^Morning\.?,?/.test(base(morning).at(-1)) || /^Morning, \w+\.$/.test(base(morning).at(-1)), base(morning).at(-1));
+  const noon = lineAt(clockRoot("clock-noon"), "2026-11-18T14:00:00+05:30");
+  says("clock line: at 14:00 it is Afternoon", /^Afternoon/.test(base(noon).at(-1)), base(noon).at(-1));
+  const evening = lineAt(clockRoot("clock-evening"), "2026-11-18T20:00:00+05:30");
+  says("clock line: at 20:00 it is Evening", /^Evening/.test(base(evening).at(-1)), base(evening).at(-1));
+  says("clock line: the hour is read in the developer's timezone, not the machine's: 02:00 India is 20:30 UTC the day before",
+    base(lineAt(clockRoot("clock-tz"), "2026-11-17T20:30:00Z")).at(-1) === "It's 2 a.m. for you, a late one.");
+  const none = lineAt(clockRoot("clock-none", null), "2026-11-18T02:00:00+05:30");
+  says("clock line: with no developer node the welcome is as before, with no clock line", !base(none).some((line) => /a late one|^Morning|^Afternoon|^Evening|Welcome back\. You/.test(line)), none.message.slice(-200));
+  says("clock line: the welcome's heading and fixed lines are unchanged beside it", late.message.includes("I'm your DevEx agent") && late.message.includes("🧭 I hold every stage to its own standards") && late.context.startsWith(`${WELCOME_LEAD}\n\n`));
+  const away = clockRoot("clock-away");
+  const stamp = join(away, ".spndevex", ".debug", "sessions", "old", "prompt.at");
+  mkdirSync(join(stamp, ".."), { recursive: true }); writeFileSync(stamp, "x");
+  utimesSync(stamp, at("2026-11-17T23:40:00+05:30") / 1000, at("2026-11-17T23:40:00+05:30") / 1000);
+  const back = lineAt(away, "2026-11-18T11:00:00+05:30");
+  says("clock line: after a night away (6 hours or more) it welcomes the developer back and names when they left",
+    base(back).at(-1) === "Welcome back. You've been away since 23:40.", base(back).at(-1));
+  says("clock line: after a night away the agent's context asks for the catch-up: what landed, what needs them, what is next", /what landed, what needs them, what is next/.test(back.context));
+  says("clock line: the catch-up is not asked on an ordinary start", !/what landed, what needs them/.test(late.context));
+  says(`clock line: the session start stays inline, under ${SESSION_START_CEILING} characters (${back.context.length})`, back.context.length <= SESSION_START_CEILING);
+  const [shortMessage] = orient(clockRoot("clock-short"), clockRoot("clock-short"), false, at("2026-11-18T02:00:00+05:30"));
+  says("clock line: a compaction or a resume keeps the status line alone", shortMessage.trim().split("\n").length === 1);
+}
+
 // ── the session start shows a parked suggestion that changes how the developer works (032 N003) ──
 console.log("\n=== orientation — parked suggestions that change how you work");
 {

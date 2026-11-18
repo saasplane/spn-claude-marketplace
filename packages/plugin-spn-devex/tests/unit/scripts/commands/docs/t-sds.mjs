@@ -114,7 +114,8 @@ for (const [name, body] of Object.entries(BUILT)) put(join(SCRATCH, "assets", na
 
 // ---------------------------------------------------------------------------- cut
 
-const USAGE = "usage: spn-devex docs sds cut <version> [--root <folder>]\n" +
+const CUT_USAGE = "usage: spn-devex docs sds cut <version> [--root <folder>] [--ds <folder>] [--ds-version <tag>]\n";
+const USAGE = CUT_USAGE +
               "       spn-devex docs sds check <version> <folder…> [--root <folder>]\n" +
               "       spn-devex docs sds repoint <version> <folder…> [--root <folder>]\n" +
               "       spn-devex docs sds bundle <page> [--assets <folder>]\n";
@@ -131,10 +132,10 @@ console.log("=== docs sds — the action is a word, and each action refuses what
     asOption.code === 2 && asOption.out === `${USAGE}\`docs sds\` needs an action. \`--check\` is the action \`check\`.\n`, asOption.out);
   const option = sds("cut", "1.0.0", "--force", "--root", MARKET);
   ok("an option that does not exist is refused by its name, with exit 2, and cuts nothing",
-    option.code === 2 && option.out === "usage: spn-devex docs sds cut <version> [--root <folder>]\n`docs sds cut` does not take `--force`.\n" && !existsSync(SERVED), option.out);
+    option.code === 2 && option.out === `${CUT_USAGE}\`docs sds cut\` does not take \`--force\`.\n` &&!existsSync(SERVED), option.out);
   const noVersion = sds("cut", "--root", MARKET);
   ok("`cut` with no version says a version is owed, exits 2 and cuts nothing",
-    noVersion.code === 2 && noVersion.out === "usage: spn-devex docs sds cut <version> [--root <folder>]\n`docs sds cut` needs a version.\n" && !existsSync(SERVED), noVersion.out);
+    noVersion.code === 2 && noVersion.out === `${CUT_USAGE}\`docs sds cut\` needs a version.\n` &&!existsSync(SERVED), noVersion.out);
   const twoVersions = sds("cut", "1.0.0", "1.1.0", "--root", MARKET);
   ok("`cut` with two versions is refused with exit 2, and cuts nothing", twoVersions.code === 2 && twoVersions.out.includes("`docs sds cut` takes one version.") && !existsSync(SERVED), twoVersions.out);
   const noRoot = sds("cut", "1.0.0", "--root");
@@ -415,6 +416,49 @@ console.log("=== docs sds cut — the fonts sit beside the stylesheet");
     run.code === 0 && readFileSync(join(folder, "fonts", "Geist-Variable.woff2")).equals(woff)
       && readFileSync(join(folder, "fonts", "OFL.txt"), "utf8") === "OFL"
       && JSON.stringify(Object.keys(cutVersions(styles)["2.0.0"]).sort()) === JSON.stringify(Object.keys(BUILT).sort()), run.out);
+}
+
+console.log("=== docs sds cut --ds — the design system's tokens are copied from a pinned version, then built");
+{
+  const SERVED_OF = (folder) => join(folder, "public", "assets", "docs");
+  const git = (cwd, ...args) => execFileSync("git", ["-c", "user.email=t@t", "-c", "user.name=t", "-c", "commit.gpgsign=false", ...args], { cwd, encoding: "utf8", stdio: "pipe" });
+  const support = join(SCRATCH, "support-ds");
+  const variables = join(support, "packages", "support-web-ds-ts", "src", "assets", "styles", "_variables.css");
+  put(variables, ":root{--surface:#fff}\n");
+  git(support, "init", "-q");
+  git(support, "add", "-A");
+  git(support, "commit", "-q", "-m", "one");
+  git(support, "tag", "v1.0.0");
+  put(variables, ":root{--surface:#eee}\n");
+  git(support, "add", "-A");
+  git(support, "commit", "-q", "-m", "two");
+  git(support, "tag", "v1.1.0");
+  put(variables, ":root{--surface:#000}\n");
+  const market = join(SCRATCH, "market-ds");
+  const styles = join(market, "packages", "plugin-spn-devex", "src", "styles");
+  for (const [name, body] of Object.entries(BUILT)) put(join(styles, name), body);
+  put(join(styles, "versions.json"), "{}\n");
+  put(join(market, "public", ".keep"), "");
+  put(join(market, "scripts", "build-styles.mjs"), "import { writeFileSync, readFileSync } from 'node:fs';\nimport { join, dirname } from 'node:path';\nimport { fileURLToPath } from 'node:url';\nconst s = join(dirname(fileURLToPath(import.meta.url)), '..', 'packages', 'plugin-spn-devex', 'src', 'styles');\nwriteFileSync(join(s, 'sds-docs.css'), readFileSync(join(s, 'ds-tokens.css'), 'utf8'));\n");
+
+  const pinned = sds("cut", "3.0.0", "--root", market, "--ds", support, "--ds-version", "v1.0.0");
+  const tokens = existsSync(join(styles, "ds-tokens.css")) ? readFileSync(join(styles, "ds-tokens.css"), "utf8") : "";
+  ok("a cut with --ds copies the tokens of the version --ds-version names, from its commit and not from the working file",
+    pinned.code === 0 && tokens.endsWith(":root{--surface:#fff}\n") && tokens.includes("support-web-ds-ts v1.0.0"), `${pinned.out} ${tokens}`);
+  ok("a cut with --ds builds the stylesheet after the tokens are copied, and serves that build in the version's folder",
+    readFileSync(join(SERVED_OF(market), "3.0.0", "sds-docs.css"), "utf8") === tokens, pinned.out);
+  const newest = sds("cut", "3.1.0", "--root", market, "--ds", support);
+  ok("a cut with --ds and no --ds-version pins the newest released version of the design system",
+    newest.code === 0 && readFileSync(join(styles, "ds-tokens.css"), "utf8").endsWith(":root{--surface:#eee}\n"), newest.out);
+  const unknown = sds("cut", "3.2.0", "--root", market, "--ds", support, "--ds-version", "v9.9.9");
+  ok("a design-system version that was never released is refused by name, and cuts nothing",
+    unknown.code === 1 && unknown.out.includes("version `v9.9.9` of the design system holds no") && !existsSync(join(SERVED_OF(market), "3.2.0")), unknown.out);
+  const alone = sds("cut", "3.3.0", "--root", market, "--ds-version", "v1.0.0");
+  ok("--ds-version with no --ds is refused, because the version is read from the checkout --ds names",
+    alone.code === 1 && alone.out.includes("`--ds-version` names a version of the design system") && !existsSync(join(SERVED_OF(market), "3.3.0")), alone.out);
+  const missing = sds("cut", "3.4.0", "--root", market, "--ds", join(SCRATCH, "no-such-support"));
+  ok("--ds naming a folder that is not there is refused, and cuts nothing",
+    missing.code === 1 && missing.out.includes("is not a folder. `--ds` names the support repository's checkout") && !existsSync(join(SERVED_OF(market), "3.4.0")), missing.out);
 }
 
 console.log(failed ? `\n  ${failed} of ${total} FAILED — t-sds` : `\n  all ${total} passed — t-sds`);

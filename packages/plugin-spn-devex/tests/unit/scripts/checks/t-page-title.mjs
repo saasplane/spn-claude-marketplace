@@ -31,6 +31,32 @@ ok("[MKT.HOOKS.138] a card's question heading inside div.sds-open passes", verdi
 ok("[MKT.HOOKS.138] a long heading after the card closes is refused again",
   verdictOf(checkPageTitle(page(card + "<h3>Another long heading right here now</h3>"))) === "deny");
 
+console.log("\n=== the same rule on a page read from disk");
+{
+  const { titleFindingsOnDisk, longHeadings, titleRefusal } = await import("../../../../src/scripts/checks/page-title.ts");
+  const { mkdtempSync, mkdirSync, rmSync, writeFileSync } = await import("node:fs");
+  const { tmpdir } = await import("node:os");
+  const { join } = await import("node:path");
+  const dir = mkdtempSync(join(tmpdir(), "page-title-"));
+  process.on("exit", () => rmSync(dir, { recursive: true, force: true }));
+  const ws = join(dir, ".spndevex", "workstreams", "open", "036-x");
+  mkdirSync(ws, { recursive: true });
+  const file = join(ws, "approach.html");
+  writeFileSync(file, "<h3>What the agent misses most, by kind</h3><h4>The shape of it</h4>");
+  const found = titleFindingsOnDisk(file);
+  ok("a saved page's long heading is named, with its rule and the way out",
+    found.length === 1 && found[0] === 'heading "What the agent misses most, by kind" is past 5 words or holds a comma (RULE.DEVEX.WORKSPACE.451) · keep a topic name, and move the sentence to the lead line under it', found.join("|"));
+  ok("the hook and the disk read one rule: the same headings are found in the same text",
+    JSON.stringify(longHeadings(file, "<h3>What the agent misses most, by kind</h3>")) === JSON.stringify(["What the agent misses most, by kind"]));
+  ok("the refusal prints as it did before the rule was shared",
+    titleRefusal(["Cost, then proof"]).startsWith("Denied: a subsection heading is a topic name of at most 5 words with no comma.\n\n  • \"Cost, then proof\""));
+  writeFileSync(file, "<h3>The shape of it</h3>");
+  ok("the page with the heading cut to a topic name passes", titleFindingsOnDisk(file).length === 0);
+  writeFileSync(file, "<h3>{{A topic name, at most five words, no comma}}</h3>");
+  ok("a slot of the template is not yet a heading, and passes", titleFindingsOnDisk(file).length === 0);
+  ok("a page that is not there has nothing to find", titleFindingsOnDisk(join(ws, "missing.html")).length === 0);
+}
+
 console.log(`\n${total - failed}/${total} passed`);
 process.exit(failed ? 1 : 0);
 

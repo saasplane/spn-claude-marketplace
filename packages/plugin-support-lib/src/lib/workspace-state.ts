@@ -1,8 +1,8 @@
 // RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md § The state file has a node for each owner
 // The chapter is the source of truth; a rule change is edited there first, then here, in the same change.
 //
-// `.spndevex/state.json`, one node for each owner: spnutils writes `workspace` and `workstreams`, and THIS
-// PLUGIN WRITES `debug` AND NOTHING ELSE, by the chapter's five steps. `WorkspaceState` restates spnutils's
+// `.spndevex/state.json`, one node for each owner: spnutils writes `workspace`, `workstreams` and `developer`, and THIS
+// PLUGIN WRITES `debug` AND `presence` AND NOTHING ELSE, by the chapter's five steps. `WorkspaceState` restates spnutils's
 // contract state `UTLWorkspaceState`.
 //
 // A TOOL MUST NEVER FAIL BECAUSE THE FILE COULD NOT BE READ: every read answers null on any fault.
@@ -129,6 +129,25 @@ function takeLock(devex: string): string {
  * Returns true when the file changed, false when it already held the node.
  */
 export function writeDebugNode(root: string, change: (current: Record<string, unknown> | null) => WorkspaceDebugState): boolean {
+  return writeOwnNode(root, "debug", change);
+}
+
+/** The agent's `presence` node: whether the developer is here, away or watching, and the words or silence that said so. */
+export type WorkspacePresenceState = {
+  /** `PRESENT`, `AWAY` or `WATCHING`. */
+  state: string;
+  /** The developer's words that set it, or null. */
+  said: string | null;
+  /** When it was set, as a report stamps an instant. */
+  since: string;
+};
+
+/** Write the `presence` node, and nothing else, by the same five steps as `writeDebugNode`. */
+export function writePresenceNode(root: string, change: (current: Record<string, unknown> | null) => WorkspacePresenceState): boolean {
+  return writeOwnNode(root, "presence", change);
+}
+
+function writeOwnNode(root: string, key: "debug" | "presence", change: (current: Record<string, unknown> | null) => object): boolean {
   const devex = join(root, DEVEX);
   const file = stateFile(root);
   if (!existsSync(file)) throw new Error(`${DEVEX}/${STATE_FILE} is not there: spnutils makes it, and the plugin writes only its debug node`);
@@ -136,8 +155,8 @@ export function writeDebugNode(root: string, change: (current: Record<string, un
   const temp = join(devex, STATE_TEMP_FILE.replace("{pid}", String(process.pid)));
   try {
     const current = readStateObject(file);
-    const node = change(isObject(current.debug) ? current.debug : null);
-    const next: Record<string, unknown> = { ...current, debug: node };
+    const node = change(isObject(current[key]) ? current[key] as Record<string, unknown> : null);
+    const next: Record<string, unknown> = { ...current, [key]: node };
     if (JSON.stringify(next) === JSON.stringify(current)) return false;
     writeFileSync(temp, `${JSON.stringify(next, null, 2)}\n`, "utf8");
     renameSync(temp, file);

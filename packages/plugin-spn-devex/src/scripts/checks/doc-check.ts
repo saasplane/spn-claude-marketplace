@@ -57,6 +57,8 @@ import { ARC_ID } from "../lib/workstream-schema.ts";
 /** An arc's address as a pattern part, read from `ARC_ID`: `N<nnn>`, `ideate` or `follow-ups`. */
 const ARC_PART = ARC_ID.source.slice(1, -1);
 import { findPartnerWords } from "./partner-words.ts";
+import { titleFindingsOnDisk } from "./page-title.ts";
+import { whereTreeFindings } from "./where-tree.ts";
 import { bookClassFaults, inPluginSource, knownHolders, ownMarketplace, pluginNameFaults } from "./book-classes.ts";
 import { GUIDE_PAGE_SUFFIX, APPROACH_SUFFIX, ARTIFACT, CONSTRUCT_PAGES, CONSTRUCT_PAGE_SUFFIX, HUB, OVERVIEW_PAGE_SUFFIX, PLUGIN_TEMPLATES, POCKET,
          artifactDocsPathOf, decisionsRegister, inArtifacts, workstreamPrefixSource, isApproachPage, isRegister as inRegisters, pagePlaceOf,
@@ -340,6 +342,24 @@ export function figureRule(path: string, text: string): Finding[] {
  * command's file. A page in a closed workstream stays as it closed, and is read in the shape it closed with: Plan, or an older `h3`
  * named Cycles at the end of How. An open or backlog page with no Plan section is told to have one (`docs cycles write` moves it).
  */
+/**
+ * 05-artifacts.md § After `How` comes a section of its own, Plan (RULE.DEVEX.WORKSPACE.487): a Plan row's facts line links the arc's
+ * preview and, where the arc has `notes/<arc>/samples/index.html`, that index alone, never a sample page or folder beside it.
+ */
+export function planRowSamples(table: string, folder: string): Finding[] {
+  const out: Finding[] = [];
+  for (const row of table.matchAll(/<tr\b[^>]*\bdata-arc="arcs\/([^"/]+)\/state\.json"[^>]*>([\s\S]*?)<\/tr>/gi)) {
+    const arc = row[1];
+    if (!exists(join(folder, "notes", arc, "samples", "index.html"))) continue;
+    const hrefs = [...row[2].matchAll(/<a\b[^>]*\bhref="([^"]*)"/gi)].map((one) => one[1]).filter((href) => /\/samples\//.test(href));
+    const beside = hrefs.filter((href) => !/\/samples\/index\.html$/.test(href));
+    if (beside.length)
+      out.push([CYCLES, `Plan's row for ${arc} links ${listed(beside)} beside its samples index — an arc with \`samples/index.html\` is linked by that index alone ` +
+        "(05-artifacts.md § After How comes a section of its own, Plan; RULE.DEVEX.WORKSPACE.487) · `spn-devex docs cycles write <workstream>` writes the row"]);
+  }
+  return out;
+}
+
 export function cyclesRule(path: string, text: string): Finding[] {
   if (section(text, "How") === null) return [];                   // approachShape reports a missing How
   const fix = "`spn-devex docs cycles show <workstream>` prints the table from the arcs";
@@ -367,7 +387,7 @@ export function cyclesRule(path: string, text: string): Finding[] {
 
   // Rows are matched by arc, never by position: the page lists arcs in the order they run.
   const { missing, unknown, stale } = tableDifferences(table, cyclesOf(home.folder));
-  const out: Finding[] = [];
+  const out: Finding[] = [...planRowSamples(table, home.folder)];
   if (missing.length)
     out.push([CYCLES, `Plan has no row for ${listed(missing)} — every arc in arcs/ is one row ` +
       `${where} · ${fix}`]);
@@ -1400,6 +1420,33 @@ export function nameRule(text: string): Finding[] {
     out.push([long.some((name) => counted(name) > NAME_LIMIT + 1) ? "RULE" : "SOFT", `${long.length} rail entr${long.length === 1 ? "y reads" : "ies read"} past three words (${long.slice(0, 3).map((name) => `"${name}"`).join(", ")}${long.length > 3 ? ", …" : ""}) — ` +
       "RULE.DEVEX.WORKSPACE.518: a heading the rail shows is a name of at most three words before its dash, a fourth only for one fixed term · write `Name — <the heading's words>` at its source"]);
   return out;
+}
+
+/**
+ * THE PAGE RULES READ FROM DISK. The Write and Edit hook reads what is typed; a page written any other way was never read.
+ * This takes the saved file of an open or backlog workstream's preview or approach page and returns the findings of the
+ * rules a heading and a section carry: 451 (a heading of at most five words, no comma), 497 (a section opens with its
+ * overview, then a figure), 518 (a rail heading of at most three words), 487 (the Plan row's links) and, on a preview, 238
+ * and 233 (`where-tree.ts`). A page in a closed workstream, and any other file, return none.
+ */
+export function pageRulesOnDisk(path: string): string[] {
+  const isPreview = /(?:^|[\\/])(?:[^\\/]*-)?preview\.html$/.test(path);
+  if (!path.endsWith(".html") || !(isPreview || isApproachPage(path))) return [];
+  const home = workstreamOf(path);
+  if (!home || inClosedWorkstream(path) || exemptWorkstream(path)) return [];
+  const text = read(path);
+  if (!text) return [];
+  const found: string[] = [...titleFindingsOnDisk(path)];
+  const rows: Finding[] = [...nameRule(text)];
+  if (isApproachPage(path)) {
+    rows.push(...figureRule(path, text));
+    const plan = section(text, "Plan");
+    const table = plan ? /<table\b[\s\S]*?<\/table>/i.exec(plan)?.[0] : undefined;
+    if (table) rows.push(...planRowSamples(table, home.folder));
+  }
+  if (isPreview) found.push(...whereTreeFindings(text));
+  // A SOFT finding is advice, and a turn does not end on advice: only what the rule refuses is read from disk.
+  return [...found, ...rows.filter(([severity]) => severity === "RULE").map(([, message]) => message)];
 }
 
 /** A book chapter: a markdown file under a folder named `spn-foundation/docs/`. */

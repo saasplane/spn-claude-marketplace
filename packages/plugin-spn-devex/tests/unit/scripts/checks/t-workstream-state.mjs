@@ -557,5 +557,56 @@ console.log("\n=== MKT.SCRIPTS.485 — the role folders `ideate/` and `follow-up
     has(stray, "notes", /`notes\/other\/` is not an arc's folder .*`N<nnn>\/`, `ideate\/` and `follow-ups\/`/), said(stray));
 }
 
+console.log("\n=== the page rules read the saved file at Stop — 451, 518, 238, 233 and the Plan row of 487");
+{
+  const { root, ws } = await dataWorkspace("state-pages-on-disk");
+  const preview = join(ws, "notes", "N001", "preview.html");
+  const written = (body) => writeFileSync(preview, `<meta charset="utf-8">\n<div class="sds-wrap">\n${body}\n</div>\n`);
+  const section = (name, body = "") => `<section id="${name.toLowerCase().replace(/\W+/g, "-")}"><div class="sds-section-head"><h2>${name}</h2></div><p class="sds-standfirst">One line.</p>${body}</section>`;
+  const tree = "<pre>spn-x/\n├── src/\n│   └── a.ts   changed: the thing\n└── tests/\n    └── t-a.mjs   new: its test</pre>";
+  const whole = () => [
+    section("Overview"), section("Today"),
+    `<section id="proposed"><div class="sds-section-head"><h2>Proposed</h2></div><p class="sds-standfirst">As it will be.</p><h3 id="s3-plugins" data-layer="plugins">Plugins</h3><h4 id="p-a">The page check</h4><p class="sds-small">For: you · Layer: Plugins</p><p>A reason.</p></section>`,
+    section("Where it lands", `<p><strong>1 &middot; spn-x</strong> &mdash; the change</p>${tree}`),
+  ].join("\n");
+
+  written(whole());
+  const green = checkWorkstream(ws);
+  ok("green: a preview with short headings, a layer mark, a For and Layer line and one tree for its repository has no page finding", !green.some((one) => one.check === "pages"), said(green));
+
+  written(whole().replace("The page check", "What the agent misses most, by kind"));
+  const long = checkWorkstream(ws);
+  ok("red: a heading past five words with a comma, in a page a shell wrote, is named at Stop with its rule",
+    has(long, "pages", /notes\/N001\/preview\.html: heading "What the agent misses most, by kind" is past 5 words or holds a comma \(RULE\.DEVEX\.WORKSPACE\.451\)/), said(long));
+  written(whole());
+  ok("green: the heading cut to a topic name passes", !checkWorkstream(ws).some((one) => one.check === "pages"));
+
+  written(whole().replace(tree, "<table><tr><td>spn-x/src/a.ts</td></tr></table>"));
+  ok("red: a Where it lands with no folder tree is named (238)", has(checkWorkstream(ws), "pages", /Where it lands holds no folder tree/), said(checkWorkstream(ws)));
+  written(whole().replace(" data-layer=\"plugins\"", ""));
+  ok("red: a layer of Proposed with no data-layer mark is named (233)", has(checkWorkstream(ws), "pages", /Proposed's layer "Plugins" carries no `data-layer` mark/), said(checkWorkstream(ws)));
+  written(whole().replace("<p class=\"sds-small\">For: you · Layer: Plugins</p>", ""));
+  ok("red: a block of Proposed with no For and Layer line is named (233)", has(checkWorkstream(ws), "pages", /Proposed's block "The page check" opens with no For and Layer line/), said(checkWorkstream(ws)));
+  written(whole().replace("Overview</h2>", "An overview of everything this preview shows and why it was written</h2>"));
+  ok("red: a rail heading past three words is named (518)", has(checkWorkstream(ws), "pages", /rail entr(?:y reads|ies read) past three words/), said(checkWorkstream(ws)));
+  written(whole());
+
+  const samples = join(ws, "notes", "N001", "samples");
+  mkdirSync(samples, { recursive: true });
+  writeFileSync(join(samples, "index.html"), "<!doctype html>\n<title>Samples of N001</title>\n");
+  writeFileSync(join(samples, "one.html"), "<!doctype html>\n<title>one</title>\n");
+  const page = join(ws, "approach.html");
+  const row = (links) => readFileSync(page, "utf8").replace(/(<tr id="N001"[^>]*>[\s\S]*?<span class="sds-small">)[\s\S]*?(<\/span>)/, `$1${links}$2`);
+  const approach = readFileSync(page, "utf8");
+  writeFileSync(page, row('Preview: <a href="notes/N001/preview.html">preview.html</a> &middot; Sample: <a href="notes/N001/samples/index.html">index.html</a> &middot; Sample: <a href="notes/N001/samples/one.html">one.html</a>'));
+  const beside = checkWorkstream(ws);
+  ok("red: a Plan row that lists a sample page beside the arc's samples index is named, with its rule (487)",
+    has(beside, "pages", /Plan's row for N001 links .*samples\/one\.html.* beside its samples index/), said(beside));
+  writeFileSync(page, row('Preview: <a href="notes/N001/preview.html">preview.html</a> &middot; Sample: <a href="notes/N001/samples/index.html">index.html</a>'));
+  ok("green: the row that links the preview and the index alone passes", !checkWorkstream(ws).some((one) => one.check === "pages"), said(checkWorkstream(ws)));
+  writeFileSync(page, approach);
+  rmSync(samples, { recursive: true });
+}
+
 console.log(failed ? `\n  ${failed} of ${total} FAILED — workstream state check` : `\n  all ${total} passed — workstream state check`);
 process.exit(failed ? 1 : 0);

@@ -200,12 +200,16 @@ export function unheldEntries(plan: GoPlan, scope: readonly ScopeSheet[]): strin
  * CHANGE TO THE WORK: `decidedBy` is left out, so a citation added or moved plans no follow-up and flags no part stale (s35, s58).
  */
 export const entryHash = (entry: SheetEntry): string => {
-  const { decidedBy: _cited, ...work } = entry;
+  // THE CASE IDS A RUNNER CREDITS ARE NO CHANGE TO THE WORK EITHER: crediting a landed entry plans no follow-up and flags no part stale.
+  const { decidedBy: _cited, credits: _credited, ...work } = entry;
   return createHash("sha1").update(JSON.stringify(work)).digest("hex").slice(0, 8);
 };
 
 /** The hash a plan signed before citations left it, decidedBy hashed in: an entry that stands as it was still matches its landed part. */
-const signedWhole = (entry: SheetEntry): string => createHash("sha1").update(JSON.stringify(entry)).digest("hex").slice(0, 8);
+const signedWhole = (entry: SheetEntry): string => {
+  const { credits: _credited, ...signed } = entry;
+  return createHash("sha1").update(JSON.stringify(signed)).digest("hex").slice(0, 8);
+};
 
 /** Minutes for one entry in each repository and kind of change, from rows that landed: `<repo>|<work>`. Absent where unmeasured. */
 export function ratesOf(measures: readonly Measure[]): Record<string, number> {

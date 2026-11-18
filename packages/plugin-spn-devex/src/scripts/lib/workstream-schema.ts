@@ -498,6 +498,8 @@ export type SheetEntry = {
   trace?: string;
   /** Whether the change is a judgment (true) or mechanical (false); required on a new entry, and read as false on a sheet written before it. */
   judged?: boolean;
+  /** The behaviour ids its runner credits, as the case titles of the run carry them. A landing accepts one where a tier id is not in the run; it changes no plan. */
+  credits?: string[];
   [field: string]: unknown;
 };
 export type Sheet = { schemaVersion: number; releaseChain: string[]; dependsOn: string[]; stack: SheetStack | null; entries: SheetEntry[]; [field: string]: unknown };
@@ -520,6 +522,8 @@ const ENTRY_FIELDS: Record<string, Rule> = {
   work: { kind: "enum", required: false, values: WORK, nullable: true },
   // Required on a new entry only: `sheet write` demands them of an entry the stored sheet lacks, so an older sheet reads whole.
   trace: { kind: "text", required: false }, judged: { kind: "boolean", required: false },
+  // The case ids the entry's runner credits, which its `tiers` do not name: optional, and never part of the work the entry plans.
+  credits: { kind: "strings", required: false },
 };
 
 /**

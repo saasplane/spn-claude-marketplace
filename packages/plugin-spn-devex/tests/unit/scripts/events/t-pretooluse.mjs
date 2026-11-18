@@ -102,6 +102,17 @@ one("the generated-file guard, folded in from the shell script",
   { tool_name: "Write", tool_input: { file_path: join(PROBE_REPO, "src", "contract", "validators", "thing.ts"), content: "x" } },
   "deny", { says: "generated Zod validator" });
 
+const PAGE = ".spndevex/workstreams/open/041-improvements/notes/N009/preview.html";
+one("a shell command that writes a workstream page is refused, and sent to Write or Edit",
+  { tool_name: "Bash", tool_input: { command: `cat > ${PAGE} <<'EOF'\n<h2>Overview</h2>\nEOF` } },
+  "deny", { says: "write it with Write or Edit, so the page checks run", parity: false, why: "the Python never read a page written through the shell" });
+one("a script that opens a workstream page and writes it is refused the same way",
+  { tool_name: "Bash", tool_input: { command: `python3 -c "open('${PAGE}', 'a').write('<li>x</li>')"` } },
+  "deny", { says: "write it with Write or Edit, so the page checks run", parity: false, why: "the Python never read a page written through the shell" });
+one("a shell write of a sample page is left alone: a sample is the work's own file",
+  { tool_name: "Bash", tool_input: { command: "cat > .spndevex/workstreams/open/041-improvements/notes/N009/samples/one.html <<'EOF'\n<p>x</p>\nEOF" } },
+  "silent", { parity: false, why: "a case of the new check only" });
+
 one("generated build output is refused too",
   { tool_name: "Write", tool_input: { file_path: join(PROBE_REPO, "dist", "generated", "thing.ts"), content: "x" } },
   "deny", { says: "generated build output" });
