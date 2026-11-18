@@ -653,6 +653,8 @@ Wear the spn-devex plugin's `refs/devex/agent/lenses/ux.md` while you place the 
 - **The notice stands flush in its place.** (`RULE.SUPPORT.SURFACE.419` · MUST · skill:spn-surface/design)
 - **The library's text styles bind to the theme's typefaces and never name a stand-in font** (`RULE.SUPPORT.SURFACE.423` · MUST · skill:spn-surface/design)
 - **A page's title is one step larger only on the page that leads.** (`RULE.SUPPORT.SURFACE.424` · MUST · skill:spn-surface/design)
+- **A cell that the library plans for a unit and the unit's Main page does not draw is a gap of the showcase, and it is fixed on the unit's page before its library page is captured** (`RULE.SUPPORT.SURFACE.446` · MUST · skill:spn-surface/design)
+- **The showcase hands its units to the capture** (`RULE.SUPPORT.SURFACE.449` · MUST · skill:spn-surface/design)
 - **Whatever stands boxed in a grid stands as tall as the tallest of its row, and a grid's cell hands its height to what it holds** (`RULE.SUPPORT.SURFACE.530` · MUST · skill:spn-surface/design)
 - **A feature takes no height of its own, and in a grid it carries its row's height down to its frame** (`RULE.SUPPORT.SURFACE.531` · MUST · skill:spn-surface/design)
 - **A text is aligned by `textAlign`, and a page never writes a class for it** (`RULE.SUPPORT.SURFACE.532` · MUST · skill:spn-surface/design)

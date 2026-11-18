@@ -84,7 +84,7 @@ spn-devex docs prose list [<path>…] [--comments] [--ledger=<file>] [--record=<
 
 spn-devex docs prose paragraphs <file> — print the flagged paragraphs of one file
 
-spn-devex docs sds cut <version> [--root <folder>] — copy the built styles into a version's folder, and list the version
+spn-devex docs sds cut <version> [--root <folder>] [--ds <folder>] [--ds-version <tag>] — copy the built styles into a version's folder, and list the version; with --ds, copy the design system's tokens first and build
 
 spn-devex docs sds check <version> <folder…> [--root <folder>] — list the pages a move to the version would change, and write nothing
 
@@ -115,6 +115,14 @@ spn-devex plugin paths check [<path>] — name each plugin path, in the plugin f
 spn-devex precedent find "<subject>" [--work <kind>] [--code] [--json] — what is already decided, written or built for a subject: the work's row first, then the matches by kind with file and line
 
 spn-devex precedent map [<kind>] [--json] — the work map's kinds of work, or one row with its references resolved to absolute paths
+
+spn-devex presence away [--said "<words>"] — record that the developer is away, with the words that said so
+
+spn-devex presence present [--said "<words>"] — record that the developer is present, with the words that said so
+
+spn-devex presence show [--json] — presence as read now: the state, how it was decided, the last message and the developer's local time
+
+spn-devex presence watching [--said "<words>"] — record that the developer is watching this session from elsewhere, with the words that said so
 
 spn-devex report refresh check <page> — measure a coverage or a tests report again and print each number a write would put on its page, beside the one the page holds
 
@@ -204,7 +212,7 @@ spn-devex workstream rows show <workstream>[/N<nnn>] [--ready] [--parallel] [--t
 
 spn-devex workstream sheet write <workstream>/<arc> --file <sheet.json> — write the arc's whole sheet from a file, every entry validated and every fact one the arc holds
 
-spn-devex workstream sheet edit <workstream>/<arc> <E> [--what …] [--op …] [--file …] [--decided-by …] [--facts …] [--then …] [--rules …] [--callers …] [--docs …] [--book …] [--tiers unit=ID,ID;contract=ID] [--trace "…"] [--judged|--mechanical] [--kind change|step] [--command "…"] [--proof "…"] — change one entry of the sheet; a missing entry is refused, and `sheet write` is named
+spn-devex workstream sheet edit <workstream>/<arc> <E> [--what …] [--op …] [--file …] [--decided-by …] [--facts …] [--then …] [--rules …] [--callers …] [--docs …] [--book …] [--tiers unit=ID,ID;contract=ID] [--credits ID,ID|none] [--trace "…"] [--judged|--mechanical] [--kind change|step] [--command "…"] [--proof "…"] — change one entry of the sheet; a missing entry is refused, and `sheet write` is named
 
 spn-devex workstream sheet drop <workstream>/<arc> <E> --note "…" — take an entry out of the sheet; --note carries why into its one log line
 
