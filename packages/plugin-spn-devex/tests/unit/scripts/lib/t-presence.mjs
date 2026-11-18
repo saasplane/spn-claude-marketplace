@@ -25,7 +25,7 @@ const stamp = (root, session, when) => {
 const stateOf = (root) => JSON.parse(readFileSync(join(root, ".spndevex", "state.json"), "utf8"));
 
 console.log("=== presence — the developer's words");
-check("words: 'going to sleep' sets AWAY", presenceWords("ok, going to sleep now") === "AWAY");
+check("[RULE.DEVEX.AGENT.178] words: 'going to sleep' sets AWAY", presenceWords("ok, going to sleep now") === "AWAY");
 check("words: \"I'm going now\" sets AWAY", presenceWords("I'm going now") === "AWAY");
 check("words: 'back tomorrow' sets AWAY", presenceWords("back tomorrow") === "AWAY");
 check("words: 'watching from my phone' sets WATCHING", presenceWords("I am watching from my phone") === "WATCHING");

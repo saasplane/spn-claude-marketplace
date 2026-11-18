@@ -11,13 +11,14 @@
 import { existsSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { REQUIRED, UsageFault, VALUE, onePath, readWords, scopeOf } from "../../../../../plugin-support-lib/src/lib/command.ts";
+import { DOCS, constructsDir } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 
 export const describe = "Fill a design-language construct's figures (drawing style, characters and building blocks, grounds, samples) from the app's design-language.json";
 export const usage = "<app> [--construct <construct.md>] [--data <design-language.json>]";
 
 const PLACEHOLDER = /^\{\{Filled by `spn-surface language write`[^}]*\}\}$/;
 const MARKED = /<!-- spn:filled (\w+) -->\n([\s\S]*?)<!-- \/spn:filled -->/g;
-const CONSTRUCT = join("docs", "02-constructs", "02-surfaces", "03-design-language.md");
+const CONSTRUCT = join(constructsDir(DOCS), "02-surfaces", "03-design-language.md");
 
 /** A heading's words as the data's key: `Drawing style` is `drawingStyle`. */
 export const keyOf = (heading: string): string =>

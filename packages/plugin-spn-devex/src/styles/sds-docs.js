@@ -5,7 +5,7 @@
 /* THE MODE IS THE DESIGN SYSTEM'S: data-mode on the page, light or dark. A page that names none takes the reader's
    own setting, and a data-theme an older page carries is read as the same word. */
 (function(){
-  var root=document.documentElement;if(root.getAttribute('data-mode'))return;
+  var root=document.documentElement;if(!root||root.getAttribute('data-mode'))return;
   var theme=root.getAttribute('data-theme'),dark=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches;
   root.setAttribute('data-mode',theme==='dark'||(theme!=='light'&&dark)?'dark':'light');
 })();

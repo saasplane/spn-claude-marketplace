@@ -103,7 +103,7 @@ one("the generated-file guard, folded in from the shell script",
   "deny", { says: "generated Zod validator" });
 
 const PAGE = ".spndevex/workstreams/open/041-improvements/notes/N009/preview.html";
-one("a shell command that writes a workstream page is refused, and sent to Write or Edit",
+one("[RULE.DEVEX.WORKSPACE.523] a shell command that writes a workstream page is refused, and sent to Write or Edit",
   { tool_name: "Bash", tool_input: { command: `cat > ${PAGE} <<'EOF'\n<h2>Overview</h2>\nEOF` } },
   "deny", { says: "write it with Write or Edit, so the page checks run", parity: false, why: "the Python never read a page written through the shell" });
 one("a script that opens a workstream page and writes it is refused the same way",

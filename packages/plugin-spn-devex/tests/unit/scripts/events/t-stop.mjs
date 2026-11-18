@@ -1573,7 +1573,7 @@ console.log("\n=== window — a new window is offered from 200k at a clean point
   const arcNow = JSON.parse(readFileSync(arcFileOf, "utf8")); decided(arcNow); writeFileSync(arcFileOf, JSON.stringify(arcNow, null, 2) + "\n");
   const holds = (reply, presence) => checkHold(held.root, new Set(["031-probe"]), reply, presence);
   const QUESTION = "The page is written.\n\nShall I go on with the next row?";
-  check("hold: while AWAY, a reply that ends on a question while a decided arc has a ready row is sent back naming the row",
+  check("[RULE.DEVEX.AGENT.179] hold: while AWAY, a reply that ends on a question while a decided arc has a ready row is sent back naming the row",
     holds(QUESTION, "AWAY").length === 1 && holds(QUESTION, "AWAY")[0].check === "hold" && /N001/.test(holds(QUESTION, "AWAY")[0].message) && /ready/.test(holds(QUESTION, "AWAY")[0].message), JSON.stringify(holds(QUESTION, "AWAY")));
   check("hold: while AWAY, a reply that ends on a hold is sent back too", holds("Landed.\n\nI'll wait for your go.", "AWAY").length === 1);
   check("hold: while PRESENT nothing changes: a question is let through", holds(QUESTION, "PRESENT").length === 0);

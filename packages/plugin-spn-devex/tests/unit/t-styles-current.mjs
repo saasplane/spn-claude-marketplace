@@ -38,7 +38,7 @@ console.log("=== styles on the design system — the docs classes read the produ
   const source = readFileSync(join(STYLES, "sds-docs.src.css"), "utf8");
   const tokens = readFileSync(join(STYLES, "ds-tokens.css"), "utf8");
   const variables = (names) => names.every((name) => new RegExp(`^\\s*${name}:`, "m").test(built));
-  ok("the stylesheet holds the design system's token names: --surface, --surface-raised, --fg, --fg-quiet, --border, --radius, --font-text, --font-code, --seed-primary",
+  ok("[RULE.DEVEX.WORKSPACE.524] the stylesheet holds the design system's token names: --surface, --surface-raised, --fg, --fg-quiet, --border, --radius, --font-text, --font-code, --seed-primary",
     variables(["--surface", "--surface-raised", "--fg", "--fg-quiet", "--border", "--radius", "--font-text", "--font-code", "--seed-primary"]));
   ok("the stylesheet derives a palette from --seed-primary, and sets dark with data-mode",
     built.includes("oklch(from var(--seed-primary)") && /\[data-mode=['"]dark['"]\]/.test(built));

@@ -117,7 +117,7 @@ console.log("\n=== edit: one entry");
 
   const credited = sheet("edit", "N001", "E2", "--credits", "WEB.LAYOUT.31,WEB.LAYOUT.32");
   const two = json(sheetFile).entries[1];
-  ok("`--credits` writes the case ids the runner credits, and leaves the tiers as they were",
+  ok("[RULE.DEVEX.WORKSPACE.529] `--credits` writes the case ids the runner credits, and leaves the tiers as they were",
     credited.code === 0 && JSON.stringify(two.credits) === JSON.stringify(["WEB.LAYOUT.31", "WEB.LAYOUT.32"]) && JSON.stringify(two.tiers) === JSON.stringify({ unit: ["T.2.01", "T.2.02"], contract: ["T.2.03"] }), credited.out + JSON.stringify(two));
   ok("`--credits` logs the edit as `credits`", lines(log).at(-1).note.includes("E2") && lines(log).at(-1).note.includes("credits"), JSON.stringify(lines(log).at(-1)));
   const before = readFileSync(stateFile, "utf8");

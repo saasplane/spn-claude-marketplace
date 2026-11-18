@@ -7,21 +7,28 @@
 
 import { bashWrites } from "./doc-check.ts";
 import { emit, readPayload, runAlone, type Payload, type Verdict } from "../lib/payload.ts";
+import { DEVEX_WORKSTREAMS, DOCS } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
 
 const SAYS = "write it with Write or Edit, so the page checks run";
 
-/** Whether a path is a page of a workstream or a docs tree: `.html` under `.spndevex/workstreams/` or a `docs/` folder, and not a sample. */
+/** The workstreams folder and the docs folder, as the docs tree names them, escaped for a pattern. */
+const WORKSTREAMS_AT = DEVEX_WORKSTREAMS.replace(/\./g, "\\.");
+const UNDER_WORKSTREAMS = new RegExp(`(?:^|/)${WORKSTREAMS_AT}/`);
+const UNDER_DOCS = new RegExp(`(?:^|/)${DOCS}/`);
+const NAMES_A_PAGE_FOLDER = new RegExp(`(?:${WORKSTREAMS_AT}/|\\b${DOCS}/)`);
+
+/** Whether a path is a page of a workstream or a docs tree: `.html` under the workstreams folder or a docs folder, and not a sample. */
 export function isPagePath(path: string): boolean {
   const slashed = path.split("\\").join("/");
   if (!/\.html?$/i.test(slashed) || /\/samples\//.test(`/${slashed}`)) return false;
-  return /(?:^|\/)\.spndevex\/workstreams\//.test(slashed) || /(?:^|\/)docs\//.test(slashed);
+  return UNDER_WORKSTREAMS.test(slashed) || UNDER_DOCS.test(slashed);
 }
 
 // A script that opens a page and writes it: the shell's other way to put bytes in a file, which `bashWrites` cannot read.
 const SCRIPTED = /\b(?:python3?|node|perl|ruby)\b[\s\S]*(?:\bopen\s*\(|writeFile|write_text|\.write\s*\(|File\.write)/;
 
 export function applies(_path: string, command: string): boolean {
-  return /\.html?\b/i.test(command) && /(?:\.spndevex\/workstreams\/|\bdocs\/)/.test(command);
+  return /\.html?\b/i.test(command) && NAMES_A_PAGE_FOLDER.test(command);
 }
 
 export function checkShellPage(payload: Payload): Verdict {
