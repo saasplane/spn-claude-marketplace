@@ -18,14 +18,14 @@
 //
 // `childOutsideSection` names each child that lies beyond its section's box (by its box or by what it draws) by more than
 // 1 px, with the side and the px. `partSectionTooWide` names a part's section with more than the padding empty at its right,
-// the content measured as `align.js` measures it: each child's right edge and what it draws beyond that edge. `unitsWithoutUsage`
+// the content measured as the arranging measures it: each child's right edge and what it draws beyond that edge. `unitsWithoutUsage`
 // blocks: it names each top-level unit with no usage (a part owes none; a unit drawn as cases alone, with no component in
 // its section, takes its first case for its usage).
 //
 // Boxes are [x, y, width, height], in the page's coordinates (a node's own x and y plus the origins of the
 // sections above it). A node is one of: a section, a set, a component, a sheet (a frame named `<unit> cases`), a
-// label (a text that is a header, a row label, a column label or a band's label), a usage (`usage · ...`), a
-// reference frame (a frame on a page that holds no set and no component), or other. Only `other` is a stray.
+// label (a text that is a header, a row label, a column label or a section's label), a usage (`usage · ...`), a
+// wrapper (a frame of the arranged form: `body · `, `section · `, `sub · `, `row · `, `cell · ` or `set · `, which the walk goes through), a reference frame (a frame on a page that holds no set and no component), or other. Only `other` is a stray.
 
 const INPUTS = {
   pageId: null,
@@ -38,12 +38,22 @@ const INPUTS = {
 };
 
 // ---- the page's reading: begin (this block is the same in page.js, scan-labels.js, scan-placement.js and scan-properties.js)
-// ---- the book's label form: begin (this block is the same in page.js and layout.js)
+// ---- the book's label form: begin (this block is the same in page.js and the three parts that read labels)
 const LABEL_PREFIX = "label · ";
 const HEADER_PREFIX = "header · ";
 const USAGE_PREFIX = "usage · ";
+// The names of the arranged form of a unit's section (the plugin's arranging): `header · <Unit>` holds the unit's name, its one
+// line and its behaviour note; `body · <Unit>` holds one `section · <name>` for each of Main's sections, each with its
+// `label · <name>` text and its `sub · <name>` subsections stacked down; a `sub · ` holds `row · ` frames, a row holds `cell · `
+// frames (the caption over the component or the instance), and `set · <Unit>` holds the component set with its row and column
+// labels. A frame with one of these names is walked through, and what stands in it belongs to the unit's section that holds it.
+// These names are the book's table of the arranged form (`04-drawing.md`, "The arranged form"). A script is passed to the connector as it is and cannot import, so each scan keeps its own copy, and `t-figma-scripts.mjs` fails unless the copies are identical.
+const ARRANGED = /^(body|section|sub|row|cell|set) · /;
+const MAIN_SECTIONS = ["Usage", "Sizes", "Levels", "Colors", "Looks", "Content", "Data", "States", "Parts"];
+// A text that names a value, a group or a caption of a table: `column · `, `row · `, `group · ` and `caption · `, beside `label · `.
+const VALUE_LABEL = /^(column|row|group|caption) · /;
 const UNIT_SEPARATOR = " — ";
-const BEHAVIOUR_PREFIX = "behaviour: ";
+const BEHAVIOUR_NOTE = /^behaviour(?: \(web only\))?: /i;
 const LAYOUT_NAMESPACE = "saasplane";
 const LAYOUT_KEY = "layout";
 const LAYOUT_SHAPES = ["set", "one component", "no set of versions, shown as cases"];
@@ -65,9 +75,9 @@ function parseHeader(text) {
   if (rest.some((line) => OLD_LAYOUT_CLAUSE.test(line))) {
     return { unit, line: null, behaviour: [], error: "the header states a layout: a header holds the unit's name, its one line and its `behaviour:` note, and the layout is the section's plugin data" };
   }
-  const note = rest.find((line) => line.startsWith(BEHAVIOUR_PREFIX));
-  const behaviour = note ? note.slice(BEHAVIOUR_PREFIX.length).split(", ").map((name) => name.trim()).filter((name) => name.length > 0) : [];
-  return { unit, line: rest.find((line) => !line.startsWith(BEHAVIOUR_PREFIX)) ?? null, behaviour, error: null };
+  const note = rest.find((line) => BEHAVIOUR_NOTE.test(line));
+  const behaviour = note ? note.replace(BEHAVIOUR_NOTE, "").split(", ").map((name) => name.trim()).filter((name) => name.length > 0) : [];
+  return { unit, line: rest.find((line) => !BEHAVIOUR_NOTE.test(line)) ?? null, behaviour, error: null };
 }
 
 // The layout a unit's section keeps as shared plugin data (`saasplane`, `layout`): { shape, tables, default, cases,
@@ -87,11 +97,6 @@ function layoutOf(section) {
   return { layout: { shape: data.shape, tables, default: data.default ?? {}, cases: data.cases ?? [], behaviour: data.behaviour ?? [] }, error: null };
 }
 
-// The set's table of a layout: the first table, captioned `the set`. Its cells are versions; a mode table's are instances.
-function setTableOf(layout) {
-  return layout.tables.find((table) => table.caption === "the set") ?? null;
-}
-
 // The values a label marks as the default: each is the candidates for the value before the mark, the whole
 // piece and its last word (an older label wrote `size SM (default)`). Never the word before the value.
 function defaultMarksOf(text) {
@@ -108,7 +113,6 @@ function defaultMarksOf(text) {
 
 const SHEET_SUFFIX = " cases";
 const CASE_NAME = /^[^=,]+=[^=,]+(, [^=,]+=[^=,]+)*$/;
-const BAND_LABELS = ["Usage", "Cases", "Parts"];
 
 if (INPUTS.pageId === null) {
   return { pages: figma.root.children.map((page) => ({ id: page.id, name: page.name })) };
@@ -121,6 +125,8 @@ if (!page || page.type !== "PAGE") {
 await figma.setCurrentPageAsync(page);
 
 function textOf(node) {
+  // a header drawn as a frame reads as its texts, one line each
+  if (node.type === "FRAME") return node.children.filter((child) => child.type === "TEXT").map((child) => child.characters).join("\n");
   try { return node.characters; } catch { return null; }
 }
 
@@ -137,21 +143,22 @@ function isSheet(node) {
 function isSection(node) {
   return node.type === "SECTION" && !isSheet(node);
 }
+// A frame of the arranged form that the walk goes through, and the header a unit's section opens with, drawn as a frame.
+const isArranged = (node) => node.type === "FRAME" && ARRANGED.test(node.name);
 
-const propertyName = (key) => key.replace(/#.*$/, "");
-function definitionsOf(node) {
-  try { return node.componentPropertyDefinitions ?? {}; } catch { return {}; }
-}
 
 // ---- the page's nodes, sorted into their kinds
 // The walk goes down through sections (and sections inside sections, for parts) and no further. A node's box
 // is in page coordinates, found by adding the origins of the sections above it, so every comparison is made in
 // one frame of reference.
 const placed = [];
-function collect(parent, depth) {
+// `parentId` is the unit's section (the nearest Figma section above a node), `holder` the node's own parent: they are the same
+// for a node that stands directly in a section, and differ for a node inside the frames of the arranged form.
+function collect(parent, depth, owner) {
   for (const node of parent.children) {
-    placed.push({ node, depth, parentId: depth === 0 ? null : parent.id });
-    if (isSection(node)) collect(node, depth + 1);
+    placed.push({ node, depth, parentId: owner, holder: parent.type === "PAGE" ? null : parent });
+    if (isSection(node)) collect(node, depth + 1, node.id);
+    else if (owner !== null && isArranged(node)) collect(node, depth, owner);
   }
 }
 function absoluteBox(node) {
@@ -159,7 +166,7 @@ function absoluteBox(node) {
   for (let up = node.parent; up && up.type !== "PAGE"; up = up.parent) { x += up.x; y += up.y; }
   return [x, y, node.width, node.height];
 }
-collect(page, 0);
+collect(page, 0, null);
 const pageHoldsUnits = placed.some(({ node }) => node.type === "COMPONENT_SET" || node.type === "COMPONENT");
 const unitNames = new Set();
 for (const { node } of placed) {
@@ -169,7 +176,7 @@ for (const { node } of placed) {
 
 // A text is a header when its first line names a unit and a line follows it (the unit's one line), or when it names a
 // unit before ` — ` (a Core file's header, a sheet's label, or an older header that still states a layout). A caption
-// such as `usage · DSImagePicker open — more`, a band's label such as `Usage`, and a value such as `none — follows the
+// such as `usage · DSImagePicker open — more`, a section's label such as `Usage`, and a value such as `none — follows the
 // hue` is not.
 function isHeaderText(text) {
   if (text.startsWith(USAGE_PREFIX)) return false;
@@ -185,25 +192,29 @@ function isUsage(node) {
   return node.name.startsWith(USAGE_PREFIX) || (node.type === "TEXT" && (textOf(node) ?? "").startsWith(USAGE_PREFIX));
 }
 
-function kindOf(node) {
+function kindOf(node, item) {
   if (node.type === "COMPONENT_SET") return "set";
   if (node.type === "COMPONENT") return "component";
   if (isSheet(node)) return "sheet";
   if (isUsage(node)) return "usage";
   if (isSection(node)) return "section";
-  if (node.type === "TEXT" && (node.name.startsWith(LABEL_PREFIX) || node.name.startsWith(HEADER_PREFIX) || isHeaderText(textOf(node) ?? ""))) return "label";
+  if (node.type === "FRAME" && node.name.startsWith(HEADER_PREFIX) && item.parentId !== null) return "label";
+  if (isArranged(node) && item.parentId !== null) return "wrapper";
+  if (node.type === "TEXT" && (node.name.startsWith(LABEL_PREFIX) || node.name.startsWith(HEADER_PREFIX) || VALUE_LABEL.test(node.name) || isHeaderText(textOf(node) ?? ""))) return "label";
   if ((node.type === "FRAME" || node.type === "SECTION") && !pageHoldsUnits) return "reference";
   return "other";
 }
 
-const entries = placed.map((item, index) => ({ ...item, index, kind: kindOf(item.node), box: absoluteBox(item.node) }));
+const entries = placed.map((item, index) => ({ ...item, index, kind: kindOf(item.node, item), box: absoluteBox(item.node) }));
 const topLevel = entries.filter((entry) => entry.depth === 0);
 const sets = entries.filter((entry) => entry.kind === "set");
 const form = topLevel.length === 0 ? "empty" : topLevel.some((entry) => entry.kind === "section") ? "sections" : "flat";
 // The unit a set, a lone component or a sheet stands for: a case component is no unit of its own.
+// A component that stands in a cell of the arranged form, or is named for its props, is a case, and no unit.
+const isCaseEntry = (entry) => CASE_NAME.test(entry.node.name) || entry.holder?.name.startsWith("cell · ");
 const unitEntryByName = new Map();
 for (const entry of entries) {
-  const isUnit = entry.kind === "set" || (entry.kind === "component" && !CASE_NAME.test(entry.node.name));
+  const isUnit = entry.kind === "set" || (entry.kind === "component" && !isCaseEntry(entry));
   if (isUnit) unitEntryByName.set(entry.node.name, entry);
 }
 for (const entry of entries) {
@@ -257,15 +268,18 @@ function readLabel(entry) {
     const unit = forSheet ? head.slice(0, -SHEET_SUFFIX.length) : head;
     // The layout is the header's section's plugin data, never the header's text: `grid` for a set, `one component`,
     // `cases` for a unit shown as cases alone, `no layout` where the section keeps none, `cannot say` where it cannot be read.
-    const home = entry.node.parent && entry.node.parent.type === "SECTION" ? entry.node.parent : null;
+    let home = entry.node.parent;
+    while (home && home.type !== "SECTION" && home.type !== "PAGE") home = home.parent;
+    if (home && home.type !== "SECTION") home = null;
     const kept = home ? layoutOf(home) : { layout: null, error: "the section holds no layout" };
     const form = forSheet ? "sheet" : parsed.error ? "cannot say" : kept.layout === null ? (kept.error === "the section holds no layout" ? "no layout" : "cannot say")
       : kept.layout.shape === "set" ? "grid" : kept.layout.shape === "one component" ? "one component" : "cases";
     return { text, part: forSheet ? "sheet" : "header", unit, via: "text", onPage: unitNames.has(head) || unitNames.has(unit), setId: null, form, reason: forSheet ? null : (parsed.error ?? kept.error) };
   }
-  if (entry.node.name.startsWith(LABEL_PREFIX) && BAND_LABELS.includes(text)) {
-    return { text, part: "band", unit: null, via: null, onPage: true, setId: null, form: null, reason: null };
-  }
+  const bare = (part) => ({ text, part, unit: null, via: null, onPage: true, setId: null, form: null, reason: null });
+  if (entry.node.name.startsWith(LABEL_PREFIX) && MAIN_SECTIONS.includes(text)) return bare("section");
+  // a caption stands in its cell, over its component, and names no row or column of a set
+  if (entry.holder?.name.startsWith("cell · ")) return bare("caption");
   const tie = tieOfValueLabel(entry);
   return { text, part: tie ? tie.axis : "untied", unit: tie ? tie.name : null, via: tie ? tie.axis : null, onPage: tie !== null, setId: tie ? tie.setId : null, form: null, reason: null };
 }
@@ -281,7 +295,7 @@ function unitOfUsage(node) {
   return names[0] ?? null;
 }
 // A unit is a set, or a lone component that is no case.
-const unitEntries = entries.filter((entry) => entry.kind === "set" || (entry.kind === "component" && !CASE_NAME.test(entry.node.name)));
+const unitEntries = entries.filter((entry) => entry.kind === "set" || (entry.kind === "component" && !isCaseEntry(entry)));
 // ---- the page's reading: end
 
 const PART = "placement";
@@ -294,7 +308,6 @@ const CAPTION_EDGE = 2;
 // A child may lie this far (px) beyond its section's box before it is named: the sums of fractional origins.
 const OUTSIDE_TOLERANCE = 1;
 
-const boxOf = (node) => [node.x, node.y, node.width, node.height];
 const meets = (first, second) =>
   first[0] < second[0] + second[2] && second[0] < first[0] + first[2] &&
   first[1] < second[1] + second[3] && second[1] < first[1] + first[3];
@@ -326,7 +339,7 @@ function overshoot(room, drawn) {
   return px > OUTSIDE_TOLERANCE ? { side, px: Math.round(px * 100) / 100 } : null;
 }
 
-// How far what a node draws reaches beyond its box on the right, in whole px (the way `align.js` reads it).
+// How far what a node draws reaches beyond its box on the right, in whole px (the way the arranging reads it).
 function drawnRightOf(node) {
   if (node.type === "TEXT" || node.type === "SECTION") return 0;
   const drawn = node.absoluteRenderBounds;
@@ -357,7 +370,7 @@ async function scanFindings() {
   if (form === "sections") {
     for (const owner of entries.filter((candidate) => candidate.kind === "section")) {
       const room = owner.node.absoluteBoundingBox ?? rectOfBox(owner.box);
-      for (const child of entries.filter((candidate) => candidate.parentId === owner.node.id)) {
+      for (const child of entries.filter((candidate) => candidate.holder === owner.node)) {
         const drawn = [
           ["box", child.node.absoluteBoundingBox ?? rectOfBox(child.box)],
           // a SECTION has no render bounds and Figma throws on the read, so a section is judged by its box alone
@@ -372,17 +385,19 @@ async function scanFindings() {
       }
     }
   }
-  // A usage's caption stands directly above it, level at the left edge, within the reach of the section's distances.
+  // A usage's caption stands directly above it, level at the left edge, within the reach of the section's distances. A usage in a
+  // cell of the arranged form is captioned by a text of the cell above it.
   const usagesWithoutCaption = entries.filter((entry) => entry.kind === "usage" && entry.node.type !== "TEXT" && entry.parentId !== null &&
+    !(entry.holder.name.startsWith("cell · ") && entry.holder.children.some((child) => child.type === "TEXT" && child.y < entry.node.y)) &&
     !entries.some((caption) => caption.kind === "usage" && caption.node.type === "TEXT" && caption.parentId === entry.parentId &&
       Math.abs(caption.box[0] - entry.box[0]) <= CAPTION_EDGE && caption.box[1] + caption.box[3] <= entry.box[1] + CAPTION_EDGE &&
       entry.box[1] - (caption.box[1] + caption.box[3]) <= CAPTION_REACH))
     .map((entry) => ({ id: entry.node.id, name: entry.node.name.slice(0, 80), in: entry.parentId }));
   // A part's section is as wide as its content and its padding, the content judged by what it draws as well as by its box (the book:
   // "A thing MUST be given room for what it draws", and the section "is as large as its content and its padding"); a top-level
-  // section is as wide as the widest of the page. `align.js` reads a part's section the same way.
+  // section is as wide as the widest of the page. the arranging reads a part's section the same way.
   const partSectionTooWide = entries.filter((entry) => entry.kind === "section" && entry.depth > 0).map((entry) => {
-    const children = entries.filter((child) => child.parentId === entry.node.id);
+    const children = entries.filter((child) => child.holder === entry.node);
     const right = Math.max(0, ...children.map((child) => child.node.x + child.node.width + drawnRightOf(child.node)));
     return { id: entry.node.id, name: entry.node.name.slice(0, 80), emptyAtRight: Math.round((entry.node.width - right) * 100) / 100, children: children.length };
   }).filter((one) => one.children > 0 && one.emptyAtRight > SECTION_PADDING + OUTSIDE_TOLERANCE)
@@ -390,32 +405,23 @@ async function scanFindings() {
   const topLevelNotSection = form === "sections"
     ? topLevel.filter((entry) => entry.kind !== "section").map((entry) => ({ id: entry.node.id, nodeType: entry.node.type, name: entry.node.name }))
     : [];
-  const sectionIds = [...new Set(entries.map((entry) => entry.parentId).filter((id) => id !== null))];
-  const meetingInSection = sectionIds.flatMap((sectionId) => pairsThatMeet(
-    entries.filter((entry) => entry.parentId === sectionId).map((entry) => ({ id: entry.node.id, box: entry.box })))
-    .map((pair) => ({ section: sectionId, pair })));
-  // A section's pieces, from the top: header, the set with its labels, usage, cases, parts. Read by the top of each.
-  const BANDS = ["header", "set", "usage", "cases", "parts"];
-  const bandOf = (entry) => {
-    if (entry.kind === "set" || entry.kind === "component") return CASE_NAME.test(entry.node.name) ? 3 : 1;
-    if (entry.kind === "sheet") return 3;
-    if (entry.kind === "usage") return 2;
-    if (entry.kind === "section") return 4;
-    const label = labelOf.get(entry);
-    if (!label) return null;
-    if (label.part === "header") return 0;
-    if (label.part === "sheet") return 3;
-    if (label.part === "row" || label.part === "column") return 1;
-    return label.part === "band" ? 2 + BAND_LABELS.indexOf(label.text) : null;
-  };
+  // Pieces that meet are found among the children of one holder: a section, or a frame of the arranged form.
+  const holderIds = [...new Set(entries.map((entry) => entry.holder?.id ?? null).filter((id) => id !== null))];
+  const meetingInSection = holderIds.flatMap((at) => pairsThatMeet(
+    entries.filter((entry) => entry.holder?.id === at).map((entry) => ({ id: entry.node.id, box: entry.box })))
+    .map((pair) => ({ section: at, pair })));
+  // A unit's section, from the top: the header, then the body, whose sections stand in Main's order (Usage, Sizes, Levels, Colors,
+  // Looks, Content, Data, States, Parts). Read by the top of each; a piece that stands above one that Main puts before it is named.
   const sectionOutOfOrder = [];
-  for (const sectionId of sectionIds) {
-    const pieces = entries.filter((entry) => entry.parentId === sectionId && bandOf(entry) !== null)
-      .sort((first, second) => first.box[1] - second.box[1] || bandOf(first) - bandOf(second));
-    let deepest = 0;
-    for (const piece of pieces) {
-      if (bandOf(piece) < deepest) sectionOutOfOrder.push({ section: sectionId, id: piece.node.id, name: piece.node.name.slice(0, 80), band: BANDS[bandOf(piece)], standsBelow: BANDS[deepest] });
-      deepest = Math.max(deepest, bandOf(piece));
+  const orderOf = (name) => MAIN_SECTIONS.indexOf(name.replace(/^section · /, ""));
+  for (const body of entries.filter((entry) => entry.kind === "wrapper" && entry.node.name.startsWith("body · "))) {
+    const header = entries.find((entry) => entry.kind === "label" && entry.parentId === body.parentId && entry.node.name.startsWith(HEADER_PREFIX));
+    if (header && header.box[1] > body.box[1]) sectionOutOfOrder.push({ section: body.parentId, id: header.node.id, name: header.node.name.slice(0, 80), band: "header", standsBelow: "body" });
+    let deepest = -1;
+    for (const one of entries.filter((entry) => entry.holder === body.node && entry.kind === "wrapper" && orderOf(entry.node.name) >= 0).sort((first, second) => first.box[1] - second.box[1])) {
+      const at = orderOf(one.node.name);
+      if (at < deepest) sectionOutOfOrder.push({ section: body.parentId, id: one.node.id, name: one.node.name.slice(0, 80), band: MAIN_SECTIONS[at], standsBelow: MAIN_SECTIONS[deepest] });
+      deepest = Math.max(deepest, at);
     }
   }
 

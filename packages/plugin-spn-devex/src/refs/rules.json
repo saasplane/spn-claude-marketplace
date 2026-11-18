@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "book": {
     "repository": "spn-foundation",
-    "commit": "542e394d"
+    "commit": "70c85118"
   },
   "rules": [
     {
@@ -23212,7 +23212,7 @@
       "class": "stated in a skill",
       "sentence": "The one picture of focus, error and disabled reads these roles of Core, named by their one name, the book's, and no block types their values",
       "chapter": "04-capabilities/02-support/01-surface/05-architecture-core/01-common/01-tokens.md",
-      "heading": "Focus, shadow and the scrim",
+      "heading": "Focus",
       "decision": null,
       "restated": [
         {
@@ -23613,6 +23613,11 @@
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
           "heading": "The rules this step holds"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/change-library.md",
+          "heading": "What the library draws, and what it does not"
         }
       ]
     },
@@ -28418,7 +28423,7 @@
       "class": "stated in a skill",
       "sentence": "A block reads the paint tokens set on its own root and no others",
       "chapter": "04-capabilities/02-support/01-surface/05-architecture-core/01-common/01-tokens.md",
-      "heading": "Surface",
+      "heading": "Surface colours",
       "decision": null,
       "restated": [
         {
@@ -28661,7 +28666,7 @@
       "class": "stated in a skill",
       "sentence": "The surface a block stands on is one value, a `color` and a `strength`, set by what draws a fill and read by the tokens",
       "chapter": "04-capabilities/02-support/01-surface/05-architecture-core/01-common/01-tokens.md",
-      "heading": "Surface",
+      "heading": "Surface colours",
       "decision": null,
       "restated": [
         {
@@ -29099,7 +29104,7 @@
       "class": "stated in a skill",
       "sentence": "A `PRIMARY` badge on a grey fill keeps the brand's own tint and words",
       "chapter": "04-capabilities/02-support/01-surface/05-architecture-core/01-common/01-tokens.md",
-      "heading": "Surface",
+      "heading": "Surface colours",
       "decision": null,
       "restated": [
         {
@@ -31868,7 +31873,7 @@
       "class": "stated in a skill",
       "sentence": "A step of the open entry stands the same contrast off its bar's fill in dark as in light",
       "chapter": "04-capabilities/02-support/01-surface/05-architecture-core/01-common/01-tokens.md",
-      "heading": "Surface",
+      "heading": "Surface colours",
       "decision": null,
       "restated": [
         {
@@ -34228,6 +34233,11 @@
         },
         {
           "plugin": "spn-surface",
+          "path": "refs/support/surface/delivery-library.md",
+          "heading": "A unit's look"
+        },
+        {
+          "plugin": "spn-surface",
           "path": "skills/design/steps/change-library.md",
           "heading": "What the library draws, and what it does not"
         },
@@ -34235,11 +34245,6 @@
           "plugin": "spn-surface",
           "path": "skills/design/steps/writer-brief.md",
           "heading": "The rules this step holds"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/steps/writer-brief.md",
-          "heading": "What you do not do"
         }
       ]
     },
@@ -34279,7 +34284,7 @@
         "skill": "spn-surface/design"
       },
       "class": "stated in a skill",
-      "sentence": "Surface and Strength take their variables from [the modes of the collections](../../05-architecture-core/01-common/01-tokens.md#the-modes-of-the-collections), as Treatment and Color do: a cell of a surface table sets both modes. `PRIMARY`'s `SOLID` fill holds the result of the brand formula at the default seed. The four theme collections hold their modes and no variable, and a designer sets them",
+      "sentence": "Surface and Strength take their variables from [the modes of the collections](../../05-architecture-core/01-common/01-tokens.md#the-modes-of-the-collections), as Treatment and Color do: a cell of a surface table sets both modes. `PRIMARY`'s `SOLID` fill holds the result of the brand formula at the default seed. The four theme collections of the panel look hold the default theme's mode first, and a designer sets another on a frame",
       "chapter": "04-capabilities/02-support/01-surface/11-delivery-library/02-figma/04-drawing.md",
       "heading": "The variables of a collection",
       "decision": "DEC.SUPPORT.SURFACE.413",
@@ -34505,15 +34510,30 @@
         "skill": "spn-surface/design"
       },
       "class": "stated in a skill",
-      "sentence": "Each planned cell is captured from the running showcase into Figma, so the web lays it out, and the plugin, the tool and the agent only arrange the captures by the plan",
-      "chapter": "04-capabilities/02-support/01-surface/11-delivery-library/02-figma/04-drawing.md",
-      "heading": "A unit's look",
+      "sentence": null,
+      "chapter": "04-capabilities/02-support/01-surface/11-delivery-library/02-figma/02-managed.md",
+      "heading": "The path of a page through the connector",
       "decision": null,
       "restated": [
         {
           "plugin": "spn-surface",
+          "path": "refs/support/surface/delivery-library.md",
+          "heading": "The path of a page through the connector"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/delivery-library.md",
+          "heading": "A unit's look"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/change-library.md",
+          "heading": "What the library draws, and what it does not"
+        },
+        {
+          "plugin": "spn-surface",
           "path": "skills/design/steps/writer-brief.md",
-          "heading": "The rules this step holds"
+          "heading": "What you do not do"
         }
       ]
     },
@@ -34902,11 +34922,6 @@
         },
         {
           "plugin": "spn-surface",
-          "path": "skills/design/steps/change-library.md",
-          "heading": "The walk, in order"
-        },
-        {
-          "plugin": "spn-surface",
           "path": "skills/design/steps/draw.md",
           "heading": "How a block is drawn"
         },
@@ -35172,6 +35187,156 @@
           "plugin": "spn-surface",
           "path": "refs/support/surface/design-languages.md",
           "heading": "The parts — 🔮"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.445",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "Hover and pressed, which no page of the showcase holds, are driven on the case rest of the unit, and every other state is captured from the page that holds it",
+      "chapter": "04-capabilities/02-support/01-surface/11-delivery-library/02-figma/04-drawing.md",
+      "heading": "A unit is one section",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/delivery-library.md",
+          "heading": "A unit is one section"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/change-library.md",
+          "heading": "What the library draws, and what it does not"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/writer-brief.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.446",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "A cell that the library plans for a unit and the unit's Main page does not draw is a gap of the showcase, and it is fixed on the unit's page before its library page is captured",
+      "chapter": "04-capabilities/02-support/01-surface/12-delivery-showcase/01-common/01-showcase.md",
+      "heading": "The sections of a main page",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/delivery-library.md",
+          "heading": "A unit's look"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/delivery-showcase.md",
+          "heading": "Sections, and the card of a section — 🔮"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/SKILL.md",
+          "heading": "The rules this step holds"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/change-library.md",
+          "heading": "What the library draws, and what it does not"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/writer-brief.md",
+          "heading": "What you do not do"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.447",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "A part of a unit that is another unit is an instance of that unit's set",
+      "chapter": "04-capabilities/02-support/01-surface/11-delivery-library/02-figma/04-drawing.md",
+      "heading": "A unit is one section",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/delivery-library.md",
+          "heading": "A unit is one section"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/change-library.md",
+          "heading": "What the library draws, and what it does not"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/writer-brief.md",
+          "heading": "The rules this step holds"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/writer-brief.md",
+          "heading": "A section"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.448",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "Every page of a file is captured at once, and a unit is arranged only after every unit it is built from that the same file holds",
+      "chapter": "04-capabilities/02-support/01-surface/11-delivery-library/02-figma/02-managed.md",
+      "heading": "The path of a page through the connector",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/delivery-library.md",
+          "heading": "The path of a page through the connector"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/writer-brief.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.449",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "The showcase hands its units to the capture",
+      "chapter": "04-capabilities/02-support/01-surface/12-delivery-showcase/01-common/01-showcase.md",
+      "heading": "The sections of a main page",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/delivery-showcase.md",
+          "heading": "Sections, and the card of a section — 🔮"
         },
         {
           "plugin": "spn-surface",
