@@ -653,3 +653,5 @@ Wear the spn-devex plugin's `refs/devex/agent/lenses/ux.md` while you place the 
 - **A page's title is one step larger only on the page that leads.** (`RULE.SUPPORT.SURFACE.424` · MUST · skill:spn-surface/design)
 - **Outside sites are read and never copied** (`RULE.SUPPORT.SURFACE.441` · MUST · skill:spn-surface/design)
 - **A backdrop may move, and stands still for a visitor who asked for reduced motion** (`RULE.SUPPORT.SURFACE.444` · MUST · skill:spn-surface/design)
+- **A cell that the library plans for a unit and the unit's Main page does not draw is a gap of the showcase, and it is fixed on the unit's page before its library page is captured** (`RULE.SUPPORT.SURFACE.446` · MUST · skill:spn-surface/design)
+- **The showcase hands its units to the capture** (`RULE.SUPPORT.SURFACE.449` · MUST · skill:spn-surface/design)
