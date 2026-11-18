@@ -75,6 +75,8 @@ A package organized by feature rather than by layer — a support library — ha
 
 **Do not hand-edit inside the managed markers**, and do not restate a plugin's rules in a repo's instruction file. A repo's own file carries only what is true of that repo alone.
 
+**The agent reads a pull request's failed checks and proposes the fix, and the pipeline stays agent-free.** A pipeline run is the repository's own workflow, started by a push and judged by its checks. The agent comes after it: it reads which checks failed and why, and proposes the change that answers each. It never runs inside the pipeline, and a green pipeline never depends on an agent.
+
 ## The workspace, one level above the repo
 
 A repo is wired by `repo`; the folder the repos sit in is minted by `workspace`. They are different levels with different writers, and the workspace level is the one people forget exists.

@@ -243,13 +243,12 @@ has nothing to decide; a written order on Sonnet; shaping, cards, previews and r
 with you on the largest. Every launch names its model, and a fork is refused (`RULE.DEVEX.AGENT.104` · MUST · check:agent-model).
 **An order quotes the facts it needs, each with its commit, and points to the rules it follows**
 (`RULE.DEVEX.WORKSPACE.276` · MUST · skill:spn-devex/execute). The log gets one note per milestone (`RULE.DEVEX.WORKSPACE.275` · MUST · check:confirmed), and you offer a
-new window from 200k at a clean point, writes the handover unasked at the next clean point past 300k, and always moves past 450k (`RULE.DEVEX.AGENT.103` · MUST · check:stop). Between 200k and 300k the offer comes once, and again only after another 50k; past 300k it stays in every reply until the developer moves or says to stay. **The offer tells the
+new window by whether the developer is there (`RULE.DEVEX.AGENT.103` · MUST · check:stop). While they are present you say one line at 200k, 300k and 400k at a clean point, each once, and their word *stay* mutes those three for the window; the cost at 500k and the compaction at 850k are said once each, even after *stay*. While they are watching you say only those two, since someone watching cannot open a window; while they are away you say nothing. Presence is read from their words first (`RULE.DEVEX.AGENT.178` · MUST · check:stop): *going to sleep* sets away, *watching from my phone* sets watching, any other message makes them present, and with no words thirty minutes of silence outside their usual hours, or three hours inside them, reads as away. While they are away, a turn that ends on a question or a hold is sent back when a decided arc still has a ready row (`RULE.DEVEX.AGENT.179` · MUST · check:stop). **The offer tells the
 person, in one or two plain sentences in their words beside the handover, why, what is kept and how:**
 each reply re-reads the whole window, so a long one makes every reply dearer; the handover and the
 workstream's folder carry every open point, so nothing is lost; and a new chat at the workspace root, in
 the editor they use, with the handover pasted as its first message, opens the next one. It names no token
-count and no *clean point* it does not explain. Staying is fine while the person is away, or when the next
-ask is small enough that moving costs more than it saves. **A small fix gets code and its test, and no line in the book.** **A round ends
+count and no *clean point* it does not explain. **A small fix gets code and its test, and no line in the book.** **A round ends
 in one gate:** the whole test tiers, one restart of the showcase or the app, the walks and the look run
 once, in the arc's final re-check row before a release, and the look of each batch is shown to the
 developer as soon as the batch lands.

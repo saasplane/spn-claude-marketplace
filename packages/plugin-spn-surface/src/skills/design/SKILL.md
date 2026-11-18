@@ -39,6 +39,8 @@ Take the scope from the argument: one page, or a flow of pages. A flow is severa
 
 **Where the ask brings a design of the page, or points at a page to follow, read `skills/design/steps/given-design.md` before step 1, and run the steps below through it.** It is the same skill and the same tree: the facts come first, the design is read once, each of steps 1 to 5 checks the partner's version instead of starting from nothing, and the reply ends on two lists and a stop before any code. It is guidance: the cases guide, and the partner's choice stands wherever they keep it.
 
+**Before a page is drawn, read the app's design language, and where it is being made, run `skills/design/steps/design-language.md`.** Read the app's construct, its capability chapter and its `design-language.json`; a page the agent draws without them reads as another hand's. The step holds intake, which records each reference, brand file and media kind a partner shares; the options, shown on the running app or its worktree in the partner's brand values; and the rounds, each recording its pick. Run `spn-surface check page <spec.json> --app <app root>` on every write of a spec, and `spn-surface check module <module folder>` on a module's folders: they refuse a raw colour in a drawing, a class on a unit, an icon outside the app's lucide set, a hero form its media does not call for, two emphases in one section, media on the wrong level, a drawing under the words narrower than its section's content, and a folder outside the module's taxonomy.
+
 **Your output is one tree for each page**: every block by the name the book gives it, with its props and the case each follows. The build reads it; the reply shows the picture of the page, and the tree in full only when the developer asks. In a partner's repository, write only the draft rows the partner accepts, in its behaviours, and each kept line as a comment in the code at the line it keeps; the tree itself is not written there. In a workstream, write it where the running arc names. A mock is the same tree drawn as skeletons (step 8). You write no code here.
 
 The decisions run in one order. Each level of a page owns one thing, and the level above it decides first. Who the app is for comes before all of them, and a block is the last thing chosen.
@@ -651,5 +653,9 @@ Wear the spn-devex plugin's `refs/devex/agent/lenses/ux.md` while you place the 
 - **The notice stands flush in its place.** (`RULE.SUPPORT.SURFACE.419` · MUST · skill:spn-surface/design)
 - **The library's text styles bind to the theme's typefaces and never name a stand-in font** (`RULE.SUPPORT.SURFACE.423` · MUST · skill:spn-surface/design)
 - **A page's title is one step larger only on the page that leads.** (`RULE.SUPPORT.SURFACE.424` · MUST · skill:spn-surface/design)
-- **Outside sites are read and never copied** (`RULE.SUPPORT.SURFACE.441` · MUST · skill:spn-surface/design)
-- **A backdrop may move, and stands still for a visitor who asked for reduced motion** (`RULE.SUPPORT.SURFACE.444` · MUST · skill:spn-surface/design)
+- **Whatever stands boxed in a grid stands as tall as the tallest of its row, and a grid's cell hands its height to what it holds** (`RULE.SUPPORT.SURFACE.530` · MUST · skill:spn-surface/design)
+- **A feature takes no height of its own, and in a grid it carries its row's height down to its frame** (`RULE.SUPPORT.SURFACE.531` · MUST · skill:spn-surface/design)
+- **A text is aligned by `textAlign`, and a page never writes a class for it** (`RULE.SUPPORT.SURFACE.532` · MUST · skill:spn-surface/design)
+- **A skeleton draws a form's fields and its heading line from the size's own tokens, and a page never sizes its bones one by one** (`RULE.SUPPORT.SURFACE.533` · MUST · skill:spn-surface/design)
+- **The content of a dialog, a drawer and a sheet stacks its parts one under another, the size's gap apart, and a page passes it no flex or gap class** (`RULE.SUPPORT.SURFACE.534` · MUST · skill:spn-surface/design)
+- **The media tokens are what any kind of picture needs, and a kind's own roles map onto them** (`RULE.SUPPORT.SURFACE.535` · MUST · skill:spn-surface/design)

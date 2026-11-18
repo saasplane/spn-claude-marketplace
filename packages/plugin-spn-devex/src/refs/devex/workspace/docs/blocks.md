@@ -57,11 +57,25 @@ Paragraphs, lists, numbered steps and subheadings are what a section is made of.
 and label them as nothing at all. **A section holds none, one or several blocks**, and nothing
 declares *the* block of a section.
 
+**On a preview and an approach page a part's body is blocks, and prose is bounded.** A paragraph carries
+a reason and runs at most 60 words, and a part with no other block stops at 120. A list holds at most
+seven items, each under 25 words; past that it is a table or subsections. Write the text of a page
+first, and only then give each part the block that shows it best, from the table below.
+
 ## What you type
 
 | What you are writing | What you type |
 | --- | --- |
 | an explanation, an argument, a part, the Description | a paragraph. Nothing else |
+| two states compared (today and proposed) | a table with the columns Today and Proposed |
+| several things, each with facts | a table of item cells: the item's title, its line and its facts in three levels |
+| steps someone takes | a flowchart where the path turns, a chain where it never does |
+| the parts of one thing, or who speaks to whom | a map, or a sequence |
+| a decision still open | its options side by side, and its card |
+| a public shape (a contract state, a route, a table, a token, a command's options) | `CODE`: declarations only, a `diff` where the shape exists today |
+| how something looks | the thing rendered on the page, light and dark side by side |
+| what a person can do | a table in the person's words: after, then before |
+| a whole file of the work | a link to it in `samples/`, never framed in the page |
 | a part, a sub-part | `### Title`, `#### Title` — `###` through `#####` all render |
 | a list where order does not matter | `- item` or `* item` |
 | a list where the order **is** the content | `1. item` — numbered lists render as numbered lists |
