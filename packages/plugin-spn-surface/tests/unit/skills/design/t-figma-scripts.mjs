@@ -1,5 +1,5 @@
-// The two scripts the design skill hands to the Figma connector's `use_figma`: `page.js` (the
-// inventory and the scan of a page) and `layout.js` (the layout of one set from its label).
+// The scripts the design skill hands to the Figma connector's `use_figma`: `page.js` (the
+// inventory of a page) and the four parts of the scan.
 //
 // Each runs here as the connector runs it: the file's text is the body of an async function whose one
 // argument is `figma`, with top-level `await` and `return`. `figma` is a stand-in of only the parts
@@ -135,8 +135,8 @@ const SCAN_PARTS = ["scan-labels.js", "scan-placement.js", "scan-properties.js",
 const FINDING_ORDER = ["emptyReading", "usagesNamingNoUnit", "versionsOutside", "versionPairsMeeting", "topLevelPairsMeeting", "strays", "defaultNamedProperties", "unreadableSets", "setsOverLimit", "emptyVersions", "emptyCases",
   "badCaseNames", "duplicateCaseNames", "labelsUnitElsewhere", "labelLayerNames", "labelsFormCannotSay", "defaultNotLabels",
   "topLevelNotSection", "meetingInSection", "sectionOutOfOrder", "unitsWithoutHeader", "outsideUnitSection",
-  "childOutsideSection", "unitsWithoutCases", "unitsWithoutUsage", "propertyNotDrawn", "propertyClearedByNameAlone", "behaviourNamesHeldProperty", "versionNotWired", "versionDiffersFromDefault", "versionSlotIsFrame", "versionTiedToAnotherProperty", "propertyTiedToNothing", "crossedBeyondTheRule", "usagesWithoutCaption", "partSectionTooWide"];
-const NOT_BLOCKING_ORDER = ["emptyVersions", "emptyCases", "unitsWithoutCases", "behaviourNamesHeldProperty", "usagesWithoutCaption", "partSectionTooWide", "propertyClearedByNameAlone", "versionSlotIsFrame", "versionDiffersFromDefault"];
+  "childOutsideSection", "unitsWithoutUsage", "propertyNotDrawn", "propertyClearedByNameAlone", "behaviourNamesHeldProperty", "versionNotWired", "versionDiffersFromDefault", "versionSlotIsFrame", "versionTiedToAnotherProperty", "propertyTiedToNothing", "crossedBeyondTheRule", "usagesWithoutCaption", "partSectionTooWide"];
+const NOT_BLOCKING_ORDER = ["emptyVersions", "emptyCases", "behaviourNamesHeldProperty", "usagesWithoutCaption", "partSectionTooWide", "propertyClearedByNameAlone", "versionSlotIsFrame", "versionDiffersFromDefault"];
 async function runScan(inputs, figma) {
   const answers = [];
   for (const part of SCAN_PARTS) {
@@ -174,8 +174,6 @@ const buttonHeader = (text_ = "DSButton\nA button that runs one action.") =>
 const buttonSet = (order, box = [0, 0, 300, 200], options) =>
   componentSet("1:set", "DSButton", box, grid("1", order), options);
 const tidy = [["SM", "rest", 20, 20], ["SM", "hover", 140, 20], ["MD", "rest", 20, 80], ["MD", "hover", 140, 80]];
-const defaultsOfButton = { size: "SM", state: "rest" };
-const layoutInputs = (more = {}) => ({ setId: "1:set", dryRun: true, defaults: defaultsOfButton, padding: 20, gap: 20, resize: true, mayMove: [], clearance: 100, listMoves: 50, ...more });
 // A section keeps its unit's layout as shared plugin data (`saasplane`, `layout`), as the plugin writes it.
 const section = (id, name, box, children, layout = null) => ({
   id, name, type: "SECTION", x: box[0], y: box[1], width: box[2], height: box[3], children,
@@ -322,156 +320,6 @@ const scanOf = async (nodes) => (await run("page.js", { pageId: "2:1", report: "
   same("a set whose default version is the one its label names is not named", agreeing.findings.defaultNotLabels.count, 0);
 }
 
-// ---- the layout ---------------------------------------------------------------------------------
-
-console.log("\n=== layout.js — the layout of one set, read from its section's plugin data");
-// A set laid out in the wrong order: the columns are swapped, so the top left carries state=hover.
-const swapped = [["SM", "hover", 20, 20], ["SM", "rest", 140, 20], ["MD", "hover", 20, 80], ["MD", "rest", 140, 80]];
-const positions = (set) => set.children.map((child) => [child.id, child.x, child.y]);
-// A unit's section as the plugin draws it: the header, then the set, keeping the layout as plugin data.
-const unitOf = (set, layout = buttonLayout(), extra = []) => section("1:sec", set.name, [0, 0, 1600, 900],
-  [headerText("1:head", set.name, `${set.name}\nA button that runs one action.`, [80, 80, 300, 20]), set, ...extra], layout);
-const inSection = (set, layout, extra) => file([page("2:1", "Actions", [unitOf(set, layout, extra)])]);
-const sectionSet = (order, box = [200, 148, 300, 200], options) => buttonSet(order, box, options);
-// The frame of the set's labels, as the plugin draws it around the set, with the column labels it measures.
-const labelsFrame = (labels, box = [80, 100, 800, 400]) => {
-  const children = labels.map(([words, width], at) => text(`F:${at}`, `label · ${words}`, words, [0, 0, width, 16]));
-  const frame = { id: "1:frame", name: "table · the set", type: "FRAME", x: box[0], y: box[1], width: box[2], height: box[3], children };
-  frame.findAll = (test) => children.filter(test);
-  return frame;
-};
-{
-  const set = sectionSet(swapped);
-  const before = positions(set);
-  const figma = inSection(set);
-  const result = await run("layout.js", layoutInputs(), figma);
-  same("dry mode moves nothing", [positions(set), set.resizes.length, [set.width, set.height]], [before, 0, [300, 200]]);
-  same("dry mode returns the plan and the default before and after", [result.mode, result.defaultBefore, result.defaultAfter, result.counts.versionsToMove], ["dry", "size=SM, state=hover", "size=SM, state=rest", 4]);
-  same("the layout switches the page once", figma.switches, 1);
-  same("[MKT.SCRIPTS.555] the layout is read from the section's plugin data and returned as understood", [result.understood, result.layoutFrom],
-    [{ rows: [{ prop: "size", values: ["SM", "MD"] }], columns: [{ prop: "state", values: ["rest", "hover"] }], default: { size: "SM", state: "rest" } }, { section: "1:sec" }]);
-}
-{
-  const set = sectionSet(swapped);
-  const result = await run("layout.js", layoutInputs({ dryRun: false }), inSection(set));
-  same("[MKT.SCRIPTS.555] applied: every version takes its cell of the set's table", positions(set).sort(), [["1:SMhover", 140, 20], ["1:SMrest", 20, 20], ["1:MDhover", 140, 80], ["1:MDrest", 20, 80]].sort());
-  same("applied: the default version after is the one at the top left", [result.mode, result.defaultBefore, result.defaultAfter], ["applied", "size=SM, state=hover", "size=SM, state=rest"]);
-  same("applied: the set's box before and after, and the proof", [result.setBoxBefore, result.setBoxAfter, result.verified], [[200, 148, 300, 200], [200, 148, 260, 140], { versionsOutside: 0, versionPairsMeeting: 0, topLevelPairsMeeting: 0 }]);
-}
-{
-  const set = sectionSet(tidy, [200, 148, 100, 100]);
-  const before = positions(set);
-  const result = await run("layout.js", layoutInputs({ dryRun: false, resize: false }), inSection(set));
-  same("it refuses when a version would leave the set, and moves nothing", [result.mode, result.checks.versionsOutside > 0, positions(set)], ["refused", true, before]);
-}
-{
-  const set = sectionSet(swapped);
-  const before = positions(set);
-  const result = await run("layout.js", layoutInputs({ dryRun: false, defaults: { size: "SM", state: "hover" } }), inSection(set));
-  same("a layout that names another default than the stack's is refused, to be corrected first, and nothing moves",
-    [result.mode, positions(set), result.refused[0].includes("correct the layout first")], ["refused", before, true]);
-  const misordered = await run("layout.js", layoutInputs({ dryRun: false, defaults: { size: "SM", state: "hover" } }),
-    inSection(sectionSet(swapped), buttonLayout({ default: { size: "SM", state: "hover" } })));
-  same("a layout whose first column is not the stack's default puts it off the top left, and is refused",
-    [misordered.mode, misordered.checks.topLeftCarriesDefaults, misordered.refused[0].includes("does not carry the given defaults")], ["refused", false, true]);
-}
-{
-  const set = sectionSet(swapped);
-  const before = positions(set);
-  const result = await run("layout.js", layoutInputs({ dryRun: false, gap: -10 }), inSection(set));
-  same("it refuses when two versions would meet, and moves nothing", [result.mode, result.checks.versionPairsMeeting > 0, positions(set)], ["refused", true, before]);
-}
-{
-  const set = sectionSet(swapped, [200, 148, 100, 100]);
-  const neighbour = componentSet("2:set", "DSInput", [400, 148, 100, 100], [version("2:a", "size=SM", 10, 10)]);
-  const figma = () => inSection(set, buttonLayout(), [neighbour]);
-  const before = positions(set);
-  const refused = await run("layout.js", layoutInputs({ dryRun: false }), figma());
-  same("it refuses when two nodes of the section would meet, and moves nothing", [refused.mode, refused.checks.topLevelPairsMeeting > 0, positions(set), [neighbour.x, neighbour.y]], ["refused", true, before, [400, 148]]);
-  const allowed = await run("layout.js", layoutInputs({ dryRun: false, mayMove: ["2:set"] }), figma());
-  same("a node it may move is moved clear, and nothing else is", [allowed.mode, allowed.nodeMoves, allowed.verified.topLevelPairsMeeting], ["applied", [["2:set", 200 + 260 + 100, 148]], 0]);
-}
-{
-  const set = sectionSet(swapped);
-  const first = componentSet("3:a", "OldLabelA", [800, 148, 100, 100], [version("3:a1", "size=SM", 10, 10)]);
-  const second = componentSet("3:b", "OldLabelB", [850, 148, 100, 100], [version("3:b1", "size=SM", 10, 10)]);
-  const figma = () => inSection(set, buttonLayout(), [first, second]);
-  const refused = await run("layout.js", layoutInputs({ dryRun: false }), figma());
-  same("two nodes that meet each other and that it does not move refuse, as before; ignored is 0", [refused.mode, refused.checks.topLevelPairsMeeting, refused.ignored], ["refused", 1, 0]);
-  const both = await run("layout.js", layoutInputs({ dryRun: false, ignore: ["3:a", "3:b"] }), figma());
-  same("the same two in `ignore` do not stop it, the answer counts them, and the proof leaves them out", [both.mode, both.ignored, both.verified.topLevelPairsMeeting], ["applied", 2, 0]);
-  const one = await run("layout.js", layoutInputs({ dryRun: true, ignore: ["3:a"] }), figma());
-  same("a pair is left out when either of its two nodes is ignored", [one.mode, one.ignored, one.checks.topLevelPairsMeeting], ["dry", 1, 0]);
-}
-{
-  const set = sectionSet(swapped);
-  const before = positions(set);
-  const bare = await run("layout.js", layoutInputs({ dryRun: false }), inSection(set, null));
-  same("[MKT.SCRIPTS.557] a set whose section holds no layout is reported, not laid out, and nothing moves",
-    [bare.mode, bare.refused[0].startsWith("the section holds no layout"), positions(set)], ["refused", true, before]);
-  const old = section("1:sec", "DSButton", [0, 0, 1600, 900], [headerText("1:head", "DSButton", "DSButton — rows: size=SM, MD · columns: state=rest, hover", [80, 80, 300, 20]), set]);
-  const fromOld = await run("layout.js", layoutInputs({ dryRun: false }), file([page("2:1", "Actions", [old])]));
-  same("[MKT.SCRIPTS.557] a header that still states a layout lays nothing out: the layout is read from the plugin data alone",
-    [fromOld.mode, fromOld.refused[0].startsWith("the section holds no layout"), positions(set)], ["refused", true, before]);
-  const loose = await run("layout.js", layoutInputs({ dryRun: false }), file([page("2:1", "Actions", [sectionSet(swapped), buttonHeader()])]));
-  same("a set that stands in no section keeps no layout, and is refused", [loose.mode, loose.refused[0].includes("stands in no section")], ["refused", true]);
-  const shapeOne = await run("layout.js", layoutInputs(), inSection(sectionSet(swapped), oneComponent));
-  same("a layout of the shape `one component` lays no set out", [shapeOne.mode, shapeOne.refused[0].includes("only from the shape `set`")], ["refused", true]);
-  const torn = sectionSet(swapped);
-  const tornSection = unitOf(torn);
-  tornSection.plugin["saasplane:layout"] = "{ not json";
-  const unreadable = await run("layout.js", layoutInputs(), file([page("2:1", "Actions", [tornSection])]));
-  same("a layout that cannot be read is said, and nothing moves", [unreadable.mode, unreadable.refused[0].startsWith("the section's layout is not JSON")], ["refused", true]);
-}
-{
-  const twice = componentSet("1:set", "DSButton", [200, 148, 300, 200], [...grid("1", swapped), version("1:dup", "size=SM, state=rest", 300, 300)]);
-  const result = await run("layout.js", layoutInputs(), inSection(twice));
-  same("two versions for one cell of the table are refused", [result.mode, result.refused[0].includes("the same cell")], ["refused", true]);
-  const stranger = componentSet("1:set", "DSButton", [200, 148, 300, 200], [...grid("1", swapped), version("1:odd", "size=LG, state=rest", 300, 300)]);
-  const odd = await run("layout.js", layoutInputs(), inSection(stranger));
-  same("a version the table holds no cell for is refused", [odd.mode, odd.refused[0].includes("has no cell for")], ["refused", true]);
-}
-{
-  const result = await run("layout.js", layoutInputs({ defaults: { size: "SM" } }), inSection(sectionSet(swapped)));
-  same("a default missing for a property is refused", [result.mode, result.refused], ["refused", ["no default is given for state"]]);
-}
-await guard(async () => {
-  // DSButton's set table: `size` down; the states, then the other variants, side by side; a mode table beside it.
-  const names = [];
-  for (const size of ["SM", "MD"]) {
-    for (const state of ["rest", "focus", "disabled"]) names.push(`size=${size}, variant=OUTLINE, state=${state}`);
-    for (const variant of ["SOLID", "QUIET"]) names.push(`size=${size}, variant=${variant}, state=rest`);
-  }
-  const set = () => componentSet("1:set", "DSButton", [200, 148, 900, 200], names.map((name, at) => version(`1:${at}`, name, 700 - (at % 5) * 100, 20 + Math.floor(at / 5) * 60)));
-  const layout = buttonLayout({
-    tables: [
-      { caption: "the set", rowGroups: [{ prop: "size", values: ["SM", "MD"] }], columnGroups: [{ prop: "state", values: ["rest", "focus", "disabled"] }, { prop: "variant", values: ["SOLID", "QUIET"] }] },
-      { caption: "color × variant", rowGroups: [{ prop: "color", values: ["DEFAULT", "PRIMARY"] }], columnGroups: [{ prop: "variant", values: ["OUTLINE", "SOLID", "QUIET"] }] },
-    ],
-    default: { size: "SM", variant: "OUTLINE", state: "rest" },
-  });
-  const defaults = { size: "SM", variant: "OUTLINE", state: "rest" };
-  const placed = set();
-  const result = await run("layout.js", layoutInputs({ dryRun: false, defaults }), inSection(placed, layout));
-  const at = (name) => { const one = placed.children.find((child) => child.name === name); return [one.x, one.y]; };
-  same("[MKT.SCRIPTS.555] the column groups stand side by side: the states at the default variant, then each other variant at rest",
-    [result.mode, at("size=SM, variant=OUTLINE, state=rest"), at("size=SM, variant=OUTLINE, state=focus"), at("size=SM, variant=OUTLINE, state=disabled"), at("size=SM, variant=SOLID, state=rest"), at("size=SM, variant=QUIET, state=rest"), at("size=MD, variant=QUIET, state=rest")],
-    ["applied", [20, 20], [140, 20], [260, 20], [380, 20], [500, 20], [500, 80]]);
-  same("[MKT.SCRIPTS.555] a mode table's cells are instances, and the set's layout leaves it", result.understood.columns.map((group) => group.prop), ["state", "variant"]);
-  const crossed = componentSet("1:set", "DSButton", [200, 148, 900, 200], [...set().children, version("1:x", "size=SM, variant=SOLID, state=focus", 0, 0)]);
-  const refused = await run("layout.js", layoutInputs({ defaults }), inSection(crossed, layout));
-  same("[MKT.SCRIPTS.555] groups are never multiplied: a version that moves two groups' props from the default has no cell", [refused.mode, refused.refused[0].includes("has no cell for")], ["refused", true]);
-  const widened = set();
-  const wide = await run("layout.js", layoutInputs({ dryRun: false, defaults }), inSection(widened, layout, [labelsFrame([["disabled", 160], ["rest (default)", 90]])]));
-  const atWide = (name) => widened.children.find((child) => child.name === name).x;
-  same("[MKT.SCRIPTS.555] a column is as wide as the wider of its label and its widest version, and the frame of the labels is no neighbour",
-    [wide.mode, atWide("size=SM, variant=OUTLINE, state=disabled"), atWide("size=SM, variant=SOLID, state=rest"), wide.checks.topLevelPairsMeeting], ["applied", 260, 260 + 160 + 20, 0]);
-});
-await guard(async () => {
-  const short = componentSet("1:set", "DSButton", [200, 148, 300, 200], [version("1:a", "size=SM, state=rest", 0, 0), version("1:b", "size=SM, state=hover", 120, 0, 100, 20)]);
-  await run("layout.js", layoutInputs({ dryRun: false }), inSection(short, buttonLayout({ tables: [{ caption: "the set", rowGroups: [{ prop: "size", values: ["SM"] }], columnGroups: [{ prop: "state", values: ["rest", "hover"] }] }] })));
-  same("a version shorter than its row stands at the row's middle, as the plugin places it", short.children.map((child) => [child.id, child.y]), [["1:a", 20], ["1:b", 30]]);
-});
 
 // A case that throws is a failed case, not the end of the suite (it throws on the scripts before the fix).
 async function guard(body) {
@@ -623,7 +471,7 @@ await guard(async () => {
   const empty = componentSet("1:set", "DSImage", [0, 0, 300, 200], [version("1:a", "state=loading", 20, 20, 100, 40, { empty: true }), version("1:b", "state=rest", 140, 20, 0, 40)]);
   const scan = (await scanOf([empty, labelText("1:label", "DSImage\nA picture, with its loading state.", [0, -30, 300, 20])]));
   same("an empty version says why it is empty", scan.findings.emptyVersions.items.map((item) => [item.version, item.why]), [["1:a", "no layer"], ["1:b", "no size"]]);
-  same("empty versions do not make the page unclean, and the answer says which findings do not block", [scan.clean, scan.notBlocking], [true, ["emptyVersions", "emptyCases", "unitsWithoutCases", "behaviourNamesHeldProperty", "usagesWithoutCaption", "partSectionTooWide", "propertyClearedByNameAlone", "versionSlotIsFrame", "versionDiffersFromDefault"]]);
+  same("empty versions do not make the page unclean, and the answer says which findings do not block", [scan.clean, scan.notBlocking], [true, ["emptyVersions", "emptyCases", "behaviourNamesHeldProperty", "usagesWithoutCaption", "partSectionTooWide", "propertyClearedByNameAlone", "versionSlotIsFrame", "versionDiffersFromDefault"]]);
 });
 // 9. the scan names a set whose default version is not the one its label names (DSBadge), and gives no false hit
 await guard(async () => {
@@ -725,7 +573,7 @@ await guard(async () => {
     [["DSButton", "B:sec", "header · DSButton"], [".DSIcon", "P:sec", "header · .DSIcon"]]);
   same("a row label and a column label are tied to the set by its rows' and columns' spans, in one frame of reference",
     inventory.labels.filter((label) => ["row", "column"].includes(label.part)).map((label) => [label.part, label.unit]), [["row", "DSButton"], ["column", "DSButton"]]);
-  same("a band's label is no value label and is tied to no unit", inventory.labels.filter((label) => label.part === "band").map((label) => label.text), ["Usage", "Cases", "Parts"]);
+  same("a Main section's label is no value label and is tied to no unit", inventory.labels.filter((label) => label.part === "section").map((label) => label.text), ["Usage", "Parts"]);
   same("the sections are listed, the part's inside its owner's", inventory.sections.map((one) => [one.id, one.parent ?? null]), [["B:sec", null], ["P:sec", "B:sec"]]);
   same("a lone component of a part is found inside its section", [inventory.components[0].id, inventory.components[0].box, inventory.components[0].parent], ["P:icon", [260, 1088, 48, 48], "P:sec"]);
   const range = await run("page.js", { pageId: "2:1", report: "inventory", from: 1, to: 2, maxBytes: 16000 }, sectioned([unitSection("B", "DSButton", [100, 100], { parts: [iconPart("P")] })]));
@@ -759,14 +607,6 @@ await guard(async () => {
   const meeting = await scanSections([unitSection("B", "DSButton", [100, 100]), second]);
   same("two sections that meet are named at the page's top level", meeting.findings.topLevelPairsMeeting.items.map((item) => item.pair), [["B:sec", "C:sec"]]);
   same("two sections that meet also fail the scan", meeting.clean, false);
-});
-await guard(async () => {
-  const swappedBands = await scanSections([unitSection("B", "DSButton", [100, 100], { casesAbove: true })]);
-  same("a section whose cases stand above its usage is named, with the band each piece of the usage stands below",
-    swappedBands.findings.sectionOutOfOrder.items.map((item) => [item.band, item.standsBelow]), [["usage", "cases"], ["usage", "cases"], ["usage", "cases"]]);
-  const headerLow = unitSection("B", "DSButton", [100, 100]);
-  headerLow.children.find((child) => child.id === "B:head").y = 380;
-  same("a header below the set is named", (await scanSections([headerLow])).findings.sectionOutOfOrder.items.map((item) => [item.id, item.band]), [["B:head", "header"]]);
 });
 await guard(async () => {
   const scan = await scanSections([unitSection("B", "DSButton", [100, 100], { header: false })]);
@@ -815,9 +655,6 @@ await guard(async () => {
   }
   const missing = unitSection("B", "DSTable", [100, 100], { header: false, sheetLabel: true });
   same("a sheet's label never hides a unit with no header", (await scanSections([missing])).findings.unitsWithoutHeader.items.map((item) => item.unit), ["DSTable"]);
-  const low = unitSection("B", "DSTable", [100, 100], { sheetLabel: true, parts: [iconPart("P")] });
-  low.children.find((child) => child.id === "B:sl").y = 840;
-  same("a sheet's label below the parts' label is out of the cases band", (await scanSections([low])).findings.sectionOutOfOrder.items.map((item) => item.id), ["B:sl"]);
 });
 await guard(async () => {
   const scan = await scanSections([unitSection("B", "DSButton", [100, 100], { caption: true })]);
@@ -927,27 +764,25 @@ await guard(async () => {
     (await scanSections([crowded])).findings.meetingInSection.items.map((item) => [item.section, [...item.pair].sort()]), [["B:sec", ["B:sheet", "B:smp"]]]);
 });
 
-console.log("\n=== page.js — units with no cases and units with no usage");
+console.log("\n=== page.js — units with no usage");
 await guard(async () => {
   const bare = unitSection("B", "DSButton", [100, 100], { parts: [iconPart("P")] });
   bare.children = bare.children.filter((child) => child.id !== "B:sheet" && child.id !== "B:smp" && child.id !== "B:cap");
   const scan = await scanSections([bare]);
-  same("a top-level unit with no sheet and no usage is named in each, and a part owes neither",
-    [scan.findings.unitsWithoutCases.items, scan.findings.unitsWithoutUsage.items],
-    [[{ unit: "DSButton", id: "B:set", in: "B:sec" }], [{ unit: "DSButton", id: "B:set", in: "B:sec" }]]);
-  same("no usage makes the scan unclean and no sheet does not, and the answer says which does not block", [scan.clean, scan.notBlocking.includes("unitsWithoutCases"), scan.notBlocking.includes("unitsWithoutUsage")], [false, true, false]);
+  same("a top-level unit with no usage is named, and a part owes none", scan.findings.unitsWithoutUsage.items, [{ unit: "DSButton", id: "B:set", in: "B:sec" }]);
+  same("no usage makes the scan unclean, and the scan holds no finding for a missing sheet of cases", [scan.clean, scan.notBlocking.includes("unitsWithoutUsage"), "unitsWithoutCases" in scan.findings], [false, false, false]);
   const full = await scanSections([unitSection("B", "DSButton", [100, 100], { parts: [iconPart("P")] })]);
-  same("a unit with a sheet and a usage is named in neither", [full.findings.unitsWithoutCases.count, full.findings.unitsWithoutUsage.count], [0, 0]);
+  same("a unit with a usage is named in none", full.findings.unitsWithoutUsage.count, 0);
 });
 await guard(async () => {
   const lone = unitSection("B", "DSButton", [100, 100]);
   lone.children = lone.children.filter((child) => child.id !== "B:sheet");
   lone.children.push(version("B:case", "case=text", 80, 668, 50, 20));
   const scan = await scanSections([lone]);
-  same("a loose case component counts as the unit's cases", scan.findings.unitsWithoutCases.count, 0);
+  same("a unit whose sheet is a loose case component still has its usage", scan.findings.unitsWithoutUsage.count, 0);
   const shared = section("SP:sec", "Shared parts", [100, 1640, 800, 400], [headerText("SP:head", "DSBase", "DSBase — one component", [80, 80, 300, 20]), version("SP:base", "DSBase", 80, 128, 48, 48)]);
   const withShared = await scanSections([unitSection("B", "DSButton", [100, 100]), shared]);
-  same("a unit in `Shared parts` is a part and owes neither", [withShared.findings.unitsWithoutCases.count, withShared.findings.unitsWithoutUsage.count], [0, 0]);
+  same("a unit in `Shared parts` is a part and owes no usage", withShared.findings.unitsWithoutUsage.count, 0);
   const other = unitSection("B", "DSButton", [100, 100]);
   other.children.find((child) => child.id === "B:smp").name = "usage · DSInput open";
   other.children.find((child) => child.id === "B:cap").characters = "usage · DSInput open";
@@ -1106,48 +941,6 @@ await guard(async () => {
   const tooWide = await scanSections([unitSection("B", "DSButton", [100, 100], { parts: [wide] })]);
   same("a part's section with more than the padding empty at its right is counted and does not block", [tooWide.findings.partSectionTooWide.items.map((item) => [item.id, item.emptyAtRight]), tooWide.clean], [[["P:sec", 220]], true]);
   same("a part's section as wide as its content and the padding is not counted", (await scanSections([unitSection("B", "DSButton", [100, 100], { parts: [iconPart("P")] })])).findings.partSectionTooWide.count, 0);
-});
-
-console.log("\n=== layout.js — a set in a section");
-const layoutIn = (nodes, inputs = {}) => run("layout.js", layoutInputs({ setId: "B:set", ...inputs }), sectioned(nodes));
-const unitWith = (order) => {
-  const unit = unitSection("B", "DSButton", [100, 100]);
-  const set = componentSet("B:set", "DSButton", [200, 148, 300, 200], grid("B", order));
-  unit.children.splice(unit.children.findIndex((child) => child.id === "B:set"), 1, set);
-  return unit;
-};
-await guard(async () => {
-  const unit = unitWith(swapped);
-  const result = await layoutIn([unit]);
-  same("[MKT.SCRIPTS.555] the layout is read from the set's own section, and the home is that section", [result.mode, result.layoutFrom, result.home], ["dry", { section: "B:sec" }, { id: "B:sec", name: "DSButton", type: "SECTION" }]);
-  same("its box is in the section's coordinates, and nothing of the section's other pieces is said to meet it", [result.setBoxBefore, result.checks.topLevelPairsMeeting], [[200, 148, 300, 200], 0]);
-  const applied = await layoutIn([unitWith(swapped)], { dryRun: false });
-  same("applied in a section: every version is placed and the verified counts are zero", [applied.mode, applied.verified], ["applied", { versionsOutside: 0, versionPairsMeeting: 0, topLevelPairsMeeting: 0 }]);
-});
-await guard(async () => {
-  const unit = unitWith(swapped);
-  unit.children = unit.children.filter((child) => child.id !== "B:head");
-  const strayHeader = labelText("X:1", "DSButton — rows: size=MD, SM · columns: state=hover, rest", [3000, 0, 300, 20]);
-  const laid = await layoutIn([unit, strayHeader]);
-  same("[MKT.SCRIPTS.557] the layout is the section's plugin data: a header anywhere on the page, its own or none, changes nothing",
-    [laid.mode, laid.understood.rows[0].values, laid.understood.columns[0].values], ["dry", ["SM", "MD"], ["rest", "hover"]]);
-});
-await guard(async () => {
-  const unit = unitWith(swapped);
-  unit.children.push(componentSet("B:near", "DSNear", [300, 148, 100, 100], [version("B:near:a", "size=SM", 10, 10)]));
-  const set = unit.children.find((child) => child.id === "B:set");
-  set.resize(100, 100);
-  const refused = await layoutIn([unit], { resize: true });
-  same("a neighbour in the same section that the planned set would meet refuses, and moves nothing",
-    [refused.mode, refused.checks.topLevelPairsMeeting > 0, refused.refused.some((reason) => reason.includes("in the section"))], ["refused", true, true]);
-  const moved = await layoutIn([unit], { dryRun: false, mayMove: ["B:near"] });
-  same("a neighbour it may move is moved clear in the section's own coordinates", [moved.mode, moved.nodeMoves.map((move) => move[0]), moved.nodeMoves[0][1] >= 200 + 260 + 100, moved.verified.topLevelPairsMeeting], ["applied", ["B:near"], true, 0]);
-});
-await guard(async () => {
-  const unit = unitWith(swapped);
-  const elsewhere = section("E:sec", "DSOther", [100, 1640, 800, 400], [loose("E:1", "Rectangle", [200, 148, 300, 200])]);
-  const result = await layoutIn([unit, elsewhere]);
-  same("a node of another section at the same relative place is no neighbour: nothing meets", [result.mode, result.checks.topLevelPairsMeeting], ["dry", 0]);
 });
 
 console.log("\n=== page.js — a version whose layers carry no reference its twin holds");
@@ -1564,10 +1357,124 @@ console.log("\n=== page.js — a set crossed beyond the rule");
   });
 }
 
+// ---- a unit's section in the arranged form -------------------------------------------------------
+// The plugin's arranging draws a unit's section as: `path · <Unit>`, the header (`header · <Unit>`, a frame of texts), and `body · <Unit>`
+// holding Main's sections by name, each a `section · <name>` frame with its `label · <name>` text and its `sub · ` subsections; a
+// `sub · ` holds `row · ` frames, a row holds `cell · ` frames (the caption over the component or instance), and Sizes holds
+// `set · <Unit>` with the component set and its row and column labels.
+
+console.log("\n=== page.js — a unit's section in the arranged form");
+const frame = (id, name, box, children) => ({ id, name, type: "FRAME", x: box[0], y: box[1], width: box[2], height: box[3], children });
+function arrangedUnit(sid, name, origin, { usage = true, swapped = false, headerLow = false, definitions = {}, behaviour = "", usageInstance = null, caption = true, looks = false, versions = null, bodyBox = [80, 200, 800, 900] } = {}) {
+  const set = componentSet(`${sid}:set`, name, [72, 28, 300, 200], versions ?? grid(sid, tidy), { definitions });
+  const usageCell = frame(`${sid}:ucell`, "cell · usage-open", [0, 0, 300, 100], [
+    ...(caption ? [text(`${sid}:ucap`, "label · open", "open", [16, 16, 200, 14])] : []),
+    usageInstance ?? instanceNode(`${sid}:uinst`, `${name} / Usage / open`, [16, 40, 200, 40])]);
+  const usageSection = frame(`${sid}:usec`, "section · Usage", [0, swapped ? 300 : 0, 800, 200], [
+    text(`${sid}:ul`, "label · Usage", "Usage", [0, 0, 100, 22]),
+    frame(`${sid}:usub`, "sub · Usage", [0, 40, 800, 140], [frame(`${sid}:urow`, "row · open", [0, 0, 800, 140], [usageCell])])]);
+  const sizesSection = frame(`${sid}:zsec`, "section · Sizes", [0, swapped ? 0 : 240, 800, 280], [
+    text(`${sid}:zl`, "label · Sizes", "Sizes", [0, 0, 100, 22]),
+    frame(`${sid}:zset`, `set · ${name}`, [0, 40, 700, 240], [set, text(`${sid}:col`, "column · rest", "rest", [100, 6, 60, 16]), text(`${sid}:row`, "row · SM (default)", "SM (default)", [0, 60, 60, 16])])]);
+  const looksSection = frame(`${sid}:lsec`, "section · Looks", [0, 560, 800, 200], [
+    text(`${sid}:ll`, "label · Looks", "Looks", [0, 0, 100, 22]),
+    frame(`${sid}:lsub`, "sub · Looks", [0, 40, 800, 140], [frame(`${sid}:lrow`, "row · filled", [0, 0, 800, 140], [
+      frame(`${sid}:lcell`, "cell · looks-filled", [0, 0, 300, 100], [text(`${sid}:lcap`, "label · filled", "filled", [16, 16, 200, 14]), version(`${sid}:lcomp`, `${name} / Looks / filled`, 16, 40, 200, 40)])])])]);
+  const head = frame(`${sid}:head`, `header · ${name}`, [80, headerLow ? 700 : 98, 600, 70], [
+    text(`${sid}:hn`, "name", name, [0, 0, 300, 24]), text(`${sid}:hl`, "line", "A button that runs one action.", [0, 28, 500, 16]),
+    ...(behaviour ? [text(`${sid}:hb`, "behaviour", behaviour, [0, 48, 500, 14])] : [])]);
+  const body = frame(`${sid}:body`, `body · ${name}`, bodyBox, [...(usage ? [usageSection] : []), sizesSection, ...(looks ? [looksSection] : [])]);
+  return section(`${sid}:sec`, name, [origin[0], origin[1], 1000, 1400], [text(`${sid}:path`, `path · ${name}`, "Components > Actions", [80, 80, 300, 14]), head, body], buttonLayout());
+}
+await guard(async () => {
+  const scan = await scanSections([arrangedUnit("B", "DSButton", [100, 100], { looks: true })]);
+  same("[MKT.SCRIPTS.601] a unit in the arranged form is read through its frames: clean, in sections, one set and its labels",
+    [scan.clean, scan.form, scan.read.sets, scan.read.wrappers, scan.read.labels, counts(scan)], [true, "sections", 1, 11, 8, {}]);
+  same("[MKT.SCRIPTS.601] a component that stands in a cell is a case and no unit: no header owed and no component read as a unit",
+    [scan.findings.unitsWithoutHeader.count, scan.read.components], [0, 1]);
+});
+await guard(async () => {
+  const inventory = await inventorySections([arrangedUnit("B", "DSButton", [100, 100])]);
+  same("[MKT.SCRIPTS.602] the frames of the arranged form are listed as wrappers, each with the unit's section as its parent",
+    inventory.wrappers.map((one) => [one.name, one.parent]), [["body · DSButton", "B:sec"], ["section · Usage", "B:sec"], ["sub · Usage", "B:sec"], ["row · open", "B:sec"], ["cell · usage-open", "B:sec"], ["section · Sizes", "B:sec"], ["set · DSButton", "B:sec"]]);
+  same("[MKT.SCRIPTS.602] a header drawn as a frame of texts is read as the unit's header, its form from the section's layout, and its box in page coordinates",
+    inventory.labels.filter((label) => label.part === "header").map((label) => [label.unit, label.form, label.name, label.box]), [["DSButton", "grid", "header · DSButton", [180, 198, 600, 70]]]);
+  same("[MKT.SCRIPTS.602] a Main section's label is read as the section's, and a row and a column label are tied to the set through the frames",
+    [inventory.labels.filter((label) => label.part === "section").map((label) => label.text), inventory.labels.filter((label) => ["row", "column"].includes(label.part)).map((label) => [label.part, label.unit])],
+    [["Usage", "Sizes"], [["column", "DSButton"], ["row", "DSButton"]]]);
+  same("[MKT.SCRIPTS.602] the set's box is in page coordinates, through the section, the body, the Sizes section and the set's frame", inventory.sets.map((one) => [one.box, one.parent]), [[[252, 608, 300, 200], "B:sec"]]);
+});
+await guard(async () => {
+  const none = await scanSections([arrangedUnit("B", "DSButton", [100, 100], { usage: false })]);
+  same("[MKT.SCRIPTS.603] a top-level unit with no Usage section is named, and the scan fails", [none.findings.unitsWithoutUsage.items, none.clean], [[{ unit: "DSButton", id: "B:set", in: "B:sec" }], false]);
+  const bare = arrangedUnit("B", "DSButton", [100, 100]);
+  const usageSection = bare.children.find((child) => child.id === "B:body").children.find((child) => child.id === "B:usec");
+  usageSection.children = usageSection.children.filter((child) => child.type === "TEXT");
+  same("[MKT.SCRIPTS.603] a Usage section that holds only its label draws no usage", (await scanSections([bare])).findings.unitsWithoutUsage.count, 1);
+  const usable = await scanSections([arrangedUnit("B", "DSButton", [100, 100])]);
+  same("[MKT.SCRIPTS.603] a Usage section with a cell is the unit's usage, and the unit is read", [usable.findings.unitsWithoutUsage.count, usable.read.sets], [0, 1]);
+});
+await guard(async () => {
+  const swapped = await scanSections([arrangedUnit("B", "DSButton", [100, 100], { swapped: true })]);
+  same("[MKT.SCRIPTS.604] Main's sections out of Main's order are named, with the section each stands below",
+    swapped.findings.sectionOutOfOrder.items.map((item) => [item.name, item.band, item.standsBelow]), [["section · Usage", "Usage", "Sizes"]]);
+  const low = await scanSections([arrangedUnit("B", "DSButton", [100, 100], { headerLow: true })]);
+  same("[MKT.SCRIPTS.604] a header below the body is named", low.findings.sectionOutOfOrder.items.map((item) => [item.id, item.band]), [["B:head", "header"]]);
+  const ordered = await scanSections([arrangedUnit("B", "DSButton", [100, 100], { looks: true })]);
+  same("[MKT.SCRIPTS.604] sections in Main's order are named by nothing, and the unit is read", [ordered.findings.sectionOutOfOrder.count, ordered.read.sets], [0, 1]);
+});
+await guard(async () => {
+  const unit = arrangedUnit("B", "DSButton", [100, 100]);
+  const row = unit.children.find((child) => child.id === "B:body").children[1].children[1].children.find((child) => child.id === "B:row");
+  row.name = "row · small";
+  const column = unit.children.find((child) => child.id === "B:body").children[1].children[1].children.find((child) => child.id === "B:col");
+  column.name = "column · other";
+  const named = (await scanSections([unit])).findings.labelLayerNames.items.map((item) => [item.label, item.why]);
+  same("[MKT.SCRIPTS.605] a row or a column label named `row · ` or `column · ` carries its whole text, and a layer that does not is named",
+    named, [["B:col", "the layer name is not `column · ` and the text"], ["B:row", "the layer name is not `row · ` and the text"]]);
+  const clean = await scanSections([arrangedUnit("B", "DSButton", [100, 100])]);
+  same("[MKT.SCRIPTS.605] `column · rest` and `row · SM (default)` with their texts are clean labels, and the labels are read", [clean.findings.labelLayerNames.count, clean.read.labels], [0, 6]);
+});
+await guard(async () => {
+  const crowded = arrangedUnit("B", "DSButton", [100, 100], { usageInstance: instanceNode("B:uinst", "DSButton / Usage / open", [16, 20, 200, 40]) });
+  same("[MKT.SCRIPTS.606] pieces that meet are named in the frame that holds them, a cell here, and not across frames",
+    (await scanSections([crowded])).findings.meetingInSection.items.map((item) => [item.section, [...item.pair].sort()]), [["B:ucell", ["B:ucap", "B:uinst"]]]);
+  const spilled = await scanSections([arrangedUnit("B", "DSButton", [100, 100], { bodyBox: [80, 200, 1100, 900] })]);
+  same("[MKT.SCRIPTS.606] the body that passes its section's edge is named as the section's child, and the unit is read", [spilled.findings.childOutsideSection.items.map((item) => [item.child, item.side, item.section]), spilled.read.sets], [[["B:body", "right", "B:sec"]], 1]);
+});
+await guard(async () => {
+  const shown = instanceNode("B:uinst", "usage · DSButton open", [16, 40, 200, 40]);
+  const captioned = await scanSections([arrangedUnit("B", "DSButton", [100, 100], { usageInstance: shown })]);
+  same("[MKT.SCRIPTS.607] a usage in a cell with a caption above it is captioned, and the unit is read", [captioned.findings.usagesWithoutCaption.count, captioned.read.sets], [0, 1]);
+  const bare = await scanSections([arrangedUnit("B", "DSButton", [100, 100], { usageInstance: instanceNode("B:uinst", "usage · DSButton open", [16, 40, 200, 40]), caption: false })]);
+  same("[MKT.SCRIPTS.607] a usage in a cell with no text above it is counted and does not block", [bare.findings.usagesWithoutCaption.items.map((item) => item.id), bare.clean], [["B:uinst"], true]);
+});
+await guard(async () => {
+  const definitions = { "withBadge#1:1": { type: "BOOLEAN", defaultValue: false } };
+  const unit = arrangedUnit("B", "DSButton", [100, 100], { definitions });
+  const set = unit.children.find((child) => child.id === "B:body").children[1].children[1].children.find((child) => child.id === "B:set");
+  const cell = unit.children.find((child) => child.id === "B:body").children[0].children[1].children[0].children[0];
+  const held = (value) => instanceNode("B:uinst", "DSButton / Usage / open", [16, 40, 200, 40], { main: set.children[0], properties: { "withBadge#1:1": { type: "BOOLEAN", value } } });
+  cell.children[1] = held(false);
+  same("[MKT.SCRIPTS.608] a boolean that no instance in a cell draws off its default is named", (await scanSections([unit])).findings.propertyNotDrawn.items.map((item) => item.property), ["withBadge"]);
+  cell.children[1] = held(true);
+  const drawn = await scanSections([unit]);
+  same("[MKT.SCRIPTS.608] an instance in a cell that holds it off its default draws it, and the checks ran", [drawn.findings.propertyNotDrawn.count, drawn.propertyChecks, drawn.read.sets], [0, "run", 1]);
+  cell.children[1] = held(false);
+  const noted = arrangedUnit("B", "DSButton", [100, 100], { definitions, behaviour: "Behaviour (web only): withBadge" });
+  same("[MKT.SCRIPTS.608] a behaviour note of a header drawn as a frame, `Behaviour (web only): `, excuses the property, and a held property named in it is reported",
+    [(await scanSections([noted])).findings.propertyNotDrawn.count, (await scanSections([noted])).findings.behaviourNamesHeldProperty.items.map((item) => item.name)], [0, ["withBadge"]]);
+});
+await guard(async () => {
+  const empty = [version("B:a", "size=SM, state=rest", 20, 20, 100, 40, { empty: true }), version("B:b", "size=SM, state=hover", 140, 20), version("B:c", "size=MD, state=rest", 20, 80), version("B:d", "size=MD, state=hover", 140, 80)];
+  same("[MKT.SCRIPTS.609] the set part reads a set that stands in a frame of the arranged form",
+    (await scanSections([arrangedUnit("B", "DSButton", [100, 100], { versions: empty })])).findings.emptyVersions.items.map((item) => item.version ?? item.id), ["B:a"]);
+});
+
 // ---- the texts ----------------------------------------------------------------------------------
 
 console.log("\n=== the texts the agent passes on");
-const PASSED_ON = ["page.js", ...SCAN_PARTS, "layout.js"];
+const PASSED_ON = ["page.js", ...SCAN_PARTS];
 for (const script of PASSED_ON) {
   const body = readFileSync(resolve(SCRIPTS, script), "utf8");
   ok(`${script} holds one INPUTS block and no console.log, no spnutils`, (body.match(/const INPUTS = \{/g) ?? []).length === 1 && INPUTS_BLOCK.test(body) && !body.includes("console.log") && !body.toLowerCase().includes("spnutils"));
@@ -1582,8 +1489,8 @@ for (const script of PASSED_ON) {
 {
   const between = (name, from, to) => { const body = readFileSync(resolve(SCRIPTS, name), "utf8"); return body.slice(body.indexOf(from), body.indexOf(to)); };
   const labelForm = (name) => between(name, "// ---- the book's label form: begin", "// ---- the book's label form: end");
-  ok("the book's label form is one block, the same in page.js, layout.js and the parts that read labels",
-    labelForm("page.js").length > 500 && ["layout.js", "scan-labels.js", "scan-placement.js", "scan-properties.js"].every((name) => labelForm(name) === labelForm("page.js")));
+  ok("the book's label form is one block, the same in page.js and the parts that read labels",
+    labelForm("page.js").length > 500 && ["scan-labels.js", "scan-placement.js", "scan-properties.js"].every((name) => labelForm(name) === labelForm("page.js")));
   const reading = (name) => between(name, "// ---- the page's reading: begin", "// ---- the page's reading: end");
   ok("the page's reading is one block, the same in page.js and the three parts that read the page's nodes",
     reading("page.js").length > 5000 && ["scan-labels.js", "scan-placement.js", "scan-properties.js"].every((name) => reading(name) === reading("page.js")));
@@ -1603,7 +1510,20 @@ await guard(async () => {
   for (const part of SCAN_PARTS) held.push(...Object.keys((await runFile(part, { pageId: "2:1" }, sectioned([]))).scan.findings));
   same("every finding of the whole scan is held by exactly one part", [...held].sort(), [...FINDING_ORDER].sort());
 });
-ok("layout.js is dry by default", /const INPUTS = \{[^}]*dryRun: true/.test(readFileSync(resolve(SCRIPTS, "layout.js"), "utf8")));
+
+console.log("\n=== the arranged form's names — one copy in each script that reads them");
+// Each script is passed to the connector whole and cannot import, so ARRANGED, MAIN_SECTIONS and VALUE_LABEL are written in each
+// script that reads them (the five hold ARRANGED, the four that read Main's sections hold the other two). The copies must not drift.
+for (const name of ["ARRANGED", "MAIN_SECTIONS", "VALUE_LABEL"]) {
+  const copies = new Map();
+  for (const script of ["page.js", ...SCAN_PARTS]) {
+    const line = readFileSync(resolve(SCRIPTS, script), "utf8").split("\n").find((one) => one.startsWith(`const ${name} = `));
+    if (line !== undefined) copies.set(script, line);
+  }
+  const lines = [...copies.values()];
+  ok(`${name} is held by ${name === "ARRANGED" ? "all five scripts" : "page.js and the scans that read Main's sections"} (${copies.size}) in one identical line`,
+    copies.size === (name === "ARRANGED" ? 5 : 4) && lines.every((line) => line === lines[0]));
+}
 
 console.log(failed ? `\n  ${failed} of ${total} FAILED — figma scripts` : `\n  all ${total} passed — figma scripts`);
 process.exit(failed ? 1 : 0);
