@@ -32,16 +32,16 @@ writeFileSync(data, JSON.stringify({
 writeFileSync(construct, text(["drawingStyle", "colourAndStrength"]));
 const filled = run(dir, "--construct", construct, "--data", data);
 const after = readFileSync(construct, "utf8");
-ok("it prints one OK line and exits 0", filled.code === 0 && filled.out.trim() === `OK ${construct}: figures filled from ${data}`, filled.out);
-ok("each marked block holds its table", after.includes("| Element | Style |\n| --- | --- |\n| Wire | thin, round caps |") && after.includes("| Element | Token | Strength |\n| --- | --- | --- |\n| Wire | --ds-drawing-wire | 30% of the text |"), after);
-ok("the words outside the blocks are unchanged", after.startsWith("# Design Language\n\nWords the author wrote.\n") && after.endsWith("After the blocks."), after);
+ok("[MKT.SCRIPTS.606] it prints one OK line and exits 0", filled.code === 0 && filled.out.trim() === `OK ${construct}: figures filled from ${data}`, filled.out);
+ok("[MKT.SCRIPTS.607] each marked block holds its table", after.includes("| Element | Style |\n| --- | --- |\n| Wire | thin, round caps |") && after.includes("| Element | Token | Strength |\n| --- | --- | --- |\n| Wire | --ds-drawing-wire | 30% of the text |"), after);
+ok("[MKT.SCRIPTS.608] the words outside the blocks are unchanged", after.startsWith("# Design Language\n\nWords the author wrote.\n") && after.endsWith("After the blocks."), after);
 run(dir, "--construct", construct, "--data", data);
-ok("a second run changes nothing", readFileSync(construct, "utf8") === after);
+ok("[MKT.SCRIPTS.609] a second run changes nothing", readFileSync(construct, "utf8") === after);
 
 console.log("\n=== language write — a block the data has no rows for");
 writeFileSync(construct, text(["characters"]));
 const missing = run(dir, "--construct", construct, "--data", data);
-ok("it is refused by name and the block stays as written", missing.code === 1 && missing.out.trim() === `REFUSED language-data ${data}: no rows for characters, which ${construct} marks to be filled` && readFileSync(construct, "utf8") === text(["characters"]), missing.out);
+ok("[MKT.SCRIPTS.610] it is refused by name and the block stays as written", missing.code === 1 && missing.out.trim() === `REFUSED language-data ${data}: no rows for characters, which ${construct} marks to be filled` && readFileSync(construct, "utf8") === text(["characters"]), missing.out);
 
 console.log(failed ? `\n  ${failed} of ${total} FAILED` : `\n  all ${total} passed`);
 process.exit(failed ? 1 : 0);

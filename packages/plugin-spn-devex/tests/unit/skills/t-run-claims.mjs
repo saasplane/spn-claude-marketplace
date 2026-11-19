@@ -16,14 +16,14 @@ const skill = (name) => readFileSync(resolve(PLUGIN, "src", "skills", name, "SKI
 console.log("=== run claims — the pipeline and the agent");
 for (const name of ["scm", "deliver"]) {
   const text = skill(name);
-  ok(`the ${name} skill says the agent reads a pull request's failed checks and proposes the fix`, /agent reads[^.]*failed checks and proposes the fix/.test(text));
-  ok(`the ${name} skill says the pipeline stays agent-free`, text.includes("the pipeline") && text.includes("agent-free"));
+  ok(`[MKT.SKILLS.31] the ${name} skill says the agent reads a pull request's failed checks and proposes the fix`, /agent reads[^.]*failed checks and proposes the fix/.test(text));
+  ok(`[MKT.SKILLS.32] the ${name} skill says the pipeline stays agent-free`, text.includes("the pipeline") && text.includes("agent-free"));
 }
 
 console.log("\n=== run claims — on-call and alerts");
 const operate = skill("operate");
-ok("the operate skill says declaring on-call in the estate is proposed", operate.includes("declaring one is proposed"));
-ok("the operate skill says an alert names its dashboard, runbook and version", operate.includes("An alert names its dashboard, its runbook and the version it concerns"));
+ok("[MKT.SKILLS.33] the operate skill says declaring on-call in the estate is proposed", operate.includes("declaring one is proposed"));
+ok("[MKT.SKILLS.34] the operate skill says an alert names its dashboard, runbook and version", operate.includes("An alert names its dashboard, its runbook and the version it concerns"));
 
 console.log(failed ? `\n  ${failed} of ${total} FAILED` : `\n  all ${total} passed`);
 process.exit(failed ? 1 : 0);
