@@ -33,6 +33,8 @@ description: How a change reaches a running setup - what must be true before a r
 
 Run the gates cheapest-first so a failure stops the run early. **Never report a gate you did not run**, and never infer one from another.
 
+**When a pull request's checks fail, the agent reads the failed checks and proposes the fix; the pipeline itself stays agent-free.** The gates above run in the pipeline with no agent in it. The agent reads each failed check after the run, names the cause, and proposes the change, which goes through the same gates again.
+
 ## What the version means
 
 - **The agent names the version from the change and writes it in the arc's log before the go.** A removed or renamed export, a new required config key or a new abstract member is major. An addition is minor. A fix is patch. The log line carries the version and the reason.

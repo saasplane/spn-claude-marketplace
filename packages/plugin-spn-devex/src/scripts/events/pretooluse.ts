@@ -66,6 +66,7 @@ import { applies as noHistoryApplies, checkNoHistory } from "../checks/no-histor
 import { checkFigureSpacing } from "../checks/figure-spacing.ts";
 import { applies as guideCommandsApply, checkGuideCommands } from "../checks/guide-commands.ts";
 import { applies as pageTitleApplies, checkPageTitle } from "../checks/page-title.ts";
+import { applies as shellPageApplies, checkShellPage } from "../checks/shell-page.ts";
 import { applies as sqlSampleApplies, checkSqlSample } from "../checks/sql-sample.ts";
 import { checkRestatesFirst } from "../checks/restates-first.ts";
 import { checkReportAsked } from "../checks/report-asked.ts";
@@ -148,6 +149,9 @@ const CHECKS: Check[] = [
   // It reads the transcript, so its fast path is two words a move to DECIDED or LANDED always carries.
   { name: { group: "arc-status", action: "arc-status" }, run: checkArcStatus, needs: ["command"],
     applies: (_path, command) => command.includes("workstream") && (command.includes("DECIDED") || command.includes("LANDED")) },
+  // A refusal, so it runs before the advice below: a page a shell writes gets none of the page checks.
+  { name: { group: "shell-page", action: "shell-page" }, run: checkShellPage, needs: ["command"],
+    applies: (path, command) => shellPageApplies(path, command) },
   { name: { group: "doc-check", action: "doc-check" }, run: checkDoc, needs: ["command", "file_path"],
     applies: (path, command) => PROSE_SUFFIXES.some((s) => path.endsWith(s) || command.includes(s)) },
   // Round-1 writes: a closed workstream, a cache or a card-less estate edit is refused; a memory write is told once. Each

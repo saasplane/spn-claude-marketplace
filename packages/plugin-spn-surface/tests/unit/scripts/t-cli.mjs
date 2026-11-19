@@ -1,6 +1,7 @@
 // `cli.ts` — the one entry: `<group> [<subject>] <action> [<path>…] [options]`.
 //
-// THIS SUITE OWNS THE ENTRY. The plugin ships three commands, `check scan`, `unit find` and `unit show`: `help`
+// THIS SUITE OWNS THE ENTRY. The plugin ships six commands, `check module`, `check page`, `check scan`,
+// `language write`, `unit find` and `unit show`: `help`
 // prints the grammar under the plugin's own name and lists them, an unknown group is refused by name, the scan
 // reads a seeded repository whole, and `unit show` reaches its command through the entry. The entry is
 // the same text spn-devex and spn-apps ship.
@@ -39,15 +40,15 @@ console.log("=== cli — help lists the three commands");
   let parsed;
   try { parsed = JSON.parse(out); } catch { parsed = null; }
   ok("--json exits clean and names the plugin", code === 0 && parsed?.plugin === "spn-surface", out);
-  ok("--json lists `check scan`, `unit find` and `unit show`, and nothing else",
-    JSON.stringify(parsed?.commands?.map((listed) => listed.command)) === '["check scan","unit find","unit show"]', out);
+  ok("--json lists `check module`, `check page`, `check scan`, `language write`, `unit find` and `unit show`, and nothing else",
+    JSON.stringify(parsed?.commands?.map((listed) => listed.command)) === '["check module","check page","check scan","language write","unit find","unit show"]', out);
 }
 
 console.log("\n=== cli — unknown names, refused by name");
 {
   const { out, code } = run("nope", "nope");
   ok("an unknown group exits 2", code === 2, out);
-  ok("names what was asked for, and the groups there are", out.includes("unknown group `nope`") && out.includes("groups: check · unit"), out);
+  ok("names what was asked for, and the groups there are", out.includes("unknown group `nope`") && out.includes("groups: check · language · unit"), out);
 }
 
 console.log("\n=== cli — `check scan` reads Surface code whole, and says what it cannot see");

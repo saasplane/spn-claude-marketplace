@@ -114,6 +114,22 @@ console.log("\n=== edit: one entry");
   ok("a missing entry is refused, naming `sheet write`", gone.code !== 0 && gone.out.includes("E9") && gone.out.includes("sheet write"), gone.out);
   const same = sheet("edit", "N001", "E1");
   ok("an edit naming no field changes nothing", same.code !== 0, same.out);
+
+  const credited = sheet("edit", "N001", "E2", "--credits", "WEB.LAYOUT.31,WEB.LAYOUT.32");
+  const two = json(sheetFile).entries[1];
+  ok("[RULE.DEVEX.WORKSPACE.529] `--credits` writes the case ids the runner credits, and leaves the tiers as they were",
+    credited.code === 0 && JSON.stringify(two.credits) === JSON.stringify(["WEB.LAYOUT.31", "WEB.LAYOUT.32"]) && JSON.stringify(two.tiers) === JSON.stringify({ unit: ["T.2.01", "T.2.02"], contract: ["T.2.03"] }), credited.out + JSON.stringify(two));
+  ok("`--credits` logs the edit as `credits`", lines(log).at(-1).note.includes("E2") && lines(log).at(-1).note.includes("credits"), JSON.stringify(lines(log).at(-1)));
+  const before = readFileSync(stateFile, "utf8");
+  const held = json(stateFile);
+  held.rows[1].entries = ["E2"];
+  held.rows[1].state = "landed";
+  writeFileSync(stateFile, JSON.stringify(held, null, 2));
+  const landed = sheet("edit", "N001", "E2", "--credits", "WEB.LAYOUT.33");
+  ok("an entry a landed row holds can still be credited", landed.code === 0 && JSON.stringify(json(sheetFile).entries[1].credits) === JSON.stringify(["WEB.LAYOUT.33"]), landed.out);
+  writeFileSync(stateFile, before);
+  const cleared = sheet("edit", "N001", "E2", "--credits", "none");
+  ok("`--credits none` removes the credits", cleared.code === 0 && json(sheetFile).entries[1].credits === undefined, cleared.out);
 }
 
 console.log("\n=== show");

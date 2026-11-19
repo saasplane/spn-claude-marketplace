@@ -1576,12 +1576,19 @@ export function landingFault(ws: string, arc: string, data: ArcData, row: ArcRow
       } else if (worst(seen) !== "SUCCESS") faults.push(`${tier} ${id} reads ${SHOWN[worst(seen)]} in ${run}`);
     }
   };
+  // AN ENTRY'S CREDITS ARE THE CASES ITS RUNNER PROVED: where a tier id is in no case of the run, the entry's `credits` stand for it, so an entry
+  // whose runner credits other ids than its `tiers` name lands on them. A tier id the run does hold is judged as it was.
+  const inRun = (id: string): boolean => runs.some((one) => one.results.some((result) => result.id === id));
+  const owedOf = (one: SheetEntry, tier: string, ids: readonly string[]): string[] => {
+    const credits = Array.isArray(one.credits) ? one.credits : [];
+    return credits.length && ids.some((id) => !inRun(id)) ? [...new Set([...ids.filter(inRun), ...credits])] : [...ids];
+  };
   if (row.work === "CODE") {
-    for (const one of mine) for (const [tier, ids] of Object.entries(one.tiers ?? {})) judge(tier, ids);
+    for (const one of mine) for (const [tier, ids] of Object.entries(one.tiers ?? {})) judge(tier, owedOf(one, tier, ids));
   } else {
     const owed = new Map<string, Set<string>>();
     for (const one of entries.filter((entry) => entry.file.startsWith(`${repo}:`)))
-      for (const [tier, ids] of Object.entries(one.tiers ?? {})) owed.set(tier, new Set([...(owed.get(tier) ?? []), ...ids]));
+      for (const [tier, ids] of Object.entries(one.tiers ?? {})) owed.set(tier, new Set([...(owed.get(tier) ?? []), ...owedOf(one, tier, ids)]));
     for (const [tier, ids] of owed) {
       judge(tier, [...ids]);
       for (const result of runs.flatMap((one) => one.results))

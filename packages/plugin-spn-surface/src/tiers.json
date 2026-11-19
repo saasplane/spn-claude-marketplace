@@ -1,6 +1,7 @@
 {
   "groups": {
     "check": "allow",
+    "language": "allow",
     "unit": "allow"
   },
   "commands": {}

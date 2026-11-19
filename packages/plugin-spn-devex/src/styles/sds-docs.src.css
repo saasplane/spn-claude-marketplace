@@ -10,9 +10,15 @@
    version that never changes.
 
    The pages read in Geist and Geist Mono, which sit in `fonts/` beside the built stylesheet in every version's
-   folder, so the urls below are relative to the stylesheet. No display font. The system stacks stay after them. */
-@font-face{font-family:SDSText;src:url("fonts/Geist-Variable.woff2") format("woff2");font-weight:100 900;font-style:normal;font-display:swap}
-@font-face{font-family:SDSCode;src:url("fonts/GeistMono-Variable.woff2") format("woff2");font-weight:100 900;font-style:normal;font-display:swap}
+   folder, so the urls below are relative to the stylesheet. No display font. The system stacks stay after them.
+
+   THE DESIGN SYSTEM'S TOKENS come first: ds-tokens.css is the design system's own variables, copied whole by
+   `spn-devex docs sds cut` from a pinned version of it, and never edited by hand. The docs classes below read its
+   names (--surface-*, --fg, --fg-quiet, --border, --radius, --font-text, --font-code), and the same two Geist files
+   are declared under the names it uses, DSDefaultText and DSDefaultCode. */
+@import "./ds-tokens.css";
+@font-face{font-family:DSDefaultText;src:url("fonts/Geist-Variable.woff2") format("woff2");font-weight:100 900;font-style:normal;font-display:swap}
+@font-face{font-family:DSDefaultCode;src:url("fonts/GeistMono-Variable.woff2") format("woff2");font-weight:100 900;font-style:normal;font-display:swap}
 @layer theme, components, utilities;
 
 /* TAILWIND. Its theme and its utilities are loaded; its reset is not, because the page's base rules are
@@ -134,48 +140,34 @@
   :root{
     --sds-weight-heading:700;
     --sds-weight-title:500;
-    --sds-paper:#edf0f3; --sds-card:#f7f9fb; --sds-ink:#141920; --sds-slate:#48525f; --sds-faint:#7c8794; --sds-text-heading:#0a0e13; --sds-text-title:#1f2731; --sds-text-description:#475160; --sds-text-fact:#5b6674;
-    --sds-text-heading-card:#080c10; --sds-text-title-card:#1a222b; --sds-text-description-card:#424c5a; --sds-text-fact-card:#566170;
-    --sds-rule:#d2d9e0; --sds-accent:#2f4e7a; --sds-accent-soft:#e0e8f4; --sds-gap:#8f5714; --sds-gap-soft:#f7ecda;
-    --sds-ok:#2a6459; --sds-ok-soft:#dcece8; --sds-fail:#a63d3d; --sds-fail-soft:#f6e1e1;
-    --sds-ui:SDSText,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
-    --sds-mono:SDSCode,ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace; --sds-xs:0.76rem; --sds-sm:0.85rem;
-    --sds-md:0.97rem; --sds-lg:1.32rem; --sds-xl:1.62rem; --sds-xxl:2.5rem; --sds-tk-k:#6d3a9c; --sds-tk-s:#2a6459;
-    --sds-tk-c:#7c8794; --sds-tk-t:#2f4e7a; --sds-tk-n:#8f5714; --sds-tk-add:#2a6459; --sds-tk-del:#a63d3d;
+    /* THE NAMES THE DOCS CLASSES READ ARE THE DESIGN SYSTEM'S: each takes its value from the tokens at the top of this
+       file (ds-tokens.css, copied by `docs sds cut`), so a page and its drawings read the product's values, and a page
+       or a section that sets --seed-primary gets a whole palette. The dark values come with data-mode, which the
+       script sets on the page when it names none. */
+    --sds-paper:var(--surface); --sds-card:color-mix(in oklch,var(--surface-inset) 55%,var(--surface)); --sds-ink:var(--fg);
+    --sds-slate:var(--fg-quiet); --sds-faint:var(--fg-muted);
+    --sds-text-heading:var(--fg); --sds-text-title:var(--fg); --sds-text-description:var(--fg-quiet); --sds-text-fact:var(--fg-muted);
+    --sds-text-heading-card:var(--fg); --sds-text-title-card:var(--fg); --sds-text-description-card:var(--fg-quiet); --sds-text-fact-card:var(--fg-muted);
+    --sds-rule:var(--border); --sds-accent:var(--surface-brand); --sds-accent-soft:color-mix(in oklch,var(--surface-brand) 14%,transparent);
+    --sds-gap:var(--warning); --sds-gap-soft:var(--warning-subtle);
+    --sds-ok:var(--success); --sds-ok-soft:var(--success-subtle); --sds-fail:var(--error); --sds-fail-soft:var(--error-subtle);
+    --sds-grey:var(--fg-quiet); --sds-grey-soft:var(--surface-inset);
+    --sds-info:var(--info); --sds-info-soft:var(--info-subtle); --sds-success:var(--success); --sds-success-soft:var(--success-subtle);
+    --sds-warning:var(--warning); --sds-warning-soft:var(--warning-subtle); --sds-error:var(--error); --sds-error-soft:var(--error-subtle);
+    --sds-ui:var(--font-text); --sds-mono:var(--font-code);
+    --sds-xs:0.76rem; --sds-sm:0.85rem; --sds-md:0.97rem; --sds-lg:1.32rem; --sds-xl:1.62rem; --sds-xxl:2.5rem;
+    /* THE TONES THE DESIGN SYSTEM HAS NO NAME FOR stay docs tokens, with a value for each mode: the colours of code and the
+       accents a block uses to tell kinds apart. */
+    --sds-tk-k:#6d3a9c; --sds-tk-s:#2a6459; --sds-tk-c:#7c8794; --sds-tk-t:var(--surface-brand); --sds-tk-n:#8f5714; --sds-tk-add:#2a6459; --sds-tk-del:#a63d3d;
     --sds-violet:#6d3a9c; --sds-violet-soft:#ece3f5; --sds-cyan:#1b6a86; --sds-cyan-soft:#dbeef4; --sds-pink:#a0366d;
     --sds-pink-soft:#f6e0ec; --sds-olive:#5a661c; --sds-olive-soft:#edf0d8; --sds-orange:#a55000; --sds-yellow:#6b5300; --sds-yellow-soft:#fbf1c4;
-    --sds-orange-soft:#fdebd3; --sds-grey:#48525f; --sds-grey-soft:#e6eaee; --sds-info:#2f4e7a;
-    --sds-info-soft:#e0e8f4; --sds-success:#2a6459; --sds-success-soft:#dcece8; --sds-warning:#8f5714;
-    --sds-warning-soft:#f7ecda; --sds-error:#a63d3d; --sds-error-soft:#f6e1e1; --sds-page-max:80rem;
+    --sds-orange-soft:#fdebd3; --sds-page-max:80rem;
     --sds-measure:58rem; --sds-rail-width:13rem; --sds-tree-width:clamp(13.5rem,calc(100vw - 77.5rem),22rem);
   }
-  @media (prefers-color-scheme:dark){
-    :root:not([data-theme="light"]){
-      --sds-paper:#0f1318; --sds-card:#171d24; --sds-ink:#e3e8ee; --sds-slate:#a3adb9; --sds-faint:#6f7986; --sds-text-heading:#f5f8fb; --sds-text-title:#dde3ea; --sds-text-description:#b0bac6; --sds-text-fact:#8f9aa8;
-    --sds-text-heading-card:#f7fafc; --sds-text-title-card:#e6ecf2; --sds-text-description-card:#b2bcc8; --sds-text-fact-card:#96a1ae;
-      --sds-rule:#242d37; --sds-accent:#86a9da; --sds-accent-soft:#18232f; --sds-gap:#d59d4f; --sds-gap-soft:#2a2113;
-      --sds-ok:#5db3a4; --sds-ok-soft:#14251f; --sds-fail:#e08a8a; --sds-fail-soft:#2b1818; --sds-tk-k:#c9a3ee;
-      --sds-tk-s:#7fc9b6; --sds-tk-c:#6f7986; --sds-tk-t:#86a9da; --sds-tk-n:#d59d4f; --sds-tk-add:#5db3a4;
-      --sds-tk-del:#e08a8a; --sds-violet:#c9a3ee; --sds-violet-soft:#251a30; --sds-cyan:#6cc3de;
-      --sds-cyan-soft:#12262e; --sds-pink:#e592bd; --sds-pink-soft:#2c1622; --sds-olive:#b9c66a;
-      --sds-olive-soft:#22260f; --sds-orange:#f59e3a; --sds-yellow:#f2d24a; --sds-yellow-soft:#2b2508; --sds-orange-soft:#33200a; --sds-grey:#a3adb9;
-      --sds-grey-soft:#1c232b; --sds-info:#86a9da; --sds-info-soft:#18232f; --sds-success:#5db3a4;
-      --sds-success-soft:#14251f; --sds-warning:#d59d4f; --sds-warning-soft:#2a2113; --sds-error:#e08a8a;
-      --sds-error-soft:#2b1818;
-    }
-  }
-  :root[data-theme="dark"]{
-    --sds-paper:#0f1318; --sds-card:#171d24; --sds-ink:#e3e8ee; --sds-slate:#a3adb9; --sds-faint:#6f7986; --sds-text-heading:#f5f8fb; --sds-text-title:#dde3ea; --sds-text-description:#b0bac6; --sds-text-fact:#8f9aa8;
-    --sds-text-heading-card:#f7fafc; --sds-text-title-card:#e6ecf2; --sds-text-description-card:#b2bcc8; --sds-text-fact-card:#96a1ae;
-    --sds-rule:#242d37; --sds-accent:#86a9da; --sds-accent-soft:#18232f; --sds-gap:#d59d4f; --sds-gap-soft:#2a2113;
-    --sds-ok:#5db3a4; --sds-ok-soft:#14251f; --sds-fail:#e08a8a; --sds-fail-soft:#2b1818; --sds-tk-k:#c9a3ee;
-    --sds-tk-s:#7fc9b6; --sds-tk-c:#6f7986; --sds-tk-t:#86a9da; --sds-tk-n:#d59d4f; --sds-tk-add:#5db3a4;
-    --sds-tk-del:#e08a8a; --sds-violet:#c9a3ee; --sds-violet-soft:#251a30; --sds-cyan:#6cc3de;
-    --sds-cyan-soft:#12262e; --sds-pink:#e592bd; --sds-pink-soft:#2c1622; --sds-olive:#b9c66a;
-    --sds-olive-soft:#22260f; --sds-orange:#f59e3a; --sds-yellow:#f2d24a; --sds-yellow-soft:#2b2508; --sds-orange-soft:#33200a; --sds-grey:#a3adb9;
-    --sds-grey-soft:#1c232b; --sds-info:#86a9da; --sds-info-soft:#18232f; --sds-success:#5db3a4;
-    --sds-success-soft:#14251f; --sds-warning:#d59d4f; --sds-warning-soft:#2a2113; --sds-error:#e08a8a;
-    --sds-error-soft:#2b1818;
+  :root[data-mode="dark"]{
+    --sds-tk-k:#c9a3ee; --sds-tk-s:#7fc9b6; --sds-tk-c:#6f7986; --sds-tk-n:#d59d4f; --sds-tk-add:#5db3a4; --sds-tk-del:#e08a8a;
+    --sds-violet:#c9a3ee; --sds-violet-soft:#251a30; --sds-cyan:#6cc3de; --sds-cyan-soft:#12262e; --sds-pink:#e592bd; --sds-pink-soft:#2c1622;
+    --sds-olive:#b9c66a; --sds-olive-soft:#22260f; --sds-orange:#f59e3a; --sds-yellow:#f2d24a; --sds-yellow-soft:#2b2508; --sds-orange-soft:#33200a;
   }
 }
 
@@ -829,4 +821,12 @@
   @media (prefers-reduced-motion:reduce){
     .sds-tree-turn{transition:none}
   }
+
+  /* ON THE DESIGN SYSTEM: the corners, the table and the drawings take the product's values. A table head is drawn as
+     DSTable draws it at MD (the text font at TITLE_MD, uppercase, muted, on the muted fill), and a cell takes the same
+     padding, so heads and cells line up. */
+  pre,.sds-scroll,.sds-table-wrap,figure.sds-file,.sds-note,.sds-card,.sds-open,blockquote{border-radius:var(--radius)}
+  .sds-drawing .sds-box{rx:8px}
+  th{font-family:var(--font-text); font-size:var(--font-title-md-size); line-height:var(--font-title-md-line-height); font-weight:500; letter-spacing:normal; text-transform:uppercase; color:var(--fg-muted); background:var(--muted); padding:.5rem var(--size-md-padding,1rem)}
+  td{padding:.5rem var(--size-md-padding,1rem)}
 }

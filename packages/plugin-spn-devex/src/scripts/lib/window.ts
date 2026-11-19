@@ -34,6 +34,8 @@ export type WindowNote = {
   repos: Record<string, string>;
   /** The goes this window started: `<workstream>/<lead>` it ran `go start` or `go write` for, or `<workstream>/*` a handover gave it. */
   goes: Record<string, "start" | "write" | "handover">;
+  /** The developer said to stay in this window: the offer lines of the window check are muted for the rest of it. Absent before this field. */
+  stay?: boolean;
 };
 
 const empty = (): WindowNote => ({ workstreams: {}, wrote: {}, told: {}, repos: {}, goes: {} });
@@ -65,6 +67,7 @@ export function readWindow(root: string, session: string | undefined): WindowNot
              goes: held?.goes && typeof held.goes === "object" ? held.goes : {} };
     // A note written before the field has no welcome, and reads it absent.
     if (held?.welcome === "whole" || held?.welcome === "short") note.welcome = held.welcome;
+    if (held?.stay === true) note.stay = true;
     return note;
   } catch { return empty(); }
 }
@@ -276,6 +279,20 @@ export function noteWelcome(root: string, session: string | undefined, form: Wel
   const note = readWindow(root, session);
   note.welcome = form;
   save(root, session, note);
+}
+
+/** Record that the developer said to stay in this window. Never throws. */
+export function noteStay(root: string, session: string | undefined): void {
+  if (!windowFile(root, session)) return;
+  const note = readWindow(root, session);
+  if (note.stay) return;
+  note.stay = true;
+  save(root, session, note);
+}
+
+/** Whether the developer said to stay in this window. */
+export function windowStays(root: string, session: string | undefined): boolean {
+  return readWindow(root, session).stay === true;
 }
 
 /** Clears what the window was told, so a note said before a compaction or a resume is said again. Never throws. */

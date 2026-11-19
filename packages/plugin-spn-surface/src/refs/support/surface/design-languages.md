@@ -73,6 +73,48 @@ A reference is read in a headless browser with its own profile, never by a fetch
 
 - **Outside sites are read and never copied** (`RULE.SUPPORT.SURFACE.441` · MUST · skill:spn-surface/design). No words, pictures, code or branding reach the app; only techniques do, each mapped to a choice of our own. A paid reference service is consulted live when someone asks, and holds no part of the library.
 
+## Made in rounds, with media kinds — 🔮
+
+A design language is kept at three levels: the platform's construct, each app's capability chapter, and each app's `design-language.json`. The construct records only the decisions; the rounds that led to them are kept beside it, so the next partner's language is made the same way.
+
+- **An agent reads the app's construct, its capability chapter and its `design-language.json` before it draws a page or a picture** (`RULE.SUPPORT.SURFACE.525` · MUST · skill:spn-surface/design).
+- **Intake records what the partner shares**: each reference by address and date, each brand file, and each media kind.
+- **Each round shows options on real pages**, the running app or its worktree in the partner's brand values, and records its pick.
+- **A language records each media kind it uses**: line drawings, illustration, product views (drawn or captured), photography, icons and marks, data and numbers, motion and video, 3D. For each, where it comes from (made, supplied, licensed, captured), its treatment, the tokens it reads, where it goes, its tablet and phone forms, its files, and its rights and alt text.
+- **Each platform keeps one brand, and each of its apps keeps its own design language.** An app changes only its looks over the brand, and an account's own branding comes last, at run time. The order: the design system's defaults, the platform's brand, the app's looks, the account's branding.
+
+## Where media go — 🔮
+
+| Media | Placed on |
+| --- | --- |
+| A hero scene, through the section's `mediaNode`, edge to edge | the section |
+| A close-up or a sheet, through the feature's media | the feature |
+| A small picture, through the item's media | the item |
+
+- **A medium is placed on the section, the feature or the item that its size fits, and its colours are the design system's tokens** (`RULE.SUPPORT.SURFACE.526` · MUST · skill:spn-surface/design).
+- **A hero form is the one its media calls for**: a scene is `BACKDROP`, one picture `SPLIT_END`, and a wide picture or two panes `MEDIA_BOTTOM`.
+- **A drawing takes its colours from the design system's tokens and mixes of them, never a raw colour**, so any brand's theme recolours it. An icon comes from the app's own lucide set only.
+- **A module holds `assets/` and `entry/` and nothing else.** Under `assets/` a folder holds folders or files, never both, grouped by kind first and then by page.
+
+## Media size by placement — 🔮
+
+A medium's size follows where it is placed. **Each size is read from the design system's container that holds it, and a drawing is made for its frame, never scaled from another placement** (`RULE.SUPPORT.SURFACE.527` · MUST · skill:spn-surface/design).
+
+| Placement | The frame |
+| --- | --- |
+| A hero | the media column beside the words |
+| Beside the words | the feature's split |
+| Under the words | the section's content width, lined up with the grid or items above it; never a side-sized drawing centred in an empty band |
+| A band of media only | the content width |
+| A container's ground | the container, edge to edge, drawn quiet |
+| An item's picture | the item's media box |
+
+## Text alignment and items — 🔮
+
+Text is start-aligned by default, set per section pattern. It is centred only for short framing with no medium beside it, or with one centrepiece medium under it; a paragraph and an item grid are never centred.
+
+- **A claim has one carrier, either its items or the medium's labels** (`RULE.SUPPORT.SURFACE.528` · MUST · skill:spn-surface/design). Where a medium already labels each point the items go; items stay where a reader scans to decide: the value list near the top, the claims and the closing call.
+
 ## Each app's guide and data — 🔮
 
 Before any page work on an app, the design skill reads that app's guide and follows it; when a choice changes, the agent changes the guide and the data together. The guide says the pick in plain words so the next person knows why; the data holds the same pick as values, so the pages and this plugin read one answer and never two.
@@ -91,7 +133,8 @@ Each suits its own reader: Stone a reader who wants a calm, dark page, Daylight 
 
 ## What is not checked yet
 
-- **No check reads a page for its design language.** A review reads the page beside the app's guide and its data.
+- **`spn-surface check page` refuses what it can read in a spec**: a raw colour in a drawing, a class on a unit, an icon outside the app's lucide set, a hero form its media does not call for, two emphases in a section, media on the wrong level, and a drawing under the words narrower than its section's content. `spn-surface check module` refuses a folder outside a module's taxonomy.
+- **The rest of a page's design language is read by a review**, beside the app's guide and its data.
 
 ## Boundary
 
@@ -107,7 +150,11 @@ This ref states what a design language is, its five parts, how a page is built f
 | `RULE.SUPPORT.SURFACE.444` | a backdrop that moves stands still for reduced motion and for the app's own motion setting |
 | `RULE.SUPPORT.SURFACE.441` | an outside site is read and never copied |
 | `RULE.SUPPORT.SURFACE.442` | a technique no choice covers, and a class on a unit, is a gap for the design system |
+| `RULE.SUPPORT.SURFACE.525` | an agent reads the app's construct, capability chapter and design-language.json before it draws |
+| `RULE.SUPPORT.SURFACE.526` | a medium is placed on the level its size fits, in the design system's tokens |
+| `RULE.SUPPORT.SURFACE.527` | a medium's size is read from the container that holds it, and drawn for its frame |
+| `RULE.SUPPORT.SURFACE.528` | a claim has one carrier, its items or the medium's labels |
 
 ## Proof
 
-No check reads a page against these rules yet. A review applies them by reading the page beside the app's guide and its data.
+`spn-surface check page` and `spn-surface check module` prove the refusals listed above. A review applies the rest by reading the page beside the app's guide and its data.

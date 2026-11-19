@@ -25,6 +25,12 @@
 // WHILE A GO RUNS, every prompt also carries the mid-run reminder to the agent (`midRunReminder`): a go of the
 // window's workstreams with a part running or ready.
 //
+// A handover's `do not touch:` line, and the lines indented under it, name no workstream for binding: what it says not to
+// touch is another window's work (`withoutDoNotTouch`).
+//
+// THE DEVELOPER'S WORDS FOR PRESENCE are read on every prompt (`hearDeveloper`): away, watching, back, and "stay" for the
+// window check; the stamp it leaves is the time of the last message (`lib/presence.ts`).
+//
 // A handover names its workstream by the folder or by the number: `025-partner-web, N011` and
 // `025 · N011` name the same workstream, because a number is never given to a second workstream. A
 // prompt with no handover binds a workstream only by its folder's name, because a three-digit number
@@ -41,7 +47,8 @@ import { sessionDir } from "../../../../plugin-support-lib/src/lib/debug-store.t
 import { begin, end, span, tagsOf } from "../../../../plugin-support-lib/src/lib/timing.ts";
 import { WORKSTREAM_NAME, handoverLines } from "./stop.ts";
 import { ARC_AFTER, ARC_PART, opensWithWorkstream, workstreamFolder, workstreamOfNumber, workstreamsOfLine } from "../lib/handover-continue.ts";
-import { bindNamed, bindVisited, readWindow, windowSet } from "../lib/window.ts";
+import { bindNamed, bindVisited, noteStay, readWindow, windowSet } from "../lib/window.ts";
+import { nextState, presenceWords, readNode, stampMessage, staysInWindow, writeState } from "../lib/presence.ts";
 /** An arc as a handover text writes it: `N011`, `ideate` or `follow-ups`, not inside a longer word or a folder name. */
 const ARC_NAME = new RegExp(`(?<![\\w-])(?:${ARC_PART})(?![\\w-])`);
 import { goStandings } from "./orientation.ts";
@@ -87,10 +94,26 @@ export function alsoOpenOf(prompt: string, root: string): string[] {
   return [...new Set(named)];
 }
 
-/** Every workstream folder a text names that exists, each one once, in the order the text names them. */
+/**
+ * The text without a handover's `do not touch:` line and the lines indented under it. What a handover says not to touch is
+ * work another window owns, so the window it hands to is bound to none of what that line names.
+ */
+export function withoutDoNotTouch(text: string): string {
+  const kept: string[] = [];
+  let inside = false;
+  for (const line of text.split("\n")) {
+    if (/^\s*do not touch:/.test(line)) { inside = true; continue; }
+    if (inside && /^\s+\S/.test(line)) continue;
+    inside = false;
+    kept.push(line);
+  }
+  return kept.join("\n");
+}
+
+/** Every workstream folder a text names that exists, each one once, in the order the text names them. A `do not touch:` line names none. */
 function workstreamsNamed(text: string, root: string): string[] {
   const named: string[] = [];
-  for (const found of text.matchAll(everyWorkstreamName()))
+  for (const found of withoutDoNotTouch(text).matchAll(everyWorkstreamName()))
     if (!named.includes(found[0]) && workstreamFolder(root, found[0])) named.push(found[0]);
   return named;
 }
@@ -229,6 +252,21 @@ export function readRecord(file: string): SessionName | null {
 }
 
 /**
+ * The developer's words for presence and for staying, read on every prompt: AWAY or WATCHING set by their words, AWAY flipped
+ * back to PRESENT by any message without them, "stay" kept in the window's note, and the message stamped for the silence read.
+ * Never throws: a window that cannot hear this is read by silence alone.
+ */
+export function hearDeveloper(root: string, session: string, prompt: string): void {
+  try {
+    const current = readNode(root)?.state ?? "PRESENT";
+    const next = nextState(current, prompt);
+    if (next !== current) writeState(root, next, presenceWords(prompt) ? prompt.trim().slice(0, 80) : null);
+  } catch { /* no state file to write: the words set nothing */ }
+  try { if (staysInWindow(prompt)) noteStay(root, session); } catch { /* the offer lines are muted by a note that is missing */ }
+  stampMessage(root, session);
+}
+
+/**
  * What the hook prints for one prompt: the answer that names the session, or the empty string.
  *
  * The record is written before the answer is returned. A name that cannot be recorded is not given,
@@ -245,6 +283,7 @@ export function answerFor(payload: Payload, start: string): string {
     for (const bound of bindingsOf(prompt, root, session)) bindNamed(root, session, bound.name, bound.by);
     for (const visited of [...citedOf(prompt, root), ...alsoOpenOf(prompt, root)]) bindVisited(root, session, visited);
   } catch { /* a binding that cannot be written is a window that hears less */ }
+  hearDeveloper(root, session, prompt);
   const areas = areasOf(prompt);
   const areaFile = areasFile(root, session);
   if (areaFile) {

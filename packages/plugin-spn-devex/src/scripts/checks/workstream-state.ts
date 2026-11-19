@@ -10,6 +10,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { basename, dirname, join, relative, resolve } from "node:path";
 import { cardsDiffer, openWithoutCard } from "./questions.ts";
 import { TERMINAL } from "./arc-status.ts";
+import { pageRulesOnDisk } from "./doc-check.ts";
 import { cyclesOf, headerStatusRule, tableStatuses } from "../commands/docs/cycles.ts";
 import { isDir, isFile, listdir } from "../lib/payload.ts";
 import { linksSharedStyles } from "../../../../plugin-support-lib/src/lib/page-styles.ts";
@@ -427,6 +428,10 @@ export function checkWorkstream(ws: string): Finding[] {
     out.push(...statusFindings(arc, data).map(say(arc, "status")));
     out.push(...findingsFindings(ws, arc, data).map(say(arc, "findings")));
   }
+  // THE PAGE RULES READ THE SAVED FILE, whichever way it was written: the Write and Edit hook reads only what is typed.
+  for (const arc of arcIdsOf(ws))
+    for (const message of pageRulesOnDisk(previewOf(ws, arc))) out.push(say(arc, "pages")(`${NOTES}/${arc}/${PREVIEW_FILE}: ${message}`));
+  if (page) for (const message of pageRulesOnDisk(page)) out.push(say(null, "pages")(`${basename(page)}: ${message}`));
   // A preview linked from What outside its arc's entry belongs to no arc's check.
   out.push(...whatLinkFindings(ws, page, text, owners).map(say(null, "stamp")));
   // The status card is read from every arc together, so it belongs to none of them.

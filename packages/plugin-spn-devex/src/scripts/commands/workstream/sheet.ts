@@ -221,7 +221,7 @@ const EDIT_LISTS:Record<string, keyof SheetEntry> = {
 
 function edit(args: string[]): number {
   const words = readWords(args, {
-    what: VALUE, op: ENTRY_OPS, file: VALUE, "decided-by": VALUE, facts: VALUE, then: VALUE, rules: VALUE, callers: VALUE, docs: VALUE, book: VALUE, tiers: VALUE, trace: VALUE, judged: FLAG, mechanical: FLAG, kind: ENTRY_KINDS, command: VALUE, proof: VALUE,
+    what: VALUE, op: ENTRY_OPS, file: VALUE, "decided-by": VALUE, facts: VALUE, then: VALUE, rules: VALUE, callers: VALUE, docs: VALUE, book: VALUE, tiers: VALUE, credits: VALUE, trace: VALUE, judged: FLAG, mechanical: FLAG, kind: ENTRY_KINDS, command: VALUE, proof: VALUE,
   });
   const [ref, id, ...more] = words.paths;
   if (!id || more.length) throw new UsageFault("takes an arc and one entry: `sheet edit <workstream>/<arc> <E> [--what …] [--tiers …] …`.");
@@ -241,6 +241,9 @@ function edit(args: string[]): number {
   }
   const tiers = words.value("tiers");
   if (tiers !== null) { next.tiers = tiersOf(tiers); changed.push("tiers"); }
+  // THE CASE IDS ITS RUNNER CREDITS, written on any entry, a landed one too: a landing accepts a credited id where a tier id is in no case of the run.
+  const credits = listOf(words, "credits");
+  if (credits) { if (credits.length) next.credits = credits; else delete next.credits; changed.push("credits"); }
   const trace = words.value("trace");
   if (trace !== null) { next.trace = trace; changed.push("trace"); }
   const judgement = judgedOf(words);
@@ -810,7 +813,7 @@ function check(args: string[]): number {
 
 export const actions: Record<string, Action> = {
   write: { describe: "write the arc's whole sheet from a file, every entry validated and every fact one the arc holds", usage: "<workstream>/<arc> --file <sheet.json>", run: write },
-  edit: { describe: "change one entry of the sheet; a missing entry is refused, and `sheet write` is named", usage: "<workstream>/<arc> <E> [--what …] [--op …] [--file …] [--decided-by …] [--facts …] [--then …] [--rules …] [--callers …] [--docs …] [--book …] [--tiers unit=ID,ID;contract=ID] [--trace \"…\"] [--judged|--mechanical] [--kind change|step] [--command \"…\"] [--proof \"…\"]", run: edit },
+  edit: { describe: "change one entry of the sheet; a missing entry is refused, and `sheet write` is named", usage: "<workstream>/<arc> <E> [--what …] [--op …] [--file …] [--decided-by …] [--facts …] [--then …] [--rules …] [--callers …] [--docs …] [--book …] [--tiers unit=ID,ID;contract=ID] [--credits ID,ID|none] [--trace \"…\"] [--judged|--mechanical] [--kind change|step] [--command \"…\"] [--proof \"…\"]", run: edit },
   drop: { describe: "take an entry out of the sheet; --note carries why into its one log line", usage: "<workstream>/<arc> <E> --note \"…\"", run: drop },
   show: { describe: "print the sheet, or one row's or one go part's entries; --json prints every field", usage: "<workstream>/<arc> [--row <id>] [--part <part>] [--json]", run: show },
   patch: { describe: "keep an entry's change as a diff against the commit its facts pin, name it in the entry, and reset the file in the worktree; --trace and --judged/--mechanical are recorded with it", usage: "<workstream>/<arc> <E> [--trace \"…\"] [--judged|--mechanical]", run: patch },

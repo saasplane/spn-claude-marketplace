@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/11-delivery-library.md",
-      "seen": "92bf9b49"
+      "seen": "02cf2b63"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/11-delivery-library/",
-      "seen": "3faf4161"
+      "seen": "804ee16d"
     }
   ]
 }
@@ -267,7 +267,7 @@ The folder is `~/.saasplane/state/surface/`. It holds what the tool takes in and
 After a page is arranged, the agent reads it back through the connector before the next page starts, as "The path of a page through the connector" states. The read-back is a comparison of the page with its plan, and it differs from the comparison of the library with a stack above.
 
 - **The read-back compares each section of a unit with its planned cells.** The set is compared by version, every other cell by instance and props, and every paint by the variable it is bound to. A section that holds a cell the plan does not name, or lacks one it does, is a difference, and so is a paint bound to no variable.
-- **A difference is reported with the unit, the section and the cell, and is never repaired by hand beside the set.** The agent corrects the plan or the capture and runs the page again.
+- **A difference is reported with the unit, the section and the cell, and is never repaired by hand beside the set.** The agent corrects the plan, the record or the plugin's drawing, and draws the page again.
 
 ### The steps a person follows
 
@@ -330,13 +330,14 @@ A page of a library file is drawn by one run of these steps, in this order, and 
 
 1. **The developer's named version.** The developer saves a named version of the file before the agent's first change in it, and the agent waits for it.
 2. **The plan from the snapshot.** The agent reads the page's units and planned cells from the CONSTRUCT snapshot, and no cell is planned from the file.
-3. **The capture.** `spnutils apps surface capture` takes a page's cells from the showcase's Main pages and submits them to the capture ids that the agent opened through the connector.
-4. **The arranging.** The plugin's code, run through the connector, arranges the captures into each unit's sections by the plan.
-5. **The read-back.** The agent reads the page back against its plan, as "The read-back of a page" states.
-6. **The developer's publish.** The developer publishes the file after its last page is read back.
+3. **The records.** `spnutils apps surface record` reads a page's cells from the showcase's Main pages into each unit's record.
+4. **The drawing.** The plugin's code, run through the connector, draws each cell from its record and arranges the cells into each unit's sections by the plan.
+5. **The gaps.** `spnutils apps surface gaps` compares the drawn page with the records and the book, and the agent fixes each gap in the plugin's drawing and draws the unit again.
+6. **The read-back.** The agent reads the page back against its plan, as "The read-back of a page" states.
+7. **The developer's publish.** The developer publishes the file after its last page is read back.
 
 - **Units that do not depend on each other MAY be drawn in parallel, each by its own run.** Each run still follows the steps in order, and keeps to the nodes a parallel run may change, as "How the connector's work is carried out" states.
-- **Every page of a file is captured at once, and a unit is arranged only after every unit it is built from that the same file holds** (`RULE.SUPPORT.SURFACE.448` · MUST · skill:spn-surface/design). The order is the snapshot's building blocks of each unit, the units its source builds on, and the no-ids run of `spnutils apps surface capture` prints the page's units in it. An instance can only be placed from a set that already stands. Units arranged by parallel runs still keep to their own nodes.
+- **Every page of a file is read into records at once, and a unit is drawn only after every unit it is built from that the same file holds** (`RULE.SUPPORT.SURFACE.448` · MUST · skill:spn-surface/design). The order is the snapshot's building blocks of each unit, the units its source builds on, and `spnutils apps surface record` prints the page's units in it. An instance can only be placed from a set that already stands. Units drawn by parallel runs still keep to their own nodes.
 
 ## How the connector's work is carried out
 
@@ -345,7 +346,7 @@ The connector works one call at a time, and each call costs time and tokens. Six
 - **An inventory of a library file MUST be read once and handed on.** Before the first change in a library file, one reading writes an inventory of it, and every agent that then works in that file is given the inventory and does not read those facts again. "What the agent reads and keeps" states what the inventory holds for the agent's own work, and "The inventory" states what it holds for the snapshot. The inventory names the time it was read. A change to the file updates the inventory's lines for what it changed. Without one, each agent reads the same facts again, and each reading is paid for in full.
 - **A script MUST cover a page and return its own proof.** The changes one page needs go in as few calls as stay safe to run again, and the same call returns what proves it: the ids changed or made, the counts, the names and the boxes. A separate reading call is made only where that proof is missing. A change followed by a reading call for each item is the same work paid for twice. A change to many versions of one unit is one script, and it returns what it changed in every version.
 - **A script that moves or makes many nodes MUST answer dry first.** The dry answer says what the script would change and changes nothing, and the script runs for real only after the dry answer is read. A change that cannot be given back is then seen before it is made.
-- **Two runs MUST change one library file at once only where neither touches what the other changes.** Each parallel run changes only its own units' sections, its own captures and its own holder node. A call that changes what runs share, such as the variables, the text styles, the order of a page's sections, a part in Shared parts or the cover, runs alone. Reading calls may run together. A change made against a state another run is changing at the same moment is the fault this rule prevents, and runs that keep to their own nodes cannot make it.
+- **Two runs MUST change one library file at once only where neither touches what the other changes.** Each parallel run changes only its own units' sections, its own drawn cells and its own holder node. A call that changes what runs share, such as the variables, the text styles, the order of a page's sections, a part in Shared parts or the cover, runs alone. Reading calls may run together. A change made against a state another run is changing at the same moment is the fault this rule prevents, and runs that keep to their own nodes cannot make it.
 - **One picture MUST be taken for each set or sheet.** It is taken once after the set or the sheet is made or changed, and once more only after a repair of what the picture showed. A picture for each step costs more than the proof the step already returned.
 - **What a probe learned MUST be written once, where the next agent reads it before working, and it is not tried again.** A fact about how Figma or the connector behaves, which an agent had to try out, is written down: how a slot of an instance is filled, how a version is copied, what the connector cannot do. The agent that learns a fact adds it to the list below. A fact tried twice is paid for twice, and a probe in a real file can change the file.
 
@@ -367,7 +368,6 @@ Read this list before you work in a library file by the connector. Each is a fac
 | Every call | The connector sees the fonts Figma hosts and the fonts uploaded to the person's Figma account, and none that is installed only on the machine; `figma.listAvailableFontsAsync()` listed `DSThemeSans` Bold, Light, Medium, Regular and Semi Bold after they were uploaded | it reads that list for the three families the `Theme-Font` values name before the first write, and never takes a missing-font reading of a text for the check |
 | Every call | A text style's `fontFamily` and `fontWeight` bind to variables with `setBoundVariable`, and switching the family variable moves the style and its texts with no missing font; a weight of 600 resolves to the family's own style name, Geist "SemiBold" and Inter "Semi Bold"; Figma hosts Geist, Geist Mono and Schibsted Grotesk (probed in Lab on 2026-11-15) | it binds a text style to the `Theme-Font` variables, sets a family by changing a variable and not a style, and asks for no style name of its own for a weight |
 | Every call | The plugin's code passes the connector's 50,000-character limit, so `spnutils apps surface figma` writes it a second time as `connector.png`, the code gzipped into a private chunk of a PNG beside a small gunzip | the agent uploads the PNG with `upload_assets`, and one `use_figma` call unpacks and evaluates it, which exposes the plugin's functions as `globalThis.__spn` |
-| Every call | The capture submits to Figma's own capture service, whose addresses, its `capture.js` script and its `/capture` endpoint on `mcp.figma.com`, the tool keeps in its surface constants | a change of that service moves those constants |
 | Pages | A call starts on the file's first page, every time | a script does not assume the page it worked on before |
 | Pages | Moving to a page is an async call, and a switch loads the file again | a script switches page once and never inside a loop over pages |
 | Pages | Work on several pages is several calls | it sends one call for each page, and calls that only read may be sent together |
@@ -481,8 +481,23 @@ A person who opens a page reads it as a tree: the page, then one section for eac
 | Parts | a text `label · Parts`, and under it one section for each part, named as the part and built the same way |
 
 - **What a section holds is the page model's, and this ref keeps only how Figma lays it out** (`RULE.SUPPORT.SURFACE.426` · MUST · skill:spn-surface/design). Figma draws a unit's Main page, the page for each of its types, and its Screens; the Overview, the Playground and the scenario pages are the web's, and Figma draws none. A unit's section in Figma reads Main's sections by name: Usage, Sizes, Levels, Colors, Looks, Content, Data, States and Parts, each under its label, with the component set in Sizes. Figma stacks the subsections of a section down the page, where the web draws them as tabs.
-- **Hover and pressed, which no page of the showcase holds, are driven on the case rest of the unit, and every other state is captured from the page that holds it** (`RULE.SUPPORT.SURFACE.445` · MUST · skill:spn-surface/design). A person who reads the library then finds the two states on the unit that has them, and a driven state is never drawn as a look of its own.
-- **A part of a unit that is another unit is an instance of that unit's set** (`RULE.SUPPORT.SURFACE.447` · MUST · skill:spn-surface/design). It is the version the part's props give, with the captured words, icon and size as its overrides. A part that no version matches stays as the capture drew it and is reported, never guessed. A designer then sets the inner unit's own props, and a change to its set reaches every unit built from it, where a plain copy would be a second look for the inner unit, which the rule on cases forbids.
+- **The states a pointer makes, hover, pressed and the Open group, which no page of the showcase holds, are driven on the case rest of the unit, and every other state is read from the page that holds it** (`RULE.SUPPORT.SURFACE.445` · MUST · skill:spn-surface/design). The Open group is driven by the unit's own trigger, the element that says it is collapsed. A person who reads the library then finds these states on the unit that has them, and a driven state is never drawn as a look of its own.
+- **A part of a unit that is another unit is an instance of that unit's set** (`RULE.SUPPORT.SURFACE.447` · MUST · skill:spn-surface/design). It is the version the part's props give, with its record's words, icon and size as its overrides. A part that no version matches stays as its record drew it and is reported, never guessed. A designer then sets the inner unit's own props, and a change to its set reaches every unit built from it, where a plain copy would be a second look for the inner unit, which the rule on cases forbids.
+- **The library file follows the same page model as the showcase, so an agent that knows one knows where each thing stands in the other.** The table maps each level; [the arranged form](#the-arranged-form) names each frame.
+
+| The showcase | The Figma file | Named |
+| --- | --- | --- |
+| the design system | one library file for each layer | `DS <n>-<Name>`, as [the files](01-files.md) state |
+| a group of the sidebar | a page | the group's name, its levels joined by ` > ` in the section's path |
+| a unit | a section on its group's page | the unit's name, such as `DSInput` |
+| the unit's Main page | the section's body: its header, then Main's sections by name | `header · `, `body · ` and the unit's name |
+| a section of Main | a frame under its label | `section · ` and the section's name |
+| a subsection (a tab on the web) | a frame stacked down the section | `sub · ` and the subsection's name |
+| a version of the unit | a component of the unit's set, in Sizes | `prop=value` joined by `, ` |
+| a prop a version does not cross | a property of the set: a boolean, a text, an instance swap, or a text property for a choice | the prop's name |
+| a case | an instance of a version with its properties set | `cell · ` and the cell's key |
+| a part that is another unit | an instance of that unit's set | the part's name |
+
 - **A cell is an instance of the unit with its props set, from the sample the unit's chapter names, and a cell of Screens is a frame at the width of its device.** A section the unit has nothing for is not drawn, and neither is an empty subsection, so no label stands over nothing. A unit in the new form needs no sorting of its props by hand: the category in its library column says which section a prop stands in (`RULE.SUPPORT.SURFACE.437` · MUST · skill:spn-surface/design), and Figma's drawing follows from the category and the prop's type. The rest of this part is for a unit not yet converted, and for the drawing itself.
 - **The header's one line is the first sentence of the set's own description, and the set's Figma description is that one line.** A header written from memory would be a second statement of what the set already says. The header is the unit's one header label, and a unit has no second header text beside it. The layout is never written on the canvas: it is kept as plugin data on the section, for the plugin, the tool and the connector, which read it there and never from a label. A header that was drawn before with a layout in its text is replaced by the header, and its layout moves to the plugin data.
 - **A part is a set or a lone component that serves another unit and that the showcase does not list on its own, and it sits in the section of the unit that owns it.** The owner is the unit whose source uses the part, read from the stack and never guessed from the name. A name that starts with a dot is always a part. A part that two or more units on the page use sits in a last section of the page, named `Shared parts`, built the same way.
@@ -663,7 +678,7 @@ How the library keeps to the last rule is stated here as far as the book can sta
 
 ### The arranged form
 
-The plugin arranges a unit's captured cells into frames of the unit's section, and each frame carries a prefix and a name. The read-back's scans read these names, so a rename moves this table, the plugin and the scans together.
+The plugin draws a unit's cells from their records and arranges them into frames of the unit's section, and each frame carries a prefix and a name. The read-back's scans read these names, so a rename moves this table, the plugin and the scans together.
 
 | Frame | What it holds |
 | --- | --- |
@@ -672,9 +687,9 @@ The plugin arranges a unit's captured cells into frames of the unit's section, a
 | `section · ` and the section's name | the section's label, and either its set or its subsections |
 | `sub · ` and the subsection's name | the subsection's group label, its rows, and any section nested in it |
 | `row · ` and the row's label | one row of cells, and for a table of a set the row's own label |
-| `cell · ` and the cell's key | one planned cell with its caption, the capture or an instance of it placed from the plan |
+| `cell · ` and the cell's key | one planned cell with its caption, the cell drawn from its record or an instance of it placed from the plan |
 | `set · ` and the unit's name | the unit's component set with the labels of its rows and columns |
-| `holding · ` and the unit's name | the captured cells taken apart, beside the page's sections, until they are placed and the frame is removed |
+| `holding · ` and the unit's name | the cells drawn from their records, beside the page's sections, until they are placed and the frame is removed |
 
 ### A usage
 
@@ -765,9 +780,9 @@ A designer who places a unit on a page sets its props on the instance, and every
 
 ### A unit's look
 
-- **A unit's look is read from the running showcase into the stack's snapshot, which names the cells to capture and is what a drawn cell is checked against** (`RULE.SUPPORT.SURFACE.411` · MUST · skill:spn-surface/design). A reader opens each case of the unit in the showcase, in light and in dark, and records each layer: what it sits in, the token each of its classes names, its layout and its box. The book states no unit's look, and no look is written by hand beside a unit: the stack's code is the one place a look is written, and a record read from what ships cannot hold a look the product does not have.
-- **Each planned cell is captured from the running showcase into Figma, so the web lays it out, and the plugin, the tool and the agent only arrange the captures by the plan** (`RULE.SUPPORT.SURFACE.422` · MUST · skill:spn-surface/design). A look rebuilt in the library from records drifts from the web in its layout, its column shares and its fonts, and a capture of what ships cannot. A cell narrower than a page is captured in a page-wide viewport with the unit's own root set at the cell's width, so the web's breakpoints do not fold it. The arranging is: crop each capture to its unit, name the layers by the unit's parts, bind every paint to the published variable of DS 1-Core, imported by key (a dark cell to the same variable as its light twin, and the twin's modes), bind every text's family and weight to the `Theme-Font` variables, a display step to `heading` and the other steps to `text` or `code` (a text then follows the family a variable holds, and a site page's frame follows the mode `SITE`), and make the set's versions components with each case an instance of its variant. A capture is never drawn by hand beside the set, and a paint that matches no variable is reported and never left as a raw colour, and it is recorded as a difference, as the rule on a value with no variable states.
-- **A cell that the library plans for a unit and the unit's Main page does not draw is a gap of the showcase, and it is fixed on the unit's page before its library page is captured** (`RULE.SUPPORT.SURFACE.446` · MUST · skill:spn-surface/design). The library captures each cell from the showcase, so a cell the showcase lacks would be drawn in Figma by hand and the two would show different pages. Hover and pressed are the exceptions, which no page can hold: the library drives them on the case rest, as "A unit is one section" states.
+- **A unit's look is read from the running showcase into records, which name the cells to draw and are what a drawn cell is checked against** (`RULE.SUPPORT.SURFACE.411` · MUST · skill:spn-surface/design). A reader opens each case of the unit in the showcase, in light and in dark, and records each layer: what it sits in, the token each of its classes names, its layout and its box. The book states no unit's look, and no look is written by hand beside a unit: the stack's code is the one place a look is written, and a record read from what ships cannot hold a look the product does not have.
+- **Each planned cell is drawn by the plugin from its record, and the record is what `spnutils apps surface gaps` checks the drawn cell against** (`RULE.SUPPORT.SURFACE.422` · MUST · skill:spn-surface/design). `spnutils apps surface record` reads each cell of a page from the showcase's Main pages into the unit's record: each layer, what it sits in, the token each of its classes names, its layout and its box, in light and in dark. A record is plain structured data, so a change to the web is a change to a file that can be compared, where a picture of the web cannot. The plugin draws each layer of a record as an auto-layout frame with the record's direction, gap, padding and alignment, each side of a split at the share of the row its record box takes, and each text at the record's size, weight and alignment. It binds every paint by its token to the published variable of DS 1-Core, imported by key (a dark cell to the same variable as its light twin, with the twin's modes), binds every text's family and weight to the `Theme-Font` variables, a display step to `heading` and the other steps to `text` or `code`, draws each icon from the core's shape, and makes the set's versions components with each case an instance of its variant. A cell narrower than a page is read in a page-wide viewport with the unit's own root set at the cell's width, so the web's breakpoints do not fold it. A drift between a drawn cell and its record, such as a column's share, a text's family, size or weight, a gap or a padding, or a paint's variable, is a gap that `gaps` names at level 3, and the agent closes it by fixing the plugin's drawing and drawing the unit again, never by hand in the file. A token that names no variable is drawn as its value and recorded as a difference, as the rule on a value with no variable states.
+- **A cell that the library plans for a unit and the unit's Main page does not draw is a gap of the showcase, and it is fixed on the unit's page before its library page is read** (`RULE.SUPPORT.SURFACE.446` · MUST · skill:spn-surface/design). The library draws each cell from the showcase's record of it, so a cell the showcase lacks would be drawn in Figma by hand and the two would show different pages. Hover and pressed are the exceptions, which no page can hold: the library drives them on the case rest, as "A unit is one section" states.
 - **An icon is the core's icon, drawn at the icon step of its unit's size.** The core's icons are Lucide's shapes, so the icon in the library is the icon on the web.
 - **A value the stack writes with no variable is drawn as that value, and recorded as a difference between the unit and the web, to be closed in the unit.** A typed value drawn without a note would pass in the library for a variable. The difference is closed by giving the value a variable in the stack, never by binding one in the library alone.
 - **A unit whose look is not read yet is drawn as a stand-in whose label says so.** A stand-in is never published as the unit.
@@ -864,11 +879,11 @@ This ref states what the library draws, how its files are layered, and what stay
 | `RULE.SUPPORT.SURFACE.036` | a library file draws what the showcase is proven against: a usage of its primary use for every top-level unit, a drawing of every property that changes what is visibly there, a header note for a property of behaviour, a mode with one case for a property whose value is a token, and a scan that reports a property nothing draws |
 | `RULE.SUPPORT.SURFACE.295` | the plugin builds the library's sets from the CONSTRUCT snapshot alone, and the tool writes the snapshot from the book and writes the plugin out |
 | `RULE.SUPPORT.SURFACE.411` | a unit's look is read from the running showcase into the stack's snapshot, and the plugin draws only the look the snapshot holds |
-| `RULE.SUPPORT.SURFACE.422` | each planned cell is captured from the running showcase into Figma, a narrow cell in a page-wide viewport with the unit's root at the cell's width, and the plugin, the tool and the agent only arrange the captures by the plan |
-| `RULE.SUPPORT.SURFACE.445` | hover and pressed, which no page of the showcase holds, are driven on the case rest of the unit in the library |
-| `RULE.SUPPORT.SURFACE.446` | a cell the library plans and a unit's Main page does not draw is a gap of the showcase, fixed on the unit's page before its library page is captured |
-| `RULE.SUPPORT.SURFACE.447` | a part of a unit that is another unit is an instance of that unit's set, at the version its props give, with the captured words, icon and size as overrides, and a part no version matches stays as captured and is reported |
-| `RULE.SUPPORT.SURFACE.448` | every page of a file is captured at once, and a unit is arranged only after every unit it is built from that the same file holds |
+| `RULE.SUPPORT.SURFACE.422` | each planned cell is drawn by the plugin from its record, a narrow cell read in a page-wide viewport with the unit's root at the cell's width, and a drift between a drawn cell and its record is a gap `gaps` names and the agent fixes in the plugin's drawing |
+| `RULE.SUPPORT.SURFACE.445` | the states a pointer makes, hover, pressed and the Open group, which no page of the showcase holds, are driven on the case rest of the unit in the library |
+| `RULE.SUPPORT.SURFACE.446` | a cell the library plans and a unit's Main page does not draw is a gap of the showcase, fixed on the unit's page before its library page is read |
+| `RULE.SUPPORT.SURFACE.447` | a part of a unit that is another unit is an instance of that unit's set, at the version its props give, with its record's words, icon and size as overrides, and a part no version matches stays as its record drew it and is reported |
+| `RULE.SUPPORT.SURFACE.448` | every page of a file is read into records at once, and a unit is drawn only after every unit it is built from that the same file holds |
 | `RULE.SUPPORT.SURFACE.392` | spn-surface carries the CONSTRUCT snapshot of each release's book, the one snapshot a repository holds, and what reads it in the plugin reads that copy alone |
 | `RULE.SUPPORT.SURFACE.296` | the page level is a mode of the collection Level, and a form a level changes stays crossed with the allowed pairs only |
 | `RULE.SUPPORT.SURFACE.037` | how a library file is organised holds for any library, the builder's and a partner's own, and the division into files is its owner's: the builder's for its design system, a partner's for its own library, which uses the builder's published library and never edits it |
