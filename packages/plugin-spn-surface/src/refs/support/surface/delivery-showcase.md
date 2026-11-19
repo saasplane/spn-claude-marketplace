@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/12-delivery-showcase/",
-      "seen": "4f5246ed"
+      "seen": "63e4c864"
     }
   ]
 }
@@ -217,9 +217,9 @@ A unit sits in one category, placed by what a developer mostly does with it. The
 
 A subsection is a tab and a cell is a card with its code, which stands beside a narrow cell and under a wide one by the width the page model reads from the unit's place. For a unit in the new form the order of a main page is the page model's (`architecture-components.md`, *The sections of the Main page*), whose sections hold the props by their category; the order below is the one for a unit not yet converted. A main page holds its sections in one order: Usage, Sizes, Levels, Colors, Cases, States, then Props. Usage is first and Props is last. A section appears only when the unit has something for it. A unit's own sections, where it has any, stand between States and Props.
 
-**A cell that the library plans for a unit and the unit's Main page does not draw is a gap of the showcase, and it is fixed on the unit's page before its library page is captured** (`RULE.SUPPORT.SURFACE.446` · MUST · skill:spn-surface/design). The library captures each cell from the showcase, so a cell the showcase lacks would be drawn in Figma by hand and the two would show different pages. Hover and pressed are the exceptions, because no page can hold them: the library drives them on the case rest.
+**A cell that the library plans for a unit and the unit's Main page does not draw is a gap of the showcase, and it is fixed on the unit's page before its library page is read** (`RULE.SUPPORT.SURFACE.446` · MUST · skill:spn-surface/design). The library draws each cell from the showcase's record of it, so a cell the showcase lacks would be drawn in Figma by hand and the two would show different pages. Hover and pressed are the exceptions, because no page can hold them: the library drives them on the case rest.
 
-**The showcase hands its units to the capture** (`RULE.SUPPORT.SURFACE.449` · MUST · skill:spn-surface/design). In its preview, `window.__SPN_SURFACE_UNITS__` holds the design system's exports by name, so the capture can tell which unit drew each part of a cell. Most units are anonymous `forwardRef` functions, so React's own names do not say which unit is which. It is set only in the showcase, never in the design system or an app.
+**The showcase hands its units to the reader** (`RULE.SUPPORT.SURFACE.449` · MUST · skill:spn-surface/design). In its preview, `window.__SPN_SURFACE_UNITS__` holds the design system's exports by name, so the reader can tell which unit drew each part of a cell. Most units are anonymous `forwardRef` functions, so React's own names do not say which unit is which. It is set only in the showcase, never in the design system or an app.
 
 | Section | Appears when the unit has | What it holds |
 | --- | --- | --- |
@@ -396,8 +396,8 @@ This ref states what a showcase shows, in what outline, and how the page of a un
 | `RULE.SUPPORT.SURFACE.021` | a showcase is read by a developer or a partner, and names no document of the book |
 | `RULE.SUPPORT.SURFACE.022` | a unit stands in its preview by its showcase layout, and several cases stand in one grid of equal cells |
 | `RULE.SUPPORT.SURFACE.039` | the section of a unit's main page that holds its cases is named Cases |
-| `RULE.SUPPORT.SURFACE.446` | a cell the library plans and a unit's Main page does not draw is a gap of the showcase, fixed on the unit's page before its library page is captured |
-| `RULE.SUPPORT.SURFACE.449` | the showcase sets `window.__SPN_SURFACE_UNITS__` to the design system's exports by name, so the capture can tell which unit drew each part of a cell |
+| `RULE.SUPPORT.SURFACE.446` | a cell the library plans and a unit's Main page does not draw is a gap of the showcase, fixed on the unit's page before its library page is read |
+| `RULE.SUPPORT.SURFACE.449` | the showcase sets `window.__SPN_SURFACE_UNITS__` to the design system's exports by name, so the reader can tell which unit drew each part of a cell |
 | `RULE.SUPPORT.SURFACE.083` | a showcase also shows the units its stack provides on its own, each marked as the stack's own |
 | `RULE.SUPPORT.SURFACE.212` | the theme is set in one floating bar on every page and in no tool of the toolbar, the toolbar keeps only what a reader uses, and the public site is a static build that writes nothing |
 | `RULE.SUPPORT.SURFACE.280` | the showcase's sidebar opens on one page, Home, then six sections, Core, App, Layout, Container, Widget and Components, and the site's pages and the sample apps stand full page, outside the sidebar |

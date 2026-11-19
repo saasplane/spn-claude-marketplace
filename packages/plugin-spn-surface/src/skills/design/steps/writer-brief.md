@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/11-delivery-library/02-figma/02-managed.md",
-      "seen": "aad14712"
+      "seen": "d2801b98"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/11-delivery-library/02-figma/04-drawing.md",
-      "seen": "d25943b5"
+      "seen": "fc0a12ab"
     }
   ]
 }
@@ -22,12 +22,12 @@
 - **SaaS Plane's design library is managed by its builder, and a partner is given the published library, as a copy from the Community page of each Support release, and does not change it** (`RULE.SUPPORT.SURFACE.028` · MUST · skill:spn-surface/design)
 - **A vocabulary whose every value names one set of tokens is a mode, and the page level is one: the collection Level, whose modes are the six values of `DSPageLevelType`** (`RULE.SUPPORT.SURFACE.296` · MUST · skill:spn-surface/design)
 - **The agent never hands the developer a Figma step to draw, rebind, delete or tick** (`RULE.SUPPORT.SURFACE.400` · MUST · skill:spn-surface/design)
-- **A unit's look is read from the running showcase into the stack's snapshot, which names the cells to capture and is what a drawn cell is checked against** (`RULE.SUPPORT.SURFACE.411` · MUST · skill:spn-surface/design)
+- **A unit's look is read from the running showcase into records, which name the cells to draw and are what a drawn cell is checked against** (`RULE.SUPPORT.SURFACE.411` · MUST · skill:spn-surface/design)
 - **Surface and Strength take their variables from [the modes of the collections](../../05-architecture-core/01-common/01-tokens.md#the-modes-of-the-collections), as Treatment and Color do: a cell of a surface table sets both modes. `PRIMARY`'s `SOLID` fill holds the result of the brand formula at the default seed. The four theme collections of the panel look hold the default theme's mode first, and a designer sets another on a frame** (`RULE.SUPPORT.SURFACE.413` · MUST · skill:spn-surface/design)
 - **A case prop whose look an instance cannot reach, a layout change such as an alignment, a placement of parts or a column count, is a look drawn once: one version for each value other than the default, on the default version only, crossed with nothing, named `prop=value`, and the case is an instance of that version** (`RULE.SUPPORT.SURFACE.421` · MUST · skill:spn-surface/design)
-- **Hover and pressed, which no page of the showcase holds, are driven on the case rest of the unit, and every other state is captured from the page that holds it** (`RULE.SUPPORT.SURFACE.445` · MUST · skill:spn-surface/design)
+- **Hover and pressed, which no page of the showcase holds, are driven on the case rest of the unit, and every other state is read from the page that holds it** (`RULE.SUPPORT.SURFACE.445` · MUST · skill:spn-surface/design)
 - **A part of a unit that is another unit is an instance of that unit's set** (`RULE.SUPPORT.SURFACE.447` · MUST · skill:spn-surface/design)
-- **Every page of a file is captured at once, and a unit is arranged only after every unit it is built from that the same file holds** (`RULE.SUPPORT.SURFACE.448` · MUST · skill:spn-surface/design)
+- **Every page of a file is read into records at once, and a unit is drawn only after every unit it is built from that the same file holds** (`RULE.SUPPORT.SURFACE.448` · MUST · skill:spn-surface/design)
 
 Read this step when you are an agent started by another and your order is to carry out the path of one page, or of some units of one page, of a library file through the Figma connector. **It is all you read before your own order.** It stands in place of the long steps: `connector-rules.md` and `change-library.md` in this folder, and "The connector's facts" in `refs/support/surface/delivery-library.md`. Every line here restates a line of theirs. Open one of them only when you are stuck: when you meet a thing this brief does not cover, or when a call fails in a way you cannot explain. Read the fact there before you try anything, and say in your report which step you opened and why.
 
@@ -35,7 +35,7 @@ Its provenance is the foundation book's design library chapter. Apply this resta
 
 ## The work
 
-The book states a unit, the library draws it, and a stack builds it. You arrange the captures of one page of one library file with `use_figma`, and you pass `skillNames: "resource:figma-use"` on every call. The page is drawn from the captures of the showcase's Main pages, and you only arrange them by the plan: the plan comes from the CONSTRUCT snapshot and the captures come from `spnutils apps surface capture`, so you draw no cell by hand. You do not publish and you save no version: both are the developer's.
+The book states a unit, the library draws it, and a stack builds it. You draw one page of one library file with the plugin's code through `use_figma`, and you pass `skillNames: "resource:figma-use"` on every call. Each cell is drawn by the plugin from its record of the showcase's Main page: the plan comes from the CONSTRUCT snapshot and the records come from `spnutils apps surface record`, so you draw no cell by hand, and `spnutils apps surface gaps` names what the drawing still misses. You do not publish and you save no version: both are the developer's.
 
 | File | It holds | Its file key |
 | --- | --- | --- |
@@ -77,11 +77,11 @@ The book states a unit, the library draws it, and a stack builds it. You arrange
 ## A section
 
 1. A page is one group of the showcase, named as the group without `Components/`, and it holds one section for each unit and nothing else at its top level. A unit's section is named as the unit and holds, from the top, where it lives (`path · <Unit>`), its header, then Main's sections by name, Usage, Sizes, Levels, Colors, Looks, Content, Data, States and Parts, each under its label, with the set in Sizes (or in the first section that shows versions where the unit has no Sizes). A section Main has nothing for is left out with its label. Every other cell of every section is an instance of a version of the set. A part sits in the section of the unit that owns it, and a part that several units use sits in a last section of the page named Shared parts.
-2. Each cell is a capture of the unit's Main page, and a narrow cell is captured in a page-wide viewport with the unit's root at the cell's width. A unit is drawn at the space it takes in use, never scaled. Hover and pressed, which no page holds, are driven on the case rest of the unit. A part of a unit that is another unit is an instance of that unit's set, at the version its props give, with the captured words, icon and size as overrides, and a part no version matches stays as captured and is reported (`RULE.SUPPORT.SURFACE.447` · MUST · skill:spn-surface/design).
-3. The arranging crops each capture to its unit, names the layers by the unit's parts, binds every paint to the library's variable (a dark cell to the same variable as its light twin, and the twin's modes), binds every text's family and weight to the `Theme-Font` variables, and makes the set's versions components with each other cell an instance. A capture is never drawn by hand beside the set.
+2. Each cell is drawn from its record of the unit's Main page, and a narrow cell is read in a page-wide viewport with the unit's root at the cell's width. A unit is drawn at the space it takes in use, never scaled. Hover and pressed, which no page holds, are driven on the case rest of the unit. A part of a unit that is another unit is an instance of that unit's set, at the version its props give, with its record's words, icon and size as overrides, and a part no version matches stays as its record drew it and is reported (`RULE.SUPPORT.SURFACE.447` · MUST · skill:spn-surface/design).
+3. The drawing makes each layer of a record an auto-layout frame with the record's layout, boxes and texts, names the layers by the unit's parts, binds every paint by its token to the library's variable (a dark cell to the same variable as its light twin, and the twin's modes), binds every text's family and weight to the `Theme-Font` variables, and makes the set's versions components with each other cell an instance. A cell is never drawn by hand beside the set; a drift is fixed in the plugin's drawing and the unit drawn again.
 4. The header is one text, in the layer `header · <Unit>`: the unit's name; on the line under it, what the unit is in one line; then `behaviour: ` and the properties that change only how the unit behaves, where it has any. It holds no layout. The layout is the section's shared plugin data, namespace `saasplane`, key `layout`: `{ shape, tables, default, cases, behaviour }`, each table a `caption`, `rowGroups` and `columnGroups`, each group a `prop` and its `values`, the default first. Read it there, never from a label.
 5. A label's layer is `label · ` and its whole text. Set the text and the layer's name in one step. A right-aligned label keeps its right edge when its text changes, so set `x` again.
-6. Touch only your own units' sections, your own captures and your own holder node. A call that changes what runs share, the variables, the text styles, the order of a page's sections, a part in Shared parts or the cover, is not yours unless your order names it. A copy of a label lands on the page's top level: append it to its section and set its place again.
+6. Touch only your own units' sections, your own drawn cells and your own holder node. A call that changes what runs share, the variables, the text styles, the order of a page's sections, a part in Shared parts or the cover, is not yours unless your order names it. A copy of a label lands on the page's top level: append it to its section and set its place again.
 
 ## What you do not do
 
@@ -90,7 +90,7 @@ The book states a unit, the library draws it, and a stack builds it. You arrange
 - Change nothing that your order does not name. Write a fault you meet in your report, and leave it.
 - Try nothing out in a library file. If you must learn how the API behaves and a read cannot tell you, stop that unit and report the question.
 - Draw nothing of a pattern, and no unit that a stack provides on its own.
-- **Draw no unit's look by hand.** A look is captured from the running showcase, and the plugin, the tool and you only arrange the captures by the plan (`RULE.SUPPORT.SURFACE.422` · MUST · skill:spn-surface/design). A cell Main does not draw is a gap of the showcase, reported for the lead and never drawn by hand (`RULE.SUPPORT.SURFACE.446` · MUST · skill:spn-surface/design), and a value the stack writes with no variable is a difference for your report, never a variable you bind.
+- **Draw no unit's look by hand.** A look is read from the running showcase into records, and the plugin draws each cell from its record (`RULE.SUPPORT.SURFACE.422` · MUST · skill:spn-surface/design). A cell Main does not draw is a gap of the showcase, reported for the lead and never drawn by hand (`RULE.SUPPORT.SURFACE.446` · MUST · skill:spn-surface/design), and a value the stack writes with no variable is a difference for your report, never a variable you bind.
 - Change no script: fill its inputs and pass the rest as it is.
 
 ## Your proof, and your report
