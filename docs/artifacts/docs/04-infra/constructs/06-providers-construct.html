@@ -4,7 +4,7 @@
 {"id":"estate-providers","variant":"construct","title":"Providers","subtitle":"One folder per cloud, holding only what changes between them.","lenses":["INFRA","ARCHITECT"],"status":"PLANNING","dependsOn":["provider-set","estate-guard"],"summary":"This plugin serves every cloud an estate can run on, and everything that varies between clouds sits in one folder per cloud under Providers.","keywords":["provider","cloud","aws","gcp","scripts half","discovery"]}
 -->
 <!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
-<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.css" integrity="sha384-EFi+bm+soztQp3Bg2oQPRtdkdyGkD/O1qSDL0QCFBIHQg2sNtFhUHlkwxArFA8dY" crossorigin="anonymous">
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.15.0/sds-docs.css" integrity="sha384-R47poopLRnz65naDQiMbuRZgxiTZtsgOLsiaP10qjWo62gNyH4ezyJy2v/TyMG5J" crossorigin="anonymous">
 <div class="sds-page">
 
 <nav class="sds-rail" id="rail">
@@ -48,34 +48,32 @@
 <section id="s2">
   <div class="sds-section-head"><h2>Model</h2></div>
   <p>The folder is the registration. Nothing names a cloud: the gate reads which folders the providers tree holds, and for each subject it imports that cloud's validator if the cloud ships one.</p>
-  <figure>
-  <svg class="sds-drawing" viewBox="22 22 1055 80" style="max-width:1055px" role="img" aria-label="Nothing between the gate and a cloud's parse is a list somebody has to keep current.">
-    <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
-    <rect class="sds-box" x="24" y="24" width="237" height="76" rx="3"/>
-    <text class="sds-label" x="40" y="50">the gate</text>
-    <text class="sds-note" x="40" y="69">names no cloud; reads the folder</text>
-    <text class="sds-note" x="40" y="88">instead</text>
-    <path class="sds-connector" d="M261 62 H334.6" marker-end="url(#ar)"/>
-    <text class="sds-note" x="269" y="54">discovers</text>
-    <rect class="sds-box" x="334.6" y="24" width="180" height="76" rx="3"/>
-    <text class="sds-label" x="350.6" y="50">providers/&lt;cloud&gt;/</text>
-    <text class="sds-note" x="350.6" y="69">the folder is the whole</text>
-    <text class="sds-note" x="350.6" y="88">registration</text>
-    <path class="sds-connector" d="M514.6 62 H570.6" marker-end="url(#ar)"/>
-    <text class="sds-note" x="527" y="54">holds</text>
-    <rect class="sds-box" x="570.6" y="24" width="224" height="76" rx="3"/>
-    <text class="sds-label" x="586.6" y="50">scripts/checks/&lt;subject&gt;.ts</text>
-    <text class="sds-note" x="586.6" y="69">this cloud's parse and its own</text>
-    <text class="sds-note" x="586.6" y="88">spellings</text>
-    <path class="sds-connector" d="M794.6 62 H850.6" marker-end="url(#ar)"/>
-    <text class="sds-note" x="810" y="54">runs</text>
-    <rect class="sds-box" x="850.6" y="24" width="224" height="76" rx="3"/>
-    <text class="sds-label" x="866.6" y="50">the rule bodies</text>
-    <text class="sds-note" x="866.6" y="69">shared, cloud-free, and handed</text>
-    <text class="sds-note" x="866.6" y="88">this cloud's patterns</text>
-  </svg>
-    <figcaption>Nothing between the gate and a cloud's parse is a list somebody has to keep current.</figcaption>
-  </figure>
+<figure class="dl-figure">
+<div class="dl-frame">
+<svg class="dl-svg" viewBox="0 0 928 408" role="img" aria-label="Nothing between the gate and a cloud's parse is a list somebody has to keep current.">
+  <rect class="dl-tile" x="332" y="16" width="264" height="64" rx="10"/>
+  <text class="dl-name" x="344" y="37">the gate</text>
+  <text class="dl-detail" x="344" y="52">names no cloud; reads the folder instead</text>
+  <path class="dl-wire" d="M464 80 L464 120"/>
+  <text class="dl-wlabel" x="476" y="104">discovers</text>
+  <rect class="dl-tile" x="332" y="120" width="264" height="64" rx="10"/>
+  <text class="dl-name" x="344" y="141">providers/&lt;cloud&gt;/</text>
+  <text class="dl-detail" x="344" y="156">the folder is the whole registration</text>
+  <path class="dl-wire" d="M464 184 L464 224"/>
+  <text class="dl-wlabel" x="476" y="208">holds</text>
+  <rect class="dl-tile" x="332" y="224" width="264" height="64" rx="10"/>
+  <text class="dl-name" x="344" y="245">scripts/checks/&lt;subject&gt;.ts</text>
+  <text class="dl-detail" x="344" y="260">this cloud's parse and its own spellings</text>
+  <path class="dl-wire" d="M464 288 L464 328"/>
+  <text class="dl-wlabel" x="476" y="312">runs</text>
+  <rect class="dl-tile" x="332" y="328" width="264" height="64" rx="10"/>
+  <text class="dl-name" x="344" y="349">the rule bodies</text>
+  <text class="dl-detail" x="344" y="364">shared, cloud-free, and handed this</text>
+  <text class="dl-detail" x="344" y="379">cloud's patterns</text>
+</svg>
+</div>
+<figcaption>Nothing between the gate and a cloud's parse is a list somebody has to keep current.</figcaption>
+</figure>
   <!-- dg:source
 { "kind": "map",
   "caption": "Nothing between the gate and a cloud's parse is a list somebody has to keep current.",
@@ -136,7 +134,8 @@
       <tr><td><p>the apps plugin's subject registry</p><p><em>until a parser exists there is no folder for it</em> — a realization that is absent says so, and a stub that answers teaches you it works</p></td><td>MUST</td></tr>
     </tbody>
   </table></div>
-  <p>Try it: <code>node packages/plugin-spn-infra/tests/run.mjs</code></p>
+  <p>Try it:</p>
+  <pre data-lang="sh">node packages/plugin-spn-infra/tests/run.mjs</pre>
 </section>
 
 
@@ -144,4 +143,4 @@
 </div>
 </div>
 
-<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.js" integrity="sha384-MUUUVipJdxCmJyrxeNHKq8xMzGTvQ+TAsWDvN5w6TKPfuOUPtHk1E90wKCBZNRC7" crossorigin="anonymous"></script>
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.15.0/sds-docs.js" integrity="sha384-XYna7dQ9hUAzsp8poWNLetdO4Oyfh/cIKwuuh6sduxMcNDmnLGJ3zcw6DaG1IN9+" crossorigin="anonymous"></script>

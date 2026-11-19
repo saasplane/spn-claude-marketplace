@@ -4,7 +4,7 @@
 {"id":"estate-guard","variant":"construct","title":"Scripts","subtitle":"The gate that catches what should never be written into an infrastructure declaration.","lenses":["INFRA","TRUST"],"status":"PLANNING","dependsOn":["checks","estate-hooks"],"summary":"Scripts holds the gate that catches what must never appear in an estate declaration — a credential, an identifier a tool should discover for itself, a cloud provider's own string outside the one entry allowed to hold it — before it is written.","keywords":["scripts","dispatcher","subject","rule","secret","allow"]}
 -->
 <!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
-<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.css" integrity="sha384-EFi+bm+soztQp3Bg2oQPRtdkdyGkD/O1qSDL0QCFBIHQg2sNtFhUHlkwxArFA8dY" crossorigin="anonymous">
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.15.0/sds-docs.css" integrity="sha384-R47poopLRnz65naDQiMbuRZgxiTZtsgOLsiaP10qjWo62gNyH4ezyJy2v/TyMG5J" crossorigin="anonymous">
 <div class="sds-page">
 
 <nav class="sds-rail" id="rail">
@@ -50,36 +50,40 @@
 <!-- 02 -->
 <section id="s2">
   <div class="sds-section-head"><h2>Model</h2></div>
-  <p>Three folders, three jobs, and the order they run in is the order a person meets them. The dispatcher is called; it asks the gate which subjects apply; each subject runs the rule bodies that have an opinion about this path.</p>
-  <figure>
-  <svg class="sds-drawing" viewBox="423 22 254 447" style="max-width:254px" role="img" aria-label="The rule bodies are cloud-free and the parse is not, which is why the two sit in different folders.">
-    <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
-    <rect class="sds-box" x="425" y="24" width="250" height="95" rx="3"/>
-    <text class="sds-label" x="441" y="50">events/</text>
-    <text class="sds-note" x="441" y="69">the dispatcher the wiring names —</text>
-    <text class="sds-note" x="441" y="88">reads the call, keeps the first</text>
-    <text class="sds-note" x="441" y="107">refusal</text>
-    <path class="sds-connector" d="M550 119 V159" marker-end="url(#ar)"/>
-    <text class="sds-note" x="560" y="143">asks</text>
-    <rect class="sds-box" x="425" y="159" width="250" height="76" rx="3"/>
-    <text class="sds-label" x="441" y="185">checks/</text>
-    <text class="sds-note" x="441" y="204">the gate — resolves which subjects</text>
-    <text class="sds-note" x="441" y="223">judge this write</text>
-    <path class="sds-connector" d="M550 235 V275" marker-end="url(#ar)"/>
-    <text class="sds-note" x="560" y="259">dispatches into</text>
-    <rect class="sds-box" x="425" y="275" width="250" height="76" rx="3"/>
-    <text class="sds-label" x="441" y="301">providers/</text>
-    <text class="sds-note" x="441" y="320">one cloud's parse of a subject,</text>
-    <text class="sds-note" x="441" y="339">outside this folder</text>
-    <path class="sds-connector" d="M550 351 V391" marker-end="url(#ar)"/>
-    <text class="sds-note" x="560" y="375">runs</text>
-    <rect class="sds-box" x="425" y="391" width="250" height="76" rx="3"/>
-    <text class="sds-label" x="441" y="417">lib/</text>
-    <text class="sds-note" x="441" y="436">the rule bodies, each named, each</text>
-    <text class="sds-note" x="441" y="455">with its own refusal</text>
-  </svg>
-    <figcaption>The rule bodies are cloud-free and the parse is not, which is why the two sit in different folders.</figcaption>
-  </figure>
+  <p>Three folders, three jobs, and the order they run in is the order a person meets them. 1. The dispatcher is called.</p>
+  <ol>
+    <li>It asks the gate which subjects apply.</li>
+    <li>Each subject runs the rule bodies that have an opinion about this path.</li>
+  </ol>
+<figure class="dl-figure">
+<div class="dl-frame">
+<svg class="dl-svg" viewBox="0 0 928 408" role="img" aria-label="The rule bodies are cloud-free and the parse is not, which is why the two sit in different folders.">
+  <rect class="dl-tile" x="332" y="16" width="264" height="64" rx="10"/>
+  <text class="dl-name" x="344" y="37">events/</text>
+  <text class="dl-detail" x="344" y="52">the dispatcher the wiring names — reads</text>
+  <text class="dl-detail" x="344" y="67">the call, keeps the first refusal</text>
+  <path class="dl-wire" d="M464 80 L464 120"/>
+  <text class="dl-wlabel" x="476" y="104">asks</text>
+  <rect class="dl-tile" x="332" y="120" width="264" height="64" rx="10"/>
+  <text class="dl-name" x="344" y="141">checks/</text>
+  <text class="dl-detail" x="344" y="156">the gate — resolves which subjects judge</text>
+  <text class="dl-detail" x="344" y="171">this write</text>
+  <path class="dl-wire" d="M464 184 L464 224"/>
+  <text class="dl-wlabel" x="476" y="208">dispatches into</text>
+  <rect class="dl-tile" x="332" y="224" width="264" height="64" rx="10"/>
+  <text class="dl-name" x="344" y="245">providers/</text>
+  <text class="dl-detail" x="344" y="260">one cloud's parse of a subject, outside</text>
+  <text class="dl-detail" x="344" y="275">this folder</text>
+  <path class="dl-wire" d="M464 288 L464 328"/>
+  <text class="dl-wlabel" x="476" y="312">runs</text>
+  <rect class="dl-tile" x="332" y="328" width="264" height="64" rx="10"/>
+  <text class="dl-name" x="344" y="349">lib/</text>
+  <text class="dl-detail" x="344" y="364">the rule bodies, each named, each with</text>
+  <text class="dl-detail" x="344" y="379">its own refusal</text>
+</svg>
+</div>
+<figcaption>The rule bodies are cloud-free and the parse is not, which is why the two sit in different folders.</figcaption>
+</figure>
   <!-- dg:source
 { "kind": "map",
   "caption": "The rule bodies are cloud-free and the parse is not, which is why the two sit in different folders.",
@@ -98,51 +102,52 @@
   <p><strong>The path is read before any text</strong>, because one refusal needs nothing else: built output is refused whatever it would contain. Then the text this call would add is taken, and each remaining subject is asked about it in turn, the first denial ending the run.</p>
   <p>A rule that fails is skipped rather than fatal: a gate that crashes the chain removes every other gate with it, which is worse than any single miss. The helpers the dispatcher reads its event and records its timings through are <strong>this plugin's own copies</strong>. A plugin is installed on its own and a partner may hold one without the others, so a sibling's file cannot be a dependency — reaching for one means resolving it at runtime, and a resolve that misses has to return the pass-through, which is silence wearing the shape of success.</p>
   <p>The figure below follows one call through the dispatcher, from the moment it arrives to the answer it gets. Every road out of it ends in an exit code of zero.</p>
-  <figure>
-  <svg class="sds-drawing" viewBox="156 22 852 916" style="max-width:852px" role="img" aria-label="The only way out with a refusal is a rule that read the path or the new text and objected. Anything the gate cannot read, and any rule that throws, falls back to allowing.">
-    <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
-    <rect class="sds-box" x="448" y="24" width="204" height="57" rx="28.5"/>
-    <text class="sds-label" x="487" y="50">A write or an edit</text>
-    <text class="sds-note" x="470" y="69">arrives at the dispatcher</text>
-    <path class="sds-box" d="M550 137 L764 181 L550 225 L336 181 Z"/>
-    <text class="sds-label" x="459" y="185">Does the call name a file?</text>
-    <rect class="sds-box" x="158" y="309" width="243" height="57" rx="28.5"/>
-    <text class="sds-label" x="220" y="335">Allow, in silence</text>
-    <text class="sds-note" x="180" y="354">unreadable input lands here too</text>
-    <path class="sds-box" d="M699 309 L941 366 L699 423 L457 366 Z"/>
-    <text class="sds-label" x="594" y="360.5">Does the path alone refuse it?</text>
-    <text class="sds-note" x="600" y="379.5">built output, whatever it holds</text>
-    <rect class="sds-box" x="439" y="479" width="221" height="57" rx="3"/>
-    <text class="sds-label" x="455" y="505">Take the text the call adds</text>
-    <text class="sds-note" x="455" y="524">content, or the replacement</text>
-    <rect class="sds-box" x="441" y="592" width="218" height="57" rx="3"/>
-    <text class="sds-label" x="457" y="618">Ask each subject in turn</text>
-    <text class="sds-note" x="457" y="637">a rule that throws is skipped</text>
-    <path class="sds-box" d="M550 705 L729 749 L550 793 L371 749 Z"/>
-    <text class="sds-label" x="477" y="753">Did a subject refuse?</text>
-    <rect class="sds-box" x="360" y="877" width="79" height="44" rx="22"/>
-    <text class="sds-label" x="382" y="903">Allow</text>
-    <path class="sds-box" d="M511 877 L739 877 L723 934 L495 934 Z"/>
-    <text class="sds-label" x="519" y="903">Print the refusal, exit zero</text>
-    <text class="sds-note" x="547" y="922">it names the laws card</text>
-    <path class="sds-connector" d="M550 81 V137" marker-end="url(#ar)"/>
-    <path class="sds-connector" d="M550 225 V253 H280 V309" marker-end="url(#ar)"/>
-    <path class="sds-connector" d="M550 225 V281 H699 V309" marker-end="url(#ar)"/>
-    <path class="sds-connector" d="M941 366 H997 V905.5 H731" marker-end="url(#ar)"/>
-    <path class="sds-connector" d="M699 423 V451 H550 V479" marker-end="url(#ar)"/>
-    <path class="sds-connector" d="M550 536 V592" marker-end="url(#ar)"/>
-    <path class="sds-connector" d="M550 649 V705" marker-end="url(#ar)"/>
-    <path class="sds-connector" d="M550 793 V821 H625 V877" marker-end="url(#ar)"/>
-    <path class="sds-connector" d="M550 793 V849 H400 V877" marker-end="url(#ar)"/>
-    <text class="sds-note" x="409" y="245">no</text>
-    <text class="sds-note" x="615" y="273">yes</text>
-    <text class="sds-note" x="959" y="358">yes</text>
-    <text class="sds-note" x="618" y="443">no</text>
-    <text class="sds-note" x="631" y="813">yes, the first one ends the run</text>
-    <text class="sds-note" x="469" y="841">no</text>
-  </svg>
-    <figcaption>The only way out with a refusal is a rule that read the path or the new text and objected. Anything the gate cannot read, and any rule that throws, falls back to allowing.</figcaption>
-  </figure>
+<figure class="dl-figure">
+<div class="dl-frame">
+<svg class="dl-svg" viewBox="0 0 928 888" role="img" aria-label="The only way out with a refusal is a rule that read the path or the new text and objected. Anything the gate cannot read, and any rule that throws, falls back to allowing.">
+  <rect class="dl-tile" x="344" y="16" width="188" height="48" rx="24"/>
+  <text class="dl-name" x="438" y="37" text-anchor="middle">A write or an edit</text>
+  <text class="dl-detail" x="438" y="52" text-anchor="middle">arrives at the dispatcher</text>
+  <path class="dl-tile" d="M428.3 122.4 L428.3 122.4 Q438 120 447.7 122.4 L584.3 155.6 Q594 158 584.3 160.4 L447.7 193.6 Q438 196 428.3 193.6 L291.7 160.4 Q282 158 291.7 155.6 Z"/>
+  <text class="dl-name" x="438" y="162" text-anchor="middle">Does the call name a file?</text>
+  <rect class="dl-tile" x="120" y="280" width="224" height="48" rx="24"/>
+  <text class="dl-name" x="232" y="301" text-anchor="middle">Allow, in silence</text>
+  <text class="dl-detail" x="232" y="316" text-anchor="middle">unreadable input lands here too</text>
+  <path class="dl-tile" d="M566.5 283.2 L566.5 283.2 Q576 280 585.5 283.2 L742.5 336.8 Q752 340 742.5 343.2 L585.5 396.8 Q576 400 566.5 396.8 L409.5 343.2 Q400 340 409.5 336.8 Z"/>
+  <text class="dl-name" x="576" y="336.5" text-anchor="middle">Does the path alone refuse it?</text>
+  <text class="dl-detail" x="576" y="351.5" text-anchor="middle">built output, whatever it holds</text>
+  <rect class="dl-tile" x="472" y="456" width="208" height="48" rx="10"/>
+  <text class="dl-name" x="484" y="477">Take the text the call adds</text>
+  <text class="dl-detail" x="484" y="492">content, or the replacement</text>
+  <rect class="dl-tile" x="476" y="560" width="200" height="48" rx="10"/>
+  <text class="dl-name" x="488" y="581">Ask each subject in turn</text>
+  <text class="dl-detail" x="488" y="596">a rule that throws is skipped</text>
+  <path class="dl-tile" d="M566.4 666.8 L566.4 666.8 Q576 664 585.6 666.8 L696.4 699.2 Q706 702 696.4 704.8 L585.6 737.2 Q576 740 566.4 737.2 L455.6 704.8 Q446 702 455.6 699.2 Z"/>
+  <text class="dl-name" x="576" y="706" text-anchor="middle">Did a subject refuse?</text>
+  <rect class="dl-tile" x="248" y="824" width="72" height="36" rx="18"/>
+  <text class="dl-name" x="284" y="846" text-anchor="middle">Allow</text>
+  <path class="dl-tile" d="M389.2 832.5 L389.2 832.5 Q392 824 401 824 L615 824 Q624 824 621.2 832.5 L610.8 863.5 Q608 872 599 872 L385 872 Q376 872 378.8 863.5 Z"/>
+  <text class="dl-name" x="500" y="845" text-anchor="middle">Print the refusal, exit zero</text>
+  <text class="dl-detail" x="500" y="860" text-anchor="middle">it names the laws card</text>
+  <path class="dl-wire" d="M438 64 L438 120"/>
+  <path class="dl-wire" d="M438 196 L438 216 Q438 224 430 224 L240 224 Q232 224 232 232 L232 280"/>
+  <path class="dl-wire" d="M438 196 L438 244 Q438 252 446 252 L568 252 Q576 252 576 260 L576 280"/>
+  <path class="dl-wire" d="M752 340 L800 340 Q808 340 808 348 L808 840 Q808 848 800 848 L616 848"/>
+  <path class="dl-wire" d="M576 400 L576 456"/>
+  <path class="dl-wire" d="M576 504 L576 560"/>
+  <path class="dl-wire" d="M576 608 L576 664"/>
+  <path class="dl-wire" d="M576 740 L576 760 Q576 768 568 768 L516 768 Q508 768 508 776 L508 824"/>
+  <path class="dl-wire" d="M576 740 L576 788 Q576 796 568 796 L292 796 Q284 796 284 804 L284 824"/>
+  <text class="dl-wlabel" x="329" y="216">no</text>
+  <text class="dl-wlabel" x="498" y="244">yes</text>
+  <text class="dl-wlabel" x="771" y="332">yes</text>
+  <text class="dl-wlabel" x="584" y="436">no</text>
+  <text class="dl-wlabel" x="584" y="760">yes, the first one ends the run</text>
+  <text class="dl-wlabel" x="424" y="788">no</text>
+</svg>
+</div>
+<figcaption>The only way out with a refusal is a rule that read the path or the new text and objected. Anything the gate cannot read, and any rule that throws, falls back to allowing.</figcaption>
+</figure>
   <!-- dg:source
 { "kind": "flowchart",
   "caption": "The only way out with a refusal is a rule that read the path or the new text and objected. Anything the gate cannot read, and any rule that throws, falls back to allowing.",
@@ -175,7 +180,12 @@
 <section id="s3">
   <div class="sds-section-head"><h2>Parts</h2></div>
   <h3 id="three-folders-three-folders-and-what-dec">Three folders — Three folders, and what decides which one a file goes in</h3>
-  <p><code>events/</code> holds what the wiring calls, and there is one such file because there is one wired moment. <code>checks/</code> holds the gate, which knows which subjects exist and how to reach a provider's parse of each. <code>lib/</code> holds everything more than one of them needs: the rule bodies, the event shape, the timing recorder. <strong>The axis is what the file is for, not what it is about</strong>, which is why a rule about secrets and a rule about built output sit side by side.</p>
+  <ul>
+    <li><code>events/</code> holds what the wiring calls, and there is one such file because there is one wired moment.</li>
+    <li><code>checks/</code> holds the gate, which knows which subjects exist and how to reach a provider's parse of each.</li>
+    <li><code>lib/</code> holds everything more than one of them needs: the rule bodies, the event shape, the timing recorder.</li>
+  </ul>
+  <p><strong>The axis is what the file is for, not what it is about</strong>, which is why a rule about secrets and a rule about built output sit side by side.</p>
   <h3 id="unsure-allows-unsure-means-allow-and-eve">Unsure allows — Unsure means allow, and every exit is zero</h3>
   <p>Unreadable input, or a call naming no file, ends the run in silence with the call allowed. A refusal prints the documented decision and still exits zero, because a hook that fails loudly takes every other gate down with it. The dispatcher returns as soon as it finds no file path, and the whole run is wrapped so nothing reaches the harness as a failure.</p>
   <h3 id="added-text-it-reads-the-text-the-call-wo">Added text — It reads the text the call would add, not the file</h3>
@@ -220,7 +230,8 @@
       <tr><td><p>the foundation's plugins construct § The shape of a plugin, and its <code>04-plugins/02-shape.md</code></p><p>the four kinds of script, one command entry, a shared folder never installed on its own</p></td><td>MUST</td></tr>
     </tbody>
   </table></div>
-  <p>Try it: <code>node packages/plugin-spn-infra/tests/run.mjs</code></p>
+  <p>Try it:</p>
+  <pre data-lang="sh">node packages/plugin-spn-infra/tests/run.mjs</pre>
 </section>
 
 
@@ -228,4 +239,4 @@
 </div>
 </div>
 
-<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.js" integrity="sha384-MUUUVipJdxCmJyrxeNHKq8xMzGTvQ+TAsWDvN5w6TKPfuOUPtHk1E90wKCBZNRC7" crossorigin="anonymous"></script>
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.15.0/sds-docs.js" integrity="sha384-XYna7dQ9hUAzsp8poWNLetdO4Oyfh/cIKwuuh6sduxMcNDmnLGJ3zcw6DaG1IN9+" crossorigin="anonymous"></script>

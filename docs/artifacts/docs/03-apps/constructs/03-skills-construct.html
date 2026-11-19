@@ -4,7 +4,7 @@
 {"id":"stack-skills","variant":"construct","title":"Skills","subtitle":"The commands an apps repository can be asked to run, one folder each.","lenses":["SERVER_DEV","WEB_DEV"],"status":"PLANNING","dependsOn":["skill-set"],"summary":"A skill belongs to this domain when it describes work on a piece of an apps repository — scaffolding a project, building a capability, running the suites, proving a package, or publishing the repository.","keywords":["skill","steps","mode","classification","stage","absence"]}
 -->
 <!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
-<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.css" integrity="sha384-EFi+bm+soztQp3Bg2oQPRtdkdyGkD/O1qSDL0QCFBIHQg2sNtFhUHlkwxArFA8dY" crossorigin="anonymous">
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.15.0/sds-docs.css" integrity="sha384-R47poopLRnz65naDQiMbuRZgxiTZtsgOLsiaP10qjWo62gNyH4ezyJy2v/TyMG5J" crossorigin="anonymous">
 <div class="sds-page">
 
 <nav class="sds-rail" id="rail">
@@ -50,36 +50,35 @@
 <section id="s2">
   <div class="sds-section-head"><h2>Model</h2></div>
   <p>The ask is matched to a skill, the skill is narrowed by a mode, and the longest skill sequences steps it reads from the provider for the node's own stack.</p>
-  <figure>
-  <svg class="sds-drawing" viewBox="423 22 254 466" style="max-width:254px" role="img" aria-label="The skill names the step and its order; the provider holds the file, so the walk is concrete without the skill naming a stack.">
-    <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
-    <rect class="sds-box" x="425" y="24" width="250" height="95" rx="3"/>
-    <text class="sds-label" x="441" y="50">the ask</text>
-    <text class="sds-note" x="441" y="69">build, scaffold, run, prove,</text>
-    <text class="sds-note" x="441" y="88">review, publish — in your own</text>
-    <text class="sds-note" x="441" y="107">words</text>
-    <path class="sds-connector" d="M550 119 V159" marker-end="url(#ar)"/>
-    <text class="sds-note" x="560" y="143">matched to</text>
-    <rect class="sds-box" x="425" y="159" width="250" height="76" rx="3"/>
-    <text class="sds-label" x="441" y="185">the skill</text>
-    <text class="sds-note" x="441" y="204">one folder under skills/, chosen</text>
-    <text class="sds-note" x="441" y="223">by its own description</text>
-    <path class="sds-connector" d="M550 235 V275" marker-end="url(#ar)"/>
-    <text class="sds-note" x="560" y="259">narrowed by</text>
-    <rect class="sds-box" x="425" y="275" width="250" height="76" rx="3"/>
-    <text class="sds-label" x="441" y="301">the mode</text>
-    <text class="sds-note" x="441" y="320">an argument the description names,</text>
-    <text class="sds-note" x="441" y="339">never a second skill</text>
-    <path class="sds-connector" d="M550 351 V391" marker-end="url(#ar)"/>
-    <text class="sds-note" x="560" y="375">sequences</text>
-    <rect class="sds-box" x="425" y="391" width="250" height="95" rx="3"/>
-    <text class="sds-label" x="441" y="417">the steps</text>
-    <text class="sds-note" x="441" y="436">named and ordered here, read from</text>
-    <text class="sds-note" x="441" y="455">the provider for the declared</text>
-    <text class="sds-note" x="441" y="474">stack</text>
-  </svg>
-    <figcaption>The skill names the step and its order; the provider holds the file, so the walk is concrete without the skill naming a stack.</figcaption>
-  </figure>
+<figure class="dl-figure">
+<div class="dl-frame">
+<svg class="dl-svg" viewBox="0 0 928 408" role="img" aria-label="The skill names the step and its order; the provider holds the file, so the walk is concrete without the skill naming a stack.">
+  <rect class="dl-tile" x="332" y="16" width="264" height="64" rx="10"/>
+  <text class="dl-name" x="344" y="37">the ask</text>
+  <text class="dl-detail" x="344" y="52">build, scaffold, run, prove, review,</text>
+  <text class="dl-detail" x="344" y="67">publish — in your own words</text>
+  <path class="dl-wire" d="M464 80 L464 120"/>
+  <text class="dl-wlabel" x="476" y="104">matched to</text>
+  <rect class="dl-tile" x="332" y="120" width="264" height="64" rx="10"/>
+  <text class="dl-name" x="344" y="141">the skill</text>
+  <text class="dl-detail" x="344" y="156">one folder under skills/, chosen by its</text>
+  <text class="dl-detail" x="344" y="171">own description</text>
+  <path class="dl-wire" d="M464 184 L464 224"/>
+  <text class="dl-wlabel" x="476" y="208">narrowed by</text>
+  <rect class="dl-tile" x="332" y="224" width="264" height="64" rx="10"/>
+  <text class="dl-name" x="344" y="245">the mode</text>
+  <text class="dl-detail" x="344" y="260">an argument the description names, never</text>
+  <text class="dl-detail" x="344" y="275">a second skill</text>
+  <path class="dl-wire" d="M464 288 L464 328"/>
+  <text class="dl-wlabel" x="476" y="312">sequences</text>
+  <rect class="dl-tile" x="332" y="328" width="264" height="64" rx="10"/>
+  <text class="dl-name" x="344" y="349">the steps</text>
+  <text class="dl-detail" x="344" y="364">named and ordered here, read from the</text>
+  <text class="dl-detail" x="344" y="379">provider for the declared stack</text>
+</svg>
+</div>
+<figcaption>The skill names the step and its order; the provider holds the file, so the walk is concrete without the skill naming a stack.</figcaption>
+</figure>
   <!-- dg:source
 { "kind": "map",
   "caption": "The skill names the step and its order; the provider holds the file, so the walk is concrete without the skill naming a stack.",
@@ -147,7 +146,8 @@
       <tr><td><p>the foundation's <code>02-delivery.md</code> § When an edit becomes behaviour</p><p>a skill edit is loadable only after an install and a fresh window</p></td><td>MUST</td></tr>
     </tbody>
   </table></div>
-  <p>Try it: <code>spn-devex restates check</code></p>
+  <p>Try it:</p>
+  <pre data-lang="sh">spn-devex restates check</pre>
 </section>
 
 
@@ -155,4 +155,4 @@
 </div>
 </div>
 
-<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.js" integrity="sha384-MUUUVipJdxCmJyrxeNHKq8xMzGTvQ+TAsWDvN5w6TKPfuOUPtHk1E90wKCBZNRC7" crossorigin="anonymous"></script>
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.15.0/sds-docs.js" integrity="sha384-XYna7dQ9hUAzsp8poWNLetdO4Oyfh/cIKwuuh6sduxMcNDmnLGJ3zcw6DaG1IN9+" crossorigin="anonymous"></script>

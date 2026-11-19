@@ -4,7 +4,7 @@
 {"id":"plugin-set","variant":"construct","title":"The Plugin","subtitle":"One folder holds everything a rule needs to reach a running session.","lenses":["ARCHITECT","LEAD"],"status":"PLANNING","dependsOn":[],"summary":"A plugin carries one of this repository's standards into a running session, in one folder: its manifest, its entry in the marketplace list, the installed copy a session actually reads, and the version field that names which bytes those are.","keywords":["plugin","marketplace","manifest","version","install","plugin root"]}
 -->
 <!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
-<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.css" integrity="sha384-EFi+bm+soztQp3Bg2oQPRtdkdyGkD/O1qSDL0QCFBIHQg2sNtFhUHlkwxArFA8dY" crossorigin="anonymous">
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.15.0/sds-docs.css" integrity="sha384-R47poopLRnz65naDQiMbuRZgxiTZtsgOLsiaP10qjWo62gNyH4ezyJy2v/TyMG5J" crossorigin="anonymous">
 <div class="sds-page">
 
 <nav class="sds-rail" id="rail">
@@ -48,34 +48,35 @@
 <section id="s2">
   <div class="sds-section-head"><h2>Model</h2></div>
   <p>Three files carry a plugin from an author's edit to the session that reads it, and confusing any two of them is where the afternoon goes. Read them left to right: what names a plugin, what a plugin claims about itself, where its bytes end up, and who reads them there.</p>
-  <figure>
-  <svg class="sds-drawing" viewBox="423 22 267 428" style="max-width:267px" role="img" aria-label="No arrow reaches a session from this checkout; only the installed copy is ever read.">
-    <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
-    <rect class="sds-box" x="425" y="24" width="250" height="76" rx="3"/>
-    <text class="sds-label" x="441" y="50">marketplace.json</text>
-    <text class="sds-note" x="441" y="69">one entry per plugin — its name,</text>
-    <text class="sds-note" x="441" y="88">its folder, its description</text>
-    <path class="sds-connector" d="M550 100 V140" marker-end="url(#ar)"/>
-    <text class="sds-note" x="560" y="124">names the folder</text>
-    <rect class="sds-box" x="425" y="140" width="250" height="76" rx="3"/>
-    <text class="sds-label" x="441" y="166">plugin.json</text>
-    <text class="sds-note" x="441" y="185">the plugin's own claim — name,</text>
-    <text class="sds-note" x="441" y="204">version, description, author</text>
-    <path class="sds-connector" d="M550 216 V256" marker-end="url(#ar)"/>
-    <text class="sds-note" x="560" y="240">an install copies it</text>
-    <rect class="sds-box" x="425" y="256" width="250" height="76" rx="3"/>
-    <text class="sds-label" x="441" y="282">the plugin root</text>
-    <text class="sds-note" x="441" y="301">the installed copy, found by name</text>
-    <text class="sds-note" x="441" y="320">and version</text>
-    <path class="sds-connector" d="M550 332 V372" marker-end="url(#ar)"/>
-    <text class="sds-note" x="560" y="356">loaded from</text>
-    <rect class="sds-box" x="425" y="372" width="250" height="76" rx="3"/>
-    <text class="sds-label" x="441" y="398">a session</text>
-    <text class="sds-note" x="441" y="417">reads the installed copy and never</text>
-    <text class="sds-note" x="441" y="436">this checkout</text>
-  </svg>
-    <figcaption>No arrow reaches a session from this checkout; only the installed copy is ever read.</figcaption>
-  </figure>
+<figure class="dl-figure">
+<div class="dl-frame">
+<svg class="dl-svg" viewBox="0 0 928 408" role="img" aria-label="No arrow reaches a session from this checkout; only the installed copy is ever read.">
+  <rect class="dl-tile" x="336" y="16" width="260" height="64" rx="10"/>
+  <text class="dl-name" x="348" y="37">marketplace.json</text>
+  <text class="dl-detail" x="348" y="52">one entry per plugin — its name, its</text>
+  <text class="dl-detail" x="348" y="67">folder, its description</text>
+  <path class="dl-wire" d="M466 80 L466 120"/>
+  <text class="dl-wlabel" x="478" y="104">names the folder</text>
+  <rect class="dl-tile" x="336" y="120" width="260" height="64" rx="10"/>
+  <text class="dl-name" x="348" y="141">plugin.json</text>
+  <text class="dl-detail" x="348" y="156">the plugin's own claim — name, version,</text>
+  <text class="dl-detail" x="348" y="171">description, author</text>
+  <path class="dl-wire" d="M466 184 L466 224"/>
+  <text class="dl-wlabel" x="478" y="208">an install copies it</text>
+  <rect class="dl-tile" x="336" y="224" width="260" height="64" rx="10"/>
+  <text class="dl-name" x="348" y="245">the plugin root</text>
+  <text class="dl-detail" x="348" y="260">the installed copy, found by name and</text>
+  <text class="dl-detail" x="348" y="275">version</text>
+  <path class="dl-wire" d="M466 288 L466 328"/>
+  <text class="dl-wlabel" x="478" y="312">loaded from</text>
+  <rect class="dl-tile" x="336" y="328" width="260" height="64" rx="10"/>
+  <text class="dl-name" x="348" y="349">a session</text>
+  <text class="dl-detail" x="348" y="364">reads the installed copy and never this</text>
+  <text class="dl-detail" x="348" y="379">checkout</text>
+</svg>
+</div>
+<figcaption>No arrow reaches a session from this checkout; only the installed copy is ever read.</figcaption>
+</figure>
   <!-- dg:source
 { "kind": "map",
   "caption": "No arrow reaches a session from this checkout; only the installed copy is ever read.",
@@ -98,7 +99,14 @@
 <section id="s3">
   <div class="sds-section-head"><h2>Parts</h2></div>
   <h3 id="the-manifest">The manifest</h3>
-  <p>Each plugin folder carries one manifest at <code>.claude-plugin/plugin.json</code>, holding a <code>name</code>, a <code>version</code>, a <code>description</code> and an <code>author</code>. The description is long on purpose. It is matched against the work at hand rather than browsed by a person, so it states in full what the plugin carries.</p>
+  <p>Each plugin folder carries one manifest at <code>.claude-plugin/plugin.json</code>, holding:</p>
+  <ul>
+    <li>a <code>name</code>;</li>
+    <li>a <code>version</code>;</li>
+    <li>a <code>description</code>;</li>
+    <li>an <code>author</code>.</li>
+  </ul>
+  <p>The description is long on purpose. It is matched against the work at hand rather than browsed by a person, so it states in full what the plugin carries.</p>
   <h3 id="version-the-version-names-what-is-publis">Version — The version names what is published</h3>
   <p>This repository releases at the version a plugin already carries, then moves the number. So the field answers <em>which bytes are installed</em>, and not <em>what am I building</em>. The four plugins carry one version and move together: a release moves all four, changed or not (rule RULE.CLAUDE_MARKETPLACE.DEVEX.007).</p>
   <h3 id="the-marketplace-entry">The marketplace entry</h3>
@@ -106,7 +114,14 @@
   <h3 id="installed-copy-the-installed-copy-and-wh">Installed copy — The installed copy, and what a wired path names</h3>
   <p>Installing reads an entry, copies that plugin's folder, and stores it where a session can read it. Everything a plugin wires names that folder through <code>CLAUDE_PLUGIN_ROOT</code> rather than through a path in this checkout, so a plugin works wherever it was installed. A command of the plugin is typed by the plugin's own name, because the plugin ships a launcher under that name in <code>bin/</code>, and no one types a path to the entry file. A plugin with a command line declares the tier of each command group in <code>tiers.json</code>.</p>
   <h3 id="contents-what-a-plugin-may-hold-and-what">Contents — What a plugin may hold, and what it owes</h3>
-  <p>A plugin folder holds any mix of the constructs this domain names, and owes none of them. <code>spn-devex</code> carries every one except <code>providers/</code>, which is why it is the folder to open to see what a full plugin looks like. <code>spn-apps</code> and <code>spn-infra</code> each carry a <code>providers/</code> folder and no <code>agents/</code>. Each construct is named by its own page, and none of them is described here.</p>
+  <p>A plugin folder holds any mix of the constructs this domain names, and owes none of them. Each construct is named by its own page, and none of them is described here. The folders to open are these:</p>
+  <div class="sds-scroll"><table>
+    <thead><tr><th>Plugin</th></tr></thead>
+    <tbody>
+      <tr><td><p><code>spn-devex</code></p><p>every construct except <code>providers/</code>, which is why it is the folder to open to see what a full plugin looks like</p></td></tr>
+      <tr><td><p><strong><code>spn-apps</code> and <code>spn-infra</code></strong></p><p>a <code>providers/</code> folder each, and no <code>agents/</code></p></td></tr>
+    </tbody>
+  </table></div>
 </section>
 
 <!-- 04 -->
@@ -135,7 +150,8 @@
       <tr><td><p>the foundation's plugins construct § The shape of a plugin, and its <code>04-plugins/02-shape.md</code></p><p>the Node realization of this construct's own shape — source beside a committed build, and a shared folder never installed on its own</p></td><td>MUST</td></tr>
     </tbody>
   </table></div>
-  <p>Try it: <code>spn-devex plugin partner check</code></p>
+  <p>Try it:</p>
+  <pre data-lang="sh">spn-devex plugin partner check</pre>
 </section>
 
 
@@ -143,4 +159,4 @@
 </div>
 </div>
 
-<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.js" integrity="sha384-MUUUVipJdxCmJyrxeNHKq8xMzGTvQ+TAsWDvN5w6TKPfuOUPtHk1E90wKCBZNRC7" crossorigin="anonymous"></script>
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.15.0/sds-docs.js" integrity="sha384-XYna7dQ9hUAzsp8poWNLetdO4Oyfh/cIKwuuh6sduxMcNDmnLGJ3zcw6DaG1IN9+" crossorigin="anonymous"></script>

@@ -116,7 +116,14 @@ A suite runs the script the way a moment runs it — as a process, handed a payl
 
 ### Replayed payloads — The payload a case replays sits beside the suites, once per event
 
-`tests/fixtures/payloads/<event>/` holds one recorded call per event this plugin wires — `orientation` · `pretooluse` · `closed` · `stop` — and a suite reads one rather than constructing its own. A payload is an input, never a generated answer, so a stale one is a fixture problem and never a passing case that stopped proving anything.
+`tests/fixtures/payloads/<event>/` holds one recorded call per event this plugin wires:
+
+- `orientation`
+- `pretooluse`
+- `closed`
+- `stop`
+
+A suite reads one rather than constructing its own. A payload is an input, never a generated answer, so a stale one is a fixture problem and never a passing case that stopped proving anything.
 
 ### Bundle cases — Two more cases prove the bundle, not one file
 
