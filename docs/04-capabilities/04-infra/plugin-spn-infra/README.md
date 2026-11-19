@@ -22,7 +22,19 @@
 | Surface Hook · Design Skill · Surface Refs | [spn-surface](../../02-surface/plugin-spn-surface/README.md) |
 | Stack Checks · Stack Tools · Stack Skills · Stack Refs | [spn-apps](../../03-apps/plugin-spn-apps/README.md) |
 
-Source folders, one per chapter: `.claude-plugin/plugin.json` for Plugin · `hooks/hooks.json` for Hooks · `skills/` for Skills · `scripts/` for Scripts — the gate, and the `lib/` holding every rule body because each is cloud-free · `refs/` for Refs · `providers/{aws,gcp}/` for Providers, a scripts half only · `tests/` for Tests. This plugin ships no `agents/` and no `scripts/tools/`, and each absence says so.
+Source folders, one per chapter:
+
+| Chapter | Source |
+| --- | --- |
+| Plugin | `.claude-plugin/plugin.json` |
+| Hooks | `hooks/hooks.json` |
+| Skills | `skills/` |
+| Scripts | `scripts/` — the gate, and the `lib/` holding every rule body because each is cloud-free |
+| Refs | `refs/` |
+| Providers | `providers/{aws,gcp}/`, a scripts half only |
+| Tests | `tests/` |
+
+This plugin ships no `agents/` and no `scripts/tools/`, and each absence says so.
 
 <!-- spn:generated contents — do not edit inside these markers; `docs.ts face` writes it -->
 | Chapter | Realizes | Carries | Status |

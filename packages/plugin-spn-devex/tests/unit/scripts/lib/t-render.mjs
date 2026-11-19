@@ -78,8 +78,8 @@ ok("a table that is not the Terms table carries no such class",
 const { cutVersions, integrityTable, newestVersion, linesFor } = await import(pathToFileURL(resolve(HERE, "..", "plugin-support-lib", "src", "lib", "page-styles.ts")).href);
 const { readFileSync } = await import("node:fs");
 const STYLES_HOME = resolve(HERE, "src", "styles");
-ok("the newest version of the shared styles is 1.14.0, so every page writer links it",
-  newestVersion(Object.keys(cutVersions(STYLES_HOME))) === "1.14.0");
+ok("the newest version of the shared styles is 1.15.0, the docs design language's, so every page writer links it",
+  newestVersion(Object.keys(cutVersions(STYLES_HOME))) === "1.15.0");
 ok("and 1.10.0 serves the Terms shares: a fixed layout, and the stacked rows under 40rem",
   /table\.sds-terms\{table-layout:fixed\}|table\.sds-terms\s*\{[^}]*table-layout:\s*fixed/.test(readFileSync(resolve(HERE, "..", "..", "public", "assets", "docs", "1.10.0", "sds-docs.css"), "utf8"))
   && readFileSync(resolve(HERE, "..", "..", "public", "assets", "docs", "1.10.0", "sds-docs.css"), "utf8").includes("max-width:40rem"));
@@ -127,6 +127,34 @@ ok("red: several columns of sentences are a paragraph each, led by the column's 
   ok("[MKT.SCRIPTS.202] a bare parenthesis stays text", bare.includes("(rule RULE.DEVEX.AGENT.113)") && !bare.includes('id="RULE.DEVEX.AGENT.113"'));
   ok("[MKT.SCRIPTS.202] a parenthesis that does not read stays text",
     produced("A page (rule RULE.DEVEX.AGENT.113 · MUST · since:2026).\n").includes("(rule RULE.DEVEX.AGENT.113 · MUST · since:2026)"));
+}
+
+// The blocks that have a markdown spelling: catalog, cards, next, and a file frame (RULE.DEVEX.WORKSPACE.532).
+{
+  console.log("=== the page renderer — catalog, cards, next and a file frame, in markdown");
+  const catalog = produced(fence("catalog", "Hub | the page every path starts from | hub-template.html\nGuide | stages and steps"));
+  ok("[RULE.DEVEX.WORKSPACE.532] a catalog fence is one tile a line: the name, its line, its literal in code",
+    catalog.includes('<div class="sds-tiles">') && catalog.includes('<div class="sds-tile"><h4>Hub</h4><p>the page every path starts from</p><p class="sds-small"><code>hub-template.html</code></p></div>')
+    && catalog.includes('<div class="sds-tile"><h4>Guide</h4><p>stages and steps</p></div>'), catalog);
+  ok("[RULE.DEVEX.WORKSPACE.532] a catalog line draws no code line when it has no literal", !catalog.split("\n").find((row) => row.includes("<h4>Guide</h4>"))?.includes("<code>"), catalog);
+  const cards = produced(fence("cards", "Reading path | what it covers | path.md\nOther | a second door | other.md"));
+  ok("[RULE.DEVEX.WORKSPACE.532] a cards fence is a tile a door, its title and its Read more both links",
+    cards.includes('<h4><a href="path.md">Reading path</a></h4><p>what it covers</p><a class="sds-more" href="path.md">Read more &rarr;</a>') && cards.includes('href="other.md">Read more'), cards);
+  ok("[RULE.DEVEX.WORKSPACE.532] one grid holds every card of the fence", (cards.match(/<div class="sds-tiles">/g) ?? []).length === 1, cards);
+  const next = produced(fence("next", "previous | The page before | before.md\nnext | The page after | after.md"));
+  ok("[RULE.DEVEX.WORKSPACE.532] a next fence is the two doors, previous then next",
+    next.includes('<div class="sds-nextnav">') && next.includes('<a class="sds-nextnav-card" href="before.md"><span class="sds-direction">&larr; Previous</span><span class="sds-title">The page before</span></a>')
+    && next.includes('<a class="sds-nextnav-card sds-next" href="after.md"><span class="sds-direction">Next &rarr;</span><span class="sds-title">The page after</span></a>'), next);
+  const file = produced("```ts file=packages/x/src/theme.ts\nexport const size = 26;\n```\n");
+  ok("[RULE.DEVEX.WORKSPACE.532] a fence tagged with file=<path> stands in a FILE frame: the path as the title, the language as the badge, the code plain",
+    file.includes('<figure class="sds-file">') && file.includes('<span class="sds-file-path">packages/x/src/theme.ts</span><span class="sds-file-lang">ts</span>') && file.includes('<pre data-lang="ts">export const size = 26;</pre>'), file);
+  const diff = produced("```diff file=docs/a.md\n- today\n+ proposed\n```\n");
+  ok("[RULE.DEVEX.WORKSPACE.532] a diff stands in a FILE frame the same way", diff.includes('<span class="sds-file-lang">diff</span>') && diff.includes('data-lang="diff"'), diff);
+  const plain = produced(fence("ts", "export const size = 26;"));
+  ok("[RULE.DEVEX.WORKSPACE.532] a code fence with no file= stays a bare code block, no frame", !plain.includes("sds-file") && plain.includes('<pre data-lang="ts">'), plain);
+  const empty = renderPage({ block: { id: "probe", title: "Probe", status: "DONE", lenses: ["ARCHITECT"], summary: "What a probe is." }, markdown: `# Probe\n\nThe lead.\n\n## What it is\n\n${fence("cards", "")}`, workspace: "/workspace", location: "/workspace/docs/02-constructs/probe.md",
+    furniture: { stylesheet: "", script: "", footer: "" } });
+  ok("[RULE.DEVEX.WORKSPACE.532] an empty cards fence is a finding, not a silent gap", empty.findings.some((f) => f.message.includes("`cards` block with no line")), JSON.stringify(empty.findings));
 }
 
 console.log(failed ? `\n  ${failed} of ${total} FAILED — t-render` : `\n  all ${total} passed — t-render`);

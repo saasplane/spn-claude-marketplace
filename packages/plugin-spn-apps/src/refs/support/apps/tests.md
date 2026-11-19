@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/02-apps/06-tests.md",
-      "seen": "a4e1dc01"
+      "seen": "6eca7775"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/06-tests/",
@@ -181,7 +181,7 @@ A suite that passes tells nothing until it says what it proved. A run owes two o
 | the run file, `tests/.output/<tier>/runs/<run>.json` — the run's name, the ids and outcome of each case, the tier, the phase, the environment, the instant, the content it ran on and whether a selection narrowed it | the agent, told the run's name, writing `Status` and `Updated at` (`<time> · <run>`) from it | the run said nothing, and a claim with no evidence behind it is a finding |
 | the framework's own readable page, at a named place | a person, and the pipeline that uploads it — what gets read in a pipeline, where no agent runs | the run still proved what it proved; only the reading of it is poorer |
 
-**A pipeline produces evidence and never writes a document.** Nothing in a pipeline judges what a result means, and a pipeline committing into the repository it built from commits into its own trigger — the artifact is published, a row keeps whatever the last scan wrote, and the release gate still fails the build on a claim with no evidence behind it.
+**A pipeline produces evidence and never writes a document.** Nothing in a pipeline judges what a result means (an agent reads a pull request's failed checks afterwards and proposes the fix, as the source-control chapter states), and a pipeline committing into the repository it built from commits into its own trigger — the artifact is published, a row keeps whatever the last scan wrote, and the release gate still fails the build on a claim with no evidence behind it.
 
 ## Case titles carry the id and the sentence
 

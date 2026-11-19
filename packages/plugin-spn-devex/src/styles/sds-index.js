@@ -4,12 +4,31 @@
    `docs index` writes from the pages on disk. Nothing is kept in the address, and nothing is remembered between
    visits. The index never reads what a frame holds, because a page opened from disk is a stranger to the page
    that frames it. Every class it sets or reads opens with sds-. */
+/* THE MODE IS THE DESIGN SYSTEM'S, as on every page: an index that names none takes the reader's setting and follows it. */
+(function(){
+  var root=document.documentElement;if(!root||root.getAttribute('data-mode')||!window.matchMedia)return;
+  var ask=window.matchMedia('(prefers-color-scheme: dark)');
+  function set(){if(root.hasAttribute('data-mode-chosen'))return;root.setAttribute('data-mode',ask.matches?'dark':'light');}
+  set();if(ask.addEventListener)ask.addEventListener('change',set);
+})();
 (function(){
   var store=document.getElementById('index-data'),whole=document.getElementById('index');
   var tree=document.getElementById('index-tree'),bar=document.getElementById('index-tabs');
   var panes=document.getElementById('index-panes'),toggle=document.getElementById('index-toggle');
   var marks=document.getElementById('index-marks');
   if(!store||!whole||!tree||!bar||!panes)return;
+
+  /* THE MODE SWITCH: light or dark for the index and every page it holds, sent to each frame as a message. */
+  var root=document.documentElement;
+  function modeNow(){return root.getAttribute('data-mode')==='dark'?'dark':'light';}
+  function tellMode(frame){if(!root.hasAttribute('data-mode-chosen')||!frame.contentWindow)return;frame.contentWindow.postMessage({sds:'mode',mode:modeNow()},'*');}
+  var modeButton=document.createElement('button');modeButton.type='button';modeButton.className='sds-index-toggle sds-index-mode';
+  function drawModeButton(){var next=modeNow()==='dark'?'light':'dark';modeButton.textContent='';modeButton.appendChild(icon(next==='dark'?'moon':'sun'));modeButton.title='Switch to '+next;modeButton.setAttribute('aria-label','Switch the index and its pages to '+next);}
+  modeButton.addEventListener('click',function(){root.setAttribute('data-mode-chosen','');root.setAttribute('data-mode',modeNow()==='dark'?'light':'dark');drawModeButton();Array.prototype.forEach.call(panes.querySelectorAll('iframe'),tellMode);});
+  if(toggle&&toggle.parentNode)toggle.parentNode.insertBefore(modeButton,toggle);
+  if(window.matchMedia)window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change',function(){setTimeout(drawModeButton,0);});
+  /* An index shown inside another index takes that index's mode the same way, and passes it on to its own frames. */
+  window.addEventListener('message',function(event){var data=event.data;if(event.source!==window.parent||window.parent===window||!data||data.sds!=='mode')return;if(data.mode!=='light'&&data.mode!=='dark')return;root.setAttribute('data-mode-chosen','');root.setAttribute('data-mode',data.mode);drawModeButton();Array.prototype.forEach.call(panes.querySelectorAll('iframe'),tellMode);});
   var data=JSON.parse(store.textContent);
   var tabs=[],rows=[],groups=[],shown=null,clock=0;
   var narrow=window.matchMedia?window.matchMedia('(max-width:60rem)'):null;
@@ -40,8 +59,11 @@
     chevron:['m9 18 6-6-6-6'],
     out:['M7 7h10v10','M7 17 17 7'],
     copy:['M10 8h10a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H10a2 2 0 0 1-2-2V10a2 2 0 0 1 2-2z','M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2'],
-    check:['M20 6 9 17l-5-5']
+    check:['M20 6 9 17l-5-5'],
+    sun:['M12 8a4 4 0 1 0 0 8a4 4 0 1 0 0-8','M12 2v2','M12 20v2','m4.93 4.93 1.41 1.41','m17.66 17.66 1.41 1.41','M2 12h2','M20 12h2','m6.34 17.66-1.41 1.41','m19.07 4.93-1.41 1.41'],
+    moon:['M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z']
   };
+  setTimeout(function(){drawModeButton();},0);
   function icon(name){
     var drawing=document.createElementNS(drawn,'svg');drawing.setAttribute('class','sds-ico');
     drawing.setAttribute('viewBox','0 0 24 24');drawing.setAttribute('aria-hidden','true');drawing.setAttribute('focusable','false');
@@ -72,18 +94,18 @@
   /* The three groups of the tree are small headings with their count, and they never fold; a group inside them
      carries the grid mark and a chevron, and folds. */
   function fold(node,into,top){
-    var box=document.createElement('details');box.className='sds-tree-group';box.open=top||!node.folded;
+    var box=document.createElement('details');box.className='sds-tree-group';box.open=top||(!node.folded&&!(into.hasAttribute&&into.hasAttribute('data-first')));
     var head=document.createElement('summary');
     var name=document.createElement('span');name.textContent=node.label;head.appendChild(name);
     if(top){
       var count=document.createElement('span');count.className='sds-tree-count';count.textContent=pagesUnder(node);head.appendChild(count);
       head.addEventListener('click',function(event){event.preventDefault();});
     }else{
-      head.className='sds-tree-grouphead';head.insertBefore(icon('grid'),name);
+      head.className='sds-tree-grouphead';if(into.hasAttribute&&into.hasAttribute('data-first'))head.insertBefore(icon('grid'),name);
       var turn=icon('chevron');turn.classList.add('sds-tree-turn');head.appendChild(turn);
     }
     box.appendChild(head);
-    var kids=document.createElement('div');kids.className='sds-tree-kids';
+    var kids=document.createElement('div');kids.className='sds-tree-kids';if(top)kids.setAttribute('data-first','');
     node.children.forEach(function(child){place(child,kids);});
     if(node.note){var note=document.createElement('p');note.className='sds-tree-note';note.textContent=node.note;kids.appendChild(note);}
     box.appendChild(kids);into.appendChild(box);
@@ -93,7 +115,7 @@
     var row=document.createElement('div');row.className='sds-tree-row';
     var link=document.createElement('a');link.className='sds-tree-link';link.href=unfilled(entry)?'#':address(entry);
     var words=document.createElement('span');words.textContent=entry.label;
-    link.appendChild(icon(kindIcon(entry)));link.appendChild(words);
+    if(into.hasAttribute&&into.hasAttribute('data-first'))link.appendChild(icon(kindIcon(entry)));link.appendChild(words);
     if(entry.title)link.title=entry.title;
     /* A plain click opens the page in the tab that is shown. A click with a key held is left to the browser,
        but not on a slot, which has no address to give the browser. */
@@ -137,6 +159,7 @@
     var away=document.createElement('button');away.type='button';away.className='sds-tab-copy sds-tab-away';away.appendChild(icon('out'));
     var close=document.createElement('button');close.type='button';close.className='sds-tab-close';close.textContent='×';
     var frame=document.createElement('iframe');frame.className='sds-pane';frame.hidden=true;
+    frame.addEventListener('load',function(){tellMode(frame);});
     var tab={wrap:wrap,title:title,copy:copy,away:away,close:close,frame:frame,note:null,slot:false,entry:null,opened:0};
     title.addEventListener('click',function(){show(tab);});
     copy.addEventListener('click',function(){copyAddress(tab);});

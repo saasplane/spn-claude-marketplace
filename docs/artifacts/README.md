@@ -15,7 +15,16 @@
 
 You consult a pocket; you never read it through. That is why it carries no number, and why it sits outside the five seats the 📖 walk crosses in order.
 
-**The folder set is fixed**: `docs/`, `guides/`, `reports/` and nothing else, beside the one `index.html`. A folder here is earned, so this pocket carries only what this repository actually authors — today that is the concept hub, one overview per domain, and the construct pages produced from their seat files.
+**The folder set is fixed**, and nothing else sits beside the one `index.html`:
+
+```tree
+index.html
+docs/
+guides/
+reports/
+```
+
+A folder here is earned, so this pocket carries only what this repository actually authors — today that is the concept hub, one overview per domain, and the construct pages produced from their seat files.
 
 ## Overviews
 

@@ -91,4 +91,8 @@ This page answers what this plugin claims about itself and what its version mean
 | the foundation's `02-delivery.md` § The set a repo gets is derived from its own claim | a workspace never types a plugin name | MUST |
 | the foundation's plugins construct § The shape of a plugin, and its `04-plugins/02-shape.md` | source beside a committed build, one command entry, a shared folder never installed on its own | MUST |
 
-Try it: `spn-devex plugin partner check`
+Try it:
+
+```sh
+spn-devex plugin partner check
+```

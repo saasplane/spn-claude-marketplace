@@ -116,4 +116,8 @@ This page answers how this plugin proves itself and how the folder is arranged. 
 | the foundation's `02-delivery.md` § When an edit becomes behaviour | a suite is run from this checkout, so it proves the source rather than an installed copy | MUST |
 | the foundation's test construct § The test tree, and its `04-plugins/02-shape.md` | the staleness case, the parity case, the payload fixture, and the shared harness every plugin's tests owe once it builds | MUST |
 
-Try it: `node packages/plugin-spn-apps/tests/run.mjs`
+Try it:
+
+```sh
+node packages/plugin-spn-apps/tests/run.mjs
+```

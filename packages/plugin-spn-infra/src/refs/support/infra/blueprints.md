@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-infra/03-blueprints.md",
-      "seen": "d452ed7b"
+      "seen": "6848f535"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/03-blueprints/",
@@ -144,7 +144,7 @@ An environment names the workload it belongs to; nothing else about it — not i
 XS · SM · MD · LG · XL · 2XL · 3XL
 ```
 
-Seven sizes, one ladder for both workloads — seven rather than three, because a three-rung ladder collapses production-at-launch and production-at-scale into one letter, which is exactly the moment a product needs room to grow. **A size is a name, not a number** — the library ships what each one means, the organization may change that or add a size of its own in its catalog, and retuning a size changes no platform's declaration (`RULE.SUPPORT.INFRA.150` · MUST · skill:spn-infra/implement: the organization owns the catalog, each platform chooses from it).
+Seven sizes, one ladder for both workloads — seven rather than three, because a three-rung ladder collapses production-at-launch and production-at-scale into one letter, which is exactly the moment a product needs room to grow. **A size is a name, not a number** — the library ships what each one means, the organization may change that or add a size of its own in its catalog, and retuning a size changes no platform's declaration (`RULE.SUPPORT.INFRA.150` · MUST · skill:spn-infra/implement), the organization owning the catalog and each platform choosing from it.
 
 **A burstable size is refused in production, by name** (`RULE.SUPPORT.INFRA.149` · MUST · skill:spn-infra/implement). `XS` and `SM` are burstable machines, so production refuses them.
 

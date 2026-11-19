@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/02-scm.md",
-      "seen": "93499a43"
+      "seen": "bcfdaa3b"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/01-function/02-scm.md",
@@ -116,6 +116,8 @@ Protection rules are not conventions a team agrees to follow. They are protectio
 **Two access tiers exist, and nothing between them.** `git-admin` grants write access, and may bypass review only by merging a pull request (`bypass_mode: pull_request`), never by pushing; the host records every bypass. `git-dev` grants write access with no bypass at all, for everyone doing ordinary work. **Neither tier bypasses a required check — MUST.** The checks jobs are required on `develop` and on `main` and are never bypassed, except for a promotion whose head already passed them on `develop`. The review bypass stays for a solo merge until beta. A middle tier would be a way to be partly exempt, which is a state nobody can reason about during an incident.
 
 **Each branch carries two rulesets, because a bypass actor reaches every rule in its ruleset.** `<branch>-protection` holds review and the branch rules (on `main`, that only `develop`, `qa`, `uat` and a `hotfix/*` merge into it), and `git-admin` may bypass it by pull request. `<branch>-checks` holds the required checks and has no bypass actor, so a failing check blocks the merge for every caller, administrators included. Review keeps its bypass because GitHub never lets an author approve their own pull request: with one member, a review nobody may bypass would block every merge. A solo merge still arrives by pull request, passes every check and is recorded, and review becomes real the day a second member joins, with no change to any ruleset.
+
+**The agent reads a pull request's failed checks and proposes the fix; the pipeline itself stays agent-free.** A person asks, the agent reads which required check failed and why, and it proposes a change on the workstream's branch for the person to approve. The checks run the same with nobody there, so a red check means the same whoever reads it.
 
 ## The delivery path
 

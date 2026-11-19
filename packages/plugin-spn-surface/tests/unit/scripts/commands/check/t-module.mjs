@@ -28,17 +28,17 @@ const module = (name, folders) => {
 console.log("=== check module — a folder outside a module's taxonomy");
 const bad = module("bad", ["assets/drawings/home", "entry/ui", "images"]);
 const refused = run(bad);
-ok("a folder beside assets/ and entry/ is refused", refused.code === 1 && refused.out.trim() === `REFUSED folder-outside-taxonomy ${bad}/images: a module holds \`assets/\` and \`entry/\` only; move the files into the folder of their kind`, `exit ${refused.code}: ${refused.out.trim()}`);
+ok("[MKT.SCRIPTS.605] a folder beside assets/ and entry/ is refused", refused.code === 1 && refused.out.trim() === `REFUSED folder-outside-taxonomy ${bad}/images: a module holds \`assets/\` and \`entry/\` only; move the files into the folder of their kind`, `exit ${refused.code}: ${refused.out.trim()}`);
 
 const mixed = module("mixed", ["assets/drawings/home", "entry/ui"]);
 writeFileSync(join(mixed, "assets", "drawings", "stray.svg"), "<svg/>");
 const second = run(mixed);
-ok("an assets folder holding folders and files is refused", second.code === 1 && second.out.includes("holds folders or files, never both"), second.out.trim());
+ok("[MKT.SCRIPTS.605] an assets folder holding folders and files is refused", second.code === 1 && second.out.includes("holds folders or files, never both"), second.out.trim());
 
 const good = module("good", ["assets/language", "assets/drawings/home", "entry/ui"]);
 writeFileSync(join(good, "assets", "language", "design-language.json"), "{}\n");
 const fixed = run(good);
-ok("assets/ and entry/ with folders by kind passes", fixed.code === 0 && fixed.out.startsWith("OK "), `exit ${fixed.code}: ${fixed.out.trim()}`);
+ok("[MKT.SCRIPTS.605] assets/ and entry/ with folders by kind passes", fixed.code === 0 && fixed.out.startsWith("OK "), `exit ${fixed.code}: ${fixed.out.trim()}`);
 
 console.log(failed ? `\n  ${failed} of ${total} FAILED` : `\n  all ${total} passed`);
 process.exit(failed ? 1 : 0);

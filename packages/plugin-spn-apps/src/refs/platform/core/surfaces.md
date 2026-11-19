@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/03-platform/01-core/03-surfaces.md",
-      "seen": "f0167c70"
+      "seen": "ff96d9fb"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/03-platform/01-core/03-surfaces/",
@@ -142,4 +142,4 @@ An unreachable vendor refuses the request — the harsher of the two readings, a
 
 ## Left out
 
-The full DNS grammar for touchpoints (`{env}-{tenant}.{spd}`, pretty names as site entries, custom domains outside the zone) is left out — it is infra-plane realization detail that an integrator reads off the org app site rather than composes by hand. A platform should own two domains, the marketing site on its own (`RULE.SUPPORT.INFRA.019` · SHOULD); an organization with one domain may put its home there, at the costs the infra coordinates name. The nine platform modules' individual dependency graph is left out beyond naming them; a module's own contract is the place to read what it exposes.
+The full DNS grammar for touchpoints (`{env}-{tenant}.{spd}`, pretty names as site entries, custom domains outside the zone) is left out — it is infra-plane realization detail that an integrator reads off the org app site rather than composes by hand. A platform should own two domains, the marketing site on its own (`RULE.SUPPORT.INFRA.019` · GUIDE); an organization with one domain may put its home there, at the costs the infra coordinates name. The nine platform modules' individual dependency graph is left out beyond naming them; a module's own contract is the place to read what it exposes.

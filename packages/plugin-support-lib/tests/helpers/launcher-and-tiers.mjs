@@ -57,7 +57,7 @@ export function tiersCases(ok, pluginDir) {
     JSON.stringify(Object.keys(declared).sort()) === '["commands","groups"]', JSON.stringify(Object.keys(declared)));
 
   const folders = groupFolders(pluginDir);
-  ok("the keys of `groups` are exactly the folders under src/scripts/commands/",
+  ok("[MKT.TESTS.28] the keys of `groups` are exactly the folders under src/scripts/commands/",
     JSON.stringify(Object.keys(declared.groups).sort()) === JSON.stringify(folders),
     `declared ${JSON.stringify(Object.keys(declared.groups).sort())} against ${JSON.stringify(folders)}`);
 

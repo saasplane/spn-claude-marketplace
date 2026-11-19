@@ -276,7 +276,7 @@ console.log("\n=== 003 — a preview's header shows the arc's status");
   ok("its script writes it, and names the preview", lines.join() === "open/031-probe/notes/N001/preview.html: wrote the arc's status", lines.join(" | "));
   ok("green: 003 then finds nothing", m003.check(root).length === 0, m003.check(root).join(" | "));
   ok("the preview reads Status DECIDED, the arc's own, linking its row, and its Arc fact is the linked badge after the type",
-    readFileSync(preview, "utf8").includes(`<span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Preview</span><span class="sds-separator">|</span><span class="sds-label">Arc:</span> <a class="sds-badge" href="../../approach.html#N001">N001</a><span class="sds-separator">|</span><span class="sds-label">Progress:</span> <span class="sds-progress sds-step-1"><span class="sds-chip-bar"><i style="width:0%"></i></span> 0 of 2 landed</span><span class="sds-state"><span class="sds-label">Status:</span> <a class="sds-badge sds-status sds-decided" href="../../approach.html#N001">DECIDED</a></span></span>`), readFileSync(preview, "utf8"));
+    readFileSync(preview, "utf8").includes(`<span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Preview</span><span class="sds-separator">|</span><span class="sds-label">Arc:</span> <a class="sds-badge" href="../../approach.html#N001">N001</a><span class="sds-separator">|</span><span class="sds-label">Progress:</span> <span class="sds-progress sds-step-1"><span class="sds-chip-bar"><i style="--share:0%"></i></span> 0 of 2 landed</span><span class="sds-state"><span class="sds-label">Status:</span> <a class="sds-badge sds-status sds-decided" href="../../approach.html#N001">DECIDED</a></span></span>`), readFileSync(preview, "utf8"));
   ok("a closed workstream's preview stays as it closed", readFileSync(join(root, ".spndevex/workstreams/closed/020-done/notes/N001/preview.html"), "utf8") === old);
 }
 
@@ -576,8 +576,8 @@ console.log("\n=== the preview template's masthead carries Progress between Arc 
 {
   const { previewProgress } = await import("../../../../src/scripts/lib/workstream.ts");
   const template = readFileSync(join(import.meta.dirname, "..", "..", "..", "..", "src", "refs", "devex", "workspace", "docs", "templates", "workstream", "approach-preview-template.html"), "utf8");
-  const written = previewProgress(7, 10).replace("sds-step-4", "sds-step-{{step}}").replace("width:70%", "width:{{pct}}%").replace("7 of 10", "{{done}} of {{total}}");
-  ok("[MKT.SCRIPTS.397] the template's masthead line holds the writer's Progress markup, after Arc and before Shown", template.includes(`</a><span class="sds-separator">|</span>${written}<span class="sds-separator">|</span><span class="sds-label">Shown:</span>`), written);
+  const written = previewProgress(7, 10).replace("sds-step-4", "sds-step-{{step}}").replace("--share:70%", "--share:{{pct}}%").replace("7 of 10", "{{done}} of {{total}}");
+  ok("[MKT.SCRIPTS.397] the template's masthead line holds the writer's Progress markup, after Arc and before Shown", [written, written.replace("--share:{{pct}}%", "width:{{pct}}%")].some((line) => template.includes(`</a><span class="sds-separator">|</span>${line}<span class="sds-separator">|</span><span class="sds-label">Shown:</span>`)), written);
 }
 
 console.log(failed ? `\n  ${failed} of ${total} FAILED — migration` : `\n  all ${total} passed — migration`);

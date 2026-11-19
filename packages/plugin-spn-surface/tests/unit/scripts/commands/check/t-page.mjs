@@ -45,44 +45,44 @@ const refused = (label, run, line) => ok(label, run.code === 1 && run.out.trim()
 const passes = (label, run) => ok(label, run.code === 0 && run.out.startsWith("OK spec.json:"), `exit ${run.code}: ${run.out.trim()}`);
 
 console.log("=== check page — a raw colour in a drawing");
-refused("a hex colour in a drawing is refused with its line", check(section({}, hero()), { "plane.svg": svg('<rect x="1" y="1" width="9" height="9" fill="#084A75"/>') }),
+refused("[MKT.SCRIPTS.599] a hex colour in a drawing is refused with its line", check(section({}, hero()), { "plane.svg": svg('<rect x="1" y="1" width="9" height="9" fill="#084A75"/>') }),
   "REFUSED raw-colour plane.svg:2: #084A75 written in the drawing; use a theme token, as var(--...) or currentColor");
-passes("a drawing in tokens and currentColor passes", check(section({}, hero()), { "plane.svg": svg('<rect x="1" y="1" width="9" height="9" style="fill:var(--card)" stroke="currentColor"/>') }));
+passes("[MKT.SCRIPTS.599] a drawing in tokens and currentColor passes", check(section({}, hero()), { "plane.svg": svg('<rect x="1" y="1" width="9" height="9" style="fill:var(--card)" stroke="currentColor"/>') }));
 
 console.log("\n=== check page — a class on a design-system unit");
-refused("a className on a unit is refused", check(section({}, hero({ className: "bg-blue-900" }))),
+refused("[MKT.SCRIPTS.599] a className on a unit is refused", check(section({}, hero({ className: "bg-blue-900" }))),
   'REFUSED class-on-unit /sections[0]/children[0] DSFeature: className="bg-blue-900" on a design-system unit; the unit takes its look from its props and the theme, never a class');
-passes("the same unit without the class passes", check(section({}, hero())));
+passes("[MKT.SCRIPTS.599] the same unit without the class passes", check(section({}, hero())));
 
 console.log("\n=== check page — an icon outside the app's set");
-refused("an icon name the app's set does not hold is refused", check(section({}, { unit: "DSIconBadge", props: { icon: "lightning-bolt" } })),
+refused("[MKT.SCRIPTS.600] an icon name the app's set does not hold is refused", check(section({}, { unit: "DSIconBadge", props: { icon: "lightning-bolt" } })),
   'REFUSED icon-outside-set /sections[0]/children[0] DSIconBadge: icon "lightning-bolt" is not in lucide-react 1.52.0, the set this app carries');
-passes("an icon the set holds passes", check(section({}, { unit: "DSIconBadge", props: { icon: "zap" } })));
-refused("a drawing offered as an icon with other paths is refused", check(section({}, { unit: "DSIconBadge", props: { icon: { media: "bolt.svg", icon: "zap" } } }), { "bolt.svg": svg('<path d="M1 1h9" stroke="currentColor"/>') }),
+passes("[MKT.SCRIPTS.600] an icon the set holds passes", check(section({}, { unit: "DSIconBadge", props: { icon: "zap" } })));
+refused("[MKT.SCRIPTS.600] a drawing offered as an icon with other paths is refused", check(section({}, { unit: "DSIconBadge", props: { icon: { media: "bolt.svg", icon: "zap" } } }), { "bolt.svg": svg('<path d="M1 1h9" stroke="currentColor"/>') }),
   "REFUSED icon-outside-set bolt.svg: its paths are not lucide-react 1.52.0's \"zap\"; the app's set is the only icon source");
 
 console.log("\n=== check page — a hero form its media does not call for");
-refused("a scene in a split hero is refused", check(section({}, hero({ mediaNode: { media: "plane.svg", kind: "scene" } }), ), undefined),
+refused("[MKT.SCRIPTS.601] a scene in a split hero is refused", check(section({}, hero({ mediaNode: { media: "plane.svg", kind: "scene" } }), ), undefined),
   "REFUSED hero-form /sections[0]/children[0] DSFeature: a scene calls for type BACKDROP, the hero says SPLIT_END");
-passes("a scene in a backdrop hero passes", check(section({}, hero({ type: "BACKDROP", mediaNode: { media: "plane.svg", kind: "scene" } }))));
+passes("[MKT.SCRIPTS.601] a scene in a backdrop hero passes", check(section({}, hero({ type: "BACKDROP", mediaNode: { media: "plane.svg", kind: "scene" } }))));
 
 console.log("\n=== check page — two emphases in one section");
-refused("a primary band and a highlight in one section are refused", check(section({ color: "PRIMARY" }, { unit: "DSFeature", props: { pageLevel: "SECTION", highlight: true } })),
+refused("[MKT.SCRIPTS.602] a primary band and a highlight in one section are refused", check(section({ color: "PRIMARY" }, { unit: "DSFeature", props: { pageLevel: "SECTION", highlight: true } })),
   "REFUSED RULE.SUPPORT.SURFACE.438 /sections[0] DSSectionContainer: 2 emphases in one section (DSSectionContainer emphasis band + DSFeature highlight); a section takes one");
-passes("one emphasis in the section passes", check(section({ color: "PRIMARY" }, { unit: "DSFeature", props: { pageLevel: "SECTION" } })));
+passes("[MKT.SCRIPTS.602] one emphasis in the section passes", check(section({ color: "PRIMARY" }, { unit: "DSFeature", props: { pageLevel: "SECTION" } })));
 
 console.log("\n=== check page — media on the wrong level");
-refused("a hero scene on a feature that is no hero is refused", check(section({}, { unit: "DSFeature", props: { pageLevel: "SECTION", mediaNode: { media: "plane.svg", kind: "scene" } } })),
+refused("[MKT.SCRIPTS.601] a hero scene on a feature that is no hero is refused", check(section({}, { unit: "DSFeature", props: { pageLevel: "SECTION", mediaNode: { media: "plane.svg", kind: "scene" } } })),
   "REFUSED media-level /sections[0]/children[0] DSFeature: the scene plane.svg is on a feature's media; a hero scene goes through the section's media, edge to edge");
-refused("a sheet on a section's media is refused", check(section({ mediaNode: { media: "plane.svg", kind: "sheet" } })),
+refused("[MKT.SCRIPTS.603] a sheet on a section's media is refused", check(section({ mediaNode: { media: "plane.svg", kind: "sheet" } })),
   "REFUSED media-level /sections[0] DSSectionContainer: the sheet plane.svg is on a section's media; a close-up or a sheet goes through the feature's media");
-passes("a sheet on the feature's media passes", check(section({}, { unit: "DSFeature", props: { pageLevel: "SECTION", mediaNode: { media: "plane.svg", kind: "sheet" } } })));
+passes("[MKT.SCRIPTS.603] a sheet on the feature's media passes", check(section({}, { unit: "DSFeature", props: { pageLevel: "SECTION", mediaNode: { media: "plane.svg", kind: "sheet" } } })));
 
 console.log("\n=== check page — a drawing narrower than its section's content");
 const under = (width) => section({}, { unit: "DSFeature", props: { pageLevel: "SECTION", mediaNode: { media: "plane.svg", kind: "sheet", placement: "under", width } } });
-refused("a drawing 480 wide under the words in a 1120 section is refused", check(under(480), undefined, "--content", "1120"),
+refused("[MKT.SCRIPTS.604] a drawing 480 wide under the words in a 1120 section is refused", check(under(480), undefined, "--content", "1120"),
   "REFUSED under-placed plane.svg: drawn 480 wide under the words, narrower than the section's content (1120); draw it for the content width, lined up with what is above");
-passes("a drawing as wide as the content passes", check(under(1120), undefined, "--content", "1120"));
+passes("[MKT.SCRIPTS.604] a drawing as wide as the content passes", check(under(1120), undefined, "--content", "1120"));
 
 console.log(failed ? `\n  ${failed} of ${total} FAILED` : `\n  all ${total} passed`);
 process.exit(failed ? 1 : 0);

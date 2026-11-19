@@ -8,12 +8,12 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/",
-      "seen": "b24ba76d"
+      "seen": "1b6fbc9d"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/09-architecture-layouts/01-common/01-layout.md",
       "section": "The layout",
-      "seen": "85476cfe"
+      "seen": "f6a4ad00"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/08-architecture-containers/01-common/01-container.md",

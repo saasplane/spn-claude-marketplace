@@ -28,3 +28,4 @@ Every row below is declared and none is claimed: a run writes the last two cells
 | MKT.TESTS.06 | Architect | tell a tier nothing runs at from a tier somebody forgot | An absent tier has no folder at all, so no empty folder claims to be proof | NEGATIVE | UNIT | PLANNED | — |
 | MKT.TESTS.07 | Quality engineer | have a behaviour row's status written by a run rather than typed | A case whose title carries a row's id writes that row's result into `tests/.output/unit/runs/<run>.json`, under the name the caller gave | POSITIVE | UNIT | PLANNED | — |
 | MKT.TESTS.08 | Backend developer | prove a gate in the shape it actually ships in | A suite spawns the script as a process and reads what comes back, rather than importing a function | POSITIVE | UNIT | PLANNED | — |
+| MKT.TESTS.28 | Quality engineer | have the launcher's groups be the folders under the commands | The keys of `groups` are exactly the folders under `src/scripts/commands/` | POSITIVE | UNIT | PLANNED | — |

@@ -7,11 +7,11 @@ description: Write one of the five reports on a repository — coverage (how muc
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
-      "seen": "7beac2a2"
+      "seen": "bd28f6f7"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/05-report.md",
-      "seen": "f4053769"
+      "seen": "71066a1f"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
@@ -32,6 +32,11 @@ description: Write one of the five reports on a repository — coverage (how muc
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "Nothing is published unless the developer asks",
       "seen": "cd38f32f"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "section": "A page is written in two passes",
+      "seen": "3cff544c"
     }
   ]
 }
@@ -79,6 +84,8 @@ The block names the type with one `SPDocReportType` value: `COVERAGE` · `TESTS`
 ## Copy the template, then fill it
 
 **Start from `refs/devex/workspace/docs/templates/pages/report-template.html`.** It holds only the page's structure — its sections with their ids, the slots you fill, and the two lines that load the shared stylesheet and script — and no rule (`RULE.DEVEX.WORKSPACE.182` · MUST · check:doc-check). Every rule for filling it is in this skill.
+
+**Write a report in two passes, the text first and the blocks second** (`RULE.DEVEX.WORKSPACE.533` · MUST · skill:spn-devex/ideate). Write each section's text in plain sentences first, then give each part the block that shows it best from [`refs/devex/workspace/docs/blocks.md`](../../refs/devex/workspace/docs/blocks.md). A report's paragraphs hold the bound of an explaining page, 120 words beside another block and 200 alone (`RULE.DEVEX.WORKSPACE.531` · MUST · check:doc-check), and `spn-devex docs audit` names, as a SOFT `fit` finding, a paragraph that should have been a list, a table or a numbered list.
 
 **The page you write links the shared files, and holds no copy of them** (`RULE.DEVEX.WORKSPACE.214` · MUST · check:doc-check). The copy keeps the template's two lines: one links one version of `sds-docs.css` by its address, and the other loads `sds-docs.js` from the same version. The stylesheet gives the report its forms in both themes. The script shows the Generated time and builds the outline. A report needs no style of its own: every form it uses is in the shared stylesheet. A `style` attribute stays only where the template has one, such as the width of a column.
 

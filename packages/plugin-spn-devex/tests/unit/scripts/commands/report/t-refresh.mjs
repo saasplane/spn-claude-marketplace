@@ -75,7 +75,7 @@ const OLD_DIGEST = "sha256:0000000000000000";
 const VERDICT = '<p class="sds-verdict">Tests prove 9 of 9 behaviours. Nothing needs your decision.</p>';
 const tile = (label, count, of, bar = "") => of === null
   ? `    <div class="sds-side"><span class="sds-label">${label}</span><span class="sds-big">${count}</span></div>`
-  : `    <div class="sds-side"><span class="sds-label">${label}</span><div class="sds-side-numbers"><span class="sds-big">${count}<span class="sds-total"> / ${of}</span></span><span class="sds-percent">100%</span></div><div class="sds-bar"><i${bar} style="width:100%"></i></div></div>`;
+  : `    <div class="sds-side"><span class="sds-label">${label}</span><div class="sds-side-numbers"><span class="sds-big">${count}<span class="sds-total"> / ${of}</span></span><span class="sds-percent">100%</span></div><div class="sds-bar"><i${bar} style="--share:100%"></i></div></div>`;
 const cells = (values, marks = {}) => values.map((value, at) => `<td class="sds-number-cell${marks[at] ? ` ${marks[at]}` : ""}">${value}</td>`).join("");
 const table = (id, heading, columns, rows) => [
   `  <h3 id="${id}">${heading}</h3>`,
@@ -100,7 +100,7 @@ const page = (block, { tiles, legend, tables, measured = `<p>The digest was <cod
   '  <div class="sds-sides">', ...tiles, "  </div>",
   '  <div class="sds-breakdown">', '    <p class="sds-breakdown-title">The 9 behaviours, by state</p>',
   `    <div class="sds-breakdown-bar" role="img" aria-label="${legend.map(([, label]) => `${label} 9`).join(", ")}">`,
-  ...legend.map(([key, label]) => `      <span class="sds-breakdown-segment ${key}" style="flex-grow:9" title="${label}: 9 behaviours"></span>`),
+  ...legend.map(([key, label]) => `      <span class="sds-breakdown-segment ${key}" style="--grow:9" title="${label}: 9 behaviours"></span>`),
   "    </div>", '    <ul class="sds-breakdown-legend">',
   ...legend.map(([key, label]) => `      <li><i class="sds-breakdown-key ${key}"></i>${label} <b>9</b></li>`),
   "    </ul>", "  </div>",
@@ -159,7 +159,7 @@ const rowOf = (text, heading, name) => {
   return [...row.matchAll(/<td class="(sds-number-cell[^"]*)">([^<]*)<\/td>/g)].map((cell) => (cell[1] === "sds-number-cell" ? cell[2] : `${cell[2]}:${cell[1].slice("sds-number-cell ".length)}`)).join(" ");
 };
 const tileOf = (text, label) => (text.split("\n").find((line) => line.includes(`<span class="sds-label">${label}</span>`)) ?? "")
-  .replace(/<[^>]+>/g, (tag) => (/width|class="sds-(success|warning|error)"/.test(tag) ? tag : " ")).replace(/\s+/g, " ").trim();
+  .replace(/<[^>]+>/g, (tag) => (/--share|class="sds-(success|warning|error)"/.test(tag) ? tag : " ")).replace(/\s+/g, " ").trim();
 
 // ---------------------------------------------------------------------------- a tests report
 
@@ -184,12 +184,12 @@ console.log("=== report refresh — a tests report");
   const text = readFileSync(path, "utf8");
   ok("[MKT.SCRIPTS.81] the command exits 0 and says what it wrote", ran.code === 0 && /wrote/.test(ran.out) && ran.out.includes(measured.digest), ran.out);
   ok("[MKT.SCRIPTS.81] each tile carries its measured count, its total, its share and its bar",
-    tileOf(text, "SUCCESS") === "SUCCESS 1 / 4 25% <i style=\"width:25.0%\">" && tileOf(text, "FAILED") === "FAILED 1 / 4 25% <i class=\"sds-error\" style=\"width:25.0%\">"
-      && tileOf(text, "PLANNED") === "PLANNED 1 / 4 25% <i class=\"sds-warning\" style=\"width:25.0%\">", [tileOf(text, "SUCCESS"), tileOf(text, "FAILED"), tileOf(text, "PLANNED")].join(" · "));
+    tileOf(text, "SUCCESS") === "SUCCESS 1 / 4 25% <i style=\"--share:25.0%\">" && tileOf(text, "FAILED") === "FAILED 1 / 4 25% <i class=\"sds-error\" style=\"--share:25.0%\">"
+      && tileOf(text, "PLANNED") === "PLANNED 1 / 4 25% <i class=\"sds-warning\" style=\"--share:25.0%\">", [tileOf(text, "SUCCESS"), tileOf(text, "FAILED"), tileOf(text, "PLANNED")].join(" · "));
   ok("[MKT.SCRIPTS.81] the legend carries each state's count",
     ["SUCCESS", "FAILED", "PENDING", "PLANNED"].every((label) => new RegExp(`</i>${label} <b>1</b>`).test(text)), text.match(/<ul class="sds-breakdown-legend">[\s\S]*?<\/ul>/)?.[0]);
   ok("[MKT.SCRIPTS.81] the bar holds one segment for each state above 0, as wide as its count, and its label says each count",
-    (text.match(/<span class="sds-breakdown-segment /g) ?? []).length === 4 && text.includes('<span class="sds-breakdown-segment sds-result-error" style="flex-grow:1" title="FAILED: 1 behaviour"></span>')
+    (text.match(/<span class="sds-breakdown-segment /g) ?? []).length === 4 && text.includes('<span class="sds-breakdown-segment sds-result-error" style="--grow:1" title="FAILED: 1 behaviour"></span>')
       && text.includes('aria-label="SUCCESS 1, FAILED 1, PENDING 1, PLANNED 1"'), text.match(/<div class="sds-breakdown-bar"[\s\S]*?<\/div>/)?.[0]);
   ok("[MKT.SCRIPTS.81] By tier: each tier's row holds its runs and its counts, a gap cell is marked, and a tier nobody names reads 0",
     rowOf(text, "By tier", "Unit") === "1 3 2 1 0 1:sds-warning 1:sds-warning" && rowOf(text, "By tier", "Journey") === "1 1 1 0 1:sds-error 0 0"
@@ -254,8 +254,8 @@ console.log("\n=== report refresh — a coverage report");
   const text = readFileSync(path, "utf8");
   ok("[MKT.SCRIPTS.81] a coverage report is refreshed from `coverage measure`", ran.code === 0 && text.includes(measured.digest) && !text.includes(OLD_DIGEST), ran.out);
   ok("[MKT.SCRIPTS.81] a count tile holds its number alone, and a share tile is green only at the whole",
-    tileOf(text, "Written") === "Written 4" && tileOf(text, "Built") === "Built 3 / 4 75% <i style=\"width:75.0%\">"
-      && tileOf(text, "Proved") === "Proved 1 / 4 25% <i style=\"width:25.0%\">" && tileOf(text, "Not written") === "Not written 0",
+    tileOf(text, "Written") === "Written 4" && tileOf(text, "Built") === "Built 3 / 4 75% <i style=\"--share:75.0%\">"
+      && tileOf(text, "Proved") === "Proved 1 / 4 25% <i style=\"--share:25.0%\">" && tileOf(text, "Not written") === "Not written 0",
     ["Written", "Built", "Proved", "Not written"].map((label) => tileOf(text, label)).join(" · "));
   ok("[MKT.SCRIPTS.81] the breakdown is proved and not proved", text.includes("</i>Proved <b>1</b>") && text.includes("</i>Not proved <b>3</b>")
     && text.includes('aria-label="Proved 1, Not proved 3"'), text.match(/<ul class="sds-breakdown-legend">[\s\S]*?<\/ul>/)?.[0]);

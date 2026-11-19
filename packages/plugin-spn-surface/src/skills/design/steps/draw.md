@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/11-delivery-library/",
-      "seen": "3faf4161"
+      "seen": "804ee16d"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/04-architecture-names/",
@@ -11,11 +11,11 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/08-architecture-containers/",
-      "seen": "ff7992e4"
+      "seen": "522e6a83"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/09-architecture-layouts/",
-      "seen": "22235267"
+      "seen": "3c79ed09"
     }
   ]
 }
@@ -42,7 +42,7 @@ Its provenance is the foundation book's design library, names, and layout and co
 
 ## What the page is drawn from
 
-The design library holds one file for each layer of the design system that is drawn. The sixth layer, App, has no file of its own, and Core holds the choices of the theme. A page draws from what those files have published, and from nothing else.
+The design library holds one file for each layer of the design system that is drawn. The sixth layer, App, has no file of its own, and Core holds the choices of the theme. A page draws from what those files have published, and from nothing else. Each file follows the showcase's page model, so a unit is found by its name: a group of the sidebar is a page, a unit is a section on it, a version of the unit is a component of its set, and a case is an instance of a version named `cell · <key>`. A library cell is drawn by the plugin from its record, which a reader took from the running showcase (`RULE.SUPPORT.SURFACE.411` · MUST · skill:spn-surface/design) (`RULE.SUPPORT.SURFACE.422` · MUST · skill:spn-surface/design).
 
 | Layer | The file holds | SaaS Plane names its file | Its file key |
 | --- | --- | --- | --- |

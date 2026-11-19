@@ -111,10 +111,7 @@ deploy:
   handle VARCHAR(180) NOT NULL UNIQUE,
   created_at TIMESTAMPTZ DEFAULT now()
 );</pre>
-  <p class="sds-small">sh &mdash; a command somebody else can run</p>
-  <pre data-lang="sh"># bring a repository to the standard, then wire its agent
-spnutils repo create platform
-spnutils repo agent-sync</pre>
+  <p class="sds-small">sh &mdash; a command the reader runs is a COMMAND block, shown below; a shell script (a branch, a loop, a function) stays a CODE block tagged <code>sh</code></p>
   <p class="sds-small">md &mdash; markdown shown as source, when the page is about the markup</p>
   <pre data-lang="md">## Terms
 
@@ -125,12 +122,12 @@ spnutils repo agent-sync</pre>
   <pre>{{org}}-{{spc}}-{{env}}-{{region}}
 &rarr; spn-dmo-live-in</pre>
   <h3 id="b-tree">TREE &mdash; a hierarchy, as a text block</h3>
-  <pre>{{root}}/
+  <pre data-lang="tree">{{root}}/
 ├── {{child}}/        {{what it holds}}
 │   └── {{leaf}}      {{what it is}}
 └── {{child}}         {{what it is}}</pre>
   <p class="sds-small">where a change lands &mdash; one folder or file on each line, and a note in one column: new or changed, then what the change is</p>
-  <pre>{{repository}}/
+  <pre data-lang="tree">{{repository}}/
 ├── {{folder}}/
 │   ├── {{file}}      new      {{what the file is}}
 │   └── {{file}}      changed  {{what the change is}}
@@ -151,6 +148,12 @@ spnutils repo agent-sync</pre>
 }</pre>
   </figure>
   <p class="sds-small">the markup: a <code>figure.sds-file</code> holding a <code>figcaption</code> (its <code>.sds-file-path</code> and its <code>.sds-file-lang</code>) and the <code>pre</code></p>
+  <h3 id="b-command">COMMAND &mdash; something the reader runs</h3>
+  <p>{{What running it does, in a sentence. One command a line; a note after two spaces and a hash stays quiet and is never copied; a script stays a CODE block.}}</p>
+  <pre data-lang="sh">{{the command the reader types}}
+{{the next command}}  # {{what to check}}</pre>
+  <div class="sds-step-see"><span class="sds-label">What you see</span><p>{{what the reader sees once it ran, in a line}}</p></div>
+  <p class="sds-small">the markup: a <code>pre</code> tagged <code>sh</code> (add <code>data-run="claude"</code> for a step asked of the agent), then a <code>.sds-step-see</code>; the page's script draws the frame, the quiet <code>$</code> and the copy button</p>
 </section>
 
 <section id="figures" data-block="example">
@@ -2174,11 +2177,29 @@ spnutils repo agent-sync</pre>
       <tr><th>{{Stated today}}</th><td>{{where the claim is written today, with a link}}</td></tr>
     </tbody></table></div>
   </div>
+  <h3 id="b-arc-status">ARC STATUS &mdash; how a construct or an arc stands</h3>
+  <p>A construct's masthead and an approach page's Plan carry a status badge: <code>sds-badge sds-status</code> and the status word in lower case. The status colours are the docs' own, one pair each with a dark value, and never the design system's alert colours, which stay with the four statuses above.</p>
+  <div class="sds-scroll"><table>
+    <thead><tr><th>Status</th><th>On a badge</th><th>Means</th></tr></thead>
+    <tbody>
+      <tr><td><code>sds-planning</code></td><td><span class="sds-badge sds-status sds-planning">PLANNING</span></td><td>a construct being shaped, nothing built yet</td></tr>
+      <tr><td><code>sds-implementing</code></td><td><span class="sds-badge sds-status sds-implementing">IMPLEMENTING</span></td><td>a construct being built</td></tr>
+      <tr><td><code>sds-done</code></td><td><span class="sds-badge sds-status sds-done">DONE</span></td><td>a construct built and proven</td></tr>
+      <tr><td><code>sds-proposed</code></td><td><span class="sds-badge sds-status sds-proposed">PROPOSED</span></td><td>an arc being shaped</td></tr>
+      <tr><td><code>sds-decided</code></td><td><span class="sds-badge sds-status sds-decided">DECIDED</span></td><td>an arc with the developer's go, and any wait</td></tr>
+      <tr><td><code>sds-running</code></td><td><span class="sds-badge sds-status sds-running">RUNNING</span></td><td>an arc whose first step has started</td></tr>
+      <tr><td><code>sds-held</code></td><td><span class="sds-badge sds-status sds-held">HELD</span></td><td>an arc waiting on something it names</td></tr>
+      <tr><td><code>sds-part-landed</code></td><td><span class="sds-badge sds-status sds-part-landed">PART LANDED</span></td><td>an arc with some steps landed</td></tr>
+      <tr><td><code>sds-landed</code></td><td><span class="sds-badge sds-status sds-landed">LANDED</span></td><td>an arc whose every step landed and was proven</td></tr>
+      <tr><td><code>sds-carried</code></td><td><span class="sds-badge sds-status sds-carried">CARRIED</span></td><td>an arc moved to another workstream</td></tr>
+      <tr><td><code>sds-dropped</code></td><td><span class="sds-badge sds-status sds-dropped">DROPPED</span></td><td>an arc not wanted, once decided</td></tr>
+    </tbody>
+  </table></div>
   <h3 id="b-utilities">UTILITIES &mdash; a layout that no block covers</h3>
   <p>Use a named class first. Use a Tailwind utility only for a layout that no block covers. A utility reads the same tokens as a named class, so both themes follow. Below, utilities put two boxes in one row. The first box is the named class <code>sds-pull</code>. The second box has no class of ours, and every part of its look is a utility.</p>
   <div class="grid gap-4 my-6 sm:grid-cols-2">
     <div class="sds-pull m-0"><span class="sds-label">A named class</span><p><code>sds-pull m-0</code> &mdash; the block, and one utility that takes away its margin inside the row.</p></div>
-    <div class="border border-ok bg-ok-soft rounded-sm px-5 py-4"><span class="block font-ui text-xs uppercase tracking-widest text-ok mb-1">Utilities alone</span><p class="m-0 max-w-none text-ink"><code>border border-ok bg-ok-soft rounded-sm px-5 py-4</code> &mdash; the same tokens, read through Tailwind.</p></div>
+    <div class="border border-ok bg-ok-soft rounded-sm px-5 py-4"><span class="block font-ui text-xs uppercase tracking-widest text-ok-ink mb-1">Utilities alone</span><p class="m-0 max-w-none text-ink"><code>border border-ok bg-ok-soft rounded-sm px-5 py-4</code> &mdash; the same tokens, read through Tailwind.</p></div>
   </div>
   <p>The built stylesheet holds one standard set of utilities, and no other utility has a rule in it. The chapter lists the set by family. The row below uses three of them: <code>flex</code> and <code>justify-between</code> put its two ends apart, and <code>text-faint</code> writes the second end in faint text.</p>
   <div class="flex justify-between gap-4"><span>{{A name}}</span><span class="text-faint">{{a note beside it, in faint text}}</span></div>

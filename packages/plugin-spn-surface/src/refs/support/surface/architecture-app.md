@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/10-architecture-app.md",
-      "seen": "181759db"
+      "seen": "a274e9c9"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/10-architecture-app/",
-      "seen": "eb6423a0"
+      "seen": "e0f0f2e7"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/10-providers/ts/08-web.md",
@@ -56,6 +56,8 @@ A conforming design system answers a fixed set of groups (`architecture-componen
 A theme is one declared object, `IDSTheme`, and it holds a closed list of choices. The choices are grouped by layer, each under the layer that reads it, from the outside of a page in: `app` holds the six global values, `layout` the layout look, `container` the look of the panel, `widget` the look of the card widget, and `component` the looks of the card and the table. Every choice is optional, the brand colour, the mode and the size among them, and a choice left out takes the value of the default theme. The mode alone has no default: left out, the theme follows the device.
 
 **Support ships a theme, and never a template. It also ships design languages, as choices and never as finished pages** (`RULE.SUPPORT.SURFACE.440` · GUIDE). A template is somebody's finished look, and it would have to be kept for every taste; a theme is the few values that make a look, and the blocks do the rest. An app picks a design language as it picks a theme: the theme says which colours and corners, and the design language says how the pages are built and how they move, so any theme recolours any design language. `design-languages.md` states what one holds.
+
+**A theme holds a brand and an app's looks, and the platform's design language says which is which.** The brand is `app.primary`, `app.neutralTemperature` and the typefaces, written once for the platform; an app's looks are the rest: `app.mode`, `app.size`, `app.motionSpeed`, `app.radius`, the layout look, and the panel, card and table looks, a row for each app. The layout type is the app's layout setting and is never a theme value, brand or look, and a design language row points at it and never copies it into a look (`RULE.SUPPORT.SURFACE.139` · MUST · skill:spn-surface/design).
 
 | Choice | What it sets |
 | --- | --- |

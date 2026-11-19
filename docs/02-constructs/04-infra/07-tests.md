@@ -92,7 +92,14 @@ There is no `integration/` folder and no `setup/` folder. Nothing runs at that t
 
 ### Bundle cases — Two more cases prove the bundle, not one file
 
-`unit/t-dist-current.mjs` and `unit/t-bundle-parity.mjs` sit at the tree's root rather than under any one mirror, because each proves a property of the whole plugin: the first recomputes a bundle's declared sources against the banner esbuild wrote into it, and the second runs a recorded payload through the source and through the committed bundle and asserts the two agree. Both call the one shared harness the foundation's plugins realization states, `packages/plugin-support-lib/tests/helpers/`, so the build and the check can never quietly disagree. This plugin ships no `commands/`, but `hooks.json` still runs a built `dist/events/pretooluse.mjs`, so it owes both cases exactly as its two siblings do.
+`unit/t-dist-current.mjs` and `unit/t-bundle-parity.mjs` sit at the tree's root rather than under any one mirror, because each proves a property of the whole plugin:
+
+| Case | What it proves |
+| --- | --- |
+| `unit/t-dist-current.mjs` | recomputes a bundle's declared sources against the banner esbuild wrote into it |
+| `unit/t-bundle-parity.mjs` | runs a recorded payload through the source and through the committed bundle and asserts the two agree |
+
+Both call the one shared harness the foundation's plugins realization states, `packages/plugin-support-lib/tests/helpers/`, so the build and the check can never quietly disagree. This plugin ships no `commands/`, but `hooks.json` still runs a built `dist/events/pretooluse.mjs`, so it owes both cases exactly as its two siblings do.
 
 ## Boundary
 
@@ -113,4 +120,8 @@ This page answers where a proof of this plugin lives, what the path means, and w
 | the apps plugin's subject registry | *until a parser exists there is no folder for it* — which is why no tier stands empty here | MUST |
 | the foundation's `04-plugins/02-shape.md` | the staleness case, the parity case, the payload fixture, and the shared harness every plugin's tests owe once it builds | MUST |
 
-Try it: `node packages/plugin-spn-infra/tests/run.mjs`
+Try it:
+
+```sh
+node packages/plugin-spn-infra/tests/run.mjs
+```

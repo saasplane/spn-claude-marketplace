@@ -78,7 +78,12 @@ Installing reads an entry, copies that plugin's folder, and stores it where a se
 
 ### Contents — What a plugin may hold, and what it owes
 
-A plugin folder holds any mix of the constructs this domain names, and owes none of them. `spn-devex` carries every one except `providers/`, which is why it is the folder to open to see what a full plugin looks like. `spn-apps` and `spn-infra` each carry a `providers/` folder and no `agents/`. Each construct is named by its own page, and none of them is described here.
+A plugin folder holds any mix of the constructs this domain names, and owes none of them. Each construct is named by its own page, and none of them is described here. The folders to open are these:
+
+| Plugin | Carries |
+| --- | --- |
+| `spn-devex` | every construct except `providers/`, which is why it is the folder to open to see what a full plugin looks like |
+| `spn-apps` and `spn-infra` | a `providers/` folder each, and no `agents/` |
 
 ## Boundary
 
@@ -99,4 +104,8 @@ This page answers what a plugin is made of, how it is listed, and what an instal
 | DEC.CLAUDE_MARKETPLACE.DEVEX.006 | the manifest is the current description, and a marketplace entry that disagrees with it is the stale side | MUST |
 | the foundation's plugins construct § The shape of a plugin, and its `04-plugins/02-shape.md` | the Node realization of this construct's own shape — source beside a committed build, and a shared folder never installed on its own | MUST |
 
-Try it: `spn-devex plugin partner check`
+Try it:
+
+```sh
+spn-devex plugin partner check
+```

@@ -18,6 +18,7 @@ import { hrefForPage, renderPage } from "../../lib/render.ts";
 import { cardsOf } from "../../checks/split-plan.ts";
 import { STATUSES } from "../../checks/arc-status.ts";
 import { masthead, type MastheadKind } from "../../checks/doc-check.ts";
+import { blockFit, type FitKind } from "../../lib/block-fit.ts";
 import { filesUnder as proseFilesUnder, paragraphs as proseParagraphs, score as proseScore } from "./prose.ts";
 
 import { withOffset } from "../../lib/clock.ts";
@@ -757,6 +758,10 @@ export function checkHeader(file: string, src: string, block: any): Finding[] {
     : ["overview", "construct", "report", "approach", "preview"].includes(block.variant) ? block.variant : null;
   for (const [grade, message] of masthead(file, src, kind))
     f.push({ check: "masthead", grade: grade as Grade, file, message });
+  // Where a paragraph, a list or a callout should have been a block, from the same reading the doc-check hook makes.
+  const fit: FitKind | null = basename(file) === HUB ? "hub" : ["overview", "report", "guide", "approach", "preview"].includes(block.variant) ? block.variant : null;
+  if (fit && file.endsWith(".html") && !/-template\.html$|\.bundled\.html$/.test(file))
+    for (const [grade, message] of blockFit(src, true, fit)) f.push({ check: "fit", grade: grade as Grade, file, message });
   return f;
 }
 
@@ -2643,6 +2648,7 @@ export function pageFor(seat: string, workspace: string, templates: string, writ
     home: overviewAbove(seat, out) ?? undefined,
   });
   for (const r of rf) findings.push({ check: "page", grade: "RULE", file: seat, message: r.message });
+  for (const [grade, message] of blockFit(markdown, false, "seat")) findings.push({ check: "fit", grade: grade as Grade, file: seat, message });
   const before = existsSync(out) ? readFileSync(out, "utf8") : "";
   if (before === html) { console.log(`current  ${relative(workspace, out)}`); return findings; }
   if (write) {

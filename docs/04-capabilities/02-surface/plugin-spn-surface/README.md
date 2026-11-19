@@ -16,7 +16,18 @@
 | Stack Checks · Stack Tools · Stack Skills · Stack Refs · Providers | [spn-apps](../../03-apps/plugin-spn-apps/README.md) |
 | Estate Guard · Estate Skills · Estate Refs | [spn-infra](../../04-infra/plugin-spn-infra/README.md) |
 
-Source folders, one per chapter: `.claude-plugin/plugin.json` for Plugin · `hooks/hooks.json` for Hooks · `skills/` for Skills · `scripts/` for Scripts · `refs/` for Refs · `tests/` for Tests. This plugin ships no `agents/` and no `providers/`, and the absence is the statement.
+Source folders, one per chapter:
+
+| Chapter | Source |
+| --- | --- |
+| Plugin | `.claude-plugin/plugin.json` |
+| Hooks | `hooks/hooks.json` |
+| Skills | `skills/` |
+| Scripts | `scripts/` |
+| Refs | `refs/` |
+| Tests | `tests/` |
+
+This plugin ships no `agents/` and no `providers/`, and the absence is the statement.
 
 <!-- spn:generated contents — do not edit inside these markers; `docs.ts face` writes it -->
 | Chapter | Realizes | Carries | Status |

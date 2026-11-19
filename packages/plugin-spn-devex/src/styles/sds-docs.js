@@ -147,14 +147,42 @@
   var LANGS={
     ts:{keywords:'const let var function return if else for while class interface type enum export import from as await async new extends implements readonly public private void null undefined true false'.split(' '),comment:/\/\/[^\n]*|\/\*[\s\S]*?\*\//g,type:/\b[A-Z][A-Za-z0-9_]+\b/g},
     json:{keywords:['true','false','null']},
-    yaml:{comment:/#[^\n]*/g},
+    yaml:{comment:/(^|\s)#[^\n]*/g,keywords:['true','false','null','yes','no','on','off'],type:/^[ \t]*(?:- )?[A-Za-z_][A-Za-z0-9_.\-]*(?=:)/gm},
     sql:{keywords:'SELECT FROM WHERE INSERT INTO VALUES UPDATE SET DELETE CREATE TABLE INDEX PRIMARY KEY FOREIGN REFERENCES NOT NULL UNIQUE ON DEFAULT ALTER ADD CONSTRAINT AND OR JOIN LEFT INNER GROUP BY ORDER LIMIT'.split(' '),comment:/--[^\n]*/g},
     sh:{comment:/#[^\n]*/g},
+    bash:{comment:/#[^\n]*/g},
+    jsonc:{keywords:['true','false','null'],comment:/\/\/[^\n]*/g},
+    tree:{},
     diff:{},
     md:{}
   };
   function esc(text){return text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+  /* A FILE TREE: a folder in the type colour, a file in the ink, its branches (an indent of spaces or of the box-drawing
+     marks) quiet and upright, a status word that opens its note (new, changed, removed) in a diff's colours, and the rest of
+     the note in the comment colour. */
+  var TREE_LINE=/^([\s\u2502\u251c\u2514\u252c\u2500|`+\\-]*?)([^\s\u2502\u251c\u2514\u252c\u2500]\S*)(?:(\s{2,})(\S.*))?$/;
+  var STATUS={'new':'sds-tk-add','added':'sds-tk-add','changed':'sds-tk-n','moved':'sds-tk-n','removed':'sds-tk-del','deleted':'sds-tk-del'};
+  function isTree(code){
+    var lines=code.replace(/\n+$/,'').split('\n');
+    if(!lines.length||!/\/$/.test(lines[0].trim()))return false;
+    return lines.every(function(line){return !line.trim()||TREE_LINE.test(line);});
+  }
+  function colourTree(code){
+    return code.split('\n').map(function(line){
+      var m=TREE_LINE.exec(line);
+      if(!m||!line.trim())return esc(line);
+      var branch=/[^\s]/.test(m[1])?'<span class="sds-tk-g">'+esc(m[1])+'</span>':esc(m[1]);
+      var name=/\/$/.test(m[2])?'<span class="sds-tk-t">'+esc(m[2])+'</span>':esc(m[2]);
+      var note='';
+      if(m[4]){
+        var s=/^(\S+)(\s{2,})(\S.*)$/.exec(m[4]);
+        note=esc(m[3])+(s&&STATUS[s[1].toLowerCase()]?'<span class="'+STATUS[s[1].toLowerCase()]+'">'+esc(s[1])+'</span>'+esc(s[2])+'<span class="sds-tk-c">'+esc(s[3])+'</span>':(STATUS[m[4].trim().toLowerCase()]?'<span class="'+STATUS[m[4].trim().toLowerCase()]+'">'+esc(m[4])+'</span>':'<span class="sds-tk-c">'+esc(m[4])+'</span>'));
+      }
+      return branch+name+note;
+    }).join('\n');
+  }
   function colour(code,lang){
+    if(lang==='tree')return colourTree(code);
     var spec=LANGS[lang];
     if(lang==='diff'){
       return code.split('\n').map(function(line){
@@ -194,6 +222,7 @@
   }
   Array.prototype.forEach.call(document.querySelectorAll('pre[data-lang]'),function(pre){
     var lang=pre.getAttribute('data-lang');
+    if(lang==='text'&&isTree(pre.textContent))lang='tree';
     if(!LANGS[lang]||pre.children.length)return;
     pre.innerHTML=colour(pre.textContent,lang);
   });
@@ -246,4 +275,230 @@
   window.addEventListener('scroll',ask,{passive:true});
   window.addEventListener('resize',ask);
   mark();
+})();
+
+/* THE DOCS DESIGN LANGUAGE'S BEHAVIOUR: the mode switch, a stepped figure's Next and Back, a figure's motion (30% in view, pausing off screen),
+   and a narrow figure's tap to open at full size. */
+/* The page's two small helpers: the light/dark switch, and the step-through of a stepped figure. */
+(function () {
+  var root = document.documentElement;
+  var btn = document.querySelector('[data-dl-mode]');
+  var chosen = false;
+  if (btn) btn.addEventListener('click', function () {
+    var next = root.getAttribute('data-mode') === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-mode', next);
+    btn.textContent = next === 'dark' ? 'Light' : 'Dark';
+    chosen = true;
+  });
+  // The page follows a change of the reader's system setting while it is open, as the index around it does, until the reader
+  // picks a mode with the switch; a page that names its own mode in its markup keeps it.
+  // The index that holds this page in a frame sends the mode its reader picked; only the page's own parent is heard, and the
+  // page then holds that mode as a reader's choice.
+  window.addEventListener('message', function (event) {
+    var data = event.data;
+    if (event.source !== window.parent || window.parent === window || !data || data.sds !== 'mode') return;
+    if (data.mode !== 'light' && data.mode !== 'dark') return;
+    root.setAttribute('data-mode', data.mode);
+    chosen = true;
+    if (btn) btn.textContent = data.mode === 'dark' ? 'Light' : 'Dark';
+  });
+  var named = root.getAttribute('data-theme') === 'dark' || root.getAttribute('data-theme') === 'light';
+  if (!named && window.matchMedia) {
+    var ask = window.matchMedia('(prefers-color-scheme: dark)');
+    if (ask.addEventListener) ask.addEventListener('change', function () {
+      if (!chosen) root.setAttribute('data-mode', ask.matches ? 'dark' : 'light');
+    });
+  }
+  document.querySelectorAll('[data-dl-stepped]').forEach(function (fig) {
+    var units = fig.querySelectorAll('[data-dl-step]');
+    var n = 0, at = 0;
+    units.forEach(function (u) { n = Math.max(n, +u.getAttribute('data-dl-step')); });
+    var prev = fig.querySelector('[data-dl-prev]'), next = fig.querySelector('[data-dl-next]'), say = fig.querySelector('[data-dl-at]');
+    function show() {
+      units.forEach(function (u) { u.classList.toggle('dl-off', at !== 0 && +u.getAttribute('data-dl-step') !== at); });
+      prev.disabled = at === 0; next.disabled = at === n;
+      say.textContent = at === 0 ? 'All at rest' : 'Step ' + at + ' of ' + n;
+    }
+    prev.addEventListener('click', function () { at = Math.max(0, at - 1); show(); });
+    next.addEventListener('click', function () { at = Math.min(n, at + 1); show(); });
+    show();
+  });
+  // fit and tap: a figure narrower than its frame shows as a preview, the whole figure a button, and opens full-screen at 1:1
+  var dlg;
+  function dialog() {
+    if (dlg) return dlg;
+    dlg = document.createElement('dialog'); dlg.className = 'dl-full'; dlg.setAttribute('aria-label', 'Figure at full size');
+    dlg.innerHTML = '<button type="button" class="dl-full-close" aria-label="Close the full view">Close</button><p class="dl-full-hint">Turn the phone to see it larger.</p><div class="dl-full-pan"></div>';
+    dlg.querySelector('.dl-full-close').addEventListener('click', function () { dlg.close(); });
+    document.body.appendChild(dlg);
+    return dlg;
+  }
+  document.querySelectorAll('.dl-frame').forEach(function (f) {
+    var s = f.querySelector('svg.dl-svg'); if (!s) return;
+    var mark = document.createElement('span'); mark.className = 'dl-expand'; mark.setAttribute('aria-hidden', 'true');
+    mark.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M9 21H3v-6"/><path d="m21 3-7 7"/><path d="m3 21 7-7"/></svg>';
+    f.appendChild(mark);
+    function sync() {
+      var narrow = f.clientWidth < s.viewBox.baseVal.width - 1;
+      f.classList.toggle('dl-preview', narrow);
+      if (narrow) { f.setAttribute('role', 'button'); f.setAttribute('tabindex', '0'); f.setAttribute('aria-label', 'Open the figure at full size'); }
+      else { f.removeAttribute('role'); f.removeAttribute('tabindex'); f.removeAttribute('aria-label'); }
+    }
+    function open() {
+      if (!f.classList.contains('dl-preview')) return;
+      var d = dialog(), pan = d.querySelector('.dl-full-pan'), copy = s.cloneNode(true);
+      copy.removeAttribute('data-motion'); copy.querySelectorAll('.dl-drawing').forEach(function (w) { w.classList.remove('dl-drawing'); w.style.strokeDasharray = ''; w.style.strokeDashoffset = ''; });
+      copy.querySelectorAll('.dl-pulse-dot').forEach(function (x) { x.remove(); });
+      pan.textContent = ''; pan.appendChild(copy);
+      d.addEventListener('close', function back() { d.removeEventListener('close', back); f.focus(); });
+      if (d.showModal) d.showModal(); else d.setAttribute('open', '');
+      d.querySelector('.dl-full-close').focus();
+      try { pan.scrollLeft = Math.max(0, copy.getBBox().x); } catch (e) {}
+    }
+    sync(); window.addEventListener('resize', sync);
+    f.addEventListener('click', open);
+    f.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); } });
+  });
+  // figure motion (the figure's spec says: data-motion = draw-once | pulse). As on saasplane.ai's SiteDrawing: it starts once
+  // 30% of the figure is in view, a loop pauses off screen, and print, PDF and reduced motion show the figure finished.
+  var still = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var printing = false;
+  window.addEventListener('beforeprint', function () { printing = true; document.querySelectorAll('svg[data-motion]').forEach(finish); });
+  function wires(svg, solidOnly) { return [].slice.call(svg.querySelectorAll('path.dl-wire, path.dl-wire-on')).filter(function (w) { return !solidOnly || !w.classList.contains('dl-wire-dash'); }); }
+  function finish(svg) {
+    svg.querySelectorAll('.dl-drawing').forEach(function (w) { w.classList.remove('dl-drawing'); w.style.strokeDasharray = ''; w.style.strokeDashoffset = ''; w.style.transition = ''; });
+    svg.querySelectorAll('.dl-pulse-dot').forEach(function (d) { d.remove(); });
+    svg.__stop = true;
+  }
+  // The site's own values (saasplane.ai media css, ab-08-2 build-evolvable): a wire draws over 2.4s on cubic-bezier(.4,0,.2,1) after .3s, and
+  // the drawings that stagger their lines step the delay by .57s (1.13s, 1.70s, 2.27s).
+  var DRAW = 2400, START = 300, STEP = 570;
+  function drawOnce(svg) {
+    var ws = wires(svg, true);
+    ws.forEach(function (w) { var L = w.getTotalLength(); w.classList.add('dl-drawing'); w.style.strokeDasharray = L + ' ' + L; w.style.strokeDashoffset = L; });
+    return function play() {
+      ws.forEach(function (w, i) {
+        var L = w.getTotalLength();
+        setTimeout(function () {
+          if (svg.__stop) return;
+          w.style.transition = 'stroke-dashoffset ' + DRAW + 'ms cubic-bezier(.4,0,.2,1)'; w.style.strokeDashoffset = 0;
+          setTimeout(function () { w.classList.remove('dl-drawing'); w.style.strokeDasharray = ''; w.style.strokeDashoffset = ''; w.style.transition = ''; }, DRAW + 100);
+        }, START + i * STEP);
+      });
+    };
+  }
+  function pulse(svg) {
+    var ws = wires(svg, false).filter(function (w) { return w.getAttribute('data-dl-flow'); }).sort(function (a, b) { return a.getAttribute('data-dl-flow') - b.getAttribute('data-dl-flow'); });
+    var dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    dot.setAttribute('class', 'dl-dot dl-pulse-dot'); dot.setAttribute('r', '3.5'); svg.appendChild(dot);
+    var running = false, visible = false, i = 0, t0 = 0;
+    // The site's loops (ab-01 .. ab-09 animateMotion): a period of 12s with keyTimes 0;0.32;1, so the light travels the whole path in the first
+    // 32% (3.84s, linear) and rests the other 8.16s. Here the light crosses the figure's wires in turn within that travel, by their length.
+    var PERIOD = 12000, TRAVEL = 3840;
+    var lens = ws.map(function (w) { return w.getTotalLength(); }), total = lens.reduce(function (s, v) { return s + v; }, 0) || 1;
+    function frame(now) {
+      if (svg.__stop || !visible) { running = false; return; }
+      if (!t0) t0 = now;
+      var e = (now - t0) % PERIOD;
+      if (e < TRAVEL) {
+        var at = e / TRAVEL * total, k = 0;
+        while (k < ws.length - 1 && at > lens[k]) { at -= lens[k]; k++; }
+        var pt = ws[k].getPointAtLength(Math.min(at, lens[k]));
+        dot.setAttribute('cx', pt.x); dot.setAttribute('cy', pt.y); dot.style.opacity = 1;
+      } else dot.style.opacity = 0;
+      requestAnimationFrame(frame);
+    }
+    dot.style.opacity = 0;
+    return { start: function () { visible = true; if (!running) { running = true; t0 = 0; requestAnimationFrame(frame); } }, stop: function () { visible = false; } };
+  }
+  document.querySelectorAll('svg[data-motion]').forEach(function (svg) {
+    if (still || !('IntersectionObserver' in window)) return;
+    var kind = svg.getAttribute('data-motion'), actor;
+    if (kind === 'draw-once') actor = { play: drawOnce(svg) }; else if (kind === 'pulse') actor = pulse(svg); else return;
+    var started = false;
+    new IntersectionObserver(function (es) {
+      es.forEach(function (e) {
+        var inView = e.isIntersecting && e.intersectionRatio >= 0.3;
+        if (kind === 'draw-once') { if (inView && !started && !printing) { started = true; actor.play(); } }
+        else if (inView && !printing) actor.start(); else actor.stop();
+      });
+    }, { threshold: [0, 0.3] }).observe(svg);
+  });
+  // reduced motion and print: a character holds its finished pose
+  function hold() { document.querySelectorAll('svg.dl-svg').forEach(function (s) { if (s.pauseAnimations) { s.pauseAnimations(); s.setCurrentTime(0); } }); }
+  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) hold();
+  window.addEventListener('beforeprint', hold);
+})();
+
+/* A COMMAND FRAME. A guide step's command (`.sds-step > pre`), or any block tagged `data-run`, stands in a frame: a head saying where it
+   runs (Terminal, unless the block says `data-run="claude"`) with a copy button, then each command line with its `$` prompt kept apart
+   from the command (the prompt is a mark, never selected or copied), then the step's "What you see" joined below in the same frame. */
+(function () {
+  function esc(t) { return t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+  // A block tagged sh or bash is framed too when it holds commands; a script (a line that opens or closes a branch or a loop) stays
+  // a plain code block, since a prompt on each line of a script would be wrong. The colouring before this ran on its text, so the
+  // text is read again from the block.
+  var SCRIPT = /^\s*(if|then|else|elif|fi|for|while|until|do|done|case|esac|function)\b|\{\s*$|^\s*\}/;
+  var blocks = Array.prototype.slice.call(document.querySelectorAll('.sds-step > pre, pre[data-run], pre[data-lang="sh"], pre[data-lang="bash"]'));
+  blocks.forEach(function (pre) {
+    if (pre.closest('.sds-cmd-frame') || pre.closest('figure.sds-file')) return;
+    var tagged = pre.getAttribute('data-lang') === 'sh' || pre.getAttribute('data-lang') === 'bash';
+    if (!tagged && pre.children.length) return;
+    if (tagged && !pre.hasAttribute('data-run') && pre.textContent.split('\n').some(function (l) { return SCRIPT.test(l); })) return;
+    var lines = pre.textContent.replace(/\n+$/, '').split('\n');
+    var commands = [];
+    pre.innerHTML = lines.map(function (line) {
+      if (!line.trim()) return '';
+      if (/^\s*#/.test(line)) return '<span class="sds-tk-c">' + esc(line) + '</span>';
+      var m = /^(.*?\S)(\s{2,}#.*)?$/.exec(line);
+      commands.push(m[1]);
+      return '<span class="sds-prompt" aria-hidden="true">$ </span><span class="sds-cmd">' + esc(m[1]) + '</span>' + (m[2] ? '<span class="sds-tk-c">' + esc(m[2]) + '</span>' : '');
+    }).join('\n');
+    var frame = document.createElement('div'); frame.className = 'sds-cmd-frame';
+    var head = document.createElement('div'); head.className = 'sds-cmd-head';
+    var where = document.createElement('span'); where.textContent = pre.getAttribute('data-run') === 'claude' ? 'Claude in VS Code' : 'Terminal';
+    // the copy mark is the index's own (lucide copy), and a check while the command is on the clipboard; its words are its title and label
+    var COPY = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M10 8h10a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H10a2 2 0 0 1-2-2V10a2 2 0 0 1 2-2z"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>';
+    var DONE = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M20 6 9 17l-5-5"/></svg>';
+    var copy = document.createElement('button'); copy.type = 'button'; copy.className = 'sds-cmd-copy'; copy.innerHTML = COPY; copy.title = 'Copy';
+    copy.setAttribute('aria-label', 'Copy the command');
+    copy.addEventListener('click', function () {
+      var text = commands.join('\n');
+      var done = function () { copy.innerHTML = DONE; copy.title = 'Copied'; copy.classList.add('sds-is-copied'); setTimeout(function () { copy.innerHTML = COPY; copy.title = 'Copy'; copy.classList.remove('sds-is-copied'); }, 1400); };
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done, done); else done();
+    });
+    head.appendChild(where); head.appendChild(copy);
+    pre.parentNode.insertBefore(frame, pre);
+    frame.appendChild(head); frame.appendChild(pre);
+    var see = frame.nextElementSibling;
+    if (see && see.classList.contains('sds-step-see')) frame.appendChild(see);
+  });
+})();
+
+/* THE SURFACE PAGE PREVIEW: the bar's three switches. Width sizes the frame; mode and notes travel to the page's copy as one message,
+   `{ "surface-page-preview": { mode, notes } }`, which the copy's own few lines read (05-artifacts.md, The surface page preview). The
+   choice is kept in this browser, so the next page opens in the same view. A copy that does not listen still shows as the page. */
+(function () {
+  var root = document.querySelector('.sds-surface'); if (!root) return;
+  var frame = root.querySelector('.sds-surface-frame');
+  var state = { width: 'desktop', mode: 'light', notes: false };
+  try { var kept = JSON.parse(localStorage.getItem('sds-surface') || '{}'); for (var k in state) if (k in kept) state[k] = kept[k]; } catch (e) {}
+  function send() { try { frame.contentWindow.postMessage({ 'surface-page-preview': { mode: state.mode, notes: state.notes } }, '*'); } catch (e) {} }
+  function apply() {
+    root.setAttribute('data-width', state.width);
+    Array.prototype.forEach.call(root.querySelectorAll('[data-surface]'), function (b) {
+      var key = b.getAttribute('data-surface'), value = b.getAttribute('data-value');
+      b.setAttribute('aria-pressed', String(key === 'notes' ? state.notes : state[key] === value));
+    });
+    try { localStorage.setItem('sds-surface', JSON.stringify(state)); } catch (e) {}
+    send();
+  }
+  root.addEventListener('click', function (e) {
+    var b = e.target.closest('[data-surface]'); if (!b) return;
+    var key = b.getAttribute('data-surface');
+    if (key === 'notes') state.notes = !state.notes; else state[key] = b.getAttribute('data-value');
+    apply();
+  });
+  frame.addEventListener('load', send);
+  apply();
 })();

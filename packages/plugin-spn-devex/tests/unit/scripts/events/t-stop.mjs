@@ -1504,7 +1504,7 @@ console.log("\n=== window — a new window is offered from 200k at a clean point
   };
   const asks = (out) => /\[window\]/.test(out);
   const clean = await hear({ kilo: 210 });
-  check("clean: offers at 210k, and the message names the size, the written points and that the developer decides",
+  check("[MKT.HOOKS.486] clean: offers at 210k, and the message names the size, the written points and that the developer decides",
     asks(clean) && /210k/.test(clean) && /past 200k/.test(clean) && /S<n>/.test(clean) && /question as a card/.test(clean) && /The developer decides/.test(clean), clean);
   check("clean: silent below 200k", !asks(await hear({ kilo: 190 })));
   check("phase does not matter: a PROPOSED arc gets the same offer at 210k", asks(await hear({ status: "PROPOSED", kilo: 210 })));
@@ -1525,7 +1525,7 @@ console.log("\n=== window — a new window is offered from 200k at a clean point
     && /no token count/.test(out) && /"clean point"/.test(out);
   check("clean: the note asks the turn to tell the person why, that nothing is lost, and how to open one", forThePerson(clean), clean);
   const alwaysClean = await hear({ kilo: 460 });
-  check("at 460k with no helper: the 400k offer is said, with the same three things", asks(alwaysClean) && /past 400k/.test(alwaysClean) && /Write every open point first/.test(alwaysClean) && forThePerson(alwaysClean), alwaysClean);
+  check("[MKT.HOOKS.486] at 460k with no helper: the 400k offer is said, with the same three things", asks(alwaysClean) && /past 400k/.test(alwaysClean) && /Write every open point first/.test(alwaysClean) && forThePerson(alwaysClean), alwaysClean);
   check("[MKT.HOOKS.322] each offer is said once per window: not again at 240k after the 200k one", !asks(await hear({ parts: [lines["bash-row-write"], sized(212, "msg_first"), feedback(212)], kilo: 240 })));
   check("[MKT.HOOKS.486] and not at 299k either: the next line waits for 300k", !asks(await hear({ parts: [lines["bash-row-write"], sized(212, "msg_first"), feedback(212)], kilo: 299 })));
   check("[MKT.HOOKS.486] the 300k line is said once the window has grown to it", asks(await hear({ parts: [lines["bash-row-write"], sized(212, "msg_first"), feedback(212)], kilo: 305 })));
@@ -1552,16 +1552,16 @@ console.log("\n=== window — a new window is offered from 200k at a clean point
   const mine = new Set(["031-probe"]);
   const text = (kilo, ...before) => [lines["bash-row-write"], ...before, sized(kilo, `msg_p${kilo}`)].map((line) => JSON.stringify(line)).join("\n") + "\n";
   const says = (kilo, presence, stays = false, ...before) => checkWindow(wroot, text(kilo, ...before), mine, false, presence, stays);
-  check("window by presence: PRESENT hears the offers at 210k, 310k and 410k, each its own line",
+  check("[MKT.HOOKS.518] window by presence: PRESENT hears the offers at 210k, 310k and 410k, each its own line",
     [210, 310, 410].every((kilo, at) => says(kilo, "PRESENT").length === 1 && says(kilo, "PRESENT")[0].message.includes(`past ${[200, 300, 400][at]}k`)));
   check("window by presence: PRESENT hears the cost line at 510k and the compaction line at 860k",
     /past 500k/.test(says(510, "PRESENT")[0]?.message) && /past 850k/.test(says(860, "PRESENT")[0]?.message));
-  check("window by presence: AWAY hears nothing at 210k, 510k or 860k", [210, 510, 860].every((kilo) => says(kilo, "AWAY").length === 0));
-  check("window by presence: WATCHING hears no offer at 210k, 310k or 410k", [210, 310, 410].every((kilo) => says(kilo, "WATCHING").length === 0));
-  check("window by presence: WATCHING hears the cost line at 510k and the compaction line at 860k, and neither offers a window",
+  check("[MKT.HOOKS.518] window by presence: AWAY hears nothing at 210k, 510k or 860k", [210, 510, 860].every((kilo) => says(kilo, "AWAY").length === 0));
+  check("[MKT.HOOKS.518] window by presence: WATCHING hears no offer at 210k, 310k or 410k", [210, 310, 410].every((kilo) => says(kilo, "WATCHING").length === 0));
+  check("[MKT.HOOKS.518] window by presence: WATCHING hears the cost line at 510k and the compaction line at 860k, and neither offers a window",
     /past 500k/.test(says(510, "WATCHING")[0]?.message) && /past 850k/.test(says(860, "WATCHING")[0]?.message) && !/offering a new window/.test(says(510, "WATCHING")[0].message));
-  check("window by presence: after stay, the offers at 210k, 310k and 410k are muted", [210, 310, 410].every((kilo) => says(kilo, "PRESENT", true).length === 0));
-  check("window by presence: after stay, the cost line at 510k and the compaction line at 860k are still said",
+  check("[MKT.HOOKS.518] window by presence: after stay, the offers at 210k, 310k and 410k are muted", [210, 310, 410].every((kilo) => says(kilo, "PRESENT", true).length === 0));
+  check("[MKT.HOOKS.518] window by presence: after stay, the cost line at 510k and the compaction line at 860k are still said",
     /past 500k/.test(says(510, "PRESENT", true)[0]?.message) && /past 850k/.test(says(860, "PRESENT", true)[0]?.message));
   check("window by presence: a line said at 310k is not said again at 350k", says(350, "PRESENT", false, feedback(310, 300)).length === 0);
   check("window by presence: past 400k with the 300k line said, the 400k line is said", /past 400k/.test(says(410, "PRESENT", false, feedback(310, 300))[0]?.message));
@@ -1573,17 +1573,17 @@ console.log("\n=== window — a new window is offered from 200k at a clean point
   const arcNow = JSON.parse(readFileSync(arcFileOf, "utf8")); decided(arcNow); writeFileSync(arcFileOf, JSON.stringify(arcNow, null, 2) + "\n");
   const holds = (reply, presence) => checkHold(held.root, new Set(["031-probe"]), reply, presence);
   const QUESTION = "The page is written.\n\nShall I go on with the next row?";
-  check("[RULE.DEVEX.AGENT.179] hold: while AWAY, a reply that ends on a question while a decided arc has a ready row is sent back naming the row",
+  check("[RULE.DEVEX.AGENT.179] [MKT.HOOKS.519] hold: while AWAY, a reply that ends on a question while a decided arc has a ready row is sent back naming the row",
     holds(QUESTION, "AWAY").length === 1 && holds(QUESTION, "AWAY")[0].check === "hold" && /N001/.test(holds(QUESTION, "AWAY")[0].message) && /ready/.test(holds(QUESTION, "AWAY")[0].message), JSON.stringify(holds(QUESTION, "AWAY")));
-  check("hold: while AWAY, a reply that ends on a hold is sent back too", holds("Landed.\n\nI'll wait for your go.", "AWAY").length === 1);
-  check("hold: while PRESENT nothing changes: a question is let through", holds(QUESTION, "PRESENT").length === 0);
-  check("hold: while WATCHING nothing changes: a question is let through", holds(QUESTION, "WATCHING").length === 0);
+  check("[MKT.HOOKS.519] hold: while AWAY, a reply that ends on a hold is sent back too", holds("Landed.\n\nI'll wait for your go.", "AWAY").length === 1);
+  check("[MKT.HOOKS.519] hold: while PRESENT nothing changes: a question is let through", holds(QUESTION, "PRESENT").length === 0);
+  check("[MKT.HOOKS.519] hold: while WATCHING nothing changes: a question is let through", holds(QUESTION, "WATCHING").length === 0);
   check("hold: while AWAY, a reply that ends on a plain report is let through", holds("The page is written and its checks are green.", "AWAY").length === 0);
   check("hold: a question inside a fence is not the reply's end", !endsOnQuestionOrHold("Done.\n\n```text\nwhat now?\n```"));
   const noRows = await dataWorkspace("hold-none");
   const doneArc = JSON.parse(readFileSync(join(noRows.ws, "arcs", "N001", "state.json"), "utf8")); doneArc.status = "DECIDED"; doneArc.rows.forEach((row) => { row.state = "landed"; });
   writeFileSync(join(noRows.ws, "arcs", "N001", "state.json"), JSON.stringify(doneArc, null, 2) + "\n");
-  check("hold: while AWAY, a question with no ready row is let through", checkHold(noRows.root, new Set(["031-probe"]), QUESTION, "AWAY").length === 0);
+  check("[MKT.HOOKS.519] hold: while AWAY, a question with no ready row is let through", checkHold(noRows.root, new Set(["031-probe"]), QUESTION, "AWAY").length === 0);
 }
 
 console.log("\n=== stop — the needs-you check judges only the cards this window raised");

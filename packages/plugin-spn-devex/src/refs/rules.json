@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "book": {
     "repository": "spn-foundation",
-    "commit": "57869bbd"
+    "commit": "0a5751f2"
   },
   "rules": [
     {
@@ -4048,7 +4048,13 @@
       "chapter": "04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
       "heading": "workspace — the folder your day runs in",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/utils/spnutils.md",
+          "heading": "workspace — the folder your day runs in"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.006",
@@ -8180,6 +8186,11 @@
       "heading": "The approach document — a workstream's, never a repository's",
       "decision": null,
       "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/docs/doc-sets.md",
+          "heading": "The templates sit beside the chapters, in templates/"
+        },
         {
           "plugin": "spn-devex",
           "path": "refs/devex/workspace/docs/doc-sets.md",
@@ -12755,6 +12766,11 @@
         {
           "plugin": "spn-devex",
           "path": "skills/execute/SKILL.md",
+          "heading": ""
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/execute/SKILL.md",
           "heading": "The rules this step holds"
         }
       ]
@@ -12775,6 +12791,11 @@
           "plugin": "spn-devex",
           "path": "refs/devex/workspace/workstream.md",
           "heading": "Drift and the passes"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/execute/SKILL.md",
+          "heading": ""
         },
         {
           "plugin": "spn-devex",
@@ -13069,7 +13090,7 @@
         "check": "doc-check"
       },
       "class": "checked",
-      "sentence": "On a preview, a paragraph gives a reason in at most 60 words, a list holds at most 7 items, each under 25 words, and a callout is one sentence",
+      "sentence": "On a preview and an approach page, a paragraph gives a reason in at most 60 words, a list holds at most 7 items, each under 25 words, and a callout is one sentence",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "Prose and lists have limits",
       "decision": null,
@@ -13099,7 +13120,13 @@
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "One stylesheet, served in versions",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/docs/doc-sets.md",
+          "heading": "Every page links one shared stylesheet, in one version"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.529",
@@ -13112,7 +13139,191 @@
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "Drift and the passes",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/workstream.md",
+          "heading": "Anything the developer has not reviewed: preview, confirm, record, then code"
+        }
+      ]
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.530",
+      "level": "MUST",
+      "params": {
+        "check": "doc-check"
+      },
+      "class": "checked",
+      "sentence": "Every block has a rule of its own: when to reach for it, its parts, its limit, and the check that holds it",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "heading": "Every block has a rule",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/docs/doc-sets.md",
+          "heading": "Blocks and figures — what a page is made of"
+        }
+      ]
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.531",
+      "level": "MUST",
+      "params": {
+        "check": "doc-check"
+      },
+      "class": "checked",
+      "sentence": "Every other page kind holds a bound of its own, and an explaining page holds a wider one than a page that decides",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "heading": "Prose and lists have limits",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/docs/doc-sets.md",
+          "heading": "Blocks and figures — what a page is made of"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/report/SKILL.md",
+          "heading": "Copy the template, then fill it"
+        }
+      ]
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.532",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
+      "sentence": "`CATALOG`, `CARDS`, `NEXT` and `FILE` are written as a fenced block, and `docs page write` draws each as the blocks template shows it",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "heading": "Four blocks have a spelling in markdown",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/docs/doc-sets.md",
+          "heading": "Blocks and figures — what a page is made of"
+        }
+      ]
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.533",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-devex/ideate"
+      },
+      "class": "stated in a skill",
+      "sentence": "A page of every kind is written in two passes, the text first and the blocks second",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "heading": "A page is written in two passes",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/docs/doc-sets.md",
+          "heading": "Blocks and figures — what a page is made of"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "The rules this step holds"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/report/SKILL.md",
+          "heading": "Copy the template, then fill it"
+        }
+      ]
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.534",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
+      "sentence": "A surface page preview is the workstream's third page template, used for a surface page review of a site's or an app's pages, and only once the app's design language exists",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "heading": "The surface page preview",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/docs/doc-sets.md",
+          "heading": "The templates sit beside the chapters, in templates/"
+        }
+      ]
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.535",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-devex/ideate"
+      },
+      "class": "stated in a skill",
+      "sentence": "The preview holds a bar and a frame, and nothing else",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "heading": "The surface page preview",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/docs/doc-sets.md",
+          "heading": "The templates sit beside the chapters, in templates/"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.536",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-devex/ideate"
+      },
+      "class": "stated in a skill",
+      "sentence": "The copy names its own mode switch and holds its notes, and it is just the page when opened alone",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "heading": "The surface page preview",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/docs/doc-sets.md",
+          "heading": "The templates sit beside the chapters, in templates/"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.537",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-devex/ideate"
+      },
+      "class": "stated in a skill",
+      "sentence": "The bar's message, the meta and the note marker change only with a new stylesheet version",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "heading": "The surface page preview",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/docs/doc-sets.md",
+          "heading": "The templates sit beside the chapters, in templates/"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.LAUNCHPAD.CONTROL_PLANE.001",
@@ -15137,6 +15348,23 @@
       ]
     },
     {
+      "id": "RULE.PLATFORM.MODULES.034",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
+      "sentence": "A module powers a platform feature and makes it filterable, and gets no copy of a platform screen",
+      "chapter": "02-constructs/03-platform/02-modules/README.md",
+      "heading": "Glossary",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "refs/platform/modules/README.md",
+          "heading": "The seven that ship"
+        }
+      ]
+    },
+    {
       "id": "RULE.SUPPORT.APPS.001",
       "level": "MUST",
       "params": {
@@ -15192,7 +15420,13 @@
       "chapter": "04-capabilities/02-support/02-apps/03-module/01-server/03-entry/README.md",
       "heading": "Entry — One Adapter per Transport, and No Guarantees",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "refs/support/apps/module/README.md",
+          "heading": "How the outside reaches it — entry"
+        }
+      ]
     },
     {
       "id": "RULE.SUPPORT.APPS.006",
@@ -15298,6 +15532,11 @@
       "restated": [
         {
           "plugin": "spn-apps",
+          "path": "refs/support/apps/module/README.md",
+          "heading": "What only this module sees — the app layer"
+        },
+        {
+          "plugin": "spn-apps",
           "path": "skills/implement/SKILL.md",
           "heading": "The rules this step holds"
         }
@@ -15314,7 +15553,13 @@
       "chapter": "04-capabilities/02-support/02-apps/03-module/01-server/02-app/01-services.md",
       "heading": "Asynchronous re-entry",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "refs/support/apps/module/README.md",
+          "heading": "What only this module sees — the app layer"
+        }
+      ]
     },
     {
       "id": "RULE.SUPPORT.APPS.013",
@@ -15562,7 +15807,13 @@
       "chapter": "04-capabilities/02-support/02-apps/03-module/01-server/02-app/README.md",
       "heading": "What leaves this layer",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "refs/support/apps/module/README.md",
+          "heading": "What only this module sees — the app layer"
+        }
+      ]
     },
     {
       "id": "RULE.SUPPORT.APPS.033",
@@ -15771,7 +16022,13 @@
       "chapter": "04-capabilities/02-support/02-apps/03-module/01-server/02-app/01-services.md",
       "heading": "Service and repository responsibilities",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "refs/support/apps/module/README.md",
+          "heading": "What only this module sees — the app layer"
+        }
+      ]
     },
     {
       "id": "RULE.SUPPORT.APPS.049",
@@ -15854,7 +16111,13 @@
       "chapter": "04-capabilities/02-support/02-apps/03-module/01-server/05-config/01-env.md",
       "heading": "The configuration grammar",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "refs/support/apps/module/README.md",
+          "heading": "Config is one namespace the module carries with it"
+        }
+      ]
     },
     {
       "id": "RULE.SUPPORT.APPS.057",
@@ -16135,7 +16398,13 @@
       "chapter": "04-capabilities/02-support/02-apps/03-module/01-server/03-entry/01-api.md",
       "heading": "Public routes declare their own defenses",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "refs/support/apps/module/README.md",
+          "heading": "How the outside reaches it — entry"
+        }
+      ]
     },
     {
       "id": "RULE.SUPPORT.APPS.079",
@@ -17201,6 +17470,11 @@
           "plugin": "spn-apps",
           "path": "skills/implement/SKILL.md",
           "heading": "The rules this step holds"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/architecture-components.md",
+          "heading": "The button, and its choice table"
         }
       ]
     },
@@ -17760,6 +18034,11 @@
       "restated": [
         {
           "plugin": "spn-apps",
+          "path": "refs/support/apps/module/README.md",
+          "heading": "How the outside reaches it — entry"
+        },
+        {
+          "plugin": "spn-apps",
           "path": "skills/implement/SKILL.md",
           "heading": "The rules this step holds"
         }
@@ -17830,6 +18109,11 @@
       "restated": [
         {
           "plugin": "spn-apps",
+          "path": "refs/support/apps/module/README.md",
+          "heading": "How the outside reaches it — entry"
+        },
+        {
+          "plugin": "spn-apps",
           "path": "skills/implement/SKILL.md",
           "heading": "The rules this step holds"
         },
@@ -17851,7 +18135,13 @@
       "chapter": "04-capabilities/02-support/02-apps/03-module/01-server/03-entry/01-api.md",
       "heading": "Public routes declare their own defenses",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "refs/support/apps/module/README.md",
+          "heading": "How the outside reaches it — entry"
+        }
+      ]
     },
     {
       "id": "RULE.SUPPORT.APPS.178",
@@ -19274,6 +19564,11 @@
       "restated": [
         {
           "plugin": "spn-apps",
+          "path": "refs/support/apps/module/module-changes.md",
+          "heading": "States and commands discipline"
+        },
+        {
+          "plugin": "spn-apps",
           "path": "refs/support/apps/providers/ts/02-naming.md",
           "heading": "Code"
         },
@@ -19296,6 +19591,11 @@
       "heading": "Read once, at the edge",
       "decision": null,
       "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "refs/support/apps/module/README.md",
+          "heading": "Config is one namespace the module carries with it"
+        },
         {
           "plugin": "spn-apps",
           "path": "skills/implement/SKILL.md",
@@ -19458,6 +19758,11 @@
       "restated": [
         {
           "plugin": "spn-apps",
+          "path": "refs/support/apps/module/README.md",
+          "heading": "The web module — the same layers, a person as the transport"
+        },
+        {
+          "plugin": "spn-apps",
           "path": "skills/implement/SKILL.md",
           "heading": "The rules this step holds"
         }
@@ -19505,6 +19810,11 @@
       "heading": "The only schema-change path",
       "decision": null,
       "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "refs/support/apps/module/README.md",
+          "heading": "Migrations travel with the module"
+        },
         {
           "plugin": "spn-apps",
           "path": "skills/implement/SKILL.md",
@@ -19698,6 +20008,11 @@
       "restated": [
         {
           "plugin": "spn-apps",
+          "path": "refs/support/apps/module/README.md",
+          "heading": "Migrations travel with the module"
+        },
+        {
+          "plugin": "spn-apps",
           "path": "skills/implement/SKILL.md",
           "heading": "The rules this step holds"
         }
@@ -19744,6 +20059,11 @@
       "heading": "The API grammar",
       "decision": null,
       "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "refs/support/apps/module/README.md",
+          "heading": "How the outside reaches it — entry"
+        },
         {
           "plugin": "spn-apps",
           "path": "skills/implement/SKILL.md",
@@ -19862,6 +20182,11 @@
       "restated": [
         {
           "plugin": "spn-apps",
+          "path": "refs/platform/core/identity.md",
+          "heading": "What a console shows follows from the rights"
+        },
+        {
+          "plugin": "spn-apps",
           "path": "refs/support/apps/module/README.md",
           "heading": "The web module — the same layers, a person as the transport"
         },
@@ -19869,6 +20194,35 @@
           "plugin": "spn-apps",
           "path": "skills/implement/SKILL.md",
           "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.APPS.266",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-apps/implement"
+      },
+      "class": "stated in a skill",
+      "sentence": "A migration that writes what a cached reader serves clears that reader's family once its writes commit",
+      "chapter": "04-capabilities/02-support/02-apps/10-providers/ts/06-service.md",
+      "heading": "Migration-seeded system rows (API-immutable)",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "providers/ts/skills/implement/steps/service.md",
+          "heading": "The rules this step holds"
+        },
+        {
+          "plugin": "spn-apps",
+          "path": "providers/ts/skills/implement/steps/service.md",
+          "heading": "Mutations"
+        },
+        {
+          "plugin": "spn-apps",
+          "path": "refs/support/apps/providers/ts/06-service.md",
+          "heading": "Mutations"
         }
       ]
     },
@@ -20197,6 +20551,23 @@
           "plugin": "spn-infra",
           "path": "refs/support/infra/providers/local/01-realization.md",
           "heading": "Realization is a target, not a command group"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.INFRA.019",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
+      "sentence": "Keep the marketing site off `{spd}`, and give a platform a domain of its own",
+      "chapter": "04-capabilities/02-support/03-infra/01-shape/02-coordinates.md",
+      "heading": "The organization registers every domain, and a platform names its home",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "refs/platform/core/surfaces.md",
+          "heading": "Left out"
         }
       ]
     },
@@ -22977,6 +23348,11 @@
       "heading": "A size is machines; the posture is safety",
       "decision": null,
       "restated": [
+        {
+          "plugin": "spn-infra",
+          "path": "refs/support/infra/blueprints.md",
+          "heading": "An environment is derived — three things may vary"
+        },
         {
           "plugin": "spn-infra",
           "path": "skills/implement/SKILL.md",
@@ -27011,6 +27387,16 @@
           "heading": "Produces to"
         },
         {
+          "plugin": "spn-devex",
+          "path": "refs/devex/agent/lenses/ui.md",
+          "heading": "Produces to"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/architecture-app.md",
+          "heading": "The theme — 🔮"
+        },
+        {
           "plugin": "spn-surface",
           "path": "refs/support/surface/architecture-app.md",
           "heading": "The theme — 🔮"
@@ -27019,6 +27405,11 @@
           "plugin": "spn-surface",
           "path": "refs/support/surface/architecture-layouts.md",
           "heading": "The three parts — 🔮"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/design-languages.md",
+          "heading": "One source for the platform's look — 🔮"
         },
         {
           "plugin": "spn-surface",
@@ -28676,6 +29067,11 @@
       "decision": null,
       "restated": [
         {
+          "plugin": "spn-devex",
+          "path": "refs/devex/agent/lenses/ui.md",
+          "heading": "Produces to"
+        },
+        {
           "plugin": "spn-surface",
           "path": "refs/support/surface/architecture-app.md",
           "heading": "The theme — 🔮"
@@ -29567,7 +29963,13 @@
       "chapter": "04-capabilities/02-support/01-surface/06-architecture-components/01-common/01-components.md",
       "heading": "DSItem",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/architecture-components.md",
+          "heading": "What a list's rows carry — 🔮"
+        }
+      ]
     },
     {
       "id": "RULE.SUPPORT.SURFACE.223",
@@ -34346,6 +34748,11 @@
         },
         {
           "plugin": "spn-surface",
+          "path": "skills/design/steps/draw.md",
+          "heading": "What the page is drawn from"
+        },
+        {
+          "plugin": "spn-surface",
           "path": "skills/design/steps/writer-brief.md",
           "heading": "The rules this step holds"
         }
@@ -34632,6 +35039,11 @@
           "plugin": "spn-surface",
           "path": "skills/design/steps/change-library.md",
           "heading": "What the library draws, and what it does not"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/draw.md",
+          "heading": "What the page is drawn from"
         },
         {
           "plugin": "spn-surface",
@@ -35455,11 +35867,16 @@
         "skill": "spn-surface/design"
       },
       "class": "stated in a skill",
-      "sentence": "An agent reads the app's construct, its capability chapter and its `design-language.json` before it draws a page or a picture",
+      "sentence": "An agent reads the platform's design language construct and the app's capability chapter before it draws a page or a picture",
       "chapter": "04-capabilities/02-support/01-surface/03-standards-patterns/01-common/05-design-languages.md",
-      "heading": "Three levels, for the agent",
+      "heading": "What the agent reads",
       "decision": null,
       "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "A page is built from the tree of its pattern"
+        },
         {
           "plugin": "spn-surface",
           "path": "refs/support/surface/design-languages.md",
@@ -35485,6 +35902,11 @@
       "decision": null,
       "restated": [
         {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "A page is built from the tree of its pattern"
+        },
+        {
           "plugin": "spn-surface",
           "path": "refs/support/surface/design-languages.md",
           "heading": "Where media go — 🔮"
@@ -35508,6 +35930,11 @@
       "heading": "Media size by placement",
       "decision": null,
       "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "A page is built from the tree of its pattern"
+        },
         {
           "plugin": "spn-surface",
           "path": "refs/support/surface/design-languages.md",
@@ -35533,9 +35960,19 @@
       "decision": null,
       "restated": [
         {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "A page is built from the tree of its pattern"
+        },
+        {
           "plugin": "spn-surface",
           "path": "refs/support/surface/design-languages.md",
           "heading": "Text alignment and items — 🔮"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/design-languages.md",
+          "heading": "Items with a medium — 🔮"
         },
         {
           "plugin": "spn-surface",
@@ -35557,6 +35994,26 @@
       "decision": null,
       "restated": [
         {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "A page is built from the tree of its pattern"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/architecture-components.md",
+          "heading": "The items, the actions and the facts"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/architecture-containers.md",
+          "heading": "The grid section"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/site-patterns.md",
+          "heading": "Feature grid"
+        },
+        {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
           "heading": "The rules this step holds"
@@ -35575,6 +36032,21 @@
       "heading": "The phone and the frame",
       "decision": null,
       "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "A page is built from the tree of its pattern"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/architecture-components.md",
+          "heading": "The items, the actions and the facts"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/architecture-containers.md",
+          "heading": "The grid section"
+        },
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
@@ -35596,6 +36068,11 @@
       "restated": [
         {
           "plugin": "spn-surface",
+          "path": "refs/support/surface/architecture-components.md",
+          "heading": "The button, and its choice table"
+        },
+        {
+          "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
           "heading": "The rules this step holds"
         }
@@ -35615,6 +36092,11 @@
       "restated": [
         {
           "plugin": "spn-surface",
+          "path": "refs/support/surface/architecture-components.md",
+          "heading": "The choice table of DSSkeleton"
+        },
+        {
+          "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
           "heading": "The rules this step holds"
         }
@@ -35632,6 +36114,11 @@
       "heading": "DSDrawer",
       "decision": null,
       "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/architecture-components.md",
+          "heading": "The overlays, and the two confirmations"
+        },
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
@@ -35655,6 +36142,1064 @@
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
           "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.536",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "A design language fills one drawing scale, and every medium in it takes the parts of that scale that apply to its kind",
+      "chapter": "04-capabilities/02-support/01-surface/03-standards-patterns/01-common/05-design-languages.md",
+      "heading": "The drawing scale",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "A page is built from the tree of its pattern"
+        },
+        {
+          "plugin": "spn-apps",
+          "path": "skills/verify/SKILL.md",
+          "heading": "Mode: app — health checks on what is running"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/design-languages.md",
+          "heading": "The drawing scale — 🔮"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/design-language.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.537",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "A language that uses no drawn media says so in its construct, and skips the parts that apply to drawn media only",
+      "chapter": "04-capabilities/02-support/01-surface/03-standards-patterns/01-common/05-design-languages.md",
+      "heading": "The drawing scale",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/design-languages.md",
+          "heading": "The drawing scale — 🔮"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/design-language.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.538",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "A medium takes one step of the scale by where it sits: S in a card, M in a section and in every docs figure, L in a hero",
+      "chapter": "04-capabilities/02-support/01-surface/03-standards-patterns/01-common/05-design-languages.md",
+      "heading": "The drawing scale",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "A page is built from the tree of its pattern"
+        },
+        {
+          "plugin": "spn-apps",
+          "path": "skills/verify/SKILL.md",
+          "heading": "Mode: app — health checks on what is running"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/design-languages.md",
+          "heading": "The drawing scale — 🔮"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/design-language.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.539",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "Words placed on media have three levels, label, name and detail, and never a fourth, and no word renders below 9px",
+      "chapter": "04-capabilities/02-support/01-surface/03-standards-patterns/01-common/05-design-languages.md",
+      "heading": "Text sizes",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/verify/SKILL.md",
+          "heading": "Mode: app — health checks on what is running"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/design-languages.md",
+          "heading": "The drawing scale — 🔮"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/design-language.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.540",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "Text never shrinks to fit: a medium that only fits with smaller words changes its form or is cut to its subject, and each medium is made at 1:1 for its frame",
+      "chapter": "04-capabilities/02-support/01-surface/03-standards-patterns/01-common/05-design-languages.md",
+      "heading": "Text sizes",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/design-languages.md",
+          "heading": "The drawing scale — 🔮"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/design-language.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.541",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "Every framed medium takes the scale's radius and the scale's one small shadow, a tile and a photo's frame and a product screen alike, and dark mode has no shadow",
+      "chapter": "04-capabilities/02-support/01-surface/03-standards-patterns/01-common/05-design-languages.md",
+      "heading": "Shape and shadow",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/design-languages.md",
+          "heading": "The drawing scale — 🔮"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/design-language.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.542",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "A line in a drawn medium, or drawn over another medium, has one of three weights, detail, line and focus, and one of three styles: solid; dashed for a reply, an inactive unit or a slot you fill; dotted for a guide or a boundary",
+      "chapter": "04-capabilities/02-support/01-surface/03-standards-patterns/01-common/05-design-languages.md",
+      "heading": "Lines",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/verify/SKILL.md",
+          "heading": "Mode: app — health checks on what is running"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/design-languages.md",
+          "heading": "The drawing scale — 🔮"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/design-language.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.543",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "A line's colour is a role token, and a line never takes opacity",
+      "chapter": "04-capabilities/02-support/01-surface/03-standards-patterns/01-common/05-design-languages.md",
+      "heading": "Lines",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/design-languages.md",
+          "heading": "The drawing scale — 🔮"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/design-language.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.544",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "A drawn medium takes its spacing from the scale, inside a tile, between tiles, inside a plate, between plates, from a wire to its label, between parallel wires, at a bend and at the frame margin, and a tile takes the inline or the stacked form",
+      "chapter": "04-capabilities/02-support/01-surface/03-standards-patterns/01-common/05-design-languages.md",
+      "heading": "Room and alignment",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/design-languages.md",
+          "heading": "The drawing scale — 🔮"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/design-language.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.545",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "Every edge and baseline of a drawn medium sits on a 4 grid: tiles in a row share their top and height, tiles in a column share their left edge, a wire runs straight between aligned centres, and no wire crosses a wire",
+      "chapter": "04-capabilities/02-support/01-surface/03-standards-patterns/01-common/05-design-languages.md",
+      "heading": "Room and alignment",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/verify/SKILL.md",
+          "heading": "Mode: app — health checks on what is running"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/design-languages.md",
+          "heading": "The drawing scale — 🔮"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/design-language.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.546",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "In a drawn medium a wire ends at the middle of the facing edge of the unit it joins, a wire's label stands clear of its wire, and a plate's name lies inside its plate",
+      "chapter": "04-capabilities/02-support/01-surface/03-standards-patterns/01-common/05-design-languages.md",
+      "heading": "How blocks meet",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/design-languages.md",
+          "heading": "The drawing scale — 🔮"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/design-language.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.547",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "In a drawn medium words keep 12 from a tile's edge, one short line stands under a name, and code is real code",
+      "chapter": "04-capabilities/02-support/01-surface/03-standards-patterns/01-common/05-design-languages.md",
+      "heading": "How blocks meet",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/design-languages.md",
+          "heading": "The drawing scale — 🔮"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/design-language.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.548",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "Each media kind's record states its frame for each placement, and how the scale's shared parts apply to it",
+      "chapter": "04-capabilities/02-support/01-surface/03-standards-patterns/01-common/05-design-languages.md",
+      "heading": "The media kinds",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/design-languages.md",
+          "heading": "The drawing scale — 🔮"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/design-language.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.549",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "Two or more features stacked in one section stand the section's stack apart, two thirds of its room on the 8 grid",
+      "chapter": "04-capabilities/02-support/01-surface/08-architecture-containers/01-common/01-container.md",
+      "heading": "DSSectionContainer",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "A page is built from the tree of its pattern"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/architecture-containers.md",
+          "heading": "The section of a page"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.550",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "A dashed line takes the muted text colour, the token `--draw-dash-color`",
+      "chapter": "04-capabilities/02-support/01-surface/03-standards-patterns/01-common/05-design-languages.md",
+      "heading": "Lines",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/design-languages.md",
+          "heading": "The drawing scale — 🔮"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/design-language.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.551",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "A dotted line takes the accent, mixed into the ground at 24% in SaaS Plane's defaults, the token `--draw-dot-color`",
+      "chapter": "04-capabilities/02-support/01-surface/03-standards-patterns/01-common/05-design-languages.md",
+      "heading": "Lines",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/design-languages.md",
+          "heading": "The drawing scale — 🔮"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/design-language.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.552",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "The lines of an illustration, a scene's ground, a desk or a person, are not wires, and they take the ink at full, at the weight the scene is drawn in",
+      "chapter": "04-capabilities/02-support/01-surface/03-standards-patterns/01-common/05-design-languages.md",
+      "heading": "Lines",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/design-languages.md",
+          "heading": "The drawing scale — 🔮"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/design-language.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.553",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "The floors of a stack stand 12 apart, closer than two separate plates, and they never touch",
+      "chapter": "04-capabilities/02-support/01-surface/03-standards-patterns/01-common/05-design-languages.md",
+      "heading": "Room and alignment",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/design-languages.md",
+          "heading": "The drawing scale — 🔮"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/design-language.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.554",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "A row's tiles share their plate's width: one tile spans it, two take half each and three take a third",
+      "chapter": "04-capabilities/02-support/01-surface/03-standards-patterns/01-common/05-design-languages.md",
+      "heading": "Room and alignment",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/design-languages.md",
+          "heading": "The drawing scale — 🔮"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/design-language.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.555",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "A caption under a plate is a detail line, set 8 below the plate's edge, and never a fourth text level",
+      "chapter": "04-capabilities/02-support/01-surface/03-standards-patterns/01-common/05-design-languages.md",
+      "heading": "Room and alignment",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/design-languages.md",
+          "heading": "The drawing scale — 🔮"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/design-language.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.556",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "A section that opens onto a group leads with the group's own link, Explore and its name, and a deeper page or the demo comes second",
+      "chapter": "04-capabilities/02-support/01-surface/03-standards-patterns/01-common/05-design-languages.md",
+      "heading": "How a page is built from it",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/design-languages.md",
+          "heading": "How a page is built from it — 🔮"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/design-language.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.557",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "A section's background and its feature's media are two layers, and a section may use both together",
+      "chapter": "04-capabilities/02-support/01-surface/03-standards-patterns/01-common/05-design-languages.md",
+      "heading": "A section's two layers",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/verify/SKILL.md",
+          "heading": "Mode: app — health checks on what is running"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/design-languages.md",
+          "heading": "A section's two layers — 🔮"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/design-language.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.558",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "A medium takes the layer that the three questions give it: the feature's if words or items point at it, the section's if the words stand on it, and the item's if it belongs to one item",
+      "chapter": "04-capabilities/02-support/01-surface/03-standards-patterns/01-common/05-design-languages.md",
+      "heading": "Which layer takes a medium",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/design-languages.md",
+          "heading": "A section's two layers — 🔮"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/design-language.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.559",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "A page has at most one scene",
+      "chapter": "04-capabilities/02-support/01-surface/03-standards-patterns/01-common/05-design-languages.md",
+      "heading": "Media by kind of section",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/verify/SKILL.md",
+          "heading": "Mode: app — health checks on what is running"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/design-languages.md",
+          "heading": "A section's two layers — 🔮"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/design-language.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.560",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "A scene never stands behind a section whose feature also has media",
+      "chapter": "04-capabilities/02-support/01-surface/03-standards-patterns/01-common/05-design-languages.md",
+      "heading": "Media by kind of section",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/verify/SKILL.md",
+          "heading": "Mode: app — health checks on what is running"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/design-languages.md",
+          "heading": "A section's two layers — 🔮"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/design-language.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.561",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "On a phone a section's scene moves under the words",
+      "chapter": "04-capabilities/02-support/01-surface/03-standards-patterns/01-common/05-design-languages.md",
+      "heading": "Media by kind of section",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/verify/SKILL.md",
+          "heading": "Mode: app — health checks on what is running"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/design-languages.md",
+          "heading": "A section's two layers — 🔮"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/design-language.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.562",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "A section's scene is drawn at 1:1 and never stretched, and its land runs past the content box on both sides to the widest window the layout serves, 2560 in SaaS Plane's defaults, fading at its far ends",
+      "chapter": "04-capabilities/02-support/01-surface/03-standards-patterns/01-common/05-design-languages.md",
+      "heading": "A section's scene",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/design-languages.md",
+          "heading": "A section's two layers — 🔮"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/design-language.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.563",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "A scene's subjects stand inside the content box",
+      "chapter": "04-capabilities/02-support/01-surface/03-standards-patterns/01-common/05-design-languages.md",
+      "heading": "A section's scene",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/design-languages.md",
+          "heading": "A section's two layers — 🔮"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/design-language.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.564",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "The section keeps the scene's height under its words, so the words and the actions stand in the sky",
+      "chapter": "04-capabilities/02-support/01-surface/03-standards-patterns/01-common/05-design-languages.md",
+      "heading": "A section's scene",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/design-languages.md",
+          "heading": "A section's two layers — 🔮"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/design-language.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.565",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "A drawing is never cut: it fits its frame whole, on its ground, and only empty sky is trimmed",
+      "chapter": "04-capabilities/02-support/01-surface/03-standards-patterns/01-common/05-design-languages.md",
+      "heading": "Media size by placement",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/design-languages.md",
+          "heading": "Media size by placement — 🔮"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/design-language.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.566",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "A screenshot inside a drawn window crops to the top of its page",
+      "chapter": "04-capabilities/02-support/01-surface/03-standards-patterns/01-common/05-design-languages.md",
+      "heading": "Media size by placement",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/design-languages.md",
+          "heading": "Media size by placement — 🔮"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/design-language.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.567",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "A list of steps or layers stands beside its drawing, numbered and in the drawing's order",
+      "chapter": "04-capabilities/02-support/01-surface/03-standards-patterns/01-common/05-design-languages.md",
+      "heading": "Items with a medium",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/design-languages.md",
+          "heading": "Items with a medium — 🔮"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/design-language.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.568",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "A list of doors stands beside the group's picture",
+      "chapter": "04-capabilities/02-support/01-surface/03-standards-patterns/01-common/05-design-languages.md",
+      "heading": "Items with a medium",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/design-languages.md",
+          "heading": "Items with a medium — 🔮"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/design-language.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.569",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "A grid of peers takes no drawing beside it",
+      "chapter": "04-capabilities/02-support/01-surface/03-standards-patterns/01-common/05-design-languages.md",
+      "heading": "Items with a medium",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/design-languages.md",
+          "heading": "Items with a medium — 🔮"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/design-language.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.570",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "A dotted line comes in two strengths: a guide, at weight 0.75 in the accent at 24%, and a boundary that holds parts, at weight 1 with round ends in the accent at 45% in light and 55% in dark, the token `--draw-dot-strong-color`; a line's style sets its pattern, its weight its thickness (a dotted line's dot size) and its role its colour, and a dotted line that must be seen is never below weight 1",
+      "chapter": "04-capabilities/02-support/01-surface/03-standards-patterns/01-common/05-design-languages.md",
+      "heading": "Lines",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/design-languages.md",
+          "heading": "The drawing scale — 🔮"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/design-language.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.571",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "The repository's design language is the one source of its platform's look, and it holds the brand once and a row for each app",
+      "chapter": "04-capabilities/02-support/01-surface/03-standards-patterns/01-common/05-design-languages.md",
+      "heading": "One source for the platform's look",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/verify/SKILL.md",
+          "heading": "Mode: app — health checks on what is running"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/design-languages.md",
+          "heading": "One source for the platform's look — 🔮"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/standards-patterns.md",
+          "heading": "The groups, smallest scope first — 🔮"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/design-language.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.572",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "Each app keeps its theme as one exported typed setting in its code, and the agent writes it from the book in the same arc as any change to the design language",
+      "chapter": "04-capabilities/02-support/01-surface/03-standards-patterns/01-common/05-design-languages.md",
+      "heading": "One source for the platform's look",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/verify/SKILL.md",
+          "heading": "Mode: app — health checks on what is running"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/design-languages.md",
+          "heading": "One source for the platform's look — 🔮"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/standards-patterns.md",
+          "heading": "The groups, smallest scope first — 🔮"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/design-language.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.573",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
+      "sentence": "An app's theme and its row in the design language agree, and a check that refuses an app out of step is 🔮 planned",
+      "chapter": "04-capabilities/02-support/01-surface/03-standards-patterns/01-common/05-design-languages.md",
+      "heading": "One source for the platform's look",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/verify/SKILL.md",
+          "heading": "Mode: app — health checks on what is running"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/design-languages.md",
+          "heading": "One source for the platform's look — 🔮"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/design-languages.md",
+          "heading": "What is not checked yet"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.574",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
+      "sentence": "An app with its theme in code keeps it until it adopts the design language",
+      "chapter": "04-capabilities/02-support/01-surface/03-standards-patterns/01-common/05-design-languages.md",
+      "heading": "One source for the platform's look",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/design-languages.md",
+          "heading": "One source for the platform's look — 🔮"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.575",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "A theme is layered in one order: the defaults, then the brand, then the app's looks, then an account's branding",
+      "chapter": "04-capabilities/02-support/01-surface/03-standards-patterns/01-common/05-design-languages.md",
+      "heading": "One source for the platform's look",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/design-languages.md",
+          "heading": "One source for the platform's look — 🔮"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/standards-patterns.md",
+          "heading": "The groups, smallest scope first — 🔮"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/design-language.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.576",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
+      "sentence": "A design language stands beside the theme: it holds its apps' looks and never the brand of another platform",
+      "chapter": "04-capabilities/02-support/01-surface/03-standards-patterns/01-common/05-design-languages.md",
+      "heading": "One source for the platform's look",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/design-languages.md",
+          "heading": "One source for the platform's look — 🔮"
         }
       ]
     }

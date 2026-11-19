@@ -99,4 +99,8 @@ This page answers what this plugin wires and why it wires one moment. It does no
 | the foundation's `02-delivery.md` § When an edit becomes behaviour | a hook script is live on its next run, and the wiring file is not | MUST |
 | the foundation's plugins construct § The shape of a plugin, and its `04-plugins/02-shape.md` | a hook is the Event kind of script, run from a committed bundle a staleness test keeps current | MUST |
 
-Try it: `node packages/plugin-spn-apps/tests/run.mjs`
+Try it:
+
+```sh
+node packages/plugin-spn-apps/tests/run.mjs
+```

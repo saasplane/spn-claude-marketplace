@@ -3,15 +3,23 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/01-common/05-design-languages.md",
-      "section": "How one is made"
+      "section": "How one is made",
+      "seen": "9705fbee"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/01-common/05-design-languages.md",
-      "section": "Media size by placement"
+      "section": "Media size by placement",
+      "seen": "d87e0a0a"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/01-common/05-design-languages.md",
-      "section": "Text alignment and items"
+      "section": "Text alignment and items",
+      "seen": "20f6399b"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/01-common/05-design-languages.md",
+      "section": "One source for the platform's look",
+      "seen": "553a4282"
     }
   ]
 }
@@ -25,18 +33,57 @@
 
 - **Outside sites are read and never copied** (`RULE.SUPPORT.SURFACE.441` · MUST · skill:spn-surface/design)
 - **A backdrop may move, and stands still for a visitor who asked for reduced motion** (`RULE.SUPPORT.SURFACE.444` · MUST · skill:spn-surface/design)
-- **An agent reads the app's construct, its capability chapter and its `design-language.json` before it draws a page or a picture** (`RULE.SUPPORT.SURFACE.525` · MUST · skill:spn-surface/design)
+- **An agent reads the platform's design language construct and the app's capability chapter before it draws a page or a picture** (`RULE.SUPPORT.SURFACE.525` · MUST · skill:spn-surface/design)
 - **A medium is placed on the section, the feature or the item that its size fits, and its colours are the design system's tokens** (`RULE.SUPPORT.SURFACE.526` · MUST · skill:spn-surface/design)
 - **Each size is read from the design system's container that holds it, and a drawing is made for its frame, never scaled from another placement** (`RULE.SUPPORT.SURFACE.527` · MUST · skill:spn-surface/design)
 - **A claim has one carrier, either its items or the medium's labels** (`RULE.SUPPORT.SURFACE.528` · MUST · skill:spn-surface/design)
+- **A design language fills one drawing scale, and every medium in it takes the parts of that scale that apply to its kind** (`RULE.SUPPORT.SURFACE.536` · MUST · skill:spn-surface/design)
+- **A language that uses no drawn media says so in its construct, and skips the parts that apply to drawn media only** (`RULE.SUPPORT.SURFACE.537` · MUST · skill:spn-surface/design)
+- **A medium takes one step of the scale by where it sits: S in a card, M in a section and in every docs figure, L in a hero** (`RULE.SUPPORT.SURFACE.538` · MUST · skill:spn-surface/design)
+- **Words placed on media have three levels, label, name and detail, and never a fourth, and no word renders below 9px** (`RULE.SUPPORT.SURFACE.539` · MUST · skill:spn-surface/design)
+- **Text never shrinks to fit: a medium that only fits with smaller words changes its form or is cut to its subject, and each medium is made at 1:1 for its frame** (`RULE.SUPPORT.SURFACE.540` · MUST · skill:spn-surface/design)
+- **Every framed medium takes the scale's radius and the scale's one small shadow, a tile and a photo's frame and a product screen alike, and dark mode has no shadow** (`RULE.SUPPORT.SURFACE.541` · MUST · skill:spn-surface/design)
+- **A line in a drawn medium, or drawn over another medium, has one of three weights, detail, line and focus, and one of three styles: solid; dashed for a reply, an inactive unit or a slot you fill; dotted for a guide or a boundary** (`RULE.SUPPORT.SURFACE.542` · MUST · skill:spn-surface/design)
+- **A line's colour is a role token, and a line never takes opacity** (`RULE.SUPPORT.SURFACE.543` · MUST · skill:spn-surface/design)
+- **A drawn medium takes its spacing from the scale, inside a tile, between tiles, inside a plate, between plates, from a wire to its label, between parallel wires, at a bend and at the frame margin, and a tile takes the inline or the stacked form** (`RULE.SUPPORT.SURFACE.544` · MUST · skill:spn-surface/design)
+- **Every edge and baseline of a drawn medium sits on a 4 grid: tiles in a row share their top and height, tiles in a column share their left edge, a wire runs straight between aligned centres, and no wire crosses a wire** (`RULE.SUPPORT.SURFACE.545` · MUST · skill:spn-surface/design)
+- **In a drawn medium a wire ends at the middle of the facing edge of the unit it joins, a wire's label stands clear of its wire, and a plate's name lies inside its plate** (`RULE.SUPPORT.SURFACE.546` · MUST · skill:spn-surface/design)
+- **In a drawn medium words keep 12 from a tile's edge, one short line stands under a name, and code is real code** (`RULE.SUPPORT.SURFACE.547` · MUST · skill:spn-surface/design)
+- **Each media kind's record states its frame for each placement, and how the scale's shared parts apply to it** (`RULE.SUPPORT.SURFACE.548` · MUST · skill:spn-surface/design)
+- **A dashed line takes the muted text colour, the token `--draw-dash-color`** (`RULE.SUPPORT.SURFACE.550` · MUST · skill:spn-surface/design)
+- **A dotted line takes the accent, mixed into the ground at 24% in SaaS Plane's defaults, the token `--draw-dot-color`** (`RULE.SUPPORT.SURFACE.551` · MUST · skill:spn-surface/design)
+- **The lines of an illustration, a scene's ground, a desk or a person, are not wires, and they take the ink at full, at the weight the scene is drawn in** (`RULE.SUPPORT.SURFACE.552` · MUST · skill:spn-surface/design)
+- **The floors of a stack stand 12 apart, closer than two separate plates, and they never touch** (`RULE.SUPPORT.SURFACE.553` · MUST · skill:spn-surface/design)
+- **A row's tiles share their plate's width: one tile spans it, two take half each and three take a third** (`RULE.SUPPORT.SURFACE.554` · MUST · skill:spn-surface/design)
+- **A caption under a plate is a detail line, set 8 below the plate's edge, and never a fourth text level** (`RULE.SUPPORT.SURFACE.555` · MUST · skill:spn-surface/design)
+- **A section that opens onto a group leads with the group's own link, Explore and its name, and a deeper page or the demo comes second** (`RULE.SUPPORT.SURFACE.556` · MUST · skill:spn-surface/design)
+- **A section's background and its feature's media are two layers, and a section may use both together** (`RULE.SUPPORT.SURFACE.557` · MUST · skill:spn-surface/design)
+- **A medium takes the layer that the three questions give it: the feature's if words or items point at it, the section's if the words stand on it, and the item's if it belongs to one item** (`RULE.SUPPORT.SURFACE.558` · MUST · skill:spn-surface/design)
+- **A page has at most one scene** (`RULE.SUPPORT.SURFACE.559` · MUST · skill:spn-surface/design)
+- **A scene never stands behind a section whose feature also has media** (`RULE.SUPPORT.SURFACE.560` · MUST · skill:spn-surface/design)
+- **On a phone a section's scene moves under the words** (`RULE.SUPPORT.SURFACE.561` · MUST · skill:spn-surface/design)
+- **A section's scene is drawn at 1:1 and never stretched, and its land runs past the content box on both sides to the widest window the layout serves, 2560 in SaaS Plane's defaults, fading at its far ends** (`RULE.SUPPORT.SURFACE.562` · MUST · skill:spn-surface/design)
+- **A scene's subjects stand inside the content box** (`RULE.SUPPORT.SURFACE.563` · MUST · skill:spn-surface/design)
+- **The section keeps the scene's height under its words, so the words and the actions stand in the sky** (`RULE.SUPPORT.SURFACE.564` · MUST · skill:spn-surface/design)
+- **A drawing is never cut: it fits its frame whole, on its ground, and only empty sky is trimmed** (`RULE.SUPPORT.SURFACE.565` · MUST · skill:spn-surface/design)
+- **A screenshot inside a drawn window crops to the top of its page** (`RULE.SUPPORT.SURFACE.566` · MUST · skill:spn-surface/design)
+- **A list of steps or layers stands beside its drawing, numbered and in the drawing's order** (`RULE.SUPPORT.SURFACE.567` · MUST · skill:spn-surface/design)
+- **A list of doors stands beside the group's picture** (`RULE.SUPPORT.SURFACE.568` · MUST · skill:spn-surface/design)
+- **A grid of peers takes no drawing beside it** (`RULE.SUPPORT.SURFACE.569` · MUST · skill:spn-surface/design)
+- **A dotted line comes in two strengths: a guide, at weight 0.75 in the accent at 24%, and a boundary that holds parts, at weight 1 with round ends in the accent at 45% in light and 55% in dark, the token `--draw-dot-strong-color`; a line's style sets its pattern, its weight its thickness (a dotted line's dot size) and its role its colour, and a dotted line that must be seen is never below weight 1** (`RULE.SUPPORT.SURFACE.570` · MUST · skill:spn-surface/design)
+- **The repository's design language is the one source of its platform's look, and it holds the brand once and a row for each app** (`RULE.SUPPORT.SURFACE.571` · MUST · skill:spn-surface/design)
+- **Each app keeps its theme as one exported typed setting in its code, and the agent writes it from the book in the same arc as any change to the design language** (`RULE.SUPPORT.SURFACE.572` · MUST · skill:spn-surface/design)
+- **A theme is layered in one order: the defaults, then the brand, then the app's looks, then an account's branding** (`RULE.SUPPORT.SURFACE.575` · MUST · skill:spn-surface/design)
 
 Read this before a page of a site or an app is drawn, and while a partner's design language is being made. 
 
-A language is kept at three levels: the platform's construct, each app's capability chapter, and each app's `design-language.json`. The construct records only the decisions. The rounds that led to them are kept beside it, so the next partner's language is made the same way.
+A language is kept as the repository's design language, a construct, and each app's capability chapter says how that app fills it. The construct holds the brand once, the primary colour, the greys and the typefaces, and a row for each app: its kind, its layout as a pointer to the app's layout setting, and its looks, mode, size, motion, radius, body, navigation, frames, card and table. It is the one source of the platform's look, for the apps and for the agent. The construct records only the decisions. The rounds that led to them are kept beside it, so the next partner's language is made the same way.
 
 ## Before any page
 
-1. **Read the app's construct, its capability chapter and its `design-language.json`.** The construct names which app follows which language and the brand; the chapter names where the app's data and drawings live; the data holds the values.
+**Before drawing, read the language's drawing scale, pick the step from the placement (S in a card, M in a section and a docs figure, L in a hero), and use only the tokens of the parts that apply to the medium's kind. A stack's floors stand 12 apart, a row's tiles share their plate's width, a caption under a plate is a detail line 8 below it, an illustration's lines take the ink at full, a dashed line takes `--draw-dash-color` and a dotted line `--draw-dot-color`, and a drawing is never cut.**
+
+1. **Read the repository's design language, the construct, and the app's capability chapter.** The construct holds the brand once and the app's row, with its looks; the chapter names where the app's drawings live. Read the construct and never a data file.
 2. **Where the app has no language yet, start with intake below.** A page is drawn only after the language says how.
 
 ## Intake
@@ -56,8 +103,9 @@ Record each thing the partner shares, each with where it came from and the day:
 
 1. **Show a round**: the options, each with what it chose and why.
 2. **Record the pick** in the round's own file beside the construct, with what the partner said, the day, and what was dropped.
-3. **Fold the decisions into the construct** and the data together, and run `spn-surface language write <app>` so the figures follow the data.
-4. **Run `spn-surface check page` on every spec** and `spn-surface check module` on every module's folders. Tokens only: a drawing takes its colours from the theme's tokens or mixes of them.
+3. **Fold the decisions into the construct**: the brand once, and the app's row for its looks, the layout as a pointer to the app's layout setting and never copied into a look. Where the construct marks figures to be filled, run `spn-surface language write <app>` so they follow.
+4. **Write each app's theme setting in the same arc**: after any change to the design language, write the one exported typed setting in each affected app's code from the brand and that app's row, named as the design system's theme type names its values (`DSThemeModeType`, `DSSizeType`, `DSMotionSpeedType`, `DSThemeRadiusType`, the layout, panel, card and table looks). The setting is the copy and the construct is the source, so the two move together and never apart. An app that keeps its theme in code and has not adopted the design language is left as it is, and no app is changed only to match. The check that compares a setting with its row comes later; until then a review reads the setting beside its row.
+5. **Run `spn-surface check page` on every spec** and `spn-surface check module` on every module's folders. Tokens only: a drawing takes its colours from the theme's tokens or mixes of them.
 
 ## When a section's pattern is picked
 
@@ -78,11 +126,13 @@ Read two parts of the construct for each section.
 
 **Alignment is decided with the pattern.** Start-aligned is the default. A section's words centre only where they frame something short with no medium beside them, or one centrepiece medium under a short title and one line; a paragraph or an item grid is never centred.
 
-**Items follow the medium.** One carrier holds each claim: where a medium already labels each point the items go, and where a reader scans to decide they stay.
+**Items follow the medium.** One carrier holds each claim: where a medium already labels each point the items go, and where a reader scans to decide they stay. A list of steps or layers stands beside its drawing, numbered and in the drawing's order; a list of doors stands beside the group's picture; a grid of peers takes no drawing.
+
+**Pick the layer with three questions.** If words or items point at the medium, it is the feature's; if it is a place the words stand on, it is the section's; if it belongs to one item, it is the item's. A section's background and its feature's media may be used together. A page has at most one scene, never behind a section whose feature has media, and on a phone it moves under the words. A section that opens onto a group leads with the group's own link, and a deeper page or the demo comes second.
 
 ## Where media go
 
-A hero scene goes through the section's media, edge to edge. A close-up or a sheet goes through the feature's media, and a small picture through the item's.
+A hero scene is the section's background, through its `mediaNode`, edge to edge, drawn at 1:1 with its land running past the content box and its subjects inside it. A close-up or a sheet goes through the feature's media, and a small picture through the item's.
 
 A scene is a hero's BACKDROP, one picture is SPLIT_END, and a wide picture or two panes are MEDIA_BOTTOM. 
 

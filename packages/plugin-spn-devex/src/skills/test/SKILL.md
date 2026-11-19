@@ -7,11 +7,11 @@ description: What proves a behaviour, at which tier, and what a passing suite do
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
-      "seen": "7beac2a2"
+      "seen": "bd28f6f7"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/05-test.md",
-      "seen": "225bbd97"
+      "seen": "53cfb13a"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/05-test.md",
@@ -190,7 +190,7 @@ A **double** stands in for a collaborator and belongs to the unit tier only; a *
 
 **An order's gate is `spnutils apps check` on each node it touched, and a part runs no test** (rule RULE.DEVEX.WORKSPACE.207 · MUST · check:doc-check). Documents come first, and then source. Then the agent type-checks each node it touched and stops. It runs no spec, no whole tier, no browser walk and no probe, because a tier run between passes repeats minutes of work for each defect it shows; every tier runs once, in the repository's full run, and a new case is shown red as the workstream chapter's Red-first tests section says. The arc's `PROOF` row keeps its place as the final re-check.
 
-**Five things an order never does, and every brief says so** (rule RULE.DEVEX.WORKSPACE.515 · MUST · skill:spn-devex/execute). An agent never rewrites a file with `sed -i`; it changes a file with the edit tool. It never runs `git stash`, because a stash takes the shared checkout's work from whoever is writing in it, and only the coordinator names one (`RULE.DEVEX.WORKSPACE.481`). It never commits: the coordinator commits by explicit path, so one agent's commit never carries another agent's file. It never formats a generated file, since a generated file is changed only by running the command that writes it. It starts a demo app only from the main checkout, through `spnutils apps dev` (`RULE.SUPPORT.APPS.264`), never from a worktree.
+**Five things an order never does, and every brief says so** (rule RULE.DEVEX.WORKSPACE.515 · MUST · skill:spn-devex/execute). An agent never rewrites a file with `sed -i`; it changes a file with the edit tool. It never runs `git stash`, because a stash takes the shared checkout's work from whoever is writing in it, and only the coordinator names one (`RULE.DEVEX.WORKSPACE.481` · MUST · skill:spn-devex/ideate). It never commits: the coordinator commits by explicit path, so one agent's commit never carries another agent's file. It never formats a generated file, since a generated file is changed only by running the command that writes it. It starts a demo app only from the main checkout, through `spnutils apps dev` (`RULE.SUPPORT.APPS.264` · MUST · skill:spn-apps/run), never from a worktree.
 
 **Count what you touched in behaviour rows, never in folders.** The capability page that claims the changed code names the rows it realizes, and each row names its cases through the id in their titles.
 

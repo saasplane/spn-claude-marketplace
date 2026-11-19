@@ -8,8 +8,11 @@ import { RUN_NAME, RUNS_KEPT, runFilePath, writeRunFile } from "../../src/lib/ru
 // THE WRITER IS THE LIBRARY'S, so a runner and a plugin command that records a run write one shape.
 export { RUN_NAME, RUNS_KEPT, runFilePath, writeRunFile };
 
-/** The behaviour id a case's title carries in brackets — the book's rule that a test title carries the id. */
-export const ID = /\[([A-Z][A-Z0-9]*(?:\.[A-Z0-9]+){2})\]/;
+/**
+ * The behaviour id a case's title carries in brackets — the book's rule that a test title carries the id. Three
+ * segments are a register row's (`MKT.HOOKS.142`); four are a book rule's (`RULE.DEVEX.WORKSPACE.519`).
+ */
+export const ID = /\[([A-Z][A-Z0-9]*(?:\.[A-Z0-9]+){2,3})\]/;
 
 /**
  * Set by the full run (`scripts/test-all.mjs`) for every package's runner, so each adds its results to the
@@ -42,8 +45,9 @@ export function resultsOf(out, tier) {
   const results = [];
   for (const line of out.split("\n")) {
     const verdict = /^\s*(PASS|FAIL)\s+(.*)$/.exec(line);
-    const id = verdict && ID.exec(verdict[2]);
-    if (id) results.push({ id: id[1], tier, status: verdict[1] === "PASS" ? "SUCCESS" : "FAILED", title: verdict[2].trim() });
+    // One result for each id a title carries, so a case that names a rule and a row proves both.
+    const ids = verdict ? [...verdict[2].matchAll(new RegExp(ID.source, "g"))] : [];
+    for (const id of ids) results.push({ id: id[1], tier, status: verdict[1] === "PASS" ? "SUCCESS" : "FAILED", title: verdict[2].trim() });
   }
   return results;
 }

@@ -43,6 +43,14 @@ function filesUnder(dir: string, base = dir): string[] {
 }
 
 /**
+ * A surface page preview: a page whose `spn:doc` variant is `surface-page-preview` (RULE.DEVEX.WORKSPACE.534). It is the work's page
+ * for one surface page, a viewer for the copy beside it, and never an arc's preview.
+ */
+export function isSurfacePagePreview(path: string): boolean {
+  try { return /<!--\s*spn:doc[\s\S]*?"variant"\s*:\s*"surface-page-preview"/.test(readFileSync(path, "utf8")); } catch { return false; }
+}
+
+/**
  * Q99: at most one preview per arc, by its fixed name, and no `previews/` folder. That every arc has its one
  * is `arcPreviewFindings`' (RULE.DEVEX.WORKSPACE.254).
  */
@@ -52,7 +60,7 @@ export function previewFindings(ws: string, arc: string): string[] {
   if (isDir(join(notes, "previews"))) out.push(`${arc} keeps a \`previews/\` folder — an arc's one preview is \`${NOTES}/${arc}/${PREVIEW_FILE}\``);
   for (const [base, under] of [[notes, `${NOTES}/${arc}`], [join(ws, "arcs", arc), `arcs/${arc}`]] as const)
     for (const file of filesUnder(base))
-      if (/preview[^/]*\.html$/i.test(file) && !(base === notes && file === PREVIEW_FILE))
+      if (/preview[^/]*\.html$/i.test(file) && !(base === notes && file === PREVIEW_FILE) && !isSurfacePagePreview(join(base, file)))
         out.push(`\`${under}/${file}\` is a second preview — an arc has at most one, \`${NOTES}/${arc}/${PREVIEW_FILE}\``);
   return out;
 }
