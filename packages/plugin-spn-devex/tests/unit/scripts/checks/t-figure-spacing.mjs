@@ -27,6 +27,33 @@ ok("[MKT.HOOKS.135] an svg that is not a drawing is not measured",
   verdictOf(checkFigureSpacing(page(TIGHT.replace("sds-drawing", "icon")))) === "silent");
 ok("[MKT.HOOKS.135] a write with no svg is quiet", verdictOf(checkFigureSpacing(page("<p>hello</p>"))) === "silent");
 
+console.log("=== the docs design language's own units are not misread as faults");
+const dl = (inner) => `<svg class="dl-svg" viewBox="0 0 400 240">${inner}</svg>`;
+const verdictFor = (inner) => verdictOf(checkFigureSpacing(page(dl(inner))));
+const BOX = '<rect class="dl-tile" x="40" y="40" width="120" height="48" rx="10"/>';
+const GLYPH = '<g class="dl-glyph" transform="translate(52 52) scale(0.8)"><rect width="16" height="12" x="4" y="8" rx="2"/><rect width="6" height="6" x="9" y="11"/></g>';
+const PERSON = (x, y) => `<g class="person" transform="translate(${x} ${y}) scale(1.4)"><g><line x1="0" y1="-26" x2="0" y2="-29"/><path d="M-2 -10 L-2 0" stroke-width="1.2"/><rect x="-4.5" y="-21" width="9" height="11" rx="3.5"/></g></g>`;
+ok("[MKT.HOOKS.135] a glyph's own rects, in its own 24-unit space, are not boxes of the figure",
+  verdictFor(`<rect class="dl-plate" x="20" y="20" width="200" height="80" rx="12"/><rect class="dl-tile" x="36" y="36" width="168" height="48" rx="10"/>${GLYPH}`) === "silent");
+ok("known-bad: the same inner rects as plain boxes are a child 4px from its container",
+  verdictFor('<rect x="4" y="8" width="16" height="12"/><rect x="5" y="9" width="6" height="6"/>') === "deny");
+ok("[MKT.HOOKS.135] a drawn character's short strokes are not connectors, nor near the frame",
+  verdictFor(`${BOX}${PERSON(300, 120)}`) === "silent");
+ok("known-bad: a short line outside a character is still a connector",
+  verdictFor(`${BOX}<path class="dl-wire" d="M260 120 L263 120"/>`) === "deny");
+ok("[MKT.HOOKS.135] a wire that meets the top of a character lands on it",
+  verdictFor(`${BOX}<path class="dl-wire" d="M100 88 L100 ${200 - 32 * 1.4}"/>${PERSON(100, 200)}`) === "silent");
+ok("known-bad: a wire that stops 40px short of the character ends in empty space",
+  verdictFor(`${BOX}<path class="dl-wire" d="M100 88 L100 ${200 - 32 * 1.4 - 40}"/>${PERSON(100, 200)}`) === "deny");
+ok("[MKT.HOOKS.135] a wire drawn on its own as a legend (data-dl-legend) may end in space",
+  verdictFor('<g data-dl-legend><path class="dl-wire" d="M40 120 H136"/></g><text class="dl-detail" x="40" y="150">default</text>') === "silent");
+ok("known-bad: the same wire without the marker ends in empty space",
+  verdictFor('<path class="dl-wire" d="M40 120 H136"/><text class="dl-detail" x="40" y="150">default</text>') === "deny");
+ok("[MKT.HOOKS.135] a chip sits on the wire it names",
+  verdictFor(`${BOX}<rect class="dl-tile" x="248" y="40" width="120" height="48" rx="10"/><path class="dl-wire" d="M160 64 H248"/><rect class="dl-chip" x="181" y="54" width="46" height="20" rx="10"/><text class="dl-chip-text" x="204" y="67.5" text-anchor="middle">N:1</text>`) === "silent");
+ok("known-bad: a plain label standing on a wire is refused",
+  verdictFor(`${BOX}<rect class="dl-tile" x="248" y="40" width="120" height="48" rx="10"/><path class="dl-wire" d="M160 64 H248"/><text class="dl-wlabel" x="204" y="67.5" text-anchor="middle">N:1</text>`) === "deny");
+
 console.log(`\n${total - failed}/${total} passed`);
 process.exit(failed ? 1 : 0);
 

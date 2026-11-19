@@ -864,7 +864,7 @@ function arcChip(data: ArcData, ws: string, questions: readonly Question[]): str
   const chipLabel = opens ? `${label}, ${data.arc} preview, opens in a new tab` : label;
   return `      <a class="sds-chip sds-${word} sds-step-${step}" ${link} aria-label="${chipLabel}">`
     + `<span class="sds-chip-line"><span class="sds-chip-name">${role ? `<span class="sds-chip-subject">${name}</span>` : `<span class="sds-mono">${number}</span><span class="sds-chip-subject"> &middot; ${name}</span>`}</span><span class="sds-arc-count">${count}</span></span>`
-    + `<span class="sds-chip-bar"><i style="width:${width}%"></i></span>${tip}</a>`;
+    + `<span class="sds-chip-bar"><i style="--share:${width}%"></i></span>${tip}</a>`;
 }
 
 /**
@@ -890,7 +890,7 @@ function statusBar(ws: string, arcs: readonly ArcData[], closed: number): string
     `    </div>`,
     `    <div class="sds-footbar-summary sds-${word.toLowerCase()} sds-step-${progressStep(done, total)}" tabindex="0" aria-label="Workstream ${word}, ${done} of ${total} steps landed, ${closed} of ${arcs.length} arcs closed">`,
     `      <span class="sds-chip-line"><span class="sds-chip-name">Overall</span><span class="sds-arc-count">${done}/${total}</span></span>`,
-    `      <span class="sds-chip-bar"><i style="width:${share(done, total)}%"></i></span>`,
+    `      <span class="sds-chip-bar"><i style="--share:${share(done, total)}%"></i></span>`,
     `      <span class="sds-tip"><span class="sds-badge sds-status sds-${word.toLowerCase()}">${word}</span><strong>Overall</strong><span>${closed} of ${arcs.length} arcs closed</span><span>${done} of ${total} steps landed</span></span>`,
     `    </div>`,
     `  </nav>`,
@@ -945,7 +945,7 @@ export function previewArc(arc: string): string {
 
 /** The header's progress fact: a short bar in the chip's fill and the steps landed, `8 of 18 landed`. */
 export function previewProgress(done: number, total: number): string {
-  return `<span class="sds-label">Progress:</span> <span class="sds-progress sds-step-${progressStep(done, total)}"><span class="sds-chip-bar"><i style="width:${share(done, total)}%"></i></span> ${done} of ${total} landed</span>`;
+  return `<span class="sds-label">Progress:</span> <span class="sds-progress sds-step-${progressStep(done, total)}"><span class="sds-chip-bar"><i style="--share:${share(done, total)}%"></i></span> ${done} of ${total} landed</span>`;
 }
 
 /**

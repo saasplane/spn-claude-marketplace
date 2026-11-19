@@ -42,8 +42,8 @@ console.log("=== styles on the design system — the docs classes read the produ
     variables(["--surface", "--surface-raised", "--fg", "--fg-quiet", "--border", "--radius", "--font-text", "--font-code", "--seed-primary"]));
   ok("[MKT.SCRIPTS.588] the stylesheet derives a palette from --seed-primary, and sets dark with data-mode",
     built.includes("oklch(from var(--seed-primary)") && /\[data-mode=['"]dark['"]\]/.test(built));
-  ok("[MKT.SCRIPTS.588] ds-tokens.css names the design-system version it was copied from, and is imported first by the source",
-    /copied whole by `spn-devex docs sds cut` from support-web-ds-ts v\d+\.\d+\.\d+/.test(tokens) && /@import "\.\/ds-tokens\.css";/.test(source));
+  ok("[MKT.SCRIPTS.588] ds-tokens.css names the design-system version or commit it was copied from, and is imported first by the source",
+    /copied whole by `spn-devex docs sds cut` from support-web-ds-ts (?:v\d+\.\d+\.\d+|[0-9a-f]{7,})/.test(tokens) && /@import "\.\/ds-tokens\.css";/.test(source));
   ok("[MKT.SCRIPTS.588] the docs names read the design system's: --sds-paper is --surface, --sds-ink is --fg, --sds-rule is --border",
     /--sds-paper: var\(--surface\)/.test(built) && /--sds-ink: var\(--fg\)/.test(built) && /--sds-rule: var\(--border\)/.test(built));
   ok("[MKT.SCRIPTS.588] the fonts are declared under the design system's names, DSDefaultText and DSDefaultCode, on the same two Geist files, and SDSText and SDSCode are gone",
@@ -64,8 +64,10 @@ for (const [version, files] of Object.entries(versions)) {
     JSON.stringify(Object.keys(files).sort()) === JSON.stringify(FILES)
       && JSON.stringify(readdirSync(join(SERVED, version)).sort()) === JSON.stringify((withFonts ? [...FILES, "fonts"] : FILES).sort()));
   if (withFonts) {
-    ok(`${version}/fonts holds the two Geist files and their licence, the bytes the styles folder holds`,
-      JSON.stringify(readdirSync(join(SERVED, version, "fonts")).sort()) === JSON.stringify(["Geist-Variable.woff2", "GeistMono-Variable.woff2", "OFL.txt"].sort())
+    // From 1.15.0 the design system's display font, Schibsted Grotesk, ships beside Geist, with its own licence.
+    const wanted = ["Geist-Variable.woff2", "GeistMono-Variable.woff2", "OFL.txt", ...(Number(version.split(".")[1]) >= 15 ? ["SchibstedGrotesk-Variable.woff2", "OFL-SchibstedGrotesk.txt"] : [])];
+    ok(`${version}/fonts holds the Geist files and their licence${wanted.length > 3 ? ", and the display font and its licence from 1.15.0" : ""}, the bytes the styles folder holds`,
+      JSON.stringify(readdirSync(join(SERVED, version, "fonts")).sort()) === JSON.stringify(wanted.sort())
         && readdirSync(join(SERVED, version, "fonts")).every((name) => sha(join(SERVED, version, "fonts", name)) === sha(join(STYLES, "fonts", name))));
   }
   for (const [name, hash] of Object.entries(files))

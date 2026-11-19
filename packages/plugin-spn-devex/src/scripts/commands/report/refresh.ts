@@ -252,10 +252,10 @@ function writeTiles(page: string, tiles: Numbers["tiles"]): Written {
     if (of === null) return next;
     next = next.replace(/(<span class="sds-percent">)[^<]*(<\/span>)/, `$1${shareOf(count, of)}$2`);
     // A bar is green only for a measure that is done. A tile that counts a gap or a failure keeps its colour.
-    return next.replace(/<i(?: class="([^"]*)")? style="width:[^"]*">/, (_all, marks: string | undefined) => {
+    return next.replace(/<i(?: class="([^"]*)")? style="(?:width|--share):[^"]*">/, (_all, marks: string | undefined) => {
       const kept = (marks ?? "").split(/\s+/).filter((mark) => mark !== "" && mark !== "sds-success");
       if (!kept.includes("sds-warning") && !kept.includes("sds-error") && count === of && of > 0) kept.push("sds-success");
-      return `<i${kept.length ? ` class="${kept.join(" ")}"` : ""} style="width:${widthOf(count, of)}">`;
+      return `<i${kept.length ? ` class="${kept.join(" ")}"` : ""} style="--share:${widthOf(count, of)}">`;
     });
   });
   for (const tile of tiles) if (!seen.has(tile.label)) unplaced.push(`the page has no tile \`${tile.label}\` — ${written(tile.count)}${tile.of === null ? "" : ` of ${written(tile.of)}`}`);
@@ -287,7 +287,7 @@ function writeBreakdown(page: string, states: Numbers["states"]): Written {
   region = region.replace(/(<div class="sds-breakdown-bar"[^>]*>)([\s\S]*?)(\n?[ \t]*<\/div>)/, (_all, open: string, inner: string, close: string) => {
     const indent = /\n([ \t]*)<span/.exec(inner)?.[1] ?? `${/\n([ \t]*)<\/div>/.exec(close)?.[1] ?? "    "}  `;
     const segments = states.filter((state) => state.count > 0 && keys.has(state.label)).map((state) =>
-      `\n${indent}<span class="sds-breakdown-segment ${keys.get(state.label)}" style="flex-grow:${state.count}" ` +
+      `\n${indent}<span class="sds-breakdown-segment ${keys.get(state.label)}" style="--grow:${state.count}" ` +
       `title="${state.label}: ${written(state.count)} behaviour${state.count === 1 ? "" : "s"}"></span>`);
     const label = states.map((state) => `${state.label} ${written(state.count)}`).join(", ");
     return `${open.replace(/aria-label="[^"]*"/, `aria-label="${label}"`)}${segments.join("")}${close.startsWith("\n") ? close : `\n${close}`}`;

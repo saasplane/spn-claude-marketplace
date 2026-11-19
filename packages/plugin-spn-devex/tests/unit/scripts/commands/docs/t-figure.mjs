@@ -113,7 +113,7 @@ function pageIn(name, text) {
   const USAGE = "usage: spn-devex docs figure check <path…> [--variant <name>]\n" +
                 "       spn-devex docs figure colour <path…> [--variant <name>]\n" +
                 "       spn-devex docs figure render <svg-or-html…>\n" +
-                "       spn-devex docs figure draw <spec.json…>\n";
+                "       spn-devex docs figure draw <spec.json…> [--case]\n";
   const bare = run([svg]);
   one("[MKT.SCRIPTS.111] a file where the action belongs is refused: each usage line, an action is owed, and exit 2",
     bare.code === 2 && bare.out === `${USAGE}\`docs figure\` needs an action.\n`);
@@ -139,7 +139,7 @@ console.log("\n=== `draw` prints the drawing of a spec a hand-written page holds
   const file = join(BASE, "skel.json");
   writeFileSync(file, JSON.stringify(spec));
   const { out, code } = run(["draw", file]);
-  one("`draw` on a spec file prints one `<figure>`", (out.match(/<figure>/g) ?? []).length === 1);
+  one("`draw` on a spec file prints one `<figure class=\"dl-figure\">`, the docs design language's", (out.match(/<figure class="dl-figure">/g) ?? []).length === 1);
   one("with the spec's own caption as `<figcaption>`", out.includes("<figcaption>one named place.</figcaption>"));
   one("and exits 0 on a spec with no finding", code === 0);
 
@@ -147,7 +147,7 @@ console.log("\n=== `draw` prints the drawing of a spec a hand-written page holds
   writeFileSync(page, "# A page\n\n```dg\n" + JSON.stringify(spec) + "\n```\n\n```dg\n" + JSON.stringify(spec) + "\n```\n");
   const md = run(["draw", page]);
   one("a `.md` file's own ```dg``` blocks are drawn in order, one `<figure>` each",
-    (md.out.match(/<figure>/g) ?? []).length === 2 && md.code === 0);
+    (md.out.match(/<figure class="dl-figure">/g) ?? []).length === 2 && md.code === 0);
 
   const badSpec = { kind: "skeleton", frame: { rows: [{ items: [{}] }] } };
   const badFile = join(BASE, "skel-bad.json");
@@ -158,7 +158,7 @@ console.log("\n=== `draw` prints the drawing of a spec a hand-written page holds
 
   const noPath2 = run(["draw"]);
   one("`draw` with no path says a path is owed, and exits 2",
-    noPath2.code === 2 && noPath2.out === "usage: spn-devex docs figure draw <spec.json…>\n`docs figure draw` needs a path.\n");
+    noPath2.code === 2 && noPath2.out === "usage: spn-devex docs figure draw <spec.json…> [--case]\n`docs figure draw` needs a path.\n");
 }
 
 console.log("\n=== `draw` reads a flow file against the specs beside it, and draws nothing");

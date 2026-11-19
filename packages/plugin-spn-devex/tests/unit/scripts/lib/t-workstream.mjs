@@ -119,7 +119,7 @@ console.log("\n=== the generated blocks — progress and open");
   const data = arcData(); data.rows[0].state = "landed";
   const inside = lib.progressInside("/nowhere", [data]);
   ok("progress: the card alone — no Overall line, no long bar, no grid of tiles", !inside.includes("<p>") && !inside.includes('class="sds-bar"') && !inside.includes("sds-arcs") && inside.startsWith('  <nav class="sds-footbar"'), inside);
-  ok("progress: a chip links its row on the page, never its data", inside.includes('href="#N001"') && inside.includes('style="width:50%"') && !inside.includes("state.json"), inside);
+  ok("progress: a chip links its row on the page, never its data", inside.includes('href="#N001"') && inside.includes('style="--share:50%"') && !inside.includes("state.json"), inside);
   const words = lib.progressInside("/nowhere", [{ ...data, arc: "N002", subject: "workstream-data", title: "Workstream data", status: "PROPOSED" }]);
   ok("[MKT.SCRIPTS.490] progress: a build arc's chip shows its title, not its subject, after the number", words.includes("<span class=\"sds-chip-subject\"> &middot; Workstream data</span>") && !words.includes("workstream data") && words.includes('class="sds-chip sds-proposed '), words);
   ok("progress: no arc, no card and nothing else", lib.progressInside("/nowhere", []) === "");
@@ -154,9 +154,9 @@ console.log("\n=== the generated blocks — progress and open");
     inside.includes('<nav class="sds-footbar" aria-label="Workstream status">') && inside.indexOf('sds-footbar-chips') < inside.indexOf('sds-footbar-summary')
       && inside.includes('<span>0 of 1 arcs closed</span>') && !inside.includes("sds-footbar-line"), inside);
   ok("progress: a chip is two lines — the number without the N and the arc's title with done/total on the right, then the bar — its status in its class, its tooltip and its accessible name, and no badge",
-    /<a class="sds-chip sds-running sds-step-3" href="#N001" aria-label="N001 the probe arc, RUNNING, 1 of 2 steps landed, in progress: none, next ready: row 2, build it, log last moved: never"><span class="sds-chip-line"><span class="sds-chip-name"><span class="sds-mono">1<\/span><span class="sds-chip-subject"> &middot; the probe arc<\/span><\/span><span class="sds-arc-count">1\/2<\/span><\/span><span class="sds-chip-bar"><i style="width:50%"><\/i><\/span><span class="sds-tip"><span class="sds-badge sds-status sds-running">RUNNING<\/span><strong>the probe arc<\/strong><span>1 of 2 steps landed<\/span><span>in progress: none<\/span><span>next ready: row 2, build it<\/span><span>log last moved: never<\/span><\/span><\/a>/.test(inside) && !/sds-chip-line"><span class="sds-badge[^>]*>RUNNING/.test(inside), inside);
+    /<a class="sds-chip sds-running sds-step-3" href="#N001" aria-label="N001 the probe arc, RUNNING, 1 of 2 steps landed, in progress: none, next ready: row 2, build it, log last moved: never"><span class="sds-chip-line"><span class="sds-chip-name"><span class="sds-mono">1<\/span><span class="sds-chip-subject"> &middot; the probe arc<\/span><\/span><span class="sds-arc-count">1\/2<\/span><\/span><span class="sds-chip-bar"><i style="--share:50%"><\/i><\/span><span class="sds-tip"><span class="sds-badge sds-status sds-running">RUNNING<\/span><strong>the probe arc<\/strong><span>1 of 2 steps landed<\/span><span>in progress: none<\/span><span>next ready: row 2, build it<\/span><span>log last moved: never<\/span><\/span><\/a>/.test(inside) && !/sds-chip-line"><span class="sds-badge[^>]*>RUNNING/.test(inside), inside);
   ok("progress: the summary is a highlighted section of two lines — Overall with steps landed, then its bar in the same step shade — with the workstream's status in its class, tooltip and accessible name",
-    /<div class="sds-footbar-summary sds-implementing sds-step-3" tabindex="0" aria-label="Workstream IMPLEMENTING, 1 of 2 steps landed, 0 of 1 arcs closed">\s*<span class="sds-chip-line"><span class="sds-chip-name">Overall<\/span><span class="sds-arc-count">1\/2<\/span><\/span>\s*<span class="sds-chip-bar"><i style="width:50%"><\/i><\/span>\s*<span class="sds-tip"><span class="sds-badge sds-status sds-implementing">IMPLEMENTING<\/span><strong>Overall<\/strong><span>0 of 1 arcs closed<\/span><span>1 of 2 steps landed<\/span><\/span>\s*<\/div>/.test(inside), inside);
+    /<div class="sds-footbar-summary sds-implementing sds-step-3" tabindex="0" aria-label="Workstream IMPLEMENTING, 1 of 2 steps landed, 0 of 1 arcs closed">\s*<span class="sds-chip-line"><span class="sds-chip-name">Overall<\/span><span class="sds-arc-count">1\/2<\/span><\/span>\s*<span class="sds-chip-bar"><i style="--share:50%"><\/i><\/span>\s*<span class="sds-tip"><span class="sds-badge sds-status sds-implementing">IMPLEMENTING<\/span><strong>Overall<\/strong><span>0 of 1 arcs closed<\/span><span>1 of 2 steps landed<\/span><\/span>\s*<\/div>/.test(inside), inside);
   {
     // RULE.DEVEX.WORKSPACE.278: every row is a build step; a chip and Overall count steps, and an arc with none shows its status.
     const build = (id, state) => ({ id, parent: "N001", title: `build ${id}`, kind: "change", state });
@@ -167,10 +167,10 @@ console.log("\n=== the generated blocks — progress and open");
     ok("[MKT.SCRIPTS.558] progress: an arc with no step yet counts 0/0, with no bar to fill, and its status is in its edge, its tooltip and its name, never in its count",
       chipOf(shaped, "N001").includes('<span class="sds-arc-count">0/0</span>') && !chipOf(shaped, "N001").includes(">proposed<") && chipOf(shaped, "N001").includes('class="sds-chip sds-proposed ')
         && /aria-label="[^"]*PROPOSED/.test(chipOf(shaped, "N001")) && chipOf(shaped, "N001").includes('sds-badge sds-status sds-proposed">PROPOSED')
-        && chipOf(shaped, "N001").includes('style="width:0%"') && !shaped.includes("sds-step-done"), shaped);
+        && chipOf(shaped, "N001").includes('style="--share:0%"') && !shaped.includes("sds-step-done"), shaped);
     const partBuilt = lib.progressInside("/nowhere", [arc("N002", "DECIDED", [build("3", "landed"), build("4", "running")])]);
     ok("progress: a part-built arc reads RUNNING and counts its steps",
-      /class="sds-chip sds-running sds-step-3"/.test(chipOf(partBuilt, "N002")) && chipOf(partBuilt, "N002").includes('<span class="sds-arc-count">1/2</span>') && chipOf(partBuilt, "N002").includes('style="width:50%"'), partBuilt);
+      /class="sds-chip sds-running sds-step-3"/.test(chipOf(partBuilt, "N002")) && chipOf(partBuilt, "N002").includes('<span class="sds-arc-count">1/2</span>') && chipOf(partBuilt, "N002").includes('style="--share:50%"'), partBuilt);
     const built = lib.progressInside("/nowhere", [arc("N002", "DECIDED", [build("3", "landed"), build("4", "landed")])]);
     ok("progress: an arc whose steps all landed reads LANDED, in the done shade", /class="sds-chip sds-landed sds-step-done"/.test(chipOf(built, "N002")), built);
     const waiting = lib.progressInside("/nowhere", [{ ...arc("N003", "DECIDED", [build("1", "waiting")]), wait: "the developer: approved, but wait" }]);
@@ -364,7 +364,7 @@ console.log("\n=== a preview's one status, the arc's — RULE.DEVEX.WORKSPACE.26
   ok("a page with no header line stays as it is", lib.previewWithStatus("<p>no header</p>\n", "N001", "LANDED") === "<p>no header</p>\n");
   {
     // The arc's steps landed, as a Progress fact right after Arc: a bar in the chip's fill and the count; Status stays last.
-    const progress = `<span class="sds-label">Progress:</span> <span class="sds-progress sds-step-3"><span class="sds-chip-bar"><i style="width:43%"></i></span> 3 of 7 landed</span>`;
+    const progress = `<span class="sds-label">Progress:</span> <span class="sds-progress sds-step-3"><span class="sds-chip-bar"><i style="--share:43%"></i></span> 3 of 7 landed</span>`;
     const counted = lib.previewWithStatus(before, "N001", "LANDED", 3, 7);
     ok("[MKT.SCRIPTS.386] a preview's header gains Progress right after Arc, '3 of 7 landed', and Status stays last",
       counted === eyebrow(`<span class="sds-line">${type}${sep}${arc}${sep}${progress}${sep}${shown}${status("LANDED")}</span>`), counted);

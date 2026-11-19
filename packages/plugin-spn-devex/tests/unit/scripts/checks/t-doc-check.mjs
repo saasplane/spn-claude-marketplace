@@ -983,5 +983,42 @@ console.log("\n=== doc-check — a long What on an open approach page holds a fi
       && grades(page("Hiring", "Model", "What a repository declares to us")).join() === "RULE:518");
 }
 
+{
+  console.log("\n=== doc-check — every page with a rail loads the script that builds it (05-artifacts.md, The page itself)");
+  const { check } = await import("../../../../src/scripts/checks/doc-check.ts");
+  const say = (label, ok, detail = "") => { n += 1; if (!ok) failed += 1; console.log(`  ${ok ? "PASS" : "FAIL"}  ${label}${ok || !detail ? "" : `\n        ${detail}`}`); };
+  const preview = join(stream(TMP, "097-rail", "open"), "notes", "N001", "preview.html");
+  const samples = join(stream(TMP, "097-rail", "open"), "notes", "N001", "samples", "index.html");
+  const body = `${linesFor("1.0.0").stylesheet}\n<div class="sds-page">\n<nav class="sds-rail" id="rail">\n  <div class="sds-rail-title">Rail</div>\n</nav>\n<div class="sds-wrap"><h2>Overview</h2><p>One line.</p></div>\n</div>\n`;
+  const withScript = `${body}${linesFor("1.0.0").script}\n`;
+  const unbuilt = (path, text, fragment = false) => check(path, text, fragment).some(([, m]) => m.includes("outline is not built"));
+  say("[MKT.HOOKS.521] red: a preview with a rail and no page script is refused", unbuilt(preview, body), JSON.stringify(check(preview, body)));
+  say("[MKT.HOOKS.521] red: a samples index with a rail and no page script is refused", unbuilt(samples, body));
+  say("[MKT.HOOKS.521] green: the same preview loading the page script draws nothing", !unbuilt(preview, withScript), JSON.stringify(check(preview, withScript)));
+  say("[MKT.HOOKS.521] green: a page with no rail draws nothing", !unbuilt(preview, body.replace(/<nav[\s\S]*?<\/nav>/, "")));
+  say("[MKT.HOOKS.521] green: an Edit's fragment is never read for it", !unbuilt(preview, body, true));
+}
+
+{
+  console.log("\n=== doc-check — a surface page preview is a bar and a frame (05-artifacts.md, The surface page preview)");
+  const { check } = await import("../../../../src/scripts/checks/doc-check.ts");
+  const say = (label, ok, detail = "") => { n += 1; if (!ok) failed += 1; console.log(`  ${ok ? "PASS" : "FAIL"}  ${label}${ok || !detail ? "" : `\n        ${detail}`}`); };
+  const path = join(stream(TMP, "096-surface", "open"), "notes", "N001", "samples", "home-preview.html");
+  const surface = (frame = '<iframe class="sds-surface-frame" src=".pages/home/index.html" title="Home"></iframe>', more = "") =>
+    `<!-- spn:doc\n{"id": "surface-page-preview-home", "variant": "surface-page-preview", "title": "Home"}\n-->\n${linesFor("1.0.0").stylesheet}\n` +
+    '<div class="sds-surface" data-width="desktop">\n<header class="sds-surface-bar"><h1 class="sds-surface-title">Home</h1>\n' +
+    '<div class="sds-surface-switch"><button type="button" data-surface="width" data-value="desktop">Desktop</button></div>\n' +
+    '<div class="sds-surface-switch"><button type="button" data-surface="mode" data-value="light">Light</button></div>\n' +
+    '<div class="sds-surface-switch"><button type="button" data-surface="notes">Notes</button></div></header>\n' +
+    `<main class="sds-surface-stage">${frame}</main>${more}\n</div>\n`;
+  const shaped = (text) => check(path, text).some(([, m]) => m.includes("a surface page preview"));
+  const said = (text) => JSON.stringify(check(path, text));
+  say("[MKT.HOOKS.522] green: the bar and the frame over a copy beside it draw nothing", check(path, surface()).length === 0, said(surface()));
+  say("[MKT.HOOKS.522] red: a template slot left in is refused", shaped(surface().replace("Home</h1>", "{{THE PAGE'S NAME}}</h1>")), said(surface()));
+  say("[MKT.HOOKS.522] red: a frame over another site is refused", shaped(surface('<iframe class="sds-surface-frame" src="https://example.com/" title="Home"></iframe>')));
+  say("[MKT.HOOKS.522] red: words of the page's own beside the bar and the frame are refused", shaped(surface(undefined, "<p>The page's own words.</p>")));
+  say("[MKT.HOOKS.522] red: a bar without its Notes switch is refused", shaped(surface().replace(/<div class="sds-surface-switch"><button type="button" data-surface="notes">Notes<\/button><\/div>/, "")));
+}
+
 console.log(failed ? `\n  ${failed} FAILED` : `\n  all ${n} passed`);
 process.exit(failed ? 1 : 0);

@@ -5,10 +5,14 @@
 // and this turns one into inline SVG. Nothing is drawn by eye: every box is measured from its own
 // text, so a connector lands on an edge and a label fits by construction rather than by luck.
 //
-// The grid: canvas 1100 wide, margin 24, three type sizes and no fourth. The chapter says 760; the page
-// renders a figure at the width of its column, about 1100, so a 760 canvas was scaled up by half and
-// every box and label read big and dark beside the hand-drawn figures of the hub (N13, 2026-09-21).
-// The chapter changes to 1100 in N13 step 1; this is the one measure from here on.
+// The look is the docs design language's (spn-foundation docs/02-constructs/01-devex/04-workspace/06-design-language.md):
+// a figure is a `dl-figure` of one `dl-svg` on the docs column's 928 frame, drawn 1:1, its units a tile of radius 10, a plate of
+// radius 12 and a wire of weight 1 with soft corners and no arrowhead. No colour and no size is written here: every mark is a class
+// of sds-docs.css, which reads the `--sds-*` tokens. Every length is the drawing scale's, step M (grid 4): a name 12, a detail 10,
+// a label 9.5, a gap of 12 between tiles, 24 between plates, 56 where a wire joins, 16 from the frame, a label 8 clear of its wire.
+// The layout of each kind is unchanged by the language; only its units are.
+
+import { checkFigures } from "./figures.ts";
 
 /**
  * THE FLOWCHART SHAPES, and each one carries its meaning (05-artifacts.md § The figures). A shape is
@@ -33,7 +37,7 @@ const RESOURCE: Record<Resource, { shape: Shape; soft?: boolean }> = {
   bucket: { shape: "bucket" },
   service: { shape: "process" },
 };
-export type Box = { id: string; label: string; note?: string; em?: boolean; off?: boolean; warn?: boolean; in?: string; shape?: Shape };
+export type Box = { id: string; label: string; note?: string; em?: boolean; off?: boolean; warn?: boolean; in?: string; shape?: Shape; icon?: string; tone?: string };
 export type Link = { from: string; to: string; label?: string; dashed?: boolean; card?: string };
 /** One band of a SYSTEM's boundary: a named layer, and the boxes inside it. */
 export type Layer = { name: string; boxes: Box[] };
@@ -42,6 +46,9 @@ export type Spec = {
   layers?: Layer[]; outside?: (Box & { as?: Resource })[]; frame?: SkeletonFrame; views?: SkeletonView[];
   /** A skeleton's layout: the views stand in it. Left out, a view is the inside of a page alone. */
   layout?: SkeletonLayout;
+  /** `draw-once` draws each wire along its path once; `pulse` sends a light along one wire at a time; `focus-steps` moves the focus from one unit
+   to the next when the reader presses Next or Back. None by default. */
+  motion?: "draw-once" | "pulse" | "focus-steps";
 };
 
 /**
@@ -229,19 +236,26 @@ export type SkeletonSection = { label?: string; actions?: SkeletonItem[]; rows: 
  *  view's page level. */
 export type SkeletonView = { viewport: "DESKTOP" | "TABLET" | "MOBILE"; state?: string; page?: SkeletonPage; frame: SkeletonFrame };
 
-/** The measure the figure check uses, at the drawn scale. */
-const W_LABEL = 7, W_NOTE = 6.4, W_TITLE = 7.6;
-// One pair of numbers, both axes: 24 where nothing connects two boxes, 56 where a connector does.
-// Padding is one number, 16, for a leaf and a container alike (05-artifacts.md § The grid).
-const PAD_X = 16, GAP_Y = 24, GAP_COL = 56, GAP_LINKED = 56;
+/** The measure the figure check uses, at the drawn scale: a character of a name (sans 600 at 12), of a detail or a wire's label
+ *  (mono at 10) and of a plate's label (mono 600 capitals at 9.5, spaced .08em). */
+const W_LABEL = 6.8, W_NOTE = 6, W_TITLE = 6.5;
+// The drawing scale: 12 between tiles, 24 between plates, 56 where a wire joins two units, 16 from the frame and inside a plate,
+// 12 inside a tile, 16 between parallel wires, 8 between a label and its wire, and a tile's height from its form (name alone 36,
+// with a detail line 48, one more line 15 more, on the grid of 4).
+const PAD_X = 12, GAP_Y = 12, GAP_PLATES = 24, GAP_COL = 56, GAP_LINKED = 56;
 // A box edge carries three connection points at most; a fourth link leaves by another side.
 // A side offers three points at most — its middle and the middle of each half.
-const SIDE_POINTS = 3, GAP_APART = 24;
-// A connector's label and the connector itself. Every figure puts this much clear space between a
-// label's line and any arrow — its own or a neighbour's — so no drawer invents its own offset and
+const SIDE_POINTS = 3, GAP_APART = 16;
+// A wire's label and the wire itself. Every figure puts this much clear space between a
+// label's line and any wire — its own or a neighbour's — so no drawer invents its own offset and
 // no reader has to work out which run a word belongs to.
 const LABEL_H = 12, LABEL_GAP = 8;
-const H_ONE = 44, H_TWO = 64;
+const H_ONE = 36, H_TWO = 48, LINE_STEP = 15;
+/** The docs column: a frame 928 wide, content 16 in from it, drawn at 1:1. */
+const FRAME_W = 928, FRAME_PAD = 16, WIRE_R = 8;
+const up4 = (n: number) => Math.ceil(n / 4) * 4;
+/** A tile's height from its form: a name alone 36, with detail lines 48 and 15 more for each line past the first, on the 4 grid. */
+const tileH = (lines: number) => (lines ? up4(33 + LINE_STEP * lines) : H_ONE);
 
 const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 // A LABEL IS SPOKEN, NOT RENDERED. A caption may carry the page's own markdown — a code span for a
@@ -256,69 +270,176 @@ const spoken = (s: string) => s
   .replace(/(^|[^*])\*([^*]+)\*(?!\*)/g, "$1$2");
 
 /**
- * A FIGURE'S viewBox HUGS ITS CONTENT, so a drawing is as wide as the paragraph above it. Every
- * drawer lays out inside a 1100 canvas and centres its rows in it, which is right for placing things
- * and wrong for shipping them: a four-box flowchart 250px wide arrived inside a 1156 canvas and
- * rendered as a small picture marooned in white space. The developer saw it on the blocks page —
- * *let each type of blocks take full width* — and the hand-authored figures were fitted then; the
- * drawer never was, so every figure it produced still paid the inset the edge-to-edge rule forbids.
- *
- * Bleed is `2`, so a `1.5` stroke on an outer edge is not clipped, and `9` wherever a connector
- * reaches the boundary, so the check's own `8px` frame rule still holds. `<defs>` is excluded: the
- * arrowhead defined there has its own coordinate space starting at 0,0, and measuring it makes every
- * figure look as though it already began at the origin (N13, 2026-09-22).
+ * A FIGURE IS DRAWN ON THE COLUMN'S 928 FRAME, AT 1:1. Every drawer lays out inside the frame, 16 in from its edge, and the
+ * viewBox is the frame's whole width and the content's height plus 16 below it; the page sets `width: 100%` and a 928 cap,
+ * so a figure is never stretched, and on a phone it scales to the column and opens at 1:1 on a tap (the docs language's
+ * "Media size"). A figure whose content is wider than the frame, a skeleton of a desktop screen, is a wider frame still,
+ * scaled to the column, and says so in its case line.
  */
 function fit(body: string[]): { x0: number; y0: number; w: number; h: number } {
-  const src = body.filter((l) => !l.includes("<defs>")).join("\n");
-  let lo: [number, number] = [Infinity, Infinity], hi: [number, number] = [-Infinity, -Infinity];
-  const see = (x: number, y: number, pad = 0) => {
-    lo = [Math.min(lo[0], x - pad), Math.min(lo[1], y - pad)];
-    hi = [Math.max(hi[0], x + pad), Math.max(hi[1], y + pad)];
-  };
+  const src = body.join("\n");
+  let hi: [number, number] = [0, 0];
+  const see = (x: number, y: number) => { hi = [Math.max(hi[0], x), Math.max(hi[1], y)]; };
   for (const m of src.matchAll(/<rect[^>]*\sx="(-?[\d.]+)" y="(-?[\d.]+)" width="([\d.]+)" height="([\d.]+)"/g))
-    { const [x, y, w, h] = m.slice(1).map(Number); see(x, y); see(x + w, y + h); }
+    { const [x, y, w, h] = m.slice(1).map(Number); see(x + w, y + h); }
   for (const m of src.matchAll(/<circle[^>]*\scx="(-?[\d.]+)" cy="(-?[\d.]+)" r="([\d.]+)"/g))
-    { const [cx, cy, r] = m.slice(1).map(Number); see(cx, cy, r); }
+    { const [cx, cy, r] = m.slice(1).map(Number); see(cx + r, cy + r); }
   for (const m of src.matchAll(/<ellipse[^>]*\scx="(-?[\d.]+)" cy="(-?[\d.]+)" rx="([\d.]+)" ry="([\d.]+)"/g))
-    { const [cx, cy, rx, ry] = m.slice(1).map(Number); see(cx - rx, cy - ry); see(cx + rx, cy + ry); }
-  // Text is measured from the same character widths the figure check measures it by, and a baseline
-  // sits below its own line, so the box runs upward from `y`.
-  for (const m of src.matchAll(/<text class="([\w-]+)" x="(-?[\d.]+)" y="(-?[\d.]+)"(?: style="[^"]*")?>([\s\S]*?)<\/text>/g)) {
+    { const [cx, cy, rx, ry] = m.slice(1).map(Number); see(cx + rx, cy + ry); }
+  // Text is measured from the same character widths the figure check measures it by.
+  for (const m of src.matchAll(/<text class="([\w -]+)" x="(-?[\d.]+)" y="(-?[\d.]+)"((?: text-anchor="\w+")?)>([\s\S]*?)<\/text>/g)) {
     const cls = m[1], x = Number(m[2]), y = Number(m[3]);
-    const w = m[4].replace(/&[a-z]+;/g, " ").length * (cls === "sds-title" ? W_TITLE : cls === "sds-label" ? W_LABEL : W_NOTE);
-    see(x, y - 13); see(x + w, y + 3);
+    const w = m[5].replace(/&[a-z]+;/g, " ").length * textW(cls);
+    const left = m[4].includes("middle") ? x - w / 2 : m[4].includes("end") ? x - w : x;
+    see(left + w, y + 3);
   }
   for (const m of src.matchAll(/<path[^>]*\sd="([^"]+)"/g)) {
-    const conn = m[0].includes('class="sds-connector');
     let x = 0, y = 0;
-    for (const [, c, u, v] of m[1].matchAll(/([MLHV])\s*(-?[\d.]+)(?:\s+(-?[\d.]+))?/g)) {
-      const a = Number(u);
-      x = c === "V" ? x : a;
-      y = c === "V" ? a : c === "H" ? y : Number(v);
-      see(x, y, conn ? 9 : 2);
+    for (const [, c, u, v] of m[1].matchAll(/([MLHVQA])\s*(-?[\d.]+)(?:[\s,]+(-?[\d.]+))?/g)) {
+      if (c === "H") x = Number(u); else if (c === "V") y = Number(u); else if (v !== undefined) { x = Number(u); y = Number(v); }
+      see(x, y);
     }
   }
-  if (!Number.isFinite(lo[0])) return { x0: 0, y0: 0, w: 1100, h: 1 };
-  const x0 = Math.floor(lo[0] - 2), y0 = Math.floor(lo[1] - 2);
-  return { x0, y0, w: Math.ceil(hi[0] + 2) - x0, h: Math.ceil(hi[1] + 2) - y0 };
+  return { x0: 0, y0: 0, w: Math.max(FRAME_W, Math.ceil(hi[0] + FRAME_PAD)), h: up4(hi[1] + FRAME_PAD) };
 }
 
-/** One masthead for every drawer: the marker it needs, and a viewBox that hugs what was drawn. */
-function svgOf(body: string[], label: string, extraClass = ""): string {
+/** The pixels a character of a text class takes, at the drawn scale. */
+function textW(cls: string): number {
+  return /\bdl-(?:detail|wlabel|tag|caption)\b/.test(cls) ? W_NOTE : /\bdl-label\b/.test(cls) ? W_TITLE : W_LABEL;
+}
+
+/** One masthead for every drawer: the frame's wrapper and a viewBox of the column's width, drawn 1:1. */
+function svgOf(body: string[], label: string, extraClass = "", motion?: string): string {
   const { x0, y0, w, h } = fit(body);
   return [
-    // A FIGURE IS NEVER SCALED UP. The page sets `width:100%` so a wide figure shrinks to the column,
-    // and that same rule stretched a NARROW one: a flowchart 586 across was blown up to the column's
-    // 1100, so its text rendered at twice the size of the figure above it and the drawing stood
-    // 1650px tall. The cap is the figure's own width, inline so it beats the stylesheet, and
-    // `width:100%` still shrinks it on a narrow screen (2026-09-22, found on the Sign-in sample).
-    `<svg class="sds-drawing${extraClass ? " " + extraClass : ""}" viewBox="${x0} ${y0} ${w} ${h}" style="max-width:${w}px" role="img" aria-label="${esc(spoken(label))}">`,
-    // THE ARROWHEAD ONLY WHERE AN ARROW USES IT. A figure with no connector — every skeleton — carried
-    // a marker it never drew, and six of them on one page repeated the id `ar` six times.
-    ...(body.some((l) => l.includes("marker-end")) ? [`  <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>`] : []),
+    `<svg class="dl-svg${extraClass ? " " + extraClass : ""}" viewBox="${x0} ${y0} ${w} ${h}"${motion ? ` data-motion="${motion}"` : ""} role="img" aria-label="${esc(spoken(label))}">`,
     ...body,
     `</svg>`,
   ].join("\n");
+}
+
+/**
+ * A WIRE, as the language draws it: solid 1, every corner soft with a radius of 8, no arrowhead, a reply dashed. `d` is the
+ * orthogonal path the layout decided (M, H, V and L only); the corners are rounded here and nowhere else, so the layout and
+ * the figure check reason about one set of corners.
+ */
+function soft(d: string): string {
+  const pts: [number, number][] = [];
+  let x = 0, y = 0;
+  for (const [, c, u, v] of d.matchAll(/([MLHV])\s*(-?[\d.]+)(?:\s+(-?[\d.]+))?/g)) {
+    const a = Number(u);
+    if (c === "H") x = a; else if (c === "V") y = a; else { x = a; y = Number(v); }
+    const last = pts[pts.length - 1];
+    if (!last || last[0] !== x || last[1] !== y) pts.push([x, y]);
+  }
+  // A point in the middle of a straight run is no corner.
+  const keep = pts.filter((p, i) => i === 0 || i === pts.length - 1
+    || !((pts[i - 1][0] === p[0] && p[0] === pts[i + 1][0]) || (pts[i - 1][1] === p[1] && p[1] === pts[i + 1][1])));
+  const n = (v: number) => String(Math.round(v * 100) / 100);
+  let out = `M${n(keep[0][0])} ${n(keep[0][1])}`;
+  for (let i = 1; i < keep.length - 1; i++) {
+    const [x0, y0] = keep[i - 1], [x1, y1] = keep[i], [x2, y2] = keep[i + 1];
+    const r = Math.min(WIRE_R, (Math.abs(x1 - x0) + Math.abs(y1 - y0)) / 2, (Math.abs(x2 - x1) + Math.abs(y2 - y1)) / 2);
+    const ax = x1 - Math.sign(x1 - x0) * r, ay = y1 - Math.sign(y1 - y0) * r;
+    const bx = x1 + Math.sign(x2 - x1) * r, by = y1 + Math.sign(y2 - y1) * r;
+    out += ` L${n(ax)} ${n(ay)} Q${n(x1)} ${n(y1)} ${n(bx)} ${n(by)}`;
+  }
+  const end = keep[keep.length - 1];
+  return out + ` L${n(end[0])} ${n(end[1])}`;
+}
+function wireSvg(d: string, dashed = false, extra = "", on = false): string {
+  return `  <path class="${on ? "dl-wire-on" : "dl-wire"}${dashed ? " dl-wire-dash" : ""}"${extra} d="${soft(d)}"/>`;
+}
+
+/**
+ * WIRES THAT MEET ONE TILE JOIN ONE BUS, as saasplane.ai draws them: where several wires leave a column for the same side of one tile, each
+ * runs a short stub to a line standing 28 clear of that side, the stubs join it, and one line goes on to the tile's middle; where several
+ * wires leave one side of one tile for different tiles, the one line runs out from the tile's middle to the same bus and the wires part there.
+ * Every wire is still its own path (it runs the shared line itself, and the strokes lie over each other), so the count of wires is the
+ * count of links. Only solid wires between different tiles join, and a group that has no room for its bus is left as drawn.
+ */
+type Side = "left" | "right" | "top" | "bottom";
+type BusWire = { d: string; from: string; to: string; dashed?: boolean };
+type BusPt = [number, number];
+function ptsOf(d: string): BusPt[] {
+  const pts: BusPt[] = []; let x = 0, y = 0;
+  for (const [, c, u, v] of d.matchAll(/([MLHV])\s*(-?[\d.]+)(?:[\s,]+(-?[\d.]+))?/g)) {
+    const a = Number(u);
+    if (c === "H") x = a; else if (c === "V") y = a; else { x = a; y = Number(v); }
+    const last = pts[pts.length - 1];
+    if (!last || last[0] !== x || last[1] !== y) pts.push([x, y]);
+  }
+  return pts;
+}
+const dOfPts = (pts: BusPt[]) => `M${pts[0][0]} ${pts[0][1]}` + pts.slice(1).map((q, i) => (q[1] === pts[i][1] ? ` H${q[0]}` : ` V${q[1]}`)).join("");
+const BUS_AT = GAP_LINKED / 2;
+/** A system's bus stands this far from the tile: its rail carries a label on the run into the bus, and the figure is 928 wide at most. */
+const SYS_BUS_AT = 28, SYS_BUSES = [28, 24, 20, 16, 0], RAIL_LANE = 16;
+function busWires(wires: BusWire[], edge: (id: string, side: Side) => number | null, attach: (id: string, side: Side) => number | null, busAt = BUS_AT): string[] {
+  const pts = wires.map((w) => ptsOf(w.d));
+  const touched = new Set<number>();
+  const arrival = (p: BusPt[], end: "last" | "first"): Side | null => {
+    const q = end === "last" ? p : [...p].reverse();
+    if (q.length < 2) return null;
+    const [a, b] = [q[q.length - 2], q[q.length - 1]];
+    if (a[1] === b[1] && a[0] !== b[0]) return a[0] < b[0] ? "left" : "right";
+    if (a[0] === b[0] && a[1] !== b[1]) return a[1] < b[1] ? "top" : "bottom";
+    return null;
+  };
+  const apply = (end: "last" | "first") => {
+    const groups = new Map<string, number[]>();
+    wires.forEach((w, i) => {
+      if (w.dashed || w.from === w.to || touched.has(i) || pts[i].length < 2) return;
+      const id = end === "last" ? w.to : w.from, side = arrival(pts[i], end);
+      if (!side) return;
+      const e = edge(id, side), last = end === "last" ? pts[i][pts[i].length - 1] : pts[i][0];
+      if (e === null || Math.abs((side === "left" || side === "right" ? last[0] : last[1]) - e) > 1) return;
+      const key = `${id}\u0000${side}`;
+      groups.set(key, [...(groups.get(key) ?? []), i]);
+    });
+    for (const [key, idx] of groups) {
+      const [id, side] = key.split("\u0000") as [string, Side];
+      const others = new Set(idx.map((i) => (end === "last" ? wires[i].from : wires[i].to)));
+      if (idx.length < 2 || others.size < 2) continue;
+      const c = attach(id, side), e = edge(id, side);
+      if (c === null || e === null) continue;
+      const horiz = side === "left" || side === "right";
+      const sign = side === "left" || side === "top" ? -1 : 1;              // the bus stands on the tile's own side of the edge
+      const bus = e + sign * busAt;
+      // each wire, walked towards the tile, as (along, across) so the one rule serves both axes
+      const cut = idx.map((i) => {
+        const q = end === "last" ? pts[i] : [...pts[i]].reverse();
+        const al = (pt: BusPt) => (horiz ? pt[0] : pt[1]) * -sign, cr = (pt: BusPt) => (horiz ? pt[1] : pt[0]);
+        const alBus = al([horiz ? bus : 0, horiz ? 0 : bus]);
+        for (let k = 1; k < q.length; k++) {
+          if (al(q[k]) >= alBus && al(q[k - 1]) < alBus) {
+            if ((horiz ? q[k][1] : q[k][0]) !== cr(q[k - 1])) return null;                                   // the run that reaches the bus is not straight
+            // a corner too near the bus is taken out: the run before it goes on to the bus instead
+            let kept = q.slice(0, k);
+            while (al(kept[kept.length - 1]) > alBus - GAP_APART) { if (kept.length < 3) return null; kept = kept.slice(0, -2); }
+            return { keep: kept, across: cr(kept[kept.length - 1]) };
+          }
+        }
+        return null;
+      });
+      if (cut.some((x) => x === null)) continue;
+      idx.forEach((i, n) => {
+        const { keep, across } = cut[n]!;
+        const join: BusPt[] = horiz ? [[bus, across], [bus, c], [e, c]] : [[across, bus], [c, bus], [c, e]];
+        const full = [...keep, ...join];
+        pts[i] = end === "last" ? full : full.reverse();
+        touched.add(i);
+      });
+    }
+  };
+  apply("last");
+  apply("first");
+  return wires.map((w, i) => (touched.has(i) ? dOfPts(pts[i]) : w.d));
+}
+
+/** A text of the language. `middle` and `end` anchor it, which the figure check reads. */
+function textSvg(cls: "dl-name" | "dl-detail" | "dl-wlabel" | "dl-label" | "dl-tag", x: number, y: number, s: string, anchor: "start" | "middle" | "end" = "start"): string {
+  return `  <text class="${cls}" x="${Math.round(x * 100) / 100}" y="${Math.round(y * 100) / 100}"${anchor === "start" ? "" : ` text-anchor="${anchor}"`}>${esc(s)}</text>`;
 }
 
 type Vert = { x: number; y1: number; y2: number; path?: number };
@@ -328,6 +449,51 @@ type Blocker = { x: number; y: number; w: number; h: number; path?: number };
 // gap above their own horizontal leg, which is exactly where they belong. Each run carries the
 // path it came from and each label the path it names, and the placer skips the match.
 type Pending = { x: number; y: number; w: number; txt: string; path?: number };
+
+/** The straight runs of a wire's path: horizontal ones `{ x, y, len }` from their left end, vertical ones `{ x, y, len }` from their top. */
+function runsOf(d: string): { h: { x: number; y: number; len: number }[]; v: { x: number; y: number; len: number }[] } {
+  const h: { x: number; y: number; len: number }[] = [], v: { x: number; y: number; len: number }[] = [];
+  let x = 0, y = 0;
+  for (const [, c, u, w] of d.matchAll(/([MHV])\s*(-?[\d.]+)(?:\s+(-?[\d.]+))?/g)) {
+    const a = Number(u);
+    const nx = c === "V" ? x : a, ny = c === "V" ? a : c === "M" ? Number(w) : y;
+    if (c === "H" && nx !== x) h.push({ x: Math.min(x, nx), y, len: Math.abs(nx - x) });
+    if (c === "V" && ny !== y) v.push({ x, y: Math.min(y, ny), len: Math.abs(ny - y) });
+    x = nx; y = ny;
+  }
+  return { h, v };
+}
+
+/**
+ * WHERE A WIRE'S LABEL STANDS: on the longest straight horizontal run of its own path that no other wire's run overlaps and that is long
+ * enough for the words between its soft corners (a run two wires share is a bus, and a label there names neither). A wire with no such
+ * run is named from the side of a vertical run of its own, the label's baseline set so it is centred on it; one with neither takes the
+ * longest run it has.
+ */
+function labelRun(d: string, others: string[], w: number): { x: number; y: number; len: number; vertical?: boolean } | null {
+  const mine = runsOf(d);
+  const theirs = others.flatMap((o) => runsOf(o));
+  // the part of a run no other wire's run lies along: a run partly on a bus keeps the stretch that is its own
+  const own = (r: { x: number; y: number; len: number }, vertical: boolean) => {
+    let pieces: [number, number][] = [[vertical ? r.y : r.x, (vertical ? r.y : r.x) + r.len]];
+    for (const t of theirs) for (const q of vertical ? t.v : t.h) {
+      if (Math.abs(vertical ? q.x - r.x : q.y - r.y) >= 1) continue;
+      const lo = vertical ? q.y : q.x, hi = lo + q.len;
+      pieces = pieces.flatMap(([a, b]): [number, number][] => hi <= a || lo >= b ? [[a, b]] : ([[a, Math.min(b, lo)], [Math.max(a, hi), b]] as [number, number][]).filter(([m, n]) => n - m > 1));
+    }
+    return pieces.map(([a, b]) => (vertical ? { x: r.x, y: a, len: b - a } : { x: a, y: r.y, len: b - a }));
+  };
+  const hs = mine.h.flatMap((r) => own(r, false)).sort((a, b) => b.len - a.len);
+  const vs = mine.v.flatMap((r) => own(r, true)).sort((a, b) => b.len - a.len);
+  const room = w + 2 * LABEL_GAP;   // the soft corners at the ends of a run take 8 each
+  const fit = hs.find((r) => r.len >= room);
+  if (fit) return fit;
+  const side = vs.find((r) => r.len >= LABEL_H + 2 * LABEL_GAP);
+  if (side) return { x: side.x + LABEL_GAP, y: side.y + side.len / 2 + 5, len: 0, vertical: true };
+  if (hs[0]) return hs[0];
+  const up = [...mine.v].sort((a, b) => b.len - a.len)[0];
+  return up ? { x: up.x + LABEL_GAP, y: up.y + up.len / 2 + 5, len: 0, vertical: true } : null;
+}
 
 /** Every vertical run in a path, so a label can be kept off all of them and not merely off its own. */
 function vertsOf(d: string, path?: number): Vert[] {
@@ -407,7 +573,7 @@ function placeLabels(pending: Pending[], verticals: Vert[], margin: number, widt
           .filter((v) => Math.min(v.y1, v.y2) < bottom + LABEL_GAP && Math.max(v.y1, v.y2) > top - LABEL_GAP)
           .map((v) => [v.x - LABEL_GAP, v.x + LABEL_GAP] as [number, number]),
         ...boxes
-          .filter((b) => b.y < bottom + LABEL_GAP && b.y + b.h > top - LABEL_GAP)
+          .filter((b) => b.y < bottom + LABEL_GAP - (b.h === 0 ? 0.75 : 0) && b.y + b.h > top - LABEL_GAP)
           .map((b) => [b.x - LABEL_GAP, b.x + b.w + LABEL_GAP] as [number, number]),
         ...settled
           .filter((q) => Math.abs(q.y - y) < PITCH)
@@ -430,7 +596,7 @@ function placeLabels(pending: Pending[], verticals: Vert[], margin: number, widt
     // A placer that invents room it does not have hides the crowding instead of fixing it.
     const at = best ?? { x: p.x, y: p.y };
     settled.push({ x: at.x, y: at.y, w: p.w });
-    return `  <text class="sds-note" x="${Math.round(at.x)}" y="${Math.round(at.y)}">${esc(p.txt)}</text>`;
+    return textSvg("dl-wlabel", Math.round(at.x), Math.round(at.y), p.txt);
   });
 }
 
@@ -457,27 +623,80 @@ function sidePoints(start: number, len: number, asking: number): number[] {
 const alignedTo = (points: number[], towards: number): number =>
   points.reduce((best, p) => (Math.abs(p - towards) < Math.abs(best - towards) ? p : best), points[0]);
 
+/** A glyph of the language: a lucide drawing, 16 in a tile, no mark behind it. A spec names one in a box's `icon`. */
+const GLYPHS: Record<string, string> = {
+  layers: '<path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/><path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"/><path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"/>',
+  "book-open": '<path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>',
+  cloud: '<path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/>',
+  database: '<ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5V19A9 3 0 0 0 21 19V5"/><path d="M3 12A9 3 0 0 0 21 12"/>',
+  server: '<rect width="20" height="8" x="2" y="2" rx="2" ry="2"/><rect width="20" height="8" x="2" y="14" rx="2" ry="2"/><line x1="6" x2="6.01" y1="6" y2="6"/><line x1="6" x2="6.01" y1="18" y2="18"/>',
+  globe: '<circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/>',
+  lock: '<rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',
+  users: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
+  "file-text": '<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/>',
+  "git-branch": '<line x1="6" x2="6" y1="3" y2="15"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 0 1-9 9"/>',
+  "circle-check": '<circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/>',
+  folder: '<path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/>',
+  "shield-check": '<path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/>',
+  rocket: '<path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/>',
+  "app-window": '<rect x="2" y="4" width="20" height="16" rx="2"/><path d="M10 4v4"/><path d="M2 8h20"/><path d="M6 4v4"/>',
+  "layout-grid": '<rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/>',
+  "key-round": '<path d="M2.586 17.414A2 2 0 0 0 2 18.828V21a1 1 0 0 0 1 1h3a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h1a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h.172a2 2 0 0 0 1.414-.586l.814-.814a6.5 6.5 0 1 0-4-4z"/><circle cx="16.5" cy="7.5" r=".5" fill="currentColor"/>',
+  "list-checks": '<path d="m3 17 2 2 4-4"/><path d="m3 7 2 2 4-4"/><path d="M13 6h8"/><path d="M13 12h8"/><path d="M13 18h8"/>',
+  mail: '<rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>',
+  monitor: '<rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/>',
+  search: '<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>',
+  flag: '<path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" x2="4" y1="22" y2="15"/>',
+  "square-pen": '<path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.375 2.625a1 1 0 0 1 3 3l-9.013 9.014a2 2 0 0 1-.853.505l-2.873.84a.5.5 0 0 1-.62-.62l.84-2.873a2 2 0 0 1 .506-.852z"/>',
+  check: '<path d="M20 6 9 17l-5-5"/>',
+};
+/** The glyph's drawing, scaled to `size` and centred on (cx, cy). */
+function glyphSvg(name: string, cx: number, cy: number, size = 16, extra = ""): string {
+  const k = size / 24;
+  return `  <g class="dl-glyph${extra}" transform="translate(${(cx - size / 2).toFixed(1)} ${(cy - size / 2).toFixed(1)}) scale(${k.toFixed(4)})">${GLYPHS[name] ?? GLYPHS["square-pen"]}</g>`;
+}
+const glyphOf = (b: Box) => (b.icon && GLYPHS[b.icon] ? b.icon : undefined);
+/** A tile's glyph takes 12 from the left edge, 16 wide, and 10 to the words: 26 in all, beside the 12 of padding. */
+const GLYPH_W = 26;
+
+/** The detail lines of a box: its note, a line to each `\n` in it (a map wraps each line further, where it is long). */
+const noteLines = (note?: string): string[] => (note ? note.split("\n") : []);
 function boxWidth(b: Box): number {
   const label = b.label.length * W_LABEL;
-  const note = (b.note ?? "").length * W_NOTE;
-  return Math.ceil(Math.max(label, note) + PAD_X * 2);
+  const note = Math.max(0, ...noteLines(b.note).map((l) => l.length)) * W_NOTE;
+  return up4(Math.max(label, note) + PAD_X * 2 + (glyphOf(b) ? GLYPH_W : 0));
 }
-const boxHeight = (b: Box) => (b.note ? H_TWO : H_ONE);
+const boxHeight = (b: Box) => (b.note ? tileH(noteLines(b.note).length) : H_ONE);
 
-/** The classes of a box: the spec's `em` is the blue tone, `warn` the amber one, and `off` a box that is absent. */
-function boxClass(b: Box): string {
-  if (b.em) return "sds-box sds-tone-blue";
-  if (b.warn) return "sds-box sds-tone-amber";
-  if (b.off) return "sds-box sds-absent";
-  return "sds-box";
+/** The face of a box, by its tone: `em` is the unit in focus, `warn` a refusal, `off` a box that is absent and drawn dashed. */
+const TONES = ["success", "warning", "error", "info", "neutral", "blue", "green", "amber", "red", "violet", "cyan", "pink", "olive", "orange", "grey"];
+function faceOf(b: Box): { cls: string; group: string; line: string } {
+  // A tone is a state (success, warning, error, info, neutral) or one of the palette's hues; the unit takes its wash, its edge and its glyph.
+  if (b.tone && TONES.includes(b.tone)) return { cls: "dl-tile-st", group: `dl-st-${b.tone}`, line: "dl-line-st" };
+  if (b.em) return { cls: "dl-tile-on", group: "", line: "dl-line-on" };
+  if (b.warn) return { cls: "dl-tile-st", group: "dl-st-error", line: "dl-line-st" };
+  if (b.off) return { cls: "dl-tile-yours", group: "", line: "dl-line-edge" };
+  return { cls: "dl-tile", group: "", line: "dl-line-edge" };
+}
+/** Wraps a unit's marks in its state group, so the state's tokens reach the glyph and the edge. */
+function unit(b: Box, marks: string[]): string {
+  const g = faceOf(b).group;
+  const inner = g ? `  <g class="${g}">\n${marks.join("\n")}\n  </g>` : marks.join("\n");
+  return STEP === null ? inner : `  <g data-dl-step="${++STEP}">\n${inner}\n  </g>`;
 }
 
-function rect(b: Box, x: number, y: number, w: number, h: number): string {
-  const cy = b.note ? y + 26 : y + h / 2 + 4;
-  const out = [`  <rect class="${boxClass(b)}" x="${x}" y="${y}" width="${w}" height="${h}" rx="3"/>`,
-               `  <text class="sds-label" x="${x + PAD_X}" y="${cy}">${esc(b.label)}</text>`];
-  if (b.note) out.push(`  <text class="sds-note" x="${x + PAD_X}" y="${cy + 19}">${esc(b.note)}</text>`);
-  return out.join("\n");
+/** A box as a tile: radius 10, its name 12 from the left (after its glyph), and its detail lines beneath it. */
+function rect(b: Box, x: number, y: number, w: number, h: number, lines: string[] = noteLines(b.note), top = false): string {
+  const g = glyphOf(b);
+  const tx = x + PAD_X + (g ? GLYPH_W : 0);
+  const marks = [`  <rect class="${faceOf(b).cls}" x="${x}" y="${y}" width="${w}" height="${h}" rx="10"/>`];
+  if (g) marks.push(glyphSvg(g, x + 20, y + h / 2, 16, (b.warn || b.tone) ? " dl-glyph-st" : ""));
+  if (!lines.length) marks.push(textSvg("dl-name", tx, top ? y + 21 : y + h / 2 + 4, b.label));
+  else {
+    marks.push(textSvg("dl-name", tx, y + 21, b.label));
+    lines.forEach((line, i) => marks.push(textSvg("dl-detail", tx, y + 36 + LINE_STEP * i, line)));
+  }
+  return unit(b, marks);
 }
 
 /**
@@ -507,11 +726,13 @@ function drawEntities(spec: Spec): { svg: string; findings: string[] } {
   for (const b of boxes) if (!placed.has(b.id)) { right.push(b); findings.push(`\`${b.id}\` is in no link, so it was placed beside the centre`); }
 
   const colWidth = (col: Box[]) => (col.length ? Math.max(...col.map(boxWidth)) : 0);
-  const wL = colWidth(left), wC = boxWidth(centre), wR = colWidth(right);
-  const colHeight = (col: Box[]) => col.reduce((h, b) => h + boxHeight(b) + GAP_Y, -GAP_Y);
-  const hL = colHeight(left), hC = boxHeight(centre), hR = colHeight(right);
+  // EVERY TILE OF THE DIAGRAM IS ONE SIZE: the widest tile's width and the tallest tile's height, so the three columns line up and a row across them is level.
+  const natL = colWidth(left), natC = boxWidth(centre), natR = colWidth(right);
+  const hTile = Math.max(...boxes.map(boxHeight));
+  const colHeight = (col: Box[]) => col.length * hTile + GAP_Y * Math.max(0, col.length - 1);
+  const hL = colHeight(left), hC = hTile, hR = colHeight(right);
 
-  const margin = 24;
+  const margin = FRAME_PAD;
   // A link's label rides in the column gap, so the gap is as wide as the widest label plus the clear
   // air it owes on both sides. Sized from GAP_COL alone, a label longer than 56px was hung above a
   // box instead and landed inside the next column (N13, 2026-09-21).
@@ -520,7 +741,8 @@ function drawEntities(spec: Spec): { svg: string; findings: string[] } {
   // of one thing, which is the shape of fault this arc keeps finding: the gap came out 80 wide for
   // text that needed 96, and three labels landed over boxes they did not belong to.
   const relationText = (l: Link) => l.label ? (l.card ? `${l.label}  ${l.card}` : l.label) : (l.card ?? "");
-  const widestLabel = Math.max(0, ...links.map((l) => relationText(l).length * W_NOTE));
+  // the words ride above the wire and the cardinality under it, so the gap is as wide as the longer of the two
+  const widestLabel = Math.max(0, ...links.flatMap((l) => [(l.label ?? "").length, (l.card ?? "").length]).map((n) => n * W_NOTE));
   // A COLUMN GAP HOLDS THE LABELS **AND** THE ELBOWS. Sized for the widest label alone, a gap two
   // relations cross has its own two vertical runs standing in the space the labels were measured
   // for — so each label is pushed off its centre, onto a box or onto its neighbour. The gap is wide
@@ -528,18 +750,21 @@ function drawEntities(spec: Spec): { svg: string; findings: string[] } {
   const crossings = Math.max(
     links.filter((l) => l.to === centre.id).length,
     links.filter((l) => l.from === centre.id).length, 1);
-  const gapCol = Math.max(GAP_COL, Math.ceil(widestLabel) + LABEL_GAP * 2 + GAP_APART * (crossings - 1));
+  const gapCol = up4(Math.max(GAP_COL, Math.ceil(widestLabel) + LABEL_GAP * 2 + GAP_APART * crossings + 8));
+  const wAll = Math.max(natL, natC, natR), equal = wAll * 3 + gapCol * 2 + margin * 2 <= FRAME_W;
+  const wL = equal ? wAll : natL, wC = equal ? wAll : natC, wR = equal ? wAll : natR;
   const height = Math.max(hL, hC, hR) + margin * 2;
-  const width = margin * 2 + wL + wC + wR + gapCol * 2;
-  const xL = margin, xC = margin + wL + gapCol, xR = xC + wC + gapCol;
+  // The three columns stand centred on the frame, on the 4 grid.
+  const width = FRAME_W;
+  const xL = Math.max(margin, up4((FRAME_W - (wL + wC + wR + gapCol * 2)) / 2)), xC = xL + wL + gapCol, xR = xC + wC + gapCol;
 
   const out: string[] = [];
   const at = new Map<string, { x: number; y: number; w: number; h: number }>();
   const layColumn = (col: Box[], x: number, w: number, total: number) => {
     let y = margin + (height - margin * 2 - total) / 2;
     for (const b of col) {
-      const h = boxHeight(b);
-      out.push(rect(b, x, y, w, h));
+      const h = hTile;
+      out.push(rect(b, x, y, w, h, undefined, true));
       at.set(b.id, { x, y, w, h });
       y += h + GAP_Y;
     }
@@ -571,6 +796,8 @@ function drawEntities(spec: Spec): { svg: string; findings: string[] } {
     lane.set(l, { i: peers.indexOf(l), n: peers.length });
   }
 
+  const eRoutes: { d: string; from: string; to: string; dashed?: boolean; pathId: number; on: boolean }[] = [];
+  const byIdE = new Map(boxes.map((b) => [b.id, b]));
   for (const [pathId, l] of links.entries()) {
     const a = at.get(l.from), b = at.get(l.to);
     if (!a || !b) continue;
@@ -580,40 +807,33 @@ function drawEntities(spec: Spec): { svg: string; findings: string[] } {
     const { i, n } = lane.get(l) ?? { i: 0, n: 1 };
     const y1 = alignedTo(sidePoints(a.y, a.h, leaves.get(`${l.from}:${fromRight ? "R" : "L"}`) ?? 0), b.y + b.h / 2);
     const y2 = alignedTo(sidePoints(b.y, b.h, lands.get(`${l.to}:${fromRight ? "L" : "R"}`) ?? 0), y1);
-    const mid = x1 + ((x2 - x1) * (i + 1)) / (n + 1);
-    const dash = l.dashed ? ' stroke-dasharray="5 4"' : "";
-    const dPath = `M${x1} ${y1} H${mid} V${y2} H${x2}`;
-    out.push(`  <path class="sds-connector" d="${dPath}"${dash} marker-end="url(#ar)"/>`);
-    eVerts.push(...vertsOf(dPath, pathId)); eHorz.push(...horzOf(dPath, pathId));
+    // THE ELBOWS STAND AT THE FAR END OF THE RUN, 16 apart, so the wire leaves its tile straight and the long leg is clear for its label; a wire that
+    // is level with its target has no elbow at all.
+    const mid = y1 === y2 ? x2 : x2 - Math.sign(x2 - x1) * (GAP_APART * (n - i) + 8);
+    const dPath = y1 === y2 ? `M${x1} ${y1} H${x2}` : `M${x1} ${y1} H${mid} V${y2} H${x2}`;
+    eRoutes.push({ d: dPath, from: l.from, to: l.to, dashed: l.dashed, pathId, on: !!byIdE.get(l.to)?.em });
     // EVERY RELATION LINE CARRIES ITS CARDINALITY, which is what the chapter asks of this kind and
     // what the drawer had no field for: an ER diagram whose lines say only *belongs to* leaves the
     // reader with the one question they opened it to answer — one, or many? It rides with the label
     // rather than sitting apart from it, because the two are read as one phrase.
     if (!l.card)
       findings.push(`the relation \`${l.from}\` → \`${l.to}\` carries no cardinality; every relation line in an entity diagram says one or many (\`card\`: "1:N")`);
-    const text = relationText(l);
-    if (text) {
-      // THE LABEL SITS IN THE COLUMN GAP, on the connector's own vertical run — the one place in an
-      // ER layout where no box can be. Hung above a box instead, it lands inside whichever column is
-      // taller. Where the run is straight across it goes a standard gap above the line.
-      const w = text.length * W_NOTE;
-      // ON ITS OWN OUTBOUND LEG, not centred on the gap. Centring every label on the gap put them all
-      // at one x, so with more than one relation crossing a gap each was pushed off by the other's
-      // elbow — onto a box, or onto its neighbour. A link's own leg runs from its source to its own
-      // elbow, at its own height, and that is a stretch no other relation in the gap occupies.
-      const lead = Math.min(x1, mid), tail = Math.max(x1, mid);
-      const want = (lead + tail - w) / 2;
-      // Kept inside the gap, so a label never starts over the column it came from.
-      const lo = Math.min(x1, x2) + LABEL_GAP, hi = Math.max(x1, x2) - LABEL_GAP;
-      // A GAP HAS TWO BANDS, NOT ONE. Relations after the first in a gap alternate to the underside
-      // of their own leg, which doubles the room without widening the figure — and a label under a
-      // line reads as belonging to it exactly as one above it does.
-      const under = i % 2 === 1;
-      ePending.push({ x: Math.round(Math.min(Math.max(want, lo), Math.max(lo, hi - w))),
-                      y: y1 + (under ? LABEL_H + LABEL_GAP : -LABEL_GAP), w, txt: text, path: pathId });
-    }
+    // THE WORDS STAND ABOVE THE WIRE AND THE CARDINALITY UNDER IT, both on the long leg: each is 8 clear of the wire and of the other.
+    const lead = Math.min(x1, mid), tail = Math.max(x1, mid);
+    const lo = Math.min(x1, x2) + LABEL_GAP, hi = Math.max(x1, x2) - LABEL_GAP;
+    const put = (txt: string, below: boolean) => {
+      const w = txt.length * W_NOTE, want = (lead + tail - w) / 2;
+      ePending.push({ x: Math.round(Math.min(Math.max(want, lo), Math.max(lo, hi - w))), y: y1 + (below ? LABEL_H + LABEL_GAP : -LABEL_GAP), w, txt, path: pathId });
+    };
+    if (l.label) put(l.label, false);
+    if (l.card) put(l.card, !!l.label);
   }
 
+  const joined = busWires(eRoutes, (id, side) => { const p = at.get(id); return !p ? null : side === "left" ? p.x : side === "right" ? p.x + p.w : null; },
+    (id, side) => { const p = at.get(id); return !p || (side !== "left" && side !== "right") ? null : Math.round(p.y + p.h / 2); });
+  eRoutes.forEach((r, i) => { r.d = joined[i]; eVerts.push(...vertsOf(r.d, r.pathId)); eHorz.push(...horzOf(r.d, r.pathId)); });
+  for (const r of eRoutes.filter((x) => !x.on)) out.push(wireSvg(r.d, r.dashed));
+  for (const r of eRoutes.filter((x) => x.on)) out.push(wireSvg(r.d, r.dashed, "", true));
   out.push(...placeLabels(ePending, eVerts, margin, width, [...at.values(), ...eHorz]));
 
   return { svg: svgOf(out, spec.title ?? spec.caption ?? "entity diagram"), findings };
@@ -625,22 +845,23 @@ function drawChain(spec: Spec): { svg: string; findings: string[] } {
   if (!boxes.length) return { svg: "", findings: ["a `dg` figure with no boxes"] };
   // 56 is the connected gap: a 7 arrowhead and 49 of shaft. It was 22, which is the grid's
   // unconnected gap — the two rules contradicted each other and the chain followed the wrong one.
-  const margin = 24, gap = 56;
+  const margin = FRAME_PAD, gap = GAP_LINKED;
   const h = Math.max(...boxes.map(boxHeight));
-  const widths = boxes.map(boxWidth);
+  // the tiles of a row are equal: the widest tile's width and the tallest's height, the text laid from the top padding in each
+  const widths = boxes.map(() => Math.max(...boxes.map(boxWidth)));
   const width = margin * 2 + widths.reduce((a, b) => a + b, 0) + gap * (boxes.length - 1);
   // A chain wider than the canvas is drawn by the map drawer as a one-way chain, which stands it
   // up as a vertical line. The neighbours are the links, since a chain declares none.
-  if (width > 1100) {
+  if (width > FRAME_W) {
     const links = boxes.slice(0, -1).map((b, i) => ({ from: b.id, to: boxes[i + 1].id }));
     return drawMap({ ...spec, kind: "map", links });
   }
   const height = margin * 2 + h;
   const out: string[] = [];
-  let x = margin;
+  let x = Math.max(margin, up4((FRAME_W - (width - margin * 2)) / 2));
   boxes.forEach((b, i) => {
-    out.push(rect(b, x, margin, widths[i], h));
-    if (i < boxes.length - 1) out.push(`  <path class="sds-connector" d="M${x + widths[i]} ${margin + h / 2} H${x + widths[i] + gap}" marker-end="url(#ar)"/>`);
+    out.push(rect(b, x, margin, widths[i], h, undefined, true));
+    if (i < boxes.length - 1) out.push(wireSvg(`M${x + widths[i]} ${margin + h / 2} H${x + widths[i] + gap}`));
     x += widths[i] + gap;
   });
   return {
@@ -663,39 +884,53 @@ function drawChain(spec: Spec): { svg: string; findings: string[] } {
  * boxes on different rows leave the bottom edge and enter the top, so no connector crosses a label.
  */
 /** Wrap a note at a fixed width so a box is never wider than a third of the canvas. */
-const NOTE_CHARS = 34;
+const NOTE_CHARS = 40;
 function wrapNote(note: string): string[] {
-  const words = note.split(/\s+/); const lines: string[] = []; let cur = "";
-  for (const w of words) {
-    if (cur && (cur + " " + w).length > NOTE_CHARS) { lines.push(cur); cur = w; } else cur = cur ? cur + " " + w : w;
-  }
-  if (cur) lines.push(cur);
-  return lines;
+  return note.split("\n").flatMap((part) => {
+    const words = part.split(/\s+/); const lines: string[] = []; let cur = "";
+    for (const w of words) {
+      if (cur && (cur + " " + w).length > NOTE_CHARS) { lines.push(cur); cur = w; } else cur = cur ? cur + " " + w : w;
+    }
+    if (cur) lines.push(cur);
+    return lines;
+  });
 }
 const shapeOf = (b: Box): Shape => b.shape ?? "process";
 
 // The lean on a parallelogram, the bars on a predefined process, the cap on a cylinder, and the
 // radius of an on-page connector. Four numbers, each belonging to one shape and to nothing else.
-const SKEW = 16, BARS = 11, CAP = 13, DOT = 17;
+const SKEW = 16, BARS = 12, CAP = 12, DOT = 14;
 // A window's title bar, a chevron's point, and how far a bucket narrows towards its foot.
-const BAR = 22, POINT = 40, TAPER = 12;
+const BAR = 24, POINT = 40, TAPER = 12;
+// THE INNER TEXT BOX OF A SPECIAL SHAPE is the largest rectangle inside its outline, and the text is laid in it with the tile's padding (12),
+// never nearer than 8 to a curve or a slant. A cylinder's body begins below its cap's whole depth (2 x CAP) and the first line is set 8 under it;
+// a horizontal cylinder's text begins after its end cap's whole width; a slanted side (parallelogram, trapezoid) takes its whole lean off each side.
+const STORE_TEXT = 2 * 12 + 8 + 12;   // from a cylinder's top to its name's baseline: the cap's depth, 8 clear, the name's height
+const storeH = (lines: number) => up4(STORE_TEXT + LINE_STEP * lines + 12);
 
 /**
- * TEXT IS CENTRED BY ARITHMETIC, NOT BY `text-anchor`. The figure check reads a `<text>` element's
- * `x` as the LEFT edge of the word and measures its box from there, so a centred label declared the
- * SVG way would be judged half a word to the right of where it actually sits — every clearance
- * around it wrong, and wrong in the direction that passes. So the drawer computes the left edge
- * itself from the same character width the check uses, and the two halves agree by construction.
+ * TEXT IS CENTRED BY `text-anchor`, which is how the language centres it: the browser sets the word on the middle, whatever its
+ * real width, and the figure check reads the anchor and measures the word from the same middle.
  */
-function centred(cls: "sds-label" | "sds-note", txt: string, cx: number, y: number): string {
-  const w = txt.length * (cls === "sds-label" ? W_LABEL : W_NOTE);
-  return `  <text class="${cls}" x="${Math.round(cx - w / 2)}" y="${y}">${esc(txt)}</text>`;
+function centred(cls: "dl-name" | "dl-detail" | "dl-wlabel", txt: string, cx: number, y: number): string {
+  return textSvg(cls, Math.round(cx * 100) / 100, y, txt, "middle");
 }
 
+/**
+ * A DIAMOND IS SIZED TO ITS WORDS, with the tile's padding round them (12 at the sides, 6 above and below the lines). The rectangle inscribed
+ * in a diamond of width W and height H holds a text of tw by th when `tw/W + th/H <= 1`; the words take about two thirds of the width and one
+ * third of the height, so nothing is left over and no diamond is larger than its text needs.
+ */
+function decisionSize(b: Box): { w: number; h: number } {
+  const lines = b.note ? wrapNote(b.note) : [];
+  const tw = Math.max(b.label.length * W_LABEL, ...lines.map((l) => l.length * W_NOTE)) + PAD_X * 2 + (glyphOf(b) ? GLYPH_W : 0);
+  const th = 14 + LINE_STEP * lines.length + 12;
+  return { w: up4(tw / 0.65), h: up4(th / 0.35) };
+}
 function mapBoxWidth(b: Box): number {
   const lines = b.note ? wrapNote(b.note) : [];
   const widest = Math.max(b.label.length * W_LABEL, ...lines.map((l) => l.length * W_NOTE));
-  const base = Math.ceil(widest + PAD_X * 2);
+  const base = up4(widest + PAD_X * 2 + (glyphOf(b) ? GLYPH_W : 0));
   switch (shapeOf(b)) {
     // A DIAMOND HOLDS ONLY THE RECTANGLE INSCRIBED IN IT. A rectangle centred in a diamond of width
     // W and height H fits exactly when `tw/W + th/H <= 1`, so a flat allowance cannot be right at
@@ -704,30 +939,29 @@ function mapBoxWidth(b: Box): number {
     // spare. Found by the developer on the Sign-in flowchart, where *The organization judges* sat
     // wider than the diamond at its own height and the note's last line fell outside it entirely
     // (2026-09-22).
-    case "decision": return base * 2;
-    case "io": return base + SKEW;
+    case "decision": return decisionSize(b).w;
+    case "io": return up4(widest + PAD_X * 2 + SKEW * 2);
     case "predefined": return base + BARS * 2;
     case "terminator": return base + 12;
     case "connector": return DOT * 2;
     case "chevron": return base + POINT;
-    case "pipe": return base + CAP;
-    case "bucket": return base + TAPER * 2;
+    case "pipe": return up4(widest + CAP * 2 + PAD_X * 2 + (glyphOf(b) ? GLYPH_W : 0));
+    case "bucket": return up4(widest + PAD_X * 2 + TAPER * 2);
     default: return base;
   }
 }
 function mapBoxHeight(b: Box): number {
   const lines = b.note ? wrapNote(b.note).length : 0;
-  const base = lines ? 26 + 19 * lines + 12 : H_ONE;
+  const base = lines ? tileH(lines) : H_ONE;
   switch (shapeOf(b)) {
     // The other half of the inscribed rule above: doubled, so the text's height uses half the
     // diamond and its width the other half.
-    case "decision": return base * 2;
+    case "decision": return decisionSize(b).h;
     // The cap sits INSIDE the box's own bounds rather than above them, so the grid's spacing keeps
     // every neighbour clear of it without the layout knowing a cylinder is there.
-    case "store": return base + CAP;
-    case "terminator": return Math.max(base, 40);
+    case "store": return storeH(lines);
+    case "terminator": return base;
     case "connector": return DOT * 2;
-    case "window": return base + BAR;
     default: return base;
   }
 }
@@ -741,76 +975,96 @@ function mapBoxHeight(b: Box): number {
  * points on a closed path — it is the CENTRING rule that wants a rectangle, and a diamond has no
  * side to be off the middle of.
  */
-function mapRect(b: Box, x: number, y: number, w: number, h: number): string {
-  const cls = boxClass(b), cx = x + w / 2, cy = y + h / 2;
+/** A closed polygon whose every corner is soft, with a radius of r: the language's form for a diamond, a slant, a pot and a point. */
+function rpoly(pts: [number, number][], r = 9): string {
+  const n = pts.length;
+  const f = (v: number) => String(Math.round(v * 10) / 10);
+  const segs = pts.map((v, i) => {
+    const toward = (a: [number, number]): [number, number] => {
+      const dx = a[0] - v[0], dy = a[1] - v[1], l = Math.hypot(dx, dy), k = Math.min(r, l / 2) / l;
+      return [v[0] + dx * k, v[1] + dy * k];
+    };
+    return { a: toward(pts[(i + n - 1) % n]), v, b: toward(pts[(i + 1) % n]) };
+  });
+  let d = `M${f(segs[0].a[0])} ${f(segs[0].a[1])}`;
+  for (const s of segs) d += ` L${f(s.a[0])} ${f(s.a[1])} Q${f(s.v[0])} ${f(s.v[1])} ${f(s.b[0])} ${f(s.b[1])}`;
+  return d + " Z";
+}
+
+function mapRect(b: Box, x: number, y: number, w: number, h: number, topAlign = false): string {
+  // only the plain forms hang their text from the top; a diamond, a pill, a slant or a cylinder keeps its text where its outline has room
+  topAlign = topAlign && ["process", "predefined", "window"].includes(shapeOf(b));
+  const face = faceOf(b), cx = x + w / 2, cy = y + h / 2;
+  // An absent unit is dashed and has no fill, except where a cap lies over its body: the cap and the body then carry the ground, or the body's
+  // top edge would show through the cap.
+  const cls = b.off && (shapeOf(b) === "store" || shapeOf(b) === "pipe") ? "dl-tile-absent" : face.cls;
   const body: string[] = [];
-  let textTop = y + 26, textMid = cy + 4, centre = true;
+  const lines = b.note ? wrapNote(b.note) : [];
+  const g = glyphOf(b);
+  const natural = lines.length ? tileH(lines.length) : H_ONE;
+  // A TILE IN A ROW OR A GRID lays its text from the top padding, so the names of a row share one baseline whatever each tile's own height.
+  let textTop = y + 21 + (topAlign ? 0 : Math.max(0, (h - natural) / 2)), textMid = topAlign ? y + 21 : cy + 4, centre = true, tx = x + PAD_X + (g ? GLYPH_W : 0);
 
   switch (shapeOf(b)) {
     case "terminator":
       body.push(`  <rect class="${cls}" x="${x}" y="${y}" width="${w}" height="${h}" rx="${h / 2}"/>`);
       break;
     case "decision":
-      body.push(`  <path class="${cls}" d="M${cx} ${y} L${x + w} ${cy} L${cx} ${y + h} L${x} ${cy} Z"/>`);
-      // THE BLOCK IS CENTRED ON THE DIAMOND'S WAIST, not hung from its top. A diamond is at its
-      // widest exactly at the middle, so text starting 26 below the top vertex begins where the
-      // shape is still narrow — and once the height was doubled to fit the text at all, a
-      // top-anchored block sat high and left the room it needed empty underneath it.
-      textTop = cy - (19 * (b.note ? wrapNote(b.note).length : 0)) / 2 + 4;
+      body.push(`  <path class="${cls}" d="${rpoly([[cx, y], [x + w, cy], [cx, y + h], [x, cy]], 10)}"/>`);
+      // THE BLOCK IS CENTRED ON THE DIAMOND'S WAIST, not hung from its top: a diamond is widest at its middle.
+      textTop = cy - (LINE_STEP * lines.length) / 2 + 4;
       break;
     case "io":
-      body.push(`  <path class="${cls}" d="M${x + SKEW} ${y} L${x + w} ${y} L${x + w - SKEW} ${y + h} L${x} ${y + h} Z"/>`);
+      body.push(`  <path class="${cls}" d="${rpoly([[x + SKEW, y], [x + w, y], [x + w - SKEW, y + h], [x, y + h]], 9)}"/>`);
       break;
     case "predefined":
-      body.push(`  <rect class="${cls}" x="${x}" y="${y}" width="${w}" height="${h}" rx="3"/>`,
-                `  <path class="${cls}" d="M${x + BARS} ${y} V${y + h}"/>`,
-                `  <path class="${cls}" d="M${x + w - BARS} ${y} V${y + h}"/>`);
+      body.push(`  <rect class="${cls}" x="${x}" y="${y}" width="${w}" height="${h}" rx="10"/>`,
+                `  <path class="${face.line}" d="M${x + BARS} ${y + 6} V${y + h - 6}"/>`,
+                `  <path class="${face.line}" d="M${x + w - BARS} ${y + 6} V${y + h - 6}"/>`);
+      centre = false; tx = x + BARS + PAD_X + (g ? GLYPH_W : 0);
       break;
     case "store":
-      // Rect from the cap's waist down, cap centred on that waist: a connector lands on the rect,
-      // which is a shape the check can measure, and the cap is the picture rather than the claim.
-      body.push(`  <rect class="${cls}" x="${x}" y="${y + CAP}" width="${w}" height="${h - CAP}" rx="3"/>`,
+      // Rect from the cap's waist down, cap centred on that waist: a wire lands on the rect, which is a shape the
+      // check can measure, and the cap is the picture rather than the claim.
+      body.push(`  <rect class="${cls}" x="${x}" y="${y + CAP}" width="${w}" height="${h - CAP}" rx="10"/>`,
                 `  <ellipse class="${cls}" cx="${cx}" cy="${y + CAP}" rx="${w / 2}" ry="${CAP}"/>`);
-      textTop = y + CAP + 26; textMid = y + CAP + (h - CAP) / 2 + 4;
+      // the text is centred in the body below the cap, its first line 8 clear of the cap's lowest curve
+      textTop = y + STORE_TEXT + Math.max(0, (h - storeH(lines.length)) / 2); textMid = textTop;
       break;
     case "connector":
-      body.push(`  <circle class="${cls}" cx="${cx}" cy="${cy}" r="${DOT}"/>`);
+      body.push(`  <circle class="dl-step" cx="${cx}" cy="${cy}" r="${DOT}"/>`);
       break;
     case "window":
-      // A client: a frame with a title bar. The bar is marked a curve so the figure check reads it
-      // as part of the picture rather than as a connector starting and ending on nothing.
-      body.push(`  <rect class="${cls}" x="${x}" y="${y}" width="${w}" height="${h}" rx="3"/>`,
-                `  <path class="sds-connector" data-role="curve" d="M${x} ${y + BAR} H${x + w}"/>`);
-      textTop = y + BAR + 24; textMid = y + BAR + (h - BAR) / 2 + 4; centre = false;
+      // A client: a plain tile, as the language draws every unit. It has no band over its name, which a blank header read as a missing picture.
+      body.push(`  <rect class="${cls}" x="${x}" y="${y}" width="${w}" height="${h}" rx="10"/>`);
+      centre = false;
       break;
     case "chevron":
-      body.push(`  <path class="${cls}" d="M${x} ${y} H${x + w - POINT} L${x + w} ${cy} L${x + w - POINT} ${y + h} H${x} Z"/>`);
+      body.push(`  <path class="${cls}" d="${rpoly([[x, y], [x + w - POINT, y], [x + w, cy], [x + w - POINT, y + h], [x, y + h]], 8)}"/>`);
       centre = false;
       break;
     case "pipe":
       // A queue, lying on its side: the cap is at the end work enters, not on top.
-      body.push(`  <rect class="${cls}" x="${x + CAP}" y="${y}" width="${w - CAP}" height="${h}" rx="3"/>`,
+      body.push(`  <rect class="${cls}" x="${x + CAP}" y="${y}" width="${w - CAP}" height="${h}" rx="10"/>`,
                 `  <ellipse class="${cls}" cx="${x + CAP}" cy="${cy}" rx="${CAP}" ry="${h / 2}"/>`);
-      textTop = y + 26; textMid = cy + 4; centre = false;
+      centre = false; tx = x + CAP * 2 + PAD_X + (g ? GLYPH_W : 0);
       break;
     case "bucket":
-      body.push(`  <path class="${cls}" d="M${x} ${y} L${x + w} ${y} L${x + w - TAPER} ${y + h} L${x + TAPER} ${y + h} Z"/>`);
-      centre = false;
+      body.push(`  <path class="${cls}" d="${rpoly([[x, y], [x + w, y], [x + w - TAPER, y + h], [x + TAPER, y + h]], 8)}"/>`);
       break;
     default:
-      body.push(`  <rect class="${cls}" x="${x}" y="${y}" width="${w}" height="${h}" rx="3"/>`);
+      body.push(`  <rect class="${cls}" x="${x}" y="${y}" width="${w}" height="${h}" rx="10"/>`);
       centre = false;
   }
+  if (g && !centre) body.push(glyphSvg(g, tx - 18, shapeOf(b) === "store" ? y + CAP + (h - CAP) / 2 : cy, 16, (b.warn || b.tone) ? " dl-glyph-st" : ""));
 
-  if (!b.note) {
-    body.push(centre ? centred("sds-label",b.label, cx, textMid) : `  <text class="sds-label" x="${x + PAD_X}" y="${textMid}">${esc(b.label)}</text>`);
-    return body.join("\n");
+  const nameAt = lines.length ? textTop : textMid;
+  if (shapeOf(b) === "connector") body.push(`  <text class="dl-step-text" x="${cx}" y="${cy + 3.5}" text-anchor="middle">${esc(b.label)}</text>`);
+  else {
+    body.push(centre ? centred("dl-name", b.label, cx, nameAt) : textSvg("dl-name", tx, nameAt, b.label));
+    lines.forEach((line, i) => body.push(centre ? centred("dl-detail", line, cx, textTop + LINE_STEP * (i + 1)) : textSvg("dl-detail", tx, textTop + LINE_STEP * (i + 1), line)));
   }
-  body.push(centre ? centred("sds-label",b.label, cx, textTop) : `  <text class="sds-label" x="${x + PAD_X}" y="${textTop}">${esc(b.label)}</text>`);
-  wrapNote(b.note).forEach((line, i) => body.push(
-    centre ? centred("sds-note",line, cx, textTop + 19 * (i + 1))
-           : `  <text class="sds-note" x="${x + PAD_X}" y="${textTop + 19 + 19 * i}">${esc(line)}</text>`));
-  return body.join("\n");
+  return unit(b, body);
 }
 
 type Placed = { x: number; y: number; w: number; h: number; row: number };
@@ -827,6 +1081,7 @@ function acrossPoints(b: Box, p: Placed, side: "top" | "bottom", asking: number)
   switch (shapeOf(b)) {
     case "decision": case "connector": case "terminator": return [Math.round(cx)];
     case "io": return [Math.round(cx + (side === "top" ? SKEW / 2 : -SKEW / 2))];
+    case "pipe": return [Math.round(p.x + CAP + (p.w - CAP) / 2)];
     default: return sidePoints(p.x, p.w, asking);
   }
 }
@@ -861,11 +1116,26 @@ const midY = (b: Box, p: Placed) => shapeOf(b) === "store" ? p.y + CAP + (p.h - 
  * filled its own row, every box stacked in one column, and each connector ran straight through the
  * boxes between its ends with its label printed over them (N13's sample, 2026-09-21).
  */
-function drawMap(spec: Spec, opts: { downward?: boolean } = {}): { svg: string; findings: string[] } {
+function drawMap(spec: Spec, opts: { downward?: boolean; fixed?: { w: number; h: number; chars: number } } = {}): { svg: string; findings: string[] } {
   const label = opts.downward ? "flowchart" : "map";
   const findings: string[] = [];
-  const all = spec.boxes ?? [];
   const links = spec.links ?? [];
+  // SEVERAL ONE-WAY CHAINS ARE A ROW EACH. Where no box is nested and every box has one wire in and one out at most, with two or more
+  // chains, each chain is laid in a row of its own, the tiles narrow enough that a row of five fits the frame, wires straight across.
+  const chainMode = (() => {
+    const bs = spec.boxes ?? [];
+    if (opts.downward || !bs.length || bs.some((b) => b.in !== undefined) || !links.length) return false;
+    const inN = new Map<string, number>(), outN = new Map<string, number>();
+    for (const l of links) { outN.set(l.from, (outN.get(l.from) ?? 0) + 1); inN.set(l.to, (inN.get(l.to) ?? 0) + 1); }
+    return bs.every((b) => (inN.get(b.id) ?? 0) <= 1 && (outN.get(b.id) ?? 0) <= 1 && (inN.get(b.id) ?? 0) + (outN.get(b.id) ?? 0) >= 1) && bs.filter((b) => !(inN.get(b.id) ?? 0)).length >= 2;
+  })();
+  const wrapTile = (b: Box): Box => (!chainMode && !opts.fixed) || !b.note ? b : { ...b, note: b.note.split("\n").flatMap((part) => {
+    const lines: string[] = []; let cur = "";
+    for (const w of part.split(/\s+/)) { if (cur && (cur + " " + w).length > (opts.fixed?.chars ?? 20)) { lines.push(cur); cur = w; } else cur = cur ? cur + " " + w : w; }
+    if (cur) lines.push(cur);
+    return lines;
+  }).join("\n") };
+  const all = (spec.boxes ?? []).map(wrapTile);
   if (!all.length) return { svg: "", findings: ["a `dg` figure with no boxes"] };
 
   const byId = new Map(all.map((b) => [b.id, b]));
@@ -884,17 +1154,72 @@ function drawMap(spec: Spec, opts: { downward?: boolean } = {}): { svg: string; 
 
   // 16 inside a container, the same number a leaf pads its own label by — one padding, not two
   // (05-artifacts.md § The primitives). It was 12, so a nested box read as falling out of its parent.
-  const HEAD = 34, PAD_IN = 16;
-  const outerW = (b: Box): number => {
-    const own = mapBoxWidth(b);
-    const inner = (kids.get(b.id) ?? []).map(outerW);
-    return inner.length ? Math.max(own, Math.max(...inner) + PAD_IN * 2) : own;
+  // A group is a plate: its label inside it, its baseline 20 from the top and its first row at 32, and 16 of padding round its tiles.
+  const HEAD = 32, PAD_IN = 16;
+  // Tiles in a plate stand 12 apart, and 56 apart where a wire joins two of them.
+  const kidGap = (b: Box): number => {
+    const ids = new Set((kids.get(b.id) ?? []).map((c) => c.id));
+    return links.some((l) => ids.has(l.from) && ids.has(l.to)) ? GAP_LINKED : GAP_Y;
   };
-  const outerH = (b: Box): number => {
+  // A PLATE LAYS ITS TILES IN ROWS, and a row fills the plate's width: one tile spans it, two share it, and so on, with the gap between.
+  // Tiles that a wire joins stand one to a row, so the wire runs straight down between them. A row wraps where the plate's room ends.
+  type Plan = { rows: Box[][]; w: number; h: number; cols?: Box[][] };
+  const plans = new Map<string, Plan>();
+  const plan = (b: Box, cap: number): Plan => {
+    const hit = plans.get(b.id);
+    if (hit) return hit;
     const inner = kids.get(b.id) ?? [];
-    if (!inner.length) return mapBoxHeight(b);
-    return HEAD + inner.reduce((h, c) => h + outerH(c) + 10, 0) + PAD_IN - 10 + PAD_IN;
+    let out: Plan;
+    if (!inner.length) out = { rows: [], w: opts.fixed ? opts.fixed.w : mapBoxWidth(b), h: opts.fixed ? opts.fixed.h : mapBoxHeight(b) };
+    else {
+      const room = cap - PAD_IN * 2, gap = kidGap(b);
+      const linked = gap === GAP_LINKED;
+      const nat = new Map(inner.map((k) => [k.id, plan(k, room)]));
+      // A PLATE WHOSE TILES ARE JOINED BY WIRES LAYS THEM IN COLUMNS, the wires running straight across: what feeds stands left, what it feeds
+      // is stacked in the next column, and a tile no wire reaches stands in a column of its own at the right. The tiles of a column share the
+      // plate's height, and the columns fill its width.
+      if (linked && inner.every((k) => !(kids.get(k.id) ?? []).length)) {
+        const ids = new Set(inner.map((k) => k.id));
+        const inside = links.filter((l) => ids.has(l.from) && ids.has(l.to));
+        const d0 = new Map<string, number>(inner.map((k) => [k.id, 0]));
+        for (let p = 0; p < inner.length; p++) for (const l of inside) d0.set(l.to, Math.max(d0.get(l.to)!, d0.get(l.from)! + 1));
+        const linkedIds = new Set(inside.flatMap((l) => [l.from, l.to]));
+        const depths = [...new Set(inner.filter((k) => linkedIds.has(k.id)).map((k) => d0.get(k.id)!))].sort((m, n) => m - n);
+        const cols: Box[][] = depths.map((dv) => inner.filter((k) => linkedIds.has(k.id) && d0.get(k.id) === dv));
+        const loose = inner.filter((k) => !linkedIds.has(k.id));
+        if (loose.length) cols.push(loose);
+        const colW = cols.map((c) => Math.max(...c.map((k) => nat.get(k.id)!.w)));
+        const colH = Math.max(...cols.map((c) => c.reduce((s, k) => s + nat.get(k.id)!.h, 0) + GAP_Y * (c.length - 1)));
+        const gaps = cols.map((_, i) => (i === cols.length - 1 ? 0 : loose.length && i === cols.length - 2 ? GAP_PLATES : GAP_LINKED));
+        const natW = colW.reduce((s, v) => s + v, 0) + gaps.reduce((s, v) => s + v, 0) + PAD_IN * 2;
+        const nl2 = b.note ? wrapNote(b.note) : [];
+        out = { rows: [], cols, w: up4(Math.max(b.label.length * W_TITLE + PAD_IN * 2, natW, cap)), h: HEAD + colH + PAD_IN + (nl2.length ? 8 + LINE_STEP * nl2.length : 0) };
+        plans.set(b.id, out);
+        return out;
+      }
+      const rows: Box[][] = [];
+      let cur: Box[] = [], used = 0;
+      for (const k of inner) {
+        const w = nat.get(k.id)!.w;
+        if (cur.length && (linked || used + GAP_Y + w > room)) { rows.push(cur); cur = []; used = 0; }
+        cur.push(k); used += (used ? GAP_Y : 0) + w;
+      }
+      if (cur.length) rows.push(cur);
+      // the tiles of a row are equal, so a row is as wide as its widest tile times its count
+      const allTiles = (r: Box[]) => r.every((k) => !(kids.get(k.id) ?? []).length);
+      const widest = Math.max(...rows.map((r) => (allTiles(r) ? Math.max(...r.map((k) => nat.get(k.id)!.w)) * r.length : r.reduce((s, k) => s + nat.get(k.id)!.w, 0)) + GAP_Y * (r.length - 1)));
+      const rowH = rows.map((r) => Math.max(...r.map((k) => nat.get(k.id)!.h)));
+      const nl = b.note ? wrapNote(b.note) : [];
+      const noteH = nl.length ? 8 + LINE_STEP * nl.length : 0, noteW = Math.max(0, ...nl.map((l) => l.length * W_NOTE)) + PAD_IN * 2;
+      out = { rows, w: up4(Math.max(b.label.length * W_TITLE + PAD_IN * 2, widest + PAD_IN * 2, noteW)),
+              h: HEAD + rowH.reduce((s, h) => s + h, 0) + gap * (rows.length - 1) + PAD_IN + noteH };
+    }
+    plans.set(b.id, out);
+    return out;
   };
+  const TOP_CAP = FRAME_W - FRAME_PAD * 2;
+  const outerW = (b: Box): number => plan(b, TOP_CAP).w;
+  const outerH = (b: Box): number => plan(b, TOP_CAP).h;
 
   // The row of a top-level box is its depth: one more than the deepest box that points at it. A
   // nested box counts through the group that holds it. A cycle is reported and its back edge ignored.
@@ -909,7 +1234,10 @@ function drawMap(spec: Spec, opts: { downward?: boolean } = {}): { svg: string; 
     if (pass === topIds.length) { findings.push("the links form a cycle, so the rows could not be decided; a map flows one way"); break; }
   }
 
-  const CANVAS = 1100, margin = 24, gapX = GAP_LINKED;
+  // A LINK THAT SKIPS A ROW RUNS DOWN A CORRIDOR BESIDE THE ROWS, so the rows give up that room of the frame when the map has one.
+  const skipping = edges.filter(([f, t2]) => (depth.get(t2) ?? 0) > (depth.get(f) ?? 0) + 1).length;
+  const reserve = skipping ? GAP_LINKED + GAP_APART * (skipping - 1) : 0;
+  const CANVAS = FRAME_W - reserve, margin = FRAME_PAD, gapX = chainMode ? 40 : GAP_LINKED;
 
   // A ONE-WAY CHAIN IS A STRAIGHT LINE. When every box has at most one link in and one out and the
   // links form a single path through all of them, the figure is a flow, and a flow reads best as a
@@ -931,14 +1259,16 @@ function drawMap(spec: Spec, opts: { downward?: boolean } = {}): { svg: string; 
         const boxes = order.map((id) => byId.get(id)!);
         const linkOf = (a: string, b: string) => links.find((l) => holder(l.from) === a && holder(l.to) === b);
         const labelW = (i: number) => ((linkOf(order[i], order[i + 1])?.label ?? "").length * W_NOTE);
-        const ws = boxes.map(mapBoxWidth), hs = boxes.map(mapBoxHeight);
+        const ws0 = boxes.map(mapBoxWidth), hs0 = boxes.map(mapBoxHeight);
+        // the tiles of a row take the widest tile's width and the tallest's height
+        const ws = ws0.map(() => Math.max(...ws0)), hs = hs0.map(() => Math.max(...hs0));
         const gaps = boxes.slice(0, -1).map((_, i) => Math.max(gapX, labelW(i) + 16));
         const total = ws.reduce((s, w) => s + w, 0) + gaps.reduce((s, g) => s + g, 0);
         const out: string[] = [];
         let width = CANVAS, height = 0;
         if (total <= CANVAS - margin * 2 && !opts.downward) {
           const h = Math.max(...hs);
-          let x = margin + Math.floor((CANVAS - margin * 2 - total) / 2);
+          let x = margin + up4((CANVAS - margin * 2 - total) / 2);
           const y = margin;
           // A BOX IS CENTRED ON THE ROW'S MIDDLE, not hung from its top. The connector runs at the
           // tallest box's mid-height, so a shorter box left at the top took its only arrow off its
@@ -947,28 +1277,28 @@ function drawMap(spec: Spec, opts: { downward?: boolean } = {}): { svg: string; 
           // figure: elements may be centred, and spacing is what must not vary.
           boxes.forEach((b, i) => {
             const by = y + (h - hs[i]) / 2;   // not rounded: a half-pixel here is the arrow off centre
-            out.push(mapRect(b, x, by, ws[i], hs[i]));
+            out.push(mapRect(b, x, by, ws[i], hs[i], true));
             if (i < boxes.length - 1) {
               const l = linkOf(order[i], order[i + 1]);
               const x1 = x + ws[i], x2 = x1 + gaps[i], cy = y + h / 2;
-              out.push(`  <path class="sds-connector" d="M${x1} ${cy} H${x2}"${l?.dashed ? ' stroke-dasharray="5 4"' : ""} marker-end="url(#ar)"/>`);
-              if (l?.label) out.push(`  <text class="sds-note" x="${Math.round(x1 + (gaps[i] - labelW(i)) / 2)}" y="${cy - 8}">${esc(l.label)}</text>`);
+              out.push(wireSvg(`M${x1} ${cy} H${x2}`, l?.dashed));
+              if (l?.label) out.push(textSvg("dl-wlabel", Math.round(x1 + (gaps[i] - labelW(i)) / 2), cy - 8, l.label));
               x = x2;
             }
           });
           height = margin + h + margin;
         } else {
           const w = Math.max(...ws);
-          const x = margin + Math.floor((CANVAS - margin * 2 - w) / 2);
+          const x = margin + up4((CANVAS - margin * 2 - w) / 2);
           let y = margin;
           const GAP_V = 40;
           boxes.forEach((b, i) => {
-            out.push(mapRect(b, x, y, w, hs[i]));
+            out.push(mapRect(b, x, y, w, hs[i], true));
             if (i < boxes.length - 1) {
               const l = linkOf(order[i], order[i + 1]);
               const cx = x + w / 2, y1 = y + hs[i], y2 = y1 + GAP_V;
-              out.push(`  <path class="sds-connector" d="M${cx} ${y1} V${y2}"${l?.dashed ? ' stroke-dasharray="5 4"' : ""} marker-end="url(#ar)"/>`);
-              if (l?.label) out.push(`  <text class="sds-note" x="${cx + 10}" y="${y1 + GAP_V / 2 + 4}">${esc(l.label)}</text>`);
+              out.push(wireSvg(`M${cx} ${y1} V${y2}`, l?.dashed));
+              if (l?.label) out.push(textSvg("dl-wlabel", cx + 12, y1 + GAP_V / 2 + 4, l.label));
               y = y2;
             }
           });
@@ -996,7 +1326,21 @@ function drawMap(spec: Spec, opts: { downward?: boolean } = {}): { svg: string; 
   };
   sweep(true); sweep(false); sweep(true);
   const rows: Box[][] = [];
-  for (const lv of levels) {
+  // SEVERAL ONE-WAY CHAINS ARE A ROW EACH: when every box has one wire in and one out at most and no box is nested, each chain is laid
+  // in a row of its own, its wires running straight across, rather than the chains being cut into rows by depth.
+  const chains: Box[][] = [];
+  if (chainMode) {
+    const inN = new Map<string, number>(), outN = new Map<string, number>();
+    for (const [f, t2] of edges) { outN.set(f, (outN.get(f) ?? 0) + 1); inN.set(t2, (inN.get(t2) ?? 0) + 1); }
+    const simple = topIds.every((id) => (inN.get(id) ?? 0) <= 1 && (outN.get(id) ?? 0) <= 1);
+    const heads2 = topIds.filter((id) => !(inN.get(id) ?? 0));
+    if (simple && heads2.length >= 2) {
+      const next2 = new Map(edges);
+      for (const h0 of heads2) { const ch: Box[] = []; let c2: string | undefined = h0; while (c2 && ch.length <= topIds.length) { ch.push(byId.get(c2)!); c2 = next2.get(c2); } chains.push(ch); }
+    }
+  }
+  if (chains.length && chains.reduce((s, c) => s + c.length, 0) === topIds.length) rows.push(...chains);
+  else for (const lv of levels) {
     const members = byLevel[levels.indexOf(lv)];
     let row: Box[] = []; let used = 0;
     for (const b of members) {
@@ -1007,16 +1351,62 @@ function drawMap(spec: Spec, opts: { downward?: boolean } = {}): { svg: string; 
     if (row.length) rows.push(row);
   }
 
+  // EVERY TILE OF A ROW OR A GRID TAKES ONE WIDTH AND ONE HEIGHT: where a figure is all tiles (no group holds any), each tile takes the widest
+  // tile's width, or the share of the frame where those do not fit a row, and the tallest tile's height, and a detail wraps only as the width
+  // forces it. The figure is laid again at that size, so the rows are equal and the columns line up from row to row.
+  if (!opts.fixed && !opts.downward && !kids.size && rows.length) {
+    const fitW = Math.min(...rows.map((r) => Math.floor((CANVAS - margin * 2 - gapX * (r.length - 1)) / r.length / 4) * 4));
+    const uni = Math.max(40, Math.min(Math.max(...top.map(outerW)), chainMode ? fitW : Math.max(...top.map(outerW))));
+    const hs2 = top.map((b) => mapBoxHeight(b)), same = top.every((b) => outerW(b) === uni) && hs2.every((v) => v === hs2[0]);
+    if (!same || uni !== Math.max(...top.map(outerW))) {
+      // the height is the tallest tile's, once the detail is wrapped to this width
+      const chars = Math.max(8, Math.floor((uni - PAD_X * 2) / W_NOTE));
+      const rewrapped = top.map((b) => b.note ? { ...b, note: b.note.split("\n").flatMap((part) => { const ls: string[] = []; let cur = ""; for (const wd of part.split(/\s+/)) { if (cur && (cur + " " + wd).length > chars) { ls.push(cur); cur = wd; } else cur = cur ? cur + " " + wd : wd; } if (cur) ls.push(cur); return ls; }).join("\n") } : b);
+      const hmax = Math.max(...rewrapped.map(mapBoxHeight));
+      return drawMap({ ...spec, boxes: (spec.boxes ?? []).map((b) => rewrapped.find((r) => r.id === b.id) ?? b) }, { ...opts, fixed: { w: uni, h: hmax, chars } });
+    }
+  }
+
   const out: string[] = [];
   const at = new Map<string, { x: number; y: number; w: number; h: number; row: number }>();
   const place = (b: Box, x: number, y: number, w: number, h: number, row: number) => {
     const inner = kids.get(b.id) ?? [];
     at.set(b.id, { x, y, w, h, row });
-    if (!inner.length) { out.push(mapRect(b, x, y, w, h)); return; }
-    out.push(`  <rect class="${boxClass(b)}" x="${x}" y="${y}" width="${w}" height="${h}" rx="3" fill="none"/>`);
-    out.push(`  <text class="sds-label" x="${x + PAD_IN}" y="${y + 22}">${esc(b.label)}</text>`);
+    if (!inner.length) { out.push(mapRect(b, x, y, w, h, true)); return; }
+    out.push(`  <rect class="${b.em ? "dl-plate-on" : "dl-plate"}" x="${x}" y="${y}" width="${w}" height="${h}" rx="12"/>`);
+    out.push(textSvg("dl-label", x + PAD_IN, y + 20, b.label.toUpperCase()));
+    const pl = plans.get(b.id)!, innerW = w - PAD_IN * 2, gap = kidGap(b);
+    // A group's own detail stands under its tiles, at the plate's padding.
+    if (b.note) wrapNote(b.note).forEach((line, li, all2) => out.push(textSvg("dl-detail", x + PAD_IN, y + h - PAD_IN - LINE_STEP * (all2.length - 1 - li) - 4, line)));
     let cy = y + HEAD;
-    for (const c of inner) { const ch = outerH(c); place(c, x + PAD_IN, cy, w - PAD_IN * 2, ch, row); cy += ch + 10; }
+    if (pl.cols) {
+      const cols = pl.cols, loose = cols.length > 1 && !links.some((l) => cols[cols.length - 1].some((k) => k.id === l.from || k.id === l.to));
+      const nat = cols.map((c) => Math.max(...c.map((k) => plans.get(k.id)!.w)));
+      const gaps = cols.map((_, i) => (i === cols.length - 1 ? 0 : loose && i === cols.length - 2 ? GAP_PLATES : GAP_LINKED));
+      const extra = innerW - nat.reduce((s, v) => s + v, 0) - gaps.reduce((s, v) => s + v, 0);
+      const colH = h - HEAD - PAD_IN - (b.note ? 8 + LINE_STEP * wrapNote(b.note).length : 0);
+      let cx = x + PAD_IN;
+      cols.forEach((c, ci) => {
+        const cw = ci === cols.length - 1 ? x + PAD_IN + innerW - cx : nat[ci] + up4(extra / cols.length);
+        const th = (colH - GAP_Y * (c.length - 1)) / c.length;
+        c.forEach((k, ki) => place(k, cx, cy + ki * (th + GAP_Y), cw, th, row));
+        cx += cw + gaps[ci];
+      });
+      return;
+    }
+    for (const r of pl.rows) {
+      const nat = r.map((k) => plans.get(k.id)!.w), rh = Math.max(...r.map((k) => plans.get(k.id)!.h));
+      const extra = innerW - nat.reduce((s, v) => s + v, 0) - GAP_Y * (r.length - 1);
+      let cx = x + PAD_IN;
+      r.forEach((k, i) => {
+        // the tiles of a row are equal; a row that holds a group keeps each its own width
+        const tiles = r.every((k) => !(kids.get(k.id) ?? []).length), base = tiles ? Math.max(...nat) : nat[i], share = tiles ? Math.max(0, innerW - base * r.length - GAP_Y * (r.length - 1)) : extra;
+        const kw = i === r.length - 1 ? x + PAD_IN + innerW - cx : tiles ? Math.max(base, Math.floor((innerW - GAP_Y * (r.length - 1)) / r.length / 2) * 2) : base + up4(share / r.length);
+        place(k, cx, cy, kw, rh, row);
+        cx += kw + GAP_Y;
+      });
+      cy += rh + gap;
+    }
   };
 
   // EVERY horizontal run through a gap takes a lane of its own, so no two connectors travel side by
@@ -1081,9 +1471,31 @@ function drawMap(spec: Spec, opts: { downward?: boolean } = {}): { svg: string; 
   rows.forEach((row, i) => {
     const rh = Math.max(...row.map(outerH));
     const rw = row.reduce((s, b) => s + outerW(b), 0) + gapX * (row.length - 1);
-    let x = margin + Math.floor((CANVAS - margin * 2 - rw) / 2);   // rows are centred
+    let x = margin + up4((CANVAS - margin * 2 - rw) / 2);   // rows are centred, on the 4 grid
+    // A WIRE RUNS STRAIGHT BETWEEN CENTRES THAT LINE UP, WITH NO JOG; where two units do not line up, a unit moves and the wire does not
+    // bend (the language's "Alignment"). So a row stands under its parents: the box that is the one child of a box in the row above, or
+    // the middle one of an odd number of them, is put on its parent's centre, and its row moves with it, rigidly, where the frame allows.
+    if (i > 0) {
+      const parentOf = (b: Box): string | null => {
+        const ps = new Set(links.filter((l) => holder(l.to) === b.id && rowOf.get(holder(l.from)) === i - 1).map((l) => holder(l.from)));
+        return ps.size === 1 ? [...ps][0] : null;
+      };
+      const kidsOf = new Map<string, Box[]>();
+      for (const b of row) { const p = parentOf(b); if (p) kidsOf.set(p, [...(kidsOf.get(p) ?? []), b]); }
+      let before = x;
+      for (const b of row) {
+        const p = parentOf(b), pa = p ? at.get(p) : undefined;
+        const sibs = p ? kidsOf.get(p)! : [];
+        if (pa && sibs.length % 2 === 1 && sibs[(sibs.length - 1) / 2] === b) {
+          const want = pa.x + pa.w / 2 - outerW(b) / 2, shift = want - before;
+          if (x + shift >= margin && x + shift + rw <= CANVAS - margin) x += shift;
+          break;
+        }
+        before += outerW(b) + gapX;
+      }
+    }
     rowTop.push(y); rowBottom.push(y + rh);
-    for (const b of row) { const w = outerW(b); place(b, x, y, w, outerH(b), i); x += w + gapX; }
+    for (const b of row) { const w = outerW(b); place(b, x, chainMode && !opts.fixed ? y + (rh - outerH(b)) / 2 : y, w, outerH(b), i); x += w + gapX; }
     y += rh + (i < rows.length - 1 ? gapAfter(i) : 0);
   });
   // A SIDE CORRIDOR PER SKIPPING LINK, clear to the right of every box. A link that skips rows runs
@@ -1099,7 +1511,7 @@ function drawMap(spec: Spec, opts: { downward?: boolean } = {}): { svg: string; 
     const ra = rowOfAny(l.from), rb = rowOfAny(l.to);
     return ra >= 0 && rb >= 0 && (rb < ra || rb > ra + 1);
   });
-  const sideLane = (l: Link) => rightMost + GAP_LINKED + Math.max(0, skippers.indexOf(l)) * GAP_Y;
+  const sideLane = (l: Link) => rightMost + GAP_LINKED + Math.max(0, skippers.indexOf(l)) * GAP_APART;
   const width = Math.max(rightMost, skippers.length ? sideLane(skippers[skippers.length - 1]) : 0) + margin;
   const height = y + margin;
 
@@ -1206,21 +1618,40 @@ function drawMap(spec: Spec, opts: { downward?: boolean } = {}): { svg: string; 
   const verticals: Vert[] = [];
   const horizontals: Blocker[] = [];
   const pending: Pending[] = [];
+  const mRoutes: { d: string; from: string; to: string; dashed?: boolean; pathId: number; on: boolean }[] = [];
 
   for (const [pathId, l] of links.entries()) {
     const a = at.get(l.from), b = at.get(l.to);
     if (!a || !b) continue;
-    const dash = l.dashed ? ' stroke-dasharray="5 4"' : "";
     let d: string; let label: { x: number; y: number } | null = null;
     const w = (l.label ?? "").length * W_NOTE;
-    if (a.row === b.row) {
+    if (a.row === b.row && a.x < b.x + b.w && b.x < a.x + a.w) {
+      // STACKED, inside one group: the wire runs down between the two, straight where nothing stands between them, and down the group's
+      // padding (8 in from its edge) where a tile does.
+      const upper = a.y < b.y ? a : b, lower = upper === a ? b : a;
+      const between = [...at.values()].some((q) => q !== a && q !== b && q.x < upper.x + upper.w && upper.x < q.x + q.w && q.y >= upper.y + upper.h - 1 && q.y + q.h <= lower.y + 1);
+      const cx = Math.round(Math.max(a.x, b.x) + Math.min(a.w, b.w) / 2);
+      const down = upper === a;
+      if (!between) {
+        d = down ? `M${cx} ${upper.y + upper.h} V${lower.y}` : `M${cx} ${lower.y} V${upper.y + upper.h}`;
+        if (l.label) label = { x: cx + 8, y: Math.round((upper.y + upper.h + lower.y) / 2 + 4) };
+      } else {
+        const sx = Math.max(a.x + a.w, b.x + b.w) + 8, ya = a.y + a.h / 2, yb = b.y + b.h / 2;
+        d = `M${a.x + a.w} ${ya} H${sx} V${yb} H${b.x + b.w}`;
+        if (l.label) label = { x: sx - w - 8, y: Math.round(Math.min(ya, yb) + (Math.abs(ya - yb)) / 2 + 4) };
+      }
+    } else if (a.row === b.row) {
       // Side by side: out of one vertical edge, into the other, the label above both.
       const rightward = a.x < b.x;
       const ba = byId.get(l.from)!, bb = byId.get(l.to)!;
       const x1 = edgeX(ba, a, rightward ? "right" : "left"), x2 = edgeX(bb, b, rightward ? "left" : "right");
-      const y1 = midY(ba, a), y2 = midY(bb, b), mid = (x1 + x2) / 2;
-      d = `M${x1} ${y1} H${mid} V${y2} H${x2}`;
-      if (l.label) label = labelAt(-1 - a.row, mid, w, Math.min(a.y, b.y) - LABEL_GAP);
+      let y1 = midY(ba, a), y2 = midY(bb, b);
+      // A WIRE BETWEEN TWO TILES BESIDE EACH OTHER RUNS STRAIGHT where their sides share a height: it meets the middle of the facing edge of the one
+      // and lands at the same height on the other.
+      if (y2 > a.y + 12 && y2 < a.y + a.h - 12) y1 = y2; else if (y1 > b.y + 12 && y1 < b.y + b.h - 12) y2 = y1;
+      const mid = (x1 + x2) / 2;
+      d = y1 === y2 ? `M${x1} ${y1} H${x2}` : `M${x1} ${y1} H${mid} V${y2} H${x2}`;
+      if (l.label) label = y1 === y2 ? { x: Math.round(mid - w / 2), y: y1 - LABEL_GAP } : labelAt(-1 - a.row, mid, w, Math.min(a.y, b.y) - LABEL_GAP);
     } else if (b.row === a.row + 1) {
       // The next row down: out of the bottom, along this link's own lane in the gap, into the top.
       const x1 = exitX(l), x2 = entryX(l);
@@ -1282,11 +1713,20 @@ function drawMap(spec: Spec, opts: { downward?: boolean } = {}): { svg: string; 
       d = parts.join(" ");
       if (l.label) label = labelAt(a.row - 1, (runFrom + sideX) / 2, w, runY - LABEL_GAP);
     }
-    out.push(`  <path class="sds-connector" d="${d}"${dash} marker-end="url(#ar)"/>`);
-    horizontals.push(...horzOf(d, pathId));
-    if (label && l.label) { verticals.push(...vertsOf(d, pathId)); pending.push({ ...label, w, txt: l.label, path: pathId }); }
-    else verticals.push(...vertsOf(d, pathId));
+    mRoutes.push({ d, from: l.from, to: l.to, dashed: l.dashed, pathId, on: !!byId.get(l.to)?.em });
+    if (label && l.label) pending.push({ ...label, w, txt: l.label, path: pathId });
   }
+  // wires that meet one tile join one bus
+  const mJoined = busWires(mRoutes, (id, side) => {
+    const b = byId.get(id), p = at.get(id); if (!b || !p) return null;
+    return side === "left" || side === "right" ? edgeX(b, p, side) : edgeY(b, p, side);
+  }, (id, side) => {
+    const b = byId.get(id), p = at.get(id); if (!b || !p) return null;
+    return side === "left" || side === "right" ? Math.round(midY(b, p)) : acrossPoints(b, p, side, 1)[0];
+  });
+  mRoutes.forEach((r, i) => { r.d = mJoined[i]; horizontals.push(...horzOf(r.d, r.pathId)); verticals.push(...vertsOf(r.d, r.pathId)); });
+  for (const r of mRoutes.filter((x) => !x.on)) out.push(wireSvg(r.d, r.dashed));
+  for (const r of mRoutes.filter((x) => x.on)) out.push(wireSvg(r.d, r.dashed, "", true));
 
   // THE BOXES GO IN. `placeLabels` has known since it was written that a box blocks as surely as a
   // connector, and this call site never passed them — so a map's labels were slid clear of every
@@ -1316,7 +1756,7 @@ function drawMap(spec: Spec, opts: { downward?: boolean } = {}): { svg: string; 
  * system reaches sits right — the same rule `ENTITIES` uses, and for the same reason: with direction
  * deciding the column, every outward edge runs one way and none of them crosses a label.
  */
-function drawSystem(spec: Spec): { svg: string; findings: string[] } {
+function drawSystem(spec: Spec, hint?: { rail: number }, busAtLine = SYS_BUS_AT, SYS_NOTE = 16): { svg: string; findings: string[]; rail?: number } {
   const findings: string[] = [];
   const layers = spec.layers ?? [];
   const outside = spec.outside ?? [];
@@ -1325,38 +1765,61 @@ function drawSystem(spec: Spec): { svg: string; findings: string[] } {
 
   const inner = layers.flatMap((l) => l.boxes);
   const byId = new Map<string, Box>([...inner, ...outside].map((b) => [b.id, b]));
-  const layerOf = new Map<string, number>();
-  layers.forEach((l, i) => l.boxes.forEach((b) => layerOf.set(b.id, i)));
   const isOut = new Set(outside.map((b) => b.id));
+  const isIn = new Set(inner.map((b) => b.id));
   for (const l of links) for (const end of [l.from, l.to])
     if (!byId.has(end)) findings.push(`an edge names \`${end}\`, and no box has that id`);
-  // RULE 3 — an edge is a call or a flow of data and it carries what flows. An unlabelled line
-  // meaning *related* is the one thing this kind refuses, because *related* is what a reader was
-  // already assuming. Inside the boundary the layer order says it, so only outward edges are held.
+  // RULE 3 — an edge is a call or a flow of data and it carries what flows.
   for (const l of links)
     if (!l.label && (isOut.has(l.from) || isOut.has(l.to)))
       findings.push(`the edge \`${l.from}\` → \`${l.to}\` crosses the boundary with nothing on it; an edge carries what flows`);
 
-  // Which side of the boundary an outside thing belongs on: what points in sits left, what is
-  // reached sits right. A thing that does both is drawn on the left, where a loop closing back is
-  // easier to follow than a loop opening forward.
+  // What points in sits left, what is reached sits right; a thing that does both sits left.
   const reaches = new Set(links.filter((l) => !isOut.has(l.from) && isOut.has(l.to)).map((l) => l.to));
   const feeds = new Set(links.filter((l) => isOut.has(l.from)).map((l) => l.from));
   const left = outside.filter((b) => feeds.has(b.id));
   const right = outside.filter((b) => !feeds.has(b.id) && reaches.has(b.id));
+  const isLeft = new Set(left.map((b) => b.id));
   for (const b of outside)
     if (!feeds.has(b.id) && !reaches.has(b.id))
       findings.push(`\`${b.id}\` sits outside the boundary with no edge to it; anything drawn outside is something the system talks to`);
 
-  const shaped = (b: Box & { as?: Resource }): Box => b.shape ? b
-    : { ...b, shape: RESOURCE[b.as ?? "service"].shape, off: b.off ?? RESOURCE[b.as ?? "service"].soft };
+  // A thing outside is as narrow as its words: its detail wraps at 16 characters.
+  const wrapAt = (note: string, chars = SYS_NOTE) => note.split("\n").flatMap((part) => {
+    const lines: string[] = []; let cur = "";
+    for (const w of part.split(/\s+/)) { if (cur && (cur + " " + w).length > chars) { lines.push(cur); cur = w; } else cur = cur ? cur + " " + w : w; }
+    if (cur) lines.push(cur);
+    return lines;
+  }).join("\n");
+  const shapedCache = new Map<string, Box>();
+  const shaped = (b: Box & { as?: Resource }): Box => {
+    const hit = shapedCache.get(b.id); if (hit) return hit;
+    const base: Box = b.shape ? b : { ...b, shape: RESOURCE[b.as ?? "service"].shape, off: b.off ?? RESOURCE[b.as ?? "service"].soft };
+    const out = base.note ? { ...base, note: wrapAt(base.note, isOut.has(b.id) ? SYS_NOTE : 22) } : base;
+    shapedCache.set(b.id, out); return out;
+  };
+  const boxOf = (id: string) => shaped(byId.get(id) as Box & { as?: Resource });
 
-  const margin = 24, HEAD_MOD = 40, HEAD_LAYER = 36, PAD_IN = 16;
-  const innerW = Math.max(200, ...inner.map(mapBoxWidth));
+  const margin = FRAME_PAD, HEAD_MOD = 32, HEAD_LAYER = 32, PAD_IN = 16;
+  const innerW = Math.max(160, ...inner.map((b) => mapBoxWidth(shaped(b))));
   const layerW = innerW + PAD_IN * 2, modW = layerW + PAD_IN * 2;
+  const labelW = (l: Link) => (l.label ?? "").length * W_NOTE;
 
-  // The left side is itself a little chain — a client knocks on a door, the door calls the entry —
-  // so it lays out in columns by how far each box is from the boundary.
+  // ---- which way each link runs
+  type K = "fwd" | "instead" | "back" | "other";
+  const outOf = (id: string) => links.filter((l) => l.from === id);
+  const kindOf = new Map<Link, K>();
+  for (const l of links) {
+    if (isLeft.has(l.from) && isIn.has(l.to)) {
+      const sibling = outOf(l.from).some((m) => isOut.has(m.to));
+      kindOf.set(l, sibling ? "instead" : "fwd");
+    } else if (isIn.has(l.from) && isLeft.has(l.to)) kindOf.set(l, "back");
+    else if (isOut.has(l.from) || isOut.has(l.to)) kindOf.set(l, "fwd");
+    else kindOf.set(l, "other");
+  }
+  const primaryOf = (id: string) => outOf(id).filter((l) => kindOf.get(l) === "fwd");
+
+  // ---- columns of the left side, by how far each box is from the boundary
   const depthOf = new Map<string, number>(left.map((b) => [b.id, 0]));
   for (let pass = 0; pass < left.length; pass++)
     for (const l of links)
@@ -1365,149 +1828,128 @@ function drawSystem(spec: Spec): { svg: string; findings: string[] } {
   const leftCols: (Box & { as?: Resource })[][] = [];
   for (const b of left) (leftCols[depthOf.get(b.id) ?? 0] ??= []).push(b);
   const leftW = leftCols.map((c) => Math.max(...c.map((b) => mapBoxWidth(shaped(b)))));
-  // A gap on the left holds the label of whatever is said across it, for the same reason.
-  const leftGap = leftCols.map((col) => {
-    const said = links.filter((l) => col.some((b) => b.id === l.from)).map((l) => (l.label ?? "").length * W_NOTE);
-    return Math.max(GAP_LINKED, Math.ceil(Math.max(0, ...said)) + 32);
+  // The corridors the sides take: one for each link that goes round (inward from a thing with its own chain, and back).
+  const pool = links.filter((l) => kindOf.get(l) === "instead" || kindOf.get(l) === "back");
+  const outward = links.filter((l) => !isOut.has(l.from) && isOut.has(l.to) && !isLeft.has(l.to));
+  const leftGap = leftCols.map((col, i) => {
+    const said = links.filter((l) => col.some((b) => b.id === l.from) && isOut.has(l.to)).map(labelW);
+    const last = i === leftCols.length - 1;
+    const said2 = last ? links.filter((l) => col.some((b) => b.id === l.from) && kindOf.get(l) === "fwd").map(labelW) : [];
+    const v = up4(Math.max(40, Math.max(0, ...said, ...said2) + 16, last ? 16 * pool.length + 24 : 0)); if (process.env.DBG) console.error('gap', i, said, said2, v); return v;
   });
   const leftSpan = leftW.reduce((t, w, i) => t + w + leftGap[i], 0);
   const rightW = right.length ? Math.max(...right.map((b) => mapBoxWidth(shaped(b)))) : 0;
 
-  const modX = margin + leftSpan;
-  // One corridor per outward edge, between the boundary and the right-hand column, GAP_APART apart.
-  const outEdges = links.filter((l) => !isOut.has(l.from) && reaches.has(l.to));
-  // The rail holds one corridor per outward edge AND the widest label said across it, because an
-  // outward edge's label sits on the run that lands in the right-hand column.
-  const outLabel = Math.max(0, ...outEdges.map((l) => (l.label ?? "").length * W_NOTE));
-  const railW = outEdges.length
-    ? Math.max(GAP_LINKED + GAP_APART * Math.max(0, outEdges.length - 1) + GAP_LINKED, Math.ceil(outLabel) + 32)
-    : GAP_LINKED;
-  const rightX = modX + modW + (right.length ? railW : 0);
+  // The right rail: a corridor for each outward link and room, past the last, for the label that rides the run into the box.
+  // (the bus of wires that meet one tile takes SYS_BUS_AT of that last run, so the label is given that much more)
+  // a wire joins a bus where it meets one tile with another wire from a different tile, or leaves one tile with another to a different tile
+  const busAt = (l: Link) => !l.dashed && (new Set(links.filter((m) => m.to === l.to && !m.dashed).map((m) => m.from)).size > 1
+    || new Set(links.filter((m) => m.from === l.from && !m.dashed).map((m) => m.to)).size > 1) ? busAtLine : 0;
+  const railMin = (i: number, l: Link) => RAIL_LANE + 16 * i + labelW(l) + 16 + busAt(l);
+  const railNeed = (order: Link[]) => up4(Math.max(40, ...order.map((l, i) => railMin(i, l))));
+  const railW = right.length ? (hint?.rail ?? railNeed([...outward].sort((m, n) => labelW(n) + busAt(n) - labelW(m) - busAt(m)))) : 0;
+  const wholeW = leftSpan + modW + railW + rightW;
+  const ox = Math.max(margin, up4((FRAME_W - wholeW) / 2));
+  const modX = ox + leftSpan;
+  const rightX = modX + modW + railW;
 
-  // Vertical: the module first, since the outside boxes hang off what they connect to.
-  const at = new Map<string, { x: number; y: number; w: number; h: number }>();
-  const body: string[] = [];
+  // ---- the module
+  type P = { x: number; y: number; w: number; h: number };
+  const at = new Map<string, P>();
   const layerAt: { y: number; h: number }[] = [];
   let y = margin + HEAD_MOD;
+  // The boxes a thing outside leads into are spaced so that each of those things stands level with its box, and, where a thing also
+  // goes round, so that a band for its wire fits between two rows.
+  // A side that holds several wires is tall enough for each to have its own seat 28 apart: a label above one wire owes 8 to the next.
+  const needFor = (n: number) => (n <= 1 ? 0 : n === 2 ? 56 : 112);
+  const sidesOf = (id: string) => Math.max(
+    links.filter((l) => l.to === id && kindOf.get(l) !== "back").length,
+    links.filter((l) => l.from === id && (kindOf.get(l) === "fwd" || kindOf.get(l) === "other")).length,
+    links.filter((l) => l.from === id && kindOf.get(l) === "back").length);
+  const hOf = (b: Box) => { const base = mapBoxHeight(shaped(b)); return Math.max(base, needFor(sidesOf(b.id)) + (shapeOf(shaped(b)) === "store" ? CAP : 0) + (needFor(sidesOf(b.id)) ? 8 : 0)); };
+  const tallest = Math.max(0, ...left.map((b) => hOf(b)));
+  const gapRows = tallest + (pool.length ? 56 : 24);
   for (const layer of layers) {
-    const hs = layer.boxes.map(mapBoxHeight);
-    const lh = HEAD_LAYER + hs.reduce((t, h) => t + h, 0) + GAP_Y * (hs.length - 1) + PAD_IN;
+    const hs = layer.boxes.map(hOf);
+    const led = layer.boxes.some((b) => links.some((l) => l.to === b.id && isLeft.has(l.from)));
+    const gaps = hs.slice(1).map((h, i) => (led ? Math.max(GAP_Y, gapRows - (hs[i] + h) / 2) : GAP_Y));
+    const lh = HEAD_LAYER + hs.reduce((t, h) => t + h, 0) + gaps.reduce((t, g) => t + g, 0) + PAD_IN;
     layerAt.push({ y, h: lh });
     let by = y + HEAD_LAYER;
-    layer.boxes.forEach((b, i) => { at.set(b.id, { x: modX + PAD_IN * 2, y: by, w: innerW, h: hs[i] }); by += hs[i] + GAP_Y; });
+    layer.boxes.forEach((b, i) => { at.set(b.id, { x: modX + PAD_IN * 2, y: by, w: innerW, h: hs[i] }); by += hs[i] + (gaps[i] ?? 0); });
     y += lh + GAP_LINKED;
   }
   const modH = y - GAP_LINKED + PAD_IN - margin;
+  const mid = (id: string) => { const p = at.get(id)!; return p.y + p.h / 2; };
 
-  // RULE 1 — one outermost container, and it is the thing being described.
-  body.push(`  <rect class="sds-box sds-absent" x="${modX}" y="${margin}" width="${modW}" height="${modH}" rx="3" fill="none"/>`);
-  body.push(`  <text class="sds-title" x="${modX + PAD_IN}" y="${margin + 26}">${esc(spec.title ?? "the system")}</text>`);
-  layers.forEach((layer, i) => {
-    const { y: ly, h: lh } = layerAt[i];
-    body.push(`  <rect class="sds-box sds-absent" x="${modX + PAD_IN}" y="${ly}" width="${layerW}" height="${lh}" rx="3" fill="none"/>`);
-    body.push(`  <text class="sds-title" x="${modX + PAD_IN * 2}" y="${ly + 24}">${esc(layer.name)}</text>`);
-    for (const b of layer.boxes) { const p = at.get(b.id)!; body.push(mapRect(b, p.x, p.y, p.w, p.h)); }
-  });
-
-  // RULE 2 — the layers run one way, the direction a call travels, and the arrow between them says so.
-  for (let i = 0; i + 1 < layers.length; i++) {
-    const a = layerAt[i], b = layerAt[i + 1];
-    body.push(`  <path class="sds-connector" d="M${modX + modW / 2} ${a.y + a.h} V${b.y}" marker-end="url(#ar)"/>`);
-  }
-
-  // An outside box is centred on what it connects to, then pushed down to keep the grid's own gap.
-  const settle = (boxes: (Box & { as?: Resource })[], want: (b: Box) => number, x: number, w: number) => {
-    const rows = boxes.map((b) => ({ b, h: mapBoxHeight(shaped(b)), y: want(b) }))
-      .sort((m, n) => m.y - n.y);
-    let floor = margin;
-    for (const r of rows) {
-      r.y = Math.max(r.y - r.h / 2, floor);
-      at.set(r.b.id, { x, y: r.y, w, h: r.h });
-      body.push(mapRect(shaped(r.b), x, r.y, w, r.h));
-      floor = r.y + r.h + GAP_Y;
-    }
+  // ---- sides: three points a side at most, dealt out in the order the other ends sit
+  const span = (b: Box, p: P) => shapeOf(b) === "store" ? { start: p.y + CAP, len: p.h - CAP } : { start: p.y, len: p.h };
+  const dealt = (id: string, group: Link[], key: (l: Link) => number): Map<Link, number> => {
+    const out = new Map<Link, number>();
+    const p = at.get(id); if (!p) return out;
+    const { start, len } = span(boxOf(id), p);
+    const pts = sidePoints(start, len, group.length);
+    [...group].sort((m, n) => key(m) - key(n)).forEach((l, i) => out.set(l, pts[Math.min(i, pts.length - 1)]));
+    return out;
+  };
+  // where a link lands on the left side of its target, and leaves from the right side of its source
+  const landY = new Map<Link, number>(), leaveY = new Map<Link, number>(), leaveLeftY = new Map<Link, number>();
+  const seatsOf = () => {
+    landY.clear(); leaveY.clear();
+    for (const id of new Set(links.map((l) => l.to)))
+      if (at.has(id)) for (const [l, v] of dealt(id, links.filter((l) => l.to === id && kindOf.get(l) !== "back" && at.has(l.from)), (l) => mid(l.from))) landY.set(l, v);
+    for (const id of new Set(links.map((l) => l.from)))
+      if (at.has(id)) for (const [l, v] of dealt(id, links.filter((l) => l.from === id && (kindOf.get(l) === "fwd" || kindOf.get(l) === "other") && at.has(l.to)), (l) => mid(l.to))) leaveY.set(l, v);
   };
   const midOf = (id: string) => { const p = at.get(id); return p ? p.y + p.h / 2 : margin + modH / 2; };
-  let lx = margin;
-  leftCols.forEach((col, i) => {
-    settle(col, (b) => {
-      const onward = links.filter((l) => l.from === b.id).map((l) => l.to);
-      return onward.length ? onward.reduce((t, id) => t + midOf(id), 0) / onward.length : margin + modH / 2;
-    }, lx, leftW[i]);
-    lx += leftW[i] + leftGap[i];
-  });
-  settle(right, (b) => {
-    const back = links.filter((l) => l.to === b.id).map((l) => l.from);
-    return back.length ? back.reduce((t, id) => t + midOf(id), 0) / back.length : margin + modH / 2;
-  }, rightX, rightW);
 
-  // The edges. Inward runs land on the left of what they reach; outward runs leave the right of the
-  // box that owns them — which layer owns an edge is the claim the figure exists to make checkable.
-  const pending: Pending[] = [], verticals: Vert[] = [];
+  // ---- the outside, placed from the deepest column out, each box on the seat of what it leads to
+  const placeLeft = () => {
+    let lx = ox; const xs = leftCols.map((_, i) => { const x = lx; lx += leftW[i] + leftGap[i]; return x; });
+    for (let i = leftCols.length - 1; i >= 0; i--) {
+      const rows = leftCols[i].map((b) => {
+        const prim = primaryOf(b.id).filter((l) => at.has(l.to) || landY.has(l));
+        const want = prim.length ? prim.reduce((t, l) => t + (isIn.has(l.to) ? landY.get(l) ?? midOf(l.to) : midOf(l.to)), 0) / prim.length : margin + modH / 2;
+        return { b, h: hOf(b), y: want };
+      }).sort((m, n) => m.y - n.y);
+      let floor = margin;
+      for (const r of rows) { r.y = Math.max(r.y - r.h / 2, floor); at.set(r.b.id, { x: xs[i], y: r.y, w: leftW[i], h: r.h }); floor = r.y + r.h + GAP_Y; }
+    }
+  };
+  const placeRight = () => {
+    const rows = right.map((b) => {
+      const back = links.filter((l) => l.to === b.id);
+      return { b, h: hOf(b), y: back.length ? back.reduce((t, l) => t + midOf(l.from), 0) / back.length : margin + modH / 2 };
+    }).sort((m, n) => m.y - n.y);
+    let floor = margin;
+    for (const r of rows) { r.y = Math.max(r.y - r.h / 2, floor); at.set(r.b.id, { x: rightX, y: r.y, w: rightW, h: r.h }); floor = r.y + r.h + GAP_Y; }
+  };
+  placeLeft(); placeRight(); seatsOf();
+  placeLeft(); seatsOf();
 
-  // A SIDE OFFERS THREE POINTS AND A LONE ARROW TAKES THE MIDDLE, on this kind as on every other.
-  // Two edges leaving one box both took its exact middle, so they ran side by side out of the
-  // boundary and the check read them as one line 7px thick. A shape's usable side is its own body:
-  // a cylinder's begins below its cap.
-  const leaving = new Map<string, number>(), arriving = new Map<string, number>();
-  for (const l of links) {
-    if (!at.has(l.from) || !at.has(l.to)) continue;
-    leaving.set(l.from, (leaving.get(l.from) ?? 0) + 1);
-    arriving.set(l.to, (arriving.get(l.to) ?? 0) + 1);
-  }
-  const span = (b: Box, p: { y: number; h: number }) =>
-    shapeOf(b) === "store" ? { start: p.y + CAP, len: p.h - CAP } : { start: p.y, len: p.h };
-
-  // TWO CONNECTORS MAY SHARE A POINT ONLY WHERE THEY PART AT ONCE. The map drawer lets a side's
-  // points be chosen by alignment, and two links taking the same one is fine there because each
-  // drops into a lane of its own within a few pixels. Here they do not: both edges leave the
-  // boundary and run RIGHT, so a shared point put them side by side for 88px and the check read
-  // them as one line 8px thick. On this kind a side's points are dealt out, one per edge, in the
-  // order the things at the other end sit — so the fan is a fan and its lines never touch.
-  const seat = new Map<Link, number>();
-  for (const [id, group] of new Map<string, Link[]>(
-    [...new Set(links.map((l) => l.from))].map((id) => [id, links.filter((l) => l.from === id && at.has(l.to))]))) {
-    if (!at.has(id)) continue;
-    group.sort((m, n) => at.get(m.to)!.y - at.get(n.to)!.y).forEach((l, i) => seat.set(l, i));
-  }
-  const arrive = new Map<Link, number>();
-  for (const [id, group] of new Map<string, Link[]>(
-    [...new Set(links.map((l) => l.to))].map((id) => [id, links.filter((l) => l.to === id && at.has(l.from))]))) {
-    if (!at.has(id)) continue;
-    group.sort((m, n) => at.get(m.from)!.y - at.get(n.from)!.y).forEach((l, i) => arrive.set(l, i));
-  }
-  const sideY = (b: Box, p: { y: number; h: number }, n: number, i: number) => {
-    const { start, len } = span(b, p);
-    const pts = sidePoints(start, len, n);
-    return pts[Math.min(i, pts.length - 1)];
+  // ---- the wires
+  type Pt = [number, number];
+  const pending: Pending[] = [], verticals: Vert[] = [], horizontals: Blocker[] = [];
+  const paths: { l: Link; pts: Pt[]; dashed?: boolean; label?: { x: number; y: number } }[] = [];
+  const dOf = (pts: Pt[]) => `M${pts[0][0]} ${pts[0][1]}` + pts.slice(1).map((p, i) => (p[1] === pts[i][1] ? ` H${p[0]}` : ` V${p[1]}`)).join("");
+  const edgeL = (id: string) => edgeX(boxOf(id), { ...at.get(id)!, row: 0 }, "left");
+  const edgeR = (id: string) => edgeX(boxOf(id), { ...at.get(id)!, row: 0 }, "right");
+  const tops = (id: string, side: "top" | "bottom") => {
+    const p = at.get(id)!;
+    return { x: acrossPoints(boxOf(id), { ...p, row: 0 }, side, 1)[0], y: edgeY(boxOf(id), { ...p, row: 0 }, side) };
   };
 
-  // WHICH CORRIDOR AN OUTWARD EDGE TAKES IS CHOSEN, NOT COUNTED OFF — the same lesson the map
-  // drawer learned about lanes, met again one layer out. An edge leaves the boundary at its own seat,
-  // runs right to its corridor, drops, and runs right again into its resource. The FIRST run of one
-  // edge and the LAST run of another therefore share a stretch of x whenever the second corridor is
-  // the further out, and the contract's 24 has to hold between them. Ordering by where the resources
-  // sit is the obvious choice and it is wrong: it put a run into the cache 8px under a run out of
-  // services. So the order is searched and scored with the figure check's own rule, exhaustively up
-  // to six corridors and greedily beyond, and where nothing is clean the best is kept and reported.
-  const outward = links.filter((l) => isOut.has(l.to) && !isOut.has(l.from) && at.has(l.to) && at.has(l.from));
-  const railOf = new Map<Link, number>();
-  outward.forEach((l, i) => railOf.set(l, i));
+  // Straight wires between the left side, into the module, and out of it to the right.
+  const railOrder = [...outward];
   if (outward.length > 1) {
-    const runsFor = (order: Link[]) => {
+    const cross = (order: Link[]) => {
       const segs: { k: Link; y: number; x1: number; x2: number }[] = [];
       order.forEach((l, i) => {
         const a = at.get(l.from)!, b = at.get(l.to)!;
-        const ba = shaped(byId.get(l.from) as Box & { as?: Resource });
-        const bb = shaped(byId.get(l.to) as Box & { as?: Resource });
-        const y1 = sideY(ba, a, leaving.get(l.from) ?? 1, seat.get(l) ?? 0);
-        const y2 = sideY(bb, b, arriving.get(l.to) ?? 1, arrive.get(l) ?? 0);
-        const via = modX + modW + GAP_LINKED + GAP_APART * i;
-        if (Math.abs(y1 - y2) < 1) segs.push({ k: l, y: y1, x1: edgeX(ba, { ...a, row: 0 }, "right"), x2: b.x });
-        else {
-          segs.push({ k: l, y: y1, x1: edgeX(ba, { ...a, row: 0 }, "right"), x2: via });
-          segs.push({ k: l, y: y2, x1: via, x2: b.x });
-        }
+        const y1 = leaveY.get(l) ?? a.y + a.h / 2, y2 = landY.get(l) ?? b.y + b.h / 2;
+        const via = modX + modW + RAIL_LANE + 16 * i;
+        if (Math.abs(y1 - y2) < 1) segs.push({ k: l, y: y1, x1: edgeR(l.from), x2: b.x });
+        else { segs.push({ k: l, y: y1, x1: edgeR(l.from), x2: via }); segs.push({ k: l, y: y2, x1: via, x2: b.x }); }
       });
       let bad = 0;
       for (let i = 0; i < segs.length; i++) for (let j = i + 1; j < segs.length; j++) {
@@ -1516,59 +1958,186 @@ function drawSystem(spec: Spec): { svg: string; findings: string[] } {
         if (apart < 0.5 || apart >= GAP_APART) continue;
         if (Math.min(segs[i].x2, segs[j].x2) - Math.max(segs[i].x1, segs[j].x1) > LABEL_GAP) bad += 1;
       }
-      return bad;
+      // wires that cross are worse than a wider rail
+      let crossed = 0;
+      for (let i = 0; i < segs.length; i++) for (let j = i + 1; j < segs.length; j++) {
+        const s = segs[i], u = segs[j];
+        if (s.k === u.k) continue;
+        // a segment is a run at y from x1 to x2; a corridor is the drop between the runs of one wire
+        // (the drops are found from the pair of runs of a wire)
+      }
+      for (const k of order) for (const m of order) {
+        if (k === m) continue;
+        const rk = segs.filter((s) => s.k === k), rm = segs.filter((s) => s.k === m);
+        if (rk.length < 2 || rm.length < 2) continue;
+        const [k1, k2] = rk, [m1, m2] = rm;
+        const kx = k1.x2, mx = m1.x2;
+        const ky0 = Math.min(k1.y, k2.y), ky1 = Math.max(k1.y, k2.y);
+        // k's drop at kx between its two runs crosses m's runs when m has a run through kx at a y between them
+        for (const r of [m1, m2]) if (kx > r.x1 && kx < r.x2 && r.y > ky0 && r.y < ky1) crossed += 1;
+        void mx;
+      }
+      return bad * 100000 + crossed * 1000 + railNeed(order);
     };
     const permute = <T,>(xs: T[]): T[][] =>
       xs.length <= 1 ? [xs] : xs.flatMap((x, i) => permute([...xs.slice(0, i), ...xs.slice(i + 1)]).map((r) => [x, ...r]));
-    let best = outward, score = runsFor(outward);
-    if (score) {
-      const tries = outward.length <= 6 ? permute(outward)
-        : [[...outward].sort((m, n) => at.get(m.to)!.y - at.get(n.to)!.y),
-           [...outward].sort((m, n) => at.get(n.to)!.y - at.get(m.to)!.y)];
-      for (const order of tries) {
-        const s2 = runsFor(order);
-        if (s2 < score) { best = order; score = s2; if (!score) break; }
+    let best = railOrder, score = cross(best);
+    for (const order of outward.length <= 6 ? permute(outward) : [[...outward].sort((m, n) => midOf(m.to) - midOf(n.to))]) {
+      const s2 = cross(order); if (s2 < score) { best = order; score = s2; }
+    }
+    railOrder.splice(0, railOrder.length, ...best);
+  }
+  for (const l of links) {
+    const k = kindOf.get(l);
+    if (!at.has(l.from) || !at.has(l.to)) continue;
+    if (k === "fwd" || k === "other") {
+      const x1 = edgeR(l.from), x2 = edgeL(l.to);
+      const y1 = leaveY.get(l) ?? midOf(l.from), y2 = landY.get(l) ?? midOf(l.to);
+      const out = !isOut.has(l.from) && isOut.has(l.to);
+      let pts: Pt[], lab: { x: number; y: number };
+      const w = labelW(l);
+      if (out) {
+        const via = modX + modW + RAIL_LANE + 16 * Math.max(0, railOrder.indexOf(l));
+        pts = Math.abs(y1 - y2) < 1 ? [[x1, y1], [x2, y2]] : [[x1, y1], [via, y1], [via, y2], [x2, y2]];
+        const from = Math.abs(y1 - y2) < 1 ? modX + modW : via;
+        lab = { x: from + (x2 - from - w) / 2, y: y2 - LABEL_GAP };
+      } else {
+        const stop = isIn.has(l.to) ? modX : x2;
+        if (Math.abs(y1 - y2) < 1) pts = [[x1, y1], [x2, y2]];
+        else { const jx = isIn.has(l.to) ? modX - 8 : Math.min(x1 + 24, (x1 + stop) / 2); pts = [[x1, y1], [jx, y1], [jx, y2], [x2, y2]]; }
+        const to = pts.length === 2 ? stop : pts[1][0];
+        lab = { x: x1 + (to - x1 - w) / 2, y: y1 - LABEL_GAP };
       }
+      paths.push({ l, pts, dashed: l.dashed, label: lab });
     }
-    best.forEach((l, i) => railOf.set(l, i));
   }
 
-  for (const [pathId, l] of links.entries()) {
-    const a = at.get(l.from), b = at.get(l.to);
-    if (!a || !b) continue;
-    const ba = shaped(byId.get(l.from) as Box & { as?: Resource });
-    const bb = shaped(byId.get(l.to) as Box & { as?: Resource });
-    const dash = l.dashed ? ' stroke-dasharray="5 4"' : "";
-    const w = (l.label ?? "").length * W_NOTE;
-    // A CYLINDER'S MIDDLE IS THE MIDDLE OF ITS BODY, not of the box its cap is reserved in — the
-    // first draw put the only arrow into a database 7px off its own centre, twice, which is the
-    // same half-a-shape mistake the map drawer had in its rows.
-    const x1 = edgeX(ba, { ...a, row: 0 }, "right"), x2 = edgeX(bb, { ...b, row: 0 }, "left");
-    const y1 = sideY(ba, a, leaving.get(l.from) ?? 1, seat.get(l) ?? 0);
-    const y2 = sideY(bb, b, arriving.get(l.to) ?? 1, arrive.get(l) ?? 0);
-    let d: string, lx2: number, ly2: number;
-    if (isOut.has(l.to) && !isOut.has(l.from)) {
-      // Out of the boundary, down its own corridor, into the resource. The label rides the last run,
-      // which is the one stretch of the route that is outside every container on the page — a label
-      // left inside the module reads as belonging to the module, and the check measures it against
-      // the boundary it sits in and calls it an overrun, which it is.
-      const via = modX + modW + GAP_LINKED + GAP_APART * (railOf.get(l) ?? 0);
-      d = Math.abs(y1 - y2) < 1 ? `M${x1} ${y1} H${x2}` : `M${x1} ${y1} H${via} V${y2} H${x2}`;
-      const from = Math.abs(y1 - y2) < 1 ? modX + modW : via;
-      lx2 = from + (x2 - from - w) / 2; ly2 = y2 - LABEL_GAP;
-    } else {
-      // Inward, or between two things outside. The label sits above the run, before the boundary.
-      d = Math.abs(y1 - y2) < 1 ? `M${x1} ${y1} H${x2}` : `M${x1} ${y1} V${y2} H${x2}`;
-      const stop = isOut.has(l.to) ? x2 : modX;
-      lx2 = x1 + (stop - x1 - w) / 2; ly2 = Math.min(y1, y2) - LABEL_GAP;
+  // The wires that go round: chosen as a set, since their corridors and bands share one space. Each is tried in every order and the order
+  // with the fewest crossings is kept; a band of a wire is the middle of the free gap beside the box it leaves or reaches.
+  const tileRects = () => [...left, ...right].map((b) => at.get(b.id)!);
+  const roundWire = (order: Link[]): { paths: typeof paths; bad: number } => {
+    const out: typeof paths = []; let bad = 0;
+    const bands: { y: number; x1: number; x2: number }[] = [];
+    // seats on the module's boxes: the back wires leave the left side of what they leave, dealt out in the order of their bands
+    const backSeat = new Map<Link, number>();
+    const planned = order.map((l, j) => {
+      const back = kindOf.get(l) === "back";
+      const n = at.get(back ? l.to : l.from)!, other = at.get(back ? l.from : l.to)!;
+      const id = back ? l.to : l.from;
+      const down = other.y + other.h / 2 > n.y + n.h / 2;
+      const cx = modX - 24 - 16 * j;
+      const p = tops(id, down ? "bottom" : "top");
+      const xa = Math.min(p.x, cx), xb = Math.max(p.x, cx);
+      const near = tileRects().filter((r) => r !== n && r.x < xb && r.x + r.w > xa);
+      let band: number;
+      if (down) {
+        const lo = n.y + n.h, below = near.filter((r) => r.y >= lo - 0.5).map((r) => r.y);
+        const hi = below.length ? Math.min(...below) : Infinity;
+        const cands: number[] = [];
+        for (let s = 0; s < 8; s++) cands.push(Number.isFinite(hi) ? Math.round(((lo + 32 + hi - 16) / 2 + (s % 2 ? 1 : -1) * Math.ceil(s / 2) * 32) / 4) * 4 : lo + 32 + 32 * s);
+        band = cands.find((y0) => y0 >= lo + 32 && y0 <= hi - 16 && !bands.some((q) => q.x1 < xb && q.x2 > xa && Math.abs(q.y - y0) < 32)) ?? (bad++, cands[0]);
+      } else {
+        const hi = n.y, above = near.filter((r) => r.y + r.h <= hi + 0.5).map((r) => r.y + r.h);
+        const lo = above.length ? Math.max(...above) : margin;
+        const cands: number[] = [];
+        for (let s = 0; s < 8; s++) cands.push(Math.round(((lo + 28 + hi - 24) / 2 + (s % 2 ? 1 : -1) * Math.ceil(s / 2) * 32) / 4) * 4);
+        band = cands.find((y0) => y0 >= lo + 28 && y0 <= hi - 24 && !bands.some((q) => q.x1 < xb && q.x2 > xa && Math.abs(q.y - y0) < 32)) ?? (bad++, cands[0]);
+      }
+      bands.push({ y: band, x1: xa, x2: xb });
+      return { l, back, id, down, cx, p, band, xa, xb };
+    });
+    // the module's side: back wires leave at seats ordered by their bands; wires that arrive take the seats the straight ones left
+    for (const [sid, group] of new Map<string, Link[]>([...new Set(planned.filter((q) => q.back).map((q) => q.l.from))].map((s) => [s, planned.filter((q) => q.back && q.l.from === s).map((q) => q.l)]))) {
+      const bandOf = (l: Link) => planned.find((q) => q.l === l)!.band;
+      for (const [l, v] of dealt(sid, group, bandOf)) backSeat.set(l, v);
     }
-    body.push(`  <path class="sds-connector" d="${d}"${dash} marker-end="url(#ar)"/>`);
-    verticals.push(...vertsOf(d, pathId));
-    if (l.label) pending.push({ x: Math.round(lx2), y: Math.round(ly2), w, txt: l.label, path: pathId });
+    for (const q of planned) {
+      let pts: Pt[], lab: { x: number; y: number };
+      const w = labelW(q.l);
+      if (q.back) {
+        const s = at.get(q.l.from)!, ys = backSeat.get(q.l) ?? s.y + s.h / 2;
+        pts = [[s.x, ys], [q.cx, ys], [q.cx, q.band], [q.p.x, q.band], [q.p.x, q.p.y]];
+        lab = { x: q.xa + (q.xb - q.xa - w) / 2, y: q.band - LABEL_GAP };
+      } else {
+        const t = at.get(q.l.to)!, yt = landY.get(q.l) ?? t.y + t.h / 2;
+        pts = [[q.p.x, q.p.y], [q.p.x, q.band], [q.cx, q.band], [q.cx, yt], [t.x, yt]];
+        lab = { x: q.xa + (q.xb - q.xa - w) / 2, y: q.band - LABEL_GAP };
+      }
+      out.push({ l: q.l, pts, dashed: q.l.dashed, label: lab });
+    }
+    return { paths: out, bad };
+  };
+  const crossings = (set: typeof paths) => {
+    const segs = set.flatMap((p, k) => p.pts.slice(1).map((b, i) => ({ k, a: p.pts[i], b })));
+    let n = 0;
+    for (let i = 0; i < segs.length; i++) for (let j = i + 1; j < segs.length; j++) {
+      const s = segs[i], t = segs[j];
+      if (s.k === t.k) continue;
+      const sv = s.a[0] === s.b[0], tv = t.a[0] === t.b[0];
+      if (sv === tv) continue;
+      const [v, h] = sv ? [s, t] : [t, s];
+      if (v.a[0] > Math.min(h.a[0], h.b[0]) && v.a[0] < Math.max(h.a[0], h.b[0]) && h.a[1] > Math.min(v.a[1], v.b[1]) && h.a[1] < Math.max(v.a[1], v.b[1])) n++;
+    }
+    return n;
+  };
+  if (pool.length) {
+    const permute = <T,>(xs: T[]): T[][] =>
+      xs.length <= 1 ? [xs] : xs.flatMap((x, i) => permute([...xs.slice(0, i), ...xs.slice(i + 1)]).map((r) => [x, ...r]));
+    const tries = pool.length <= 6 ? permute(pool) : [pool];
+    let best = roundWire(pool), score = best.bad * 100 + crossings([...paths, ...best.paths]);
+    for (const order of tries) {
+      const r = roundWire(order), s = r.bad * 100 + crossings([...paths, ...r.paths]);
+      if (s < score) { best = r; score = s; if (!score) break; }
+    }
+    if (best.bad) findings.push("a wire that goes round the left side found no free band between the boxes; give the boxes more room");
+    paths.push(...best.paths);
   }
-  body.push(...placeLabels(pending, verticals, margin, rightX + rightW + margin));
 
-  return { svg: svgOf(body, spec.title ?? spec.caption ?? "system diagram"), findings };
+  // ---- draw: the module first, then the tiles, then the wires and their words
+  const body: string[] = [];
+  body.push(`  <rect class="dl-plate" x="${modX}" y="${margin}" width="${modW}" height="${modH}" rx="12"/>`);
+  body.push(textSvg("dl-label", modX + PAD_IN, margin + 20, (spec.title ?? "the system").toUpperCase()));
+  layers.forEach((layer, i) => {
+    const { y: ly, h: lh } = layerAt[i];
+    body.push(`  <rect class="dl-frame-line" x="${modX + PAD_IN}" y="${ly}" width="${layerW}" height="${lh}" rx="10"/>`);
+    body.push(textSvg("dl-label", modX + PAD_IN * 2, ly + 20, layer.name.toUpperCase()));
+    for (const b of layer.boxes) { const p = at.get(b.id)!; body.push(mapRect(shaped(b), p.x, p.y, p.w, p.h)); }
+  });
+  for (const b of [...left, ...right]) { const p = at.get(b.id)!; body.push(mapRect(shaped(b), p.x, p.y, p.w, p.h)); }
+  for (let i = 0; i + 1 < layers.length; i++) {
+    const a = layerAt[i], b = layerAt[i + 1];
+    body.push(wireSvg(`M${modX + modW / 2} ${a.y + a.h} V${b.y}`));
+  }
+  const sPaths = paths.map((p) => ({ d: dOf(p.pts), from: p.l.from, to: p.l.to, dashed: p.dashed }));
+  const sJoined = busAtLine === 0 ? sPaths.map((w) => w.d) : busWires(sPaths, (id, side) => {
+    const p = at.get(id); if (!p) return null;
+    return side === "left" || side === "right" ? edgeX(boxOf(id), { ...p, row: 0 }, side) : edgeY(boxOf(id), { ...p, row: 0 }, side);
+  }, (id, side) => {
+    const p = at.get(id); if (!p) return null;
+    return side === "left" || side === "right" ? Math.round(midY(boxOf(id), { ...p, row: 0 })) : acrossPoints(boxOf(id), { ...p, row: 0 }, side, 1)[0];
+  }, busAtLine);
+  const sOn = (l: Link) => !!boxOf(l.to)?.em;
+  paths.forEach((p, id) => {
+    const d = sJoined[id];
+    verticals.push(...vertsOf(d, id));
+    horizontals.push(...horzOf(d, id));
+    // A LABEL STANDS ON THE STRAIGHT RUN OF ITS OWN WIRE AS DRAWN. The wire's route was laid before wires that meet one tile were joined
+    // on a bus, and a label placed from that first route stood where the wire no longer ran (a label 84 off its wire). Each label is
+    // therefore set from the wire's final path: the longest straight run no other wire shares, centred on it, a standard gap clear.
+    if (p.l.label && p.label) {
+      const w = labelW(p.l), own = labelRun(sJoined[id], sJoined.filter((_, k) => k !== id), w);
+      const at = !own ? p.label : own.vertical ? { x: own.x, y: own.y } : { x: own.x + (own.len - w) / 2, y: own.y - LABEL_GAP };
+      pending.push({ x: Math.round(at.x), y: Math.round(at.y), w, txt: p.l.label, path: id });
+    }
+  });
+  paths.forEach((p, id) => { if (!sOn(p.l)) body.push(wireSvg(sJoined[id], p.dashed)); });
+  paths.forEach((p, id) => { if (sOn(p.l)) body.push(wireSvg(sJoined[id], p.dashed, "", true)); });
+  const blockers: Blocker[] = [...tileRects(), { x: modX, y: margin, w: modW, h: modH }, ...horizontals];
+  body.push(...placeLabels(pending, verticals, margin, Math.max(FRAME_W, rightX + rightW + margin), blockers));
+
+  const need = right.length ? railNeed(railOrder) : 0;
+  if (!hint && right.length && need < railW) return drawSystem(spec, { rail: need }, busAtLine, SYS_NOTE);
+  return { svg: svgOf(body, spec.title ?? spec.caption ?? "system diagram"), findings, rail: need };
 }
 
 /**
@@ -1598,12 +2167,12 @@ function drawSequence(spec: Spec): { svg: string; findings: string[] } {
   for (const m of known) if (!m.label)
     findings.push(`the message \`${m.from}\` → \`${m.to}\` carries no label; a sequence shows who says WHAT to whom`);
 
-  const margin = 24;
+  const margin = FRAME_PAD;
   // One pitch per message. A label sits LABEL_GAP above its own arrow and owes the same to the arrow
   // above it, so the pitch is that gap twice plus the line itself — the same arithmetic a lane uses.
-  const HEAD_H = 44, PITCH = LABEL_H + LABEL_GAP * 3, TAIL = 36, SELF_W = 44, SELF_H = 22;
+  const HEAD_H = H_ONE, PITCH = LABEL_H + LABEL_GAP * 3, TAIL = 36, SELF_W = 44, SELF_H = 24;
 
-  const ws = parts.map((b) => Math.max(120, Math.ceil(b.label.length * W_LABEL + PAD_X * 2)));
+  const ws = parts.map((b) => up4(Math.max(120, b.label.length * W_LABEL + PAD_X * 2)));
   // A COLUMN GAP GROWS TO HOLD THE WIDEST THING SAID ACROSS IT. A message's label is centred on its
   // own arrow, so a long one on a short arrow sprawls over the lifelines either side of it.
   const gaps = parts.slice(0, -1).map((_, i) => {
@@ -1617,37 +2186,190 @@ function drawSequence(spec: Spec): { svg: string; findings: string[] } {
 
   const out: string[] = [];
   const xs: number[] = [];
-  let x = margin;
+  // The participants stand centred on the frame, on the 4 grid.
+  let x = Math.max(margin, up4((FRAME_W - (ws.reduce((s, w) => s + w, 0) + gaps.reduce((s, g) => s + g, 0))) / 2));
   parts.forEach((b, i) => {
     xs.push(x + ws[i] / 2);
-    out.push(`  <rect class="${boxClass(b)}" x="${x}" y="${margin}" width="${ws[i]}" height="${HEAD_H}" rx="3"/>`);
-    out.push(centred("sds-label",b.label, x + ws[i] / 2, margin + HEAD_H / 2 + 4));
+    out.push(rect({ ...b, note: undefined, icon: undefined }, x, margin, ws[i], HEAD_H, []));
     x += ws[i] + (gaps[i] ?? 0);
   });
 
   let y = margin + HEAD_H + PITCH;
+  let flow = 0;
   for (const m of known) {
     const a = xs[idx.get(m.from)!], b = xs[idx.get(m.to)!];
-    const dash = m.dashed ? ' stroke-dasharray="5 4"' : "";
+    flow += 1;
     if (m.from === m.to) {
       // A PARTICIPANT SPEAKING TO ITSELF is a loop off its own lifeline and back, because an arrow
       // from a line to the same line has nowhere to be and no length a reader could see.
-      out.push(`  <path class="sds-connector" d="M${a} ${y} H${a + SELF_W} V${y + SELF_H} H${a}"${dash} marker-end="url(#ar)"/>`);
-      if (m.label) out.push(`  <text class="sds-note" x="${Math.round(a + SELF_W + LABEL_GAP)}" y="${y + SELF_H / 2 + 4}">${esc(m.label)}</text>`);
+      out.push(wireSvg(`M${a} ${y} H${a + SELF_W} V${y + SELF_H} H${a}`, m.dashed, ` data-dl-flow="${flow}"`));
+      if (m.label) out.push(textSvg("dl-wlabel", Math.round(a + SELF_W + LABEL_GAP), y + SELF_H / 2 + 3, m.label));
       y += SELF_H + PITCH;
       continue;
     }
-    out.push(`  <path class="sds-connector" d="M${a} ${y} H${b}"${dash} marker-end="url(#ar)"/>`);
-    if (m.label) out.push(centred("sds-note",m.label, (a + b) / 2, y - LABEL_GAP));
+    out.push(wireSvg(`M${a} ${y} H${b}`, m.dashed, ` data-dl-flow="${flow}"`));
+    if (m.label) out.push(centred("dl-wlabel", m.label, (a + b) / 2, y - LABEL_GAP));
     y += PITCH;
   }
 
   // The lifelines are drawn last so they run the full height, and they run on past the last message.
   const foot = y - PITCH + TAIL;
   parts.forEach((_, i) => out.push(
-    `  <path class="sds-connector sds-lifeline" d="M${xs[i]} ${margin + HEAD_H} V${foot}" stroke-dasharray="3 5"/>`));
+    `  <path class="dl-guide" data-role="lifeline" d="M${xs[i]} ${margin + HEAD_H} V${foot}"/>`));
 
   return { svg: svgOf(out, spec.title ?? spec.caption ?? "sequence diagram"), findings };
+}
+
+
+/**
+ * THE FLOWCHART'S OWN LAYOUT: a spine down the middle of the frame, the branches in columns the same distance to either side of it.
+ *
+ * The rows are the depth of each box (the longest path to it), so a path runs down the page; the spine is the column of the head, and each
+ * way out of a decision takes a column beside it, the first to the left and the second to the right, the same distance from the spine whichever
+ * sides are used. Where the ways meet again the joining box is on the column of the decision that split them, and each branch reaches it by the
+ * shortest orthogonal route: straight down its own column, along a lane just above the join, and into the join's top, so the branches
+ * run into one line there and no wire runs down the frame's edge. A decision's ways leave by its side vertices; steps stand the scale's
+ * stack floor (56) apart; the wires into a tile in focus are the accent.
+ *
+ * It answers only the shape it can read: one head, every link to a box further down, at most two columns each side. Anything else is the map's.
+ */
+function drawFlowSpine(spec: Spec): { svg: string; findings: string[] } | null {
+  const boxes = spec.boxes ?? [], links = spec.links ?? [];
+  if (!boxes.length || !links.length || boxes.some((b) => b.in !== undefined)) return null;
+  const byId = new Map(boxes.map((b) => [b.id, b]));
+  if (links.some((l) => !byId.has(l.from) || !byId.has(l.to) || l.from === l.to)) return null;
+  const outs = new Map<string, Link[]>(), ins = new Map<string, Link[]>();
+  for (const b of boxes) { outs.set(b.id, []); ins.set(b.id, []); }
+  for (const l of links) { outs.get(l.from)!.push(l); ins.get(l.to)!.push(l); }
+  const heads = boxes.filter((b) => !ins.get(b.id)!.length);
+  if (heads.length !== 1) return null;
+  // depth: the longest path from the head; a cycle leaves a box unplaced
+  const depth = new Map<string, number>(boxes.map((b) => [b.id, 0]));
+  for (let pass = 0; pass <= boxes.length; pass++) {
+    let moved = false;
+    for (const l of links) { const want = depth.get(l.from)! + 1; if (want > depth.get(l.to)!) { depth.set(l.to, want); moved = true; } }
+    if (!moved) break;
+    if (pass === boxes.length) return null;
+  }
+  // order: by depth, then as written
+  const order = [...boxes].sort((a, b) => depth.get(a.id)! - depth.get(b.id)! || boxes.indexOf(a) - boxes.indexOf(b));
+  const col = new Map<string, number>(), anc = new Map<string, Set<string>>();
+  const splits = (id: string) => outs.get(id)!.length > 1;
+  // WHERE THE WAYS OUT OF A SPLIT STAND. A diamond's ways are centred on its own column (two stand either side of it, three leave the middle one
+  // straight on); any other box that splits keeps its first way straight on, and the others stand beside it, left then right, nearest first.
+  const sideOf = new Map<string, number>();
+  for (const b of boxes) if (splits(b.id)) {
+    const ways = outs.get(b.id)!.filter((l) => ins.get(l.to)!.length === 1).map((l) => l.to);
+    const n = ways.length;
+    const pattern = shapeOf(b) === "decision"
+      ? Array.from({ length: n }, (_, i) => i - (n - 1) / 2).map((v) => (n % 2 === 0 ? (v < 0 ? Math.floor(v) : Math.ceil(v)) : v))
+      : [0, -1, 1, -2, 2].slice(0, n);
+    ways.forEach((id, i) => sideOf.set(id, pattern[i]));
+  }
+  col.set(heads[0].id, 0); anc.set(heads[0].id, new Set());
+  for (const b of order) {
+    if (b.id === heads[0].id) continue;
+    const inl = ins.get(b.id)!;
+    const regions = inl.map((l) => new Set([...anc.get(l.from)!, ...(splits(l.from) ? [l.from] : [])]));
+    if (inl.length === 1) {
+      const from = inl[0].from;
+      col.set(b.id, col.get(from)! + (splits(from) ? sideOf.get(b.id) ?? 0 : 0));
+      anc.set(b.id, regions[0]);
+    } else {
+      const common = [...regions[0]].filter((id) => regions.every((r) => r.has(id)));
+      const deepest = common.sort((m, n) => depth.get(n)! - depth.get(m)!)[0];
+      col.set(b.id, deepest ? col.get(deepest)! : 0);
+      anc.set(b.id, new Set(common.filter((id) => id !== deepest)));
+    }
+  }
+  const cols = [...new Set(col.values())];
+  if (cols.some((c) => Math.abs(c) > 2)) return null;
+  // The distance from the spine to the first column beside it, the same on both sides: far enough that the widest tile of each stands clear
+  // of the widest on the spine by the connected gap, and that a decision's way out has room for its label and a corner.
+  const wOf = new Map(boxes.map((b) => [b.id, mapBoxWidth(b)])), hOf = new Map(boxes.map((b) => [b.id, mapBoxHeight(b)]));
+  const halfIn = (c: number, r: number) => { const b = boxes.find((q) => col.get(q.id) === c && depth.get(q.id) === r); return b ? wOf.get(b.id)! / 2 : null; };
+  const rowNos = [...new Set(boxes.map((b) => depth.get(b.id)!))];
+  // how far apart two columns must stand: the widest pair of tiles that share a row, and the connected gap between them
+  const apart = (c1: number, c2: number): number => {
+    let need = 0, any = false;
+    for (const r of rowNos) for (const s of [-1, 1]) {
+      const h1 = halfIn(s * c1, r), h2 = halfIn(s * c2, r);
+      if (h1 !== null && h2 !== null) { need = Math.max(need, h1 + h2 + GAP_LINKED); any = true; }
+    }
+    void any;
+    return need;
+  };
+  // a decision's way out is a run from its side vertex, with room for its answer and a corner; a split's ways stand far enough apart for each answer
+  const answer = (id: string) => Math.max(0, ...outs.get(id)!.map((l) => (l.label ?? "").length * W_NOTE)) + GAP_APART;
+  let off1 = apart(0, 1), ring = 0;
+  for (const b of boxes) if (splits(b.id)) {
+    if (shapeOf(b) === "decision") off1 = Math.max(off1, wOf.get(b.id)! / 2 + Math.max(GAP_LINKED, answer(b.id)));
+    else off1 = Math.max(off1, answer(b.id));
+    ring = Math.max(ring, answer(b.id));
+  }
+  const off2 = off1 + Math.max(apart(1, 2), ring);
+  const colX = (c: number) => FRAME_W / 2 + Math.sign(c) * (Math.abs(c) === 0 ? 0 : Math.abs(c) === 1 ? off1 : off2);
+  const left = Math.min(...boxes.map((b) => colX(col.get(b.id)!) - wOf.get(b.id)! / 2));
+  const right = Math.max(...boxes.map((b) => colX(col.get(b.id)!) + wOf.get(b.id)! / 2));
+  if (left < FRAME_PAD || right > FRAME_W - FRAME_PAD) return null;
+
+  const rows = [...new Set(order.map((b) => depth.get(b.id)!))].sort((m, n) => m - n);
+  const rowH = new Map(rows.map((r) => [r, Math.max(...boxes.filter((b) => depth.get(b.id) === r).map((b) => hOf.get(b.id)!))]));
+  const rowTop = new Map<number, number>();
+  let y = FRAME_PAD;
+  for (const r of rows) { rowTop.set(r, y); y += rowH.get(r)! + GAP_LINKED; }
+  type P = { x: number; y: number; w: number; h: number; cx: number };
+  const at = new Map<string, P>();
+  const out: string[] = [];
+  const findings: string[] = [];
+  for (const b of order) {
+    const w = wOf.get(b.id)!, h = hOf.get(b.id)!, r = depth.get(b.id)!;
+    const cx = colX(col.get(b.id)!), top = rowTop.get(r)! + (rowH.get(r)! - h) / 2;
+    at.set(b.id, { x: cx - w / 2, y: top, w, h, cx });
+    out.push(mapRect(b, cx - w / 2, top, w, h));
+  }
+  const shapeById = new Map(boxes.map((b) => [b.id, shapeOf(b)]));
+  const wires: { d: string; dashed?: boolean; on: boolean }[] = [];
+  const labels: string[] = [];
+  const asBox = (id: string): Placed => ({ ...at.get(id)!, row: 0 });
+  for (const l of links) {
+    const a = at.get(l.from)!, b = at.get(l.to)!, ba = byId.get(l.from)!, bb = byId.get(l.to)!;
+    const yb = edgeY(ba, asBox(l.from), "bottom"), yt = edgeY(bb, asBox(l.to), "top");
+    const on = !!bb.em;
+    const w = (l.label ?? "").length * W_NOTE;
+    let d: string;
+    if (shapeById.get(l.from) === "decision" && b.cx !== a.cx) {
+      const side = b.cx < a.cx ? -1 : 1, vx = a.cx + side * a.w / 2, cy = a.y + a.h / 2;
+      d = `M${vx} ${cy} H${b.cx} V${yt}`;
+      if (l.label) labels.push(textSvg("dl-wlabel", Math.round(Math.min(vx, b.cx) + (Math.abs(b.cx - vx) - w) / 2), cy - LABEL_GAP, l.label));
+    } else if (b.cx === a.cx) {
+      d = `M${a.cx} ${yb} V${yt}`;
+      // beside the straight run; below the lane when the box's other ways leave along one
+      const lower = splits(l.from) && outs.get(l.from)!.some((o) => at.get(o.to)!.cx !== a.cx);
+      if (l.label) labels.push(textSvg("dl-wlabel", a.cx + 8, Math.round(lower ? yt - LABEL_GAP : (yb + yt) / 2 + 4), l.label));
+    } else {
+      // the shortest orthogonal route: down this tile's own column to a lane, along it to the target's column, in. The lane is the splitter's own
+      // where the box splits to a box with no other way in, and otherwise the one just above the join, where the branches run into one line.
+      const own = splits(l.from) && ins.get(l.to)!.length === 1;
+      const ly = own ? yb + GAP_LINKED / 2 : Math.max(yt - GAP_LINKED / 2, yb + GAP_LINKED / 2);
+      d = `M${a.cx} ${yb} V${ly} H${b.cx} V${yt}`;
+      if (l.label) {
+        // the answer stands above the run between this column and the next one in towards the splitter
+        const inner = own ? (Math.abs(col.get(l.to)! - col.get(l.from)!) > 1 ? colX(col.get(l.to)! - Math.sign(col.get(l.to)! - col.get(l.from)!)) : a.cx) : a.cx;
+        const lo = Math.min(inner, b.cx), span = Math.abs(b.cx - inner);
+        labels.push(textSvg("dl-wlabel", Math.round(lo + Math.max(0, (span - w) / 2)), ly - LABEL_GAP, l.label));
+      }
+    }
+    wires.push({ d, dashed: l.dashed, on });
+  }
+  // the plain wires first, the accent ones over them, so where a bus is shared the accent shows
+  for (const w of wires.filter((x) => !x.on)) out.push(wireSvg(w.d, w.dashed));
+  for (const w of wires.filter((x) => x.on)) out.push(wireSvg(w.d, w.dashed, "", true));
+  out.push(...labels);
+  for (const l of links)
+    if (shapeById.get(l.from) === "decision" && !l.label)
+      findings.push(`the branch \`${l.from}\` → \`${l.to}\` leaves a decision with no answer on it; each branch out of a decision carries its own answer`);
+  return { svg: svgOf(out, spec.title ?? spec.caption ?? "flowchart"), findings };
 }
 
 /**
@@ -1674,7 +2396,8 @@ function drawFlowchart(spec: Spec): { svg: string; findings: string[] } {
   });
   const shapeById = new Map(shaped.map((b) => [b.id, shapeOf(b)]));
 
-  const { svg, findings } = drawMap({ ...spec, boxes: shaped }, { downward: true });
+  const spine = drawFlowSpine({ ...spec, boxes: shaped });
+  const { svg, findings } = spine ?? drawMap({ ...spec, boxes: shaped }, { downward: true });
   // A DIAMOND WITH AN UNANSWERED BRANCH is the one fault this kind can have that a map cannot. The
   // chapter says a decision carries each branch's answer, and a reader meeting two unlabelled arrows
   // out of a diamond has to guess which one is yes — which is the question the diamond was asked.
@@ -1693,10 +2416,11 @@ function drawFlowchart(spec: Spec): { svg: string; findings: string[] } {
  * Every number below is a copy of a grid number or a number of its own; none is shared with another
  * kind, so a change here never moves a MAP, a FLOWCHART, a SYSTEM or an ENTITIES figure.
  *
- * Marks, never tints: a background is a surface (`sds-skel-surface`), a solid line is a border the block
- * has (`sds-skel-border`), a dotted line marks a component, a part or a slot (`sds-skel-guide`), a thin
- * line is a control (`sds-skel-control`), and a soft bar stands in for content (`sds-skel-bar`). A drawing
- * carries no colour of its own: every mark is a class of the shared stylesheet.
+ * Marks, never tints: a background is a surface (`dl-sk-surface`), a solid line is a border the block
+ * has (`dl-line-edge`), a dotted line marks a component, a part or a slot (`dl-frame-line`), a thin
+ * line is a control (`dl-ctl`, `dl-ctl-on` for the main one), and a soft bar stands in for content (`dl-bar`). A drawing
+ * carries no colour and no size of its own: every mark is a class of the shared stylesheet, and its words take the language's
+ * three levels (a name, a detail, a label), never a fourth.
  */
 const SKEL_PAD = 16, SKEL_GAP = 24, SKEL_LABEL_H = 12, SKEL_LABEL_GAP = 8;
 const SKEL_W_LABEL = 7, SKEL_W_NOTE = 6.4, SKEL_W_TITLE = 7.6;
@@ -1710,8 +2434,41 @@ const skelSizeH = (frame: SkeletonFrame, inherited: number): number => {
   const size = frame.size ?? skelGridSectionOf(frame)?.size;
   return size !== undefined && SKEL_CONTROL_H[size] !== undefined ? SKEL_CONTROL_H[size] : inherited;
 };
-/** The corner of a rounded frame; a square one has none. */
-const SKEL_ROUND = 8;
+/**
+ * THE CORNERS OF A SKELETON ARE THE DESIGN SYSTEM THEME'S, not the docs'. A drawn unit names the role its corner has, and the role is the
+ * design system's own token for that unit: the stylesheet the docs ship (`ds-tokens.css`, copied from the design system) sets `rx` and `ry`
+ * on every `rect[data-corner]` from that token, so a partner whose theme sets `--radius` differently has their corners drawn. The `rx`
+ * attribute holds the same number at the default theme (`--radius` 0.625rem = 10px) as the fallback where no stylesheet reaches the drawing.
+ *   ctl, badge  `--radius-sm`, 6: `rounded-sm`, fixed at every size, on a button, an input, a select, a textarea, a checkbox, a toggle, a
+ *               pager button, a nav entry, a badge (DSButton, DSInput, DSSelect, DSBadge)
+ *   xs … xl     `--size-<size>-radius`: a card with a `size`, a panel container's frame (DSCardRoot, DSPanelContainerRoot)
+ *   frame       `--radius-lg`, 10: a card with no size (`rounded-lg`), a table's rounded frame, a block that is a frame on its own, the window
+ *   inset       the frame's corner less the 2px a selected line stands in from it
+ *   mark        half of `--radius-sm`: a placeholder mark, a dotted group boundary
+ * Two corners take no token: `pill` (fully rounded: a pill tab bar, a switch's track, a placeholder bar, a scroll mark) and `none` (a
+ * square frame, `rounded: false`, a band, a flush edge).
+ */
+export type SkelCorner = "none" | "pill" | "ctl" | "badge" | "xs" | "sm" | "md" | "lg" | "xl" | "frame" | "inset" | "mark";
+/** Each themed corner: the CSS the stylesheet sets `rx` from, and the pixels it comes to at the default theme (the attribute's fallback). */
+export const SKEL_CORNER: Record<Exclude<SkelCorner, "none" | "pill">, { css: string; px: number }> = {
+  ctl: { css: "var(--radius-sm)", px: 6 },
+  badge: { css: "var(--radius-sm)", px: 6 },
+  xs: { css: "var(--size-xs-radius)", px: 6 },
+  sm: { css: "var(--size-sm-radius)", px: 8 },
+  md: { css: "var(--size-md-radius)", px: 8 },
+  lg: { css: "var(--size-lg-radius)", px: 10 },
+  xl: { css: "var(--size-xl-radius)", px: 10 },
+  frame: { css: "var(--radius-lg)", px: 10 },
+  inset: { css: "calc(var(--radius-lg) - 2px)", px: 8 },
+  mark: { css: "calc(var(--radius-sm) / 2)", px: 3 },
+};
+const SKEL_SIZE_CORNERS: SkelCorner[] = ["xs", "sm", "md", "lg", "xl"];
+/** The corner of a frame whose size sets it: a panel container's, at the size its controls stand at (the height says it); a card's, at its own. */
+const skelSizeCorner = (ctl: number): SkelCorner => SKEL_SIZE_CORNERS[Object.values(SKEL_CONTROL_H).indexOf(ctl)] ?? "sm";
+const skelCardCorner = (frame: SkeletonFrame): SkelCorner => {
+  const size = frame.size ?? skelGridSectionOf(frame)?.size;
+  return size !== undefined && SKEL_CONTROL_H[size] !== undefined ? skelSizeCorner(SKEL_CONTROL_H[size]) : "frame";
+};
 /** A tag's line: the note measure, its own clear air below it before the words or bars it heads. */
 const SKEL_TAG_H = SKEL_LABEL_H + SKEL_LABEL_GAP;
 /** One placeholder bar and the gap under it; a heading bar is a little taller. */
@@ -1721,14 +2478,14 @@ const SKEL_PACK_GAP = 4;
 /** How many named boundaries may sit inside one another before the drawing is split: a container, a widget or a card
  *  in it, and a group in that. */
 const SKEL_NEST_MAX = 3;
-const SKEL_LINES_W = 160, SKEL_FIELD_W = 160, SKEL_CARD_H = 64;
+const SKEL_LINES_W = 144, SKEL_FIELD_W = 144, SKEL_CARD_H = 64;
 const WIDTH_FRACTIONS: Record<string, number> = { "1/4": 1 / 4, "1/3": 1 / 3, "1/2": 1 / 2, "2/3": 2 / 3, "3/4": 3 / 4 };
 // THE OUTER FRAME TAKES THE GRID'S CONTENT WIDTH (05-artifacts.md § The grid), as the hand-drawn
 // skeletons did: a layout is a screen, and a screen drawn 300 wide reads as a widget.
-const SKEL_CANVAS = 1052;
+const SKEL_CANVAS = 896;
 // A FLOOR RATHER THAN A ZERO, for the degenerate case every row's width is left to a `fill` or a
 // fraction: nothing would set the frame's own width, and 0 is not a figure.
-const SKEL_MIN_W = 200;
+const SKEL_MIN_W = 184;
 
 const SKEL_LOOKS = ["raised", "bordered", "flat", "card", "container"];
 /** A container on a surface: the height of its header, a band inside its outline under its unit's name, from its top
@@ -1751,7 +2508,7 @@ const SKEL_INLINE_ICON = 14;
 /** The width a view is drawn at, for each screen class. It stands for the class, and is never a size on a screen. */
 // THE DESKTOP TAKES THE GRID'S WIDTH, and the tablet and the phone share the next line, three parts to two, with
 // the gap between them: 617 + 24 + 411 is the grid's 1052.
-const SKEL_VIEW_W: Record<string, number> = { DESKTOP: 1052, TABLET: 617, MOBILE: 411 };
+const SKEL_VIEW_W: Record<string, number> = { DESKTOP: 896, TABLET: 568, MOBILE: 384 };
 /** The task states a view may show, in `DSTaskStateType`'s own order (RULE.DEVEX.WORKSPACE.230). The views of one screen
  *  class are drawn in this order, after the view with no `state`, and a flow file's `state` names one of them. */
 export const SKEL_TASK_STATES = ["IDLE", "WORKING", "DONE", "FAILED", "EMPTY", "DENIED"];
@@ -1900,10 +2657,10 @@ function skelFeatureFrames(frame: SkeletonFrame): { whole: boolean; text: boolea
 /** A FRAME IS DRAWN WITH THE MARKS A FRAME'S LOOK ALREADY HAS: a thin outline, as a card's, solid where it is `bordered`; behind
  *  it the background of a raised frame where it is `raised` or its colour is not `BASE`; and a rounded corner unless `rounded`
  *  is false. How strong a fill is, and how far a raised frame stands off, are the library's look and draw no mark of their own. */
-function skelSurfaceMarks(surface: SkelSurface, x: number, y: number, w: number, h: number): string[] {
-  const rx = surface.rounded === false ? 0 : SKEL_ROUND;
+function skelSurfaceMarks(surface: SkelSurface, x: number, y: number, w: number, h: number, corner: SkelCorner = "frame"): string[] {
+  const rx: SkelCorner = surface.rounded === false ? "none" : corner;
   const filled = surface.raised === true || (surface.color !== undefined && surface.color !== "BASE");
-  return [...(filled ? [skelRect("sds-skel-surface", x, y, w, h, rx)] : []), skelRect(surface.bordered === true ? "sds-skel-border" : "sds-skel-control", x, y, w, h, rx)];
+  return [...(filled ? [skelRect("dl-sk-surface", x, y, w, h, rx)] : []), skelRect(surface.bordered === true ? "dl-line-edge" : "dl-ctl", x, y, w, h, rx)];
 }
 
 /** A `DSAccordionGroup` WITH ITS ENTRIES, in `IDSAccordionGroupOption`'s names (RULE.DEVEX.WORKSPACE.301): a group that names its `options`
@@ -1948,17 +2705,17 @@ function skelDrawAccordion(frame: SkeletonFrame, entries: SkeletonAccordionOptio
     const wrapAt = w - pad * 2, known = skelAccordionWidths.get(option);
     skelAccordionWidths.set(option, known === undefined ? wrapAt : Math.min(known, wrapAt));
     const lines = skelAccordionLines(option, wrapAt), entryH = skelAccordionEntryH(frame, option, ctl);
-    if (bordered) out.push(skelRect("sds-skel-control", x, top, w, entryH, SKEL_ROUND));
+    if (bordered) out.push(skelRect("dl-ctl", x, top, w, entryH, "frame"));
     const cx = x + pad + SKEL_INLINE_ICON / 2, cy = top + ctl / 2, unit = SKEL_INLINE_ICON / 24;
     const at = (vx: number, vy: number): [number, number] => [cx - SKEL_INLINE_ICON / 2 + vx * unit, cy - SKEL_INLINE_ICON / 2 + vy * unit];
-    out.push(...(option.expanded === true ? [skelPath("sds-skel-glyph", [[at(6, 15), at(12, 9), at(18, 15)]])] : skelGlyph("select", cx, cy, SKEL_INLINE_ICON)));
+    out.push(...(option.expanded === true ? [skelPath("dl-glyph", [[at(6, 15), at(12, 9), at(18, 15)]])] : skelGlyph("select", cx, cy, SKEL_INLINE_ICON)));
     out.push(skelStepText(String(option.header ?? ""), SKEL_STEP_ITEM, x + pad + SKEL_INLINE_ICON + SKEL_LABEL_GAP, cy + 4));
     if (lines.length) {
       // A BORDERED ENTRY THAT IS OPEN DIVIDES ITS HEADER FROM ITS BODY BY A LINE ACROSS ITS OUTLINE.
-      if (bordered) out.push(`  <path class="sds-skel-control" d="M${r2(x)} ${r2(top + ctl)} H${r2(x + w)}"/>`);
+      if (bordered) out.push(`  <path class="dl-ctl" d="M${r2(x)} ${r2(top + ctl)} H${r2(x + w)}"/>`);
       let lineTop = top + ctl + (bordered ? SKEL_PAD : SKEL_LABEL_GAP);
       for (const line of lines) {
-        out.push(`  <text class="sds-code" x="${r2(x + pad)}" y="${Math.round(lineTop + 13)}">${esc(line)}</text>`);
+        out.push(`  <text class="dl-detail" x="${r2(x + pad)}" y="${Math.round(lineTop + 13)}">${esc(line)}</text>`);
         lineTop += SKEL_ITEM_LINE;
       }
     }
@@ -2048,7 +2805,7 @@ const SKEL_CARD_MARK = 22;
 const SKEL_STEP_CONTAINER = 20, SKEL_STEP_CARD = 15, SKEL_STEP_PART = 13, SKEL_STEP_ITEM = 12;
 const skelStepW = (words: string, step: number) => Math.ceil(words.length * SKEL_W_TITLE * step / SKEL_STEP_PART);
 const skelStepText = (words: string, step: number, x: number, y: number) =>
-  `  <text class="sds-title" x="${r2(x)}" y="${Math.round(y)}" style="font-size:${step}px${step === SKEL_STEP_ITEM ? ";font-weight:500" : ""}">${esc(words)}</text>`;
+  `  <text class="dl-name" x="${r2(x)}" y="${Math.round(y)}">${esc(words)}</text>`;
 /** The facts on the line under an item's title: its description first, then each of `meta`. */
 const skelItemFacts = (it: SkeletonItem): (string | SkeletonItem)[] =>
   [...(it.item?.description !== undefined && !it.item?.meta?.length ? [it.item.description] : []), ...(it.item?.meta ?? [])];
@@ -2163,8 +2920,8 @@ const skelScrolls = (it: SkeletonItem): boolean => skelCode.has(it) || it.contro
  *  scrolling part takes. */
 const SKEL_SCROLL_MARK = 20, SKEL_SCROLL_MIN = SKEL_SCROLL_MARK * 2;
 const skelScrollMark = (edge: number, mid: number): string[] => [
-  skelRect("sds-skel-surface", edge - SKEL_SCROLL_MARK, mid - SKEL_SCROLL_MARK / 2, SKEL_SCROLL_MARK, SKEL_SCROLL_MARK, SKEL_SCROLL_MARK / 2),
-  skelRect("sds-skel-control", edge - SKEL_SCROLL_MARK, mid - SKEL_SCROLL_MARK / 2, SKEL_SCROLL_MARK, SKEL_SCROLL_MARK, SKEL_SCROLL_MARK / 2),
+  skelRect("dl-sk-surface", edge - SKEL_SCROLL_MARK, mid - SKEL_SCROLL_MARK / 2, SKEL_SCROLL_MARK, SKEL_SCROLL_MARK, "pill"),
+  skelRect("dl-ctl", edge - SKEL_SCROLL_MARK, mid - SKEL_SCROLL_MARK / 2, SKEL_SCROLL_MARK, SKEL_SCROLL_MARK, "pill"),
   ...skelGlyph("next", edge - SKEL_SCROLL_MARK / 2, mid, 12),
 ];
 /** AN ITEM'S MEDIA IS READ IN `IDSItemMedia`'S KINDS (RULE.DEVEX.WORKSPACE.294). A name written as a word is a mark, as before; `ICON` is
@@ -2345,7 +3102,6 @@ function skelFixedWidth(it: SkeletonItem, h: number): number {
 const skelFieldHeadH = (it: SkeletonItem) => (it.label !== undefined ? SKEL_ITEM_LINE : SKEL_HEAD_BAR);
 const skelFieldBelow = (it: SkeletonItem): string | undefined => it.error ?? it.description;
 const skelFieldBelowH = (it: SkeletonItem) => (it.label !== undefined || skelFieldBelow(it) !== undefined ? SKEL_PACK_GAP + SKEL_ITEM_LINE : 0);
-const SKEL_FAIL = "var(--sds-fail)";
 /** The height of the value of a field that is read: a line of words, or a badge of the size it has among facts. */
 const SKEL_READ_LINE = 20;
 
@@ -2604,18 +3360,18 @@ function skelRowWidths(row: SkeletonRow, available: number, ctl: number, finding
   return widths;
 }
 
-const skelRect = (cls: string, x: number, y: number, w: number, h: number, rx = 3) =>
-  `  <rect class="${cls}" x="${r2(x)}" y="${r2(y)}" width="${r2(w)}" height="${r2(h)}" rx="${rx}"/>`;
+const skelRect = (cls: string, x: number, y: number, w: number, h: number, corner: SkelCorner) =>
+  `  <rect class="${cls}" x="${r2(x)}" y="${r2(y)}" width="${r2(w)}" height="${r2(h)}" rx="${corner === "none" ? 0 : corner === "pill" ? r2(Math.min(w, h) / 2) : SKEL_CORNER[corner].px}"${corner === "none" || corner === "pill" ? "" : ` data-corner="${corner}"`}/>`;
 const skelPath = (cls: string, points: [number, number][][]) =>
   `  <path class="${cls}" d="${points.map((line) => line.map(([px, py], i) => `${i ? "L" : "M"}${r2(px)} ${r2(py)}`).join(" ")).join(" ")}"/>`;
 
 /** A frame's marks. The outer frame is the drawing's own edge; a part is a surface, a border or neither, and a part with no border of its own shows the dotted boundary. */
-function skelMarks(look: string | undefined, x: number, y: number, w: number, h: number): string[] {
-  if (look === "bordered") return [skelRect("sds-skel-border", x, y, w, h)];
+function skelMarks(look: string | undefined, x: number, y: number, w: number, h: number, card: SkelCorner = "frame"): string[] {
+  if (look === "bordered") return [skelRect("dl-line-edge", x, y, w, h, "frame")];
   // A CARD IS A THIN, ROUNDED OUTLINE with nothing behind it: a part with a title of its own, as a page draws one.
-  if (look === "card") return [skelRect("sds-skel-control", x, y, w, h, SKEL_ROUND)];
-  if (look === "flat") return [skelRect("sds-skel-guide", x, y, w, h)];
-  return [skelRect("sds-skel-surface", x, y, w, h), skelRect("sds-skel-guide", x, y, w, h)];
+  if (look === "card") return [skelRect("dl-ctl", x, y, w, h, card)];
+  if (look === "flat") return [skelRect("dl-frame-line", x, y, w, h, "frame")];
+  return [skelRect("dl-sk-surface", x, y, w, h, "frame"), skelRect("dl-frame-line", x, y, w, h, "frame")];
 }
 
 /**
@@ -2625,14 +3381,14 @@ function skelMarks(look: string | undefined, x: number, y: number, w: number, h:
 function skelGlyph(name: string, cx: number, cy: number, g: number): string[] {
   const u = g / 24, X = (v: number) => cx - g / 2 + v * u, Y = (v: number) => cy - g / 2 + v * u;
   const line = (...pts: number[][]): [number, number][] => pts.map(([a, b]) => [X(a), Y(b)]);
-  const stroke = (...lines: [number, number][][]) => skelPath("sds-skel-glyph", lines);
-  const solid = (...lines: [number, number][][]) => skelPath("sds-skel-glyph sds-skel-glyph-solid", lines);
-  const dot = (a: number, b: number, rad: number) => `  <circle class="sds-skel-glyph sds-skel-glyph-solid" cx="${r2(X(a))}" cy="${r2(Y(b))}" r="${r2(rad * u)}"/>`;
+  const stroke = (...lines: [number, number][][]) => skelPath("dl-glyph", lines);
+  const solid = (...lines: [number, number][][]) => skelPath("dl-glyph dl-glyph-solid", lines);
+  const dot = (a: number, b: number, rad: number) => `  <circle class="dl-glyph dl-glyph-solid" cx="${r2(X(a))}" cy="${r2(Y(b))}" r="${r2(rad * u)}"/>`;
   switch (name) {
     case "close": return [stroke(line([6, 6], [18, 18]), line([18, 6], [6, 18]))];
     case "add": return [stroke(line([12, 5], [12, 19]), line([5, 12], [19, 12]))];
     case "menu": return [stroke(line([5, 7], [19, 7]), line([5, 12], [19, 12]), line([5, 17], [19, 17]))];
-    case "search": return [`  <circle class="sds-skel-glyph" cx="${r2(X(10))}" cy="${r2(Y(10))}" r="${r2(6 * u)}"/>`, stroke(line([15, 15], [20, 20]))];
+    case "search": return [`  <circle class="dl-glyph" cx="${r2(X(10))}" cy="${r2(Y(10))}" r="${r2(6 * u)}"/>`, stroke(line([15, 15], [20, 20]))];
     case "more": return [dot(5, 12, 1.6), dot(12, 12, 1.6), dot(19, 12, 1.6)];
     case "previous": return [stroke(line([14, 5], [7, 12], [14, 19]))];
     case "next": return [stroke(line([10, 5], [17, 12], [10, 19]))];
@@ -2657,10 +3413,10 @@ function skelGlyph(name: string, cx: number, cy: number, g: number): string[] {
 function skelIcon(name: string, cx: number, cy: number, h: number, mark: boolean, on?: boolean, across = h): string[] {
   const circle = (cls: string, r: number) => `  <circle class="${cls}" cx="${r2(cx)}" cy="${r2(cy)}" r="${r2(r)}"/>`;
   // A TILE THAT IS SET UP carries a small filled check at its top end corner, as a brand that is on does.
-  const check = on === true ? [circle("sds-skel-bar", 4).replace(`cx="${r2(cx)}" cy="${r2(cy)}"`, `cx="${r2(cx + h / 2)}" cy="${r2(cy - h / 2)}"`)] : [];
-  if (!mark) return [skelRect("sds-skel-control", cx - h / 2, cy - h / 2, h, h), ...skelGlyph(name, cx, cy, Math.round(h / 2)), ...check];
-  if (name === "default") return [circle(on === false ? "sds-skel-control" : "sds-skel-bar", across / 2)];
-  return [circle("sds-skel-control", across / 2), ...skelGlyph(name, cx, cy, Math.round(across / 2))];
+  const check = on === true ? [circle("dl-bar", 4).replace(`cx="${r2(cx)}" cy="${r2(cy)}"`, `cx="${r2(cx + h / 2)}" cy="${r2(cy - h / 2)}"`)] : [];
+  if (!mark) return [skelRect("dl-ctl", cx - h / 2, cy - h / 2, h, h, "ctl"), ...skelGlyph(name, cx, cy, Math.round(h / 2)), ...check];
+  if (name === "default") return [circle(on === false ? "dl-ctl" : "dl-bar", across / 2)];
+  return [circle("dl-ctl", across / 2), ...skelGlyph(name, cx, cy, Math.round(across / 2))];
 }
 
 /** ONE LINE OF FACTS, a dot between every two of them, a badge among them, from `fx` on the centre line `factsMid`: the whole line where
@@ -2669,10 +3425,10 @@ function skelIcon(name: string, cx: number, cy: number, h: number, mark: boolean
 function skelDrawFactLine(line: SkelFactLine, fx: number, factsMid: number, h: number, refusal: string, findings: string[], out: string[]): void {
   line.forEach(({ fact, dot }) => {
     if (dot) {
-      out.push(`  <text class="sds-note" x="${r2(fx + 6)}" y="${Math.round(factsMid + 4)}">${SKEL_FACT_DOT}</text>`);
+      out.push(`  <text class="dl-detail" x="${r2(fx + 6)}" y="${Math.round(factsMid + 4)}">${SKEL_FACT_DOT}</text>`);
       fx += SKEL_FACT_DOT_W;
     }
-    if (typeof fact === "string") out.push(`  <text class="sds-note" x="${r2(fx)}" y="${Math.round(factsMid + 4)}">${esc(fact)}</text>`);
+    if (typeof fact === "string") out.push(`  <text class="dl-detail" x="${r2(fx)}" y="${Math.round(factsMid + 4)}">${esc(fact)}</text>`);
     else if (fact.control !== "badge") findings.push(refusal);
     else skelDrawLeaf(fact, "control", fx, factsMid - SKEL_FACT_CTL / 2, skelFixedWidth(fact, SKEL_FACT_CTL), SKEL_FACT_CTL, SKEL_FACT_CTL, SKEL_FACT_CTL, findings, out);
     fx += skelFactW(fact, h);
@@ -2683,33 +3439,33 @@ function skelDrawFactLine(line: SkelFactLine, fx: number, factsMid: number, h: n
 function skelDrawLeaf(it: SkeletonItem, kind: SkelKind, ix: number, iy: number, iw: number, ih: number, boxH: number, h: number, findings: string[], out: string[]): void {
   const mid = iy + ih / 2;
   const baseline = Math.round(mid + 4);
-  if (kind === "plain") { out.push(it.part ? skelStepText(it.text!, SKEL_STEP_PART, ix, baseline) : `  <text class="sds-label" x="${ix}" y="${baseline}">${esc(it.text!)}</text>`); return; }
+  if (kind === "plain") { out.push(it.part ? skelStepText(it.text!, SKEL_STEP_PART, ix, baseline) : `  <text class="dl-name" x="${ix}" y="${baseline}">${esc(it.text!)}</text>`); return; }
   if (kind === "note") {
     // A LINE OF CODE WIDER THAN ITS COLUMN KEEPS ITS WIDTH AND IS CUT AT THE COLUMN'S END, where the mark stands (RULE.DEVEX.WORKSPACE.304).
     if (skelCode.has(it) && typeof it.note === "string" && skelWordW(it.note) > iw) {
       const shown = it.note.slice(0, Math.max(0, Math.floor((iw - SKEL_SCROLL_MARK - SKEL_PACK_GAP) / SKEL_W_LABEL)));
-      out.push(`  <text class="sds-code" x="${ix}" y="${baseline}">${esc(shown)}</text>`, ...skelScrollMark(ix + iw, mid));
+      out.push(`  <text class="dl-detail" x="${ix}" y="${baseline}">${esc(shown)}</text>`, ...skelScrollMark(ix + iw, mid));
       return;
     }
     // A NOTE WIDER THAN ITS COLUMN WRAPS AT A WORD (RULE.DEVEX.WORKSPACE.303), its lines centred together where its row is taller.
     skelWrapKeep(it, iw);
     const lines = skelNoteLines(it);
-    if (lines.length < 2) { out.push(`  <text class="sds-code" x="${ix}" y="${baseline}">${esc(it.note!)}</text>`); return; }
+    if (lines.length < 2) { out.push(`  <text class="dl-detail" x="${ix}" y="${baseline}">${esc(it.note!)}</text>`); return; }
     lines.forEach((line, k) =>
-      out.push(`  <text class="sds-code" x="${ix}" y="${Math.round(mid + 4 - (lines.length - 1) * SKEL_ITEM_LINE / 2 + k * SKEL_ITEM_LINE)}">${esc(line)}</text>`));
+      out.push(`  <text class="dl-detail" x="${ix}" y="${Math.round(mid + 4 - (lines.length - 1) * SKEL_ITEM_LINE / 2 + k * SKEL_ITEM_LINE)}">${esc(line)}</text>`));
     return;
   }
   if (kind === "slot") {
     // A SLOT THAT IS A FEATURE'S MEDIA, WITH `frames` NAMING `MEDIA`, STANDS IN THE FEATURE'S FRAME, flush.
     const framed = skelItemFrames.get(it);
     out.push(...(framed ? skelSurfaceMarks(framed, ix, iy, iw, ih) : skelMarks(undefined, ix, iy, iw, ih)));
-    out.push(`  <text class="sds-note" x="${ix + SKEL_LABEL_GAP}" y="${iy + SKEL_LABEL_H + 4}">${esc(it.slot!)}</text>`);
+    out.push(`  <text class="dl-detail" x="${ix + SKEL_LABEL_GAP}" y="${iy + SKEL_LABEL_H + 4}">${esc(it.slot!)}</text>`);
     return;
   }
   if (kind === "place") {
     out.push(...skelMarks(undefined, ix, iy, iw, ih));
-    out.push(`  <text class="sds-note" x="${ix + SKEL_LABEL_GAP}" y="${iy + SKEL_LABEL_H + 4}">${esc(it.tag!)}</text>`);
-    if (it.text !== undefined) out.push(`  <text class="sds-code" x="${ix + SKEL_PAD}" y="${Math.round(iy + SKEL_TAG_H + (ih - SKEL_TAG_H) / 2 + 4)}">${esc(it.text)}</text>`);
+    out.push(`  <text class="dl-detail" x="${ix + SKEL_LABEL_GAP}" y="${iy + SKEL_LABEL_H + 4}">${esc(it.tag!)}</text>`);
+    if (it.text !== undefined) out.push(`  <text class="dl-detail" x="${ix + SKEL_PAD}" y="${Math.round(iy + SKEL_TAG_H + (ih - SKEL_TAG_H) / 2 + 4)}">${esc(it.text)}</text>`);
     return;
   }
   if (kind === "item") {
@@ -2735,7 +3491,7 @@ function skelDrawLeaf(it: SkeletonItem, kind: SkelKind, ix: number, iy: number, 
       const baseOf = (lineTop: number, size: number) => Math.round(lineTop + (skelHeadLine(size) + size * 0.7) / 2);
       out.push(skelStepText(String(item.title ?? ""), stat.value, startOf(valueW), baseOf(top, stat.value)));
       if (label !== undefined)
-        out.push(`  <text class="sds-note" x="${r2(startOf(labelW))}" y="${baseOf(top + skelHeadLine(stat.value), stat.label)}" style="font-size:${stat.label}px">${esc(label)}</text>`);
+        out.push(`  <text class="dl-detail" x="${r2(startOf(labelW))}" y="${baseOf(top + skelHeadLine(stat.value), stat.label)}">${esc(label)}</text>`);
       return;
     }
     // THE CHOSEN LINE OF A FEATURE'S BOXED ITEMS KEEPS ITS FRAME AND DRAWS A HEAVIER LINE INSIDE ITS EDGE (RULE.DEVEX.WORKSPACE.298), as
@@ -2744,8 +3500,8 @@ function skelDrawLeaf(it: SkeletonItem, kind: SkelKind, ix: number, iy: number, 
     else if (item.selected === true && !boxed)
       skelSay(findings, "`selected` marks the chosen item line of a `DSFeature` whose `items.surface` boxes its items, as the design system reads it only there, and this line stands in no box");
     else if (item.selected === true && boxed) {
-      const inner = boxed.rounded === false ? 0 : SKEL_ROUND - 2;
-      out.push(skelRect("sds-skel-control sds-skel-main", ix + 2, iy + 2, iw - 4, ih - 4, inner));
+      const inner: SkelCorner = boxed.rounded === false ? "none" : "inset";
+      out.push(skelRect("dl-ctl-on", ix + 2, iy + 2, iw - 4, ih - 4, inner));
     }
     const lineH = boxed ? skelItemH(it, h) : ih, lineX = boxed ? ix + SKEL_PAD : ix, lineW = boxed ? iw - SKEL_PAD * 2 : iw;
     const lineMid = boxed ? iy + SKEL_PAD + lineH / 2 : mid;
@@ -2782,7 +3538,7 @@ function skelDrawLeaf(it: SkeletonItem, kind: SkelKind, ix: number, iy: number, 
     // A NUMBERED ITEM'S NUMBER STANDS BEFORE ITS TITLE, quiet, at the title's size and weight (RULE.DEVEX.WORKSPACE.290).
     const number = skelItemNumber(it), step = skelItemStep(it);
     if (number !== undefined)
-      out.push(`  <text class="sds-note" x="${r2(wx)}" y="${Math.round(titleY)}" style="font-size:${step}px;font-weight:${step === SKEL_STEP_ITEM ? 500 : 600}">${number}</text>`);
+      out.push(`  <text class="dl-name" x="${r2(wx)}" y="${Math.round(titleY)}">${number}</text>`);
     out.push(skelStepText(item.title ?? "", step, wx + skelItemNumberW(it), titleY));
     // THE FACTS STAND ON ONE LINE, a dot between every two of them, a badge among them.
     const ownDescription = skelItemOwnDescription(it);
@@ -2800,11 +3556,11 @@ function skelDrawLeaf(it: SkeletonItem, kind: SkelKind, ix: number, iy: number, 
     const factsMid = inline ? titleY - 4 : (afterTitle ? 0 : below) + (badgeLine ? titleY + 5 + SKEL_PACK_GAP + SKEL_FACT_BADGE / 2 : titleY + SKEL_ITEM_LINE - 4);
     const descriptionY = afterTitle ? factsMid + factsBelow + (badgeLine ? SKEL_FACT_BADGE / 2 + 13 : 4 + SKEL_ITEM_LINE) : titleY + SKEL_ITEM_LINE;
     wrapped.description.forEach((line, k) =>
-      out.push(`  <text class="sds-note" x="${r2(wx)}" y="${Math.round(descriptionY + k * SKEL_ITEM_LINE)}">${esc(line)}</text>`));
+      out.push(`  <text class="dl-detail" x="${r2(wx)}" y="${Math.round(descriptionY + k * SKEL_ITEM_LINE)}">${esc(line)}</text>`));
     let fx = wx;
     if (inline) {
       fx += skelItemTitleW(it);
-      out.push(`  <text class="sds-note" x="${r2(fx + 6)}" y="${Math.round(factsMid + 4)}">${SKEL_FACT_DOT}</text>`);
+      out.push(`  <text class="dl-detail" x="${r2(fx + 6)}" y="${Math.round(factsMid + 4)}">${SKEL_FACT_DOT}</text>`);
       fx += SKEL_FACT_DOT_W;
     }
     wrapped.facts.forEach((line, k) =>
@@ -2817,7 +3573,7 @@ function skelDrawLeaf(it: SkeletonItem, kind: SkelKind, ix: number, iy: number, 
       // nothing round it says it can be pressed apart from the line.
       else if (partKind === "icon" && SKEL_END_ARROWS.includes(part.icon!)) {
         out.push(...skelGlyph(part.icon!, ex + h / 2, lineMid, Math.round(h / 2)));
-        if (part.text !== undefined) out.push(`  <text class="sds-code" x="${ex + h + SKEL_LABEL_GAP}" y="${Math.round(lineMid + 4)}">${esc(part.text)}</text>`);
+        if (part.text !== undefined) out.push(`  <text class="dl-detail" x="${ex + h + SKEL_LABEL_GAP}" y="${Math.round(lineMid + 4)}">${esc(part.text)}</text>`);
       } else skelDrawLeaf(part, partKind!, ex, lineMid - h / 2, pw, h, h, h, findings, out);
       ex += pw + SKEL_LABEL_GAP;
     }
@@ -2857,8 +3613,8 @@ function skelDrawLeaf(it: SkeletonItem, kind: SkelKind, ix: number, iy: number, 
     if (mediaBox) {
       const given = head.media!, cx = startOf(mediaBox) + mediaBox / 2, cy = iy + mediaBox / 2;
       // AN AVATAR WITH NO PICTURE SHOWS ITS INITIALS in a circle; a mark is a circle that holds its shape, as every mark is.
-      if (given.mtype === "AVATAR") out.push(`  <circle class="sds-skel-control" cx="${r2(cx)}" cy="${r2(cy)}" r="${r2(mediaBox / 2)}"/>`,
-        `  <text class="sds-note" x="${r2(cx)}" y="${Math.round(cy + 5)}" text-anchor="middle" style="font-size:${Math.round(mediaBox / 3)}px;font-weight:600">${esc(skelInitials(String(given.title ?? "")))}</text>`);
+      if (given.mtype === "AVATAR") out.push(`  <circle class="dl-ctl" cx="${r2(cx)}" cy="${r2(cy)}" r="${r2(mediaBox / 2)}"/>`,
+        `  <text class="dl-name" x="${r2(cx)}" y="${Math.round(cy + 5)}" text-anchor="middle">${esc(skelInitials(String(given.title ?? "")))}</text>`);
       else out.push(...skelIcon(given.icon ?? "default", cx, cy, mediaBox, true, undefined, mediaBox));
     }
     // A HEAD'S EYEBROW IS WORDS OR A BADGE (RULE.DEVEX.WORKSPACE.295): a badge stands as a badge among the facts does, packed above the title.
@@ -2872,7 +3628,7 @@ function skelDrawLeaf(it: SkeletonItem, kind: SkelKind, ix: number, iy: number, 
     for (const line of lines) {
       const lineBase = Math.round(iy + line.top + (skelHeadLine(line.size) + line.size * 0.7) / 2);
       if (line.part === "title") out.push(skelStepText(line.words, line.size, startOf(line.w), lineBase));
-      else out.push(`  <text class="sds-note" x="${r2(startOf(line.w))}" y="${lineBase}" style="font-size:${line.size}px${line.part === "eyebrow" ? ";letter-spacing:.08em;font-weight:600" : ""}">${esc(line.words)}</text>`);
+      else out.push(`  <text class="${line.part === "eyebrow" ? "dl-label" : line.part === "title" ? "dl-name" : "dl-detail"}" x="${r2(startOf(line.w))}" y="${lineBase}">${esc(line.words)}</text>`);
     }
     // THE FACTS STAND ON ONE LINE UNDER THE DESCRIPTION, as an item's `meta` stands under its title, and on the lines they wrap to where
     // they run past the column, each line centred by its own measure with `textAlign` `CENTER` (RULE.DEVEX.WORKSPACE.303).
@@ -2885,7 +3641,7 @@ function skelDrawLeaf(it: SkeletonItem, kind: SkelKind, ix: number, iy: number, 
     else if (!SKEL_ICONS.includes(it.icon!)) findings.push(`an icon is \`${it.icon}\`, and a skeleton draws ${SKEL_ICONS.join(" · ")}; \`default\` is drawn where none fits`);
     const mark = it.mark ?? it.on !== undefined;
     out.push(...skelIcon(it.icon!, ix + h / 2, mid, h, mark, it.on, mark && it.mark !== true ? h - SKEL_MARK_DROP : h));
-    if (it.text !== undefined) out.push(`  <text class="sds-code" x="${ix + h + SKEL_LABEL_GAP}" y="${baseline}">${esc(it.text)}</text>`);
+    if (it.text !== undefined) out.push(`  <text class="dl-detail" x="${ix + h + SKEL_LABEL_GAP}" y="${baseline}">${esc(it.text)}</text>`);
     return;
   }
   if (kind === "control") {
@@ -2893,15 +3649,15 @@ function skelDrawLeaf(it: SkeletonItem, kind: SkelKind, ix: number, iy: number, 
     if (!SKEL_CONTROLS.includes(it.control!)) findings.push(`a control is \`${it.control}\`, and a skeleton draws ${SKEL_CONTROLS.join(" · ")}`);
     if (it.tag !== undefined) findings.push(`a control carries no tag: \`${it.tag}\` names a component, a part or a slot, and a control is told by its sample value`);
     if (text.includes("\n")) findings.push("a control stands on one line, and its sample value runs over more");
-    const cls = "sds-skel-control" + (it.main ? " sds-skel-main" : "");
+    const cls = it.main ? "dl-ctl-on" : "dl-ctl";
     if (it.icon !== undefined && skelOwnWidth(it) && !SKEL_ICONS.includes(it.icon))
       findings.push(`an icon is \`${it.icon}\`, and a skeleton draws ${SKEL_ICONS.join(" · ")}; \`default\` is drawn where none fits`);
     if (it.control === "switch") {
       // ON OR OFF IS TOLD BY WHERE THE KNOB STANDS, and by its weight: at the end and solid when on, at the start and hollow when off.
       const trackH = h - SKEL_SWITCH_DROP, trackW = skelSwitchW(h), knob = trackH / 2 - 3;
-      out.push(skelRect("sds-skel-control", ix, mid - trackH / 2, trackW, trackH, trackH / 2));
-      out.push(`  <circle class="sds-skel-glyph${it.on ? " sds-skel-glyph-solid" : ""}" cx="${r2(it.on ? ix + trackW - trackH / 2 : ix + trackH / 2)}" cy="${r2(mid)}" r="${r2(knob)}"/>`);
-      if (text) out.push(`  <text class="sds-code" x="${ix + trackW + SKEL_LABEL_GAP}" y="${baseline}">${esc(text)}</text>`);
+      out.push(skelRect("dl-ctl", ix, mid - trackH / 2, trackW, trackH, "pill"));
+      out.push(`  <circle class="dl-glyph${it.on ? " dl-glyph-solid" : ""}" cx="${r2(it.on ? ix + trackW - trackH / 2 : ix + trackH / 2)}" cy="${r2(mid)}" r="${r2(knob)}"/>`);
+      if (text) out.push(`  <text class="dl-detail" x="${ix + trackW + SKEL_LABEL_GAP}" y="${baseline}">${esc(text)}</text>`);
       return;
     }
     if (it.control === "tabs") {
@@ -2931,22 +3687,22 @@ function skelDrawLeaf(it: SkeletonItem, kind: SkelKind, ix: number, iy: number, 
       if (pill) {
         // THE PILL: a muted rounded track with an outline holds the words, and the chosen one stands in a filled pill.
         const pillH = h - trackPad * 2, trackW = cut ? iw : iw + inset * 2;
-        out.push(skelRect("sds-skel-surface", ix, iy, trackW, h, h / 2));
-        out.push(skelRect("sds-skel-control", ix, iy, trackW, h, h / 2));
+        out.push(skelRect("dl-sk-surface", ix, iy, trackW, h, "pill"));
+        out.push(skelRect("dl-ctl", ix, iy, trackW, h, "pill"));
         let px = ix + inset;
         words.forEach((word, index) => {
           if (index === chosen && shows(px - pillPad, skelTabW(it, word) + pillPad * 2))
-            out.push(skelRect("sds-skel-control", px - pillPad, iy + trackPad, skelTabW(it, word) + pillPad * 2, pillH, pillH / 2));
+            out.push(skelRect("dl-ctl", px - pillPad, iy + trackPad, skelTabW(it, word) + pillPad * 2, pillH, "pill"));
           px += skelTabW(it, word) + SKEL_GAP;
         });
-      } else out.push(`  <path class="sds-skel-control" d="M${r2(ix)} ${r2(foot)} H${r2(ix + iw)}"/>`);
+      } else out.push(`  <path class="dl-ctl" d="M${r2(ix)} ${r2(foot)} H${r2(ix + iw)}"/>`);
       let tx = ix + inset;
       words.forEach((word, index) => {
         const tw = skelTabW(it, word);
         if (shows(tx, tw)) {
           if (it.icon !== undefined) out.push(...skelGlyph(it.icon, tx + SKEL_INLINE_ICON / 2, mid, SKEL_INLINE_ICON));
-          out.push(`  <text class="${index === chosen ? "sds-label" : "sds-code"}" x="${r2(tx + skelInlineIconW(it))}" y="${baseline}">${esc(word)}</text>`);
-          if (index === chosen && !pill) out.push(`  <path class="sds-skel-border" d="M${r2(tx)} ${r2(foot)} H${r2(tx + tw)}"/>`);
+          out.push(`  <text class="${index === chosen ? "dl-name" : "dl-detail"}" x="${r2(tx + skelInlineIconW(it))}" y="${baseline}">${esc(word)}</text>`);
+          if (index === chosen && !pill) out.push(`  <path class="dl-line-edge" d="M${r2(tx)} ${r2(foot)} H${r2(tx + tw)}"/>`);
         }
         tx += tw + SKEL_GAP;
       });
@@ -2958,30 +3714,30 @@ function skelDrawLeaf(it: SkeletonItem, kind: SkelKind, ix: number, iy: number, 
       if (!text) findings.push("a badge carries its word in `text`, and this one carries none");
       if (it.main) findings.push("a badge never takes the weight of a main action; leave `main` off a badge");
       const badgeH = h - SKEL_BADGE_DROP;
-      out.push(skelRect("sds-skel-control", ix, mid - badgeH / 2, iw, badgeH, badgeH / 2));
+      out.push(skelRect("dl-ctl", ix, mid - badgeH / 2, iw, badgeH, "badge"));
       if (it.icon !== undefined) out.push(...skelGlyph(it.icon, ix + SKEL_LABEL_GAP + SKEL_INLINE_ICON / 2, mid, SKEL_INLINE_ICON));
-      if (text) out.push(`  <text class="sds-code" x="${r2(ix + SKEL_LABEL_GAP + skelInlineIconW(it))}" y="${baseline}">${esc(text)}</text>`);
+      if (text) out.push(`  <text class="dl-detail" x="${r2(ix + SKEL_LABEL_GAP + skelInlineIconW(it))}" y="${baseline}">${esc(text)}</text>`);
       return;
     }
     if (it.control === "pager") {
       let px = ix;
       for (const part of skelPagerParts(it)) {
         const pw = skelPartW(part, h);
-        out.push(skelRect(cls, px, iy, pw, h));
+        out.push(skelRect(cls, px, iy, pw, h, "ctl"));
         if (part === "‹" || part === "›") out.push(...skelGlyph(part === "‹" ? "previous" : "next", px + pw / 2, mid, Math.round(h / 2)));
-        else out.push(`  <text class="sds-code" x="${r2(px + (pw - part.length * SKEL_W_LABEL) / 2)}" y="${baseline}">${esc(part)}</text>`);
+        else out.push(`  <text class="dl-detail" x="${r2(px + (pw - part.length * SKEL_W_LABEL) / 2)}" y="${baseline}">${esc(part)}</text>`);
         px += pw + SKEL_PACK_GAP;
       }
       return;
     }
     if (it.control === "checkbox") {
-      out.push(skelRect(cls, ix, iy, h, h));
+      out.push(skelRect(cls, ix, iy, h, h, "ctl"));
       out.push(...skelGlyph("checkbox", ix + h / 2, mid, Math.round(h / 2)));
-      if (text) out.push(`  <text class="sds-code" x="${ix + h + SKEL_LABEL_GAP}" y="${baseline}">${esc(text)}</text>`);
+      if (text) out.push(`  <text class="dl-detail" x="${ix + h + SKEL_LABEL_GAP}" y="${baseline}">${esc(text)}</text>`);
       return;
     }
-    out.push(skelRect(cls, ix, iy, iw, h));
-    if (text) out.push(`  <text class="sds-code" x="${ix + SKEL_PAD}" y="${baseline}">${esc(text)}</text>`);
+    out.push(skelRect(cls, ix, iy, iw, h, "ctl"));
+    if (text) out.push(`  <text class="dl-detail" x="${ix + SKEL_PAD}" y="${baseline}">${esc(text)}</text>`);
     if (it.control === "select") out.push(...skelGlyph("select", ix + iw - SKEL_PAD - 4, mid, Math.round(h / 2)));
     return;
   }
@@ -2989,7 +3745,7 @@ function skelDrawLeaf(it: SkeletonItem, kind: SkelKind, ix: number, iy: number, 
   const count = Math.max(1, it.lines ?? 3);
   const kindOf = it.standin ?? "rows";
   if (!SKEL_STANDINS.includes(kindOf)) findings.push(`a stand-in is \`${kindOf}\`, and a skeleton draws ${SKEL_STANDINS.join(" · ")}`);
-  const bar = (x: number, y: number, w: number, hh: number) => skelRect("sds-skel-bar", x, y, w, hh);
+  const bar = (x: number, y: number, w: number, hh: number) => skelRect("dl-bar", x, y, w, hh, "pill");
   if (kindOf === "table") {
     // A TABLE WITH SAMPLE VALUES: a head row of words, a line under it, and a few rows of cells. The room over is
     // shared by the columns that hold data; a column with an empty head holds the actions of a row and stands at the end.
@@ -3010,16 +3766,16 @@ function skelDrawLeaf(it: SkeletonItem, kind: SkelKind, ix: number, iy: number, 
     const headLine = headY + SKEL_TABLE_HEAD - 4, bandTop = it.flush ? it.edgeTop ?? iy : iy;
     // A FLUSH TABLE IN A PART THAT IS A UNIT reaches that part's boundary, which stands inside the outline.
     const reach = SKEL_PAD - (it.inPart ? SKEL_LABEL_GAP : 0);
-    if (it.flush) out.push(skelRect("sds-skel-surface", ix - reach, bandTop, iw + reach * 2, headLine - bandTop, 0));
+    if (it.flush) out.push(skelRect("dl-sk-surface", ix - reach, bandTop, iw + reach * 2, headLine - bandTop, "none"));
     columns.forEach((head, c) => { if (head) out.push(it.flush
-      ? `  <text class="sds-note" x="${r2(left[c])}" y="${Math.round((bandTop + headLine) / 2 + 4)}" style="letter-spacing:.06em;font-weight:600">${esc(head.toUpperCase())}</text>`
-      : `  <text class="sds-label" x="${r2(left[c])}" y="${Math.round(headY + 12)}">${esc(head)}</text>`); });
+      ? `  <text class="dl-label" x="${r2(left[c])}" y="${Math.round((bandTop + headLine) / 2 + 4)}">${esc(head.toUpperCase())}</text>`
+      : `  <text class="dl-name" x="${r2(left[c])}" y="${Math.round(headY + 12)}">${esc(head)}</text>`); });
     // A FLUSH TABLE REACHES THE OUTLINE OF ITS CONTAINER: the line under its head row and a line under each row
     // run from edge to edge, as a table does that is the whole of a container's content.
     const lineFrom = it.flush ? ix - reach : ix + SKEL_PAD, lineTo = it.flush ? ix + iw + reach : ix + iw - SKEL_PAD;
-    out.push(`  <path class="sds-skel-control" d="M${r2(lineFrom)} ${r2(headY + SKEL_TABLE_HEAD - 4)} H${r2(lineTo)}"/>`);
+    out.push(`  <path class="dl-ctl" d="M${r2(lineFrom)} ${r2(headY + SKEL_TABLE_HEAD - 4)} H${r2(lineTo)}"/>`);
     if (it.flush) for (let r = 1; r < rows.length; r++)
-      out.push(`  <path class="sds-skel-control" d="M${r2(lineFrom)} ${r2(headY + SKEL_TABLE_HEAD + r * skelTableRowH(h) - 2)} H${r2(lineTo)}"/>`);
+      out.push(`  <path class="dl-ctl" d="M${r2(lineFrom)} ${r2(headY + SKEL_TABLE_HEAD + r * skelTableRowH(h) - 2)} H${r2(lineTo)}"/>`);
     rows.forEach((row, r) => {
       if (!Array.isArray(row)) { findings.push("a row of a table is a list of cells, one for each column"); return; }
       if (row.length > columns.length) findings.push(`a row of a table holds ${row.length} cells, and the table has ${columns.length} columns`);
@@ -3040,7 +3796,7 @@ function skelDrawLeaf(it: SkeletonItem, kind: SkelKind, ix: number, iy: number, 
     const cardW = (iw - SKEL_GAP * (count - 1)) / count;
     for (let c = 0; c < count; c++) {
       const cx = ix + c * (cardW + SKEL_GAP);
-      out.push(skelRect("sds-skel-control", cx, iy, cardW, SKEL_CARD_H));
+      out.push(skelRect("dl-ctl", cx, iy, cardW, SKEL_CARD_H, "frame"));
       out.push(bar(cx + SKEL_PAD, iy + SKEL_PAD, (cardW - SKEL_PAD * 2) * 0.5, SKEL_HEAD_BAR));
       out.push(bar(cx + SKEL_PAD, iy + SKEL_PAD + SKEL_BAR_STEP + 4, cardW - SKEL_PAD * 2, SKEL_BAR));
       out.push(bar(cx + SKEL_PAD, iy + SKEL_PAD + SKEL_BAR_STEP * 2 + 4, (cardW - SKEL_PAD * 2) * 0.7, SKEL_BAR));
@@ -3058,12 +3814,12 @@ function skelDrawLeaf(it: SkeletonItem, kind: SkelKind, ix: number, iy: number, 
       // lighter in tone than its value, so it reads as the heading of the value and does not compete with it; the mark
       // of its help stands beside it, where the entered field's stands at the end of the line.
       out.push(it.read
-        ? `  <text class="sds-note" x="${r2(ix)}" y="${Math.round(iy + 13)}" style="font-size:${SKEL_STEP_ITEM}px;font-weight:600">${esc(it.label)}</text>`
-        : `  <text class="sds-title" x="${r2(ix)}" y="${Math.round(iy + 13)}" style="font-size:${SKEL_STEP_ITEM}px;font-weight:400">${esc(it.label)}</text>`);
+        ? `  <text class="dl-name" x="${r2(ix)}" y="${Math.round(iy + 13)}">${esc(it.label)}</text>`
+        : `  <text class="dl-detail" x="${r2(ix)}" y="${Math.round(iy + 13)}">${esc(it.label)}</text>`);
       if (it.info) {
         const cx = it.read ? ix + skelStepW(it.label, SKEL_STEP_ITEM) + SKEL_LABEL_GAP + 6 : ix + iw - 6;
-        out.push(`  <circle class="sds-skel-glyph" cx="${r2(cx)}" cy="${r2(iy + 9)}" r="6"/>`);
-        out.push(`  <text class="sds-note" x="${r2(cx)}" y="${r2(iy + 12.5)}" text-anchor="middle" style="font-size:9px;font-weight:600">i</text>`);
+        out.push(`  <circle class="dl-glyph" cx="${r2(cx)}" cy="${r2(iy + 9)}" r="6"/>`);
+        out.push(`  <text class="dl-label" x="${r2(cx)}" y="${r2(iy + 12.5)}" text-anchor="middle">I</text>`);
       }
     }
     if (it.read) {
@@ -3073,14 +3829,14 @@ function skelDrawLeaf(it: SkeletonItem, kind: SkelKind, ix: number, iy: number, 
       if (it.control === "badge") {
         const badge: SkeletonItem = { control: "badge", text };
         skelDrawLeaf(badge, "control", ix, valueMid - SKEL_FACT_CTL / 2, skelFixedWidth(badge, SKEL_FACT_CTL), SKEL_FACT_CTL, SKEL_FACT_CTL, SKEL_FACT_CTL, findings, out);
-      } else out.push(`  <text class="sds-title" x="${r2(ix)}" y="${Math.round(valueMid + 4)}" style="font-size:${SKEL_STEP_PART}px;font-weight:400">${esc(text)}</text>`);
+      } else out.push(`  <text class="dl-detail" x="${r2(ix)}" y="${Math.round(valueMid + 4)}">${esc(text)}</text>`);
       return;
     }
     const failed = it.error !== undefined;
-    out.push(failed ? skelRect("sds-skel-control", ix, top, iw, h).replace("/>", ` style="stroke:${SKEL_FAIL}"/>`) : skelRect("sds-skel-control", ix, top, iw, h));
-    if (it.text !== undefined) out.push(`  <text class="sds-code" x="${ix + SKEL_PAD}" y="${Math.round(top + h / 2 + 4)}">${esc(it.text)}</text>`);
+    out.push(skelRect(failed ? "dl-line-warn" : "dl-ctl", ix, top, iw, h, "ctl"));
+    if (it.text !== undefined) out.push(`  <text class="dl-detail" x="${ix + SKEL_PAD}" y="${Math.round(top + h / 2 + 4)}">${esc(it.text)}</text>`);
     if (it.control === "select") out.push(...skelGlyph("select", ix + iw - SKEL_PAD - 4, top + h / 2, Math.round(h / 2)));
-    if (below !== undefined) out.push(`  <text class="sds-note" x="${r2(ix)}" y="${Math.round(top + h + SKEL_PACK_GAP + 13)}"${failed ? ` style="fill:${SKEL_FAIL}"` : ""}>${esc(below)}</text>`);
+    if (below !== undefined) out.push(`  <text class="${failed ? "dl-detail dl-detail-warn" : "dl-detail"}" x="${r2(ix)}" y="${Math.round(top + h + SKEL_PACK_GAP + 13)}">${esc(below)}</text>`);
     return;
   }
   const heads = new Set(it.headings ?? []);
@@ -3172,17 +3928,17 @@ function skelDrawFrame(frame: SkeletonFrame, x: number, y: number, forcedW: numb
   // is belongs to the library's look, so every strength draws the same band.
   // A GRID SECTION'S `section` IS DRAWN AS A SECTION'S OWN FIELDS (RULE.DEVEX.WORKSPACE.293).
   const sectionLook = skelSectionLook(frame);
-  const band = sectionLook !== undefined && SKEL_SURFACE_COLORS.includes(sectionLook.color as string) && sectionLook.color !== "BASE" ? skelRect("sds-skel-surface", x, y, w, h, 0) : undefined;
+  const band = sectionLook !== undefined && SKEL_SURFACE_COLORS.includes(sectionLook.color as string) && sectionLook.color !== "BASE" ? skelRect("dl-sk-surface", x, y, w, h, "none") : undefined;
   if (band && !(root && !bare)) out.push(band);
   if (surface) {
     const headH = skelContainerHead(frame);
     // BY DEFAULT A CONTAINER FRAMES ITS CONTENT AND ITS FOOTER, NOT ITS HEADER: the container's extent is a dotted
     // outline, as a group's is, and the content and the footer stand in one thin rounded box under the header.
-    out.push(skelRect("sds-skel-guide", x, y, w, h));
-    if (rows.length && !skelCardsOnly(frame)) out.push(skelRect("sds-skel-control", x, y + skelContainerEdge(frame), w, h - skelContainerEdge(frame), SKEL_ROUND));
+    out.push(skelRect("dl-frame-line", x, y, w, h, skelSizeCorner(ctl)));
+    if (rows.length && !skelCardsOnly(frame)) out.push(skelRect("dl-ctl", x, y + skelContainerEdge(frame), w, h - skelContainerEdge(frame), skelSizeCorner(ctl)));
     const bandY = y + skelContainerBandTop(frame);
     if (frame.label) out.push(skelStepText(frame.label, SKEL_STEP_CONTAINER, x + SKEL_PAD, bandY + 23));
-    if (frame.label && frame.note) out.push(`  <text class="sds-note" x="${x + SKEL_PAD}" y="${bandY + 40}">${esc(frame.note)}</text>`);
+    if (frame.label && frame.note) out.push(`  <text class="dl-detail" x="${x + SKEL_PAD}" y="${bandY + 40}">${esc(frame.note)}</text>`);
     const actions = frame.actions ?? [];
     let ax = x + w - SKEL_PAD - (actions.reduce((t, a) => t + skelFixedWidth(a, ctl), 0) + SKEL_LABEL_GAP * Math.max(0, actions.length - 1));
     const actionsTop = bandY + (headH - SKEL_LABEL_GAP * 2 - ctl) / 2;
@@ -3196,22 +3952,22 @@ function skelDrawFrame(frame: SkeletonFrame, x: number, y: number, forcedW: numb
   // A ROOT FRAME THAT STANDS IN A LAYOUT'S CONTENT IS BARE: the content's line is its edge.
   // A FEATURE WHOSE `frames` HOLD THE WHOLE OF IT IS DRAWN IN ITS OWN FRAME, in place of its dotted boundary (RULE.DEVEX.WORKSPACE.286).
   const featureFrames = skelFeatureFrames(frame);
-  if (root && !bare) out.push(skelRect("sds-box", x, y, w, h), ...(band ? [band] : []));
-  else if (!bare && !isContainer && !surface) out.push(...(featureFrames.whole ? skelSurfaceMarks(skelSurfaceOf(frame), x, y, w, h) : skelMarks(frame.look, x, y, w, h)));
+  if (root && !bare) out.push(skelRect("dl-sk-window", x, y, w, h, "frame"), ...(band ? [band] : []));
+  else if (!bare && !isContainer && !surface) out.push(...(featureFrames.whole ? skelSurfaceMarks(skelSurfaceOf(frame), x, y, w, h) : skelMarks(frame.look, x, y, w, h, skelCardCorner(frame))));
   // A SECTION'S `inset` IS A SOLID LINE ALONG THE TOP AND THE BOTTOM EDGE OF ITS BOX, and none at its sides.
-  if (sectionLook?.inset === true) out.push(skelPath("sds-skel-border", [[[x, y], [x + w, y]], [[x, y + h], [x + w, y + h]]]));
+  if (sectionLook?.inset === true) out.push(skelPath("dl-line-edge", [[[x, y], [x + w, y]], [[x, y + h], [x + w, y + h]]]));
   const corner = skelCornerName(frame, frame.look === "container");
   const tagH = corner ? SKEL_TAG_H + SKEL_LABEL_GAP : 0;
-  if (corner) out.push(`  <text class="sds-note" x="${x + SKEL_LABEL_GAP}" y="${y + SKEL_LABEL_H + 4}">${esc(corner)}</text>`);
+  if (corner) out.push(`  <text class="dl-detail" x="${x + SKEL_LABEL_GAP}" y="${y + SKEL_LABEL_H + 4}">${esc(corner)}</text>`);
   // A CONTAINER'S UNIT IS NAMED AT THE CORNER OF ITS OUTLINE, over its header, quiet, on the line the book gives a name.
   if (frame.look === "container" && frame.unit !== undefined)
-    out.push(`  <text class="sds-note" x="${x + SKEL_LABEL_GAP}" y="${y + SKEL_LABEL_H + 4}">${esc(frame.unit)}</text>`);
+    out.push(`  <text class="dl-detail" x="${x + SKEL_LABEL_GAP}" y="${y + SKEL_LABEL_H + 4}">${esc(frame.unit)}</text>`);
   // A CARD MAY CARRY A MARK BEFORE ITS TITLE, for the kind of thing the card is about.
   const cardMark = frame.look === "card" && frame.media !== undefined ? SKEL_CARD_MARK + SKEL_LABEL_GAP : 0;
   if (cardMark) out.push(...skelIcon(frame.media!, x + SKEL_PAD + SKEL_CARD_MARK / 2, y + tagH + 21, SKEL_CARD_MARK, true, undefined, SKEL_CARD_MARK));
   if (frame.label && !surface) out.push(frame.look === "card" ? skelStepText(frame.label, SKEL_STEP_CARD, x + SKEL_PAD + cardMark, y + tagH + 26)
-    : `  <text class="sds-title" x="${x + SKEL_PAD}" y="${y + tagH + 26}">${esc(frame.label)}</text>`);
-  if (frame.label && frame.note && !surface) out.push(`  <text class="sds-code" x="${x + SKEL_PAD}" y="${y + tagH + 45}">${esc(frame.note)}</text>`);
+    : `  <text class="dl-name" x="${x + SKEL_PAD}" y="${y + tagH + 26}">${esc(frame.label)}</text>`);
+  if (frame.label && frame.note && !surface) out.push(`  <text class="dl-detail" x="${x + SKEL_PAD}" y="${y + tagH + 45}">${esc(frame.note)}</text>`);
   // A CARD'S ACTIONS STAND AT THE END OF ITS TITLE'S LINE, as a container's stand at the end of its header.
   if (frame.look === "card" && frame.actions?.length) {
     let cx = x + w - SKEL_PAD - (frame.actions.reduce((t, a) => t + skelFixedWidth(a, ctl), 0) + SKEL_LABEL_GAP * (frame.actions.length - 1));
@@ -3239,22 +3995,22 @@ function skelDrawFrame(frame: SkeletonFrame, x: number, y: number, forcedW: numb
     let top = y + skelHead(frame);
     heights.forEach((ph) => { tops.push(top); top += ph; });
     const listed = parts.map((p) => !!p.tag && Array.isArray(frame.frames) && frame.frames.includes(p.tag));
-    const radius = frame.rounded ? SKEL_ROUND : 0;
+    const radius: SkelCorner = frame.rounded ? skelSizeCorner(ctl) : "none";
     for (let i = 0; i < parts.length; i++) {
       if (!listed[i]) continue;
       let end = i;
       while (end + 1 < parts.length && listed[end + 1]) end++;
       const fy = tops[i], fh = tops[end] + heights[end] - fy;
-      if (frame.raised) out.push(skelRect("sds-skel-surface", x, fy, w, fh, radius));
+      if (frame.raised) out.push(skelRect("dl-sk-surface", x, fy, w, fh, radius));
       if (frame.bordered) {
-        out.push(skelRect("sds-skel-border", x, fy, w, fh, radius));
-        for (let d = i + 1; d <= end; d++) out.push(`  <path class="sds-skel-border" d="M${r2(x)} ${r2(tops[d])} H${r2(x + w)}"/>`);
+        out.push(skelRect("dl-line-edge", x, fy, w, fh, radius));
+        for (let d = i + 1; d <= end; d++) out.push(`  <path class="dl-line-edge" d="M${r2(x)} ${r2(tops[d])} H${r2(x + w)}"/>`);
       }
       i = end;
     }
     parts.forEach((part, i) => {
       // A PART WITH NO SOLID BORDER AROUND IT KEEPS ITS DOTTED BOUNDARY; a solid line already marks the others.
-      if (!(frame.bordered && listed[i])) out.push(skelRect("sds-skel-guide", x, tops[i], w, heights[i], 0));
+      if (!(frame.bordered && listed[i])) out.push(skelRect("dl-frame-line", x, tops[i], w, heights[i], "none"));
       skelDrawFrame(part, x, tops[i], w, findings, out, heights[i], named + (skelNamed(frame) ? 1 : 0), ctl, true);
     });
     return;
@@ -3295,12 +4051,12 @@ function skelDrawFrame(frame: SkeletonFrame, x: number, y: number, forcedW: numb
   rows.forEach((row, rowIndex) => {
     const rh = heights[rowIndex];
     if (row.marked && !(row.items ?? []).some((it) => it.frame))
-      out.push(skelRect("sds-skel-guide", itemsX, rowY - SKEL_GUIDE_OUT, w - SKEL_PAD - (itemsX - x), rh + SKEL_GUIDE_OUT * 2, 0));
+      out.push(skelRect("dl-frame-line", itemsX, rowY - SKEL_GUIDE_OUT, w - SKEL_PAD - (itemsX - x), rh + SKEL_GUIDE_OUT * 2, "none"));
     // THE CHOSEN LINE OF A LIST IS A BAND across the outline, from the line above it to the line under it.
     if (surface && row.chosen) {
       const bandTop = rowIndex === 0 ? y + skelContainerEdge(frame) : rowY - SKEL_GAP / 2;
       const bandEnd = rowIndex === rows.length - 1 ? y + h : rowY + rh + SKEL_GAP / 2;
-      out.push(skelRect("sds-skel-surface", x, bandTop, w, bandEnd - bandTop, 0));
+      out.push(skelRect("dl-sk-surface", x, bandTop, w, bandEnd - bandTop, "none"));
     }
     // A PART OF A CONTAINER'S CONTENT, AND ITS FOOTER, BEGIN UNDER A LINE across the outline. A line between two rows
     // of one part, as a list in a group draws, stays inside that part's boundary.
@@ -3308,9 +4064,9 @@ function skelDrawFrame(frame: SkeletonFrame, x: number, y: number, forcedW: numb
     // marked by its own boundary and takes no line, and the line between two rows of one list stays.
     if ((surface || frame.look === "card") && dividers.has(rowIndex)) {
       const inPart = row.within !== undefined && !row.lead ? SKEL_LABEL_GAP : 0;
-      if (!partStarts.has(rowIndex)) out.push(`  <path class="sds-skel-control" d="M${r2(x + inPart)} ${r2(rowY - SKEL_GAP / 2)} H${r2(x + w - inPart)}"/>`);
+      if (!partStarts.has(rowIndex)) out.push(`  <path class="dl-ctl" d="M${r2(x + inPart)} ${r2(rowY - SKEL_GAP / 2)} H${r2(x + w - inPart)}"/>`);
     }
-    if (row.label) out.push(`  <text class="sds-label" x="${x + SKEL_PAD}" y="${Math.round(rowY + rh / 2 + 4)}">${esc(row.label)}</text>`);
+    if (row.label) out.push(`  <text class="dl-name" x="${x + SKEL_PAD}" y="${Math.round(rowY + rh / 2 + 4)}">${esc(row.label)}</text>`);
     // A FLUSH TABLE IS TOLD WHERE THE EDGE ABOVE IT IS: the line under the header, or the outline, where it is the first
     // row, or the line over its part. Where a unit's name stands over it, the table begins under the name.
     const namedAbove = row.within !== undefined || (rowIndex === 0 && frame.unit !== undefined && !skelContainerHead(frame));
@@ -3325,8 +4081,8 @@ function skelDrawFrame(frame: SkeletonFrame, x: number, y: number, forcedW: numb
       while (end + 1 < rows.length && rows[end + 1].within === row.within && !rows[end + 1].lead) end++;
       const bottom = rowY + heights.slice(rowIndex, end + 1).reduce((t, v) => t + v, 0) + SKEL_GAP * (end - rowIndex);
       const card = skelLevel(row.within) === "card";
-      out.push(skelRect(card ? "sds-skel-control" : "sds-skel-guide", x + SKEL_LABEL_GAP, rowY - SKEL_LABEL_GAP, w - SKEL_LABEL_GAP * 2, bottom - rowY + SKEL_LABEL_GAP * 2, card ? SKEL_ROUND : 3));
-      out.push(`  <text class="sds-note" x="${x + SKEL_PAD}" y="${rowY + SKEL_LABEL_GAP}">${esc(row.within)}</text>`);
+      out.push(skelRect(card ? "dl-ctl" : "dl-frame-line", x + SKEL_LABEL_GAP, rowY - SKEL_LABEL_GAP, w - SKEL_LABEL_GAP * 2, bottom - rowY + SKEL_LABEL_GAP * 2, card ? "frame" : "mark"));
+      out.push(`  <text class="dl-detail" x="${x + SKEL_PAD}" y="${rowY + SKEL_LABEL_GAP}">${esc(row.within)}</text>`);
       if (named + (skelNamed(frame) ? 1 : 0) >= SKEL_NEST_MAX)
         findings.push(`the boundary \`${row.within}\` sits inside ${named + (skelNamed(frame) ? 1 : 0)} named boundaries, and a skeleton nests ${SKEL_NEST_MAX} at most; draw \`${row.within}\` as a skeleton of its own`);
     }
@@ -3364,15 +4120,15 @@ function skelDrawFrame(frame: SkeletonFrame, x: number, y: number, forcedW: numb
         let end = rowIndex;
         while (linedRows[end + 1] === true) end++;
         const bottom = rowY + heights.slice(rowIndex, end + 1).reduce((t, v) => t + v, 0) + SKEL_GAP * (end - rowIndex);
-        out.push(skelRect("sds-skel-control", itemsX - reach, rowY - reach, rowContentW + reach * 2, bottom - rowY + reach * 2, SKEL_ROUND));
+        out.push(skelRect("dl-ctl", itemsX - reach, rowY - reach, rowContentW + reach * 2, bottom - rowY + reach * 2, "frame"));
       }
-      if (before) out.push(`  <path class="sds-skel-control" d="M${r2(itemsX - reach)} ${r2(rowY - SKEL_GAP / 2)} H${r2(itemsX + rowContentW + reach)}"/>`);
+      if (before) out.push(`  <path class="dl-ctl" d="M${r2(itemsX - reach)} ${r2(rowY - SKEL_GAP / 2)} H${r2(itemsX + rowContentW + reach)}"/>`);
       if (lines.across) {
         let lx = startX;
         row.items.forEach((it, i) => {
           if (i < row.items.length - 1 && skelKind(it) !== "spacer") {
             const cx = lx + widths[i] + skelGapAfter(row, i) / 2;
-            out.push(`  <path class="sds-skel-control" d="M${r2(cx)} ${r2(rowY - (before || edge ? SKEL_GAP / 2 : 0))} V${r2(rowY + rh + (after || edge ? SKEL_GAP / 2 : 0))}"/>`);
+            out.push(`  <path class="dl-ctl" d="M${r2(cx)} ${r2(rowY - (before || edge ? SKEL_GAP / 2 : 0))} V${r2(rowY + rh + (after || edge ? SKEL_GAP / 2 : 0))}"/>`);
           }
           lx += widths[i] + skelGapAfter(row, i);
         });
@@ -3788,10 +4544,10 @@ function skelNavColumn(nav: SkeletonLayout["navigation"], nx: number, ny: number
   for (let i = 0; i < count; i++) {
     const top = ny + i * SKEL_NAV_STEP;
     const isChosen = words.length > 0 && words[i] === nav?.chosen;
-    if (isChosen) out.push(skelRect("sds-skel-surface", nx + 6, top, nw - 12, 24, 4));
-    if (!open) out.push(skelRect("sds-skel-bar", nx + nw / 2 - 6, top + 6, 12, 12, 3));
-    else if (!words.length) out.push(skelRect("sds-skel-bar", nx + 14, top + 9, 60, SKEL_BAR, 3));
-    else out.push(`  <text class="${isChosen ? "sds-title" : "sds-label"}" x="${r2(nx + 14)}" y="${r2(top + 16)}">${esc(words[i])}</text>`);
+    if (isChosen) out.push(skelRect("dl-sk-surface", nx + 6, top, nw - 12, 24, "ctl"));
+    if (!open) out.push(skelRect("dl-bar", nx + nw / 2 - 6, top + 6, 12, 12, "mark"));
+    else if (!words.length) out.push(skelRect("dl-bar", nx + 14, top + 9, 60, SKEL_BAR, "pill"));
+    else out.push(`  <text class="${isChosen ? "dl-name" : "dl-name"}" x="${r2(nx + 14)}" y="${r2(top + 16)}">${esc(words[i])}</text>`);
   }
 }
 /** The height a column of entries asks for: its head, its entries, and its foot. */
@@ -3799,7 +4555,7 @@ const skelNavNeed = (nav: SkeletonLayout["navigation"]) =>
   SKEL_LAYOUT_BAR + (Array.isArray(nav?.nav) && nav!.nav!.length ? nav!.nav!.length : 4) * SKEL_NAV_STEP + SKEL_LAYOUT_BAR;
 /** The app's tile and its name at the head of a navigation; a sketch names no app, so the name is a bar. */
 const skelAppHead = (ax: number, cy: number, named: boolean): string[] => [
-  skelRect("sds-skel-bar", ax, cy - 7, 14, 14, 3), ...(named ? [skelRect("sds-skel-bar", ax + 20, cy - SKEL_BAR / 2, 60, SKEL_BAR, 3)] : []),
+  skelRect("dl-bar", ax, cy - 7, 14, 14, "mark"), ...(named ? [skelRect("dl-bar", ax + 20, cy - SKEL_BAR / 2, 60, SKEL_BAR, "pill")] : []),
 ];
 
 /**
@@ -3864,24 +4620,24 @@ function skelDrawWindow(view: SkeletonView, layout: SkeletonLayout | undefined, 
       ? `the \`${skelViewName(view)}\` view needs ${needs} across, and its class stands at ${W}; an arrangement that does not fit its screen is stacked, or drawn with fewer parts in a row`
       : `the \`${skelViewName(view)}\` view needs ${needs} across, and its content in a \`${type}\` with a \`${width}\` body stands at ${r2(innerW)}; an arrangement that does not fit is stacked, or drawn in a wider body`);
 
-  out.push(skelRect("sds-box", x, y, W, H));
+  out.push(skelRect("dl-sk-window", x, y, W, H, "frame"));
   // THE NAVIGATION, a surface at its edge.
   if (type !== undefined && type !== "CANVAS") {
     if (phone) {
-      out.push(skelRect("sds-skel-surface", x, y, W, bar, 0));
+      out.push(skelRect("dl-sk-surface", x, y, W, bar, "none"));
       out.push(...skelIcon("menu", x + 8 + SKEL_DEFAULT_H / 2, y + bar / 2, SKEL_DEFAULT_H, false));
       out.push(...skelAppHead(x + 16 + SKEL_DEFAULT_H, y + bar / 2, true));
       out.push(...skelIcon("person", x + W - 16 - 12, y + bar / 2, 24, true, undefined, 24));
     } else if (type === "TOPNAV") {
       const barX = x + inset(navAt), barW = W - inset(navAt) * 2, barY = y + inset(navAt);
-      out.push(skelRect("sds-skel-surface", barX, barY, barW, bar, navAt ? 0 : SKEL_ROUND));
+      out.push(skelRect("dl-sk-surface", barX, barY, barW, bar, navAt ? "none" : "frame"));
       const boxX = Math.max(x + (W - boxW) / 2, barX);
       out.push(...skelAppHead(boxX + 16, barY + bar / 2, true));
       const words = Array.isArray(nav?.nav) ? nav!.nav!.map(String) : [];
       let wx = boxX + 16 + 80 + SKEL_GAP;
       words.forEach((word, i) => {
-        if (word === nav?.chosen) out.push(skelRect("sds-skel-surface", wx - 8, barY + 12, skelWordW(word) + 16, 24, 4));
-        out.push(`  <text class="${word === nav?.chosen ? "sds-title" : "sds-label"}" x="${r2(wx)}" y="${r2(barY + bar / 2 + 4)}">${esc(word)}</text>`);
+        if (word === nav?.chosen) out.push(skelRect("dl-sk-surface", wx - 8, barY + 12, skelWordW(word) + 16, 24, "ctl"));
+        out.push(`  <text class="${word === nav?.chosen ? "dl-name" : "dl-name"}" x="${r2(wx)}" y="${r2(barY + bar / 2 + 4)}">${esc(word)}</text>`);
         wx += skelWordW(word) + SKEL_GAP;
       });
       out.push(...skelIcon("person", Math.min(boxX + boxW, barX + barW) - 16 - 12, barY + bar / 2, 24, true, undefined, 24));
@@ -3889,14 +4645,14 @@ function skelDrawWindow(view: SkeletonView, layout: SkeletonLayout | undefined, 
       // A RAIL RUNS THE WINDOW'S HEIGHT; A DOCK'S COLUMN STANDS INSIDE THE CONTENT, AT ITS LEFT.
       const nx = type === "RAIL" ? x + inset(navAt) : contentX + inset(navAt), ny = (type === "RAIL" ? y : contentTop) + inset(navAt);
       const nh = (type === "RAIL" ? H : contentH) - inset(navAt) * 2;
-      out.push(skelRect("sds-skel-surface", nx, ny, side, nh, navAt ? 0 : SKEL_ROUND));
+      out.push(skelRect("dl-sk-surface", nx, ny, side, nh, navAt ? "none" : "frame"));
       out.push(...skelAppHead(navOpen ? nx + 14 : nx + side / 2 - 7, ny + SKEL_LAYOUT_BAR / 2, navOpen));
       skelNavColumn(nav, nx, ny + SKEL_LAYOUT_BAR, side, navOpen, out);
       out.push(...skelIcon("person", navOpen ? nx + 14 + 12 : nx + side / 2, ny + nh - SKEL_LAYOUT_BAR / 2, 24, true, undefined, 24));
     }
   }
   // THE CONTENT, a solid line round its box: square where it is attached, rounded where it stands in.
-  if (type !== undefined) out.push(skelRect("sds-skel-border", contentX, contentTop, contentW, contentH, contentAt ? 0 : SKEL_ROUND));
+  if (type !== undefined) out.push(skelRect("dl-line-edge", contentX, contentTop, contentW, contentH, contentAt ? "none" : "frame"));
   if (pageFrame) skelDrawFrame(pageFrame, innerX, contentTop, undefined, findings, out, undefined, 0, SKEL_DEFAULT_H, true, innerW);
   skelDrawFrame(frame, innerX, contentTop + pageH, undefined, findings, out, undefined, 0, SKEL_DEFAULT_H, true, innerW);
   return H;
@@ -3935,14 +4691,14 @@ function skelDrawViews(views: SkeletonView[], layout: SkeletonLayout | undefined
   }
   const stateAt = (view: SkeletonView) => (view.state === undefined ? -1 : SKEL_TASK_STATES.indexOf(view.state));
   drawn.sort((one, other) => classes.indexOf(one.viewport) - classes.indexOf(other.viewport) || stateAt(one) - stateAt(other));
-  const left = 24;
-  let x = left, y = 24, lineH = 0;
+  const left = FRAME_PAD;
+  let x = left, y = FRAME_PAD, lineH = 0;
   for (const view of drawn) {
     const stands = SKEL_VIEW_W[view.viewport];
     // IN A LAYOUT, OR UNDER A PAGE LEVEL, THE WINDOW STANDS AT ITS CLASS'S WIDTH and what it holds is measured against its content.
     if (layout !== undefined || view.page !== undefined) {
       if (x > left && x + stands > left + SKEL_CANVAS) { x = left; y += lineH + SKEL_GAP; lineH = 0; }
-      out.push(`  <text class="sds-note" x="${x}" y="${y + SKEL_LABEL_H}">${esc(skelViewName(view))}</text>`);
+      out.push(`  <text class="dl-detail" x="${x}" y="${y + SKEL_LABEL_H}">${esc(skelViewName(view))}</text>`);
       lineH = Math.max(lineH, SKEL_TAG_H + skelDrawWindow(view, layout, x, y + SKEL_TAG_H, findings, out));
       x += stands + SKEL_GAP;
       continue;
@@ -3952,7 +4708,7 @@ function skelDrawViews(views: SkeletonView[], layout: SkeletonLayout | undefined
       findings.push(`the \`${skelViewName(view)}\` view needs ${needs} across, and its class stands at ${stands}; an arrangement that does not fit its screen is stacked, or drawn with fewer parts in a row`);
     const w = Math.max(stands, needs);
     if (x > left && x + w > left + SKEL_CANVAS) { x = left; y += lineH + SKEL_GAP; lineH = 0; }
-    out.push(`  <text class="sds-note" x="${x}" y="${y + SKEL_LABEL_H}">${esc(skelViewName(view))}</text>`);
+    out.push(`  <text class="dl-detail" x="${x}" y="${y + SKEL_LABEL_H}">${esc(skelViewName(view))}</text>`);
     skelDrawFrame(view.frame, x, y + SKEL_TAG_H, undefined, findings, out, undefined, 0, SKEL_DEFAULT_H, false, stands);
     lineH = Math.max(lineH, SKEL_TAG_H + skelFrameHeight(view.frame, SKEL_DEFAULT_H));
     x += w + SKEL_GAP;
@@ -3979,6 +4735,34 @@ function skelChosenFindings(views: SkeletonView[], layout: SkeletonLayout | unde
 /** A `skeleton` with neither `frame` nor `views` draws nothing: it is one outer frame, or one for each
  *  screen class, and there is no other claim this kind can make. The spec is read from a copy, since the
  *  drawer writes its own marks on what it reads. */
+/**
+ * A ROW OF PANELS THAT CANNOT STAND ACROSS THE FRAME IS WRAPPED, by the drawer and not by the spec: the book's spec says one row, and where
+ * its panels need more than the desktop's 896 the drawer lays them in as many rows as they need, each row the same number of panels (four
+ * across that do not fit are two rows of two). A row that fits, or holds anything but panels, or carries a label of its own, is left as written.
+ */
+function skelWrapRows(frame: SkeletonFrame | undefined, inherited = SKEL_DEFAULT_H): void {
+  if (!frame || typeof frame !== "object") return;
+  const ctl = skelSizeH(frame, inherited);
+  const plain = frame.look !== "container" && frame.look !== "card" && frame.unit === undefined && Array.isArray(frame.rows);
+  if (plain) {
+    const room = SKEL_CANVAS - skelInset(frame) * 2 - (skelLabelCol(frame) ? skelLabelCol(frame) + SKEL_GAP : 0);
+    const next: SkeletonRow[] = [];
+    for (const row of frame.rows!) {
+      const items = Array.isArray(row?.items) ? row.items : [];
+      const panels = items.length > 1 && items.every((it) => it && typeof it === "object" && skelKind(it) === "frame" && it.frame!.unit === undefined) && !row.label && !row.framed && !row.within;
+      if (!panels || skelRowMinWidth(row, ctl) <= room) { next.push(row); continue; }
+      let per = items.length;
+      while (per > 1 && skelRowMinWidth({ ...row, items: items.slice(0, per) }, ctl) > room) per--;
+      const rowsN = Math.ceil(items.length / per);
+      per = Math.ceil(items.length / rowsN);
+      for (let i = 0; i < items.length; i += per) next.push({ ...row, items: items.slice(i, i + per) });
+    }
+    // in place: the drawer keeps what it knows of a frame against its rows array
+    if (next.length !== frame.rows!.length) frame.rows!.splice(0, frame.rows!.length, ...next);
+  }
+  for (const row of skelRows(frame)) for (const it of row?.items ?? []) if (it && typeof it === "object" && it.frame) skelWrapRows(it.frame, ctl);
+}
+
 function drawSkeleton(given: Spec): { svg: string; findings: string[] } {
   const findings: string[] = [];
   const out: string[] = [];
@@ -3990,6 +4774,8 @@ function drawSkeleton(given: Spec): { svg: string; findings: string[] } {
   if (Array.isArray(spec.views)) for (const view of spec.views) skelUnits(view?.frame, findings);
   skelLooks(spec.frame, findings);
   if (Array.isArray(spec.views)) for (const view of spec.views) skelLooks(view?.frame, findings, undefined, undefined, undefined, view?.viewport);
+  skelWrapRows(spec.frame);
+  if (Array.isArray(spec.views)) for (const view of spec.views) skelWrapRows(view?.frame);
   let layout: SkeletonLayout | undefined;
   if (spec.layout !== undefined) {
     if (spec.views === undefined) findings.push("`layout` is the layout the views stand in, so a spec with a `layout` holds `views`; give the frame a `viewport`");
@@ -4001,13 +4787,13 @@ function drawSkeleton(given: Spec): { svg: string; findings: string[] } {
     if (!Array.isArray(spec.views) || !spec.views.length) return { svg: "", findings: [...findings, "a `skeleton` figure whose `views` holds no view; give each view a `viewport` and a `frame`"] };
     skelChosenFindings(spec.views, layout, findings);
   } else if (!spec.frame) return { svg: "", findings: [...findings, "a `skeleton` figure with no `frame` and no `views`; a skeleton is one outer frame, or one for each screen class"] };
-  const paint = (said: string[], into: string[]) => views ? skelDrawViews(spec.views!, layout, said, into) : skelDrawFrame(spec.frame!, 24, 24, undefined, said, into);
+  const paint = (said: string[], into: string[]) => views ? skelDrawViews(spec.views!, layout, said, into) : skelDrawFrame(spec.frame!, FRAME_PAD, FRAME_PAD, undefined, said, into);
   // A HEAD WRAPS TO THE WIDTH ITS ROW GIVES IT, and so do an item line's words and a note (RULE.DEVEX.WORKSPACE.303), so a spec that holds
   // one is first drawn to learn each width, and that drawing and what it found are put aside. A spec with none is drawn once.
   if (skelHasHead(spec) || skelHasOptions(spec) || skelHasWords(spec)) paint([...findings], []);
   paint(findings, out);
   if (views && !out.length) return { svg: "", findings };
-  return { svg: svgOf(out, spec.title ?? spec.caption ?? "skeleton", "sds-skeleton"), findings };
+  return { svg: svgOf(out, spec.title ?? spec.caption ?? "skeleton", "dl-skeleton"), findings };
 }
 
 const DRAWERS: Record<string, (s: Spec) => { svg: string; findings: string[] }> = {
@@ -4015,7 +4801,22 @@ const DRAWERS: Record<string, (s: Spec) => { svg: string; findings: string[] }> 
   chain: drawChain,
   flowchart: drawFlowchart,
   sequence: drawSequence,
-  system: drawSystem,
+  // A SYSTEM IS 928 WIDE AT MOST, 1:1, 16 from the frame's edge, and clean for the figure check. The bus stands 28 from its tile; where that leaves the
+  // figure wider (a rail carries a label on the run into the bus) or the check finds fault, the bus is brought nearer (24, 20, 16), and failing those the
+  // figure has no bus and its wires keep their own runs. The edge is never tightened.
+  system: (spec: Spec) => {
+    const widthOfSvg = (svg: string) => Number(svg.match(/viewBox="[-\d.]+ [-\d.]+ ([\d.]+)/)?.[1] ?? FRAME_W);
+    const first = drawSystem(spec);
+    let fits: ReturnType<typeof drawSystem> | null = null;
+    // the detail of a thing outside wraps at 16 characters where the column allows, then at 14 and 12
+    for (const bus of SYS_BUSES) for (const note of [16, 14, 12]) {
+      const r = note === 16 && bus === SYS_BUS_AT ? first : drawSystem(spec, undefined, bus, note);
+      if (!r.svg || widthOfSvg(r.svg) > FRAME_W) continue;
+      if (checkFigures(r.svg).length === 0) return r;
+      fits ??= r;
+    }
+    return fits ?? first;
+  },
   map: drawMap,
   skeleton: drawSkeleton,
 };
@@ -4037,11 +4838,59 @@ const RETIRED: Record<string, string> = {
 
 export const KINDS = Object.keys(DRAWERS);
 
+const MOTIONS = ["draw-once", "pulse", "focus-steps"];
+const MOTION_KINDS: Record<string, string[]> = {
+  "draw-once": ["flowchart", "system", "entities", "map", "chain"],
+  pulse: ["sequence", "flowchart", "system", "map", "chain"],
+  "focus-steps": ["map", "chain"],
+};
+/** While a figure that steps is drawn, each unit is numbered in the order it is drawn. */
+let STEP: number | null = null;
 export function draw(spec: Spec): { svg: string; findings: string[] } {
   const kind = (spec.kind ?? "").toLowerCase();
   if (RETIRED[kind]) return { svg: "", findings: [RETIRED[kind]] };
   const drawer = DRAWERS[kind];
   if (!drawer)
     return { svg: "", findings: [`no helper draws a \`${spec.kind}\` figure. The helpers are ${KINDS.join(" · ")}; author this one as SVG in an HTML block in the seat file and it is used verbatim (05-artifacts.md, The figures)`] };
-  return drawer(spec);
+  STEP = spec.motion === "focus-steps" ? 0 : null;
+  let drawn: { svg: string; findings: string[] };
+  try { drawn = drawer(spec); } finally { /* the count ends with the drawing */ }
+  const stepsDrawn = STEP ?? 0; STEP = null;
+  void stepsDrawn;
+  // A figure that moves says so in its spec (`motion`), and the page's script starts it once 30% of it is in view. The language's Motion table says
+  // which kinds may take which: a motion on a kind the table does not allow is a finding.
+  if (drawn.svg && spec.motion) {
+    if (!MOTIONS.includes(spec.motion as string)) return { svg: drawn.svg, findings: [...drawn.findings, `\`motion\` is \`${String(spec.motion)}\`, and a figure moves by \`draw-once\`, \`pulse\` or \`focus-steps\`, or not at all`] };
+    if (!MOTION_KINDS[spec.motion].includes(kind)) return { svg: drawn.svg, findings: [...drawn.findings, `\`motion\` \`${spec.motion}\` is for ${MOTION_KINDS[spec.motion].join(", ")} figures; a \`${kind}\` figure stays still`] };
+    let svg = drawn.svg.replace(/^<svg class="dl-svg/, `<svg data-motion="${spec.motion}" class="dl-svg`);
+    // a pulse follows the wires in the order they were drawn
+    if (spec.motion === "pulse" && !/data-dl-flow=/.test(svg)) { let i = 0; svg = svg.replace(/<path class="dl-wire/g, () => `<path data-dl-flow="${++i}" class="dl-wire`); }
+    return { svg, findings: drawn.findings };
+  }
+  return drawn;
+}
+
+/**
+ * THE FIGURE AS A PAGE HOLDS IT: a `dl-figure` of one frame that holds the drawing and the caption the spec gave. The case line (kind,
+ * frame, the text sizes, motion, people) is a reviewer's note and belongs to an arc's preview or sample, so it is written only when asked
+ * for (`caseLine`); a published page and a template as it ships carry none. The language draws no card, no fill and no
+ * border of its own, so the frame is the page's own surface; the page's script gives a figure narrower than its frame the small
+ * expand mark and the full view (the language's "Media size").
+ */
+export function figureOf(spec: Spec, svg: string, caption = "", opts: { caseLine?: boolean } = {}): string {
+  const kind = (spec.kind ?? "").toLowerCase();
+  const wide = Number(svg.match(/viewBox="[-\d.]+ [-\d.]+ ([\d.]+)/)?.[1] ?? FRAME_W);
+  const frame = wide > FRAME_W ? `${wide}, scaled to the column` : String(FRAME_W);
+  const kindName = kind ? kind[0].toUpperCase() + kind.slice(1) : "Figure";
+  const steps = spec.motion === "focus-steps" && /data-dl-step=/.test(svg);
+  return [
+    `<figure class="dl-figure"${steps ? " data-dl-stepped" : ""}>`,
+    `<div class="dl-frame">`,
+    svg,
+    `</div>`,
+    ...(steps ? [`<div class="dl-steps"><button type="button" data-dl-prev>Back</button><button type="button" data-dl-next>Next</button><span data-dl-at></span></div>`] : []),
+    ...(caption ? [`<figcaption>${caption}</figcaption>`] : []),
+    ...(!opts.caseLine ? [] : [`<p class="dl-case"><b>${kindName}</b> &middot; frame ${frame} &middot; labels 12 / 10 / 9.5 px &middot; ${spec.motion === "draw-once" ? "draws once" : spec.motion === "pulse" ? "pulses" : spec.motion === "focus-steps" ? "steps with Next and Back" : "still"} &middot; people: none</p>`]),
+    `</figure>`,
+  ].join("\n");
 }

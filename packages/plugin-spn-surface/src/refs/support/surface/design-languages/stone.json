@@ -26,5 +26,60 @@
     "diagram": "flat, thin line, one accent",
     "mediaBackdrop": { "type": "GLOW", "moving": false }
   },
-  "density": "calm: one claim a section, lines of about sixty characters"
+  "density": "calm: one claim a section, lines of about sixty characters",
+  "looks": {
+    "app": {
+      "mode": "DARK",
+      "size": "MD",
+      "motionSpeed": "DEFAULT",
+      "radius": "MEDIUM"
+    },
+    "layout": {
+      "body": {
+        "color": "BASE",
+        "strength": "SUBTLE",
+        "width": "WIDE"
+      },
+      "navigation": {
+        "color": "BASE",
+        "strength": "SUBTLE",
+        "opacity": "OPAQUE",
+        "entry": "LINE",
+        "bordered": true,
+        "raised": false,
+        "elevation": "SM",
+        "attached": true,
+        "sticky": true
+      },
+      "content": {
+        "color": "BASE",
+        "strength": "SUBTLE",
+        "bordered": false,
+        "raised": false,
+        "attached": true
+      }
+    },
+    "container": {
+      "panel": {
+        "frames": [
+          "CONTENT",
+          "FOOTER"
+        ]
+      }
+    },
+    "component": {
+      "card": {
+        "color": "BASE",
+        "strength": "SUBTLE",
+        "raised": false,
+        "elevation": "SM",
+        "bordered": true,
+        "rounded": true
+      },
+      "table": {
+        "striped": false,
+        "hoverable": true
+      }
+    }
+  }
 }
