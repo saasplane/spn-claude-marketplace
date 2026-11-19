@@ -4,7 +4,7 @@
 {"id":"provider-set","variant":"construct","title":"Providers","subtitle":"Everything that changes with a stack or a cloud lives in one folder, and nowhere else.","lenses":["ARCHITECT","LEAD"],"status":"PLANNING","dependsOn":["plugin-set","skill-set","ref-set","checks"],"summary":"A provider is one folder per instance — one stack, or one cloud — holding everything about that instance that varies, inside a plugin that otherwise stays the same for every one of them.","keywords":["provider","instance","stack","cloud","gate","plugin","extension"]}
 -->
 <!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
-<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.css" integrity="sha384-EFi+bm+soztQp3Bg2oQPRtdkdyGkD/O1qSDL0QCFBIHQg2sNtFhUHlkwxArFA8dY" crossorigin="anonymous">
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.15.0/sds-docs.css" integrity="sha384-R47poopLRnz65naDQiMbuRZgxiTZtsgOLsiaP10qjWo62gNyH4ezyJy2v/TyMG5J" crossorigin="anonymous">
 <div class="sds-page">
 
 <nav class="sds-rail" id="rail">
@@ -47,34 +47,35 @@
 <section id="s2">
   <div class="sds-section-head"><h2>Model</h2></div>
   <p><strong>A provider mirrors the plugin's own folder names.</strong> A plugin holds <code>skills/</code> and <code>scripts/</code>; a provider contributes to both under the same two names. That is the whole of the shape, and it is why plugging one in needs no explanation: the folders a contributor must fill are the ones they have already read.</p>
-  <figure>
-  <svg class="sds-drawing" viewBox="423 22 254 428" style="max-width:254px" role="img" aria-label="The gate never spells an instance, so the arrow into a provider folder is resolved rather than typed.">
-    <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
-    <rect class="sds-box" x="425" y="24" width="250" height="76" rx="3"/>
-    <text class="sds-label" x="441" y="50">sprepo.json</text>
-    <text class="sds-note" x="441" y="69">the repository's own claim — the</text>
-    <text class="sds-note" x="441" y="88">stack, or the cloud</text>
-    <path class="sds-connector" d="M550 100 V140" marker-end="url(#ar)"/>
-    <text class="sds-note" x="560" y="124">read by</text>
-    <rect class="sds-box" x="425" y="140" width="250" height="76" rx="3"/>
-    <text class="sds-label" x="441" y="166">the gate</text>
-    <text class="sds-note" x="441" y="185">a skill or a check that states no</text>
-    <text class="sds-note" x="441" y="204">rule about any instance</text>
-    <path class="sds-connector" d="M550 216 V256" marker-end="url(#ar)"/>
-    <text class="sds-note" x="560" y="240">dispatches into</text>
-    <rect class="sds-box" x="425" y="256" width="250" height="76" rx="3"/>
-    <text class="sds-label" x="441" y="282">providers/&lt;instance&gt;/</text>
-    <text class="sds-note" x="441" y="301">the skills half, the scripts half,</text>
-    <text class="sds-note" x="441" y="320">or only one of them</text>
-    <path class="sds-connector" d="M550 332 V372" marker-end="url(#ar)"/>
-    <text class="sds-note" x="560" y="356">produces</text>
-    <rect class="sds-box" x="425" y="372" width="250" height="76" rx="3"/>
-    <text class="sds-label" x="441" y="398">the answer</text>
-    <text class="sds-note" x="441" y="417">the steps a skill loads, or the</text>
-    <text class="sds-note" x="441" y="436">verdict a check returns</text>
-  </svg>
-    <figcaption>The gate never spells an instance, so the arrow into a provider folder is resolved rather than typed.</figcaption>
-  </figure>
+<figure class="dl-figure">
+<div class="dl-frame">
+<svg class="dl-svg" viewBox="0 0 928 408" role="img" aria-label="The gate never spells an instance, so the arrow into a provider folder is resolved rather than typed.">
+  <rect class="dl-tile" x="336" y="16" width="260" height="64" rx="10"/>
+  <text class="dl-name" x="348" y="37">sprepo.json</text>
+  <text class="dl-detail" x="348" y="52">the repository's own claim — the stack,</text>
+  <text class="dl-detail" x="348" y="67">or the cloud</text>
+  <path class="dl-wire" d="M466 80 L466 120"/>
+  <text class="dl-wlabel" x="478" y="104">read by</text>
+  <rect class="dl-tile" x="336" y="120" width="260" height="64" rx="10"/>
+  <text class="dl-name" x="348" y="141">the gate</text>
+  <text class="dl-detail" x="348" y="156">a skill or a check that states no rule</text>
+  <text class="dl-detail" x="348" y="171">about any instance</text>
+  <path class="dl-wire" d="M466 184 L466 224"/>
+  <text class="dl-wlabel" x="478" y="208">dispatches into</text>
+  <rect class="dl-tile" x="336" y="224" width="260" height="64" rx="10"/>
+  <text class="dl-name" x="348" y="245">providers/&lt;instance&gt;/</text>
+  <text class="dl-detail" x="348" y="260">the skills half, the scripts half, or</text>
+  <text class="dl-detail" x="348" y="275">only one of them</text>
+  <path class="dl-wire" d="M466 288 L466 328"/>
+  <text class="dl-wlabel" x="478" y="312">produces</text>
+  <rect class="dl-tile" x="336" y="328" width="260" height="64" rx="10"/>
+  <text class="dl-name" x="348" y="349">the answer</text>
+  <text class="dl-detail" x="348" y="364">the steps a skill loads, or the verdict</text>
+  <text class="dl-detail" x="348" y="379">a check returns</text>
+</svg>
+</div>
+<figcaption>The gate never spells an instance, so the arrow into a provider folder is resolved rather than typed.</figcaption>
+</figure>
   <!-- dg:source
 { "kind": "map",
   "caption": "The gate never spells an instance, so the arrow into a provider folder is resolved rather than typed.",
@@ -138,7 +139,8 @@
       <tr><td><p>the apps plugin's subject registry</p><p><em>until a parser exists there is no folder for it</em> — a realization that is absent says so, and a stub that answers teaches you it works</p></td><td>MUST</td></tr>
     </tbody>
   </table></div>
-  <p>Try it: <code>spn-devex docs coherence check</code></p>
+  <p>Try it:</p>
+  <pre data-lang="sh">spn-devex docs coherence check</pre>
 </section>
 
 
@@ -146,4 +148,4 @@
 </div>
 </div>
 
-<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.js" integrity="sha384-MUUUVipJdxCmJyrxeNHKq8xMzGTvQ+TAsWDvN5w6TKPfuOUPtHk1E90wKCBZNRC7" crossorigin="anonymous"></script>
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.15.0/sds-docs.js" integrity="sha384-XYna7dQ9hUAzsp8poWNLetdO4Oyfh/cIKwuuh6sduxMcNDmnLGJ3zcw6DaG1IN9+" crossorigin="anonymous"></script>

@@ -4,7 +4,7 @@
 {"id":"stack-refs","variant":"construct","title":"Refs","subtitle":"The foundation book's rules, carried inside this plugin for a reader with no other copy.","lenses":["SERVER_DEV","ARCHITECT"],"status":"PLANNING","dependsOn":["ref-set"],"summary":"Refs carries, inside this plugin, the foundation-book rules a partner needs but has no checkout to read.","keywords":["ref","restatement","domain","stamp","leaf","generated"]}
 -->
 <!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
-<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.css" integrity="sha384-EFi+bm+soztQp3Bg2oQPRtdkdyGkD/O1qSDL0QCFBIHQg2sNtFhUHlkwxArFA8dY" crossorigin="anonymous">
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.15.0/sds-docs.css" integrity="sha384-R47poopLRnz65naDQiMbuRZgxiTZtsgOLsiaP10qjWo62gNyH4ezyJy2v/TyMG5J" crossorigin="anonymous">
 <div class="sds-page">
 
 <nav class="sds-rail" id="rail">
@@ -49,34 +49,35 @@
 <section id="s2">
   <div class="sds-section-head"><h2>Model</h2></div>
   <p>The book is the source. A ref is the copy that travels with the plugin, arranged so its shape tells a reader where to look before they have read anything.</p>
-  <figure>
-  <svg class="sds-drawing" viewBox="426 22 248 428" style="max-width:248px" role="img" aria-label="The reader holds the plugin and not the book, so the copy is complete and says which version it copied.">
-    <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
-    <rect class="sds-box" x="428" y="24" width="244" height="76" rx="3"/>
-    <text class="sds-label" x="444" y="50">the book</text>
-    <text class="sds-note" x="444" y="69">the foundation's own chapters —</text>
-    <text class="sds-note" x="444" y="88">the source that governs</text>
-    <path class="sds-connector" d="M550 100 V140" marker-end="url(#ar)"/>
-    <text class="sds-note" x="560" y="124">restated as</text>
-    <rect class="sds-box" x="428" y="140" width="244" height="76" rx="3"/>
-    <text class="sds-label" x="444" y="166">a ref</text>
-    <text class="sds-note" x="444" y="185">a self-contained leaf, complete</text>
-    <text class="sds-note" x="444" y="204">without the book beside it</text>
-    <path class="sds-connector" d="M550 216 V256" marker-end="url(#ar)"/>
-    <text class="sds-note" x="560" y="240">carries</text>
-    <rect class="sds-box" x="428" y="256" width="244" height="76" rx="3"/>
-    <text class="sds-label" x="444" y="282">the stamp</text>
-    <text class="sds-note" x="444" y="301">each chapter it restates, and the</text>
-    <text class="sds-note" x="444" y="320">hash last read there</text>
-    <path class="sds-connector" d="M550 332 V372" marker-end="url(#ar)"/>
-    <text class="sds-note" x="560" y="356">read by</text>
-    <rect class="sds-box" x="428" y="372" width="244" height="76" rx="3"/>
-    <text class="sds-label" x="444" y="398">a drift run</text>
-    <text class="sds-note" x="444" y="417">compares the hash and reports a</text>
-    <text class="sds-note" x="444" y="436">copy that fell behind</text>
-  </svg>
-    <figcaption>The reader holds the plugin and not the book, so the copy is complete and says which version it copied.</figcaption>
-  </figure>
+<figure class="dl-figure">
+<div class="dl-frame">
+<svg class="dl-svg" viewBox="0 0 928 408" role="img" aria-label="The reader holds the plugin and not the book, so the copy is complete and says which version it copied.">
+  <rect class="dl-tile" x="336" y="16" width="260" height="64" rx="10"/>
+  <text class="dl-name" x="348" y="37">the book</text>
+  <text class="dl-detail" x="348" y="52">the foundation's own chapters — the</text>
+  <text class="dl-detail" x="348" y="67">source that governs</text>
+  <path class="dl-wire" d="M466 80 L466 120"/>
+  <text class="dl-wlabel" x="478" y="104">restated as</text>
+  <rect class="dl-tile" x="336" y="120" width="260" height="64" rx="10"/>
+  <text class="dl-name" x="348" y="141">a ref</text>
+  <text class="dl-detail" x="348" y="156">a self-contained leaf, complete without</text>
+  <text class="dl-detail" x="348" y="171">the book beside it</text>
+  <path class="dl-wire" d="M466 184 L466 224"/>
+  <text class="dl-wlabel" x="478" y="208">carries</text>
+  <rect class="dl-tile" x="336" y="224" width="260" height="64" rx="10"/>
+  <text class="dl-name" x="348" y="245">the stamp</text>
+  <text class="dl-detail" x="348" y="260">each chapter it restates, and the hash</text>
+  <text class="dl-detail" x="348" y="275">last read there</text>
+  <path class="dl-wire" d="M466 288 L466 328"/>
+  <text class="dl-wlabel" x="478" y="312">read by</text>
+  <rect class="dl-tile" x="336" y="328" width="260" height="64" rx="10"/>
+  <text class="dl-name" x="348" y="349">a drift run</text>
+  <text class="dl-detail" x="348" y="364">compares the hash and reports a copy</text>
+  <text class="dl-detail" x="348" y="379">that fell behind</text>
+</svg>
+</div>
+<figcaption>The reader holds the plugin and not the book, so the copy is complete and says which version it copied.</figcaption>
+</figure>
   <!-- dg:source
 { "kind": "map",
   "caption": "The reader holds the plugin and not the book, so the copy is complete and says which version it copied.",
@@ -142,7 +143,8 @@
       <tr><td><p>the foundation's <code>02-delivery.md</code> § When an edit becomes behaviour</p><p>a ref is readable only after an install, so an edit here is not live in the open session</p></td><td>MUST</td></tr>
     </tbody>
   </table></div>
-  <p>Try it: <code>spn-devex restates check</code></p>
+  <p>Try it:</p>
+  <pre data-lang="sh">spn-devex restates check</pre>
 </section>
 
 
@@ -150,4 +152,4 @@
 </div>
 </div>
 
-<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.js" integrity="sha384-MUUUVipJdxCmJyrxeNHKq8xMzGTvQ+TAsWDvN5w6TKPfuOUPtHk1E90wKCBZNRC7" crossorigin="anonymous"></script>
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.15.0/sds-docs.js" integrity="sha384-XYna7dQ9hUAzsp8poWNLetdO4Oyfh/cIKwuuh6sduxMcNDmnLGJ3zcw6DaG1IN9+" crossorigin="anonymous"></script>

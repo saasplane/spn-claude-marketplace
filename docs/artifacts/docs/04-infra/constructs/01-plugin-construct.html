@@ -4,7 +4,7 @@
 {"id":"estate-plugin","variant":"construct","title":"Plugin","subtitle":"The one folder that carries this repository's infrastructure rules into a working session.","lenses":["INFRA","ARCHITECT"],"status":"PLANNING","dependsOn":["plugin-set"],"summary":"This plugin carries this repository's estate standard — the rules for the infrastructure a product runs on — into a session that is working on one, in one folder.","keywords":["plugin","manifest","version","lockstep","description","INFRA"]}
 -->
 <!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
-<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.css" integrity="sha384-EFi+bm+soztQp3Bg2oQPRtdkdyGkD/O1qSDL0QCFBIHQg2sNtFhUHlkwxArFA8dY" crossorigin="anonymous">
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.15.0/sds-docs.css" integrity="sha384-R47poopLRnz65naDQiMbuRZgxiTZtsgOLsiaP10qjWo62gNyH4ezyJy2v/TyMG5J" crossorigin="anonymous">
 <div class="sds-page">
 
 <nav class="sds-rail" id="rail">
@@ -49,33 +49,34 @@
 <section id="s2">
   <div class="sds-section-head"><h2>Model</h2></div>
   <p>A session never reads this checkout. It reads an installed copy, found by the plugin's name together with the version its manifest carries, and it loads that copy only where the repository it is standing in declares the world this plugin serves.</p>
-  <figure>
-  <svg class="sds-drawing" viewBox="423 22 267 409" style="max-width:267px" role="img" aria-label="The declared world decides the load; the version decides which bytes are loaded.">
-    <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
-    <rect class="sds-box" x="425" y="24" width="250" height="76" rx="3"/>
-    <text class="sds-label" x="441" y="50">the marketplace entry</text>
-    <text class="sds-note" x="441" y="69">names this plugin and the folder</text>
-    <text class="sds-note" x="441" y="88">holding it</text>
-    <path class="sds-connector" d="M550 100 V140" marker-end="url(#ar)"/>
-    <text class="sds-note" x="560" y="124">points at</text>
-    <rect class="sds-box" x="425" y="140" width="250" height="76" rx="3"/>
-    <text class="sds-label" x="441" y="166">plugin.json</text>
-    <text class="sds-note" x="441" y="185">name, version, description — the</text>
-    <text class="sds-note" x="441" y="204">plugin's own claim</text>
-    <path class="sds-connector" d="M550 216 V256" marker-end="url(#ar)"/>
-    <text class="sds-note" x="560" y="240">an install copies it</text>
-    <rect class="sds-box" x="425" y="256" width="250" height="57" rx="3"/>
-    <text class="sds-label" x="441" y="282">the installed copy</text>
-    <text class="sds-note" x="441" y="301">found by name and version together</text>
-    <path class="sds-connector" d="M550 313 V353" marker-end="url(#ar)"/>
-    <text class="sds-note" x="560" y="337">loaded into</text>
-    <rect class="sds-box" x="425" y="353" width="250" height="76" rx="3"/>
-    <text class="sds-label" x="441" y="379">an INFRA repository</text>
-    <text class="sds-note" x="441" y="398">its own sprepo.json decides this</text>
-    <text class="sds-note" x="441" y="417">plugin is loaded</text>
-  </svg>
-    <figcaption>The declared world decides the load; the version decides which bytes are loaded.</figcaption>
-  </figure>
+<figure class="dl-figure">
+<div class="dl-frame">
+<svg class="dl-svg" viewBox="0 0 928 408" role="img" aria-label="The declared world decides the load; the version decides which bytes are loaded.">
+  <rect class="dl-tile" x="332" y="16" width="264" height="64" rx="10"/>
+  <text class="dl-name" x="344" y="37">the marketplace entry</text>
+  <text class="dl-detail" x="344" y="52">names this plugin and the folder holding</text>
+  <text class="dl-detail" x="344" y="67">it</text>
+  <path class="dl-wire" d="M464 80 L464 120"/>
+  <text class="dl-wlabel" x="476" y="104">points at</text>
+  <rect class="dl-tile" x="332" y="120" width="264" height="64" rx="10"/>
+  <text class="dl-name" x="344" y="141">plugin.json</text>
+  <text class="dl-detail" x="344" y="156">name, version, description — the</text>
+  <text class="dl-detail" x="344" y="171">plugin's own claim</text>
+  <path class="dl-wire" d="M464 184 L464 224"/>
+  <text class="dl-wlabel" x="476" y="208">an install copies it</text>
+  <rect class="dl-tile" x="332" y="224" width="264" height="64" rx="10"/>
+  <text class="dl-name" x="344" y="245">the installed copy</text>
+  <text class="dl-detail" x="344" y="260">found by name and version together</text>
+  <path class="dl-wire" d="M464 288 L464 328"/>
+  <text class="dl-wlabel" x="476" y="312">loaded into</text>
+  <rect class="dl-tile" x="332" y="328" width="264" height="64" rx="10"/>
+  <text class="dl-name" x="344" y="349">an INFRA repository</text>
+  <text class="dl-detail" x="344" y="364">its own sprepo.json decides this plugin</text>
+  <text class="dl-detail" x="344" y="379">is loaded</text>
+</svg>
+</div>
+<figcaption>The declared world decides the load; the version decides which bytes are loaded.</figcaption>
+</figure>
   <!-- dg:source
 { "kind": "map",
   "caption": "The declared world decides the load; the version decides which bytes are loaded.",
@@ -105,7 +106,14 @@
   <h3 id="infra-loading-it-loads-where-a-repositor">INFRA loading — It loads where a repository declares INFRA</h3>
   <p><strong>The world is read from the repository, never typed by a workspace.</strong> A repository declaring <code>INFRA</code> gets this plugin, and that covers both the estate repository and the blueprint repository beside it, because both are edited under the estate's laws. A repository declaring another world never loads it, which is why the guard can be narrow: it only ever meets files that belong to an estate.</p>
   <h3 id="plugin-contents-what-this-plugin-holds-a">Plugin contents — What this plugin holds, and what it leaves out</h3>
-  <p><code>spn-infra</code> ships <code>hooks/</code>, <code>skills/</code>, <code>scripts/</code>, <code>refs/</code>, <code>providers/</code> and <code>tests/</code>. <strong>It ships no <code>agents/</code> folder, and the absence is the statement</strong>: an agent brief convenes a reviewer over a change, and the estate's own review happens against a rendering through the tool's doors rather than against a diff. Each of the folders it does ship is named by its own page here.</p>
+  <p><code>spn-infra</code> ships six folders:</p>
+  <pre data-lang="tree">hooks/
+skills/
+scripts/
+refs/
+providers/
+tests/</pre>
+  <p><strong>It ships no <code>agents/</code> folder, and the absence is the statement</strong>: an agent brief convenes a reviewer over a change, and the estate's own review happens against a rendering through the tool's doors rather than against a diff. Each of the folders it does ship is named by its own page here.</p>
 </section>
 
 <!-- 04 -->
@@ -134,7 +142,8 @@
       <tr><td><p>the foundation's plugins construct § The shape of a plugin, and its <code>04-plugins/02-shape.md</code></p><p>source beside a committed build, one command entry, a shared folder never installed on its own</p></td><td>MUST</td></tr>
     </tbody>
   </table></div>
-  <p>Try it: <code>spn-devex plugin partner check</code></p>
+  <p>Try it:</p>
+  <pre data-lang="sh">spn-devex plugin partner check</pre>
 </section>
 
 
@@ -142,4 +151,4 @@
 </div>
 </div>
 
-<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.js" integrity="sha384-MUUUVipJdxCmJyrxeNHKq8xMzGTvQ+TAsWDvN5w6TKPfuOUPtHk1E90wKCBZNRC7" crossorigin="anonymous"></script>
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.15.0/sds-docs.js" integrity="sha384-XYna7dQ9hUAzsp8poWNLetdO4Oyfh/cIKwuuh6sduxMcNDmnLGJ3zcw6DaG1IN9+" crossorigin="anonymous"></script>

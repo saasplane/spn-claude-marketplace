@@ -4,7 +4,7 @@
 {"id":"estate-tests","variant":"construct","title":"Tests","subtitle":"How this plugin proves the rules it refuses a bad file on.","lenses":["INFRA","QA"],"status":"PLANNING","dependsOn":["tests","estate-guard","estate-providers"],"summary":"This plugin proves its own gate — the rules that refuse a file — in a Tests folder arranged so moving a source file moves its test with it.","keywords":["test","tier","mirror","runner","harness","suite"]}
 -->
 <!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
-<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.css" integrity="sha384-EFi+bm+soztQp3Bg2oQPRtdkdyGkD/O1qSDL0QCFBIHQg2sNtFhUHlkwxArFA8dY" crossorigin="anonymous">
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.15.0/sds-docs.css" integrity="sha384-R47poopLRnz65naDQiMbuRZgxiTZtsgOLsiaP10qjWo62gNyH4ezyJy2v/TyMG5J" crossorigin="anonymous">
 <div class="sds-page">
 
 <nav class="sds-rail" id="rail">
@@ -50,34 +50,35 @@
 <section id="s2">
   <div class="sds-section-head"><h2>Model</h2></div>
   <p>Two fixed folders and one file, and the shape of the path carries the meaning.</p>
-  <figure>
-  <svg class="sds-drawing" viewBox="270 22 560 372" style="max-width:560px" role="img" aria-label="The runner walks, so a suite is discovered by where a source file sits rather than by a list.">
-    <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
-    <rect class="sds-box" x="441" y="24" width="218" height="76" rx="3"/>
-    <text class="sds-label" x="457" y="50">run.mjs</text>
-    <text class="sds-note" x="457" y="69">walks the whole tree and runs</text>
-    <text class="sds-note" x="457" y="88">every suite it finds</text>
-    <rect class="sds-box" x="272" y="184" width="250" height="76" rx="3"/>
-    <text class="sds-label" x="288" y="210">helpers/</text>
-    <text class="sds-note" x="288" y="229">the harness — one real process per</text>
-    <text class="sds-note" x="288" y="248">case, and the plugin root</text>
-    <rect class="sds-box" x="578" y="184" width="250" height="76" rx="3"/>
-    <text class="sds-label" x="594" y="210">unit/</text>
-    <text class="sds-note" x="594" y="229">the tier, which is the first thing</text>
-    <text class="sds-note" x="594" y="248">the path says</text>
-    <rect class="sds-box" x="425" y="316" width="250" height="76" rx="3"/>
-    <text class="sds-label" x="441" y="342">unit/&lt;source path&gt;</text>
-    <text class="sds-note" x="441" y="361">the mirror — the suite sits at its</text>
-    <text class="sds-note" x="441" y="380">source's own path</text>
-    <path class="sds-connector" d="M496 100 V128 H397 V184" marker-end="url(#ar)"/>
-    <path class="sds-connector" d="M605 100 V156 H703 V184" marker-end="url(#ar)"/>
-    <path class="sds-connector" d="M703 260 V288 H550 V316" marker-end="url(#ar)"/>
-    <text class="sds-note" x="613" y="120">loaded by each suite</text>
-    <text class="sds-note" x="622" y="148">walks into</text>
-    <text class="sds-note" x="563" y="280">the rest of the path</text>
-  </svg>
-    <figcaption>The runner walks, so a suite is discovered by where a source file sits rather than by a list.</figcaption>
-  </figure>
+<figure class="dl-figure">
+<div class="dl-frame">
+<svg class="dl-svg" viewBox="0 0 928 364" role="img" aria-label="The runner walks, so a suite is discovered by where a source file sits rather than by a list.">
+  <rect class="dl-tile" x="332" y="16" width="264" height="64" rx="10"/>
+  <text class="dl-name" x="344" y="37">run.mjs</text>
+  <text class="dl-detail" x="344" y="52">walks the whole tree and runs every</text>
+  <text class="dl-detail" x="344" y="67">suite it finds</text>
+  <rect class="dl-tile" x="172" y="164" width="264" height="64" rx="10"/>
+  <text class="dl-name" x="184" y="185">helpers/</text>
+  <text class="dl-detail" x="184" y="200">the harness — one real process per case,</text>
+  <text class="dl-detail" x="184" y="215">and the plugin root</text>
+  <rect class="dl-tile" x="492" y="164" width="264" height="64" rx="10"/>
+  <text class="dl-name" x="504" y="185">unit/</text>
+  <text class="dl-detail" x="504" y="200">the tier, which is the first thing the</text>
+  <text class="dl-detail" x="504" y="215">path says</text>
+  <rect class="dl-tile" x="492" y="284" width="264" height="64" rx="10"/>
+  <text class="dl-name" x="504" y="305">unit/&lt;source path&gt;</text>
+  <text class="dl-detail" x="504" y="320">the mirror — the suite sits at its</text>
+  <text class="dl-detail" x="504" y="335">source's own path</text>
+  <path class="dl-wire" d="M464 80 L464 100 Q464 108 456 108 L312 108 Q304 108 304 116 L304 164"/>
+  <path class="dl-wire" d="M464 80 L464 100 Q464 108 472 108 L522 108 Q530 108 530 116 L530 128 Q530 136 538 136 L616 136 Q624 136 624 144 L624 164"/>
+  <path class="dl-wire" d="M624 228 L624 284"/>
+  <text class="dl-wlabel" x="472" y="100">loaded by each suite</text>
+  <text class="dl-wlabel" x="547" y="128">walks into</text>
+  <text class="dl-wlabel" x="632" y="264">the rest of the path</text>
+</svg>
+</div>
+<figcaption>The runner walks, so a suite is discovered by where a source file sits rather than by a list.</figcaption>
+</figure>
   <!-- dg:source
 { "kind": "map",
   "caption": "The runner walks, so a suite is discovered by where a source file sits rather than by a list.",
@@ -114,7 +115,15 @@
   <h3 id="replayed-payloads-the-payload-a-case-rep">Replayed payloads — The payload a case replays sits beside the suites, once per event</h3>
   <p><code>tests/fixtures/payloads/pretooluse/</code> holds one recorded call for the one event this plugin wires, and a suite reads it rather than constructing its own. A payload is an input, never a generated answer, so a stale one is a fixture problem and never a passing case that stopped proving anything.</p>
   <h3 id="bundle-cases-two-more-cases-prove-the-bu">Bundle cases — Two more cases prove the bundle, not one file</h3>
-  <p><code>unit/t-dist-current.mjs</code> and <code>unit/t-bundle-parity.mjs</code> sit at the tree's root rather than under any one mirror, because each proves a property of the whole plugin: the first recomputes a bundle's declared sources against the banner esbuild wrote into it, and the second runs a recorded payload through the source and through the committed bundle and asserts the two agree. Both call the one shared harness the foundation's plugins realization states, <code>packages/plugin-support-lib/tests/helpers/</code>, so the build and the check can never quietly disagree. This plugin ships no <code>commands/</code>, but <code>hooks.json</code> still runs a built <code>dist/events/pretooluse.mjs</code>, so it owes both cases exactly as its two siblings do.</p>
+  <p><code>unit/t-dist-current.mjs</code> and <code>unit/t-bundle-parity.mjs</code> sit at the tree's root rather than under any one mirror, because each proves a property of the whole plugin:</p>
+  <div class="sds-scroll"><table>
+    <thead><tr><th>Case</th></tr></thead>
+    <tbody>
+      <tr><td><p><code>unit/t-dist-current.mjs</code></p><p>recomputes a bundle's declared sources against the banner esbuild wrote into it</p></td></tr>
+      <tr><td><p><code>unit/t-bundle-parity.mjs</code></p><p>runs a recorded payload through the source and through the committed bundle and asserts the two agree</p></td></tr>
+    </tbody>
+  </table></div>
+  <p>Both call the one shared harness the foundation's plugins realization states, <code>packages/plugin-support-lib/tests/helpers/</code>, so the build and the check can never quietly disagree. This plugin ships no <code>commands/</code>, but <code>hooks.json</code> still runs a built <code>dist/events/pretooluse.mjs</code>, so it owes both cases exactly as its two siblings do.</p>
 </section>
 
 <!-- 04 -->
@@ -143,7 +152,8 @@
       <tr><td><p>the foundation's <code>04-plugins/02-shape.md</code></p><p>the staleness case, the parity case, the payload fixture, and the shared harness every plugin's tests owe once it builds</p></td><td>MUST</td></tr>
     </tbody>
   </table></div>
-  <p>Try it: <code>node packages/plugin-spn-infra/tests/run.mjs</code></p>
+  <p>Try it:</p>
+  <pre data-lang="sh">node packages/plugin-spn-infra/tests/run.mjs</pre>
 </section>
 
 
@@ -151,4 +161,4 @@
 </div>
 </div>
 
-<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.js" integrity="sha384-MUUUVipJdxCmJyrxeNHKq8xMzGTvQ+TAsWDvN5w6TKPfuOUPtHk1E90wKCBZNRC7" crossorigin="anonymous"></script>
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.15.0/sds-docs.js" integrity="sha384-XYna7dQ9hUAzsp8poWNLetdO4Oyfh/cIKwuuh6sduxMcNDmnLGJ3zcw6DaG1IN9+" crossorigin="anonymous"></script>

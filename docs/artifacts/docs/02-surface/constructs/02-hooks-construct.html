@@ -4,7 +4,7 @@
 {"id":"surface-hooks","variant":"construct","title":"Hooks","subtitle":"One moment wired, because the one rule here is about a script about to run.","lenses":["ARCHITECT","UX"],"status":"PLANNING","dependsOn":["surface-plugin","hook-set"],"summary":"This plugin wires exactly one moment of a session, the point where the Figma connector is about to run a script, and one tool, because its one rule is about what that script says.","keywords":["hook","hooks.json","PreToolUse","matcher","entry","connector"]}
 -->
 <!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
-<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.css" integrity="sha384-EFi+bm+soztQp3Bg2oQPRtdkdyGkD/O1qSDL0QCFBIHQg2sNtFhUHlkwxArFA8dY" crossorigin="anonymous">
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.15.0/sds-docs.css" integrity="sha384-R47poopLRnz65naDQiMbuRZgxiTZtsgOLsiaP10qjWo62gNyH4ezyJy2v/TyMG5J" crossorigin="anonymous">
 <div class="sds-page">
 
 <nav class="sds-rail" id="rail">
@@ -48,33 +48,31 @@
 <section id="s2">
   <div class="sds-section-head"><h2>Model</h2></div>
   <p>One moment, narrowed to one tool name, behind one command.</p>
-  <figure>
-  <svg class="sds-drawing" viewBox="430 22 239 409" style="max-width:239px" role="img" aria-label="The matcher is applied by the harness first, so a session that never draws in Figma never starts this plugin's process.">
-    <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
-    <rect class="sds-box" x="432" y="24" width="235" height="76" rx="3"/>
-    <text class="sds-label" x="448" y="50">a connector call about to run</text>
-    <text class="sds-note" x="448" y="69">mcp__figma__use_figma, and no</text>
-    <text class="sds-note" x="448" y="88">other tool</text>
-    <path class="sds-connector" d="M549.5 100 V140" marker-end="url(#ar)"/>
-    <text class="sds-note" x="559.5" y="124">matched by</text>
-    <rect class="sds-box" x="432" y="140" width="235" height="76" rx="3"/>
-    <text class="sds-label" x="448" y="166">the one entry</text>
-    <text class="sds-note" x="448" y="185">hooks.json — one command, one</text>
-    <text class="sds-note" x="448" y="204">timeout</text>
-    <path class="sds-connector" d="M549.5 216 V256" marker-end="url(#ar)"/>
-    <text class="sds-note" x="559.5" y="240">runs</text>
-    <rect class="sds-box" x="432" y="256" width="235" height="76" rx="3"/>
-    <text class="sds-label" x="448" y="282">the dispatcher</text>
-    <text class="sds-note" x="448" y="301">hands the call to the connector</text>
-    <text class="sds-note" x="448" y="320">check</text>
-    <path class="sds-connector" d="M549.5 332 V372" marker-end="url(#ar)"/>
-    <text class="sds-note" x="559.5" y="356">returns</text>
-    <rect class="sds-box" x="432" y="372" width="235" height="57" rx="3"/>
-    <text class="sds-label" x="448" y="398">a verdict</text>
-    <text class="sds-note" x="448" y="417">a refusal, advice, or silence</text>
-  </svg>
-    <figcaption>The matcher is applied by the harness first, so a session that never draws in Figma never starts this plugin's process.</figcaption>
-  </figure>
+<figure class="dl-figure">
+<div class="dl-frame">
+<svg class="dl-svg" viewBox="0 0 928 344" role="img" aria-label="The matcher is applied by the harness first, so a session that never draws in Figma never starts this plugin's process.">
+  <rect class="dl-tile" x="332" y="16" width="264" height="48" rx="10"/>
+  <text class="dl-name" x="344" y="37">a connector call about to run</text>
+  <text class="dl-detail" x="344" y="52">mcp__figma__use_figma, and no other tool</text>
+  <path class="dl-wire" d="M464 64 L464 104"/>
+  <text class="dl-wlabel" x="476" y="88">matched by</text>
+  <rect class="dl-tile" x="332" y="104" width="264" height="48" rx="10"/>
+  <text class="dl-name" x="344" y="125">the one entry</text>
+  <text class="dl-detail" x="344" y="140">hooks.json — one command, one timeout</text>
+  <path class="dl-wire" d="M464 152 L464 192"/>
+  <text class="dl-wlabel" x="476" y="176">runs</text>
+  <rect class="dl-tile" x="332" y="192" width="264" height="48" rx="10"/>
+  <text class="dl-name" x="344" y="213">the dispatcher</text>
+  <text class="dl-detail" x="344" y="228">hands the call to the connector check</text>
+  <path class="dl-wire" d="M464 240 L464 280"/>
+  <text class="dl-wlabel" x="476" y="264">returns</text>
+  <rect class="dl-tile" x="332" y="280" width="264" height="48" rx="10"/>
+  <text class="dl-name" x="344" y="301">a verdict</text>
+  <text class="dl-detail" x="344" y="316">a refusal, advice, or silence</text>
+</svg>
+</div>
+<figcaption>The matcher is applied by the harness first, so a session that never draws in Figma never starts this plugin's process.</figcaption>
+</figure>
   <!-- dg:source
 { "kind": "map",
   "caption": "The matcher is applied by the harness first, so a session that never draws in Figma never starts this plugin's process.",
@@ -131,7 +129,8 @@
       <tr><td><p>the foundation's plugins construct § The shape of a plugin, and its <code>04-plugins/02-shape.md</code></p><p>a hook is the Event kind of script, run from a committed bundle a staleness test keeps current</p></td><td>MUST</td></tr>
     </tbody>
   </table></div>
-  <p>Try it: <code>node packages/plugin-spn-surface/tests/run.mjs</code></p>
+  <p>Try it:</p>
+  <pre data-lang="sh">node packages/plugin-spn-surface/tests/run.mjs</pre>
 </section>
 
 
@@ -139,4 +138,4 @@
 </div>
 </div>
 
-<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.js" integrity="sha384-MUUUVipJdxCmJyrxeNHKq8xMzGTvQ+TAsWDvN5w6TKPfuOUPtHk1E90wKCBZNRC7" crossorigin="anonymous"></script>
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.15.0/sds-docs.js" integrity="sha384-XYna7dQ9hUAzsp8poWNLetdO4Oyfh/cIKwuuh6sduxMcNDmnLGJ3zcw6DaG1IN9+" crossorigin="anonymous"></script>

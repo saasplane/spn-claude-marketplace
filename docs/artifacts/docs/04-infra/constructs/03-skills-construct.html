@@ -4,7 +4,7 @@
 {"id":"estate-skills","variant":"construct","title":"Skills","subtitle":"The commands that change what a piece of infrastructure declares itself to be.","lenses":["INFRA","ARCHITECT"],"status":"PLANNING","dependsOn":["skill-set"],"summary":"The skills here are how an estate — the infrastructure a product runs on — gets changed: by editing what it declares itself to be, then letting a tool render and apply that declaration.","keywords":["skill","declare","plan","module","release","door"]}
 -->
 <!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
-<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.css" integrity="sha384-EFi+bm+soztQp3Bg2oQPRtdkdyGkD/O1qSDL0QCFBIHQg2sNtFhUHlkwxArFA8dY" crossorigin="anonymous">
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.15.0/sds-docs.css" integrity="sha384-R47poopLRnz65naDQiMbuRZgxiTZtsgOLsiaP10qjWo62gNyH4ezyJy2v/TyMG5J" crossorigin="anonymous">
 <div class="sds-page">
 
 <nav class="sds-rail" id="rail">
@@ -48,34 +48,34 @@
 <section id="s2">
   <div class="sds-section-head"><h2>Model</h2></div>
   <p>Each skill is a different point on one walk, and the last box is the same for all of them.</p>
-  <figure>
-  <svg class="sds-drawing" viewBox="423 22 254 428" style="max-width:254px" role="img" aria-label="Every skill ends at the tool's command, because a cloud is changed only through the tool's own doors.">
-    <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
-    <rect class="sds-box" x="425" y="24" width="250" height="76" rx="3"/>
-    <text class="sds-label" x="441" y="50">the ask</text>
-    <text class="sds-note" x="441" y="69">change what the estate is, or</text>
-    <text class="sds-note" x="441" y="88">publish what it runs</text>
-    <path class="sds-connector" d="M550 100 V140" marker-end="url(#ar)"/>
-    <text class="sds-note" x="560" y="124">matched to</text>
-    <rect class="sds-box" x="425" y="140" width="250" height="76" rx="3"/>
-    <text class="sds-label" x="441" y="166">the skill</text>
-    <text class="sds-note" x="441" y="185">one folder under `skills/`, chosen</text>
-    <text class="sds-note" x="441" y="204">by its own description</text>
-    <path class="sds-connector" d="M550 216 V256" marker-end="url(#ar)"/>
-    <text class="sds-note" x="560" y="240">reviewed as</text>
-    <rect class="sds-box" x="425" y="256" width="250" height="76" rx="3"/>
-    <text class="sds-label" x="441" y="282">the manifest edit</text>
-    <text class="sds-note" x="441" y="301">one line per choice, validated and</text>
-    <text class="sds-note" x="441" y="320">read as a diff</text>
-    <path class="sds-connector" d="M550 332 V372" marker-end="url(#ar)"/>
-    <text class="sds-note" x="560" y="356">handed to</text>
-    <rect class="sds-box" x="425" y="372" width="250" height="76" rx="3"/>
-    <text class="sds-label" x="441" y="398">the tool's command</text>
-    <text class="sds-note" x="441" y="417">the only door a cloud is changed</text>
-    <text class="sds-note" x="441" y="436">through</text>
-  </svg>
-    <figcaption>Every skill ends at the tool's command, because a cloud is changed only through the tool's own doors.</figcaption>
-  </figure>
+<figure class="dl-figure">
+<div class="dl-frame">
+<svg class="dl-svg" viewBox="0 0 928 408" role="img" aria-label="Every skill ends at the tool's command, because a cloud is changed only through the tool's own doors.">
+  <rect class="dl-tile" x="332" y="16" width="264" height="64" rx="10"/>
+  <text class="dl-name" x="344" y="37">the ask</text>
+  <text class="dl-detail" x="344" y="52">change what the estate is, or publish</text>
+  <text class="dl-detail" x="344" y="67">what it runs</text>
+  <path class="dl-wire" d="M464 80 L464 120"/>
+  <text class="dl-wlabel" x="476" y="104">matched to</text>
+  <rect class="dl-tile" x="332" y="120" width="264" height="64" rx="10"/>
+  <text class="dl-name" x="344" y="141">the skill</text>
+  <text class="dl-detail" x="344" y="156">one folder under `skills/`, chosen by</text>
+  <text class="dl-detail" x="344" y="171">its own description</text>
+  <path class="dl-wire" d="M464 184 L464 224"/>
+  <text class="dl-wlabel" x="476" y="208">reviewed as</text>
+  <rect class="dl-tile" x="332" y="224" width="264" height="64" rx="10"/>
+  <text class="dl-name" x="344" y="245">the manifest edit</text>
+  <text class="dl-detail" x="344" y="260">one line per choice, validated and read</text>
+  <text class="dl-detail" x="344" y="275">as a diff</text>
+  <path class="dl-wire" d="M464 288 L464 328"/>
+  <text class="dl-wlabel" x="476" y="312">handed to</text>
+  <rect class="dl-tile" x="332" y="328" width="264" height="64" rx="10"/>
+  <text class="dl-name" x="344" y="349">the tool's command</text>
+  <text class="dl-detail" x="344" y="364">the only door a cloud is changed through</text>
+</svg>
+</div>
+<figcaption>Every skill ends at the tool's command, because a cloud is changed only through the tool's own doors.</figcaption>
+</figure>
   <!-- dg:source
 { "kind": "map",
   "caption": "Every skill ends at the tool's command, because a cloud is changed only through the tool's own doors.",
@@ -136,7 +136,8 @@
       <tr><td><p><code>RULE.DEVEX.UTILS.019</code></p><p>every skill here restates a chapter and adds no rule of its own</p></td><td>MUST</td></tr>
     </tbody>
   </table></div>
-  <p>Try it: <code>spn-devex restates check</code></p>
+  <p>Try it:</p>
+  <pre data-lang="sh">spn-devex restates check</pre>
 </section>
 
 
@@ -144,4 +145,4 @@
 </div>
 </div>
 
-<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.js" integrity="sha384-MUUUVipJdxCmJyrxeNHKq8xMzGTvQ+TAsWDvN5w6TKPfuOUPtHk1E90wKCBZNRC7" crossorigin="anonymous"></script>
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.15.0/sds-docs.js" integrity="sha384-XYna7dQ9hUAzsp8poWNLetdO4Oyfh/cIKwuuh6sduxMcNDmnLGJ3zcw6DaG1IN9+" crossorigin="anonymous"></script>

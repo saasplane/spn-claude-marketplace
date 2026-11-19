@@ -4,7 +4,7 @@
 {"id":"ref-set","variant":"construct","title":"Refs","subtitle":"A copy of a rule that says the moment it has fallen behind.","lenses":["VOICE","ARCHITECT"],"status":"PLANNING","dependsOn":["plugin-set"],"summary":"A ref is a markdown restatement of one or more foundation chapters, carrying a hash of the exact text it last read.","keywords":["ref","spn:restates","seen","hash","drift","unstamped"]}
 -->
 <!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
-<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.css" integrity="sha384-EFi+bm+soztQp3Bg2oQPRtdkdyGkD/O1qSDL0QCFBIHQg2sNtFhUHlkwxArFA8dY" crossorigin="anonymous">
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.15.0/sds-docs.css" integrity="sha384-R47poopLRnz65naDQiMbuRZgxiTZtsgOLsiaP10qjWo62gNyH4ezyJy2v/TyMG5J" crossorigin="anonymous">
 <div class="sds-page">
 
 <nav class="sds-rail" id="rail">
@@ -49,34 +49,35 @@
 <section id="s2">
   <div class="sds-section-head"><h2>Model</h2></div>
   <p>The hash is taken once, when the copy is made. Everything afterwards is a comparison.</p>
-  <figure>
-  <svg class="sds-drawing" viewBox="429 22 241 428" style="max-width:241px" role="img" aria-label="The stamp stands between the copy and the drift run, which is what lets a run name the chapter that moved.">
-    <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
-    <rect class="sds-box" x="431" y="24" width="237" height="76" rx="3"/>
-    <text class="sds-label" x="447" y="50">a chapter</text>
-    <text class="sds-note" x="447" y="69">the rule's one home, in the</text>
-    <text class="sds-note" x="447" y="88">foundation book</text>
-    <path class="sds-connector" d="M549.5 100 V140" marker-end="url(#ar)"/>
-    <text class="sds-note" x="559.5" y="124">copied into</text>
-    <rect class="sds-box" x="431" y="140" width="237" height="76" rx="3"/>
-    <text class="sds-label" x="447" y="166">the restatement</text>
-    <text class="sds-note" x="447" y="185">the copy a reader with no book</text>
-    <text class="sds-note" x="447" y="204">checkout can read</text>
-    <path class="sds-connector" d="M549.5 216 V256" marker-end="url(#ar)"/>
-    <text class="sds-note" x="559.5" y="240">carries</text>
-    <rect class="sds-box" x="431" y="256" width="237" height="76" rx="3"/>
-    <text class="sds-label" x="447" y="282">the stamp</text>
-    <text class="sds-note" x="447" y="301">a path, an optional section, and</text>
-    <text class="sds-note" x="447" y="320">the hash last seen</text>
-    <path class="sds-connector" d="M549.5 332 V372" marker-end="url(#ar)"/>
-    <text class="sds-note" x="559.5" y="356">read by</text>
-    <rect class="sds-box" x="431" y="372" width="237" height="76" rx="3"/>
-    <text class="sds-label" x="447" y="398">the drift run</text>
-    <text class="sds-note" x="447" y="417">re-reads the chapter today and</text>
-    <text class="sds-note" x="447" y="436">compares the hash</text>
-  </svg>
-    <figcaption>The stamp stands between the copy and the drift run, which is what lets a run name the chapter that moved.</figcaption>
-  </figure>
+<figure class="dl-figure">
+<div class="dl-frame">
+<svg class="dl-svg" viewBox="0 0 928 408" role="img" aria-label="The stamp stands between the copy and the drift run, which is what lets a run name the chapter that moved.">
+  <rect class="dl-tile" x="336" y="16" width="260" height="64" rx="10"/>
+  <text class="dl-name" x="348" y="37">a chapter</text>
+  <text class="dl-detail" x="348" y="52">the rule's one home, in the foundation</text>
+  <text class="dl-detail" x="348" y="67">book</text>
+  <path class="dl-wire" d="M466 80 L466 120"/>
+  <text class="dl-wlabel" x="478" y="104">copied into</text>
+  <rect class="dl-tile" x="336" y="120" width="260" height="64" rx="10"/>
+  <text class="dl-name" x="348" y="141">the restatement</text>
+  <text class="dl-detail" x="348" y="156">the copy a reader with no book checkout</text>
+  <text class="dl-detail" x="348" y="171">can read</text>
+  <path class="dl-wire" d="M466 184 L466 224"/>
+  <text class="dl-wlabel" x="478" y="208">carries</text>
+  <rect class="dl-tile" x="336" y="224" width="260" height="64" rx="10"/>
+  <text class="dl-name" x="348" y="245">the stamp</text>
+  <text class="dl-detail" x="348" y="260">a path, an optional section, and the</text>
+  <text class="dl-detail" x="348" y="275">hash last seen</text>
+  <path class="dl-wire" d="M466 288 L466 328"/>
+  <text class="dl-wlabel" x="478" y="312">read by</text>
+  <rect class="dl-tile" x="336" y="328" width="260" height="64" rx="10"/>
+  <text class="dl-name" x="348" y="349">the drift run</text>
+  <text class="dl-detail" x="348" y="364">re-reads the chapter today and compares</text>
+  <text class="dl-detail" x="348" y="379">the hash</text>
+</svg>
+</div>
+<figcaption>The stamp stands between the copy and the drift run, which is what lets a run name the chapter that moved.</figcaption>
+</figure>
   <!-- dg:source
 { "kind": "map",
   "caption": "The stamp stands between the copy and the drift run, which is what lets a run name the chapter that moved.",
@@ -113,47 +114,46 @@
   <h3 id="restatement-failures-three-ways-a-restat">Restatement failures — Three ways a restatement fails, and they are not the same finding</h3>
   <p><strong>Undeclared</strong> is prose naming a source the block leaves out, which no run can see. <strong>Unstamped</strong> is a file saying what it restates and carrying no block at all, so nothing machine-readable exists to compare. <strong>Unread</strong> is a name no check can resolve to a file, which is an under-report rather than a hidden fault.</p>
   <p>Follow one file through the checks and each finding falls out at its own question, which is why they are three findings and not one.</p>
-  <figure>
-  <svg class="sds-drawing" viewBox="64 22 973 696" style="max-width:973px" role="img" aria-label="A file reaches the comparison only after it has a block, names nothing the block leaves out, and every name resolves to a file.">
-    <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
-    <rect class="sds-box" x="412" y="24" width="275" height="44" rx="22"/>
-    <text class="sds-label" x="434" y="50">A file that says what it restates</text>
-    <path class="sds-box" d="M550 124 L736 168 L550 212 L364 168 Z"/>
-    <text class="sds-label" x="473" y="172">Does it carry a block?</text>
-    <rect class="sds-box" x="66" y="296" width="217" height="76" rx="38"/>
-    <text class="sds-label" x="143" y="322">Unstamped</text>
-    <text class="sds-note" x="88" y="341">nothing machine-readable to</text>
-    <text class="sds-note" x="152" y="360">compare</text>
-    <path class="sds-box" d="M686 296 L1033 340 L686 384 L339 340 Z"/>
-    <text class="sds-label" x="529" y="344">Does its prose name a source the block omits?</text>
-    <rect class="sds-box" x="175" y="468" width="153" height="57" rx="28.5"/>
-    <text class="sds-label" x="217" y="494">Undeclared</text>
-    <text class="sds-note" x="197" y="513">no run can see it</text>
-    <path class="sds-box" d="M654 468 L924 512 L654 556 L384 512 Z"/>
-    <text class="sds-label" x="535" y="516">Does every name resolve to a file?</text>
-    <rect class="sds-box" x="285" y="640" width="230" height="76" rx="38"/>
-    <text class="sds-label" x="379" y="666">Unread</text>
-    <text class="sds-note" x="307" y="685">an under-report, not a hidden</text>
-    <text class="sds-note" x="384" y="704">fault</text>
-    <rect class="sds-box" x="571" y="640" width="243" height="57" rx="28.5"/>
-    <text class="sds-label" x="630" y="666">Compare the stamps</text>
-    <text class="sds-note" x="593" y="685">stamped and current, or drifted</text>
-    <path class="sds-connector" d="M550 68 V124" marker-end="url(#ar)"/>
-    <path class="sds-connector" d="M550 212 V240 H175 V296" marker-end="url(#ar)"/>
-    <path class="sds-connector" d="M550 212 V268 H686 V296" marker-end="url(#ar)"/>
-    <path class="sds-connector" d="M686 384 V412 H252 V468" marker-end="url(#ar)"/>
-    <path class="sds-connector" d="M686 384 V440 H654 V468" marker-end="url(#ar)"/>
-    <path class="sds-connector" d="M654 556 V584 H400 V640" marker-end="url(#ar)"/>
-    <path class="sds-connector" d="M654 556 V612 H693 V640" marker-end="url(#ar)"/>
-    <text class="sds-note" x="356" y="232">no</text>
-    <text class="sds-note" x="608" y="260">yes</text>
-    <text class="sds-note" x="459" y="404">yes</text>
-    <text class="sds-note" x="664" y="432">no</text>
-    <text class="sds-note" x="521" y="576">no</text>
-    <text class="sds-note" x="664" y="604">yes</text>
-  </svg>
-    <figcaption>A file reaches the comparison only after it has a block, names nothing the block leaves out, and every name resolves to a file.</figcaption>
-  </figure>
+<figure class="dl-figure">
+<div class="dl-frame">
+<svg class="dl-svg" viewBox="0 0 928 652" role="img" aria-label="A file reaches the comparison only after it has a block, names nothing the block leaves out, and every name resolves to a file.">
+  <rect class="dl-tile" x="332" y="16" width="264" height="36" rx="18"/>
+  <text class="dl-name" x="464" y="38" text-anchor="middle">A file that says what it restates</text>
+  <path class="dl-tile" d="M454.4 110.7 L454.4 110.7 Q464 108 473.6 110.7 L588.4 143.3 Q598 146 588.4 148.7 L473.6 181.3 Q464 184 454.4 181.3 L339.6 148.7 Q330 146 339.6 143.3 Z"/>
+  <text class="dl-name" x="464" y="150" text-anchor="middle">Does it carry a block?</text>
+  <rect class="dl-tile" x="60" y="268" width="248" height="48" rx="24"/>
+  <text class="dl-name" x="184" y="289" text-anchor="middle">Unstamped</text>
+  <text class="dl-detail" x="184" y="304" text-anchor="middle">nothing machine-readable to compare</text>
+  <path class="dl-tile" d="M608.1 269.5 L608.1 269.5 Q618 268 627.9 269.5 L862.1 304.5 Q872 306 862.1 307.5 L627.9 342.5 Q618 344 608.1 342.5 L373.9 307.5 Q364 306 373.9 304.5 Z"/>
+  <text class="dl-name" x="618" y="310" text-anchor="middle">Does its prose name a source the block omits?</text>
+  <rect class="dl-tile" x="168" y="428" width="140" height="48" rx="24"/>
+  <text class="dl-name" x="238" y="449" text-anchor="middle">Undeclared</text>
+  <text class="dl-detail" x="238" y="464" text-anchor="middle">no run can see it</text>
+  <path class="dl-tile" d="M552.2 429.9 L552.2 429.9 Q562 428 571.8 429.9 L750.2 464.1 Q760 466 750.2 467.9 L571.8 502.1 Q562 504 552.2 502.1 L373.8 467.9 Q364 466 373.8 464.1 Z"/>
+  <text class="dl-name" x="562" y="470" text-anchor="middle">Does every name resolve to a file?</text>
+  <rect class="dl-tile" x="200" y="588" width="248" height="48" rx="24"/>
+  <text class="dl-name" x="324" y="609" text-anchor="middle">Unread</text>
+  <text class="dl-detail" x="324" y="624" text-anchor="middle">an under-report, not a hidden fault</text>
+  <rect class="dl-tile" x="504" y="588" width="224" height="48" rx="24"/>
+  <text class="dl-name" x="616" y="609" text-anchor="middle">Compare the stamps</text>
+  <text class="dl-detail" x="616" y="624" text-anchor="middle">stamped and current, or drifted</text>
+  <path class="dl-wire" d="M464 52 L464 108"/>
+  <path class="dl-wire" d="M464 184 L464 204 Q464 212 456 212 L192 212 Q184 212 184 220 L184 268"/>
+  <path class="dl-wire" d="M464 184 L464 232 Q464 240 472 240 L610 240 Q618 240 618 248 L618 268"/>
+  <path class="dl-wire" d="M618 344 L618 364 Q618 372 610 372 L246 372 Q238 372 238 380 L238 428"/>
+  <path class="dl-wire" d="M618 344 L618 392 Q618 400 610 400 L570 400 Q562 400 562 408 L562 428"/>
+  <path class="dl-wire" d="M562 504 L562 524 Q562 532 554 532 L332 532 Q324 532 324 540 L324 588"/>
+  <path class="dl-wire" d="M562 504 L562 552 Q562 560 570 560 L608 560 Q616 560 616 568 L616 588"/>
+  <text class="dl-wlabel" x="318" y="204">no</text>
+  <text class="dl-wlabel" x="532" y="232">yes</text>
+  <text class="dl-wlabel" x="419" y="364">yes</text>
+  <text class="dl-wlabel" x="584" y="392">no</text>
+  <text class="dl-wlabel" x="437" y="524">no</text>
+  <text class="dl-wlabel" x="580" y="552">yes</text>
+</svg>
+</div>
+<figcaption>A file reaches the comparison only after it has a block, names nothing the block leaves out, and every name resolves to a file.</figcaption>
+</figure>
   <!-- dg:source
 { "kind": "flowchart",
   "caption": "A file reaches the comparison only after it has a block, names nothing the block leaves out, and every name resolves to a file.",
@@ -207,7 +207,8 @@
       <tr><td><p>DEC.CLAUDE_MARKETPLACE.DEVEX.003</p><p>a ref that carries no block is unstamped, and a marker no tool reads is not a declaration</p></td><td>MUST</td></tr>
     </tbody>
   </table></div>
-  <p>Try it: <code>spn-devex restates check</code></p>
+  <p>Try it:</p>
+  <pre data-lang="sh">spn-devex restates check</pre>
 </section>
 
 
@@ -215,4 +216,4 @@
 </div>
 </div>
 
-<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.js" integrity="sha384-MUUUVipJdxCmJyrxeNHKq8xMzGTvQ+TAsWDvN5w6TKPfuOUPtHk1E90wKCBZNRC7" crossorigin="anonymous"></script>
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.15.0/sds-docs.js" integrity="sha384-XYna7dQ9hUAzsp8poWNLetdO4Oyfh/cIKwuuh6sduxMcNDmnLGJ3zcw6DaG1IN9+" crossorigin="anonymous"></script>
