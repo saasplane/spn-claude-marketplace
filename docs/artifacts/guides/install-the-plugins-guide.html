@@ -4,7 +4,7 @@
 {"id":"spn-claude-marketplace-install-the-plugins","variant":"guide","title":"Install the Plugins","lenses":["SERVER_DEV","WEB_DEV","ARCHITECT","INFRA"],"summary":"Putting the plugin set into a workspace from a directory or from git, the refresh that actually replaces the installed bytes, and the checks that tell you which version a session is really running.","keywords":["install","plugins","marketplace","agent-sync","scope","cache","refresh","verify"],"source":"docs/05-guides/01-install-the-plugins.md"}
 -->
 <!-- Produced by `docs guide` from docs/05-guides/01-install-the-plugins.md. Never edit this page: change the guide, and produce the page again. -->
-<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.12.0/sds-docs.css" integrity="sha384-WiniroKwtgBGQa/YuvtjywJOoLCqJRnD4v2OCINQys2XzhwipkthjfpJRU1RWSJn" crossorigin="anonymous">
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.15.0/sds-docs.css" integrity="sha384-R47poopLRnz65naDQiMbuRZgxiTZtsgOLsiaP10qjWo62gNyH4ezyJy2v/TyMG5J" crossorigin="anonymous">
 <div class="sds-page sds-guide">
 
 <nav class="sds-rail" id="rail">
@@ -52,7 +52,13 @@ claude plugin marketplace add /opt/work/saasplane/code/spn-claude-marketplace
 
 # or from the published repository
 claude plugin marketplace add &lt;org&gt;/spn-claude-marketplace</pre>
-    <p><code>--scope</code> takes <code>user</code>, <code>project</code> or <code>local</code>, and defaults to <code>user</code>. A workspace that is one of several on your machine wants <code>project</code>, so the registration travels with the folder rather than with your account.</p>
+    <p><code>--scope</code> takes one of three values, and defaults to <code>user</code>:</p>
+    <ul>
+      <li><code>user</code></li>
+      <li><code>project</code></li>
+      <li><code>local</code></li>
+    </ul>
+    <p>A workspace that is one of several on your machine wants <code>project</code>, so the registration travels with the folder rather than with your account.</p>
     <p>Before you register a directory you are authoring, you can check that its manifest is well formed:</p>
     <pre data-lang="bash">claude plugin validate /opt/work/saasplane/code/spn-claude-marketplace</pre>
   </div>
@@ -114,7 +120,14 @@ LIVE=$(claude plugin list --json | node -e \
 
 diff -rq "$LIVE/" "$REPO/packages/plugin-spn-devex/" | grep -v "__pycache__\|\.DS_Store\|\.in_use"</pre>
     <p>Silence means the installed bytes are the bytes you are reading. Any output means the session is running something older than your working tree, and <code>spnutils repo agent-sync</code> is what reconciles it.</p>
-    <p><code>__pycache__</code>, <code>.DS_Store</code>, <code>.git</code> and <code>.in_use</code> are excluded because each exists in one copy for a reason of its own. <code>.in_use</code> is the awkward one: the CLI writes it into the installed copy, so a comparison that reads it reports drift on every single run.</p>
+    <p>Four names are excluded, because each exists in one copy for a reason of its own:</p>
+    <ul>
+      <li><code>__pycache__</code></li>
+      <li><code>.DS_Store</code></li>
+      <li><code>.git</code></li>
+      <li><code>.in_use</code></li>
+    </ul>
+    <p><code>.in_use</code> is the awkward one: the CLI writes it into the installed copy, so a comparison that reads it reports drift on every single run.</p>
   </div>
   <div class="sds-step">
     <h3 id="fresh-window-take-a-fresh-window">Fresh window — take a fresh window</h3>
@@ -132,4 +145,4 @@ diff -rq "$LIVE/" "$REPO/packages/plugin-spn-devex/" | grep -v "__pycache__\|\.D
 </div>
 </div>
 
-<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.12.0/sds-docs.js" integrity="sha384-wCFcUN8WHuihR4yVBolwrWWQDsbdzAocPJ2ql89kWPohRUNkJI33uWvUy/t/RDQu" crossorigin="anonymous"></script>
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.15.0/sds-docs.js" integrity="sha384-XYna7dQ9hUAzsp8poWNLetdO4Oyfh/cIKwuuh6sduxMcNDmnLGJ3zcw6DaG1IN9+" crossorigin="anonymous"></script>

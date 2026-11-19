@@ -4,7 +4,7 @@
 {"id":"stack-checks","variant":"construct","title":"Scripts","subtitle":"Every file this plugin runs, sorted by what calls it and what stack it serves.","lenses":["SERVER_DEV","WEB_DEV"],"status":"PLANNING","dependsOn":["apps-hooks","checks"],"summary":"Scripts holds everything this plugin executes, divided by what calls each file — the wiring, the gate the wiring asks, the tools a person or agent runs by typing their path, and the libraries the others read.","keywords":["gate","subject","dispatcher","register","action","coverage"]}
 -->
 <!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
-<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.css" integrity="sha384-EFi+bm+soztQp3Bg2oQPRtdkdyGkD/O1qSDL0QCFBIHQg2sNtFhUHlkwxArFA8dY" crossorigin="anonymous">
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.15.0/sds-docs.css" integrity="sha384-R47poopLRnz65naDQiMbuRZgxiTZtsgOLsiaP10qjWo62gNyH4ezyJy2v/TyMG5J" crossorigin="anonymous">
 <div class="sds-page">
 
 <nav class="sds-rail" id="rail">
@@ -53,34 +53,35 @@
 <section id="s2">
   <div class="sds-section-head"><h2>Model</h2></div>
   <p>The folder has two halves that never meet. One is reached by the wiring and answers about a single write. The other is reached by its own path and answers about a whole repository.</p>
-  <figure>
-  <svg class="sds-drawing" viewBox="273 22 554 268" style="max-width:554px" role="img" aria-label="The wired half answers about one write; the commanded half answers about a repository, and neither reads the other.">
-    <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
-    <rect class="sds-box" x="275" y="24" width="244" height="76" rx="3"/>
-    <text class="sds-label" x="291" y="50">the wired half</text>
-    <text class="sds-note" x="291" y="69">events/ and checks/ — one process</text>
-    <text class="sds-note" x="291" y="88">per write</text>
-    <rect class="sds-box" x="575" y="24" width="250" height="76" rx="3"/>
-    <text class="sds-label" x="591" y="50">the commanded half</text>
-    <text class="sds-note" x="591" y="69">tools/ — run by its own path, over</text>
-    <text class="sds-note" x="591" y="88">one repository</text>
-    <rect class="sds-box" x="288" y="212" width="231" height="76" rx="3"/>
-    <text class="sds-label" x="304" y="238">the gate</text>
-    <text class="sds-note" x="304" y="257">reads the declaration, resolves</text>
-    <text class="sds-note" x="304" y="276">into the provider for it</text>
-    <rect class="sds-box" x="575" y="212" width="237" height="76" rx="3"/>
-    <text class="sds-label" x="591" y="238">the shared half</text>
-    <text class="sds-note" x="591" y="257">lib/ — the payload, the reading,</text>
-    <text class="sds-note" x="591" y="276">the register, the hash</text>
-    <path class="sds-connector" d="M458 100 V128 H404 V212" marker-end="url(#ar)"/>
-    <path class="sds-connector" d="M458 100 V156 H634 V212" marker-end="url(#ar)"/>
-    <path class="sds-connector" d="M700 100 V184 H753 V212" marker-end="url(#ar)"/>
-    <text class="sds-note" x="418" y="120">asks</text>
-    <text class="sds-note" x="530" y="148">reads</text>
-    <text class="sds-note" x="711" y="176">reads</text>
-  </svg>
-    <figcaption>The wired half answers about one write; the commanded half answers about a repository, and neither reads the other.</figcaption>
-  </figure>
+<figure class="dl-figure">
+<div class="dl-frame">
+<svg class="dl-svg" viewBox="0 0 928 272" role="img" aria-label="The wired half answers about one write; the commanded half answers about a repository, and neither reads the other.">
+  <rect class="dl-tile" x="172" y="16" width="264" height="64" rx="10"/>
+  <text class="dl-name" x="184" y="37">the wired half</text>
+  <text class="dl-detail" x="184" y="52">events/ and checks/ — one process per</text>
+  <text class="dl-detail" x="184" y="67">write</text>
+  <rect class="dl-tile" x="492" y="16" width="264" height="64" rx="10"/>
+  <text class="dl-name" x="504" y="37">the commanded half</text>
+  <text class="dl-detail" x="504" y="52">tools/ — run by its own path, over one</text>
+  <text class="dl-detail" x="504" y="67">repository</text>
+  <rect class="dl-tile" x="172" y="192" width="264" height="64" rx="10"/>
+  <text class="dl-name" x="184" y="213">the gate</text>
+  <text class="dl-detail" x="184" y="228">reads the declaration, resolves into the</text>
+  <text class="dl-detail" x="184" y="243">provider for it</text>
+  <rect class="dl-tile" x="492" y="192" width="264" height="64" rx="10"/>
+  <text class="dl-name" x="504" y="213">the shared half</text>
+  <text class="dl-detail" x="504" y="228">lib/ — the payload, the reading, the</text>
+  <text class="dl-detail" x="504" y="243">register, the hash</text>
+  <path class="dl-wire" d="M238 80 L238 100 Q238 108 246 108 L296 108 Q304 108 304 116 L304 192"/>
+  <path class="dl-wire" d="M370 80 L370 128 Q370 136 378 136 L550 136 Q558 136 558 144 L558 156 Q558 164 566 164 L616 164 Q624 164 624 172 L624 192"/>
+  <path class="dl-wire" d="M624 80 L624 192"/>
+  <text class="dl-wlabel" x="259" y="100">asks</text>
+  <text class="dl-wlabel" x="449" y="128">reads</text>
+  <text class="dl-wlabel" x="576" y="156">reads</text>
+</svg>
+</div>
+<figcaption>The wired half answers about one write; the commanded half answers about a repository, and neither reads the other.</figcaption>
+</figure>
   <!-- dg:source
 { "kind": "map",
   "caption": "The wired half answers about one write; the commanded half answers about a repository, and neither reads the other.",
@@ -124,43 +125,43 @@
   <h3 id="run-artifact-it-reads-the-run-s-own-arti">Run artifact — It reads the run's own artifact, never a specification</h3>
   <p>A status derived from a specification reports a case that exists as a case that ran. Crossing a route with a surface, or scanning a source tree for case titles, cannot see a case that was skipped or filtered out. So the writer reads the file the runner produced, and a row whose case never reached the runner says so.</p>
   <p>The figure follows one row of a register through the three sections above, from the run's start to what the writer leaves on it.</p>
-  <figure>
-  <svg class="sds-drawing" viewBox="137 22 891 722" style="max-width:891px" role="img" aria-label="The writer changes a row only at the last step. At every earlier question the run cannot speak for the row, so the row is left exactly as it was.">
-    <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
-    <rect class="sds-box" x="461" y="24" width="177" height="44" rx="22"/>
-    <text class="sds-label" x="483" y="50">A row in a register</text>
-    <path class="sds-box" d="M550 124 L715 181 L550 238 L385 181 Z"/>
-    <text class="sds-label" x="484" y="175.5">Is it hand-checked?</text>
-    <text class="sds-note" x="531" y="194.5">MANUAL</text>
-    <path class="sds-box" d="M550 294 L771 338 L550 382 L329 338 Z"/>
-    <text class="sds-label" x="456" y="342">Did the run cover its tier?</text>
-    <rect class="sds-box" x="139" y="494" width="142" height="44" rx="22"/>
-    <text class="sds-label" x="161" y="520">Left as it was</text>
-    <path class="sds-box" d="M649 494 L961 538 L649 582 L337 538 Z"/>
-    <text class="sds-label" x="509" y="542">Did a case reach the runner with its id?</text>
-    <rect class="sds-box" x="327" y="666" width="160" height="57" rx="28.5"/>
-    <text class="sds-label" x="355" y="692">The row says so</text>
-    <text class="sds-note" x="349" y="711">no case ran for it</text>
-    <rect class="sds-box" x="543" y="666" width="230" height="76" rx="38"/>
-    <text class="sds-label" x="578" y="692">Write the two run cells</text>
-    <text class="sds-note" x="565" y="711">status, and the moment it was</text>
-    <text class="sds-note" x="642" y="730">found</text>
-    <path class="sds-connector" d="M550 68 V124" marker-end="url(#ar)"/>
-    <path class="sds-connector" d="M715 181 H1017 V410 H210 V494" marker-end="url(#ar)"/>
-    <path class="sds-connector" d="M550 238 V294" marker-end="url(#ar)"/>
-    <path class="sds-connector" d="M550 382 V438 H210 V494" marker-end="url(#ar)"/>
-    <path class="sds-connector" d="M550 382 V466 H649 V494" marker-end="url(#ar)"/>
-    <path class="sds-connector" d="M649 582 V610 H407 V666" marker-end="url(#ar)"/>
-    <path class="sds-connector" d="M649 582 V638 H658 V666" marker-end="url(#ar)"/>
-    <text class="sds-note" x="856" y="173">yes</text>
-    <text class="sds-note" x="558" y="274">no</text>
-    <text class="sds-note" x="374" y="430">no</text>
-    <text class="sds-note" x="590" y="458">yes</text>
-    <text class="sds-note" x="522" y="602">no</text>
-    <text class="sds-note" x="664" y="630">yes</text>
-  </svg>
-    <figcaption>The writer changes a row only at the last step. At every earlier question the run cannot speak for the row, so the row is left exactly as it was.</figcaption>
-  </figure>
+<figure class="dl-figure">
+<div class="dl-frame">
+<svg class="dl-svg" viewBox="0 0 928 696" role="img" aria-label="The writer changes a row only at the last step. At every earlier question the run cannot speak for the row, so the row is left exactly as it was.">
+  <rect class="dl-tile" x="352" y="16" width="168" height="36" rx="18"/>
+  <text class="dl-name" x="436" y="38" text-anchor="middle">A row in a register</text>
+  <path class="dl-tile" d="M427.1 112.5 L427.1 112.5 Q436 108 444.9 112.5 L545.1 163.5 Q554 168 545.1 172.5 L444.9 223.5 Q436 228 427.1 223.5 L326.9 172.5 Q318 168 326.9 163.5 Z"/>
+  <text class="dl-name" x="436" y="164.5" text-anchor="middle">Is it hand-checked?</text>
+  <text class="dl-detail" x="436" y="179.5" text-anchor="middle">MANUAL</text>
+  <path class="dl-tile" d="M426.3 286.3 L426.3 286.3 Q436 284 445.7 286.3 L586.3 319.7 Q596 322 586.3 324.3 L445.7 357.7 Q436 360 426.3 357.7 L285.7 324.3 Q276 322 285.7 319.7 Z"/>
+  <text class="dl-name" x="436" y="326" text-anchor="middle">Did the run cover its tier?</text>
+  <rect class="dl-tile" x="116" y="472" width="132" height="36" rx="18"/>
+  <text class="dl-name" x="182" y="494" text-anchor="middle">Left as it was</text>
+  <path class="dl-tile" d="M522.1 473.6 L522.1 473.6 Q532 472 541.9 473.6 L750.1 508.4 Q760 510 750.1 511.6 L541.9 546.4 Q532 548 522.1 546.4 L313.9 511.6 Q304 510 313.9 508.4 Z"/>
+  <text class="dl-name" x="532" y="514" text-anchor="middle">Did a case reach the runner with its id?</text>
+  <rect class="dl-tile" x="212" y="632" width="144" height="48" rx="24"/>
+  <text class="dl-name" x="284" y="653" text-anchor="middle">The row says so</text>
+  <text class="dl-detail" x="284" y="668" text-anchor="middle">no case ran for it</text>
+  <rect class="dl-tile" x="412" y="632" width="248" height="48" rx="24"/>
+  <text class="dl-name" x="536" y="653" text-anchor="middle">Write the two run cells</text>
+  <text class="dl-detail" x="536" y="668" text-anchor="middle">status, and the moment it was found</text>
+  <path class="dl-wire" d="M436 52 L436 108"/>
+  <path class="dl-wire" d="M554 168 L808 168 Q816 168 816 176 L816 380 Q816 388 808 388 L190 388 Q182 388 182 396 L182 472"/>
+  <path class="dl-wire" d="M436 228 L436 284"/>
+  <path class="dl-wire" d="M436 360 L436 408 Q436 416 428 416 L190 416 Q182 416 182 424 L182 472"/>
+  <path class="dl-wire" d="M436 360 L436 436 Q436 444 444 444 L524 444 Q532 444 532 452 L532 472"/>
+  <path class="dl-wire" d="M532 548 L532 568 Q532 576 524 576 L292 576 Q284 576 284 584 L284 632"/>
+  <path class="dl-wire" d="M532 548 L532 602 Q532 604 534 604 L534 604 Q536 604 536 606 L536 632"/>
+  <text class="dl-wlabel" x="676" y="160">yes</text>
+  <text class="dl-wlabel" x="444" y="264">no</text>
+  <text class="dl-wlabel" x="303" y="408">no</text>
+  <text class="dl-wlabel" x="475" y="436">yes</text>
+  <text class="dl-wlabel" x="402" y="568">no</text>
+  <text class="dl-wlabel" x="542" y="596">yes</text>
+</svg>
+</div>
+<figcaption>The writer changes a row only at the last step. At every earlier question the run cannot speak for the row, so the row is left exactly as it was.</figcaption>
+</figure>
   <!-- dg:source
 { "kind": "flowchart",
   "caption": "The writer changes a row only at the last step. At every earlier question the run cannot speak for the row, so the row is left exactly as it was.",
@@ -218,7 +219,8 @@
       <tr><td><p>the foundation's plugins construct § The shape of a plugin, and its <code>04-plugins/02-shape.md</code></p><p>the four kinds of script, one command entry, a shared folder never installed on its own</p></td><td>MUST</td></tr>
     </tbody>
   </table></div>
-  <p>Try it: <code>node packages/plugin-spn-apps/tests/run.mjs</code></p>
+  <p>Try it:</p>
+  <pre data-lang="sh">node packages/plugin-spn-apps/tests/run.mjs</pre>
 </section>
 
 
@@ -226,4 +228,4 @@
 </div>
 </div>
 
-<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.js" integrity="sha384-MUUUVipJdxCmJyrxeNHKq8xMzGTvQ+TAsWDvN5w6TKPfuOUPtHk1E90wKCBZNRC7" crossorigin="anonymous"></script>
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.15.0/sds-docs.js" integrity="sha384-XYna7dQ9hUAzsp8poWNLetdO4Oyfh/cIKwuuh6sduxMcNDmnLGJ3zcw6DaG1IN9+" crossorigin="anonymous"></script>

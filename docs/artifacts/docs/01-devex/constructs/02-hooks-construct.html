@@ -4,7 +4,7 @@
 {"id":"hook-set","variant":"construct","title":"Hooks","subtitle":"A hook is how a rule gets asked again, every single time, instead of trusted from memory.","lenses":["ARCHITECT","SERVER_DEV"],"status":"PLANNING","dependsOn":["plugin-set"],"summary":"A hook is code a plugin wires to a moment a session offers, so the runtime calls it and the rule is asked again on every single call.","keywords":["hook","hooks.json","moment","payload","verdict","dispatcher"]}
 -->
 <!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
-<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.css" integrity="sha384-EFi+bm+soztQp3Bg2oQPRtdkdyGkD/O1qSDL0QCFBIHQg2sNtFhUHlkwxArFA8dY" crossorigin="anonymous">
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.15.0/sds-docs.css" integrity="sha384-R47poopLRnz65naDQiMbuRZgxiTZtsgOLsiaP10qjWo62gNyH4ezyJy2v/TyMG5J" crossorigin="anonymous">
 <div class="sds-page">
 
 <nav class="sds-rail" id="rail">
@@ -56,40 +56,41 @@
 <section id="s2">
   <div class="sds-section-head"><h2>Model</h2></div>
   <p>The moments run in the order a session meets them. Nothing chains one to the next: each is offered independently, and a plugin wires the ones it has something to say at.</p>
-  <figure>
-  <svg class="sds-drawing" viewBox="423 22 254 544" style="max-width:254px" role="img" aria-label="Only the call moment sits before the act, so every other moment can speak and never refuse.">
-    <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
-    <rect class="sds-box" x="425" y="24" width="250" height="76" rx="3"/>
-    <text class="sds-label" x="441" y="50">the window opens</text>
-    <text class="sds-note" x="441" y="69">SessionStart — the ground is read</text>
-    <text class="sds-note" x="441" y="88">and printed</text>
-    <path class="sds-connector" d="M550 100 V140" marker-end="url(#ar)"/>
-    <text class="sds-note" x="560" y="124">then</text>
-    <rect class="sds-box" x="425" y="140" width="250" height="76" rx="3"/>
-    <text class="sds-label" x="441" y="166">a prompt is sent</text>
-    <text class="sds-note" x="441" y="185">UserPromptSubmit — the session may</text>
-    <text class="sds-note" x="441" y="204">be named</text>
-    <path class="sds-connector" d="M550 216 V256" marker-end="url(#ar)"/>
-    <text class="sds-note" x="560" y="240">then</text>
-    <rect class="sds-box" x="425" y="256" width="250" height="76" rx="3"/>
-    <text class="sds-label" x="441" y="282">a call is about to run</text>
-    <text class="sds-note" x="441" y="301">PreToolUse — the one moment a call</text>
-    <text class="sds-note" x="441" y="320">can be refused</text>
-    <path class="sds-connector" d="M550 332 V372" marker-end="url(#ar)"/>
-    <text class="sds-note" x="560" y="356">then</text>
-    <rect class="sds-box" x="425" y="372" width="250" height="76" rx="3"/>
-    <text class="sds-label" x="441" y="398">a command finished</text>
-    <text class="sds-note" x="441" y="417">PostToolUse — the act has already</text>
-    <text class="sds-note" x="441" y="436">happened</text>
-    <path class="sds-connector" d="M550 448 V488" marker-end="url(#ar)"/>
-    <text class="sds-note" x="560" y="472">then</text>
-    <rect class="sds-box" x="425" y="488" width="250" height="76" rx="3"/>
-    <text class="sds-label" x="441" y="514">the turn is ending</text>
-    <text class="sds-note" x="441" y="533">Stop — warnings only, because the</text>
-    <text class="sds-note" x="441" y="552">turn is written</text>
-  </svg>
-    <figcaption>Only the call moment sits before the act, so every other moment can speak and never refuse.</figcaption>
-  </figure>
+<figure class="dl-figure">
+<div class="dl-frame">
+<svg class="dl-svg" viewBox="0 0 928 512" role="img" aria-label="Only the call moment sits before the act, so every other moment can speak and never refuse.">
+  <rect class="dl-tile" x="340" y="16" width="252" height="64" rx="10"/>
+  <text class="dl-name" x="352" y="37">the window opens</text>
+  <text class="dl-detail" x="352" y="52">SessionStart — the ground is read and</text>
+  <text class="dl-detail" x="352" y="67">printed</text>
+  <path class="dl-wire" d="M466 80 L466 120"/>
+  <text class="dl-wlabel" x="478" y="104">then</text>
+  <rect class="dl-tile" x="340" y="120" width="252" height="64" rx="10"/>
+  <text class="dl-name" x="352" y="141">a prompt is sent</text>
+  <text class="dl-detail" x="352" y="156">UserPromptSubmit — the session may be</text>
+  <text class="dl-detail" x="352" y="171">named</text>
+  <path class="dl-wire" d="M466 184 L466 224"/>
+  <text class="dl-wlabel" x="478" y="208">then</text>
+  <rect class="dl-tile" x="340" y="224" width="252" height="64" rx="10"/>
+  <text class="dl-name" x="352" y="245">a call is about to run</text>
+  <text class="dl-detail" x="352" y="260">PreToolUse — the one moment a call can</text>
+  <text class="dl-detail" x="352" y="275">be refused</text>
+  <path class="dl-wire" d="M466 288 L466 328"/>
+  <text class="dl-wlabel" x="478" y="312">then</text>
+  <rect class="dl-tile" x="340" y="328" width="252" height="64" rx="10"/>
+  <text class="dl-name" x="352" y="349">a command finished</text>
+  <text class="dl-detail" x="352" y="364">PostToolUse — the act has already</text>
+  <text class="dl-detail" x="352" y="379">happened</text>
+  <path class="dl-wire" d="M466 392 L466 432"/>
+  <text class="dl-wlabel" x="478" y="416">then</text>
+  <rect class="dl-tile" x="340" y="432" width="252" height="64" rx="10"/>
+  <text class="dl-name" x="352" y="453">the turn is ending</text>
+  <text class="dl-detail" x="352" y="468">Stop — warnings only, because the turn</text>
+  <text class="dl-detail" x="352" y="483">is written</text>
+</svg>
+</div>
+<figcaption>Only the call moment sits before the act, so every other moment can speak and never refuse.</figcaption>
+</figure>
   <!-- dg:source
 { "kind": "map",
   "caption": "Only the call moment sits before the act, so every other moment can speak and never refuse.",
@@ -137,34 +138,35 @@
   <p><strong>The developer is shown a refusal, and advice goes to the agent alone.</strong> A refusal stops a call, so the developer needs to know why the work stopped. Advice lets the call go on, and the agent is the one who can act on it, so nothing of it is put in the developer's pane. A soft finding of the doc standard is advice. The dispatcher says it once for a file in a window, and says it again when the finding changes, because it is then a different finding.</p>
   <h3 id="one-process-one-process-and-the-order-in">One process — One process, and the order inside it</h3>
   <p>The dispatcher imports every check and calls each in turn. Each check declares what it <code>applies</code> to, decided from the path or the command alone, and which fields it <code>needs</code>, so a call that cannot interest a check never reaches it. The order is a path test, then a file read, then a workspace walk. A check that throws is caught and passed over, and the rest still run.</p>
-  <figure>
-  <svg class="sds-drawing" viewBox="423 22 254 428" style="max-width:254px" role="img" aria-label="The verdict is returned rather than printed and parsed back, so a refusal cannot be lost.">
-    <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
-    <rect class="sds-box" x="425" y="24" width="250" height="76" rx="3"/>
-    <text class="sds-label" x="441" y="50">hooks.json</text>
-    <text class="sds-note" x="441" y="69">one entry per moment — a matcher,</text>
-    <text class="sds-note" x="441" y="88">a command, a timeout</text>
-    <path class="sds-connector" d="M550 100 V140" marker-end="url(#ar)"/>
-    <text class="sds-note" x="560" y="124">wires</text>
-    <rect class="sds-box" x="425" y="140" width="250" height="76" rx="3"/>
-    <text class="sds-label" x="441" y="166">the event</text>
-    <text class="sds-note" x="441" y="185">the harness hands the script its</text>
-    <text class="sds-note" x="441" y="204">payload on stdin</text>
-    <path class="sds-connector" d="M550 216 V256" marker-end="url(#ar)"/>
-    <text class="sds-note" x="560" y="240">runs</text>
-    <rect class="sds-box" x="425" y="256" width="250" height="76" rx="3"/>
-    <text class="sds-label" x="441" y="282">the dispatcher</text>
-    <text class="sds-note" x="441" y="301">one process; it calls each check</text>
-    <text class="sds-note" x="441" y="320">that applies</text>
-    <path class="sds-connector" d="M550 332 V372" marker-end="url(#ar)"/>
-    <text class="sds-note" x="560" y="356">answers with</text>
-    <rect class="sds-box" x="425" y="372" width="250" height="76" rx="3"/>
-    <text class="sds-label" x="441" y="398">the verdict</text>
-    <text class="sds-note" x="441" y="417">deny, note, or nothing — returned,</text>
-    <text class="sds-note" x="441" y="436">then printed once</text>
-  </svg>
-    <figcaption>The verdict is returned rather than printed and parsed back, so a refusal cannot be lost.</figcaption>
-  </figure>
+<figure class="dl-figure">
+<div class="dl-frame">
+<svg class="dl-svg" viewBox="0 0 928 408" role="img" aria-label="The verdict is returned rather than printed and parsed back, so a refusal cannot be lost.">
+  <rect class="dl-tile" x="332" y="16" width="264" height="64" rx="10"/>
+  <text class="dl-name" x="344" y="37">hooks.json</text>
+  <text class="dl-detail" x="344" y="52">one entry per moment — a matcher, a</text>
+  <text class="dl-detail" x="344" y="67">command, a timeout</text>
+  <path class="dl-wire" d="M464 80 L464 120"/>
+  <text class="dl-wlabel" x="476" y="104">wires</text>
+  <rect class="dl-tile" x="332" y="120" width="264" height="64" rx="10"/>
+  <text class="dl-name" x="344" y="141">the event</text>
+  <text class="dl-detail" x="344" y="156">the harness hands the script its payload</text>
+  <text class="dl-detail" x="344" y="171">on stdin</text>
+  <path class="dl-wire" d="M464 184 L464 224"/>
+  <text class="dl-wlabel" x="476" y="208">runs</text>
+  <rect class="dl-tile" x="332" y="224" width="264" height="64" rx="10"/>
+  <text class="dl-name" x="344" y="245">the dispatcher</text>
+  <text class="dl-detail" x="344" y="260">one process; it calls each check that</text>
+  <text class="dl-detail" x="344" y="275">applies</text>
+  <path class="dl-wire" d="M464 288 L464 328"/>
+  <text class="dl-wlabel" x="476" y="312">answers with</text>
+  <rect class="dl-tile" x="332" y="328" width="264" height="64" rx="10"/>
+  <text class="dl-name" x="344" y="349">the verdict</text>
+  <text class="dl-detail" x="344" y="364">deny, note, or nothing — returned, then</text>
+  <text class="dl-detail" x="344" y="379">printed once</text>
+</svg>
+</div>
+<figcaption>The verdict is returned rather than printed and parsed back, so a refusal cannot be lost.</figcaption>
+</figure>
   <!-- dg:source
 { "kind": "map",
   "caption": "The verdict is returned rather than printed and parsed back, so a refusal cannot be lost.",
@@ -219,7 +221,8 @@
       <tr><td><p>the foundation's plugins construct § The shape of a plugin, and its <code>04-plugins/02-shape.md</code></p><p>a hook is the Event kind of script, run from a committed bundle a staleness test keeps current</p></td><td>MUST</td></tr>
     </tbody>
   </table></div>
-  <p>Try it: <code>spn-devex plugin partner check</code></p>
+  <p>Try it:</p>
+  <pre data-lang="sh">spn-devex plugin partner check</pre>
 </section>
 
 
@@ -227,4 +230,4 @@
 </div>
 </div>
 
-<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.js" integrity="sha384-MUUUVipJdxCmJyrxeNHKq8xMzGTvQ+TAsWDvN5w6TKPfuOUPtHk1E90wKCBZNRC7" crossorigin="anonymous"></script>
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.15.0/sds-docs.js" integrity="sha384-XYna7dQ9hUAzsp8poWNLetdO4Oyfh/cIKwuuh6sduxMcNDmnLGJ3zcw6DaG1IN9+" crossorigin="anonymous"></script>

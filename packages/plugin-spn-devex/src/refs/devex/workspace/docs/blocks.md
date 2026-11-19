@@ -9,7 +9,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "The blocks — what a page reaches for instead of prose",
-      "seen": "719f6434"
+      "seen": "1c506a4c"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
@@ -96,6 +96,7 @@ second an explaining page's.
 | **Comparison** | two states of one thing | a Today and a Proposed column | prose that sets them side by side is this table | `doc-check` (530) |
 | `CODE` | a literal | a fence tagged with its language | declarations only for a public shape; two code names in a sentence | `doc-check` (530) |
 | `FILE` | code that is one file, or part of one | path as title, language as badge | the path from the repository's root | the page writer (532) |
+| `UNIT` | a unit of the design system shown as it draws | a fence tagged `unit`, one tree | one tree; no raw element, and no finding left | the page writer (538) |
 | `TREE` | a hierarchy easier read than drawn | a fence tagged `tree`, one path a line, a folder ending in `/`, its note after two spaces | paths and short notes, never sentences | `doc-check` (233, 238) |
 | `COMMAND` | something the reader runs, in a terminal or asks of the agent | a fence tagged `sh` (or `bash`), one command a line, `run=claude` after the tag for a step asked of the agent; in a guide, a step's command. Drawn in a frame: where it runs with a copy button, a quiet `$` never selected or copied, the step's What you see below | one command a line, never a script (a script stays `CODE`); its result is a line, not pasted output | the page script and `doc-check` |
 | `DIFF` | what a file says today and will say | a `FILE` frame holding a `diff` fence | an approach page or a preview only | the page writer (532) |
@@ -129,6 +130,7 @@ What `doc-check` flags, each as the block it should have been:
 | a decision still open | its options side by side, and its card |
 | a public shape (a contract state, a route, a table, a token, a command's options) | `CODE`: declarations only, a `diff` where the shape exists today |
 | how something looks | the thing rendered on the page, light and dark side by side |
+| a unit of the design system as it draws | a fence tagged `unit`, one tree (*A rendered unit is a tree*, below) |
 | what a person can do | a table in the person's words: after, then before |
 | a whole file of the work | a link to it in `samples/`, never framed in the page |
 | a part, a sub-part | `### Title`, `#### Title` — `###` through `#####` all render |
@@ -196,6 +198,17 @@ export interface IDSTheme {}
 and *Read more* both links. `next` makes the two doors, and a line may be left out. `file=<path>` makes the frame with
 the path as its title and the language as a badge. A `cards` line with no link, and a block with no line, are findings.
 The `PROSE` panel still has no spelling: write a paragraph where you wanted one, and never hand-write HTML to fake it.
+
+## A rendered unit is a tree
+
+**A unit of the design system is shown as a fenced tree, and `docs page write` renders it into a unit in its own frame on every write** (rule RULE.DEVEX.WORKSPACE.538 · GUIDE). The fence is tagged `unit` and holds one tree in the render's form: a unit with its props, a placement or a slot, `specVersion` at the top, and no raw element. The writer sends the tree to `spnutils apps surface render` and sets the page it prints in a frame, light and dark side by side, the unit's name as the title and the tree below it as code. A tree the render refuses, or one with a finding, stops the write with the finding's words. On github.com the fence reads as plain code. The spelling is proposed until the book lands.
+
+````markdown
+```unit
+{ "specVersion": 1,
+  "sections": [ { "unit": "DSFeature", "props": { "pageLevel": "PAGE", "type": "BACKDROP", "title": "A title" } } ] }
+```
+````
 
 ## A figure is a ```dg``` fence of strict JSON
 

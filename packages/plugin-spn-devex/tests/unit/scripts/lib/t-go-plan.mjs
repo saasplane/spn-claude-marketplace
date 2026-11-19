@@ -618,5 +618,19 @@ const readBack = JSON.parse(JSON.stringify(fuPart("apply-plat")));
 same("[MKT.SCRIPTS.567] a part's declared pass outlives the first read; an old part's BASELINE still becomes its work", [renameToWork(readBack), readBack.pass, (() => { const old = { id: "x", pass: "BASELINE" }; renameToWork(old); return [old.work, "pass" in old]; })()],
   [false, fuPart("apply-plat").pass, ["TEST", false]]);
 
+// A design-language change reaches each web app of its repository: one proof part for each APP_WEB node, after the repository's other parts.
+const { themeCommandOf } = await import(join(lib, "go-plan.ts"));
+const themeRepo = { repo: "plat", world: "APPS", stack: null, consumes: [], unread: null,
+  nodes: [{ folder: "apps/web-www-ts", kind: "APP_WEB" }, { folder: "apps/web-app-ts", kind: "APP_WEB" }, { folder: "apps/server-ts", kind: "APP_SERVER" }] };
+const themeOptions = { map: { repos: [themeRepo], order: ["plat"], unplaced: [] }, passes: () => legacyPasses };
+const themeOf = (file) => deriveGo([{ arc: "N1", sheet: sheet([entry("E1", file, {})], ["plat"]) }], themeOptions);
+const themed = themeOf("plat:docs/02-constructs/02-surfaces/03-design-language.md");
+same("[MKT.SCRIPTS.614] a design-language change adds one theme part for each web app of its repository, named for the repository and the app folder, and runs the theme command",
+  [themed.parts.filter((p) => p.id.startsWith("theme-")).map((p) => [p.id, p.work, p.entries, themeCommandOf(p)]), goFaults(themed)],
+  [[["theme-plat-web-www-ts", "TEST", [], "spnutils apps surface theme web-www-ts"], ["theme-plat-web-app-ts", "TEST", [], "spnutils apps surface theme web-app-ts"]], []]);
+same("[MKT.SCRIPTS.614] a theme part waits on the repository's parts that hold entries, and an entry of another title adds none",
+  [themed.parts.find((p) => p.id === "theme-plat-web-www-ts").waitsOn, themeOf("plat:docs/02-constructs/02-surfaces/04-sign-in.md").parts.some((p) => p.id.startsWith("theme-"))],
+  [themed.parts.filter((p) => p.entries.length).map((p) => p.id), false]);
+
 console.log(`\n${total - failed}/${total} passed`);
 process.exit(failed ? 1 : 0);

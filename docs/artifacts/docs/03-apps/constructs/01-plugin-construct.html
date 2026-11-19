@@ -4,7 +4,7 @@
 {"id":"apps-plugin","variant":"construct","title":"The Plugin","subtitle":"The one folder that makes spn-apps its own plugin, separate from every other.","lenses":["ARCHITECT","LEAD"],"status":"PLANNING","dependsOn":["plugin-set"],"summary":"This plugin is the one folder everything in the apps domain ships from, and the folder an install copies whole.","keywords":["plugin","manifest","identity","description","version","lockstep"]}
 -->
 <!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
-<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.css" integrity="sha384-EFi+bm+soztQp3Bg2oQPRtdkdyGkD/O1qSDL0QCFBIHQg2sNtFhUHlkwxArFA8dY" crossorigin="anonymous">
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.15.0/sds-docs.css" integrity="sha384-R47poopLRnz65naDQiMbuRZgxiTZtsgOLsiaP10qjWo62gNyH4ezyJy2v/TyMG5J" crossorigin="anonymous">
 <div class="sds-page">
 
 <nav class="sds-rail" id="rail">
@@ -46,35 +46,40 @@
 <!-- 02 -->
 <section id="s2">
   <div class="sds-section-head"><h2>Model</h2></div>
-  <p>A repository declares a world; the set of plugins it gets is derived from that declaration; an install copies each one; and a session reads the installed copy rather than this checkout.</p>
-  <figure>
-  <svg class="sds-drawing" viewBox="423 22 254 428" style="max-width:254px" role="img" aria-label="Nobody types a plugin name into a workspace: the declaration is read and the set follows from it.">
-    <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
-    <rect class="sds-box" x="425" y="24" width="250" height="76" rx="3"/>
-    <text class="sds-label" x="441" y="50">a repository's claim</text>
-    <text class="sds-note" x="441" y="69">sprepo.json — the world it answers</text>
-    <text class="sds-note" x="441" y="88">to</text>
-    <path class="sds-connector" d="M550 100 V140" marker-end="url(#ar)"/>
-    <text class="sds-note" x="560" y="124">derives</text>
-    <rect class="sds-box" x="425" y="140" width="250" height="76" rx="3"/>
-    <text class="sds-label" x="441" y="166">the derived set</text>
-    <text class="sds-note" x="441" y="185">which plugins this repository is</text>
-    <text class="sds-note" x="441" y="204">entitled to load</text>
-    <path class="sds-connector" d="M550 216 V256" marker-end="url(#ar)"/>
-    <text class="sds-note" x="560" y="240">installed as</text>
-    <rect class="sds-box" x="425" y="256" width="250" height="76" rx="3"/>
-    <text class="sds-label" x="441" y="282">the installed copy</text>
-    <text class="sds-note" x="441" y="301">found by name and by the version</text>
-    <text class="sds-note" x="441" y="320">the manifest carries</text>
-    <path class="sds-connector" d="M550 332 V372" marker-end="url(#ar)"/>
-    <text class="sds-note" x="560" y="356">read by</text>
-    <rect class="sds-box" x="425" y="372" width="250" height="76" rx="3"/>
-    <text class="sds-label" x="441" y="398">a session</text>
-    <text class="sds-note" x="441" y="417">matches the description against</text>
-    <text class="sds-note" x="441" y="436">the work at hand</text>
-  </svg>
-    <figcaption>Nobody types a plugin name into a workspace: the declaration is read and the set follows from it.</figcaption>
-  </figure>
+  <p>A repository declares a world, and then:</p>
+  <ol>
+    <li>the set of plugins it gets is derived from that declaration;</li>
+    <li>an install copies each one;</li>
+    <li>a session reads the installed copy rather than this checkout.</li>
+  </ol>
+<figure class="dl-figure">
+<div class="dl-frame">
+<svg class="dl-svg" viewBox="0 0 928 408" role="img" aria-label="Nobody types a plugin name into a workspace: the declaration is read and the set follows from it.">
+  <rect class="dl-tile" x="332" y="16" width="264" height="64" rx="10"/>
+  <text class="dl-name" x="344" y="37">a repository's claim</text>
+  <text class="dl-detail" x="344" y="52">sprepo.json — the world it answers to</text>
+  <path class="dl-wire" d="M464 80 L464 120"/>
+  <text class="dl-wlabel" x="476" y="104">derives</text>
+  <rect class="dl-tile" x="332" y="120" width="264" height="64" rx="10"/>
+  <text class="dl-name" x="344" y="141">the derived set</text>
+  <text class="dl-detail" x="344" y="156">which plugins this repository is</text>
+  <text class="dl-detail" x="344" y="171">entitled to load</text>
+  <path class="dl-wire" d="M464 184 L464 224"/>
+  <text class="dl-wlabel" x="476" y="208">installed as</text>
+  <rect class="dl-tile" x="332" y="224" width="264" height="64" rx="10"/>
+  <text class="dl-name" x="344" y="245">the installed copy</text>
+  <text class="dl-detail" x="344" y="260">found by name and by the version the</text>
+  <text class="dl-detail" x="344" y="275">manifest carries</text>
+  <path class="dl-wire" d="M464 288 L464 328"/>
+  <text class="dl-wlabel" x="476" y="312">read by</text>
+  <rect class="dl-tile" x="332" y="328" width="264" height="64" rx="10"/>
+  <text class="dl-name" x="344" y="349">a session</text>
+  <text class="dl-detail" x="344" y="364">matches the description against the work</text>
+  <text class="dl-detail" x="344" y="379">at hand</text>
+</svg>
+</div>
+<figcaption>Nobody types a plugin name into a workspace: the declaration is read and the set follows from it.</figcaption>
+</figure>
   <!-- dg:source
 { "kind": "map",
   "caption": "Nobody types a plugin name into a workspace: the declaration is read and the set follows from it.",
@@ -134,7 +139,8 @@
       <tr><td><p>the foundation's plugins construct § The shape of a plugin, and its <code>04-plugins/02-shape.md</code></p><p>source beside a committed build, one command entry, a shared folder never installed on its own</p></td><td>MUST</td></tr>
     </tbody>
   </table></div>
-  <p>Try it: <code>spn-devex plugin partner check</code></p>
+  <p>Try it:</p>
+  <pre data-lang="sh">spn-devex plugin partner check</pre>
 </section>
 
 
@@ -142,4 +148,4 @@
 </div>
 </div>
 
-<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.js" integrity="sha384-MUUUVipJdxCmJyrxeNHKq8xMzGTvQ+TAsWDvN5w6TKPfuOUPtHk1E90wKCBZNRC7" crossorigin="anonymous"></script>
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.15.0/sds-docs.js" integrity="sha384-XYna7dQ9hUAzsp8poWNLetdO4Oyfh/cIKwuuh6sduxMcNDmnLGJ3zcw6DaG1IN9+" crossorigin="anonymous"></script>

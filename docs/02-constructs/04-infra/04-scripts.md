@@ -41,7 +41,9 @@ This construct realizes the book's `01-devex/02-agent/04-plugins`.
 
 ## Model
 
-Three folders, three jobs, and the order they run in is the order a person meets them. The dispatcher is called; it asks the gate which subjects apply; each subject runs the rule bodies that have an opinion about this path.
+Three folders, three jobs, and the order they run in is the order a person meets them. 1. The dispatcher is called.
+2. It asks the gate which subjects apply.
+3. Each subject runs the rule bodies that have an opinion about this path.
 
 ```dg
 { "kind": "map",
@@ -96,7 +98,11 @@ The figure below follows one call through the dispatcher, from the moment it arr
 
 ### Three folders — Three folders, and what decides which one a file goes in
 
-`events/` holds what the wiring calls, and there is one such file because there is one wired moment. `checks/` holds the gate, which knows which subjects exist and how to reach a provider's parse of each. `lib/` holds everything more than one of them needs: the rule bodies, the event shape, the timing recorder. **The axis is what the file is for, not what it is about**, which is why a rule about secrets and a rule about built output sit side by side.
+- `events/` holds what the wiring calls, and there is one such file because there is one wired moment.
+- `checks/` holds the gate, which knows which subjects exist and how to reach a provider's parse of each.
+- `lib/` holds everything more than one of them needs: the rule bodies, the event shape, the timing recorder.
+
+**The axis is what the file is for, not what it is about**, which is why a rule about secrets and a rule about built output sit side by side.
 
 ### Unsure allows — Unsure means allow, and every exit is zero
 

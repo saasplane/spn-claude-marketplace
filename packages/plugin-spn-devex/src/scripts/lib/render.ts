@@ -11,15 +11,87 @@
 // closed — headings, paragraphs, tables, lists, fenced blocks — and a dependency would have to be
 // installed on a partner's machine to read a document.
 
-import { dirname, relative, resolve } from "node:path";
-import { existsSync } from "node:fs";
+import { execFileSync } from "node:child_process";
+import { dirname, join, relative, resolve } from "node:path";
+import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
 
 import { draw, figureOf, type Spec } from "./draw.ts";
 import { sentenceColumn } from "./item-cells.ts";
 import { isSeatFile, producedPageOf } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
+import { stylesDir } from "../../../../plugin-support-lib/src/lib/page-styles.ts";
 import { RULE_ID_SRC, chipOf, parseFields } from "../../../../plugin-support-lib/src/lib/rule-mark.ts";
 
-export type Finding = { message: string; line?: number };
+/** `stops` says the finding is the render's: the page is not written while it stands (RULE.DEVEX.WORKSPACE.538). */
+export type Finding = { message: string; line?: number; stops?: boolean };
+
+// ---------------------------------------------------------------------------- the UNIT block
+
+/**
+ * The render of one file: the page `spnutils apps surface render --file <file>` prints, or the words it refused with. It is ONE
+ * FUNCTION, so a test replaces it with `setUnitRender` (Support's command is not released yet).
+ */
+export type UnitRender = (file: string) => string;
+
+const spnutilsRender: UnitRender = (file) => {
+  try {
+    return execFileSync("spnutils", ["apps", "surface", "render", "--file", file], { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"], maxBuffer: 64 * 1024 * 1024 });
+  } catch (error) {
+    const failed = error as { stdout?: unknown; stderr?: unknown; message?: string };
+    throw new Error(`${String(failed.stderr ?? "")}${String(failed.stdout ?? "")}`.trim() || String(failed.message));
+  }
+};
+let unitRender: UnitRender = spnutilsRender;
+/** Replace the render, or give back the real one with no argument. */
+export function setUnitRender(render: UnitRender = spnutilsRender): void { unitRender = render; }
+
+/**
+ * The version of `@saasplane/support-web-ds-ts` the docs stylesheet's Support release pins: the tag the tokens file in the
+ * plugin's styles folder was copied from, which `docs sds cut` writes in its first line. Null where it cannot be read.
+ */
+export function designSystemVersion(styles: string | null = stylesDir(import.meta.dirname)): string | null {
+  if (!styles || !existsSync(join(styles, "ds-tokens.css"))) return null;
+  return /support-web-ds-ts v?(\d+\.\d+\.\d+)/.exec(readFileSync(join(styles, "ds-tokens.css"), "utf8").split("\n")[0])?.[1] ?? null;
+}
+
+/** A value as an attribute of the page: `srcdoc` holds a whole page, so every `&` and `"` is written as an entity. */
+const attribute = (text: string): string => text.replace(/&/g, "&amp;").replace(/"/g, "&quot;");
+
+/** The page set to one mode: `data-mode` on its `<html>`, or on a wrapping element where the printed page has none. */
+function inMode(page: string, mode: "light" | "dark"): string {
+  if (/<html\b/i.test(page)) return page.replace(/<html\b([^>]*?)(\sdata-mode="[^"]*")?([^>]*)>/i, `<html$1$3 data-mode="${mode}">`);
+  return `<div data-mode="${mode}">${page}</div>`;
+}
+
+/**
+ * A fence tagged `unit`: one tree, a unit with its props. It is wrapped as a render file, drawn by the render, and set in a frame:
+ * the unit's name as the title, the page in light and dark side by side, and the tree below as code. A tree that is no JSON, a
+ * refusal and a finding each stop the write with the render's words.
+ */
+function unitFrame(body: string[], findings: Finding[]): string {
+  const stop = (message: string): string => { findings.push({ message, stops: true }); return ""; };
+  let tree: any;
+  try { tree = JSON.parse(body.join("\n")); } catch (e) { return stop(`a \`unit\` fence is not strict JSON — ${(e as Error).message}`); }
+  const sections = Array.isArray(tree?.sections) ? tree.sections : [tree];
+  const name = sections[0]?.unit;
+  if (typeof name !== "string") return stop("a `unit` fence holds a tree whose first unit has no name: `{ \"unit\": \"DSFeature\", \"props\": { … } }`");
+  const ds = designSystemVersion();
+  if (!ds) return stop("a `unit` fence cannot be drawn: the docs stylesheet's design-system version is not read from `ds-tokens.css` in the plugin's styles folder");
+  const file = { app: { ds, theme: {}, layout: { type: "CANVAS", nav: [] }, page: "SITE" }, tree: { specVersion: 1, sections } };
+  const folder = mkdtempSync(join(tmpdir(), "spn-unit-"));
+  let page: string;
+  try {
+    const path = join(folder, "unit.json");
+    writeFileSync(path, JSON.stringify(file));
+    page = unitRender(path);
+  } catch (e) {
+    return stop(`the render stopped the \`${name}\` fence: ${(e as Error).message}`);
+  } finally { rmSync(folder, { recursive: true, force: true }); }
+  const frame = (mode: "light" | "dark"): string =>
+    `<iframe data-mode="${mode}" title="${esc(name)}, ${mode}" style="width:100%;min-height:24rem;border:0" srcdoc="${attribute(inMode(page, mode))}"></iframe>`;
+  return `  <figure class="sds-file">\n    <figcaption><span class="sds-file-path">${esc(name)}</span><span class="sds-file-lang">unit</span></figcaption>\n`
+    + `    ${frame("light")}\n    ${frame("dark")}\n    <pre data-lang="json">${escapedCode(JSON.stringify(sections.length === 1 && !Array.isArray(tree?.sections) ? tree : { specVersion: 1, sections }, null, 2))}</pre>\n  </figure>`;
+}
 
 const LENS_LABEL: Record<string, string> = {
   LEAD: "Engineering leader", BUSINESS: "Business manager", PRODUCT: "Product manager",
@@ -291,6 +363,8 @@ function renderBody(lines: string[], findings: Finding[]): string {
       i++;
       if (lang === "catalog" || lang === "cards" || lang === "next") {
         out.push(spelled(lang, body, findings));
+      } else if (lang === "unit") {
+        out.push(unitFrame(body, findings));
       } else if (lang === "dg") {
         let spec: Spec | null = null;
         try { spec = JSON.parse(body.join("\n")); } catch (e) { findings.push({ message: `a \`dg\` figure is not strict JSON — ${(e as Error).message}` }); }

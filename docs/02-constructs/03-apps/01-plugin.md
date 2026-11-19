@@ -36,7 +36,11 @@ This construct realizes the book's `01-devex/02-agent/04-plugins`.
 
 ## Model
 
-A repository declares a world; the set of plugins it gets is derived from that declaration; an install copies each one; and a session reads the installed copy rather than this checkout.
+A repository declares a world, and then:
+
+1. the set of plugins it gets is derived from that declaration;
+2. an install copies each one;
+3. a session reads the installed copy rather than this checkout.
 
 ```dg
 { "kind": "map",

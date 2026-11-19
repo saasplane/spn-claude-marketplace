@@ -4,7 +4,7 @@
 {"id":"estate-hooks","variant":"construct","title":"Hooks","subtitle":"One moment wired, because every rule here is about a file about to be written.","lenses":["INFRA","TRUST"],"status":"PLANNING","dependsOn":["hook-set","estate-plugin"],"summary":"This plugin wires exactly one moment of a session — the point just before a write happens — because every rule it holds is about what a file contains.","keywords":["hook","hooks.json","PreToolUse","matcher","timeout","plugin root"]}
 -->
 <!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
-<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.css" integrity="sha384-EFi+bm+soztQp3Bg2oQPRtdkdyGkD/O1qSDL0QCFBIHQg2sNtFhUHlkwxArFA8dY" crossorigin="anonymous">
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.15.0/sds-docs.css" integrity="sha384-R47poopLRnz65naDQiMbuRZgxiTZtsgOLsiaP10qjWo62gNyH4ezyJy2v/TyMG5J" crossorigin="anonymous">
 <div class="sds-page">
 
 <nav class="sds-rail" id="rail">
@@ -49,34 +49,35 @@
 <section id="s2">
   <div class="sds-section-head"><h2>Model</h2></div>
   <p>One entry, read from the outside in: a moment, the calls it is narrowed to, and the command those calls reach.</p>
-  <figure>
-  <svg class="sds-drawing" viewBox="423 22 254 428" style="max-width:254px" role="img" aria-label="One entry, and the narrowing happens before the command runs rather than inside it.">
-    <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
-    <rect class="sds-box" x="425" y="24" width="250" height="76" rx="3"/>
-    <text class="sds-label" x="441" y="50">a call about to run</text>
-    <text class="sds-note" x="441" y="69">PreToolUse — the one moment a call</text>
-    <text class="sds-note" x="441" y="88">can be refused</text>
-    <path class="sds-connector" d="M550 100 V140" marker-end="url(#ar)"/>
-    <text class="sds-note" x="560" y="124">narrowed by</text>
-    <rect class="sds-box" x="425" y="140" width="250" height="76" rx="3"/>
-    <text class="sds-label" x="441" y="166">the matcher</text>
-    <text class="sds-note" x="441" y="185">Write or Edit; every other call</text>
-    <text class="sds-note" x="441" y="204">passes untouched</text>
-    <path class="sds-connector" d="M550 216 V256" marker-end="url(#ar)"/>
-    <text class="sds-note" x="560" y="240">runs</text>
-    <rect class="sds-box" x="425" y="256" width="250" height="76" rx="3"/>
-    <text class="sds-label" x="441" y="282">the command</text>
-    <text class="sds-note" x="441" y="301">the dispatcher, named against the</text>
-    <text class="sds-note" x="441" y="320">plugin root</text>
-    <path class="sds-connector" d="M550 332 V372" marker-end="url(#ar)"/>
-    <text class="sds-note" x="560" y="356">returns</text>
-    <rect class="sds-box" x="425" y="372" width="250" height="76" rx="3"/>
-    <text class="sds-label" x="441" y="398">a verdict</text>
-    <text class="sds-note" x="441" y="417">a refusal, or silence and the</text>
-    <text class="sds-note" x="441" y="436">ordinary flow continues</text>
-  </svg>
-    <figcaption>One entry, and the narrowing happens before the command runs rather than inside it.</figcaption>
-  </figure>
+<figure class="dl-figure">
+<div class="dl-frame">
+<svg class="dl-svg" viewBox="0 0 928 408" role="img" aria-label="One entry, and the narrowing happens before the command runs rather than inside it.">
+  <rect class="dl-tile" x="332" y="16" width="264" height="64" rx="10"/>
+  <text class="dl-name" x="344" y="37">a call about to run</text>
+  <text class="dl-detail" x="344" y="52">PreToolUse — the one moment a call can</text>
+  <text class="dl-detail" x="344" y="67">be refused</text>
+  <path class="dl-wire" d="M464 80 L464 120"/>
+  <text class="dl-wlabel" x="476" y="104">narrowed by</text>
+  <rect class="dl-tile" x="332" y="120" width="264" height="64" rx="10"/>
+  <text class="dl-name" x="344" y="141">the matcher</text>
+  <text class="dl-detail" x="344" y="156">Write or Edit; every other call passes</text>
+  <text class="dl-detail" x="344" y="171">untouched</text>
+  <path class="dl-wire" d="M464 184 L464 224"/>
+  <text class="dl-wlabel" x="476" y="208">runs</text>
+  <rect class="dl-tile" x="332" y="224" width="264" height="64" rx="10"/>
+  <text class="dl-name" x="344" y="245">the command</text>
+  <text class="dl-detail" x="344" y="260">the dispatcher, named against the plugin</text>
+  <text class="dl-detail" x="344" y="275">root</text>
+  <path class="dl-wire" d="M464 288 L464 328"/>
+  <text class="dl-wlabel" x="476" y="312">returns</text>
+  <rect class="dl-tile" x="332" y="328" width="264" height="64" rx="10"/>
+  <text class="dl-name" x="344" y="349">a verdict</text>
+  <text class="dl-detail" x="344" y="364">a refusal, or silence and the ordinary</text>
+  <text class="dl-detail" x="344" y="379">flow continues</text>
+</svg>
+</div>
+<figcaption>One entry, and the narrowing happens before the command runs rather than inside it.</figcaption>
+</figure>
   <!-- dg:source
 { "kind": "map",
   "caption": "One entry, and the narrowing happens before the command runs rather than inside it.",
@@ -136,7 +137,8 @@
       <tr><td><p>the foundation's plugins construct § The shape of a plugin, and its <code>04-plugins/02-shape.md</code></p><p>a hook is the Event kind of script, run from a committed bundle a staleness test keeps current</p></td><td>MUST</td></tr>
     </tbody>
   </table></div>
-  <p>Try it: <code>node packages/plugin-spn-infra/tests/run.mjs</code></p>
+  <p>Try it:</p>
+  <pre data-lang="sh">node packages/plugin-spn-infra/tests/run.mjs</pre>
 </section>
 
 
@@ -144,4 +146,4 @@
 </div>
 </div>
 
-<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.js" integrity="sha384-MUUUVipJdxCmJyrxeNHKq8xMzGTvQ+TAsWDvN5w6TKPfuOUPtHk1E90wKCBZNRC7" crossorigin="anonymous"></script>
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.15.0/sds-docs.js" integrity="sha384-XYna7dQ9hUAzsp8poWNLetdO4Oyfh/cIKwuuh6sduxMcNDmnLGJ3zcw6DaG1IN9+" crossorigin="anonymous"></script>

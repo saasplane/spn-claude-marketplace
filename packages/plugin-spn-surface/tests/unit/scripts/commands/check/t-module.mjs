@@ -40,5 +40,10 @@ writeFileSync(join(good, "assets", "language", "design-language.json"), "{}\n");
 const fixed = run(good);
 ok("[MKT.SCRIPTS.605] assets/ and entry/ with folders by kind passes", fixed.code === 0 && fixed.out.startsWith("OK "), `exit ${fixed.code}: ${fixed.out.trim()}`);
 
+const offSchema = module("off-schema", ["assets/language", "entry/ui"]);
+writeFileSync(join(offSchema, "assets", "language", "design-language.json"), '{"drawingStyle": 7, "nothing": "a schema would refuse"}\n');
+const unread = run(offSchema);
+ok("[MKT.SCRIPTS.612] the module check reads no design-language data file: one off any schema passes", unread.code === 0 && unread.out.startsWith("OK "), `exit ${unread.code}: ${unread.out.trim()}`);
+
 console.log(failed ? `\n  ${failed} of ${total} FAILED` : `\n  all ${total} passed`);
 process.exit(failed ? 1 : 0);

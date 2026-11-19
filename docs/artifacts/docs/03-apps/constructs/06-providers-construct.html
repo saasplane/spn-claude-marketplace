@@ -4,7 +4,7 @@
 {"id":"apps-providers","variant":"construct","title":"Providers","subtitle":"The one folder where a language may be named at all.","lenses":["ARCHITECT","SERVER_DEV"],"status":"PLANNING","dependsOn":["provider-set","stack-skills","stack-checks"],"summary":"Providers is the one folder in this plugin allowed to name a language, holding everything that varies with the language a project is written in, one folder per stack.","keywords":["provider","instance","stack","steps","subject","private"]}
 -->
 <!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
-<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.css" integrity="sha384-EFi+bm+soztQp3Bg2oQPRtdkdyGkD/O1qSDL0QCFBIHQg2sNtFhUHlkwxArFA8dY" crossorigin="anonymous">
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.15.0/sds-docs.css" integrity="sha384-R47poopLRnz65naDQiMbuRZgxiTZtsgOLsiaP10qjWo62gNyH4ezyJy2v/TyMG5J" crossorigin="anonymous">
 <div class="sds-page">
 
 <nav class="sds-rail" id="rail">
@@ -48,34 +48,35 @@
 <section id="s2">
   <div class="sds-section-head"><h2>Model</h2></div>
   <p>The gate composes a path from the declaration and imports whatever is there. Nothing about the stack reaches the gate, and nothing about the gate is repeated in the provider.</p>
-  <figure>
-  <svg class="sds-drawing" viewBox="283 22 534 372" style="max-width:534px" role="img" aria-label="The path is composed from the declaration, which is why a second stack costs a folder and no edit.">
-    <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
-    <rect class="sds-box" x="428" y="24" width="244" height="76" rx="3"/>
-    <text class="sds-label" x="444" y="50">the claim</text>
-    <text class="sds-note" x="444" y="69">the stack the nearest sprepo.json</text>
-    <text class="sds-note" x="444" y="88">declares</text>
-    <rect class="sds-box" x="425" y="156" width="250" height="76" rx="3"/>
-    <text class="sds-label" x="441" y="182">the composed path</text>
-    <text class="sds-note" x="441" y="201">providers/&lt;stack&gt;/ — never written</text>
-    <text class="sds-note" x="441" y="220">out in a gate</text>
-    <rect class="sds-box" x="285" y="316" width="250" height="76" rx="3"/>
-    <text class="sds-label" x="301" y="342">the skills half</text>
-    <text class="sds-note" x="301" y="361">a procedure: what to do, in order,</text>
-    <text class="sds-note" x="301" y="380">in this stack</text>
-    <rect class="sds-box" x="591" y="316" width="224" height="76" rx="3"/>
-    <text class="sds-label" x="607" y="342">the scripts half</text>
-    <text class="sds-note" x="607" y="361">a parse, and the private rules</text>
-    <text class="sds-note" x="607" y="380">that read it</text>
-    <path class="sds-connector" d="M550 100 V156" marker-end="url(#ar)"/>
-    <path class="sds-connector" d="M488 232 V260 H410 V316" marker-end="url(#ar)"/>
-    <path class="sds-connector" d="M613 232 V288 H703 V316" marker-end="url(#ar)"/>
-    <text class="sds-note" x="558" y="136">composes</text>
-    <text class="sds-note" x="496" y="252">a skill loads</text>
-    <text class="sds-note" x="709" y="280">a gate imports</text>
-  </svg>
-    <figcaption>The path is composed from the declaration, which is why a second stack costs a folder and no edit.</figcaption>
-  </figure>
+<figure class="dl-figure">
+<div class="dl-frame">
+<svg class="dl-svg" viewBox="0 0 928 364" role="img" aria-label="The path is composed from the declaration, which is why a second stack costs a folder and no edit.">
+  <rect class="dl-tile" x="332" y="16" width="264" height="64" rx="10"/>
+  <text class="dl-name" x="344" y="37">the claim</text>
+  <text class="dl-detail" x="344" y="52">the stack the nearest sprepo.json</text>
+  <text class="dl-detail" x="344" y="67">declares</text>
+  <rect class="dl-tile" x="332" y="136" width="264" height="64" rx="10"/>
+  <text class="dl-name" x="344" y="157">the composed path</text>
+  <text class="dl-detail" x="344" y="172">providers/&lt;stack&gt;/ — never written out</text>
+  <text class="dl-detail" x="344" y="187">in a gate</text>
+  <rect class="dl-tile" x="172" y="284" width="264" height="64" rx="10"/>
+  <text class="dl-name" x="184" y="305">the skills half</text>
+  <text class="dl-detail" x="184" y="320">a procedure: what to do, in order, in</text>
+  <text class="dl-detail" x="184" y="335">this stack</text>
+  <rect class="dl-tile" x="492" y="284" width="264" height="64" rx="10"/>
+  <text class="dl-name" x="504" y="305">the scripts half</text>
+  <text class="dl-detail" x="504" y="320">a parse, and the private rules that read</text>
+  <text class="dl-detail" x="504" y="335">it</text>
+  <path class="dl-wire" d="M464 80 L464 136"/>
+  <path class="dl-wire" d="M464 200 L464 220 Q464 228 456 228 L312 228 Q304 228 304 236 L304 284"/>
+  <path class="dl-wire" d="M464 200 L464 220 Q464 228 472 228 L522 228 Q530 228 530 236 L530 248 Q530 256 538 256 L616 256 Q624 256 624 264 L624 284"/>
+  <text class="dl-wlabel" x="472" y="116">composes</text>
+  <text class="dl-wlabel" x="312" y="220">a skill loads</text>
+  <text class="dl-wlabel" x="538" y="248">a gate imports</text>
+</svg>
+</div>
+<figcaption>The path is composed from the declaration, which is why a second stack costs a folder and no edit.</figcaption>
+</figure>
   <!-- dg:source
 { "kind": "map",
   "caption": "The path is composed from the declaration, which is why a second stack costs a folder and no edit.",
@@ -145,7 +146,8 @@
       <tr><td><p><code>RULE.PLATFORM.CORE.033</code></p><p>the enablement grammar the source subject's refusals are written against</p></td><td>MUST</td></tr>
     </tbody>
   </table></div>
-  <p>Try it: <code>node packages/plugin-spn-apps/tests/run.mjs</code></p>
+  <p>Try it:</p>
+  <pre data-lang="sh">node packages/plugin-spn-apps/tests/run.mjs</pre>
 </section>
 
 
@@ -153,4 +155,4 @@
 </div>
 </div>
 
-<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.js" integrity="sha384-MUUUVipJdxCmJyrxeNHKq8xMzGTvQ+TAsWDvN5w6TKPfuOUPtHk1E90wKCBZNRC7" crossorigin="anonymous"></script>
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.15.0/sds-docs.js" integrity="sha384-XYna7dQ9hUAzsp8poWNLetdO4Oyfh/cIKwuuh6sduxMcNDmnLGJ3zcw6DaG1IN9+" crossorigin="anonymous"></script>

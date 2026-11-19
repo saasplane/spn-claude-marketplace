@@ -4,7 +4,7 @@
 {"id":"surface-tests","variant":"construct","title":"Tests","subtitle":"How this plugin proves the check and the scripts it ships.","lenses":["QA","WEB_DEV"],"status":"PLANNING","dependsOn":["surface-scripts"],"summary":"This plugin ships a rule that runs on a person's design file, so it owes proof of its own: one tier, mirrored on its source, behind a runner that walks and judges on an exit code.","keywords":["tests","tier","mirror","runner","harness","bundle"]}
 -->
 <!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
-<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.css" integrity="sha384-EFi+bm+soztQp3Bg2oQPRtdkdyGkD/O1qSDL0QCFBIHQg2sNtFhUHlkwxArFA8dY" crossorigin="anonymous">
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.15.0/sds-docs.css" integrity="sha384-R47poopLRnz65naDQiMbuRZgxiTZtsgOLsiaP10qjWo62gNyH4ezyJy2v/TyMG5J" crossorigin="anonymous">
 <div class="sds-page">
 
 <nav class="sds-rail" id="rail">
@@ -47,32 +47,31 @@
 <section id="s2">
   <div class="sds-section-head"><h2>Model</h2></div>
   <p>The runner walks the tier, runs each suite in its own process, and reads the exit code as the verdict.</p>
-  <figure>
-  <svg class="sds-drawing" viewBox="279 22 541 353" style="max-width:541px" role="img" aria-label="The exit code is the verdict; the summary line only says how many cases there were.">
-    <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
-    <rect class="sds-box" x="444" y="24" width="212" height="57" rx="3"/>
-    <text class="sds-label" x="460" y="50">the runner</text>
-    <text class="sds-note" x="460" y="69">tests/run.mjs walks the tier</text>
-    <rect class="sds-box" x="428" y="137" width="244" height="76" rx="3"/>
-    <text class="sds-label" x="444" y="163">a suite</text>
-    <text class="sds-note" x="444" y="182">t-&lt;name&gt;.mjs at its source file's</text>
-    <text class="sds-note" x="444" y="201">path</text>
-    <rect class="sds-box" x="281" y="297" width="237" height="76" rx="3"/>
-    <text class="sds-label" x="297" y="323">the harness</text>
-    <text class="sds-note" x="297" y="342">the plugin root, found and never</text>
-    <text class="sds-note" x="297" y="361">counted</text>
-    <rect class="sds-box" x="574" y="297" width="244" height="57" rx="3"/>
-    <text class="sds-label" x="590" y="323">the verdict</text>
-    <text class="sds-note" x="590" y="342">the exit code, one line per suite</text>
-    <path class="sds-connector" d="M550 81 V137" marker-end="url(#ar)"/>
-    <path class="sds-connector" d="M489 213 V241 H400 V297" marker-end="url(#ar)"/>
-    <path class="sds-connector" d="M611 213 V269 H696 V297" marker-end="url(#ar)"/>
-    <text class="sds-note" x="558" y="117">runs</text>
-    <text class="sds-note" x="619" y="233">is written against</text>
-    <text class="sds-note" x="631" y="261">ends in</text>
-  </svg>
-    <figcaption>The exit code is the verdict; the summary line only says how many cases there were.</figcaption>
-  </figure>
+<figure class="dl-figure">
+<div class="dl-frame">
+<svg class="dl-svg" viewBox="0 0 928 316" role="img" aria-label="The exit code is the verdict; the summary line only says how many cases there were.">
+  <rect class="dl-tile" x="332" y="16" width="264" height="48" rx="10"/>
+  <text class="dl-name" x="344" y="37">the runner</text>
+  <text class="dl-detail" x="344" y="52">tests/run.mjs walks the tier</text>
+  <rect class="dl-tile" x="332" y="120" width="264" height="48" rx="10"/>
+  <text class="dl-name" x="344" y="141">a suite</text>
+  <text class="dl-detail" x="344" y="156">t-&lt;name&gt;.mjs at its source file's path</text>
+  <rect class="dl-tile" x="172" y="252" width="264" height="48" rx="10"/>
+  <text class="dl-name" x="184" y="273">the harness</text>
+  <text class="dl-detail" x="184" y="288">the plugin root, found and never counted</text>
+  <rect class="dl-tile" x="492" y="252" width="264" height="48" rx="10"/>
+  <text class="dl-name" x="504" y="273">the verdict</text>
+  <text class="dl-detail" x="504" y="288">the exit code, one line per suite</text>
+  <path class="dl-wire" d="M464 64 L464 120"/>
+  <path class="dl-wire" d="M464 168 L464 188 Q464 196 456 196 L312 196 Q304 196 304 204 L304 252"/>
+  <path class="dl-wire" d="M464 168 L464 188 Q464 196 472 196 L522 196 Q530 196 530 204 L530 216 Q530 224 538 224 L616 224 Q624 224 624 232 L624 252"/>
+  <text class="dl-wlabel" x="472" y="100">runs</text>
+  <text class="dl-wlabel" x="348" y="188">is written against</text>
+  <text class="dl-wlabel" x="556" y="216">ends in</text>
+</svg>
+</div>
+<figcaption>The exit code is the verdict; the summary line only says how many cases there were.</figcaption>
+</figure>
   <!-- dg:source
 { "kind": "map",
   "caption": "The exit code is the verdict; the summary line only says how many cases there were.",
@@ -125,7 +124,8 @@
       <tr><td><p>the foundation's plugins construct § The shape of a plugin, and its <code>04-plugins/02-shape.md</code></p><p>a hook is run from a committed bundle a staleness test keeps current</p></td><td>MUST</td></tr>
     </tbody>
   </table></div>
-  <p>Try it: <code>node packages/plugin-spn-surface/tests/run.mjs</code></p>
+  <p>Try it:</p>
+  <pre data-lang="sh">node packages/plugin-spn-surface/tests/run.mjs</pre>
 </section>
 
 
@@ -133,4 +133,4 @@
 </div>
 </div>
 
-<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.js" integrity="sha384-MUUUVipJdxCmJyrxeNHKq8xMzGTvQ+TAsWDvN5w6TKPfuOUPtHk1E90wKCBZNRC7" crossorigin="anonymous"></script>
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.15.0/sds-docs.js" integrity="sha384-XYna7dQ9hUAzsp8poWNLetdO4Oyfh/cIKwuuh6sduxMcNDmnLGJ3zcw6DaG1IN9+" crossorigin="anonymous"></script>

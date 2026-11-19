@@ -4,7 +4,7 @@
 {"id":"tests","variant":"construct","title":"Tests","subtitle":"A suite sits at the same path as the file it proves, so nothing has to be searched for.","lenses":["QA","SERVER_DEV"],"status":"PLANNING","dependsOn":["plugin-set","checks"],"summary":"Tests is the folder a plugin proves itself from, arranged so a reader can find the suite that covers a script just by following that script's own path.","keywords":["test","suite","tier","mirror","runner","harness"]}
 -->
 <!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
-<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.css" integrity="sha384-EFi+bm+soztQp3Bg2oQPRtdkdyGkD/O1qSDL0QCFBIHQg2sNtFhUHlkwxArFA8dY" crossorigin="anonymous">
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.15.0/sds-docs.css" integrity="sha384-R47poopLRnz65naDQiMbuRZgxiTZtsgOLsiaP10qjWo62gNyH4ezyJy2v/TyMG5J" crossorigin="anonymous">
 <div class="sds-page">
 
 <nav class="sds-rail" id="rail">
@@ -49,34 +49,35 @@
 <section id="s2">
   <div class="sds-section-head"><h2>Model</h2></div>
   <p>A suite's address is derived, never chosen. Read it outward from the folder every plugin's proof sits in.</p>
-  <figure>
-  <svg class="sds-drawing" viewBox="426 22 248 428" style="max-width:248px" role="img" aria-label="The tier comes first and the mirror second, so a second tier for one file lands beside its suite rather than on it.">
-    <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
-    <rect class="sds-box" x="428" y="24" width="244" height="76" rx="3"/>
-    <text class="sds-label" x="444" y="50">tests/</text>
-    <text class="sds-note" x="444" y="69">the root; the runner and the</text>
-    <text class="sds-note" x="444" y="88">helpers sit here and nowhere else</text>
-    <path class="sds-connector" d="M550 100 V140" marker-end="url(#ar)"/>
-    <text class="sds-note" x="560" y="124">first</text>
-    <rect class="sds-box" x="428" y="140" width="244" height="76" rx="3"/>
-    <text class="sds-label" x="444" y="166">the tier</text>
-    <text class="sds-note" x="444" y="185">unit — what kind of proof the</text>
-    <text class="sds-note" x="444" y="204">suites below are</text>
-    <path class="sds-connector" d="M550 216 V256" marker-end="url(#ar)"/>
-    <text class="sds-note" x="560" y="240">then</text>
-    <rect class="sds-box" x="428" y="256" width="244" height="76" rx="3"/>
-    <text class="sds-label" x="444" y="282">the mirror</text>
-    <text class="sds-note" x="444" y="301">the source file's own path inside</text>
-    <text class="sds-note" x="444" y="320">the plugin, repeated</text>
-    <path class="sds-connector" d="M550 332 V372" marker-end="url(#ar)"/>
-    <text class="sds-note" x="560" y="356">names</text>
-    <rect class="sds-box" x="428" y="372" width="244" height="76" rx="3"/>
-    <text class="sds-label" x="444" y="398">the suite</text>
-    <text class="sds-note" x="444" y="417">t-&lt;name&gt;.mjs, reached by a walk</text>
-    <text class="sds-note" x="444" y="436">and never by a list</text>
-  </svg>
-    <figcaption>The tier comes first and the mirror second, so a second tier for one file lands beside its suite rather than on it.</figcaption>
-  </figure>
+<figure class="dl-figure">
+<div class="dl-frame">
+<svg class="dl-svg" viewBox="0 0 928 408" role="img" aria-label="The tier comes first and the mirror second, so a second tier for one file lands beside its suite rather than on it.">
+  <rect class="dl-tile" x="332" y="16" width="264" height="64" rx="10"/>
+  <text class="dl-name" x="344" y="37">tests/</text>
+  <text class="dl-detail" x="344" y="52">the root; the runner and the helpers sit</text>
+  <text class="dl-detail" x="344" y="67">here and nowhere else</text>
+  <path class="dl-wire" d="M464 80 L464 120"/>
+  <text class="dl-wlabel" x="476" y="104">first</text>
+  <rect class="dl-tile" x="332" y="120" width="264" height="64" rx="10"/>
+  <text class="dl-name" x="344" y="141">the tier</text>
+  <text class="dl-detail" x="344" y="156">unit — what kind of proof the suites</text>
+  <text class="dl-detail" x="344" y="171">below are</text>
+  <path class="dl-wire" d="M464 184 L464 224"/>
+  <text class="dl-wlabel" x="476" y="208">then</text>
+  <rect class="dl-tile" x="332" y="224" width="264" height="64" rx="10"/>
+  <text class="dl-name" x="344" y="245">the mirror</text>
+  <text class="dl-detail" x="344" y="260">the source file's own path inside the</text>
+  <text class="dl-detail" x="344" y="275">plugin, repeated</text>
+  <path class="dl-wire" d="M464 288 L464 328"/>
+  <text class="dl-wlabel" x="476" y="312">names</text>
+  <rect class="dl-tile" x="332" y="328" width="264" height="64" rx="10"/>
+  <text class="dl-name" x="344" y="349">the suite</text>
+  <text class="dl-detail" x="344" y="364">t-&lt;name&gt;.mjs, reached by a walk and</text>
+  <text class="dl-detail" x="344" y="379">never by a list</text>
+</svg>
+</div>
+<figcaption>The tier comes first and the mirror second, so a second tier for one file lands beside its suite rather than on it.</figcaption>
+</figure>
   <!-- dg:source
 { "kind": "map",
   "caption": "The tier comes first and the mirror second, so a second tier for one file lands beside its suite rather than on it.",
@@ -99,9 +100,22 @@
 <section id="s3">
   <div class="sds-section-head"><h2>Parts</h2></div>
   <h3 id="folder-contents-what-the-folder-holds-an">Folder contents — What the folder holds, and the two tiers that are absent</h3>
-  <p><code>tests/</code> holds the runner, a <code>helpers/</code> folder for what every suite imports, and one folder per tier. Only <code>unit/</code> exists. <code>integration/</code> is absent because nothing in these plugins runs at that tier, and <code>setup/</code> is absent because the runner needs none. <strong>An absent folder says what is true; a folder standing empty to look complete teaches a reader that the tier works.</strong></p>
+  <p><code>tests/</code> holds the runner, a <code>helpers/</code> folder for what every suite imports, and one folder per tier. Only <code>unit/</code> exists:</p>
+  <ul>
+    <li><code>integration/</code> is absent because nothing in these plugins runs at that tier.</li>
+    <li><code>setup/</code> is absent because the runner needs none.</li>
+  </ul>
+  <p><strong>An absent folder says what is true; a folder standing empty to look complete teaches a reader that the tier works.</strong></p>
   <h3 id="mirror-path-the-mirror-repeats-the-sourc">Mirror path — The mirror repeats the source's own path</h3>
-  <p>Under the tier, a suite sits at the path its source sits at inside the plugin. A check under <code>src/scripts/checks/</code> is proven under <code>unit/scripts/checks/</code>. A provider's rule is the one place the two paths differ: it lives under <code>src/providers/&lt;instance&gt;/scripts/checks/_&lt;subject&gt;/</code> and is proven under <code>unit/providers/&lt;instance&gt;/checks/_&lt;subject&gt;/</code>, without the provider's <code>scripts/</code> segment. Apart from that, nothing maps one to the other: the path is the map.</p>
+  <p>Under the tier, a suite sits at the path its source sits at inside the plugin.</p>
+  <div class="sds-scroll"><table>
+    <thead><tr><th>Source</th><th>Proven under</th></tr></thead>
+    <tbody>
+      <tr><td>a check under <code>src/scripts/checks/</code></td><td><code>unit/scripts/checks/</code></td></tr>
+      <tr><td>a provider's rule under <code>src/providers/&lt;instance&gt;/scripts/checks/_&lt;subject&gt;/</code></td><td><code>unit/providers/&lt;instance&gt;/checks/_&lt;subject&gt;/</code>, without the provider's <code>scripts/</code> segment</td></tr>
+    </tbody>
+  </table></div>
+  <p>A provider's rule is the one place the two paths differ. Apart from that, nothing maps one to the other: the path is the map.</p>
   <h3 id="folders-and-framework-the-folders-are-th">Folders and framework — The folders are the convention; the framework is not</h3>
   <p>The authoring stack's own test step names a framework as well as a tree, and only the tree is adopted here. These suites drive real hook processes through standard input and assert on what comes back out, so a framework would wrap a subprocess harness in another harness and buy nothing. <strong>The runner stays a plain <code>.mjs</code> file with no dependency</strong>, which is also what lets a partner run it with nothing installed.</p>
   <h3 id="hop-counting-nothing-counts-a-hop">Hop counting — Nothing counts a <code>..</code> hop</h3>
@@ -111,30 +125,28 @@
   <h3 id="behaviour-ids-a-case-that-carries-a-beha">Behaviour ids — A case that carries a behaviour id becomes that row's result</h3>
   <p>This repository declares no stack, so no stack runner writes its behaviour rows. The suites are the runner instead: a case whose title carries a row's id writes that row's result into the file of the run its caller named, and a tool told that run's name reads the file and fills the two cells a run owns. A row no case reached is left saying so.</p>
   <p>The figure below is that hand-off as one line, from a case's title to the row's cells.</p>
-  <figure>
-  <svg class="sds-drawing" viewBox="426 22 248 409" style="max-width:248px" role="img" aria-label="The case cites the row and the tool only reads the file, so a row a case never reached is left saying so.">
-    <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
-    <rect class="sds-box" x="428" y="24" width="244" height="57" rx="3"/>
-    <text class="sds-label" x="444" y="50">A case</text>
-    <text class="sds-note" x="444" y="69">its title carries a row's id</text>
-    <path class="sds-connector" d="M550 81 V121" marker-end="url(#ar)"/>
-    <rect class="sds-box" x="428" y="121" width="244" height="76" rx="3"/>
-    <text class="sds-label" x="444" y="147">The run's file</text>
-    <text class="sds-note" x="444" y="166">written under the name the caller</text>
-    <text class="sds-note" x="444" y="185">gave</text>
-    <path class="sds-connector" d="M550 197 V237" marker-end="url(#ar)"/>
-    <rect class="sds-box" x="428" y="237" width="244" height="76" rx="3"/>
-    <text class="sds-label" x="444" y="263">The tool</text>
-    <text class="sds-note" x="444" y="282">told that run's name, reads the</text>
-    <text class="sds-note" x="444" y="301">file</text>
-    <path class="sds-connector" d="M550 313 V353" marker-end="url(#ar)"/>
-    <rect class="sds-box sds-tone-blue" x="428" y="353" width="244" height="76" rx="3"/>
-    <text class="sds-label" x="444" y="379">The row</text>
-    <text class="sds-note" x="444" y="398">the two cells a run owns are</text>
-    <text class="sds-note" x="444" y="417">filled</text>
-  </svg>
-    <figcaption>The case cites the row and the tool only reads the file, so a row a case never reached is left saying so.</figcaption>
-  </figure>
+<figure class="dl-figure">
+<div class="dl-frame">
+<svg class="dl-svg" viewBox="0 0 928 344" role="img" aria-label="The case cites the row and the tool only reads the file, so a row a case never reached is left saying so.">
+  <rect class="dl-tile" x="340" y="16" width="252" height="48" rx="10"/>
+  <text class="dl-name" x="352" y="37">A case</text>
+  <text class="dl-detail" x="352" y="52">its title carries a row's id</text>
+  <path class="dl-wire" d="M466 64 L466 104"/>
+  <rect class="dl-tile" x="340" y="104" width="252" height="48" rx="10"/>
+  <text class="dl-name" x="352" y="125">The run's file</text>
+  <text class="dl-detail" x="352" y="140">written under the name the caller gave</text>
+  <path class="dl-wire" d="M466 152 L466 192"/>
+  <rect class="dl-tile" x="340" y="192" width="252" height="48" rx="10"/>
+  <text class="dl-name" x="352" y="213">The tool</text>
+  <text class="dl-detail" x="352" y="228">told that run's name, reads the file</text>
+  <path class="dl-wire" d="M466 240 L466 280"/>
+  <rect class="dl-tile-on" x="340" y="280" width="252" height="48" rx="10"/>
+  <text class="dl-name" x="352" y="301">The row</text>
+  <text class="dl-detail" x="352" y="316">the two cells a run owns are filled</text>
+</svg>
+</div>
+<figcaption>The case cites the row and the tool only reads the file, so a row a case never reached is left saying so.</figcaption>
+</figure>
   <!-- dg:source
 { "kind": "chain",
   "caption": "The case cites the row and the tool only reads the file, so a row a case never reached is left saying so.",
@@ -148,7 +160,14 @@
   <h3 id="shipping-shape-what-a-suite-proves-is-th">Shipping shape — What a suite proves is the shipping shape</h3>
   <p>A suite runs the script the way a moment runs it — as a process, handed a payload on standard input, read back from standard output — rather than importing a function and calling it. A gate that passes when imported and fails when spawned is a gate that has never been proven, and both spellings exist in the folder it is asked about.</p>
   <h3 id="replayed-payloads-the-payload-a-case-rep">Replayed payloads — The payload a case replays sits beside the suites, once per event</h3>
-  <p><code>tests/fixtures/payloads/&lt;event&gt;/</code> holds one recorded call per event this plugin wires — <code>orientation</code> · <code>pretooluse</code> · <code>closed</code> · <code>stop</code> — and a suite reads one rather than constructing its own. A payload is an input, never a generated answer, so a stale one is a fixture problem and never a passing case that stopped proving anything.</p>
+  <p><code>tests/fixtures/payloads/&lt;event&gt;/</code> holds one recorded call per event this plugin wires:</p>
+  <ul>
+    <li><code>orientation</code></li>
+    <li><code>pretooluse</code></li>
+    <li><code>closed</code></li>
+    <li><code>stop</code></li>
+  </ul>
+  <p>A suite reads one rather than constructing its own. A payload is an input, never a generated answer, so a stale one is a fixture problem and never a passing case that stopped proving anything.</p>
   <h3 id="bundle-cases-two-more-cases-prove-the-bu">Bundle cases — Two more cases prove the bundle, not one file</h3>
   <p>Once a plugin builds, <code>unit/t-dist-current.mjs</code> and <code>unit/t-bundle-parity.mjs</code> sit at the tree's root rather than under any one mirror, because each proves a property of the whole plugin: the first recomputes a bundle's declared sources against the banner esbuild wrote into it, and the second runs a recorded payload through the source and through the committed bundle and asserts the two agree. Both call the one shared harness the foundation's plugins realization states, <code>packages/plugin-support-lib/tests/helpers/</code>, so the build and the check can never quietly disagree.</p>
 </section>
@@ -181,7 +200,8 @@
       <tr><td><p>the foundation's <code>04-plugins/02-shape.md</code></p><p>the staleness case, the parity case, the payload fixture, and the shared harness every plugin's tests owe once it builds</p></td><td>MUST</td></tr>
     </tbody>
   </table></div>
-  <p>Try it: <code>node packages/plugin-spn-devex/tests/run.mjs</code></p>
+  <p>Try it:</p>
+  <pre data-lang="sh">node packages/plugin-spn-devex/tests/run.mjs</pre>
 </section>
 
 
@@ -189,4 +209,4 @@
 </div>
 </div>
 
-<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.js" integrity="sha384-MUUUVipJdxCmJyrxeNHKq8xMzGTvQ+TAsWDvN5w6TKPfuOUPtHk1E90wKCBZNRC7" crossorigin="anonymous"></script>
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.15.0/sds-docs.js" integrity="sha384-XYna7dQ9hUAzsp8poWNLetdO4Oyfh/cIKwuuh6sduxMcNDmnLGJ3zcw6DaG1IN9+" crossorigin="anonymous"></script>

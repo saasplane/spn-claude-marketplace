@@ -62,7 +62,14 @@ The last arrow is the one to remember: a session reads the installed copy, so ed
 
 ### The manifest
 
-Each plugin folder carries one manifest at `.claude-plugin/plugin.json`, holding a `name`, a `version`, a `description` and an `author`. The description is long on purpose. It is matched against the work at hand rather than browsed by a person, so it states in full what the plugin carries.
+Each plugin folder carries one manifest at `.claude-plugin/plugin.json`, holding:
+
+- a `name`;
+- a `version`;
+- a `description`;
+- an `author`.
+
+The description is long on purpose. It is matched against the work at hand rather than browsed by a person, so it states in full what the plugin carries.
 
 ### Version — The version names what is published
 

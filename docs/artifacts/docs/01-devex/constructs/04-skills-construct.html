@@ -4,7 +4,7 @@
 {"id":"skill-set","variant":"construct","title":"Skills","subtitle":"A skill only loads when the work in front of you actually matches it.","lenses":["ARCHITECT","LEAD"],"status":"PLANNING","dependsOn":["plugin-set"],"summary":"A skill is a named unit of work a session can be asked for — a folder holding a description that is matched against the work at hand, and the instructions that load only once that description matches.","keywords":["skill","SKILL.md","description","match","steps","stage"]}
 -->
 <!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
-<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.css" integrity="sha384-EFi+bm+soztQp3Bg2oQPRtdkdyGkD/O1qSDL0QCFBIHQg2sNtFhUHlkwxArFA8dY" crossorigin="anonymous">
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.15.0/sds-docs.css" integrity="sha384-R47poopLRnz65naDQiMbuRZgxiTZtsgOLsiaP10qjWo62gNyH4ezyJy2v/TyMG5J" crossorigin="anonymous">
 <div class="sds-page">
 
 <nav class="sds-rail" id="rail">
@@ -49,34 +49,34 @@
 <section id="s2">
   <div class="sds-section-head"><h2>Model</h2></div>
   <p>The listing is cheap to hold because it is one line per skill. Everything expensive is read only after a match.</p>
-  <figure>
-  <svg class="sds-drawing" viewBox="423 22 254 428" style="max-width:254px" role="img" aria-label="The listing is the only part held in full; everything after it is read only on a match.">
-    <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
-    <rect class="sds-box" x="425" y="24" width="250" height="76" rx="3"/>
-    <text class="sds-label" x="441" y="50">the work at hand</text>
-    <text class="sds-note" x="441" y="69">what this turn is trying to do, in</text>
-    <text class="sds-note" x="441" y="88">your own words</text>
-    <path class="sds-connector" d="M550 100 V140" marker-end="url(#ar)"/>
-    <text class="sds-note" x="560" y="124">matched against</text>
-    <rect class="sds-box" x="425" y="140" width="250" height="76" rx="3"/>
-    <text class="sds-label" x="441" y="166">the listing</text>
-    <text class="sds-note" x="441" y="185">every installed skill's name and</text>
-    <text class="sds-note" x="441" y="204">description, one line each</text>
-    <path class="sds-connector" d="M550 216 V256" marker-end="url(#ar)"/>
-    <text class="sds-note" x="560" y="240">loads</text>
-    <rect class="sds-box" x="425" y="256" width="250" height="76" rx="3"/>
-    <text class="sds-label" x="441" y="282">SKILL.md</text>
-    <text class="sds-note" x="441" y="301">loaded only once a description</text>
-    <text class="sds-note" x="441" y="320">matches the work</text>
-    <path class="sds-connector" d="M550 332 V372" marker-end="url(#ar)"/>
-    <text class="sds-note" x="560" y="356">sequences</text>
-    <rect class="sds-box" x="425" y="372" width="250" height="76" rx="3"/>
-    <text class="sds-label" x="441" y="398">a step file</text>
-    <text class="sds-note" x="441" y="417">read only when the skill sequences</text>
-    <text class="sds-note" x="441" y="436">it</text>
-  </svg>
-    <figcaption>The listing is the only part held in full; everything after it is read only on a match.</figcaption>
-  </figure>
+<figure class="dl-figure">
+<div class="dl-frame">
+<svg class="dl-svg" viewBox="0 0 928 408" role="img" aria-label="The listing is the only part held in full; everything after it is read only on a match.">
+  <rect class="dl-tile" x="336" y="16" width="260" height="64" rx="10"/>
+  <text class="dl-name" x="348" y="37">the work at hand</text>
+  <text class="dl-detail" x="348" y="52">what this turn is trying to do, in your</text>
+  <text class="dl-detail" x="348" y="67">own words</text>
+  <path class="dl-wire" d="M466 80 L466 120"/>
+  <text class="dl-wlabel" x="478" y="104">matched against</text>
+  <rect class="dl-tile" x="336" y="120" width="260" height="64" rx="10"/>
+  <text class="dl-name" x="348" y="141">the listing</text>
+  <text class="dl-detail" x="348" y="156">every installed skill's name and</text>
+  <text class="dl-detail" x="348" y="171">description, one line each</text>
+  <path class="dl-wire" d="M466 184 L466 224"/>
+  <text class="dl-wlabel" x="478" y="208">loads</text>
+  <rect class="dl-tile" x="336" y="224" width="260" height="64" rx="10"/>
+  <text class="dl-name" x="348" y="245">SKILL.md</text>
+  <text class="dl-detail" x="348" y="260">loaded only once a description matches</text>
+  <text class="dl-detail" x="348" y="275">the work</text>
+  <path class="dl-wire" d="M466 288 L466 328"/>
+  <text class="dl-wlabel" x="478" y="312">sequences</text>
+  <rect class="dl-tile" x="336" y="328" width="260" height="64" rx="10"/>
+  <text class="dl-name" x="348" y="349">a step file</text>
+  <text class="dl-detail" x="348" y="364">read only when the skill sequences it</text>
+</svg>
+</div>
+<figcaption>The listing is the only part held in full; everything after it is read only on a match.</figcaption>
+</figure>
   <!-- dg:source
 { "kind": "map",
   "caption": "The listing is the only part held in full; everything after it is read only on a match.",
@@ -142,7 +142,8 @@
       <tr><td><p><code>RULE.DEVEX.AGENT.025</code></p><p>a folder per skill value and a value per folder, so the set a gate dispatches over is closed</p></td><td>MUST</td></tr>
     </tbody>
   </table></div>
-  <p>Try it: <code>spn-devex restates check</code></p>
+  <p>Try it:</p>
+  <pre data-lang="sh">spn-devex restates check</pre>
 </section>
 
 
@@ -150,4 +151,4 @@
 </div>
 </div>
 
-<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.js" integrity="sha384-MUUUVipJdxCmJyrxeNHKq8xMzGTvQ+TAsWDvN5w6TKPfuOUPtHk1E90wKCBZNRC7" crossorigin="anonymous"></script>
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.15.0/sds-docs.js" integrity="sha384-XYna7dQ9hUAzsp8poWNLetdO4Oyfh/cIKwuuh6sduxMcNDmnLGJ3zcw6DaG1IN9+" crossorigin="anonymous"></script>
