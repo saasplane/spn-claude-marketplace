@@ -76,6 +76,20 @@ The brand is also one fenced `json` block, in the theme's own keys, which the co
              "typefaces": { "text": "{{…}}", "display": "{{…}}", "code": "{{…}}" } } }
 ```
 
+### The language as data
+
+{{The language's own choices, as the construct's last data block: the pages it is for, how its sections, interactions and media are styled and how dense it is. `spn-surface language write` fills the construct's figures from this block, and it is never a separate file.}}
+
+```json
+{ "language": { "name": "{{saasplane-site}}",
+                "for": "{{Visitor}}",
+                "pageTemplates": ["{{…}}"],
+                "sectionStyle": "{{…}}",
+                "interactionStyle": "{{…}}",
+                "mediaStyle": "{{…}}",
+                "density": "{{…}}" } }
+```
+
 ### The references
 
 | Site | Read | What was taken |
