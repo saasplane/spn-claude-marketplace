@@ -3,7 +3,7 @@
   "files": [
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/templates",
-      "seen": "880f311d"
+      "seen": "aec2dd49"
     }
   ]
 }
