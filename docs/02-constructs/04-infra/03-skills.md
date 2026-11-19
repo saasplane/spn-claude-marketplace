@@ -101,4 +101,8 @@ This page answers which skills an estate repository answers to and what each one
 | `RULE.DEVEX.WORKSPACE.020` | a cloud is changed only through the tool's own doors, and never by hand | MUST |
 | `RULE.DEVEX.UTILS.019` | every skill here restates a chapter and adds no rule of its own | MUST |
 
-Try it: `spn-devex restates check`
+Try it:
+
+```sh
+spn-devex restates check
+```

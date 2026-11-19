@@ -105,4 +105,8 @@ Add `providers/<instance>/`, with a `skills/` half for what a skill loads and a 
 | `RULE.DEVEX.WORKSPACE.176` | a repository answers to the world it declares, which is what makes `sprepo.json` the one place an instance is read from | MUST |
 | the apps plugin's subject registry | *until a parser exists there is no folder for it* — a realization that is absent says so, and a stub that answers teaches you it works | MUST |
 
-Try it: `spn-devex docs coherence check`
+Try it:
+
+```sh
+spn-devex docs coherence check
+```

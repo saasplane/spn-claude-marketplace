@@ -147,4 +147,8 @@ This page answers what the scripts tree holds, what it refuses, what it reads to
 | `RULE.CLAUDE_MARKETPLACE.DEVEX.008` | a plugin carries its own libraries and never reaches into a sibling at runtime | MUST |
 | the foundation's plugins construct § The shape of a plugin, and its `04-plugins/02-shape.md` | the four kinds of script, one command entry, a shared folder never installed on its own | MUST |
 
-Try it: `node packages/plugin-spn-infra/tests/run.mjs`
+Try it:
+
+```sh
+node packages/plugin-spn-infra/tests/run.mjs
+```

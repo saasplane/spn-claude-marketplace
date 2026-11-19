@@ -110,4 +110,8 @@ This page answers what this plugin restates and how the folder is arranged. It d
 | `RULE.DEVEX.WORKSPACE.176` | a repository answers to the world it declares, which is what makes a stack a claim rather than something detected | MUST |
 | the foundation's `02-delivery.md` § When an edit becomes behaviour | a ref is readable only after an install, so an edit here is not live in the open session | MUST |
 
-Try it: `spn-devex restates check`
+Try it:
+
+```sh
+spn-devex restates check
+```

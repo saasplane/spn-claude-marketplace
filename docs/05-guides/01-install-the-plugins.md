@@ -54,7 +54,13 @@ claude plugin marketplace add /opt/work/saasplane/code/spn-claude-marketplace
 claude plugin marketplace add <org>/spn-claude-marketplace
 ```
 
-`--scope` takes `user`, `project` or `local`, and defaults to `user`. A workspace that is one of several on your machine wants `project`, so the registration travels with the folder rather than with your account.
+`--scope` takes one of three values, and defaults to `user`:
+
+- `user`
+- `project`
+- `local`
+
+A workspace that is one of several on your machine wants `project`, so the registration travels with the folder rather than with your account.
 
 Before you register a directory you are authoring, you can check that its manifest is well formed:
 
@@ -146,7 +152,14 @@ diff -rq "$LIVE/" "$REPO/packages/plugin-spn-devex/" | grep -v "__pycache__\|\.D
 
 Silence means the installed bytes are the bytes you are reading. Any output means the session is running something older than your working tree, and `spnutils repo agent-sync` is what reconciles it.
 
-`__pycache__`, `.DS_Store`, `.git` and `.in_use` are excluded because each exists in one copy for a reason of its own. `.in_use` is the awkward one: the CLI writes it into the installed copy, so a comparison that reads it reports drift on every single run.
+Four names are excluded, because each exists in one copy for a reason of its own:
+
+- `__pycache__`
+- `.DS_Store`
+- `.git`
+- `.in_use`
+
+`.in_use` is the awkward one: the CLI writes it into the installed copy, so a comparison that reads it reports drift on every single run.
 
 ## Step 5 — Fresh window — take a fresh window
 

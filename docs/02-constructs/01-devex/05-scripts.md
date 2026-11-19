@@ -69,7 +69,12 @@ A refusal ends a chain, because anything said after an answer is noise. Advice d
 
 ### Four folders — The four folders, and what reaches each
 
-`checks/` holds the files a moment's dispatcher composes. `events/` holds one file per moment, which is the only code the wiring names. `tools/` holds the files nothing wires, reached by typing a path. `lib/` holds what more than one of the others reads and what none of them owns. The whole tree sits under `scripts/`, and the plugin's `hooks/` folder holds the wiring file alone.
+The whole tree sits under `scripts/`, and the plugin's `hooks/` folder holds the wiring file alone. Each of the four folders holds one kind of file:
+
+- `checks/` holds the files a moment's dispatcher composes.
+- `events/` holds one file per moment, which is the only code the wiring names.
+- `tools/` holds the files nothing wires, reached by typing a path.
+- `lib/` holds what more than one of the others reads and what none of them owns.
 
 ### Check header — A check is a file, and its header names its source
 
@@ -129,7 +134,14 @@ One tool here writes. It reads the files of the one run it is told to read and p
 
 ### Page producer — A tool produces the pages, and the page's own shape belongs to the book
 
-An author writes markdown and a reader opens HTML, and the whole of what sits between the two is a job of the documents tool: `page` produces, `face` writes the generated regions of a face, `figures` measures every drawing, and `audit` produces a page again and compares it byte for byte, so a hand edit is found rather than inherited. What the tool must not decide is what a page is made of. **The block vocabulary, the figure grammar and the furniture a page carries are the foundation's**, stated in `spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md` with the templates beside it, and this folder only realizes them. Where the two disagree, the chapter wins.
+An author writes markdown and a reader opens HTML, and the whole of what sits between the two is a job of the documents tool:
+
+- `page` produces.
+- `face` writes the generated regions of a face.
+- `figures` measures every drawing.
+- `audit` produces a page again and compares it byte for byte, so a hand edit is found rather than inherited.
+
+What the tool must not decide is what a page is made of. **The block vocabulary, the figure grammar and the furniture a page carries are the foundation's**, stated in `spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md` with the templates beside it, and this folder only realizes them. Where the two disagree, the chapter wins.
 
 ## Boundary
 
@@ -153,4 +165,8 @@ This page answers what a script is, how each kind is reached, and what it answer
 | the foundation's `05-artifacts.md` § The blocks · § The figures | what a produced page is made of, which this folder renders and never decides | MUST |
 | the foundation's plugins construct § The shape of a plugin, and its `04-plugins/02-shape.md` | the four kinds of script, the `<group> [<subject>] <action>` shape `commands/` dispatches by, one command entry | MUST |
 
-Try it: `spn-devex plugin partner check`
+Try it:
+
+```sh
+spn-devex plugin partner check
+```

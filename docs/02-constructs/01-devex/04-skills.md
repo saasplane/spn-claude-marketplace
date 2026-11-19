@@ -111,4 +111,8 @@ This page answers what a skill is, how it is selected, and what it may contain. 
 | `RULE.DEVEX.UTILS.019` | a skill restates a chapter's steps and adds no rule of its own | MUST |
 | `RULE.DEVEX.AGENT.025` | a folder per skill value and a value per folder, so the set a gate dispatches over is closed | MUST |
 
-Try it: `spn-devex restates check`
+Try it:
+
+```sh
+spn-devex restates check
+```
