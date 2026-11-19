@@ -731,9 +731,13 @@ repoint` moves the hash with the version. A line with no hash still loads, and t
   utility only where no class fits. A utility outside the set has no effect on a page.
 - **A version is a folder that never changes.** `docs sds cut <version>` writes it, with a `fonts/`
   folder beside the stylesheet and the scripts, and it refuses a version that exists. The pages read in
-  Geist and Geist Mono (`RULE.DEVEX.WORKSPACE.214`): `sds-docs.css` declares `@font-face` for `SDSText`
-  and `SDSCode` on the two files in `fonts/`, by urls relative to the stylesheet, and each keeps the
-  system stack after it, so a page whose fonts did not load still reads. A bundled copy of a page
+  Geist and Geist Mono (`RULE.DEVEX.WORKSPACE.214`): `sds-docs.css` declares `@font-face` for `DSDefaultText`
+  and `DSDefaultCode`, the design system's own names, on the two files in `fonts/`, by urls relative to the
+  stylesheet, and each keeps the system stack after it, so a page whose fonts did not load still reads. The
+  stylesheet's colours, corners and type read the design system's tokens (`--surface-*`, `--fg`, `--fg-quiet`,
+  `--border`, `--radius`, `--font-text`, `--font-code`), which `docs sds cut` copies from a pinned design-system
+  version; a page or a section that sets `--seed-primary` gets a whole palette, and `data-mode` on the page
+  sets dark. A bundled copy of a page
   carries no font file. A change to the styles is a new version, and
   `docs sds repoint <version> <folder>` moves every page under a folder to it.
 - **That address is the one hosted address a page may hold.** Every link from one page to another

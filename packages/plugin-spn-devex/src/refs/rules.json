@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "book": {
     "repository": "spn-foundation",
-    "commit": "70c85118"
+    "commit": "57869bbd"
   },
   "rules": [
     {
@@ -1102,9 +1102,9 @@
         "check": "stop"
       },
       "class": "checked",
-      "sentence": "The agent offers a new window from 200,000 tokens of context at a clean point, and past 300,000 writes the handover at the next clean point unasked",
+      "sentence": "The agent offers a new window by whether you are there: while you are present it says one line at 200,000, 300,000 and 400,000 tokens of context, each once and at a natural boundary, and it says the cost at 500,000 and the compaction at 850,000 even after you say to stay",
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
-      "heading": "The agent offers a new window from 200k, at a clean point",
+      "heading": "A new window by presence",
       "decision": null,
       "restated": [
         {
@@ -2317,6 +2317,44 @@
           "plugin": "spn-devex",
           "path": "refs/devex/agent/lenses.md",
           "heading": "Which views speak, and how many"
+        }
+      ]
+    },
+    {
+      "id": "RULE.DEVEX.AGENT.178",
+      "level": "MUST",
+      "params": {
+        "check": "stop"
+      },
+      "class": "checked",
+      "sentence": "Presence is read from your words first, and from silence only to say you are away",
+      "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
+      "heading": "A new window by presence",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/workstream.md",
+          "heading": "Work is sized by its kind, and fixes gather into a round"
+        }
+      ]
+    },
+    {
+      "id": "RULE.DEVEX.AGENT.179",
+      "level": "MUST",
+      "params": {
+        "check": "stop"
+      },
+      "class": "checked",
+      "sentence": "While you are away, a turn that ends on a question to you or on a hold is sent back when a decided arc of the window still has a ready row",
+      "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
+      "heading": "A new window by presence",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/workstream.md",
+          "heading": "Work is sized by its kind, and fixes gather into a round"
         }
       ]
     },
@@ -4000,6 +4038,17 @@
           "heading": "Five regions, one writer each"
         }
       ]
+    },
+    {
+      "id": "RULE.DEVEX.UTILS.536",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
+      "sentence": "`workspace clock set` writes the `developer` node of the state file, and only that node; the time of your last message is never kept there",
+      "chapter": "04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
+      "heading": "workspace — the folder your day runs in",
+      "decision": null,
+      "restated": []
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.006",
@@ -7454,9 +7503,11 @@
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.238",
-      "level": "GUIDE",
-      "params": {},
-      "class": "guidance",
+      "level": "MUST",
+      "params": {
+        "check": "doc-check"
+      },
+      "class": "checked",
       "sentence": "`Where it lands` is one folder tree for each repository, and the blocks that explain a change follow its tree",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "The approach document — a workstream's, never a repository's",
@@ -13010,6 +13061,58 @@
           "heading": "What each seat holds"
         }
       ]
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.522",
+      "level": "MUST",
+      "params": {
+        "check": "doc-check"
+      },
+      "class": "checked",
+      "sentence": "On a preview, a paragraph gives a reason in at most 60 words, a list holds at most 7 items, each under 25 words, and a callout is one sentence",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "heading": "Prose and lists have limits",
+      "decision": null,
+      "restated": []
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.523",
+      "level": "MUST",
+      "params": {
+        "check": "doc-check"
+      },
+      "class": "checked",
+      "sentence": "A page is written with Write or Edit, its figures come from a spec, and an agreed point is folded into its part",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "heading": "Prose and lists have limits",
+      "decision": null,
+      "restated": []
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.524",
+      "level": "MUST",
+      "params": {
+        "check": "doc-check"
+      },
+      "class": "checked",
+      "sentence": "The stylesheet reads the design system's token names",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "heading": "One stylesheet, served in versions",
+      "decision": null,
+      "restated": []
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.529",
+      "level": "MUST",
+      "params": {
+        "check": "split-plan"
+      },
+      "class": "checked",
+      "sentence": "A sheet entry, one a landed row holds included, may name the case ids its runner credits",
+      "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
+      "heading": "Drift and the passes",
+      "decision": null,
+      "restated": []
     },
     {
       "id": "RULE.LAUNCHPAD.CONTROL_PLANE.001",
@@ -34216,7 +34319,7 @@
         "skill": "spn-surface/design"
       },
       "class": "stated in a skill",
-      "sentence": "A unit's look is read from the running showcase into the stack's snapshot, which names the cells to capture and is what a drawn cell is checked against",
+      "sentence": "A unit's look is read from the running showcase into records, which name the cells to draw and are what a drawn cell is checked against",
       "chapter": "04-capabilities/02-support/01-surface/11-delivery-library/02-figma/04-drawing.md",
       "heading": "A unit's look",
       "decision": null,
@@ -34513,7 +34616,7 @@
       "sentence": null,
       "chapter": "04-capabilities/02-support/01-surface/11-delivery-library/02-figma/02-managed.md",
       "heading": "The path of a page through the connector",
-      "decision": null,
+      "decision": "DEC.SUPPORT.SURFACE.422",
       "restated": [
         {
           "plugin": "spn-surface",
@@ -35102,7 +35205,7 @@
         },
         {
           "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
+          "path": "skills/design/steps/design-language.md",
           "heading": "The rules this step holds"
         }
       ]
@@ -35190,7 +35293,7 @@
         },
         {
           "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
+          "path": "skills/design/steps/design-language.md",
           "heading": "The rules this step holds"
         }
       ]
@@ -35202,7 +35305,7 @@
         "skill": "spn-surface/design"
       },
       "class": "stated in a skill",
-      "sentence": "Hover and pressed, which no page of the showcase holds, are driven on the case rest of the unit, and every other state is captured from the page that holds it",
+      "sentence": "The states a pointer makes, hover, pressed and the Open group, which no page of the showcase holds, are driven on the case rest of the unit, and every other state is read from the page that holds it",
       "chapter": "04-capabilities/02-support/01-surface/11-delivery-library/02-figma/04-drawing.md",
       "heading": "A unit is one section",
       "decision": null,
@@ -35231,7 +35334,7 @@
         "skill": "spn-surface/design"
       },
       "class": "stated in a skill",
-      "sentence": "A cell that the library plans for a unit and the unit's Main page does not draw is a gap of the showcase, and it is fixed on the unit's page before its library page is captured",
+      "sentence": "A cell that the library plans for a unit and the unit's Main page does not draw is a gap of the showcase, and it is fixed on the unit's page before its library page is read",
       "chapter": "04-capabilities/02-support/01-surface/12-delivery-showcase/01-common/01-showcase.md",
       "heading": "The sections of a main page",
       "decision": null,
@@ -35304,7 +35407,7 @@
         "skill": "spn-surface/design"
       },
       "class": "stated in a skill",
-      "sentence": "Every page of a file is captured at once, and a unit is arranged only after every unit it is built from that the same file holds",
+      "sentence": "Every page of a file is read into records at once, and a unit is drawn only after every unit it is built from that the same file holds",
       "chapter": "04-capabilities/02-support/01-surface/11-delivery-library/02-figma/02-managed.md",
       "heading": "The path of a page through the connector",
       "decision": null,
@@ -35328,7 +35431,7 @@
         "skill": "spn-surface/design"
       },
       "class": "stated in a skill",
-      "sentence": "The showcase hands its units to the capture",
+      "sentence": "The showcase hands its units to the reader",
       "chapter": "04-capabilities/02-support/01-surface/12-delivery-showcase/01-common/01-showcase.md",
       "heading": "The sections of a main page",
       "decision": null,
@@ -35338,6 +35441,216 @@
           "path": "refs/support/surface/delivery-showcase.md",
           "heading": "Sections, and the card of a section — 🔮"
         },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.525",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "An agent reads the app's construct, its capability chapter and its `design-language.json` before it draws a page or a picture",
+      "chapter": "04-capabilities/02-support/01-surface/03-standards-patterns/01-common/05-design-languages.md",
+      "heading": "Three levels, for the agent",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/design-languages.md",
+          "heading": "Made in rounds, with media kinds — 🔮"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/design-language.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.526",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "A medium is placed on the section, the feature or the item that its size fits, and its colours are the design system's tokens",
+      "chapter": "04-capabilities/02-support/01-surface/03-standards-patterns/01-common/05-design-languages.md",
+      "heading": "Where media go",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/design-languages.md",
+          "heading": "Where media go — 🔮"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/design-language.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.527",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "Each size is read from the design system's container that holds it, and a drawing is made for its frame, never scaled from another placement",
+      "chapter": "04-capabilities/02-support/01-surface/03-standards-patterns/01-common/05-design-languages.md",
+      "heading": "Media size by placement",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/design-languages.md",
+          "heading": "Media size by placement — 🔮"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/design-language.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.528",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "A claim has one carrier, either its items or the medium's labels",
+      "chapter": "04-capabilities/02-support/01-surface/03-standards-patterns/01-common/05-design-languages.md",
+      "heading": "Text alignment and items",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/design-languages.md",
+          "heading": "Text alignment and items — 🔮"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/design-language.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.530",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "Whatever stands boxed in a grid stands as tall as the tallest of its row, and a grid's cell hands its height to what it holds",
+      "chapter": "04-capabilities/02-support/01-surface/06-architecture-components/01-common/01-components.md",
+      "heading": "The phone and the frame",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.531",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "A feature takes no height of its own, and in a grid it carries its row's height down to its frame",
+      "chapter": "04-capabilities/02-support/01-surface/06-architecture-components/01-common/01-components.md",
+      "heading": "The phone and the frame",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.532",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "A text is aligned by `textAlign`, and a page never writes a class for it",
+      "chapter": "04-capabilities/02-support/01-surface/06-architecture-components/01-common/01-components.md",
+      "heading": "DSText",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.533",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "A skeleton draws a form's fields and its heading line from the size's own tokens, and a page never sizes its bones one by one",
+      "chapter": "04-capabilities/02-support/01-surface/06-architecture-components/01-common/01-components.md",
+      "heading": "DSSkeleton",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.534",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "The content of a dialog, a drawer and a sheet stacks its parts one under another, the size's gap apart, and a page passes it no flex or gap class",
+      "chapter": "04-capabilities/02-support/01-surface/06-architecture-components/01-common/01-components.md",
+      "heading": "DSDrawer",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.535",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "The media tokens are what any kind of picture needs, and a kind's own roles map onto them",
+      "chapter": "04-capabilities/02-support/01-surface/05-architecture-core/01-common/01-tokens.md",
+      "heading": "Media",
+      "decision": null,
+      "restated": [
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",

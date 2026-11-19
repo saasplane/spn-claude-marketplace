@@ -20,6 +20,8 @@
 //   1. the welcome — a heading that greets you by name, the tagline, who the agent is, the eight
 //      stages and every role. The heading has two forms: a returning visit, and a first visit, which
 //      is a workspace with no workstream in any state.
+//   (under the status line, one clock line when `.spndevex/state.json` names the developer's timezone: the hour, or a welcome
+//   back with the catch-up cue after a night away; `lib/presence.ts`)
 //   2. ONE status line of counts — the repositories, the open workstreams, the backlog, and the other
 //      windows open here, each part dropped when it is zero. Checkouts behind their base, unwired
 //      repositories, a stale plugin or a rung below an ordinary session go on a line only the agent
@@ -55,6 +57,7 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 import { commandWords, usageLine } from "../../../../plugin-support-lib/src/lib/command.ts";
 import { isDir, isFile, listdir, read, readPayload, runAlone, type Payload } from "../lib/payload.ts";
 import { clearTold, noteWelcome } from "../lib/window.ts";
+import { clockLine } from "../lib/presence.ts";
 import { ARCS, DEVEX, SESSIONS, WORKSTREAM_STATES, isApproachPage, isWorkspaceDevex, legacyWorkstreamsDir, workstreamsDir } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { isBuilderWorkspace } from "../lib/builder.ts";
 import { arcIdsOf, notesDirOf } from "../lib/workstream.ts";
@@ -514,7 +517,7 @@ export const WELCOME_LEAD =
   "Your first reply opens with the welcome below, word for word and whole, before any tool call and before " +
   "any other text, whatever the prompt — a question and a pasted handover included: the heading, the italic " +
   "line, and the 🤖, 🧭 and 👥 lines, each whole, with the `&nbsp;` spacer line after the italic line and after " +
-  "each of the three, then the status line. Trim nothing. The prompt is answered after it, never instead of it.";
+  "each of the three, then the status line. Trim nothing. A clock line standing under the status line is said with it. The prompt is answered after it, never instead of it.";
 
 /**
  * The line the agent reads first on a start that continues a window (a compaction or a resume): that window's first reply
@@ -940,7 +943,7 @@ export function parkedLines(root: string, named: number = PARKED_NAMED): string[
  * question and the note. `whole` is false where the window continues one (a compaction or a resume): the start is then the status line and the
  * one Go line, and the welcome is left out.
  */
-export function orient(root: string, cwd: string, whole = true): [message: string, context: string] {
+export function orient(root: string, cwd: string, whole = true, now: number = Date.now()): [message: string, context: string] {
   const repos: Repo[] = members(root).map(([name, path]) => {
     const { world, stack, pins } = lawOf(path);
     const want = expectedPlugins(world);
@@ -1021,12 +1024,17 @@ export function orient(root: string, cwd: string, whole = true): [message: strin
     // Building (rung 3) is an ordinary session, and an ordinary session says nothing about its rung.
     rung: level < 3 ? `rung ${level}: ${why}` : null,
   };
-  const message = whole ? clean([...greeting, WELCOME_SPACER, statusLine(ground)]) : statusLine(ground);
+  // THE CLOCK LINE GOES UNDER THE STATUS LINE of a whole welcome, and only where the workspace names the developer's clock.
+  // The welcome's own lines and the stop check that holds the first reply to them are unchanged.
+  const clock = whole ? clockLine(root, who, now) : null;
+  const message = whole ? clean([...greeting, WELCOME_SPACER, statusLine(ground), ...(clock ? ["", clock.line] : [])]) : statusLine(ground);
 
   // THE GROUND IS READ ON ASKING. The members, their law, the wiring and every workstream are one command
   // away (`spnutils workspace status`), and no first reply needs them: a window carries what the first
   // reply needs and nothing else (RULE.DEVEX.AGENT.105).
   const lines: string[] = [];
+  if (clock?.catchUp)
+    lines.push("The developer was away: under the clock line, give the catch-up in a few plain lines — what landed, what needs them, what is next — before anything else.", "");
   const problems = groundLine(ground);
   if (problems) lines.push(problems, "");
   if (behind)

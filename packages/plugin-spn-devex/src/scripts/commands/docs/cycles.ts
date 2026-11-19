@@ -107,7 +107,9 @@ export function cycleOfData(folder: string, arc: string): Cycle | null {
   const notes = posix.dirname(previewHref);
   const previews: Preview[] = [];
   if (isFile(join(folder, previewHref))) previews.push({ name: PREVIEW_FILE, href: previewHref, kind: "preview" });
-  for (const sample of listdir(join(folder, notes, "samples")))
+  // AN ARC WITH A SAMPLES INDEX IS LINKED BY THAT INDEX ALONE: the index is the way into every sample, so the row names no page or folder beside it.
+  const samples = listdir(join(folder, notes, "samples"));
+  for (const sample of samples.includes("index.html") ? ["index.html"] : samples)
     previews.push({ name: sample, href: `${notes}/samples/${sample}`, kind: "sample" });
   return { id: arc, name: typeof data.title === "string" ? data.title : arc, does: typeof data.decides === "string" ? data.decides : "",
            status, detail: wait || (typeof data.reason === "string" ? data.reason : ""), file, previews };

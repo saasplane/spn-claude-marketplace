@@ -104,7 +104,7 @@ judgment gate*).
 
 ## A session opens on the welcome, then one status line
 
-**The first reply of every new window opens with the whole welcome, whatever the prompt, and then the status line — MUST** (`RULE.DEVEX.AGENT.164` · MUST · check:stop) (`DEC.DEVEX.WORKSPACE.045`).
+**The first reply of every new window opens with the whole welcome, whatever the prompt, and then the status line, with one clock line under it where the workspace names the developer's timezone — MUST** (`RULE.DEVEX.AGENT.164` · MUST · check:stop) (`DEC.DEVEX.WORKSPACE.045`).
 A window is new when the developer starts it or clears it; a compaction or a resume continues a window whose first reply was already given. The welcome costs about 2,000 tokens at the start of each window. The session-start hook prints it. It is a heading that greets the developer by name, the tagline,
 🤖 who the agent is, 🧭 the five phases with the eight stages inside them, by their names, and 👥
 every seat on the team, grouped by function. Each line opens on what the agent holds, in *I*, and
@@ -117,6 +117,7 @@ speaks for the people who build on what the builders publish and is no seat on a
 plugin types it, so a partner's workspace shows the same words with no book in it. The roles line
 groups the team by function: Leadership, Engineering, Product and design, Data and AI, Go-to-market,
 and Finance and business, each naming the roles inside it that its own name does not already say (`RULE.DEVEX.WORKSPACE.283` · MUST · check:stop).
+**One clock line goes under the status line, and the welcome's heading and fixed lines stay as they are.** The plugin reads the hour in the timezone of the state file's `developer` node and leaves the line out when there is none: late between 00:00 and 04:59 (*It's 2 a.m. for you, a late one.*), then *Morning*, *Afternoon* or *Evening* with the developer's name. After a gap of 6 hours or more since the developer's last message it says *Welcome back. You've been away since 05:40.* and adds the catch-up: what landed, what needs them and what is next.
 
 **The welcome's words are in the construct.** The DevEx agent construct gives the welcome word for word in one
 fenced block, with both headings, the place where the name goes, and the partner sentence marked as said only in a

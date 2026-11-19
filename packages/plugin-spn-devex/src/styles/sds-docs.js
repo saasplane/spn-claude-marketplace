@@ -2,6 +2,13 @@
    The one script every page loads: the rail, the fold under each section, the link beside each
    heading, the reader's own time on a report, and the colour of a code block. Every class it sets or
    reads opens with sds-. */
+/* THE MODE IS THE DESIGN SYSTEM'S: data-mode on the page, light or dark. A page that names none takes the reader's
+   own setting, and a data-theme an older page carries is read as the same word. */
+(function(){
+  var root=document.documentElement;if(!root||root.getAttribute('data-mode'))return;
+  var theme=root.getAttribute('data-theme'),dark=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches;
+  root.setAttribute('data-mode',theme==='dark'||(theme!=='light'&&dark)?'dark':'light');
+})();
 (function(){
   var rail=document.getElementById('rail');if(!rail)return;
   var secs=Array.prototype.slice.call(document.querySelectorAll('section[id]'));

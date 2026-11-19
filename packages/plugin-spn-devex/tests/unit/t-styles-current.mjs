@@ -32,6 +32,25 @@ try {
 ok("a fresh build of sds-docs.src.css writes the bytes of sds-docs.css", check.status === 0, check.output.trim());
 for (const name of FILES) ok(`src/styles/${name} is there`, existsSync(join(STYLES, name)));
 
+console.log("=== styles on the design system — the docs classes read the product's tokens");
+{
+  const built = readFileSync(join(STYLES, "sds-docs.css"), "utf8");
+  const source = readFileSync(join(STYLES, "sds-docs.src.css"), "utf8");
+  const tokens = readFileSync(join(STYLES, "ds-tokens.css"), "utf8");
+  const variables = (names) => names.every((name) => new RegExp(`^\\s*${name}:`, "m").test(built));
+  ok("[RULE.DEVEX.WORKSPACE.524] the stylesheet holds the design system's token names: --surface, --surface-raised, --fg, --fg-quiet, --border, --radius, --font-text, --font-code, --seed-primary",
+    variables(["--surface", "--surface-raised", "--fg", "--fg-quiet", "--border", "--radius", "--font-text", "--font-code", "--seed-primary"]));
+  ok("the stylesheet derives a palette from --seed-primary, and sets dark with data-mode",
+    built.includes("oklch(from var(--seed-primary)") && /\[data-mode=['"]dark['"]\]/.test(built));
+  ok("ds-tokens.css names the design-system version it was copied from, and is imported first by the source",
+    /copied whole by `spn-devex docs sds cut` from support-web-ds-ts v\d+\.\d+\.\d+/.test(tokens) && /@import "\.\/ds-tokens\.css";/.test(source));
+  ok("the docs names read the design system's: --sds-paper is --surface, --sds-ink is --fg, --sds-rule is --border",
+    /--sds-paper: var\(--surface\)/.test(built) && /--sds-ink: var\(--fg\)/.test(built) && /--sds-rule: var\(--border\)/.test(built));
+  ok("the fonts are declared under the design system's names, DSDefaultText and DSDefaultCode, on the same two Geist files, and SDSText and SDSCode are gone",
+    /font-family: DSDefaultText;[^}]*Geist-Variable\.woff2/.test(built) && /font-family: DSDefaultCode;[^}]*GeistMono-Variable\.woff2/.test(built) && !/SDSText|SDSCode/.test(built));
+  ok("the page script sets data-mode where a page names none", /setAttribute\('data-mode'/.test(readFileSync(join(STYLES, "sds-docs.js"), "utf8")));
+}
+
 console.log("=== styles versions — a version that was cut never changes");
 const versions = JSON.parse(readFileSync(join(STYLES, "versions.json"), "utf8"));
 const folders = existsSync(SERVED) ? readdirSync(SERVED).sort() : [];

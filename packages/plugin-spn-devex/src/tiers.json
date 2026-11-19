@@ -8,6 +8,7 @@
     "plan": "allow",
     "plugin": "allow",
     "precedent": "allow",
+    "presence": "allow",
     "report": "allow",
     "restates": "allow",
     "workstream": "allow"

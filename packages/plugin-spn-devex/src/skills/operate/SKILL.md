@@ -36,7 +36,11 @@ description: How a running platform is observed, responded to, and maintained - 
 - **A log line is for whoever is reading it at 3am.** Say what was being attempted, on what, and what happened. Never a bare stack trace, never an internal detail that leaks outward, and never a secret, a token, or a customer's data.
 - **What is measured is what a customer feels** — latency at the entry, failure rate by code, queue depth and age. A dashboard of resource graphs with no customer-facing signal on it explains nothing when the product itself is what is wrong.
 
+- **An alert names its dashboard, its runbook and the version it concerns.** An alert that arrives without them sends whoever is paged to look for the three, at the moment each minute counts.
+
 ## During an incident
+
+**The incident order names no one.** The order below says what is done; the estate holds no declaration of who is on call yet, and declaring one is proposed, so the team says who is reached.
 
 1. **Stabilize before diagnosing.** Roll back, scale out, or shed load first — the cause can be found from evidence afterwards, and a system that keeps failing while being studied is a choice.
 2. **Change one thing, and write down that you changed it.** An estate mutated by three people in parallel cannot be reasoned about, and the record of what was done is the only input the follow-up has.

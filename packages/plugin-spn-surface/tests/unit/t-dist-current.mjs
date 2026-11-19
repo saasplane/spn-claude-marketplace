@@ -14,6 +14,9 @@ const BUNDLES = [
   resolve(PLUGIN, "src", "dist", "cli.mjs"),
   resolve(PLUGIN, "src", "dist", "events", "pretooluse.mjs"),
   resolve(PLUGIN, "src", "dist", "commands", "check", "scan.mjs"),
+  resolve(PLUGIN, "src", "dist", "commands", "check", "page.mjs"),
+  resolve(PLUGIN, "src", "dist", "commands", "check", "module.mjs"),
+  resolve(PLUGIN, "src", "dist", "commands", "language", "write.mjs"),
   resolve(PLUGIN, "src", "dist", "commands", "unit", "show.mjs"),
 ];
 

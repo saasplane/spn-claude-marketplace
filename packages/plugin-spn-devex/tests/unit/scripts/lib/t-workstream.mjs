@@ -433,7 +433,23 @@ console.log("\n=== the landing gate reads the tree and names every fault — MKT
   const refusal = gate() ?? "";
   ok("[MKT.HOOKS.321] one refusal names a stale run, a failure and a missing id", /was taken before/.test(refusal) && /unit U\.1 reads FAILURE/.test(refusal) && /U\.2 is not in the run/.test(refusal), refusal);
 
-  const plain = await dataWorkspace("t-workstream-commits-plain");
+  // AN ENTRY'S CREDITS stand for a tier id that is in no case of the run: the entry names RULE ids and its runner credits other ids.
+  const credited = (credits) => writeFileSync(join(w.ws, "arcs", "N001", "sheet.json"), JSON.stringify({ schemaVersion: 1, releaseChain: [], dependsOn: [], stack: { folder: "x", dmo: "none", reset: "x" },
+    entries: [{ ...entry, tiers: { unit: ["RULE.X.1"] }, ...(credits ? { credits } : {}) }] }, null, 2));
+  run("unit", [["U.1", "SUCCESS"], ["U.2", "SUCCESS"]], treeHash);
+  credited(null);
+  ok("a tier id that is in no case of the run is refused, as before, where the entry credits none", /RULE\.X\.1 is not in the run/.test(gate() ?? ""), String(gate()));
+  credited(["U.1", "U.2"]);
+  ok("a landed entry's credited ids stand for the tier id the run lacks, so a row whose runner credits other ids lands", gate() === null, String(gate()));
+  run("unit", [["U.1", "SUCCESS"], ["U.2", "FAILED"]], treeHash);
+  ok("a credited id that failed in the run refuses the row, named", /unit U\.2 reads FAILURE/.test(gate() ?? ""), String(gate()));
+  credited(["U.1", "U.7"]);
+  run("unit", [["U.1", "SUCCESS"], ["U.2", "SUCCESS"]], treeHash);
+  ok("a credited id that is in no case of the run refuses the row, named", /U\.7 is not in the run/.test(gate() ?? ""), String(gate()));
+  const { entryHash } = await import("../../../../src/scripts/lib/go-plan.ts");
+  ok("crediting an entry changes no hash of its work, so a landed part is not flagged stale", entryHash({ ...entry }) === entryHash({ ...entry, credits: ["U.1"] }));
+
+  const plain =await dataWorkspace("t-workstream-commits-plain");
   const unkept = cli(plain.root, ["workstream", "row", "state", "031/N001", "1", "running"]);
   ok("[MKT.HOOKS.324] where .spndevex is no git repository a write succeeds and commits nothing", unkept.code === 0, unkept.out);
   const kept = await dataWorkspace("t-workstream-commits");

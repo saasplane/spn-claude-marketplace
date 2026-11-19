@@ -5,7 +5,7 @@
 // write a copy of a page that carries its version's styles inside it. Every refusal exits 1 and
 // writes nothing.
 //
-//   spn-devex docs sds cut <version> [--root <folder>]                  cut a version
+//   spn-devex docs sds cut <version> [--root <folder>] [--ds <folder>] [--ds-version <tag>]   cut a version, with the design system's tokens copied first where --ds names its checkout
 //   spn-devex docs sds check <version> <folder…> [--root <folder>]      list the pages a move would change
 //   spn-devex docs sds repoint <version> <folder…> [--root <folder>]    move the pages
 //   spn-devex docs sds bundle <page> [--assets <folder>]                write the bundled copy
@@ -13,6 +13,7 @@
 // A SUBJECT WITH FOUR ACTIONS, AND A `file` PATH. `check` is the look before `repoint` and writes
 // nothing. The version is a word of its own before the paths, so it is never read as a path.
 
+import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { existsSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
@@ -129,12 +130,55 @@ function copyFonts(from: string, to: string): void {
   }
 }
 
+/** Where the design system's own variables sit, under a checkout of the support repository. */
+const DS_VARIABLES = join("packages", "support-web-ds-ts", "src", "assets", "styles", "_variables.css");
+/** The file in the styles folder that holds those variables, which the stylesheet's source imports first. */
+const TOKENS_FILE = "ds-tokens.css";
+
+/** The newest released version of the design system, as a tag of the support checkout: `v11.13.1`. Null where there is none. */
+function newestTag(ds: string): string | null {
+  try {
+    const tags = execFileSync("git", ["-C", ds, "tag", "--list", "v[0-9]*", "--sort=-v:refname"], { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] });
+    return tags.split("\n").find((tag) => /^v\d+\.\d+\.\d+$/.test(tag)) ?? null;
+  } catch { return null; }
+}
+
+/**
+ * THE TOKENS ARE TAKEN, NEVER WRITTEN: the design system's own variables, read from the pinned version's commit, so the
+ * file holds the values that version released. Returns the file's text, or a sentence where it cannot be read.
+ */
+export function tokensFrom(ds: string, tag: string | null): { text: string; tag: string } | string {
+  const pinned = tag ?? newestTag(ds);
+  if (pinned === null) return `\`${ds}\` holds no released version of the design system (a tag such as \`v11.13.1\`). Name one with \`--ds-version <tag>\``;
+  let variables = "";
+  try {
+    variables = execFileSync("git", ["-C", ds, "show", `${pinned}:${slashes(DS_VARIABLES)}`], { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"], maxBuffer: 16 * 1024 * 1024 });
+  } catch { return `version \`${pinned}\` of the design system holds no \`${slashes(DS_VARIABLES)}\` in \`${ds}\``; }
+  return { tag: pinned, text: `/* The design system's own variables, copied whole by \`spn-devex docs sds cut\` from support-web-ds-ts ${pinned}. Never edited by hand: cut copies them again. */\n${variables}` };
+}
+
+/** Copy the design system's tokens into the styles folder, and build the stylesheet from them. Null where it went, a sentence where it did not. */
+function refreshTokens(home: string, styles: string, ds: string, tag: string | null): string | null {
+  if (!isDir(ds)) return `\`${ds}\` is not a folder. \`--ds\` names the support repository's checkout`;
+  const tokens = tokensFrom(ds, tag);
+  if (typeof tokens === "string") return tokens;
+  writeFileSync(join(styles, TOKENS_FILE), tokens.text, "utf8");
+  try { execFileSync(process.execPath, [join(home, "scripts", "build-styles.mjs")], { stdio: ["ignore", "pipe", "pipe"], cwd: home }); }
+  catch (error) { return `the build of the styles failed after the tokens were copied: ${String((error as { stderr?: unknown }).stderr ?? error).trim()}`; }
+  console.log(`✓ copied the design system's tokens from ${tokens.tag} → ${join(styles, TOKENS_FILE)}`);
+  return null;
+}
+
 /** Copy the three built files, and the fonts beside them, into the version's folder, and list the version with each file's hash. */
-function cut(version: string, root: string | null): number {
+function cut(version: string, root: string | null, ds: string | null = null, dsVersion: string | null = null): number {
   if (!VERSION.test(version)) return refuse("cut", `\`${version}\` is not a version. A version is three numbers, such as \`1.1.0\``);
   const home = marketplaceFrom(root);
   if (home === null) return refuse("cut", NOT_MARKETPLACE(root));
   const styles = join(home, STYLES_SEAT);
+  if (ds !== null) {
+    const failed = refreshTokens(home, styles, resolve(ds), dsVersion);
+    if (failed !== null) return refuse("cut", failed);
+  } else if (dsVersion !== null) return refuse("cut", "`--ds-version` names a version of the design system, and it is read from the checkout `--ds` names");
   const folder = join(home, SERVED_SEAT, version);
   const versions = versionsIn(styles);
   if (typeof versions === "string") return refuse("cut", versions);
@@ -355,10 +399,10 @@ function versionFirst(words: string[]): { version: string; rest: string[] } {
 }
 
 function cutAction(args: string[]): number {
-  const words = readWords(args, { root: VALUE });
+  const words = readWords(args, { root: VALUE, ds: VALUE, "ds-version": VALUE });
   const { version, rest } = versionFirst(words.paths);
   if (rest.length) throw new UsageFault("takes one version.");
-  return cut(version, words.value("root"));
+  return cut(version, words.value("root"), words.value("ds"), words.value("ds-version"));
 }
 
 /** `check` and `repoint` are one reading of the pages; `repoint` is the one that writes them. */
@@ -375,8 +419,8 @@ function bundleAction(args: string[]): Promise<number> {
 
 export const actions: Record<string, Action> = {
   cut: {
-    describe: "copy the built styles into a version's folder, and list the version",
-    usage: "<version> [--root <folder>]",
+    describe: "copy the built styles into a version's folder, and list the version; with --ds, copy the design system's tokens first and build",
+    usage: "<version> [--root <folder>] [--ds <folder>] [--ds-version <tag>]",
     run: cutAction,
   },
   check: {
