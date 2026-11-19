@@ -49,6 +49,16 @@
 | `{{web-www-ts}}` | Visitor | {{its own: saasplane-site}} | {{the app's layout setting}} | {{body, navigation, frames, size, motion}} |
 | `{{web-platform-ts}}` | Team | the design system's | {{the app's layout setting}} | {{its looks}} |
 
+Each app's row is also written as one fenced `json` block, keyed by the app's code, which `spnutils apps surface render --app` and `spnutils apps surface theme` read. It holds the theme's own values for the app, the layout as the app's own setting, and the kind of page. The table above is for the reader, the block for the commands, and the two never differ.
+
+```json
+{ "app": "{{www}}",
+  "ds": "{{the design system version the app pins}}",
+  "theme": { "app": { "primary": "{{#084A75}}" } },
+  "layout": { "type": "{{TOPNAV}}", "nav": [] },
+  "page": "{{SITE}}" }
+```
+
 ### The brand
 
 {{The platform's one brand, as values: the primary colour, the greys and the typefaces, set once. The radius, like every other look, is each app's, in its row. An app changes only its looks over it, never the brand itself.}}
@@ -58,6 +68,13 @@
 | Primary | {{the primary colour}} |
 | Greys | {{the neutral temperature and its steps}} |
 | Typefaces | {{the heading, body and mono faces}} |
+
+The brand is also one fenced `json` block, in the theme's own keys, which the commands read with every row.
+
+```json
+{ "brand": { "app": { "primary": "{{#084A75}}", "neutralTemperature": {{0}} },
+             "typefaces": { "text": "{{…}}", "display": "{{…}}", "code": "{{…}}" } } }
+```
 
 ### The references
 
@@ -267,6 +284,8 @@ Start-aligned is the default. A section's words centre only where they frame som
 | Rule | What it decides | Weight |
 | --- | --- | --- |
 | `{{RULE.SUPPORT.SURFACE.440}}` | a site or an app follows one design language | GUIDE |
+| `{{RULE.SUPPORT.SURFACE.577}}` | an app whose theme setting is out of step with its row is refused by the theme check | MUST |
+| `{{RULE.SUPPORT.SURFACE.578}}` | the brand and each app's row are also written as one data block each, which the commands read | MUST |
 | `{{RULE.SUPPORT.SURFACE.536}}` | a language fills one drawing scale, and each medium takes the parts that apply to its kind | MUST |
 | `{{RULE.SUPPORT.SURFACE.557}}` | a section's background and its feature's media are two layers, used together or apart | MUST |
 | `{{RULE.SUPPORT.SURFACE.558}}` | a medium takes the layer the three questions give it | MUST |

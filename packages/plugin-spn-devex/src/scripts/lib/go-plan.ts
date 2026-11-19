@@ -13,6 +13,7 @@ import { join } from "node:path";
 import { nodeKindOf } from "../checks/push-tiers.ts";
 import { designTrackOf, type Pass } from "./passes.ts";
 import { logFiles, telemetryFolder } from "../../../../plugin-support-lib/src/lib/debug-store.ts";
+import { constructsDir } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import {
   DONE_STATES, entryWork, goFaults, GO_PART_SETTLED, GO_SCHEMA_VERSION,
   type ArcData, type GoPart, type GoPlan, type Sheet, type SheetEntry, type Work,
@@ -174,10 +175,10 @@ export function titleOfDocument(path: string, dirs: readonly string[]): string {
   return stem.split("-").map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(" ");
 }
 
-/** Whether an entry changes a design-language construct: a file under `docs/02-constructs/` whose title ends `Design Language`. */
+/** Whether an entry changes a design-language construct: a file in the constructs seat whose title ends `Design Language`. */
 export function changesDesignLanguage(entry: SheetEntry, dirs: readonly string[]): boolean {
   const path = entry.file.slice(entry.file.indexOf(":") + 1);
-  return /(^|\/)docs\/02-constructs\//.test(path) && /Design Language$/.test(titleOfDocument(path, dirs));
+  return path.startsWith(`${constructsDir("docs")}/`) && /Design Language$/.test(titleOfDocument(path, dirs));
 }
 
 const repoOf = (entry: SheetEntry): string => entry.file.slice(0, entry.file.indexOf(":"));
