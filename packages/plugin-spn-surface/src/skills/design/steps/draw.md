@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/11-delivery-library/",
-      "seen": "65112600"
+      "seen": "3faf4161"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/04-architecture-names/",
@@ -46,13 +46,13 @@ The design library holds one file for each layer of the design system that is dr
 
 | Layer | The file holds | SaaS Plane names its file | Its file key |
 | --- | --- | --- | --- |
-| Core | the variables, the text styles, the scale and the icons | `DS 1-core` | `3RZVOKGItY4Kos2ZVfmI3V` |
-| Components | one page for each group of components | `DS 2-Components` | `saEPRBFUOa7QEj84NpCJkr` |
-| Widgets | one page for each widget | `DS 3-Widgets` | `QfApgt8QTngjhGe0Hqf3Xq` |
-| Containers | the panel, with its parts and its look | `DS 4-Containers` | `XQPPdU83nFQjT5LQ3JmHgg` |
-| Layouts | the layout, in each of its types | `DS 5-Layouts` | `ENmqF4WjVnecAVnpuy0nHF` |
+| Core | the variables, the text styles, the scale and the icons | `DS 1-Core` | `nOZVEGGnikJwPkAj1Me387` |
+| Components | one page for each group of components | `DS 2-Components` | `B62AWTp11ARCSw2z5oquEd` |
+| Widgets | one page for each widget | `DS 3-Widgets` | `ZCBwqzCvuMP5XHwrG1mVe6` |
+| Containers | the panel, with its parts and its look | `DS 4-Containers` | `qp2hnmZYr05qzmniFlojO2` |
+| Layouts | the layout, in each of its types | `DS 5-Layouts` | `joz6fxsQ8sOaDgahNUIfG1` |
 
-**Never draw from Lab.** It holds drafts, and it is never published.
+**Never draw from Lab.** It holds drafts, and it is never published. SaaS Plane's own file for the pages of an app, `DS 6-App` (file key `JdsfKm9qcY8C7AzAD9ZJBC`), is a design file that composes them from the published files, and it is never published.
 
 ## How each line of the tree is drawn
 

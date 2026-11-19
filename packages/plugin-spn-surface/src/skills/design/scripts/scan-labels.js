@@ -13,15 +13,15 @@
 //   (The connector refuses a returned value over 20,480 bytes: `answerBytes` stays 18000 or under. The lists give up
 //   items, down to 3 and then to counts alone, the counts always whole; `shortened` says what was left out.)
 //
-// Holds: labelsUnitElsewhere, labelLayerNames, labelsFormCannotSay, defaultNotLabels, unitsWithoutHeader, usagesNamingNoUnit, unitsWithoutCases, unitsWithoutUsage, emptyReading.
-//          It also answers `read`: what the page holds, counted by kind. `unitsWithoutCases` does not block. `unitsWithoutUsage` blocks:
-//          it names each top-level unit with no usage (a part owes none; a unit drawn as cases alone, with no component in its
-//          section, takes its first case for its usage). A scan that found no unit is not clean: `emptyReading` says so.
+// Holds: labelsUnitElsewhere, labelLayerNames, labelsFormCannotSay, defaultNotLabels, unitsWithoutHeader, usagesNamingNoUnit, unitsWithoutUsage, emptyReading.
+//          It also answers `read`: what the page holds, counted by kind. `unitsWithoutUsage` blocks:
+//          it names each top-level unit whose section holds no `section · Usage` with a cell in it and no usage node (a part owes none;
+//          a unit drawn as cases alone, with no component in its section, takes its first case for its usage). A scan that found no unit is not clean: `emptyReading` says so.
 //
 // Boxes are [x, y, width, height], in the page's coordinates (a node's own x and y plus the origins of the
 // sections above it). A node is one of: a section, a set, a component, a sheet (a frame named `<unit> cases`), a
-// label (a text that is a header, a row label, a column label or a band's label), a usage (`usage · ...`), a
-// reference frame (a frame on a page that holds no set and no component), or other. Only `other` is a stray.
+// label (a text that is a header, a row label, a column label or a section's label), a usage (`usage · ...`), a
+// wrapper (a frame of the arranged form: `body · `, `section · `, `sub · `, `row · `, `cell · ` or `set · `, which the walk goes through), a reference frame (a frame on a page that holds no set and no component), or other. Only `other` is a stray.
 
 const INPUTS = {
   pageId: null,
@@ -34,12 +34,22 @@ const INPUTS = {
 };
 
 // ---- the page's reading: begin (this block is the same in page.js, scan-labels.js, scan-placement.js and scan-properties.js)
-// ---- the book's label form: begin (this block is the same in page.js and layout.js)
+// ---- the book's label form: begin (this block is the same in page.js and the three parts that read labels)
 const LABEL_PREFIX = "label · ";
 const HEADER_PREFIX = "header · ";
 const USAGE_PREFIX = "usage · ";
+// The names of the arranged form of a unit's section (the plugin's arranging): `header · <Unit>` holds the unit's name, its one
+// line and its behaviour note; `body · <Unit>` holds one `section · <name>` for each of Main's sections, each with its
+// `label · <name>` text and its `sub · <name>` subsections stacked down; a `sub · ` holds `row · ` frames, a row holds `cell · `
+// frames (the caption over the component or the instance), and `set · <Unit>` holds the component set with its row and column
+// labels. A frame with one of these names is walked through, and what stands in it belongs to the unit's section that holds it.
+// These names are the book's table of the arranged form (`04-drawing.md`, "The arranged form"). A script is passed to the connector as it is and cannot import, so each scan keeps its own copy, and `t-figma-scripts.mjs` fails unless the copies are identical.
+const ARRANGED = /^(body|section|sub|row|cell|set) · /;
+const MAIN_SECTIONS = ["Usage", "Sizes", "Levels", "Colors", "Looks", "Content", "Data", "States", "Parts"];
+// A text that names a value, a group or a caption of a table: `column · `, `row · `, `group · ` and `caption · `, beside `label · `.
+const VALUE_LABEL = /^(column|row|group|caption) · /;
 const UNIT_SEPARATOR = " — ";
-const BEHAVIOUR_PREFIX = "behaviour: ";
+const BEHAVIOUR_NOTE = /^behaviour(?: \(web only\))?: /i;
 const LAYOUT_NAMESPACE = "saasplane";
 const LAYOUT_KEY = "layout";
 const LAYOUT_SHAPES = ["set", "one component", "no set of versions, shown as cases"];
@@ -61,9 +71,9 @@ function parseHeader(text) {
   if (rest.some((line) => OLD_LAYOUT_CLAUSE.test(line))) {
     return { unit, line: null, behaviour: [], error: "the header states a layout: a header holds the unit's name, its one line and its `behaviour:` note, and the layout is the section's plugin data" };
   }
-  const note = rest.find((line) => line.startsWith(BEHAVIOUR_PREFIX));
-  const behaviour = note ? note.slice(BEHAVIOUR_PREFIX.length).split(", ").map((name) => name.trim()).filter((name) => name.length > 0) : [];
-  return { unit, line: rest.find((line) => !line.startsWith(BEHAVIOUR_PREFIX)) ?? null, behaviour, error: null };
+  const note = rest.find((line) => BEHAVIOUR_NOTE.test(line));
+  const behaviour = note ? note.replace(BEHAVIOUR_NOTE, "").split(", ").map((name) => name.trim()).filter((name) => name.length > 0) : [];
+  return { unit, line: rest.find((line) => !BEHAVIOUR_NOTE.test(line)) ?? null, behaviour, error: null };
 }
 
 // The layout a unit's section keeps as shared plugin data (`saasplane`, `layout`): { shape, tables, default, cases,
@@ -83,11 +93,6 @@ function layoutOf(section) {
   return { layout: { shape: data.shape, tables, default: data.default ?? {}, cases: data.cases ?? [], behaviour: data.behaviour ?? [] }, error: null };
 }
 
-// The set's table of a layout: the first table, captioned `the set`. Its cells are versions; a mode table's are instances.
-function setTableOf(layout) {
-  return layout.tables.find((table) => table.caption === "the set") ?? null;
-}
-
 // The values a label marks as the default: each is the candidates for the value before the mark, the whole
 // piece and its last word (an older label wrote `size SM (default)`). Never the word before the value.
 function defaultMarksOf(text) {
@@ -104,7 +109,6 @@ function defaultMarksOf(text) {
 
 const SHEET_SUFFIX = " cases";
 const CASE_NAME = /^[^=,]+=[^=,]+(, [^=,]+=[^=,]+)*$/;
-const BAND_LABELS = ["Usage", "Cases", "Parts"];
 
 if (INPUTS.pageId === null) {
   return { pages: figma.root.children.map((page) => ({ id: page.id, name: page.name })) };
@@ -117,6 +121,8 @@ if (!page || page.type !== "PAGE") {
 await figma.setCurrentPageAsync(page);
 
 function textOf(node) {
+  // a header drawn as a frame reads as its texts, one line each
+  if (node.type === "FRAME") return node.children.filter((child) => child.type === "TEXT").map((child) => child.characters).join("\n");
   try { return node.characters; } catch { return null; }
 }
 
@@ -133,21 +139,22 @@ function isSheet(node) {
 function isSection(node) {
   return node.type === "SECTION" && !isSheet(node);
 }
+// A frame of the arranged form that the walk goes through, and the header a unit's section opens with, drawn as a frame.
+const isArranged = (node) => node.type === "FRAME" && ARRANGED.test(node.name);
 
-const propertyName = (key) => key.replace(/#.*$/, "");
-function definitionsOf(node) {
-  try { return node.componentPropertyDefinitions ?? {}; } catch { return {}; }
-}
 
 // ---- the page's nodes, sorted into their kinds
 // The walk goes down through sections (and sections inside sections, for parts) and no further. A node's box
 // is in page coordinates, found by adding the origins of the sections above it, so every comparison is made in
 // one frame of reference.
 const placed = [];
-function collect(parent, depth) {
+// `parentId` is the unit's section (the nearest Figma section above a node), `holder` the node's own parent: they are the same
+// for a node that stands directly in a section, and differ for a node inside the frames of the arranged form.
+function collect(parent, depth, owner) {
   for (const node of parent.children) {
-    placed.push({ node, depth, parentId: depth === 0 ? null : parent.id });
-    if (isSection(node)) collect(node, depth + 1);
+    placed.push({ node, depth, parentId: owner, holder: parent.type === "PAGE" ? null : parent });
+    if (isSection(node)) collect(node, depth + 1, node.id);
+    else if (owner !== null && isArranged(node)) collect(node, depth, owner);
   }
 }
 function absoluteBox(node) {
@@ -155,7 +162,7 @@ function absoluteBox(node) {
   for (let up = node.parent; up && up.type !== "PAGE"; up = up.parent) { x += up.x; y += up.y; }
   return [x, y, node.width, node.height];
 }
-collect(page, 0);
+collect(page, 0, null);
 const pageHoldsUnits = placed.some(({ node }) => node.type === "COMPONENT_SET" || node.type === "COMPONENT");
 const unitNames = new Set();
 for (const { node } of placed) {
@@ -165,7 +172,7 @@ for (const { node } of placed) {
 
 // A text is a header when its first line names a unit and a line follows it (the unit's one line), or when it names a
 // unit before ` — ` (a Core file's header, a sheet's label, or an older header that still states a layout). A caption
-// such as `usage · DSImagePicker open — more`, a band's label such as `Usage`, and a value such as `none — follows the
+// such as `usage · DSImagePicker open — more`, a section's label such as `Usage`, and a value such as `none — follows the
 // hue` is not.
 function isHeaderText(text) {
   if (text.startsWith(USAGE_PREFIX)) return false;
@@ -181,25 +188,29 @@ function isUsage(node) {
   return node.name.startsWith(USAGE_PREFIX) || (node.type === "TEXT" && (textOf(node) ?? "").startsWith(USAGE_PREFIX));
 }
 
-function kindOf(node) {
+function kindOf(node, item) {
   if (node.type === "COMPONENT_SET") return "set";
   if (node.type === "COMPONENT") return "component";
   if (isSheet(node)) return "sheet";
   if (isUsage(node)) return "usage";
   if (isSection(node)) return "section";
-  if (node.type === "TEXT" && (node.name.startsWith(LABEL_PREFIX) || node.name.startsWith(HEADER_PREFIX) || isHeaderText(textOf(node) ?? ""))) return "label";
+  if (node.type === "FRAME" && node.name.startsWith(HEADER_PREFIX) && item.parentId !== null) return "label";
+  if (isArranged(node) && item.parentId !== null) return "wrapper";
+  if (node.type === "TEXT" && (node.name.startsWith(LABEL_PREFIX) || node.name.startsWith(HEADER_PREFIX) || VALUE_LABEL.test(node.name) || isHeaderText(textOf(node) ?? ""))) return "label";
   if ((node.type === "FRAME" || node.type === "SECTION") && !pageHoldsUnits) return "reference";
   return "other";
 }
 
-const entries = placed.map((item, index) => ({ ...item, index, kind: kindOf(item.node), box: absoluteBox(item.node) }));
+const entries = placed.map((item, index) => ({ ...item, index, kind: kindOf(item.node, item), box: absoluteBox(item.node) }));
 const topLevel = entries.filter((entry) => entry.depth === 0);
 const sets = entries.filter((entry) => entry.kind === "set");
 const form = topLevel.length === 0 ? "empty" : topLevel.some((entry) => entry.kind === "section") ? "sections" : "flat";
 // The unit a set, a lone component or a sheet stands for: a case component is no unit of its own.
+// A component that stands in a cell of the arranged form, or is named for its props, is a case, and no unit.
+const isCaseEntry = (entry) => CASE_NAME.test(entry.node.name) || entry.holder?.name.startsWith("cell · ");
 const unitEntryByName = new Map();
 for (const entry of entries) {
-  const isUnit = entry.kind === "set" || (entry.kind === "component" && !CASE_NAME.test(entry.node.name));
+  const isUnit = entry.kind === "set" || (entry.kind === "component" && !isCaseEntry(entry));
   if (isUnit) unitEntryByName.set(entry.node.name, entry);
 }
 for (const entry of entries) {
@@ -253,15 +264,18 @@ function readLabel(entry) {
     const unit = forSheet ? head.slice(0, -SHEET_SUFFIX.length) : head;
     // The layout is the header's section's plugin data, never the header's text: `grid` for a set, `one component`,
     // `cases` for a unit shown as cases alone, `no layout` where the section keeps none, `cannot say` where it cannot be read.
-    const home = entry.node.parent && entry.node.parent.type === "SECTION" ? entry.node.parent : null;
+    let home = entry.node.parent;
+    while (home && home.type !== "SECTION" && home.type !== "PAGE") home = home.parent;
+    if (home && home.type !== "SECTION") home = null;
     const kept = home ? layoutOf(home) : { layout: null, error: "the section holds no layout" };
     const form = forSheet ? "sheet" : parsed.error ? "cannot say" : kept.layout === null ? (kept.error === "the section holds no layout" ? "no layout" : "cannot say")
       : kept.layout.shape === "set" ? "grid" : kept.layout.shape === "one component" ? "one component" : "cases";
     return { text, part: forSheet ? "sheet" : "header", unit, via: "text", onPage: unitNames.has(head) || unitNames.has(unit), setId: null, form, reason: forSheet ? null : (parsed.error ?? kept.error) };
   }
-  if (entry.node.name.startsWith(LABEL_PREFIX) && BAND_LABELS.includes(text)) {
-    return { text, part: "band", unit: null, via: null, onPage: true, setId: null, form: null, reason: null };
-  }
+  const bare = (part) => ({ text, part, unit: null, via: null, onPage: true, setId: null, form: null, reason: null });
+  if (entry.node.name.startsWith(LABEL_PREFIX) && MAIN_SECTIONS.includes(text)) return bare("section");
+  // a caption stands in its cell, over its component, and names no row or column of a set
+  if (entry.holder?.name.startsWith("cell · ")) return bare("caption");
   const tie = tieOfValueLabel(entry);
   return { text, part: tie ? tie.axis : "untied", unit: tie ? tie.name : null, via: tie ? tie.axis : null, onPage: tie !== null, setId: tie ? tie.setId : null, form: null, reason: null };
 }
@@ -277,11 +291,11 @@ function unitOfUsage(node) {
   return names[0] ?? null;
 }
 // A unit is a set, or a lone component that is no case.
-const unitEntries = entries.filter((entry) => entry.kind === "set" || (entry.kind === "component" && !CASE_NAME.test(entry.node.name)));
+const unitEntries = entries.filter((entry) => entry.kind === "set" || (entry.kind === "component" && !isCaseEntry(entry)));
 // ---- the page's reading: end
 
 const PART = "labels";
-const NOT_BLOCKING = ["unitsWithoutCases"];
+const NOT_BLOCKING = [];
 
 function parseVersionName(name) {
   const values = {};
@@ -320,7 +334,7 @@ function readSet(set) {
   return { set, versions, definitions, readError, props, defaultVersion, topLeftVersion: topLeft?.name ?? null };
 }
 
-const GROUP_OF = { set: "sets", component: "components", sheet: "sheets", label: "labels", usage: "usages", section: "sections", reference: "references", other: "others" };
+const GROUP_OF = { set: "sets", component: "components", sheet: "sheets", label: "labels", usage: "usages", section: "sections", wrapper: "wrappers", reference: "references", other: "others" };
 const captions = entries.filter((entry) => entry.kind === "usage" && entry.node.type === "TEXT").length;
 const read = Object.fromEntries(Object.keys(GROUP_OF).map((kind) => [GROUP_OF[kind], entries.filter((entry) => entry.kind === kind).length]));
 read.usages -= captions;
@@ -357,25 +371,25 @@ async function scanFindings() {
       return name === HEADER_PREFIX + label.unit ? [] : [{ label: label.entry.node.id, name: name.slice(0, 80), text: label.text.slice(0, 80), why: "the layer name is not `header · ` and the unit's name" }];
     }
     if (label.part === "header" && form === "sections") return [{ label: label.entry.node.id, name: name.slice(0, 80), text: label.text.slice(0, 80), why: "the layer name of a header is `header · ` and the unit's name" }];
-    if (!name.startsWith(LABEL_PREFIX)) return [{ label: label.entry.node.id, name: name.slice(0, 80), text: label.text.slice(0, 80), why: "the layer name has no `label · ` prefix" }];
-    if (name !== LABEL_PREFIX + label.text) return [{ label: label.entry.node.id, name: name.slice(0, 80), text: label.text.slice(0, 80), why: "the layer name is not `label · ` and the text" }];
+    // a value, a group or a caption of a table may carry `column · `, `row · `, `group · ` or `caption · `; the first three name the text whole
+    const prefix = /^(label|column|row|group|caption) · /.exec(name)?.[0];
+    if (!prefix) return [{ label: label.entry.node.id, name: name.slice(0, 80), text: label.text.slice(0, 80), why: "the layer name has no `label · ` prefix" }];
+    if (!/^(group|caption)/.test(prefix) && name !== prefix + label.text) return [{ label: label.entry.node.id, name: name.slice(0, 80), text: label.text.slice(0, 80), why: `the layer name is not \`${prefix.trim()} \` and the text` }];
     return [];
   });
   const labelsFormCannotSay = labelEntries.filter((label) => label.part === "header" && (label.form === "cannot say" || (label.form === "no layout" && label.entry.parentId !== null)) && sets.some((set) => set.node.name === label.unit))
     .map((label) => ({ label: label.entry.node.id, unit: label.unit, reason: label.reason }));
-  // A unit whose versions draw everything it can show owes no sheet, so `unitsWithoutCases` is a count that does not
-  // block. A top-level unit owes a usage, which shows its primary use, so `unitsWithoutUsage` blocks. A part (a unit in a
-  // section inside a section, a name that starts with a dot, or a unit in `Shared parts`) owes neither.
+  // A top-level unit owes a Usage: a `section · Usage` of its section that holds something beside its label, or a usage node.
+  // A part (a unit in a section inside a section, a name that starts with a dot, or a unit in `Shared parts`) owes none.
   const sectionNameOf = (id) => entries.find((candidate) => candidate.node.id === id)?.node.name ?? null;
   const topUnits = form !== "sections" ? [] : [...unitEntryByName].filter(([name, entry]) =>
     entry.parentId !== null && entry.depth < 2 && !name.startsWith(".") && sectionNameOf(entry.parentId) !== "Shared parts");
-  const unitsWithoutCases = topUnits.filter(([name, entry]) => !entries.some((candidate) => candidate.parentId === entry.parentId &&
-    ((candidate.kind === "sheet" && candidate.node.name === name + SHEET_SUFFIX) || (candidate.kind === "component" && CASE_NAME.test(candidate.node.name)))))
-    .map(([name, entry]) => ({ unit: name, id: entry.node.id, in: entry.parentId }));
+  const holdsUsageSection = (sectionId) => entries.some((candidate) => candidate.kind === "wrapper" && candidate.parentId === sectionId &&
+    candidate.node.name === "section · Usage" && candidate.node.children.some((child) => !(child.type === "TEXT" && child.name.startsWith(LABEL_PREFIX))));
   // A unit drawn as cases alone (a sheet, and no component in its section) takes its first case for its usage.
   const drawnAsCasesAlone = (entry) => entry.kind === "sheet" && entry.node.children.some((child) => !isSheetLabel(child)) &&
     !unitEntries.some((candidate) => candidate.parentId === entry.parentId);
-  const unitsWithoutUsage = topUnits.filter(([name, entry]) => !drawnAsCasesAlone(entry) && !entries.some((candidate) => candidate.kind === "usage" &&
+  const unitsWithoutUsage = topUnits.filter(([name, entry]) => !drawnAsCasesAlone(entry) && !holdsUsageSection(entry.parentId) && !entries.some((candidate) => candidate.kind === "usage" &&
     candidate.parentId === entry.parentId && unitOfUsage(candidate.node) === name))
     .map(([name, entry]) => ({ unit: name, id: entry.node.id, in: entry.parentId }));
   // A set or a lone component is a unit, and a unit has a header. A case component is no unit.
@@ -391,7 +405,7 @@ async function scanFindings() {
 
   return {
     emptyReading, usagesNamingNoUnit, labelsUnitElsewhere, labelLayerNames, labelsFormCannotSay, defaultNotLabels,
-    unitsWithoutHeader, unitsWithoutCases, unitsWithoutUsage,
+    unitsWithoutHeader, unitsWithoutUsage,
   };
 }
 

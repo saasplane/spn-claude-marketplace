@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/12-delivery-showcase.md",
-      "seen": "cafbd95a"
+      "seen": "7e3b898e"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/12-delivery-showcase/",
-      "seen": "9f3c7fbd"
+      "seen": "63e4c864"
     }
   ]
 }
@@ -91,7 +91,7 @@ The table of units below lists the core units, the ones the constructs name, and
 - **A unit of the stack's own MUST declare that it is, and the showcase MUST show that on its card in the group's Overview and in the opening of its main page.** It stands in the group whose job it does, after the units the constructs name. It has no drawing in the library, so its Figma group holds a dash, as a missing value does. The table below does not list it, because the book does not name it.
 - **A unit that is shown with no such mark MUST be one the constructs name.** An unmarked unit that no construct lists is evidence of a second standard, not of this one.
 
-The Core pages Colour, Type, Scale, Icons and States each cover every section that the library's Core page of the same name has. A section is covered when it has a home on that page under the same name, shows the same tokens with the same values, and has the one line that the library's header has. The showcase may cover a section by a section of the page, a tab or another page of the story, keeps its live components, its code and its teaching sections, and may hold more than the library does. The library's file lists the sections, in "A section of the Core file". Motion shows the motion tokens of the standards. Primitives, Patterns and Inline alignment stay in the showcase alone, since they show components and the Core file holds none.
+The Core pages Colour, Type, Scale, Icons and States each cover every section that the library's Core page of the same name has. A section is covered when it has a home on that page under the same name, each subsection the library names is a tab of it under the same name, it shows the same tokens with the same values, each row shows the book's job line, and it has the one line that the library's header has. The showcase may cover a section by a section of the page, a tab or another page of the story, keeps its live components, its code and its teaching sections, and may hold more than the library does. The library's file lists the sections, in "A section of the Core file". Motion shows the motion tokens of the standards. Primitives, Patterns and Inline alignment stay in the showcase alone, since they show components and the Core file holds none.
 
 A group's Overview names the group, says in one sentence what its units are for, and holds one card for each unit: its name, its category, one sentence, a small live example with real words, and the pages the unit has.
 
@@ -216,6 +216,10 @@ A unit sits in one category, placed by what a developer mostly does with it. The
 ## Sections, and the card of a section — 🔮
 
 A subsection is a tab and a cell is a card with its code, which stands beside a narrow cell and under a wide one by the width the page model reads from the unit's place. For a unit in the new form the order of a main page is the page model's (`architecture-components.md`, *The sections of the Main page*), whose sections hold the props by their category; the order below is the one for a unit not yet converted. A main page holds its sections in one order: Usage, Sizes, Levels, Colors, Cases, States, then Props. Usage is first and Props is last. A section appears only when the unit has something for it. A unit's own sections, where it has any, stand between States and Props.
+
+**A cell that the library plans for a unit and the unit's Main page does not draw is a gap of the showcase, and it is fixed on the unit's page before its library page is read** (`RULE.SUPPORT.SURFACE.446` · MUST · skill:spn-surface/design). The library draws each cell from the showcase's record of it, so a cell the showcase lacks would be drawn in Figma by hand and the two would show different pages. Hover and pressed are the exceptions, because no page can hold them: the library drives them on the case rest.
+
+**The showcase hands its units to the reader** (`RULE.SUPPORT.SURFACE.449` · MUST · skill:spn-surface/design). In its preview, `window.__SPN_SURFACE_UNITS__` holds the design system's exports by name, so the reader can tell which unit drew each part of a cell. Most units are anonymous `forwardRef` functions, so React's own names do not say which unit is which. It is set only in the showcase, never in the design system or an app.
 
 | Section | Appears when the unit has | What it holds |
 | --- | --- | --- |
@@ -392,6 +396,8 @@ This ref states what a showcase shows, in what outline, and how the page of a un
 | `RULE.SUPPORT.SURFACE.021` | a showcase is read by a developer or a partner, and names no document of the book |
 | `RULE.SUPPORT.SURFACE.022` | a unit stands in its preview by its showcase layout, and several cases stand in one grid of equal cells |
 | `RULE.SUPPORT.SURFACE.039` | the section of a unit's main page that holds its cases is named Cases |
+| `RULE.SUPPORT.SURFACE.446` | a cell the library plans and a unit's Main page does not draw is a gap of the showcase, fixed on the unit's page before its library page is read |
+| `RULE.SUPPORT.SURFACE.449` | the showcase sets `window.__SPN_SURFACE_UNITS__` to the design system's exports by name, so the reader can tell which unit drew each part of a cell |
 | `RULE.SUPPORT.SURFACE.083` | a showcase also shows the units its stack provides on its own, each marked as the stack's own |
 | `RULE.SUPPORT.SURFACE.212` | the theme is set in one floating bar on every page and in no tool of the toolbar, the toolbar keeps only what a reader uses, and the public site is a static build that writes nothing |
 | `RULE.SUPPORT.SURFACE.280` | the showcase's sidebar opens on one page, Home, then six sections, Core, App, Layout, Container, Widget and Components, and the site's pages and the sample apps stand full page, outside the sidebar |

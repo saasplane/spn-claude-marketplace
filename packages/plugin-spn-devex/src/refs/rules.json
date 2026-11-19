@@ -23716,6 +23716,11 @@
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
           "heading": "The rules this step holds"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/change-library.md",
+          "heading": "What the library draws, and what it does not"
         }
       ]
     },
@@ -34331,6 +34336,11 @@
         },
         {
           "plugin": "spn-surface",
+          "path": "refs/support/surface/delivery-library.md",
+          "heading": "A unit's look"
+        },
+        {
+          "plugin": "spn-surface",
           "path": "skills/design/steps/change-library.md",
           "heading": "What the library draws, and what it does not"
         },
@@ -34338,11 +34348,6 @@
           "plugin": "spn-surface",
           "path": "skills/design/steps/writer-brief.md",
           "heading": "The rules this step holds"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/steps/writer-brief.md",
-          "heading": "What you do not do"
         }
       ]
     },
@@ -34612,7 +34617,28 @@
       "chapter": "04-capabilities/02-support/01-surface/11-delivery-library/02-figma/02-managed.md",
       "heading": "The path of a page through the connector",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/delivery-library.md",
+          "heading": "The path of a page through the connector"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/delivery-library.md",
+          "heading": "A unit's look"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/change-library.md",
+          "heading": "What the library draws, and what it does not"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/writer-brief.md",
+          "heading": "What you do not do"
+        }
+      ]
     },
     {
       "id": "RULE.SUPPORT.SURFACE.423",
@@ -34999,11 +35025,6 @@
         },
         {
           "plugin": "spn-surface",
-          "path": "skills/design/steps/change-library.md",
-          "heading": "The walk, in order"
-        },
-        {
-          "plugin": "spn-surface",
           "path": "skills/design/steps/draw.md",
           "heading": "How a block is drawn"
         },
@@ -35291,6 +35312,16 @@
       "restated": [
         {
           "plugin": "spn-surface",
+          "path": "refs/support/surface/delivery-library.md",
+          "heading": "A unit is one section"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/change-library.md",
+          "heading": "What the library draws, and what it does not"
+        },
+        {
+          "plugin": "spn-surface",
           "path": "skills/design/steps/writer-brief.md",
           "heading": "The rules this step holds"
         }
@@ -35310,8 +35341,28 @@
       "restated": [
         {
           "plugin": "spn-surface",
+          "path": "refs/support/surface/delivery-library.md",
+          "heading": "A unit's look"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/delivery-showcase.md",
+          "heading": "Sections, and the card of a section — 🔮"
+        },
+        {
+          "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
           "heading": "The rules this step holds"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/change-library.md",
+          "heading": "What the library draws, and what it does not"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/writer-brief.md",
+          "heading": "What you do not do"
         }
       ]
     },
@@ -35329,8 +35380,23 @@
       "restated": [
         {
           "plugin": "spn-surface",
+          "path": "refs/support/surface/delivery-library.md",
+          "heading": "A unit is one section"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/change-library.md",
+          "heading": "What the library draws, and what it does not"
+        },
+        {
+          "plugin": "spn-surface",
           "path": "skills/design/steps/writer-brief.md",
           "heading": "The rules this step holds"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/writer-brief.md",
+          "heading": "A section"
         }
       ]
     },
@@ -35346,6 +35412,11 @@
       "heading": "The path of a page through the connector",
       "decision": null,
       "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/delivery-library.md",
+          "heading": "The path of a page through the connector"
+        },
         {
           "plugin": "spn-surface",
           "path": "skills/design/steps/writer-brief.md",
@@ -35365,6 +35436,11 @@
       "heading": "The sections of a main page",
       "decision": null,
       "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/delivery-showcase.md",
+          "heading": "Sections, and the card of a section — 🔮"
+        },
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",

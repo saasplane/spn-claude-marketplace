@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/11-delivery-library/02-figma/02-managed.md",
-      "seen": "6cd9e69f"
+      "seen": "d2801b98"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/11-delivery-library/02-figma/04-drawing.md",
-      "seen": "3373442a"
+      "seen": "fc0a12ab"
     }
   ]
 }
@@ -29,21 +29,21 @@
 - **A part of a unit that is another unit is an instance of that unit's set** (`RULE.SUPPORT.SURFACE.447` · MUST · skill:spn-surface/design)
 - **Every page of a file is captured at once, and a unit is arranged only after every unit it is built from that the same file holds** (`RULE.SUPPORT.SURFACE.448` · MUST · skill:spn-surface/design)
 
-Read this step when you are an agent started by another and your order is to change one page of a library file through the Figma connector. **It is all you read before your own order.** It stands in place of the long steps: `connector-rules.md`, `change-library.md` and `operations-and-composing.md` in this folder, and "The connector's facts" in `refs/support/surface/delivery-library.md`. Every line here restates a line of theirs. Open one of them only when you are stuck: when you meet a thing this brief does not cover, or when a call fails in a way you cannot explain. Read the fact there before you try anything, and say in your report which step you opened and why.
+Read this step when you are an agent started by another and your order is to carry out the path of one page, or of some units of one page, of a library file through the Figma connector. **It is all you read before your own order.** It stands in place of the long steps: `connector-rules.md` and `change-library.md` in this folder, and "The connector's facts" in `refs/support/surface/delivery-library.md`. Every line here restates a line of theirs. Open one of them only when you are stuck: when you meet a thing this brief does not cover, or when a call fails in a way you cannot explain. Read the fact there before you try anything, and say in your report which step you opened and why.
 
 Its provenance is the foundation book's design library chapter. Apply this restatement. The chapter is provenance, and not a file to open.
 
 ## The work
 
-The book states a unit, the library draws it, and a stack builds it. You change one page of one library file with `use_figma`, and you pass `skillNames: "resource:figma-use"` on every call. You do not publish and you save no version: both are the developer's.
+The book states a unit, the library draws it, and a stack builds it. You draw one page of one library file with the plugin's code through `use_figma`, and you pass `skillNames: "resource:figma-use"` on every call. Each cell is drawn by the plugin from its record of the showcase's Main page: the plan comes from the CONSTRUCT snapshot and the records come from `spnutils apps surface record`, so you draw no cell by hand, and `spnutils apps surface gaps` names what the drawing still misses. You do not publish and you save no version: both are the developer's.
 
 | File | It holds | Its file key |
 | --- | --- | --- |
-| `DS 1-core` | the variables, the text styles, the scale and the icons | `3RZVOKGItY4Kos2ZVfmI3V` |
-| `DS 2-Components` | one page for each group of components | `saEPRBFUOa7QEj84NpCJkr` |
-| `DS 3-Widgets` | one page for each widget | `QfApgt8QTngjhGe0Hqf3Xq` |
-| `DS 4-Containers` | the panel, with its parts and its look | `XQPPdU83nFQjT5LQ3JmHgg` |
-| `DS 5-Layouts` | the layout, in each of its types | `ENmqF4WjVnecAVnpuy0nHF` |
+| `DS 1-Core` | the variables, the text styles, the scale and the icons | `nOZVEGGnikJwPkAj1Me387` |
+| `DS 2-Components` | one page for each group of components | `B62AWTp11ARCSw2z5oquEd` |
+| `DS 3-Widgets` | one page for each widget | `ZCBwqzCvuMP5XHwrG1mVe6` |
+| `DS 4-Containers` | the panel, with its parts and its look | `qp2hnmZYr05qzmniFlojO2` |
+| `DS 5-Layouts` | the layout, in each of its types | `joz6fxsQ8sOaDgahNUIfG1` |
 
 - **Check your order against the live file before the first change, and say what you corrected.** The order names the nodes you may touch, and the web's file and line for each thing you make. Where the order and the web differ, take the web and say so.
 - **Take the file's facts from the inventory you were handed, and read the file only for what it does not hold.** A key of Core that you import by is read in the inventory or in Core's own file, and never guessed.
@@ -69,38 +69,34 @@ The book states a unit, the library draws it, and a stack builds it. You change 
 
 1. A version is named `property=value, property=value`, with no comma inside a value. The versions' names define the properties: renaming a property or a value in every version's name renames it, and the ids and keys stand.
 2. A published set, a version, a lone component and a case keep their ids and keys. Change what is inside one, and never remove one to make it again.
-3. A new version is `twin.clone()`, named, appended to the set, placed in the grid, with the set resized to hold it. **A copy loses every property tie, and each slot in it becomes a plain frame.** It keeps its variable bindings and its text styles. So in the same call, tie each layer again as its twin is tied (`componentPropertyReferences`), and make each slot again as a copy of the twin's slot. That copy stays a slot and loses its ties too: tie it again (`slotContentId`, and `visible` where the twin has it). Compare each copy with its twin.
-4. The default version is the one at the top left of the grid, not the first child. Read `set.defaultVariant.id` before and after any move.
-5. Before you add a property or a value, work out the versions the set will hold, and say the number. It never passes 1,000.
-6. Give a new property a default value that draws what stands. The versions that stand then gain the cell in their names and nothing else. Put the cell where a neighbouring set of the page puts it: `size` goes first.
-7. Bind a size, a radius, a gap, a padding, a fill and a text style to the variable or the style a neighbour binds. Type a number only where your order names one. Make no variable, no collection and no mode, and change no text style.
-8. Read the overrides of the cases and usages that place your unit before you change an instance inside it, and set again what the change dropped.
-9. Write a set's description with plain apostrophes, and check what reads back.
+3. The default version is the one at the top left of the grid, not the first child. Read `set.defaultVariant.id` before and after any move.
+4. Bind a size, a radius, a gap, a padding, a fill and a text style to the variable or the style a neighbour binds, and a paint to the published variable of DS 1-Core, imported by key. Type a number only where your order names one. Make no variable, no collection and no mode, and change no text style. A paint that matches no variable is reported and never left as a raw colour.
+5. Read the overrides of the cases and usages that place your unit before you change an instance inside it, and set again what the change dropped.
+6. Write a set's description with plain apostrophes, and check what reads back.
 
-## A section, a label, a case
+## A section
 
-0. A unit written in the page-model form is drawn from its chapter's samples block and props table: Figma draws its Main page, a page for each type and its Screens, each cell an instance of the unit with its props set from the sample the chapter names, and no unit whose block has none. The rest of this part is for a unit not yet converted.
-1. A unit's section holds, in this order: where it lives (`path · <Unit>`), the header, then the bands Usage, Variations, Cases and Parts, each under its label. Variations is the unit's tables: the set's table with its group titles and labels, then its mode tables. A table of one column names each value above its version, which keeps the width it takes in use. A unit is drawn at the space it takes in use, never scaled: `PAGE` or `CONTAINER` the content's full width, `WIDGET` three side by side, `GROUP`, `CONTENT` or `INLINE` four. A unit whose widest use is `PAGE` or `CONTAINER` draws its cases and its mode tables but the level table at `WIDGET`, three to a row, and the caption names that level.
-2. The header is one text, in the layer `header · <Unit>`: the unit's name; on the line under it, what the unit is in one line; then `behaviour: ` and the properties that change only how the unit behaves, where it has any. It holds no layout. The layout is the section's shared plugin data, namespace `saasplane`, key `layout`: `{ shape, tables, default, cases, behaviour }`, each table a `caption`, `rowGroups` and `columnGroups`, each group a `prop` and its `values`, the default first. Read it there, never from a label, and write it in the same call that changes the set. When the set gains a property, the layout names it.
-3. A row or column label names one value, and a group's title names the property, `states` for the states; ` (default)` follows the default's value, once. Each is a text whose layer is `label · ` and its whole text. Set the text and the layer's name in one step. A right-aligned label keeps its right edge when its text changes, so set `x` again.
-4. A case is a component on the unit's sheet `<Unit> cases`. It holds an instance of the unit with its values set, and it is named `property=value`, with `, ` between two cells. The sheet's label names its cases. A unit drawn from data shows each trait of its data across its versions until each appears once, and it draws every trait its data's type carries. A case that draws the same picture as a version or the usage is left out, and the plan names the one it repeats.
-5. A copy of a label or a case lands on the page's top level. Append it to its section or its sheet, and set its place again.
-6. Grow the set, its section and its sheet so that nothing inside the section meets. Move no other section: write a section that now reaches its neighbour in your report.
+1. A page is one group of the showcase, named as the group without `Components/`, and it holds one section for each unit and nothing else at its top level. A unit's section is named as the unit and holds, from the top, where it lives (`path · <Unit>`), its header, then Main's sections by name, Usage, Sizes, Levels, Colors, Looks, Content, Data, States and Parts, each under its label, with the set in Sizes (or in the first section that shows versions where the unit has no Sizes). A section Main has nothing for is left out with its label. Every other cell of every section is an instance of a version of the set. A part sits in the section of the unit that owns it, and a part that several units use sits in a last section of the page named Shared parts.
+2. Each cell is drawn from its record of the unit's Main page, and a narrow cell is read in a page-wide viewport with the unit's root at the cell's width. A unit is drawn at the space it takes in use, never scaled. Hover and pressed, which no page holds, are driven on the case rest of the unit. A part of a unit that is another unit is an instance of that unit's set, at the version its props give, with its record's words, icon and size as overrides, and a part no version matches stays as its record drew it and is reported (`RULE.SUPPORT.SURFACE.447` · MUST · skill:spn-surface/design).
+3. The drawing makes each layer of a record an auto-layout frame with the record's layout, boxes and texts, names the layers by the unit's parts, binds every paint by its token to the library's variable (a dark cell to the same variable as its light twin, and the twin's modes), binds every text's family and weight to the `Theme-Font` variables, and makes the set's versions components with each other cell an instance. A cell is never drawn by hand beside the set; a drift is fixed in the plugin's drawing and the unit drawn again.
+4. The header is one text, in the layer `header · <Unit>`: the unit's name; on the line under it, what the unit is in one line; then `behaviour: ` and the properties that change only how the unit behaves, where it has any. It holds no layout. The layout is the section's shared plugin data, namespace `saasplane`, key `layout`: `{ shape, tables, default, cases, behaviour }`, each table a `caption`, `rowGroups` and `columnGroups`, each group a `prop` and its `values`, the default first. Read it there, never from a label.
+5. A label's layer is `label · ` and its whole text. Set the text and the layer's name in one step. A right-aligned label keeps its right edge when its text changes, so set `x` again.
+6. Touch only your own units' sections, your own drawn cells and your own holder node. A call that changes what runs share, the variables, the text styles, the order of a page's sections, a part in Shared parts or the cover, is not yours unless your order names it. A copy of a label lands on the page's top level: append it to its section and set its place again.
 
 ## What you do not do
 
-- **Send no `align.js` and no scan part.** A closer does both when the drawing is done.
+- **Send no scan part.** The scan is made once, when every page of the file is done.
 - **Hand the developer no Figma step to draw, rebind, delete or tick** (`RULE.SUPPORT.SURFACE.400` · MUST · skill:spn-surface/design). The developer's part is to publish and to run the plugin; you fix the rest, or report it.
 - Change nothing that your order does not name. Write a fault you meet in your report, and leave it.
 - Try nothing out in a library file. If you must learn how the API behaves and a read cannot tell you, stop that unit and report the question.
 - Draw nothing of a pattern, and no unit that a stack provides on its own.
-- **Draw no unit's look by hand.** A look is read from the running showcase into the stack's snapshot, and the plugin draws only the look the snapshot holds (`RULE.SUPPORT.SURFACE.411` · MUST · skill:spn-surface/design). A unit whose look is not read yet stays a stand-in whose label says so, and a value the stack writes with no variable is a difference for your report, never a variable you bind.
+- **Draw no unit's look by hand.** A look is read from the running showcase into records, and the plugin draws each cell from its record (`RULE.SUPPORT.SURFACE.422` · MUST · skill:spn-surface/design). A cell Main does not draw is a gap of the showcase, reported for the lead and never drawn by hand (`RULE.SUPPORT.SURFACE.446` · MUST · skill:spn-surface/design), and a value the stack writes with no variable is a difference for your report, never a variable you bind.
 - Change no script: fill its inputs and pass the rest as it is.
 
 ## Your proof, and your report
 
 - **Read each set you touch before the first change and after the last, in calls of their own:** its id, key, default and property definitions, and each version's id, key and name. Every version that stood keeps its id and its key. For a version that must look the same, compare the hash of its `exportAsync` PNG bytes before and after, and return the hashes, never the bytes.
-- **Take one picture of each set and sheet you changed, and look at it.** Say in the report which pictures you looked at and what each showed. Take one more only after a repair.
+- **Take one picture of each section you arranged, and look at it.** Say in the report which pictures you looked at and what each showed. Take one more only after a repair.
 - **Write the report after each unit, to the path your order names.** If your room runs short, stop at a clean point, with every version whole, named and tied, and say which units you did not reach.
-- **End the report with what the closer needs:** the page's id, each thing you made with its id, the sets, sheets and sections that grew with their sizes before and after, and anything you know stands out of place.
+- **End the report with the page's read-back:** the page's id, each section you arranged with its id, each section's cells against its plan, each paint bound to no variable, and anything you know stands out of place.
 - **Write down each fact about Figma or the connector that you had to learn,** in one sentence, so that no agent tries it again.
