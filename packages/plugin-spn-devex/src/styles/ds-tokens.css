@@ -1,4 +1,4 @@
-/* The design system's own variables, copied whole by `spn-devex docs sds cut` from support-web-ds-ts v11.13.2. Never edited by hand: cut copies them again. */
+/* The design system's own variables, copied whole by `spn-devex docs sds cut` from support-web-ds-ts v11.14.0. Never edited by hand: cut copies them again. */
 /* =========================================================================
    DESIGN TOKENS  —  see docs/04-capabilities/05-web/support-web-ds-ts/03-design-system.md
    Tier 0 seed (only per-theme knob) · Tier 1 ramps · Tier 2 roles
@@ -584,6 +584,17 @@
   /* The inner shadow along the top and bottom edges of a section that takes `inset`. */
   --shadow-inset: inset 0 10px 10px -10px var(--shadow-color), inset 0 -10px 10px -10px var(--shadow-color);
 
+  /* The media tokens: what any kind of picture needs, whether a photograph, an illustration, a product view or a line
+     drawing. A kind's own roles stay in its design language and map onto these. In light the shade is the brand's own
+     darkest step, so a raised picture casts a tinted shadow; in dark it is black, a shadow and never a glow. */
+  --shadow-shade: oklch(from var(--color-primary-950) 0.2 c h);
+  /* The corners of a picture, a capture or a drawing's frame. */
+  --media-radius: var(--radius);
+  /* The edge of a framed picture. */
+  --media-frame: var(--surface-border);
+  /* Words over a picture: the page's own surface, mostly opaque. */
+  --media-scrim: color-mix(in oklch, var(--surface) 70%, transparent);
+
   /* Frozen-column trailing edge. Deliberately far softer than --shadow-color: this is a
        depth hint telling the reader that content slides UNDER the pinned column, not a
        divider. At elevation strength it reads as a hard rule and cuts the table in two. */
@@ -947,6 +958,8 @@
   --shadow-elevation-lg: 0 3px 6px -2px rgb(0 0 0 / 0.45), 0 14px 32px -6px rgb(0 0 0 / 0.45);
   --shadow-elevation-xl: 0 6px 10px -3px rgb(0 0 0 / 0.5), 0 24px 56px -8px rgb(0 0 0 / 0.5);
   --shadow-inset: inset 0 14px 12px -12px var(--shadow-color), inset 0 -14px 12px -12px var(--shadow-color);
+  --shadow-shade: rgb(0 0 0);
+  --media-scrim: color-mix(in oklch, var(--surface) 75%, transparent);
   --table-pin-shadow: rgb(0 0 0 / 0.32);
 }
 

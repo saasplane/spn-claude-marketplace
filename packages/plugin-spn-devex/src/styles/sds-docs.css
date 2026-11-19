@@ -376,6 +376,13 @@
   --shadow-elevation-lg: 0 3px 6px -2px rgb(0 0 0 / 0.12), 0 14px 32px -6px rgb(0 0 0 / 0.12);
   --shadow-elevation-xl: 0 6px 10px -3px rgb(0 0 0 / 0.14), 0 24px 56px -8px rgb(0 0 0 / 0.14);
   --shadow-inset: inset 0 10px 10px -10px var(--shadow-color), inset 0 -10px 10px -10px var(--shadow-color);
+  --shadow-shade: oklch(from var(--color-primary-950) 0.2 c h);
+  --media-radius: var(--radius);
+  --media-frame: var(--surface-border);
+  --media-scrim: var(--surface);
+  @supports (color: color-mix(in lab, red, red)) {
+    --media-scrim: color-mix(in oklch, var(--surface) 70%, transparent);
+  }
   --table-pin-shadow: rgb(0 0 0 / 0.04);
   --primary: var(--seed-primary);
   --primary-hover: oklch(from var(--seed-primary) calc(l * 0.85) c h);
@@ -765,6 +772,11 @@
   --shadow-elevation-lg: 0 3px 6px -2px rgb(0 0 0 / 0.45), 0 14px 32px -6px rgb(0 0 0 / 0.45);
   --shadow-elevation-xl: 0 6px 10px -3px rgb(0 0 0 / 0.5), 0 24px 56px -8px rgb(0 0 0 / 0.5);
   --shadow-inset: inset 0 14px 12px -12px var(--shadow-color), inset 0 -14px 12px -12px var(--shadow-color);
+  --shadow-shade: rgb(0 0 0);
+  --media-scrim: var(--surface);
+  @supports (color: color-mix(in lab, red, red)) {
+    --media-scrim: color-mix(in oklch, var(--surface) 75%, transparent);
+  }
   --table-pin-shadow: rgb(0 0 0 / 0.32);
 }
 .rdp-root {
