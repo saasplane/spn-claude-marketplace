@@ -18,7 +18,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { basename, dirname, join, resolve } from "node:path";
 import { type Action, FLAG, VALUE, UsageFault, readWords } from "../../../../../plugin-support-lib/src/lib/command.ts";
 import {
-  changedEntries, clearWaiting, deriveGo, workflowOf, fullRunMinutes, goFileOf, isApplyPart, landedEntries, landedOrder, landedMeasures, markDropped, markWaiting, planScope, proposeScopes, readGo, readyParts, newCasesOf, ratesOf, workspaceMapOf, staleEntries, tangledParts, unheldEntries,
+  changedEntries, clearWaiting, themeCommandOf, deriveGo, workflowOf, fullRunMinutes, goFileOf, isApplyPart, landedEntries, landedOrder, landedMeasures, markDropped, markWaiting, planScope, proposeScopes, readGo, readyParts, newCasesOf, ratesOf, workspaceMapOf, staleEntries, tangledParts, unheldEntries,
   type ScopeSheet,
 } from "../../lib/go-plan.ts";
 import { PLUGIN_TEMPLATES } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
@@ -41,7 +41,7 @@ const briefOf = (ws: string, lead: string, part: GoPart): string => join(notesDi
 /** Whether a TEST part is the repository's proof run, after the releases: told apart by its id. */
 export const isProofRun = (part: GoPart): boolean => part.work === "TEST" && part.id.startsWith("proof-");
 /** Whether a TEST part is a repository's full run or its proof run rather than its baseline: told apart by their ids. */
-export const isFullRun = (part: GoPart): boolean => part.work === "TEST" && !part.id.startsWith("baseline-");
+export const isFullRun = (part: GoPart): boolean => part.work === "TEST" && !part.id.startsWith("baseline-") && !part.id.startsWith("theme-");
 
 /** The first read of an open workstream's go plan: each part's `pass` becomes `work`, the file written back with one log line, before the schema reads it. A closed workstream's is left as it closed. */
 export function renameGo(ws: string, lead: string): void {
@@ -66,6 +66,7 @@ export function nextStep(ref: string, ws: string, plan: GoPlan): string {
   const ready = readyParts(plan);
   const first = ready[0];
   if (first) {
+    if (first.id.startsWith("theme-")) return `Next: \`workstream go start ${ref} ${first.id}\`, then run \`${themeCommandOf(first)}\` in ${first.repo}.`;
     if (first.work === "TEST") return `Next: \`workstream go start ${ref} ${first.id}\`, then run the repository's whole suite.`;
     if (first.work === "RELEASE") return `Next: \`workstream go start ${ref} ${first.id}\`, then release ${first.repo}.`;
     if (isApplyPart(first)) return `Next: make the lead's edits for the light entries of ${first.id} in the ${first.repo} worktree, then \`workstream go start ${ref} ${first.id}\`, which applies its patches and lands it as one commit.`;
@@ -561,6 +562,7 @@ function start(args: string[]): number {
   logEvent(ws, arc, "go", null, `${id} started`);
   console.log(`ok · ${arc} ${id} running`);
   if (part.work === "RELEASE") console.log(`Next: release ${part.repo}, then \`workstream report write\` on it.`);
+  else if (part.id.startsWith("theme-")) console.log(`Next: run \`${themeCommandOf(part)}\` in ${part.repo}, then \`workstream report write\` on it.`);
   else if (isProofRun(part))
     console.log(`Next: run the whole tiers of ${part.repo} on what was released, then \`workstream row state ${basename(ws)}/${arc} <row> landed --run <name>\` for the arc's PROOF row, then \`workstream report write\` on it.`);
   else console.log(nextStep(`${basename(ws)}/${arc}`, ws, next).replace(/^Next: /, `Next: run the whole suite of ${part.repo}, then `));

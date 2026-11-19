@@ -156,6 +156,30 @@ export function readGo(ws: string, lead: string): GoPlan | null {
   return data as GoPlan;
 }
 
+/**
+ * THE TITLE OF A DOCUMENT as an entry's file gives it: the `title` of its `spn:doc` block, else its first `# ` heading, else
+ * the words of its file's name (`03-design-language.md` is `Design Language`), for a file the entry has yet to make.
+ */
+export function titleOfDocument(path: string, dirs: readonly string[]): string {
+  const found = dirs.map((dir) => join(dir, path)).find((one) => existsSync(one));
+  if (found) {
+    try {
+      const text = readFileSync(found, "utf8");
+      const block = /"title"\s*:\s*"((?:[^"\\]|\\.)*)"/.exec(/<!--\s*spn:doc[\s\S]*?-->/.exec(text)?.[0] ?? "")?.[1];
+      const heading = /^#\s+(.+?)\s*$/m.exec(text)?.[1];
+      if (block ?? heading) return String(block ?? heading);
+    } catch { /* the file's name stands */ }
+  }
+  const stem = (path.split("/").pop() ?? path).replace(/\.md$/, "").replace(/^\d+-/, "");
+  return stem.split("-").map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(" ");
+}
+
+/** Whether an entry changes a design-language construct: a file under `docs/02-constructs/` whose title ends `Design Language`. */
+export function changesDesignLanguage(entry: SheetEntry, dirs: readonly string[]): boolean {
+  const path = entry.file.slice(entry.file.indexOf(":") + 1);
+  return /(^|\/)docs\/02-constructs\//.test(path) && /Design Language$/.test(titleOfDocument(path, dirs));
+}
+
 const repoOf = (entry: SheetEntry): string => entry.file.slice(0, entry.file.indexOf(":"));
 
 /** An entry as a go names it, `N009/E14`. */
@@ -581,7 +605,7 @@ export function deriveGo(scope: readonly ScopeSheet[], options: DeriveOptions = 
   const nodeKindsOf = (repo: string): Map<string, string> => new Map((map?.repos.find((one) => one.repo === repo)?.nodes ?? []).map((node) => [node.folder, node.kind] as const));
   // `entries` says the part holds entries: the generated files a table puts in its release pass are GENERATED work there, never a release.
   const workOf = (pass: string, repo: string, entries = false): Work => {
-    if (pass === "baseline" || pass === "full" || pass === "proof" || pass === "red") return "TEST";
+    if (pass === "baseline" || pass === "full" || pass === "proof" || pass === "red" || pass === "theme") return "TEST";
     const roles = rolesOf(passesOf(repo));
     if (entries && pass === roles.generated) return "GENERATED";
     if (pass === "release") return "RELEASE";
@@ -827,6 +851,20 @@ export function deriveGo(scope: readonly ScopeSheet[], options: DeriveOptions = 
     }
   }
 
+  // A DESIGN-LANGUAGE CHANGE REACHES EACH WEB APP OF ITS REPOSITORY: one proof part for each `APP_WEB` node, `theme-<repo>-<app-folder>`,
+  // which runs `spnutils apps surface theme <app-folder>` after the repository's apply (RULE.SUPPORT.SURFACE.572, 577).
+  const themed: GoPart[] = [];
+  for (const repo of repos) {
+    const reaches = scope.some(({ sheet }) => sheet.entries.some((entry) => repoOf(entry) === repo && changesDesignLanguage(entry, options.dirsOf?.(repo) ?? [])));
+    if (!reaches) continue;
+    for (const node of map?.repos.find((one) => one.repo === repo)?.nodes ?? []) {
+      if (node.kind !== "APP_WEB") continue;
+      const id = `theme-${repo}-${node.folder.split("/").pop()}`;
+      if (!keptIds.has(id)) themed.push(part(id, repo, "theme", [], []));
+    }
+  }
+  fresh.push(...themed);
+
   // THE DESIGN TRACK runs beside the code passes: `draw` waits only on the repository's book part, `publish` waits on its full run and on the developer.
   const design = options.design ?? (map ? designTrackOf() : []);
   const drawRow = design.find((one) => one.id === "draw"), publishRow = design.find((one) => one.id === "publish");
@@ -865,6 +903,12 @@ export function deriveGo(scope: readonly ScopeSheet[], options: DeriveOptions = 
     const mine = parts.filter((other) => other.repo === one.repo);
     const book = rolesOf(passesOf(one.repo)).book;
     one.waitsOn = partPass(one) === "draw" ? mine.filter((other) => partPass(other) === book).map((other) => other.id) : mine.filter((other) => isFullPart(other)).map((other) => other.id);
+  }
+  // A THEME PART WAITS ON ITS REPOSITORY'S APPLY, else on the parts that hold the repository's entries: it proves what they wrote.
+  for (const one of themed) {
+    const mine = parts.filter((other) => other.repo === one.repo && other !== one && other.entries.length);
+    const apply = mine.filter(isApplyPart);
+    one.waitsOn = (apply.length ? apply : mine).map((other) => other.id);
   }
   // TWO PARTS THAT EDIT ONE FILE NEVER RUN TOGETHER, and a part is ready only once the parts that edit the files its entries' `book` lines
   // name have landed (s51). A wait that would close a circle is not added.
@@ -1261,12 +1305,16 @@ export function readyParts(plan: GoPlan): GoPart[] {
  * the parts the plan says it waits on have landed, so independent parts run together and the waits are the plan's own.
  * The lead's apply parts and a step are told what to run; any other part reads its brief.
  */
+/** The command a theme part runs: its id is `theme-<repo>-<app-folder>`. */
+export const themeCommandOf = (part: Pick<GoPart, "id" | "repo">): string => `spnutils apps surface theme ${part.id.slice(`theme-${part.repo}-`.length)}`;
+
 export function workflowOf(plan: GoPlan, scope: readonly ScopeSheet[]): string {
   const held = new Map(scope.flatMap(({ arc, sheet }) => sheet.entries.map((entry) => [refOf(arc, entry), entry] as const)));
   const ref = `${plan.lead}`;
   const parts = plan.parts.map((one) => {
     const steps = one.entries.flatMap((entryRef) => { const entry = held.get(entryRef); return entry && isStep(entry) ? [`${entryRef}: run \`${String(entry.command ?? "")}\`; it is done when ${String(entry.proof ?? "")}`] : []; });
     const prompt = steps.length ? `Carry out the step of part ${one.id} in ${one.repo}'s worktree. ${steps.join(" ")} Commit nothing, launch no agent, and report what the command printed.`
+      : one.id.startsWith("theme-") ? `Run \`${themeCommandOf(one)}\` in ${one.repo}'s worktree and report what it printed.`
       : isApplyPart(one) ? `Run \`spn-devex workstream go start ${ref} ${one.id}\` from the workspace, which applies the part's patches in order, and report what it printed.`
       : `Read the order for part ${one.id} (${ref}'s orders folder, ${one.id}.md) and carry it out as it says.`;
     return { id: one.id, repo: one.repo, work: one.work, waitsOn: one.waitsOn, prompt };

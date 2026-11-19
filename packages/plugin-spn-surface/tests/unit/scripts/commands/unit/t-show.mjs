@@ -277,5 +277,16 @@ console.log("\n=== unit show — the plugin's own copy");
   ok("finds a widget's table in the widgets ref", widget.code === 0 && widget.out.includes("not this unit: a DSCard"), widget.out.slice(0, 1200));
 }
 
+console.log("\n=== unit show — a case as a tree");
+{
+  const { out, code } = run(FIXTURE, "unit", "show", "DSSheet");
+  const tree = '{"unit":"DSSheet","props":{"placement":"RIGHT"}}';
+  ok("[MKT.SCRIPTS.611] a case prints its tree in the render's form under its sentence, a cell that is the place's setting no prop",
+    code === 0 && out.includes(`      ${tree}\n`), out);
+  ok("[MKT.SCRIPTS.611] a case that sends the reader elsewhere prints no tree", out.split("\n").filter((line) => line.startsWith('      {"unit"')).length === 1, out);
+  const json = JSON.parse(run(FIXTURE, "unit", "show", "DSSheet", "--json").out);
+  ok("[MKT.SCRIPTS.611] --json gives the tree of each case, and null for a redirect", json.cases[0].tree === tree && json.cases[1].tree === null, JSON.stringify(json.cases));
+}
+
 console.log(failed ? `\n  ${failed} of ${total} FAILED — unit show` : `\n  all ${total} passed — unit show`);
 process.exit(failed ? 1 : 0);

@@ -1,11 +1,12 @@
 // The page renderer and a code block (`05-artifacts.md` § One stylesheet, served in versions): a produced page
 // holds plain code in a `pre` tagged with its language, and no colour. The shared script colours the block when
 // the page opens, so the renderer writes the same block a person writes by hand.
+import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 
 const HERE = resolve(import.meta.dirname, "..", "..", "..", "..");
-const { renderPage } = await import(pathToFileURL(resolve(HERE, "src", "scripts", "lib", "render.ts")).href);
+const { renderPage, setUnitRender, designSystemVersion } = await import(pathToFileURL(resolve(HERE, "src", "scripts", "lib", "render.ts")).href);
 
 let total = 0, failed = 0;
 const ok = (label, condition, detail = "") => {
@@ -155,6 +156,34 @@ ok("red: several columns of sentences are a paragraph each, led by the column's 
   const empty = renderPage({ block: { id: "probe", title: "Probe", status: "DONE", lenses: ["ARCHITECT"], summary: "What a probe is." }, markdown: `# Probe\n\nThe lead.\n\n## What it is\n\n${fence("cards", "")}`, workspace: "/workspace", location: "/workspace/docs/02-constructs/probe.md",
     furniture: { stylesheet: "", script: "", footer: "" } });
   ok("[RULE.DEVEX.WORKSPACE.532] an empty cards fence is a finding, not a silent gap", empty.findings.some((f) => f.message.includes("`cards` block with no line")), JSON.stringify(empty.findings));
+}
+
+console.log("\n=== the page renderer — a unit fence is drawn by the render and set in a frame");
+{
+  const tree = { unit: "DSFeature", props: { pageLevel: "PAGE", type: "BACKDROP", title: "A title" } };
+  const seen = [];
+  setUnitRender((file) => { seen.push(JSON.parse(readFileSync(file, "utf8"))); return "<html><head></head><body><p class=\"x\">drawn & ready</p></body></html>"; });
+  const made = renderPage({
+    block: { id: "probe", title: "Probe", status: "DONE", lenses: ["ARCHITECT"], summary: "What a probe is." },
+    markdown: `# Probe\n\nThe lead.\n\n## What it is\n\n${fence("unit", JSON.stringify(tree))}`,
+    workspace: "/workspace", location: "/workspace/docs/02-constructs/probe.md", furniture: { stylesheet: "", script: "", footer: "" },
+  });
+  const pinned = readFileSync(resolve(HERE, "src", "styles", "ds-tokens.css"), "utf8").split("\n")[0].match(/support-web-ds-ts v(\d+\.\d+\.\d+)/)?.[1];
+  ok("[MKT.SCRIPTS.613] a unit fence is wrapped as a render file carrying the pinned design-system version and the tree as its one section",
+    seen.length === 1 && designSystemVersion() === pinned && JSON.stringify(seen[0]) === JSON.stringify({ app: { ds: pinned, theme: {}, layout: { type: "CANVAS", nav: [] }, page: "SITE" }, tree: { specVersion: 1, sections: [tree] } }), JSON.stringify(seen));
+  ok("[MKT.SCRIPTS.613] the page stands in a frame: the unit's name as title, light and dark side by side, the tree below as code",
+    made.findings.length === 0 && made.html.includes('<span class="sds-file-path">DSFeature</span>')
+      && made.html.includes('<iframe data-mode="light"') && made.html.includes('<iframe data-mode="dark"')
+      && made.html.includes('data-mode=&quot;dark&quot;') && made.html.includes("drawn &amp; ready") && made.html.includes('<pre data-lang="json">'), made.html.slice(-1800));
+  setUnitRender(() => { throw new Error("DSFeature has no prop `kind`"); });
+  const refused = renderPage({
+    block: { id: "probe", title: "Probe", status: "DONE", lenses: ["ARCHITECT"], summary: "What a probe is." },
+    markdown: `# Probe\n\nThe lead.\n\n## What it is\n\n${fence("unit", JSON.stringify(tree))}`,
+    workspace: "/workspace", location: "/workspace/docs/02-constructs/probe.md", furniture: { stylesheet: "", script: "", footer: "" },
+  });
+  ok("[MKT.SCRIPTS.613] a render's refusal is a finding that stops the write, with the render's words, and no frame is drawn",
+    refused.findings.length === 1 && refused.findings[0].stops === true && refused.findings[0].message.includes("DSFeature has no prop `kind`") && !refused.html.includes("<iframe"), JSON.stringify(refused.findings));
+  setUnitRender();
 }
 
 console.log(failed ? `\n  ${failed} of ${total} FAILED — t-render` : `\n  all ${total} passed — t-render`);
