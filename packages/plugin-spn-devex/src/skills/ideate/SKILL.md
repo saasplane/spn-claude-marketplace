@@ -22,6 +22,11 @@ description: Decide what a node IS, and design a requirement inside that shape -
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "The outline is fixed for an argument and borrowed for an explanation",
       "seen": "2c6b68b6"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "section": "A page is written in two passes",
+      "seen": "3cff544c"
     }
   ]
 }

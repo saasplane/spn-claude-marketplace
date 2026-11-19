@@ -9,7 +9,12 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "The blocks — what a page reaches for instead of prose",
-      "seen": "f7b7dabf"
+      "seen": "8f70c554"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "section": "Four blocks have a spelling in markdown",
+      "seen": "21835ddd"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
@@ -21,7 +26,7 @@
 -->
 # Blocks and figures, in the spelling you actually write
 
-**Source of truth:** the foundation's `04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md` — *The masthead, and the opening*, *The blocks* and *The figures*. This file restates them for an agent that ships without the book beside it; where the two disagree, the book wins.
+**Source of truth:** the foundation's `04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md` — *The masthead, and the opening*, *The blocks*, *Four blocks have a spelling in markdown* and *The figures*. This file restates them for an agent that ships without the book beside it; where the two disagree, the book wins.
 
 **You write markdown.** `docs page write` produces the HTML, and the shared stylesheet that every page
 links supplies every border, background and colour. That gives a block the same form on every page
@@ -57,10 +62,59 @@ Paragraphs, lists, numbered steps and subheadings are what a section is made of.
 and label them as nothing at all. **A section holds none, one or several blocks**, and nothing
 declares *the* block of a section.
 
-**On a preview and an approach page a part's body is blocks, and prose is bounded.** A paragraph carries
-a reason and runs at most 60 words, and a part with no other block stops at 120. A list holds at most
-seven items, each under 25 words; past that it is a table or subsections. Write the text of a page
-first, and only then give each part the block that shows it best, from the table below.
+**Every page kind bounds its prose, and a paragraph that does a block's job is flagged.** A preview and an approach
+page hold a paragraph to 60 words beside another block and 120 as a part's only content, a list to seven items each
+under 25 words, and a callout to one sentence. A hub, an overview, a guide, a report and a construct seat file explain,
+so they hold 120 and 200 words, ten items each under 60 words, and three sentences (rules 522 and 531). `doc-check`
+names, as a SOFT finding, a paragraph that lists items, sets today against after, gives steps, or crowds code names
+(rule 530; the table below).
+
+## A page is written in two passes
+
+**Write the text first, then give each subsection the block that shows it best** (rule RULE.DEVEX.WORKSPACE.533).
+The first pass is the page kind's sections and, under each subsection, its topic name, its claim and its content, in
+plain sentences with no block chosen. The second pass takes each subsection in turn, reads what its content is,
+picks the block from the table in *What you type*, and writes it in its own form. A seat file's blocks are the
+spellings in this file, and `docs page write` renders them; an approach page and a preview take the same blocks
+as HTML from `blocks-template.html`. Then run `docs page check` or `docs audit`, whose SOFT findings name each
+paragraph that should have been a block.
+
+## Every block has a rule
+
+**Each block has its own rule: when to reach for it, its parts, its limit and the check that holds it** (rule
+RULE.DEVEX.WORKSPACE.530). Where a limit has two numbers, the first is a preview's and an approach page's, and the
+second an explaining page's.
+
+| Block | Reach for it when | Its parts | Its limit | Held by |
+| --- | --- | --- | --- | --- |
+| **Paragraph** | one claim with its grounds | the claim, then the reason | 60 words beside another block, 120 alone · 120 and 200 | `doc-check` (531) |
+| **List** | a few loose points, no order | one line a point | 7 items, each under 25 words · 10, each under 60 | `doc-check` (522, 531) |
+| **Numbered list** | steps, the order is the content | one step a line | the list's limit; a path that turns is a flowchart | `doc-check` (530) |
+| **Callout** (`MUST`) | a rule somebody must follow | the rule, then its check | one sentence · three | `doc-check` (522, 531) |
+| **Table** | a record, or things compared down a column | a header, a row a thing | a column only where a reader compares down it | `doc-check` (259) |
+| **Item cells** | several things, each with facts | title, its line, its facts | three levels, no inline style | `doc-check` (259) |
+| **Comparison** | two states of one thing | a Today and a Proposed column | prose that sets them side by side is this table | `doc-check` (530) |
+| `CODE` | a literal | a fence tagged with its language | declarations only for a public shape; two code names in a sentence | `doc-check` (530) |
+| `FILE` | code that is one file, or part of one | path as title, language as badge | the path from the repository's root | the page writer (532) |
+| `TREE` | a hierarchy easier read than drawn | a fence tagged `tree`, one path a line, a folder ending in `/`, its note after two spaces | paths and short notes, never sentences | `doc-check` (233, 238) |
+| `COMMAND` | something the reader runs, in a terminal or asks of the agent | a fence tagged `sh` (or `bash`), one command a line, `run=claude` after the tag for a step asked of the agent; in a guide, a step's command. Drawn in a frame: where it runs with a copy button, a quiet `$` never selected or copied, the step's What you see below | one command a line, never a script (a script stays `CODE`); its result is a line, not pasted output | the page script and `doc-check` |
+| `DIFF` | what a file says today and will say | a `FILE` frame holding a `diff` fence | an approach page or a preview only | the page writer (532) |
+| **Figure** | a shape: parts, a path, participants, data | a sentence before, the drawing, a caption after | drawn from a spec | `docs figure check` |
+| `CATALOG` | a set of named things, no order | a tile: name, line, literal | one line a tile | the page writer (532) |
+| `CARDS` | pages a reader might go to next | title, description, *Read more* | one grid for a subsection | the page writer (532) |
+| `NEXT` | the two pages either side | a title and a direction | two doors, no paragraph | the page writer (532) |
+| **Sample link** | a whole file of the work | a link into `samples/` | never framed in the page | read at review |
+| **Card** | a decision still open | options side by side, and the card | the card section of the book | `doc-check` |
+
+What `doc-check` flags, each as the block it should have been:
+
+| The paragraph | The block |
+| --- | --- |
+| lists four things after a colon, or three clauses joined by semicolons | a list, or a table of item cells |
+| sets today against what is proposed | a table with a Today and a Proposed column |
+| gives steps as First, then Then | a numbered list, a chain or a flowchart |
+| holds a run of four code names joined by commas, or five in a sentence | a list, a table or a `FILE` frame |
+| runs past its page kind's bound | a subsection, or a table |
 
 ## What you type
 
@@ -82,9 +136,13 @@ first, and only then give each part the block that shows it best, from the table
 | a rule somebody has to follow (`MUST`) | `> the rule, in one sentence` — a blockquote becomes the accent callout |
 | a record, a comparison, a glossary | a markdown table. A table already arrives as a bordered card, so it needs nothing added |
 | a literal — a contract, a manifest, a command, its output (`CODE`) | a fenced block **tagged with its language** |
-| a hierarchy easier read than drawn (`TREE`) | a fenced block, untagged |
+| a hierarchy easier read than drawn (`TREE`) | a fenced block tagged `tree`: a folder (a name ending in `/`), then two spaces or more and what it holds; folders, files, branches, a status word (new, changed, removed) and the notes are coloured apart when the page opens. A `text` block of that shape is read as a tree too |
 | today against after (`DIFF`) | a fenced block tagged `diff`. **An approach page or a preview only**, since a construct states current truth |
 | a shape (a figure) | a fenced block tagged `dg`, holding strict JSON |
+| a set of named things, no order | a fence tagged `catalog`, one line a tile (*Four blocks have a spelling*, below) |
+| pages a reader might go to next | a fence tagged `cards`, one line a door |
+| the two pages either side of this one | a fence tagged `next`, a `previous` line and a `next` line |
+| a code block that is one file | its fence tag carries `file=<path>` after the language |
 | a note to yourself, never rendered | `<!-- … -->`, on one line or many |
 
 **A fenced block with no language is never coloured**, so tag it. The page holds the code plain, and
@@ -103,17 +161,40 @@ file you are reading before the first line, and a path in a line above a block i
 skipped. A `DIFF` always shows one file, so it always stands in one. A block that is no one file — a
 command, a sample of output, a shape written out — stays a `CODE` block, with no frame.
 
-The frame is HTML, on a hand-written page (an approach page or a preview): a `figure.sds-file` holding
+In a seat file the frame is a fence tag, ```` ```ts file=packages/x/src/theme.ts ````, and `docs page write` draws it. On a hand-written page (an approach page or a preview) the frame is HTML: a `figure.sds-file` holding
 a `figcaption` with its `.sds-file-path` and its `.sds-file-lang`, then the `pre`. The code stays plain
 in the file, and the shared script colours it. It is never a sample framed in the page.
 
-## What has no markdown spelling yet
+## Four blocks have a spelling in markdown
 
-`CATALOG` · `CARDS` · `NEXT` · `FILE` · the `PROSE` panel are named in the chapter and **the renderer produces
-none of them** — there is no markdown that asks for one, and `docs page write` adds no navigation. They
-exist today only as hand-written HTML in the templates. Until that changes, write a table for a
-`CATALOG` and ordinary paragraphs where you wanted a `PROSE` panel, and do not hand-write HTML to
-fake either.
+**`CATALOG`, `CARDS`, `NEXT` and `FILE` are fenced blocks, and `docs page write` draws each as the blocks template
+shows it** (rule RULE.DEVEX.WORKSPACE.532). A fence reads as plain code on github.com. One line is one thing, and
+its parts are split on a space, a bar and a space.
+
+````markdown
+```catalog
+Hub | the page every path starts from | hub-template.html
+Guide | stages and steps
+```
+
+```cards
+Reading path | what the path covers | path.md
+```
+
+```next
+previous | The page before | before.md
+next | The page after | after.md
+```
+
+```ts file=packages/support-web-ds-ts/src/ui/core/theme.ts
+export interface IDSTheme {}
+```
+````
+
+`catalog` makes one tile a line in one grid, its literal in code and optional. `cards` makes a tile a door, the title
+and *Read more* both links. `next` makes the two doors, and a line may be left out. `file=<path>` makes the frame with
+the path as its title and the language as a badge. A `cards` line with no link, and a block with no line, are findings.
+The `PROSE` panel still has no spelling: write a paragraph where you wanted one, and never hand-write HTML to fake it.
 
 ## A figure is a ```dg``` fence of strict JSON
 

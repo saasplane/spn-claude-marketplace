@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "seen": "bb41a4c5"
+      "seen": "e2258389"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
@@ -791,6 +791,8 @@ version of the stylesheet that has them.
 **Markdown keeps its own grammar and HTML keeps the blocks.** A capability chapter stays markdown and is never produced as a page, so none of this reaches it. The split is stated in the book: `02-document.md` governs markdown, `05-artifacts.md` governs the page.
 
 **A block is a visual insert, not a section shape.** Normal prose needs no block. Reach for one when the content is *not* a paragraph, a list or a table — a rule the reader must not skim, a picture, a fixed list of doors, a comparison. **The set is closed**: `MUST` · `CATALOG` · `COMPARISON` · `GLOSSARY` · `CODE` · `DIFF` · `TREE` · `PROSE` · `CARDS` · `NEXT`, plus the figure kinds below, and a new kind is a decision rather than an invention. Every block and every figure kind is written out, in the spelling you actually type, in [`blocks.md`](blocks.md) beside this file — read that before authoring a document with figures in it, and read a page template beside it. **Do not open the HTML blocks template**: it is the *rendered* reference a person opens. It is much larger than the markdown form, and most of it is markup and inline SVG that the renderer and the drawer produce for you (decision DEC.DEVEX.WORKSPACE.136). Every `dg` example in the markdown form is executed by the drawer's test suite, so an example you copy draws.
+
+**A page is written in two passes, and every block has its rule** (`RULE.DEVEX.WORKSPACE.533` · MUST · skill:spn-devex/ideate). Write the text first: the page kind's sections, and under each subsection its topic name, its claim and its content, in plain sentences. Then give each subsection the block that shows it best, from the choice table in [`blocks.md`](blocks.md), and write it in that block's markdown. The same file carries one rule for every block (when to reach for it, its parts, its limit, the check that holds it), and `doc-check` names, as a SOFT finding, a paragraph that lists items, sets today against after, gives steps as prose, crowds code names, or runs past its page kind's bound (`RULE.DEVEX.WORKSPACE.531` · MUST · check:doc-check): 60 and 120 words on a preview and an approach page, 120 and 200 on a hub, an overview, a guide, a report and a construct seat file. `CATALOG`, `CARDS`, `NEXT` and a `FILE` frame are fenced blocks (`RULE.DEVEX.WORKSPACE.532` · GUIDE), written out in `blocks.md`.
 
 ### The figure kinds
 

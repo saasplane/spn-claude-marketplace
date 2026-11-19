@@ -3,15 +3,23 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/01-common/05-design-languages.md",
-      "section": "How one is made"
+      "section": "How one is made",
+      "seen": "9705fbee"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/01-common/05-design-languages.md",
-      "section": "Media size by placement"
+      "section": "Media size by placement",
+      "seen": "d87e0a0a"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/01-common/05-design-languages.md",
-      "section": "Text alignment and items"
+      "section": "Text alignment and items",
+      "seen": "20f6399b"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/01-common/05-design-languages.md",
+      "section": "One source for the platform's look",
+      "seen": "553a4282"
     }
   ]
 }
@@ -32,11 +40,13 @@
 
 Read this before a page of a site or an app is drawn, and while a partner's design language is being made. 
 
-A language is kept at three levels: the platform's construct, each app's capability chapter, and each app's `design-language.json`. The construct records only the decisions. The rounds that led to them are kept beside it, so the next partner's language is made the same way.
+A language is kept as the repository's design language, a construct, and each app's capability chapter says how that app fills it. The construct holds the brand once, the primary colour, the greys and the typefaces, and a row for each app: its kind, its layout as a pointer to the app's layout setting, and its looks, mode, size, motion, radius, body, navigation, frames, card and table. It is the one source of the platform's look, for the apps and for the agent. The construct records only the decisions. The rounds that led to them are kept beside it, so the next partner's language is made the same way.
 
 ## Before any page
 
-1. **Read the app's construct, its capability chapter and its `design-language.json`.** The construct names which app follows which language and the brand; the chapter names where the app's data and drawings live; the data holds the values.
+**Before drawing, read the language's drawing scale, pick the step from the placement (S in a card, M in a section and a docs figure, L in a hero), and use only the tokens of the parts that apply to the medium's kind. A stack's floors stand 12 apart, a row's tiles share their plate's width, a caption under a plate is a detail line 8 below it, an illustration's lines take the ink at full, a dashed line takes `--draw-dash-color` and a dotted line `--draw-dot-color`, and a drawing is never cut.**
+
+1. **Read the repository's design language, the construct, and the app's capability chapter.** The construct holds the brand once and the app's row, with its looks; the chapter names where the app's drawings live. Read the construct and never a data file.
 2. **Where the app has no language yet, start with intake below.** A page is drawn only after the language says how.
 
 ## Intake
@@ -56,8 +66,9 @@ Record each thing the partner shares, each with where it came from and the day:
 
 1. **Show a round**: the options, each with what it chose and why.
 2. **Record the pick** in the round's own file beside the construct, with what the partner said, the day, and what was dropped.
-3. **Fold the decisions into the construct** and the data together, and run `spn-surface language write <app>` so the figures follow the data.
-4. **Run `spn-surface check page` on every spec** and `spn-surface check module` on every module's folders. Tokens only: a drawing takes its colours from the theme's tokens or mixes of them.
+3. **Fold the decisions into the construct**: the brand once, and the app's row for its looks, the layout as a pointer to the app's layout setting and never copied into a look. Where the construct marks figures to be filled, run `spn-surface language write <app>` so they follow.
+4. **Write each app's theme setting in the same arc**: after any change to the design language, write the one exported typed setting in each affected app's code from the brand and that app's row, named as the design system's theme type names its values (`DSThemeModeType`, `DSSizeType`, `DSMotionSpeedType`, `DSThemeRadiusType`, the layout, panel, card and table looks). The setting is the copy and the construct is the source, so the two move together and never apart. An app that keeps its theme in code and has not adopted the design language is left as it is, and no app is changed only to match. The check that compares a setting with its row comes later; until then a review reads the setting beside its row.
+5. **Run `spn-surface check page` on every spec** and `spn-surface check module` on every module's folders. Tokens only: a drawing takes its colours from the theme's tokens or mixes of them.
 
 ## When a section's pattern is picked
 
@@ -78,11 +89,13 @@ Read two parts of the construct for each section.
 
 **Alignment is decided with the pattern.** Start-aligned is the default. A section's words centre only where they frame something short with no medium beside them, or one centrepiece medium under a short title and one line; a paragraph or an item grid is never centred.
 
-**Items follow the medium.** One carrier holds each claim: where a medium already labels each point the items go, and where a reader scans to decide they stay.
+**Items follow the medium.** One carrier holds each claim: where a medium already labels each point the items go, and where a reader scans to decide they stay. A list of steps or layers stands beside its drawing, numbered and in the drawing's order; a list of doors stands beside the group's picture; a grid of peers takes no drawing.
+
+**Pick the layer with three questions.** If words or items point at the medium, it is the feature's; if it is a place the words stand on, it is the section's; if it belongs to one item, it is the item's. A section's background and its feature's media may be used together. A page has at most one scene, never behind a section whose feature has media, and on a phone it moves under the words. A section that opens onto a group leads with the group's own link, and a deeper page or the demo comes second.
 
 ## Where media go
 
-A hero scene goes through the section's media, edge to edge. A close-up or a sheet goes through the feature's media, and a small picture through the item's.
+A hero scene is the section's background, through its `mediaNode`, edge to edge, drawn at 1:1 with its land running past the content box and its subjects inside it. A close-up or a sheet goes through the feature's media, and a small picture through the item's.
 
 A scene is a hero's BACKDROP, one picture is SPLIT_END, and a wide picture or two panes are MEDIA_BOTTOM. 
 
