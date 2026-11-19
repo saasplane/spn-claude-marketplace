@@ -1,7 +1,6 @@
 // The page renderer and a code block (`05-artifacts.md` § One stylesheet, served in versions): a produced page
 // holds plain code in a `pre` tagged with its language, and no colour. The shared script colours the block when
 // the page opens, so the renderer writes the same block a person writes by hand.
-import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 
