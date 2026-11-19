@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "book": {
     "repository": "spn-foundation",
-    "commit": "ed19314d"
+    "commit": "57869bbd"
   },
   "rules": [
     {
@@ -34319,7 +34319,7 @@
         "skill": "spn-surface/design"
       },
       "class": "stated in a skill",
-      "sentence": "A unit's look is read from the running showcase into the stack's snapshot, which names the cells to capture and is what a drawn cell is checked against",
+      "sentence": "A unit's look is read from the running showcase into records, which name the cells to draw and are what a drawn cell is checked against",
       "chapter": "04-capabilities/02-support/01-surface/11-delivery-library/02-figma/04-drawing.md",
       "heading": "A unit's look",
       "decision": null,
@@ -34616,7 +34616,7 @@
       "sentence": null,
       "chapter": "04-capabilities/02-support/01-surface/11-delivery-library/02-figma/02-managed.md",
       "heading": "The path of a page through the connector",
-      "decision": null,
+      "decision": "DEC.SUPPORT.SURFACE.422",
       "restated": [
         {
           "plugin": "spn-surface",
@@ -35305,7 +35305,7 @@
         "skill": "spn-surface/design"
       },
       "class": "stated in a skill",
-      "sentence": "The states a pointer makes, hover, pressed and the Open group, which no page of the showcase holds, are driven on the case rest of the unit, and every other state is captured from the page that holds it",
+      "sentence": "The states a pointer makes, hover, pressed and the Open group, which no page of the showcase holds, are driven on the case rest of the unit, and every other state is read from the page that holds it",
       "chapter": "04-capabilities/02-support/01-surface/11-delivery-library/02-figma/04-drawing.md",
       "heading": "A unit is one section",
       "decision": null,
@@ -35334,7 +35334,7 @@
         "skill": "spn-surface/design"
       },
       "class": "stated in a skill",
-      "sentence": "A cell that the library plans for a unit and the unit's Main page does not draw is a gap of the showcase, and it is fixed on the unit's page before its library page is captured",
+      "sentence": "A cell that the library plans for a unit and the unit's Main page does not draw is a gap of the showcase, and it is fixed on the unit's page before its library page is read",
       "chapter": "04-capabilities/02-support/01-surface/12-delivery-showcase/01-common/01-showcase.md",
       "heading": "The sections of a main page",
       "decision": null,
@@ -35407,7 +35407,7 @@
         "skill": "spn-surface/design"
       },
       "class": "stated in a skill",
-      "sentence": "Every page of a file is captured at once, and a unit is arranged only after every unit it is built from that the same file holds",
+      "sentence": "Every page of a file is read into records at once, and a unit is drawn only after every unit it is built from that the same file holds",
       "chapter": "04-capabilities/02-support/01-surface/11-delivery-library/02-figma/02-managed.md",
       "heading": "The path of a page through the connector",
       "decision": null,
@@ -35431,7 +35431,7 @@
         "skill": "spn-surface/design"
       },
       "class": "stated in a skill",
-      "sentence": "The showcase hands its units to the capture",
+      "sentence": "The showcase hands its units to the reader",
       "chapter": "04-capabilities/02-support/01-surface/12-delivery-showcase/01-common/01-showcase.md",
       "heading": "The sections of a main page",
       "decision": null,
