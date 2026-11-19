@@ -44,17 +44,17 @@ console.log("\n=== the same rule on a page read from disk");
   const file = join(ws, "approach.html");
   writeFileSync(file, "<h3>What the agent misses most, by kind</h3><h4>The shape of it</h4>");
   const found = titleFindingsOnDisk(file);
-  ok("a saved page's long heading is named, with its rule and the way out",
+  ok("[MKT.HOOKS.512] a saved page's long heading is named, with its rule and the way out",
     found.length === 1 && found[0] === 'heading "What the agent misses most, by kind" is past 5 words or holds a comma (RULE.DEVEX.WORKSPACE.451) · keep a topic name, and move the sentence to the lead line under it', found.join("|"));
-  ok("the hook and the disk read one rule: the same headings are found in the same text",
+  ok("[MKT.HOOKS.512] the hook and the disk read one rule: the same headings are found in the same text",
     JSON.stringify(longHeadings(file, "<h3>What the agent misses most, by kind</h3>")) === JSON.stringify(["What the agent misses most, by kind"]));
-  ok("the refusal prints as it did before the rule was shared",
+  ok("[MKT.HOOKS.512] the refusal prints as it did before the rule was shared",
     titleRefusal(["Cost, then proof"]).startsWith("Denied: a subsection heading is a topic name of at most 5 words with no comma.\n\n  • \"Cost, then proof\""));
   writeFileSync(file, "<h3>The shape of it</h3>");
-  ok("the page with the heading cut to a topic name passes", titleFindingsOnDisk(file).length === 0);
+  ok("[MKT.HOOKS.512] the page with the heading cut to a topic name passes", titleFindingsOnDisk(file).length === 0);
   writeFileSync(file, "<h3>{{A topic name, at most five words, no comma}}</h3>");
-  ok("a slot of the template is not yet a heading, and passes", titleFindingsOnDisk(file).length === 0);
-  ok("a page that is not there has nothing to find", titleFindingsOnDisk(join(ws, "missing.html")).length === 0);
+  ok("[MKT.HOOKS.512] a slot of the template is not yet a heading, and passes", titleFindingsOnDisk(file).length === 0);
+  ok("[MKT.HOOKS.512] a page that is not there has nothing to find", titleFindingsOnDisk(join(ws, "missing.html")).length === 0);
 }
 
 console.log(`\n${total - failed}/${total} passed`);

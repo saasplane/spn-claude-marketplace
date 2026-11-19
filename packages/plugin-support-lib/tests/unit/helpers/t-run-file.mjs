@@ -78,6 +78,13 @@ console.log("=== the suite runner's run file");
 }
 
 {
+  const out = "  PASS  [RULE.DEVEX.WORKSPACE.519] a rule's case\n  PASS  [RULE.DEVEX.WORKSPACE.520] [MKT.SCRIPTS.104] a case naming a rule and a row";
+  const found = resultsOf(out, "UNIT").map((r) => r.id);
+  ok("[MKT.TESTS.07] a title's bracketed id of four segments is read too, and a title naming two ids yields both",
+    JSON.stringify(found) === '["RULE.DEVEX.WORKSPACE.519","RULE.DEVEX.WORKSPACE.520","MKT.SCRIPTS.104"]', JSON.stringify(found));
+}
+
+{
   const root = repo();
   execFileSync("git", ["init", "-q"], { cwd: root });
   execFileSync("git", ["-c", "user.name=t", "-c", "user.email=t@t", "commit", "-q", "--allow-empty", "-m", "x"], { cwd: root });

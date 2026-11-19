@@ -443,21 +443,21 @@ console.log("=== docs sds cut --ds — the design system's tokens are copied fro
 
   const pinned = sds("cut", "3.0.0", "--root", market, "--ds", support, "--ds-version", "v1.0.0");
   const tokens = existsSync(join(styles, "ds-tokens.css")) ? readFileSync(join(styles, "ds-tokens.css"), "utf8") : "";
-  ok("a cut with --ds copies the tokens of the version --ds-version names, from its commit and not from the working file",
+  ok("[MKT.SCRIPTS.590] a cut with --ds copies the tokens of the version --ds-version names, from its commit and not from the working file",
     pinned.code === 0 && tokens.endsWith(":root{--surface:#fff}\n") && tokens.includes("support-web-ds-ts v1.0.0"), `${pinned.out} ${tokens}`);
-  ok("a cut with --ds builds the stylesheet after the tokens are copied, and serves that build in the version's folder",
+  ok("[MKT.SCRIPTS.590] a cut with --ds builds the stylesheet after the tokens are copied, and serves that build in the version's folder",
     readFileSync(join(SERVED_OF(market), "3.0.0", "sds-docs.css"), "utf8") === tokens, pinned.out);
   const newest = sds("cut", "3.1.0", "--root", market, "--ds", support);
-  ok("a cut with --ds and no --ds-version pins the newest released version of the design system",
+  ok("[MKT.SCRIPTS.590] a cut with --ds and no --ds-version pins the newest released version of the design system",
     newest.code === 0 && readFileSync(join(styles, "ds-tokens.css"), "utf8").endsWith(":root{--surface:#eee}\n"), newest.out);
   const unknown = sds("cut", "3.2.0", "--root", market, "--ds", support, "--ds-version", "v9.9.9");
-  ok("a design-system version that was never released is refused by name, and cuts nothing",
+  ok("[MKT.SCRIPTS.590] a design-system version that was never released is refused by name, and cuts nothing",
     unknown.code === 1 && unknown.out.includes("version `v9.9.9` of the design system holds no") && !existsSync(join(SERVED_OF(market), "3.2.0")), unknown.out);
   const alone = sds("cut", "3.3.0", "--root", market, "--ds-version", "v1.0.0");
-  ok("--ds-version with no --ds is refused, because the version is read from the checkout --ds names",
+  ok("[MKT.SCRIPTS.590] --ds-version with no --ds is refused, because the version is read from the checkout --ds names",
     alone.code === 1 && alone.out.includes("`--ds-version` names a version of the design system") && !existsSync(join(SERVED_OF(market), "3.3.0")), alone.out);
   const missing = sds("cut", "3.4.0", "--root", market, "--ds", join(SCRATCH, "no-such-support"));
-  ok("--ds naming a folder that is not there is refused, and cuts nothing",
+  ok("[MKT.SCRIPTS.590] --ds naming a folder that is not there is refused, and cuts nothing",
     missing.code === 1 && missing.out.includes("is not a folder. `--ds` names the support repository's checkout") && !existsSync(join(SERVED_OF(market), "3.4.0")), missing.out);
 }
 

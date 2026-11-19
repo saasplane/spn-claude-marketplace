@@ -1,7 +1,7 @@
 // `cli.ts` — the one entry: `<group> [<subject>] <action> [<path>…] [options]`.
 //
-// THIS SUITE OWNS THE ENTRY. The plugin ships six commands, `check module`, `check page`, `check scan`,
-// `language write`, `unit find` and `unit show`: `help`
+// THIS SUITE OWNS THE ENTRY. The plugin ships six commands, `[MKT.SCRIPTS.598] check module`, `[MKT.SCRIPTS.598] check page`, `check scan`,
+// `[MKT.SCRIPTS.598] language write`, `unit find` and `unit show`: `help`
 // prints the grammar under the plugin's own name and lists them, an unknown group is refused by name, the scan
 // reads a seeded repository whole, and `unit show` reaches its command through the entry. The entry is
 // the same text spn-devex and spn-apps ship.
