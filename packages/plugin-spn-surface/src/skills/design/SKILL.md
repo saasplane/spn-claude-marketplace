@@ -7,7 +7,7 @@ description: Design a page of a SaaS Plane app from the blocks of the design sys
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
-      "seen": "bd28f6f7"
+      "seen": "af8ef53c"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/03-ideate.md",
@@ -15,7 +15,7 @@ description: Design a page of a SaaS Plane app from the blocks of the design sys
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/",
-      "seen": "1b6fbc9d"
+      "seen": "dc04579e"
     }
   ]
 }
@@ -664,3 +664,10 @@ Wear the spn-devex plugin's `refs/devex/agent/lenses/ux.md` while you place the 
 - **The content of a dialog, a drawer and a sheet stacks its parts one under another, the size's gap apart, and a page passes it no flex or gap class** (`RULE.SUPPORT.SURFACE.534` · MUST · skill:spn-surface/design)
 - **The media tokens are what any kind of picture needs, and a kind's own roles map onto them** (`RULE.SUPPORT.SURFACE.535` · MUST · skill:spn-surface/design)
 - **Two or more features stacked in one section stand the section's stack apart, two thirds of its room on the 8 grid** (`RULE.SUPPORT.SURFACE.549` · MUST · skill:spn-surface/design)
+- **`spnutils apps surface render` draws each page of a tree and prints it, in one of two forms** (`RULE.SUPPORT.SURFACE.579` · MUST · skill:spn-surface/design)
+- **The app object is the design language's row for the app, and no field of it is written by hand in a tree file** (`RULE.SUPPORT.SURFACE.580` · MUST · skill:spn-surface/design)
+- **A tree has `specVersion` at its top, and a version the render does not read is refused** (`RULE.SUPPORT.SURFACE.581` · MUST · skill:spn-surface/design)
+- **A tree holds units, placements, slots and text, and no raw element** (`RULE.SUPPORT.SURFACE.582` · MUST · skill:spn-surface/design)
+- **The render prints `{ "pages": [ { "html", "findings" } ] }` to standard output, one whole page for each page of the tree** (`RULE.SUPPORT.SURFACE.583` · MUST · skill:spn-surface/design)
+- **The render is stateless: it writes no file, keeps no cache of a page and reads no state of an earlier run** (`RULE.SUPPORT.SURFACE.584` · MUST · skill:spn-surface/design)
+- **The design system at the app object's `ds` version is fetched once into the machine's store when no app has it installed** (`RULE.SUPPORT.SURFACE.585` · MUST · skill:spn-surface/design)

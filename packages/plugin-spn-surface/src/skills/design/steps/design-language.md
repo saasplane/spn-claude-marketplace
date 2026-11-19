@@ -19,7 +19,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/01-common/05-design-languages.md",
       "section": "One source for the platform's look",
-      "seen": "553a4282"
+      "seen": "748c105b"
     }
   ]
 }
@@ -52,7 +52,6 @@
 - **Each media kind's record states its frame for each placement, and how the scale's shared parts apply to it** (`RULE.SUPPORT.SURFACE.548` · MUST · skill:spn-surface/design)
 - **A dashed line takes the muted text colour, the token `--draw-dash-color`** (`RULE.SUPPORT.SURFACE.550` · MUST · skill:spn-surface/design)
 - **A dotted line takes the accent, mixed into the ground at 24% in SaaS Plane's defaults, the token `--draw-dot-color`** (`RULE.SUPPORT.SURFACE.551` · MUST · skill:spn-surface/design)
-- **The lines of an illustration, a scene's ground, a desk or a person, are not wires, and they take the ink at full, at the weight the scene is drawn in** (`RULE.SUPPORT.SURFACE.552` · MUST · skill:spn-surface/design)
 - **The floors of a stack stand 12 apart, closer than two separate plates, and they never touch** (`RULE.SUPPORT.SURFACE.553` · MUST · skill:spn-surface/design)
 - **A row's tiles share their plate's width: one tile spans it, two take half each and three take a third** (`RULE.SUPPORT.SURFACE.554` · MUST · skill:spn-surface/design)
 - **A caption under a plate is a detail line, set 8 below the plate's edge, and never a fourth text level** (`RULE.SUPPORT.SURFACE.555` · MUST · skill:spn-surface/design)
@@ -74,6 +73,8 @@
 - **The repository's design language is the one source of its platform's look, and it holds the brand once and a row for each app** (`RULE.SUPPORT.SURFACE.571` · MUST · skill:spn-surface/design)
 - **Each app keeps its theme as one exported typed setting in its code, and the agent writes it from the book in the same arc as any change to the design language** (`RULE.SUPPORT.SURFACE.572` · MUST · skill:spn-surface/design)
 - **A theme is layered in one order: the defaults, then the brand, then the app's looks, then an account's branding** (`RULE.SUPPORT.SURFACE.575` · MUST · skill:spn-surface/design)
+- **`spnutils apps surface theme <app>` refuses an app whose theme setting is out of step with its row** (`RULE.SUPPORT.SURFACE.577` · MUST · skill:spn-surface/design)
+- **The brand is written as one data block, and each app's row as one data block keyed by the app's code, in the design language's construct** (`RULE.SUPPORT.SURFACE.578` · MUST · skill:spn-surface/design)
 
 Read this before a page of a site or an app is drawn, and while a partner's design language is being made. 
 
@@ -104,7 +105,7 @@ Record each thing the partner shares, each with where it came from and the day:
 1. **Show a round**: the options, each with what it chose and why.
 2. **Record the pick** in the round's own file beside the construct, with what the partner said, the day, and what was dropped.
 3. **Fold the decisions into the construct**: the brand once, and the app's row for its looks, the layout as a pointer to the app's layout setting and never copied into a look. Where the construct marks figures to be filled, run `spn-surface language write <app>` so they follow.
-4. **Write each app's theme setting in the same arc**: after any change to the design language, write the one exported typed setting in each affected app's code from the brand and that app's row, named as the design system's theme type names its values (`DSThemeModeType`, `DSSizeType`, `DSMotionSpeedType`, `DSThemeRadiusType`, the layout, panel, card and table looks). The setting is the copy and the construct is the source, so the two move together and never apart. An app that keeps its theme in code and has not adopted the design language is left as it is, and no app is changed only to match. The check that compares a setting with its row comes later; until then a review reads the setting beside its row.
+4. **Write each app's theme setting in the same arc**: after any change to the design language, write the one exported typed setting in each affected app's code from the brand and that app's row, named as the design system's theme type names its values (`DSThemeModeType`, `DSSizeType`, `DSMotionSpeedType`, `DSThemeRadiusType`, the layout, panel, card and table looks). The setting is the copy and the construct is the source, so the two move together and never apart. An app that keeps its theme in code and has not adopted the design language is left as it is, and no app is changed only to match. Then run `spnutils apps surface theme <app>` for each app whose setting you wrote: it refuses a setting out of step with the app's row, names each value that differs with the app's side and the book's side by side, and writes no file (`RULE.SUPPORT.SURFACE.577` · MUST · skill:spn-surface/design). Write the brand and each app's row also as one `json` data block each, keyed by the app's code, in the construct; the theme check and the page render read those blocks (`RULE.SUPPORT.SURFACE.578` · MUST · skill:spn-surface/design), and no separate data file is made.
 5. **Run `spn-surface check page` on every spec** and `spn-surface check module` on every module's folders. Tokens only: a drawing takes its colours from the theme's tokens or mixes of them.
 
 ## When a section's pattern is picked

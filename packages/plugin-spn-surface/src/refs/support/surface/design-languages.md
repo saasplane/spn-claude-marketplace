@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/01-common/05-design-languages.md",
-      "seen": "088053be"
+      "seen": "ac6a19d3"
     }
   ]
 }
@@ -201,15 +201,18 @@ Before any page work on an app, the design skill reads the repository's design l
 | --- | --- | --- |
 | The design language: the brand once and a row for each app | the repository's own docs, as a construct | a person, and the agent before it draws |
 | The app's theme: the same choices as values | one exported typed setting in the app's code | the app's pages |
+| The brand and each app's row, as data | one `json` data block each, keyed by the app's code, in the same construct | `spnutils apps surface theme` and `spnutils apps surface render --app` |
 
 The design language holds the brand once: the primary colour, the greys and the typefaces. It holds a row for each app: the app's kind, its layout as a pointer to the app's layout setting, and its looks: mode, size, motion, radius, body, navigation, frames, card and table. The layout stays the app's own setting and is never copied into a look.
 
 - **The repository's design language is the one source of its platform's look, and it holds the brand once and a row for each app** (`RULE.SUPPORT.SURFACE.571` · MUST · skill:spn-surface/design)
 - **Each app keeps its theme as one exported typed setting in its code, and the agent writes it from the book in the same arc as any change to the design language** (`RULE.SUPPORT.SURFACE.572` · MUST · skill:spn-surface/design)
-- **An app's theme and its row in the design language agree, and a check that refuses an app out of step is planned** (`RULE.SUPPORT.SURFACE.573` · GUIDE). Until it exists, a review reads the app's setting beside its row.
+- **An app's theme and its row in the design language agree** (`RULE.SUPPORT.SURFACE.573` · GUIDE). The check that refuses an app out of step is the one the next rule states.
 - **An app with its theme in code keeps it until it adopts the design language** (`RULE.SUPPORT.SURFACE.574` · GUIDE). The platform's apps move one at a time, and no app is changed only to match.
 - **A theme is layered in one order: the defaults, then the brand, then the app's looks, then an account's branding** (`RULE.SUPPORT.SURFACE.575` · MUST · skill:spn-surface/design)
 - **A design language stands beside the theme: it holds its apps' looks and never the brand of another platform** (`RULE.SUPPORT.SURFACE.576` · GUIDE). A partner's brand is the partner's design language, and an app that serves two platforms keeps a row in each.
+- **`spnutils apps surface theme <app>` refuses an app whose theme setting is out of step with its row** (`RULE.SUPPORT.SURFACE.577` · MUST · skill:spn-surface/design). It reads the app's row and the brand from the design language and the app's exported setting from its code, names each value that differs with the app's side and the book's side by side, writes no file, and refuses an app that has a row and no setting, and a setting with no row.
+- **The brand is written as one data block, and each app's row as one data block keyed by the app's code, in the design language's construct** (`RULE.SUPPORT.SURFACE.578` · MUST · skill:spn-surface/design). The block is `json` and holds the theme's own values, so the people who read the construct, the theme check and the page render all read one answer. The data is never a separate file.
 - **Layout type is the app's layout setting and never a theme value** (`RULE.SUPPORT.SURFACE.139` · MUST · skill:spn-surface/design). A row points at the app's layout setting and never copies it into a look.
 
 ## The starting list — 🔮
@@ -229,7 +232,7 @@ Each suits its own reader: Stone a reader who wants a calm, dark page, Daylight 
 - **`spn-surface check page` refuses what it can read in a spec**: a raw colour in a drawing, a class on a unit, an icon outside the app's lucide set, a hero form its media does not call for, two emphases in a section, media on the wrong level, and a drawing under the words narrower than its section's content. `spn-surface check module` refuses a folder outside a module's taxonomy.
 - **No check reads a medium against the drawing scale yet**: text sizes, line weights and styles, a frame's radius and shadow, and spacing off the scale go to a review.
 - **The rest of a page's design language is read by a review**, beside the design language and the app's theme setting.
-- **No check compares an app's theme setting with its row yet** (`RULE.SUPPORT.SURFACE.573` · GUIDE): a review reads the setting beside its row.
+- **The theme check reads the values the setting and the row share, and no more** (`RULE.SUPPORT.SURFACE.577` · MUST · skill:spn-surface/design): the rest of a row's looks are read by a review.
 
 ## Boundary
 
@@ -285,12 +288,14 @@ This ref states what a design language is, its five parts, how a page is built f
 | `RULE.SUPPORT.SURFACE.570` | a dotted line has two strengths, guide and boundary, and never goes below weight 1 where it must be seen |
 | `RULE.SUPPORT.SURFACE.571` | the repository's design language is the one source of its platform's look: the brand once, a row for each app |
 | `RULE.SUPPORT.SURFACE.572` | each app keeps its theme as one exported typed setting, written by the agent in the same arc as a language change |
-| `RULE.SUPPORT.SURFACE.573` | an app's theme and its row agree; the check is planned |
+| `RULE.SUPPORT.SURFACE.573` | an app's theme and its row agree; the theme check refuses one out of step |
 | `RULE.SUPPORT.SURFACE.574` | an app with its theme in code keeps it until it adopts the design language |
 | `RULE.SUPPORT.SURFACE.575` | a theme is layered: defaults, brand, the app's looks, an account's branding |
 | `RULE.SUPPORT.SURFACE.576` | a design language holds its apps' looks and never the brand of another platform |
+| `RULE.SUPPORT.SURFACE.577` | `spnutils apps surface theme <app>` refuses an app whose theme setting is out of step with its row |
+| `RULE.SUPPORT.SURFACE.578` | the brand and each app's row are each one data block, keyed by the app's code, in the construct |
 | `RULE.SUPPORT.SURFACE.139` | layout type is the app's layout setting and never a theme value |
 
 ## Proof
 
-`spn-surface check page` and `spn-surface check module` prove the refusals listed above. A review applies the rest by reading the page beside the design language and the app's theme setting.
+`spn-surface check page` and `spn-surface check module` prove the refusals listed above, and `spnutils apps surface theme <app>` proves a setting against its row. A review applies the rest by reading the page beside the design language.

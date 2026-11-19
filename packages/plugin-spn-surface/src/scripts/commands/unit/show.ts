@@ -153,6 +153,23 @@ function tableOf(section: string): Table {
   return { cases, limits };
 }
 
+/**
+ * One case as a tree in the render's form, `{ "unit", "props" }`: each prop whose cell holds one value
+ * the way a unit's samples hold it (RULE.SUPPORT.SURFACE.429): a closed value, a flag or a number. A cell
+ * that says "the place's", "nothing", a dash, or lists several values sets no prop, and the closing note
+ * after a value, "(the unit's)", is dropped. A case that sends the reader elsewhere has no tree.
+ */
+export function caseTree(unit: string, one: Case): string | null {
+  if (one.redirect) return null;
+  const props: Record<string, string | number | boolean> = {};
+  for (const { prop, value } of one.props) {
+    const word = /^([A-Z][A-Z0-9_]*|true|false|\d+)(?: \([^)]*\))?$/.exec(value)?.[1];
+    if (word === undefined) continue;
+    props[prop] = word === "true" ? true : word === "false" ? false : /^\d+$/.test(word) ? Number(word) : word;
+  }
+  return JSON.stringify({ unit, props });
+}
+
 /** The distance between two names, in edits, for naming the closest units to one that is unknown. */
 function distance(a: string, b: string): number {
   const row = Array.from({ length: b.length + 1 }, (_, index) => index);
@@ -433,7 +450,7 @@ export function run(args: string[]): number {
 
   if (words.given("json")) {
     console.log(JSON.stringify({ unit: name, group: unit.group, line, book, link: unit.link, props: unit.props,
-      usage: unit.usage?.words ?? null, placeSized, cases: table?.cases ?? [], limits: table?.limits ?? [], index }, null, 2));
+      usage: unit.usage?.words ?? null, placeSized, cases: (table?.cases ?? []).map((one) => ({ ...one, tree: caseTree(name, one) })), limits: table?.limits ?? [], index }, null, 2));
     return 0;
   }
 
@@ -464,6 +481,7 @@ export function run(args: string[]): number {
       if (!one.redirect) {
         const props = one.props.map((prop) => `${prop.prop} ${prop.value}`);
         out.push(`      ${[...props, `the page writes ${one.writes}`].join(" · ")}`);
+        out.push(`      ${caseTree(name, one)}`);
       }
     }
     for (const limit of table.limits) { out.push(""); out.push(limit); }

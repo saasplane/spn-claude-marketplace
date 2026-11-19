@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "book": {
     "repository": "spn-foundation",
-    "commit": "54366a20"
+    "commit": "2a32f607"
   },
   "rules": [
     {
@@ -13324,6 +13324,17 @@
           "heading": "The rules this step holds"
         }
       ]
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.538",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
+      "sentence": "A unit of the design system is shown as a fenced tree, and `docs page write` renders it into a unit in its own frame on every write",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "heading": "A rendered unit is written as a tree",
+      "decision": null,
+      "restated": []
     },
     {
       "id": "RULE.LAUNCHPAD.CONTROL_PLANE.001",
@@ -36576,7 +36587,7 @@
         "skill": "spn-surface/design"
       },
       "class": "stated in a skill",
-      "sentence": "The lines of an illustration, a scene's ground, a desk or a person, are not wires, and they take the ink at full, at the weight the scene is drawn in",
+      "sentence": null,
       "chapter": "04-capabilities/02-support/01-surface/03-standards-patterns/01-common/05-design-languages.md",
       "heading": "Lines",
       "decision": null,
@@ -36585,11 +36596,6 @@
           "plugin": "spn-surface",
           "path": "refs/support/surface/design-languages.md",
           "heading": "The drawing scale — 🔮"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/steps/design-language.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -37118,7 +37124,7 @@
       "level": "GUIDE",
       "params": {},
       "class": "guidance",
-      "sentence": "An app's theme and its row in the design language agree, and a check that refuses an app out of step is 🔮 planned",
+      "sentence": "An app's theme and its row in the design language agree",
       "chapter": "04-capabilities/02-support/01-surface/03-standards-patterns/01-common/05-design-languages.md",
       "heading": "One source for the platform's look",
       "decision": null,
@@ -37132,11 +37138,6 @@
           "plugin": "spn-surface",
           "path": "refs/support/surface/design-languages.md",
           "heading": "One source for the platform's look — 🔮"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "refs/support/surface/design-languages.md",
-          "heading": "What is not checked yet"
         }
       ]
     },
@@ -37200,6 +37201,202 @@
           "plugin": "spn-surface",
           "path": "refs/support/surface/design-languages.md",
           "heading": "One source for the platform's look — 🔮"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.577",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "`spnutils apps surface theme <app>` refuses an app whose theme setting is out of step with its row",
+      "chapter": "04-capabilities/02-support/01-surface/03-standards-patterns/01-common/05-design-languages.md",
+      "heading": "One source for the platform's look",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/design-languages.md",
+          "heading": "One source for the platform's look — 🔮"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/design-languages.md",
+          "heading": "What is not checked yet"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/design-language.md",
+          "heading": "The rules this step holds"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/design-language.md",
+          "heading": "Rounds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.578",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "The brand is written as one data block, and each app's row as one data block keyed by the app's code, in the design language's construct",
+      "chapter": "04-capabilities/02-support/01-surface/03-standards-patterns/01-common/05-design-languages.md",
+      "heading": "One source for the platform's look",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/design-languages.md",
+          "heading": "One source for the platform's look — 🔮"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/design-language.md",
+          "heading": "The rules this step holds"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/design-language.md",
+          "heading": "Rounds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.579",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "`spnutils apps surface render` draws each page of a tree and prints it, in one of two forms",
+      "chapter": "04-capabilities/02-support/01-surface/11-delivery-library/01-common/02-render.md",
+      "heading": "The command",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.580",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "The app object is the design language's row for the app, and no field of it is written by hand in a tree file",
+      "chapter": "04-capabilities/02-support/01-surface/11-delivery-library/01-common/02-render.md",
+      "heading": "The app object",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.581",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "A tree has `specVersion` at its top, and a version the render does not read is refused",
+      "chapter": "04-capabilities/02-support/01-surface/11-delivery-library/01-common/02-render.md",
+      "heading": "The tree",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.582",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "A tree holds units, placements, slots and text, and no raw element",
+      "chapter": "04-capabilities/02-support/01-surface/11-delivery-library/01-common/02-render.md",
+      "heading": "The tree",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.583",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "The render prints `{ \"pages\": [ { \"html\", \"findings\" } ] }` to standard output, one whole page for each page of the tree",
+      "chapter": "04-capabilities/02-support/01-surface/11-delivery-library/01-common/02-render.md",
+      "heading": "The output",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.584",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "The render is stateless: it writes no file, keeps no cache of a page and reads no state of an earlier run",
+      "chapter": "04-capabilities/02-support/01-surface/11-delivery-library/01-common/02-render.md",
+      "heading": "Nothing is kept",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.585",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "The design system at the app object's `ds` version is fetched once into the machine's store when no app has it installed",
+      "chapter": "04-capabilities/02-support/01-surface/11-delivery-library/01-common/02-render.md",
+      "heading": "Nothing is kept",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/SKILL.md",
+          "heading": "The rules this step holds"
         }
       ]
     }

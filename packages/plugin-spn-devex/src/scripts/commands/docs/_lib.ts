@@ -2648,6 +2648,8 @@ export function pageFor(seat: string, workspace: string, templates: string, writ
     home: overviewAbove(seat, out) ?? undefined,
   });
   for (const r of rf) findings.push({ check: "page", grade: "RULE", file: seat, message: r.message });
+  // THE RENDER'S WORDS STOP THE WRITE: a `unit` fence it refused, or found fault with, leaves the page as it stood (RULE.DEVEX.WORKSPACE.538).
+  if (rf.some((r) => r.stops)) return findings;
   for (const [grade, message] of blockFit(markdown, false, "seat")) findings.push({ check: "fit", grade: grade as Grade, file: seat, message });
   const before = existsSync(out) ? readFileSync(out, "utf8") : "";
   if (before === html) { console.log(`current  ${relative(workspace, out)}`); return findings; }
