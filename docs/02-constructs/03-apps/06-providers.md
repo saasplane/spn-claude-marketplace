@@ -117,4 +117,8 @@ This page answers what this domain's provider contributes and how it is arranged
 | `DEC.DEVEX.FUNCTION.035` | a rule reaches a write-time hook only where review would be too late, which is why the cycle rule is here as well as in the command-line tool | MUST |
 | `RULE.PLATFORM.CORE.033` | the enablement grammar the source subject's refusals are written against | MUST |
 
-Try it: `node packages/plugin-spn-apps/tests/run.mjs`
+Try it:
+
+```sh
+node packages/plugin-spn-apps/tests/run.mjs
+```

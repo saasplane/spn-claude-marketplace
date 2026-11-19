@@ -11,7 +11,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/10-providers/ts/06-service.md",
-      "seen": "40d8a0ec"
+      "seen": "b1f264a3"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/10-providers/ts/07-data.md",
@@ -37,6 +37,7 @@
 - **A file holds one component and only what its name says, so an interface file holds types only** (`RULE.SUPPORT.APPS.237` · MUST · skill:spn-apps/implement)
 - **A script is written in the stack's language and kept in a folder the tree names** (`RULE.SUPPORT.APPS.241` · MUST · skill:spn-apps/implement)
 - **A repository narrows by data scope only through `SPRepository`'s `applyDataScope` and `filterByDataScope`, on the column it opts in, and never with a predicate of its own** (`RULE.SUPPORT.APPS.249` · MUST · skill:spn-apps/implement)
+- **A migration that writes what a cached reader serves clears that reader's family once its writes commit** (`RULE.SUPPORT.APPS.266` · MUST · skill:spn-apps/implement)
 - **A date a service writes for a business record is the request's trusted simulated time, or the real time when there is none** (`RULE.SUPPORT.APPS.267` · MUST · skill:spn-apps/implement)
 
 Use one template for every module service — **this template is the standard**. The method families it fills in are the foundation book's, closed and stack-agnostic (`01-services.md` · `02-repositories.md`, the method-families sections). The TypeScript rendering and the fuller skeleton are the service-patterns and database-patterns chapters of the provider set. Layer rule: `app/services`, `app/repositories`, `app/entities` hold classes only — helpers go to `app/utils/` or `app/support/` (see `02-structure.md`).

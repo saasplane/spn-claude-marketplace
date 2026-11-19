@@ -27,5 +27,60 @@
     "photo": "flush and rounded",
     "mediaBackdrop": { "type": "DOTS", "moving": false }
   },
-  "density": "roomy: the hero at XL, an ordinary section at MD, shorter lines"
+  "density": "roomy: the hero at XL, an ordinary section at MD, shorter lines",
+  "looks": {
+    "app": {
+      "mode": "LIGHT",
+      "size": "MD",
+      "motionSpeed": "SLOW",
+      "radius": "LARGE"
+    },
+    "layout": {
+      "body": {
+        "color": "BASE",
+        "strength": "SUBTLE",
+        "width": "WIDE"
+      },
+      "navigation": {
+        "color": "DEFAULT",
+        "strength": "SUBTLE",
+        "opacity": "OPAQUE",
+        "entry": "SUBTLE",
+        "bordered": false,
+        "raised": false,
+        "elevation": "SM",
+        "attached": true,
+        "sticky": true
+      },
+      "content": {
+        "color": "BASE",
+        "strength": "SUBTLE",
+        "bordered": false,
+        "raised": false,
+        "attached": true
+      }
+    },
+    "container": {
+      "panel": {
+        "frames": [
+          "CONTENT",
+          "FOOTER"
+        ]
+      }
+    },
+    "component": {
+      "card": {
+        "color": "BASE",
+        "strength": "SUBTLE",
+        "raised": true,
+        "elevation": "SM",
+        "bordered": false,
+        "rounded": true
+      },
+      "table": {
+        "striped": true,
+        "hoverable": true
+      }
+    }
+  }
 }

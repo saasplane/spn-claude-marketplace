@@ -23,7 +23,19 @@
 | Surface Hook · Design Skill · Surface Refs | [spn-surface](../../02-surface/plugin-spn-surface/README.md) |
 | Estate Guard · Estate Skills · Estate Refs | [spn-infra](../../04-infra/plugin-spn-infra/README.md) |
 
-Source folders, one per chapter: `.claude-plugin/plugin.json` for Plugin · `hooks/hooks.json` for Hooks · `skills/` for Skills · `scripts/` for Scripts — the gate, plus the `lib/` and `tools/` beside it · `refs/` for Refs · `providers/ts/` for Providers, both halves · `tests/` for Tests. This plugin ships no `agents/`, and the absence is the statement.
+Source folders, one per chapter:
+
+| Chapter | Source |
+| --- | --- |
+| Plugin | `.claude-plugin/plugin.json` |
+| Hooks | `hooks/hooks.json` |
+| Skills | `skills/` |
+| Scripts | `scripts/` — the gate, plus the `lib/` and `tools/` beside it |
+| Refs | `refs/` |
+| Providers | `providers/ts/`, both halves |
+| Tests | `tests/` |
+
+This plugin ships no `agents/`, and the absence is the statement.
 
 <!-- spn:generated contents — do not edit inside these markers; `docs.ts face` writes it -->
 | Chapter | Realizes | Carries | Status |

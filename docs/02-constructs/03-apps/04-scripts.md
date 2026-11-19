@@ -161,4 +161,8 @@ This page answers what sits in this plugin's scripts folder and what each part m
 | the foundation's `02-delivery.md` § When an edit becomes behaviour | a script here is live on its next run, so an edit lands without an install | MUST |
 | the foundation's plugins construct § The shape of a plugin, and its `04-plugins/02-shape.md` | the four kinds of script, one command entry, a shared folder never installed on its own | MUST |
 
-Try it: `node packages/plugin-spn-apps/tests/run.mjs`
+Try it:
+
+```sh
+node packages/plugin-spn-apps/tests/run.mjs
+```

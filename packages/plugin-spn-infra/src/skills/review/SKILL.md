@@ -7,11 +7,11 @@ description: Read an estate plan or a declaration diff back before anything appl
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
-      "seen": "7beac2a2"
+      "seen": "bd28f6f7"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/04-develop.md",
-      "seen": "c57cb970"
+      "seen": "ce593b71"
     }
   ]
 }

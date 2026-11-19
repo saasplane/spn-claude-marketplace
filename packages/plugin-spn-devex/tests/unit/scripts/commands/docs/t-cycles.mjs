@@ -90,10 +90,10 @@ try {
     const link = (href, text) => `<a href="${href}">${text}</a>`;
     const indexed = join(TMP, ".spndevex", WORKSTREAMS, "backlog", "043-indexed");
     putArc(indexed, "N20", { title: "an arc with an index", decides: "Samples are browsed by their index.", status: "DECIDED" }, { preview: true, samples: ["one.html", "two.html", "index.html"] });
-    ok("an arc with a samples index is linked by the preview and that index alone, never a sample page beside it",
+    ok("[MKT.SCRIPTS.587] an arc with a samples index is linked by the preview and that index alone, never a sample page beside it",
       cyclesOf(indexed).find((one) => one.id === "N20").previews.map((one) => one.href).join(" ") === "notes/N20/preview.html notes/N20/samples/index.html",
       JSON.stringify(cyclesOf(indexed)));
-    ok("an arc with no index still lists each sample it holds", cyclesOf(folder).find((one) => one.id === "N10").previews.length === 2);
+    ok("[MKT.SCRIPTS.587] an arc with no index still lists each sample it holds", cyclesOf(folder).find((one) => one.id === "N10").previews.length === 2);
     ok("the Arc cell is three levels: the title in bold, the line, then the preview, each sample and the reason as facts",
       arcCell(byId.N10) === `<p><strong>N10 &mdash; the release</strong></p><p>The plugins ship once.</p><span class="sds-small">` +
         ["Preview: " + link("notes/N10/preview.html", "preview.html"), "Sample: " + link("notes/N10/samples/close_message.md", "close_message.md"),

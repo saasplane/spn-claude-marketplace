@@ -18,7 +18,7 @@
 
 | Part of the construct | Lives in | What it is |
 | --- | --- | --- |
-| The data | `src/modules/{{module}}/assets/language/design-language.json` | the language's values, imported |
+| The theme | the app's boot module, one exported typed setting | written by the agent from the design language's brand and this app's row, never by hand |
 | A page and its words | `src/modules/{{module}}/entry/ui/pages/<group>/<Name>Page.tsx` and `<Name>Page.data.ts` | the page, with its words beside it |
 | Each section's frame | `src/modules/{{module}}/entry/ui/containers/` | the module's containers, on the design system's section container |
 | The drawings | `src/modules/{{module}}/assets/drawings/<page>/<name>.svg` and `.css` | imported and drawn inline, tokens only |
@@ -64,4 +64,4 @@ Where a medium already labels each point, the items go; {{the places this app al
 
 ## Checks
 
-`spn-surface check page <page>` and `spn-surface check module <module>` refuse a hex colour or a hand-written font stack in a drawing; media in the wrong place, such as a scene in a feature or a sheet on a section; a `design-language.json` off its schema; and a construct figure that is out of date.
+`spn-surface check page <page>` and `spn-surface check module <module>` refuse a hex colour or a hand-written font stack in a drawing; media in the wrong place, such as a scene in a feature or a sheet on a section; and a construct figure that is out of date.

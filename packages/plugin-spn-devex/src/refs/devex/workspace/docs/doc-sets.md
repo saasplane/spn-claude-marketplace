@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "seen": "bb41a4c5"
+      "seen": "cb4dbf98"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
@@ -29,7 +29,7 @@
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/04-docs.md",
-      "seen": "175890dd"
+      "seen": "c04a4728"
     },
     {
       "path": "spn-foundation/CONCEPT.md",
@@ -494,14 +494,16 @@ Every page somebody writes by hand is copied from a template, and the templates 
 | --- | --- | --- |
 | `templates/pages/` | `hub-template.html` · `overview-template.html` · `construct-template.html` · `guide-template.html` · `artifact-index-template.html` · `report-template.html` · `blocks-template.html` | the page kinds a repository has — hub, overview, construct, guide and the index of artifacts — and the report; the blocks template shows every block and figure kind rendered |
 | `templates/seat-files/` | `construct-seat-template.md` · `schema-template.sql` | what an author writes *inside* a seat: the markdown a construct page is produced from, and the authoritative data model |
-| `templates/workstream/` | `approach-template.html` · `approach-preview-template.html` · `arc-template.md` · `order-template.md` · `handover-template.md` | the workstream's own files. **The approach document is here because an argument is a workstream's**, never a repository's |
+| `templates/workstream/` | `approach-template.html` · `approach-preview-template.html` · `surface-page-preview-template.html` · `arc-template.md` · `order-template.md` · `handover-template.md` | the workstream's own files. **The approach document is here because an argument is a workstream's**, never a repository's |
 | `templates/agent/` | `skill-template.md` · `agent-template.md` · `lens-template.md` · `ref-template.md` · `hook-template.ts` | the agent's own files — hand-written too, and a kind with no template gets written from the last one its author happened to see |
 
 **The plugin and the CLI carry different sets, because they answer different moments.** `pages/` and `seat-files/` ship in both, since the agent copies one to write a page and `repo create` emits a started hub page. `workstream/` and `agent/` ship in the plugin alone: the CLI creates a workstream folder with `mkdir` and owes no shape, and it never writes a skill. The copies are stamped with the book's hash and exported on release, so a release whose copies disagree with the source fails rather than publishing drift.
 
 **A scaffold beats a template, a template beats a document, and a document beats a conversation.** Where the CLI creates a file, that scaffold *is* the template and none is kept in the book — a seat face, a behaviour file, a capability chapter and the glossary are all made that way.
 
-**The page templates, and the seat files behind them**: `hub-template.html` for the one hub a repository has, `overview-template.html` for one reading path or the hub of a repository other than the foundation, `construct-template.html` for a produced construct page (`docs page` copies its two lines that load the shared stylesheet and script into every page it produces), `guide-template.html` for a guide page that `docs guide` produces, `artifact-index-template.html` for the index that `docs index` produces, `approach-template.html` for a workstream's argument, `approach-preview-template.html` for a preview page in a workstream, and `report-template.html` for a report — one shell for all five report types. `construct-seat-template.md` is the seat file an author actually writes, and `capability-template.md` one capability chapter. `blocks-template.html` is copied into nothing: it shows every block and every figure kind rendered, and you consult it beside a page template. **A hub has no link above its rail** (`RULE.DEVEX.WORKSPACE.220` · MUST · check:corpus): it is the root, so no page sits above it for a link to lead back to.
+**The page templates, and the seat files behind them**: `hub-template.html` for the one hub a repository has, `overview-template.html` for one reading path or the hub of a repository other than the foundation, `construct-template.html` for a produced construct page (`docs page` copies its two lines that load the shared stylesheet and script into every page it produces), `guide-template.html` for a guide page that `docs guide` produces, `artifact-index-template.html` for the index that `docs index` produces, `approach-template.html` for a workstream's argument, `approach-preview-template.html` for a preview page in a workstream, `surface-page-preview-template.html` for a surface page review (below), and `report-template.html` for a report — one shell for all five report types. `construct-seat-template.md` is the seat file an author actually writes, and `capability-template.md` one capability chapter. `blocks-template.html` is copied into nothing: it shows every block and every figure kind rendered, and you consult it beside a page template. **A hub has no link above its rail** (`RULE.DEVEX.WORKSPACE.220` · MUST · check:corpus): it is the root, so no page sits above it for a link to lead back to.
+
+**A surface page preview is the workstream's third page template, for reviewing a site's or an app's pages, and only once the app's design language exists** (`RULE.DEVEX.WORKSPACE.534` · GUIDE). Reach for it when the developer asks to review the pages of a surface, and never before the design language the pages follow is written; until then the review is of the design language, on the arc's preview. **The preview holds a bar and a frame and nothing else** (`RULE.DEVEX.WORKSPACE.535` · MUST · skill:spn-devex/ideate): the bar has the page's title, the width switch (Desktop, Tablet, Phone), the mode switch (Light, Dark) and Notes, off by default, and the frame shows the page's copy in `.pages/<page>/`. The copy is the work's own file, so the sample rule (`RULE.DEVEX.WORKSPACE.267` · MUST · check:workstream-state) holds for it. **The copy names its own mode switch and holds its notes, and is just the page when opened alone** (`RULE.DEVEX.WORKSPACE.536` · MUST · skill:spn-devex/ideate): a `preview-mode` meta, a hidden `data-note` for each section, the few lines that read the bar's message `{ "surface-page-preview": { mode, notes } }`, and no SaaS Plane name. **The bar's message, the meta and the note marker change only with a new stylesheet version** (`RULE.DEVEX.WORKSPACE.537` · MUST · skill:spn-devex/ideate). **A group of previews reviews the app's top navigation and footer once**, in its layout sample `00-layout` with the menus open and the phone drawer; every other page shows its own content only.
 
 **The rules every page kind shares are stated once, in the chapter, and no template repeats them**: headings carry no count and are never links, numbers are for file names, the book's own words are translated, and a card is a title, a description and a *Read more*. **The book's own words are translated on every page a newcomer reads**: say *the agent's viewpoint*, and note once that the book calls it a lens. A word a first-time reader cannot guess is explained where it first appears, or replaced by the plain word. A count is never an explanation: *the eight phases* tells a newcomer nothing, so say what the phases are. A door is a *Read …* line under the text, naming what it opens in the words the heading already carries — *Read Agent →*. A card that carries an action — a link or a button — keeps it at the card's bottom edge: the cards of one row are as tall as the tallest, so the actions line up however long the text above each one is.
 
@@ -654,7 +656,7 @@ come from. A flow is drawn as a figure with its steps, one line for each actor's
 it to the arc's preview first, then writes any handover or asks for a new window. A handover names what the preview
 shows, so a new window starts from a page that is true; a saved note the preview does not carry is not enough.
 
-**`Where it lands` is one folder tree for each repository** (`RULE.DEVEX.WORKSPACE.238` · GUIDE). The
+**`Where it lands` is one folder tree for each repository** (`RULE.DEVEX.WORKSPACE.238` · MUST · check:doc-check). The
 section is grouped by repository, in the order the work runs, and a repository's Docs, the book pages and the
 repository's own pages that explain the change, sit inside its tree. It is never a table of file paths. One line
 names the repository and says what happens there. Then the repository is one `TREE` block: one folder or file
@@ -731,10 +733,10 @@ repoint` moves the hash with the version. A line with no hash still loads, and t
   utility only where no class fits. A utility outside the set has no effect on a page.
 - **A version is a folder that never changes.** `docs sds cut <version>` writes it, with a `fonts/`
   folder beside the stylesheet and the scripts, and it refuses a version that exists. The pages read in
-  Geist and Geist Mono (`RULE.DEVEX.WORKSPACE.214`): `sds-docs.css` declares `@font-face` for `DSDefaultText`
+  Geist and Geist Mono (`RULE.DEVEX.WORKSPACE.214` · MUST · check:doc-check): `sds-docs.css` declares `@font-face` for `DSDefaultText`
   and `DSDefaultCode`, the design system's own names, on the two files in `fonts/`, by urls relative to the
   stylesheet, and each keeps the system stack after it, so a page whose fonts did not load still reads. The
-  stylesheet's colours, corners and type read the design system's tokens (`--surface-*`, `--fg`, `--fg-quiet`,
+  stylesheet reads the design system's token names (`RULE.DEVEX.WORKSPACE.524` · MUST · check:doc-check): its colours, corners and type read the tokens (`--surface-*`, `--fg`, `--fg-quiet`,
   `--border`, `--radius`, `--font-text`, `--font-code`), which `docs sds cut` copies from a pinned design-system
   version; a page or a section that sets `--seed-primary` gets a whole palette, and `data-mode` on the page
   sets dark. A bundled copy of a page
@@ -791,6 +793,8 @@ version of the stylesheet that has them.
 **Markdown keeps its own grammar and HTML keeps the blocks.** A capability chapter stays markdown and is never produced as a page, so none of this reaches it. The split is stated in the book: `02-document.md` governs markdown, `05-artifacts.md` governs the page.
 
 **A block is a visual insert, not a section shape.** Normal prose needs no block. Reach for one when the content is *not* a paragraph, a list or a table — a rule the reader must not skim, a picture, a fixed list of doors, a comparison. **The set is closed**: `MUST` · `CATALOG` · `COMPARISON` · `GLOSSARY` · `CODE` · `DIFF` · `TREE` · `PROSE` · `CARDS` · `NEXT`, plus the figure kinds below, and a new kind is a decision rather than an invention. Every block and every figure kind is written out, in the spelling you actually type, in [`blocks.md`](blocks.md) beside this file — read that before authoring a document with figures in it, and read a page template beside it. **Do not open the HTML blocks template**: it is the *rendered* reference a person opens. It is much larger than the markdown form, and most of it is markup and inline SVG that the renderer and the drawer produce for you (decision DEC.DEVEX.WORKSPACE.136). Every `dg` example in the markdown form is executed by the drawer's test suite, so an example you copy draws.
+
+**A page is written in two passes, and every block has its rule** (`RULE.DEVEX.WORKSPACE.533` · MUST · skill:spn-devex/ideate), and the rule for every block is (`RULE.DEVEX.WORKSPACE.530` · MUST · check:doc-check). The check reads the saved file at every Stop and in `docs check`, so a page written any other way is checked too. Write the text first: the page kind's sections, and under each subsection its topic name, its claim and its content, in plain sentences. Then give each subsection the block that shows it best, from the choice table in [`blocks.md`](blocks.md), and write it in that block's markdown. The same file carries one rule for every block (when to reach for it, its parts, its limit, the check that holds it), and `doc-check` names, as a SOFT finding, a paragraph that lists items, sets today against after, gives steps as prose, crowds code names, or runs past its page kind's bound (`RULE.DEVEX.WORKSPACE.531` · MUST · check:doc-check): 60 and 120 words on a preview and an approach page, 120 and 200 on a hub, an overview, a guide, a report and a construct seat file. `CATALOG`, `CARDS`, `NEXT` and a `FILE` frame are fenced blocks (`RULE.DEVEX.WORKSPACE.532` · GUIDE), written out in `blocks.md`: a fence tagged `catalog`, `cards` or `next`, one line a tile, a door or a link, split on a space, a bar and a space, and a code fence whose tag carries `file=<path>`; a `sh` fence is a `COMMAND` frame.
 
 ### The figure kinds
 

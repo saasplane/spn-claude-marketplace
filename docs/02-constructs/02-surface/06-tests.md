@@ -87,4 +87,8 @@ This page answers how this plugin proves itself. It does not answer what a test 
 | --- | --- | --- |
 | the foundation's plugins construct § The shape of a plugin, and its `04-plugins/02-shape.md` | a hook is run from a committed bundle a staleness test keeps current | MUST |
 
-Try it: `node packages/plugin-spn-surface/tests/run.mjs`
+Try it:
+
+```sh
+node packages/plugin-spn-surface/tests/run.mjs
+```

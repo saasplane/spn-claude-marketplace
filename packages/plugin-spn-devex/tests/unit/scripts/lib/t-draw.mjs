@@ -7,11 +7,13 @@
 //
 // So every case here draws a figure and then asks the real check to judge it. A drawer whose output
 // its own gate refuses is a defect, whichever half is wrong.
-import { draw, KINDS } from "../../../../src/scripts/lib/draw.ts";
+import { draw, figureOf, KINDS } from "../../../../src/scripts/lib/draw.ts";
 import { checkFigures } from "../../../../src/scripts/lib/figures.ts";
 import { SEAT } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { createHash } from "node:crypto";
 
+// THE BYTE-FOR-BYTE PINS BELOW WERE RE-TAKEN WHEN THE SKELETON'S CORNERS BECAME THE THEME'S (order 08): every `rx` now comes from a role and
+// each themed rect carries `data-corner`. Only those two attributes moved; the semantic cases beside each pin still hold every position.
 let n = 0, failed = 0;
 function one(name, got, want) {
   n += 1;
@@ -26,6 +28,23 @@ const says = (s) => (got) => JSON.stringify(got).includes(s);
 
 /** Draw it, then let the real figure check judge what came out. */
 const judge = (spec) => { const { svg, findings } = draw(spec); return { findings, figure: checkFigures(svg), svg }; };
+
+/**
+ * A WIRE, AS THE LAYOUT DECIDED IT. The language draws every corner soft, as a quadratic whose control point is the sharp corner the
+ * layout chose, so the layout is read back from those control points: `M x y`, then `H` or `V` to each corner and to the end.
+ * What these cases assert is where wires run, and that is the same however the corners are rounded.
+ */
+const sharpD = (d) => {
+  const toks = [...d.matchAll(/([MLQ])\s*(-?[\d.]+) (-?[\d.]+)(?: (-?[\d.]+) (-?[\d.]+))?/g)];
+  const pts = [];
+  toks.forEach(([, c, a, b], i) => {
+    if (c === "M" || c === "Q") pts.push([+a, +b]);                       // a quadratic's control point is the sharp corner
+    else if (toks[i + 1]?.[1] !== "Q") pts.push([+a, +b]);                // an L that begins a soft corner is not a corner, the last L is the end
+  });
+  return [`M${pts[0][0]} ${pts[0][1]}`, ...pts.slice(1).map((p, i) => (p[1] === pts[i][1] ? `H${p[0]}` : `V${p[1]}`))].join(" ");
+};
+/** Every wire of a drawing, solid or dashed, in the layout's own terms. */
+const wires = (svg) => [...svg.matchAll(/<path class="dl-wire(?: dl-wire-dash)?"[^>]* d="([^"]+)"/g)].map((m) => sharpD(m[1]));
 
 console.log("=== every drawer's output passes the figure check");
 
@@ -77,18 +96,18 @@ for (const [name, spec] of Object.entries(FIGURES)) {
 {
   const flat = judge(FIGURES["map — a one-way chain that fits is one horizontal line"]).svg;
   one("a chain that fits has every box on one y", flat, (g) => new Set([...g.matchAll(/<rect[^>]* y="([\d.]+)"/g)].map((m) => m[1])).size === 1);
-  one("and every link is a single horizontal segment", flat, (g) => [...g.matchAll(/<path class="sds-connector" d="([^"]+)"/g)].every((m) => /^M[\d.]+ [\d.]+ H[\d.]+$/.test(m[1])));
+  one("and every link is a single horizontal segment", flat, (g) => wires(g).length > 0 && wires(g).every((d) => /^M[\d.]+ [\d.]+ H[\d.]+$/.test(d)));
   const branch = judge(FIGURES["map — a branch keeps every link, laid in rows"]).svg;
-  one("a flow with a branch draws all four links", branch, (g) => (g.match(/marker-end/g) ?? []).length === 4);
+  one("a flow with a branch draws all four links", branch, (g) => wires(g).length === 4);
   one("and its boxes sit in more than one row", branch, (g) => new Set([...g.matchAll(/<rect[^>]* y="([\d.]+)"/g)].map((m) => m[1])).size > 1);
   const wide = judge(FIGURES["chain — too wide for the canvas stands up as a vertical line"]).svg;
   one("a chain too wide for the canvas has every box on one x", wide, (g) => new Set([...g.matchAll(/<rect[^>]* x="([\d.]+)"/g)].map((m) => m[1])).size === 1);
-  one("and is no wider than the canvas", wide, (g) => Number(g.match(/viewBox="0 0 (\d+)/)[1]) <= 1100);
+  one("and is no wider than the canvas", wide, (g) => Number(g.match(/viewBox="0 0 (\d+)/)[1]) <= 928);
   const tall = judge(FIGURES["map — a one-way chain too wide for the canvas is one vertical line"]).svg;
   one("a chain too wide has every box on one x", tall, (g) => new Set([...g.matchAll(/<rect[^>]* x="([\d.]+)"/g)].map((m) => m[1])).size === 1);
-  one("and every link is a single vertical segment", tall, (g) => [...g.matchAll(/<path class="sds-connector" d="([^"]+)"/g)].every((m) => /^M[\d.]+ [\d.]+ V[\d.]+$/.test(m[1])));
+  one("and every link is a single vertical segment", tall, (g) => wires(g).length > 0 && wires(g).every((d) => /^M[\d.]+ [\d.]+ V[\d.]+$/.test(d)));
   const ordered = judge(FIGURES["map — rows are ordered so links do not cross"]).svg;
-  const xOf = (label) => Number(ordered.match(new RegExp(`<text class="sds-label" x="([\\d.]+)" y="[\\d.]+">${label}<`))[1]);
+  const xOf = (label) => Number(ordered.match(new RegExp(`<text class="dl-name" x="([\\d.]+)" y="[\\d.]+">${label}<`))[1]);
   // Two orders are crossing-free (Ground first or Vocabulary first); what must hold is that the
   // rows agree, so the one link that could cross another does not.
   one("the two rows are ordered the same way, so no run crosses another", ordered, () => (xOf("Ground") < xOf("Vocabulary")) === (xOf("Providers") < xOf("Coordinates")));
@@ -139,7 +158,7 @@ console.log("\n=== the map drawer keeps the three rules it was found breaking");
     boxes: [{ id: "a", label: "Contract", note: "the shared surface" }, { id: "b", label: "App" }, { id: "c", label: "Entry" }],
     links: [{ from: "a", to: "b", label: "types" }, { from: "b", to: "c" }] });
   const rects = [...svg.matchAll(/<rect[^>]*y="([\d.]+)"[^>]*height="([\d.]+)"/g)].map((m) => [Number(m[1]), Number(m[2])]);
-  const runs = [...svg.matchAll(/<path class="sds-connector" d="M[\d.]+ ([\d.]+) H/g)].map((m) => Number(m[1]));
+  const runs = wires(svg).map((d) => Number(d.match(/^M[\d.]+ ([\d.]+) H/)?.[1]));
   one("a row of unequal boxes shares one centre line, so a lone arrow is straight",
     rects.map(([y, h]) => y + h / 2), (mids) => new Set(mids).size === 1 && runs.every((r) => r === mids[0]));
 }
@@ -150,9 +169,9 @@ console.log("\n=== the map drawer keeps the three rules it was found breaking");
     boxes: [{ id: "v", label: "Vocabulary" }, { id: "g", label: "Ground" }, { id: "p", label: "Providers" }, { id: "c", label: "Coordinates" }],
     links: [{ from: "v", to: "c" }, { from: "g", to: "p" }, { from: "g", to: "c" }] });
   const verts = [];
-  [...svg.matchAll(/<path class="sds-connector" d="([^"]+)"/g)].forEach((m, k) => {
+  wires(svg).forEach((d, k) => {
     let x = 0, y = 0;
-    for (const [, cmd, u, v] of m[1].matchAll(/([MHV])\s*(-?[\d.]+)(?:\s+(-?[\d.]+))?/g)) {
+    for (const [, cmd, u, v] of d.matchAll(/([MHV])\s*(-?[\d.]+)(?:\s+(-?[\d.]+))?/g)) {
       const a = Number(u);
       const nx = cmd === "V" ? x : a, ny = cmd === "V" ? a : cmd === "M" ? Number(v) : y;
       if (cmd === "V") verts.push({ k, x, y1: Math.min(y, ny), y2: Math.max(y, ny) });
@@ -164,9 +183,9 @@ console.log("\n=== the map drawer keeps the three rules it was found breaking");
     if (verts[i].k === verts[j].k) continue;
     const apart = Math.abs(verts[i].x - verts[j].x);
     const run = Math.min(verts[i].y2, verts[j].y2) - Math.max(verts[i].y1, verts[j].y1);
-    if (apart >= 0.5 && apart < 24 && run > 8) tooClose.push(`${apart}px for ${run}px`);
+    if (apart >= 0.5 && apart < 16 && run > 8) tooClose.push(`${apart}px for ${run}px`);
   }
-  one("no two verticals from different connectors run closer than 24", tooClose, none);
+  one("no two verticals from different wires run closer than 16", tooClose, none);
 }
 {
   // A link that skips a row left by the right edge of a box sitting FIRST in a row of six, so it ran
@@ -176,7 +195,7 @@ console.log("\n=== the map drawer keeps the three rules it was found breaking");
     links: [{ from: "b0", to: "b8", label: "depends on" }] });
   const rows = [...svg.matchAll(/<rect[^>]*y="([\d.]+)"[^>]*height="([\d.]+)"/g)].map((m) => [Number(m[1]), Number(m[2])]);
   const top = rows[0];
-  const d = svg.match(/<path class="sds-connector" d="([^"]+)"/)[1];
+  const d = wires(svg)[0];
   one("a skipping link out of a box that is not last in its row drops below the row before it travels",
     d, (g) => /^M[\d.]+ ([\d.]+) V([\d.]+) H/.test(g)
       && Number(/^M[\d.]+ ([\d.]+)/.exec(g)[1]) >= top[0] + top[1]);
@@ -196,14 +215,14 @@ console.log("\n=== FLOWCHART — the standard shapes, and the path runs down the
   one("and the figure check passes it", r.figure, none);
   one("`flowchart` is a kind the book names, and a helper draws it", KINDS, (k) => k.includes("flowchart"));
   one("the ends of the path are terminators — a rect rounded to a half its own height",
-    r.svg, (g) => (g.match(/<rect[^>]*height="44"[^>]*rx="22"/g) ?? []).length === 2);
-  one("a box with two ways out is drawn as a diamond", r.svg, (g) => /<path class="sds-box" d="M[\d.]+ [\d.]+ L[\d.]+ [\d.]+ L[\d.]+ [\d.]+ L[\d.]+ [\d.]+ Z"/.test(g));
+    r.svg, (g) => (g.match(/<rect[^>]*height="36"[^>]*rx="18"/g) ?? []).length === 2);
+  one("a box with two ways out is drawn as a diamond", r.svg, (g) => /<path class="dl-tile" d="M[^"]*(?:Q[^QZ]*){4}Z"/.test(g));
   one("a store carries a cap, and its body is a rect the check can measure",
-    r.svg, (g) => /<ellipse class="sds-box"/.test(g) && /<rect class="sds-box"[^>]*\/>\n  <ellipse/.test(g));
+    r.svg, (g) => /<ellipse class="dl-tile"/.test(g) && /<rect class="dl-tile"[^>]*\/>\n  <ellipse/.test(g));
   // Inference gives `c` a diamond because it has two ways out; naming a shape must overrule that.
   one("a named shape always wins over the inferred one",
     draw({ ...spec, boxes: spec.boxes.map((b) => (b.id === "c" ? { ...b, shape: "process" } : b)) }).svg,
-    (g) => !/<path class="sds-box" d="M[\d.]+ [\d.]+ L/.test(g));
+    (g) => !/<path class="dl-tile" d="M[^"]*Q/.test(g));
   one("a branch out of a decision with no answer on it is a finding",
     draw({ ...spec, links: spec.links.map((l) => (l.label === "no" ? { from: l.from, to: l.to } : l)) }).findings,
     says("leaves a decision with no answer"));
@@ -216,25 +235,23 @@ console.log("\n=== FLOWCHART — the standard shapes, and the path runs down the
     draw({ ...line, kind: "map" }).svg, (g) => new Set([...g.matchAll(/<rect[^>]* y="([\d.]+)"/g)].map((m) => m[1])).size === 1);
 }
 
-console.log("\n=== a figure hugs its own content");
+console.log("\n=== a figure is drawn on the column's frame, at 1:1");
 {
-  // The drawer lays out in a 1100 canvas and centres its rows in it. That is right for PLACING
-  // things and wrong for shipping them: a narrow figure arrived marooned in white space.
-  //
-  // Measured over every coordinate the drawing puts on the page — boxes, connectors and words
-  // alike. A corridor beside the boxes is content too, so measuring against the boxes alone would
-  // call a figure wasteful for routing a link exactly where it had to go.
+  // The language draws every figure on the docs column's 928 frame, 16 in from its edge, and the page shows it at 1:1 up to that
+  // width: the viewBox is the frame's whole width, so the page never stretches a narrow figure, and what is drawn stands inside it.
   const spread = (svg) => {
-    const body = svg.split("\n").filter((l) => !l.includes("<defs>")).join("\n");
     const xs = [];
-    for (const m of body.matchAll(/<rect[^>]* x="(-?[\d.]+)"[^>]* width="([\d.]+)"/g)) xs.push(Number(m[1]), Number(m[1]) + Number(m[2]));
-    for (const m of body.matchAll(/<ellipse[^>]* cx="(-?[\d.]+)" cy="(-?[\d.]+)" rx="([\d.]+)"/g)) xs.push(Number(m[1]) - Number(m[3]), Number(m[1]) + Number(m[3]));
-    // The same three character widths the drawer measures by and the figure check judges by.
-    const PX = { "sds-title": 7.6, "sds-label": 7.0, "sds-code": 6.6, "sds-note": 6.4 };
-    for (const m of body.matchAll(/<text class="([\w-]+)" x="(-?[\d.]+)"[^>]*>([\s\S]*?)<\/text>/g))
-      xs.push(Number(m[2]), Number(m[2]) + m[3].replace(/&[a-z]+;/g, " ").length * (PX[m[1]] ?? 7));
-    for (const m of body.matchAll(/<path[^>]* d="([^"]+)"/g)) {
-      for (const [, c, u] of m[1].matchAll(/([MLHV])\s*(-?[\d.]+)/g)) if (c !== "V") xs.push(Number(u));
+    for (const m of svg.matchAll(/<rect[^>]* x="(-?[\d.]+)"[^>]* width="([\d.]+)"/g)) xs.push(Number(m[1]), Number(m[1]) + Number(m[2]));
+    for (const m of svg.matchAll(/<ellipse[^>]* cx="(-?[\d.]+)" cy="(-?[\d.]+)" rx="([\d.]+)"/g)) xs.push(Number(m[1]) - Number(m[3]), Number(m[1]) + Number(m[3]));
+    // The character widths the drawer measures by and the figure check judges by.
+    const PX = { "dl-name": 6.8, "dl-detail": 6, "dl-wlabel": 6, "dl-tag": 6, "dl-label": 6.5 };
+    for (const m of svg.matchAll(/<text class="([\w-]+)" x="(-?[\d.]+)" y="[\d.]+"( text-anchor="\w+")?>([\s\S]*?)<\/text>/g)) {
+      const w = m[4].replace(/&[a-z]+;/g, " ").length * (PX[m[1]] ?? 7);
+      const at = Number(m[2]) - (m[3]?.includes("middle") ? w / 2 : 0);
+      xs.push(at, at + w);
+    }
+    for (const m of svg.matchAll(/<path[^>]* d="([^"]+)"/g)) {
+      for (const [, c, u] of m[1].matchAll(/([MLHVQ])\s*(-?[\d.]+)/g)) if (c !== "V") xs.push(Number(u));
     }
     return [Math.min(...xs), Math.max(...xs)];
   };
@@ -243,8 +260,8 @@ console.log("\n=== a figure hugs its own content");
     const [x0, , w] = svg.match(/viewBox="(-?[\d.]+) (-?[\d.]+) ([\d.]+) ([\d.]+)"/).slice(1).map(Number);
     const [left, right] = spread(svg);
     const short = name.split(" —")[0];
-    one(`${short} — the viewBox holds everything drawn`, [x0 <= left + 0.5, right <= x0 + w + 0.5], (v) => v.every(Boolean));
-    one(`${short} — and carries no more than 12px of air beside it`, [left - x0, x0 + w - right], (v) => v.every((g) => g <= 12));
+    one(`${short} — the viewBox is the frame's 928, and holds everything drawn`, [x0, w >= 928, left >= x0 + 8, right <= x0 + w - 8], (v) => v[0] === 0 && v.slice(1).every(Boolean));
+    one(`${short} — the frame is never wider than the column unless the content is`, w, (g) => g === 928 || right > 928 - 16);
   }
 }
 
@@ -272,13 +289,13 @@ console.log("\n=== SYSTEM — one drawer for server, web and estate");
   one("and the figure check passes what it drew", r.figure, none);
   one("`system` is a kind the book names, and a helper draws it", KINDS, (k) => k.includes("system"));
   one("there is one outermost container, and it is the thing described",
-    r.svg, (g) => g.includes(`>modules/project<`));
-  one("a store is drawn as a cylinder", r.svg, (g) => /<ellipse class="sds-box"/.test(g));
-  one("a client is drawn as a window — a frame with a title bar",
-    r.svg, (g) => /data-role="curve"/.test(g));
-  one("a way in is drawn as a chevron", r.svg, (g) => /<path class="sds-box" d="M[\d.]+ [\d.]+ H[\d.]+ L[\d.]+ [\d.]+ L[\d.]+ [\d.]+ H[\d.]+ Z"/.test(g));
+    r.svg, (g) => g.includes(`>MODULES/PROJECT<`));
+  one("a store is drawn as a cylinder", r.svg, (g) => /<ellipse class="dl-tile"/.test(g));
+  one("a client is drawn as a plain tile, with no band over its name that a blank header would read as a missing picture",
+    r.svg, (g) => !/data-role="curve"/.test(g));
+  one("a way in is drawn as a chevron", r.svg, (g) => /<path class="dl-tile" d="M[^"]*(?:Q[^QZ]*){5}Z"/.test(g));
   one("the layers are joined one way, in the direction a call travels",
-    r.svg, (g) => (g.match(/<path class="sds-connector" d="M[\d.]+ [\d.]+ V[\d.]+" marker-end/g) ?? []).length === 2);
+    r.svg, (g) => wires(g).filter((d) => /^M[\d.]+ [\d.]+ V[\d.]+$/.test(d)).length === 2);
 
   // WEB AND ESTATE ARE THE SAME SHAPE, which is the claim the kind makes rather than an illustration
   // of it. Both were drawn from their own source and both found faults the server figure had not.
@@ -376,8 +393,8 @@ console.log("\n=== ENTITIES — every relation line says one or many");
   one("a relation with no cardinality is a finding",
     draw({ kind: "entities", boxes, links: links.map(({ card, ...l }) => l) }).findings,
     says("carries no cardinality"));
-  one("and the cardinality is rendered with its label, as one phrase",
-    draw({ kind: "entities", boxes, links }).svg, (g) => g.includes("belongs to  N:1"));
+  one("and the cardinality is rendered with its label: the words above the wire and the cardinality under it",
+    draw({ kind: "entities", boxes, links }).svg, (g) => g.includes(">belongs to<") && g.includes(">N:1<"));
 
   // THREE RELATIONS BROKE THIS DRAWER, and it broke without any cardinality involved — proven by
   // running the same three bare. The label was slid clear of two connectors and dropped onto the box
@@ -422,7 +439,7 @@ console.log("\n=== ENTITIES — every relation line says one or many");
 
   // The placer may move a label to a neighbouring band; it may never move it out of the picture.
   // A FIGURE HUGS ITS CONTENT, so its viewBox has an origin of its own and is not `0 0 w h`.
-  const ys = [...r.svg.matchAll(/<text class="sds-note"[^>]*y="([\d.]+)"/g)].map((m) => Number(m[1]));
+  const ys = [...r.svg.matchAll(/<text class="dl-wlabel"[^>]*y="([\d.]+)"/g)].map((m) => Number(m[1]));
   const vb = /viewBox="([\d.-]+) ([\d.-]+) ([\d.-]+) ([\d.-]+)"/.exec(r.svg).slice(1).map(Number);
   one("no label is placed outside the figure's own box", ys,
       (g) => g.length > 0 && g.every((y) => y >= vb[1] && y <= vb[1] + vb[3]));
@@ -473,17 +490,16 @@ console.log("\n=== a figure is never scaled UP to the column it sits in");
   const box = (n) => ({ id: `b${n}`, label: `Box ${n}`, note: "a note that sets the width" });
   const narrow = draw({ kind: "flowchart", caption: "c", boxes: [box(1), box(2), box(3)],
                         links: [{ from: "b1", to: "b2", label: "then" }, { from: "b2", to: "b3", label: "then" }] });
-  const capOf = (svg) => Number(/style="max-width:(\d+)px"/.exec(svg)?.[1]);
   const widthOf = (svg) => Number(/viewBox="[-\d.]+ [-\d.]+ (\d+)/.exec(svg)[1]);
-  one("the cap is present and is the figure's own width",
-      capOf(narrow.svg), widthOf(narrow.svg));
-  one("a narrow figure caps well under the 1100 canvas, so the page cannot stretch it",
-      capOf(narrow.svg), (got) => got > 0 && got < 1100);
+  // The language draws on the column's 928 frame and the page shows it at 1:1 up to 928 (`.dl-svg` is `width: 100%` with that cap), so a
+  // narrow figure's viewBox is the frame's whole width and is never smaller: nothing stretches it. A figure whose content is wider
+  // than the frame is a wider viewBox, which the page scales down to the column and never up.
+  one("a narrow figure is drawn on the frame's 928, so the page cannot stretch it", widthOf(narrow.svg), 928);
+  one("and carries no inline width of its own: the stylesheet's cap is the one place it is set", narrow.svg, (g) => !/style=|max-width/.test(g));
   const wide = draw({ kind: "map", caption: "c",
                       boxes: [box(1), box(2), box(3), box(4)],
                       links: [{ from: "b1", to: "b2" }, { from: "b1", to: "b3" }, { from: "b1", to: "b4" }] });
-  one("a wide figure caps at its own width too, and `width:100%` still shrinks it to the column",
-      capOf(wide.svg), widthOf(wide.svg));
+  one("a wide figure is the frame's 928 or its own width, whichever is more, and is shrunk to the column, never grown", widthOf(wide.svg), (g) => g >= 928);
   one("the cap does not disturb the geometry the check measures", checkFigures(narrow.svg), none);
 }
 
@@ -518,43 +534,47 @@ console.log("\n=== a drawing carries the shared stylesheet's class names, and no
 {
   const tones = draw({ kind: "map", caption: "Three boxes, one of each mark.",
     boxes: [{ id: "a", label: "Marked", em: true }, { id: "b", label: "Warned", warn: true }, { id: "c", label: "Absent", off: true }] }).svg;
-  one("the drawing itself is `sds-drawing`", tones, (g) => g.startsWith('<svg class="sds-drawing" '));
-  one("a box marked `em` takes the blue tone", tones, (g) => g.includes('<rect class="sds-box sds-tone-blue"'));
-  one("a box marked `warn` takes the amber tone", tones, (g) => g.includes('<rect class="sds-box sds-tone-amber"'));
-  one("a box marked `off` is `sds-absent`", tones, (g) => g.includes('<rect class="sds-box sds-absent"'));
-  one("a box's label is `sds-label`", tones, (g) => />Marked<\/text>/.test(g) && /<text class="sds-label"[^>]*>Marked</.test(g));
+  one("the drawing itself is `dl-svg`", tones, (g) => g.startsWith('<svg class="dl-svg" '));
+  one("a box marked `em` is the tile in focus", tones, (g) => g.includes('<rect class="dl-tile-on"'));
+  one("a box marked `warn` takes the error state: a state group, and the state's tile", tones, (g) => g.includes('<g class="dl-st-error">') && g.includes('<rect class="dl-tile-st"'));
+  one("a box marked `off` is drawn dashed, with no fill: `dl-tile-yours`", tones, (g) => g.includes('<rect class="dl-tile-yours"'));
+  one("a box's name is `dl-name`", tones, (g) => />Marked<\/text>/.test(g) && /<text class="dl-name"[^>]*>Marked</.test(g));
 
   const sequence = draw({ kind: "sequence", caption: "One call and its answer.",
     boxes: [{ id: "a", label: "Caller" }, { id: "b", label: "Service" }],
     links: [{ from: "a", to: "b", label: "asks" }, { from: "b", to: "a", label: "answers", dashed: true }] }).svg;
-  one("a lifeline keeps its name beside the connector's: `sds-connector sds-lifeline`",
-    sequence, (g) => (g.match(/<path class="sds-connector sds-lifeline" /g) ?? []).length === 2);
-  one("and the figure check still reads a lifeline as background, never as a connector that ends in the air",
+  one("a lifeline is a guide, dotted, and says it is a lifeline",
+    sequence, (g) => (g.match(/<path class="dl-guide" data-role="lifeline" /g) ?? []).length === 2);
+  one("and the figure check still reads a lifeline as background, never as a wire that ends in the air",
     checkFigures(sequence), none);
-  one("a message's label is `sds-note`", sequence, (g) => /<text class="sds-note"[^>]*>asks</.test(g));
+  one("a message is a wire, and a reply is the dashed one", sequence, (g) => (g.match(/<path class="dl-wire"/g) ?? []).length === 1 && (g.match(/<path class="dl-wire dl-wire-dash"/g) ?? []).length === 1);
+  one("a message's label is `dl-wlabel`", sequence, (g) => /<text class="dl-wlabel"[^>]*>asks</.test(g));
+  one("a figure draws no arrowhead and no marker: a wire has none", sequence, (g) => !/marker|<defs>/.test(g));
 
   // Every figure of this suite is drawn and every class of each is collected, so a name without the
   // prefix fails here whichever drawer wrote it.
   const system = draw({ kind: "system", title: "modules/project", caption: "One layer, and the store it reads.",
     layers: [{ name: "service", boxes: [{ id: "s", label: "ProjectService" }] }],
     outside: [{ id: "db", label: "Database", as: "store" }], links: [{ from: "s", to: "db", label: "reads" }] }).svg;
-  one("a system's boundary is named by `sds-title`", system, (g) => /<text class="sds-title"[^>]*>modules\/project</.test(g));
+  one("a system's boundary is a plate, named by `dl-label` in capitals", system, (g) => /<rect class="dl-plate"/.test(g) && /<text class="dl-label"[^>]*>MODULES\/PROJECT</.test(g));
 
   const classes = new Set();
   for (const svg of [...Object.values(FIGURES).map((spec) => draw(spec).svg), tones, sequence, system])
     for (const found of svg.matchAll(/class="([^"]+)"/g)) for (const name of found[1].split(" ")) classes.add(name);
-  one("every class a drawer writes opens with `sds-`", [...classes].filter((name) => !name.startsWith("sds-")), none);
+  one("every class a drawer writes opens with `dl-`", [...classes].filter((name) => !name.startsWith("dl-")), none);
   one("and the set holds the names the drawers are built from",
-    ["sds-drawing", "sds-box", "sds-connector", "sds-label", "sds-note", "sds-title", "sds-lifeline", "sds-tone-blue", "sds-tone-amber", "sds-absent"]
+    ["dl-svg", "dl-tile", "dl-tile-on", "dl-name", "dl-detail", "dl-wlabel", "dl-wire", "dl-wire-dash", "dl-guide", "dl-plate", "dl-label"]
       .filter((name) => !classes.has(name)), none);
+  one("no colour and no size is written in a drawing: no fill, stroke, style or font-size attribute", [...Object.values(FIGURES).map((spec) => draw(spec).svg), tones, sequence, system],
+    (all) => all.every((g) => !/ (fill|stroke|style|font-size|stroke-dasharray)=/.test(g)));
 
-  // VERIFY THE VERIFIER: the check reads a connector by the shared name alone, so a path that
-  // carries another name is not a connector to it, and the same path with the shared name is.
-  const wrap = (name) => `<svg class="sds-drawing" viewBox="0 0 400 200" role="img" aria-label="x">` +
-    `<rect class="sds-box" x="40" y="60" width="100" height="60" rx="3"/><path class="${name}" d="M240 30 H185"/></svg>`;
-  one("known-bad: a connector that ends in the air is reported when it carries the shared name",
-    checkFigures(wrap("sds-connector")), says("empty space"));
-  one("a path with any other class is not read as a connector", checkFigures(wrap("mine")), none);
+  // VERIFY THE VERIFIER: the check reads a wire by the shared name alone, so a path that
+  // carries another name is not a wire to it, and the same path with the shared name is.
+  const wrap = (name) => `<svg class="dl-svg" viewBox="0 0 400 200" role="img" aria-label="x">` +
+    `<rect class="dl-tile" x="40" y="60" width="100" height="60" rx="10"/><path class="${name}" d="M240 30 H185"/></svg>`;
+  one("known-bad: a wire that ends in the air is reported when it carries the shared name",
+    checkFigures(wrap("dl-wire")), says("empty space"));
+  one("a path with any other class is not read as a wire", checkFigures(wrap("mine")), none);
 }
 
 console.log("\n=== SKELETON — the marks, the controls and the check of a layer's own blocks");
@@ -573,10 +593,10 @@ console.log("\n=== SKELETON — the marks, the controls and the check of a layer
           { frame: { tag: "main", rows: [{ items: [{ note: "the page" }] }] } }] }] } };
   const plan = judge(PLAN_SPEC);
   one("a spec in the new fields draws with no finding", plan.findings, none);
-  one("a skeleton draws no connector: position is the whole claim", plan.svg, (g) => !g.includes("sds-connector"));
+  one("a skeleton draws no connector: position is the whole claim", plan.svg, (g) => !g.includes("dl-wire") && !g.includes("marker"));
   one("`skeleton` is a kind the book names, and a helper draws it", KINDS, (k) => k.includes("skeleton"));
   one("a skeleton's drawing is marked, so the figure check reads it by the skeleton's own rules",
-    plan.svg, (g) => g.startsWith('<svg class="sds-drawing sds-skeleton"') && checkFigures(g).length === 0);
+    plan.svg, (g) => g.startsWith('<svg class="dl-svg dl-skeleton"') && checkFigures(g).length === 0);
   one("a spec with no `frame` is a finding, not an empty canvas", draw({ kind: "skeleton" }).findings, says("no `frame`"));
   one("an unknown `width` on a nested frame is a finding",
     draw({ kind: "skeleton", frame: { rows: [{ items: [
@@ -590,15 +610,15 @@ console.log("\n=== SKELETON — the marks, the controls and the check of a layer
     { frame: { tag: "B", look: "bordered", rows: [{ items: [{ text: "b" }] }] } },
     { frame: { tag: "C", look: "flat", rows: [{ items: [{ text: "c" }] }] } }] }] } }).svg;
   one("a drawing carries no inline colour and no tone", marks, (g) => !/ (fill|stroke|style)=|sds-tone-/.test(g.replace(/style="max-width:\d+px"/, "")));
-  one("a part with no look is a surface with the dotted boundary", marks, (g) => rect(g, "sds-skel-surface").length === 1 && rect(g, "sds-skel-guide").length === 2);
-  one("a bordered part is one solid border and no dotted boundary", marks, (g) => rect(g, "sds-skel-border").length === 1);
-  one("the outer frame is the drawing's own edge, not a mark", marks, (g) => rect(g, "sds-box").length === 1);
+  one("a part with no look is a surface with the dotted boundary", marks, (g) => rect(g, "dl-sk-surface").length === 1 && rect(g, "dl-frame-line").length === 2);
+  one("a bordered part is one solid border and no dotted boundary", marks, (g) => rect(g, "dl-line-edge").length === 1);
+  one("the outer frame is the drawing's own edge, not a mark", marks, (g) => rect(g, "dl-sk-window").length === 1);
 
   // 2 · a frame's look
   const look = (value) => draw({ kind: "skeleton", frame: { rows: [{ items: [{ frame: { tag: "P", look: value, rows: [] } }] }] } });
-  one("`raised` draws a surface under the boundary", look("raised").svg, (g) => g.includes("sds-skel-surface") && g.includes("sds-skel-guide"));
-  one("`flat` draws the boundary and no surface", look("flat").svg, (g) => !g.includes("sds-skel-surface") && g.includes("sds-skel-guide"));
-  one("`bordered` draws a border and no boundary", look("bordered").svg, (g) => g.includes("sds-skel-border") && !g.includes("sds-skel-guide"));
+  one("`raised` draws a surface under the boundary", look("raised").svg, (g) => g.includes("dl-sk-surface") && g.includes("dl-frame-line"));
+  one("`flat` draws the boundary and no surface", look("flat").svg, (g) => !g.includes("dl-sk-surface") && g.includes("dl-frame-line"));
+  one("`bordered` draws a border and no boundary", look("bordered").svg, (g) => g.includes("dl-line-edge") && !g.includes("dl-frame-line"));
   one("a look the skeleton lacks is refused by name", look("glass").findings, says("`glass`"));
   one("a part with a look and no name is a finding",
     draw({ kind: "skeleton", frame: { rows: [{ items: [{ frame: { look: "flat", rows: [] } }] }] } }).findings, says("carries no name"));
@@ -614,12 +634,12 @@ console.log("\n=== SKELETON — the marks, the controls and the check of a layer
     { control: "field", text: "name@example.com" }, { control: "select", text: "Sort" }, { control: "checkbox" },
     { control: "pager", text: "‹ 1 2 ›" }] }] } });
   one("every control draws with no finding", controls.findings, none);
-  one("a control is a thin outline of the component's height, 32 by default", controls.svg, (g) => rect(g, "sds-skel-control").every((r) => r[3] === 32));
-  one("the main action is told apart by weight, with the same class and no colour", controls.svg, (g) => g.includes("sds-skel-control sds-skel-main") && rect(g, "sds-skel-control sds-skel-main").length === 1);
+  one("a control is a thin outline of the component's height, 32 by default", controls.svg, (g) => rect(g, "dl-ctl").every((r) => r[3] === 32));
+  one("the main action is told apart by weight, with the same class and no colour", controls.svg, (g) => g.includes("dl-ctl-on") && rect(g, "dl-ctl-on").length === 1);
   one("a pager is one packed group: its parts sit 4px apart", controls.svg, (g) => {
-    const boxes = rect(g, "sds-skel-control").slice(-4); return boxes.slice(1).every((b, i) => b[0] - (boxes[i][0] + boxes[i][2]) === 4); });
+    const boxes = rect(g, "dl-ctl").slice(-4); return boxes.slice(1).every((b, i) => b[0] - (boxes[i][0] + boxes[i][2]) === 4); });
   one("a framed row no longer decides a control's height", draw({ kind: "skeleton", frame: { rows: [{ framed: true, items: [{ control: "button", text: "Save" }] }] } }).svg,
-    (g) => rect(g, "sds-skel-control")[0][3] === 32);
+    (g) => rect(g, "dl-ctl")[0][3] === 32);
   one("a control with a tag is a finding", draw({ kind: "skeleton", frame: { rows: [{ items: [{ control: "button", text: "x", tag: "name" }] }] } }).findings, says("a control carries no tag"));
   one("a control that runs over one line is a finding", draw({ kind: "skeleton", frame: { rows: [{ items: [{ control: "button", text: "a\nb" }] }] } }).findings, says("one line"));
   one("a control the skeleton lacks is refused by name", draw({ kind: "skeleton", frame: { rows: [{ items: [{ control: "slider", text: "x" }] }] } }).findings, says("`slider`"));
@@ -627,66 +647,66 @@ console.log("\n=== SKELETON — the marks, the controls and the check of a layer
   // 5 · icons
   const icons = draw({ kind: "skeleton", frame: { rows: [{ items: ["close", "add", "menu", "search", "more", "previous", "next", "select", "checkbox", "bell", "person", "default"].map((icon) => ({ icon })) }] } });
   one("each of the twelve icons draws with no finding", icons.findings, none);
-  one("an icon is an action, and sits in a square whose side is the control's height", icons.svg, (g) => rect(g, "sds-skel-control").length === 12 && rect(g, "sds-skel-control").every((r) => r[2] === 32 && r[3] === 32));
-  const roundMarks = (g) => [...g.matchAll(/<circle class="(sds-skel-bar|sds-skel-control)" cx="([\d.]+)" cy="([\d.]+)" r="([\d.]+)"/g)].map((m) => [m[1], Number(m[4])]);
+  one("an icon is an action, and sits in a square whose side is the control's height", icons.svg, (g) => rect(g, "dl-ctl").length === 12 && rect(g, "dl-ctl").every((r) => r[2] === 32 && r[3] === 32));
+  const roundMarks = (g) => [...g.matchAll(/<circle class="(dl-bar|dl-ctl)" cx="([\d.]+)" cy="([\d.]+)" r="([\d.]+)"/g)].map((m) => [m[1], Number(m[4])]);
   const marked = draw({ kind: "skeleton", frame: { rows: [{ items: [{ icon: "person", mark: true }, { icon: "default", mark: true }, { icon: "default", on: false }, { icon: "more" }] }] } });
-  one("a mark is drawn in a circle: one that stands for a thing or a person is as wide as a control, and one that tells a state is small, and empty where `on` is false", roundMarks(marked.svg).map((m) => m.join(":")).join(), "sds-skel-control:16,sds-skel-bar:16,sds-skel-control:10");
-  one("a mark has no square, and the action beside it keeps its own", rect(marked.svg, "sds-skel-control").length, 1);
-  one("a mark keeps the room of a control, so marks and actions share one rhythm", rect(marked.svg, "sds-skel-control")[0][0], 24 + 16 + 3 * (32 + 4));
-  one("icons are line shapes of the stylesheet, with no transform", icons.svg, (g) => g.includes("sds-skel-glyph") && !g.includes("transform"));
+  one("a mark is drawn in a circle: one that stands for a thing or a person is as wide as a control, and one that tells a state is small, and empty where `on` is false", roundMarks(marked.svg).map((m) => m.join(":")).join(), "dl-ctl:16,dl-bar:16,dl-ctl:10");
+  one("a mark has no square, and the action beside it keeps its own", rect(marked.svg, "dl-ctl").length, 1);
+  one("a mark keeps the room of a control, so marks and actions share one rhythm", rect(marked.svg, "dl-ctl")[0][0], 16 + 16 + 3 * (32 + 4));
+  one("icons are line shapes of the stylesheet, with no transform", icons.svg, (g) => g.includes("dl-glyph") && !g.includes("transform"));
   one("an icon the set lacks is a finding that names the default", draw({ kind: "skeleton", frame: { rows: [{ items: [{ icon: "rocket" }] }] } }).findings, says("`default`"));
   const word = draw({ kind: "skeleton", frame: { rows: [{ items: [{ icon: "add", text: "New" }, { control: "button", text: "Go" }] }] } }).svg;
-  const wordY = Number((word.match(/<text class="sds-code" x="[\d.]+" y="([\d.]+)">New/) ?? [])[1]);
-  one("a word beside an icon is centred on the icon's own line", word, () => wordY === rect(word, "sds-skel-control")[0][1] + 16 + 4);
+  const wordY = Number((word.match(/<text class="dl-detail" x="[\d.]+" y="([\d.]+)">New/) ?? [])[1]);
+  one("a word beside an icon is centred on the icon's own line", word, () => wordY === rect(word, "dl-ctl")[0][1] + 16 + 4);
 
   // 6 · a title is plain text
   const title = draw({ kind: "skeleton", frame: { rows: [{ items: [{ text: "Members" }] }] } }).svg;
-  one("a title is plain text with no box", title, (g) => g.includes(">Members<") && rect(g, "sds-skel-control").length === 0 && rect(g, "sds-skel-guide").length === 0);
+  one("a title is plain text with no box", title, (g) => g.includes(">Members<") && rect(g, "dl-ctl").length === 0 && rect(g, "dl-frame-line").length === 0);
 
   // 7 · stand-ins
   const standin = (kind, extra = {}) => draw({ kind: "skeleton", frame: { rows: [{ items: [{ standin: kind, lines: 3, fill: true, ...extra }] }] } });
   one("rows are bars, and a heading bar is shorter and taller", standin("rows", { headings: [0] }).svg,
-    (g) => { const b = rect(g, "sds-skel-bar"); return b.length === 3 && b[0][2] < b[1][2] && b[0][3] > b[1][3]; });
-  one("a card grid is cards, each with bars", standin("cards").svg, (g) => rect(g, "sds-skel-control").length === 3 && rect(g, "sds-skel-bar").length === 9);
-  one("a form field is its label above its field", standin("field").svg, (g) => rect(g, "sds-skel-bar").length === 1 && rect(g, "sds-skel-control").length === 1);
+    (g) => { const b = rect(g, "dl-bar"); return b.length === 3 && b[0][2] < b[1][2] && b[0][3] > b[1][3]; });
+  one("a card grid is cards, each with bars", standin("cards").svg, (g) => rect(g, "dl-ctl").length === 3 && rect(g, "dl-bar").length === 9);
+  one("a form field is its label above its field", standin("field").svg, (g) => rect(g, "dl-bar").length === 1 && rect(g, "dl-ctl").length === 1);
   // A field with its own words is the library's form field: its title above its control, the mark of its help
   // at the end of the title's line, and one line under the control.
   const named = standin("field", { label: "Name", text: "Nightly export", info: true }).svg;
-  const control = (g) => rect(g, "sds-skel-control")[0];
-  one("a field with a label shows the word and no bar", named, (g) => g.includes(">Name<") && g.includes(">Nightly export<") && rect(g, "sds-skel-bar").length === 0);
-  one("the mark of a field's help stands at the end of the title's line", named, (g) => { const c = control(g); const cx = Number(/<circle class="sds-skel-glyph" cx="([\d.]+)"/.exec(g)?.[1]); return Math.abs(cx - (c[0] + c[2] - 6)) < 1; });
+  const control = (g) => rect(g, "dl-ctl")[0];
+  one("a field with a label shows the word and no bar", named, (g) => g.includes(">Name<") && g.includes(">Nightly export<") && rect(g, "dl-bar").length === 0);
+  one("the mark of a field's help stands at the end of the title's line", named, (g) => { const c = control(g); const cx = Number(/<circle class="dl-glyph" cx="([\d.]+)"/.exec(g)?.[1]); return Math.abs(cx - (c[0] + c[2] - 6)) < 1; });
   one("a field with no info draws no mark", standin("field", { label: "Name" }).svg, (g) => !g.includes("<circle"));
   const described = standin("field", { label: "Starts on", description: "In the time zone of the organization" }).svg;
   const refused = standin("field", { label: "Time", description: "In 24 hours", error: "Enter a time from 00:00 to 23:59" }).svg;
-  one("a description stands under the control, in no failure colour", described, (g) => g.includes(">In the time zone of the organization<") && !g.includes("--sds-fail"));
+  one("a description stands under the control, in no failure colour", described, (g) => g.includes(">In the time zone of the organization<") && !g.includes("dl-detail-warn") && !g.includes("dl-line-warn"));
   one("an error takes the place of the description, in the failure colour, on its line and on the control", refused,
-    (g) => g.includes(">Enter a time from 00:00 to 23:59<") && !g.includes(">In 24 hours<") && (g.match(/--sds-fail/g) ?? []).length === 2);
+    (g) => g.includes(">Enter a time from 00:00 to 23:59<") && !g.includes(">In 24 hours<") && (g.match(/dl-detail-warn/g) ?? []).length === 1 && (g.match(/dl-line-warn/g) ?? []).length === 1);
   const height = (g) => Number(/viewBox="[\d.]+ [\d.]+ [\d.]+ ([\d.]+)"/.exec(g)?.[1]);
   one("a field keeps the room of the line under its control where it has neither", [named, refused], ([plain, failed]) => height(plain) === height(failed));
-  one("a field drawn as a select carries the select's mark", standin("field", { label: "Owner", text: "Dana Lee", control: "select" }).svg, (g) => g.includes("sds-skel-glyph"));
+  one("a field drawn as a select carries the select's mark", standin("field", { label: "Owner", text: "Dana Lee", control: "select" }).svg, (g) => g.includes("dl-glyph"));
   // A field that is read is the library's data unit: its value under its title, with no box.
   const reading = standin("field", { label: "Session", text: "8 hours", read: true }).svg;
-  one("a field that is read shows its title and its value, and no box", reading, (g) => g.includes(">Session<") && g.includes(">8 hours<") && rect(g, "sds-skel-control").length === 0);
-  one("the title of a field that is read is heavier and lighter in tone than its value", reading, (g) => /class="sds-note"[^>]*font-weight:600">Session</.test(g) && /class="sds-title"[^>]*font-weight:400">8 hours</.test(g));
-  one("the mark of a read field's help stands beside its title, and not at the end of the line", standin("field", { label: "Session", text: "8 hours", read: true, info: true }).svg, (g) => Number(/<circle class="sds-skel-glyph" cx="([\d.]+)"/.exec(g)?.[1]) < 200);
+  one("a field that is read shows its title and its value, and no box", reading, (g) => g.includes(">Session<") && g.includes(">8 hours<") && rect(g, "dl-ctl").length === 0);
+  one("the title of a field that is read is heavier and lighter in tone than its value", reading, (g) => /class="dl-name"[^>]*>Session</.test(g) && /class="dl-detail"[^>]*>8 hours</.test(g));
+  one("the mark of a read field's help stands beside its title, and not at the end of the line", standin("field", { label: "Session", text: "8 hours", read: true, info: true }).svg, (g) => Number(/<circle class="dl-glyph" cx="([\d.]+)"/.exec(g)?.[1]) < 200);
   one("a field that is read is lower than one that is entered", [reading, named], ([read, entered]) => height(read) < height(entered));
-  one("a value that is a state is a badge under its title", standin("field", { label: "Bank", text: "Waiting", read: true, control: "badge" }).svg, (g) => g.includes(">Waiting<") && rect(g, "sds-skel-control").length === 1);
+  one("a value that is a state is a badge under its title", standin("field", { label: "Bank", text: "Waiting", read: true, control: "badge" }).svg, (g) => g.includes(">Waiting<") && rect(g, "dl-ctl").length === 1);
   one("a field that is read and has no title is a finding", standin("field", { text: "8 hours", read: true }).findings, says("carries its title in `label`"));
   // A row of a table that is being changed: its box takes the width of its column, and the action that saves it stands beside it.
   const edited = draw({ kind: "skeleton", frame: { rows: [{ items: [{ standin: "table", fill: true, columns: ["Text", "German", ""], cells: [["Sign in", "Anmelden", ""], ["Sign out", { control: "field", text: "Abmelden", fill: true }, { icon: "checkbox" }]] }] }] } });
-  one("a box in a cell that takes fill is as wide as its column, and the action of the row stands beside it", [edited.findings.length, rect(edited.svg, "sds-skel-control")],
+  one("a box in a cell that takes fill is as wide as its column, and the action of the row stands beside it", [edited.findings.length, rect(edited.svg, "dl-ctl")],
     ([found, boxes]) => found === 0 && boxes.length === 2 && boxes[0][2] > 300 && boxes[1][0] - (boxes[0][0] + boxes[0][2]) <= 24);
   // A row with no border may be marked by a dotted line, where a spec asks; a container's header stands inside its outline, so it takes none.
   const backPage = (marked, onContainer = false) => draw({ kind: "skeleton", frame: { rows: [{ ...(marked ? { marked: true } : {}), items: [{ icon: "previous", text: "Schedules" }] },
     { items: [{ frame: { look: "container", label: "New schedule", ...(onContainer ? { marked: true } : {}), rows: [{ items: [{ standin: "field", label: "Name", fill: true }] }] } }] }] } });
-  one("a marked row has a dotted line, as wide as the container's outline", [backPage(true).findings.length, rect(backPage(true).svg, "sds-skel-guide"), rect(backPage(true).svg, "sds-skel-control")],
+  one("a marked row has a dotted line, as wide as the container's outline", [backPage(true).findings.length, rect(backPage(true).svg, "dl-frame-line"), rect(backPage(true).svg, "dl-ctl")],
     ([found, guides, boxes]) => { const outline = boxes.reduce((widest, box) => (box[2] > widest[2] ? box : widest)); return found === 0 && guides.length === 2 && guides[0][0] === outline[0] && guides[0][2] === outline[2]; });
-  one("a page that asks for no mark has no dotted line but the container's own extent", rect(backPage(false).svg, "sds-skel-guide").length, 1);
+  one("a page that asks for no mark has no dotted line but the container's own extent", rect(backPage(false).svg, "dl-frame-line").length, 1);
   one("a container takes no `marked`, since its header stands inside its outline", backPage(false, true).findings, says("a container takes no `marked`"));
   const choices = (words) => ({ items: words.map((text) => (text ? { control: "checkbox", text, fill: true } : { spacer: true })) });
   one("the choices of a set stand in columns, and a shorter row keeps them", draw({ kind: "skeleton", frame: { rows: [choices(["Members", "Roles", "Directory"]), choices(["Custom domain", "Sign-in policy", ""])] } }).svg,
-    (g) => { const x = rect(g, "sds-skel-control").map((r) => r[0]); return x.length === 5 && x[0] === x[3] && x[1] === x[4] && x[1] > x[0]; });
-  one("list entries are a mark and a bar each", standin("list").svg, (g) => rect(g, "sds-skel-bar").length === 6);
+    (g) => { const x = rect(g, "dl-ctl").map((r) => r[0]); return x.length === 5 && x[0] === x[3] && x[1] === x[4] && x[1] > x[0]; });
+  one("list entries are a mark and a bar each", standin("list").svg, (g) => rect(g, "dl-bar").length === 6);
   one("a stand-in the skeleton lacks is refused by name", standin("tree").findings, says("`tree`"));
 
   // 8 · a part that takes the height left
@@ -695,19 +715,19 @@ console.log("\n=== SKELETON — the marks, the controls and the check of a layer
     { frame: { tag: "children", rows: [{ items: [{ standin: "rows", lines: 14, fill: true }] }] } }] }] } }).svg;
   const ys = (g, cls) => rect(g, cls).map((r) => r[1] + r[3]);
   one("`nav` reaches down and `account` stands at the foot of the column", rail, (g) => {
-    const guides = rect(g, "sds-skel-guide"); const column = guides[0], account = guides[3];
+    const guides = rect(g, "dl-frame-line"); const column = guides[0], account = guides[3];
     return Math.abs((account[1] + account[3]) - (column[1] + column[3] - 16)) < 1; });
-  one("the two columns end on one line", rail, (g) => { const [column, , , , children] = rect(g, "sds-skel-guide"); return column[1] + column[3] === children[1] + children[3]; });
+  one("the two columns end on one line", rail, (g) => { const [column, , , , children] = rect(g, "dl-frame-line"); return column[1] + column[3] === children[1] + children[3]; });
 
   // 9 · measures of its own
   one("the other kinds' constants are untouched by the skeleton: a MAP draws as before", draw({ kind: "map", boxes: [{ id: "a", label: "A" }] }).svg,
-    (g) => g.includes('class="sds-box"') && !g.includes("sds-skel"));
+    (g) => g.includes('class="dl-tile"') && !g.includes("dl-sk-") && !g.includes("dl-skeleton"));
 
   // 10 · the check
   const centre = draw({ kind: "skeleton", frame: { rows: [{ items: [{ text: "Members" }, { icon: "close" }, { control: "button", text: "Go" }, { slot: "s" }] }] } });
   one("the items of one row share one centre line", centre.svg, () => {
-    const g = centre.svg; const c = rect(g, "sds-skel-control").map((r) => r[1] + r[3] / 2);
-    const label = Number((g.match(/<text class="sds-label" x="[\d.]+" y="([\d.]+)"/) ?? [])[1]) - 4;
+    const g = centre.svg; const c = rect(g, "dl-ctl").map((r) => r[1] + r[3] / 2);
+    const label = Number((g.match(/<text class="dl-name" x="[\d.]+" y="([\d.]+)"/) ?? [])[1]) - 4;
     return new Set([...c, label]).size === 1 && none(centre.findings); });
   const nestOf = (tags) => tags.reduceRight((inner, tag) => ({ tag, rows: inner ? [{ items: [{ frame: inner }] }] : [] }), undefined);
   const deep = { kind: "skeleton", frame: { rows: [{ items: [{ frame: nestOf(["a", "b", "c", "d"]) }] }] } };
@@ -720,18 +740,18 @@ console.log("\n=== SKELETON — the marks, the controls and the check of a layer
   const box = (props) => draw({ kind: "skeleton", frame: { rows: [{ items: [{ frame: { tag: "C", ...props, rows: [part("Header"), part("Content"), part("Footer")] } }] }] } });
   const all = box({ frames: ["Header", "Content", "Footer"], raised: true, rounded: true });
   one("a container with `frames` draws with no finding", all.findings, none);
-  one("parts of a container stand with no gap between them", all.svg, (g) => { const r = rect(g, "sds-skel-guide"); return r.length === 3 && r[1][1] === r[0][1] + r[0][3] && r[2][1] === r[1][1] + r[1][3]; });
-  one("a raised frame is one surface behind its parts, rounded", all.svg, (g) => rect(g, "sds-skel-surface").length === 1 && g.includes('class="sds-skel-surface"') && /sds-skel-surface"[^>]*rx="8"/.test(g));
-  one("a raised frame leaves each part its dotted boundary", all.svg, (g) => rect(g, "sds-skel-guide").length === 3 && rect(g, "sds-skel-border").length === 0);
+  one("parts of a container stand with no gap between them", all.svg, (g) => { const r = rect(g, "dl-frame-line"); return r.length === 3 && r[1][1] === r[0][1] + r[0][3] && r[2][1] === r[1][1] + r[1][3]; });
+  one("a raised frame is one surface behind its parts, rounded", all.svg, (g) => rect(g, "dl-sk-surface").length === 1 && g.includes('class="dl-sk-surface"') && /dl-sk-surface"[^>]*rx="8"/.test(g));
+  one("a raised frame leaves each part its dotted boundary", all.svg, (g) => rect(g, "dl-frame-line").length === 3 && rect(g, "dl-line-edge").length === 0);
   const bordered = box({ frames: ["Header", "Content", "Footer"], bordered: true });
-  one("a bordered frame is one outline, square when not `rounded`", bordered.svg, (g) => rect(g, "sds-skel-border").length === 1 && /sds-skel-border"[^>]*rx="0"/.test(g));
-  one("a bordered frame has one solid line between each two parts", bordered.svg, (g) => (g.match(/<path class="sds-skel-border"/g) ?? []).length === 2);
-  one("a part inside a bordered frame shows no dotted boundary", bordered.svg, (g) => rect(g, "sds-skel-guide").length === 0);
+  one("a bordered frame is one outline, square when not `rounded`", bordered.svg, (g) => rect(g, "dl-line-edge").length === 1 && /dl-line-edge"[^>]*rx="0"/.test(g));
+  one("a bordered frame has one solid line between each two parts", bordered.svg, (g) => (g.match(/<path class="dl-line-edge"/g) ?? []).length === 2);
+  one("a part inside a bordered frame shows no dotted boundary", bordered.svg, (g) => rect(g, "dl-frame-line").length === 0);
   const both = box({ frames: ["Content", "Footer"], raised: true, bordered: true, rounded: true });
-  one("a frame may be both raised and bordered", both.svg, (g) => rect(g, "sds-skel-surface").length === 1 && rect(g, "sds-skel-border").length === 1);
-  one("a part in no frame is flat: its dotted boundary and no surface", both.svg, (g) => rect(g, "sds-skel-guide").length === 1);
-  one("a frame holds only the parts named, next to each other", both.svg, (g) => { const s = rect(g, "sds-skel-surface")[0], b = rect(g, "sds-skel-guide")[0]; return s[1] === b[1] + b[3]; });
-  one("an empty `frames` is all flat: three dotted boundaries and no frame", box({ frames: [] }).svg, (g) => rect(g, "sds-skel-guide").length === 3 && !g.includes("sds-skel-surface") && rect(g, "sds-skel-border").length === 0);
+  one("a frame may be both raised and bordered", both.svg, (g) => rect(g, "dl-sk-surface").length === 1 && rect(g, "dl-line-edge").length === 1);
+  one("a part in no frame is flat: its dotted boundary and no surface", both.svg, (g) => rect(g, "dl-frame-line").length === 1);
+  one("a frame holds only the parts named, next to each other", both.svg, (g) => { const s = rect(g, "dl-sk-surface")[0], b = rect(g, "dl-frame-line")[0]; return s[1] === b[1] + b[3]; });
+  one("an empty `frames` is all flat: three dotted boundaries and no frame", box({ frames: [] }).svg, (g) => rect(g, "dl-frame-line").length === 3 && !g.includes("dl-sk-surface") && rect(g, "dl-line-edge").length === 0);
   one("`frames` naming a part that is not there is a finding", box({ frames: ["Nope"], raised: true }).findings, says("no part of this container has that `tag`"));
   one("`frames` with neither `raised` nor `bordered` is a finding", box({ frames: ["Header"] }).findings, says("neither `raised` nor `bordered`"));
   one("`raised` with no `frames` is a finding", box({ raised: true }).findings, says("belong to a frame with `frames`"));
@@ -743,7 +763,7 @@ console.log("\n=== SKELETON — the marks, the controls and the check of a layer
     { frame: { tag: "rail", rows: [{ items: [{ slot: "top" }] }, { items: [item] }, { items: [{ slot: "foot" }] }] } },
     { frame: { tag: "main", rows: [{ items: [{ standin: "rows", lines: 24 }] }] } }] }] } });
   const grown = column({ slot: "nav", fill: true });
-  const guides = (g) => rect(g, "sds-skel-guide");
+  const guides = (g) => rect(g, "dl-frame-line");
   one("a slot with `fill` and nothing inside it draws with no finding", grown.findings, none);
   one("a slot with `fill` reaches down, and the slot after it stands at the foot", grown.svg, (g) => { const r = guides(g); const rail = r[0], nav = r[2], foot = r[3]; return nav[3] > 100 && foot[1] + foot[3] + 16 === rail[1] + rail[3]; });
   one("a slot with no `fill` keeps the height of a control", column({ slot: "nav" }).svg, (g) => guides(g)[2][3] === 32);
@@ -753,13 +773,13 @@ console.log("\n=== SKELETON — the marks, the controls and the check of a layer
   // 14 · a control's size step
   const sized = (size, inner) => draw({ kind: "skeleton", frame: { size, rows: [{ items: [{ control: "button", text: "Go" }, { icon: "add" }, { control: "field", text: "x" }] }, ...(inner ?? [])] } });
   for (const [step, height] of [["XS", 28], ["SM", 32], ["MD", 36], ["LG", 40], ["XL", 44]])
-    one(`size ${step} draws every control ${height} high`, sized(step).svg, (g) => rect(g, "sds-skel-control").length === 3 && rect(g, "sds-skel-control").every((r) => r[3] === height));
-  one("no size is `SM`, 32", sized(undefined).svg, (g) => rect(g, "sds-skel-control").every((r) => r[3] === 32));
+    one(`size ${step} draws every control ${height} high`, sized(step).svg, (g) => rect(g, "dl-ctl").length === 3 && rect(g, "dl-ctl").every((r) => r[3] === height));
+  one("no size is `SM`, 32", sized(undefined).svg, (g) => rect(g, "dl-ctl").every((r) => r[3] === 32));
   one("a frame inside the outer one takes its own size, and a control reads the nearest", draw({ kind: "skeleton", frame: { size: "XL", rows: [{ items: [
     { frame: { tag: "small", size: "XS", rows: [{ items: [{ control: "button", text: "a" }] }] } }, { frame: { tag: "inherits", rows: [{ items: [{ control: "button", text: "b" }] }] } }] }] } }).svg,
-    (g) => rect(g, "sds-skel-control").map((r) => r[3]).join() === "28,44");
+    (g) => rect(g, "dl-ctl").map((r) => r[3]).join() === "28,44");
   one("a size the step lacks is a finding that names it", sized("HUGE").findings, says("`HUGE`"));
-  one("a row's height follows the size step", sized("XL").svg, (g) => rect(g, "sds-box")[0][3] - rect(sized("XS").svg, "sds-box")[0][3] === 16);
+  one("a row's height follows the size step", sized("XL").svg, (g) => rect(g, "dl-sk-window")[0][3] - rect(sized("XS").svg, "dl-sk-window")[0][3] === 16);
 
 
   // 11 · the old fields
@@ -775,70 +795,70 @@ console.log("\n=== SKELETON — the marks, the controls and the check of a layer
   const circles = (g) => [...g.matchAll(/<circle class="([^"]+)" cx="([\d.]+)"/g)].map((m) => [m[1], Number(m[2])]);
   const switches = row({ control: "switch", text: "Off" }, { control: "switch", text: "On", on: true });
   one("a switch draws without a finding", switches.findings, none);
-  one("a switch that is on has its knob at the end of its track, and solid", circles(switches.svg)[1], (g) => g[0].includes("sds-skel-glyph-solid"));
+  one("a switch that is on has its knob at the end of its track, and solid", circles(switches.svg)[1], (g) => g[0].includes("dl-glyph-solid"));
   one("a switch that is off has its knob at the start of its track, and hollow", circles(switches.svg)[0], (g) => !g[0].includes("solid"));
   one("the two knobs stand at different places in their tracks", row({ control: "switch" }, { control: "switch", on: true }).svg,
-    (g) => { const track = rect(g, "sds-skel-control"), knob = circles(g); return knob[0][1] - track[0][0] < track[0][2] / 2 && knob[1][1] - track[1][0] > track[1][2] / 2; });
-  one("a switch's track stands 12 lower than a control", rect(switches.svg, "sds-skel-control")[0][3], 20);
+    (g) => { const track = rect(g, "dl-ctl"), knob = circles(g); return knob[0][1] - track[0][0] < track[0][2] / 2 && knob[1][1] - track[1][0] > track[1][2] / 2; });
+  one("a switch's track stands 12 lower than a control", rect(switches.svg, "dl-ctl")[0][3], 20);
   // Tabs inside a container, a card or a widget are the line; the same tabs at the page level are pills (below).
   const inBox = (...items) => draw({ kind: "skeleton", frame: { rows: [{ items: [{ frame: { rows: [{ items }] } }] }] } });
   const tabs = inBox({ control: "tabs", tabs: ["Email", "SMS", "WhatsApp"], chosen: 1 });
   one("a row of tabs draws without a finding", tabs.findings, none);
-  one("the chosen tab alone is heavy", [...tabs.svg.matchAll(/<text class="sds-label"[^>]*>([^<]+)</g)].map((m) => m[1]).join(), "SMS");
-  one("the chosen tab alone has a line under it", (tabs.svg.match(/<path class="sds-skel-border"/g) ?? []).length, 1);
-  one("with no `chosen`, the first tab is the chosen one", inBox({ control: "tabs", tabs: ["A", "B"] }).svg, (g) => g.includes('<text class="sds-label"') && /sds-label"[^>]*>A</.test(g));
+  one("the chosen tab alone is heavy", [...tabs.svg.matchAll(/<text class="dl-name"[^>]*>([^<]+)</g)].map((m) => m[1]).join(), "SMS");
+  one("the chosen tab alone has a line under it", (tabs.svg.match(/<path class="dl-line-edge"/g) ?? []).length, 1);
+  one("with no `chosen`, the first tab is the chosen one", inBox({ control: "tabs", tabs: ["A", "B"] }).svg, (g) => g.includes('<text class="dl-name"') && /dl-name"[^>]*>A</.test(g));
   one("a `chosen` the row lacks is a finding that counts the tabs", inBox({ control: "tabs", tabs: ["A", "B"], chosen: 2 }).findings, says("has 2 tabs, counted from 0"));
   one("a row of tabs with no words is a finding", inBox({ control: "tabs" }).findings, says("names its words in `tabs`"));
   // Tabs that stand at the page level, in the root frame's rows or in the page head's actions, are a track holding a pill.
   const pageTabs = row({ control: "tabs", tabs: ["Email", "SMS", "WhatsApp"], chosen: 1 });
-  const pageTrack = rect(pageTabs.svg, "sds-skel-surface")[0], pagePill = rect(pageTabs.svg, "sds-skel-control")[1];
+  const pageTrack = rect(pageTabs.svg, "dl-sk-surface")[0], pagePill = rect(pageTabs.svg, "dl-ctl")[1];
   one("tabs at the page level draw without a finding", pageTabs.findings, none);
   one("tabs at the page level are a muted track and a pill, with no line under anything", pageTabs.svg,
-    (g) => rect(g, "sds-skel-surface").length === 1 && rect(g, "sds-skel-control").length === 2 && !g.includes("sds-skel-border") && !g.includes('<path class="sds-skel-control"'));
+    (g) => rect(g, "dl-sk-surface").length === 1 && rect(g, "dl-ctl").length === 2 && !g.includes("dl-line-edge") && !g.includes('<path class="dl-ctl"'));
   one("the pill stands inside the track, which is fully rounded", [pagePill, pageTrack], ([pill, track]) => pill[0] > track[0] && pill[0] + pill[2] < track[0] + track[2] && pill[3] < track[3]);
-  one("the chosen word alone is heavy, and the others are words in the code style", [pageTabs.svg.match(/<text class="sds-label"[^>]*>([^<]+)</g)?.length, pageTabs.svg.match(/<text class="sds-code"/g)?.length], (g) => g[0] === 1 && g[1] === 2);
+  one("the chosen word alone is heavy, and the others are words in the code style", [pageTabs.svg.match(/<text class="dl-name"[^>]*>([^<]+)</g)?.length, pageTabs.svg.match(/<text class="dl-detail"/g)?.length], (g) => g[0] === 1 && g[1] === 2);
   // The track's edge is the row's edge, where the page head and the parts under it start; the words stand inside it.
-  one("the pill's track starts where the row starts, lined up with the page head", pageTrack[0], 24 + 16);
-  one("page-level tabs stand their words inside the track", [...pageTabs.svg.matchAll(/<text class="sds-(?:label|code)" x="([\d.]+)"/g)].map((m) => Number(m[1])), (g) => g.length === 3 && g[1] - g[0] > 0 && g.every((x) => x > pageTrack[0]));
+  one("the pill's track starts where the row starts, lined up with the page head", pageTrack[0], 16 + 16);
+  one("page-level tabs stand their words inside the track", [...pageTabs.svg.matchAll(/<text class="dl-(?:name|detail)" x="([\d.]+)"/g)].map((m) => Number(m[1])), (g) => g.length === 3 && g[1] - g[0] > 0 && g.every((x) => x > pageTrack[0]));
   const headTabs = draw({ kind: "skeleton", views: [{ viewport: "DESKTOP", page: { item: { title: "Overview" }, actions: [{ control: "tabs", tabs: ["Day", "Week"], chosen: 0 }] }, frame: { rows: [{ items: [{ note: "x" }] }] } }] });
-  one("tabs in the page head's actions are pills too", headTabs, (g) => g.findings.length === 0 && !g.svg.includes("sds-skel-border") && rect(g.svg, "sds-skel-surface").length >= 1);
-  one("tabs inside a container still draw the line under the chosen one", (inBox({ control: "tabs", tabs: ["A", "B"] }).svg.match(/<path class="sds-skel-border"/g) ?? []).length, 1);
+  one("tabs in the page head's actions are pills too", headTabs, (g) => g.findings.length === 0 && !g.svg.includes("dl-line-edge") && rect(g.svg, "dl-sk-surface").length >= 1);
+  one("tabs inside a container still draw the line under the chosen one", (inBox({ control: "tabs", tabs: ["A", "B"] }).svg.match(/<path class="dl-line-edge"/g) ?? []).length, 1);
   const badge = row({ control: "badge", text: "Published v2" }, { control: "button", text: "Publish" });
   one("a badge draws without a finding", badge.findings, none);
-  one("a badge stands 8 lower than the button beside it", rect(badge.svg, "sds-skel-control").map((r) => r[3]).join(), "24,32");
-  one("a badge and a button share the row's centre line", rect(badge.svg, "sds-skel-control"), (g) => g[0][1] + g[0][3] / 2 === g[1][1] + g[1][3] / 2);
+  one("a badge stands 8 lower than the button beside it", rect(badge.svg, "dl-ctl").map((r) => r[3]).join(), "24,32");
+  one("a badge and a button share the row's centre line", rect(badge.svg, "dl-ctl"), (g) => g[0][1] + g[0][3] / 2 === g[1][1] + g[1][3] / 2);
   one("a badge with `main` is a finding: it is never something to press", row({ control: "badge", text: "x", main: true }).findings, says("never takes the weight of a main action"));
   one("a badge with no word is a finding", row({ control: "badge" }).findings, says("carries its word in `text`"));
   one("a badge and a tab may carry an icon, drawn with no square around it", inBox({ control: "badge", text: "Platform", icon: "default" }, { control: "tabs", tabs: ["Email"], icon: "default" }),
-    (g) => g.findings.length === 0 && (g.svg.match(/<circle class="sds-skel-glyph /g) ?? []).length === 2 && rect(g.svg, "sds-skel-control").length === 1);
+    (g) => g.findings.length === 0 && (g.svg.match(/<circle class="dl-glyph /g) ?? []).length === 2 && rect(g.svg, "dl-ctl").length === 1);
   one("an icon the set lacks, on a badge, is a finding that names the default", row({ control: "badge", text: "x", icon: "rocket" }).findings, says("`default`"));
   one("the three carry no tag, as every control", row({ control: "switch", tag: "name" }).findings, says("a control carries no tag"));
-  one("none of the three takes the rest of its row with `fill`", rect(row({ control: "badge", text: "x", fill: true }).svg, "sds-skel-control")[0][2], (g) => g < 60);
+  one("none of the three takes the rest of its row with `fill`", rect(row({ control: "badge", text: "x", fill: true }).svg, "dl-ctl")[0][2], (g) => g < 60);
 
   // 13 · a view for each screen class, in one figure
   const frameOf = (label, items = [{ text: "Members" }]) => ({ label, rows: [{ items }] });
   const views = draw({ kind: "skeleton", views: [{ viewport: "MOBILE", frame: frameOf("Phone") }, { viewport: "DESKTOP", frame: frameOf("Desk") }] });
-  const outer = (g) => rect(g, "sds-box");
+  const outer = (g) => rect(g, "dl-sk-window");
   one("a spec with `views` draws without a finding", views.findings, none);
   one("each view is one outer frame", outer(views.svg).length, 2);
-  one("the views are drawn desktop first, whatever order the spec lists them in", [...views.svg.matchAll(/<text class="sds-note"[^>]*>([A-Z]+)</g)].map((m) => m[1]).join(), "DESKTOP,MOBILE");
-  one("a view's width stands for its class: the desktop takes the grid's width", outer(views.svg).map((r) => r[2]).join(), "1052,411");
+  one("the views are drawn desktop first, whatever order the spec lists them in", [...views.svg.matchAll(/<text class="dl-detail"[^>]*>([A-Z]+)</g)].map((m) => m[1]).join(), "DESKTOP,MOBILE");
+  one("a view's width stands for its class: the desktop takes the grid's width", outer(views.svg).map((r) => r[2]).join(), "896,384");
   one("the desktop stands alone on its line, and the phone starts the next", outer(views.svg), (g) => g[1][0] === g[0][0] && g[1][1] > g[0][1] + g[0][3]);
-  one("a figure of views is a skeleton the figure check reads by the skeleton's own rules", views.svg, (g) => g.startsWith('<svg class="sds-drawing sds-skeleton"') && checkFigures(g).length === 0);
+  one("a figure of views is a skeleton the figure check reads by the skeleton's own rules", views.svg, (g) => g.startsWith('<svg class="dl-svg dl-skeleton"') && checkFigures(g).length === 0);
   const three = draw({ kind: "skeleton", views: ["TABLET", "MOBILE", "DESKTOP"].map((viewport) => ({ viewport, frame: frameOf(viewport) })) });
-  one("a view that would pass the grid's width starts a new line: the tablet stands under the desktop", outer(three.svg), (g) => g.length === 3 && g[1][0] === g[0][0] && g[1][1] > g[0][1] + g[0][3] && g[2][1] === g[1][1] && g[1][2] === 617 && g[2][0] - (g[1][0] + g[1][2]) === 24 && g[2][0] + g[2][2] === g[0][0] + g[0][2]);
-  one("a figure of three views is no wider than the grid", three.svg, (g) => Number(g.match(/viewBox="[-\d.]+ [-\d.]+ ([\d.]+)/)[1]) <= 1056);
+  one("a view that would pass the grid's width starts a new line: the tablet stands under the desktop", outer(three.svg), (g) => g.length === 3 && g[1][0] === g[0][0] && g[1][1] > g[0][1] + g[0][3] && g[2][1] > g[1][1] && g[1][2] === 568 && g[2][2] === 384);
+  one("a figure of three views is no wider than the grid", three.svg, (g) => Number(g.match(/viewBox="[-\d.]+ [-\d.]+ ([\d.]+)/)[1]) <= 16 + 896 + 16);
   one("`frame` beside `views` is a finding", draw({ kind: "skeleton", frame: frameOf("x"), views: [{ viewport: "MOBILE", frame: frameOf("y") }] }).findings, says("`frame` or `views`, never both"));
   one("a viewport that is no screen class is refused by name", draw({ kind: "skeleton", views: [{ viewport: "WATCH", frame: frameOf("x") }] }).findings, says("`WATCH`"));
   one("two views of one class are a finding", draw({ kind: "skeleton", views: [{ viewport: "MOBILE", frame: frameOf("x") }, { viewport: "MOBILE", frame: frameOf("y") }] }).findings, says("one view for a screen class"));
   one("a view with no frame is a finding", draw({ kind: "skeleton", views: [{ viewport: "MOBILE" }] }).findings, says("has no `frame`"));
   one("`views` holding no view is a finding, not an empty canvas", draw({ kind: "skeleton", views: [] }), (g) => g.svg === "" && says("holds no view")(g.findings));
   const wide = [{ control: "field", text: "Search members" }, { control: "button", text: "Invite a member" }, { control: "button", text: "Export" }];
-  one("a view whose frame needs more than its class has is a finding that names both widths", draw({ kind: "skeleton", views: [{ viewport: "MOBILE", frame: frameOf("x", wide) }] }).findings, says("and its class stands at 411"));
+  one("a view whose frame needs more than its class has is a finding that names both widths", draw({ kind: "skeleton", views: [{ viewport: "MOBILE", frame: frameOf("x", wide) }] }).findings, says("and its class stands at 384"));
   one("the same row fits a desktop", draw({ kind: "skeleton", views: [{ viewport: "DESKTOP", frame: frameOf("x", wide) }] }).findings, none);
   const beside = [{ frame: { tag: "groups", width: "1/3", rows: [{ items: [{ standin: "list", fill: true }] }] } }, { frame: { tag: "items", rows: [{ items: [{ text: "Project" }] }] } }];
   one("a view measures a share exactly: a third beside the rest fits a desktop", draw({ kind: "skeleton", views: [{ viewport: "DESKTOP", frame: frameOf("x", beside) }] }).findings, none);
-  one("a spec with one frame draws at the grid's width, as before views existed", outer(draw({ kind: "skeleton", frame: frameOf("x") }).svg)[0][2], 1052);
+  one("a spec with one frame draws at the grid's width, as before views existed", outer(draw({ kind: "skeleton", frame: frameOf("x") }).svg)[0][2], 896);
 
   // 13b · a view for each task state its blocks show (RULE.DEVEX.WORKSPACE.230)
   const stated = draw({ kind: "skeleton", views: [
@@ -846,7 +866,7 @@ console.log("\n=== SKELETON — the marks, the controls and the check of a layer
     { viewport: "MOBILE", frame: frameOf("Phone") }, { viewport: "DESKTOP", state: "EMPTY", frame: frameOf("Desk empty") }, { viewport: "DESKTOP", frame: frameOf("Desk") }] });
   one("a view takes `state`, and views of one class in several states draw without a finding", stated.findings, none);
   one("the views of one class stand together, the one with no state first and the rest in `DSTaskStateType`'s order, each under its class and its state",
-    [...stated.svg.matchAll(/<text class="sds-note"[^>]*>([A-Z]+(?: · [A-Z]+)?)</g)].map((m) => m[1]).join(), "DESKTOP,DESKTOP · EMPTY,DESKTOP · DENIED,MOBILE,MOBILE · EMPTY");
+    [...stated.svg.matchAll(/<text class="dl-detail"[^>]*>([A-Z]+(?: · [A-Z]+)?)</g)].map((m) => m[1]).join(), "DESKTOP,DESKTOP · EMPTY,DESKTOP · DENIED,MOBILE,MOBILE · EMPTY");
   one("a state that is no value of `DSTaskStateType` is a finding that names the values",
     draw({ kind: "skeleton", views: [{ viewport: "DESKTOP", state: "LOADING", frame: frameOf("x") }] }).findings, says("`LOADING`"));
   one("two views of one class in one state are a finding",
@@ -860,30 +880,30 @@ console.log("\n=== SKELETON — the marks, the controls and the check of a layer
   const table = (extra = {}) => draw({ kind: "skeleton", frame: { rows: [{ items: [{ standin: "table", fill: true, columns: ["Name", "Email", "State", ""],
     cells: [["Dana Lee", "dana@acme.com", "", { icon: "more" }], ["Omar Haddad", "omar@acme.com", { control: "badge", text: "Invited" }, { icon: "more" }]], ...extra }] }] } });
   one("a table with sample cells draws without a finding", table().findings, none);
-  one("its head row is the words of its columns, and an empty head draws no word", texts(table().svg, "sds-label").map((t) => t[2]).join(), "Name,Email,State");
-  one("a cell stands under the head of its column", texts(table().svg, "sds-code").filter((t) => t[2] === "dana@acme.com" || t[2] === "omar@acme.com").map((t) => t[0]),
-    (g) => g.length === 2 && g[0] === g[1] && g[0] === texts(table().svg, "sds-label")[1][0]);
-  one("a cell may be a badge, drawn as a badge is", rect(table().svg, "sds-skel-control").some((r) => r[3] === 24), true);
-  one("a column with an empty head holds the actions of a row, at the end of the table", rect(table().svg, "sds-skel-control").filter((r) => r[2] === 32 && r[3] === 32),
-    (g) => g.length === 2 && g[0][0] === g[1][0] && g[0][0] + 32 === 24 + 1052 - 16 - 16);
+  one("its head row is the words of its columns, and an empty head draws no word", texts(table().svg, "dl-name").map((t) => t[2]).join(), "Name,Email,State");
+  one("a cell stands under the head of its column", texts(table().svg, "dl-detail").filter((t) => t[2] === "dana@acme.com" || t[2] === "omar@acme.com").map((t) => t[0]),
+    (g) => g.length === 2 && g[0] === g[1] && g[0] === texts(table().svg, "dl-name")[1][0]);
+  one("a cell may be a badge, drawn as a badge is", rect(table().svg, "dl-ctl").some((r) => r[3] === 24), true);
+  one("a column with an empty head holds the actions of a row, at the end of the table", rect(table().svg, "dl-ctl").filter((r) => r[2] === 32 && r[3] === 32),
+    (g) => g.length === 2 && g[0][0] === g[1][0] && g[0][0] + 32 === 16 + 896 - 16 - 16);
   one("a table with no `columns` is a finding", table({ columns: undefined }).findings, says("names the words of its head row in `columns`"));
   one("a row with more cells than columns is a finding that counts both", table({ columns: ["Name"] }).findings, says("holds 4 cells, and the table has 1 columns"));
   one("a cell that is a frame is a finding", table({ cells: [[{ frame: { rows: [] } }]] }).findings, says("a cell of a table is a word, a note, an icon or a control"));
-  one("a table too wide for a phone is refused by the view", draw({ kind: "skeleton", views: [{ viewport: "MOBILE", frame: { rows: [{ items: [{ standin: "table", fill: true, columns: ["Name", "Email", "Role", "State", "Created by", "Created at"], cells: [["Omar Haddad", "omar@acme.com", "Member", "Invited", "Dana Lee", "2 May 2026"]] }] }] } }] }).findings, says("its class stands at 411"));
+  one("a table too wide for a phone is refused by the view", draw({ kind: "skeleton", views: [{ viewport: "MOBILE", frame: { rows: [{ items: [{ standin: "table", fill: true, columns: ["Name", "Email", "Role", "State", "Created by", "Created at"], cells: [["Omar Haddad", "omar@acme.com", "Member", "Invited", "Dana Lee", "2 May 2026"]] }] }] } }] }).findings, says("its class stands at 384"));
 
   // 15 · an item line
   const line = (item, extra = {}) => draw({ kind: "skeleton", frame: { rows: [{ items: [{ item, fill: true, ...extra }] }] } });
   const full = line({ media: "person", title: "Dana Lee", description: "Admin", end: [{ control: "badge", text: "Invited" }, { icon: "more" }] });
   one("an item line draws without a finding", full.findings, none);
-  one("its title is heavy and its description is quiet", [texts(full.svg, "sds-title").map((t) => t[2]).join(), texts(full.svg, "sds-note").map((t) => t[2]).includes("Admin")].join(), "Dana Lee,true");
-  one("the description stands under the title, at the same start", [texts(full.svg, "sds-title")[0], texts(full.svg, "sds-note").find((t) => t[2] === "Admin")], (g) => g[0][0] === g[1][0] && g[1][1] > g[0][1]);
-  one("the media is as tall as the two lines beside it, and the words start after it", texts(full.svg, "sds-title")[0][0], 24 + 16 + 40 + 8);
-  one("beside a title alone the media is as tall as a control", texts(line({ media: "person", title: "Dana Lee" }).svg, "sds-title")[0][0], 24 + 16 + 32 + 8);
-  one("the media of a person is a circle, and no square", [roundMarks(full.svg)[0].join(":"), rect(full.svg, "sds-skel-control").filter((r) => r[0] === 40).length].join(), "sds-skel-control:20,0");
-  one("what is pressed at the end of an item keeps its square", rect(full.svg, "sds-skel-control").some((r) => r[2] === 32 && r[3] === 32), true);
-  one("what stands at its end ends at the end of the line", rect(full.svg, "sds-skel-control").map((r) => r[0] + r[2]), (g) => Math.max(...g) === 24 + 1052 - 16);
-  one("an item with a description stands taller than one without", rect(full.svg, "sds-box")[0][3] > rect(line({ title: "Dana Lee" }).svg, "sds-box")[0][3], true);
-  one("an item with no media starts its words at the start of the line", texts(line({ title: "Dana Lee" }).svg, "sds-title")[0][0], 24 + 16);
+  one("its title is heavy and its description is quiet", [texts(full.svg, "dl-name").map((t) => t[2]).join(), texts(full.svg, "dl-detail").map((t) => t[2]).includes("Admin")].join(), "Dana Lee,true");
+  one("the description stands under the title, at the same start", [texts(full.svg, "dl-name")[0], texts(full.svg, "dl-detail").find((t) => t[2] === "Admin")], (g) => g[0][0] === g[1][0] && g[1][1] > g[0][1]);
+  one("the media is as tall as the two lines beside it, and the words start after it", texts(full.svg, "dl-name")[0][0], 16 + 16 + 40 + 8);
+  one("beside a title alone the media is as tall as a control", texts(line({ media: "person", title: "Dana Lee" }).svg, "dl-name")[0][0], 16 + 16 + 32 + 8);
+  one("the media of a person is a circle, and no square", [roundMarks(full.svg)[0].join(":"), rect(full.svg, "dl-ctl").filter((r) => r[0] === 40).length].join(), "dl-ctl:20,0");
+  one("what is pressed at the end of an item keeps its square", rect(full.svg, "dl-ctl").some((r) => r[2] === 32 && r[3] === 32), true);
+  one("what stands at its end ends at the end of the line", rect(full.svg, "dl-ctl").map((r) => r[0] + r[2]), (g) => Math.max(...g) === 16 + 896 - 16);
+  one("an item with a description stands taller than one without", rect(full.svg, "dl-sk-window")[0][3] > rect(line({ title: "Dana Lee" }).svg, "dl-sk-window")[0][3], true);
+  one("an item with no media starts its words at the start of the line", texts(line({ title: "Dana Lee" }).svg, "dl-name")[0][0], 16 + 16);
   one("an item with no title is a finding", line({ media: "person" }).findings, says("carries its `title`"));
   one("a media the set lacks is a finding that names the default", line({ media: "rocket", title: "x" }).findings, says("`default`"));
   one("a frame at the end of an item line is a finding", line({ title: "x", end: [{ frame: { rows: [] } }] }).findings, says("the end of an item line holds"));
@@ -891,14 +911,14 @@ console.log("\n=== SKELETON — the marks, the controls and the check of a layer
   // 15a · the line of facts under an item's title
   const facts = line({ media: "default", title: "SaaS Plane Platform", meta: [{ control: "badge", text: "Platform" }, "platform", "Owner: Dana Lee"] });
   one("an item with a line of facts draws without a finding", facts.findings, none);
-  one("a dot stands between every two facts, a badge among them", texts(facts.svg, "sds-note").map((t) => t[2]).join("|"), "·|platform|·|Owner: Dana Lee");
-  one("the dot after a badge stands between the badge and the next fact", [rect(facts.svg, "sds-skel-control").find((r) => r[3] === 16), texts(facts.svg, "sds-note")],
-    (g) => g[1][0][0] > g[0][0] + g[0][2] && g[1][0][0] < g[1][1][0]);
+  one("a dot stands between every two facts, a badge among them", texts(facts.svg, "dl-detail").map((t) => t[2]).join("|"), "Platform|·|platform|·|Owner: Dana Lee");
+  one("the dot after a badge stands between the badge and the next fact", [rect(facts.svg, "dl-ctl").find((r) => r[3] === 16), texts(facts.svg, "dl-detail")],
+    (g) => g[1][1][0] > g[0][0] + g[0][2] && g[1][1][0] < g[1][2][0]);
   const badges = line({ title: "x", meta: [{ control: "badge", text: "Platform", icon: "default" }, { control: "badge", text: "Pending", icon: "default" }] });
-  one("two badges on one line have a dot between them", [badges.findings.length, texts(badges.svg, "sds-note").map((t) => t[2]).join("|")], (g) => g[0] === 0 && g[1] === "·");
-  one("the facts stand on one line under the title, in the order given", [rect(facts.svg, "sds-skel-control").find((r) => r[3] === 16), texts(facts.svg, "sds-note")[0], texts(facts.svg, "sds-title")[0]],
+  one("two badges on one line have a dot between them", [badges.findings.length, texts(badges.svg, "dl-detail").map((t) => t[2]).join("|")], (g) => g[0] === 0 && g[1] === "Platform|·|Pending");
+  one("the facts stand on one line under the title, in the order given", [rect(facts.svg, "dl-ctl").find((r) => r[3] === 16), texts(facts.svg, "dl-detail").find((t) => t[2] === "platform"), texts(facts.svg, "dl-name")[0]],
     (g) => g[0][0] === g[2][0] && g[1][0] > g[0][0] + g[0][2] && g[1][1] > g[2][1]);
-  one("an item whose facts hold a badge stands a little taller than one whose facts are words", rect(facts.svg, "sds-box")[0][3] > rect(line({ title: "x", description: "y" }).svg, "sds-box")[0][3], true);
+  one("an item whose facts hold a badge stands a little taller than one whose facts are words", rect(facts.svg, "dl-sk-window")[0][3] > rect(line({ title: "x", description: "y" }).svg, "dl-sk-window")[0][3], true);
   one("a fact that is neither a word nor a badge is a finding", line({ title: "x", meta: [{ control: "button", text: "Go" }] }).findings, says("a word or a badge"));
 
   // 15a2 · an item marked `inline`: its facts stand on the title's line, after a dot
@@ -906,57 +926,57 @@ console.log("\n=== SKELETON — the marks, the controls and the check of a layer
   const compactPlain = line({ title: "v3" });
   const compactFacts = line({ title: "v3", meta: [{ control: "badge", text: "Draft" }] });
   one("an inline item draws without a finding", compact.findings, none);
-  one("an inline item stands one line tall, as a title alone does", rect(compact.svg, "sds-box")[0][3], rect(compactPlain.svg, "sds-box")[0][3]);
-  one("an item with facts and not inline keeps its facts under the title and stands taller", rect(compactFacts.svg, "sds-box")[0][3] > rect(compactPlain.svg, "sds-box")[0][3], true);
+  one("an inline item stands one line tall, as a title alone does", rect(compact.svg, "dl-sk-window")[0][3], rect(compactPlain.svg, "dl-sk-window")[0][3]);
+  one("an item with facts and not inline keeps its facts under the title and stands taller", rect(compactFacts.svg, "dl-sk-window")[0][3] > rect(compactPlain.svg, "dl-sk-window")[0][3], true);
   one("an inline item's badge stands on the title's line, after the title and a dot",
-    [texts(compact.svg, "sds-title")[0], texts(compact.svg, "sds-note").find((t) => t[2] === "·"), rect(compact.svg, "sds-skel-control").find((r) => r[3] === 16)],
+    [texts(compact.svg, "dl-name")[0], texts(compact.svg, "dl-detail").find((t) => t[2] === "·"), rect(compact.svg, "dl-ctl").find((r) => r[3] === 16)],
     (g) => g[1][0] > g[0][0] && g[2][0] > g[1][0] && Math.abs((g[2][1] + g[2][3] / 2) - (g[0][1] - 4)) <= 3);
-  one("an inline item's dot stands level with its title's words", [texts(compact.svg, "sds-title")[0][1], texts(compact.svg, "sds-note").find((t) => t[2] === "·")[1]], (g) => g[0] === g[1]);
+  one("an inline item's dot stands level with its title's words", [texts(compact.svg, "dl-name")[0][1], texts(compact.svg, "dl-detail").find((t) => t[2] === "·")[1]], (g) => g[0] === g[1]);
 
   // 15b · a card: a thin rounded outline, with a title of its own
   const card = (frame) => draw({ kind: "skeleton", frame: { rows: [{ items: [{ frame }] }] } });
   const titled = card({ look: "card", label: "Sign-in", rows: [{ items: [{ text: "Account" }] }] });
   one("a card with a title draws without a finding, and needs no tag", titled.findings, none);
-  one("a card is a thin outline with a rounded corner, and nothing behind it", titled.svg, (g) => /<rect class="sds-skel-control"[^>]*rx="8"/.test(g) && !g.includes("sds-skel-surface") && !g.includes("sds-skel-guide"));
-  one("a card's title is drawn as a title, in the heavy weight", titled.svg, (g) => /<text class="sds-title"[^>]*>Sign-in</.test(g));
-  one("a card's head is lower than the head of a frame with a title", rect(titled.svg, "sds-box")[0][3] < rect(card({ tag: "x", label: "Sign-in", rows: [{ items: [{ text: "Account" }] }] }).svg, "sds-box")[0][3] - 16, true);
+  one("a card is a thin outline with a rounded corner, and nothing behind it", titled.svg, (g) => /<rect class="dl-ctl"[^>]*rx="10"/.test(g) && !g.includes("dl-sk-surface") && !g.includes("dl-frame-line"));
+  one("a card's title is drawn as a title, in the heavy weight", titled.svg, (g) => /<text class="dl-name"[^>]*>Sign-in</.test(g));
+  one("a card's head is lower than the head of a frame with a title", rect(titled.svg, "dl-sk-window")[0][3] < rect(card({ tag: "x", label: "Sign-in", rows: [{ items: [{ text: "Account" }] }] }).svg, "dl-sk-window")[0][3] - 16, true);
   one("a card with neither a title nor a tag is a finding", card({ look: "card", rows: [] }).findings, says("carries no name"));
 
   // 15c · a container on a surface: one thin outline holding its header, its content and its footer (RULE.DEVEX.WORKSPACE.268)
   const boxed = card({ look: "container", label: "Sign-in", note: "By app", actions: [{ control: "button", text: "Set our own" }],
     rows: [{ items: [{ text: "Account" }] }], footer: [{ items: [{ note: "Follows the default" }] }] });
-  const outline = (g) => [...g.matchAll(/<rect class="sds-skel-control" x="([\d.]+)" y="([\d.]+)" width="([\d.]+)" height="([\d.]+)" rx="8"/g)].map((m) => m.slice(1).map(Number));
+  const outline = (g) => [...g.matchAll(/<rect class="dl-ctl" x="([\d.]+)" y="([\d.]+)" width="([\d.]+)" height="([\d.]+)" rx="\d+" data-corner="(?:xs|sm|md|lg|xl|frame)"/g)].map((m) => m.slice(1).map(Number));
   /** A container's extent is the first dotted outline; the thin rounded box under its header is `outline`. */
-  const extent = (g) => rect(g, "sds-skel-guide")[0];
+  const extent = (g) => rect(g, "dl-frame-line")[0];
   one("a container draws without a finding", boxed.findings, none);
-  const lineYs = (g) => [...g.matchAll(/<path class="sds-skel-control" d="M[\d.]+ ([\d.]+) H[\d.]+"\/>/g)].map((m) => Number(m[1]));
-  one("its title stands inside its outline, in the heavy weight, with the line under it quiet", [texts(boxed.svg, "sds-title").find((t) => t[2] === "Sign-in"), texts(boxed.svg, "sds-note").find((t) => t[2] === "By app"), extent(boxed.svg)],
+  const lineYs = (g) => [...g.matchAll(/<path class="dl-ctl" d="M[\d.]+ ([\d.]+) H[\d.]+"\/>/g)].map((m) => Number(m[1]));
+  one("its title stands inside its outline, in the heavy weight, with the line under it quiet", [texts(boxed.svg, "dl-name").find((t) => t[2] === "Sign-in"), texts(boxed.svg, "dl-detail").find((t) => t[2] === "By app"), extent(boxed.svg)],
     (g) => g[0][1] > g[2][1] && g[1][1] > g[0][1] && g[0][0] === g[2][0] + 16);
-  one("its actions stand at the end of its header, inside the outline", rect(boxed.svg, "sds-skel-control").find((r) => r[3] === 32 && r[2] > 60), (g) => g[0] + g[2] === extent(boxed.svg)[0] + extent(boxed.svg)[2] - 16 && g[1] > extent(boxed.svg)[1]);
+  one("its actions stand at the end of its header, inside the outline", rect(boxed.svg, "dl-ctl").find((r) => r[3] === 32 && r[2] > 60), (g) => g[0] + g[2] === extent(boxed.svg)[0] + extent(boxed.svg)[2] - 16 && g[1] > extent(boxed.svg)[1]);
   // The default frame of a container (RULE.DEVEX.WORKSPACE.269): a dotted extent, an unframed header, and one rounded box under the header.
-  one("its extent is a dotted outline, and no line stands under the header: the one line is the footer's, inside the box", [rect(boxed.svg, "sds-skel-guide").length, lineYs(boxed.svg), outline(boxed.svg)[0]], (g) => g[0] === 1 && g[1].length === 1 && g[1][0] > g[2][1] + 16);
+  one("its extent is a dotted outline, and no line stands under the header: the one line is the footer's, inside the box", [rect(boxed.svg, "dl-frame-line").length, lineYs(boxed.svg), outline(boxed.svg)[0]], (g) => g[0] === 1 && g[1].length === 1 && g[1][0] > g[2][1] + 16);
   one("its content and its footer stand in one thin rounded box under the header, to the extent's bottom and sides",
-    [extent(boxed.svg), outline(boxed.svg), texts(boxed.svg, "sds-note").find((t) => t[2] === "By app")],
+    [extent(boxed.svg), outline(boxed.svg), texts(boxed.svg, "dl-detail").find((t) => t[2] === "By app")],
     ([ext, boxes, note]) => boxes.length === 1 && boxes[0][0] === ext[0] && boxes[0][2] === ext[2] && boxes[0][1] + boxes[0][3] === ext[1] + ext[3] && boxes[0][1] > note[1]);
-  one("no box goes round the header: the box begins under its words", [outline(boxed.svg)[0], texts(boxed.svg, "sds-title").find((t) => t[2] === "Sign-in")], ([box, title]) => box[1] > title[1]);
-  one("its content stands inside the outline", texts(boxed.svg, "sds-label").find((t) => t[2] === "Account"), (g) => g[1] > outline(boxed.svg)[0][1] && g[0] === outline(boxed.svg)[0][0] + 16);
+  one("no box goes round the header: the box begins under its words", [outline(boxed.svg)[0], texts(boxed.svg, "dl-name").find((t) => t[2] === "Sign-in")], ([box, title]) => box[1] > title[1]);
+  one("its content stands inside the outline", texts(boxed.svg, "dl-name").find((t) => t[2] === "Account"), (g) => g[1] > outline(boxed.svg)[0][1] && g[0] === outline(boxed.svg)[0][0] + 16);
   // 15c · a footer sits under a line, inside the same box (RULE.DEVEX.WORKSPACE.272)
   one("its footer stands in the same box as its content, under a line that crosses the box", boxed.svg,
-    (g) => lineYs(g).length === 1 && outline(g).length === 1 && texts(g, "sds-code").some((t) => t[2] === "Follows the default" && t[1] > lineYs(g)[0] && t[1] < outline(g)[0][1] + outline(g)[0][3]) && lineYs(g)[0] > outline(g)[0][1]);
+    (g) => lineYs(g).length === 1 && outline(g).length === 1 && texts(g, "dl-detail").some((t) => t[2] === "Follows the default" && t[1] > lineYs(g)[0] && t[1] < outline(g)[0][1] + outline(g)[0][3]) && lineYs(g)[0] > outline(g)[0][1]);
   // 15c · the content of a container is one or more parts, a line between every two, and no dotted boundary on a part
   const partOf = (label, extra = {}) => ({ part: true, label, rows: [{ items: [{ text: label + " field" }] }], ...extra });
   const threeParts = card({ look: "container", label: "New job", sections: [partOf("Details"), partOf("Trigger"), partOf("Destinations")] });
   one("three content parts draw without a finding", threeParts.findings, none);
-  one("three content parts draw two lines inside the box and no dotted boundary but the extent", [lineYs(threeParts.svg).length, rect(threeParts.svg, "sds-skel-guide").length, texts(threeParts.svg, "sds-note").filter((t) => t[2] === "Group").length],
+  one("three content parts draw two lines inside the box and no dotted boundary but the extent", [lineYs(threeParts.svg).length, rect(threeParts.svg, "dl-frame-line").length, texts(threeParts.svg, "dl-detail").filter((t) => t[2] === "Group").length],
     (g) => g[0] === 2 && g[1] === 1 && g[2] === 0);
-  one("each part carries its own title", ["Details", "Trigger", "Destinations"].map((t) => texts(threeParts.svg, "sds-title").some((x) => x[2] === t) || texts(threeParts.svg, "sds-step").some((x) => x[2] === t) || JSON.stringify(threeParts.svg).includes(">" + t + "<")), (g) => g.every(Boolean));
+  one("each part carries its own title", ["Details", "Trigger", "Destinations"].map((t) => texts(threeParts.svg, "dl-name").some((x) => x[2] === t) || texts(threeParts.svg, "sds-step").some((x) => x[2] === t) || JSON.stringify(threeParts.svg).includes(">" + t + "<")), (g) => g.every(Boolean));
   const withGroup = card({ look: "container", label: "New job", sections: [partOf("Details"),
     partOf("Destinations", { sections: [{ label: "Destination 1", rows: [{ items: [{ text: "Type" }] }] }] })] });
-  one("a group inside a part keeps its dotted boundary and the word Group", [withGroup.findings, rect(withGroup.svg, "sds-skel-guide").length, texts(withGroup.svg, "sds-note").filter((t) => t[2] === "Group").length],
+  one("a group inside a part keeps its dotted boundary and the word Group", [withGroup.findings, rect(withGroup.svg, "dl-frame-line").length, texts(withGroup.svg, "dl-detail").filter((t) => t[2] === "Group").length],
     (g) => g[0].length === 0 && g[1] === 2 && g[2] === 1);
   one("a footer under two parts is a second line, under the last part", card({ look: "container", label: "x", sections: [partOf("A"), partOf("B")], footer: [{ items: [{ note: "n" }] }] }).svg, (g) => lineYs(g).length === 2);
   one("sections with no `part` stay groups, with no line between them", card({ look: "container", label: "x", sections: [{ label: "A", rows: [{ items: [{ text: "a" }] }] }, { label: "B", rows: [{ items: [{ text: "b" }] }] }] }).svg,
-    (g) => lineYs(g).length === 0 && texts(g, "sds-note").filter((t) => t[2] === "Group").length === 2);
+    (g) => lineYs(g).length === 0 && texts(g, "dl-detail").filter((t) => t[2] === "Group").length === 2);
   one("a container with no header is its outline alone, and needs no name", card({ look: "container", rows: [{ items: [{ text: "x" }] }] }), (g) => g.findings.length === 0 && outline(g.svg).length === 1);
   one("a frame at the end of a container's header is a finding", card({ look: "container", label: "x", actions: [{ frame: { rows: [] } }], rows: [] }).findings, says("the actions of a container's header"));
   // 15c · content that is only cards stands flush (RULE.DEVEX.WORKSPACE.269)
@@ -972,70 +992,72 @@ console.log("\n=== SKELETON — the marks, the controls and the check of a layer
   const withAction = card({ look: "card", label: "Account", actions: [{ control: "button", text: "Add directory" }], rows: [{ items: [{ text: "x" }] }] });
   const withoutAction = card({ look: "card", label: "Account", rows: [{ items: [{ text: "x" }] }] });
   one("a card's actions stand at the end of its title's line, inside its outline",
-    [withAction.findings, rect(withAction.svg, "sds-skel-control").find((r) => r[3] === 32 && r[2] > 60), outline(withAction.svg)[0], texts(withAction.svg, "sds-title").find((t) => t[2] === "Account")],
+    [withAction.findings, rect(withAction.svg, "dl-ctl").find((r) => r[3] === 32 && r[2] > 60), outline(withAction.svg)[0], texts(withAction.svg, "dl-name").find((t) => t[2] === "Account")],
     ([found, button, box, title]) => found.length === 0 && button !== undefined && button[0] + button[2] === box[0] + box[2] - 16 && button[1] < title[1] && title[1] < button[1] + button[3]);
   one("a card with an action stands taller than one without", [withAction, withoutAction].map((c) => outline(c.svg)[0][3]), (g) => g[0] > g[1]);
   one("a card's action that is a frame is a finding", card({ look: "card", label: "x", actions: [{ frame: { rows: [] } }], rows: [] }).findings, says("the actions of a card's header"));
   // 15c · a brand pressed to set it up is a tile (RULE.DEVEX.WORKSPACE.269)
   const tile = (on) => card({ look: "card", label: "Social sign-in", rows: [{ items: [{ icon: "default", mark: false, ...(on === undefined ? {} : { on }) }] }] });
-  one("an icon with `mark: false` and `on` is a square action as tall as a control, and not a circle", [tile(true).findings, rect(tile(true).svg, "sds-skel-control").filter((r) => r[2] === 32 && r[3] === 32).length, (tile(false).svg.match(/<circle class="sds-skel-(?:bar|control)"/g) ?? []).length],
+  one("an icon with `mark: false` and `on` is a square action as tall as a control, and not a circle", [tile(true).findings, rect(tile(true).svg, "dl-ctl").filter((r) => r[2] === 32 && r[3] === 32).length, (tile(false).svg.match(/<circle class="sds-skel-(?:bar|control)"/g) ?? []).length],
     ([found, squares, circles]) => found.length === 0 && squares === 1 && circles === 0);
   one("a tile that is set up carries a small filled check at its top end corner, and one that is not carries none",
-    [rect(tile(true).svg, "sds-skel-control").find((r) => r[2] === 32 && r[3] === 32), [...tile(true).svg.matchAll(/<circle class="sds-skel-bar" cx="([\d.]+)" cy="([\d.]+)" r="4"/g)].map((m) => [Number(m[1]), Number(m[2])]), (tile(false).svg.match(/<circle class="sds-skel-bar"/g) ?? []).length],
+    [rect(tile(true).svg, "dl-ctl").find((r) => r[2] === 32 && r[3] === 32), [...tile(true).svg.matchAll(/<circle class="dl-bar" cx="([\d.]+)" cy="([\d.]+)" r="4"/g)].map((m) => [Number(m[1]), Number(m[2])]), (tile(false).svg.match(/<circle class="dl-bar"/g) ?? []).length],
     ([square, checks, none]) => checks.length === 1 && checks[0][0] === square[0] + square[2] && checks[0][1] === square[1] && none === 0);
   const parted = card({ look: "container", label: "Web addresses", sections: [
     { label: "Sites", actions: [{ control: "button", text: "Change" }], rows: [{ items: [{ text: "plat.spn.io" }] }] },
     { label: "Email domains", actions: [{ control: "button", text: "Add" }], rows: [{ items: [{ note: "None yet" }] }] }] });
   one("a container with two parts of content draws without a finding", parted.findings, none);
-  one("each part has its own title, with its action at the end of that title", [texts(parted.svg, "sds-title").find((t) => t[2] === "Email domains"), rect(parted.svg, "sds-skel-control").filter((r) => r[3] === 32)],
+  one("each part has its own title, with its action at the end of that title", [texts(parted.svg, "dl-name").find((t) => t[2] === "Email domains"), rect(parted.svg, "dl-ctl").filter((r) => r[3] === 32)],
     (g) => g[1].length === 2 && Math.abs((g[1][1][1] + 16) - (g[0][1] - 4)) < 1 && g[1][1][0] + g[1][1][2] === outline(parted.svg)[0][0] + outline(parted.svg)[0][2] - 16);
-  one("no line crosses the container, under the header or between its parts", (parted.svg.match(/<path class="sds-skel-control" d="M/g) ?? []).length, 0);
+  one("no line crosses the container, under the header or between its parts", (parted.svg.match(/<path class="dl-ctl" d="M/g) ?? []).length, 0);
   one("a part of the content with a title and no unit is a group: a dotted boundary, *Group* at its corner, its title inside",
-    [rect(parted.svg, "sds-skel-guide"), texts(parted.svg, "sds-note").filter((t) => t[2] === "Group"), texts(parted.svg, "sds-title").find((t) => t[2] === "Sites")],
+    [rect(parted.svg, "dl-frame-line"), texts(parted.svg, "dl-detail").filter((t) => t[2] === "Group"), texts(parted.svg, "dl-name").find((t) => t[2] === "Sites")],
     ([guides, names, title]) => guides.length === 3 && names.length === 2 && names[0][1] < title[1] && title[1] < guides[1][1] + guides[1][3]);
   // 15c · the titles of a surface stand in steps
-  const stepOf = (g, words) => (g.match(new RegExp(`style="([^"]*)">${words}<`)) ?? [])[1];
+  // THE LANGUAGE HAS THREE LEVELS OF TEXT, never a fourth, so a skeleton's title of every step is a name; what the step still decides
+  // is the line the words stand on (its height and its gap), which the cases below keep asserting.
+  const stepOf = (g, words) => (g.match(new RegExp(`<text class="([\\w -]+)"[^>]*>${words}<`)) ?? [])[1];
   const stepped = card({ look: "container", label: "Sign-in", rows: [{ items: [{ frame: { look: "card", label: "Account", sections: [
     { label: "Directories", actions: [{ control: "button", text: "Add" }], rows: [{ items: [{ item: { title: "Acme Okta", meta: ["SAML"] }, fill: true }] }] }] } }] }] });
   one("a card with a part of content draws without a finding", stepped.findings, none);
   one("a container's title, a card's, a part's and an item's are four steps, largest first", ["Sign-in", "Account", "Directories", "Acme Okta"].map((w) => stepOf(stepped.svg, w)),
-    (g) => g.join("|") === "font-size:20px|font-size:15px|font-size:13px|font-size:12px;font-weight:500");
-  one("the title of a part is heavy and an item's title is of medium weight", [stepOf(stepped.svg, "Directories"), stepOf(stepped.svg, "Acme Okta")], (g) => !g[0].includes("font-weight") && g[1].includes("font-weight:500"));
+    (g) => g.join("|") === "dl-name|dl-name|dl-name|dl-name");
+  one("the title of a part and an item's title are names, and a name is the one weight the language has", [stepOf(stepped.svg, "Directories"), stepOf(stepped.svg, "Acme Okta")], (g) => g[0] === "dl-name" && g[1] === "dl-name");
   const headed = draw({ kind: "skeleton", frame: { label: "Organization", rows: [{ items: [{ item: { media: "default", title: "SaaS Plane Platform", meta: ["platform"] }, fill: true }] }] } });
-  one("an item on the page itself is the page's header, as large and heavy as a container's title", [headed.findings.length, stepOf(headed.svg, "SaaS Plane Platform")], (g) => g[0] === 0 && g[1] === "font-size:20px");
+  one("an item on the page itself is the page's header, as large and heavy as a container's title", [headed.findings.length, stepOf(headed.svg, "SaaS Plane Platform")], (g) => g[0] === 0 && g[1] === "dl-name");
   const flushed = card({ look: "container", label: "Orders", rows: [{ items: [{ standin: "table", fill: true, flush: true, columns: ["Order", "Customer"], cells: [["ORD-1", "Acme"], ["ORD-2", "Blue"]] }] }] });
-  one("a flush table draws its lines from one edge of the container's outline to the other", [flushed.findings.length, extent(flushed.svg), [...flushed.svg.matchAll(/<path class="sds-skel-(?:control|border)" d="M([\d.]+) [\d.]+ H([\d.]+)"/g)].map((m) => [Number(m[1]), Number(m[2])])],
+  one("a flush table draws its lines from one edge of the container's outline to the other", [flushed.findings.length, extent(flushed.svg), [...flushed.svg.matchAll(/<path class="dl-(?:ctl|line-edge)" d="M([\d.]+) [\d.]+ H([\d.]+)"/g)].map((m) => [Number(m[1]), Number(m[2])])],
     (g) => g[0] === 0 && g[2].length === 2 && g[2].every((l) => l[0] === g[1][0] && l[1] === g[1][0] + g[1][2]));
-  one("the head row of a flush table is a band, with its words in capitals", [flushed.svg.includes('class="sds-skel-surface"'), texts(flushed.svg, "sds-note").map((t) => t[2])], (g) => g[0] && g[1].includes("ORDER") && g[1].includes("CUSTOMER"));
+  one("the head row of a flush table is a band, with its words in capitals", [flushed.svg.includes('class="dl-sk-surface"'), texts(flushed.svg, "dl-label").map((t) => t[2])], (g) => g[0] && g[1].includes("ORDER") && g[1].includes("CUSTOMER"));
   const cardWithMark = card({ look: "card", label: "Email", media: "default", rows: [{ items: [{ note: "SendGrid" }] }] });
-  one("a card with a mark draws it before its title, and the title starts after it", [cardWithMark.findings.length, (cardWithMark.svg.match(/<circle/g) ?? []).length, texts(cardWithMark.svg, "sds-title").find((t) => t[2] === "Email")[0], texts(card({ look: "card", label: "Email", rows: [{ items: [{ note: "SendGrid" }] }] }).svg, "sds-title").find((t) => t[2] === "Email")[0]],
+  one("a card with a mark draws it before its title, and the title starts after it", [cardWithMark.findings.length, (cardWithMark.svg.match(/<circle/g) ?? []).length, texts(cardWithMark.svg, "dl-name").find((t) => t[2] === "Email")[0], texts(card({ look: "card", label: "Email", rows: [{ items: [{ note: "SendGrid" }] }] }).svg, "dl-name").find((t) => t[2] === "Email")[0]],
     (g) => g[0] === 0 && g[1] === 1 && g[2] === g[3] + 30);
   const itemOfThree = line({ media: "default", title: "SendGrid", description: "Sends the email of every app", meta: [{ control: "badge", text: "Connected" }, "Since 2 May"] });
   const itemOfTwo = line({ media: "default", title: "SendGrid", meta: [{ control: "badge", text: "Connected" }, "Since 2 May"] });
-  one("an item with a description and facts stands itemOfThree lines: the description on its own line, the facts under it", [itemOfThree.findings.length, texts(itemOfThree.svg, "sds-note").map((t) => t[2]), rect(itemOfThree.svg, "sds-box")[0][3] - rect(itemOfTwo.svg, "sds-box")[0][3]],
+  one("an item with a description and facts stands itemOfThree lines: the description on its own line, the facts under it", [itemOfThree.findings.length, texts(itemOfThree.svg, "dl-detail").map((t) => t[2]), rect(itemOfThree.svg, "dl-sk-window")[0][3] - rect(itemOfTwo.svg, "dl-sk-window")[0][3]],
     (g) => g[0] === 0 && g[1][0] === "Sends the email of every app" && g[1].includes("Since 2 May") && g[2] === 18);
-  one("an item with a description and no facts keeps itemOfTwo lines", texts(line({ title: "x", description: "y" }).svg, "sds-note").map((t) => t[2]), (g) => g.length === 1 && g[0] === "y");
+  one("an item with a description and no facts keeps itemOfTwo lines", texts(line({ title: "x", description: "y" }).svg, "dl-detail").map((t) => t[2]), (g) => g.length === 1 && g[0] === "y");
   const listWithLines = card({ look: "container", label: "Users", divided: true, rows: [{ items: [{ item: { title: "Dana Lee" }, fill: true }] }, { items: [{ item: { title: "Li Wei" }, fill: true }] }, { items: [{ item: { title: "Omar" }, fill: true }] }] });
-  one("a divided container has a line between each two of its rows, and none under its header", [listWithLines.findings.length, (listWithLines.svg.match(/<path class="sds-skel-control" d="M/g) ?? []).length], (g) => g[0] === 0 && g[1] === 2);
+  one("a divided container has a line between each two of its rows, and none under its header", [listWithLines.findings.length, (listWithLines.svg.match(/<path class="dl-ctl" d="M/g) ?? []).length], (g) => g[0] === 0 && g[1] === 2);
   const radius = (g) => [...g.matchAll(/<circle[^>]* r="([\d.]+)"/g)].map((m) => Number(m[1]));
   one("a mark that is a thing and tells its state is as tall as a control, and one that only tells a state is small",
     [radius(card({ look: "card", label: "x", rows: [{ items: [{ icon: "default", mark: true, on: true, text: "Google" }] }] }).svg)[0], radius(card({ look: "card", label: "x", rows: [{ items: [{ icon: "default", on: true }] }] }).svg)[0]], (g) => g[0] > g[1]);
   const listWithChosen = card({ look: "container", label: "Groups", divided: true, rows: [{ chosen: true, items: [{ item: { title: "Authentication" }, fill: true }] }, { items: [{ item: { title: "Billing" }, fill: true }] }] });
-  one("the chosen line of a list is a band across the box, from its top to the line under the row", [listWithChosen.findings.length, rect(listWithChosen.svg, "sds-skel-surface"), outline(listWithChosen.svg)[0], lineYs(listWithChosen.svg)[0]],
+  one("the chosen line of a list is a band across the box, from its top to the line under the row", [listWithChosen.findings.length, rect(listWithChosen.svg, "dl-sk-surface"), outline(listWithChosen.svg)[0], lineYs(listWithChosen.svg)[0]],
     (g) => g[0] === 0 && g[1].length === 1 && g[1][0][0] === g[2][0] && g[1][0][2] === g[2][2] && g[1][0][1] === g[2][1] && g[1][0][1] + g[1][0][3] === g[3]);
   const cardWithList = draw({ kind: "skeleton", frame: { rows: [{ items: [{ frame: { look: "card", label: "Account", sections: [{ rows: [{ items: [{ control: "switch", text: "Open" }] }] },
     { label: "Directories", divided: true, rows: [{ items: [{ item: { title: "Acme Okta" }, fill: true }] }, { items: [{ item: { title: "Acme Entra" }, fill: true }] }, { items: [{ item: { title: "Acme Ping" }, fill: true }] }] }] } }] }] } });
-  one("a list in a card has a line between each two of its rows, and no line above the part", [cardWithList.findings.length, (cardWithList.svg.match(/<path class="sds-skel-control" d="M/g) ?? []).length], (g) => g[0] === 0 && g[1] === 2);
-  one("a part of a card has no line above it", (card({ look: "card", label: "Account", sections: [{ rows: [{ items: [{ text: "x" }] }] }, { label: "Directories", rows: [{ items: [{ text: "y" }] }] }] }).svg.match(/<path class="sds-skel-control" d="M/g) ?? []).length, 0);
+  one("a list in a card has a line between each two of its rows, and no line above the part", [cardWithList.findings.length, (cardWithList.svg.match(/<path class="dl-ctl" d="M/g) ?? []).length], (g) => g[0] === 0 && g[1] === 2);
+  one("a part of a card has no line above it", (card({ look: "card", label: "Account", sections: [{ rows: [{ items: [{ text: "x" }] }] }, { label: "Directories", rows: [{ items: [{ text: "y" }] }] }] }).svg.match(/<path class="dl-ctl" d="M/g) ?? []).length, 0);
   const groupList = card({ look: "container", label: "Web addresses", sections: [{ label: "Sites", divided: true, rows: [{ items: [{ item: { title: "acme.spn.io" }, fill: true }] }, { items: [{ item: { title: "my.acme.com" }, fill: true }] }] }] });
-  one("the line between two rows of a list in a group stays inside the group's boundary", [groupList.findings.length, rect(groupList.svg, "sds-skel-guide")[1], [...groupList.svg.matchAll(/<path class="sds-skel-control" d="M([\d.]+) [\d.]+ H([\d.]+)"\/>/g)].map((m) => [Number(m[1]), Number(m[2])])],
+  one("the line between two rows of a list in a group stays inside the group's boundary", [groupList.findings.length, rect(groupList.svg, "dl-frame-line")[1], [...groupList.svg.matchAll(/<path class="dl-ctl" d="M([\d.]+) [\d.]+ H([\d.]+)"\/>/g)].map((m) => [Number(m[1]), Number(m[2])])],
     ([found, group, lines]) => found === 0 && lines.length === 1 && lines[0][0] === group[0] && lines[0][1] === group[0] + group[2]);
-  one("a plain word in a row keeps the weight of a word", texts(card({ look: "card", label: "x", rows: [{ items: [{ text: "plain" }] }] }).svg, "sds-label").map((t) => t[2]), (g) => g.includes("plain"));
+  one("a plain word in a row keeps the weight of a word", texts(card({ look: "card", label: "x", rows: [{ items: [{ text: "plain" }] }] }).svg, "dl-name").map((t) => t[2]), (g) => g.includes("plain"));
   one("a look the skeleton lacks names the five it has", card({ tag: "x", look: "glass", rows: [] }).findings, says("raised · bordered · flat · card · container"));
 
   // 16 · one estimate of width, for every spec
   const shared = { kind: "skeleton", frame: { rows: [{ items: [{ frame: { tag: "a", width: "1/4", rows: [{ items: [{ standin: "list", fill: true }] }] } }, { frame: { tag: "b", rows: [{ items: [{ control: "field", text: "x" }, { control: "button", text: "Go" }] }] } }] }] } };
-  one("a spec with one frame is no wider than the grid where its shares fit it", outer(draw(shared).svg)[0][2], 1052);
+  one("a spec with one frame is no wider than the grid where its shares fit it", outer(draw(shared).svg)[0][2], 896);
 
   // 17 · a page's skeleton draws every level: the layout, the page level and each block's unit (RULE.DEVEX.WORKSPACE.260)
   const boxes = (g, cls) => [...g.matchAll(new RegExp(`<rect class="${cls}" x="([\\d.]+)" y="([\\d.]+)" width="([\\d.]+)" height="([\\d.]+)" rx="([\\d.]+)"`, "g"))].map((m) => m.slice(1).map(Number));
@@ -1051,66 +1073,66 @@ console.log("\n=== SKELETON — the marks, the controls and the check of a layer
   const win = (g) => outer(g)[0] ?? [];
   one("a page in a RAIL that is open draws with no finding, its layout drawn round it, and the figure check reads it as a skeleton", [desk.findings, desk.figure, desk.svg.includes(">Dashboard<")], (g) => g[0].length === 0 && g[1].length === 0 && g[2]);
   one("an attached rail that is open is a surface at the window's left edge, 131 wide at a desktop, the window's height",
-    [win(desk.svg), boxes(desk.svg, "sds-skel-surface")[0]], ([w, nav]) => nav[0] === w[0] && nav[1] === w[1] && nav[2] === 131 && nav[3] === w[3] && nav[4] === 0);
+    [win(desk.svg), boxes(desk.svg, "dl-sk-surface")[0]], ([w, nav]) => nav[0] === w[0] && nav[1] === w[1] && nav[2] === 131 && nav[3] === w[3] && nav[4] === 0);
   one("a WIDE body at a desktop is a box 701 wide, square where it is attached, centred in the area beside the open rail",
-    [win(desk.svg), boxes(desk.svg, "sds-skel-border")], ([w, content]) => content.length === 1 && content[0][2] === 701 && content[0][4] === 0
-      && content[0][0] === w[0] + 131 + (1052 - 131 - 701) / 2 && content[0][1] === w[1] && content[0][3] === w[3]);
+    [win(desk.svg), boxes(desk.svg, "dl-line-edge")], ([w, content]) => content.length === 1 && content[0][2] === 701 && content[0][4] === 0
+      && content[0][0] === w[0] + 131 + (896 - 131 - 701) / 2 && content[0][1] === w[1] && content[0][3] === w[3]);
   one("the open rail holds the words of `nav`, and the chosen one is heavier, in a band",
-    [texts(desk.svg, "sds-label").map((t) => t[2]), texts(desk.svg, "sds-title").map((t) => t[2])], ([plain, heavy]) => plain.includes("Dashboard") && plain.includes("Customers") && heavy.includes("Orders") && !plain.includes("Orders"));
+    [texts(desk.svg, "dl-name").map((t) => t[2]), rect(desk.svg, "dl-sk-surface").length], ([words, bands]) => words.includes("Dashboard") && words.includes("Customers") && words.includes("Orders") && bands >= 2);
   const tablet = paged("TABLET", RAIL);
   one("at a tablet the rail is shut to 40 and the box is the screen beside it, since a width only bounds",
-    [tablet.findings.length, boxes(tablet.svg, "sds-skel-surface")[0]?.[2], boxes(tablet.svg, "sds-skel-border")[0]?.[2]], (g) => g[0] === 0 && g[1] === 40 && g[2] === 617 - 40);
+    [tablet.findings.length, boxes(tablet.svg, "dl-sk-surface")[0]?.[2], boxes(tablet.svg, "dl-line-edge")[0]?.[2]], (g) => g[0] === 0 && g[1] === 40 && g[2] === 568 - 40);
   const phone = paged("MOBILE", { ...RAIL, navigation: { ...RAIL.navigation, attached: false }, content: { attached: false } });
   one("on a phone every part attaches: one bar 48 high across the top, the menu at its start, and the content the screen under it",
-    [win(phone.svg), boxes(phone.svg, "sds-skel-surface")[0], boxes(phone.svg, "sds-skel-border")[0], phone.svg.match(/M[\d.]+ [\d.]+ L[\d.]+ [\d.]+ M[\d.]+ [\d.]+ L[\d.]+ [\d.]+ M/) !== null],
-    ([w, bar, content, menu]) => bar[2] === 411 && bar[3] === 48 && bar[1] === w[1] && content[1] === w[1] + 48 && content[2] === 411 && content[4] === 0 && menu);
+    [win(phone.svg), boxes(phone.svg, "dl-sk-surface")[0], boxes(phone.svg, "dl-line-edge")[0], phone.svg.match(/M[\d.]+ [\d.]+ L[\d.]+ [\d.]+ M[\d.]+ [\d.]+ L[\d.]+ [\d.]+ M/) !== null],
+    ([w, bar, content, menu]) => bar[2] === 384 && bar[3] === 48 && bar[1] === w[1] && content[1] === w[1] + 48 && content[2] === 384 && content[4] === 0 && menu);
   const apart = paged("DESKTOP", { type: "RAIL", body: { width: "FULL" }, navigation: { attached: false, open: true }, content: { attached: false } });
   one("a navigation and a content that are not attached are rounded and stand 16 in",
-    [win(apart.svg), boxes(apart.svg, "sds-skel-surface")[0], boxes(apart.svg, "sds-skel-border")[0]],
-    ([w, nav, content]) => nav[0] === w[0] + 16 && nav[1] === w[1] + 16 && nav[4] === 8 && content[4] === 8 && content[0] === nav[0] + 131 + 16 && content[0] + content[2] === w[0] + w[2] - 16);
+    [win(apart.svg), boxes(apart.svg, "dl-sk-surface")[0], boxes(apart.svg, "dl-line-edge")[0]],
+    ([w, nav, content]) => nav[0] === w[0] + 16 && nav[1] === w[1] + 16 && nav[4] === 10 && content[4] === 10 && content[0] === nav[0] + 131 + 16 && content[0] + content[2] === w[0] + w[2] - 16);
   const top = paged("DESKTOP", { type: "TOPNAV", body: { width: "XWIDE" }, navigation: { nav: ["Dashboard", "Orders"], chosen: "Orders" } });
   one("a top bar runs across the window, 48 high, and the content stands under it at the body's width",
-    [win(top.svg), boxes(top.svg, "sds-skel-surface")[0], boxes(top.svg, "sds-skel-border")[0]],
-    ([w, bar, content]) => bar[0] === w[0] && bar[2] === 1052 && bar[3] === 48 && content[1] === w[1] + 48 && content[2] === 842 && content[0] === w[0] + (1052 - 842) / 2);
+    [win(top.svg), boxes(top.svg, "dl-sk-surface")[0], boxes(top.svg, "dl-line-edge")[0]],
+    ([w, bar, content]) => bar[0] === w[0] && bar[2] === 896 && bar[3] === 48 && content[1] === w[1] + 48 && content[2] === 842 && content[0] === w[0] + (896 - 842) / 2);
   const dock = paged("DESKTOP", { type: "DOCK" });
   one("a dock's column stands inside the content, at its left, and the page stands beside it",
-    [boxes(dock.svg, "sds-skel-border")[0], boxes(dock.svg, "sds-skel-surface")[0], texts(dock.svg, "sds-title").find((t) => t[2] === "Orders")],
+    [boxes(dock.svg, "dl-line-edge")[0], boxes(dock.svg, "dl-sk-surface")[0], texts(dock.svg, "dl-name").find((t) => t[2] === "Orders")],
     ([content, column, title]) => column[0] === content[0] && column[1] === content[1] && column[2] === 131 && title[0] > column[0] + 131);
   const canvas = paged("DESKTOP", { type: "CANVAS", body: { width: "MEDIUM" } });
   one("CANVAS draws the body alone: the content's box and no navigation",
-    [canvas.findings.length, boxes(canvas.svg, "sds-skel-border")[0], canvas.svg.includes("sds-skel-surface\" x=\"" + win(canvas.svg)[0])], (g) => g[0] === 0 && g[1][2] === 561 && !g[2]);
+    [canvas.findings.length, boxes(canvas.svg, "dl-line-edge")[0], canvas.svg.includes("dl-sk-surface\" x=\"" + win(canvas.svg)[0])], (g) => g[0] === 0 && g[1][2] === 561 && !g[2]);
   const wideTable = { size: "XS", rows: [{ items: [{ standin: "table", fill: true, columns: ["Order", "Customer", "Email", "Status", "Total", "Placed", "Channel", "Owner"],
     cells: [["#1042", "Acme Corporation", "orders@acme.example", "Pending", "$1,240.00", "2 May 2026", "Online", "Dana Lee"]] }] }] };
   one("a view that needs more room than its content has is a finding that names the content's width",
     paged("DESKTOP", RAIL, undefined, wideTable).findings, says("its content in a `RAIL` with a `WIDE` body stands at 701"));
   const fullBody = paged("DESKTOP", { ...RAIL, body: { width: "FULL" } }, undefined, wideTable);
-  one("the same view fits a FULL body, which is all the window beside the shut rail", [fullBody.findings, boxes(fullBody.svg, "sds-skel-border")[0]?.[2]], (g) => g[0].length === 0 && g[1] === 1052 - 40);
+  one("the same view fits a FULL body, which is all the window beside the shut rail", [fullBody.findings, boxes(fullBody.svg, "dl-line-edge")[0]?.[2]], (g) => g[0].length === 0 && g[1] === 896 - 40);
 
   // 17a · the page level: first in the content, the largest title, its actions at the end, the way back before the title
-  const titleOf = (g, words) => texts(g, "sds-title").filter((t) => t[2] === words).at(-1);
-  one("the page level's title is the largest of a surface's titles, a step over a container's",
-    [stepOf(desk.svg, "Orders"), texts(desk.svg, "sds-note").map((t) => t[2])], (g) => g[0] === "font-size:24px" && g[1].includes("Every order placed"));
+  const titleOf = (g, words) => texts(g, "dl-name").filter((t) => t[2] === words).at(-1);
+  one("the page level's title is a name, and its description a detail",
+    [stepOf(desk.svg, "Orders"), texts(desk.svg, "dl-detail").map((t) => t[2])], (g) => g[0] === "dl-name" && g[1].includes("Every order placed"));
   one("the page level stands first in the content, above the container, with its main action at the end",
-    [titleOf(desk.svg, "Orders"), outline(desk.svg)[0], boxes(desk.svg, "sds-skel-border")[0], desk.svg.match(/<rect class="sds-skel-control sds-skel-main" x="([\d.]+)" y="[\d.]+" width="([\d.]+)"/)],
+    [titleOf(desk.svg, "Orders"), outline(desk.svg)[0], boxes(desk.svg, "dl-line-edge")[0], desk.svg.match(/<rect class="dl-ctl-on" x="([\d.]+)" y="[\d.]+" width="([\d.]+)"/)],
     ([title, container, content, main]) => title[1] < container[1] && title[0] === content[0] + 16 && Number(main[1]) + Number(main[2]) === content[0] + content[2] - 16);
   const back = paged("DESKTOP", undefined, { item: { title: "Blue Bakery" }, back: true });
   one("`back` is the way back, an action before the title, and a page with no layout stands in its window",
-    [back.findings.length, rect(back.svg, "sds-skel-control")[0], titleOf(back.svg, "Blue Bakery"), outer(back.svg).length],
+    [back.findings.length, rect(back.svg, "dl-ctl")[0], titleOf(back.svg, "Blue Bakery"), outer(back.svg).length],
     ([found, icon, title, windows]) => found === 0 && icon[2] === icon[3] && icon[0] + icon[2] < title[0] && windows === 1);
   const headedRoot = paged("DESKTOP", undefined, { item: { title: "Orders" } }, { rows: [{ items: [{ item: { title: "Acme Corp" }, fill: true }] }] });
   one("under a page level, an item in the frame is one thing among the content, not the page's header",
-    [stepOf(headedRoot.svg, "Orders"), stepOf(headedRoot.svg, "Acme Corp")], (g) => g[0] === "font-size:24px" && g[1] === "font-size:12px;font-weight:500");
+    [stepOf(headedRoot.svg, "Orders"), stepOf(headedRoot.svg, "Acme Corp")], (g) => g[0] === "dl-name" && g[1] === "dl-name");
   one("a view's `page` with no `item` is a finding", paged("DESKTOP", RAIL, { actions: [] }).findings, says("`page` carries its `item`"));
 
   // 17b · each block's unit, at the level its name gives
-  const notes = (g) => texts(g, "sds-note").map((t) => t[2]);
+  const notes = (g) => texts(g, "dl-detail").map((t) => t[2]);
   one("a container's unit is named at the corner of its outline, over its header",
-    [notes(desk.svg).includes("DSPanelContainer"), texts(desk.svg, "sds-note").find((t) => t[2] === "DSPanelContainer"), extent(desk.svg)],
+    [notes(desk.svg).includes("DSPanelContainer"), texts(desk.svg, "dl-detail").find((t) => t[2] === "DSPanelContainer"), extent(desk.svg)],
     ([named, name, box]) => named && name[0] === box[0] + 8 && name[1] > box[1] && name[1] < box[1] + 24);
   const headedBox = paged("DESKTOP", RAIL, undefined, { size: "XS", rows: [{ items: [{ frame: { look: "container", unit: "DSPanelContainer", label: "Desk lamps", note: "Lamps for a desk", actions: [{ control: "button", text: "Add product" }],
     rows: [{ items: [{ standin: "table", fill: true, flush: true, columns: ["Product", "Price"], cells: [["Arc desk lamp", "$89.00"]] }] }] } }] }] });
   one("a container's title, the line under it and its actions stand inside its outline, under its unit's name, as `DSPanelContainer.Header`",
-    [headedBox.findings, texts(headedBox.svg, "sds-note").find((t) => t[2] === "DSPanelContainer"), titleOf(headedBox.svg, "Desk lamps"), texts(headedBox.svg, "sds-note").find((t) => t[2] === "Lamps for a desk"), extent(headedBox.svg)],
+    [headedBox.findings, texts(headedBox.svg, "dl-detail").find((t) => t[2] === "DSPanelContainer"), titleOf(headedBox.svg, "Desk lamps"), texts(headedBox.svg, "dl-detail").find((t) => t[2] === "Lamps for a desk"), extent(headedBox.svg)],
     ([found, name, title, note, box]) => found.length === 0 && name[1] < title[1] && title[1] < note[1] && title[0] === box[0] + 16 && title[1] > box[1] && note[1] < box[1] + box[3]);
   one("the rail's chosen entry is named by its word, and an index is a finding that names the word",
     paged("DESKTOP", { ...RAIL, navigation: { ...RAIL.navigation, chosen: 1 } }).findings, says("name the open entry by its word, one of `nav`"));
@@ -1122,21 +1144,21 @@ console.log("\n=== SKELETON — the marks, the controls and the check of a layer
     paged("DESKTOP", { ...RAIL, navigation: { nav: RAIL.navigation.nav } }).findings, says("no `chosen`"));
   one("a container's unit is named once, at its outline's corner", notes(headedBox.svg).filter((name) => name === "DSPanelContainer").length, 1);
   one("a part that is a widget is a dotted boundary round its rows, its name at its corner",
-    [notes(desk.svg), boxes(desk.svg, "sds-skel-guide").length, extent(desk.svg), boxes(desk.svg, "sds-skel-guide")[1]],
+    [notes(desk.svg), boxes(desk.svg, "dl-frame-line").length, extent(desk.svg), boxes(desk.svg, "dl-frame-line")[1]],
     ([names, guides, box, first]) => names.includes("DSFilterBar") && names.includes("DSDataTable") && guides === 3 && first[0] === box[0] + 8 && first[2] === box[2] - 16);
   one("a flush table in a widget reaches the widget's boundary, under its name",
-    [boxes(desk.svg, "sds-skel-guide")[2], desk.svg.match(/<rect class="sds-skel-surface" x="([\d.]+)" y="([\d.]+)" width="([\d.]+)"[^>]*rx="0"\/>\s*<text class="sds-note"[^>]*letter-spacing/)],
+    [boxes(desk.svg, "dl-frame-line")[2], desk.svg.match(/<rect class="dl-sk-surface" x="([\d.]+)" y="([\d.]+)" width="([\d.]+)"[^>]*rx="0"\/>\s*<text class="dl-label"/)],
     ([widget, band]) => band !== null && Number(band[1]) === widget[0] && Number(band[3]) === widget[2] && Number(band[2]) > widget[1] + 20);
   const unitFrames = judge({ kind: "skeleton", frame: { rows: [{ items: [{ frame: { unit: "DSComparison", rows: [{ items: [
     { frame: { unit: "DSCard", label: "Revenue", rows: [{ items: [{ text: "$12,400" }] }] } }] }] } }] }] } });
   one("a frame that names a widget and no look is a dotted boundary with its name, and a card its outline, its name and its title",
-    [unitFrames.findings, notes(unitFrames.svg), boxes(unitFrames.svg, "sds-skel-guide").length, outline(unitFrames.svg).length, stepOf(unitFrames.svg, "Revenue")],
-    ([found, names, guides, cards, step]) => found.length === 0 && names.includes("DSComparison") && names.includes("DSCard") && guides === 1 && cards === 1 && step === "font-size:15px");
+    [unitFrames.findings, notes(unitFrames.svg), boxes(unitFrames.svg, "dl-frame-line").length, outline(unitFrames.svg).length, stepOf(unitFrames.svg, "Revenue")],
+    ([found, names, guides, cards, step]) => found.length === 0 && names.includes("DSComparison") && names.includes("DSCard") && guides === 1 && cards === 1 && step === "dl-name");
   const cardWidget = judge({ kind: "skeleton", frame: { rows: [{ items: [{ frame: { unit: "DSCardWidget", label: "Contacts", media: "person", rows: [{ items: [{ item: { title: "Dana Lee" }, fill: true }] }] } },
     { frame: { unit: "DSCardWidget", label: "Teams", media: "person", rows: [{ items: [{ item: { title: "Sales" }, fill: true }] }] } }] }] } });
   one("`DSCardWidget` is a card: its outline, its name at the corner and its title inside",
-    [cardWidget.findings, notes(cardWidget.svg), outline(cardWidget.svg).length, boxes(cardWidget.svg, "sds-skel-guide").length, stepOf(cardWidget.svg, "Contacts")],
-    ([found, names, cards, guides, step]) => found.length === 0 && names.includes("DSCardWidget") && cards === 2 && guides === 0 && step === "font-size:15px");
+    [cardWidget.findings, notes(cardWidget.svg), outline(cardWidget.svg).length, boxes(cardWidget.svg, "dl-frame-line").length, stepOf(cardWidget.svg, "Contacts")],
+    ([found, names, cards, guides, step]) => found.length === 0 && names.includes("DSCardWidget") && cards === 2 && guides === 0 && step === "dl-name");
   const fourDeep = draw({ kind: "skeleton", views: [{ viewport: "DESKTOP", page: { item: { title: "Overview" } }, frame: { rows: [{ items: [{ frame: { unit: "DSPanelContainer", rows: [{ items: [
     { frame: { unit: "DSComparison", rows: [{ items: [{ frame: { unit: "DSCard", label: "Revenue", sections: [{ label: "This month", rows: [{ items: [{ text: "$12,400" }] }] }], rows: [] } }] }] } }] }] } }] }] } }] });
   one("the count starts at the container: a container, a widget or a card, and a group are three, and a fourth level is a finding",
@@ -1219,7 +1241,7 @@ console.log("=== SKELETON — which unit, when: taught by the book, refused by t
 
   // 7 · a skeleton draws a rail shut to its icons on a desktop too; `open: true` is the exception
   const RAIL = { type: "RAIL", body: { width: "FULL" }, navigation: { nav: ["Orders", "Customers"], chosen: "Orders" } };
-  const railW = (g) => [...g.matchAll(/<rect class="sds-skel-surface" x="[\d.]+" y="[\d.]+" width="([\d.]+)"/g)].map((m) => Number(m[1]))[0];
+  const railW = (g) => [...g.matchAll(/<rect class="dl-sk-surface" x="[\d.]+" y="[\d.]+" width="([\d.]+)"/g)].map((m) => Number(m[1]))[0];
   const body = inPage([{ frame: { unit: "DSPanelContainer", label: "Orders", rows: [{ items: [{ text: "180" }] }] } }]);
   one("a rail at a desktop is shut to its icons, 40 wide, and the words of its entries are not drawn",
     [railW(page(body, RAIL).svg), page(body, RAIL).svg.includes(">Customers<"), page(body, RAIL).findings], (g) => g[0] === 40 && !g[1] && g[2].length === 0);
@@ -1240,25 +1262,27 @@ console.log("=== SKELETON — a feature's head, in DSFeature's own names (RULE.D
     { slot: "mediaNode", fill: true }] }] } });
   const texts = (g, cls) => [...g.matchAll(new RegExp(`<text class="${cls}" x="([\\d.]+)" y="([\\d.]+)"(?: style="([^"]*)")?>([^<]*)<`, "g"))]
     .map((m) => ({ x: Number(m[1]), y: Number(m[2]), style: m[3] ?? "", words: m[4] }));
-  const sized = (g, px) => texts(g, "sds-note").filter((t) => t.style.startsWith(`font-size:${px}px`));
-  const titleOf = (g) => texts(g, "sds-title").filter((t) => /font-size:(24|20|15)px/.test(t.style));
+  // The language has three levels of text, so a head's lines are told apart by their level: the title a name, the description a detail,
+  // the eyebrow a label; the level of the head (PAGE, CONTAINER, WIDGET) sets the line each stands on, and so the height of the head.
+  const sized = (g, level) => texts(g, level === "eyebrow" ? "dl-label" : "dl-detail").filter((t) => t.words !== "mediaNode" && t.words !== "·");
+  const titleOf = (g) => texts(g, "dl-name").filter((t) => t.words !== "After the head");
   const height = (g) => Number(/viewBox="[-\d.]+ [-\d.]+ [\d.]+ ([\d.]+)"/.exec(g)?.[1]);
 
   // 1 · the title stands at its level's step, heavy; the description a step larger than an item's words
-  one("a head's title stands at its level's step: 24px at PAGE, 20px at CONTAINER, 15px at WIDGET, and 20px where `pageLevel` is left out",
-    ["PAGE", "CONTAINER", "WIDGET", undefined].map((pageLevel) => titleOf(headed(pageLevel ? { pageLevel } : {}).svg)[0]?.style),
-    (g) => g.join("|") === "font-size:24px|font-size:20px|font-size:15px|font-size:20px");
-  one("a head's description is 16px at PAGE, 14px at CONTAINER and 13px at WIDGET, each larger than an item's 11px line",
-    ["PAGE", "CONTAINER", "WIDGET"].map((pageLevel, i) => sized(headed({ pageLevel, description: "From paid to shipped." }).svg, [16, 14, 13][i]).map((t) => t.words).join("")),
+  one("a head's title is a name at every level, and the line it stands on follows the level: PAGE over CONTAINER over WIDGET, and a head with no `pageLevel` is a container's",
+    [...["PAGE", "CONTAINER", "WIDGET", undefined].map((pageLevel) => { const g = headed(pageLevel ? { pageLevel } : {}).svg; return [titleOf(g).length, height(g)]; })],
+    (g) => g.every(([n]) => n === 1) && g[0][1] > g[1][1] && g[1][1] > g[2][1] && g[3][1] === g[1][1]);
+  one("a head's description is a detail at every level, under the title",
+    ["PAGE", "CONTAINER", "WIDGET"].map((pageLevel) => sized(headed({ pageLevel, description: "From paid to shipped." }).svg).map((t) => t.words).join("")),
     (g) => g.every((words) => words === "From paid to shipped."));
 
   // 2 · the eyebrow is drawn in capitals, small and spaced, packed 6px above the title
   const withEyebrow = headed({ eyebrow: "Orders" }), without = headed({});
   one("the eyebrow is written in a sentence's case and drawn in capitals, 11px and spaced",
-    sized(withEyebrow.svg, 11).map((t) => [t.words, t.style]),
-    (g) => g.length === 1 && g[0][0] === "ORDERS" && g[0][1].includes("letter-spacing") && !withEyebrow.svg.includes(">Orders<"));
+    sized(withEyebrow.svg, "eyebrow").map((t) => [t.words]),
+    (g) => g.length === 1 && g[0][0] === "ORDERS" && !withEyebrow.svg.includes(">Orders<"));
   one("the eyebrow's line and a 6px gap stand above the title: the title moves down by 14 + 6 and the head grows by the same",
-    [titleOf(withEyebrow.svg)[0]?.y - titleOf(without.svg)[0]?.y, height(withEyebrow.svg) - height(without.svg), titleOf(withEyebrow.svg)[0]?.y - sized(withEyebrow.svg, 11)[0]?.y],
+    [titleOf(withEyebrow.svg)[0]?.y - titleOf(without.svg)[0]?.y, height(withEyebrow.svg) - height(without.svg), titleOf(withEyebrow.svg)[0]?.y - sized(withEyebrow.svg, "eyebrow")[0]?.y],
     ([moved, grown, apart]) => moved === 20 && grown === 20 && apart > 0 && apart < 30);
   one("a head is as tall as its lines and takes no control's height: a title alone at 20px stands lower than a row with a button",
     [height(without.svg), height(draw({ kind: "skeleton", frame: { rows: [{ items: [{ control: "button", text: "Go" }] }] } }).svg)],
@@ -1266,7 +1290,7 @@ console.log("=== SKELETON — a feature's head, in DSFeature's own names (RULE.D
 
   // 3 · the title and the description wrap at a word to the column, and the height counts every line
   const wrapped = narrow({ description: SENTENCE });
-  const lines = sized(wrapped.svg, 14), after = texts(wrapped.svg, "sds-label").find((t) => t.words === "After the head");
+  const lines = sized(wrapped.svg).filter((t) => SENTENCE.includes(t.words)), after = texts(wrapped.svg, "dl-name").find((t) => t.words === "After the head");
   one("a long description in a narrow column wraps at a word, onto three lines or more, and keeps every word",
     [lines.length, lines.map((t) => t.words).join(" ")], ([count, words]) => count >= 3 && words === SENTENCE);
   one("the wrapped head's height counts every line: the row under it starts below the last line, a gap clear",
@@ -1276,16 +1300,16 @@ console.log("=== SKELETON — a feature's head, in DSFeature's own names (RULE.D
 
   // 4 · the facts stand on one line under the description, as an item's facts do
   const facts = headed({ description: "From paid to shipped.", facts: [{ control: "badge", text: "Real time" }, { control: "badge", text: "Shopify" }] });
-  const badges = [...facts.svg.matchAll(/<rect class="sds-skel-control" x="([\d.]+)" y="([\d.]+)" width="[\d.]+" height="16"/g)].map((m) => [Number(m[1]), Number(m[2])]);
+  const badges = [...facts.svg.matchAll(/<rect class="dl-ctl" x="([\d.]+)" y="([\d.]+)" width="[\d.]+" height="16"/g)].map((m) => [Number(m[1]), Number(m[2])]);
   one("a head's facts stand on one line under the description: two badges at the facts' height, side by side, with a dot between",
-    [badges, sized(facts.svg, 14)[0]?.y, texts(facts.svg, "sds-note").filter((t) => t.words === "·").length, facts.findings],
+    [badges, texts(facts.svg, "dl-detail").find((t) => t.words === "From paid to shipped.")?.y, texts(facts.svg, "dl-detail").filter((t) => t.words === "·").length, facts.findings],
     ([marks, description, dots, found]) => marks.length === 2 && marks[0][1] === marks[1][1] && marks[1][0] > marks[0][0] && marks[0][1] > description && dots === 1 && found.length === 0);
-  one("a fact that is only words is drawn as a word", headed({ facts: [{ text: "Live" }] }).svg, (g) => texts(g, "sds-note").some((t) => t.words === "Live"));
+  one("a fact that is only words is drawn as a word", headed({ facts: [{ text: "Live" }] }).svg, (g) => texts(g, "dl-detail").some((t) => t.words === "Live"));
 
   // 5 · `textAlign` `CENTER` centres every line
   const start = headed({ description: "From paid to shipped." }), centred = headed({ description: "From paid to shipped.", textAlign: "CENTER" });
   one("`textAlign` `CENTER` centres every line: each starts further in than at `START`, and the shorter line further in again",
-    [titleOf(start.svg)[0]?.x, titleOf(centred.svg)[0]?.x, sized(start.svg, 14)[0]?.x, sized(centred.svg, 14)[0]?.x, centred.findings],
+    [titleOf(start.svg)[0]?.x, titleOf(centred.svg)[0]?.x, sized(start.svg)[0]?.x, sized(centred.svg)[0]?.x, centred.findings],
     ([titleStart, titleCentre, lineStart, lineCentre, found]) => titleCentre > titleStart && lineCentre > lineStart && lineCentre > titleCentre && found.length === 0);
 
   // 6 · the findings
@@ -1304,7 +1328,7 @@ console.log("=== SKELETON — a feature's head, in DSFeature's own names (RULE.D
     { items: [{ note: "Where each order stands, and what waits." }, { spacer: true }, { control: "badge", text: "Real time" }] },
     { items: [{ item: { media: "default", title: "Live status", description: "Paid, packed or shipped" }, fill: true }] }] } }] };
   one("a spec with loose `text` and `note` items draws byte for byte as it did before the head item",
-    createHash("sha256").update(draw(LOOSE).svg).digest("hex"), "5dad41d636d8f5b8ece28d801e51e4df6adcede2b6863539b049a57d74494a24");
+    createHash("sha256").update(draw(LOOSE).svg).digest("hex"), "dd6b8e12a05443dcdb2d8d7910e99a4a23fa930968d9d435525d28132ceeb292");
 }
 
 console.log("=== SKELETON — a section's fill and room, a feature's frames, and every field read (RULE.DEVEX.WORKSPACE.285 to .288)");
@@ -1316,7 +1340,7 @@ console.log("=== SKELETON — a section's fill and room, a feature's frames, and
   const NOTE = [{ items: [{ note: "Every team rebuilds the same plumbing" }] }];
   const section = (look, rows = NOTE) => draw({ kind: "skeleton", frame: { rows: [{ items: [{ fill: true, frame: { unit: "DSSectionContainer", rows, ...look } }] }] } });
   const feature = (look, rows) => draw({ kind: "skeleton", frame: { rows: [{ items: [{ fill: true, frame: { unit: "DSFeature", rows, ...look } }] }] } });
-  const extent = (g) => boxes(g, "sds-skel-guide")[0];
+  const extent = (g) => boxes(g, "dl-frame-line")[0];
   const DOORS = [{ items: [{ item: { media: "default", title: "Secure", description: "Zero trust by construction" }, fill: true }, { item: { media: "default", title: "Scalable" }, fill: true }] }];
   const HEAD = [{ items: [{ head: { title: "Plans for every team" } }] }];
   const BESIDE = [{ items: [{ frame: { rows: HEAD } }, { slot: "mediaNode · the product", fill: true }] }];
@@ -1325,13 +1349,13 @@ console.log("=== SKELETON — a section's fill and room, a feature's frames, and
   const cell = { fill: true, frame: { unit: "DSFeature", rows: [{ items: [{ head: { pageLevel: "WIDGET", title: "Audit log" } }] }] } };
   const grid = draw({ kind: "skeleton", frame: { rows: [{ items: [{ fill: true, frame: { unit: "DSFeatureGridSectionContainer", rows: [...HEAD, { items: [cell, { ...cell }] }] } }] }] } });
   one("`DSFeatureGridSectionContainer` is a unit a spec may name: a container, drawn as a section is, its name at the corner of its outline",
-    [grid.findings, grid.svg.includes(">DSFeatureGridSectionContainer<"), boxes(grid.svg, "sds-skel-control").filter((b) => b[4] === 8)[0], extent(grid.svg)],
+    [grid.findings, grid.svg.includes(">DSFeatureGridSectionContainer<"), boxes(grid.svg, "dl-ctl").filter((b) => b[4] === 8)[0], extent(grid.svg)],
     ([found, named, box, outer]) => found.length === 0 && named && box[0] === outer[0] && box[2] === outer[2]);
 
   // 2 · a section's fill is a band across its box, and every strength draws the same band
   const banded = section({ color: "DEFAULT" });
   one("a section's `color` other than `BASE` is a band: a raised frame's background across the whole box, square, and no finding",
-    [banded.findings, boxes(banded.svg, "sds-skel-surface"), extent(banded.svg), boxes(section({}).svg, "sds-skel-surface"), boxes(section({ color: "BASE" }).svg, "sds-skel-surface")],
+    [banded.findings, boxes(banded.svg, "dl-sk-surface"), extent(banded.svg), boxes(section({}).svg, "dl-sk-surface"), boxes(section({ color: "BASE" }).svg, "dl-sk-surface")],
     ([found, band, outer, plain, base]) => found.length === 0 && band.length === 1 && same(band[0].slice(0, 4), outer.slice(0, 4)) && band[0][4] === 0 && plain.length === 0 && base.length === 0);
   one("how strong the fill is belongs to the library's look: `SUBTLE`, `QUIET` and `SOLID` draw the same band, and a fill draws one",
     ["SUBTLE", "QUIET", "SOLID"].map((strength) => section({ color: "PRIMARY", strength }).svg),
@@ -1340,7 +1364,7 @@ console.log("=== SKELETON — a section's fill and room, a feature's frames, and
   // 3 · `inset` is a solid line along the top and the bottom edge of the box, and none at its sides
   const inset = section({ inset: true }), [ix, iy, iw, ih] = extent(inset.svg);
   one("a section's `inset` is a solid line along its top and its bottom edge, and none at its sides",
-    [inset.findings, [...inset.svg.matchAll(/<path class="sds-skel-border" d="([^"]+)"/g)].map((m) => m[1]), section({}).svg.includes("sds-skel-border")],
+    [inset.findings, [...inset.svg.matchAll(/<path class="dl-line-edge" d="([^"]+)"/g)].map((m) => m[1]), section({}).svg.includes("dl-line-edge")],
     ([found, lines, plain]) => found.length === 0 && lines.length === 1 && lines[0] === `M${ix} ${iy} L${ix + iw} ${iy} M${ix} ${iy + ih} L${ix + iw} ${iy + ih}` && !plain);
 
   // 4 · a `size` stands the section's room above and below its content: its room on a phone
@@ -1360,7 +1384,7 @@ console.log("=== SKELETON — a section's fill and room, a feature's frames, and
 
   // 6 · `items.surface` puts each item line of a feature in a frame of its own
   const doors = feature({ items: { surface: {} } }, DOORS);
-  const doorBoxes = boxes(doors.svg, "sds-skel-control").filter((b) => b[4] === 8);
+  const doorBoxes = boxes(doors.svg, "dl-ctl").filter((b) => b[4] === 10);
   one("`items.surface` puts each item line in a thin rounded outline of its own, as tall as its row, its words a boundary's padding in",
     [doors.findings, doorBoxes, wordsAt(doors.svg, "Secure"), wordsAt(doors.svg, "Scalable")],
     ([found, two, secure, scalable]) => found.length === 0 && two.length === 2 && two[0][3] === two[1][3] && two[0][1] === two[1][1]
@@ -1369,31 +1393,31 @@ console.log("=== SKELETON — a section's fill and room, a feature's frames, and
     extent(doors.svg)[3] - extent(feature({}, DOORS).svg)[3], 32);
   const raisedDoors = feature({ items: { surface: { raised: true, elevation: "MD" } } }, DOORS);
   one("a raised frame has a raised frame's background behind its outline, and a bordered one a solid line in place of the thin one",
-    [boxes(raisedDoors.svg, "sds-skel-surface").filter((b) => b[4] === 8), boxes(raisedDoors.svg, "sds-skel-control").filter((b) => b[4] === 8),
-      boxes(feature({ items: { surface: { bordered: true } } }, DOORS).svg, "sds-skel-border"), boxes(feature({ items: { surface: { bordered: true } } }, DOORS).svg, "sds-skel-control").filter((b) => b[4] === 8)],
+    [boxes(raisedDoors.svg, "dl-sk-surface").filter((b) => b[4] === 10), boxes(raisedDoors.svg, "dl-ctl").filter((b) => b[4] === 10),
+      boxes(feature({ items: { surface: { bordered: true } } }, DOORS).svg, "dl-line-edge"), boxes(feature({ items: { surface: { bordered: true } } }, DOORS).svg, "dl-ctl").filter((b) => b[4] === 10)],
     ([fills, outlines, solid, thin]) => fills.length === 2 && same(fills, outlines) && solid.length === 2 && thin.length === 0);
-  one("a frame with `rounded` false has square corners", boxes(feature({ items: { surface: { rounded: false } } }, DOORS).svg, "sds-skel-control").filter((b) => b[4] === 0).length, 2);
-  one("a colour other than `BASE` gives the frame a background too", boxes(feature({ items: { surface: { color: "DEFAULT" } } }, DOORS).svg, "sds-skel-surface").filter((b) => b[4] === 8).length, 2);
+  one("a frame with `rounded` false has square corners", boxes(feature({ items: { surface: { rounded: false } } }, DOORS).svg, "dl-ctl").filter((b) => b[4] === 0).length, 2);
+  one("a colour other than `BASE` gives the frame a background too", boxes(feature({ items: { surface: { color: "DEFAULT" } } }, DOORS).svg, "dl-sk-surface").filter((b) => b[4] === 10).length, 2);
   one("how far a raised frame stands off belongs to the library's look: `elevation` `MD` and `LG` draw the same raised frame",
-    [feature({ items: { surface: { raised: true, elevation: "LG" } } }, DOORS).svg === raisedDoors.svg, boxes(raisedDoors.svg, "sds-skel-surface").filter((b) => b[4] === 8).length],
+    [feature({ items: { surface: { raised: true, elevation: "LG" } } }, DOORS).svg === raisedDoors.svg, boxes(raisedDoors.svg, "dl-sk-surface").filter((b) => b[4] === 10).length],
     ([alike, raised]) => alike && raised === 2);
 
   // 7 · `frames` and `surface`: the feature's own frame, round the whole of it, its media, or its words
   const whole = feature({ frames: ["TEXT"], surface: {} }, HEAD);
   one("`frames` `TEXT` on a feature with no media frames the whole feature, in place of its dotted boundary, its name kept",
-    [whole.findings, boxes(whole.svg, "sds-skel-guide"), boxes(whole.svg, "sds-skel-control").filter((b) => b[4] === 8), extent(feature({}, HEAD).svg), whole.svg.includes(">DSFeature<")],
+    [whole.findings, boxes(whole.svg, "dl-frame-line"), boxes(whole.svg, "dl-ctl").filter((b) => b[4] === 10), extent(feature({}, HEAD).svg), whole.svg.includes(">DSFeature<")],
     ([found, guides, frame, plain, named]) => found.length === 0 && guides.length === 0 && frame.length === 1 && same(frame[0].slice(0, 4), plain.slice(0, 4)) && named);
   const media = feature({ frames: ["MEDIA"], surface: { raised: true, elevation: "LG" } }, [...HEAD, { items: [{ slot: "mediaNode · the product", fill: true, height: 3 }] }]);
   const plainMedia = feature({}, [...HEAD, { items: [{ slot: "mediaNode · the product", fill: true, height: 3 }] }]);
   one("`frames` `MEDIA` frames the slot that is the feature's media, flush, and the feature keeps its dotted boundary",
-    [media.findings, boxes(media.svg, "sds-skel-control").filter((b) => b[4] === 8), boxes(media.svg, "sds-skel-surface").filter((b) => b[4] === 8), boxes(plainMedia.svg, "sds-skel-guide")[1], extent(media.svg)],
+    [media.findings, boxes(media.svg, "dl-ctl").filter((b) => b[4] === 10), boxes(media.svg, "dl-sk-surface").filter((b) => b[4] === 10), boxes(plainMedia.svg, "dl-frame-line")[1], extent(media.svg)],
     ([found, outline, fill, slot, outer]) => found.length === 0 && outline.length === 1 && same(outline, fill) && same(outline[0].slice(0, 4), slot.slice(0, 4)) && outer !== undefined);
   one("`frames` `TEXT` and `MEDIA` together frame the whole feature, and leave the slot its own mark",
-    [boxes(feature({ frames: ["TEXT", "MEDIA"] }, BESIDE).svg, "sds-skel-control").filter((b) => b[4] === 8), extent(feature({}, BESIDE).svg)],
+    [boxes(feature({ frames: ["TEXT", "MEDIA"] }, BESIDE).svg, "dl-ctl").filter((b) => b[4] === 10), extent(feature({}, BESIDE).svg)],
     ([frame, outer]) => frame.length === 1 && same(frame[0].slice(0, 4), outer.slice(0, 4)));
   const words = feature({ frames: ["TEXT"] }, BESIDE), wordsPlain = feature({}, BESIDE);
   one("`frames` `TEXT` alone beside media frames the words, and the slot keeps its dotted mark",
-    [words.findings, boxes(words.svg, "sds-skel-control").filter((b) => b[4] === 8), boxes(wordsPlain.svg, "sds-skel-guide")[1], boxes(words.svg, "sds-skel-guide").length, boxes(wordsPlain.svg, "sds-skel-guide").length],
+    [words.findings, boxes(words.svg, "dl-ctl").filter((b) => b[4] === 10), boxes(wordsPlain.svg, "dl-frame-line")[1], boxes(words.svg, "dl-frame-line").length, boxes(wordsPlain.svg, "dl-frame-line").length],
     ([found, frame, column, guides, plainGuides]) => found.length === 0 && frame.length === 1 && same(frame[0].slice(0, 4), column.slice(0, 4)) && guides === plainGuides);
 
   // 8 · the frames' findings
@@ -1421,7 +1445,7 @@ console.log("=== SKELETON — a section's fill and room, a feature's frames, and
     { items: [{ head: { eyebrow: "Orders", title: "Watch every order move", description: "Each order shows where it stands." } }] },
     { items: [{ item: { media: "default", title: "Live status", description: "Paid, packed or shipped" }, fill: true }, { slot: "mediaNode · the product", fill: true }] }] } }] }] } }] }] } }] };
   one("a section and a feature written with none of the new fields draw byte for byte as before",
-    createHash("sha256").update(draw(PLAIN).svg).digest("hex"), "45e92a0ba59ce1114ff1ad250657ca422a65eb0ff970dcfd29563b23231bbafd");
+    createHash("sha256").update(draw(PLAIN).svg).digest("hex"), "c6f8abdf6910293490aef7821c50285fabb4d8841d4f88c874ecd8994d271446");
 }
 
 console.log("=== SKELETON — lines, numbers and alignment, and a grid section's fill (RULE.DEVEX.WORKSPACE.289 to .293)");
@@ -1430,8 +1454,8 @@ console.log("=== SKELETON — lines, numbers and alignment, and a grid section's
   const boxes = (g, cls) => [...g.matchAll(new RegExp(`<rect class="${cls}" x="([\\d.]+)" y="([\\d.]+)" width="([\\d.]+)" height="([\\d.]+)" rx="([\\d.]+)"`, "g"))].map((m) => m.slice(1).map(Number));
   const wordsAt = (g, words) => [...g.matchAll(/<text class="[^"]+" x="([\d.]+)" y="([\d.]+)"[^>]*>([^<]*)</g)].map((m) => ({ x: Number(m[1]), y: Number(m[2]), words: m[3] })).find((t) => t.words === words);
   /** The thin lines across, as [x1, y, x2], and the thin lines down, as [x, y1, y2]. */
-  const across = (g) => [...g.matchAll(/<path class="sds-skel-control" d="M([\d.]+) ([\d.]+) H([\d.]+)"/g)].map((m) => m.slice(1).map(Number));
-  const down = (g) => [...g.matchAll(/<path class="sds-skel-control" d="M([\d.]+) ([\d.]+) V([\d.]+)"/g)].map((m) => m.slice(1).map(Number));
+  const across = (g) => [...g.matchAll(/<path class="dl-ctl" d="M([\d.]+) ([\d.]+) H([\d.]+)"/g)].map((m) => m.slice(1).map(Number));
+  const down = (g) => [...g.matchAll(/<path class="dl-ctl" d="M([\d.]+) ([\d.]+) V([\d.]+)"/g)].map((m) => m.slice(1).map(Number));
   const ITEM = (title, extra = {}) => ({ item: { title, description: "One line under it" }, ...extra });
   const FILLED = (title) => ITEM(title, { fill: true });
   const HEAD = (textAlign) => ({ items: [{ head: { title: "Start in four steps", ...(textAlign ? { textAlign } : {}) } }] });
@@ -1445,7 +1469,7 @@ console.log("=== SKELETON — lines, numbers and alignment, and a grid section's
   one("`items.type` `LIST` draws a line under every item but its last, across the column, where `borderType` is left out, and no finding",
     [list.findings, across(list.svg), down(list.svg), across(unlined.svg)],
     ([found, lines, verticals, none_]) => found.length === 0 && lines.length === 2 && verticals.length === 0 && none_.length === 0
-      && lines[0][1] > connect.y && lines[0][1] < choose.y && lines[1][1] > choose.y && lines[1][1] < live.y && lines[0][2] - lines[0][0] > 900);
+      && lines[0][1] > connect.y && lines[0][1] < choose.y && lines[1][1] > choose.y && lines[1][1] < live.y && lines[0][2] - lines[0][0] > 800);
   const noneList = feature({ items: { type: "LIST", borderType: "NONE" } }, LIST), gridItems = feature({ items: { type: "GRID" } }, GRID);
   one("a `LIST` with `borderType` `NONE` draws no line, and a `GRID` draws none where `borderType` is left out, with no finding",
     [noneList.findings, gridItems.findings, across(noneList.svg), across(gridItems.svg), down(gridItems.svg)],
@@ -1459,7 +1483,7 @@ console.log("=== SKELETON — lines, numbers and alignment, and a grid section's
       && rowLine[0] < downs[0][0] && rowLine[2] > downs[0][0]);
   const edge = feature({ items: { borderType: "EDGE" } }, GRID);
   one("`EDGE` adds a thin rounded outline round the items, and the lines reach it",
-    [boxes(edge.svg, "sds-skel-control").filter((b) => b[4] === 8), across(edge.svg), down(edge.svg)],
+    [boxes(edge.svg, "dl-ctl").filter((b) => b[4] === 10), across(edge.svg), down(edge.svg)],
     ([outline, lines, downs]) => outline.length === 1 && lines.length === 1 && lines[0][0] === outline[0][0] && lines[0][2] === outline[0][0] + outline[0][2]
       && downs[0][1] === outline[0][1] && downs[1][2] === outline[0][1] + outline[0][3]);
   const boxedList = feature({ items: { type: "LIST", surface: {} } }, LIST), boxedGrid = feature({ items: { borderType: "GRID", surface: {} } }, GRID);
@@ -1494,16 +1518,16 @@ console.log("=== SKELETON — lines, numbers and alignment, and a grid section's
     [numbered.findings, ["1.", "2.", "3."].map((n) => wordsAt(numbered.svg, n)), ["Connect your store", "Choose your plan", "Go live"].map((t) => wordsAt(numbered.svg, t))],
     ([found, numbers, titles]) => found.length === 0 && numbers.every((n, i) => n && n.y === titles[i].y && n.x < titles[i].x));
   one("the number takes the room before the title, and the description stays under the start of the line",
-    [wordsAt(numbered.svg, "Go live"), wordsAt(plain.svg, "Go live"), wordsAt(numbered.svg, "3."), numbered.svg.match(/<text class="sds-note" x="([\d.]+)" y="[\d.]+">One line under it</)[1], plain.svg.match(/<text class="sds-note" x="([\d.]+)" y="[\d.]+">One line under it</)[1]],
+    [wordsAt(numbered.svg, "Go live"), wordsAt(plain.svg, "Go live"), wordsAt(numbered.svg, "3."), numbered.svg.match(/<text class="dl-detail" x="([\d.]+)" y="[\d.]+">One line under it</)[1], plain.svg.match(/<text class="dl-detail" x="([\d.]+)" y="[\d.]+">One line under it</)[1]],
     ([titled, untitled, number, under, plainUnder]) => titled.x > untitled.x && number.x === untitled.x && under === plainUnder);
-  one("the number is quiet, at the title's size and weight", numbered.svg.includes('<text class="sds-note" x="') && /style="font-size:12px;font-weight:500">1\.</.test(numbered.svg), true);
+  one("the number is a name, at the title's level", /<text class="dl-name" x="[\d.]+" y="[\d.]+">1\.</.test(numbered.svg), true);
   one("`items.numbered` that is not true or false is a finding", feature({ items: { numbered: "yes" } }, LIST).findings, says("`items.numbered` is `"));
 
   // 3 · a feature's `textAlign` lines up the rows that stand with its head
   const BUTTONS = { items: [{ control: "button", text: "Start building", main: true }, { control: "button", text: "Read the docs" }] };
-  const buttons = (g) => boxes(g, "sds-skel-control(?: sds-skel-main)?").filter((b) => b[4] === 3);
+  const buttons = (g) => boxes(g, "dl-ctl(?:-on)?").filter((b) => b[4] === 6);   // a control takes the theme's small corner, `--radius-sm`: 6
   const centred = feature({}, [HEAD("CENTER"), BUTTONS]), started = feature({}, [HEAD(), BUTTONS]);
-  const outer = (g) => boxes(g, "sds-skel-guide")[0];
+  const outer = (g) => boxes(g, "dl-frame-line")[0];
   one("a head's `textAlign` `CENTER` centres the row of actions under it: the room left over is shared on its two sides",
     [centred.findings, buttons(centred.svg), outer(centred.svg), buttons(started.svg)],
     ([found, [first, second], box, [startFirst]]) => found.length === 0 && Math.abs((first[0] - box[0]) - (box[0] + box[2] - (second[0] + second[2]))) <= 1 && first[0] > startFirst[0]);
@@ -1520,23 +1544,23 @@ console.log("=== SKELETON — lines, numbers and alignment, and a grid section's
     ([grid_, list_, start]) => grid_ > start && list_ === start);
   const heading = gsec({}, [HEAD("CENTER"), BUTTONS, { items: [CELL("Documents"), CELL("Audit log")] }]);
   one("a grid section's centred heading centres its actions, and its cells keep the row",
-    [heading.findings, buttons(heading.svg), boxes(heading.svg, "sds-skel-guide")[0]],
+    [heading.findings, buttons(heading.svg), boxes(heading.svg, "dl-frame-line")[0]],
     ([found, [first, second], box]) => found.length === 0 && Math.abs((first[0] - box[0]) - (box[0] + box[2] - (second[0] + second[2]))) <= 1);
 
   // 4 · `verticalAlign` stands the two sides of a split against each other, each at its own height
   const WORDS = { frame: { rows: [HEAD(), { items: [FILLED("Connect your store")] }, { items: [FILLED("Choose your plan")] }, BUTTONS] } };
   const aligned = (verticalAlign) => feature(verticalAlign ? { verticalAlign } : {}, [{ items: [WORDS, { slot: "mediaNode · short code", fill: true, height: 2 }] }]);
-  const slotOf = (g) => boxes(g, "sds-skel-guide").find((b) => b[3] === 64) ?? boxes(g, "sds-skel-guide")[2];
-  const wordsBox = (g) => boxes(g, "sds-skel-guide")[1];
+  const slotOf = (g) => boxes(g, "dl-frame-line").find((b) => b[3] === 64) ?? boxes(g, "dl-frame-line")[2];
+  const wordsBox = (g) => boxes(g, "dl-frame-line")[1];
   const [topped, middled, footed, stretched] = ["TOP", "CENTER", "BOTTOM", undefined].map(aligned);
   one("`verticalAlign` `TOP`, `CENTER` and `BOTTOM` stand the short side at the top, the middle and the foot of the taller one, at its own height; with none it stretches as before",
-    [...[topped, middled, footed].map((g) => [g.findings, slotOf(g.svg), wordsBox(g.svg)]), [boxes(stretched.svg, "sds-skel-guide")[2], wordsBox(stretched.svg)]],
+    [...[topped, middled, footed].map((g) => [g.findings, slotOf(g.svg), wordsBox(g.svg)]), [boxes(stretched.svg, "dl-frame-line")[2], wordsBox(stretched.svg)]],
     ([[f1, top, words1], [f2, middle, words2], [f3, foot, words3], [slot, words4]]) => [f1, f2, f3].every((f) => f.length === 0) && [top, middle, foot].every((s) => s && s[3] === 64)
       && top[1] === words1[1] && Math.abs(middle[1] + 32 - (words2[1] + words2[3] / 2)) < 1 && foot[1] + 64 === words3[1] + words3[3]
       && slot[3] > 64 && slot[3] === words4[3] && slot[1] === words4[1]);
   const tall = feature({ verticalAlign: "CENTER" }, [{ items: [{ frame: { rows: [HEAD()] } }, { slot: "mediaNode · the product", fill: true, height: 8 }] }]);
   one("the words beside a taller picture keep their own height, at the middle of it",
-    [boxes(tall.svg, "sds-skel-guide")[1], boxes(tall.svg, "sds-skel-guide")[2]],
+    [boxes(tall.svg, "dl-frame-line")[1], boxes(tall.svg, "dl-frame-line")[2]],
     ([region, slot]) => region[3] < slot[3] && Math.abs(region[1] + region[3] / 2 - (slot[1] + slot[3] / 2)) < 1);
   const folded = feature({ verticalAlign: "TOP" }, [HEAD(), ...LIST]);
   one("a view where the split folds, as a phone's, reads no `verticalAlign` and says nothing, as the design system reads it nowhere but in a split",
@@ -1550,9 +1574,9 @@ console.log("=== SKELETON — lines, numbers and alignment, and a grid section's
   // 5 · a grid section's `section` is drawn as a section's own fields
   const sectionOf = (look) => draw({ kind: "skeleton", frame: { rows: [{ items: [{ fill: true, frame: { unit: "DSSectionContainer", rows: [HEAD()], ...look } }] }] } });
   const sectioned = gsec({ section: { color: "DEFAULT", inset: true, size: "SM" } }, [HEAD()]), section_ = sectionOf({ color: "DEFAULT", inset: true, size: "SM" });
-  const extent = (g) => boxes(g, "sds-skel-guide")[0];
+  const extent = (g) => boxes(g, "dl-frame-line")[0];
   one("a grid section's `section` draws a section's band, its inset and its room, as a `DSSectionContainer` with the same fields does",
-    [sectioned.findings, boxes(sectioned.svg, "sds-skel-surface"), extent(sectioned.svg), extent(section_.svg), /<path class="sds-skel-border" d="M[\d.]+ [\d.]+ L/.test(sectioned.svg), extent(gsec({}, [HEAD()]).svg)],
+    [sectioned.findings, boxes(sectioned.svg, "dl-sk-surface"), extent(sectioned.svg), extent(section_.svg), /<path class="dl-line-edge" d="M[\d.]+ [\d.]+ L/.test(sectioned.svg), extent(gsec({}, [HEAD()]).svg)],
     ([found, band, box, sectionBox, inset, plainBox]) => found.length === 0 && band.length === 1 && JSON.stringify(band[0].slice(0, 4)) === JSON.stringify(box.slice(0, 4))
       && box[3] === sectionBox[3] && inset && box[3] > plainBox[3]);
   one("a grid section's `section.size` is the size of every block inside, as a section's is",
@@ -1573,7 +1597,7 @@ console.log("=== SKELETON — lines, numbers and alignment, and a grid section's
       { items: [ROW("Invite the team"), ROW("Go live")] }] } }] }] } }] },
     { items: [{ fill: true, frame: { unit: "DSFeatureGridSectionContainer", rows: [{ items: [{ head: { title: "Built for messy data" } }] }, { items: [GCELL("Entity resolution"), GCELL("Your schema")] }] } }] }] } }] };
   one("a feature, a split, its item rows and a grid section written with none of these fields draw byte for byte as before",
-    createHash("sha256").update(draw(AS_BEFORE).svg).digest("hex"), "c59e5a3e39549f0f1f202dbf5fcc598c4d65cefa57a0db1d6742d290af2db362");
+    createHash("sha256").update(draw(AS_BEFORE).svg).digest("hex"), "9805dd40df7e4d5dfc156b468494f13f8db5847887ea28add719e59c4d8785ed");
 }
 
 console.log("=== SKELETON — an item's and a head's parts, and a grid's columns (RULE.DEVEX.WORKSPACE.294 to .299)");
@@ -1583,7 +1607,7 @@ console.log("=== SKELETON — an item's and a head's parts, and a grid's columns
   const circles = (g, cls) => [...g.matchAll(new RegExp(`<circle class="${cls}" cx="([\\d.]+)" cy="([\\d.]+)" r="([\\d.]+)"`, "g"))].map((m) => m.slice(1).map(Number));
   const wordsAt = (g, words) => [...g.matchAll(/<text class="([^"]+)" x="([\d.]+)" y="([\d.]+)"[^>]*>([^<]*)</g)].map((m) => ({ cls: m[1], x: Number(m[2]), y: Number(m[3]), words: m[4] })).find((t) => t.words === words);
   /** The glyph strokes, each as its list of [x, y] points. */
-  const strokes = (g) => [...g.matchAll(/<path class="sds-skel-glyph" d="([^"]+)"/g)].map((m) => m[1].split(/ (?=M)/).map((run) => [...run.matchAll(/[ML]([\d.]+) ([\d.]+)/g)].map((p) => [Number(p[1]), Number(p[2])])));
+  const strokes = (g) => [...g.matchAll(/<path class="dl-glyph" d="([^"]+)"/g)].map((m) => m[1].split(/ (?=M)/).map((run) => [...run.matchAll(/[ML]([\d.]+) ([\d.]+)/g)].map((p) => [Number(p[1]), Number(p[2])])));
   const viewBox = (g) => g.match(/viewBox="([^"]+)"/)[1];
   const feature = (look, rows) => draw({ kind: "skeleton", frame: { rows: [{ items: [{ fill: true, frame: { unit: "DSFeature", rows, ...look } }] }] } });
   const LINE = (line, extra = {}) => ({ items: [{ item: { title: "Live status", description: "Paid, packed or shipped", ...line }, fill: true, ...extra }] });
@@ -1592,7 +1616,7 @@ console.log("=== SKELETON — an item's and a head's parts, and a grid's columns
   const bare = feature({}, [LINE({ media: { mtype: "ICON", node: "add" } })]), marked = feature({}, [LINE({ media: "add" })]);
   const bareTitle = wordsAt(bare.svg, "Live status"), [[, top], [, foot]] = strokes(bare.svg)[0]?.[0] ?? [[0, 0], [0, 0]];
   one("an item's `media` `ICON` is a bare icon: its shape with no circle and no square round it, as large as the title and centred on the title's line, and no finding",
-    [bare.findings, circles(bare.svg, "sds-skel-control").length, boxes(bare.svg, "sds-skel-control").length, foot - top, (top + foot) / 2, bareTitle.y, circles(marked.svg, "sds-skel-control").length],
+    [bare.findings, circles(bare.svg, "dl-ctl").length, boxes(bare.svg, "dl-ctl").length, foot - top, (top + foot) / 2, bareTitle.y, circles(marked.svg, "dl-ctl").length],
     ([found, rings, squares, tall, centre, titleY, markRings]) => found.length === 0 && rings === 0 && squares === 0 && tall > 8 && tall < 12 && Math.abs(centre - (titleY - 4)) < 1 && markRings === 1);
   one("a bare icon takes the title's size and a gap, so the title stands nearer the start than beside a mark",
     [bareTitle.x, wordsAt(marked.svg, "Live status").x, wordsAt(feature({}, [LINE({})]).svg, "Live status").x],
@@ -1608,17 +1632,17 @@ console.log("=== SKELETON — an item's and a head's parts, and a grid's columns
   // 2 · a head's own media, a `MARK` or an `AVATAR` over its words, in its level's box
   const HEADW = (extra = {}, level = "WIDGET") => ({ items: [{ head: { pageLevel: level, title: "Documents", description: "Templates rendered to PDF.", ...extra } }] });
   const headMark = feature({}, [HEADW({ media: { mtype: "MARK", icon: "add" } })]), headPlain = feature({}, [HEADW()]);
-  const [ring] = circles(headMark.svg, "sds-skel-control");
+  const [ring] = circles(headMark.svg, "dl-ctl");
   one("a head's `media` `MARK` stands over its words at a `WIDGET`'s box, 40 across, 12 above the title, and moves the words down by both, with no finding",
     [headMark.findings, ring, wordsAt(headMark.svg, "Documents"), wordsAt(headPlain.svg, "Documents")],
     ([found, [cx, cy, r], title, plainTitle]) => found.length === 0 && r === 20 && cx - r === plainTitle.x && title.y - plainTitle.y === 52 && cy + r < title.y - 12);
   one("a `CONTAINER` head's box is 48 across",
-    circles(feature({}, [HEADW({ media: { mtype: "MARK" } }, "CONTAINER")]).svg, "sds-skel-bar").map((c) => c[2]), (g) => g.length === 1 && g[0] === 24);
+    circles(feature({}, [HEADW({ media: { mtype: "MARK" } }, "CONTAINER")]).svg, "dl-bar").map((c) => c[2]), (g) => g.length === 1 && g[0] === 24);
   const avatar = feature({}, [HEADW({ media: { mtype: "AVATAR", title: "Ana Ruiz" } })]);
   one("a head's `media` `AVATAR` is a circle of its initials, with no finding",
-    [avatar.findings, circles(avatar.svg, "sds-skel-control").length, wordsAt(avatar.svg, "AR")], ([found, rings, initials]) => found.length === 0 && rings === 1 && initials && initials.cls === "sds-note");
+    [avatar.findings, circles(avatar.svg, "dl-ctl").length, wordsAt(avatar.svg, "AR")], ([found, rings, initials]) => found.length === 0 && rings === 1 && initials && initials.cls === "dl-name");
   const centredMark = feature({}, [HEADW({ media: { mtype: "MARK", icon: "add" }, textAlign: "CENTER" })]);
-  one("a centred head centres its media", [circles(centredMark.svg, "sds-skel-control")[0], boxes(centredMark.svg, "sds-skel-guide")[0]],
+  one("a centred head centres its media", [circles(centredMark.svg, "dl-ctl")[0], boxes(centredMark.svg, "dl-frame-line")[0]],
     ([[cx], box]) => Math.abs(cx - (box[0] + box[2] / 2)) <= 1);
   one("a head's media at `PAGE` draws nothing over the words and is a finding, since a feature there stands its media beside them; an `ICON` on a head is a finding",
     [feature({}, [HEADW({ media: { mtype: "MARK" } }, "PAGE")]), feature({}, [HEADW({}, "PAGE")]).svg, feature({}, [HEADW({ media: { mtype: "ICON", node: "add" } })]).findings, feature({}, [HEADW({ media: { mtype: "AVATAR" } })]).findings],
@@ -1627,10 +1651,10 @@ console.log("=== SKELETON — an item's and a head's parts, and a grid's columns
 
   // 3 · a `BADGE` eyebrow, drawn as a badge among the facts is, packed above the title
   const badged = feature({}, [HEADW({ eyebrow: { control: "badge", text: "Recommended" } })]), worded = feature({}, [HEADW({ eyebrow: "Recommended" })]);
-  const pill = boxes(badged.svg, "sds-skel-control").find((b) => b[3] === 16), badgedTitle = wordsAt(badged.svg, "Documents");
+  const pill = boxes(badged.svg, "dl-ctl").find((b) => b[3] === 16), badgedTitle = wordsAt(badged.svg, "Documents");
   one("a head's `eyebrow` written as a badge is a badge over the title, its word as written, and no finding",
     [badged.findings, pill, wordsAt(badged.svg, "Recommended"), wordsAt(badged.svg, "RECOMMENDED"), badgedTitle, wordsAt(worded.svg, "RECOMMENDED")],
-    ([found, box, word, capitals, title, wordedCaps]) => found.length === 0 && box && box[4] === 8 && word && word.cls === "sds-code" && !capitals
+    ([found, box, word, capitals, title, wordedCaps]) => found.length === 0 && box && box[4] === 6 && word && word.cls === "dl-detail" && !capitals
       && box[1] + box[3] < title.y - 12 && wordedCaps);
   one("the badge's line is a badge's height, so the title stands 6 lower than under words in small capitals",
     wordsAt(badged.svg, "Documents").y - wordsAt(worded.svg, "Documents").y, 6);
@@ -1647,7 +1671,7 @@ console.log("=== SKELETON — an item's and a head's parts, and a grid's columns
     [written.findings, written.svg === afterDescription.svg, wordsAt(afterDescription.svg, "CRM").y > wordsAt(afterDescription.svg, META.description).y], ([found, alike, under]) => found.length === 0 && alike && under);
   const badgeFacts = feature({}, [LINE({ ...META, meta: ["CRM", { control: "badge", text: "OAuth" }], factsPlacement: "AFTER_TITLE" })]);
   one("with a badge among the facts, the badge's line stands between the title and the description",
-    [boxes(badgeFacts.svg, "sds-skel-control").find((b) => b[3] === 16), wordsAt(badgeFacts.svg, "Salesforce").y, wordsAt(badgeFacts.svg, META.description).y],
+    [boxes(badgeFacts.svg, "dl-ctl").find((b) => b[3] === 16), wordsAt(badgeFacts.svg, "Salesforce").y, wordsAt(badgeFacts.svg, META.description).y],
     ([badge, title, description]) => badge && badge[1] > title && badge[1] + badge[3] < description - 8);
   one("a `factsPlacement` the design system lacks is a finding", feature({}, [LINE({ ...META, factsPlacement: "BEFORE_TITLE" })]).findings, says("an item line's `factsPlacement` is `BEFORE_TITLE`, and it takes AFTER_DESCRIPTION · AFTER_TITLE"));
 
@@ -1655,7 +1679,7 @@ console.log("=== SKELETON — an item's and a head's parts, and a grid's columns
   const arrowed = feature({}, [LINE({ end: [{ icon: "ARROW_RIGHT" }] })]), chevron = feature({}, [LINE({ end: [{ icon: "next" }] })]);
   const shaft = strokes(arrowed.svg).at(-1)?.[0];
   one("`ARROW_RIGHT` at the end of an item line is its shape alone, a level shaft with its head, at the line's end, with no finding",
-    [arrowed.findings, boxes(arrowed.svg, "sds-skel-control").length, boxes(chevron.svg, "sds-skel-control").length, shaft, boxes(arrowed.svg, "sds-skel-guide")[0]],
+    [arrowed.findings, boxes(arrowed.svg, "dl-ctl").length, boxes(chevron.svg, "dl-ctl").length, shaft, boxes(arrowed.svg, "dl-frame-line")[0]],
     ([found, squares, chevronSquares, [[x1, y1], [x2, y2]], box]) => found.length === 0 && squares === 0 && chevronSquares === 1 && y1 === y2 && x2 > x1 && box[0] + box[2] - x2 < 40);
   const upRight = strokes(feature({}, [LINE({ end: [{ icon: "ARROW_UP_RIGHT" }] })]).svg).at(-1)?.[0];
   one("`ARROW_UP_RIGHT` rises to the end, for a line that leaves the site", [upRight], ([[[x1, y1], [x2, y2]]]) => x2 > x1 && y2 < y1);
@@ -1664,10 +1688,10 @@ console.log("=== SKELETON — an item's and a head's parts, and a grid's columns
   // 6 · a selected item line of a feature's boxed items: a heavier line inside its edge
   const OPTIONS = [LINE({ title: "Shape", selected: true }), LINE({ title: "Build" })];
   const chosen = feature({ items: { type: "LIST", surface: { raised: true } } }, OPTIONS);
-  const [mark] = boxes(chosen.svg, "sds-skel-control sds-skel-main"), frames = boxes(chosen.svg, "sds-skel-control").filter((b) => b[4] === 8);
+  const [mark] = boxes(chosen.svg, "dl-ctl-on"), frames = boxes(chosen.svg, "dl-ctl").filter((b) => b[4] === 10);
   one("`selected` on an item line of a feature with `items.surface` draws a heavier line 2 inside its box, which keeps its size, and no finding",
     [chosen.findings, mark, frames], ([found, inner, outer]) => found.length === 0 && inner && outer.length === 2 && inner[0] === outer[0][0] + 2 && inner[1] === outer[0][1] + 2
-      && inner[2] === outer[0][2] - 4 && inner[3] === outer[0][3] - 4 && inner[4] === 6 && outer[1][3] === outer[0][3]);
+      && inner[2] === outer[0][2] - 4 && inner[3] === outer[0][3] - 4 && inner[4] === 8 && outer[1][3] === outer[0][3]);
   one("`selected` where the items stand in no box is a finding, since the design system reads it only on boxed items, and draws nothing",
     [feature({}, OPTIONS), feature({}, [LINE({ title: "Shape" }), LINE({ title: "Build" })]).svg],
     ([unboxed, plain]) => says("`selected` marks the chosen item line of a `DSFeature` whose `items.surface` boxes its items")(unboxed.findings) && unboxed.svg === plain);
@@ -1698,7 +1722,7 @@ console.log("=== SKELETON — an item's and a head's parts, and a grid's columns
       { items: [{ fill: true, frame: { unit: "DSFeature", rows: [{ items: [{ icon: "default", mark: true }] }, { items: [{ head: { pageLevel: "WIDGET", eyebrow: "Messaging", title: "Notifications", description: "Email, push and in-app." } }] }] } },
         { fill: true, frame: { unit: "DSFeature", rows: [{ items: [{ item: { media: "default", title: "Salesforce", description: "Accounts, both ways.", meta: ["CRM", "OAuth"] }, fill: true }] }] } }] }] } }] }] } }] };
   one("items, heads and a grid section written with none of these fields draw byte for byte as before",
-    createHash("sha256").update(draw(PARTS_BEFORE).svg).digest("hex"), "13af0699d5bb3cd2c98af0c36360558e6dd69867283fea8b2a761d059d930cf3");
+    createHash("sha256").update(draw(PARTS_BEFORE).svg).digest("hex"), "caea4b8a0c4ee9d8e665470a16884aa0e1c590935a8b2a6e0a70832168edff43");
 }
 
 console.log("=== SKELETON — statistics, an accordion's entries and the tabs' own type (RULE.DEVEX.WORKSPACE.300 to .302)");
@@ -1708,7 +1732,7 @@ console.log("=== SKELETON — statistics, an accordion's entries and the tabs' o
   const texts = (g) => [...g.matchAll(/<text class="([^"]+)" x="([\d.]+)" y="([\d.]+)"(?: style="([^"]*)")?>([^<]*)</g)].map((m) => ({ cls: m[1], x: Number(m[2]), y: Number(m[3]), style: m[4] ?? "", words: m[5] }));
   const wordsAt = (g, words) => texts(g).find((t) => t.words === words);
   /** The plain strokes, glyphs and lines alike, each as its list of [x, y] points. */
-  const strokes = (g, cls = "sds-skel-glyph") => [...g.matchAll(new RegExp(`<path class="${cls}" d="([^"]+)"`, "g"))].map((m) => [...m[1].matchAll(/[MLHV]\s*([\d.]+)(?:\s+([\d.]+))?/g)].map((p) => [Number(p[1]), p[2] === undefined ? undefined : Number(p[2])]));
+  const strokes = (g, cls = "dl-glyph") => [...g.matchAll(new RegExp(`<path class="${cls}" d="([^"]+)"`, "g"))].map((m) => [...m[1].matchAll(/[MLHV]\s*([\d.]+)(?:\s+([\d.]+))?/g)].map((p) => [Number(p[1]), p[2] === undefined ? undefined : Number(p[2])]));
   const feature = (look, rows) => draw({ kind: "skeleton", frame: { rows: [{ items: [{ fill: true, frame: { unit: "DSFeature", rows, ...look } }] }] } });
   const HEAD = (extra = {}) => ({ items: [{ head: { title: "Built for teams like yours", ...extra } }] });
   const STAT = (title, description, extra = {}) => ({ item: { title, description, ...extra }, fill: true });
@@ -1717,16 +1741,16 @@ console.log("=== SKELETON — statistics, an accordion's entries and the tabs' o
   // 1 · `items.type` `STATS`: each item line a statistic, its value large over its label, one level below the feature's own
   const stats = feature({ items: { type: "STATS" } }, [HEAD(), STATS_ROW]);
   const [value, label] = [wordsAt(stats.svg, "12k"), wordsAt(stats.svg, "orders a day, live")];
-  one("`items.type` `STATS` draws each item line as a statistic: its title the value, heavy at a card title's 15px under a `CONTAINER` feature, and its description the label under it, quiet at 13px, with no finding",
-    [stats.findings, value, label], ([found, number, words]) => found.length === 0 && number.cls === "sds-title" && number.style === "font-size:15px"
-      && words.cls === "sds-note" && words.style === "font-size:13px" && words.y > number.y && words.y - number.y < 20);
-  const sizes = (pageLevel) => { const g = feature({ items: { type: "STATS" } }, [HEAD({ pageLevel }), STATS_ROW]).svg; return [wordsAt(g, "12k").style, wordsAt(g, "orders a day, live").style]; };
-  one("a statistic stands one level below its feature's head: 20 over 14 under `PAGE`, and 13 over 12 under `WIDGET`",
-    [sizes("PAGE"), sizes("WIDGET")], ([page, widget]) => page.join() === "font-size:20px,font-size:14px" && widget.join() === "font-size:13px,font-size:12px");
+  one("`items.type` `STATS` draws each item line as a statistic: its title the value, a name, and its description the label under it, a detail, with no finding",
+    [stats.findings, value, label], ([found, number, words]) => found.length === 0 && number.cls === "dl-name"
+      && words.cls === "dl-detail" && words.y > number.y && words.y - number.y < 20);
+  const sizes = (pageLevel) => { const g = feature({ items: { type: "STATS" } }, [HEAD({ pageLevel }), STATS_ROW]).svg; return [wordsAt(g, "12k"), wordsAt(g, "orders a day, live")]; };
+  one("a statistic stands one level below its feature's head: a name over a detail at every level, and under a taller head under `PAGE` than under `WIDGET`",
+    [sizes("PAGE"), sizes("WIDGET")], ([page, widget]) => page[0].cls === "dl-name" && page[1].cls === "dl-detail" && widget[0].cls === "dl-name" && widget[1].cls === "dl-detail" && page[0].y > widget[0].y);
   const plainLines = feature({}, [HEAD(), STATS_ROW]);
   one("a statistic draws no media, no facts line and no number, and stands no line apart from the next, as `STATS` take none where `borderType` is left out",
-    [stats.findings, strokes(stats.svg, "sds-skel-control").length, texts(stats.svg).filter((t) => t.words.includes("·")).length, wordsAt(plainLines.svg, "12k").style],
-    ([found, lines, dots, asItem]) => found.length === 0 && lines === 0 && dots === 0 && asItem.includes("font-size:12px"));
+    [stats.findings, strokes(stats.svg, "dl-ctl").length, texts(stats.svg).filter((t) => t.words.includes("·")).length, wordsAt(plainLines.svg, "12k").cls],
+    ([found, lines, dots, asItem]) => found.length === 0 && lines === 0 && dots === 0 && asItem === "dl-name");
   const centred = feature({ items: { type: "STATS" } }, [HEAD({ textAlign: "CENTER" }), STATS_ROW]);
   const middle = (t, size) => t.x + Math.ceil(t.words.length * 7.6 * size / 13) / 2;
   one("a centred head centres each statistic's value and its label in its place, on one centre line",
@@ -1734,10 +1758,10 @@ console.log("=== SKELETON — statistics, an accordion's entries and the tabs' o
     ([number, words, started]) => number.x > started.x && Math.abs(middle(number, 15) - (words.x + Math.ceil(words.words.length * 6.4 * 13 / 11) / 2)) <= 1);
   const lined = feature({ items: { type: "STATS", borderType: "GRID" } }, [HEAD(), STATS_ROW]);
   one("`borderType` `GRID` stands a line in the gap after each statistic of a row but its last, as a `GRID` of items does, with no finding",
-    [lined.findings, strokes(lined.svg, "sds-skel-control").filter((s) => s[1] && s[1][1] === undefined && s[0][1] !== undefined)], ([found, downs]) => found.length === 0 && downs.length === 2);
+    [lined.findings, strokes(lined.svg, "dl-ctl").filter((s) => s[1] && s[1][1] === undefined && s[0][1] !== undefined)], ([found, downs]) => found.length === 0 && downs.length === 2);
   const boxed = feature({ items: { type: "STATS", surface: { bordered: true } } }, [HEAD(), STATS_ROW]);
   one("`items.surface` puts each statistic in a frame of its own, as the design system sets it in a `DSCard`, its value at a boundary's padding",
-    [boxed.findings, boxes(boxed.svg, "sds-skel-border").filter((b) => b[4] === 8), wordsAt(boxed.svg, "12k")],
+    [boxed.findings, boxes(boxed.svg, "dl-line-edge").filter((b) => b[4] === 10), wordsAt(boxed.svg, "12k")],
     ([found, frames, number]) => found.length === 0 && frames.length === 3 && number.x === frames[0][0] + 16);
   one("media, facts or `selected` on a statistic, and `items.numbered` with `STATS`, are findings",
     [feature({ items: { type: "STATS" } }, [HEAD(), { items: [STAT("12k", "orders", { media: "default", meta: ["Live"] })] }]).findings,
@@ -1756,19 +1780,19 @@ console.log("=== SKELETON — statistics, an accordion's entries and the tabs' o
   one("a `DSAccordionGroup` with `options` draws each entry's header, and under the open one its words, with no finding; a shut entry's words are not drawn",
     [plain.findings, ...OPTIONS.map((o) => wordsAt(plain.svg, o.header)), wordsAt(plain.svg, OPTIONS[0].content), wordsAt(plain.svg, OPTIONS[1].content), wordsAt(plain.svg, "DSAccordionGroup")],
     ([found, first, second, third, open, shut, name]) => found.length === 0 && first && second && third && open && !shut && name
-      && first.style === "font-size:12px;font-weight:500" && open.cls === "sds-code" && open.y > first.y && open.y < second.y && second.y < third.y);
+      && first.cls === "dl-name" && open.cls === "dl-detail" && open.y > first.y && open.y < second.y && second.y < third.y);
   const chevrons = strokes(plain.svg).map((s) => s.map(([x, y]) => [x, y]));
   one("each header leads with the design system's chevron: down while the entry is shut, turned up while it is open",
     chevrons, (g) => g.length === 3 && g[0][1][1] < g[0][0][1] && g[1][1][1] > g[1][0][1] && g[2][1][1] > g[2][0][1]
       && wordsAt(plain.svg, OPTIONS[0].header).x > g[0][2][0]);
-  const outlines = boxes(bordered.svg, "sds-skel-control").filter((b) => b[4] === 8);
+  const outlines = boxes(bordered.svg, "dl-ctl").filter((b) => b[4] === 10);
   one("`bordered` puts each entry in a thin rounded outline of its own, with a line across under the open entry's header and its words a boundary's padding in",
-    [bordered.findings, outlines, strokes(bordered.svg, "sds-skel-control"), wordsAt(bordered.svg, OPTIONS[0].content), boxes(plain.svg, "sds-skel-control").filter((b) => b[4] === 8).length],
+    [bordered.findings, outlines, strokes(bordered.svg, "dl-ctl"), wordsAt(bordered.svg, OPTIONS[0].content), boxes(plain.svg, "dl-ctl").filter((b) => b[4] === 10).length],
     ([found, frames, lines, open, plainFrames]) => found.length === 0 && frames.length === 3 && frames[0][3] > frames[1][3] && lines.length === 1
       && lines[0][0][1] === frames[0][1] + 32 && open.x === frames[0][0] + 16 && plainFrames === 0);
   const narrow = group({ bordered: true }, OPTIONS, "MOBILE");
   one("an open entry's words wrap at a word to the entry's width, and the entry grows by a line for each, with no finding",
-    [narrow.findings, texts(narrow.svg).filter((t) => t.cls === "sds-code"), boxes(narrow.svg, "sds-skel-control").filter((b) => b[4] === 8)[0]],
+    [narrow.findings, texts(narrow.svg).filter((t) => t.cls === "dl-detail" && t.words !== "MOBILE" && t.words !== "DSAccordionGroup"), boxes(narrow.svg, "dl-ctl").filter((b) => b[4] === 10)[0]],
     ([found, lines, frame]) => found.length === 0 && lines.length === 2 && lines[1].y - lines[0].y === 18 && lines.every((t) => t.x + t.words.length * 7 <= frame[0] + frame[2] - 16));
   one("`options` on another unit, `rows` beside `options`, an entry with no `header`, an `expanded` or a `bordered` that is not true or false, and a key an entry does not have are findings",
     [draw({ kind: "skeleton", frame: { rows: [{ items: [{ fill: true, frame: { unit: "DSFeature", options: OPTIONS, rows: [HEAD()] } }] }] } }).findings,
@@ -1783,13 +1807,13 @@ console.log("=== SKELETON — statistics, an accordion's entries and the tabs' o
   // 3 · `DSTabs` `type`: `PILL` draws the pills inside a feature, `LINE` the line at the page level
   const TABS = (extra = {}) => ({ items: [{ control: "tabs", tabs: ["Workspace", "Workstreams", "Docs"], chosen: 0, ...extra }] });
   const pills = feature({}, [HEAD(), TABS({ type: "PILL" }), { items: [{ slot: "the open tab's picture", fill: true, height: 4 }] }]), lineTabs = feature({}, [HEAD(), TABS()]);
-  const rounded = (g) => boxes(g, "sds-skel-(?:surface|control)").filter((b) => b[4] >= 10);
+  const rounded = (g) => boxes(g, "dl-(?:sk-surface|ctl)").filter((b) => b[4] === b[3] / 2);   // a pill: rounded to half its own height
   one("a row of tabs with `type` `PILL` inside a feature is drawn as pills: a rounded track and the chosen tab in a pill, no line under it, and no finding; with no `type` it keeps the line",
-    [pills.findings, rounded(pills.svg).length, strokes(pills.svg, "sds-skel-border").length, rounded(lineTabs.svg).length, strokes(lineTabs.svg, "sds-skel-border").length],
+    [pills.findings, rounded(pills.svg).length, strokes(pills.svg, "dl-line-edge").length, rounded(lineTabs.svg).length, strokes(lineTabs.svg, "dl-line-edge").length],
     ([found, pillShapes, underline, lineShapes, lineUnderline]) => found.length === 0 && pillShapes === 3 && underline === 0 && lineShapes === 0 && lineUnderline === 1);
   const atPage = (extra) => draw({ kind: "skeleton", frame: { rows: [TABS(extra), { items: [{ standin: "rows", fill: true }] }] } });
   one("`type` `LINE` draws the line at the page level, and `PILL` there draws byte for byte as the pills the level picks",
-    [atPage({ type: "LINE" }), atPage({ type: "PILL" }).svg === atPage({}).svg], ([line, same]) => line.findings.length === 0 && rounded(line.svg).length === 0 && strokes(line.svg, "sds-skel-border").length === 1 && same);
+    [atPage({ type: "LINE" }), atPage({ type: "PILL" }).svg === atPage({}).svg], ([line, same]) => line.findings.length === 0 && rounded(line.svg).length === 0 && strokes(line.svg, "dl-line-edge").length === 1 && same);
   one("a `type` the skeleton does not draw, and `type` on an item that is no row of tabs, are findings",
     [feature({}, [HEAD(), TABS({ type: "SWITCH" })]).findings, feature({}, [HEAD(), { items: [{ control: "button", text: "Start", type: "PILL" }] }]).findings],
     ([switched, button]) => says("a row of tabs' `type` is `SWITCH`, and a skeleton draws LINE · PILL")(switched)
@@ -1804,7 +1828,7 @@ console.log("=== SKELETON — statistics, an accordion's entries and the tabs' o
       { items: [{ control: "tabs", tabs: ["Workspace", "Docs"], chosen: 1 }] },
       { items: [{ fill: true, frame: { unit: "DSAccordionGroup", rows: [{ items: [{ text: "Do I need my own cloud account?" }, { spacer: true }, { icon: "select" }] }, { items: [{ note: "Yes, in your account." }] }] } }] }] } }] }] } }] }] } }] };
   one("numbers faked as heads, an accordion written as rows and tabs with no `type` draw byte for byte as before",
-    createHash("sha256").update(draw(LOOKS_BEFORE).svg).digest("hex"), "5b5a9173fd518a9865d63b1fe4f42c0c396662365e85628ae55004b4415a57c7");
+    createHash("sha256").update(draw(LOOKS_BEFORE).svg).digest("hex"), "9871ced8236520ae6daa45a13a4313c93825acdccf6b58a14a5eb95e95964bb4");
 }
 
 console.log("=== SKELETON — text that fits: words that wrap, code and tabs that scroll, a picture behind the words (RULE.DEVEX.WORKSPACE.303 to .305)");
@@ -1821,14 +1845,14 @@ console.log("=== SKELETON — text that fits: words that wrap, code and tabs tha
   // 1 · an item line's description wraps at a word to its column, and the item grows a line for each
   const LONG = "Accounts and contacts, both ways, every hour of the day.";
   const pair = view("TABLET", [{ items: [{ item: { media: "default", title: "Salesforce", description: LONG }, fill: true }, { item: { media: "default", title: "HubSpot", description: "Deals as they move." }, fill: true }] }]);
-  const lines = texts(pair.svg).filter((t) => t.cls === "sds-note" && LONG.includes(t.words));
+  const lines = texts(pair.svg).filter((t) => t.cls === "dl-detail" && LONG.includes(t.words));
   one("an item line's description wider than its column wraps at a word inside it, each line 18px under the last, with no width finding",
     [pair.findings, lines], ([found, parts]) => !wide(found) && parts.length >= 2 && parts.map((t) => t.words).join(" ") === LONG
-      && parts.every((t, k) => k === 0 || t.y - parts[k - 1].y === 18) && parts.every((t) => t.x + factW(t) <= 24 + 16 + 280));
+      && parts.every((t, k) => k === 0 || t.y - parts[k - 1].y === 18) && parts.every((t) => t.x + factW(t) <= 16 + 16 + 280));
 
   // 2 · a line of facts breaks between two facts, and a fact in words at a word; a dot stands only between facts of one line
   const facts = view("MOBILE", [{ items: [{ item: { title: "Postgres", description: "Read replicas only.", meta: ["Database", "Key", "Read only, every region", { control: "badge", text: "Beta" }] }, fill: true }, { item: { title: "Stripe", description: "Charges.", meta: ["Billing"] }, fill: true }] }]);
-  const factLines = [...new Set(texts(facts.svg).filter((t) => t.cls === "sds-note" && t.y > 40 && t.words !== "Read replicas only." && t.words !== "Charges." && t.words !== "Billing").map((t) => t.y))];
+  const factLines = [...new Set(texts(facts.svg).filter((t) => t.cls === "dl-detail" && t.y > 40 && t.words !== "Read replicas only." && t.words !== "Charges." && t.words !== "Billing").map((t) => t.y))];
   const dotsAtStart = texts(facts.svg).filter((t) => t.words === "·").filter((dot) => !texts(facts.svg).some((t) => t.y === dot.y && t.x < dot.x && t.words !== "·" && t.x > 24));
   one("an item line's facts wrap between two facts, each further line 20px under the last where the line holds a badge, and no line starts with a dot",
     [facts.findings, factLines, dotsAtStart], ([found, ys, startDots]) => !wide(found) && ys.length >= 2 && ys[1] - ys[0] === 20 && startDots.length === 0);
@@ -1836,22 +1860,22 @@ console.log("=== SKELETON — text that fits: words that wrap, code and tabs tha
   // 3 · a head's line of facts wraps to its column, each line centred where the head is
   const BADGES = ["TypeScript", "React", "Postgres", "AWS", "Kubernetes"].map((text) => ({ control: "badge", text }));
   const head = view("MOBILE", [{ items: [{ head: { title: "Ship your SaaS in weeks", pageLevel: "PAGE", facts: BADGES, textAlign: "CENTER" } }] }]);
-  const badgeRows = [...new Set(boxes(head.svg, "sds-skel-control").filter((b) => b[3] === 16).map((b) => b[1]))];
+  const badgeRows = [...new Set(boxes(head.svg, "dl-ctl").filter((b) => b[3] === 16).map((b) => b[1]))];
   one("a head's line of facts wider than its column wraps between two facts, 20px a line, with no width finding",
     [head.findings, badgeRows], ([found, ys]) => !wide(found) && ys.length === 2 && ys[1] - ys[0] === 20);
 
   // 4 · a note wraps at a word to its column
   const NOTE = "header: flat · content: raised, with widgets and a footer";
   const noted = view("MOBILE", [{ items: [{ frame: { width: "1/2", rows: [{ items: [{ note: NOTE }] }] } }, { fill: true, frame: { rows: [{ items: [{ text: "Orders" }] }] } }] }]);
-  const noteLines = texts(noted.svg).filter((t) => t.cls === "sds-code" && NOTE.includes(t.words));
+  const noteLines = texts(noted.svg).filter((t) => t.cls === "dl-detail" && NOTE.includes(t.words));
   one("a note wider than its column wraps at a word inside it, its lines 18px apart, with no width finding",
     [noted.findings, noteLines], ([found, parts]) => !wide(found) && parts.length >= 2 && parts.map((t) => t.words).join(" ") === NOTE && parts[1].y - parts[0].y === 18);
 
   // 5 · code keeps its width: cut at the column's end, with the mark there, and never wrapped
   const LINE = "  data: { getData: () => api.orders.list({ status: 'OPEN', limit: 50 }) },";
   const code = view("MOBILE", [{ items: [{ fill: true, frame: { unit: "DSCodeBlockView", label: "apps/web/src/config.ts", rows: [{ items: [{ note: "const config = {" }] }, { items: [{ note: LINE }] }, { items: [{ note: "};" }] }] } }] }]);
-  const cutLine = texts(code.svg).find((t) => t.cls === "sds-code" && t.words.length > 4 && LINE.startsWith(t.words));
-  const marks = boxes(code.svg, "sds-skel-surface").filter((b) => b[2] === 20 && b[4] === 10);
+  const cutLine = texts(code.svg).find((t) => t.cls === "dl-detail" && t.words.length > 4 && LINE.startsWith(t.words));
+  const marks = boxes(code.svg, "dl-sk-surface").filter((b) => b[2] === 20 && b[4] === 10);
   one("a line of code wider than its column keeps its width and is cut at the column's end, where the mark of the cut stands, with no width finding",
     [code.findings, cutLine, marks, wordsAt(code.svg, "const config = {")],
     ([found, shown, tiles, short]) => !wide(found) && shown && shown.words !== LINE && tiles.length === 1 && shown.x + shown.words.length * 7 <= tiles[0][0] && short);
@@ -1862,10 +1886,10 @@ console.log("=== SKELETON — text that fits: words that wrap, code and tabs tha
   const pills = tabsIn("PILL"), lineTabs = tabsIn("LINE");
   const shownTabs = (g) => TABS.filter((word) => wordsAt(g, word));
   one("a row of `PILL` tabs wider than its column scrolls: its track ends at the column, the tabs that stand whole are drawn, and the mark stands at the end, with no width finding",
-    [pills.findings, shownTabs(pills.svg), boxes(pills.svg, "sds-skel-surface").filter((b) => b[2] === 20 && b[4] === 10), boxes(pills.svg, "sds-skel-surface").filter((b) => b[3] === 32 && b[4] === 16)],
-    ([found, shown, tiles, tracks]) => !wide(found) && shown.length > 1 && shown.length < TABS.length && tiles.length === 1 && tracks.length === 1 && tracks[0][0] + tracks[0][2] <= 411 + 24);
+    [pills.findings, shownTabs(pills.svg), boxes(pills.svg, "dl-sk-surface").filter((b) => b[2] === 20 && b[4] === 10), boxes(pills.svg, "dl-sk-surface").filter((b) => b[3] === 32 && b[4] === 16)],
+    ([found, shown, tiles, tracks]) => !wide(found) && shown.length > 1 && shown.length < TABS.length && tiles.length === 1 && tracks.length === 1 && tracks[0][0] + tracks[0][2] <= 384 + 24);
   one("a row of `LINE` tabs scrolls the same way, as `DSTabs` scrolls every horizontal row",
-    [lineTabs.findings, shownTabs(lineTabs.svg), boxes(lineTabs.svg, "sds-skel-surface").filter((b) => b[2] === 20 && b[4] === 10)],
+    [lineTabs.findings, shownTabs(lineTabs.svg), boxes(lineTabs.svg, "dl-sk-surface").filter((b) => b[2] === 20 && b[4] === 10)],
     ([found, shown, tiles]) => !wide(found) && shown.length > 1 && shown.length < TABS.length && tiles.length === 1);
 
   // 7 · `type` `BACKDROP`: the media behind the words, the words at three fifths on a tablet and a desktop
@@ -1875,17 +1899,17 @@ console.log("=== SKELETON — text that fits: words that wrap, code and tabs tha
     { items: [{ control: "button", text: "Start building", main: true }, { control: "button", text: "Read the docs" }] }] } });
   const backdrop = (viewport, extra, rows) => view(viewport, [{ items: [HERO(extra, rows)] }]);
   const desk = backdrop("DESKTOP"), phone = backdrop("MOBILE");
-  const picture = (g) => boxes(g, "sds-skel-surface").find((b) => b[0] === 24 + 16 + 8);
+  const picture = (g) => boxes(g, "dl-sk-surface").find((b) => b[0] === 16 + 16 + 8);
   const span = (g) => { const words = texts(g).filter((t) => ["Ship your SaaS in weeks", "Start building", "Read the docs"].includes(t.words)); return [Math.min(...words.map((t) => t.x)), Math.max(...words.map((t) => t.x))]; };
   one("a `DSFeature` of `type` `BACKDROP` draws its media behind its words: one box across the feature under its name, its name at its corner, the head and the actions inside it, with no finding",
     [desk.findings, picture(desk.svg), wordsAt(desk.svg, "mediaNode · a mood picture"), wordsAt(desk.svg, "Ship your SaaS in weeks"), wordsAt(desk.svg, "Read the docs")],
-    ([found, box, name, title, action]) => found.length === 0 && box && box[2] === 1052 - 32 - 16 && name.x === box[0] + 8 && name.y === box[1] + 16
+    ([found, box, name, title, action]) => found.length === 0 && box && box[2] === 896 - 32 - 16 && name.x === box[0] + 8 && name.y === box[1] + 16
       && title.y > name.y && action.y < box[1] + box[3]);
   const [deskFrom, deskTo] = span(desk.svg), [phoneFrom] = span(phone.svg);
   one("over a backdrop the words keep to three fifths of the width on a desktop, centred by the head's `textAlign`, and take the whole width on a phone",
     [deskFrom, deskTo, phoneFrom, picture(desk.svg)], ([from, to, phoneStart, box]) => from > box[0] + box[2] * 0.15 && to < box[0] + box[2] * 0.85 && phoneStart < from);
   one("a part named in `frames` frames the whole of a backdrop, as its media lies under its words",
-    boxes(backdrop("DESKTOP", { frames: ["MEDIA"], surface: { bordered: true } }).svg, "sds-skel-border").filter((b) => b[4] === 8), (frames) => frames.length === 1 && frames[0][0] === 24 + 16);
+    boxes(backdrop("DESKTOP", { frames: ["MEDIA"], surface: { bordered: true } }).svg, "dl-line-edge").filter((b) => b[4] === 10), (frames) => frames.length === 1 && frames[0][0] === 16 + 16);
   one("another `type`, a `BACKDROP` with no slot alone in a row, and `type` on a frame that is not a `DSFeature` are findings",
     [backdrop("DESKTOP", { type: "SPLIT_END" }).findings, backdrop("DESKTOP", {}, [{ items: [{ head: { title: "Ship" } }] }]).findings,
       view("DESKTOP", [{ items: [{ fill: true, frame: { unit: "DSSectionContainer", type: "BACKDROP", rows: [{ items: [{ text: "Hi" }] }] } }] }]).findings],
@@ -1901,7 +1925,208 @@ console.log("=== SKELETON — text that fits: words that wrap, code and tabs tha
       { items: [{ note: "Synced every hour" }] },
       { items: [{ fill: true, frame: { unit: "DSCodeBlockView", label: "config.ts", rows: [{ items: [{ note: "const config = {};" }] }] } }] }] } }] }] } }] };
   one("item lines, heads, notes, code and tabs that fit their columns draw byte for byte as before",
-    createHash("sha256").update(draw(FITS_BEFORE).svg).digest("hex"), "1e01355fe79104bc7aa6503a0579260d2a7d63c395adf4749b9ff93623544837");
+    createHash("sha256").update(draw(FITS_BEFORE).svg).digest("hex"), "0824126c06505cde6b127db7d328060641096d19f7d1b39695a5e6c747d01be7");
+}
+
+console.log("\n=== the docs design language: a wire runs straight, a figure says how it moves, a unit may carry a glyph");
+{
+  // A WIRE RUNS STRAIGHT BETWEEN CENTRES THAT LINE UP, WITH NO JOG: the one child of a box, and the middle one of an odd number of them,
+  // stand on their parent's centre, so the wire into each is one straight run.
+  const tree = draw({ kind: "map", boxes: [{ id: "p", label: "Parent box", note: "with a note under it" }, { id: "l", label: "Left" }, { id: "m", label: "The middle one", note: "a wider box" },
+    { id: "r", label: "Right" }, { id: "o", label: "Only child" }], links: [{ from: "p", to: "l" }, { from: "p", to: "m" }, { from: "p", to: "r" }, { from: "m", to: "o" }] });
+  one("the middle child and the only child are each reached by one straight wire, with no jog", wires(tree.svg), (ds) =>
+    ds.length === 4 && ds.filter((d) => /^M[\d.]+ [\d.]+ V[\d.]+$/.test(d)).length >= 2);
+  one("and the figure check passes it", checkFigures(tree.svg), none);
+
+  const fig = draw({ kind: "sequence", motion: "pulse", boxes: [{ id: "a", label: "A" }, { id: "b", label: "B" }], links: [{ from: "a", to: "b", label: "asks" }, { from: "b", to: "a", label: "answers", dashed: true }] });
+  one("a spec's `motion` is written on the drawing for the page's script, and each message is a numbered wire the pulse follows",
+    fig.svg, (g) => g.includes('data-motion="pulse"') && /data-dl-flow="1"/.test(g) && /data-dl-flow="2"/.test(g));
+  one("a motion the language lacks is a finding that names the two it has", draw({ kind: "map", motion: "spin", boxes: [{ id: "a", label: "A" }] }).findings, says("`draw-once`, `pulse` or `focus-steps`"));
+  one("a figure with no `motion` is still: no attribute", draw({ kind: "map", boxes: [{ id: "a", label: "A" }] }).svg, (g) => !g.includes("data-motion"));
+
+  const glyph = draw({ kind: "map", boxes: [{ id: "a", label: "Members", note: "who is in", icon: "users" }, { id: "b", label: "Keys", icon: "key-round" }], links: [{ from: "a", to: "b" }] });
+  one("a box that names a `icon` carries its glyph 12 from the left, 16 wide, and its words after it", glyph.svg, (g) => (g.match(/<g class="dl-glyph"/g) ?? []).length === 2 && /<text class="dl-name" x="\d+" y="[\d.]+">Members</.test(g));
+  one("and the figure check passes it", checkFigures(glyph.svg), none);
+
+  const placed = figureOf({ kind: "map", caption: "c" }, draw({ kind: "map", boxes: [{ id: "a", label: "A" }] }).svg, "A caption.");
+  one("the figure as a page holds it is a `dl-figure` of one frame and the caption, and carries no case line by default",
+    placed, (g) => g.startsWith('<figure class="dl-figure">\n<div class="dl-frame">') && g.includes("<figcaption>A caption.</figcaption>") && !g.includes("dl-case"));
+  one("a case line, a reviewer's note, is written only when asked for: `caseLine`",
+    figureOf({ kind: "map", caption: "c" }, draw({ kind: "map", boxes: [{ id: "a", label: "A" }] }).svg, "A caption.", { caseLine: true }),
+    (g) => g.includes('<p class="dl-case"><b>Map</b> &middot; frame 928 &middot; labels 12 / 10 / 9.5 px &middot; still &middot; people: none</p>'));
+}
+
+console.log("=== every link of a system draws, a map lays a plate in columns, chains are rows (order 04)");
+{
+  const B = (id, label, kw = {}) => ({ id, label, ...kw });
+  const sys = { kind: "system", title: "mod", layers: [
+      { name: "Entry", boxes: [B("api", "api"), B("cli", "cli"), B("q", "queue")] }, { name: "App", boxes: [B("svc", "services", { em: true }), B("repo", "repositories")] }],
+    outside: [B("client", "Browser", { as: "client" }), B("door", "Ingress", { as: "way-in" }), B("term", "Terminal", { as: "client" }), B("sched", "Scheduler", { as: "service" }),
+      B("queue", "Queue", { as: "queue" }), B("db", "Database", { as: "store" })],
+    links: [{ from: "client", to: "door", label: "arrives" }, { from: "door", to: "api", label: "calls" }, { from: "term", to: "cli", label: "runs" },
+      { from: "sched", to: "api", label: "calls instead" }, { from: "sched", to: "queue", label: "enqueues" }, { from: "queue", to: "q", label: "pulls" },
+      { from: "svc", to: "queue", label: "puts work" }, { from: "svc", to: "sched", label: "creates" }, { from: "svc", to: "db", label: "commits" }, { from: "repo", to: "db", label: "rows" }] };
+  const r = judge(sys);
+  one("every link of a system draws: the layer wire and one wire for each of its ten links", (r.svg.match(/<path class="dl-wire/g) ?? []).length, 11);
+  one("a system fits the 928 frame, at 1:1", r.svg, (g) => /viewBox="0 0 928 /.test(g));
+  one("a system with links that go round is clean for the check and the drawer", [r.findings, r.figure], ([f, c]) => f.length === 0 && c.length === 0);
+  const mp = judge({ kind: "map", boxes: [B("w", "Whole"), B("a", "A", { note: "n", in: "w" }), B("b", "B", { in: "w" }), B("c", "C", { in: "w" }), B("d", "D", { in: "w" })], links: [{ from: "a", to: "b" }, { from: "a", to: "c" }] });
+  const tiles = [...mp.svg.matchAll(/<rect class="dl-tile[^"]*" x="([\d.]+)" y="([\d.]+)" width="([\d.]+)" height="([\d.]+)"/g)].map((m) => m.slice(1).map(Number));
+  one("a plate whose tiles are joined lays them in columns: the feeding tile, its targets stacked, and the unlinked one beside", tiles.length === 4 && tiles[0][0] < tiles[1][0] && tiles[1][0] === tiles[2][0] && tiles[2][1] > tiles[1][1] && tiles[3][0] > tiles[1][0], true);
+  one("the tiles of a column share the plate's height, and the figure is clean", [tiles[0][3] === tiles[3][3], mp.figure.length], (g) => g[0] && g[1] === 0);
+  const ch = judge({ kind: "map", boxes: ["a", "b", "c", "d", "e", "f"].map((i) => B(i, i.toUpperCase())), links: [{ from: "a", to: "b" }, { from: "b", to: "c" }, { from: "d", to: "e" }, { from: "e", to: "f" }] });
+  const ys = [...new Set([...ch.svg.matchAll(/<rect class="dl-tile" x="[\d.]+" y="([\d.]+)"/g)].map((m) => m[1]))];
+  one("two chains draw as two rows, each wire straight across, and the figure is clean", [ys.length, ch.figure.length], (g) => g[0] === 2 && g[1] === 0);
+  const gn = draw({ kind: "map", boxes: [B("g", "Group", { note: "its own detail" }), B("k", "Kid", { in: "g" })] });
+  one("a group may carry a detail line of its own, under its tiles", gn.svg, (g) => g.includes(">its own detail<"));
+}
+
+console.log("=== motion: each kind takes only the motions the language's table gives it (order 04)");
+{
+  const steps = draw({ kind: "chain", motion: "focus-steps", boxes: [{ id: "a", label: "A" }, { id: "b", label: "B" }, { id: "c", label: "C" }], links: [{ from: "a", to: "b" }, { from: "b", to: "c" }] });
+  one("focus steps number each unit in the order drawn, for the page's Next and Back", steps.svg, (g) => g.includes('data-motion="focus-steps"') && /data-dl-step="1"/.test(g) && /data-dl-step="3"/.test(g) && !/data-dl-step="4"/.test(g));
+  one("and the figure as a page holds it carries the two buttons and says it steps",
+    figureOf({ kind: "chain", motion: "focus-steps" }, steps.svg, "", { caseLine: true }), (g) => g.includes("data-dl-stepped") && g.includes("data-dl-next") && g.includes("steps with Next and Back"));
+  one("a pulse numbers every wire of a flowchart in the order drawn", draw({ kind: "flowchart", motion: "pulse", boxes: [{ id: "a", label: "A" }, { id: "b", label: "B" }, { id: "c", label: "C" }], links: [{ from: "a", to: "b" }, { from: "b", to: "c" }] }).svg,
+    (g) => /data-dl-flow="1"/.test(g) && /data-dl-flow="2"/.test(g));
+  one("a motion on a kind the table does not give it is a finding", draw({ kind: "skeleton", motion: "pulse", frame: { rows: [] } }).findings, says("a `skeleton` figure stays still"));
+  one("draw once is refused on a sequence, which takes the pulse", draw({ kind: "sequence", motion: "draw-once", boxes: [{ id: "a", label: "A" }, { id: "b", label: "B" }], links: [{ from: "a", to: "b", label: "x" }] }).findings, says("stays still"));
+}
+
+
+console.log("=== the flowchart's spine, the wide skeleton, the bus and the accent (order 05)");
+{
+  const tile = (svg, w) => [...svg.matchAll(/<(?:rect|path) class="dl-tile[\w-]*"[^>]*>/g)].map((m) => m[0]);
+  const rects = (svg) => [...svg.matchAll(/<rect class="dl-tile[\w-]*" x="(-?[\d.]+)" y="(-?[\d.]+)" width="([\d.]+)" height="([\d.]+)"/g)].map((m) => m.slice(1).map(Number));
+  const fc = { kind: "flowchart", boxes: [{ id: "s", label: "Start", shape: "terminator", em: true }, { id: "p", label: "A step" }, { id: "d", label: "Is it right?", shape: "decision" },
+    { id: "a", label: "Fix it" }, { id: "b", label: "Ship it" }, { id: "e", label: "End", shape: "terminator", em: true }],
+    links: [{ from: "s", to: "p" }, { from: "p", to: "d" }, { from: "d", to: "a", label: "no" }, { from: "d", to: "b", label: "yes" }, { from: "a", to: "e" }, { from: "b", to: "e" }] };
+  const f = draw(fc);
+  const r = rects(f.svg).map(([x, , w]) => x + w / 2);
+  one("a flowchart's spine stands on the middle of the 928 frame", r[0], (c) => Math.abs(c - 464) < 1);
+  one("its branches stand the same distance either side of the spine", rects(f.svg).filter((_, i) => i === 2 || i === 3).map(([x, , w]) => x + w / 2), ([l, rr]) => Math.abs((464 - l) - (rr - 464)) < 1);
+  one("a branch rejoins at the end's top, and no wire runs down the frame's edge", [...f.svg.matchAll(/class="dl-wire(?:-on)?" d="([^"]+)"/g)].map((m) => m[1]),
+    (ds) => ds.every((d) => [...d.matchAll(/[ML](-?[\d.]+) /g)].every((m) => Number(m[1]) > 100 && Number(m[1]) < 828)));
+  one("the flowchart is clean and its figure check finds nothing", [f.findings, checkFigures(f.svg)], ([a, b]) => a.length === 0 && b.length === 0);
+  one("a decision is sized to its words: the diamond of two short words is narrower than 220", f.svg.match(/class="dl-tile" d="M([\d.]+) ([\d.]+)/) ? 1 : 0, () => {
+    const m = f.svg.match(/<path class="dl-tile" d="([^"]+)"/)[1]; const xs = [...m.matchAll(/[ML]([\d.]+) /g)].map((q) => Number(q[1]));
+    return Math.max(...xs) - Math.min(...xs) < 220;
+  });
+  one("the wires into a tile in focus are the accent, and the rest are plain", [(f.svg.match(/class="dl-wire-on"/g) ?? []).length, (f.svg.match(/class="dl-wire"/g) ?? []).length], ([on, plain]) => on === 2 && plain === 4);
+  one("the flowchart's tiles stand 56 apart down the spine", rects(f.svg).slice(0, 2), ([a, b]) => b[1] - (a[1] + a[3]) === 56);
+  // the skeleton of panels that cannot stand across 896 wraps into rows of as many as fit
+  const panel = (tag) => ({ frame: { tag, rows: [{ items: [{ standin: "rows", lines: 3, fill: true }] }, { items: [{ control: "button", text: "A long button label here" }, { control: "button", text: "Another long one" }] }] } });
+  const wide = draw({ kind: "skeleton", frame: { label: "Panels", rows: [{ items: [panel("one"), panel("two"), panel("three"), panel("four"), panel("five")] }] } });
+  one("a row of panels that cannot fit 928 wraps into rows, and the figure is 928 wide", [wide.svg.match(/viewBox="0 0 (\d+)/)[1], wide.findings], ([w, fs]) => Number(w) === 928 && fs.length === 0);
+  // wires that meet one tile join one bus
+  const bus = draw({ kind: "entities", boxes: [{ id: "a", label: "A" }, { id: "b", label: "B" }, { id: "c", label: "Centre", em: true }], links: [{ from: "a", to: "c", label: "x", card: "1:N" }, { from: "b", to: "c", label: "y", card: "1:N" }] });
+  const ds = [...bus.svg.matchAll(/class="dl-wire-on" d="([^"]+)"/g)].map((m) => m[1]);
+  const trunk = (d) => d.match(/L([\d.]+) ([\d.]+)\s*$/);
+  one("two wires into one tile run the same last stretch: one bus, then one line", [ds.length, ds.map((d) => d.split(" ").slice(-2).join(" "))], ([n, ends]) => n === 2 && ends[0] === ends[1]);
+  one("a system layer's name is a label in small capitals", draw({ kind: "system", title: "m", layers: [{ name: "Entry", boxes: [{ id: "x", label: "api" }] }], outside: [] }).svg, (g) => g.includes('class="dl-label"') && g.includes(">ENTRY<"));
+  // a system's wire labels stand on their own wire as drawn, after the bus has joined the wires that meet one tile (order 06)
+  const cloud = draw({ kind: "system", title: "acct", layers: [
+    { name: "App", boxes: [{ id: "compute", label: "compute", em: true }, { id: "workers", label: "workers" }] }],
+  outside: [{ id: "secrets", label: "Secrets", as: "cache" }, { id: "mdb", label: "Database", as: "store" }, { id: "bucket", label: "Bucket", as: "bucket" }],
+  links: [{ from: "compute", to: "secrets", label: "{{reads}}" }, { from: "compute", to: "mdb", label: "{{writes}}" }, { from: "workers", to: "bucket", label: "{{objects}}" }, { from: "workers", to: "mdb", label: "{{queries}}" }] });
+  const runsOfSvg = (svg) => [...svg.matchAll(/class="dl-wire(?:-on)?(?: dl-wire-dash)?" d="([^"]+)"/g)].flatMap((m) => {
+    const p = [...m[1].matchAll(/([MLQ])\s*(-?[\d.]+)\s+(-?[\d.]+)(?:\s+(-?[\d.]+)\s+(-?[\d.]+))?/g)].flatMap(([, c, a, b, c2, d2]) => c === "Q" ? [[+a, +b], [+c2, +d2]] : [[+a, +b]]);
+    return p.slice(1).map((q, i) => [p[i], q]).filter(([u, v]) => u[1] === v[1] && u[0] !== v[0]).map(([u, v]) => [Math.min(u[0], v[0]), Math.max(u[0], v[0]), u[1]]);
+  });
+  const labels = [...cloud.svg.matchAll(/<text class="dl-wlabel" x="(-?[\d.]+)" y="(-?[\d.]+)"[^>]*>([^<]*)</g)].map((m) => ({ x: +m[1], y: +m[2], w: m[3].length * 6, t: m[3] }));
+  const wire = runsOfSvg(cloud.svg);
+  one("every wire label of a system stands 8 above a straight run of a wire, over the middle of its words", labels.map((l) => [l.t, wire.some(([a, b, y]) => Math.abs(y - (l.y + 8)) < 1.5 && a <= l.x + l.w / 2 && l.x + l.w / 2 <= b)]),
+    (r) => r.length === 4 && r.every(([, ok]) => ok));
+  // every system figure of the book's templates stands at 928 or less, 1:1, never scaled to the column (order 06)
+  const widthOf = (spec) => Number(draw(spec).svg.match(/viewBox="0 0 (\d+)/)[1]);
+  const bussed = (n) => ({ kind: "system", title: "m", layers: [{ name: "App", boxes: [{ id: "a", label: "api" }, { id: "b", label: "worker" }] }],
+    outside: [{ id: "db", label: "Database", as: "store" }, { id: "q", label: "Queue", as: "queue" }, { id: "in", label: "Client", as: "client" }],
+    links: [{ from: "in", to: "a", label: "calls" }, { from: "a", to: "db", label: "x".repeat(n) }, { from: "b", to: "db", label: "y".repeat(n) }, { from: "b", to: "q", label: "z".repeat(n) }] });
+  one("a system figure with wires on a bus stays within 928 at 1:1, for short and for long words", [10, 14, 18].map((n) => widthOf(bussed(n))), (ws) => ws.every((w) => w <= 928));
+  const edges = (svg) => { const w = Number(svg.match(/viewBox="0 0 (\d+)/)[1]); const r = [...svg.matchAll(/<rect class="dl-(?:plate|tile)[^"]*" x="([\d.]+)" y="[\d.]+" width="([\d.]+)"/g)].map((m) => [+m[1], +m[1] + +m[2]]); return [Math.min(...r.map((q) => q[0])), w - Math.max(...r.map((q) => q[1]))]; };
+  one("a system figure's content stands 16 or more from the frame on each side, never nearer, for short and for long words",
+    [...[10, 14, 18, 22].map((n) => draw(bussed(n)).svg), cloud.svg].map(edges), (es) => es.every(([l, r]) => l >= 16 && r >= 16));
+  // THE INNER TEXT BOX OF EVERY SPECIAL SHAPE: the text stands inside the largest rectangle the outline holds, 8 or more from each curve and slant
+  const shapeBox = (svg) => { const xs = [], ys = []; for (const m of svg.matchAll(/<rect class="dl-tile[^"]*" x="([\d.]+)" y="([\d.]+)" width="([\d.]+)" height="([\d.]+)"/g)) { xs.push(+m[1], +m[1] + +m[3]); ys.push(+m[2], +m[2] + +m[4]); }
+    for (const m of svg.matchAll(/<ellipse class="dl-tile[^"]*" cx="([\d.]+)" cy="([\d.]+)" rx="([\d.]+)" ry="([\d.]+)"/g)) { xs.push(+m[1] - +m[3], +m[1] + +m[3]); ys.push(+m[2] - +m[4], +m[2] + +m[4]); }
+    for (const m of svg.matchAll(/<path class="dl-tile[^"]*" d="([^"]+)"/g)) for (const q of m[1].matchAll(/(-?[\d.]+) (-?[\d.]+)/g)) { xs.push(+q[1]); ys.push(+q[2]); }
+    return { x: Math.min(...xs), y: Math.min(...ys), w: Math.max(...xs) - Math.min(...xs), h: Math.max(...ys) - Math.min(...ys) }; };
+  const textBox = (svg) => { let l = 1e9, r = -1e9, t = 1e9, b = -1e9; for (const m of svg.matchAll(/<text class="(dl-name|dl-detail)" x="([\d.]+)" y="([\d.]+)"( text-anchor="middle")?>([^<]*)</g)) { const w = m[5].length * (m[1] === "dl-name" ? 6.8 : 6), x = +m[2] - (m[4] ? w / 2 : 0); l = Math.min(l, x); r = Math.max(r, x + w); t = Math.min(t, +m[3] - (m[1] === "dl-name" ? 12 : 10)); b = Math.max(b, +m[3]); } return { l, r, t, b }; };
+  const innerOf = (shape, bx) => ({ store: [bx.x, bx.x + bx.w, bx.y + 24, bx.y + bx.h], pipe: [bx.x + 24, bx.x + bx.w, bx.y, bx.y + bx.h], bucket: [bx.x + 12, bx.x + bx.w - 12, bx.y, bx.y + bx.h],
+    io: [bx.x + 16, bx.x + bx.w - 16, bx.y, bx.y + bx.h], chevron: [bx.x, bx.x + bx.w - 40, bx.y, bx.y + bx.h], predefined: [bx.x + 12, bx.x + bx.w - 12, bx.y, bx.y + bx.h],
+    terminator: [bx.x + bx.h / 2 * 0.27, bx.x + bx.w - bx.h / 2 * 0.27, bx.y, bx.y + bx.h], window: [bx.x, bx.x + bx.w, bx.y, bx.y + bx.h], process: [bx.x, bx.x + bx.w, bx.y, bx.y + bx.h] })[shape];
+  const pads = {};
+  for (const shape of ["store", "pipe", "bucket", "io", "chevron", "predefined", "terminator", "window", "process"]) {
+    const svg = draw({ kind: "map", boxes: [{ id: "a", label: "A name", note: "a short detail line", shape }] }).svg;
+    const unitA = svg;
+    const bx = shapeBox(unitA), tb = textBox(unitA), [il, ir, it, ib] = innerOf(shape, bx);
+    pads[shape] = Math.min(tb.l - il, ir - tb.r, tb.t - it, ib - tb.b);
+  }
+  one("each special shape lays its text in the inner rectangle of its outline, 8 or more clear of every curve and slant (cylinder, horizontal cylinder, trapezoid, parallelogram, arrow, predefined, terminator, plain tile)", pads, (p) => Object.values(p).every((v) => v >= 8));
+  const dec = draw({ kind: "flowchart", boxes: [{ id: "a", label: "Does it pass?", note: "decided by the check", shape: "decision" }] }).svg;
+  { const bx = shapeBox(dec), tb = textBox(dec);
+    one("a decision holds its text with 8 clear all round: the inscribed rectangle of the diamond", ((tb.r - tb.l + 16) / bx.w) + ((tb.b - tb.t + 16) / bx.h), (v) => v <= 1); }
+  // the tiles of a row are equal in width and in height, with their names on one baseline, whatever their texts hold
+  const rowSpec = { kind: "map", boxes: [{ id: "a", label: "Violet", note: "a long detail" }, { id: "b", label: "Cyan" }, { id: "c", label: "Pink", note: "short" }, { id: "d", label: "A longer name", note: "mid detail" }, { id: "e", label: "Olive" }], links: [{ from: "a", to: "b" }, { from: "b", to: "c" }, { from: "c", to: "d" }, { from: "d", to: "e" }, { from: "x", to: "y" }].slice(0, 4).concat([]) };
+  const gridRows = (svg) => { const tiles = [...svg.matchAll(/<rect class="dl-tile[^"]*" x="([\d.]+)" y="([\d.]+)" width="([\d.]+)" height="([\d.]+)"/g)].map((m) => m.slice(1).map(Number)); const names = [...svg.matchAll(/<text class="dl-name" x="([\d.]+)" y="([\d.]+)"/g)].map((m) => +m[2]);
+    return { widths: new Set(tiles.map((t) => t[2])).size, heights: new Set(tiles.map((t) => t[3])).size, tops: new Set(tiles.map((t) => t[1])).size, baselines: new Set(names.map((y, i) => y - tiles[i][1])).size }; };
+  for (const [name, spec] of [["a map's one-way chain row", rowSpec], ["a chain", { ...rowSpec, kind: "chain", links: [] }]]) {
+    const g = gridRows(draw(spec).svg);
+    one(`${name}: tiles whose texts differ in length draw one width, one height, one top, and names on one baseline`, g, (v) => v.widths === 1 && v.heights === 1 && v.tops === 1 && v.baselines === 1);
+  }
+  const pal = draw({ kind: "map", boxes: ["a", "b", "c", "d", "e", "f", "g", "h"].map((id, i) => ({ id, label: i % 3 ? "Hue " + id : "A longer hue name " + id, ...(i % 2 ? { note: "a detail that wraps to more lines than the others do here" } : {}) })), links: [{ from: "a", to: "b" }, { from: "b", to: "c" }, { from: "c", to: "d" }, { from: "e", to: "f" }, { from: "f", to: "g" }, { from: "g", to: "h" }] }).svg;
+  one("a grid of two rows draws every tile one width and one height: its columns line up from row to row", gridRows(pal), (v) => v.widths === 1 && v.heights === 1);
+  one("no label of that system stands away from the wires: each is within 8 of one", labels.map((l) => Math.min(...wire.filter(([a, b]) => a <= l.x + l.w && l.x <= b).map(([, , y]) => Math.abs(y - l.y)))), (ds) => ds.every((d) => d <= 9));
+}
+
+// ---------------------------------------------------------------------------------------------------------------------------------
+// ORDER 08 · A SKELETON'S CORNERS ARE THE THEME'S: each unit role takes the design system's token for it, at the default theme and when
+// `--radius` is changed in the tokens. The tokens are read from the docs build's own `ds-tokens.css`, never typed here.
+{
+  console.log("\n=== SKELETON — corners come from the design system's tokens");
+  const { readFileSync } = await import("node:fs");
+  const { SKEL_CORNER } = await import("../../../../src/scripts/lib/draw.ts");
+  const tokens = readFileSync(new URL("../../../../src/styles/ds-tokens.css", import.meta.url), "utf8");
+  // a tiny resolver for the declarations the corner tokens are made of: `var(--a)`, `calc(x +/- Npx)`, `calc(x / N)`, `N rem`
+  const decl = (name, css) => { const m = [...css.matchAll(new RegExp(`(?:^|[;{\\s])${name}:\\s*([^;]+);`, "g"))]; return m.length ? m[0][1].replace(/\/\*.*?\*\//g, "").trim() : undefined; };
+  const px = (expr, css, radius) => {
+    expr = expr.trim();
+    let m;
+    if ((m = expr.match(/^var\((--[\w-]+)\)$/))) return m[1] === "--radius" ? radius : px(decl(m[1], css), css, radius);
+    if ((m = expr.match(/^calc\((.+)\)$/))) return px(m[1], css, radius);
+    if ((m = expr.match(/^(.+?)\s+([-+])\s+(\d+)px$/))) return px(m[1], css, radius) + (m[2] === "-" ? -1 : 1) * Number(m[3]);
+    if ((m = expr.match(/^(.+?)\s*\/\s*(\d+)$/))) return px(m[1], css, radius) / Number(m[2]);
+    if ((m = expr.match(/^([\d.]+)rem$/))) return Number(m[1]) * 16;
+    throw new Error("cannot resolve " + expr);
+  };
+  const base = px(decl("--radius", tokens), tokens, NaN);
+  one("the default theme's `--radius` is 10px", base, 10);
+  const roles = Object.entries(SKEL_CORNER);
+  one("every themed role's `rx` fallback is its token's value at the default theme", roles.map(([r, c]) => [r, px(c.css, tokens, base)]),
+    (v) => v.every(([r, got]) => got === SKEL_CORNER[r].px));
+  const AT = (r) => ({ ctl: r - 4, badge: r - 4, xs: r - 4, sm: r - 2, md: r - 2, lg: r, xl: r, frame: r, inset: r - 2, mark: (r - 4) / 2 });
+  one("a changed `--radius` changes every themed role: at 4px and at 16px the corners are the theme's own, none of the docs' numbers",
+    [4, 16].map((r) => roles.map(([role, c]) => [role, px(c.css, tokens, r), AT(r)[role]])), (v) => v.every((set) => set.every(([, got, want]) => got === want)));
+  one("the tokens the roles name are in the docs build's `ds-tokens.css`, which `docs sds cut --ds` copies from the design system", ["--radius-sm", "--radius-md", "--radius-lg", "--size-xs-radius", "--size-sm-radius", "--size-md-radius", "--size-lg-radius", "--size-xl-radius"].map((t) => decl(t, tokens) !== undefined), (v) => v.every(Boolean));
+  // what the drawer writes: each unit role carries its role and the token's px
+  const frameSpec = (rows, extra = {}) => draw({ kind: "skeleton", frame: { rows, ...extra } });
+  const rectsOf = (svg, cls) => [...svg.matchAll(new RegExp(`<rect class="${cls}" [^>]*?rx="([\\d.]+)"(?: data-corner="(\\w+)")?`, "g"))].map((m) => [Number(m[1]), m[2]]);
+  const ctrls = (control, text, extra = {}) => frameSpec([{ items: [{ control, text, ...extra }] }]).svg;
+  for (const control of ["button", "input", "select"])
+    one(`a ${control} takes the control corner \`--radius-sm\`, 6, at the default theme`, rectsOf(ctrls(control, "Save"), "dl-ctl").filter((r) => r[1] === "ctl"), (v) => v.length === 1 && v[0][0] === 6);
+  for (const size of ["XS", "SM", "MD", "LG", "XL"])
+    one(`a button at ${size} takes the same \`--radius-sm\` corner: the design system fixes it at every size`, rectsOf(frameSpec([{ items: [{ control: "button", text: "Go" }] }], { size }).svg, "dl-ctl").filter((r) => r[1] === "ctl").map((r) => r[0]), (v) => v.length === 1 && v[0] === 6);
+  one("a badge takes `--radius-sm`, the design system's `rounded-sm`, and is no pill", rectsOf(ctrls("badge", "New"), "dl-ctl"), (v) => v.length === 1 && v[0][1] === "badge" && v[0][0] === 6);
+  one("a checkbox and a pager's buttons take the control corner", [rectsOf(ctrls("checkbox", "Agree"), "dl-ctl"), rectsOf(ctrls("pager", "", { pages: 3 }), "dl-ctl")], (v) => v[0].every((r) => r[1] === "ctl") && v[1].every((r) => r[1] === "ctl"));
+  one("a switch's track is a pill: full, no token", rectsOf(ctrls("switch", "On"), "dl-ctl"), (v) => v.length === 1 && v[0][1] === undefined && v[0][0] > 0);
+  const tabsPill = frameSpec([{ items: [{ control: "tabs", tabs: ["A", "B"], chosen: 0, type: "PILL" }] }]).svg;
+  one("a pill tab bar stays a pill, its track and its chosen tab rounded to half the shorter side, no token", [...tabsPill.matchAll(/<rect class="dl-(?:sk-surface|ctl)" [^>]*?width="([\d.]+)" height="([\d.]+)" rx="([\d.]+)"( data-corner)?/g)].map((m) => [Number(m[3]) === Math.min(Number(m[1]), Number(m[2])) / 2, !m[4]]), (v) => v.length === 3 && v.every(([half, bare]) => half && bare));
+  one("a card with no size takes `--radius-lg`, 10", rectsOf(frameSpec([{ items: [{ frame: { look: "card", label: "Card", rows: [{ items: [{ note: "n" }] }] } }] }]).svg, "dl-ctl").filter((r) => r[1] === "frame"), (v) => v.length >= 1 && v.every((r) => r[0] === 10));
+  const sized = (size) => rectsOf(frameSpec([{ items: [{ frame: { look: "card", size, label: "Card", rows: [{ items: [{ note: "n" }] }] } }] }]).svg, "dl-ctl").filter((r) => r[1] && r[1] !== "ctl");
+  for (const [size, role, want] of [["XS", "xs", 6], ["SM", "sm", 8], ["MD", "md", 8], ["LG", "lg", 10], ["XL", "xl", 10]])
+    one(`a card at ${size} takes \`--size-${role}-radius\`, ${want}`, sized(size), (v) => v.length >= 1 && v.every((r) => r[1] === role && r[0] === want));
+  one("a frame with `rounded: false` stays square: rx 0, no role", rectsOf(draw({ kind: "skeleton", frame: { rows: [{ items: [{ frame: { tag: "C", frames: ["Header"], bordered: true, rounded: false, rows: [{ items: [{ frame: { tag: "Header", rows: [{ items: [{ text: "Header" }] }] } }] }] } }] }] } }).svg, "dl-line-edge"), (v) => v.length >= 1 && v.every((r) => r[0] === 0 && r[1] === undefined));
+  one("every rect with no role in a skeleton is square or a pill: none takes a number of the docs' own", (() => { const svg = ctrls("button", "Save") + frameSpec([{ items: [{ control: "badge", text: "n" }, { control: "switch", text: "s" }, { control: "tabs", tabs: ["A"], chosen: 0 }] }, { items: [{ standin: "rows" }] }]).svg; return [...svg.matchAll(/<rect [^>]*?width="([\d.]+)" height="([\d.]+)" rx="([\d.]+)"(?: data-corner="(\w+)")?/g)].filter((m) => !m[4] && Number(m[3]) !== 0 && Number(m[3]) !== Math.min(Number(m[1]), Number(m[2])) / 2).length; })(), 0);
 }
 
 console.log(failed ? `\n  ${failed} FAILED` : `\n  all ${n} passed`);

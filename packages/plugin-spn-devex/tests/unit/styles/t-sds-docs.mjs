@@ -31,11 +31,15 @@ const block = (lang, text, holdsElement = false) => ({
 
 /** Runs the whole script on a page that holds these blocks and nothing else. A block with no tag is not a `pre[data-lang]`. */
 const open = (blocks) => {
+  // The page is a page with no figure and no mode switch: the docs design language's behaviour (the mode switch, a figure's steps,
+  // its tap to open, its motion) finds nothing on it, and the script must still colour the blocks.
   const document = {
     getElementById: () => null,
+    querySelector: () => null,
+    documentElement: { getAttribute: () => null, setAttribute() {} },
     querySelectorAll: (selector) => (selector === "pre[data-lang]" ? blocks.filter((pre) => pre.lang !== null) : []),
   };
-  vm.runInNewContext(SCRIPT, { document: document, window: { addEventListener() {}, scrollY: 0 } });
+  vm.runInNewContext(SCRIPT, { document: document, window: { addEventListener() {}, scrollY: 0, matchMedia: () => ({ matches: false }) } });
   return blocks;
 };
 
@@ -58,7 +62,7 @@ const SAMPLES = {
   },
   yaml: {
     plain: "# one environment row\nsetup: dev\nregion: in",
-    coloured: `${comment("# one environment row")}\nsetup: dev\nregion: in`,
+    coloured: `${comment("# one environment row")}\n${type("setup")}: dev\n${type("region")}: in`,
   },
   sql: {
     plain: "CREATE TABLE iam_identity (\n  id CHAR(26) PRIMARY KEY, -- the row's id\n  handle VARCHAR(180) NOT NULL\n);",
@@ -96,8 +100,27 @@ ok("a keyword inside a comment or a string is not coloured as code, and the scri
 console.log("=== the shared script — what it leaves alone");
 const [untagged] = open([block(null, "folder/\n  file 26")]);
 ok("a block with no language is not coloured", untagged.innerHTML === null);
-const [unknown] = open([block("text", "folder/\n  file")]);
+const [unknown] = open([block("cobol", "folder/\n  file")]);
 ok("a block with a language the script does not know is not coloured", unknown.innerHTML === null);
+// A file tree: a folder in the type colour, a file in the ink, the words after its gap in the comment colour (N010).
+const [tree] = open([block("tree", "docs/\n  README.md   the map")]);
+ok("a tree block colours its folder and its comment, and leaves its file plain",
+  tree.innerHTML === `${type("docs/")}\n  README.md   ${comment("the map")}`, tree.innerHTML);
+const [textTree] = open([block("text", "folder/\n  file")]);
+ok("a text block shaped as a tree is coloured as one", textTree.innerHTML === `${type("folder/")}\n  file`, textTree.innerHTML);
+const [plainText] = open([block("text", "the first line is not a folder\n  so this stays plain")]);
+ok("a text block not shaped as a tree is not coloured", plainText.innerHTML === null);
+const [drawn] = open([block("tree", "repo/\n├── docs/\n│   └── a.md      new      the page")]);
+ok("a tree drawn with box marks keeps its branches quiet and colours a status word as a diff does",
+  drawn.innerHTML.includes('<span class="sds-tk-g">├── </span>') && drawn.innerHTML.includes('<span class="sds-tk-add">new</span>')
+  && drawn.innerHTML.includes(comment("the page")) && drawn.innerHTML.includes(type("docs/")), drawn.innerHTML);
+const [yaml] = open([block("yaml", "region: in\nactive: true")]);
+ok("a yaml block colours its keys and its true, false and null",
+  yaml.innerHTML.includes(type("region")) && yaml.innerHTML.includes(type("active")) && yaml.innerHTML.includes(keyword("true")), yaml.innerHTML);
+const [bash] = open([block("bash", "# a comment")]);
+ok("a bash block is coloured as sh", bash.innerHTML === comment("# a comment"), bash.innerHTML);
+const [jsonc] = open([block("jsonc", "// a note")]);
+ok("a jsonc block colours its // comment", jsonc.innerHTML === comment("// a note"), jsonc.innerHTML);
 const [written] = open([block("ts", "export const done = 1;", true)]);
 ok("a block that already holds an element keeps what its file says", written.innerHTML === null);
 const [first, second] = open([block(null, "plain"), block("sh", "# after an untagged block")]);

@@ -14,27 +14,32 @@
 // centre of each item of a row, a control on one line, a slot that holds nothing, and how deep names nest.
 // The rules for boxes, labels and arrows are not applied to it, and no other kind changes.
 
-/** The measure, at the drawn scale: pixels per character, by text class. */
-const PX: Record<string, number> = { "sds-title": 7.6, "sds-label": 7.0, "sds-code": 6.6, "sds-note": 6.4 };
-/** A path that is a connector: its `class` holds `sds-connector`, alone or beside a tone or `sds-lifeline`. */
-const CONNECTOR = /\bclass="(?:[^"]*\s)?sds-connector(?:\s[^"]*)?"/;
+/** The measure, at the drawn scale: pixels per character, by text class. The docs design language's three levels are a name (sans
+ *  600 at 12), a detail or a wire's label (mono at 10) and a plate's label (mono 600 capitals at 9.5, spaced .08em); the `sds-`
+ *  classes are the flat drawing's, which a hand-written page may still hold. */
+const PX: Record<string, number> = {
+  "dl-name": 6.8, "dl-detail": 6, "dl-wlabel": 6, "dl-tag": 6, "dl-caption": 6, "dl-label": 6.5,
+  "sds-title": 7.6, "sds-label": 7.0, "sds-code": 6.6, "sds-note": 6.4,
+};
+/** A path that is a connector: a `dl-wire` (solid, dashed or in focus), a lifeline, or the flat drawing's `sds-connector`. */
+const CONNECTOR = /\bclass="(?:[^"]*\s)?(?:sds-connector|dl-wire(?:-on|-dash|-inactive)?)(?:\s[^"]*)?"|data-role="lifeline"/;
 const EDGE = 8, JOIN_TOL = 6, BOX_TOL = 4;
 // A connector needs shaft a reader can see, and a label on it needs room to sit in. Both were rules
 // nothing enforced: the chapter has asked for 36 of visible shaft since it was written, and a label
 // was only ever compared with the box CONTAINING it — so a label lying across its neighbour passed.
 // Found by the developer on the SYSTEM samples, 2026-09-22: every fault was in hand-drawn SVG, and
 // every drawer-produced figure was already clean.
-const MIN_SHAFT = 36, LABEL_TOL = 1, PAD = 16, PAD_TOL = 2;
+const MIN_SHAFT = 36, LABEL_TOL = 1, PAD = 16, PAD_TOL = 2;   // a plate keeps 16 round what it holds (the language's scale)
 // A label owes this much clear air to everything that is not its own text: a box it is not inside,
 // another label, and any connector. Checking for *clearance* rather than for overlap is the point —
 // a label one pixel clear of an arrow does not overlap it and is still unreadable.
-const LABEL_GAP = 8, GAP_APART = 24;
+const LABEL_GAP = 8, GAP_APART = 16;   // parallel wires 16 apart
 // How far off a side's centre a lone arrow may land before a reader sees it as off-centre.
 const CENTRE_TOL = 2;
 // The clear air a connector owes a shape it passes without touching. It is the contract's own
 // unconnected gap rather than the padding number: at 16 a line threading between two stacked boxes
 // measured clean and still read as cramped, because what was too small was the corridor, not the
-// line's distance from either side. 24 forces the corridor to be one a reader can see through.
+// line's distance from either side. 16 forces the corridor to be one a reader can see through.
 const LINE_CLEAR = GAP_APART;
 /** The drawn length of a connector, summed over its segments. */
 const shaftOf = (pts: Pt[]): number => {
@@ -45,6 +50,52 @@ const shaftOf = (pts: Pt[]): number => {
 
 type Pt = [number, number];
 type Rect = [number, number, number, number];
+
+
+// WHAT THE CHECK DOES NOT MEASURE AS A FIGURE'S OWN GEOMETRY. A glyph is a stock drawing in its own 24-unit coordinates under a
+// transform, and a character (the language's person and agent) is a stroked drawing in its own coordinates; reading their `<rect>`s,
+// `<line>`s and `<circle>`s at the figure's scale reads a coordinate space that is not the figure's, and made a hand's stroke "a
+// connector 3px long" and a glyph's inner square "a box 0px from its container". A chip is a pill that sits ON the wire it names, so
+// it is the wire's label and not a box the wire passes. Each is taken out before the figure is measured. A character stays a shape a
+// wire may land on: a role's wire meets the top of the person it names.
+const GLYPH_GROUP = /<g\b[^>]*\bclass="(?:[^"]*\s)?dl-glyph(?:[ -][^"]*)?"[^>]*>/g;
+const CHARACTER_GROUP = /<g\b[^>]*\bclass="(?:[^"]*\s)?(?:agent|person)(?:\s[^"]*)?"[^>]*>/g;
+const LEGEND_GROUP = /<g\b[^>]*\bdata-dl-legend\b[^>]*>/g;
+const CHIP_RECT = /<rect\b[^>]*\bclass="dl-chip(?:-on)?"[^>]*\/>/g;
+/** A character stands on its origin: about 32 tall at scale 1 (the agent's antenna and a person's hair are the tallest), 8 either side. */
+const CHARACTER_HALF = 8, CHARACTER_TALL = 32;
+
+/** The `[start, end)` of every `<g>` whose opening tag matches `open`, to its balanced `</g>`. */
+function groupRanges(svg: string, open: RegExp): [number, number, string][] {
+  const out: [number, number, string][] = [];
+  const tag = /<g\b[^>]*>|<\/g>/g;
+  for (const m of svg.matchAll(open)) {
+    const start = m.index ?? 0;
+    tag.lastIndex = start;
+    let depth = 0, end = svg.length;
+    for (let t = tag.exec(svg); t; t = tag.exec(svg)) {
+      depth += t[0] === "</g>" ? -1 : t[0].endsWith("/>") ? 0 : 1;
+      if (depth === 0) { end = tag.lastIndex; break; }
+    }
+    out.push([start, end, m[0]]);
+  }
+  return out;
+}
+
+/** The svg with the ranges cut out. */
+function without(svg: string, ranges: [number, number, string][]): string {
+  let out = "", at = 0;
+  for (const [a, b] of [...ranges].sort((x, y) => x[0] - y[0])) { if (a < at) continue; out += svg.slice(at, a); at = b; }
+  return out + svg.slice(at);
+}
+
+/** What a character's origin says about the room it takes: a rectangle on its feet, as a closed shape a wire may land on. */
+function characterShape(open: string): Pt[] | null {
+  const t = open.match(/translate\((-?[\d.]+)[ ,]+(-?[\d.]+)\)/), k = open.match(/scale\((-?[\d.]+)/);
+  if (!t) return null;
+  const x = Number(t[1]), y = Number(t[2]), f = k ? Number(k[1]) : 1;
+  return [[x - CHARACTER_HALF * f, y - CHARACTER_TALL * f], [x + CHARACTER_HALF * f, y - CHARACTER_TALL * f], [x + CHARACTER_HALF * f, y], [x - CHARACTER_HALF * f, y]];
+}
 
 export type FigureFinding = { figure: number; message: string };
 
@@ -63,7 +114,7 @@ const unescape = (s: string) => s
  * counted as empty space (N13, 2026-09-22).
  */
 function subpathsAll(d: string): { pts: Pt[]; closed: boolean }[] {
-  const toks = [...d.matchAll(/([MLHVCZmlhvcz])|(-?[\d.]+)/g)];
+  const toks = [...d.matchAll(/([MLHVCQZmlhvcqz])|(-?[\d.]+)/g)];
   const out: { pts: Pt[]; closed: boolean }[] = [];
   let cur: Pt[] = [], cmd = "", x = 0, y = 0;
   const flush = (closed: boolean) => { if (cur.length) out.push({ pts: cur, closed }); cur = []; };
@@ -84,6 +135,9 @@ function subpathsAll(d: string): { pts: Pt[]; closed: boolean }[] {
         case "h": x += nums[j]; cur.push([x, y]); j += 1; break;
         case "V": y = nums[j]; cur.push([x, y]); j += 1; break;
         case "v": y += nums[j]; cur.push([x, y]); j += 1; break;
+        // A soft corner is a quadratic whose control point is the sharp corner the layout decided: both are kept, so a wire
+        // is judged by the corners it was laid out with and a closed shape keeps its vertices.
+        case "Q": cur.push([nums[j], nums[j + 1]]); x = nums[j + 2]; y = nums[j + 3]; cur.push([x, y]); j += 4; break;
         case "C": x = nums[j + 4]; y = nums[j + 5]; cur.push([x, y]); j += 6; break;
         case "c": x += nums[j + 4]; y += nums[j + 5]; cur.push([x, y]); j += 6; break;
         default: j += 1;
@@ -166,12 +220,17 @@ export function checkFigures(src: string): FigureFinding[] {
   const findings: FigureFinding[] = [];
   const svgs = [...src.matchAll(/<svg[\s\S]*?<\/svg>/g)].map((m) => m[0]);
 
-  svgs.forEach((svg, n) => {
-    if (/class="sds-drawing[^"]*\bsds-skeleton\b/.test(svg)) return;
+  svgs.forEach((whole, n) => {
+    if (/class="(?:sds-drawing[^"]*\bsds-skeleton|dl-svg[^"]*\bdl-skeleton)\b/.test(whole)) return;
+    const characters = groupRanges(whole, CHARACTER_GROUP);
+    const svg = without(whole, [...groupRanges(whole, GLYPH_GROUP), ...characters,
+      ...[...whole.matchAll(CHIP_RECT)].map((c): [number, number, string] => [c.index ?? 0, (c.index ?? 0) + c[0].length, c[0]])]);
+    const legends = groupRanges(svg, LEGEND_GROUP);
+    const inLegend = (at: number) => legends.some(([a, b]) => at >= a && at < b);
     // A viewBox may carry an origin, so a figure can hug its own content and render edge to edge
     // rather than paying an inner margin the section already provides (05-artifacts.md § A figure runs
     // edge to edge). The edge test measures against the box's real bounds, not against 0,0.
-    const vb = svg.match(/viewBox="(-?\d+(?:\.\d+)?) (-?\d+(?:\.\d+)?) (\d+(?:\.\d+)?) (\d+(?:\.\d+)?)/);
+    const vb = whole.match(/viewBox="(-?\d+(?:\.\d+)?) (-?\d+(?:\.\d+)?) (\d+(?:\.\d+)?) (\d+(?:\.\d+)?)/);
     if (!vb) { findings.push({ figure: n + 1, message: "no viewBox, so nothing can be measured" }); return; }
     const X0 = Number(vb[1]), Y0 = Number(vb[2]), W = X0 + Number(vb[3]), H = Y0 + Number(vb[4]);
     const rects: Rect[] = [...svg.matchAll(/<rect[^>]*\sx="([\d.]+)"\s+y="([\d.]+)"\s+width="([\d.]+)"\s+height="([\d.]+)"/g)]
@@ -194,14 +253,14 @@ export function checkFigures(src: string): FigureFinding[] {
     }
 
     // A lifeline, an axis or a chart curve is background rather than a claim, so it is exempt.
-    const conns: { pts: Pt[]; exempt: boolean }[] = [];
+    const conns: { pts: Pt[]; exempt: boolean; legend?: boolean }[] = [];
     for (const m of svg.matchAll(/<line\b([^>]*)>/g)) {
       const at = m[1];
       // nosemgrep: javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp -- pattern built from this script's own constants and escaped text, never outside input
       const g = (k: string) => Number(at.match(new RegExp(`\\s${k}="(-?[\\d.]+)"`))?.[1] ?? NaN);
       const pts: Pt[] = [[g("x1"), g("y1")], [g("x2"), g("y2")]];
       if (pts.flat().some(Number.isNaN)) continue;
-      conns.push({ pts, exempt: /lifeline|axis/.test(at) });
+      conns.push({ pts, exempt: /lifeline|axis/.test(at), legend: inLegend(m.index ?? 0) });
     }
     const circles: [number, number, number][] = [...svg.matchAll(/<circle[^>]*\scx="([\d.]+)"\s+cy="([\d.]+)"\s+r="([\d.]+)"/g)]
       .map((m) => [Number(m[1]), Number(m[2]), Number(m[3])]);
@@ -213,7 +272,7 @@ export function checkFigures(src: string): FigureFinding[] {
 
     // A closed subpath is a SHAPE — a flowchart's decision diamond, a terminator — and a connector is
     // allowed to land on one, exactly as it lands on a `<rect>` edge.
-    const shapes: Pt[][] = [];
+    const shapes: Pt[][] = characters.map((c) => characterShape(c[2])).filter((q): q is Pt[] => q !== null);
     // A DIAMOND, as centre and half-axes: four points, opposite pairs sharing a centre, one pair on
     // each axis. That is the shape the drawer emits for a decision, and the only closed path whose
     // label containment can be tested by a formula rather than by a point-in-polygon walk.
@@ -225,19 +284,19 @@ export function checkFigures(src: string): FigureFinding[] {
       const parts = subpathsAll(d[1]);
       for (const sp of parts) if (sp.closed && sp.pts.length >= 3) {
         shapes.push(sp.pts);
-        const q = sp.pts.length === 5 && sp.pts[0][0] === sp.pts[4][0] && sp.pts[0][1] === sp.pts[4][1]
-          ? sp.pts.slice(0, 4) : sp.pts.length === 4 ? sp.pts : null;
-        if (!q) continue;
-        const cx = (q[0][0] + q[2][0]) / 2, cy = (q[1][1] + q[3][1]) / 2;
-        const onAxis = Math.abs(q[0][0] - cx) < 1 && Math.abs(q[2][0] - cx) < 1
-                    && Math.abs(q[1][1] - cy) < 1 && Math.abs(q[3][1] - cy) < 1;
-        if (!onAxis) continue;
-        const a = Math.abs(q[1][0] - cx), b = Math.abs(q[0][1] - cy);
-        if (a > 1 && b > 1) diamonds.push([cx, cy, a, b]);
+        // A DIAMOND is a closed path with a vertex at the middle of each side of its box and none at its corners. Its corners are
+        // soft in the language, so the path holds more than four points; the sharp vertices are the quadratics' control points.
+        const xs = sp.pts.map((q) => q[0]), ys = sp.pts.map((q) => q[1]);
+        const lox = Math.min(...xs), hix = Math.max(...xs), loy = Math.min(...ys), hiy = Math.max(...ys);
+        const cx = (lox + hix) / 2, cy = (loy + hiy) / 2;
+        const has = (px: number, py: number) => sp.pts.some((q) => Math.abs(q[0] - px) < 1 && Math.abs(q[1] - py) < 1);
+        const vertices = has(cx, loy) && has(hix, cy) && has(cx, hiy) && has(lox, cy);
+        const cornered = has(lox, loy) || has(hix, loy) || has(lox, hiy) || has(hix, hiy);
+        if (vertices && !cornered && hix - lox > 2 && hiy - loy > 2) diamonds.push([cx, cy, (hix - lox) / 2, (hiy - loy) / 2]);
       }
       if (!CONNECTOR.test(at)) continue;
       const exempt = /lifeline|axis|curve/.test(at);
-      for (const sp of parts) if (!sp.closed && sp.pts.length >= 2) conns.push({ pts: sp.pts, exempt });
+      for (const sp of parts) if (!sp.closed && sp.pts.length >= 2) conns.push({ pts: sp.pts, exempt, legend: inLegend(m.index ?? 0) });
     }
 
     const segs: { k: number; a: Pt; b: Pt }[] = [];
@@ -269,6 +328,7 @@ export function checkFigures(src: string): FigureFinding[] {
     conns.forEach((c, k) => {
       if (c.exempt) return;
       for (const [which, p] of [["start", c.pts[0]], ["end", c.pts[c.pts.length - 1]]] as [string, Pt][]) {
+        if (c.legend) continue;   // a wire drawn on its own, as a legend or a sample of the block, is allowed to end in space
         if (onBox(p, rects)) continue;
         if (onShape(p, shapes) || onCircle(p, circles) || onEllipse(p, ellipses)) continue;
         if (segs.some((s) => s.k !== k && distToSegment(p, s.a, s.b) <= JOIN_TOL)) continue;
@@ -375,15 +435,16 @@ export function checkFigures(src: string): FigureFinding[] {
     }
 
     // Every label, measured, so one can be compared with another and with the boxes it is NOT in.
-    const HGT: Record<string, number> = { "sds-title": 13, "sds-label": 12, "sds-code": 11, "sds-note": 11 };
-    const placed: { r: Rect; txt: string }[] = [];
+    const HGT: Record<string, number> = { "dl-name": 12, "dl-detail": 10, "dl-wlabel": 10, "dl-tag": 10, "dl-label": 10, "sds-title": 13, "sds-label": 12, "sds-code": 11, "sds-note": 11 };
+    const placed: { r: Rect; txt: string; host: number }[] = [];
     const overlap = (a: Rect, b: Rect): [number, number] =>
       [Math.min(a[0] + a[2], b[0] + b[2]) - Math.max(a[0], b[0]),
        Math.min(a[1] + a[3], b[1] + b[3]) - Math.max(a[1], b[1])];
 
-    for (const m of svg.matchAll(/<text class="([\w-]+)"[^>]*x="([\d.]+)" y="([\d.]+)"[^>]*>([\s\S]*?)<\/text>/g)) {
-      const cls = m[1], x = Number(m[2]), y = Number(m[3]), txt = unescape(m[4]);
+    for (const m of svg.matchAll(/<text class="([\w -]+)"[^>]*x="(-?[\d.]+)" y="(-?[\d.]+)"([^>]*)>([\s\S]*?)<\/text>/g)) {
+      const cls = m[1].split(" ")[0], y = Number(m[3]), txt = unescape(m[5]);
       const w = txt.length * (PX[cls] ?? 7);
+      const x = Number(m[2]) - (/text-anchor="middle"/.test(m[4]) ? w / 2 : /text-anchor="end"/.test(m[4]) ? w : 0);
       const lh = HGT[cls] ?? 12;
       const lr: Rect = [x, y - lh, w, lh];
       // The same rect, grown by the clear air the label is owed on every side. Everything below is
@@ -428,7 +489,16 @@ export function checkFigures(src: string): FigureFinding[] {
           break;
         }
       }
+      // A tile's name and its detail line are one unit, set 15 apart by the scale; they owe each other no clear air.
+      // The unit may be a rect or a closed shape (a chevron, a slant, a pot), so a shape's own box counts as its host.
+      const hosts: Rect[] = [...rects, ...shapes.map((pts): Rect => {
+        const xs = pts.map((q) => q[0]), ys = pts.map((q) => q[1]);
+        return [Math.min(...xs), Math.min(...ys), Math.max(...xs) - Math.min(...xs), Math.max(...ys) - Math.min(...ys)];
+      })];
+      const hostOf = hosts.reduce((best, r, ri) => (r[0] <= x && x <= r[0] + r[2] && r[1] <= y && y <= r[1] + r[3]
+        && (best < 0 || r[2] * r[3] < hosts[best][2] * hosts[best][3]) ? ri : best), -1);
       for (const q of placed) {
+        if (hostOf >= 0 && q.host === hostOf) continue;
         const [ox, oy] = overlap(lr, q.r);
         if (ox > LABEL_TOL && oy > LABEL_TOL) {
           findings.push({ figure: n + 1, message: `the labels "${q.txt.slice(0, 22)}" and "${txt.slice(0, 22)}" overlap by ${Math.round(ox)}px` });
@@ -452,14 +522,15 @@ export function checkFigures(src: string): FigureFinding[] {
         });
       // Every connector, not just a vertical one crossing the text. A label sits a standard gap from
       // the run it names, so anything closer than that gap is a different connector passing too near.
-      for (const s of inShape ? [] : crossable) {
+      // A chip is the label of the wire it sits on, drawn over it, so the wire it names runs under its text by design.
+      for (const s of inShape || /^dl-chip-text/.test(cls) ? [] : crossable) {
         const d = distSegRect(s.a, s.b, lr);
         if (d < LABEL_GAP - 0.5) {
           findings.push({ figure: n + 1, message: `a connector runs ${Math.round(d)}px from the label "${txt.slice(0, 30)}" — a label owes ${LABEL_GAP}px of clear air to every arrow, its own included` });
           break;
         }
       }
-      placed.push({ r: lr, txt });
+      placed.push({ r: lr, txt, host: hostOf });
       const inside = rects.filter((r) => r[0] <= x && x <= r[0] + r[2] && r[1] <= y && y <= r[1] + r[3]);
       const narrowest = inside.length ? inside.reduce((a, b) => (a[2] <= b[2] ? a : b)) : null;
       const limit = narrowest ? narrowest[0] + narrowest[2] : W;

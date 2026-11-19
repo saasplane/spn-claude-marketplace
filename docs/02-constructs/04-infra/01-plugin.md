@@ -77,7 +77,18 @@ A session never reads this checkout. It reads an installed copy, found by the pl
 
 ### Plugin contents — What this plugin holds, and what it leaves out
 
-`spn-infra` ships `hooks/`, `skills/`, `scripts/`, `refs/`, `providers/` and `tests/`. **It ships no `agents/` folder, and the absence is the statement**: an agent brief convenes a reviewer over a change, and the estate's own review happens against a rendering through the tool's doors rather than against a diff. Each of the folders it does ship is named by its own page here.
+`spn-infra` ships six folders:
+
+```tree
+hooks/
+skills/
+scripts/
+refs/
+providers/
+tests/
+```
+
+**It ships no `agents/` folder, and the absence is the statement**: an agent brief convenes a reviewer over a change, and the estate's own review happens against a rendering through the tool's doors rather than against a diff. Each of the folders it does ship is named by its own page here.
 
 ## Boundary
 
@@ -98,4 +109,8 @@ This page answers what carries the estate standard into a session and which byte
 | the foundation's `02-delivery.md` § The set a repo gets is derived from its own claim | a workspace never types a plugin name; the set comes from the consuming repository's own manifest | MUST |
 | the foundation's plugins construct § The shape of a plugin, and its `04-plugins/02-shape.md` | source beside a committed build, one command entry, a shared folder never installed on its own | MUST |
 
-Try it: `spn-devex plugin partner check`
+Try it:
+
+```sh
+spn-devex plugin partner check
+```

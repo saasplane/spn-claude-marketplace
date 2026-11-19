@@ -95,4 +95,8 @@ This page answers what this plugin carries from the book and how it is arranged.
 | `RULE.DEVEX.WORKSPACE.118` | a ref that carries a rule it does not own is a restatement, and says so under a stamp | MUST |
 | the foundation's plugins construct § The shape of a plugin, and its `04-plugins/02-shape.md` | `refs/` holds one folder per book domain | MUST |
 
-Try it: `spn-devex restates check`
+Try it:
+
+```sh
+spn-devex restates check
+```

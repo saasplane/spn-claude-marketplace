@@ -20,7 +20,13 @@ Scripts holds everything this plugin executes, divided by what calls each file: 
 
 ## Overview
 
-Today the plugin runs three checks: the connector check, the Surface check and the read advice. **The command line ships three commands**: `check scan`, which reads Surface code whole for every note the check gives, `unit find`, which names the units a task's words point to, and `unit show`, which prints one unit from the CONSTRUCT snapshot the plugin carries, or a unit beyond the core from the symbol index of the repository it runs in, or, from a workspace's root, of each repository in it; `--repo` narrows either lookup to one repository. The entry refuses an unknown group by name, and a command added later is a file under `commands/` and reachable as soon as it exists. The helpers a check needs, the masker that blanks comments and strings, the text a pending write would leave, and the stack of the repository that owns a path, live in the shared support folder and are bundled into each plugin that reads them, so no plugin reads a neighbour's file.
+Today the plugin runs three checks: the connector check, the Surface check and the read advice. **The command line ships three commands**:
+
+- `check scan` reads Surface code whole for every note the check gives.
+- `unit find` names the units a task's words point to.
+- `unit show` prints one unit from the CONSTRUCT snapshot the plugin carries, or a unit beyond the core from the symbol index of the repository it runs in, or, from a workspace's root, of each repository in it.
+
+`--repo` narrows either lookup to one repository. The entry refuses an unknown group by name, and a command added later is a file under `commands/` and reachable as soon as it exists. The helpers a check needs, the masker that blanks comments and strings, the text a pending write would leave, and the stack of the repository that owns a path, live in the shared support folder and are bundled into each plugin that reads them, so no plugin reads a neighbour's file.
 
 This construct realizes the book's `01-devex/02-agent/04-plugins`.
 
@@ -108,4 +114,8 @@ This page answers what this plugin runs and what it reads from the shared folder
 | `RULE.DEVEX.AGENT.066` | a gate never names an instance | MUST |
 | the foundation's plugins construct § The shape of a plugin, and its `04-plugins/02-shape.md` | source beside a committed build, one command entry, a shared folder never installed on its own | MUST |
 
-Try it: `node scripts/build-plugins.mjs plugin-spn-surface`
+Try it:
+
+```sh
+node scripts/build-plugins.mjs plugin-spn-surface
+```

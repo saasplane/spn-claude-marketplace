@@ -105,4 +105,8 @@ This page answers which subjects the estate's cards cover and what a card may co
 | `RULE.SUPPORT.INFRA.026` | which manifest declares which kind of estate node, which the manifest card restates | MUST |
 | `RULE.DEVEX.UTILS.019` | a card carries rules it does not own and adds none | MUST |
 
-Try it: `spn-devex restates check`
+Try it:
+
+```sh
+spn-devex restates check
+```

@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/03-utils/01-spnutils.md",
-      "seen": "24ed829f"
+      "seen": "86473ccf"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
-      "seen": "49abb7b6"
+      "seen": "5f08701f"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
@@ -22,7 +22,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md",
       "section": "The state file has a node for each owner",
-      "seen": "25e51cd0"
+      "seen": "e46a5048"
     }
   ],
   "decisions": [
@@ -104,10 +104,18 @@ ship, and `validate` is the half that names what you still owe.
 `workspace` mints the folder, keeps its settings and plugins current, and reports what is open. It
 needs no repository, so its commands are the one group a repository's `rules.md` does not list:
 `spnutils help --json` names them. It does not turn the agent's own recording on or off, and it writes
-nothing under `.spndevex/.debug/`: that folder is the plugin's. It writes the `workspace` and
-`workstreams` nodes of `.spndevex/state.json` and never the plugin's `debug` node, and `workspace
-status` reads `debug.telemetry` for its recording line, or `.debug/switches.json` where the file has no
-`debug` node yet, and writes nothing to the file.
+nothing under `.spndevex/.debug/`: that folder is the plugin's. It writes the `workspace`,
+`workstreams` and `developer` nodes of `.spndevex/state.json` and never the plugin's `debug` or `presence`
+nodes, and `workspace status` reads `debug.telemetry` for its recording line, or `.debug/switches.json`
+where the file has no `debug` node yet, and writes nothing to the file.
+
+**`workspace clock` reads your clock, and `workspace clock set` writes the `developer` node and only that
+node** (`RULE.DEVEX.UTILS.536` · GUIDE). `spnutils workspace clock [--json]` prints your local time in the
+timezone you set, your usual hours and whether now is inside them, and says so when no hours are set; it
+reads only. `spnutils workspace clock set --timezone <iana> --hours <from>-<to>` writes the timezone and
+the usual hours as `HH:MM-HH:MM`, a window across midnight allowed (`10:30-04:00`), and refuses an unknown
+zone or a malformed hour with nothing written. The plugin's hooks read the node to tell a late night from
+an afternoon, and the time of your last message is never kept there.
 
 **`spnutils workspace init [name]` takes the workspace's name as its one argument, and a name is given
 once** (`RULE.DEVEX.WORKSPACE.324` · MUST · skill:spn-devex/develop). The name is positional, written to the `workspace` node, and is

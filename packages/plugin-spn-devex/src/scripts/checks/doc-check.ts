@@ -56,13 +56,14 @@ import { isBuilderWorkspace } from "../lib/builder.ts";
 import { ARC_ID } from "../lib/workstream-schema.ts";
 /** An arc's address as a pattern part, read from `ARC_ID`: `N<nnn>`, `ideate` or `follow-ups`. */
 const ARC_PART = ARC_ID.source.slice(1, -1);
+import { blockFit, fitKind } from "../lib/block-fit.ts";
 import { findPartnerWords } from "./partner-words.ts";
 import { titleFindingsOnDisk } from "./page-title.ts";
 import { whereTreeFindings } from "./where-tree.ts";
 import { bookClassFaults, inPluginSource, knownHolders, ownMarketplace, pluginNameFaults } from "./book-classes.ts";
 import { GUIDE_PAGE_SUFFIX, APPROACH_SUFFIX, ARTIFACT, CONSTRUCT_PAGES, CONSTRUCT_PAGE_SUFFIX, HUB, OVERVIEW_PAGE_SUFFIX, PLUGIN_TEMPLATES, POCKET,
          artifactDocsPathOf, decisionsRegister, inArtifacts, workstreamPrefixSource, isApproachPage, isRegister as inRegisters, pagePlaceOf,
-         workstreamDirOf, workstreamsDir } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
+         workstreamDirOf, workstreamsDir, isSeatFile } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { BUNDLED_SUFFIX, OWN_COPY, PAGE_SCRIPT, SERVED_FILES, cutVersions, linksSharedStyles, stylesDir } from "../../../../plugin-support-lib/src/lib/page-styles.ts";
 import { CYCLES_COLUMNS, cyclesOf, headerOf, headerStatusRule, openHeadingFor, openHeadingOf, tableColumns,
          tableDifferences } from "../commands/docs/cycles.ts";
@@ -454,7 +455,7 @@ export function openHeadingRule(path: string, text: string): Finding[] {
 const LOADS_PAGE_SCRIPT = new RegExp(`<script\\b[^>]*\\bsrc="[^"]*${PAGE_SCRIPT.replace(".", "\\.")}"`, "i");
 
 /**
- * The chrome an approach page owes its reader. The shared script builds the rail from the headings
+ * The chrome every page with a rail owes its reader. The shared script builds the rail from the headings
  * and folds it, so a page that carries a rail and loads no shared script shows an empty outline.
  */
 export function pageFurniture(text: string): Finding[] {
@@ -637,6 +638,33 @@ function workstreamTemplates(): string | null {
     if (exists(found)) return found;
   }
   return null;
+}
+
+/** Whether a page's `spn:doc` block says its variant is `surface-page-preview`. */
+export const isSurfacePreviewText = (text: string): boolean => /<!--\s*spn:doc[\s\S]*?"variant"\s*:\s*"surface-page-preview"/.test(text);
+
+/**
+ * RULE.DEVEX.WORKSPACE.535: a surface page preview holds a bar and a frame and nothing else. It is held to the template: no `{{…}}` slot
+ * left in, the bar with the page's title and the width, mode and Notes switches, a frame whose address is the copy beside the page
+ * (a relative path, never another site), and no section, table, list or paragraph of the page's own words, which belong in the copy.
+ */
+export function surfacePageShape(text: string): Finding[] {
+  const parts: string[] = [];
+  const bare = text.replace(/<!--[\s\S]*?-->/g, " ");
+  const slots = (bare.match(/\{\{[^{}\n]*\}\}/g) ?? []).length;
+  if (slots) parts.push(`still holds ${slots} template slot${slots === 1 ? "" : "s"}`);
+  const switches = ["width", "mode", "notes"].filter((one) => !new RegExp(`data-surface="${one}"`).test(bare));
+  if (!/class="sds-surface-bar"/.test(bare) || !/class="sds-surface-title"/.test(bare)) parts.push("has no bar with the page's title");
+  else if (switches.length) parts.push(`has no ${switches.join(" and no ")} switch in its bar`);
+  const frame = /<iframe\b[^>]*class="[^"]*sds-surface-frame[^"]*"[^>]*>/.exec(bare);
+  if (!frame) parts.push("has no frame over the page's copy");
+  else {
+    const src = /\bsrc="([^"]*)"/.exec(frame[0])?.[1] ?? "";
+    if (!src || /^([a-z][a-z0-9+.-]*:|\/)/i.test(src)) parts.push("frames an address that is not the copy beside it");
+  }
+  if (/<(?:h2|h3|section|table|ul|ol|p)\b/i.test(bare.replace(/<header\b[\s\S]*?<\/header>/i, ""))) parts.push("holds words of its own beside the bar and the frame");
+  if (!parts.length) return [];
+  return [["RULE", `a surface page preview ${parts.join(", and ")} (RULE.DEVEX.WORKSPACE.535) · keep to the template: the bar and the frame only, and the page's own words in its copy`]];
 }
 
 /** An arc's preview, by its fixed name in `notes/<arc>/` (`N<nnn>`, `ideate` or `follow-ups`). */
@@ -1333,11 +1361,16 @@ export function check(path: string, text: string, fragment = false): Finding[] {
     if (!fragment || ownSentences.length >= 5) found.push(...voice(ownProse, ownSentences, kindOf(path), isOperative(path)));
     return found;
   }
+  // A surface page preview is a bar and a frame (RULE.DEVEX.WORKSPACE.535): the template's shape is all it is read for, never an arc's preview's.
+  if (isHtml && !fragment && isSurfacePreviewText(text)) return [...structural(path), ...uncutVersions(text), ...surfacePageShape(text)];
   const isApproach = isApproachPage(path);
   const isOverview = path.endsWith("-overview.html");
   const prose = proseOf(text, isHtml);
   const out: Finding[] = structural(path);
   if (isHtml) out.push(...uncutVersions(text));
+  // Every page that carries a rail owes it the shared script, a preview and a samples index as much
+  // as an approach page: a page rewritten whole and short of that line shows an empty outline.
+  if (isHtml && !fragment) out.push(...pageFurniture(text));
 
   if ((isApproach || isOverview) && !fragment) {
     if (!/who this is for|audience/i.test(text))
@@ -1353,7 +1386,7 @@ export function check(path: string, text: string, fragment = false): Finding[] {
       const exempt = exemptWorkstream(path);
       out.push(...approachShape(text, exempt));
       if (!exempt) out.push(...cyclesRule(path, text), ...headerRule(path, text));
-      out.push(...pageFurniture(text), ...figureRule(path, text));
+      out.push(...figureRule(path, text));
     }
     out.push(...openCards(text));
   } else if (isOverview) {
@@ -1370,6 +1403,10 @@ export function check(path: string, text: string, fragment = false): Finding[] {
   // A page of a repository's pocket, and a workstream's own pages (an approach page, a preview) while open.
   if (isHtml && !fragment && (inPocket(path) || ((isApproach || /-?preview\.html$/.test(path)) && workstreamOf(path) !== null && !inClosedWorkstream(path))))
     out.push(...nameRule(text));
+
+  // Where a paragraph, a list or a callout should have been a block: a page of a bounded kind, and a construct's seat file.
+  const fit = isHtml ? fitKind(path) : (isSeatFile(path) ? "seat" : null);
+  if (fit && !fragment && !(isHtml && (inClosedWorkstream(path) || exemptWorkstream(path)))) out.push(...blockFit(text, isHtml, fit));
 
   const sents = sentences(prose);
   if (!fragment || sents.length >= 5) out.push(...voice(prose, sents, kindOf(path), isOperative(path)));

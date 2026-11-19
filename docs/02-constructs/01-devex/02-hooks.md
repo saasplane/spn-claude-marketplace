@@ -165,4 +165,8 @@ This page answers which moments exist, how a script claims one, what it is hande
 | RULE.CLAUDE_MARKETPLACE.DEVEX.002 | the dispatcher does refuse on its own account, through the generated-file guard it runs before the list | MUST |
 | the foundation's plugins construct § The shape of a plugin, and its `04-plugins/02-shape.md` | a hook is the Event kind of script, run from a committed bundle a staleness test keeps current | MUST |
 
-Try it: `spn-devex plugin partner check`
+Try it:
+
+```sh
+spn-devex plugin partner check
+```

@@ -63,11 +63,23 @@ The tree sits at the plugin's root rather than beside the source, so a suite is 
 
 ### Folder contents — What the folder holds, and the two tiers that are absent
 
-`tests/` holds the runner, a `helpers/` folder for what every suite imports, and one folder per tier. Only `unit/` exists. `integration/` is absent because nothing in these plugins runs at that tier, and `setup/` is absent because the runner needs none. **An absent folder says what is true; a folder standing empty to look complete teaches a reader that the tier works.**
+`tests/` holds the runner, a `helpers/` folder for what every suite imports, and one folder per tier. Only `unit/` exists:
+
+- `integration/` is absent because nothing in these plugins runs at that tier.
+- `setup/` is absent because the runner needs none.
+
+**An absent folder says what is true; a folder standing empty to look complete teaches a reader that the tier works.**
 
 ### Mirror path — The mirror repeats the source's own path
 
-Under the tier, a suite sits at the path its source sits at inside the plugin. A check under `src/scripts/checks/` is proven under `unit/scripts/checks/`. A provider's rule is the one place the two paths differ: it lives under `src/providers/<instance>/scripts/checks/_<subject>/` and is proven under `unit/providers/<instance>/checks/_<subject>/`, without the provider's `scripts/` segment. Apart from that, nothing maps one to the other: the path is the map.
+Under the tier, a suite sits at the path its source sits at inside the plugin.
+
+| Source | Proven under |
+| --- | --- |
+| a check under `src/scripts/checks/` | `unit/scripts/checks/` |
+| a provider's rule under `src/providers/<instance>/scripts/checks/_<subject>/` | `unit/providers/<instance>/checks/_<subject>/`, without the provider's `scripts/` segment |
+
+A provider's rule is the one place the two paths differ. Apart from that, nothing maps one to the other: the path is the map.
 
 ### Folders and framework — The folders are the convention; the framework is not
 
@@ -131,4 +143,8 @@ This page answers where a suite sits, how it is found, and what it may not compu
 | `RULE.DEVEX.UTILS.019` | a suite proves a restatement fires; it states no rule of its own | MUST |
 | the foundation's `04-plugins/02-shape.md` | the staleness case, the parity case, the payload fixture, and the shared harness every plugin's tests owe once it builds | MUST |
 
-Try it: `node packages/plugin-spn-devex/tests/run.mjs`
+Try it:
+
+```sh
+node packages/plugin-spn-devex/tests/run.mjs
+```

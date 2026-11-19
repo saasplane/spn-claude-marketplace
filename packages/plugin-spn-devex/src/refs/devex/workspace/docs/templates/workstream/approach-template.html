@@ -120,13 +120,13 @@
   <!-- spn:generated progress — do not edit inside these markers; `workstream progress write` writes it from the arcs -->
   <nav class="sds-footbar" aria-label="Workstream status">
     <div class="sds-footbar-chips">
-      <a class="sds-chip sds-landed sds-step-1" href="#ideate" aria-label="Ideate, LANDED"><span class="sds-chip-line"><span class="sds-chip-name">Ideate</span><span class="sds-arc-count">0/0</span></span><span class="sds-chip-bar"><i style="width:0%"></i></span><span class="sds-tip"><span class="sds-badge sds-status sds-landed">LANDED</span><strong>{{the ideate arc's full title}}</strong></span></a>
-      <a class="sds-chip sds-running sds-step-3" href="#N001" aria-label="N001 {{the arc's title}}, RUNNING, {{done}} of {{total}} steps landed"><span class="sds-chip-line"><span class="sds-chip-name"><span class="sds-mono">1</span><span class="sds-chip-subject"> &middot; {{the arc's title}}</span></span><span class="sds-arc-count">{{done}}/{{total}}</span></span><span class="sds-chip-bar"><i style="width:{{share}}%"></i></span><span class="sds-tip"><span class="sds-badge sds-status sds-running">RUNNING</span><strong>{{the arc's full title}}</strong><span>{{done}} of {{total}} steps landed</span><span>{{the wait, or the reason for CARRIED and DROPPED}}</span></span></a>
-      <a class="sds-chip sds-proposed sds-step-1" href="#follow-ups" aria-label="Follow-ups, PROPOSED"><span class="sds-chip-line"><span class="sds-chip-name">Follow-ups</span><span class="sds-arc-count">0/0</span></span><span class="sds-chip-bar"><i style="width:0%"></i></span><span class="sds-tip"><span class="sds-badge sds-status sds-proposed">PROPOSED</span><strong>{{the follow-up arc's full title}}</strong></span></a>
+      <a class="sds-chip sds-landed sds-step-1" href="#ideate" aria-label="Ideate, LANDED"><span class="sds-chip-line"><span class="sds-chip-name">Ideate</span><span class="sds-arc-count">0/0</span></span><span class="sds-chip-bar"><i style="--share:0%"></i></span><span class="sds-tip"><span class="sds-badge sds-status sds-landed">LANDED</span><strong>{{the ideate arc's full title}}</strong></span></a>
+      <a class="sds-chip sds-running sds-step-3" href="#N001" aria-label="N001 {{the arc's title}}, RUNNING, {{done}} of {{total}} steps landed"><span class="sds-chip-line"><span class="sds-chip-name"><span class="sds-mono">1</span><span class="sds-chip-subject"> &middot; {{the arc's title}}</span></span><span class="sds-arc-count">{{done}}/{{total}}</span></span><span class="sds-chip-bar"><i style="--share:{{share}}%"></i></span><span class="sds-tip"><span class="sds-badge sds-status sds-running">RUNNING</span><strong>{{the arc's full title}}</strong><span>{{done}} of {{total}} steps landed</span><span>{{the wait, or the reason for CARRIED and DROPPED}}</span></span></a>
+      <a class="sds-chip sds-proposed sds-step-1" href="#follow-ups" aria-label="Follow-ups, PROPOSED"><span class="sds-chip-line"><span class="sds-chip-name">Follow-ups</span><span class="sds-arc-count">0/0</span></span><span class="sds-chip-bar"><i style="--share:0%"></i></span><span class="sds-tip"><span class="sds-badge sds-status sds-proposed">PROPOSED</span><strong>{{the follow-up arc's full title}}</strong></span></a>
     </div>
     <div class="sds-footbar-summary sds-implementing sds-step-3" tabindex="0" aria-label="Workstream IMPLEMENTING, {{done}} of {{total}} rows done, {{X}} of {{Y}} arcs closed">
       <span class="sds-chip-line"><span class="sds-chip-name">Overall</span><span class="sds-arc-count">{{done}}/{{total}}</span></span>
-      <span class="sds-chip-bar"><i style="width:{{share}}%"></i></span>
+      <span class="sds-chip-bar"><i style="--share:{{share}}%"></i></span>
       <span class="sds-tip"><span class="sds-badge sds-status sds-implementing">IMPLEMENTING</span><strong>Overall</strong><span>{{X}} of {{Y}} arcs closed</span><span>{{done}} of {{total}} rows done</span></span>
     </div>
   </nav>
@@ -156,6 +156,16 @@
       </tbody>
     </table></div>
     <div class="sds-recommended"><b>Recommended: {{A}}.</b> {{the reason it wins, which may name the views it rests on}}</div>
+    <span class="sds-key">Preview</span>
+    <p>{{Why each option is shown in this form: the one artifact whose difference is the whole difference between them.}}</p>
+    <span class="sds-key">Today</span>
+    <pre><code>{{today's code, where real code exists}}</code></pre>
+    <span class="sds-key">Option A (recommended)</span>
+    <pre><code>{{what option A leaves, in the same form}}</code></pre>
+    <span class="sds-key">Option B</span>
+    <pre><code>{{&hellip;}}</code></pre>
+    <span class="sds-key">Option C</span>
+    <pre><code>{{&hellip;}}</code></pre>
   </div>
   <!-- /spn:generated -->
 </section>

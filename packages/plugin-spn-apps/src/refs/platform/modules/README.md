@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/03-platform/02-modules/README.md",
-      "seen": "69e26146"
+      "seen": "87a60782"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/03-platform/02-modules/",
@@ -43,7 +43,7 @@ Tenancy, Identity, Data and Trust and Surfaces are platform core, not part of th
 
 Beside the seven the platform ships one domain module, HIR (hiring). It is the platform's one product module: it sells something, so it is not part of the standard library, and a platform composes it only when its product is hiring. It depends on Entities and names it, as any module names what it reads.
 
-**A module powers a platform feature and makes it filterable, and gets no copy of a platform screen** (`RULE.PLATFORM.MODULES.034` · SHOULD · skill:spn-apps/implement). The audit log, files, notifications and schedules stay the platform's own screens unless a partner asks for a copy. A module's data shows on the platform's screen through a filter the server already takes (record type, person, date), and no module-specific page is built for it. Two screens over one record drift apart. The audit log is the worked example: it takes record type, person and date filters on the one audit screen, and hiring has no Activity > Hiring page.
+**A module powers a platform feature and makes it filterable, and gets no copy of a platform screen** (`RULE.PLATFORM.MODULES.034` · GUIDE). The audit log, files, notifications and schedules stay the platform's own screens unless a partner asks for a copy. A module's data shows on the platform's screen through a filter the server already takes (record type, person, date), and no module-specific page is built for it. Two screens over one record drift apart. The audit log is the worked example: it takes record type, person and date filters on the one audit screen, and hiring has no Activity > Hiring page.
 
 ## What adopting one commits the platform to
 

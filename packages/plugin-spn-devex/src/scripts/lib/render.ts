@@ -14,7 +14,7 @@
 import { dirname, relative, resolve } from "node:path";
 import { existsSync } from "node:fs";
 
-import { draw, type Spec } from "./draw.ts";
+import { draw, figureOf, type Spec } from "./draw.ts";
 import { sentenceColumn } from "./item-cells.ts";
 import { isSeatFile, producedPageOf } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { RULE_ID_SRC, chipOf, parseFields } from "../../../../plugin-support-lib/src/lib/rule-mark.ts";
@@ -217,6 +217,39 @@ function anchorOf(text: string): string {
   return text.toLowerCase().replace(/`/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 40);
 }
 
+/**
+ * The blocks that have a spelling of their own in markdown, each a fenced block tagged with its name and holding one line per thing, its parts split on ` | `:
+ *   catalog   Name | one line | literal (the literal is optional)        one tile each
+ *   cards     Title | description | link                                  a door each, title and Read more both links
+ *   next      previous | Title | link, and next | Title | link            the two doors either side of the page
+ */
+function spelled(kind: string, body: string[], findings: Finding[]): string {
+  const rows = body.map((row) => row.trim()).filter((row) => row && !row.startsWith("#")).map((row) => row.replace(/^[-*]\s+/, "").split(/\s+\|\s+/).map((cell) => cell.trim()));
+  if (!rows.length) { findings.push({ message: `a \`${kind}\` block with no line` }); return ""; }
+  if (kind === "catalog") {
+    const tiles = rows.map(([name, line = "", literal = ""]) => `    <div class="sds-tile"><h4>${inline(name)}</h4>${line ? `<p>${inline(line)}</p>` : ""}${literal ? `<p class="sds-small"><code>${esc(literal.replace(/^`|`$/g, ""))}</code></p>` : ""}</div>`);
+    return `  <div class="sds-tiles">\n${tiles.join("\n")}\n  </div>`;
+  }
+  if (kind === "cards") {
+    const tiles = rows.map(([title, line = "", link = ""]) => {
+      if (!link) findings.push({ message: `a \`cards\` line with no link, "${title}" — a card is Title | description | link` });
+      const href = rewriteHref(link || "#");
+      return `    <div class="sds-tile"><h4><a href="${esc(href)}">${inline(title)}</a></h4>${line ? `<p>${inline(line)}</p>` : ""}<a class="sds-more" href="${esc(href)}">Read more &rarr;</a></div>`;
+    });
+    return `  <div class="sds-tiles">\n${tiles.join("\n")}\n  </div>`;
+  }
+  const door = (direction: string) => {
+    const row = rows.find((one) => one[0].toLowerCase() === direction);
+    if (!row) return "";
+    const [, title = "", link = ""] = row;
+    const mark = direction === "previous" ? "&larr; Previous" : "Next &rarr;";
+    return `    <a class="sds-nextnav-card${direction === "next" ? " sds-next" : ""}" href="${esc(rewriteHref(link || "#"))}"><span class="sds-direction">${mark}</span><span class="sds-title">${inline(title)}</span></a>`;
+  };
+  const doors = [door("previous"), door("next")].filter(Boolean);
+  if (!doors.length) { findings.push({ message: "a `next` block with no `previous | Title | link` or `next | Title | link` line" }); return ""; }
+  return `  <div class="sds-nextnav">\n${doors.join("\n")}\n  </div>`;
+}
+
 /** One section's body: paragraphs, tables, lists, fenced blocks and figures. */
 function renderBody(lines: string[], findings: Finding[]): string {
   const out: string[] = [];
@@ -248,21 +281,24 @@ function renderBody(lines: string[], findings: Finding[]): string {
     }
     if (/^```/.test(l)) {
       flush();
-      const lang = l.replace(/^```/, "").trim();
+      const tag = l.replace(/^```/, "").trim();
+      // A fence tag is a language, and may carry `file=<path>`: the block then stands in a FILE frame titled by that path.
+      const fileAt = /\bfile=(\S+)/.exec(tag);
+      const lang = tag.replace(/\bfile=\S+/, "").trim();
       const body: string[] = [];
       i++;
       while (i < lines.length && !/^```/.test(lines[i])) body.push(lines[i++]);
       i++;
-      if (lang === "dg") {
+      if (lang === "catalog" || lang === "cards" || lang === "next") {
+        out.push(spelled(lang, body, findings));
+      } else if (lang === "dg") {
         let spec: Spec | null = null;
         try { spec = JSON.parse(body.join("\n")); } catch (e) { findings.push({ message: `a \`dg\` figure is not strict JSON — ${(e as Error).message}` }); }
         if (spec) {
           const { svg, findings: df } = draw(spec);
           for (const m of df) findings.push({ message: m });
           if (svg) {
-            out.push(`  <figure>\n${svg.split("\n").map((x) => "  " + x).join("\n")}`);
-            if (spec.caption) out.push(`    <figcaption>${inline(spec.caption)}</figcaption>`);
-            out.push(`  </figure>`);
+            out.push(figureOf(spec, svg, spec.caption ? inline(spec.caption) : ""));
             // The spec stays in the page as a comment, so the figure's source travels with it.
             out.push(`  <!-- dg:source\n${body.join("\n")}\n  -->`);
           }
@@ -272,7 +308,9 @@ function renderBody(lines: string[], findings: Finding[]): string {
       } else {
         // The page holds plain code, tagged with its language. The shared script colours the block
         // when the page opens, so no colour is written here.
-        out.push(`  <pre${lang ? ` data-lang="${lang}"` : ""}>${lang ? escapedCode(body.join("\n")) : esc(body.join("\n"))}</pre>`);
+        const pre = `<pre${lang ? ` data-lang="${lang}"` : ""}>${lang ? escapedCode(body.join("\n")) : esc(body.join("\n"))}</pre>`;
+        if (fileAt) out.push(`  <figure class="sds-file">\n    <figcaption><span class="sds-file-path">${esc(fileAt[1])}</span>${lang ? `<span class="sds-file-lang">${esc(lang)}</span>` : ""}</figcaption>\n    ${pre}\n  </figure>`);
+        else out.push(`  ${pre}`);
       }
       continue;
     }

@@ -96,4 +96,8 @@ This page answers which skill this domain ships and how it is shaped. It does no
 | `RULE.DEVEX.WORKSPACE.118` | a skill that carries a rule it does not own is a restatement, and says so under a stamp | MUST |
 | the foundation's `02-delivery.md` § When an edit becomes behaviour | a skill edit is loadable only after an install and a fresh window | MUST |
 
-Try it: `spn-devex restates check`
+Try it:
+
+```sh
+spn-devex restates check
+```

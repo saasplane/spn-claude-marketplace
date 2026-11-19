@@ -25,7 +25,19 @@
 
 Every construct of this domain is realized here. The domain plugins realize their own constructs — see [spn-surface](../../02-surface/plugin-spn-surface/README.md), [spn-apps](../../03-apps/plugin-spn-apps/README.md) and [spn-infra](../../04-infra/plugin-spn-infra/README.md).
 
-Source folders, one per chapter: `.claude-plugin/plugin.json` for Plugin · `hooks/hooks.json` for Hooks · `agents/` for Agents, with the viewpoint files they are handed in `refs/devex/agent/lenses/` · `skills/` for Skills · `scripts/` for Scripts — `checks/`, `events/`, `tools/` and the `lib/` they share · `refs/` for Refs · `tests/` for Tests. This plugin carries no `providers/`, because it answers to no stack and no cloud; the Providers chapter states the shape the other two obey.
+Source folders, one per chapter:
+
+| Chapter | Source |
+| --- | --- |
+| Plugin | `.claude-plugin/plugin.json` |
+| Hooks | `hooks/hooks.json` |
+| Agents | `agents/`, with the viewpoint files they are handed in `refs/devex/agent/lenses/` |
+| Skills | `skills/` |
+| Scripts | `scripts/` — `checks/`, `events/`, `tools/` and the `lib/` they share |
+| Refs | `refs/` |
+| Tests | `tests/` |
+
+This plugin carries no `providers/`, because it answers to no stack and no cloud; the Providers chapter states the shape the other two obey.
 
 <!-- spn:generated contents — do not edit inside these markers; `docs.ts face` writes it -->
 | Chapter | Realizes | Carries | Status |

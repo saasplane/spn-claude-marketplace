@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/08-operate.md",
-      "seen": "ae9c194e"
+      "seen": "78818923"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/01-function/08-operate.md",
@@ -31,6 +31,8 @@
 ## The order an incident is handled in
 
 **Stop the harm, then find the cause, then fix it, then write down what it taught.** Reordering these is the commonest way an incident runs long: a cause hunted before the harm is stopped is a cause found late, while the harm continues.
+
+**Who is reached on call is not declared anywhere yet; declaring it in the estate is proposed.** The incident order names no person and the estate holds no key for one today, so who do I call is answered by the team's own, and no tool reads it.
 
 **Closing an incident owes something back.** The loop is only closed when what it taught has landed where the next person will meet it: the owning chapter, a check that fires at write time, or a register row only where a choice was weighed, an answer reversed or a conflict settled.
 
