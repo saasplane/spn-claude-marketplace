@@ -9,17 +9,17 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "The blocks — what a page reaches for instead of prose",
-      "seen": "8f70c554"
+      "seen": "719f6434"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "Four blocks have a spelling in markdown",
-      "seen": "21835ddd"
+      "seen": "98a0bf5e"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "The figures — what sits inside a block, and the closed set of them",
-      "seen": "67370d7d"
+      "seen": "d1bbd288"
     }
   ]
 }
@@ -77,7 +77,7 @@ plain sentences with no block chosen. The second pass takes each subsection in t
 picks the block from the table in *What you type*, and writes it in its own form. A seat file's blocks are the
 spellings in this file, and `docs page write` renders them; an approach page and a preview take the same blocks
 as HTML from `blocks-template.html`. Then run `docs page check` or `docs audit`, whose SOFT findings name each
-paragraph that should have been a block.
+paragraph that should have been a block. The check runs on the saved file at every Stop and in `docs check`, not only on Write and Edit, so a page written any other way is checked too.
 
 ## Every block has a rule
 
@@ -125,6 +125,7 @@ What `doc-check` flags, each as the block it should have been:
 | several things, each with facts | a table of item cells: the item's title, its line and its facts in three levels |
 | steps someone takes | a flowchart where the path turns, a chain where it never does |
 | the parts of one thing, or who speaks to whom | a map, or a sequence |
+| a screen or a layout | a `skeleton` figure, one view for each screen class, drawn by `docs figure draw` |
 | a decision still open | its options side by side, and its card |
 | a public shape (a contract state, a route, a table, a token, a command's options) | `CODE`: declarations only, a `diff` where the shape exists today |
 | how something looks | the thing rendered on the page, light and dark side by side |

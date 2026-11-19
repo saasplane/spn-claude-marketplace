@@ -9,7 +9,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "section": "It opens on the welcome and one status line, never a status dump",
-      "seen": "eccb2737"
+      "seen": "4d9acefa"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",

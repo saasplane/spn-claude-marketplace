@@ -7,7 +7,7 @@ description: Prove or disprove a claim about what a SaaS Plane codebase actually
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
-      "seen": "7beac2a2"
+      "seen": "bd28f6f7"
     }
   ]
 }

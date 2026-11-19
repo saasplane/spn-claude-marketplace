@@ -7,11 +7,11 @@ description: Decide what a node IS, and design a requirement inside that shape -
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
-      "seen": "7beac2a2"
+      "seen": "bd28f6f7"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/03-ideate.md",
-      "seen": "e1dfce15"
+      "seen": "b78913ec"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
@@ -296,6 +296,10 @@ When the arc changes code, the idea is worked in the code itself, one connected 
 - **A change agreed on an arc reaches that arc's preview before any handover** (`RULE.DEVEX.WORKSPACE.505` · MUST · skill:spn-devex/ideate)
 - **Each arc state says what a new piece of work does, so no fix lands outside an arc** (`RULE.DEVEX.WORKSPACE.516` · MUST · skill:spn-devex/ideate)
 - **While the shape is discussed, a find stays on the ideate arc, and no build arc opens until the ideate arc proposes it** (`RULE.DEVEX.WORKSPACE.519` · MUST · skill:spn-devex/ideate)
+- **A page of every kind is written in two passes, the text first and the blocks second** (`RULE.DEVEX.WORKSPACE.533` · MUST · skill:spn-devex/ideate)
+- **The preview holds a bar and a frame, and nothing else** (`RULE.DEVEX.WORKSPACE.535` · MUST · skill:spn-devex/ideate)
+- **The copy names its own mode switch and holds its notes, and it is just the page when opened alone** (`RULE.DEVEX.WORKSPACE.536` · MUST · skill:spn-devex/ideate)
+- **The bar's message, the meta and the note marker change only with a new stylesheet version** (`RULE.DEVEX.WORKSPACE.537` · MUST · skill:spn-devex/ideate)
 - **Registering is optional, and the chain is complete without it.** (`RULE.LAUNCHPAD.CONTROL_PLANE.001` · MUST · skill:spn-devex/ideate)
 - **Launchpad is built at the partner stage, on the same backbone and with the same stack every adopter gets. It consumes the published packages rather than reading around them.** (`RULE.LAUNCHPAD.CONTROL_PLANE.002` · MUST · skill:spn-devex/ideate)
 - **Launchpad is a stage, not a sixth domain.** (`RULE.LAUNCHPAD.CONTROL_PLANE.003` · MUST · skill:spn-devex/ideate)

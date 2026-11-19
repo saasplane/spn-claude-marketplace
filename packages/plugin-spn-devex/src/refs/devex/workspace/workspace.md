@@ -3,15 +3,15 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/01-workspace.md",
-      "seen": "739ce2d2"
+      "seen": "c1a9db28"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/02-workstream.md",
-      "seen": "26fc3576"
+      "seen": "dd99a0e0"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
-      "seen": "49abb7b6"
+      "seen": "5f08701f"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -31,12 +31,12 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md",
       "section": "Two dot-homes",
-      "seen": "41837c3f"
+      "seen": "590d5d7b"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md",
       "section": "The state file has a node for each owner",
-      "seen": "25e51cd0"
+      "seen": "e46a5048"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md",
@@ -61,7 +61,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md",
       "section": "DevEx Workspace — One Window, Laws by Declaration",
-      "seen": "13aacb06"
+      "seen": "a8de1f7d"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
@@ -230,7 +230,7 @@ The workspace folder carries two dot-homes: `.claude/` (settings — the marketp
 
 ```
 .spndevex/
-  state.json                              what the commands record, a node for each owner: workspace, workstreams, debug
+  state.json                              what the commands record, a node for each owner: workspace, workstreams, debug, developer, presence
   workstreams/
     backlog/
       {NNN}-{subject}/                    prepared, blocked, or not picked up yet
@@ -282,11 +282,20 @@ The workspace folder carries two dot-homes: `.claude/` (settings — the marketp
   },
   "debug": {
     "telemetry": true
+  },
+  "developer": {
+    "timezone": "Asia/Kolkata",
+    "usualHours": { "from": "10:30", "to": "04:00" }
+  },
+  "presence": {
+    "state": "PRESENT",
+    "said": "going to sleep",
+    "since": "2026-11-18T23:10+05:30"
   }
 }
 ```
 
-A node joins the file only when the folder tree cannot show its fact — MUST; a new node, or a new key in one, comes with the reason the tree cannot hold it. **Each node has one writer, and a program changes only the nodes in its own column — MUST.** `workspace.name` is spnutils's, written by `workspace init <name>` and read by `workspace status`'s first line. `workstreams.lastNumber` is spnutils's, written when a folder shows a higher number than the record; it is read by spnutils, for the next free number, and by the plugin's workstream commands, which still write none. `debug.telemetry` is the plugin's, written by `debug switch on|off` and read by the plugin's hooks and by `workspace status`'s recording line. spnutils never writes `debug`, and the plugin never writes `workspace` or `workstreams`. A name is lower-case letters, digits and hyphens, starting with a letter, at most 40 characters — MUST.
+A node joins the file only when the folder tree cannot show its fact — MUST; a new node, or a new key in one, comes with the reason the tree cannot hold it. **Each node has one writer, and a program changes only the nodes in its own column — MUST.** `workspace.name` is spnutils's, written by `workspace init <name>` and read by `workspace status`'s first line. `workstreams.lastNumber` is spnutils's, written when a folder shows a higher number than the record; it is read by spnutils, for the next free number, and by the plugin's workstream commands, which still write none. `debug.telemetry` is the plugin's, written by `debug switch on|off` and read by the plugin's hooks and by `workspace status`'s recording line. `developer` is spnutils's, written by `workspace clock set --timezone <iana> --hours <from>-<to>` and read by the plugin's hooks and by `workspace clock`, which prints the local time and whether it is inside the usual hours. `presence` is the plugin's, written by `spn-devex presence present|away|watching` and by its prompt hook from the developer's words, and read by the plugin's hooks. spnutils never writes `debug` or `presence`, and the plugin never writes `workspace`, `workstreams` or `developer`. The two new nodes hold what no folder shows, a timezone, usual hours and what was said about being away or watching, and **`lastPromptAt` is never kept**: the time of the last message is read from the newest write under `.debug/sessions/`, which the prompt hook makes on every prompt. A name is lower-case letters, digits and hyphens, starting with a letter, at most 40 characters — MUST.
 
 **A write follows the same five steps in both programs — MUST.** (1) Take the lock: make the folder `.spndevex/.state.lock/`; making a folder either succeeds or fails at once, so only one writer holds it, and a lock older than 30 seconds was left by a program that died and is taken over with one line saying so. (2) Read the whole file again, under the lock. (3) Change its own node and nothing else: every other top-level node is written back exactly as it was read, including one this program does not know, so an older spnutils never drops a `debug` node a newer plugin wrote. (4) Write the result to a temporary file beside it, `.spndevex/.state.json.<pid>.tmp`. (5) Rename the temporary file over `state.json`, and remove the lock. **A read takes no lock**: the rename replaces the file in one step, so a hook reading `debug.telemetry` mid-write sees the old file or the new one, never half of either. A read that fails still answers *off*: a tool never fails because a switch could not be read.
 

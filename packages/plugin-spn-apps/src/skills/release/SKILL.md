@@ -7,11 +7,11 @@ description: Publish this repository's releasable projects, in lockstep, through
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
-      "seen": "7beac2a2"
+      "seen": "bd28f6f7"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/07-deliver.md",
-      "seen": "4c116f39"
+      "seen": "1d6cc7ef"
     }
   ]
 }

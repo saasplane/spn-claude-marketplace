@@ -60,7 +60,7 @@ spn-devex docs figure colour <path…> [--variant <name>] — a code block's fil
 
 spn-devex docs figure render <svg-or-html…> — render each figure in a headless browser, and report what it painted
 
-spn-devex docs figure draw <spec.json…> — print the drawing of each spec — a `.json` file, or a `.md` page's own ```dg``` blocks; a `.flow.json` is read against its specs
+spn-devex docs figure draw <spec.json…> [--case] — print the drawing of each spec — a `.json` file, or a `.md` page's own ```dg``` blocks; a `.flow.json` is read against its specs
 
 spn-devex docs guide check <guide.md…> [--name <name>] [--out <file>] — report each guide page that differs from what its guide gives, and write nothing
 

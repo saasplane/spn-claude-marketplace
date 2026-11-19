@@ -7,11 +7,11 @@ description: Carry out a go. Use the moment the developer gives the go on one ar
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
-      "seen": "7beac2a2"
+      "seen": "bd28f6f7"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
-      "seen": "90b22d70"
+      "seen": "cd529187"
     }
   ]
 }
@@ -19,7 +19,7 @@ description: Carry out a go. Use the moment the developer gives the go on one ar
 
 1. The scope: every arc the go covers is DECIDED and its sheet reads whole (`workstream sheet check`). The go refuses an entry that is incomplete, a change with no patch or a step with no command or no proof, in every hand-written file, the book, config, migrations, contract, server, web and tests included, and no warning stands in place of the refusal; a change marked judged still carries its patch (`RULE.DEVEX.WORKSPACE.502` · MUST · check:split-plan).
 2. Drift: `workstream state check --facts`, and `sheet edit` for each entry whose fact moved.
-3. The plan: before a go, the lead runs `go propose` and puts the scope to the developer; then `workstream go write <lead> --scope …`, and `go show` to read it. The plan is derived from the workspace map, rebuilt from the repositories' files on every plan, and from the passes each repository's world declares, which the plugin that serves that world supplies (`RULE.DEVEX.WORKSPACE.508`, `RULE.DEVEX.WORKSPACE.509` · MUST · skill:spn-devex/execute).
+3. The plan: before a go, the lead runs `go propose` and puts the scope to the developer; then `workstream go write <lead> --scope …`, and `go show` to read it. The plan is derived from the workspace map, rebuilt from the repositories' files on every plan, and from the passes each repository's world declares, which the plugin that serves that world supplies (`RULE.DEVEX.WORKSPACE.508` · MUST · skill:spn-devex/execute) (`RULE.DEVEX.WORKSPACE.509` · MUST · skill:spn-devex/execute).
 4. Baselines: `go start` each repository's baseline, its whole suite on the base, once, and record what already fails.
 5. The parts: launch each part's brief, a pass at a time; fold each report with `report write`.
    Run the parts three or four at a time, each on a Sonnet helper. Review, and the developer, stay with the main agent.

@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/02-apps/03-module.md",
-      "seen": "1b459580"
+      "seen": "59373b8c"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/03-module/",
-      "seen": "ec975181"
+      "seen": "b774f986"
     }
   ]
 }
@@ -68,7 +68,7 @@ A command **MUST** carry the caller's intent only. Never write context the runti
 
 **A value that comes in kinds is a base plus `mtype` plus one carrier for each kind**, such as a fee that is a percent (`CDTDecimal`) or a fixed amount (an amount and `SPCurrencyCodeType`), and never two nullable fields.
 
-**A field that holds a person's data ends in one of the closed forms** (`RULE.SUPPORT.APPS.225`), and **an audit actor is never null**: the service chapter converts only when `createdBy` and `updatedBy` are both set.
+**A field that holds a person's data ends in one of the closed forms** (`RULE.SUPPORT.APPS.225` · MUST · skill:spn-apps/implement), and **an audit actor is never null**: the service chapter converts only when `createdBy` and `updatedBy` are both set.
 
 ### The read ladder — one entity at four richnesses
 
@@ -96,6 +96,8 @@ You model an entity at escalating richness so a consumer fetches exactly what it
 | `{State}List` | an ordered array | order is part of the answer |
 
 Nest a wrapper's collection under a named field, never a bare top-level map or array. Search results carry their own shape — the ordered rows and the total, together — and if you iterate a map while depending on its order, you have written a bug that will not reproduce.
+
+**A read returning the ordered `{State}List` is named for that type, never as a plural** (`DEC.SUPPORT.APPS.104`). A plural name promises the keyed map; write verbs are not governed.
 
 ### The service interface is the only seam a caller sees
 
@@ -136,6 +138,8 @@ Declare one discriminator, `mtype`, on a polymorphic family's base, typed as the
 ## What only this module sees — the app layer
 
 `app/` is module-private. What crosses in is a Command; what crosses out is a State returned by a contract service. Two seams run through it, and they are the whole of its structure: **one seam out** — the contract services the module implements — and **one seam down** — the repositories, the only code touching storage. Read entities, utils and support as internal parts of one of those two.
+
+`app/` is module-private with exactly two exceptions (`RULE.SUPPORT.APPS.032` · MUST · skill:spn-apps/implement); the boot registering every module's entities with the shared data layer is the one visibility exception, and the entities folder is the only `app/` seat it may reach (`RULE.SUPPORT.APPS.010` · MUST · skill:spn-apps/implement). **The authorization gate sits on the contract service method, never on the entry** (`RULE.SUPPORT.APPS.046` · MUST · skill:spn-apps/implement), so every transport passes the same gate; a pre-authentication method carries none, and an asynchronous re-entry authorized when its event was produced is deliberately ungated and documented as such. Services own the asynchronous re-entry (`RULE.SUPPORT.APPS.012` · MUST · skill:spn-apps/implement): nothing else in `app/` consumes from a queue.
 
 | Concern | Service | Repository |
 | --- | --- | --- |
@@ -214,6 +218,14 @@ Follow one grammar for every API route you add — `/{module}/{entity}[/{sub-ent
 
 **The API entry also serves a module's contract services to the other services of the platform, on the remote route.** It is the HTTP API and not a fourth entry. The module's manager lists its contract services (name, methods as data, what implements it), boot registers each, and the entry mounts one route for all of them, which reads the module, the service and the method from the request: `POST /remote` with the passport header and the calling service's credential header. The order **MUST** hold: check the calling service first (a good credential naming one of the platform's trusted services), before the body is read; find the contract service among those registered; find the method among those the methods data lists; validate the command; build the execution context from the passport (a passport that cannot be read or is refused ends the call as unauthenticated, and no passport runs with no caller); run the method; validate the result. The route listens on a port of its own (`{CODE}_API_REMOTE_PORT`; no port, no listener), keeps no list of who may call what (authorization stays on the service method), answers as the public API does, and keeps the passport and the service credential out of logged headers. A contract may hold methods that have no controller, such as one that returns an opened secret to another module, so no public call can reach them. A person's address is counted from the right of the forwarded-address header, by the number of proxies in front of each listener (`{CODE}_API_TRUSTED_PROXIES`, `{CODE}_API_REMOTE_TRUSTED_PROXIES`), and a route's rate limit is counted in the service's shared cache, so it is one limit however many instances serve the route.
 
+**The remote route listens on a port of its own** (`RULE.SUPPORT.APPS.172` · MUST · skill:spn-apps/implement): `{CODE}_API_REMOTE_PORT`. A service that sets none opens no remote listener and serves no contract to others. The set of entries stays three (`RULE.SUPPORT.APPS.005` · MUST · skill:spn-apps/implement).
+
+**The person's address is counted from the right of the forwarded-address header** (`RULE.SUPPORT.APPS.176` · MUST · skill:spn-apps/implement). Each listener is told how many proxies stand in front of it, `{CODE}_API_TRUSTED_PROXIES` for the public one and `{CODE}_API_REMOTE_TRUSTED_PROXIES` for the remote one, each `0` unless set.
+
+**A route names a state and an operation on it, and never who calls it** (`RULE.SUPPORT.APPS.261` · MUST · skill:spn-apps/implement). One path serves every caller, and the gate behind it decides who may call; a caller's role, audience or app is never a path segment. A parent's act on its child is on the child's routes, `/org/child/update`.
+
+**A public route declares its defenses on the route itself, beside the command it accepts** (`RULE.SUPPORT.APPS.078` · MUST · skill:spn-apps/implement), in two independent dials. **The framework counts, and never verifies** (`RULE.SUPPORT.APPS.177` · MUST · skill:spn-apps/implement): you never write the counter, it is kept in the service's shared cache so a limit is one limit across instances, and verifying a solution is the application's own vendor call.
+
 A queue listener you write consumes a message, parses it into the contract Event, rehydrates the recorded actor into a fresh execution context, then hands the work to a service — never business logic of its own. Make handling idempotent through the event's request key, and run it under a real principal — the originating actor or an explicit system actor, never context-free. Subscribe only to topics your module's migrations made. The migration runs first, as it does for a table, because nothing creates a missing topic: a subscribe or a publish to a topic that does not exist is an error that names the topic (`RULE.SUPPORT.APPS.178` · MUST · skill:spn-apps/implement).
 
 **A request may run as if at another moment, only where the deployment is non-production and trusts it** (`RULE.SUPPORT.APPS.268` · MUST · skill:spn-apps/implement). The API entry reads `x-spn-simulate-at`, an ISO 8601 time with its offset, under an `NP` workload with `{CODE}_API_SIMULATION_TRUSTED` `true`, ignores it anywhere else, and refuses a value it cannot use. A service whose workload is `PROD` and whose setting is `true` refuses to start. The service then sets the dates it writes for a business record from the trusted simulated time, or the real time when there is none (`RULE.SUPPORT.APPS.267` · MUST · skill:spn-apps/implement), and the repository only saves them. What grants, limits, bills or proves access never follows it, and nor does an audit row. The simulation travels to another service as a header beside the passport, and on the queue as a header of the message beside its trace, never in the event's body. Each receiver applies its own trust, and a value it cannot use is treated as absent, so retries and delivery deadlines run on the real clock.
@@ -226,9 +238,13 @@ A CLI controller declares one command per contract service method, its flags der
 
 Treat `migrations/` as the module's only schema-change path — never run DDL by hand and never rely on ORM auto-sync, anywhere including local. Write files timestamped and **append-only**: once a migration has run anywhere, it is immutable, so write a correction as a new migration rather than editing an old one. The runner merges every module's migrations into one global ascending order by numeric version, ties by module code, tracked by module and version per application, so two modules that share a version both run. A migration writes only its own module's tables; rows that belong to another module (permissions, roles and enablements to IAM, labels and entity types to MDM) travel as a contribution that the owner applies, and a changed frozen migration stops the run at preflight. Implement `up` on every migration, and implement `down` where the change is reversible. Runs happen over the migration connection only, the only DDL-capable credential the application ever holds, in a run mode that starts no entries.
 
+**While the stage is ALPHA, the migration that owns a table is edited in every repository, instead of adding a migration or an `ALTER`, and the stack is reset clean before testing** (`RULE.SUPPORT.APPS.246` · MUST · skill:spn-apps/implement). The move to beta collapses a repository's migrations into one baseline before the first append-only migration, so the append-only rule above holds from then on. A module's migrations write only its own tables; what a module has for another module travels as a contribution the owner applies. **A contribution for an owner held in another service travels on `POST /remote-migration`, a route of the framework's own, and is never a contract method** (`RULE.SUPPORT.APPS.256` · MUST · skill:spn-apps/implement). It sits beside the remote route on the same listener, behind the same service credential check, and the owner's own migration hooks apply it under the owner's lock.
+
 ## Config is one namespace the module carries with it
 
 A module's configuration is one namespace, declared by the module and populated once at boot from the environment. Read it thereafter through the module reference, never by reading the environment directly — a variable you read anywhere but boot is an undeclared dependency, invisible to validation and impossible to supply in a test that stands the module up with no environment at all. Stay inside your own `{CODE}_{MODULE}_*` prefix; never read outside it. When your setting is a fact the estate publishes, the estate's key carries no module's name, and the application's own settings write your key as a `${…}` reference to it (`RULE.SUPPORT.INFRA.111` · MUST · check:subjects).
+
+**Code never branches on the name of an environment, and it reads a setting named for what it does** (`RULE.SUPPORT.APPS.233` · MUST · skill:spn-apps/implement). The estate sets that setting for each environment, so a new environment needs no change in the code. Two variables are unprefixed, `APP_ENV` (the setup whose env file loads) and `APP_MODE` (the run mode that filters which declared entries start); both are launcher facts, set by the operator or the command line and never inside an env file (`RULE.SUPPORT.APPS.056` · MUST · skill:spn-apps/implement). No manifest lists an app's run modes.
 
 ## How one module reaches another
 
@@ -250,6 +266,8 @@ Contract names live at two altitudes. **Wire names are identical on every stack,
 A web module carries the same three layers, but expect most modules to never earn more than `entry/ui/` — the thin form, and the default. The generated API client is already the contract-derived client of the platform surface, so wrap it in a local service only when the module owns genuine client-side domain logic (offline operation, local persistence, a complex editor evaluating without a round trip). That is the full form, and it brings a local contract with it — states and service interfaces under the same seam discipline the server follows, but carrying **no permission codes**: authorization is decided on the server, so cite the server's permission code rather than declaring a second one.
 
 `entry/ui/` holds `pages` (routes and composition), `containers` (the framed parts a page is assembled from), `components` (props in, events out, no data fetching of their own), `hooks` (the only layer that calls the generated client, one hook per concern) and `utils` (pure presentational helpers — label lookups, formatting, never a business rule). It holds `widgets` where the module ships embeddable units.
+
+**A web prop is typed by a contract state, command or result as it is, or as a union narrowed with `in`, and never by `Partial`, `Pick`, `Omit` or an intersection of it** (`RULE.SUPPORT.APPS.243` · MUST · skill:spn-apps/implement). The prop then keeps the shape the contract promises.
 
 **A module's shared list and record page take the app's own additions: columns on a list, sections on a record page** (`RULE.SUPPORT.APPS.265` · MUST · skill:spn-apps/implement). The module draws an addition after its own fields and never drops one of its own, and it never learns which module an addition comes from: the app passes it in as props. A stored extra field stays a custom field of the platform's extensible-records module.
 

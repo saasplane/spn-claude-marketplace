@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/03-standards-patterns.md",
-      "seen": "95513e78"
+      "seen": "4d62fedb"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/",
-      "seen": "2fbb2ec4"
+      "seen": "9841a874"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
@@ -56,7 +56,7 @@ Task and flow patterns hold on every kind of app. App and site patterns are chos
 
 **A site's page MUST be a sequence of sections, and each MUST own its room and its fill** (`RULE.SUPPORT.SURFACE.414` · MUST · skill:spn-surface/design). The layout's box gives the side room, so the words of every section and the bar's items share one edge at every width; what a section holds adds no room unless it is framed, and a frame insets its own words. A footer's list of links keeps its words on the column's edge, with rows that are not pressed whole, each holding a link that marks itself under the pointer. A menu's panel is as wide as what it holds: a few short entries stand as a compact list, and a wide panel is for entries that carry content of their own.
 
-The site patterns decide where emphasis goes, and the site's design language decides how it looks. A section takes a test for each kind of emphasis, such as a highlight, a gradient or the shape of a picture, and the design language says how that emphasis is drawn on this site. A design language stands beside the theme and never inside it: the theme says which colours and corners, and the design language says how the pages are built and how they look and move. Because it is only choices, any brand's theme recolours it. `design-languages.md` states what one holds and how one is made.
+The site patterns decide where emphasis goes, and the site's design language decides how it looks. A section takes a test for each kind of emphasis, such as a highlight, a gradient or the shape of a picture, and the design language says how that emphasis is drawn on this site. A design language stands beside the theme and never inside it: the theme says which colours and corners, and the design language says how the pages are built and how they look and move. Because it is only choices, any brand's theme recolours it. `design-languages.md` states what one holds and how one is made. The platform's design language is the one source of its look: it holds the brand once and a row for each app, an app keeps its theme as one typed setting written from it, and a theme is layered in one order, the defaults, the brand, the app's looks, then an account's branding (`RULE.SUPPORT.SURFACE.571` · MUST · skill:spn-surface/design) (`RULE.SUPPORT.SURFACE.572` · MUST · skill:spn-surface/design) (`RULE.SUPPORT.SURFACE.575` · MUST · skill:spn-surface/design).
 
 **A rule about how a page is designed and uses a unit is guidance, and it says its reason** (`RULE.SUPPORT.SURFACE.394` · MUST · skill:spn-surface/design). So the rules here read as advice wherever they say which pattern or unit a page picks, where a part stands, which value, variant, colour or size a page writes, how many of a thing a view shows, and the words a page uses. MUST is kept for four things: what the design system and a stack must build, the floor a person is owed whatever the design, the process of the library and the showcase, and true claims. A true claim is a number on a marketing page, read from the real system and never made up. A bold rule below with no MUST is advice, and a partner's choice against it stands.
 

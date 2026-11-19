@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/08-architecture-containers/",
-      "seen": "ff7992e4"
+      "seen": "522e6a83"
     }
   ]
 }
@@ -194,6 +194,7 @@ A section is one part of a page, set apart from the next by a fill of its own an
 
 - **A section of a page MUST be `DSSectionContainer`, and it MUST be the only unit that gives a part of a page its fill and its room** (`RULE.SUPPORT.SURFACE.243` · MUST · skill:spn-surface/design). The room above and below comes from the section's size and the sides are the layout's space, `--layout-space` (`RULE.SUPPORT.SURFACE.200` · MUST · skill:spn-surface/design), so a page writes no padding, no maximum width and no gutter for a section. A section that is `flush` draws no room of its own on any side (`RULE.SUPPORT.SURFACE.313` · MUST · skill:spn-surface/design). It takes no header, no footer, no frame and no parts, and `DSPanelContainer` takes no section's job.
 - **A section MUST take its room above and below from its size, and hand that size to what it holds** (`RULE.SUPPORT.SURFACE.247` · MUST · skill:spn-surface/design). The size is the app's where it is unset, and every block inside the section takes it, as the blocks in a panel container take the panel's. Each value is a token, `--section-<step>-room` and `--section-<step>-gap`, with a smaller value under the layouts' phone width, and a partner overrides the tokens once for the whole site.
+- **Two or more features stacked in one section MUST stand the section's stack apart, two thirds of its room on the 8 grid** (`RULE.SUPPORT.SURFACE.549` · MUST · skill:spn-surface/design). The token is `--section-<step>-stack`, 64px at `MD` and 40px on a phone, so the features read as blocks of one section and never as two sections; a section that holds one child takes none of it, and an item gap never stands between two features.
 
 | Size | Room above and below | Grid gap, or room on each side of a line | Typical use |
 | --- | --- | --- | --- |
@@ -259,7 +260,7 @@ A grid of features under a heading is `DSFeatureGridSectionContainer` (`RULE.SUP
 - **The columns MUST follow the screen class, and never a measured width** (`RULE.SUPPORT.SURFACE.271` · MUST · skill:spn-surface/design). `grid` states how many columns stand at a desktop, a tablet and a phone, each from 1 to 4, and the live device picks one. A number above 4 is read as 4 and one below 1 as 1. Nothing in the section measures its place.
 - **The gap and the lines MUST follow the section's size.** With `NONE` the cells stand the section's grid gap apart. With `GRID` or `EDGE` each cell keeps that gap as its room on every side and draws its own line at its end and at its bottom, so a short last row keeps its lines at every width. `EDGE` adds a line around the outside, rounded with the theme's radius.
 - **A section MAY take `inset`, the grid section MUST take it through `section`, and a reveal MUST play once** (`RULE.SUPPORT.SURFACE.282` · MUST · skill:spn-surface/design). `DSSectionContainer` takes no `reveal`, because a section holds no words of its own.
-- **The grid section MUST add no surface.** The section's fill is under the heading and each feature draws its own frame from its own `surface`.
+- **The grid section MUST add no surface, and each cell MUST hand its height to its feature** (`RULE.SUPPORT.SURFACE.530` · MUST · skill:spn-surface/design) (`RULE.SUPPORT.SURFACE.531` · MUST · skill:spn-surface/design). The section's fill is under the heading and each feature draws its own frame from its own `surface`. A row is as tall as its tallest feature, and every feature of the row fills its cell.
 - **The columns of a grid MUST be one shape, `IDSGridColumns`, and a page MUST set them per screen class** (`RULE.SUPPORT.SURFACE.260` · MUST · skill:spn-surface/design) (`RULE.SUPPORT.SURFACE.271` · MUST · skill:spn-surface/design). `IDSGridColumns` holds `desktop`, `tablet` and `mobile`, all required. `IDSGrid` extends it and adds the optional `borderType` of `DSGridBorderType`, `NONE` where left out: a grid is its columns and its lines. Every other unit that draws a grid of cells holds the shape as an attribute, `gridColumns`, and never extends it, except `DSList`, which takes lines too and holds the whole `IDSGrid` as `grid`, each with its own default and range stated in `architecture-components.md`.
 
 ### The name of a unit and its props

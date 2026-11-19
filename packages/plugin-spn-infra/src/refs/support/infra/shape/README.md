@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-infra/01-shape.md",
-      "seen": "69f404a6"
+      "seen": "6e02059b"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
-      "seen": "49abb7b6"
+      "seen": "5f08701f"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/03-blueprints/01-layers.md",
@@ -77,7 +77,7 @@ The layers are nouns; each takes `up · down · status`, and `--plan` on `up` or
 
 **Every provisioning run names its mode, and there is no default** (`RULE.SUPPORT.INFRA.094` · MUST · skill:spn-infra/implement). `up` and `down` each take exactly one of `--plan` or `--apply`. A command that plans when you forget a flag is a command doing another command's job, and a default would decide the direction of the mistake for you.
 
-Beside the layers: `logs <spc> [service]` · `show <spc>` (resolution per layer, incl. **PINNED @ version or a path**) · `trust-ca` (trust the machine's own CA — what the local `organization up` does as part of its bootstrap) · `domain register <spc> <host>|unregister` (register a host with the local proxy, `--app <kind code>`, needing no privilege and writing no `/etc/hosts` — what the local edge provider calls for every route, and what a test calls for its own `lc-test` domain) · the `config` commands (`set · get · list · export · import · diff · render` — the app plane only, never the ledger) · `web deploy|rollback <spc> <env> <app>` (a built bundle into the platform's own storage engine, and a landed release back onto the route — no separate store) · `web configure <spc> <env> <app> --out <file>` (a web app's build values for one environment, as `VITE_*` lines, written before each web build so a bundle carries its environment) · `bases publish <version> --repository <host/repository>` (the release's stack base and runtime base, pushed to the organization's base repository by the estate's bases workflow) · `scaffold repo|organization|platform|module` · `validate` · `test` · `release`.
+Beside the layers: `logs <spc> [service]` · `show <spc>` (resolution per layer, incl. **PINNED @ version or a path**) · `trust-ca` (trust the machine's own CA — what the local `organization up` does as part of its bootstrap) · `domain register <spc> <host>|unregister` (register a host with the local proxy, `--app <kind code>`, needing no privilege and writing no `/etc/hosts` — what the local edge provider calls for every route, and what a test calls for its own `lc-test` domain) · the `config` commands (`set · get · list · export · import · diff · render` — the app plane only, never the ledger) · `web deploy|rollback <spc> <env> <app>` (a built bundle into the platform's own storage engine, and a landed release back onto the route — no separate store) · `web configure <spc> <env> <app> --out <file>` (a web app's build values for one environment, as `VITE_*` lines, written before each web build so a bundle carries its environment) · `bases publish <version> --repository <host/repository>` (the release's stack base and runtime base, pushed to the organization's base repository by the estate's bases workflow) · `domain read-zone <code> <file>` and `check-zone <code> <file> --name-server <host>` (moving a domain's DNS to the estate before the registrar is switched; both read the zone exported from the DNS host and reach no account, `read-zone` listing the records the declaration lacks or holds with other values, `check-zone` asking a nameserver of the zone the estate stood for every record) · `ground up --cloud --plan|--apply` (the ground, cloud only: the plan prints the checks, the state store it would stand and the mail groups it would make or correct; the apply stands the store, then makes the missing groups, aliases and settings through your own sign-in, and never deletes; `organization up --cloud` no longer runs it and refuses by name while the store is absent) · `deployments up|status <spc> --env <env> --cloud` (the deployments layer, cloud only with no local form; a person may plan and read its status, only the pipeline's identity applies it, by image digest) · `scaffold repo|organization|platform|module` · `validate` · `test` · `release`.
 
 ## Doors — who may run what, where
 

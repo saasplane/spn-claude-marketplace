@@ -13,11 +13,11 @@
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/02-workstream.md",
-      "seen": "26fc3576"
+      "seen": "dd99a0e0"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
-      "seen": "90b22d70"
+      "seen": "cd529187"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -42,7 +42,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "section": "An arc carries its specification, or names the note that holds it",
-      "seen": "103a339d"
+      "seen": "36f2db87"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -56,7 +56,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "seen": "bb41a4c5"
+      "seen": "cb4dbf98"
     }
   ]
 }
@@ -524,7 +524,7 @@ repository's own concept names its domains; where a concept names none, ask.
 | --- | --- |
 | `PROPOSED` | joins the sheet |
 | `DECIDED` | a sheet edit, then the preview |
-| `RUNNING` | the five steps of a change mid-run (`RULE.DEVEX.WORKSPACE.459`); a small decided fix joins the running arc's go as an entry, on the developer's words |
+| `RUNNING` | the five steps of a change mid-run (`RULE.DEVEX.WORKSPACE.459` · MUST · skill:spn-devex/execute); a small decided fix joins the running arc's go as an entry, on the developer's words |
 | `LANDED` | a step on the `follow-ups` arc, the arc that closes the workstream, named by its role |
 
 ### The kinds of go, and the other words that move things
@@ -768,7 +768,7 @@ handover's `open:` line holds only this workstream's cards.
 When you help shape an idea and a new workstream is opened from it, that workstream is yours from then
 on, and you ask its cards here. A workstream is yours when a write of this window put its path inside
 the folder, or when your first prompt or a handover named it; a log line that only mentions another
-workstream makes it nobody's but the window that works there (`RULE.DEVEX.WORKSPACE.236` · MUST · short). A window that
+workstream makes it nobody's but the window that works there (`RULE.DEVEX.WORKSPACE.236` · MUST · short). A workstream named only in a handover's `do not touch:` line, or its continuation lines, binds the window to nothing. A window that
 works on no workstream asks no card.
 
 **Agent reports, test and check output, and hook replies go to the arc's log, never the chat.** They
@@ -1188,7 +1188,7 @@ writing one file lose one agent's work without a signal.
 release, or run `apps format`, which rewrites whole nodes. The coordinator commits, by explicit
 path, once it has read the report.
 
-**Five things an order never does, and every brief says so** (`RULE.DEVEX.WORKSPACE.515` · MUST · skill:spn-devex/execute). An agent never rewrites a file with `sed -i`; it changes a file with the edit tool. It never runs `git stash`, because a stash takes the shared checkout's work from whoever is writing in it, and only the coordinator names one (`RULE.DEVEX.WORKSPACE.481`). It never commits: the coordinator commits by explicit path, so one agent's commit never carries another agent's file. It never formats a generated file, since a generated file is changed only by running the command that writes it. It starts a demo app only from the main checkout, through `spnutils apps dev` (`RULE.SUPPORT.APPS.264`), never from a worktree.
+**Five things an order never does, and every brief says so** (`RULE.DEVEX.WORKSPACE.515` · MUST · skill:spn-devex/execute). An agent never rewrites a file with `sed -i`; it changes a file with the edit tool. It never runs `git stash`, because a stash takes the shared checkout's work from whoever is writing in it, and only the coordinator names one (`RULE.DEVEX.WORKSPACE.481` · MUST · skill:spn-devex/ideate). It never commits: the coordinator commits by explicit path, so one agent's commit never carries another agent's file. It never formats a generated file, since a generated file is changed only by running the command that writes it. It starts a demo app only from the main checkout, through `spnutils apps dev` (`RULE.SUPPORT.APPS.264` · MUST · skill:spn-apps/run), never from a worktree.
 
 **An agent runs only the gates its order names, and never a writer.** A gate that rewrites
 generated files, such as `restates … write`, a plugin build or a register edit, changes files
@@ -1382,7 +1382,9 @@ pages opened in tabs, grouped by what each is for. The arc's preview links the i
 the decisions and any detail that is the arc's alone. An arc of one page, or with no drawn page, keeps everything on its preview.
 Writing, naming, grouping and retiring the pages is the agent's job, and a page a decision has overtaken leaves the index.
 `spn-devex docs index write` writes the index from the pages on disk, so the tree is never typed. A sample draws the changes
-already decided on its arcs, and never today's code as it stands.
+already decided on its arcs, and never today's code as it stands. A few surface page previews are linked from the arc's preview, and many go in a group folder of the samples under the one index (`docs/…/05-artifacts.md § The surface page preview`).
+
+**A sheet entry, one a landed row holds included, may name the case ids its runner credits** (`RULE.DEVEX.WORKSPACE.529` · MUST · check:split-plan). `sheet edit <E> --credits <ids>` writes them, and a CODE or PROOF row lands on a credited id as on a case the run proved, where a tier id of the entry is in no case of the run. Crediting changes none of the work the entry plans, so it flags no landed part stale.
 
 **A sample is the work's own file, never a page built with the page template — MUST**
 (`RULE.DEVEX.WORKSPACE.267` · MUST · check:workstream-state). It keeps the format the work produces, and does not link the shared stylesheet
@@ -1391,7 +1393,7 @@ is. `workstream state check` names a sample built with the page template; a samp
 produces passes, its masthead's `Type` naming the page kind, such as `Approach`, or its name the book
 template it is a review copy of, such as `blocks-template.html`.
 
-**Draw *Where it lands* as one folder tree for each repository** (`RULE.DEVEX.WORKSPACE.238` · GUIDE). A
+**Draw *Where it lands* as one folder tree for each repository** (`RULE.DEVEX.WORKSPACE.238` · MUST · check:doc-check). A
 reviewer understands a change by browsing folders, and a path in a table cell has to be put together in
 the head. So never write the section as a table of file paths. Group it by repository, in the order the
 work runs. For each repository write one line that names it and says what happens there, and then one

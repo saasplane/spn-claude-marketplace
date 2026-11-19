@@ -1,4 +1,4 @@
-/* The design system's own variables, copied whole by `spn-devex docs sds cut` from support-web-ds-ts v11.14.0. Never edited by hand: cut copies them again. */
+/* The design system's own variables, copied whole by `spn-devex docs sds cut` from support-web-ds-ts v11.15.0. Never edited by hand: cut copies them again. */
 /* =========================================================================
    DESIGN TOKENS  —  see docs/04-capabilities/05-web/support-web-ds-ts/03-design-system.md
    Tier 0 seed (only per-theme knob) · Tier 1 ramps · Tier 2 roles
@@ -256,6 +256,12 @@
   --section-lg-gap: 2.5rem; /* 40px, 24px on a phone */
   --section-xl-room: 8rem; /* 128px, 72px on a phone: the hero */
   --section-xl-gap: 3rem; /* 48px, 32px on a phone */
+  /* Two features stacked in one section: two thirds of the section's room, on the 8 grid. */
+  --section-xs-stack: 1.5rem; /* 24px, 16px on a phone */
+  --section-sm-stack: 2.5rem; /* 40px, 24px on a phone */
+  --section-md-stack: 4rem; /* 64px, 40px on a phone */
+  --section-lg-stack: 4.5rem; /* 72px, 40px on a phone */
+  --section-xl-stack: 5.5rem; /* 88px, 48px on a phone */
 
   /* ---------------------------------------------------------------------
        SCALE
@@ -453,6 +459,11 @@
     --section-lg-gap: 1.5rem; /* 24px, 40px elsewhere */
     --section-xl-room: 4.5rem; /* 72px, 128px elsewhere */
     --section-xl-gap: 2rem; /* 32px, 48px elsewhere */
+    --section-xs-stack: 1rem; /* 16px, 24px elsewhere */
+    --section-sm-stack: 1.5rem; /* 24px, 40px elsewhere */
+    --section-md-stack: 2.5rem; /* 40px, 64px elsewhere */
+    --section-lg-stack: 2.5rem; /* 40px, 72px elsewhere */
+    --section-xl-stack: 3rem; /* 48px, 88px elsewhere */
   }
 }
 
@@ -1036,6 +1047,192 @@
   --surface-step-2: oklch(0.45 var(--neutral-chroma) var(--neutral-hue));
   --surface-step-3: oklch(0.52 var(--neutral-chroma) var(--neutral-hue));
 }
+/* =========================================================================
+   THE DRAWING SCALE — every value a drawing may take, each a token. The design system ships the names with SaaS Plane's
+   values as defaults; a design language overrides the values, and a drawing reads only these names. A drawing picks its
+   step by where it sits (S a card's media, M a section's drawing, L a hero) and never sets a size, weight, colour or
+   shadow of its own. A container with `data-draw-step` S, M or L switches the three text sizes below.
+   ========================================================================= */
+/* The colours are mixes of the roles, worked out where the mode is set, so a block that forces a mode takes its own. */
+:root,
+[data-mode='dark'],
+[data-mode='light'] {
+  --draw-ink: var(--foreground);
+  --draw-muted: var(--muted-foreground);
+  --draw-accent: var(--primary);
+  --draw-ground: var(--card);
+  --draw-edge: color-mix(in oklch, var(--foreground) 14%, var(--background));
+  --draw-plate: color-mix(in oklch, var(--primary) 4.5%, var(--background));
+  --draw-plate-edge: color-mix(in oklch, var(--primary) 24%, var(--background));
+  --draw-wire: color-mix(in oklch, var(--foreground) 30%, var(--background));
+  --draw-warn: var(--error);
+  /* The colour follows the line's style: a dashed line (a reply, an inactive unit, a slot to fill) is muted, a dotted
+     line (a guide, a boundary) is the plate's edge, and only a solid wire is the wire's. */
+  --draw-dash-color: var(--draw-muted);
+  --draw-dot-color: var(--draw-plate-edge);
+  /* A dotted boundary, the edge of a named place that holds parts, is stronger than a guide: the accent at 45 percent. */
+  --draw-dot-strong-color: color-mix(in oklch, var(--primary) 45%, var(--background));
+  --draw-shadow: drop-shadow(0 1px 1px color-mix(in oklch, var(--foreground) 8%, transparent));
+}
+[data-mode='dark'] {
+  --draw-accent: var(--primary-fg);
+  --draw-dot-strong-color: color-mix(in oklch, var(--primary-fg) 55%, var(--background));
+  --draw-shadow: none;
+}
+:root {
+  /* Lines: three weights, a dash and a dot pattern. */
+  --draw-stroke-detail: 0.75;
+  --draw-stroke-line: 1;
+  --draw-stroke-focus: 1.25;
+  --draw-dash: 4 4;
+  --draw-dot: 1 3;
+  /* Shape. */
+  --draw-radius-tile: var(--radius-lg);
+  --draw-radius-plate: calc(var(--radius-lg) + 2px);
+  /* Type: the design system's faces, weights and tracking. */
+  --draw-font-name: var(--font-text);
+  --draw-font-mono: var(--font-code);
+  --draw-weight-name: var(--font-weight-medium);
+  --draw-weight-detail: var(--font-weight-regular);
+  --draw-weight-label: var(--font-weight-semibold);
+  --draw-track-label: 0.08em;
+  /* Text by step, then the step-free names, which are M. */
+  --draw-text-name-s: 11px;
+  --draw-text-detail-s: 9.5px;
+  --draw-text-label-s: 9px;
+  --draw-text-name-m: 12px;
+  --draw-text-detail-m: 10px;
+  --draw-text-label-m: 9.5px;
+  --draw-text-name-l: 14px;
+  --draw-text-detail-l: 11.5px;
+  --draw-text-label-l: 10.5px;
+  --draw-text-name: var(--draw-text-name-m);
+  --draw-text-detail: var(--draw-text-detail-m);
+  --draw-text-label: var(--draw-text-label-m);
+  /* Spacing, the icon and the heights of a tile at each step, in pixels: M as drawn, S 0.85 of it and L 1.2 of it,
+     rounded to the 4 grid. The step-free names are M, and a container with `data-draw-step` switches them. */
+  --draw-space-tile-s: 12px;
+  --draw-space-tile-m: 12px;
+  --draw-space-tile-l: 16px;
+  --draw-space-tile: var(--draw-space-tile-m);
+  --draw-space-gap-s: 12px;
+  --draw-space-gap-m: 12px;
+  --draw-space-gap-l: 16px;
+  --draw-space-gap: var(--draw-space-gap-m);
+  --draw-space-plate-s: 12px;
+  --draw-space-plate-m: 16px;
+  --draw-space-plate-l: 20px;
+  --draw-space-plate: var(--draw-space-plate-m);
+  --draw-space-plates-s: 20px;
+  --draw-space-plates-m: 24px;
+  --draw-space-plates-l: 28px;
+  --draw-space-plates: var(--draw-space-plates-m);
+  --draw-space-join-s: 48px;
+  --draw-space-join-m: 56px;
+  --draw-space-join-l: 68px;
+  --draw-space-join: var(--draw-space-join-m);
+  --draw-space-label-s: 8px;
+  --draw-space-label-m: 8px;
+  --draw-space-label-l: 8px;
+  --draw-space-label: var(--draw-space-label-m);
+  --draw-space-parallel-s: 12px;
+  --draw-space-parallel-m: 16px;
+  --draw-space-parallel-l: 20px;
+  --draw-space-parallel: var(--draw-space-parallel-m);
+  --draw-space-frame-s: 12px;
+  --draw-space-frame-m: 16px;
+  --draw-space-frame-l: 20px;
+  --draw-space-frame: var(--draw-space-frame-m);
+  --draw-bend-s: 8px;
+  --draw-bend-m: 8px;
+  --draw-bend-l: 8px;
+  --draw-bend: var(--draw-bend-m);
+  --draw-icon-s: 12px;
+  --draw-icon-m: 16px;
+  --draw-icon-l: 20px;
+  --draw-icon: var(--draw-icon-m);
+  --draw-icon-gap-s: 8px;
+  --draw-icon-gap-m: 10px;
+  --draw-icon-gap-l: 12px;
+  --draw-icon-gap: var(--draw-icon-gap-m);
+  --draw-tile-1-s: 32px;
+  --draw-tile-1-m: 36px;
+  --draw-tile-1-l: 44px;
+  --draw-tile-1: var(--draw-tile-1-m);
+  --draw-tile-2-s: 40px;
+  --draw-tile-2-m: 48px;
+  --draw-tile-2-l: 56px;
+  --draw-tile-2: var(--draw-tile-2-m);
+  --draw-tile-stacked-s: 56px;
+  --draw-tile-stacked-m: 64px;
+  --draw-tile-stacked-l: 76px;
+  --draw-tile-stacked: var(--draw-tile-stacked-m);
+  --draw-tile-stacked-detail-s: 68px;
+  --draw-tile-stacked-detail-m: 80px;
+  --draw-tile-stacked-detail-l: 96px;
+  --draw-tile-stacked-detail: var(--draw-tile-stacked-detail-m);
+}
+[data-draw-step='S'] {
+  --draw-text-name: var(--draw-text-name-s);
+  --draw-text-detail: var(--draw-text-detail-s);
+  --draw-text-label: var(--draw-text-label-s);
+  --draw-space-tile: var(--draw-space-tile-s);
+  --draw-space-gap: var(--draw-space-gap-s);
+  --draw-space-plate: var(--draw-space-plate-s);
+  --draw-space-plates: var(--draw-space-plates-s);
+  --draw-space-join: var(--draw-space-join-s);
+  --draw-space-label: var(--draw-space-label-s);
+  --draw-space-parallel: var(--draw-space-parallel-s);
+  --draw-space-frame: var(--draw-space-frame-s);
+  --draw-bend: var(--draw-bend-s);
+  --draw-icon: var(--draw-icon-s);
+  --draw-icon-gap: var(--draw-icon-gap-s);
+  --draw-tile-1: var(--draw-tile-1-s);
+  --draw-tile-2: var(--draw-tile-2-s);
+  --draw-tile-stacked: var(--draw-tile-stacked-s);
+  --draw-tile-stacked-detail: var(--draw-tile-stacked-detail-s);
+}
+[data-draw-step='M'] {
+  --draw-text-name: var(--draw-text-name-m);
+  --draw-text-detail: var(--draw-text-detail-m);
+  --draw-text-label: var(--draw-text-label-m);
+  --draw-space-tile: var(--draw-space-tile-m);
+  --draw-space-gap: var(--draw-space-gap-m);
+  --draw-space-plate: var(--draw-space-plate-m);
+  --draw-space-plates: var(--draw-space-plates-m);
+  --draw-space-join: var(--draw-space-join-m);
+  --draw-space-label: var(--draw-space-label-m);
+  --draw-space-parallel: var(--draw-space-parallel-m);
+  --draw-space-frame: var(--draw-space-frame-m);
+  --draw-bend: var(--draw-bend-m);
+  --draw-icon: var(--draw-icon-m);
+  --draw-icon-gap: var(--draw-icon-gap-m);
+  --draw-tile-1: var(--draw-tile-1-m);
+  --draw-tile-2: var(--draw-tile-2-m);
+  --draw-tile-stacked: var(--draw-tile-stacked-m);
+  --draw-tile-stacked-detail: var(--draw-tile-stacked-detail-m);
+}
+[data-draw-step='L'] {
+  --draw-text-name: var(--draw-text-name-l);
+  --draw-text-detail: var(--draw-text-detail-l);
+  --draw-text-label: var(--draw-text-label-l);
+  --draw-space-tile: var(--draw-space-tile-l);
+  --draw-space-gap: var(--draw-space-gap-l);
+  --draw-space-plate: var(--draw-space-plate-l);
+  --draw-space-plates: var(--draw-space-plates-l);
+  --draw-space-join: var(--draw-space-join-l);
+  --draw-space-label: var(--draw-space-label-l);
+  --draw-space-parallel: var(--draw-space-parallel-l);
+  --draw-space-frame: var(--draw-space-frame-l);
+  --draw-bend: var(--draw-bend-l);
+  --draw-icon: var(--draw-icon-l);
+  --draw-icon-gap: var(--draw-icon-gap-l);
+  --draw-tile-1: var(--draw-tile-1-l);
+  --draw-tile-2: var(--draw-tile-2-l);
+  --draw-tile-stacked: var(--draw-tile-stacked-l);
+  --draw-tile-stacked-detail: var(--draw-tile-stacked-detail-l);
+}
+
 /* The page's fill and the page's text colour, which a gradient ends toward (SOFTER toward the first, STRONGER toward
    the second). A surface re-points --surface and --foreground to its own, so a gradient reads these two, worked out
    only on the root and on a block that forces a mode. */

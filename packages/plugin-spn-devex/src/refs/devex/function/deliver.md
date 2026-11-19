@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/07-deliver.md",
-      "seen": "4c116f39"
+      "seen": "1d6cc7ef"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/01-function/07-deliver.md",
@@ -33,6 +33,8 @@ The agent names the bump from the change, using the table of the book's *What a 
 **Cheapest first is the whole ordering rule.** A gate that takes a second and can fail runs before one that takes ten minutes, because the only thing a late failure buys is a longer wait for the same answer.
 
 **A release runs from a clean tree.** The release train stages everything it finds, so a release run while another session holds uncommitted work publishes that work.
+
+**A failed release check is read by the agent, and the pipeline stays agent-free.** The agent reads a pull request's failed checks and proposes the fix; the release itself runs the same gates with no agent in it.
 
 ## What travels, and what never does
 

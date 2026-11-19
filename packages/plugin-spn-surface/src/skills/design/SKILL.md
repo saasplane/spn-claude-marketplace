@@ -7,15 +7,15 @@ description: Design a page of a SaaS Plane app from the blocks of the design sys
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
-      "seen": "7beac2a2"
+      "seen": "bd28f6f7"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/03-ideate.md",
-      "seen": "e1dfce15"
+      "seen": "b78913ec"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/",
-      "seen": "5290ca02"
+      "seen": "1b6fbc9d"
     }
   ]
 }
@@ -663,3 +663,4 @@ Wear the spn-devex plugin's `refs/devex/agent/lenses/ux.md` while you place the 
 - **A skeleton draws a form's fields and its heading line from the size's own tokens, and a page never sizes its bones one by one** (`RULE.SUPPORT.SURFACE.533` · MUST · skill:spn-surface/design)
 - **The content of a dialog, a drawer and a sheet stacks its parts one under another, the size's gap apart, and a page passes it no flex or gap class** (`RULE.SUPPORT.SURFACE.534` · MUST · skill:spn-surface/design)
 - **The media tokens are what any kind of picture needs, and a kind's own roles map onto them** (`RULE.SUPPORT.SURFACE.535` · MUST · skill:spn-surface/design)
+- **Two or more features stacked in one section stand the section's stack apart, two thirds of its room on the 8 grid** (`RULE.SUPPORT.SURFACE.549` · MUST · skill:spn-surface/design)

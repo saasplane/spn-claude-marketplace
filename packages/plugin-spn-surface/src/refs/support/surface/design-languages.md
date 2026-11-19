@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/01-common/05-design-languages.md",
-      "seen": "4e77c843"
+      "seen": "088053be"
     }
   ]
 }
@@ -189,7 +189,7 @@ Text is start-aligned by default, set per section pattern. It is centred only fo
 
 Where a section's items stand beside a medium, the kind of items decides the form. The words stand across the section, the items at the start beside the medium, and the medium is centred on the items.
 
-- **A list of steps or layers stands beside its drawing, numbered and in the drawing's order; where the drawing already labels each step, the items go (`RULE.SUPPORT.SURFACE.528`)** (`RULE.SUPPORT.SURFACE.567` · MUST · skill:spn-surface/design)
+- **A list of steps or layers stands beside its drawing, numbered and in the drawing's order; where the drawing already labels each step, the items go (`RULE.SUPPORT.SURFACE.528` · MUST · skill:spn-surface/design)** (`RULE.SUPPORT.SURFACE.567` · MUST · skill:spn-surface/design)
 - **A list of doors stands beside the group's picture** (`RULE.SUPPORT.SURFACE.568` · MUST · skill:spn-surface/design)
 - **A grid of peers takes no drawing beside it** (`RULE.SUPPORT.SURFACE.569` · MUST · skill:spn-surface/design)
 
@@ -229,7 +229,7 @@ Each suits its own reader: Stone a reader who wants a calm, dark page, Daylight 
 - **`spn-surface check page` refuses what it can read in a spec**: a raw colour in a drawing, a class on a unit, an icon outside the app's lucide set, a hero form its media does not call for, two emphases in a section, media on the wrong level, and a drawing under the words narrower than its section's content. `spn-surface check module` refuses a folder outside a module's taxonomy.
 - **No check reads a medium against the drawing scale yet**: text sizes, line weights and styles, a frame's radius and shadow, and spacing off the scale go to a review.
 - **The rest of a page's design language is read by a review**, beside the design language and the app's theme setting.
-- **No check compares an app's theme setting with its row yet** (`RULE.SUPPORT.SURFACE.573`): a review reads the setting beside its row.
+- **No check compares an app's theme setting with its row yet** (`RULE.SUPPORT.SURFACE.573` · GUIDE): a review reads the setting beside its row.
 
 ## Boundary
 
