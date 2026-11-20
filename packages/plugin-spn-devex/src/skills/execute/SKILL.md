@@ -11,7 +11,7 @@ description: Carry out a go. Use the moment the developer gives the go on one ar
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
-      "seen": "cd529187"
+      "seen": "bf5260c2"
     }
   ]
 }
@@ -19,7 +19,7 @@ description: Carry out a go. Use the moment the developer gives the go on one ar
 
 1. The scope: every arc the go covers is DECIDED and its sheet reads whole (`workstream sheet check`). The go refuses an entry that is incomplete, a change with no patch or a step with no command or no proof, in every hand-written file, the book, config, migrations, contract, server, web and tests included, and no warning stands in place of the refusal; a change marked judged still carries its patch (`RULE.DEVEX.WORKSPACE.502` · MUST · check:split-plan).
 2. Drift: `workstream state check --facts`, and `sheet edit` for each entry whose fact moved.
-3. The plan: before a go, the lead runs `go propose` and puts the scope to the developer; then `workstream go write <lead> --scope …`, and `go show` to read it. The plan is derived from the workspace map, rebuilt from the repositories' files on every plan, and from the passes each repository's world declares, which the plugin that serves that world supplies (`RULE.DEVEX.WORKSPACE.508` · MUST · skill:spn-devex/execute) (`RULE.DEVEX.WORKSPACE.509` · MUST · skill:spn-devex/execute).
+3. The plan: before a go, the lead runs `go propose` and puts the scope to the developer; then `workstream go write <lead> --scope …`, and `go show` to read it. The plan is derived from the workspace map, rebuilt from the repositories' files on every plan, and from the passes each repository's world declares, which the plugin that serves that world supplies (`RULE.DEVEX.WORKSPACE.508` · MUST · skill:spn-devex/execute) (`RULE.DEVEX.WORKSPACE.509` · MUST · skill:spn-devex/execute). A workstream written from a layout, such as a partner's foundation, is refused the go while any section is Pending or cites a decision newer than itself: run `workstream layout check <NNN>` first, and `go write` refuses the same way (`RULE.DEVEX.WORKSPACE.542` · MUST · skill:spn-devex/execute).
 4. Baselines: `go start` each repository's baseline, its whole suite on the base, once, and record what already fails.
 5. The parts: launch each part's brief, a pass at a time; fold each report with `report write`.
    Run the parts three or four at a time, each on a Sonnet helper. Review, and the developer, stay with the main agent.
@@ -72,3 +72,4 @@ description: Carry out a go. Use the moment the developer gives the go on one ar
 - **The sheet holds what each case proves, and its code is written in the test passes, once the names are final** (`RULE.DEVEX.WORKSPACE.510` · MUST · skill:spn-devex/execute)
 - **Every new case is shown failing on the base before the code it proves, and it fails for the right reason** (`RULE.DEVEX.WORKSPACE.511` · MUST · skill:spn-devex/execute)
 - **Five things an order never does, and every brief says so** (`RULE.DEVEX.WORKSPACE.515` · MUST · skill:spn-devex/execute)
+- **The go on a workstream written from a layout is refused while any section is `PENDING`, or cites a decision newer than the section itself, and the refusal names each such section** (`RULE.DEVEX.WORKSPACE.542` · MUST · skill:spn-devex/execute)
