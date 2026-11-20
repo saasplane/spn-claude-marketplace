@@ -484,8 +484,22 @@
   var state = { width: 'desktop', mode: 'light', notes: false };
   try { var kept = JSON.parse(localStorage.getItem('sds-surface') || '{}'); for (var k in state) if (k in kept) state[k] = kept[k]; } catch (e) {}
   function send() { try { frame.contentWindow.postMessage({ 'surface-page-preview': { mode: state.mode, notes: state.notes } }, '*'); } catch (e) {} }
+  // Each device frames the page at its own width, so the page lays itself out as on that device; where the stage is
+  // narrower, the frame is scaled down whole and never narrowed, so Desktop never falls into the tablet's layout.
+  var WIDTHS = { desktop: 1440, tablet: 768, phone: 390 };
+  var stage = root.querySelector('.sds-surface-stage');
+  function fit() {
+    var w = WIDTHS[state.width] || WIDTHS.desktop, room = stage.clientWidth, high = stage.clientHeight;
+    var scale = Math.min(1, room / w);
+    frame.style.width = w + 'px';
+    frame.style.height = (high / scale) + 'px';
+    frame.style.transform = scale < 1 ? 'scale(' + scale + ')' : '';
+    frame.style.marginLeft = Math.max(0, (room - w * scale) / 2) + 'px';
+  }
+  addEventListener('resize', fit);
   function apply() {
     root.setAttribute('data-width', state.width);
+    fit();
     Array.prototype.forEach.call(root.querySelectorAll('[data-surface]'), function (b) {
       var key = b.getAttribute('data-surface'), value = b.getAttribute('data-value');
       b.setAttribute('aria-pressed', String(key === 'notes' ? state.notes : state[key] === value));
