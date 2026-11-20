@@ -28,7 +28,7 @@
     },
     {
       "path": "spn-foundation/docs/01-purpose/02-what.md",
-      "seen": "8e953608"
+      "seen": "ca334950"
     }
   ]
 }

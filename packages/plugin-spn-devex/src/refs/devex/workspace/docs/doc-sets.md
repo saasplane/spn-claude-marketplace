@@ -7,12 +7,12 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "seen": "c216812e"
+      "seen": "4cb44838"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "The masthead, and the opening",
-      "seen": "a964af7f"
+      "seen": "b8b710da"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
@@ -29,11 +29,11 @@
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/04-docs.md",
-      "seen": "c04a4728"
+      "seen": "7aa46cbe"
     },
     {
       "path": "spn-foundation/CONCEPT.md",
-      "seen": "58566134"
+      "seen": "a3caf1a9"
     }
   ],
   "decisions": [
