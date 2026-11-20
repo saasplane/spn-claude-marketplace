@@ -75,12 +75,12 @@ function pageIn(name, text) {
 // A FIGURE COMES FROM A SPEC (RULE.DEVEX.WORKSPACE.523), and what a spec draws is measured as a page's drawing is.
 {
   const flat = run(["check", pageIn("check-flat", shared(`<figure><svg class="sds-drawing" viewBox="0 0 100 60"><rect class="sds-box" x="10" y="10" width="40" height="20"/></svg></figure>`))]);
-  one("red: `figure check` names a hand-drawn `sds-drawing` figure, whatever its geometry, and says to draw it from a spec",
+  one("[RULE.DEVEX.WORKSPACE.523] [MKT.SCRIPTS.616] red: `figure check` names a hand-drawn `sds-drawing` figure, whatever its geometry, and says to draw it from a spec",
     flat.code === 1 && flat.out.includes("hand-drawn `sds-drawing`") && flat.out.includes("RULE.DEVEX.WORKSPACE.523"));
   const arrow = run(["check", pageIn("check-arrow", shared(`<figure><svg class="dl-svg" viewBox="0 0 400 120"><rect class="dl-tile" x="16" y="16" width="120" height="48" rx="10"/><rect class="dl-tile" x="248" y="16" width="120" height="48" rx="10"/><path class="dl-wire" d="M136 40 H248" marker-end="url(#a)"/></svg></figure>`))]);
-  one("red: `figure check` names an arrowhead (`marker-end`) on a figure", arrow.code === 1 && arrow.out.includes("marker-end"));
+  one("[RULE.DEVEX.WORKSPACE.523] [MKT.SCRIPTS.616] red: `figure check` names an arrowhead (`marker-end`) on a figure", arrow.code === 1 && arrow.out.includes("marker-end"));
   const sample = run(["check", pageIn("check-sample", shared(`<figure><svg class="dl-svg" viewBox="0 0 400 120"><g data-dl-legend><path class="dl-wire" d="M40 60 H136" marker-end="url(#a)"/></g></svg></figure>`))]);
-  one("green: a sample the design language's page marks data-dl-legend is not named", sample.code === 0 && sample.out.includes("clean — 1 page"));
+  one("[RULE.DEVEX.WORKSPACE.523] [MKT.SCRIPTS.616] green: a sample the design language's page marks data-dl-legend is not named", sample.code === 0 && sample.out.includes("clean — 1 page"));
   // The map that came back clean: the wire from Behaviors to How runs down through Capabilities, inside the What plate.
   const MAP = { kind: "map", caption: "What has three parts.", boxes: [
     { id: "why", label: "Why", note: "the benefit to the consumer" }, { id: "what", label: "What" },
@@ -90,12 +90,12 @@ function pageIn(name, text) {
   const specFile = join(BASE, "why-what-how.json");
   writeFileSync(specFile, JSON.stringify(MAP));
   const spec = run(["check", specFile]);
-  one("red: a spec file named on its own is drawn and measured, and the wire through a tile it does not join is named",
+  one("[MKT.SCRIPTS.617] red: a spec file named on its own is drawn and measured, and the wire through a tile it does not join is named",
     spec.code === 1 && spec.out.includes("spec1: a connector runs through a box it does not join"), spec.out);
   const seat = join(BASE, "seat-map"); mkdirSync(seat, { recursive: true });
   writeFileSync(join(seat, "01-thing.md"), `# Thing\n\n\`\`\`dg\n${JSON.stringify(MAP)}\n\`\`\`\n`);
   const md = run(["check", seat]);
-  one("red: a seat file's `dg` spec is measured as it draws", md.code === 1 && md.out.includes("runs through a box it does not join"));
+  one("[MKT.SCRIPTS.617] red: a seat file's `dg` spec is measured as it draws", md.code === 1 && md.out.includes("runs through a box it does not join"));
 }
 
 // `colour` reads a page's code blocks — also no browser. A page's file holds plain code, and the shared

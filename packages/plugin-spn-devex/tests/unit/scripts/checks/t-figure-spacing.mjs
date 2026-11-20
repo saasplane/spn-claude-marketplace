@@ -63,17 +63,17 @@ console.log("=== a wire that runs through a tile it does not join");
     '<rect class="dl-tile" x="208" y="92" width="160" height="48" rx="10"/><rect class="dl-tile" x="208" y="184" width="160" height="48" rx="10"/>' +
     '<path class="dl-wire" d="M288 88 L288 184"/>');
   const said = checkFigureSpacing(page(MAP))?.deny ?? "";
-  ok("red: the wire through the tile it does not join is named as running through it", /runs through a box it does not join/.test(said), said);
-  ok("red: the finding names the tile it crosses", said.includes("208,92"), said);
+  ok("[MKT.HOOKS.525] red: the wire through the tile it does not join is named as running through it", /runs through a box it does not join/.test(said), said);
+  ok("[MKT.HOOKS.525] red: the finding names the tile it crosses", said.includes("208,92"), said);
   const ROUND = MAP.replace('<path class="dl-wire" d="M288 88 L288 184"/>',
     '<path class="dl-wire" d="M368 64 L376 64 Q392 64 392 80 L392 200 Q392 208 384 208 L368 208"/>');
-  ok("green: a wire that lands on a tile's side and leaves by its own corridor is not a crossing",
+  ok("[MKT.HOOKS.525] green: a wire that lands on a tile's side and leaves by its own corridor is not a crossing",
     !/runs through a box/.test(checkFigureSpacing(page(ROUND))?.deny ?? ""), checkFigureSpacing(page(ROUND))?.deny);
-  ok("green: a wire into a box inside a plate crosses the plate's wall, which is not a crossing",
+  ok("[MKT.HOOKS.525] green: a wire into a box inside a plate crosses the plate's wall, which is not a crossing",
     !/runs through a box/.test(checkFigureSpacing(page(dl('<rect class="dl-plate" x="16" y="100" width="368" height="120" rx="12"/>' +
       '<rect class="dl-tile" x="120" y="16" width="160" height="48" rx="10"/><rect class="dl-tile" x="120" y="140" width="160" height="48" rx="10"/>' +
       '<path class="dl-wire" d="M200 64 L200 140"/>')))?.deny ?? ""));
-  ok("green: a sample wire inside data-dl-legend, drawn over a sample tile, is the design language's subject",
+  ok("[MKT.HOOKS.525] green: a sample wire inside data-dl-legend, drawn over a sample tile, is the design language's subject",
     !/runs through a box/.test(checkFigureSpacing(page(dl('<g data-dl-legend><rect class="dl-tile" x="40" y="40" width="160" height="48" rx="10"/>' +
       '<path class="dl-wire" d="M20 64 L220 64"/></g>')))?.deny ?? ""));
 }

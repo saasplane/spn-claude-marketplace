@@ -1039,20 +1039,20 @@ console.log("\n=== doc-check — a long What on an open approach page holds a fi
     '<text class="dl-detail" x="40" y="90">an arrowhead, as the old drawing had it</text></svg>';
   const hand = (path, text) => docCheck.check(path, text).filter(([, m]) => m.includes("RULE.DEVEX.WORKSPACE.523"));
   const one = hand(artifact, page(FLAT));
-  say("red: a hand-drawn `sds-drawing` figure on a produced page is a RULE that says to draw it from a spec",
+  say("[RULE.DEVEX.WORKSPACE.523] [MKT.HOOKS.524] red: a hand-drawn `sds-drawing` figure on a produced page is a RULE that says to draw it from a spec",
     one.length === 1 && one[0][0] === "RULE" && one[0][1].includes("sds-drawing") && one[0][1].includes("docs figure draw"), JSON.stringify(one));
-  say("red: a skeleton in the flat drawing's classes is named as one", hand(artifact, page(SKELETON)).some(([, m]) => m.includes("sds-skeleton")));
-  say("red: an arrowhead (`marker-end`) on a figure in the language's classes is named",
+  say("[RULE.DEVEX.WORKSPACE.523] [MKT.HOOKS.524] red: a skeleton in the flat drawing's classes is named as one", hand(artifact, page(SKELETON)).some(([, m]) => m.includes("sds-skeleton")));
+  say("[RULE.DEVEX.WORKSPACE.523] [MKT.HOOKS.524] red: an arrowhead (`marker-end`) on a figure in the language's classes is named",
     hand(preview, page(ARROW)).some(([, m]) => m.includes("marker-end")), JSON.stringify(hand(preview, page(ARROW))));
-  say("red: the saved preview is read for it at a turn's end",
+  say("[RULE.DEVEX.WORKSPACE.523] [MKT.HOOKS.524] red: the saved preview is read for it at a turn's end",
     (() => { mkdirSync(dirname(preview), { recursive: true }); writeFileSync(preview, page(FLAT)); return docCheck.pageRulesOnDisk(preview).some((m) => m.includes("RULE.DEVEX.WORKSPACE.523")); })());
-  say("red: a seat file's inline flat drawing is named", hand(seat, `# Thing\n\n${FLAT}\n`).length === 1);
-  say("green: a figure the drawer drew draws nothing", hand(artifact, page(DRAWN)).length === 0, JSON.stringify(hand(artifact, page(DRAWN))));
-  say("green: the design language's sample, marked data-dl-legend, is that page's subject and is not named",
+  say("[RULE.DEVEX.WORKSPACE.523] [MKT.HOOKS.524] red: a seat file's inline flat drawing is named", hand(seat, `# Thing\n\n${FLAT}\n`).length === 1);
+  say("[RULE.DEVEX.WORKSPACE.523] [MKT.HOOKS.524] green: a figure the drawer drew draws nothing", hand(artifact, page(DRAWN)).length === 0, JSON.stringify(hand(artifact, page(DRAWN))));
+  say("[RULE.DEVEX.WORKSPACE.523] [MKT.HOOKS.524] green: the design language's sample, marked data-dl-legend, is that page's subject and is not named",
     hand(artifact, page(SAMPLE)).length === 0, JSON.stringify(hand(artifact, page(SAMPLE))));
-  say("green: an svg that carries data-dl-legend itself is a sample", hand(artifact, page(FLAT.replace("<svg ", "<svg data-dl-legend "))).length === 0);
-  say("green: a seat file's fenced example of the old markup is not a figure", hand(seat, `# Thing\n\n\`\`\`html\n${FLAT}\n\`\`\`\n`).length === 0);
-  say("green: a page of a closed workstream keeps the figures it closed with", hand(closed, page(FLAT)).length === 0);
+  say("[RULE.DEVEX.WORKSPACE.523] [MKT.HOOKS.524] green: an svg that carries data-dl-legend itself is a sample", hand(artifact, page(FLAT.replace("<svg ", "<svg data-dl-legend "))).length === 0);
+  say("[RULE.DEVEX.WORKSPACE.523] [MKT.HOOKS.524] green: a seat file's fenced example of the old markup is not a figure", hand(seat, `# Thing\n\n\`\`\`html\n${FLAT}\n\`\`\`\n`).length === 0);
+  say("[RULE.DEVEX.WORKSPACE.523] [MKT.HOOKS.524] green: a page of a closed workstream keeps the figures it closed with", hand(closed, page(FLAT)).length === 0);
 }
 
 console.log(failed ? `\n  ${failed} FAILED` : `\n  all ${n} passed`);
