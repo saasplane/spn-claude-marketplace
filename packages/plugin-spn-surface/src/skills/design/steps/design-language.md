@@ -19,7 +19,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/01-common/05-design-languages.md",
       "section": "One source for the platform's look",
-      "seen": "748c105b"
+      "seen": "791b4288"
     }
   ]
 }
@@ -75,6 +75,7 @@
 - **A theme is layered in one order: the defaults, then the brand, then the app's looks, then an account's branding** (`RULE.SUPPORT.SURFACE.575` · MUST · skill:spn-surface/design)
 - **`spnutils apps surface theme <app>` refuses an app whose theme setting is out of step with its row** (`RULE.SUPPORT.SURFACE.577` · MUST · skill:spn-surface/design)
 - **The brand is written as one data block, and each app's row as one data block keyed by the app's code, in the design language's construct** (`RULE.SUPPORT.SURFACE.578` · MUST · skill:spn-surface/design)
+- **Each app's row lists the kinds of page it serves, `SITE` for public pages, which take the site look, and `APP` for signed-in pages, which take the app layout, and the scaffold writes one theme setting for each kind from the row: `src/site-theme.ts` exporting `SITE_THEME`, and `src/app-theme.ts` exporting `APP_THEME`** (`RULE.SUPPORT.SURFACE.586` · MUST · skill:spn-surface/design)
 
 Read this before a page of a site or an app is drawn, and while a partner's design language is being made. 
 
