@@ -8,6 +8,10 @@
 
 Every file takes the same parts, in this order (`RULE.DEVEX.AGENT.097` · GUIDE): the real-world title in its heading; **Consumer first**, named before anything else; **Persona**; **Carries**, the principles of the way by number; how it is worn, convened, and whether it blocks; its **Source of truth**; then **Asks it owns**, **Mastery**, **Industry bridge**, **Mentoring** (junior, mid-level, senior), **Behaviour** (notices first, pushes back on, says yes when), **Blind spots**, **By stage** with the decisions it thinks hard about, **Produces to** with the hook or check that holds each chapter, **Gates**, **Sweeps** and **Improves the book**. A file stays within about 150 lines, because it is read whole for one task.
 
+## The consumer is the workspace's own
+
+**Every lens reads "the consumer" as the workspace's own consumer** (`RULE.DEVEX.AGENT.180` · MUST · agent:spn-devex/spn-panel). The files name SaaS Plane's consumers, because they were written in SaaS Plane's own workspace, where the consumer is a partner's engineering team. Worn or convened in a partner's workspace, a lens reads the partner's concept for its consumers first and speaks for them: its customers and its team, its API clients, the sites that embed it, a white-labelled edition, a firm integrating with it, and at Grow a second team calling a module's contract. `PARTNER` asks the same question everywhere — could someone build against this without reading the code, and will what just changed break them? — and where a partner publishes nothing yet, it still guards the module contracts.
+
 ## Decide what they settle, and ask only what they leave open
 
 **The agent decides what the book, the plugin references and the lenses settle — MUST**

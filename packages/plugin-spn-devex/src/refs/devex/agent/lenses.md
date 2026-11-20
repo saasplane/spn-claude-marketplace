@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/03-lenses.md",
-      "seen": "2bdd10e2"
+      "seen": "4755696a"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/03-lenses/01-lenses.md",
-      "seen": "fbec2436"
+      "seen": "680c3484"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
@@ -85,6 +85,8 @@
 | never | the full text of a standard, or the whole book |
 
 **A lens learns the partner's industry for its own discipline, and one industry brief keeps it** (`RULE.DEVEX.AGENT.099` · MUST · skill:spn-devex/ideate). The brief is written once at ideation in the partner's own purpose part, each fact with its source and date; every lens reads it before researching, and refreshes the part it owns.
+
+**Every lens reads "the consumer" as the workspace's own consumer** (`RULE.DEVEX.AGENT.180` · MUST · agent:spn-devex/spn-panel). In SaaS Plane's own workspace it is a partner's engineering team; in a partner's workspace it is the partner's own customers, team, API clients, embedding sites, white-labelled editions and integrating firms, and `PARTNER` speaks for them.
 
 ## A view in a discussion about a shape
 
