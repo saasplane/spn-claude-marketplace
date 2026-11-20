@@ -33,6 +33,7 @@
 - **Every unit states how its examples are shown, in two facts, and every page of the showcase and of the library is laid out from them** (`RULE.SUPPORT.SURFACE.431` · MUST · skill:spn-surface/design)
 - **A unit's states are listed in its samples block, each with how it is made, and the showcase and the library draw exactly that list** (`RULE.SUPPORT.SURFACE.432` · MUST · skill:spn-surface/design)
 - **Every value a unit accepts is shown once, a prop with kinds or parts included, and a variation finds its place by what it varies** (`RULE.SUPPORT.SURFACE.433` · MUST · skill:spn-surface/design)
+- **Art, a picture or the product running, keeps the level's gap in every form** (`RULE.SUPPORT.SURFACE.434` · MUST · skill:spn-surface/design)
 - **The library draws coverage, and never combinations** (`RULE.SUPPORT.SURFACE.435` · MUST · skill:spn-surface/design)
 - **A unit's usage is one primary use, at the width one cell of its row takes, in light and in dark** (`RULE.SUPPORT.SURFACE.436` · MUST · skill:spn-surface/design)
 - **Every prop of a unit is sorted into exactly one category, and the category stands in the library column of its props table** (`RULE.SUPPORT.SURFACE.437` · MUST · skill:spn-surface/design)

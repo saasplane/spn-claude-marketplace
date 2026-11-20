@@ -125,7 +125,7 @@ Use the `release` skill (bump `version` in `spinfrapkg.json` → `spnutils infra
 - **browser-reachable under every hosting** (`RULE.SUPPORT.INFRA.060` · MUST · skill:spn-infra/implement)
 - **A platform declares the five hundred local ports it owns, and writes both ends: `providers.local.ports: { first, last }`, where `first` is a multiple of 500 and `last` is `first + 499`** (`RULE.SUPPORT.INFRA.062` · MUST · skill:spn-infra/implement)
 - **A key never names a bucket** (`RULE.SUPPORT.INFRA.063` · MUST · skill:spn-infra/implement)
-- **So an environment is derived, and only what its own row declares may vary: its workload, its size, and its hosting** (`RULE.SUPPORT.INFRA.064` · MUST · skill:spn-infra/implement)
+- **So an environment is derived, and only what its own row declares may vary** (`RULE.SUPPORT.INFRA.064` · MUST · skill:spn-infra/implement)
 - **singular for the whole company** (`RULE.SUPPORT.INFRA.065` · MUST · skill:spn-infra/implement)
 - **an estate repository carries no `package.json`** (`RULE.SUPPORT.INFRA.066` · MUST · skill:spn-infra/implement)
 - **A resource world's schemas are its own named baseline plus what it declares, which adds and never replaces, and no resource passes from the platform's resources to a space's** (`RULE.SUPPORT.INFRA.077` · MUST · skill:spn-infra/implement)

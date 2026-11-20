@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "book": {
     "repository": "spn-foundation",
-    "commit": "2a32f607"
+    "commit": "d62c7387"
   },
   "rules": [
     {
@@ -2557,7 +2557,7 @@
         "skill": "spn-devex/ideate"
       },
       "class": "stated in a skill",
-      "sentence": "The DevEx stages are eight — `BOOTSTRAP` · `SCM` · `IDEATE` · `DEVELOP` · `TEST` · `PROVISION` · `DELIVER` · `OPERATE` — and this phase covers both deciding a node's shape and designing a requirement inside it",
+      "sentence": "The DevEx stages are eight, and this phase covers both deciding a node's shape and designing a requirement inside it",
       "chapter": "02-constructs/01-devex/01-function/03-ideate.md",
       "heading": "Model",
       "decision": null,
@@ -21422,7 +21422,7 @@
         "skill": "spn-infra/implement"
       },
       "class": "stated in a skill",
-      "sentence": "So an environment is derived, and only what its own row declares may vary: its workload, its size, and its hosting",
+      "sentence": "So an environment is derived, and only what its own row declares may vary",
       "chapter": "02-constructs/02-support/03-infra/03-blueprints.md",
       "heading": "A derived environment",
       "decision": null,
@@ -25724,32 +25724,6 @@
           "heading": "The rules this step holds"
         }
       ]
-    },
-    {
-      "id": "RULE.SUPPORT.SURFACE.089",
-      "level": "MUST",
-      "params": {
-        "skill": "spn-surface/design"
-      },
-      "class": "stated in a skill",
-      "sentence": null,
-      "chapter": "02-constructs/02-support/01-surface/06-architecture-components.md",
-      "heading": "The groups",
-      "decision": null,
-      "restated": []
-    },
-    {
-      "id": "RULE.SUPPORT.SURFACE.090",
-      "level": "MUST",
-      "params": {
-        "skill": "spn-surface/design"
-      },
-      "class": "stated in a skill",
-      "sentence": null,
-      "chapter": "02-constructs/02-support/01-surface/06-architecture-components.md",
-      "heading": "The groups",
-      "decision": null,
-      "restated": []
     },
     {
       "id": "RULE.SUPPORT.SURFACE.091",
@@ -35344,7 +35318,7 @@
         "skill": "spn-surface/design"
       },
       "class": "stated in a skill",
-      "sentence": null,
+      "sentence": "Art, a picture or the product running, keeps the level's gap in every form",
       "chapter": "02-constructs/02-support/01-surface/06-architecture-components.md",
       "heading": "DSFeature",
       "decision": null,

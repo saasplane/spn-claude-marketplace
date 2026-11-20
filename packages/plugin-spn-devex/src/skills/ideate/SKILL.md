@@ -264,7 +264,7 @@ When the arc changes code, the idea is worked in the code itself, one connected 
 - **Ideation writes each change as a patch from the moment you ask for an arc or a preview to be prepared, and never while a shape is only discussed** (`RULE.DEVEX.AGENT.176` · MUST · skill:spn-devex/ideate)
 - **spec-first** (`RULE.DEVEX.FUNCTION.007` · MUST · skill:spn-devex/ideate)
 - **`IDEATE` decides the shape, and designing a requirement inside that shape is part of it** (`RULE.DEVEX.FUNCTION.016` · MUST · skill:spn-devex/ideate)
-- **The DevEx stages are eight — `BOOTSTRAP` · `SCM` · `IDEATE` · `DEVELOP` · `TEST` · `PROVISION` · `DELIVER` · `OPERATE` — and this phase covers both deciding a node's shape and designing a requirement inside it** (`RULE.DEVEX.FUNCTION.062` · MUST · skill:spn-devex/ideate)
+- **The DevEx stages are eight, and this phase covers both deciding a node's shape and designing a requirement inside it** (`RULE.DEVEX.FUNCTION.062` · MUST · skill:spn-devex/ideate)
 - **A partner's or developer's idea is unfolded in one order, the one their own words lead** (`RULE.DEVEX.FUNCTION.098` · MUST · skill:spn-devex/ideate)
 - **A step acting on a set carries that set** (`RULE.DEVEX.WORKSPACE.064` · MUST · skill:spn-devex/ideate)
 - **`migrations/` earns you none either** (`RULE.DEVEX.WORKSPACE.086` · MUST · skill:spn-devex/ideate)
