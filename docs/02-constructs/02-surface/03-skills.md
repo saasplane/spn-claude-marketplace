@@ -20,7 +20,14 @@ A skill belongs to this domain when it describes work on what a person sees and 
 
 ## Overview
 
-The design skill answers a request to design, lay out or draw a page, a screen or a flow of pages. **Its result is a tree of named blocks, one tree for each page**, and it writes no code. The decisions it orders are the ones the Surface standards order: the person, the flow, the pattern, the panels, the tasks, and only then the blocks.
+The design skill answers a request to design, lay out or draw a page, a screen or a flow of pages. **Its result is a tree of named blocks, one tree for each page**, and it writes no code. The decisions it orders are the ones the Surface standards order, and the blocks come last:
+
+1. the person;
+2. the flow;
+3. the pattern;
+4. the panels;
+5. the tasks;
+6. only then the blocks.
 
 This construct realizes the book's `01-devex/02-agent/02-skills`.
 

@@ -4,7 +4,7 @@
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/06-architecture-components.md",
       "section": "The choice table",
-      "seen": "af5c2473"
+      "seen": "8a8293c3"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/04-plugins.md",

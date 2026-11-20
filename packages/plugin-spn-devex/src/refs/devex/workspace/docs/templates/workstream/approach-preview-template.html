@@ -58,17 +58,24 @@
 
   <p class="sds-standfirst">{{What the heading would have said, as one sentence: the statement this subsection makes.}}</p>
   <p>{{What the diagram shows.}}</p>
-  <figure>
-  <svg class="sds-drawing" viewBox="18 18 1016 84" width="1016" height="84" role="img" aria-label="{{What the diagram shows, in words.}}">
-    <defs><marker id="ar-pv" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
-    <rect class="sds-box sds-tone-blue" x="20" y="20" width="300" height="80" rx="3"/><text class="sds-title" x="36" y="48">{{Part}}</text><text class="sds-code" x="36" y="70">{{what it does}}</text>
-    <path class="sds-connector" d="M320 60 H376" marker-end="url(#ar-pv)"/>
-    <rect class="sds-box" x="376" y="20" width="300" height="80" rx="3"/><text class="sds-title" x="392" y="48">{{Part}}</text><text class="sds-code" x="392" y="70">{{what it does}}</text>
-    <path class="sds-connector" d="M676 60 H732" marker-end="url(#ar-pv)"/>
-    <rect class="sds-box" x="732" y="20" width="300" height="80" rx="3"/><text class="sds-title" x="748" y="48">{{Part}}</text><text class="sds-code" x="748" y="70">{{what it does}}</text>
-  </svg>
-  <figcaption>{{What to notice.}}</figcaption>
-  </figure>
+<figure class="dl-figure">
+<div class="dl-frame">
+<svg class="dl-svg" viewBox="0 0 928 80" role="img" aria-label="{{What the diagram shows, in words.}}">
+  <rect class="dl-tile-on" x="228" y="16" width="120" height="48" rx="10"/>
+  <text class="dl-name" x="240" y="37">{{Part}}</text>
+  <text class="dl-detail" x="240" y="52">{{what it does}}</text>
+  <path class="dl-wire" d="M348 40 L404 40"/>
+  <rect class="dl-tile" x="404" y="16" width="120" height="48" rx="10"/>
+  <text class="dl-name" x="416" y="37">{{Part}}</text>
+  <text class="dl-detail" x="416" y="52">{{what it does}}</text>
+  <path class="dl-wire" d="M524 40 L580 40"/>
+  <rect class="dl-tile" x="580" y="16" width="120" height="48" rx="10"/>
+  <text class="dl-name" x="592" y="37">{{Part}}</text>
+  <text class="dl-detail" x="592" y="52">{{what it does}}</text>
+</svg>
+</div>
+<figcaption>{{What to notice.}}</figcaption>
+</figure>
 
   <h3 id="s2b">{{A topic name, at most five words, no comma}}</h3>
 
@@ -156,13 +163,19 @@
 
   <p class="sds-standfirst">{{What the heading would have said, as one sentence: the statement this subsection makes.}}</p>
   <p>{{What the drawing shows. A figure is drawn by <code>docs figure draw</code> from its specification, and pasted here whole.}}</p>
-  <figure>
-  <svg class="sds-drawing" viewBox="18 18 660 84" width="660" height="84" role="img" aria-label="{{What the drawing shows, in words.}}">
-    <rect class="sds-box" x="20" y="20" width="300" height="80" rx="3"/><text class="sds-title" x="36" y="48">{{Part}}</text><text class="sds-code" x="36" y="70">{{what it becomes}}</text>
-    <rect class="sds-box sds-tone-blue" x="376" y="20" width="300" height="80" rx="3"/><text class="sds-title" x="392" y="48">{{Part}}</text><text class="sds-code" x="392" y="70">{{what it becomes}}</text>
-  </svg>
-  <figcaption>{{What to notice.}}</figcaption>
-  </figure>
+<figure class="dl-figure">
+<div class="dl-frame">
+<svg class="dl-svg" viewBox="0 0 928 80" role="img" aria-label="{{What the drawing shows, in words.}}">
+  <rect class="dl-tile" x="296" y="16" width="140" height="48" rx="10"/>
+  <text class="dl-name" x="308" y="37">{{Part}}</text>
+  <text class="dl-detail" x="308" y="52">{{what it becomes}}</text>
+  <rect class="dl-tile-on" x="492" y="16" width="140" height="48" rx="10"/>
+  <text class="dl-name" x="504" y="37">{{Part}}</text>
+  <text class="dl-detail" x="504" y="52">{{what it becomes}}</text>
+</svg>
+</div>
+<figcaption>{{What to notice.}}</figcaption>
+</figure>
 
   <!-- Choose, for each construct, the form that shows it best: a plain description for an idea or a rule; a diagram for
        structure or flow (s3c); a skeleton for a screen or a layout (s3f); an inline sample that renders the thing itself

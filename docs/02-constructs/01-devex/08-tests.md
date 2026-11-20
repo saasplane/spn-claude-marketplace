@@ -87,7 +87,13 @@ The authoring stack's own test step names a framework as well as a tree, and onl
 
 ### Hop counting — Nothing counts a `..` hop
 
-A suite that types its own depth is a suite the next move breaks, and every suite broke at once the first time these folders changed. So the plugin root is resolved once, in the harness, and exported; the runner finds the tier by walking down from its own folder; and the helper that resolves a script's path walks whatever folders a provider's `checks/` actually holds. A suite imports those answers and computes none of them.
+A suite that types its own depth is a suite the next move breaks, and every suite broke at once the first time these folders changed. So each of those answers is found in one place:
+
+- the plugin root is resolved once, in the harness, and exported;
+- the runner finds the tier by walking down from its own folder;
+- the helper that resolves a script's path walks whatever folders a provider's `checks/` actually holds.
+
+A suite imports those answers and computes none of them.
 
 ### Suite walk — A suite is found by a walk, never by a list
 

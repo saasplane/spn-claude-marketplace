@@ -42,7 +42,12 @@
   <p>An apps repository is held to rules about what its contracts, services and tests contain, and some of those rules can only be written for one language. <code>spn-apps</code> carries them. Each folder here is the same kind of instrument <code>spn-devex</code> defines.</p>
   <p>This page is for a backend or web developer working in an apps repository, and for anyone about to add a rule or a stack to this plugin. It assumes you know what a plugin is; if you do not, the <a href="../01-devex/devex-overview.html">spn-devex overview</a> comes first. After it you know which folder a change to this plugin belongs in, and why most of the plugin never names a language.</p>
   <p><strong>The one thing to unlearn is that a stack plugin is written in its stack everywhere.</strong> Most of this plugin is stack-agnostic. The skills and the gate read which stack a node declares in its own <code>sprepo.json</code>, then load the stack's part from <code>providers/</code>. So adding a second stack is adding a folder, not editing a gate. This plugin ships no agents, and it has no chapter for them.</p>
-  <p><strong>What you can decide after this page.</strong> Whether a rule you want to add is true of every stack or of one; which folder it then belongs in; and where its proof goes.</p>
+  <p><strong>What you can decide after this page:</strong></p>
+  <ul>
+    <li>whether a rule you want to add is true of every stack or of one;</li>
+    <li>which folder it then belongs in;</li>
+    <li>where its proof goes.</li>
+  </ul>
 </section>
 
 <section id="s1">
@@ -61,14 +66,46 @@
 
 <section id="s3">
   <div class="sds-section-head"><h2>Skills &mdash; the commands an apps repository answers to</h2></div>
-  <p>A skill belongs here when its work is work on an apps node: starting a project, building a capability, reviewing, running the suites, proving a package and releasing. A skill here names no stack. It states the order of the work and reads the steps for each language from the provider the node declares. Planning is not a skill of this domain: it is folded into the stack-agnostic planning skill in <code>spn-devex</code>, which loads the stack's planning step from this plugin's provider.</p>
+  <p>A skill belongs here when its work is work on an apps node:</p>
+  <ul>
+    <li>starting a project;</li>
+    <li>building a capability;</li>
+    <li>reviewing;</li>
+    <li>running the suites;</li>
+    <li>proving a package;</li>
+    <li>releasing.</li>
+  </ul>
+  <p>A skill here names no stack. It states the order of the work and reads the steps for each language from the provider the node declares. Planning is not a skill of this domain: it is folded into the stack-agnostic planning skill in <code>spn-devex</code>, which loads the stack's planning step from this plugin's provider.</p>
   <p><em>Decide here:</em> whether a new request belongs to this domain's skills, and what it reads from a provider.</p>
   <p><a class="sds-more" href="constructs/03-skills-construct.html">Read Skills &rarr;</a></p>
 </section>
 
 <section id="s4">
   <div class="sds-section-head"><h2>Scripts &mdash; the code this plugin runs</h2></div>
-  <p>The folder divides by what calls each file. The wiring starts one process, which asks one gate; the gate reads the declared stack and resolves into a provider's checks without naming a language itself. Tools are run by a person or the agent by their own path, and read this stack's registers. A tool writes only what a run found, because the rest of a behaviour row is somebody's decision and must not be replaced by a guess.</p>
+  <p>The folder divides by what calls each file. A check is reached in one straight line from the moment a file is written.</p>
+  <figure class="dl-figure">
+  <div class="dl-frame">
+  <svg class="dl-svg" viewBox="0 0 928 80" role="img" aria-label="How a write reaches a provider's checks in spn-apps">
+    <rect class="dl-tile" x="44" y="16" width="168" height="48" rx="10"/>
+    <text class="dl-name" x="56" y="37">The wiring</text>
+    <text class="dl-detail" x="56" y="52">a write or an edit</text>
+    <path class="dl-wire" d="M212 40 L268 40"/>
+    <rect class="dl-tile" x="268" y="16" width="168" height="48" rx="10"/>
+    <text class="dl-name" x="280" y="37">One process</text>
+    <text class="dl-detail" x="280" y="52">started by the moment</text>
+    <path class="dl-wire" d="M436 40 L492 40"/>
+    <rect class="dl-tile-on" x="492" y="16" width="168" height="48" rx="10"/>
+    <text class="dl-name" x="504" y="37">The gate</text>
+    <text class="dl-detail" x="504" y="52">reads the declared stack</text>
+    <path class="dl-wire" d="M660 40 L716 40"/>
+    <rect class="dl-tile" x="716" y="16" width="168" height="48" rx="10"/>
+    <text class="dl-name" x="728" y="37">A provider's checks</text>
+    <text class="dl-detail" x="728" y="52">one folder per stack</text>
+  </svg>
+  </div>
+  <figcaption>The gate is the one step that reads the declared stack, and it names no language itself: the language lives only in the provider.</figcaption>
+  </figure>
+  <p>Tools are run by a person or the agent by their own path, and read this stack's registers. A tool writes only what a run found, because the rest of a behaviour row is somebody's decision and must not be replaced by a guess.</p>
   <p><em>Decide here:</em> whether a new piece of code is a check the gate asks, or a tool somebody runs.</p>
   <p><a class="sds-more" href="constructs/04-scripts-construct.html">Read Scripts &rarr;</a></p>
 </section>
