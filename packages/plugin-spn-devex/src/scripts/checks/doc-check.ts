@@ -5,7 +5,8 @@
 // and the Plan section after How, RULE.DEVEX.WORKSPACE.487), 01-workstream.md § A step row says where, what work, and how
 // (RULE.DEVEX.WORKSPACE.183), 05-artifacts.md § One stylesheet, served in versions (RULE.DEVEX.WORKSPACE.214),
 // § The header (a short name of at most three words, RULE.DEVEX.WORKSPACE.517) and § What an overview and a hub hold
-// (a rail entry of at most three words, RULE.DEVEX.WORKSPACE.518)
+// (a rail entry of at most three words, RULE.DEVEX.WORKSPACE.518), § Prose and lists have limits (a figure comes from a
+// spec and never by hand, RULE.DEVEX.WORKSPACE.523)
 // and 06-registers.md § Writing a row. The chapters are the source of truth: a rule change is edited
 // there first, then here, in the same change. This script checks only what a script CAN check; the
 // register itself is judgement.
@@ -60,6 +61,7 @@ import { blockFit, fitKind } from "../lib/block-fit.ts";
 import { findPartnerWords } from "./partner-words.ts";
 import { titleFindingsOnDisk } from "./page-title.ts";
 import { whereTreeFindings } from "./where-tree.ts";
+import { handDrawnFigures } from "../lib/figures.ts";
 import { bookClassFaults, inPluginSource, knownHolders, ownMarketplace, pluginNameFaults } from "./book-classes.ts";
 import { GUIDE_PAGE_SUFFIX, APPROACH_SUFFIX, ARTIFACT, CONSTRUCT_PAGES, CONSTRUCT_PAGE_SUFFIX, HUB, OVERVIEW_PAGE_SUFFIX, PLUGIN_TEMPLATES, POCKET,
          artifactDocsPathOf, decisionsRegister, inArtifacts, workstreamPrefixSource, isApproachPage, isRegister as inRegisters, pagePlaceOf,
@@ -332,6 +334,18 @@ export function figureRule(path: string, text: string): Finding[] {
   return [["RULE", `${basename(path)} runs ${length} characters in What and holds no figure ` +
     "(05-artifacts.md § A section opens with its own overview; RULE.DEVEX.WORKSPACE.497) · add a figure where seeing is faster, " +
     "or one line, `<!-- no figure: the reason prose is clearer here -->`"]];
+}
+
+/**
+ * 05-artifacts.md § Prose and lists have limits (RULE.DEVEX.WORKSPACE.523): a figure is drawn from a spec by `docs figure draw`, never
+ * by hand with coordinates. A page or a seat file that carries a flat drawing (`svg.sds-drawing`, `sds-skeleton`) or an arrowhead
+ * (`marker-end`) carries a figure drawn by hand, and each one is a RULE that says to draw it from a `dg` spec. A seat file's fenced
+ * code is an example and is not read; a sample the design language's page marks `data-dl-legend` is not read either
+ * (`handDrawnFigures`). A page in a closed workstream, or in the early workstream that keeps its old shape, is not read.
+ */
+export function handDrawnRule(path: string, text: string): Finding[] {
+  if (inClosedWorkstream(path) || exemptWorkstream(path)) return [];
+  return handDrawnFigures(text, path.endsWith(".md")).map(({ figure, message }) => ["RULE", `figure ${figure} ${message}`] as Finding);
 }
 
 /**
@@ -1400,6 +1414,8 @@ export function check(path: string, text: string, fragment = false): Finding[] {
     out.push(...workingDetail(path, text), ...partnerWords(path, text));
   }
   if (isHtml && itemCellPage(path) && !inClosedWorkstream(path)) out.push(...columnRule(text));
+  // A figure comes from a spec (RULE.DEVEX.WORKSPACE.523): one drawn by hand is named on every page and seat file this reads.
+  out.push(...handDrawnRule(path, text));
   // A page of a repository's pocket, and a workstream's own pages (an approach page, a preview) while open.
   if (isHtml && !fragment && (inPocket(path) || ((isApproach || /-?preview\.html$/.test(path)) && workstreamOf(path) !== null && !inClosedWorkstream(path))))
     out.push(...nameRule(text));
@@ -1474,7 +1490,7 @@ export function pageRulesOnDisk(path: string): string[] {
   const text = read(path);
   if (!text) return [];
   const found: string[] = [...titleFindingsOnDisk(path)];
-  const rows: Finding[] = [...nameRule(text)];
+  const rows: Finding[] = [...nameRule(text), ...handDrawnRule(path, text)];
   if (isApproachPage(path)) {
     rows.push(...figureRule(path, text));
     const plan = section(text, "Plan");

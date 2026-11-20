@@ -1020,5 +1020,40 @@ console.log("\n=== doc-check — a long What on an open approach page holds a fi
   say("[MKT.HOOKS.522] red: a bar without its Notes switch is refused", shaped(surface().replace(/<div class="sds-surface-switch"><button type="button" data-surface="notes">Notes<\/button><\/div>/, "")));
 }
 
+{
+  console.log("\n=== doc-check — a figure comes from a spec, and one drawn by hand is named (RULE.DEVEX.WORKSPACE.523)");
+  const docCheck = await import("../../../../src/scripts/checks/doc-check.ts");
+  const say = (label, ok, detail = "") => { n += 1; if (!ok) failed += 1; console.log(`  ${ok ? "PASS" : "FAIL"}  ${label}${ok || !detail ? "" : `\n        ${String(detail).slice(0, 300)}`}`); };
+  const artifact = join(artifactDocsDir(PROBE_DOCS), "probe-overview.html");
+  const preview = join(stream(TMP, "097-figures", "open"), "notes", "N001", "preview.html");
+  const closed = join(stream(TMP, "096-figures", "closed"), "notes", "N001", "preview.html");
+  const seat = join(PROBE_DOCS, "02-constructs", "01-probe", "01-thing.md");
+  const page = (figure) => `${linesFor("1.0.0").stylesheet}\n<section id="s1"><h2>Model</h2><p>The thing.</p>\n<figure>${figure}</figure></section>\n`;
+  const FLAT = '<svg class="sds-drawing" viewBox="0 0 400 120"><rect class="sds-box" x="20" y="20" width="120" height="80" rx="3"/></svg>';
+  const SKELETON = '<svg class="sds-drawing sds-skeleton" viewBox="0 0 400 120"><rect class="sds-box" x="20" y="20" width="120" height="80" rx="3"/></svg>';
+  const ARROW = '<svg class="dl-svg" viewBox="0 0 400 120"><rect class="dl-tile" x="16" y="16" width="120" height="48" rx="10"/>' +
+    '<rect class="dl-tile" x="248" y="16" width="120" height="48" rx="10"/><path class="dl-wire" d="M136 40 H248" marker-end="url(#a)"/></svg>';
+  const DRAWN = '<svg class="dl-svg" viewBox="0 0 400 120"><rect class="dl-tile" x="16" y="16" width="120" height="48" rx="10"/>' +
+    '<rect class="dl-tile" x="248" y="16" width="120" height="48" rx="10"/><path class="dl-wire" d="M136 40 H248"/></svg>';
+  const SAMPLE = '<svg class="dl-svg" viewBox="0 0 400 120"><g data-dl-legend><path class="dl-wire" d="M40 60 H136" marker-end="url(#a)"/></g>' +
+    '<text class="dl-detail" x="40" y="90">an arrowhead, as the old drawing had it</text></svg>';
+  const hand = (path, text) => docCheck.check(path, text).filter(([, m]) => m.includes("RULE.DEVEX.WORKSPACE.523"));
+  const one = hand(artifact, page(FLAT));
+  say("red: a hand-drawn `sds-drawing` figure on a produced page is a RULE that says to draw it from a spec",
+    one.length === 1 && one[0][0] === "RULE" && one[0][1].includes("sds-drawing") && one[0][1].includes("docs figure draw"), JSON.stringify(one));
+  say("red: a skeleton in the flat drawing's classes is named as one", hand(artifact, page(SKELETON)).some(([, m]) => m.includes("sds-skeleton")));
+  say("red: an arrowhead (`marker-end`) on a figure in the language's classes is named",
+    hand(preview, page(ARROW)).some(([, m]) => m.includes("marker-end")), JSON.stringify(hand(preview, page(ARROW))));
+  say("red: the saved preview is read for it at a turn's end",
+    (() => { mkdirSync(dirname(preview), { recursive: true }); writeFileSync(preview, page(FLAT)); return docCheck.pageRulesOnDisk(preview).some((m) => m.includes("RULE.DEVEX.WORKSPACE.523")); })());
+  say("red: a seat file's inline flat drawing is named", hand(seat, `# Thing\n\n${FLAT}\n`).length === 1);
+  say("green: a figure the drawer drew draws nothing", hand(artifact, page(DRAWN)).length === 0, JSON.stringify(hand(artifact, page(DRAWN))));
+  say("green: the design language's sample, marked data-dl-legend, is that page's subject and is not named",
+    hand(artifact, page(SAMPLE)).length === 0, JSON.stringify(hand(artifact, page(SAMPLE))));
+  say("green: an svg that carries data-dl-legend itself is a sample", hand(artifact, page(FLAT.replace("<svg ", "<svg data-dl-legend "))).length === 0);
+  say("green: a seat file's fenced example of the old markup is not a figure", hand(seat, `# Thing\n\n\`\`\`html\n${FLAT}\n\`\`\`\n`).length === 0);
+  say("green: a page of a closed workstream keeps the figures it closed with", hand(closed, page(FLAT)).length === 0);
+}
+
 console.log(failed ? `\n  ${failed} FAILED` : `\n  all ${n} passed`);
 process.exit(failed ? 1 : 0);
