@@ -3,15 +3,15 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/01-bootstrap.md",
-      "seen": "d24446b6"
+      "seen": "e06e1465"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/01-function/01-bootstrap.md",
-      "seen": "ada95ffb"
+      "seen": "a008cdc4"
     },
     {
       "path": "spn-foundation/docs/05-guides/README.md",
-      "seen": "1074ee6f"
+      "seen": "d794fa5e"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
@@ -26,6 +26,15 @@
 **Source of truth:** the foundation's `02-constructs/01-devex/01-function/01-bootstrap.md` and `04-capabilities/01-devex/01-function/01-bootstrap.md` for the stage, the guides seat (`docs/05-guides/`) for the walk itself, and `04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md` for `workspace init <name>`. This file restates them for use inside a wired workspace and adds nothing; where the two disagree, the book wins and this file is regenerated.
 
 Follow this walk from an empty folder to one sample platform answering on the laptop, then a first feature in flight. Every step names the command or skill that carries it; statuses are honest — ✅ runs today, 🚧 the step works but by hand, or with the agent improvising more than it should. No cloud account is needed: AWS is only for standing environments in the cloud, and that walk comes later.
+
+## The door, the ground, the foundation, the joining path
+
+**Getting started and bootstrap are one journey.** The person does the install (the container runtime, node, `gh` and `spnutils`, signed in to GitHub and the registry), runs `spnutils workspace init <name>` in an empty folder, opens VS Code with Claude Code there, and talks with the agent. From then on every skill and every `spnutils` command is the agent's; the walk below is what the agent runs, never a list the person types.
+
+- **The door has three paths, and only two create anything** (`RULE.DEVEX.FUNCTION.105` · MUST · skill:spn-devex/bootstrap). *Start a new platform* writes the foundation workstream; *join an existing platform* takes the joining path; *just look around* creates nothing.
+- **The ground is checked, never decided** (`RULE.DEVEX.FUNCTION.106` · MUST · skill:spn-devex/bootstrap). The accounts and sign-ins no tool can create — the toolchain, the GitHub organization and sign-in, the registry sign-in, the domain and its zone, the mail records, the cloud account with Organizations, the quota case and the identity seat, and the provider keys — are the foundation workstream's Ground, each with its already-done check and what it blocks (the go, or the cloud walk). An item is Done only when its check passes, and a cloud read runs only on the developer's approval at that step. The steps M1 to M5 of the manual minimum are its cloud items.
+- **A new platform's first workstream is written whole from bootstrap's layout data** (`RULE.DEVEX.FUNCTION.108` · MUST · skill:spn-devex/bootstrap) after a few chat questions: the path, the workspace's name, who it is for, the product in one sentence. Every round (vision and phases, domains, product, surface, runtime, estate, the read-back), every section and every decide-only arc is on the page from the first minute, each section Pending with Known, Needed and Waits on. The data is `refs/devex/workspace/foundation-layout.json`, and `spn-devex workstream layout` writes and keeps it (`refs/devex/workspace/workstream.md` § Written from a layout). The go builds skeletons only and runs the stack; a module's inside is its own workstream's.
+- **The joining path asks one question, where the team lives** (`RULE.DEVEX.FUNCTION.107` · MUST · skill:spn-devex/bootstrap), then mints the workspace, clones and wires the repositories the estate declares, walks the sign-ins and the team's keys, runs the stack from the pinned versions, and closes on an onboarding read at the newcomer's first task. It asks no estate question and creates nothing beyond the local workspace.
 
 **Before step 1, the machine**, in the order one thing depends on the next: **node** at the version
 the repositories pin, a version manager that reads that pin (`fnm` or `nvm`), **pnpm**, **OpenTofu**
