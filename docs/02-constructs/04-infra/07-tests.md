@@ -76,7 +76,13 @@ A passing suite proves the code does what the suite says; it does not prove the 
 
 ### Folder counting — Nothing counts folders to find the code
 
-Moving the suites once broke every one of them at the same moment, because each computed its own depth back to the plugin. So the harness exports the plugin root, found once; the runner walks; and a suite states only what it proves. **A suite that types a depth is a suite the next move breaks**, and nothing here types one.
+Moving the suites once broke every one of them at the same moment, because each computed its own depth back to the plugin. So each part does one thing:
+
+- the harness exports the plugin root, found once;
+- the runner walks;
+- a suite states only what it proves.
+
+**A suite that types a depth is a suite the next move breaks**, and nothing here types one.
 
 ### Real verdict — A case runs the real process and reads the real verdict
 
