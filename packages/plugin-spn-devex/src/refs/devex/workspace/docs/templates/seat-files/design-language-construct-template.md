@@ -10,18 +10,20 @@
   "summary": "{{The Description's first sentence, word for word.}}"
 }
 -->
-<!-- RESTATES: spn-foundation docs/04-capabilities/02-support/01-surface/03-standards-patterns/01-common/05-design-languages.md § A design language · § Where media go · § Media size by placement · § Text alignment and items · § The drawing scale · § A section's two layers · § Which layer takes a medium · § Media by kind of section · § A section's scene · § Items with a medium
+<!-- RESTATES: spn-foundation docs/04-capabilities/02-support/01-surface/03-standards-patterns/01-common/05-design-languages.md § A design language · § The parts · § The drawing scale · § How blocks meet · § Where media go · § A section's two layers · § Which layer takes a medium · § Media by kind of section · § A section's scene · § Media size by placement · § Text alignment and items · § Items with a medium
      This file carries rules it does not own. The chapter above is the source of truth.
      A rule change is edited there first, then here, in the same change. Never add a rule here.
      restate-drift.ts reports this copy when its source moves. -->
 <!-- A PLATFORM'S DESIGN LANGUAGE CONSTRUCT, in the construct seat shape. The agent reads it before it draws any page or
      picture. It records only the decisions; the review rounds that led there are kept beside it. Sections marked
-     "Filled by spn-surface language write" are written by that command from the app's real files, never by hand. -->
+     "Filled by spn-surface language write" are written by that command from the app's real files, never by hand.
+     The language holds no samples: its hero samples and its section samples are two pages beside it. -->
 # Design Language
 
 `For: UX designer · UI designer` · `Status: 🔮 PLANNING`
 
-{{THE DESCRIPTION. What the platform's look is, who reads this page (the agent, before it draws any page or picture), and how the page runs: which app follows which language, the parts every drawing is made of, how a page is laid out, and the samples drawn from the app's real files.}}
+{{THE DESCRIPTION. What the platform's look is, who reads this page (the agent, before it draws any page or picture), and how the page runs: which app follows which language, and the five parts every choice belongs to: page templates, section style, media style, interaction style and density, and the two sample pages that sit beside it.}}
+
 
 ## Overview
 
@@ -44,19 +46,22 @@
 
 ### Which app follows what
 
-| App | Kind | Language | Layout | Looks (body, navigation, frames, size, motion) |
-| --- | --- | --- | --- | --- |
-| `{{web-www-ts}}` | Visitor | {{its own: saasplane-site}} | {{the app's layout setting}} | {{body, navigation, frames, size, motion}} |
-| `{{web-platform-ts}}` | Team | the design system's | {{the app's layout setting}} | {{its looks}} |
+| App | Kind of person | Page | Surface | Language | Layout | Looks (body, navigation, frames, size, motion) |
+| --- | --- | --- | --- | --- | --- | --- |
+| `{{web-www-ts}}` | Visitor | {{SITE}} | {{WEB}} | {{its own: saasplane-site}} | {{the app's layout setting}} | {{body, navigation, frames, size, motion}} |
+| `{{web-platform-ts}}` | Team | {{APP}} | {{WEB}} | the design system's | {{the app's layout setting}} | {{its looks}} |
 
-Each app's row is also written as one fenced `json` block, keyed by the app's code, which `spnutils apps surface render --app` and `spnutils apps surface theme` read. It holds the theme's own values for the app, the layout as the app's own setting, and the kind of page. The table above is for the reader, the block for the commands, and the two never differ.
+Each app's row is also written as one fenced `json` block, keyed by the app's code, which `spnutils apps surface render --app` and `spnutils apps surface theme` read. It holds the theme's own values for the app, the layout as the app's own setting, the kind of page, the kind of surface, and the values where the app departs from the language, part by part, in `overrides`. An app follows the language and never forks it. The table above is for the reader, the block for the commands, and the two never differ.
 
 ```json
 { "app": "{{www}}",
   "ds": "{{the design system version the app pins}}",
+  "language": "{{saasplane-site}}",
   "theme": { "app": { "primary": "{{#084A75}}" } },
   "layout": { "type": "{{TOPNAV}}", "nav": [] },
-  "page": "{{SITE}}" }
+  "page": "{{SITE}}",
+  "surface": "{{WEB}}",
+  "overrides": {} }
 ```
 
 ### The brand
@@ -76,36 +81,178 @@ The brand is also one fenced `json` block, in the theme's own keys, which the co
              "typefaces": { "text": "{{…}}", "display": "{{…}}", "code": "{{…}}" } } }
 ```
 
+### Voice and claims
+
+{{The platform's voice, written once for each app: how it speaks, the words it bans, and each claim it makes with whether it is built or planned. A claim is written as built only once the feature it names stands in the product.}}
+
+| App | Voice | Banned words | Claim | Status |
+| --- | --- | --- | --- | --- |
+| `{{web-www-ts}}` | {{plain, warm and specific}} | {{the words the language never uses}} | {{one claim}} | {{BUILT or PLANNED}} |
+
 ### The language as data
 
 {{The language's own choices, as the construct's last data block: the pages it is for, how its sections, interactions and media are styled and how dense it is. `spn-surface language write` fills the construct's figures from this block, and it is never a separate file.}}
 
+Its keys are the five parts' ids, and each part holds its subsections by id in camel case. A table the construct marks as filled is written from this block and never by hand. The `template` key names the version of this template the construct follows, and `version` the version of the language.
+
 ```json
-{ "language": { "name": "{{saasplane-site}}",
+{ "language": { "template": 2,
+                "name": "{{saasplane-site}}",
+                "version": "{{1}}",
                 "for": "{{Visitor}}",
-                "pageTemplates": ["{{…}}"],
-                "sectionStyle": "{{…}}",
-                "interactionStyle": "{{…}}",
-                "mediaStyle": "{{…}}",
-                "density": "{{…}}" } }
+                "pageTemplates": { "templatesByCategory": [{ "category": "{{…}}" }] },
+                "sectionStyle": { "grounds": [{ "ground": "{{…}}" }] },
+                "mediaStyle": { "drawingStyle": [{ "element": "{{…}}" }] },
+                "interactionStyle": { "motion": [{ "kind": "{{…}}" }] },
+                "density": { "pageText": [{ "role": "{{…}}" }] } } }
 ```
 
 ### The references
 
-| Site | Read | What was taken |
-| --- | --- | --- |
-| {{https://example.com}} | {{2026-11-18}} | {{grounds, angles, motion. Never words, pictures or branding.}} |
+{{One row for each site and each part. Each row says what the site does, our choice, and MAPPED, GAP or NOT_TAKEN. The reference read of each site is kept beside this page, written from the reference template, and the review rounds that led to each choice are kept with it.}}
+
+| Site | Read | Part | What it does | Our choice | Status |
+| --- | --- | --- | --- | --- | --- |
+| {{https://example.com}} | {{2026-11-18}} | {{section-style}} | {{grounds, angles, motion}} | {{what the language took, never words, pictures or branding}} | {{MAPPED}} |
 
 ## Parts
 
-{{The parts in reading order: the units every drawing is made of, the blocks built from them, how a page and its drawings are laid out, and samples drawn from the app's real files.}}
+{{The five parts in reading order: page templates, section style, media style, interaction style and density. The language holds no samples: its hero samples and its section samples are two pages beside it, built from the app's own media files, and each subsection links the samples that show it.}}
 
-### Drawing style
+| I am drawing | Read |
+| --- | --- |
+| A page, or the order of its sections | [Page templates](#page-templates) |
+| The ground, surface, unit or emphasis of a section | [Section style](#section-style) |
+| A diagram, an icon, a photo or a product view | [Media style](#media-style) |
+| Something that moves, or a unit that changes state | [Interaction style](#interaction-style) |
+| Words, room or the layout of a page | [Density](#density) |
+| A choice the language does not make | [Gaps and open questions](#gaps-and-open-questions) |
+
+### Page templates
+
+#### Templates by category
+<!-- spn:part page-templates.templates-by-category status={{SET}} applies={{BOTH}} samples={{…}} -->
+
+{{One row for each category of page the language builds. The question is the one the reader brings to that page, and the next step is the one thing the page asks of them.}}
+
+| Category | Kind of person | Flow step | The question the visitor brings | One next step | Sections in order | Grounds |
+| --- | --- | --- | --- | --- | --- | --- |
+| {{a landing page}} | {{Visitor}} | {{first visit}} | {{what is this, and is it for me}} | {{start with the demo}} | {{hero, claims, proof, closing call}} | {{BASE, then DEFAULT}} |
+
+#### Section patterns
+<!-- spn:part page-templates.section-patterns status={{SET}} applies={{SITE}} samples={{…}} -->
+
+{{For each pattern a page is built from: the frame of its words, its calls to action, and the proof it carries. Voice, banned words and the status of each claim are the app's, in Voice and claims.}}
+
+| Pattern | Eyebrow | Title | Lead length | Claims |
+| --- | --- | --- | --- | --- |
+| {{a hero}} | {{none or one short noun phrase}} | {{one sentence}} | {{one or two sentences}} | {{at most one}} |
+
+| Calls to action | Primary | Secondary | Where each stands | How a label is formed |
+| --- | --- | --- | --- | --- |
+| {{a page}} | {{the one action the page is for}} | {{the lighter way in}} | {{opening, mid-page and closing}} | {{a verb and its object, never a bare Learn more}} |
+
+| Proof kind | Where it stands | Read from |
+| --- | --- | --- |
+| {{figure}} | {{beside the claim it proves}} | {{the real system, never a number written by hand}} |
+| {{logo, quote, badge}} | {{under the claim, or in the closing band}} | {{a named source}} |
+
+#### Page and sections
+<!-- spn:part page-templates.page-and-sections status={{SET}} applies={{BOTH}} samples={{…}} -->
+
+| Pick | Choice |
+| --- | --- |
+| A page | {{a hero, then the sections in the order of the reader's questions, then a closing call}} |
+| Onward | {{a section that opens onto a group leads with the group's own link, Explore and its name; a deeper page or the demo comes second}} |
+| Section groups | {{sections that answer one question share a fill; groups alternate BASE and DEFAULT; three at most}} |
+| Room | {{hero XL, section MD, emphasis LG, closing SM}} |
+
+### Section style
+
+#### Grounds
+<!-- spn:part section-style.grounds status={{SET}} applies={{BOTH}} samples={{…}} -->
+
+{{Filled by `spn-surface language write`: none, dots, a scene's own ground and a plate, each with when to use it.}}
+
+#### Surfaces and tones
+<!-- spn:part section-style.surfaces-and-tones status={{SET}} applies={{BOTH}} samples={{…}} -->
+
+{{One row for each surface, and a second row where web and native differ.}}
+
+| Role | Design-system token | Tone or glass | Elevation | Radius |
+| --- | --- | --- | --- | --- |
+| {{a card}} | `{{--card}}` | {{tone}} | {{one small shadow in light; none in dark}} | {{10}} |
+
+#### Units and props
+<!-- spn:part section-style.units-and-props status={{SET}} applies={{BOTH}} samples={{…}} -->
+
+{{The units a section is built from, with the props and sizes this language sets. A unit that takes the design system's default says so.}}
+
+| Unit | Props | Sizes |
+| --- | --- | --- |
+| {{card, button, chip, form, accordion, quote}} | {{the design system's props this language sets}} | {{the sizes it uses}} |
+
+#### Emphasis
+<!-- spn:part section-style.emphasis status={{SET}} applies={{SITE}} samples={{…}} -->
+
+{{How a section is made to stand out: flat, a gradient, or an inverse band or stage. Say how many a page may hold and where none stands.}}
+
+| Emphasis | When | How many a page | Never on |
+| --- | --- | --- | --- |
+| {{flat}} | {{the default}} | {{any}} | {{none}} |
+| {{inverse band or stage}} | {{the one section the page leads to}} | {{one}} | {{a form, a table}} |
+
+#### Dark mode
+<!-- spn:part section-style.dark-mode status={{SET}} applies={{BOTH}} samples={{…}} -->
+
+{{What flips in dark and what stays.}}
+
+| Part | In dark |
+| --- | --- |
+| {{ground, text, edge}} | {{flips with the theme}} |
+| {{the one shadow, a scene's sky}} | {{stays, or is dropped}} |
+
+#### A section's two layers
+<!-- spn:part section-style.two-layers status={{SET}} applies={{SITE}} samples={{…}} -->
+
+A section has two layers, and they are separate. The section's background is nothing, a pattern such as {{dots}}, or a scene that fills the section edge to edge on its ground. The feature's own media stands beside, under or over its words. A section may use both. Three questions say which layer a medium takes:
+
+| Question | If yes, the medium is |
+| --- | --- |
+| Must it be read, because words or items point at it? | the feature's |
+| Is it a place or a surface the words stand on? | the section's |
+| Does it belong to one item? | the item's |
+
+{{Drop the scene rows below where the language uses no scene.}}
+
+| Kind of section | The section's background | The feature's media |
+| --- | --- | --- |
+| A landing hero | {{a scene, edge to edge, or none}} | {{none while a scene stands behind it, else a drawing beside the words}} |
+| A sub-page hero | {{none or dots}} | {{the page's drawing beside the words}} |
+| A section making a claim | {{none or dots}} | {{a drawing beside or under the words}} |
+| Items with a picture | {{none}} | {{a drawing beside the items, and each item's own small picture}} |
+| A grid or stats | {{none or dots}} | {{none}} |
+| A quote | {{none}} | {{none, or one picture of the person}} |
+| A demo | {{none or dots}} | {{the product view under the words}} |
+| A closing call | {{none or dots}} | {{none}} |
+
+A page has at most one scene. A scene never stands behind a section whose feature also has media. On a phone a section's scene moves under the words.
+
+#### A section's scene
+<!-- spn:part section-style.scene status={{SET}} applies={{SITE}} samples={{…}} -->
+
+A scene is drawn at 1:1 and never stretched. Its land runs past the content box on both sides to {{2560}} wide, fading at its far ends. Its subjects stand inside the content box. The section keeps the scene's height under its words, so the words and the actions stand in the sky.
+
+### Media style
+
+#### Drawing style
+<!-- spn:part media-style.drawing-style status={{SET}} applies={{SITE}} samples={{…}} -->
 
 <!-- Filled by spn-surface language write: each element as the pages draw it. Line weights, tiles, wire and pulse, plate, focus, angle. -->
 {{Filled by `spn-surface language write`.}}
 
-### Colour and strength
+#### Colour and strength
+<!-- spn:part media-style.colour-and-strength status={{SET}} applies={{SITE}} samples={{…}} -->
 
 | Element | Token | Strength |
 | --- | --- | --- |
@@ -113,11 +260,13 @@ The brand is also one fenced `json` block, in the theme's own keys, which the co
 | {{Wire}} | `{{--ds-drawing-wire}}` | {{30% of the text}} |
 | {{Shade}} | `{{--ds-drawing-shade}}` | {{one small shadow in light; none in dark}} |
 
-### Characters and building blocks
+#### Characters
+<!-- spn:part media-style.characters status={{SET}} applies={{SITE}} samples={{…}} -->
 
 {{Filled by `spn-surface language write`: people and the agent at the sizes the pages use, and the tile, wire, group, step and chip, each drawn and counted across the app's drawings.}}
 
-### How the blocks meet
+#### How the blocks meet
+<!-- spn:part media-style.how-the-blocks-meet status={{SET}} applies={{SITE}} samples={{…}} -->
 
 How the blocks meet is part of the style of a drawn medium, and a drawing is checked against it before it ships. {{Drop this part where the language uses no drawn media.}}
 
@@ -126,11 +275,12 @@ How the blocks meet is part of the style of a drawn medium, and a drawing is che
 | A wire's ends | Each end meets the unit it joins at the middle of the facing edge: never inside a plate, past a border, or in empty space. A wire into a group meets the plate's edge, or the one card it means. |
 | A wire's label | Stands {{8}} clear of its wire and is crossed by no wire. |
 | A plate's name | Lies inside its plate, in {{small capitals}}; a name longer than the plate is cut to the plate's subject. |
-| Words in a tile | Keep at least {{12}} from every edge of their tile and never cross it; a name too long for its tile is cut to its subject or the tile widens. |
+| Words in a box | Keep at least {{12}} from every edge of a tile, and {{10}} across a tag or a chip with {{4}} above and below their capitals; no edge or line crosses them. A glyph sits on the middle of the words beside it, and a box of one line holds both on its own middle. A name too long for its box is cut to its subject, or the box widens. |
 | Words under a name | One short line, never three; the detail stays on the page the drawing leads to. |
 | Code in a drawing | Real and valid, in the shape the product writes it, never a sketch of it. |
 
-### Drawing scale
+#### Drawing scale
+<!-- spn:part media-style.drawing-scale status={{SET}} applies={{SITE}} samples={{…}} -->
 
 Every medium takes one scale, and each value in it is a token, so a name reads the same size on every page. A medium picks its step from where it sits: {{S in a card, M beside or under a section's words and in every docs figure, L in a hero}}. Its text never shrinks to fit, each medium is made at 1:1 for its frame, and no word renders below {{9}}px. The values below are SaaS Plane's defaults; a language may change any of them.
 
@@ -189,19 +339,31 @@ S takes these at {{0.85}} and L at {{1.2}}, rounded to the {{4}} grid.
 
 Every edge and baseline sits on a {{4}} grid. Tiles in a row share their top and their height, and tiles in a column share their left edge. A row's tiles share their plate's width, so no tile stands with empty room beside it: one tile spans the row, two take half each, three take a third. A wire runs straight between centres that line up, and no wire crosses another wire.
 
-### Page and sections
+#### Drawing kinds
+<!-- spn:part media-style.drawing-kinds status={{SET}} applies={{SITE}} samples={{…}} -->
 
-| Pick | Choice |
-| --- | --- |
-| A page | {{a hero, then the sections in the order of the reader's questions, then a closing call}} |
-| Onward | {{a section that opens onto a group leads with the group's own link, Explore and its name; a deeper page or the demo comes second}} |
-| Section groups | {{sections that answer one question share a fill; groups alternate BASE and DEFAULT; three at most}} |
-| Room | {{hero XL, section MD, emphasis LG, closing SM}} |
-| Page text | {{each role of a page's words, its element or class and the design system's type step it reads: page title on the heading step XL, section MD, sub-section SM, part title on the title step LG, body on the content step LG, small and tables MD, labels XS; one token a role, never a class a role}} |
-| Faces | {{which of the design system's three faces each role takes: display for the titles a page is read by, text for every other word, code for code}} |
-| Weights | {{which of the design system's four weights each role takes, and that no weight sits between them}} |
+{{Filled by `spn-surface language write`: one drawing of each kind the app uses, from its real files, and when to reach for it.}}
 
-### Where media go
+#### Icons
+<!-- spn:part media-style.icons status={{SET}} applies={{BOTH}} samples={{…}} -->
+
+{{The icon set, its size, its stroke and the tile an icon sits on.}}
+
+| Set | Size | Stroke | Tile |
+| --- | --- | --- | --- |
+| {{lucide}} | {{16 in a tile, 20 stacked}} | {{1.5}} | {{none, or the tile's face}} |
+
+#### Photos and product views
+<!-- spn:part media-style.photos-and-product-views status={{SET}} applies={{BOTH}} samples={{…}} -->
+
+{{How a photo or a product view is framed.}}
+
+| Medium | Frame | Radius | Crop |
+| --- | --- | --- | --- |
+| {{a product view}} | {{the window's own outline}} | {{10}} | {{the top of its page}} |
+
+#### Where media go
+<!-- spn:part media-style.where-media-go status={{SET}} applies={{SITE}} samples={{…}} -->
 
 | Media | Placed on | Through |
 | --- | --- | --- |
@@ -209,36 +371,8 @@ Every edge and baseline sits on a {{4}} grid. Tiles in a row share their top and
 | A close-up or a sheet | the feature | the feature's media |
 | A small picture | an item | the item's media |
 
-### A section's two layers
-
-A section has two layers, and they are separate. The section's background is nothing, a pattern such as {{dots}}, or a scene that fills the section edge to edge on its ground. The feature's own media stands beside, under or over its words. A section may use both. Three questions say which layer a medium takes:
-
-| Question | If yes, the medium is |
-| --- | --- |
-| Must it be read, because words or items point at it? | the feature's |
-| Is it a place or a surface the words stand on? | the section's |
-| Does it belong to one item? | the item's |
-
-{{Drop the scene rows below where the language uses no scene.}}
-
-| Kind of section | The section's background | The feature's media |
-| --- | --- | --- |
-| A landing hero | {{a scene, edge to edge, or none}} | {{none while a scene stands behind it, else a drawing beside the words}} |
-| A sub-page hero | {{none or dots}} | {{the page's drawing beside the words}} |
-| A section making a claim | {{none or dots}} | {{a drawing beside or under the words}} |
-| Items with a picture | {{none}} | {{a drawing beside the items, and each item's own small picture}} |
-| A grid or stats | {{none or dots}} | {{none}} |
-| A quote | {{none}} | {{none, or one picture of the person}} |
-| A demo | {{none or dots}} | {{the product view under the words}} |
-| A closing call | {{none or dots}} | {{none}} |
-
-A page has at most one scene. A scene never stands behind a section whose feature also has media. On a phone a section's scene moves under the words.
-
-### A section's scene
-
-A scene is drawn at 1:1 and never stretched. Its land runs past the content box on both sides to {{2560}} wide, fading at its far ends. Its subjects stand inside the content box. The section keeps the scene's height under its words, so the words and the actions stand in the sky.
-
-### Media size by placement
+#### Media size by placement
+<!-- spn:part media-style.media-size-by-placement status={{SET}} applies={{SITE}} samples={{…}} -->
 
 A medium's size follows where it is placed, and each size is read from the design system's container that holds it, never guessed. A drawing is made for its frame, never scaled from another placement, and never cut: it fits its frame whole on its ground, and only empty sky is trimmed. A screenshot inside a drawn window crops to the top of its page. {{The widths are at the desktop, in the app's body width, less its room on each side.}}
 
@@ -251,7 +385,68 @@ A medium's size follows where it is placed, and each size is read from the desig
 | A container's ground | the container, edge to edge behind its content, drawn quiet: low-contrast lines, no labels, nothing the words must compete with | the same, still quiet |
 | An item's picture | the item's media box: {{size with a title and a line}}, {{size with a title alone}} | the same box |
 
-### Alignment and items
+#### Media kinds
+<!-- spn:part media-style.media-kinds status={{SET}} applies={{BOTH}} samples={{…}} -->
+
+{{One row for each kind of medium the language uses.}}
+
+| Kind | Source | Rights | Alt text | Tablet and phone form |
+| --- | --- | --- | --- | --- |
+| {{a drawing}} | {{drawn from the app's own files}} | {{ours}} | {{one sentence naming what it shows}} | {{whole, or cropped to its subject}} |
+
+### Interaction style
+
+#### Motion
+<!-- spn:part interaction-style.motion status={{SET}} applies={{BOTH}} samples={{…}} -->
+
+{{What moves, at what speed, and the frame it holds still on for a reader who asks for less motion.}}
+
+#### Angles and arrival
+<!-- spn:part interaction-style.angles-and-arrival status={{SET}} applies={{SITE}} samples={{…}} -->
+
+{{Filled by `spn-surface language write`: the front and isometric angles, and how parts arrive.}}
+
+#### States
+<!-- spn:part interaction-style.states status={{SET}} applies={{APP}} samples={{…}} -->
+
+{{Each state a unit takes, its look, and the way back from a failure or a refusal.}}
+
+| State | Look | The way back |
+| --- | --- | --- |
+| {{idle}} | {{the unit at rest}} | {{none}} |
+| {{working}} | {{a quiet progress mark, the words kept}} | {{none}} |
+| {{done}} | {{the result in place}} | {{none}} |
+| {{failed}} | {{the reason in words, beside the unit}} | {{retry}} |
+| {{empty}} | {{one line and the next action}} | {{the action}} |
+| {{denied}} | {{who may, in words}} | {{ask for access}} |
+
+### Density
+
+#### Page text
+<!-- spn:part density.page-text status={{SET}} applies={{BOTH}} samples={{…}} -->
+
+{{Each role of a page's words, its element or class and the design system's type step it reads; the faces and the weights; and the type ladder.}}
+
+| Pick | Choice |
+| --- | --- |
+| Page text | {{each role of a page's words, its element or class and the design system's type step it reads: page title on the heading step XL, section MD, sub-section SM, part title on the title step LG, body on the content step LG, small and tables MD, labels XS; one token a role, never a class a role}} |
+| Faces | {{which of the design system's three faces each role takes: display for the titles a page is read by, text for every other word, code for code}} |
+| Weights | {{which of the design system's four weights each role takes, and that no weight sits between them}} |
+
+#### Room and layouts
+<!-- spn:part density.room-and-layouts status={{SET}} applies={{BOTH}} samples={{…}} -->
+
+{{How much room a section takes, the density step, the data views, and the layout type each kind of page takes.}}
+
+| Pick | Choice |
+| --- | --- |
+| Section room | {{hero XL, section MD, emphasis LG, closing SM}} |
+| Density step | {{the step an app screen takes}} |
+| Data views | {{a table, a list, a card grid: when each}} |
+| Layout type | {{TOPNAV for a site; RAIL, DOCK or CANVAS for an app}} |
+
+#### Alignment and items
+<!-- spn:part density.alignment-and-items status={{SET}} applies={{SITE}} samples={{…}} -->
 
 Start-aligned is the default. A section's words centre only where they frame something short, and one carrier holds each claim: the items, or the medium's labels, never both.
 
@@ -268,15 +463,8 @@ Start-aligned is the default. A section's words centre only where they frame som
 | A paragraph, or an item grid | never centred | kept |
 | Where a reader scans to decide | start-aligned always | kept: {{the value list near the top, the claims, the closing call}} |
 
-### Grounds and drawing kinds
-
-{{Filled by `spn-surface language write`: none, dots, a scene's own ground and a plate, each with when to use it; one drawing of each kind the app uses, from its real files; front and isometric angles, and how parts arrive.}}
-
-### Motion
-
-{{What moves, at what speed, and the frame it holds still on for a reader who asks for less motion.}}
-
-### Tablet and phone
+#### Tablet and phone
+<!-- spn:part density.tablet-and-phone status={{SET}} applies={{BOTH}} samples={{…}} -->
 
 | Drawing form | When |
 | --- | --- |
@@ -285,9 +473,24 @@ Start-aligned is the default. A section's words centre only where they frame som
 | Laid out again as a column | a row of steps |
 | A smaller drawing of the same idea | none of the above reads |
 
-### Samples
+### Gaps and open questions
 
-{{Filled by `spn-surface language write`: each hero at its real layout, from the app's media files, and the app's section drawings, wide ones full width, the rest two across.}}
+{{What the language does not decide, so an agent flags a missing value and never invents one.}}
+
+#### Not in the language
+<!-- spn:part gaps.not-in-the-language status={{SET}} applies={{BOTH}} samples={{…}} -->
+
+{{A list of the choices the language leaves out, one line each.}}
+
+#### Design-system gaps
+<!-- spn:part gaps.design-system-gaps status={{SET}} applies={{BOTH}} samples={{…}} -->
+
+{{A list of the values the language wants and the design system does not yet hold, one line each.}}
+
+#### What the agent must ask
+<!-- spn:part gaps.what-the-agent-must-ask status={{SET}} applies={{BOTH}} samples={{…}} -->
+
+{{A list of the questions the agent asks the person before it draws, one line each.}}
 
 ## Boundary
 
