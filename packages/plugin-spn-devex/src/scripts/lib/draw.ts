@@ -2387,6 +2387,7 @@ function drawMap(
     string,
     { x: number; y: number; w: number; h: number; row: number }
   >();
+  const tileAt = new Map<string, number>();
   const place = (
     b: Box,
     x: number,
@@ -2398,6 +2399,7 @@ function drawMap(
     const inner = kids.get(b.id) ?? [];
     at.set(b.id, { x, y, w, h, row });
     if (!inner.length) {
+      tileAt.set(b.id, out.length); // the fan-out pass may stand a tile under a gap, and redraws it here
       out.push(mapRect(b, x, y, w, h, true));
       return;
     }
@@ -3033,6 +3035,81 @@ function drawMap(
         : acrossPoints(b, p, side, 1)[0];
     },
   );
+  // A FAN-OUT ROUTES ON ONE SHARED LINE. One box whose links all run down to two or more boxes
+  // drew each link as a route of its own: a staircase where a lane was taken, a run round the right
+  // edge for a box a row further down, and each label at whatever height its route left room for
+  // (the developer, 2026-11-20, of the design language's four apps: "I have talked about this issue
+  // before"). Now the parent's line runs down to one line at one height, each child's wire leaves it
+  // with one bend and drops straight to the middle of the child's top, and every sibling's label
+  // stands on its own drop at the same height. A child a row further down stands under the nearest
+  // gap of the rows between, so its drop passes through it; a child with links of its own stays where
+  // it is, and so does its group, as drawn before.
+  {
+    const groups = new Map<string, number[]>();
+    mRoutes.forEach((r, i) => {
+      if (r.dashed) return;
+      groups.set(r.from, [...(groups.get(r.from) ?? []), i]);
+    });
+    for (const [from, idx] of groups) {
+      if (idx.length < 2) continue;
+      const pb = byId.get(from),
+        p = at.get(from);
+      if (!pb || !p || (kids.get(from) ?? []).length) continue;
+      const kidsOf = idx.map((i) => ({ i, id: mRoutes[i].to, t: at.get(mRoutes[i].to)! }));
+      if (kidsOf.some((k) => !k.t || k.t.row <= p.row || (kids.get(k.id) ?? []).length)) continue;
+      const top = p.y + p.h,
+        firstTop = Math.min(...kidsOf.map((k) => k.t.y));
+      const busY = up4(top + (firstTop - top) / 4);
+      if (firstTop - busY < LABEL_H + LABEL_GAP * 3) continue;
+      const trunk = Math.round(p.x + p.w / 2);
+      // a deeper child stands under the gap nearest its middle, where its drop meets no box; one that cannot move (it
+      // has links of its own, or no gap fits it) keeps the route it was given, and its siblings still share the line
+      const keep = new Set<number>();
+      for (const k of kidsOf) {
+        const cx = k.t.x + k.t.w / 2;
+        const between = [...at.entries()].filter(
+          ([id, q]) => id !== k.id && id !== from && q.y < k.t.y && q.y + q.h > busY,
+        );
+        const blocks = (x: number) => between.some(([, q]) => x > q.x - 24 && x < q.x + q.w + 24);
+        if (!blocks(cx)) continue;
+        const own = links.some((l) => (l.from === k.id || l.to === k.id) && l.from !== from);
+        const xs = between.map(([, q]) => q).sort((a, b) => a.x - b.x);
+        const gaps: number[] = [];
+        for (let g = 0; g + 1 < xs.length; g++)
+          if (xs[g + 1].x - (xs[g].x + xs[g].w) >= 48) gaps.push((xs[g].x + xs[g].w + xs[g + 1].x) / 2);
+        const fits = (c: number) =>
+          c - k.t.w / 2 >= margin &&
+          c + k.t.w / 2 <= width - margin &&
+          ![...at.entries()].some(([id, q]) => id !== k.id && q.row === k.t.row && q.x < c + k.t.w / 2 + 24 && q.x + q.w > c - k.t.w / 2 - 24);
+        // the nearest gap; of two as near, the right one, where a drop crosses no label set right of its own
+        const c = gaps.filter(fits).sort((a, b) => Math.abs(a - cx) - Math.abs(b - cx) || b - a)[0];
+        if (own || c === undefined || !tileAt.has(k.id)) {
+          keep.add(k.i);
+          continue;
+        }
+        const nx = Math.round(c - k.t.w / 2);
+        k.t = { ...k.t, x: nx };
+        at.set(k.id, k.t);
+        out[tileAt.get(k.id)!] = mapRect(byId.get(k.id)!, nx, k.t.y, k.t.w, k.t.h, true);
+      }
+      if (kidsOf.length - keep.size < 2) continue;
+      const labelY = Math.round((busY + firstTop) / 2 + LABEL_H / 2);
+      for (const k of kidsOf.filter((q) => !keep.has(q.i))) {
+        const x = Math.round(k.t.x + k.t.w / 2),
+          y = k.t.y;
+        // straight runs only: the wire's own drawing softens each corner
+        mJoined[k.i] =
+          x === trunk
+            ? `M${trunk} ${top} L${trunk} ${y}`
+            : `M${trunk} ${top} L${trunk} ${busY} L${x} ${busY} L${x} ${y}`;
+        const lab = pending.find((q) => q.path === mRoutes[k.i].pathId);
+        if (lab) {
+          lab.y = labelY;
+          lab.x = x + LABEL_GAP;
+        }
+      }
+    }
+  }
   mRoutes.forEach((r, i) => {
     r.d = mJoined[i];
     horizontals.push(...horzOf(r.d, r.pathId));

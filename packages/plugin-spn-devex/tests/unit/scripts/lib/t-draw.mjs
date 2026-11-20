@@ -9721,5 +9721,49 @@ console.log(
   );
 }
 
+console.log("=== a fan-out from one box routes on one shared line (041 N012)");
+{
+  // the design language's four apps, the figure the developer pointed at on 2026-11-20
+  const fan = judge({
+    kind: "map",
+    boxes: [
+      { id: "ds", label: "The design system's look", note: "units, theme defaults" },
+      { id: "www", label: "saasplane.ai", note: "Deep ocean, its design language, its drawings", em: true },
+      { id: "console", label: "Console", note: "rail" },
+      { id: "account", label: "Account", note: "dock" },
+      { id: "identity", label: "Identity", note: "sign-in canvas" },
+    ],
+    links: [
+      { from: "ds", to: "www", label: "with its own look on top" },
+      { from: "ds", to: "console", label: "unchanged" },
+      { from: "ds", to: "account", label: "unchanged" },
+      { from: "ds", to: "identity", label: "unchanged" },
+    ],
+  });
+  const all = [...fan.svg.matchAll(/<path class="dl-wire(?:-on)?"[^>]* d="([^"]+)"/g)].map((m) => sharpD(m[1]));
+  const bent = all.filter((d) => /H/.test(d));
+  one(
+    "every wire leaves the parent at one point, and a wire that bends runs down, across one line and down: one bend of its own",
+    all.every((d) => d.startsWith(all[0].split(" ")[0])) && bent.every((d) => /^M\S+ \S+ V\S+ H\S+ V\S+$/.test(d)),
+    true,
+  );
+  one(
+    "the shared line stands at one height",
+    new Set(bent.map((d) => d.split(" ")[2])).size,
+    1,
+  );
+  one(
+    "the sibling labels stand level",
+    new Set([...fan.svg.matchAll(/<text class="dl-wlabel" x="[\d.]+" y="([\d.]+)"/g)].map((m) => m[1])).size,
+    1,
+  );
+  one(
+    "the box a row further down stands under a gap, so its drop meets no box: no wire runs round the edge",
+    all.some((d) => (d.match(/[HV]/g) ?? []).length > 3),
+    false,
+  );
+  one("the fan-out passes the figure check", fan.figure.map((f) => f.message), none);
+}
+
 console.log(failed ? `\n  ${failed} FAILED` : `\n  all ${n} passed`);
 process.exit(failed ? 1 : 0);

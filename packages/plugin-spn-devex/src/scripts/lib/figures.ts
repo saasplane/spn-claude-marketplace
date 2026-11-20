@@ -580,6 +580,54 @@ export function checkFigures(src: string): FigureFinding[] {
           findings.push({ figure: n + 1, message: `a connector crosses the label "${txt.slice(0, 30)}" at x=${Math.round(ax)}` });
       }
     }
+
+    // A FAN-OUT ROUTES ON ONE SHARED LINE (041 N012). A wire leaves the line it shares with one bend of its own, so a
+    // drawn wire with more than two corners is a staircase or a run round the edge; and wires leaving one point carry
+    // their labels level, each beside the drop that meets its box.
+    const wirePaths = [...svg.matchAll(/<path class="dl-wire(?:-on|-dash)?"[^>]* d="([^"]+)"/g)].map((m) => m[1]);
+    const fromOne = new Map<string, string[]>();
+    for (const d of wirePaths) {
+      const k = d.match(/^M\s*(-?[\d.]+)[ ,](-?[\d.]+)/)?.slice(1).join(",");
+      if (k) fromOne.set(k, [...(fromOne.get(k) ?? []), d]);
+    }
+    // a fan-out's wire is one of several leaving one point and ending in a drop onto its box's top; a run round the edge
+    // into a box's side is the map's own corridor for a link that skips rows, and is judged elsewhere
+    const endsInDrop = (d: string) => {
+      const pts = [...d.matchAll(/(-?[\d.]+)[ ,](-?[\d.]+)/g)].map((m) => [Number(m[1]), Number(m[2])]);
+      const [x1, y1] = pts[pts.length - 1], [x0, y0] = pts[pts.length - 2] ?? pts[0];
+      return Math.abs(x1 - x0) <= 1 && y1 > y0;
+    };
+    const endOf = (d: string) => (d.match(/(-?[\d.]+)[ ,](-?[\d.]+)\s*$/) ?? []).slice(1).map(Number);
+    // a box that another box's wire also enters is a join: its place answers both, so its drop is not judged here
+    const joined = (d: string, start: string) =>
+      wirePaths.some((o) => {
+        if (o === d || o.startsWith(start)) return false;
+        const [a, b] = endOf(o), [x, y] = endOf(d);
+        return Math.abs(a - x) <= 2 && Math.abs(b - y) <= 2;
+      });
+    for (const [k, sibs] of fromOne) {
+      if (sibs.length < 2) continue;
+      const start = `M${k.replace(",", " ")}`;
+      for (const d of sibs.filter((x) => endsInDrop(x) && !joined(x, start))) {
+        const corners = (d.match(/Q/g) ?? []).length;
+        if (corners > 2)
+          findings.push({ figure: n + 1, message: `a wire of a fan-out bends ${corners} times — it leaves the line it shares with one bend of its own, so its box stands where a straight drop reaches it` });
+      }
+    }
+    const wlabels = [...svg.matchAll(/<text class="dl-wlabel" x="([\d.]+)" y="([\d.]+)"/g)].map((m) => [Number(m[1]), Number(m[2])]);
+    for (const [, sibs] of fromOne) {
+      if (sibs.length < 2) continue;
+      const ys = new Set<number>();
+      for (const d of sibs) {
+        const pts = [...d.matchAll(/(-?[\d.]+)[ ,](-?[\d.]+)/g)].map((m) => [Number(m[1]), Number(m[2])]);
+        const [x1, y1] = pts[pts.length - 1], [x0, y0] = pts[pts.length - 2] ?? pts[0];
+        if (Math.abs(x1 - x0) > 1) continue; // its last run is not a drop
+        const lab = wlabels.find(([lx, ly]) => lx >= x1 + 4 && lx <= x1 + 20 && ly > Math.min(y0, y1) && ly < Math.max(y0, y1) + 4);
+        if (lab) ys.add(lab[1]);
+      }
+      if (ys.size > 1)
+        findings.push({ figure: n + 1, message: `the labels of wires that leave one box stand at ${ys.size} heights — sibling labels stand level, each beside its own drop` });
+    }
   });
   return findings;
 }
