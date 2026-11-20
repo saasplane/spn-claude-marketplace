@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "book": {
     "repository": "spn-foundation",
-    "commit": "d62c7387"
+    "commit": "348ad5ce"
   },
   "rules": [
     {
@@ -35327,6 +35327,11 @@
           "plugin": "spn-surface",
           "path": "refs/support/surface/architecture-components.md",
           "heading": "The level and the form"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/mock.md",
+          "heading": "The rules this step holds"
         }
       ]
     },
