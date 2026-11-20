@@ -1,6 +1,6 @@
 // `language write` — a construct's marked figures filled from its own `language` block, and nothing else changed.
 import { execFileSync } from "node:child_process";
-import { mkdtempSync, readFileSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 
@@ -51,6 +51,29 @@ const bare = ["# Design Language", "", "### Drawing style", "", "{{Filled by `sp
 writeFileSync(construct, bare);
 const none = run(dir, "--construct", construct);
 ok("[MKT.SCRIPTS.615] a construct with no language block is refused naming it and the heading", none.code !== 0 && none.out.includes(construct) && none.out.includes("### The language as data") && readFileSync(construct, "utf8") === bare, none.out);
+
+console.log("\n=== language write — a placeholder found by its part id, a template it does not read, the default construct");
+const BYID = { mediaStyle: { drawingStyle: [{ element: "Tile", style: "radius 10" }] }, drawingStyle: [{ element: "Wire", style: "by words" }] };
+const idText = (language) => ["# Design Language", "", ...block(language), "#### Drawing style", "<!-- spn:part media-style.drawing-style status=SET applies=SITE samples=none -->", "", "{{Filled by `spn-surface language write`.}}", ""].join("\n");
+writeFileSync(construct, idText({ template: 2, ...BYID }));
+const byId = run(dir, "--construct", construct);
+const idAfter = readFileSync(construct, "utf8");
+ok("[MKT.SCRIPTS.618] a placeholder under a #### heading is filled from its part id, before the heading's words", byId.code === 0 && idAfter.includes("<!-- spn:filled media-style.drawing-style -->") && idAfter.includes("| Tile | radius 10 |") && !idAfter.includes("| Wire | by words |"), idAfter);
+run(dir, "--construct", construct);
+ok("[MKT.SCRIPTS.618] a second run on an id-filled construct changes nothing", readFileSync(construct, "utf8") === idAfter);
+writeFileSync(construct, idText({ drawingStyle: BYID.drawingStyle }));
+run(dir, "--construct", construct);
+ok("[MKT.SCRIPTS.618] with no row under its id, the heading's words fill it", readFileSync(construct, "utf8").includes("| Wire | by words |"));
+const future = idText({ template: 9, ...BYID });
+writeFileSync(construct, future);
+const refused = run(dir, "--construct", construct);
+ok("[MKT.SCRIPTS.619] a block of template 9 is refused naming the version, and the construct stays as written", refused.code === 1 && refused.out.includes("names template 9") && readFileSync(construct, "utf8") === future, refused.out);
+const repo = mkdtempSync(join(tmpdir(), "language-repo-"));
+mkdirSync(join(repo, "docs", "02-constructs", "10-surfaces"), { recursive: true });
+mkdirSync(join(repo, "apps", "web"), { recursive: true });
+writeFileSync(join(repo, "docs", "02-constructs", "10-surfaces", "03-design-language.md"), idText({ template: 2, ...BYID }));
+const found = run(join(repo, "apps", "web"));
+ok("[MKT.SCRIPTS.620] with no flag the construct is found in a surfaces folder of any number above the app", found.code === 0 && found.out.includes("10-surfaces") && readFileSync(join(repo, "docs", "02-constructs", "10-surfaces", "03-design-language.md"), "utf8").includes("| Tile | radius 10 |"), found.out);
 
 console.log(failed ? `\n  ${failed} of ${total} FAILED` : `\n  all ${total} passed`);
 process.exit(failed ? 1 : 0);

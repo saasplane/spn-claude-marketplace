@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "book": {
     "repository": "spn-foundation",
-    "commit": "348ad5ce"
+    "commit": "ecf2ce92"
   },
   "rules": [
     {
@@ -36441,7 +36441,7 @@
         "skill": "spn-surface/design"
       },
       "class": "stated in a skill",
-      "sentence": "In a drawn medium words keep 12 from a tile's edge, one short line stands under a name, and code is real code",
+      "sentence": "In a drawn medium words keep their inset inside every box and no edge or line crosses them, a glyph and its words share one middle, one short line stands under a name, and code is real code",
       "chapter": "04-capabilities/02-support/01-surface/03-standards-patterns/01-common/05-design-languages.md",
       "heading": "How blocks meet",
       "decision": null,

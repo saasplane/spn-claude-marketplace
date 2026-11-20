@@ -6726,24 +6726,18 @@
   .sds-surface-stage {
     flex: 1;
     min-height: 0;
-    display: flex;
-    justify-content: center;
+    position: relative;
+    overflow: hidden;
   }
   .sds-surface-frame {
     display: block;
-    width: 100%;
+    width: 1440px;
     height: 100%;
     border: 0;
     background: var(--surface);
+    transform-origin: 0 0;
   }
-  .sds-surface[data-width="tablet"] .sds-surface-frame {
-    width: 768px;
-    max-width: 100%;
-    box-shadow: 0 0 0 1px var(--surface-border);
-  }
-  .sds-surface[data-width="phone"] .sds-surface-frame {
-    width: 390px;
-    max-width: 100%;
+  .sds-surface[data-width="tablet"] .sds-surface-frame, .sds-surface[data-width="phone"] .sds-surface-frame {
     box-shadow: 0 0 0 1px var(--surface-border);
   }
   @media (max-width: 640px) {

@@ -1,4 +1,4 @@
-<!-- RESTATES: spn-foundation docs/04-capabilities/02-support/01-surface/03-standards-patterns/01-common/05-design-languages.md § Where media go · § Media size by placement · § Text alignment and items · 02-support/02-apps/03-module/02-web/README.md § assets beside entry
+<!-- RESTATES: spn-foundation docs/04-capabilities/02-support/01-surface/03-standards-patterns/01-common/05-design-languages.md § The parts · § Where media go · § Media size by placement · § Text alignment and items · 02-support/02-apps/03-module/02-web/README.md § assets beside entry
      This file carries rules it does not own. The chapter above is the source of truth.
      A rule change is edited there first, then here, in the same change. Never add a rule here.
      restate-drift.ts reports this copy when its source moves. -->
@@ -12,7 +12,8 @@
 
 `For: Agent · Web developer` · `Status: ✅ DONE` · `Realizes: Design Language`
 
-{{One paragraph: which language this app follows, by the construct's Model table, and where its data and drawings live.}}
+{{One paragraph: which language this app follows, by the construct's Model table, which version of it the app is pinned to, and where its data and drawings live.}}
+
 
 ## Where
 
@@ -28,16 +29,35 @@
 
 `assets/` stands beside `entry/` and is not a layer: imported files (the drawings and the data) live in the package's source tree, content images are resolved from `public/`, and `entry/ui/` holds only its taxonomy. Under `assets/` a folder holds folders or files, never both: grouped by kind first, then by page.
 
-## Layouts this app fills
+## The language it follows
 
-| Kind | Sections |
+| Pin | Value |
 | --- | --- |
-| Visitor or Learner (a site) | Media size, Alignment and items, Grounds, Drawing kinds, Angles and arrival, Motion, Heroes |
-| Team or Everyday users (an app) | Density, Panels, States, Data views, Empty and error states |
+| Language | {{the language's name, from the construct's Model table}} |
+| Language version | {{the version of the language this app is pinned to}} |
+| Template | {{2}} |
+| Reads references | {{the reference reads this app's choices were taken from, or none}} |
 
-## Media sizes
+The app's row in the construct names its kind of page, a site or an app, and its kind of surface, web or native. An app follows the language and never forks it.
 
-The construct's Media size table, with this app's measured frames. Each size is read from the design system's container that holds it, and a drawing is made for its frame, never scaled from another placement.
+## Parts this app fills
+
+| Kind | Subsections, by part id |
+| --- | --- |
+| Visitor or Learner (a site) | `media-style.media-size-by-placement`, `density.alignment-and-items`, `section-style.grounds`, `media-style.drawing-kinds`, `interaction-style.angles-and-arrival`, `interaction-style.motion`, `page-templates.templates-by-category` |
+| Team or Everyday users (an app) | `density.room-and-layouts`, `section-style.units-and-props`, `interaction-style.states`, `density.page-text` |
+
+### Page templates
+
+{{The values where this app differs from the construct's page templates: its categories, section patterns, and page and sections. Each departure is named by its part id under What this app extends.}}
+
+### Section style
+
+{{The values where this app differs: grounds, surfaces and tones, units and props, emphasis, dark mode.}}
+
+### Media style
+
+The construct's Media size by placement table, with this app's measured frames. Each size is read from the design system's container that holds it, and a drawing is made for its frame, never scaled from another placement.
 
 | Placement | Frame on desktop | On a phone |
 | --- | --- | --- |
@@ -48,15 +68,21 @@ The construct's Media size table, with this app's measured frames. Each size is 
 | A container's ground | {{the container, edge to edge, drawn quiet}} | the same, still quiet |
 | An item's picture | {{the item's media box: with a title and a line, with a title alone}} | the same box |
 
-## Alignment and items
+### Interaction style
 
-The construct's rules for this app: start-aligned is the default; words centre only on a hero or closing call with no medium beside it, a stats band, or one centrepiece medium under a short title and one line; a paragraph or an item grid is never centred.
+{{The values where this app differs: motion with its reduced-motion frame, angles and arrival, states.}}
+
+### Density
+
+The construct's rules for this app, at `density.alignment-and-items`: start-aligned is the default; words centre only on a hero or closing call with no medium beside it, a stats band, or one centrepiece medium under a short title and one line; a paragraph or an item grid is never centred.
 
 Where a medium already labels each point, the items go; {{the places this app always keeps its items: the value list near the top, the claims, the closing call}}.
 
-## Special handling
+## What this app extends
 
-### {{What departs from the construct}}
+Each extension names the part id it adds to or changes, and holds only the values where this app differs. The brand is never changed here.
+
+### {{`section-style.grounds`: what departs from the construct}}
 
 **Why** — {{one sentence.}}
 **What** — {{what differs.}}
