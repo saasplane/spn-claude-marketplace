@@ -50,7 +50,7 @@
 - **Positioning** as April Dunford states it — the real alternative, the unique value, who cares most.
 - **Jobs to be Done** — the progress the buyer is trying to make.
 - **A message hierarchy for each persona** — one outcome each, then its proof.
-- **The purpose part's headline and its AI-native claim.** The book's headline is *Scale your engineering on standards every team keeps*, and AI-native has two halves: AI-native engineering, by the devex agent, which reads, discusses, writes and proves every change, and the AI-native platform (planned), by the operating agent. A page claims the first as built and the second as planned (`01-purpose/02-what.md`).
+- **The purpose part's headline and its AI-native claim.** The book's headline is *Scale your engineering on one foundation, with agents*, and AI-native has two halves: AI-native engineering, by the devex agent, which reads, discusses, writes and proves every change, and the AI-native platform (planned), by the operating agent. A page claims the first as built and the second as planned (`01-purpose/02-what.md`).
 - **Developer marketing** — working code and real numbers persuade a builder; adjectives do not.
 - **Evidence, consulted live and never copied into the plugin**: Mobbin's website sections (hero, pricing, proof, sign-up) through its MCP where the workspace holds a plan and its site otherwise; Nielsen Norman Group on how people read a web page; Page Flows for sign-up and onboarding; the product sites of the developer tools a buyer weighs us against. **A finding lands mapped onto the book's rule for the words of a marketing page and its Surface patterns**, citing its source and the date it was read.
 
