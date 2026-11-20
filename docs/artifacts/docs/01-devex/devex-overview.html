@@ -44,7 +44,12 @@
   <p>A rule in the foundation book does nothing until something applies it while you work. <code>spn-devex</code> is where that happens for every repository, whatever world it declares. It is also the widest of the four plugins, so it is the place to learn what a plugin can hold at all.</p>
   <p>This page is for anyone about to change a plugin in this repository, or to read one: an architect deciding where a new rule should run, or a backend developer about to write a check. It assumes no earlier reading. After it you know which folder a piece of plugin code belongs in, what that folder promises, and which construct page to open next.</p>
   <p><strong>The one thing to unlearn is that a plugin makes rules.</strong> None of them does. Every rule is stated once, in a chapter of the foundation book, and a plugin carries instruments that read that rule and apply it at the moment somebody works. So each folder below is one kind of instrument, and each is defined once, here in <code>spn-devex</code>. The other two plugins use the same folder names and add what only their own domain can say. That is why a general question, such as <em>what is a hook?</em>, always has its answer in this domain.</p>
-  <p><strong>What you can decide after this page.</strong> Which folder a new piece of plugin code belongs in; whether a rule you want to enforce should run at the moment a file is written, or only when somebody asks for a sweep; and what has to happen before an edit to a plugin is the code a session actually runs.</p>
+  <p><strong>What you can decide after this page:</strong></p>
+  <ul>
+    <li>which folder a new piece of plugin code belongs in;</li>
+    <li>whether a rule you want to enforce should run at the moment a file is written, or only when somebody asks for a sweep;</li>
+    <li>what has to happen before an edit to a plugin is the code a session actually runs.</li>
+  </ul>
 </section>
 
 <section id="s1">
@@ -84,7 +89,14 @@
 
 <section id="s6">
   <div class="sds-section-head"><h2>Scripts &mdash; the code a plugin runs</h2></div>
-  <p>Everything a plugin can execute sits under <code>scripts/</code>, divided by what calls it: <code>events/</code> for the process a hook moment starts, <code>checks/</code> for the questions it composes, <code>tools/</code> for what a person or the agent runs by its own path, and <code>lib/</code> for what both read. A rule answered one way while a file is written and another way in a sweep would be two rules, so the code that decides lives once and both callers import it. Every script names the chapter it applies in its own header.</p>
+  <p>Everything a plugin can execute sits under <code>scripts/</code>, divided by what calls it:</p>
+  <ul>
+    <li><code>events/</code> for the process a hook moment starts;</li>
+    <li><code>checks/</code> for the questions it composes;</li>
+    <li><code>tools/</code> for what a person or the agent runs by its own path;</li>
+    <li><code>lib/</code> for what both read.</li>
+  </ul>
+  <p>A rule answered one way while a file is written and another way in a sweep would be two rules, so the code that decides lives once and both callers import it. Every script names the chapter it applies in its own header.</p>
   <p><em>Decide here:</em> whether a rule should be a check wired to a moment, a tool run on request, or both sharing one library.</p>
   <p><a class="sds-more" href="constructs/05-scripts-construct.html">Read Scripts &rarr;</a></p>
 </section>

@@ -7,12 +7,12 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "seen": "c216812e"
+      "seen": "4cb44838"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "The masthead, and the opening",
-      "seen": "a964af7f"
+      "seen": "b8b710da"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
@@ -29,11 +29,11 @@
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/04-docs.md",
-      "seen": "c04a4728"
+      "seen": "7aa46cbe"
     },
     {
       "path": "spn-foundation/CONCEPT.md",
-      "seen": "58566134"
+      "seen": "a3caf1a9"
     }
   ],
   "decisions": [
@@ -443,7 +443,7 @@ kind: a good example beside a poor one shows the difference faster than the rule
 | Page kind | Title | Subtitle | Description |
 | --- | --- | --- | --- |
 | **construct** — the workstream | *The Workstream* | *Your work stays together in one folder, even after you close the window you started it in.* | *A workstream is a folder that holds one piece of work, from the first idea until you close it. Read this before you start a change that will take more than one working session. The page explains how the folder is named, how it moves between waiting, open and closed, and what is checked before you can close it.* |
-| **hub** — the foundation's | *Scale your engineering on standards every team keeps.* | *The AI-native, DevEx-first Foundation for Building and Launching Secure, Scalable, Compliance-ready SaaS Platforms.* | *SaaS Plane is a set of standards, tools and code libraries for building software that customers use over the internet. Read this page first to see how the parts fit together before you open any of them. Each area below links to the page that explains it in full.* |
+| **hub** — the foundation's | *Scale your engineering on one foundation, with agents.* | *The AI-native, DevEx-first Foundation for Building and Launching Secure, Scalable, Compliance-ready SaaS Platforms.* | *SaaS Plane is a set of standards, tools and code libraries for building software that customers use over the internet. Read this page first to see how the parts fit together before you open any of them. Each area below links to the page that explains it in full.* |
 | **concept overview** — `concept-devex-agent-overview.html` | *The agent is a member of the team, not a tool beside it.* | *The SaaS Plane DevEx Agent: what it is, what you can ask it to do, and how it works in your folder.* | *This page explains the coding agent that works with you in this workspace. Read it before you install the agent or ask it for anything. The pages below cover how a session opens, the skills it runs, and the roles it looks through.* |
 | **repository overview** — `spn-support-ts` | *Every app starts from the same shape.* | *The TypeScript backbone every SaaS Plane app is built on.* | *This repository holds the TypeScript libraries and the command-line tool that every SaaS Plane application is built from. Read this page to find the part you need before you open its code. Each area below links to its own page.* |
 | **approach** — `plain-language-approach.html` | *Plain Language* | *Decides how every page in the book opens, and how the agent talks to you.* | *This page plans a change to how the book's pages open and to what the agent says when you open a new window. Read it before you review the work it lists. Why comes first, then what changes, then how the work runs.* |

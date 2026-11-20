@@ -20,7 +20,7 @@ This plugin wires exactly one moment of a session — the point just before a wr
 
 ## Overview
 
-A credential, an identifier a tool discovers for itself, a provider's own string outside the entry that sanctions it, a hand edit to built output — each of these is a property of text somebody is about to write. So the wiring is as narrow as the rules are: one moment, two calls, one command.
+A credential, an identifier a tool discovers for itself, a provider's own string outside the entry that sanctions it, a hand edit to built output — each of these is a property of text somebody is about to write. So the wiring is as narrow as the rules are. It claims one moment, narrows it to two calls, and sends both to one command.
 
 **The moment decides the authority, and only one moment can refuse.** A call about to run is the last point at which a write can still be stopped; every later moment arrives after the file exists and can do nothing but comment. An estate leak is cheap to catch at the moment somebody writes it and expensive to find afterwards, so this plugin claims that moment and no other.
 

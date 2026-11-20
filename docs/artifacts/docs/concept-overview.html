@@ -82,6 +82,30 @@
   <p>The last two rows are one argument, not two facts. Being public is not a convenience
   here — it is the constraint the whole restatement machinery exists to answer.</p>
 
+  <p>Drawn as parts, the refusal and the check that keeps it look like this.</p>
+  <figure class="dl-figure">
+  <div class="dl-frame">
+  <svg class="dl-svg" viewBox="0 0 928 288" role="img" aria-label="A rule stated in the book, restated in a plugin, and the checker that compares the two">
+    <rect class="dl-tile" x="312" y="16" width="252" height="48" rx="10"/>
+    <text class="dl-name" x="324" y="37">The drift checker</text>
+    <text class="dl-detail" x="324" y="52">run here, before anything is published</text>
+    <rect class="dl-tile-on" x="312" y="120" width="252" height="48" rx="10"/>
+    <text class="dl-name" x="324" y="141">A file in a plugin</text>
+    <text class="dl-detail" x="324" y="156">restates the chapter, adds no rule</text>
+    <rect class="dl-tile" x="312" y="224" width="252" height="48" rx="10"/>
+    <text class="dl-name" x="324" y="245">The foundation book</text>
+    <text class="dl-detail" x="324" y="260">a chapter states the rule</text>
+    <path class="dl-wire" d="M438 168 L438 224"/>
+    <path class="dl-wire" d="M564 40 L612 40 Q620 40 620 48 L620 240 Q620 248 612 248 L564 248"/>
+    <path class="dl-wire-on" d="M438 64 L438 120"/>
+    <text class="dl-wlabel" x="256" y="204">names the chapter it restates</text>
+    <text class="dl-wlabel" x="577" y="32">reads</text>
+    <text class="dl-wlabel" x="446" y="100">compares</text>
+  </svg>
+  </div>
+  <figcaption>No rule starts in this repository. Every file that carries one names the chapter it restates, and the drift checker is the one thing that reads both trees.</figcaption>
+  </figure>
+
   <div class="sds-pull sds-warning">
     <h4><span class="sds-badge sds-warning">gap</span> Boundary — no argument recorded</h4>
     <div class="sds-scroll"><table><tbody>
@@ -168,6 +192,30 @@
   answer in one place — <code>spn-devex</code>'s hook set. A stack plugin's chapter says what its
   own checks decide, never what a check is.</p>
 
+  <figure class="dl-figure">
+  <div class="dl-frame">
+  <svg class="dl-svg" viewBox="0 0 928 232" role="img" aria-label="spn-devex defines the five instrument kinds, and the three domain plugins are written in them">
+    <rect class="dl-tile-on" x="360" y="16" width="212" height="48" rx="10"/>
+    <text class="dl-name" x="372" y="37">spn-devex</text>
+    <text class="dl-detail" x="372" y="52">plugin, hook, skill, ref, agent</text>
+    <rect class="dl-plate" x="174" y="120" width="584" height="96" rx="12"/>
+    <text class="dl-label" x="190" y="140">THE DOMAIN PLUGINS</text>
+    <rect class="dl-tile" x="190" y="152" width="176" height="48" rx="10"/>
+    <text class="dl-name" x="202" y="173">spn-surface</text>
+    <text class="dl-detail" x="202" y="188">what a person sees</text>
+    <rect class="dl-tile" x="378" y="152" width="176" height="48" rx="10"/>
+    <text class="dl-name" x="390" y="173">spn-apps</text>
+    <text class="dl-detail" x="390" y="188">what only a stack can say</text>
+    <rect class="dl-tile" x="566" y="152" width="176" height="48" rx="10"/>
+    <text class="dl-name" x="578" y="173">spn-infra</text>
+    <text class="dl-detail" x="578" y="188">what changes an estate</text>
+    <path class="dl-wire" d="M466 64 L466 120"/>
+    <text class="dl-wlabel" x="474" y="100">the grammar, restated by none</text>
+  </svg>
+  </div>
+  <figcaption>A general question, such as what a hook is, has its answer in spn-devex. A domain plugin's chapter says what its own checks decide, never what a check is.</figcaption>
+  </figure>
+
   <p><strong>The five instrument kinds are a shape, not a seat.</strong> Plugin, hook, skill, ref
   and agent are what an instrument can be, each defined once, in <code>spn-devex</code>. They are
   the vocabulary the four domains are written in rather than a division of the tree — which is
@@ -203,9 +251,14 @@
   <h2>Declared world — The world it declares</h2>
   <p>This repository declares <code>GENERAL</code>, which is a world with no stack in it.</p>
 
-  <p>A repository's manifest declares which world it belongs to — <code>FOUNDATION</code>,
-  <code>APPS</code>, <code>INFRA</code> or <code>GENERAL</code> — and a public marketplace is the
-  last of those. It ships no application, no package a service depends on, and no estate
+  <p>A repository's manifest declares which of four worlds it belongs to:</p>
+  <ul>
+    <li><code>FOUNDATION</code></li>
+    <li><code>APPS</code></li>
+    <li><code>INFRA</code></li>
+    <li><code>GENERAL</code>, the world of a public marketplace.</li>
+  </ul>
+  <p>This repository ships no application, no package a service depends on, and no estate
   declaration; it holds one docs tree and no nodes at all, so the <code>apps</code> and
   <code>infra</code> commands refuse it by name.</p>
 

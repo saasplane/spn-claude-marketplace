@@ -139,8 +139,8 @@ console.log("\n=== `figure check` takes a folder, the way `audit check` does");
   // reads as the tool being broken rather than as the argument being a folder. Found by a step 7
   // agent, which then ran it per file and said so rather than reporting the crash as a green.
   // A page in the shared form: the check reads a drawing only on a page that links the shared stylesheet.
-  const page = (svg) => `${linesFor("1.0.0").stylesheet}\n<h1>p</h1>\n<figure><svg class="sds-drawing" viewBox="0 0 100 60">${svg}</svg></figure>\n`;
-  const clean = page('<rect class="sds-box" x="10" y="10" width="40" height="20"/>');
+  const page = (svg) => `${linesFor("1.0.0").stylesheet}\n<h1>p</h1>\n<figure><svg class="dl-svg" viewBox="0 0 100 60">${svg}</svg></figure>\n`;
+  const clean = page('<rect class="dl-tile" x="10" y="10" width="40" height="20"/>');
   const ws = repo({
     [`${CORE_PAGES}/a-construct.html`]: clean,
     [`${CORE_PAGES}/b-construct.html`]: clean,

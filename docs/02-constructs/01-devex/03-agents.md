@@ -77,7 +77,13 @@ A brief declaring `tools` is bound by it: the permission is a fact about the con
 
 ### A fixed persona
 
-A brief with no argument is one voice, always: an engineering lead, a prose rewriter, a prose reviewer. Its whole authority is the words in its own file, read the same way each time it is called.
+A brief with no argument is always one voice. Three briefs are of that kind:
+
+- an engineering lead;
+- a prose rewriter;
+- a prose reviewer.
+
+Its whole authority is the words in its own file, read the same way each time it is called.
 
 ### A parameterized reviewer
 

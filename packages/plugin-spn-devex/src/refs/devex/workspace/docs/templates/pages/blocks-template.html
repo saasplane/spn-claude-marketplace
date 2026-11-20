@@ -161,77 +161,109 @@ deploy:
   <p>{{Every figure has a sentence before it saying what you are looking at, and a caption after it saying what to notice. Choose the kind by what the reader has to see.}}</p>
   <h3 id="b-sequence">SEQUENCE &mdash; steps in order</h3>
   <p>{{What you are looking at.}}</p>
-  <figure>
-  <svg class="sds-drawing" viewBox="18 18 1016 84" width="1016" height="84" role="img" aria-label="{{Three steps in order, left to right.}}">
-    <defs><marker id="ar-blk" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
-    <rect class="sds-box sds-tone-blue" x="20" y="20" width="300" height="80" rx="3"/><text class="sds-title" x="36" y="48">{{Step}}</text><text class="sds-code" x="36" y="70">{{what it settles}}</text><text class="sds-note" x="36" y="90">{{where it lives}}</text>
-    <path class="sds-connector" d="M320 60 H376" marker-end="url(#ar-blk)"/>
-    <rect class="sds-box" x="376" y="20" width="300" height="80" rx="3"/><text class="sds-title" x="392" y="48">{{Step}}</text><text class="sds-code" x="392" y="70">{{what it settles}}</text>
-    <path class="sds-connector" d="M676 60 H732" marker-end="url(#ar-blk)"/>
-    <rect class="sds-box" x="732" y="20" width="300" height="80" rx="3"/><text class="sds-title" x="748" y="48">{{Step}}</text><text class="sds-code" x="748" y="70">{{what it settles}}</text>
-  </svg>
-  <figcaption>{{What to notice.}}</figcaption>
-  </figure>
+<figure class="dl-figure">
+<div class="dl-frame">
+<svg class="dl-svg" viewBox="0 0 928 80" role="img" aria-label="{{Three steps in order, left to right.}}">
+  <rect class="dl-tile-on" x="200" y="16" width="140" height="48" rx="10"/>
+  <text class="dl-name" x="212" y="37">{{Step}}</text>
+  <text class="dl-detail" x="212" y="52">{{what it settles}}</text>
+  <path class="dl-wire" d="M340 40 L396 40"/>
+  <rect class="dl-tile" x="396" y="16" width="140" height="48" rx="10"/>
+  <text class="dl-name" x="408" y="37">{{Step}}</text>
+  <text class="dl-detail" x="408" y="52">{{what it settles}}</text>
+  <path class="dl-wire" d="M536 40 L592 40"/>
+  <rect class="dl-tile" x="592" y="16" width="140" height="48" rx="10"/>
+  <text class="dl-name" x="604" y="37">{{Step}}</text>
+  <text class="dl-detail" x="604" y="52">{{what it settles}}</text>
+</svg>
+</div>
+<figcaption>{{What to notice.}}</figcaption>
+</figure>
   <ol>
     <li><strong>{{Step}}</strong> &mdash; {{what happens, what must be true before it, what it leaves behind}}</li>
     <li><strong>{{Step}}</strong> &mdash; {{&hellip;}}</li>
   </ol>
   <h3 id="b-map">MAP &mdash; the parts of one thing</h3>
   <p>{{What you are looking at: the whole, then its parts and what flows between them.}}</p>
-  <figure>
-  <svg class="sds-drawing" viewBox="18 14 1036 234" width="1036" height="234" role="img" aria-label="{{A whole holding three parts; one part feeds the other two, and a fourth stands beside them.}}">
-    <defs><marker id="ar-blk2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
-    <rect class="sds-box sds-absent" x="20" y="16" width="1032" height="230" rx="3"/><text class="sds-title" x="36" y="42">{{The whole}}</text>
-    <rect class="sds-box sds-tone-blue" x="36" y="62" width="300" height="168" rx="3"/><text class="sds-title" x="52" y="100">{{Part}}</text><text class="sds-code" x="52" y="126">{{what it is}}</text><text class="sds-note" x="52" y="152">{{where it lives}}</text>
-    <path class="sds-connector" d="M336 98 H392" marker-end="url(#ar-blk2)"/>
-    <path class="sds-connector" d="M336 194 H392" marker-end="url(#ar-blk2)"/>
-    <rect class="sds-box" x="392" y="62" width="280" height="72" rx="3"/><text class="sds-title" x="408" y="92">{{Part}}</text><text class="sds-code" x="408" y="116">{{what it is}}</text>
-    <rect class="sds-box" x="392" y="158" width="280" height="72" rx="3"/><text class="sds-title" x="408" y="188">{{Part}}</text><text class="sds-code" x="408" y="212">{{what it is}}</text>
-    <rect class="sds-box" x="696" y="62" width="340" height="168" rx="3"/><text class="sds-title" x="712" y="100">{{Part}}</text><text class="sds-code" x="712" y="126">{{stands beside}}</text>
-  </svg>
-  <figcaption>{{What to notice: which part everything else reads, and where the boundary is.}}</figcaption>
-  </figure>
+<figure class="dl-figure">
+<div class="dl-frame">
+<svg class="dl-svg" viewBox="0 0 928 188" role="img" aria-label="{{A whole holding three parts; one part feeds the other two, and a fourth stands beside them.}}">
+  <rect class="dl-plate" x="16" y="16" width="896" height="156" rx="12"/>
+  <text class="dl-label" x="32" y="36">{{THE WHOLE}}</text>
+  <rect class="dl-tile-on" x="32" y="48" width="256" height="108" rx="10"/>
+  <text class="dl-name" x="44" y="69">{{Part}}</text>
+  <text class="dl-detail" x="44" y="84">{{what it is}}</text>
+  <rect class="dl-tile" x="344" y="48" width="256" height="48" rx="10"/>
+  <text class="dl-name" x="356" y="69">{{Part}}</text>
+  <text class="dl-detail" x="356" y="84">{{what it is}}</text>
+  <rect class="dl-tile" x="344" y="108" width="256" height="48" rx="10"/>
+  <text class="dl-name" x="356" y="129">{{Part}}</text>
+  <text class="dl-detail" x="356" y="144">{{what it is}}</text>
+  <rect class="dl-tile" x="624" y="48" width="272" height="108" rx="10"/>
+  <text class="dl-name" x="636" y="69">{{Part}}</text>
+  <text class="dl-detail" x="636" y="84">{{stands beside}}</text>
+  <path class="dl-wire" d="M288 102 L308 102 Q316 102 316 94 L316 80 Q316 72 324 72 L344 72"/>
+  <path class="dl-wire" d="M288 102 L308 102 Q316 102 316 110 L316 124 Q316 132 324 132 L344 132"/>
+</svg>
+</div>
+<figcaption>{{What to notice: which part everything else reads, and where the boundary is.}}</figcaption>
+</figure>
   <h3 id="b-seqdiagram">SEQUENCE figure &mdash; who speaks to whom</h3>
   <p>{{What you are looking at: the participants, and the order they speak in. Use this instead of a flow whenever more than one party acts and <em>who</em> acted is the thing to see.}}</p>
-  <figure>
-  <svg class="sds-drawing" viewBox="58 14 984 306" width="984" height="306" role="img" aria-label="{{Three participants exchanging four messages in order, time running down.}}">
-    <defs><marker id="ar-seq" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
-    <rect class="sds-box sds-tone-blue" x="60" y="16" width="260" height="48" rx="3"/><text class="sds-title" x="76" y="46">{{Participant}}</text>
-    <rect class="sds-box" x="420" y="16" width="260" height="48" rx="3"/><text class="sds-title" x="436" y="46">{{Participant}}</text>
-    <rect class="sds-box" x="780" y="16" width="260" height="48" rx="3"/><text class="sds-title" x="796" y="46">{{Participant}}</text>
-    <path class="sds-connector" data-role="lifeline" d="M190 64 V318" stroke-dasharray="4 5"/>
-    <path class="sds-connector" data-role="lifeline" d="M550 64 V318" stroke-dasharray="4 5"/>
-    <path class="sds-connector" data-role="lifeline" d="M910 64 V318" stroke-dasharray="4 5"/>
-    <text class="sds-label" x="200" y="104">{{the message it sends}}</text>
-    <path class="sds-connector" d="M190 114 H545" marker-end="url(#ar-seq)"/>
-    <text class="sds-label" x="560" y="164">{{what it asks for}}</text>
-    <path class="sds-connector" d="M550 174 H905" marker-end="url(#ar-seq)"/>
-    <text class="sds-label" x="560" y="224">{{what comes back &mdash; a reply is dashed}}</text>
-    <path class="sds-connector" d="M910 234 H555" stroke-dasharray="6 4" marker-end="url(#ar-seq)"/>
-    <text class="sds-label" x="200" y="284">{{the outcome the first one sees}}</text>
-    <path class="sds-connector" d="M550 294 H195" marker-end="url(#ar-seq)"/>
-  </svg>
-  <figcaption>{{What to notice: which party never speaks to which, and where a reply crosses a boundary.}}</figcaption>
-  </figure>
+<figure class="dl-figure">
+<div class="dl-frame">
+<svg class="dl-svg" viewBox="0 0 928 248" role="img" aria-label="{{Three participants exchanging four messages in order, time running down.}}">
+  <rect class="dl-tile-on" x="196" y="16" width="128" height="36" rx="10"/>
+  <text class="dl-name" x="208" y="38">{{Participant}}</text>
+  <rect class="dl-tile" x="424" y="16" width="128" height="36" rx="10"/>
+  <text class="dl-name" x="436" y="38">{{Participant}}</text>
+  <rect class="dl-tile" x="610" y="16" width="128" height="36" rx="10"/>
+  <text class="dl-name" x="622" y="38">{{Participant}}</text>
+  <path class="dl-wire" data-dl-flow="1" d="M260 88 L488 88"/>
+  <text class="dl-wlabel" x="374" y="80" text-anchor="middle">{{the message it sends}}</text>
+  <path class="dl-wire" data-dl-flow="2" d="M488 124 L674 124"/>
+  <text class="dl-wlabel" x="581" y="116" text-anchor="middle">{{what it asks for}}</text>
+  <path class="dl-wire dl-wire-dash" data-dl-flow="3" d="M674 160 L488 160"/>
+  <text class="dl-wlabel" x="581" y="152" text-anchor="middle">{{what comes back, dashed}}</text>
+  <path class="dl-wire" data-dl-flow="4" d="M488 196 L260 196"/>
+  <text class="dl-wlabel" x="374" y="188" text-anchor="middle">{{the outcome the first one sees}}</text>
+  <path class="dl-guide" data-role="lifeline" d="M260 52 V232"/>
+  <path class="dl-guide" data-role="lifeline" d="M488 52 V232"/>
+  <path class="dl-guide" data-role="lifeline" d="M674 52 V232"/>
+</svg>
+</div>
+<figcaption>{{What to notice: which party never speaks to which, and where a reply crosses a boundary.}}</figcaption>
+</figure>
   <h3 id="b-entities">ENTITIES figure &mdash; what relates to what</h3>
   <p>{{What you are looking at: the subject at the centre, what points at it, and what it points at. Every line carries its cardinality.}}</p>
-  <figure>
-  <svg class="sds-drawing" viewBox="38 38 1034 274" width="1034" height="274" role="img" aria-label="{{One central record, one thing pointing at it, and two things it points at, each relation labelled with its cardinality.}}">
-    <defs><marker id="ar-er" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
-    <rect class="sds-box" x="40" y="120" width="250" height="110" rx="3"/><text class="sds-title" x="56" y="152">{{Entity}}</text><text class="sds-code" x="56" y="180">{{the key}}</text><text class="sds-note" x="56" y="208">{{what it is}}</text>
-    <rect class="sds-box sds-tone-blue" x="470" y="110" width="250" height="130" rx="3"/><text class="sds-title" x="486" y="142">{{The subject}}</text><text class="sds-code" x="486" y="170">{{the key}}</text><text class="sds-note" x="486" y="196">{{the fields that relate}}</text><text class="sds-note" x="486" y="222">{{what it is}}</text>
-    <rect class="sds-box" x="880" y="40" width="190" height="100" rx="3"/><text class="sds-title" x="896" y="72">{{Entity}}</text><text class="sds-code" x="896" y="100">{{the key}}</text><text class="sds-note" x="896" y="126">{{what it is}}</text>
-    <rect class="sds-box" x="880" y="210" width="190" height="100" rx="3"/><text class="sds-title" x="896" y="242">{{Entity}}</text><text class="sds-code" x="896" y="270">{{the key}}</text><text class="sds-note" x="896" y="296">{{what it is}}</text>
-    <text class="sds-note" x="300" y="166">{{one}}</text><text class="sds-note" x="400" y="166">{{many}}</text>
-    <path class="sds-connector" d="M290 175 H470" marker-end="url(#ar-er)"/>
-    <text class="sds-note" x="300" y="200">{{what it means}}</text>
-    <text class="sds-note" x="730" y="142">{{many}}</text><text class="sds-note" x="812" y="82">{{one}}</text>
-    <path class="sds-connector" d="M720 150 H800 V90 H880" marker-end="url(#ar-er)"/>
-    <text class="sds-note" x="730" y="192">{{many}}</text><text class="sds-note" x="812" y="252">{{one}}</text>
-    <path class="sds-connector" d="M720 200 H800 V260 H880" marker-end="url(#ar-er)"/>
-  </svg>
-  <figcaption>{{What to notice: which way each relation points, and which of them may be absent.}}</figcaption>
-  </figure>
+<figure class="dl-figure">
+<div class="dl-frame">
+<svg class="dl-svg" viewBox="0 0 928 140" role="img" aria-label="{{One central record, one thing pointing at it, and two things it points at, each relation labelled with its cardinality.}}">
+  <rect class="dl-tile" x="112" y="46" width="128" height="48" rx="10"/>
+  <text class="dl-name" x="124" y="67">{{Entity}}</text>
+  <text class="dl-detail" x="124" y="82">{{the key}}</text>
+  <rect class="dl-tile-on" x="400" y="46" width="128" height="48" rx="10"/>
+  <text class="dl-name" x="412" y="67">{{The subject}}</text>
+  <text class="dl-detail" x="412" y="82">{{the key}}</text>
+  <rect class="dl-tile" x="688" y="16" width="128" height="48" rx="10"/>
+  <text class="dl-name" x="700" y="37">{{Entity}}</text>
+  <text class="dl-detail" x="700" y="52">{{the key}}</text>
+  <rect class="dl-tile" x="688" y="76" width="128" height="48" rx="10"/>
+  <text class="dl-name" x="700" y="97">{{Entity}}</text>
+  <text class="dl-detail" x="700" y="112">{{the key}}</text>
+  <path class="dl-wire" d="M528 70 L550 70 Q556 70 556 64 L556 64 Q556 58 562 58 L640 58 Q648 58 648 50 L648 48 Q648 40 656 40 L688 40"/>
+  <path class="dl-wire" d="M528 70 L550 70 Q556 70 556 76 L556 76 Q556 82 562 82 L656 82 Q664 82 664 90 L664 92 Q664 100 672 100 L688 100"/>
+  <path class="dl-wire-on" d="M240 70 L400 70"/>
+  <text class="dl-wlabel" x="269" y="62">{{what it means}}</text>
+  <text class="dl-wlabel" x="311" y="90">1:N</text>
+  <text class="dl-wlabel" x="537" y="50">{{what it means}}</text>
+  <text class="dl-wlabel" x="824" y="78">N:1</text>
+  <text class="dl-wlabel" x="427" y="34">{{what it means}}</text>
+  <text class="dl-wlabel" x="587" y="102">N:1</text>
+</svg>
+</div>
+<figcaption>{{What to notice: which way each relation points, and which of them may be absent.}}</figcaption>
+</figure>
   <h3 id="b-system">SYSTEM &mdash; the architecture of a thing you build</h3>
   <p>{{What you are looking at: one bounded thing, its layers in the direction a call travels, and what it talks to outside its boundary. Use it for a server module, a web module, an app or an estate package &mdash; they are the same picture, and drawing them alike is the point.}}</p>
   <div class="sds-pull">
