@@ -8,7 +8,9 @@ spn-surface check page <spec.json> --app <app root> [--media <dir>] [--content <
 
 spn-surface check scan [<path>…] — Scan Surface code for every note the Surface check gives, whole files
 
-spn-surface language write <app> [--construct <construct.md>] — Fill a design-language construct's figures (drawing style, characters and building blocks, grounds, samples) from the `language` block of its own construct
+spn-surface language check <app> [--construct <construct.md>] — Refuse a design-language construct whose filled tables differ from the `language` block they are filled from
+
+spn-surface language write <app> [--construct <construct.md>] — Fill a design-language construct's figures (drawing style, characters and building blocks, grounds, drawing kinds) from the `language` block of its own construct
 
 spn-surface page copy <url> <folder> [--notes <notes.json>] — Copy one running page into a folder as one self-contained file, with a hidden note for each section, for a surface page preview
 

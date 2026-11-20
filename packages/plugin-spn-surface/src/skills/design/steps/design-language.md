@@ -48,7 +48,7 @@
 - **A drawn medium takes its spacing from the scale, inside a tile, between tiles, inside a plate, between plates, from a wire to its label, between parallel wires, at a bend and at the frame margin, and a tile takes the inline or the stacked form** (`RULE.SUPPORT.SURFACE.544` · MUST · skill:spn-surface/design)
 - **Every edge and baseline of a drawn medium sits on a 4 grid: tiles in a row share their top and height, tiles in a column share their left edge, a wire runs straight between aligned centres, and no wire crosses a wire** (`RULE.SUPPORT.SURFACE.545` · MUST · skill:spn-surface/design)
 - **In a drawn medium a wire ends at the middle of the facing edge of the unit it joins, a wire's label stands clear of its wire, and a plate's name lies inside its plate** (`RULE.SUPPORT.SURFACE.546` · MUST · skill:spn-surface/design)
-- **In a drawn medium words keep 12 from a tile's edge, one short line stands under a name, and code is real code** (`RULE.SUPPORT.SURFACE.547` · MUST · skill:spn-surface/design)
+- **In a drawn medium words keep their inset inside every box and no edge or line crosses them, a glyph and its words share one middle, one short line stands under a name, and code is real code** (`RULE.SUPPORT.SURFACE.547` · MUST · skill:spn-surface/design)
 - **Each media kind's record states its frame for each placement, and how the scale's shared parts apply to it** (`RULE.SUPPORT.SURFACE.548` · MUST · skill:spn-surface/design)
 - **A dashed line takes the muted text colour, the token `--draw-dash-color`** (`RULE.SUPPORT.SURFACE.550` · MUST · skill:spn-surface/design)
 - **A dotted line takes the accent, mixed into the ground at 24% in SaaS Plane's defaults, the token `--draw-dot-color`** (`RULE.SUPPORT.SURFACE.551` · MUST · skill:spn-surface/design)
@@ -85,13 +85,14 @@ A language is kept as the repository's design language, a construct, and each ap
 **Before drawing, read the language's drawing scale, pick the step from the placement (S in a card, M in a section and a docs figure, L in a hero), and use only the tokens of the parts that apply to the medium's kind. A stack's floors stand 12 apart, a row's tiles share their plate's width, a caption under a plate is a detail line 8 below it, an illustration's lines take the ink at full, a dashed line takes `--draw-dash-color` and a dotted line `--draw-dot-color`, and a drawing is never cut.**
 
 1. **Read the repository's design language, the construct, and the app's capability chapter.** The construct holds the brand once and the app's row, with its looks; the chapter names where the app's drawings live. Read the construct and never a data file.
-2. **Where the app has no language yet, start with intake below.** A page is drawn only after the language says how.
+2. **Find a choice by its part and subsection.** The language holds five parts, Page templates, Section style, Media style, Interaction style and Density, each with fixed subsections, and every subsection carries a marker line `<!-- spn:part <part>.<subsection> status=… applies=… samples=… -->`. Look for the choice at its id, such as `section-style.grounds` or `density.page-text`, and read its status: SET is the language's own choice, DEFAULT is the design system's, and NONE means the language uses none. A choice the language does not make is listed under Gaps and open questions, where the agent asks and never invents it.
+3. **Where the app has no language yet, start with intake below.** A page is drawn only after the language says how.
 
 ## Intake
 
 Record each thing the partner shares, each with where it came from and the day:
 
-- **Each reference**, by address and date, with what was taken from it: a ground, an angle, a motion. Never its words, pictures or branding.
+- **Each reference**, by address and date, read with the reference template (`design-language-reference-template.md`): one read for each site, with its viewport and the kind of person it serves, then the five parts, and for each subsection what the site does, the values measured, our choice, and MAPPED, GAP or NOT_TAKEN. Never its words, pictures or branding.
 - **Each brand file**, with the tokens it sets. One brand serves the platform; an app changes only its looks over it.
 - **Each media kind** the partner wants: line drawings, illustration, product views (drawn or captured), photography, icons and marks, data and numbers, motion and video, 3D. For each, where it comes from (made, supplied, licensed, captured), its treatment, the tokens it reads, where it goes, its tablet and phone forms, its files, and its rights and alt text.
 
@@ -104,13 +105,13 @@ Record each thing the partner shares, each with where it came from and the day:
 
 1. **Show a round**: the options, each with what it chose and why.
 2. **Record the pick** in the round's own file beside the construct, with what the partner said, the day, and what was dropped.
-3. **Fold the decisions into the construct**: the brand once, and the app's row for its looks, the layout as a pointer to the app's layout setting and never copied into a look. Where the construct marks figures to be filled, run `spn-surface language write <app>` so they follow.
+3. **Fold the decisions into the construct**, each at its part and subsection id: the brand once, and the app's row for its looks, the layout as a pointer to the app's layout setting and never copied into a look. Where the construct marks figures to be filled, run `spn-surface language write <app>` so they follow.
 4. **Write each app's theme setting in the same arc**: after any change to the design language, write the one exported typed setting in each affected app's code from the brand and that app's row, named as the design system's theme type names its values (`DSThemeModeType`, `DSSizeType`, `DSMotionSpeedType`, `DSThemeRadiusType`, the layout, panel, card and table looks). The setting is the copy and the construct is the source, so the two move together and never apart. An app that keeps its theme in code and has not adopted the design language is left as it is, and no app is changed only to match. Then run `spnutils apps surface theme <app>` for each app whose setting you wrote: it refuses a setting out of step with the app's row, names each value that differs with the app's side and the book's side by side, and writes no file (`RULE.SUPPORT.SURFACE.577` · MUST · skill:spn-surface/design). Write the brand and each app's row also as one `json` data block each, keyed by the app's code, in the construct; the theme check and the page render read those blocks (`RULE.SUPPORT.SURFACE.578` · MUST · skill:spn-surface/design), and no separate data file is made.
 5. **Run `spn-surface check page` on every spec** and `spn-surface check module` on every module's folders. Tokens only: a drawing takes its colours from the theme's tokens or mixes of them.
 
 ## When a section's pattern is picked
 
-Read two parts of the construct for each section.
+Read two subsections of the construct for each section: Media size by placement (`media-style.media-size-by-placement`) and Alignment and items (`density.alignment-and-items`).
 
 **Media size follows the placement, and each size is read from the design system's container that holds it, never guessed.** A drawing is made for its frame and never scaled from another placement.
 

@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/01-common/05-design-languages.md",
-      "seen": "ac6a19d3"
+      "seen": "23d7d14b"
     }
   ]
 }
@@ -36,6 +36,23 @@ A site or an app follows one design language, and every page reads it before it 
 ## The parts — 🔮
 
 Five parts, each a group of choices, and each choice names a unit or a token of the design system.
+
+Every language holds the five parts in this order, each with the same subsections, so an agent finds a choice at the same heading in every language, a partner's included. A part or a subsection the language does not use says so in one line, and is never left out.
+
+| Part | Its subsections |
+| --- | --- |
+| **Page templates** | Templates by category · Section patterns · Page and sections |
+| **Section style** | Grounds · Surfaces and tones · Units and props · Emphasis · Dark mode · A section's two layers · A section's scene |
+| **Media style** | Drawing style · Colour and strength · Characters · How the blocks meet · Drawing scale · Drawing kinds · Icons · Photos and product views · Where media go · Media size by placement · Media kinds |
+| **Interaction style** | Motion · Angles and arrival · States |
+| **Density** | Page text · Room and layouts · Alignment and items · Tablet and phone |
+
+- **Each subsection carries a fixed id, its status and the kind of page it serves.** The id, such as `section-style.grounds`, stays when a heading's words change, so a tool or an agent finds the part by its id. The marker line under the heading reads `<!-- spn:part section-style.grounds status=SET applies=SITE samples=… -->`: the status says whether the language set the choice (SET), took the design system's default (DEFAULT) or uses none (NONE), so a blank is never read as a decision, and `applies` says whether the choice serves a site's pages (SITE), an app's screens (APP) or both (BOTH).
+- **One language serves every surface of the platform.** Each app's row names its kind of page, a site or an app, and its kind of surface, web or native, so a native app is one more row of the same language under the same brand.
+- **An app extends the language and never forks it.** Its capability chapter adds to a part by the part's id, and its row holds only the values where it differs, part by part. The brand is never changed by an app.
+- **The language's values are one versioned data block inside the construct, keyed by the parts' ids.** Every table the construct marks as filled is written from that block and never by hand, so the words and the values cannot drift apart.
+- **A language holds no samples.** Its hero samples and its section samples are two pages beside it, built from the app's own media files, and each subsection links the samples that show it. A sample page's title never ends in "Design Language", which the reader of a language's theme refuses.
+- **A reference site is read into the same five parts.** One reference read for each site, written from the reference template, records part by part what the site does, the values measured from it, our choice, and whether that choice is MAPPED, a GAP in the design system or NOT_TAKEN. The construct's references compare each site with the language part by part.
 
 | Part | The choices it holds |
 | --- | --- |
@@ -78,7 +95,7 @@ A design language fills one drawing scale of tokens. SaaS Plane's values are the
 - **A row's tiles share their plate's width: one tile spans it, two take half each and three take a third** (`RULE.SUPPORT.SURFACE.554` · MUST · skill:spn-surface/design)
 - **A caption under a plate is a detail line, set 8 below the plate's edge, and never a fourth text level** (`RULE.SUPPORT.SURFACE.555` · MUST · skill:spn-surface/design)
 - **In a drawn medium a wire ends at the middle of the facing edge of the unit it joins, a wire's label stands clear of its wire, and a plate's name lies inside its plate** (`RULE.SUPPORT.SURFACE.546` · MUST · skill:spn-surface/design)
-- **In a drawn medium words keep 12 from a tile's edge, one short line stands under a name, and code is real code** (`RULE.SUPPORT.SURFACE.547` · MUST · skill:spn-surface/design)
+- **In a drawn medium words keep their inset inside every box and no edge or line crosses them, a glyph and its words share one middle, one short line stands under a name, and code is real code** (`RULE.SUPPORT.SURFACE.547` · MUST · skill:spn-surface/design)
 - **Each media kind's record states its frame for each placement, and how the scale's shared parts apply to it** (`RULE.SUPPORT.SURFACE.548` · MUST · skill:spn-surface/design)
 
 Before a medium is made, pick the step from its placement and read the language's tokens for it. SaaS Plane's defaults: label 9, 9.5 and 10.5, name 11, 12 and 14, detail 9.5, 10 and 11.5, for S, M and L; line weights 0.75, 1 and 1.25; spaces on a 4 grid.
