@@ -2,7 +2,7 @@
 // and the table those rows become. A file whose name starts with `_` is a helper and is never dispatched.
 import { existsSync, readdirSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
-import { DOCS, constructsDir } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
+import { DOCS, SEAT, constructsDir } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 
 export const PLACEHOLDER = /^\{\{Filled by `spn-surface language write`[^}]*\}\}$/;
 /** A fresh pattern each call: a global pattern keeps its position between uses. */
@@ -13,7 +13,7 @@ export const READS_TEMPLATES: readonly number[] = [1, 2];
 /** A construct's place under the constructs folder: a `surfaces` domain folder, whatever its number, holding the construct. */
 const SURFACES = /^\d+-surfaces$/;
 const CONSTRUCT_FILE = /^\d+-design-language\.md$/;
-export const CONSTRUCT_WORDS = "`docs/02-constructs/<NN>-surfaces/<NN>-design-language.md`";
+export const CONSTRUCT_WORDS = `\`${DOCS}/${SEAT.constructs}/<NN>-surfaces/<NN>-design-language.md\``;
 
 /** A heading's words as the data's key: `Drawing style` is `drawingStyle`. */
 export const keyOf = (heading: string): string =>
