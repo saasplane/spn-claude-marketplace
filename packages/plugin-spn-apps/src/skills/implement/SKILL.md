@@ -7,7 +7,7 @@ description: THE requirement router for SaaS Plane TS repos. Use whenever the us
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
-      "seen": "af8ef53c"
+      "seen": "f9709d35"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/04-develop.md",

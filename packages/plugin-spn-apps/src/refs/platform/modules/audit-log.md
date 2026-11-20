@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/03-platform/02-modules/07-audit-log.md",
-      "seen": "edcf9873"
+      "seen": "a5294150"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/03-platform/02-modules/07-audit-log/",

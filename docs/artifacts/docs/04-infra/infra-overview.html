@@ -42,7 +42,12 @@
   <p>An estate declaration says what infrastructure should exist, and some things must never appear in one: a credential, an account identifier a tool finds for itself, a cloud's own string outside the entry allowed to hold it. <code>spn-infra</code> catches those at the moment they are written, and explains the estate's words to a reader who may never open the book.</p>
   <p>This page is for a DevOps engineer or an architect working in an estate repository, and for anyone about to add a rule or a cloud to this plugin. It assumes you know what a plugin is; if you do not, the <a href="../01-devex/devex-overview.html">spn-devex overview</a> comes first. After it you know where each estate rule is enforced, and what this plugin will never do for you.</p>
   <p><strong>The one thing to unlearn is that an estate plugin operates the estate.</strong> It does not. The gate refuses a bad write, the cards explain the vocabulary, and each skill names the command that does the work through the tool's own doors. A cloud is changed only by that tool, never by this plugin and never by a hand-run apply. This plugin ships no agents, and it has no chapter for them.</p>
-  <p><strong>What you can decide after this page.</strong> Whether a rule you want is about the text of a declaration, and so belongs in the gate; whether it is the same on every cloud or belongs to one; and where its proof goes.</p>
+  <p><strong>What you can decide after this page:</strong></p>
+  <ul>
+    <li>whether a rule you want is about the text of a declaration, and so belongs in the gate;</li>
+    <li>whether it is the same on every cloud or belongs to one;</li>
+    <li>where its proof goes.</li>
+  </ul>
 </section>
 
 <section id="s1">
@@ -61,14 +66,55 @@
 
 <section id="s3">
   <div class="sds-section-head"><h2>Skills &mdash; the doors an estate is changed through</h2></div>
-  <p>An estate is changed by editing what it declares itself to be, then letting a tool render and apply that declaration. The skills cover that walk: starting a new piece, changing what the estate is, reviewing and running a rendering before anybody approves it, verifying, and releasing a finished piece. They share one boundary, and each one states it: no skill changes a cloud. Each names the command that does.</p>
+  <p>An estate is changed by editing what it declares itself to be, then letting a tool render and apply that declaration. The skills cover that walk, from starting a new piece to releasing a finished one.</p>
+  <figure class="dl-figure">
+  <div class="dl-frame">
+  <svg class="dl-svg" viewBox="0 0 928 68" role="img" aria-label="The walk the spn-infra skills cover">
+    <rect class="dl-tile" x="52" y="16" width="120" height="36" rx="10"/>
+    <text class="dl-name" x="64" y="37">Start a piece</text>
+    <path class="dl-wire" d="M172 34 L228 34"/>
+    <rect class="dl-tile" x="228" y="16" width="120" height="36" rx="10"/>
+    <text class="dl-name" x="240" y="37">Change it</text>
+    <path class="dl-wire" d="M348 34 L404 34"/>
+    <rect class="dl-tile" x="404" y="16" width="120" height="36" rx="10"/>
+    <text class="dl-name" x="416" y="37">Review and run</text>
+    <path class="dl-wire" d="M524 34 L580 34"/>
+    <rect class="dl-tile" x="580" y="16" width="120" height="36" rx="10"/>
+    <text class="dl-name" x="592" y="37">Verify</text>
+    <path class="dl-wire" d="M700 34 L756 34"/>
+    <rect class="dl-tile" x="756" y="16" width="120" height="36" rx="10"/>
+    <text class="dl-name" x="768" y="37">Release</text>
+  </svg>
+  </div>
+  <figcaption>Review and run a rendering before anybody approves it. No step of the walk changes a cloud: each skill names the command that does.</figcaption>
+  </figure>
+  <p>The skills share one boundary, and each one states it: no skill changes a cloud. Each names the command that does.</p>
   <p><em>Decide here:</em> which request starts which walk, and which command each one hands the work to.</p>
   <p><a class="sds-more" href="constructs/03-skills-construct.html">Read Skills &rarr;</a></p>
 </section>
 
 <section id="s4">
   <div class="sds-section-head"><h2>Scripts &mdash; the write-time gate and what runs it</h2></div>
-  <p>The scripts tree is the catch. A dispatcher the wiring starts, a gate that works out which subjects have an opinion about the file, and a set of named rule bodies in <code>lib/</code>, each free of any cloud. Read the direction it fails in first: when the gate does not understand its input, it allows the call. A gate that refused everything it could not parse would deny far more than it knows about, and people would route around it.</p>
+  <p>The scripts tree is the catch, and it runs in three parts, one after the other.</p>
+  <figure class="dl-figure">
+  <div class="dl-frame">
+  <svg class="dl-svg" viewBox="0 0 928 80" role="img" aria-label="The write-time catch in spn-infra's scripts">
+    <rect class="dl-tile" x="104" y="16" width="204" height="48" rx="10"/>
+    <text class="dl-name" x="116" y="37">The dispatcher</text>
+    <text class="dl-detail" x="116" y="52">started by the wiring</text>
+    <path class="dl-wire" d="M308 40 L364 40"/>
+    <rect class="dl-tile-on" x="364" y="16" width="204" height="48" rx="10"/>
+    <text class="dl-name" x="376" y="37">The gate</text>
+    <text class="dl-detail" x="376" y="52">which subjects have an opinion</text>
+    <path class="dl-wire" d="M568 40 L624 40"/>
+    <rect class="dl-tile" x="624" y="16" width="204" height="48" rx="10"/>
+    <text class="dl-name" x="636" y="37">Named rule bodies</text>
+    <text class="dl-detail" x="636" y="52">in lib/</text>
+  </svg>
+  </div>
+  <figcaption>Every rule body is free of any cloud. When the gate does not understand its input, it allows the call.</figcaption>
+  </figure>
+  <p>The gate works out which subjects have an opinion about the file, and each rule body in <code>lib/</code> is free of any cloud. Read the direction it fails in first: when the gate does not understand its input, it allows the call. A gate that refused everything it could not parse would deny far more than it knows about, and people would route around it.</p>
   <p><em>Decide here:</em> whether a new rule is a rule body the gate asks, and whether it holds on every cloud.</p>
   <p><a class="sds-more" href="constructs/04-scripts-construct.html">Read Scripts &rarr;</a></p>
 </section>

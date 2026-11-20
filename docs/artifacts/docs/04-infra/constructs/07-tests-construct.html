@@ -107,7 +107,13 @@
   <h3 id="runner-the-runner-walks-and-it-judges-on">Runner — The runner walks, and it judges on the exit code</h3>
   <p><code>run.mjs</code> finds every suite by walking the tree and taking each file whose name marks it as one, so a suite is discovered by where its source sits rather than by being added to a list. It reads each suite's own exit code as the verdict and uses the printed summary only for the count, because a suite that exits non-zero while printing a cheerful last line would otherwise read as green. Standard error is discarded rather than inherited, so a fixture's warnings do not appear in the run as this run's findings.</p>
   <h3 id="folder-counting-nothing-counts-folders-t">Folder counting — Nothing counts folders to find the code</h3>
-  <p>Moving the suites once broke every one of them at the same moment, because each computed its own depth back to the plugin. So the harness exports the plugin root, found once; the runner walks; and a suite states only what it proves. <strong>A suite that types a depth is a suite the next move breaks</strong>, and nothing here types one.</p>
+  <p>Moving the suites once broke every one of them at the same moment, because each computed its own depth back to the plugin. So each part does one thing:</p>
+  <ul>
+    <li>the harness exports the plugin root, found once;</li>
+    <li>the runner walks;</li>
+    <li>a suite states only what it proves.</li>
+  </ul>
+  <p><strong>A suite that types a depth is a suite the next move breaks</strong>, and nothing here types one.</p>
   <h3 id="real-verdict-a-case-runs-the-real-proces">Real verdict — A case runs the real process and reads the real verdict</h3>
   <p>The harness writes a hook event to a fresh process on standard input and parses the decision back out, so what a case proves is what the harness would see rather than what a function returns. A case states the decision it expects and, for a refusal, a fragment the message must carry — which is how a rule that fires for the wrong reason is caught rather than counted as a pass.</p>
   <h3 id="absences-what-is-absent-and-the-absence-">Absences — What is absent, and the absence is the statement</h3>

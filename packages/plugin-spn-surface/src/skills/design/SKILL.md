@@ -7,11 +7,11 @@ description: Design a page of a SaaS Plane app from the blocks of the design sys
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
-      "seen": "af8ef53c"
+      "seen": "f9709d35"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/03-ideate.md",
-      "seen": "b78913ec"
+      "seen": "da4650d4"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/",

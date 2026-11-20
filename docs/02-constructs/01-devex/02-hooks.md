@@ -77,7 +77,29 @@ The moments run in the order a session meets them. Nothing chains one to the nex
 
 ### The window opening
 
-One script runs when a session starts, resumes or is cleared, and what it prints is the first screen a developer reads. Nothing in that screen is typed: the script walks the workspace, reads each repository's own manifest for the world and the stack it claims, checks the wiring that claim implies, and lists every workstream in each of its states. A workspace holding no manifest at all is the case where there is nothing to read, and the script then asks instead of reporting, and points at the day-zero skill. Every read is wrapped, because a crash here is a window that opens on a stack trace.
+One script runs when a session starts, resumes or is cleared, and what it prints is the first screen a developer reads. Nothing in that screen is typed: the script reads it all from the workspace, along the path below.
+
+```dg
+{ "kind": "flowchart",
+  "title": "What the window-opening script does when a session starts, resumes or is cleared",
+  "caption": "A workspace holding no manifest at all is the one case with nothing to read, so the script asks instead of reporting.",
+  "boxes": [{ "id": "s", "label": "A session starts, resumes or is cleared" },
+            { "id": "m", "label": "Does the workspace hold a manifest?" },
+            { "id": "read", "label": "Read each repository's manifest", "note": "the world and the stack it claims" },
+            { "id": "wire", "label": "Check the wiring that claim implies" },
+            { "id": "ws", "label": "List every workstream in each of its states" },
+            { "id": "ask", "label": "Ask, and point at the day-zero skill" },
+            { "id": "e", "label": "The first screen" }],
+  "links": [{ "from": "s", "to": "m" },
+            { "from": "m", "to": "read", "label": "yes" },
+            { "from": "m", "to": "ask", "label": "no" },
+            { "from": "read", "to": "wire" },
+            { "from": "wire", "to": "ws" },
+            { "from": "ws", "to": "e" },
+            { "from": "ask", "to": "e" }] }
+```
+
+Every read is wrapped, because a crash here is a window that opens on a stack trace.
 
 The same script puts the short rules in front of the agent, after the ground. They are ten plain lines about how a reply reads and who decides what, and each one ends with the reference and the heading that hold the rule whole. A line is a pointer and never a second copy of the rule. The agent reads the block and the developer's pane does not show it. The script reads no prompt, so no script judges whether a prompt opens a discussion.
 
@@ -96,7 +118,8 @@ One script, no matcher. By the time it runs the turn is already written, so a re
 A warning makes the agent reply again, and the developer reads that reply. So the script asks first whether work runs, which it reads from the rows of the window's own arcs: work runs while one of them is marked in progress.
 
 - **A reply owes *Needs you* at its top in two cases.** A reply that raises a card holds the card there in full, once. A reply that waits names every card open from an earlier reply in one line. A progress reply owes no line for an older card.
-- **While work runs, only a finding about the reply sends the agent back.** That is a card not put in full, a decision put with no whole card, a handover block that is missing or not whole, and a first reply with no welcome. Every other finding is held. At the first turn end where no row is in progress, each held finding that is still true is said whole, and one the agent fixed in between is not said.
+- **While work runs, only a finding about the reply sends the agent back.** Four findings are about the reply: a card not put in full, a decision put with no whole card, a handover block that is missing or not whole, and a first reply with no welcome.
+- **Every other finding is held until work stops.** At the first turn end where no row is in progress, each held finding that is still true is said whole, and one the agent fixed in between is not said.
 - **A handover block is asked for once.** After a reply that holds a whole block, a later reply that names the next window owes no second block while the rows of the window's arcs have not moved. Once they move, the old block no longer says where to start, and a block is owed again.
 
 ### Payload — The payload, and what a hook reads from it

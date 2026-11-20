@@ -117,7 +117,58 @@
   <h3 id="the-wiring-file">The wiring file</h3>
   <p><code>hooks.json</code> inside a plugin's <code>hooks/</code> folder is the whole declaration, and it is the only file that folder holds. Each moment carries an optional matcher naming which tool calls reach it, a command written against <code>CLAUDE_PLUGIN_ROOT</code>, and a timeout. One entry per moment is the rule that pays: five separate entries once matched a single edit, and each one paid an interpreter start-up before reading a byte.</p>
   <h3 id="the-window-opening">The window opening</h3>
-  <p>One script runs when a session starts, resumes or is cleared, and what it prints is the first screen a developer reads. Nothing in that screen is typed: the script walks the workspace, reads each repository's own manifest for the world and the stack it claims, checks the wiring that claim implies, and lists every workstream in each of its states. A workspace holding no manifest at all is the case where there is nothing to read, and the script then asks instead of reporting, and points at the day-zero skill. Every read is wrapped, because a crash here is a window that opens on a stack trace.</p>
+  <p>One script runs when a session starts, resumes or is cleared, and what it prints is the first screen a developer reads. Nothing in that screen is typed: the script reads it all from the workspace, along the path below.</p>
+<figure class="dl-figure">
+<div class="dl-frame">
+<svg class="dl-svg" viewBox="0 0 928 580" role="img" aria-label="What the window-opening script does when a session starts, resumes or is cleared">
+  <rect class="dl-tile" x="312" y="16" width="304" height="36" rx="18"/>
+  <text class="dl-name" x="464" y="38" text-anchor="middle">A session starts, resumes or is cleared</text>
+  <path class="dl-tile" d="M454.2 109.8 L454.2 109.8 Q464 108 473.8 109.8 L656.2 144.2 Q666 146 656.2 147.8 L473.8 182.2 Q464 184 454.2 182.2 L271.8 147.8 Q262 146 271.8 144.2 Z"/>
+  <text class="dl-name" x="464" y="150" text-anchor="middle">Does the workspace hold a manifest?</text>
+  <rect class="dl-tile" x="88" y="240" width="236" height="48" rx="10"/>
+  <text class="dl-name" x="100" y="261">Read each repository's manifest</text>
+  <text class="dl-detail" x="100" y="276">the world and the stack it claims</text>
+  <rect class="dl-tile" x="586" y="246" width="272" height="36" rx="10"/>
+  <text class="dl-name" x="598" y="268">Ask, and point at the day-zero skill</text>
+  <rect class="dl-tile" x="74" y="344" width="264" height="36" rx="10"/>
+  <text class="dl-name" x="86" y="366">Check the wiring that claim implies</text>
+  <rect class="dl-tile" x="46" y="436" width="320" height="36" rx="10"/>
+  <text class="dl-name" x="58" y="458">List every workstream in each of its states</text>
+  <rect class="dl-tile" x="390" y="528" width="148" height="36" rx="18"/>
+  <text class="dl-name" x="464" y="550" text-anchor="middle">The first screen</text>
+  <path class="dl-wire" d="M464 52 L464 108"/>
+  <path class="dl-wire" d="M262 146 L214 146 Q206 146 206 154 L206 240"/>
+  <path class="dl-wire" d="M666 146 L714 146 Q722 146 722 154 L722 246"/>
+  <path class="dl-wire" d="M206 288 L206 344"/>
+  <path class="dl-wire" d="M206 380 L206 436"/>
+  <path class="dl-wire" d="M206 472 L206 492 Q206 500 214 500 L456 500 Q464 500 464 508 L464 528"/>
+  <path class="dl-wire" d="M722 282 L722 492 Q722 500 714 500 L472 500 Q464 500 464 508 L464 528"/>
+  <text class="dl-wlabel" x="225" y="138">yes</text>
+  <text class="dl-wlabel" x="688" y="138">no</text>
+</svg>
+</div>
+<figcaption>A workspace holding no manifest at all is the one case with nothing to read, so the script asks instead of reporting.</figcaption>
+</figure>
+  <!-- dg:source
+{ "kind": "flowchart",
+  "title": "What the window-opening script does when a session starts, resumes or is cleared",
+  "caption": "A workspace holding no manifest at all is the one case with nothing to read, so the script asks instead of reporting.",
+  "boxes": [{ "id": "s", "label": "A session starts, resumes or is cleared" },
+            { "id": "m", "label": "Does the workspace hold a manifest?" },
+            { "id": "read", "label": "Read each repository's manifest", "note": "the world and the stack it claims" },
+            { "id": "wire", "label": "Check the wiring that claim implies" },
+            { "id": "ws", "label": "List every workstream in each of its states" },
+            { "id": "ask", "label": "Ask, and point at the day-zero skill" },
+            { "id": "e", "label": "The first screen" }],
+  "links": [{ "from": "s", "to": "m" },
+            { "from": "m", "to": "read", "label": "yes" },
+            { "from": "m", "to": "ask", "label": "no" },
+            { "from": "read", "to": "wire" },
+            { "from": "wire", "to": "ws" },
+            { "from": "ws", "to": "e" },
+            { "from": "ask", "to": "e" }] }
+  -->
+  <p>Every read is wrapped, because a crash here is a window that opens on a stack trace.</p>
   <p>The same script puts the short rules in front of the agent, after the ground. They are ten plain lines about how a reply reads and who decides what, and each one ends with the reference and the heading that hold the rule whole. A line is a pointer and never a second copy of the rule. The agent reads the block and the developer's pane does not show it. The script reads no prompt, so no script judges whether a prompt opens a discussion.</p>
   <h3 id="before-a-call-a-call-about-to-run">Before a call — A call about to run</h3>
   <p>One script, one matcher, and the whole chain of checks behind it. This is the only moment that may return a refusal, so every gate in the marketplace lives here or nowhere. Its matcher names the calls that could interest a check — reads, writes, edits, shell commands and searches.</p>
@@ -128,7 +179,8 @@
   <p>A warning makes the agent reply again, and the developer reads that reply. So the script asks first whether work runs, which it reads from the rows of the window's own arcs: work runs while one of them is marked in progress.</p>
   <ul>
     <li>**A reply owes <em>Needs you</em> at its top in two cases.** A reply that raises a card holds the card there in full, once. A reply that waits names every card open from an earlier reply in one line. A progress reply owes no line for an older card.</li>
-    <li><strong>While work runs, only a finding about the reply sends the agent back.</strong> That is a card not put in full, a decision put with no whole card, a handover block that is missing or not whole, and a first reply with no welcome. Every other finding is held. At the first turn end where no row is in progress, each held finding that is still true is said whole, and one the agent fixed in between is not said.</li>
+    <li><strong>While work runs, only a finding about the reply sends the agent back.</strong> Four findings are about the reply: a card not put in full, a decision put with no whole card, a handover block that is missing or not whole, and a first reply with no welcome.</li>
+    <li><strong>Every other finding is held until work stops.</strong> At the first turn end where no row is in progress, each held finding that is still true is said whole, and one the agent fixed in between is not said.</li>
     <li><strong>A handover block is asked for once.</strong> After a reply that holds a whole block, a later reply that names the next window owes no second block while the rows of the window's arcs have not moved. Once they move, the old block no longer says where to start, and a block is owed again.</li>
   </ul>
   <h3 id="payload-the-payload-and-what-a-hook-read">Payload — The payload, and what a hook reads from it</h3>

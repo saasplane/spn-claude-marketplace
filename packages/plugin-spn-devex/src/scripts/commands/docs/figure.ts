@@ -5,7 +5,7 @@
 // Two halves under one subject: the geometry check reads a spec and the SVG it draws to; the browser
 // render answers what a real layout paints; `draw` is the same drawer, offered to a hand-written page.
 //
-//   spn-devex docs figure check <path…> [--variant <name>]    labels fit and connectors join, and every spec draws
+//   spn-devex docs figure check <path…> [--variant <name>]    labels fit and connectors join, every spec draws and is measured, and no figure is drawn by hand
 //   spn-devex docs figure colour <path…> [--variant <name>]   a code block's file holds plain code, and carries no colour span
 //   spn-devex docs figure render <svg-or-html…>               render each in a headless browser and report what it painted
 //   spn-devex docs figure draw <spec.json…> [--case]                   print the drawing of each spec — a `.json` file, or a `.md` page's own ```dg``` blocks;
@@ -20,7 +20,7 @@
 import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync, statSync } from "node:fs";
 import { basename, dirname, extname, join, relative } from "node:path";
-import { checkFigures, colouredBlocks } from "../../lib/figures.ts";
+import { checkFigures, colouredBlocks, handDrawnFigures } from "../../lib/figures.ts";
 import { draw, figureOf } from "../../lib/draw.ts";
 import { readFlow } from "../../lib/flow.ts";
 import { type Action, FLAG, REQUIRED, readWords, scopeOf } from "../../../../../plugin-support-lib/src/lib/command.ts";
@@ -80,7 +80,10 @@ function geometry(sub: "check" | "colour", args: string[]): number {
     // reinvent the summary line, and a reader of the line can tell a report from a refusal.
     let soft = 0;
     for (const f of files) {
-      const src = readFileSync(f, "utf8");
+      // A SPEC FILE NAMED ON ITS OWN IS READ AS THE ONE SPEC IT HOLDS, as `draw` reads it. It was read as a page holding no block and
+      // no drawing, and so came back clean whatever it drew. A `.flow.json` names specs and draws nothing, so it is not one.
+      const raw = readFileSync(f, "utf8");
+      const src = f.endsWith(".json") && !f.endsWith(".flow.json") ? "```dg\n" + raw.trim() + "\n```\n" : raw;
       // A DRAWING IS READ BY THE SHARED STYLESHEET'S CLASS NAMES. A page that links no shared
       // stylesheet holds other names, so it is named once, as a RULE, and its drawings are not read.
       // A page of a closed workstream is not named either.
@@ -122,10 +125,18 @@ function geometry(sub: "check" | "colour", args: string[]): number {
         catch (e) { total += 1; console.log(`✗ RULE figure    ${relative(workspace, f)}\n         spec${n}: the drawer refused it — ${(e as Error).message}`); continue; }
         for (const d of out.findings) { total += 1; console.log(`✗ RULE figure    ${relative(workspace, f)}\n         spec${n}: ${d}`); }
         if (!out.svg) { total += 1; console.log(`✗ RULE figure    ${relative(workspace, f)}\n         spec${n}: draws nothing, so the page renders no figure at all`); }
+        // WHAT A SPEC DRAWS IS MEASURED, as the drawing a page carries is. A spec was drawn here and only the drawer's own findings
+        // were read, so a map whose wire ran through a tile it did not join came back clean: the geometry was never measured.
+        else for (const x of checkFigures(out.svg)) { total += 1; console.log(`✗ RULE figure    ${relative(workspace, f)}\n         spec${n}: ${x.message}`); }
       }
       const found = checkFigures(src);
       total += found.length;
       for (const x of found) console.log(`✗ RULE figure    ${relative(workspace, f)}\n         svg${x.figure}: ${x.message}`);
+      // A FIGURE COMES FROM A SPEC (RULE.DEVEX.WORKSPACE.523): one drawn by hand, in the flat drawing's classes or with an arrowhead,
+      // is named on every page this reads, whatever its geometry. A page in a closed workstream keeps the figures it closed with.
+      const hand = inClosedWorkstream(f) ? [] : handDrawnFigures(src, f.endsWith(".md"));
+      total += hand.length;
+      for (const x of hand) console.log(`✗ RULE figure    ${relative(workspace, f)}\n         svg${x.figure}: ${x.message}`);
     }
     const all = total + soft;
     console.log(all

@@ -119,7 +119,13 @@
   <h3 id="folders-and-framework-the-folders-are-th">Folders and framework — The folders are the convention; the framework is not</h3>
   <p>The authoring stack's own test step names a framework as well as a tree, and only the tree is adopted here. These suites drive real hook processes through standard input and assert on what comes back out, so a framework would wrap a subprocess harness in another harness and buy nothing. <strong>The runner stays a plain <code>.mjs</code> file with no dependency</strong>, which is also what lets a partner run it with nothing installed.</p>
   <h3 id="hop-counting-nothing-counts-a-hop">Hop counting — Nothing counts a <code>..</code> hop</h3>
-  <p>A suite that types its own depth is a suite the next move breaks, and every suite broke at once the first time these folders changed. So the plugin root is resolved once, in the harness, and exported; the runner finds the tier by walking down from its own folder; and the helper that resolves a script's path walks whatever folders a provider's <code>checks/</code> actually holds. A suite imports those answers and computes none of them.</p>
+  <p>A suite that types its own depth is a suite the next move breaks, and every suite broke at once the first time these folders changed. So each of those answers is found in one place:</p>
+  <ul>
+    <li>the plugin root is resolved once, in the harness, and exported;</li>
+    <li>the runner finds the tier by walking down from its own folder;</li>
+    <li>the helper that resolves a script's path walks whatever folders a provider's <code>checks/</code> actually holds.</li>
+  </ul>
+  <p>A suite imports those answers and computes none of them.</p>
   <h3 id="suite-walk-a-suite-is-found-by-a-walk-ne">Suite walk — A suite is found by a walk, never by a list</h3>
   <p>The runner walks the tier and runs every file it finds. A list would be a second place a new suite has to be added, and the suite nobody added to it is the one that silently never runs.</p>
   <h3 id="behaviour-ids-a-case-that-carries-a-beha">Behaviour ids — A case that carries a behaviour id becomes that row's result</h3>

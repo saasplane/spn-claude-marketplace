@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/03-standards-patterns.md",
-      "seen": "959db723"
+      "seen": "e31bd3a6"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/",

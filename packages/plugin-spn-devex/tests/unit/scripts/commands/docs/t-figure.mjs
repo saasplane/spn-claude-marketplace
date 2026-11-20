@@ -45,14 +45,14 @@ function pageIn(name, text) {
 
 // `check` reads a page's own geometry — no browser involved, so this is the same on every machine.
 {
-  const { out, code } = run(["check", pageIn("check", shared(`<h1>p</h1>\n<figure><svg class="sds-drawing" viewBox="0 0 100 60"><rect class="sds-box" x="10" y="10" width="40" height="20"/></svg></figure>`))]);
+  const { out, code } = run(["check", pageIn("check", shared(`<h1>p</h1>\n<figure><svg class="dl-svg" viewBox="0 0 100 60"><rect class="dl-tile" x="10" y="10" width="40" height="20"/></svg></figure>`))]);
   one("`figure check` runs the geometry check, not the render — it reports pages, not a render's PNG line",
     out.includes("clean — 1 page") && !out.includes("->"));
   one("and it exits clean", code === 0);
 }
 {
   // VERIFY THE VERIFIER: the same faulty drawing, on a page in the shared form, is reported.
-  const { out, code } = run(["check", pageIn("check-bad", shared(drawing("sds-drawing", "sds-box", "sds-connector")))]);
+  const { out, code } = run(["check", pageIn("check-bad", shared(drawing("dl-svg", "dl-tile", "dl-wire")))]);
   one("known-bad: a connector that ends in empty space, on a page that links the shared stylesheet, is refused",
     out.includes("RULE figure") && out.includes("empty space") && code === 1);
 }
@@ -70,6 +70,32 @@ function pageIn(name, text) {
   const report = run(["check", pageIn("check-report", `<style>.x{color:red}</style>\n<div id="root"></div>\n`)]);
   one("[MKT.SCRIPTS.108] an html file that is no page of ours is read past: it is not named, and the exit is 0",
     !report.out.includes("RULE styles") && report.code === 0);
+}
+
+// A FIGURE COMES FROM A SPEC (RULE.DEVEX.WORKSPACE.523), and what a spec draws is measured as a page's drawing is.
+{
+  const flat = run(["check", pageIn("check-flat", shared(`<figure><svg class="sds-drawing" viewBox="0 0 100 60"><rect class="sds-box" x="10" y="10" width="40" height="20"/></svg></figure>`))]);
+  one("[RULE.DEVEX.WORKSPACE.523] [MKT.SCRIPTS.616] red: `figure check` names a hand-drawn `sds-drawing` figure, whatever its geometry, and says to draw it from a spec",
+    flat.code === 1 && flat.out.includes("hand-drawn `sds-drawing`") && flat.out.includes("RULE.DEVEX.WORKSPACE.523"));
+  const arrow = run(["check", pageIn("check-arrow", shared(`<figure><svg class="dl-svg" viewBox="0 0 400 120"><rect class="dl-tile" x="16" y="16" width="120" height="48" rx="10"/><rect class="dl-tile" x="248" y="16" width="120" height="48" rx="10"/><path class="dl-wire" d="M136 40 H248" marker-end="url(#a)"/></svg></figure>`))]);
+  one("[RULE.DEVEX.WORKSPACE.523] [MKT.SCRIPTS.616] red: `figure check` names an arrowhead (`marker-end`) on a figure", arrow.code === 1 && arrow.out.includes("marker-end"));
+  const sample = run(["check", pageIn("check-sample", shared(`<figure><svg class="dl-svg" viewBox="0 0 400 120"><g data-dl-legend><path class="dl-wire" d="M40 60 H136" marker-end="url(#a)"/></g></svg></figure>`))]);
+  one("[RULE.DEVEX.WORKSPACE.523] [MKT.SCRIPTS.616] green: a sample the design language's page marks data-dl-legend is not named", sample.code === 0 && sample.out.includes("clean — 1 page"));
+  // The map that came back clean: the wire from Behaviors to How runs down through Capabilities, inside the What plate.
+  const MAP = { kind: "map", caption: "What has three parts.", boxes: [
+    { id: "why", label: "Why", note: "the benefit to the consumer" }, { id: "what", label: "What" },
+    { id: "con", label: "Constructs", note: "the words for the things", in: "what" }, { id: "beh", label: "Behaviors", note: "what a consumer can do", in: "what" },
+    { id: "cap", label: "Capabilities", note: "what must exist for it", in: "what" }, { id: "how", label: "How", note: "code, tests and guides" }],
+    links: [{ from: "why", to: "con" }, { from: "con", to: "beh" }, { from: "con", to: "cap" }, { from: "beh", to: "how" }, { from: "cap", to: "how" }] };
+  const specFile = join(BASE, "why-what-how.json");
+  writeFileSync(specFile, JSON.stringify(MAP));
+  const spec = run(["check", specFile]);
+  one("[MKT.SCRIPTS.617] red: a spec file named on its own is drawn and measured, and the wire through a tile it does not join is named",
+    spec.code === 1 && spec.out.includes("spec1: a connector runs through a box it does not join"), spec.out);
+  const seat = join(BASE, "seat-map"); mkdirSync(seat, { recursive: true });
+  writeFileSync(join(seat, "01-thing.md"), `# Thing\n\n\`\`\`dg\n${JSON.stringify(MAP)}\n\`\`\`\n`);
+  const md = run(["check", seat]);
+  one("[MKT.SCRIPTS.617] red: a seat file's `dg` spec is measured as it draws", md.code === 1 && md.out.includes("runs through a box it does not join"));
 }
 
 // `colour` reads a page's code blocks — also no browser. A page's file holds plain code, and the shared
@@ -186,7 +212,7 @@ console.log("\n=== `draw` reads a flow file against the specs beside it, and dra
 console.log("\n=== `--variant` narrows the pages `check` and `colour` read");
 {
   const block = (variant) => `<!-- spn:doc\n${JSON.stringify({ id: variant, variant, title: "Probe" })}\n-->\n`;
-  const faulty = shared(drawing("sds-drawing", "sds-box", "sds-connector"));
+  const faulty = shared(drawing("dl-svg", "dl-tile", "dl-wire"));
   const offBlock = shared(`<pre data-lang="ts"><span class="sds-tk-k">const</span> a = <span class="sds-tk-k">1</span>;</pre>`);
   // Three pages with the same two faults: an overview, a report, and a page that declares no variant.
   const dir = join(BASE, "variants");

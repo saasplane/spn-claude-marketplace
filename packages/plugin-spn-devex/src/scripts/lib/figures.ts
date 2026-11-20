@@ -1,9 +1,10 @@
 // RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § The figures · § A connector is a claim
-//           § One stylesheet, served in versions
+//           § One stylesheet, served in versions · § Prose and lists have limits (RULE.DEVEX.WORKSPACE.523, a figure comes from a spec)
 // The chapter is the source of truth. A rule change is edited there first, then here, in the same change.
 //
 //   check    labels fit their boxes; every connector starts and ends on a box edge or on another
-//            connector; nothing hugs the viewBox edge; no connector crosses a label
+//            connector; nothing hugs the viewBox edge; no connector crosses a label; none runs through a box it does not join
+//   hand     a figure drawn by hand: the flat drawing's classes, or an arrowhead the drawer never makes
 //   colour   the code blocks of a page whose file carries colour spans; the shared script colours a block when the page opens
 //
 // A connector is a claim that two things touch, which is what makes a figure checkable rather than a
@@ -199,6 +200,24 @@ function distSegRect(a: Pt, b: Pt, r: Rect): number {
   return Math.hypot(dx, dy);
 }
 
+/**
+ * Whether a segment enters a box's interior, the box shrunk by the edge tolerance so a wire landing on a side or running along
+ * one does not count. Liang–Barsky clipping, so a diagonal is judged as exactly as an axis-aligned run.
+ */
+function throughRect(a: Pt, b: Pt, r: Rect): boolean {
+  const x0 = r[0] + BOX_TOL, y0 = r[1] + BOX_TOL, x1 = r[0] + r[2] - BOX_TOL, y1 = r[1] + r[3] - BOX_TOL;
+  if (x1 <= x0 || y1 <= y0) return false;
+  const dx = b[0] - a[0], dy = b[1] - a[1];
+  let lo = 0, hi = 1;
+  for (const [p, q] of [[-dx, a[0] - x0], [dx, x1 - a[0]], [-dy, a[1] - y0], [dy, y1 - a[1]]] as [number, number][]) {
+    if (p === 0) { if (q <= 0) return false; continue; }
+    const t = q / p;
+    if (p < 0) lo = Math.max(lo, t); else hi = Math.min(hi, t);
+    if (lo >= hi) return false;
+  }
+  return hi > lo;
+}
+
 function sideOfAny(p: Pt, r: Rect): boolean {
   const [rx, ry, rw, rh] = r;
   const onX = rx - BOX_TOL <= p[0] && p[0] <= rx + rw + BOX_TOL;
@@ -345,6 +364,25 @@ export function checkFigures(src: string): FigureFinding[] {
       }
     });
 
+    // A WIRE THAT RUNS THROUGH A TILE IT DOES NOT JOIN claims a touch the figure does not have: a reader follows the line into the
+    // tile and reads it as ending there. The clearance rule below measured such a run as "0px from a box", which names the wrong
+    // fault and is reported once a figure; a crossing is its own finding, one for each tile a wire crosses. A container is
+    // exempt, since a wire reaching a box inside a plate crosses the plate's wall by design, and so is a wire drawn as a sample.
+    const tiles = rects.filter((r) => !rects.some((q) =>
+      q !== r && q[0] >= r[0] && q[1] >= r[1] && q[0] + q[2] <= r[0] + r[2] && q[1] + q[3] <= r[1] + r[3]));
+    const crossed = new Set<string>();
+    conns.forEach((c) => {
+      if (c.exempt || c.legend) return;
+      for (let i = 1; i < c.pts.length; i++) {
+        for (const r of tiles) {
+          const key = `${r.join(",")}`;
+          if (crossed.has(key) || !throughRect(c.pts[i - 1], c.pts[i], r)) continue;
+          crossed.add(key);
+          findings.push({ figure: n + 1, message: `a connector runs through a box it does not join, the one at ${r[0]},${r[1]} — a connector is a claim that two things touch, so it goes round a box it does not end on` });
+        }
+      }
+    });
+
     // A CONNECTOR OWES CLEAR AIR TO EVERY SHAPE IT MERELY PASSES. Landing on a box is a claim; running
     // alongside one is not, and a line threaded two pixels past a corner reads as touching it. The
     // rules so far protected labels from lines and lines from each other, and left the commonest
@@ -374,7 +412,7 @@ export function checkFigures(src: string): FigureFinding[] {
       const inside = (r: Rect) => attached.some((c) =>
         c !== r && r[0] >= c[0] && r[1] >= c[1] && r[0] + r[2] <= c[0] + c[2] && r[1] + r[3] <= c[1] + c[3]);
       for (const r of rects) {
-        if (encloses(r) || inside(r)) continue;
+        if (encloses(r) || inside(r) || (!conns[seg.k].legend && throughRect(seg.a, seg.b, r))) continue;   // a crossing is reported above
         const touches = [seg.a, seg.b].some((p) => meets(p, r));
         if (touches) continue;
         const d = distSegRect(seg.a, seg.b, r);
@@ -542,8 +580,88 @@ export function checkFigures(src: string): FigureFinding[] {
           findings.push({ figure: n + 1, message: `a connector crosses the label "${txt.slice(0, 30)}" at x=${Math.round(ax)}` });
       }
     }
+
+    // A FAN-OUT ROUTES ON ONE SHARED LINE (041 N012). A wire leaves the line it shares with one bend of its own, so a
+    // drawn wire with more than two corners is a staircase or a run round the edge; and wires leaving one point carry
+    // their labels level, each beside the drop that meets its box.
+    const wirePaths = [...svg.matchAll(/<path class="dl-wire(?:-on|-dash)?"[^>]* d="([^"]+)"/g)].map((m) => m[1]);
+    const fromOne = new Map<string, string[]>();
+    for (const d of wirePaths) {
+      const k = d.match(/^M\s*(-?[\d.]+)[ ,](-?[\d.]+)/)?.slice(1).join(",");
+      if (k) fromOne.set(k, [...(fromOne.get(k) ?? []), d]);
+    }
+    // a fan-out's wire is one of several leaving one point and ending in a drop onto its box's top; a run round the edge
+    // into a box's side is the map's own corridor for a link that skips rows, and is judged elsewhere
+    const endsInDrop = (d: string) => {
+      const pts = [...d.matchAll(/(-?[\d.]+)[ ,](-?[\d.]+)/g)].map((m) => [Number(m[1]), Number(m[2])]);
+      const [x1, y1] = pts[pts.length - 1], [x0, y0] = pts[pts.length - 2] ?? pts[0];
+      return Math.abs(x1 - x0) <= 1 && y1 > y0;
+    };
+    const endOf = (d: string) => (d.match(/(-?[\d.]+)[ ,](-?[\d.]+)\s*$/) ?? []).slice(1).map(Number);
+    // a box that another box's wire also enters is a join: its place answers both, so its drop is not judged here
+    const joined = (d: string, start: string) =>
+      wirePaths.some((o) => {
+        if (o === d || o.startsWith(start)) return false;
+        const [a, b] = endOf(o), [x, y] = endOf(d);
+        return Math.abs(a - x) <= 2 && Math.abs(b - y) <= 2;
+      });
+    for (const [k, sibs] of fromOne) {
+      if (sibs.length < 2) continue;
+      const start = `M${k.replace(",", " ")}`;
+      for (const d of sibs.filter((x) => endsInDrop(x) && !joined(x, start))) {
+        const corners = (d.match(/Q/g) ?? []).length;
+        if (corners > 2)
+          findings.push({ figure: n + 1, message: `a wire of a fan-out bends ${corners} times — it leaves the line it shares with one bend of its own, so its box stands where a straight drop reaches it` });
+      }
+    }
+    const wlabels = [...svg.matchAll(/<text class="dl-wlabel" x="([\d.]+)" y="([\d.]+)"/g)].map((m) => [Number(m[1]), Number(m[2])]);
+    for (const [, sibs] of fromOne) {
+      if (sibs.length < 2) continue;
+      const ys = new Set<number>();
+      for (const d of sibs) {
+        const pts = [...d.matchAll(/(-?[\d.]+)[ ,](-?[\d.]+)/g)].map((m) => [Number(m[1]), Number(m[2])]);
+        const [x1, y1] = pts[pts.length - 1], [x0, y0] = pts[pts.length - 2] ?? pts[0];
+        if (Math.abs(x1 - x0) > 1) continue; // its last run is not a drop
+        const lab = wlabels.find(([lx, ly]) => lx >= x1 + 4 && lx <= x1 + 20 && ly > Math.min(y0, y1) && ly < Math.max(y0, y1) + 4);
+        if (lab) ys.add(lab[1]);
+      }
+      if (ys.size > 1)
+        findings.push({ figure: n + 1, message: `the labels of wires that leave one box stand at ${ys.size} heights — sibling labels stand level, each beside its own drop` });
+    }
   });
   return findings;
+}
+
+// ---------------------------------------------------------------------------- a figure drawn by hand
+
+/**
+ * 05-artifacts.md § A page is written with Write or Edit, its figures come from a spec (RULE.DEVEX.WORKSPACE.523): a figure is drawn
+ * from a spec by `docs figure draw`, never by hand with coordinates. Two marks say a figure was drawn by hand, because the drawer
+ * makes neither: the flat drawing's classes (`svg.sds-drawing`, and its skeleton `sds-skeleton`), and an arrowhead (`marker-end`),
+ * which the language's wire does not have.
+ *
+ * A SAMPLE IS NOT A FIGURE OF THE PAGE. The docs design language's construct page shows the language's own units, and it marks each
+ * drawing that stands as a sample with `data-dl-legend`. A mark inside a `data-dl-legend` group, or on an `svg` that carries the
+ * attribute itself, is that page's subject and is not read; nothing else is exempt. In a markdown file, fenced code is not read.
+ */
+export function handDrawnFigures(src: string, markdown = false): FigureFinding[] {
+  const found: FigureFinding[] = [];
+  // A markdown file's fenced code is an example of markup, never a figure the file draws.
+  const read = markdown ? src.replace(/^(`{3,}|~{3,})[^\n]*\n[\s\S]*?^\1[ \t]*$/gm, " ") : src;
+  [...read.matchAll(/<svg\b[^>]*>[\s\S]*?<\/svg>/g)].forEach((m, n) => {
+    const whole = m[0];
+    const open = /^<svg\b[^>]*>/.exec(whole)?.[0] ?? "";
+    if (/\bdata-dl-legend\b/.test(open)) return;
+    const flat = /\bclass="(?:[^"]*\s)?(sds-drawing|sds-skeleton)(?:\s[^"]*)?"/.exec(open);
+    if (flat) {
+      found.push({ figure: n + 1, message: `is a hand-drawn \`${/sds-skeleton/.test(open) ? "sds-skeleton" : "sds-drawing"}\` figure — draw it from a \`dg\` spec with \`spn-devex docs figure draw <spec.json>\` and paste what it prints (RULE.DEVEX.WORKSPACE.523)` });
+      return;
+    }
+    const outside = without(whole, groupRanges(whole, LEGEND_GROUP));
+    if (/\bmarker-end\s*=/.test(outside))
+      found.push({ figure: n + 1, message: "carries an arrowhead (`marker-end`), and the drawer's wire has none — draw it from a `dg` spec with `spn-devex docs figure draw <spec.json>` (RULE.DEVEX.WORKSPACE.523)" });
+  });
+  return found;
 }
 
 // ---------------------------------------------------------------------------- colour
