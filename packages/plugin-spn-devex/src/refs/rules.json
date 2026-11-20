@@ -2359,6 +2359,35 @@
       ]
     },
     {
+      "id": "RULE.DEVEX.AGENT.180",
+      "level": "MUST",
+      "params": {
+        "agent": "spn-devex/spn-panel"
+      },
+      "class": "kept by an agent",
+      "sentence": "Every lens reads \"the consumer\" as the workspace's own consumer: the column above names whose work each lens serves, and in a partner's workspace that someone is the partner's own — its customers, its team, its API clients, the sites that embed it, a white-labelled edition, a firm integrating with it, and at Grow a second team calling a module's contract",
+      "chapter": "04-capabilities/01-devex/02-agent/03-lenses/01-lenses.md",
+      "heading": "The workspace's consumer",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/agent/lenses/README.md",
+          "heading": "The consumer is the workspace's own"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/agent/lenses/partner.md",
+          "heading": "Lens — PARTNER (Partner Solutions Architect)"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/agent/lenses.md",
+          "heading": "What a window carries, and when"
+        }
+      ]
+    },
+    {
       "id": "RULE.DEVEX.FUNCTION.007",
       "level": "MUST",
       "params": {
@@ -3316,7 +3345,7 @@
         {
           "plugin": "spn-devex",
           "path": "skills/bootstrap/SKILL.md",
-          "heading": "The acts, and their order is forced rather than chosen"
+          "heading": "The rounds, one section at a time"
         },
         {
           "plugin": "spn-devex",
@@ -3465,6 +3494,122 @@
         {
           "plugin": "spn-devex",
           "path": "skills/scm/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.DEVEX.FUNCTION.105",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-devex/bootstrap"
+      },
+      "class": "stated in a skill",
+      "sentence": "Bootstrap opens on a door with three paths — start a new platform, join an existing platform, or just look around — and only the first two create anything; after the one install and `spnutils workspace init`, every skill and every `spnutils` command is the agent's to run",
+      "chapter": "04-capabilities/01-devex/01-function/01-bootstrap.md",
+      "heading": "The door",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/function/bootstrap.md",
+          "heading": "The door, the ground, the foundation, the joining path"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/bootstrap/SKILL.md",
+          "heading": "bootstrap — an empty folder becomes a partner's foundation"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/bootstrap/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.DEVEX.FUNCTION.106",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-devex/bootstrap"
+      },
+      "class": "stated in a skill",
+      "sentence": "The accounts and sign-ins no tool can create are the foundation workstream's Ground section, each item with the check that says it is already done; the agent checks the ground and never decides it, an item turns Done only when its check passes, and a check that reads a cloud account runs only with the developer's approval at that step",
+      "chapter": "04-capabilities/01-devex/01-function/01-bootstrap.md",
+      "heading": "The ground",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/function/bootstrap.md",
+          "heading": "The door, the ground, the foundation, the joining path"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/bootstrap/SKILL.md",
+          "heading": "The ground — checked, never decided"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/bootstrap/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.DEVEX.FUNCTION.107",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-devex/bootstrap"
+      },
+      "class": "stated in a skill",
+      "sentence": "The joining path asks one question, where the team lives — its GitHub organization or its estate repository — then mints the workspace, clones and wires the repositories the estate declares, walks the sign-ins and the team's provider keys, runs the local stack from the pinned versions, and closes on an onboarding read; it asks no estate question and creates nothing beyond the local workspace",
+      "chapter": "04-capabilities/01-devex/01-function/01-bootstrap.md",
+      "heading": "The joining path",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/function/bootstrap.md",
+          "heading": "The door, the ground, the foundation, the joining path"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/bootstrap/SKILL.md",
+          "heading": "The joining path"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/bootstrap/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.DEVEX.FUNCTION.108",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-devex/bootstrap"
+      },
+      "class": "stated in a skill",
+      "sentence": "A new platform's first workstream is written whole from bootstrap's layout data after a few questions in chat — the path, the workspace's name, who the platform is for and the product in one sentence — so every round, section and arc is on the page from the first minute, each section Pending with what it knows, needs and waits on",
+      "chapter": "04-capabilities/01-devex/01-function/01-bootstrap.md",
+      "heading": "The foundation workstream",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/function/bootstrap.md",
+          "heading": "The door, the ground, the foundation, the joining path"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/bootstrap/SKILL.md",
+          "heading": "Write the workstream from the layout data"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/bootstrap/SKILL.md",
           "heading": "The rules this step holds"
         }
       ]
@@ -13335,6 +13480,127 @@
       "heading": "A rendered unit is written as a tree",
       "decision": null,
       "restated": []
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.539",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-devex/bootstrap"
+      },
+      "class": "stated in a skill",
+      "sentence": "An arc is created when its work starts, or with every one of its sections naming what it waits on; a workstream written from a layout opens all its arcs at once, and none of them is empty, because each section says what it still needs and what it waits for",
+      "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
+      "heading": "Written from a layout",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/workstream.md",
+          "heading": "Written from a layout"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/bootstrap/SKILL.md",
+          "heading": "Write the workstream from the layout data"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/bootstrap/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.540",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-devex/bootstrap"
+      },
+      "class": "stated in a skill",
+      "sentence": "The layout data is the workstream's structure, kept in the plugin as data and read-only: its rounds, each round's sections and subsections, the views that start a round and the views that join it, the arcs, and the tree of where each arc lands; a change to it is a change to the book and the plugins, never to one workstream",
+      "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
+      "heading": "Written from a layout",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/workstream.md",
+          "heading": "Written from a layout"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/bootstrap/SKILL.md",
+          "heading": "Write the workstream from the layout data"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/bootstrap/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.541",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-devex/bootstrap"
+      },
+      "class": "stated in a skill",
+      "sentence": "An answer is recorded once, as a decision in the founder's words with its day, and every section that uses it cites that decision; a changed answer reopens every section that cites it, marking each `PROPOSED` again",
+      "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
+      "heading": "Written from a layout",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/workstream.md",
+          "heading": "Written from a layout"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/bootstrap/SKILL.md",
+          "heading": "The rounds, one section at a time"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/bootstrap/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.542",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-devex/execute"
+      },
+      "class": "stated in a skill",
+      "sentence": "The go on a workstream written from a layout is refused while any section is `PENDING`, or cites a decision newer than the section itself, and the refusal names each such section",
+      "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
+      "heading": "Written from a layout",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/workstream.md",
+          "heading": "Written from a layout"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/bootstrap/SKILL.md",
+          "heading": "The read-back, and the go"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/execute/SKILL.md",
+          "heading": ""
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/execute/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.LAUNCHPAD.CONTROL_PLANE.001",
@@ -37375,6 +37641,30 @@
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.586",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "Each app's row lists the kinds of page it serves, `SITE` for public pages, which take the site look, and `APP` for signed-in pages, which take the app layout, and the scaffold writes one theme setting for each kind from the row: `src/site-theme.ts` exporting `SITE_THEME`, and `src/app-theme.ts` exporting `APP_THEME`",
+      "chapter": "04-capabilities/02-support/01-surface/03-standards-patterns/01-common/05-design-languages.md",
+      "heading": "One source for the platform's look",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/design-languages.md",
+          "heading": "One source for the platform's look — 🔮"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/design-language.md",
           "heading": "The rules this step holds"
         }
       ]
