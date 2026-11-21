@@ -46,14 +46,14 @@ function pageIn(name, text) {
 // `check` reads a page's own geometry — no browser involved, so this is the same on every machine.
 {
   const { out, code } = run(["check", pageIn("check", shared(`<h1>p</h1>\n<figure><svg class="dl-svg" viewBox="0 0 100 60"><rect class="dl-tile" x="10" y="10" width="40" height="20"/></svg></figure>`))]);
-  one("`figure check` runs the geometry check, not the render — it reports pages, not a render's PNG line",
+  one("[MKT.SCRIPTS.17] `figure check` runs the geometry check, not the render — it reports pages, not a render's PNG line",
     out.includes("clean — 1 page") && !out.includes("->"));
-  one("and it exits clean", code === 0);
+  one("[MKT.SCRIPTS.17] and it exits clean", code === 0);
 }
 {
   // VERIFY THE VERIFIER: the same faulty drawing, on a page in the shared form, is reported.
   const { out, code } = run(["check", pageIn("check-bad", shared(drawing("dl-svg", "dl-tile", "dl-wire")))]);
-  one("known-bad: a connector that ends in empty space, on a page that links the shared stylesheet, is refused",
+  one("[MKT.SCRIPTS.17] known-bad: a connector that ends in empty space, on a page that links the shared stylesheet, is refused",
     out.includes("RULE figure") && out.includes("empty space") && code === 1);
 }
 {
@@ -104,18 +104,18 @@ function pageIn(name, text) {
   const coloured = `<pre data-lang="ts"><span class="sds-tk-k">const</span> a = <span class="sds-tk-n">1</span>;</pre>`;
   const plain = `<pre data-lang="ts">const a = 1; // a &lt;tag&gt;</pre>\n<pre data-lang="diff">- today\n+ after</pre>\n<pre>folder/\n  file</pre>`;
   const { out, code } = run(["colour", pageIn("colour", shared(plain))]);
-  one("`figure colour` runs the colour check, not the render: a plain block tagged with its language passes, and so does a block with no language",
+  one("[MKT.SCRIPTS.629] `figure colour` runs the colour check, not the render: a plain block tagged with its language passes, and so does a block with no language",
     out.includes("every code block is plain in its file") && code === 0);
   const bad = run(["colour", pageIn("colour-bad", shared(coloured))]);
-  one("known-bad: a block whose file still carries colour spans is refused, and the finding names its language",
+  one("[MKT.SCRIPTS.629] known-bad: a block whose file still carries colour spans is refused, and the finding names its language",
     bad.out.includes("1 block carries colour in the file") && bad.out.includes("a `ts` block carries colour spans in the file") && bad.code === 1);
-  one("the finding says who colours a block, and what to do", bad.out.includes("the shared script colours it when the page opens: remove the spans"));
+  one("[MKT.SCRIPTS.629] the finding says who colours a block, and what to do", bad.out.includes("the shared script colours it when the page opens: remove the spans"));
   const untagged = run(["colour", pageIn("colour-untagged", shared(`<pre><span class="sds-tk-del">- today</span></pre>`))]);
-  one("known-bad: a block with no language that carries colour spans is refused too",
+  one("[MKT.SCRIPTS.629] known-bad: a block with no language that carries colour spans is refused too",
     untagged.out.includes("a block with no language carries colour spans in the file") && untagged.code === 1);
-  one("each of the seven classes the shared script writes is found, in a block of any language",
+  one("[MKT.SCRIPTS.629] each of the seven classes the shared script writes is found, in a block of any language",
     ["k", "t", "s", "c", "n", "add", "del"].every((name) => colouredBlocks(`<pre data-lang="sql"><span class="sds-tk-${name}">x</span></pre>`).length === 1));
-  one("a span written as text, and a span outside a block, are not colour in a block",
+  one("[MKT.SCRIPTS.629] a span written as text, and a span outside a block, are not colour in a block",
     colouredBlocks(`<p><span class="sds-tk-k">const</span></p>\n<pre data-lang="md">&lt;span class="sds-tk-k"&gt;const&lt;/span&gt;</pre>`).length === 0);
   const own = run(["colour", pageIn("colour-own", `<!-- spn:doc\n{"id": "probe", "variant": "overview", "title": "Probe"}\n-->\n<style>.tk-k{color:red}</style>\n<pre data-lang="ts"><span class="tk-k">const</span> a = 1;</pre>\n`)]);
   one("[MKT.SCRIPTS.108] `figure colour` names a page that holds its own copy once, as a RULE, and reads no block of it",
@@ -148,13 +148,13 @@ function pageIn(name, text) {
   one("[MKT.SCRIPTS.142] `render` with no file says a path is owed, and exits 2",
     noFile.code === 2 && noFile.out === "usage: spn-devex docs figure render <svg-or-html…>\n`docs figure render` needs a path.\n");
   const noPath = run(["check"]);
-  one("`check` with no path says a path is owed, and exits 2",
+  one("[MKT.SCRIPTS.628] `check` with no path says a path is owed, and exits 2",
     noPath.code === 2 && noPath.out === "usage: spn-devex docs figure check <path…> [--variant <name>]\n`docs figure check` needs a path.\n");
-  one("and so does `colour`", run(["colour"]).code === 2 && run(["colour"]).out.includes("`docs figure colour` needs a path."));
+  one("[MKT.SCRIPTS.628] and so does `colour`", run(["colour"]).code === 2 && run(["colour"]).out.includes("`docs figure colour` needs a path."));
   const option = run(["check", svg, "--json"]);
-  one("an option the command does not take is refused by its name, with exit 2",
+  one("[MKT.SCRIPTS.628] an option the command does not take is refused by its name, with exit 2",
     option.code === 2 && option.out.includes("`docs figure check` does not take `--json`."));
-  one("`render` takes no `--variant`", run(["render", svg, "--variant", "overview"]).code === 2);
+  one("[MKT.SCRIPTS.628] `render` takes no `--variant`", run(["render", svg, "--variant", "overview"]).code === 2);
 }
 
 // `draw` is the same drawer offered to a hand-written page: a `.json` spec, or a `.md` page's own
@@ -165,25 +165,25 @@ console.log("\n=== `draw` prints the drawing of a spec a hand-written page holds
   const file = join(BASE, "skel.json");
   writeFileSync(file, JSON.stringify(spec));
   const { out, code } = run(["draw", file]);
-  one("`draw` on a spec file prints one `<figure class=\"dl-figure\">`, the docs design language's", (out.match(/<figure class="dl-figure">/g) ?? []).length === 1);
-  one("with the spec's own caption as `<figcaption>`", out.includes("<figcaption>one named place.</figcaption>"));
-  one("and exits 0 on a spec with no finding", code === 0);
+  one("[MKT.SCRIPTS.630] `draw` on a spec file prints one `<figure class=\"dl-figure\">`, the docs design language's", (out.match(/<figure class="dl-figure">/g) ?? []).length === 1);
+  one("[MKT.SCRIPTS.630] with the spec's own caption as `<figcaption>`", out.includes("<figcaption>one named place.</figcaption>"));
+  one("[MKT.SCRIPTS.630] and exits 0 on a spec with no finding", code === 0);
 
   const page = join(BASE, "skel.md");
   writeFileSync(page, "# A page\n\n```dg\n" + JSON.stringify(spec) + "\n```\n\n```dg\n" + JSON.stringify(spec) + "\n```\n");
   const md = run(["draw", page]);
-  one("a `.md` file's own ```dg``` blocks are drawn in order, one `<figure>` each",
+  one("[MKT.SCRIPTS.630] a `.md` file's own ```dg``` blocks are drawn in order, one `<figure>` each",
     (md.out.match(/<figure class="dl-figure">/g) ?? []).length === 2 && md.code === 0);
 
   const badSpec = { kind: "skeleton", frame: { rows: [{ items: [{}] }] } };
   const badFile = join(BASE, "skel-bad.json");
   writeFileSync(badFile, JSON.stringify(badSpec));
   const bad = run(["draw", badFile]);
-  one("known-bad: an item that is none of the shapes a skeleton has is a finding",
+  one("[MKT.SCRIPTS.630] known-bad: an item that is none of the shapes a skeleton has is a finding",
     bad.out.includes("none of `text`, `note`, `slot`, `icon`, `control`, `standin`, `item`, `spacer` or `frame`") && bad.code === 1);
 
   const noPath2 = run(["draw"]);
-  one("`draw` with no path says a path is owed, and exits 2",
+  one("[MKT.SCRIPTS.628] `draw` with no path says a path is owed, and exits 2",
     noPath2.code === 2 && noPath2.out === "usage: spn-devex docs figure draw <spec.json…> [--case]\n`docs figure draw` needs a path.\n");
 }
 
@@ -200,12 +200,12 @@ console.log("\n=== `draw` reads a flow file against the specs beside it, and dra
   const clean = join(dir, "invite.flow.json");
   writeFileSync(clean, flow([{ on: "Send invite", to: "members" }, { on: "Send invite", to: "invite", state: "FAILED" }]));
   const good = run(["draw", clean]);
-  one("a clean flow file prints no `<figure>`, says it is clean, and exits 0",
+  one("[MKT.SCRIPTS.631] a clean flow file prints no `<figure>`, says it is clean, and exits 0",
     !good.out.includes("<figure>") && good.out.includes("clean — ") && good.code === 0);
   const bad = join(dir, "bad.flow.json");
   writeFileSync(bad, flow([{ on: "Send invite", to: "members", state: "EMPTY" }]));
   const refused = run(["draw", bad]);
-  one("known-bad: a move that lands on a state its page's spec does not draw is a RULE, and exits 1",
+  one("[MKT.SCRIPTS.631] known-bad: a move that lands on a state its page's spec does not draw is a RULE, and exits 1",
     refused.out.includes("✗ RULE flow") && refused.out.includes("draws no view in that state") && refused.code === 1);
 }
 
@@ -222,7 +222,7 @@ console.log("\n=== `--variant` narrows the pages `check` and `colour` read");
   writeFileSync(join(dir, "plain.html"), faulty + offBlock);
 
   const whole = run(["check", dir]);
-  one("known-bad: with no filter `check` reports the fault on all three pages",
+  one("[MKT.SCRIPTS.141] known-bad: with no filter `check` reports the fault on all three pages",
     whole.code === 1 && whole.out.includes("6 figure findings — 6 RULE, 0 SOFT, over 3 pages"));
   const overviews = run(["check", dir, "--variant", "overview"]);
   one("[MKT.SCRIPTS.141] `check --variant overview` reads the page whose block declares that variant, and no other",
@@ -239,13 +239,13 @@ console.log("\n=== `--variant` narrows the pages `check` and `colour` read");
     outside.code === 2 && outside.out.includes("takes `--variant` from approach · overview · construct") && outside.out.includes("and `chapter` is none of them."));
 
   const allBlocks = run(["colour", dir]);
-  one("known-bad: with no filter `colour` reports the block on all three pages", allBlocks.code === 1 && allBlocks.out.includes("3 blocks carry colour in the file"));
+  one("[MKT.SCRIPTS.141] known-bad: with no filter `colour` reports the block on all three pages", allBlocks.code === 1 && allBlocks.out.includes("3 blocks carry colour in the file"));
   const reports = run(["colour", dir, "--variant", "report"]);
   one("[MKT.SCRIPTS.141] `colour --variant report` reads the one page of that variant",
     reports.code === 1 && reports.out.includes("1 block carries colour in the file") && reports.out.includes("report.html") && !reports.out.includes("overview.html"));
   one("[MKT.SCRIPTS.141] the message names the block by its language", reports.out.includes("a `ts` block carries colour spans in the file"));
   const oneFile = run(["check", join(dir, "plain.html")]);
-  one("a path that names one file reads that file alone", oneFile.code === 1 && oneFile.out.includes("over 1 page") && !oneFile.out.includes("overview.html"));
+  one("[MKT.SCRIPTS.141] a path that names one file reads that file alone", oneFile.code === 1 && oneFile.out.includes("over 1 page") && !oneFile.out.includes("overview.html"));
 }
 
 console.log(failed ? `\n  ${failed} of ${n} FAILED` : `\n  all ${n} passed`);

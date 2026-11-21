@@ -237,10 +237,17 @@ function onBox(p: Pt, rects: Rect[]): boolean {
 
 export function checkFigures(src: string): FigureFinding[] {
   const findings: FigureFinding[] = [];
-  const svgs = [...src.matchAll(/<svg[\s\S]*?<\/svg>/g)].map((m) => m[0]);
+  const found = [...src.matchAll(/<svg[\s\S]*?<\/svg>/g)];
+  const svgs = found.map((m) => m[0]);
+  // A DESIGN-LANGUAGE SAMPLE, `<figure class="dl-fig">`, IS A MOCKUP OF THE PRODUCT AND NOT A DOCS FIGURE,
+  // so an svg inside one is passed over the way a skeleton is. Read as a diagram, one design-language
+  // page drew 5,260 box-padding findings.
+  const samples = [...src.matchAll(/<figure\b[^>]*\bclass="(?:[^"]*\s)?dl-fig(?=[\s"])[^>]*>[\s\S]*?<\/figure>/g)]
+    .map((m): [number, number] => [m.index ?? 0, (m.index ?? 0) + m[0].length]);
+  const inSample = (n: number): boolean => samples.some(([a, b]) => (found[n].index ?? 0) >= a && (found[n].index ?? 0) < b);
 
   svgs.forEach((whole, n) => {
-    if (/class="(?:sds-drawing[^"]*\bsds-skeleton|dl-svg[^"]*\bdl-skeleton)\b/.test(whole)) return;
+    if (/class="(?:sds-drawing[^"]*\bsds-skeleton|dl-svg[^"]*\bdl-skeleton)\b/.test(whole) || inSample(n)) return;
     const characters = groupRanges(whole, CHARACTER_GROUP);
     const svg = without(whole, [...groupRanges(whole, GLYPH_GROUP), ...characters,
       ...[...whole.matchAll(CHIP_RECT)].map((c): [number, number, string] => [c.index ?? 0, (c.index ?? 0) + c[0].length, c[0]])]);

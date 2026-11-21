@@ -28,7 +28,26 @@ import { BOOK_PATTERNS, BOOK_SITE_PATTERNS, BOOK_TEMPLATES, PLUGIN_PATTERNS, PLU
 
 
 const HERE = dirname(new URL(import.meta.url).pathname);
-const PLUGIN = resolve(HERE, "..", "..", "..");
+/** The plugin's `src/` this command was loaded from. */
+const OWN_PLUGIN = resolve(HERE, "..", "..", "..");
+/** This plugin's `src/`, under a checkout of the marketplace. */
+const PLUGIN_SEAT = join("packages", "plugin-spn-devex", "src");
+
+/**
+ * The plugin's `src/` a write lands in: the one of the marketplace checkout the command runs in, the
+ * nearest at or above `cwd` that holds this plugin, else the plugin the command was loaded from.
+ *
+ * THE COPIES ARE WRITTEN BESIDE THE CHECKOUT THE COMMAND RUNS IN. `spn-devex` on the path is the
+ * installed plugin's, which is the main checkout's; run from a worktree's checkout, it wrote that
+ * worktree's copies into the main checkout instead (041 S48).
+ */
+export function pluginFor(cwd: string, own: string = OWN_PLUGIN): string {
+  for (let at = resolve(cwd), last = ""; at !== last; last = at, at = dirname(at)) {
+    if (existsSync(join(at, PLUGIN_SEAT, "refs"))) return join(at, PLUGIN_SEAT);
+  }
+  return own;
+}
+const PLUGIN = pluginFor(process.cwd());
 
 /** A rule's parenthesis as the book states it, read from `refs/rules.json` (which the build writes from the book), so the index never names a holder of its own. */
 function ruleParens(id: string): string {

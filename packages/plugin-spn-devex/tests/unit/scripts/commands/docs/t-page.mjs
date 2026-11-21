@@ -359,6 +359,24 @@ console.log("\n=== `docs page` needs its action as a word, and both actions need
   one("[MKT.SCRIPTS.130] and after the write a `check` reads the page as current and exits 0",
     [run(ws, ["page", "check", THING]).includes("current"), exitIn(ws, ["page", "check", THING])].join(), "true,0");
 
+  // A PAGE MOVED BY `docs sds repoint` IS STILL WHAT ITS SEAT FILE PRODUCES: the version and its hash are
+  // rewritten in both served lines, the way the repoint writes them, and the comparison reads that version.
+  {
+    const at = join(ws, pageOf("01-core", "thing"));
+    const written = readFileSync(at, "utf8");
+    const repointed = written.replace(/(assets\/docs\/)\d+\.\d+\.\d+(\/sds-docs\.(?:css|js)")/g, "$19.9.9$2")
+      .replace(/integrity="[^"]*"/g, 'integrity="sha384-repointed"');
+    writeFileSync(at, repointed);
+    one("[MKT.SCRIPTS.627] `check` reads a page repointed to another version as current, and exits 0",
+      [repointed !== written, run(ws, ["page", "check", THING]).includes("current"), exitIn(ws, ["page", "check", THING])].join(), "true,true,0");
+    one("[MKT.SCRIPTS.627] and `write` leaves the version the page links as it is",
+      [run(ws, ["page", "write", THING]).includes("current"), readFileSync(at, "utf8") === repointed].join(), "true,true");
+    writeFileSync(at, `${repointed}<p>a hand edit</p>\n`);
+    one("[MKT.SCRIPTS.627] known-bad: a repointed page with a hand edit is still not what `write` produces",
+      run(ws, ["page", "check", THING]), (got) => got.includes("✗ RULE page") && got.includes("is not what `docs page write` produces"));
+    writeFileSync(at, written);
+  }
+
   run(ws, ["page", "write", CORE]);
   one("a folder names every seat file under it, and no seat file beside it", pages(), "true true false");
   run(ws, ["page", "write", THING, `${EDGE}/gate.md`]);

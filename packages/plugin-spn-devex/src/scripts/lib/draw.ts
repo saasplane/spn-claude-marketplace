@@ -437,6 +437,14 @@ const tileH = (lines: number) => (lines ? up4(33 + LINE_STEP * lines) : H_ONE);
 
 const esc = (s: string) =>
   s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+/**
+ * A spec's caption as the text of a `<figcaption>`, for a drawing printed on its own. `figureOf` writes its caption as markup,
+ * because a page renders the caption's own markdown first; `docs figure draw` has no page around it, so its caption is text,
+ * and a `<` in it wrote an element into the figure (041 follow-ups row 8). An entity the author wrote, such as `&mdash;`, is kept.
+ */
+export const captionText = (s: string): string =>
+  s.replace(/&(?![A-Za-z]+;|#\d+;|#x[0-9A-Fa-f]+;)/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 // A LABEL IS SPOKEN, NOT RENDERED. A caption may carry the page's own markdown — a code span for a
 // contract term, emphasis on one word — and the `<figcaption>` renders it as markup. The `aria-label`
 // is read aloud instead, so the same sentence reaching it verbatim makes a screen reader announce the
@@ -2128,7 +2136,13 @@ function drawMap(
   const reserve = skipping ? GAP_LINKED + GAP_APART * (skipping - 1) : 0;
   const CANVAS = FRAME_W - reserve,
     margin = FRAME_PAD,
-    gapX = chainMode ? 40 : GAP_LINKED;
+    // A CHAIN'S GAP HOLDS ITS WIRE'S LABEL. Several chains are laid with one gap of 40 between their tiles, and a label wider
+    // than 40 less its clear air on each side found no room on its wire, so the placer stood it beside the boxes (041 follow-ups
+    // row 8, on spn-support-ts's figures). The gap is the widest label's, with its clear air, and one gap for every row keeps
+    // the columns lined up.
+    gapX = chainMode
+      ? Math.max(40, up4(Math.max(0, ...links.map((l) => (l.label ?? "").length * W_NOTE)) + LABEL_GAP * 2))
+      : GAP_LINKED;
 
   // A ONE-WAY CHAIN IS A STRAIGHT LINE. When every box has at most one link in and one out and the
   // links form a single path through all of them, the figure is a flow, and a flow reads best as a

@@ -9765,5 +9765,34 @@ console.log("=== a fan-out from one box routes on one shared line (041 N012)");
   one("the fan-out passes the figure check", fan.figure.map((f) => f.message), none);
 }
 
+console.log("\n=== a wire label on one of several chains stands on its wire (041 follow-ups row 8)");
+{
+  // Two chains are two rows; their gap was 40 whatever the labels, so a label wider than 24 found no room and stood beside the boxes.
+  const spec = {
+    kind: "map",
+    boxes: [{ id: "a", label: "Alpha" }, { id: "b", label: "Beta" }, { id: "c", label: "Gamma" },
+      { id: "d", label: "Delta" }, { id: "e", label: "Epsilon" }, { id: "f", label: "Zeta" }],
+    links: [{ from: "a", to: "b", label: "feeds" }, { from: "b", to: "c", label: "then" },
+      { from: "d", to: "e", label: "reads" }, { from: "e", to: "f", label: "writes" }],
+  };
+  const { svg } = draw(spec);
+  const wires = [...svg.matchAll(/<path class="dl-wire" d="M([\d.]+) ([\d.]+) L([\d.]+) [\d.]+"/g)].map((m) => m.slice(1).map(Number));
+  const labels = [...svg.matchAll(/<text class="dl-wlabel" x="([\d.]+)" y="([\d.]+)"[^>]*>([^<]*)</g)].map((m) => ({ x: Number(m[1]), y: Number(m[2]), w: m[3].length * 6 }));
+  const onItsWire = (l) => wires.some(([x1, y, x2]) => l.x >= x1 + 8 && l.x + l.w <= x2 - 8 && y - l.y === 8);
+  one("[MKT.SCRIPTS.633] each label sits over the span of a wire, 8 clear of the tiles at both ends and 8 above the line",
+    labels.map((l) => [l.x, l.y, onItsWire(l)]), (got) => got.length === 4 && got.every(([, , on]) => on));
+  one("[MKT.SCRIPTS.633] and the drawing passes the figure check", checkFigures(svg).map((f) => f.message), none);
+}
+
+console.log("\n=== a caption printed on its own is text, so a `<` in it is escaped (041 follow-ups row 8)");
+{
+  const { captionText } = await import("../../../../src/scripts/lib/draw.ts");
+  const spec = { kind: "chain", caption: "a port < 9000 & the next one &mdash; kept", boxes: [{ id: "a", label: "A" }, { id: "b", label: "B" }] };
+  const out = figureOf(spec, draw(spec).svg, captionText(spec.caption));
+  one("[MKT.SCRIPTS.630] the `<` and the `&` of the caption are written as entities, and the author's own entity is kept",
+    out.match(/<figcaption>[\s\S]*?<\/figcaption>/)?.[0], "<figcaption>a port &lt; 9000 &amp; the next one &mdash; kept</figcaption>");
+  one("[MKT.SCRIPTS.630] known-bad: the caption handed over unescaped writes the `<` raw", figureOf(spec, draw(spec).svg, spec.caption).includes("port < 9000"), true);
+}
+
 console.log(failed ? `\n  ${failed} FAILED` : `\n  all ${n} passed`);
 process.exit(failed ? 1 : 0);
