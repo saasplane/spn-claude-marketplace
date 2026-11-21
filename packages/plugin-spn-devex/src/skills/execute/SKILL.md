@@ -11,7 +11,7 @@ description: Carry out a go. Use the moment the developer gives the go on one ar
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
-      "seen": "47470a11"
+      "seen": "5ad84a2b"
     }
   ]
 }
@@ -38,6 +38,8 @@ description: Carry out a go. Use the moment the developer gives the go on one ar
 7. Generated files, then the release chain, in the order the workspace map gives and the sheets set.
 8. Close: `go check` prints nothing, and every row of the scope is LANDED; then `workstream close <workstream>`.
    When an arc lands, the lead runs `debug cost review` and raises each finding as a suggestion.
+
+- **A handover quotes no decision without naming where it lives** (`RULE.DEVEX.WORKSPACE.545` · MUST · skill:spn-devex/execute). Name the row, the sheet entry or the preview section that holds it; a decision with no such place is written to one first.
 
 ## The rules this step holds
 
@@ -73,3 +75,4 @@ description: Carry out a go. Use the moment the developer gives the go on one ar
 - **Every new case is shown failing on the base before the code it proves, and it fails for the right reason** (`RULE.DEVEX.WORKSPACE.511` · MUST · skill:spn-devex/execute)
 - **Five things an order never does, and every brief says so** (`RULE.DEVEX.WORKSPACE.515` · MUST · skill:spn-devex/execute)
 - **The go on a workstream written from a layout is refused while any section is `PENDING`, or cites a decision newer than the section itself, and the refusal names each such section** (`RULE.DEVEX.WORKSPACE.542` · MUST · skill:spn-devex/execute)
+- **A handover quotes no decision without naming where it lives** (`RULE.DEVEX.WORKSPACE.545` · MUST · skill:spn-devex/execute)

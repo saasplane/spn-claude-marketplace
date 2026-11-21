@@ -86,3 +86,26 @@ export function constructOf(app: string): string | null {
   }
   return null;
 }
+
+/** A part's words that only point at where the choice was made, such as "Decided in 041 N008." or "See the arc". */
+const POINTER = /^(?:decided|recorded|settled|chosen|agreed)\s+(?:in|by|on|at)\b|^(?:see|per|as in|same as|from)\b/i;
+
+/**
+ * The ids of the parts whose whole body is a pointer (RULE.SUPPORT.SURFACE.590). A body is what stands between a part's marker and the next
+ * marker or heading, without comments; a table, a list item or a fenced block is a rule, and a body of more than one short sentence is words.
+ */
+export function pointerParts(source: string): string[] {
+  const lines = source.split("\n");
+  const found: string[] = [];
+  for (let at = 0; at < lines.length; at += 1) {
+    const marker = PART_MARKER.exec(lines[at]);
+    if (!marker) continue;
+    const body: string[] = [];
+    for (let next = at + 1; next < lines.length && !PART_MARKER.test(lines[next]) && !/^#{1,6}\s/.test(lines[next]); next += 1) {
+      if (lines[next].trim()) body.push(lines[next].trim());
+    }
+    const words = body.filter((line) => !/^<!--[\s\S]*-->$/.test(line)).join(" ");
+    if (words && words.length <= 160 && !/[|`]|^[-*]\s/.test(words) && POINTER.test(words)) found.push(marker[1]);
+  }
+  return found;
+}

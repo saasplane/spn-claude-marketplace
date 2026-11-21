@@ -15,7 +15,7 @@ description: Design a page of a SaaS Plane app from the blocks of the design sys
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/",
-      "seen": "62d7150d"
+      "seen": "da37f5d3"
     }
   ]
 }
@@ -38,6 +38,8 @@ Take the scope from the argument: one page, or a flow of pages. A flow is severa
 **Where the ask is to set up Figma, or the check before drawing finds something missing, read `skills/design/steps/setup-figma.md` and run it with the person before anything is drawn.**
 
 **Where the ask is to review the pages of a site or an app, and its design language exists, read `skills/design/steps/page-preview.md`.** It copies each running page with `spn-surface page copy`, applies the decided sections, media and words in the copy only, writes each section's note from its case line, and writes the surface page preview from the template.
+
+**Where the ask is a review of a site, or an arc's final re-check of a site that is running, read `skills/design/steps/site-review.md` and run `skills/design/scripts/site-walk.mjs`.** It walks every page at a phone, a tablet and a desktop width in light and dark and reads computed values: each medium's scale and smallest text, the parts hidden at rest, sideways scroll, the head and the root files. A review of copies alone is not a review of the site.
 
 **Where the ask brings a design of the page, or points at a page to follow, read `skills/design/steps/given-design.md` before step 1, and run the steps below through it.** It is the same skill and the same tree: the facts come first, the design is read once, each of steps 1 to 5 checks the partner's version instead of starting from nothing, and the reply ends on two lists and a stop before any code. It is guidance: the cases guide, and the partner's choice stands wherever they keep it.
 
@@ -375,6 +377,8 @@ page  /orders · purpose: find an order · main action: New order · pattern: Fi
 
 Under the tree, give one line for each task: what the person sees in each task state, and the way back from a failure. Then name what is missing.
 
+**A public page of a web app also owns its head.** The tree names the page's title (ending in the app's name), its description, its canonical path and whether a search engine may list it, so the build sets them through the stack's one head hook when the page loads. The shell holds the default head and no canonical link, and a public site has a `robots.txt`, a `sitemap.xml` and, where it states a privacy commitment, a privacy notice (`RULE.SUPPORT.APPS.269` · MUST · skill:spn-apps/implement). The `implement` skill's `ui` step builds it.
+
 For a flow, write the trees in the order a person meets the pages. Each Move names the page it leads to.
 
 ```text
@@ -671,3 +675,5 @@ Wear the spn-devex plugin's `refs/devex/agent/lenses/ux.md` while you place the 
 - **The render prints `{ "pages": [ { "html", "findings" } ] }` to standard output, one whole page for each page of the tree** (`RULE.SUPPORT.SURFACE.583` · MUST · skill:spn-surface/design)
 - **The render is stateless: it writes no file, keeps no cache of a page and reads no state of an earlier run** (`RULE.SUPPORT.SURFACE.584` · MUST · skill:spn-surface/design)
 - **The design system at the app object's `ds` version is fetched once into the machine's store when no app has it installed** (`RULE.SUPPORT.SURFACE.585` · MUST · skill:spn-surface/design)
+- **A second feature in a band stands at the level of the section's first** (`RULE.SUPPORT.SURFACE.587` · MUST · skill:spn-surface/design)
+- **A site's bands follow the design system's three screen classes and no widths of their own** (`RULE.SUPPORT.SURFACE.588` · MUST · skill:spn-surface/design)

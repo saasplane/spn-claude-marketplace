@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "book": {
     "repository": "spn-foundation",
-    "commit": "64fb1c74"
+    "commit": "bf8e7fae"
   },
   "rules": [
     {
@@ -2384,6 +2384,45 @@
           "plugin": "spn-devex",
           "path": "refs/devex/agent/lenses.md",
           "heading": "What a window carries, and when"
+        }
+      ]
+    },
+    {
+      "id": "RULE.DEVEX.AGENT.181",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-devex/ideate"
+      },
+      "class": "stated in a skill",
+      "sentence": "A panel's reply opens with its verdict, in one of the three words: Pass, Pass with advice or Blocked",
+      "chapter": "04-capabilities/01-devex/02-agent/03-lenses/01-lenses.md",
+      "heading": "What a panel may never do",
+      "decision": "DEC.DEVEX.AGENT.181",
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "agents/spn-panel.md",
+          "heading": "How a convening works"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "agents/spn-panel.md",
+          "heading": "The report"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/agent/lenses.md",
+          "heading": "How a view is made"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "The views that take part"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -13443,6 +13482,11 @@
           "plugin": "spn-devex",
           "path": "skills/ideate/SKILL.md",
           "heading": "The rules this step holds"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/page-preview.md",
+          "heading": "Traps"
         }
       ]
     },
@@ -13614,6 +13658,127 @@
       "heading": "Drawing style",
       "decision": null,
       "restated": []
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.544",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-devex/ideate"
+      },
+      "class": "stated in a skill",
+      "sentence": "A decision you give lives on the arc it moves, written in the reply that agrees it",
+      "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
+      "heading": "An instruction is recorded before it is executed",
+      "decision": "DEC.DEVEX.WORKSPACE.544",
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/workstream.md",
+          "heading": "A decision lives on its arc, a handover names where, and a sample follows its standard"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "While the shape is discussed, a find stays on the ideate arc"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.545",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-devex/execute"
+      },
+      "class": "stated in a skill",
+      "sentence": "A handover quotes no decision without naming where it lives",
+      "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
+      "heading": "An instruction is recorded before it is executed",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/workstream.md",
+          "heading": "A decision lives on its arc, a handover names where, and a sample follows its standard"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/execute/SKILL.md",
+          "heading": ""
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/execute/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.546",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-devex/ideate"
+      },
+      "class": "stated in a skill",
+      "sentence": "A sample follows what it depends on: an edit checks it against the current standard for its kind first, and a standard that lands under it puts a row on the arc to re-cut it",
+      "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
+      "heading": "An arc carries its specification, or names the note that holds it",
+      "decision": "DEC.DEVEX.WORKSPACE.546",
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/workstream.md",
+          "heading": "A decision lives on its arc, a handover names where, and a sample follows its standard"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "While the shape is discussed, a find stays on the ideate arc"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "The rules this step holds"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/page-preview.md",
+          "heading": "Traps"
+        }
+      ]
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.547",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "A surface page sample is checked against the current standard for its kind before it is edited",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "heading": "The surface page preview",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/workstream.md",
+          "heading": "A decision lives on its arc, a handover names where, and a sample follows its standard"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/mock.md",
+          "heading": "The rules this step holds"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/page-preview.md",
+          "heading": "Traps"
+        }
+      ]
     },
     {
       "id": "RULE.LAUNCHPAD.CONTROL_PLANE.001",
@@ -20580,6 +20745,45 @@
       ]
     },
     {
+      "id": "RULE.SUPPORT.APPS.269",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-apps/implement"
+      },
+      "class": "stated in a skill",
+      "sentence": "A public page of a web app carries a complete head: the shell holds the default set, and each page sets its own through the stack's one head hook when it loads",
+      "chapter": "04-capabilities/02-support/02-apps/05-app/02-web/03-public-pages.md",
+      "heading": "9 · The head every public page carries",
+      "decision": "DEC.SUPPORT.APPS.269",
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "providers/ts/skills/implement/steps/ui.md",
+          "heading": "The UI module package (MODULE_WEB)"
+        },
+        {
+          "plugin": "spn-apps",
+          "path": "refs/support/apps/app.md",
+          "heading": "The public pages of a web app are its own pages"
+        },
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/SKILL.md",
+          "heading": "6. State the page as a tree"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/site-review.md",
+          "heading": "The walk"
+        }
+      ]
+    },
+    {
       "id": "RULE.SUPPORT.INFRA.001",
       "level": "MUST",
       "params": {
@@ -23824,6 +24028,30 @@
           "plugin": "spn-infra",
           "path": "refs/support/infra/modules.md",
           "heading": "The app plane is authored"
+        },
+        {
+          "plugin": "spn-infra",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.INFRA.159",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-infra/implement"
+      },
+      "class": "stated in a skill",
+      "sentence": "The edge and the app split a web app's headers: the edge sends transport and framing, and the app sends the content policy",
+      "chapter": "04-capabilities/02-support/03-infra/08-operate/01-deployments.md",
+      "heading": "Web delivery is a store and a pointer",
+      "decision": "DEC.SUPPORT.INFRA.159",
+      "restated": [
+        {
+          "plugin": "spn-infra",
+          "path": "refs/support/infra/operate.md",
+          "heading": "Web delivery is a store and a pointer"
         },
         {
           "plugin": "spn-infra",
@@ -37674,6 +37902,170 @@
           "plugin": "spn-surface",
           "path": "refs/support/surface/design-languages.md",
           "heading": "One source for the platform's look — 🔮"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/design-language.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.587",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "A second feature in a band stands at the level of the section's first",
+      "chapter": "04-capabilities/02-support/01-surface/08-architecture-containers/01-common/01-container.md",
+      "heading": "DSSectionContainer",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/architecture-containers.md",
+          "heading": "The section of a page"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/SKILL.md",
+          "heading": "The rules this step holds"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/site-review.md",
+          "heading": "The walk"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.588",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "A site's bands follow the design system's three screen classes and no widths of their own",
+      "chapter": "04-capabilities/02-support/01-surface/03-standards-patterns/01-common/03-site-patterns.md",
+      "heading": "What holds across",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/site-patterns.md",
+          "heading": "What holds across — 🔮"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/SKILL.md",
+          "heading": "The rules this step holds"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/site-review.md",
+          "heading": "The walk"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.589",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "A drawing beside the words stays legible at the narrowest column it stands in, which is the column at 1024 px",
+      "chapter": "04-capabilities/02-support/01-surface/03-standards-patterns/01-common/05-design-languages.md",
+      "heading": "Media size by placement",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/design-languages.md",
+          "heading": "Media size by placement — 🔮"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/site-patterns.md",
+          "heading": "What holds across — 🔮"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/design-language.md",
+          "heading": "The rules this step holds"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/site-review.md",
+          "heading": "The walk"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.590",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "No part holds a pointer in place of its rule, and a part with nothing of the app's own names the design system's default it follows",
+      "chapter": "04-capabilities/02-support/01-surface/03-standards-patterns/01-common/05-design-languages.md",
+      "heading": "The parts",
+      "decision": "DEC.SUPPORT.SURFACE.590",
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/design-languages.md",
+          "heading": "The parts — 🔮"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/design-language.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.591",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "A sample page draws each drawing in a frame that scales it whole and carries the app's own tokens",
+      "chapter": "04-capabilities/02-support/01-surface/03-standards-patterns/01-common/05-design-languages.md",
+      "heading": "The parts",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/design-languages.md",
+          "heading": "The parts — 🔮"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/design-language.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.592",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "A review of a site, and an arc's final re-check of a site, walks every page of the live site at a phone, a tablet and a desktop width, in light and in dark, and reads computed values",
+      "chapter": "04-capabilities/02-support/01-surface/03-standards-patterns/01-common/05-design-languages.md",
+      "heading": "A site's review walks the site",
+      "decision": "DEC.SUPPORT.SURFACE.592",
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/design-languages.md",
+          "heading": "The parts — 🔮"
         },
         {
           "plugin": "spn-surface",

@@ -1017,6 +1017,16 @@ console.log("\n=== doc-check — a long What on an open approach page holds a fi
   say("[MKT.HOOKS.522] red: a template slot left in is refused", shaped(surface().replace("Home</h1>", "{{THE PAGE'S NAME}}</h1>")), said(surface()));
   say("[MKT.HOOKS.522] red: a frame over another site is refused", shaped(surface('<iframe class="sds-surface-frame" src="https://example.com/" title="Home"></iframe>')));
   say("[MKT.HOOKS.522] red: words of the page's own beside the bar and the frame are refused", shaped(surface(undefined, "<p>The page's own words.</p>")));
+  {
+    const { mkdirSync, writeFileSync } = await import("node:fs");
+    mkdirSync(join(dirname(path), ".pages", "home"), { recursive: true });
+    const copy = join(dirname(path), ".pages", "home", "index.html");
+    const copied = () => check(path, surface()).some(([, m]) => m.includes("RULE.DEVEX.WORKSPACE.536"));
+    writeFileSync(copy, "<html><head></head><body><script>addEventListener('message',function(e){var d=e.data.mode})</script></body></html>");
+    say("[MKT.HOOKS.522] red: a framed copy with no preview-mode meta and the wrong message is refused", copied());
+    writeFileSync(copy, '<html><head><meta name="preview-mode" content="data-theme"></head><body><script>addEventListener("message",function(e){var d=e.data["surface-page-preview"]})</script></body></html>');
+    say("[MKT.HOOKS.522] green: a framed copy with the meta and the listener draws nothing", !copied());
+  }
   say("[MKT.HOOKS.522] red: a bar without its Notes switch is refused", shaped(surface().replace(/<div class="sds-surface-switch"><button type="button" data-surface="notes">Notes<\/button><\/div>/, "")));
 }
 

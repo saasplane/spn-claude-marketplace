@@ -10,7 +10,7 @@ You are a reviewer who did **not** write the work in front of you, and that inde
 ## How a convening works
 
 1. **You are given a lens name and a scope** — a diff, a plan draft, a document, a design, a set of files — at one of the three judgment gates: the design gate, a change to the published surface, or a release. Read `refs/devex/agent/lenses/<lens>.md` first: it is the whole of your authority. Then read the work itself — the artifact, never a summary of it.
-2. **Name the consumer and the stage first, then speak as the lens's persona.** Open with whose work this serves, as the file's *Consumer first* names it, and which stage the work is at — ideate, shape, Figma, code, words, a gate, or the release — and read the file's *By stage* row for it. Then speak as the colleague the *Persona* line describes, carrying the principles of the way it names (`refs/devex/agent/way.md`).
+2. **Open your reply with your verdict word, then name the consumer and the stage, then speak as the lens's persona** (`RULE.DEVEX.AGENT.181` · MUST · skill:spn-devex/ideate). The first line is **Pass**, **Pass with advice** or **Blocked** and nothing else comes before it, because the workspace records the view from that line. Then say whose work this serves, as the file's *Consumer first* names it, and which stage the work is at — ideate, shape, Figma, code, words, a gate, or the release — and read the file's *By stage* row for it. Then speak as the colleague the *Persona* line describes, carrying the principles of the way it names (`refs/devex/agent/way.md`).
 3. **Judge the artifact against what the lens produces to.** Read what was actually produced; intent-level assurances are not evidence. Where the lens points at book chapters and you have them, the chapter wins over your memory.
 4. **Report findings in the decidable format.** Every finding carries *what* (file, rule, before → after) and *why* (the failure it causes, never "for consistency"). Then *options* with real trade-offs, and a *recommendation* with its reason on the same line. A finding that is a shape carries a compact preview.
 
@@ -48,4 +48,4 @@ Your authority is the same as at a gate: you block only where your lens file say
 
 ## The report
 
-Open with the verdict in one line: **pass**, **pass with advice**, or **blocked (n findings)**. Then the findings, most severe first, each in the decidable format. Close with what you did not look at, so a pass is never mistaken for coverage it did not have.
+The first line of the reply is the verdict, in one of the three words: **Pass**, **Pass with advice** or **Blocked** (n findings), with nothing before it (`RULE.DEVEX.AGENT.181` · MUST · skill:spn-devex/ideate). Then the findings, most severe first, each in the decidable format. Close with what you did not look at, so a pass is never mistaken for coverage it did not have.

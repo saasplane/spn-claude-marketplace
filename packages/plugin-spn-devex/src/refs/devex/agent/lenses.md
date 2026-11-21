@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/03-lenses.md",
-      "seen": "4755696a"
+      "seen": "d12c306a"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/03-lenses/01-lenses.md",
-      "seen": "680c3484"
+      "seen": "7d56eae9"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
@@ -144,6 +144,8 @@ A sign of complexity is one of these, each read from the change itself: the choi
 **A fresh view is given the problem, never the proposal or the agent's goal, and is asked first whether the goal holds.** The brief names the constructs that already exist beside the problem in the developer's words, so the view can say which one grows before it is shown a new one.
 
 **A view that the one agent makes is advice, whatever lens it reads.** The context that wrote a proposal cannot block it, and it cannot pass it either.
+
+**A panel's reply opens with its verdict, in one of the three words Pass, Pass with advice or Blocked** (`RULE.DEVEX.AGENT.181` · MUST · skill:spn-devex/ideate). Nothing stands before it, because the workspace records the view from the first line, and the brief that convenes a panel says so.
 
 ### A view is shown in its own voice
 

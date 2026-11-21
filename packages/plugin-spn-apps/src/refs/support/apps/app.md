@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/02-apps/05-app.md",
-      "seen": "aa5950f7"
+      "seen": "394b0e2d"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/05-app/",
-      "seen": "d54f2eab"
+      "seen": "9df00ebc"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/03-module/02-web/03-entry/01-pages.md",
@@ -331,6 +331,7 @@ A public address differs from a module's signed-in route in one way: the signed-
 - **Structured data follows the kind:** `JobPosting` for a job, `Product` with an `Offer` for a product, and the markup matches the visible page.
 - **A sitemap lists the canonical addresses.** robots.txt controls crawling and `noindex` controls indexing, and the two are not used on one address. A demo site, a preview environment and any signed-in page are never indexed.
 - **A closed job** carries a past `validThrough` or answers 404 or 410; **a sold-out item that will return** stays with `OutOfStock`; **one that will not return** answers 410 or redirects to its nearest page, never the home page.
+- **The shell holds the default head, and each public page sets its own through the stack's one head hook when it loads** (`RULE.SUPPORT.APPS.269` · MUST · skill:spn-apps/implement). The shell carries the language, the default title and description, the theme colours, the icons, the share preview, `robots` and the content policy the build writes, and the structured data, and carries no canonical link and no `og:url`. A page sets its title, description, canonical link and share preview, and `noindex` off production; a public site ships `robots.txt` and `sitemap.xml`, and a privacy notice where it states a privacy commitment.
 - **How the app serves the page to a crawler is not settled.** A web app is a static bundle with one `index.html`, one title and one description for every address, so a public page that must carry its own title, markup and status needs a server answer that the deployment chapter does not provide yet. The choice between pre-rendering at build, a rendering edge and a rendering service is the product's to make.
 
 ## What an application owns that a module never does
