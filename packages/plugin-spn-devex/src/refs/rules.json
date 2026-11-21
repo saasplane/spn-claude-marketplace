@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "book": {
     "repository": "spn-foundation",
-    "commit": "bf8e7fae"
+    "commit": "bc896b9b"
   },
   "rules": [
     {
@@ -2423,6 +2423,25 @@
           "plugin": "spn-devex",
           "path": "skills/ideate/SKILL.md",
           "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.DEVEX.AGENT.182",
+      "level": "MUST",
+      "params": {
+        "check": "stop"
+      },
+      "class": "checked",
+      "sentence": "A window that opens on a compaction summary while you are present offers a new window in one line at its first clean point",
+      "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
+      "heading": "A new window by presence",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/workstream.md",
+          "heading": "Work is sized by its kind, and fixes gather into a round"
         }
       ]
     },
@@ -35949,7 +35968,7 @@
       "level": "GUIDE",
       "params": {},
       "class": "guidance",
-      "sentence": "A section takes one emphasis and never two",
+      "sentence": null,
       "chapter": "04-capabilities/02-support/01-surface/03-standards-patterns/01-common/03-site-patterns.md",
       "heading": "What holds across",
       "decision": null,
@@ -38073,6 +38092,19 @@
           "heading": "The rules this step holds"
         }
       ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.593",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "Features that each answer their own question stand in sections of their own; one section holds several features only when they answer one question",
+      "chapter": "04-capabilities/02-support/01-surface/03-standards-patterns/01-common/03-site-patterns.md",
+      "heading": "What holds across",
+      "decision": null,
+      "restated": []
     }
   ]
 }
