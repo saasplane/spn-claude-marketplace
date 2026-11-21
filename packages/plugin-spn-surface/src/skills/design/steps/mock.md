@@ -23,6 +23,7 @@
 - **A skeleton is drawn for one level: the app, a layout with its body, navigation and content, the page level, a container, a widget or a card, or a component. It shows where that level's primary sub-components are placed, each with its own component's name, and sample values fill the rest** (`RULE.DEVEX.WORKSPACE.230` · MUST · skill:spn-surface/design)
 - **A page's skeleton stands in its layout and draws every level: the window, the layout's body, navigation and content, the page level, the containers, the widgets and cards, and the components** (`RULE.DEVEX.WORKSPACE.260` · MUST · skill:spn-surface/design)
 - **A mock of a layout is a `SKELETON` figure drawn by its helper, with a flow file ordering the pages and each page drawn once** (`RULE.DEVEX.WORKSPACE.454` · MUST · skill:spn-surface/design)
+- **A surface page sample is checked against the current standard for its kind before it is edited** (`RULE.DEVEX.WORKSPACE.547` · MUST · skill:spn-surface/design)
 - **A vertical item line spaces its text by its level** (`RULE.SUPPORT.SURFACE.228` · MUST · skill:spn-surface/design)
 - **A unit has its pages in one order, and each page exists only when the unit has something for it** (`RULE.SUPPORT.SURFACE.425` · MUST · skill:spn-surface/design)
 - **The Main page holds these sections in this order, each in one format** (`RULE.SUPPORT.SURFACE.426` · MUST · skill:spn-surface/design)

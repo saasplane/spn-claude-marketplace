@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/01-common/03-site-patterns.md",
-      "seen": "9596f901"
+      "seen": "baf00c37"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/02-web/03-site-patterns.md",
@@ -262,6 +262,7 @@ Every site pattern answers the same questions about its look, in this order (`RU
 - **Points stand flat, and doors stand boxed and raised** (`RULE.SUPPORT.SURFACE.293` · MUST · skill:spn-surface/design). A point is read and a door is pressed, so the look says which before a reader tries.
 - **A grid section is for items that are each a thing of their own** (`RULE.SUPPORT.SURFACE.259` · MUST · skill:spn-surface/design). The parts or points of one subject are a feature's items, because the data decides which, and media alone decides neither.
 - **Every section with items stands at the start, and words are centred only where there is nothing to scan** (`RULE.SUPPORT.SURFACE.346` · GUIDE). A Statement, a Closing call and a hero with no picture are centred. Points, Steps, Doors, a Feature grid and Questions stand at `START`, also where they state the problem the page ends: the fill already says so.
+- **A site's bands follow the design system's three screen classes and no widths of their own** (`RULE.SUPPORT.SURFACE.588` · MUST · skill:spn-surface/design). A phone is under 768 px, a tablet from 768 to 1023 px, and a section stands side by side from 1024 px; under 1024 px every band stacks, the words first. A drawing beside the words stays legible at its column at 1024 px (`RULE.SUPPORT.SURFACE.589` · MUST · skill:spn-surface/design).
 - **Lines that stand side by side are one sentence each, of about one length** (`RULE.SUPPORT.SURFACE.342` · GUIDE). The items of a grid, the cells of a grid section and the options of Choose to see are read across. The budget of each line is the length of the words by level, in `standards-core.md`.
 
 ### Icon or mark

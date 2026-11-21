@@ -160,3 +160,4 @@ Use the `release` skill (bump `version` in `spinfrapkg.json` → `spnutils infra
 - **A deployment is told who it is and where its traces go** (`RULE.SUPPORT.INFRA.154` · MUST · skill:spn-infra/implement)
 - **An application is given a module's settings only when its row names the module** (`RULE.SUPPORT.INFRA.157` · MUST · skill:spn-infra/implement)
 - **The estate publishes whether an environment is production, and only a non-production one may let a request simulate time** (`RULE.SUPPORT.INFRA.158` · MUST · skill:spn-infra/implement)
+- **The edge and the app split a web app's headers: the edge sends transport and framing, and the app sends the content policy** (`RULE.SUPPORT.INFRA.159` · MUST · skill:spn-infra/implement)

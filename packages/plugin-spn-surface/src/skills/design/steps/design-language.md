@@ -9,7 +9,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/01-common/05-design-languages.md",
       "section": "Media size by placement",
-      "seen": "d87e0a0a"
+      "seen": "8cfddb0b"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/01-common/05-design-languages.md",
@@ -76,6 +76,10 @@
 - **`spnutils apps surface theme <app>` refuses an app whose theme setting is out of step with its row** (`RULE.SUPPORT.SURFACE.577` · MUST · skill:spn-surface/design)
 - **The brand is written as one data block, and each app's row as one data block keyed by the app's code, in the design language's construct** (`RULE.SUPPORT.SURFACE.578` · MUST · skill:spn-surface/design)
 - **Each app's row lists the kinds of page it serves, `SITE` for public pages, which take the site look, and `APP` for signed-in pages, which take the app layout, and the scaffold writes one theme setting for each kind from the row: `src/site-theme.ts` exporting `SITE_THEME`, and `src/app-theme.ts` exporting `APP_THEME`** (`RULE.SUPPORT.SURFACE.586` · MUST · skill:spn-surface/design)
+- **A drawing beside the words stays legible at the narrowest column it stands in, which is the column at 1024 px** (`RULE.SUPPORT.SURFACE.589` · MUST · skill:spn-surface/design)
+- **No part holds a pointer in place of its rule, and a part with nothing of the app's own names the design system's default it follows** (`RULE.SUPPORT.SURFACE.590` · MUST · skill:spn-surface/design)
+- **A sample page draws each drawing in a frame that scales it whole and carries the app's own tokens** (`RULE.SUPPORT.SURFACE.591` · MUST · skill:spn-surface/design)
+- **A review of a site, and an arc's final re-check of a site, walks every page of the live site at a phone, a tablet and a desktop width, in light and in dark, and reads computed values** (`RULE.SUPPORT.SURFACE.592` · MUST · skill:spn-surface/design)
 
 Read this before a page of a site or an app is drawn, and while a partner's design language is being made. 
 

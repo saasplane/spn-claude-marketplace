@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/08-architecture-containers.md",
-      "seen": "5b65b9d6"
+      "seen": "d9e9bed2"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/08-architecture-containers/",
-      "seen": "522e6a83"
+      "seen": "ec4b3a10"
     }
   ]
 }
@@ -195,6 +195,7 @@ A section is one part of a page, set apart from the next by a fill of its own an
 - **A section of a page MUST be `DSSectionContainer`, and it MUST be the only unit that gives a part of a page its fill and its room** (`RULE.SUPPORT.SURFACE.243` · MUST · skill:spn-surface/design). The room above and below comes from the section's size and the sides are the layout's space, `--layout-space` (`RULE.SUPPORT.SURFACE.200` · MUST · skill:spn-surface/design), so a page writes no padding, no maximum width and no gutter for a section. A section that is `flush` draws no room of its own on any side (`RULE.SUPPORT.SURFACE.313` · MUST · skill:spn-surface/design). It takes no header, no footer, no frame and no parts, and `DSPanelContainer` takes no section's job.
 - **A section MUST take its room above and below from its size, and hand that size to what it holds** (`RULE.SUPPORT.SURFACE.247` · MUST · skill:spn-surface/design). The size is the app's where it is unset, and every block inside the section takes it, as the blocks in a panel container take the panel's. Each value is a token, `--section-<step>-room` and `--section-<step>-gap`, with a smaller value under the layouts' phone width, and a partner overrides the tokens once for the whole site.
 - **Two or more features stacked in one section MUST stand the section's stack apart, two thirds of its room on the 8 grid** (`RULE.SUPPORT.SURFACE.549` · MUST · skill:spn-surface/design). The token is `--section-<step>-stack`, 64px at `MD` and 40px on a phone, so the features read as blocks of one section and never as two sections; a section that holds one child takes none of it, and an item gap never stands between two features.
+- **A second feature in a band stands at the level of the section's first** (`RULE.SUPPORT.SURFACE.587` · MUST · skill:spn-surface/design). A level that does not allow a feature's `type` draws the default of that level, silently, so a band's second feature at `WIDGET`, which allows only `MEDIA_TOP` and `MEDIA_BOTTOM`, lost its `ITEMS_SPLIT_END`. The features of a band share the level that allows the type the band names.
 
 | Size | Room above and below | Grid gap, or room on each side of a line | Typical use |
 | --- | --- | --- | --- |
