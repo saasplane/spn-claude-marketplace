@@ -103,7 +103,7 @@ import { sessionDir } from "../../../../plugin-support-lib/src/lib/debug-store.t
 import { cacheState, goStandings, welcome } from "./orientation.ts";
 import { begin, span, end, settle, tagsOf } from "../../../../plugin-support-lib/src/lib/timing.ts";
 import { recordUsage, windowSize } from "../lib/usage.ts";
-import { arcsWrittenSince, fromWorkspace, named, readWindow, reposWritten, visitedWorkstreams, windowGoes, windowSet, windowStays } from "../lib/window.ts";
+import { arcsWrittenSince, fromWorkspace, named, noteCompactOffered, readWindow, reposWritten, visitedWorkstreams, windowCompactOffered, windowGoes, windowSet, windowStays } from "../lib/window.ts";
 import { type PresenceState, readPresence } from "../lib/presence.ts";
 
 type Warning = { check: string; message: string };
@@ -2083,22 +2083,7 @@ export function checkWindow(root: string, transcript: string, mine: Set<string>,
   // NEVER WHILE A HELPER RUNS: a row of the window's arcs in progress, or a background helper that has not handed back.
   if (running) return [];
   const always = due >= COST_POINT;
-  const launched = new Map<string, number>();
-  lines.forEach((line, at) => {
-    if (!line.includes('"Agent"') || !line.includes("run_in_background")) return;
-    try {
-      const entry = JSON.parse(line) as { type?: string; message?: { content?: unknown } };
-      if (entry.type !== "assistant" || !Array.isArray(entry.message?.content)) return;
-      for (const block of entry.message!.content as Array<Record<string, unknown>>) {
-        const input = (block.input ?? {}) as Record<string, unknown>;
-        if (block.type === "tool_use" && block.name === "Agent" && input.run_in_background === true) launched.set(String(block.id), at);
-      }
-    } catch { /* a torn line is skipped */ }
-  });
-  for (const [id, at] of launched) {
-    const handed = `<tool-use-id>${id}</tool-use-id>`;
-    if (!lines.slice(at + 1).some((line) => line.includes(handed))) return [];
-  }
+  if (helperOut(lines)) return [];
   if (!always && checkWorkstreamState(root, mine).length) return [];
   const written = "Write every open point first: a suggestion as S<n>, a question as a card, decided work as a row. ";
   // THE OFFER IS WHERE A PERSON LEARNS HOW WINDOWS WORK (01-workstream.md § The agent offers a new window):
@@ -2113,6 +2098,54 @@ export function checkWindow(root: string, transcript: string, mine: Set<string>,
     : due >= COST_POINT
     ? `${head}, and each reply now costs several times what a fresh window's does and takes longer. ${written}Then say in one plain sentence that replies are getting slow and dear${presence === "PRESENT" ? ", and that a new window would help" : ""}. ${PERSON}`
     : `${head}, and the point is clean: no order running, \`workstream state check\` whole. ${written}${offer}${PERSON}`;
+  return [{ check: "window", message }];
+}
+
+/** Whether a background helper launched in this transcript has not handed back: no line may be said while one runs. */
+function helperOut(lines: string[]): boolean {
+  const launched = new Map<string, number>();
+  lines.forEach((line, at) => {
+    if (!line.includes('"Agent"') || !line.includes("run_in_background")) return;
+    try {
+      const entry = JSON.parse(line) as { type?: string; message?: { content?: unknown } };
+      if (entry.type !== "assistant" || !Array.isArray(entry.message?.content)) return;
+      for (const block of entry.message!.content as Array<Record<string, unknown>>) {
+        const input = (block.input ?? {}) as Record<string, unknown>;
+        if (block.type === "tool_use" && block.name === "Agent" && input.run_in_background === true) launched.set(String(block.id), at);
+      }
+    } catch { /* a torn line is skipped */ }
+  });
+  for (const [id, at] of launched) {
+    const handed = `<tool-use-id>${id}</tool-use-id>`;
+    if (!lines.slice(at + 1).some((line) => line.includes(handed))) return true;
+  }
+  return false;
+}
+
+/** Whether the transcript shows the window opened on a compaction summary: a user entry the harness marks `isCompactSummary`. */
+function opensOnSummary(lines: string[]): boolean {
+  return lines.some((line) => {
+    if (!line.includes('"isCompactSummary"')) return false;
+    try { const entry = JSON.parse(line) as { type?: string; isCompactSummary?: boolean }; return entry.type === "user" && entry.isCompactSummary === true; }
+    catch { return false; }
+  });
+}
+
+/**
+ * THE COMPACTION OFFER (RULE.DEVEX.AGENT.182). A window that opens on a compaction summary while the developer is PRESENT offers a
+ * new window in one line at its first clean point (the window check's own: no row running, no helper out, `workstream state check`
+ * whole), whatever its size. Said once (`said`, kept in the window's note), never while WATCHING or AWAY, and muted by "stay".
+ */
+export function checkCompactOffer(root: string, transcript: string, mine: Set<string>, running: boolean,
+                                  presence: PresenceState = "PRESENT", stays = false, said = false): Warning[] {
+  if (presence !== "PRESENT" || stays || said || running) return [];
+  const lines = transcript.split("\n");
+  if (!opensOnSummary(lines) || helperOut(lines)) return [];
+  if (checkWorkstreamState(root, mine).length) return [];
+  const message = "This window opened on a compaction summary, which dropped detail, and the point is clean: no order running, `workstream state check` whole. " +
+    "Write every open point first: a suggestion as S<n>, a question as a card, decided work as a row. " +
+    "Then end your reply with the handover and, in one plain sentence beside it, the offer of a new window: it starts clean with the handover and the workstream's folder, " +
+    "which carry every open point. The developer decides: if they say stay, say nothing more about it. " + PERSON;
   return [{ check: "window", message }];
 }
 
@@ -2229,7 +2262,15 @@ if (argv1Base === "stop.ts" || argv1Base === "stop.mjs") {
     // A MAIN WINDOW ONLY, AND NOT WHERE THE TURN CONTINUES BECAUSE A HOOK SPOKE: the offer is made once.
     ...span({ group: "stop", action: "window" }, () => {
       if (event.agent_id || event.stop_hook_active === true || !event.transcript_path) return [];
-      try { return checkWindow(root, readFileSync(event.transcript_path, "utf8"), mine, running, presence.state, windowStays(root, session)); } catch { return []; }
+      try {
+        const transcript = readFileSync(event.transcript_path, "utf8");
+        const stays = windowStays(root, session);
+        const sized = checkWindow(root, transcript, mine, running, presence.state, stays);
+        if (sized.length) return sized;
+        const offer = checkCompactOffer(root, transcript, mine, running, presence.state, stays, windowCompactOffered(root, session));
+        if (offer.length) noteCompactOffered(root, session);
+        return offer;
+      } catch { return []; }
     }),
   ];
   // WHILE A ROW IS IN PROGRESS, ONLY A FINDING ABOUT THE REPLY IS SAID (RULE.DEVEX.WORKSPACE.244).
