@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "book": {
     "repository": "spn-foundation",
-    "commit": "4be5a1c8"
+    "commit": "df78fb29"
   },
   "rules": [
     {
@@ -13601,6 +13601,19 @@
           "heading": "The rules this step holds"
         }
       ]
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.543",
+      "level": "MUST",
+      "params": {
+        "check": "doc-check"
+      },
+      "class": "checked",
+      "sentence": "A wire carries no arrowhead",
+      "chapter": "02-constructs/01-devex/04-workspace/06-docs-design-language.md",
+      "heading": "Drawing style",
+      "decision": null,
+      "restated": []
     },
     {
       "id": "RULE.LAUNCHPAD.CONTROL_PLANE.001",

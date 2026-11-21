@@ -21,7 +21,7 @@ import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync, statSync } from "node:fs";
 import { basename, dirname, extname, join, relative } from "node:path";
 import { checkFigures, colouredBlocks, handDrawnFigures } from "../../lib/figures.ts";
-import { draw, figureOf } from "../../lib/draw.ts";
+import { captionText, draw, figureOf } from "../../lib/draw.ts";
 import { readFlow } from "../../lib/flow.ts";
 import { type Action, FLAG, REQUIRED, readWords, scopeOf } from "../../../../../plugin-support-lib/src/lib/command.ts";
 import { DEVEX_WORKSTREAMS, DOCS, hasSegment, slashes } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
@@ -313,7 +313,7 @@ function drawSpecs(args: string[]): number {
       catch (e) { total += 1; console.log(`✗ RULE figure    ${relative(workspace, file)}\n         spec${i + 1}: not valid JSON — ${(e as Error).message}`); return; }
       const { svg, findings } = draw(spec as Parameters<typeof draw>[0]);
       for (const f of findings) { total += 1; console.log(`✗ RULE figure    ${relative(workspace, file)}\n         spec${i + 1}: ${f}`); }
-      if (svg) console.log(figureOf(spec as Parameters<typeof draw>[0], svg, spec.caption, { caseLine: words.given("case") }));
+      if (svg) console.log(figureOf(spec as Parameters<typeof draw>[0], svg, captionText(spec.caption ?? ""), { caseLine: words.given("case") }));
     });
   }
   return total ? 1 : 0;

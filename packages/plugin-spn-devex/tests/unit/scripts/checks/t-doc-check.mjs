@@ -1042,7 +1042,7 @@ console.log("\n=== doc-check — a long What on an open approach page holds a fi
   say("[RULE.DEVEX.WORKSPACE.523] [MKT.HOOKS.524] red: a hand-drawn `sds-drawing` figure on a produced page is a RULE that says to draw it from a spec",
     one.length === 1 && one[0][0] === "RULE" && one[0][1].includes("sds-drawing") && one[0][1].includes("docs figure draw"), JSON.stringify(one));
   say("[RULE.DEVEX.WORKSPACE.523] [MKT.HOOKS.524] red: a skeleton in the flat drawing's classes is named as one", hand(artifact, page(SKELETON)).some(([, m]) => m.includes("sds-skeleton")));
-  say("[RULE.DEVEX.WORKSPACE.523] [MKT.HOOKS.524] red: an arrowhead (`marker-end`) on a figure in the language's classes is named",
+  say("[RULE.DEVEX.WORKSPACE.523] [RULE.DEVEX.WORKSPACE.543] [MKT.HOOKS.524] red: an arrowhead (`marker-end`) on a figure in the language's classes is named",
     hand(preview, page(ARROW)).some(([, m]) => m.includes("marker-end")), JSON.stringify(hand(preview, page(ARROW))));
   say("[RULE.DEVEX.WORKSPACE.523] [MKT.HOOKS.524] red: the saved preview is read for it at a turn's end",
     (() => { mkdirSync(dirname(preview), { recursive: true }); writeFileSync(preview, page(FLAT)); return docCheck.pageRulesOnDisk(preview).some((m) => m.includes("RULE.DEVEX.WORKSPACE.523")); })());

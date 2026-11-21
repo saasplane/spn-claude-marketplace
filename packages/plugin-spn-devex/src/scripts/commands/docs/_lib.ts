@@ -912,6 +912,29 @@ export function checkFurniture(file: string, src: string): Finding[] {
     "Link one of them, or cut the version with `docs sds cut` (05-artifacts.md, One stylesheet, served in versions)" }];
 }
 
+/** A whole opening tag of a `<link>` or `<script>` that loads one of the served files from a version's folder. */
+const SERVED_ELEMENT = new RegExp(
+  `<(?:link|script)\\b[^>]*\\b(?:href|src)="[^"]*/\\d+\\.\\d+\\.\\d+/(?:${SERVED_FILES.map((served) => served.replace(/\./g, "\\.")).join("|")})"[^>]*>`, "gi");
+
+/** An element with its version, its `integrity` and its `crossorigin` taken out: what is left is what a page says besides the version. */
+const shapeOf = (element: string): string =>
+  element.replace(/\/\d+\.\d+\.\d+\//, "/{version}/").replace(/\s+integrity="[^"]*"/i, "").replace(/\s+crossorigin(?:="[^"]*")?/i, "");
+
+/**
+ * A produced page, with each line that loads a served file taken from the page on disk where the two
+ * differ only in the version and its hash.
+ *
+ * `docs page write` writes the version the template links, and `docs sds repoint` moves a page to
+ * another version with its hash. A REPOINTED PAGE IS STILL WHAT THE SEAT FILE PRODUCES, so the
+ * comparison reads the version the page links now. Whether that version exists is the furniture
+ * check's, which names a version nobody cut.
+ */
+export function asLinkedBy(produced: string, onDisk: string): string {
+  const linked = [...onDisk.matchAll(SERVED_ELEMENT)].map((found) => found[0]);
+  if (!linked.length) return produced;
+  return produced.replace(SERVED_ELEMENT, (element) => linked.find((own) => shapeOf(own) === shapeOf(element)) ?? element);
+}
+
 /**
  * A page's stylesheet closes every brace it opens.
  *
@@ -1420,7 +1443,7 @@ export function checkProduced(file: string, src: string, block: any, workspace: 
   } catch (e) {
     return [{ check: "produced", grade: "SOFT", file, message: `the page could not be produced for comparison — ${(e as Error).message}` }];
   }
-  if (html === src) return [];
+  if (asLinkedBy(html, src) === src) return [];
   return [{ check: "produced", grade: "RULE", file,
     message: `this page is not what \`docs.ts page\` produces from ${relative(workspace, seat)}. A page is never edited by hand: edit the seat file and produce it again` }];
 }
@@ -2652,7 +2675,8 @@ export function pageFor(seat: string, workspace: string, templates: string, writ
   if (rf.some((r) => r.stops)) return findings;
   for (const [grade, message] of blockFit(markdown, false, "seat")) findings.push({ check: "fit", grade: grade as Grade, file: seat, message });
   const before = existsSync(out) ? readFileSync(out, "utf8") : "";
-  if (before === html) { console.log(`current  ${relative(workspace, out)}`); return findings; }
+  // A PAGE MOVED TO ANOTHER VERSION BY `docs sds repoint` IS CURRENT, and a write leaves its version as it is.
+  if (before && asLinkedBy(html, before) === before) { console.log(`current  ${relative(workspace, out)}`); return findings; }
   if (write) {
     mkdirSync(dirname(out), { recursive: true });
     writeFileSync(out, html);

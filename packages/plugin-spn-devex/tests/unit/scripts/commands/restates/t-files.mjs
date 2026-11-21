@@ -9,7 +9,8 @@ import { dirname, join } from "node:path";
 import { PLUGIN } from "../../../../helpers/harness.mjs";
 import { BOOK_TEMPLATES } from "../../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { BOOK_PATTERNS, BOOK_SITE_PATTERNS, PLUGIN_PATTERNS, PLUGIN_SITE_PATTERNS } from "../../../../../../plugin-support-lib/src/lib/docs-tree.ts";
-import { exportTemplates, PATTERNS_SET, SITE_PATTERNS_SET } from "../../../../../src/scripts/commands/restates/files.ts";
+import { PLUGIN_TEMPLATES } from "../../../../../../plugin-support-lib/src/lib/docs-tree.ts";
+import { exportTemplates, PATTERNS_SET, SITE_PATTERNS_SET, pluginFor } from "../../../../../src/scripts/commands/restates/files.ts";
 
 const BASE = mkdtempSync(join(tmpdir(), "t-restates-files-"));
 process.on("exit", () => rmSync(BASE, { recursive: true, force: true }));
@@ -216,6 +217,20 @@ console.log("\n=== restates files — the action is a word, and both actions nee
   ok("[MKT.SCRIPTS.168] `check <book>` compares this plugin's own copies with that book, reports them behind, and exits 1",
     read.code === 1 && /behind the book/.test(read.out) && read.out.includes("run `spn-devex restates files write <book>`"), `exit ${read.code}\n${read.out}`);
   ok("[MKT.SCRIPTS.168] and `check` writes nothing: the book still has no index", !existsSync(join(book, BOOK_TEMPLATES, "index.md")));
+
+  // THE COPIES LAND BESIDE THE CHECKOUT THE COMMAND RUNS IN (041 S48): the `spn-devex` on the path is the
+  // main checkout's, and run from a worktree it wrote that worktree's copies into the main checkout.
+  const checkout = join(BASE, "a-worktree", "spn-claude-marketplace");
+  const seat = join(checkout, "packages", "plugin-spn-devex", "src");
+  mkdirSync(join(seat, "refs"), { recursive: true });
+  mkdirSync(join(checkout, "docs"), { recursive: true });
+  ok("[MKT.SCRIPTS.632] the plugin a write lands in is the one of the checkout the command runs in, from any folder inside it",
+    pluginFor(checkout, "/own") === seat && pluginFor(join(checkout, "docs"), "/own") === seat, pluginFor(join(checkout, "docs"), "/own"));
+  ok("[MKT.SCRIPTS.632] and outside a checkout it is the plugin the command was loaded from", pluginFor(here, "/own") === "/own");
+  const { book: worktreeBook } = pair(BOOK, {});
+  const wrote = typed(join(checkout, "docs"), "write", worktreeBook);
+  ok("[MKT.SCRIPTS.632] `write` typed inside that checkout writes the copies into it",
+    wrote.code === 0 && readFileSync(join(seat, PLUGIN_TEMPLATES, "pages", "report-template.html"), "utf8") === BOOK["pages/report-template.html"], `exit ${wrote.code}\n${wrote.out}`);
 }
 
 console.log(failed ? `\n  ${failed} of ${total} FAILED — restates files` : `\n  all ${total} passed — restates files`);
