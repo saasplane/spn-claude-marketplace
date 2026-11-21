@@ -681,6 +681,24 @@ export function surfacePageShape(text: string): Finding[] {
   return [["RULE", `a surface page preview ${parts.join(", and ")} (RULE.DEVEX.WORKSPACE.535) · keep to the template: the bar and the frame only, and the page's own words in its copy`]];
 }
 
+/**
+ * RULE.DEVEX.WORKSPACE.536: the copy a surface page preview frames names its own mode switch in a `preview-mode` meta and listens for the
+ * bar's message `{ "surface-page-preview": { mode, notes } }`, whichever way it was made. Read only where the framed copy sits beside the
+ * preview as a file; a copy that is not there is not judged here.
+ */
+export function surfacePageCopy(path: string, text: string): Finding[] {
+  const bare = text.replace(/<!--[\s\S]*?-->/g, " ");
+  const src = /<iframe\b[^>]*class="[^"]*sds-surface-frame[^"]*"[^>]*\bsrc="([^"]*)"/.exec(bare)?.[1];
+  if (!src || /^([a-z][a-z0-9+.-]*:|\/)/i.test(src)) return [];
+  let copy: string;
+  try { copy = readFileSync(join(dirname(path), src.split(/[?#]/)[0]), "utf8"); } catch { return []; }
+  const missing: string[] = [];
+  if (!/<meta\s+name="preview-mode"/i.test(copy)) missing.push("the `preview-mode` meta");
+  if (!/surface-page-preview/.test(copy)) missing.push("a listener for the message `{ \"surface-page-preview\": { mode, notes } }`");
+  if (!missing.length) return [];
+  return [["RULE", `the page a surface page preview frames (${src}) lacks ${missing.join(" and ")} (RULE.DEVEX.WORKSPACE.536) · a page made by any other means carries the same meta and listener, or the bar's switches do nothing`]];
+}
+
 /** An arc's preview, by its fixed name in `notes/<arc>/` (`N<nnn>`, `ideate` or `follow-ups`). */
 const isArcPreview = (path: string): boolean => new RegExp(`[\\\\/]notes[\\\\/]${ARC_PART}[\\\\/]preview\\.html$`).test(path);
 
@@ -1376,7 +1394,7 @@ export function check(path: string, text: string, fragment = false): Finding[] {
     return found;
   }
   // A surface page preview is a bar and a frame (RULE.DEVEX.WORKSPACE.535): the template's shape is all it is read for, never an arc's preview's.
-  if (isHtml && !fragment && isSurfacePreviewText(text)) return [...structural(path), ...uncutVersions(text), ...surfacePageShape(text)];
+  if (isHtml && !fragment && isSurfacePreviewText(text)) return [...structural(path), ...uncutVersions(text), ...surfacePageShape(text), ...surfacePageCopy(path, text)];
   const isApproach = isApproachPage(path);
   const isOverview = path.endsWith("-overview.html");
   const prose = proseOf(text, isHtml);

@@ -41,5 +41,15 @@ writeFileSync(construct, filled.replace('"template": 2', '"template": 9'));
 const future = run("check", dir, "--construct", construct);
 ok("[MKT.SCRIPTS.619] a block of template 9 is refused naming the version", future.code === 1 && future.out.includes("names template 9"), future.out);
 
+console.log("\n=== language check — a part holds its rule, never a pointer to it");
+writeFileSync(construct, filled);
+const pointerText = filled + "\n#### Colour and strength\n<!-- spn:part media-style.colour-and-strength status=SET applies=SITE samples=none -->\n\nDecided in 041 N008.\n";
+writeFileSync(construct, pointerText);
+const pointer = run("check", dir, "--construct", construct);
+ok("[MKT.SCRIPTS.621] a part that reads only a pointer is refused naming its id", pointer.code === 1 && pointer.out.includes("REFUSED language-pointer") && pointer.out.includes("media-style.colour-and-strength"), pointer.out);
+writeFileSync(construct, filled + "\n#### Colour and strength\n<!-- spn:part media-style.colour-and-strength status=DEFAULT applies=SITE samples=none -->\n\nThe design system's neutral ramp, with the accent on one unit.\n");
+const named = run("check", dir, "--construct", construct);
+ok("[MKT.SCRIPTS.621] a part that names the default it follows passes", named.code === 0, named.out);
+
 console.log(failed ? `\n  ${failed} of ${total} FAILED` : `\n  all ${total} passed`);
 process.exit(failed ? 1 : 0);
