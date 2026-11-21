@@ -38104,7 +38104,13 @@
       "chapter": "04-capabilities/02-support/01-surface/03-standards-patterns/01-common/03-site-patterns.md",
       "heading": "What holds across",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     }
   ]
 }
