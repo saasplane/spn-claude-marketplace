@@ -36,6 +36,8 @@ export type WindowNote = {
   goes: Record<string, "start" | "write" | "handover">;
   /** The developer said to stay in this window: the offer lines of the window check are muted for the rest of it. Absent before this field. */
   stay?: boolean;
+  /** The one-line offer of a new window after a compaction summary (RULE.DEVEX.AGENT.182) was said in this window. Absent before this field. */
+  compactOffered?: boolean;
 };
 
 const empty = (): WindowNote => ({ workstreams: {}, wrote: {}, told: {}, repos: {}, goes: {} });
@@ -68,6 +70,7 @@ export function readWindow(root: string, session: string | undefined): WindowNot
     // A note written before the field has no welcome, and reads it absent.
     if (held?.welcome === "whole" || held?.welcome === "short") note.welcome = held.welcome;
     if (held?.stay === true) note.stay = true;
+    if (held?.compactOffered === true) note.compactOffered = true;
     return note;
   } catch { return empty(); }
 }
@@ -288,6 +291,20 @@ export function noteStay(root: string, session: string | undefined): void {
   if (note.stay) return;
   note.stay = true;
   save(root, session, note);
+}
+
+/** Record that the compaction-summary offer was said in this window, so it is said once. Never throws. */
+export function noteCompactOffered(root: string, session: string | undefined): void {
+  if (!windowFile(root, session)) return;
+  const note = readWindow(root, session);
+  if (note.compactOffered) return;
+  note.compactOffered = true;
+  save(root, session, note);
+}
+
+/** Whether the compaction-summary offer was already said in this window. */
+export function windowCompactOffered(root: string, session: string | undefined): boolean {
+  return readWindow(root, session).compactOffered === true;
 }
 
 /** Whether the developer said to stay in this window. */

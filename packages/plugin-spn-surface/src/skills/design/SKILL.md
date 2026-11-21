@@ -677,3 +677,4 @@ Wear the spn-devex plugin's `refs/devex/agent/lenses/ux.md` while you place the 
 - **The design system at the app object's `ds` version is fetched once into the machine's store when no app has it installed** (`RULE.SUPPORT.SURFACE.585` · MUST · skill:spn-surface/design)
 - **A second feature in a band stands at the level of the section's first** (`RULE.SUPPORT.SURFACE.587` · MUST · skill:spn-surface/design)
 - **A site's bands follow the design system's three screen classes and no widths of their own** (`RULE.SUPPORT.SURFACE.588` · MUST · skill:spn-surface/design)
+- **Features that each answer their own question stand in sections of their own; one section holds several features only when they answer one question** (`RULE.SUPPORT.SURFACE.593` · MUST · skill:spn-surface/design)
