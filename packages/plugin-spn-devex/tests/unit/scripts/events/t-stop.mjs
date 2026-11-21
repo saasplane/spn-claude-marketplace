@@ -1566,6 +1566,30 @@ console.log("\n=== window — a new window is offered from 200k at a clean point
   check("window by presence: a line said at 310k is not said again at 350k", says(350, "PRESENT", false, feedback(310, 300)).length === 0);
   check("window by presence: past 400k with the 300k line said, the 400k line is said", /past 400k/.test(says(410, "PRESENT", false, feedback(310, 300))[0]?.message));
 
+  // THE COMPACTION OFFER (RULE.DEVEX.AGENT.182): a window that opened on a compaction summary, offered once at its first clean point.
+  const { checkCompactOffer } = await import("../../../../src/scripts/events/stop.ts");
+  const summary = { type: "user", isCompactSummary: true, isVisibleInTranscriptOnly: true, message: { role: "user", content: "This session is being continued from a previous conversation that ran out of context." } };
+  const compacted = (...before) => [summary, lines["bash-row-write"], ...before, sized(40, "msg_c40")].map((line) => JSON.stringify(line)).join("\n") + "\n";
+  const offered = (presence, stays = false, said = false, running = false, transcript = compacted()) => checkCompactOffer(wroot, transcript, mine, running, presence, stays, said);
+  check("[RULE.DEVEX.AGENT.182] [MKT.HOOKS.526] compaction offer: PRESENT, a summary window at a clean point is offered a new window, at any size",
+    offered("PRESENT").length === 1 && offered("PRESENT")[0].check === "window" && /compaction summary/.test(offered("PRESENT")[0].message));
+  check("[MKT.HOOKS.526] compaction offer: not said while AWAY or WATCHING", offered("AWAY").length === 0 && offered("WATCHING").length === 0);
+  check("[MKT.HOOKS.526] compaction offer: muted by stay", offered("PRESENT", true).length === 0);
+  check("[MKT.HOOKS.526] compaction offer: said once, so not when the window's note records it", offered("PRESENT", false, true).length === 0);
+  check("[MKT.HOOKS.526] compaction offer: not while a row runs", offered("PRESENT", false, false, true).length === 0);
+  check("[MKT.HOOKS.526] compaction offer: not while a background helper has not handed back",
+    offered("PRESENT", false, false, false, compacted(lines["agent-background-pending"])).length === 0);
+  check("[MKT.HOOKS.526] compaction offer: a window with no compaction summary hears nothing at 40k", offered("PRESENT", false, false, false, text(40)).length === 0);
+  {
+    const { root: sroot } = await dataWorkspace("compact-offer-hook");
+    writeFileSync(join(sroot, "summary.jsonl"), compacted());
+    bindOpen(sroot, "compact-w");
+    const stopHook = () => run("node", [`${HOOKS}/src/scripts/events/stop.ts`], { cwd: sroot, session_id: "compact-w", transcript_path: join(sroot, "summary.jsonl"), last_assistant_message: "done" }, sroot);
+    const first = stopHook();
+    check("[MKT.HOOKS.526] compaction offer: the Stop hook says it, and records it in the window's note", /\[window\]/.test(first) && /compactOffered/.test(readFileSync(join(sroot, ".spndevex", ".debug", "sessions", "compact-w", "window.json"), "utf8")), first);
+    check("[MKT.HOOKS.526] compaction offer: the next Stop does not say it again", !/\[window\]/.test(stopHook()));
+  }
+
   // THE HOLD CHECK, while the developer is away.
   const held = await dataWorkspace("hold-away");
   const decided = (data) => { data.status = "DECIDED"; };
