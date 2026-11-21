@@ -180,6 +180,20 @@ spn-devex workstream go wait <workstream>/<arc> <part> (--on "…" | --clear) �
 
 spn-devex workstream handover <workstream> [--continue "…"] [--do-not-touch "…"] — the handover block, written from the rows, the cards, the live orders and the pins into the arc's log, and printed
 
+spn-devex workstream layout write <workstream> [--known <section>=<words> …] [--layout <file>] — write the workstream's sections from bootstrap's layout data, every one Pending, and print the arcs to open
+
+spn-devex workstream layout answer <workstream> <section>[,<section>…] --said "…" [--known "…"] — record the founder's answer once, as a decision every named section cites, each then Proposed
+
+spn-devex workstream layout change <workstream> <decision> --said "…" — change a recorded answer, reopening every section that cites it
+
+spn-devex workstream layout decide <workstream> <section>[,<section>…] — mark sections Decided on the founder's yes
+
+spn-devex workstream layout strike <workstream> <section>[,<section>…] --said "…" — strike a part that does not apply, by the founder's recorded words
+
+spn-devex workstream layout check <workstream> — refuse the go while a section is Pending or cites a decision newer than itself
+
+spn-devex workstream layout show <workstream> [--json] — print each section's state, Known or Needed, and the decisions
+
 spn-devex workstream open --file <block.json> --note "<the developer's words>" [--backlog "<the blocker>"] — open a workstream from the six-things block: the next number, its folder, its approach page, its ideate arc and its follow-up arc
 
 spn-devex workstream progress write <workstream> — regenerate the progress block in the approach page's Plan

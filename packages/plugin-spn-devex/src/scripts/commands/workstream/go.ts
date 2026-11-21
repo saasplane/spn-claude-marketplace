@@ -27,6 +27,7 @@ import { refFile } from "../../lib/work-map.ts";
 import { arcDataDir, arcIdsOf, logEvent, logFileOf, notesDirOf, readArc, readJson, readJsonl, readSheet, workspaceOf, writeWhole } from "../../lib/workstream.ts";
 import { DONE_STATES, GO_PART_SETTLED, renameDataToWork, type ArcData, type GoPart, type GoPlan, type SheetEntry } from "../../lib/workstream-schema.ts";
 import { arcNamed, listOf, workstreamNamed } from "./_shared.ts";
+import { layoutFindings, readLayout } from "./layout.ts";
 import { sizedStop } from "../../checks/child-size.ts";
 import { panelOnRecord, panelsVisible } from "../../checks/split-plan.ts";
 import { patchOwed, renameFirstRead, sheetFindings, stepIsWhole } from "./sheet.ts";
@@ -319,6 +320,10 @@ function write(args: string[]): number {
   const [ref, ...more] = words.paths;
   if (more.length) throw new UsageFault("takes one arc.");
   const { ws, arc: lead } = arcNamed(ref);
+  // A WORKSTREAM WRITTEN FROM A LAYOUT waits on every section: one Pending, or citing a newer decision, refuses the go (RULE.DEVEX.WORKSPACE.542).
+  const layout = readLayout(ws);
+  const waiting = layout ? layoutFindings(layout) : [];
+  if (waiting.length) { console.log(`Refused: the go waits on ${waiting.length} section${waiting.length === 1 ? "" : "s"} of the layout: ${waiting.join(" · ")}. Nothing was written.`); return 1; }
   const scope = listOf(words, "scope") ?? [lead];
   const { sheets, arcs, faults } = scopeOf(ws, scope, lead, workspaceOf() ?? process.cwd());
   if (faults.length) { console.log(`Refused: ${faults.join(" · ")}. Nothing was written.`); return 1; }

@@ -13,11 +13,11 @@
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/02-workstream.md",
-      "seen": "9e596e25"
+      "seen": "6a53f9cf"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
-      "seen": "cd529187"
+      "seen": "47470a11"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -53,6 +53,11 @@
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "section": "A prompt while an arc runs",
       "seen": "25adff56"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
+      "section": "Written from a layout",
+      "seen": "dc88cf46"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
@@ -999,6 +1004,28 @@ work does. Arcs with the developer's go are built in parallel, each in any windo
 **A planning job has no status, ever.** It is a read or a draft that prepares a preview, done by you, and by
 a child only when it would take more than about 15 minutes. What comes back is facts and the preview's
 section, with no report file.
+
+### Written from a layout
+
+**An arc is created when its work starts, or with every section naming what it waits on**
+(`RULE.DEVEX.WORKSPACE.539` · MUST · skill:spn-devex/bootstrap). A workstream written from a layout — a partner's foundation workstream,
+which bootstrap writes — opens all its arcs at once, and none is empty.
+
+- **The layout data is the shape, read-only** (`RULE.DEVEX.WORKSPACE.540` · MUST · skill:spn-devex/bootstrap):
+  `refs/devex/workspace/foundation-layout.json` holds `questions`, `ground`, `rounds` (each with `startsWith`,
+  `joinsWhen` and its `sections`: `id`, `title`, `needed`, `waitsOn`, `lands`) and `arcs` (`id`, `title`,
+  `subject`, `goal`, `landsIn`, `tree`). Never add, drop or reorder one in a workstream; a struck part is
+  struck by the founder's words.
+- **The workstream keeps the answers in `arcs/ideate/layout.json`**, written by `spn-devex workstream layout
+  write <NNN> [--known <section>=<words> …]` and changed only by the layout commands. A section is `PENDING`
+  until answered, `PROPOSED` once its Known is filled, `DECIDED` on the founder's yes, or `STRUCK`.
+- **An answer is recorded once and cited where it lands** (`RULE.DEVEX.WORKSPACE.541` · MUST · skill:spn-devex/bootstrap):
+  `layout answer <NNN> <section>[,<section>…] --said "…"` records one decision every named section cites;
+  `layout change <NNN> <decision> --said "…"` moves it to a new revision and reopens every citing section;
+  `layout decide` marks sections Decided; `layout strike` strikes a part by the founder's words.
+- **The go is refused while a section is `PENDING` or cites a decision newer than itself**
+  (`RULE.DEVEX.WORKSPACE.542` · MUST · skill:spn-devex/execute). `layout check <NNN>` names each one, and `workstream go write`
+  refuses the same way.
 
 ## An arc carries what its steps act on
 

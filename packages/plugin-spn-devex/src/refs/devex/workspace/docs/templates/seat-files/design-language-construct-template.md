@@ -10,7 +10,7 @@
   "summary": "{{The Description's first sentence, word for word.}}"
 }
 -->
-<!-- RESTATES: spn-foundation docs/04-capabilities/02-support/01-surface/03-standards-patterns/01-common/05-design-languages.md § A design language · § The parts · § The drawing scale · § How blocks meet · § Where media go · § A section's two layers · § Which layer takes a medium · § Media by kind of section · § A section's scene · § Media size by placement · § Text alignment and items · § Items with a medium
+<!-- RESTATES: spn-foundation docs/04-capabilities/02-support/01-surface/03-standards-patterns/01-common/05-design-languages.md § A design language · § The parts · § One source for the platform's look · § The drawing scale · § How blocks meet · § Where media go · § A section's two layers · § Which layer takes a medium · § Media by kind of section · § A section's scene · § Media size by placement · § Text alignment and items · § Items with a medium
      This file carries rules it does not own. The chapter above is the source of truth.
      A rule change is edited there first, then here, in the same change. Never add a rule here.
      restate-drift.ts reports this copy when its source moves. -->
@@ -46,12 +46,15 @@
 
 ### Which app follows what
 
-| App | Kind of person | Page | Surface | Language | Layout | Looks (body, navigation, frames, size, motion) |
+| App | Kind of person | Page kinds | Surface | Language | Layout | Looks (body, navigation, frames, size, motion) |
 | --- | --- | --- | --- | --- | --- | --- |
 | `{{web-www-ts}}` | Visitor | {{SITE}} | {{WEB}} | {{its own: saasplane-site}} | {{the app's layout setting}} | {{body, navigation, frames, size, motion}} |
+| `{{web-account-ts}}` | {{Customer}} | {{APP · SITE}} | {{WEB}} | {{the app's own, with the site look for its public pages}} | {{the app's layout setting}} | {{its looks}} |
 | `{{web-platform-ts}}` | Team | {{APP}} | {{WEB}} | the design system's | {{the app's layout setting}} | {{its looks}} |
 
-Each app's row is also written as one fenced `json` block, keyed by the app's code, which `spnutils apps surface render --app` and `spnutils apps surface theme` read. It holds the theme's own values for the app, the layout as the app's own setting, the kind of page, the kind of surface, and the values where the app departs from the language, part by part, in `overrides`. An app follows the language and never forks it. The table above is for the reader, the block for the commands, and the two never differ.
+{{Each app's row lists the kinds of page it serves. `SITE` is a public page, which takes the site look: its sections, its media and the brand. `APP` is a signed-in page, which takes the app layout. An app with both, such as a signed-in console with a few shared public pages, lists both, and its public pages wear the site look under the site layout.}}
+
+Each app's row is also written as one fenced `json` block, keyed by the app's code, which `spnutils apps surface render --app` and `spnutils apps surface theme` read. It holds the theme's own values for the app, the layout as the app's own setting, the kinds of page as one kind or a list, the kind of surface, and the values where the app departs from the language, part by part, in `overrides`. The scaffold writes one theme setting for each kind of page from the row: `src/site-theme.ts` for `SITE` and `src/app-theme.ts` for `APP`. An app follows the language and never forks it. The table above is for the reader, the block for the commands, and the two never differ.
 
 ```json
 { "app": "{{www}}",
@@ -59,14 +62,14 @@ Each app's row is also written as one fenced `json` block, keyed by the app's co
   "language": "{{saasplane-site}}",
   "theme": { "app": { "primary": "{{#084A75}}" } },
   "layout": { "type": "{{TOPNAV}}", "nav": [] },
-  "page": "{{SITE}}",
+  "page": ["{{SITE}}"],
   "surface": "{{WEB}}",
   "overrides": {} }
 ```
 
 ### The brand
 
-{{The platform's one brand, as values: the primary colour, the greys and the typefaces, set once. The radius, like every other look, is each app's, in its row. An app changes only its looks over it, never the brand itself.}}
+{{The platform's one brand, as values: the primary colour, the greys and the typefaces, set once. The radius, like every other look, is each app's, in its row. An app changes only its looks over it, never the brand itself. A partner's brand is asked in the foundation workstream's surface round, and a value not chosen yet reads "not yet", which means the design system's own value.}}
 
 | Brand value | Value |
 | --- | --- |
