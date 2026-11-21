@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/01-common/05-design-languages.md",
-      "seen": "d6b5001d"
+      "seen": "76c32757"
     }
   ]
 }
@@ -52,6 +52,9 @@ Every language holds the five parts in this order, each with the same subsection
 - **An app extends the language and never forks it.** Its capability chapter adds to a part by the part's id, and its row holds only the values where it differs, part by part. The brand is never changed by an app.
 - **The language's values are one versioned data block inside the construct, keyed by the parts' ids.** Every table the construct marks as filled is written from that block and never by hand, so the words and the values cannot drift apart.
 - **A language holds no samples.** Its hero samples and its section samples are two pages beside it, built from the app's own media files, and each subsection links the samples that show it. A sample page's title never ends in "Design Language", which the reader of a language's theme refuses.
+- **No part holds a pointer in place of its rule, and a part with nothing of the app's own names the design system's default it follows** (`RULE.SUPPORT.SURFACE.590` · MUST · skill:spn-surface/design). A part the language sets holds the choice; one it leaves to the design system has the status `DEFAULT` and names the default; one it does not use has `NONE`. `spn-surface language check` refuses a part whose words are a pointer alone, such as *Decided in 041 N008.*
+- **A sample page draws each drawing in a frame that scales it whole and carries the app's own tokens** (`RULE.SUPPORT.SURFACE.591` · MUST · skill:spn-surface/design). A drawing placed at a width of its own making with no token map draws black fills and overlapping units.
+- **A review of a site, and an arc's final re-check of one, walks every page of the live site at a phone, a tablet and a desktop width, in light and dark, by computed values** (`RULE.SUPPORT.SURFACE.592` · MUST · skill:spn-surface/design), with `skills/design/scripts/site-walk.mjs`.
 - **A reference site is read into the same five parts.** One reference read for each site, written from the reference template, records part by part what the site does, the values measured from it, our choice, and whether that choice is MAPPED, a GAP in the design system or NOT_TAKEN. The construct's references compare each site with the language part by part.
 
 | Part | The choices it holds |
@@ -193,6 +196,7 @@ A medium's size follows where it is placed. **Each size is read from the design 
 | A container's ground | the container, edge to edge, drawn quiet |
 | An item's picture | the item's media box |
 
+- **A drawing beside the words stays legible at the narrowest column it stands in, the column at 1024 px** (`RULE.SUPPORT.SURFACE.589` · MUST · skill:spn-surface/design). A drawing whose smallest text renders under 11 px there, or whose scale falls below half, is redrawn for that column.
 - **A drawing is never cut: it fits its frame whole, on its ground, and only empty sky is trimmed** (`RULE.SUPPORT.SURFACE.565` · MUST · skill:spn-surface/design)
 - **A screenshot inside a drawn window crops to the top of its page** (`RULE.SUPPORT.SURFACE.566` · MUST · skill:spn-surface/design)
 

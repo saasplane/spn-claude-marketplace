@@ -24,7 +24,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/01-common/03-site-patterns.md",
       "section": "What holds across",
-      "seen": "cf7f9719"
+      "seen": "4277da79"
     },
     {
       "path": "spn-foundation/docs/01-purpose/02-what.md",

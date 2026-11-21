@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-infra/08-operate.md",
-      "seen": "724184d8"
+      "seen": "1d55413d"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/08-operate/",
-      "seen": "2395d5d3"
+      "seen": "fee040eb"
     }
   ]
 }
@@ -162,6 +162,8 @@ The cache contract derives from the tree and is rendered twice, never configured
 /_assets/*   immutable, cached indefinitely   only hashed names can exist there
 /*           short lifetime, invalidated      the entry document, public files
 ```
+
+**The edge and the app split a web app's headers: the edge sends transport and framing, and the app sends the content policy** (`RULE.SUPPORT.INFRA.159` · MUST · skill:spn-infra/implement). The edge sends `strict-transport-security`, `x-content-type-options: nosniff`, `referrer-policy`, `permissions-policy` and the `frame-ancestors` answer, the same for every web app. The content policy is the app's, written by its build from its own values, because only the app knows its API origins; an edge policy with `connect-src 'self'` would block every console's API calls. The blueprints' behaviour rows BLU.HEAD.01 and BLU.HEAD.02 state both halves.
 
 **No environment's edge reads another environment's store.** Each environment's distribution fronts its own store, in its own account, under its own key. The tenant edge is the one reader that crosses environments, and it reads only the store a route names. A web release reaches another environment only by promotion, never by a shared origin.
 

@@ -4,7 +4,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "The surface page preview",
-      "seen": "eeb41049"
+      "seen": "8681f8dd"
     }
   ]
 }
@@ -34,4 +34,6 @@ A page that exists only as a design is rendered from its tree; a page that runs 
 ## Traps
 
 - **The copy names its own mode switch in its `preview-mode` meta and uses no SaaS Plane name.** A partner's site and the book's own sample are made the same way. Opened alone, the copy is just the page.
+- **A page made by any other means carries the same meta and listener.** A page rendered, copied or written by hand names its mode switch in the `preview-mode` meta and listens for `{ "surface-page-preview": { mode, notes } }`, and never for `{ mode }` alone. `spn-devex docs check` refuses a preview whose framed page lacks either (`RULE.DEVEX.WORKSPACE.536` · MUST · skill:spn-devex/ideate).
+- **Check a page sample against the current standard for its kind before you edit it** (`RULE.DEVEX.WORKSPACE.547` · MUST · skill:spn-surface/design). A page designed before code is rendered from its tree (step 0), and a running page is copied (step 1). A hand-made page is made again that way, and when a tool or rule a sample depends on lands, a row goes on the arc to re-cut it (`RULE.DEVEX.WORKSPACE.546` · MUST · skill:spn-devex/ideate).
 - **The bar's message, the meta and the note marker change only with a new stylesheet version.** Never edit them in a copy.

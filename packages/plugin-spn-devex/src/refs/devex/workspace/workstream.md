@@ -13,11 +13,11 @@
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/02-workstream.md",
-      "seen": "6a53f9cf"
+      "seen": "01af8b58"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
-      "seen": "47470a11"
+      "seen": "5ad84a2b"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -42,7 +42,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "section": "An arc carries its specification, or names the note that holds it",
-      "seen": "36f2db87"
+      "seen": "d688b918"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -61,7 +61,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "seen": "4cb44838"
+      "seen": "374413f4"
     }
   ]
 }
@@ -1301,6 +1301,10 @@ the end of each step.** Inside a step, run only the specs of what you touched.
 
 **An agent launches no child agent — MUST.** A child can go on writing after its parent has reported,
 so the coordinator reads a tree that is still moving. Every order says so under *Never*.
+
+## A decision lives on its arc, a handover names where, and a sample follows its standard
+
+**A decision the developer gives becomes a row, a sheet entry or a preview section on the arc it moves, in the reply that agrees it** (`RULE.DEVEX.WORKSPACE.544` · MUST · skill:spn-devex/ideate). **A handover quotes no decision without naming where it lives** (`RULE.DEVEX.WORKSPACE.545` · MUST · skill:spn-devex/execute). **An edit to a sample first checks it against the current standard for its kind, and a standard that lands under it puts a row on the arc to re-cut it** (`RULE.DEVEX.WORKSPACE.546` · MUST · skill:spn-devex/ideate). **An edit to a surface page sample first asks whether the page is rendered from its tree or copied from the running page, and makes it that way** (`RULE.DEVEX.WORKSPACE.547` · MUST · skill:spn-surface/design).
 
 ## Ideating is free. Executing is not. A number is a promise.
 
