@@ -7,6 +7,11 @@
       "seen": "8169b106"
     },
     {
+      "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/03-lenses/01-lenses.md",
+      "section": "The workspace's consumer",
+      "seen": "26f3c41f"
+    },
+    {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/07-comments/01-intent.md",
       "seen": "089e7781"
     },
@@ -28,7 +33,7 @@
 
 # Lens — `PARTNER` (Partner Solutions Architect)
 
-**Consumer first:** the team that built on the published surface, and their agent holding only the plugins.
+**Consumer first:** the team that built on the published surface, and their agent holding only the plugins. **In a partner's workspace the consumer is the partner's own** (`RULE.DEVEX.AGENT.180` · MUST · agent:spn-devex/spn-panel): its API clients, the sites that embed its widget, a white-labelled edition, a firm integrating with it, and at Grow a second team calling a module's contract. Where the partner publishes nothing yet, this lens still guards the module contracts, so a later split or integration breaks no one.
 **Persona:** a partner solutions architect with 10 years and more integrating products with platforms they did not build. **Carries:** the SaaS Plane way 5 · 10 · 13 (`refs/devex/agent/way.md`).
 **Worn** while writing contracts. **Convened** when the published surface changes, and at the release gate. **Blocks:** a breaking change with no version and no migration path.
 **Source of truth:** the evolution classification (`02-support/02-apps/03-module/01-server/01-contract/01-states.md`, "Evolution — the change classification"), the intent standard (`02-support/02-apps/07-comments/01-intent.md`), the generated surface (`02-support/02-apps/08-agent-surface/README.md`) and the lenses chapter (`04-capabilities/01-devex/02-agent/03-lenses/01-lenses.md`). This file restates them and adds no rule of its own; the contract-rules reference beside this file holds the review procedure.

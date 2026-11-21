@@ -1,6 +1,6 @@
 ---
 name: bootstrap
-description: Walk an empty folder to a platform running locally - the door first, then the workspace, then a workstream that holds the estate answers, then the acts that bring the organization up, make the estate repo, wire it, scaffold and release its packages, create the platform repo with its concept, name the provider keys the partner fills, bring the platform layer up and run the stack. Asks the identity, legal, hosting, cloud, owner, region, business model, domain, stack and twin coordinates one at a time, and derives the category tree, the apps and both repository names rather than asking for them. Use when the workspace holds no sprepo.json at all, when someone is starting a new organization or platform from nothing, or when the session orientation reports day-0 mode. Interactive by design - you ask, they answer, and no act runs on an answer nobody gave. Stack-agnostic.
+description: Open the door of an empty workspace and lay a partner's whole foundation out - three paths (start a new platform, join an existing one, just look around); for a new platform a few questions in chat, then the foundation workstream written whole from the layout data with every round, section and arc Pending, the ground's accounts checked, and each answer recorded once; at its go the acts that bring the organization up, make and release the estate, create the platform repo and its skeletons, name the provider keys and run the stack; for a joiner one question, then the workspace, the clones, the sign-ins, the running stack and an onboarding read. Use when the workspace holds no sprepo.json at all, when someone is starting a new organization or platform from nothing, when a new developer is joining a team's platform from a fresh workspace, or when the session orientation reports day-0 mode. Interactive by design - you ask, they answer, and no act runs on an answer nobody gave. Stack-agnostic.
 ---
 <!-- spn:restates
 {
@@ -11,178 +11,154 @@ description: Walk an empty folder to a platform running locally - the door first
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/01-bootstrap.md",
-      "seen": "d24446b6"
+      "seen": "47ef9ac3"
     }
   ]
 }
 -->
 
-# bootstrap — an empty folder becomes a working workspace
+# bootstrap — an empty folder becomes a partner's foundation
 
-**Read [`refs/devex/workspace/workstream.md`](../../refs/devex/workspace/workstream.md) before acting.** It holds the loop this skill runs inside: how a prompt is read, where a new ask goes, what a prompt does to a running arc, and how a reply closes.
+**Read [`refs/devex/workspace/workstream.md`](../../refs/devex/workspace/workstream.md) before acting.** It holds the loop this skill runs inside: how a prompt is read, where a new ask goes, what a prompt does to a running arc, and how a reply closes. **Read [`refs/devex/function/bootstrap.md`](../../refs/devex/function/bootstrap.md) too**: it restates the door, the ground, the foundation workstream and the joining path this walk carries out.
 
-Scan the workspace root, find no `sprepo.json` anywhere, and you are on day zero. You have no code to pattern-match against, and that is the condition this walk is written for. What you do have is the standards, the published packages, and the shape every platform here already takes.
+Scan the workspace root, find no `sprepo.json` anywhere, and you are on day zero. You have no code to pattern-match against, and that is the condition this walk is written for. What you do have is the standards, the published packages, the shape every platform here already takes, and **the layout data**, `refs/devex/workspace/foundation-layout.json`, which is the whole foundation workstream's shape.
+
+**The person types the install, `spnutils workspace init <name>`, and nothing else.** They installed the toolchain and `spnutils`, signed in to GitHub and the registry, ran `workspace init` in an empty folder and opened VS Code with Claude Code there. From here every skill and every `spnutils` command is yours to run (`RULE.DEVEX.FUNCTION.105` · MUST · skill:spn-devex/bootstrap). Never ask them to type one.
 
 **Nothing in this walk is hand-made except the folders and the git remotes.** Every other file arrives from a command. If you find yourself opening an editor to create a manifest, stop. A command owns that file, and hand-writing it starts a workspace out of standard on day one.
 
-## Act 0 is a door, and a no is a real answer
+## The door — three paths
 
-**Open by asking whether they want to start a new platform.** One question, and then you wait. The orientation screen already puts that question on the table, so you are continuing it rather than opening a new one.
+**Open on the door, and wait for the answer.** The orientation screen already puts the question on the table, so you are continuing it rather than opening a new one.
 
-A *no* is an answer, not a stall. Nothing is created, the folder stays empty, and the session stays in day-0 mode for whenever they come back. A *yes* starts at act 1 and runs the acts in order.
+| Path | What you do next | What it creates |
+| --- | --- | --- |
+| Start a new platform | the few chat questions, then the foundation workstream written whole | the foundation workstream |
+| Join an existing platform | one question, then [the joining path](#the-joining-path) | the joining workstream, the clones, the local stack |
+| Just look around | answer what they ask, and show the book and the orientation | nothing |
 
-**Never run act 1 on a maybe.** Minting a workspace is cheap to do and awkward to explain to somebody who only asked what this was.
+**Only the first two paths create anything.** Looking around leaves the folder as it is, and the session stays in day-0 mode for whenever they come back. **Never take a path on a maybe.** Minting a workspace is cheap to do and awkward to explain to somebody who only asked what this was.
 
-## The acts, and their order is forced rather than chosen
+## The ground — checked, never decided
 
-The repositories come from the answers, not always two. The usual shape, one team and no infra material of its own, makes two, and the estate one comes first. It carries a package for the organization and one for the platform.
+The ground is what must exist before you can create a repository or stand an estate up, and that no tool can create for them. **You check each item and never decide it** (`RULE.DEVEX.FUNCTION.106` · MUST · skill:spn-devex/bootstrap). The layout data's `ground` lists them, each with its check and what it blocks; they are the Ground section of the foundation workstream's ideate preview.
 
-```
-{org}-infra/                        sprepo.json  { type: INFRA }
-  packages/infra-organization/        spinfrapkg.json
-  packages/infra-platform-{spc}/      spinfrapkg.json
+- **An item turns Done only when its check passes.** `gh auth status`, `spnutils workspace status`, a registry read as the person, `spnutils workspace env show` for the keys. Their word that it is done is not the check.
+- **A cloud read waits for their yes at that step.** The cloud account, Organizations, the quota case and the identity seat are read only, each on the developer's approval at that step, and no AWS read happens before it. Ask each time.
+- **The go waits only on the items marked `GO`.** A platform runs locally on day 0, so a founder with no domain or cloud account yet finishes the foundation, and the `CLOUD` items carry to the cloud walk in the follow-ups arc.
+- **The decisions stay in the rounds.** The domain's name, the cloud and the region are answers in round 6; the ground only says whether what was decided exists yet.
 
-{org}-{platform}-ts/                sprepo.json  { type: APPS, stack: TS,
-                                        infra: { organization: pkg@ver,
-                                                 platform:     pkg@ver } }
-```
+## A new platform — the foundation workstream, written whole
 
-| # | The act | The command | Why it sits here and not later |
-| --- | --- | --- | --- |
-| 0 | The door | — you ask | An act nobody agreed to is an act nobody can undo |
-| 1 | Ask the workspace's name, then mint the workspace | — you ask, one question; then `spnutils workspace init <name>` — already run where `.spndevex/` is the workspace's, which is how a partner arrives | The floor has to exist before a session has any guidance at all. It also mints `.spndevex/`, so it comes before the workstream, and a new workspace is refused without its name |
-| 2 | Open the workstream | `mkdir`, then `spn-devex workstream arc edit` | The answers need a home on disk before the first one is given |
-| 3 | The estate questions, one at a time | — you ask, they answer | Each answer is written into the arc as it arrives |
-| 3b | The shape questions, at most three, one at a time, each with its reason | — you ask: (1) *How many teams will build on the platform?* One team keeps the platform's concept in the platform's own docs; several teams need a book of their own first. (2) *Will any team build its own services or app libraries in its own repository?* Each becomes a repository that joins when the team starts, and is known to the others by its published client. (3) *Do you keep infra material of your own beside the estate?* It becomes an infra support repository, made before the estate | The repositories made at acts 5 to 9 follow these answers, so they are asked before anything is made, and each answer is written into the arc as it arrives |
-| 4 | Read the coordinates back, with the recommended repositories, and get a yes | — you ask. The recommendation: one team, the estate then the platform, the platform's concept in its docs; several teams, their own book (FOUNDATION) first, then the estate and the platform, each team's service repository joining when the team starts; own infra material, an infra support repository before the estate. A repository added after day zero, such as a new team's service, is placed by the workspace map from its own files, with no new bootstrap | The coordinates and the repositories are agreed once, in one place, before any repository is made or any name derives from them |
-| 5 | Bring the organization up, then make the estate folder and mint it | `spnutils infra organization up`, then `mkdir <org>-infra`, `git init` and `spnutils infra scaffold repo` inside it | The book's utils chapter runs the organization layer once, before any `repo create`, and `repo create` refuses by name until it has. The estate repository exists only as a folder until act 7 has written its organization node |
-| 6 | Wire it | `spnutils repo agent-sync` | Without it the session has no `implement`, no `review`, no `release` |
-| 7 | The two estate packages, organization first, then the estate repository created and pushed | `spnutils infra scaffold`, then `implement` to fill `providers.scm.org` and the rest, then `spnutils repo create <org>-infra` from inside the folder, `git remote add origin`, `git push` | The platform package names the organization it belongs to. `repo create` reads the GitHub organization from the organization node that reaches the folder, refuses before the node exists or while `providers.scm.org` is empty, and refuses when that GitHub organization does not exist. It opens no checkout, so the folder is the repository and `origin` is added by hand |
-| 8 | Release them and stage the pins | `spnutils infra release --local` | The platform repo pins a version, and it cannot pin a working tree |
-| 9 | The platform repository | a new folder and `git init`, then `repo create <org>-<spc>-<stack> --from <organization package>@<version>`, then `apps scaffold repo` | The scaffold takes both pins as arguments, so act 8 has to have happened. The pin it writes does not exist yet when `repo create` runs, so the command takes `--from`, the estate node answering which organization's SCM (`package@version` or a path) |
-| 10 | Its concept, then its projects | the `ideate` skill, then `apps scaffold <kind>` | The concept decides which kinds exist. Scaffolding first is deciding by accident |
-| 11 | The provider keys | — you name them, they fill `~/.spnenv` | The provider registry fails fast at boot when a type or key is missing. A walk that ends in a running stack cannot defer this |
-| 12 | Bring the platform up | `spnutils infra platform up <spc>` | The platform layer reads what the organization layer wrote at act 5 |
-| 13 | Run the stack, and say what they should see | the domain plugin's run skill | This is the acceptance. Day zero ends on a platform that answers, not on a filled arc |
-| 14 | Close the workstream | — move the folder to `closed/` | Both repositories exist and the concept is agreed, so the folder is a receipt |
+### The chat questions, before anything is written
 
-- **Act 6 is where day zero used to stop.** A partner's first repository is an estate repo, it carries no `package.json`, and that is precisely the case the wiring command refused. If you meet that refusal, say so plainly and name it as the known blocker rather than working around it by hand.
-- **A partner holds no marketplace checkout, and nothing has to be said about it.** The mode follows from where they are standing, so the same command wires the published source. Their plugins resolve from the published marketplace, and the book reaches them as a published rendering rather than a path they can open.
-- **Act 1 opens with one question: the workspace's name.** Ask it alone, before init runs, because init refuses a new workspace without one. A name is lower-case letters, digits and hyphens, starting with a letter, at most 40 characters, such as `saasplane` or `acme-platform`, and it is given once: init writes it to the `workspace` node of `.spndevex/state.json`, and a later run keeps it. Then run `spnutils workspace init <name>` with their answer.
-- **Act 1 also writes the saasplane env, `~/.spnenv`.** The command writes the file's **shape** — its markers, its managed defaults and an empty keep region. **It derives no key**, so a fresh partner file has nothing to fill in yet. A key arrives later, when you build what needs it, and you ask them for the value. Their own keys go in `spnutils:dev`, which no run reads or writes. Never print a value back — `refs/devex/workspace/workspace.md` § The saasplane env carries the rule.
-- **Unfold the partner's idea in the order their own words lead** (`RULE.DEVEX.FUNCTION.098` · MUST · skill:spn-devex/ideate). Take this step when the idea is first taken in, before act 10 hands it to `ideate`; each step waits for the one before it:
-  1. **The idea, in their words**, quoted, and what it proves for them.
-  2. **The trade before the constructs.** The actors in the trade's own words, then the modules and the states by name, then the day-zero flow, and only then the cut of how deep the first version goes. Fields come when they ask for them, and each category's journey asks them once the category tree is derived.
-  3. **The existing twin before a new construct.** Each part names the construct the book or the platform already holds for it, and a new construct is proposed only where none fits.
-  4. **Several modules are planned with a split test and one table.** The test says why the modules split where they do, and one module table holds the set, which the developer decides and names.
-  5. **Open asks stay few.** A *settled so far* table holds what is agreed, and no more than three asks are open at once.
-  6. **Each new term is defined once,** where it first appears, and used the same way after.
-  7. **The preview follows their spine,** the order in which they told the idea, and not the order of the book's chapters.
-- **Act 10 is a conversation, not a generation.** Hand it to `ideate`, which agrees one block at a time. A concept you drafted whole is a concept nobody agreed to.
-- **Acts 11 to 13 are the acceptance, and they are what day zero is for.** A partner who has never seen this estate finishes the walk, runs the local stack, and sees the default SaaS Plane platform answer. Anything short of that is a form somebody filled in.
-- **Acts 5, 12 and 13 go through the CLI's own doors.** `infra organization up` and `infra platform up <spc>` are the commands, and `tofu apply` is never hand-run, locally or anywhere else.
-- **Stop at the end of each act and say what it produced.** The developer is watching a workspace appear out of nothing, and a silent run of the whole walk gives them nothing to correct.
+Ask the layout data's `questions`, one at a time: the path, the workspace's name (where `.spndevex/` is not already the workspace's), who the platform is for (customers outside the company, or the company itself), and the product in one sentence. **These are the only questions asked before the workstream exists**, because the workstream is where every later answer is kept.
 
-## Act 2 — the workstream that holds the answers
+- **The workspace's name** is lower-case letters, digits and hyphens, starting with a letter, at most 40 characters, such as `saasplane` or `acme-platform`. Where `.spndevex/` is not yet the workspace's, run `spnutils workspace init <name>` with it; init writes it to the `workspace` node of `.spndevex/state.json` and also writes the saasplane env's **shape**, deriving no key. Where `.spndevex/` is already the workspace's, init has run, and you never run it again.
 
-The five answers name every account address, package scope, repository name and code prefix, and they name them permanently. Until act 10 writes `CONCEPT.md` there is no repository to keep them in, so **the workstream is the seat**, and it is opened before the first question is asked.
+### Write the workstream from the layout data
 
-**Read the number, never type one.** `spnutils workspace status` prints a line reading `next free number NNN`. That is the number. A partner's folder may already hold work, numbers are assigned once and never reused, and a hardcoded `001` collides the first time somebody has done anything here before.
-
-**The subject is `new-platform`.** It names the work. `setup` names a phase of a tool's life and would be the wrong noun for a folder that outlives the tool.
+**Read the number, never type one.** `spnutils workspace status` prints `next free number NNN`. The subject is `foundation`.
 
 ```
-.spndevex/workstreams/open/{NNN}-new-platform/
-  approach.html                     the page the arc stands on, copied from the template the plugin ships
+.spndevex/workstreams/open/{NNN}-foundation/
+  approach.html                     the page, from the plugin's template: masthead, Why, What, Plan, Open
   arcs/
-    ideate/                         the workstream's first arc, opened with the folder
-    N001/                           the estate coordinates, the first build arc, written by the arc commands and nobody else
-      state.json                    the arc, and one row per question
-      log.jsonl                     every write, with each answer beside its row
-      estate-coordinates.md         the arc's name file, which the commands write
-    follow-ups/                     the workstream's last arc, opened with the folder
+    ideate/                         the flow: its layout.json holds every section, and the answers
+      layout.json                   written by `workstream layout write`, changed only by the layout commands
+    N001/ … N006/                   the decide-only arcs, each opened from the layout data
+    follow-ups/                     one workstream per module after the go, the design language rounds, the cloud walk
   notes/
-    N001/
-      preview.html                  the coordinates as they stand, read back at act 4 for the go
+    ideate/preview.html             the Ground, the flow round by round, the read-back
+    N001/ … N006/preview.html       each arc's tree of where it lands
 ```
 
-It opens in `open/` because nothing blocks it — the developer is in front of you and the questions are the work.
+Write these in order, before the founder is asked anything more (`RULE.DEVEX.FUNCTION.108` · MUST · skill:spn-devex/bootstrap):
 
-### The answers go in the arc, and the arc commands write it
-
-**An arc is data, and only the arc commands write it.** `spn-devex workstream arc edit` writes `arcs/N001/`, and the hook that runs before every edit refuses a hand edit there. So you never type a file into `arcs/`. The arc a command opens is the arc the page, the hooks and `spn-devex workstream state check` all read. `refs/devex/workspace/workstream.md` carries the commands and what each field holds.
-
-**The page argues nothing, and it is still needed.** An approach page usually argues. The routing test in `refs/devex/workspace/docs/doc-sets.md` is one question — *were options weighed and one chosen?* — and on day zero nothing is weighed. The developer is telling you their organization's code, not choosing between two, so the coordinates are a record, and a record belongs in the arc. But an arc stands on its workstream's page: its row in Plan is its address, `approach.html#N001`, and the state check reads the arc against that row. So the page holds a masthead, one paragraph of Why, one line of What, and the Cycles table.
-
-**A partner has the page to copy.** The template ships with this plugin, at `refs/devex/workspace/docs/templates/workstream/approach-template.html`, so a partner who never checks out the book copies the same page as a builder. **Where the developer asks for the argument written up, that is an ordinary page in an ordinary sitting** — offer it after act 4, and never let the walk wait on it.
-
-### Open the arc before the first question
-
-Write these at act 2, in this order, before the first question is asked. `{NNN}` is the number `workspace status` gave.
-
-1. **The page.** Copy the template to `approach.html` in the folder. Its masthead reads `{NNN} - New platform`, and its subtitle says it holds the estate's coordinates. Its Why is one paragraph: five answers name every account address, package scope, repository name and code prefix in this estate, permanently, and this workstream holds them until `CONCEPT.md` exists to carry them. Its What is one line: the coordinates are a record, not a choice, with `Read the preview →` linking `notes/N001/preview.html`. Keep the Plan section's arcs table with its three arcs, `ideate`, `N001` and `follow-ups`, and take out every slot the walk does not fill, the sample card under Open and the row under Deferred among them.
-2. **The arcs.** Every workstream has its `ideate` arc first and its `follow-ups` arc last, and the numbered build arcs sit between them. `N001` is the estate-coordinates arc, the first build arc, opened as `PROPOSED`; `ideate` and `follow-ups` open beside it, each with a row in Plan's arcs table:
+1. **The page.** Copy `refs/devex/workspace/docs/templates/workstream/approach-template.html` to `approach.html`. Its masthead reads `{NNN} - Foundation`; its Why quotes the product sentence; its What has one entry per arc.
+2. **The role arcs**, `spn-devex workstream arc edit {NNN}/ideate` and `spn-devex workstream arc edit {NNN}/follow-ups`.
+3. **The sections**, with what the chat questions told as Known:
 
    ```sh
-   spn-devex workstream arc edit {NNN}/ideate
-   spn-devex workstream arc edit {NNN}/follow-ups
-   spn-devex workstream arc edit {NNN}/N001 --title "The estate coordinates" --subject estate-coordinates \
-     --goal "The answers that name every account address, package scope, repository name and code prefix in this estate, kept here until the platform's CONCEPT.md carries them."
+   spn-devex workstream layout write {NNN} --known "1.1=<who it is for, in their words>" --known "1.2=<the product sentence>"
    ```
 
-3. **One row per question**, rows 1 to 12, in the order of act 3's *What you ask*; the command takes each row's number and prints it. The title is the question, and the acceptance is what its answer decides:
+   Every other section is written `PENDING` with its Needed and its Waits on. The command prints one `arc edit` line for each arc of the layout data.
+4. **The arcs**, by the lines it printed, each with `{NNN}` in place of `<workstream>`. Each `--note` says the layout opened it, which is the ideate arc's proposal (`RULE.DEVEX.WORKSPACE.539` · MUST · skill:spn-devex/bootstrap). None of them is empty, because every section names what it waits on.
+5. **The previews.** The ideate preview holds the Ground table and the flow round by round, each section with Known, Needed and Waits on; each arc's preview holds its tree of where it lands, each leaf `— not yet decided`. Copy `approach-preview-template.html` for each and take out every slot they do not fill.
+6. **The Plan rows and the stamps**: `spn-devex docs cycles write {NNN}`, then `spn-devex workstream arc stamp write {NNN}/<arc>` for each arc. `spn-devex workstream state check {NNN}` then reads no finding.
 
-   ```sh
-   spn-devex workstream row add {NNN}/N001 "The organization's code, its name, and the mail domain" --kind question --repo "—" --work DOCS \
-     --acceptance "Every account address, the package scope, the repository names, the estate's root"
-   ```
+**The layout is read-only.** The rounds, sections, views and arcs come from the data, never from you; a change to them is a change to the book and the plugins (`RULE.DEVEX.WORKSPACE.540` · MUST · skill:spn-devex/bootstrap). A part that does not apply is struck, not deleted.
 
-4. **The steps after the questions**, rows 13 to 19, written the same way:
+### The rounds, one section at a time
 
-   | Row | Title | Acceptance | Lands at |
-   | --- | --- | --- | --- |
-   | 13 | The coordinates and what derives from them, read back and agreed | the log carries the go | act 4, just before the go, with the read-back as its note |
-   | 14 | The organization up, then the estate repository, wired, with both packages released and pinned | `spnutils workspace status` lists an INFRA member | act 8 |
-   | 15 | The platform repository, scaffolded against both pins | `workspace status` lists an APPS member | act 9 |
-   | 16 | Its concept, agreed one block at a time | `CONCEPT.md` exists at its root and carries the coordinates | act 10 |
-   | 17 | The provider keys named, and the saasplane env filled | `spnutils workspace env show` reports each key as set | act 11 |
-   | 18 | The platform up, on the organization already up | the platform layer reports its state | act 12 |
-   | 19 | The stack running, and the platform answering | they open the surface and it responds | act 13 |
+| Round | Starts with · joins when | Sections |
+| --- | --- | --- |
+| 1 · Vision and phases | STRATEGY, PRODUCT, BUSINESS, LEAD · DATA, ARCHITECT, GROWTH, FINANCE | who it is for, the long-term vision, growth stages (Prove · Repeat · Grow · Scale, in their unit), phases, the data and its processing, seams and hard-to-undo choices |
+| 2 · Domains | PRODUCT, ARCHITECT, DATA · TRUST, PARTNER, AI | domains and subdomains, what each owns, regulated data, outside services, each domain against the modules |
+| 3 · Product shape | BUSINESS, PRODUCT, TRUST · SALES, SUPPORT, GROWTH | business models, categories, apps and pools (derived), each category's arrival |
+| 4 · Surface shape | UX, UI, PRODUCT · MARKETING, VOICE, WEB_DEV, PARTNER | delivery per audience, page kinds per app, a public site or none, the brand |
+| 5 · Runtime shape | ARCHITECT, SERVER_DEV, INFRA · TRUST, FINANCE, PARTNER, AI | modules, services, workloads, stores with messaging and secrets, sizes |
+| 6 · Estate shape | INFRA, TRUST, ARCHITECT · FINANCE, LEAD | organization and hosting, cloud and regions, domains and environments, teams and owners |
+| Read-back | LEAD, ARCHITECT | the hard-to-undo list first, then every decision, then what the skeletons will be |
 
-5. **The preview's first draft.** This arc has a preview because the developer decides the go from the read-back. Copy `refs/devex/workspace/docs/templates/workstream/approach-preview-template.html` to `notes/N001/preview.html`. Its Today says nothing exists yet. Its Proposed holds the coordinates table (the question, `— not yet asked`, and what the answer decides) and the table of what derives from them, each value `— not yet derived`. Its Where it lands names the estate and platform repositories as not known yet. Take out every block and slot it does not fill, its Open among them.
-6. **The arc's row in Plan, then its stamp:**
+**Vision comes first, as the founder tells it.** Take the next section whose Waits on is answered, in the round's order, and bring the views the round starts with; a view that joins comes in when the section's question reaches it. No round convenes all of them.
 
-   ```sh
-   spn-devex docs cycles write {NNN}
-   spn-devex workstream arc stamp write {NNN}/N001
-   ```
+**Record each answer once, the moment it is given** (`RULE.DEVEX.WORKSPACE.541` · MUST · skill:spn-devex/bootstrap):
 
-`docs cycles write` also writes the preview's Status badge from the arc. Until the stamp, each write says the arc's part of the page is behind its goal, title or repositories, and the stamp is what answers it. A row added later never asks for it again; a repository named for the first time, at act 4, does. `spn-devex workstream state check {NNN}` now reads the arc with no finding. Rows 14 to 19 may be written while the arc is `PROPOSED`, and none of them starts before the go at act 4; acts 5 to 13 run them after it. Each of them gets its repository with `--repo` once act 4 has derived the name.
+```sh
+spn-devex workstream layout answer {NNN} 1.4,3.1 --said "<their words, as they gave them>"
+spn-devex workstream layout decide {NNN} 1.4,3.1          # on their yes
+spn-devex workstream layout strike {NNN} 4.3 --said "<their words>"   # a part that does not apply
+spn-devex workstream layout change {NNN} D002 --said "<their new words>"   # reopens every section citing D002
+```
 
-**What day zero does not ask.** Compliance targets, the setup catalog beyond `dev`, and every environment after the first are real decisions, and none of them is needed to reach a running platform. They are settled inside the concept at act 10 and in the declarations after it. The vendor integrations are not rows either, for a different reason: they are keys rather than coordinates. They are asked at act 11, and they never come near a file the estate tracks.
+Name every section the answer fills, across rounds and arcs, so it is cited where it lands and never typed twice. Bring the section's preview current in the same step. A window that closes picks up at the next Pending section: `spn-devex workstream layout show {NNN}` says where.
 
-## Act 3 — the estate questions
+**Unfold the partner's idea in the order their own words lead** (`RULE.DEVEX.FUNCTION.098` · MUST · skill:spn-devex/ideate). Each step waits for the one before it:
 
-Get these wrong and you rename accounts, package scopes and every code prefix after the code exists. So ask them first, one at a time, and wait for each answer.
+1. **The idea, in their words**, quoted, and what it proves for them.
+2. **The trade before the constructs.** The actors in the trade's own words, then the modules and the states by name, then the day-zero flow, and only then the cut of how deep the first version goes. Fields come when they ask for them, and each category's journey asks them once the category tree is derived.
+3. **The existing twin before a new construct.** Each part names the construct the book or the platform already holds for it, and a new construct is proposed only where none fits.
+4. **Several modules are planned with a split test and one table.** The test says why the modules split where they do, and one module table holds the set, which the developer decides and names.
+5. **Open asks stay few.** A *settled so far* table holds what is agreed, and no more than three asks are open at once.
+6. **Each new term is defined once,** where it first appears, and used the same way after.
+7. **The preview follows their spine,** the order in which they told the idea, and not the order of the book's chapters.
+
+**The foundation decides the shape and leaves each module's inside to the next workstreams.** Round 2 settles high-level domains and subdomains; a module's states, contract, schema and journeys are its own workstream's, which the follow-ups arc names.
+
+**The brand is asked in section 4.4**, colour, greys, typefaces, references and media kinds, and every answer may be *not yet*. The read-back then names the brand, or *the design system's own look until you have one*. Each app's design language row lists its page kinds (`SITE` for public pages, `APP` for signed-in pages), and the scaffold writes the app's theme setting from it.
+
+## Round 6 and round 3 — the estate and product questions
+
+Get these wrong and you rename accounts, package scopes and every code prefix after the code exists. They are the sections of round 6 (6.1 to 6.3) and round 3 (3.1), plus the stack and the closest twin, which the estate arc N006 and the runtime arc N004 record. Ask them one at a time, and record each with `layout answer` as it arrives.
 
 **Most of what the scaffold needs is derived rather than asked.** Your job is to know the whole inventory and ask only the part nobody can work out. The two tables below are that split, and the second one is the longer of the two on purpose.
 
 ### What you ask
 
-| # | What you ask | What their answer decides |
-| --- | --- | --- |
-| 1 | The organization's code, its name, and the mail domain | Every account address, the package scope, the repository names, the estate's root |
-| 2 | The legal entity — its registered name and address | `legal.name` and `legal.address` on the organization, and the public trust page later |
-| 3 | The hosting account the repositories are created under | `providers.scm.org` and `providers.scm.mtype` on the platform manifest |
-| 4 | The cloud, its home region, and which cloud region each estate region maps to | `providers.cloud.mtype`, `.home` and `.regions[].region` on the organization |
-| 5 | One platform or several, the code and the name for each, and its domain | The estate nodes, the isolation units, and every `{APP}_` prefix |
-| 6 | The platform's first human — email, first name, last name, display name | `owner.*` on the platform, and who the first account belongs to |
-| 7 | The region they launch in, and where each Account's data must stay | `regions[].code`, and the residency answer the compliance envelope reads |
-| 8 | Which business models the partner sells — **more than one is allowed** | The category tree, and through it the pools, categories and apps the partner's product module declares |
-| 9 | Which service domains the product needs | The app set and the module set — and whether an existing module already answers |
-| 10 | Whether they want a public marketing site at launch | Whether `www` is scaffolded |
-| 11 | The stack | Which apps plugin binds the platform repo, and which scaffolds run |
-| 12 | Which platform here is the closest twin | Whether a mechanism transfers, or whether they are genuinely inventing one |
+| # | What you ask | Section | What their answer decides |
+| --- | --- | --- | --- |
+| 1 | The organization's code, its name, and the mail domain | 6.1 | Every account address, the package scope, the repository names, the estate's root |
+| 2 | The legal entity — its registered name and address | 6.1 | `legal.name` and `legal.address` on the organization, and the public trust page later |
+| 3 | The hosting account the repositories are created under | 6.1 | `providers.scm.org` and `providers.scm.mtype` on the platform manifest |
+| 4 | The cloud, its home region, and which cloud region each estate region maps to | 6.2 | `providers.cloud.mtype`, `.home` and `.regions[].region` on the organization |
+| 5 | One platform or several, the code and the name for each, and its domain | 6.3 | The estate nodes, the isolation units, and every `{APP}_` prefix |
+| 6 | The platform's first human — email, first name, last name, display name | 6.3 | `owner.*` on the platform, and who the first account belongs to |
+| 7 | The region they launch in, and where each Account's data must stay | 6.2 | `regions[].code`, and the residency answer the compliance envelope reads |
+| 8 | Which business models the partner sells — **more than one is allowed** | 3.1 | The category tree, and through it the pools, categories and apps the partner's product module declares |
+| 9 | Which service domains the product needs | 2.1 | The app set and the module set — and whether an existing module already answers |
+| 10 | Whether they want a public marketing site at launch | 4.3 | Whether `www` is scaffolded |
+| 11 | The stack | 5.1 | Which apps plugin binds the platform repo, and which scaffolds run |
+| 12 | Which platform here is the closest twin | 2.5 | Whether a mechanism transfers, or whether they are genuinely inventing one |
+
+### Section 6.4 — the shape questions
+
+The repositories the go makes follow these answers, so they are asked before anything is made, and each is recorded as it arrives.
+
+| Section | The questions |
+| --- | --- |
+| 6.4 | The shape questions, at most three, one at a time, each with its reason: (1) *How many teams will build on the platform?* One team keeps the platform's concept in the platform's own docs; several teams need a book of their own first. (2) *Will any team build its own services or app libraries in its own repository?* Each becomes a repository that joins when the team starts, and is known to the others by its published client. (3) *Do you keep infra material of your own beside the estate?* It becomes an infra support repository, made before the estate |
 
 ### What you derive, and must never ask
 
@@ -191,7 +167,7 @@ Get these wrong and you rename accounts, package scopes and every code prefix af
 | The category tree the platform declares | the business models | the table below, unioned, duplicates collapsed |
 | The apps, and so the surface set | the categories | one app per category that signs in, plus the `IDENTITY` app. `www` is a host the estate deploys, never an app row |
 | Both repository names | `{org}`, `{spc}` and the stack | `{org}-infra` and `{org}-{spc}-{stack}` |
-| `apps[].repo` and `apps[].kindCode` | the surfaces | declared data, which is why act 4 reads the names back |
+| `apps[].repo` and `apps[].kindCode` | the surfaces | declared data, which is why the read-back reads the names back |
 | `modules[].code`, `.layer`, `.after` | the service domains | the module set the domains imply |
 | `networkIndex` and `network.index` | position | `0` for the first |
 | `blueprint.package` and `.version` | the published blueprints | the current pin |
@@ -220,79 +196,90 @@ The answer is a category tree. Each model is made from categories and the apps t
 
 **Marketplace composes on a different axis from the rest.** Every other model declares categories under the customer's own account. Marketplace declares merchants and shoppers beneath the platform itself. Choosing it beside B2B is not a contradiction, and it is what produces the widest set of apps.
 
-### Each category's journey, asked once the tree is derived
+### Each category's journey, section 3.3
 
-**Walk each derived category through its journey, one question at a time, and write each answer down before the next.** The questions are not coordinates, and the partner answers in their own words. `Platform` is never asked about. Where a category has no people of its own, say so and go on.
+**Walk each derived category through its arrival, one question at a time, and record each answer before the next.** The questions are not coordinates, and the partner answers in their own words. `Platform` is never asked about. Where a category has no people of its own, say so and go on. The fuller journey — fields, roles, notices and screens — is the module's own workstream's, after the go.
 
 | What you ask of each category | What the answer lands as |
 | --- | --- |
 | How they arrive: register themselves, are invited or are created by the parent; vetted or not | the registration door and the vetting (migration) |
-| What the org must tell us, and when: at registration or later | a catalog field in the product module's MDM `fields`, assigned to the category by IAM `categoryFields` (migration) |
 | Who joins it, and with which roles by default | default roles, an IAM contribution (migration) |
-| What each person must tell us, and when; how sensitive; who sees it; whether they edit their own | a catalog field, assigned per category as above (migration) |
-| What the org is offered | enablement defaults (migration); an operator's change later (console) |
-| Who sees which part of its data | data scopes offered (migration); each person's values (console) |
 | How they sign in | policy defaults (migration); provider secrets (estate config); an org's own policy (console) |
-| What they are told at each step | notification actions and templates (migration) |
-| Which groups they segment by | product tags (migration); a tenant's own tags (console) |
-| What a demo or test environment needs to show | sample records, a per-environment seed |
-| May its parent add fields of its own for it? | the enablement `IAM_MANAGE_CHILD_CATEGORY_FIELDS` on the parent's category (migration) |
 
-**The answer decides where it lands, by the rule of the ideate chapter.** What the product's code, flows or tests rely on is a migration contribution, the same in every environment. What differs per environment is the estate's declaration. A tenant's own choice is the console, at runtime. Sample records are a per-environment seed. Tenants' own fields and tags stay ENT's and are never asked here.
-
-**The answers write three things.** The product module's MDM contribution `fields` (key, target, fieldConfig, sensitivity), the IAM contribution `categoryFields` (categoryCode, fieldKey, required, collectAt, viewPermissions, editableBySubject, displayOrder), and one journey for each category in the arc's notes (arrive, set up the org, add people, sign in, what each step asks and tells). Each journey becomes that category's journey tests.
+**The answer decides where it lands, by the rule of the ideate chapter.** What the product's code, flows or tests rely on is a migration contribution, the same in every environment. What differs per environment is the estate's declaration. A tenant's own choice is the console, at runtime.
 
 ### How to ask
 
 - **Ask one question and stop.** A numbered list of all of them arrives as a form, and a form gets one careless pass.
-- **Write each answer down before you ask the next one.** Land that question's row with their answer as its note, `spn-devex workstream row state {NNN}/N001 <row> landed --note "<their answer, as they gave it>"`. Answers written at the end are the same lost window as answers written nowhere, because the window can close partway through.
+- **Record each answer before you ask the next one**, with `layout answer`. Answers written at the end are the same lost window as answers written nowhere, because the window can close partway through.
 - **Never fill an answer in for them.** A code you invented becomes the account address, the scope and the prefix, and it is expensive to take back. The legal entity, the owner's name and the cloud region are the ones an agent is most tempted to guess.
 - **The cloud region mapping is a choice, not a derivation.** `ap-south-1` does not follow from `in` by any rule this estate states. Somebody decided it, so somebody has to say it.
 - **The closest twin is the one people skip, and it earns the most.** A twin tells you which mechanisms transfer wholesale. Where this is their first platform there is no twin, and saying so beats inventing one.
-- **The estate questions are the rows of the coordinates table above, and the category questions are the journey table's.** Its *What it decides* column says what consumes each answer. Do not walk a partner through every coordinate a platform will ever carry: the rest is settled inside the concept at act 10 and in the declarations after that.
 
-## Act 4 — read back what they said, and what follows from it
+## The read-back, and the go
 
-Show every answered row as it now stands, and then show what you derived from it. Ask whether the whole picture is right. This is the last cheap moment: after act 5 the organization code is in a repository name, and after act 8 it is in a published package.
+Show every section as it now stands, and then show what you derived. This is the last cheap moment: after the go the organization code is in a repository name, and soon after in a published package.
 
-**Read back three things, in this order.**
+**Read back in this order.**
 
 | What | Why it is in the read-back |
 | --- | --- |
+| The hard-to-undo list, from 1.6 | Each item costs a migration or a rename once code stands on it |
 | The answers, as given | They correct their own typing before anything derives from it |
 | **The two repository names** | They are declared data rather than convenience, and a rename moves every path a pin resolves against |
+| The recommended repositories | From 6.4, read back before any repository is made: one team, the estate then the platform, the platform's concept in its docs; several teams, their own book (FOUNDATION) first, then the estate and the platform, each team's service repository joining when the team starts; own infra material, an infra support repository before the estate. A repository added after day zero is placed by the workspace map from its own files, with no new bootstrap |
 | **The app set, and the categories it came from** | A wrong business model shows up here as a missing app, which is cheap, rather than at boot, which is not |
-| Each category's journey | The fields it asks and when are written into migrations, and a wrong one costs a reset |
+| The brand, or the design system's own look | The first apps wear it, so they say plainly which |
+| What the skeletons will be | A module's package with its seats and no states, an app's shell with its layout and theme, the estate's rows |
 
 **The names are derived and read back, never typed.** `{spc}` is permanent — three lowercase letters, never renamed — and the repository name inherits that permanence. Showing it is how a wrong `{spc}` gets caught while it still costs nothing.
 
-**The read-back is the preview.** Bring `notes/N001/preview.html` current first: every answer as given in its Proposed, every derived value beside it, and both repository names in its Where it lands. Show them that page. Once they agree, land row 13 with the read-back as its note.
+**The go is refused while a section is Pending or out of date** (`RULE.DEVEX.WORKSPACE.542` · MUST · skill:spn-devex/execute). Run `spn-devex workstream layout check {NNN}`; it names each section still `PENDING`, and each citing a decision newer than itself, and `workstream go write` refuses the same way. Once it passes and the founder says yes, record the go on each arc with `spn-devex workstream arc edit {NNN}/<arc> --status DECIDED --note "<their words>"`, then follow the `execute` skill: the change sheets are written from N001 to N006 and the plan derives the running order itself, estate packages and pins first.
 
-**A go is written down or it did not happen.** Record it with the command that moves the arc out of `PROPOSED`, carrying their words as they gave them, as `refs/devex/workspace/workstream.md` shows:
+## The go's acts, and their order is forced rather than chosen
 
-```sh
-spn-devex workstream row state {NNN}/N001 13 landed --note "<the read-back: the repository names, the categories, the apps>"
-spn-devex workstream arc edit {NNN}/N001 --status DECIDED --note "<the developer's words>"
+The repositories come from the answers, not always two. The usual shape, one team and no infra material of its own, makes two, and the estate one comes first. It carries a package for the organization and one for the platform.
+
+```
+{org}-infra/                        sprepo.json  { type: INFRA }
+  packages/infra-organization/        spinfrapkg.json
+  packages/infra-platform-{spc}/      spinfrapkg.json
+
+{org}-{platform}-ts/                sprepo.json  { type: APPS, stack: TS,
+                                        infra: { organization: pkg@ver,
+                                                 platform:     pkg@ver } }
 ```
 
-The log then holds `PROPOSED → DECIDED · <their words>`, and rows 14 to 19 are build work.
+| # | The act | The command | Why it sits here and not later |
+| --- | --- | --- | --- |
+| 5 | Bring the organization up, then make the estate folder and mint it | `spnutils infra organization up`, then `mkdir <org>-infra`, `git init` and `spnutils infra scaffold repo` inside it | The book's utils chapter runs the organization layer once, before any `repo create`, and `repo create` refuses by name until it has. The estate repository exists only as a folder until act 7 has written its organization node |
+| 6 | Wire it | `spnutils repo agent-sync` | Without it the session has no `implement`, no `review`, no `release` |
+| 7 | The two estate packages, organization first, then the estate repository created and pushed | `spnutils infra scaffold`, then `implement` to fill `providers.scm.org` and the rest, then `spnutils repo create <org>-infra` from inside the folder, `git remote add origin`, `git push` | The platform package names the organization it belongs to. `repo create` reads the GitHub organization from the organization node that reaches the folder, refuses before the node exists or while `providers.scm.org` is empty, and refuses when that GitHub organization does not exist. It opens no checkout, so the folder is the repository and `origin` is added by hand |
+| 8 | Release them and stage the pins | `spnutils infra release --local` | The platform repo pins a version, and it cannot pin a working tree |
+| 9 | The platform repository | a new folder and `git init`, then `repo create <org>-<spc>-<stack> --from <organization package>@<version>`, then `apps scaffold repo` | The scaffold takes both pins as arguments, so act 8 has to have happened. The pin it writes does not exist yet when `repo create` runs, so the command takes `--from`, the estate node answering which organization's SCM (`package@version` or a path) |
+| 10 | Its concept, then its skeletons | `CONCEPT.md` from N001's decisions, then `apps scaffold <kind>` once for each module and app the arcs decided | The concept decides which kinds exist. Scaffolding first is deciding by accident. A module is scaffolded one at a time with the existing scaffold |
+| 11 | The provider keys | — you name them, they fill `~/.spnenv` | The provider registry fails fast at boot when a type or key is missing. A walk that ends in a running stack cannot defer this |
+| 12 | Bring the platform up | `spnutils infra platform up <spc>` | The platform layer reads what the organization layer wrote at act 5 |
+| 13 | Run the stack, and say what they should see | the domain plugin's run skill | This is the acceptance. The go ends on a platform that answers, not on a filled page |
 
-**The rows are the plan, and no `plan.md` is written.** Rows 14 to 19 already name acts 5 to 13, each with its command from the table above. Give each its repository with `--repo` once act 4 has derived the names, then `spn-devex docs cycles write {NNN}` writes How's places for them, and you write the one line under each, then `spn-devex workstream arc stamp write {NNN}/N001`. Then `spn-devex workstream state check {NNN}` reads the arc with no finding, and acts 5 to 10 may run.
-
-Then say which act runs next, and run it.
+- **Act 6 is where day zero used to stop.** A partner's first repository is an estate repo, it carries no `package.json`, and that is precisely the case the wiring command refused. If you meet that refusal, say so plainly and name it as the known blocker rather than working around it by hand.
+- **A partner holds no marketplace checkout, and nothing has to be said about it.** The mode follows from where they are standing, so the same command wires the published source. Their plugins resolve from the published marketplace, and the book reaches them as a published rendering rather than a path they can open.
+- **Acts 11 to 13 are the acceptance.** A partner who has never seen this estate finishes the go, runs the local stack, and sees their platform's skeleton answer. Anything short of that is a form somebody filled in.
+- **Acts 5, 12 and 13 go through the CLI's own doors.** `infra organization up` and `infra platform up <spc>` are the commands, and `tofu apply` is never hand-run, locally or anywhere else.
+- **Stop at the end of each act and say what it produced.** The developer is watching a workspace appear out of nothing, and a silent run of the whole go gives them nothing to correct.
 
 ## Act 11 — the provider keys, and the pause while they are filled
 
-**This act is a hard stop, not a nicety.** The provider registry fails fast at boot when a type or a key is missing, so a walk that ends in a running stack has to have asked for them. A walk ending at *scaffolded* could have deferred this one. This one cannot.
+**This act is a hard stop, not a nicety.** The provider registry fails fast at boot when a type or a key is missing, so a go that ends in a running stack has to have asked for them.
 
-`workspace init` wrote the saasplane env's **shape** at act 1 and derived no key, by design. The values are theirs.
+`workspace init` wrote the saasplane env's **shape** and derived no key, by design. The values are theirs.
 
 **What you do here, in order.**
 
-1. **Name the keys the platform will look for**, and say what each one is for. Email, SMS and storage are the families that stop a boot.
+1. **Name the keys the platform will look for**, from section 2.4's outside services, and say what each one is for. Email, SMS and storage are the families that stop a boot.
 2. **Say what breaks without each one** — plainly, so they can decide which they need today and which can wait.
 3. **Point them at the saasplane env** and stop. Their own keys go in the `spnutils:dev` region, which no run reads or writes.
-4. **Wait.** Then confirm the values with `spnutils workspace env show`, which prints a value nobody typed and shows every typed value as set or unset.
+4. **Wait.** Then confirm the values with `spnutils workspace env show`, which prints a value nobody typed and shows every typed value as set or unset. The ground's `keys` item turns Done on it.
 
 - **Never print a value back, and never read a region of that file onto the screen.** A transcript outlives the session that wrote it, and a printed credential is exposed from that moment. `refs/devex/workspace/workspace.md` § The saasplane env carries the rule.
 - **Confirm presence, never content.** The status command answers *is it set* without answering *what is it*, which is the only question you need.
@@ -306,59 +293,64 @@ The organization layer is already up from act 5, and the platform layer reads wh
 spnutils infra platform up <spc>
 ```
 
-`<spc>` is the platform's code, from the answer to question 5, and it comes straight after the verb (`RULE.DEVEX.UTILS.072` · MUST · skill:spn-devex/develop). No environment entry selects a platform.
+`<spc>` is the platform's code, from section 6.3, and it comes straight after the verb (`RULE.DEVEX.UTILS.072` · MUST · skill:spn-devex/develop). No environment entry selects a platform.
 
-- **The CLI's own doors, always.** `tofu apply` and `tofu destroy` are never hand-run — not in the cloud, and not locally either. This is the same rule act 9's `repo create` already follows, so nothing new is being excused here.
+- **The CLI's own doors, always.** `tofu apply` and `tofu destroy` are never hand-run — not in the cloud, and not locally either.
 - **Stop after each and say what it produced.** A partner watching an estate appear has no way to tell a slow layer from a stuck one unless you say.
 - **A refusal here is information, not a blocker to work around.** Name what refused and what it was reading, and stop. An estate brought up by hand is an estate nothing can reason about afterwards.
 
 ## Act 13 — run it, and say what they should see
 
-**Act 13 is the acceptance the whole walk exists for.** Hand the run to the domain plugin's run skill, which owns how a platform of that stack starts.
+**Act 13 is the acceptance the go exists for.** Hand the run to the domain plugin's run skill, which owns how a platform of that stack starts.
 
 Then say, in plain words, what they are looking at:
 
 - **Which surface to open**, by name, and what answering looks like.
-- **What the default platform does** — sign-in through `IDENTITY`, and the consoles their business models opened.
-- **What is deliberately empty.** A fresh platform has no data, and an empty console is the correct result rather than a failure.
+- **What the platform does now** — sign-in through `IDENTITY`, and the consoles their business models opened, each in its brand or the design system's own look.
+- **What is deliberately empty.** A skeleton has no business logic and a fresh platform has no data, so an empty console is the correct result rather than a failure.
 
-**Then stop.** Day zero ends here. The first real workstream is theirs to open, and the skeleton is ready for it.
+## Closing the foundation workstream
 
-## Closing the workstream
+**It closes when the platform runs and they have seen it answer**, and the follow-ups arc names the next workstreams: one per module, the design language rounds on the running apps, and the cloud walk with the ground's `CLOUD` items. Close it through the workspace chapter's close gate, and say in one line what landed: the two repository names, the two package versions, the surfaces that came up, and where the decisions now live. **The decisions outlive the workstream inside `CONCEPT.md` and the constructs**, which the go writes, so closing loses nothing.
 
-**It closes when the platform runs and they have seen it answer** — the end of act 13. That makes it a receipt for day zero rather than a list of things to do, and it is why it closes rather than staying open forever. A walk that stopped at scaffolded would be closing on a folder nobody had proved.
+## The joining path
 
-Move the whole folder from `open/` to `closed/`, and say in one line what landed: the two repository names, the two package versions, the surfaces that came up, and where the coordinates now live. **The coordinates outlive the workstream inside `CONCEPT.md`**, which act 10 writes, so closing loses nothing.
+**Ask one question: where the team lives** — its GitHub organization, or its estate repository (`RULE.DEVEX.FUNCTION.107` · MUST · skill:spn-devex/bootstrap). Then, stopping after each step to say what it produced:
+
+1. **Mint the workspace** where `.spndevex/` is not yet the workspace's, with the name they gave, and open a joining workstream, `{NNN}-joining`, with its role arcs.
+2. **Clone the repositories the estate declares**, each beside the others, and wire each with `spnutils repo agent-sync`, then `spnutils workspace agent-sync`.
+3. **Walk the sign-ins and the keys**: GitHub and the registry as the ground checks them, then the provider keys the team keeps, named and filled as act 11 says.
+4. **Bring the local stack up from the pinned versions**, `spnutils infra organization up`, then `spnutils infra platform up <spc>`, and run it with the domain plugin's run skill.
+5. **Close on an onboarding read**: the vision, the concept, what is built, and where the newcomer's first task sits. Then close the joining workstream.
+
+**It asks no estate question and creates nothing beyond the local workspace.** Nothing is created in GitHub or in a cloud, and nothing is decided: the team's foundation already holds every answer.
 
 ## Where they stand, read from the ground
 
-Day zero is not a switch. It is the first rung of a ladder, and you work out which rung they are on by reading the workspace rather than by asking. What you offer next depends on that answer, so a partner in week one and a partner in month six get different sessions.
+Day zero is not a switch. It is the first rung of a ladder, and you work out which rung they are on by reading the workspace rather than by asking.
 
 | Rung | What the ground shows | What you offer next |
 | --- | --- | --- |
-| 0 · empty | No `sprepo.json` anywhere | The door, then the acts above |
+| 0 · empty | No `sprepo.json` anywhere, no open foundation workstream | The door |
+| 0b · foundation open | An `open/{NNN}-foundation` folder with sections still Pending | The next Pending section, from `layout show`; never question one again |
 | 1 · estate only | One `INFRA` repo. Packages present, nothing released | Finish the organization package, then the platform one, then release and stage the pins |
 | 2 · repos, no concept | An `APPS` repo exists. No `CONCEPT.md` at its root | `ideate` — boundary, domains, surfaces, one agreed block at a time |
 | 3 · concept, few projects | `CONCEPT.md` present. Very few `spkind.json` below it | `new` — the projects the concept implies, each kind from the closed set |
 | 4 · building | Apps and modules present, suites running | The contract-first loop, and the review gate each contract change opens |
 | 5 · never run locally | Code present. No local estate state, nothing pinned | `provision` — the layers in order, and what each one owns |
-| 6 · running, not deployed | Local green. No cloud environment answers | The cloud walk, phase by phase — which is where a finished day zero leaves them |
+| 6 · running, not deployed | Local green. No cloud environment answers | The cloud walk, phase by phase — which is where a finished foundation leaves them |
 
 Two cheap signals carry most of this. Whether `CONCEPT.md` exists separates rungs 1 and 2, and whether the platform repo pins a version or a path tells you if anything has been released. Both are one file read.
 
-One more signal shapes your tone rather than your offer. Count the folders in `.spndevex/workstreams/closed/` and you know whether this workspace has finished anything before. An empty archive means explain more; a full one means get out of the way.
+Count the folders in `.spndevex/workstreams/closed/` and you know whether this workspace has finished anything before. An empty archive means explain more; a full one means get out of the way.
 
-**A bootstrap walk left half-finished is read from the same ground.** An `open/{NNN}-new-platform` folder means somebody started this before. Read its arc, see which rows carry answers, and resume from the first one that does not — never from question one, and never by asking again for something the file already holds.
+## Open with a greeting, and end with the door
 
-## Open with a greeting, and end with a door
-
-A session that opens with a status dump greets nobody. Greet them, then show the ground, then leave one open question — never a menu of options. They arrive with something in mind, and a leading question picks their subject for them.
+A session that opens with a status dump greets nobody. Greet them, then show the ground, then leave one open question — never a menu of options beyond the door's three paths.
 
 > Welcome to SaaS Plane — your workspace is set up, and it holds no repository yet. A clean start.
 >
-> Say yes and I open a workstream to hold your answers, then ask the estate questions one at a time. Each answer lands in a file as you give it, so nothing rests on this window staying open. We finish with your platform running locally, and you looking at it. Say no and nothing is created.
->
-> Would you like to start a new platform?
+> Are you starting a new platform, joining a team that already has one, or just looking around? If you are starting one, I ask a few questions here, then lay the whole foundation out as one workstream, every decision marked as still to answer, and we go through them together; we finish with your platform running locally. If you are joining, tell me where your team lives and I set the rest up. Looking around creates nothing.
 
 That is the door a partner meets: they ran `spnutils workspace init <name>` before they opened the window, because the floor it writes is what brings the plugins here. In a folder nobody minted, which is a builder's case with the plugins at user scope, the door says the folder is empty and offers to mint the workspace as well.
 
@@ -366,14 +358,23 @@ That is the door a partner meets: they ran `spnutils workspace init <name>` befo
 
 - **Never invent an organization code, a platform code, or a domain name.** Those are theirs, and every later name derives from them.
 - **Never invent a legal entity, an owner's name, or a cloud region.** These are the three an agent reaches for when it wants to be helpful, and all three end up in a manifest somebody signs.
+- **Never ask them to type a skill or a `spnutils` command after the install and `workspace init`.** Running them is yours.
+- **Never mark a ground item Done on their word, and never read a cloud account before their yes at that step.**
 - **Never print a provider key back, and never read the saasplane env onto the screen.** Confirm that a key is set; never confirm what it is.
-- **Never run an act whose input nobody supplied.** A default you chose quietly is the hardest kind of decision to find later.
-- **Never hand-write a manifest, a settings file or a scaffolded folder.** The command that owns it writes it, and a hand-made copy drifts from the standard on the day it is created.
-- **Never skip act 1 where nobody minted the workspace.** A workspace nobody minted has no permission floor, so the session guiding the rest of the walk is the one session with no guidance. Where `.spndevex/` is already the workspace's, act 1 has run, and you go to act 2 without running it again.
-- **Never ask a question before the arc exists.** An answer given to a session with nowhere to put it is an answer the next window cannot read.
+- **Never run an act whose input nobody supplied, and never start the go while `layout check` refuses.** A default you chose quietly is the hardest kind of decision to find later.
+- **Never hand-write a manifest, a settings file, a scaffolded folder or a file under `arcs/`.** The command that owns it writes it, and a hand-made copy drifts from the standard on the day it is created.
+- **Never add, drop or reorder a round, section or arc of the layout.** Strike a part by the founder's words; change the shape only through the book and the plugins.
+- **Never ask a question before the workstream exists**, beyond the door's chat questions. An answer given to a session with nowhere to put it is an answer the next window cannot read.
 
 ## The rules this step holds
 
 <!-- Generated by the plugins build from `spn-devex/src/refs/rules.json`. Change the book, never these lines. -->
 
+- **Bootstrap opens on a door with three paths — start a new platform, join an existing platform, or just look around — and only the first two create anything; after the one install and `spnutils workspace init`, every skill and every `spnutils` command is the agent's to run** (`RULE.DEVEX.FUNCTION.105` · MUST · skill:spn-devex/bootstrap)
+- **The accounts and sign-ins no tool can create are the foundation workstream's Ground section, each item with the check that says it is already done; the agent checks the ground and never decides it, an item turns Done only when its check passes, and a check that reads a cloud account runs only with the developer's approval at that step** (`RULE.DEVEX.FUNCTION.106` · MUST · skill:spn-devex/bootstrap)
+- **The joining path asks one question, where the team lives — its GitHub organization or its estate repository — then mints the workspace, clones and wires the repositories the estate declares, walks the sign-ins and the team's provider keys, runs the local stack from the pinned versions, and closes on an onboarding read; it asks no estate question and creates nothing beyond the local workspace** (`RULE.DEVEX.FUNCTION.107` · MUST · skill:spn-devex/bootstrap)
+- **A new platform's first workstream is written whole from bootstrap's layout data after a few questions in chat — the path, the workspace's name, who the platform is for and the product in one sentence — so every round, section and arc is on the page from the first minute, each section Pending with what it knows, needs and waits on** (`RULE.DEVEX.FUNCTION.108` · MUST · skill:spn-devex/bootstrap)
 - **A session opens on generated orientation read from the workspace and never typed, and an empty workspace is asked the estate questions instead of being read** (`RULE.DEVEX.WORKSPACE.045` · MUST · skill:spn-devex/bootstrap)
+- **An arc is created when its work starts, or with every one of its sections naming what it waits on; a workstream written from a layout opens all its arcs at once, and none of them is empty, because each section says what it still needs and what it waits for** (`RULE.DEVEX.WORKSPACE.539` · MUST · skill:spn-devex/bootstrap)
+- **The layout data is the workstream's structure, kept in the plugin as data and read-only: its rounds, each round's sections and subsections, the views that start a round and the views that join it, the arcs, and the tree of where each arc lands; a change to it is a change to the book and the plugins, never to one workstream** (`RULE.DEVEX.WORKSPACE.540` · MUST · skill:spn-devex/bootstrap)
+- **An answer is recorded once, as a decision in the founder's words with its day, and every section that uses it cites that decision; a changed answer reopens every section that cites it, marking each `PROPOSED` again** (`RULE.DEVEX.WORKSPACE.541` · MUST · skill:spn-devex/bootstrap)

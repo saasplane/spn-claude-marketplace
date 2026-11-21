@@ -26,6 +26,7 @@ const WRITERS: Record<string, string> = {
   "sheet.json": "the `workstream sheet` commands, and the opening write of `workstream arc edit`",
   "questions.jsonl": "the `workstream question` commands",
   "suggestions.jsonl": "`workstream suggestion add`, `suggestion state` and `suggestion edit`",
+  "layout.json": "the `workstream layout` commands",
 };
 
 /** Why a path a call writes is a script's alone, or null. */

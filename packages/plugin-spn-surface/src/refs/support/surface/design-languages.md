@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/01-common/05-design-languages.md",
-      "seen": "23d7d14b"
+      "seen": "d6b5001d"
     }
   ]
 }
@@ -229,7 +229,8 @@ The design language holds the brand once: the primary colour, the greys and the 
 - **A theme is layered in one order: the defaults, then the brand, then the app's looks, then an account's branding** (`RULE.SUPPORT.SURFACE.575` · MUST · skill:spn-surface/design)
 - **A design language stands beside the theme: it holds its apps' looks and never the brand of another platform** (`RULE.SUPPORT.SURFACE.576` · GUIDE). A partner's brand is the partner's design language, and an app that serves two platforms keeps a row in each.
 - **`spnutils apps surface theme <app>` refuses an app whose theme setting is out of step with its row** (`RULE.SUPPORT.SURFACE.577` · MUST · skill:spn-surface/design). It reads the app's row and the brand from the design language and the app's exported setting from its code, names each value that differs with the app's side and the book's side by side, writes no file, and refuses an app that has a row and no setting, and a setting with no row.
-- **The brand is written as one data block, and each app's row as one data block keyed by the app's code, in the design language's construct** (`RULE.SUPPORT.SURFACE.578` · MUST · skill:spn-surface/design). The block is `json` and holds the theme's own values, so the people who read the construct, the theme check and the page render all read one answer. The data is never a separate file.
+- **The brand is written as one data block, and each app's row as one data block keyed by the app's code, in the design language's construct** (`RULE.SUPPORT.SURFACE.578` · MUST · skill:spn-surface/design). The block is `json` and holds the theme's own values, so the people who read the construct, the theme check and the page render all read one answer.
+- **Each app's row lists the kinds of page it serves, `SITE` for public pages, which take the site look, and `APP` for signed-in pages, which take the app layout, and the scaffold writes one theme setting for each kind from the row: `src/site-theme.ts` exporting `SITE_THEME`, and `src/app-theme.ts` exporting `APP_THEME`** (`RULE.SUPPORT.SURFACE.586` · MUST · skill:spn-surface/design). An app with both kinds keeps both settings, and the theme check reads each. A row's `page` is one kind or a list, and a row without one serves `APP`. A partner's design language starts on day 0 from the blank template, its brand asked in the foundation workstream's surface round. The data is never a separate file.
 - **Layout type is the app's layout setting and never a theme value** (`RULE.SUPPORT.SURFACE.139` · MUST · skill:spn-surface/design). A row points at the app's layout setting and never copies it into a look.
 
 ## The starting list — 🔮
@@ -311,6 +312,7 @@ This ref states what a design language is, its five parts, how a page is built f
 | `RULE.SUPPORT.SURFACE.576` | a design language holds its apps' looks and never the brand of another platform |
 | `RULE.SUPPORT.SURFACE.577` | `spnutils apps surface theme <app>` refuses an app whose theme setting is out of step with its row |
 | `RULE.SUPPORT.SURFACE.578` | the brand and each app's row are each one data block, keyed by the app's code, in the construct |
+| `RULE.SUPPORT.SURFACE.586` | each app's row lists its kinds of page, `SITE` and `APP`, and the scaffold writes one theme setting for each kind |
 | `RULE.SUPPORT.SURFACE.139` | layout type is the app's layout setting and never a theme value |
 
 ## Proof
