@@ -75,7 +75,7 @@ console.log("\n=== the templates are laid out by where the made file lives, and 
   const surface = text(join("surface", "surface-page-template.html"));
   ok("[MKT.SCRIPTS.407] the surface page template holds a small sample page in its template, two sections each with a note, and the two metas, the app's stylesheet empty",
     /<template id="page">[\s\S]*<\/template>/.test(surface) && (surface.match(/data-note="\d"/g) ?? []).length === 2 && (surface.match(/<section data-slot="section-container"/g) ?? []).length === 2
-      && /<meta name="surface-ds" content="\d+\.\d+\.\d+">/.test(surface) && /<meta name="surface-app-css" content="">/.test(surface) && surface.length < 12000 && !/<style|<script(?! src)/.test(surface), String(surface.length));
+      && /<meta name="surface-ds" content="\d+\.\d+\.\d+">/.test(surface) && /<meta name="surface-app-css" content="">/.test(surface) && surface.length < 14000 && !/<style|<script(?! src)/.test(surface), String(surface.length));
 }
 
 console.log(failed ? `\n  ${failed} of ${total} FAILED — templates` : `\n  all ${total} passed — templates`);

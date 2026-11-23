@@ -29,10 +29,9 @@ export type Placed = { number: number; section: number; html: string };
 
 const escapeHtml = (text: string): string => text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
-/** One note's markup: a hidden aside, numbered from 1, pinned to the top left of its section. */
+/** One note's markup: a hidden aside of the class `sds-note` (the page script draws the sticky note), numbered from 1, pinned to the top left of its section. */
 export function noteHtml(number: number, note: string): string {
-  const badge = `<b style="display:inline-grid;place-items:center;width:20px;height:20px;margin-right:6px;border-radius:50%;background:#f9fafb;color:#111827;font-size:12px">${number}</b>`;
-  return `<aside data-note="${number}" hidden style="position:absolute;top:12px;left:12px;z-index:60;max-width:300px;padding:8px 10px;border-radius:8px;background:#111827;color:#f9fafb;font:500 13px/1.45 system-ui,sans-serif;box-shadow:0 4px 16px rgba(0,0,0,.25)">${badge}${escapeHtml(note)}</aside>`;
+  return `<aside class="sds-note" data-note="${number}" hidden>${number} &middot; ${escapeHtml(note)}</aside>`;
 }
 
 /**

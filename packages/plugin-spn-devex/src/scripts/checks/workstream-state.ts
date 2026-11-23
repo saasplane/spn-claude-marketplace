@@ -67,7 +67,7 @@ export function previewFindings(ws: string, arc: string): string[] {
 }
 
 /** The kinds of page the book has. A sample whose masthead names one is a page of the book the work produces. */
-export const BOOK_PAGE_KINDS: readonly string[] = ["approach", "preview", "construct", "overview", "report", "guide", "index", "hub", "page"];
+export const BOOK_PAGE_KINDS: readonly string[] = ["approach", "preview", "arc", "construct", "overview", "report", "guide", "index", "hub", "page"];
 
 /** A review copy of one of the book's templates, named for it: `blocks-template.html`, `approach-template-v2.html`. */
 const TEMPLATE_COPY = /-template(?:-[^/.]+)?\.html?$/i;
@@ -95,6 +95,40 @@ export function sampleFindings(ws: string, arc: string): string[] {
     out.push(`\`${NOTES}/${arc}/samples/${file}\` is built with the page template, the shared docs stylesheet and a masthead — ` +
       "a sample is the work's own file in its own format, browsed through `samples/index.html`; only a sample of a book page " +
       "the work produces carries a masthead, its `Type` naming the page kind or its name the template it copies");
+  }
+  return out;
+}
+
+/** Every `path` a samples index's `index-data` lists, with the group's `base` put in front where it names one. */
+function indexPaths(node: unknown, base: string, out: string[]): void {
+  if (Array.isArray(node)) { for (const one of node) indexPaths(one, base, out); return; }
+  if (!node || typeof node !== "object") return;
+  const record = node as Record<string, unknown>;
+  if (typeof record.path === "string") out.push(base + record.path);
+  for (const key of ["groups", "children", "items"]) indexPaths(record[key], base, out);
+}
+
+/**
+ * RULE.DEVEX.WORKSPACE.267: an arc's samples index lists only what the work produces. An entry whose path leaves
+ * `samples/` (a `..` segment) is a view of the work, kept in `work/` and never linked from samples; an entry that is no
+ * HTML page is a file the agent manages, kept out of samples.
+ */
+export function sampleIndexFindings(ws: string, arc: string): string[] {
+  let text = "";
+  try { text = readFileSync(join(notesDirOf(ws, arc), "samples", "index.html"), "utf8"); } catch { return []; }
+  const json = /<script\b[^>]*\bid="index-data"[^>]*>([\s\S]*?)<\/script>/i.exec(text)?.[1];
+  if (!json) return [];
+  let data: unknown;
+  try { data = JSON.parse(json); } catch { return []; }
+  const base = typeof (data as { base?: unknown })?.base === "string" ? (data as { base: string }).base : "";
+  const paths: string[] = [];
+  indexPaths(data, base, paths);
+  const out: string[] = [];
+  for (const one of paths) {
+    if (one.split(/[\\/]/).includes(".."))
+      out.push(`${arc}'s samples index lists \`${one}\`: a samples index lists only what the work produces; ${one} is a view of the work, kept in work/ and never linked from samples (rule 267)`);
+    else if (!/\.html?$/i.test(one.split(/[?#]/)[0]))
+      out.push(`${arc}'s samples index lists \`${one}\`: a samples index shows only pages a reader reviews; ${one} is a file the agent manages, kept out of samples (rule 267)`);
   }
   return out;
 }
@@ -441,6 +475,7 @@ export function checkWorkstream(ws: string): Finding[] {
     out.push(...previewFindings(ws, arc).map(say(arc, "preview")));
     out.push(...sampleFindings(ws, arc).map(say(arc, "samples")));
     out.push(...sampleLinkFindings(ws, arc).map(say(arc, "preview")));
+    out.push(...sampleIndexFindings(ws, arc).map(say(arc, "samples")));
     if (!data) continue;
     out.push(...arcPreviewFindings(ws, arc, data, owners).map(say(arc, "preview")));
     out.push(...pageFindings(ws, arc, data, page, text, owners).map(say(arc, "stamp")));

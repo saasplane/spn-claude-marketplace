@@ -28,7 +28,7 @@ ok("a note stands in the section of the heading that carries its title", placed.
 ok("a note whose title no heading carries is left out, and a section takes one note", placed.length === 2, JSON.stringify(placed));
 ok("a note is numbered from 1 by its place in the notes file", placed.map((one) => one.number).join() === "1,3");
 const aside = noteHtml(2, "a <b> line");
-ok("a note is a hidden aside marked data-note, with its number and its words escaped", aside.startsWith('<aside data-note="2" hidden ') && aside.includes(">2</b>a &lt;b&gt; line</aside>"), aside);
+ok("a note is a hidden aside marked data-note, with its number and its words escaped", aside === '<aside class="sds-note" data-note="2" hidden>2 &middot; a &lt;b&gt; line</aside>' && !aside.includes("style="), aside);
 
 console.log("\n=== page copy — the surface page template holds the copy");
 const TEMPLATE = '<meta name="surface-ds" content="11.21.0">\n<meta name="surface-app-css" content="">\n<title>{{NAME}}</title>\n<!-- spn:doc\n{"id": "surface-page-{{page}}", "variant": "surface-page", "title": "{{NAME}}"}\n-->\n<h1 class="sds-surface-title">{{NAME}}</h1>\n<template id="page">\n<div data-section="1">sample</div>\n</template>\n<script src="x.js"></script>\n';

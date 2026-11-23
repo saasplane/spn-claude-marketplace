@@ -2827,11 +2827,12 @@
     --sds-status-dropped: oklch(0.582835 0.202194 29.0717);
     --sds-status-dropped-soft: oklch(0.724946 0.15472 25.82 / 0.14);
     --sds-measure: 58rem;
-    --sds-content-floor: 50rem;
+    --sds-content-floor: 48rem;
+    --sds-page-pad: 2rem;
     --sds-rail-width: 14rem;
-    --sds-tree-width: clamp(13.5rem,calc(100vw - 70.5rem),22rem);
-    --sds-outline-fold: 68rem;
-    --sds-tree-fold: 81.5rem;
+    --sds-tree-width: clamp(13.5rem,calc(100vw - 71.5rem),22rem);
+    --sds-outline-fold: 69rem;
+    --sds-tree-fold: 82.5rem;
   }
   :root[data-mode="dark"] {
     --sds-tk-k: var(--sds-violet);
@@ -2926,7 +2927,7 @@
     grid-template-columns: minmax(0,1fr) var(--sds-rail-width);
     max-width: min(98vw,var(--sds-page-max));
     margin: 0 auto;
-    padding: 3rem 8px 6rem;
+    padding: 3rem var(--sds-page-pad) 6rem;
     align-items: start;
   }
   .sds-rail {
@@ -3755,7 +3756,7 @@
     border-top: 1px solid var(--sds-rule);
     padding-top: 1.3rem;
   }
-  @media (max-width:68rem) {
+  @media (max-width:69rem) {
     .sds-page, .sds-page[data-frame="page"].sds-has-rail {
       gap: calc(0.25rem * 6);
       padding-top: calc(0.25rem * 8);
@@ -5595,7 +5596,7 @@
     margin: 0px;
     max-width: 34rem;
   }
-  @media (max-width:81.5rem) {
+  @media (max-width:82.5rem) {
     .sds-index,.sds-index.sds-is-folded {
       grid-template-columns: minmax(0,1fr);
       grid-template-rows: auto minmax(0,1fr);
@@ -7054,6 +7055,7 @@
   gap: 1rem;
   padding: .8rem 1.1rem;
   border-bottom: 1px solid var(--sds-rule);
+  border-radius: calc(var(--radius) - 1px) calc(var(--radius) - 1px) 0 0;
   background: var(--muted);
 }
 .sds-group-head h5 {
@@ -7313,7 +7315,7 @@
   margin: -.85rem -1rem 0;
   border-bottom: 1px solid var(--sds-rule);
   background-color: var(--sds-paper);
-  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+  border-radius: calc(var(--radius-sm) - 1px) calc(var(--radius-sm) - 1px) 0 0;
   padding: .8rem 1rem;
 }
 .sds-tile-picture svg {

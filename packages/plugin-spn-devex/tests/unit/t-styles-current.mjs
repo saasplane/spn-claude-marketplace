@@ -72,20 +72,22 @@ console.log("=== styles on the design system — the docs classes read the produ
   ok("[MKT.SCRIPTS.589] the page grid gives the content the free width and the outline its own: .sds-page's columns put minmax(0,1fr) first and the rail's width second",
     /\.sds-page\{[^}]*grid-template-columns:minmax\(0,1fr\) var\(--sds-rail-width\)/.test(source));
   ok("[MKT.SCRIPTS.589] a narrow page folds the rail into a menu under the title, opened by a button",
-    /sds-rail-toggle/.test(script) && /matchMedia\('\(max-width: 68rem\)'\)/.test(script));
+    /sds-rail-toggle/.test(script) && /matchMedia\('\(max-width: 69rem\)'\)/.test(script));
   ok("[MKT.SCRIPTS.589] the page grid puts the wrap first and the rail second, on the right, and a page template page has the whole width",
     /\.sds-page > \.sds-wrap\{grid-column:1/.test(source) && /\.sds-page > \.sds-rail\{grid-column:2/.test(source) && /\.sds-page\[data-frame="page"\]\{grid-template-columns:minmax\(0,1fr\)\}/.test(source));
   const token = (name) => new RegExp(`${name}:\\s*([0-9.]+)rem`).exec(source)?.[1];
   const index = readFileSync(join(STYLES, "docs-index.js"), "utf8");
-  ok("[MKT.SCRIPTS.589] the widths of the regions are tokens: the reading width 58rem, the content floor 50rem, the page cap 90rem, the outline 14rem, the tree 13.5rem growing to 22rem, and the two folds 68rem and 81.5rem",
-    token("--sds-measure") === "58" && token("--sds-content-floor") === "50" && token("--sds-page-max") === "90" && token("--sds-rail-width") === "14" && /--sds-tree-width:clamp\(13\.5rem,calc\(100vw - 70\.5rem\),22rem\)/.test(source) && token("--sds-outline-fold") === "68" && token("--sds-tree-fold") === "81.5"
-      && Number(token("--sds-tree-fold")) - Number(token("--sds-outline-fold")) === 13.5 && 70.5 === Number(token("--sds-outline-fold")) + 2.5);
-  ok("[MKT.SCRIPTS.589] the outline folds at the content floor plus the outline, its gap and the gutters, so the content never narrows below the floor, and the tree folds first, at that and the tree's least width",
-    Number(token("--sds-outline-fold")) === Number(token("--sds-content-floor")) + Number(token("--sds-rail-width")) + 3 + 1 && Number(token("--sds-tree-fold")) === Number(token("--sds-outline-fold")) + 13.5
+  ok("[MKT.SCRIPTS.589] the widths of the regions are tokens: the reading width 58rem, the content floor 48rem, the page's side padding 2rem, the page cap 90rem, the outline 14rem, the tree 13.5rem growing to 22rem, and the two folds 69rem and 82.5rem",
+    token("--sds-measure") === "58" && token("--sds-content-floor") === "48" && token("--sds-page-pad") === "2" && token("--sds-page-max") === "90" && token("--sds-rail-width") === "14" && /--sds-tree-width:clamp\(13\.5rem,calc\(100vw - 71\.5rem\),22rem\)/.test(source) && token("--sds-outline-fold") === "69" && token("--sds-tree-fold") === "82.5"
+      && Number(token("--sds-tree-fold")) - Number(token("--sds-outline-fold")) === 13.5 && 71.5 === Number(token("--sds-outline-fold")) + 2.5);
+  ok("[MKT.SCRIPTS.589] the outline folds at the content floor plus the outline, its gap and the two side paddings, so the content never narrows below the floor, and the tree folds first, at that and the tree's least width",
+    Number(token("--sds-outline-fold")) === Number(token("--sds-content-floor")) + Number(token("--sds-rail-width")) + 3 + 2 * Number(token("--sds-page-pad")) && Number(token("--sds-tree-fold")) === Number(token("--sds-outline-fold")) + 13.5
       && Number(token("--sds-tree-fold")) > Number(token("--sds-outline-fold")));
   ok("[MKT.SCRIPTS.589] the typed numbers agree with the tokens: the page's query and the page script at the outline's fold, the index's query and the index script at the tree's fold",
     source.includes(`@media (max-width:${token("--sds-outline-fold")}rem){\n    .sds-page, .sds-page[data-frame="page"].sds-has-rail{`) && source.includes(`@media (max-width:${token("--sds-tree-fold")}rem){\n    .sds-index,.sds-index.sds-is-folded{`)
       && script.includes(`matchMedia('(max-width: ${token("--sds-outline-fold")}rem)')`) && index.includes(`matchMedia('(max-width:${token("--sds-tree-fold")}rem)')`));
+  ok("[MKT.SCRIPTS.589] a surface page's note is a sticky note drawn by one class in the frame's document, from the design system's warning tokens",
+    /\.sds-note\{[^}]*border:1px solid var\(--warning\)[^}]*background:var\(--warning-subtle\);color:var\(--on-warning-subtle\)/.test(script) && !/\[data-note\]\{[^}]*background/.test(script));
   ok("[MKT.SCRIPTS.589] running text stops at the reading width, and a page's content column is never narrower than it where the outline stands",
     /p\{margin:0 0 1rem; max-width:var\(--sds-measure\)\}/.test(source) && /\.sds-standfirst\{[^}]*max-width:var\(--sds-measure\)/.test(source) && /\.sds-page > \.sds-rail\{grid-column:2/.test(source));
   ok("[MKT.SCRIPTS.589] the breadcrumb is a small muted line, and the rail's title reads the name over On this page",

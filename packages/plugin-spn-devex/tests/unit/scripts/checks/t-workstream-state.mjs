@@ -283,6 +283,19 @@ console.log("\n=== RULE.DEVEX.WORKSPACE.267 — a sample is the work's own file,
   const green = checkWorkstream(ws);
   ok("green: a drawing that borrows the stylesheet with no masthead, a plain index, a book page the work produces, a review copy of a book template named for it, and a page with its own styles pass",
     green.length === 0, said(green));
+  const indexFile = join(samples, "index.html");
+  const withData = (paths) => `<!doctype html>\n<title>Samples of N001</title>\n<script type="application/json" id="index-data">${JSON.stringify({ base: "", groups: [{ label: "G", children: paths.map((path) => ({ label: path, path })) }] })}</script>\n`;
+  writeFileSync(indexFile, withData(["patterns/find-in-a-list.html", "../work/view.html"]));
+  const redIndex = checkWorkstream(ws);
+  ok("[RULE.DEVEX.WORKSPACE.267] red: a samples index entry that leaves samples/ is named, with the rule",
+    has(redIndex, "samples", /lists only what the work produces; \.\.\/work\/view\.html is a view of the work, kept in work\/ and never linked from samples \(rule 267\)/), said(redIndex));
+  writeFileSync(indexFile, withData(["patterns/find-in-a-list.html", "templates/order-template.md", "data/rows.json"]));
+  const redKind = checkWorkstream(ws);
+  ok("[RULE.DEVEX.WORKSPACE.267] red: a samples index entry that is no HTML page is named, with the rule",
+    has(redKind, "samples", /lists only|shows only pages a reader reviews; templates\/order-template\.md is a file the agent manages, kept out of samples \(rule 267\)/) && has(redKind, "samples", /data\/rows\.json is a file the agent manages/), said(redKind));
+  ok("a page in the index is not named for its kind", !has(redKind, "samples", /find-in-a-list\.html is a file/), said(redKind));
+  writeFileSync(indexFile, withData(["patterns/find-in-a-list.html"]));
+  ok("[RULE.DEVEX.WORKSPACE.267] green: an index whose paths stay in samples/ passes", !has(checkWorkstream(ws), "samples", /view of the work/), said(checkWorkstream(ws)));
 }
 
 console.log("\n=== RULE.DEVEX.WORKSPACE.262 — an arc's notes folder holds the five, and nothing else");

@@ -66,7 +66,7 @@ export type Finding = { check: string; grade: Grade; file: string; message: stri
  */
 export const VARIANTS = ["approach", "overview", "construct", "behaviors", "capability", "report",
                   "face", "data_model", "surface_map", "route_map", "register", "preview",
-                  "guide", "index", "page"] as const;
+                  "guide", "index", "page", "arc"] as const;
 export type Variant = (typeof VARIANTS)[number];
 
 /** The words a preview's Status chip shows: the arc's status, `PROPOSED` until the design is decided (RULE.DEVEX.WORKSPACE.266). */
@@ -689,7 +689,7 @@ export function checkHeader(file: string, src: string, block: any): Finding[] {
   else if (shared && line1) {
     // A workstream's own pages, the approach page and an arc's page, chain their levels with ` · ` and end on the page's numbered name:
     // `SaaS Plane · 041 Improvements`, `SaaS Plane · 041 Improvements · N018 Docs tooling`. Every other page has the three fields.
-    const chained = block.variant === "approach" || block.variant === "preview";
+    const chained = block.variant === "approach" || block.variant === "preview" || block.variant === "arc";
     // THE LINE IS THE BREADCRUMB: its levels are joined by ` · `, each level above the page a link. A page written before it joined them with `|`.
     const parts = text(line1[1]).split(chained ? "·" : /[·|]/).map((p) => p.trim()).filter(Boolean);
     if (chained ? parts.length < 2 || parts.length > 3 : parts.length !== 3) add("RULE", chained ? `the identity line carries ${parts.length} levels, not two or three` : `the identity line carries ${parts.length} fields, not three`);
@@ -722,7 +722,7 @@ export function checkHeader(file: string, src: string, block: any): Finding[] {
   // so its template carries no For chips and none are compared.
   const chips = [...h.matchAll(/class="sds-badge sds-lens"[^>]*>([\s\S]*?)<\/span>/g)].map((m) => text(m[1]));
   const wantChips = (block.lenses ?? []).map((l: string) => LENS_LABEL[l]).filter(Boolean);
-  if (shared && block.variant !== "preview" && chips.join(" · ") !== wantChips.join(" · "))
+  if (shared && block.variant !== "preview" && block.variant !== "arc" && chips.join(" · ") !== wantChips.join(" · "))
     add("RULE", `For reads \`${chips.join(" · ")}\`; the block's lenses render as \`${wantChips.join(" · ")}\``);
   if (/\bLenses:/.test(h)) add("RULE", "the tag line reads `For:`, never `Lenses:`");
   if (!shared) return f;
@@ -748,7 +748,7 @@ export function checkHeader(file: string, src: string, block: any): Finding[] {
     }
     if (!/>\s*Commit:\s*</.test(shown))
       add("RULE", "no Commit — a report names the commit it read, beside Generated");
-  } else if (block.variant === "preview") {
+  } else if (block.variant === "preview" || block.variant === "arc") {
     // A PREVIEW'S CHIP IS THE ARC'S STATUS, never the block's `status` (RULE.DEVEX.WORKSPACE.266). The
     // block's word says how far the workstream's page has come; the chip reads `PROPOSED` until the
     // developer decides the design and the arc's own status after, so the two are not compared.
@@ -769,11 +769,11 @@ export function checkHeader(file: string, src: string, block: any): Finding[] {
   // author saves and the page `docs audit` reads are judged by the same rule. The kind is the
   // block's variant; a hub is the overview named `concept-overview.html`.
   const kind: MastheadKind | null = basename(file) === HUB ? "hub"
-    : ["overview", "construct", "report", "approach", "preview"].includes(block.variant) ? block.variant : null;
+    : ["overview", "construct", "report", "approach", "preview", "arc"].includes(block.variant) ? (block.variant === "arc" ? "preview" : block.variant) : null;
   for (const [grade, message] of masthead(file, src, kind))
     f.push({ check: "masthead", grade: grade as Grade, file, message });
   // Where a paragraph, a list or a callout should have been a block, from the same reading the doc-check hook makes.
-  const fit: FitKind | null = basename(file) === HUB ? "hub" : ["overview", "report", "guide", "approach", "preview"].includes(block.variant) ? block.variant : null;
+  const fit: FitKind | null = basename(file) === HUB ? "hub" : ["overview", "report", "guide", "approach", "preview", "arc"].includes(block.variant) ? (block.variant === "arc" ? "preview" : block.variant) : null;
   if (fit && file.endsWith(".html") && !/-template\.html$|\.bundled\.html$/.test(file))
     for (const [grade, message] of blockFit(src, true, fit)) f.push({ check: "fit", grade: grade as Grade, file, message });
   return f;
@@ -3379,7 +3379,7 @@ export function walkKindOf(file: string, block: any): WalkKind | null {
   const variant = block?.variant;
   if (name === HUB) return "hub";
   if (isApproachPage(file) || variant === "approach") return "approach";
-  if (name.endsWith("-preview.html") || variant === "preview") return "preview";
+  if (name.endsWith("-preview.html") || variant === "preview" || variant === "arc") return "preview";
   if (name.endsWith("-construct.html") || variant === "construct") return "construct";
   if (name.endsWith("-overview.html") || variant === "overview") return "overview";
   if (name.endsWith("-guide.html") || variant === "guide") return "guide";
