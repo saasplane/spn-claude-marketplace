@@ -497,7 +497,7 @@ console.log("\n=== a guide goes back to the hub of its repository, one step up t
 {
   const hub = `<!-- spn:doc\n{"id":"hub","variant":"overview","title":"The Hub &amp; More","lenses":["LEAD"],"summary":"s"}\n-->\n<h1>x</h1>\n`;
   const root = repo({ [`${GUIDES}/01-getting-started.md`]: TABLE_GUIDE, [`${GUIDES}/02-build.md`]: "# Build\n",
-    [`${DOCS}/README.md`]: "# Docs\n", [`${DOCS}/${POCKET.artifacts}/${ARTIFACT.docs}/concept-overview.html`]: hub });
+    [`${DOCS}/README.md`]: "# Docs\n", [`${DOCS}/${POCKET.artifacts}/public/${ARTIFACT.docs}/concept-overview.html`]: hub });
   const ran = guide(["write", join(root, GUIDES, "01-getting-started.md")]);
   const text = read(root, `${PAGES}/getting-started-guide.html`);
   ok("the way back opens the hub, a page, named by the repository", ran.code === 0

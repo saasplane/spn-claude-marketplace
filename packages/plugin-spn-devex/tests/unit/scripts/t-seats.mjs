@@ -60,7 +60,7 @@ function run(root, args) {
 }
 const readAt = (root, p) => readFileSync(join(root, p), "utf8");
 /** Where the construct pages of the domain `01-core` sit: the `constructs` folder of its folder in the pocket. */
-const CORE_PAGES = `docs/${POCKET.artifacts}/${ARTIFACT.docs}/01-core/${CONSTRUCT_PAGES}`;
+const CORE_PAGES = `docs/${POCKET.artifacts}/public/${ARTIFACT.docs}/01-core/${CONSTRUCT_PAGES}`;
 
 let n = 0, failed = 0;
 function one(name, got, want) {
@@ -145,7 +145,7 @@ console.log("\n=== `figure check` takes a folder, the way `audit check` does");
     [`${CORE_PAGES}/a-construct.html`]: clean,
     [`${CORE_PAGES}/b-construct.html`]: clean,
   });
-  const out = run(ws, ["figure", "check", `docs/${POCKET.artifacts}/${ARTIFACT.docs}`]);
+  const out = run(ws, ["figure", "check", `docs/${POCKET.artifacts}/public/${ARTIFACT.docs}`]);
   one("a folder is every page under it, not a read of the directory", out, lacks("EISDIR"));
   one("and it says how many it judged", out, has("clean — 2 pages"));
   one("a path that is not there is named, not read",
