@@ -151,6 +151,52 @@ function unitFrame(body: string[], findings: Finding[]): string {
     + `    <pre data-lang="json">${escapedCode(JSON.stringify(sections.length === 1 && !Array.isArray(tree?.sections) ? tree : { specVersion: 1, sections }, null, 2))}</pre>\n  </figure>`;
 }
 
+/**
+ * The units the design system builds, which `scripts/build-unit-styles.mjs` writes beside `ds-unit.css` as `ds-units.json` from the
+ * design system's surface snapshot. Null where the list cannot be read, and then no skeleton is held against it.
+ */
+export type BuiltUnits = ReadonlySet<string> | null;
+function readBuiltUnits(): BuiltUnits {
+  const styles = stylesDir(import.meta.dirname);
+  if (!styles || !existsSync(join(styles, "ds-units.json"))) return null;
+  try {
+    const list = JSON.parse(readFileSync(join(styles, "ds-units.json"), "utf8"))?.units;
+    return Array.isArray(list) ? new Set(list.filter((name: unknown): name is string => typeof name === "string")) : null;
+  } catch { return null; }
+}
+let builtUnits: BuiltUnits | undefined;
+/** Replace the list of built units, or give back the file's with no argument. A test names its own. */
+export function setBuiltUnits(units?: Iterable<string> | null): void { builtUnits = units === undefined ? undefined : units === null ? null : new Set(units); }
+
+/** Each unit a skeleton spec names: the `unit` of any frame or section in it, however deep. */
+function skeletonUnits(spec: unknown, found: Set<string> = new Set()): Set<string> {
+  if (Array.isArray(spec)) spec.forEach((one) => skeletonUnits(one, found));
+  else if (spec && typeof spec === "object") {
+    for (const [key, value] of Object.entries(spec)) {
+      if (key === "unit" && typeof value === "string") found.add(value);
+      else skeletonUnits(value, found);
+    }
+  }
+  return found;
+}
+
+/**
+ * A SKELETON OF A UNIT THE DESIGN SYSTEM BUILDS stops the write, because the page then shows a sketch of what a `unit` fence draws for
+ * real. A skeleton of a shape that is not built yet carries `"planned": true`; once the design system builds it, this finding is the
+ * page's cue to change it to a `unit`.
+ */
+function builtSkeleton(spec: Spec, findings: Finding[]): void {
+  if (spec.kind !== "skeleton" || spec.planned === true) return;
+  const built = (builtUnits === undefined ? (builtUnits = readBuiltUnits()) : builtUnits);
+  if (!built) return;
+  const named = [...skeletonUnits(spec)].filter((name) => built.has(name));
+  if (!named.length) return;
+  findings.push({
+    message: `a \`dg\` skeleton names ${named.map((name) => `\`${name}\``).join(", ")}, which the design system builds: draw it with a \`unit\` fence, or set \`"planned": true\` on the skeleton where it shows a shape that is not built yet`,
+    stops: true,
+  });
+}
+
 const LENS_LABEL: Record<string, string> = {
   LEAD: "Engineering leader", BUSINESS: "Business manager", PRODUCT: "Product manager",
   ARCHITECT: "Architect", SERVER_DEV: "Backend developer", WEB_DEV: "Web developer",
@@ -339,7 +385,17 @@ function sentenceShape(head: string[], rows: string[][]): (typeof ITEM_SHAPES)[n
   };
 }
 
-function table(lines: string[]): string {
+/** A plain table that reads as a catalog: a name column, a description column, and more than four rows. */
+const NAME_HEAD = /^(?:name|term|item|block|unit|command|page|check|field|option|figure|kind|type|tool|file|rule|view|layout|part)s?$/i;
+const DESCRIPTION_HEAD = /^(?:description|meaning|purpose|summary|what (?:it|this)\b.*|use|uses|does|about)$/i;
+const bare = (cell: string): string => cell.replace(/[`*]/g, "").trim();
+/** The description column's name where the table reads as a catalog, else null. */
+function readsAsCatalog(head: string[], rows: string[][]): string | null {
+  const at = head.findIndex((name, k) => k > 0 && DESCRIPTION_HEAD.test(bare(name)));
+  return rows.length > 4 && head.length <= 3 && NAME_HEAD.test(bare(head[0])) && at > 0 ? bare(head[at]) : null;
+}
+
+function table(lines: string[], findings: Finding[] = []): string {
   // A `\|` inside a cell is a pipe the author wants shown, not a column break — markdown's own rule,
   // and the one the first pattern table in the corpus needed (`{org}-{family}-public\|-private`).
   const cells = (l: string) => l.trim().replace(/^\|/, "").replace(/\|$/, "").split(/(?<!\\)\|/).map((c) => c.trim().replace(/\\\|/g, "|"));
@@ -347,6 +403,9 @@ function table(lines: string[]): string {
   const rows = lines.slice(2).map(cells);
   const shape = ITEM_SHAPES.find((one) => one.head.length === head.length && one.head.every((name, at) => name.test(head[at])))
     ?? sentenceShape(head, rows);
+  // SOFT: a table of names and what each is, past four rows, is a catalog a reader browses (the block table in 05-artifacts.md).
+  const described = ITEM_SHAPES.includes(shape as (typeof ITEM_SHAPES)[number]) ? null : readsAsCatalog(head, rows);
+  if (described) findings.push({ message: `a table of ${rows.length} rows reads as a catalog, a \`${bare(head[0])}\` column and a \`${described}\` column: a \`catalog\` fence (\`layout=GRID\`, or \`LIST\` where the names are long) lets a reader browse them, and a plain table is for a wide comparison of attributes` });
   const th = (shape ? shape.columns : head.map(inline)).map((c) => `<th>${c}</th>`).join("");
   const tb = rows.map((r) => `<tr>${(shape ? shape.row(r) : r.map(inline)).map((c) => `<td>${c}</td>`).join("")}</tr>`).join("\n      ");
   return `  <div class="sds-scroll"><table${shape?.tableClass ? ` class="${shape.tableClass}"` : ""}>\n    <thead><tr>${th}</tr></thead>\n    <tbody>\n      ${tb}\n    </tbody>\n  </table></div>`;
@@ -655,6 +714,7 @@ function renderBody(lines: string[], findings: Finding[], nested = false): strin
         let spec: Spec | null = null;
         try { spec = JSON.parse(body.join("\n")); } catch (e) { findings.push({ message: `a \`dg\` figure is not strict JSON — ${(e as Error).message}` }); }
         if (spec) {
+          builtSkeleton(spec, findings);
           const { svg, findings: df } = draw(spec);
           for (const m of df) findings.push({ message: m });
           if (svg) {
@@ -681,7 +741,7 @@ function renderBody(lines: string[], findings: Finding[], nested = false): strin
       flush();
       const block: string[] = [];
       while (i < lines.length && /^\s*\|/.test(lines[i])) block.push(lines[i++]);
-      if (block.length >= 2) out.push(table(block));
+      if (block.length >= 2) out.push(table(block, findings));
       else findings.push({ message: "a table with no body row" });
       continue;
     }

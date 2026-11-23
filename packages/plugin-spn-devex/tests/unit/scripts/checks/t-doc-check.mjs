@@ -816,6 +816,24 @@ console.log("\n=== RULE.DEVEX.WORKSPACE.259 — a column whose cells hold senten
   say("green: a report's tables are its own, and the same sentences there draw none", notes(checkPage("/d/artifacts/reports/docs-report.html", `<meta charset="utf-8">\n${shared}\n${sentences}\n`)).length === 0);
 }
 
+// ── a sidebar of pages: only the index of artifacts has one ──
+console.log("\n=== doc-check — a page of the artifacts pocket holds no sidebar of other pages");
+{
+  const { check: checkPage, sidebarRule } = await import("../../../../src/scripts/checks/doc-check.ts");
+  const say = (label, pass, detail = "") => { n += 1; if (!pass) failed += 1; console.log(`  ${pass ? "PASS" : "FAIL"}  ${label}${pass || !detail ? "" : `\n        ${String(detail).slice(0, 300)}`}`); };
+  const side = '<nav class="side"><a href="./a-overview.html">A</a><a href="./b-overview.html">B</a></nav>';
+  const rail = '<nav class="sds-rail" id="rail"><a class="sds-home" href="../README.html">back</a><a href="#s0">One</a><a href="#s1">Two</a></nav>';
+  const index = '<script type="application/json" id="index-data">{}</script>';
+  say("red: a nav that links two other pages is found, as a rule", sidebarRule(`<body>${side}</body>`).length === 1 && sidebarRule(`<body>${side}</body>`)[0][0] === "RULE", JSON.stringify(sidebarRule(side)));
+  say("green: the page's own rail, the way back and the outline links are not a sidebar", sidebarRule(`<body>${rail}</body>`).length === 0);
+  say("green: a nav of anchors on the page, and a nav that links one page, draw none", sidebarRule('<nav><a href="#a">a</a><a href="#b">b</a></nav>').length === 0 && sidebarRule('<nav><a href="./a.html">a</a></nav>').length === 0);
+  say("green: the index of artifacts, which holds an index-data block, is the one page that has such a nav", sidebarRule(`${index}<body>${side}</body>`).length === 0);
+  const page = (body) => `<meta charset="utf-8">\n<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.16.0/sds-docs.css">\n<div class="sds-page">${body}</div>`;
+  const hit = (path, body) => checkPage(path, page(body)).filter(([, text]) => text.includes("sidebar of links to other pages")).length;
+  say("red: a page under docs/artifacts/ with a sidebar is told by the whole check", hit("/r/docs/artifacts/docs/a-overview.html", side) === 1);
+  say("green: the same page outside the artifacts pocket, or its index, is not read", hit("/r/notes/a-overview.html", side) === 0 && hit("/r/docs/artifacts/index.html", side) === 0);
+}
+
 // ── the compressed fault (RULE.DEVEX.WORKSPACE.096): a note on a page a person reads ──
 console.log("\n=== doc-check — a compressed sentence is a note on a page a person reads");
 {

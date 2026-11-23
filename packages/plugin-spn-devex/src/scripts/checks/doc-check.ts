@@ -1432,6 +1432,7 @@ export function check(path: string, text: string, fragment = false): Finding[] {
     out.push(...workingDetail(path, text), ...partnerWords(path, text));
   }
   if (isHtml && itemCellPage(path) && !inClosedWorkstream(path)) out.push(...columnRule(text));
+  if (isHtml && !fragment && inPocket(path) && !inClosedWorkstream(path)) out.push(...sidebarRule(text));
   // A figure comes from a spec (RULE.DEVEX.WORKSPACE.523): one drawn by hand is named on every page and seat file this reads.
   out.push(...handDrawnRule(path, text));
   // A page of a repository's pocket, and a workstream's own pages (an approach page, a preview) while open.
@@ -1457,6 +1458,22 @@ const inPocket = (path: string): boolean => {
   const parts = slashes(path).split("/");
   return parts.includes(POCKET.artifacts) && parts.includes("docs") && basename(path) !== "index.html";
 };
+
+/**
+ * 05-artifacts.md: a page whose sidebar lists other pages is the index of artifacts, built from the artifact index template, and no other
+ * page has a sidebar of its own. A page of the artifacts pocket other than the index (it holds no `index-data` block) that holds a `<nav>`
+ * linking to two or more other pages draws a finding. The page's own rail, `sds-rail`, holds its outline and the way back, and is not read.
+ */
+export function sidebarRule(text: string): Finding[] {
+  if (/id="index-data"/.test(text)) return [];
+  const sidebars = [...text.matchAll(/<nav\b([^>]*)>([\s\S]*?)<\/nav>/gi)]
+    .filter(([, attrs]) => !/\bclass="[^"]*\bsds-rail\b/.test(attrs) && !/\bid="rail"/.test(attrs))
+    .filter(([, , inside]) => [...inside.matchAll(/<a\b[^>]*\bhref="([^"#][^"]*)"/gi)].filter(([, href]) => !/^[a-z][a-z0-9+.-]*:/i.test(href)).length >= 2);
+  return sidebars.length
+    ? [["RULE", "this page holds a sidebar of links to other pages. Only the index of artifacts has one, built from `templates/pages/artifact-index-template.html` " +
+      "with each entry a page; a page that lists pages becomes an index of its own, or links its pages in a catalog (05-artifacts.md, the block table)"]]
+    : [];
+}
 
 /** The words a list shows: tags dropped, entities read, and the part before a heading's dash. */
 const shown = (html: string): string => html.replace(/<span class="sds-number">[\s\S]*?<\/span>/g, "").replace(/<[^>]+>/g, "").replace(/&mdash;/g, "—").replace(/&amp;/g, "&")

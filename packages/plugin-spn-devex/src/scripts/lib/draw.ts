@@ -79,6 +79,8 @@ export type Spec = {
   outside?: (Box & { as?: Resource })[];
   frame?: SkeletonFrame;
   views?: SkeletonView[];
+  /** On a skeleton: it shows a shape the design system does not build yet. A skeleton naming a unit the design system builds stops the page write unless it is planned. */
+  planned?: boolean;
   /** A skeleton's layout: the views stand in it. Left out, a view is the inside of a page alone. */
   layout?: SkeletonLayout;
   /** `draw-once` draws each wire along its path once; `pulse` sends a light along one wire at a time; `focus-steps` moves the focus from one unit
@@ -8872,7 +8874,7 @@ function skelLooks(
  *  finding that names it. The fields the drawer writes on its own copy are listed too, since a spec that writes one asks for
  *  what the drawer does anyway; `tone`, `em`, `off` and `warn` on an item or a frame keep the findings that name what replaced them. */
 const SKEL_FIELDS: Record<string, string[]> = {
-  spec: ["kind", "title", "caption", "frame", "views", "layout"],
+  spec: ["kind", "title", "caption", "frame", "views", "layout", "planned"],
   view: ["viewport", "state", "page", "frame"],
   page: ["item", "actions", "back"],
   frame: [

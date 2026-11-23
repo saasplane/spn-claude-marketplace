@@ -7,7 +7,7 @@ import { join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 
 const HERE = resolve(import.meta.dirname, "..", "..", "..", "..");
-const { renderPage, setUnitRender, designSystemVersion, pageFromRender } = await import(pathToFileURL(resolve(HERE, "src", "scripts", "lib", "render.ts")).href);
+const { renderPage, setUnitRender, setBuiltUnits, designSystemVersion, pageFromRender } = await import(pathToFileURL(resolve(HERE, "src", "scripts", "lib", "render.ts")).href);
 
 let total = 0, failed = 0;
 const ok = (label, condition, detail = "") => {
@@ -247,6 +247,38 @@ const made = (markdown) => renderPage({
   furniture: { stylesheet: "", script: "", footer: "" },
 });
 const tilde = (tag, body) => `~~~${tag}\n${body}\n~~~\n`;
+
+console.log("\n=== the page renderer — a skeleton of a built unit, and a table that reads as a catalog");
+{
+  const skeleton = (extra, unit = "DSFeature") => fence("dg", JSON.stringify({
+    kind: "skeleton", caption: "A sketch", ...extra,
+    frame: { label: "A frame", unit, rows: [{ label: "Row", items: [{ text: "One" }] }] },
+  }));
+  setBuiltUnits(["DSFeature", "DSLayout"]);
+  const built = made(skeleton({}));
+  ok("a `dg` skeleton whose frame names a unit the design system builds stops the write, naming the unit and the `unit` fence",
+    built.findings.some((f) => f.stops === true && f.message.includes("`DSFeature`") && f.message.includes("`unit` fence") && f.message.includes('"planned": true')), JSON.stringify(built.findings));
+  ok("a skeleton marked `\"planned\": true` is let through, and so is one whose unit the design system does not build",
+    !made(skeleton({ planned: true })).findings.some((f) => f.stops) && made(skeleton({}, "DSCard")).findings.length === 0, JSON.stringify(made(skeleton({ planned: true })).findings));
+  const deep = made(fence("dg", JSON.stringify({ kind: "skeleton", views: [{ viewport: "DESKTOP", frame: { rows: [{ items: [{ frame: { unit: "DSLayout", rows: [{ items: [{ text: "x" }] }] } }] }] } }] })));
+  ok("a unit named in a view, a nested frame or a section is found too", deep.findings.some((f) => f.stops === true && f.message.includes("`DSLayout`")), JSON.stringify(deep.findings));
+  setBuiltUnits(null);
+  ok("where no list of built units can be read, no skeleton is held against it", !made(skeleton({})).findings.some((f) => f.message.includes("builds")));
+  setBuiltUnits();
+  const fileList = made(skeleton({}));
+  ok("the list of built units is read from ds-units.json in the styles folder by default, and DSFeature is built",
+    fileList.findings.some((f) => f.stops === true && f.message.includes("`DSFeature`")), JSON.stringify(fileList.findings));
+
+  const rows = (n) => Array.from({ length: n }, (_, k) => [`Thing ${k + 1}`, `what thing ${k + 1} is`]);
+  const catalog = made(table(["Name", "Description"], ...rows(5)));
+  ok("a plain table of a name column and a description column past four rows is a soft finding that points to a catalog fence",
+    catalog.findings.length === 1 && !catalog.findings[0].stops && catalog.findings[0].message.includes("reads as a catalog") && catalog.findings[0].message.includes("`catalog`"), JSON.stringify(catalog.findings));
+  ok("four rows, a wide comparison of attributes, and a Terms table draw none",
+    made(table(["Name", "Description"], ...rows(4))).findings.length === 0
+      && made(table(["Name", "Reads", "Writes", "Owns"], ...rows(6).map((r) => [...r, "x", "y"]))).findings.length === 0
+      && made(table(["Term", "Contract term", "What it means"], ...rows(6).map((r) => [r[0], "`X`", r[1]]))).findings.length === 0
+      && made(table(["Piece", "The question it answers", "Its terms"], ...rows(6).map((r) => [r[0], r[1], "t"]))).findings.every((f) => !f.message.includes("reads as a catalog")));
+}
 
 console.log("\n=== the page renderer — a catalog in three layouts, with media and facts");
 {
