@@ -13,23 +13,23 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/01-corpus.md",
-      "seen": "6fc57b30"
+      "seen": "283001e7"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/02-document.md",
-      "seen": "6a0aea96"
+      "seen": "aa30a7f1"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md",
-      "seen": "d27b36e6"
+      "seen": "d1290bf8"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
       "section": "The masthead, and the opening",
       "seen": "b8b710da"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
       "section": "The words a report uses",
       "seen": "aa9dbb74"
     },
@@ -41,7 +41,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/02-document.md",
       "section": "Structure rules",
-      "seen": "242b0b39"
+      "seen": "fb67078a"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/01-corpus.md",
@@ -64,7 +64,7 @@
       "seen": "aefddb15"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
       "section": "A construct types no proof, and its rows sit at its own path",
       "seen": "44e6fe0b"
     },
@@ -99,7 +99,7 @@
 **Consumer first:** the newcomer reading in a second language.
 **Persona:** a senior technical editor and content designer with 10 years and more in developer docs and interface writing. **Carries:** the SaaS Plane way 3 · 4 · 8 · 10 · 14 (`refs/devex/agent/way.md`).
 **Worn** on every piece of writing, in its three modes: a doc, the words of an app's screen, and the words of a marketing page. **Convened** at a judgment gate over a document. **Blocks:** a corpus that misses its seat's share of reach (`RULE.DEVEX.WORKSPACE.107` · MUST · check:doc-check).
-**Source of truth:** the readability bar (`01-devex/04-workspace/04-docs/01-corpus.md`), the document block, tag line and behaviour row (`01-devex/04-workspace/04-docs/02-document.md`), the voice, upkeep and counting checks (`01-devex/04-workspace/04-docs/04-discipline.md`), the masthead and a report's words (`01-devex/04-workspace/04-docs/05-artifacts.md`), the words of a page by kind (`02-support/01-surface/01-standards-core/01-common/01-standards.md`), rules RULE.DEVEX.WORKSPACE.096, .106, .107, .115, .123, .125, .128, .131, .132, .142, .143, .144, .146, .182, .187 and DEC.DEVEX.AGENT.032, and the lenses chapter (`04-capabilities/01-devex/02-agent/03-lenses/01-lenses.md`). This file restates them and adds no rule of its own.
+**Source of truth:** the readability bar (`01-devex/04-workspace/04-docs/01-corpus.md`), the document block, tag line and behaviour row (`01-devex/04-workspace/04-docs/02-document.md`), the voice, upkeep and counting checks (`01-devex/04-workspace/04-docs/04-discipline.md`), the masthead and a report's words (`01-devex/04-workspace/04-docs/05-pages.md`), the words of a page by kind (`02-support/01-surface/01-standards-core/01-common/01-standards.md`), rules RULE.DEVEX.WORKSPACE.096, .106, .107, .115, .123, .125, .128, .131, .132, .142, .143, .144, .146, .182, .187 and DEC.DEVEX.AGENT.032, and the lenses chapter (`04-capabilities/01-devex/02-agent/03-lenses/01-lenses.md`). This file restates them and adds no rule of its own.
 
 ## Asks it owns
 

@@ -1,4 +1,4 @@
-// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § The guide page — stages, and steps that number themselves · § The index of artifacts — one page that opens every other · § One stylesheet, served in versions
+// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-pages.md § The guide page — stages, and steps that number themselves · § The index of artifacts — one page that opens every other · § One stylesheet, served in versions
 // The chapter is the source of truth; a rule change is edited there first, then here, in the same change.
 //
 // What `docs index` and `docs guide` share: each takes the shell of a template of the book, fills its
@@ -52,7 +52,7 @@ export function newestCut(): string {
   const styles = process.env.SPN_STYLES ?? stylesDir(fileURLToPath(import.meta.url));
   const version = styles === null ? null : newestVersion(Object.keys(cutVersions(styles)));
   if (version === null)
-    throw new Refusal(`no version of the shared styles was cut${styles === null ? "" : ` in ${styles}`}, so a page has no version to link (05-artifacts.md, One stylesheet, served in versions)`);
+    throw new Refusal(`no version of the shared styles was cut${styles === null ? "" : ` in ${styles}`}, so a page has no version to link (08-stylesheet.md, One stylesheet, served in versions)`);
   return version;
 }
 

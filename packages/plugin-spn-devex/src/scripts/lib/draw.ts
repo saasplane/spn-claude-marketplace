@@ -1,11 +1,11 @@
-// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § The figures · § A connector is a claim
+// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-pages.md § The figures · § A connector is a claim
 // The chapter is the source of truth. A rule change is edited there first, then here, in the same change.
 //
 // The `.dg` drawer. A figure's single source is its spec — a fenced ```dg block in the seat file —
 // and this turns one into inline SVG. Nothing is drawn by eye: every box is measured from its own
 // text, so a connector lands on an edge and a label fits by construction rather than by luck.
 //
-// The look is the docs design language's (spn-foundation docs/02-constructs/01-devex/04-workspace/06-design-language.md):
+// The look is the Docs look's (spn-foundation docs/02-constructs/01-devex/04-workspace/06-docs-look.md):
 // a figure is a `dl-figure` of one `dl-svg` on the docs column's 928 frame, drawn 1:1, its units a tile of radius 10, a plate of
 // radius 12 and a wire of weight 1 with soft corners and no arrowhead. No colour and no size is written here: every mark is a class
 // of docs-language.css, which reads the `--sds-*` tokens. Every length is the drawing scale's, step M (grid 4): a name 12, a detail 10,
@@ -15,7 +15,7 @@
 import { checkFigures } from "./figures.ts";
 
 /**
- * THE FLOWCHART SHAPES, and each one carries its meaning (05-artifacts.md § The figures). A shape is
+ * THE FLOWCHART SHAPES, and each one carries its meaning (05-pages.md § The figures). A shape is
  * not decoration: a reader knows a decision from a step before reading either label, which is the
  * whole reason `FLOWCHART` is its own kind rather than a `MAP` with a diamond bolted on.
  */
@@ -33,7 +33,7 @@ export type Shape =
   | "bucket";
 
 /**
- * A RESOURCE OUTSIDE A SYSTEM'S BOUNDARY CARRIES THE SHAPE OF WHAT IT IS (05-artifacts.md § SYSTEM,
+ * A RESOURCE OUTSIDE A SYSTEM'S BOUNDARY CARRIES THE SHAPE OF WHAT IT IS (05-pages.md § SYSTEM,
  * rule 4). Seven kinds, and each earns its place by being a different KIND of thing rather than a
  * different colour of the same thing — you read what a box is before you read its name.
  */
@@ -89,7 +89,7 @@ export type Spec = {
 };
 
 /**
- * THE LAYOUT A SKETCH STANDS IN, in the words of `DSLayoutType` and of the three parts' looks (05-artifacts.md
+ * THE LAYOUT A SKETCH STANDS IN, in the words of `DSLayoutType` and of the three parts' looks (05-pages.md
  * § `SKELETON`, RULE.DEVEX.WORKSPACE.260). It is the sketch's setting and never part of an app pattern: a pattern
  * fills the content of any layout and names none of its own.
  */
@@ -142,7 +142,7 @@ export type SkeletonMedia = {
 
 /**
  * SKELETON — where the parts of a screen or a block sit, and nothing about how they look
- * (05-artifacts.md § `SKELETON`). An item is plain words, a control, an icon, a slot, a stand-in, a
+ * (05-pages.md § `SKELETON`). An item is plain words, a control, an icon, a slot, a stand-in, a
  * note in muted text, or a frame of its own: a region, such as a navigation beside a main area.
  * A spec holds one `frame`, or `views`: one screen at several screen classes.
  */
@@ -1952,7 +1952,7 @@ function drawMap(
   }
 
   // 16 inside a container, the same number a leaf pads its own label by — one padding, not two
-  // (05-artifacts.md § The primitives). It was 12, so a nested box read as falling out of its parent.
+  // (05-pages.md § The primitives). It was 12, so a nested box read as falling out of its parent.
   // A group is a plate: its label inside it, its baseline 20 from the top and its first row at 32, and 16 of padding round its tiles.
   const HEAD = 32,
     PAD_IN = 16;
@@ -3992,7 +3992,7 @@ function drawSystem(
 /**
  * SEQUENCE — a process with more than one participant, where WHO SPEAKS TO WHOM is the thing to see.
  * One lifeline per participant, time running down, one arrow per message carrying its own label, and
- * a dashed arrow for a reply (05-artifacts.md § The figures).
+ * a dashed arrow for a reply (05-pages.md § The figures).
  *
  * **A lifeline runs on past the last message.** The developer, on the handoff figure: *for seq flow
  * diagram can we have particpant vertical line grow extra*. A lifeline is the participant's existence
@@ -4473,7 +4473,7 @@ function drawFlowchart(spec: Spec): { svg: string; findings: string[] } {
  * eye, every box measured from its own text. No connectors: position is the whole claim, so this
  * drawer emits none.
  *
- * A SKELETON READS ITS OWN MEASURES (05-artifacts.md § `SKELETON`, § The skeleton's own guidelines).
+ * A SKELETON READS ITS OWN MEASURES (05-pages.md § `SKELETON`, § The skeleton's own guidelines).
  * Every number below is a copy of a grid number or a number of its own; none is shared with another
  * kind, so a change here never moves a MAP, a FLOWCHART, a SYSTEM or an ENTITIES figure.
  *
@@ -4583,7 +4583,7 @@ const WIDTH_FRACTIONS: Record<string, number> = {
   "2/3": 2 / 3,
   "3/4": 3 / 4,
 };
-// THE OUTER FRAME TAKES THE GRID'S CONTENT WIDTH (05-artifacts.md § The grid), as the hand-drawn
+// THE OUTER FRAME TAKES THE GRID'S CONTENT WIDTH (05-pages.md § The grid), as the hand-drawn
 // skeletons did: a layout is a screen, and a screen drawn 300 wide reads as a widget.
 const SKEL_CANVAS = 896;
 // A FLOOR RATHER THAN A ZERO, for the degenerate case every row's width is left to a `fill` or a
@@ -8271,7 +8271,7 @@ function skelDrawFrame(
 }
 
 /**
- * WHICH UNIT, WHEN (05-artifacts.md § `SKELETON`, standards-patterns § Which unit, when). The unit a spec names decides
+ * WHICH UNIT, WHEN (05-pages.md § `SKELETON`, standards-patterns § Which unit, when). The unit a spec names decides
  * the look, and the drawer refuses a unit the rule names wrongly: a `DSCard` is one thing on its own, with no titled
  * parts; a `DSCardWidget` is one thing among several of its kind, built from data, with titled parts; a container is a
  * part of the page with a header; and a line about one thing is a `DSItem`. It reads the spec as written, before
@@ -9183,7 +9183,7 @@ const skelAppHead = (ax: number, cy: number, named: boolean): string[] => [
 ];
 
 /**
- * ONE VIEW IN ITS LAYOUT, WITH ITS PAGE LEVEL (05-artifacts.md § `SKELETON`, RULE.DEVEX.WORKSPACE.260). The window is the
+ * ONE VIEW IN ITS LAYOUT, WITH ITS PAGE LEVEL (05-pages.md § `SKELETON`, RULE.DEVEX.WORKSPACE.260). The window is the
  * view at its class's width. The window is the body: below `FULL`, at a desktop, the body's box is its share of a
  * window 1920 wide, centred; at a tablet and on a phone it is the screen. The navigation is a surface at its edge: a
  * rail the window's height, open at a desktop and shut at a tablet; a top bar across the window, its items in the box;
@@ -9438,7 +9438,7 @@ function skelDrawWindow(
 
 /**
  * A SPEC WITH `views` DRAWS ONE SCREEN AT SEVERAL SCREEN CLASSES, AND IN SEVERAL TASK STATES, IN ONE FIGURE
- * (05-artifacts.md § `SKELETON`, RULE.DEVEX.WORKSPACE.230). Each view is a whole frame of its own. They are drawn in one
+ * (05-pages.md § `SKELETON`, RULE.DEVEX.WORKSPACE.230). Each view is a whole frame of its own. They are drawn in one
  * order, desktop, then tablet, then phone, and the views of one class stand together: the one with no `state` first,
  * the others in `DSTaskStateType`'s order. Each stands under the name of its class and the word of its state, at the
  * width that stands for its class. A view that would pass the grid's content width starts a new line, so a figure
@@ -9757,7 +9757,7 @@ const DRAWERS: Record<
  * flowchart answers *what happens, and where does it turn*.
  */
 const RETIRED: Record<string, string> = {
-  flow: "`flow` is retired. Use `map` when the figure is the PARTS of one thing and how they touch, or `flowchart` when it is a PATH somebody takes and where it turns — a flowchart has the standard shapes because a decision is not a step, and a map has none because its boxes are all the same kind of thing (05-artifacts.md, The figures)",
+  flow: "`flow` is retired. Use `map` when the figure is the PARTS of one thing and how they touch, or `flowchart` when it is a PATH somebody takes and where it turns — a flowchart has the standard shapes because a decision is not a step, and a map has none because its boxes are all the same kind of thing (05-pages.md, The figures)",
 };
 
 export const KINDS = Object.keys(DRAWERS);
@@ -9778,7 +9778,7 @@ export function draw(spec: Spec): { svg: string; findings: string[] } {
     return {
       svg: "",
       findings: [
-        `no helper draws a \`${spec.kind}\` figure. The helpers are ${KINDS.join(" · ")}; author this one as SVG in an HTML block in the seat file and it is used verbatim (05-artifacts.md, The figures)`,
+        `no helper draws a \`${spec.kind}\` figure. The helpers are ${KINDS.join(" · ")}; author this one as SVG in an HTML block in the seat file and it is used verbatim (05-pages.md, The figures)`,
       ],
     };
   STEP = spec.motion === "focus-steps" ? 0 : null;

@@ -1,4 +1,4 @@
-// RESTATES: `docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md` § The figures, and
+// RESTATES: `docs/04-capabilities/01-devex/04-workspace/04-docs/05-pages.md` § The figures, and
 // `docs/05-guides/README.md` § Before step 1 — your machine, which names the browser this needs.
 // The chapters are the source of truth; a rule change is edited there first, then here.
 //
@@ -102,7 +102,7 @@ function geometry(sub: "check" | "colour", args: string[]): number {
         let spec;
         try { spec = JSON.parse(m[1]); }
         catch (e) { total += 1; console.log(`✗ RULE figure    ${relative(workspace, f)}\n         spec${n}: not valid JSON — ${(e as Error).message}`); continue; }
-        // A FIGURE SAYS WHAT IT SHOWS, and until now nothing said so. `05-artifacts.md § The
+        // A FIGURE SAYS WHAT IT SHOWS, and until now nothing said so. `05-pages.md § The
         // figures` has made it a MUST since it was written — *every figure has a sentence before it
         // saying what you are looking at, and a caption after it saying what to notice. A figure
         // with neither is decoration* — and 94 of the corpus's 150 specs carry neither field.

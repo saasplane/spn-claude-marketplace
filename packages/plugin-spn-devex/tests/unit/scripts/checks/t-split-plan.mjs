@@ -129,7 +129,7 @@ function build(name, { eyebrow, rows = LANDED, cards = "", answered = [], log = 
   });
 }
 
-// THE SPLIT PLAN IS THE ARCS' ROWS (RULE.DEVEX.WORKSPACE.038, `05-artifacts.md` § The split plan is the
+// THE SPLIT PLAN IS THE ARCS' ROWS (RULE.DEVEX.WORKSPACE.038, `05-pages.md` § The split plan is the
 // arcs' step rows): each row's repo is the scope, and its state is read.
 /** A workstream whose only split plan is its arc N2's rows; a page is added only where asked. */
 function buildArcs(name, rows, { page: withPage = false, log = "", extra = {} } = {}) {
@@ -449,7 +449,7 @@ one("and one still saying it is running is refused", "close",
   move(`.spndevex/${WORKSTREAMS}/open/001-a-subject`, `.spndevex/${WORKSTREAMS}/closed/`),
   "deny", { says: "does not say it is closed" });
 
-// THE STATUS IS A FIELD, AND THE TITLE IS NOT IT. `05-artifacts.md` § The approach document says the
+// THE STATUS IS A FIELD, AND THE TITLE IS NOT IT. `05-pages.md` § The approach document says the
 // masthead CARRIES a status; reading the whole line for a finished word reads the title too, so this
 // page — still PLANNING, under a title with the word *complete* in it — closed as green.
 one("a title carrying a finished word does not close a page that is still PLANNING", "close",
@@ -465,7 +465,7 @@ one("a status reading incomplete is not read as complete", "close",
   "deny", { says: "does not say it is closed" });
 
 // THE OTHER HALF OF THE SAME FAULT: the gate must know the words the standard actually gives an
-// approach page. `executed — record` is `05-artifacts.md`'s own finished status, and a page stamped
+// approach page. `executed — record` is `05-pages.md`'s own finished status, and a page stamped
 // exactly as the chapter requires was refused for it.
 one("a masthead reading the book's own executed status closes", "close",
   build("sp-executed", { eyebrow: "Status: &#x2705; executed &mdash; record" }),
@@ -579,7 +579,7 @@ one("[MKT.SCRIPTS.431] the ideate arc in `arcs/ideate/` is read by the gate as a
 
 // ---------------------------------------------------------------- what `carried` is allowed to mean
 //
-// `carried` MEANS THE WORK LEAVES THIS WORKSTREAM (05-artifacts.md § The approach document). Before
+// `carried` MEANS THE WORK LEAVES THIS WORKSTREAM (05-pages.md § The approach document). Before
 // that rule the word covered two things, and the count lied: measured on `008` 2026-09-22, TEN of
 // twelve carried rows named a later arc of `008` itself, and the page reported `pending 0` above
 // them while one of those arcs sat blocked on an open card.
@@ -795,7 +795,7 @@ console.log("\n=== split-plan — a page that holds its own copy of the styles")
     splitPlan.ownCopyLines(shut, [join(shut, `.spndevex/${WORKSTREAMS}/closed/001-a-subject/a-subject-approach.html`)]).length === 0);
 }
 
-// AN ANSWERED CARD IS FOUND BY ITS ANCHOR, never by a Q number in the text (05-artifacts.md § The fold
+// AN ANSWERED CARD IS FOUND BY ITS ANCHOR, never by a Q number in the text (05-pages.md § The fold
 // check reads the anchor). Until the records moved to `questions.jsonl` the reader of answers found
 // none, so this half of the rule never ran; the first page it read folded every answer under `id="q1"`
 // and still drew the note, because it looked for `Q1` in the words.

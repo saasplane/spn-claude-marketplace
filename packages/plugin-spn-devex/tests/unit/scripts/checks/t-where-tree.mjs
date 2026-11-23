@@ -25,7 +25,7 @@ console.log("=== Where it lands — one folder tree for each repository (238)");
 ok("[MKT.HOOKS.513] a repository named with a tree of tree characters passes", whereItLandsFindings(where(one)).length === 0);
 const none = whereItLandsFindings(where("<table><tr><td>spn-x/src/a.ts</td></tr></table>"));
 ok("[MKT.HOOKS.513] a section with no tree is refused as it prints", none.length === 1 &&
-  none[0] === "Where it lands holds no folder tree — it is one tree for each repository, and never a table of paths (05-artifacts.md § The approach document; RULE.DEVEX.WORKSPACE.238) · draw each repository as one `<pre>` tree, a folder or file on each line with `├──` and `└──`, and its note in one column on the right", none[0]);
+  none[0] === "Where it lands holds no folder tree — it is one tree for each repository, and never a table of paths (05-pages.md § The approach document; RULE.DEVEX.WORKSPACE.238) · draw each repository as one `<pre>` tree, a folder or file on each line with `├──` and `└──`, and its note in one column on the right", none[0]);
 const short = whereItLandsFindings(where(two));
 ok("[MKT.HOOKS.513] a second repository named with no tree of its own is refused, with the counts", short.length === 1 && short[0].startsWith("Where it lands names 2 repositories and draws 1 tree — one tree for each repository"), short.join("|"));
 ok("the section with a tree for each repository passes", whereItLandsFindings(where(`${one}<p><strong>2 &middot; spn-y</strong> &mdash; the other</p>${TREE}`)).length === 0);
@@ -41,7 +41,7 @@ ok("a layer with its mark and a block passes", proposedFindings(proposed(layer))
 ok("Shape needs no mark", proposedFindings(proposed(`<h3 id="s3-shape">Shape</h3>${layer}`)).length === 0);
 const unmarked = proposedFindings(proposed(layer.replace(' data-layer="plugins"', "")));
 ok("[MKT.HOOKS.513] a layer with no data-layer mark is refused as it prints", unmarked.length === 1 &&
-  unmarked[0] === 'Proposed\'s layer "Plugins" carries no `data-layer` mark from server · web · surface · plugins · estate (05-artifacts.md § The approach document; RULE.DEVEX.WORKSPACE.233) · write `<h3 data-layer="…">`', unmarked[0]);
+  unmarked[0] === 'Proposed\'s layer "Plugins" carries no `data-layer` mark from server · web · surface · plugins · estate (05-pages.md § The approach document; RULE.DEVEX.WORKSPACE.233) · write `<h3 data-layer="…">`', unmarked[0]);
 ok("a mark that is no layer is refused too", proposedFindings(proposed(layer.replace('data-layer="plugins"', 'data-layer="tools"'))).length === 1);
 const bare = proposedFindings(proposed(layer.replace('<p class="sds-small">For: you · Layer: Plugins</p>', "")));
 ok("[MKT.HOOKS.513] a block with no For, Layer or Reads line has no finding (233)", bare.length === 0, bare.join(" | "));

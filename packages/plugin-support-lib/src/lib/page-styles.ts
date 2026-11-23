@@ -1,4 +1,4 @@
-// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § One stylesheet, served in versions
+// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/08-stylesheet.md § One stylesheet, served in versions
 // The chapter is the source of truth; a change is made there first, then here, in the same change.
 
 // What every command and check needs to know about the shared page styles lives once, here: the
@@ -90,7 +90,7 @@ export function linksSharedStyles(html: string): boolean {
 /** What a command says about a page that links no shared stylesheet, so every command says it in one way. */
 export const OWN_COPY = "this page links no shared stylesheet: it holds its own copy of the styles, and the " +
   "class names that copy used. Produce it again with `docs page write`, or copy it from its template, so it links " +
-  "`docs-language.css` (05-artifacts.md, One stylesheet, served in versions)";
+  "`docs-language.css` (08-stylesheet.md, One stylesheet, served in versions)";
 
 /** One file's integrity hash as a browser reads it: `sha384-` and the base64 of the SHA-384 of its bytes. */
 export function sha384Of(bytes: Uint8Array): string {

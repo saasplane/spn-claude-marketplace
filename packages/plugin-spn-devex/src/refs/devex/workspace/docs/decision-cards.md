@@ -2,14 +2,14 @@
 {
   "docs": [
     {
-      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
       "section": "The approach document — a workstream's, never a repository's",
-      "seen": "d1d4cdc7"
+      "seen": "8afa1ec1"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "section": "A card is only for what the rules leave open",
-      "seen": "ca6d2fed"
+      "seen": "db20f6a6"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
@@ -32,7 +32,7 @@
 # Decision cards — the shape, and where it is defined
 
 **The book owns this grammar.** It is stated in the foundation's
-`docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md`, under *The approach document — a workstream's, never a repository's* → `Open`, and
+`docs/04-capabilities/01-devex/04-workspace/04-docs/05-pages.md`, under *The approach document — a workstream's, never a repository's* → `Open`, and
 several of its clauses are **MUST**. This file exists because the plugins ship without the
 book beside them. It restates the grammar for an agent that cannot open that chapter, and it
 must be kept in step with it. **When the two disagree, the book wins.**
@@ -216,7 +216,7 @@ already gave point at a different question. A reopened card keeps its number and
 **A card raised in conversation keeps the number it was given there.** The person has been reading
 those numbers, so the page uses them rather than starting a second run.
 
-> Restates `01-devex/04-workspace/04-docs/05-artifacts.md` — *The approach document* → `Open`. Where the two
+> Restates `01-devex/04-workspace/04-docs/05-pages.md` — *The approach document* → `Open`. Where the two
 > disagree, the chapter wins.
 
 ## While a card is open

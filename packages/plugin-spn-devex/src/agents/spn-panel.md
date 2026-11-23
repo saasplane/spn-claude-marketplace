@@ -46,7 +46,7 @@ Your authority is the same as at a gate: you block only where your lens file say
 
 **And `voice` is a lens of its own** (`RULE.DEVEX.WORKSPACE.107` · MUST · check:doc-check), worn on every piece of writing and convened at a judgment gate. It reads `refs/devex/agent/lenses/voice.md`, and unlike the standing check above it blocks a page that misses its seat's share of reach. The shares sit in `refs/devex/workspace/docs/doc-sets.md` § One voice.
 
-**When the lens is `voice` or `ui` and the work is a docs page, also read `refs/devex/workspace/docs/blocks.md`** (§ *Which block a content takes*, § *Which figure*), and report a block or figure the page uses against it as advice, naming the line.
+**When the lens is `voice` or `ui` and the work is a docs page, also read `refs/devex/workspace/docs/blocks.md` and `refs/devex/workspace/docs/figures.md`** (§ *Which block a content takes*, § *Which figure*), and report a block or figure the page uses against it as advice, naming the line.
 
 ## The report
 

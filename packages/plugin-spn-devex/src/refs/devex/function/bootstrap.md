@@ -129,7 +129,7 @@ ship with these plugins, beside this file:
 | an approach page, to argue a piece of work | [`templates/workstream/approach-template.html`](../workspace/docs/templates/workstream/approach-template.html) |
 | a question you cannot answer alone | [`refs/devex/workspace/docs/decision-cards.md`](../workspace/docs/decision-cards.md) — it is a card, and a card is `div.open` wrapping an `h4` whose id is its number |
 | a construct, a domain face, an overview | [`refs/devex/workspace/docs/doc-sets.md`](../workspace/docs/doc-sets.md) |
-| the markdown and figures inside any of them | [`refs/devex/workspace/docs/blocks.md`](../workspace/docs/blocks.md) |
+| the markdown and figures inside any of them | [`refs/devex/workspace/docs/blocks.md` and `refs/devex/workspace/docs/figures.md`](../workspace/docs/blocks.md) |
 
 **Copy the template rather than writing a page from memory.** It carries the section order, the card
 shape and the furniture every check reads, and a page assembled by hand is a page that passes review

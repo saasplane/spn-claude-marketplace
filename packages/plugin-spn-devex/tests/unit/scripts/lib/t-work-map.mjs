@@ -20,7 +20,7 @@ const table = [
   "# map", "",
   "| Work | Seen when | Skill | Read first | Look in | Learned |", "| --- | --- | --- | --- | --- | --- |",
   "| server-contract | skill:spn-apps:implement · write:**/contract/states/*.ts | spn-apps:implement | apps providers/ts/02-naming.md · module/README.md | a sibling contract | boolean is isActive |",
-  "| preview | write:**/notes/N*/preview.html · layer:plugins | spn-devex:ideate | devex workspace/docs/doc-sets.md · book 05-artifacts.md § The figures | the pinned code | — |",
+  "| preview | write:**/notes/N*/preview.html · layer:plugins | spn-devex:ideate | devex workspace/docs/doc-sets.md · book 05-pages.md § The figures | the pinned code | — |",
   "| release | — | spn-apps:release | devex function/deliver.md | — | — |",
 ].join("\n");
 

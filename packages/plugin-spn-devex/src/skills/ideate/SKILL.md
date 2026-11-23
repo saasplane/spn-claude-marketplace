@@ -14,19 +14,19 @@ description: Decide what a node IS, and design a requirement inside that shape -
       "seen": "da4650d4"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
       "section": "The masthead, and the opening",
       "seen": "b8b710da"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/08-stylesheet.md",
       "section": "The outline is fixed for an argument and borrowed for an explanation",
       "seen": "2c6b68b6"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/06-blocks.md",
       "section": "A page is written in two passes",
-      "seen": "5812f898"
+      "seen": "b428fcc6"
     }
   ]
 }
@@ -224,7 +224,7 @@ The full text of all three is in [`refs/devex/workspace/workstream.md`](../../re
 - **Migrate only live records** (`RULE.DEVEX.FUNCTION.093` · MUST · skill:spn-devex/ideate).
 - **Take five checks before the options are written:** the premise (`RULE.DEVEX.FUNCTION.099` · MUST · skill:spn-devex/ideate), which side changes when a participant joins (`RULE.DEVEX.FUNCTION.100` · MUST · skill:spn-devex/ideate), split trust (`RULE.DEVEX.FUNCTION.101` · MUST · skill:spn-devex/ideate), a frame that moves where the thing lives (`RULE.DEVEX.FUNCTION.102` · MUST · skill:spn-devex/ideate), and how the laptop gets the fact (`RULE.DEVEX.FUNCTION.103` · MUST · skill:spn-devex/ideate).
 - **List every part beside the developer's words it serves, and cut what serves none** (`RULE.DEVEX.FUNCTION.096` · MUST · skill:spn-devex/ideate).
-- **An approach page or a preview follows the blocks ref.** Its blocks and figures follow [`refs/devex/workspace/docs/blocks.md`](../../refs/devex/workspace/docs/blocks.md), read before the first block is written. A passage of three or more steps, relations, states or layers gains a matching figure beside it (`RULE.DEVEX.WORKSPACE.548` · GUIDE), a command a page shows is one the command line accepts (`RULE.DEVEX.WORKSPACE.557` · MUST · check:doc-check), and the doc-check hook's hints on what was written are acted on before the page is finished. A page that already exists gets its block pass file by file: `spn-devex docs blocks units <file>`, then the `spn-block-rewriter` agent (`RULE.DEVEX.WORKSPACE.558` · GUIDE).
+- **An approach page or a preview follows the blocks ref.** Its blocks and figures follow [`refs/devex/workspace/docs/blocks.md` and `refs/devex/workspace/docs/figures.md`](../../refs/devex/workspace/docs/blocks.md), read before the first block is written. A passage of three or more steps, relations, states or layers gains a matching figure beside it (`RULE.DEVEX.WORKSPACE.548` · GUIDE), a command a page shows is one the command line accepts (`RULE.DEVEX.WORKSPACE.557` · MUST · check:doc-check), and the doc-check hook's hints on what was written are acted on before the page is finished. A page that already exists gets its block pass file by file: `spn-devex docs blocks units <file>`, then the `spn-block-rewriter` agent (`RULE.DEVEX.WORKSPACE.558` · GUIDE).
 - **Write a page by the runbook:** a page the developer will open is written by [`refs/devex/workspace/docs/writing-a-page.md`](../../refs/devex/workspace/docs/writing-a-page.md): pick the template, start it with `docs page write` or `docs page new`, fill every slot and section, check, look, hand on (RULE.DEVEX.WORKSPACE.560).
 - **A go on an arc that is not decided, or whose sheet is not whole, is recorded with `workstream decision write`.** The patches, the sheet and the preview come first, then the arc is decided (`workstream arc edit --status DECIDED`), then `execute` runs; `go write` refuses an arc that is PROPOSED.
 - **Place the proposal where it is read** (`RULE.DEVEX.FUNCTION.097` · MUST · skill:spn-devex/ideate). The chat holds what was asked for, the approach page one line a part, the preview what is judged.

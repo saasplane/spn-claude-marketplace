@@ -1,4 +1,4 @@
-// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § The templates — the pages, and the two seat files behind them · § One stylesheet, served in versions
+// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-pages.md § The templates — the pages, and the two seat files behind them · § One stylesheet, served in versions
 // The chapter is the source of truth; a rule change is edited there first, then here, in the same change.
 //
 // `spn-devex docs page new <kind> <path>`: a hand page started from its kind's template. It fills what the tool can

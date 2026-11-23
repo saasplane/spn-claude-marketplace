@@ -894,7 +894,8 @@ console.log("\n=== every example in the blocks reference actually draws");
     existsSync(here),
     true,
   );
-  const src = existsSync(here) ? readFileSync(here, "utf8") : "";
+  const figures = new URL("../../../../src/refs/devex/workspace/docs/figures.md", import.meta.url);
+  const src = (existsSync(here) ? readFileSync(here, "utf8") : "") + (existsSync(figures) ? readFileSync(figures, "utf8") : "");
   const fences = [...src.matchAll(/```dg\n([\s\S]*?)\n```/g)].map((m) => m[1]);
   one(
     "the reference carries a worked example of more than one kind",
@@ -1214,7 +1215,7 @@ console.log("\n=== the label a screen reader is given is spoken, not rendered");
     "a link is spoken as its text, never as its address",
     labelOf({
       kind: "map",
-      caption: "Read [the chapter](../05-artifacts.md) for the rule.",
+      caption: "Read [the chapter](../05-pages.md) for the rule.",
       boxes,
     }),
     "Read the chapter for the rule.",

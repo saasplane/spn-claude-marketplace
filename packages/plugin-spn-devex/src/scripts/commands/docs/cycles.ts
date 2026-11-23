@@ -1,4 +1,4 @@
-// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § `How` ends in Cycles, and the arcs are the state
+// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-pages.md § `How` ends in Cycles, and the arcs are the state
 //           RULE.DEVEX.WORKSPACE.487, an approach page reads Why, What, Plan, How, Open, Deferred, and Plan lists the arcs at `approach.html#arcs`
 //           docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § An arc's status is one of six, stored or worked out
 // The chapters are the source of truth; a rule change is edited there first, then here.
@@ -28,7 +28,7 @@
 // still ends How in an older `h3` Cycles is read there too, which is how a closed page stays as it closed; `write` moves that
 // subsection into a Plan section of its own on an open or backlog page, and creates the section after What where there is none.
 //
-// Every class it reads and writes is a name of the shared stylesheet (05-artifacts.md § One stylesheet,
+// Every class it reads and writes is a name of the shared stylesheet (05-pages.md § One stylesheet,
 // served in versions). A page that links no shared stylesheet is refused by `write`, and not written.
 
 import { writeFileSync } from "node:fs";
@@ -416,7 +416,7 @@ export function headerStatusOf(text: string): HeaderStatus | null {
 }
 
 /**
- * The word the arcs give a workstream page's header (05-artifacts.md § How ends in Cycles):
+ * The word the arcs give a workstream page's header (05-pages.md § How ends in Cycles):
  * `PLANNING` while no arc is past `DECIDED`, `IMPLEMENTING` once one is, and `DONE` for a
  * workstream in `closed/`. It is `workstreamWord`, which the progress block's *Overall* takes too.
  */
@@ -470,7 +470,7 @@ export function openHeadingFor(text: string): string {
 export type Place = { repo: string; arcs: string[] };
 
 /**
- * The places of `How`, read from the arcs (05-artifacts.md § `How` ends in Cycles): each repository an arc's
+ * The places of `How`, read from the arcs (05-pages.md § `How` ends in Cycles): each repository an arc's
  * header or rows name, in the order the arcs first reach it, with the arcs that reach it. A row that names
  * no repository reaches no place.
  */
@@ -752,7 +752,7 @@ function writePages(folder: string, target: string, cycles: Cycle[]): number {
     const produced = producedPage(folder, text, cycles);
     if (!produced) {
       console.error(`${shown} has no arcs table to write — the page has no How to put a Plan section after, or its Plan section holds no table ` +
-        `(05-artifacts.md § After How comes a section of its own, Plan; RULE.DEVEX.WORKSPACE.487). Nothing was written.`);
+        `(05-pages.md § After How comes a section of its own, Plan; RULE.DEVEX.WORKSPACE.487). Nothing was written.`);
       code = 1;
       continue;
     }

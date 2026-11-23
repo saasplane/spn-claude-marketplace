@@ -1,6 +1,6 @@
 // RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/03-tree.md § What a Where row declares
 //           docs/04-capabilities/02-support/02-apps/10-providers/ts/03-structure.md § What a Where Row May Name
-//           docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § The coverage report — written, built and proved
+//           docs/04-capabilities/01-devex/04-workspace/04-docs/05-pages.md § The coverage report — written, built and proved
 // The chapters are the source of truth; a rule change is edited there first, then here, in the same change.
 //
 // The join both reports read Built from: each capability chapter's Where section, read against the

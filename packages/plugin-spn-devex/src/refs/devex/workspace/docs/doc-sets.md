@@ -3,33 +3,33 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/README.md",
-      "seen": "5f71c031"
+      "seen": "e66fcc7d"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "seen": "70a2fe70"
+      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
+      "seen": "8829621b"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
       "section": "The masthead, and the opening",
       "seen": "b8b710da"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/08-stylesheet.md",
       "section": "The outline is fixed for an argument and borrowed for an explanation",
       "seen": "2c6b68b6"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/03-tree.md",
-      "seen": "29eb5818"
+      "seen": "bab5ea2c"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/02-document.md",
-      "seen": "6a0aea96"
+      "seen": "aa30a7f1"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/04-docs.md",
-      "seen": "b97b0dea"
+      "seen": "13acca92"
     },
     {
       "path": "spn-foundation/CONCEPT.md",
@@ -332,7 +332,7 @@ The pocket holds what the node **authors** rather than derives, and its three au
 
 **Every HTML page of the pocket and of an arc's notes starts from a docs template** (`RULE.DEVEX.WORKSPACE.554` · MUST · check:doc-check). A page of a kind with no template of its own uses `page-template.html`; a page with no template's frame is refused.
 
-**A page whose sidebar lists other pages is the index page, and it never has a sidebar of its own** (`RULE.DEVEX.WORKSPACE.550` · MUST · skill:spn-devex/ideate). A samples home, a set of previews and a set of reports are each an index of `index-template.html`, so a reader finds one rail and one set of tabs for any set of pages. **A design language's samples are one samples home, with each sample in a surface preview**, in `docs/artifacts/design-languages/<language>/`: `index.html` is the home, `shared/`, `site/` and `app/` hold one folder per group, each sample the page and its `<slot>.preview.html`, and `assets/` holds what the pages load; the list of samples is data beside the spec, `docs/specs/design-languages/<language>.samples.json`. **A design-language construct page holds its spec in a fold** (`RULE.DEVEX.WORKSPACE.551` · MUST · skill:spn-devex/ideate): a short opening states the language's picks, and one fold keeps the tables and drawings. **Done and landed read the Success badge**: border `--sds-success`, text `--on-success-subtle` and ground `--sds-success-soft`, in both themes, and the looks of `CATALOG`, `TABS`, group panels, the fold and a framed unit are the Docs design language's.
+**A page whose sidebar lists other pages is the index page, and it never has a sidebar of its own** (`RULE.DEVEX.WORKSPACE.550` · MUST · skill:spn-devex/ideate). A samples home, a set of previews and a set of reports are each an index of `index-template.html`, so a reader finds one rail and one set of tabs for any set of pages. **A design language's samples are one samples home, with each sample in a surface preview**, in `docs/artifacts/design-languages/<language>/`: `index.html` is the home, `shared/`, `site/` and `app/` hold one folder per group, each sample the page and its `<slot>.preview.html`, and `assets/` holds what the pages load; the list of samples is data beside the spec, `docs/specs/design-languages/<language>.samples.json`. **A design-language construct page holds its spec in a fold** (`RULE.DEVEX.WORKSPACE.551` · MUST · skill:spn-devex/ideate): a short opening states the language's picks, and one fold keeps the tables and drawings. **Done and landed read the Success badge**: border `--sds-success`, text `--on-success-subtle` and ground `--sds-success-soft`, in both themes, and the looks of `CATALOG`, `TABS`, group panels, the fold and a framed unit are the Docs look's.
 
 **Every repository has its getting-started guide and its test-and-verify guide as a page.** A newcomer needs these before any other guide: the first says how to start, and the second says how to check that a change works. Every other guide stays markdown, unless a developer asks for it as a page. A guide page is stages, and a stage is steps. A step holds why, the command and what you see, in that order. The stylesheet numbers the steps, so nobody types a number. A guide page has no status. Where `docs guide` finds no step in a guide, it reports the guide and writes nothing.
 
@@ -509,7 +509,7 @@ Every page somebody writes by hand is copied from a template, and the templates 
 
 **A surface preview is one file, the surface page template in `templates/surface/`, for reviewing a site's or an app's pages, and only once the app's design language exists** (`RULE.DEVEX.WORKSPACE.534` · GUIDE). Reach for it when the developer asks to review the pages of a surface, and never before the design language the pages follow is written; until then the review is of the design language, on the arc's page. **The page holds a bar and the page's markup and nothing else** (`RULE.DEVEX.WORKSPACE.535` · MUST · skill:spn-devex/ideate): the bar has the page's title, the width switch (Desktop, Tablet, Phone), the mode switch (Light, Dark) and Notes, off by default, and the markup stands in one `<template id="page">`, which is what `spnutils apps surface render` prints or the body of a copy of a running page. The markup is the work's own, so the sample rule (`RULE.DEVEX.WORKSPACE.267` · MUST · check:workstream-state) holds for it. **The page names the design system and the app's stylesheet in two metas, and the shared script builds the frame's document** (`RULE.DEVEX.WORKSPACE.536` · MUST · skill:spn-devex/ideate): the `surface-ds` meta names the version of the design system the markup was drawn with, the `surface-app-css` meta names the app's stylesheet by a relative path, or is empty for Surface's own look, and the script links `design-system.css` from the published `assets/docs/<docs version>/design-system.css`, the folder it was served from, links the app's stylesheet, sets `data-mode` from the Light and Dark switch and sizes the frame by the width switch; the switches set the frame's own document directly, so no message and no meta in the markup is needed, and a note is an element marked `data-note`, hidden until Notes is on. `spn-devex docs check` refuses a surface page without the template, the two metas or the bar. **The frame's document, the metas and the note marker change only with a new stylesheet version** (`RULE.DEVEX.WORKSPACE.537` · MUST · skill:spn-devex/ideate). **A group of previews reviews the app's top navigation and footer once**, in its layout sample `00-layout` with the menus open and the phone drawer; every other page shows its own content only.
 
-**A template's placeholders are short names in capitals, each explained once, in a comment at the top of the file** (`<!-- Placeholders: {{NAME}} … -->`), and the same value takes the same name everywhere on a page: `{{NAME}}` is the page's short name, at most three words, in the `<title>`, the outline's title, the eyebrow's last segment and the index entry; `{{TITLE}}` is the heading, in the `<h1>` alone; `{{UP-HREF}}` (and `{{HUB-HREF}}` on a construct page) are the links of the eyebrow's first line, the breadcrumb. A placeholder inside example content shows the shape of a row and stays. The block's optional `name` holds the short name where `title` is longer; the page writer fills `{{NAME}}` from `name`, and from `title` where there is none, and refuses a `name` of more than three words (`RULE.DEVEX.WORKSPACE.517`). **The rules every page kind shares are stated once, in the chapter, and no template repeats them**: headings carry no count and are never links, numbers are for file names, the book's own words are translated, and a card is a title, a description and a *Read more*. **The book's own words are translated on every page a newcomer reads**: say *the agent's viewpoint*, and note once that the book calls it a lens. A word a first-time reader cannot guess is explained where it first appears, or replaced by the plain word. A count is never an explanation: *the eight phases* tells a newcomer nothing, so say what the phases are. A door is a *Read …* line under the text, naming what it opens in the words the heading already carries — *Read Agent →*. A card that carries an action — a link or a button — keeps it at the card's bottom edge: the cards of one row are as tall as the tallest, so the actions line up however long the text above each one is.
+**A template's placeholders are short names in capitals, each explained once, in a comment at the top of the file** (`<!-- Placeholders: {{NAME}} … -->`), and the same value takes the same name everywhere on a page: `{{NAME}}` is the page's short name, at most three words, in the `<title>`, the outline's title, the eyebrow's last segment and the index entry; `{{TITLE}}` is the heading, in the `<h1>` alone; `{{UP-HREF}}` (and `{{HUB-HREF}}` on a construct page) are the links of the eyebrow's first line, the breadcrumb. A placeholder inside example content shows the shape of a row and stays. The block's optional `name` holds the short name where `title` is longer; the page writer fills `{{NAME}}` from `name`, and from `title` where there is none, and refuses a `name` of more than three words (`RULE.DEVEX.WORKSPACE.517` · MUST · check:doc-check). **The rules every page kind shares are stated once, in the chapter, and no template repeats them**: headings carry no count and are never links, numbers are for file names, the book's own words are translated, and a card is a title, a description and a *Read more*. **The book's own words are translated on every page a newcomer reads**: say *the agent's viewpoint*, and note once that the book calls it a lens. A word a first-time reader cannot guess is explained where it first appears, or replaced by the plain word. A count is never an explanation: *the eight phases* tells a newcomer nothing, so say what the phases are. A door is a *Read …* line under the text, naming what it opens in the words the heading already carries — *Read Agent →*. A card that carries an action — a link or a button — keeps it at the card's bottom edge: the cards of one row are as tall as the tallest, so the actions line up however long the text above each one is.
 
 **They do not share a lifecycle** (`RULE.DEVEX.WORKSPACE.088` · GUIDE). Two describe a moment; one renders something live.
 
@@ -692,12 +692,16 @@ to the em dash, and every `<h3 id>` inside it an entry under it, named the same 
 order* is *SEQUENCE* in the rail, and the heading on the page keeps the rest (RULE.DEVEX.WORKSPACE.231,
 styles `1.2.0`). **So every heading the rail shows reads as a name of at most three words before its dash**
 (`RULE.DEVEX.WORKSPACE.518` · MUST · check:doc-check): a heading that is a sentence keeps its words after the dash
-and takes a name from the section's own words in front, *Candidate — The candidate, and what it keeps*. Join two
+and takes a name from the section's own words in front, *Candidate — the candidate, and what it keeps*. Join two
 parts with *and* or *or*, never a comma (*Export and erasure*, not *Export, erasure*); a contrast may keep its comma
 (*Steps, not rules*). A heading with no `id` never reaches
 the rail, which is why a template ships every section and subsection with one. **The side gutter is
 `8px` on every page, at every width, except a report at phone width (`40rem` and below), which takes
 `16px`.**
+
+**On a hub and an overview, the words after a heading's dash are a plain phrase a newcomer reads in one pass** (`RULE.DEVEX.WORKSPACE.561` · GUIDE). These pages are where a reader starts, so *Kind and shape — the one fact* becomes *Kind and shape — the one choice every other rule follows from*. The name before the dash stays short, because the rail shows only the name; the phrase has no word limit and keeps every term.
+
+**A heading's name is in sentence case, and the words after its dash run on in lowercase** (`RULE.DEVEX.WORKSPACE.562` · GUIDE): *Shared rules — the rules this path shares*. A construct's, a product's or a command's own name keeps the capitals it was given: *Module Contract Chain — how a contract reaches code*.
 
 ### Every page links one shared stylesheet, in one version
 
@@ -794,7 +798,7 @@ version of the stylesheet that has them.
 
 **A table cell that holds an item reads in three levels on a hub, an overview, a construct, an approach page and a preview** (`RULE.DEVEX.WORKSPACE.259` · MUST · check:doc-check). The title is the cell's first paragraph, in bold where it is words; the line that says what it is or does is the paragraph under it; the facts are one line of `Key: value` pairs separated by middots, in `<span class="sds-small">`. A level with nothing to say is left out, and so is a fact whose value is a dash. **A table keeps a column only where a reader compares down it** — a status, a count, a version, a weight, and a contract term beside the word a person uses for it — and what nobody reads down becomes a level of the item's cell; `doc-check` names a column whose cells hold sentences, as a note. A table of one column takes the width it is given and wraps at a phone's width, where a wider table scrolls inside its box. A construct's seat file keeps its markdown columns, and `docs page` writes the cells: `Terms` is three columns, `Term` · `Contract term` · `Description`, with the contract term in code style, taking fixed shares of the width so a term never wraps (the term 22 in a hundred, the contract term 26, the meaning the rest; under `40rem` each row stacks as term, contract term, meaning, with the shared styles from `1.10.0`), `Binds` is `Rule · Weight` with what the rule decides under it, a Model's `Piece · The question it answers · Its terms` is one column with `Terms:` as a fact, and a Boundary's `Owns · Refuses · Who owns that instead` keeps Owns beside Refuses with `Owned by:` as a fact. Any other seat table keeps its columns, except a column after the first whose cells hold sentences, which `docs page` writes under the first column's title: the line where it is the only one, or a paragraph led by its column's name where several are. A column that lists code is never one of sentences. On a hub or an overview, written by hand, you apply the same rule to every table. Every piece of text sits in the element whose tone it reads in — a name in an `h4`, a bold lead or a cell's first paragraph, running text in a paragraph, a fact in `sds-small` — and a page never sets a colour on text. A report's tables follow its own sections.
 
-**Markdown keeps its own grammar and HTML keeps the blocks.** A capability chapter stays markdown and is never produced as a page, so none of this reaches it. The split is stated in the book: `02-document.md` governs markdown, `05-artifacts.md` governs the page.
+**Markdown keeps its own grammar and HTML keeps the blocks.** A capability chapter stays markdown and is never produced as a page, so none of this reaches it. The split is stated in the book: `02-document.md` governs markdown, `05-pages.md` governs the page.
 
 **A block is a visual insert, not a section shape.** Normal prose needs no block. Reach for one when the content is *not* a paragraph, a list or a table — a rule the reader must not skim, a picture, a fixed list of doors, a comparison. **The set is closed**: `MUST` · `CATALOG` · `COMPARISON` · `GLOSSARY` · `CODE` · `DIFF` · `TREE` · `PROSE` · `CARDS` · `NEXT`, plus the figure kinds below, and a new kind is a decision rather than an invention. Every block and every figure kind is written out, in the spelling you actually type, in [`blocks.md`](blocks.md) beside this file — read that before authoring a document with figures in it, and read a page template beside it. **Do not open the HTML blocks template**: it is the *rendered* reference a person opens. It is much larger than the markdown form, and most of it is markup and inline SVG that the renderer and the drawer produce for you (decision DEC.DEVEX.WORKSPACE.136). Every `dg` example in the markdown form is executed by the drawer's test suite, so an example you copy draws.
 

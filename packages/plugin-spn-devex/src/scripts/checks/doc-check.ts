@@ -1,13 +1,13 @@
 #!/usr/bin/env node
 // RESTATES: the foundation book — 02-document.md rule 9 (RULE.DEVEX.WORKSPACE.162), rules 11-12 (RULE.DEVEX.WORKSPACE.096, the
 // one voice; RULE.DEVEX.WORKSPACE.106, its reach and its measure; RULE.DEVEX.WORKSPACE.107, the three moves that reach the
-// reader), 04-discipline.md § Voice discipline, 05-artifacts.md (the masthead, the approach document,
+// reader), 04-discipline.md § Voice discipline, 05-pages.md (the masthead, the approach document,
 // and the Plan section after How, RULE.DEVEX.WORKSPACE.487), 01-workstream.md § A step row says where, what work, and how
-// (RULE.DEVEX.WORKSPACE.183), 05-artifacts.md § One stylesheet, served in versions (RULE.DEVEX.WORKSPACE.214),
+// (RULE.DEVEX.WORKSPACE.183), 08-stylesheet.md § One stylesheet, served in versions (RULE.DEVEX.WORKSPACE.214),
 // § The header (a short name of at most three words, RULE.DEVEX.WORKSPACE.517) and § What an overview and a hub hold
 // (a rail entry of at most three words, RULE.DEVEX.WORKSPACE.518), § Prose and lists have limits (a figure comes from a
 // spec and never by hand, RULE.DEVEX.WORKSPACE.523)
-// and 06-registers.md § Writing a row. The chapters are the source of truth: a rule change is edited
+// and 09-registers.md § Writing a row. The chapters are the source of truth: a rule change is edited
 // there first, then here, in the same change. This script checks only what a script CAN check; the
 // register itself is judgement.
 //
@@ -275,10 +275,10 @@ export function structural(path: string): Finding[] {
 
 // ---------------------------------------------------------------------------- the approach page
 
-// An approach page lives in the workstream that argues it (05-artifacts.md § The approach document),
+// An approach page lives in the workstream that argues it (05-pages.md § The approach document),
 // and its arcs sit beside it in `arcs/`. Only a page inside a workstream has arcs to compare against.
 // One early workstream is exempt by name: its page was written in the shape before this one, and it
-// closes under that shape (05-artifacts.md § The approach document).
+// closes under that shape (05-pages.md § The approach document).
 const EXEMPT_WORKSTREAM = /^008-/;
 
 /** The workstream folder a path sits in, and its name, or null outside one. */
@@ -322,7 +322,7 @@ function inClosedWorkstream(path: string): boolean {
 const WHAT_WITHOUT_FIGURE = 6000;
 
 /**
- * 05-artifacts.md § A section opens with its own overview, then a figure (RULE.DEVEX.WORKSPACE.497). On an open or backlog
+ * 05-pages.md § A section opens with its own overview, then a figure (RULE.DEVEX.WORKSPACE.497). On an open or backlog
  * approach page, a What past 6,000 characters of text holds a `<figure>` or an `<svg>`, or one `<!-- no figure: … -->` line
  * saying why prose is clearer there. A page in a closed workstream is not read.
  */
@@ -334,12 +334,12 @@ export function figureRule(path: string, text: string): Finding[] {
   if (length <= WHAT_WITHOUT_FIGURE) return [];
   if (/<figure\b|<svg\b|<!--\s*no figure:/i.test(what)) return [];
   return [["RULE", `${basename(path)} runs ${length} characters in What and holds no figure ` +
-    "(05-artifacts.md § A section opens with its own overview; RULE.DEVEX.WORKSPACE.497) · add a figure where seeing is faster, " +
+    "(05-pages.md § A section opens with its own overview; RULE.DEVEX.WORKSPACE.497) · add a figure where seeing is faster, " +
     "or one line, `<!-- no figure: the reason prose is clearer here -->`"]];
 }
 
 /**
- * 05-artifacts.md § Prose and lists have limits (RULE.DEVEX.WORKSPACE.523): a figure is drawn from a spec by `docs figure draw`, never
+ * 06-blocks.md § Prose and lists have limits (RULE.DEVEX.WORKSPACE.523): a figure is drawn from a spec by `docs figure draw`, never
  * by hand with coordinates. A page or a seat file that carries a flat drawing (`svg.sds-drawing`, `sds-skeleton`) or an arrowhead
  * (`marker-end`) carries a figure drawn by hand, and each one is a RULE that says to draw it from a `dg` spec. A seat file's fenced
  * code is an example and is not read; a sample the design language's page marks `data-dl-legend` is not read either
@@ -351,7 +351,7 @@ export function handDrawnRule(path: string, text: string): Finding[] {
 }
 
 /**
- * 05-artifacts.md § After `How` comes a section of its own, Plan (RULE.DEVEX.WORKSPACE.487). The Plan section is `<section id="arcs">`
+ * 05-pages.md § After `How` comes a section of its own, Plan (RULE.DEVEX.WORKSPACE.487). The Plan section is `<section id="arcs">`
  * under the `h2` Plan, and holds a table of two columns, Arc · Status. Inside a workstream the table has one row per arc in `arcs/`,
  * in the order a person chooses, and each row is the arc's own: its name, its line and the links to its preview and its samples, and the
  * reason a CARRIED or DROPPED arc carries (all in the Arc cell), and its status badge.
@@ -360,7 +360,7 @@ export function handDrawnRule(path: string, text: string): Finding[] {
  * named Cycles at the end of How. An open or backlog page with no Plan section is told to have one (`docs cycles write` moves it).
  */
 /**
- * 05-artifacts.md § After `How` comes a section of its own, Plan (RULE.DEVEX.WORKSPACE.487): a Plan row's facts line links the arc's
+ * 05-pages.md § After `How` comes a section of its own, Plan (RULE.DEVEX.WORKSPACE.487): a Plan row's facts line links the arc's
  * preview and, where the arc has `notes/<arc>/samples/index.html`, that index alone, never a sample page or folder beside it.
  */
 export function planRowSamples(table: string, folder: string): Finding[] {
@@ -372,7 +372,7 @@ export function planRowSamples(table: string, folder: string): Finding[] {
     const beside = hrefs.filter((href) => !/\/samples\/index\.html$/.test(href));
     if (beside.length)
       out.push([CYCLES, `Plan's row for ${arc} links ${listed(beside)} beside its samples index — an arc with \`samples/index.html\` is linked by that index alone ` +
-        "(05-artifacts.md § After How comes a section of its own, Plan; RULE.DEVEX.WORKSPACE.487) · `spn-devex docs cycles write <workstream>` writes the row"]);
+        "(05-pages.md § After How comes a section of its own, Plan; RULE.DEVEX.WORKSPACE.487) · `spn-devex docs cycles write <workstream>` writes the row"]);
   }
   return out;
 }
@@ -380,7 +380,7 @@ export function planRowSamples(table: string, folder: string): Finding[] {
 export function cyclesRule(path: string, text: string): Finding[] {
   if (section(text, "How") === null) return [];                   // approachShape reports a missing How
   const fix = "`spn-devex docs cycles show <workstream>` prints the table from the arcs";
-  const where = "(05-artifacts.md § After How comes a section of its own, Plan; RULE.DEVEX.WORKSPACE.487)";
+  const where = "(05-pages.md § After How comes a section of its own, Plan; RULE.DEVEX.WORKSPACE.487)";
   const plan = section(text, "Plan");
   if (plan === null) {
     if (!inClosedWorkstream(path)) {
@@ -424,10 +424,10 @@ function closedCyclesRule(text: string, fix: string): Finding[] {
   const named = subsections.filter((m) => /^Cycles\b/i.test(flat(m[1]))).at(-1);
   if (!named)
     return [[CYCLES, "the page has neither a Plan section nor How's older Cycles subsection — one row " +
-      `per arc with ${CYCLES_HEADER} (05-artifacts.md § After How comes a section of its own, Plan) · ${fix}`]];
+      `per arc with ${CYCLES_HEADER} (05-pages.md § After How comes a section of its own, Plan) · ${fix}`]];
   if (named !== subsections.at(-1))
     return [[CYCLES, `How carries "${flat(subsections.at(-1)![1])}" after Cycles — Cycles is How's last ` +
-      "subsection in the older shape (05-artifacts.md § After How comes a section of its own, Plan)"]];
+      "subsection in the older shape (05-pages.md § After How comes a section of its own, Plan)"]];
   return [];
 }
 
@@ -435,7 +435,7 @@ function closedCyclesRule(text: string, fix: string): Finding[] {
 const WRITES_THE_PAGE = "`spn-devex docs cycles write <workstream>` writes it from the arcs";
 
 /**
- * 05-artifacts.md § After How comes a section of its own, Plan: on a workstream's page the header's status follows the arcs.
+ * 05-pages.md § After How comes a section of its own, Plan: on a workstream's page the header's status follows the arcs.
  * It reads `PLANNING` while no arc is past `DECIDED`, `IMPLEMENTING` once an arc runs or has
  * landed, and `DONE` when the workstream closes. The rule itself is `headerStatusRule`, beside the
  * command that writes the status; this states the finding. A header that labels none of the three
@@ -448,13 +448,13 @@ export function headerRule(path: string, text: string): Finding[] {
   if (!found) return [];
   if (inClosedWorkstream(path))
     return [[CYCLES, `the header's status reads ${found.shows}, and a closed workstream reads ${found.gives} ` +
-      "(05-artifacts.md § After How comes a section of its own, Plan) · stamp the header's status badge, which a closed page keeps by hand"]];
+      "(05-pages.md § After How comes a section of its own, Plan) · stamp the header's status badge, which a closed page keeps by hand"]];
   return [[CYCLES, `the header's status reads ${found.shows} and the arcs give ${found.gives} — the header's status ` +
-    `follows the arcs (05-artifacts.md § After How comes a section of its own, Plan; RULE.DEVEX.WORKSPACE.204) · ${WRITES_THE_PAGE}`]];
+    `follows the arcs (05-pages.md § After How comes a section of its own, Plan; RULE.DEVEX.WORKSPACE.204) · ${WRITES_THE_PAGE}`]];
 }
 
 /**
- * 05-artifacts.md § After How comes a section of its own, Plan: the heading of `Open` names the cards that are open, each by
+ * 05-pages.md § After How comes a section of its own, Plan: the heading of `Open` names the cards that are open, each by
  * its number, and with no card open it reads `Open — no card is open`. A page with no `Open` heading
  * and a page in a closed workstream are not judged.
  */
@@ -464,7 +464,7 @@ export function openHeadingRule(path: string, text: string): Finding[] {
   const gives = openHeadingFor(text);
   if (shows === null || shows === gives) return [];
   return [[CYCLES, `the heading of Open reads "${shows}" and the page's cards give "${gives}" ` +
-    `(05-artifacts.md § After How comes a section of its own, Plan; RULE.DEVEX.WORKSPACE.204) · ${WRITES_THE_PAGE}`]];
+    `(05-pages.md § After How comes a section of its own, Plan; RULE.DEVEX.WORKSPACE.204) · ${WRITES_THE_PAGE}`]];
 }
 
 /** A page's line that loads the shared script, which builds the rail and folds it. */
@@ -479,7 +479,7 @@ export function pageFurniture(text: string): Finding[] {
   if (LOADS_PAGE_SCRIPT.test(text)) return [];
   return [[FURNITURE,
     `The outline is not built and does not fold: the page carries a rail and loads no \`${PAGE_SCRIPT}\`. ` +
-    "The shared script builds the rail from the headings and folds it (05-artifacts.md, The page itself) · " +
+    "The shared script builds the rail from the headings and folds it (05-pages.md, The page itself) · " +
     "add the script's line at the end of the page — take it from the approach template, " +
     `\`${PLUGIN_TEMPLATES}/workstream/approach-template.html\``]];
 }
@@ -501,14 +501,14 @@ const arcHeading = (id: string | null, words: string): boolean =>
   /^(?:N\d{3}[a-z]?|ideate|follow-ups)\b/i.test(words) || (id !== null && (/^(?:N\d{3}[a-z]?|ideate|follow-ups)$/i.test(id) || /-what$/.test(id)));
 
 /**
- * 05-artifacts.md § The approach document: What is told by construct and How by repository, and an arc is neither (RULE.DEVEX.WORKSPACE.487).
+ * 05-pages.md § The approach document: What is told by construct and How by repository, and an arc is neither (RULE.DEVEX.WORKSPACE.487).
  * It names an arc as a heading of What or How, a status word or a developer's quoted line in How, and a code block, a file frame or a
  * tab set in What (the page is the summary, the arc page is the preview). A page still in the older order, Plan after How, owes its
  * rewrite pass and is told softly; a page in the new order is held to it.
  */
 export function whatHowShape(text: string, older: boolean): Finding[] {
   const grade = older ? "SOFT" : "RULE";
-  const where = "(05-artifacts.md § The approach document; RULE.DEVEX.WORKSPACE.487)";
+  const where = "(05-pages.md § The approach document; RULE.DEVEX.WORKSPACE.487)";
   const out: Finding[] = [];
   const what = section(text, "What");
   const how = section(text, "How");
@@ -563,7 +563,7 @@ export function whatHowShape(text: string, older: boolean): Finding[] {
 
 /**
  * An opening, then Why -> What -> Plan -> How -> Open -> Deferred, in that order and nothing else
- * (05-artifacts.md § The approach document). `exempt` is the early workstream's page, which keeps the
+ * (05-pages.md § The approach document). `exempt` is the early workstream's page, which keeps the
  * shape it was written in and is held only to the skeleton.
  */
 export function approachShape(text: string, exempt = false, closed = false): Finding[] {
@@ -579,7 +579,7 @@ export function approachShape(text: string, exempt = false, closed = false): Fin
   if (exempt) return [];
 
   const out: Finding[] = [];
-  const where = "(05-artifacts.md § The approach document)";
+  const where = "(05-pages.md § The approach document)";
   if (heads.includes("terms"))
     out.push(["RULE", `carries a Terms section, and an approach page has none ${where} · explain a word ` +
       "in brackets where it first appears; a word the product owns belongs in its construct's own Terms table"]);
@@ -596,20 +596,20 @@ export function approachShape(text: string, exempt = false, closed = false): Fin
   if (!closed) out.push(...whatHowShape(text, older));
   if (!/<p\b[^>]*class="(?:[^"]*\s)?sds-standfirst(?:\s[^"]*)?"/i.test(text))
     out.push(["RULE", "has no opening — one `p.sds-standfirst` in the header comes before Why " +
-      "(05-artifacts.md § The masthead, and the opening; RULE.DEVEX.WORKSPACE.182) · start from the approach template"]);
+      "(05-pages.md § The masthead, and the opening; RULE.DEVEX.WORKSPACE.182) · start from the approach template"]);
   return out;
 }
 
 // ---------------------------------------------------------------------------- the masthead
 
-// 05-artifacts.md § The masthead, and the opening (RULE.DEVEX.WORKSPACE.187, RULE.DEVEX.WORKSPACE.182).
+// 05-pages.md § The masthead, and the opening (RULE.DEVEX.WORKSPACE.187, RULE.DEVEX.WORKSPACE.182).
 // The header holds the Title (`h1`), an optional Subtitle (`p.sds-subtitle`) and the Description (one
 // `p.sds-standfirst`), in that order, and nothing after the Description. Every masthead finding is SOFT
 // while the trees outside the foundation wait for their retrofit (the retrofit still owed); when every tree
 // audits clean, change SECOND_PARAGRAPH to RULE, because the chapter states that rule as MUST.
 const SECOND_PARAGRAPH = "SOFT";
 const MASTHEAD = "SOFT";
-const MASTHEAD_WHERE = "(05-artifacts.md § The masthead, and the opening; RULE.DEVEX.WORKSPACE.187)";
+const MASTHEAD_WHERE = "(05-pages.md § The masthead, and the opening; RULE.DEVEX.WORKSPACE.187)";
 
 /**
  * The page kinds the masthead rule binds, read from a page's file name. The index of artifacts has
@@ -921,7 +921,7 @@ export function partnerWords(path: string, text: string): Finding[] {
     "why, and the ways to reach it, each with its trade-off (RULE.DEVEX.AGENT.160)"] as Finding);
 }
 
-/** An overview borrows its outline and carries no argument organs (05-artifacts). */
+/** An overview borrows its outline and carries no argument organs (05-pages). */
 export function overviewShape(text: string): Finding[] {
   const organs = headings(text).filter((h) => h === "open" || h === "deferred");
   if (organs.length)
@@ -1280,7 +1280,7 @@ export function isRegister(path: string): boolean {
   return inRegisters(p);
 }
 
-// 06-registers.md § A row states present truth, and carries no supersession — a row is never
+// 09-registers.md § A row states present truth, and carries no supersession — a row is never
 // annotated, struck through, or left standing with a note, and it never names what it replaced.
 // THE WORD IS NOT THE BREACH; the ruling is. A row legitimately says `superseding the working label
 // "AGT"` — ordinary English about an enum value, a file set or a config key. So a ruling is only a
@@ -1319,11 +1319,11 @@ export function supersession(rid: string, body: string, raw: string): Finding[] 
   for (const [name, how] of [...over.map((n) => [n, "rules over"] as const),
                              ...under.map((n) => [n, "is ruled by"] as const)])
     out.push([SUPERSESSION, `row ${rid} ${how} ${name} — a row states present truth and never names ` +
-      `what it replaced (06-registers.md § A row states present truth) · rewrite the row, and let git ` +
+      `what it replaced (09-registers.md § A row states present truth) · rewrite the row, and let git ` +
       `keep the old wording`]);
   if (ANNOTATED.test(raw))
     out.push([SUPERSESSION, `row ${rid} carries struck-through or annotated text — a row is never ` +
-      `annotated, struck through, or left standing with a note (06-registers.md § A row states ` +
+      `annotated, struck through, or left standing with a note (09-registers.md § A row states ` +
       `present truth) · rewrite the cell, and let git keep the old wording`]);
   return out;
 }
@@ -1472,7 +1472,7 @@ export function kindOf(path: string): string {
 
 // ---------------------------------------------------------------------------- the shared styles
 
-// 05-artifacts.md § What a stored page carries, and what a published one carries: the check on a page
+// 08-stylesheet.md § What a stored page carries, and what a published one carries: the check on a page
 // refuses a link to a version that nobody cut. The finding carries the words below, and the hook
 // reads them to tell the one finding it refuses a write for.
 const UNCUT = "links a version of the shared styles that nobody cut";
@@ -1504,7 +1504,7 @@ export function uncutVersions(text: string, styles: string | null = ownStylesDir
   return [...new Set(linked)].filter((version) => !cut.includes(version)).map((version): Finding =>
     ["RULE", `the page ${UNCUT}: \`${version}\`. \`versions.json\` holds ${cut.map((one) => `\`${one}\``).join(" · ")}. ` +
       `Link a version that exists, or cut this one first with \`spn-devex docs styles cut ${version}\` ` +
-      "(05-artifacts.md § One stylesheet, served in versions)"]);
+      "(08-stylesheet.md § One stylesheet, served in versions)"]);
 }
 
 /**
@@ -1555,7 +1555,7 @@ export function check(path: string, text: string, fragment = false): Finding[] {
 
   if ((isApproach || isOverview) && !fragment) {
     if (!/who this is for|audience/i.test(text))
-      out.push(["BLOCK", "masthead names no audience — an artifact has no seat, so its content is decided by its audience (05-artifacts)"]);
+      out.push(["BLOCK", "masthead names no audience — an artifact has no seat, so its content is decided by its audience (05-pages)"]);
     const terms = /<section id="s0"[\s\S]*?<\/section>/.exec(text);
     if (terms) {
       const n = [...terms[0].matchAll(/<tr>/g)].length - 1;
@@ -1646,7 +1646,7 @@ const inPocket = (path: string): boolean => {
 };
 
 /**
- * 05-artifacts.md: a page whose sidebar lists other pages is the index of artifacts, built from the index template, and no other
+ * 05-pages.md: a page whose sidebar lists other pages is the index of artifacts, built from the index template, and no other
  * page has a sidebar of its own. A page of the artifacts pocket other than the index (it holds no `index-data` block) that holds a `<nav>`
  * linking to two or more other pages draws a finding. The page's own rail, `sds-rail`, holds its outline and the way back, and is not read.
  */
@@ -1657,7 +1657,7 @@ export function sidebarRule(text: string): Finding[] {
     .filter(([, , inside]) => [...inside.matchAll(/<a\b[^>]*\bhref="([^"#][^"]*)"/gi)].filter(([, href]) => !/^[a-z][a-z0-9+.-]*:/i.test(href)).length >= 2);
   return sidebars.length
     ? [["RULE", `this page holds a sidebar of links to other pages. Only the index of artifacts has one, built from \`${TEMPLATES}/${DOCS}/pages/index-template.html\` ` +
-      "with each entry a page; a page that lists pages becomes an index of its own, or links its pages in a catalog (05-artifacts.md, the block table)"]]
+      "with each entry a page; a page that lists pages becomes an index of its own, or links its pages in a catalog (05-pages.md, the block table)"]]
     : [];
 }
 
@@ -1669,7 +1669,7 @@ const counted = (name: string): number => name.split(/\s+/).filter((one) => /[\p
 const NAME_LIMIT = 3;
 
 /**
- * 05-artifacts.md § The header and § What an overview and a hub hold: a page's short name, the block's `title`, is
+ * 05-pages.md § The header and § What an overview and a hub hold: a page's short name, the block's `title`, is
  * at most three words and never a sentence (RULE.DEVEX.WORKSPACE.517), and each heading the page's rail shows, a
  * section's `h2` and every `h3` with an id, reads as a name of at most three words before its dash
  * (RULE.DEVEX.WORKSPACE.518). Both are read in a list, where a sentence cannot be told from its neighbours.

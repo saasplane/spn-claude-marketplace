@@ -1,4 +1,4 @@
-// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/03-tree.md · 05-artifacts.md · 02-document.md
+// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/03-tree.md · 05-pages.md · 02-document.md
 // The chapters are the source of truth; a rule change is edited there first, then here.
 //
 // A construct's status, rolled up from the behaviour rows at its own path.

@@ -510,7 +510,7 @@ console.log("\n=== the gap scan measures and never fixes");
       catch { return false; }
     });
 
-  // AN ARGUMENT IS A WORKSTREAM'S, NEVER A REPOSITORY'S. 05-artifacts.md has always said "an
+  // AN ARGUMENT IS A WORKSTREAM'S, NEVER A REPOSITORY'S. 05-pages.md has always said "an
   // argument does not live here", but nothing checked it, so fifteen pages accumulated across three
   // repositories before anybody counted. A rule a person has to remember is a rule that holds until
   // the week somebody is busy. The page is refused wherever it sits in `docs/`, a pocket folder too.
@@ -534,7 +534,7 @@ console.log("\n=== the gap scan measures and never fixes");
     one("the same page in a workstream is not", got, (g) => !/belongs to the workstream/.test(g));
   }
 
-  // The pocket's folder set is docs, guides and reports (05-artifacts.md § What the pocket
+  // The pocket's folder set is docs, guides and reports (05-pages.md § What the pocket
   // holds). A folder the set does not name held "what a document was written from", and every such
   // file was a seat depending on a pocket — 229 files across five repositories, 187 of them cited by
   // nothing. The check reads the set, so any other name is refused the same way; two are probed.

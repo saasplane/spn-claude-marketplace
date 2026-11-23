@@ -1,5 +1,5 @@
 // RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/03-tree.md § The five seats · § The two pockets · § A seat may carry `templates/`
-//           docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § What the pocket holds · § The approach document — a workstream's, never a repository's
+//           docs/04-capabilities/01-devex/04-workspace/04-docs/05-pages.md § What the pocket holds · § The approach document — a workstream's, never a repository's
 // The chapters are the source of truth; a rule change is edited there first, then here.
 //
 // The docs layout, stated once: every plugin script builds and recognizes a docs path through this
@@ -61,14 +61,14 @@ export const POCKET = { registers: "registers", artifacts: "artifacts" } as cons
 export type Pocket = keyof typeof POCKET;
 
 /**
- * The artifacts pocket's folder set, which is fixed (05-artifacts.md § What the pocket holds). The
+ * The artifacts pocket's folder set, which is fixed (05-pages.md § What the pocket holds). The
  * index of artifacts sits beside the three, directly in the pocket.
  */
 export const ARTIFACT = { docs: "docs", guides: "guides", reports: "reports", surface: "surface" } as const;
 export const ARTIFACT_FOLDERS: readonly string[] = Object.values(ARTIFACT);
 
 /**
- * The two halves of the pocket (05-artifacts.md § What the pocket holds, rule 221): `public/` holds `docs/`, `guides/` and `surface/`, and
+ * The two halves of the pocket (05-pages.md § What the pocket holds, rule 221): `public/` holds `docs/`, `guides/` and `surface/`, and
  * `private/` holds `reports/`. A repository that still holds the earlier layout keeps `docs/`, `guides/` and `reports/` directly in the
  * pocket until the rewrite pass moves its pages.
  */
@@ -234,7 +234,7 @@ export function domainDirOf(seatFolder: string): string | null {
 }
 
 /**
- * The construct page a seat file is produced as (05-artifacts.md § What the pocket holds):
+ * The construct page a seat file is produced as (05-pages.md § What the pocket holds):
  * `<docs>/02-constructs/01-x/a.md` gives `<docs>/artifacts/docs/01-x/constructs/a-construct.html`.
  */
 export function producedPageOf(seatFile: string): string {

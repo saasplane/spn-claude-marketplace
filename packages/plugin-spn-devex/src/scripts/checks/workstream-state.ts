@@ -1,5 +1,5 @@
 // RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § An arc is cut by what is reviewed and released together, and named for its domain · § The folder · § The commands · § The life of an arc, and every file it touches · § The approach page keeps up with its arcs · § Open and backlog workstreams follow the standard as it moves · § An arc carries its specification, or names the note that holds it
-//           docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § The approach document — a workstream's, never a repository's · § After `How` comes a section of its own, Plan (RULE.DEVEX.WORKSPACE.487)
+//           docs/04-capabilities/01-devex/04-workspace/04-docs/05-pages.md § The approach document — a workstream's, never a repository's · § After `How` comes a section of its own, Plan (RULE.DEVEX.WORKSPACE.487)
 // The chapters are the source of truth; a rule change is edited there first, then here, in the same change.
 //
 // `workstream state check`, as a function: whether each open and backlog workstream is whole. The

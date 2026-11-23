@@ -1,4 +1,4 @@
-// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § The figures — what sits inside a block, and the closed set of them
+// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/07-figures.md § The figures — what sits inside a block, and the closed set of them
 // The chapter is the source of truth. A rule change is edited there first, then here, in the same change.
 //
 // Figures beside the passages that call for them, and matching them (rule RULE.DEVEX.WORKSPACE.548). Both hints are SOFT and read a seat file's markdown:

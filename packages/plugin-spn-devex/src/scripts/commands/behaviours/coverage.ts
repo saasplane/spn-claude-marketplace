@@ -184,7 +184,7 @@ export function citingCases(root: string, nodes: string[]): CitingCase[] {
 
 /**
  * The row statuses a Repository row counts, each always present so a zero reads as counted. A `MANUAL`
- * row counts in none of the numbers (05-artifacts.md § The tests report): a person proves it by the
+ * row counts in none of the numbers (05-pages.md § The tests report): a person proves it by the
  * repository's browser guide, so it is listed as `manual` beside the counts, and the four sum to Written.
  */
 const STATUS_WORDS = ["SUCCESS", "FAILED", "PENDING", "PLANNED"] as const;

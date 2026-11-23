@@ -121,7 +121,7 @@ ${STYLES.stylesheet}
 
 // The same page with the two-column Cycles table an open workstream carries, written from a folder's
 // arcs: the Arc cell holds the title, the line and the facts, and the Status cell the badge.
-// A status as an open page draws it: its badge (05-artifacts.md § How ends in Cycles).
+// A status as an open page draws it: its badge (05-pages.md § How ends in Cycles).
 const BADGE = (word) => `<span class="sds-badge sds-status sds-${word.toLowerCase()}">${word}</span>`;
 const cleanFor = (folder) => CLEAN_FOUR.replace(/  <div class="sds-scroll"><table>[\s\S]*<\/table><\/div>\n/, `${tableOf(cyclesOf(folder))}\n`);
 const CLEAN = cleanFor(PROBE_STREAM);
@@ -430,7 +430,7 @@ one("a Subtitle under the Description is out of place",
 
 console.log("\n=== doc-check — the approach page: an opening, six sections, Plan between What and How");
 
-// 05-artifacts.md § The approach document. The page is an opening, then Why > What > How > Open >
+// 05-pages.md § The approach document. The page is an opening, then Why > What > How > Open >
 // Deferred, nothing else; there is no Terms section; Plan is a section of its own after How.
 const PLAN_SECTION = /<section id="arcs"[\s\S]*?<\/section>\n/;
 
@@ -1031,7 +1031,7 @@ console.log("\n=== doc-check — a long What on an open approach page holds a fi
 }
 
 {
-  console.log("\n=== doc-check — every page with a rail loads the script that builds it (05-artifacts.md, The page itself)");
+  console.log("\n=== doc-check — every page with a rail loads the script that builds it (05-pages.md, The page itself)");
   const { check } = await import("../../../../src/scripts/checks/doc-check.ts");
   const say = (label, ok, detail = "") => { n += 1; if (!ok) failed += 1; console.log(`  ${ok ? "PASS" : "FAIL"}  ${label}${ok || !detail ? "" : `\n        ${detail}`}`); };
   const preview = join(stream(TMP, "097-rail", "open"), "notes", "N001", "preview.html");
@@ -1047,7 +1047,7 @@ console.log("\n=== doc-check — a long What on an open approach page holds a fi
 }
 
 {
-  console.log("\n=== doc-check — a surface preview is a bar and a frame (05-artifacts.md, The surface preview)");
+  console.log("\n=== doc-check — a surface preview is a bar and a frame (05-pages.md, The surface preview)");
   const { check } = await import("../../../../src/scripts/checks/doc-check.ts");
   const say = (label, ok, detail = "") => { n += 1; if (!ok) failed += 1; console.log(`  ${ok ? "PASS" : "FAIL"}  ${label}${ok || !detail ? "" : `\n        ${detail}`}`); };
   const path = join(stream(TMP, "096-surface", "open"), "notes", "N001", "samples", "home-preview.html");

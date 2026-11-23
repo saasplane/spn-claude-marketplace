@@ -11,7 +11,7 @@ Take the units of one file and give each the block that shows it best. A unit is
 tables, lists and fences, and the hints the page writer's checks raised for it. **Change only a unit's form.**
 
 Run `spn-devex docs blocks units <file>` yourself, or work from the units your order carries. Read
-`refs/devex/workspace/docs/blocks.md` first: *Which block a content takes* and *Which figure, for what you need to show* decide every
+`refs/devex/workspace/docs/blocks.md` and `refs/devex/workspace/docs/figures.md` first: *Which block a content takes* and *Which figure, for what you need to show* decide every
 change. Do not re-derive a hint, and do not go looking for more files.
 
 ## What you change

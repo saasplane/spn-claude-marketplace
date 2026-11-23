@@ -1,4 +1,4 @@
-// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/06-registers.md
+// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/09-registers.md
 // The chapters are the source of truth; a rule change is edited there first, then here.
 //
 // The next free number of an id's place.

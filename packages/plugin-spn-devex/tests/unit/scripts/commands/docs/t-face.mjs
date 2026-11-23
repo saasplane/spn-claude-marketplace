@@ -503,7 +503,7 @@ console.log("\n=== the domain's glossary lands on its overview too, in HTML (Q22
 
   one("the overview gains a generated region, the first in any HTML page",
     page, has("spn:generated glossary"));
-  // THE PAGE READS IN THREE COLUMNS (05-artifacts.md § The shape of a section, on every page kind): the
+  // THE PAGE READS IN THREE COLUMNS (05-pages.md § The shape of a section, on every page kind): the
   // term in bold, linked to its construct's page; the contract's spelling in code style; the meaning.
   one("and it carries the glossary as three columns, Term · Contract term · Description",
     page, (g) => g.includes("<thead><tr><th>Term</th><th>Contract term</th><th>Description</th></tr></thead>") && !g.includes("<th>What it means</th>"));

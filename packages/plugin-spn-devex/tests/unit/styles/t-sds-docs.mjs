@@ -1,4 +1,4 @@
-// The shared script's colouring of a code block (`05-artifacts.md` § One stylesheet, served in versions): a page's
+// The shared script's colouring of a code block (`08-stylesheet.md` § One stylesheet, served in versions): a page's
 // file holds plain code in a `pre` tagged with its language, and the script colours the block when the page opens.
 // The script is the one place the language rules live, so each case states the markup a language's sample must
 // become, and the page tools are read to prove they hold no second copy.

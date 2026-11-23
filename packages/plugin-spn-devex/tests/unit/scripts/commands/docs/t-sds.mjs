@@ -1,5 +1,5 @@
 // `docs styles` — cuts a version of the shared page styles, moves the pages of a folder to a version, and
-// writes a copy of a page with its version's styles inside it (`05-artifacts.md` § One stylesheet,
+// writes a copy of a page with its version's styles inside it (`05-pages.md` § One stylesheet,
 // served in versions). Every case builds a small marketplace and a few pages in a scratch folder,
 // runs the real command through `cli.ts`, and reads the files back from disk. No case reaches the
 // network: a bundle reads its files from `--assets`, or from a folder beside the page.

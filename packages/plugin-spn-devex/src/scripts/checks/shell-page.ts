@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § The approach document — a workstream's, never a repository's
+// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-pages.md § The approach document — a workstream's, never a repository's
 // A WORKSTREAM OR DOCS PAGE IS NEVER WRITTEN THROUGH THE SHELL. The Write and Edit hook reads what is typed, tells the agent
 // to read `doc-sets.md` and `blocks.md` before it edits a preview, and runs the page checks; a page a script wrote or grew
 // got none of that, and a preview built that way read as notes (041 N009). A sample is the work's own file in its own

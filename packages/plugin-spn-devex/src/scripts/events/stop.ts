@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § The arc · § A step row says where, what work, and how · § Say what you opened, and know when to wait for the answer · § Stopping in the middle is a handover · § A prompt while an arc runs
-//           docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § The approach document
+//           docs/04-capabilities/01-devex/04-workspace/04-docs/05-pages.md § The approach document
 //           docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md § The reply while work runs shows what needs you, then what moved
 //           docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § A card is only for what the rules leave open
 //           RULE.DEVEX.WORKSPACE.486, a question is named Q<n> and a suggestion S<n>, with a capital letter, wherever a person reads it
@@ -1171,7 +1171,7 @@ function argued(root: string, mine: Set<string>): Array<[string, string[]]> {
 
 // ---------------------------------------------------------------------------- reply-shape
 //
-// RESTATES: 05-artifacts.md § The approach document → Open. The clause is the one most often missed:
+// RESTATES: 05-pages.md § The approach document → Open. The clause is the one most often missed:
 // *open items put to a person in chat follow this layout exactly as a document's Open section does*
 // — MUST. That covers a status reply, an answer to "what's left?", and a pending-work report.
 //
@@ -1487,7 +1487,7 @@ export function checkPageCurrent(touched: Set<string> | null): Warning[] {
     `. The parts of a page that the arcs decide are produced, never typed (RULE.DEVEX.WORKSPACE.204). Run ` +
     behind.map((one) => `\`spn-devex docs cycles write ${one.workstream}\``).join(" and ") +
     `, which writes the header's status, the Plan table and the heading of \`Open\` from the arcs. The rest ` +
-    `of the page is yours to bring current in the same turn (05-artifacts.md § After How comes a section of its own, Plan).` }];
+    `of the page is yours to bring current in the same turn (05-pages.md § After How comes a section of its own, Plan).` }];
 }
 
 /** The status a preview's header shows, as its status badge reads it; null where it shows none. */
