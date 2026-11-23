@@ -150,20 +150,20 @@
   <!-- PROPOSED HOLDS THE LAYERS THAT CHANGE (RULE.DEVEX.WORKSPACE.233). Shape first, then Server, Web, Surface, Plugins and Estate, each only
        for a layer the change touches: a layer that does not change has no section and no line. A layer section carries a data-layer
        mark, which the hook reads to tell which kinds of work a write draws. Inside a layer, one subsection for each module, named by the
-       book's own seats. Every block opens with a For and Layer line, shows a new file whole and a change as today's code beside the
-       proposed, and ends with a Reads line naming the file and line each name and value comes from. Before a block is written, read the
+       book's own seats. Every part is its title, one or two sentences of description, then its block or figure and nothing after it:
+       no For and Layer line (the layer is the h3 above it) and no Reads line (a fact it held goes into the description).
+       A part shows a new file whole and a change as today's code beside the proposed. Before a block is written, read the
        work map's row for its kind of work (refs/devex/agent/work-map.md). Delete the sections the preview does not need. -->
   <h3 id="s3-shape">Shape</h3>
   <p class="sds-standfirst">{{CODE-CATEGORIES}}</p>
   <h3 id="s3-server" data-layer="server">Server</h3>
   <p class="sds-standfirst">{{SUBSECTION-MODULE}}</p>
   <h4 id="s3-server-contract" data-layer="server-contract">{{Module}} &middot; Contract</h4>
-  <p class="sds-small">For: {{who reads it}} &middot; Layer: server contract</p>
+  <p>{{ONE-OR-TWO-SENTENCES-WHAT-THE-FILE-IS}}</p>
   <figure class="sds-file">
     <figcaption><span class="sds-file-path">{{path of the file}}</span><span class="sds-file-lang">ts</span></figcaption>
     <pre data-lang="ts">{{NEW-FILE}}</pre>
   </figure>
-  <p class="sds-small">Reads: {{FILE-LINE}}</p>
   <h3 id="s3-web" data-layer="web">Web</h3>
   <p class="sds-standfirst">{{SUBSECTION-MODULE-2}}</p>
   <h3 id="s3-surface" data-layer="surface">Surface</h3>

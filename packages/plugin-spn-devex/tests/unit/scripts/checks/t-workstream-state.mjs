@@ -612,13 +612,13 @@ console.log("\n=== the page rules read the saved file at Stop — 451, 518, 238,
   const tree = "<pre>spn-x/\n├── src/\n│   └── a.ts   changed: the thing\n└── tests/\n    └── t-a.mjs   new: its test</pre>";
   const whole = () => [
     section("Overview"), section("Today"),
-    `<section id="proposed"><div class="sds-section-head"><h2>Proposed</h2></div><p class="sds-standfirst">As it will be.</p><h3 id="s3-plugins" data-layer="plugins">Plugins</h3><h4 id="p-a">The page check</h4><p class="sds-small">For: you · Layer: Plugins</p><p>A reason.</p></section>`,
+    `<section id="proposed"><div class="sds-section-head"><h2>Proposed</h2></div><p class="sds-standfirst">As it will be.</p><h3 id="s3-plugins" data-layer="plugins">Plugins</h3><h4 id="p-a">The page check</h4><p>A reason.</p></section>`,
     section("Where it lands", `<p><strong>1 &middot; spn-x</strong> &mdash; the change</p>${tree}`),
   ].join("\n");
 
   written(whole());
   const green = checkWorkstream(ws);
-  ok("[MKT.HOOKS.513] green: a preview with short headings, a layer mark, a For and Layer line and one tree for its repository has no page finding", !green.some((one) => one.check === "pages"), said(green));
+  ok("[MKT.HOOKS.513] green: a preview with short headings, a layer mark, no For and Layer line and one tree for its repository has no page finding", !green.some((one) => one.check === "pages"), said(green));
 
   written(whole().replace("The page check", "What the agent misses most, by kind"));
   const long = checkWorkstream(ws);
@@ -631,8 +631,10 @@ console.log("\n=== the page rules read the saved file at Stop — 451, 518, 238,
   ok("[MKT.HOOKS.513] red: a Where it lands with no folder tree is named (238)", has(checkWorkstream(ws), "pages", /Where it lands holds no folder tree/), said(checkWorkstream(ws)));
   written(whole().replace(" data-layer=\"plugins\"", ""));
   ok("[MKT.HOOKS.513] red: a layer of Proposed with no data-layer mark is named (233)", has(checkWorkstream(ws), "pages", /Proposed's layer "Plugins" carries no `data-layer` mark/), said(checkWorkstream(ws)));
-  written(whole().replace("<p class=\"sds-small\">For: you · Layer: Plugins</p>", ""));
-  ok("[MKT.HOOKS.513] red: a block of Proposed with no For and Layer line is named (233)", has(checkWorkstream(ws), "pages", /Proposed's block "The page check" opens with no For and Layer line/), said(checkWorkstream(ws)));
+  written(whole().replace("<p>A reason.</p>", "<p class=\"sds-small\">For: you · Layer: Plugins</p><p>A reason.</p>"));
+  ok("[MKT.HOOKS.513] green: a block of Proposed carries no For and Layer line, and one that does is not asked to drop it by this check (233)", !has(checkWorkstream(ws), "pages", /For and Layer/), said(checkWorkstream(ws)));
+  written(whole());
+  ok("[MKT.HOOKS.513] green: a block of Proposed with no For, Layer or Reads line has no finding (233)", !has(checkWorkstream(ws), "pages", /For and Layer|Reads/), said(checkWorkstream(ws)));
   written(whole().replace("Overview</h2>", "An overview of everything this preview shows and why it was written</h2>"));
   ok("[MKT.HOOKS.515] red: a rail heading past three words is named (518)", has(checkWorkstream(ws), "pages", /rail entr(?:y reads|ies read) past three words/), said(checkWorkstream(ws)));
   written(whole());

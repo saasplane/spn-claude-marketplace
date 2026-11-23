@@ -521,6 +521,17 @@ try {
     write(page, CLEAN.replace("the check, in one sentence.", "a check reads the new shape")),
     "reports", "N2's line is not the arc's own line");
 
+  // An arc whose `decides` is empty has no line to compare with: a line the row carries is not a finding (order X).
+  const noLine = stream(WORKSPACE, "042-noline");
+  putArc(noLine, "N2", "the check", "DECIDED");
+  writeFileSync(join(noLine, ARCS, "N2", "state.json"), readFileSync(join(noLine, ARCS, "N2", "state.json"), "utf8").replace(/"decides": "[^"]*"/, '"decides": ""'));
+  one("a row's own line, where the arc's decides is empty, is not compared",
+    write(join(noLine, "noline-approach.html"), cleanFor(noLine).replace("<strong>N2 &mdash; the check</strong></p>", "<strong>N2 &mdash; the check</strong></p><p>a line the row states itself</p>")),
+    "silent");
+  one("a row's own line, where the arc's decides is set, is still compared",
+    write(join(stream(WORKSPACE, "043-setline"), "setline-approach.html"), cleanFor(join(workstreamsDir(WORKSPACE, "open"), "043-setline")).replace("the check, in one sentence.", "a line typed over it")),
+    "reports", "N2's line is not the arc's own line");
+
   one("four columns in an open workstream — told to run the command",
     write(page, CLEAN_FOUR), "reports", "run `spn-devex docs cycles write <workstream>`");
 

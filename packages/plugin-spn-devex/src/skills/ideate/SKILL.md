@@ -217,7 +217,7 @@ The full text of all three is in [`refs/devex/workspace/workstream.md`](../../re
   5. **Open asks stay few,** at most three.
   6. **Each new term is defined once,** where it first appears.
   7. **The preview follows their spine,** the order they told the idea in.
-- **A preview reads the map row of every kind of work it draws, and ends each block with a Reads line.** A public page's proposal states the site's hierarchy and the use case before its address.
+- **A preview reads the map row of every kind of work it draws.** A public page's proposal states the site's hierarchy and the use case before its address.
 - **Name the source of every name and value** (`RULE.DEVEX.FUNCTION.090` · MUST · skill:spn-devex/ideate). Only a value no source holds is marked new.
 - **Propose a field only where a report the developer asked for reads it** (`RULE.DEVEX.FUNCTION.091` · MUST · skill:spn-devex/ideate).
 - **Give each idea one name, in the construct that owns it** (`RULE.DEVEX.FUNCTION.092` · MUST · skill:spn-devex/ideate).

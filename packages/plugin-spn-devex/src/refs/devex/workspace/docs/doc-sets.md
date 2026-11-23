@@ -631,8 +631,8 @@ the reader is asked to decide, what to look at first and what is not final. *Tod
 with *Shape*, which holds no code, and then holds one section for each layer set that changes, *Server*,
 *Web*, *Surface*, *Plugins* and *Estate*, each with its layers and, inside a layer, one subsection for each
 module; a layer that does not change has no section and no line. Each layer section carries a `data-layer`
-mark. Each block opens with a For and Layer line, shows a new file whole, shows a change as today's code
-beside the proposed, and ends with a Reads line naming the file and line each name and value comes from.
+mark. Each part is its title, one or two sentences of description, then its block or figure and nothing after it: no For and Layer line, no Reads line. A part shows a new file whole and a change as today's code
+beside the proposed.
 *Plugins* shows a change to the agent's own mechanics as journeys and outcomes, never as code. It is drawn
 from the sheet's entries: an outline in the order they connect, and a code block only for an entry marked
 `judged`, shown as the patch the sheet keeps for it. A section about a path, who speaks to whom, or the parts

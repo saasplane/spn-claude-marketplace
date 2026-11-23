@@ -1,8 +1,7 @@
 #!/usr/bin/env node
 // RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § The approach document — a workstream's, never a repository's
 // A PREVIEW'S TWO STRUCTURAL RULES THAT NO HOOK READ: `Where it lands` is one folder tree for each repository
-// (RULE.DEVEX.WORKSPACE.238), and each layer of `Proposed` carries a `data-layer` mark with a For and Layer line on every
-// block (RULE.DEVEX.WORKSPACE.233). The page is read as it is saved, at every Stop and in `docs check`; a page that is not a
+// (RULE.DEVEX.WORKSPACE.238), and each layer of `Proposed` carries a `data-layer` mark (RULE.DEVEX.WORKSPACE.233); a part carries no For, Layer or Reads line. The page is read as it is saved, at every Stop and in `docs check`; a page that is not a
 // preview, or has no such section yet, has nothing to find.
 
 import { readFileSync } from "node:fs";
@@ -35,7 +34,7 @@ export function whereItLandsFindings(text: string): string[] {
   return [];
 }
 
-/** Rule 233: each layer section of `Proposed` carries a `data-layer` mark, and each block opens with a For and Layer line. */
+/** Rule 233: each layer section of `Proposed` carries a `data-layer` mark. A part holds no For, Layer or Reads line: the layer is the heading it sits under. */
 export function proposedFindings(text: string): string[] {
   const proposed = part(text, "Proposed");
   if (proposed === null) return [];
@@ -47,13 +46,6 @@ export function proposedFindings(text: string): string[] {
     const mark = /\bdata-layer="([^"]*)"/.exec(heading[1])?.[1];
     if (!mark || !LAYERS.includes(mark))
       out.push(`Proposed's layer "${name}" carries no \`data-layer\` mark from ${LAYERS.join(" · ")} ${why} · write \`<h3 data-layer="…">\``);
-  }
-  const blocks = [...proposed.matchAll(/<h4\b[^>]*>([\s\S]*?)<\/h4>([\s\S]*?)(?=<h[234]\b|$)/gi)];
-  for (const block of blocks) {
-    const name = block[1].replace(/<[^>]+>/g, "").trim();
-    const flat = block[2].replace(/<[^>]+>/g, " ");
-    if (!/\bFor:/.test(flat) || !/\bLayer:/.test(flat))
-      out.push(`Proposed's block "${name}" opens with no For and Layer line ${why} · \`<p class="sds-small">For: who · Layer: where</p>\` under its heading`);
   }
   return out;
 }

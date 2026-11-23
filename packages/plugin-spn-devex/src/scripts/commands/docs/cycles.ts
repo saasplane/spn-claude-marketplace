@@ -292,7 +292,8 @@ export function tableDifferences(table: string, cycles: Cycle[], from?: { page: 
       stale.push(`${key}'s row carries no \`id="${cycle.id}"\`, so \`approach.html#${cycle.id}\` opens nothing`);
     if (titleOf(cells[0]) !== arcLabel(cycle).replace(/\s+/g, " ").trim())
       stale.push(`${key} is named "${titleOf(cells[0])}" and the arc is "${arcLabel(cycle)}"`);
-    if (lineOf(cells[0]) !== lineOf(expected))
+    // An arc whose `decides` is empty has no line to compare with, so the row's own line stands (order X, the lead's decision).
+    if (cycle.does && lineOf(cells[0]) !== lineOf(expected))
       stale.push(`${key}'s line is not the arc's own line`);
     // The facts are compared whole, links and their text, as plain text.
     // BY WHAT A LINK OPENS: its address resolved from the page's own folder, `arc.html` and `preview.html` being one page, and the link's words not read.
