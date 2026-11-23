@@ -516,3 +516,65 @@
   frame.addEventListener('load', send);
   apply();
 })();
+
+// TABS (N017): each .sds-tabset holds a bar of tabs and one panel per tab. Without this every panel shows; with it one shows at a time, the bar takes arrow keys, Home and End, and the open tab is kept in the hash.
+(function () {
+  function open(set, tab, focus) {
+    set.querySelectorAll('[role="tab"]').forEach(function (t) {
+      var on = t === tab;
+      t.setAttribute('aria-selected', on ? 'true' : 'false');
+      t.tabIndex = on ? 0 : -1;
+      var panel = document.getElementById(t.getAttribute('aria-controls'));
+      if (panel) panel.hidden = !on;
+    });
+    if (focus) tab.focus();
+    tab.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+  }
+  // A row wider than its place scrolls inside its box, with an arrow at an edge that has more, as DSTabs does.
+  function scroller(set) {
+    var bar = set.querySelector('.sds-tabset-bar');
+    var wrap = document.createElement('div');
+    wrap.className = 'sds-tabset-scroll';
+    bar.parentNode.insertBefore(wrap, bar);
+    wrap.appendChild(bar);
+    var arrows = ['start', 'end'].map(function (side) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'sds-tabset-arrow';
+      b.dataset.side = side;
+      b.tabIndex = -1;
+      b.setAttribute('aria-hidden', 'true');
+      b.textContent = side === 'start' ? '‹' : '›';
+      b.addEventListener('click', function () {
+        bar.scrollBy({ left: (side === 'start' ? -1 : 1) * bar.clientWidth * 0.8, behavior: 'smooth' });
+      });
+      wrap.appendChild(b);
+      return b;
+    });
+    function update() {
+      var max = bar.scrollWidth - bar.clientWidth;
+      arrows[0].hidden = bar.scrollLeft <= 1;
+      arrows[1].hidden = bar.scrollLeft >= max - 1;
+    }
+    bar.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('resize', update);
+    update();
+  }
+  document.querySelectorAll('.sds-tabset').forEach(function (set) {
+    var tabs = Array.prototype.slice.call(set.querySelectorAll('[role="tab"]'));
+    if (!tabs.length) return;
+    scroller(set);
+    var fromHash = tabs.filter(function (t) { return '#' + t.getAttribute('aria-controls') === location.hash; })[0];
+    open(set, fromHash || tabs.filter(function (t) { return t.getAttribute('aria-selected') === 'true'; })[0] || tabs[0], false);
+    set.classList.add('sds-is-ready');
+    tabs.forEach(function (t, i) {
+      t.addEventListener('click', function () { open(set, t, false); });
+      t.addEventListener('keydown', function (e) {
+        var to = { ArrowRight: i + 1, ArrowLeft: i - 1, Home: 0, End: tabs.length - 1 }[e.key];
+        if (to === undefined) return;
+        e.preventDefault();
+        open(set, tabs[(to + tabs.length) % tabs.length], true);
+      });
+    });
+  });
+})();

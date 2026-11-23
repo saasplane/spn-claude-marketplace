@@ -142,5 +142,70 @@ const ruleOf = (selector) => new RegExp(`\\${selector}\\{([^}]*)\\}`).exec(SOURC
 ok("[MKT.SCRIPTS.554] an arc's count never wraps", /flex:none/.test(ruleOf(".sds-arc-count")) && /white-space:nowrap/.test(ruleOf(".sds-arc-count")));
 ok("[MKT.SCRIPTS.554] the status bar's cells fill the row", /flex:1 0 auto/.test(ruleOf(".sds-chip")));
 
+// N017: the tabs block's script. A fake page holds one tabset of three tabs; the script is run on it as a browser would.
+console.log("=== the shared script — a tabset shows one panel, takes the arrow keys, and keeps the open tab in the hash");
+{
+  const el = (tag, attrs = {}) => ({
+    tag, attrs: { ...attrs }, hidden: false, tabIndex: 0, listeners: {}, children: [], classes: new Set(), dataset: {}, focused: false,
+    getAttribute(n) { return this.attrs[n] ?? null; }, setAttribute(n, v) { this.attrs[n] = String(v); },
+    addEventListener(t, f) { this.listeners[t] = f; }, focus() { this.focused = true; }, scrollIntoView() {}, scrollBy() {},
+    classList: { add: (c) => classes.add(c) }, appendChild(c) { this.children.push(c); return c; }, scrollLeft: 0, scrollWidth: 0, clientWidth: 0,
+  });
+  const classes = new Set();
+  const run = (hash) => {
+    const tabs = ["a", "b", "c"].map((id, i) => el("button", { role: "tab", "aria-controls": `p-${id}`, "aria-selected": String(i === 0) }));
+    const panels = Object.fromEntries(["a", "b", "c"].map((id) => [`p-${id}`, el("div")]));
+    const bar = el("div"); bar.parentNode = { insertBefore() {} };
+    const set = { querySelectorAll: () => tabs, querySelector: () => bar, classList: { add: (c) => classes.add(c) } };
+    classes.clear();
+    const document = {
+      getElementById: (id) => panels[id] ?? null, querySelector: () => null, createElement: (t) => el(t),
+      documentElement: { getAttribute: () => null, setAttribute() {} },
+      querySelectorAll: (selector) => (selector === ".sds-tabset" ? [set] : []),
+    };
+    vm.runInNewContext(SCRIPT, { document, location: { hash }, window: { addEventListener() {}, scrollY: 0, matchMedia: () => ({ matches: false }) } });
+    return { tabs, panels };
+  };
+  const { tabs, panels } = run("");
+  const shown = () => Object.values(panels).map((p) => !p.hidden);
+  ok("a tabset opens on its selected tab: one panel shown, the others hidden, and the set is marked ready", JSON.stringify(shown()) === "[true,false,false]" && tabs[0].tabIndex === 0 && tabs[1].tabIndex === -1 && classes.has("sds-is-ready"));
+  tabs[0].listeners.keydown({ key: "ArrowRight", preventDefault() {} });
+  ok("the right arrow opens the next tab and moves the focus to it", JSON.stringify(shown()) === "[false,true,false]" && tabs[1].focused && tabs[1].getAttribute("aria-selected") === "true");
+  tabs[1].listeners.keydown({ key: "End", preventDefault() {} });
+  ok("End opens the last tab, and the right arrow from the last wraps to the first", JSON.stringify(shown()) === "[false,false,true]" && (tabs[2].listeners.keydown({ key: "ArrowRight", preventDefault() {} }), JSON.stringify(shown()) === "[true,false,false]"));
+  tabs[0].listeners.keydown({ key: "ArrowLeft", preventDefault() {} });
+  ok("the left arrow from the first wraps to the last, and Home opens the first", JSON.stringify(shown()) === "[false,false,true]" && (tabs[2].listeners.keydown({ key: "Home", preventDefault() {} }), JSON.stringify(shown()) === "[true,false,false]"));
+  tabs[1].listeners.click();
+  ok("a click opens its tab", JSON.stringify(shown()) === "[false,true,false]");
+  ok("the tab the address's hash names is the one open at the start", JSON.stringify(Object.values(run("#p-c").panels).map((p) => !p.hidden)) === "[false,false,true]");
+}
+
+// N017: the rules of the new blocks are in the stylesheet source and its build, and the unit styles are the design system's, scoped.
+console.log("=== the shared stylesheet — tabs, groups, facts, the fold and the inline unit");
+{
+  const BUILT = readFileSync(resolve(HERE, "src", "styles", "sds-docs.css"), "utf8");
+  for (const selector of [".sds-tabset-bar", ".sds-tabset[data-type='PILL']", ".sds-group-jumps", ".sds-group", ".sds-tile-facts", ".sds-tiles[data-layout='LIST']", ".sds-catalog-table", ".sds-tile-media", ".sds-fold", ".sds-unit-pair"]) {
+    const plain = selector.replace(/'/g, "");
+    ok(`\`${selector}\` is in the source and the built stylesheet`, SOURCE.includes(selector) && (BUILT.includes(selector) || BUILT.includes(plain) || BUILT.includes(selector.replace(/'/g, '"'))));
+  }
+  ok("a done and a landed badge read the success token", /--sds-status-done:\s*var\(--sds-success\)/.test(SOURCE) && /--sds-status-landed-soft:\s*var\(--sds-success-soft\)/.test(SOURCE));
+  const { scopeUnitCss, scopeSelector } = await import(pathToFileURL(resolve(HERE, "..", "..", "scripts", "build-unit-styles.mjs")).href);
+  ok("the base reset's `*`, `html`, `body` and element selectors become descendants or the unit itself",
+    JSON.stringify(scopeSelector("*")) === '[".sds-unit *"]' && JSON.stringify(scopeSelector("html")) === '[".sds-unit"]' && JSON.stringify(scopeSelector("body")) === '[".sds-unit"]' && JSON.stringify(scopeSelector("h1")) === '[".sds-unit h1"]' && JSON.stringify(scopeSelector(".ds\\:flex")) === '[".sds-unit .ds\\\\:flex"]');
+  ok("`:root` and `[data-mode=light]` become `.sds-unit` and `.sds-unit[data-mode=light]`, and `[data-mode=dark]` its dark twin, also as a block inside the unit",
+    JSON.stringify(scopeSelector(":root")) === '[".sds-unit"]' && JSON.stringify(scopeSelector(":root[data-mode=dark] .a")) === '[".sds-unit[data-mode=dark] .a"]'
+      && JSON.stringify(scopeSelector("[data-mode=light]")) === '[".sds-unit[data-mode=light]",".sds-unit [data-mode=light]"]' && JSON.stringify(scopeSelector('[data-mode="dark"] p')) === '[".sds-unit[data-mode=dark] p",".sds-unit [data-mode=dark] p"]');
+  const cut = scopeUnitCss("/*! lib */*,:before{box-sizing:border-box}:root,:host{--a:1}[data-mode=dark]{--a:2}@font-face{font-family:F;src:url(../assets/fonts/geist/Geist-Variable.woff2)}@property --x{syntax:'*';inherits:false}@keyframes k{from{opacity:0}to{opacity:1}}@layer base{h1{margin:0}@media (min-width:48rem){.a,.b{color:red}}}@layer a,b;", "v1.0.0");
+  ok("a cut scopes every rule, in a layer and a media query too, and a list keeps each of its selectors",
+    cut.includes(".sds-unit *,.sds-unit :before{box-sizing:border-box}") && cut.includes(".sds-unit{--a:1}") && cut.includes(".sds-unit[data-mode=dark],.sds-unit [data-mode=dark]{--a:2}")
+      && cut.includes("@layer base{.sds-unit h1{margin:0}@media (min-width:48rem){.sds-unit .a,.sds-unit .b{color:red}}}") && cut.includes("@layer a,b;"), cut);
+  ok("@font-face, @property and @keyframes stay global, and a font's url reads the version folder's fonts",
+    cut.includes("@font-face{font-family:F;src:url(fonts/Geist-Variable.woff2)}") && cut.includes("@property --x{syntax:'*';inherits:false}") && cut.includes("@keyframes k{from{opacity:0}to{opacity:1}}"), cut);
+  ok("a cut keeps the licence comment and says where it came from", cut.startsWith("/* The design system's own stylesheet, support-web-ds-ts v1.0.0,") && cut.includes("/*! lib */"));
+  const unit = readFileSync(resolve(HERE, "src", "styles", "ds-unit.css"), "utf8");
+  ok("ds-unit.css is in the styles folder, scoped: its first rule outside a layer or font is under .sds-unit, and no global body or html rule is left",
+    unit.includes(".sds-unit") && !/(^|})(html|body|:root|\*)[,{]/.test(unit.replace(/\/\*[\s\S]*?\*\//g, "")), unit.slice(0, 300));
+}
+
 console.log(`\n${total - failed}/${total} passed`);
 process.exit(failed ? 1 : 0);

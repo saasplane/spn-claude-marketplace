@@ -167,13 +167,41 @@ console.log("\n=== the page renderer — a unit fence is drawn by the render and
     markdown: `# Probe\n\nThe lead.\n\n## What it is\n\n${fence("unit", JSON.stringify(tree))}`,
     workspace: "/workspace", location: "/workspace/docs/02-constructs/probe.md", furniture: { stylesheet: "", script: "", footer: "" },
   });
+  const pageOf = (markdown, stylesheet = "") => renderPage({
+    block: { id: "probe", title: "Probe", status: "DONE", lenses: ["ARCHITECT"], summary: "What a probe is." },
+    markdown: `# Probe\n\nThe lead.\n\n## What it is\n\n${markdown}`, workspace: "/workspace", location: "/workspace/docs/02-constructs/probe.md",
+    furniture: { stylesheet, script: "", footer: "" },
+  });
+  setUnitRender(() => "<body><p>x</p></body>");
+  const linked = pageOf(fence("unit", JSON.stringify(tree)), '<link rel="stylesheet" href="https://x/1.15.0/sds-docs.css" integrity="sha384-b" crossorigin="anonymous">');
+  setUnitRender(() => "<!doctype html><html><head><style>.a{color:red}</style></head><body><style>.b{}</style><p>body</p><script>alert(1)</script></body></html>");
+  const styled = pageOf(fence("unit", JSON.stringify(tree)));
+  const captionSeen = [];
+  setUnitRender((file) => { captionSeen.push(JSON.parse(readFileSync(file, "utf8"))); return "<body><p>x</p></body>"; });
+  const captioned = pageOf(fence("unit", JSON.stringify({ unit: "DSFeature", props: {}, caption: "The `feature` hero" })));
+  const sectionsSeen = [];
+  setUnitRender((file) => { sectionsSeen.push(...JSON.parse(readFileSync(file, "utf8")).tree.sections); return "<body><p>x</p></body>"; });
+  pageOf(fence("unit", JSON.stringify({ sections: [{ unit: "DSFeature", props: {} }], caption: "Two" })));
+  const badCaption = pageOf(fence("unit", JSON.stringify({ unit: "DSFeature", props: {}, caption: 3 })));
+  setUnitRender((file) => { seen.push(JSON.parse(readFileSync(file, "utf8"))); return "<html><head></head><body><p class=\"x\">drawn & ready</p></body></html>"; });
   const pinned = readFileSync(resolve(HERE, "src", "styles", "ds-tokens.css"), "utf8").split("\n")[0].match(/support-web-ds-ts v(\d+\.\d+\.\d+)/)?.[1];
   ok("[MKT.SCRIPTS.613] a unit fence is wrapped as a render file carrying the pinned design-system version and the tree as its one section",
     seen.length === 1 && designSystemVersion() === pinned && JSON.stringify(seen[0]) === JSON.stringify({ app: { ds: pinned, theme: {}, layout: { type: "CANVAS", nav: [] }, page: "SITE" }, tree: { specVersion: 1, sections: [tree] } }), JSON.stringify(seen));
-  ok("[MKT.SCRIPTS.613] the page stands in a frame: the unit's name as title, light and dark side by side, the tree below as code",
-    made.findings.length === 0 && made.html.includes('<span class="sds-file-path">DSFeature</span>')
-      && made.html.includes('<iframe data-mode="light"') && made.html.includes('<iframe data-mode="dark"')
-      && made.html.includes('data-mode=&quot;dark&quot;') && made.html.includes("drawn &amp; ready") && made.html.includes('<pre data-lang="json">'), made.html.slice(-1800));
+  ok("[MKT.SCRIPTS.613] the unit's markup stands in the page itself, once in light and once in dark, side by side, with the tree below as code, and no frame",
+    made.findings.length === 0 && made.html.includes('<span class="sds-file-path">DSFeature</span><span class="sds-file-lang">unit</span>')
+      && made.html.includes('<div class="sds-unit" data-mode="light"><p class="x">drawn & ready</p></div>') && made.html.includes('<div class="sds-unit" data-mode="dark"><p class="x">drawn & ready</p></div>')
+      && made.html.includes('<div class="sds-unit-pair">') && !made.html.includes("<iframe") && !made.html.includes("srcdoc") && made.html.includes('<pre data-lang="json">'), made.html.slice(-1800));
+  ok("[MKT.SCRIPTS.613] a page with a unit fence links ds-unit.css after the shared stylesheet, from the same folder, and a page with none does not",
+    linked.html.indexOf("sds-docs.css") > 0 && linked.html.indexOf("ds-unit.css") > linked.html.indexOf("sds-docs.css") && linked.html.includes('href="https://x/1.15.0/ds-unit.css"') && !/ds-unit\.css"[^>]*integrity/.test(linked.html)
+      && !produced(fence("json", "{}")).includes("ds-unit.css"), linked.html.slice(0, 600));
+  ok("[MKT.SCRIPTS.613] the unit's markup holds no style and no script, whatever the printed page carried",
+    !/<style|<script/.test(styled.html.slice(styled.html.indexOf("sds-unit-pair"), styled.html.indexOf("</figure>"))) && styled.html.includes("<p>body</p>"), styled.html.slice(-900));
+  ok("[MKT.SCRIPTS.613] a caption is the figcaption's text, the unit's name stays as the small label, and the caption is out of the tree sent to the render and of the tree shown",
+    captioned.html.includes('<span class="sds-file-path">The <code>feature</code> hero</span><span class="sds-file-lang">DSFeature</span>')
+      && captionSeen.length === 1 && !("caption" in captionSeen[0].tree.sections[0]) && !JSON.stringify(captionSeen[0]).includes("hero")
+      && !captioned.html.includes('"caption"'), captioned.html.slice(-900));
+  ok("[MKT.SCRIPTS.613] a caption beside sections is taken out too, and a caption that is no string stops the write",
+    JSON.stringify(sectionsSeen) === JSON.stringify([{ unit: "DSFeature", props: {} }]) && badCaption.findings.length === 1 && badCaption.findings[0].stops === true, JSON.stringify(badCaption.findings));
   setUnitRender(() => { throw new Error("DSFeature has no prop `kind`"); });
   const refused = renderPage({
     block: { id: "probe", title: "Probe", status: "DONE", lenses: ["ARCHITECT"], summary: "What a probe is." },
@@ -183,6 +211,104 @@ console.log("\n=== the page renderer — a unit fence is drawn by the render and
   ok("[MKT.SCRIPTS.613] a render's refusal is a finding that stops the write, with the render's words, and no frame is drawn",
     refused.findings.length === 1 && refused.findings[0].stops === true && refused.findings[0].message.includes("DSFeature has no prop `kind`") && !refused.html.includes("<iframe"), JSON.stringify(refused.findings));
   setUnitRender();
+}
+
+const made = (markdown) => renderPage({
+  block: { id: "probe", title: "Probe", status: "DONE", lenses: ["ARCHITECT"], summary: "What a probe is." },
+  markdown: `# Probe\n\nThe lead.\n\n## What it is\n\n${markdown}\n`, workspace: "/workspace", location: "/workspace/docs/02-constructs/probe.md",
+  furniture: { stylesheet: "", script: "", footer: "" },
+});
+const tilde = (tag, body) => `~~~${tag}\n${body}\n~~~\n`;
+
+console.log("\n=== the page renderer — a catalog in three layouts, with media and facts");
+{
+  const legacy = made(fence("catalog", "Name | one line | `literal`\nOther | more"));
+  ok("[MKT.SCRIPTS.614] today's catalog spelling draws exactly as it did: one tile each, no data attribute",
+    legacy.html.includes('  <div class="sds-tiles">\n    <div class="sds-tile"><h4>Name</h4><p>one line</p><p class="sds-small"><code>literal</code></p></div>\n    <div class="sds-tile"><h4>Other</h4><p>more</p></div>\n  </div>') && legacy.findings.length === 0, legacy.html);
+  const grid = made(fence("catalog", "`RAIL` | a sidebar\n  Navigation: at the side\n  Takes: DASHBOARD; RESOURCES\nCANVAS | the body alone\n  Navigation: none"));
+  ok("[MKT.SCRIPTS.614] facts under an item draw a GRID card: a data-facts count, the line, and a dl of key and value",
+    grid.html.includes('<div class="sds-tiles" data-layout="GRID">') && grid.html.includes('<div class="sds-tile" data-facts="2"><h4><code>RAIL</code></h4><p class="sds-tile-line">a sidebar</p>')
+      && grid.html.includes('<dl class="sds-tile-facts"><div><dt>Navigation</dt><dd>at the side</dd></div><div><dt>Takes</dt><dd>DASHBOARD; RESOURCES</dd></div></dl>') && grid.html.includes('data-facts="1"') && grid.findings.length === 0, grid.html);
+  const list = made(fence("catalog layout=LIST", "MARKETING | a site\n  Layouts: `TOPNAV` for the site\n  Sections: every site section"));
+  ok("[MKT.SCRIPTS.614] layout=LIST draws one card a row, its words and its facts in a body",
+    list.html.includes('data-layout="LIST"') && list.html.includes('<div class="sds-tile"><div class="sds-tile-body"><h4>MARKETING</h4><p>a site</p>') && list.html.includes("<dt>Layouts</dt><dd><code>TOPNAV</code> for the site</dd>") && !list.html.includes("data-facts"), list.html);
+  ok("[MKT.SCRIPTS.614] a LIST card with one fact says so, for the stylesheet", made(fence("catalog layout=LIST", "A | a\n  Key: one")).html.includes("sds-tile-facts sds-tile-facts-one"));
+  const tab = made(fence("catalog layout=TABLE", "A | first\n  Layouts: x\n  Pages: p\nB | second\n  Layouts: y\n  Sections: s"));
+  ok("[MKT.SCRIPTS.614] layout=TABLE makes the things columns and each fact key a row, an empty cell where a thing has none",
+    tab.html.includes('<table class="sds-catalog-table">') && tab.html.includes("<thead><tr><th></th><th><h4>A</h4><p>first</p></th><th><h4>B</h4><p>second</p></th></tr></thead>")
+      && tab.html.includes("<tr><th>Layouts</th><td>x</td><td>y</td></tr>") && tab.html.includes("<tr><th>Pages</th><td>p</td><td></td></tr>") && tab.html.includes("<tr><th>Sections</th><td></td><td>s</td></tr>"), tab.html);
+  const icon = made(fence("catalog media=ICON", "Text page | plain text | file\n  Types: MARKETING"));
+  ok("[MKT.SCRIPTS.614] media=ICON draws the named icon beside the words, in a head row",
+    icon.html.includes('data-layout="GRID" data-media="ICON"') && icon.html.includes('<div class="sds-tile-head"><span class="sds-tile-media" data-media="ICON"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 22a2') && icon.html.includes("<h4>Text page</h4><p>plain text</p></div></div>"), icon.html);
+  ok("[MKT.SCRIPTS.614] media=MARK draws the icon in a mark, and an icon that is not named is a finding with a plain circle",
+    made(fence("catalog media=MARK", "Site | a site | globe\n  For: a Visitor")).html.includes('data-media="MARK"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5')
+      && made(fence("catalog media=MARK", "Site | a site | nonesuch\n  For: a Visitor")).findings.some((f) => f.message.includes("nonesuch")));
+  ok("[MKT.SCRIPTS.614] media=AVATAR draws initials, the name's first letter or the third cell",
+    made(fence("catalog media=AVATAR", "Team | who work\n  Often: daily")).html.includes('data-media="AVATAR">T</span>') && made(fence("catalog media=AVATAR", "Team | who work | ab\n  Often: daily")).html.includes('data-media="AVATAR">AB</span>'));
+  ok("[MKT.SCRIPTS.614] media=AVATAR_GROUP draws several overlapping initials",
+    made(fence("catalog media=AVATAR_GROUP", "Crew | a team | a, b, c\n  Often: daily")).html.includes('data-media="AVATAR_GROUP"><span>A</span><span>B</span><span>C</span></span>'));
+  const top = made(fence("catalog media=MEDIA_TOP", "`RAIL` | a sidebar | rail\n  Navigation: at the side"));
+  ok("[MKT.SCRIPTS.614] media=MEDIA_TOP draws a picture over the words, the drawing the third cell names",
+    top.html.includes('data-media="MEDIA_TOP"') && top.html.includes('<div class="sds-tile-picture"><svg class="sds-wire"') && top.html.includes('<rect class="nav" x="1" y="1" width="34"') && top.html.includes("<h4><code>RAIL</code></h4>") && top.findings.length === 0, top.html);
+  ok("[MKT.SCRIPTS.614] a layout or a media that is none of the closed names stops the write",
+    made(fence("catalog layout=ROWS", "A | a")).findings.some((f) => f.stops && f.message.includes("ROWS")) && made(fence("catalog media=PHOTO", "A | a")).findings.some((f) => f.stops && f.message.includes("PHOTO")));
+  ok("[MKT.SCRIPTS.614] a fact whose key is a sentence is a finding, and so is a GRID card of four facts",
+    made(fence("catalog", "A | a\n  This is a whole sentence of a key: value")).findings.some((f) => f.message.includes("never a sentence"))
+      && made(fence("catalog", "A | a\n  One: 1\n  Two: 2\n  Three: 3\n  Four: 4")).findings.some((f) => f.message.includes("up to three facts")));
+  ok("[MKT.SCRIPTS.614] a media in TABLE and MEDIA_TOP in LIST are findings, not silent",
+    made(fence("catalog layout=TABLE media=ICON", "A | a\n  K: v")).findings.length === 1 && made(fence("catalog layout=LIST media=MEDIA_TOP", "A | a\n  K: v")).findings.length === 1);
+}
+
+console.log("\n=== the page renderer — groups in a catalog are panels");
+{
+  const grouped = made(fence("catalog", "## Actions\n`DSButton` | a button\n`DSToolbar` | a toolbar\n## Typography\n`DSKbd` | a key"));
+  ok("[MKT.SCRIPTS.614] two groups are two panels, each with its name and count in the head and its members as a catalog in the body",
+    grouped.html.includes('<section class="sds-group" id="g-actions" aria-labelledby="g-actions-title">') && grouped.html.includes('<h5 id="g-actions-title">Actions</h5><span class="sds-group-count">2 items</span>')
+      && grouped.html.includes('<span class="sds-group-count">1 item</span>') && grouped.html.includes('<div class="sds-group-body"><div class="sds-tiles sds-tiles-compact" data-layout="GRID">') && grouped.findings.length === 0, grouped.html);
+  ok("[MKT.SCRIPTS.614] a row of links above the panels jumps to each",
+    grouped.html.includes('<nav class="sds-group-jumps" aria-label="Groups"><a class="sds-group-jump" href="#g-actions">Actions <span>2</span></a> <a class="sds-group-jump" href="#g-typography">Typography <span>1</span></a></nav>')
+      && grouped.html.indexOf("sds-group-jumps") < grouped.html.indexOf('<section class="sds-group"'));
+  const one = made(fence("catalog", "## Only\nA | a\nB | b"));
+  ok("[MKT.SCRIPTS.614] one group is no panel: the catalog is drawn as one, with no jump row",
+    !one.html.includes("sds-group") && one.html.includes('<div class="sds-tiles">'));
+  ok("[MKT.SCRIPTS.614] a group takes the fence's layout, and items above the first group are a finding",
+    made(fence("catalog layout=LIST", "## A\nx | y\n  K: v\n## B\nz | w\n  K: u")).html.includes('data-layout="LIST"')
+      && made(fence("catalog", "stray | item\n## A\nx | y\n## B\nz | w")).findings.some((f) => f.message.includes("above its first")));
+}
+
+console.log("\n=== the page renderer — tabs");
+{
+  const body = "--- MARKETING\nSome *prose* here.\n\n```json\n{ \"a\": 1 }\n```\n--- RESOURCES\n- one\n- two";
+  const tabs = made(tilde("tabs", body));
+  ok("[MKT.SCRIPTS.615] a tilde fence tagged tabs draws a LINE tabset: a tablist, the first tab selected, and a panel for each tab",
+    tabs.html.includes('<div class="sds-tabset" data-type="LINE">') && tabs.html.includes('role="tablist"') && tabs.html.includes('id="t-1-1" aria-controls="p-1-1" aria-selected="true">MARKETING</button>')
+      && tabs.html.includes('id="t-1-2" aria-controls="p-1-2" aria-selected="false">RESOURCES</button>') && tabs.html.includes('<div class="sds-tabset-panel" role="tabpanel" id="p-1-2" aria-labelledby="t-1-2">') && tabs.findings.length === 0, tabs.html);
+  ok("[MKT.SCRIPTS.615] a panel's body is drawn by the same body renderer: prose, code and lists, and every panel is in the markup",
+    tabs.html.includes("<em>prose</em>") && tabs.html.includes('<pre data-lang="json">{ "a": 1 }</pre>') && tabs.html.includes("<li>one</li>") && !tabs.html.includes("hidden"));
+  ok("[MKT.SCRIPTS.615] look=SWITCH and look=PILL set the type, and each page numbers its sets",
+    made(tilde("tabs look=SWITCH", "--- A\nx\n--- B\ny")).html.includes('data-type="SWITCH"') && made(tilde("tabs look=PILL", "--- A\nx\n--- B\ny")).html.includes('data-type="PILL"')
+      && made(tilde("tabs", "--- A\nx\n--- B\ny") + "\n" + tilde("tabs", "--- C\nx\n--- D\ny")).html.includes('id="t-2-1"'));
+  ok("[MKT.SCRIPTS.615] six tabs stand, a seventh stops the write with a finding",
+    made(tilde("tabs", ["A", "B", "C", "D", "E", "F"].map((l) => `--- ${l}\nx`).join("\n"))).findings.length === 0
+      && made(tilde("tabs", ["A", "B", "C", "D", "E", "F", "G"].map((l) => `--- ${l}\nx`).join("\n"))).findings.some((f) => f.stops && f.message.includes("two to six")));
+  ok("[MKT.SCRIPTS.615] a single tab stops the write", made(tilde("tabs", "--- A\nx")).findings.some((f) => f.stops && f.message.includes("two to six")));
+  ok("[MKT.SCRIPTS.615] tabs inside tabs are refused", made(tilde("tabs", "--- A\nx\n~~~tabs\n--- B\ny\n--- C\nz")).findings.some((f) => f.stops && f.message.includes("tabs inside tabs")));
+  ok("[MKT.SCRIPTS.615] a look that is none of the three stops the write", made(tilde("tabs look=BOX", "--- A\nx\n--- B\ny")).findings.some((f) => f.stops && f.message.includes("BOX")));
+  ok("[MKT.SCRIPTS.615] words before the first label, and a fence never closed, stop the write",
+    made(tilde("tabs", "stray\n--- A\nx\n--- B\ny")).findings.some((f) => f.stops && f.message.includes("before the first"))
+      && made("~~~tabs\n--- A\nx\n--- B\ny\n").findings.some((f) => f.stops && f.message.includes("never closed")));
+  ok("[MKT.SCRIPTS.615] a --- line inside a code fence of a panel is code, not a label", made(tilde("tabs", "--- A\n```text\n--- not a tab\n```\n--- B\ny")).findings.length === 0);
+}
+
+console.log("\n=== the page renderer — a file frame that folds");
+{
+  const plain = made("```json file=docs/specs/x.json\n{}\n```");
+  const folded = made("```json file=docs/specs/x.json fold\n{}\n```");
+  ok("[MKT.SCRIPTS.616] a file frame without fold is as it was, with no details",
+    plain.html.includes('<figure class="sds-file">') && !plain.html.includes("<details"));
+  ok("[MKT.SCRIPTS.616] the word fold draws the same frame inside a details whose summary is the path",
+    folded.html.includes('<details class="sds-fold">\n    <summary>docs/specs/x.json</summary>\n  <figure class="sds-file">') && folded.html.includes('<span class="sds-file-lang">json</span>') && folded.html.includes('data-lang="json"') && folded.findings.length === 0, folded.html);
+  ok("[MKT.SCRIPTS.616] fold with no file= is a finding, and the code is drawn plain", made("```json fold\n{}\n```").findings.some((f) => f.message.includes("`file=<path>`")));
 }
 
 console.log(failed ? `\n  ${failed} of ${total} FAILED — t-render` : `\n  all ${total} passed — t-render`);

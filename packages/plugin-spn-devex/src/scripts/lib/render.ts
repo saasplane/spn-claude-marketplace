@@ -54,24 +54,38 @@ export function designSystemVersion(styles: string | null = stylesDir(import.met
   return /support-web-ds-ts v?(\d+\.\d+\.\d+)/.exec(readFileSync(join(styles, "ds-tokens.css"), "utf8").split("\n")[0])?.[1] ?? null;
 }
 
-/** A value as an attribute of the page: `srcdoc` holds a whole page, so every `&` and `"` is written as an entity. */
-const attribute = (text: string): string => text.replace(/&/g, "&amp;").replace(/"/g, "&quot;");
+/** Set by `unitFrame` when a page draws a unit, so the page links `ds-unit.css`; reset for every page. */
+let unitUsed = false;
 
-/** The page set to one mode: `data-mode` on its `<html>`, or on a wrapping element where the printed page has none. */
-function inMode(page: string, mode: "light" | "dark"): string {
-  if (/<html\b/i.test(page)) return page.replace(/<html\b([^>]*?)(\sdata-mode="[^"]*")?([^>]*)>/i, `<html$1$3 data-mode="${mode}">`);
-  return `<div data-mode="${mode}">${page}</div>`;
+/**
+ * The markup a render's printed page stands for in the docs page itself: the `<body>` content, with no `<style>` and no
+ * `<script>`. A printed page with no `<body>` loses its document furniture instead.
+ */
+function unitMarkup(page: string): string {
+  const body = /<body\b[^>]*>([\s\S]*?)<\/body>/i.exec(page);
+  let html = body ? body[1] : page.replace(/<!doctype[^>]*>/gi, "").replace(/<head\b[\s\S]*?<\/head>/gi, "").replace(/<\/?html\b[^>]*>/gi, "");
+  html = html.replace(/<style\b[\s\S]*?<\/style>/gi, "").replace(/<script\b[\s\S]*?<\/script>/gi, "");
+  return html.trim();
 }
 
 /**
- * A fence tagged `unit`: one tree, a unit with its props. It is wrapped as a render file, drawn by the render, and set in a frame:
- * the unit's name as the title, the page in light and dark side by side, and the tree below as code. A tree that is no JSON, a
- * refusal and a finding each stop the write with the render's words.
+ * A fence tagged `unit`: one tree, a unit with its props. It is wrapped as a render file and drawn by the render, and the
+ * unit's own markup stands in the page, once in light and once in dark, side by side (`.sds-unit`, styled by `ds-unit.css`),
+ * with the tree below as code. The tree may carry a top-level `"caption"`: it is the figcaption's text, the unit's name stays
+ * as the small label, and it is taken out before the render and before the tree is shown. A tree that is no JSON, a refusal
+ * and a finding each stop the write with the render's words.
  */
 function unitFrame(body: string[], findings: Finding[]): string {
   const stop = (message: string): string => { findings.push({ message, stops: true }); return ""; };
   let tree: any;
   try { tree = JSON.parse(body.join("\n")); } catch (e) { return stop(`a \`unit\` fence is not strict JSON — ${(e as Error).message}`); }
+  let caption = "";
+  if (tree && typeof tree === "object" && !Array.isArray(tree) && "caption" in tree) {
+    const { caption: said, ...rest } = tree;
+    if (typeof said !== "string") return stop("a `unit` fence's `caption` is a string, the words under the unit");
+    caption = said.trim();
+    tree = rest;
+  }
   const sections = Array.isArray(tree?.sections) ? tree.sections : [tree];
   const name = sections[0]?.unit;
   if (typeof name !== "string") return stop("a `unit` fence holds a tree whose first unit has no name: `{ \"unit\": \"DSFeature\", \"props\": { … } }`");
@@ -87,10 +101,14 @@ function unitFrame(body: string[], findings: Finding[]): string {
   } catch (e) {
     return stop(`the render stopped the \`${name}\` fence: ${(e as Error).message}`);
   } finally { rmSync(folder, { recursive: true, force: true }); }
-  const frame = (mode: "light" | "dark"): string =>
-    `<iframe data-mode="${mode}" title="${esc(name)}, ${mode}" style="width:100%;min-height:24rem;border:0" srcdoc="${attribute(inMode(page, mode))}"></iframe>`;
-  return `  <figure class="sds-file">\n    <figcaption><span class="sds-file-path">${esc(name)}</span><span class="sds-file-lang">unit</span></figcaption>\n`
-    + `    ${frame("light")}\n    ${frame("dark")}\n    <pre data-lang="json">${escapedCode(JSON.stringify(sections.length === 1 && !Array.isArray(tree?.sections) ? tree : { specVersion: 1, sections }, null, 2))}</pre>\n  </figure>`;
+  unitUsed = true;
+  const markup = unitMarkup(page);
+  const mode = (m: "light" | "dark"): string => `    <div class="sds-unit" data-mode="${m}">${markup}</div>`;
+  const label = caption ? `<span class="sds-file-path">${inline(caption)}</span><span class="sds-file-lang">${esc(name)}</span>`
+    : `<span class="sds-file-path">${esc(name)}</span><span class="sds-file-lang">unit</span>`;
+  return `  <figure class="sds-file">\n    <figcaption>${label}</figcaption>\n`
+    + `    <div class="sds-unit-pair">\n${mode("light")}\n${mode("dark")}\n    </div>\n`
+    + `    <pre data-lang="json">${escapedCode(JSON.stringify(sections.length === 1 && !Array.isArray(tree?.sections) ? tree : { specVersion: 1, sections }, null, 2))}</pre>\n  </figure>`;
 }
 
 const LENS_LABEL: Record<string, string> = {
@@ -289,19 +307,211 @@ function anchorOf(text: string): string {
   return text.toLowerCase().replace(/`/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 40);
 }
 
+// ---------------------------------------------------------------------------- the CATALOG block
+
+/** The layouts and the media a `catalog` fence tag may name (the design system's `DSDataTableConfigLayoutType`, `DSItemMediaType`, `DSFeatureType`). */
+const CATALOG_LAYOUTS = ["GRID", "LIST", "TABLE"];
+const CATALOG_MEDIA = ["ICON", "MARK", "AVATAR", "AVATAR_GROUP", "MEDIA_TOP"];
+
+/** The icons an `ICON` or `MARK` item may name, as the sample draws them (24-unit boxes, drawn by the stylesheet's stroke). */
+const ICONS: Record<string, string> = {
+  globe: '<circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/>',
+  file: '<path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"/><path d="M14 2v5a1 1 0 0 0 1 1h5"/>',
+  "file-x": '<path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"/><path d="M14 2v5a1 1 0 0 0 1 1h5"/><path d="m14.5 12.5-5 5"/><path d="m9.5 12.5 5 5"/>',
+  shield: '<path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/>',
+  key: '<path d="m2 21 9.6-9.6"/><path d="m7.5 15.5 2.3 2.3a1 1 0 0 1 0 1.4l-2.1 2.1a1 1 0 0 1-1.4 0L4 19"/><circle cx="15.5" cy="7.5" r="5.5"/>',
+  "app-window": '<rect x="2" y="4" width="20" height="16" rx="2"/><path d="M10 4v4"/><path d="M2 8h20"/><path d="M6 4v4"/>',
+  user: '<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
+  circle: '<circle cx="12" cy="12" r="10"/>',
+};
+
+/** The drawings a `MEDIA_TOP` item may name: the four layouts' wireframes, and a plain frame for any other name. */
+const WIRES: Record<string, string> = {
+  rail: '<rect class="nav" x="1" y="1" width="34" height="94" rx="3"/><rect class="line" x="8" y="10" width="20" height="4" rx="2"/><rect class="line" x="8" y="22" width="16" height="3" rx="1.5"/><rect class="line" x="8" y="30" width="18" height="3" rx="1.5"/><rect class="line" x="12" y="38" width="14" height="3" rx="1.5"/><rect class="line" x="12" y="46" width="12" height="3" rx="1.5"/><rect class="line" x="46" y="12" width="60" height="5" rx="2"/><rect class="box" x="46" y="26" width="104" height="60" rx="3"/>',
+  dock: '<rect class="nav" x="1" y="1" width="158" height="14" rx="3"/><rect class="line" x="8" y="6" width="20" height="4" rx="2"/><rect class="nav" x="8" y="22" width="34" height="66" rx="3"/><rect class="line" x="13" y="30" width="22" height="3" rx="1.5"/><rect class="line" x="13" y="38" width="18" height="3" rx="1.5"/><rect class="line" x="13" y="46" width="20" height="3" rx="1.5"/><rect class="line" x="52" y="24" width="56" height="5" rx="2"/><rect class="box" x="52" y="36" width="98" height="52" rx="3"/>',
+  topnav: '<rect class="nav" x="1" y="1" width="158" height="14" rx="3"/><rect class="line" x="8" y="6" width="20" height="4" rx="2"/><rect class="line" x="80" y="6.5" width="14" height="3" rx="1.5"/><rect class="line" x="100" y="6.5" width="14" height="3" rx="1.5"/><rect class="line" x="120" y="6.5" width="14" height="3" rx="1.5"/><rect class="line" x="30" y="26" width="64" height="5" rx="2"/><rect class="box" x="30" y="38" width="100" height="50" rx="3"/>',
+  canvas: '<rect class="box" x="50" y="22" width="60" height="52" rx="3"/><rect class="line" x="60" y="32" width="40" height="4" rx="2"/><rect class="line" x="60" y="44" width="40" height="6" rx="2"/><rect class="nav" x="60" y="58" width="40" height="8" rx="2"/>',
+};
+
+type CatalogItem = { name: string; line: string; third: string; facts: [string, string][] };
+type CatalogGroup = { name: string | null; items: CatalogItem[] };
+
+/** A fence tag's `key=value` words, and the bare words beside them. */
+function tagWords(tag: string): { words: string[]; options: Record<string, string> } {
+  const words: string[] = [], options: Record<string, string> = {};
+  for (const word of tag.split(/\s+/).filter(Boolean)) {
+    const at = word.indexOf("=");
+    if (at > 0) options[word.slice(0, at)] = word.slice(at + 1); else words.push(word);
+  }
+  return { words, options };
+}
+
+/**
+ * A `catalog` fence's lines: an item is an unindented `Name | one line | third` line, and the indented lines under it are its
+ * facts, `Key: value`, one a line; a key is a word or two, never a sentence. A line `## <Group name>` starts a group.
+ */
+function catalogLines(body: string[], findings: Finding[]): CatalogGroup[] {
+  const groups: CatalogGroup[] = [{ name: null, items: [] }];
+  for (const raw of body) {
+    if (!raw.trim()) continue;
+    const group = /^##\s+(\S.*)$/.exec(raw);
+    if (group) { groups.push({ name: group[1].trim(), items: [] }); continue; }
+    if (/^\s+\S/.test(raw)) {
+      const item = groups[groups.length - 1].items.at(-1);
+      const fact = /^\s+[-*]?\s*([^:]+?):\s+(\S.*)$/.exec(raw);
+      if (!item) { findings.push({ message: `a \`catalog\` fact with no item above it: "${raw.trim()}"` }); continue; }
+      if (!fact || fact[1].trim().split(/\s+/).length > 3) { findings.push({ message: `a \`catalog\` fact is \`Key: value\`, with a key of a word or two, never a sentence: "${raw.trim()}"` }); continue; }
+      item.facts.push([fact[1].trim(), fact[2].trim()]);
+      continue;
+    }
+    if (raw.startsWith("#")) continue;
+    const [name, line = "", third = ""] = raw.trim().replace(/^[-*]\s+/, "").split(/\s+\|\s+/).map((cell) => cell.trim());
+    groups[groups.length - 1].items.push({ name, line, third, facts: [] });
+  }
+  if (!groups[0].items.length) groups.shift();
+  return groups;
+}
+
+/** One item's media: the span (or, for `MEDIA_TOP`, the picture) the fence's one media names. */
+function mediaOf(media: string, item: CatalogItem, findings: Finding[]): string {
+  const text = item.name.replace(/`/g, "");
+  if (media === "ICON" || media === "MARK") {
+    const key = item.third.replace(/^`|`$/g, "").toLowerCase().replace(/[\s_]+/g, "-");
+    if (key && !ICONS[key]) findings.push({ message: `a \`catalog\` item names the icon "${item.third}", which is none of: ${Object.keys(ICONS).join(", ")}` });
+    return `<span class="sds-tile-media" data-media="${media}"><svg viewBox="0 0 24 24" aria-hidden="true">${ICONS[key] ?? ICONS.circle}</svg></span>`;
+  }
+  if (media === "AVATAR") return `<span class="sds-tile-media" data-media="AVATAR">${esc((item.third || text.charAt(0)).toUpperCase())}</span>`;
+  if (media === "AVATAR_GROUP") {
+    const initials = (item.third ? item.third.split(",").map((one) => one.trim()).filter(Boolean) : [text.charAt(0)]).slice(0, 4);
+    return `<span class="sds-tile-media" data-media="AVATAR_GROUP">${initials.map((one) => `<span>${esc(one.toUpperCase())}</span>`).join("")}</span>`;
+  }
+  const wire = item.third.replace(/^`|`$/g, "").toLowerCase();
+  if (wire && !WIRES[wire]) findings.push({ message: `a \`catalog\` MEDIA_TOP item names the drawing "${item.third}", which is none of: ${Object.keys(WIRES).join(", ")}` });
+  return `<div class="sds-tile-picture"><svg class="sds-wire" viewBox="0 0 160 96" aria-hidden="true"><rect class="frame" x="0.5" y="0.5" width="159" height="95" rx="4"/>${WIRES[wire] ?? ""}</svg></div>`;
+}
+
+/** The cards of one set of items, as the fence's layout and media draw them. Without either, and with no facts, the one-line tile of old. */
+function catalogHtml(items: CatalogItem[], layout: string | null, media: string | null, findings: Finding[], compact = false): string {
+  const hasFacts = items.some((item) => item.facts.length);
+  if (!layout && !media && !hasFacts) {
+    const tiles = items.map(({ name, line, third }) => `    <div class="sds-tile"><h4>${inline(name)}</h4>${line ? `<p>${inline(line)}</p>` : ""}${third ? `<p class="sds-small"><code>${esc(third.replace(/^`|`$/g, ""))}</code></p>` : ""}</div>`);
+    return `  <div class="sds-tiles">\n${tiles.join("\n")}\n  </div>`;
+  }
+  const kind = layout ?? "GRID";
+  if (kind === "TABLE") {
+    if (media) findings.push({ message: `a \`catalog\` in TABLE has no media; \`media=${media}\` is not drawn` });
+    const keys: string[] = [];
+    for (const item of items) for (const [key] of item.facts) if (!keys.includes(key)) keys.push(key);
+    const head = items.map((item) => `<th><h4>${inline(item.name)}</h4>${item.line ? `<p>${inline(item.line)}</p>` : ""}</th>`).join("");
+    const rows = keys.map((key) => `      <tr><th>${inline(key)}</th>${items.map((item) => `<td>${inline(item.facts.find(([name]) => name === key)?.[1] ?? "")}</td>`).join("")}</tr>`);
+    return `  <div class="sds-scroll"><table class="sds-catalog-table">\n    <thead><tr><th></th>${head}</tr></thead>\n    <tbody>\n${rows.join("\n")}\n    </tbody>\n  </table></div>`;
+  }
+  let kept = media;
+  if (kept === "MEDIA_TOP" && kind !== "GRID") { findings.push({ message: "a `catalog` draws `media=MEDIA_TOP` in GRID only" }); kept = null; }
+  const tiles = items.map((item) => {
+    const facts = item.facts.length
+      ? `<dl class="sds-tile-facts${kind === "LIST" && item.facts.length === 1 ? " sds-tile-facts-one" : ""}">${item.facts.map(([key, value]) => `<div><dt>${inline(key)}</dt><dd>${inline(value)}</dd></div>`).join("")}</dl>` : "";
+    if (kind === "GRID" && item.facts.length > 3) findings.push({ message: `a GRID card holds up to three facts, "${item.name}" has ${item.facts.length}; use \`layout=LIST\`` });
+    const count = kind === "GRID" && item.facts.length ? ` data-facts="${Math.min(item.facts.length, 3)}"` : "";
+    const words = `<h4>${inline(item.name)}</h4>${item.line ? `<p>${inline(item.line)}</p>` : ""}`;
+    if (kind === "LIST") {
+      const mediaHtml = kept ? mediaOf(kept, item, findings) : "";
+      return `    <div class="sds-tile">${mediaHtml}<div class="sds-tile-body">${words}\n      ${facts}</div></div>`;
+    }
+    if (kept === "MEDIA_TOP") return `    <div class="sds-tile"${count}>${mediaOf(kept, item, findings)}\n      <div class="sds-tile-head"><div>${words}</div></div>\n      ${facts}</div>`;
+    if (kept) return `    <div class="sds-tile"${count}><div class="sds-tile-head">${mediaOf(kept, item, findings)}<div>${words}</div></div>\n      ${facts}</div>`;
+    return `    <div class="sds-tile"${count}><h4>${inline(item.name)}</h4>${item.line ? `<p class="sds-tile-line">${inline(item.line)}</p>` : ""}${item.third ? `<p class="sds-small"><code>${esc(item.third.replace(/^`|`$/g, ""))}</code></p>` : ""}\n      ${facts}</div>`;
+  });
+  return `  <div class="sds-tiles${compact ? " sds-tiles-compact" : ""}" data-layout="${kind}"${kept ? ` data-media="${kept}"` : ""}>\n${tiles.join("\n")}\n  </div>`;
+}
+
+/** Group ids already used on the page, so a second catalog's group of the same name gets its own anchor. */
+let groupIds = new Set<string>();
+
+/**
+ * A `catalog` fence: ```catalog layout=GRID|LIST|TABLE media=ICON|MARK|AVATAR|AVATAR_GROUP|MEDIA_TOP. The item line is
+ * `Name | one line | third`, and the third cell is the literal (a code line) where the fence has no media, the icon's name with
+ * ICON and MARK (`globe`, `file`, `file-x`, `shield`, `key`, `app-window`, `user`), the initials with AVATAR, a comma list of
+ * initials with AVATAR_GROUP, and a drawing's name with MEDIA_TOP (`rail`, `dock`, `topnav`, `canvas`). With two or more
+ * `## Group` lines, each group is a panel and a row of links above them jumps to each.
+ */
+function catalogBlock(tag: string, body: string[], findings: Finding[]): string {
+  const { options } = tagWords(tag);
+  let layout: string | null = null, media: string | null = null;
+  if ("layout" in options) {
+    if (!CATALOG_LAYOUTS.includes(options.layout)) findings.push({ message: `a \`catalog\` layout is one of ${CATALOG_LAYOUTS.join(", ")}, not \`${options.layout}\``, stops: true });
+    else layout = options.layout;
+  }
+  if ("media" in options) {
+    if (!CATALOG_MEDIA.includes(options.media)) findings.push({ message: `a \`catalog\` media is one of ${CATALOG_MEDIA.join(", ")}, not \`${options.media}\``, stops: true });
+    else media = options.media;
+  }
+  const groups = catalogLines(body, findings);
+  if (!groups.length) { findings.push({ message: "a `catalog` block with no line" }); return ""; }
+  const named = groups.filter((group) => group.name !== null);
+  if (named.length < 2) return catalogHtml(groups.flatMap((group) => group.items), layout, media, findings);
+  const out: string[] = [];
+  if (groups[0].name === null) {
+    findings.push({ message: "a `catalog` with groups holds items above its first `## Group` line; they are drawn before the panels" });
+    out.push(catalogHtml(groups[0].items, layout, media, findings));
+  }
+  const panels = named.map((group) => {
+    if (!group.items.length) findings.push({ message: `a \`catalog\` group with no item, "${group.name}"` });
+    let id = `g-${anchorOf(group.name as string)}`;
+    for (let n = 2; groupIds.has(id); n++) id = `g-${anchorOf(group.name as string)}-${n}`;
+    groupIds.add(id);
+    const compact = layout !== "LIST" && layout !== "TABLE" && !media && group.items.every((item) => !item.facts.length);
+    const members = group.items.length ? catalogHtml(group.items, layout ?? "GRID", media, findings, compact) : "";
+    const count = `${group.items.length} ${group.items.length === 1 ? "item" : "items"}`;
+    return { id, group, count, html: `<section class="sds-group" id="${id}" aria-labelledby="${id}-title">\n  <div class="sds-group-head"><h5 id="${id}-title">${inline(group.name as string)}</h5><span class="sds-group-count">${count}</span></div>\n  <div class="sds-group-body">${members.trim()}</div>\n</section>` };
+  });
+  out.push(`  <nav class="sds-group-jumps" aria-label="Groups">${panels.map((p) => `<a class="sds-group-jump" href="#${p.id}">${inline(p.group.name as string)} <span>${p.group.items.length}</span></a>`).join(" ")}</nav>`);
+  out.push(...panels.map((p) => p.html));
+  return out.join("\n");
+}
+
+// ---------------------------------------------------------------------------- the TABS block
+
+const TAB_LOOKS = ["LINE", "SWITCH", "PILL"];
+/** How many tabsets this page has drawn, so each tab and panel has its own id. */
+let tabsDrawn = 0;
+
+/**
+ * A fence opened with tildes: `~~~tabs look=LINE|SWITCH|PILL`, a `--- <label>` line before each panel, and a closing `~~~`.
+ * Each panel's body is ordinary markdown, drawn by the body renderer; tabs inside tabs are refused, and so are fewer than
+ * two or more than six tabs. Every panel is in the markup, so with no script every panel shows.
+ */
+function tabsBlock(tag: string, body: string[], findings: Finding[], nested: boolean): string {
+  const stop = (message: string): string => { findings.push({ message, stops: true }); return ""; };
+  const { options } = tagWords(tag);
+  const look = options.look ?? "LINE";
+  if (!TAB_LOOKS.includes(look)) return stop(`a \`tabs\` look is one of ${TAB_LOOKS.join(", ")}, not \`${look}\``);
+  if (nested || body.some((line) => /^~~~\S/.test(line))) return stop("tabs inside tabs are refused: a panel holds ordinary blocks, and a second set of alternatives is a fold or a part of its own");
+  const panels: { label: string; lines: string[] }[] = [];
+  let fenced = false;
+  for (const line of body) {
+    if (/^```/.test(line)) fenced = !fenced;
+    const start = fenced ? null : /^---\s+(\S.*)$/.exec(line);
+    if (start) panels.push({ label: start[1].trim(), lines: [] });
+    else if (panels.length) panels[panels.length - 1].lines.push(line);
+    else if (line.trim()) return stop("a `tabs` fence starts each panel with a `--- <label>` line, and holds nothing before the first");
+  }
+  if (panels.length < 2 || panels.length > 6) return stop(`a \`tabs\` fence takes two to six tabs, this one has ${panels.length}`);
+  const n = ++tabsDrawn;
+  const bar = panels.map((panel, k) => `      <button type="button" role="tab" id="t-${n}-${k + 1}" aria-controls="p-${n}-${k + 1}" aria-selected="${k === 0}">${inline(panel.label)}</button>`);
+  const body_ = panels.map((panel, k) => `    <div class="sds-tabset-panel" role="tabpanel" id="p-${n}-${k + 1}" aria-labelledby="t-${n}-${k + 1}">\n${renderBody(panel.lines, findings, true)}\n    </div>`);
+  return `  <div class="sds-tabset" data-type="${look}">\n    <div class="sds-tabset-bar" role="tablist" aria-label="${esc(panels.map((p) => p.label).join(", "))}">\n${bar.join("\n")}\n    </div>\n${body_.join("\n")}\n  </div>`;
+}
+
 /**
  * The blocks that have a spelling of their own in markdown, each a fenced block tagged with its name and holding one line per thing, its parts split on ` | `:
- *   catalog   Name | one line | literal (the literal is optional)        one tile each
+ *   catalog   Name | one line | third, and facts indented under it       see `catalogBlock`; the tag takes layout= and media=
  *   cards     Title | description | link                                  a door each, title and Read more both links
  *   next      previous | Title | link, and next | Title | link            the two doors either side of the page
  */
 function spelled(kind: string, body: string[], findings: Finding[]): string {
   const rows = body.map((row) => row.trim()).filter((row) => row && !row.startsWith("#")).map((row) => row.replace(/^[-*]\s+/, "").split(/\s+\|\s+/).map((cell) => cell.trim()));
   if (!rows.length) { findings.push({ message: `a \`${kind}\` block with no line` }); return ""; }
-  if (kind === "catalog") {
-    const tiles = rows.map(([name, line = "", literal = ""]) => `    <div class="sds-tile"><h4>${inline(name)}</h4>${line ? `<p>${inline(line)}</p>` : ""}${literal ? `<p class="sds-small"><code>${esc(literal.replace(/^`|`$/g, ""))}</code></p>` : ""}</div>`);
-    return `  <div class="sds-tiles">\n${tiles.join("\n")}\n  </div>`;
-  }
   if (kind === "cards") {
     const tiles = rows.map(([title, line = "", link = ""]) => {
       if (!link) findings.push({ message: `a \`cards\` line with no link, "${title}" — a card is Title | description | link` });
@@ -323,7 +533,7 @@ function spelled(kind: string, body: string[], findings: Finding[]): string {
 }
 
 /** One section's body: paragraphs, tables, lists, fenced blocks and figures. */
-function renderBody(lines: string[], findings: Finding[]): string {
+function renderBody(lines: string[], findings: Finding[], nested = false): string {
   const out: string[] = [];
   let i = 0;
   const para: string[] = [];
@@ -351,17 +561,34 @@ function renderBody(lines: string[], findings: Finding[]): string {
       out.push(`  <h${level} id="${anchorOf(t)}">${inline(t)}</h${level}>`);
       i++; continue;
     }
+    // A fence of tildes is the TABS block, closed by a line of three tildes alone.
+    if (/^~~~tabs\b/.test(l)) {
+      flush();
+      const tag = l.replace(/^~~~/, "").trim();
+      const body: string[] = [];
+      i++;
+      while (i < lines.length && !/^~~~\s*$/.test(lines[i])) body.push(lines[i++]);
+      if (i >= lines.length) findings.push({ message: "a `tabs` fence is never closed with `~~~`", stops: true });
+      i++;
+      out.push(tabsBlock(tag, body, findings, nested));
+      continue;
+    }
     if (/^```/.test(l)) {
       flush();
       const tag = l.replace(/^```/, "").trim();
-      // A fence tag is a language, and may carry `file=<path>`: the block then stands in a FILE frame titled by that path.
+      // A fence tag is a language, and may carry `file=<path>`: the block then stands in a FILE frame titled by that path,
+      // and the word `fold` draws that frame inside a `details` whose summary is the path.
       const fileAt = /\bfile=(\S+)/.exec(tag);
-      const lang = tag.replace(/\bfile=\S+/, "").trim();
+      const folded = /(?:^|\s)fold(?=\s|$)/.test(tag);
+      const lang = tag.replace(/\bfile=\S+/, "").replace(/(?:^|\s)fold(?=\s|$)/, " ").trim();
+      const kind = lang.split(/\s+/)[0];
       const body: string[] = [];
       i++;
       while (i < lines.length && !/^```/.test(lines[i])) body.push(lines[i++]);
       i++;
-      if (lang === "catalog" || lang === "cards" || lang === "next") {
+      if (kind === "catalog") {
+        out.push(catalogBlock(lang, body, findings));
+      } else if (lang === "cards" || lang === "next") {
         out.push(spelled(lang, body, findings));
       } else if (lang === "unit") {
         out.push(unitFrame(body, findings));
@@ -383,8 +610,11 @@ function renderBody(lines: string[], findings: Finding[]): string {
         // The page holds plain code, tagged with its language. The shared script colours the block
         // when the page opens, so no colour is written here.
         const pre = `<pre${lang ? ` data-lang="${lang}"` : ""}>${lang ? escapedCode(body.join("\n")) : esc(body.join("\n"))}</pre>`;
-        if (fileAt) out.push(`  <figure class="sds-file">\n    <figcaption><span class="sds-file-path">${esc(fileAt[1])}</span>${lang ? `<span class="sds-file-lang">${esc(lang)}</span>` : ""}</figcaption>\n    ${pre}\n  </figure>`);
-        else out.push(`  ${pre}`);
+        if (folded && !fileAt) findings.push({ message: "the word `fold` needs a `file=<path>` in the same fence tag: the fold's summary is the path" });
+        if (fileAt) {
+          const frame = `  <figure class="sds-file">\n    <figcaption><span class="sds-file-path">${esc(fileAt[1])}</span>${lang ? `<span class="sds-file-lang">${esc(lang)}</span>` : ""}</figcaption>\n    ${pre}\n  </figure>`;
+          out.push(folded ? `  <details class="sds-fold">\n    <summary>${esc(fileAt[1])}</summary>\n${frame}\n  </details>` : frame);
+        } else out.push(`  ${pre}`);
       }
       continue;
     }
@@ -462,10 +692,17 @@ function renderPageBody(opts: Parameters<typeof renderPage>[0]): { html: string;
   const findings: Finding[] = [];
   const { block } = opts;
   const lines = opts.markdown.split("\n");
+  tabsDrawn = 0; groupIds = new Set(); unitUsed = false;
 
   // Everything above the first `##` is the lead: the h1 and the tag line are the masthead's,
   // so they are dropped here rather than rendered twice.
-  const firstSection = lines.findIndex((l) => /^##\s/.test(l));
+  // A `## ` line inside a fence is not a section: a catalog fence uses it for its groups.
+  const sectionAt = new Set<number>();
+  for (let k = 0, fence = ""; k < lines.length; k++) {
+    if (fence) { if (fence === "```" ? /^```/.test(lines[k]) : /^~~~\s*$/.test(lines[k])) fence = ""; continue; }
+    if (/^```/.test(lines[k])) fence = "```"; else if (/^~~~tabs\b/.test(lines[k])) fence = "~~~"; else if (/^##\s/.test(lines[k])) sectionAt.add(k);
+  }
+  const firstSection = lines.findIndex((_, k) => sectionAt.has(k));
   const leadLines = lines.slice(0, firstSection < 0 ? lines.length : firstSection)
     .filter((l) => !/^#\s/.test(l) && !/^`(For|Lenses):/.test(l.trim()));
   // The first lead paragraph is the standfirst — the page's promise in one line — and the ones after it
@@ -476,7 +713,7 @@ function renderPageBody(opts: Parameters<typeof renderPage>[0]): { html: string;
   const sections: string[] = [];
   if (firstSection >= 0) {
     const bounds: number[] = [];
-    lines.forEach((l, k) => { if (k >= firstSection && /^##\s/.test(l)) bounds.push(k); });
+    lines.forEach((_, k) => { if (k >= firstSection && sectionAt.has(k)) bounds.push(k); });
     bounds.push(lines.length);
     for (let s = 0; s < bounds.length - 1; s++) {
       const heading = lines[bounds[s]].replace(/^##\s*/, "");
@@ -525,6 +762,9 @@ ${subtitle}${lead}
     `<!-- spn:doc\n${JSON.stringify(block)}\n-->`,
     `<!-- Produced by \`docs.ts page\` from the seat file. Never edit this page: edit the seat file and produce it again. -->`,
     opts.furniture.stylesheet,
+    // A page that draws a unit also links the design system's unit styles, from the folder of the shared stylesheet, after it.
+    ...(unitUsed && /sds-docs\.css/.test(opts.furniture.stylesheet)
+      ? [opts.furniture.stylesheet.replace(/sds-docs\.css/, "ds-unit.css").replace(/\s(?:integrity|crossorigin)="[^"]*"/g, "")] : []),
     `<div class="sds-page">`,
     ``,
     `<nav class="sds-rail" id="rail">`,
