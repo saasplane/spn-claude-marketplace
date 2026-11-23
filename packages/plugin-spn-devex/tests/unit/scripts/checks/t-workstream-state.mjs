@@ -157,7 +157,7 @@ console.log("\n=== Q99 — one preview per arc, by its fixed name");
   ok("[MKT.HOOKS.523] green: a surface preview is never an arc's second preview", !has(checkWorkstream(ws), "preview", /home-preview\.html` is a second preview/), said(checkWorkstream(ws)));
   rmSync(join(notes, "home-preview.html"));
   mkdirSync(join(notes, "samples", "templates", "workstream"), { recursive: true });
-  writeFileSync(join(notes, "samples", "templates", "workstream", "arc-preview-template.html"), "<p>a template copy</p>");
+  writeFileSync(join(notes, "samples", "templates", "workstream", "arc-template.html"), "<p>a template copy</p>");
   writeFileSync(join(notes, "samples", "layout-preview.html"), "<p>a sample</p>");
   ok("green: a file under samples/ is a sample, never an arc's second preview", !has(checkWorkstream(ws), "preview", /samples\//), said(checkWorkstream(ws)));
   writeFileSync(join(notes, "samples", "layout-preview.html"), "<p>a sample</p>");
@@ -165,6 +165,15 @@ console.log("\n=== Q99 — one preview per arc, by its fixed name");
   ok("red: a preview-named file beside preview.html still fails with samples/ present", has(checkWorkstream(ws), "preview", /notes\/N001\/layout-preview\.html` is a second preview/), said(checkWorkstream(ws)));
   rmSync(join(notes, "layout-preview.html"));
   rmSync(join(notes, "samples"), { recursive: true });
+  // An arc's page is arc.html; preview.html is read where arc.html is absent, and neither is another's second preview.
+  renameSync(join(notes, "preview.html"), join(notes, "arc.html"));
+  ok("green: arc.html is the arc's page, never a second preview, and an arc holding it is not one with no page",
+    !has(checkWorkstream(ws), "preview", /is a second preview/) && !has(checkWorkstream(ws), "preview", /has no preview/), said(checkWorkstream(ws)));
+  writeFileSync(join(notes, "layout-preview.html"), "<p>a second</p>");
+  ok("red: a preview-named file beside arc.html fails as a second preview, naming arc.html", has(checkWorkstream(ws), "preview", /layout-preview\.html` is a second preview — an arc has at most one page, `notes\/N001\/arc\.html`/), said(checkWorkstream(ws)));
+  rmSync(join(notes, "layout-preview.html"));
+  renameSync(join(notes, "arc.html"), join(notes, "preview.html"));
+  ok("green: preview.html, the name before arc.html, is read where arc.html is absent", !has(checkWorkstream(ws), "preview", /has no preview|is a second preview/), said(checkWorkstream(ws)));
   renameSync(join(notes, "preview.html"), join(notes, "draft.html"));
   const page = join(ws, "approach.html");
   const text = readFileSync(page, "utf8");

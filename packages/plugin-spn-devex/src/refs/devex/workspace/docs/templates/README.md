@@ -3,7 +3,7 @@
   "files": [
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/templates",
-      "seen": "5c8e698c"
+      "seen": "d64872e1"
     }
   ]
 }
@@ -32,11 +32,10 @@ review and fails a gate.
 
 | Group | Templates |
 | --- | --- |
-| `agent/` | [`agent-template.md`](agent/agent-template.md) · [`hook-template.ts`](agent/hook-template.ts) · [`lens-template.md`](agent/lens-template.md) · [`ref-template.md`](agent/ref-template.md) · [`skill-template.md`](agent/skill-template.md) |
-| `pages/` | [`blocks-template.html`](pages/blocks-template.html) · [`construct-template.html`](pages/construct-template.html) · [`guide-template.html`](pages/guide-template.html) · [`hub-template.html`](pages/hub-template.html) · [`index-template.html`](pages/index-template.html) · [`overview-template.html`](pages/overview-template.html) · [`report-template.html`](pages/report-template.html) |
-| `seat-files/` | [`capability-template.md`](seat-files/capability-template.md) · [`construct-seat-template.md`](seat-files/construct-seat-template.md) · [`design-language-capability-template.md`](seat-files/design-language-capability-template.md) · [`design-language-construct-template.md`](seat-files/design-language-construct-template.md) · [`design-language-reference-template.md`](seat-files/design-language-reference-template.md) · [`schema-template.sql`](seat-files/schema-template.sql) · [`test-and-verify-template.md`](seat-files/test-and-verify-template.md) |
-| `surface/` | [`surface-preview-template.html`](surface/surface-preview-template.html) |
-| `workstream/` | [`approach-template.html`](workstream/approach-template.html) · [`arc-preview-template.html`](workstream/arc-preview-template.html) · [`arc-template.md`](workstream/arc-template.md) · [`handover-template.md`](workstream/handover-template.md) · [`order-template.md`](workstream/order-template.md) · [`plan-template.md`](workstream/plan-template.md) |
+| `docs/` | [`pages/blocks-template.html`](docs/pages/blocks-template.html) · [`pages/construct-template.html`](docs/pages/construct-template.html) · [`pages/guide-template.html`](docs/pages/guide-template.html) · [`pages/hub-template.html`](docs/pages/hub-template.html) · [`pages/index-template.html`](docs/pages/index-template.html) · [`pages/overview-template.html`](docs/pages/overview-template.html) · [`pages/page-template.html`](docs/pages/page-template.html) · [`pages/report-template.html`](docs/pages/report-template.html) · [`seats/capability-template.md`](docs/seats/capability-template.md) · [`seats/construct-seat-template.md`](docs/seats/construct-seat-template.md) · [`seats/design-language-capability-template.md`](docs/seats/design-language-capability-template.md) · [`seats/design-language-construct-template.md`](docs/seats/design-language-construct-template.md) · [`seats/design-language-reference-template.md`](docs/seats/design-language-reference-template.md) · [`seats/schema-template.sql`](docs/seats/schema-template.sql) · [`seats/test-and-verify-template.md`](docs/seats/test-and-verify-template.md) |
+| `plugin/` | [`agent-template.md`](plugin/agent-template.md) · [`hook-template.ts`](plugin/hook-template.ts) · [`lens-template.md`](plugin/lens-template.md) · [`ref-template.md`](plugin/ref-template.md) · [`skill-template.md`](plugin/skill-template.md) |
+| `surface/` | [`surface-page-template.html`](surface/surface-page-template.html) |
+| `workstream/` | [`approach-template.html`](workstream/approach-template.html) · [`arc-record-template.md`](workstream/arc-record-template.md) · [`arc-template.html`](workstream/arc-template.html) · [`handover-template.md`](workstream/handover-template.md) · [`order-template.md`](workstream/order-template.md) · [`plan-template.md`](workstream/plan-template.md) |
 
 **Never edit a file here.** It is an output. The rule lives in the book's copy, a builder changes
 it there, and the export carries it.

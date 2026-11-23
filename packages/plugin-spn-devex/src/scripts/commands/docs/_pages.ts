@@ -12,7 +12,7 @@ import { INDEX_SCRIPT, OWN_COPY, PAGE_SCRIPT, STYLESHEET, cutVersions, integrity
   stylesDir } from "../../../../../plugin-support-lib/src/lib/page-styles.ts";
 
 /** The folder of the templates that holds the page templates. */
-const PAGE_TEMPLATES = "pages";
+const PAGE_TEMPLATES = join("docs", "pages");
 
 /** A reason a command stops and writes nothing. The command prints its message and exits 1. */
 export class Refusal extends Error {}
@@ -105,7 +105,7 @@ export function withHead(template: string, head: Head): string {
     hashes = integrityFor(styles, head.version, [STYLESHEET, head.script]);
   } catch (error) { throw new Refusal(`${(error as Error).message}, so a page cannot link it`); }
   const lines = linesFor(head.version, head.script, hashes);
-  let page = template.replace(/^\s*<!--(?!\s*spn:doc)[\s\S]*?-->\s*/, "");
+  let page = template.replace(/^(?:\s*<!--(?!\s*spn:doc)[\s\S]*?-->)+\s*/, "");
   page = page.replace(/\n*<footer>[\s\S]*?<\/footer>\n*/, "\n\n");
   page = swap(page, /<title>[\s\S]*?<\/title>/, `<title>${escaped(head.tab)}</title>`, "`<title>`");
   page = swap(page, /<!--\s*spn:doc[\s\S]*?-->/,

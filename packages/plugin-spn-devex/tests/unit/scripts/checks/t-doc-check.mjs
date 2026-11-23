@@ -1046,6 +1046,27 @@ console.log("\n=== doc-check — a long What on an open approach page holds a fi
     say("[MKT.HOOKS.522] green: a framed copy with the meta and the listener draws nothing", !copied());
   }
   say("[MKT.HOOKS.522] red: a bar without its Notes switch is refused", shaped(surface().replace(/<div class="sds-surface-switch"><button type="button" data-surface="notes">Notes<\/button><\/div>/, "")));
+
+  // The surface page in one file: the bar, the frame and the page's markup in one template, with two metas.
+  const ONE = join(dirname(path), "home-page.html");
+  const page = (over = {}) => {
+    const o = { ds: '<meta name="surface-ds" content="11.21.0">\n', css: '<meta name="surface-app-css" content="">\n', template: '<template id="page"><section><h1>Scale it.</h1></section></template>', more: "", ...over };
+    return `<meta charset="utf-8">\n${o.ds}${o.css}<!-- spn:doc\n{"id": "surface-page-home", "variant": "surface-page", "title": "Home"}\n-->\n${linesFor("1.0.0").stylesheet}\n` +
+      '<div class="sds-surface" data-width="desktop">\n<header class="sds-surface-bar"><h1 class="sds-surface-title">Home</h1>\n' +
+      '<div class="sds-surface-switch"><button type="button" data-surface="width" data-value="desktop">Desktop</button></div>\n' +
+      '<div class="sds-surface-switch"><button type="button" data-surface="mode" data-value="light">Light</button></div>\n' +
+      '<div class="sds-surface-switch"><button type="button" data-surface="notes">Notes</button></div></header>\n' +
+      `<main class="sds-surface-stage"><iframe class="sds-surface-frame" title="Home"></iframe></main>${o.more}\n</div>\n${o.template}\n`;
+  };
+  const refused = (text) => check(ONE, text).some(([, m]) => m.includes("a surface page"));
+  say("[MKT.HOOKS.522] green: a surface page of one file holds the bar, the frame, the template and the two metas, and draws nothing", check(ONE, page()).length === 0, JSON.stringify(check(ONE, page())));
+  say("[MKT.HOOKS.522] red: a page with no template for its markup is refused", refused(page({ template: "" })));
+  say("[MKT.HOOKS.522] red: a page with no surface-ds meta is refused, and one whose meta is no version", refused(page({ ds: "" })) && refused(page({ ds: '<meta name="surface-ds" content="latest">\n' })));
+  say("[MKT.HOOKS.522] red: a page with no surface-app-css meta is refused, and one naming another site's stylesheet", refused(page({ css: "" })) && refused(page({ css: '<meta name="surface-app-css" content="https://example.com/a.css">\n' })));
+  say("[MKT.HOOKS.522] green: an app stylesheet may be empty, Surface's own look, or a relative path", !refused(page()) && !refused(page({ css: '<meta name="surface-app-css" content="www.css">\n' })));
+  say("[MKT.HOOKS.522] red: words of the page's own beside the bar and the template are refused, and the same words inside the template are not", refused(page({ more: "<p>words</p>" })) && !refused(page({ template: '<template id="page"><p>words</p><h2>More</h2></template>' })));
+  say("[MKT.HOOKS.522] red: a slot left in the page is refused", refused(page({ ds: '<meta name="surface-ds" content="{{DS-VERSION}}">\n' })));
+  say("[MKT.HOOKS.522] the page of one file needs no copy beside it, so the old copy check reads nothing of it", !check(ONE, page()).some(([, m]) => m.includes("RULE.DEVEX.WORKSPACE.536") && m.includes("frames")));
 }
 
 {

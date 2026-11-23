@@ -12,7 +12,7 @@ import { join, relative } from "node:path";
 import { type Migration } from "../migration.ts";
 import { isDir, isFile, listdir } from "../payload.ts";
 import {
-  NOTES, PREVIEW_FILE, approachOf, arcIdsOf, firstOpenArc, isDataLayout, nameFileHolds, nameFileOf, readArc, stampsOn, strayLevels,
+  NOTES, ARC_FILE, PREVIEW_FILE, approachOf, arcIdsOf, firstOpenArc, isDataLayout, nameFileHolds, nameFileOf, readArc, stampsOn, strayLevels,
   strayNotes, workstreamsOf,
 } from "../workstream.ts";
 import { subjectFault } from "../workstream-schema.ts";
@@ -29,7 +29,7 @@ function linkingPages(ws: string): string[] {
   for (const arc of listdir(join(ws, NOTES))) {
     const notes = join(ws, NOTES, arc);
     if (!isDir(notes)) continue;
-    for (const file of [PREVIEW_FILE, "plan.md"]) if (isFile(join(notes, file))) pages.push(join(notes, file));
+    for (const file of [ARC_FILE, PREVIEW_FILE, "plan.md"]) if (isFile(join(notes, file))) pages.push(join(notes, file));
     for (const order of listdir(join(notes, "orders"))) if (order.endsWith(".md")) pages.push(join(notes, "orders", order));
   }
   return pages;

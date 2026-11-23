@@ -4,114 +4,146 @@
      This file holds the structure of a workstream's approach page and states no rule: the sections
      in order with their ids, the card's markup, the slots an author fills, and the two lines that load the shared stylesheet and script. The sections
      above state every rule for writing the page. -->
+<!-- Placeholders:
+     {{NAME}} the workstream's numbered name: its number, then its words, with no separator, such as `041 Improvements` (RULE.DEVEX.WORKSPACE.517: at most three words, and the number is no word): written in the `<title>`, the `<h1>`, the outline's title and the eyebrow's last level, and the arc pages' breadcrumb
+     {{SUMMARY}} The Description's first sentence, word for word.
+     {{SUBTITLE}} THE SUBTITLE: the decision this page plans, one plain sentence.
+     {{LEAD}} THE DESCRIPTION, one paragraph: what changes, why you would read this page, and how the page runs.
+     {{BULLET-DISTINCT}} one bullet for each distinct thing
+     {{PROBLEM-LINE}} The problem in one line, and the evidence for it.
+     {{CATEGORY-TWO}} Category &mdash; one or two words, such as Cost
+     {{HEADING-WOULD}} What the heading would have said, as one sentence: the statement this subsection makes.
+     {{WRONG-MEASURED}} What is wrong, measured.
+     {{CATEGORY-TWO-2}} Category &mdash; one or two words
+     {{DECISION-LINE}} The decision in one line. Nothing outside these domains changes.
+     {{DOMAIN-E}} Domain &mdash; e.g. DevEx &middot; Workspace
+     {{IDEATE-ARC}} The ideate arc's goal, as the write puts it: the shape proposed and the build arcs it opens
+     {{ARC-S}} The arc's goal, as the write puts it
+     {{CHANGE-DESCRIPTION}} The change as description, bullets or a diagram, then why. A settled question is stated here as a result, with no Q number on view; its anchor, such as <code>id="q12"</code>, sits invisible on the statement.
+     {{FOLLOW-UP}} The follow-up arc's goal, as the write puts it: what the build arcs leave open
+     {{DOMAIN-PROPOSED}} Domain &mdash; proposed, if it does not exist yet
+     {{ORDER-WORK}} The order the work runs in, in one line.
+     {{PLACES-CHANGE}} The places change in this order: &hellip;. What holds for every arc is on &hellip;.
+     {{REPOSITORY-PLACE}} repository, or a place that is no repository
+     {{CHANGES-HERE}} What changes here, in a line or two. Ships: what is released, or nothing. The paths and what each file says live in the preview.
+     {{ORDER-ARCS}} The order the arcs run in, in a sentence.
+     {{IDEATE-ARC-2}} The ideate arc, first
+     {{STAMP-WORKSTREAM}} the stamp `workstream arc stamp write` wrote
+     {{ARC-NAMED}} Arc, named for its domain
+     {{WAIT-CARRIED}} for a wait, CARRIED and DROPPED, the developer's words or the reason as a fact
+     {{FOLLOW-UP-2}} The follow-up arc, last
+     {{WAIT-REASON}} the wait, or the reason for CARRIED and DROPPED
+     {{QUESTION-NOUN}} The question, as a noun phrase naming the choice
+     {{PROBLEM-PLAIN}} The problem in plain words, what it costs to leave it alone, and what is blocked until it is answered. It stands by itself, before What.
+     {{FACTS-BEHIND}} The facts behind it: the file, the rule, what is there today, the before and after.
+     {{SPOKE-WHY}} Who spoke and why those views, in one line, with how each view was made: spoken by the one agent, or a fresh agent.
+     {{VIEW-S}} This view's reason in one or two plain sentences, as a colleague would say it out loud. It says only what Why and What do not, and it names no option by its letter.
+     {{OBJECTION-VIEWS}} No objection. Views with nothing to add are named together in one line.
+     {{REASON-WINS}} the reason it wins, which may name the views it rests on
+     {{WHY-OPTION}} Why each option is shown in this form: the one artifact whose difference is the whole difference between them.
+     {{TODAY-S}} today's code, where real code exists
+     {{OPTION-LEAVES}} what option A leaves, in the same form
+     {{WHY-NOW}} why not now, in a line -->
 <meta charset="utf-8">
-<title>Approach Template v3</title>
+<title>{{NAME}}</title>
 <!-- spn:doc
-{"id": "ws-{{NNN}}-{{slug}}", "variant": "approach", "title": "{{NNN}} - {{TITLE}}", "lenses": ["{{LENS}}"], "status": "PLANNING", "summary": "{{The Description's first sentence, word for word.}}", "keywords": ["{{…}}"]}
+{"id": "ws-{{NNN}}-{{slug}}", "variant": "approach", "title": "{{NAME}}", "lenses": ["{{LENS}}"], "status": "PLANNING", "summary": "{{SUMMARY}}", "keywords": ["{{…}}"]}
 -->
-
-<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.16.0/sds-docs.css" integrity="sha384-iWEdPPpgS7KEpaxAuL1aWPVR0lfgWDibcmX6gnRP6QAISVJCNl//yz2faqNcvmq7" crossorigin="anonymous">
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.16.0/sds-docs.css" integrity="sha384-iPi3diDZaIbK3FmnUfnnZOQs6LAv12kHUr2Ks3xVSjhgtMDB4DLKrG03lDgsjzPC" crossorigin="anonymous">
 <div class="sds-page">
-
 <nav class="sds-rail" id="rail">
-  <div class="sds-rail-title">{{NNN}} - {{TITLE}}</div>
+  <div class="sds-rail-title">{{NAME}}</div>
 </nav>
 <div class="sds-wrap">
-
 <header class="sds-masthead">
-  <div class="sds-eyebrow"><span class="sds-line1">{{WORKSPACE}} &nbsp;|&nbsp; Workstream &nbsp;|&nbsp; {{NNN}} - {{TITLE}}</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Approach</span><span class="sds-separator">|</span><span class="sds-label">For:</span> <span class="sds-audience"><span class="sds-badge sds-lens">{{ROLE}}</span><span class="sds-badge sds-lens">{{ROLE}}</span></span><span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-planning">&#x1F52E; PLANNING</span></span></span></div>
-  <h1>{{NNN}} - {{TITLE}}</h1>
-  <p class="sds-subtitle">{{THE SUBTITLE: the decision this page plans, one plain sentence.}}</p>
-  <p class="sds-standfirst">{{THE DESCRIPTION, one paragraph: what changes, why you would read this page, and how the page runs.}}</p>
+  <div class="sds-eyebrow"><span class="sds-line1">{{WORKSPACE}} &middot; {{NAME}}</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Approach</span><span class="sds-separator">|</span><span class="sds-label">For:</span> <span class="sds-audience"><span class="sds-badge sds-lens">{{ROLE}}</span><span class="sds-badge sds-lens">{{ROLE}}</span></span><span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-planning">&#x1F52E; PLANNING</span></span></span></div>
+  <h1>{{NAME}}</h1>
+  <p class="sds-subtitle">{{SUBTITLE}}</p>
+  <p class="sds-standfirst">{{LEAD}}</p>
 </header>
-
 <!-- spn:closing
      The closing block goes here, under the masthead. The agent writes it at the close, and `workstream close` refuses a page without it
      (RULE.DEVEX.WORKSPACE.206): it is written at the close, and the close refuses a page without it. Replace this comment with it, in this shape:
        <div class="sds-note">
-         <p>🚀 <strong>{{NNN}} {{TITLE}} has shipped.</strong> {{one line of measured numbers}}</p>
+         <p>🚀 <strong>{{NAME}} has shipped.</strong> {{one line of measured numbers}}</p>
          <p>&nbsp;</p>
          <p><strong>📦 What we delivered</strong></p>
-         <ul><li>{{one bullet for each distinct thing}}</li></ul>
+         <ul><li>{{BULLET-DISTINCT}}</li></ul>
          <p>&nbsp;</p>
          <p><strong>🧠 What we learned</strong></p>
-         <ul><li>{{one bullet for each distinct thing}}</li></ul>
+         <ul><li>{{BULLET-DISTINCT}}</li></ul>
          <p>&nbsp;</p>
          <p><strong>Thank you 👍</strong></p>
          <p>{{one line}}</p>
        </div>
 -->
-
 <section id="s1" data-block="reasons">
   <div class="sds-section-head"><h2>Why</h2></div>
-  <p class="sds-standfirst">{{The problem in one line, and the evidence for it.}}</p>
-  <h3 id="cat1">{{Category &mdash; one or two words, such as Cost}}</h3>
-  <p class="sds-standfirst">{{What the heading would have said, as one sentence: the statement this subsection makes.}}</p>
+  <p class="sds-standfirst">{{PROBLEM-LINE}}</p>
+  <h3 id="cat1">{{CATEGORY-TWO}}</h3>
+  <p class="sds-standfirst">{{HEADING-WOULD}}</p>
   <h4 id="w1">{{Finding}}</h4>
-  <p class="sds-standfirst">{{What the heading would have said, as one sentence: the statement this subsection makes.}}</p>
-  <p>{{What is wrong, measured.}}</p>
+  <p class="sds-standfirst">{{HEADING-WOULD}}</p>
+  <p>{{WRONG-MEASURED}}</p>
   <h4 id="w2">{{Finding}}</h4>
-  <p class="sds-standfirst">{{What the heading would have said, as one sentence: the statement this subsection makes.}}</p>
+  <p class="sds-standfirst">{{HEADING-WOULD}}</p>
   <p>{{&hellip;}}</p>
-  <h3 id="cat2">{{Category &mdash; one or two words}}</h3>
-  <p class="sds-standfirst">{{What the heading would have said, as one sentence: the statement this subsection makes.}}</p>
+  <h3 id="cat2">{{CATEGORY-TWO-2}}</h3>
+  <p class="sds-standfirst">{{HEADING-WOULD}}</p>
   <h4 id="w3">{{Finding}}</h4>
-  <p class="sds-standfirst">{{What the heading would have said, as one sentence: the statement this subsection makes.}}</p>
+  <p class="sds-standfirst">{{HEADING-WOULD}}</p>
   <p>{{&hellip;}}</p>
 </section>
-
 <section id="s2" data-block="reasons">
   <div class="sds-section-head"><h2>What</h2></div>
-  <p class="sds-standfirst">{{The decision in one line. Nothing outside these domains changes.}}</p>
-  <h3 id="d1">{{Domain &mdash; e.g. DevEx &middot; Workspace}}</h3>
-  <p class="sds-standfirst">{{What the heading would have said, as one sentence: the statement this subsection makes.}}</p>
+  <p class="sds-standfirst">{{DECISION-LINE}}</p>
+  <h3 id="d1">{{DOMAIN-E}}</h3>
+  <p class="sds-standfirst">{{HEADING-WOULD}}</p>
   <h4 id="ideate-what">{{The ideate arc's title}}</h4>
-  <p class="sds-standfirst">{{What the heading would have said, as one sentence: the statement this subsection makes.}}</p>
-  <p>{{The ideate arc's goal, as the write puts it: the shape proposed and the build arcs it opens}}</p>
-  <p>Read the preview &rarr; <a href="notes/ideate/preview.html">{{preview name}}</a></p>
+  <p class="sds-standfirst">{{HEADING-WOULD}}</p>
+  <p>{{IDEATE-ARC}}</p>
+  <p>Read the arc page &rarr; <a href="notes/ideate/arc.html">{{arc page name}}</a></p>
   <h4 id="N001-what">{{The arc's title}}</h4>
-  <p class="sds-standfirst">{{What the heading would have said, as one sentence: the statement this subsection makes.}}</p>
-  <p>{{The arc's goal, as the write puts it}}</p>
-  <p>{{The change as description, bullets or a diagram, then why. A settled question is stated here as a result, with no Q number on view; its anchor, such as <code>id="q12"</code>, sits invisible on the statement.}}</p>
-  <p>Read the preview &rarr; <a href="notes/N001/preview.html">{{preview name}}</a></p>
+  <p class="sds-standfirst">{{HEADING-WOULD}}</p>
+  <p>{{ARC-S}}</p>
+  <p>{{CHANGE-DESCRIPTION}}</p>
+  <p>Read the arc page &rarr; <a href="notes/N001/arc.html">{{arc page name}}</a></p>
   <h4 id="N002-what">{{The arc's title}}</h4>
-  <p class="sds-standfirst">{{What the heading would have said, as one sentence: the statement this subsection makes.}}</p>
-  <p>{{The arc's goal, as the write puts it}}</p>
+  <p class="sds-standfirst">{{HEADING-WOULD}}</p>
+  <p>{{ARC-S}}</p>
   <p>{{&hellip;}}</p>
-  <p>Read the preview &rarr; <a href="notes/N002/preview.html">{{preview name}}</a></p>
+  <p>Read the arc page &rarr; <a href="notes/N002/arc.html">{{arc page name}}</a></p>
   <h4 id="follow-ups-what">{{The follow-up arc's title}}</h4>
-  <p class="sds-standfirst">{{What the heading would have said, as one sentence: the statement this subsection makes.}}</p>
-  <p>{{The follow-up arc's goal, as the write puts it: what the build arcs leave open}}</p>
-  <p>Read the preview &rarr; <a href="notes/follow-ups/preview.html">{{preview name}}</a></p>
-  <h3 id="d2">{{Domain &mdash; proposed, if it does not exist yet}}</h3>
-  <p class="sds-standfirst">{{What the heading would have said, as one sentence: the statement this subsection makes.}}</p>
+  <p class="sds-standfirst">{{HEADING-WOULD}}</p>
+  <p>{{FOLLOW-UP}}</p>
+  <p>Read the arc page &rarr; <a href="notes/follow-ups/arc.html">{{arc page name}}</a></p>
+  <h3 id="d2">{{DOMAIN-PROPOSED}}</h3>
+  <p class="sds-standfirst">{{HEADING-WOULD}}</p>
   <p>{{&hellip;}}</p>
 </section>
-
 <section id="s3" data-block="sequence">
   <div class="sds-section-head"><h2>How</h2></div>
-  <p class="sds-standfirst">{{The order the work runs in, in one line.}}</p>
-  <p id="h0">{{The places change in this order: &hellip;. What holds for every arc is on &hellip;.}}</p>
-  <h3 id="h1">{{repository, or a place that is no repository}} &mdash; {{the kind of change}}</h3>
-  <p class="sds-standfirst">{{What the heading would have said, as one sentence: the statement this subsection makes.}}</p>
-  <p>{{What changes here, in a line or two. Ships: what is released, or nothing. The paths and what each file says live in the preview.}}</p>
+  <p class="sds-standfirst">{{ORDER-WORK}}</p>
+  <p id="h0">{{PLACES-CHANGE}}</p>
+  <h3 id="h1">{{REPOSITORY-PLACE}} &mdash; {{the kind of change}}</h3>
+  <p class="sds-standfirst">{{HEADING-WOULD}}</p>
+  <p>{{CHANGES-HERE}}</p>
   <p><span class="sds-small">Arcs: ideate &middot; N001 &middot; N002</span></p>
   <h3 id="h2">{{place}} &mdash; {{the kind of change}}</h3>
-  <p class="sds-standfirst">{{What the heading would have said, as one sentence: the statement this subsection makes.}}</p>
+  <p class="sds-standfirst">{{HEADING-WOULD}}</p>
   <p>{{&hellip; Ships: &hellip;}}</p>
   <p><span class="sds-small">Arcs: N002 &middot; follow-ups</span></p>
 </section>
-
 <section id="arcs" data-block="sequence">
   <div class="sds-section-head"><h2>Plan</h2></div>
-  <p>{{The order the arcs run in, in a sentence.}}</p>
+  <p>{{ORDER-ARCS}}</p>
   <div class="sds-scroll"><table>
     <thead><tr><th>Arc</th><th class="sds-status-col">Status</th></tr></thead>
     <tbody>
-      <tr id="ideate" data-arc="arcs/ideate/state.json" data-arc-stamp="{{&hellip;}}"><td><p><strong>ideate &mdash; {{The ideate arc, first}}</strong></p><p>{{one line}}</p><span class="sds-small">Preview: <a href="notes/ideate/preview.html">preview.html</a></span></td><td><span class="sds-badge sds-status sds-landed">LANDED</span></td></tr>
-      <tr id="N001" data-arc="arcs/N001/state.json" data-arc-stamp="{{the stamp `workstream arc stamp write` wrote}}"><td><p><strong>N001 &mdash; {{Arc, named for its domain}}</strong></p><p>{{one line}}</p><span class="sds-small">Preview: <a href="notes/N001/preview.html">preview.html</a> &middot; Samples: <a href="notes/N001/samples/index.html">index.html</a> &middot; {{for a wait, CARRIED and DROPPED, the developer's words or the reason as a fact}}</span></td><td><span class="sds-badge sds-status sds-proposed">PROPOSED</span></td></tr>
-      <tr id="N002" data-arc="arcs/N002/state.json" data-arc-stamp="{{&hellip;}}"><td><p><strong>N002 &mdash; {{Arc}}</strong></p><p>{{&hellip;}}</p><span class="sds-small">Preview: <a href="notes/N002/preview.html">preview.html</a></span></td><td><span class="sds-badge sds-status sds-decided">DECIDED</span></td></tr>
-      <tr id="follow-ups" data-arc="arcs/follow-ups/state.json" data-arc-stamp="{{&hellip;}}"><td><p><strong>follow-ups &mdash; {{The follow-up arc, last}}</strong></p><p>{{one line}}</p><span class="sds-small">Preview: <a href="notes/follow-ups/preview.html">preview.html</a></span></td><td><span class="sds-badge sds-status sds-proposed">PROPOSED</span></td></tr>
+      <tr id="ideate" data-arc="arcs/ideate/state.json" data-arc-stamp="{{&hellip;}}"><td><p><strong>ideate &mdash; {{IDEATE-ARC-2}}</strong></p><p>{{one line}}</p><span class="sds-small">Preview: <a href="notes/ideate/arc.html">arc.html</a></span></td><td><span class="sds-badge sds-status sds-landed">LANDED</span></td></tr>
+      <tr id="N001" data-arc="arcs/N001/state.json" data-arc-stamp="{{STAMP-WORKSTREAM}}"><td><p><strong>N001 &mdash; {{ARC-NAMED}}</strong></p><p>{{one line}}</p><span class="sds-small">Preview: <a href="notes/N001/arc.html">arc.html</a> &middot; Samples: <a href="notes/N001/samples/index.html">index.html</a> &middot; {{WAIT-CARRIED}}</span></td><td><span class="sds-badge sds-status sds-proposed">PROPOSED</span></td></tr>
+      <tr id="N002" data-arc="arcs/N002/state.json" data-arc-stamp="{{&hellip;}}"><td><p><strong>N002 &mdash; {{Arc}}</strong></p><p>{{&hellip;}}</p><span class="sds-small">Preview: <a href="notes/N002/arc.html">arc.html</a></span></td><td><span class="sds-badge sds-status sds-decided">DECIDED</span></td></tr>
+      <tr id="follow-ups" data-arc="arcs/follow-ups/state.json" data-arc-stamp="{{&hellip;}}"><td><p><strong>follow-ups &mdash; {{FOLLOW-UP-2}}</strong></p><p>{{one line}}</p><span class="sds-small">Preview: <a href="notes/follow-ups/arc.html">arc.html</a></span></td><td><span class="sds-badge sds-status sds-proposed">PROPOSED</span></td></tr>
     </tbody>
   </table></div>
   <!-- The badge class is the status word in lower case: sds-proposed, sds-decided, sds-running, sds-landed, sds-carried, sds-dropped.
@@ -121,7 +153,7 @@
   <nav class="sds-footbar" aria-label="Workstream status">
     <div class="sds-footbar-chips">
       <a class="sds-chip sds-landed sds-step-1" href="#ideate" aria-label="Ideate, LANDED"><span class="sds-chip-line"><span class="sds-chip-name">Ideate</span><span class="sds-arc-count">0/0</span></span><span class="sds-chip-bar"><i style="--share:0%"></i></span><span class="sds-tip"><span class="sds-badge sds-status sds-landed">LANDED</span><strong>{{the ideate arc's full title}}</strong></span></a>
-      <a class="sds-chip sds-running sds-step-3" href="#N001" aria-label="N001 {{the arc's title}}, RUNNING, {{done}} of {{total}} steps landed"><span class="sds-chip-line"><span class="sds-chip-name"><span class="sds-mono">1</span><span class="sds-chip-subject"> &middot; {{the arc's title}}</span></span><span class="sds-arc-count">{{done}}/{{total}}</span></span><span class="sds-chip-bar"><i style="--share:{{share}}%"></i></span><span class="sds-tip"><span class="sds-badge sds-status sds-running">RUNNING</span><strong>{{the arc's full title}}</strong><span>{{done}} of {{total}} steps landed</span><span>{{the wait, or the reason for CARRIED and DROPPED}}</span></span></a>
+      <a class="sds-chip sds-running sds-step-3" href="#N001" aria-label="N001 {{the arc's title}}, RUNNING, {{done}} of {{total}} steps landed"><span class="sds-chip-line"><span class="sds-chip-name"><span class="sds-mono">1</span><span class="sds-chip-subject"> &middot; {{the arc's title}}</span></span><span class="sds-arc-count">{{done}}/{{total}}</span></span><span class="sds-chip-bar"><i style="--share:{{share}}%"></i></span><span class="sds-tip"><span class="sds-badge sds-status sds-running">RUNNING</span><strong>{{the arc's full title}}</strong><span>{{done}} of {{total}} steps landed</span><span>{{WAIT-REASON}}</span></span></a>
       <a class="sds-chip sds-proposed sds-step-1" href="#follow-ups" aria-label="Follow-ups, PROPOSED"><span class="sds-chip-line"><span class="sds-chip-name">Follow-ups</span><span class="sds-arc-count">0/0</span></span><span class="sds-chip-bar"><i style="--share:0%"></i></span><span class="sds-tip"><span class="sds-badge sds-status sds-proposed">PROPOSED</span><strong>{{the follow-up arc's full title}}</strong></span></a>
     </div>
     <div class="sds-footbar-summary sds-implementing sds-step-3" tabindex="0" aria-label="Workstream IMPLEMENTING, {{done}} of {{total}} rows done, {{X}} of {{Y}} arcs closed">
@@ -132,20 +164,19 @@
   </nav>
   <!-- /spn:generated -->
 </section>
-
 <section id="s4" data-block="reasons">
   <!-- spn:generated open — do not edit inside these markers; `workstream question` writes it from questions.jsonl -->
   <div class="sds-section-head"><h2>Open &mdash; Q{{n}} &middot; Q{{n}}</h2></div>
   <div class="sds-open">
-    <h4 id="q{{n}}">Q{{n}} &middot; {{The question, as a noun phrase naming the choice}}</h4>
+    <h4 id="q{{n}}">Q{{n}} &middot; {{QUESTION-NOUN}}</h4>
     <span class="sds-key">Why it matters</span>
-    <p>{{The problem in plain words, what it costs to leave it alone, and what is blocked until it is answered. It stands by itself, before What.}}</p>
+    <p>{{PROBLEM-PLAIN}}</p>
     <span class="sds-key">What</span>
-    <p>{{The facts behind it: the file, the rule, what is there today, the before and after.}}</p>
+    <p>{{FACTS-BEHIND}}</p>
     <span class="sds-key">Views</span>
-    <p>{{Who spoke and why those views, in one line, with how each view was made: spoken by the one agent, or a fresh agent.}}</p>
-    <p><strong>{{Architect}}:</strong> {{This view's reason in one or two plain sentences, as a colleague would say it out loud. It says only what Why and What do not, and it names no option by its letter.}}</p>
-    <p><strong>{{QA and Partner}}:</strong> {{No objection. Views with nothing to add are named together in one line.}}</p>
+    <p>{{SPOKE-WHY}}</p>
+    <p><strong>{{Architect}}:</strong> {{VIEW-S}}</p>
+    <p><strong>{{QA and Partner}}:</strong> {{OBJECTION-VIEWS}}</p>
     <span class="sds-key">Options</span>
     <div class="sds-scroll"><table>
       <thead><tr><th></th><th>What it does</th><th>What it costs</th></tr></thead>
@@ -155,13 +186,13 @@
         <tr><td><strong>C</strong></td><td>{{leave it as it is}}</td><td>{{what that costs}}</td></tr>
       </tbody>
     </table></div>
-    <div class="sds-recommended"><b>Recommended: {{A}}.</b> {{the reason it wins, which may name the views it rests on}}</div>
+    <div class="sds-recommended"><b>Recommended: {{A}}.</b> {{REASON-WINS}}</div>
     <span class="sds-key">Preview</span>
-    <p>{{Why each option is shown in this form: the one artifact whose difference is the whole difference between them.}}</p>
+    <p>{{WHY-OPTION}}</p>
     <span class="sds-key">Today</span>
-    <pre><code>{{today's code, where real code exists}}</code></pre>
+    <pre><code>{{TODAY-S}}</code></pre>
     <span class="sds-key">Option A (recommended)</span>
-    <pre><code>{{what option A leaves, in the same form}}</code></pre>
+    <pre><code>{{OPTION-LEAVES}}</code></pre>
     <span class="sds-key">Option B</span>
     <pre><code>{{&hellip;}}</code></pre>
     <span class="sds-key">Option C</span>
@@ -169,25 +200,21 @@
   </div>
   <!-- /spn:generated -->
 </section>
-
 <section id="s5" data-block="comparison">
   <div class="sds-section-head"><h2>Deferred</h2></div>
   <p class="sds-standfirst">Parked, each with the event that brings it back.</p>
   <h3 id="s5-{{domain}}">{{Domain}}</h3>
-  <p class="sds-standfirst">{{What the heading would have said, as one sentence: the statement this subsection makes.}}</p>
+  <p class="sds-standfirst">{{HEADING-WOULD}}</p>
   <div class="sds-scroll"><table>
     <thead><tr><th>Parked</th></tr></thead>
     <tbody>
-      <tr><td><p><strong>{{item}}</strong></p><p>{{why not now, in a line}}</p><span class="sds-small">Needed for: {{the event that brings it back}}</span></td></tr>
+      <tr><td><p><strong>{{item}}</strong></p><p>{{WHY-NOW}}</p><span class="sds-small">Needed for: {{the event that brings it back}}</span></td></tr>
     </tbody>
   </table></div>
 </section>
-
 </div>
 </div>
-
 <footer>
   The approach template &middot; for the workstreams after 008 &middot; copy it and fill the slots &middot; the rules for this page are in <code>05-artifacts.md</code> and <code>01-workstream.md</code> &middot; every block and figure is shown once in <code>blocks-template.html</code>
 </footer>
-
-<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.16.0/sds-docs.js" integrity="sha384-HbsCKU7ded4eUbPoHAYnsqyTAmtmoiQLQga1Aer2INikS1vSU/h3C1jlu1qBX58N" crossorigin="anonymous"></script>
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.16.0/sds-docs.js" integrity="sha384-ylWgxoG5OtgS3kWBdUOPAaX0gFwX0L6YMXjJA2BjZWQU+MxZDzdAjh43QqeGQ6co" crossorigin="anonymous"></script>

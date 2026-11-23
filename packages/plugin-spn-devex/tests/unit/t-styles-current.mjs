@@ -59,6 +59,32 @@ console.log("=== styles on the design system — the docs classes read the produ
   ok("[MKT.SCRIPTS.588] the fonts are declared under the design system's names, DSDefaultText and DSDefaultCode, on the same two Geist files, and SDSText and SDSCode are gone",
     /font-family: DSDefaultText;[^}]*Geist-Variable\.woff2/.test(built) && /font-family: DSDefaultCode;[^}]*GeistMono-Variable\.woff2/.test(built) && !/SDSText|SDSCode/.test(built));
   ok("[MKT.SCRIPTS.589] the page script sets data-mode where a page names none", /setAttribute\('data-mode'/.test(readFileSync(join(STYLES, "sds-docs.js"), "utf8")));
+  const script = readFileSync(join(STYLES, "sds-docs.js"), "utf8");
+  ok("[MKT.SCRIPTS.589] the surface page builds its frame's document from the template named page, with design-system.css and the app's stylesheet linked, and sets the mode on the frame directly",
+    /getElementById\('page'\)/.test(script) && /frame\.srcdoc = pageDocument\(\)/.test(script) && /design-system\.css/.test(script) && /surface-app-css/.test(script)
+      && /documentElement\.setAttribute\('data-mode', state\.mode\)/.test(script));
+  ok("[MKT.SCRIPTS.589] the surface page sends no message and reads no preview-mode meta: the switches set the frame's own document",
+    !/postMessage/.test(script) && !/preview-mode/.test(script) && !/surface-page-preview/.test(script));
+  ok("[MKT.SCRIPTS.589] a page with no rail and three or more sections whose heads hold an h2 gets the rail from the script, and one with fewer gets none",
+    /secs\.length<3\)return/.test(script) && /sds-has-rail/.test(script) && /createElement\('nav'\);rail\.className='sds-rail'/.test(script));
+  ok("[MKT.SCRIPTS.589] a narrow page folds the rail into a menu under the title, opened by a button",
+    /sds-rail-toggle/.test(script) && /matchMedia\('\(max-width: 75rem\)'\)/.test(script));
+  ok("[MKT.SCRIPTS.589] the page grid puts the wrap first and the rail second, on the right, and a page template page has the whole width",
+    /\.sds-page > \.sds-wrap\{grid-column:1/.test(source) && /\.sds-page > \.sds-rail\{grid-column:2/.test(source) && /\.sds-page\[data-frame="page"\]\{grid-template-columns:minmax\(0,1fr\)\}/.test(source));
+  const token = (name) => new RegExp(`${name}:\\s*([0-9.]+)rem`).exec(source)?.[1];
+  const index = readFileSync(join(STYLES, "sds-index.js"), "utf8");
+  ok("[MKT.SCRIPTS.589] the widths of the regions are tokens: the reading width 58rem, the outline 13rem, the tree 13.5rem growing to 22rem, and the two folds 75rem and 88.5rem",
+    token("--sds-measure") === "58" && token("--sds-rail-width") === "13" && /--sds-tree-width:clamp\(13\.5rem,calc\(100vw - 77\.5rem\),22rem\)/.test(source) && token("--sds-outline-fold") === "75" && token("--sds-tree-fold") === "88.5");
+  ok("[MKT.SCRIPTS.589] the outline folds at the reading width plus the outline, its gap and the gutters, so the content never narrows below the reading width, and the tree folds first, at that and the tree's least width",
+    Number(token("--sds-outline-fold")) === Number(token("--sds-measure")) + Number(token("--sds-rail-width")) + 3 + 1 && Number(token("--sds-tree-fold")) === Number(token("--sds-outline-fold")) + 13.5
+      && Number(token("--sds-tree-fold")) > Number(token("--sds-outline-fold")));
+  ok("[MKT.SCRIPTS.589] the typed numbers agree with the tokens: the page's query and the page script at the outline's fold, the index's query and the index script at the tree's fold",
+    source.includes(`@media (max-width:${token("--sds-outline-fold")}rem){\n    .sds-page, .sds-page[data-frame="page"].sds-has-rail{`) && source.includes(`@media (max-width:${token("--sds-tree-fold")}rem){\n    .sds-index,.sds-index.sds-is-folded{`)
+      && script.includes(`matchMedia('(max-width: ${token("--sds-outline-fold")}rem)')`) && index.includes(`matchMedia('(max-width:${token("--sds-tree-fold")}rem)')`));
+  ok("[MKT.SCRIPTS.589] running text stops at the reading width, and a page's content column is never narrower than it where the outline stands",
+    /p\{margin:0 0 1rem; max-width:var\(--sds-measure\)\}/.test(source) && /\.sds-standfirst\{[^}]*max-width:var\(--sds-measure\)/.test(source) && /\.sds-page > \.sds-rail\{grid-column:2/.test(source));
+  ok("[MKT.SCRIPTS.589] the breadcrumb is a small muted line, and the rail's title reads the name over On this page",
+    /\.sds-crumb\{/.test(source) && /\.sds-rail-title::after\{content:"On this page"/.test(source) && /\.sds-crumb/.test(built) && /On this page/.test(built));
 }
 
 console.log("=== styles versions — a version that was cut never changes");

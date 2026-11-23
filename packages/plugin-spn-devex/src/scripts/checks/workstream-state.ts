@@ -15,7 +15,7 @@ import { cyclesOf, headerStatusRule, tableStatuses } from "../commands/docs/cycl
 import { isDir, isFile, listdir } from "../lib/payload.ts";
 import { linksSharedStyles } from "../../../../plugin-support-lib/src/lib/page-styles.ts";
 import {
-  DATA_FILES, FACTS_FILE, findingsFileOf, SHEET_FILE, LOG_FILE, NOTES, PREVIEW_FILE, approachOf, arcStatus, stepsMayStart, arcDataDir, arcIdsOf, factsFileOf, sheetFileOf, readSheet, firstOpenArc, leafRows, isDataLayout, logFileOf, markdownArcsOf,
+  DATA_FILES, FACTS_FILE, findingsFileOf, SHEET_FILE, LOG_FILE, NOTES, ARC_FILE, PREVIEW_FILE, arcPageNameOf, approachOf, arcStatus, stepsMayStart, arcDataDir, arcIdsOf, factsFileOf, sheetFileOf, readSheet, firstOpenArc, leafRows, isDataLayout, logFileOf, markdownArcsOf,
   NO_REPO, arcStamp, markdownIn, nameFileHolds, nameFileOf, notesDirOf, previewOf, questionsFileOf, readJsonl, readQuestions, stampsOn, stateFileOf,
   strayLevels, strayNotes, suggestionsFileOf, readJson, readArc, workstreamsOf, previewWithStatus, builtOf,
   localLinks, previewHrefOf, previewOwners, slotsIn, whatEntryOf, whatId, whatRange, workstreamName,
@@ -43,31 +43,31 @@ function filesUnder(dir: string, base = dir): string[] {
 }
 
 /**
- * A surface preview: a page whose `spn:doc` variant is `surface-page-preview` (RULE.DEVEX.WORKSPACE.534). It is the work's page
+ * A surface page: a page whose `spn:doc` variant is `surface-page` (or `surface-page-preview`, as the pages written before it) (RULE.DEVEX.WORKSPACE.534). It is the work's page
  * for one surface page, a viewer for the copy beside it, and never an arc's preview.
  */
 export function isSurfacePagePreview(path: string): boolean {
-  try { return /<!--\s*spn:doc[\s\S]*?"variant"\s*:\s*"surface-page-preview"/.test(readFileSync(path, "utf8")); } catch { return false; }
+  try { return /<!--\s*spn:doc[\s\S]*?"variant"\s*:\s*"surface-page(?:-preview)?"/.test(readFileSync(path, "utf8")); } catch { return false; }
 }
 
 /**
  * Q99: at most one preview per arc, by its fixed name, and no `previews/` folder. A file under `samples/` is a sample, never a preview: a
- * template copy named `arc-preview-template.html` there is read by the sample check, not this one. That every arc has its one
+ * template copy named `arc-template.html` there is read by the sample check, not this one. That every arc has its one
  * is `arcPreviewFindings`' (RULE.DEVEX.WORKSPACE.254).
  */
 export function previewFindings(ws: string, arc: string): string[] {
   const out: string[] = [];
   const notes = notesDirOf(ws, arc);
-  if (isDir(join(notes, "previews"))) out.push(`${arc} keeps a \`previews/\` folder — an arc's one preview is \`${NOTES}/${arc}/${PREVIEW_FILE}\``);
+  if (isDir(join(notes, "previews"))) out.push(`${arc} keeps a \`previews/\` folder — an arc's one page is \`${NOTES}/${arc}/${ARC_FILE}\``);
   for (const [base, under] of [[notes, `${NOTES}/${arc}`], [join(ws, "arcs", arc), `arcs/${arc}`]] as const)
     for (const file of filesUnder(base))
-      if (/preview[^/]*\.html$/i.test(file) && !(base === notes && file === PREVIEW_FILE) && !(base === notes && file.startsWith("samples/")) && !isSurfacePagePreview(join(base, file)))
-        out.push(`\`${under}/${file}\` is a second preview — an arc has at most one, \`${NOTES}/${arc}/${PREVIEW_FILE}\``);
+      if (/preview[^/]*\.html$/i.test(file) && !(base === notes && (file === ARC_FILE || file === PREVIEW_FILE)) && !(base === notes && file.startsWith("samples/")) && !isSurfacePagePreview(join(base, file)))
+        out.push(`\`${under}/${file}\` is a second preview — an arc has at most one page, \`${NOTES}/${arc}/${ARC_FILE}\``);
   return out;
 }
 
 /** The kinds of page the book has. A sample whose masthead names one is a page of the book the work produces. */
-export const BOOK_PAGE_KINDS: readonly string[] = ["approach", "preview", "construct", "overview", "report", "guide", "index", "hub"];
+export const BOOK_PAGE_KINDS: readonly string[] = ["approach", "preview", "construct", "overview", "report", "guide", "index", "hub", "page"];
 
 /** A review copy of one of the book's templates, named for it: `blocks-template.html`, `approach-template-v2.html`. */
 const TEMPLATE_COPY = /-template(?:-[^/.]+)?\.html?$/i;
@@ -155,7 +155,7 @@ export function nameFindings(ws: string, arc: string, data: ArcData): string[] {
 }
 
 /** The path a preview named by the arc sits at: the fixed place, or where a carried arc's `preview` field names it. */
-const previewPathOf = (ws: string, arc: string, data: ArcData): string => resolve(ws, previewHrefOf(arc, data));
+const previewPathOf = (ws: string, arc: string, data: ArcData): string => resolve(ws, previewHrefOf(arc, data, ws));
 
 /**
  * RULE.DEVEX.WORKSPACE.254: every arc has one preview, written when it opens; an arc's preview names another arc by its What,
@@ -164,7 +164,7 @@ const previewPathOf = (ws: string, arc: string, data: ArcData): string => resolv
 export function arcPreviewFindings(ws: string, arc: string, data: ArcData, owners: ReadonlyMap<string, string>): string[] {
   const out: string[] = [];
   const path = previewPathOf(ws, arc, data);
-  const href = previewHrefOf(arc, data);
+  const href = previewHrefOf(arc, data, ws);
   const number = workstreamName(ws).number;
   const inFolder = notesFolderOf(ws, path);
   if (inFolder && inFolder !== arc)
@@ -452,7 +452,7 @@ export function checkWorkstream(ws: string): Finding[] {
   }
   // THE PAGE RULES READ THE SAVED FILE, whichever way it was written: the Write and Edit hook reads only what is typed.
   for (const arc of arcIdsOf(ws))
-    for (const message of pageRulesOnDisk(previewOf(ws, arc))) out.push(say(arc, "pages")(`${NOTES}/${arc}/${PREVIEW_FILE}: ${message}`));
+    for (const message of pageRulesOnDisk(previewOf(ws, arc))) out.push(say(arc, "pages")(`${NOTES}/${arc}/${arcPageNameOf(ws, arc)}: ${message}`));
   if (page) for (const message of pageRulesOnDisk(page)) out.push(say(null, "pages")(`${basename(page)}: ${message}`));
   // A preview linked from What outside its arc's entry belongs to no arc's check.
   out.push(...whatLinkFindings(ws, page, text, owners).map(say(null, "stamp")));

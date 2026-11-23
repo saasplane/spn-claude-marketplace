@@ -679,4 +679,4 @@ Wear the spn-devex plugin's `refs/devex/agent/lenses/ux.md` while you place the 
 - **A site's bands follow the design system's three screen classes and no widths of their own** (`RULE.SUPPORT.SURFACE.588` · MUST · skill:spn-surface/design)
 - **Features that each answer their own question stand in sections of their own; one section holds several features only when they answer one question** (`RULE.SUPPORT.SURFACE.593` · MUST · skill:spn-surface/design)
 - **A choice left out is refused, never defaulted** (`RULE.SUPPORT.SURFACE.596` · MUST · skill:spn-surface/design)
-- **A page that shows a copy links the design system's stylesheet at the version the output names and the app's language stylesheet, sets `data-mode`, and runs no script** (`RULE.SUPPORT.SURFACE.597` · MUST · skill:spn-surface/design)
+- **The render returns markup only, and a page that shows a copy builds the page around it** (`RULE.SUPPORT.SURFACE.597` · MUST · skill:spn-surface/design)

@@ -202,7 +202,7 @@ spn-devex workstream question raise <workstream>/<arc> --file card.json (the car
 
 spn-devex workstream question brief <workstream>/Q<n> — print a fresh view's brief from the card: the problem and the constraints first, no options, the proposals to follow
 
-spn-devex workstream question show Q<n> --in <notes/<arc>/preview.html> — show an open card on an arc's preview, in its Open
+spn-devex workstream question show Q<n> --in <notes/<arc>/arc.html> — show an open card on an arc's page, in its Open
 
 spn-devex workstream question answer Q<n> --key <option> --words "…" [--entries E7,E9] — answer a card in your words; it leaves every Open; with --entries, folded into the What, cited, and the go written again
 

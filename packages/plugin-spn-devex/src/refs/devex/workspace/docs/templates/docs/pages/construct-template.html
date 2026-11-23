@@ -1,0 +1,136 @@
+<!-- RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § The four page kinds · § A construct's six sections, in one order · § A construct types no proof, and its rows sit at its own path · § The masthead, and the opening · § The Terms table, and what is not a Term · § The shape of a section, on every page kind · § How a page hands a reader on · § The templates — the pages, and the two seat files behind them · § The header — two lines, six fields, produced from the block · § A construct's status is derived, never typed · § The blocks — what a page reaches for instead of prose · § The figures — what sits inside a block, and the closed set of them · § One stylesheet, served in versions · § The page itself — its outline, its rail, its width and its furniture
+     and docs/04-capabilities/01-devex/04-workspace/04-docs/01-corpus.md § The readability bar
+     This file holds the structure of a construct page and states no rule: the sections in order
+     with their ids, the slots, and the two lines that load the shared stylesheet and script, which `docs page` copies into every page it
+     produces from a seat file. The sections above state every rule for writing the page. -->
+<!-- Placeholders:
+     {{TITLE}} the page's heading, the promise the page makes: the `<h1>` only
+     {{NAME}} the page's short name, at most three words (RULE.DEVEX.WORKSPACE.517): the block's title, written in the `<title>`, the outline's title, the eyebrow's last segment, the breadcrumb of a page below it and the page's entry in an index
+     {{SUMMARY}} The Description's first sentence, word for word.
+     {{UP-HREF}} THE ADDRESS OF THE OVERVIEW THAT LINKS FORWARD TO THIS PAGE, ending in .html
+     {{UP}} THAT OVERVIEW&rsquo;S PAGE NAME
+     {{SUBTITLE}} THE SUBTITLE: the promise, one plain sentence, from the seat block's subtitle field.
+     {{LEAD}} THE DESCRIPTION, one paragraph, from the seat file's first lead paragraph: what this thing is, in everyday words; why you would read this page; then at most two short sentences on how the page runs.
+     {{PROBLEM-READER}} THE PROBLEM, in the reader's own terms, before any SaaS Plane word is used to solve it.
+     {{CHANGES-BECAUSE}} WHAT CHANGES because this construct exists, and what a reader should believe by the end of this page.
+     {{FIRST-TIME}} FOR A FIRST-TIME READER: "If this is your first …" — what to unlearn, and the sentences to keep. The detail is the Model's.
+     {{DEFINITION-READER}} a definition the reader understands on this line
+     {{ORDER-NEWCOMER}} &hellip; in the order a newcomer meets the words; a term the contract does not spell has an empty Contract term cell
+     {{OVERVIEW-LOOKING}} The overview: what you are looking at, in prose first. Then the general shape before any part. What follows is BLOCKS, each of a kind chosen by what it explains — the two below are examples of kinds, not a fixed order, and a model that has no contract has no code block.
+     {{THREE-STEPS}} Three steps in order, left to right.
+     {{EXAMPLE-BLOCK}} EXAMPLE block, only when the model has a contract: one sentence saying what you are looking at, then the contract as declared, a comment per member.
+     {{WHY-SHAPED}} Why it is shaped so — the prose says why, never what the comments already say.
+     {{H-PER}} One h3 per part, in reading order; h4 inside. Each part is blocks, kinds chosen by content — the three below show three kinds.
+     {{PART-FIXED}} Part that is a fixed list — a CATALOG block
+     {{PART-RULE}} Part that is a rule — a MUST block
+     {{RULE-SENTENCE}} The rule, in one sentence.
+     {{WHY-HAPPENS}} Then why, and what happens when it is broken.
+     {{SUB-PART}} Sub-part — a REASONS block
+     {{DEEP-CONCEPT}} As deep as the concept needs. A part stops where another construct continues — name it once and link it.
+     {{AFTER-PARTS}} After the parts, in plain prose: this page answers {{X}}. It does not answer {{Y}} — that is <a href="#">{{construct}}</a>, and you read it next when {{the situation}}.
+     {{CHAPTER-RD}} chapter or RD.X.NNN
+     {{DECIDES-LINE}} what it decides, in a line -->
+<meta charset="utf-8">
+<title>{{NAME}}</title>
+<!-- spn:doc
+{"id": "{{slug}}", "variant": "construct", "title": "{{NAME}}", "lenses": ["{{LENS}}"], "status": "IMPLEMENTING", "dependsOn": ["{{id}}"], "summary": "{{SUMMARY}}"}
+-->
+
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.16.0/sds-docs.css" integrity="sha384-iPi3diDZaIbK3FmnUfnnZOQs6LAv12kHUr2Ks3xVSjhgtMDB4DLKrG03lDgsjzPC" crossorigin="anonymous">
+<div class="sds-page">
+
+<nav class="sds-rail" id="rail">
+  <div class="sds-rail-title">{{NAME}}</div>
+</nav>
+<div class="sds-wrap">
+<p class="sds-crumb"><a href="{{UP-HREF}}">&larr; {{UP}}</a></p>
+
+<header class="sds-masthead">
+  <div class="sds-eyebrow"><span class="sds-line1">{{WORKSPACE}} &nbsp;|&nbsp; {{LOCATION}} &nbsp;|&nbsp; {{NAME}}</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Construct</span><span class="sds-separator">|</span><span class="sds-label">For:</span> <span class="sds-audience"><span class="sds-badge sds-lens">{{ROLE}}</span><span class="sds-badge sds-lens">{{ROLE}}</span></span><span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-implementing">&#x1F6A7; IMPLEMENTING</span></span></span></div>
+  <h1>{{TITLE}}</h1>
+  <p class="sds-subtitle">{{SUBTITLE}}</p>
+  <p class="sds-standfirst">{{LEAD}}</p>
+</header>
+
+<section id="s0" data-block="reasons">
+  <div class="sds-section-head"><h2>Overview</h2></div>
+  <p>{{PROBLEM-READER}}</p>
+  <p>{{CHANGES-BECAUSE}}</p>
+  <p>{{FIRST-TIME}}</p>
+</section>
+
+<section id="s1" data-block="glossary">
+  <div class="sds-section-head"><h2>Terms</h2></div>
+  <div class="sds-scroll"><table class="sds-terms">
+    <thead><tr><th>Term</th><th>Contract term</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td><strong>{{Estate}}</strong></td><td><code>{{ContractTerm}}</code></td><td>{{DEFINITION-READER}}</td></tr>
+      <tr><td><strong>{{Ring}}</strong></td><td></td><td>{{ORDER-NEWCOMER}}</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="s2" data-block="map">
+  <div class="sds-section-head"><h2>Model</h2></div>
+  <p>{{OVERVIEW-LOOKING}}</p>
+<figure class="dl-figure">
+<div class="dl-frame">
+<svg class="dl-svg" viewBox="0 0 928 80" role="img" aria-label="{{THREE-STEPS}}">
+  <rect class="dl-tile-on" x="200" y="16" width="140" height="48" rx="10"/>
+  <text class="dl-name" x="212" y="37">{{Step}}</text>
+  <text class="dl-detail" x="212" y="52">{{what it settles}}</text>
+  <path class="dl-wire" d="M340 40 L396 40"/>
+  <rect class="dl-tile" x="396" y="16" width="140" height="48" rx="10"/>
+  <text class="dl-name" x="408" y="37">{{Step}}</text>
+  <text class="dl-detail" x="408" y="52">{{what it settles}}</text>
+  <path class="dl-wire" d="M536 40 L592 40"/>
+  <rect class="dl-tile" x="592" y="16" width="140" height="48" rx="10"/>
+  <text class="dl-name" x="604" y="37">{{Step}}</text>
+  <text class="dl-detail" x="604" y="52">{{what it settles}}</text>
+</svg>
+</div>
+<figcaption>{{What to notice.}}</figcaption>
+</figure>
+  <p>{{EXAMPLE-BLOCK}}</p>
+  <pre data-lang="ts">export enum {{SPContractType}} {
+  {{MEMBER}} = '{{member}}',   // what this member means
+}</pre>
+  <p>{{WHY-SHAPED}}</p>
+</section>
+
+<section id="s3" data-block="reasons">
+  <div class="sds-section-head"><h2>Parts</h2></div>
+  <p>{{H-PER}}</p>
+  <h3 id="p1">{{PART-FIXED}}</h3>
+  <div class="sds-scroll"><table>
+    <thead><tr><th>{{Key}}</th><th>{{Example}}</th><th>{{Why it exists}}</th></tr></thead>
+    <tbody><tr><td><code>{{key}}</code></td><td><code>{{value}}</code></td><td>{{&hellip;}}</td></tr></tbody>
+  </table></div>
+  <h3 id="p2">{{PART-RULE}}</h3>
+  <p><strong>{{RULE-SENTENCE}}</strong> {{WHY-HAPPENS}}</p>
+  <h4>{{SUB-PART}}</h4>
+  <p>{{DEEP-CONCEPT}}</p>
+</section>
+
+<section id="s4" data-block="reasons">
+  <div class="sds-section-head"><h2>Boundary</h2></div>
+  <p>{{AFTER-PARTS}}</p>
+</section>
+
+<section id="s5" data-block="comparison">
+  <div class="sds-section-head"><h2>Binds</h2></div>
+  <div class="sds-scroll"><table>
+    <thead><tr><th>Rule</th><th>Weight</th></tr></thead>
+    <tbody><tr><td><p><a href="#"><code>{{CHAPTER-RD}}</code></a></p><p>{{DECIDES-LINE}}</p></td><td>MUST</td></tr></tbody>
+  </table></div>
+  <p>Try it: <code>{{one command a reader can run}}</code></p>
+</section>
+
+</div>
+</div>
+
+<footer>
+  A template &middot; <code>docs page</code> produces the page from its seat file &middot; the rules for this page are in <code>05-artifacts.md</code> &middot; every block and figure is shown once in <code>blocks-template.html</code>
+</footer>
+
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.16.0/sds-docs.js" integrity="sha384-ylWgxoG5OtgS3kWBdUOPAaX0gFwX0L6YMXjJA2BjZWQU+MxZDzdAjh43QqeGQ6co" crossorigin="anonymous"></script>

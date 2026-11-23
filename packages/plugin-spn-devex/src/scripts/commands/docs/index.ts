@@ -67,7 +67,7 @@ function pagesUnder(folder: string): string[] {
   });
 }
 
-/** A page's name is the `title` of its block, and its `<title>` where it has no block. */
+/** A page's name is the `name` of its block, its `title` where it has none, and its `<title>` where it has no block. */
 function factsOf(file: string): PageFacts {
   const text = readFileSync(file, "utf8");
   let block: Record<string, unknown> = {};
@@ -75,7 +75,8 @@ function factsOf(file: string): PageFacts {
   if (found) { try { block = JSON.parse(found[1]) as Record<string, unknown>; } catch { block = {}; } }
   const stem = basename(file, ".html");
   const tab = /<title>([\s\S]*?)<\/title>/.exec(text)?.[1];
-  const title = typeof block.title === "string" && block.title ? block.title : (tab ? plainText(tab) : "") || stem;
+  // The entry is the page's short name: the block's `name`, or its `title` where it has none, or its `<title>`; a numbered name keeps its number, drawn plainly.
+  const title = typeof block.name === "string" && block.name.trim() ? block.name.trim() : typeof block.title === "string" && block.title ? block.title : (tab ? plainText(tab) : "") || stem;
   const kind = typeof block.variant === "string" && block.variant ? block.variant : stem.slice(stem.lastIndexOf("-") + 1);
   return { text, title, kind, source: typeof block.source === "string" ? block.source : null };
 }
@@ -245,7 +246,7 @@ function indexPage(template: string, tree: Tree, where: { organisation: string; 
   around = swap(around, /\{\{WORKSPACE\}\}/, escaped(where.organisation), "slot `{{WORKSPACE}}`");
   around = swap(around, /\{\{REPOSITORY\}\}/, escaped(where.location), "slot `{{REPOSITORY}}`");
   // THE HEAD CARD names the repository and opens its hub, so the hub is the way back and the side needs no other.
-  around = swap(around, /\{\{THE ADDRESS OF THE HUB[^}]*\}\}/g, attribute(where.hub), "slot for the address of the hub");
+  around = swap(around, /\{\{UP-HREF\}\}/g, attribute(where.hub), "slot `{{UP-HREF}}`");
   around = swap(around, /\{\{NAME OF THE REPOSITORY\}\}/g, escaped(basename(where.repository)), "slot `{{NAME OF THE REPOSITORY}}`");
   refuseSlots(around, TEMPLATE);
   // The data sits in a script element, so a `<` in it is written as its escape and can never close the element.

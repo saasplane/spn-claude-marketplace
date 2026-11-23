@@ -324,7 +324,7 @@ console.log("\n=== the name file — RULE.DEVEX.WORKSPACE.264");
   ok("it holds the title, the goal, the status, what it decides, its repos and its links, in that order",
     order.every((part, at) => text.indexOf(part) >= 0 && (at === 0 || text.indexOf(part) > text.indexOf(order[at - 1]))), text);
   ok("its links: the arc on the page first, then the preview and the plan that are on disk",
-    text.includes("[the arc on the approach page](../../approach.html#N001) · [preview](../../notes/N001/preview.html) · [plan](../../notes/N001/plan.md)") && !text.includes("samples"), text);
+    text.includes("[the arc on the approach page](../../approach.html#N001) · [arc page](../../notes/N001/preview.html) · [plan](../../notes/N001/plan.md)") && !text.includes("samples"), text);
   ok("no rows and no log", !text.includes("write the book") && !text.includes("log.jsonl"));
   ok("it holds against its data", lib.nameFileHolds(ws, data, text));
   ok("red: a hand edit of the goal does not hold", !lib.nameFileHolds(ws, data, text.replace("the probe is answered", "something else")));

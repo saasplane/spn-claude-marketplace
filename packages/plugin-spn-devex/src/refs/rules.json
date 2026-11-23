@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "book": {
     "repository": "spn-foundation",
-    "commit": "50de1165"
+    "commit": "82842d32"
   },
   "rules": [
     {
@@ -7307,7 +7307,7 @@
         "check": "corpus"
       },
       "class": "checked",
-      "sentence": "A hub has no link above its rail",
+      "sentence": "A hub has no breadcrumb above its masthead",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "The templates — the pages, and the two seat files behind them",
       "decision": null,
@@ -8074,7 +8074,7 @@
         "check": "workstream-owner"
       },
       "class": "checked",
-      "sentence": "Every arc has one preview, and its name is fixed: `notes/N<nnn>/preview.html`",
+      "sentence": "Every arc has one page, and its name is fixed: `notes/N<nnn>/arc.html`",
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "An arc carries its specification, or names the note that holds it",
       "decision": null,
@@ -13177,6 +13177,11 @@
           "plugin": "spn-devex",
           "path": "refs/devex/workspace/docs/doc-sets.md",
           "heading": "Every page opens on a masthead of three levels"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/docs/doc-sets.md",
+          "heading": "The templates sit beside the chapters, in templates/"
         }
       ]
     },
@@ -13425,7 +13430,7 @@
       "level": "GUIDE",
       "params": {},
       "class": "guidance",
-      "sentence": "A surface preview is a page template of its own, in `templates/surface/`, used for a surface page review of a site's or an app's pages, and only once the app's design language exists",
+      "sentence": "A surface preview is one file, the surface page template in `templates/surface/`, used for a surface page review of a site's or an app's pages, and only once the app's design language exists",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "The surface preview",
       "decision": null,
@@ -13444,7 +13449,7 @@
         "skill": "spn-devex/ideate"
       },
       "class": "stated in a skill",
-      "sentence": "The preview holds a bar and a frame, and nothing else",
+      "sentence": "The page holds a bar and the page's markup, and nothing else",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "The surface preview",
       "decision": null,
@@ -13468,7 +13473,7 @@
         "skill": "spn-devex/ideate"
       },
       "class": "stated in a skill",
-      "sentence": "The copy names its own mode switch and holds its notes, and it is just the page when opened alone",
+      "sentence": "The page names the design system and the app's stylesheet in two metas, and the shared script builds the frame's document",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "The surface preview",
       "decision": null,
@@ -13482,11 +13487,6 @@
           "plugin": "spn-devex",
           "path": "skills/ideate/SKILL.md",
           "heading": "The rules this step holds"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/steps/page-preview.md",
-          "heading": "Traps"
         }
       ]
     },
@@ -13497,7 +13497,7 @@
         "skill": "spn-devex/ideate"
       },
       "class": "stated in a skill",
-      "sentence": "The bar's message, the meta and the note marker change only with a new stylesheet version",
+      "sentence": "The frame's document, the metas and the note marker change only with a new stylesheet version",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "The surface preview",
       "decision": null,
@@ -13815,7 +13815,7 @@
         "skill": "spn-devex/ideate"
       },
       "class": "stated in a skill",
-      "sentence": "A page whose sidebar lists other pages is the index page, built from `templates/pages/index-template.html`, and it never has a sidebar of its own",
+      "sentence": "A page whose sidebar lists other pages is the index page, built from `templates/docs/pages/index-template.html`, and it never has a sidebar of its own",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "The index of artifacts — one page that opens every other",
       "decision": null,
@@ -38237,7 +38237,7 @@
         "skill": "spn-surface/design"
       },
       "class": "stated in a skill",
-      "sentence": "A page that shows a copy links the design system's stylesheet at the version the output names and the app's language stylesheet, sets `data-mode`, and runs no script",
+      "sentence": "The render returns markup only, and a page that shows a copy builds the page around it",
       "chapter": "04-capabilities/02-support/01-surface/11-delivery-library/01-common/02-render.md",
       "heading": "A page that shows a copy",
       "decision": null,

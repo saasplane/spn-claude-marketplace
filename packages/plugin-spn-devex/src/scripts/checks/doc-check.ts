@@ -223,8 +223,8 @@ function pocketKind(parts: string[]): { place: string; suffix: string } | null {
 }
 const NODE_MANIFESTS = ["spkind.json", "spinfrapkg.json"];
 const SKIP = new Set(["node_modules", ".git", "dist", "build", "coverage", "tool-results", ".output", ".nx"]);
-/** An arc's one preview, `.spndevex/workstreams/<state>/<NNN>-<subject>/notes/<arc>/preview.html` (RULE.DEVEX.WORKSPACE.262). */
-const ARC_PREVIEW = new RegExp(`\\/${workstreamPrefixSource()}[^/]+\\/notes\\/N\\d+\\/preview\\.html$`);
+/** An arc's one page, `.spndevex/workstreams/<state>/<NNN>-<subject>/notes/<arc>/arc.html`, or `preview.html` where it was written before that name (RULE.DEVEX.WORKSPACE.262). */
+const ARC_PREVIEW = new RegExp(`\\/${workstreamPrefixSource()}[^/]+\\/notes\\/N\\d+\\/(?:arc|preview)\\.html$`);
 
 const MD_LINK = /!?\[([^\]]*)\]\([^)]*\)/g;
 const MD_BLOCK_START = /^(?:#{1,6}\s|[-*+]\s|\d+[.)]\s)/;
@@ -654,15 +654,42 @@ function workstreamTemplates(): string | null {
   return null;
 }
 
-/** Whether a page's `spn:doc` block says its variant is `surface-page-preview`. */
-export const isSurfacePreviewText = (text: string): boolean => /<!--\s*spn:doc[\s\S]*?"variant"\s*:\s*"surface-page-preview"/.test(text);
+/** Whether a page's `spn:doc` block says it is a surface page: variant `surface-page`, or `surface-page-preview` as the pages written before it were. */
+export const isSurfacePreviewText = (text: string): boolean => /<!--\s*spn:doc[\s\S]*?"variant"\s*:\s*"surface-page(?:-preview)?"/.test(text);
+
+const LEGACY_SURFACE_PAGE = /<!--\s*spn:doc[\s\S]*?"variant"\s*:\s*"surface-page-preview"/;
 
 /**
- * RULE.DEVEX.WORKSPACE.535: a surface preview holds a bar and a frame and nothing else. It is held to the template: no `{{…}}` slot
- * left in, the bar with the page's title and the width, mode and Notes switches, a frame whose address is the copy beside the page
- * (a relative path, never another site), and no section, table, list or paragraph of the page's own words, which belong in the copy.
+ * RULE.DEVEX.WORKSPACE.535 and .536: a surface page holds a bar and the page's markup, and nothing else. It is held to the template: no
+ * `{{…}}` slot left in, the bar with the page's title and the width, mode and Notes switches, a frame, one `<template id="page">` that
+ * holds the markup, and the two metas that name the design system's version and the app's stylesheet. Words of the page's own stand in
+ * the template, never beside the bar. A page written with the variant `surface-page-preview` is held to the shape it had, a frame over a
+ * copy beside it.
  */
 export function surfacePageShape(text: string): Finding[] {
+  if (LEGACY_SURFACE_PAGE.test(text)) return legacySurfacePageShape(text);
+  const parts: string[] = [];
+  const bare = text.replace(/<!--[\s\S]*?-->/g, " ");
+  const slots = (bare.match(/\{\{[^{}\n]*\}\}/g) ?? []).length;
+  if (slots) parts.push(`still holds ${slots} template slot${slots === 1 ? "" : "s"}`);
+  const switches = ["width", "mode", "notes"].filter((one) => !new RegExp(`data-surface="${one}"`).test(bare));
+  if (!/class="sds-surface-bar"/.test(bare) || !/class="sds-surface-title"/.test(bare)) parts.push("has no bar with the page's title");
+  else if (switches.length) parts.push(`has no ${switches.join(" and no ")} switch in its bar`);
+  if (!/<iframe\b[^>]*class="[^"]*sds-surface-frame[^"]*"[^>]*>/.test(bare)) parts.push("has no frame for the page");
+  if (!/<template\s+id="page"[^>]*>/.test(bare)) parts.push("has no `<template id=\"page\">` holding the page's markup");
+  const ds = /<meta\s+name="surface-ds"\s+content="([^"]*)"/.exec(bare)?.[1];
+  if (ds === undefined) parts.push("has no `surface-ds` meta naming the design system's version");
+  else if (!slots && !/^\d+\.\d+\.\d+$/.test(ds.trim())) parts.push(`names \`${ds}\` in its \`surface-ds\` meta, which is no version`);
+  const app = /<meta\s+name="surface-app-css"\s+content="([^"]*)"/.exec(bare)?.[1];
+  if (app === undefined) parts.push("has no `surface-app-css` meta naming the app's stylesheet");
+  else if (!slots && app.trim() && /^([a-z][a-z0-9+.-]*:|\/)/i.test(app.trim())) parts.push("names an app stylesheet that is no relative path (it is empty for Surface's own look)");
+  const outside = bare.replace(/<template\b[\s\S]*?<\/template>/i, " ").replace(/<header\b[\s\S]*?<\/header>/i, "");
+  if (/<(?:h2|h3|section|table|ul|ol|p)\b/i.test(outside)) parts.push("holds words of its own beside the bar and the template");
+  if (!parts.length) return [];
+  return [["RULE", `a surface page ${parts.join(", and ")} (RULE.DEVEX.WORKSPACE.535, .536) · keep to the template: the bar, the frame and the page's markup in its template, with the two metas`]];
+}
+
+function legacySurfacePageShape(text: string): Finding[] {
   const parts: string[] = [];
   const bare = text.replace(/<!--[\s\S]*?-->/g, " ");
   const slots = (bare.match(/\{\{[^{}\n]*\}\}/g) ?? []).length;
@@ -682,11 +709,12 @@ export function surfacePageShape(text: string): Finding[] {
 }
 
 /**
- * RULE.DEVEX.WORKSPACE.536: the copy a surface preview frames names its own mode switch in a `preview-mode` meta and listens for the
- * bar's message `{ "surface-page-preview": { mode, notes } }`, whichever way it was made. Read only where the framed copy sits beside the
- * preview as a file; a copy that is not there is not judged here.
+ * The copy a legacy surface preview frames names its own mode switch in a `preview-mode` meta and listens for the bar's message. A surface
+ * page has no copy beside it, so only a page written with the variant `surface-page-preview` is read. Read only where the framed copy sits
+ * beside the preview as a file; a copy that is not there is not judged here.
  */
 export function surfacePageCopy(path: string, text: string): Finding[] {
+  if (!LEGACY_SURFACE_PAGE.test(text)) return [];
   const bare = text.replace(/<!--[\s\S]*?-->/g, " ");
   const src = /<iframe\b[^>]*class="[^"]*sds-surface-frame[^"]*"[^>]*\bsrc="([^"]*)"/.exec(bare)?.[1];
   if (!src || /^([a-z][a-z0-9+.-]*:|\/)/i.test(src)) return [];
@@ -700,7 +728,7 @@ export function surfacePageCopy(path: string, text: string): Finding[] {
 }
 
 /** An arc's preview, by its fixed name in `notes/<arc>/` (`N<nnn>`, `ideate` or `follow-ups`). */
-const isArcPreview = (path: string): boolean => new RegExp(`[\\\\/]notes[\\\\/]${ARC_PART}[\\\\/]preview\\.html$`).test(path);
+const isArcPreview = (path: string): boolean => new RegExp(`[\\\\/]notes[\\\\/]${ARC_PART}[\\\\/](?:arc|preview)\\.html$`).test(path);
 
 // A comment every page keeps: the restated chapter, the page's `spn:doc` block, the approach page's `spn:closing` shape (replaced by the closing block at the close), the markers of a generated block, and the `no figure:` line that says why a long What has no figure.
 const KEPT_COMMENT = /^\s*(?:RESTATES:|spn:doc\b|spn:closing\b|\/?spn:generated\b|no figure:)/;
@@ -721,7 +749,7 @@ export function templateShape(path: string, text: string, template: string | nul
   let model = template;
   if (model === null) {
     const dir = workstreamTemplates();
-    try { model = dir ? readFileSync(join(dir, preview ? "arc-preview-template.html" : "approach-template.html"), "utf8") : ""; }
+    try { model = dir ? readFileSync(join(dir, preview ? "arc-template.html" : "approach-template.html"), "utf8") : ""; }
     catch { model = ""; }
   }
   const parts: string[] = [];
@@ -1436,7 +1464,7 @@ export function check(path: string, text: string, fragment = false): Finding[] {
   // A figure comes from a spec (RULE.DEVEX.WORKSPACE.523): one drawn by hand is named on every page and seat file this reads.
   out.push(...handDrawnRule(path, text));
   // A page of a repository's pocket, and a workstream's own pages (an approach page, a preview) while open.
-  if (isHtml && !fragment && (inPocket(path) || ((isApproach || /-?preview\.html$/.test(path)) && workstreamOf(path) !== null && !inClosedWorkstream(path))))
+  if (isHtml && !fragment && (inPocket(path) || ((isApproach || /(?:-?preview|arc)\.html$/.test(path)) && workstreamOf(path) !== null && !inClosedWorkstream(path))))
     out.push(...nameRule(text));
 
   // Where a paragraph, a list or a callout should have been a block: a page of a bounded kind, and a construct's seat file.
@@ -1470,7 +1498,7 @@ export function sidebarRule(text: string): Finding[] {
     .filter(([, attrs]) => !/\bclass="[^"]*\bsds-rail\b/.test(attrs) && !/\bid="rail"/.test(attrs))
     .filter(([, , inside]) => [...inside.matchAll(/<a\b[^>]*\bhref="([^"#][^"]*)"/gi)].filter(([, href]) => !/^[a-z][a-z0-9+.-]*:/i.test(href)).length >= 2);
   return sidebars.length
-    ? [["RULE", "this page holds a sidebar of links to other pages. Only the index of artifacts has one, built from `templates/pages/index-template.html` " +
+    ? [["RULE", "this page holds a sidebar of links to other pages. Only the index of artifacts has one, built from `templates/docs/pages/index-template.html` " +
       "with each entry a page; a page that lists pages becomes an index of its own, or links its pages in a catalog (05-artifacts.md, the block table)"]]
     : [];
 }
@@ -1492,9 +1520,15 @@ export function nameRule(text: string): Finding[] {
   const out: Finding[] = [];
   const block = /<!--\s*spn:doc\s*(\{[\s\S]*?\})\s*-->/.exec(text);
   let title = "";
-  if (block) { try { title = String((JSON.parse(block[1]) as { title?: unknown }).title ?? ""); } catch { title = ""; } }
-  // A workstream's number in front of its page's name is an address, not a word of the name: `040 - Hiring Demo Ready`.
-  title = title.replace(/^\d{3}\s*(?:·\s*\S+\s*)?-\s+/, "");
+  if (block) {
+    try {
+      const parsed = JSON.parse(block[1]) as { title?: unknown; name?: unknown };
+      title = String((typeof parsed.name === "string" && parsed.name.trim() ? parsed.name : parsed.title) ?? "");
+    } catch { title = ""; }
+  }
+  // The number in front of a numbered name is an address, not a word of the name: `041 Improvements`, `N018 Docs tooling`, `03 Surface Types`
+  // (and `040 - Hiring Demo Ready`, as the pages written before it).
+  title = title.replace(/^(?:\d{2,3}|N\d{3})\s*(?:·\s*\S+\s*)?-\s+/, "").replace(/^(?:\d{2,3}|N\d{3})\s+(?=\S)/, "");
   // A fourth word is kept for one fixed term that breaks if cut, so four words warn and five refuse.
   const grade = (n: number): "RULE" | "SOFT" => (n > NAME_LIMIT + 1 ? "RULE" : "SOFT");
   if (title && !/\{\{/.test(title) && (counted(title) > NAME_LIMIT || /[.?!:]$/.test(title)))
@@ -1518,7 +1552,7 @@ export function nameRule(text: string): Finding[] {
  * and 233 (`where-tree.ts`). A page in a closed workstream, and any other file, return none.
  */
 export function pageRulesOnDisk(path: string): string[] {
-  const isPreview = /(?:^|[\\/])(?:[^\\/]*-)?preview\.html$/.test(path);
+  const isPreview = /(?:^|[\\/])(?:(?:[^\\/]*-)?preview|arc)\.html$/.test(path);
   if (!path.endsWith(".html") || !(isPreview || isApproachPage(path))) return [];
   const home = workstreamOf(path);
   if (!home || inClosedWorkstream(path) || exemptWorkstream(path)) return [];
@@ -1575,7 +1609,7 @@ export function itemCellPage(path: string): boolean {
   if (isApproachPage(path) || base === HUB) return true;
   if (/-(overview|construct)\.html$/.test(base)) return true;
   // An arc's preview, by its fixed name in `notes/<arc>/` (`N<nnn>`, `ideate` or `follow-ups`), or a preview outside any workstream.
-  return new RegExp(`[\\\\/]notes[\\\\/]${ARC_PART}[\\\\/]preview\\.html$`).test(path) || /-preview\.html$/.test(base);
+  return new RegExp(`[\\\\/]notes[\\\\/]${ARC_PART}[\\\\/](?:arc|preview)\\.html$`).test(path) || /-preview\.html$/.test(base);
 }
 
 /**

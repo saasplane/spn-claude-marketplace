@@ -85,7 +85,7 @@ import { checkHowItRuns } from "../checks/how-it-runs.ts";
 import { checkPartnerWords } from "../checks/partner-words.ts";
 import { checkPagePath } from "../checks/page-path.ts";
 import { checkWorkstream, heldByStop } from "../checks/workstream-state.ts";
-import { PREVIEW_FILE, approachOf, arcDataDir, arcStatus, stepsMayStart, arcIdsOf, leafRows, logLinesOf, notesDirOf, previewOf, previewWouldChange, readArc, readJsonl, readQuestions, readyRows, stateFileOf,
+import { ARC_FILE, PREVIEW_FILE, approachOf, arcDataDir, arcStatus, stepsMayStart, arcIdsOf, leafRows, logLinesOf, notesDirOf, previewOf, previewWouldChange, readArc, readJsonl, readQuestions, readyRows, stateFileOf,
          suggestionsFileOf, workstreamsOf } from "../lib/workstream.ts";
 import { findWorkingDetail } from "../lib/working-detail.ts";
 import { readAreas, type AreaViews } from "../lib/areas.ts";
@@ -439,7 +439,7 @@ const SAMPLES = "samples";
 export function notesFiles(arc: string): string[] {
   const folder = notesDirOf(homeOf(arc), idOf(arc));
   const out: string[] = [];
-  for (const name of [PREVIEW_FILE, "plan.md"]) {
+  for (const name of [ARC_FILE, PREVIEW_FILE, "plan.md"]) {
     try { if (statSync(join(folder, name)).isFile()) out.push(join(folder, name)); } catch { /* absent */ }
   }
   const walk = (dir: string): void => {
@@ -471,7 +471,7 @@ export const previewAsWritten = (text: string): string =>
 function notesSignature(files: string[]): string {
   return createHash("sha256").update(files.map((file) => {
     try {
-      if (basename(file) === PREVIEW_FILE) return `${file}\u0000${previewAsWritten(readFileSync(file, "utf8"))}`;
+      if (basename(file) === ARC_FILE || basename(file) === PREVIEW_FILE) return `${file}\u0000${previewAsWritten(readFileSync(file, "utf8"))}`;
       const stat = statSync(file);
       return `${file}\u0000${stat.size}\u0000${stat.mtimeMs}`;
     } catch { return file; }

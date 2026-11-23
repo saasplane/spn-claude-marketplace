@@ -96,7 +96,7 @@ export function handoverBlock(ws: string, said: { continue?: string; doNotTouch?
   const values: Array<[string, string]> = [
     ["continue", said.continue && finds ? `${said.continue} ${finds[0].toUpperCase()}${finds.slice(1)}` : continuing],
     ["model", `${leadData?.model ?? "unchanged"}.`],
-    ["read first", `approach.html#${whatId(lead)}; notes/${lead}/preview.html; arcs/${lead}/log.jsonl, its last lines.`],
+    ["read first", `approach.html#${whatId(lead)}; notes/${lead}/arc.html; arcs/${lead}/log.jsonl, its last lines.`],
     ["pins", `${pins.size ? [...pins].join("; ") : "none read"}.`],
     ["state", `${state.join("; ") || "no arc"}.`],
     ["live now", `${live.length ? live.join("; ") : "nothing running"}.`],

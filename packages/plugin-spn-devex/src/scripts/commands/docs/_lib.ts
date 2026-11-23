@@ -14,7 +14,7 @@
 import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync, statSync } from "node:fs";
 import { dirname, join, resolve, basename, relative } from "node:path";
 import { fileURLToPath } from "node:url";
-import { docsRoot, hrefForPage, renderPage } from "../../lib/render.ts";
+import { docsRoot, hrefForPage, nameWords, renderPage } from "../../lib/render.ts";
 import { cardsOf } from "../../checks/split-plan.ts";
 import { STATUSES } from "../../checks/arc-status.ts";
 import { masthead, type MastheadKind } from "../../checks/doc-check.ts";
@@ -59,14 +59,14 @@ export type Finding = { check: string; grade: Grade; file: string; message: stri
 //
 // A PREVIEW is a page a workstream shows the developer before the work is built. It sits in
 // `notes/N<nnn>/previews/`, its file name ends `-preview.html`, and it is written from
-// `workstream/arc-preview-template.html`. It carries no fixed outline.
+// `workstream/arc-template.html`. It carries no fixed outline.
 /**
  * The kinds a document's block may declare. `guide` and `index` are the two produced pages beside
  * a construct page (05-artifacts.md § The guide page, § The index of artifacts).
  */
 export const VARIANTS = ["approach", "overview", "construct", "behaviors", "capability", "report",
                   "face", "data_model", "surface_map", "route_map", "register", "preview",
-                  "guide", "index"] as const;
+                  "guide", "index", "page"] as const;
 export type Variant = (typeof VARIANTS)[number];
 
 /** The words a preview's Status chip shows: the arc's status, `PROPOSED` until the design is decided (RULE.DEVEX.WORKSPACE.266). */
@@ -336,6 +336,11 @@ export function checkBlock(file: string, src: string, block: any, err: string | 
   }
   if ("keywords" in block && (!Array.isArray(block.keywords) || block.keywords.length < 1))
     add("SOFT", "`keywords` is present but carries nothing");
+  // `name` is the page's short name where `title` is longer: the tab, the outline's title, the eyebrow and the index entry (RULE.DEVEX.WORKSPACE.517).
+  if ("name" in block) {
+    if (typeof block.name !== "string" || !block.name.trim()) add("RULE", "`name` is the page's short name, a few words, and it is present but empty");
+    else if (nameWords(block.name) > 3) add("RULE", `\`name\` is ${nameWords(block.name)} words, and a short name is at most three (RULE.DEVEX.WORKSPACE.517)`);
+  }
   return f;
 }
 
@@ -677,14 +682,17 @@ export function checkHeader(file: string, src: string, block: any): Finding[] {
   const line1 = h.match(/class="sds-line1"[^>]*>([\s\S]*?)<\/span>/);
   if (shared && !line1) add("RULE", "no identity line — `{workspace} | {location} | {title}`");
   else if (shared && line1) {
-    const parts = text(line1[1]).split("|").map((p) => p.trim()).filter(Boolean);
-    if (parts.length !== 3) add("RULE", `the identity line carries ${parts.length} fields, not three`);
-    else if (parts[2] !== text(block.title)) add("RULE", `the header title \`${parts[2]}\` is not the block's \`${block.title}\``);
+    // A workstream's own pages, the approach page and an arc's page, chain their levels with ` · ` and end on the page's numbered name:
+    // `SaaS Plane · 041 Improvements`, `SaaS Plane · 041 Improvements · N018 Docs tooling`. Every other page has the three fields.
+    const chained = block.variant === "approach" || block.variant === "preview";
+    const parts = text(line1[1]).split(chained ? "·" : "|").map((p) => p.trim()).filter(Boolean);
+    if (chained ? parts.length < 2 || parts.length > 3 : parts.length !== 3) add("RULE", chained ? `the identity line carries ${parts.length} levels, not two or three` : `the identity line carries ${parts.length} fields, not three`);
+    else if (parts[parts.length - 1] !== text(typeof block.name === "string" && block.name.trim() ? block.name : block.title))
+      add("RULE", `the header title \`${parts[2]}\` is not the block's ${typeof block.name === "string" && block.name.trim() ? `name \`${block.name}\`` : `\`${block.title}\``}`);
   }
 
   // AN OVERVIEW IS NAMED IN THE MASTHEAD AND PROMISES IN ITS `h1`, and the template says so in its
-  // own placeholders: one slot asks for `{{PAGE NAME: Concept · Infra · Shape}}` and the other for
-  // `{{The promise, as a short sentence…}}`. Requiring both to equal the block title made that
+  // own placeholders: one slot is `{{NAME}}`, the short name, and the other is `{{TITLE}}`, the promise. Requiring both to equal the block title made that
   // impossible, so all forty overviews put the promise in all three and the tab strip read as forty
   // sentences. Every other kind's name and title are the same words, which is why this hid.
   const h1 = headings(src, "h1").map(text);
@@ -2492,7 +2500,7 @@ export function statusFor(seat: string, workspace: string, write: boolean, say: 
  * of its own today; when it does, it is rendered from the seat, never from the template.
  */
 export function furniture(templates: string): { stylesheet: string; script: string; footer: string } {
-  const template = readFileSync(join(templates, "pages", "construct-template.html"), "utf8");
+  const template = readFileSync(join(templates, "docs", "pages", "construct-template.html"), "utf8");
   const named = (file: string): string => file.replace(/\./g, "\\.");
   const stylesheet = new RegExp(`<link\\b[^>]*\\bhref="[^"]*${named(STYLESHEET)}"[^>]*>`, "i").exec(template)?.[0];
   const script = new RegExp(`<script\\b[^>]*\\bsrc="[^"]*${named(PAGE_SCRIPT)}"[^>]*>\\s*</script>`, "i").exec(template)?.[0];
@@ -3288,10 +3296,17 @@ export function checkConstructLink(file: string, src: string): Finding[] {
   return f;
 }
 
+/** The address a page's back link opens: its breadcrumb, `p.sds-crumb`, or the link at the top of its rail, `a.sds-home`, in a page written before the breadcrumb. */
+export function backLinkOf(src: string): string | null {
+  const crumb = /<p class="sds-crumb"[^>]*><a\b[^>]*?href="([^"]*)"/.exec(src);
+  if (crumb) return crumb[1];
+  return /<a class="sds-home"[^>]*?href="([^"]*)"/.exec(src)?.[1] ?? null;
+}
+
 /**
  * In its back link and its previous and next doors, a page opens a page.
  *
- * The back link at the top of the rail (`a.sds-home`) and the two doors of the `NEXT` block
+ * The back link, the breadcrumb above the masthead (`p.sds-crumb`) or, in a page written before it, the first link of the rail (`a.sds-home`), and the two doors of the `NEXT` block
  * (`a.sds-nextnav-card` inside `div.sds-nextnav`) open a page that ends in `.html`; a markdown file
  * walks a markdown file by its own footer. A link inside the content, Where to go next included, may
  * open anything a reader needs for reference. An anchor after the path is fine, and a link to another
@@ -3306,8 +3321,8 @@ export function checkRailLinks(file: string, src: string): Finding[] {
     f.push({ check: "rail", grade: "RULE", file, message:
       `${where} opens \`${href}\` — the back link and the previous and next doors open a page that ends in \`.html\`; only a link inside the content may open a markdown file` });
   };
-  const back = src.match(/<a class="sds-home"[^>]*?href="([^"]*)"/);
-  if (back) refuse("the back link", back[1]);
+  const back = backLinkOf(src);
+  if (back) refuse("the back link", back);
   for (const nav of src.matchAll(/<div class="sds-nextnav"[^>]*>([\s\S]*?)<\/div>/g))
     for (const door of nav[1].matchAll(/<a\b([^>]*)>/g)) {
       const attributes = door[1];
@@ -3366,7 +3381,8 @@ export function checkWayBack(file: string, src: string, block: any): Finding[] {
   const kind = walkKindOf(file, block);
   if (!kind) return [];
   // The index's way back is its head card, which opens the hub; every other page's is the back link.
-  const back = src.match(/<a class="sds-home" href="([^"]*)"/) ?? (kind === "index" ? src.match(/<a class="sds-rail-brand" href="([^"]*)"/) : null);
+  const found = backLinkOf(src) ?? (kind === "index" ? src.match(/<a class="sds-rail-brand" href="([^"]*)"/)?.[1] ?? null : null);
+  const back = found === null ? null : [found, found];
   const rule = (message: string): Finding[] => [{ check: "rail", grade: "RULE", file, message }];
   if (kind === "hub" || kind === "approach")
     return back ? rule(`the way back opens \`${back[1]}\` — ${kind === "hub" ? "the hub is the top of a repository's chain" : "an approach page is the top of a workstream's chain"}, so it carries no way back`) : [];

@@ -135,12 +135,15 @@
 
 /* THE TOKENS, each with its dark value. A page never writes a colour or a size of its own. */
 /* THE WIDTHS OF A PAGE are four of them: `--sds-page-max` is the cap of a page and of its footer,
-   `--sds-measure` is the longest line of running text, `--sds-rail-width` is the rail beside a page, and
-   `--sds-tree-width` is the tree of the index: what a window leaves once a page inside the index has its rail,
+   `--sds-measure` is the longest line of running text, `--sds-rail-width` is the outline beside a page, and
+   `--sds-tree-width` is the tree of the index: what a window leaves once a page inside the index has its outline,
    gap, measure and gutters, so the page's text keeps its full line. No script and no page sets a width.
-   A media query cannot read a token, so the two points where the layout changes stay typed numbers:
-   60rem, where a page and the index turn to one column, and 40rem, where a page takes the whole
-   window. After a change of `--sds-page-max`, look at both. */
+   THE WINDOW WIDTHS WHERE THE LAYOUT FOLDS are tokens too: `--sds-outline-fold` is 75rem, the measure, the outline, its
+   gap and the gutters (58 + 13 + 3 + 1), below which the outline folds into a menu under the title, so the content never
+   narrows below the measure; `--sds-tree-fold` is 88.5rem, that and the tree's least width (13.5), below which the tree of
+   the index folds above the pages, so it folds first. A media query cannot read a token, so the same numbers are typed in the
+   queries and in the scripts, and `t-styles-current` holds them equal. 40rem is where a page takes the whole window.
+   After a change of `--sds-page-max`, `--sds-measure` or `--sds-rail-width`, change both folds. */
 @layer theme {
   :root{
     --sds-weight-heading:var(--font-weight-bold);
@@ -177,7 +180,7 @@
     --sds-orange-soft:#fdebd3; --sds-page-max:80rem;
     /* the statuses of approach and preview pages, docs tokens, one value per mode */
     --sds-status-planning:oklch(0.767462 0.171331 61.6975); --sds-status-planning-soft:oklch(0.810515 0.145533 67.1324 / 0.2); --sds-status-implementing:oklch(0.3949 0.0942473 244.756); --sds-status-implementing-soft:oklch(0.3949 0.0942473 244.756 / 0.14); --sds-status-done:oklch(0.735386 0.13145 144.907); --sds-status-done-soft:oklch(0.767314 0.115667 145.001 / 0.18); --sds-status-proposed:rgb(107, 83, 0); --sds-status-proposed-soft:rgb(251, 241, 196); --sds-status-decided:oklch(0.570136 0.196001 256.188); --sds-status-decided-soft:oklch(0.699265 0.146593 249.792 / 0.13); --sds-status-running:rgb(165, 80, 0); --sds-status-running-soft:rgb(253, 235, 211); --sds-status-held:oklch(0.439 0 0); --sds-status-held-soft:oklch(0.97 0 0); --sds-status-part-landed:rgb(90, 102, 28); --sds-status-part-landed-soft:rgb(237, 240, 216); --sds-status-landed:oklch(0.735386 0.13145 144.907); --sds-status-landed-soft:oklch(0.767314 0.115667 145.001 / 0.18); --sds-status-carried:rgb(27, 106, 134); --sds-status-carried-soft:rgb(219, 238, 244); --sds-status-dropped:oklch(0.582835 0.202194 29.0717); --sds-status-dropped-soft:oklch(0.724946 0.15472 25.82 / 0.14);
-    --sds-measure:58rem; --sds-rail-width:13rem; --sds-tree-width:clamp(13.5rem,calc(100vw - 77.5rem),22rem);
+    --sds-measure:58rem; --sds-rail-width:13rem; --sds-tree-width:clamp(13.5rem,calc(100vw - 77.5rem),22rem); --sds-outline-fold:75rem; --sds-tree-fold:88.5rem;
   }
   :root[data-mode="dark"]{
     --sds-tk-k:var(--sds-violet); --sds-tk-s:var(--sds-cyan); --sds-tk-c:var(--fg-quiet); --sds-tk-t:var(--surface-brand); --sds-tk-n:var(--sds-orange); --sds-tk-add:var(--on-success-subtle); --sds-tk-del:var(--on-error-subtle);
@@ -214,6 +217,19 @@
   .sds-rail a.sds-is-current{@apply text-accent border-l-accent; font-weight:var(--font-weight-semibold)}
   .sds-rail .sds-count{@apply ml-auto font-ui bg-gap-soft text-gap-ink; font-size:var(--font-content-xs-size); line-height:var(--font-content-xs-line-height); font-weight:var(--font-weight-semibold); border-radius:calc(var(--radius-sm) - 2px); padding:.125rem .4rem}
   .sds-wrap{@apply flex flex-col gap-13 min-w-0}
+  /* The rail is the page's outline, on the right of the content: the wrap comes first and the rail second, and the rail's title reads the
+     page's name over "On this page". A page with no rail (the page template) has the whole width, and the script gives it a rail
+     when it holds three or more sections. The breadcrumb is a small muted line above the masthead, back to where the reader came from. */
+  .sds-page > .sds-wrap{grid-column:1; grid-row:1}
+  .sds-page > .sds-rail{grid-column:2; grid-row:1}
+  .sds-page[data-frame="page"]{grid-template-columns:minmax(0,1fr)}
+  .sds-page[data-frame="page"].sds-has-rail{grid-template-columns:minmax(0,1fr) var(--sds-rail-width)}
+  .sds-page[data-frame="page"] > .sds-wrap{width:100%}
+  .sds-crumb{@apply font-ui text-xs text-fact m-0; max-width:none}
+  .sds-crumb a{@apply text-fact no-underline}
+  .sds-crumb a:hover{@apply text-accent}
+  .sds-rail-title::after{content:"On this page"; display:block; margin-top:.25rem; text-transform:none; letter-spacing:0; font-weight:var(--font-weight-regular)}
+  .sds-rail-toggle{display:none; font:inherit; color:inherit; background:none; border:0; padding:0; cursor:pointer}
   .sds-masthead{@apply flex flex-col; gap:1.1rem}
   .sds-eyebrow{@apply flex flex-col gap-2 font-ui text-xs text-fact}
   .sds-eyebrow .sds-line{@apply flex flex-wrap items-center; gap:.4rem .6rem; line-height:var(--font-content-md-line-height)}
@@ -357,9 +373,13 @@
   .sds-open .sds-scroll{margin:.4rem 0}
   pre.sds-preview{@apply font-mono text-xs overflow-x-auto leading-normal; background:var(--surface); border:1px solid var(--surface-border); border-radius:var(--radius-lg); padding:.7rem .9rem; margin:1rem 0}
   footer{@apply font-ui text-xs text-fact; border-top:1px solid var(--sds-rule); padding-top:1.3rem}
-  @media (max-width:60rem){
-    .sds-page{@apply gap-6 pt-8; grid-template-columns:minmax(0,1fr)}
+  @media (max-width:75rem){
+    .sds-page, .sds-page[data-frame="page"].sds-has-rail{@apply gap-6 pt-8; grid-template-columns:minmax(0,1fr)}
+    .sds-page > .sds-wrap, .sds-page > .sds-rail{grid-column:auto; grid-row:auto}
     .sds-rail{@apply static bg-card; border:1px solid var(--sds-rule); border-radius:var(--radius-sm); padding:.9rem 1rem}
+    .sds-rail-title{display:none}
+    .sds-rail-toggle{display:block; width:100%; text-align:left; font-weight:var(--font-weight-semibold)}
+    .sds-rail:not(.sds-is-open) > a{display:none}
     .sds-rail a{@apply pl-0; border-left:none}
     .sds-rail a.sds-is-current{border-left:none}
   }
@@ -841,7 +861,7 @@
 
   /* The index on a narrow screen: the side sits above the tabs. Folded, it is one line that holds the fold
    button and the head card. The script folds the tree at the start, and after a page is chosen. */
-  @media (max-width:60rem){
+  @media (max-width:88.5rem){
     .sds-index,.sds-index.sds-is-folded{grid-template-columns:minmax(0,1fr); grid-template-rows:auto minmax(0,1fr)}
     .sds-index-side,.sds-index.sds-is-folded .sds-index-side{@apply static bg-card; overflow-y:auto; border-right:0; border-bottom:1px solid var(--sds-rule); padding:.5rem .6rem; max-height:70dvh}
     .sds-index.sds-is-folded .sds-index-side{@apply flex-row items-center}

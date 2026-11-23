@@ -68,9 +68,9 @@ console.log("\n=== its status is worked out, and it needs no rows");
 console.log("\n=== where it is read");
 {
   // The ideate arc's one preview is filled once it is decided.
-  writeFileSync(join(ws, "notes", "ideate", "preview.html"), PREVIEW);
+  writeFileSync(join(ws, "notes", "ideate", "arc.html"), PREVIEW);
   // the follow-up arc reads LANDED once every suggestion is settled (none is raised), so its preview is filled too; both role arcs have their Plan row and What entry
-  writeFileSync(join(ws, "notes", "follow-ups", "preview.html"), PREVIEW);
+  writeFileSync(join(ws, "notes", "follow-ups", "arc.html"), PREVIEW);
   await writeRolePageParts(ws, ["ideate", "follow-ups"]);
   for (const arc of ["ideate", "follow-ups"]) cli(root, ["workstream", "arc", "stamp", "write", `031/${arc}`]);
   cli(root, ["docs", "cycles", "write", "031"]);

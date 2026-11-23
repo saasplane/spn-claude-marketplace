@@ -31,7 +31,7 @@
   window.addEventListener('message',function(event){var data=event.data;if(event.source!==window.parent||window.parent===window||!data||data.sds!=='mode')return;if(data.mode!=='light'&&data.mode!=='dark')return;root.setAttribute('data-mode-chosen','');root.setAttribute('data-mode',data.mode);drawModeButton();Array.prototype.forEach.call(panes.querySelectorAll('iframe'),tellMode);});
   var data=JSON.parse(store.textContent);
   var tabs=[],rows=[],groups=[],shown=null,clock=0;
-  var narrow=window.matchMedia?window.matchMedia('(max-width:60rem)'):null;
+  var narrow=window.matchMedia?window.matchMedia('(max-width:88.5rem)'):null;
 
   /* WHERE A PAGE IS. `data.base` is the one place the path to the pages is kept. A page marked `beside`
      sits next to the index itself, which only a sample does. */

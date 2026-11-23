@@ -93,7 +93,7 @@ const lacks = (s) => (got) => !String(got).includes(s);
     one("[MKT.SCRIPTS.110] a link out of the seat tree is expressed against the page's own folder", page,
         has(`href="../../../../${SEAT.capabilities}/x.md"`));
     one("[MKT.SCRIPTS.110] the rail's home link is expressed against it too, not shipped as `../README.md`", page,
-        (g) => g.includes(`class="sds-home" href="../../../../${SEAT.constructs}/README.md"`));
+        (g) => g.includes(`class="sds-crumb"><a href="../../../../${SEAT.constructs}/README.md"`));
     one("[MKT.SCRIPTS.110] every relative link of the page names a file that is there",
         [...page.matchAll(/href="(\.[^"#]*)/g)].map((found) => found[1]).filter((href) => absent(ws, join(dirname(pageOf("01-core", "thing")), href))), (g) => g.length === 0);
     // THE AUDIT HAS TO HAVE READ THE PAGES for its silence about them to mean anything, so the case
@@ -103,7 +103,7 @@ const lacks = (s) => (got) => !String(got).includes(s);
     // A PRODUCED PAGE CARRIES THE TEMPLATE'S TWO LINES, AND NOTHING ELSE OF ITS FURNITURE. The line
     // that links the shared stylesheet sits above the page, and the line that loads the shared
     // script closes it. Both are read from the book's own template, so the version is the book's.
-    const bookTemplate = readFileSync(resolve(templates, "pages", "construct-template.html"), "utf8");
+    const bookTemplate = readFileSync(resolve(templates, "docs", "pages", "construct-template.html"), "utf8");
     const linkLine = bookTemplate.match(/<link\b[^>]*sds-docs\.css"[^>]*>/)[0];
     const scriptLine = bookTemplate.match(/<script\b[^>]*sds-docs\.js"[^>]*><\/script>/)[0];
     const pagePath = pageOf("01-core", "thing");
@@ -123,8 +123,8 @@ const lacks = (s) => (got) => !String(got).includes(s);
     // A template that also holds a style block and a script with code gives the same page: the two
     // lines are taken, and nothing else.
     const more = mkdtempSync(join(tmpdir(), "spn-templates-"));
-    mkdirSync(join(more, "pages"));
-    writeFileSync(join(more, "pages", "construct-template.html"),
+    mkdirSync(join(more, "docs", "pages"), { recursive: true });
+    writeFileSync(join(more, "docs", "pages", "construct-template.html"),
                   bookTemplate + "\n<style>.mine{color:red}</style>\n<script>/* a script with code */</script>\n");
     process.env.SPN_TEMPLATES = more;
     run(ws, ["page", "write", seatPath]);
@@ -132,7 +132,7 @@ const lacks = (s) => (got) => !String(got).includes(s);
 
     // KNOWN-BAD: a template with no line that loads the shared stylesheet. A page produced from it
     // would link no shared file, so the command refuses and the page on disk stays as it is.
-    writeFileSync(join(more, "pages", "construct-template.html"), bookTemplate.replace(linkLine, ""));
+    writeFileSync(join(more, "docs", "pages", "construct-template.html"), bookTemplate.replace(linkLine, ""));
     const refused = run(ws, ["page", "write", seatPath]);
     one("known-bad: a template with no line that loads the shared stylesheet is refused, and the finding names the file",
         refused, (g) => g.includes("RULE page") && g.includes("holds no line that loads `sds-docs.css`"));
@@ -169,8 +169,8 @@ const lacks = (s) => (got) => !String(got).includes(s);
     // edit to the note made every one of them stale at once. The template here carries a marked
     // footer, so the case fails if any of it reaches the page.
     const noted = mkdtempSync(join(tmpdir(), "spn-templates-"));
-    mkdirSync(join(noted, "pages"));
-    writeFileSync(join(noted, "pages", "construct-template.html"),
+    mkdirSync(join(noted, "docs", "pages"), { recursive: true });
+    writeFileSync(join(noted, "docs", "pages", "construct-template.html"),
       bookTemplate.replace(/<footer>[\s\S]*?<\/footer>/, "") +
       "\n<footer>AUTHOR-NOTE: copy this template, keep the comments</footer>\n");
     process.env.SPN_TEMPLATES = noted;
@@ -267,11 +267,11 @@ console.log("\n=== the rail names the page, and the way back opens the overview 
     page, has('<div class="sds-rail-title">The Thing Itself</div>'));
   one("and never the word it replaced", page, lacks('<div class="sds-rail-title">Outline</div>'));
   one("[MKT.SCRIPTS.110] the way back opens the overview whose own links name the construct, a page and never a markdown file",
-    page, has(`class="sds-home" href="../b-second-overview.html">&larr; Second Overview`));
+    page, has(`class="sds-crumb"><a href="../b-second-overview.html">&larr; Second Overview`));
   one("[MKT.SCRIPTS.110] another construct of the domain goes to the overview that names it, not to the first",
-    readAt(ws, pageOf("01-core", "other")), has(`class="sds-home" href="../a-first-overview.html">&larr; First Overview`));
+    readAt(ws, pageOf("01-core", "other")), has(`class="sds-crumb"><a href="../a-first-overview.html">&larr; First Overview`));
   one("[MKT.SCRIPTS.110] a construct no overview names goes to the domain's first overview",
-    readAt(ws, pageOf("01-core", "stray")), has(`class="sds-home" href="../a-first-overview.html"`));
+    readAt(ws, pageOf("01-core", "stray")), has(`class="sds-crumb"><a href="../a-first-overview.html"`));
   one("so the old category label is gone", page, lacks("&larr; the model"));
   one("and the audit finds no rail finding on any of the three",
     run(ws, ["audit", "check", POCKET_DOCS, "--finding", "rail"]), (g) => /clean/.test(g));
@@ -294,7 +294,7 @@ console.log("\n=== the rail names the page, and the way back opens the overview 
       '<!-- spn:doc\n{"id":"hub","variant":"overview","title":"The Hub","lenses":["ARCHITECT"],"summary":"s"}\n-->\n<h1>x</h1>\n' });
   run(withHub, ["page", "write", `docs/${SEAT.constructs}/01-core/thing.md`]);
   one("[MKT.SCRIPTS.110] a domain with no overview goes back to the hub page",
-    readAt(withHub, pageOf("01-core", "thing")), has(`class="sds-home" href="../../concept-overview.html">&larr; The Hub`));
+    readAt(withHub, pageOf("01-core", "thing")), has(`class="sds-crumb"><a href="../../concept-overview.html">&larr; The Hub`));
   const bare = repo(files);
   run(bare, ["page", "write", `docs/${SEAT.constructs}/01-core/thing.md`]);
   one("with no overview and no hub the constructs face stands, rather than a link to nothing",

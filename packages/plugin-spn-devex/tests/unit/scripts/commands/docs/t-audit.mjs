@@ -1179,7 +1179,7 @@ console.log("\n=== a page's furniture is the shared files': a version that exist
   one("a page `docs page` produced links the shared stylesheet, and the audit finds it clean", audit(produced),
     // The page takes its two lines from the template, so it links the version the template links.
     (g) => /<link rel="stylesheet" href="[^"]*\/assets\/docs\/\d+\.\d+\.\d+\/sds-docs\.css" integrity="sha384-[^"]+" crossorigin="anonymous">/.test(produced)
-      && produced.includes(/<link rel="stylesheet"[^>]*>/.exec(readFileSync(resolve(templates, "pages", "construct-template.html"), "utf8"))[0])
+      && produced.includes(/<link rel="stylesheet"[^>]*>/.exec(readFileSync(resolve(templates, "docs", "pages", "construct-template.html"), "utf8"))[0])
       && g.includes("clean — 1 page"));
   one("known-bad: the same page edited by hand is not what the seat produces",
     audit(produced.replace("<h2>Model</h2>", "<h2>Model</h2>\n<p>typed into the page</p>")), has("✗ RULE produced"));
@@ -1406,7 +1406,7 @@ console.log("\n=== a preview page: variant `preview`, its own title, a Status ch
 {
   // THE BOOK'S OWN TEMPLATE GIVES THE TWO LINES, so a clean case links what the book links.
   const templates = TEMPLATES_DIR;
-  const previewTemplate = readFileSync(resolve(templates, "workstream", "arc-preview-template.html"), "utf8");
+  const previewTemplate = readFileSync(resolve(templates, "workstream", "arc-template.html"), "utf8");
   const linkLine = previewTemplate.match(/<link\b[^>]*sds-docs\.css"[^>]*>/)[0];
   const scriptLine = previewTemplate.match(/<script\b[^>]*sds-docs\.js"[^>]*><\/script>/)[0];
   const notes = `.spndevex/${WORKSTREAMS}/open/001-a/notes/N001`;
@@ -1416,7 +1416,7 @@ console.log("\n=== a preview page: variant `preview`, its own title, a Status ch
   const state = (word) => `<span class="sds-state"><span class="sds-label">Status:</span> <a class="sds-badge sds-status sds-${word.toLowerCase()}">${word}</a></span>`;
   const page = (o, { chip = state("PROPOSED"), named = o.title, heading = o.title, own = "" } = {}) =>
     block(o) + `${linkLine}\n${own}<nav class="sds-rail" id="rail"></nav>\n<header class="sds-masthead">\n` +
-    `<div class="sds-eyebrow"><span class="sds-line1">SaaS Plane &nbsp;|&nbsp; Workstream 001 &nbsp;|&nbsp; ${named}</span>` +
+    `<div class="sds-eyebrow"><span class="sds-line1">SaaS Plane &middot; 001 A &middot; ${named}</span>` +
     `<span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Preview</span><span class="sds-separator">|</span>` +
     `<span class="sds-label">Shown:</span> <span class="sds-badge">2026-10-01</span>${chip}</span></div>\n` +
     `<h1>${heading}</h1>\n<p class="sds-subtitle">Decides how the page is laid out.</p>\n` +
@@ -1461,11 +1461,11 @@ console.log("\n=== a preview page: variant `preview`, its own title, a Status ch
     audit({ [`${notes}/samples/broken-preview.html`]: broken }, `${notes}/samples/broken-preview.html`),
     (got) => has("a sample, a template and a bundled copy are not audited as pages")(got) && lacks("RULE")(got));
   one("a template file is not audited as a page, wherever it sits",
-    audit({ [`${notes}/previews/arc-preview-template.html`]: previewTemplate }, `${notes}/previews/arc-preview-template.html`),
+    audit({ [`${notes}/previews/arc-template.html`]: previewTemplate }, `${notes}/previews/arc-template.html`),
     (got) => has("a sample, a template and a bundled copy are not audited as pages")(got) && lacks("RULE")(got));
   one("a notes folder is audited for its previews alone — the sample and the template beside it are not counted",
     audit({ [at]: page(good), [`${notes}/samples/broken-preview.html`]: broken, [`${notes}/samples/close-message.md`]: "Closing.\n",
-            [`${notes}/samples/arc-preview-template.html`]: previewTemplate }, notes),
+            [`${notes}/samples/arc-template.html`]: previewTemplate }, notes),
     has("clean — 1 page"));
 }
 

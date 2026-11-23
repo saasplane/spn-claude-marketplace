@@ -42,7 +42,7 @@ export const SPREAD_TABLE = 5;
 /** The page kind a path is, or null where the content is not held to the page-kind bounds. */
 export function fitKind(path: string): FitKind | null {
   const base = basename(path);
-  if (/(?:^|[\\/])notes[\\/][^\\/]+[\\/]preview\.html$/.test(path) || /-preview\.html$/.test(base) || base === "preview.html") return "preview";
+  if (/(?:^|[\\/])notes[\\/][^\\/]+[\\/](?:arc|preview)\.html$/.test(path) || /-preview\.html$/.test(base) || base === "preview.html" || base === "arc.html") return "preview";
   if (base === "approach.html" || base.endsWith("-approach.html")) return "approach";
   if (base.endsWith("-overview.html")) return "overview";
   // A construct page is produced from its seat file, which is read in its place.

@@ -3,17 +3,30 @@
      its head card, its tree, the folded column's group marks, the tabs, the block of data that holds the tree, and the lines that load the shared stylesheet
      and the index's script. `docs index` writes the tree from the pages on disk. The sections above state
      every rule. -->
+<!-- Placeholders:
+     {{PAGE-LISTS}} What this page lists, in one sentence.
+     {{UP-HREF}} THE ADDRESS OF THE HUB: base, then the path of the hub
+     {{BASE-PATH}} BASE: the path from this page to the pages, ending in a slash. It is empty when this page sits in docs/artifacts.
+     {{PATH-BASE}} PATH: from base to the page. The hub sits in docs/.
+     {{DOMAIN-HAS}} DOMAIN: it has one overview, so it opens that overview
+     {{OVERVIEW-TITLE}} OVERVIEW: its title
+     {{PATH-BASE-2}} PATH: from base to the page. An overview sits in docs/, in the folder of its domain.
+     {{CONSTRUCT-TITLE}} CONSTRUCT: its title
+     {{PATH-BASE-3}} PATH: from base to the page. A construct sits in the constructs/ folder of its domain.
+     {{DOMAIN-HAS-2}} DOMAIN: it has more than one overview, so it is a folder
+     {{PATH-BASE-4}} PATH: from base to the page.
+     {{PATH-BASE-5}} PATH: from base to the page. A report sits in reports/. -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Index Template</title>
 <!-- spn:doc
-{"id": "{{slug}}", "variant": "index", "title": "{{NAME}}", "summary": "{{What this page lists, in one sentence.}}"}
+{"id": "{{slug}}", "variant": "index", "title": "{{NAME}}", "summary": "{{PAGE-LISTS}}"}
 -->
-<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.16.0/sds-docs.css" integrity="sha384-iWEdPPpgS7KEpaxAuL1aWPVR0lfgWDibcmX6gnRP6QAISVJCNl//yz2faqNcvmq7" crossorigin="anonymous">
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.16.0/sds-docs.css" integrity="sha384-iPi3diDZaIbK3FmnUfnnZOQs6LAv12kHUr2Ks3xVSjhgtMDB4DLKrG03lDgsjzPC" crossorigin="anonymous">
 <div class="sds-index" id="index">
   <aside class="sds-index-side" id="index-side">
     <div class="sds-rail-head">
-      <a class="sds-rail-brand" href="{{THE ADDRESS OF THE HUB: base, then the path of the hub}}" title="Open the hub of {{NAME OF THE REPOSITORY}}" aria-label="Docs for {{NAME OF THE REPOSITORY}}: open its hub">
+      <a class="sds-rail-brand" href="{{UP-HREF}}" title="Open the hub of {{NAME OF THE REPOSITORY}}" aria-label="Docs for {{NAME OF THE REPOSITORY}}: open its hub">
         <span class="sds-rail-mark"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m16 6 4 14"/><path d="M12 6v14"/><path d="M8 8v12"/><path d="M4 4v16"/></svg></span>
         <span class="sds-rail-words"><span class="sds-rail-name">{{NAME OF THE REPOSITORY}}</span><span class="sds-rail-place">{{WORKSPACE}} · {{REPOSITORY}}</span></span>
       </a>
@@ -21,7 +34,7 @@
     </div>
     <nav class="sds-tree" id="index-tree" aria-label="Pages"></nav>
     <div class="sds-rail-marks" id="index-marks" aria-label="Groups of pages"></div>
-    <noscript><p class="sds-index-note">This index needs its script to list the pages. Start at <a href="{{THE ADDRESS OF THE HUB: base, then the path of the hub}}">the hub</a>.</p></noscript>
+    <noscript><p class="sds-index-note">This index needs its script to list the pages. Start at <a href="{{UP-HREF}}">the hub</a>.</p></noscript>
   </aside>
   <main class="sds-index-main">
     <div class="sds-tabs" id="index-tabs" role="tablist" aria-label="Open pages"></div>
@@ -50,7 +63,7 @@
      holds a slot opens a tab that says the page is a slot, and nothing is loaded. -->
 <script type="application/json" id="index-data">
 {
- "base": "{{BASE: the path from this page to the pages, ending in a slash. It is empty when this page sits in docs/artifacts.}}",
+ "base": "{{BASE-PATH}}",
  "tabs": 8,
  "groups": [
   {
@@ -59,48 +72,48 @@
     {
      "label": "{{HUB: its title}}",
      "kind": "overview",
-     "path": "{{PATH: from base to the page. The hub sits in docs/.}}"
+     "path": "{{PATH-BASE}}"
     },
     {
      "label": "{{AREA}}",
      "children": [
       {
-       "label": "{{DOMAIN: it has one overview, so it opens that overview}}",
-       "title": "{{OVERVIEW: its title}}",
+       "label": "{{DOMAIN-HAS}}",
+       "title": "{{OVERVIEW-TITLE}}",
        "kind": "overview",
-       "path": "{{PATH: from base to the page. An overview sits in docs/, in the folder of its domain.}}",
+       "path": "{{PATH-BASE-2}}",
        "children": [
         {
-         "label": "{{CONSTRUCT: its title}}",
+         "label": "{{CONSTRUCT-TITLE}}",
          "kind": "construct",
-         "path": "{{PATH: from base to the page. A construct sits in the constructs/ folder of its domain.}}"
+         "path": "{{PATH-BASE-3}}"
         }
        ]
       },
       {
-       "label": "{{DOMAIN: it has more than one overview, so it is a folder}}",
+       "label": "{{DOMAIN-HAS-2}}",
        "children": [
         {
-         "label": "{{OVERVIEW: its title}}",
+         "label": "{{OVERVIEW-TITLE}}",
          "kind": "overview",
-         "path": "{{PATH: from base to the page. An overview sits in docs/, in the folder of its domain.}}",
+         "path": "{{PATH-BASE-2}}",
          "children": [
           {
-           "label": "{{CONSTRUCT: its title}}",
+           "label": "{{CONSTRUCT-TITLE}}",
            "kind": "construct",
-           "path": "{{PATH: from base to the page. A construct sits in the constructs/ folder of its domain.}}"
+           "path": "{{PATH-BASE-3}}"
           }
          ]
         },
         {
-         "label": "{{OVERVIEW: its title}}",
+         "label": "{{OVERVIEW-TITLE}}",
          "kind": "overview",
-         "path": "{{PATH: from base to the page. An overview sits in docs/, in the folder of its domain.}}",
+         "path": "{{PATH-BASE-2}}",
          "children": [
           {
-           "label": "{{CONSTRUCT: its title}}",
+           "label": "{{CONSTRUCT-TITLE}}",
            "kind": "construct",
-           "path": "{{PATH: from base to the page. A construct sits in the constructs/ folder of its domain.}}"
+           "path": "{{PATH-BASE-3}}"
           }
          ]
         }
@@ -116,7 +129,7 @@
     {
      "label": "{{GUIDE: its title}}",
      "kind": "guide",
-     "path": "{{PATH: from base to the page.}}"
+     "path": "{{PATH-BASE-4}}"
     }
    ]
   },
@@ -126,11 +139,11 @@
     {
      "label": "{{REPORT: its title}}",
      "kind": "report",
-     "path": "{{PATH: from base to the page. A report sits in reports/.}}"
+     "path": "{{PATH-BASE-5}}"
     }
    ]
   }
  ]
 }
 </script>
-<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.16.0/sds-index.js" integrity="sha384-3+6snabpRwRxrBEUYNiBQGyNV38zHnFsBA+ePFqZx5FUwD7RaOaiVVU9PU8ZuqpS" crossorigin="anonymous"></script>
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.16.0/sds-index.js" integrity="sha384-kwVZZROuoPwo8uNMCnv4dvxKl3KMu93G/Eq82hdLwhnjxIT0i/L6fAoDtWUlg18Z" crossorigin="anonymous"></script>

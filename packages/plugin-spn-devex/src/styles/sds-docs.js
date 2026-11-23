@@ -9,6 +9,18 @@
   var theme=root.getAttribute('data-theme'),dark=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches;
   root.setAttribute('data-mode',theme==='dark'||(theme!=='light'&&dark)?'dark':'light');
 })();
+/* THE RAIL OF A PAGE THAT HAS NONE: a page with no rail and three or more sections whose heads hold an h2 gets one, the same rail every other
+   page has, which the lines below fill with its sections. A page with fewer sections, a page with a rail of its own and a surface page get nothing. */
+(function(){
+  var page=document.querySelector('.sds-page');if(!page||document.getElementById('rail')||document.querySelector('.sds-surface'))return;
+  var wrap=page.querySelector('.sds-wrap');if(!wrap)return;
+  var secs=Array.prototype.filter.call(wrap.children,function(s){return s.tagName==='SECTION'&&s.querySelector('h2');});
+  if(secs.length<3)return;
+  secs.forEach(function(s,i){if(!s.id)s.id='sds-section-'+(i+1);});
+  var rail=document.createElement('nav');rail.className='sds-rail';rail.id='rail';
+  var title=document.createElement('div');title.className='sds-rail-title';title.textContent=document.title;rail.appendChild(title);
+  page.insertBefore(rail,wrap);page.classList.add('sds-has-rail');
+})();
 (function(){
   var rail=document.getElementById('rail');if(!rail)return;
   var secs=Array.prototype.slice.call(document.querySelectorAll('section[id]'));
@@ -277,6 +289,21 @@
   mark();
 })();
 
+/* THE RAIL ON A NARROW PAGE folds into a menu under the title: the rail moves under the masthead, and its title becomes a button that opens it. */
+(function(){
+  var rail=document.getElementById('rail');var page=rail&&rail.closest('.sds-page');if(!page)return;
+  var wrap=page.querySelector('.sds-wrap');if(!wrap)return;
+  var toggle=document.createElement('button');toggle.type='button';toggle.className='sds-rail-toggle';toggle.setAttribute('aria-expanded','false');toggle.textContent='On this page';
+  rail.insertBefore(toggle,rail.firstChild);
+  toggle.addEventListener('click',function(){var open=rail.classList.toggle('sds-is-open');toggle.setAttribute('aria-expanded',String(open));});
+  rail.addEventListener('click',function(e){if(e.target.closest('a')){rail.classList.remove('sds-is-open');toggle.setAttribute('aria-expanded','false');}});
+  var narrow=window.matchMedia?window.matchMedia('(max-width: 75rem)'):null;
+  function place(){
+    var head=wrap.querySelector('.sds-masthead');
+    if(narrow&&narrow.matches&&head)head.parentNode.insertBefore(rail,head.nextSibling);else if(rail.parentNode!==page)page.insertBefore(rail,wrap);
+  }
+  place();if(narrow&&narrow.addEventListener)narrow.addEventListener('change',place);
+})();
 /* THE DOCS DESIGN LANGUAGE'S BEHAVIOUR: the mode switch, a stepped figure's Next and Back, a figure's motion (30% in view, pausing off screen),
    and a narrow figure's tap to open at full size. */
 /* The page's two small helpers: the light/dark switch, and the step-through of a stepped figure. */
@@ -475,15 +502,38 @@
   });
 })();
 
-/* THE SURFACE PAGE PREVIEW: the bar's three switches. Width sizes the frame; mode and notes travel to the page's copy as one message,
-   `{ "surface-page-preview": { mode, notes } }`, which the copy's own few lines read (05-artifacts.md, The surface page preview). The
-   choice is kept in this browser, so the next page opens in the same view. A copy that does not listen still shows as the page. */
+/* THE SURFACE PAGE: the bar's three switches, and the frame's document. The page's markup stands in `<template id="page">`; this builds
+   the frame's document from it, linking `design-system.css` from the folder this script was served from, the cut of the design system
+   that `<meta name="surface-ds">` names, and the app's stylesheet at the path `<meta name="surface-app-css">` names. Width sizes the frame; mode sets
+   `data-mode` on the frame's own `<html>`, and notes shows or hides each `[data-note]` in it, both set directly with no message. The
+   choice is kept in this browser, so the next page opens in the same view (05-artifacts.md, The surface preview). */
 (function () {
   var root = document.querySelector('.sds-surface'); if (!root) return;
   var frame = root.querySelector('.sds-surface-frame');
+  var template = document.getElementById('page');
   var state = { width: 'desktop', mode: 'light', notes: false };
   try { var kept = JSON.parse(localStorage.getItem('sds-surface') || '{}'); for (var k in state) if (k in kept) state[k] = kept[k]; } catch (e) {}
-  function send() { try { frame.contentWindow.postMessage({ 'surface-page-preview': { mode: state.mode, notes: state.notes } }, '*'); } catch (e) {} }
+  function meta(name) { var m = document.querySelector('meta[name="' + name + '"]'); return m ? (m.getAttribute('content') || '').trim() : ''; }
+  function attr(text) { return String(text).replace(/&/g, '&amp;').replace(/"/g, '&quot;'); }
+  var own = document.querySelector('script[src*="sds-docs.js"]');
+  var folder = own ? own.getAttribute('src').replace(/[^\/]*$/, '') : '';
+  var appCss = meta('surface-app-css');
+  function pageDocument() {
+    return '<!doctype html><html lang="en" data-mode="' + state.mode + '"><head><meta charset="utf-8">' +
+      '<meta name="viewport" content="width=device-width, initial-scale=1">' +
+      '<link rel="stylesheet" href="' + attr(folder + 'design-system.css') + '">' +
+      (appCss && appCss.charAt(0) !== '{' ? '<link rel="stylesheet" href="' + attr(appCss) + '">' : '') +
+      '<style>html,body{margin:0}body{background:var(--surface,var(--background));color:var(--foreground)}</style></head><body>' +
+      (template ? template.innerHTML : '') + '</body></html>';
+  }
+  // The mode and the notes are set on the frame's own document, which is this page's origin.
+  function set() {
+    try {
+      var inner = frame.contentDocument; if (!inner || !inner.documentElement) return;
+      inner.documentElement.setAttribute('data-mode', state.mode);
+      Array.prototype.forEach.call(inner.querySelectorAll('[data-note]'), function (n) { n.hidden = !state.notes; });
+    } catch (e) {}
+  }
   // Each device frames the page at its own width, so the page lays itself out as on that device; where the stage is
   // narrower, the frame is scaled down whole and never narrowed, so Desktop never falls into the tablet's layout.
   var WIDTHS = { desktop: 1440, tablet: 768, phone: 390 };
@@ -505,7 +555,7 @@
       b.setAttribute('aria-pressed', String(key === 'notes' ? state.notes : state[key] === value));
     });
     try { localStorage.setItem('sds-surface', JSON.stringify(state)); } catch (e) {}
-    send();
+    set();
   }
   root.addEventListener('click', function (e) {
     var b = e.target.closest('[data-surface]'); if (!b) return;
@@ -513,7 +563,8 @@
     if (key === 'notes') state.notes = !state.notes; else state[key] = b.getAttribute('data-value');
     apply();
   });
-  frame.addEventListener('load', send);
+  frame.addEventListener('load', set);
+  frame.srcdoc = pageDocument();
   apply();
 })();
 

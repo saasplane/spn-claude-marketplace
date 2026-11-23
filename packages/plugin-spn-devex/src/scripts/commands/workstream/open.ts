@@ -60,20 +60,19 @@ function highestFolder(root: string): number {
 
 /** The approach page from the template: its masthead filled, and the four sections written from the block. */
 function pageFrom(text: string, block: Block, number: string, workspace: string, blocker: string | null): string {
-  const title = `${number} - ${titleCase(block.subject)}`;
+  const title = `${number} ${titleCase(block.subject)}`;
   const head = text.slice(0, text.indexOf('<section id="s1"'));
   const tail = text.slice(text.indexOf("<script src="));
   const filled = head
-    .replace(/<!-- RESTATES[\s\S]*?-->\n?/, "")
-    .replace("<title>Approach Template v3</title>", `<title>${escapeHtml(title)}</title>`)
+    .replace(/^(?:<!--(?!\s*spn:doc)[\s\S]*?-->\n?)+/, "")
     .replace(/<!-- spn:doc[\s\S]*?-->/, () => `<!-- spn:doc\n${JSON.stringify({
       id: `ws-${number}-${block.subject}`, variant: "approach", title, lenses: ["LEAD"], status: "PLANNING",
       summary: block.goal, keywords: [block.subject],
     }).replace(/[^\x00-\x7f]/g, (char) => `\\u${char.charCodeAt(0).toString(16).padStart(4, "0")}`)}\n-->`)
     .replace('<span class="sds-badge sds-lens">{{ROLE}}</span><span class="sds-badge sds-lens">{{ROLE}}</span>', '<span class="sds-badge sds-lens">LEAD</span>')
-    .replace("{{THE SUBTITLE: the decision this page plans, one plain sentence.}}", escapeHtml(block.goal))
-    .replace("{{THE DESCRIPTION, one paragraph: what changes, why you would read this page, and how the page runs.}}", escapeHtml(`${block.goal} ${block.whyNow}`))
-    .split("{{NNN}} - {{TITLE}}").join(escapeHtml(title))
+    .replace("{{SUBTITLE}}", escapeHtml(block.goal))
+    .replace("{{LEAD}}", escapeHtml(`${block.goal} ${block.whyNow}`))
+    .split("{{NAME}}").join(escapeHtml(title))
     .split("{{WORKSPACE}}").join(escapeHtml(workspace));
   const p = (value: string): string => `  <p>${escapeHtml(value)}</p>`;
   const body = [

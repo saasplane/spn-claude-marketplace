@@ -59,7 +59,7 @@ console.log("\n=== arc edit and the row commands — open an arc, change its hea
   const opened = cli(root, ["workstream", "arc", "edit", "031/N002", "--title", "the second arc", "--subject", "second", "--goal", "the second outcome"]);
   ok("an arc is opened as PROPOSED", opened.code === 0 && /ok · N002 0\/0 · N002 opened · PROPOSED/.test(opened.out), opened.out);
   const second = json(join(ws, "arcs", "N002", "state.json"));
-  ok("its data holds the schema's header", second.schemaVersion === 2 && second.status === "PROPOSED" && second.preview === "preview.html" && second.rows.length === 0);
+  ok("its data holds the schema's header", second.schemaVersion === 2 && second.status === "PROPOSED" && second.preview === "arc.html" && second.rows.length === 0);
   const bare = cli(root, ["workstream", "arc", "edit", "031/N003"]);
   ok("red: an arc opened with no title is refused, exit 2", bare.code === 2 && bare.out.includes("opens N003 with `--title`, `--subject` and `--goal`: an arc opens only when all three are known, and until then its line stays in How (RULE.DEVEX.WORKSPACE.254)."), bare.out);
   const added = cli(root, ["workstream", "row", "add", "031/N001", "check it", "--kind", "fix", "--repo", "spn-x", "--work", "DOCS", "--blocked-by", "2", "--touches", "marketplace:b,foundation:c"]);
@@ -248,7 +248,7 @@ console.log("\n=== question — raise, show, answer, withdraw");
   ok("[MKT.SCRIPTS.383] a What with a path:line is taken, and the number is past every anchor the page carries", raised.code === 0 && raised.out.startsWith("Q8 · open · approach.html Open — Q8"), raised.out);
   ok("the card stands in the approach page's Open, under its heading", /<h2>Open &mdash; Q8<\/h2>/.test(readFileSync(page, "utf8")) && readFileSync(page, "utf8").includes('<h4 id="q8">'));
   const notPreview = cli(root, ["workstream", "question", "show", "031/q8", "--in", "notes/N001/plan.md"]);
-  ok("red: a card is shown only on an arc's preview", notPreview.code === 2 && notPreview.out.includes("notes/<arc>/preview.html"), notPreview.out);
+  ok("red: a card is shown only on an arc's preview", notPreview.code === 2 && notPreview.out.includes("notes/<arc>/arc.html"), notPreview.out);
   const shown = cli(root, ["workstream", "question", "show", "031/q8", "--in", "notes/N001/preview.html"]);
   const preview = readFileSync(join(ws, "notes", "N001", "preview.html"), "utf8");
   ok("shown on the preview, with the line back to the approach page", shown.code === 0 && preview.includes('<h4 id="q8">') && preview.includes('href="../../approach.html#s4"'), shown.out);
@@ -300,13 +300,13 @@ console.log("\n=== arc edit and row state — a status or a row state moved refr
 console.log("\n=== arc edit --preview — a carried arc's Plan row links where its notes now live (S137)");
 {
   const carried = await dataWorkspace("commands-preview");
-  const elsewhere = "../032-next/notes/N002/preview.html";
-  put(carried.root, ".spndevex/workstreams/open/032-next/notes/N002/preview.html", "<meta charset=\"utf-8\">\n<section id=\"s1\"><h2>Overview</h2></section>\n");
+  const elsewhere = "../032-next/notes/N002/arc.html";
+  put(carried.root, ".spndevex/workstreams/open/032-next/notes/N002/arc.html", "<meta charset=\"utf-8\">\n<section id=\"s1\"><h2>Overview</h2></section>\n");
   put(carried.root, ".spndevex/workstreams/open/032-next/notes/N002/samples/table.md", "| a |\n");
   const page = join(carried.ws, "approach.html");
   const wrong = cli(carried.root, ["workstream", "arc", "edit", "031/N001", "--preview", "../032-next/notes/N002/draft.html"]);
-  ok("red: a path that does not end in preview.html is refused, and nothing is written",
-    wrong.code === 2 && wrong.out.includes("`preview.html`") && json(join(carried.ws, "arcs", "N001", "state.json")).preview === "preview.html", wrong.out);
+  ok("red: a path that does not end in arc.html is refused, and nothing is written",
+    wrong.code === 2 && wrong.out.includes("`arc.html`") && json(join(carried.ws, "arcs", "N001", "state.json")).preview === "preview.html", wrong.out);
   const onRow = cli(carried.root, ["workstream", "row", "edit", "031/N001", "1", "--preview", elsewhere]);
   ok("red: `--preview` belongs to the arc, never to a row", onRow.code === 2 && onRow.out.includes("`--preview`"), onRow.out);
   const moved = cli(carried.root, ["workstream", "arc", "edit", "031/N001", "--status", "CARRIED", "--reason", "to 032", "--preview", elsewhere, "--note", "the developer: move N001 to 032"]);
@@ -314,7 +314,7 @@ console.log("\n=== arc edit --preview — a carried arc's Plan row links where i
   ok("the path is written onto the arc's data", moved.code === 0 && data.preview === elsewhere && /N001 · status, preview|N001 · preview, status|preview/.test(moved.out), `${moved.out}\n${JSON.stringify(data.preview)}`);
   const cyclesRow = (/<tr id="N001"[^>]*>.*?<\/tr>/s.exec(readFileSync(page, "utf8")) ?? [""])[0];
   ok("the Plan row links the preview and the sample where the notes now live, and not the empty folder",
-    cyclesRow.includes(`href="${elsewhere}"`) && cyclesRow.includes('href="../032-next/notes/N002/samples/table.md"') && !cyclesRow.includes('href="notes/N001/preview.html"'), cyclesRow);
+    cyclesRow.includes(`href="${elsewhere}"`) && cyclesRow.includes('href="../032-next/notes/N002/samples/table.md"') && !cyclesRow.includes('href="notes/N001/arc.html"'), cyclesRow);
   ok("no state check finding asks for a preview at notes/N001/", !/has no preview/.test(moved.out), moved.out);
   const back = cli(carried.root, ["workstream", "arc", "edit", "031/N001", "--preview", "preview.html"]);
   ok("`--preview preview.html` gives the fixed place back, and the row links it again",
@@ -378,7 +378,7 @@ console.log("\n=== row add and row state — steps may be written before the go,
   const noWords = write("031/N002", "--status", "DECIDED");
   ok("red: the go without the developer's words is refused, and the arc stays PROPOSED",
     noWords.code === 2 && noWords.out.includes("moves only with them in the same write") && json(second).status === "PROPOSED", noWords.out);
-  put(plan.ws, "notes/N002/preview.html", [
+  put(plan.ws, "notes/N002/arc.html", [
     '<header class="sds-masthead"><div class="sds-eyebrow"><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Preview</span><span class="sds-state"><span class="sds-label">Status:</span> <a class="sds-badge sds-status sds-proposed" href="../../approach.html#N002">PROPOSED</a></span></span></div></header>',
     '<section id="s3"><h2>Proposed</h2>', "<p>The bar, as proposed.</p>", "<p>Nothing else.</p>", "</section>"].join("\n"));
   rmSync(join(plan.ws, "arcs", "N002", "sheet.json"), { force: true }); // the steps here are by hand, so this arc keeps no sheet
@@ -387,8 +387,8 @@ console.log("\n=== row add and row state — steps may be written before the go,
   ok("the go with a wait stores DECIDED and the wait, its status line leading with the move and the words beside it",
     go.code === 0 && status?.note === "PROPOSED → DECIDED · the developer: approved, but wait" && json(second).status === "DECIDED" && json(second).wait === "the developer: approved, but wait", `${go.out}${JSON.stringify(status)}`);
   ok("the go lists each line of the preview that still says proposed, by its number, and not the masthead's badge or the Proposed heading",
-    go.out.includes("the preview still says proposed in 1 line(s)") && go.out.includes("notes/N002/preview.html:3  The bar, as proposed.")
-      && !go.out.includes("preview.html:1 ") && !go.out.includes("preview.html:2 "), go.out);
+    go.out.includes("the preview still says proposed in 1 line(s)") && go.out.includes("notes/N002/arc.html:3  The bar, as proposed.")
+      && !go.out.includes("arc.html:1 ") && !go.out.includes("arc.html:2 "), go.out);
   const waited = row("state", "031/N002", "1", "running");
   ok("red: no step starts while the wait holds, and the refusal quotes it", waited.code === 2 && waited.out.includes("holds the developer's wait, \"the developer: approved, but wait\""), waited.out);
   const silentStart = write("031/N002", "--start");
@@ -450,7 +450,7 @@ console.log("\n=== arc edit — an arc opens whole: its data, its preview, its W
   const write = (...words) => cli(whole.root, ["workstream", "arc", "edit", ...words]);
   const goal = "Each control's evidence leaves as one file an auditor can read, named for the control.";
   const arcOf = (id) => join(whole.ws, "arcs", id);
-  const noteOf = (id) => join(whole.ws, "notes", id, "preview.html");
+  const noteOf = (id) => join(whole.ws, "notes", id, "arc.html");
 
   const noGoal = write("031/N002", "--title", "Evidence export", "--subject", "evidence-export", "--under", "d1");
   ok("red: an opening without --goal is refused in the chapter's words, exit 2", noGoal.code === 2
@@ -464,20 +464,20 @@ console.log("\n=== arc edit — an arc opens whole: its data, its preview, its W
   const opened = write("031/N002", "--title", "Evidence export", "--subject", "evidence-export", "--goal", goal, "--under", "d1");
   ok("the line names the four pieces", opened.code === 0 && opened.out.startsWith("ok · N002 0/0 · N002 opened · PROPOSED · preview · What entry · Plan row\n"), opened.out);
   ok("and each piece's place, as drawn", opened.out.includes("  arcs/N002/state.json       written, with its log line and its name file, evidence-export.md\n")
-    && opened.out.includes("  notes/N002/preview.html    written from the template: the masthead, the PROPOSED badge, the back link to #N002-what, four sections to fill\n")
-    && opened.out.includes("  approach.html · What       #N002-what written under d1, Platform · Data and trust: the title, the goal, and the link to notes/N002/preview.html\n")
+    && opened.out.includes("  notes/N002/arc.html        written from the template: the masthead, the PROPOSED badge, the back link to #N002-what, four sections to fill\n")
+    && opened.out.includes("  approach.html · What       #N002-what written under d1, Platform · Data and trust: the title, the goal, and the link to notes/N002/arc.html\n")
     && opened.out.includes("  approach.html · Plan       row N002 written and stamped, its preview linked\n"), opened.out);
   ok("the data holds the goal, PROPOSED, and the fixed preview", json(join(arcOf("N002"), "state.json")).goal === goal && json(join(arcOf("N002"), "state.json")).status === "PROPOSED");
   const preview = readFileSync(noteOf("N002"), "utf8");
   ok("the preview is the template with its masthead filled: title, back link, title, arc, badge",
-    preview.includes("<title>031 · N002 - Evidence Export</title>") && preview.includes('href="../../approach.html#N002-what">&larr; 031 - Probe</a>')
-      && preview.includes("<h1>Evidence export</h1>") && preview.includes('href="../../approach.html#N002">N002</a>') && preview.includes("sds-status sds-proposed")
+    preview.includes("<title>N002 Evidence export</title>") && preview.includes('href="../../approach.html#N002-what">&larr; 031 Probe</a>')
+      && preview.includes("<h1>N002 Evidence export</h1>") && preview.includes('href="../../approach.html#N002">N002</a>') && preview.includes("sds-status sds-proposed")
       && !preview.includes("{{NNN}}") && !preview.includes("{{nnn}}") && !preview.includes("{{THE PREVIEW NAME}}") && !preview.includes("RESTATES"), preview.slice(0, 1500));
-  ok("the subtitle and the description stay slots for the agent", preview.includes("{{THE SUBTITLE") && preview.includes("{{THE DESCRIPTION"));
+  ok("the subtitle and the description stay slots for the agent", preview.includes("{{SUBTITLE}}") && preview.includes("{{LEAD}}"));
   const after = readFileSync(page, "utf8");
-  const entry = '  <h4 id="N002-what">Evidence export</h4>\n  <p>Each control\'s evidence leaves as one file an auditor can read, named for the control.</p>\n  <p>Read the preview &rarr; <a href="notes/N002/preview.html">Evidence export</a></p>\n  <h3 id="d2">';
+  const entry = '  <h4 id="N002-what">Evidence export</h4>\n  <p>Each control\'s evidence leaves as one file an auditor can read, named for the control.</p>\n  <p>Read the arc page &rarr; <a href="notes/N002/arc.html">Evidence export</a></p>\n  <h3 id="d2">';
   ok("the What entry stands at the end of d1's part, before d2, with the title, the goal and the link", after.includes(entry), after);
-  ok("the Plan row is there, stamped", /<tr id="N002" data-arc="arcs\/N002\/state.json" data-arc-stamp="[0-9a-f]{12}">/.test(after) && after.includes('href="notes/N002/preview.html"'));
+  ok("the Plan row is there, stamped", /<tr id="N002" data-arc="arcs\/N002\/state.json" data-arc-stamp="[0-9a-f]{12}">/.test(after) && after.includes('href="notes/N002/arc.html"'));
   const check = cli(whole.root, ["workstream", "state", "check", "031"]);
   ok("the workstream passes its own check at once", check.code === 0 && /whole/.test(check.out), check.out);
 
@@ -494,11 +494,11 @@ console.log("\n=== arc edit — an arc opens whole: its data, its preview, its W
   rmSync(noteOf("N003"));
   const filled = write("031/N003");
   ok("a bare write fills the preview it finds missing and keeps the entry and the row", filled.code === 0 && filled.out.startsWith("ok · N003 · preview written from the template · What entry kept · Plan row kept"), filled.out);
-  ok("the fresh preview is the template again, and the page is as it was", readFileSync(noteOf("N003"), "utf8").includes("<title>031 · N003 - Second Export</title>") && readFileSync(page, "utf8") === bytes);
+  ok("the fresh preview is the template again, and the page is as it was", readFileSync(noteOf("N003"), "utf8").includes("<title>N003 Second export</title>") && readFileSync(page, "utf8") === bytes);
   const twice = write("031/N003");
   ok("and a second bare write finds it whole", twice.out.startsWith("ok · N003 · whole: nothing written") && readFileSync(page, "utf8") === bytes, twice.out);
 
-  writeFileSync(page, bytes.replace(/\s*<h4 id="N003-what">[^]*?<\/p>\n  <p>Read the preview[^\n]*N003[^\n]*<\/p>/, "").replace(/\s*<tr id="N003"[^\n]*<\/tr>/, ""));
+  writeFileSync(page, bytes.replace(/\s*<h4 id="N003-what">[^]*?<\/p>\n  <p>Read the arc page[^\n]*N003[^\n]*<\/p>/, "").replace(/\s*<tr id="N003"[^\n]*<\/tr>/, ""));
   const both = write("031/N003");
   ok("a bare write writes the entry and the row it finds missing, and keeps the preview",
     both.code === 0 && both.out.includes("What entry: #N003-what written at the end of What") && both.out.includes("Plan row written and stamped") && both.out.includes("preview kept"), both.out);
@@ -1284,8 +1284,8 @@ console.log("\n=== the role arcs by their addresses: ideate and follow-ups (Q33)
   ok("[MKT.SCRIPTS.484] the ideate arc is opened by its address", ideate.code === 0 && existsSync(join(role.ws, "arcs", "ideate", "state.json")), ideate.out);
   const fact = run("fact", "write", "031/ideate", "--source", "spn-x/a.ts:1", "--fact", "a is one");
   ok("[MKT.SCRIPTS.484] a fact against `<ws>/ideate` goes to arcs/ideate/facts.jsonl", fact.code === 0 && lines(join(role.ws, "arcs", "ideate", "facts.jsonl")).length === 1, fact.out);
-  const preview = join(role.ws, "notes", "ideate", "preview.html");
-  ok("[MKT.SCRIPTS.485] the ideate arc's preview is written at notes/ideate/preview.html", existsSync(preview), ideate.out);
+  const preview = join(role.ws, "notes", "ideate", "arc.html");
+  ok("[MKT.SCRIPTS.485] the ideate arc's preview is written at notes/ideate/arc.html", existsSync(preview), ideate.out);
   const other = run("arc", "edit", "031/other", "--title", "x", "--subject", "x", "--goal", "x");
   ok("[MKT.SCRIPTS.484] red: an address that is none of the three forms is refused naming them", other.code !== 0 && other.out.includes("N<nnn>") && other.out.includes("ideate") && other.out.includes("follow-ups"), other.out);
   const follow = openRole("follow-ups", "follow-ups");

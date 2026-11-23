@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/02-workstream.md",
-      "seen": "01af8b58"
+      "seen": "8c896f2e"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
@@ -248,7 +248,7 @@ The workspace folder carries two dot-homes: `.claude/` (settings — the marketp
             <subject>.md                  the arc's name: its goal, its status and its links, written by the commands
         notes/
           <arc>/                          the same three forms; one arc's work order: at most these six entries, each made when the arc needs it
-            preview.html                  the arc's one preview, where something must be seen or worded to decide
+            arc.html                      the arc's one page, where something must be seen or worded to decide
             samples/                      real files of the kind the work produces, each in its own format
             plan.md                       what a row needs beside it: the traps, a set, a move table
             orders/                       one brief per delegated execution, named by its row, and its report

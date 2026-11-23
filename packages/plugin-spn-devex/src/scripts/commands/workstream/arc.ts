@@ -18,7 +18,7 @@ import { STORED_STATUSES, raisedSuggestions } from "../../checks/arc-status.ts";
 import { stepRowFindings } from "../../checks/workstream-state.ts";
 import { mapOrderOf } from "../../lib/go-plan.ts";
 import {
-  NOTES, PREVIEW_FILE, approachOf, arcDataDir, arcIdsOf, arcStamp, arcStatus, doneOf, everDecided, logEvent, logLinesOf, newArc, nextBuildArc, notesDirOf, previewFromTemplate, previewHrefOf, previewOf,
+  NOTES, ARC_FILE, arcPageNameOf, approachOf, arcDataDir, arcIdsOf, arcStamp, arcStatus, doneOf, everDecided, logEvent, logLinesOf, newArc, nextBuildArc, notesDirOf, previewFromTemplate, previewHrefOf, previewOf,
   previewPathFault, proposedLines, readArc, readJsonl, restamped, sheetFileOf, stampsOn, suggestionsFileOf, whatEntryOf, whatId, withEntryLink, withWhatEntry, workspaceOf, writeArc, writeJsonl, writeWhole,
 } from "../../lib/workstream.ts";
 import { isFile } from "../../lib/payload.ts";
@@ -95,7 +95,7 @@ function header(data: ArcData, words: Words): string[] {
   const preview = words.value("preview");
   if (preview !== null) {
     const fault = previewPathFault(preview);
-    if (fault) throw new UsageFault(`takes \`--preview\` as the path from the workstream folder to the arc's preview, such as \`../030-next/notes/N002/${PREVIEW_FILE}\`: \`${preview}\` ${fault}.`);
+    if (fault) throw new UsageFault(`takes \`--preview\` as the path from the workstream folder to the arc's preview, such as \`../030-next/notes/N002/${ARC_FILE}\`: \`${preview}\` ${fault}.`);
     if (data.preview !== preview) { data.preview = preview; changed.push("preview"); }
   }
   const status = words.value("status");
@@ -181,9 +181,9 @@ function repairedWords(pieces: Pieces, arc: string): string[] {
 }
 
 /** The detail lines under an opening's one line: where each piece went, as the preview draws them. */
-function openingLines(data: ArcData, pieces: Pieces): string[] {
+function openingLines(ws: string, data: ArcData, pieces: Pieces): string[] {
   const arc = data.arc;
-  const href = previewHrefOf(arc, data);
+  const href = previewHrefOf(arc, data, ws);
   const rows: Array<[string, string]> = [
     [`arcs/${arc}/state.json`, `written, with its log line and its name file, ${data.subject}.md`],
     [href, pieces.preview === "written" ? `written from the template: the masthead, the ${arcStatus(data)} badge, the back link to #${whatId(arc)}, four sections to fill`
@@ -219,9 +219,9 @@ function leavePageWhole(ws: string, data: ArcData, under: string | null): Pieces
   const needsEntry = whatEntryOf(text, arc) === null;
   const entry = needsEntry ? typed(() => withWhatEntry(text, data, under)) : null;
   const pieces: Pieces = { preview: "kept", entry: "kept", where: "", cycles: "kept" };
-  const previewPath = resolve(ws, previewHrefOf(arc, data));
+  const previewPath = resolve(ws, previewHrefOf(arc, data, ws));
   if (!isFile(previewPath)) {
-    if (previewHrefOf(arc, data) === `${NOTES}/${arc}/${PREVIEW_FILE}`) {
+    if (previewHrefOf(arc, data, ws) === `${NOTES}/${arc}/${ARC_FILE}`) {
       typed(() => writeWhole(previewPath, previewFromTemplate(ws, { arc, subject: data.subject, title: data.title, status: arcStatus(data) })));
       pieces.preview = "written";
     } else pieces.preview = "elsewhere";
@@ -308,7 +308,7 @@ function edit(args: string[]): number {
     const was = data.status;
     raisedGuard(ws, arc, was, words);
     wordsGuard(arc, data, everDecided(data, logLinesOf(ws, arc)), words);
-    const oldHref = previewHrefOf(arc, data);
+    const oldHref = previewHrefOf(arc, data, ws);
     const changed = header(data, words);
     if (was === "PROPOSED" && data.status === "DECIDED") {
       const found = sheetFindings(ws, arc);
@@ -329,7 +329,7 @@ function edit(args: string[]): number {
     const page = approachOf(ws);
     if (previewMoved && page) {
       const text = readFileSync(page, "utf8");
-      const linked = withEntryLink(text, arc, oldHref, previewHrefOf(arc, data));
+      const linked = withEntryLink(text, arc, oldHref, previewHrefOf(arc, data, ws));
       if (linked !== text) writeFileSync(page, linked, "utf8");
     }
     if (repairs) repaired = leavePageWhole(ws, data, under);
@@ -353,7 +353,7 @@ function edit(args: string[]): number {
   const refreshed = refreshIfMoved(ws, before, previewMoved);
   const { done, total } = doneOf(data);
   console.log(`ok · ${bare ? arc : `${arc} ${done}/${total}`} · ${[...said, ...refreshed.said].join(" · ")}`);
-  if (opened) for (const line of openingLines(data, opened)) console.log(line);
+  if (opened) for (const line of openingLines(ws, data, opened)) console.log(line);
   for (const line of [...refreshed.lines, ...afterWrite(ws)]) console.log(line);
   for (const line of stepRowFindings(data, before.get(arc), mapOrderOf(workspaceOf()))) console.log(`note: ${line}`);
   if (goes) for (const line of previewProposals(ws, arc)) console.log(line);
@@ -374,7 +374,7 @@ function previewProposals(ws: string, arc: string): string[] {
   if (!found.length) return [];
   const shown = (words: string): string => (words.length > 110 ? `${words.slice(0, 107)}…` : words);
   return [`the preview still says proposed in ${found.length} line(s) — bring each current now the go is given, with its Open:`,
-    ...found.map((one) => `  ${NOTES}/${arc}/${PREVIEW_FILE}:${one.line}  ${shown(one.text)}`)];
+    ...found.map((one) => `  ${NOTES}/${arc}/${arcPageNameOf(ws, arc)}:${one.line}  ${shown(one.text)}`)];
 }
 
 function stamp(args: string[]): number {

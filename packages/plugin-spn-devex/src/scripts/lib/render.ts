@@ -23,6 +23,9 @@ import { isSeatFile, producedPageOf } from "../../../../plugin-support-lib/src/l
 import { stylesDir } from "../../../../plugin-support-lib/src/lib/page-styles.ts";
 import { RULE_ID_SRC, chipOf, parseFields } from "../../../../plugin-support-lib/src/lib/rule-mark.ts";
 
+/** The words of a short name: a run that holds a letter or a digit, so a dash, a `·` and a number's separator are not words (RULE.DEVEX.WORKSPACE.517). */
+export const nameWords = (name: string): number => name.split(/\s+/).filter((word) => /[\p{L}\p{N}]/u.test(word)).length;
+
 /** `stops` says the finding is the render's: the page is not written while it stands (RULE.DEVEX.WORKSPACE.538). */
 export type Finding = { message: string; line?: number; stops?: boolean };
 
@@ -30,10 +33,10 @@ export type Finding = { message: string; line?: number; stops?: boolean };
 
 /**
  * The render of one file: what `spnutils apps surface render --file <file> --app <code> --modes LIGHT,DARK --devices DESKTOP` prints,
- * or the words it refused with. `inline` adds `--inline`, which prints a whole page with the design system's style.css inside it.
+ * or the words it refused with: the markup of the tree alone, for each mode and device.
  * It is ONE FUNCTION, so a test replaces it with `setUnitRender`.
  */
-export type UnitRender = (file: string, options?: { app: string; inline: boolean; ds?: string }) => string;
+export type UnitRender = (file: string, options?: { app: string; ds?: string }) => string;
 
 /**
  * The app a `unit` fence is drawn under when the fence names none: `surface`, Surface's own brand-free language (decided by the lead,
@@ -79,9 +82,9 @@ export function pagesFromRender(printed: string): { LIGHT: string; DARK: string 
 /** The first mode's page of what the render printed (see `pagesFromRender`). */
 export function pageFromRender(printed: string): string { return pagesFromRender(printed).LIGHT; }
 
-const spnutilsRender: UnitRender = (file, options = { app: DEFAULT_RENDER_APP, inline: false }) => {
+const spnutilsRender: UnitRender = (file, options = { app: DEFAULT_RENDER_APP }) => {
   try {
-    return execFileSync("spnutils", ["apps", "surface", "render", "--file", file, "--app", options.app, ...(options.ds ? ["--ds", options.ds] : []), "--modes", "LIGHT,DARK", "--devices", "DESKTOP", ...(options.inline ? ["--inline"] : [])],
+    return execFileSync("spnutils", ["apps", "surface", "render", "--file", file, "--app", options.app, ...(options.ds ? ["--ds", options.ds] : []), "--modes", "LIGHT,DARK", "--devices", "DESKTOP"],
       { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"], maxBuffer: 64 * 1024 * 1024 });
   } catch (error) {
     const failed = error as { stdout?: unknown; stderr?: unknown; message?: string };
@@ -103,6 +106,8 @@ export function designSystemVersion(styles: string | null = stylesDir(import.met
 
 /** Set by `unitFrame` when a page draws a unit, so the page links `ds-unit.css`; reset for every page. */
 let unitUsed = false;
+/** The page's link to the shared docs stylesheet, which a framed unit's document takes its `design-system.css` link from; set for every page. */
+let unitStylesheet = "";
 
 /**
  * The markup a render's printed page stands for in the docs page itself: the `<body>` content, with no `<style>` and no
@@ -119,7 +124,7 @@ function unitMarkup(page: string): string {
  * A fence tagged `unit`: one tree, a unit with its props. It is wrapped as a render file and drawn by the render, and the
  * unit's own markup stands in the page, once in light and once in dark, side by side (`.sds-unit`, styled by `ds-unit.css`),
  * with the tree below as code. A window-sized unit (the first unit is `DSLayout`, or the tree has more than one section) is drawn in an `iframe`
- * instead, 640px high and full width, whose `srcdoc` is the render's whole printed page, one for light and one for dark; a top-level
+ * instead, 640px high and full width, whose `srcdoc` is a document built from the render's markup, with `design-system.css` linked at the page's own stylesheet version and `data-mode` set, one for light and one for dark; a top-level
  * `"frame": true|false` forces either. The tree may carry a top-level `"caption"`: it is the figcaption's text, the unit's name stays
  * as the small label. `caption`, `frame` and `app` (the code of the app row it is drawn under) are taken out before the render and before the tree is shown. A tree that is no JSON, a refusal
  * and a finding each stop the write with the render's words.
@@ -162,19 +167,20 @@ function unitFrame(body: string[], findings: Finding[]): string {
   try {
     const path = join(folder, "unit.json");
     writeFileSync(path, JSON.stringify(file));
-    pages = pagesFromRender(unitRender(path, { app, inline: framed, ...(ds ? { ds } : {}) }));
+    pages = pagesFromRender(unitRender(path, { app, ...(ds ? { ds } : {}) }));
   } catch (e) {
     return stop(`the render stopped the \`${name}\` fence: ${(e as Error).message}`);
   } finally { rmSync(folder, { recursive: true, force: true }); }
   let mode: (m: "light" | "dark") => string;
   if (framed) {
-    // The render's whole printed page is the frame's document, so it needs no `ds-unit.css`; the mode is set on its `<html>`.
+    // The frame's document is built here from the render's markup, the way the surface page template builds its own: `design-system.css`
+    // is linked at the version of the page's shared stylesheet, and the mode is set on `<html>`. The markup carries no page of its own.
+    const link = /sds-docs\.css/.test(unitStylesheet)
+      ? unitStylesheet.replace(/sds-docs\.css/, "design-system.css").replace(/\s(?:integrity|crossorigin)="[^"]*"/g, "") : "";
     const document = (m: "light" | "dark"): string => {
-      const page = pages[m === "light" ? "LIGHT" : "DARK"];
-      const set = /<html\b[^>]*>/i.test(page)
-        ? page.replace(/<html\b([^>]*)>/i, (_w, attrs: string) => `<html${attrs.replace(/\sdata-mode="[^"]*"/i, "")} data-mode="${m}">`)
-        : `<html data-mode="${m}">${page}</html>`;
-      return set.replace(/&/g, "&amp;").replace(/"/g, "&quot;");
+      const markup = unitMarkup(pages[m === "light" ? "LIGHT" : "DARK"]);
+      const whole = `<!doctype html><html lang="en" data-mode="${m}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">${link}<style>html,body{margin:0}body{background:var(--surface,var(--background));color:var(--foreground)}</style></head><body><div id="root">${markup}</div></body></html>`;
+      return whole.replace(/&/g, "&amp;").replace(/"/g, "&quot;");
     };
     mode = (m) => `    <iframe class="sds-unit-frame" data-mode="${m}" title="${esc(name)}, ${m}" width="100%" height="640" srcdoc="${document(m)}"></iframe>`;
   } else {
@@ -857,7 +863,7 @@ function renderPageBody(opts: Parameters<typeof renderPage>[0]): { html: string;
   const findings: Finding[] = [];
   const { block } = opts;
   const lines = opts.markdown.split("\n");
-  tabsDrawn = 0; groupIds = new Set(); unitUsed = false;
+  tabsDrawn = 0; groupIds = new Set(); unitUsed = false; unitStylesheet = opts.furniture.stylesheet;
 
   // Everything above the first `##` is the lead: the h1 and the tag line are the masthead's,
   // so they are dropped here rather than rendered twice.
@@ -913,17 +919,23 @@ function renderPageBody(opts: Parameters<typeof renderPage>[0]): { html: string;
   // first paragraph stays the Description (RULE.DEVEX.WORKSPACE.187).
   const subtitle = block.subtitle ? `  <p class="sds-subtitle">${esc(String(block.subtitle))}</p>\n` : "";
 
+  // THE PAGE'S SHORT NAME AND ITS HEADING ARE TWO THINGS. `name` is the tab, the outline's title, the eyebrow's last segment and the index
+  // entry, at most three words (RULE.DEVEX.WORKSPACE.517); `title` is the heading, in the `<h1>` alone. A block with no `name` has the
+  // `title` for both, so no seat needs a change. A `name` of more than three words stops the write.
+  const name = typeof block.name === "string" && block.name.trim() ? block.name.trim() : String(block.title ?? "");
+  if (typeof block.name === "string" && nameWords(block.name) > 3)
+    findings.push({ message: `\`name\` is ${nameWords(block.name)} words, and a short name is at most three (RULE.DEVEX.WORKSPACE.517): ${block.name.trim()}`, stops: true });
   const masthead =
 `<header class="sds-masthead">
   <!-- Rendered from the spn:doc block by \`docs.ts page\`. Never typed: a header that disagreed with its block is what this removes. -->
-  <div class="sds-eyebrow"><span class="sds-line1">${opts.workspace} &nbsp;|&nbsp; ${opts.location} &nbsp;|&nbsp; ${esc(block.title)}</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">${type}</span><span class="sds-separator">|</span><span class="sds-label">For:</span> <span class="sds-audience">${lensChips}</span>${statusPart}</span></div>
+  <div class="sds-eyebrow"><span class="sds-line1">${opts.workspace} &nbsp;|&nbsp; ${opts.location} &nbsp;|&nbsp; ${esc(name)}</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">${type}</span><span class="sds-separator">|</span><span class="sds-label">For:</span> <span class="sds-audience">${lensChips}</span>${statusPart}</span></div>
   <h1>${esc(block.title)}</h1>
 ${subtitle}${lead}
 </header>`;
 
   const html = [
     `<meta charset="utf-8">`,
-    `<title>${esc(block.title)}</title>`,
+    `<title>${esc(name)}</title>`,
     `<!-- spn:doc\n${JSON.stringify(block)}\n-->`,
     `<!-- Produced by \`docs.ts page\` from the seat file. Never edit this page: edit the seat file and produce it again. -->`,
     opts.furniture.stylesheet,
@@ -933,20 +945,20 @@ ${subtitle}${lead}
     `<div class="sds-page">`,
     ``,
     `<nav class="sds-rail" id="rail">`,
-    // THE WAY BACK NAMES WHERE IT GOES (Q238). Where the caller resolved the page above this one
-    // — a construct's domain overview — that page is named. Where it could not, the constructs
-    // seat's own face stands: the seat file sits one level under it, so `../README.md` is the link
-    // an author would write, re-expressed for the page's folder by the same rewriter the body uses.
-    opts.home
-      ? `  <a class="sds-home" href="${opts.home.href}">&larr; ${esc(opts.home.label)}</a>`
-      : `  <a class="sds-home" href="${rewriteHref("../README.md")}">&larr; the model</a>`,
     // THE RAIL CARRIES THE PAGE'S OWN NAME, NOT THE WORD `Outline` (Q239). A reader already knows a
     // rail is an outline — it is a list of this page's headings sitting beside them. What the label
     // can add is WHOSE, which is the one thing the rail does not say once the masthead has scrolled
     // away. 157 of 157 pages said `Outline`, and `blocks-template.html` already said `Blocks`.
-    `  <div class="sds-rail-title">${esc(String(block.title ?? "Outline"))}</div>`,
+    `  <div class="sds-rail-title">${esc(name || "Outline")}</div>`,
     `</nav>`,
     `<div class="sds-wrap">`,
+    // THE WAY BACK NAMES WHERE IT GOES (Q238), and it is the breadcrumb above the masthead, not a link in the rail. Where the caller
+    // resolved the page above this one — a construct's domain overview — that page is named. Where it could not, the constructs
+    // seat's own face stands: the seat file sits one level under it, so `../README.md` is the link an author would write,
+    // re-expressed for the page's folder by the same rewriter the body uses.
+    opts.home
+      ? `<p class="sds-crumb"><a href="${opts.home.href}">&larr; ${esc(opts.home.label)}</a></p>`
+      : `<p class="sds-crumb"><a href="${rewriteHref("../README.md")}">&larr; the model</a></p>`,
     ``,
     masthead,
     ``,

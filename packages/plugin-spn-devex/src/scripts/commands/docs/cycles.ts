@@ -36,7 +36,7 @@ import { basename, dirname, join, posix, relative, resolve } from "node:path";
 import { STATUSES, TERMINAL } from "../../checks/arc-status.ts";
 import { cardsIn, mastheadStatus } from "../../checks/split-plan.ts";
 import { isDir, isFile, listdir, read, unescape, workspaceRoot } from "../../lib/payload.ts";
-import { NO_REPO, PREVIEW_FILE, approachOf, arcIdsOf, arcOrder, arcStatus, blockAt, previewHrefOf, readArc, stampsOn, workstreamWord, writeNameFile, writeOpenBlocks, writePreviewStatus } from "../../lib/workstream.ts";
+import { NO_REPO, ARC_FILE, PREVIEW_FILE, approachOf, arcIdsOf, arcOrder, arcStatus, blockAt, previewHrefOf, readArc, stampsOn, workstreamWord, writeNameFile, writeOpenBlocks, writePreviewStatus } from "../../lib/workstream.ts";
 import { ARCS, WORKSTREAM_STATES, isApproachPage, workstreamsDir } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { OWN_COPY, linksSharedStyles } from "../../../../../plugin-support-lib/src/lib/page-styles.ts";
 import { type Action, FLAG, UsageFault, readWords } from "../../../../../plugin-support-lib/src/lib/command.ts";
@@ -103,10 +103,10 @@ export function cycleOfData(folder: string, arc: string): Cycle | null {
     ? arcStatus((readArc(folder, arc) ?? data) as Parameters<typeof arcStatus>[0]) : null;
   const wait = typeof data.wait === "string" && data.wait.trim() ? `wait: ${data.wait.trim()}` : "";
   // An arc carried to another workstream names where its preview now lives, and its samples sit beside it.
-  const previewHref = previewHrefOf(arc, { preview: typeof data.preview === "string" ? data.preview : PREVIEW_FILE });
+  const previewHref = previewHrefOf(arc, { preview: typeof data.preview === "string" ? data.preview : ARC_FILE }, folder);
   const notes = posix.dirname(previewHref);
   const previews: Preview[] = [];
-  if (isFile(join(folder, previewHref))) previews.push({ name: PREVIEW_FILE, href: previewHref, kind: "preview" });
+  if (isFile(join(folder, previewHref))) previews.push({ name: posix.basename(previewHref), href: previewHref, kind: "preview" });
   // AN ARC WITH A SAMPLES INDEX IS LINKED BY THAT INDEX ALONE: the index is the way into every sample, so the row names no page or folder beside it.
   const samples = listdir(join(folder, notes, "samples"));
   for (const sample of samples.includes("index.html") ? ["index.html"] : samples)

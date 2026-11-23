@@ -26,7 +26,7 @@ description: Write one of the five reports on a repository — coverage (how muc
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "The header — two lines, six fields, produced from the block",
-      "seen": "e2b67f2c"
+      "seen": "e41850eb"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
@@ -83,7 +83,7 @@ The block names the type with one `SPDocReportType` value: `COVERAGE` · `TESTS`
 
 ## Copy the template, then fill it
 
-**Start from `refs/devex/workspace/docs/templates/pages/report-template.html`.** It holds only the page's structure — its sections with their ids, the slots you fill, and the two lines that load the shared stylesheet and script — and no rule (`RULE.DEVEX.WORKSPACE.182` · MUST · check:doc-check). Every rule for filling it is in this skill.
+**Start from `refs/devex/workspace/docs/templates/docs/pages/report-template.html`.** It holds only the page's structure — its sections with their ids, the slots you fill, and the two lines that load the shared stylesheet and script — and no rule (`RULE.DEVEX.WORKSPACE.182` · MUST · check:doc-check). Every rule for filling it is in this skill.
 
 **Write a report in two passes, the text first and the blocks second** (`RULE.DEVEX.WORKSPACE.533` · MUST · skill:spn-devex/ideate). Write each section's text in plain sentences first, then give each part the block that shows it best from [`refs/devex/workspace/docs/blocks.md`](../../refs/devex/workspace/docs/blocks.md). A report's paragraphs hold the bound of an explaining page, 120 words beside another block and 200 alone (`RULE.DEVEX.WORKSPACE.531` · MUST · check:doc-check), and `spn-devex docs audit` names, as a SOFT `fit` finding, a paragraph that should have been a list, a table or a numbered list.
 

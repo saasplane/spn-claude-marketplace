@@ -151,7 +151,7 @@ wherever it stands. The `workstream question` commands are the record's only wri
 | Command | What it does |
 | --- | --- |
 | `question raise <arc> --file card.json` | takes the next number from the record, writes the record, and puts the card in the approach page's `Open`. `card.json` is the card with its title, and a card with a part missing is refused, and so is a card whose What cites nothing it read: add the file and line, or a fact id, for what the card says about today, for example `scripts/commands/workstream/question.ts:68` or `f9` |
-| `question show <qN> --in notes/<arc>/preview.html` | shows the card in that preview's `Open`, with a line back to the approach page |
+| `question show <qN> --in notes/<arc>/arc.html` | shows the card in that preview's `Open`, with a line back to the approach page |
 | `question answer <qN> --key A --words "…"` | records the answer in the developer's words, and takes the card off every page |
 | `question withdraw <qN> --words "…"` | records the withdrawal, and takes the card off every page |
 

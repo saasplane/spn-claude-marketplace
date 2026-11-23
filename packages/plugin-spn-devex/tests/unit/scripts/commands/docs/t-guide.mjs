@@ -477,17 +477,17 @@ tool run
     first.code === 1 && first.out.includes("no page has been produced here yet. Run `docs guide write`") && unchanged(), first.out);
 
   const templates = join(BASE, "templates-before");
-  mkdirSync(join(templates, "pages"), { recursive: true });
-  writeFileSync(join(templates, "pages", "guide-template.html"), "<title>Guide</title>\n<style>.step{}</style>\n<div class=\"page guide\"></div>\n");
+  mkdirSync(join(templates, "docs", "pages"), { recursive: true });
+  writeFileSync(join(templates, "docs", "pages", "guide-template.html"), "<title>Guide</title>\n<style>.step{}</style>\n<div class=\"page guide\"></div>\n");
   const refused = guide(["write", join(root, GUIDES, "01-getting-started.md")], { SPN_TEMPLATES: templates });
   ok("a template that links no shared stylesheet is refused in the one wording, and no page is written",
     refused.code === 1 && refused.out.includes(OWN_COPY) && unchanged(), refused.out);
 
   // A template with a slot this command does not know is not filled by a guess.
-  const real = readFileSync(join(environment.SPN_TEMPLATES, "pages", "guide-template.html"), "utf8");
+  const real = readFileSync(join(environment.SPN_TEMPLATES, "docs", "pages", "guide-template.html"), "utf8");
   const changed = join(BASE, "templates-changed");
-  mkdirSync(join(changed, "pages"), { recursive: true });
-  writeFileSync(join(changed, "pages", "guide-template.html"), real.replace("<h1>{{NAME}}</h1>", "<h1>{{NAME}}</h1>\n  <p>{{A NEW SLOT}}</p>"));
+  mkdirSync(join(changed, "docs", "pages"), { recursive: true });
+  writeFileSync(join(changed, "docs", "pages", "guide-template.html"), real.replace("<h1>{{TITLE}}</h1>", "<h1>{{TITLE}}</h1>\n  <p>{{A NEW SLOT}}</p>"));
   const slot = guide(["write", join(root, GUIDES, "01-getting-started.md")], { SPN_TEMPLATES: changed });
   ok("a template with a slot the command does not fill is refused, and the slot is named",
     slot.code === 1 && slot.out.includes("{{A NEW SLOT}}") && unchanged(), slot.out);
@@ -501,7 +501,7 @@ console.log("\n=== a guide goes back to the hub of its repository, one step up t
   const ran = guide(["write", join(root, GUIDES, "01-getting-started.md")]);
   const text = read(root, `${PAGES}/getting-started-guide.html`);
   ok("the way back opens the hub, a page, named by the repository", ran.code === 0
-    && text.includes(`<a class="sds-home" href="../docs/concept-overview.html">&larr; ${basename(root)}</a>`), ran.out + each(text, /(<a [^>]*sds-home[^>]*>)/g).join(" "));
+    && text.includes(`<p class="sds-crumb"><a href="../docs/concept-overview.html">&larr; ${basename(root)}</a></p>`), ran.out + each(text, /(<a [^>]*sds-home[^>]*>)/g).join(" "));
   ok("and it is not the index, and it keeps the page inside its own tab", !text.includes("../index.html") && !text.includes('target="_top"'));
   ok("the page is current against what the command writes now", guide(["check", join(root, GUIDES, "01-getting-started.md")]).code === 0);
 }

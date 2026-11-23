@@ -7,7 +7,7 @@
      `state.json`, `log.jsonl`, `facts.jsonl` and `<subject>.md`, the arc's name file. Nobody types in it, and the
      PreToolUse hook refuses an edit there. The arc's address is its row on the approach page, `approach.html#<arc>`,
      and every link to the arc points there, never at `state.json`.
-     `notes/<arc>/` holds what the agent writes: `preview.html`, `samples/`, `plan.md`, `orders/`, `scripts/` and `work/`.
+     `notes/<arc>/` holds what the agent writes: `arc.html`, `samples/`, `plan.md`, `orders/`, `scripts/` and `work/`.
      This file is not copied into a workstream. It shows the commands that write the arc's data and what each field
      holds, then the agent's own files, so an arc is opened and run the same way every time. No card lives in an arc:
      a question is a record in `questions.jsonl`, raised with `workstream question raise`. -->
@@ -63,7 +63,7 @@ spn-devex workstream arc stamp write {{arc}}
   "status": "PROPOSED", "reason": null, "wait": null,
   "decides": "{{what this arc decides}}", "repos": ["{{repo}}", "{{repo}}"],
   "cycle": "{{the package it releases, or none}}", "follows": "{{N<m>, or nothing}}", "model": "{{Opus 5.5}}",
-  "preview": "preview.html",
+  "preview": "arc.html",
   "rows": [
     { "id": "{{1}}", "parent": "N{{nnn}}", "title": "{{the step's What: the files, or plan § k}}",
       "kind": "{{change}}", "repo": "{{repo}}", "work": "{{DOCS}}", "mechanism": "{{agents}}",
@@ -95,7 +95,7 @@ arcs/{{arc}}/{{short-name}}.md   the arc's name, written with its data: the titl
 
 ```text
 notes/{{arc}}/
-  preview.html      every arc's one preview, written when the arc opens: each proposal a
+  arc.html          every arc's one page, written when the arc opens: each proposal a
                     section, its status in the masthead, frozen at the go
   samples/          real files of the kind the work produces, each in its own format, as many as the work needs
   plan.md           optional, written at the go only where the arc has traps, a set or a move table; never while PROPOSED

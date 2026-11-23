@@ -390,8 +390,8 @@ const withAreas = () => repo({
 {
   const root = withAreas();
   const templates = join(BASE, "templates-before");
-  mkdirSync(join(templates, "pages"), { recursive: true });
-  writeFileSync(join(templates, "pages", "index-template.html"), "<title>Index</title>\n<style>.tree{}</style>\n<div class=\"index\"></div>\n");
+  mkdirSync(join(templates, "docs", "pages"), { recursive: true });
+  writeFileSync(join(templates, "docs", "pages", "index-template.html"), "<title>Index</title>\n<style>.tree{}</style>\n<div class=\"index\"></div>\n");
   const refused = index(["write", root], { SPN_TEMPLATES: templates });
   ok("a template that links no shared stylesheet is refused in the one wording, and no index is written",
     refused.code === 1 && refused.out.includes(OWN_COPY) && !existsSync(join(root, INDEX)), refused.out);
