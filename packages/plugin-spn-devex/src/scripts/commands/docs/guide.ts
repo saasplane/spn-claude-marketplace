@@ -1,4 +1,4 @@
-// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § The guide page — stages, and steps that number themselves
+// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-pages.md § The guide page — stages, and steps that number themselves
 // The chapter is the source of truth; a rule change is edited there first, then here, in the same change.
 //
 // A guide's page, produced from its markdown: the command reads the guide and places what it finds.
@@ -459,7 +459,7 @@ function pageOf(guideFile: string, options: { name: string | null; out: string |
     return [{ grade: "RULE", check: "guide", file, message:
       "this guide holds no step, so no page is written. A step is a row of a table with a `Step` and a `Runs` column, " +
       "a `###` heading under a `##` section, a heading that opens with `Step`, a number and a dash, or a `##` section that opens with a number and a dot. " +
-      "Bring the guide to the shape of steps first (05-artifacts.md, The guide page)" }];
+      "Bring the guide to the shape of steps first (05-pages.md, The guide page)" }];
 
   const named = locationOf(file, workspace);
   const page = guidePage(pageTemplate(templatesDir(workspace), TEMPLATE), guide, sections, {

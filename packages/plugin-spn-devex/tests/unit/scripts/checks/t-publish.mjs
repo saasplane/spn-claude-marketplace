@@ -1,4 +1,4 @@
-// `publish` — the check on a publish (05-artifacts.md § Nothing is published unless the developer
+// `publish` — the check on a publish (05-pages.md § Nothing is published unless the developer
 // asks · § What a stored page carries, and what a published one carries).
 //
 // It reminds on every publish, because it cannot know whether the developer asked. It refuses one

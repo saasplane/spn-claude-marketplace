@@ -83,7 +83,7 @@ put it at 18 %. Watch the share, never a count.
 
 ## A block or figure that breaks the rule
 
-Where the sample holds a docs page, also report a block or a figure that breaks `refs/devex/workspace/docs/blocks.md` (§ *Which block a content takes*, § *Which figure, for what you need to show*), naming the rule line it breaks. It is a finding, never a block.
+Where the sample holds a docs page, also report a block or a figure that breaks `refs/devex/workspace/docs/blocks.md` and `refs/devex/workspace/docs/figures.md` (§ *Which block a content takes*, § *Which figure, for what you need to show*), naming the rule line it breaks. It is a finding, never a block.
 
 For a block rewrite by `spn-block-rewriter`, also check that the new block's facts equal the old form's, cell for cell and item for item, and that no heading, title or description moved. A fact that left, or a heading that moved, is a finding.
 

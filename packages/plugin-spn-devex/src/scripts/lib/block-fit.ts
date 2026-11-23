@@ -1,4 +1,4 @@
-// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § Every block has a rule · § Prose and lists have limits · § A page is written in two passes
+// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/06-blocks.md § Every block has a rule · § Prose and lists have limits · § A page is written in two passes
 // The chapter is the source of truth. A rule change is edited there first, then here, in the same change.
 //
 // Where a paragraph should have been a block: each paragraph, list and callout is held to its block's limit. Every finding is SOFT and names the block.

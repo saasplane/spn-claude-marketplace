@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // A drawing below the figure spacing contract is refused as the page is written.
 //
-// WHAT IT READS. Each `<svg class="dl-svg">` (the docs design language's figure) and each `<svg class="sds-drawing">` (a flat drawing a
+// WHAT IT READS. Each `<svg class="dl-svg">` (the Docs look's figure) and each `<svg class="sds-drawing">` (a flat drawing a
 // hand-written page may still hold) that a `.html` or `.md` write carries, measured with the same `checkFigures` that
 // `docs figure` runs, so the write and the audit give one answer. The thresholds are the drawing scale's: a label 8 clear of its
 // wire, parallel wires 16 apart, a plate 16 round what it holds, a wire 8 or more from the frame.

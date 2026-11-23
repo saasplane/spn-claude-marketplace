@@ -1,5 +1,5 @@
 // RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § An arc is cut by what is reviewed and released together, and named for its domain · § The workstream is kept as data, and every file has one owner · § The folder · § The formats · § The approach page keeps up with its arcs · § An arc carries its specification, or names the note that holds it
-//           docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § After `How` comes a section of its own, Plan (RULE.DEVEX.WORKSPACE.487) · § The approach document — a workstream's, never a repository's
+//           docs/04-capabilities/01-devex/04-workspace/04-docs/05-pages.md § After `How` comes a section of its own, Plan (RULE.DEVEX.WORKSPACE.487) · § The approach document — a workstream's, never a repository's
 // The chapters are the source of truth; a rule change is edited there first, then here, in the same change.
 //
 // The shared state library: where each file a script owns sits, how it is read and written, the
@@ -798,7 +798,7 @@ export function inline(text: string): string {
 const share = (done: number, total: number): number => (total ? Math.round((done / total) * 100) : 0);
 
 /**
- * A workstream's own word, which its page's header shows and *Overall* takes (05-artifacts.md § How ends in
+ * A workstream's own word, which its page's header shows and *Overall* takes (05-pages.md § How ends in
  * Cycles): `DONE` for a workstream in `closed/`, `IMPLEMENTING` once the first step of any arc has started, which an
  * arc `RUNNING` or `LANDED` says, else `PLANNING`. Read from the arcs' worked-out statuses alone, so the header and
  * *Overall* cannot disagree.

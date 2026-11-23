@@ -1,4 +1,4 @@
-// The shared page styles (`05-artifacts.md` § One stylesheet, served in versions): the built stylesheet
+// The shared page styles (`08-stylesheet.md` § One stylesheet, served in versions): the built stylesheet
 // is what its source builds, and a version that was cut holds the bytes it was cut with. A built file
 // that fell behind its source would be served to every page at the next cut, and a version that
 // changed would restyle every page that links it.

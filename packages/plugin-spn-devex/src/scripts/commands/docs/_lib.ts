@@ -1,4 +1,4 @@
-// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/03-tree.md · 05-artifacts.md · 02-document.md
+// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/03-tree.md · 05-pages.md · 02-document.md
 // This file carries rules it does not own. Those chapters are the source of truth. A rule change is
 // edited there first, then here, in the same change. `restates check` reports this copy when a
 // source moves, and reports this header too when a chapter it names is not where it says.
@@ -62,7 +62,7 @@ export type Finding = { check: string; grade: Grade; file: string; message: stri
 // `workstream/arc-template.html`. It carries no fixed outline.
 /**
  * The kinds a document's block may declare. `guide` and `index` are the two produced pages beside
- * a construct page (05-artifacts.md § The guide page, § The index of artifacts).
+ * a construct page (05-pages.md § The guide page, § The index of artifacts).
  */
 export const VARIANTS = ["approach", "overview", "construct", "behaviors", "capability", "report",
                   "face", "data_model", "surface_map", "route_map", "register", "preview",
@@ -267,14 +267,14 @@ export function checkBlock(file: string, src: string, block: any, err: string | 
 
   if (variant && !VARIANTS.includes(variant)) add("RULE", `\`variant\` \`${variant}\` is not one of ${VARIANTS.join(" · ")}`);
 
-  // AN ARGUMENT IS A WORKSTREAM'S, NEVER A REPOSITORY'S (05-artifacts.md § What the pocket holds).
+  // AN ARGUMENT IS A WORKSTREAM'S, NEVER A REPOSITORY'S (05-pages.md § What the pocket holds).
   // A repository states what is true now; an approach page weighs options and carries open cards,
   // and a docs tree holding both is how a stale argument comes to be read as a statement of today.
   // Fifteen pages had accumulated in repositories before this fired.
   if (variant === "approach" && /(^|\/)docs\//.test(file.replace(/\\/g, "/")))
     add("RULE", `an approach page belongs to the workstream that argues it, never to a repository's \`docs/\` — move it under \`${DEVEX_WORKSTREAMS}/\``);
 
-  // THE POCKET'S FOLDER SET IS FIXED: DOCS, GUIDES, REPORTS AND NOTHING ELSE (05-artifacts.md § What
+  // THE POCKET'S FOLDER SET IS FIXED: DOCS, GUIDES, REPORTS AND NOTHING ELSE (05-pages.md § What
   // the pocket holds). A file in any other folder of the pocket is a file some seat needs, and a fact
   // a seat needs lives in a seat. An overview or a construct page out of its place is told its place.
   const pocketFolder = artifactFolderOf(file);
@@ -674,7 +674,7 @@ export function checkHeader(file: string, src: string, block: any): Finding[] {
   // reports every markdown document in the corpus as malformed, which is what it was doing.
   if (!file.endsWith(".html")) return checkSeatHeader(file, src, block);
 
-  // THE INDEX HAS NO HEADER LINE AND NO MASTHEAD (05-artifacts.md § The index of artifacts). It is a
+  // THE INDEX HAS NO HEADER LINE AND NO MASTHEAD (05-pages.md § The index of artifacts). It is a
   // frame around other pages, and each page it opens carries its own, so nothing here is asked of it.
   if (block.variant === "index") return f;
 
@@ -733,7 +733,7 @@ export function checkHeader(file: string, src: string, block: any): Finding[] {
   // Status: the chip carries the enum word; a face and a FOUNDATION construct have no chip at all.
   const statusChip = h.match(/class="sds-badge sds-status[^"]*"[^>]*>([\s\S]*?)<\/span>/);
   if (block.variant === "report") {
-    // A REPORT'S HEADER IS TWO LINES UNDER THE BREADCRUMB (05-artifacts.md § The header,
+    // A REPORT'S HEADER IS TWO LINES UNDER THE BREADCRUMB (05-pages.md § The header,
     // RULE.DEVEX.WORKSPACE.192): Type and For, then Generated and Commit. Read with the comments
     // removed, because the template explains the lines inside the header itself.
     const shown = h.replace(/<!--[\s\S]*?-->/g, " ");
@@ -883,7 +883,7 @@ export function holdsOwnCopy(file: string, src: string): boolean {
 
 /**
  * Whether a page sits under a workstream's `closed/` folder. A closed argument stays as it is
- * rendered, so its styles are never checked (05-artifacts.md § The page itself).
+ * rendered, so its styles are never checked (05-pages.md § The page itself).
  */
 export function inClosedWorkstream(file: string): boolean {
   return file.replace(/\\/g, "/").includes(`/${DEVEX_WORKSTREAMS}/closed/`);
@@ -902,7 +902,7 @@ const SERVED_VERSION = new RegExp(
   `<(?:link|script)\\b[^>]*\\b(?:href|src)="(?:[^"]*/)?(\\d+\\.\\d+\\.\\d+)/(?:${ANY_SERVED_NAMES.map((served) => served.replace(/\./g, "\\.")).join("|")})"`, "gi");
 
 /**
- * A page's furniture is the shared stylesheet's and the shared script's (05-artifacts.md § The page
+ * A page's furniture is the shared stylesheet's and the shared script's (05-pages.md § The page
  * itself, RULE.DEVEX.WORKSPACE.214).
  *
  * A PAGE THAT LINKS THE SHARED STYLESHEET IS HELD TO ONE THING: each version its two lines name is
@@ -926,7 +926,7 @@ export function checkFurniture(file: string, src: string): Finding[] {
   return [{ check: "furniture", grade: "RULE", file, message:
     `this page links version ${absent.map((version) => "`" + version + "`").join(" · ")} of the shared styles, and no such version exists. ` +
     `The versions that exist: ${versions.map((version) => "`" + version + "`").join(" · ") || "none"}. ` +
-    "Link one of them, or cut the version with `docs styles cut` (05-artifacts.md, One stylesheet, served in versions)" }];
+    "Link one of them, or cut the version with `docs styles cut` (08-stylesheet.md, One stylesheet, served in versions)" }];
 }
 
 /** A whole opening tag of a `<link>` or `<script>` that loads one of the served files from a version's folder. */
@@ -1129,7 +1129,7 @@ export function worldOf(file: string): string | null {
  * THREE KINDS CARRY NONE. An overview describes, so a face is either current or a defect. A
  * FOUNDATION repository's construct states a standard, and its behaviour rows are `PROMISE` — five
  * columns, no `Status` and no `Tier` — so there is no run to roll up and no proof state to name. A
- * word written there would be a claim somebody typed once, which is exactly what `05-artifacts.md`
+ * word written there would be a claim somebody typed once, which is exactly what `05-pages.md`
  * § *A construct's status is derived, never typed* forbids. A report is a snapshot, and the next run
  * replaces it rather than moving it through states.
  */
@@ -1141,7 +1141,7 @@ export function carriesStatus(file: string, block: any): boolean {
   if (block?.variant === "report") return false;
   if (block?.variant === "construct" && worldOf(file) === "FOUNDATION") return false;
   // A GUIDE PAGE AND THE INDEX ARE PRODUCED FROM A SOURCE, and neither has a state of its own
-  // (05-artifacts.md § The guide page). The guide's markdown keeps the status it has.
+  // (05-pages.md § The guide page). The guide's markdown keeps the status it has.
   if ((block?.variant === "guide" || block?.variant === "index") && file.endsWith(".html")) return false;
   return true;
 }
@@ -1892,7 +1892,7 @@ export function buildGlossaryHtml(domainDir: string, overviewFile: string): { bo
     return `<a href="${address}${fragment === undefined ? "" : `#${fragment}`}">${label}</a>`;
   });
   const cell = (x: string, seat: string) => linked(esc(x.replace(/\\\|/g, "|")).replace(/`([^`]*)`/g, "<code>$1</code>"), seat);
-  // THREE COLUMNS (05-artifacts.md § The shape of a section, on every page kind): the term, linked to its
+  // THREE COLUMNS (05-pages.md § The shape of a section, on every page kind): the term, linked to its
   // construct's page, in bold; the contract's spelling as the seat writes it, in code style, empty where the
   // seat has a dash, with a note the seat adds after the code under it in small type; and the meaning. A row
   // with no consumer word is titled by the contract's spelling. A construct's name heads its group as a header
@@ -2500,7 +2500,7 @@ export function statusFor(seat: string, workspace: string, write: boolean, say: 
  * The furniture: the two lines of the construct template that load the shared files. The first is
  * the line that links `docs-language.css`, and the second is the line that loads `docs-page.js`. A
  * produced page carries those two lines and nothing else of the template's: no `<style>` block and
- * no script with code (05-artifacts.md § What a stored page carries).
+ * no script with code (05-pages.md § What a stored page carries).
  *
  * A TEMPLATE THAT LACKS EITHER LINE IS REFUSED, because a page produced from it would link no
  * shared file and would show its text with no styling.
@@ -2515,7 +2515,7 @@ export function furniture(templates: string): { stylesheet: string; script: stri
   const script = new RegExp(`<script\\b[^>]*\\bsrc="[^"]*${anyNameOf(PAGE_SCRIPT)}"[^>]*>\\s*</script>`, "i").exec(template)?.[0];
   if (!stylesheet || !script)
     throw new Error(`\`construct-template.html\` holds no line that loads \`${stylesheet ? PAGE_SCRIPT : STYLESHEET}\`, ` +
-      "so a page produced from it would link no shared file (05-artifacts.md, One stylesheet, served in versions)");
+      "so a page produced from it would link no shared file (08-stylesheet.md, One stylesheet, served in versions)");
   return { stylesheet, script, footer: "" };
 }
 

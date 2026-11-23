@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/03-lenses/01-lenses.md",
-      "seen": "280acea7"
+      "seen": "f31dfe81"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",

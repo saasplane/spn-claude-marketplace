@@ -15,7 +15,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/",
-      "seen": "c99bb438"
+      "seen": "de2ac7e0"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/07-architecture-widgets/",

@@ -1,4 +1,4 @@
-// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § One stylesheet, served in versions
+// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/08-stylesheet.md § One stylesheet, served in versions
 // The chapter is the source of truth; a rule change is edited there first, then here.
 //
 // `docs sds …` is the old name of `docs styles …` (the group was renamed with the files it cuts, from version 1.16.0). It stays for one

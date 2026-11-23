@@ -1,4 +1,4 @@
-// The shared page styles (`05-artifacts.md` § One stylesheet, served in versions): what a page's link
+// The shared page styles (`08-stylesheet.md` § One stylesheet, served in versions): what a page's link
 // says, and which versions were cut. Every command that reads a page asks this module first.
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";

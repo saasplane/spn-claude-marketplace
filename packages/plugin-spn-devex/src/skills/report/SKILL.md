@@ -10,33 +10,33 @@ description: Write one of the five reports on a repository — coverage (how muc
       "seen": "f9709d35"
     },
     {
-      "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/05-report.md",
-      "seen": "81706a25"
+      "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/05-docs-pages.md",
+      "seen": "422c982c"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
       "section": "The masthead, and the opening",
       "seen": "b8b710da"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
       "section": "Reports and templates",
-      "seen": "9999eb27"
+      "seen": "8fe55314"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
       "section": "The header — two lines, six fields, produced from the block",
-      "seen": "e41850eb"
+      "seen": "de0e2c56"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
       "section": "Nothing is published unless the developer asks",
-      "seen": "cd38f32f"
+      "seen": "ca82b47a"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/06-blocks.md",
       "section": "A page is written in two passes",
-      "seen": "5812f898"
+      "seen": "b428fcc6"
     }
   ]
 }
@@ -87,7 +87,7 @@ The block names the type with one `SPDocReportType` value: `COVERAGE` · `TESTS`
 
 **Write the page by the runbook:** a page the developer will open is written by [`refs/devex/workspace/docs/writing-a-page.md`](../../refs/devex/workspace/docs/writing-a-page.md): pick the template, start it with `docs page write` or `docs page new`, fill every slot and section, check, look, hand on (RULE.DEVEX.WORKSPACE.560).
 
-**Write a report in two passes, the text first and the blocks second** (`RULE.DEVEX.WORKSPACE.533` · MUST · skill:spn-devex/ideate). A report's blocks and figures follow the blocks ref, and the doc-check hook's hints on what was written (a table that reads as a catalog, a passage that calls for a figure, a figure that does not match, a command that is gone) are acted on before the report is finished. Write each section's text in plain sentences first, then give each part the block that shows it best from [`refs/devex/workspace/docs/blocks.md`](../../refs/devex/workspace/docs/blocks.md). A report's paragraphs hold the bound of an explaining page, 120 words beside another block and 200 alone (`RULE.DEVEX.WORKSPACE.531` · MUST · check:doc-check), and `spn-devex docs audit` names, as a SOFT `fit` finding, a paragraph that should have been a list, a table or a numbered list.
+**Write a report in two passes, the text first and the blocks second** (`RULE.DEVEX.WORKSPACE.533` · MUST · skill:spn-devex/ideate). A report's blocks and figures follow the blocks ref, and the doc-check hook's hints on what was written (a table that reads as a catalog, a passage that calls for a figure, a figure that does not match, a command that is gone) are acted on before the report is finished. Write each section's text in plain sentences first, then give each part the block that shows it best from [`refs/devex/workspace/docs/blocks.md` and `refs/devex/workspace/docs/figures.md`](../../refs/devex/workspace/docs/blocks.md). A report's paragraphs hold the bound of an explaining page, 120 words beside another block and 200 alone (`RULE.DEVEX.WORKSPACE.531` · MUST · check:doc-check), and `spn-devex docs audit` names, as a SOFT `fit` finding, a paragraph that should have been a list, a table or a numbered list.
 
 **The page you write links the shared files, and holds no copy of them** (`RULE.DEVEX.WORKSPACE.214` · MUST · check:doc-check). The copy keeps the template's two lines: one links one version of `docs-language.css` by its address, and the other loads `docs-page.js` from the same version. The stylesheet gives the report its forms in both themes. The script shows the Generated time and builds the outline. A report needs no style of its own: every form it uses is in the shared stylesheet. A `style` attribute stays only where the template has one, such as the width of a column.
 

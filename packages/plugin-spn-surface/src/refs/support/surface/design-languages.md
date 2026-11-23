@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/01-common/05-design-languages.md",
-      "seen": "7c54ace4"
+      "seen": "b2b5941c"
     }
   ]
 }

@@ -7,10 +7,10 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/",
-      "seen": "c99bb438"
+      "seen": "de2ac7e0"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/07-figures.md",
       "section": "`SKELETON` — a mock of a layout",
       "seen": "ba0dc4e4"
     }

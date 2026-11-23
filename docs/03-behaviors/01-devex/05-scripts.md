@@ -432,6 +432,6 @@ Every row below is declared and none is claimed: a run writes the last two cells
 | `MKT.CHECK.04` – `MKT.CHECK.07` | `MKT.SCRIPTS.03` – `MKT.SCRIPTS.06`, in order |
 | `MKT.TOOL.01` – `MKT.TOOL.07` | `MKT.SCRIPTS.07` – `MKT.SCRIPTS.13`, in order |
 | `MKT.PAGE.01` · `MKT.PAGE.02` · `MKT.PAGE.03` | `MKT.SCRIPTS.14` · `MKT.SCRIPTS.15` · `MKT.SCRIPTS.16` |
-| `MKT.PAGE.04` | **struck** — a figure's grammar is stated in the foundation's `05-artifacts.md`, and it is the book's promise to make |
+| `MKT.PAGE.04` | **struck** — a figure's grammar is stated in the foundation's `05-pages.md`, and it is the book's promise to make |
 | `MKT.PAGE.05` – `MKT.PAGE.08` | `MKT.SCRIPTS.17` – `MKT.SCRIPTS.20`, in order |
 | `MKT.SCRIPTS.561` | `MKT.SCRIPTS.577`, since the workflow file moved out of the arc's data |

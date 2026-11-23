@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § The approach document — a workstream's, never a repository's
+// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-pages.md § The approach document — a workstream's, never a repository's
 // A PREVIEW'S TWO STRUCTURAL RULES THAT NO HOOK READ: `Where it lands` is one folder tree for each repository
 // (RULE.DEVEX.WORKSPACE.238), and each layer of `Proposed` carries a `data-layer` mark (RULE.DEVEX.WORKSPACE.233); a part carries no For, Layer or Reads line. The page is read as it is saved, at every Stop and in `docs check`; a page that is not a
 // preview, or has no such section yet, has nothing to find.
@@ -28,7 +28,7 @@ export function whereItLandsFindings(text: string): string[] {
   // bundle</strong>`) is a step in the section's prose, never a repository, so its bold text must be one repository-shaped word.
   const trees = [...where.matchAll(/<pre\b([^>]*)>([\s\S]*?)<\/pre>/gi)].filter((one) => /\bdata-lang="tree"/.test(one[1]) || TREE_CHARACTERS.test(one[2])).length;
   const named = [...where.matchAll(/<p>\s*<strong>\s*\d+\s*(?:&middot;|·)\s*([^<]*)<\/strong>/gi)].filter((one) => REPOSITORY_NAME.test(one[1].trim())).length;
-  const why = "(05-artifacts.md § The approach document; RULE.DEVEX.WORKSPACE.238) · draw each repository as one `<pre>` tree, a folder or file on each line with `├──` and `└──`, and its note in one column on the right";
+  const why = "(05-pages.md § The approach document; RULE.DEVEX.WORKSPACE.238) · draw each repository as one `<pre>` tree, a folder or file on each line with `├──` and `└──`, and its note in one column on the right";
   if (!trees) return [`Where it lands holds no folder tree — it is one tree for each repository, and never a table of paths ${why}`];
   if (named > trees) return [`Where it lands names ${named} repositories and draws ${trees} tree${trees === 1 ? "" : "s"} — one tree for each repository ${why}`];
   return [];
@@ -39,7 +39,7 @@ export function proposedFindings(text: string): string[] {
   const proposed = part(text, "Proposed");
   if (proposed === null) return [];
   const out: string[] = [];
-  const why = "(05-artifacts.md § The approach document; RULE.DEVEX.WORKSPACE.233)";
+  const why = "(05-pages.md § The approach document; RULE.DEVEX.WORKSPACE.233)";
   for (const heading of proposed.matchAll(/<h3\b([^>]*)>([\s\S]*?)<\/h3>/gi)) {
     const name = heading[2].replace(/<[^>]+>/g, "").trim();
     if (/^shape$/i.test(name)) continue;

@@ -1,4 +1,4 @@
-// The page renderer and a code block (`05-artifacts.md` § One stylesheet, served in versions): a produced page
+// The page renderer and a code block (`08-stylesheet.md` § One stylesheet, served in versions): a produced page
 // holds plain code in a `pre` tagged with its language, and no colour. The shared script colours the block when
 // the page opens, so the renderer writes the same block a person writes by hand.
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
@@ -356,6 +356,12 @@ console.log("\n=== the page renderer — a catalog in three layouts, with media 
   const counted = made(fence("catalog layout=LIST name=Form", "Trees | boxes\n  Items: 11\n  State: new\nTables | rows\n  Items: 24\n  State: old"));
   ok("[MKT.SCRIPTS.614] a list with side columns heads the main column with name= and every side column with its key; a column of numbers is set at the end",
     counted.html.includes('<div class="sds-tiles-head" aria-hidden="true"><span>Form</span><span data-align="end">Items</span><span>State</span></div>') && counted.html.includes('<div data-align="end"><dt>Items</dt><dd>11</dd></div>') && !counted.html.includes('<div data-align="end"><dt>State'), counted.html);
+  const below = made(fence("catalog layout=LIST", "ORG | members\n  Per call: the record's organization is the caller\n  Writes: as permitted\nPARENT_ORG | above\n  Per call: the platform: no filter; otherwise the record's parent organization is the caller\nCHILD_ORG | below\n  Per call: the child column is the caller"));
+  ok("[MKT.SCRIPTS.614] facts below the line stand in one column per fact name on every item: no fact takes the row, and a missing fact keeps its column empty",
+    !below.html.includes("sds-tile-fact-wide") && below.html.includes('<dl class="sds-tile-facts"><div><dt>Per call</dt><dd>the platform: no filter; otherwise the record&#39;s parent organization is the caller</dd></div><div class="sds-tile-fact-none"></div></dl>') || (!below.html.includes("sds-tile-fact-wide") && below.html.includes('<div><dt>Per call</dt><dd>the child column is the caller</dd></div><div class="sds-tile-fact-none"></div></dl>')));
+  const tagged = made(fence("catalog layout=LIST", "TOOLCHAIN | the bases resolve\n  Owes: [UNIT]\nAPP_WEB | the UI face\n  Owes: [JOURNEY] [COMPONENT]"));
+  ok("[MKT.SCRIPTS.614] a fact written as bracketed codes draws one badge for each, and up to three tags stand in a side column",
+    tagged.html.includes('data-facts="side"') && tagged.html.includes('<dd><span class="sds-tags"><span class="sds-badge">JOURNEY</span> <span class="sds-badge">COMPONENT</span></span></dd>'));
   ok("[MKT.SCRIPTS.614] one long fact, a sentence, or three facts keeps the facts under the description",
     !made(fence("catalog layout=LIST", "A | a\n  Weight: MUST\nB | b\n  Weight: this value is longer than twenty")).html.includes("data-facts")
       && !made(fence("catalog layout=LIST", "A | a\n  Weight: Do it. Now")).html.includes("data-facts")

@@ -2,8 +2,8 @@
 {
   "docs": [
     {
-      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "seen": "76fc037b"
+      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
+      "seen": "2e5f7bbe"
     }
   ]
 }
@@ -11,7 +11,7 @@
 
 # Writing a page — the runbook
 
-**Source of truth:** the artifacts chapter (`04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md`), RULE.DEVEX.WORKSPACE.560. This file restates it as one runbook and adds no rule. **The book governs.** Read it when you are about to write a page, any page the developer will open: it says which template, which command, and what makes the page done.
+**Source of truth:** the artifacts chapter (`04-capabilities/01-devex/04-workspace/04-docs/05-pages.md`), RULE.DEVEX.WORKSPACE.560. This file restates it as one runbook and adds no rule. **The book governs.** Read it when you are about to write a page, any page the developer will open: it says which template, which command, and what makes the page done.
 
 **A page that reaches the developer holds no placeholder and no empty section.** A `{{…}}` left from a template, a heading with nothing under it and a section whose only content is a placeholder are each a finding, and a reply that links such a page is refused.
 
@@ -34,7 +34,7 @@
 
 4. **Check.** `spn-devex docs page check <file>`: no placeholder, no empty section, no finding. Act on every hint too; a hint is the block or figure the page should have used.
 
-5. **Look.** `spn-devex docs look <file>`, in light and in dark, at the Mac widths of the Docs design language. A page you have not looked at is a page you have not seen.
+5. **Look.** `spn-devex docs look <file>`, in light and in dark, at the Mac widths of the Docs look. A page you have not looked at is a page you have not seen.
 
 6. **Hand on.** Link the page where it belongs: an arc's page from the approach page's Plan row, its samples from the arc's page, and a samples folder holds HTML pages only. Hand the developer the page's whole `file:///` address.
 

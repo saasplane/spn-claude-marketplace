@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § The approach document · § The split plan is the arcs' step rows, and Repo is the scope
+// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-pages.md § The approach document · § The split plan is the arcs' step rows, and Repo is the scope
 //           RULE.DEVEX.WORKSPACE.485, a go's first plan and each release part wait for a panel's verdict on record
 //           docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § The workstream is a scope of work, not a window · § A step row says where, what work, and how · § Documents first, and the order they are written in · § Retirement is close-or-graduate · § Closing a workstream is a check; closing a window is nothing
 // The chapters are the source of truth. A rule change is edited there first, then here, in the same change.
@@ -35,7 +35,7 @@
 // It also carries finding F5's fix: a card answered ON THE PAGE, in its own `sds-recommended` block,
 // was invisible to a check that read only the arcs. Four cards sat in `Open` answered for a day.
 //
-// EVERY CLASS READ HERE IS A NAME OF THE SHARED STYLESHEET (05-artifacts.md § One stylesheet, served
+// EVERY CLASS READ HERE IS A NAME OF THE SHARED STYLESHEET (05-pages.md § One stylesheet, served
 // in versions). No class is read of a page that links no shared stylesheet: its cards are read by
 // their `id`, its header is not read, and the gate names the page once with `OWN_COPY`.
 
@@ -337,7 +337,7 @@ export function stateOf(row: Row): string {
 
 // ---------------------------------------------------------------------------- what `carried` names
 //
-// `carried` MEANS THE WORK LEAVES THIS WORKSTREAM (05-artifacts.md § The approach document).
+// `carried` MEANS THE WORK LEAVES THIS WORKSTREAM (05-pages.md § The approach document).
 // A carried row names a successor scope that can receive it: another workstream, in `open/` or
 // `backlog/`. Three things were one value before this, and the count lied because of it.
 //
@@ -553,7 +553,7 @@ function home(root: string, subject: string): string {
 
 /**
  * An approach page written into a member repository. An approach page lives in the workstream that
- * argues it and closes with it; no pocket of a repository holds one (05-artifacts.md § The approach
+ * argues it and closes with it; no pocket of a repository holds one (05-pages.md § The approach
  * document — a workstream's, never a repository's). A workstream's own page is where arguing it is
  * the point.
  */
@@ -645,7 +645,7 @@ export function closing(destination: string): boolean {
 
 // ---------------------------------------------------------------------------- the answered card
 //
-// 05-artifacts.md § The approach document → Open — an answered question is not an `Open` entry with
+// 05-pages.md § The approach document → Open — an answered question is not an `Open` entry with
 // an answer written beside it: it folds into the section that then states it, and leaves.
 //
 // THE PAGE ALONE CANNOT TELL whether a card is answered, so this reads the workstream's records beside
@@ -820,7 +820,7 @@ export function staleCards(folder: string, pages: string[]): Array<[string, stri
  *
  * Deliberately weak. It asks only that the card's `q<n>` anchor stands somewhere outside `Open`, because
  * no check can judge whether a fold carries enough. The anchor, never a Q number in the words, is what
- * the book's fold check reads (05-artifacts.md § The fold check reads the anchor). A gate that fires on
+ * the book's fold check reads (05-pages.md § The fold check reads the anchor). A gate that fires on
  * real deletions and stays quiet on thin folds is worth more than one nobody trusts.
  */
 export function unfoldedCards(folder: string, pages: string[]): Array<[string, string]> {
@@ -948,7 +948,7 @@ export function gateDocumentsFirst(payload: Payload): Verdict {
           `Its record is settled, and the page now says nothing about it at all. A fold ` +
           `moves the card into the section that states what it settled; what replaces it is what ` +
           `execution reads, because the window holding the answer is gone ` +
-          `(05-artifacts.md, The approach document).`) };
+          `(05-pages.md, The approach document).`) };
       }
       const stale = staleCards(folder, pages);
       const staleLine = stale.slice(0, 6).map(([page, number, why]) => `${number} in ${where(page)} (${why})`).join(" · ");
@@ -957,7 +957,7 @@ export function gateDocumentsFirst(payload: Payload): Verdict {
           `An answered card is still in \`Open\` — ${staleLine}. The page still asks a question ` +
           `somebody has already settled. Fold each one into the section that now states it, and ` +
           `take it out of \`Open\`: an answered question is never an entry with the answer ` +
-          `written beside it (05-artifacts.md, The approach document).`) };
+          `written beside it (05-pages.md, The approach document).`) };
       }
       const misshapen = pages.flatMap((page) => misshapenCards(page).map((card) => ({ page: fromWorkspace(root, page), ...card })));
       const shapeLine = misshapen.slice(0, 6).map((card) => `${card.number} in ${card.page} (${card.shape})`).join(" · ");
@@ -968,7 +968,7 @@ export function gateDocumentsFirst(payload: Payload): Verdict {
           `\`<div class="sds-open">\` wrapping \`<h4 id="q<n>">\` (RULE.DEVEX.WORKSPACE.147); \`div.sds-card\` is ` +
           `the decided shape, so the page shows the question as settled and the rail does not count ` +
           `it. Fold an answered card into the section that states its decision, and rewrite a ` +
-          `question still open in the open shape (05-artifacts.md, A card).`) };
+          `question still open in the open shape (05-pages.md, A card).`) };
       }
     }
   }
@@ -1026,7 +1026,7 @@ export function gateDocumentsFirst(payload: Payload): Verdict {
 // tells everyone who opens the page — rather than the folder — that the work is live. `010` sat that
 // way until the developer noticed it, and this gate passed it: it read rows, and nobody reads rows first.
 const EYEBROW = /class="sds-eyebrow"[^>]*>([\s\S]*?)<\/div>/i;
-// THE STATUS IS ONE FIELD OF THE MASTHEAD, AND THE GATE READS THAT FIELD. `05-artifacts.md` § The
+// THE STATUS IS ONE FIELD OF THE MASTHEAD, AND THE GATE READS THAT FIELD. `05-pages.md` § The
 // approach document says the masthead CARRIES a status drawn from a closed set — the status is not
 // the whole line. Scanning the whole line for a finished word reads the title and the lens list as
 // the status, so a page stamped `Status: PLANNING` under a title carrying the word *complete* would
@@ -1037,7 +1037,7 @@ const STATUS_FIELD = /\bstatus\s*:\s*([^|]*)$/i;
 // Both vocabularies a page in this corpus is written in, because a page carries one or the other and
 // a gate that knows one of them asks for words the book does not have:
 //
-//   the approach document's own set   `05-artifacts.md` § The approach document —
+//   the approach document's own set   `05-pages.md` § The approach document —
 //                                     🚧 in progress · ✅ authoritative · ✅ executed — record · living
 //   a document's front-matter status  `SPDocStatusType` — DONE · IMPLEMENTING · PLANNING
 //
@@ -1153,7 +1153,7 @@ export function gateClose(payload: Payload): Verdict {
           `\`${subject}\` is closing while its page still says it is running. Stamp the masthead ` +
           `first — ${unstamped.map((p) => basename(p)).join(" · ")} — because a reader opens the ` +
           `page, not the folder, and the folder is the only thing this move changes ` +
-          `(05-artifacts.md, The approach document).`,
+          `(05-pages.md, The approach document).`,
         deny:
           `Denied: ${subject}'s page does not say it is closed. The masthead is what a reader ` +
           `meets first, and closing must change it as well as the folder.`,
@@ -1224,7 +1224,7 @@ export function gateClose(payload: Payload): Verdict {
         deny:
           `Denied: \`${subject}\` cannot close while a row waits on an arc of this same workstream ` +
           `that has not landed. Those rows are SEQUENCING rather than carried — the work never left ` +
-          `here, so nobody else is going to do it (05-artifacts.md, The approach document).\n\n` +
+          `here, so nobody else is going to do it (05-pages.md, The approach document).\n\n` +
           `${listed}${more}\n\n` +
           `Land the arc, or split the row: the half that reached its node becomes a landed row, and ` +
           `the half that did not becomes a row carried to a scope that can receive it, or deferred ` +
@@ -1241,7 +1241,7 @@ export function gateClose(payload: Payload): Verdict {
         deny:
           `Denied: \`${subject}\` cannot close while a carried row names a scope that will never ` +
           `run it. \`carried\` means the work LEAVES this workstream, so the target must be another ` +
-          `workstream in \`open/\` or \`backlog/\` (05-artifacts.md, The approach document).\n\n` +
+          `workstream in \`open/\` or \`backlog/\` (05-pages.md, The approach document).\n\n` +
           `${listed}${more}\n\n` +
           `Repair each on THIS page, never in the workstream named — a closed scope closed honestly ` +
           `on what it knew, and a receipt is not rewritten by a later standard. Either name a scope ` +

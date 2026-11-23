@@ -1,4 +1,4 @@
-// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § Every block has a rule · § A page is written in two passes
+// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/06-blocks.md § Every block has a rule · § A page is written in two passes
 // The chapter is the source of truth.
 //
 // The units of one file a block pass reads, so a rewriting agent picks the best block for each section rather than reading a whole file.

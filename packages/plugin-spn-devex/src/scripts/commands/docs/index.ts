@@ -1,4 +1,4 @@
-// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § The index of artifacts — one page that opens every other
+// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-pages.md § The index of artifacts — one page that opens every other
 // The chapter is the source of truth; a rule change is edited there first, then here, in the same change.
 //
 // The index of a repository's artifacts, produced from the pages on disk.

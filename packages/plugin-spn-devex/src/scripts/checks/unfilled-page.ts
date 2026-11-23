@@ -1,4 +1,4 @@
-// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § The templates — the pages, and the two seat files behind them
+// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-pages.md § The templates — the pages, and the two seat files behind them
 // The chapter is the source of truth; a rule change is edited there first, then here, in the same change.
 //
 // A page shown to the developer holds no placeholder (RULE.DEVEX.WORKSPACE.560). A reply that links a `file:///` page which still holds a

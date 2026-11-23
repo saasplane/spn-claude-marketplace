@@ -1,4 +1,4 @@
-// `docs cycles` — a workstream's Cycles table, printed from its arcs' data (05-artifacts.md § `How` ends
+// `docs cycles` — a workstream's Cycles table, printed from its arcs' data (05-pages.md § `How` ends
 // in Cycles, and the arcs are the state). Each case builds a workstream in a temporary folder, because
 // what the command reads is arcs, and the arcs of a real workstream move every day.
 import { mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, statSync, utimesSync, writeFileSync } from "node:fs";

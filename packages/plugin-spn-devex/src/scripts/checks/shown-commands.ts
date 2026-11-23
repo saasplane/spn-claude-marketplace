@@ -1,5 +1,6 @@
 #!/usr/bin/env node
-// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § Code blocks
+// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/06-blocks.md § Which block a content takes, and how its fence is written
+//
 // A COMMAND A PAGE SHOWS IS ONE THE COMMAND LINE ACCEPTS TODAY, as decision 046 holds a permission rule to the command table.
 // The table is `refs/commands.md` of each plugin, generated from the commands tree. A `node <name>.ts` line is a form that is gone, and a
 // `spn-devex`, `spn-apps`, `spn-surface`, `spn-infra` or `spnutils` line whose command words the table does not hold is a finding. Every finding

@@ -19,7 +19,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/01-common/05-design-languages.md",
       "section": "One source for the platform's look",
-      "seen": "06822808"
+      "seen": "fbb340ef"
     }
   ]
 }

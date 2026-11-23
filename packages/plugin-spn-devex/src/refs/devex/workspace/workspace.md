@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/02-workstream.md",
-      "seen": "4aff3d3c"
+      "seen": "a792c869"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
@@ -51,7 +51,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md",
       "section": "Scope control",
-      "seen": "923d3752"
+      "seen": "36cc08d5"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md",

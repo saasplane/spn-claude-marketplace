@@ -1,4 +1,4 @@
-// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § Reports and templates
+// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-pages.md § Reports and templates
 //           docs/04-capabilities/01-devex/04-workspace/04-docs/02-document.md § Metadata
 // The chapters are the source of truth; a rule change is edited there first, then here, in the same change.
 //
@@ -423,7 +423,7 @@ function run(args: string[], write: boolean): number {
   }
   if (!REFRESHED.includes(type))
     return refused(`${named}: the block's \`reportType\` reads \`${type}\`, and this command refreshes ${REFRESHED.map((one) => `\`${one}\``).join(" and ")}`);
-  // Every class read and written below is a name of the shared stylesheet (05-artifacts.md § One
+  // Every class read and written below is a name of the shared stylesheet (05-pages.md § One
   // stylesheet, served in versions). A page that links none holds its own class names, so it is refused.
   if (!linksSharedStyles(page)) return refused(`${named}: ${OWN_COPY}. Nothing was written.`);
 

@@ -1,4 +1,4 @@
-// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § The approach document — a workstream's, never a repository's
+// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-pages.md § The approach document — a workstream's, never a repository's
 //           docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § Open and backlog workstreams follow the standard as it moves
 // The chapters are the source of truth; a rule change is edited there first, then here, in the same change.
 //

@@ -1,4 +1,4 @@
-// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § The coverage report — written, built and proved
+// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-pages.md § The coverage report — written, built and proved
 //           docs/04-capabilities/01-devex/04-workspace/04-docs/03-tree.md § What a Where row declares
 //           docs/04-capabilities/02-support/02-apps/10-providers/ts/03-structure.md § What a Where Row May Name
 //           docs/registers/decisions.md RULE.DEVEX.WORKSPACE.191
@@ -187,7 +187,7 @@ export function measure(root: string): Record<string, unknown> {
   };
   const isProved = (row: { status: string | null }): boolean => row.status === "SUCCESS";
 
-  // A MANUAL row counts in none of the numbers (05-artifacts.md § The coverage report): a person proves
+  // A MANUAL row counts in none of the numbers (05-pages.md § The coverage report): a person proves
   // it by the repository's browser guide and no run records it, so counted it would read as Not proved.
   // Each level lists its own as `manual` instead.
   const counted = tests.rows.filter((row) => row.status !== "MANUAL");

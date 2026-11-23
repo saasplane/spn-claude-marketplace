@@ -519,7 +519,7 @@ export function headerSources(text: string): Header[] {
 /**
  * Where a header's source resolves, or null.
  *
- * A HEADER NAMES A SIBLING BARE. `03-tree.md · 05-artifacts.md · 02-document.md` is three chapters of
+ * A HEADER NAMES A SIBLING BARE. `03-tree.md · 05-pages.md · 02-document.md` is three chapters of
  * one folder, and only the first carries a path — so the folder of the last source that resolved is
  * a root for the next one. That is how these headers are written, and a resolver that missed it
  * would report two thirds of a correct header as broken.
@@ -536,9 +536,9 @@ export function resolveSource(token: string, roots: string[]): string | null {
 /**
  * Every file under a tree, indexed by its bare name.
  *
- * A PATH AND A BARE NAME ARE DIFFERENT CLAIMS, and one test cannot judge both. `docs/…/05-artifacts.md`
+ * A PATH AND A BARE NAME ARE DIFFERENT CLAIMS, and one test cannot judge both. `docs/…/05-pages.md`
  * claims a LOCATION, so it is wrong the moment the folder is renamed — which is exactly the defect
- * nine headers carried. A bare `06-registers.md` claims only that the file EXISTS, and a reader finds
+ * nine headers carried. A bare `09-registers.md` claims only that the file EXISTS, and a reader finds
  * it; demanding a path there would report six correct headers as broken and push every one of them
  * into a verbose rewrite. So a bare name is looked up by name, across the whole workspace, because
  * the CLI that owns a rule is a different repository from the plugins that restate it.

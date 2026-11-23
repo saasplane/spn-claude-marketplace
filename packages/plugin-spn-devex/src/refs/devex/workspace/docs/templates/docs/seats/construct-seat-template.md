@@ -10,7 +10,7 @@
   "summary": "{{The Description's first sentence, word for word.}}"
 }
 -->
-<!-- RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § The four page kinds · § The masthead, and the opening · § A construct's status is derived, never typed · 03-tree.md § What — constructs: the model, read in order
+<!-- RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-pages.md § The four page kinds · § The masthead, and the opening · § A construct's status is derived, never typed · 03-tree.md § What — constructs: the model, read in order
      This file carries rules it does not own. The chapter above is the source of truth.
      A rule change is edited there first, then here, in the same change. Never add a rule here.
      restate-drift.ts reports this copy when its source moves. -->
@@ -25,7 +25,7 @@
 
 `For: {{Actor}} · {{Actor}}` · `Status: 🔮 PLANNING`
 
-{{THE DESCRIPTION, one paragraph and the only one above Overview: what this thing is, in everyday words; why you would read this page; then at most two short sentences on how the page runs — "A workstream is a folder that holds one piece of work, from the first idea until you close it. Read this before you start a change that will take more than one working session. The page explains how the folder is named, how it moves between waiting, open and closed, and what is checked before you can close it." It is held to 05-artifacts.md § The masthead, and the opening, and construct-template.html's masthead comment carries the poor examples and the check to run before you save. The promise is the block's `subtitle`, never this paragraph. Anything that argues belongs in Overview below.}}
+{{THE DESCRIPTION, one paragraph and the only one above Overview: what this thing is, in everyday words; why you would read this page; then at most two short sentences on how the page runs — "A workstream is a folder that holds one piece of work, from the first idea until you close it. Read this before you start a change that will take more than one working session. The page explains how the folder is named, how it moves between waiting, open and closed, and what is checked before you can close it." It is held to 05-pages.md § The masthead, and the opening, and construct-template.html's masthead comment carries the poor examples and the check to run before you save. The promise is the block's `subtitle`, never this paragraph. Anything that argues belongs in Overview below.}}
 
 ## Overview
 <!-- WHY THIS CONSTRUCT EXISTS. What went wrong without it, what it changes, and what a reader should expect to

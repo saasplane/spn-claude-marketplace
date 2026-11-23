@@ -51,12 +51,12 @@ description: What proves a behaviour, at which tier, and what a passing suite do
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/03-tree.md",
       "section": "How — guides: steps, and nothing proven",
-      "seen": "d8041e03"
+      "seen": "9183001f"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "section": "An order is one delegated execution, and every order follows the same rules",
-      "seen": "f7f191d7"
+      "seen": "57d783c5"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/06-tests/README.md",
