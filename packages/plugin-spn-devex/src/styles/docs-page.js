@@ -4,6 +4,8 @@
    reads opens with sds-. */
 /* THE MODE IS THE DESIGN SYSTEM'S: data-mode on the page, light or dark. A page that names none takes the reader's
    own setting, and a data-theme an older page carries is read as the same word. */
+/* A PAGE OPENS AT ITS START (or at the section its address names): a reload does not restore an old position, in a window or in the index's frame. */
+try{if('scrollRestoration' in history)history.scrollRestoration='manual';}catch(e){}
 (function(){
   var root=document.documentElement;if(!root||root.getAttribute('data-mode'))return;
   var theme=root.getAttribute('data-theme'),dark=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -580,8 +582,14 @@
       var panel = document.getElementById(t.getAttribute('aria-controls'));
       if (panel) panel.hidden = !on;
     });
-    if (focus) tab.focus();
-    tab.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+    if (focus) tab.focus({ preventScroll: true });
+    // Keeping the open tab in view moves its own bar sideways and never the page, and nothing moves when a set is set up at load.
+    var bar = set.querySelector('.sds-tabset-bar');
+    if (bar && bar.scrollWidth > bar.clientWidth) {
+      var at = tab.getBoundingClientRect(), box = bar.getBoundingClientRect();
+      if (at.left < box.left) bar.scrollLeft += at.left - box.left;
+      else if (at.right > box.right) bar.scrollLeft += at.right - box.right;
+    }
   }
   // A row wider than its place scrolls inside its box, with an arrow at an edge that has more, as DSTabs does.
   function scroller(set) {

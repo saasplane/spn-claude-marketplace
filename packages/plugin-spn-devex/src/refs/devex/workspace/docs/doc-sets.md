@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "seen": "80bf3af3"
+      "seen": "70a2fe70"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
@@ -29,7 +29,7 @@
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/04-docs.md",
-      "seen": "5d1acda8"
+      "seen": "b97b0dea"
     },
     {
       "path": "spn-foundation/CONCEPT.md",
@@ -336,7 +336,7 @@ The pocket holds what the node **authors** rather than derives, and its three au
 
 **Every repository has its getting-started guide and its test-and-verify guide as a page.** A newcomer needs these before any other guide: the first says how to start, and the second says how to check that a change works. Every other guide stays markdown, unless a developer asks for it as a page. A guide page is stages, and a stage is steps. A step holds why, the command and what you see, in that order. The stylesheet numbers the steps, so nobody types a number. A guide page has no status. Where `docs guide` finds no step in a guide, it reports the guide and writes nothing.
 
-**The index opens every page of a repository from one place.** A tree of the pages sits on the left, in the groups Docs, Guides and Reports, and a group that holds nothing is left out. The pages open in tabs on the right. The index has no masthead and no header line, because it is a frame around other pages. `docs index` refuses a repository that has no `docs/artifacts`. The hub stays the page you read first: it explains the model, and the index is where you look for one file among all of them.
+**The index opens every page of a repository from one place.** A tree of the pages sits on the left, in the groups Docs, Guides and Reports, and a group that holds nothing is left out. One page is open at a time on the right, and a click on a tree entry changes it. The index has no masthead and no header line, because it is a frame around other pages. `docs index` refuses a repository that has no `docs/artifacts`. The hub stays the page you read first: it explains the model, and the index is where you look for one file among all of them.
 
 **The folder set is fixed, and adding one is a decision**: `docs/`, `guides/`, `reports/` and nothing else, beside the one `index.html` (`RULE.DEVEX.WORKSPACE.221` · MUST · check:corpus). `docs/` holds the hub, the overviews and the construct pages, and the index reads its groups and its domains from these folders. A `resources/` folder for *what a document was written from* is refused by name: every such file is a file some seat needs, and **nothing in a pocket may be depended on** (`RULE.DEVEX.WORKSPACE.138` · GUIDE).
 

@@ -349,9 +349,9 @@ ${linesFor("1.0.0").script}
     const bare = build("open", "059-bare", PAGE({ cyclesBody: "" }));
     const bareWrote = await capture(["docs", "cycles", "write", bare]);
     const bareText = readFileSync(join(bare, "approach.html"), "utf8");
-    const howEnd = bareText.indexOf("</section>", bareText.indexOf("<h2>How"));
-    ok("[MKT.SCRIPTS.400] a page with no Plan section gets one after How, holding the arcs table from the arcs, and says so",
-      bareWrote.code === 0 && /the Plan section/.test(bareWrote.out) && bareText.indexOf('<section id="arcs"') > howEnd && bareText.indexOf('<section id="arcs"') < bareText.indexOf('<section id="s4"')
+    const whatEnd = bareText.indexOf("</section>", bareText.indexOf("<h2>What"));
+    ok("[MKT.SCRIPTS.400] a page with no Plan section gets one between What and How, holding the arcs table from the arcs, and says so",
+      bareWrote.code === 0 && /the Plan section/.test(bareWrote.out) && bareText.indexOf('<section id="arcs"') > whatEnd && bareText.indexOf('<section id="arcs"') < bareText.indexOf("<h2>How")
         && bareText.includes("<h2>Plan</h2>") && count(bareText, "<th>Arc</th>") === 1 && cyclesRule(join(bare, "approach.html"), bareText).length === 0, `${bareWrote.out}${bareWrote.err}\n${bareText}`);
     const oldHome = build("open", "060-older", PAGE({ cyclesBody: "" }));
     const oldFile = join(oldHome, "approach.html");
@@ -443,6 +443,15 @@ console.log("\n=== the places of How, produced from the rows' repo (RULE.DEVEX.W
   ok("an Arcs line that names other arcs is rewritten, and the facts after it kept", stale.includes(`<span class="sds-small">Arcs: N001 &middot; Size: large</span>`), stale);
   const bare = placedPage(withPlace(""), [{ repo: "spn-x", arcs: ["N001"] }]);
   ok("a place with no facts line gains one under its line", /Ships: the book\.<\/p>\n {2}<p><span class="sds-small">Arcs: N001<\/span><\/p>/.test(bare), bare);
+
+  // How told as a catalog, one item for each repository: the item is found by its h4, and only its Arcs fact is written.
+  const { shapedApproachPage } = await import("../../../../helpers/workstream-fixture.mjs");
+  const tiled = placedPage(shapedApproachPage("x"), [{ repo: "spn-x", arcs: ["N001", "N002"] }, { repo: "spn-y", arcs: ["N002"] }]);
+  ok("a repository's item in the catalog takes its Arcs fact, and keeps what the agent wrote there",
+    tiled.includes("<div><dt>Arcs</dt><dd>N001 &middot; N002</dd></div>") && tiled.includes("<div><dt>Ships</dt><dd>a minor release</dd></div>") && tiled.includes("<p>The probe changes the <a href=\"#c1\">template</a>.</p>"), tiled.slice(tiled.indexOf("<h2>How")));
+  ok("a repository the rows name with no item gains one at the end of the catalog, with the slots the agent fills and its Arcs fact",
+    /<h4 id="how-spn-y">spn-y<\/h4><p>\{\{REPO-CHANGE\}\}<\/p>[\s\S]*<dd>\{\{RELEASE\}\}<\/dd>[\s\S]*<dt>Arcs<\/dt><dd>N002<\/dd>[\s\S]*<\/div>\n<\/section>/.test(tiled) && !/<h3 id="how-/.test(tiled), tiled.slice(tiled.indexOf("<h2>How")));
+  ok("written twice, the catalog does not move", placedPage(tiled, [{ repo: "spn-x", arcs: ["N001", "N002"] }, { repo: "spn-y", arcs: ["N002"] }]) === tiled);
 
   const { root, ws } = await dataWorkspace("cycles-places", { rows: [
     ...arcData().rows,

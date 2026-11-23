@@ -2,7 +2,7 @@
 // once on a fixture that breaks it, and to pass once the fixture is mended the way the agent would.
 import { mkdirSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { PREVIEW, arcData, cli, dataWorkspace, put, writeRolePageParts } from "../../../helpers/workstream-fixture.mjs";
+import { PREVIEW, arcData, cli, dataWorkspace, put, shapedApproachPage, writeRolePageParts } from "../../../helpers/workstream-fixture.mjs";
 import { workspace } from "../../../helpers/fixture.mjs";
 
 const { checkWorkstream, checkWorkspace, sectionText } = await import("../../../../src/scripts/checks/workstream-state.ts");
@@ -210,8 +210,14 @@ console.log("\n=== RULE.DEVEX.WORKSPACE.254 — a What entry of its own, and a l
 
   writeFileSync(page, withSecond.replace(entry2, `  <h4 id="c2">The second arc</h4>\n  <p>No entry id.</p>\n`));
   const noEntry = checkWorkstream(ws);
-  ok("red: an arc with no What entry fails, naming the entry and the command that anchors or writes it",
-    has(noEntry, "stamp", /N002 has no What entry, `N002-what`, on the approach page — `spn-devex workstream arc edit 031\/N002 --under <heading id>` anchors it on its subject heading, or writes it under a domain heading/), said(noEntry));
+  ok("green: an arc with no What entry passes while its Plan row links its page — the row is the arc's address, and the entry is the older way",
+    !has(noEntry, "stamp", /has no What entry/), said(noEntry));
+  const noRow = withSecond.replace(entry2, `  <h4 id="c2">The second arc</h4>\n  <p>No entry id.</p>\n`).replace(/\s*<tr id="N002"[^\n]*<\/tr>/, "");
+  writeFileSync(page, noRow);
+  const neither = checkWorkstream(ws);
+  ok("red: an arc with no entry and no Plan row fails, naming the row it lacks, and the older entry is named only where the page still tells What by arc",
+    has(neither, "stamp", /N002 has no row in Plan carrying `data-arc="arcs\/N002\/state.json"`/) && has(neither, "stamp", /N002 has no What entry, `N002-what`, on the approach page — `spn-devex workstream arc edit 031\/N002 --under <heading id>` anchors it on its subject heading, or writes it under a domain heading/), said(neither));
+  writeFileSync(page, withSecond.replace(entry2, `  <h4 id="c2">The second arc</h4>\n  <p>No entry id.</p>\n`));
 
   writeFileSync(page, withSecond.replace('<a href="notes/N002/preview.html">the second</a>', "the second"));
   ok("red: an entry that does not link its arc's preview fails", has(checkWorkstream(ws), "stamp", /N002's preview is not linked from its What entry, `#N002-what`/), said(checkWorkstream(ws)));
@@ -225,8 +231,8 @@ console.log("\n=== RULE.DEVEX.WORKSPACE.254 — a What entry of its own, and a l
   writeFileSync(page, withSecond);
   writeFileSync(join(ws, "notes", "N002", "preview.html"), PREVIEW.replace("<p>the probe</p>", '<p>after <a href="../N001/preview.html">the first</a></p>'));
   const previewLink = checkWorkstream(ws);
-  ok("red: a preview that links another arc's preview fails, naming the What it should link",
-    has(previewLink, "preview", /N002's preview links `\.\.\/N001\/preview\.html`, N001's preview — a preview names another arc by its What, `\.\.\/\.\.\/approach\.html#N001-what`, and never links its preview/), said(previewLink));
+  ok("red: a preview that links another arc's preview fails, naming the Plan row it should link",
+    has(previewLink, "preview", /N002's preview links `\.\.\/N001\/preview\.html`, N001's preview — a preview names another arc by its Plan row, `\.\.\/\.\.\/approach\.html#N001`, and never links its preview/), said(previewLink));
   writeFileSync(join(ws, "notes", "N002", "preview.html"), PREVIEW.replace("<p>the probe</p>", '<p>after <a href="../../approach.html#N001-what">the first</a></p>'));
   ok("green: a preview that names the other arc by its What passes", checkWorkstream(ws).length === 0, said(checkWorkstream(ws)));
   writeFileSync(join(ws, "notes", "N002", "preview.html"), PREVIEW);
@@ -646,6 +652,21 @@ console.log("\n=== the page rules read the saved file at Stop — 451, 518, 238,
   ok("[MKT.HOOKS.514] green: the row that links the preview and the index alone passes", !checkWorkstream(ws).some((one) => one.check === "pages"), said(checkWorkstream(ws)));
   writeFileSync(page, approach);
   rmSync(samples, { recursive: true });
+}
+
+console.log("\n=== RULE.DEVEX.WORKSPACE.254 — a page told by construct: the Plan row is the arc's address and the one place that links its page");
+{
+  const { root, ws } = await dataWorkspace("state-told");
+  const page = join(ws, "approach.html");
+  const { arcStamp } = await import("../../../../src/scripts/lib/workstream.ts");
+  const stamp = arcStamp(JSON.parse(readFileSync(join(ws, "arcs", "N001", "state.json"), "utf8")));
+  const told = shapedApproachPage(stamp);
+  writeFileSync(page, told);
+  ok("green: What holds no entry for the arc and its construct links the arc's page, and the check passes", checkWorkstream(ws).length === 0, said(checkWorkstream(ws)));
+  ok("a link to the arc's page from a construct of What is no finding of the outside-an-entry kind", !has(checkWorkstream(ws), "stamp", /outside N001's entry/), said(checkWorkstream(ws)));
+  writeFileSync(page, told.replace(/(<tr id="N001"[^\n]*)<a href="notes\/N001\/preview\.html">preview\.html<\/a>/, "$1preview.html"));
+  ok("red: a Plan row that does not link its arc's page fails, naming the row", has(checkWorkstream(ws), "stamp", /N001's preview is not linked from its Plan row, `#N001`/), said(checkWorkstream(ws)));
+  writeFileSync(page, told);
 }
 
 console.log(failed ? `\n  ${failed} of ${total} FAILED — workstream state check` : `\n  all ${total} passed — workstream state check`);

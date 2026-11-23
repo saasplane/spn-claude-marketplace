@@ -1332,6 +1332,7 @@ function headingWords(text: string, head: Heading): string {
  * an anchor, to the next heading of the same level or higher. Null where What holds neither.
  */
 export function whatEntryOf(text: string, arc: string): { from: number; to: number; kind: "entry" | "anchor" } | null {
+  // This is the entry a page written before the shape of order T keeps; a page told by construct has none (`planRowOf`).
   const range = whatRange(text);
   if (!range) return null;
   const heads = headingsIn(text, range);
@@ -1348,6 +1349,19 @@ export function whatEntryOf(text: string, arc: string): { from: number; to: numb
   if (at < 0) return null;
   const next = heads.slice(at + 1).find((head) => head.level <= heads[at].level);
   return { from: heads[at].at, to: next ? next.at : range.to, kind };
+}
+
+/** Whether the page still tells What by arc: it holds an entry or an anchor `<arc>-what` for an arc. A page told by construct holds none. */
+export const holdsArcEntries = (text: string): boolean => /\bid="(?:N\d+[a-z]?|ideate|follow-ups)-what"/.test(text);
+
+/**
+ * An arc's row in Plan, `<tr id="<arc>">`, the arc's address on the approach page (`approach.html#<arc>`) and, on a page told
+ * by construct, the one place that links the arc's page. Null where Plan holds no such row.
+ */
+export function planRowOf(text: string, arc: string): { from: number; to: number; kind: "row" } | null {
+  // nosemgrep: javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp -- pattern built from this script's own constants and escaped text, never outside input
+  const found = new RegExp(`<tr\\b[^>]*\\bid="${arc.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}"[^>]*>[\\s\\S]*?</tr>`, "i").exec(text);
+  return found ? { from: found.index, to: found.index + found[0].length, kind: "row" } : null;
 }
 
 /** Every link of an HTML text that points inside the workspace's files, as written and as a path from `base`, fragment left off. */

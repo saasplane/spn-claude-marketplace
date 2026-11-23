@@ -261,10 +261,10 @@ function settle(args: string[], state: "answered" | "withdrawn"): number {
   if (cited) {
     const folded = foldIntoWhat(ws, record, key, said);
     citeInEntries(ws, record.arc, record.id, key, cited);
-    settled.push(folded ? `folded into ${record.arc}'s What` : `! ${record.arc} has no What entry to fold into`, citedLine(cited));
+    settled.push(folded ? `folded into ${record.arc}'s What` : `! ${record.arc} has no What entry to fold into — fold the answer into the construct of What that tells it`, citedLine(cited));
     settled.push(...writeGoAgain(ws, record.arc));
   }
-  const owed = state === "answered" ? (cited ? "" : `owed: ${record.arc}'s What, its Log line`) : "owed: its Log line";
+  const owed = state === "answered" ? (cited ? "" : `owed: ${record.arc}'s construct in What, its Log line`) : "owed: its Log line";
   console.log(`${[`${cardName(record.id)} · ${state}${key ? ` ${key}` : ""} · off ${off} page${off === 1 ? "" : "s"}`, ...refreshed.said, ...settled, ...(owed ? [owed] : [])].join(" · ")}`);
   for (const line of [...refreshed.lines, ...lines]) console.log(line);
   return 0;

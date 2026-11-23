@@ -6,7 +6,7 @@ import { createHash } from "node:crypto";
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { basename, join, resolve } from "node:path";
 import { PLUGIN } from "../../../../helpers/harness.mjs";
-import { CARD as BARE_CARD, arcData, cli, ownPlugins, writeClosingBlock, dataWorkspace as bareArc, put } from "../../../../helpers/workstream-fixture.mjs";
+import { CARD as BARE_CARD, arcData, cli, ownPlugins, writeClosingBlock, dataWorkspace as bareArc, put, shapedApproachPage } from "../../../../helpers/workstream-fixture.mjs";
 // A card's What cites what it read, or `question raise` refuses it (MKT.SCRIPTS.383).
 const CARD = { ...BARE_CARD, what: "The file is `a.ts:12`." };
 import { workspace } from "../../../../helpers/fixture.mjs";
@@ -264,7 +264,7 @@ console.log("\n=== question — raise, show, answer, withdraw");
   const withdrawn = cli(root, ["workstream", "question", "withdraw", "031/q9", "--words", "not needed"]);
   ok("a card is withdrawn in your words, off its one page", withdrawn.code === 0 && withdrawn.out.startsWith("Q9 · withdrawn · off 1 page · owed: its Log line"), withdrawn.out);
   const answered = cli(root, ["workstream", "question", "answer", "031/q8", "--key", "A", "--words", "Q8 - A"]);
-  ok("a card is answered, and the line says what is owed", answered.code === 0 && answered.out.startsWith("Q8 · answered A · off 2 pages · owed: N001's What, its Log line"), answered.out);
+  ok("a card is answered, and the line says what is owed", answered.code === 0 && answered.out.startsWith("Q8 · answered A · off 2 pages · owed: N001's construct in What, its Log line"), answered.out);
   ok("it leaves both pages, and the preview drops its Open", !readFileSync(page, "utf8").includes('<h4 id="q8">') && !readFileSync(join(ws, "notes", "N001", "preview.html"), "utf8").includes("sds-open"));
   const record = lines(join(ws, "questions.jsonl")).find((one) => one.id === "q8");
   ok("the record holds the answer in your words", record.state === "answered" && record.answer.key === "A" && record.answer.words === "Q8 - A");
@@ -464,13 +464,13 @@ console.log("\n=== arc edit — an arc opens whole: its data, its preview, its W
   const opened = write("031/N002", "--title", "Evidence export", "--subject", "evidence-export", "--goal", goal, "--under", "d1");
   ok("the line names the four pieces", opened.code === 0 && opened.out.startsWith("ok · N002 0/0 · N002 opened · PROPOSED · preview · What entry · Plan row\n"), opened.out);
   ok("and each piece's place, as drawn", opened.out.includes("  arcs/N002/state.json       written, with its log line and its name file, evidence-export.md\n")
-    && opened.out.includes("  notes/N002/arc.html        written from the template: the masthead, the PROPOSED badge, the back link to #N002-what, four sections to fill\n")
+    && opened.out.includes("  notes/N002/arc.html        written from the template: the masthead, the PROPOSED badge, the back link to #N002, four sections to fill\n")
     && opened.out.includes("  approach.html · What       #N002-what written under d1, Platform · Data and trust: the title, the goal, and the link to notes/N002/arc.html\n")
     && opened.out.includes("  approach.html · Plan       row N002 written and stamped, its preview linked\n"), opened.out);
   ok("the data holds the goal, PROPOSED, and the fixed preview", json(join(arcOf("N002"), "state.json")).goal === goal && json(join(arcOf("N002"), "state.json")).status === "PROPOSED");
   const preview = readFileSync(noteOf("N002"), "utf8");
   ok("the preview is the template with its masthead filled: title, the eyebrow's breadcrumb, title, arc, badge",
-    preview.includes("<title>N002 Evidence export</title>") && preview.includes('&middot; <a href="../../approach.html#N002-what">031 Probe</a> &middot; N002 Evidence export</span>') && !preview.includes("sds-crumb")
+    preview.includes("<title>N002 Evidence export</title>") && preview.includes('&middot; <a href="../../approach.html#N002">031 Probe</a> &middot; N002 Evidence export</span>') && !preview.includes("sds-crumb")
       && preview.includes("<h1>N002 Evidence export</h1>") && preview.includes('href="../../approach.html#N002">N002</a>') && preview.includes("sds-status sds-proposed")
       && !preview.includes("{{NNN}}") && !preview.includes("{{nnn}}") && !preview.includes("{{THE PREVIEW NAME}}") && !preview.includes("RESTATES"), preview.slice(0, 1500));
   ok("the subtitle and the description stay slots for the agent", preview.includes("{{SUBTITLE}}") && preview.includes("{{LEAD}}"));
@@ -503,6 +503,18 @@ console.log("\n=== arc edit — an arc opens whole: its data, its preview, its W
   ok("a bare write writes the entry and the row it finds missing, and keeps the preview",
     both.code === 0 && both.out.includes("What entry: #N003-what written at the end of What") && both.out.includes("Plan row written and stamped") && both.out.includes("preview kept"), both.out);
   ok("and the workstream passes its check again", cli(whole.root, ["workstream", "state", "check", "031"]).code === 0);
+
+  // A page told by construct has no entry for an arc: the opening writes the preview and the Plan row, and the row is the arc's address.
+  const told = await dataWorkspace("commands-opening-shaped");
+  const toldPage = join(told.ws, "approach.html");
+  const { arcStamp } = await import(resolve(PLUGIN, "src", "scripts", "lib", "workstream.ts"));
+  writeFileSync(toldPage, shapedApproachPage(arcStamp(json(join(told.ws, "arcs", "N001", "state.json")))));
+  const second = cli(told.root, ["workstream", "arc", "edit", "031/N002", "--title", "Evidence export", "--subject", "evidence-export", "--goal", goal]);
+  ok("on a page told by construct the opening names the preview and the Plan row, and no What entry", second.code === 0
+    && second.out.startsWith("ok · N002 0/0 · N002 opened · PROPOSED · preview · Plan row\n") && !second.out.includes("approach.html · What"), second.out);
+  const toldAfter = readFileSync(toldPage, "utf8");
+  ok("and the page holds no entry for the arc, only its Plan row, which links its page", !toldAfter.includes("N002-what") && /<tr id="N002" data-arc="arcs\/N002\/state.json" data-arc-stamp="[0-9a-f]{12}">/.test(toldAfter) && toldAfter.includes('href="notes/N002/arc.html"'));
+  ok("and the workstream passes its own check", cli(told.root, ["workstream", "state", "check", "031"]).code === 0, cli(told.root, ["workstream", "state", "check", "031"]).out);
 
   // An existing arc takes the anchor on a subject heading.
   writeFileSync(page, readFileSync(page, "utf8").replace('<h4 id="N001-what">The probe</h4>', '<h4 id="c1">The probe</h4>'));

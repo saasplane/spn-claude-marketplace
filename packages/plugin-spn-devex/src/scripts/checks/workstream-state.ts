@@ -18,7 +18,7 @@ import {
   DATA_FILES, FACTS_FILE, findingsFileOf, SHEET_FILE, LOG_FILE, NOTES, ARC_FILE, PREVIEW_FILE, arcPageNameOf, approachOf, arcStatus, stepsMayStart, arcDataDir, arcIdsOf, factsFileOf, sheetFileOf, readSheet, firstOpenArc, leafRows, isDataLayout, logFileOf, markdownArcsOf,
   NO_REPO, arcStamp, markdownIn, nameFileHolds, nameFileOf, notesDirOf, previewOf, questionsFileOf, readJsonl, readQuestions, stampsOn, stateFileOf,
   strayLevels, strayNotes, suggestionsFileOf, readJson, readArc, workstreamsOf, previewWithStatus, builtOf,
-  localLinks, previewHrefOf, previewOwners, slotsIn, whatEntryOf, whatId, whatRange, workstreamName,
+  holdsArcEntries, localLinks, planRowOf, previewHrefOf, previewOwners, slotsIn, whatEntryOf, whatId, whatRange, workstreamName,
 } from "../lib/workstream.ts";
 import { ARC_ID, WORK, DONE_STATES, arcFaults, factFaults, findingFaults, type Finding as ReviewFinding, sheetFaults, logFaults, questionFaults, cardName, subjectFault, suggestionFaults, type ArcData, type ArcRow, type Fact } from "../lib/workstream-schema.ts";
 
@@ -213,7 +213,7 @@ export function arcPreviewFindings(ws: string, arc: string, data: ArcData, owner
     const other = owners.get(link.path);
     if (!other || other === arc || seen.has(other)) continue;
     seen.add(other);
-    out.push(`${arc}'s preview links \`${link.href}\`, ${other}'s preview — a preview names another arc by its What, \`../../approach.html#${whatId(other)}\`, and never links its preview`);
+    out.push(`${arc}'s preview links \`${link.href}\`, ${other}'s preview — a preview names another arc by its Plan row, \`../../approach.html#${other}\`, and never links its preview`);
   }
   const status = arcStatus(data);
   const slots = slotsIn(text);
@@ -236,8 +236,9 @@ export function findingsFindings(ws: string, arc: string, data: ArcData): string
 }
 
 /**
- * S7: the arc's row in Plan under its address, its stamp against its goal, title and repositories, and its own What
- * entry, `<arc>-what`, which links its preview and no other arc's (RULE.DEVEX.WORKSPACE.254).
+ * S7: the arc's row in Plan under its address, its stamp against its goal, title and repositories, and the place that links
+ * its preview and no other arc's (RULE.DEVEX.WORKSPACE.254): its Plan row, and, on a page written before What was told by
+ * construct, its own What entry, `<arc>-what`.
  */
 export function pageFindings(ws: string, arc: string, data: ArcData, page: string | null, text: string, owners: ReadonlyMap<string, string> = previewOwners(ws)): string[] {
   if (!page) return [`${arc} has no approach page to stand on`];
@@ -248,11 +249,14 @@ export function pageFindings(ws: string, arc: string, data: ArcData, page: strin
     out.push(`${arc}'s row in Plan carries no \`id="${arc}"\`, so \`approach.html#${arc}\` opens nothing — \`spn-devex docs cycles write\` writes it`);
   else if (row.stamp !== arcStamp(data))
     out.push(`${arc}'s part on the approach page is behind its goal, title or repositories — bring Why, What and How current, then \`workstream arc stamp write ${arc}\``);
-  const entry = whatEntryOf(text, arc);
+  // A page told by construct has no entry per arc: the Plan row is the arc's address and links its page. A page that still tells What by arc is read as it was.
+  const entry = whatEntryOf(text, arc) ?? planRowOf(text, arc);
   if (!entry) {
-    out.push(`${arc} has no What entry, \`${whatId(arc)}\`, on the approach page — \`spn-devex workstream arc edit ${workstreamName(ws).number}/${arc} --under <heading id>\` anchors it on its subject heading, or writes it under a domain heading`);
+    if (holdsArcEntries(text))
+      out.push(`${arc} has no What entry, \`${whatId(arc)}\`, on the approach page — \`spn-devex workstream arc edit ${workstreamName(ws).number}/${arc} --under <heading id>\` anchors it on its subject heading, or writes it under a domain heading`);
     return out;
   }
+  const place = entry.kind === "row" ? "Plan row" : "What entry";
   const own = previewPathOf(ws, arc, data);
   const links = localLinks(text.slice(entry.from, entry.to), dirname(page));
   const crossed = new Set<string>();
@@ -260,21 +264,22 @@ export function pageFindings(ws: string, arc: string, data: ArcData, page: strin
     const other = owners.get(link.path);
     if (!other || other === arc || crossed.has(other)) continue;
     crossed.add(other);
-    out.push(`${arc}'s What entry links \`${link.href}\`, ${other}'s preview — an arc's entry links its own preview only, and names another arc by its What, \`approach.html#${whatId(other)}\``);
+    out.push(`${arc}'s ${place} links \`${link.href}\`, ${other}'s preview — an arc's entry links its own preview only, and names another arc by its ${entry.kind === "row" ? "Plan row" : "What"}, \`approach.html#${entry.kind === "row" ? other : whatId(other)}\``);
   }
   for (const link of links) {
     const folder = notesFolderOf(ws, link.path);
     if (!folder || folder === arc || owners.get(link.path)) continue;
-    out.push(`${arc}'s What entry links \`${link.href}\`, inside ${folder}'s folder — an arc's entry links into \`${NOTES}/${arc}/\` only, and names another arc by its What, \`approach.html#${whatId(folder)}\``);
+    out.push(`${arc}'s ${place} links \`${link.href}\`, inside ${folder}'s folder — an arc's entry links into \`${NOTES}/${arc}/\` only, and names another arc by its ${entry.kind === "row" ? "Plan row" : "What"}, \`approach.html#${entry.kind === "row" ? folder : whatId(folder)}\``);
   }
-  if (!links.some((link) => link.path === own)) out.push(`${arc}'s preview is not linked from its What entry, \`#${whatId(arc)}\``);
+  if (!links.some((link) => link.path === own)) out.push(`${arc}'s preview is not linked from its ${place}, \`#${entry.kind === "row" ? arc : whatId(arc)}\``);
   return out;
 }
 
 /** RULE.DEVEX.WORKSPACE.254: a preview is linked from its own arc's What entry, and from no other place in What. One finding for each arc whose preview is so linked. */
 export function whatLinkFindings(ws: string, page: string | null, text: string, owners: ReadonlyMap<string, string>): string[] {
   const range = whatRange(text);
-  if (!page || !range) return [];
+  // A page told by construct links arc pages from the constructs the arcs change, so the rule binds only a page that tells What by arc.
+  if (!page || !range || !holdsArcEntries(text)) return [];
   const inside = [...new Set(owners.values())].flatMap((arc) => { const entry = whatEntryOf(text, arc); return entry ? [entry] : []; });
   const out: string[] = [];
   const seen = new Set<string>();

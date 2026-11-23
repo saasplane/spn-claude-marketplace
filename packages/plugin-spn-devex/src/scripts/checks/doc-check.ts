@@ -492,14 +492,59 @@ function headings(text: string): string[] {
     .map((h) => h.split(/\s+/)[0].replace(/[:—-]+$/, "").toLowerCase());
 }
 
-const APPROACH_SECTIONS = ["why", "what", "how", "plan", "open", "deferred"];
+const APPROACH_SECTIONS = ["why", "what", "plan", "how", "open", "deferred"];
+/** The order a page written before Plan moved between What and How keeps: accepted until the rewrite pass moves it. */
+const OLDER_SECTIONS = ["why", "what", "how", "plan", "open", "deferred"];
+
+/** An arc as a heading's words or its id: `N017`, `ideate`, `follow-ups`, or an id ending `-what`. */
+const arcHeading = (id: string | null, words: string): boolean =>
+  /^(?:N\d{3}[a-z]?|ideate|follow-ups)\b/i.test(words) || (id !== null && (/^(?:N\d{3}[a-z]?|ideate|follow-ups)$/i.test(id) || /-what$/.test(id)));
 
 /**
- * An opening, then Why -> What -> How -> Plan -> Open -> Deferred, in that order and nothing else
+ * 05-artifacts.md § The approach document: What is told by construct and How by repository, and an arc is neither (RULE.DEVEX.WORKSPACE.487).
+ * It names an arc as a heading of What or How, a status word or a developer's quoted line in How, and a code block, a file frame or a
+ * tab set in What (the page is the summary, the arc page is the preview). A page still in the older order, Plan after How, owes its
+ * rewrite pass and is told softly; a page in the new order is held to it.
+ */
+export function whatHowShape(text: string, older: boolean): Finding[] {
+  const grade = older ? "SOFT" : "RULE";
+  const where = "(05-artifacts.md § The approach document; RULE.DEVEX.WORKSPACE.487)";
+  const out: Finding[] = [];
+  const what = section(text, "What");
+  const how = section(text, "How");
+  for (const [name, body] of [["What", what], ["How", how]] as const) {
+    if (body === null) continue;
+    const arcs = [...body.matchAll(/<h([34])\b([^>]*)>([\s\S]*?)<\/h\1>/gi)]
+      .filter((found) => arcHeading(/\bid="([^"]*)"/.exec(found[2])?.[1] ?? null, flat(found[3])))
+      .map((found) => flat(found[3]));
+    if (arcs.length)
+      out.push([grade, `${name} has ${arcs.length === 1 ? "a heading that is an arc" : "headings that are arcs"}, ${listed(arcs)} — ${name === "What" ? "What is told by domain (an `h3`) and construct (an `h4`)" : "How is told by repository"}, ` +
+        `and each arc's goal is its row in Plan ${where} · \`spn-devex docs cycles show <workstream>\` prints the rows`]);
+  }
+  if (how !== null) {
+    const words = flat(how);
+    const status = /\b(?:RUNNING|PROPOSED|DECIDED|LANDED|CARRIED|DROPPED)\b|\bis running\b|\bready for the go\b/.exec(words);
+    if (status)
+      out.push([grade, `How says "${status[0]}" — a status word belongs to the Plan row and the arc's page, and How says what changes in each repository and what ships ${where}`]);
+    if (/<blockquote\b|<q\b/i.test(how) || /[“"][^“”"<>]{30,}[”"]/.test(words))
+      out.push([grade, `How quotes a line of the developer — the developer's words are the arc's, and How says what changes and what ships ${where}`]);
+    if (/\bThe batch\b/.test(words))
+      out.push([grade, `How tells how the go runs — that is the go plan's, and How says what changes in each repository ${where}`]);
+  }
+  if (what !== null) {
+    const kinds = [/<pre\b/i.test(what) ? "a code block" : "", /class="sds-file"/.test(what) ? "a file frame" : "", /class="sds-tabset"/.test(what) ? "a tab set" : ""].filter(Boolean);
+    if (kinds.length)
+      out.push([grade, `What holds ${kinds.join(" and ")} — the page is the summary and the arc page is the preview, so What holds the decision, at most a small figure, and the links to the arc page ${where}`]);
+  }
+  return out;
+}
+
+/**
+ * An opening, then Why -> What -> Plan -> How -> Open -> Deferred, in that order and nothing else
  * (05-artifacts.md § The approach document). `exempt` is the early workstream's page, which keeps the
  * shape it was written in and is held only to the skeleton.
  */
-export function approachShape(text: string, exempt = false): Finding[] {
+export function approachShape(text: string, exempt = false, closed = false): Finding[] {
   const heads = headings(text);
   if (!heads.length) return [];
   // The SKELETON decides the kind. A settled approach legitimately lacks Open, and a closed one lacks
@@ -508,7 +553,7 @@ export function approachShape(text: string, exempt = false): Finding[] {
   if (missing.length)
     return [["RULE", "carries no " + missing.join(" + ") + " — this explains rather than argues, so " +
       `it is an overview: ${POCKET.artifacts}/${ARTIFACT.docs}/<domain>/<name>${OVERVIEW_PAGE_SUFFIX} (RULE.DEVEX.WORKSPACE.102 / 040). An approach ` +
-      "is an opening, then Why > What > How > Plan > Open > Deferred"]];
+      "is an opening, then Why > What > Plan > How > Open > Deferred"]];
   if (exempt) return [];
 
   const out: Finding[] = [];
@@ -519,11 +564,14 @@ export function approachShape(text: string, exempt = false): Finding[] {
   const others = [...new Set(heads.filter((h) => h !== "terms" && !APPROACH_SECTIONS.includes(h)))];
   if (others.length)
     out.push(["RULE", `carries ${others.join(" + ")} — an approach page is an opening, then Why > What > ` +
-      `How > Plan > Open > Deferred, and nothing else ${where}`]);
-  const order = heads.filter((h) => APPROACH_SECTIONS.includes(h)).map((h) => APPROACH_SECTIONS.indexOf(h));
-  if (order.some((at, i) => i > 0 && at < order[i - 1]))
-    out.push(["RULE", `sections run ${heads.filter((h) => APPROACH_SECTIONS.includes(h)).join(" > ")} — ` +
-      `the order is Why > What > How > Plan > Open > Deferred ${where}`]);
+      `Plan > How > Open > Deferred, and nothing else ${where}`]);
+  const named = heads.filter((h) => APPROACH_SECTIONS.includes(h));
+  const inOrder = (list: string[]): boolean => named.map((h) => list.indexOf(h)).every((at, i, all) => i === 0 || at >= all[i - 1]);
+  const older = !inOrder(APPROACH_SECTIONS) && inOrder(OLDER_SECTIONS);
+  if (!inOrder(APPROACH_SECTIONS) && !older)
+    out.push(["RULE", `sections run ${named.join(" > ")} — ` +
+      `the order is Why > What > Plan > How > Open > Deferred ${where}`]);
+  if (!closed) out.push(...whatHowShape(text, older));
   if (!/<p\b[^>]*class="(?:[^"]*\s)?sds-standfirst(?:\s[^"]*)?"/i.test(text))
     out.push(["RULE", "has no opening — one `p.sds-standfirst` in the header comes before Why " +
       "(05-artifacts.md § The masthead, and the opening; RULE.DEVEX.WORKSPACE.182) · start from the approach template"]);
@@ -1446,7 +1494,7 @@ export function check(path: string, text: string, fragment = false): Finding[] {
   if (isApproach) {
     if (!fragment) {
       const exempt = exemptWorkstream(path);
-      out.push(...approachShape(text, exempt));
+      out.push(...approachShape(text, exempt, inClosedWorkstream(path)));
       if (!exempt) out.push(...cyclesRule(path, text), ...headerRule(path, text));
       out.push(...figureRule(path, text));
     }

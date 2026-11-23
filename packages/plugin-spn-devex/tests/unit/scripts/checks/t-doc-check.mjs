@@ -427,7 +427,7 @@ one("a Subtitle under the Description is out of place",
   }
 }
 
-console.log("\n=== doc-check — the approach page: an opening, six sections, Plan after How");
+console.log("\n=== doc-check — the approach page: an opening, six sections, Plan between What and How");
 
 // 05-artifacts.md § The approach document. The page is an opening, then Why > What > How > Open >
 // Deferred, nothing else; there is no Terms section; Plan is a section of its own after How.
@@ -458,8 +458,21 @@ one("a section outside the five",
 one("sections out of order",
   write(APPROACH, CLEAN.replace(`<h2>What &mdash; the shape</h2>`, `<h2>Deferred &mdash; parked</h2>`)
     + `<section id="s7"><h2>What &mdash; late</h2><p>You read it last.</p></section>`),
-  "reports", "the order is Why > What > How > Plan > Open > Deferred");
+  "reports", "the order is Why > What > Plan > How > Open > Deferred");
 
+// Plan stands between What and How; a page written with Plan after How is still accepted until the rewrite pass moves it (RULE.DEVEX.WORKSPACE.487).
+const NEW_ORDER = (text) => { const plan = PLAN_SECTION.exec(text)[0]; return text.replace(PLAN_SECTION, "").replace('<section id="s3">', `${plan}<section id="s3">`); };
+one("a page in the new order, Plan between What and How, is accepted", write(APPROACH, NEW_ORDER(CLEAN)), "silent");
+one("a page in the older order, Plan after How, is still accepted", write(APPROACH, CLEAN), "silent");
+one("What with an arc as a heading — What is told by domain and construct",
+  write(APPROACH, NEW_ORDER(CLEAN).replace("<p>You get one place", `<h4 id="N001-what">N001 &mdash; the chapter</h4>\n  <p>You get one place`)),
+  "reports", "What has a heading that is an arc");
+one("How with a status word", write(APPROACH, NEW_ORDER(CLEAN).replace("<p>You read the chapter first", "<p>N001 is RUNNING. You read the chapter first")),
+  "reports", "How says \"RUNNING\"");
+one("How quoting the developer", write(APPROACH, NEW_ORDER(CLEAN).replace("<p>You read the chapter first", "<p>The developer said: &ldquo;do the chapter first and then the check after it&rdquo;. You read the chapter first")),
+  "reports", "How quotes a line of the developer");
+one("What holding a code block — the page is the summary", write(APPROACH, NEW_ORDER(CLEAN).replace("<p>You get one place", "<pre>const a = 1;</pre>\n  <p>You get one place")),
+  "reports", "What holds a code block");
 one("no opening — no standfirst above Why",
   write(APPROACH, CLEAN.replace(/<p class="sds-standfirst">[^\n]*\n/, "")),
   "reports", "has no opening");

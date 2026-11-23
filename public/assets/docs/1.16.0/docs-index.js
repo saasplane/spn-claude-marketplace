@@ -3,9 +3,11 @@
    a time on the right, in one frame under a bar. The tree is read from the page's data block, which
    `docs index` writes from the pages on disk. A click on an entry replaces the page in the frame and pushes the
    address, `#<its path>`, so Back returns to the page before, and a reload or a shared link opens the page again; nothing
-   else is remembered between visits. The bar holds the page's name, reload, copy link and open in a new window; a click
+   else is remembered between visits. The bar holds the page's name, the theme, copy link and open in a new window; the browser's own reload opens the same page again through the address; a click
    on an entry with a key held, or a middle click, opens the page in a browser tab of its own. The index never reads what
    a frame holds, because a page opened from disk is a stranger to the page that frames it. Every class it sets or reads opens with sds-. */
+/* THE INDEX OPENS AT ITS START: a reload does not restore an old position. */
+try{if('scrollRestoration' in history)history.scrollRestoration='manual';}catch(e){}
 /* THE MODE IS THE DESIGN SYSTEM'S, as on every page: an index that names none takes the reader's setting and follows it. */
 (function(){
   var root=document.documentElement;if(!root||root.getAttribute('data-mode')||!window.matchMedia)return;
@@ -24,10 +26,9 @@
   var root=document.documentElement;
   function modeNow(){return root.getAttribute('data-mode')==='dark'?'dark':'light';}
   function tellMode(frame){if(!root.hasAttribute('data-mode-chosen')||!frame.contentWindow)return;frame.contentWindow.postMessage({sds:'mode',mode:modeNow()},'*');}
-  var modeButton=document.createElement('button');modeButton.type='button';modeButton.className='sds-index-toggle sds-index-mode';
+  var modeButton=document.createElement('button');modeButton.type='button';modeButton.className='sds-bar-button sds-index-mode';modeButton.setAttribute('data-act','theme');
   function drawModeButton(){var next=modeNow()==='dark'?'light':'dark';modeButton.textContent='';modeButton.appendChild(icon(next==='dark'?'moon':'sun'));modeButton.title='Switch to '+next;modeButton.setAttribute('aria-label','Switch the index and its pages to '+next);}
   modeButton.addEventListener('click',function(){root.setAttribute('data-mode-chosen','');root.setAttribute('data-mode',modeNow()==='dark'?'light':'dark');drawModeButton();Array.prototype.forEach.call(panes.querySelectorAll('iframe'),tellMode);});
-  if(toggle&&toggle.parentNode)toggle.parentNode.insertBefore(modeButton,toggle);
   if(window.matchMedia)window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change',function(){setTimeout(drawModeButton,0);});
   /* An index shown inside another index takes that index's mode the same way, and passes it on to its own frames. */
   window.addEventListener('message',function(event){var data=event.data;if(event.source!==window.parent||window.parent===window||!data||data.sds!=='mode')return;if(data.mode!=='light'&&data.mode!=='dark')return;root.setAttribute('data-mode-chosen','');root.setAttribute('data-mode',data.mode);drawModeButton();Array.prototype.forEach.call(panes.querySelectorAll('iframe'),tellMode);});
@@ -44,9 +45,6 @@
   /* THE NAME OF A PAGE. The tree shows an entry's label. A domain's overview is shown as Overview inside the
      domain's group, so it has a title too, which is the overview's own. The bar names the page by that title. */
   function named(entry){return entry.title||entry.label;}
-  function pagesUnder(node){
-    return (node.children||[]).reduce(function(sum,child){return sum+pagesUnder(child);},node.path?1:0);
-  }
   function whereOf(entry){return new URL(address(entry),location.href).href;}
 
   /* THE MARKS are drawn from the design system's own set (lucide), in the colour of the text around them, so
@@ -60,7 +58,6 @@
     activity:['M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2'],
     chevron:['m9 18 6-6-6-6'],
     out:['M7 7h10v10','M7 17 17 7'],
-    reload:['M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8','M21 3v5h-5'],
     copy:['M10 8h10a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H10a2 2 0 0 1-2-2V10a2 2 0 0 1 2-2z','M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2'],
     check:['M20 6 9 17l-5-5'],
     sun:['M12 8a4 4 0 1 0 0 8a4 4 0 1 0 0-8','M12 2v2','M12 20v2','m4.93 4.93 1.41 1.41','m17.66 17.66 1.41 1.41','M2 12h2','M20 12h2','m6.34 17.66-1.41 1.41','m19.07 4.93-1.41 1.41'],
@@ -94,14 +91,13 @@
     }
     if(node.path){page(node,into);}else{fold(node,into,false);}
   }
-  /* The three groups of the tree are small headings with their count, and they never fold; a group inside them
+  /* The three groups of the tree are small headings, and they never fold; a group inside them
      carries the grid mark and a chevron, and folds. */
   function fold(node,into,top){
     var box=document.createElement('details');box.className='sds-tree-group';box.open=top||(!node.folded&&!(into.hasAttribute&&into.hasAttribute('data-first')));
     var head=document.createElement('summary');
     var name=document.createElement('span');name.textContent=node.label;head.appendChild(name);
     if(top){
-      var count=document.createElement('span');count.className='sds-tree-count';count.textContent=pagesUnder(node);head.appendChild(count);
       head.addEventListener('click',function(event){event.preventDefault();});
     }else{
       head.className='sds-tree-grouphead';if(into.hasAttribute&&into.hasAttribute('data-first'))head.insertBefore(icon('grid'),name);
@@ -137,7 +133,7 @@
     rows.push({entry:entry,link:link});
   }
 
-  /* THE BAR above the frame names the page on screen and holds three buttons: reload, a copy of the page's whole address,
+  /* THE BAR above the frame names the page on screen and holds three buttons: the theme, a copy of the page's whole address,
      and the page alone in a new window. The frame is made once, and a click on an entry points it at another page. */
   var told=null;
   function tell(button,words){
@@ -151,7 +147,9 @@
     button.setAttribute('data-act',name);button.appendChild(icon(mark));bar.appendChild(button);return button;
   }
   var title=document.createElement('span');title.className='sds-bar-name';bar.appendChild(title);
-  var again=tool('reload','Reload','reload'),copy=tool('copy','Copy link','copy'),away=tool('away','Open in a new window','out');
+  var copy=tool('copy','Copy link','copy'),away=tool('away','Open in a new window','out');
+  /* THE THEME SWITCH stands first in the bar, before copy and open, so it is reachable when the tree is folded: theme, copy, open. */
+  bar.insertBefore(modeButton,copy);
   /* The whole address of the page on screen, as the browser bar would show it if the page were opened alone.
      Where the clipboard is not given to the page, the address is shown to copy by hand. */
   copy.addEventListener('click',function(){
@@ -165,13 +163,6 @@
     if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(at).then(done,byHand);}else{byHand();}
   });
   away.addEventListener('click',function(){if(shown)window.open(whereOf(shown),'_blank','noopener');});
-  /* RELOAD the page on screen. A page opened from disk is a stranger to the index, so where its frame refuses the
-     call, the frame is pointed at the page's address again. */
-  again.addEventListener('click',function(){
-    if(!shown||unfilled(shown))return;
-    try{frame.contentWindow.location.reload();}
-    catch(e){mount(address(shown));frame.title=named(shown);frame.hidden=false;}
-  });
   /* THE FRAME IS MADE AGAIN FOR EACH PAGE: pointing a frame that holds a page at another adds an entry to the browser's history,
      and then Back would step the frame and leave the address on the page after. A new frame's first page adds none, so one
      click is one step of history, the address's. */
@@ -216,7 +207,7 @@
     }
     frame.title=named(entry);
     frame.hidden=slot;if(note)note.hidden=!slot;
-    again.hidden=slot;copy.hidden=slot;away.hidden=slot;
+    copy.hidden=slot;away.hidden=slot;
     /* The tree shows which page is on screen, opens what is above it, and the folded column marks its group. */
     var held=null;
     rows.forEach(function(row){

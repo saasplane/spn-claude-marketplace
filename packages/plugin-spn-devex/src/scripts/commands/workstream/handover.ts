@@ -12,7 +12,7 @@ import { basename, join } from "node:path";
 import { VALUE, UsageFault, readWords } from "../../../../../plugin-support-lib/src/lib/command.ts";
 import {
   arcIdsOf, arcStatus, builtOf, factsFileOf, firstOpenArc, logEvent, notesDirOf, openQuestions, readArc, readJsonl, readQuestions,
-  suggestionName, suggestionOpen, suggestionsOf, whatId,
+  suggestionName, suggestionOpen, suggestionsOf,
 } from "../../lib/workstream.ts";
 import { readGo } from "../../lib/go-plan.ts";
 import { cardName, type ArcData, type GoPlan } from "../../lib/workstream-schema.ts";
@@ -96,7 +96,7 @@ export function handoverBlock(ws: string, said: { continue?: string; doNotTouch?
   const values: Array<[string, string]> = [
     ["continue", said.continue && finds ? `${said.continue} ${finds[0].toUpperCase()}${finds.slice(1)}` : continuing],
     ["model", `${leadData?.model ?? "unchanged"}.`],
-    ["read first", `approach.html#${whatId(lead)}; notes/${lead}/arc.html; arcs/${lead}/log.jsonl, its last lines.`],
+    ["read first", `approach.html#${lead}; notes/${lead}/arc.html; arcs/${lead}/log.jsonl, its last lines.`],
     ["pins", `${pins.size ? [...pins].join("; ") : "none read"}.`],
     ["state", `${state.join("; ") || "no arc"}.`],
     ["live now", `${live.length ? live.join("; ") : "nothing running"}.`],

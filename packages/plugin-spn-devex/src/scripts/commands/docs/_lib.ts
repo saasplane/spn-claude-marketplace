@@ -118,7 +118,8 @@ export const OUTLINE: Partial<Record<Variant, { order: string[]; optional: strin
     optional: ["Binds", "Proof"],
   },
   approach: {
-    order: ["Terms", "Why", "What", "How", "Plan", "Open", "Deferred"],
+    // Plan stands between What and How (RULE.DEVEX.WORKSPACE.487); a page written with Plan after How is still accepted (`checkOutline`).
+    order: ["Terms", "Why", "What", "Plan", "How", "Open", "Deferred"],
     optional: ["Terms", "Plan"],
   },
   // WHAT A MIGRATION KNOWS, AND NOTHING ELSE (03-tree.md, RULE.DEVEX.WORKSPACE.134). A data model defines no
@@ -377,7 +378,9 @@ export function checkOutline(file: string, src: string, block: any): Finding[] {
 
   // Order, over the sections that belong — a swapped pair is the fault this catches.
   const order = spec.order;
-  const ranked = seen.map((s) => order.indexOf(s));
+  // An approach page written before Plan moved between What and How reads Why, What, How, Plan: accepted until the rewrite pass.
+  const older = variant === "approach" && seen.join(" ") === ["Terms", "Why", "What", "How", "Plan", "Open", "Deferred"].filter((w) => seen.includes(w)).join(" ");
+  const ranked = older ? [] : seen.map((s) => order.indexOf(s));
   for (let i = 1; i < ranked.length; i++) {
     if (ranked[i] < ranked[i - 1]) {
       f.push({ check: "outline", grade, file, message: `\`${seen[i - 1]}\` comes before \`${seen[i]}\`; the ${variant} outline is ${order.join(" → ")}` });

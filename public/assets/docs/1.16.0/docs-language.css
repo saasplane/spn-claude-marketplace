@@ -5339,15 +5339,6 @@
   .sds-tree-group > summary::-webkit-details-marker {
     display: none;
   }
-  .sds-tree-count {
-    margin-left: auto;
-    font-family: var(--sds-ui);
-    color: var(--sds-text-fact);
-    font-size: var(--font-content-xxs-size);
-    font-weight: var(--font-weight-medium);
-    line-height: var(--font-heading-xxl-line-height);
-    letter-spacing: 0;
-  }
   .sds-tree-group .sds-tree-group > summary.sds-tree-grouphead {
     display: flex;
     cursor: pointer;
@@ -5449,8 +5440,17 @@
     align-items: center;
     gap: 0.25rem;
     background-color: var(--sds-card);
-    padding: .35rem .6rem .35rem .9rem;
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    padding-block: .35rem;
+    padding-inline: calc(max(0px,(100% - var(--sds-page-max))/2) + var(--sds-page-pad));
     border-bottom: 1px solid var(--sds-rule);
+  }
+  @media (max-width:40rem) {
+    .sds-pagebar {
+      padding-inline: 16px;
+    }
   }
   .sds-bar-name {
     min-width: 0px;

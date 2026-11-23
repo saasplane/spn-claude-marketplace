@@ -11,7 +11,7 @@ description: Carry out a go. Use the moment the developer gives the go on one ar
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
-      "seen": "240ad401"
+      "seen": "153398c5"
     }
   ]
 }
@@ -79,3 +79,4 @@ description: Carry out a go. Use the moment the developer gives the go on one ar
 - **Five things an order never does, and every brief says so** (`RULE.DEVEX.WORKSPACE.515` · MUST · skill:spn-devex/execute)
 - **The go on a workstream written from a layout is refused while any section is `PENDING`, or cites a decision newer than the section itself, and the refusal names each such section** (`RULE.DEVEX.WORKSPACE.542` · MUST · skill:spn-devex/execute)
 - **A handover quotes no decision without naming where it lives** (`RULE.DEVEX.WORKSPACE.545` · MUST · skill:spn-devex/execute)
+- **While an arc changes the agent's own tools, the agent and its helpers run those tools from the arc's branch source, and build, cut and test once at the end** (`RULE.DEVEX.WORKSPACE.559` · MUST · skill:spn-devex/execute)

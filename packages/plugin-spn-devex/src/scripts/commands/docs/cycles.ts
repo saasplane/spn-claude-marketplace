@@ -1,5 +1,5 @@
 // RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § `How` ends in Cycles, and the arcs are the state
-//           RULE.DEVEX.WORKSPACE.487, an approach page reads Why, What, How, Plan, Open, Deferred, and Plan lists the arcs at `approach.html#arcs`
+//           RULE.DEVEX.WORKSPACE.487, an approach page reads Why, What, Plan, How, Open, Deferred, and Plan lists the arcs at `approach.html#arcs`
 //           docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § An arc's status is one of six, stored or worked out
 // The chapters are the source of truth; a rule change is edited there first, then here.
 //
@@ -24,9 +24,9 @@
 // `Open`. `doc-check` compares a page with the same reading, through `tableDifferences` and
 // `headerStatusRule`.
 //
-// THE TABLE IS THE PLAN SECTION'S (RULE.DEVEX.WORKSPACE.487): `<section id="arcs">` under the `h2` Plan, right after How. A page that
+// THE TABLE IS THE PLAN SECTION'S (RULE.DEVEX.WORKSPACE.487): `<section id="arcs">` under the `h2` Plan, between What and How. A page that
 // still ends How in an older `h3` Cycles is read there too, which is how a closed page stays as it closed; `write` moves that
-// subsection into a Plan section of its own on an open or backlog page, and creates the section after How where there is none.
+// subsection into a Plan section of its own on an open or backlog page, and creates the section after What where there is none.
 //
 // Every class it reads and writes is a name of the shared stylesheet (05-artifacts.md § One stylesheet,
 // served in versions). A page that links no shared stylesheet is refused by `write`, and not written.
@@ -348,9 +348,9 @@ export function cyclesTableAt(text: string): { from: number; to: number } | null
   return { from, to: from + table[0].length };
 }
 
-/** Where How's own section closes, so a section can follow it: the last `</section>` of How's body, else the end of the body. */
-function afterHowSection(text: string): number | null {
-  const how = h2Body(text, "How");
+/** Where a section closes, so another can follow it: the last `</section>` of its body, else the end of the body. */
+function afterHowSection(text: string, name = "How"): number | null {
+  const how = h2Body(text, name);
   if (!how) return null;
   const close = text.lastIndexOf("</section>", how.end);
   return close >= how.bodyAt ? close + "</section>".length : how.end;
@@ -361,9 +361,10 @@ const planSection = (inside: string): string =>
   `<section id="arcs" data-block="sequence">\n  <div class="sds-section-head"><h2>Plan</h2></div>\n${inside}</section>`;
 
 /**
- * The page with its arcs table in a Plan section of its own after How (RULE.DEVEX.WORKSPACE.487). A page that has one is returned as it is.
- * An older `h3` Cycles at the end of How (its order line, table and progress block) moves out into the section, and a page with none gets
- * a section holding the table `rows` give, written by the caller. Null where the page has no How to follow.
+ * The page with its arcs table in a Plan section of its own, between What and How (RULE.DEVEX.WORKSPACE.487). A page that has one, in
+ * either order, is returned as it is. An older `h3` Cycles at the end of How (its order line, table and progress block) moves out into
+ * a section after How, as the migration wrote it, and a page with none gets a section after What holding the table `rows` give,
+ * written by the caller. Null where the page has no How to stand before.
  */
 export function withPlanSection(text: string, table: () => string): string | null {
   if (hasPlan(text)) return text;
@@ -378,7 +379,8 @@ export function withPlanSection(text: string, table: () => string): string | nul
     const how = text.slice(0, old.from).replace(/[ \t]*$/, "");
     return `${how}${trail}\n\n${planSection(moved.endsWith("\n") ? moved : `${moved}\n`)}${text.slice(outer)}`;
   }
-  const at = afterHowSection(text);
+  if (h2Body(text, "How") === null) return null;
+  const at = afterHowSection(text, "What") ?? afterHowSection(text);
   if (at === null) return null;
   return `${text.slice(0, at)}\n\n${planSection(`  <p>The arcs, in the order they run.</p>\n${table()}\n`)}${text.slice(at)}`;
 }
@@ -514,6 +516,8 @@ export function placedPage(text: string, places: Place[]): string {
     const how = h2Body(out, "How")!;
     const bodyAt = how.bodyAt;
     const body = out.slice(bodyAt, how.end);
+    // A page told the way the template tells How holds its places as a catalog, one item for each repository (`placedTile`).
+    if (/class="sds-tiles"/.test(body)) { out = placedTile(out, bodyAt, body, place); continue; }
     // The places end where How's body does: before an older `h3` Cycles, else before the close of How's own section.
     const headings = [...body.matchAll(/<h3\b[^>]*>([\s\S]*?)<\/h3>/gi)];
     const cycles = headings.filter((found) => /^Cycles\b/i.test(flat(found[1]))).at(-1);
@@ -543,6 +547,34 @@ export function placedPage(text: string, places: Place[]): string {
   return out;
 }
 
+/**
+ * One place of How as an item of the catalog: its `Arcs` fact written, rewritten or added to the item whose `h4` names the
+ * repository, and an item added at the end of the catalog, with the slots the agent fills, where none names it. The text of the item is the agent's.
+ */
+function placedTile(out: string, bodyAt: number, body: string, place: Place): string {
+  const value = arcsValue(place);
+  const close = body.lastIndexOf("</section>");
+  const end = body.lastIndexOf("</div>", close >= 0 ? close : body.length);
+  const heads = [...body.matchAll(/<h4\b[^>]*>([\s\S]*?)<\/h4>/gi)].filter((found) => found.index! < end);
+  const at = heads.findIndex((found) => namesPlace(flat(found[1]), place.repo));
+  if (at < 0) {
+    const tile = `  <div class="sds-tile">\n      <div class="sds-tile-body"><h4 id="${placeId(out, place.repo)}">${escape(place.repo)}</h4><p>{{REPO-CHANGE}}</p>\n` +
+      `      <dl class="sds-tile-facts"><div><dt>Ships</dt><dd>{{RELEASE}}</dd></div><div><dt>After</dt><dd>{{UPSTREAM}}</dd></div><div><dt>Arcs</dt><dd>${value}</dd></div></dl></div></div>\n  `;
+    const where = bodyAt + end;
+    return out.slice(0, where) + tile + out.slice(where);
+  }
+  const from = bodyAt + heads[at].index! + heads[at][0].length;
+  const to = bodyAt + (heads[at + 1]?.index ?? end);
+  const part = out.slice(from, to);
+  const fact = /<dt>Arcs<\/dt>\s*<dd>[\s\S]*?<\/dd>/;
+  let written: string;
+  if (fact.test(part)) written = part.replace(fact, `<dt>Arcs</dt><dd>${value}</dd>`);
+  else if (/<\/dl>/.test(part)) written = part.replace(/<\/dl>/, `<div><dt>Arcs</dt><dd>${value}</dd></div></dl>`);
+  else if (/<\/p>/.test(part)) written = part.replace(/<\/p>/, `</p>\n      <dl class="sds-tile-facts"><div><dt>Arcs</dt><dd>${value}</dd></div></dl>`);
+  else written = `\n      <dl class="sds-tile-facts"><div><dt>Arcs</dt><dd>${value}</dd></div></dl>${part}`;
+  return out.slice(0, from) + written + out.slice(to);
+}
+
 /** The parts of a page that the arcs decide, as `write` names them. */
 export const PRODUCED_PARTS = { status: "the header's status", places: "the places of How", plan: "the Plan section", table: "the Plan table", open: "the heading of Open" } as const;
 
@@ -553,7 +585,7 @@ export const PRODUCED_PARTS = { status: "the header's status", places: "the plac
  * written. Null where the page holds no How to follow and no arcs table to write.
  */
 export function producedPage(folder: string, text: string, cycles: Cycle[] = cyclesOf(folder)): { text: string; wrote: string[]; skipped: string[] } | null {
-  // THE PLAN SECTION FIRST (RULE.DEVEX.WORKSPACE.487): an older Cycles subsection moves into it, and a page with none gets one after How.
+  // THE PLAN SECTION FIRST (RULE.DEVEX.WORKSPACE.487): an older Cycles subsection moves into it, and a page with none gets one after What.
   const planned = withPlanSection(text, () => tableOf(cycles));
   if (planned === null || !cyclesTableAt(planned)) return null;
   const wrote: string[] = [];

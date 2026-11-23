@@ -13,11 +13,11 @@
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/02-workstream.md",
-      "seen": "8c896f2e"
+      "seen": "4aff3d3c"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
-      "seen": "9244cb85"
+      "seen": "153398c5"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -42,7 +42,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "section": "An arc carries its specification, or names the note that holds it",
-      "seen": "43c8c7ef"
+      "seen": "5cddcb76"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -61,7 +61,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "seen": "80bf3af3"
+      "seen": "70a2fe70"
     }
   ]
 }
@@ -183,8 +183,8 @@ backlog workstream holds it.
 
 **`state check` reads every open and backlog workstream, and never a closed one.** It validates each
 arc's data; an arc with no preview, and no second preview beside the one by its fixed name; the stamp of
-each arc's *Plan* row, a hash of the arc's goal, title and repositories; the arc's own `What` entry,
-`<arc>-what`, which links its preview, and a `What` entry or a preview that links another arc's preview;
+each arc's *Plan* row, a hash of the arc's goal, title and repositories; the arc's own *Plan* row (or, on an older page, its `What` entry,
+`<arc>-what`), which links its preview, and an entry or a preview that links another arc's preview;
 a `{{…}}` slot left in the preview of a decided arc; the cards against
 their records; the report of each landed row with an order; and each status against
 its steps: a step running on an arc not `DECIDED`, or holding a wait, and a stored `LANDED` arc with a step
@@ -201,7 +201,7 @@ files it writes, and a file a command owns is written only by that command.
 | Step | Files it writes |
 | --- | --- |
 | shape | `suggestions.jsonl`, by command; nothing else moves |
-| open the arc, as the plan becomes clear | `state.json`, `log.jsonl` and `<subject>.md`, by command (`arc edit <arc> --title … --subject … --goal …`); the preview from the template and its `What` entry, `<arc>-what`; one line in `How`; the *Plan* row (`docs cycles write`), then `arc stamp write` |
+| open the arc, as the plan becomes clear | `state.json`, `log.jsonl` and `<subject>.md`, by command (`arc edit <arc> --title … --subject … --goal …`); the preview from the template; a place in `How`; the *Plan* row (`docs cycles write`), then `arc stamp write` |
 | preview and cards | the preview, filled by planning jobs, which record no step, while the arc reads `PROPOSED`; the cards in `Open`, by `question raise`; each fact read, by `fact write` |
 | decide | the developer's go on the preview, written with their words: `arc edit <arc> --status DECIDED --note "<the developer's words>"`, with `--wait` where they said wait; the answers folded into `What` and the preview, and each line the write lists as still saying proposed brought current; the register rows owed |
 | plan | the rows, by `row add`, each with its kind, model, `blockedBy` and `touches`; `plan.md` where the arc has traps, a set or a move table; the one line of each new place in the page's `How` |
@@ -1345,11 +1345,11 @@ work produces such a file. Each one reads `PROPOSED` until the developer answers
 masthead, whose one status is the arc's, written by the arc's commands (`RULE.DEVEX.WORKSPACE.266` · MUST · check:workstream-state), and a
 sample with the section of the preview that links it. Before the go, rewrite a proposal a later one
 replaces in place, and say so in the arc's log. The approach page links the preview and every sample:
-its `What` holds one entry per arc, `<h4 id="<arc>-what">` or that id as an anchor on a subject heading,
-which links that arc's preview and no other.
+its `What` is told by construct and holds no entry per arc: each arc's *Plan* row, `#<arc>`, links its preview, and a construct links the arc pages its change comes from;
+a page written before that shape keeps `<h4 id="<arc>-what">` entries, which are still read.
 The write that opens the arc as `PROPOSED` writes its preview, so a preview always has its arc and a first
 sample has a folder to go to. A preview belongs to its arc: a later arc that needs an earlier arc's work
-links that arc's `What` entry, `approach.html#<arc>-what` (for `N<nnn>`, `ideate` and `follow-ups`), and never links, copies, says again or edits
+links that arc's *Plan* row, `approach.html#<arc>` (for `N<nnn>`, `ideate` and `follow-ups`), and never links, copies, says again or edits
 its preview or sample (`RULE.DEVEX.WORKSPACE.224` · MUST · short). A copy is a second version, and nothing keeps the two in step.
 **A change to how something looks is made in the preview first, as often as the developer likes, with no
 test** (`RULE.DEVEX.WORKSPACE.274` · MUST · check:workstream-state). It reaches code only through a preview the developer said go on, and is
@@ -1411,7 +1411,7 @@ writes it into the previews of every open and backlog workstream.
 
 **An arc that changes several pages of a surface, or gathers many finds shared as screenshots, keeps each page as a sample of its own under one index** (`RULE.DEVEX.WORKSPACE.520` · GUIDE).
 The index is `notes/<arc>/samples/index.html`, the same frame as a repository's index page: a tree in a side panel, with
-pages opened in tabs, grouped by what each is for. The arc's preview links the index once, says what each group holds, and keeps
+one page open at a time, grouped by what each is for. The arc's preview links the index once, says what each group holds, and keeps
 the decisions and any detail that is the arc's alone. An arc of one page, or with no drawn page, keeps everything on its preview.
 Writing, naming, grouping and retiring the pages is the agent's job, and a page a decision has overtaken leaves the index.
 `spn-devex docs index write` writes the index from the pages on disk, so the tree is never typed. **A page whose sidebar lists other pages is the index page, built from `templates/docs/pages/index-template.html`, and it never has a sidebar of its own** (`RULE.DEVEX.WORKSPACE.550` · MUST · skill:spn-devex/ideate): a samples home, a set of previews and a set of reports are each an index of that template. A design language's samples are one such home, each sample in a surface preview, in the repository that owns the language. A sample draws the changes
@@ -1611,7 +1611,7 @@ there** (`RULE.DEVEX.WORKSPACE.263` · MUST · check:workstream-state). The deve
 that, such that changing the arc number in the browser quickly opens"*. A preview's masthead links
 `../../approach.html#N013`; a plan links the same; an order `../../../approach.html#N013`; a report, a
 handover and a command's output name the address. Never link `arcs/<arc>/state.json`: it is data for the
-commands. Where `What` gives one arc a part of its own, that part's heading carries `id="<arc>-what"`.
+commands. `What` gives an arc no part of its own (an older page keeps `id="<arc>-what"` entries, still read).
 `docs cycles write` writes the ids, and `state check` names a row without one. The header's status
 reads `PLANNING` while no arc is past `DECIDED`, `IMPLEMENTING` once an arc runs or has landed, and
 `DONE` when the workstream closes. The heading of `Open` reads `Open — Q<n> · Q<n>`, each open card by

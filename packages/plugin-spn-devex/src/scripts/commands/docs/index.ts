@@ -239,7 +239,7 @@ function indexPage(template: string, tree: Tree, where: { organisation: string; 
   const shell = withHead(template, {
     tab: headed?.tab ?? `${where.location} Artifacts`,
     block: { id: headed?.id ?? `${basename(where.repository)}-artifacts-index`, variant: "index", title: headed?.title ?? "Artifacts",
-      summary: headed?.summary ?? `Every page of this repository's ${POCKET_PATH}, in one tree, opened in tabs.` },
+      summary: headed?.summary ?? `Every page of this repository's ${POCKET_PATH}, in one tree, one page open at a time.` },
     produced: "Produced by `docs index` from the pages on disk. Never edit this page: produce it again.",
     version: newestCut(), script: INDEX_SCRIPT,
   });
@@ -398,7 +398,7 @@ function run(args: string[], write: boolean): number {
       const first = groups.flatMap(entriesOf)[0]?.path ?? "";
       const headed = half ? { tab: `${named === "—" ? basename(repository) : named} ${half === VISIBILITY.public ? "Public" : "Private"}`, id: `${basename(repository)}-artifacts-${half}-index`,
         title: half === VISIBILITY.public ? "Public" : "Private",
-        summary: `Every page of this repository's ${slashes(relative(repository, root))}, in one tree, opened in tabs.` } : undefined;
+        summary: `Every page of this repository's ${slashes(relative(repository, root))}, in one tree, one page open at a time.` } : undefined;
       const produce = (): string => indexPage(pageTemplate(templatesDir(workspace), TEMPLATE), { base, groups }, {
         organisation: "SaaS Plane",
         location: named === "—" ? basename(repository) : named,

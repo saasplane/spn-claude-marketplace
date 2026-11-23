@@ -160,6 +160,21 @@ console.log("=== the index's brand — a link to the index itself, which opens i
     /<a class="sds-rail-brand" href="index\.html"/.test(readFileSync(join(PLUGIN, "src", "refs", "devex", "workspace", "docs", "templates", "docs", "pages", "index-template.html"), "utf8")));
 }
 
+console.log("=== a page opens at its start — no scroll at set-up, and no restored position");
+{
+  const page = readFileSync(join(STYLES, "docs-page.js"), "utf8");
+  const index = readFileSync(join(STYLES, "docs-index.js"), "utf8");
+  ok("[MKT.SCRIPTS.589] a tab set keeps its open tab in view by moving its own bar, and never calls scrollIntoView on the tab (the page would scroll to the first set below the fold)",
+    !/tab\.scrollIntoView/.test(page) && /bar\.scrollLeft \+= /.test(page) && /tab\.focus\(\{ preventScroll: true \}\)/.test(page));
+  ok("[MKT.SCRIPTS.589] the page script and the index script both set history.scrollRestoration to manual",
+    /history\.scrollRestoration='manual'/.test(page) && /history\.scrollRestoration='manual'/.test(index));
+  const source = readFileSync(join(STYLES, "docs-language.src.css"), "utf8");
+  ok("[MKT.SCRIPTS.589] the tree's group headings carry no count: no `sds-tree-count` in the script or the stylesheet",
+    !/sds-tree-count|pagesUnder/.test(index) && !/sds-tree-count/.test(source));
+  ok("[MKT.SCRIPTS.589] the bar's row takes the page's cap and side padding (the tokens `--sds-page-max` and `--sds-page-pad`, 16px under the phone breakpoint), so its name stands where the page's text begins",
+    /\.sds-pagebar\{[^}]*padding-inline:calc\(max\(0px,\(100% - var\(--sds-page-max\)\)\/2\) \+ var\(--sds-page-pad\)\)/.test(source) && /@media \(max-width:40rem\)\{ \.sds-pagebar\{padding-inline:16px\} \}/.test(source));
+}
+
 console.log("=== the index shows one page at a time — no tab strip, and a door is one link");
 {
   const index = readFileSync(join(STYLES, "docs-index.js"), "utf8");
@@ -167,8 +182,8 @@ console.log("=== the index shows one page at a time — no tab strip, and a door
   const template = readFileSync(join(PLUGIN, "src", "refs", "devex", "workspace", "docs", "templates", "docs", "pages", "index-template.html"), "utf8");
   ok("[MKT.SCRIPTS.589] the index script holds no tab: no strip, no close, no state of tabs, one frame, and the address is pushed by a click",
     !/sds-tab\b|sds-tab-|tablist|role','tab'|shut\(|tabs\.push|data\.tabs/.test(index) && /pushState\(null,'',hashOf\(entry\)\)/.test(index) && /addEventListener\('hashchange'/.test(index));
-  ok("[MKT.SCRIPTS.589] the bar holds the page's name and three buttons: reload, copy link and open in a new window",
-    /data-act|tool\('reload'/.test(index) && /tool\('copy','Copy link'/.test(index) && /tool\('away','Open in a new window'/.test(index) && /sds-bar-name/.test(index));
+  ok("[MKT.SCRIPTS.589] the bar holds the page's name and three buttons in this order, theme, copy link and open in a new window, and no reload (the browser's own opens the same page again); the theme switch is no longer in the tree's head",
+    !/tool\('reload'|reload:\[|data-act='reload'/.test(index) && /data-act/.test(index) && /bar\.insertBefore\(modeButton,copy\)/.test(index) && !/insertBefore\(modeButton,toggle\)/.test(index) && /sds-pagebar\{[^}]*position:sticky; top:0/.test(readFileSync(join(STYLES, "docs-language.src.css"), "utf8")) && /tool\('copy','Copy link'/.test(index) && /tool\('away','Open in a new window'/.test(index) && /sds-bar-name/.test(index));
   ok("[MKT.SCRIPTS.589] a key held on a click, and a middle click, are left to the browser, and no row carries a second arrow",
     /if\(held&&!unfilled\(entry\)\)return;/.test(index) && !/sds-tree-new/.test(index) && !/sds-tree-new/.test(source));
   ok("[MKT.SCRIPTS.589] the stylesheet holds no rule only the tab strip used, and keeps the bar's",

@@ -802,7 +802,7 @@
    it, so both themes follow. */
   .sds-rail-mark svg,.sds-ico,.sds-index-toggle svg{@apply flex-none fill-none; width:1rem; height:1rem; stroke:currentColor; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round}
 
-  /* The index: the tree. The three groups are small headings with their count, and they never fold. Inside a
+  /* The index: the tree. The three groups are small headings, and they never fold. Inside a
    group, a group row only folds and a page row only opens: a row does one thing. */
   .sds-tree{@apply font-ui text-sm}
   .sds-tree,.sds-tree-kids{@apply grid min-w-0; grid-template-columns:minmax(0,1fr)}
@@ -811,7 +811,6 @@
   .sds-tree-group .sds-tree-group{@apply mt-0}
   .sds-tree-group > summary{@apply flex items-center min-w-0 font-ui uppercase text-fact; list-style:none; padding:.2rem .55rem; font-size:var(--font-content-xxs-size); font-weight:var(--font-weight-semibold); line-height:var(--font-content-xxl3-line-height); letter-spacing:.09em; cursor:default}
   .sds-tree-group > summary::-webkit-details-marker{@apply hidden}
-  .sds-tree-count{@apply ml-auto font-ui text-fact; font-size:var(--font-content-xxs-size); font-weight:var(--font-weight-medium); line-height:var(--font-heading-xxl-line-height); letter-spacing:0}
   .sds-tree-group .sds-tree-group > summary.sds-tree-grouphead{@apply flex items-center normal-case font-ui text-sm text-title cursor-pointer; gap:.55rem; letter-spacing:0; font-weight:var(--font-weight-regular); line-height:var(--font-title-md-line-height); padding:.42rem .55rem; border-radius:var(--radius-sm)}
   .sds-tree-grouphead .sds-ico{@apply text-description}
   .sds-tree-grouphead .sds-tree-turn{@apply ml-auto; transition:transform .15s}
@@ -835,9 +834,12 @@
   .sds-tree-link.sds-is-current .sds-ico{@apply text-title}
   .sds-tree-group > summary:focus-visible,.sds-tree-link:focus-visible,.sds-tree-fold:focus-visible,.sds-bar-button:focus-visible,.sds-index-toggle:focus-visible,.sds-rail-brand:focus-visible,.sds-rail-groupmark:focus-visible{outline:2px solid var(--sds-accent); outline-offset:-2px}
 
-  /* The index: the bar above the frame. One page is on screen at a time; the bar carries its name, a reload, a copy of
+  /* The index: the bar above the frame. One page is on screen at a time; the bar carries its name, the theme switch, a copy of
    its whole address, and the page alone in a new window. */
-  .sds-pagebar{@apply flex items-center gap-1 bg-card; padding:.35rem .6rem .35rem .9rem; border-bottom:1px solid var(--sds-rule)}
+  /* THE BAR LINES UP WITH THE PAGE: its row takes the page's own cap and side padding, so the name stands where the page's text begins
+     and the last button at the page's right edge, at every width. The bar's ground and rule run the whole frame; the row inside is the page's width. */
+  .sds-pagebar{@apply flex items-center gap-1 bg-card; position:sticky; top:0; z-index:5; padding-block:.35rem; padding-inline:calc(max(0px,(100% - var(--sds-page-max))/2) + var(--sds-page-pad)); border-bottom:1px solid var(--sds-rule)}
+  @media (max-width:40rem){ .sds-pagebar{padding-inline:16px} }
   .sds-bar-name{@apply flex-1 min-w-0 overflow-hidden whitespace-nowrap font-ui text-sm text-title; text-overflow:ellipsis; font-weight:var(--font-weight-semibold)}
   .sds-bar-button{@apply flex-none grid text-fact cursor-pointer; place-items:center; width:1.6rem; height:1.6rem; border:0; border-radius:var(--radius-sm); background:none}
   .sds-bar-button .sds-ico{width:.9rem; height:.9rem}

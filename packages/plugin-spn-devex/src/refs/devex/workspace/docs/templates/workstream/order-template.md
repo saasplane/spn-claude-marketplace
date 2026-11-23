@@ -39,6 +39,8 @@ parts. **Search with `grep` in Bash**, since you have no Grep tool. **Hand back*
 
 **Read first:** {{the references of the order's kind of work, as `spn-devex precedent find "<subject>" --work <kind>` prints them: `<plugin> <path>` · …}}
 
+**Run the tool from source, where the arc changes the agent's own tools** (RULE.DEVEX.WORKSPACE.559): {{the source commands: `node packages/plugin-spn-devex/src/scripts/cli.ts <command>`, `tsx src/index.ts` in `apps/utility-ts`, `docs styles preview <folder>`, or `none, this arc changes no tool`}}. Check a change by running the tool on the samples and reading what it writes and finds; the build, the stylesheet's cut and the test files run once, at the end, when the coordinator says.
+
 **A name, a shape or a construct no entry of this order holds is not yours to make up** (RULE.DEVEX.WORKSPACE.495): stop, return `needs-you`, and list each one under `unnamed:` in the report.
 
 **Never, in this order:** `sed -i`; `git stash`; a commit by anything but an explicit path, which only the coordinator makes; formatting a generated file; starting a demo app from anywhere but the main checkout.

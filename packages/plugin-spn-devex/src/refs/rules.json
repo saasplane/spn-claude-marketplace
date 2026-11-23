@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "book": {
     "repository": "spn-foundation",
-    "commit": "a8d2fb50"
+    "commit": "3db57223"
   },
   "rules": [
     {
@@ -7495,7 +7495,7 @@
       "level": "GUIDE",
       "params": {},
       "class": "guidance",
-      "sentence": "`What` groups by domain, `How` by repository, and `Why` by the nature of the problem",
+      "sentence": "`What` groups by domain and construct, `How` by repository, and `Why` by the nature of the problem",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "The approach document — a workstream's, never a repository's",
       "decision": null,
@@ -12463,7 +12463,7 @@
         "check": "doc-check"
       },
       "class": "checked",
-      "sentence": "After `How` comes a section of its own, *Plan*: one row per arc, in the arc order (`ideate` first, the build arcs by number and letter, `follow-ups` last), the same order the status bar follows",
+      "sentence": "After `What` comes a section of its own, *Plan*: one row per arc, in the arc order (`ideate` first, the build arcs by number and letter, `follow-ups` last), the same order the status bar follows",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "Plan lists the arcs, and the arcs are the state",
       "decision": null,
@@ -13991,6 +13991,30 @@
           "plugin": "spn-devex",
           "path": "skills/ideate/SKILL.md",
           "heading": "How a first proposal is shaped"
+        }
+      ]
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.559",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-devex/execute"
+      },
+      "class": "stated in a skill",
+      "sentence": "While an arc changes the agent's own tools, the agent and its helpers run those tools from the arc's branch source, and build, cut and test once at the end",
+      "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
+      "heading": "Drift and the passes",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/execute/SKILL.md",
+          "heading": "The rules this step holds"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "While the shape is discussed, a find stays on the ideate arc"
         }
       ]
     },
