@@ -86,17 +86,17 @@ spn-devex docs prose list [<path>…] [--comments] [--ledger=<file>] [--record=<
 
 spn-devex docs prose paragraphs <file> — print the flagged paragraphs of one file
 
-spn-devex docs sds cut <version> [--root <folder>] [--ds <folder>] [--ds-version <tag>] — copy the built styles into a version's folder, and list the version; with --ds, copy the design system's tokens first and build
-
-spn-devex docs sds check <version> <folder…> [--root <folder>] — list the pages a move to the version would change, and write nothing
-
-spn-devex docs sds repoint <version> <folder…> [--root <folder>] — move every page under the folders to the version
-
-spn-devex docs sds bundle <page> [--assets <folder>] — write a copy of a page that carries its version's styles inside it
-
 spn-devex docs status check <seat…> — report each status that differs from what its behaviour rows derive, and write nothing
 
 spn-devex docs status write <seat…> — write the status the behaviour rows derive into each seat file
+
+spn-devex docs styles cut <version> [--root <folder>] [--ds <folder>] [--ds-version <tag>] — copy the built styles into a version's folder, and list the version; with --ds, copy the design system's tokens first and build
+
+spn-devex docs styles check <version> <folder…> [--root <folder>] — list the pages a move to the version would change, and write nothing
+
+spn-devex docs styles repoint <version> <folder…> [--root <folder>] — move every page under the folders to the version
+
+spn-devex docs styles bundle <page> [--assets <folder>] — write a copy of a page that carries its version's styles inside it
 
 spn-devex docs topics check [<path>…] — the topic and id findings under the paths, from the three seats of each path's repository
 

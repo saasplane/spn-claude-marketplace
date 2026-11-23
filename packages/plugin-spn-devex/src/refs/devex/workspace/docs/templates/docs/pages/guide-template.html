@@ -6,8 +6,7 @@
      {{TITLE}} the page's heading, the promise the page makes: the `<h1>` only
      {{NAME}} the page's short name, at most three words (RULE.DEVEX.WORKSPACE.517): the block's title, written in the `<title>`, the outline's title, the eyebrow's last segment, the breadcrumb of a page below it and the page's entry in an index
      {{SUMMARY}} The Description's first sentence, word for word.
-     {{UP-HREF}} THE ADDRESS OF THE HUB: base, then the path of the hub, ending in .html
-     {{UP}} THE HUB&rsquo;S REPOSITORY NAME
+     {{UP-HREF}} THE ADDRESS OF THE HUB: base, then the path of the hub, ending in .html: the eyebrow&rsquo;s second level links it
      {{SUBTITLE}} THE SUBTITLE: the task, in one plain sentence.
      {{LEAD}} THE DESCRIPTION, one paragraph: what this guide walks you through, in everyday words; who it is for; then one short sentence on how it runs.
      {{HAVE-END}} WHAT YOU HAVE AT THE END, in the reader's own terms: what runs, what exists, what you can do next.
@@ -28,17 +27,15 @@
 <!-- spn:doc
 {"id": "{{slug}}", "variant": "guide", "title": "{{NAME}}", "lenses": ["{{LENS}}"], "summary": "{{SUMMARY}}"}
 -->
-<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.16.0/sds-docs.css" integrity="sha384-iPi3diDZaIbK3FmnUfnnZOQs6LAv12kHUr2Ks3xVSjhgtMDB4DLKrG03lDgsjzPC" crossorigin="anonymous">
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.16.0/docs-language.css" integrity="sha384-yyUDP96qm3IeqFNEyD9g9iKgx/IpoirVMsVcV+fMZNkKy+w1pGqs1+sy0Zu4n7Ml" crossorigin="anonymous">
 <div class="sds-page sds-guide">
 
 <nav class="sds-rail" id="rail">
   <div class="sds-rail-title">{{NAME}}</div>
 </nav>
 <div class="sds-wrap">
-<p class="sds-crumb"><a href="{{UP-HREF}}">&larr; {{UP}}</a></p>
-
 <header class="sds-masthead">
-  <div class="sds-eyebrow"><span class="sds-line1">{{WORKSPACE}} &nbsp;|&nbsp; {{LOCATION}} &nbsp;|&nbsp; {{NAME}}</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Guide</span><span class="sds-separator">|</span><span class="sds-label">For:</span> <span class="sds-audience"><span class="sds-badge sds-lens">{{ROLE}}</span><span class="sds-badge sds-lens">{{ROLE}}</span></span></span></div>
+  <div class="sds-eyebrow"><span class="sds-line1">{{WORKSPACE}} &middot; <a href="{{UP-HREF}}">{{LOCATION}}</a> &middot; {{NAME}}</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Guide</span><span class="sds-separator">|</span><span class="sds-label">For:</span> <span class="sds-audience"><span class="sds-badge sds-lens">{{ROLE}}</span><span class="sds-badge sds-lens">{{ROLE}}</span></span></span></div>
   <h1>{{TITLE}}</h1>
   <p class="sds-subtitle">{{SUBTITLE}}</p>
   <p class="sds-standfirst">{{LEAD}}</p>
@@ -108,4 +105,4 @@
   A template &middot; a guide is stages, and a stage is steps &middot; a step holds why, the command and what you see, in that order &middot; a step numbers itself
 </footer>
 
-<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.16.0/sds-docs.js" integrity="sha384-ylWgxoG5OtgS3kWBdUOPAaX0gFwX0L6YMXjJA2BjZWQU+MxZDzdAjh43QqeGQ6co" crossorigin="anonymous"></script>
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.16.0/docs-page.js" integrity="sha384-KUtnPgiMoh3GcV3TkaaZN5fEDfV3Q33IG26YHwmcMbjeb04ObMXBrg65htkq6n7N" crossorigin="anonymous"></script>

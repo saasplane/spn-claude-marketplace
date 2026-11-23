@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "book": {
     "repository": "spn-foundation",
-    "commit": "06ef6ea1"
+    "commit": "47def34c"
   },
   "rules": [
     {
@@ -7307,7 +7307,7 @@
         "check": "corpus"
       },
       "class": "checked",
-      "sentence": "A hub has no breadcrumb above its masthead",
+      "sentence": "A hub has no link in the masthead's first line",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "The templates — the pages, and the two seat files behind them",
       "decision": null,
@@ -38314,7 +38314,7 @@
         "skill": "spn-surface/design"
       },
       "class": "stated in a skill",
-      "sentence": "Each app row has one language stylesheet, written from the row and never by hand",
+      "sentence": "A page that shows a render links the design system's stylesheet, and an app's own stylesheet only where the app gives one",
       "chapter": "04-capabilities/02-support/01-surface/03-standards-patterns/01-common/05-design-languages.md",
       "heading": "One source for the platform's look",
       "decision": null,
