@@ -314,7 +314,7 @@
   /* FILE: a code block that is one file, framed, its path from the repository's root as the title and its
      language as a badge. The title bar takes no margin, and its path starts where the code starts. */
   .sds-file{@apply max-w-full overflow-hidden; background:var(--surface); border:1px solid var(--surface-border); border-radius:var(--radius-lg); margin:1.6rem 0}
-  .sds-file>figcaption{@apply flex items-center font-mono text-xs text-description; gap:.75rem; margin:0; padding:.4rem 1.1rem; border-bottom:1px solid var(--sds-rule)}
+  .sds-file>figcaption{@apply flex items-center font-mono text-xs text-description; gap:.75rem; margin:0; padding:.4rem 1.1rem; border-bottom:1px solid var(--sds-rule); background:var(--muted)}
   .sds-file .sds-file-path{@apply min-w-0 wrap-anywhere; flex:1}
   .sds-file .sds-file-lang{@apply font-ui uppercase text-fact; flex:none; padding:0 .5rem; border:1px solid var(--sds-rule); border-radius:999px; font-size:var(--font-content-xxs-size); letter-spacing:.06em}
   .sds-file>pre{margin:0; border:0; border-radius:0}
@@ -1401,6 +1401,7 @@ pre .sds-tk-g { color: var(--sds-tk-c); font-style: normal; }
   gap: 1rem;
   padding: .8rem 1.1rem;
   border-bottom: 1px solid var(--sds-rule);
+  background: var(--muted);
 }
 .sds-group-head h5 {
   margin: 0;
