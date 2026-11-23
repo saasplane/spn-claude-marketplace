@@ -183,12 +183,36 @@ function codeRun(sentence: string): [run: number, all: number] {
   return [best, spans.length];
 }
 
+/** A name that reads as a condition, a question or a case: it starts with a lower-case article or question word, or with a digit. */
+export const readsAsCondition = (name: string): boolean => /^(?:a|an|the|how|when|if|what)\s/.test(name.trim().replace(/^[`*_]+/, "")) || /^\d/.test(name.trim().replace(/^[`*_]+/, ""));
+
+const CONDITIONS = "a first column of conditions is a table (rule 549)";
+export const HAND_WRITTEN_CARDS = "this card block is hand-written without the writer's attributes, so its rows will not line up: use a table, or the writer's markup";
+
+/** Card blocks written by hand in html: item headings that read as conditions, and facts in a block the writer did not emit. */
+function tileFindings(text: string): Finding[] {
+  const t = text.replace(/<!--[\s\S]*?-->/g, " ").replace(/<(script|style|template)\b[\s\S]*?<\/\1>/gi, " ");
+  const out: Finding[] = [];
+  for (const block of t.matchAll(/<div\b([^>]*\bclass="[^"]*\bsds-tiles\b[^"]*"[^>]*)>([\s\S]*?)(?=<div\b[^>]*\bclass="[^"]*\bsds-tiles\b|<\/section>|$)/gi)) {
+    const attrs = block[1];
+    const tiles = [...block[2].matchAll(/<div\b([^>]*\bclass="[^"]*\bsds-tile\b(?!s|-)[^"]*"[^>]*)>([\s\S]*?)(?=<div\b[^>]*\bclass="[^"]*\bsds-tile\b(?!s|-)|<\/section>|$)/gi)];
+    const heads = tiles.map((tile) => plain(/<h[1-6]\b[^>]*>([\s\S]*?)<\/h[1-6]>/i.exec(tile[2])?.[1] ?? "")).filter(Boolean);
+    const first = heads.find(readsAsCondition);
+    if (first) out.push(["SOFT", `a card block whose item "${first}" reads as a condition: ${CONDITIONS}`]);
+    const withFacts = tiles.filter((tile) => /\bsds-tile-facts\b/.test(tile[2]));
+    const noLayout = !/\bdata-layout=/.test(attrs);
+    const noFacts = /\bdata-layout="GRID"/.test(attrs) && withFacts.some((tile) => !/\bdata-facts=/.test(tile[1]));
+    if (withFacts.length && (noLayout || noFacts)) out.push(["SOFT", HAND_WRITTEN_CARDS]);
+  }
+  return out;
+}
+
 export type FitOptions = { kind: FitKind };
 
 /** The findings for one page's content. */
 export function blockFit(text: string, isHtml: boolean, kind: FitKind): Finding[] {
   const units = isHtml ? unitsOfHtml(text) : unitsOfMarkdown(text);
-  const out: Finding[] = [];
+  const out: Finding[] = isHtml ? tileFindings(text) : [];
   const bound = BOUNDS[kind];
   for (const unit of units) {
     if (unit.kind === "callout") {

@@ -74,6 +74,22 @@ ok("[RULE.DEVEX.WORKSPACE.531] a preview, an approach page and an overview have 
   fitKind("/r/.spndevex/workstreams/open/041-x/notes/N001/preview.html") === "preview" && fitKind("/r/x/041-approach.html") === "approach"
   && fitKind("/r/docs/artifacts/docs/a-overview.html") === "overview" && fitKind("/r/docs/artifacts/docs/a-construct.html") === null && fitKind("/r/docs/04-capabilities/a.md") === null);
 
+console.log("=== hand-written card blocks (RULE.DEVEX.WORKSPACE.549)");
+const tiles = (attrs, tile, heads) => `<div class="sds-tiles"${attrs}>${heads.map((h) => `<div class="sds-tile"${tile}><h4>${h}</h4><p>one line</p><dl class="sds-tile-facts"><div><dt>Key</dt><dd>value</dd></div></dl></div>`).join("")}</div>`;
+const written = ' data-layout="GRID"', facts = ' data-facts="1"';
+ok("[RULE.DEVEX.WORKSPACE.549] red: an sds-tiles block whose item headings read as conditions is a soft finding naming the item",
+  sayHtml(tiles(written, facts, ["how ideas connect", "Reach"])).some((m) => m.includes('"how ideas connect"') && m.includes("a first column of conditions is a table (rule 549)")));
+ok("[RULE.DEVEX.WORKSPACE.549] red: a heading that opens on a digit reads as a condition",
+  sayHtml(tiles(written, facts, ["3 steps in a row"])).some((m) => m.includes("reads as a condition")));
+ok("[RULE.DEVEX.WORKSPACE.549] green: named things in the writer's markup are silent",
+  sayHtml(tiles(written, facts, ["Reach", "Voice", "The Voice Check"])).length === 0);
+ok("[RULE.DEVEX.WORKSPACE.549] red: tiles with facts in a block without the writer's attributes is a soft finding",
+  sayHtml(tiles("", "", ["Reach"])).includes("this card block is hand-written without the writer's attributes, so its rows will not line up: use a table, or the writer's markup"));
+ok("[RULE.DEVEX.WORKSPACE.549] red: a GRID block whose tile lacks data-facts is the same finding",
+  sayHtml(tiles(written, "", ["Reach"])).some((m) => m.includes("hand-written without the writer's attributes")));
+ok("[RULE.DEVEX.WORKSPACE.549] green: tiles with no facts and no attributes are silent",
+  sayHtml('<div class="sds-tiles"><div class="sds-tile"><h4>Reach</h4><p>one line</p></div></div>').length === 0);
+
 console.log("=== the hook reads a construct's seat file");
 const WORK = realpathSync(mkdtempSync(join(tmpdir(), "block-fit-")));
 process.on("exit", () => rmSync(WORK, { recursive: true, force: true }));
