@@ -232,6 +232,11 @@ The rows leave some content between two of them. These lines settle the usual ca
 - **A tree is a `tree` fence**, one path a line, children indented two spaces under their folder, a folder ending in `/`, and a note after two spaces. A line that is no path is a note on the line before it.
 - **A code block with no path stays `CODE`.** A `FILE` frame names the file the block is; a block that holds two files is two fences.
 - **A drawing a `dg` kind cannot draw stays the hand-drawn figure the page already has**, between its `<!-- fig:name -->` markers: plates, the task-state colours, people and agents. A new figure starts as a `dg` fence and becomes hand-drawn only when no kind can say it.
+- **A table the tools read keeps its form.** A construct's `Terms`, `Binds` and vocabulary tables, a register's rows and every generated block are read by the docs tools, which build the glossary and the rules index from them, so they stay plain tables whatever their shape.
+- **A first column of conditions is a table.** When each row starts with a case ("if…", "a provider's `NEW`"), not the name of a thing, the content is a lookup and stays a table. Questions asked in order are a numbered list, not a flowchart.
+- **A chain is for steps in order.** A run a thing goes through (build, scan, attest) is a `chain`. Things related by verbs ("cites", "declares", "bounds") are a `map`, with the verb on the link.
+- **A tree is for a hierarchy.** Flat paths with no nesting stay a list or a table; a tree's note is everything after the two spaces.
+- **A heading cut to a word applies to every table you touch**, kept or converted, and a transposed table's row labels are cut the same way.
 - **Was and Now headings stay on a book page.** Today and Proposed are a workstream page's comparison words, never a construct's.
 
 A plain table of a name column and a description column past four rows reads as a catalog, and the page writer says so as a soft finding. A fence is written as the page writer reads it, and reads as plain code on github.com:
