@@ -81,6 +81,10 @@ the share that lands on the reader. Measured once on § *Kind Delivery*: unpacki
 moved reach from 17 % to 15 %, its exact bar, with no word getting worse. Two beneficiary clauses
 put it at 18 %. Watch the share, never a count.
 
+## A block or figure that breaks the rule
+
+Where the sample holds a docs page, also report a block or a figure that breaks `refs/devex/workspace/docs/blocks.md` (§ *Which block a content takes*, § *Which figure, for what you need to show*), naming the rule line it breaks. It is a finding, never a block.
+
 ## Report
 
 State a verdict first, then the evidence:
