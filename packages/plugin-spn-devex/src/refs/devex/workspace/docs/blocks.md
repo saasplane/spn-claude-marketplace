@@ -265,16 +265,17 @@ The web's way.
 
 ## A rendered unit is a tree
 
-**A unit of the design system is shown as a fenced tree, and `docs page write` renders it into a unit in its own frame on every write** (rule RULE.DEVEX.WORKSPACE.538 · GUIDE). The fence is tagged `unit` and holds one tree in the render's form: a unit with its props, a placement or a slot, `specVersion` at the top, and no raw element. The writer sends the tree to `spnutils apps surface render` and sets the page it prints in a frame, light and dark side by side, the unit's name as the title and the tree below it as code. A tree the render refuses, or one with a finding, stops the write with the finding's words. On github.com the fence reads as plain code.
+**A unit of the design system is shown as a fenced tree, and `docs page write` renders it into a unit in its own frame on every write** (rule RULE.DEVEX.WORKSPACE.538 · GUIDE). The fence is tagged `unit` and holds one tree in the render's form: either one unit as `"unit"` with its `"props"`, or `"sections"`, a list of units each with its props, a placement or a slot, with `"caption"` beside them; the writer adds the render's own `treeVersion` key, so none is written, and no raw element. The writer sends the tree to `spnutils apps surface render` and sets the page it prints in a frame, light and dark side by side, the unit's name as the title and the tree below it as code. A tree the render refuses, or one with a finding, stops the write with the finding's words. On github.com the fence reads as plain code.
 
 ````markdown
 ```unit
-{ "specVersion": 1,
-  "sections": [ { "unit": "DSFeature", "props": { "pageLevel": "PAGE", "type": "BACKDROP", "title": "A title" } } ] }
+{ "caption": "A feature section",
+  "unit": "DSFeature",
+  "props": { "pageLevel": "PAGE", "type": "BACKDROP", "title": "A title" } }
 ```
 ````
 
-**A window-sized unit is drawn in a frame of its own.** A tree whose first unit is `DSLayout`, or that holds more than one section, is set in an `iframe` of 640px height and full width, one for light and one for dark, and needs no `ds-unit.css`; a small unit stands inline. A `"frame": true` or `"frame": false` beside `caption` forces either, and `"app": "<code>"` names the app row it is drawn under. The writer takes all three keys, and `caption`, out of the tree before it renders.
+**A window-sized unit is drawn in a frame of its own.** A tree whose first unit is `DSLayout`, or that holds more than one section, is set in an `iframe` of 640px height and full width, one for light and one for dark, and needs no `ds-unit.css`; a small unit stands inline. A `"frame": true` or `"frame": false` beside `caption` forces either, and `"app": "<code>"` names the app row it is drawn under. The writer takes `app`, `frame` and `caption` out of the tree before it renders. A page of several units is written as `{ "caption": …, "sections": [ { "unit": …, "props": … }, … ] }`.
 
 ## Which figure, for what you need to show
 
