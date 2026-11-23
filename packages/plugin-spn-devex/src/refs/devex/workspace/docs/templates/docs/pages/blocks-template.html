@@ -7,7 +7,7 @@
 
 
 
-<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.16.0/docs-language.css" integrity="sha384-eVD+IKBOvQdjamPNYDYt/cSGd89JPQBFPUGneKDviQlHjWc8KB4hxNVbNQ1wRBQd" crossorigin="anonymous">
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.16.0/docs-language.css" integrity="sha384-z6T3Ju/mWAnv24wb8AFXMHYMyXMd5U/g7N2hA3X1uCys4Ty2Yy7TcMXWe+SMPck0" crossorigin="anonymous">
 <div class="sds-page">
 <nav class="sds-rail" id="rail">
   <div class="sds-rail-title">Blocks</div>
@@ -133,6 +133,32 @@ Fit | whether each block takes the content it was written for
       <dl class="sds-tile-facts"><div><dt>Weight</dt><dd>GUIDE</dd></div></dl></div>
     <div class="sds-tile"><div class="sds-tile-main"><div class="sds-tile-body"><h4>Fit</h4><p>whether each block takes the content it was written for</p></div></div>
       <dl class="sds-tile-facts"><div><dt>Weight</dt><dd>MUST</dd></div></dl></div>
+  </div>
+
+  <p>An item may carry a quoted line under its description: an indented <code>&gt;</code> line, drawn in quotation marks, as a message or a saying is shown. Side columns still hold the facts.</p>
+  <pre data-lang="text">```catalog layout=LIST name=Check
+Block | Catches a paragraph that does a block's job, or a table that reads as a catalog.
+  &gt; a table of 6 rows reads as a catalog: a `catalog` fence lets a reader browse them
+  Grade: soft finding
+Figure | Catches a passage that walks through three or more steps with no figure beside it.
+  &gt; a learner would see this faster as a chain: add a `dg` figure beside it
+  Grade: rule finding
+```</pre>
+  <div class="sds-tiles" data-layout="LIST" data-facts="side" data-columns="1">
+    <div class="sds-tiles-head" aria-hidden="true"><span>Check</span><span>Grade</span></div>
+    <div class="sds-tile"><div class="sds-tile-main"><div class="sds-tile-body"><h4>Block</h4><p>Catches a paragraph that does a block's job, or a table that reads as a catalog.</p><p class="sds-tile-quote">&ldquo;a table of 6 rows reads as a catalog: a <code>catalog</code> fence lets a reader browse them&rdquo;</p></div></div>
+      <dl class="sds-tile-facts"><div><dt>Grade</dt><dd>soft finding</dd></div></dl></div>
+    <div class="sds-tile"><div class="sds-tile-main"><div class="sds-tile-body"><h4>Figure</h4><p>Catches a passage that walks through three or more steps with no figure beside it.</p><p class="sds-tile-quote">&ldquo;a learner would see this faster as a chain: add a <code>dg</code> figure beside it&rdquo;</p></div></div>
+      <dl class="sds-tile-facts"><div><dt>Grade</dt><dd>rule finding</dd></div></dl></div>
+  </div>
+  <p>An item may also carry a note: an indented <code>~ Label: phrase</code> line, drawn as a small muted label and an italic phrase under the description.</p>
+  <pre data-lang="text">```catalog layout=LIST
+Release chain | the order the repositories release in
+  ~ Needed for: the go, once the book and Support have landed
+```</pre>
+  <div class="sds-tiles" data-layout="LIST">
+    <div class="sds-tile"><div class="sds-tile-body"><h4>Release chain</h4><p>the order the repositories release in</p><p class="sds-tile-note"><span>Needed for</span> <em>the go, once the book and Support have landed</em></p>
+      </div></div>
   </div>
 
   <h4 id="b-catalog-table">TABLE layout</h4>
@@ -2706,4 +2732,4 @@ deploy:
 </div>
 </div>
 
-<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.16.0/docs-page.js" integrity="sha384-bUcUMs5a2AK/ri9Agb1d0fRAtNioxNc3QQSa5mPRoAWYCXd1sU+K/dWEoIH9LvNa" crossorigin="anonymous"></script>
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.16.0/docs-page.js" integrity="sha384-yDkvlVaxZfr5SBqgjOk8GZPsDngeCYQxHHaY1aPfty/M6hFe1DXJz++VjJ+i+082" crossorigin="anonymous"></script>

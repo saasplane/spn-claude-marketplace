@@ -35,6 +35,11 @@
      {{SUBSECTION-MODULE-2}} One subsection for each module: Contract and App (full form only), Entry (ui): pages, containers, components, hooks, utils, widgets.
      {{WHEN-BLOCK}} Only when a block must change: Standards, Names, Core, Components, Widgets, Containers, Layouts, App, Delivery.
      {{CHANGE-AGENT}} A change to the agent's plugins and tools, shown as journeys and outcomes, never as code: what changes for the agent and for you, before and after. The file detail stays in the sheet and the plan.
+     {{RULES-PART}} One or two sentences for a part that lists rules or any set with one fact each: the title is "Name &middot; number", the line what it says, the side column its one fact, under a named head row (Rule &middot; Weight).
+     {{CHECKS-PART}} One or two sentences for a part that lists checks: the title the check, the line what it catches, the quoted message under it, the Grade in the side column.
+     {{COMMAND-PART}} One or two sentences for a changed command: the Today and After tabs (<code>tabs look=SWITCH</code>) show it as it reads before and after; a detail only some readers want goes in a fold.
+     {{FIGURE-PART}} One or two sentences for a part with a <code>dg</code> figure beside its words; the figure names the same things in the same order.
+     {{FILE-PART}} One or two sentences for a part that shows one file: a frame whose head is the path, the language tag and a copy button.
      {{SERVICES-HOSTS}} Services, hosts, config, secrets.
      {{USED-DECISION}} Used where a decision is still open. One column for each option, and one row for each thing a reader compares. The question itself is asked on the approach page.
      {{DRAWING-SHOWS}} What the drawing shows. A figure is drawn by <code>docs figure draw</code> from its specification, and pasted here whole.
@@ -82,7 +87,7 @@
 <!-- spn:doc
 {"id": "ws-{{NNN}}-{{slug}}-{{preview-slug}}", "variant": "arc", "title": "{{NAME}}", "lenses": ["{{LENS}}"], "status": "PLANNING", "summary": "{{SUMMARY}}", "keywords": ["{{…}}"]}
 -->
-<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.16.0/docs-language.css" integrity="sha384-eVD+IKBOvQdjamPNYDYt/cSGd89JPQBFPUGneKDviQlHjWc8KB4hxNVbNQ1wRBQd" crossorigin="anonymous">
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.16.0/docs-language.css" integrity="sha384-z6T3Ju/mWAnv24wb8AFXMHYMyXMd5U/g7N2hA3X1uCys4Ty2Yy7TcMXWe+SMPck0" crossorigin="anonymous">
 <div class="sds-page">
 <nav class="sds-rail" id="rail">
   <div class="sds-rail-title">{{NAME}}</div>
@@ -170,6 +175,56 @@
   <p class="sds-standfirst">{{WHEN-BLOCK}}</p>
   <h3 id="s3-plugins" data-layer="plugins">Plugins</h3>
   <p class="sds-standfirst">{{CHANGE-AGENT}}</p>
+  <h4 id="s3-plugins-rules" data-layer="plugins-rules">{{Rules part}}</h4>
+  <p>{{RULES-PART}}</p>
+  <div class="sds-tiles" data-layout="LIST" data-facts="side" data-columns="1">
+    <div class="sds-tiles-head" aria-hidden="true"><span>Rule</span><span>Weight</span></div>
+    <div class="sds-tile"><div class="sds-tile-main"><div class="sds-tile-body"><h4>{{Rule name}} &middot; {{number}}</h4><p>{{what the rule says}}</p></div></div>
+      <dl class="sds-tile-facts"><div><dt>Weight</dt><dd>{{GUIDE or MUST}}</dd></div></dl></div>
+    <div class="sds-tile"><div class="sds-tile-main"><div class="sds-tile-body"><h4>{{Rule name}} &middot; {{number}}</h4><p>{{what the rule says}}</p></div></div>
+      <dl class="sds-tile-facts"><div><dt>Weight</dt><dd>{{GUIDE or MUST}}</dd></div></dl></div>
+  </div>
+  <h4 id="s3-plugins-checks" data-layer="plugins-checks">{{Checks part}}</h4>
+  <p>{{CHECKS-PART}}</p>
+  <div class="sds-tiles" data-layout="LIST" data-facts="side" data-columns="1">
+    <div class="sds-tiles-head" aria-hidden="true"><span>Check</span><span>Grade</span></div>
+    <div class="sds-tile"><div class="sds-tile-main"><div class="sds-tile-body"><h4>{{Check name}}</h4><p>{{what the check catches}}</p><p class="sds-tile-quote">&ldquo;{{the message it prints, with names filled in at run time}}&rdquo;</p></div></div>
+      <dl class="sds-tile-facts"><div><dt>Grade</dt><dd>{{soft finding, rule finding or stops the write}}</dd></div></dl></div>
+  </div>
+  <h4 id="s3-plugins-command" data-layer="plugins-command">{{Command part}}</h4>
+  <p>{{COMMAND-PART}}</p>
+  <div class="sds-tabset" data-type="SWITCH">
+    <div class="sds-tabset-bar" role="tablist" aria-label="{{Command}}">
+      <button type="button" role="tab" id="t-{{cmd}}-today" aria-controls="p-{{cmd}}-today" aria-selected="true">Today</button>
+      <button type="button" role="tab" id="t-{{cmd}}-after" aria-controls="p-{{cmd}}-after" aria-selected="false">After</button>
+    </div>
+    <div class="sds-tabset-panel" role="tabpanel" id="p-{{cmd}}-today" aria-labelledby="t-{{cmd}}-today"><pre data-lang="sh">{{the command as it reads today}}</pre></div>
+    <div class="sds-tabset-panel" role="tabpanel" id="p-{{cmd}}-after" aria-labelledby="t-{{cmd}}-after"><pre data-lang="sh">{{the command as it will read}}</pre></div>
+  </div>
+  <details>
+    <summary>{{The detail to fold}}</summary>
+    <pre data-lang="sh">{{an example call, or the detail a reader opens only when they want it}}</pre>
+  </details>
+  <h4 id="s3-plugins-feed" data-layer="plugins-feed">{{Figure part}}</h4>
+  <p>{{FIGURE-PART}}</p>
+<figure class="dl-figure">
+<div class="dl-frame">
+<svg class="dl-svg" viewBox="0 0 928 80" role="img" aria-label="{{FIGURE-PART-2}}">
+  <rect class="dl-tile" x="296" y="16" width="140" height="36" rx="10"/>
+  <text class="dl-name" x="308" y="37">{{Input}}</text>
+  <path class="dl-wire" d="M436 34 L492 34"/>
+  <rect class="dl-tile-on" x="492" y="16" width="140" height="36" rx="10"/>
+  <text class="dl-name" x="504" y="37">{{Writer}}</text>
+</svg>
+</div>
+<figcaption>{{What to notice.}}</figcaption>
+</figure>
+  <h4 id="s3-plugins-file" data-layer="plugins-file">{{File part}}</h4>
+  <p>{{FILE-PART}}</p>
+  <figure class="sds-file">
+    <figcaption><span class="sds-file-path">{{path of the file}}</span><span class="sds-file-lang">ts</span></figcaption>
+    <pre data-lang="ts">{{the file, whole, or the change}}</pre>
+  </figure>
   <h3 id="s3-estate" data-layer="estate">Estate</h3>
   <p class="sds-standfirst">{{SERVICES-HOSTS}}</p>
   <h3 id="s3a">{{TOPIC-NAME}}</h3>
@@ -349,4 +404,4 @@
 </div>
 </div>
 <!-- The arc template &middot; copy it and fill the slots &middot; an arc's one page is <code>notes/N&lt;nnn&gt;/arc.html</code>, and the approach page links it &middot; a real sample sits in <code>notes/N&lt;nnn&gt;/samples/</code> under its own name &middot; every block and figure is shown once in <code>blocks-template.html</code> -->
-<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.16.0/docs-page.js" integrity="sha384-bUcUMs5a2AK/ri9Agb1d0fRAtNioxNc3QQSa5mPRoAWYCXd1sU+K/dWEoIH9LvNa" crossorigin="anonymous"></script>
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.16.0/docs-page.js" integrity="sha384-yDkvlVaxZfr5SBqgjOk8GZPsDngeCYQxHHaY1aPfty/M6hFe1DXJz++VjJ+i+082" crossorigin="anonymous"></script>

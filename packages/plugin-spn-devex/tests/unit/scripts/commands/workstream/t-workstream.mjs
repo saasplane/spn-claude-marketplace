@@ -25,6 +25,8 @@ const ok = (label, condition, detail = "") => {
 // `go write` refuses a repository it cannot place (MKT.SCRIPTS.566): spn-x is placed in every fixture here.
 const dataArc = (name, opts = {}) => bareArc(name, { placed: true, ...opts });
 const dataWorkspace = (name, opts = {}) => dataArc(name, { ...opts, rows: opts.rows ?? arcData().rows.map((one) => ({ ...one, work: "DOCS" })) });
+/** A fresh arc page still holds the template's slots, which the state check reports as `unfilled`; every other finding must be absent. */
+const onlyUnfilled = (run) => !/state check/.test(run.out) && run.out.split("\n").every((line) => !/^\d+-\S+ /.test(line) || line.includes("[unfilled]"));
 const json = (path) => JSON.parse(readFileSync(path, "utf8"));
 const lines = (path) => (existsSync(path) ? readFileSync(path, "utf8") : "").split("\n").filter(Boolean).map((line) => JSON.parse(line));
 
@@ -278,7 +280,7 @@ console.log("\n=== arc edit and row state — a status or a row state moved refr
   const views = await dataWorkspace("commands-views");
   const header = (badge) => `<header class="sds-masthead"><div class="sds-eyebrow"><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Preview</span>${badge}</span></div><h1>Probe</h1></header>\n`;
   const stale = '<span class="sds-state"><span class="sds-label">Status:</span> <a class="sds-badge sds-status sds-decided" href="../../approach.html#N001">DECIDED</a></span>';
-  put(views.ws, "notes/N001/preview.html", `${header(stale)}<div class="sds-wrap"><section id="s1"><h2>Overview</h2></section></div>\n`);
+  put(views.ws, "notes/N001/preview.html", `${header(stale)}<div class="sds-wrap"><section id="s1"><h2>Overview</h2><p>What the preview shows.</p></section></div>\n`);
   const page = join(views.ws, "approach.html");
   const preview = join(views.ws, "notes", "N001", "preview.html");
   cli(views.root, ["workstream", "row", "state", "031/N001", "1", "landed"]);
@@ -479,7 +481,7 @@ console.log("\n=== arc edit — an arc opens whole: its data, its preview, its W
   ok("the What entry stands at the end of d1's part, before d2, with the title, the goal and the link", after.includes(entry), after);
   ok("the Plan row is there, stamped", /<tr id="N002" data-arc="arcs\/N002\/state.json" data-arc-stamp="[0-9a-f]{12}">/.test(after) && after.includes('href="notes/N002/arc.html"'));
   const check = cli(whole.root, ["workstream", "state", "check", "031"]);
-  ok("the workstream passes its own check at once", check.code === 0 && /whole/.test(check.out), check.out);
+  ok("the workstream passes its own check at once", onlyUnfilled(check), check.out);
 
   const atEnd = write("031/N003", "--title", "Second export", "--subject", "second-export", "--goal", "A second outcome.");
   const endPage = readFileSync(page, "utf8");
@@ -502,7 +504,7 @@ console.log("\n=== arc edit — an arc opens whole: its data, its preview, its W
   const both = write("031/N003");
   ok("a bare write writes the entry and the row it finds missing, and keeps the preview",
     both.code === 0 && both.out.includes("What entry: #N003-what written at the end of What") && both.out.includes("Plan row written and stamped") && both.out.includes("preview kept"), both.out);
-  ok("and the workstream passes its check again", cli(whole.root, ["workstream", "state", "check", "031"]).code === 0);
+  ok("and the workstream passes its check again", onlyUnfilled(cli(whole.root, ["workstream", "state", "check", "031"])));
 
   // A page told by construct has no entry for an arc: the opening writes the preview and the Plan row, and the row is the arc's address.
   const told = await dataWorkspace("commands-opening-shaped");
@@ -514,7 +516,7 @@ console.log("\n=== arc edit — an arc opens whole: its data, its preview, its W
     && second.out.startsWith("ok · N002 0/0 · N002 opened · PROPOSED · preview · Plan row\n") && !second.out.includes("approach.html · What"), second.out);
   const toldAfter = readFileSync(toldPage, "utf8");
   ok("and the page holds no entry for the arc, only its Plan row, which links its page", !toldAfter.includes("N002-what") && /<tr id="N002" data-arc="arcs\/N002\/state.json" data-arc-stamp="[0-9a-f]{12}">/.test(toldAfter) && toldAfter.includes('href="notes/N002/arc.html"'));
-  ok("and the workstream passes its own check", cli(told.root, ["workstream", "state", "check", "031"]).code === 0, cli(told.root, ["workstream", "state", "check", "031"]).out);
+  ok("and the workstream passes its own check", onlyUnfilled(cli(told.root, ["workstream", "state", "check", "031"])), cli(told.root, ["workstream", "state", "check", "031"]).out);
 
   // An existing arc takes the anchor on a subject heading.
   writeFileSync(page, readFileSync(page, "utf8").replace('<h4 id="N001-what">The probe</h4>', '<h4 id="c1">The probe</h4>'));
@@ -522,7 +524,7 @@ console.log("\n=== arc edit — an arc opens whole: its data, its preview, its W
   ok("--under on a subject heading anchors an arc that already exists", anchored.code === 0
     && anchored.out.startsWith("ok · N001 · What entry: #N001-what anchored on c1 · preview kept · Plan row kept"), anchored.out);
   ok("the anchor is a span on the heading, and the heading is as it was", readFileSync(page, "utf8").includes('<h4 id="c1"><span id="N001-what"></span>The probe</h4>'));
-  ok("and the workstream passes its check", cli(whole.root, ["workstream", "state", "check", "031"]).code === 0);
+  ok("and the workstream passes its check", onlyUnfilled(cli(whole.root, ["workstream", "state", "check", "031"])));
   const noHeading = write("031/N001", "--under", "zz");
   ok("red: an anchor on a heading What does not hold is refused", noHeading.code === 2 && noHeading.out.includes("finds no domain or subject heading `zz`"), noHeading.out);
   const onRow = cli(whole.root, ["workstream", "row", "edit", "031/N001", "1", "--under", "c1"]);
