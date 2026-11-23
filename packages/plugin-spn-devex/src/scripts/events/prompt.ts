@@ -318,7 +318,7 @@ export function answerFor(payload: Payload, start: string): string {
 const AREAS: Array<AreaViews & { pattern: RegExp }> = [
   { area: "a site page", views: ["UX", "UI", "VOICE", "MARKETING"], skill: "spn-surface:design",
     pattern: /\b(?:site|website|web ?page|landing|home ?page|topic page|launchpad|www)\b/i },
-  { area: "docs", views: ["VOICE"], skill: "spn-devex:spn-prose-rewriter",
+  { area: "docs", views: ["VOICE"], skill: "spn-devex:spn-prose-rewriter or spn-devex:spn-block-rewriter",
     pattern: /\b(?:docs?|chapter|the book|guide|readme|wording|words)\b/i },
   { area: "apps code", views: ["ARCHITECT", "SERVER_DEV", "WEB_DEV"], skill: "spn-apps:implement",
     pattern: /\b(?:service|endpoint|contract|module|screen|component|header|queue|listener|migration|api)\b/i },

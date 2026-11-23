@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "seen": "c12def10"
+      "seen": "e89862c3"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
@@ -268,7 +268,7 @@ named a table in none of 252 rows measured; deleting it repaired the defect that
 the files could. Storage is read in the data model itself, which is grouped by table and says which
 constraint matters and why each index exists.
 
-**A domain's overview is its face in HTML**: it sits in `artifacts/docs/<domain>/`, links into the `constructs/` folder beside it, and
+**A domain's overview is its face in HTML**: it sits in `artifacts/public/docs/<domain>/`, links into the `constructs/` folder beside it, and
 carries the same glossary. Extra reading paths beneath it carry none.
 
 **The invariants between the seats hold this shape up, and the folders are only where they land.** A
@@ -308,12 +308,12 @@ The pocket holds what the node **authors** rather than derives, and its three au
 | Kind | Path | Holds | Earned when |
 | --- | --- | --- | --- |
 | **Concept** | `CONCEPT.md`, the repository root | the whole model, once — shape, never depth | the repo exists |
-| **Overview** | `artifacts/docs/<folder>/<name>-overview.html`; the hub is `artifacts/docs/concept-overview.html` | one source expanded to reading depth, one level down | the fixed set below names it |
-| **Construct page** | `artifacts/docs/<folder>/constructs/<slug>-construct.html` | one construct at reading depth, produced from its seat file | a construct exists |
+| **Overview** | `artifacts/public/docs/<folder>/<name>-overview.html`; the hub is `artifacts/public/docs/concept-overview.html` | one source expanded to reading depth, one level down | the fixed set below names it |
+| **Construct page** | `artifacts/public/docs/<folder>/constructs/<slug>-construct.html` | one construct at reading depth, produced from its seat file | a construct exists |
 
 **A concept is not an artifact.** It sits at the repository root beside `README.md`, a scaffold marker written before `docs/` exists and read by somebody who may never open the tree. It is listed here because it is the first altitude of the progression, not because the pocket holds it.
 
-**`artifacts/docs/` mirrors the constructs seat folder for folder.** `<folder>` is the seat's folder path under `02-constructs/`, so the seat `02-constructs/<folder>/<slug>.md` gives the page `artifacts/docs/<folder>/constructs/<slug>-construct.html`, and **no folder inside the pocket holds a `README.md`**. An overview is named `<name>-overview.html`, with no `concept-` before the name, because its folder says which domain it belongs to. An overview that no single folder owns sits beside the hub. That is what lets the audit pair a page with its seat file by path alone, rather than by an index somebody maintains.
+**`artifacts/public/docs/` mirrors the constructs seat folder for folder.** `<folder>` is the seat's folder path under `02-constructs/`, so the seat `02-constructs/<folder>/<slug>.md` gives the page `artifacts/public/docs/<folder>/constructs/<slug>-construct.html`, and **no folder inside the pocket holds a `README.md`**. An overview is named `<name>-overview.html`, with no `concept-` before the name, because its folder says which domain it belongs to. An overview that no single folder owns sits beside the hub. That is what lets the audit pair a page with its seat file by path alone, rather than by an index somebody maintains.
 
 **Four page kinds cover everything somebody writes by hand**, and each answers one reader: an **approach** for the person deciding, a **hub** for the person arriving, an **overview** for the person taking one reading path, and a **construct** for the person building against the model. Only the approach carries cards, and only the approach lives outside the pocket.
 
@@ -323,8 +323,14 @@ The pocket holds what the node **authors** rather than derives, and its three au
 
 | Kind | Path | Produced by | Produced from |
 | --- | --- | --- | --- |
-| **Guide page** | `artifacts/guides/<name>-guide.html` | `docs guide write <guide.md>` | the guide's markdown in `05-guides/`, and `guide-template.html` |
-| **The index of artifacts** | `artifacts/index.html` | `docs index write <repository>` | the pages on disk, and `index-template.html` |
+| **Guide page** | `artifacts/public/guides/<name>-guide.html` | `docs guide write <guide.md>` | the guide's markdown in `05-guides/`, and `guide-template.html` |
+| **The index pages** | `artifacts/public/index.html` and `artifacts/private/index.html` | `docs index write <repository>` | the pages on disk, and `index-template.html` |
+
+**The pocket has two halves** (`RULE.DEVEX.WORKSPACE.221` · MUST · check:corpus). `public/` holds `docs/`, `guides/` and `surface/` (a design language's samples home, in `surface/<language>/`), and `private/` holds `reports/`. Each half has an index page from the index template, and the pocket's `README.md` says which to open. A repository that still holds the earlier layout keeps `docs/`, `guides/` and `reports/` directly in the pocket until the rewrite pass moves them, and the page writer keeps writing there and says so in one line.
+
+**`public/` is self-contained** (`RULE.DEVEX.WORKSPACE.555` · MUST · check:doc-check). A public page links only inside `public/` or out of the repository, never into `private/` and never to a `.md` seat file; the page writer turns a seat link into the built page's link, or into the file's address on github.com, read from the git remote. **`private/` may link into `public/`** (`RULE.DEVEX.WORKSPACE.556` · GUIDE).
+
+**Every HTML page of the pocket and of an arc's notes starts from a docs template** (`RULE.DEVEX.WORKSPACE.554` · MUST · check:doc-check). A page of a kind with no template of its own uses `page-template.html`; a page with no template's frame is refused.
 
 **A page whose sidebar lists other pages is the index page, and it never has a sidebar of its own** (`RULE.DEVEX.WORKSPACE.550` · MUST · skill:spn-devex/ideate). A samples home, a set of previews and a set of reports are each an index of `index-template.html`, so a reader finds one rail and one set of tabs for any set of pages. **A design language's samples are one samples home, with each sample in a surface preview**, in `docs/artifacts/design-languages/<language>/`: `index.html` is the home, `shared/`, `site/` and `app/` hold one folder per group, each sample the page and its `<slot>.preview.html`, and `assets/` holds what the pages load; the list of samples is data beside the spec, `docs/specs/design-languages/<language>.samples.json`. **A design-language construct page holds its spec in a fold** (`RULE.DEVEX.WORKSPACE.551` · MUST · skill:spn-devex/ideate): a short opening states the language's picks, and one fold keeps the tables and drawings. **Done and landed read the Success badge**: border `--sds-success`, text `--on-success-subtle` and ground `--sds-success-soft`, in both themes, and the looks of `CATALOG`, `TABS`, group panels, the fold and a framed unit are the Docs design language's.
 
