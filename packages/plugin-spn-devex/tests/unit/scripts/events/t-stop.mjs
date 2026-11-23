@@ -1515,7 +1515,8 @@ console.log("\n=== window — a new window is offered from 200k at a clean point
   const found = await hear({ broken: true, kilo: 210 });
   check("[S73] a state finding at 210k is said, and does not hold the offer back: the clean point is this window's own", asks(found) && /\[state\]/.test(found), found);
   const always = await hear({ status: "RUNNING", running: true, kilo: 460 });
-  check("[MKT.HOOKS.322] a child running at 460k: no offer, the always-message too waits for it", !asks(always), always);
+  check("[MKT.HOOKS.322] [S73] a row running at 460k does not hold the line, and the message says the handover follows when the running work finishes",
+    asks(always) && /handover follows when the running work finishes/.test(always), always);
   // THE OFFER IS WHERE A PERSON LEARNS HOW WINDOWS WORK: a partner holds no book, so the note asks the
   // turn to say why a new window helps, that nothing is lost, and how to open one, in the person's words.
   const forThePerson = (out) => /one or two plain sentences/.test(out) && /never this note's/.test(out)
@@ -1580,7 +1581,10 @@ console.log("\n=== window — a new window is offered from 200k at a clean point
     const m210 = own(210)[0].message, m410 = own(410)[0].message;
     check("[S73] window: the 200k message no longer claims the state check whole, and says what is true", !/workstream state check/.test(m210) && /no order of this window is running and no helper of it is out/.test(m210), m210);
     check("[S73] window: a helper out holds the offer at 210k and 310k", own(210, lines["agent-background-pending"]).length === 0 && own(310, lines["agent-background-pending"]).length === 0);
-    check("[S73] window: a row of this window running holds it at 210k and at 410k", checkWindow(dirty.root, text(210), mine, true, "PRESENT", false).length === 0 && checkWindow(dirty.root, text(410), mine, true, "PRESENT", false).length === 0);
+    check("[S73] window: a row of this window running holds it at 210k and 310k", checkWindow(dirty.root, text(210), mine, true, "PRESENT", false).length === 0 && checkWindow(dirty.root, text(310), mine, true, "PRESENT", false).length === 0);
+    const ranLate = checkWindow(dirty.root, text(410), mine, true, "PRESENT", false);
+    check("[S73] window: at 410k a running row does not hold it, and the message says the handover follows when the running work finishes",
+      ranLate.length === 1 && /past 400k/.test(ranLate[0].message) && /handover follows when the running work finishes/.test(ranLate[0].message), JSON.stringify(ranLate));
     const late = own(410, lines["agent-background-pending"]);
     check("[S73] window: at 410k a helper out does not hold it, and the message says the handover follows when the helper reports",
       late.length === 1 && /past 400k/.test(late[0].message) && /handover follows when it reports/.test(late[0].message) && !/no helper of it is out/.test(late[0].message), JSON.stringify(late));
@@ -1600,6 +1604,15 @@ console.log("\n=== window — a new window is offered from 200k at a clean point
   check("[MKT.HOOKS.526] compaction offer: not while a row runs", offered("PRESENT", false, false, true).length === 0);
   check("[MKT.HOOKS.526] compaction offer: not while a background helper has not handed back",
     offered("PRESENT", false, false, false, compacted(lines["agent-background-pending"])).length === 0);
+  {
+    const standing = await dataWorkspace("compact-own-clean");
+    const other = join(standing.root, ".spndevex", "workstreams", "open", "099-other");
+    mkdirSync(join(other, "arcs", "N001"), { recursive: true });
+    writeFileSync(join(other, "arcs", "N001", "state.json"), "{ not json");
+    const own = checkCompactOffer(standing.root, compacted(), mine, false, "PRESENT", false, false);
+    check("[S73] compaction offer: another workstream's standing finding does not hold it, and its message claims no state check",
+      own.length === 1 && !/workstream state check/.test(own[0].message) && /no helper of it is out/.test(own[0].message), JSON.stringify(own));
+  }
   check("[MKT.HOOKS.526] compaction offer: a window with no compaction summary hears nothing at 40k", offered("PRESENT", false, false, false, text(40)).length === 0);
   {
     const { root: sroot } = await dataWorkspace("compact-offer-hook");

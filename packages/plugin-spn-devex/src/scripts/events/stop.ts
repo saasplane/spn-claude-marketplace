@@ -2036,7 +2036,7 @@ export function sayOnce(found: Warning[], told: Record<string, string>): { said:
 // window once the developer says "stay". The cost line at COST_POINT and the compaction line at COMPACT_POINT are said once
 // each, even after "stay". WATCHING hears no offer, for someone who watches cannot open a window, and hears the other two.
 // AWAY hears nothing at any size. The offers at 200k and 300k wait for this window's own clean point; at 400k and past it the offer
-// is said at the next reply even while a helper is out, and its message says the handover follows when the helper reports.
+// is said at the next reply even while a helper is out or a row of this window runs, and its message says the handover follows.
 const OFFERS = [200_000, 300_000, 400_000];
 const COST_POINT = 500_000;
 const COMPACT_POINT = 850_000;
@@ -2050,7 +2050,7 @@ const PERSON = "Say it in the developer's words and never this note's, with no t
  * too. WATCHING: no offer line, the other two. AWAY: nothing. Clean is this window's own and what can be computed: no row of
  * this window's arcs runs and no helper launched in the background by this window is out. Other arcs' standing findings do not
  * hold the offer back (`checkWorkstreamState` is not asked). The cost and compaction lines, and the offer at 400k and past it,
- * do not wait for a helper: the offer then says the handover follows when the helper reports (RULE.DEVEX.WORKSPACE.448). That
+ * do not wait for a helper or a running row: the offer then says the handover follows when the helper reports or the running work finishes (RULE.DEVEX.WORKSPACE.448). That
  * every open point is written first cannot be computed, so the message asks for it. It reads the transcript and keeps no state:
  * which sizes it has said is read from the hook's own feedback in it.
  *
@@ -2084,12 +2084,11 @@ export function checkWindow(root: string, transcript: string, mine: Set<string>,
   if (due <= said) return [];
   // THIS WINDOW'S OWN CLEAN POINT: no row of its arcs in progress, and no background helper of it that has not handed back, until
   // the last offer's size (400k): from there the offer is said at the next reply, and says the handover follows the helper's report.
-  if (running) return [];
   const helper = helperOut(lines);
   const late = due >= OFFERS[OFFERS.length - 1];
-  if (helper && !late) return [];
-  const handoverWaits = helper && due < COST_POINT
-    ? "A helper of this window is still out, so the handover follows when it reports (RULE.DEVEX.WORKSPACE.448): say the offer now and write the handover after its report. " : "";
+  if ((running || helper) && !late) return [];
+  const handoverWaits = (running || helper) && due < COST_POINT
+    ? `${running && helper ? "A row and a helper of this window are still running" : running ? "A row of this window is still running" : "A helper of this window is still out"}, so the handover follows when ${running ? "the running work finishes" : "it reports"} (RULE.DEVEX.WORKSPACE.448): say the offer now and write the handover after that. ` : "";
   const written = "Write every open point first: a suggestion as S<n>, a question as a card, decided work as a row. ";
   // THE OFFER IS WHERE A PERSON LEARNS HOW WINDOWS WORK (01-workstream.md § The agent offers a new window):
   // a partner holds no book, so the reply says why, what is kept and how, in the person's words.
@@ -2102,7 +2101,7 @@ export function checkWindow(root: string, transcript: string, mine: Set<string>,
     ? `${head}, and a window this long compacts soon, which drops detail. ${written}Then say in one plain sentence that this window will compact soon and what is kept, and that a new window with its handover keeps more. ${PERSON}`
     : due >= COST_POINT
     ? `${head}, and each reply now costs several times what a fresh window's does and takes longer. ${written}Then say in one plain sentence that replies are getting slow and dear${presence === "PRESENT" ? ", and that a new window would help" : ""}. ${PERSON}`
-    : `${head}, and ${helper ? "no order of this window is running" : "no order of this window is running and no helper of it is out"}. ${written}${handoverWaits}${offer}${PERSON}`;
+    : `${head}, and ${running || helper ? "the window is long" : "no order of this window is running and no helper of it is out"}. ${written}${handoverWaits}${offer}${PERSON}`;
   return [{ check: "window", message }];
 }
 
@@ -2138,16 +2137,15 @@ function opensOnSummary(lines: string[]): boolean {
 
 /**
  * THE COMPACTION OFFER (RULE.DEVEX.AGENT.182). A window that opens on a compaction summary while the developer is PRESENT offers a
- * new window in one line at its first clean point (the window check's own: no row running, no helper out, `workstream state check`
- * whole), whatever its size. Said once (`said`, kept in the window's note), never while WATCHING or AWAY, and muted by "stay".
+ * new window in one line at its first clean point (the window check's own, this window's: no row of its arcs running,
+ * no helper of it out; other arcs' standing findings do not count), whatever its size. Said once (`said`, kept in the window's note), never while WATCHING or AWAY, and muted by "stay".
  */
 export function checkCompactOffer(root: string, transcript: string, mine: Set<string>, running: boolean,
                                   presence: PresenceState = "PRESENT", stays = false, said = false): Warning[] {
   if (presence !== "PRESENT" || stays || said || running) return [];
   const lines = transcript.split("\n");
   if (!opensOnSummary(lines) || helperOut(lines)) return [];
-  if (checkWorkstreamState(root, mine).length) return [];
-  const message = "This window opened on a compaction summary, which dropped detail, and the point is clean: no order running, `workstream state check` whole. " +
+  const message = "This window opened on a compaction summary, which dropped detail, and the point is clean: no order of this window is running and no helper of it is out. " +
     "Write every open point first: a suggestion as S<n>, a question as a card, decided work as a row. " +
     "Then end your reply with the handover and, in one plain sentence beside it, the offer of a new window: it starts clean with the handover and the workstream's folder, " +
     "which carry every open point. The developer decides: if they say stay, say nothing more about it. " + PERSON;
