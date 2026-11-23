@@ -256,6 +256,12 @@ console.log("\n=== RULE.DEVEX.WORKSPACE.267 — a sample is the work's own file,
   mkdirSync(join(samples, "template-review"), { recursive: true });
   writeFileSync(join(samples, "template-review", "blocks-template.html"), `<meta charset="utf-8">\n${stylesheet}\n${masthead("")}\n`);
   writeFileSync(join(samples, "template-review", "approach-template-v2.html"), `<meta charset="utf-8">\n${stylesheet}\n${masthead("")}\n`);
+  const redLink = checkWorkstream(ws);
+  ok("[RULE.DEVEX.WORKSPACE.552] red: a preview that does not link its samples index is named, word for word",
+    has(redLink, "preview", /^N001's preview does not link its samples: end its Overview with a line that opens samples\/index\.html \(rule 552\)$/), said(redLink));
+  const previewPath = join(ws, "notes", "N001", "preview.html");
+  writeFileSync(previewPath, readFileSync(previewPath, "utf8").replace("</section>", `<p><a href="samples/index.html">Open the samples</a></p></section>`));
+  ok("[RULE.DEVEX.WORKSPACE.552] green: a link whose href ends in samples/index.html passes", !has(checkWorkstream(ws), "preview", /does not link its samples/), said(checkWorkstream(ws)));
   const green = checkWorkstream(ws);
   ok("green: a drawing that borrows the stylesheet with no masthead, a plain index, a book page the work produces, a review copy of a book template named for it, and a page with its own styles pass",
     green.length === 0, said(green));

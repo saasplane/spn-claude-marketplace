@@ -99,6 +99,18 @@ export function sampleFindings(ws: string, arc: string): string[] {
 }
 
 /**
+ * RULE.DEVEX.WORKSPACE.552: an arc whose notes hold `samples/index.html` links it from its preview, so a reviewer
+ * opens the built thing without hunting for it. The preview holds a link whose `href` ends in `samples/index.html`.
+ */
+export function sampleLinkFindings(ws: string, arc: string): string[] {
+  if (!isFile(join(notesDirOf(ws, arc), "samples", "index.html"))) return [];
+  let text = "";
+  try { text = readFileSync(previewOf(ws, arc), "utf8"); } catch { return []; }
+  if (/<a\b[^>]*\bhref="[^"]*samples\/index\.html(?:[?#][^"]*)?"/i.test(text)) return [];
+  return [`${arc}'s preview does not link its samples: end its Overview with a line that opens samples/index.html (rule 552)`];
+}
+
+/**
  * RULE.DEVEX.WORKSPACE.262: an arc's notes folder holds `preview.html`, `samples/`, `plan.md`, `orders/`,
  * `scripts/` and `work/`, and nothing else. Each other entry is named with where it belongs. The `previews/`
  * folder and a second preview are left to the one-preview check, which names them in its own words.
@@ -427,6 +439,7 @@ export function checkWorkstream(ws: string): Finding[] {
     const data = faults.length ? null : readArc(ws, arc);
     out.push(...previewFindings(ws, arc).map(say(arc, "preview")));
     out.push(...sampleFindings(ws, arc).map(say(arc, "samples")));
+    out.push(...sampleLinkFindings(ws, arc).map(say(arc, "preview")));
     if (!data) continue;
     out.push(...arcPreviewFindings(ws, arc, data, owners).map(say(arc, "preview")));
     out.push(...pageFindings(ws, arc, data, page, text, owners).map(say(arc, "stamp")));
