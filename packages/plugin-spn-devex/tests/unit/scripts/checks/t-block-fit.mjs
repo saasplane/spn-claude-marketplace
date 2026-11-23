@@ -89,6 +89,12 @@ ok("[RULE.DEVEX.WORKSPACE.549] red: a GRID block whose tile lacks data-facts is 
   sayHtml(tiles(written, "", ["Reach"])).some((m) => m.includes("hand-written without the writer's attributes")));
 ok("[RULE.DEVEX.WORKSPACE.549] green: tiles with no facts and no attributes are silent",
   sayHtml('<div class="sds-tiles"><div class="sds-tile"><h4>Reach</h4><p>one line</p></div></div>').length === 0);
+ok("[RULE.DEVEX.WORKSPACE.549] red: facts whose values are phrases read as description and are folded into the line",
+  sayHtml(`<div class="sds-tiles" data-layout="LIST"><div class="sds-tile"><div class="sds-tile-body"><h4>Rail</h4><p>a rail</p>\n<dl class="sds-tile-facts"><div><dt>Width</dt><dd>on the right, from three sections</dd></div></dl></div></div></div>`).some((m) => m.includes("these facts read as description") && m.includes("(rule 549)")));
+ok("[RULE.DEVEX.WORKSPACE.549] red: a fact holding a quoted message says make it a quote, and not also fold it",
+  (() => { const m = sayHtml(`<div class="sds-tiles" data-layout="LIST"><div class="sds-tile"><div class="sds-tile-body"><h4>Block</h4><p>a line</p>\n<dl class="sds-tile-facts"><div><dt>Says</dt><dd>&ldquo;a table of six rows reads as a catalog&rdquo;</dd></div></dl></div></div></div>`); return m.some((x) => x.includes("make it a quote")) && !m.some((x) => x.includes("read as description")); })());
+ok("[RULE.DEVEX.WORKSPACE.549] green: short values as facts are silent",
+  !sayHtml(tiles(' data-layout="LIST"', "", ["Reach"])).some((m) => m.includes("read as description")));
 
 console.log("=== the hook reads a construct's seat file");
 const WORK = realpathSync(mkdtempSync(join(tmpdir(), "block-fit-")));

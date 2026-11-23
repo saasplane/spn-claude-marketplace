@@ -509,7 +509,7 @@ const WIRES: Record<string, string> = {
   canvas: '<rect class="box" x="50" y="22" width="60" height="52" rx="3"/><rect class="line" x="60" y="32" width="40" height="4" rx="2"/><rect class="line" x="60" y="44" width="40" height="6" rx="2"/><rect class="nav" x="60" y="58" width="40" height="8" rx="2"/>',
 };
 
-type CatalogItem = { name: string; line: string; third: string; facts: [string, string][] };
+type CatalogItem = { name: string; line: string; third: string; facts: [string, string][]; quote?: string; note?: [string, string] };
 type CatalogGroup = { name: string | null; items: CatalogItem[] };
 
 /** A fence tag's `key=value` words, and the bare words beside them. */
@@ -524,7 +524,8 @@ function tagWords(tag: string): { words: string[]; options: Record<string, strin
 
 /**
  * A `catalog` fence's lines: an item is an unindented `Name | one line | third` line, and the indented lines under it are its
- * facts, `Key: value`, one a line; a key is a word or two, never a sentence. A line `## <Group name>` starts a group.
+ * facts, `Key: value`, one a line; a key is a word or two, never a sentence. An indented `> text` line is what the item prints, drawn as a quoted
+ * italic line, and an indented `~ Label: phrase` line is one conditional phrase, drawn as a note. A line `## <Group name>` starts a group.
  */
 function catalogLines(body: string[], findings: Finding[]): CatalogGroup[] {
   const groups: CatalogGroup[] = [{ name: null, items: [] }];
@@ -536,6 +537,10 @@ function catalogLines(body: string[], findings: Finding[]): CatalogGroup[] {
       const item = groups[groups.length - 1].items.at(-1);
       const fact = /^\s+[-*]?\s*([^:]+?):\s+(\S.*)$/.exec(raw);
       if (!item) { findings.push({ message: `a \`catalog\` fact with no item above it: "${raw.trim()}"` }); continue; }
+      const quote = /^\s+>\s*(\S.*)$/.exec(raw);
+      if (quote) { item.quote = quote[1].trim(); continue; }
+      const note = /^\s+~\s*([^:]+?):\s+(\S.*)$/.exec(raw);
+      if (note) { item.note = [note[1].trim(), note[2].trim()]; continue; }
       if (!fact || fact[1].trim().split(/\s+/).length > 3) { findings.push({ message: `a \`catalog\` fact is \`Key: value\`, with a key of a word or two, never a sentence: "${raw.trim()}"` }); continue; }
       item.facts.push([fact[1].trim(), fact[2].trim()]);
       continue;
@@ -572,9 +577,23 @@ export function wideFact(value: string): boolean {
   return plain.length > 40 || /\.\s+\S/.test(plain) || plain.split(/\s+/).length > 6;
 }
 
+/** A short fact is a word, a number, a status or a version: up to 20 characters, no sentence. */
+export function shortFact(value: string): boolean {
+  const plain = value.replace(/<[^>]*>/g, "").trim();
+  return plain.length > 0 && plain.length <= 20 && !/[.!?]\s+\S/.test(plain);
+}
+
+/** The fact names of a LIST whose every item holds one or two short facts, in first-seen order and at most two; else null (the list draws its facts under the description). */
+function sideFactKeys(items: CatalogItem[]): string[] | null {
+  if (!items.length || items.some((item) => item.facts.length < 1 || item.facts.length > 2 || item.facts.some(([, value]) => !shortFact(value)))) return null;
+  const keys: string[] = [];
+  for (const item of items) for (const [key] of item.facts) if (!keys.includes(key)) keys.push(key);
+  return keys.length <= 2 ? keys : null;
+}
+
 /** The cards of one set of items, as the fence's layout and media draw them. Without either, and with no facts, the one-line tile of old. */
 function catalogHtml(items: CatalogItem[], layout: string | null, media: string | null, findings: Finding[], compact = false): string {
-  const hasFacts = items.some((item) => item.facts.length);
+  const hasFacts = items.some((item) => item.facts.length || item.quote || item.note);
   const words = (text: string): number => text.trim().split(/\s+/).filter(Boolean).length;
   const longForCards = items.some((item) => words(item.name) > 4 || words(item.line ?? "") > 15 || item.facts.length > 3 || item.facts.some(([, value]) => words(value) > 5));
   if (!layout && longForCards) findings.push({ message: "these items are long for cards: layout=LIST (rule 549)" });
@@ -593,14 +612,22 @@ function catalogHtml(items: CatalogItem[], layout: string | null, media: string 
     const rows = keys.map((key) => `      <tr><th>${inline(key)}</th>${items.map((item) => `<td>${inline(item.facts.find(([name]) => name === key)?.[1] ?? "")}</td>`).join("")}</tr>`);
     return `  <div class="sds-scroll"><table class="sds-catalog-table">\n    <thead><tr><th></th>${head}</tr></thead>\n    <tbody>\n${rows.join("\n")}\n    </tbody>\n  </table></div>`;
   }
+  const side = kind === "LIST" ? sideFactKeys(items) : null;
+  // A column whose every value is a number is set at the end, under a head set at the end, so the digits line up.
+  const endAligned = (side ?? []).filter((key) => items.every((item) => { const found = item.facts.find(([name]) => name === key); return !found || /^[\d.,]+%?$/.test(found[1].trim()); }));
   let kept = media;
   if (kept === "MEDIA_TOP" && kind !== "GRID") { findings.push({ message: "a `catalog` draws `media=MEDIA_TOP` in GRID only" }); kept = null; }
   const tiles = items.map((item) => {
     const facts = item.facts.length
-      ? `<dl class="sds-tile-facts${kind === "LIST" && item.facts.length === 1 ? " sds-tile-facts-one" : ""}">${item.facts.map(([key, value]) => `<div${wideFact(value) ? ' class="sds-tile-fact-wide"' : ""}><dt>${inline(key)}</dt><dd>${inline(value)}</dd></div>`).join("")}</dl>` : "";
+      ? `<dl class="sds-tile-facts${kind === "LIST" && !side && item.facts.length === 1 ? " sds-tile-facts-one" : ""}">${item.facts.map(([key, value]) => `<div${wideFact(value) ? ' class="sds-tile-fact-wide"' : ""}><dt>${inline(key)}</dt><dd>${inline(value)}</dd></div>`).join("")}</dl>` : "";
     if (kind === "GRID" && item.facts.length > 3) findings.push({ message: `a GRID card holds up to three facts, "${item.name}" has ${item.facts.length}; use \`layout=LIST\`` });
     const count = kind === "GRID" && item.facts.length ? ` data-facts="${Math.min(item.facts.length, 3)}"` : "";
-    const words = `<h4>${inline(item.name)}</h4>${item.line ? `<p>${inline(item.line)}</p>` : ""}`;
+    const words = `<h4>${inline(item.name)}</h4>${item.line ? `<p>${inline(item.line)}</p>` : ""}${item.quote ? `<p class="sds-tile-quote">&ldquo;${inline(item.quote)}&rdquo;</p>` : ""}${item.note ? `<p class="sds-tile-note"><span>${inline(item.note[0])}</span> <em>${inline(item.note[1])}</em></p>` : ""}`;
+    if (kind === "LIST" && side) {
+      const cells = side.map((key) => { const found = item.facts.find(([name]) => name === key); return found ? `<div${endAligned.includes(key) ? ' data-align="end"' : ""}><dt>${inline(key)}</dt><dd>${inline(found[1])}</dd></div>` : `<div class="sds-tile-fact-none"></div>`; });
+      const mediaHtml = kept ? mediaOf(kept, item, findings) : "";
+      return `    <div class="sds-tile"><div class="sds-tile-main">${mediaHtml}<div class="sds-tile-body">${words}</div></div>\n      <dl class="sds-tile-facts">${cells.join("")}</dl></div>`;
+    }
     if (kind === "LIST") {
       const mediaHtml = kept ? mediaOf(kept, item, findings) : "";
       return `    <div class="sds-tile">${mediaHtml}<div class="sds-tile-body">${words}\n      ${facts}</div></div>`;
@@ -609,7 +636,8 @@ function catalogHtml(items: CatalogItem[], layout: string | null, media: string 
     if (kept) return `    <div class="sds-tile"${count}><div class="sds-tile-head">${mediaOf(kept, item, findings)}<div>${words}</div></div>\n      ${facts}</div>`;
     return `    <div class="sds-tile"${count}><h4>${inline(item.name)}</h4>${item.line ? `<p class="sds-tile-line">${inline(item.line)}</p>` : ""}${item.third ? `<p class="sds-small"><code>${esc(item.third.replace(/^`|`$/g, ""))}</code></p>` : ""}\n      ${facts}</div>`;
   });
-  return `  <div class="sds-tiles${compact ? " sds-tiles-compact" : ""}" data-layout="${kind}"${kept ? ` data-media="${kept}"` : ""}>\n${tiles.join("\n")}\n  </div>`;
+  const head = side ? `    <div class="sds-tiles-head" aria-hidden="true"><span>${inline(catalogNoun)}</span>${side.map((key) => `<span${endAligned.includes(key) ? ' data-align="end"' : ""}>${inline(key)}</span>`).join("")}</div>\n` : "";
+  return `  <div class="sds-tiles${compact ? " sds-tiles-compact" : ""}" data-layout="${kind}"${side ? ` data-facts="side" data-columns="${side.length}"` : ""}${kept ? ` data-media="${kept}"` : ""}>\n${head}${tiles.join("\n")}\n  </div>`;
 }
 
 /** Group ids already used on the page, so a second catalog's group of the same name gets its own anchor. */
@@ -622,8 +650,12 @@ let groupIds = new Set<string>();
  * initials with AVATAR_GROUP, and a drawing's name with MEDIA_TOP (`rail`, `dock`, `topnav`, `canvas`). With two or more
  * `## Group` lines, each group is a panel and a row of links above them jumps to each.
  */
+/** The noun that heads a list's main column when it shows side columns: `name=Form` in the fence tag, else "Item". */
+let catalogNoun = "Item";
+
 function catalogBlock(tag: string, body: string[], findings: Finding[]): string {
   const { options } = tagWords(tag);
+  catalogNoun = options.name?.trim() || "Item";
   let layout: string | null = null, media: string | null = null;
   if ("layout" in options) {
     if (!CATALOG_LAYOUTS.includes(options.layout)) findings.push({ message: `a \`catalog\` layout is one of ${CATALOG_LAYOUTS.join(", ")}, not \`${options.layout}\``, stops: true });

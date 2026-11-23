@@ -120,6 +120,20 @@ MARKETING · Visitor | a site for someone deciding whether the product is for th
       <dl class="sds-tile-facts sds-tile-facts-one"><div><dt>Needed for</dt><dd>a decision, then a later arc once it is made</dd></div></dl></div></div>
   </div>
   <p>An item with exactly one fact draws it as one line under its description: a small muted label, then the value in italic. Two or more facts keep the columns.</p>
+  <p>Where every item in the list holds one or two short facts (a word, a number, a status, a version; up to about 20 characters, no sentence), the facts sit at the row&rsquo;s right end, one narrow column each, lined up down the list. The column&rsquo;s name shows once, above the list. A phrase that describes the item belongs in its line, not in a fact.</p>
+  <pre data-lang="text">```catalog layout=LIST name=Rule
+Reach | how far a reader gets before the page loses them
+  Weight: GUIDE
+Fit | whether each block takes the content it was written for
+  Weight: MUST
+```</pre>
+  <div class="sds-tiles" data-layout="LIST" data-facts="side" data-columns="1">
+    <div class="sds-tiles-head" aria-hidden="true"><span>Rule</span><span>Weight</span></div>
+    <div class="sds-tile"><div class="sds-tile-main"><div class="sds-tile-body"><h4>Reach</h4><p>how far a reader gets before the page loses them</p></div></div>
+      <dl class="sds-tile-facts"><div><dt>Weight</dt><dd>GUIDE</dd></div></dl></div>
+    <div class="sds-tile"><div class="sds-tile-main"><div class="sds-tile-body"><h4>Fit</h4><p>whether each block takes the content it was written for</p></div></div>
+      <dl class="sds-tile-facts"><div><dt>Weight</dt><dd>MUST</dd></div></dl></div>
+  </div>
 
   <h4 id="b-catalog-table">TABLE layout</h4>
   <p class="sds-small"><strong>Use when</strong> two to four things are compared fact by fact.</p>

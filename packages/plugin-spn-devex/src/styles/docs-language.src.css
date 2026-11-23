@@ -1738,7 +1738,7 @@ pre .sds-tk-g { color: var(--sds-tk-c); font-style: normal; }
   background: none;
   border: 0;
   border-radius: 0;
-  padding: 1.1rem 1.2rem;
+  padding: .75rem 1rem;
 }
 .sds-tiles[data-layout='LIST'] > .sds-tile + .sds-tile {
   border-top: 1px solid var(--sds-rule);
@@ -1749,14 +1749,36 @@ pre .sds-tk-g { color: var(--sds-tk-c); font-style: normal; }
 }
 .sds-tiles[data-layout='LIST'] .sds-tile-body > h4 {
   margin: 0 0 .2rem;
+  font-size: var(--sds-sm);
 }
 .sds-tiles[data-layout='LIST'] .sds-tile-body > p {
-  margin: 0 0 .8rem;
+  margin: 0;
   font-size: var(--sds-sm);
   color: var(--sds-text-description-card);
 }
 /* As many columns as the facts and the width allow: three facts stand in one row on a laptop, and wrap on a narrow one
    (the developer, 2026-11-23: "we have enough psace can we have facts in three column"). */
+/* A check's message: one quoted line in italic, the muted colour, under the description. No label, the quote marks say it. */
+.sds-tiles[data-layout='LIST'] .sds-tile-body > p.sds-tile-quote {
+  margin: .1rem 0 0;
+  font-style: italic;
+  color: var(--sds-text-fact-card);
+}
+/* A note: one conditional phrase, a small muted label then the phrase in italic, tight under the line. */
+.sds-tiles[data-layout='LIST'] .sds-tile-body > p.sds-tile-note {
+  margin: .1rem 0 0;
+  font-size: var(--sds-caption);
+}
+.sds-tiles[data-layout='LIST'] .sds-tile-body > p.sds-tile-note > span {
+  color: var(--sds-text-fact-card);
+  margin-right: .5rem;
+}
+.sds-tiles[data-layout='LIST'] .sds-tile-body > p.sds-tile-note > em {
+  color: var(--sds-text-description-card);
+}
+.sds-tiles[data-layout='LIST'] .sds-tile-body > .sds-tile-facts {
+  margin-top: .5rem;
+}
 .sds-tiles[data-layout='LIST'] .sds-tile-facts {
   grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
   column-gap: 1.6rem;
@@ -1803,6 +1825,77 @@ pre .sds-tk-g { color: var(--sds-tk-c); font-style: normal; }
   .sds-tiles[data-layout='LIST'] .sds-tile-facts {
     grid-template-columns: 1fr;
   }
+}
+
+/* SIDE FACTS: a list whose every item holds one or two short facts (a word, a number, a status, a version) draws them at the row's
+   right end, one narrow column per fact. The list is a grid and each row a subgrid of it, so the columns line up down the list; the
+   column's name shows once, in a head row, and each item's own label is kept for a screen reader. On a phone the facts fall back
+   under the description, label above value. */
+.sds-tiles[data-layout='LIST'][data-facts='side'] {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) repeat(var(--sds-side-columns, 1), 8.5rem);
+  column-gap: 0;
+  row-gap: 0;
+}
+.sds-tiles[data-layout='LIST'][data-facts='side'][data-columns='2'] { --sds-side-columns: 2; }
+.sds-tiles[data-layout='LIST'][data-facts='side'] > .sds-tile,
+.sds-tiles[data-layout='LIST'][data-facts='side'] > .sds-tiles-head {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: subgrid;
+  align-items: start;
+}
+.sds-tiles[data-layout='LIST'][data-facts='side'] .sds-tile-main {
+  display: flex;
+  gap: .9rem;
+  min-width: 0;
+}
+.sds-tiles[data-layout='LIST'][data-facts='side'] .sds-tile-body > p {
+  margin-bottom: 0;
+}
+.sds-tiles[data-layout='LIST'][data-facts='side'] .sds-tile-facts {
+  display: contents;
+}
+.sds-tiles[data-layout='LIST'][data-facts='side'] .sds-tile-facts > div {
+  display: block;
+  padding-left: 1rem;
+}
+.sds-tiles[data-layout='LIST'][data-facts='side'] > .sds-tiles-head > span:not(:first-child) {
+  padding-left: 1rem;
+}
+.sds-tiles[data-layout='LIST'][data-facts='side'] .sds-tile-facts dt {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.sds-tiles[data-layout='LIST'][data-facts='side'] [data-align='end'] {
+  text-align: end;
+}
+.sds-tiles[data-layout='LIST'][data-facts='side'] .sds-tile-facts dd {
+  margin: 0;
+  white-space: nowrap;
+}
+.sds-tiles[data-layout='LIST'] > .sds-tiles-head {
+  padding: .65rem 1rem;
+  border-bottom: 1px solid var(--sds-rule);
+  font-size: var(--sds-xs);
+  letter-spacing: .02em;
+  color: var(--sds-text-fact-card);
+}
+@media (max-width: 720px) {
+  .sds-tiles[data-layout='LIST'][data-facts='side'] { display: block; }
+  .sds-tiles[data-layout='LIST'][data-facts='side'] > .sds-tiles-head { display: none; }
+  .sds-tiles[data-layout='LIST'][data-facts='side'] > .sds-tile { display: block; }
+  .sds-tiles[data-layout='LIST'][data-facts='side'] .sds-tile-facts { display: flex; flex-wrap: wrap; gap: .5rem 1.6rem; margin-top: .6rem; }
+  .sds-tiles[data-layout='LIST'][data-facts='side'] .sds-tile-facts dt {
+    position: static; width: auto; height: auto; overflow: visible; clip-path: none;
+    display: block; font-size: var(--sds-xs); color: var(--sds-text-fact-card);
+  }
+  .sds-tiles[data-layout='LIST'][data-facts='side'] .sds-tile-fact-none { display: none; }
+  .sds-tiles[data-layout='LIST'][data-facts='side'] .sds-tile-facts > div { padding-left: 0; }
 }
 
 /* TABLE: the things side by side as columns, each column headed like a tile, and their facts lined up by key as rows.

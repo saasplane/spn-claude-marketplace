@@ -345,7 +345,23 @@ console.log("\n=== the page renderer — a catalog in three layouts, with media 
   const list = made(fence("catalog layout=LIST", "MARKETING | a site\n  Layouts: `TOPNAV` for the site\n  Sections: every site section"));
   ok("[MKT.SCRIPTS.614] layout=LIST draws one card a row, its words and its facts in a body",
     list.html.includes('data-layout="LIST"') && list.html.includes('<div class="sds-tile"><div class="sds-tile-body"><h4>MARKETING</h4><p>a site</p>') && list.html.includes("<dt>Layouts</dt><dd><code>TOPNAV</code> for the site</dd>") && !list.html.includes("data-facts"), list.html);
-  ok("[MKT.SCRIPTS.614] a LIST card with one fact says so, for the stylesheet", made(fence("catalog layout=LIST", "A | a\n  Key: one")).html.includes("sds-tile-facts sds-tile-facts-one"));
+  ok("[MKT.SCRIPTS.614] a LIST card with one fact says so, for the stylesheet", made(fence("catalog layout=LIST", "A | a\n  Key: one longer phrase of a value")).html.includes("sds-tile-facts sds-tile-facts-one"));
+  const sideList = made(fence("catalog layout=LIST", "A | a\n  Weight: MUST\nB | b\n  Weight: GUIDE"));
+  ok("[MKT.SCRIPTS.614] a LIST whose every item holds one or two short facts marks the list data-facts=side, names the column once in a head row and draws no one-line fact",
+    sideList.html.includes('data-layout="LIST" data-facts="side" data-columns="1"') && sideList.html.includes('<div class="sds-tiles-head" aria-hidden="true"><span>Item</span><span>Weight</span></div>')
+      && sideList.html.includes('<div class="sds-tile-main"><div class="sds-tile-body"><h4>A</h4><p>a</p></div></div>') && sideList.html.includes('<dl class="sds-tile-facts"><div><dt>Weight</dt><dd>MUST</dd></div></dl>') && !sideList.html.includes("facts-one"), sideList.html);
+  const quoted = made(fence("catalog layout=LIST", "Block | what it catches\n  > a table of 6 rows reads as a catalog\n  ~ When: only on a seat file\n  Grade: soft"));
+  ok("[MKT.SCRIPTS.614] a > line under an item is a quoted italic line and a ~ line is a note, both in the body under the description, beside a side fact",
+    quoted.html.includes('<p>what it catches</p><p class="sds-tile-quote">&ldquo;a table of 6 rows reads as a catalog&rdquo;</p><p class="sds-tile-note"><span>When</span> <em>only on a seat file</em></p></div></div>') && quoted.html.includes('data-facts="side"') && quoted.findings.length === 0, quoted.html);
+  const counted = made(fence("catalog layout=LIST name=Form", "Trees | boxes\n  Items: 11\n  State: new\nTables | rows\n  Items: 24\n  State: old"));
+  ok("[MKT.SCRIPTS.614] a list with side columns heads the main column with name= and every side column with its key; a column of numbers is set at the end",
+    counted.html.includes('<div class="sds-tiles-head" aria-hidden="true"><span>Form</span><span data-align="end">Items</span><span>State</span></div>') && counted.html.includes('<div data-align="end"><dt>Items</dt><dd>11</dd></div>') && !counted.html.includes('<div data-align="end"><dt>State'), counted.html);
+  ok("[MKT.SCRIPTS.614] one long fact, a sentence, or three facts keeps the facts under the description",
+    !made(fence("catalog layout=LIST", "A | a\n  Weight: MUST\nB | b\n  Weight: this value is longer than twenty")).html.includes("data-facts")
+      && !made(fence("catalog layout=LIST", "A | a\n  Weight: Do it. Now")).html.includes("data-facts")
+      && !made(fence("catalog layout=LIST", "A | a\n  K1: x\n  K2: y\n  K3: z")).html.includes("data-facts"));
+  ok("[MKT.SCRIPTS.614] two short facts make two columns, an empty cell where an item has none of a key",
+    made(fence("catalog layout=LIST", "A | a\n  Weight: MUST\n  Since: 1.2\nB | b\n  Since: 1.3")).html.includes('data-columns="2"') && made(fence("catalog layout=LIST", "A | a\n  Weight: MUST\n  Since: 1.2\nB | b\n  Since: 1.3")).html.includes('<div class="sds-tile-fact-none"></div>'));
   const tab = made(fence("catalog layout=TABLE", "A | first\n  Layouts: x\n  Pages: p\nB | second\n  Layouts: y\n  Sections: s"));
   ok("[MKT.SCRIPTS.614] layout=TABLE makes the things columns and each fact key a row, an empty cell where a thing has none",
     tab.html.includes('<table class="sds-catalog-table">') && tab.html.includes("<thead><tr><th></th><th><h4>A</h4><p>first</p></th><th><h4>B</h4><p>second</p></th></tr></thead>")

@@ -208,6 +208,8 @@ function codeRun(sentence: string): [run: number, all: number] {
 /** A name that reads as a condition, a question or a case: it starts with a lower-case article or question word, or with a digit. */
 export const readsAsCondition = (name: string): boolean => /^(?:a|an|the|how|when|if|what)\s/.test(name.trim().replace(/^[`*_]+/, "")) || /^\d/.test(name.trim().replace(/^[`*_]+/, ""));
 
+/** A fact value of more than this many words is a phrase that describes the item, not a value a reader compares down a list. */
+export const PHRASE_FACT_WORDS = 4;
 const CONDITIONS = "a first column of conditions is a table (rule 549)";
 export const HAND_WRITTEN_CARDS = "this card block is hand-written without the writer's attributes, so its rows will not line up: use a table, or the writer's markup";
 
@@ -215,7 +217,7 @@ export const HAND_WRITTEN_CARDS = "this card block is hand-written without the w
 function tileFindings(text: string): Finding[] {
   const t = text.replace(/<!--[\s\S]*?-->/g, " ").replace(/<(script|style|template)\b[\s\S]*?<\/\1>/gi, " ");
   const out: Finding[] = [];
-  for (const block of t.matchAll(/<div\b([^>]*\bclass="[^"]*\bsds-tiles\b[^"]*"[^>]*)>([\s\S]*?)(?=<div\b[^>]*\bclass="[^"]*\bsds-tiles\b|<\/section>|$)/gi)) {
+  for (const block of t.matchAll(/<div\b([^>]*\bclass="[^"]*\bsds-tiles(?![\w-])[^"]*"[^>]*)>([\s\S]*?)(?=<div\b[^>]*\bclass="[^"]*\bsds-tiles(?![\w-])|<\/section>|$)/gi)) {
     const attrs = block[1];
     const tiles = [...block[2].matchAll(/<div\b([^>]*\bclass="[^"]*\bsds-tile\b(?!s|-)[^"]*"[^>]*)>([\s\S]*?)(?=<div\b[^>]*\bclass="[^"]*\bsds-tile\b(?!s|-)|<\/section>|$)/gi)];
     const heads = tiles.map((tile) => plain(/<h[1-6]\b[^>]*>([\s\S]*?)<\/h[1-6]>/i.exec(tile[2])?.[1] ?? "")).filter(Boolean);
@@ -225,6 +227,11 @@ function tileFindings(text: string): Finding[] {
     const noLayout = !/\bdata-layout=/.test(attrs);
     const noFacts = /\bdata-layout="GRID"/.test(attrs) && withFacts.some((tile) => !/\bdata-facts=/.test(tile[1]));
     if (withFacts.length && (noLayout || noFacts)) out.push(["SOFT", HAND_WRITTEN_CARDS]);
+    const values = [...block[2].matchAll(/<dl\b[^>]*\bsds-tile-facts\b[^>]*>([\s\S]*?)<\/dl>/gi)].flatMap((dl) => [...dl[1].matchAll(/<dd\b[^>]*>([\s\S]*?)<\/dd>/gi)].map((dd) => plain(dd[1])));
+    const quoted = values.find((value) => /^["\u201c\u2018']/.test(value) && value.split(/\s+/).length > 3);
+    const phrase = quoted ? undefined : values.find((value) => value.split(/\s+/).filter(Boolean).length > PHRASE_FACT_WORDS);
+    if (quoted) out.push(["SOFT", `this fact holds a message the item prints, "${quoted.length > 40 ? `${quoted.slice(0, 40)}…` : quoted}": make it a quote, a \`> \` line under the item in the fence (rule 549)`]);
+    if (phrase) out.push(["SOFT", `these facts read as description, "${phrase.length > 40 ? `${phrase.slice(0, 40)}…` : phrase}": fold them into each item's line (rule 549)`]);
   }
   return out;
 }

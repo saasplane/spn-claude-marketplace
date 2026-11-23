@@ -243,6 +243,16 @@ The rows leave some content between two of them. These lines settle the usual ca
 - **Two to four things make a catalog table, and five or more make a wide one.** A `catalog layout=TABLE` holds two to four things and at most six facts. Five things or more, or seven facts or more, is a wide comparison and stays a plain table.
 - **A catalog needs a name for each item, once.** A table whose first column repeats a name, or has no name at all, stays a table.
 - **A description is a clause a reader reads, not a value.** A column of sentences or clauses beside a name reads as a catalog. A column of numbers, owners, states or one-word values is a table of attributes, and stays a table.
+- **A fact is a value compared down a list; a phrase that describes the item goes in its line.** In a `catalog layout=LIST`, where every item holds one or two short facts (a word, a number, a status, a version; up to about 20 characters), they sit at the row's right end, one narrow column each, the column's name once at the top of the list. A fact that is a phrase is folded into the item's line (rule 549).
+- **Which part of a list item does this go in?** Read down to the first row that fits (rule 549):
+
+| What you have | It goes in |
+| --- | --- |
+| a value compared down the list: a status, a weight, a grade, a version, a count | a side column, named once at the top of the list (one or two of them) |
+| words that describe the item | the item's line |
+| what the item prints, such as a message | a quote, a `> ` line under the item in the fence |
+| one phrase that holds only under a condition | a note, a `~ Label: phrase` line under the item |
+| three or more values, or a fact that is a sentence | facts below the line |
 - **A table of links to parts of the same page stays a table.** `cards` are doors to other pages a reader may open next; a list of examples or references is not a set of doors.
 - **A converted table keeps its words.** The first column becomes the items' names and its heading is dropped. Each other heading becomes a fact key and is cut to a word or two (`The prefix of its published keys` becomes `Prefix`). An item may have no one line of its own.
 - **Order decides between a list and a figure.** Steps a reader carries out in turn are a numbered list, and stay numbered when the sentence before them counts them ("Three steps…"). A flow between things the page names is a `chain`. Layers inside a boundary are a `system`. Anything else that connects things is a `map`.
@@ -261,7 +271,7 @@ A plain table of a name column and a description column past four rows reads as 
 | Block | You write | It becomes |
 | --- | --- | --- |
 | `CATALOG`, `GRID` | a fence tagged `catalog`, one line a card: name, one line; the card's facts on the lines under it, indented, one `Key: value` a line | cards in a grid of two to four across, each fact's label above its value |
-| `CATALOG`, `LIST` | the same fence tagged `catalog layout=LIST` | one card a row, its name on the left and its facts on the right |
+| `CATALOG`, `LIST` | the same fence tagged `catalog layout=LIST`; a list with side columns adds `name=Rule` (the item noun) to head the main column, and each side column is headed by its fact's key | one card a row, its name on the left and its facts on the right |
 | `CATALOG`, `TABLE` | the same fence tagged `catalog layout=TABLE` | the cards as columns and each fact key as a row |
 | `CATALOG` media | `media=ICON`, `MARK`, `AVATAR`, `AVATAR_GROUP` or `MEDIA_TOP` after the tag, one for every item; an item names its media after its line | `ICON` for an item read as a line, `MARK` for an item that is a thing of its own, `AVATAR` for a person or a team, `MEDIA_TOP` for an item told best by its shape |
 | `TABS` | a fence of tildes tagged `tabs look=LINE`, `SWITCH` or `PILL` (`LINE` when left out), and a `--- <label>` line before each panel, whose body is one block; two to six tabs, never nested | a bar at the start and one panel at a time; every panel shows where the script does not run |
