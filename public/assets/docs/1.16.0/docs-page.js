@@ -297,7 +297,7 @@
   rail.insertBefore(toggle,rail.firstChild);
   toggle.addEventListener('click',function(){var open=rail.classList.toggle('sds-is-open');toggle.setAttribute('aria-expanded',String(open));});
   rail.addEventListener('click',function(e){if(e.target.closest('a')){rail.classList.remove('sds-is-open');toggle.setAttribute('aria-expanded','false');}});
-  var narrow=window.matchMedia?window.matchMedia('(max-width: 68rem)'):null;
+  var narrow=window.matchMedia?window.matchMedia('(max-width: 69rem)'):null;
   function place(){
     var head=wrap.querySelector('.sds-masthead');
     if(narrow&&narrow.matches&&head)head.parentNode.insertBefore(rail,head.nextSibling);else if(rail.parentNode!==page)page.insertBefore(rail,wrap);
@@ -518,12 +518,14 @@
   var own = document.querySelector('script[src*="docs-page.js"]');
   var folder = own ? own.getAttribute('src').replace(/[^\/]*$/, '') : '';
   var appCss = meta('surface-app-css');
+  // A note is a sticky note: one class, the drawn from the design system's warning tokens, so it follows light, dark and the theme, drawn in the frame's document.
+  var NOTE_CSS = '.sds-note{position:absolute;top:12px;left:12px;z-index:60;max-width:300px;padding:8px 10px;border:1px solid var(--warning);border-radius:8px;background:var(--warning-subtle);color:var(--on-warning-subtle);font:500 13px/1.45 system-ui,sans-serif;box-shadow:0 4px 12px rgba(0,0,0,.18)}';
   function pageDocument() {
     return '<!doctype html><html lang="en" data-mode="' + state.mode + '"><head><meta charset="utf-8">' +
       '<meta name="viewport" content="width=device-width, initial-scale=1">' +
       '<link rel="stylesheet" href="' + attr(folder + 'design-system.css') + '">' +
       (appCss && appCss.charAt(0) !== '{' ? '<link rel="stylesheet" href="' + attr(appCss) + '">' : '') +
-      '<style>html,body{margin:0}body{background:var(--surface,var(--background));color:var(--foreground)}</style></head><body>' +
+      '<style>html,body{margin:0}body{background:var(--surface,var(--background));color:var(--foreground)}' + NOTE_CSS + '</style></head><body>' +
       (template ? template.innerHTML : '') + '</body></html>';
   }
   // The mode and the notes are set on the frame's own document, which is this page's origin.

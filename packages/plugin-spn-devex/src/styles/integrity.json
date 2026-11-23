@@ -80,9 +80,9 @@
     "sds-index.js": "sha384-3MwLCbuBjXFJ31GfVcuLaTKmcRlHwURJXB1nbsc5ri9Ryn5hzX16nkfSDiNOTpZW"
   },
   "1.16.0": {
-    "docs-language.css": "sha384-H4EyRs541ZXMRQxsxagmy9Ir0am/DHEi/ot+dmQMJq+nN0IKEXJsWuQgsGoL3ket",
-    "docs-page.js": "sha384-fASmpiRQhaxN1A7t7PNPFM0prAf8/4bUtYQlzVDU8gKi4M3M7YywzuZDVKDh2Euw",
-    "docs-index.js": "sha384-NovGfghJhU3OAH2vfxJRe2LRbz9T3a/RSDg2C0RsyiFNwutpWkQzAdnVcYli4vZU",
+    "docs-language.css": "sha384-OyDb7H6JzPz4We3hILWyxDyew4jJWK/IVFCOFRWU+iQ3xhH21R27fIism3iOgg+4",
+    "docs-page.js": "sha384-VShOIXdIjFgJz7PkwqMDZ43Zw18H+Szs+ir8Esl52os0rlKkXRiEsk2mQ6m5qwOn",
+    "docs-index.js": "sha384-TEPdCyf0KJjI05DDRqLSPsZv7YMFkzWImODpj3E70zGa+tGBl58VPvhPlO9cltLE",
     "design-system-units.css": "sha384-A2jO8RBkHrfB+c9TGYCiyCRSbiiYcoCSvrqK/YmbvCDwUJoX8+HpaF9aZyZTngVr",
     "design-system.css": "sha384-G/EyxBHe5adbtpTw/mnAsvKCsDXUMBTD/DAcMzNbZiYbEudwVGq++ezDLB4GWwOR"
   }
