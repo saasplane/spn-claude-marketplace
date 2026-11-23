@@ -36,43 +36,39 @@ This construct realizes the book's `01-devex/02-agent/04-plugins`.
 
 ## Model
 
-A repository declares a world, and then:
+A repository's claim declares a world, and then:
 
-1. the set of plugins it gets is derived from that declaration;
-2. an install copies each one;
+1. the derived set of plugins it gets follows from that declaration;
+2. an install copies each one, and the installed copy is found by its name and its version;
 3. a session reads the installed copy rather than this checkout.
 
 ```dg
-{ "kind": "map",
+{ "kind": "chain",
+  "title": "From a repository's claim to a session",
   "caption": "Nobody types a plugin name into a workspace: the declaration is read and the set follows from it.",
   "boxes": [
-    { "id": "a", "label": "a repository's claim", "note": "sprepo.json — the world it answers to" },
+    { "id": "a", "label": "a repository's claim", "note": "sprepo.json, the world it answers to" },
     { "id": "b", "label": "the derived set", "note": "which plugins this repository is entitled to load" },
     { "id": "c", "label": "the installed copy", "note": "found by name and by the version the manifest carries" },
-    { "id": "d", "label": "a session", "note": "matches the description against the work at hand" }
-  ],
-  "links": [
-    { "from": "a", "to": "b", "label": "derives" },
-    { "from": "b", "to": "c", "label": "installed as" },
-    { "from": "c", "to": "d", "label": "read by" }
+    { "id": "d", "label": "a session", "note": "matches the description against the work at hand", "em": true }
   ] }
 ```
 
 ## Parts
 
-### Plugin identity — The identity is this plugin's own
+### Plugin identity — the identity is this plugin's own
 
 The manifest names this folder `spn-surface` and describes the Surface domain before any stack is chosen: the standards of content, interaction, patterns and names, the architecture of the design system, and the one skill, `design`, that states a page as a tree of named blocks. The description is long deliberately, because it is matched against the work at hand rather than browsed by a person, and material nothing matches is material nothing reaches.
 
-### Who gets it — The world decides who gets it
+### Who gets it — the world decides who gets it
 
 A workspace never types a plugin name. Each repository declares its world in its own manifest, and the set of plugins it is entitled to load is derived from that declaration. The derivation is the foundation's, and this page only says which side of it this plugin sits on: a repository that builds a page loads this plugin beside the apps plugin.
 
-### Version number — The version is the number of what is published
+### Version number — the version is the number of what is published
 
 The manifest reads `0.1.0`, the version this plugin's first release publishes. The field names what is published rather than what somebody is working on, and a cache directory is keyed by version, so a plugin edited without an increment installs over its own published bytes and nothing tells a reader which of the two is running.
 
-### Plugin contents — What this plugin holds, and what it does not
+### Plugin contents — what this plugin holds, and what it does not
 
 This folder ships wiring, a skill, scripts, refs and tests. It ships no agents, because a persona and a reviewing viewpoint answer to no stack and live once in the core plugin, where the UX and UI lenses are. It ships no providers folder, because it holds no file that names a stack. Each folder it does ship has its own page, and none of them is described here.
 

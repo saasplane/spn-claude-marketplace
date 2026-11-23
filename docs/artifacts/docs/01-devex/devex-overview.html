@@ -25,7 +25,7 @@
 }
 -->
 
-<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.15.0/sds-docs.css" integrity="sha384-R47poopLRnz65naDQiMbuRZgxiTZtsgOLsiaP10qjWo62gNyH4ezyJy2v/TyMG5J" crossorigin="anonymous">
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.16.0/docs-language.css" integrity="sha384-z6T3Ju/mWAnv24wb8AFXMHYMyXMd5U/g7N2hA3X1uCys4Ty2Yy7TcMXWe+SMPck0" crossorigin="anonymous">
 <div class="sds-page">
 <nav class="sds-rail" id="rail">
   <a class="sds-home" href="../concept-overview.html">&larr; the hub</a>
@@ -39,11 +39,65 @@
   <p class="sds-standfirst">spn-devex is the plugin every SaaS Plane repository loads, and this page reads it one folder at a time, in the order the folders depend on each other. Read it before you decide where a new rule should run, or when you want to see what a plugin can hold at all. It takes each folder in turn, says what it is for and what you would decide there, and sends you to the page that states it in full.</p>
 </header>
 
-<section id="s0">
+<section id="s0" data-block="reasons">
   <div class="sds-section-head"><h2>Overview</h2></div>
   <p>A rule in the foundation book does nothing until something applies it while you work. <code>spn-devex</code> is where that happens for every repository, whatever world it declares. It is also the widest of the four plugins, so it is the place to learn what a plugin can hold at all.</p>
   <p>This page is for anyone about to change a plugin in this repository, or to read one: an architect deciding where a new rule should run, or a backend developer about to write a check. It assumes no earlier reading. After it you know which folder a piece of plugin code belongs in, what that folder promises, and which construct page to open next.</p>
   <p><strong>The one thing to unlearn is that a plugin makes rules.</strong> None of them does. Every rule is stated once, in a chapter of the foundation book, and a plugin carries instruments that read that rule and apply it at the moment somebody works. So each folder below is one kind of instrument, and each is defined once, here in <code>spn-devex</code>. The other two plugins use the same folder names and add what only their own domain can say. That is why a general question, such as <em>what is a hook?</em>, always has its answer in this domain.</p>
+  <p>The picture below is the eight folders in the order this page reads them.</p>
+<figure class="dl-figure">
+<div class="dl-frame">
+<svg class="dl-svg" viewBox="0 0 928 696" role="img" aria-label="The folders of the plugin, in the order this page reads them">
+  <rect class="dl-tile-on" x="364" y="16" width="204" height="48" rx="10"/>
+  <text class="dl-name" x="376" y="37">The Plugin</text>
+  <text class="dl-detail" x="376" y="52">the folder a session installs</text>
+  <path class="dl-wire" d="M466 64 L466 104"/>
+  <rect class="dl-tile" x="364" y="104" width="204" height="48" rx="10"/>
+  <text class="dl-name" x="376" y="125">Hooks</text>
+  <text class="dl-detail" x="376" y="140">code the session runs</text>
+  <path class="dl-wire" d="M466 152 L466 192"/>
+  <rect class="dl-tile" x="364" y="192" width="204" height="48" rx="10"/>
+  <text class="dl-name" x="376" y="213">Refs</text>
+  <text class="dl-detail" x="376" y="228">a chapter, stamped</text>
+  <path class="dl-wire" d="M466 240 L466 280"/>
+  <rect class="dl-tile" x="364" y="280" width="204" height="48" rx="10"/>
+  <text class="dl-name" x="376" y="301">Agents</text>
+  <text class="dl-detail" x="376" y="316">a second reader</text>
+  <path class="dl-wire" d="M466 328 L466 368"/>
+  <rect class="dl-tile" x="364" y="368" width="204" height="48" rx="10"/>
+  <text class="dl-name" x="376" y="389">Skills</text>
+  <text class="dl-detail" x="376" y="404">a named piece of work</text>
+  <path class="dl-wire" d="M466 416 L466 456"/>
+  <rect class="dl-tile" x="364" y="456" width="204" height="48" rx="10"/>
+  <text class="dl-name" x="376" y="477">Scripts</text>
+  <text class="dl-detail" x="376" y="492">the code a plugin runs</text>
+  <path class="dl-wire" d="M466 504 L466 544"/>
+  <rect class="dl-tile" x="364" y="544" width="204" height="48" rx="10"/>
+  <text class="dl-name" x="376" y="565">Providers</text>
+  <text class="dl-detail" x="376" y="580">where an instance may be named</text>
+  <path class="dl-wire" d="M466 592 L466 632"/>
+  <rect class="dl-tile" x="364" y="632" width="204" height="48" rx="10"/>
+  <text class="dl-name" x="376" y="653">Tests</text>
+  <text class="dl-detail" x="376" y="668">how a plugin proves itself</text>
+</svg>
+</div>
+<figcaption>Notice the order: what a plugin is comes first, and each folder after it uses the words of the one before.</figcaption>
+</figure>
+  <!-- dg:source
+{ "kind": "chain",
+  "title": "The folders of the plugin, in the order this page reads them",
+  "caption": "Notice the order: what a plugin is comes first, and each folder after it uses the words of the one before.",
+  "boxes": [
+    { "id": "plugin", "label": "The Plugin", "note": "the folder a session installs", "em": true },
+    { "id": "hooks", "label": "Hooks", "note": "code the session runs" },
+    { "id": "refs", "label": "Refs", "note": "a chapter, stamped" },
+    { "id": "agents", "label": "Agents", "note": "a second reader" },
+    { "id": "skills", "label": "Skills", "note": "a named piece of work" },
+    { "id": "scripts", "label": "Scripts", "note": "the code a plugin runs" },
+    { "id": "providers", "label": "Providers", "note": "where an instance may be named" },
+    { "id": "tests", "label": "Tests", "note": "how a plugin proves itself" }
+  ] }
+  -->
   <p><strong>What you can decide after this page:</strong></p>
   <ul>
     <li>which folder a new piece of plugin code belongs in;</li>
@@ -52,63 +106,63 @@
   </ul>
 </section>
 
-<section id="s1">
+<section id="s1" data-block="reasons">
   <div class="sds-section-head"><h2>The Plugin &mdash; the folder a session installs</h2></div>
   <p>The plugin is the unit that carries a rule from this repository into a running session: one folder, one small manifest in <code>.claude-plugin/plugin.json</code>, and one entry in the marketplace list this repository keeps by hand. A session never reads this checkout. It reads an installed copy, found by the plugin's name and the version its manifest carries, so an edit here is not yet a change in behaviour. The version names what is published, and it moves after a release, never before.</p>
   <p><em>Decide here:</em> what has to happen before an edit to a plugin is what a session runs.</p>
   <p><a class="sds-more" href="constructs/01-plugin-construct.html">Read The Plugin &rarr;</a></p>
 </section>
 
-<section id="s2">
+<section id="s2" data-block="reasons">
   <div class="sds-section-head"><h2>Hooks &mdash; code the session runs for you</h2></div>
   <p>A hook is code the runtime calls at a moment it chooses, so a rule is asked again on every call instead of being remembered from a document. <code>hooks/hooks.json</code> declares the wiring: which moments of a session a plugin claims, narrowed to the calls it could have an opinion about. The moment decides the authority. Only the moment before a call runs can refuse it; every later moment can only advise. A hook returns its decision rather than printing it, and it always exits zero, so one crash never takes the other gates down.</p>
   <p><em>Decide here:</em> which moment a new rule should run at, and whether it may refuse or only advise.</p>
   <p><a class="sds-more" href="constructs/02-hooks-construct.html">Read Hooks &rarr;</a></p>
 </section>
 
-<section id="s3">
+<section id="s3" data-block="reasons">
   <div class="sds-section-head"><h2>Refs &mdash; a chapter, restated and stamped</h2></div>
   <p>A reader may hold the plugins and never hold the book, so a ref restates a chapter inside the plugin. It is a copy made on purpose, and it carries a stamp: the hash of the exact text it last read. A run that compares the stamp with the book can then report that a chapter has moved since it was copied, instead of the copy quietly going out of date. A ref adds no rule. Where a ref and its chapter disagree, the chapter wins and the ref is rewritten.</p>
   <p><em>Decide here:</em> whether a rule a plugin needs should be restated in it, and how its copy is kept current.</p>
   <p><a class="sds-more" href="constructs/06-refs-construct.html">Read Refs &rarr;</a></p>
 </section>
 
-<section id="s4">
+<section id="s4" data-block="reasons">
   <div class="sds-section-head"><h2>Agents &mdash; a second reader, convened mid-turn</h2></div>
   <p>The context that wrote a change already agrees with its own reasons, so a review needs a different reader. An agent brief is that reader: a persona with its own name that a session convenes mid-turn, holding only the authority its own file grants it. A reviewing brief carries no viewpoint of its own. It is handed a lens when it is convened, one file per engineering function, and the lens states what that review may refuse and what it may only advise. The book calls this viewpoint a lens.</p>
   <p><em>Decide here:</em> which viewpoint a piece of work should be reviewed through, and what that reviewer may block.</p>
   <p><a class="sds-more" href="constructs/03-agents-construct.html">Read Agents &rarr;</a></p>
 </section>
 
-<section id="s5">
+<section id="s5" data-block="reasons">
   <div class="sds-section-head"><h2>Skills &mdash; a named piece of work</h2></div>
   <p>Loading every rule into every turn would bury the one rule the turn needed. A skill narrows the loading: a folder with a name, a description, and the steps for one kind of work, read only once the work at hand matches the description. The description is matched against what you type, not read by a person browsing a list, so it states the kind of request it answers in the words a developer uses. A skill carries steps and never a rule of its own, because a rule that lives only in a skill is a rule nothing can check.</p>
   <p><em>Decide here:</em> what a request should be called so it runs the same steps every time.</p>
   <p><a class="sds-more" href="constructs/04-skills-construct.html">Read Skills &rarr;</a></p>
 </section>
 
-<section id="s6">
+<section id="s6" data-block="reasons">
   <div class="sds-section-head"><h2>Scripts &mdash; the code a plugin runs</h2></div>
   <p>Everything a plugin can execute sits under <code>scripts/</code>, divided by what calls it:</p>
-  <ul>
-    <li><code>events/</code> for the process a hook moment starts;</li>
-    <li><code>checks/</code> for the questions it composes;</li>
-    <li><code>tools/</code> for what a person or the agent runs by its own path;</li>
-    <li><code>lib/</code> for what both read.</li>
-  </ul>
+  <div class="sds-tiles" data-layout="LIST">
+    <div class="sds-tile"><div class="sds-tile-body"><h4><code>events/</code></h4><p>the process a hook moment starts</p></div></div>
+    <div class="sds-tile"><div class="sds-tile-body"><h4><code>checks/</code></h4><p>the questions it composes</p></div></div>
+    <div class="sds-tile"><div class="sds-tile-body"><h4><code>tools/</code></h4><p>what a person or the agent runs by its own path</p></div></div>
+    <div class="sds-tile"><div class="sds-tile-body"><h4><code>lib/</code></h4><p>what both read</p></div></div>
+  </div>
   <p>A rule answered one way while a file is written and another way in a sweep would be two rules, so the code that decides lives once and both callers import it. Every script names the chapter it applies in its own header.</p>
   <p><em>Decide here:</em> whether a rule should be a check wired to a moment, a tool run on request, or both sharing one library.</p>
   <p><a class="sds-more" href="constructs/05-scripts-construct.html">Read Scripts &rarr;</a></p>
 </section>
 
-<section id="s7">
+<section id="s7" data-block="reasons">
   <div class="sds-section-head"><h2>Providers &mdash; where an instance may be named</h2></div>
   <p>A plugin that names its stack or its cloud in a gate is a plugin the next stack cannot join. A provider is one folder per instance, under <code>providers/</code>, holding everything that varies with it: a scripts half that a gate dispatches into, and a skills half only where the instance changes how the work is written. Every gate reads the instance from the nearest <code>sprepo.json</code>. <code>spn-devex</code> defines this construct and ships no <code>providers/</code> folder itself, because nothing it does varies by instance.</p>
   <p><em>Decide here:</em> whether a new stack or cloud needs a folder of its own, and which halves it contributes.</p>
   <p><a class="sds-more" href="constructs/07-providers-construct.html">Read Providers &rarr;</a></p>
 </section>
 
-<section id="s8">
+<section id="s8" data-block="reasons">
   <div class="sds-section-head"><h2>Tests &mdash; how a plugin proves itself</h2></div>
   <p>A plugin is code, so it owes proof, and the proof sits where a reader can work out its path without searching. Under <code>tests/</code> the tier comes first and the mirror second: <code>unit/</code> says what kind of proof a suite is, and the path under it repeats the path of the source file it proves. The runner finds every suite by walking the folder rather than reading a list, and no suite counts its own depth, so moving a file does not break the suites around it.</p>
   <p><em>Decide here:</em> where the proof for a new script goes, and how to run it.</p>
@@ -199,15 +253,15 @@
 
 <section id="s10" data-block="next">
   <div class="sds-section-head"><h2>Next — Where to go next</h2></div>
-  <ul>
-    <li>The surface plugin, which adds what a person sees and touches &rarr; <a href="../02-surface/surface-overview.html">spn-surface</a></li>
-    <li>The stack plugin, which adds what only a stack can say &rarr; <a href="../03-apps/apps-overview.html">spn-apps</a></li>
-    <li>The estate plugin, which adds what only an estate can say &rarr; <a href="../04-infra/infra-overview.html">spn-infra</a></li>
-    <li>What each chapter here is held to in this plugin's own source &rarr; <a href="../../../04-capabilities/01-devex/plugin-spn-devex/README.md">capabilities: spn-devex</a></li>
-    <li>What a developer using this plugin is promised &rarr; <a href="../../../03-behaviors/01-devex/README.md">behaviours: devex</a></li>
-    <li>Every construct of this domain, in reading order &rarr; <a href="../../../02-constructs/01-devex/README.md">constructs: devex</a></li>
-    <li>Back to the whole model &rarr; <a href="../concept-overview.html">the hub</a></li>
-  </ul>
+  <div class="sds-tiles">
+    <a class="sds-tile sds-door" href="../02-surface/surface-overview.html"><span class="sds-door-kicker">What a person sees and touches</span><span class="sds-door-title">spn-surface<span class="sds-door-arrow" aria-hidden="true">&rarr;</span></span></a>
+    <a class="sds-tile sds-door" href="../03-apps/apps-overview.html"><span class="sds-door-kicker">What only a stack can say</span><span class="sds-door-title">spn-apps<span class="sds-door-arrow" aria-hidden="true">&rarr;</span></span></a>
+    <a class="sds-tile sds-door" href="../04-infra/infra-overview.html"><span class="sds-door-kicker">What only an estate can say</span><span class="sds-door-title">spn-infra<span class="sds-door-arrow" aria-hidden="true">&rarr;</span></span></a>
+    <a class="sds-tile sds-door" href="../../../04-capabilities/01-devex/plugin-spn-devex/README.md"><span class="sds-door-kicker">What each chapter here is held to in this plugin's own source</span><span class="sds-door-title">Capabilities: spn-devex<span class="sds-door-arrow" aria-hidden="true">&rarr;</span></span></a>
+    <a class="sds-tile sds-door" href="../../../03-behaviors/01-devex/README.md"><span class="sds-door-kicker">What a developer using this plugin is promised</span><span class="sds-door-title">Behaviours: devex<span class="sds-door-arrow" aria-hidden="true">&rarr;</span></span></a>
+    <a class="sds-tile sds-door" href="../../../02-constructs/01-devex/README.md"><span class="sds-door-kicker">Every construct of this domain, in reading order</span><span class="sds-door-title">Constructs: devex<span class="sds-door-arrow" aria-hidden="true">&rarr;</span></span></a>
+    <a class="sds-tile sds-door" href="../concept-overview.html"><span class="sds-door-kicker">Back to the whole model</span><span class="sds-door-title">The hub<span class="sds-door-arrow" aria-hidden="true">&rarr;</span></span></a>
+  </div>
 </section>
 
 </div>
@@ -217,4 +271,4 @@
   Sources: <a href="../../../../CONCEPT.md">CONCEPT.md</a> &sect; devex; the constructs it links.
 </footer>
 
-<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.15.0/sds-docs.js" integrity="sha384-XYna7dQ9hUAzsp8poWNLetdO4Oyfh/cIKwuuh6sduxMcNDmnLGJ3zcw6DaG1IN9+" crossorigin="anonymous"></script>
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.16.0/docs-page.js" integrity="sha384-yDkvlVaxZfr5SBqgjOk8GZPsDngeCYQxHHaY1aPfty/M6hFe1DXJz++VjJ+i+082" crossorigin="anonymous"></script>

@@ -39,7 +39,7 @@ This construct realizes the book's `01-devex/02-agent/04-plugins`.
 
 ## Model
 
-One entry, read from the outside in: a moment, the calls it is narrowed to, and the command those calls reach.
+One entry, read from the outside in: a call about to run, the matcher that narrows it to a write or an edit, the command those calls reach, and the verdict the command returns, which is a refusal, or silence so the ordinary flow continues.
 
 ```dg
 { "kind": "map",
@@ -61,23 +61,23 @@ One entry, read from the outside in: a moment, the calls it is narrowed to, and 
 
 ## Parts
 
-### One moment — One moment, because every law here is about text
+### One moment — one moment, because every law here is about text
 
 `spn-devex` wires five moments across eight tools, and it has reason to: it has something to say when a window opens, when a prompt is sent, after a command has run, and before a turn is handed back. This plugin has nothing to say at any of those. **What it knows is what a file may not contain**, and the only moment that knowledge can act on is the one before a file is written.
 
-### Matcher — The matcher narrows before the command runs
+### Matcher — the matcher narrows before the command runs
 
 The moment fires on every tool call, and a script deciding for itself whether it cares would be a process started for every read, every search and every shell command. The matcher is where that cost is refused: the harness starts nothing at all unless the call is a write or an edit.
 
-### Plugin root — The command is written against the plugin root
+### Plugin root — the command is written against the plugin root
 
 `${CLAUDE_PLUGIN_ROOT}` is the installed copy, so the same wiring works in every repository that loads the plugin and nothing has to know where the plugin was installed. The path under it — `scripts/events/pretooluse.ts` — is the dispatcher, and the wiring stops there: what that dispatcher runs is discovered rather than declared.
 
-### Wiring folder — The folder holds the wiring and nothing else
+### Wiring folder — the folder holds the wiring and nothing else
 
 `hooks/` carries `hooks.json` alone. **Code lives under `scripts/`**, filed by what kind of thing it is, which is why the wired path leaves the hooks folder immediately. A reader looking for what a refusal says opens the scripts tree, and a reader looking for when it fires opens this one file.
 
-### Timeout — One timeout, and it is generous on purpose
+### Timeout — one timeout, and it is generous on purpose
 
 The dispatcher resolves its subjects by reading a folder and importing each cloud's validators, so a first run pays for the imports. The declared allowance is large enough that a cold run finishes inside it, because a hook the harness gives up on is a gate nobody can tell from a gate that allowed the call.
 

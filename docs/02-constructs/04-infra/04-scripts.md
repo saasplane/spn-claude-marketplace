@@ -41,9 +41,11 @@ This construct realizes the book's `01-devex/02-agent/04-plugins`.
 
 ## Model
 
-Three folders, three jobs, and the order they run in is the order a person meets them. 1. The dispatcher is called.
-2. It asks the gate which subjects apply.
-3. Each subject runs the rule bodies that have an opinion about this path.
+Three folders, three jobs, and the order they run in is the order a person meets them:
+
+1. The dispatcher in `events/` is called.
+2. It asks the gate in `checks/` which subjects apply.
+3. Each subject runs the rule bodies in `lib/` that have an opinion about this path.
 
 ```dg
 { "kind": "map",
@@ -65,19 +67,21 @@ Three folders, three jobs, and the order they run in is the order a person meets
 
 A rule that fails is skipped rather than fatal: a gate that crashes the chain removes every other gate with it, which is worse than any single miss. The helpers the dispatcher reads its event and records its timings through are **this plugin's own copies**. A plugin is installed on its own and a partner may hold one without the others, so a sibling's file cannot be a dependency — reaching for one means resolving it at runtime, and a resolve that misses has to return the pass-through, which is silence wearing the shape of success.
 
-The figure below follows one call through the dispatcher, from the moment it arrives to the answer it gets. Every road out of it ends in an exit code of zero.
+The figure below follows one call through the dispatcher, from the moment it arrives to the answer it gets. A write or an edit arrives. If the call names no file, it is allowed in silence, and so is any input the gate cannot read. Where the call names a file, the path alone may refuse it, because built output is refused whatever it holds. Otherwise the dispatcher takes the text the call adds. Then it asks each subject in turn.
+
+A rule that throws is skipped. When a subject refuses, the dispatcher prints the refusal, exit zero, and the first refusal ends the run; when none refuses, the call is allowed. Every road out of it ends in an exit code of zero.
 
 ```dg
 { "kind": "flowchart",
   "caption": "The only way out with a refusal is a rule that read the path or the new text and objected. Anything the gate cannot read, and any rule that throws, falls back to allowing.",
   "boxes": [
     { "id": "call", "label": "A write or an edit", "note": "arrives at the dispatcher", "shape": "terminator" },
-    { "id": "file", "label": "Does the call name a file?", "shape": "decision" },
+    { "id": "file", "label": "The call names a file", "shape": "decision" },
     { "id": "silent", "label": "Allow, in silence", "note": "unreadable input lands here too", "shape": "terminator" },
-    { "id": "path", "label": "Does the path alone refuse it?", "note": "built output, whatever it holds", "shape": "decision" },
+    { "id": "path", "label": "The path alone refuses it", "note": "built output, whatever it holds", "shape": "decision" },
     { "id": "text", "label": "Take the text the call adds", "note": "content, or the replacement" },
-    { "id": "subjects", "label": "Ask each subject in turn", "note": "a rule that throws is skipped" },
-    { "id": "verdict", "label": "Did a subject refuse?", "shape": "decision" },
+    { "id": "subjects", "label": "Each subject in turn", "note": "a rule that throws is skipped" },
+    { "id": "verdict", "label": "A subject refuses", "shape": "decision" },
     { "id": "refuse", "label": "Print the refusal, exit zero", "note": "it names the laws card", "shape": "io" },
     { "id": "allow", "label": "Allow", "shape": "terminator" }
   ],
@@ -96,39 +100,41 @@ The figure below follows one call through the dispatcher, from the moment it arr
 
 ## Parts
 
-### Three folders — Three folders, and what decides which one a file goes in
+### Three folders — three folders, and what decides which one a file goes in
 
-- `events/` holds what the wiring calls, and there is one such file because there is one wired moment.
-- `checks/` holds the gate, which knows which subjects exist and how to reach a provider's parse of each.
-- `lib/` holds everything more than one of them needs: the rule bodies, the event shape, the timing recorder.
+```catalog layout=LIST
+`events/` | what the wiring calls, and there is one such file because there is one wired moment
+`checks/` | the gate, which knows which subjects exist and how to reach a provider's parse of each
+`lib/` | everything more than one of them needs: the rule bodies, the event shape, the timing recorder
+```
 
 **The axis is what the file is for, not what it is about**, which is why a rule about secrets and a rule about built output sit side by side.
 
-### Unsure allows — Unsure means allow, and every exit is zero
+### Unsure allows — unsure means allow, and every exit is zero
 
 Unreadable input, or a call naming no file, ends the run in silence with the call allowed. A refusal prints the documented decision and still exits zero, because a hook that fails loudly takes every other gate down with it. The dispatcher returns as soon as it finds no file path, and the whole run is wrapped so nothing reaches the harness as a failure.
 
-### Added text — It reads the text the call would add, not the file
+### Added text — it reads the text the call would add, not the file
 
 A refusal must be about what is being written. Judging the file on disk would refuse an edit to a file that already carries the fault and miss the fault arriving now. So a write's content or an edit's replacement is taken, whichever is present, and where there is no new text only the subject that reads the path alone can run.
 
-### Cloud discovery — The gate discovers the clouds and deliberately runs every one
+### Cloud discovery — the gate discovers the clouds and deliberately runs every one
 
 The gate names no cloud. It reads which folders the providers tree holds and imports each one's validator for each subject, so a third cloud joins by adding a folder rather than by editing an import list. **And it runs all of them, not the declared one.** A write-time gate cannot read a resolved estate — there may not be one yet — and running only the declared cloud's patterns would let an AWS region into a declaration whose cloud entry says Google, which is the mistake somebody makes while moving an estate between clouds and the moment the gate is most worth having. The cost is a handful of regular expressions against text already in memory.
 
-### Flat rule bodies — The rule bodies sit flat, because every one of them is cloud-free
+### Flat rule bodies — the rule bodies sit flat, because every one of them is cloud-free
 
 *An account id is never pinned* is true on every cloud, and so is *no secrets at any path*, and so is *built output is not source*. Those rule bodies name no cloud anywhere in them. The provider-string rule is the exception, and it varies in its **patterns** rather than in its judgement — *a provider string lives only inside a cloud entry* holds everywhere, while what a region looks like is that cloud's business — so it is written as a factory each cloud feeds its own spellings to. **There is no rules folder**, because the moment one exists, rules drift into it that only one cloud ever needed.
 
-### Identifier refusal — An identifier is refused where a key names it
+### Identifier refusal — an identifier is refused where a key names it
 
 A bare run of digits is not evidence of anything, and refusing every one of them would block timestamps, sizes and identifiers with nothing to do with an account. So the rule fires where a key spelled as an account identifier is assigned a value of the right shape, and leaves a loose number alone. The credential rule is shaped the same way: it needs a credential-named key assigned a quoted literal of real length, and ignores a reference to a variable. Both sides of the length boundary are stated as test cases, so nobody re-derives the threshold from a regular expression.
 
-### Estate manifest — One rule reads only the estate manifest
+### Estate manifest — one rule reads only the estate manifest
 
 A provider's own region string is legitimate in a small number of places — the region mapping on a cloud entry, and a profile's capacity keys. Searching for such strings everywhere would refuse documentation and test fixtures. So the rule fires only on a file named as an estate manifest, removes the sanctioned homes from the text first, and searches what is left.
 
-### Refusal cards — Every refusal names the card that explains it
+### Refusal cards — every refusal names the card that explains it
 
 A denial and its reasoning are one hop apart: the sentence every refusal carries points at the laws card this plugin ships, so a reader who has just been refused can reach the rule without searching for it. The sentence is written once and quoted by every rule, because copies of a law drift and a person then meets a different account of it depending on which file they happened to touch.
 

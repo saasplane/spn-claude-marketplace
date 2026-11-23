@@ -4,18 +4,16 @@
 {"id":"stack-skills","variant":"construct","title":"Skills","subtitle":"The commands an apps repository can be asked to run, one folder each.","lenses":["SERVER_DEV","WEB_DEV"],"status":"PLANNING","dependsOn":["skill-set"],"summary":"A skill belongs to this domain when it describes work on a piece of an apps repository — scaffolding a project, building a capability, running the suites, proving a package, or publishing the repository.","keywords":["skill","steps","mode","classification","stage","absence"]}
 -->
 <!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
-<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.15.0/sds-docs.css" integrity="sha384-R47poopLRnz65naDQiMbuRZgxiTZtsgOLsiaP10qjWo62gNyH4ezyJy2v/TyMG5J" crossorigin="anonymous">
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.16.0/docs-language.css" integrity="sha384-z6T3Ju/mWAnv24wb8AFXMHYMyXMd5U/g7N2hA3X1uCys4Ty2Yy7TcMXWe+SMPck0" crossorigin="anonymous">
 <div class="sds-page">
 
 <nav class="sds-rail" id="rail">
-  <a class="sds-home" href="../apps-overview.html">&larr; spn-apps</a>
   <div class="sds-rail-title">Skills</div>
 </nav>
 <div class="sds-wrap">
-
 <header class="sds-masthead">
   <!-- Rendered from the spn:doc block by `docs.ts page`. Never typed: a header that disagreed with its block is what this removes. -->
-  <div class="sds-eyebrow"><span class="sds-line1">SaaS Plane &nbsp;|&nbsp; Claude Marketplace &nbsp;|&nbsp; Skills</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Construct</span><span class="sds-separator">|</span><span class="sds-label">For:</span> <span class="sds-audience"><span class="sds-badge sds-lens">Backend developer</span><span class="sds-badge sds-lens">Web developer</span></span><span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-planning">&#x1F52E; PLANNING</span></span></span></div>
+  <div class="sds-eyebrow"><span class="sds-line1"><a href="../../concept-overview.html">SaaS Plane</a> &middot; <a href="../apps-overview.html">Claude Marketplace</a> &middot; Skills</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Construct</span><span class="sds-separator">|</span><span class="sds-label">For:</span> <span class="sds-audience"><span class="sds-badge sds-lens">Backend developer</span><span class="sds-badge sds-lens">Web developer</span></span><span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-planning">&#x1F52E; PLANNING</span></span></span></div>
   <h1>Skills</h1>
   <p class="sds-subtitle">The commands an apps repository can be asked to run, one folder each.</p>
   <p class="sds-standfirst">A skill belongs to this domain when it describes work on a piece of an apps repository — scaffolding a project, building a capability, running the suites, proving a package, or publishing the repository. Read this page before you add a new skill here, or when you want to know why one is missing. It explains why the longest skills read their steps from elsewhere, why a mode is an argument rather than a second folder, and which skill is deliberately absent.</p>
@@ -25,7 +23,31 @@
 <section id="s0">
   <div class="sds-section-head"><h2>Overview</h2></div>
   <p>Each of those is a different walk, and each lives in one folder under this plugin's <code>skills/</code>.</p>
-  <p>The thing to check first is that <strong>a skill here names no stack</strong>. The steps of a build differ in every language, so the skill states the order and reads the step files from the provider the node's own <code>sprepo.json</code> declares. The second thing is the absence: <strong>planning is not a skill of this domain.</strong> The book's skill set is closed and folded planning into a stack-agnostic skill, so shipping one here would add a value the standard does not have, and two skills would then compete for the same ask.</p>
+  <p>The thing to check first is that <strong>a skill here names no stack</strong>. The steps of a build differ in every language, so the skill states the order and reads the step files from the provider the node's own <code>sprepo.json</code> declares.</p>
+<figure class="dl-figure">
+<div class="dl-frame">
+<svg class="dl-svg" viewBox="0 0 928 80" role="img" aria-label="How a skill reaches a step without naming a stack">
+  <rect class="dl-tile" x="164" y="16" width="164" height="48" rx="10"/>
+  <text class="dl-name" x="176" y="37">A skill</text>
+  <path class="dl-wire" d="M328 40 L384 40"/>
+  <rect class="dl-tile" x="384" y="16" width="164" height="48" rx="10"/>
+  <text class="dl-name" x="396" y="37">The provider</text>
+  <text class="dl-detail" x="396" y="52">declared in sprepo.json</text>
+  <path class="dl-wire" d="M548 40 L604 40"/>
+  <rect class="dl-tile" x="604" y="16" width="164" height="48" rx="10"/>
+  <text class="dl-name" x="616" y="37">The step files</text>
+</svg>
+</div>
+<figcaption>Look at the middle box: the provider is the only place the stack is named.</figcaption>
+</figure>
+  <!-- dg:source
+{ "kind": "chain",
+  "title": "How a skill reaches a step without naming a stack",
+  "caption": "Look at the middle box: the provider is the only place the stack is named.",
+  "boxes": [{ "id": "a", "label": "A skill" }, { "id": "b", "label": "The provider", "note": "declared in sprepo.json" },
+            { "id": "c", "label": "The step files" }] }
+  -->
+  <p>The second thing is the absence: <strong>planning is not a skill of this domain.</strong> The book's skill set is closed and folded planning into a stack-agnostic skill, so shipping one here would add a value the standard does not have, and two skills would then compete for the same ask.</p>
   <p>This construct realizes the book's <code>01-devex/02-agent/02-skills</code>.</p>
 </section>
 
@@ -155,4 +177,4 @@
 </div>
 </div>
 
-<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.15.0/sds-docs.js" integrity="sha384-XYna7dQ9hUAzsp8poWNLetdO4Oyfh/cIKwuuh6sduxMcNDmnLGJ3zcw6DaG1IN9+" crossorigin="anonymous"></script>
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.16.0/docs-page.js" integrity="sha384-yDkvlVaxZfr5SBqgjOk8GZPsDngeCYQxHHaY1aPfty/M6hFe1DXJz++VjJ+i+082" crossorigin="anonymous"></script>

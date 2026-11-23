@@ -38,7 +38,7 @@ This construct realizes the book's `01-devex/02-agent/04-plugins`.
 
 ## Model
 
-Three files carry a plugin from an author's edit to the session that reads it, and confusing any two of them is where the afternoon goes. Read them left to right: what names a plugin, what a plugin claims about itself, where its bytes end up, and who reads them there.
+Three files carry a plugin from an author's edit to the session that reads it, and confusing any two of them is where the afternoon goes. Read them left to right: `marketplace.json` names a plugin, `plugin.json` is what a plugin claims about itself, the plugin root is where its bytes end up, and a session is who reads them there.
 
 ```dg
 { "kind": "map",
@@ -87,10 +87,10 @@ Installing reads an entry, copies that plugin's folder, and stores it where a se
 
 A plugin folder holds any mix of the constructs this domain names, and owes none of them. Each construct is named by its own page, and none of them is described here. The folders to open are these:
 
-| Plugin | Carries |
-| --- | --- |
-| `spn-devex` | every construct except `providers/`, which is why it is the folder to open to see what a full plugin looks like |
-| `spn-apps` and `spn-infra` | a `providers/` folder each, and no `agents/` |
+```catalog layout=LIST name=Plugin
+`spn-devex` | every construct except `providers/`, which is why it is the folder to open to see what a full plugin looks like
+`spn-apps` and `spn-infra` | a `providers/` folder each, and no `agents/`
+```
 
 ## Boundary
 

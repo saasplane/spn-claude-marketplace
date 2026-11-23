@@ -37,7 +37,7 @@ This construct realizes the book's `01-devex/02-agent/04-plugins`.
 
 ## Model
 
-One moment, narrowed to two tool names, behind one command — and what that command runs is decided per call from the repository's own declaration.
+One moment, narrowed to two tool names, behind one command — and what that command runs is decided per call from the repository's own declaration. A write about to run is matched by the one entry, the entry runs the dispatcher, and the dispatcher returns a verdict: a refusal, advice, or silence.
 
 ```dg
 { "kind": "map",

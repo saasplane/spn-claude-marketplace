@@ -36,7 +36,7 @@ The thing to check first is whether any gate names an instance. A gate that spel
 
 ## Model
 
-**A provider mirrors the plugin's own folder names.** A plugin holds `skills/` and `scripts/`; a provider contributes to both under the same two names. That is the whole of the shape, and it is why plugging one in needs no explanation: the folders a contributor must fill are the ones they have already read.
+**A provider mirrors the plugin's own folder names.** A plugin holds `skills/` and `scripts/`; a provider contributes to both under the same two names. That is the whole of the shape, and it is why plugging one in needs no explanation: the folders a contributor must fill are the ones they have already read. Read the path left to right: `sprepo.json` is the repository's own claim, the gate reads it and dispatches into a provider folder, and the answer is the steps a skill loads or the verdict a check returns.
 
 ```dg
 { "kind": "map",

@@ -22,7 +22,17 @@ A skill belongs to this domain when it describes work on a piece of an apps repo
 
 Each of those is a different walk, and each lives in one folder under this plugin's `skills/`.
 
-The thing to check first is that **a skill here names no stack**. The steps of a build differ in every language, so the skill states the order and reads the step files from the provider the node's own `sprepo.json` declares. The second thing is the absence: **planning is not a skill of this domain.** The book's skill set is closed and folded planning into a stack-agnostic skill, so shipping one here would add a value the standard does not have, and two skills would then compete for the same ask.
+The thing to check first is that **a skill here names no stack**. The steps of a build differ in every language, so the skill states the order and reads the step files from the provider the node's own `sprepo.json` declares.
+
+```dg
+{ "kind": "chain",
+  "title": "How a skill reaches a step without naming a stack",
+  "caption": "Look at the middle box: the provider is the only place the stack is named.",
+  "boxes": [{ "id": "a", "label": "A skill" }, { "id": "b", "label": "The provider", "note": "declared in sprepo.json" },
+            { "id": "c", "label": "The step files" }] }
+```
+
+The second thing is the absence: **planning is not a skill of this domain.** The book's skill set is closed and folded planning into a stack-agnostic skill, so shipping one here would add a value the standard does not have, and two skills would then compete for the same ask.
 
 This construct realizes the book's `01-devex/02-agent/02-skills`.
 
