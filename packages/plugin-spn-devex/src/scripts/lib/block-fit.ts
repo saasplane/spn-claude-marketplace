@@ -207,12 +207,33 @@ function tileFindings(text: string): Finding[] {
   return out;
 }
 
+/** The shared script's `TREE_LINE` and `isTree` (src/styles/sds-docs.js), copied: a block of lines that opens on a folder and whose every line is a path with a branch and an optional note. */
+const TREE_LINE = /^([\s\u2502\u251c\u2514\u252c\u2500|`+\\-]*?)([^\s\u2502\u251c\u2514\u252c\u2500]\S*)(?:(\s{2,})(\S.*))?$/;
+export function isTree(code: string): boolean {
+  const lines = code.replace(/\n+$/, "").split("\n");
+  if (!lines.length || !/\/$/.test(lines[0].trim())) return false;
+  return lines.every((line) => !line.trim() || TREE_LINE.test(line));
+}
+export const BARE_TREE = "this block is a tree: mark it `<pre data-lang=\"tree\">` so the script colours it (rule 238)";
+
+/** A `<pre>` with no `data-lang` whose text reads as a tree: the shared script colours only a block it is told is one. */
+function treeFindings(text: string): Finding[] {
+  const t = text.replace(/<!--[\s\S]*?-->/g, " ").replace(/<(script|style|template)\b[\s\S]*?<\/\1>/gi, " ");
+  const out: Finding[] = [];
+  for (const pre of t.matchAll(/<pre\b([^>]*)>([\s\S]*?)<\/pre>/gi)) {
+    if (/\bdata-lang=/.test(pre[1])) continue;
+    if (pre[2].includes("<")) continue; // already marked up: the script leaves it
+    if (isTree(entity(pre[2]))) out.push(["SOFT", BARE_TREE]);
+  }
+  return out;
+}
+
 export type FitOptions = { kind: FitKind };
 
 /** The findings for one page's content. */
 export function blockFit(text: string, isHtml: boolean, kind: FitKind): Finding[] {
   const units = isHtml ? unitsOfHtml(text) : unitsOfMarkdown(text);
-  const out: Finding[] = isHtml ? tileFindings(text) : [];
+  const out: Finding[] = isHtml ? [...tileFindings(text), ...treeFindings(text)] : [];
   const bound = BOUNDS[kind];
   for (const unit of units) {
     if (unit.kind === "callout") {

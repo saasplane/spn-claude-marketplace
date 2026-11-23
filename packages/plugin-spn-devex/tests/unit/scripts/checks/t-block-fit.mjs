@@ -105,5 +105,12 @@ ok("[RULE.DEVEX.WORKSPACE.530] red: the doc-check hook names the paragraph that 
 const clean = run("# Thing\n\n- a database\n- a cache\n- a queue\n- object storage\n");
 ok("[RULE.DEVEX.WORKSPACE.530] green: the known-good twin, as a list, is silent on that finding", !clean.includes("parallel items"), clean.slice(0, 300));
 
+console.log("=== a tree on a hand-written page (RULE.DEVEX.WORKSPACE.238)");
+const TREE = "notes/\n  N018/\n    preview.html   the arc's preview\n    samples/\n      index.html";
+const BARE = "this block is a tree: mark it `<pre data-lang=\"tree\">` so the script colours it (rule 238)";
+ok("[RULE.DEVEX.WORKSPACE.238] red: a bare pre that reads as a tree is a soft finding with the exact message", blockFit(html(`<pre>${TREE}</pre>`), true, "preview").some(([sev, m]) => sev === "SOFT" && m === BARE));
+ok("[RULE.DEVEX.WORKSPACE.238] green: the same tree marked data-lang=\"tree\" is silent", sayHtml(`<pre data-lang="tree">${TREE}</pre>`).length === 0);
+ok("[RULE.DEVEX.WORKSPACE.238] green: a pre of code is no tree", sayHtml(`<pre>const a = 1;\nconst b = 2;</pre>`).length === 0);
+
 console.log(failed ? `\n  ${failed} of ${total} FAILED — t-block-fit` : `\n  all ${total} passed — t-block-fit`);
 process.exit(failed ? 1 : 0);
