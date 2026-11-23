@@ -26,7 +26,7 @@ description: Decide what a node IS, and design a requirement inside that shape -
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "A page is written in two passes",
-      "seen": "3cff544c"
+      "seen": "5812f898"
     }
   ]
 }
@@ -217,13 +217,16 @@ The full text of all three is in [`refs/devex/workspace/workstream.md`](../../re
   5. **Open asks stay few,** at most three.
   6. **Each new term is defined once,** where it first appears.
   7. **The preview follows their spine,** the order they told the idea in.
-- **A preview reads the map row of every kind of work it draws, and ends each block with a Reads line.** A public page's proposal states the site's hierarchy and the use case before its address.
+- **A preview reads the map row of every kind of work it draws.** A public page's proposal states the site's hierarchy and the use case before its address.
 - **Name the source of every name and value** (`RULE.DEVEX.FUNCTION.090` · MUST · skill:spn-devex/ideate). Only a value no source holds is marked new.
 - **Propose a field only where a report the developer asked for reads it** (`RULE.DEVEX.FUNCTION.091` · MUST · skill:spn-devex/ideate).
 - **Give each idea one name, in the construct that owns it** (`RULE.DEVEX.FUNCTION.092` · MUST · skill:spn-devex/ideate).
 - **Migrate only live records** (`RULE.DEVEX.FUNCTION.093` · MUST · skill:spn-devex/ideate).
 - **Take five checks before the options are written:** the premise (`RULE.DEVEX.FUNCTION.099` · MUST · skill:spn-devex/ideate), which side changes when a participant joins (`RULE.DEVEX.FUNCTION.100` · MUST · skill:spn-devex/ideate), split trust (`RULE.DEVEX.FUNCTION.101` · MUST · skill:spn-devex/ideate), a frame that moves where the thing lives (`RULE.DEVEX.FUNCTION.102` · MUST · skill:spn-devex/ideate), and how the laptop gets the fact (`RULE.DEVEX.FUNCTION.103` · MUST · skill:spn-devex/ideate).
 - **List every part beside the developer's words it serves, and cut what serves none** (`RULE.DEVEX.FUNCTION.096` · MUST · skill:spn-devex/ideate).
+- **An approach page or a preview follows the blocks ref.** Its blocks and figures follow [`refs/devex/workspace/docs/blocks.md`](../../refs/devex/workspace/docs/blocks.md), read before the first block is written. A passage of three or more steps, relations, states or layers gains a matching figure beside it (`RULE.DEVEX.WORKSPACE.548` · GUIDE), a command a page shows is one the command line accepts (`RULE.DEVEX.WORKSPACE.557` · MUST · check:doc-check), and the doc-check hook's hints on what was written are acted on before the page is finished. A page that already exists gets its block pass file by file: `spn-devex docs blocks units <file>`, then the `spn-block-rewriter` agent (`RULE.DEVEX.WORKSPACE.558` · GUIDE).
+- **Write a page by the runbook:** a page the developer will open is written by [`refs/devex/workspace/docs/writing-a-page.md`](../../refs/devex/workspace/docs/writing-a-page.md): pick the template, start it with `docs page write` or `docs page new`, fill every slot and section, check, look, hand on (RULE.DEVEX.WORKSPACE.560).
+- **A go on an arc that is not decided, or whose sheet is not whole, is recorded with `workstream decision write`.** The patches, the sheet and the preview come first, then the arc is decided (`workstream arc edit --status DECIDED`), then `execute` runs; `go write` refuses an arc that is PROPOSED.
 - **Place the proposal where it is read** (`RULE.DEVEX.FUNCTION.097` · MUST · skill:spn-devex/ideate). The chat holds what was asked for, the approach page one line a part, the preview what is judged.
 - **A proposal shown in chat is laid out by a preview's layers, and its flow shows its steps** (`RULE.DEVEX.WORKSPACE.504` · MUST · skill:spn-devex/ideate). Answer in the order the preview reads: *Shape* first, then *Server* by module, *Web*, *Surface*, *Plugins* and *Estate* for the layers that change. Each block names its file and shows today's code beside the proposed. Draw a flow as a figure with its steps, never as prose alone, so the chat reads as the preview will.
 - **A change agreed on an arc reaches its preview before any handover** (`RULE.DEVEX.WORKSPACE.505` · MUST · skill:spn-devex/ideate). When a change is settled in discussion, apply it to the arc's preview first. Write the handover, or ask for a new window, only after the preview shows what the developer agreed; a saved note is not enough.
@@ -250,6 +253,7 @@ When the arc changes code, the idea is worked in the code itself, one connected 
 
 - **Record each find the developer shares, and propose its fix.** A screenshot and a few words become one sample page under the ideate arc's samples index: the screenshot as it is, the proposed look drawn beside it, the code it changes and its case line. The next find adds a page, and nothing already reviewed is rewritten.
 - **Several drawn pages are samples under one index** (`RULE.DEVEX.WORKSPACE.520` · GUIDE). The index is `notes/<arc>/samples/index.html`, written by `spn-devex docs index write` from the pages on disk and never typed. The arc's preview links it once, says what each group holds and keeps the decisions. An arc of one page, or with no drawn page, keeps everything on its preview.
+- **Iterating on samples uses the quick loop** (`RULE.DEVEX.WORKSPACE.559` · MUST · skill:spn-devex/execute): run the writers and checks from the arc's branch source, `node packages/plugin-spn-devex/src/scripts/cli.ts …`, try a stylesheet change with `docs styles preview <samples folder>`, and leave the build, `docs styles cut <version> --replace` and the tests for the end of the iteration.
 - **Managing the samples is your job, never the developer's.** Write, name, group and retire the pages: the index groups them by what each is for (drawn on an app, read from a reference, how the agent works), and a page a decision has overtaken leaves it. A page is drawn with every change already decided on the arcs, never as today's code stands. Where a problem has options that each need a whole page, each option is a page; where they compare best side by side, one page holds them all.
 - **Group the finds by what you would review and release together, then ask once.** When the grouping is clear, propose the arcs on the ideate preview with `--proposes`. A handover written before then names the finds and the arcs they might become, and never tells the next window to open an arc for each find.
 
@@ -301,11 +305,14 @@ When the arc changes code, the idea is worked in the code itself, one connected 
 - **Each arc state says what a new piece of work does, so no fix lands outside an arc** (`RULE.DEVEX.WORKSPACE.516` · MUST · skill:spn-devex/ideate)
 - **While the shape is discussed, a find stays on the ideate arc, and no build arc opens until the ideate arc proposes it** (`RULE.DEVEX.WORKSPACE.519` · MUST · skill:spn-devex/ideate)
 - **A page of every kind is written in two passes, the text first and the blocks second** (`RULE.DEVEX.WORKSPACE.533` · MUST · skill:spn-devex/ideate)
-- **The preview holds a bar and a frame, and nothing else** (`RULE.DEVEX.WORKSPACE.535` · MUST · skill:spn-devex/ideate)
-- **The copy names its own mode switch and holds its notes, and it is just the page when opened alone** (`RULE.DEVEX.WORKSPACE.536` · MUST · skill:spn-devex/ideate)
-- **The bar's message, the meta and the note marker change only with a new stylesheet version** (`RULE.DEVEX.WORKSPACE.537` · MUST · skill:spn-devex/ideate)
+- **The page holds a bar and the page's markup, and nothing else** (`RULE.DEVEX.WORKSPACE.535` · MUST · skill:spn-devex/ideate)
+- **The page names the design system and the app's stylesheet in two metas, and the shared script builds the frame's document** (`RULE.DEVEX.WORKSPACE.536` · MUST · skill:spn-devex/ideate)
+- **The frame's document, the metas and the note marker change only with a new stylesheet version** (`RULE.DEVEX.WORKSPACE.537` · MUST · skill:spn-devex/ideate)
 - **A decision you give lives on the arc it moves, written in the reply that agrees it** (`RULE.DEVEX.WORKSPACE.544` · MUST · skill:spn-devex/ideate)
 - **A sample follows what it depends on: an edit checks it against the current standard for its kind first, and a standard that lands under it puts a row on the arc to re-cut it** (`RULE.DEVEX.WORKSPACE.546` · MUST · skill:spn-devex/ideate)
+- **A page whose sidebar lists other pages is the index page, built from `templates/docs/pages/index-template.html`, and it never has a sidebar of its own** (`RULE.DEVEX.WORKSPACE.550` · MUST · skill:spn-devex/ideate)
+- **A design-language construct page holds its spec in a fold** (`RULE.DEVEX.WORKSPACE.551` · MUST · skill:spn-devex/ideate)
+- **A docs page has four regions, and each one behaves the same on every page** (`RULE.DEVEX.WORKSPACE.553` · MUST · skill:spn-devex/ideate)
 - **Registering is optional, and the chain is complete without it.** (`RULE.LAUNCHPAD.CONTROL_PLANE.001` · MUST · skill:spn-devex/ideate)
 - **Launchpad is built at the partner stage, on the same backbone and with the same stack every adopter gets. It consumes the published packages rather than reading around them.** (`RULE.LAUNCHPAD.CONTROL_PLANE.002` · MUST · skill:spn-devex/ideate)
 - **Launchpad is a stage, not a sixth domain.** (`RULE.LAUNCHPAD.CONTROL_PLANE.003` · MUST · skill:spn-devex/ideate)

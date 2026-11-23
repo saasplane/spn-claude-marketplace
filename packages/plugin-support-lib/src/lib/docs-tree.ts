@@ -22,6 +22,7 @@
 //
 // Paths are compared with forward slashes.
 
+import { existsSync, readdirSync } from "node:fs";
 import { join, sep } from "node:path";
 
 /** The workspace's working-state folder, at the workspace root. */
@@ -63,8 +64,18 @@ export type Pocket = keyof typeof POCKET;
  * The artifacts pocket's folder set, which is fixed (05-artifacts.md § What the pocket holds). The
  * index of artifacts sits beside the three, directly in the pocket.
  */
-export const ARTIFACT = { docs: "docs", guides: "guides", reports: "reports" } as const;
+export const ARTIFACT = { docs: "docs", guides: "guides", reports: "reports", surface: "surface" } as const;
 export const ARTIFACT_FOLDERS: readonly string[] = Object.values(ARTIFACT);
+
+/**
+ * The two halves of the pocket (05-artifacts.md § What the pocket holds, rule 221): `public/` holds `docs/`, `guides/` and `surface/`, and
+ * `private/` holds `reports/`. A repository that still holds the earlier layout keeps `docs/`, `guides/` and `reports/` directly in the
+ * pocket until the rewrite pass moves its pages.
+ */
+export const VISIBILITY = { public: "public", private: "private" } as const;
+export type Visibility = keyof typeof VISIBILITY;
+/** Which half of the pocket each folder belongs to. */
+export const VISIBILITY_OF: Record<string, Visibility> = { docs: "public", guides: "public", surface: "public", reports: "private" };
 /** The folder of a domain that holds its construct pages, beside the domain's overviews. */
 export const CONSTRUCT_PAGES = "constructs";
 
@@ -104,15 +115,36 @@ export function registersDir(docs: string): string { return pocketDir(docs, "reg
 /** The decision log, `<docs>/registers/decisions.md`. */
 export function decisionsRegister(docs: string): string { return join(registersDir(docs), DECISIONS); }
 export function artifactsDir(docs: string): string { return pocketDir(docs, "artifacts"); }
+/**
+ * Which layout a docs tree's pocket has. It is the earlier one (`today`) only where the pocket holds `docs/`, `guides/`, `reports/` or an
+ * index directly in it and neither `public/` nor `private/`; a pocket that does not exist yet, or holds one of the two, is `split`.
+ */
+export function artifactsLayout(docs: string): "split" | "today" {
+  const pocket = artifactsDir(docs);
+  if (!existsSync(pocket)) return "split";
+  if (existsSync(join(pocket, VISIBILITY.public)) || existsSync(join(pocket, VISIBILITY.private))) return "split";
+  return readdirSync(pocket).some((name) => name !== FACE && !name.startsWith(".")) ? "today" : "split";
+}
+/** The folder one artifact folder sits in: `<pocket>/public/docs` in the split layout, `<pocket>/docs` in the earlier one. */
+export function artifactFolderDir(docs: string, folder: string): string {
+  const inside = artifactsLayout(docs) === "split" ? [VISIBILITY_OF[folder] ?? VISIBILITY.public, folder] : [folder];
+  return join(artifactsDir(docs), ...inside);
+}
 /** The pocket's `docs` folder: the hub, and one folder for each domain or subdomain. */
-export function artifactDocsDir(docs: string): string { return join(artifactsDir(docs), ARTIFACT.docs); }
+export function artifactDocsDir(docs: string): string { return artifactFolderDir(docs, ARTIFACT.docs); }
 /** Where a domain's construct pages sit, from the domain's folder in the pocket. */
 export function domainConstructsDir(domainFolder: string): string { return join(domainFolder, CONSTRUCT_PAGES); }
-export function reportsDir(docs: string): string { return join(artifactsDir(docs), ARTIFACT.reports); }
+export function reportsDir(docs: string): string { return artifactFolderDir(docs, ARTIFACT.reports); }
 /** Where guide pages sit: the pocket folder that holds each guide produced as a page. */
-export function guidePagesDir(docs: string): string { return join(artifactsDir(docs), ARTIFACT.guides); }
-/** The index of artifacts of a docs tree. */
-export function artifactIndex(docs: string): string { return join(artifactsDir(docs), ARTIFACT_INDEX); }
+export function guidePagesDir(docs: string): string { return artifactFolderDir(docs, ARTIFACT.guides); }
+/** Where a design language's samples homes sit: one folder for each language. */
+export function surfacePagesDir(docs: string): string { return artifactFolderDir(docs, ARTIFACT.surface); }
+/** The index of artifacts of a docs tree: the pocket's own in the earlier layout, and the public one in the split layout. */
+export function artifactIndex(docs: string): string {
+  return artifactsLayout(docs) === "split" ? join(artifactsDir(docs), VISIBILITY.public, ARTIFACT_INDEX) : join(artifactsDir(docs), ARTIFACT_INDEX);
+}
+/** The index of the private half of the pocket, which holds the reports. */
+export function privateIndex(docs: string): string { return join(artifactsDir(docs), VISIBILITY.private, ARTIFACT_INDEX); }
 /** The hub page of a docs tree. */
 export function hubPage(docs: string): string { return join(artifactDocsDir(docs), HUB); }
 /**
@@ -123,7 +155,18 @@ export function hubPage(docs: string): string { return join(artifactDocsDir(docs
 export function artifactFolderOf(path: string): string | null {
   const parts = slashes(path).split("/");
   for (let at = 0; at + 3 < parts.length; at += 1)
-    if (parts[at] === DOCS && parts[at + 1] === POCKET.artifacts) return parts[at + 2] || null;
+    if (parts[at] === DOCS && parts[at + 1] === POCKET.artifacts) {
+      const hidden = parts[at + 2] in VISIBILITY ? 1 : 0;
+      return at + 3 + hidden < parts.length ? parts[at + 2 + hidden] || null : null;
+    }
+  return null;
+}
+
+/** Which half of the pocket a path sits in, `public` or `private`, or null where it sits in the earlier layout or outside the pocket. */
+export function visibilityOf(path: string): Visibility | null {
+  const parts = slashes(path).split("/");
+  for (let at = 0; at + 3 < parts.length; at += 1)
+    if (parts[at] === DOCS && parts[at + 1] === POCKET.artifacts) return parts[at + 2] in VISIBILITY ? (parts[at + 2] as Visibility) : null;
   return null;
 }
 
@@ -134,7 +177,10 @@ export function artifactFolderOf(path: string): string | null {
 export function artifactDocsPathOf(path: string): string[] | null {
   const parts = slashes(path).split("/");
   for (let at = 0; at + 3 < parts.length; at += 1)
-    if (parts[at] === DOCS && parts[at + 1] === POCKET.artifacts && parts[at + 2] === ARTIFACT.docs) return parts.slice(at + 3);
+    if (parts[at] === DOCS && parts[at + 1] === POCKET.artifacts) {
+      const hidden = parts[at + 2] in VISIBILITY ? 1 : 0;
+      if (parts[at + 2 + hidden] === ARTIFACT.docs) return parts.slice(at + 3 + hidden);
+    }
   return null;
 }
 
@@ -184,7 +230,7 @@ export function isSeatFile(path: string): boolean {
 export function domainDirOf(seatFolder: string): string | null {
   const split = splitAtSeat(`${slashes(seatFolder).replace(/\/+$/, "")}/`, "constructs");
   if (!split) return null;
-  return [split.docs, POCKET.artifacts, ARTIFACT.docs, ...split.rel.split("/").filter(Boolean)].join("/");
+  return [slashes(artifactDocsDir(split.docs)), ...split.rel.split("/").filter(Boolean)].join("/");
 }
 
 /**
@@ -215,7 +261,8 @@ export function seatOf(producedPage: string): string {
   const norm = slashes(producedPage);
   const inside = artifactDocsPathOf(norm);
   if (inside === null || !isProducedPage(norm)) return norm;
-  const docs = norm.slice(0, norm.length - [POCKET.artifacts, ARTIFACT.docs, ...inside].join("/").length - 1);
+  const visible = visibilityOf(norm);
+  const docs = norm.slice(0, norm.length - [POCKET.artifacts, ...(visible ? [visible] : []), ARTIFACT.docs, ...inside].join("/").length - 1);
   const name = inside.at(-1)!.slice(0, -CONSTRUCT_PAGE_SUFFIX.length);
   return [docs, SEAT.constructs, ...inside.slice(0, -2), `${name}.md`].join("/");
 }
@@ -239,7 +286,7 @@ export function pagePlaceOf(path: string): string | null {
   const norm = slashes(path);
   const folder = artifactFolderOf(norm);
   if (folder === null) return null;
-  const pocketDocs = [DOCS, POCKET.artifacts, ARTIFACT.docs].join("/");
+  const pocketDocs = [DOCS, POCKET.artifacts, ...(visibilityOf(norm) ? [VISIBILITY.public] : []), ARTIFACT.docs].join("/");
   const name = norm.slice(norm.lastIndexOf("/") + 1);
   if (name.endsWith(OVERVIEW_PAGE_SUFFIX)) {
     if (isOverview(norm)) return null;
@@ -248,7 +295,8 @@ export function pagePlaceOf(path: string): string | null {
   if (!name.endsWith(CONSTRUCT_PAGE_SUFFIX) || isProducedPage(norm)) return null;
   // The folders between the pocket's folder and the page name the domain in two places: directly in the
   // pocket under a folder named `constructs`, and beside a domain's overviews.
-  const below = norm.slice(norm.lastIndexOf(segment(`${POCKET.artifacts}/${folder}`))).split("/").slice(3, -1);
+  const visible = visibilityOf(norm);
+  const below = norm.slice(norm.lastIndexOf(segment(`${POCKET.artifacts}/${visible ? `${visible}/` : ""}${folder}`))).split("/").slice(visible ? 4 : 3, -1);
   const named = below.length > 0 && !below.includes(CONSTRUCT_PAGES) && (folder === CONSTRUCT_PAGES || folder === ARTIFACT.docs);
   return `${pocketDocs}/${named ? below.join("/") : "<domain>"}/${CONSTRUCT_PAGES}/${name}`;
 }

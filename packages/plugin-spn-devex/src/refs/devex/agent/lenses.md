@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/03-lenses/01-lenses.md",
-      "seen": "7d56eae9"
+      "seen": "280acea7"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
@@ -112,7 +112,7 @@
 | how it is built and proved | `ARCHITECT` · `SERVER_DEV` · `QA` · `INFRA` · `TRUST` | the stack's `implement` skill, and `spn-devex:test` |
 | an estate: a layer, a region, a release of infrastructure | `INFRA` · `TRUST` · `ARCHITECT` | `spn-infra:implement` |
 | what a person reads or sees | `VOICE` · `UX` · `UI`, `MARKETING` on a marketing page, and `ARCHITECT` when a boundary moves | `spn-surface:design` for a page or a screen |
-| the book's prose, a document | `VOICE`, and the view that owns the chapter | the `spn-prose-rewriter` agent, for a batch of flagged paragraphs |
+| the book's prose, a document | `VOICE`, and the view that owns the chapter | the `spn-prose-rewriter` agent, for a batch of flagged paragraphs, and the `spn-block-rewriter` agent, for the form of a section's blocks (`spn-devex docs blocks units <file>`) |
 
 **The area a request touches brings its views and its skill before the agent answers it, in chat as well as on a card** (`RULE.DEVEX.AGENT.177` · MUST · check:prompt). The area is read from what the request names and the paths it touches: the book's prose, a stack's code, a site page, an estate, a release, a direction. The prompt check finds the area's row in the table above and names its views and its skill in the turn's context, so the agent says which views it brought, and wears or convenes them, before it settles a shape. A view is never something the developer has to ask for, and a reply that settles the design without the views its area names is sent back by the turn-end check.
 

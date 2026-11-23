@@ -14,7 +14,7 @@ import { basename, dirname, join, relative, resolve } from "node:path";
 import { type Action, REQUIRED, UsageFault, VALUE, readWords, scopeOf } from "../../../../../plugin-support-lib/src/lib/command.ts";
 import { GUIDE_PAGE_SUFFIX, docsRootOf, guidePagesDir, slashes } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { PAGE_SCRIPT } from "../../../../../plugin-support-lib/src/lib/page-styles.ts";
-import { hrefForPage } from "../../lib/render.ts";
+import { hrefForPage, nameWords } from "../../lib/render.ts";
 import { LENS_LABEL, hubAbove, locationOf, resolveWorkspace } from "./_lib.ts";
 import { Refusal, attribute, escaped, newestCut, pageTemplate,
   place, refuseSlots, say, swap, templatesDir, withHead, type Note } from "./_pages.ts";
@@ -401,12 +401,15 @@ function sectionsOf(guide: Guide, link: Link): { sections: string[]; tally: Tall
 function guidePage(template: string, guide: Guide, sections: string[], where: { organisation: string; location: string; source: string; hub: { href: string; label: string } | null }): string {
   const { block } = guide;
   const title = String(block.title);
+  // The short name is the block's `name`, or its `title` where it has none; the heading is the title (RULE.DEVEX.WORKSPACE.517).
+  const name = typeof block.name === "string" && block.name.trim() ? block.name.trim() : title;
+  if (nameWords(name) > 3) throw new Refusal(`the guide's \`name\`, "${name}", is ${nameWords(name)} words, and a short name is at most three (RULE.DEVEX.WORKSPACE.517)`);
   const lenses = Array.isArray(block.lenses) ? block.lenses.map(String) : [];
   // A guide page has no status, so the block of the page has no `status` field.
-  const pageBlock = { id: block.id ?? slug(title), variant: "guide", title,
+  const pageBlock = { id: block.id ?? slug(title), variant: "guide", title, ...(name !== title ? { name } : {}),
     ...(block.subtitle ? { subtitle: block.subtitle } : {}), lenses, summary: block.summary ?? "",
     ...(block.keywords ? { keywords: block.keywords } : {}), source: where.source };
-  const page = withHead(template, { tab: title, block: pageBlock, version: newestCut(), script: PAGE_SCRIPT,
+  const page = withHead(template, { tab: name, block: pageBlock, version: newestCut(), script: PAGE_SCRIPT,
     produced: `Produced by \`docs guide\` from ${where.source}. Never edit this page: change the guide, and produce the page again.` });
 
   const from = page.indexOf("<section");
@@ -414,14 +417,15 @@ function guidePage(template: string, guide: Guide, sections: string[], where: { 
   const to = page.lastIndexOf(closing);
   if (from < 0 || to < from) throw new Refusal("the template has no section, so the page cannot be produced from it");
   let shell = `${page.slice(0, from)}${HELD}${page.slice(to + closing.length)}`;
-  // THE WAY BACK IS THE HUB, one step up the chain, and the template's `the index` is replaced. A
-  // repository with no hub gives the page no way back, because a link must open a page that is there.
-  shell = swap(shell, /[ \t]*<a class="sds-home"[^>]*>[^<]*<\/a>\n/,
-    where.hub ? `  <a class="sds-home" href="${attribute(where.hub.href)}">&larr; ${escaped(where.hub.label)}</a>\n` : "", "way back in its rail");
-  shell = swap(shell, /\{\{PAGE NAME[^}]*\}\}/, escaped(title), "slot for the name in the rail");
+  // THE WAY BACK IS THE HUB, one step up the chain, and it is the eyebrow's second level, the location, which links it. A
+  // repository with no hub gives the page no way back, because a link must open a page that is there: the location stays plain.
+  shell = swap(shell, /<a href="\{\{UP-HREF\}\}">(\{\{LOCATION\}\})<\/a>/,
+    where.hub ? `<a href="${attribute(where.hub.href)}">{{LOCATION}}</a>` : "{{LOCATION}}", "the location's link in the eyebrow");
   shell = swap(shell, /\{\{WORKSPACE\}\}/, escaped(where.organisation), "slot `{{WORKSPACE}}`");
   shell = swap(shell, /\{\{LOCATION\}\}/, escaped(where.location), "slot `{{LOCATION}}`");
-  shell = swap(shell, /\{\{NAME\}\}/, escaped(title), "slot `{{NAME}}`").replace(/\{\{NAME\}\}/g, () => escaped(title));
+  // {{NAME}} stands in the outline's title and the eyebrow; {{TITLE}} in the heading alone.
+  shell = swap(shell, /\{\{NAME\}\}/, escaped(name), "slot `{{NAME}}`").replace(/\{\{NAME\}\}/g, () => escaped(name));
+  shell = swap(shell, /\{\{TITLE\}\}/, escaped(title), "slot `{{TITLE}}`").replace(/\{\{TITLE\}\}/g, () => escaped(title));
   shell = swap(shell, /(<span class="sds-audience">)(?:<span class="sds-badge sds-lens">[^<]*<\/span>)+/,
     `<span class="sds-audience">${lenses.map((lens) => `<span class="sds-badge sds-lens">${escaped(LENS_LABEL[lens] ?? lens)}</span>`).join("")}`,
     "audience in its header");

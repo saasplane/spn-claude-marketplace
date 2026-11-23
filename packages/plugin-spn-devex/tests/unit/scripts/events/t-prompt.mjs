@@ -396,7 +396,7 @@ console.log("\n=== prompt — the mid-run reminder, while a go of the window has
   same("[MKT.HOOKS.507] a prompt touching a site page names UX, UI, VOICE, MARKETING and spn-surface:design",
     site.find((one) => one.area === "a site page"), { area: "a site page", views: ["UX", "UI", "VOICE", "MARKETING"], skill: "spn-surface:design" });
   same("[MKT.HOOKS.507] one touching docs names VOICE and the prose rewriter",
-    areasOf("tidy the guide's wording").find((one) => one.area === "docs"), { area: "docs", views: ["VOICE"], skill: "spn-devex:spn-prose-rewriter" });
+    areasOf("tidy the guide's wording").find((one) => one.area === "docs"), { area: "docs", views: ["VOICE"], skill: "spn-devex:spn-prose-rewriter or spn-devex:spn-block-rewriter" });
   same("[MKT.HOOKS.507] a prompt that touches no area names none", areasOf("What time is it?"), []);
   same("[MKT.HOOKS.507] the reminder names each view, the skill and the rule",
     /UX, UI, VOICE, MARKETING and spn-surface:design/.test(areaReminder(site)) && /RULE\.DEVEX\.AGENT\.177/.test(areaReminder(site)), true);

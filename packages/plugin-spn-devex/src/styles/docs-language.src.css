@@ -5,18 +5,18 @@
    `sds-`. Our tokens are Tailwind's theme. Our named classes use Tailwind inside, by `@apply`, where
    Tailwind has a utility for the declaration.
 
-   This is the file a person or an agent edits. `node scripts/build-styles.mjs` builds `sds-docs.css`
-   beside it, with @tailwindcss/cli 4.3.3, and `spn-devex docs sds cut <version>` serves a build as a
+   This is the file a person or an agent edits. `node scripts/build-styles.mjs` builds `docs-language.css`
+   beside it, with @tailwindcss/cli 4.3.3, and `spn-devex docs styles cut <version>` serves a build as a
    version that never changes.
 
    The pages read in Geist and Geist Mono, which sit in `fonts/` beside the built stylesheet in every version's
    folder, so the urls below are relative to the stylesheet. No display font. The system stacks stay after them.
 
-   THE DESIGN SYSTEM'S TOKENS come first: ds-tokens.css is the design system's own variables, copied whole by
-   `spn-devex docs sds cut` from a pinned version of it, and never edited by hand. The docs classes below read its
+   THE DESIGN SYSTEM'S TOKENS come first: design-system-tokens.css is the design system's own variables, copied whole by
+   `spn-devex docs styles cut` from a pinned version of it, and never edited by hand. The docs classes below read its
    names (--surface-*, --fg, --fg-quiet, --border, --radius, --font-text, --font-code), and the same two Geist files
    are declared under the names it uses, DSDefaultText and DSDefaultCode. */
-@import "./ds-tokens.css";
+@import "./design-system-tokens.css";
 @font-face{font-family:DSDefaultText;src:url("fonts/Geist-Variable.woff2") format("woff2");font-weight:100 900;font-style:normal;font-display:swap}
 @font-face{font-family:DSDefaultCode;src:url("fonts/GeistMono-Variable.woff2") format("woff2");font-weight:100 900;font-style:normal;font-display:swap}
 @font-face{font-family:DSDefaultDisplay;src:url("fonts/SchibstedGrotesk-Variable.woff2") format("woff2");font-weight:100 900;font-style:normal;font-display:swap}
@@ -134,19 +134,27 @@
 }
 
 /* THE TOKENS, each with its dark value. A page never writes a colour or a size of its own. */
-/* THE WIDTHS OF A PAGE are four of them: `--sds-page-max` is the cap of a page and of its footer,
-   `--sds-measure` is the longest line of running text, `--sds-rail-width` is the rail beside a page, and
-   `--sds-tree-width` is the tree of the index: what a window leaves once a page inside the index has its rail,
-   gap, measure and gutters, so the page's text keeps its full line. No script and no page sets a width.
-   A media query cannot read a token, so the two points where the layout changes stay typed numbers:
-   60rem, where a page and the index turn to one column, and 40rem, where a page takes the whole
-   window. After a change of `--sds-page-max`, look at both. */
+/* THE WIDTHS OF A PAGE are four of them: `--sds-page-max` is the cap of a page and of its footer (90rem, so a wide Mac
+   screen is used),
+   `--sds-measure` is the longest line of running text, `--sds-rail-width` is the outline beside a page, and
+   `--sds-tree-width` is the tree of the index: what a window leaves once a page inside the index has its outline,
+   gap, content floor and gutters (the outline fold) and 2.5rem more, so the page keeps its outline beside the tree.
+   No script and no page sets a width.
+   THE CONTENT FLOOR, `--sds-content-floor`, is 48rem: the least width a page's content keeps while the outline stands.
+   THE WINDOW WIDTHS WHERE THE LAYOUT FOLDS are tokens too: `--sds-outline-fold` is 69rem, the content floor, the outline,
+   its gap and the two side paddings, `--sds-page-pad` of 2rem each (48 + 14 + 3 + 4), below which the outline folds into a menu under the title, so a 13" or 14"
+   Mac with the index's tree open keeps its outline; `--sds-tree-fold` is 82.5rem, that and the tree's least width (13.5),
+   below which the tree of the index folds above the pages, so it folds first. The tree's width reads its middle term
+   from the outline fold the same way it always did: the outline fold plus 2.5rem (69 + 2.5 = 71.5; it was 75 + 2.5 = 77.5).
+   A media query cannot read a token, so the same numbers are typed in the queries and in the scripts, and
+   `t-styles-current` holds them equal. 40rem is where a page takes the whole window.
+   After a change of `--sds-page-max`, `--sds-content-floor`, `--sds-page-pad` or `--sds-rail-width`, change both folds and the tree's middle term. */
 @layer theme {
   :root{
     --sds-weight-heading:var(--font-weight-bold);
     --sds-weight-title:var(--font-weight-medium);
     /* THE NAMES THE DOCS CLASSES READ ARE THE DESIGN SYSTEM'S: each takes its value from the tokens at the top of this
-       file (ds-tokens.css, copied by `docs sds cut`), so a page and its drawings read the product's values, and a page
+       file (design-system-tokens.css, copied by `docs styles cut`), so a page and its drawings read the product's values, and a page
        or a section that sets --seed-primary gets a whole palette. The dark values come with data-mode, which the
        script sets on the page when it names none. */
     --sds-paper:var(--surface); --sds-card:var(--surface-sunken); --sds-ink:var(--fg);
@@ -171,16 +179,20 @@
     --sds-caption:var(--font-content-xs-size); --sds-caption-lh:var(--font-content-xs-line-height);
     /* THE TONES THE DESIGN SYSTEM HAS NO NAME FOR stay docs tokens, with a value for each mode: the colours of code and the
        accents a block uses to tell kinds apart. */
-    --sds-tk-k:var(--sds-violet); --sds-tk-s:var(--sds-cyan); --sds-tk-c:var(--fg-quiet); --sds-tk-t:var(--surface-brand); --sds-tk-n:var(--sds-orange); --sds-tk-add:var(--on-success-subtle); --sds-tk-del:var(--on-error-subtle);
+    --sds-tk-k:var(--sds-violet); --sds-tk-s:var(--sds-cyan); --sds-tk-c:var(--fg-quiet); --sds-tk-t:var(--surface-brand-fg); --sds-tk-n:var(--sds-orange); --sds-tk-add:var(--on-success-subtle); --sds-tk-del:var(--on-error-subtle);
     --sds-violet:#6d3a9c; --sds-violet-soft:#ece3f5; --sds-cyan:#1b6a86; --sds-cyan-soft:#dbeef4; --sds-pink:#a0366d;
     --sds-pink-soft:#f6e0ec; --sds-olive:#5a661c; --sds-olive-soft:#edf0d8; --sds-orange:#a55000; --sds-yellow:#6b5300; --sds-yellow-soft:#fbf1c4;
-    --sds-orange-soft:#fdebd3; --sds-page-max:80rem;
+    --sds-orange-soft:#fdebd3; --sds-page-max:90rem;
+    /* THE HEAD OF A FRAME (a file, a command, a unit, a fold) is one height and one inset: its first text starts --sds-frame-head-px
+       in from the frame's edge, its row is --sds-frame-head-h tall at the least, and its tag and copy button (1.5rem square) sit inside
+       that height without stretching it. A group panel's head and a table's first column take the same inset. */
+    --sds-frame-head-h:2rem; --sds-frame-head-px:1.1rem;
     /* the statuses of approach and preview pages, docs tokens, one value per mode */
     --sds-status-planning:oklch(0.767462 0.171331 61.6975); --sds-status-planning-soft:oklch(0.810515 0.145533 67.1324 / 0.2); --sds-status-implementing:oklch(0.3949 0.0942473 244.756); --sds-status-implementing-soft:oklch(0.3949 0.0942473 244.756 / 0.14); --sds-status-done:oklch(0.735386 0.13145 144.907); --sds-status-done-soft:oklch(0.767314 0.115667 145.001 / 0.18); --sds-status-proposed:rgb(107, 83, 0); --sds-status-proposed-soft:rgb(251, 241, 196); --sds-status-decided:oklch(0.570136 0.196001 256.188); --sds-status-decided-soft:oklch(0.699265 0.146593 249.792 / 0.13); --sds-status-running:rgb(165, 80, 0); --sds-status-running-soft:rgb(253, 235, 211); --sds-status-held:oklch(0.439 0 0); --sds-status-held-soft:oklch(0.97 0 0); --sds-status-part-landed:rgb(90, 102, 28); --sds-status-part-landed-soft:rgb(237, 240, 216); --sds-status-landed:oklch(0.735386 0.13145 144.907); --sds-status-landed-soft:oklch(0.767314 0.115667 145.001 / 0.18); --sds-status-carried:rgb(27, 106, 134); --sds-status-carried-soft:rgb(219, 238, 244); --sds-status-dropped:oklch(0.582835 0.202194 29.0717); --sds-status-dropped-soft:oklch(0.724946 0.15472 25.82 / 0.14);
-    --sds-measure:58rem; --sds-rail-width:13rem; --sds-tree-width:clamp(13.5rem,calc(100vw - 77.5rem),22rem);
+    --sds-measure:58rem; --sds-content-floor:48rem; --sds-page-pad:2rem; --sds-rail-width:14rem; --sds-tree-width:clamp(13.5rem,calc(100vw - 71.5rem),22rem); --sds-outline-fold:69rem; --sds-tree-fold:82.5rem;
   }
   :root[data-mode="dark"]{
-    --sds-tk-k:var(--sds-violet); --sds-tk-s:var(--sds-cyan); --sds-tk-c:var(--fg-quiet); --sds-tk-t:var(--surface-brand); --sds-tk-n:var(--sds-orange); --sds-tk-add:var(--on-success-subtle); --sds-tk-del:var(--on-error-subtle);
+    --sds-tk-k:var(--sds-violet); --sds-tk-s:var(--sds-cyan); --sds-tk-c:var(--fg-quiet); --sds-tk-t:var(--surface-brand-fg); --sds-tk-n:var(--sds-orange); --sds-tk-add:var(--on-success-subtle); --sds-tk-del:var(--on-error-subtle);
     --sds-violet:#c9a3ee; --sds-violet-soft:#251a30; --sds-cyan:#6cc3de; --sds-cyan-soft:#12262e; --sds-pink:#e592bd; --sds-pink-soft:#2c1622;
     --sds-olive:#b9c66a; --sds-olive-soft:#22260f; --sds-orange:#f59e3a; --sds-yellow:#f2d24a; --sds-yellow-soft:#2b2508; --sds-orange-soft:#33200a;
     --sds-status-planning:oklch(0.767462 0.171331 61.6975); --sds-status-planning-soft:oklch(0.810515 0.145533 67.1324 / 0.18); --sds-status-implementing:oklch(0.54 0.0942473 244.756); --sds-status-implementing-soft:oklch(0.54 0.0942473 244.756 / 0.14); --sds-status-done:oklch(0.735386 0.13145 144.907); --sds-status-done-soft:oklch(0.767314 0.115667 145.001 / 0.18); --sds-status-proposed:rgb(242, 210, 74); --sds-status-proposed-soft:rgb(43, 37, 8); --sds-status-decided:oklch(0.570136 0.196001 256.188); --sds-status-decided-soft:oklch(0.699265 0.146593 249.792 / 0.18); --sds-status-running:rgb(245, 158, 58); --sds-status-running-soft:rgb(51, 32, 10); --sds-status-held:oklch(0.76 0 0); --sds-status-held-soft:oklch(0.275 0 0); --sds-status-part-landed:rgb(185, 198, 106); --sds-status-part-landed-soft:rgb(34, 38, 15); --sds-status-landed:oklch(0.735386 0.13145 144.907); --sds-status-landed-soft:oklch(0.767314 0.115667 145.001 / 0.18); --sds-status-carried:rgb(108, 195, 222); --sds-status-carried-soft:rgb(18, 38, 46); --sds-status-dropped:oklch(0.582835 0.202194 29.0717); --sds-status-dropped-soft:oklch(0.724946 0.15472 25.82 / 0.18);
@@ -195,7 +207,7 @@
   *{@apply box-border}
   /* TEXT ON A CARD. Four text tokens, each with a second value for the fill of a card or a table, so text keeps
      its contrast on the surface it stands on. */
-  .bg-card,.sds-scroll,.sds-tile,.sds-side,pre,.sds-open,.sds-record-group,.sds-decider,.sds-prose,.sds-nextnav-card,.sds-card,.sds-frame,.sds-tabs,.sds-index-side{--sds-text-heading:var(--sds-text-heading-card); --sds-text-title:var(--sds-text-title-card); --sds-text-description:var(--sds-text-description-card); --sds-text-fact:var(--sds-text-fact-card); color:var(--sds-text-description)}
+  .bg-card,.sds-scroll,.sds-tile,.sds-side,pre,.sds-open,.sds-record-group,.sds-decider,.sds-prose,.sds-nextnav-card,.sds-card,.sds-frame,.sds-pagebar,.sds-index-side{--sds-text-heading:var(--sds-text-heading-card); --sds-text-title:var(--sds-text-title-card); --sds-text-description:var(--sds-text-description-card); --sds-text-fact:var(--sds-text-fact-card); color:var(--sds-text-description)}
   body{@apply m-0 bg-paper text-description font-ui; font-size:var(--font-content-lg-size); line-height:var(--font-content-md-line-height); -webkit-font-smoothing:antialiased}
   p{margin:0 0 1rem; max-width:var(--sds-measure)}
   p,li{font-size:var(--sds-body); line-height:var(--sds-body-lh)}
@@ -203,7 +215,7 @@
   strong{@apply text-title; font-weight:var(--sds-weight-title)}
   em{@apply italic text-description}
   a{@apply text-accent}
-  .sds-page{@apply grid gap-12; grid-template-columns:var(--sds-rail-width) minmax(0,1fr); max-width:min(98vw,var(--sds-page-max)); margin:0 auto; padding:3rem 8px 6rem; align-items:start}
+  .sds-page{@apply grid gap-12; grid-template-columns:minmax(0,1fr) var(--sds-rail-width); max-width:var(--sds-page-max); margin:0 auto; padding:3rem var(--sds-page-pad) 6rem; align-items:start}
   .sds-rail{@apply sticky top-10 font-ui text-xs}
   .sds-rail .sds-home{@apply pl-0 text-accent block; border-left:none; margin-bottom:.9rem; font-weight:var(--font-weight-semibold)}
   .sds-rail .sds-rail-title{@apply uppercase text-fact; letter-spacing:.15em; margin-bottom:.85rem; font-size:var(--font-content-xs-size); font-weight:var(--font-weight-bold)}
@@ -214,11 +226,28 @@
   .sds-rail a.sds-is-current{@apply text-accent border-l-accent; font-weight:var(--font-weight-semibold)}
   .sds-rail .sds-count{@apply ml-auto font-ui bg-gap-soft text-gap-ink; font-size:var(--font-content-xs-size); line-height:var(--font-content-xs-line-height); font-weight:var(--font-weight-semibold); border-radius:calc(var(--radius-sm) - 2px); padding:.125rem .4rem}
   .sds-wrap{@apply flex flex-col gap-13 min-w-0}
+  /* The rail is the page's outline, on the right of the content: the wrap comes first and the rail second, and the rail's title reads the
+     page's name over "On this page". A page with no rail (the page template) has the whole width, and the script gives it a rail
+     when it holds three or more sections. The breadcrumb is a small muted line above the masthead, back to where the reader came from. */
+  .sds-page > .sds-wrap{grid-column:1; grid-row:1}
+  .sds-page > .sds-rail{grid-column:2; grid-row:1}
+  .sds-page[data-frame="page"]{grid-template-columns:minmax(0,1fr)}
+  .sds-page[data-frame="page"].sds-has-rail{grid-template-columns:minmax(0,1fr) var(--sds-rail-width)}
+  .sds-page[data-frame="page"] > .sds-wrap{width:100%}
+  /* KEPT ONLY FOR PAGES WRITTEN BEFORE THE EYEBROW WAS THE BREADCRUMB: no template and no writer emits .sds-crumb any more; the rewrite pass removes it. */
+  .sds-crumb{@apply font-ui text-xs text-fact m-0; max-width:none}
+  .sds-crumb a{@apply text-fact no-underline}
+  .sds-crumb a:hover{@apply text-accent}
+  .sds-rail-title::after{content:"On this page"; display:block; margin-top:.25rem; text-transform:none; letter-spacing:0; font-weight:var(--font-weight-regular)}
+  .sds-rail-toggle{display:none; font:inherit; color:inherit; background:none; border:0; padding:0; cursor:pointer}
   .sds-masthead{@apply flex flex-col; gap:1.1rem}
   .sds-eyebrow{@apply flex flex-col gap-2 font-ui text-xs text-fact}
   .sds-eyebrow .sds-line{@apply flex flex-wrap items-center; gap:.4rem .6rem; line-height:var(--font-content-md-line-height)}
   .sds-eyebrow .sds-separator{@apply text-rule; font-weight:var(--font-weight-regular)}
   .sds-eyebrow .sds-line1{@apply uppercase text-fact; letter-spacing:.15em; font-weight:var(--font-weight-semibold); line-height:var(--font-content-md-line-height)}
+  /* THE EYEBROW'S FIRST LINE IS THE BREADCRUMB: each level above the page is a link that keeps the line's colour and weight. */
+  .sds-eyebrow .sds-line1 a{color:inherit; font-weight:inherit; text-decoration:none}
+  .sds-eyebrow .sds-line1 a:hover{@apply text-accent}
   .sds-eyebrow .sds-label{@apply font-ui uppercase text-fact; font-size:var(--sds-caption); line-height:var(--sds-caption-lh); letter-spacing:.08em}
   .sds-eyebrow .sds-audience{@apply inline-flex flex-wrap items-center; gap:.45rem}
   .sds-badge{@apply inline-flex items-center bg-card font-ui uppercase text-description whitespace-nowrap; gap:.35rem; padding:.1rem .6rem; border-radius:999px; border:1px solid var(--sds-rule); font-size:var(--sds-caption); letter-spacing:.06em; line-height:var(--sds-caption-lh)}
@@ -232,6 +261,17 @@
   .sds-tile h4 a:hover{@apply text-accent}
   .sds-tile p{@apply text-sm text-description max-w-none flex-1; margin:0 0 .6rem}
   .sds-tile .sds-more{@apply text-sm no-underline self-start; font-weight:var(--font-weight-semibold)}
+  /* A DOOR (the `cards` block): the whole tile is one link. An optional kicker, then the title with an arrow after it, then the line.
+     Hover and keyboard focus turn the border and the title to the accent, and the arrow moves right; focus draws the tree's ring. */
+  a.sds-door{@apply no-underline cursor-pointer; gap:.2rem; color:inherit}
+  .sds-door-kicker{@apply block font-ui uppercase text-fact; font-size:var(--font-content-xxs-size); font-weight:var(--font-weight-semibold); letter-spacing:.09em; line-height:var(--font-content-xxl3-line-height)}
+  .sds-door-title{@apply block font-ui text-md text-title; font-weight:var(--font-weight-semibold)}
+  .sds-door-arrow{@apply inline-block; margin-left:.35rem; transition:transform .15s}
+  .sds-door-line{@apply block flex-1 text-sm text-description}
+  a.sds-door:hover,a.sds-door:focus-visible{border-color:var(--sds-accent)}
+  a.sds-door:hover .sds-door-title,a.sds-door:focus-visible .sds-door-title{@apply text-accent}
+  a.sds-door:hover .sds-door-arrow,a.sds-door:focus-visible .sds-door-arrow{transform:translateX(.25rem)}
+  a.sds-door:focus-visible{outline:2px solid var(--sds-accent); outline-offset:-2px}
 
   /* The Summary's tiles */
   .sds-sides{@apply grid; grid-template-columns:repeat(auto-fit,minmax(14rem,1fr)); gap:.8rem; margin:1.2rem 0}
@@ -273,6 +313,7 @@
   tr:last-child > :first-child{border-bottom-left-radius:calc(var(--radius-lg) - var(--radius-lg))}
   tr:last-child > :last-child{border-bottom-right-radius:calc(var(--radius-lg) - var(--radius-lg))}
   td{@apply align-top text-description; padding:8px 16px; border-bottom:1px solid var(--surface-divider); font-size:var(--sds-small); line-height:var(--sds-small-lh)}
+  th:first-child,td:first-child{padding-left:var(--sds-frame-head-px)}
   tr.sds-current > td,tr.sds-current > th{background:var(--primary-subtle)}
   td > p{margin:0}
   td > p + p{margin-top:.35rem}
@@ -314,9 +355,9 @@
   /* FILE: a code block that is one file, framed, its path from the repository's root as the title and its
      language as a badge. The title bar takes no margin, and its path starts where the code starts. */
   .sds-file{@apply max-w-full overflow-hidden; background:var(--surface); border:1px solid var(--surface-border); border-radius:var(--radius-lg); margin:1.6rem 0}
-  .sds-file>figcaption{@apply flex items-center font-mono text-xs text-description; gap:.75rem; margin:0; padding:.4rem 1.1rem; border-bottom:1px solid var(--sds-rule)}
+  .sds-file>figcaption{@apply flex items-center font-mono text-xs text-description; box-sizing:border-box; min-height:var(--sds-frame-head-h); gap:.75rem; margin:0; padding:.2rem var(--sds-frame-head-px) .2rem var(--sds-frame-head-px); border-bottom:1px solid var(--sds-rule); background:var(--muted)}
   .sds-file .sds-file-path{@apply min-w-0 wrap-anywhere; flex:1}
-  .sds-file .sds-file-lang{@apply font-ui uppercase text-fact; flex:none; padding:0 .5rem; border:1px solid var(--sds-rule); border-radius:999px; font-size:var(--font-content-xxs-size); letter-spacing:.06em}
+  .sds-file .sds-file-lang,.sds-cmd-head .sds-file-lang{@apply font-ui uppercase text-fact; flex:none; padding:0 .5rem; border:1px solid var(--sds-rule); border-radius:999px; font-size:var(--font-content-xxs-size); letter-spacing:.06em}
   .sds-file>pre{margin:0; border:0; border-radius:0}
 
   /* A figure */
@@ -357,9 +398,13 @@
   .sds-open .sds-scroll{margin:.4rem 0}
   pre.sds-preview{@apply font-mono text-xs overflow-x-auto leading-normal; background:var(--surface); border:1px solid var(--surface-border); border-radius:var(--radius-lg); padding:.7rem .9rem; margin:1rem 0}
   footer{@apply font-ui text-xs text-fact; border-top:1px solid var(--sds-rule); padding-top:1.3rem}
-  @media (max-width:60rem){
-    .sds-page{@apply gap-6 pt-8; grid-template-columns:minmax(0,1fr)}
+  @media (max-width:69rem){
+    .sds-page, .sds-page[data-frame="page"].sds-has-rail{@apply gap-6 pt-8; grid-template-columns:minmax(0,1fr)}
+    .sds-page > .sds-wrap, .sds-page > .sds-rail{grid-column:auto; grid-row:auto}
     .sds-rail{@apply static bg-card; border:1px solid var(--sds-rule); border-radius:var(--radius-sm); padding:.9rem 1rem}
+    .sds-rail-title{display:none}
+    .sds-rail-toggle{display:block; width:100%; text-align:left; font-weight:var(--font-weight-semibold)}
+    .sds-rail:not(.sds-is-open) > a{display:none}
     .sds-rail a{@apply pl-0; border-left:none}
     .sds-rail a.sds-is-current{border-left:none}
   }
@@ -502,7 +547,7 @@
 
   /* Long paths wrap */
   p code,li code{@apply wrap-anywhere}
-  footer{max-width:min(98vw,var(--sds-page-max)); margin:0 auto; padding:1.3rem 16px 3rem}
+  footer{max-width:var(--sds-page-max); margin:0 auto; padding:1.3rem 16px 3rem}
 
   /* Phone width */
   @media (max-width:40rem){
@@ -738,8 +783,7 @@
   .sds-step-see .sds-label{@apply block font-ui tracking-widest uppercase text-fact; font-size:var(--sds-caption); line-height:var(--sds-caption-lh); margin-bottom:.2rem}
   .sds-step-see p{@apply m-0}
 
-  /* THE INDEX of a repository's artifacts: the tree of its pages on the left, and tabs on the right with one
-   page in each. The page fills the window, and each part scrolls by itself. The tree's width is a token. The side
+  /* THE INDEX of a repository's artifacts: the tree of its pages on the left, and one page at a time on the right, under a bar. The page fills the window, and each part scrolls by itself. The tree's width is a token. The side
    reads as the app rail does: a head card, small group headings, an icon per kind of page, the current page on a
    soft pill. Every colour reads a token, so the light and the dark theme each draw it with their own values. */
   .sds-index{@apply grid; --sds-rail-pill:color-mix(in srgb,var(--sds-text-title) 7%,transparent); --sds-rail-hover:color-mix(in srgb,var(--sds-text-title) 4%,transparent); grid-template-columns:var(--sds-tree-width) minmax(0,1fr); height:100dvh}
@@ -763,7 +807,7 @@
    it, so both themes follow. */
   .sds-rail-mark svg,.sds-ico,.sds-index-toggle svg{@apply flex-none fill-none; width:1rem; height:1rem; stroke:currentColor; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round}
 
-  /* The index: the tree. The three groups are small headings with their count, and they never fold. Inside a
+  /* The index: the tree. The three groups are small headings, and they never fold. Inside a
    group, a group row only folds and a page row only opens: a row does one thing. */
   .sds-tree{@apply font-ui text-sm}
   .sds-tree,.sds-tree-kids{@apply grid min-w-0; grid-template-columns:minmax(0,1fr)}
@@ -772,7 +816,6 @@
   .sds-tree-group .sds-tree-group{@apply mt-0}
   .sds-tree-group > summary{@apply flex items-center min-w-0 font-ui uppercase text-fact; list-style:none; padding:.2rem .55rem; font-size:var(--font-content-xxs-size); font-weight:var(--font-weight-semibold); line-height:var(--font-content-xxl3-line-height); letter-spacing:.09em; cursor:default}
   .sds-tree-group > summary::-webkit-details-marker{@apply hidden}
-  .sds-tree-count{@apply ml-auto font-ui text-fact; font-size:var(--font-content-xxs-size); font-weight:var(--font-weight-medium); line-height:var(--font-heading-xxl-line-height); letter-spacing:0}
   .sds-tree-group .sds-tree-group > summary.sds-tree-grouphead{@apply flex items-center normal-case font-ui text-sm text-title cursor-pointer; gap:.55rem; letter-spacing:0; font-weight:var(--font-weight-regular); line-height:var(--font-title-md-line-height); padding:.42rem .55rem; border-radius:var(--radius-sm)}
   .sds-tree-grouphead .sds-ico{@apply text-description}
   .sds-tree-grouphead .sds-tree-turn{@apply ml-auto; transition:transform .15s}
@@ -789,37 +832,27 @@
   .sds-tree-row{@apply flex items-center relative; border-radius:var(--radius-sm)}
   .sds-tree-row:hover{background:var(--sds-rail-hover)}
   .sds-tree-row:has(.sds-is-current){background:none}
-  .sds-tree-link{@apply flex items-center flex-1 min-w-0 font-ui text-sm text-title no-underline; gap:.55rem; padding:.42rem 2rem .42rem .55rem; border-radius:var(--radius-sm); line-height:var(--font-title-md-line-height); background:none; border:0}
+  .sds-tree-link{@apply flex items-center flex-1 min-w-0 font-ui text-sm text-title no-underline; gap:.55rem; padding:.42rem .55rem; border-radius:var(--radius-sm); line-height:var(--font-title-md-line-height); background:none; border:0}
   .sds-tree-link > span{@apply whitespace-nowrap overflow-hidden; text-overflow:ellipsis}
   .sds-tree-link .sds-ico{@apply text-description}
   .sds-tree-link.sds-is-current{@apply text-title; font-weight:var(--font-weight-semibold); background:var(--sds-rail-pill)}
   .sds-tree-link.sds-is-current .sds-ico{@apply text-title}
-  .sds-tree-group > summary:focus-visible,.sds-tree-link:focus-visible,.sds-tree-new:focus-visible,.sds-tree-fold:focus-visible,.sds-tab-title:focus-visible,.sds-tab-close:focus-visible,.sds-tab-copy:focus-visible,.sds-index-toggle:focus-visible,.sds-rail-brand:focus-visible,.sds-rail-groupmark:focus-visible{outline:2px solid var(--sds-accent); outline-offset:-2px}
+  .sds-tree-group > summary:focus-visible,.sds-tree-link:focus-visible,.sds-tree-fold:focus-visible,.sds-bar-button:focus-visible,.sds-index-toggle:focus-visible,.sds-rail-brand:focus-visible,.sds-rail-groupmark:focus-visible{outline:2px solid var(--sds-accent); outline-offset:-2px}
 
-  /* The index: the arrow that opens a page in a new tab. It is always there, faint at rest, and full on hover and
-   on the current row; it has its own room, so a name never runs under it. */
-  .sds-tree-new{@apply grid p-0 text-fact cursor-pointer absolute; place-items:center; right:.3rem; top:50%; transform:translateY(-50%); width:1.6rem; height:1.6rem; border:0; border-radius:var(--radius-sm); background:none; opacity:.55}
-  .sds-tree-row:hover .sds-tree-new,.sds-tree-new:focus-visible,.sds-tree-link.sds-is-current + .sds-tree-new{opacity:1}
-  .sds-tree-new:hover{@apply text-title; background:var(--sds-rail-pill)}
-  .sds-tree-new .sds-ico{width:.85rem; height:.85rem}
-
-  /* The index: the tabs. A tab that is not shown keeps its frame, so its page stays loaded. Each tab carries
-   its page's name, a copy of its whole address, the page alone in a new window, and its close. */
-  .sds-tabs{@apply flex gap-1 overflow-x-auto bg-card; align-items:flex-end; padding:.45rem .5rem 0; border-bottom:1px solid var(--sds-rule)}
-  .sds-tab{@apply flex items-center bg-card; flex:0 1 15rem; min-width:7rem; border:1px solid var(--sds-rule); border-bottom:0; border-radius:var(--radius-sm) var(--radius-sm) 0 0}
-  .sds-tab.sds-is-current{@apply bg-paper border-accent; box-shadow:inset 0 2px 0 var(--sds-accent)}
-  .sds-tab-title{@apply flex-1 min-w-0 overflow-hidden whitespace-nowrap text-left font-ui text-xs text-description cursor-pointer; text-overflow:ellipsis; border:0; background:none; padding:.42rem .2rem .42rem .7rem}
-  .sds-tab.sds-is-current .sds-tab-title{@apply text-title; font-weight:var(--font-weight-semibold)}
-  .sds-tab-copy{@apply flex-none grid text-fact cursor-pointer; place-items:center; width:1.4rem; height:1.4rem; border:0; border-radius:var(--radius-sm); background:none}
-  .sds-tab-copy .sds-ico{width:.85rem; height:.85rem}
-  .sds-tab-copy:hover,.sds-tab-copy.sds-is-copied{@apply text-accent}
-  .sds-tab-copy:hover{@apply bg-accent-soft}
-  .sds-tab-copy[hidden]{@apply hidden}
-  .sds-tab-close{@apply flex-none mr-1 text-fact text-md leading-none cursor-pointer; width:1.4rem; height:1.4rem; border:0; border-radius:var(--radius-sm); background:none}
-  .sds-tab-close:hover{@apply bg-accent-soft text-accent}
-  .sds-tab-close[disabled]{visibility:hidden}
-  .sds-tab-copied{@apply fixed font-ui text-xs pointer-events-none; z-index:30; padding:.3rem .6rem; border-radius:var(--radius-sm); font-weight:var(--font-weight-medium); line-height:var(--font-heading-xl-line-height); background:var(--sds-text-title); color:var(--sds-paper)}
-  .sds-tab-copied[hidden]{@apply hidden}
+  /* The index: the bar above the frame. One page is on screen at a time; the bar carries its name, the theme switch, a copy of
+   its whole address, and the page alone in a new window. */
+  /* THE BAR LINES UP WITH THE PAGE: its row takes the page's own cap and side padding, so the name stands where the page's text begins
+     and the last button at the page's right edge, at every width. The bar's ground and rule run the whole frame; the row inside is the page's width. */
+  .sds-pagebar{@apply flex items-center gap-1 bg-card; position:sticky; top:0; z-index:5; padding-block:.35rem; padding-inline:calc(max(0px,(100% - var(--sds-page-max))/2) + var(--sds-page-pad)); border-bottom:1px solid var(--sds-rule)}
+  @media (max-width:40rem){ .sds-pagebar{padding-inline:16px} }
+  .sds-bar-name{@apply flex-1 min-w-0 overflow-hidden whitespace-nowrap font-ui text-sm text-title; text-overflow:ellipsis; font-weight:var(--font-weight-semibold)}
+  .sds-bar-button{@apply flex-none grid text-fact cursor-pointer; place-items:center; width:1.6rem; height:1.6rem; border:0; border-radius:var(--radius-sm); background:none}
+  .sds-bar-button .sds-ico{width:.9rem; height:.9rem}
+  .sds-bar-button:hover,.sds-bar-button.sds-is-copied{@apply text-accent}
+  .sds-bar-button:hover{@apply bg-accent-soft}
+  .sds-bar-button[hidden]{@apply hidden}
+  .sds-bar-copied{@apply fixed font-ui text-xs pointer-events-none; z-index:30; padding:.3rem .6rem; border-radius:var(--radius-sm); font-weight:var(--font-weight-medium); line-height:var(--font-heading-xl-line-height); background:var(--sds-text-title); color:var(--sds-paper)}
+  .sds-bar-copied[hidden]{@apply hidden}
   .sds-panes{@apply flex-1 bg-paper; min-height:0}
   .sds-pane{@apply block w-full h-full bg-paper; border:0}
   .sds-pane[hidden]{@apply hidden}
@@ -835,13 +868,13 @@
   .sds-rail-groupmark{@apply font-ui text-description cursor-pointer; width:2rem; height:2rem; border-radius:var(--radius-sm); border:0; background:none; font-size:var(--font-content-xxs-size); font-weight:var(--font-weight-semibold); line-height:var(--font-heading-xxl-line-height); letter-spacing:.04em}
   .sds-rail-groupmark:hover,.sds-rail-groupmark.sds-is-current{@apply text-title; background:var(--sds-rail-pill)}
 
-  /* The index: the note of a slot. An entry whose address is still a slot has no page, so its tab shows a note. */
+  /* The index: the note of a slot. An entry whose address is still a slot has no page, so the frame's place shows a note. */
   .sds-pane-slot{@apply grid p-8; place-content:center; overflow-y:auto}
   .sds-pane-slot .sds-pull{@apply m-0; max-width:34rem}
 
-  /* The index on a narrow screen: the side sits above the tabs. Folded, it is one line that holds the fold
+  /* The index on a narrow screen: the side sits above the page. Folded, it is one line that holds the fold
    button and the head card. The script folds the tree at the start, and after a page is chosen. */
-  @media (max-width:60rem){
+  @media (max-width:82.5rem){
     .sds-index,.sds-index.sds-is-folded{grid-template-columns:minmax(0,1fr); grid-template-rows:auto minmax(0,1fr)}
     .sds-index-side,.sds-index.sds-is-folded .sds-index-side{@apply static bg-card; overflow-y:auto; border-right:0; border-bottom:1px solid var(--sds-rule); padding:.5rem .6rem; max-height:70dvh}
     .sds-index.sds-is-folded .sds-index-side{@apply flex-row items-center}
@@ -850,7 +883,7 @@
     .sds-index.sds-is-folded .sds-rail-marks{@apply hidden}
   }
   @media (prefers-reduced-motion:reduce){
-    .sds-tree-turn{transition:none}
+    .sds-tree-turn,.sds-door-arrow{transition:none}
   }
 
   /* ON THE DESIGN SYSTEM: the corners, the table and the drawings take the product's values. A table head is drawn as
@@ -862,7 +895,7 @@
   .sds-drawing .sds-box{rx:8px}
 }
 
-/* the docs' headings are set in the design system's display font (its [data-ds-page='SITE'] value); unlayered, so it follows ds-tokens.css */
+/* the docs' headings are set in the design system's display font (its [data-ds-page='SITE'] value); unlayered, so it follows design-system-tokens.css */
 :root{--font-heading:var(--font-display)}
 
 @layer components {
@@ -900,14 +933,14 @@
 /* ============ THE DOCS DESIGN LANGUAGE ============ */
 @layer components {
 /* THE DOCS DESIGN LANGUAGE. A sibling of saasplane.ai's: plates, tiles, wires with soft corners, glyphs and the drawn characters. Three layers:
-   the design system's tokens (ds-tokens.css, with its --draw-* scale), this file's --sds-* docs tokens, which read them, and the dl- classes,
+   the design system's tokens (design-system-tokens.css, with its --draw-* scale), this file's --sds-* docs tokens, which read them, and the dl- classes,
    which read only --sds-* tokens and write no raw colour. A figure is an svg of class dl-svg on a 928 frame, drawn 1:1. */
 /* The docs design language, in three layers. Layer 1 is the design system's tokens (--success, --surface-brand ...),
-   which sds-docs.css already maps. Layer 2 is sds-docs.css's docs tokens (--sds-*): the ones it has, and the ones in the
+   which docs-language.css already maps. Layer 2 is docs-language.css's docs tokens (--sds-*): the ones it has, and the ones in the
    block below, which it takes on. Layer 3 is the dl- classes, which read only --sds-* tokens, never a layer-1 name and
    never a raw colour. */
 
-/* ---- tokens sds-docs.css takes on: each a strength of tokens it already has, named once ---- */
+/* ---- tokens docs-language.css takes on: each a strength of tokens it already has, named once ---- */
 :root, .dl-partner {
   --sds-plate: var(--draw-plate);       /* a plate's floor */
   --sds-plate-on: color-mix(in srgb, var(--sds-accent) 12%, var(--sds-card));   /* a plate in focus */
@@ -1144,7 +1177,7 @@ dialog.dl-full::backdrop { background: var(--sds-paper); }
 .dl-sk-surface { fill: var(--sds-plate); stroke: none; }                                        /* a surface behind a part: the plate's floor, no edge */
 .dl-sk-window  { fill: none; stroke: var(--sds-tile-edge); stroke-width: var(--sds-stroke-line); }   /* the window a skeleton draws as part of its drawing */
 /* THE CORNERS OF A SKELETON ARE THE DESIGN SYSTEM THEME'S: each drawn unit names its role in `data-corner`, and the rule below sets `rx` from the
-   design system's own token (ds-tokens.css), so a theme that sets `--radius` differently draws its own corners. The `rx` attribute holds the default
+   design system's own token (design-system-tokens.css), so a theme that sets `--radius` differently draws its own corners. The `rx` attribute holds the default
    theme's pixels where no stylesheet reaches the drawing. A pill and a square corner take no token, so they carry no role. The roles and their
    tokens are `SKEL_CORNER` in the drawer. */
 rect[data-corner="ctl"], rect[data-corner="badge"] { rx: var(--radius-sm); }
@@ -1167,8 +1200,9 @@ pre .sds-tk-g { color: var(--sds-tk-c); font-style: normal; }
    radius. Its head says where the command runs and holds the copy button; the `$` prompt is quiet and never selected; "What you see"
    sits in the same frame, below a rule, on the sunken ground. */
 .sds-cmd-frame { background: var(--surface); border: 1px solid var(--surface-border); border-radius: var(--radius-lg); margin: 1rem 0; overflow: hidden; }
-.sds-cmd-head { display: flex; align-items: center; justify-content: space-between; gap: .75rem; padding: .35rem .5rem .35rem 1rem; background: var(--muted); border-bottom: 1px solid var(--surface-border);
-  font-family: var(--font-text); font-size: var(--font-content-xs-size); line-height: var(--font-content-xs-line-height); font-weight: var(--font-weight-medium); text-transform: uppercase; letter-spacing: .06em; color: var(--fg-muted); }
+.sds-cmd-head { display: flex; align-items: center; gap: .75rem; box-sizing: border-box; min-height: var(--sds-frame-head-h); margin: 0; padding: .2rem var(--sds-frame-head-px); background: var(--muted); border-bottom: 1px solid var(--sds-rule);
+  font-family: var(--font-code); font-size: var(--font-content-xs-size); line-height: var(--font-content-xs-line-height); font-weight: 400; text-transform: none; letter-spacing: normal; color: var(--sds-text-description); }
+.sds-cmd-head .sds-file-path { flex: 1; min-width: 0; }
 .sds-cmd-copy { font: inherit; text-transform: none; letter-spacing: normal; color: var(--fg-muted); background: none; border: 1px solid transparent; border-radius: var(--radius-sm); padding: .1rem .5rem; cursor: pointer; }
 .sds-cmd-copy:hover { color: var(--fg); border-color: var(--surface-border); }
 .sds-cmd-frame > pre { margin: 0; border: 0; border-radius: 0; background: none; }
@@ -1176,8 +1210,8 @@ pre .sds-tk-g { color: var(--sds-tk-c); font-style: normal; }
 .sds-cmd-frame > .sds-step-see { margin: 0; padding: .6rem 1rem; border: 0; border-top: 1px solid var(--surface-border); border-radius: 0; background: var(--surface-sunken); }
 @media print { .sds-cmd-copy { display: none; } }
 /* the command frame's copy mark: the index's own copy icon in a square button, a check while copied */
-.sds-cmd-copy { display: grid; place-items: center; width: 1.6rem; height: 1.6rem; padding: 0; }
-.sds-cmd-copy svg { width: .9rem; height: .9rem; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.sds-cmd-copy { display: grid; place-items: center; flex: none; width: 1.5rem; height: 1.5rem; padding: 0; margin-right: calc(var(--sds-frame-head-px) * -.5); }
+.sds-cmd-copy svg { width: .85rem; height: .85rem; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .sds-cmd-copy.sds-is-copied { color: var(--on-success-subtle); }
 
 /* A SKELETON IS A DRAWING OF A SCREEN: its control icons (a row's menu, a pager's arrows, a select's chevron, a checkbox's tick) take the
@@ -1205,4 +1239,744 @@ pre .sds-tk-g { color: var(--sds-tk-c); font-style: normal; }
 .sds-surface-frame { display: block; width: 1440px; height: 100%; border: 0; background: var(--surface); transform-origin: 0 0; }
 .sds-surface[data-width="tablet"] .sds-surface-frame, .sds-surface[data-width="phone"] .sds-surface-frame { box-shadow: 0 0 0 1px var(--surface-border); }
 @media (max-width: 640px) { .sds-surface-bar { gap: .4rem .75rem; } .sds-surface-title { flex-basis: 100%; } }
+}
+
+/* BLOCKS (N017): the info-card CATALOG in three layouts and with media, TABS, the group panels, the fold and the inline UNIT. Folded in from the sample's docs-language-additions.css, unlayered as the sample loads it so each rule wins over the layered base. Every colour, size and radius is a token above, so both themes follow. */
+
+/* STATUS: done and landed read the theme's success token instead of a colour of their own, in both modes. The shared sheet
+   sets them in @layer theme, so these unlayered lines win. The developer, 2026-11-23: 'also for sds-done can we use token
+   sds-success'. */
+:root,
+:root[data-mode='dark'] {
+  --sds-status-done: var(--sds-success);
+  --sds-status-done-soft: var(--sds-success-soft);
+  --sds-status-landed: var(--sds-success);
+  --sds-status-landed-soft: var(--sds-success-soft);
+}
+/* The badge reads exactly as the Success badge does: the edge in the success colour, the words in its ink on the soft fill
+   (`--on-success-subtle`), so done and landed are as legible as SUCCESS in both modes. */
+.sds-badge.sds-status.sds-done,
+.sds-badge.sds-status.sds-landed {
+  border-color: var(--sds-success);
+  color: var(--on-success-subtle);
+  background: var(--sds-success-soft);
+}
+
+/* TABS: one thing in several forms, one shown at a time, in the design system's three looks (DSTabsType). The class is
+   sds-tabset. Without the script every panel shows. */
+.sds-tabset {
+  margin: 1.6rem 0;
+}
+.sds-tabset-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .25rem;
+}
+.sds-tabset-bar [role='tab'] {
+  font: inherit;
+  font-size: var(--sds-sm);
+  color: var(--sds-text-description);
+  background: none;
+  border: 0;
+  cursor: pointer;
+  padding: .45rem .8rem;
+}
+.sds-tabset-bar [role='tab'][aria-selected='true'] {
+  color: var(--sds-text-title);
+  font-weight: var(--font-weight-semibold);
+}
+.sds-tabset-bar [role='tab']:focus-visible {
+  outline: 2px solid var(--sds-accent);
+  outline-offset: 2px;
+}
+/* A row wider than its place scrolls inside its box and never wraps a label, as DSTabs does through DSHScroll, with an
+   arrow at an edge that has more. The script adds the arrows and keeps the open tab in view. */
+.sds-tabset-scroll {
+  position: relative;
+  max-width: 100%;
+}
+.sds-tabset[data-type='SWITCH'] .sds-tabset-scroll,
+.sds-tabset[data-type='PILL'] .sds-tabset-scroll {
+  display: inline-block;
+}
+.sds-tabset-bar {
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  scrollbar-width: none;
+  max-width: 100%;
+}
+.sds-tabset-bar::-webkit-scrollbar {
+  display: none;
+}
+.sds-tabset-bar [role='tab'] {
+  flex: none;
+  white-space: nowrap;
+}
+.sds-tabset-arrow {
+  position: absolute;
+  top: 0;
+  bottom: 1px;
+  width: 2rem;
+  border: 0;
+  cursor: pointer;
+  color: var(--sds-text-description);
+  font: inherit;
+  font-size: var(--sds-md);
+  line-height: 1;
+}
+.sds-tabset-arrow[hidden] {
+  display: none;
+}
+.sds-tabset-arrow[data-side='start'] {
+  left: 0;
+  text-align: left;
+  padding-left: .2rem;
+  background: linear-gradient(to right, var(--sds-paper) 55%, transparent);
+}
+.sds-tabset-arrow[data-side='end'] {
+  right: 0;
+  text-align: right;
+  padding-right: .2rem;
+  background: linear-gradient(to left, var(--sds-paper) 55%, transparent);
+}
+.sds-tabset-arrow:hover {
+  color: var(--sds-accent);
+}
+.sds-tabset-panel > :first-child { margin-top: .8rem; }
+.sds-tabset-panel > :last-child { margin-bottom: 0; }
+.sds-tabset:not(.sds-is-ready) .sds-tabset-bar { display: none; }
+/* LINE, the default: the open tab underlined in the accent over a hairline, with no fill. */
+.sds-tabset[data-type='LINE'] .sds-tabset-bar {
+  gap: 0;
+  border-bottom: 1px solid var(--sds-rule);
+}
+.sds-tabset[data-type='LINE'] [role='tab'] {
+  margin-bottom: -1px;
+  border-bottom: 2px solid transparent;
+}
+.sds-tabset[data-type='LINE'] [role='tab'][aria-selected='true'] {
+  border-bottom-color: var(--sds-accent);
+}
+/* SWITCH: a bar with a pill on the open tab, for two ways to show one thing. */
+.sds-tabset[data-type='SWITCH'] .sds-tabset-bar {
+  display: inline-flex;
+  padding: .2rem;
+  border-radius: var(--radius-sm);
+  background-color: var(--sds-card);
+  border: 1px solid var(--sds-rule);
+}
+.sds-tabset[data-type='SWITCH'] [role='tab'] {
+  border-radius: calc(var(--radius-sm) - 2px);
+  padding: .3rem .8rem;
+}
+.sds-tabset[data-type='SWITCH'] [role='tab'][aria-selected='true'] {
+  background-color: var(--sds-paper);
+  box-shadow: 0 0 0 1px var(--sds-rule);
+}
+/* PILL: a floating, fully rounded bar with room between its tabs, the open one filled. */
+.sds-tabset[data-type='PILL'] .sds-tabset-bar {
+  display: inline-flex;
+  gap: .3rem;
+  padding: .25rem;
+  border-radius: 999px;
+  background-color: var(--sds-card);
+  box-shadow: 0 1px 3px color-mix(in oklch, var(--sds-ink) 12%, transparent);
+}
+.sds-tabset[data-type='PILL'] [role='tab'] {
+  border-radius: 999px;
+  padding: .35rem .9rem;
+}
+.sds-tabset[data-type='PILL'] [role='tab']:hover:not([aria-selected='true']) {
+  background-color: var(--sds-accent-soft);
+}
+.sds-tabset[data-type='PILL'] [role='tab'][aria-selected='true'] {
+  background-color: var(--sds-accent);
+  color: var(--sds-paper);
+}
+
+/* GROUP: a construct's own group as a panel, its name and count in its head and its members in its body. A row of links
+   above the panels jumps to each. Tabs stand in a panel's head only where each member fills the panel. */
+.sds-group-jumps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .4rem;
+  margin: 1.2rem 0 1rem;
+}
+.sds-group-jump {
+  display: inline-flex;
+  gap: .35rem;
+  align-items: baseline;
+  padding: .25rem .65rem;
+  border: 1px solid var(--sds-rule);
+  border-radius: 999px;
+  font-size: var(--sds-sm);
+  color: var(--sds-text-title);
+  text-decoration: none;
+}
+.sds-group-jump span {
+  color: var(--sds-text-fact);
+  font-size: var(--sds-xs);
+}
+.sds-group-jump:hover {
+  border-color: var(--sds-accent);
+  color: var(--sds-accent);
+}
+.sds-group {
+  margin: 0 0 1.1rem;
+  border: 1px solid var(--sds-rule);
+  border-radius: var(--radius);
+  background-color: var(--sds-paper);
+  scroll-margin-top: 1rem;
+}
+.sds-group-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: .8rem var(--sds-frame-head-px);
+  border-bottom: 1px solid var(--sds-rule);
+  border-radius: calc(var(--radius) - 1px) calc(var(--radius) - 1px) 0 0;
+  background: var(--muted);
+}
+.sds-group-head h5 {
+  margin: 0;
+  font-size: var(--sds-md);
+  font-weight: var(--font-weight-semibold);
+  color: var(--sds-text-title);
+  text-transform: none;
+  letter-spacing: normal;
+}
+.sds-group-count {
+  font-size: var(--sds-xs);
+  color: var(--sds-text-fact);
+  white-space: nowrap;
+}
+.sds-group-body {
+  padding: 1rem 1.1rem;
+}
+.sds-group-body > .sds-tiles {
+  margin: 0;
+}
+.sds-tiles-compact {
+  grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr));
+  gap: .6rem;
+}
+.sds-tiles-compact > .sds-tile,
+.sds-tiles[data-layout='GRID'].sds-tiles-compact > .sds-tile {
+  display: flex;
+  flex-direction: column;
+  grid-row: auto;
+  grid-template-rows: none;
+  padding: .65rem .8rem;
+}
+.sds-tiles-compact > .sds-tile h4 {
+  margin: 0 0 .2rem;
+  font-size: var(--sds-sm);
+}
+.sds-tiles-compact > .sds-tile p {
+  margin: 0;
+  font-size: var(--sds-xs);
+}
+.sds-group-part {
+  margin: 1rem 0 0;
+  border-top: 1px solid var(--sds-rule);
+  padding-top: .9rem;
+}
+.sds-group-lead {
+  margin: 0 0 .8rem;
+  font-size: var(--sds-sm);
+  color: var(--sds-text-description);
+}
+.sds-group-part > .sds-tiles {
+  margin: 0;
+}
+.sds-group-tabs {
+  margin: 1rem 0 0;
+  border-top: 1px solid var(--sds-rule);
+  padding-top: .9rem;
+}
+.sds-group-subhead {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.sds-group-subhead > span {
+  font-size: var(--sds-sm);
+  color: var(--sds-text-description);
+  padding-bottom: .5rem;
+}
+.sds-group-subhead .sds-tabset-scroll {
+  flex: 0 1 auto;
+  min-width: 0;
+}
+.sds-group-split {
+  display: grid;
+  grid-template-columns: minmax(10rem, 16rem) 1fr;
+  gap: 1.2rem;
+  align-items: start;
+}
+.sds-group-split svg {
+  width: 100%;
+  height: auto;
+}
+.sds-group-split h4 {
+  margin: 0 0 .2rem;
+}
+.sds-group-split p {
+  margin: 0 0 .7rem;
+  font-size: var(--sds-sm);
+  color: var(--sds-text-description);
+}
+.sds-group-facts {
+  display: grid;
+  gap: .55rem;
+  margin: 0;
+}
+.sds-group-facts > div {
+  display: flex;
+  flex-direction: column;
+  gap: .1rem;
+}
+.sds-group-facts dt {
+  font-size: var(--sds-xs);
+  color: var(--sds-text-fact);
+}
+.sds-group-facts dd {
+  margin: 0;
+  font-size: var(--sds-sm);
+  color: var(--sds-text-title);
+}
+@media (max-width: 720px) {
+  .sds-group-split {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* A tile's facts: one line each, the key in the fact tone and the value in the description tone. */
+.sds-tile .sds-tile-facts {
+  display: grid;
+  gap: .3rem;
+  margin: .2rem 0 0;
+  font-size: var(--sds-sm);
+}
+.sds-tile .sds-tile-facts > div {
+  display: grid;
+  grid-template-columns: minmax(6.5rem, max-content) 1fr;
+  column-gap: .6rem;
+}
+.sds-tile .sds-tile-facts dt {
+  color: var(--sds-text-fact-card);
+  font-weight: var(--font-weight-medium);
+}
+.sds-tile .sds-tile-facts dd {
+  margin: 0;
+  color: var(--sds-text-description-card);
+  overflow-wrap: anywhere;
+}
+.sds-tile .sds-tile-facts code {
+  font-size: inherit;
+}
+.sds-tile > p.sds-tile-line {
+  flex: 0 0 auto;
+}
+
+/* GRID: each card a widget. The name, the line and each fact are rows of the grid itself (subgrid), so they line up across
+   the cards of a row whatever their length. The facts stand as one group under a hairline, each label above its value, the
+   way a record's read view shows a field. A card says how many facts it holds in data-facts, one to three. */
+.sds-tiles[data-layout='GRID'] {
+  row-gap: .8rem;
+}
+.sds-tiles[data-layout='GRID'] > .sds-tile {
+  display: grid;
+  grid-template-rows: subgrid;
+  row-gap: .55rem;
+  align-content: start;
+}
+.sds-tiles[data-layout='GRID'] > .sds-tile[data-facts='1'] { grid-row: span 3; }
+.sds-tiles[data-layout='GRID'] > .sds-tile[data-facts='2'] { grid-row: span 4; }
+.sds-tiles[data-layout='GRID'] > .sds-tile[data-facts='3'] { grid-row: span 5; }
+.sds-tiles[data-layout='GRID'] > .sds-tile > h4,
+.sds-tiles[data-layout='GRID'] > .sds-tile > p {
+  margin: 0;
+}
+.sds-tiles[data-layout='GRID'] .sds-tile-facts {
+  display: contents;
+}
+.sds-tiles[data-layout='GRID'] .sds-tile-facts > div {
+  display: flex;
+  flex-direction: column;
+  gap: .15rem;
+}
+.sds-tiles[data-layout='GRID'] .sds-tile-facts > div:first-child {
+  border-top: 1px solid var(--sds-rule);
+  padding-top: .65rem;
+  margin-top: .15rem;
+}
+.sds-tiles[data-layout='GRID'] .sds-tile-facts dt {
+  font-size: var(--sds-xs);
+  letter-spacing: .02em;
+}
+.sds-tiles[data-layout='GRID'] .sds-tile-facts dd {
+  font-size: var(--sds-sm);
+  color: var(--sds-text-title-card);
+}
+
+/* MEDIA: a catalog names one media for all its items, in DSItem's and DSFeature's own terms (DSItemMediaType, DSFeatureType),
+   and every item takes it, or none does. ICON, MARK and AVATAR stand at the item's start, beside its title and description, as
+   DSItem draws them; MEDIA_TOP is a picture over the words, the width of the card, as DSFeature's MEDIA_TOP. */
+.sds-tile-head {
+  display: flex;
+  gap: .7rem;
+  align-items: flex-start;
+  min-width: 0;
+}
+.sds-tile-head > div {
+  min-width: 0;
+}
+.sds-tile-head h4 {
+  margin: 0 0 .2rem;
+}
+.sds-tile-head p {
+  margin: 0;
+  font-size: var(--sds-sm);
+  color: var(--sds-text-description-card);
+}
+.sds-tile-media {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--sds-text-fact-card);
+}
+.sds-tile-media svg {
+  width: 1.15rem;
+  height: 1.15rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.sds-tile-media[data-media='ICON'] {
+  margin-top: .1rem;
+}
+.sds-tile-media[data-media='MARK'] {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: var(--radius-sm);
+  background-color: var(--sds-accent-soft);
+  color: var(--sds-accent);
+}
+.sds-tile-media[data-media='AVATAR'] {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 999px;
+  background-color: var(--sds-accent-soft);
+  color: var(--sds-accent);
+  font-size: var(--sds-sm);
+  font-weight: var(--font-weight-semibold);
+}
+.sds-tile-media[data-media='AVATAR_GROUP'] {
+  gap: 0;
+}
+.sds-tile-media[data-media='AVATAR_GROUP'] > span {
+  width: 1.8rem;
+  height: 1.8rem;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--sds-accent-soft);
+  color: var(--sds-accent);
+  border: 2px solid var(--sds-card);
+  font-size: var(--sds-xs);
+  font-weight: var(--font-weight-semibold);
+}
+.sds-tile-media[data-media='AVATAR_GROUP'] > span + span {
+  margin-left: -.6rem;
+}
+.sds-tile-picture {
+  margin: -.85rem -1rem 0;
+  border-bottom: 1px solid var(--sds-rule);
+  background-color: var(--sds-paper);
+  border-radius: calc(var(--radius-sm) - 1px) calc(var(--radius-sm) - 1px) 0 0;
+  padding: .8rem 1rem;
+}
+.sds-tile-picture svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 6.5rem;
+}
+.sds-wire .frame { fill: var(--sds-card); stroke: var(--sds-rule); }
+.sds-wire .nav { fill: var(--sds-accent-soft); stroke: none; }
+.sds-wire .line { fill: var(--sds-rule); stroke: none; }
+.sds-wire .box { fill: none; stroke: var(--sds-rule); }
+/* With a head row (media beside the words), a card's rows are the head and its facts; MEDIA_TOP adds the picture's row. */
+.sds-tiles[data-layout='GRID'][data-media] > .sds-tile[data-facts='1'] { grid-row: span 2; }
+.sds-tiles[data-layout='GRID'][data-media] > .sds-tile[data-facts='2'] { grid-row: span 3; }
+.sds-tiles[data-layout='GRID'][data-media] > .sds-tile[data-facts='3'] { grid-row: span 4; }
+.sds-tiles[data-layout='GRID'][data-media='MEDIA_TOP'] > .sds-tile[data-facts='1'] { grid-row: span 3; }
+.sds-tiles[data-layout='GRID'][data-media='MEDIA_TOP'] > .sds-tile[data-facts='2'] { grid-row: span 4; }
+.sds-tiles[data-layout='GRID'][data-media='MEDIA_TOP'] > .sds-tile[data-facts='3'] { grid-row: span 5; }
+
+/* LIST: as DSFeature's LIST items, one under another in one panel, a line between each two. An item is its media at the start,
+   then its title, its description and its facts, each label above its value, in two columns that line up down the list;
+   one column on a narrow screen. */
+.sds-tiles[data-layout='LIST'] {
+  display: block;
+  background-color: var(--sds-card);
+  border: 1px solid var(--sds-rule);
+  border-radius: var(--radius-sm);
+}
+.sds-tiles[data-layout='LIST'] > .sds-tile {
+  display: flex;
+  flex-direction: row;
+  gap: .9rem;
+  background: none;
+  border: 0;
+  border-radius: 0;
+  padding: .75rem 1rem;
+}
+.sds-tiles[data-layout='LIST'] > .sds-tile + .sds-tile {
+  border-top: 1px solid var(--sds-rule);
+}
+.sds-tiles[data-layout='LIST'] .sds-tile-body {
+  flex: 1;
+  min-width: 0;
+}
+.sds-tiles[data-layout='LIST'] .sds-tile-body > h4 {
+  margin: 0 0 .2rem;
+  font-size: var(--sds-sm);
+}
+.sds-tiles[data-layout='LIST'] .sds-tile-body > p {
+  margin: 0;
+  font-size: var(--sds-sm);
+  color: var(--sds-text-description-card);
+}
+/* As many columns as the facts and the width allow: three facts stand in one row on a laptop, and wrap on a narrow one
+   (the developer, 2026-11-23: "we have enough psace can we have facts in three column"). */
+/* A check's message: one quoted line in italic, the muted colour, under the description. No label, the quote marks say it. */
+.sds-tiles[data-layout='LIST'] .sds-tile-body > p.sds-tile-quote {
+  margin: .1rem 0 0;
+  font-style: italic;
+  color: var(--sds-text-fact-card);
+}
+/* A note: one conditional phrase, a small muted label then the phrase in italic, tight under the line. */
+.sds-tiles[data-layout='LIST'] .sds-tile-body > p.sds-tile-note {
+  margin: .1rem 0 0;
+  font-size: var(--sds-caption);
+}
+.sds-tiles[data-layout='LIST'] .sds-tile-body > p.sds-tile-note > span {
+  color: var(--sds-text-fact-card);
+  margin-right: .5rem;
+}
+.sds-tiles[data-layout='LIST'] .sds-tile-body > p.sds-tile-note > em {
+  color: var(--sds-text-description-card);
+}
+.sds-tiles[data-layout='LIST'] .sds-tile-body > .sds-tile-facts {
+  margin-top: .5rem;
+}
+.sds-tiles[data-layout='LIST'] .sds-tile-facts {
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  column-gap: 1.6rem;
+  row-gap: .75rem;
+}
+.sds-tiles[data-layout='LIST'] .sds-tile-facts > div {
+  display: flex;
+  flex-direction: column;
+  gap: .15rem;
+}
+.sds-tiles[data-layout='LIST'] .sds-tile-facts dt {
+  font-size: var(--sds-xs);
+  letter-spacing: .02em;
+}
+.sds-tiles[data-layout='LIST'] .sds-tile-facts dd {
+  color: var(--sds-text-title-card);
+}
+/* A fact that is a sentence takes the whole row; the short ones share a row in columns. */
+.sds-tiles[data-layout='LIST'] .sds-tile-fact-wide {
+  grid-column: 1 / -1;
+}
+.sds-tiles[data-layout='LIST'] .sds-tile-facts-one {
+  grid-template-columns: 1fr;
+}
+/* ONE FACT IS ONE LINE under the description, never a stacked label and value: a small muted label, then the value in italic in the
+   description colour, on the same line (the developer, 2026-11-23: "cant we use something like italic or diff color etc.. taking too much apsces"). */
+.sds-tiles[data-layout='LIST'] .sds-tile-facts-one > div {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: .6rem;
+}
+.sds-tiles[data-layout='LIST'] .sds-tile-facts-one dt {
+  font-size: var(--sds-caption);
+  font-weight: var(--font-weight-regular, 400);
+  color: var(--sds-text-fact-card);
+}
+.sds-tiles[data-layout='LIST'] .sds-tile-facts-one dd {
+  font-style: italic;
+  color: var(--sds-text-description-card);
+  line-height: 1.5;
+}
+@media (max-width: 720px) {
+  .sds-tiles[data-layout='LIST'] .sds-tile-facts {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* SIDE FACTS: a list whose every item holds one or two short facts (a word, a number, a status, a version) draws them at the row's
+   right end, one narrow column per fact. The list is a grid and each row a subgrid of it, so the columns line up down the list; the
+   column's name shows once, in a head row, and each item's own label is kept for a screen reader. On a phone the facts fall back
+   under the description, label above value. */
+.sds-tiles[data-layout='LIST'][data-facts='side'] {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) repeat(var(--sds-side-columns, 1), 8.5rem);
+  column-gap: 0;
+  row-gap: 0;
+}
+.sds-tiles[data-layout='LIST'][data-facts='side'][data-columns='2'] { --sds-side-columns: 2; }
+.sds-tiles[data-layout='LIST'][data-facts='side'] > .sds-tile,
+.sds-tiles[data-layout='LIST'][data-facts='side'] > .sds-tiles-head {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: subgrid;
+  align-items: start;
+}
+.sds-tiles[data-layout='LIST'][data-facts='side'] .sds-tile-main {
+  display: flex;
+  gap: .9rem;
+  min-width: 0;
+}
+.sds-tiles[data-layout='LIST'][data-facts='side'] .sds-tile-body > p {
+  margin-bottom: 0;
+}
+.sds-tiles[data-layout='LIST'][data-facts='side'] .sds-tile-facts {
+  display: contents;
+}
+.sds-tiles[data-layout='LIST'][data-facts='side'] .sds-tile-facts > div {
+  display: block;
+  padding-left: 1rem;
+}
+.sds-tiles[data-layout='LIST'][data-facts='side'] > .sds-tiles-head > span:not(:first-child) {
+  padding-left: 1rem;
+}
+.sds-tiles[data-layout='LIST'][data-facts='side'] .sds-tile-facts dt {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.sds-tiles[data-layout='LIST'][data-facts='side'] [data-align='end'] {
+  text-align: end;
+}
+.sds-tiles[data-layout='LIST'][data-facts='side'] .sds-tile-facts dd {
+  margin: 0;
+  white-space: nowrap;
+}
+.sds-tiles[data-layout='LIST'] > .sds-tiles-head {
+  padding: .65rem 1rem;
+  border-bottom: 1px solid var(--sds-rule);
+  font-size: var(--sds-xs);
+  letter-spacing: .02em;
+  color: var(--sds-text-fact-card);
+}
+@media (max-width: 720px) {
+  .sds-tiles[data-layout='LIST'][data-facts='side'] { display: block; }
+  .sds-tiles[data-layout='LIST'][data-facts='side'] > .sds-tiles-head { display: none; }
+  .sds-tiles[data-layout='LIST'][data-facts='side'] > .sds-tile { display: block; }
+  .sds-tiles[data-layout='LIST'][data-facts='side'] .sds-tile-facts { display: flex; flex-wrap: wrap; gap: .5rem 1.6rem; margin-top: .6rem; }
+  .sds-tiles[data-layout='LIST'][data-facts='side'] .sds-tile-facts dt {
+    position: static; width: auto; height: auto; overflow: visible; clip-path: none;
+    display: block; font-size: var(--sds-xs); color: var(--sds-text-fact-card);
+  }
+  .sds-tiles[data-layout='LIST'][data-facts='side'] .sds-tile-fact-none { display: none; }
+  .sds-tiles[data-layout='LIST'][data-facts='side'] .sds-tile-facts > div { padding-left: 0; }
+}
+
+/* TABLE: the things side by side as columns, each column headed like a tile, and their facts lined up by key as rows.
+   It scrolls inside its own frame on a narrow screen, as every table does. */
+.sds-catalog-table {
+  table-layout: fixed;
+  min-width: 44rem;
+}
+.sds-catalog-table thead th {
+  vertical-align: top;
+  text-transform: none;
+  letter-spacing: normal;
+  background-color: var(--sds-card);
+}
+.sds-catalog-table thead th:first-child {
+  width: 9rem;
+}
+.sds-catalog-table thead th h4 {
+  margin: 0 0 .25rem;
+  font-size: var(--sds-md);
+  color: var(--sds-text-title-card);
+}
+.sds-catalog-table thead th p {
+  margin: 0;
+  font-weight: normal;
+  font-size: var(--sds-sm);
+  color: var(--sds-text-description-card);
+}
+.sds-catalog-table tbody th {
+  vertical-align: top;
+  text-transform: none;
+  letter-spacing: normal;
+  text-align: left;
+  font-size: var(--sds-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--sds-text-fact);
+}
+.sds-catalog-table tbody td {
+  vertical-align: top;
+  font-size: var(--sds-sm);
+  color: var(--sds-text-description);
+}
+
+/* FOLD: a file frame behind a summary that is its path, shut until the reader opens it. */
+.sds-fold {
+  margin: 1.6rem 0;
+  border: 1px solid var(--sds-rule);
+  border-radius: var(--radius);
+  background-color: var(--sds-paper);
+}
+.sds-fold > summary {
+  cursor: pointer;
+  box-sizing: border-box;
+  min-height: var(--sds-frame-head-h);
+  padding: .4rem var(--sds-frame-head-px);
+  font-family: var(--font-code);
+  font-size: var(--font-content-xs-size);
+  line-height: var(--font-content-xs-line-height);
+  color: var(--sds-text-description);
+}
+.sds-fold > summary:hover { color: var(--sds-accent); }
+.sds-fold[open] > summary { border-bottom: 1px solid var(--sds-rule); }
+.sds-fold > .sds-file { margin: 0; border: 0; border-radius: 0 0 var(--radius) var(--radius); }
+
+/* UNIT: the unit's own markup stands in the page, once in light and once in dark, side by side. ds-unit.css, the design
+   system's stylesheet scoped under .sds-unit, styles what is inside; these rules only place the two. */
+.sds-unit-pair {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.sds-unit-pair > .sds-unit {
+  min-width: 0;
+  overflow: auto;
+  max-height: 46rem;
+}
+.sds-unit-pair > .sds-unit + .sds-unit { border-left: 1px solid var(--sds-rule); }
+/* A window-sized unit: the pair is two frames, 640px high (the height attribute), with no border of their own. */
+.sds-unit-pair > .sds-unit-frame { display: block; width: 100%; min-width: 0; border: 0; background: transparent; }
+.sds-unit-pair > .sds-unit-frame + .sds-unit-frame { border-left: 1px solid var(--sds-rule); }
+@media (max-width: 720px) {
+  .sds-unit-pair { grid-template-columns: 1fr; }
+  .sds-unit-pair > .sds-unit + .sds-unit { border-left: 0; border-top: 1px solid var(--sds-rule); }
+  .sds-unit-pair > .sds-unit-frame + .sds-unit-frame { border-left: 0; border-top: 1px solid var(--sds-rule); }
 }

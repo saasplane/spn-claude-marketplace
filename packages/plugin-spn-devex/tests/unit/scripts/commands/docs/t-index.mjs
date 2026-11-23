@@ -26,7 +26,7 @@ const same = (label, got, want) => ok(label, JSON.stringify(got) === JSON.string
 const STYLES = join(BASE, "styles");
 mkdirSync(STYLES);
 writeFileSync(join(STYLES, "versions.json"), JSON.stringify({ "1.0.0": {}, "1.10.0": {}, "1.2.0": {} }));
-// Each cut version has the hash of each served file, as `docs sds cut` records them.
+// Each cut version has the hash of each served file, as `docs styles cut` records them.
 const HASHES = Object.fromEntries(["1.0.0", "1.10.0", "1.2.0"].map((version) => [version,
   { "sds-docs.css": `sha384-css${version}`, "sds-docs.js": `sha384-js${version}`, "sds-index.js": `sha384-index${version}` }]));
 writeFileSync(join(STYLES, "integrity.json"), JSON.stringify(HASHES));
@@ -151,7 +151,7 @@ const withAreas = () => repo({
     tree.groups[1].children.map((node) => [node.label, node.kind]), [["Getting Started", "guide"], ["A Later Guide", "guide"]]);
   ok("the run says which construct no overview of its domain links", /SOFT[^\n]*01-kind-construct\.html\n[^\n]*no overview of its domain links/.test(ran.out), ran.out);
 
-  ok("the data keeps the path to the pages empty, and the limit of tabs", tree.base === "" && tree.tabs === 8, JSON.stringify([tree.base, tree.tabs]));
+  ok("the data keeps the path to the pages empty, and no limit of tabs", tree.base === "" && !("tabs" in tree), JSON.stringify(tree).slice(0, 80));
   const lines = linesFor(NEWEST, INDEX_SCRIPT, HASHES[NEWEST]);
   ok("the page links the newest version that was cut, and loads the index's script from it",
     text.includes(lines.stylesheet) && text.includes(lines.script) && !text.includes("/1.0.0/") && !text.includes("/1.2.0/"),
@@ -390,8 +390,8 @@ const withAreas = () => repo({
 {
   const root = withAreas();
   const templates = join(BASE, "templates-before");
-  mkdirSync(join(templates, "pages"), { recursive: true });
-  writeFileSync(join(templates, "pages", "artifact-index-template.html"), "<title>Index</title>\n<style>.tree{}</style>\n<div class=\"index\"></div>\n");
+  mkdirSync(join(templates, "docs", "pages"), { recursive: true });
+  writeFileSync(join(templates, "docs", "pages", "index-template.html"), "<title>Index</title>\n<style>.tree{}</style>\n<div class=\"index\"></div>\n");
   const refused = index(["write", root], { SPN_TEMPLATES: templates });
   ok("a template that links no shared stylesheet is refused in the one wording, and no index is written",
     refused.code === 1 && refused.out.includes(OWN_COPY) && !existsSync(join(root, INDEX)), refused.out);
@@ -409,23 +409,23 @@ const withAreas = () => repo({
     uncut.code === 1 && uncut.out.includes("no version of the shared styles was cut") && !existsSync(join(root, INDEX)), uncut.out);
 }
 
-console.log("\n=== the head card opens the hub");
+console.log("\n=== the head card opens the index itself, at its default page");
 {
   const root = withAreas();
   index(["write", root]);
   const text = read(root, INDEX);
-  ok("the head card sits at the top of the side and opens the hub, named by the repository",
-    text.includes(`<aside class="sds-index-side" id="index-side">\n    <div class="sds-rail-head">\n      <a class="sds-rail-brand" href="${ARTIFACT.docs}/${HUB}"`)
+  ok("the head card sits at the top of the side and links the index file itself, with no hash, named by the repository",
+    text.includes(`<aside class="sds-index-side" id="index-side">\n    <div class="sds-rail-head">\n      <a class="sds-rail-brand" href="index.html"`)
       && text.includes(`<span class="sds-rail-name">${basename(root)}</span>`) && !text.includes("sds-home"));
   const away = join(BASE, "elsewhere-back", ARTIFACT_INDEX);
   mkdirSync(dirname(away));
   index(["write", root, "--out", away]);
-  ok("written elsewhere, the head card opens the hub by its path from where the page sits",
-    readFileSync(away, "utf8").includes(`class="sds-rail-brand" href="${relative(dirname(away), join(root, POCKET_DOCS, HUB))}"`));
+  ok("written elsewhere, the hub is the link in the note of a page whose script does not run, by its path from where the page sits",
+    readFileSync(away, "utf8").includes(`Start at <a href="${relative(dirname(away), join(root, POCKET_DOCS, HUB))}">the hub</a>`));
   const bare = repo({ [`${POCKET_DOCS}/${AGENT}/devex-agent-overview.html`]: overview("agent", "DevEx Agent"), [`${ARTIFACTS}/README.md`]: "# Artifacts\n" });
   index(["write", bare]);
-  ok("a repository with no hub: the head card opens the first page of the tree, and no other way back is drawn",
-    !read(bare, INDEX).includes("sds-home") && read(bare, INDEX).includes(`class="sds-rail-brand" href="${ARTIFACT.docs}/${AGENT}/devex-agent-overview.html"`));
+  ok("a repository with no hub: the note names the first page of the tree, and no other way back is drawn",
+    !read(bare, INDEX).includes("sds-home") && read(bare, INDEX).includes(`Start at <a href="${ARTIFACT.docs}/${AGENT}/devex-agent-overview.html">the hub</a>`));
 }
 
 console.log("\n=== an arc's samples index (RULE.DEVEX.WORKSPACE.520)");

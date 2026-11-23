@@ -9,7 +9,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "The blocks — what a page reaches for instead of prose",
-      "seen": "1c506a4c"
+      "seen": "13d99337"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
@@ -19,14 +19,19 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "The figures — what sits inside a block, and the closed set of them",
-      "seen": "d1bbd288"
+      "seen": "519469fc"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "section": "Which block a content takes, and how its fence is written",
+      "seen": "e7d8e632"
     }
   ]
 }
 -->
 # Blocks and figures, in the spelling you actually write
 
-**Source of truth:** the foundation's `04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md` — *The masthead, and the opening*, *The blocks*, *Four blocks have a spelling in markdown* and *The figures*. This file restates them for an agent that ships without the book beside it; where the two disagree, the book wins.
+**Source of truth:** the foundation's `04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md` — *The masthead, and the opening*, *The blocks*, *Four blocks have a spelling in markdown*, *Which block a content takes, and how its fence is written* and *The figures*. This file restates them for an agent that ships without the book beside it; where the two disagree, the book wins.
 
 **You write markdown.** `docs page write` produces the HTML, and the shared stylesheet that every page
 links supplies every border, background and colour. That gives a block the same form on every page
@@ -102,7 +107,7 @@ second an explaining page's.
 | `DIFF` | what a file says today and will say | a `FILE` frame holding a `diff` fence | an approach page or a preview only | the page writer (532) |
 | **Figure** | a shape: parts, a path, participants, data | a sentence before, the drawing, a caption after | drawn from a spec | `docs figure check` |
 | `CATALOG` | a set of named things, no order | a tile: name, line, literal | one line a tile | the page writer (532) |
-| `CARDS` | pages a reader might go to next | title, description, *Read more* | one grid for a subsection | the page writer (532) |
+| `CARDS` | pages a reader might go to next | optional kicker, title, description | one grid for a subsection | the page writer (532) |
 | `NEXT` | the two pages either side | a title and a direction | two doors, no paragraph | the page writer (532) |
 | **Sample link** | a whole file of the work | a link into `samples/` | never framed in the page | read at review |
 | **Card** | a decision still open | options side by side, and the card | the card section of the book | `doc-check` |
@@ -194,21 +199,163 @@ export interface IDSTheme {}
 ```
 ````
 
-`catalog` makes one tile a line in one grid, its literal in code and optional. `cards` makes a tile a door, the title
-and *Read more* both links. `next` makes the two doors, and a line may be left out. `file=<path>` makes the frame with
+`catalog` makes one tile a line in one grid, its literal in code and optional. `cards` makes a tile a door: the whole tile is one link, with an arrow after the title, and a line of four parts
+(`Kicker | Title | description | link`) puts a kicker before the title, where three parts do not. `next` makes the two doors, and a line may be left out. `file=<path>` makes the frame with
 the path as its title and the language as a badge. A `cards` line with no link, and a block with no line, are findings.
 The `PROSE` panel still has no spelling: write a paragraph where you wanted one, and never hand-write HTML to fake it.
 
+## Which block a content takes, and how its fence is written
+
+**Content that has a shape takes the block that shape names, from this table, read down to the first row that fits** (rule RULE.DEVEX.WORKSPACE.549 · GUIDE). Headings and fact keys are words, never sentences: `Layout · Arrangement · Use`, `Standard pages`, `Frequency`.
+
+**Ask four questions in this order, and the first "yes" decides the block** (rule RULE.DEVEX.WORKSPACE.549 · GUIDE):
+
+1. Is the first thing on each line a condition, a question or a case ("when…", "a unit not built yet", "if…")? Write a plain table.
+2. Are two to four things compared fact by fact? Write `catalog layout=TABLE`.
+3. Is each line a thing with a name and a sentence a reader reads? Write `catalog layout=GRID`, or `LIST` when the names are long.
+4. Otherwise, write a plain table.
+
+Three worked examples, each as Content, Right, Wrong:
+
+- **The figure table itself.** Content: each row starts with a condition ("2–4 things compared fact by fact") and says what to use. Right: a plain table. Wrong: cards, because a reader looks a case up and does not browse names.
+- **Four checks, each a name, a sentence and a weight.** Content: `Reach`, `Voice`, `Length`, `Fit`, each with what it measures and how much it counts. Right: `catalog layout=GRID`. Wrong: a plain table, because the names are things a reader browses and the sentences are read.
+- **Five numbers sorted by kind.** Content: a kind in the first column and a count beside it. Right: a plain table. Wrong: a catalog, because a number is a value, not a sentence a reader reads.
+
+**GRID or LIST is decided by what each item holds.** Use `GRID` when every item fits a card: a name of up to four words, one line of up to about fifteen words, and at most three short facts. Cards are for things a reader scans and picks from. Use `LIST` for anything longer: a name over four words, a line over about fifteen words, more than three facts, or facts that are sentences. Rows are for things a reader reads down. More than six items in the construct's own groups take group panels, and each panel holds a `GRID` or a `LIST` by the same test.
+
+Then read the table down to the first row that fits.
+
+| When the content is | Use |
+| --- | --- |
+| 2–4 things compared fact by fact | `catalog layout=TABLE` |
+| things a reader browses | `catalog layout=GRID`, or `LIST` when the names are long |
+| more than six things in groups | group panels (`## Group` lines in a catalog) |
+| whole alternatives, where each reader needs one | `tabs look=PILL` |
+| one block in several forms | `tabs look=LINE` |
+| two short views flipped back and forth | `tabs look=SWITCH` |
+| detail some readers want | a fold |
+| a file the page explains | `file=<path> fold` with an empty body |
+| what every reader must read | stays on the page |
+| a wide comparison of attributes | a plain table |
+
+The rows leave some content between two of them. These lines settle the usual cases, so two writers choose the same block:
+
+- **Two to four things make a catalog table, and five or more make a wide one.** A `catalog layout=TABLE` holds two to four things and at most six facts. Five things or more, or seven facts or more, is a wide comparison and stays a plain table.
+- **A catalog needs a name for each item, once.** A table whose first column repeats a name, or has no name at all, stays a table.
+- **A description is a clause a reader reads, not a value.** A column of sentences or clauses beside a name reads as a catalog. A column of numbers, owners, states or one-word values is a table of attributes, and stays a table.
+- **A fact is a value compared down a list; a phrase that describes the item goes in its line.** In a `catalog layout=LIST`, where every item holds one or two short facts (a word, a number, a status, a version; up to about 20 characters), they sit at the row's right end, one narrow column each, the column's name once at the top of the list. A fact that is a phrase is folded into the item's line (rule 549).
+- **Which part of a list item does this go in?** Read down to the first row that fits (rule 549):
+
+| What you have | It goes in |
+| --- | --- |
+| a value compared down the list: a status, a weight, a grade, a version, a count | a side column, named once at the top of the list (one or two of them) |
+| words that describe the item | the item's line |
+| what the item prints, such as a message | a quote, a `> ` line under the item in the fence |
+| one phrase that holds only under a condition | a note, a `~ Label: phrase` line under the item |
+| three or more values, or a fact that is a sentence | facts below the line |
+- **A table of links to parts of the same page stays a table.** `cards` are doors to other pages a reader may open next; a list of examples or references is not a set of doors.
+- **A converted table keeps its words.** The first column becomes the items' names and its heading is dropped. Each other heading becomes a fact key and is cut to a word or two (`The prefix of its published keys` becomes `Prefix`). An item may have no one line of its own.
+- **Order decides between a list and a figure.** Steps a reader carries out in turn are a numbered list, and stay numbered when the sentence before them counts them ("Three steps…"). A flow between things the page names is a `chain`. Layers inside a boundary are a `system`. Anything else that connects things is a `map`.
+- **A tree is a `tree` fence**, one path a line, children indented two spaces under their folder, a folder ending in `/`, and a note after two spaces. A line that is no path is a note on the line before it.
+- **A code block with no path stays `CODE`.** A `FILE` frame names the file the block is; a block that holds two files is two fences.
+- **A drawing a `dg` kind cannot draw stays the hand-drawn figure the page already has**, between its `<!-- fig:name -->` markers: plates, the task-state colours, people and agents. A new figure starts as a `dg` fence and becomes hand-drawn only when no kind can say it.
+- **A table the tools read keeps its form.** A construct's `Terms`, `Binds` and vocabulary tables, a register's rows and every generated block are read by the docs tools, which build the glossary and the rules index from them, so they stay plain tables whatever their shape.
+- **A first column of conditions is a table.** When each row starts with a case ("if…", "a provider's `NEW`"), not the name of a thing, the content is a lookup and stays a table. Questions asked in order are a numbered list, not a flowchart.
+- **A chain is for steps in order.** A run a thing goes through (build, scan, attest) is a `chain`. Things related by verbs ("cites", "declares", "bounds") are a `map`, with the verb on the link.
+- **A tree is for a hierarchy.** Flat paths with no nesting stay a list or a table; a tree's note is everything after the two spaces.
+- **A heading cut to a word applies to every table you touch**, kept or converted, and a transposed table's row labels are cut the same way.
+- **Was and Now headings stay on a book page.** Today and Proposed are a workstream page's comparison words, never a construct's.
+
+A plain table of a name column and a description column past four rows reads as a catalog, and the page writer says so as a soft finding. A fence is written as the page writer reads it, and reads as plain code on github.com:
+
+| Block | You write | It becomes |
+| --- | --- | --- |
+| `CATALOG`, `GRID` | a fence tagged `catalog`, one line a card: name, one line; the card's facts on the lines under it, indented, one `Key: value` a line | cards in a grid of two to four across, each fact's label above its value |
+| `CATALOG`, `LIST` | the same fence tagged `catalog layout=LIST`; a list with side columns adds `name=Rule` (the item noun) to head the main column, and each side column is headed by its fact's key | one card a row, its name on the left and its facts on the right |
+| `CATALOG`, `TABLE` | the same fence tagged `catalog layout=TABLE` | the cards as columns and each fact key as a row |
+| `CATALOG` media | `media=ICON`, `MARK`, `AVATAR`, `AVATAR_GROUP` or `MEDIA_TOP` after the tag, one for every item; an item names its media after its line | `ICON` for an item read as a line, `MARK` for an item that is a thing of its own, `AVATAR` for a person or a team, `MEDIA_TOP` for an item told best by its shape |
+| `TABS` | a fence of tildes tagged `tabs look=LINE`, `SWITCH` or `PILL` (`LINE` when left out), and a `--- <label>` line before each panel, whose body is one block; two to six tabs, never nested | a bar at the start and one panel at a time; every panel shows where the script does not run |
+| group panels | `## Group` lines inside a `catalog` fence | one panel for each group |
+| fold | `file=<path> fold` after the language, the body left empty to read the file from the repository root | the file's frame inside a `details` whose summary is the path |
+
+````markdown
+```catalog layout=GRID
+`RAIL` | a sidebar
+  Navigation: at the side
+```
+
+~~~tabs look=PILL
+--- Server
+The server's way.
+--- Web
+The web's way.
+~~~
+
+```yaml file=docs/spec.yaml fold
+```
+````
+
 ## A rendered unit is a tree
 
-**A unit of the design system is shown as a fenced tree, and `docs page write` renders it into a unit in its own frame on every write** (rule RULE.DEVEX.WORKSPACE.538 · GUIDE). The fence is tagged `unit` and holds one tree in the render's form: a unit with its props, a placement or a slot, `specVersion` at the top, and no raw element. The writer sends the tree to `spnutils apps surface render` and sets the page it prints in a frame, light and dark side by side, the unit's name as the title and the tree below it as code. A tree the render refuses, or one with a finding, stops the write with the finding's words. On github.com the fence reads as plain code. The spelling is proposed until the book lands.
+**A unit of the design system is shown as a fenced tree, and `docs page write` renders it into a unit in its own frame on every write** (rule RULE.DEVEX.WORKSPACE.538 · GUIDE). The fence is tagged `unit` and holds one tree in the render's form: either one unit as `"unit"` with its `"props"`, or `"sections"`, a list of units each with its props, a placement or a slot, with `"caption"` beside them; the writer adds the render's own `treeVersion` key, so none is written, and no raw element. The writer sends the tree to `spnutils apps surface render` and sets the page it prints in a frame, light and dark side by side, the unit's name as the title and the tree below it as code. A tree the render refuses, or one with a finding, stops the write with the finding's words. On github.com the fence reads as plain code.
 
 ````markdown
 ```unit
-{ "specVersion": 1,
-  "sections": [ { "unit": "DSFeature", "props": { "pageLevel": "PAGE", "type": "BACKDROP", "title": "A title" } } ] }
+{ "caption": "A feature section",
+  "unit": "DSFeature",
+  "props": { "pageLevel": "PAGE", "type": "BACKDROP", "title": "A title" } }
 ```
 ````
+
+**A window-sized unit is drawn in a frame of its own.** A tree whose first unit is `DSLayout`, or that holds more than one section, is set in an `iframe` of 640px height and full width, one for light and one for dark, and needs no `design-system-units.css`; a small unit stands inline. A `"frame": true` or `"frame": false` beside `caption` forces either, and `"app": "<code>"` names the app row it is drawn under. The writer takes `app`, `frame` and `caption` out of the tree before it renders. A page of several units is written as `{ "caption": …, "sections": [ { "unit": …, "props": … }, … ] }`.
+
+## Which figure, for what you need to show
+
+**The figure is chosen by what the reader has to see, from this table, read down to the first row that fits** (rule RULE.DEVEX.WORKSPACE.548 · GUIDE). Anything the design system builds is drawn by the render, never by hand.
+
+| You need to show | Use |
+| --- | --- |
+| how ideas connect | a `dg` diagram |
+| a unit the design system builds | `unit`: inline when small, framed when window-sized (a layout, a whole page) |
+| a unit, variant or page shape not built yet | a skeleton, marked planned; once the design system builds it, the page writer flags it and it becomes a `unit` |
+| one whole page of a product, for review | the surface preview |
+| several such pages | a samples index: the index template, each entry a surface preview |
+| a running page as it is | `spn-surface page copy`, in a surface preview |
+| a small picture of an item in a list | `CATALOG` media |
+
+**A passage that walks through three or more steps, relations, states or layers keeps its words and gains a `dg` figure beside it** (rule RULE.DEVEX.WORKSPACE.548 · GUIDE). The kind is the one the passage's shape names:
+
+| The passage walks through | `kind` |
+| --- | --- |
+| steps between named things | `chain` |
+| actors answering each other | `sequence` |
+| things related by verbs | `map` |
+| one-to-many links | `entities` |
+| states a thing moves between | `flowchart`, a box for each state and each link named for its event (there is no `state` kind: a lifecycle is a `flowchart`) |
+| layers inside a boundary | `system` |
+| a choice with branches | `flowchart` |
+
+**The figure matches the passage.** Every box is a thing the passage names, in its words. Every link is a relation the passage states. A `chain` or a `sequence` runs in the passage's order. The `caption` says what to look at, in one sentence; the passage keeps the why. Never add a box the passage does not name, and never drop one it does.
+
+A worked example. The passage: *A seat file is read by the page writer, which draws it as a page; the check then reads the page and the index lists it.* Its figure:
+
+```dg
+{ "kind": "chain",
+  "title": "A seat file becomes a page, which is checked and listed",
+  "caption": "Look at where the check sits: it reads the page, never the seat file.",
+  "boxes": [{ "id": "a", "label": "Seat file" }, { "id": "b", "label": "Page writer" },
+            { "id": "c", "label": "Page" }, { "id": "d", "label": "Index" }] }
+```
+
+The boxes are the passage's nouns, the order is its order, and the reason the passage gives stays in the passage.
+
+Where the passage is unsure, these lines decide:
+- **A numbered list counts as the passage**, so it gains its figure beside it. A section that already holds a figure of the same steps gains no second one.
+- **A link runs from the thing that does to the thing it is done to, and its label is the passage's verb.** A passage that says the workloads *pull* draws `Workloads → Staging`, never a chain that reads as a push.
+- **Draw every relation the passage states between the boxes it names, and no relation it only implies.** At most six boxes; where the passage names more, the figure shows the part the caption points at.
+- **A caption states only what the passage states.** A cardinality or an exception the passage does not say is not written in the caption.
+
+**A skeleton is marked `"planned": true` at the top of its spec.** One that names a unit the design system builds, without the mark, stops the write: draw it with a `unit` fence instead.
 
 ## A figure is a ```dg``` fence of strict JSON
 

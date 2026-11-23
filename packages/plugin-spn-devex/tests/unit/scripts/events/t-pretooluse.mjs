@@ -407,7 +407,7 @@ one("2l: an asset upload to a page already published is silent",
   writeFileSync(stored, `<!doctype html>\n${linesFor("1.0.0").stylesheet}\n${BODY}${linesFor("1.0.0").script}\n`);
   one("[MKT.HOOKS.46] known-bad: a publish of a page that links the shared address is refused through the chain",
     { tool_name: "Artifact", tool_input: { file_path: stored, icon: "chart" } }, "deny",
-    { says: `spn-devex docs sds bundle ${stored}`, parity: false, why: "a new check" });
+    { says: `spn-devex docs styles bundle ${stored}`, parity: false, why: "a new check" });
   one("[MKT.HOOKS.46] and the refusal names the copy to publish instead",
     { tool_name: "Artifact", tool_input: { action: "publish", file_path: stored } }, "deny",
     { says: join(reports, "tests-report.bundled.html"), parity: false, why: "a new check" });

@@ -12,7 +12,7 @@ spn-surface language check <app> [--construct <construct.md>] — Refuse a desig
 
 spn-surface language write <app> [--construct <construct.md>] — Fill a design-language construct's figures (drawing style, characters and building blocks, grounds, drawing kinds) from the `language` block of its own construct
 
-spn-surface page copy <url> <folder> [--notes <notes.json>] — Copy one running page into a folder as one self-contained file, with a hidden note for each section, for a surface page preview
+spn-surface page copy <url> <folder> [--notes <notes.json>] [--name <name>] [--ds <version>] [--app-css <path>] [--template <file>] — Copy one running page into a folder as a surface page: the surface page template holding the copy's markup, with a hidden note for each section
 
 spn-surface unit find <words…> [--repo <name or path>] [--json] — Name the units whose name or line carries a task's words, from the snapshot and the symbol index
 

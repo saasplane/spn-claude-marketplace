@@ -4,10 +4,24 @@
    reads opens with sds-. */
 /* THE MODE IS THE DESIGN SYSTEM'S: data-mode on the page, light or dark. A page that names none takes the reader's
    own setting, and a data-theme an older page carries is read as the same word. */
+/* A PAGE OPENS AT ITS START (or at the section its address names): a reload does not restore an old position, in a window or in the index's frame. */
+try{if('scrollRestoration' in history)history.scrollRestoration='manual';}catch(e){}
 (function(){
   var root=document.documentElement;if(!root||root.getAttribute('data-mode'))return;
   var theme=root.getAttribute('data-theme'),dark=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches;
   root.setAttribute('data-mode',theme==='dark'||(theme!=='light'&&dark)?'dark':'light');
+})();
+/* THE RAIL OF A PAGE THAT HAS NONE: a page with no rail and three or more sections whose heads hold an h2 gets one, the same rail every other
+   page has, which the lines below fill with its sections. A page with fewer sections, a page with a rail of its own and a surface page get nothing. */
+(function(){
+  var page=document.querySelector('.sds-page');if(!page||document.getElementById('rail')||document.querySelector('.sds-surface'))return;
+  var wrap=page.querySelector('.sds-wrap');if(!wrap)return;
+  var secs=Array.prototype.filter.call(wrap.children,function(s){return s.tagName==='SECTION'&&s.querySelector('h2');});
+  if(secs.length<3)return;
+  secs.forEach(function(s,i){if(!s.id)s.id='sds-section-'+(i+1);});
+  var rail=document.createElement('nav');rail.className='sds-rail';rail.id='rail';
+  var title=document.createElement('div');title.className='sds-rail-title';title.textContent=document.title;rail.appendChild(title);
+  page.insertBefore(rail,wrap);page.classList.add('sds-has-rail');
 })();
 (function(){
   var rail=document.getElementById('rail');if(!rail)return;
@@ -277,6 +291,21 @@
   mark();
 })();
 
+/* THE RAIL ON A NARROW PAGE folds into a menu under the title: the rail moves under the masthead, and its title becomes a button that opens it. */
+(function(){
+  var rail=document.getElementById('rail');var page=rail&&rail.closest('.sds-page');if(!page)return;
+  var wrap=page.querySelector('.sds-wrap');if(!wrap)return;
+  var toggle=document.createElement('button');toggle.type='button';toggle.className='sds-rail-toggle';toggle.setAttribute('aria-expanded','false');toggle.textContent='On this page';
+  rail.insertBefore(toggle,rail.firstChild);
+  toggle.addEventListener('click',function(){var open=rail.classList.toggle('sds-is-open');toggle.setAttribute('aria-expanded',String(open));});
+  rail.addEventListener('click',function(e){if(e.target.closest('a')){rail.classList.remove('sds-is-open');toggle.setAttribute('aria-expanded','false');}});
+  var narrow=window.matchMedia?window.matchMedia('(max-width: 69rem)'):null;
+  function place(){
+    var head=wrap.querySelector('.sds-masthead');
+    if(narrow&&narrow.matches&&head)head.parentNode.insertBefore(rail,head.nextSibling);else if(rail.parentNode!==page)page.insertBefore(rail,wrap);
+  }
+  place();if(narrow&&narrow.addEventListener)narrow.addEventListener('change',place);
+})();
 /* THE DOCS DESIGN LANGUAGE'S BEHAVIOUR: the mode switch, a stepped figure's Next and Back, a figure's motion (30% in view, pausing off screen),
    and a narrow figure's tap to open at full size. */
 /* The page's two small helpers: the light/dark switch, and the step-through of a stepped figure. */
@@ -435,6 +464,25 @@
    from the command (the prompt is a mark, never selected or copied), then the step's "What you see" joined below in the same frame. */
 (function () {
   function esc(t) { return t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+  // Every frame's head ends the same way: its tag, then this copy button. The mark is the index's own (lucide copy), and a check
+  // while the text is on the clipboard; its words are its title and label.
+  var COPY = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M10 8h10a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H10a2 2 0 0 1-2-2V10a2 2 0 0 1 2-2z"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>';
+  var DONE = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M20 6 9 17l-5-5"/></svg>';
+  function copyButton(text, label) {
+    var copy = document.createElement('button'); copy.type = 'button'; copy.className = 'sds-cmd-copy'; copy.innerHTML = COPY; copy.title = 'Copy';
+    copy.setAttribute('aria-label', label);
+    copy.addEventListener('click', function () {
+      var done = function () { copy.innerHTML = DONE; copy.title = 'Copied'; copy.classList.add('sds-is-copied'); setTimeout(function () { copy.innerHTML = COPY; copy.title = 'Copy'; copy.classList.remove('sds-is-copied'); }, 1400); };
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text()).then(done, done); else done();
+    });
+    return copy;
+  }
+  // A file frame (a file, a unit) gains the button at the end of its head: it copies the frame's code.
+  Array.prototype.slice.call(document.querySelectorAll('figure.sds-file > figcaption')).forEach(function (cap) {
+    var code = cap.parentNode.querySelector('pre');
+    if (!code || cap.querySelector('.sds-cmd-copy')) return;
+    cap.appendChild(copyButton(function () { return code.textContent; }, 'Copy the code'));
+  });
   // A block tagged sh or bash is framed too when it holds commands; a script (a line that opens or closes a branch or a loop) stays
   // a plain code block, since a prompt on each line of a script would be wrong. The colouring before this ran on its text, so the
   // text is read again from the block.
@@ -456,18 +504,9 @@
     }).join('\n');
     var frame = document.createElement('div'); frame.className = 'sds-cmd-frame';
     var head = document.createElement('div'); head.className = 'sds-cmd-head';
-    var where = document.createElement('span'); where.textContent = pre.getAttribute('data-run') === 'claude' ? 'Claude in VS Code' : 'Terminal';
-    // the copy mark is the index's own (lucide copy), and a check while the command is on the clipboard; its words are its title and label
-    var COPY = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M10 8h10a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H10a2 2 0 0 1-2-2V10a2 2 0 0 1 2-2z"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>';
-    var DONE = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M20 6 9 17l-5-5"/></svg>';
-    var copy = document.createElement('button'); copy.type = 'button'; copy.className = 'sds-cmd-copy'; copy.innerHTML = COPY; copy.title = 'Copy';
-    copy.setAttribute('aria-label', 'Copy the command');
-    copy.addEventListener('click', function () {
-      var text = commands.join('\n');
-      var done = function () { copy.innerHTML = DONE; copy.title = 'Copied'; copy.classList.add('sds-is-copied'); setTimeout(function () { copy.innerHTML = COPY; copy.title = 'Copy'; copy.classList.remove('sds-is-copied'); }, 1400); };
-      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done, done); else done();
-    });
-    head.appendChild(where); head.appendChild(copy);
+    var where = document.createElement('span'); where.className = 'sds-file-path'; where.textContent = pre.getAttribute('data-run') === 'claude' ? 'Claude in VS Code' : 'Terminal';
+    var tag = document.createElement('span'); tag.className = 'sds-file-lang'; tag.textContent = pre.getAttribute('data-run') === 'claude' ? 'claude' : 'sh';
+    head.appendChild(where); head.appendChild(tag); head.appendChild(copyButton(function () { return commands.join('\n'); }, 'Copy the command'));
     pre.parentNode.insertBefore(frame, pre);
     frame.appendChild(head); frame.appendChild(pre);
     var see = frame.nextElementSibling;
@@ -475,15 +514,40 @@
   });
 })();
 
-/* THE SURFACE PAGE PREVIEW: the bar's three switches. Width sizes the frame; mode and notes travel to the page's copy as one message,
-   `{ "surface-page-preview": { mode, notes } }`, which the copy's own few lines read (05-artifacts.md, The surface page preview). The
-   choice is kept in this browser, so the next page opens in the same view. A copy that does not listen still shows as the page. */
+/* THE SURFACE PAGE: the bar's three switches, and the frame's document. The page's markup stands in `<template id="page">`; this builds
+   the frame's document from it, linking `design-system.css` from the folder this script was served from, the cut of the design system
+   that `<meta name="surface-ds">` names, and the app's stylesheet at the path `<meta name="surface-app-css">` names. Width sizes the frame; mode sets
+   `data-mode` on the frame's own `<html>`, and notes shows or hides each `[data-note]` in it, both set directly with no message. The
+   choice is kept in this browser, so the next page opens in the same view (05-artifacts.md, The surface preview). */
 (function () {
   var root = document.querySelector('.sds-surface'); if (!root) return;
   var frame = root.querySelector('.sds-surface-frame');
+  var template = document.getElementById('page');
   var state = { width: 'desktop', mode: 'light', notes: false };
   try { var kept = JSON.parse(localStorage.getItem('sds-surface') || '{}'); for (var k in state) if (k in kept) state[k] = kept[k]; } catch (e) {}
-  function send() { try { frame.contentWindow.postMessage({ 'surface-page-preview': { mode: state.mode, notes: state.notes } }, '*'); } catch (e) {} }
+  function meta(name) { var m = document.querySelector('meta[name="' + name + '"]'); return m ? (m.getAttribute('content') || '').trim() : ''; }
+  function attr(text) { return String(text).replace(/&/g, '&amp;').replace(/"/g, '&quot;'); }
+  var own = document.querySelector('script[src*="docs-page.js"]');
+  var folder = own ? own.getAttribute('src').replace(/[^\/]*$/, '') : '';
+  var appCss = meta('surface-app-css');
+  // A note is a sticky note: one class, the drawn from the design system's warning tokens, so it follows light, dark and the theme, drawn in the frame's document.
+  var NOTE_CSS = '.sds-note{position:absolute;top:12px;left:12px;z-index:60;max-width:300px;padding:8px 10px;border:1px solid var(--warning);border-radius:8px;background:var(--warning-subtle);color:var(--on-warning-subtle);font:500 13px/1.45 system-ui,sans-serif;box-shadow:0 4px 12px rgba(0,0,0,.18)}';
+  function pageDocument() {
+    return '<!doctype html><html lang="en" data-mode="' + state.mode + '"><head><meta charset="utf-8">' +
+      '<meta name="viewport" content="width=device-width, initial-scale=1">' +
+      '<link rel="stylesheet" href="' + attr(folder + 'design-system.css') + '">' +
+      (appCss && appCss.charAt(0) !== '{' ? '<link rel="stylesheet" href="' + attr(appCss) + '">' : '') +
+      '<style>html,body{margin:0}body{background:var(--surface,var(--background));color:var(--foreground)}' + NOTE_CSS + '</style></head><body>' +
+      (template ? template.innerHTML : '') + '</body></html>';
+  }
+  // The mode and the notes are set on the frame's own document, which is this page's origin.
+  function set() {
+    try {
+      var inner = frame.contentDocument; if (!inner || !inner.documentElement) return;
+      inner.documentElement.setAttribute('data-mode', state.mode);
+      Array.prototype.forEach.call(inner.querySelectorAll('[data-note]'), function (n) { n.hidden = !state.notes; });
+    } catch (e) {}
+  }
   // Each device frames the page at its own width, so the page lays itself out as on that device; where the stage is
   // narrower, the frame is scaled down whole and never narrowed, so Desktop never falls into the tablet's layout.
   var WIDTHS = { desktop: 1440, tablet: 768, phone: 390 };
@@ -505,7 +569,7 @@
       b.setAttribute('aria-pressed', String(key === 'notes' ? state.notes : state[key] === value));
     });
     try { localStorage.setItem('sds-surface', JSON.stringify(state)); } catch (e) {}
-    send();
+    set();
   }
   root.addEventListener('click', function (e) {
     var b = e.target.closest('[data-surface]'); if (!b) return;
@@ -513,6 +577,75 @@
     if (key === 'notes') state.notes = !state.notes; else state[key] = b.getAttribute('data-value');
     apply();
   });
-  frame.addEventListener('load', send);
+  frame.addEventListener('load', set);
+  frame.srcdoc = pageDocument();
   apply();
+})();
+
+// TABS (N017): each .sds-tabset holds a bar of tabs and one panel per tab. Without this every panel shows; with it one shows at a time, the bar takes arrow keys, Home and End, and the open tab is kept in the hash.
+(function () {
+  function open(set, tab, focus) {
+    set.querySelectorAll('[role="tab"]').forEach(function (t) {
+      var on = t === tab;
+      t.setAttribute('aria-selected', on ? 'true' : 'false');
+      t.tabIndex = on ? 0 : -1;
+      var panel = document.getElementById(t.getAttribute('aria-controls'));
+      if (panel) panel.hidden = !on;
+    });
+    if (focus) tab.focus({ preventScroll: true });
+    // Keeping the open tab in view moves its own bar sideways and never the page, and nothing moves when a set is set up at load.
+    var bar = set.querySelector('.sds-tabset-bar');
+    if (bar && bar.scrollWidth > bar.clientWidth) {
+      var at = tab.getBoundingClientRect(), box = bar.getBoundingClientRect();
+      if (at.left < box.left) bar.scrollLeft += at.left - box.left;
+      else if (at.right > box.right) bar.scrollLeft += at.right - box.right;
+    }
+  }
+  // A row wider than its place scrolls inside its box, with an arrow at an edge that has more, as DSTabs does.
+  function scroller(set) {
+    var bar = set.querySelector('.sds-tabset-bar');
+    var wrap = document.createElement('div');
+    wrap.className = 'sds-tabset-scroll';
+    bar.parentNode.insertBefore(wrap, bar);
+    wrap.appendChild(bar);
+    var arrows = ['start', 'end'].map(function (side) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'sds-tabset-arrow';
+      b.dataset.side = side;
+      b.tabIndex = -1;
+      b.setAttribute('aria-hidden', 'true');
+      b.textContent = side === 'start' ? '‹' : '›';
+      b.addEventListener('click', function () {
+        bar.scrollBy({ left: (side === 'start' ? -1 : 1) * bar.clientWidth * 0.8, behavior: 'smooth' });
+      });
+      wrap.appendChild(b);
+      return b;
+    });
+    function update() {
+      var max = bar.scrollWidth - bar.clientWidth;
+      arrows[0].hidden = bar.scrollLeft <= 1;
+      arrows[1].hidden = bar.scrollLeft >= max - 1;
+    }
+    bar.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('resize', update);
+    update();
+  }
+  document.querySelectorAll('.sds-tabset').forEach(function (set) {
+    var tabs = Array.prototype.slice.call(set.querySelectorAll('[role="tab"]'));
+    if (!tabs.length) return;
+    scroller(set);
+    var fromHash = tabs.filter(function (t) { return '#' + t.getAttribute('aria-controls') === location.hash; })[0];
+    open(set, fromHash || tabs.filter(function (t) { return t.getAttribute('aria-selected') === 'true'; })[0] || tabs[0], false);
+    set.classList.add('sds-is-ready');
+    tabs.forEach(function (t, i) {
+      t.addEventListener('click', function () { open(set, t, false); });
+      t.addEventListener('keydown', function (e) {
+        var to = { ArrowRight: i + 1, ArrowLeft: i - 1, Home: 0, End: tabs.length - 1 }[e.key];
+        if (to === undefined) return;
+        e.preventDefault();
+        open(set, tabs[(to + tabs.length) % tabs.length], true);
+      });
+    });
+  });
 })();

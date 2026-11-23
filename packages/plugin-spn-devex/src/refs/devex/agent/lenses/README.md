@@ -2,7 +2,7 @@
 
 **One file for each engineering function and each chair at a partner's leadership table sits beside this one.** Each is a senior teammate's whole brief: whose work it serves, the principles of the SaaS Plane way it carries, what it masters, what it produces to, and what it may block.
 
-**This folder is the `03-lenses` construct, restated.** The construct says what a lens *is* and the shape every file takes; the files say what each one *knows and does*. `refs/devex/agent/way.md` holds the way and the ask router, and it is in every window; a lens file is read only for the task that calls for it. The template every file is copied from is `refs/devex/workspace/docs/templates/agent/lens-template.md`.
+**This folder is the `03-lenses` construct, restated.** The construct says what a lens *is* and the shape every file takes; the files say what each one *knows and does*. `refs/devex/agent/way.md` holds the way and the ask router, and it is in every window; a lens file is read only for the task that calls for it. The template every file is copied from is `refs/devex/workspace/docs/templates/plugin/lens-template.md`.
 
 ## The shape, in its order
 

@@ -49,5 +49,34 @@ console.log("\n=== the build script copies, reports and keeps");
   ok("[MKT.SCRIPTS.407] it keeps the plugin's copy and says so when no book is beside the checkout", /no spn-foundation beside this checkout/.test(text) && /refs\/devex\/workspace\/docs\/templates/.test(text));
   ok("[MKT.SCRIPTS.407] a file only the plugin holds is reported, never deleted", /only in the plugin's templates, so it is kept/.test(text) && !/unlinkSync|rmSync\(join\(PLUGIN_TEMPLATES/.test(text));
 }
+
+console.log("\n=== the templates are laid out by where the made file lives, and their placeholders are names");
+{
+  const files = filesUnder(COPY).filter((file) => file !== "README.md");
+  const folders = new Set(files.map((file) => file.split(/[\\/]/)[0]));
+  ok("[MKT.SCRIPTS.407] the folders are docs, plugin, surface and workstream, and the old pages, seat-files and agent folders are gone",
+    [...folders].sort().join() === "docs,plugin,surface,workstream" && files.some((file) => file.startsWith(join("docs", "pages"))) && files.some((file) => file.startsWith(join("docs", "seats"))), [...folders].join());
+  const pages = files.filter((file) => file.endsWith(".html"));
+  const text = (file) => readFileSync(join(COPY, file), "utf8");
+  const ownCopy = pages.filter((file) => !/blocks-template/.test(file));
+  const hasPlaceholders = (file) => /<!-- Placeholders:\n[\s\S]*?-->/.test(text(file));
+  ok("[MKT.SCRIPTS.407] every page template that has a placeholder to explain explains each once, in one comment at the top, `<!-- Placeholders: {{NAME}} … -->`",
+    ownCopy.filter((file) => /\{\{[A-Z][A-Z-]*\}\}/.test(text(file.replace(/\\/g, "/")))).every((file) => hasPlaceholders(file)), ownCopy.filter((file) => !hasPlaceholders(file)).join(", "));
+  const outside = (file) => text(file).replace(/<!-- Placeholders:\n[\s\S]*?-->/, "").replace(/<!--[\s\S]*?-->/g, "");
+  const sentence = (file) => [...outside(file).matchAll(/\{\{([^{}]*)\}\}/g)].map((m) => m[1]).filter((one) => /[.:;]/.test(one.replace(/&\w+;/g, "")) && one.length > 30);
+  ok("[MKT.SCRIPTS.407] outside the example content, no page template holds a placeholder that is an instruction sentence", ownCopy.filter((file) => !/approach|arc-template|report|blocks|index/.test(file)).every((file) => sentence(file).length === 0), ownCopy.map((file) => `${file}: ${sentence(file)[0] ?? ""}`).filter((s) => !s.endsWith(": ")).join(" | "));
+  const frame = text(join("docs", "pages", "page-template.html"));
+  ok("[MKT.SCRIPTS.407] the page template is the bare frame: the two shared lines, a masthead whose first line is the breadcrumb, sections, no rail, variant `page`",
+    /<div class="sds-page" data-frame="page"><div class="sds-wrap">/.test(frame) && /<span class="sds-line1">\{\{WORKSPACE\}\} &middot; <a href="\{\{UP-HREF\}\}">\{\{REPOSITORY\}\}<\/a> &middot; \{\{NAME\}\}<\/span>/.test(frame) && !/sds-crumb/.test(frame) && !/\{\{UP\}\}/.test(frame) && !/class="sds-rail"/.test(frame)
+      && /"variant": "page"/.test(frame) && /<h1>\{\{TITLE\}\}<\/h1>/.test(frame) && /<title>\{\{NAME\}\}<\/title>/.test(frame) && (frame.match(/<section\b/g) ?? []).length >= 2);
+  const withRail = ["construct", "overview", "guide", "report"].map((name) => text(join("docs", "pages", `${name}-template.html`)));
+  ok("[MKT.SCRIPTS.407] a template with a rail has its back link as the links of the eyebrow's first line, the breadcrumb, never a line above the masthead and never in the rail, and its name and its heading are two placeholders",
+    withRail.every((page) => /<span class="sds-line1">[^<]*<a href="\{\{(?:HUB|UP)-HREF\}\}">/.test(page) && !/sds-crumb/.test(page) && !/\{\{UP\}\}/.test(page) && !/sds-home/.test(page) && /<title>\{\{NAME\}\}<\/title>/.test(page) && /<h1>\{\{TITLE\}\}<\/h1>/.test(page) && /class="sds-rail-title">\{\{NAME\}\}</.test(page)));
+  const surface = text(join("surface", "surface-page-template.html"));
+  ok("[MKT.SCRIPTS.407] the surface page template holds a small sample page in its template, two sections each with a note, and the two metas, the app's stylesheet empty",
+    /<template id="page">[\s\S]*<\/template>/.test(surface) && (surface.match(/data-note="\d"/g) ?? []).length === 2 && (surface.match(/<section data-slot="section-container"/g) ?? []).length === 2
+      && /<meta name="surface-ds" content="\d+\.\d+\.\d+">/.test(surface) && /<meta name="surface-app-css" content="">/.test(surface) && surface.length < 14000 && !/<style|<script(?! src)/.test(surface), String(surface.length));
+}
+
 console.log(failed ? `\n  ${failed} of ${total} FAILED — templates` : `\n  all ${total} passed — templates`);
 process.exit(failed ? 1 : 0);

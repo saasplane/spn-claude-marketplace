@@ -1,5 +1,5 @@
 // `checks/where-tree.ts` — a preview's `Where it lands` is one folder tree for each repository (RULE.DEVEX.WORKSPACE.238), and each
-// layer of `Proposed` carries a `data-layer` mark with a For and Layer line on every block (RULE.DEVEX.WORKSPACE.233).
+// layer of `Proposed` carries a `data-layer` mark (RULE.DEVEX.WORKSPACE.233); a block carries no For, Layer or Reads line.
 const { whereTreeFindings, whereItLandsFindings, proposedFindings, whereTreeOnDisk } = await import("../../../../src/scripts/checks/where-tree.ts");
 const { mkdtempSync, rmSync, writeFileSync } = await import("node:fs");
 const { tmpdir } = await import("node:os");
@@ -31,16 +31,20 @@ ok("[MKT.HOOKS.513] a second repository named with no tree of its own is refused
 ok("the section with a tree for each repository passes", whereItLandsFindings(where(`${one}<p><strong>2 &middot; spn-y</strong> &mdash; the other</p>${TREE}`)).length === 0);
 ok("a page with no Where it lands has nothing to find", whereItLandsFindings(section("Today")).length === 0);
 
-console.log("\n=== Proposed — a data-layer mark and a For and Layer line (233)");
-ok("a layer with its mark and a block with its For and Layer line passes", proposedFindings(proposed(layer)).length === 0);
+const steps = `<p><strong>1 &middot; Build the bundle first</strong> &mdash; run it</p><p><strong>2 &middot; Then release</strong> &mdash; in order</p>`;
+ok("[MKT.HOOKS.513] a numbered step paragraph is a step, never a repository", whereItLandsFindings(where(`${steps}${one}`)).length === 0, whereItLandsFindings(where(`${steps}${one}`)).join("|"));
+ok("[MKT.HOOKS.527] a tree marked data-lang=tree counts as a tree", whereItLandsFindings(where(`<p><strong>1 &middot; spn-x</strong> &mdash; the change</p><pre data-lang="tree">spn-x/\n└── a.ts   new</pre>`)).length === 0);
+ok("[MKT.HOOKS.527] a second repository name with no tree is still refused beside steps", whereItLandsFindings(where(`${steps}${two}`)).length === 1);
+
+console.log("\n=== Proposed — a data-layer mark, and no For, Layer or Reads line (233)");
+ok("a layer with its mark and a block passes", proposedFindings(proposed(layer)).length === 0);
 ok("Shape needs no mark", proposedFindings(proposed(`<h3 id="s3-shape">Shape</h3>${layer}`)).length === 0);
 const unmarked = proposedFindings(proposed(layer.replace(' data-layer="plugins"', "")));
 ok("[MKT.HOOKS.513] a layer with no data-layer mark is refused as it prints", unmarked.length === 1 &&
   unmarked[0] === 'Proposed\'s layer "Plugins" carries no `data-layer` mark from server · web · surface · plugins · estate (05-artifacts.md § The approach document; RULE.DEVEX.WORKSPACE.233) · write `<h3 data-layer="…">`', unmarked[0]);
 ok("a mark that is no layer is refused too", proposedFindings(proposed(layer.replace('data-layer="plugins"', 'data-layer="tools"'))).length === 1);
 const bare = proposedFindings(proposed(layer.replace('<p class="sds-small">For: you · Layer: Plugins</p>', "")));
-ok("[MKT.HOOKS.513] a block with no For and Layer line is refused as it prints", bare.length === 1 &&
-  bare[0] === 'Proposed\'s block "The page check" opens with no For and Layer line (05-artifacts.md § The approach document; RULE.DEVEX.WORKSPACE.233) · `<p class="sds-small">For: who · Layer: where</p>` under its heading', bare[0]);
+ok("[MKT.HOOKS.513] a block with no For, Layer or Reads line has no finding (233)", bare.length === 0, bare.join(" | "));
 ok("the fixed page passes", proposedFindings(proposed(layer)).length === 0);
 
 console.log("\n=== both, on text and from disk");

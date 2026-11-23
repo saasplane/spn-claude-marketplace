@@ -8,7 +8,7 @@
 // The look is the docs design language's (spn-foundation docs/02-constructs/01-devex/04-workspace/06-design-language.md):
 // a figure is a `dl-figure` of one `dl-svg` on the docs column's 928 frame, drawn 1:1, its units a tile of radius 10, a plate of
 // radius 12 and a wire of weight 1 with soft corners and no arrowhead. No colour and no size is written here: every mark is a class
-// of sds-docs.css, which reads the `--sds-*` tokens. Every length is the drawing scale's, step M (grid 4): a name 12, a detail 10,
+// of docs-language.css, which reads the `--sds-*` tokens. Every length is the drawing scale's, step M (grid 4): a name 12, a detail 10,
 // a label 9.5, a gap of 12 between tiles, 24 between plates, 56 where a wire joins, 16 from the frame, a label 8 clear of its wire.
 // The layout of each kind is unchanged by the language; only its units are.
 
@@ -79,6 +79,8 @@ export type Spec = {
   outside?: (Box & { as?: Resource })[];
   frame?: SkeletonFrame;
   views?: SkeletonView[];
+  /** On a skeleton: it shows a shape the design system does not build yet. A skeleton naming a unit the design system builds stops the page write unless it is planned. */
+  planned?: boolean;
   /** A skeleton's layout: the views stand in it. Left out, a view is the inside of a page alone. */
   layout?: SkeletonLayout;
   /** `draw-once` draws each wire along its path once; `pulse` sends a light along one wire at a time; `focus-steps` moves the focus from one unit
@@ -4509,7 +4511,7 @@ const skelSizeH = (frame: SkeletonFrame, inherited: number): number => {
 };
 /**
  * THE CORNERS OF A SKELETON ARE THE DESIGN SYSTEM THEME'S, not the docs'. A drawn unit names the role its corner has, and the role is the
- * design system's own token for that unit: the stylesheet the docs ship (`ds-tokens.css`, copied from the design system) sets `rx` and `ry`
+ * design system's own token for that unit: the stylesheet the docs ship (`design-system-tokens.css`, copied from the design system) sets `rx` and `ry`
  * on every `rect[data-corner]` from that token, so a partner whose theme sets `--radius` differently has their corners drawn. The `rx`
  * attribute holds the same number at the default theme (`--radius` 0.625rem = 10px) as the fallback where no stylesheet reaches the drawing.
  *   ctl, badge  `--radius-sm`, 6: `rounded-sm`, fixed at every size, on a button, an input, a select, a textarea, a checkbox, a toggle, a
@@ -8872,7 +8874,7 @@ function skelLooks(
  *  finding that names it. The fields the drawer writes on its own copy are listed too, since a spec that writes one asks for
  *  what the drawer does anyway; `tone`, `em`, `off` and `warn` on an item or a frame keep the findings that name what replaced them. */
 const SKEL_FIELDS: Record<string, string[]> = {
-  spec: ["kind", "title", "caption", "frame", "views", "layout"],
+  spec: ["kind", "title", "caption", "frame", "views", "layout", "planned"],
   view: ["viewport", "state", "page", "frame"],
   page: ["item", "actions", "back"],
   frame: [

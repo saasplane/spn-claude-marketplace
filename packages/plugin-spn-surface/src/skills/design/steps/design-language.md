@@ -19,7 +19,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/01-common/05-design-languages.md",
       "section": "One source for the platform's look",
-      "seen": "791b4288"
+      "seen": "06822808"
     }
   ]
 }
@@ -80,6 +80,7 @@
 - **No part holds a pointer in place of its rule, and a part with nothing of the app's own names the design system's default it follows** (`RULE.SUPPORT.SURFACE.590` · MUST · skill:spn-surface/design)
 - **A sample page draws each drawing in a frame that scales it whole and carries the app's own tokens** (`RULE.SUPPORT.SURFACE.591` · MUST · skill:spn-surface/design)
 - **A review of a site, and an arc's final re-check of a site, walks every page of the live site at a phone, a tablet and a desktop width, in light and in dark, and reads computed values** (`RULE.SUPPORT.SURFACE.592` · MUST · skill:spn-surface/design)
+- **A page that shows a render links the design system's stylesheet, and an app's own stylesheet only where the app gives one** (`RULE.SUPPORT.SURFACE.595` · MUST · skill:spn-surface/design)
 
 Read this before a page of a site or an app is drawn, and while a partner's design language is being made. 
 

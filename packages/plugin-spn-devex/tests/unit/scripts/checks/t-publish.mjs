@@ -46,7 +46,7 @@ console.log("\n=== publish — a page that loads its styles from outside is refu
   const verdict = publish(stored);
   ok("[MKT.HOOKS.46] known-bad: a publish of a page that links the shared address is refused", Boolean(verdict?.deny), JSON.stringify(verdict));
   ok("[MKT.HOOKS.46] the refusal names the command that bundles the page",
-    verdict?.deny?.includes(`\`spn-devex docs sds bundle ${stored}\``), verdict?.deny);
+    verdict?.deny?.includes(`\`spn-devex docs styles bundle ${stored}\``), verdict?.deny);
   ok("[MKT.HOOKS.46] and the copy to publish instead, beside the page",
     verdict?.deny?.includes(`\`${join(TMP, "docs/artifacts/reports", "tests-report.bundled.html")}\``), verdict?.deny);
   ok("[MKT.HOOKS.46] it names each address the page loads from outside, the stylesheet's and the script's",

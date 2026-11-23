@@ -32,7 +32,9 @@ export const FACTS_FILE = "facts.jsonl";
 export const SHEET_FILE = "sheet.json";
 export const QUESTIONS_FILE = "questions.jsonl";
 export const SUGGESTIONS_FILE = "suggestions.jsonl";
-/** An arc's one preview, by its fixed name, in `notes/N<nnn>/`. */
+/** An arc's one page, by its fixed name, in `notes/N<nnn>/`. */
+export const ARC_FILE = "arc.html";
+/** The name an arc's page had before `arc.html`: an arc written then keeps it until the rewrite pass, and every reader falls back to it where `arc.html` is absent. */
 export const PREVIEW_FILE = "preview.html";
 /** The states whose workstreams are held to the standard of the day. A closed one stays as it closed. */
 export const HELD_STATES: readonly WorkstreamState[] = ["open", "backlog"];
@@ -42,7 +44,7 @@ export const HELD_STATES: readonly WorkstreamState[] = ["open", "backlog"];
  * whether it is a file or a folder. `samples/` and `work/` may hold folders of their own; the others are flat.
  */
 export const NOTES_ENTRIES: ReadonlyMap<string, "file" | "folder"> = new Map([
-  [PREVIEW_FILE, "file"], ["samples", "folder"], ["plan.md", "file"], ["orders", "folder"], ["scripts", "folder"],
+  [ARC_FILE, "file"], [PREVIEW_FILE, "file"], ["samples", "folder"], ["plan.md", "file"], ["orders", "folder"], ["scripts", "folder"],
   ["work", "folder"],
 ]);
 
@@ -63,7 +65,7 @@ export function strayHome(name: string, folder: boolean): string {
   const cards = "records in the workstream's `questions.jsonl`, by `workstream question raise`, once each is checked against the records already there";
   const facts = "records in the arc's `facts.jsonl`, by `workstream fact write`, each with the commit it was read at";
   const named = (pattern: RegExp): boolean => pattern.test(lower.replace(/\.[a-z0-9]+$/, ""));
-  if (lower === "previews" || /preview[^/]*\.html$/.test(lower)) return `a section of the arc's one \`${PREVIEW_FILE}\``;
+  if (lower === "previews" || /preview[^/]*\.html$/.test(lower)) return `a section of the arc's one \`${ARC_FILE}\``;
   if (folder) {
     if (named(/cards?|questions?/)) return cards;
     if (named(/(?:^|[-_.])facts?(?:[-_.]|$)/)) return facts;
@@ -149,21 +151,30 @@ export const FINDINGS_FILE = "findings.jsonl";
 export const findingsFileOf = (ws: string, arc: string): string => join(arcDataDir(ws, arc), FINDINGS_FILE);
 export const sheetFileOf = (ws: string, arc: string): string => join(arcDataDir(ws, arc), SHEET_FILE);
 export const notesDirOf = (ws: string, arc: string): string => join(ws, NOTES, arc);
-export const previewOf = (ws: string, arc: string): string => join(notesDirOf(ws, arc), PREVIEW_FILE);
+/** The file an arc's page is in: `arc.html`, or `preview.html` where only that is there, or `arc.html` where neither is. */
+export const arcPageNameOf = (ws: string, arc: string): string => {
+  const notes = notesDirOf(ws, arc);
+  return !isFile(join(notes, ARC_FILE)) && isFile(join(notes, PREVIEW_FILE)) ? PREVIEW_FILE : ARC_FILE;
+};
+/** An arc's page, `notes/<arc>/arc.html`, or `preview.html` there where the arc was written before the name and has no `arc.html`. */
+export const previewOf = (ws: string, arc: string): string => join(notesDirOf(ws, arc), arcPageNameOf(ws, arc));
 /**
  * Where an arc's preview is linked from its workstream folder: the arc's `preview` field where it is a
  * path, as an arc carried to another workstream keeps it (`workstream arc edit <arc> --preview <path>`),
- * and `notes/N<nnn>/preview.html` where it is the fixed name alone.
+ * and `notes/N<nnn>/arc.html` where it is a fixed name alone (`preview.html` where the workstream folder is given and holds only that).
  */
-export function previewHrefOf(arc: string, data: Pick<ArcData, "preview"> | null): string {
+export function previewHrefOf(arc: string, data: Pick<ArcData, "preview"> | null, ws?: string): string {
   const given = typeof data?.preview === "string" ? data.preview.trim() : "";
-  return given.includes("/") ? given : `${NOTES}/${arc}/${PREVIEW_FILE}`;
+  if (given.includes("/")) return given;
+  const kept = given === PREVIEW_FILE ? PREVIEW_FILE : ARC_FILE;
+  const present = ws && (isFile(join(notesDirOf(ws, arc), ARC_FILE)) || isFile(join(notesDirOf(ws, arc), PREVIEW_FILE))) ? arcPageNameOf(ws, arc) : kept;
+  return `${NOTES}/${arc}/${present}`;
 }
 /** The fault in a `--preview` value, or null: a path from the workstream folder that ends in the fixed name. */
 export function previewPathFault(value: string): string | null {
-  if (value === PREVIEW_FILE) return null;
+  if (value === ARC_FILE || value === PREVIEW_FILE) return null;
   if (value.startsWith("/") || /^[a-z]+:/i.test(value)) return "is not a path from the workstream folder";
-  if (!value.endsWith(`/${PREVIEW_FILE}`)) return `does not end in the arc's one preview, \`${PREVIEW_FILE}\``;
+  if (!value.endsWith(`/${ARC_FILE}`) && !value.endsWith(`/${PREVIEW_FILE}`)) return `does not end in the arc's one page, \`${ARC_FILE}\``;
   return null;
 }
 export const questionsFileOf = (ws: string): string => join(ws, QUESTIONS_FILE);
@@ -433,7 +444,7 @@ export function nameFileText(ws: string, data: ArcData): string {
   if (Array.isArray(data.repos) && data.repos.length) lines.push("", `**Repos.** ${data.repos.join(" · ")}`);
   const notes = `../../${NOTES}/${data.arc}`;
   const links = [`[the arc on the approach page](${arcAddress(data.arc, "../../")})`];
-  if (isFile(previewOf(ws, data.arc))) links.push(`[preview](${notes}/${PREVIEW_FILE})`);
+  if (isFile(previewOf(ws, data.arc))) links.push(`[arc page](${notes}/${arcPageNameOf(ws, data.arc)})`);
   if (isFile(join(notesDirOf(ws, data.arc), "plan.md"))) links.push(`[plan](${notes}/plan.md)`);
   if (isDir(join(notesDirOf(ws, data.arc), "samples"))) links.push(`[samples](${notes}/samples/)`);
   lines.push("", `**Links.** ${links.join(" · ")}`, "");
@@ -501,7 +512,7 @@ export function commitWrites(ws: string, message: string): boolean {
 /** A new arc's data, `PROPOSED`, with no row. */
 export function newArc(arc: string, subject: string, title: string): ArcData {
   return { schemaVersion: SCHEMA_VERSION, arc, subject, title, goal: null, status: "PROPOSED", reason: null,
-           decides: null, repos: [], cycle: null, follows: null, model: null, preview: PREVIEW_FILE, rows: [] };
+           decides: null, repos: [], cycle: null, follows: null, model: null, preview: ARC_FILE, rows: [] };
 }
 
 export function readQuestions(ws: string): Question[] {
@@ -860,7 +871,7 @@ function arcChip(data: ArcData, ws: string, questions: readonly Question[]): str
   // the chip; one without keeps the jump to the arc's row.
   const opens = isFile(previewOf(ws, data.arc));
   const tip = `<span class="sds-tip"><span class="sds-badge sds-status sds-${word}">${escapeHtml(status)}</span><strong>${escapeHtml(data.title)}</strong><span>${said}</span>${why ? `<span>${escapeHtml(why)}</span>` : ""}${runningWords.map((words) => `<span>${escapeHtml(words)}</span>`).join("")}${opens ? "<span>opens its preview in a new tab</span>" : ""}</span>`;
-  const link = opens ? `href="${NOTES}/${data.arc}/${PREVIEW_FILE}" target="_blank" rel="noopener"` : `href="#${data.arc}"`;
+  const link = opens ? `href="${NOTES}/${data.arc}/${arcPageNameOf(ws, data.arc)}" target="_blank" rel="noopener"` : `href="#${data.arc}"`;
   const chipLabel = opens ? `${label}, ${data.arc} preview, opens in a new tab` : label;
   return `      <a class="sds-chip sds-${word} sds-step-${step}" ${link} aria-label="${chipLabel}">`
     + `<span class="sds-chip-line"><span class="sds-chip-name">${role ? `<span class="sds-chip-subject">${name}</span>` : `<span class="sds-mono">${number}</span><span class="sds-chip-subject"> &middot; ${name}</span>`}</span><span class="sds-arc-count">${count}</span></span>`
@@ -1226,11 +1237,11 @@ function workstreamTemplates(): string | null {
 /** A slug as words in title case: `evidence-export` reads `Evidence Export`. */
 export const titleCase = (slug: string): string => slug.split("-").filter(Boolean).map((word) => word[0].toUpperCase() + word.slice(1)).join(" ");
 
-/** The workstream's number and its title as the approach page names it: `031 - Compliance Certification`. */
+/** The workstream's number and its title as the approach page names it: `031 Compliance Certification`, the number then the words, with no separator. */
 export function workstreamName(ws: string): { number: string; title: string } {
   const found = /^(\d+)-(.+)$/.exec(basename(ws));
   const number = found ? found[1] : basename(ws);
-  return { number, title: `${number} - ${found ? titleCase(found[2]) : basename(ws)}` };
+  return { number, title: `${number} ${found ? titleCase(found[2]) : basename(ws)}` };
 }
 
 /**
@@ -1240,21 +1251,23 @@ export function workstreamName(ws: string): { number: string; title: string } {
  */
 export function previewFromTemplate(ws: string, data: Pick<ArcData, "arc" | "subject" | "title" | "status">): string {
   const dir = workstreamTemplates();
-  if (!dir) throw new Error("finds no approach-preview-template.html among the plugin's references");
-  let text = readFileSync(join(dir, "approach-preview-template.html"), "utf8");
+  if (!dir) throw new Error("finds no arc-template.html among the plugin's references");
+  let text = readFileSync(join(dir, "arc-template.html"), "utf8");
   const start = text.indexOf("<meta charset");
   if (start > 0) text = text.slice(start);
   const { number, title } = workstreamName(ws);
   const page = approachOf(ws);
-  const workspace = page ? /<span class="sds-line1">([^<&]*?)\s*&nbsp;\|&nbsp;/.exec(readFileSync(page, "utf8"))?.[1] : undefined;
+  const workspace = page ? /<span class="sds-line1">(?:<a\b[^>]*>)?([^<&]*?)(?:<\/a>)?\s*(?:&nbsp;\|&nbsp;|&middot;)/.exec(readFileSync(page, "utf8"))?.[1] : undefined;
   const json = (value: string): string => JSON.stringify(value).slice(1, -1);
+  const arcName = /^N\d+/.test(data.arc) ? `${data.arc} ${data.title}` : data.title;
   text = text.replace(/<!-- spn:doc[\s\S]*?-->/, (block) => block
     .replace("ws-{{NNN}}-{{slug}}-{{preview-slug}}", json(`ws-${basename(ws)}-${data.subject}`))
-    .replace("{{THE PREVIEW NAME}}", json(data.title)));
+    .replace("{{NAME}}", json(arcName)));
+  // The arc's page names itself with its numbered name, `N018 Docs tooling`, in its tab, its outline, its heading and its eyebrow alike; the
+  // eyebrow chains the workstream's numbered name above it, and the eyebrow's workstream level links the approach page's What entry.
   const slots: Array<[string, string]> = [
-    ["{{THE ARC'S SUBJECT, IN TITLE CASE}}", titleCase(data.subject)],
-    ["{{THE PREVIEW NAME}}", escapeHtml(data.title)],
-    ["{{NNN}} - {{TITLE}}", title],
+    ["{{NAME}}", escapeHtml(arcName)],
+    ["{{WORKSTREAM}}", escapeHtml(title)],
     ["{{NNN}}", number],
     ["N{{nnn}}", data.arc],
     ["{{arc}}", data.arc],
@@ -1319,6 +1332,7 @@ function headingWords(text: string, head: Heading): string {
  * an anchor, to the next heading of the same level or higher. Null where What holds neither.
  */
 export function whatEntryOf(text: string, arc: string): { from: number; to: number; kind: "entry" | "anchor" } | null {
+  // This is the entry a page written before the shape of order T keeps; a page told by construct has none (`planRowOf`).
   const range = whatRange(text);
   if (!range) return null;
   const heads = headingsIn(text, range);
@@ -1337,6 +1351,19 @@ export function whatEntryOf(text: string, arc: string): { from: number; to: numb
   return { from: heads[at].at, to: next ? next.at : range.to, kind };
 }
 
+/** Whether the page still tells What by arc: it holds an entry or an anchor `<arc>-what` for an arc. A page told by construct holds none. */
+export const holdsArcEntries = (text: string): boolean => /\bid="(?:N\d+[a-z]?|ideate|follow-ups)-what"/.test(text);
+
+/**
+ * An arc's row in Plan, `<tr id="<arc>">`, the arc's address on the approach page (`approach.html#<arc>`) and, on a page told
+ * by construct, the one place that links the arc's page. Null where Plan holds no such row.
+ */
+export function planRowOf(text: string, arc: string): { from: number; to: number; kind: "row" } | null {
+  // nosemgrep: javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp -- pattern built from this script's own constants and escaped text, never outside input
+  const found = new RegExp(`<tr\\b[^>]*\\bid="${arc.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}"[^>]*>[\\s\\S]*?</tr>`, "i").exec(text);
+  return found ? { from: found.index, to: found.index + found[0].length, kind: "row" } : null;
+}
+
 /** Every link of an HTML text that points inside the workspace's files, as written and as a path from `base`, fragment left off. */
 export function localLinks(html: string, base: string): Array<{ href: string; path: string }> {
   const out: Array<{ href: string; path: string }> = [];
@@ -1353,7 +1380,7 @@ export function previewOwners(ws: string): Map<string, string> {
   const out = new Map<string, string>();
   for (const arc of arcIdsOf(ws)) {
     const data = readArc(ws, arc);
-    if (data) out.set(resolve(ws, previewHrefOf(arc, data)), arc);
+    if (data) out.set(resolve(ws, previewHrefOf(arc, data, ws)), arc);
   }
   return out;
 }
@@ -1361,7 +1388,7 @@ export function previewOwners(ws: string): Map<string, string> {
 const entryHtml = (data: Pick<ArcData, "arc" | "title" | "goal" | "preview">): string => [
   `  <h4 id="${whatId(data.arc)}">${inline(data.title)}</h4>`,
   `  <p>${inline(typeof data.goal === "string" ? data.goal : "")}</p>`,
-  `  <p>Read the preview &rarr; <a href="${previewHrefOf(data.arc, data)}">${inline(data.title)}</a></p>`,
+  `  <p>Read the arc page &rarr; <a href="${previewHrefOf(data.arc, data)}">${inline(data.title)}</a></p>`,
 ].join("\n");
 
 /**

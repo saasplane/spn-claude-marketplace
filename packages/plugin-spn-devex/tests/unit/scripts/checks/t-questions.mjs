@@ -70,7 +70,7 @@ console.log("\n=== same — each page's card equal to its record's (state check)
   writeFileSync(preview, good);
   ok("green: the card rendered again, it passes", cardsDiffer(ws, records).length === 0);
   const answered = cli(root, ["workstream", "question", "answer", "031/q1", "--key", "A", "--words", "Q1 - A"]);
-  ok("an answer takes the card off both pages", answered.code === 0 && /Q1 · answered A · off 2 pages · owed: N001's What, its Log line/.test(answered.out), answered.out);
+  ok("an answer takes the card off both pages", answered.code === 0 && /Q1 · answered A · off 2 pages · owed: N001's construct in What, its Log line/.test(answered.out), answered.out);
   const after = readQuestions(ws);
   ok("green: nothing differs once the card is off every page", cardsDiffer(ws, after).length === 0 && openWithoutCard(ws, after).length === 0, cardsDiffer(ws, after).join(" | "));
   writeFileSync(page, readFileSync(page, "utf8").replace("<!-- /spn:generated -->\n</section>\n</div>", `${cardHtml(after[0], "  ")}\n  <!-- /spn:generated -->\n</section>\n</div>`));

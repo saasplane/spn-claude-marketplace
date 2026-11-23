@@ -108,6 +108,7 @@ ${STYLES.stylesheet}
   <p>You get one place for the model. You get one shape per page, and you get one plain voice.</p>
 </section>
 <section id="s3"><div class="sds-section-head"><h2>How &mdash; the order</h2></div>
+  <figure class="dl-figure"><div class="dl-frame"><svg class="dl-svg" viewBox="0 0 928 80" role="img" aria-label="Book, then plugins."></svg></div></figure>
   <h3 id="h1">spn-foundation &mdash; the chapter</h3>
   <p>You read the chapter first, and the code follows it.</p>
 </section>
@@ -323,6 +324,7 @@ console.log("\n=== doc-check — the masthead: h1, an optional p.sds-subtitle, o
 const CONSTRUCT = join(domainConstructsDir(PROBE_DOMAIN), "probe-construct.html");
 const page = (inner) => `<!doctype html>
 ${STYLES.stylesheet}
+<div class="sds-page"><div class="sds-wrap">
 <header class="sds-masthead">
   <div class="sds-eyebrow"><span class="sds-audience">Architect</span></div>
 ${inner}
@@ -330,6 +332,7 @@ ${inner}
 <section id="s0"><div class="sds-section-head"><h2>Overview</h2></div>
   <p>You read this part when you need the core. You leave it knowing where each piece sits.</p>
 </section>
+</div></div>
 `;
 // The same builder under a name the cases further down can reach, where `page` names a file.
 const constructPage = (inner) => page(inner);
@@ -362,8 +365,8 @@ one("a Subtitle under the Description is out of place",
 // THE PLACE OF A PAGE UNDER THE POCKET'S `docs` FOLDER NAMES ITS KIND. A page in a `constructs` folder
 // is a construct page, and every other page is an overview: beside the hub, or in a domain's folder.
 {
-  const OVERVIEW = `<!doctype html>\n${STYLES.stylesheet}\n<div class="sds-eyebrow">Who this is for &middot; a reader</div>\n` +
-    `<section><h2>Overview</h2><p>You read it once and you know it.</p></section>`;
+  const OVERVIEW = `<!doctype html>\n${STYLES.stylesheet}\n<div class="sds-page"><div class="sds-wrap"><div class="sds-masthead"><div class="sds-eyebrow">Who this is for &middot; a reader</div></div>\n` +
+    `<section><h2>Overview</h2><p>You read it once and you know it.</p></section></div></div>`;
   const strayConstruct = join(PROBE_DOMAIN, "probe-construct.html");
   one("[MKT.SCRIPTS.110] an overview in its domain's folder is held to its suffix, and draws no finding about its place",
     write(join(PROBE_DOMAIN, "probe-overview.html"), OVERVIEW), "silent");
@@ -425,7 +428,7 @@ one("a Subtitle under the Description is out of place",
   }
 }
 
-console.log("\n=== doc-check — the approach page: an opening, six sections, Plan after How");
+console.log("\n=== doc-check — the approach page: an opening, six sections, Plan between What and How");
 
 // 05-artifacts.md § The approach document. The page is an opening, then Why > What > How > Open >
 // Deferred, nothing else; there is no Terms section; Plan is a section of its own after How.
@@ -456,8 +459,21 @@ one("a section outside the five",
 one("sections out of order",
   write(APPROACH, CLEAN.replace(`<h2>What &mdash; the shape</h2>`, `<h2>Deferred &mdash; parked</h2>`)
     + `<section id="s7"><h2>What &mdash; late</h2><p>You read it last.</p></section>`),
-  "reports", "the order is Why > What > How > Plan > Open > Deferred");
+  "reports", "the order is Why > What > Plan > How > Open > Deferred");
 
+// Plan stands between What and How; a page written with Plan after How is still accepted until the rewrite pass moves it (RULE.DEVEX.WORKSPACE.487).
+const NEW_ORDER = (text) => { const plan = PLAN_SECTION.exec(text)[0]; return text.replace(PLAN_SECTION, "").replace('<section id="s3">', `${plan}<section id="s3">`); };
+one("a page in the new order, Plan between What and How, is accepted", write(APPROACH, NEW_ORDER(CLEAN)), "silent");
+one("a page in the older order, Plan after How, is still accepted", write(APPROACH, CLEAN), "silent");
+one("What with an arc as a heading — What is told by domain and construct",
+  write(APPROACH, NEW_ORDER(CLEAN).replace("<p>You get one place", `<h4 id="N001-what">N001 &mdash; the chapter</h4>\n  <p>You get one place`)),
+  "reports", "What has a heading that is an arc");
+one("How with a status word", write(APPROACH, NEW_ORDER(CLEAN).replace("<p>You read the chapter first", "<p>N001 is RUNNING. You read the chapter first")),
+  "reports", "How says \"RUNNING\"");
+one("How quoting the developer", write(APPROACH, NEW_ORDER(CLEAN).replace("<p>You read the chapter first", "<p>The developer said: &ldquo;do the chapter first and then the check after it&rdquo;. You read the chapter first")),
+  "reports", "How quotes a line of the developer");
+one("What holding a code block — the page is the summary", write(APPROACH, NEW_ORDER(CLEAN).replace("<p>You get one place", "<pre>const a = 1;</pre>\n  <p>You get one place")),
+  "reports", "What holds a code block");
 one("no opening — no standfirst above Why",
   write(APPROACH, CLEAN.replace(/<p class="sds-standfirst">[^\n]*\n/, "")),
   "reports", "has no opening");
@@ -503,6 +519,17 @@ try {
 
   one("a line under the title typed by hand",
     write(page, CLEAN.replace("the check, in one sentence.", "a check reads the new shape")),
+    "reports", "N2's line is not the arc's own line");
+
+  // An arc whose `decides` is empty has no line to compare with: a line the row carries is not a finding (order X).
+  const noLine = stream(WORKSPACE, "042-noline");
+  putArc(noLine, "N2", "the check", "DECIDED");
+  writeFileSync(join(noLine, ARCS, "N2", "state.json"), readFileSync(join(noLine, ARCS, "N2", "state.json"), "utf8").replace(/"decides": "[^"]*"/, '"decides": ""'));
+  one("a row's own line, where the arc's decides is empty, is not compared",
+    write(join(noLine, "noline-approach.html"), cleanFor(noLine).replace("<strong>N2 &mdash; the check</strong></p>", "<strong>N2 &mdash; the check</strong></p><p>a line the row states itself</p>")),
+    "silent");
+  one("a row's own line, where the arc's decides is set, is still compared",
+    write(join(stream(WORKSPACE, "043-setline"), "setline-approach.html"), cleanFor(join(workstreamsDir(WORKSPACE, "open"), "043-setline")).replace("the check, in one sentence.", "a line typed over it")),
     "reports", "N2's line is not the arc's own line");
 
   one("four columns in an open workstream — told to run the command",
@@ -713,13 +740,15 @@ try {
 
   // A guide page as `docs guide` writes it: a header line with no status, a Title, a Description, its
   // stages and its steps. It sits in `guides/`, and its name ends `-guide.html`.
-  const GUIDE = `<!doctype html>\n${STYLES.stylesheet}\n<nav class="sds-rail" id="rail"></nav>\n<header class="sds-masthead">\n` +
+  const GUIDE = `<!doctype html>\n${STYLES.stylesheet}\n<div class="sds-page"><div class="sds-wrap"><nav class="sds-rail" id="rail"></nav>\n<header class="sds-masthead">\n` +
     `  <div class="sds-eyebrow"><span class="sds-line1">SaaS Plane &nbsp;|&nbsp; Probe &nbsp;|&nbsp; Getting Started</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Guide</span></span></div>\n` +
     `  <h1>Getting Started</h1>\n  <p class="sds-standfirst">You go from a clone to a running service. Read it on your first day.</p>\n</header>\n` +
     `<section id="s1"><div class="sds-section-head"><h2>Machine ready — The machine is ready</h2></div>\n  <p>You install the tools once, and you check them once.</p>\n` +
-    `  <div class="sds-step"><h3 id="h1">Install the toolchain</h3><p>You need it before any other step.</p><pre>spnutils setup</pre><p>You see one line for each tool.</p></div>\n</section>\n${STYLES.script}\n`;
+    `  <div class="sds-step"><h3 id="h1">Install the toolchain</h3><p>You need it before any other step.</p><pre>spnutils setup</pre><p>You see one line for each tool.</p></div>\n</section>\n</div></div>${STYLES.script}\n`;
   const guidePage = join(guidePagesDir(PROBE_DOCS), "getting-started-guide.html");
   one("a guide page under artifacts/guides/ is in its place, and draws no finding", write(guidePage, GUIDE), "silent");
+  const LINKED = GUIDE.replace("SaaS Plane &nbsp;|&nbsp; Probe &nbsp;|&nbsp; Getting Started", 'SaaS Plane &middot; <a href="../hub.html">Probe</a> &middot; Getting Started');
+  one("the eyebrow's first line is the breadcrumb: levels joined by a middle dot, each level above the page a link, draws no finding", write(guidePage, LINKED), "silent");
   one("a page under artifacts/guides/ whose name does not end -guide.html",
     write(join(guidePagesDir(PROBE_DOCS), "getting-started.html"), GUIDE), "reports", "does not end -guide.html");
   // The index of artifacts as `docs index` writes it: no header, no Title, no Description, and its own script.
@@ -745,7 +774,7 @@ try {
 
   const RAIL = `<nav class="sds-rail" id="rail"></nav>\n`;
   one("known-bad: a page that carries a rail and loads no shared script is told its outline is not built",
-    write(statusPage, withStatus(CLEAN, "IMPLEMENTING", "&#x1F6A7;") + RAIL), "reports", "carries a rail and loads no `sds-docs.js`");
+    write(statusPage, withStatus(CLEAN, "IMPLEMENTING", "&#x1F6A7;") + RAIL), "reports", "carries a rail and loads no `docs-page.js`");
   one("untouched: the same page with the shared script's line is silent",
     write(statusPage, withStatus(CLEAN, "IMPLEMENTING", "&#x1F6A7;") + RAIL + `${STYLES.script}\n`), "silent");
 } finally {
@@ -814,6 +843,24 @@ console.log("\n=== RULE.DEVEX.WORKSPACE.259 — a column whose cells hold senten
   const hubGlossary = oneCell.replace("<h2>Terms</h2>", "<h2>Glossary</h2>");
   say("green: a hub's one-column glossary is untouched", columnRule(hubGlossary).length === 0, JSON.stringify(columnRule(hubGlossary)));
   say("green: a report's tables are its own, and the same sentences there draw none", notes(checkPage("/d/artifacts/reports/docs-report.html", `<meta charset="utf-8">\n${shared}\n${sentences}\n`)).length === 0);
+}
+
+// ── a sidebar of pages: only the index of artifacts has one ──
+console.log("\n=== doc-check — a page of the artifacts pocket holds no sidebar of other pages");
+{
+  const { check: checkPage, sidebarRule } = await import("../../../../src/scripts/checks/doc-check.ts");
+  const say = (label, pass, detail = "") => { n += 1; if (!pass) failed += 1; console.log(`  ${pass ? "PASS" : "FAIL"}  ${label}${pass || !detail ? "" : `\n        ${String(detail).slice(0, 300)}`}`); };
+  const side = '<nav class="side"><a href="./a-overview.html">A</a><a href="./b-overview.html">B</a></nav>';
+  const rail = '<nav class="sds-rail" id="rail"><a class="sds-home" href="../README.html">back</a><a href="#s0">One</a><a href="#s1">Two</a></nav>';
+  const index = '<script type="application/json" id="index-data">{}</script>';
+  say("[MKT.SCRIPTS.631] red: a nav that links two other pages is found, as a rule", sidebarRule(`<body>${side}</body>`).length === 1 && sidebarRule(`<body>${side}</body>`)[0][0] === "RULE", JSON.stringify(sidebarRule(side)));
+  say("[MKT.SCRIPTS.631] green: the page's own rail, the way back and the outline links are not a sidebar", sidebarRule(`<body>${rail}</body>`).length === 0);
+  say("[MKT.SCRIPTS.631] green: a nav of anchors on the page, and a nav that links one page, draw none", sidebarRule('<nav><a href="#a">a</a><a href="#b">b</a></nav>').length === 0 && sidebarRule('<nav><a href="./a.html">a</a></nav>').length === 0);
+  say("[MKT.SCRIPTS.631] green: the index of artifacts, which holds an index-data block, is the one page that has such a nav", sidebarRule(`${index}<body>${side}</body>`).length === 0);
+  const page = (body) => `<meta charset="utf-8">\n<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.16.0/docs-language.css">\n<div class="sds-page">${body}</div>`;
+  const hit = (path, body) => checkPage(path, page(body)).filter(([, text]) => text.includes("sidebar of links to other pages")).length;
+  say("[MKT.SCRIPTS.631] red: a page under docs/artifacts/ with a sidebar is told by the whole check", hit("/r/docs/artifacts/docs/a-overview.html", side) === 1);
+  say("[MKT.SCRIPTS.631] green: the same page outside the artifacts pocket, or its index, is not read", hit("/r/notes/a-overview.html", side) === 0 && hit("/r/docs/artifacts/index.html", side) === 0);
 }
 
 // ── the compressed fault (RULE.DEVEX.WORKSPACE.096): a note on a page a person reads ──
@@ -1000,7 +1047,7 @@ console.log("\n=== doc-check — a long What on an open approach page holds a fi
 }
 
 {
-  console.log("\n=== doc-check — a surface page preview is a bar and a frame (05-artifacts.md, The surface page preview)");
+  console.log("\n=== doc-check — a surface preview is a bar and a frame (05-artifacts.md, The surface preview)");
   const { check } = await import("../../../../src/scripts/checks/doc-check.ts");
   const say = (label, ok, detail = "") => { n += 1; if (!ok) failed += 1; console.log(`  ${ok ? "PASS" : "FAIL"}  ${label}${ok || !detail ? "" : `\n        ${detail}`}`); };
   const path = join(stream(TMP, "096-surface", "open"), "notes", "N001", "samples", "home-preview.html");
@@ -1011,7 +1058,7 @@ console.log("\n=== doc-check — a long What on an open approach page holds a fi
     '<div class="sds-surface-switch"><button type="button" data-surface="mode" data-value="light">Light</button></div>\n' +
     '<div class="sds-surface-switch"><button type="button" data-surface="notes">Notes</button></div></header>\n' +
     `<main class="sds-surface-stage">${frame}</main>${more}\n</div>\n`;
-  const shaped = (text) => check(path, text).some(([, m]) => m.includes("a surface page preview"));
+  const shaped = (text) => check(path, text).some(([, m]) => m.includes("a surface preview"));
   const said = (text) => JSON.stringify(check(path, text));
   say("[MKT.HOOKS.522] green: the bar and the frame over a copy beside it draw nothing", check(path, surface()).length === 0, said(surface()));
   say("[MKT.HOOKS.522] red: a template slot left in is refused", shaped(surface().replace("Home</h1>", "{{THE PAGE'S NAME}}</h1>")), said(surface()));
@@ -1028,6 +1075,27 @@ console.log("\n=== doc-check — a long What on an open approach page holds a fi
     say("[MKT.HOOKS.522] green: a framed copy with the meta and the listener draws nothing", !copied());
   }
   say("[MKT.HOOKS.522] red: a bar without its Notes switch is refused", shaped(surface().replace(/<div class="sds-surface-switch"><button type="button" data-surface="notes">Notes<\/button><\/div>/, "")));
+
+  // The surface page in one file: the bar, the frame and the page's markup in one template, with two metas.
+  const ONE = join(dirname(path), "home-page.html");
+  const page = (over = {}) => {
+    const o = { ds: '<meta name="surface-ds" content="11.21.0">\n', css: '<meta name="surface-app-css" content="">\n', template: '<template id="page"><section><h1>Scale it.</h1></section></template>', more: "", ...over };
+    return `<meta charset="utf-8">\n${o.ds}${o.css}<!-- spn:doc\n{"id": "surface-page-home", "variant": "surface-page", "title": "Home"}\n-->\n${linesFor("1.0.0").stylesheet}\n` +
+      '<div class="sds-surface" data-width="desktop">\n<header class="sds-surface-bar"><h1 class="sds-surface-title">Home</h1>\n' +
+      '<div class="sds-surface-switch"><button type="button" data-surface="width" data-value="desktop">Desktop</button></div>\n' +
+      '<div class="sds-surface-switch"><button type="button" data-surface="mode" data-value="light">Light</button></div>\n' +
+      '<div class="sds-surface-switch"><button type="button" data-surface="notes">Notes</button></div></header>\n' +
+      `<main class="sds-surface-stage"><iframe class="sds-surface-frame" title="Home"></iframe></main>${o.more}\n</div>\n${o.template}\n`;
+  };
+  const refused = (text) => check(ONE, text).some(([, m]) => m.includes("a surface page"));
+  say("[MKT.HOOKS.522] green: a surface page of one file holds the bar, the frame, the template and the two metas, and draws nothing", check(ONE, page()).length === 0, JSON.stringify(check(ONE, page())));
+  say("[MKT.HOOKS.522] red: a page with no template for its markup is refused", refused(page({ template: "" })));
+  say("[MKT.HOOKS.522] red: a page with no surface-ds meta is refused, and one whose meta is no version", refused(page({ ds: "" })) && refused(page({ ds: '<meta name="surface-ds" content="latest">\n' })));
+  say("[MKT.HOOKS.522] red: a page with no surface-app-css meta is refused, and one naming another site's stylesheet", refused(page({ css: "" })) && refused(page({ css: '<meta name="surface-app-css" content="https://example.com/a.css">\n' })));
+  say("[MKT.HOOKS.522] green: an app stylesheet may be empty, Surface's own look, or a relative path", !refused(page()) && !refused(page({ css: '<meta name="surface-app-css" content="www.css">\n' })));
+  say("[MKT.HOOKS.522] red: words of the page's own beside the bar and the template are refused, and the same words inside the template are not", refused(page({ more: "<p>words</p>" })) && !refused(page({ template: '<template id="page"><p>words</p><h2>More</h2></template>' })));
+  say("[MKT.HOOKS.522] red: a slot left in the page is refused", refused(page({ ds: '<meta name="surface-ds" content="{{DS-VERSION}}">\n' })));
+  say("[MKT.HOOKS.522] the page of one file needs no copy beside it, so the old copy check reads nothing of it", !check(ONE, page()).some(([, m]) => m.includes("RULE.DEVEX.WORKSPACE.536") && m.includes("frames")));
 }
 
 {
@@ -1063,6 +1131,36 @@ console.log("\n=== doc-check — a long What on an open approach page holds a fi
   say("[RULE.DEVEX.WORKSPACE.523] [MKT.HOOKS.524] green: an svg that carries data-dl-legend itself is a sample", hand(artifact, page(FLAT.replace("<svg ", "<svg data-dl-legend "))).length === 0);
   say("[RULE.DEVEX.WORKSPACE.523] [MKT.HOOKS.524] green: a seat file's fenced example of the old markup is not a figure", hand(seat, `# Thing\n\n\`\`\`html\n${FLAT}\n\`\`\`\n`).length === 0);
   say("[RULE.DEVEX.WORKSPACE.523] [MKT.HOOKS.524] green: a page of a closed workstream keeps the figures it closed with", hand(closed, page(FLAT)).length === 0);
+}
+
+
+console.log("\n=== doc-check — every page from a template, a shown command, and the hints on what is written (RULE.DEVEX.WORKSPACE.554, 557, 548)");
+{
+  const docCheck = await import("../../../../src/scripts/checks/doc-check.ts");
+  const say = (label, ok, detail = "") => { n += 1; if (!ok) failed += 1; console.log(`  ${ok ? "PASS" : "FAIL"}  ${label}${ok || !detail ? "" : `\n        ${String(detail).slice(0, 300)}`}`); };
+  const bare = join(PROBE_DOCS, "artifacts", "public", "docs", "probe-overview.html");
+  const framed = join(PROBE_DOCS, "artifacts", "public", "docs", "framed-overview.html");
+  const seat = join(PROBE_DOCS, "02-constructs", "01-probe", "01-thing.md");
+  const notes = join(stream(TMP, "097-x", "open"), "notes", "N001", "extra.html");
+  const sample = join(stream(TMP, "097-x", "open"), "notes", "N001", "samples", "home.html");
+  const FRAME = '<div class="sds-page"><div class="sds-wrap"><div class="sds-masthead"></div></div></div>';
+  const frames = (path, text) => docCheck.check(path, text).filter(([, m]) => m.includes("RULE.DEVEX.WORKSPACE.554"));
+  say("[MKT.HOOKS.529] red: a bare page of the public pocket is named, with the page template", frames(bare, `<!doctype html>${STYLES.stylesheet}<p>bare</p>`).length === 1 && frames(bare, `<!doctype html>${STYLES.stylesheet}<p>bare</p>`)[0][1].includes("page-template.html"));
+  say("[MKT.HOOKS.529] green: a page with the frame is silent on that", frames(framed, `<!doctype html>${STYLES.stylesheet}${FRAME}`).length === 0);
+  say("[MKT.HOOKS.529] red: a page in an arc's own notes needs the frame too", frames(notes, `<!doctype html>${STYLES.stylesheet}<p>bare</p>`).length === 1);
+  say("[MKT.HOOKS.529] green: a sample under samples/ is a view of the work, never a docs page", frames(sample, `<!doctype html>${STYLES.stylesheet}<p>bare</p>`).length === 0);
+  say("[MKT.HOOKS.529] green: an Edit's fragment is not judged for a frame", docCheck.check(bare, "<p>bare</p>", true).filter(([, m]) => m.includes("554")).length === 0);
+  const gone = docCheck.check(seat, "# Thing\n\nTry it: `node docs.ts audit docs/02-constructs`\n").filter(([, m]) => m.includes("is gone"));
+  say("[MKT.HOOKS.528] red: a seat file that shows an old command is told the current form", gone.length === 1 && gone[0][0] === "SOFT" && gone[0][1].includes("spn-devex docs audit"), JSON.stringify(gone));
+  say("[MKT.HOOKS.528] green: a current command is silent", docCheck.check(seat, "# Thing\n\nTry it: `spn-devex docs audit check docs`\n").filter(([, m]) => m.includes("is gone")).length === 0);
+  const written = docCheck.checkDoc({ tool_input: { file_path: seat, content: "# Thing\n\nThe writer draws it → the check reads it → the index lists it → the reader opens it.\n" } });
+  say("[MKT.HOOKS.532] red: the hook, on a written seat file, adds the figure hint", typeof written?.note === "string" && written.note.includes("add a dg figure beside it"), JSON.stringify(written));
+  const edited = docCheck.checkDoc({ tool_input: { file_path: seat, new_string: "The writer draws it → the check reads it → the index lists it → the reader opens it.\n" } });
+  say("[MKT.HOOKS.532] red: the hook, on an Edit's replacement text, adds it too", typeof edited?.note === "string" && edited.note.includes("add a dg figure beside it"), JSON.stringify(edited));
+  const table = "# Thing\n\n| Name | What |\n| --- | --- |\n" + ["a", "b", "c"].map((k) => `| \`${k}\` | one two three four five six seven eight nine ten eleven twelve words |`).join("\n") + "\n";
+  const catalog = docCheck.checkDoc({ tool_input: { file_path: seat, content: table } });
+  say("[MKT.HOOKS.532] red: the hook, on a written seat file, names a table that reads as a catalog", typeof catalog?.note === "string" && catalog.note.includes("reads as a catalog"), JSON.stringify(catalog));
+  say("[MKT.HOOKS.532] every hint the hook adds stays advisory: the note is no refusal", written?.deny === undefined && catalog?.deny === undefined);
 }
 
 console.log(failed ? `\n  ${failed} FAILED` : `\n  all ${n} passed`);

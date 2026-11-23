@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "book": {
     "repository": "spn-foundation",
-    "commit": "bc896b9b"
+    "commit": "f0bac8e1"
   },
   "rules": [
     {
@@ -2438,6 +2438,11 @@
       "heading": "A new window by presence",
       "decision": null,
       "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/workstream.md",
+          "heading": "Work is sized by its kind, and fixes gather into a round"
+        },
         {
           "plugin": "spn-devex",
           "path": "refs/devex/workspace/workstream.md",
@@ -7283,7 +7288,7 @@
         "check": "doc-check"
       },
       "class": "checked",
-      "sentence": "Every repository's artifacts open from one page, `docs/artifacts/index.html`",
+      "sentence": "Every repository's artifacts open from two index pages, `docs/artifacts/public/index.html` and `docs/artifacts/private/index.html`",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "The index of artifacts — one page that opens every other",
       "decision": null,
@@ -7302,7 +7307,7 @@
         "check": "corpus"
       },
       "class": "checked",
-      "sentence": "A hub has no link above its rail",
+      "sentence": "A hub has no link in the masthead's first line",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "The templates — the pages, and the two seat files behind them",
       "decision": null,
@@ -7326,6 +7331,11 @@
       "heading": "What the pocket holds",
       "decision": null,
       "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/docs/doc-sets.md",
+          "heading": "The artifacts pocket — concept, overview, construct page"
+        },
         {
           "plugin": "spn-devex",
           "path": "refs/devex/workspace/docs/doc-sets.md",
@@ -7485,7 +7495,7 @@
       "level": "GUIDE",
       "params": {},
       "class": "guidance",
-      "sentence": "`What` groups by domain, `How` by repository, and `Why` by the nature of the problem",
+      "sentence": "`What` groups by domain and construct, `How` by repository, and `Why` by the nature of the problem",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "The approach document — a workstream's, never a repository's",
       "decision": null,
@@ -7697,30 +7707,6 @@
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "One stylesheet, served in versions",
       "decision": "DEC.DEVEX.WORKSPACE.237",
-      "restated": [
-        {
-          "plugin": "spn-devex",
-          "path": "refs/devex/workspace/docs/doc-sets.md",
-          "heading": "What an overview and a hub hold, section by section"
-        },
-        {
-          "plugin": "spn-devex",
-          "path": "refs/devex/workspace/workstream.md",
-          "heading": "Anything the developer has not reviewed: preview, confirm, record, then code"
-        }
-      ]
-    },
-    {
-      "id": "RULE.DEVEX.WORKSPACE.238",
-      "level": "MUST",
-      "params": {
-        "check": "doc-check"
-      },
-      "class": "checked",
-      "sentence": "`Where it lands` is one folder tree for each repository, and the blocks that explain a change follow its tree",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "heading": "The approach document — a workstream's, never a repository's",
-      "decision": null,
       "restated": [
         {
           "plugin": "spn-devex",
@@ -8093,7 +8079,7 @@
         "check": "workstream-owner"
       },
       "class": "checked",
-      "sentence": "Every arc has one preview, and its name is fixed: `notes/N<nnn>/preview.html`",
+      "sentence": "Every arc has one page, and its name is fixed: `notes/N<nnn>/arc.html`",
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "An arc carries its specification, or names the note that holds it",
       "decision": null,
@@ -12477,7 +12463,7 @@
         "check": "doc-check"
       },
       "class": "checked",
-      "sentence": "After `How` comes a section of its own, *Plan*: one row per arc, in the arc order (`ideate` first, the build arcs by number and letter, `follow-ups` last), the same order the status bar follows",
+      "sentence": "After `What` comes a section of its own, *Plan*: one row per arc, in the arc order (`ideate` first, the build arcs by number and letter, `follow-ups` last), the same order the status bar follows",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "Plan lists the arcs, and the arcs are the state",
       "decision": null,
@@ -13196,6 +13182,11 @@
           "plugin": "spn-devex",
           "path": "refs/devex/workspace/docs/doc-sets.md",
           "heading": "Every page opens on a masthead of three levels"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/docs/doc-sets.md",
+          "heading": "The templates sit beside the chapters, in templates/"
         }
       ]
     },
@@ -13444,9 +13435,9 @@
       "level": "GUIDE",
       "params": {},
       "class": "guidance",
-      "sentence": "A surface page preview is the workstream's third page template, used for a surface page review of a site's or an app's pages, and only once the app's design language exists",
+      "sentence": "A surface preview is one file, the surface page template in `templates/surface/`, used for a surface page review of a site's or an app's pages, and only once the app's design language exists",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "heading": "The surface page preview",
+      "heading": "The surface preview",
       "decision": null,
       "restated": [
         {
@@ -13463,9 +13454,9 @@
         "skill": "spn-devex/ideate"
       },
       "class": "stated in a skill",
-      "sentence": "The preview holds a bar and a frame, and nothing else",
+      "sentence": "The page holds a bar and the page's markup, and nothing else",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "heading": "The surface page preview",
+      "heading": "The surface preview",
       "decision": null,
       "restated": [
         {
@@ -13487,9 +13478,9 @@
         "skill": "spn-devex/ideate"
       },
       "class": "stated in a skill",
-      "sentence": "The copy names its own mode switch and holds its notes, and it is just the page when opened alone",
+      "sentence": "The page names the design system and the app's stylesheet in two metas, and the shared script builds the frame's document",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "heading": "The surface page preview",
+      "heading": "The surface preview",
       "decision": null,
       "restated": [
         {
@@ -13501,11 +13492,6 @@
           "plugin": "spn-devex",
           "path": "skills/ideate/SKILL.md",
           "heading": "The rules this step holds"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/steps/page-preview.md",
-          "heading": "Traps"
         }
       ]
     },
@@ -13516,9 +13502,9 @@
         "skill": "spn-devex/ideate"
       },
       "class": "stated in a skill",
-      "sentence": "The bar's message, the meta and the note marker change only with a new stylesheet version",
+      "sentence": "The frame's document, the metas and the note marker change only with a new stylesheet version",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "heading": "The surface page preview",
+      "heading": "The surface preview",
       "decision": null,
       "restated": [
         {
@@ -13779,7 +13765,7 @@
       "class": "stated in a skill",
       "sentence": "A surface page sample is checked against the current standard for its kind before it is edited",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "heading": "The surface page preview",
+      "heading": "The surface preview",
       "decision": null,
       "restated": [
         {
@@ -13798,6 +13784,252 @@
           "heading": "Traps"
         }
       ]
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.548",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
+      "sentence": "Which figure, for what you need to show",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "heading": "The figures — what sits inside a block, and the closed set of them",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "How a first proposal is shaped"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/SKILL.md",
+          "heading": "8. Draw it as skeletons — a mock, with no Figma"
+        }
+      ]
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.549",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
+      "sentence": "Content that has a shape takes the block that shape names, from this table, read down to the first row that fits",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "heading": "Which block a content takes, and how its fence is written",
+      "decision": null,
+      "restated": []
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.550",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-devex/ideate"
+      },
+      "class": "stated in a skill",
+      "sentence": "A page whose sidebar lists other pages is the index page, built from `templates/docs/pages/index-template.html`, and it never has a sidebar of its own",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "heading": "The index of artifacts — one page that opens every other",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/docs/doc-sets.md",
+          "heading": "The artifacts pocket — concept, overview, construct page"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/workstream.md",
+          "heading": "Anything the developer has not reviewed: preview, confirm, record, then code"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.551",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-devex/ideate"
+      },
+      "class": "stated in a skill",
+      "sentence": "A design-language construct page holds its spec in a fold",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "heading": "The surface preview",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/docs/doc-sets.md",
+          "heading": "The artifacts pocket — concept, overview, construct page"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.552",
+      "level": "MUST",
+      "params": {
+        "check": "workstream-state"
+      },
+      "class": "checked",
+      "sentence": "An arc whose notes hold a samples index links it from its preview",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "heading": "The approach document — a workstream's, never a repository's",
+      "decision": null,
+      "restated": []
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.553",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-devex/ideate"
+      },
+      "class": "stated in a skill",
+      "sentence": "A docs page has four regions, and each one behaves the same on every page",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "heading": "The templates — the pages, and the two seat files behind them",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.554",
+      "level": "MUST",
+      "params": {
+        "check": "doc-check"
+      },
+      "class": "checked",
+      "sentence": "Every HTML page in a repository's `docs/artifacts/` or an arc's `notes/` starts from one of the docs templates",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "heading": "The templates — the pages, and the two seat files behind them",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/docs/doc-sets.md",
+          "heading": "The artifacts pocket — concept, overview, construct page"
+        }
+      ]
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.555",
+      "level": "MUST",
+      "params": {
+        "check": "doc-check"
+      },
+      "class": "checked",
+      "sentence": "`public/` is self-contained",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "heading": "What the pocket holds",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/docs/doc-sets.md",
+          "heading": "The artifacts pocket — concept, overview, construct page"
+        }
+      ]
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.556",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
+      "sentence": "`private/` may link into `public/`",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "heading": "What the pocket holds",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/docs/doc-sets.md",
+          "heading": "The artifacts pocket — concept, overview, construct page"
+        }
+      ]
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.557",
+      "level": "MUST",
+      "params": {
+        "check": "doc-check"
+      },
+      "class": "checked",
+      "sentence": "A command a page shows, in a `sh` block or after \"Try it:\", is a form the command line accepts today",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "heading": "Which block a content takes, and how its fence is written",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "How a first proposal is shaped"
+        }
+      ]
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.558",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
+      "sentence": "A page that already exists gets its second pass file by file, and only its form changes",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "heading": "A page is written in two passes",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "How a first proposal is shaped"
+        }
+      ]
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.559",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-devex/execute"
+      },
+      "class": "stated in a skill",
+      "sentence": "While an arc changes the agent's own tools, the agent and its helpers run those tools from the arc's branch source, and build, cut and test once at the end",
+      "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
+      "heading": "Drift and the passes",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/execute/SKILL.md",
+          "heading": "The rules this step holds"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "While the shape is discussed, a find stays on the ideate arc"
+        }
+      ]
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.560",
+      "level": "MUST",
+      "params": {
+        "check": "doc-check"
+      },
+      "class": "checked",
+      "sentence": "A page shown to the developer holds no placeholder and no empty section",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "heading": "A page is written in two passes",
+      "decision": null,
+      "restated": []
     },
     {
       "id": "RULE.LAUNCHPAD.CONTROL_PLANE.001",
@@ -37779,7 +38011,7 @@
         "skill": "spn-surface/design"
       },
       "class": "stated in a skill",
-      "sentence": "`spnutils apps surface render` draws each page of a tree and prints it, in one of two forms",
+      "sentence": "`spnutils apps surface render` draws a tree in an app's design language, and its three choices are always given",
       "chapter": "04-capabilities/02-support/01-surface/11-delivery-library/01-common/02-render.md",
       "heading": "The command",
       "decision": null,
@@ -37798,9 +38030,9 @@
         "skill": "spn-surface/design"
       },
       "class": "stated in a skill",
-      "sentence": "The app object is the design language's row for the app, and no field of it is written by hand in a tree file",
+      "sentence": "The app's row in the design language is the one source of the look, and no field of it is written in a tree file",
       "chapter": "04-capabilities/02-support/01-surface/11-delivery-library/01-common/02-render.md",
-      "heading": "The app object",
+      "heading": "The app",
       "decision": null,
       "restated": [
         {
@@ -37817,7 +38049,7 @@
         "skill": "spn-surface/design"
       },
       "class": "stated in a skill",
-      "sentence": "A tree has `specVersion` at its top, and a version the render does not read is refused",
+      "sentence": "A tree has `treeVersion` at its top, and a version the render does not read is refused",
       "chapter": "04-capabilities/02-support/01-surface/11-delivery-library/01-common/02-render.md",
       "heading": "The tree",
       "decision": null,
@@ -37855,7 +38087,7 @@
         "skill": "spn-surface/design"
       },
       "class": "stated in a skill",
-      "sentence": "The render prints `{ \"pages\": [ { \"html\", \"findings\" } ] }` to standard output, one whole page for each page of the tree",
+      "sentence": "The render prints the HTML of the tree, keyed by mode and then by device, and no document around it",
       "chapter": "04-capabilities/02-support/01-surface/11-delivery-library/01-common/02-render.md",
       "heading": "The output",
       "decision": null,
@@ -37893,7 +38125,7 @@
         "skill": "spn-surface/design"
       },
       "class": "stated in a skill",
-      "sentence": "The design system at the app object's `ds` version is fetched once into the machine's store when no app has it installed",
+      "sentence": "The design system at the version the app pins is fetched once into the machine's store when no app has it installed",
       "chapter": "04-capabilities/02-support/01-surface/11-delivery-library/01-common/02-render.md",
       "heading": "Nothing is kept",
       "decision": null,
@@ -38103,6 +38335,68 @@
       "sentence": "Features that each answer their own question stand in sections of their own; one section holds several features only when they answer one question",
       "chapter": "04-capabilities/02-support/01-surface/03-standards-patterns/01-common/03-site-patterns.md",
       "heading": "What holds across",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.595",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "A page that shows a render links the design system's stylesheet, and an app's own stylesheet only where the app gives one",
+      "chapter": "04-capabilities/02-support/01-surface/03-standards-patterns/01-common/05-design-languages.md",
+      "heading": "One source for the platform's look",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/design-languages.md",
+          "heading": "One source for the platform's look — 🔮"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/design-language.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.596",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "A choice left out is refused, never defaulted",
+      "chapter": "04-capabilities/02-support/01-surface/11-delivery-library/01-common/02-render.md",
+      "heading": "The command",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.597",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "The render returns markup only, and a page that shows a copy builds the page around it",
+      "chapter": "04-capabilities/02-support/01-surface/11-delivery-library/01-common/02-render.md",
+      "heading": "A page that shows a copy",
       "decision": null,
       "restated": [
         {

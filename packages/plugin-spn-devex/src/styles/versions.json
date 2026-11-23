@@ -78,5 +78,12 @@
     "sds-docs.css": "a432a828da9b0bb5f18431dd42bef4b0101cdbd4b62f7f2419d25423798897e7",
     "sds-docs.js": "efb99106b54c608d13bbd1d0f879099fff7f6ab699738e9bda9071c405c92dbc",
     "sds-index.js": "e16346de0438ed082a5d8950cd863aef2342b857864e5df72f4bb44ad29159ce"
+  },
+  "1.16.0": {
+    "docs-language.css": "b6f0c1e69846dda6bd9991ccede715e36b2f1becf2d707928a6537a0c36b18ac",
+    "docs-page.js": "ac161243d18e410c1c87e59d58e95c1b0c6df60faf28f7f3facd84fcaa68f391",
+    "docs-index.js": "fc412e38934a3ca0da827b0b66d1e2f4a412451107810d45c45e3969c78181b3",
+    "design-system-units.css": "8e15d06a7ce7ab1131c17e0f982feb8f2926ed1ded4b6e6d5bb579ba0ff56250",
+    "design-system.css": "1783656b11e093050443b19c1f4d2020aa2e327fcd2f0dc04bfbc2feea067503"
   }
 }

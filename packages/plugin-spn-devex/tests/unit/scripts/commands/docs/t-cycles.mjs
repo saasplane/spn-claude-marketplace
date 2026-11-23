@@ -137,6 +137,18 @@ try {
       tableDifferences(reasonless, cycles).stale.some((line) => /N10's links are not the arc's preview and samples/.test(line)), JSON.stringify(tableDifferences(reasonless, cycles)));
     const extra = table.replace("</tbody>", `<tr><td><p><strong>N9 &mdash; the old form</strong></p></td><td>RUNNING</td></tr>\n    </tbody>`);
     ok("a row for the Markdown arc names no arc the data holds", tableDifferences(extra, cycles).unknown.join() === "N9", JSON.stringify(tableDifferences(extra, cycles)));
+    // A ROW IS KEYED BY ITS OWN ADDRESS: `id="N10"` names the arc whatever the title says, so a row titled in words still finds its arc.
+    const reworded = table.replace(/<strong>N10 &mdash; [^<]*<\/strong>/, "<strong>A title that names no number</strong>");
+    const worded = tableDifferences(reworded, cycles);
+    ok("a row's key is its id, so a retitled row is stale in its name and not missing or unknown", worded.missing.length === 0 && worded.unknown.length === 0 && worded.stale.some((line) => /is named/.test(line)), JSON.stringify(worded));
+    // A LINK IS COMPARED BY WHAT IT OPENS: `arc.html`, `./` and `preview.html` open the one page; its words are not read.
+    const arcPreview = cycles.find((cycle) => cycle.previews.length)?.previews[0];
+    if (arcPreview) {
+      const spelled = table.split(`href="${arcPreview.href}"`).join(`href="./${arcPreview.href.replace(/preview\.html$/, "arc.html")}"`);
+      ok("a link spelled ./…/arc.html opens what …/preview.html opens, so the row is current", spelled !== table && JSON.stringify(tableDifferences(spelled, cycles)) === JSON.stringify({ missing: [], unknown: [], stale: [] }), JSON.stringify(tableDifferences(spelled, cycles)));
+    }
+    const badged = table.replace(/sds-status sds-running">RUNNING<\/span>/, 'sds-status sds-landed">LANDED</span>');
+    ok("a status badge that differs from the arc's state is stale, whatever the cell's words", tableDifferences(badged, cycles).stale.some((line) => /reads LANDED/.test(line)), JSON.stringify(tableDifferences(badged, cycles)));
   }
 
   console.log("\n=== docs cycles — naming the workstream");
@@ -349,9 +361,9 @@ ${linesFor("1.0.0").script}
     const bare = build("open", "059-bare", PAGE({ cyclesBody: "" }));
     const bareWrote = await capture(["docs", "cycles", "write", bare]);
     const bareText = readFileSync(join(bare, "approach.html"), "utf8");
-    const howEnd = bareText.indexOf("</section>", bareText.indexOf("<h2>How"));
-    ok("[MKT.SCRIPTS.400] a page with no Plan section gets one after How, holding the arcs table from the arcs, and says so",
-      bareWrote.code === 0 && /the Plan section/.test(bareWrote.out) && bareText.indexOf('<section id="arcs"') > howEnd && bareText.indexOf('<section id="arcs"') < bareText.indexOf('<section id="s4"')
+    const whatEnd = bareText.indexOf("</section>", bareText.indexOf("<h2>What"));
+    ok("[MKT.SCRIPTS.400] a page with no Plan section gets one between What and How, holding the arcs table from the arcs, and says so",
+      bareWrote.code === 0 && /the Plan section/.test(bareWrote.out) && bareText.indexOf('<section id="arcs"') > whatEnd && bareText.indexOf('<section id="arcs"') < bareText.indexOf("<h2>How")
         && bareText.includes("<h2>Plan</h2>") && count(bareText, "<th>Arc</th>") === 1 && cyclesRule(join(bare, "approach.html"), bareText).length === 0, `${bareWrote.out}${bareWrote.err}\n${bareText}`);
     const oldHome = build("open", "060-older", PAGE({ cyclesBody: "" }));
     const oldFile = join(oldHome, "approach.html");
@@ -443,6 +455,15 @@ console.log("\n=== the places of How, produced from the rows' repo (RULE.DEVEX.W
   ok("an Arcs line that names other arcs is rewritten, and the facts after it kept", stale.includes(`<span class="sds-small">Arcs: N001 &middot; Size: large</span>`), stale);
   const bare = placedPage(withPlace(""), [{ repo: "spn-x", arcs: ["N001"] }]);
   ok("a place with no facts line gains one under its line", /Ships: the book\.<\/p>\n {2}<p><span class="sds-small">Arcs: N001<\/span><\/p>/.test(bare), bare);
+
+  // How told as a catalog, one item for each repository: the item is found by its h4, and only its Arcs fact is written.
+  const { shapedApproachPage } = await import("../../../../helpers/workstream-fixture.mjs");
+  const tiled = placedPage(shapedApproachPage("x"), [{ repo: "spn-x", arcs: ["N001", "N002"] }, { repo: "spn-y", arcs: ["N002"] }]);
+  ok("a repository's item in the catalog carries no Arcs fact (Plan alone links arcs), and keeps what the agent wrote there",
+    !tiled.includes("<dt>Arcs</dt>") && tiled.includes("<div><dt>Ships</dt><dd>a minor release</dd></div>") && tiled.includes("<p>The probe changes the <a href=\"#c1\">template</a>.</p>"), tiled.slice(tiled.indexOf("<h2>How")));
+  ok("a repository the rows name with no item gains one at the end of the catalog, with the slots the agent fills and no Arcs fact",
+    /<h4 id="how-spn-y">spn-y<\/h4><p>\{\{REPO-CHANGE\}\}<\/p>[\s\S]*<dd>\{\{RELEASE\}\}<\/dd>[\s\S]*<\/div>\n<\/section>/.test(tiled) && !/<h3 id="how-/.test(tiled) && !tiled.includes("<dt>Arcs</dt>"), tiled.slice(tiled.indexOf("<h2>How")));
+  ok("written twice, the catalog does not move", placedPage(tiled, [{ repo: "spn-x", arcs: ["N001", "N002"] }, { repo: "spn-y", arcs: ["N002"] }]) === tiled);
 
   const { root, ws } = await dataWorkspace("cycles-places", { rows: [
     ...arcData().rows,

@@ -48,6 +48,38 @@ export function approachPage(stamp = "") {
   ].join("\n");
 }
 
+/**
+ * The approach page told the way the template tells it (order T): What by domain and construct with no entry for an arc, Plan between
+ * What and How, How as a catalog of repositories, the arc's address its Plan row alone.
+ */
+export function shapedApproachPage(stamp = "") {
+  const old = approachPage(stamp);
+  const row = /    <tr id="N001"[^\n]*\n/.exec(old.replace(/^\s+<tr/m, "    <tr")) ?? /      <tr id="N001"[^\n]*\n/.exec(old);
+  const plan = old.slice(old.indexOf('<section id="arcs"'), old.indexOf('<section id="s4"'));
+  return old.slice(0, old.indexOf('<section id="s2"')) + [
+    `<section id="s2" data-block="reasons">`,
+    `  <div class="sds-section-head"><h2>What</h2></div>`,
+    `  <p class="sds-standfirst">The probe is answered.</p>`,
+    `  <h3 id="d1">DevEx &middot; Workspace</h3>`,
+    `  <p class="sds-standfirst">The probe changes how a page is told.</p>`,
+    `  <h4 id="c1">Docs &middot; Templates</h4>`,
+    `  <p>The probe changes one template.</p>`,
+    `  <p><span class="sds-small">Arcs: <a href="notes/N001/preview.html">N001</a></span></p>`,
+    `  <p>Read the arc page &rarr; <a href="notes/N001/preview.html">the probe</a></p>`,
+    `</section>`,
+    plan.trimEnd(),
+    `<section id="s3" data-block="sequence">`,
+    `  <div class="sds-section-head"><h2>How</h2></div>`,
+    `  <p class="sds-standfirst">The book releases first.</p>`,
+    `  <div class="sds-tiles" data-layout="LIST">`,
+    `    <div class="sds-tile">`,
+    `      <div class="sds-tile-body"><h4 id="h1">spn-x</h4><p>The probe changes the <a href="#c1">template</a>.</p>`,
+    `      <dl class="sds-tile-facts"><div><dt>Ships</dt><dd>a minor release</dd></div><div><dt>After</dt><dd>nothing</dd></div><div><dt>Arcs</dt><dd>N001</dd></div></dl></div></div>`,
+    `  </div>`,
+    `</section>`,
+  ].join("\n") + "\n" + old.slice(old.indexOf('<section id="s4"'));
+}
+
 export const PREVIEW = `<meta charset="utf-8">\n<div class="sds-wrap">\n<section id="s1"><h2>Overview</h2><p>the probe</p></section>\n</div>\n`;
 
 /** The arc's data: decided, two rows, the second waiting on the first. */

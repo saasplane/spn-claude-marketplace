@@ -14,7 +14,7 @@ const SHOWN = 4;
 export function applies(path: string): boolean {
   const p = path.split("\\").join("/");
   if (!p.includes(`/${DEVEX_WORKSTREAMS}/`)) return false;
-  return /\/notes\/N\d+\/preview\.html$/.test(p) || /\/notes\/[^/]+\/samples\/[^/]+$/.test(p);
+  return /\/notes\/N\d+\/(?:arc|preview)\.html$/.test(p) || /\/notes\/[^/]+\/samples\/[^/]+$/.test(p);
 }
 
 const ENTITIES: Record<string, string> = { "&lt;": "<", "&gt;": ">", "&amp;": "&", "&quot;": "\"", "&#39;": "'", "&rsquo;": "'" };
@@ -35,7 +35,7 @@ export function checkSqlSample(payload: Payload): Verdict {
   if (!found.length) return null;
   // A NOTE, NEVER A DENY: a stack standard reaches the agent as words, and no stack standard is a hard check.
   return { note:
-    `The SQL in this ${path.endsWith("preview.html") ? "preview" : "sample"} departs from the SQL naming chapter. ` +
+    `The SQL in this ${/(?:arc|preview)\.html$/.test(path) ? "preview" : "sample"} departs from the SQL naming chapter. ` +
     `${found.length} finding(s):\n\n` +
     `${found.slice(0, SHOWN).map((item) => `  [${item.rule}] ${item.message}`).join("\n")}` +
     (found.length > SHOWN ? `\n  and ${found.length - SHOWN} more` : "") +

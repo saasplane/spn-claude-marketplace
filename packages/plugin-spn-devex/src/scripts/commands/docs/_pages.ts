@@ -8,11 +8,11 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 import { bookTemplatesDir } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
-import { INDEX_SCRIPT, OWN_COPY, PAGE_SCRIPT, STYLESHEET, cutVersions, integrityFor, linesFor, linksSharedStyles, newestVersion,
+import { INDEX_SCRIPT, OWN_COPY, PAGE_SCRIPT, STYLESHEET, anyNameOf, cutVersions, integrityFor, linesFor, linksSharedStyles, newestVersion, nameIn,
   stylesDir } from "../../../../../plugin-support-lib/src/lib/page-styles.ts";
 
 /** The folder of the templates that holds the page templates. */
-const PAGE_TEMPLATES = "pages";
+const PAGE_TEMPLATES = join("docs", "pages");
 
 /** A reason a command stops and writes nothing. The command prints its message and exits 1. */
 export class Refusal extends Error {}
@@ -102,18 +102,18 @@ export function withHead(template: string, head: Head): string {
   let hashes: Record<string, string>;
   try {
     if (styles === null) throw new Error(`version ${head.version} has no integrity hash: no \`styles/\` folder was found`);
-    hashes = integrityFor(styles, head.version, [STYLESHEET, head.script]);
+    hashes = integrityFor(styles, head.version, [nameIn(head.version, STYLESHEET), nameIn(head.version, head.script)]);
   } catch (error) { throw new Refusal(`${(error as Error).message}, so a page cannot link it`); }
   const lines = linesFor(head.version, head.script, hashes);
-  let page = template.replace(/^\s*<!--(?!\s*spn:doc)[\s\S]*?-->\s*/, "");
+  let page = template.replace(/^(?:\s*<!--(?!\s*spn:doc)[\s\S]*?-->)+\s*/, "");
   page = page.replace(/\n*<footer>[\s\S]*?<\/footer>\n*/, "\n\n");
   page = swap(page, /<title>[\s\S]*?<\/title>/, `<title>${escaped(head.tab)}</title>`, "`<title>`");
   page = swap(page, /<!--\s*spn:doc[\s\S]*?-->/,
     `<!-- spn:doc\n${JSON.stringify(head.block)}\n-->\n<!-- ${head.produced} -->`, "`spn:doc` block");
-  page = swap(page, new RegExp(`<link\\b[^>]*\\bhref="[^"]*${literal(STYLESHEET)}"[^>]*>`), lines.stylesheet,
+  page = swap(page, new RegExp(`<link\\b[^>]*\\bhref="[^"]*${anyNameOf(STYLESHEET)}"[^>]*>`), lines.stylesheet,
     `line that links \`${STYLESHEET}\``);
   // nosemgrep: javascript.lang.security.audit.unknown-value-with-script-tag.unknown-value-with-script-tag, javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp -- a pattern that finds the template's own script line, built from this script's constants and escaped text; no page text is written from a value here
-  page = swap(page, new RegExp(`<script\\b[^>]*\\bsrc="[^"]*${literal(head.script)}"[^>]*></script>`), lines.script,
+  page = swap(page, new RegExp(`<script\\b[^>]*\\bsrc="[^"]*${anyNameOf(head.script)}"[^>]*></script>`), lines.script,
     `line that loads \`${head.script}\``);
   return page;
 }

@@ -42,6 +42,8 @@ spn-devex docs audit check [<path>…] [--variant <name>] [--finding <name>] —
 
 spn-devex docs audit report <repo> [--json] — the gap scan of one repository, printed; with --json, as data
 
+spn-devex docs blocks units <file> [--json] — print one unit for each section and subsection of a seat file, with the block hints raised for it
+
 spn-devex docs book check [<book>] [--run <name>] — read every chapter of the book through the book check; with --run, record a clean read as a named run in the book
 
 spn-devex docs coherence check [<path>] [--finding <name>] — the findings under the path, from every document of its repository compared with the others
@@ -74,9 +76,11 @@ spn-devex docs index write <path> [--out <file>] — write the index of the repo
 
 spn-devex docs look <page> [--out <folder>] — render a whole page in light and in dark, and report console errors, failed requests and a page wider than its window
 
-spn-devex docs page check <seat…> — report each page that differs from what its seat file gives, and write nothing
+spn-devex docs page check <seat…> — report each page that differs from what its seat file gives, and write nothing; an `.html` page is read for slots, empty sections and every page finding
 
 spn-devex docs page write <seat…> — write each construct page from its seat file
+
+spn-devex docs page new <kind> <path> [--name <name>] [--workstream <NNN-subject>] [--arc <arc>] — start a hand page from its kind's template: the tool fills what it knows and names the placeholders still to fill
 
 spn-devex docs parity check [<path>…] — the parity findings under the paths, from the seats and the packages of each path's repository
 
@@ -84,17 +88,19 @@ spn-devex docs prose list [<path>…] [--comments] [--ledger=<file>] [--record=<
 
 spn-devex docs prose paragraphs <file> — print the flagged paragraphs of one file
 
-spn-devex docs sds cut <version> [--root <folder>] [--ds <folder>] [--ds-version <tag>] — copy the built styles into a version's folder, and list the version; with --ds, copy the design system's tokens first and build
-
-spn-devex docs sds check <version> <folder…> [--root <folder>] — list the pages a move to the version would change, and write nothing
-
-spn-devex docs sds repoint <version> <folder…> [--root <folder>] — move every page under the folders to the version
-
-spn-devex docs sds bundle <page> [--assets <folder>] — write a copy of a page that carries its version's styles inside it
-
 spn-devex docs status check <seat…> — report each status that differs from what its behaviour rows derive, and write nothing
 
 spn-devex docs status write <seat…> — write the status the behaviour rows derive into each seat file
+
+spn-devex docs styles cut <version> [--replace] [--root <folder>] [--ds <folder>] [--ds-version <tag>] — copy the built styles into a version's folder, and list the version; --replace recuts a version that is not published; with --ds, copy the design system's tokens first and build
+
+spn-devex docs styles preview <folder> [--root <folder>] — the quick loop: build the styles and copy the built files into <folder>/_assets/docs/<next version>/, with no hash and no version listed
+
+spn-devex docs styles check <version> <folder…> [--root <folder>] — list the pages a move to the version would change, and write nothing
+
+spn-devex docs styles repoint <version> <folder…> [--root <folder>] — move every page under the folders to the version
+
+spn-devex docs styles bundle <page> [--assets <folder>] — write a copy of a page that carries its version's styles inside it
 
 spn-devex docs topics check [<path>…] — the topic and id findings under the paths, from the three seats of each path's repository
 
@@ -202,7 +208,7 @@ spn-devex workstream question raise <workstream>/<arc> --file card.json (the car
 
 spn-devex workstream question brief <workstream>/Q<n> — print a fresh view's brief from the card: the problem and the constraints first, no options, the proposals to follow
 
-spn-devex workstream question show Q<n> --in <notes/<arc>/preview.html> — show an open card on an arc's preview, in its Open
+spn-devex workstream question show Q<n> --in <notes/<arc>/arc.html> — show an open card on an arc's page, in its Open
 
 spn-devex workstream question answer Q<n> --key <option> --words "…" [--entries E7,E9] — answer a card in your words; it leaves every Open; with --entries, folded into the What, cited, and the go written again
 

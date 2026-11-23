@@ -674,7 +674,7 @@ export function handDrawnFigures(src: string, markdown = false): FigureFinding[]
 // ---------------------------------------------------------------------------- colour
 
 /**
- * A code block is coloured when the page opens, by the shared script (`styles/sds-docs.js`), which holds
+ * A code block is coloured when the page opens, by the shared script (`styles/docs-page.js`), which holds
  * the language rules and is their one place. A page's file holds plain code, so the command side keeps
  * no rule of its own: it only finds a block whose file carries the spans the script writes.
  */

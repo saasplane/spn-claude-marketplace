@@ -2,7 +2,7 @@
 // once on a fixture that breaks it, and to pass once the fixture is mended the way the agent would.
 import { mkdirSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { PREVIEW, arcData, cli, dataWorkspace, put, writeRolePageParts } from "../../../helpers/workstream-fixture.mjs";
+import { PREVIEW, arcData, cli, dataWorkspace, put, shapedApproachPage, writeRolePageParts } from "../../../helpers/workstream-fixture.mjs";
 import { workspace } from "../../../helpers/fixture.mjs";
 
 const { checkWorkstream, checkWorkspace, sectionText } = await import("../../../../src/scripts/checks/workstream-state.ts");
@@ -154,8 +154,26 @@ console.log("\n=== Q99 — one preview per arc, by its fixed name");
   ok("red: a second preview by another name fails", has(checkWorkstream(ws), "preview", /layout-preview\.html` is a second preview/), said(checkWorkstream(ws)));
   rmSync(join(notes, "layout-preview.html"));
   writeFileSync(join(notes, "home-preview.html"), '<!-- spn:doc\n{"id": "surface-page-preview-home", "variant": "surface-page-preview", "title": "Home"}\n-->\n<div class="sds-surface"></div>');
-  ok("[MKT.HOOKS.523] green: a surface page preview is never an arc's second preview", !has(checkWorkstream(ws), "preview", /home-preview\.html` is a second preview/), said(checkWorkstream(ws)));
+  ok("[MKT.HOOKS.523] green: a surface preview is never an arc's second preview", !has(checkWorkstream(ws), "preview", /home-preview\.html` is a second preview/), said(checkWorkstream(ws)));
   rmSync(join(notes, "home-preview.html"));
+  mkdirSync(join(notes, "samples", "templates", "workstream"), { recursive: true });
+  writeFileSync(join(notes, "samples", "templates", "workstream", "arc-template.html"), "<p>a template copy</p>");
+  writeFileSync(join(notes, "samples", "layout-preview.html"), "<p>a sample</p>");
+  ok("green: a file under samples/ is a sample, never an arc's second preview", !has(checkWorkstream(ws), "preview", /samples\//), said(checkWorkstream(ws)));
+  writeFileSync(join(notes, "samples", "layout-preview.html"), "<p>a sample</p>");
+  writeFileSync(join(notes, "layout-preview.html"), "<p>a second</p>");
+  ok("red: a preview-named file beside preview.html still fails with samples/ present", has(checkWorkstream(ws), "preview", /notes\/N001\/layout-preview\.html` is a second preview/), said(checkWorkstream(ws)));
+  rmSync(join(notes, "layout-preview.html"));
+  rmSync(join(notes, "samples"), { recursive: true });
+  // An arc's page is arc.html; preview.html is read where arc.html is absent, and neither is another's second preview.
+  renameSync(join(notes, "preview.html"), join(notes, "arc.html"));
+  ok("green: arc.html is the arc's page, never a second preview, and an arc holding it is not one with no page",
+    !has(checkWorkstream(ws), "preview", /is a second preview/) && !has(checkWorkstream(ws), "preview", /has no preview/), said(checkWorkstream(ws)));
+  writeFileSync(join(notes, "layout-preview.html"), "<p>a second</p>");
+  ok("red: a preview-named file beside arc.html fails as a second preview, naming arc.html", has(checkWorkstream(ws), "preview", /layout-preview\.html` is a second preview — an arc has at most one page, `notes\/N001\/arc\.html`/), said(checkWorkstream(ws)));
+  rmSync(join(notes, "layout-preview.html"));
+  renameSync(join(notes, "arc.html"), join(notes, "preview.html"));
+  ok("green: preview.html, the name before arc.html, is read where arc.html is absent", !has(checkWorkstream(ws), "preview", /has no preview|is a second preview/), said(checkWorkstream(ws)));
   renameSync(join(notes, "preview.html"), join(notes, "draft.html"));
   const page = join(ws, "approach.html");
   const text = readFileSync(page, "utf8");
@@ -192,8 +210,14 @@ console.log("\n=== RULE.DEVEX.WORKSPACE.254 — a What entry of its own, and a l
 
   writeFileSync(page, withSecond.replace(entry2, `  <h4 id="c2">The second arc</h4>\n  <p>No entry id.</p>\n`));
   const noEntry = checkWorkstream(ws);
-  ok("red: an arc with no What entry fails, naming the entry and the command that anchors or writes it",
-    has(noEntry, "stamp", /N002 has no What entry, `N002-what`, on the approach page — `spn-devex workstream arc edit 031\/N002 --under <heading id>` anchors it on its subject heading, or writes it under a domain heading/), said(noEntry));
+  ok("green: an arc with no What entry passes while its Plan row links its page — the row is the arc's address, and the entry is the older way",
+    !has(noEntry, "stamp", /has no What entry/), said(noEntry));
+  const noRow = withSecond.replace(entry2, `  <h4 id="c2">The second arc</h4>\n  <p>No entry id.</p>\n`).replace(/\s*<tr id="N002"[^\n]*<\/tr>/, "");
+  writeFileSync(page, noRow);
+  const neither = checkWorkstream(ws);
+  ok("red: an arc with no entry and no Plan row fails, naming the row it lacks, and the older entry is named only where the page still tells What by arc",
+    has(neither, "stamp", /N002 has no row in Plan carrying `data-arc="arcs\/N002\/state.json"`/) && has(neither, "stamp", /N002 has no What entry, `N002-what`, on the approach page — `spn-devex workstream arc edit 031\/N002 --under <heading id>` anchors it on its subject heading, or writes it under a domain heading/), said(neither));
+  writeFileSync(page, withSecond.replace(entry2, `  <h4 id="c2">The second arc</h4>\n  <p>No entry id.</p>\n`));
 
   writeFileSync(page, withSecond.replace('<a href="notes/N002/preview.html">the second</a>', "the second"));
   ok("red: an entry that does not link its arc's preview fails", has(checkWorkstream(ws), "stamp", /N002's preview is not linked from its What entry, `#N002-what`/), said(checkWorkstream(ws)));
@@ -207,8 +231,8 @@ console.log("\n=== RULE.DEVEX.WORKSPACE.254 — a What entry of its own, and a l
   writeFileSync(page, withSecond);
   writeFileSync(join(ws, "notes", "N002", "preview.html"), PREVIEW.replace("<p>the probe</p>", '<p>after <a href="../N001/preview.html">the first</a></p>'));
   const previewLink = checkWorkstream(ws);
-  ok("red: a preview that links another arc's preview fails, naming the What it should link",
-    has(previewLink, "preview", /N002's preview links `\.\.\/N001\/preview\.html`, N001's preview — a preview names another arc by its What, `\.\.\/\.\.\/approach\.html#N001-what`, and never links its preview/), said(previewLink));
+  ok("red: a preview that links another arc's preview fails, naming the Plan row it should link",
+    has(previewLink, "preview", /N002's preview links `\.\.\/N001\/preview\.html`, N001's preview — a preview names another arc by its Plan row, `\.\.\/\.\.\/approach\.html#N001`, and never links its preview/), said(previewLink));
   writeFileSync(join(ws, "notes", "N002", "preview.html"), PREVIEW.replace("<p>the probe</p>", '<p>after <a href="../../approach.html#N001-what">the first</a></p>'));
   ok("green: a preview that names the other arc by its What passes", checkWorkstream(ws).length === 0, said(checkWorkstream(ws)));
   writeFileSync(join(ws, "notes", "N002", "preview.html"), PREVIEW);
@@ -256,9 +280,28 @@ console.log("\n=== RULE.DEVEX.WORKSPACE.267 — a sample is the work's own file,
   mkdirSync(join(samples, "template-review"), { recursive: true });
   writeFileSync(join(samples, "template-review", "blocks-template.html"), `<meta charset="utf-8">\n${stylesheet}\n${masthead("")}\n`);
   writeFileSync(join(samples, "template-review", "approach-template-v2.html"), `<meta charset="utf-8">\n${stylesheet}\n${masthead("")}\n`);
+  const redLink = checkWorkstream(ws);
+  ok("[RULE.DEVEX.WORKSPACE.552] red: a preview that does not link its samples index is named, word for word",
+    has(redLink, "preview", /^N001's preview does not link its samples: end its Overview with a line that opens samples\/index\.html \(rule 552\)$/), said(redLink));
+  const previewPath = join(ws, "notes", "N001", "preview.html");
+  writeFileSync(previewPath, readFileSync(previewPath, "utf8").replace("</section>", `<p><a href="samples/index.html">Open the samples</a></p></section>`));
+  ok("[RULE.DEVEX.WORKSPACE.552] green: a link whose href ends in samples/index.html passes", !has(checkWorkstream(ws), "preview", /does not link its samples/), said(checkWorkstream(ws)));
   const green = checkWorkstream(ws);
   ok("green: a drawing that borrows the stylesheet with no masthead, a plain index, a book page the work produces, a review copy of a book template named for it, and a page with its own styles pass",
     green.length === 0, said(green));
+  const indexFile = join(samples, "index.html");
+  const withData = (paths) => `<!doctype html>\n<title>Samples of N001</title>\n<script type="application/json" id="index-data">${JSON.stringify({ base: "", groups: [{ label: "G", children: paths.map((path) => ({ label: path, path })) }] })}</script>\n`;
+  writeFileSync(indexFile, withData(["patterns/find-in-a-list.html", "../work/view.html"]));
+  const redIndex = checkWorkstream(ws);
+  ok("[RULE.DEVEX.WORKSPACE.267] red: a samples index entry that leaves samples/ is named, with the rule",
+    has(redIndex, "samples", /lists only what the work produces; \.\.\/work\/view\.html is a view of the work, kept in work\/ and never linked from samples \(rule 267\)/), said(redIndex));
+  writeFileSync(indexFile, withData(["patterns/find-in-a-list.html", "templates/order-template.md", "data/rows.json"]));
+  const redKind = checkWorkstream(ws);
+  ok("[RULE.DEVEX.WORKSPACE.267] red: a samples index entry that is no HTML page is named, with the rule",
+    has(redKind, "samples", /lists only|shows only pages a reader reviews; templates\/order-template\.md is a file the agent manages, kept out of samples \(rule 267\)/) && has(redKind, "samples", /data\/rows\.json is a file the agent manages/), said(redKind));
+  ok("a page in the index is not named for its kind", !has(redKind, "samples", /find-in-a-list\.html is a file/), said(redKind));
+  writeFileSync(indexFile, withData(["patterns/find-in-a-list.html"]));
+  ok("[RULE.DEVEX.WORKSPACE.267] green: an index whose paths stay in samples/ passes", !has(checkWorkstream(ws), "samples", /view of the work/), said(checkWorkstream(ws)));
 }
 
 console.log("\n=== RULE.DEVEX.WORKSPACE.262 — an arc's notes folder holds the five, and nothing else");
@@ -569,13 +612,13 @@ console.log("\n=== the page rules read the saved file at Stop — 451, 518, 238,
   const tree = "<pre>spn-x/\n├── src/\n│   └── a.ts   changed: the thing\n└── tests/\n    └── t-a.mjs   new: its test</pre>";
   const whole = () => [
     section("Overview"), section("Today"),
-    `<section id="proposed"><div class="sds-section-head"><h2>Proposed</h2></div><p class="sds-standfirst">As it will be.</p><h3 id="s3-plugins" data-layer="plugins">Plugins</h3><h4 id="p-a">The page check</h4><p class="sds-small">For: you · Layer: Plugins</p><p>A reason.</p></section>`,
+    `<section id="proposed"><div class="sds-section-head"><h2>Proposed</h2></div><p class="sds-standfirst">As it will be.</p><h3 id="s3-plugins" data-layer="plugins">Plugins</h3><h4 id="p-a">The page check</h4><p>A reason.</p></section>`,
     section("Where it lands", `<p><strong>1 &middot; spn-x</strong> &mdash; the change</p>${tree}`),
   ].join("\n");
 
   written(whole());
   const green = checkWorkstream(ws);
-  ok("[MKT.HOOKS.513] green: a preview with short headings, a layer mark, a For and Layer line and one tree for its repository has no page finding", !green.some((one) => one.check === "pages"), said(green));
+  ok("[MKT.HOOKS.513] green: a preview with short headings, a layer mark, no For and Layer line and one tree for its repository has no page finding", !green.some((one) => one.check === "pages"), said(green));
 
   written(whole().replace("The page check", "What the agent misses most, by kind"));
   const long = checkWorkstream(ws);
@@ -588,8 +631,10 @@ console.log("\n=== the page rules read the saved file at Stop — 451, 518, 238,
   ok("[MKT.HOOKS.513] red: a Where it lands with no folder tree is named (238)", has(checkWorkstream(ws), "pages", /Where it lands holds no folder tree/), said(checkWorkstream(ws)));
   written(whole().replace(" data-layer=\"plugins\"", ""));
   ok("[MKT.HOOKS.513] red: a layer of Proposed with no data-layer mark is named (233)", has(checkWorkstream(ws), "pages", /Proposed's layer "Plugins" carries no `data-layer` mark/), said(checkWorkstream(ws)));
-  written(whole().replace("<p class=\"sds-small\">For: you · Layer: Plugins</p>", ""));
-  ok("[MKT.HOOKS.513] red: a block of Proposed with no For and Layer line is named (233)", has(checkWorkstream(ws), "pages", /Proposed's block "The page check" opens with no For and Layer line/), said(checkWorkstream(ws)));
+  written(whole().replace("<p>A reason.</p>", "<p class=\"sds-small\">For: you · Layer: Plugins</p><p>A reason.</p>"));
+  ok("[MKT.HOOKS.513] green: a block of Proposed carries no For and Layer line, and one that does is not asked to drop it by this check (233)", !has(checkWorkstream(ws), "pages", /For and Layer/), said(checkWorkstream(ws)));
+  written(whole());
+  ok("[MKT.HOOKS.513] green: a block of Proposed with no For, Layer or Reads line has no finding (233)", !has(checkWorkstream(ws), "pages", /For and Layer|Reads/), said(checkWorkstream(ws)));
   written(whole().replace("Overview</h2>", "An overview of everything this preview shows and why it was written</h2>"));
   ok("[MKT.HOOKS.515] red: a rail heading past three words is named (518)", has(checkWorkstream(ws), "pages", /rail entr(?:y reads|ies read) past three words/), said(checkWorkstream(ws)));
   written(whole());
@@ -609,6 +654,21 @@ console.log("\n=== the page rules read the saved file at Stop — 451, 518, 238,
   ok("[MKT.HOOKS.514] green: the row that links the preview and the index alone passes", !checkWorkstream(ws).some((one) => one.check === "pages"), said(checkWorkstream(ws)));
   writeFileSync(page, approach);
   rmSync(samples, { recursive: true });
+}
+
+console.log("\n=== RULE.DEVEX.WORKSPACE.254 — a page told by construct: the Plan row is the arc's address and the one place that links its page");
+{
+  const { root, ws } = await dataWorkspace("state-told");
+  const page = join(ws, "approach.html");
+  const { arcStamp } = await import("../../../../src/scripts/lib/workstream.ts");
+  const stamp = arcStamp(JSON.parse(readFileSync(join(ws, "arcs", "N001", "state.json"), "utf8")));
+  const told = shapedApproachPage(stamp);
+  writeFileSync(page, told);
+  ok("green: What holds no entry for the arc and its construct links the arc's page, and the check passes", checkWorkstream(ws).length === 0, said(checkWorkstream(ws)));
+  ok("a link to the arc's page from a construct of What is no finding of the outside-an-entry kind", !has(checkWorkstream(ws), "stamp", /outside N001's entry/), said(checkWorkstream(ws)));
+  writeFileSync(page, told.replace(/(<tr id="N001"[^\n]*)<a href="notes\/N001\/preview\.html">preview\.html<\/a>/, "$1preview.html"));
+  ok("red: a Plan row that does not link its arc's page fails, naming the row", has(checkWorkstream(ws), "stamp", /N001's preview is not linked from its Plan row, `#N001`/), said(checkWorkstream(ws)));
+  writeFileSync(page, told);
 }
 
 console.log(failed ? `\n  ${failed} of ${total} FAILED — workstream state check` : `\n  all ${total} passed — workstream state check`);

@@ -38,8 +38,10 @@ const ROOT = "/probe-workspace";
 const REPO = join(ROOT, "probe-repo");
 const DOCS_TREE = tree.docsOf(REPO);
 const SEAT_FILE = join(tree.constructsDir(DOCS_TREE), "01-domain", "02-thing.md");
+// The pocket's public half: a pocket that does not exist yet takes the split layout (`artifactsLayout`).
+const PUBLIC = join(DOCS_TREE, POCKET.artifacts, tree.VISIBILITY.public);
 // The pocket's `docs` folder, and one domain's folder in it, named as the domain's seat folder is.
-const POCKET_DOCS = join(DOCS_TREE, POCKET.artifacts, ARTIFACT.docs);
+const POCKET_DOCS = join(PUBLIC, ARTIFACT.docs);
 const DOMAIN = join(POCKET_DOCS, "01-domain");
 const PAGE = join(DOMAIN, CONSTRUCT_PAGES, `02-thing${tree.CONSTRUCT_PAGE_SUFFIX}`);
 const OVERVIEW = join(DOMAIN, `domain${tree.OVERVIEW_PAGE_SUFFIX}`);
@@ -50,9 +52,9 @@ same("each seat folder sits directly in the docs tree",
   Object.keys(SEAT).map((seat) => tree.seatDir(DOCS_TREE, seat)), SEATS.map((name) => join(DOCS_TREE, name)));
 same("the decisions register sits in the registers pocket",
   tree.decisionsRegister(DOCS_TREE), join(DOCS_TREE, POCKET.registers, tree.DECISIONS));
-same("the pocket holds the folders docs, guides and reports, and the index sits beside them",
+same("the pocket holds the folders docs, guides, reports and surface, and the index sits in its public half",
   [ARTIFACT_FOLDERS, tree.artifactIndex(DOCS_TREE)],
-  [[ARTIFACT.docs, ARTIFACT.guides, ARTIFACT.reports], join(DOCS_TREE, POCKET.artifacts, tree.ARTIFACT_INDEX)]);
+  [[ARTIFACT.docs, ARTIFACT.guides, ARTIFACT.reports, ARTIFACT.surface], join(PUBLIC, tree.ARTIFACT_INDEX)]);
 same("the hub sits directly in the docs folder of the artifacts pocket", tree.hubPage(DOCS_TREE), join(POCKET_DOCS, tree.HUB));
 same("a domain's folder in the pocket is named as its seat folder, and the seat itself gives the pocket's docs folder",
   [join(tree.constructsDir(DOCS_TREE), "01-area", "02-domain"), `${tree.constructsDir(DOCS_TREE)}/`, tree.behaviorsDir(DOCS_TREE)].map(tree.domainDirOf),
@@ -83,15 +85,18 @@ same("[MKT.SCRIPTS.110] an overview ends -overview.html under the pocket's docs 
 same("[MKT.SCRIPTS.110] a page in its place belongs nowhere else, and neither does a file of another kind",
   [PAGE, OVERVIEW, tree.hubPage(DOCS_TREE), join(DOMAIN, "notes.md"), SEAT_FILE].map(tree.pagePlaceOf), [null, null, null, null, null]);
 const POCKET_DOCS_NAMED = [DOCS, POCKET.artifacts, ARTIFACT.docs].join("/");
+// A page already in the pocket's public half is told the place in that half; a stray outside both halves, the earlier place.
+const PUBLIC_DOCS_NAMED = [DOCS, POCKET.artifacts, tree.VISIBILITY.public, ARTIFACT.docs].join("/");
+const overviewPlace = (named) => `${named}/domain${tree.OVERVIEW_PAGE_SUFFIX} beside the hub, or ${named}/<domain>/domain${tree.OVERVIEW_PAGE_SUFFIX}`;
 same("[MKT.SCRIPTS.110] a construct page out of its place is told its domain's constructs folder",
   [CONSTRUCT_BESIDE_OVERVIEWS, join(DOCS_TREE, POCKET.artifacts, CONSTRUCT_PAGES, "01-area", "02-domain", `03-thing${tree.CONSTRUCT_PAGE_SUFFIX}`),
    STRAY_PAGES[1]].map(tree.pagePlaceOf),
-  [`${POCKET_DOCS_NAMED}/01-domain/${CONSTRUCT_PAGES}/02-thing${tree.CONSTRUCT_PAGE_SUFFIX}`,
+  [`${PUBLIC_DOCS_NAMED}/01-domain/${CONSTRUCT_PAGES}/02-thing${tree.CONSTRUCT_PAGE_SUFFIX}`,
    `${POCKET_DOCS_NAMED}/01-area/02-domain/${CONSTRUCT_PAGES}/03-thing${tree.CONSTRUCT_PAGE_SUFFIX}`,
    `${POCKET_DOCS_NAMED}/<domain>/${CONSTRUCT_PAGES}/02-thing${tree.CONSTRUCT_PAGE_SUFFIX}`]);
 same("[MKT.SCRIPTS.110] an overview out of its place is told the hub's folder and a domain's folder",
   [OVERVIEW_IN_CONSTRUCTS, STRAY_PAGES[0]].map(tree.pagePlaceOf),
-  Array(2).fill(`${POCKET_DOCS_NAMED}/domain${tree.OVERVIEW_PAGE_SUFFIX} beside the hub, or ${POCKET_DOCS_NAMED}/<domain>/domain${tree.OVERVIEW_PAGE_SUFFIX}`));
+  [overviewPlace(PUBLIC_DOCS_NAMED), overviewPlace(POCKET_DOCS_NAMED)]);
 same("[MKT.SCRIPTS.110] the hub out of its place is told the one place a hub sits in",
   tree.pagePlaceOf(join(STRAY, tree.HUB)), `${POCKET_DOCS_NAMED}/${tree.HUB}`);
 same("the path under the pocket's docs folder is one part for each folder, and null outside it",

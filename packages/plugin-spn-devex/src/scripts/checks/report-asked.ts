@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // A report is written when somebody asks for one (RULE.DEVEX.WORKSPACE.212).
 //
-// WHAT IT READS. A write under `docs/artifacts/reports/`, and the user prompts of the window's transcript
+// WHAT IT READS. A write under `docs/artifacts/private/reports/` (or `docs/artifacts/reports/` where the pocket keeps the earlier layout), and the user prompts of the window's transcript
 // (the payload's `transcript_path`), newest first. A prompt that says "report" is the ask. Tool results
 // and assistant text are not prompts. A window with no transcript to read is not a finding.
 
@@ -9,7 +9,7 @@ import { readFileSync } from "node:fs";
 import { ARTIFACT, DOCS, POCKET } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { emit, readPayload, runAlone, type Payload, type Verdict } from "../lib/payload.ts";
 
-const REPORTS = `/${DOCS}/${POCKET.artifacts}/${ARTIFACT.reports}/`;
+const REPORTS = [`/${DOCS}/${POCKET.artifacts}/${ARTIFACT.reports}/`, `/${DOCS}/${POCKET.artifacts}/private/${ARTIFACT.reports}/`];
 const ASK = /\breports?\b/i;
 
 /** What a person typed in one transcript line, or null where the line is not a user prompt. */
@@ -27,7 +27,8 @@ function promptOf(line: string): string | null {
 export function checkReportAsked(payload: Payload & { transcript_path?: string }): Verdict {
   const tool = payload.tool_name ?? "";
   if (tool !== "Write" && tool !== "Edit" && tool !== "MultiEdit") return null;
-  if (!(payload.tool_input?.file_path ?? "").includes(REPORTS)) return null;
+  const written = payload.tool_input?.file_path ?? "";
+  if (!REPORTS.some((folder) => written.includes(folder))) return null;
   if (!payload.transcript_path) return null;
 
   let lines: string[];

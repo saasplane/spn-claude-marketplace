@@ -25,6 +25,7 @@
 //   handover   a reply that says a new window is needed carries the nine labelled lines, in one column,
 //              once while the rows stand, and names each open card in one line; a close or a handover
 //              never opens with a table, a heading or a count
+//   unfilled-page  a reply that links a `file:///` page still holding a `{{…}}` slot (outside `templates/`) is sent back to fill it or say it is a template (RULE.DEVEX.WORKSPACE.560)
 //   how-it-runs, partner-words, page-path  the reply's last asks about running the work, the words a partner cannot open, and its page addresses, after the handover
 //   close-message  a turn whose tool results hold a close's success text ends on the closing message: a 🚀 or ✈️ heading, what was
 //              delivered, what was learned, Thank you 👍 and that the window can be retired (RULE.DEVEX.WORKSPACE.206)
@@ -44,8 +45,8 @@
 //              under the status line (`orientation.ts`) is allowed and not required
 //   hold       while the developer is AWAY (`lib/presence.ts`), a reply that ends on a question or a hold while a decided arc of the
 //              window has a ready row is sent back with the row named: a hold is carried, never a stop
-//   window     by the developer's presence: PRESENT hears a new window offered at 200k, 300k and 400k at a clean point, once each, muted by
-//              "stay"; PRESENT and WATCHING hear the cost line at 500k and the compaction line at 850k, once each, even after "stay"; AWAY hears none
+//   window     by the developer's presence: PRESENT hears a new window offered at 200k, 300k and 400k, once each, muted by "stay", at this
+//              window's own clean point (no row of its arcs running, no helper of it out), and at 400k and past it at the next reply anyway; PRESENT and WATCHING hear the cost line at 500k and the compaction line at 850k, once each, even after "stay"; AWAY hears none
 //   corpus    the docs trees still answer the questions only a whole-corpus read can ask
 //
 // AN ARC IS READ FROM ITS DATA: its header and rows from `arcs/N<nnn>/state.json`, its events from
@@ -61,7 +62,7 @@
 // unfinished, and that window hears about it. A window bound to none hears nothing about them.
 //
 // WHILE A ROW IS IN PROGRESS, ONLY A FINDING ABOUT THE REPLY SENDS THE AGENT BACK (RULE.DEVEX.WORKSPACE.244):
-// `needs-you`, `reply-shape`, `handover`, `how-it-runs`, `partner-words`, `page-path`, `close-message`, `card-case`, `in-flight`, `proposal-record`, `welcome`, `window` and `hold`. Every other finding is held, and the checks find
+// `needs-you`, `reply-shape`, `handover`, `how-it-runs`, `partner-words`, `page-path`, `unfilled-page`, `close-message`, `card-case`, `in-flight`, `proposal-record`, `welcome`, `window` and `hold`. Every other finding is held, and the checks find
 // it again at the first turn end where no row is in progress (`splitFindings`).
 //
 // `corpus` is the newest and the odd one out: every other check here reads what the TURN wrote, and
@@ -84,8 +85,9 @@ import { replayPanels } from "../lib/panel.ts";
 import { checkHowItRuns } from "../checks/how-it-runs.ts";
 import { checkPartnerWords } from "../checks/partner-words.ts";
 import { checkPagePath } from "../checks/page-path.ts";
+import { checkUnfilledPage } from "../checks/unfilled-page.ts";
 import { checkWorkstream, heldByStop } from "../checks/workstream-state.ts";
-import { PREVIEW_FILE, approachOf, arcDataDir, arcStatus, stepsMayStart, arcIdsOf, leafRows, logLinesOf, notesDirOf, previewOf, previewWouldChange, readArc, readJsonl, readQuestions, readyRows, stateFileOf,
+import { ARC_FILE, PREVIEW_FILE, approachOf, arcDataDir, arcStatus, stepsMayStart, arcIdsOf, leafRows, logLinesOf, notesDirOf, previewOf, previewWouldChange, readArc, readJsonl, readQuestions, readyRows, stateFileOf,
          suggestionsFileOf, workstreamsOf } from "../lib/workstream.ts";
 import { findWorkingDetail } from "../lib/working-detail.ts";
 import { readAreas, type AreaViews } from "../lib/areas.ts";
@@ -439,7 +441,7 @@ const SAMPLES = "samples";
 export function notesFiles(arc: string): string[] {
   const folder = notesDirOf(homeOf(arc), idOf(arc));
   const out: string[] = [];
-  for (const name of [PREVIEW_FILE, "plan.md"]) {
+  for (const name of [ARC_FILE, PREVIEW_FILE, "plan.md"]) {
     try { if (statSync(join(folder, name)).isFile()) out.push(join(folder, name)); } catch { /* absent */ }
   }
   const walk = (dir: string): void => {
@@ -471,7 +473,7 @@ export const previewAsWritten = (text: string): string =>
 function notesSignature(files: string[]): string {
   return createHash("sha256").update(files.map((file) => {
     try {
-      if (basename(file) === PREVIEW_FILE) return `${file}\u0000${previewAsWritten(readFileSync(file, "utf8"))}`;
+      if (basename(file) === ARC_FILE || basename(file) === PREVIEW_FILE) return `${file}\u0000${previewAsWritten(readFileSync(file, "utf8"))}`;
       const stat = statSync(file);
       return `${file}\u0000${stat.size}\u0000${stat.mtimeMs}`;
     } catch { return file; }
@@ -2035,7 +2037,8 @@ export function sayOnce(found: Warning[], told: Record<string, string>): { said:
 // While the developer is PRESENT, one line at each of OFFERS, at a clean point, said once each and muted for the rest of the
 // window once the developer says "stay". The cost line at COST_POINT and the compaction line at COMPACT_POINT are said once
 // each, even after "stay". WATCHING hears no offer, for someone who watches cannot open a window, and hears the other two.
-// AWAY hears nothing at any size. Never while a helper runs.
+// AWAY hears nothing at any size. The offers at 200k and 300k wait for this window's own clean point; at 400k and past it the offer
+// is said at the next reply even while a helper is out or a row of this window runs, and its message says the handover follows.
 const OFFERS = [200_000, 300_000, 400_000];
 const COST_POINT = 500_000;
 const COMPACT_POINT = 850_000;
@@ -2046,11 +2049,12 @@ const PERSON = "Say it in the developer's words and never this note's, with no t
 /**
  * THE WINDOW CHECK (RULE.DEVEX.AGENT.103), by the developer's presence. PRESENT: at a clean point, one line at 200k, 300k and 400k, each
  * said once and muted by "stay"; at 500k the cost line and at 850k the compaction line, each said once and said after "stay"
- * too. WATCHING: no offer line, the other two. AWAY: nothing. Clean is what can be computed: no row of this window's arcs
- * runs, no helper launched in the background is out, and `workstream state check` finds nothing for the window's workstreams
- * (the cost and compaction lines do not wait for the last). That every open point is written first cannot be computed, so
- * the message asks for it. It reads the transcript and keeps no state: which sizes it has said is read from the hook's own
- * feedback in it, and nothing is said while a helper runs.
+ * too. WATCHING: no offer line, the other two. AWAY: nothing. Clean is this window's own and what can be computed: no row of
+ * this window's arcs runs and no helper launched in the background by this window is out. Other arcs' standing findings do not
+ * hold the offer back (`checkWorkstreamState` is not asked). The cost and compaction lines, and the offer at 400k and past it,
+ * do not wait for a helper or a running row: the offer then says the handover follows when the helper reports or the running work finishes (RULE.DEVEX.WORKSPACE.448). That
+ * every open point is written first cannot be computed, so the message asks for it. It reads the transcript and keeps no state:
+ * which sizes it has said is read from the hook's own feedback in it.
  *
  * @param mine      the workstreams this window works on
  * @param running   whether a row of this window's arcs is in progress (`workRuns`): the line then waits
@@ -2080,11 +2084,13 @@ export function checkWindow(root: string, transcript: string, mine: Set<string>,
     } catch { /* a torn line is skipped */ }
   }
   if (due <= said) return [];
-  // NEVER WHILE A HELPER RUNS: a row of the window's arcs in progress, or a background helper that has not handed back.
-  if (running) return [];
-  const always = due >= COST_POINT;
-  if (helperOut(lines)) return [];
-  if (!always && checkWorkstreamState(root, mine).length) return [];
+  // THIS WINDOW'S OWN CLEAN POINT: no row of its arcs in progress, and no background helper of it that has not handed back, until
+  // the last offer's size (400k): from there the offer is said at the next reply, and says the handover follows the helper's report.
+  const helper = helperOut(lines);
+  const late = due >= OFFERS[OFFERS.length - 1];
+  if ((running || helper) && !late) return [];
+  const handoverWaits = (running || helper) && due < COST_POINT
+    ? `${running && helper ? "A row and a helper of this window are still running" : running ? "A row of this window is still running" : "A helper of this window is still out"}, so the handover follows when ${running ? "the running work finishes" : "it reports"} (RULE.DEVEX.WORKSPACE.448): say the offer now and write the handover after that. ` : "";
   const written = "Write every open point first: a suggestion as S<n>, a question as a card, decided work as a row. ";
   // THE OFFER IS WHERE A PERSON LEARNS HOW WINDOWS WORK (01-workstream.md § The agent offers a new window):
   // a partner holds no book, so the reply says why, what is kept and how, in the person's words.
@@ -2097,7 +2103,7 @@ export function checkWindow(root: string, transcript: string, mine: Set<string>,
     ? `${head}, and a window this long compacts soon, which drops detail. ${written}Then say in one plain sentence that this window will compact soon and what is kept, and that a new window with its handover keeps more. ${PERSON}`
     : due >= COST_POINT
     ? `${head}, and each reply now costs several times what a fresh window's does and takes longer. ${written}Then say in one plain sentence that replies are getting slow and dear${presence === "PRESENT" ? ", and that a new window would help" : ""}. ${PERSON}`
-    : `${head}, and the point is clean: no order running, \`workstream state check\` whole. ${written}${offer}${PERSON}`;
+    : `${head}, and ${running || helper ? "the window is long" : "no order of this window is running and no helper of it is out"}. ${written}${handoverWaits}${offer}${PERSON}`;
   return [{ check: "window", message }];
 }
 
@@ -2133,16 +2139,15 @@ function opensOnSummary(lines: string[]): boolean {
 
 /**
  * THE COMPACTION OFFER (RULE.DEVEX.AGENT.182). A window that opens on a compaction summary while the developer is PRESENT offers a
- * new window in one line at its first clean point (the window check's own: no row running, no helper out, `workstream state check`
- * whole), whatever its size. Said once (`said`, kept in the window's note), never while WATCHING or AWAY, and muted by "stay".
+ * new window in one line at its first clean point (the window check's own, this window's: no row of its arcs running,
+ * no helper of it out; other arcs' standing findings do not count), whatever its size. Said once (`said`, kept in the window's note), never while WATCHING or AWAY, and muted by "stay".
  */
 export function checkCompactOffer(root: string, transcript: string, mine: Set<string>, running: boolean,
                                   presence: PresenceState = "PRESENT", stays = false, said = false): Warning[] {
   if (presence !== "PRESENT" || stays || said || running) return [];
   const lines = transcript.split("\n");
   if (!opensOnSummary(lines) || helperOut(lines)) return [];
-  if (checkWorkstreamState(root, mine).length) return [];
-  const message = "This window opened on a compaction summary, which dropped detail, and the point is clean: no order running, `workstream state check` whole. " +
+  const message = "This window opened on a compaction summary, which dropped detail, and the point is clean: no order of this window is running and no helper of it is out. " +
     "Write every open point first: a suggestion as S<n>, a question as a card, decided work as a row. " +
     "Then end your reply with the handover and, in one plain sentence beside it, the offer of a new window: it starts clean with the handover and the workstream's folder, " +
     "which carry every open point. The developer decides: if they say stay, say nothing more about it. " + PERSON;
@@ -2257,6 +2262,7 @@ if (argv1Base === "stop.ts" || argv1Base === "stop.mjs") {
     ...span({ group: "stop", action: "how-it-runs" }, () => checkHowItRuns(withoutFences(reply), root)),
     ...span({ group: "stop", action: "partner-words" }, () => checkPartnerWords(withoutFences(reply), root, turn.prompt)),
     ...span({ group: "stop", action: "page-path" }, () => checkPagePath(withoutFences(reply))),
+    ...span({ group: "stop", action: "unfilled-page" }, () => checkUnfilledPage(withoutFences(reply))),
     ...span({ group: "stop", action: "welcome" }, () => checkWelcome(firstTurn, readWindow(root, session).welcome)),
     ...span({ group: "stop", action: "corpus" }, () => checkCorpus(root, reposWritten(root, session), mine)),
     // A MAIN WINDOW ONLY, AND NOT WHERE THE TURN CONTINUES BECAUSE A HOOK SPOKE: the offer is made once.

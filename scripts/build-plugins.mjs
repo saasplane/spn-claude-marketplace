@@ -42,12 +42,17 @@
 // writes `refs/rules.json` and each skill step's rules block from the book beside this checkout, the way
 // `refs/commands.md` is written from `cli.mjs`. With no book there, both stay as committed.
 //
+// SPNUTILS'S COMMANDS ARE SNAPSHOT HERE TOO: with `spnutils` on the PATH, `spnutils help --json` is read and `{cli, commands:[{command,
+// signature}]}` is written to spn-devex's `refs/spnutils-commands.json`, which the shown-command check reads beside the plugin tables. With
+// no `spnutils` on the PATH, or no output that reads, the committed file stays.
+//
 // THE TEMPLATES ARE COPIED HERE TOO (RULE.DEVEX.WORKSPACE.490): every file of the book's `04-docs/templates/` folder is copied into
 // spn-devex's `refs/devex/workspace/docs/templates/`, subfolders kept, from the same book. A template is changed in the book and nowhere
 // else; a file only the plugin holds is reported and never deleted, and with no book beside the checkout the plugin's copy stays as committed.
 
 import * as esbuild from "esbuild";
 import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
+import { execFileSync } from "node:child_process";
 import { dirname, join, relative } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { bannerFor, pluginSourceHash } from "./lib/source-hash.mjs";
@@ -165,6 +170,26 @@ async function writeRules() {
   return { book, ...writeRulesIndex(book, ROOT) };
 }
 
+/**
+ * `spn-devex/src/refs/spnutils-commands.json`: the commands `spnutils help --json` lists, only each one's command and signature. Null where
+ * `spnutils` is not on the PATH or its output does not read, and the committed file stays; false where the text is unchanged.
+ */
+function writeSpnutilsCommands() {
+  let help;
+  try { help = JSON.parse(execFileSync("spnutils", ["help", "--json"], { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"], maxBuffer: 64 * 1024 * 1024 })); }
+  catch { return null; }
+  if (!help || typeof help.cli !== "string" || !Array.isArray(help.commands)) return null;
+  const commands = help.commands.filter((one) => typeof one?.command === "string" && typeof one?.signature === "string")
+    .map(({ command, signature }) => ({ command, signature }));
+  if (!commands.length) return null;
+  const text = JSON.stringify({ cli: help.cli, commands }, null, 2) + "\n";
+  const target = join(PACKAGES, "plugin-spn-devex", "src", "refs", "spnutils-commands.json");
+  mkdirSync(dirname(target), { recursive: true });
+  const same = isFile(target) && readFileSync(target, "utf8") === text;
+  if (!same) writeFileSync(target, text);
+  return { commands: commands.length, changed: !same };
+}
+
 /** The book's templates folder, from the book's root. */
 const BOOK_TEMPLATES = join("docs", "04-capabilities", "01-devex", "04-workspace", "04-docs", "templates");
 /** Where spn-devex carries its copy. */
@@ -241,6 +266,9 @@ async function buildOnce() {
     console.log(`  ok    rules index  (${rules.rules} rules, book at ${rules.commit}${rules.faults.length ? `, ${rules.faults.length} that do not read` : ""})`);
     for (const file of rules.written) console.log(`          ${file}`);
   }
+  const utils = writeSpnutilsCommands();
+  if (utils === null) console.log("  keep  refs/spnutils-commands.json — no spnutils on the PATH");
+  else console.log(`  ok    spnutils commands  (${utils.commands} commands${utils.changed ? ", written" : ", unchanged"})`);
   const copied = copyTemplates(rules?.book ?? null);
   if (copied === null) console.log("  keep  refs/devex/workspace/docs/templates — no spn-foundation beside this checkout");
   else {
