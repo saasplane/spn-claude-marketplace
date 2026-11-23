@@ -59,7 +59,7 @@ export type Finding = { check: string; grade: Grade; file: string; message: stri
 //
 // A PREVIEW is a page a workstream shows the developer before the work is built. It sits in
 // `notes/N<nnn>/previews/`, its file name ends `-preview.html`, and it is written from
-// `workstream/approach-preview-template.html`. It carries no fixed outline.
+// `workstream/arc-preview-template.html`. It carries no fixed outline.
 /**
  * The kinds a document's block may declare. `guide` and `index` are the two produced pages beside
  * a construct page (05-artifacts.md § The guide page, § The index of artifacts).

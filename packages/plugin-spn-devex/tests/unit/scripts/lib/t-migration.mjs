@@ -575,7 +575,7 @@ console.log("\n=== 012 — an arc's position is dropped from its state file, and
 console.log("\n=== the preview template's masthead carries Progress between Arc and Shown, as the writer writes it");
 {
   const { previewProgress } = await import("../../../../src/scripts/lib/workstream.ts");
-  const template = readFileSync(join(import.meta.dirname, "..", "..", "..", "..", "src", "refs", "devex", "workspace", "docs", "templates", "workstream", "approach-preview-template.html"), "utf8");
+  const template = readFileSync(join(import.meta.dirname, "..", "..", "..", "..", "src", "refs", "devex", "workspace", "docs", "templates", "workstream", "arc-preview-template.html"), "utf8");
   const written = previewProgress(7, 10).replace("sds-step-4", "sds-step-{{step}}").replace("--share:70%", "--share:{{pct}}%").replace("7 of 10", "{{done}} of {{total}}");
   ok("[MKT.SCRIPTS.397] the template's masthead line holds the writer's Progress markup, after Arc and before Shown", [written, written.replace("--share:{{pct}}%", "width:{{pct}}%")].some((line) => template.includes(`</a><span class="sds-separator">|</span>${line}<span class="sds-separator">|</span><span class="sds-label">Shown:</span>`)), written);
 }

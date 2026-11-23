@@ -1240,8 +1240,8 @@ export function workstreamName(ws: string): { number: string; title: string } {
  */
 export function previewFromTemplate(ws: string, data: Pick<ArcData, "arc" | "subject" | "title" | "status">): string {
   const dir = workstreamTemplates();
-  if (!dir) throw new Error("finds no approach-preview-template.html among the plugin's references");
-  let text = readFileSync(join(dir, "approach-preview-template.html"), "utf8");
+  if (!dir) throw new Error("finds no arc-preview-template.html among the plugin's references");
+  let text = readFileSync(join(dir, "arc-preview-template.html"), "utf8");
   const start = text.indexOf("<meta charset");
   if (start > 0) text = text.slice(start);
   const { number, title } = workstreamName(ws);

@@ -27,7 +27,7 @@ import { Refusal, attribute, escaped, newestCut,
 
 export const describe = "the index of a repository's artifacts, produced from the pages on disk";
 
-const TEMPLATE = "artifact-index-template.html";
+const TEMPLATE = "index-template.html";
 const OPTIONS = { out: VALUE };
 /** The artifacts pocket, as a message names it. */
 const POCKET_PATH = `${DOCS}/${POCKET.artifacts}`;

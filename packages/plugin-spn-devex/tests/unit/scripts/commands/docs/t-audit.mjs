@@ -1406,7 +1406,7 @@ console.log("\n=== a preview page: variant `preview`, its own title, a Status ch
 {
   // THE BOOK'S OWN TEMPLATE GIVES THE TWO LINES, so a clean case links what the book links.
   const templates = TEMPLATES_DIR;
-  const previewTemplate = readFileSync(resolve(templates, "workstream", "approach-preview-template.html"), "utf8");
+  const previewTemplate = readFileSync(resolve(templates, "workstream", "arc-preview-template.html"), "utf8");
   const linkLine = previewTemplate.match(/<link\b[^>]*sds-docs\.css"[^>]*>/)[0];
   const scriptLine = previewTemplate.match(/<script\b[^>]*sds-docs\.js"[^>]*><\/script>/)[0];
   const notes = `.spndevex/${WORKSTREAMS}/open/001-a/notes/N001`;
@@ -1461,11 +1461,11 @@ console.log("\n=== a preview page: variant `preview`, its own title, a Status ch
     audit({ [`${notes}/samples/broken-preview.html`]: broken }, `${notes}/samples/broken-preview.html`),
     (got) => has("a sample, a template and a bundled copy are not audited as pages")(got) && lacks("RULE")(got));
   one("a template file is not audited as a page, wherever it sits",
-    audit({ [`${notes}/previews/approach-preview-template.html`]: previewTemplate }, `${notes}/previews/approach-preview-template.html`),
+    audit({ [`${notes}/previews/arc-preview-template.html`]: previewTemplate }, `${notes}/previews/arc-preview-template.html`),
     (got) => has("a sample, a template and a bundled copy are not audited as pages")(got) && lacks("RULE")(got));
   one("a notes folder is audited for its previews alone — the sample and the template beside it are not counted",
     audit({ [at]: page(good), [`${notes}/samples/broken-preview.html`]: broken, [`${notes}/samples/close-message.md`]: "Closing.\n",
-            [`${notes}/samples/approach-preview-template.html`]: previewTemplate }, notes),
+            [`${notes}/samples/arc-preview-template.html`]: previewTemplate }, notes),
     has("clean — 1 page"));
 }
 

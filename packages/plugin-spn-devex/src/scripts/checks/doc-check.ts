@@ -721,7 +721,7 @@ export function templateShape(path: string, text: string, template: string | nul
   let model = template;
   if (model === null) {
     const dir = workstreamTemplates();
-    try { model = dir ? readFileSync(join(dir, preview ? "approach-preview-template.html" : "approach-template.html"), "utf8") : ""; }
+    try { model = dir ? readFileSync(join(dir, preview ? "arc-preview-template.html" : "approach-template.html"), "utf8") : ""; }
     catch { model = ""; }
   }
   const parts: string[] = [];
@@ -1460,7 +1460,7 @@ const inPocket = (path: string): boolean => {
 };
 
 /**
- * 05-artifacts.md: a page whose sidebar lists other pages is the index of artifacts, built from the artifact index template, and no other
+ * 05-artifacts.md: a page whose sidebar lists other pages is the index of artifacts, built from the index template, and no other
  * page has a sidebar of its own. A page of the artifacts pocket other than the index (it holds no `index-data` block) that holds a `<nav>`
  * linking to two or more other pages draws a finding. The page's own rail, `sds-rail`, holds its outline and the way back, and is not read.
  */
@@ -1470,7 +1470,7 @@ export function sidebarRule(text: string): Finding[] {
     .filter(([, attrs]) => !/\bclass="[^"]*\bsds-rail\b/.test(attrs) && !/\bid="rail"/.test(attrs))
     .filter(([, , inside]) => [...inside.matchAll(/<a\b[^>]*\bhref="([^"#][^"]*)"/gi)].filter(([, href]) => !/^[a-z][a-z0-9+.-]*:/i.test(href)).length >= 2);
   return sidebars.length
-    ? [["RULE", "this page holds a sidebar of links to other pages. Only the index of artifacts has one, built from `templates/pages/artifact-index-template.html` " +
+    ? [["RULE", "this page holds a sidebar of links to other pages. Only the index of artifacts has one, built from `templates/pages/index-template.html` " +
       "with each entry a page; a page that lists pages becomes an index of its own, or links its pages in a catalog (05-artifacts.md, the block table)"]]
     : [];
 }

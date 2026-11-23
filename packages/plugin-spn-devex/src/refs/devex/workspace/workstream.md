@@ -1335,7 +1335,7 @@ so the coordinator reads a tree that is still moving. Every order says so under 
 **Every arc has its preview from the write that opens it, and it holds what must be seen or worded for
 the developer to decide** — a look, a rule's wording, a tree; for a pin move, a rename or a change its
 rows can list, that is the list. It has one, by a fixed name, `notes/<arc>/preview.html`, copied from
-`approach-preview-template.html` (`RULE.DEVEX.WORKSPACE.254` · MUST · check:workstream-owner), and it is drawn from the arc's sheet entries rather than typed again: an outline of the changes in the order they connect, one line for each file, and a code block only for an entry marked `judged`. There is no `previews/` folder: each
+`arc-preview-template.html` (`RULE.DEVEX.WORKSPACE.254` · MUST · check:workstream-owner), and it is drawn from the arc's sheet entries rather than typed again: an outline of the changes in the order they connect, one line for each file, and a code block only for an entry marked `judged`. There is no `previews/` folder: each
 proposal the arc makes is a section of its one page, and a `*preview*.html` anywhere else under an arc
 fails `workstream state check`. A sample is a real file of the kind
 the work produces — a template, a report, a document. It keeps its own format and its own name, lives
@@ -1414,7 +1414,7 @@ The index is `notes/<arc>/samples/index.html`, the same frame as a repository's 
 pages opened in tabs, grouped by what each is for. The arc's preview links the index once, says what each group holds, and keeps
 the decisions and any detail that is the arc's alone. An arc of one page, or with no drawn page, keeps everything on its preview.
 Writing, naming, grouping and retiring the pages is the agent's job, and a page a decision has overtaken leaves the index.
-`spn-devex docs index write` writes the index from the pages on disk, so the tree is never typed. **A page whose sidebar lists other pages is the artifact index, built from `templates/pages/artifact-index-template.html`, and it never has a sidebar of its own** (`RULE.DEVEX.WORKSPACE.550` · MUST · skill:spn-devex/ideate): a samples home, a set of previews and a set of reports are each an index of that template. A design language's samples are one such home, each sample in a surface page preview, in the repository that owns the language. A sample draws the changes
+`spn-devex docs index write` writes the index from the pages on disk, so the tree is never typed. **A page whose sidebar lists other pages is the artifact index, built from `templates/pages/index-template.html`, and it never has a sidebar of its own** (`RULE.DEVEX.WORKSPACE.550` · MUST · skill:spn-devex/ideate): a samples home, a set of previews and a set of reports are each an index of that template. A design language's samples are one such home, each sample in a surface page preview, in the repository that owns the language. A sample draws the changes
 already decided on its arcs, and never today's code as it stands. A few surface page previews are linked from the arc's preview, and many go in a group folder of the samples under the one index (`docs/…/05-artifacts.md § The surface page preview`).
 
 **A sheet entry, one a landed row holds included, may name the case ids its runner credits** (`RULE.DEVEX.WORKSPACE.529` · MUST · check:split-plan). `sheet edit <E> --credits <ids>` writes them, and a CODE or PROOF row lands on a credited id as on a case the run proved, where a tier id of the entry is in no case of the run. Crediting changes none of the work the entry plans, so it flags no landed part stale.
@@ -1486,7 +1486,7 @@ how thorough you were goes into the arc's log.
 
 **A preview outside any workstream uses the same template** (`RULE.DEVEX.WORKSPACE.209` · MUST · skill:spn-devex/ideate). When
 the developer asks for something no workstream owns and it must be shown as a page, copy
-`approach-preview-template.html`, name the page `<subject>-preview.html`, and write it into the
+`arc-preview-template.html`, name the page `<subject>-preview.html`, and write it into the
 session's scratch folder. Leave out the link back to an approach page; the status badge links nothing and reads `PROPOSED` until the developer answers and `DECIDED` after. Hand it over
 as its full path. Publish it only when the developer asks, and then give them the link. When a
 workstream opens for the work, move the page to its first arc's `notes/N<nnn>/preview.html`.

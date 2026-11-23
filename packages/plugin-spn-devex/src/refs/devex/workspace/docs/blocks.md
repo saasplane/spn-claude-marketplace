@@ -309,7 +309,7 @@ The web's way.
 | a unit the design system builds | `unit`: inline when small, framed when window-sized (a layout, a whole page) |
 | a unit, variant or page shape not built yet | a skeleton, marked planned; once the design system builds it, the page writer flags it and it becomes a `unit` |
 | one whole page of a product, for review | the surface page preview |
-| several such pages | a samples index: the artifact index template, each entry a surface page preview |
+| several such pages | a samples index: the index template, each entry a surface page preview |
 | a running page as it is | `spn-surface page copy`, in a surface page preview |
 | a small picture of an item in a list | `CATALOG` media |
 
