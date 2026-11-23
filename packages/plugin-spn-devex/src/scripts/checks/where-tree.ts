@@ -9,6 +9,8 @@ import { readFileSync } from "node:fs";
 
 const LAYERS = ["server", "web", "surface", "plugins", "estate"];
 const TREE_CHARACTERS = /[├└│]/;
+/** A repository is named by one word: letters, digits, dots, dashes and slashes, with no space. */
+const REPOSITORY_NAME = /^[\w.@-]+(?:\/[\w.-]+)*\/?$/;
 
 /** The part of a page under its `h2` named `name`, to the next `h2`; null where the page has none. */
 function part(text: string, name: string): string | null {
@@ -23,8 +25,10 @@ function part(text: string, name: string): string | null {
 export function whereItLandsFindings(text: string): string[] {
   const where = part(text, "Where it lands");
   if (where === null) return [];
-  const trees = [...where.matchAll(/<pre\b[^>]*>([\s\S]*?)<\/pre>/gi)].filter((one) => TREE_CHARACTERS.test(one[1])).length;
-  const named = [...where.matchAll(/<p>\s*<strong>\s*\d+\s*(?:&middot;|·)/gi)].length;
+  // ONLY A TREE IS COUNTED AS A TREE, AND ONLY A REPOSITORY'S NAME AS A REPOSITORY: a numbered step paragraph (`<p><strong>1 · Build the
+  // bundle</strong>`) is a step in the section's prose, never a repository, so its bold text must be one repository-shaped word.
+  const trees = [...where.matchAll(/<pre\b([^>]*)>([\s\S]*?)<\/pre>/gi)].filter((one) => /\bdata-lang="tree"/.test(one[1]) || TREE_CHARACTERS.test(one[2])).length;
+  const named = [...where.matchAll(/<p>\s*<strong>\s*\d+\s*(?:&middot;|·)\s*([^<]*)<\/strong>/gi)].filter((one) => REPOSITORY_NAME.test(one[1].trim())).length;
   const why = "(05-artifacts.md § The approach document; RULE.DEVEX.WORKSPACE.238) · draw each repository as one `<pre>` tree, a folder or file on each line with `├──` and `└──`, and its note in one column on the right";
   if (!trees) return [`Where it lands holds no folder tree — it is one tree for each repository, and never a table of paths ${why}`];
   if (named > trees) return [`Where it lands names ${named} repositories and draws ${trees} tree${trees === 1 ? "" : "s"} — one tree for each repository ${why}`];

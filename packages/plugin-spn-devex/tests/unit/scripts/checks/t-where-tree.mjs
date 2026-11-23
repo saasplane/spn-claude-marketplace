@@ -31,6 +31,11 @@ ok("[MKT.HOOKS.513] a second repository named with no tree of its own is refused
 ok("the section with a tree for each repository passes", whereItLandsFindings(where(`${one}<p><strong>2 &middot; spn-y</strong> &mdash; the other</p>${TREE}`)).length === 0);
 ok("a page with no Where it lands has nothing to find", whereItLandsFindings(section("Today")).length === 0);
 
+const steps = `<p><strong>1 &middot; Build the bundle first</strong> &mdash; run it</p><p><strong>2 &middot; Then release</strong> &mdash; in order</p>`;
+ok("[MKT.HOOKS.513] a numbered step paragraph is a step, never a repository", whereItLandsFindings(where(`${steps}${one}`)).length === 0, whereItLandsFindings(where(`${steps}${one}`)).join("|"));
+ok("a tree marked data-lang=tree counts as a tree", whereItLandsFindings(where(`<p><strong>1 &middot; spn-x</strong> &mdash; the change</p><pre data-lang="tree">spn-x/\n└── a.ts   new</pre>`)).length === 0);
+ok("a second repository name with no tree is still refused beside steps", whereItLandsFindings(where(`${steps}${two}`)).length === 1);
+
 console.log("\n=== Proposed — a data-layer mark and a For and Layer line (233)");
 ok("a layer with its mark and a block with its For and Layer line passes", proposedFindings(proposed(layer)).length === 0);
 ok("Shape needs no mark", proposedFindings(proposed(`<h3 id="s3-shape">Shape</h3>${layer}`)).length === 0);
