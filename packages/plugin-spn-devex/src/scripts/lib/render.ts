@@ -12,14 +12,14 @@
 // installed on a partner's machine to read a document.
 
 import { execFileSync } from "node:child_process";
-import { dirname, join, relative, resolve } from "node:path";
-import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { dirname, join, relative, resolve, sep } from "node:path";
+import { existsSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 
 import { draw, figureOf, type Spec } from "./draw.ts";
 import { readsAsCondition } from "./block-fit.ts";
 import { sentenceColumn } from "./item-cells.ts";
-import { isSeatFile, producedPageOf } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
+import { isSeatFile, producedPageOf, visibilityOf } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { stylesDir } from "../../../../plugin-support-lib/src/lib/page-styles.ts";
 import { RULE_ID_SRC, chipOf, parseFields } from "../../../../plugin-support-lib/src/lib/rule-mark.ts";
 
@@ -281,6 +281,28 @@ let pageRoot: string | null = null;
  */
 let rewriteHref: (href: string) => string = (h) => h;
 
+const remotes = new Map<string, { top: string; url: string } | null>();
+
+/**
+ * The address of a file on github.com, read from the git remote of the repository that holds it, or null where there is no remote that names
+ * github.com. It reads the remote with git and never the network.
+ */
+export function githubAddress(path: string): string | null {
+  let file = path;
+  try { file = realpathSync(path); } catch { /* a file not written yet keeps the path it was given */ }
+  const folder = dirname(file);
+  if (!remotes.has(folder)) {
+    try {
+      const top = execFileSync("git", ["-C", folder, "rev-parse", "--show-toplevel"], { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim();
+      const raw = execFileSync("git", ["-C", folder, "remote", "get-url", "origin"], { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim();
+      const found = /github\.com[:/]([^/\s]+\/[^/\s]+?)(?:\.git)?$/.exec(raw);
+      remotes.set(folder, found ? { top, url: `https://github.com/${found[1]}` } : null);
+    } catch { remotes.set(folder, null); }
+  }
+  const remote = remotes.get(folder);
+  return remote ? `${remote.url}/blob/HEAD/${relative(remote.top, file).split(sep).join("/")}` : null;
+}
+
 /**
  * Re-express a seat file's link for the page produced from it.
  *
@@ -293,6 +315,8 @@ let rewriteHref: (href: string) => string = (h) => h;
 export function hrefForPage(seat: string, out: string): (href: string) => string {
   const seatDir = dirname(seat);
   const outDir = dirname(out);
+  // A public page links no `.md` seat file (RULE.DEVEX.WORKSPACE.555): a link to one becomes the file's address on github.com.
+  const publicPage = visibilityOf(out) === "public";
   return (href) => {
     if (/^(?:[a-z]+:|#|\/\/|\/)/i.test(href)) return href;
     const hash = href.indexOf("#");
@@ -301,6 +325,7 @@ export function hrefForPage(seat: string, out: string): (href: string) => string
     if (!path) return href;
     let target = resolve(seatDir, path);
     if (isSeatFile(target)) target = producedPageOf(target);
+    if (publicPage && target.endsWith(".md")) { const address = githubAddress(target); if (address) return address + frag; }
     const rel = relative(outDir, target);
     return (rel.startsWith(".") ? rel : `./${rel}`) + frag;
   };

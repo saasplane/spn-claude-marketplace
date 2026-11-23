@@ -569,7 +569,7 @@ console.log("\n=== the gap scan measures and never fixes");
 
     const leftOverview = at(`${LEFT_OVERVIEWS}/core-overview.html`, overviewPage);
     one("[MKT.SCRIPTS.110] an overview left under `overviews/` is a finding of the audit, and it names the folder the pocket does not hold",
-      leftOverview, (g) => g.includes("✗ RULE block") && g.includes("the pocket holds `docs/`, `guides/` and `reports/`, and no `overviews/`"));
+      leftOverview, (g) => g.includes("✗ RULE block") && g.includes("the pocket holds `docs/`, `guides/`, `reports/` and `surface/`, and no `overviews/`"));
     one("[MKT.SCRIPTS.110] and it names where the overview belongs: beside the hub, or in its domain's folder",
       leftOverview, has(`this page belongs at ${placed.beside} beside the hub, or ${POCKET_DOCS}/<domain>/core-overview.html`));
     const leftConstruct = at(`${LEFT_CONSTRUCTS}/01-core/01-thing-construct.html`, constructPage);
@@ -1383,7 +1383,7 @@ console.log("\n=== a guide page and the index of artifacts are pages the audit k
     audit({ [stray]: guide() }, stray), (g) => g.includes("`index.html` is the one page that sits directly in the pocket") && g.includes("`guides/`"));
   const elsewhere = `${POCKET_DOCS}/index.html`;
   one("known-bad: an index in a folder of the pocket is refused, because a repository has one and it sits in the pocket itself",
-    audit({ [elsewhere]: index() }, elsewhere), has("a repository has one index, and it is `docs/artifacts/index.html`"));
+    audit({ [elsewhere]: index() }, elsewhere), has("a repository has one index in the pocket and one in each half of it"));
   one("the pocket's face sits directly in the pocket too, and is not refused",
     audit({ [`docs/${POCKET.artifacts}/README.md`]: doc({ id: "p", title: "Artifacts", lenses: ["ARCHITECT"], status: "DONE" }, "x\n", "`For: Architect` · `Status: ✅ DONE`") },
       `docs/${POCKET.artifacts}/README.md`), lacks("directly in the pocket"));

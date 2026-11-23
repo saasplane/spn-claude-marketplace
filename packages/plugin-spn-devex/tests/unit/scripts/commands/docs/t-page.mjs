@@ -47,7 +47,7 @@ function run(root, args) {
 }
 const readAt = (root, p) => readFileSync(join(root, p), "utf8");
 /** The pocket's `docs` folder, which holds the hub and one folder for each domain. */
-const POCKET_DOCS = `docs/${POCKET.artifacts}/${ARTIFACT.docs}`;
+const POCKET_DOCS = `docs/${POCKET.artifacts}/public/${ARTIFACT.docs}`;
 /** Where a construct's page sits: the `constructs` folder of its domain's folder in the pocket. */
 const pageOf = (domain, name) => `${POCKET_DOCS}/${domain}/${CONSTRUCT_PAGES}/${name}-construct.html`;
 const absent = (root, p) => !existsSync(join(root, p));
@@ -91,9 +91,9 @@ const lacks = (s) => (got) => !String(got).includes(s);
          absent(ws, `docs/${POCKET.artifacts}/${CONSTRUCT_PAGES}`)].join(" "), "true true true");
     one("[MKT.SCRIPTS.110] a sibling seat link becomes the sibling PAGE, in the same constructs folder", page, has('href="./other-construct.html"'));
     one("[MKT.SCRIPTS.110] a link out of the seat tree is expressed against the page's own folder", page,
-        has(`href="../../../../${SEAT.capabilities}/x.md"`));
+        has(`href="../../../../../${SEAT.capabilities}/x.md"`));
     one("[MKT.SCRIPTS.110] the rail's home link is expressed against it too, not shipped as `../README.md`", page,
-        (g) => g.includes(`class="sds-crumb"><a href="../../../../${SEAT.constructs}/README.md"`));
+        (g) => g.includes(`class="sds-crumb"><a href="../../../../../${SEAT.constructs}/README.md"`));
     one("[MKT.SCRIPTS.110] every relative link of the page names a file that is there",
         [...page.matchAll(/href="(\.[^"#]*)/g)].map((found) => found[1]).filter((href) => absent(ws, join(dirname(pageOf("01-core", "thing")), href))), (g) => g.length === 0);
     // THE AUDIT HAS TO HAVE READ THE PAGES for its silence about them to mean anything, so the case

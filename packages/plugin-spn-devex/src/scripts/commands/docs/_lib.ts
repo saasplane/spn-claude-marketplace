@@ -22,7 +22,7 @@ import { blockFit, type FitKind } from "../../lib/block-fit.ts";
 import { filesUnder as proseFilesUnder, paragraphs as proseParagraphs, score as proseScore } from "./prose.ts";
 
 import { withOffset } from "../../lib/clock.ts";
-import { GUIDE_PAGE_SUFFIX, ARTIFACT_FOLDERS, ARTIFACT_INDEX, DEVEX_WORKSTREAMS, DOCS, FACE, HUB, POCKET, SEAT, SEATS, TEMPLATES,
+import { GUIDE_PAGE_SUFFIX, ARTIFACT_FOLDERS, VISIBILITY, VISIBILITY_OF, visibilityOf, ARTIFACT_INDEX, DEVEX_WORKSTREAMS, DOCS, FACE, HUB, POCKET, SEAT, SEATS, TEMPLATES,
   artifactDocsDir, artifactFolderOf, behaviorsDir, bookTemplatesDir, capabilitiesDir, constructsDir, docsOf, domainDirOf, hubPage, inSeat, inTemplates,
   docsRootOf, isApproachPage, isOverview, isProducedPage, isSeatFile, mirrorPath, pagePlaceOf, producedPageOf, seatOf, slashes, splitAtSeat,
   workstreamDirOf } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
@@ -245,6 +245,7 @@ export function isMoment(value: unknown): boolean {
 /** Whether a file sits directly in a docs tree's artifacts pocket, in no folder of it. */
 export function directlyInPocket(file: string): boolean {
   const parts = file.replace(/\\/g, "/").split("/");
+  if (parts.length >= 4 && parts.at(-4) === DOCS && parts.at(-3) === POCKET.artifacts && parts.at(-2) in VISIBILITY) return true;
   return parts.length >= 3 && parts.at(-3) === DOCS && parts.at(-2) === POCKET.artifacts;
 }
 
@@ -287,11 +288,15 @@ export function checkBlock(file: string, src: string, block: any, err: string | 
 
   // BESIDE ITS FOLDERS THE POCKET HOLDS ITS FACE AND ONE PAGE, THE INDEX. Every other page sits in
   // the folder of its kind, and the index sits nowhere but directly in the pocket.
+  // THE TWO HALVES OF THE POCKET (RULE.DEVEX.WORKSPACE.221): a report belongs to `private/`, and the docs, the guides and the samples to `public/`.
+  const half = visibilityOf(file);
+  if (half !== null && pocketFolder !== null && ARTIFACT_FOLDERS.includes(pocketFolder) && VISIBILITY_OF[pocketFolder] !== half)
+    add("RULE", `\`${pocketFolder}/\` belongs to \`${VISIBILITY_OF[pocketFolder]}/\`, never \`${half}/\` (RULE.DEVEX.WORKSPACE.221)`);
   const direct = directlyInPocket(file);
   if (direct && ![FACE, ARTIFACT_INDEX].includes(basename(file)))
     add("RULE", `\`${ARTIFACT_INDEX}\` is the one page that sits directly in the pocket — this file belongs in ${ARTIFACT_FOLDERS.map((folder) => `\`${folder}/\``).join(", ").replace(/, ([^,]*)$/, " or $1")}`);
   if (variant === "index" && !(direct && basename(file) === ARTIFACT_INDEX))
-    add("RULE", `a repository has one index, and it is \`${DOCS}/${POCKET.artifacts}/${ARTIFACT_INDEX}\` — \`docs index\` writes it there`);
+    add("RULE", `a repository has one index in the pocket and one in each half of it, and they are \`${DOCS}/${POCKET.artifacts}/${ARTIFACT_INDEX}\` or \`${DOCS}/${POCKET.artifacts}/public/${ARTIFACT_INDEX}\` and \`${DOCS}/${POCKET.artifacts}/private/${ARTIFACT_INDEX}\` — \`docs index\` writes them there`);
 
   // An overview describes, a FOUNDATION construct states a standard, and a report is a snapshot;
   // none of the three carries a status. Every other page kind carries one. `carriesStatus` states
