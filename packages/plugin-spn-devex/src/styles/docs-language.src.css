@@ -5,18 +5,18 @@
    `sds-`. Our tokens are Tailwind's theme. Our named classes use Tailwind inside, by `@apply`, where
    Tailwind has a utility for the declaration.
 
-   This is the file a person or an agent edits. `node scripts/build-styles.mjs` builds `sds-docs.css`
-   beside it, with @tailwindcss/cli 4.3.3, and `spn-devex docs sds cut <version>` serves a build as a
+   This is the file a person or an agent edits. `node scripts/build-styles.mjs` builds `docs-language.css`
+   beside it, with @tailwindcss/cli 4.3.3, and `spn-devex docs styles cut <version>` serves a build as a
    version that never changes.
 
    The pages read in Geist and Geist Mono, which sit in `fonts/` beside the built stylesheet in every version's
    folder, so the urls below are relative to the stylesheet. No display font. The system stacks stay after them.
 
-   THE DESIGN SYSTEM'S TOKENS come first: ds-tokens.css is the design system's own variables, copied whole by
-   `spn-devex docs sds cut` from a pinned version of it, and never edited by hand. The docs classes below read its
+   THE DESIGN SYSTEM'S TOKENS come first: design-system-tokens.css is the design system's own variables, copied whole by
+   `spn-devex docs styles cut` from a pinned version of it, and never edited by hand. The docs classes below read its
    names (--surface-*, --fg, --fg-quiet, --border, --radius, --font-text, --font-code), and the same two Geist files
    are declared under the names it uses, DSDefaultText and DSDefaultCode. */
-@import "./ds-tokens.css";
+@import "./design-system-tokens.css";
 @font-face{font-family:DSDefaultText;src:url("fonts/Geist-Variable.woff2") format("woff2");font-weight:100 900;font-style:normal;font-display:swap}
 @font-face{font-family:DSDefaultCode;src:url("fonts/GeistMono-Variable.woff2") format("woff2");font-weight:100 900;font-style:normal;font-display:swap}
 @font-face{font-family:DSDefaultDisplay;src:url("fonts/SchibstedGrotesk-Variable.woff2") format("woff2");font-weight:100 900;font-style:normal;font-display:swap}
@@ -149,7 +149,7 @@
     --sds-weight-heading:var(--font-weight-bold);
     --sds-weight-title:var(--font-weight-medium);
     /* THE NAMES THE DOCS CLASSES READ ARE THE DESIGN SYSTEM'S: each takes its value from the tokens at the top of this
-       file (ds-tokens.css, copied by `docs sds cut`), so a page and its drawings read the product's values, and a page
+       file (design-system-tokens.css, copied by `docs styles cut`), so a page and its drawings read the product's values, and a page
        or a section that sets --seed-primary gets a whole palette. The dark values come with data-mode, which the
        script sets on the page when it names none. */
     --sds-paper:var(--surface); --sds-card:var(--surface-sunken); --sds-ink:var(--fg);
@@ -225,6 +225,7 @@
   .sds-page[data-frame="page"]{grid-template-columns:minmax(0,1fr)}
   .sds-page[data-frame="page"].sds-has-rail{grid-template-columns:minmax(0,1fr) var(--sds-rail-width)}
   .sds-page[data-frame="page"] > .sds-wrap{width:100%}
+  /* KEPT ONLY FOR PAGES WRITTEN BEFORE THE EYEBROW WAS THE BREADCRUMB: no template and no writer emits .sds-crumb any more; the rewrite pass removes it. */
   .sds-crumb{@apply font-ui text-xs text-fact m-0; max-width:none}
   .sds-crumb a{@apply text-fact no-underline}
   .sds-crumb a:hover{@apply text-accent}
@@ -235,6 +236,9 @@
   .sds-eyebrow .sds-line{@apply flex flex-wrap items-center; gap:.4rem .6rem; line-height:var(--font-content-md-line-height)}
   .sds-eyebrow .sds-separator{@apply text-rule; font-weight:var(--font-weight-regular)}
   .sds-eyebrow .sds-line1{@apply uppercase text-fact; letter-spacing:.15em; font-weight:var(--font-weight-semibold); line-height:var(--font-content-md-line-height)}
+  /* THE EYEBROW'S FIRST LINE IS THE BREADCRUMB: each level above the page is a link that keeps the line's colour and weight. */
+  .sds-eyebrow .sds-line1 a{color:inherit; font-weight:inherit; text-decoration:none}
+  .sds-eyebrow .sds-line1 a:hover{@apply text-accent}
   .sds-eyebrow .sds-label{@apply font-ui uppercase text-fact; font-size:var(--sds-caption); line-height:var(--sds-caption-lh); letter-spacing:.08em}
   .sds-eyebrow .sds-audience{@apply inline-flex flex-wrap items-center; gap:.45rem}
   .sds-badge{@apply inline-flex items-center bg-card font-ui uppercase text-description whitespace-nowrap; gap:.35rem; padding:.1rem .6rem; border-radius:999px; border:1px solid var(--sds-rule); font-size:var(--sds-caption); letter-spacing:.06em; line-height:var(--sds-caption-lh)}
@@ -882,7 +886,7 @@
   .sds-drawing .sds-box{rx:8px}
 }
 
-/* the docs' headings are set in the design system's display font (its [data-ds-page='SITE'] value); unlayered, so it follows ds-tokens.css */
+/* the docs' headings are set in the design system's display font (its [data-ds-page='SITE'] value); unlayered, so it follows design-system-tokens.css */
 :root{--font-heading:var(--font-display)}
 
 @layer components {
@@ -920,14 +924,14 @@
 /* ============ THE DOCS DESIGN LANGUAGE ============ */
 @layer components {
 /* THE DOCS DESIGN LANGUAGE. A sibling of saasplane.ai's: plates, tiles, wires with soft corners, glyphs and the drawn characters. Three layers:
-   the design system's tokens (ds-tokens.css, with its --draw-* scale), this file's --sds-* docs tokens, which read them, and the dl- classes,
+   the design system's tokens (design-system-tokens.css, with its --draw-* scale), this file's --sds-* docs tokens, which read them, and the dl- classes,
    which read only --sds-* tokens and write no raw colour. A figure is an svg of class dl-svg on a 928 frame, drawn 1:1. */
 /* The docs design language, in three layers. Layer 1 is the design system's tokens (--success, --surface-brand ...),
-   which sds-docs.css already maps. Layer 2 is sds-docs.css's docs tokens (--sds-*): the ones it has, and the ones in the
+   which docs-language.css already maps. Layer 2 is docs-language.css's docs tokens (--sds-*): the ones it has, and the ones in the
    block below, which it takes on. Layer 3 is the dl- classes, which read only --sds-* tokens, never a layer-1 name and
    never a raw colour. */
 
-/* ---- tokens sds-docs.css takes on: each a strength of tokens it already has, named once ---- */
+/* ---- tokens docs-language.css takes on: each a strength of tokens it already has, named once ---- */
 :root, .dl-partner {
   --sds-plate: var(--draw-plate);       /* a plate's floor */
   --sds-plate-on: color-mix(in srgb, var(--sds-accent) 12%, var(--sds-card));   /* a plate in focus */
@@ -1164,7 +1168,7 @@ dialog.dl-full::backdrop { background: var(--sds-paper); }
 .dl-sk-surface { fill: var(--sds-plate); stroke: none; }                                        /* a surface behind a part: the plate's floor, no edge */
 .dl-sk-window  { fill: none; stroke: var(--sds-tile-edge); stroke-width: var(--sds-stroke-line); }   /* the window a skeleton draws as part of its drawing */
 /* THE CORNERS OF A SKELETON ARE THE DESIGN SYSTEM THEME'S: each drawn unit names its role in `data-corner`, and the rule below sets `rx` from the
-   design system's own token (ds-tokens.css), so a theme that sets `--radius` differently draws its own corners. The `rx` attribute holds the default
+   design system's own token (design-system-tokens.css), so a theme that sets `--radius` differently draws its own corners. The `rx` attribute holds the default
    theme's pixels where no stylesheet reaches the drawing. A pill and a square corner take no token, so they carry no role. The roles and their
    tokens are `SKEL_CORNER` in the drawer. */
 rect[data-corner="ctl"], rect[data-corner="badge"] { rx: var(--radius-sm); }

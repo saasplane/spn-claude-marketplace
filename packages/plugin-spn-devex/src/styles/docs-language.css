@@ -2,7 +2,7 @@
 @layer properties;
 :root {
   --seed-primary: #084a75;
-  --neutral-hue: 0;
+  --neutral-hue: none;
   --neutral-chroma: 0;
   --color-primary-50: oklch(from var(--seed-primary) 0.971 calc(c * 0.2) h);
   --color-primary-100: oklch(from var(--seed-primary) 0.936 calc(c * 0.35) h);
@@ -806,6 +806,53 @@
   --surface-step-3: oklch(0.8 calc(var(--neutral-chroma) * 0.6) var(--neutral-hue));
   --surface-translucent-fill: 82%;
   --surface-blur: 12px;
+  --tone-sage: #e6f2ee;
+  --tone-sage-quiet: #bae2d5;
+  --tone-sage-deep: #175345;
+  --tone-peach: #fbefe3;
+  --tone-peach-quiet: #ecd3b9;
+  --tone-peach-deep: #5f401e;
+  --tone-lilac: #efe9f8;
+  --tone-lilac-quiet: #ded1f0;
+  --tone-lilac-deep: #4f3f64;
+  --tone-sky: #e5f1f6;
+  --tone-sky-quiet: #b9dfee;
+  --tone-sky-deep: #164f62;
+  --tone-sand: #f4efe8;
+  --tone-sand-quiet: #e9d4b7;
+  --tone-sand-deep: #5b431b;
+  --glass-tint: color-mix(in oklch, white 55%, transparent);
+  --glass-edge: color-mix(in oklch, white 70%, transparent);
+  --glass-sheen: linear-gradient(180deg, color-mix(in oklch, white 45%, transparent), transparent 40%);
+  --glass-blur: 16px;
+}
+[data-mode='dark'] {
+  --tone-sage: #192b25;
+  --tone-sage-quiet: #0c221c;
+  --tone-sage-deep: #011913;
+  --tone-peach: #2f2419;
+  --tone-peach-quiet: #261a0d;
+  --tone-peach-deep: #1e1003;
+  --tone-lilac: #292331;
+  --tone-lilac-quiet: #201928;
+  --tone-lilac-deep: #171020;
+  --tone-sky: #192930;
+  --tone-sky-quiet: #0b2027;
+  --tone-sky-deep: #00171f;
+  --tone-sand: #2d2519;
+  --tone-sand-quiet: #251b0c;
+  --tone-sand-deep: #1d1102;
+  --glass-tint: color-mix(in oklch, white 8%, transparent);
+  --glass-edge: color-mix(in oklch, white 14%, transparent);
+  --glass-sheen: linear-gradient(180deg, color-mix(in oklch, white 10%, transparent), transparent 40%);
+  --glass-blur: 16px;
+}
+@media (prefers-reduced-transparency: reduce) {
+  :root, [data-mode='light'], [data-mode='dark'] {
+    --glass-tint: var(--surface-raised);
+    --glass-sheen: linear-gradient(transparent, transparent);
+    --glass-blur: 0px;
+  }
 }
 [data-mode='dark'] {
   --surface-brand: var(--primary);
@@ -827,11 +874,11 @@
   }
   --draw-plate: var(--primary);
   @supports (color: color-mix(in lab, red, red)) {
-    --draw-plate: color-mix(in oklch, var(--primary) 4.5%, var(--background));
+    --draw-plate: color-mix(in oklab, var(--primary) 4.5%, var(--background));
   }
   --draw-plate-edge: var(--primary);
   @supports (color: color-mix(in lab, red, red)) {
-    --draw-plate-edge: color-mix(in oklch, var(--primary) 24%, var(--background));
+    --draw-plate-edge: color-mix(in oklab, var(--primary) 24%, var(--background));
   }
   --draw-wire: var(--foreground);
   @supports (color: color-mix(in lab, red, red)) {
@@ -842,7 +889,7 @@
   --draw-dot-color: var(--draw-plate-edge);
   --draw-dot-strong-color: var(--primary);
   @supports (color: color-mix(in lab, red, red)) {
-    --draw-dot-strong-color: color-mix(in oklch, var(--primary) 45%, var(--background));
+    --draw-dot-strong-color: color-mix(in oklab, var(--primary) 45%, var(--background));
   }
   --draw-shadow: drop-shadow(0 1px 1px var(--foreground));
   @supports (color: color-mix(in lab, red, red)) {
@@ -853,7 +900,7 @@
   --draw-accent: var(--primary-fg);
   --draw-dot-strong-color: var(--primary-fg);
   @supports (color: color-mix(in lab, red, red)) {
-    --draw-dot-strong-color: color-mix(in oklch, var(--primary-fg) 55%, var(--background));
+    --draw-dot-strong-color: color-mix(in oklab, var(--primary-fg) 55%, var(--background));
   }
   --draw-shadow: none;
 }
@@ -2875,7 +2922,7 @@
   .sds-page {
     display: grid;
     gap: calc(0.25rem * 12);
-    grid-template-columns: var(--sds-rail-width) minmax(0,1fr);
+    grid-template-columns: minmax(0,1fr) var(--sds-rail-width);
     max-width: min(98vw,var(--sds-page-max));
     margin: 0 auto;
     padding: 3rem 8px 6rem;
@@ -3023,6 +3070,14 @@
     letter-spacing: .15em;
     font-weight: var(--font-weight-semibold);
     line-height: var(--font-content-md-line-height);
+  }
+  .sds-eyebrow .sds-line1 a {
+    color: inherit;
+    font-weight: inherit;
+    text-decoration: none;
+  }
+  .sds-eyebrow .sds-line1 a:hover {
+    color: var(--sds-accent);
   }
   .sds-eyebrow .sds-label {
     font-family: var(--sds-ui);

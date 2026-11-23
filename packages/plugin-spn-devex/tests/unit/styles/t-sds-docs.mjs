@@ -8,7 +8,7 @@ import { pathToFileURL } from "node:url";
 import vm from "node:vm";
 
 const HERE = resolve(import.meta.dirname, "..", "..", "..");
-const SCRIPT = readFileSync(resolve(HERE, "src", "styles", "sds-docs.js"), "utf8");
+const SCRIPT = readFileSync(resolve(HERE, "src", "styles", "docs-page.js"), "utf8");
 const FIGURES = resolve(HERE, "src", "scripts", "lib", "figures.ts");
 const RENDERER = resolve(HERE, "src", "scripts", "lib", "render.ts");
 
@@ -137,7 +137,7 @@ for (const [name, path] of [["figures.ts", FIGURES], ["render.ts", RENDERER]]) {
 ok("the shared script holds the keyword lists", /\bSELECT FROM WHERE\b/.test(SCRIPT) && /\bconst let var function\b/.test(SCRIPT));
 
 // MKT.SCRIPTS.554: the approach page's status bar keeps each arc on one line, and its cells fill the row.
-const SOURCE = readFileSync(resolve(HERE, "src", "styles", "sds-docs.src.css"), "utf8");
+const SOURCE = readFileSync(resolve(HERE, "src", "styles", "docs-language.src.css"), "utf8");
 const ruleOf = (selector) => new RegExp(`\\${selector}\\{([^}]*)\\}`).exec(SOURCE)?.[1] ?? "";
 ok("[MKT.SCRIPTS.554] an arc's count never wraps", /flex:none/.test(ruleOf(".sds-arc-count")) && /white-space:nowrap/.test(ruleOf(".sds-arc-count")));
 ok("[MKT.SCRIPTS.554] the status bar's cells fill the row", /flex:1 0 auto/.test(ruleOf(".sds-chip")));
@@ -183,7 +183,7 @@ console.log("=== the shared script — a tabset shows one panel, takes the arrow
 // N017: the rules of the new blocks are in the stylesheet source and its build, and the unit styles are the design system's, scoped.
 console.log("=== the shared stylesheet — tabs, groups, facts, the fold and the inline unit");
 {
-  const BUILT = readFileSync(resolve(HERE, "src", "styles", "sds-docs.css"), "utf8");
+  const BUILT = readFileSync(resolve(HERE, "src", "styles", "docs-language.css"), "utf8");
   for (const selector of [".sds-tabset-bar", ".sds-tabset[data-type='PILL']", ".sds-group-jumps", ".sds-group", ".sds-tile-facts", ".sds-tiles[data-layout='LIST']", ".sds-catalog-table", ".sds-tile-media", ".sds-fold", ".sds-unit-pair"]) {
     const plain = selector.replace(/'/g, "");
     ok(`\`${selector}\` is in the source and the built stylesheet`, SOURCE.includes(selector) && (BUILT.includes(selector) || BUILT.includes(plain) || BUILT.includes(selector.replace(/'/g, '"'))));
@@ -202,8 +202,8 @@ console.log("=== the shared stylesheet — tabs, groups, facts, the fold and the
   ok("@font-face, @property and @keyframes stay global, and a font's url reads the version folder's fonts",
     cut.includes("@font-face{font-family:F;src:url(fonts/Geist-Variable.woff2)}") && cut.includes("@property --x{syntax:'*';inherits:false}") && cut.includes("@keyframes k{from{opacity:0}to{opacity:1}}"), cut);
   ok("a cut keeps the licence comment and says where it came from", cut.startsWith("/* The design system's own stylesheet, support-web-ds-ts v1.0.0,") && cut.includes("/*! lib */"));
-  const unit = readFileSync(resolve(HERE, "src", "styles", "ds-unit.css"), "utf8");
-  ok("ds-unit.css is in the styles folder, scoped: its first rule outside a layer or font is under .sds-unit, and no global body or html rule is left",
+  const unit = readFileSync(resolve(HERE, "src", "styles", "design-system-units.css"), "utf8");
+  ok("design-system-units.css is in the styles folder, scoped: its first rule outside a layer or font is under .sds-unit, and no global body or html rule is left",
     unit.includes(".sds-unit") && !/(^|})(html|body|:root|\*)[,{]/.test(unit.replace(/\/\*[\s\S]*?\*\//g, "")), unit.slice(0, 300));
 }
 

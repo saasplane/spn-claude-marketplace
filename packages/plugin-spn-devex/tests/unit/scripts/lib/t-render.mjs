@@ -80,7 +80,7 @@ ok("a table that is not the Terms table carries no such class",
 const { cutVersions, integrityTable, newestVersion, linesFor } = await import(pathToFileURL(resolve(HERE, "..", "plugin-support-lib", "src", "lib", "page-styles.ts")).href);
 const { readFileSync } = await import("node:fs");
 const STYLES_HOME = resolve(HERE, "src", "styles");
-ok("the newest version of the shared styles is 1.16.0, which serves ds-unit.css and design-system.css, so every page writer links it",
+ok("the newest version of the shared styles is 1.16.0, which serves design-system-units.css and design-system.css, so every page writer links it",
   newestVersion(Object.keys(cutVersions(STYLES_HOME))) === "1.16.0");
 ok("and 1.10.0 serves the Terms shares: a fixed layout, and the stacked rows under 40rem",
   /table\.sds-terms\{table-layout:fixed\}|table\.sds-terms\s*\{[^}]*table-layout:\s*fixed/.test(readFileSync(resolve(HERE, "..", "..", "public", "assets", "docs", "1.10.0", "sds-docs.css"), "utf8"))
@@ -175,7 +175,7 @@ console.log("\n=== the page renderer — a unit fence is drawn by the render and
     furniture: { stylesheet, script: "", footer: "" },
   });
   setUnitRender(() => "<body><p>x</p></body>");
-  const linked = pageOf(fence("unit", JSON.stringify(tree)), '<link rel="stylesheet" href="https://x/1.16.0/sds-docs.css" integrity="sha384-b" crossorigin="anonymous">');
+  const linked = pageOf(fence("unit", JSON.stringify(tree)), '<link rel="stylesheet" href="https://x/1.16.0/docs-language.css" integrity="sha384-b" crossorigin="anonymous">');
   setUnitRender(() => "<!doctype html><html><head><style>.a{color:red}</style></head><body><style>.b{}</style><p>body</p><script>alert(1)</script></body></html>");
   const styled = pageOf(fence("unit", JSON.stringify(tree)));
   const captionSeen = [];
@@ -186,16 +186,16 @@ console.log("\n=== the page renderer — a unit fence is drawn by the render and
   pageOf(fence("unit", JSON.stringify({ sections: [{ unit: "DSFeature", props: {} }], caption: "Two" })));
   const badCaption = pageOf(fence("unit", JSON.stringify({ unit: "DSFeature", props: {}, caption: 3 })));
   setUnitRender((file) => { seen.push(JSON.parse(readFileSync(file, "utf8"))); return "<html><head></head><body><p class=\"x\">drawn & ready</p></body></html>"; });
-  const pinned = readFileSync(resolve(HERE, "src", "styles", "ds-unit.css"), "utf8").split("\n")[0].match(/support-web-ds-ts v(\d+\.\d+\.\d+)/)?.[1];
+  const pinned = readFileSync(resolve(HERE, "src", "styles", "design-system-units.css"), "utf8").split("\n")[0].match(/support-web-ds-ts v(\d+\.\d+\.\d+)/)?.[1];
   ok("[MKT.SCRIPTS.613] a unit fence is wrapped as a render file holding the tree alone, `treeVersion` and its one section, and the render is given the `surface` app with the version its unit stylesheet was cut from",
-    seen.length === 1 && JSON.stringify(seen[0]) === JSON.stringify({ treeVersion: 1, sections: [tree] }) && designSystemVersion(undefined, "ds-unit.css") === pinned && DEFAULT_RENDER_APP === "surface", JSON.stringify(seen));
+    seen.length === 1 && JSON.stringify(seen[0]) === JSON.stringify({ treeVersion: 1, sections: [tree] }) && designSystemVersion(undefined, "design-system-units.css") === pinned && DEFAULT_RENDER_APP === "surface", JSON.stringify(seen));
   ok("[MKT.SCRIPTS.613] the unit's markup stands in the page itself, once in light and once in dark, side by side, with the tree below as code, and no frame",
     made.findings.length === 0 && made.html.includes('<span class="sds-file-path">DSFeature</span><span class="sds-file-lang">unit</span>')
       && made.html.includes('<div class="sds-unit" data-mode="light"><p class="x">drawn & ready</p></div>') && made.html.includes('<div class="sds-unit" data-mode="dark"><p class="x">drawn & ready</p></div>')
       && made.html.includes('<div class="sds-unit-pair">') && !made.html.includes("<iframe") && !made.html.includes("srcdoc") && made.html.includes('<pre data-lang="json">'), made.html.slice(-1800));
-  ok("[MKT.SCRIPTS.613] a page with a unit fence links ds-unit.css after the shared stylesheet, from the same folder, and a page with none does not",
-    linked.html.indexOf("sds-docs.css") > 0 && linked.html.indexOf("ds-unit.css") > linked.html.indexOf("sds-docs.css") && linked.html.includes('href="https://x/1.16.0/ds-unit.css"') && !/ds-unit\.css"[^>]*integrity/.test(linked.html)
-      && !produced(fence("json", "{}")).includes("ds-unit.css"), linked.html.slice(0, 600));
+  ok("[MKT.SCRIPTS.613] a page with a unit fence links design-system-units.css after the shared stylesheet, from the same folder, and a page with none does not",
+    linked.html.indexOf("docs-language.css") > 0 && linked.html.indexOf("design-system-units.css") > linked.html.indexOf("docs-language.css") && linked.html.includes('href="https://x/1.16.0/design-system-units.css"') && !/design-system-units\.css"[^>]*integrity/.test(linked.html)
+      && !produced(fence("json", "{}")).includes("design-system-units.css"), linked.html.slice(0, 600));
   ok("[MKT.SCRIPTS.613] the unit's markup holds no style and no script, whatever the printed page carried",
     !/<style|<script/.test(styled.html.slice(styled.html.indexOf("sds-unit-pair"), styled.html.indexOf("</figure>"))) && styled.html.includes("<p>body</p>"), styled.html.slice(-900));
   ok("[MKT.SCRIPTS.613] a caption is the figcaption's text, the unit's name stays as the small label, and the caption is out of the tree sent to the render and of the tree shown",
@@ -216,7 +216,7 @@ console.log("\n=== the page renderer — a unit fence is drawn by the render and
   const framedSeen = [];
   setUnitRender((file) => { framedSeen.push(JSON.parse(readFileSync(file, "utf8"))); return '<!doctype html><html lang="en"><head><style>a{}</style></head><body><p class="w">a "whole" page & more</p></body></html>'; });
   const layoutTree = { unit: "DSLayout", props: { type: "RAIL" } };
-  const layout = pageOf(fence("unit", JSON.stringify(layoutTree)), '<link rel="stylesheet" href="https://x/1.16.0/sds-docs.css">');
+  const layout = pageOf(fence("unit", JSON.stringify(layoutTree)), '<link rel="stylesheet" href="https://x/1.16.0/docs-language.css">');
   const manySections = pageOf(fence("unit", JSON.stringify({ sections: [{ unit: "DSFeature", props: {} }, { unit: "DSFeature", props: {} }] })));
   const forcedOff = pageOf(fence("unit", JSON.stringify({ ...layoutTree, frame: false })));
   const forcedOn = pageOf(fence("unit", JSON.stringify({ unit: "DSFeature", props: {}, frame: true, caption: "Framed" })));
@@ -230,10 +230,10 @@ console.log("\n=== the page renderer — a unit fence is drawn by the render and
     srcdocs.length === 2 && srcdocs[0].startsWith("<!doctype html><html lang=\"en\" data-mode=\"light\">") && srcdocs[1].includes('data-mode="dark"') && !srcdocs[0].includes("<style>a{}</style>")
       && srcdocs[0].includes('<link rel="stylesheet" href="https://x/1.16.0/design-system.css">') && srcdocs[1].includes('data-mode="dark"')
       && srcdocs[0].includes('<p class="w">a "whole" page & more</p>') && layout.html.includes("a &quot;whole&quot; page &amp; more"), layout.html.slice(-1500));
-  ok("[MKT.SCRIPTS.627] a unit drawn in a frame needs no ds-unit.css, so the page links none, and the tree is still shown below",
-    !layout.html.includes("ds-unit.css") && layout.html.includes('<pre data-lang="json">'));
+  ok("[MKT.SCRIPTS.627] a unit drawn in a frame needs no design-system-units.css, so the page links none, and the tree is still shown below",
+    !layout.html.includes("design-system-units.css") && layout.html.includes('<pre data-lang="json">'));
   ok("[MKT.SCRIPTS.627] a tree with more than one section is drawn in a frame too",
-    (manySections.html.match(/<iframe\b/g) ?? []).length === 2 && !manySections.html.includes("ds-unit.css"), manySections.html.slice(-800));
+    (manySections.html.match(/<iframe\b/g) ?? []).length === 2 && !manySections.html.includes("design-system-units.css"), manySections.html.slice(-800));
   ok("[MKT.SCRIPTS.627] \"frame\": false draws a layout inline, and \"frame\": true frames a small unit; the key is out of the tree sent to the render and of the tree shown",
     !forcedOff.html.includes("<iframe") && forcedOff.html.includes('class="sds-unit" data-mode="light"') && (forcedOn.html.match(/<iframe\b/g) ?? []).length === 2
       && !forcedOn.html.includes('"frame"') && !forcedOff.html.includes('"frame"') && framedSeen.every((seen) => !JSON.stringify(seen).includes('"frame"')) && forcedOn.html.includes("Framed"), forcedOff.html.slice(-800));
@@ -248,8 +248,8 @@ console.log("\n=== the page renderer — a unit fence is drawn by the render and
   ok("[MKT.SCRIPTS.632] a unit fence is drawn by one call of the new render, each mode taking its own html, and the fence's `app` names the app row and is out of the tree",
     calls.length === 2 && calls[0].options.app === "docs" && !("inline" in calls[0].options) && JSON.stringify(calls[0].file) === JSON.stringify({ treeVersion: 1, sections: [{ unit: "DSFeature", props: {} }] })
       && small.html.includes('data-mode="light"><p class="l">light</p>') && small.html.includes('data-mode="dark"><p class="d">dark</p>') && !small.html.includes('"app"'), small.html.slice(-700));
-  ok("[MKT.SCRIPTS.632] the `surface` app is drawn with --ds, the version ds-unit.css was cut from, and a fence naming another app sends no --ds",
-    calls[1].options.ds === designSystemVersion(undefined, "ds-unit.css") && /^\d+\.\d+\.\d+$/.test(calls[1].options.ds) && calls[0].options.app === "docs" && !("ds" in calls[0].options));
+  ok("[MKT.SCRIPTS.632] the `surface` app is drawn with --ds, the version design-system-units.css was cut from, and a fence naming another app sends no --ds",
+    calls[1].options.ds === designSystemVersion(undefined, "design-system-units.css") && /^\d+\.\d+\.\d+$/.test(calls[1].options.ds) && calls[0].options.app === "docs" && !("ds" in calls[0].options));
   ok("[MKT.SCRIPTS.632] a framed unit is drawn by the same render call as any other, with the default app where the fence names none, and each frame holds its mode's page",
     !("inline" in calls[1].options) && calls[1].options.app === DEFAULT_RENDER_APP && /srcdoc="[^"]*light/.test(whole.html) && /srcdoc="[^"]*dark/.test(whole.html), whole.html.slice(-700));
   setUnitRender(() => modes("<p>x</p>", "<p>y</p>", { findings: [{ message: "DSFeature has no prop `kind`" }] }));
@@ -295,7 +295,7 @@ console.log("\n=== the page renderer — a skeleton of a built unit, and a table
   ok("[MKT.SCRIPTS.629] where no list of built units can be read, no skeleton is held against it", !made(skeleton({})).findings.some((f) => f.message.includes("builds")));
   setBuiltUnits();
   const fileList = made(skeleton({}));
-  ok("[MKT.SCRIPTS.629] the list of built units is read from ds-units.json in the styles folder by default, and DSFeature is built",
+  ok("[MKT.SCRIPTS.629] the list of built units is read from design-system-units.json in the styles folder by default, and DSFeature is built",
     fileList.findings.some((f) => f.stops === true && f.message.includes("`DSFeature`")), JSON.stringify(fileList.findings));
 
   const rows = (n) => Array.from({ length: n }, (_, k) => [`Thing ${k + 1}`, `what thing ${k + 1} is`]);
@@ -458,7 +458,7 @@ console.log("\n=== the page renderer — the page's name and its title are two t
   const named = write(block({ name: "Probe", title: "A Probe Says What It Is" }), { href: "../up.html", label: "Up" });
   const heading = (html, tag) => (new RegExp(`<${tag}[^>]*>([^<]*)</${tag}>`).exec(html) ?? [])[1];
   ok("[MKT.SCRIPTS.614] a block's `name` is the tab, the outline's title and the eyebrow's last segment, and its `title` is the heading alone",
-    heading(named.html, "title") === "Probe" && heading(named.html, "h1") === "A Probe Says What It Is" && /class="sds-rail-title">Probe</.test(named.html) && /&nbsp;\|&nbsp; Probe<\/span>/.test(named.html), named.html.slice(0, 900));
+    heading(named.html, "title") === "Probe" && heading(named.html, "h1") === "A Probe Says What It Is" && /class="sds-rail-title">Probe</.test(named.html) && /&middot; Probe<\/span>/.test(named.html), named.html.slice(0, 900));
   const plain = write(block({ title: "Probe" }));
   ok("[MKT.SCRIPTS.614] a block with no `name` has its `title` for all of them, so no seat needs a change",
     heading(plain.html, "title") === "Probe" && heading(plain.html, "h1") === "Probe" && /class="sds-rail-title">Probe</.test(plain.html) && plain.findings.length === 0, JSON.stringify(plain.findings));
@@ -467,9 +467,14 @@ console.log("\n=== the page renderer — the page's name and its title are two t
     long.findings.some((f) => f.stops === true && f.message.includes("RULE.DEVEX.WORKSPACE.517") && f.message.includes("4 words")), JSON.stringify(long.findings));
   ok("[MKT.SCRIPTS.614] a `name` of three words, and one with a dash and a number, are within the rule",
     write(block({ name: "Three Word Name" })).findings.length === 0 && write(block({ name: "Infra · Shape 2" })).findings.length === 0);
-  ok("[MKT.SCRIPTS.614] the way back is a breadcrumb above the masthead, inside the wrap, and the rail holds no back link",
-    /<div class="sds-wrap">\n<p class="sds-crumb"><a href="\.\.\/up\.html">&larr; Up<\/a><\/p>\n\n<header class="sds-masthead">/.test(named.html) && !/sds-home/.test(named.html), named.html.slice(0, 1400));
-  ok("[MKT.SCRIPTS.614] where no page is named above it the constructs face stands as the breadcrumb", /<p class="sds-crumb"><a href="[^"]*README\.md">&larr; the model<\/a><\/p>/.test(plain.html));
+  ok("[MKT.SCRIPTS.614] the way back is the masthead's first line, the breadcrumb: the location links the page above, the name is plain, and there is no line above the masthead and no back link in the rail",
+    /<div class="sds-wrap">\n<header class="sds-masthead">\n[^\n]*\n  <div class="sds-eyebrow"><span class="sds-line1">\/workspace &middot; <a href="\.\.\/up\.html">[^<]*<\/a> &middot; Probe<\/span>/.test(named.html)
+      && !/sds-crumb/.test(named.html) && !/sds-home/.test(named.html), named.html.slice(0, 1400));
+  ok("[MKT.SCRIPTS.614] where no page is named above it the constructs face stands as the location's link", /<span class="sds-line1">[^<]*&middot; <a href="[^"]*README\.md">[^<]*<\/a> &middot; Probe/.test(plain.html) && !/sds-crumb/.test(plain.html));
+  const hubbed = renderPage({ block: block({ title: "Probe" }), markdown: "# Probe\n\nThe lead.\n\n## What it is\n\nText.\n", workspace: "SaaS Plane", location: "spn-probe",
+    furniture: { stylesheet: "", script: "", footer: "" }, home: { href: "../up.html", label: "Up" }, hub: "../../hub.html" });
+  ok("[MKT.SCRIPTS.614] where the repository has a hub the organization links it, and the location links the page above",
+    hubbed.html.includes('<span class="sds-line1"><a href="../../hub.html">SaaS Plane</a> &middot; <a href="../up.html">spn-probe</a> &middot; Probe</span>'), hubbed.html.slice(0, 900));
 }
 
 console.log(failed ? `\n  ${failed} of ${total} FAILED — t-render` : `\n  all ${total} passed — t-render`);

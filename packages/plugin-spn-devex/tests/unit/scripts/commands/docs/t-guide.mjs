@@ -26,7 +26,7 @@ const same = (label, got, want) => ok(label, JSON.stringify(got) === JSON.string
 const STYLES = join(BASE, "styles");
 mkdirSync(STYLES);
 writeFileSync(join(STYLES, "versions.json"), JSON.stringify({ "1.0.0": {}, "1.10.0": {}, "1.2.0": {} }));
-// Each cut version has the hash of each served file, as `docs sds cut` records them.
+// Each cut version has the hash of each served file, as `docs styles cut` records them.
 const HASHES = Object.fromEntries(["1.0.0", "1.10.0", "1.2.0"].map((version) => [version,
   { "sds-docs.css": `sha384-css${version}`, "sds-docs.js": `sha384-js${version}`, "sds-index.js": `sha384-index${version}` }]));
 writeFileSync(join(STYLES, "integrity.json"), JSON.stringify(HASHES));
@@ -169,7 +169,7 @@ After the last step the service is down again.
     text.includes(`href="${STYLES_ADDRESS}${NEWEST}/sds-docs.css" integrity="${HASHES[NEWEST]["sds-docs.css"]}" crossorigin="anonymous"`)
       && text.includes(`src="${STYLES_ADDRESS}${NEWEST}/sds-docs.js" integrity="${HASHES[NEWEST]["sds-docs.js"]}" crossorigin="anonymous"`));
   ok("the header says the workspace, the repository's declared name and the guide, then the type and the audience",
-    text.includes('<span class="sds-line1">SaaS Plane &nbsp;|&nbsp; Sample &nbsp;|&nbsp; Getting Started</span>')
+    /<span class="sds-line1">SaaS Plane &middot; (?:<a href="[^"]*">)?Sample(?:<\/a>)? &middot; Getting Started<\/span>/.test(text)
       && text.includes('<span class="sds-badge sds-type">Guide</span>')
       && text.includes('<span class="sds-audience"><span class="sds-badge sds-lens">Backend developer</span><span class="sds-badge sds-lens">Quality engineer</span></span>'));
   ok("the title is on the tab, in the rail and in the masthead, and the summary is the description",
@@ -501,7 +501,7 @@ console.log("\n=== a guide goes back to the hub of its repository, one step up t
   const ran = guide(["write", join(root, GUIDES, "01-getting-started.md")]);
   const text = read(root, `${PAGES}/getting-started-guide.html`);
   ok("the way back opens the hub, a page, named by the repository", ran.code === 0
-    && text.includes(`<p class="sds-crumb"><a href="../docs/concept-overview.html">&larr; ${basename(root)}</a></p>`), ran.out + each(text, /(<a [^>]*sds-home[^>]*>)/g).join(" "));
+    && text.includes('&middot; <a href="../docs/concept-overview.html">Sample</a> &middot;') && !text.includes("sds-crumb"), ran.out + each(text, /(<a [^>]*sds-home[^>]*>)/g).join(" "));
   ok("and it is not the index, and it keeps the page inside its own tab", !text.includes("../index.html") && !text.includes('target="_top"'));
   ok("the page is current against what the command writes now", guide(["check", join(root, GUIDES, "01-getting-started.md")]).code === 0);
 }

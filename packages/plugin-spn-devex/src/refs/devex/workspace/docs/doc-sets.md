@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "seen": "e89862c3"
+      "seen": "80bf3af3"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
@@ -29,7 +29,7 @@
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/04-docs.md",
-      "seen": "ae28bfff"
+      "seen": "5d1acda8"
     },
     {
       "path": "spn-foundation/CONCEPT.md",
@@ -509,7 +509,7 @@ Every page somebody writes by hand is copied from a template, and the templates 
 
 **A surface preview is one file, the surface page template in `templates/surface/`, for reviewing a site's or an app's pages, and only once the app's design language exists** (`RULE.DEVEX.WORKSPACE.534` · GUIDE). Reach for it when the developer asks to review the pages of a surface, and never before the design language the pages follow is written; until then the review is of the design language, on the arc's page. **The page holds a bar and the page's markup and nothing else** (`RULE.DEVEX.WORKSPACE.535` · MUST · skill:spn-devex/ideate): the bar has the page's title, the width switch (Desktop, Tablet, Phone), the mode switch (Light, Dark) and Notes, off by default, and the markup stands in one `<template id="page">`, which is what `spnutils apps surface render` prints or the body of a copy of a running page. The markup is the work's own, so the sample rule (`RULE.DEVEX.WORKSPACE.267` · MUST · check:workstream-state) holds for it. **The page names the design system and the app's stylesheet in two metas, and the shared script builds the frame's document** (`RULE.DEVEX.WORKSPACE.536` · MUST · skill:spn-devex/ideate): the `surface-ds` meta names the version of the design system the markup was drawn with, the `surface-app-css` meta names the app's stylesheet by a relative path, or is empty for Surface's own look, and the script links `design-system.css` from the published `assets/docs/<docs version>/design-system.css`, the folder it was served from, links the app's stylesheet, sets `data-mode` from the Light and Dark switch and sizes the frame by the width switch; the switches set the frame's own document directly, so no message and no meta in the markup is needed, and a note is an element marked `data-note`, hidden until Notes is on. `spn-devex docs check` refuses a surface page without the template, the two metas or the bar. **The frame's document, the metas and the note marker change only with a new stylesheet version** (`RULE.DEVEX.WORKSPACE.537` · MUST · skill:spn-devex/ideate). **A group of previews reviews the app's top navigation and footer once**, in its layout sample `00-layout` with the menus open and the phone drawer; every other page shows its own content only.
 
-**A template's placeholders are short names in capitals, each explained once, in a comment at the top of the file** (`<!-- Placeholders: {{NAME}} … -->`), and the same value takes the same name everywhere on a page: `{{NAME}}` is the page's short name, at most three words, in the `<title>`, the outline's title, the eyebrow's last segment and the index entry; `{{TITLE}}` is the heading, in the `<h1>` alone; `{{UP}}` and `{{UP-HREF}}` are the breadcrumb. A placeholder inside example content shows the shape of a row and stays. The block's optional `name` holds the short name where `title` is longer; the page writer fills `{{NAME}}` from `name`, and from `title` where there is none, and refuses a `name` of more than three words (`RULE.DEVEX.WORKSPACE.517`). **The rules every page kind shares are stated once, in the chapter, and no template repeats them**: headings carry no count and are never links, numbers are for file names, the book's own words are translated, and a card is a title, a description and a *Read more*. **The book's own words are translated on every page a newcomer reads**: say *the agent's viewpoint*, and note once that the book calls it a lens. A word a first-time reader cannot guess is explained where it first appears, or replaced by the plain word. A count is never an explanation: *the eight phases* tells a newcomer nothing, so say what the phases are. A door is a *Read …* line under the text, naming what it opens in the words the heading already carries — *Read Agent →*. A card that carries an action — a link or a button — keeps it at the card's bottom edge: the cards of one row are as tall as the tallest, so the actions line up however long the text above each one is.
+**A template's placeholders are short names in capitals, each explained once, in a comment at the top of the file** (`<!-- Placeholders: {{NAME}} … -->`), and the same value takes the same name everywhere on a page: `{{NAME}}` is the page's short name, at most three words, in the `<title>`, the outline's title, the eyebrow's last segment and the index entry; `{{TITLE}}` is the heading, in the `<h1>` alone; `{{UP-HREF}}` (and `{{HUB-HREF}}` on a construct page) are the links of the eyebrow's first line, the breadcrumb. A placeholder inside example content shows the shape of a row and stays. The block's optional `name` holds the short name where `title` is longer; the page writer fills `{{NAME}}` from `name`, and from `title` where there is none, and refuses a `name` of more than three words (`RULE.DEVEX.WORKSPACE.517`). **The rules every page kind shares are stated once, in the chapter, and no template repeats them**: headings carry no count and are never links, numbers are for file names, the book's own words are translated, and a card is a title, a description and a *Read more*. **The book's own words are translated on every page a newcomer reads**: say *the agent's viewpoint*, and note once that the book calls it a lens. A word a first-time reader cannot guess is explained where it first appears, or replaced by the plain word. A count is never an explanation: *the eight phases* tells a newcomer nothing, so say what the phases are. A door is a *Read …* line under the text, naming what it opens in the words the heading already carries — *Read Agent →*. A card that carries an action — a link or a button — keeps it at the card's bottom edge: the cards of one row are as tall as the tallest, so the actions line up however long the text above each one is.
 
 **They do not share a lifecycle** (`RULE.DEVEX.WORKSPACE.088` · GUIDE). Two describe a moment; one renders something live.
 
@@ -614,12 +614,12 @@ section per area, then Glossary, then Where to go next.
   means.** The term links to the page that defines it. There is no *Contract term* fact; the generated
   glossary, with its contract terms, belongs to each domain (`RULE.DEVEX.WORKSPACE.150` · GUIDE).
 
-**Every page walks up one step, by the breadcrumb above its masthead** (`RULE.DEVEX.WORKSPACE.232` · MUST · check:corpus).
-The top of a chain has none. A construct page goes back to its overview: where a domain has more than one
+**Every page walks up one step, by the breadcrumb, which is the masthead's first line** (`RULE.DEVEX.WORKSPACE.232` · MUST · check:corpus).
+Each level above the page is a link, the page's own name is plain, and ` · ` stands between the levels; there is no separate back-link line above the masthead. The top of a chain has no link. A construct page goes back to its overview: where a domain has more than one
 overview, the one that links forward to it, and where it has one, that one. An overview, a guide, a report
 and an index go back to the hub. A preview goes back to its approach page, at the subsection it serves. The
 hub is the top of a repository's chain and an approach page is the top of a workstream's, so neither carries
-a back link. In its back link and its previous and next doors, a markdown file opens a markdown file and a page opens a
+a link in its first line. In its back link and its previous and next doors, a markdown file opens a markdown file and a page opens a
 page; a link inside the content, *Where to go next* included, may open a markdown file, a sample or a preview.
 
 **A preview shows, and an approach page argues** (`RULE.DEVEX.WORKSPACE.233` · MUST · check:doc-check). A preview's
@@ -702,8 +702,8 @@ the rail, which is why a template ships every section and subsection with one. *
 ### Every page links one shared stylesheet, in one version
 
 **Every page links one shared stylesheet and one shared script as its base, and holds no copy of
-them** (`RULE.DEVEX.WORKSPACE.214` · MUST · check:doc-check). The stylesheet is `sds-docs.css`, and the script is
-`sds-docs.js`. Between them they carry the colours in both themes, the outline rail, the fold, the
+them** (`RULE.DEVEX.WORKSPACE.214` · MUST · check:doc-check). The stylesheet is `docs-language.css`, and the script is
+`docs-page.js`. Between them they carry the colours in both themes, the outline rail, the fold, the
 badges and the link on each heading. A page that holds a copy of its styles keeps the faults of the
 day it was written. With one shared file, a fault is fixed once, for every page that links the file.
 
@@ -719,15 +719,15 @@ its end.
 
 **The hash is how a browser knows a file is the one that was cut.** `integrity` holds the SHA-384 of
 the file as its version was cut, so a browser refuses a file overwritten under that version, and
-`crossorigin="anonymous"` lets it check a file from another address. `docs sds cut` records each new
+`crossorigin="anonymous"` lets it check a file from another address. `docs styles cut` records each new
 version's hashes in the plugin's `integrity.json`, and a recorded hash never changes. A command that
-writes a page writes the hash beside the version and refuses a version the table lacks; `docs sds
+writes a page writes the hash beside the version and refuses a version the table lacks; `docs styles
 repoint` moves the hash with the version. A line with no hash still loads, and the code scan reports it.
 
 - **A page may add a style of its own, for a case the shared stylesheet does not cover.** The shared
   classes come first. The page's own `<style>` block sits after the stylesheet's line, and a class it
   defines itself takes no `sds-` prefix, and never a utility's name. What several pages need goes
-  into `sds-docs` in a later version. The check on a page refuses a link to a version that nobody cut.
+  into `docs-language` in a later version. The check on a page refuses a link to a version that nobody cut.
 - **A callout takes a status class, and it may hold a heading and a table.** The callout is
   `sds-pull`, and the heading and the table take its status's colour. A declared gap in a hub is such
   a callout, with `sds-warning`.
@@ -735,17 +735,17 @@ repoint` moves the hash with the version. A line with no hash still loads, and t
   spacing, size, type, borders, corners and overflow, and the colours of our tokens, such as `flex`,
   `gap-4`, `mt-2`, `text-sm`, `text-faint` and `bg-accent-soft`. Use a named class first, and a
   utility only where no class fits. A utility outside the set has no effect on a page.
-- **A version is a folder that never changes.** `docs sds cut <version>` writes it, with a `fonts/`
+- **A version is a folder that never changes.** `docs styles cut <version>` writes it, with a `fonts/`
   folder beside the stylesheet and the scripts, and it refuses a version that exists. The pages read in
-  Geist and Geist Mono (`RULE.DEVEX.WORKSPACE.214` · MUST · check:doc-check): `sds-docs.css` declares `@font-face` for `DSDefaultText`
+  Geist and Geist Mono (`RULE.DEVEX.WORKSPACE.214` · MUST · check:doc-check): `docs-language.css` declares `@font-face` for `DSDefaultText`
   and `DSDefaultCode`, the design system's own names, on the two files in `fonts/`, by urls relative to the
   stylesheet, and each keeps the system stack after it, so a page whose fonts did not load still reads. The
   stylesheet reads the design system's token names (`RULE.DEVEX.WORKSPACE.524` · MUST · check:doc-check): its colours, corners and type read the tokens (`--surface-*`, `--fg`, `--fg-quiet`,
-  `--border`, `--radius`, `--font-text`, `--font-code`), which `docs sds cut` copies from a pinned design-system
+  `--border`, `--radius`, `--font-text`, `--font-code`), which `docs styles cut` copies from a pinned design-system
   version; a page or a section that sets `--seed-primary` gets a whole palette, and `data-mode` on the page
   sets dark. A bundled copy of a page
   carries no font file. A change to the styles is a new version, and
-  `docs sds repoint <version> <folder>` moves every page under a folder to it.
+  `docs styles repoint <version> <folder>` moves every page under a folder to it.
 - **That address is the one hosted address a page may hold.** Every link from one page to another
   stays relative.
 - **A stored page needs the network once.** Your browser fetches the shared files the first time you
@@ -753,7 +753,7 @@ repoint` moves the hash with the version. A line with no hash still loads, and t
 
 **A published page carries its version's styles inside it — MUST** (decision
 RULE.DEVEX.WORKSPACE.215). The publishing host does not load a stylesheet from the version's address,
-so a published page that links out arrives with no styling. `docs sds bundle <page>` writes a copy
+so a published page that links out arrives with no styling. `docs styles bundle <page>` writes a copy
 beside the page, named `<page>.bundled.html`, with the stylesheet and the script inside it. You
 publish the copy, and the stored page keeps its two lines. The check before a publish refuses a page
 that links a stylesheet from outside, and it names the command. **A page that somebody reads with no
@@ -810,7 +810,7 @@ Write the specification in a ```` ```dg ```` fence and the drawer computes every
 | `FLOWCHART` | a path one actor walks, with the shapes a flowchart has — a diamond is a choice |
 | `SEQUENCE` | a path several actors walk together, when *who said it* is the fact |
 | `ENTITIES` | data and how it relates |
-| `TREE` · `STATE` · `CODE` · `FILE` · `DIFF` | a hierarchy · a lifecycle · source · source that is one file, framed with its path · a change, in a `FILE` frame |
+| `TREE` · `CODE` · `FILE` · `DIFF` | a hierarchy · source · source that is one file, framed with its path · a change, in a `FILE` frame |
 | `SYSTEM` | the architecture of something you build — a server module, a web module, an estate package |
 
 ### Drawing a `SYSTEM` figure for a module you are looking at

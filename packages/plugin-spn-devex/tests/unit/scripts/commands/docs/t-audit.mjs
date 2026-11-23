@@ -11,7 +11,7 @@ import { dirname, join, resolve } from "node:path";
 import { execFileSync } from "node:child_process";
 import { ARTIFACT, CONSTRUCT_PAGES, POCKET, SEAT, WORKSTREAMS } from "../../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { INDEX_SCRIPT, OWN_COPY, linesFor } from "../../../../../../plugin-support-lib/src/lib/page-styles.ts";
-import { ENUM_HEAD, checkCodeFigures, checkTreeFigures } from "../../../../../src/scripts/commands/docs/_lib.ts";
+import { ENUM_HEAD, backLinkOf, checkCodeFigures, checkTreeFigures } from "../../../../../src/scripts/commands/docs/_lib.ts";
 import { FINDINGS } from "../../../../../src/scripts/commands/docs/audit.ts";
 
 const TOOL = resolve(PLUGIN, "src", "scripts", "cli.ts");
@@ -1178,13 +1178,13 @@ console.log("\n=== a page's furniture is the shared files': a version that exist
 
   one("a page `docs page` produced links the shared stylesheet, and the audit finds it clean", audit(produced),
     // The page takes its two lines from the template, so it links the version the template links.
-    (g) => /<link rel="stylesheet" href="[^"]*\/assets\/docs\/\d+\.\d+\.\d+\/sds-docs\.css" integrity="sha384-[^"]+" crossorigin="anonymous">/.test(produced)
+    (g) => /<link rel="stylesheet" href="[^"]*\/assets\/docs\/\d+\.\d+\.\d+\/docs-language\.css" integrity="sha384-[^"]+" crossorigin="anonymous">/.test(produced)
       && produced.includes(/<link rel="stylesheet"[^>]*>/.exec(readFileSync(resolve(templates, "docs", "pages", "construct-template.html"), "utf8"))[0])
       && g.includes("clean — 1 page"));
   one("known-bad: the same page edited by hand is not what the seat produces",
     audit(produced.replace("<h2>Model</h2>", "<h2>Model</h2>\n<p>typed into the page</p>")), has("✗ RULE produced"));
-  const own = produced.replace(LINES.stylesheet, "<style>.badge{color:red}</style>")
-    .replace(LINES.script, "<script>/* a rail builder of this page's own */</script>")
+  const own = produced.replace(/<link rel="stylesheet"[^>]*>/, "<style>.badge{color:red}</style>")
+    .replace(/<script src="[^"]*"[^>]*><\/script>/, "<script>/* a rail builder of this page's own */</script>")
     .replaceAll("sds-section-head", "sec-head").replaceAll("sds-label", "lbl").replaceAll("sds-separator", "sep").replaceAll("sds-", "");
   const named = audit(own);
   one("[MKT.SCRIPTS.108] a produced page that holds its own copy draws the one RULE line, and no `produced` finding",
@@ -1407,8 +1407,8 @@ console.log("\n=== a preview page: variant `preview`, its own title, a Status ch
   // THE BOOK'S OWN TEMPLATE GIVES THE TWO LINES, so a clean case links what the book links.
   const templates = TEMPLATES_DIR;
   const previewTemplate = readFileSync(resolve(templates, "workstream", "arc-template.html"), "utf8");
-  const linkLine = previewTemplate.match(/<link\b[^>]*sds-docs\.css"[^>]*>/)[0];
-  const scriptLine = previewTemplate.match(/<script\b[^>]*sds-docs\.js"[^>]*><\/script>/)[0];
+  const linkLine = previewTemplate.match(/<link\b[^>]*docs-language\.css"[^>]*>/)[0];
+  const scriptLine = previewTemplate.match(/<script\b[^>]*docs-page\.js"[^>]*><\/script>/)[0];
   const notes = `.spndevex/${WORKSTREAMS}/open/001-a/notes/N001`;
   const at = `${notes}/previews/layout-preview.html`;
   const good = { id: "ws-001-a-layout", variant: "preview", title: "Layout", lenses: ["ARCHITECT"], status: "PLANNING",
@@ -1638,6 +1638,17 @@ console.log("\n=== the set `--finding` takes is the names the audit's own findin
   one("[MKT.SCRIPTS.130] `audit check` of a path that does not exist names it as a RULE finding, with no stack",
     said, (got) => got.includes("✗ RULE audit") && got.includes("no such file or folder") && !got.includes("ENOENT"));
   one("[MKT.SCRIPTS.130] and exits 1", status, 1);
+}
+
+console.log("\n=== the back link — the last link of the eyebrow's first line");
+{
+  const eyebrow = (line) => `<header class="sds-masthead">\n  <div class="sds-eyebrow"><span class="sds-line1">${line}</span></div>\n</header>`;
+  one("[MKT.SCRIPTS.130] a page whose first line links the hub and the page above goes back to the page above, the last link",
+    backLinkOf(eyebrow('<a href="../hub.html">SaaS Plane</a> &middot; <a href="../up.html">Loc</a> &middot; Name')), "../up.html");
+  one("[MKT.SCRIPTS.130] a page whose first line holds no link has no back link, and the hub and an approach page are such", backLinkOf(eyebrow("SaaS Plane &middot; 041 Improvements")), null);
+  one("[MKT.SCRIPTS.130] a page written before the breadcrumb still reads its crumb line, and the first link of its rail after that",
+    backLinkOf('<p class="sds-crumb"><a href="../old.html">&larr; Old</a></p>' + eyebrow("A | B | C")), "../old.html");
+  one("[MKT.SCRIPTS.130] and the rail's link where there is neither", backLinkOf('<a class="sds-home" href="../rail.html">&larr; Home</a>' + eyebrow("A | B | C")), "../rail.html");
 }
 
 console.log(failed ? `\n  ${failed} of ${n} FAILED` : `\n  all ${n} passed`);

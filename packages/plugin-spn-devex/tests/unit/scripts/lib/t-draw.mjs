@@ -9309,13 +9309,13 @@ console.log(
 
 // ---------------------------------------------------------------------------------------------------------------------------------
 // ORDER 08 · A SKELETON'S CORNERS ARE THE THEME'S: each unit role takes the design system's token for it, at the default theme and when
-// `--radius` is changed in the tokens. The tokens are read from the docs build's own `ds-tokens.css`, never typed here.
+// `--radius` is changed in the tokens. The tokens are read from the docs build's own `design-system-tokens.css`, never typed here.
 {
   console.log("\n=== SKELETON — corners come from the design system's tokens");
   const { readFileSync } = await import("node:fs");
   const { SKEL_CORNER } = await import("../../../../src/scripts/lib/draw.ts");
   const tokens = readFileSync(
-    new URL("../../../../src/styles/ds-tokens.css", import.meta.url),
+    new URL("../../../../src/styles/design-system-tokens.css", import.meta.url),
     "utf8",
   );
   // a tiny resolver for the declarations the corner tokens are made of: `var(--a)`, `calc(x +/- Npx)`, `calc(x / N)`, `N rem`
@@ -9366,7 +9366,7 @@ console.log(
     (v) => v.every((set) => set.every(([, got, want]) => got === want)),
   );
   one(
-    "the tokens the roles name are in the docs build's `ds-tokens.css`, which `docs sds cut --ds` copies from the design system",
+    "the tokens the roles name are in the docs build's `design-system-tokens.css`, which `docs styles cut --ds` copies from the design system",
     [
       "--radius-sm",
       "--radius-md",

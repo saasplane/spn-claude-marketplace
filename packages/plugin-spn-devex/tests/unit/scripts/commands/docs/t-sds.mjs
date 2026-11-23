@@ -1,9 +1,9 @@
-// `docs sds` — cuts a version of the shared page styles, moves the pages of a folder to a version, and
+// `docs styles` — cuts a version of the shared page styles, moves the pages of a folder to a version, and
 // writes a copy of a page with its version's styles inside it (`05-artifacts.md` § One stylesheet,
 // served in versions). Every case builds a small marketplace and a few pages in a scratch folder,
 // runs the real command through `cli.ts`, and reads the files back from disk. No case reaches the
 // network: a bundle reads its files from `--assets`, or from a folder beside the page.
-import { execFileSync } from "node:child_process";
+import { execFileSync, spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, realpathSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -24,9 +24,9 @@ const ok = (label, condition, detail = "") => {
 };
 
 const ENV = { ...process.env, SPN_TELEMETRY: "off", SPN_WORKSPACE: SCRATCH };
-/** One run of `docs sds` through the entry, from a working directory, with its exit code and what it printed. */
+/** One run of `docs styles` through the entry, from a working directory, with its exit code and what it printed. */
 const sdsFrom = (cwd, ...args) => {
-  try { return { code: 0, out: execFileSync(process.execPath, [TOOL, "docs", "sds", ...args], { encoding: "utf8", env: ENV, stdio: "pipe", cwd }) }; }
+  try { return { code: 0, out: execFileSync(process.execPath, [TOOL, "docs", "styles", ...args], { encoding: "utf8", env: ENV, stdio: "pipe", cwd }) }; }
   catch (error) { return { code: error.status ?? 1, out: String(error.stdout ?? "") + String(error.stderr ?? "") }; }
 };
 const sds = (...args) => sdsFrom(SCRATCH, ...args);
@@ -114,39 +114,39 @@ for (const [name, body] of Object.entries(BUILT)) put(join(SCRATCH, "assets", na
 
 // ---------------------------------------------------------------------------- cut
 
-const CUT_USAGE = "usage: spn-devex docs sds cut <version> [--root <folder>] [--ds <folder>] [--ds-version <tag>]\n";
+const CUT_USAGE = "usage: spn-devex docs styles cut <version> [--root <folder>] [--ds <folder>] [--ds-version <tag>]\n";
 const USAGE = CUT_USAGE +
-              "       spn-devex docs sds check <version> <folder…> [--root <folder>]\n" +
-              "       spn-devex docs sds repoint <version> <folder…> [--root <folder>]\n" +
-              "       spn-devex docs sds bundle <page> [--assets <folder>]\n";
+              "       spn-devex docs styles check <version> <folder…> [--root <folder>]\n" +
+              "       spn-devex docs styles repoint <version> <folder…> [--root <folder>]\n" +
+              "       spn-devex docs styles bundle <page> [--assets <folder>]\n";
 
-console.log("=== docs sds — the action is a word, and each action refuses what it does not take");
+console.log("=== docs styles — the action is a word, and each action refuses what it does not take");
 {
   const bare = sds();
   ok("[MKT.SCRIPTS.111] no action prints each usage line, says an action is owed and exits 2",
-    bare.code === 2 && bare.out === `${USAGE}\`docs sds\` needs an action.\n`, bare.out);
+    bare.code === 2 && bare.out === `${USAGE}\`docs styles\` needs an action.\n`, bare.out);
   const unknown = sds("publish", "1.0.0");
-  ok("[MKT.SCRIPTS.111] an action that does not exist is refused the same way", unknown.code === 2 && unknown.out === `${USAGE}\`docs sds\` needs an action.\n`, unknown.out);
+  ok("[MKT.SCRIPTS.111] an action that does not exist is refused the same way", unknown.code === 2 && unknown.out === `${USAGE}\`docs styles\` needs an action.\n`, unknown.out);
   const asOption = sds("--check", "1.1.0", SITE);
   ok("[MKT.SCRIPTS.111] `--check` where the action belongs is named as the action `check`",
-    asOption.code === 2 && asOption.out === `${USAGE}\`docs sds\` needs an action. \`--check\` is the action \`check\`.\n`, asOption.out);
+    asOption.code === 2 && asOption.out === `${USAGE}\`docs styles\` needs an action. \`--check\` is the action \`check\`.\n`, asOption.out);
   const option = sds("cut", "1.0.0", "--force", "--root", MARKET);
   ok("an option that does not exist is refused by its name, with exit 2, and cuts nothing",
-    option.code === 2 && option.out === `${CUT_USAGE}\`docs sds cut\` does not take \`--force\`.\n` &&!existsSync(SERVED), option.out);
+    option.code === 2 && option.out === `${CUT_USAGE}\`docs styles cut\` does not take \`--force\`.\n` &&!existsSync(SERVED), option.out);
   const noVersion = sds("cut", "--root", MARKET);
   ok("`cut` with no version says a version is owed, exits 2 and cuts nothing",
-    noVersion.code === 2 && noVersion.out === `${CUT_USAGE}\`docs sds cut\` needs a version.\n` &&!existsSync(SERVED), noVersion.out);
+    noVersion.code === 2 && noVersion.out === `${CUT_USAGE}\`docs styles cut\` needs a version.\n` &&!existsSync(SERVED), noVersion.out);
   const twoVersions = sds("cut", "1.0.0", "1.1.0", "--root", MARKET);
-  ok("`cut` with two versions is refused with exit 2, and cuts nothing", twoVersions.code === 2 && twoVersions.out.includes("`docs sds cut` takes one version.") && !existsSync(SERVED), twoVersions.out);
+  ok("`cut` with two versions is refused with exit 2, and cuts nothing", twoVersions.code === 2 && twoVersions.out.includes("`docs styles cut` takes one version.") && !existsSync(SERVED), twoVersions.out);
   const noRoot = sds("cut", "1.0.0", "--root");
   ok("`--root` with no value after it is refused with exit 2", noRoot.code === 2 && noRoot.out.includes("needs a value after `--root`."), noRoot.out);
   const noPage = sds("bundle");
   ok("`bundle` with no page says a path is owed, and exits 2",
-    noPage.code === 2 && noPage.out === "usage: spn-devex docs sds bundle <page> [--assets <folder>]\n`docs sds bundle` needs a path.\n", noPage.out);
+    noPage.code === 2 && noPage.out === "usage: spn-devex docs styles bundle <page> [--assets <folder>]\n`docs styles bundle` needs a path.\n", noPage.out);
   ok("`bundle` with two pages is refused with exit 2", sds("bundle", LEDGER, INDEX).code === 2);
 }
 
-console.log("=== docs sds cut — a version is a folder and an entry");
+console.log("=== docs styles cut — a version is a folder and an entry");
 {
   const first = sds("cut", "1.0.0", "--root", MARKET);
   const folder = join(SERVED, "1.0.0");
@@ -178,7 +178,7 @@ console.log("=== docs sds cut — a version is a folder and an entry");
     readFileSync(join(folder, "sds-docs.css"), "utf8") === CSS && both["1.0.0"]["sds-docs.css"] === sha(CSS));
 }
 
-console.log("=== docs sds cut — what it refuses");
+console.log("=== docs styles cut — what it refuses");
 {
   writeFileSync(join(STYLES, "sds-docs.js"), `${PAGE_JS}// a change after the cut\n`);
   const before = tree(MARKET);
@@ -229,7 +229,7 @@ console.log("=== docs sds cut — what it refuses");
 
 // ---------------------------------------------------------------------------- repoint
 
-console.log("=== docs sds repoint — what it refuses");
+console.log("=== docs styles repoint — what it refuses");
 {
   const before = `${tree(SITE)}\n${tree(WORKSTREAMS)}`;
   const never = sds("repoint", "9.9.9", SITE, WORKSTREAMS, "--root", MARKET);
@@ -245,19 +245,19 @@ console.log("=== docs sds repoint — what it refuses");
     noFolder.code === 1 && noFolder.out.includes("no-such-folder") && `${tree(SITE)}\n${tree(WORKSTREAMS)}` === before, noFolder.out);
   const noPages = sds("repoint", "1.1.0", "--root", MARKET);
   ok("[MKT.SCRIPTS.112] a move that names no folder prints its usage line, says a path is owed and exits 2",
-    noPages.code === 2 && noPages.out === "usage: spn-devex docs sds repoint <version> <folder…> [--root <folder>]\n`docs sds repoint` needs a path.\n", noPages.out);
+    noPages.code === 2 && noPages.out === "usage: spn-devex docs styles repoint <version> <folder…> [--root <folder>]\n`docs styles repoint` needs a path.\n", noPages.out);
   const noLook = sds("check", "1.1.0", "--root", MARKET);
   ok("[MKT.SCRIPTS.134] `check` that names no folder is refused the same way, because a look is of the folders it is given",
-    noLook.code === 2 && noLook.out === "usage: spn-devex docs sds check <version> <folder…> [--root <folder>]\n`docs sds check` needs a path.\n", noLook.out);
+    noLook.code === 2 && noLook.out === "usage: spn-devex docs styles check <version> <folder…> [--root <folder>]\n`docs styles check` needs a path.\n", noLook.out);
   const withOption = sds("repoint", "1.1.0", SITE, "--check", "--root", MARKET);
   ok("`repoint` does not take `--check`: the look is the action `check`, and the refused run changes no page",
-    withOption.code === 2 && withOption.out.includes("`docs sds repoint` does not take `--check`.") && `${tree(SITE)}\n${tree(WORKSTREAMS)}` === before, withOption.out);
+    withOption.code === 2 && withOption.out.includes("`docs styles repoint` does not take `--check`.") && `${tree(SITE)}\n${tree(WORKSTREAMS)}` === before, withOption.out);
   const neverLook = sds("check", "9.9.9", SITE, "--root", MARKET);
   ok("[MKT.SCRIPTS.134] `check` refuses a version nobody cut as `repoint` does, with exit 1",
-    neverLook.code === 1 && neverLook.out.includes("docs sds check — refused") && neverLook.out.includes("9.9.9"), neverLook.out);
+    neverLook.code === 1 && neverLook.out.includes("docs styles check — refused") && neverLook.out.includes("9.9.9"), neverLook.out);
 }
 
-console.log("=== docs sds repoint — the version changes, and no other byte");
+console.log("=== docs styles repoint — the version changes, and no other byte");
 {
   const before = tree(SITE);
   const dry = sds("check", "1.1.0", SITE, "--root", MARKET);
@@ -301,7 +301,7 @@ console.log("=== docs sds repoint — the version changes, and no other byte");
 
 // ---------------------------------------------------------------------------- bundle
 
-console.log("=== docs sds bundle — a copy that carries its styles inside it");
+console.log("=== docs styles bundle — a copy that carries its styles inside it");
 const ASSETS = join(SERVED, "1.1.0");
 const CUT_CSS = readFileSync(join(ASSETS, "sds-docs.css"), "utf8");
 const LOADS_SHARED = /<link\b[^>]*sds-docs\.css|<script\b[^>]*\bsrc="[^"]*sds-(?:docs|index)\.js"/;
@@ -350,7 +350,7 @@ const LOADS_SHARED = /<link\b[^>]*sds-docs\.css|<script\b[^>]*\bsrc="[^"]*sds-(?
       && closingCopy.split("</style>").length === 3 && closingCopy.split("</script>").length === 2, closingCopy);
 }
 
-console.log("=== docs sds bundle — what it refuses");
+console.log("=== docs styles bundle — what it refuses");
 {
   const own = sds("bundle", OWN, "--assets", ASSETS);
   ok("[MKT.SCRIPTS.103] a page that links no shared stylesheet is refused with exit 1, in the words every command uses",
@@ -380,7 +380,7 @@ console.log("=== docs sds bundle — what it refuses");
   ok("a page that is not there is refused", absent.code === 1 && absent.out.includes("not a file"), absent.out);
 }
 
-console.log("=== docs sds repoint — the hash moves with the version");
+console.log("=== docs styles repoint — the hash moves with the version");
 {
   const hashes = integrityTable(STYLES);
   const tag = (version, hash) => `<link rel="stylesheet" href="${STYLES_ADDRESS}${version}/sds-docs.css" integrity="${hash}" crossorigin="anonymous">\n`
@@ -400,7 +400,7 @@ console.log("=== docs sds repoint — the hash moves with the version");
   writeFileSync(join(STYLES, "versions.json"), `${JSON.stringify(listed, null, 2)}\n`);
 }
 
-console.log("=== docs sds cut — the fonts sit beside the stylesheet");
+console.log("=== docs styles cut — the fonts sit beside the stylesheet");
 {
   const market = join(SCRATCH, "fonts-marketplace");
   const styles = join(market, "packages", "plugin-spn-devex", "src", "styles");
@@ -418,32 +418,53 @@ console.log("=== docs sds cut — the fonts sit beside the stylesheet");
       && JSON.stringify(Object.keys(cutVersions(styles)["1.5.0"]).sort()) === JSON.stringify(Object.keys(BUILT).sort()), run.out);
 }
 
-console.log("=== docs sds cut — from 1.16.0 a version also serves the design system's two stylesheets");
+console.log("=== docs styles cut — from 1.16.0 a version also serves the design system's two stylesheets");
 {
   const market = join(SCRATCH, "unit-marketplace");
   const styles = join(market, "packages", "plugin-spn-devex", "src", "styles");
-  for (const [name, body] of Object.entries(BUILT)) put(join(styles, name), body);
+  // From 1.16.0 the files have new names; the old ones stay in the folder for a version before it.
+  const NEW = { "docs-language.css": CSS, "docs-page.js": PAGE_JS, "docs-index.js": INDEX_JS };
+  for (const [name, body] of [...Object.entries(BUILT), ...Object.entries(NEW)]) put(join(styles, name), body);
   put(join(styles, "versions.json"), "{}\n");
   mkdirSync(join(market, "public"), { recursive: true });
   const folder = join(market, "public", "assets", "docs", "1.16.0");
   const without = sds("cut", "1.16.0", "--root", market);
-  ok("[MKT.SCRIPTS.628] a cut of 1.16.0 with no ds-unit.css or design-system.css in the styles folder is refused by their names, and writes nothing",
-    without.code === 1 && without.out.includes("`ds-unit.css`") && without.out.includes("`design-system.css`") && !existsSync(folder) && cutVersions(styles)["1.16.0"] === undefined, without.out);
-  put(join(styles, "ds-unit.css"), ".sds-unit .a{color:red}\n");
+  ok("[MKT.SCRIPTS.628] a cut of 1.16.0 with no design-system-units.css or design-system.css in the styles folder is refused by their names, and writes nothing",
+    without.code === 1 && without.out.includes("`design-system-units.css`") && without.out.includes("`design-system.css`") && !existsSync(folder) && cutVersions(styles)["1.16.0"] === undefined, without.out);
+  put(join(styles, "design-system-units.css"), ".sds-unit .a{color:red}\n");
   put(join(styles, "design-system.css"), ".a{color:red}\n");
   const cut = sds("cut", "1.16.0", "--root", market);
   const listed = cutVersions(styles)["1.16.0"];
   const pinned = integrityTable(styles)["1.16.0"];
-  ok("[MKT.SCRIPTS.628] a cut of 1.16.0 serves the three shared files and the two design-system stylesheets, with a hash of each in versions.json and integrity.json",
-    cut.code === 0 && JSON.stringify(readdirSync(folder).sort()) === JSON.stringify(["ds-unit.css", "design-system.css", ...Object.keys(BUILT)].sort())
-      && JSON.stringify(Object.keys(listed)) === JSON.stringify(["sds-docs.css", "sds-docs.js", "sds-index.js", "ds-unit.css", "design-system.css"])
-      && listed["ds-unit.css"] === sha(".sds-unit .a{color:red}\n") && pinned["design-system.css"] === sha384Of(Buffer.from(".a{color:red}\n")), cut.out);
+  ok("[MKT.SCRIPTS.628] a cut of 1.16.0 serves the three shared files, under their names from 1.16.0, and the two design-system stylesheets, with a hash of each in versions.json and integrity.json",
+    cut.code === 0 && JSON.stringify(readdirSync(folder).sort()) === JSON.stringify(["design-system-units.css", "design-system.css", ...Object.keys(NEW)].sort())
+      && JSON.stringify(Object.keys(listed)) === JSON.stringify(["docs-language.css", "docs-page.js", "docs-index.js", "design-system-units.css", "design-system.css"])
+      && listed["design-system-units.css"] === sha(".sds-unit .a{color:red}\n") && pinned["design-system.css"] === sha384Of(Buffer.from(".a{color:red}\n")), cut.out);
   const before = cutVersions(styles);
   const early = sds("cut", "1.15.1", "--root", market);
-  ok("[MKT.SCRIPTS.628] a version before 1.16.0 still serves the three files alone", early.code === 0 && Object.keys(cutVersions(styles)["1.15.1"]).length === 3 && !existsSync(join(market, "public", "assets", "docs", "1.15.1", "ds-unit.css")) && Object.keys(before).length === 1, early.out);
+  ok("[MKT.SCRIPTS.628] a version before 1.16.0 still serves the three files alone, under the names it was cut with", early.code === 0 && Object.keys(cutVersions(styles)["1.15.1"]).join() === "sds-docs.css,sds-docs.js,sds-index.js" && Object.keys(cutVersions(styles)["1.15.1"]).length === 3 && !existsSync(join(market, "public", "assets", "docs", "1.15.1", "design-system-units.css")) && Object.keys(before).length === 1, early.out);
+  // THE NAMES MOVE WITH THE VERSION: a page of 1.15.1 links `sds-docs.css`, and moved to 1.16.0 it links `docs-language.css` with that file's hash.
+  const hashes = integrityTable(styles);
+  const oldTag = `<link rel="stylesheet" href="${STYLES_ADDRESS}1.15.1/sds-docs.css" integrity="${hashes["1.15.1"]["sds-docs.css"]}" crossorigin="anonymous">\n`
+    + `<script src="${STYLES_ADDRESS}1.15.1/sds-docs.js"></script>\n<script src="${STYLES_ADDRESS}1.15.1/sds-index.js"></script>\n`;
+  const renameSite = join(SCRATCH, "rename-site");
+  const oldPage = put(join(renameSite, "old.html"), `<title>o</title>\n${oldTag}<p>body</p>\n`);
+  const forward = sds("repoint", "1.16.0", renameSite, "--root", market);
+  const wanted = `<title>o</title>\n<link rel="stylesheet" href="${STYLES_ADDRESS}1.16.0/docs-language.css" integrity="${hashes["1.16.0"]["docs-language.css"]}" crossorigin="anonymous">\n`
+    + `<script src="${STYLES_ADDRESS}1.16.0/docs-page.js"></script>\n<script src="${STYLES_ADDRESS}1.16.0/docs-index.js"></script>\n<p>body</p>\n`;
+  ok("[MKT.SCRIPTS.628] `docs styles repoint` to 1.16.0 gives a page the new names of the shared files, and the hash of the new file", forward.code === 0 && readFileSync(oldPage, "utf8") === wanted, readFileSync(oldPage, "utf8"));
+  const back = sds("repoint", "1.15.1", renameSite, "--root", market);
+  ok("[MKT.SCRIPTS.628] and back to 1.15.1 it gets the old names again", back.code === 0 && readFileSync(oldPage, "utf8") === `<title>o</title>\n${oldTag}<p>body</p>\n`, readFileSync(oldPage, "utf8"));
+
+  // THE OLD NAME OF THE COMMAND STAYS FOR ONE RELEASE: it says the new name, then does what the new one does.
+  const run = spawnSync(process.execPath, [TOOL, "docs", "sds", "check", "1.16.0", renameSite, "--root", market], { encoding: "utf8", env: ENV, cwd: SCRATCH });
+  const aliased = { code: run.status, out: run.stdout, err: run.stderr };
+  ok("[MKT.SCRIPTS.628] `docs sds` prints the new name and runs the same action", aliased.code === 0 && aliased.err.includes("`docs sds check` is now `docs styles check`") && aliased.out.includes("1 page would move to 1.16.0"), `${aliased.out}${aliased.err}`);
+  const helped = execFileSync(process.execPath, [TOOL, "help"], { encoding: "utf8", env: ENV, stdio: "pipe", cwd: SCRATCH });
+  ok("[MKT.SCRIPTS.628] help lists `docs styles` and leaves the alias out", helped.includes("docs styles cut") && !helped.includes("docs sds cut"));
 }
 
-console.log("=== docs sds cut --ds — the design system's tokens are copied from a pinned version, then built");
+console.log("=== docs styles cut --ds — the design system's tokens are copied from a pinned version, then built");
 {
   const SERVED_OF = (folder) => join(folder, "public", "assets", "docs");
   const git = (cwd, ...args) => execFileSync("git", ["-c", "user.email=t@t", "-c", "user.name=t", "-c", "commit.gpgsign=false", ...args], { cwd, encoding: "utf8", stdio: "pipe" });
@@ -464,17 +485,17 @@ console.log("=== docs sds cut --ds — the design system's tokens are copied fro
   for (const [name, body] of Object.entries(BUILT)) put(join(styles, name), body);
   put(join(styles, "versions.json"), "{}\n");
   put(join(market, "public", ".keep"), "");
-  put(join(market, "scripts", "build-styles.mjs"), "import { writeFileSync, readFileSync } from 'node:fs';\nimport { join, dirname } from 'node:path';\nimport { fileURLToPath } from 'node:url';\nconst s = join(dirname(fileURLToPath(import.meta.url)), '..', 'packages', 'plugin-spn-devex', 'src', 'styles');\nwriteFileSync(join(s, 'sds-docs.css'), readFileSync(join(s, 'ds-tokens.css'), 'utf8'));\n");
+  put(join(market, "scripts", "build-styles.mjs"), "import { writeFileSync, readFileSync } from 'node:fs';\nimport { join, dirname } from 'node:path';\nimport { fileURLToPath } from 'node:url';\nconst s = join(dirname(fileURLToPath(import.meta.url)), '..', 'packages', 'plugin-spn-devex', 'src', 'styles');\nwriteFileSync(join(s, 'sds-docs.css'), readFileSync(join(s, 'design-system-tokens.css'), 'utf8'));\n");
 
   const pinned = sds("cut", "1.3.0", "--root", market, "--ds", support, "--ds-version", "v1.0.0");
-  const tokens = existsSync(join(styles, "ds-tokens.css")) ? readFileSync(join(styles, "ds-tokens.css"), "utf8") : "";
+  const tokens = existsSync(join(styles, "design-system-tokens.css")) ? readFileSync(join(styles, "design-system-tokens.css"), "utf8") : "";
   ok("[MKT.SCRIPTS.590] a cut with --ds copies the tokens of the version --ds-version names, from its commit and not from the working file",
     pinned.code === 0 && tokens.endsWith(":root{--surface:#fff}\n") && tokens.includes("support-web-ds-ts v1.0.0"), `${pinned.out} ${tokens}`);
   ok("[MKT.SCRIPTS.590] a cut with --ds builds the stylesheet after the tokens are copied, and serves that build in the version's folder",
     readFileSync(join(SERVED_OF(market), "1.3.0", "sds-docs.css"), "utf8") === tokens, pinned.out);
   const newest = sds("cut", "1.3.1", "--root", market, "--ds", support);
   ok("[MKT.SCRIPTS.590] a cut with --ds and no --ds-version pins the newest released version of the design system",
-    newest.code === 0 && readFileSync(join(styles, "ds-tokens.css"), "utf8").endsWith(":root{--surface:#eee}\n"), newest.out);
+    newest.code === 0 && readFileSync(join(styles, "design-system-tokens.css"), "utf8").endsWith(":root{--surface:#eee}\n"), newest.out);
   const unknown = sds("cut", "1.3.2", "--root", market, "--ds", support, "--ds-version", "v9.9.9");
   ok("[MKT.SCRIPTS.590] a design-system version that was never released is refused by name, and cuts nothing",
     unknown.code === 1 && unknown.out.includes("version `v9.9.9` of the design system holds no") && !existsSync(join(SERVED_OF(market), "1.3.2")), unknown.out);

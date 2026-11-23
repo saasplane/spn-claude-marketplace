@@ -12,22 +12,30 @@ import { dirname, join } from "node:path";
 
 /** The address every version's folder sits under. A version's files are at `<address><version>/`. */
 export const STYLES_ADDRESS = "https://saasplane.github.io/spn-claude-marketplace/assets/docs/";
-/** The stylesheet every page links. */
-export const STYLESHEET = "sds-docs.css";
-/** The script every page loads. */
-export const PAGE_SCRIPT = "sds-docs.js";
-/** The script the index of artifacts loads. */
-export const INDEX_SCRIPT = "sds-index.js";
-/** The files one version serves, in the order `versions.json` lists them. */
+/** The first version whose served files carry the names below. Versions before it keep the names they were cut with, which never change. */
+export const NEW_NAMES_FROM = "1.16.0";
+/** The stylesheet every page links, from `NEW_NAMES_FROM`. */
+export const STYLESHEET = "docs-language.css";
+/** The script every page loads, from `NEW_NAMES_FROM`. */
+export const PAGE_SCRIPT = "docs-page.js";
+/** The script the index of artifacts loads, from `NEW_NAMES_FROM`. */
+export const INDEX_SCRIPT = "docs-index.js";
+/** The files one version serves, in the order `versions.json` lists them, from `NEW_NAMES_FROM`. */
 export const SERVED_FILES: readonly string[] = Object.freeze([STYLESHEET, PAGE_SCRIPT, INDEX_SCRIPT]);
 /** The scoped design-system stylesheet a page with an inline unit links, beside the shared stylesheet. Served from 1.16.0. */
-export const UNIT_STYLESHEET = "ds-unit.css";
+export const UNIT_STYLESHEET = "design-system-units.css";
 /** The design system's whole stylesheet, unscoped, for a page of its own that holds the system's markup. Served from 1.16.0. */
 export const DESIGN_SYSTEM_STYLESHEET = "design-system.css";
 /** The first version that serves the two design-system stylesheets beside the three shared files. */
 export const UNIT_FILES_FROM = "1.16.0";
 /** The two design-system stylesheets a version from `UNIT_FILES_FROM` serves, after the three shared files. */
 export const UNIT_FILES: readonly string[] = Object.freeze([UNIT_STYLESHEET, DESIGN_SYSTEM_STYLESHEET]);
+/** The names versions before `NEW_NAMES_FROM` were cut with, each beside the name that replaced it. They are published and never change. */
+export const OLD_NAMES: Readonly<Record<string, string>> = Object.freeze({
+  [STYLESHEET]: "sds-docs.css", [PAGE_SCRIPT]: "sds-docs.js", [INDEX_SCRIPT]: "sds-index.js", [UNIT_STYLESHEET]: "ds-unit.css",
+});
+/** Every name a served file has had, as one list: for a pattern that finds a page's link to a served file of any version. */
+export const ANY_SERVED_NAMES: readonly string[] = Object.freeze([...SERVED_FILES, ...UNIT_FILES, ...Object.values(OLD_NAMES)]);
 /** What the file name of a page's bundled copy ends in. A bundled copy is not a page of the tree. */
 export const BUNDLED_SUFFIX = ".bundled.html";
 /** The table of each cut version's integrity hash of each file it serves, beside `versions.json`. */
@@ -36,13 +44,13 @@ export const INTEGRITY_FILE = "integrity.json";
 export const PREFIX = "sds-";
 
 /** The link of a page to the shared stylesheet: everything of its `href` before the file's name. */
-const STYLESHEET_LINK = /<link\b[^>]*\bhref="([^"]*)sds-docs\.css"[^>]*>/i;
+const STYLESHEET_LINK = /<link\b[^>]*\bhref="([^"]*)(?:docs-language|sds-docs)\.css"[^>]*>/i;
 /** A version as the last folder of an address: `…/1.0.0/`. */
 const VERSION_FOLDER = /(?:^|\/)(\d+\.\d+\.\d+)\/$/;
 
 /** What a page's link to the shared stylesheet says: the folder it loads from, and the version in it. */
 export type SharedStyles = {
-  /** Everything of the `href` before `sds-docs.css`: an address, or a relative path to a folder. */
+  /** Everything of the `href` before the stylesheet's name: an address, or a relative path to a folder. */
   folder: string;
   /** The version the folder names, or null where the folder names none. */
   version: string | null;
@@ -57,6 +65,23 @@ export function sharedStyles(html: string): SharedStyles | null {
   return { folder, version: VERSION_FOLDER.exec(folder)?.[1] ?? null, served: folder.startsWith(STYLES_ADDRESS) };
 }
 
+/** Whether a version is `later` than or equal to another: three numbers each. */
+const atLeast = (version: string, later: string): boolean => {
+  const a = version.split(".").map(Number), b = later.split(".").map(Number);
+  return (a[0] - b[0] || a[1] - b[1] || a[2] - b[2]) >= 0;
+};
+
+/** A served file as one version names it: a name of `SERVED_FILES` or `UNIT_FILES`, in the old name where the version predates `NEW_NAMES_FROM`. */
+export function nameIn(version: string, name: string): string {
+  return atLeast(version, NEW_NAMES_FROM) ? name : OLD_NAMES[name] ?? name;
+}
+
+/** The pattern text, for a regular expression, that matches a served file's name in any version: the new name or the one it replaced. */
+export function anyNameOf(name: string): string {
+  const escape = (text: string): string => text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return OLD_NAMES[name] ? `(?:${escape(name)}|${escape(OLD_NAMES[name])})` : escape(name);
+}
+
 /** Whether a page links the shared stylesheet. A page that does not holds its own copy of the styles. */
 export function linksSharedStyles(html: string): boolean {
   return sharedStyles(html) !== null;
@@ -65,7 +90,7 @@ export function linksSharedStyles(html: string): boolean {
 /** What a command says about a page that links no shared stylesheet, so every command says it in one way. */
 export const OWN_COPY = "this page links no shared stylesheet: it holds its own copy of the styles, and the " +
   "class names that copy used. Produce it again with `docs page write`, or copy it from its template, so it links " +
-  "`sds-docs.css` (05-artifacts.md, One stylesheet, served in versions)";
+  "`docs-language.css` (05-artifacts.md, One stylesheet, served in versions)";
 
 /** One file's integrity hash as a browser reads it: `sha384-` and the base64 of the SHA-384 of its bytes. */
 export function sha384Of(bytes: Uint8Array): string {
@@ -80,9 +105,11 @@ export function sha384Of(bytes: Uint8Array): string {
  */
 export function linesFor(version: string, script: string = PAGE_SCRIPT, integrity?: Record<string, string>): { stylesheet: string; script: string } {
   const pinned = (file: string): string => (integrity?.[file] ? ` integrity="${integrity[file]}" crossorigin="anonymous"` : "");
+  // THE NAMES ARE THE VERSION'S: a version before `NEW_NAMES_FROM` serves the old ones, so the line names the file as that version holds it.
+  const sheet = nameIn(version, STYLESHEET), loaded = nameIn(version, script);
   return {
-    stylesheet: `<link rel="stylesheet" href="${STYLES_ADDRESS}${version}/${STYLESHEET}"${pinned(STYLESHEET)}>`,
-    script: `<script src="${STYLES_ADDRESS}${version}/${script}"${pinned(script)}></script>`,
+    stylesheet: `<link rel="stylesheet" href="${STYLES_ADDRESS}${version}/${sheet}"${pinned(sheet)}>`,
+    script: `<script src="${STYLES_ADDRESS}${version}/${loaded}"${pinned(loaded)}></script>`,
   };
 }
 
@@ -128,12 +155,10 @@ export function integrityFor(styles: string, version: string, files: readonly st
   return entry;
 }
 
-/** The files one version serves: the three shared files, and from `UNIT_FILES_FROM` the two design-system stylesheets. */
+/** The files one version serves, under the names it was cut with: three shared files, and from `UNIT_FILES_FROM` the two design-system stylesheets. */
 export function servedFilesOf(version: string): readonly string[] {
-  const parts = (v: string): number[] => v.split(".").map(Number);
-  const a = parts(version), b = parts(UNIT_FILES_FROM);
-  const from = a[0] - b[0] || a[1] - b[1] || a[2] - b[2];
-  return from >= 0 ? [...SERVED_FILES, ...UNIT_FILES] : SERVED_FILES;
+  const shared = SERVED_FILES.map((name) => nameIn(version, name));
+  return atLeast(version, UNIT_FILES_FROM) ? [...shared, ...UNIT_FILES.map((name) => nameIn(version, name))] : shared;
 }
 
 /** The newest version that was cut, by its three numbers, or null where none was. */

@@ -19,7 +19,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "The figures — what sits inside a block, and the closed set of them",
-      "seen": "3608634f"
+      "seen": "519469fc"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
@@ -297,7 +297,7 @@ The web's way.
 ```
 ````
 
-**A window-sized unit is drawn in a frame of its own.** A tree whose first unit is `DSLayout`, or that holds more than one section, is set in an `iframe` of 640px height and full width, one for light and one for dark, and needs no `ds-unit.css`; a small unit stands inline. A `"frame": true` or `"frame": false` beside `caption` forces either, and `"app": "<code>"` names the app row it is drawn under. The writer takes `app`, `frame` and `caption` out of the tree before it renders. A page of several units is written as `{ "caption": …, "sections": [ { "unit": …, "props": … }, … ] }`.
+**A window-sized unit is drawn in a frame of its own.** A tree whose first unit is `DSLayout`, or that holds more than one section, is set in an `iframe` of 640px height and full width, one for light and one for dark, and needs no `design-system-units.css`; a small unit stands inline. A `"frame": true` or `"frame": false` beside `caption` forces either, and `"app": "<code>"` names the app row it is drawn under. The writer takes `app`, `frame` and `caption` out of the tree before it renders. A page of several units is written as `{ "caption": …, "sections": [ { "unit": …, "props": … }, … ] }`.
 
 ## Which figure, for what you need to show
 
@@ -321,7 +321,7 @@ The web's way.
 | actors answering each other | `sequence` |
 | things related by verbs | `map` |
 | one-to-many links | `entities` |
-| states a thing moves between | `flowchart`, a box for each state and each link named for its event (`state` is not a `dg` kind yet) |
+| states a thing moves between | `flowchart`, a box for each state and each link named for its event (there is no `state` kind: a lifecycle is a `flowchart`) |
 | layers inside a boundary | `system` |
 | a choice with branches | `flowchart` |
 

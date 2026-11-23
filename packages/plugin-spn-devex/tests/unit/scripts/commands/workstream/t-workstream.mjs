@@ -469,8 +469,8 @@ console.log("\n=== arc edit — an arc opens whole: its data, its preview, its W
     && opened.out.includes("  approach.html · Plan       row N002 written and stamped, its preview linked\n"), opened.out);
   ok("the data holds the goal, PROPOSED, and the fixed preview", json(join(arcOf("N002"), "state.json")).goal === goal && json(join(arcOf("N002"), "state.json")).status === "PROPOSED");
   const preview = readFileSync(noteOf("N002"), "utf8");
-  ok("the preview is the template with its masthead filled: title, back link, title, arc, badge",
-    preview.includes("<title>N002 Evidence export</title>") && preview.includes('href="../../approach.html#N002-what">&larr; 031 Probe</a>')
+  ok("the preview is the template with its masthead filled: title, the eyebrow's breadcrumb, title, arc, badge",
+    preview.includes("<title>N002 Evidence export</title>") && preview.includes('&middot; <a href="../../approach.html#N002-what">031 Probe</a> &middot; N002 Evidence export</span>') && !preview.includes("sds-crumb")
       && preview.includes("<h1>N002 Evidence export</h1>") && preview.includes('href="../../approach.html#N002">N002</a>') && preview.includes("sds-status sds-proposed")
       && !preview.includes("{{NNN}}") && !preview.includes("{{nnn}}") && !preview.includes("{{THE PREVIEW NAME}}") && !preview.includes("RESTATES"), preview.slice(0, 1500));
   ok("the subtitle and the description stay slots for the agent", preview.includes("{{SUBTITLE}}") && preview.includes("{{LEAD}}"));

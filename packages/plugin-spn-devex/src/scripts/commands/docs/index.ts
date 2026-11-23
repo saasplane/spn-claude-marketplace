@@ -250,7 +250,7 @@ function indexPage(template: string, tree: Tree, where: { organisation: string; 
   let around = `${shell.slice(0, data.index)}\u0000${shell.slice(data.index + data[0].length)}`;
   around = swap(around, /\{\{WORKSPACE\}\}/, escaped(where.organisation), "slot `{{WORKSPACE}}`");
   around = swap(around, /\{\{REPOSITORY\}\}/, escaped(where.location), "slot `{{REPOSITORY}}`");
-  // THE HEAD CARD names the repository and opens its hub, so the hub is the way back and the side needs no other.
+  // THE HEAD CARD names the repository and opens the index itself, at its first page. The hub is the way back, in the note a page with no script shows.
   around = swap(around, /\{\{UP-HREF\}\}/g, attribute(where.hub), "slot `{{UP-HREF}}`");
   around = swap(around, /\{\{NAME OF THE REPOSITORY\}\}/g, escaped(basename(where.repository)), "slot `{{NAME OF THE REPOSITORY}}`");
   refuseSlots(around, TEMPLATE);

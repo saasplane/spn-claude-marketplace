@@ -2,22 +2,22 @@
 // RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § The blocks · § One stylesheet, served in versions
 // The chapter is the source of truth; a rule change is edited there first, then here.
 //
-// The cut of `ds-unit.css`: the design system's own `style.css`, every rule of it scoped under `.sds-unit`, so a unit's markup
+// The cut of `design-system-units.css`: the design system's own `style.css`, every rule of it scoped under `.sds-unit`, so a unit's markup
 // can stand in a docs page (the UNIT block) and the docs page's own styles are not touched by the design system's.
 //
-//     node scripts/build-unit-styles.mjs                          cut it from the design-system version `ds-tokens.css` was copied from
+//     node scripts/build-unit-styles.mjs                          cut it from the design-system version `design-system-tokens.css` was copied from
 //     node scripts/build-unit-styles.mjs --from <style.css> [--version <v>]   cut it from this file
 //     node scripts/build-unit-styles.mjs --units <snapshot.json>  read the built units from this snapshot (default: the one `spnutils apps surface snapshot support-web-ds-ts` writes)
 //     node scripts/build-unit-styles.mjs --check                  exit 1 where a file in the styles folder is not what a cut writes
 //
 // THREE FILES ARE CUT, and a version from 1.16.0 serves the first two beside the shared stylesheet:
-//   ds-unit.css         the design system's `style.css`, scoped under `.sds-unit`, for a unit drawn inline in a docs page
+//   design-system-units.css         the design system's `style.css`, scoped under `.sds-unit`, for a unit drawn inline in a docs page
 //   design-system.css   the same `style.css`, whole and unscoped, for a page of its own that holds the design system's markup
-//   ds-units.json       the units the design system builds, `{ designSystem, readFrom, units: [...] }`, which the page writer reads to
+//   design-system-units.json       the units the design system builds, `{ designSystem, readFrom, units: [...] }`, which the page writer reads to
 //                       tell a skeleton of a built unit from one that is planned. It is read from the surface snapshot of
 //                       `support-web-ds-ts`; where none is on the machine the list is not rewritten and says so.
 //
-// WHERE THE SOURCE IS READ. `ds-tokens.css` says in its first line which version of `support-web-ds-ts` it was copied from.
+// WHERE THE SOURCE IS READ. `design-system-tokens.css` says in its first line which version of `support-web-ds-ts` it was copied from.
 // That version's published package holds `styles/style.css`; the agent's cache of the design system holds one folder per version
 // at `~/.saasplane/cache/design-system/<version>/node_modules/@saasplane/support-web-ds-ts/styles/style.css`.
 //
@@ -122,7 +122,10 @@ export function scopeUnitCss(css, version = "") {
 /** The design system's whole `style.css`, unscoped: the cut's comment first, then the file as it was released. */
 export function wholeCss(css, version = "") {
   const head = `/* The design system's own stylesheet${version ? `, support-web-ds-ts ${version},` : ""} whole and unscoped, written by scripts/build-unit-styles.mjs. Never edited by hand: the cut writes it again. */`;
-  return `${head}\n${css.endsWith("\n") ? css : `${css}\n`}`;
+  // THE FONTS ARE FOUND BESIDE THE FILE, like the scoped one's: a surface page loads this file from the folder of its version, which holds `fonts/`, so
+  // `url(../assets/fonts/<folder>/<file>)` becomes `url(fonts/<file>)`.
+  const whole = fontUrls(css);
+  return `${head}\n${whole.endsWith("\n") ? whole : `${whole}\n`}`;
 }
 
 /** The names of the units a surface snapshot of the design system holds, in its order; null where the snapshot holds none. */
@@ -131,18 +134,34 @@ export function unitsOf(snapshot) {
   return units.length ? units : null;
 }
 
+/**
+ * Names the design system exports that are no unit: a host, a context, a manager. The rest of its exports under `ui/` whose name starts
+ * with `DS` are the units it builds (its components, widgets, containers, layouts and the app's own).
+ */
+export const NOT_UNITS = new Set(["DSServerHost", "DSOverlayContainer", "DSOverlayContext", "DSReadyAttribute", "DSSurfaceContext", "DSElementObserveManager"]);
+
+/** The units a published package's `index.d.ts` exports, in its order; null where the file is not there or holds none. */
+export function unitsFromIndex(text) {
+  const names = [];
+  for (const [, path] of text.matchAll(/from '\.\/ui\/([^']+)'/g)) {
+    const name = path.split("/").at(-1);
+    if (/^DS[A-Z]/.test(name) && !NOT_UNITS.has(name) && !names.includes(name)) names.push(name);
+  }
+  return names.length ? names : null;
+}
+
 // ---------------------------------------------------------------------------- the command
 
 const ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
 const STYLES = join(ROOT, "packages", "plugin-spn-devex", "src", "styles");
-const TARGET = join(STYLES, "ds-unit.css");
+const TARGET = join(STYLES, "design-system-units.css");
 const WHOLE = join(STYLES, "design-system.css");
-const UNITS = join(STYLES, "ds-units.json");
+const UNITS = join(STYLES, "design-system-units.json");
 const SNAPSHOT = join(homedir(), ".saasplane", "state", "surface", "compare", "support-web-ds-ts", "snapshot.json");
 
-/** The version `ds-tokens.css` was copied from, or null. */
+/** The version `design-system-tokens.css` was copied from, or null. */
 export function pinnedVersion(styles = STYLES) {
-  const file = join(styles, "ds-tokens.css");
+  const file = join(styles, "design-system-tokens.css");
   return existsSync(file) ? /support-web-ds-ts v?(\d+\.\d+\.\d+)/.exec(readFileSync(file, "utf8").split("\n")[0])?.[1] ?? null : null;
 }
 
@@ -151,7 +170,7 @@ function main(argv) {
   const version = at("--version") ?? pinnedVersion();
   let source = at("--from");
   if (source === null) {
-    if (!version) { console.error("ds-tokens.css names no design-system version in its first line. Name a file with `--from <style.css>`."); return 2; }
+    if (!version) { console.error("design-system-tokens.css names no design-system version in its first line. Name a file with `--from <style.css>`."); return 2; }
     source = join(homedir(), ".saasplane", "cache", "design-system", version, "node_modules", "@saasplane", "support-web-ds-ts", "styles", "style.css");
   }
   if (!existsSync(source)) { console.error(`\`${source}\` is not there. Sign in to the registry and run the render once so the design system ${version ?? ""} is cached, or name a file with \`--from <style.css>\`.`); return 2; }
@@ -159,10 +178,14 @@ function main(argv) {
   const tag = version ? `v${version}` : "";
   const cut = scopeUnitCss(css, tag);
   const whole = wholeCss(css, tag);
-  // The built units: from the snapshot, kept as it was where the machine holds none.
+  // The built units: from the published package the stylesheet was cut from (its `index.d.ts`, so a list and its stylesheet are one release);
+  // else from the snapshot, kept as it was where the machine holds none.
   const snapshotFile = at("--units") ?? SNAPSHOT;
   let units = null;
-  if (existsSync(snapshotFile)) {
+  const indexFile = version ? join(homedir(), ".saasplane", "cache", "design-system", version, "node_modules", "@saasplane", "support-web-ds-ts", "index.d.ts") : "";
+  const exported = at("--units") === null && indexFile && existsSync(indexFile) ? unitsFromIndex(readFileSync(indexFile, "utf8")) : null;
+  if (exported) units = `${JSON.stringify({ designSystem: version, readFrom: version, units: exported }, null, 2)}\n`;
+  else if (existsSync(snapshotFile)) {
     try {
       const snapshot = JSON.parse(readFileSync(snapshotFile, "utf8"));
       const names = unitsOf(snapshot);
@@ -172,7 +195,7 @@ function main(argv) {
   if (argv.includes("--check")) {
     const same = (file, text) => existsSync(file) && readFileSync(file, "utf8") === text;
     const behind = [[TARGET, cut], [WHOLE, whole], ...(units ? [[UNITS, units]] : [])].filter(([file, text]) => !same(file, text)).map(([file]) => file.slice(STYLES.length + 1));
-    console.log(behind.length ? `${behind.join(", ")} behind the source: run \`node scripts/build-unit-styles.mjs\`` : "ds-unit.css and design-system.css are current: a fresh cut writes the same bytes");
+    console.log(behind.length ? `${behind.join(", ")} behind the source: run \`node scripts/build-unit-styles.mjs\`` : "design-system-units.css and design-system.css are current: a fresh cut writes the same bytes");
     return behind.length ? 1 : 0;
   }
   writeFileSync(TARGET, cut, "utf8");

@@ -1,4 +1,4 @@
-/* The design system's own variables, copied whole by `spn-devex docs sds cut` from support-web-ds-ts v11.15.0. Never edited by hand: cut copies them again. */
+/* The design system's own variables, copied whole by `spn-devex docs styles cut` from support-web-ds-ts v11.21.0. Never edited by hand: cut copies them again. */
 /* =========================================================================
    DESIGN TOKENS  —  see docs/04-capabilities/05-web/support-web-ds-ts/03-design-system.md
    Tier 0 seed (only per-theme knob) · Tier 1 ramps · Tier 2 roles
@@ -11,7 +11,7 @@
   --seed-primary: #084a75;
   /* The temperature of the greys (IDSTheme.app.neutralTemperature): an OKLCH hue and the chroma of the darkest greys.
        NEUTRAL, the default, is no chroma: every grey has no colour. */
-  --neutral-hue: 0;
+  --neutral-hue: none;
   --neutral-chroma: 0;
 
   /* ---------------------------------------------------------------------
@@ -1038,6 +1038,66 @@
   --surface-translucent-fill: 82%;
   --surface-blur: 12px;
 }
+
+/* Tones and glass: grounds an app gives a block by a class of its own, through the paint tokens above
+   (`--surface-fill`, `--surface-blur`, `--surface-translucent-fill`), never a colour of its own making. A tone has
+   three strengths: the pastel (a card's or a panel's ground), `-quiet` (a band with presence) and `-deep` (an
+   inverse band, white words on it). Glass is a frosted fill over a picture or a toned band: its tint, its bright edge,
+   a sheen from the top and the blur behind it. Each design language names the tones and the glass its site uses. */
+:root,
+[data-mode='light'] {
+  --tone-sage: #e6f2ee;
+  --tone-sage-quiet: #bae2d5;
+  --tone-sage-deep: #175345;
+  --tone-peach: #fbefe3;
+  --tone-peach-quiet: #ecd3b9;
+  --tone-peach-deep: #5f401e;
+  --tone-lilac: #efe9f8;
+  --tone-lilac-quiet: #ded1f0;
+  --tone-lilac-deep: #4f3f64;
+  --tone-sky: #e5f1f6;
+  --tone-sky-quiet: #b9dfee;
+  --tone-sky-deep: #164f62;
+  --tone-sand: #f4efe8;
+  --tone-sand-quiet: #e9d4b7;
+  --tone-sand-deep: #5b431b;
+  --glass-tint: color-mix(in oklch, white 55%, transparent);
+  --glass-edge: color-mix(in oklch, white 70%, transparent);
+  --glass-sheen: linear-gradient(180deg, color-mix(in oklch, white 45%, transparent), transparent 40%);
+  --glass-blur: 16px;
+}
+/* In dark a tone is darker than the page, never lighter, as a stronger surface is. */
+[data-mode='dark'] {
+  --tone-sage: #192b25;
+  --tone-sage-quiet: #0c221c;
+  --tone-sage-deep: #011913;
+  --tone-peach: #2f2419;
+  --tone-peach-quiet: #261a0d;
+  --tone-peach-deep: #1e1003;
+  --tone-lilac: #292331;
+  --tone-lilac-quiet: #201928;
+  --tone-lilac-deep: #171020;
+  --tone-sky: #192930;
+  --tone-sky-quiet: #0b2027;
+  --tone-sky-deep: #00171f;
+  --tone-sand: #2d2519;
+  --tone-sand-quiet: #251b0c;
+  --tone-sand-deep: #1d1102;
+  --glass-tint: color-mix(in oklch, white 8%, transparent);
+  --glass-edge: color-mix(in oklch, white 14%, transparent);
+  --glass-sheen: linear-gradient(180deg, color-mix(in oklch, white 10%, transparent), transparent 40%);
+  --glass-blur: 16px;
+}
+/* A person who asks for less transparency sees glass as a solid ground of the page's own, with no blur. */
+@media (prefers-reduced-transparency: reduce) {
+  :root,
+  [data-mode='light'],
+  [data-mode='dark'] {
+    --glass-tint: var(--surface-raised);
+    --glass-sheen: linear-gradient(transparent, transparent);
+    --glass-blur: 0px;
+  }
+}
 [data-mode='dark'] {
   --surface-brand: var(--primary);
   --surface-brand-hover: var(--primary-hover);
@@ -1062,8 +1122,10 @@
   --draw-accent: var(--primary);
   --draw-ground: var(--card);
   --draw-edge: color-mix(in oklch, var(--foreground) 14%, var(--background));
-  --draw-plate: color-mix(in oklch, var(--primary) 4.5%, var(--background));
-  --draw-plate-edge: color-mix(in oklch, var(--primary) 24%, var(--background));
+  /* The accent's mixes into the ground are taken in oklab: a grey written as oklch with hue 0 would turn a mix in oklch
+     through magenta (a Deep ocean plate read mauve on the docs' ground, 041 N012), and oklab mixes no hue. */
+  --draw-plate: color-mix(in oklab, var(--primary) 4.5%, var(--background));
+  --draw-plate-edge: color-mix(in oklab, var(--primary) 24%, var(--background));
   --draw-wire: color-mix(in oklch, var(--foreground) 30%, var(--background));
   --draw-warn: var(--error);
   /* The colour follows the line's style: a dashed line (a reply, an inactive unit, a slot to fill) is muted, a dotted
@@ -1071,12 +1133,12 @@
   --draw-dash-color: var(--draw-muted);
   --draw-dot-color: var(--draw-plate-edge);
   /* A dotted boundary, the edge of a named place that holds parts, is stronger than a guide: the accent at 45 percent. */
-  --draw-dot-strong-color: color-mix(in oklch, var(--primary) 45%, var(--background));
+  --draw-dot-strong-color: color-mix(in oklab, var(--primary) 45%, var(--background));
   --draw-shadow: drop-shadow(0 1px 1px color-mix(in oklch, var(--foreground) 8%, transparent));
 }
 [data-mode='dark'] {
   --draw-accent: var(--primary-fg);
-  --draw-dot-strong-color: color-mix(in oklch, var(--primary-fg) 55%, var(--background));
+  --draw-dot-strong-color: color-mix(in oklab, var(--primary-fg) 55%, var(--background));
   --draw-shadow: none;
 }
 :root {

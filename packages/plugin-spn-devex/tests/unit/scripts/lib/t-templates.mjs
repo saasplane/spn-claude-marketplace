@@ -66,12 +66,12 @@ console.log("\n=== the templates are laid out by where the made file lives, and 
   const sentence = (file) => [...outside(file).matchAll(/\{\{([^{}]*)\}\}/g)].map((m) => m[1]).filter((one) => /[.:;]/.test(one.replace(/&\w+;/g, "")) && one.length > 30);
   ok("[MKT.SCRIPTS.407] outside the example content, no page template holds a placeholder that is an instruction sentence", ownCopy.filter((file) => !/approach|arc-template|report|blocks|index/.test(file)).every((file) => sentence(file).length === 0), ownCopy.map((file) => `${file}: ${sentence(file)[0] ?? ""}`).filter((s) => !s.endsWith(": ")).join(" | "));
   const frame = text(join("docs", "pages", "page-template.html"));
-  ok("[MKT.SCRIPTS.407] the page template is the bare frame: the two shared lines, a breadcrumb, a masthead, sections, no rail, variant `page`",
-    /<div class="sds-page" data-frame="page"><div class="sds-wrap">/.test(frame) && /<p class="sds-crumb"><a href="\{\{UP-HREF\}\}">&larr; \{\{UP\}\}<\/a><\/p>/.test(frame) && !/class="sds-rail"/.test(frame)
+  ok("[MKT.SCRIPTS.407] the page template is the bare frame: the two shared lines, a masthead whose first line is the breadcrumb, sections, no rail, variant `page`",
+    /<div class="sds-page" data-frame="page"><div class="sds-wrap">/.test(frame) && /<span class="sds-line1">\{\{WORKSPACE\}\} &middot; <a href="\{\{UP-HREF\}\}">\{\{REPOSITORY\}\}<\/a> &middot; \{\{NAME\}\}<\/span>/.test(frame) && !/sds-crumb/.test(frame) && !/\{\{UP\}\}/.test(frame) && !/class="sds-rail"/.test(frame)
       && /"variant": "page"/.test(frame) && /<h1>\{\{TITLE\}\}<\/h1>/.test(frame) && /<title>\{\{NAME\}\}<\/title>/.test(frame) && (frame.match(/<section\b/g) ?? []).length >= 2);
   const withRail = ["construct", "overview", "guide", "report"].map((name) => text(join("docs", "pages", `${name}-template.html`)));
-  ok("[MKT.SCRIPTS.407] a template with a rail has its back link as a breadcrumb above the masthead, never in the rail, and its name and its heading are two placeholders",
-    withRail.every((page) => /<p class="sds-crumb">/.test(page) && !/sds-home/.test(page) && /<title>\{\{NAME\}\}<\/title>/.test(page) && /<h1>\{\{TITLE\}\}<\/h1>/.test(page) && /class="sds-rail-title">\{\{NAME\}\}</.test(page)));
+  ok("[MKT.SCRIPTS.407] a template with a rail has its back link as the links of the eyebrow's first line, the breadcrumb, never a line above the masthead and never in the rail, and its name and its heading are two placeholders",
+    withRail.every((page) => /<span class="sds-line1">[^<]*<a href="\{\{(?:HUB|UP)-HREF\}\}">/.test(page) && !/sds-crumb/.test(page) && !/\{\{UP\}\}/.test(page) && !/sds-home/.test(page) && /<title>\{\{NAME\}\}<\/title>/.test(page) && /<h1>\{\{TITLE\}\}<\/h1>/.test(page) && /class="sds-rail-title">\{\{NAME\}\}</.test(page)));
   const surface = text(join("surface", "surface-page-template.html"));
   ok("[MKT.SCRIPTS.407] the surface page template holds a small sample page in its template, two sections each with a note, and the two metas, the app's stylesheet empty",
     /<template id="page">[\s\S]*<\/template>/.test(surface) && (surface.match(/data-note="\d"/g) ?? []).length === 2 && (surface.match(/<section data-slot="section-container"/g) ?? []).length === 2

@@ -93,7 +93,7 @@ const lacks = (s) => (got) => !String(got).includes(s);
     one("[MKT.SCRIPTS.110] a link out of the seat tree is expressed against the page's own folder", page,
         has(`href="../../../../../${SEAT.capabilities}/x.md"`));
     one("[MKT.SCRIPTS.110] the rail's home link is expressed against it too, not shipped as `../README.md`", page,
-        (g) => g.includes(`class="sds-crumb"><a href="../../../../../${SEAT.constructs}/README.md"`));
+        (g) => g.includes(`<a href="../../../../../${SEAT.constructs}/README.md">`) && !g.includes("sds-crumb"));
     one("[MKT.SCRIPTS.110] every relative link of the page names a file that is there",
         [...page.matchAll(/href="(\.[^"#]*)/g)].map((found) => found[1]).filter((href) => absent(ws, join(dirname(pageOf("01-core", "thing")), href))), (g) => g.length === 0);
     // THE AUDIT HAS TO HAVE READ THE PAGES for its silence about them to mean anything, so the case
@@ -104,8 +104,8 @@ const lacks = (s) => (got) => !String(got).includes(s);
     // that links the shared stylesheet sits above the page, and the line that loads the shared
     // script closes it. Both are read from the book's own template, so the version is the book's.
     const bookTemplate = readFileSync(resolve(templates, "docs", "pages", "construct-template.html"), "utf8");
-    const linkLine = bookTemplate.match(/<link\b[^>]*sds-docs\.css"[^>]*>/)[0];
-    const scriptLine = bookTemplate.match(/<script\b[^>]*sds-docs\.js"[^>]*><\/script>/)[0];
+    const linkLine = bookTemplate.match(/<link\b[^>]*docs-language\.css"[^>]*>/)[0];
+    const scriptLine = bookTemplate.match(/<script\b[^>]*docs-page\.js"[^>]*><\/script>/)[0];
     const pagePath = pageOf("01-core", "thing");
     const seatPath = `docs/${SEAT.constructs}/01-core/thing.md`;
     one("a section head carries no number — a heading is a name", page, (g) => !/class="sds-number"/.test(g));
@@ -135,7 +135,7 @@ const lacks = (s) => (got) => !String(got).includes(s);
     writeFileSync(join(more, "docs", "pages", "construct-template.html"), bookTemplate.replace(linkLine, ""));
     const refused = run(ws, ["page", "write", seatPath]);
     one("known-bad: a template with no line that loads the shared stylesheet is refused, and the finding names the file",
-        refused, (g) => g.includes("RULE page") && g.includes("holds no line that loads `sds-docs.css`"));
+        refused, (g) => g.includes("RULE page") && g.includes("holds no line that loads `docs-language.css`"));
     one("and nothing is written: the page on disk is the page it was", readAt(ws, pagePath), page);
     process.env.SPN_TEMPLATES = templates;
     rmSync(more, { recursive: true, force: true });
@@ -267,12 +267,12 @@ console.log("\n=== the rail names the page, and the way back opens the overview 
     page, has('<div class="sds-rail-title">The Thing Itself</div>'));
   one("and never the word it replaced", page, lacks('<div class="sds-rail-title">Outline</div>'));
   one("[MKT.SCRIPTS.110] the way back opens the overview whose own links name the construct, a page and never a markdown file",
-    page, has(`class="sds-crumb"><a href="../b-second-overview.html">&larr; Second Overview`));
+    page, has(`<span class="sds-line1">`) && has(`<a href="../b-second-overview.html">`));
   one("[MKT.SCRIPTS.110] another construct of the domain goes to the overview that names it, not to the first",
-    readAt(ws, pageOf("01-core", "other")), has(`class="sds-crumb"><a href="../a-first-overview.html">&larr; First Overview`));
+    readAt(ws, pageOf("01-core", "other")), has(`<a href="../a-first-overview.html">`));
   one("[MKT.SCRIPTS.110] a construct no overview names goes to the domain's first overview",
-    readAt(ws, pageOf("01-core", "stray")), has(`class="sds-crumb"><a href="../a-first-overview.html"`));
-  one("so the old category label is gone", page, lacks("&larr; the model"));
+    readAt(ws, pageOf("01-core", "stray")), has(`<a href="../a-first-overview.html">`));
+  one("so the old category label is gone", page, lacks("sds-crumb"));
   one("and the audit finds no rail finding on any of the three",
     run(ws, ["audit", "check", POCKET_DOCS, "--finding", "rail"]), (g) => /clean/.test(g));
 }
@@ -294,11 +294,11 @@ console.log("\n=== the rail names the page, and the way back opens the overview 
       '<!-- spn:doc\n{"id":"hub","variant":"overview","title":"The Hub","lenses":["ARCHITECT"],"summary":"s"}\n-->\n<h1>x</h1>\n' });
   run(withHub, ["page", "write", `docs/${SEAT.constructs}/01-core/thing.md`]);
   one("[MKT.SCRIPTS.110] a domain with no overview goes back to the hub page",
-    readAt(withHub, pageOf("01-core", "thing")), has(`class="sds-crumb"><a href="../../concept-overview.html">&larr; The Hub`));
+    readAt(withHub, pageOf("01-core", "thing")), has(`<a href="../../concept-overview.html">`));
   const bare = repo(files);
   run(bare, ["page", "write", `docs/${SEAT.constructs}/01-core/thing.md`]);
   one("with no overview and no hub the constructs face stands, rather than a link to nothing",
-    readAt(bare, pageOf("01-core", "thing")), has("&larr; the model"));
+    readAt(bare, pageOf("01-core", "thing")), has("README.md\">"));
 }
 
 // ---------------------------------------------------------------- the grammar: an action, and the seat files it names
@@ -359,12 +359,12 @@ console.log("\n=== `docs page` needs its action as a word, and both actions need
   one("[MKT.SCRIPTS.130] and after the write a `check` reads the page as current and exits 0",
     [run(ws, ["page", "check", THING]).includes("current"), exitIn(ws, ["page", "check", THING])].join(), "true,0");
 
-  // A PAGE MOVED BY `docs sds repoint` IS STILL WHAT ITS SEAT FILE PRODUCES: the version and its hash are
+  // A PAGE MOVED BY `docs styles repoint` IS STILL WHAT ITS SEAT FILE PRODUCES: the version and its hash are
   // rewritten in both served lines, the way the repoint writes them, and the comparison reads that version.
   {
     const at = join(ws, pageOf("01-core", "thing"));
     const written = readFileSync(at, "utf8");
-    const repointed = written.replace(/(assets\/docs\/)\d+\.\d+\.\d+(\/sds-docs\.(?:css|js)")/g, "$19.9.9$2")
+    const repointed = written.replace(/(assets\/docs\/)\d+\.\d+\.\d+(\/docs-(?:language\.css|page\.js)")/g, "$19.9.9$2")
       .replace(/integrity="[^"]*"/g, 'integrity="sha384-repointed"');
     writeFileSync(at, repointed);
     one("[MKT.SCRIPTS.627] `check` reads a page repointed to another version as current, and exits 0",

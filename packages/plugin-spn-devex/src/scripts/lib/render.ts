@@ -40,7 +40,7 @@ export type UnitRender = (file: string, options?: { app: string; ds?: string }) 
 
 /**
  * The app a `unit` fence is drawn under when the fence names none: `surface`, Surface's own brand-free language (decided by the lead,
- * 2026-11-23). It is drawn with `--ds <version>`, the version `ds-unit.css` was cut from; a fence naming another app sends no `--ds`.
+ * 2026-11-23). It is drawn with `--ds <version>`, the version `design-system-units.css` was cut from; a fence naming another app sends no `--ds`.
  */
 export const DEFAULT_RENDER_APP = "surface";
 
@@ -97,14 +97,14 @@ export function setUnitRender(render: UnitRender = spnutilsRender): void { unitR
 
 /**
  * The version of `@saasplane/support-web-ds-ts` the docs stylesheet's Support release pins: the tag the tokens file in the
- * plugin's styles folder was copied from, which `docs sds cut` writes in its first line. Null where it cannot be read.
+ * plugin's styles folder was copied from, which `docs styles cut` writes in its first line. Null where it cannot be read.
  */
-export function designSystemVersion(styles: string | null = stylesDir(import.meta.dirname), file = "ds-tokens.css"): string | null {
+export function designSystemVersion(styles: string | null = stylesDir(import.meta.dirname), file = "design-system-tokens.css"): string | null {
   if (!styles || !existsSync(join(styles, file))) return null;
   return /support-web-ds-ts v?(\d+\.\d+\.\d+)/.exec(readFileSync(join(styles, file), "utf8").split("\n")[0])?.[1] ?? null;
 }
 
-/** Set by `unitFrame` when a page draws a unit, so the page links `ds-unit.css`; reset for every page. */
+/** Set by `unitFrame` when a page draws a unit, so the page links `design-system-units.css` (`ds-unit.css` in a version before 1.16.0); reset for every page. */
 let unitUsed = false;
 /** The page's link to the shared docs stylesheet, which a framed unit's document takes its `design-system.css` link from; set for every page. */
 let unitStylesheet = "";
@@ -122,7 +122,7 @@ function unitMarkup(page: string): string {
 
 /**
  * A fence tagged `unit`: one tree, a unit with its props. It is wrapped as a render file and drawn by the render, and the
- * unit's own markup stands in the page, once in light and once in dark, side by side (`.sds-unit`, styled by `ds-unit.css`),
+ * unit's own markup stands in the page, once in light and once in dark, side by side (`.sds-unit`, styled by `design-system-units.css`),
  * with the tree below as code. A window-sized unit (the first unit is `DSLayout`, or the tree has more than one section) is drawn in an `iframe`
  * instead, 640px high and full width, whose `srcdoc` is a document built from the render's markup, with `design-system.css` linked at the page's own stylesheet version and `data-mode` set, one for light and one for dark; a top-level
  * `"frame": true|false` forces either. The tree may carry a top-level `"caption"`: it is the figcaption's text, the unit's name stays
@@ -159,8 +159,8 @@ function unitFrame(body: string[], findings: Finding[]): string {
   const framed = forced ?? (name === "DSLayout" || sections.length > 1);
   // The render takes the tree alone, and the app row it is drawn under comes from `--app`. The `surface` app is drawn with the design
   // system version its unit stylesheet was cut from, so a unit's markup and its styles always match.
-  const ds = app === DEFAULT_RENDER_APP ? (designSystemVersion(undefined, "ds-unit.css") ?? designSystemVersion()) : null;
-  if (app === DEFAULT_RENDER_APP && !ds) return stop("a `unit` fence cannot be drawn: the docs stylesheet's design-system version is not read from `ds-unit.css` or `ds-tokens.css` in the plugin's styles folder");
+  const ds = app === DEFAULT_RENDER_APP ? (designSystemVersion(undefined, "design-system-units.css") ?? designSystemVersion()) : null;
+  if (app === DEFAULT_RENDER_APP && !ds) return stop("a `unit` fence cannot be drawn: the docs stylesheet's design-system version is not read from `design-system-units.css` or `design-system-tokens.css` in the plugin's styles folder");
   const file = { treeVersion: 1, sections };
   const folder = mkdtempSync(join(tmpdir(), "spn-unit-"));
   let pages: { LIGHT: string; DARK: string };
@@ -175,8 +175,8 @@ function unitFrame(body: string[], findings: Finding[]): string {
   if (framed) {
     // The frame's document is built here from the render's markup, the way the surface page template builds its own: `design-system.css`
     // is linked at the version of the page's shared stylesheet, and the mode is set on `<html>`. The markup carries no page of its own.
-    const link = /sds-docs\.css/.test(unitStylesheet)
-      ? unitStylesheet.replace(/sds-docs\.css/, "design-system.css").replace(/\s(?:integrity|crossorigin)="[^"]*"/g, "") : "";
+    const link = /(?:docs-language|sds-docs)\.css/.test(unitStylesheet)
+      ? unitStylesheet.replace(/(?:docs-language|sds-docs)\.css/, "design-system.css").replace(/\s(?:integrity|crossorigin)="[^"]*"/g, "") : "";
     const document = (m: "light" | "dark"): string => {
       const markup = unitMarkup(pages[m === "light" ? "LIGHT" : "DARK"]);
       const whole = `<!doctype html><html lang="en" data-mode="${m}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">${link}<style>html,body{margin:0}body{background:var(--surface,var(--background));color:var(--foreground)}</style></head><body><div id="root">${markup}</div></body></html>`;
@@ -195,15 +195,15 @@ function unitFrame(body: string[], findings: Finding[]): string {
 }
 
 /**
- * The units the design system builds, which `scripts/build-unit-styles.mjs` writes beside `ds-unit.css` as `ds-units.json` from the
+ * The units the design system builds, which `scripts/build-unit-styles.mjs` writes beside `design-system-units.css` as `design-system-units.json` from the
  * design system's surface snapshot. Null where the list cannot be read, and then no skeleton is held against it.
  */
 export type BuiltUnits = ReadonlySet<string> | null;
 function readBuiltUnits(): BuiltUnits {
   const styles = stylesDir(import.meta.dirname);
-  if (!styles || !existsSync(join(styles, "ds-units.json"))) return null;
+  if (!styles || !existsSync(join(styles, "design-system-units.json"))) return null;
   try {
-    const list = JSON.parse(readFileSync(join(styles, "ds-units.json"), "utf8"))?.units;
+    const list = JSON.parse(readFileSync(join(styles, "design-system-units.json"), "utf8"))?.units;
     return Array.isArray(list) ? new Set(list.filter((name: unknown): name is string => typeof name === "string")) : null;
   } catch { return null; }
 }
@@ -870,6 +870,8 @@ export function renderPage(opts: {
    * face stands, which is what every produced page carried before.
    */
   home?: { href: string; label: string };
+  /** The address of the hub, which the eyebrow's first level (the organization) links. Omitted where the repository has no hub. */
+  hub?: string | null;
   /** The folder holding `docs/`: where a folded fence with no body reads its `file=` path from (`docsRoot(seat)`). */
   root?: string | null;
 }): { html: string; findings: Finding[] } {
@@ -950,10 +952,14 @@ function renderPageBody(opts: Parameters<typeof renderPage>[0]): { html: string;
   const name = typeof block.name === "string" && block.name.trim() ? block.name.trim() : String(block.title ?? "");
   if (typeof block.name === "string" && nameWords(block.name) > 3)
     findings.push({ message: `\`name\` is ${nameWords(block.name)} words, and a short name is at most three (RULE.DEVEX.WORKSPACE.517): ${block.name.trim()}`, stops: true });
+  // THE EYEBROW'S FIRST LINE IS THE BREADCRUMB: the organization links the hub, the location links the page above (the overview, or
+  // the constructs seat's own face where there is none), and the page's own name is plain.
+  const workspaceLevel = opts.hub ? `<a href="${opts.hub}">${opts.workspace}</a>` : opts.workspace;
+  const upHref = opts.home ? opts.home.href : rewriteHref("../README.md");
   const masthead =
 `<header class="sds-masthead">
   <!-- Rendered from the spn:doc block by \`docs.ts page\`. Never typed: a header that disagreed with its block is what this removes. -->
-  <div class="sds-eyebrow"><span class="sds-line1">${opts.workspace} &nbsp;|&nbsp; ${opts.location} &nbsp;|&nbsp; ${esc(name)}</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">${type}</span><span class="sds-separator">|</span><span class="sds-label">For:</span> <span class="sds-audience">${lensChips}</span>${statusPart}</span></div>
+  <div class="sds-eyebrow"><span class="sds-line1">${workspaceLevel} &middot; <a href="${upHref}">${opts.location}</a> &middot; ${esc(name)}</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">${type}</span><span class="sds-separator">|</span><span class="sds-label">For:</span> <span class="sds-audience">${lensChips}</span>${statusPart}</span></div>
   <h1>${esc(block.title)}</h1>
 ${subtitle}${lead}
 </header>`;
@@ -965,8 +971,8 @@ ${subtitle}${lead}
     `<!-- Produced by \`docs.ts page\` from the seat file. Never edit this page: edit the seat file and produce it again. -->`,
     opts.furniture.stylesheet,
     // A page that draws a unit also links the design system's unit styles, from the folder of the shared stylesheet, after it.
-    ...(unitUsed && /sds-docs\.css/.test(opts.furniture.stylesheet)
-      ? [opts.furniture.stylesheet.replace(/sds-docs\.css/, "ds-unit.css").replace(/\s(?:integrity|crossorigin)="[^"]*"/g, "")] : []),
+    ...(unitUsed && /(?:docs-language|sds-docs)\.css/.test(opts.furniture.stylesheet)
+      ? [opts.furniture.stylesheet.replace(/docs-language\.css/, "design-system-units.css").replace(/sds-docs\.css/, "ds-unit.css").replace(/\s(?:integrity|crossorigin)="[^"]*"/g, "")] : []),
     `<div class="sds-page">`,
     ``,
     `<nav class="sds-rail" id="rail">`,
@@ -977,14 +983,7 @@ ${subtitle}${lead}
     `  <div class="sds-rail-title">${esc(name || "Outline")}</div>`,
     `</nav>`,
     `<div class="sds-wrap">`,
-    // THE WAY BACK NAMES WHERE IT GOES (Q238), and it is the breadcrumb above the masthead, not a link in the rail. Where the caller
-    // resolved the page above this one — a construct's domain overview — that page is named. Where it could not, the constructs
-    // seat's own face stands: the seat file sits one level under it, so `../README.md` is the link an author would write,
-    // re-expressed for the page's folder by the same rewriter the body uses.
-    opts.home
-      ? `<p class="sds-crumb"><a href="${opts.home.href}">&larr; ${esc(opts.home.label)}</a></p>`
-      : `<p class="sds-crumb"><a href="${rewriteHref("../README.md")}">&larr; the model</a></p>`,
-    ``,
+    // THE WAY BACK IS THE EYEBROW'S SECOND LEVEL (Q238): the location links the page above, in the masthead's first line.
     masthead,
     ``,
     sections.join("\n\n"),

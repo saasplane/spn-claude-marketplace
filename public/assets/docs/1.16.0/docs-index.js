@@ -301,7 +301,16 @@
     });
   }
   foldTree(!!(narrow&&narrow.matches));
+  /* THE DEFAULT PAGE is the first row of the tree: the page the index opens when its address holds no hash. The brand at the top of the side
+     is a link to this file with no hash (a real link, so a click, a middle click and "copy link" all give the index as a fresh open
+     does), and it says which page that opens. */
+  function defaultRow(){return rows[0];}
+  var brand=document.querySelector('.sds-rail-brand');
+  if(brand&&rows.length){
+    var openName='Open '+named(defaultRow().entry);
+    brand.setAttribute('aria-label',openName);brand.title=openName;
+  }
   var first=asked();
-  if(rows.length)open((first||rows[0]).entry,true);
+  if(rows.length)open((first||defaultRow()).entry,true);
   window.addEventListener('hashchange',function(){var row=asked();if(row&&(!shown||shown.entry!==row.entry))open(row.entry,false);});
 })();

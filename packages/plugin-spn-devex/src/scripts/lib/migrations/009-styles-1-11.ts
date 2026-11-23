@@ -3,7 +3,7 @@
 // The chapters are the source of truth; a rule change is edited there first, then here, in the same change.
 //
 // Migration 009: the approach page of each open and backlog workstream, and the preview of each of its arcs, move to
-// shared styles 1.11.0, as `docs sds repoint` moves a page, so the eyebrow's Progress and the chip's arrow show. A page
+// shared styles 1.11.0, as `docs styles repoint` moves a page, so the eyebrow's Progress and the chip's arrow show. A page
 // on 1.11.0 or later is left, and `closed/` is never read: a closed workstream stays as it closed.
 
 import { readFileSync, writeFileSync } from "node:fs";
@@ -13,12 +13,14 @@ import { type Migration } from "../migration.ts";
 import { isFile, listdir } from "../payload.ts";
 import { HELD_STATES, NOTES, previewOf, workstreamsOf } from "../workstream.ts";
 import { APPROACH_PAGE, DEVEX_WORKSTREAMS } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
-import { SERVED_FILES, STYLES_ADDRESS, integrityFor, sha384Of, stylesDir } from "../../../../../plugin-support-lib/src/lib/page-styles.ts";
+import { STYLES_ADDRESS, integrityFor, servedFilesOf, sha384Of, stylesDir } from "../../../../../plugin-support-lib/src/lib/page-styles.ts";
 
 /** The version the pages move to. */
 export const TARGET = "1.11.0";
 
 const escaped = (text: string): string => text.replace(/[.*+?^${}()|[\]\\/]/g, "\\$&");
+// THE NAMES ARE THOSE OF THE VERSION IT MOVES TO: 1.11.0 predates the new names, and a page it moves links the old ones.
+const SERVED_FILES = servedFilesOf(TARGET);
 const SERVED_NAMES = SERVED_FILES.map(escaped).join("|");
 /** An element of a page that loads a shared file from the served address, with the version and the file it names. */
 const LOADED_ELEMENT = new RegExp(

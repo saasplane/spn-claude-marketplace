@@ -17,7 +17,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
-      "seen": "240ad401"
+      "seen": "9244cb85"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -61,7 +61,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "seen": "c12def10"
+      "seen": "80bf3af3"
     }
   ]
 }
@@ -1660,14 +1660,14 @@ proposed in chat, the names of your scripts and note files, and full lists of fi
 finding says what was found, and a link to the note serves a reader who wants the evidence. You read
 the arc, so nothing is lost by keeping it there.
 
-**Every page walks up one step, by the breadcrumb above its masthead** (`RULE.DEVEX.WORKSPACE.232` · MUST · check:corpus).
+**Every page walks up one step, by the breadcrumb, which is the masthead's first line** (`RULE.DEVEX.WORKSPACE.232` · MUST · check:corpus).
 A preview goes back to its approach page, at the subsection it serves. An approach page is the top of its
-workstream's chain, so it has no breadcrumb. In its back link and its previous and next doors, a page opens a
+workstream's chain, so its first line holds no link. In its back link and its previous and next doors, a page opens a
 page; a link inside the content, *Where to go next* included, may open a markdown file, a sample or a preview.
 
 **The page links one version of the shared stylesheet and script as its base, and holds no copy of
 them** (`RULE.DEVEX.WORKSPACE.214` · MUST · check:doc-check). An approach page and a preview keep the two lines their template
-has. One links `sds-docs.css` by the version's address, and the other loads `sds-docs.js` from the
+has. One links `docs-language.css` by the version's address, and the other loads `docs-page.js` from the
 same version, and the version's folder carries the Geist and Geist Mono fonts the stylesheet reads, in a `fonts/` folder beside it. A page that holds a copy of its styles keeps the faults of the day it was written, and
 a shared file is fixed once for every page. Use the shared classes first. Where the page has a case
 they do not cover, reach for a utility of the standard set, such as `flex` or `text-faint`. Where no
@@ -1732,7 +1732,7 @@ developer does ask:
 
 - **Publish the bundled copy, never the stored page** (`RULE.DEVEX.WORKSPACE.215` · MUST · check:publish). The
   publishing host does not load the shared stylesheet, so a page that links it arrives with no
-  styling. `docs sds bundle <page>` writes `<page>.bundled.html` beside the page, with the styles of
+  styling. `docs styles bundle <page>` writes `<page>.bundled.html` beside the page, with the styles of
   the page's own version inside it. You publish that copy, and the stored page keeps its two lines.
   Send the bundled copy as well to a reader who has no network.
 
@@ -1802,7 +1802,7 @@ Nothing above is enforced by good intentions. Every transition that can be check
 | a card raised in full once, under **Needs you** at the top of its reply, and named in one line in a reply that ends the work or stops it | `stop.ts`, when a turn ends |
 | an answered card shown on a preview (its `shownIn`) whose arc's notes did not move is named once, as a note and not a refusal, and a proposed arc carries no review point to a later row of itself | `stop.ts`, when a turn ends |
 | a page published without being asked is met by a reminder, never a refusal | `pretooluse.ts`, on a publish |
-| a page that links its stylesheet from outside is refused on a publish, and the refusal names `docs sds bundle` | `pretooluse.ts`, on a publish |
+| a page that links its stylesheet from outside is refused on a publish, and the refusal names `docs styles bundle` | `pretooluse.ts`, on a publish |
 | a reply that passes work on carries a handover block with all nine labels and no `{{…}}` left, once while the step rows have not moved, and names each open card | `stop.ts`, when a turn ends |
 | while a row is in progress, only a finding about the reply sends the agent back, and the rest is found again when it waits | `stop.ts`, when a turn ends |
 | the short rules are in the agent's context from the first turn | `orientation.ts`, at session start |

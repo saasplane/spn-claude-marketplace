@@ -208,7 +208,7 @@ function tileFindings(text: string): Finding[] {
   return out;
 }
 
-/** The shared script's `TREE_LINE` and `isTree` (src/styles/sds-docs.js), copied: a block of lines that opens on a folder and whose every line is a path with a branch and an optional note. */
+/** The shared script's `TREE_LINE` and `isTree` (src/styles/docs-page.js), copied: a block of lines that opens on a folder and whose every line is a path with a branch and an optional note. */
 const TREE_LINE = /^([\s\u2502\u251c\u2514\u252c\u2500|`+\\-]*?)([^\s\u2502\u251c\u2514\u252c\u2500]\S*)(?:(\s{2,})(\S.*))?$/;
 export function isTree(code: string): boolean {
   const lines = code.replace(/\n+$/, "").split("\n");

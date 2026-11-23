@@ -1257,18 +1257,17 @@ export function previewFromTemplate(ws: string, data: Pick<ArcData, "arc" | "sub
   if (start > 0) text = text.slice(start);
   const { number, title } = workstreamName(ws);
   const page = approachOf(ws);
-  const workspace = page ? /<span class="sds-line1">([^<&]*?)\s*(?:&nbsp;\|&nbsp;|&middot;)/.exec(readFileSync(page, "utf8"))?.[1] : undefined;
+  const workspace = page ? /<span class="sds-line1">(?:<a\b[^>]*>)?([^<&]*?)(?:<\/a>)?\s*(?:&nbsp;\|&nbsp;|&middot;)/.exec(readFileSync(page, "utf8"))?.[1] : undefined;
   const json = (value: string): string => JSON.stringify(value).slice(1, -1);
   const arcName = /^N\d+/.test(data.arc) ? `${data.arc} ${data.title}` : data.title;
   text = text.replace(/<!-- spn:doc[\s\S]*?-->/, (block) => block
     .replace("ws-{{NNN}}-{{slug}}-{{preview-slug}}", json(`ws-${basename(ws)}-${data.subject}`))
     .replace("{{NAME}}", json(arcName)));
   // The arc's page names itself with its numbered name, `N018 Docs tooling`, in its tab, its outline, its heading and its eyebrow alike; the
-  // eyebrow chains the workstream's numbered name above it, and the breadcrumb leads back to the approach page.
+  // eyebrow chains the workstream's numbered name above it, and the eyebrow's workstream level links the approach page's What entry.
   const slots: Array<[string, string]> = [
     ["{{NAME}}", escapeHtml(arcName)],
     ["{{WORKSTREAM}}", escapeHtml(title)],
-    ["{{UP}}", escapeHtml(title)],
     ["{{NNN}}", number],
     ["N{{nnn}}", data.arc],
     ["{{arc}}", data.arc],

@@ -80,10 +80,10 @@
     "sds-index.js": "e16346de0438ed082a5d8950cd863aef2342b857864e5df72f4bb44ad29159ce"
   },
   "1.16.0": {
-    "sds-docs.css": "1c9af92ee2b48c9ab82e646a222118962b1b3e6d059b790c46607dfff582ec6d",
-    "sds-docs.js": "064d272c455de3fdb4c365192d856235b0beb4c4ab42c40e94ac8117f1866af1",
-    "sds-index.js": "ff0e8059b32372599711646939f5f116872baa3df517d893563b9afd480275fa",
-    "ds-unit.css": "b4c3be759f7ec9997b35cce22e7d132208dd4bf2f7a5ca84a48f64fd65bd5943",
-    "design-system.css": "beedf9fd9408461060f79b83a34e09dca9b37f638cb0d3764763809cee0b58ac"
+    "docs-language.css": "15ffefd98c3dbada43803d9b62657644dea2cb4df869d8d98c26c7ba2de04a22",
+    "docs-page.js": "5f416cd1f49f401a5ce75859136746ddecde7dd828195a224b4bf8c34192dbd8",
+    "docs-index.js": "92938cdf251971aa3b067e50a28492ea9207e015b248cd0f80336b8473493b27",
+    "design-system-units.css": "8e15d06a7ce7ab1131c17e0f982feb8f2926ed1ded4b6e6d5bb579ba0ff56250",
+    "design-system.css": "1783656b11e093050443b19c1f4d2020aa2e327fcd2f0dc04bfbc2feea067503"
   }
 }

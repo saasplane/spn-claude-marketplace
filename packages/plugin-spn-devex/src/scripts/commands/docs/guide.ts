@@ -417,10 +417,10 @@ function guidePage(template: string, guide: Guide, sections: string[], where: { 
   const to = page.lastIndexOf(closing);
   if (from < 0 || to < from) throw new Refusal("the template has no section, so the page cannot be produced from it");
   let shell = `${page.slice(0, from)}${HELD}${page.slice(to + closing.length)}`;
-  // THE WAY BACK IS THE HUB, one step up the chain, and the template's `the index` is replaced. A
-  // repository with no hub gives the page no way back, because a link must open a page that is there.
-  shell = swap(shell, /[ \t]*<p class="sds-crumb">[\s\S]*?<\/p>\n+/,
-    where.hub ? `<p class="sds-crumb"><a href="${attribute(where.hub.href)}">&larr; ${escaped(where.hub.label)}</a></p>\n\n` : "", "breadcrumb above the masthead");
+  // THE WAY BACK IS THE HUB, one step up the chain, and it is the eyebrow's second level, the location, which links it. A
+  // repository with no hub gives the page no way back, because a link must open a page that is there: the location stays plain.
+  shell = swap(shell, /<a href="\{\{UP-HREF\}\}">(\{\{LOCATION\}\})<\/a>/,
+    where.hub ? `<a href="${attribute(where.hub.href)}">{{LOCATION}}</a>` : "{{LOCATION}}", "the location's link in the eyebrow");
   shell = swap(shell, /\{\{WORKSPACE\}\}/, escaped(where.organisation), "slot `{{WORKSPACE}}`");
   shell = swap(shell, /\{\{LOCATION\}\}/, escaped(where.location), "slot `{{LOCATION}}`");
   // {{NAME}} stands in the outline's title and the eyebrow; {{TITLE}} in the heading alone.

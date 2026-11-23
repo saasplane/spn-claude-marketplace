@@ -68,7 +68,7 @@ import { bookClassFaults, inPluginSource, knownHolders, ownMarketplace, pluginNa
 import { GUIDE_PAGE_SUFFIX, APPROACH_SUFFIX, ARTIFACT, CONSTRUCT_PAGES, CONSTRUCT_PAGE_SUFFIX, HUB, OVERVIEW_PAGE_SUFFIX, PLUGIN_TEMPLATES, POCKET,
          artifactDocsPathOf, decisionsRegister, inArtifacts, workstreamPrefixSource, isApproachPage, isRegister as inRegisters, pagePlaceOf,
          workstreamDirOf, workstreamsDir, isSeatFile, visibilityOf } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
-import { BUNDLED_SUFFIX, OWN_COPY, PAGE_SCRIPT, SERVED_FILES, cutVersions, linksSharedStyles, stylesDir } from "../../../../plugin-support-lib/src/lib/page-styles.ts";
+import { ANY_SERVED_NAMES, BUNDLED_SUFFIX, OWN_COPY, PAGE_SCRIPT, anyNameOf, cutVersions, linksSharedStyles, stylesDir } from "../../../../plugin-support-lib/src/lib/page-styles.ts";
 import { CYCLES_COLUMNS, cyclesOf, headerOf, headerStatusRule, openHeadingFor, openHeadingOf, tableColumns,
          tableDifferences } from "../commands/docs/cycles.ts";
 
@@ -468,7 +468,7 @@ export function openHeadingRule(path: string, text: string): Finding[] {
 }
 
 /** A page's line that loads the shared script, which builds the rail and folds it. */
-const LOADS_PAGE_SCRIPT = new RegExp(`<script\\b[^>]*\\bsrc="[^"]*${PAGE_SCRIPT.replace(".", "\\.")}"`, "i");
+const LOADS_PAGE_SCRIPT = new RegExp(`<script\\b[^>]*\\bsrc="[^"]*${anyNameOf(PAGE_SCRIPT)}"`, "i");
 
 /**
  * The chrome every page with a rail owes its reader. The shared script builds the rail from the headings
@@ -1360,7 +1360,7 @@ const UNCUT = "links a version of the shared styles that nobody cut";
 
 /** A link or a script of a page that loads one of the served files: everything before the file's name. */
 const SERVED_LINK = new RegExp(
-  `\\b(?:href|src)="([^"]*)(?:${SERVED_FILES.map((file) => file.replace(/\./g, "\\.")).join("|")})"`, "gi");
+  `\\b(?:href|src)="([^"]*)(?:${ANY_SERVED_NAMES.map((file) => file.replace(/\./g, "\\.")).join("|")})"`, "gi");
 /** A version as the last folder of an address or a path: `…/1.0.0/`. */
 const VERSION_FOLDER = /(?:^|\/)(\d+\.\d+\.\d+)\/$/;
 
@@ -1384,7 +1384,7 @@ export function uncutVersions(text: string, styles: string | null = ownStylesDir
     .filter((version): version is string => version !== undefined);
   return [...new Set(linked)].filter((version) => !cut.includes(version)).map((version): Finding =>
     ["RULE", `the page ${UNCUT}: \`${version}\`. \`versions.json\` holds ${cut.map((one) => `\`${one}\``).join(" · ")}. ` +
-      `Link a version that exists, or cut this one first with \`spn-devex docs sds cut ${version}\` ` +
+      `Link a version that exists, or cut this one first with \`spn-devex docs styles cut ${version}\` ` +
       "(05-artifacts.md § One stylesheet, served in versions)"]);
 }
 
@@ -1570,7 +1570,7 @@ export function nameRule(text: string): Finding[] {
   if (title && !/\{\{/.test(title) && (counted(title) > NAME_LIMIT || /[.?!:]$/.test(title)))
     out.push([/[.?!:]$/.test(title) ? "RULE" : grade(counted(title)), `the page's name "${title}" is ${counted(title)} words or reads as a sentence — RULE.DEVEX.WORKSPACE.517: a short ` +
       "name is at most three words, a fourth only for one fixed term that breaks if cut, and the `<h1>` carries the promise · name the page in the words it uses for its subject"]);
-  // The rail reads a section's first h2, wherever it sits inside it, and every h3 with an id (sds-docs.js).
+  // The rail reads a section's first h2, wherever it sits inside it, and every h3 with an id (docs-page.js).
   const heads = [...text.matchAll(/<section id="[^"]+"[^>]*>(?:(?!<section\b|<\/section>)[\s\S])*?<h2[^>]*>([\s\S]*?)<\/h2>/g), ...text.matchAll(/<h3 id="[^"]+"[^>]*>([\s\S]*?)<\/h3>/g)]
     .map((found) => shown(found[1])).filter((name) => name && !/\{\{/.test(name));
   const long = heads.filter((name) => counted(name) > NAME_LIMIT);

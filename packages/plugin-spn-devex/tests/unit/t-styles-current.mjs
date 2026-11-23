@@ -11,10 +11,12 @@ const PLUGIN = join(import.meta.dirname, "..", "..");
 const ROOT = join(PLUGIN, "..", "..");
 const STYLES = join(PLUGIN, "src", "styles");
 const SERVED = join(ROOT, "public", "assets", "docs");
-const FILES = ["sds-docs.css", "sds-docs.js", "sds-index.js"];
+const FILES = ["docs-language.css", "docs-page.js", "docs-index.js"];
+// Versions before 1.16.0 keep the names they were cut with, which never change.
+const OLD_FILES = ["sds-docs.css", "sds-docs.js", "sds-index.js"];
 // From 1.16.0 a version also serves the design system's scoped stylesheet and its whole one.
-const UNIT_FILES = ["ds-unit.css", "design-system.css"];
-const filesOf = (version) => { const [major, minor] = version.split(".").map(Number); return major > 1 || minor >= 16 ? [...FILES, ...UNIT_FILES] : FILES; };
+const UNIT_FILES = ["design-system-units.css", "design-system.css"];
+const filesOf = (version) => { const [major, minor] = version.split(".").map(Number); return major > 1 || minor >= 16 ? [...FILES, ...UNIT_FILES] : OLD_FILES; };
 
 let total = 0, failed = 0;
 const ok = (label, condition, detail = "") => {
@@ -32,34 +34,34 @@ try {
 } catch (error) {
   check = { status: error.status ?? 1, output: `${error.stdout ?? ""}${error.stderr ?? ""}` };
 }
-ok("[MKT.SCRIPTS.589] a fresh build of sds-docs.src.css writes the bytes of sds-docs.css", check.status === 0, check.output.trim());
-for (const name of [...FILES, ...UNIT_FILES, "ds-units.json"]) ok(`src/styles/${name} is there`, existsSync(join(STYLES, name)));
+ok("[MKT.SCRIPTS.589] a fresh build of docs-language.src.css writes the bytes of docs-language.css", check.status === 0, check.output.trim());
+for (const name of [...FILES, ...UNIT_FILES, "design-system-units.json"]) ok(`src/styles/${name} is there`, existsSync(join(STYLES, name)));
 {
-  const units = JSON.parse(readFileSync(join(STYLES, "ds-units.json"), "utf8"));
-  ok("ds-units.json names the design-system version of ds-unit.css and lists the units it builds",
-    units.designSystem === /support-web-ds-ts v(\d+\.\d+\.\d+)/.exec(readFileSync(join(STYLES, "ds-unit.css"), "utf8").split("\n")[0])?.[1] && Array.isArray(units.units) && units.units.includes("DSLayout") && units.units.includes("DSFeature"));
+  const units = JSON.parse(readFileSync(join(STYLES, "design-system-units.json"), "utf8"));
+  ok("design-system-units.json names the design-system version of design-system-units.css and lists the units it builds",
+    units.designSystem === /support-web-ds-ts v(\d+\.\d+\.\d+)/.exec(readFileSync(join(STYLES, "design-system-units.css"), "utf8").split("\n")[0])?.[1] && Array.isArray(units.units) && units.units.includes("DSLayout") && units.units.includes("DSFeature"));
   ok("design-system.css is the scoped stylesheet's source whole: every rule of it stands unscoped",
-    !readFileSync(join(STYLES, "design-system.css"), "utf8").includes(".sds-unit") && readFileSync(join(STYLES, "design-system.css"), "utf8").length < readFileSync(join(STYLES, "ds-unit.css"), "utf8").length);
+    !readFileSync(join(STYLES, "design-system.css"), "utf8").includes(".sds-unit") && readFileSync(join(STYLES, "design-system.css"), "utf8").length < readFileSync(join(STYLES, "design-system-units.css"), "utf8").length);
 }
 
 console.log("=== styles on the design system — the docs classes read the product's tokens");
 {
-  const built = readFileSync(join(STYLES, "sds-docs.css"), "utf8");
-  const source = readFileSync(join(STYLES, "sds-docs.src.css"), "utf8");
-  const tokens = readFileSync(join(STYLES, "ds-tokens.css"), "utf8");
+  const built = readFileSync(join(STYLES, "docs-language.css"), "utf8");
+  const source = readFileSync(join(STYLES, "docs-language.src.css"), "utf8");
+  const tokens = readFileSync(join(STYLES, "design-system-tokens.css"), "utf8");
   const variables = (names) => names.every((name) => new RegExp(`^\\s*${name}:`, "m").test(built));
   ok("[RULE.DEVEX.WORKSPACE.524] [MKT.SCRIPTS.588] the stylesheet holds the design system's token names: --surface, --surface-raised, --fg, --fg-quiet, --border, --radius, --font-text, --font-code, --seed-primary",
     variables(["--surface", "--surface-raised", "--fg", "--fg-quiet", "--border", "--radius", "--font-text", "--font-code", "--seed-primary"]));
   ok("[MKT.SCRIPTS.588] the stylesheet derives a palette from --seed-primary, and sets dark with data-mode",
     built.includes("oklch(from var(--seed-primary)") && /\[data-mode=['"]dark['"]\]/.test(built));
-  ok("[MKT.SCRIPTS.588] ds-tokens.css names the design-system version or commit it was copied from, and is imported first by the source",
-    /copied whole by `spn-devex docs sds cut` from support-web-ds-ts (?:v\d+\.\d+\.\d+|[0-9a-f]{7,})/.test(tokens) && /@import "\.\/ds-tokens\.css";/.test(source));
+  ok("[MKT.SCRIPTS.588] design-system-tokens.css names the design-system version or commit it was copied from, and is imported first by the source",
+    /copied whole by `spn-devex docs styles cut` from support-web-ds-ts (?:v\d+\.\d+\.\d+|[0-9a-f]{7,})/.test(tokens) && /@import "\.\/design-system-tokens\.css";/.test(source));
   ok("[MKT.SCRIPTS.588] the docs names read the design system's: --sds-paper is --surface, --sds-ink is --fg, --sds-rule is --border",
     /--sds-paper: var\(--surface\)/.test(built) && /--sds-ink: var\(--fg\)/.test(built) && /--sds-rule: var\(--border\)/.test(built));
   ok("[MKT.SCRIPTS.588] the fonts are declared under the design system's names, DSDefaultText and DSDefaultCode, on the same two Geist files, and SDSText and SDSCode are gone",
     /font-family: DSDefaultText;[^}]*Geist-Variable\.woff2/.test(built) && /font-family: DSDefaultCode;[^}]*GeistMono-Variable\.woff2/.test(built) && !/SDSText|SDSCode/.test(built));
-  ok("[MKT.SCRIPTS.589] the page script sets data-mode where a page names none", /setAttribute\('data-mode'/.test(readFileSync(join(STYLES, "sds-docs.js"), "utf8")));
-  const script = readFileSync(join(STYLES, "sds-docs.js"), "utf8");
+  ok("[MKT.SCRIPTS.589] the page script sets data-mode where a page names none", /setAttribute\('data-mode'/.test(readFileSync(join(STYLES, "docs-page.js"), "utf8")));
+  const script = readFileSync(join(STYLES, "docs-page.js"), "utf8");
   ok("[MKT.SCRIPTS.589] the surface page builds its frame's document from the template named page, with design-system.css and the app's stylesheet linked, and sets the mode on the frame directly",
     /getElementById\('page'\)/.test(script) && /frame\.srcdoc = pageDocument\(\)/.test(script) && /design-system\.css/.test(script) && /surface-app-css/.test(script)
       && /documentElement\.setAttribute\('data-mode', state\.mode\)/.test(script));
@@ -74,7 +76,7 @@ console.log("=== styles on the design system — the docs classes read the produ
   ok("[MKT.SCRIPTS.589] the page grid puts the wrap first and the rail second, on the right, and a page template page has the whole width",
     /\.sds-page > \.sds-wrap\{grid-column:1/.test(source) && /\.sds-page > \.sds-rail\{grid-column:2/.test(source) && /\.sds-page\[data-frame="page"\]\{grid-template-columns:minmax\(0,1fr\)\}/.test(source));
   const token = (name) => new RegExp(`${name}:\\s*([0-9.]+)rem`).exec(source)?.[1];
-  const index = readFileSync(join(STYLES, "sds-index.js"), "utf8");
+  const index = readFileSync(join(STYLES, "docs-index.js"), "utf8");
   ok("[MKT.SCRIPTS.589] the widths of the regions are tokens: the reading width 58rem, the outline 13rem, the tree 13.5rem growing to 22rem, and the two folds 75rem and 88.5rem",
     token("--sds-measure") === "58" && token("--sds-rail-width") === "13" && /--sds-tree-width:clamp\(13\.5rem,calc\(100vw - 77\.5rem\),22rem\)/.test(source) && token("--sds-outline-fold") === "75" && token("--sds-tree-fold") === "88.5");
   ok("[MKT.SCRIPTS.589] the outline folds at the reading width plus the outline, its gap and the gutters, so the content never narrows below the reading width, and the tree folds first, at that and the tree's least width",
@@ -121,6 +123,39 @@ for (const version of Object.keys(versions))
   for (const name of filesOf(version))
     ok(`${version}/${name} holds the sha384 the table records`,
       integrity[version]?.[name] === `sha384-${createHash("sha384").update(readFileSync(join(SERVED, version, name))).digest("base64")}`);
+
+console.log("=== styles fonts — a surface page draws in the design system's own fonts");
+{
+  // design-system.css is loaded from the folder of its version by a surface page, so its @font-face urls must read `fonts/<file>` like the scoped file's, and each file
+  // they name must be in the cut's `fonts/` folder.
+  for (const name of ["design-system.css", "design-system-units.css"]) {
+    const css = readFileSync(join(STYLES, name), "utf8");
+    const urls = [...css.matchAll(/url\(\s*["']?([^)"']*\.woff2)["']?\s*\)/g)].map((match) => match[1]);
+    ok(`${name} names its fonts as fonts/<file>, and never ../assets/fonts`, urls.length > 0 && urls.every((url) => /^fonts\/[^/]+$/.test(url)) && !css.includes("../assets/fonts"), urls.join(" "));
+    const cut = join(SERVED, "1.16.0", "fonts");
+    ok(`every font ${name} names is in the cut's fonts folder`, urls.every((url) => existsSync(join(cut, url.slice("fonts/".length)))), urls.join(" "));
+  }
+}
+
+console.log("=== the design system's version — the cut files, the tokens and the units list are one release");
+{
+  const first = (name) => readFileSync(join(STYLES, name), "utf8").split("\n")[0];
+  const versionOf = (name) => /support-web-ds-ts v(\d+\.\d+\.\d+)/.exec(first(name))?.[1];
+  const units = JSON.parse(readFileSync(join(STYLES, "design-system-units.json"), "utf8"));
+  ok("design-system.css, design-system-units.css, design-system-tokens.css and the units list name one design-system version",
+    new Set([versionOf("design-system.css"), versionOf("design-system-units.css"), versionOf("design-system-tokens.css"), units.designSystem]).size === 1 && Boolean(units.designSystem),
+    [versionOf("design-system.css"), versionOf("design-system-units.css"), versionOf("design-system-tokens.css"), units.designSystem].join(" "));
+}
+
+console.log("=== the index's brand — a link to the index itself, which opens its default page");
+{
+  const index = readFileSync(join(STYLES, "docs-index.js"), "utf8");
+  ok("[MKT.SCRIPTS.589] the index opens its default page, the first row of the tree, from one function, and the brand says which page that is: aria-label `Open <name>`",
+    /function defaultRow\(\)\{return rows\[0\];\}/.test(index) && /open\(\(first\|\|defaultRow\(\)\)\.entry,true\)/.test(index)
+      && /var openName='Open '\+named\(defaultRow\(\)\.entry\);/.test(index) && /brand\.setAttribute\('aria-label',openName\)/.test(index));
+  ok("[MKT.SCRIPTS.589] the brand is a real link to index.html in the index template, so a click, a middle click and copy link give the index with no hash",
+    /<a class="sds-rail-brand" href="index\.html"/.test(readFileSync(join(PLUGIN, "src", "refs", "devex", "workspace", "docs", "templates", "docs", "pages", "index-template.html"), "utf8")));
+}
 
 console.log(failed ? `\n  ${failed} of ${total} FAILED — t-styles-current` : `\n  all ${total} passed — t-styles-current`);
 process.exit(failed ? 1 : 0);

@@ -12,7 +12,7 @@
 // THE BROWSER IS THE ONE THE MACHINE ALREADY HAS, found the way `spn-devex docs look` finds it: the global Playwright (`npm root -g`)
 // and its own chromium. No path into a user's own install is named, and no browser profile is opened.
 import { execFileSync } from "node:child_process";
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { basename, join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { UsageFault, VALUE, readWords } from "../../../../../plugin-support-lib/src/lib/command.ts";
@@ -77,8 +77,34 @@ export function fillTemplate(template: string, markup: string, options: { name: 
   return filled;
 }
 
-/** Where the template is looked for when `--template` names none: the spn-devex plugin's copy beside this plugin in the marketplace. */
-export const TEMPLATE_BESIDE = resolve(import.meta.dirname, "..", "..", "..", "..", "..", "plugin-spn-devex", "src", "refs", "devex", "workspace", "docs", "templates", "surface", "surface-page-template.html");
+/** Where the build puts the surface page template inside the spn-devex plugin: the copy of the book's template, under its refs. */
+export const TEMPLATE_IN_DEVEX = join("refs", "devex", "workspace", "docs", "templates", "surface", "surface-page-template.html");
+
+/** Three numbers as a version, to put the newest first. */
+const versionParts = (name: string): number[] => name.split(".").map((part) => Number(part) || 0);
+
+/**
+ * Where the surface page template is looked for when `--template` names none: the copy the plugins' build writes into the spn-devex plugin,
+ * read through the folder of the plugins beside this one. In the marketplace that is `packages/plugin-spn-devex/src/refs/…` beside this plugin;
+ * installed, it is the newest version of `spn-devex` beside `spn-surface` in the plugins' folder (`…/<marketplace>/spn-devex/<version>/refs/…`).
+ * Null where neither holds it; the caller then refuses by name and says to pass `--template`. `from` is the folder this file runs from.
+ */
+export function templateBeside(from: string = import.meta.dirname): string | null {
+  for (let at = resolve(from), up = 0; up < 6; up++, at = resolve(at, "..")) {
+    const inMarketplace = join(at, "..", "plugin-spn-devex", "src", TEMPLATE_IN_DEVEX);
+    if (existsSync(inMarketplace)) return resolve(inMarketplace);
+    const installed = join(at, "..", "spn-devex");
+    if (existsSync(installed)) {
+      const versions = readdirSync(installed).filter((name) => /^\d+\.\d+\.\d+$/.test(name))
+        .sort((one, two) => { const a = versionParts(two), b = versionParts(one); return a[0] - b[0] || a[1] - b[1] || a[2] - b[2]; });
+      for (const version of versions) {
+        const held = join(installed, version, TEMPLATE_IN_DEVEX);
+        if (existsSync(held)) return resolve(held);
+      }
+    }
+  }
+  return null;
+}
 
 // What runs in the page, as text: this file is checked without a browser's types.
 const HEADINGS = "[...document.querySelectorAll('section h1, section h2, section h3')].map(function(h){var s=h.closest('section');return {title:h.textContent.trim(),section:s?[...document.querySelectorAll('section')].indexOf(s):-1};})";
@@ -106,7 +132,10 @@ export async function run(args: string[]): Promise<number> {
   if (notesFile && !existsSync(resolve(notesFile))) throw new UsageFault(`names \`${notesFile}\`, and nothing is there.`);
   const notes: Note[] = notesFile ? JSON.parse(readFileSync(resolve(notesFile), "utf8")) : [];
 
-  const templateFile = resolve(words.value("template") ?? TEMPLATE_BESIDE);
+  const named = words.value("template");
+  const found = named ? resolve(named) : templateBeside();
+  if (found === null) throw new UsageFault("finds no surface page template beside this plugin: the spn-devex plugin's copy is not installed next to spn-surface. Pass `--template <file>`, the `surface-page-template.html` of the spn-devex plugin's refs.");
+  const templateFile = found;
   if (!existsSync(templateFile)) throw new UsageFault(`names the surface page template \`${templateFile}\`, and nothing is there. Pass \`--template <file>\`, the \`surface-page-template.html\` of the spn-devex plugin's refs.`);
 
   const entry = playwrightPath();

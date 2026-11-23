@@ -26,7 +26,7 @@ import { GUIDE_PAGE_SUFFIX, ARTIFACT_FOLDERS, VISIBILITY, VISIBILITY_OF, visibil
   artifactDocsDir, artifactFolderOf, behaviorsDir, bookTemplatesDir, capabilitiesDir, constructsDir, docsOf, domainDirOf, hubPage, inSeat, inTemplates,
   docsRootOf, isApproachPage, isOverview, isProducedPage, isSeatFile, mirrorPath, pagePlaceOf, producedPageOf, seatOf, slashes, splitAtSeat,
   workstreamDirOf } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
-import { OWN_COPY, PAGE_SCRIPT, SERVED_FILES, STYLESHEET, cutVersions, linksSharedStyles,
+import { ANY_SERVED_NAMES, OWN_COPY, PAGE_SCRIPT, STYLESHEET, anyNameOf, cutVersions, linksSharedStyles,
   stylesDir, BUNDLED_SUFFIX } from "../../../../../plugin-support-lib/src/lib/page-styles.ts";
 import { under } from "../../../../../plugin-support-lib/src/lib/command.ts";
 export type Grade = "RULE" | "SOFT";
@@ -685,12 +685,13 @@ export function checkHeader(file: string, src: string, block: any): Finding[] {
   const shared = !holdsOwnCopy(file, src);
 
   const line1 = h.match(/class="sds-line1"[^>]*>([\s\S]*?)<\/span>/);
-  if (shared && !line1) add("RULE", "no identity line — `{workspace} | {location} | {title}`");
+  if (shared && !line1) add("RULE", "no identity line — `{workspace} · {location} · {title}`");
   else if (shared && line1) {
     // A workstream's own pages, the approach page and an arc's page, chain their levels with ` · ` and end on the page's numbered name:
     // `SaaS Plane · 041 Improvements`, `SaaS Plane · 041 Improvements · N018 Docs tooling`. Every other page has the three fields.
     const chained = block.variant === "approach" || block.variant === "preview";
-    const parts = text(line1[1]).split(chained ? "·" : "|").map((p) => p.trim()).filter(Boolean);
+    // THE LINE IS THE BREADCRUMB: its levels are joined by ` · `, each level above the page a link. A page written before it joined them with `|`.
+    const parts = text(line1[1]).split(chained ? "·" : /[·|]/).map((p) => p.trim()).filter(Boolean);
     if (chained ? parts.length < 2 || parts.length > 3 : parts.length !== 3) add("RULE", chained ? `the identity line carries ${parts.length} levels, not two or three` : `the identity line carries ${parts.length} fields, not three`);
     else if (parts[parts.length - 1] !== text(typeof block.name === "string" && block.name.trim() ? block.name : block.title))
       add("RULE", `the header title \`${parts[2]}\` is not the block's ${typeof block.name === "string" && block.name.trim() ? `name \`${block.name}\`` : `\`${block.title}\``}`);
@@ -895,7 +896,7 @@ export function stylesFolder(): string | null {
 
 /** The version named by each `<link>` and `<script>` of a page that loads one of the served files. */
 const SERVED_VERSION = new RegExp(
-  `<(?:link|script)\\b[^>]*\\b(?:href|src)="(?:[^"]*/)?(\\d+\\.\\d+\\.\\d+)/(?:${SERVED_FILES.map((served) => served.replace(/\./g, "\\.")).join("|")})"`, "gi");
+  `<(?:link|script)\\b[^>]*\\b(?:href|src)="(?:[^"]*/)?(\\d+\\.\\d+\\.\\d+)/(?:${ANY_SERVED_NAMES.map((served) => served.replace(/\./g, "\\.")).join("|")})"`, "gi");
 
 /**
  * A page's furniture is the shared stylesheet's and the shared script's (05-artifacts.md § The page
@@ -922,12 +923,12 @@ export function checkFurniture(file: string, src: string): Finding[] {
   return [{ check: "furniture", grade: "RULE", file, message:
     `this page links version ${absent.map((version) => "`" + version + "`").join(" · ")} of the shared styles, and no such version exists. ` +
     `The versions that exist: ${versions.map((version) => "`" + version + "`").join(" · ") || "none"}. ` +
-    "Link one of them, or cut the version with `docs sds cut` (05-artifacts.md, One stylesheet, served in versions)" }];
+    "Link one of them, or cut the version with `docs styles cut` (05-artifacts.md, One stylesheet, served in versions)" }];
 }
 
 /** A whole opening tag of a `<link>` or `<script>` that loads one of the served files from a version's folder. */
 const SERVED_ELEMENT = new RegExp(
-  `<(?:link|script)\\b[^>]*\\b(?:href|src)="[^"]*/\\d+\\.\\d+\\.\\d+/(?:${SERVED_FILES.map((served) => served.replace(/\./g, "\\.")).join("|")})"[^>]*>`, "gi");
+  `<(?:link|script)\\b[^>]*\\b(?:href|src)="[^"]*/\\d+\\.\\d+\\.\\d+/(?:${ANY_SERVED_NAMES.map((served) => served.replace(/\./g, "\\.")).join("|")})"[^>]*>`, "gi");
 
 /** An element with its version, its `integrity` and its `crossorigin` taken out: what is left is what a page says besides the version. */
 const shapeOf = (element: string): string =>
@@ -937,7 +938,7 @@ const shapeOf = (element: string): string =>
  * A produced page, with each line that loads a served file taken from the page on disk where the two
  * differ only in the version and its hash.
  *
- * `docs page write` writes the version the template links, and `docs sds repoint` moves a page to
+ * `docs page write` writes the version the template links, and `docs styles repoint` moves a page to
  * another version with its hash. A REPOINTED PAGE IS STILL WHAT THE SEAT FILE PRODUCES, so the
  * comparison reads the version the page links now. Whether that version exists is the furniture
  * check's, which names a version nobody cut.
@@ -1452,6 +1453,7 @@ export function checkProduced(file: string, src: string, block: any, workspace: 
       // `← the model` and calls all 20 pages of a repository hand-edited. Third time this file has
       // learned that both halves must be handed the same inputs.
       home: overviewAbove(seat, file) ?? undefined,
+      hub: hubOf(seat, file),
       root: docsRoot(seat),
     }).html;
   } catch (e) {
@@ -2493,7 +2495,7 @@ export function statusFor(seat: string, workspace: string, write: boolean, say: 
 
 /**
  * The furniture: the two lines of the construct template that load the shared files. The first is
- * the line that links `sds-docs.css`, and the second is the line that loads `sds-docs.js`. A
+ * the line that links `docs-language.css`, and the second is the line that loads `docs-page.js`. A
  * produced page carries those two lines and nothing else of the template's: no `<style>` block and
  * no script with code (05-artifacts.md § What a stored page carries).
  *
@@ -2506,9 +2508,8 @@ export function statusFor(seat: string, workspace: string, write: boolean, say: 
  */
 export function furniture(templates: string): { stylesheet: string; script: string; footer: string } {
   const template = readFileSync(join(templates, "docs", "pages", "construct-template.html"), "utf8");
-  const named = (file: string): string => file.replace(/\./g, "\\.");
-  const stylesheet = new RegExp(`<link\\b[^>]*\\bhref="[^"]*${named(STYLESHEET)}"[^>]*>`, "i").exec(template)?.[0];
-  const script = new RegExp(`<script\\b[^>]*\\bsrc="[^"]*${named(PAGE_SCRIPT)}"[^>]*>\\s*</script>`, "i").exec(template)?.[0];
+  const stylesheet = new RegExp(`<link\\b[^>]*\\bhref="[^"]*${anyNameOf(STYLESHEET)}"[^>]*>`, "i").exec(template)?.[0];
+  const script = new RegExp(`<script\\b[^>]*\\bsrc="[^"]*${anyNameOf(PAGE_SCRIPT)}"[^>]*>\\s*</script>`, "i").exec(template)?.[0];
   if (!stylesheet || !script)
     throw new Error(`\`construct-template.html\` holds no line that loads \`${stylesheet ? PAGE_SCRIPT : STYLESHEET}\`, ` +
       "so a page produced from it would link no shared file (05-artifacts.md, One stylesheet, served in versions)");
@@ -2647,6 +2648,12 @@ export function overviewAbove(seat: string, out: string): { href: string; label:
   return existsSync(hub) ? target(hub) : null;
 }
 
+/** The address of the hub as the page at `out` links it, for a construct seat; null where the repository has no hub. */
+export function hubOf(seat: string, out: string): string | null {
+  const split = splitAtSeat(resolve(seat).replace(/\\/g, "/"), "constructs", "last");
+  return split ? hubAbove(split.docs, out)?.href ?? null : null;
+}
+
 export function pageFor(seat: string, workspace: string, templates: string, write: boolean): Finding[] {
   const findings: Finding[] = [];
 
@@ -2683,6 +2690,7 @@ export function pageFor(seat: string, workspace: string, templates: string, writ
     block, markdown, workspace: org, location, furniture: lines,
     link: hrefForPage(seat, out),
     home: overviewAbove(seat, out) ?? undefined,
+    hub: hubOf(seat, out),
     root: docsRoot(seat),
   });
   for (const r of rf) findings.push({ check: "page", grade: "RULE", file: seat, message: r.message });
@@ -2690,7 +2698,7 @@ export function pageFor(seat: string, workspace: string, templates: string, writ
   if (rf.some((r) => r.stops)) return findings;
   for (const [grade, message] of blockFit(markdown, false, "seat")) findings.push({ check: "fit", grade: grade as Grade, file: seat, message });
   const before = existsSync(out) ? readFileSync(out, "utf8") : "";
-  // A PAGE MOVED TO ANOTHER VERSION BY `docs sds repoint` IS CURRENT, and a write leaves its version as it is.
+  // A PAGE MOVED TO ANOTHER VERSION BY `docs styles repoint` IS CURRENT, and a write leaves its version as it is.
   if (before && asLinkedBy(html, before) === before) { console.log(`current  ${relative(workspace, out)}`); return findings; }
   if (write) {
     mkdirSync(dirname(out), { recursive: true });
@@ -3301,8 +3309,16 @@ export function checkConstructLink(file: string, src: string): Finding[] {
   return f;
 }
 
-/** The address a page's back link opens: its breadcrumb, `p.sds-crumb`, or the link at the top of its rail, `a.sds-home`, in a page written before the breadcrumb. */
+/**
+ * The address a page's back link opens: the last link of the eyebrow's first line, `span.sds-line1` (the breadcrumb, whose levels above the
+ * page are links), or, in a page written before it, the crumb `p.sds-crumb`, or the link at the top of its rail, `a.sds-home`.
+ */
 export function backLinkOf(src: string): string | null {
+  const line1 = /class="(?:sds-line sds-line1|sds-line1)"[^>]*>([\s\S]*?)<\/(?:span|div)>/.exec(src);
+  if (line1) {
+    const links = [...line1[1].matchAll(/<a\b[^>]*?href="([^"]*)"/g)];
+    if (links.length) return links[links.length - 1][1];
+  }
   const crumb = /<p class="sds-crumb"[^>]*><a\b[^>]*?href="([^"]*)"/.exec(src);
   if (crumb) return crumb[1];
   return /<a class="sds-home"[^>]*?href="([^"]*)"/.exec(src)?.[1] ?? null;
@@ -3311,7 +3327,7 @@ export function backLinkOf(src: string): string | null {
 /**
  * In its back link and its previous and next doors, a page opens a page.
  *
- * The back link, the breadcrumb above the masthead (`p.sds-crumb`) or, in a page written before it, the first link of the rail (`a.sds-home`), and the two doors of the `NEXT` block
+ * The back link, the last link of the eyebrow's first line or, in a page written before it, the crumb `p.sds-crumb` or the first link of the rail (`a.sds-home`), and the two doors of the `NEXT` block
  * (`a.sds-nextnav-card` inside `div.sds-nextnav`) open a page that ends in `.html`; a markdown file
  * walks a markdown file by its own footer. A link inside the content, Where to go next included, may
  * open anything a reader needs for reference. An anchor after the path is fine, and a link to another
@@ -3376,7 +3392,7 @@ export function walkKindOf(file: string, block: any): WalkKind | null {
  * Every page walks up one step, by the back link at the top of its rail; the top of a chain has none.
  *
  * A construct page goes back to the overview that links forward to it, an overview, a guide, a report
- * and an index to the hub (an index by its head card), a preview to the approach page of its workstream. The hub and an approach
+ * and an index to the hub (an index by the link in its noscript note), a preview to the approach page of its workstream. The hub and an approach
  * page carry none. Where the page a link should open is not there (a repository with no hub, a preview
  * outside a workstream), the page owes no link: a link is a promise a reader can follow. A back link
  * that opens a markdown file is the rail check's to refuse, so it is not said twice.
@@ -3385,8 +3401,8 @@ export function checkWayBack(file: string, src: string, block: any): Finding[] {
   if (!file.endsWith(".html") || inTemplates(file) || holdsOwnCopy(file, src)) return [];
   const kind = walkKindOf(file, block);
   if (!kind) return [];
-  // The index's way back is its head card, which opens the hub; every other page's is the back link.
-  const found = backLinkOf(src) ?? (kind === "index" ? src.match(/<a class="sds-rail-brand" href="([^"]*)"/)?.[1] ?? null : null);
+  // The index's way back is the link to the hub in its noscript note (its head card opens the index itself); every other page's is the back link.
+  const found = backLinkOf(src) ?? (kind === "index" ? src.match(/<noscript>[\s\S]*?<a href="([^"]*)"/)?.[1] ?? null : null);
   const back = found === null ? null : [found, found];
   const rule = (message: string): Finding[] => [{ check: "rail", grade: "RULE", file, message }];
   if (kind === "hub" || kind === "approach")

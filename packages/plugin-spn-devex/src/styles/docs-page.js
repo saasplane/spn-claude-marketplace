@@ -515,7 +515,7 @@
   try { var kept = JSON.parse(localStorage.getItem('sds-surface') || '{}'); for (var k in state) if (k in kept) state[k] = kept[k]; } catch (e) {}
   function meta(name) { var m = document.querySelector('meta[name="' + name + '"]'); return m ? (m.getAttribute('content') || '').trim() : ''; }
   function attr(text) { return String(text).replace(/&/g, '&amp;').replace(/"/g, '&quot;'); }
-  var own = document.querySelector('script[src*="sds-docs.js"]');
+  var own = document.querySelector('script[src*="docs-page.js"]');
   var folder = own ? own.getAttribute('src').replace(/[^\/]*$/, '') : '';
   var appCss = meta('surface-app-css');
   function pageDocument() {

@@ -1,11 +1,13 @@
 // `page copy` — what runs without a browser: where a note is placed, the mode meta, the listener, the copy's assembly and the refusals.
 import { execFileSync } from "node:child_process";
-import { join, resolve } from "node:path";
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { dirname, join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 
 const SRC = resolve(import.meta.dirname, "..", "..", "..", "..", "..", "src");
 const CLI = join(SRC, "scripts", "cli.ts");
-const { placeNotes, noteHtml, pageMarkup, fillTemplate, slugOf, TEMPLATE_BESIDE } = await import(pathToFileURL(join(SRC, "scripts", "commands", "page", "copy.ts")).href);
+const { placeNotes, noteHtml, pageMarkup, fillTemplate, slugOf, templateBeside, TEMPLATE_IN_DEVEX } = await import(pathToFileURL(join(SRC, "scripts", "commands", "page", "copy.ts")).href);
 
 let total = 0, failed = 0;
 const ok = (label, condition, detail = "") => {
@@ -41,7 +43,24 @@ ok("[MKT.SCRIPTS.637] a name becomes a file name", slugOf("Home — Page 2") ===
 let refused = "";
 try { fillTemplate("<p>no tag</p>", markup, { name: "x", ds: "", appCss: "" }); } catch (error) { refused = String(error.message ?? error); }
 ok("[MKT.SCRIPTS.637] a template with no `page` tag is refused", refused.includes("template"), refused);
-ok("[MKT.SCRIPTS.637] the template is looked for beside the spn-devex plugin's refs when none is named", TEMPLATE_BESIDE.includes("plugin-spn-devex") && TEMPLATE_BESIDE.endsWith("surface-page-template.html"), TEMPLATE_BESIDE);
+ok("[MKT.SCRIPTS.637] the template is looked for beside the spn-devex plugin's refs when none is named: in the marketplace", String(templateBeside()).includes("plugin-spn-devex") && String(templateBeside()).endsWith("surface-page-template.html"), String(templateBeside()));
+{
+  // INSTALLED: `<plugins>/<marketplace>/spn-surface/<version>/dist/commands/page` runs beside `<plugins>/<marketplace>/spn-devex/<version>/refs/…`; the newest version holding the template is read.
+  const cache = mkdtempSync(join(tmpdir(), "page-copy-installed-"));
+  const surface = join(cache, "saasplane", "spn-surface", "0.5.0", "dist", "commands", "page");
+  mkdirSync(surface, { recursive: true });
+  for (const version of ["0.9.0", "0.10.0", "0.11.0"]) {
+    if (version === "0.11.0") { mkdirSync(join(cache, "saasplane", "spn-devex", version), { recursive: true }); continue; }
+    const file = join(cache, "saasplane", "spn-devex", version, TEMPLATE_IN_DEVEX);
+    mkdirSync(dirname(file), { recursive: true });
+    writeFileSync(file, version);
+  }
+  ok("[MKT.SCRIPTS.637] installed, the template is the newest installed spn-devex version that holds it, found beside spn-surface", templateBeside(surface) === join(cache, "saasplane", "spn-devex", "0.10.0", TEMPLATE_IN_DEVEX), String(templateBeside(surface)));
+  const lone = join(cache, "alone", "spn-surface", "0.5.0", "dist", "commands", "page");
+  mkdirSync(lone, { recursive: true });
+  ok("[MKT.SCRIPTS.637] with no spn-devex beside it there is no template, and the command refuses by name, saying to pass --template", templateBeside(lone) === null);
+  rmSync(cache, { recursive: true, force: true });
+}
 
 console.log("\n=== page copy — refused by name");
 {

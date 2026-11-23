@@ -722,6 +722,8 @@ try {
     `  <div class="sds-step"><h3 id="h1">Install the toolchain</h3><p>You need it before any other step.</p><pre>spnutils setup</pre><p>You see one line for each tool.</p></div>\n</section>\n</div></div>${STYLES.script}\n`;
   const guidePage = join(guidePagesDir(PROBE_DOCS), "getting-started-guide.html");
   one("a guide page under artifacts/guides/ is in its place, and draws no finding", write(guidePage, GUIDE), "silent");
+  const LINKED = GUIDE.replace("SaaS Plane &nbsp;|&nbsp; Probe &nbsp;|&nbsp; Getting Started", 'SaaS Plane &middot; <a href="../hub.html">Probe</a> &middot; Getting Started');
+  one("the eyebrow's first line is the breadcrumb: levels joined by a middle dot, each level above the page a link, draws no finding", write(guidePage, LINKED), "silent");
   one("a page under artifacts/guides/ whose name does not end -guide.html",
     write(join(guidePagesDir(PROBE_DOCS), "getting-started.html"), GUIDE), "reports", "does not end -guide.html");
   // The index of artifacts as `docs index` writes it: no header, no Title, no Description, and its own script.
@@ -747,7 +749,7 @@ try {
 
   const RAIL = `<nav class="sds-rail" id="rail"></nav>\n`;
   one("known-bad: a page that carries a rail and loads no shared script is told its outline is not built",
-    write(statusPage, withStatus(CLEAN, "IMPLEMENTING", "&#x1F6A7;") + RAIL), "reports", "carries a rail and loads no `sds-docs.js`");
+    write(statusPage, withStatus(CLEAN, "IMPLEMENTING", "&#x1F6A7;") + RAIL), "reports", "carries a rail and loads no `docs-page.js`");
   one("untouched: the same page with the shared script's line is silent",
     write(statusPage, withStatus(CLEAN, "IMPLEMENTING", "&#x1F6A7;") + RAIL + `${STYLES.script}\n`), "silent");
 } finally {
@@ -830,7 +832,7 @@ console.log("\n=== doc-check — a page of the artifacts pocket holds no sidebar
   say("[MKT.SCRIPTS.631] green: the page's own rail, the way back and the outline links are not a sidebar", sidebarRule(`<body>${rail}</body>`).length === 0);
   say("[MKT.SCRIPTS.631] green: a nav of anchors on the page, and a nav that links one page, draw none", sidebarRule('<nav><a href="#a">a</a><a href="#b">b</a></nav>').length === 0 && sidebarRule('<nav><a href="./a.html">a</a></nav>').length === 0);
   say("[MKT.SCRIPTS.631] green: the index of artifacts, which holds an index-data block, is the one page that has such a nav", sidebarRule(`${index}<body>${side}</body>`).length === 0);
-  const page = (body) => `<meta charset="utf-8">\n<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.16.0/sds-docs.css">\n<div class="sds-page">${body}</div>`;
+  const page = (body) => `<meta charset="utf-8">\n<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.16.0/docs-language.css">\n<div class="sds-page">${body}</div>`;
   const hit = (path, body) => checkPage(path, page(body)).filter(([, text]) => text.includes("sidebar of links to other pages")).length;
   say("[MKT.SCRIPTS.631] red: a page under docs/artifacts/ with a sidebar is told by the whole check", hit("/r/docs/artifacts/docs/a-overview.html", side) === 1);
   say("[MKT.SCRIPTS.631] green: the same page outside the artifacts pocket, or its index, is not read", hit("/r/notes/a-overview.html", side) === 0 && hit("/r/docs/artifacts/index.html", side) === 0);
