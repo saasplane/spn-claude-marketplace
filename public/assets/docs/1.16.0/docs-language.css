@@ -2803,7 +2803,7 @@
     --sds-yellow: #6b5300;
     --sds-yellow-soft: #fbf1c4;
     --sds-orange-soft: #fdebd3;
-    --sds-page-max: 80rem;
+    --sds-page-max: 90rem;
     --sds-status-planning: oklch(0.767462 0.171331 61.6975);
     --sds-status-planning-soft: oklch(0.810515 0.145533 67.1324 / 0.2);
     --sds-status-implementing: oklch(0.3949 0.0942473 244.756);
@@ -2827,10 +2827,11 @@
     --sds-status-dropped: oklch(0.582835 0.202194 29.0717);
     --sds-status-dropped-soft: oklch(0.724946 0.15472 25.82 / 0.14);
     --sds-measure: 58rem;
-    --sds-rail-width: 13rem;
-    --sds-tree-width: clamp(13.5rem,calc(100vw - 77.5rem),22rem);
-    --sds-outline-fold: 75rem;
-    --sds-tree-fold: 88.5rem;
+    --sds-content-floor: 50rem;
+    --sds-rail-width: 14rem;
+    --sds-tree-width: clamp(13.5rem,calc(100vw - 70.5rem),22rem);
+    --sds-outline-fold: 68rem;
+    --sds-tree-fold: 81.5rem;
   }
   :root[data-mode="dark"] {
     --sds-tk-k: var(--sds-violet);
@@ -3754,7 +3755,7 @@
     border-top: 1px solid var(--sds-rule);
     padding-top: 1.3rem;
   }
-  @media (max-width:75rem) {
+  @media (max-width:68rem) {
     .sds-page, .sds-page[data-frame="page"].sds-has-rail {
       gap: calc(0.25rem * 6);
       padding-top: calc(0.25rem * 8);
@@ -5594,7 +5595,7 @@
     margin: 0px;
     max-width: 34rem;
   }
-  @media (max-width:88.5rem) {
+  @media (max-width:81.5rem) {
     .sds-index,.sds-index.sds-is-folded {
       grid-template-columns: minmax(0,1fr);
       grid-template-rows: auto minmax(0,1fr);
