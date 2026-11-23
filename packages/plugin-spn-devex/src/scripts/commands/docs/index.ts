@@ -374,7 +374,7 @@ function run(args: string[], write: boolean): number {
     const split = artifactsLayout(docs) === "split";
     const halves: (Visibility | undefined)[] = split ? [VISIBILITY.public, VISIBILITY.private].filter((half) => existsSync(join(artifacts, half))) : [undefined];
     if (!halves.length) throw new Refusal(`${POCKET_PATH} holds neither \`public/\` nor \`private/\`, so there is nothing to list`);
-    if (!split && existsSync(artifacts)) console.log(`${POCKET_PATH} holds the earlier layout, so the index is written beside docs/, guides/ and reports/ until the rewrite pass moves them to public/ and private/`);
+    if (!split && existsSync(artifacts)) console.log(`${POCKET_PATH} holds the earlier layout, so the index is written beside ${ARTIFACT.docs}/, ${ARTIFACT.guides}/ and ${ARTIFACT.reports}/ until the rewrite pass moves them to ${VISIBILITY.public}/ and ${VISIBILITY.private}/`);
     const named = locationOf(docs, workspace);
     let failed = 0;
     for (const half of halves) failed = Math.max(failed, one(half, half === halves[0] ? typedOut : null));

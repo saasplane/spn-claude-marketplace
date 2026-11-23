@@ -65,7 +65,7 @@ import { titleFindingsOnDisk } from "./page-title.ts";
 import { whereTreeFindings } from "./where-tree.ts";
 import { handDrawnFigures } from "../lib/figures.ts";
 import { bookClassFaults, inPluginSource, knownHolders, ownMarketplace, pluginNameFaults } from "./book-classes.ts";
-import { GUIDE_PAGE_SUFFIX, APPROACH_SUFFIX, ARTIFACT, CONSTRUCT_PAGES, CONSTRUCT_PAGE_SUFFIX, HUB, OVERVIEW_PAGE_SUFFIX, PLUGIN_TEMPLATES, POCKET,
+import { GUIDE_PAGE_SUFFIX, APPROACH_SUFFIX, ARTIFACT, CONSTRUCT_PAGES, CONSTRUCT_PAGE_SUFFIX, HUB, OVERVIEW_PAGE_SUFFIX, PLUGIN_TEMPLATES, POCKET, DOCS, TEMPLATES, VISIBILITY,
          artifactDocsPathOf, decisionsRegister, inArtifacts, workstreamPrefixSource, isApproachPage, isRegister as inRegisters, pagePlaceOf,
          workstreamDirOf, workstreamsDir, isSeatFile, visibilityOf } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { ANY_SERVED_NAMES, BUNDLED_SUFFIX, OWN_COPY, PAGE_SCRIPT, anyNameOf, cutVersions, linksSharedStyles, stylesDir } from "../../../../plugin-support-lib/src/lib/page-styles.ts";
@@ -849,7 +849,8 @@ const FILLED_MEDIA = /<(?:img|svg|table|figure|iframe|video|canvas|picture|ul|ol
 const SLOT = /\{\{(?:(?!\{\{|\}\})[^\n])*\}\}/g;
 
 /** A template, or a file under a `templates/` folder, is a model and holds slots by design. */
-export const isTemplatePath = (path: string): boolean => /(?:^|\/)templates\//.test(slashes(path));
+const TEMPLATE_FOLDER = new RegExp(`(?:^|\\/)${TEMPLATES}\\/`);
+export const isTemplatePath = (path: string): boolean => TEMPLATE_FOLDER.test(slashes(path));
 
 /** The `{{…}}` slots a page's text still holds, each once, outside comments, scripts, styles and code. */
 export function slotsLeft(text: string): string[] {
@@ -1627,11 +1628,14 @@ export function publicLinkFindings(path: string, text: string): Finding[] {
   return out;
 }
 
+/** A page directly in one half of the artifacts pocket. */
+const POCKET_HALF_PAGE = new RegExp(`\\/${POCKET.artifacts}\\/(?:${VISIBILITY.public}|${VISIBILITY.private})\\/[^/]+\\.html$`);
+
 /** A page that owes a docs template's frame: a page of the artifacts pocket, or one of an arc's own notes, never a sample, a view of the work or a template. */
 export function startsFromTemplate(path: string): boolean {
   const norm = slashes(path);
   if (/\/(?:samples|work|templates|surface)\//.test(norm) || norm.endsWith(BUNDLED_SUFFIX)) return false;
-  if (inPocket(path) || /\/artifacts\/(?:public|private)\/[^/]+\.html$/.test(norm)) return true;
+  if (inPocket(path) || POCKET_HALF_PAGE.test(norm)) return true;
   return /\/notes\/(?:N\d+|ideate|follow-ups)\/[^/]+\.html$/.test(norm) && !inClosedWorkstream(path);
 }
 
@@ -1652,7 +1656,7 @@ export function sidebarRule(text: string): Finding[] {
     .filter(([, attrs]) => !/\bclass="[^"]*\bsds-rail\b/.test(attrs) && !/\bid="rail"/.test(attrs))
     .filter(([, , inside]) => [...inside.matchAll(/<a\b[^>]*\bhref="([^"#][^"]*)"/gi)].filter(([, href]) => !/^[a-z][a-z0-9+.-]*:/i.test(href)).length >= 2);
   return sidebars.length
-    ? [["RULE", "this page holds a sidebar of links to other pages. Only the index of artifacts has one, built from `templates/docs/pages/index-template.html` " +
+    ? [["RULE", `this page holds a sidebar of links to other pages. Only the index of artifacts has one, built from \`${TEMPLATES}/${DOCS}/pages/index-template.html\` ` +
       "with each entry a page; a page that lists pages becomes an index of its own, or links its pages in a catalog (05-artifacts.md, the block table)"]]
     : [];
 }

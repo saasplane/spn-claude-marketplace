@@ -19,7 +19,7 @@ import { createHash } from "node:crypto";
 import { existsSync, mkdirSync, readFileSync, readdirSync, statSync, unlinkSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { DEVEX_WORKSTREAMS, slashes } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
+import { DEVEX_WORKSTREAMS, DOCS, POCKET, slashes } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import {
   ANY_SERVED_NAMES, BUNDLED_SUFFIX, INTEGRITY_FILE, OLD_NAMES, OWN_COPY, STYLESHEET, STYLES_ADDRESS, anyNameOf, cutVersions, integrityTable,
   nameIn, newestVersion, servedFilesOf, sha384Of, sharedStyles, stylesDir,
@@ -264,7 +264,7 @@ function cut(version: string, root: string | null, ds: string | null = null, dsV
 // ---------------------------------------------------------------------------- preview
 
 /** The folders a preview may write into: a workstream's folder, or a repository's artifacts pocket. */
-const PREVIEW_PLACE = new RegExp(`(?:^|\\/)(?:${escaped(DEVEX_WORKSTREAMS)}|docs\\/artifacts)(?:\\/|$)`);
+const PREVIEW_PLACE = new RegExp(`(?:^|\\/)(?:${escaped(DEVEX_WORKSTREAMS)}|${escaped(DOCS)}\\/${escaped(POCKET.artifacts)})(?:\\/|$)`);
 
 /** The version the next cut will be: the newest listed version where it is not published, else the next minor after it. */
 function nextVersion(versions: readonly string[], published: Set<string>): string {
@@ -283,7 +283,7 @@ function nextVersion(versions: readonly string[], published: Set<string>): strin
 function preview(folder: string, root: string | null): number {
   const target = resolve(folder);
   if (!PREVIEW_PLACE.test(slashes(target))) {
-    return refuse("preview", `\`${target}\` is not under a workstream's folder (\`${slashes(DEVEX_WORKSTREAMS)}/\`) or a repository's \`docs/artifacts/\`, so nothing is written there`);
+    return refuse("preview", `\`${target}\` is not under a workstream's folder (\`${slashes(DEVEX_WORKSTREAMS)}/\`) or a repository's \`${DOCS}/${POCKET.artifacts}/\`, so nothing is written there`);
   }
   if (!isDir(target)) return refuse("preview", `\`${target}\` is not a folder`);
   const home = marketplaceFrom(root);
