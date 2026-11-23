@@ -1,7 +1,9 @@
 // The page renderer and a code block (`05-artifacts.md` § One stylesheet, served in versions): a produced page
 // holds plain code in a `pre` tagged with its language, and no colour. The shared script colours the block when
 // the page opens, so the renderer writes the same block a person writes by hand.
-import { resolve } from "node:path";
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 
 const HERE = resolve(import.meta.dirname, "..", "..", "..", "..");
@@ -309,6 +311,29 @@ console.log("\n=== the page renderer — a file frame that folds");
   ok("[MKT.SCRIPTS.616] the word fold draws the same frame inside a details whose summary is the path",
     folded.html.includes('<details class="sds-fold">\n    <summary>docs/specs/x.json</summary>\n  <figure class="sds-file">') && folded.html.includes('<span class="sds-file-lang">json</span>') && folded.html.includes('data-lang="json"') && folded.findings.length === 0, folded.html);
   ok("[MKT.SCRIPTS.616] fold with no file= is a finding, and the code is drawn plain", made("```json fold\n{}\n```").findings.some((f) => f.message.includes("`file=<path>`")));
+}
+
+console.log("\n=== the page renderer — a folded fence with no body reads its file");
+{
+  const root = mkdtempSync(join(tmpdir(), "spn-fold-"));
+  mkdirSync(join(root, "docs", "specs"), { recursive: true });
+  writeFileSync(join(root, "docs", "specs", "x.json"), '{ "a": 1 }\n');
+  const withRoot = (markdown, rootDir = root) => renderPage({
+    block: { id: "probe", title: "Probe", status: "DONE", lenses: ["ARCHITECT"], summary: "What a probe is." },
+    markdown: `# Probe\n\nThe lead.\n\n## What it is\n\n${markdown}\n`, workspace: "/workspace", location: "/workspace/docs/02-constructs/probe.md",
+    furniture: { stylesheet: "", script: "", footer: "" }, root: rootDir,
+  });
+  const read = withRoot("```json file=docs/specs/x.json fold\n```");
+  ok("[MKT.SCRIPTS.616] a folded fence with no body shows the file's content, relative to the folder holding docs/",
+    read.findings.length === 0 && read.html.includes('<summary>docs/specs/x.json</summary>') && read.html.includes('<pre data-lang="json">{ "a": 1 }</pre>'), read.html.slice(-700));
+  ok("[MKT.SCRIPTS.616] a folded fence with a body still shows the body, and the file is not read",
+    withRoot("```json file=docs/specs/x.json fold\n{ \"b\": 2 }\n```").html.includes('{ "b": 2 }') && !withRoot("```json file=docs/specs/x.json fold\n{ \"b\": 2 }\n```").html.includes('"a": 1'));
+  const missing = withRoot("```json file=docs/specs/none.json fold\n```");
+  ok("[MKT.SCRIPTS.616] a path that does not exist stops the write with a finding naming it",
+    missing.findings.length === 1 && missing.findings[0].stops === true && missing.findings[0].message.includes("docs/specs/none.json") && !missing.html.includes("sds-fold"), JSON.stringify(missing.findings));
+  ok("[MKT.SCRIPTS.616] with no root known, an empty folded fence stops the write; an empty fence that does not fold is not read",
+    made("```json file=docs/specs/x.json fold\n```").findings.some((f) => f.stops) && made("```json file=docs/specs/x.json\n```").findings.length === 0);
+  rmSync(root, { recursive: true, force: true });
 }
 
 console.log(failed ? `\n  ${failed} of ${total} FAILED — t-render` : `\n  all ${total} passed — t-render`);

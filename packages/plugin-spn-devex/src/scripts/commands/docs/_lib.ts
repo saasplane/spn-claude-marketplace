@@ -14,7 +14,7 @@
 import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync, statSync } from "node:fs";
 import { dirname, join, resolve, basename, relative } from "node:path";
 import { fileURLToPath } from "node:url";
-import { hrefForPage, renderPage } from "../../lib/render.ts";
+import { docsRoot, hrefForPage, renderPage } from "../../lib/render.ts";
 import { cardsOf } from "../../checks/split-plan.ts";
 import { STATUSES } from "../../checks/arc-status.ts";
 import { masthead, type MastheadKind } from "../../checks/doc-check.ts";
@@ -1439,6 +1439,7 @@ export function checkProduced(file: string, src: string, block: any, workspace: 
       // `← the model` and calls all 20 pages of a repository hand-edited. Third time this file has
       // learned that both halves must be handed the same inputs.
       home: overviewAbove(seat, file) ?? undefined,
+      root: docsRoot(seat),
     }).html;
   } catch (e) {
     return [{ check: "produced", grade: "SOFT", file, message: `the page could not be produced for comparison — ${(e as Error).message}` }];
@@ -2669,6 +2670,7 @@ export function pageFor(seat: string, workspace: string, templates: string, writ
     block, markdown, workspace: org, location, furniture: lines,
     link: hrefForPage(seat, out),
     home: overviewAbove(seat, out) ?? undefined,
+    root: docsRoot(seat),
   });
   for (const r of rf) findings.push({ check: "page", grade: "RULE", file: seat, message: r.message });
   // THE RENDER'S WORDS STOP THE WRITE: a `unit` fence it refused, or found fault with, leaves the page as it stood (RULE.DEVEX.WORKSPACE.538).

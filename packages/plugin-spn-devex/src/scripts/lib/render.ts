@@ -132,6 +132,15 @@ const escapedCode = (code: string) => code.replace(/&/g, "&amp;").replace(/</g, 
  * from SUB at runtime, for the reason `figures.ts` records: a digit in the marker gets matched, and
  * writing the control character as a literal puts raw NUL bytes in this file.
  */
+/** The folder holding `docs/` that a seat file sits in: the repository root a `file=` path is read from. Null where the path has no `docs` folder. */
+export function docsRoot(seat: string): string | null {
+  const at = seat.lastIndexOf("/docs/");
+  return at < 0 ? null : seat.slice(0, at);
+}
+
+/** The repository root the page is written from, set by `renderPage`; null where the caller names none. */
+let pageRoot: string | null = null;
+
 /**
  * How a relative link is re-expressed for the produced page. Set by `renderPage`, identity by default.
  *
@@ -586,6 +595,16 @@ function renderBody(lines: string[], findings: Finding[], nested = false): strin
       i++;
       while (i < lines.length && !/^```/.test(lines[i])) body.push(lines[i++]);
       i++;
+      // A FOLDED FENCE WITH NO BODY READS ITS FILE: the path is relative to the folder holding `docs/`, so a page shows a spec
+      // without copying it into the markdown. A path that is not there stops the write.
+      if (folded && fileAt && !body.some((line) => line.trim())) {
+        const where = pageRoot ? resolve(pageRoot, fileAt[1]) : null;
+        if (!where || !existsSync(where)) {
+          findings.push({ message: `a folded fence with no body reads \`${fileAt[1]}\` from the repository root${pageRoot ? "" : " (the page's folder holding `docs/` is not known)"}, and no file is there`, stops: true });
+          continue;
+        }
+        body.push(...readFileSync(where, "utf8").replace(/\n$/, "").split("\n"));
+      }
       if (kind === "catalog") {
         out.push(catalogBlock(lang, body, findings));
       } else if (lang === "cards" || lang === "next") {
@@ -678,13 +697,17 @@ export function renderPage(opts: {
    * face stands, which is what every produced page carried before.
    */
   home?: { href: string; label: string };
+  /** The folder holding `docs/`: where a folded fence with no body reads its `file=` path from (`docsRoot(seat)`). */
+  root?: string | null;
 }): { html: string; findings: Finding[] } {
-  const previousRewrite = rewriteHref;
+  const previousRewrite = rewriteHref, previousRoot = pageRoot;
   rewriteHref = opts.link ?? ((h) => h);
+  pageRoot = opts.root ?? null;
   try {
     return renderPageBody(opts);
   } finally {
     rewriteHref = previousRewrite;
+    pageRoot = previousRoot;
   }
 }
 
