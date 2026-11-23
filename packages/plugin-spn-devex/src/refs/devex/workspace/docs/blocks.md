@@ -221,6 +221,19 @@ The `PROSE` panel still has no spelling: write a paragraph where you wanted one,
 | what every reader must read | stays on the page |
 | a wide comparison of attributes | a plain table |
 
+The rows leave some content between two of them. These lines settle the usual cases, so two writers choose the same block:
+
+- **Two to four things make a catalog table, and five or more make a wide one.** A `catalog layout=TABLE` holds two to four things and at most six facts. Five things or more, or seven facts or more, is a wide comparison and stays a plain table.
+- **A catalog needs a name for each item, once.** A table whose first column repeats a name, or has no name at all, stays a table.
+- **A description is a clause a reader reads, not a value.** A column of sentences or clauses beside a name reads as a catalog. A column of numbers, owners, states or one-word values is a table of attributes, and stays a table.
+- **A table of links to parts of the same page stays a table.** `cards` are doors to other pages a reader may open next; a list of examples or references is not a set of doors.
+- **A converted table keeps its words.** The first column becomes the items' names and its heading is dropped. Each other heading becomes a fact key and is cut to a word or two (`The prefix of its published keys` becomes `Prefix`). An item may have no one line of its own.
+- **Order decides between a list and a figure.** Steps a reader carries out in turn are a numbered list, and stay numbered when the sentence before them counts them ("Three steps…"). A flow between things the page names is a `chain`. Layers inside a boundary are a `system`. Anything else that connects things is a `map`.
+- **A tree is a `tree` fence**, one path a line, children indented two spaces under their folder, a folder ending in `/`, and a note after two spaces. A line that is no path is a note on the line before it.
+- **A code block with no path stays `CODE`.** A `FILE` frame names the file the block is; a block that holds two files is two fences.
+- **A drawing a `dg` kind cannot draw stays the hand-drawn figure the page already has**, between its `<!-- fig:name -->` markers: plates, the task-state colours, people and agents. A new figure starts as a `dg` fence and becomes hand-drawn only when no kind can say it.
+- **Was and Now headings stay on a book page.** Today and Proposed are a workstream page's comparison words, never a construct's.
+
 A plain table of a name column and a description column past four rows reads as a catalog, and the page writer says so as a soft finding. A fence is written as the page writer reads it, and reads as plain code on github.com:
 
 | Block | You write | It becomes |
