@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "book": {
     "repository": "spn-foundation",
-    "commit": "bc896b9b"
+    "commit": "39054297"
   },
   "rules": [
     {
@@ -13798,6 +13798,60 @@
           "heading": "Traps"
         }
       ]
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.548",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
+      "sentence": "Which figure, for what you need to show",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "heading": "The figures — what sits inside a block, and the closed set of them",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/SKILL.md",
+          "heading": "8. Draw it as skeletons — a mock, with no Figma"
+        }
+      ]
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.549",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
+      "sentence": "Content that has a shape takes the block that shape names, from this table, read down to the first row that fits",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "heading": "Which block a content takes, and how its fence is written",
+      "decision": null,
+      "restated": []
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.550",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-devex/ideate"
+      },
+      "class": "stated in a skill",
+      "sentence": "A page whose sidebar lists other pages is the artifact index, built from `templates/pages/artifact-index-template.html`, and it never has a sidebar of its own",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "heading": "The index of artifacts — one page that opens every other",
+      "decision": null,
+      "restated": []
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.551",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-devex/ideate"
+      },
+      "class": "stated in a skill",
+      "sentence": "A design-language construct page holds its spec in a fold",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "heading": "The surface page preview",
+      "decision": null,
+      "restated": []
     },
     {
       "id": "RULE.LAUNCHPAD.CONTROL_PLANE.001",
@@ -37779,7 +37833,7 @@
         "skill": "spn-surface/design"
       },
       "class": "stated in a skill",
-      "sentence": "`spnutils apps surface render` draws each page of a tree and prints it, in one of two forms",
+      "sentence": "`spnutils apps surface render` draws a tree in an app's design language, and its three choices are always given",
       "chapter": "04-capabilities/02-support/01-surface/11-delivery-library/01-common/02-render.md",
       "heading": "The command",
       "decision": null,
@@ -37798,9 +37852,9 @@
         "skill": "spn-surface/design"
       },
       "class": "stated in a skill",
-      "sentence": "The app object is the design language's row for the app, and no field of it is written by hand in a tree file",
+      "sentence": "The app's row in the design language is the one source of the look, and no field of it is written in a tree file",
       "chapter": "04-capabilities/02-support/01-surface/11-delivery-library/01-common/02-render.md",
-      "heading": "The app object",
+      "heading": "The app",
       "decision": null,
       "restated": [
         {
@@ -37817,7 +37871,7 @@
         "skill": "spn-surface/design"
       },
       "class": "stated in a skill",
-      "sentence": "A tree has `specVersion` at its top, and a version the render does not read is refused",
+      "sentence": "A tree has `treeVersion` at its top, and a version the render does not read is refused",
       "chapter": "04-capabilities/02-support/01-surface/11-delivery-library/01-common/02-render.md",
       "heading": "The tree",
       "decision": null,
@@ -37855,7 +37909,7 @@
         "skill": "spn-surface/design"
       },
       "class": "stated in a skill",
-      "sentence": "The render prints `{ \"pages\": [ { \"html\", \"findings\" } ] }` to standard output, one whole page for each page of the tree",
+      "sentence": "The render prints the HTML of the tree, keyed by mode and then by device, and no document around it",
       "chapter": "04-capabilities/02-support/01-surface/11-delivery-library/01-common/02-render.md",
       "heading": "The output",
       "decision": null,
@@ -37893,7 +37947,7 @@
         "skill": "spn-surface/design"
       },
       "class": "stated in a skill",
-      "sentence": "The design system at the app object's `ds` version is fetched once into the machine's store when no app has it installed",
+      "sentence": "The design system at the version the app pins is fetched once into the machine's store when no app has it installed",
       "chapter": "04-capabilities/02-support/01-surface/11-delivery-library/01-common/02-render.md",
       "heading": "Nothing is kept",
       "decision": null,
@@ -38111,6 +38165,45 @@
           "heading": "The rules this step holds"
         }
       ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.595",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "Each app row has one language stylesheet, written from the row and never by hand",
+      "chapter": "04-capabilities/02-support/01-surface/03-standards-patterns/01-common/05-design-languages.md",
+      "heading": "One source for the platform's look",
+      "decision": null,
+      "restated": []
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.596",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "A choice left out is refused, never defaulted",
+      "chapter": "04-capabilities/02-support/01-surface/11-delivery-library/01-common/02-render.md",
+      "heading": "The command",
+      "decision": null,
+      "restated": []
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.597",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "A page that shows a copy links the design system's stylesheet at the version the output names and the app's language stylesheet, sets `data-mode`, and runs no script",
+      "chapter": "04-capabilities/02-support/01-surface/11-delivery-library/01-common/02-render.md",
+      "heading": "A page that shows a copy",
+      "decision": null,
+      "restated": []
     }
   ]
 }

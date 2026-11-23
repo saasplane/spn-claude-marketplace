@@ -5,7 +5,7 @@
 
 
 
-<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.15.0/sds-docs.css" integrity="sha384-R47poopLRnz65naDQiMbuRZgxiTZtsgOLsiaP10qjWo62gNyH4ezyJy2v/TyMG5J" crossorigin="anonymous">
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.16.0/sds-docs.css" integrity="sha384-tz+de8X8s+AqVXmWW3RluVGMuotIF352yTGkdX4YcMpPrRCH55ZeuiM2ya0cyRo3" crossorigin="anonymous">
 <div class="sds-page">
 <nav class="sds-rail" id="rail">
   <a class="sds-home" href="{{THE ADDRESS OF THE HUB: base, then the path of the hub, ending in .html}}">&larr; {{THE HUB&rsquo;S REPOSITORY NAME}}</a>
@@ -42,6 +42,7 @@
   <div class="sds-section-head"><h2>Words &mdash; blocks that set writing apart</h2></div>
   <p>Each one below is a <strong>block</strong>: it carries a border, a background or a form of its own, so a reader sees it is not the surrounding prose before reading a word of it. Use one when the content is a rule, a set, a comparison, a literal, a shape, or a passage that belongs in its own panel.</p>
   <h3 id="b-prose">PROSE &mdash; the markdown block</h3>
+  <p class="sds-small"><strong>Use when</strong> a passage of markdown has to stand apart from the page&rsquo;s own voice.</p>
   <p>{{A passage that explains. Use it wherever the content is plain writing and no other block fits: <strong>REASONS</strong> is for prose that makes a claim and gives grounds, and this is for prose that simply teaches. It carries its own border, background and text colour, so it reads as a block the page chose rather than as the page's own voice continuing. Everything markdown gives you renders inside it.}}</p>
   <div class="sds-prose">
   <p>{{A paragraph. <strong>Bold</strong> marks a rule or a term, never emphasis; <em>italic</em> is a phrase quoted from somewhere else; <code>inline code</code> is a literal &mdash; a file, a field, a command. A link sits on the words that name what it opens, never on <a href="#">the whole sentence</a>.}}</p>
@@ -56,19 +57,275 @@
   <blockquote><p>{{A sentence worth setting apart &mdash; a rule stated in full, or a line quoted from the source the page is about.}}</p></blockquote>
   </div>
   <h3 id="b-must">MUST &mdash; a rule</h3>
+  <p class="sds-small"><strong>Use when</strong> a rule somebody has to follow needs the check that enforces it.</p>
   <div class="sds-pull">
     <span class="sds-label">Must</span>
     <p><strong>{{The rule, in one sentence.}}</strong> {{Who it binds, what it binds them to, and what happens when it is broken.}}</p>
     <p class="sds-small">Check it with <code>{{command}}</code>.</p>
   </div>
-  <h3 id="b-catalog">CATALOG &mdash; a fixed list, one line each</h3>
-  <p>{{What the set is, and the rule that decides what is in it.}}</p>
-  <div class="sds-tiles">
-    <div class="sds-tile"><h4>{{Thing}}</h4><p>{{one line: what it is for}}</p><p class="sds-small"><code>{{its literal}}</code></p></div>
-    <div class="sds-tile"><h4>{{Thing}}</h4><p>{{&hellip;}}</p><p class="sds-small"><code>{{its literal}}</code></p></div>
-    <div class="sds-tile"><h4>{{Thing}}</h4><p>{{&hellip;}}</p><p class="sds-small"><code>{{its literal}}</code></p></div>
+  <h3 id="b-catalog">CATALOG &mdash; info cards</h3>
+  <p class="sds-small"><strong>Use when</strong> the content is a set of named things with no order between them, or two to four things compared fact by fact.</p>
+  <p>A catalog is a set of named things with no order between them. Each card reads in three levels, as an item cell does: the name, one line saying what it is, then its facts, one <code>Key: value</code> a line. The fence names its layout, and <code>GRID</code> is the default. The three layouts are the design system&rsquo;s own names for a set of records, <code>DSDataTableConfigLayoutType</code>: <code>GRID</code>, <code>LIST</code> and <code>TABLE</code>. Headings and fact keys are words, never sentences.</p>
+  <div class="sds-scroll"><table>
+    <thead><tr><th>Layout</th><th>Arrangement</th><th>Use</th></tr></thead>
+    <tbody>
+      <tr><td><strong><code>GRID</code></strong></td><td>two to four cards across</td><td>a set to browse, each card short: one line and up to three facts</td></tr>
+      <tr><td><strong><code>LIST</code></strong></td><td>one card a row, its name on the left and its facts on the right</td><td>each thing has many facts, or long names, and they are read one thing at a time</td></tr>
+      <tr><td><strong><code>TABLE</code></strong></td><td>the things side by side as columns, their facts lined up by key as rows</td><td>two to four things compared fact by fact</td></tr>
+    </tbody>
+  </table></div>
+
+  <h4 id="b-catalog-grid">GRID layout</h4>
+  <p class="sds-small"><strong>Use when</strong> a reader browses a set and each card is short.</p>
+  <p>The layouts of Surface, as a set to browse. Each card is a widget: its name and line, then its facts as one group, each label above its value, and every row lined up across the cards. The fence:</p>
+  <pre data-lang="text">```catalog
+RAIL | a sidebar that opens and shuts
+  Navigation: at the side, several levels deep
+  Takes: DASHBOARD; RESOURCES for guides and API docs
+DOCK | a top bar over a column beside the page
+  Navigation: top and side
+  Takes: a person's or a thing's settings
+```</pre>
+  <div class="sds-tiles" data-layout="GRID">
+    <div class="sds-tile" data-facts="2"><h4><code>RAIL</code></h4><p class="sds-tile-line">a sidebar that opens and shuts</p>
+      <dl class="sds-tile-facts"><div><dt>Navigation</dt><dd>at the side, several levels deep</dd></div><div><dt>Takes</dt><dd>DASHBOARD; RESOURCES for guides and API docs</dd></div></dl></div>
+    <div class="sds-tile" data-facts="2"><h4><code>DOCK</code></h4><p class="sds-tile-line">a top bar over a column beside the page</p>
+      <dl class="sds-tile-facts"><div><dt>Navigation</dt><dd>top and side</dd></div><div><dt>Takes</dt><dd>a person&rsquo;s or a thing&rsquo;s settings</dd></div></dl></div>
+    <div class="sds-tile" data-facts="2"><h4><code>TOPNAV</code></h4><p class="sds-tile-line">a bar across the top</p>
+      <dl class="sds-tile-facts"><div><dt>Navigation</dt><dd>one bar, the few entries that fit</dd></div><div><dt>Takes</dt><dd>MARKETING, PORTAL, a help centre</dd></div></dl></div>
+    <div class="sds-tile" data-facts="2"><h4><code>CANVAS</code></h4><p class="sds-tile-line">the body alone</p>
+      <dl class="sds-tile-facts"><div><dt>Navigation</dt><dd>none</dd></div><div><dt>Takes</dt><dd>sign-in, an app that cannot start, a landing page, a tool that fills the window</dd></div></dl></div>
   </div>
-  <h3 id="b-comparison">COMPARISON &mdash; things side by side</h3>
+
+  <h4 id="b-catalog-list">LIST layout</h4>
+  <p class="sds-small"><strong>Use when</strong> each thing has many facts, or long names, and a reader takes them one at a time.</p>
+  <p>The surface types, read one at a time. In the fence, a card&rsquo;s facts go on the lines under it, indented:</p>
+  <pre data-lang="text">```catalog layout=LIST
+MARKETING · Visitor | a site for someone deciding whether the product is for them
+  Layouts: TOPNAV for the site · CANVAS for a landing page that stands alone
+  Standard pages: Text page, Not found
+```</pre>
+  <div class="sds-tiles" data-layout="LIST" data-media="MARK">
+    <div class="sds-tile"><span class="sds-tile-media" data-media="MARK"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg></span>
+      <div class="sds-tile-body"><h4>MARKETING &middot; Visitor</h4><p>a site for someone deciding whether the product is for them</p>
+      <dl class="sds-tile-facts"><div><dt>Layouts</dt><dd><code>TOPNAV</code> for the site &middot; <code>CANVAS</code> for a landing page that stands alone</dd></div><div><dt>Standard pages</dt><dd>Text page, Not found</dd></div></dl></div></div>
+    <div class="sds-tile"><span class="sds-tile-media" data-media="MARK"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M10 4v4"/><path d="M2 8h20"/><path d="M6 4v4"/></svg></span>
+      <div class="sds-tile-body"><h4>DASHBOARD &middot; Team</h4><p>an app a team uses as their job; admin and console apps are dashboards</p>
+      <dl class="sds-tile-facts"><div><dt>Layouts</dt><dd><code>RAIL</code> for the app &middot; <code>DOCK</code> for settings &middot; <code>CANVAS</code> for sign-in, an app that cannot start, a tool</dd></div><div><dt>Standard pages</dt><dd>Not found, No access</dd></div></dl></div></div>
+  </div>
+
+  <h4 id="b-catalog-table">TABLE layout</h4>
+  <p class="sds-small"><strong>Use when</strong> two to four things are compared fact by fact.</p>
+  <p>The surface types, compared fact by fact. The same fence with <code>layout=TABLE</code>: the cards become columns, and each fact key becomes a row.</p>
+  <div class="sds-scroll"><table class="sds-catalog-table">
+    <thead><tr><th></th>
+      <th><h4>MARKETING &middot; Visitor</h4><p>a site for someone deciding</p></th>
+      <th><h4>RESOURCES &middot; Learner</h4><p>a site for someone learning</p></th>
+      <th><h4>DASHBOARD &middot; Team</h4><p>an app a team works in</p></th>
+      <th><h4>PORTAL &middot; Everyday users</h4><p>an app people use for themselves</p></th></tr></thead>
+    <tbody>
+      <tr><th>Layouts</th><td><code>TOPNAV</code> for the site; <code>CANVAS</code> for a landing page</td><td><code>RAIL</code> for guides and API docs, kept open; <code>TOPNAV</code> for a help centre</td><td><code>RAIL</code> for the app; <code>DOCK</code> for settings; <code>CANVAS</code> for sign-in, an app that cannot start, a tool</td><td><code>TOPNAV</code> for the app; <code>DOCK</code> for an account; <code>CANVAS</code> for sign-in, an app that cannot start, a tool</td></tr>
+      <tr><th>Sections</th><td>every site section</td><td>ten sections that serve a Learner, and Groups and their items</td><td>every app pattern</td><td>the eight app patterns that serve Everyday users</td></tr>
+      <tr><th>Standard pages</th><td>Text page, Not found</td><td>Text page, Not found</td><td>Not found, No access</td><td>Not found, No access</td></tr>
+    </tbody>
+  </table></div>
+
+  <h4 id="b-catalog-media">Media variants</h4>
+  <p class="sds-small"><strong>Use when</strong> an item is better known by a small picture, an icon or initials than by its name alone.</p>
+  <p>An item may carry media, named in the design system&rsquo;s own terms, so a catalog reads as <code>DSItem</code> and <code>DSFeature</code> draw. The fence names one media for the whole catalog, and every item takes it, or none does. An item names its icon by <code>DSIconType</code>, its avatar by its initials, and its picture by a drawing.</p>
+  <div class="sds-scroll"><table>
+    <thead><tr><th>Media</th><th>Term</th><th>Draws</th><th>Use</th></tr></thead>
+    <tbody>
+      <tr><td><strong>None</strong></td><td>&mdash;</td><td>the title and the description alone</td><td>the names say enough, as in the GRID above</td></tr>
+      <tr><td><strong><code>ICON</code></strong></td><td><code>DSItemMediaType.ICON</code></td><td>a bare icon at the item&rsquo;s start</td><td>each item is a line a person reads</td></tr>
+      <tr><td><strong><code>MARK</code></strong></td><td><code>DSItemMediaType.MARK</code></td><td>an icon on a tinted square</td><td>each item stands for a thing of its own</td></tr>
+      <tr><td><strong><code>AVATAR</code></strong></td><td><code>DSItemMediaType.AVATAR</code> &middot; <code>AVATAR_GROUP</code></td><td>initials in a circle, or several overlapping</td><td>each item is a person, a kind of person or a team</td></tr>
+      <tr><td><strong><code>MEDIA_TOP</code></strong></td><td><code>DSFeatureType.MEDIA_TOP</code></td><td>a picture over the words, the width of the card</td><td>each item is told best by its shape, such as a layout</td></tr>
+    </tbody>
+  </table></div>
+
+  <h4 id="b-catalog-icon">ICON media</h4>
+  <p>The pages every surface has, each a line a person reads:</p>
+  <pre data-lang="text">```catalog media=ICON
+Not found | an address that leads nowhere | icon: FILE_X
+  Types: all four
+  Layout: the surface's own, its navigation kept
+```</pre>
+  <div class="sds-tiles" data-layout="GRID" data-media="ICON">
+    <div class="sds-tile" data-facts="2"><div class="sds-tile-head"><span class="sds-tile-media" data-media="ICON"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"/><path d="M14 2v5a1 1 0 0 0 1 1h5"/><path d="m14.5 12.5-5 5"/><path d="m9.5 12.5 5 5"/></svg></span><div><h4>Not found</h4><p>an address that leads nowhere</p></div></div>
+      <dl class="sds-tile-facts"><div><dt>Types</dt><dd>all four</dd></div><div><dt>Layout</dt><dd>the surface&rsquo;s own, its navigation kept</dd></div></dl></div>
+    <div class="sds-tile" data-facts="2"><div class="sds-tile-head"><span class="sds-tile-media" data-media="ICON"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></svg></span><div><h4>No access</h4><p>a page the person may not open</p></div></div>
+      <dl class="sds-tile-facts"><div><dt>Types</dt><dd>DASHBOARD, PORTAL</dd></div><div><dt>Layout</dt><dd>the app&rsquo;s own, its navigation kept</dd></div></dl></div>
+  </div>
+
+  <h4 id="b-catalog-mark">MARK media</h4>
+  <p>The surface types, each a thing of its own:</p>
+  <pre data-lang="text">```catalog media=MARK
+MARKETING | a site for someone deciding | icon: GLOBE
+  Category: SITE
+  For: a Visitor
+```</pre>
+  <div class="sds-tiles" data-layout="GRID" data-media="MARK">
+    <div class="sds-tile" data-facts="2"><div class="sds-tile-head"><span class="sds-tile-media" data-media="MARK"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg></span><div><h4>MARKETING</h4><p>a site for someone deciding</p></div></div>
+      <dl class="sds-tile-facts"><div><dt>Category</dt><dd>SITE</dd></div><div><dt>For</dt><dd>a Visitor</dd></div></dl></div>
+    <div class="sds-tile" data-facts="2"><div class="sds-tile-head"><span class="sds-tile-media" data-media="MARK"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M10 4v4"/><path d="M2 8h20"/><path d="M6 4v4"/></svg></span><div><h4>DASHBOARD</h4><p>an app a team works in</p></div></div>
+      <dl class="sds-tile-facts"><div><dt>Category</dt><dd>APP</dd></div><div><dt>For</dt><dd>a Team</dd></div></dl></div>
+  </div>
+
+  <h4 id="b-catalog-avatar">AVATAR media</h4>
+  <p>The kinds of person, each drawn by its initial. <code>AVATAR_GROUP</code> draws several overlapping, for a team named by its people:</p>
+  <pre data-lang="text">```catalog media=AVATAR
+Team | who use the app as their job | avatar: T
+  Frequency: every day or every week
+  Device: a desktop; a phone for a quick check
+```</pre>
+  <div class="sds-tiles" data-layout="GRID" data-media="AVATAR">
+    <div class="sds-tile" data-facts="2"><div class="sds-tile-head"><span class="sds-tile-media" data-media="AVATAR">T</span><div><h4>Team</h4><p>who use the app as their job</p></div></div>
+      <dl class="sds-tile-facts"><div><dt>Frequency</dt><dd>every day or every week</dd></div><div><dt>Device</dt><dd>a desktop; a phone for a quick check</dd></div></dl></div>
+    <div class="sds-tile" data-facts="2"><div class="sds-tile-head"><span class="sds-tile-media" data-media="AVATAR">V</span><div><h4>Visitor</h4><p>not signed in, deciding</p></div></div>
+      <dl class="sds-tile-facts"><div><dt>Frequency</dt><dd>once, or a few times</dd></div><div><dt>Device</dt><dd>any; often a phone, from a link</dd></div></dl></div>
+  </div>
+
+  <h4 id="b-catalog-media-top">MEDIA_TOP picture</h4>
+  <p>The layouts of Surface, each told by its shape. The picture is a drawing the item names:</p>
+  <pre data-lang="text">```catalog media=MEDIA_TOP
+RAIL | a sidebar that opens and shuts | picture: layout-rail
+  Navigation: at the side, several levels deep
+  Takes: DASHBOARD; RESOURCES for guides and API docs
+```</pre>
+  <div class="sds-tiles" data-layout="GRID" data-media="MEDIA_TOP">
+    <div class="sds-tile" data-facts="2"><div class="sds-tile-picture"><svg class="sds-wire" viewBox="0 0 160 96" aria-hidden="true"><rect class="frame" x="0.5" y="0.5" width="159" height="95" rx="4"/><rect class="nav" x="1" y="1" width="34" height="94" rx="3"/><rect class="line" x="8" y="10" width="20" height="4" rx="2"/><rect class="line" x="8" y="22" width="16" height="3" rx="1.5"/><rect class="line" x="8" y="30" width="18" height="3" rx="1.5"/><rect class="line" x="12" y="38" width="14" height="3" rx="1.5"/><rect class="line" x="12" y="46" width="12" height="3" rx="1.5"/><rect class="line" x="46" y="12" width="60" height="5" rx="2"/><rect class="box" x="46" y="26" width="104" height="60" rx="3"/></svg></div>
+      <div class="sds-tile-head"><div><h4><code>RAIL</code></h4><p>a sidebar that opens and shuts</p></div></div>
+      <dl class="sds-tile-facts"><div><dt>Navigation</dt><dd>at the side, several levels deep</dd></div><div><dt>Takes</dt><dd>DASHBOARD; RESOURCES for guides and API docs</dd></div></dl></div>
+    <div class="sds-tile" data-facts="2"><div class="sds-tile-picture"><svg class="sds-wire" viewBox="0 0 160 96" aria-hidden="true"><rect class="frame" x="0.5" y="0.5" width="159" height="95" rx="4"/><rect class="box" x="50" y="22" width="60" height="52" rx="3"/><rect class="line" x="60" y="32" width="40" height="4" rx="2"/><rect class="line" x="60" y="44" width="40" height="6" rx="2"/><rect class="nav" x="60" y="58" width="40" height="8" rx="2"/></svg></div>
+      <div class="sds-tile-head"><div><h4><code>CANVAS</code></h4><p>the body alone</p></div></div>
+      <dl class="sds-tile-facts"><div><dt>Navigation</dt><dd>none</dd></div><div><dt>Takes</dt><dd>sign-in, an app that cannot start, a landing page, a tool that fills the window</dd></div></dl></div>
+  </div>
+
+  <h3 id="b-tabs">TABS &mdash; several forms</h3>
+  <p class="sds-small"><strong>Use when</strong> a reader needs one of several forms of one thing and skips the rest.</p>
+  <p>Tabs show one thing in several forms, one at a time: the same file for each surface type, a value today and proposed, a command run locally or in the cloud. A tab never hides something every reader must read; that is a sequence or a paragraph. The looks are the design system&rsquo;s own, <code>DSTabsType</code>.</p>
+  <div class="sds-scroll"><table>
+    <thead><tr><th>Look</th><th>Term</th><th>Draws</th><th>Use</th><th>Place</th></tr></thead>
+    <tbody>
+      <tr><td><strong><code>LINE</code></strong></td><td><code>DSTabsType.LINE</code></td><td>the open tab underlined over a hairline</td><td>one block in up to six forms the reader picks once and reads</td><td>at the start, directly above the block</td></tr>
+      <tr><td><strong><code>SWITCH</code></strong></td><td><code>DSTabsType.SWITCH</code></td><td>a small bar with a pill on the open tab</td><td>two or three short views of the same content, flipped back and forth, such as today and proposed</td><td>at the start, small, beside or just above the block</td></tr>
+      <tr><td><strong><code>PILL</code></strong></td><td><code>DSTabsType.PILL</code></td><td>a floating rounded bar, the open tab filled</td><td>whole alternatives that change the rest of a part for this reader, such as local or cloud</td><td>at the top of the part, before everything it changes</td></tr>
+    </tbody>
+  </table></div>
+  <p>Two to six tabs, each label one or two words, one block in each panel, and tabs never nest. The fence takes tildes, so a code fence fits inside it, and a <code>---</code> line names each panel. Tabs are never for forms a reader compares, which stand side by side in a <code>CATALOG</code> as <code>TABLE</code>.</p>
+
+  <h4 id="b-tabs-line">LINE tabs</h4>
+  <p>Surface&rsquo;s spec, its layouts by job for each surface type:</p>
+  <pre data-lang="text">~~~tabs look=LINE
+--- MARKETING
+```json
+{ "TOPNAV": "the site", … }
+```
+--- RESOURCES
+```json
+{ "RAIL": "guides and API docs, …", … }
+```
+~~~</pre>
+  <div class="sds-tabset" data-type="LINE">
+    <div class="sds-tabset-bar" role="tablist" aria-label="Surface type">
+      <button type="button" role="tab" id="t-line-mk" aria-controls="p-line-mk" aria-selected="true">MARKETING</button>
+      <button type="button" role="tab" id="t-line-rs" aria-controls="p-line-rs" aria-selected="false">RESOURCES</button>
+    </div>
+    <div class="sds-tabset-panel" role="tabpanel" id="p-line-mk" aria-labelledby="t-line-mk"><pre data-lang="json">"layouts": { "byJob": { "value": {
+  "TOPNAV": "the site",
+  "CANVAS": "a landing page that stands alone, with no site navigation and a short footer",
+  "NOT_FOUND": "the site's own layout, its navigation kept"
+} } }</pre></div>
+    <div class="sds-tabset-panel" role="tabpanel" id="p-line-rs" aria-labelledby="t-line-rs"><pre data-lang="json">"layouts": { "byJob": { "value": {
+  "RAIL": "guides and API docs, whose pages run in groups of several levels",
+  "TOPNAV": "a help centre, shallow and started from a search",
+  "NOT_FOUND": "the site's own layout, its navigation kept"
+} } }</pre></div>
+  </div>
+
+  <h4 id="b-tabs-switch">SWITCH tabs</h4>
+  <p>Two ways to show one thing: the done badge&rsquo;s colour today, and as proposed.</p>
+  <pre data-lang="text">~~~tabs look=SWITCH
+--- Today
+```css
+--sds-status-done: oklch(0.735386 0.13145 144.907);
+```
+--- Proposed
+```css
+--sds-status-done: var(--sds-success);
+```
+~~~</pre>
+  <div class="sds-tabset" data-type="SWITCH">
+    <div class="sds-tabset-bar" role="tablist" aria-label="Version">
+      <button type="button" role="tab" id="t-sw-today" aria-controls="p-sw-today" aria-selected="true">Today</button>
+      <button type="button" role="tab" id="t-sw-prop" aria-controls="p-sw-prop" aria-selected="false">Proposed</button>
+    </div>
+    <div class="sds-tabset-panel" role="tabpanel" id="p-sw-today" aria-labelledby="t-sw-today"><pre data-lang="css">--sds-status-done: oklch(0.735386 0.13145 144.907);
+--sds-status-done-soft: oklch(0.767314 0.115667 145.001 / 0.18);</pre></div>
+    <div class="sds-tabset-panel" role="tabpanel" id="p-sw-prop" aria-labelledby="t-sw-prop"><pre data-lang="css">--sds-status-done: var(--sds-success);
+--sds-status-done-soft: var(--sds-success-soft);</pre></div>
+  </div>
+
+  <h4 id="b-tabs-pill">PILL tabs</h4>
+  <p>Whole alternatives for different readers: standing an environment up on a laptop, or in the cloud.</p>
+  <pre data-lang="text">~~~tabs look=PILL
+--- Local
+spnutils infra environment up &lt;spc&gt; &lt;env&gt; --plan
+--- Cloud
+spnutils infra environment up &lt;spc&gt; &lt;env&gt; --cloud --plan
+~~~</pre>
+  <div class="sds-tabset" data-type="PILL">
+    <div class="sds-tabset-bar" role="tablist" aria-label="Where it runs">
+      <button type="button" role="tab" id="t-pill-local" aria-controls="p-pill-local" aria-selected="true">Local</button>
+      <button type="button" role="tab" id="t-pill-cloud" aria-controls="p-pill-cloud" aria-selected="false">Cloud</button>
+    </div>
+    <div class="sds-tabset-panel" role="tabpanel" id="p-pill-local" aria-labelledby="t-pill-local"><pre data-lang="bash">spnutils infra environment up &lt;spc&gt; &lt;env&gt; --plan</pre><p>Local is the default, on Docker from the pinned declarations. Read the plan, then run it again with <code>--apply</code>.</p></div>
+    <div class="sds-tabset-panel" role="tabpanel" id="p-pill-cloud" aria-labelledby="t-pill-cloud"><pre data-lang="bash">spnutils infra environment up &lt;spc&gt; &lt;env&gt; --cloud --plan</pre><p><code>--cloud</code> is never implied. Read the plan before any <code>--apply</code>.</p></div>
+  </div>
+
+  <h3 id="b-groups">GROUP PANELS &mdash; many groups</h3>
+  <p class="sds-small"><strong>Use when</strong> more than six things fall into the construct&rsquo;s own groups, and a reader browses them.</p>
+  <p>A row holds no more than six tabs, so more than six forms are grouped in the construct&rsquo;s own groups, never in groups made up for the page. Each group is a panel: its name and count in its head, its members in its body, and a row of links above the panels jumps to each. Every group takes the same panel, whatever its size. A panel holds what a reader does with its members:</p>
+  <div class="sds-scroll"><table>
+    <thead><tr><th>Members</th><th>Body</th></tr></thead>
+    <tbody>
+      <tr><td>a set to browse, a line each</td><td>a <code>CATALOG</code> grid, all in view</td></tr>
+      <tr><td>forms a reader compares</td><td>a <code>CATALOG</code> grid with their pictures, all in view, never tabs</td></tr>
+      <tr><td>alternatives where a reader needs one</td><td>tabs, at the start of the panel, above the one block they change</td></tr>
+    </tbody>
+  </table></div>
+  <pre data-lang="text">~~~group Actions
+```catalog
+DSButton | a button or a link, with a loading state that keeps its size
+DSToolbar | a toolbar, with its items, groups and separators
+```
+~~~</pre>
+  <nav class="sds-group-jumps" aria-label="Groups"><a class="sds-group-jump" href="#g-actions">Actions <span>2</span></a> <a class="sds-group-jump" href="#g-feedback">Feedback <span>3</span></a> <a class="sds-group-jump" href="#g-layouts">Layouts <span>2</span></a></nav>
+<section class="sds-group" id="g-actions" aria-labelledby="g-actions-title">
+  <div class="sds-group-head"><h5 id="g-actions-title">Actions</h5><span class="sds-group-count">2 units</span></div>
+  <div class="sds-group-body"><div class="sds-tiles sds-tiles-compact" data-layout="GRID"><div class="sds-tile"><h4><code>DSButton</code></h4><p>a button or a link, with a loading state that keeps its size</p></div><div class="sds-tile"><h4><code>DSToolbar</code></h4><p>a toolbar, with its items, groups and separators</p></div></div></div>
+</section>
+<section class="sds-group" id="g-feedback" aria-labelledby="g-feedback-title">
+  <div class="sds-group-head"><h5 id="g-feedback-title">Feedback</h5><span class="sds-group-count">3 units</span></div>
+  <div class="sds-group-body"><div class="sds-tiles sds-tiles-compact" data-layout="GRID"><div class="sds-tile"><h4><code>DSAlert</code></h4><p>a message in the page</p></div><div class="sds-tile"><h4><code>DSEmpty</code></h4><p>what an empty place says</p></div><div class="sds-tile"><h4><code>DSSpinner</code></h4><p>a spinner while loading</p></div></div></div>
+</section>
+<section class="sds-group" id="g-layouts" aria-labelledby="g-layouts-title">
+  <div class="sds-group-head"><h5 id="g-layouts-title">Layouts</h5><span class="sds-group-count">2 units</span></div>
+  <div class="sds-group-body"><div class="sds-tiles sds-tiles-compact" data-layout="GRID"><div class="sds-tile"><h4><code>DSLayout</code></h4><p>the frame of a page</p></div><div class="sds-tile"><h4><code>DSSiteLayout</code></h4><p>the wrapper of a site&rsquo;s page</p></div></div></div>
+</section>
+
+  <h3 id="b-fold">FOLD &mdash; extra detail</h3>
+  <p class="sds-small"><strong>Use when</strong> some readers want detail the rest can skip, or a file the page explains has no need to be shown whole.</p>
+  <p>A fold is a <code>details</code> with its summary. It keeps the page short and still shows on a search. What every reader must read never goes in one. A file the page explains is a fold with an empty body, <code>file=&lt;path&gt; fold</code>, and the writer reads the file&rsquo;s own words.</p>
+  <details>
+    <summary>{{What the detail is, in a few words}}</summary>
+    <p>{{The detail: the full table, the long spec or the edge cases that only some readers need.}}</p>
+  </details>
+  <pre data-lang="text">```ts file=packages/support-web-ds-ts/src/ui/core/theme.ts fold
+```</pre>
+  <h3 id="b-comparison">COMPARISON</h3>
+  <p class="sds-small"><strong>Use when</strong> a wide comparison of attributes, or two states of one thing, reads down a column. Things side by side.</p>
   <div class="sds-scroll"><table>
     <thead><tr><th></th><th>{{A reader's question}}</th><th>{{A reader's question}}</th></tr></thead>
     <tbody><tr><td><strong>{{Thing}}</strong></td><td>{{&hellip;}}</td><td>{{&hellip;}}</td></tr><tr><td><strong>{{Thing}}</strong></td><td>{{&hellip;}}</td><td>{{&hellip;}}</td></tr></tbody>
@@ -78,13 +335,15 @@
 <section id="literals" data-block="example">
   <div class="sds-section-head"><h2>Literals &mdash; code, trees and changes, read character by character</h2></div>
   <p>{{A literal is read character by character, so it sits in a block of its own. The page's file holds the code plain, and the shared script colours it when the page opens.}}</p>
-  <h3 id="b-example">EXAMPLE &mdash; faster to see, with a CODE figure</h3>
+  <h3 id="b-example">EXAMPLE &mdash; a CODE figure</h3>
+  <p class="sds-small"><strong>Use when</strong> the reader understands faster by seeing the real thing.</p>
   <p>{{One sentence saying what you are looking at.}}</p>
   <pre data-lang="ts">export enum {{SPContractType}} {
   {{MEMBER}} = '{{member}}',   // what this member means
 }</pre>
   <p>{{One sentence saying what to notice.}}</p>
-  <h3 id="b-code">CODE &mdash; one block per language the shared script colours</h3>
+  <h3 id="b-code">CODE &mdash; by language</h3>
+  <p class="sds-small"><strong>Use when</strong> the content is a literal: a contract, a manifest, a command or its output. One block for each language the shared script colours.</p>
   <p>{{Tag every block with its language, as <code>data-lang</code> on the <code>pre</code>. The file holds plain code. The shared script, <code>sds-docs.js</code>, reads the tag when the page opens and colours the block, so nobody writes a colour into a page. A block with no tag is never coloured.}}</p>
   <p class="sds-small">ts &mdash; a contract as it is declared, a comment per member</p>
   <pre data-lang="ts">export interface SPRepo {
@@ -121,7 +380,8 @@ deploy:
   <p class="sds-small">no language &mdash; output, a path, a name pattern: nothing to colour</p>
   <pre>{{org}}-{{spc}}-{{env}}-{{region}}
 &rarr; spn-dmo-live-in</pre>
-  <h3 id="b-tree">TREE &mdash; a hierarchy, as a text block</h3>
+  <h3 id="b-tree">TREE &mdash; a text hierarchy</h3>
+  <p class="sds-small"><strong>Use when</strong> a hierarchy is easier read than drawn, such as a folder layout.</p>
   <pre data-lang="tree">{{root}}/
 ├── {{child}}/        {{what it holds}}
 │   └── {{leaf}}      {{what it is}}
@@ -132,14 +392,16 @@ deploy:
 │   ├── {{file}}      new      {{what the file is}}
 │   └── {{file}}      changed  {{what the change is}}
 └── {{folder}}/       changed  {{what changes in the files under it}}</pre>
-  <h3 id="b-diff">DIFF &mdash; what a file says today and what it will say (approach pages only)</h3>
+  <h3 id="b-diff">DIFF &mdash; today and after</h3>
+  <p class="sds-small"><strong>Use when</strong> an approach or a preview proposes a change to a file the reader can open, showing what it says today and what it will say. Approach pages only.</p>
   <p class="sds-small">a diff always shows one file, so it stands in a FILE frame</p>
   <figure class="sds-file">
     <figcaption><span class="sds-file-path">{{path of the file, from its repository&rsquo;s root}}</span><span class="sds-file-lang">diff</span></figcaption>
     <pre data-lang="diff">- what the file says today
 + what it will say</pre>
   </figure>
-  <h3 id="b-file">FILE &mdash; a code block that shows one file, framed with its path as the title</h3>
+  <h3 id="b-file">FILE &mdash; one file</h3>
+  <p class="sds-small"><strong>Use when</strong> a block of code is one file, or a part of one; its path is the frame&rsquo;s title.</p>
   <p>{{Where a block of code is one file, or a part of one: a diff of a file, the declaration a file holds, a file&rsquo;s first lines. The path stands in the frame&rsquo;s title, from the repository&rsquo;s root; the language stands as a badge at its end; the code stays plain in the file and the shared script colours it. A block that is no one file (a command, a sample of output, a shape written out) stays a CODE block, with no frame.}}</p>
   <figure class="sds-file">
     <figcaption><span class="sds-file-path">{{packages/support-web-ds-ts/src/ui/core/theme.ts}}</span><span class="sds-file-lang">ts</span></figcaption>
@@ -148,7 +410,8 @@ deploy:
 }</pre>
   </figure>
   <p class="sds-small">the markup: a <code>figure.sds-file</code> holding a <code>figcaption</code> (its <code>.sds-file-path</code> and its <code>.sds-file-lang</code>) and the <code>pre</code></p>
-  <h3 id="b-command">COMMAND &mdash; something the reader runs</h3>
+  <h3 id="b-command">COMMAND &mdash; a run</h3>
+  <p class="sds-small"><strong>Use when</strong> the reader runs a command in a terminal or asks the agent for a step.</p>
   <p>{{What running it does, in a sentence. One command a line; a note after two spaces and a hash stays quiet and is never copied; a script stays a CODE block.}}</p>
   <pre data-lang="sh">{{the command the reader types}}
 {{the next command}}  # {{what to check}}</pre>
@@ -160,6 +423,7 @@ deploy:
   <div class="sds-section-head"><h2>Figures &mdash; a shape the reader must see</h2></div>
   <p>{{Every figure has a sentence before it saying what you are looking at, and a caption after it saying what to notice. Choose the kind by what the reader has to see.}}</p>
   <h3 id="b-sequence">SEQUENCE &mdash; steps in order</h3>
+  <p class="sds-small"><strong>Use when</strong> steps run in order, and the path never turns.</p>
   <p>{{What you are looking at.}}</p>
 <figure class="dl-figure">
 <div class="dl-frame">
@@ -183,7 +447,8 @@ deploy:
     <li><strong>{{Step}}</strong> &mdash; {{what happens, what must be true before it, what it leaves behind}}</li>
     <li><strong>{{Step}}</strong> &mdash; {{&hellip;}}</li>
   </ol>
-  <h3 id="b-map">MAP &mdash; the parts of one thing</h3>
+  <h3 id="b-map">MAP &mdash; one thing</h3>
+  <p class="sds-small"><strong>Use when</strong> ideas connect: the parts of one thing and how they touch (a <code>dg</code> diagram).</p>
   <p>{{What you are looking at: the whole, then its parts and what flows between them.}}</p>
 <figure class="dl-figure">
 <div class="dl-frame">
@@ -208,7 +473,8 @@ deploy:
 </div>
 <figcaption>{{What to notice: which part everything else reads, and where the boundary is.}}</figcaption>
 </figure>
-  <h3 id="b-seqdiagram">SEQUENCE figure &mdash; who speaks to whom</h3>
+  <h3 id="b-seqdiagram">SEQUENCE figure &mdash; who speaks</h3>
+  <p class="sds-small"><strong>Use when</strong> a process has several participants and who speaks to whom is the thing to see.</p>
   <p>{{What you are looking at: the participants, and the order they speak in. Use this instead of a flow whenever more than one party acts and <em>who</em> acted is the thing to see.}}</p>
 <figure class="dl-figure">
 <div class="dl-frame">
@@ -234,7 +500,8 @@ deploy:
 </div>
 <figcaption>{{What to notice: which party never speaks to which, and where a reply crosses a boundary.}}</figcaption>
 </figure>
-  <h3 id="b-entities">ENTITIES figure &mdash; what relates to what</h3>
+  <h3 id="b-entities">ENTITIES figure &mdash; relations</h3>
+  <p class="sds-small"><strong>Use when</strong> the content is data and what relates to what is the thing to see.</p>
   <p>{{What you are looking at: the subject at the centre, what points at it, and what it points at. Every line carries its cardinality.}}</p>
 <figure class="dl-figure">
 <div class="dl-frame">
@@ -264,7 +531,8 @@ deploy:
 </div>
 <figcaption>{{What to notice: which way each relation points, and which of them may be absent.}}</figcaption>
 </figure>
-  <h3 id="b-system">SYSTEM &mdash; the architecture of a thing you build</h3>
+  <h3 id="b-system">SYSTEM &mdash; an architecture</h3>
+  <p class="sds-small"><strong>Use when</strong> the content is the architecture of a thing you build: a module, an app or an estate.</p>
   <p>{{What you are looking at: one bounded thing, its layers in the direction a call travels, and what it talks to outside its boundary. Use it for a server module, a web module, an app or an estate package &mdash; they are the same picture, and drawing them alike is the point.}}</p>
   <div class="sds-pull">
     <span class="sds-label">The three rules</span>
@@ -540,7 +808,8 @@ deploy:
 </div>
 <figcaption>{{What to notice: the third drawing of the same figure. The public internet arrives through dns, an operator arrives at the bastion, a peered account arrives at the peering link. Compute is what reaches outward — the secret store, the managed database, the bucket — and the workers reach one thing only. Server, web and estate are one shape, which is the whole reason this kind is not three kinds.}}</figcaption>
 </figure>
-  <h3 id="b-flowchart">FLOWCHART &mdash; a path somebody takes, in the shapes a flowchart has</h3>
+  <h3 id="b-flowchart">FLOWCHART &mdash; a path</h3>
+  <p class="sds-small"><strong>Use when</strong> a path somebody takes turns, and each branch needs its answer, in the shapes a flowchart has.</p>
   <p>{{What you are looking at: where the path starts, each step, and the points where it branches. Use this rather than a <strong>MAP</strong> whenever the content is a path rather than a set of parts &mdash; a MAP answers <em>what is this made of</em>, a flowchart answers <em>what happens, and where does it turn</em>. The shape carries the meaning, so a reader reads the picture before the labels.}}</p>
   <figure class="dl-figure">
 <div class="dl-frame">
@@ -590,7 +859,8 @@ deploy:
       <tr><td><strong>On-page connector</strong></td><td>the path continues from the matching letter, where a line would cross the page</td><td>a small circle with a letter in it</td></tr>
     </tbody>
   </table></div>
-  <h3 id="b-architecture">MAP figure, at its hardest &mdash; a cloud estate</h3>
+  <h3 id="b-architecture">MAP &mdash; a cloud estate</h3>
+  <p class="sds-small"><strong>Use when</strong> a map holds nested groups and many edges, at its hardest, as an estate does.</p>
   <p>{{What you are looking at: the accounts an organization holds, then one of them opened up. This is still a MAP &mdash; containers holding boxes &mdash; and it holds the nesting rule: the account holds the network, the network holds the subnets, and nothing goes deeper. A third level is the first thing you will want and the first thing to cut.}}</p>
   <figure class="dl-figure">
 <div class="dl-frame">
@@ -640,7 +910,27 @@ deploy:
 </div>
 <figcaption>{{What to notice: nothing reaches the data subnet from outside, and every account is the same shape at a different size.}}</figcaption>
 </figure>
-  <h3 id="b-skeleton">SKELETON &mdash; a mock of a layout</h3>
+  <h3 id="b-surface">SURFACE &mdash; units and pages</h3>
+  <p class="sds-small"><strong>Use when</strong> the content is a unit the design system builds, or one whole page of a product.</p>
+  <p>A docs page never draws a surface by hand. A unit, a page and its structure are all drawn by <code>spnutils apps surface render</code> from one tree of the design system&rsquo;s units, in the look of a design language, so a drawing can never disagree with the units it shows.</p>
+  <div class="sds-scroll"><table>
+    <thead><tr><th>Show</th><th>Block</th><th>Drawn by</th></tr></thead>
+    <tbody>
+      <tr><td>a unit, as it looks</td><td><code>UNIT</code>, a fenced tree, framed in light and dark: inline when small, framed when window-sized</td><td>the render, in the language&rsquo;s look</td></tr>
+      <tr><td>a whole page or a flow</td><td>a sample link to its surface page preview</td><td>the render, written to the preview&rsquo;s copy</td></tr>
+      <tr><td>several pages</td><td>a samples index, made from the artifact index template, each entry a surface page preview</td><td>the render, one preview each</td></tr>
+    </tbody>
+  </table></div>
+  <h4 id="b-unit">UNIT &mdash; a rendered unit</h4>
+  <p class="sds-small"><strong>Use when</strong> the reader should see a unit of the design system as it draws, light and dark.</p>
+  <p>The page holds the tree, in a fence tagged <code>unit</code>. <code>docs page write</code> sends it to the render and sets the result in a frame, the unit&rsquo;s name as its title, light and dark side by side, the tree below it as code. A tree the render refuses stops the write. The frame is the writer&rsquo;s output, so a template shows the fence:</p>
+  <pre data-lang="text">```unit
+{ "specVersion": 1,
+  "sections": [ { "unit": "DSFeature", "props": { "pageLevel": "PAGE", "type": "BACKDROP", "title": "A title" } } ] }
+```</pre>
+
+  <h3 id="b-skeleton">SKELETON &mdash; planned units only</h3>
+  <p class="sds-small"><strong>Use when</strong> a unit, a variant or a page shape is not built yet, as a mock of a layout. A skeleton is marked planned; once the design system builds the unit the page writer flags it, and it becomes a <code>unit</code>.</p>
   <p>{{What you are looking at: the thing&rsquo;s outer frame, and where each of its places sits.}} A skeleton is a preview: each place reads by its own mark, never by a tint — a dotted boundary with a name for a component, a part or a slot; a background for raised, a solid line for bordered, neither for flat — in plain words or by a block&rsquo;s prop where one exists, and nothing shows the library&rsquo;s look. A construct page or an overview asks for one in a <code>dg</code> block of kind <code>skeleton</code>; a hand-written page takes the drawing from <code>docs figure draw &lt;spec&gt;</code>. One sample at each level:</p>
   <p><strong>A page</strong> &mdash; a listing page: the shut rail, the page head, and one container holding a data table with its filter bar and its paging.</p>
 <figure class="dl-figure">
@@ -2229,19 +2519,22 @@ deploy:
 <section id="navigation" data-block="example">
   <div class="sds-section-head"><h2>Navigation &mdash; the words and the ways out of a page</h2></div>
   <p>{{What a reader uses to find a word, or to leave for the next page.}}</p>
-  <h3 id="b-glossary">GLOSSARY &mdash; the words, in the order a reader meets them</h3>
+  <h3 id="b-glossary">GLOSSARY &mdash; the words</h3>
+  <p class="sds-small"><strong>Use when</strong> the record is the words a page gives meanings to, in the order a reader meets them.</p>
   <p class="sds-small">On a <strong>domain overview</strong> this region is generated by <code>docs face</code> from the constructs' <code>Terms</code> tables, grouped by construct in the domain's reading order, in three columns: <code>Term</code> &middot; <code>Contract term</code> &middot; <code>Description</code>. On a <strong>hub</strong> it is written by hand and is one column of item cells (the term in bold, then what it means): a hub names the book's own structural words, and 9 of the foundation hub's 11 have no contract term at all.</p>
   <div class="sds-scroll"><table class="sds-terms">
     <thead><tr><th>Term</th><th>Contract term</th><th>Description</th></tr></thead>
     <tbody><tr><td><strong>{{Estate}}</strong></td><td><code>{{SPEstate}}</code></td><td>{{a definition the reader understands on this line}}</td></tr></tbody>
   </table></div>
-  <h3 id="b-cards">CARDS &mdash; navigation, on a hub</h3>
+  <h3 id="b-cards">CARDS &mdash; hub doors</h3>
+  <p class="sds-small"><strong>Use when</strong> several pages are doors a reader might go to next.</p>
   <div class="sds-tiles">
     <div class="sds-tile"><h4><a href="#">{{Reading path}}</a></h4><p>{{what the path covers, in one line}}</p><a class="sds-more" href="#">Read more &rarr;</a></div>
     <div class="sds-tile"><h4><a href="#">{{Reading path}}</a></h4><p>{{&hellip;}}</p><a class="sds-more" href="#">Read more &rarr;</a></div>
   </div>
   <p><a class="sds-more" href="#">Read {{the page, by the name it carries}} &rarr;</a> {{&mdash; the link under a subsection's text, when it has one path}}</p>
-  <h3 id="b-next">NEXT &mdash; the two doors either side of here</h3>
+  <h3 id="b-next">NEXT &mdash; two doors</h3>
+  <p class="sds-small"><strong>Use when</strong> a reader leaves a page for the one before or after it.</p>
   <p>{{Small on purpose: a title and a direction. A reader leaving a page wants the next page, not a paragraph about it.}}</p>
   <div class="sds-nextnav">
     <a class="sds-nextnav-card" href="#"><span class="sds-direction">&larr; Previous</span><span class="sds-title">{{The page before this one}}</span></a>
@@ -2252,7 +2545,8 @@ deploy:
 <section id="style" data-block="example">
   <div class="sds-section-head"><h2>Colour and layout &mdash; tones, statuses and utilities</h2></div>
   <p>{{The classes a block or a drawing takes for its colour, and the utilities for a layout no block covers.}}</p>
-  <h3 id="b-palette">PALETTE &mdash; the tones a drawing, a chart or a badge may take</h3>
+  <h3 id="b-palette">PALETTE &mdash; the ten tones</h3>
+  <p class="sds-small"><strong>Use when</strong> a drawing, a chart or a badge needs a tone that carries no meaning.</p>
   <p>Put one tone class on a box, a connector, an arrowhead or a badge. A tone is a plain colour for a drawing or a chart, and it carries no meaning. A tone is a pair of tokens, so both themes follow, and a page never writes a colour of its own. A chart takes its series starting at violet, cyan, pink and olive, so a red line is not read as an error. To say how a thing stands, use a status class, shown in the next block.</p>
   <figure class="dl-figure">
 <div class="dl-frame">
@@ -2333,7 +2627,8 @@ deploy:
 </div>
 <figcaption>The same tones on a badge: <span class="sds-badge sds-tone-blue">blue</span> <span class="sds-badge sds-tone-green">green</span> <span class="sds-badge sds-tone-amber">amber</span> <span class="sds-badge sds-tone-red">red</span> <span class="sds-badge sds-tone-violet">violet</span> <span class="sds-badge sds-tone-cyan">cyan</span> <span class="sds-badge sds-tone-pink">pink</span> <span class="sds-badge sds-tone-olive">olive</span> <span class="sds-badge sds-tone-orange">orange</span> <span class="sds-badge sds-tone-grey">grey</span></figcaption>
   </figure>
-  <h3 id="b-status">STATUS &mdash; info, success, warning and error</h3>
+  <h3 id="b-status">STATUS &mdash; four classes</h3>
+  <p class="sds-small"><strong>Use when</strong> a result or a callout says how a thing stands: info, success, warning or error.</p>
   <p>A status says how a thing stands. Put one status class on a badge or a pull. Each status has two tokens of its own, the colour and its soft ground, and each has a dark value: <code>--sds-info</code> and <code>--sds-info-soft</code>, and so on. A status is never a tone of the palette, so changing a warning does not change a chart.</p>
   <div class="sds-scroll"><table>
     <thead><tr><th>Class</th><th>On a badge</th><th>Use it when</th></tr></thead>
@@ -2356,7 +2651,8 @@ deploy:
       <tr><th>{{Stated today}}</th><td>{{where the claim is written today, with a link}}</td></tr>
     </tbody></table></div>
   </div>
-  <h3 id="b-arc-status">ARC STATUS &mdash; how a construct or an arc stands</h3>
+  <h3 id="b-arc-status">ARC STATUS &mdash; standing</h3>
+  <p class="sds-small"><strong>Use when</strong> a masthead or a Plan row names where a construct or an arc stands. Done and landed take the Success badge: border <code>--sds-success</code>, text <code>--on-success-subtle</code>, background <code>--sds-success-soft</code>.</p>
   <p>A construct's masthead and an approach page's Plan carry a status badge: <code>sds-badge sds-status</code> and the status word in lower case. The status colours are the docs' own, one pair each with a dark value, and never the design system's alert colours, which stay with the four statuses above.</p>
   <div class="sds-scroll"><table>
     <thead><tr><th>Status</th><th>On a badge</th><th>Means</th></tr></thead>
@@ -2374,7 +2670,8 @@ deploy:
       <tr><td><code>sds-dropped</code></td><td><span class="sds-badge sds-status sds-dropped">DROPPED</span></td><td>an arc not wanted, once decided</td></tr>
     </tbody>
   </table></div>
-  <h3 id="b-utilities">UTILITIES &mdash; a layout that no block covers</h3>
+  <h3 id="b-utilities">UTILITIES &mdash; no block covers</h3>
+  <p class="sds-small"><strong>Use when</strong> a layout is needed that no block covers.</p>
   <p>Use a named class first. Use a Tailwind utility only for a layout that no block covers. A utility reads the same tokens as a named class, so both themes follow. Below, utilities put two boxes in one row. The first box is the named class <code>sds-pull</code>. The second box has no class of ours, and every part of its look is a utility.</p>
   <div class="grid gap-4 my-6 sm:grid-cols-2">
     <div class="sds-pull m-0"><span class="sds-label">A named class</span><p><code>sds-pull m-0</code> &mdash; the block, and one utility that takes away its margin inside the row.</p></div>
@@ -2387,4 +2684,4 @@ deploy:
 </div>
 </div>
 
-<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.15.0/sds-docs.js" integrity="sha384-XYna7dQ9hUAzsp8poWNLetdO4Oyfh/cIKwuuh6sduxMcNDmnLGJ3zcw6DaG1IN9+" crossorigin="anonymous"></script>
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.16.0/sds-docs.js" integrity="sha384-HbsCKU7ded4eUbPoHAYnsqyTAmtmoiQLQga1Aer2INikS1vSU/h3C1jlu1qBX58N" crossorigin="anonymous"></script>
