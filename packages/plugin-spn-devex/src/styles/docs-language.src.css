@@ -179,7 +179,7 @@
     --sds-caption:var(--font-content-xs-size); --sds-caption-lh:var(--font-content-xs-line-height);
     /* THE TONES THE DESIGN SYSTEM HAS NO NAME FOR stay docs tokens, with a value for each mode: the colours of code and the
        accents a block uses to tell kinds apart. */
-    --sds-tk-k:var(--sds-violet); --sds-tk-s:var(--sds-cyan); --sds-tk-c:var(--fg-quiet); --sds-tk-t:var(--surface-brand); --sds-tk-n:var(--sds-orange); --sds-tk-add:var(--on-success-subtle); --sds-tk-del:var(--on-error-subtle);
+    --sds-tk-k:var(--sds-violet); --sds-tk-s:var(--sds-cyan); --sds-tk-c:var(--fg-quiet); --sds-tk-t:var(--surface-brand-fg); --sds-tk-n:var(--sds-orange); --sds-tk-add:var(--on-success-subtle); --sds-tk-del:var(--on-error-subtle);
     --sds-violet:#6d3a9c; --sds-violet-soft:#ece3f5; --sds-cyan:#1b6a86; --sds-cyan-soft:#dbeef4; --sds-pink:#a0366d;
     --sds-pink-soft:#f6e0ec; --sds-olive:#5a661c; --sds-olive-soft:#edf0d8; --sds-orange:#a55000; --sds-yellow:#6b5300; --sds-yellow-soft:#fbf1c4;
     --sds-orange-soft:#fdebd3; --sds-page-max:90rem;
@@ -188,7 +188,7 @@
     --sds-measure:58rem; --sds-content-floor:48rem; --sds-page-pad:2rem; --sds-rail-width:14rem; --sds-tree-width:clamp(13.5rem,calc(100vw - 71.5rem),22rem); --sds-outline-fold:69rem; --sds-tree-fold:82.5rem;
   }
   :root[data-mode="dark"]{
-    --sds-tk-k:var(--sds-violet); --sds-tk-s:var(--sds-cyan); --sds-tk-c:var(--fg-quiet); --sds-tk-t:var(--surface-brand); --sds-tk-n:var(--sds-orange); --sds-tk-add:var(--on-success-subtle); --sds-tk-del:var(--on-error-subtle);
+    --sds-tk-k:var(--sds-violet); --sds-tk-s:var(--sds-cyan); --sds-tk-c:var(--fg-quiet); --sds-tk-t:var(--surface-brand-fg); --sds-tk-n:var(--sds-orange); --sds-tk-add:var(--on-success-subtle); --sds-tk-del:var(--on-error-subtle);
     --sds-violet:#c9a3ee; --sds-violet-soft:#251a30; --sds-cyan:#6cc3de; --sds-cyan-soft:#12262e; --sds-pink:#e592bd; --sds-pink-soft:#2c1622;
     --sds-olive:#b9c66a; --sds-olive-soft:#22260f; --sds-orange:#f59e3a; --sds-yellow:#f2d24a; --sds-yellow-soft:#2b2508; --sds-orange-soft:#33200a;
     --sds-status-planning:oklch(0.767462 0.171331 61.6975); --sds-status-planning-soft:oklch(0.810515 0.145533 67.1324 / 0.18); --sds-status-implementing:oklch(0.54 0.0942473 244.756); --sds-status-implementing-soft:oklch(0.54 0.0942473 244.756 / 0.14); --sds-status-done:oklch(0.735386 0.13145 144.907); --sds-status-done-soft:oklch(0.767314 0.115667 145.001 / 0.18); --sds-status-proposed:rgb(242, 210, 74); --sds-status-proposed-soft:rgb(43, 37, 8); --sds-status-decided:oklch(0.570136 0.196001 256.188); --sds-status-decided-soft:oklch(0.699265 0.146593 249.792 / 0.18); --sds-status-running:rgb(245, 158, 58); --sds-status-running-soft:rgb(51, 32, 10); --sds-status-held:oklch(0.76 0 0); --sds-status-held-soft:oklch(0.275 0 0); --sds-status-part-landed:rgb(185, 198, 106); --sds-status-part-landed-soft:rgb(34, 38, 15); --sds-status-landed:oklch(0.735386 0.13145 144.907); --sds-status-landed-soft:oklch(0.767314 0.115667 145.001 / 0.18); --sds-status-carried:rgb(108, 195, 222); --sds-status-carried-soft:rgb(18, 38, 46); --sds-status-dropped:oklch(0.582835 0.202194 29.0717); --sds-status-dropped-soft:oklch(0.724946 0.15472 25.82 / 0.18);
@@ -1749,8 +1749,10 @@ pre .sds-tk-g { color: var(--sds-tk-c); font-style: normal; }
   font-size: var(--sds-sm);
   color: var(--sds-text-description-card);
 }
+/* As many columns as the facts and the width allow: three facts stand in one row on a laptop, and wrap on a narrow one
+   (the developer, 2026-11-23: "we have enough psace can we have facts in three column"). */
 .sds-tiles[data-layout='LIST'] .sds-tile-facts {
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
   column-gap: 1.6rem;
   row-gap: .75rem;
 }
@@ -1766,11 +1768,30 @@ pre .sds-tk-g { color: var(--sds-tk-c); font-style: normal; }
 .sds-tiles[data-layout='LIST'] .sds-tile-facts dd {
   color: var(--sds-text-title-card);
 }
+/* A fact that is a sentence takes the whole row; the short ones share a row in columns. */
+.sds-tiles[data-layout='LIST'] .sds-tile-fact-wide {
+  grid-column: 1 / -1;
+}
 .sds-tiles[data-layout='LIST'] .sds-tile-facts-one {
   grid-template-columns: 1fr;
 }
+/* ONE FACT IS ONE LINE under the description, never a stacked label and value: a small muted label, then the value in italic in the
+   description colour, on the same line (the developer, 2026-11-23: "cant we use something like italic or diff color etc.. taking too much apsces"). */
+.sds-tiles[data-layout='LIST'] .sds-tile-facts-one > div {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: .6rem;
+}
+.sds-tiles[data-layout='LIST'] .sds-tile-facts-one dt {
+  font-size: var(--sds-caption);
+  font-weight: var(--font-weight-regular, 400);
+  color: var(--sds-text-fact-card);
+}
 .sds-tiles[data-layout='LIST'] .sds-tile-facts-one dd {
-  line-height: 1.75;
+  font-style: italic;
+  color: var(--sds-text-description-card);
+  line-height: 1.5;
 }
 @media (max-width: 720px) {
   .sds-tiles[data-layout='LIST'] .sds-tile-facts {

@@ -566,6 +566,12 @@ function mediaOf(media: string, item: CatalogItem, findings: Finding[]): string 
   return `<div class="sds-tile-picture"><svg class="sds-wire" viewBox="0 0 160 96" aria-hidden="true"><rect class="frame" x="0.5" y="0.5" width="159" height="95" rx="4"/>${WIRES[wire] ?? ""}</svg></div>`;
 }
 
+/** A fact whose value is long (over about 40 characters) or holds a sentence (a full stop then more text, or over six words) takes a whole row; short facts share one. */
+export function wideFact(value: string): boolean {
+  const plain = value.replace(/<[^>]*>/g, "").trim();
+  return plain.length > 40 || /\.\s+\S/.test(plain) || plain.split(/\s+/).length > 6;
+}
+
 /** The cards of one set of items, as the fence's layout and media draw them. Without either, and with no facts, the one-line tile of old. */
 function catalogHtml(items: CatalogItem[], layout: string | null, media: string | null, findings: Finding[], compact = false): string {
   const hasFacts = items.some((item) => item.facts.length);
@@ -591,7 +597,7 @@ function catalogHtml(items: CatalogItem[], layout: string | null, media: string 
   if (kept === "MEDIA_TOP" && kind !== "GRID") { findings.push({ message: "a `catalog` draws `media=MEDIA_TOP` in GRID only" }); kept = null; }
   const tiles = items.map((item) => {
     const facts = item.facts.length
-      ? `<dl class="sds-tile-facts${kind === "LIST" && item.facts.length === 1 ? " sds-tile-facts-one" : ""}">${item.facts.map(([key, value]) => `<div><dt>${inline(key)}</dt><dd>${inline(value)}</dd></div>`).join("")}</dl>` : "";
+      ? `<dl class="sds-tile-facts${kind === "LIST" && item.facts.length === 1 ? " sds-tile-facts-one" : ""}">${item.facts.map(([key, value]) => `<div${wideFact(value) ? ' class="sds-tile-fact-wide"' : ""}><dt>${inline(key)}</dt><dd>${inline(value)}</dd></div>`).join("")}</dl>` : "";
     if (kind === "GRID" && item.facts.length > 3) findings.push({ message: `a GRID card holds up to three facts, "${item.name}" has ${item.facts.length}; use \`layout=LIST\`` });
     const count = kind === "GRID" && item.facts.length ? ` data-facts="${Math.min(item.facts.length, 3)}"` : "";
     const words = `<h4>${inline(item.name)}</h4>${item.line ? `<p>${inline(item.line)}</p>` : ""}`;

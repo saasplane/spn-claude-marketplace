@@ -25,6 +25,7 @@
 //   handover   a reply that says a new window is needed carries the nine labelled lines, in one column,
 //              once while the rows stand, and names each open card in one line; a close or a handover
 //              never opens with a table, a heading or a count
+//   unfilled-page  a reply that links a `file:///` page still holding a `{{…}}` slot (outside `templates/`) is sent back to fill it or say it is a template (RULE.DEVEX.WORKSPACE.560)
 //   how-it-runs, partner-words, page-path  the reply's last asks about running the work, the words a partner cannot open, and its page addresses, after the handover
 //   close-message  a turn whose tool results hold a close's success text ends on the closing message: a 🚀 or ✈️ heading, what was
 //              delivered, what was learned, Thank you 👍 and that the window can be retired (RULE.DEVEX.WORKSPACE.206)
@@ -61,7 +62,7 @@
 // unfinished, and that window hears about it. A window bound to none hears nothing about them.
 //
 // WHILE A ROW IS IN PROGRESS, ONLY A FINDING ABOUT THE REPLY SENDS THE AGENT BACK (RULE.DEVEX.WORKSPACE.244):
-// `needs-you`, `reply-shape`, `handover`, `how-it-runs`, `partner-words`, `page-path`, `close-message`, `card-case`, `in-flight`, `proposal-record`, `welcome`, `window` and `hold`. Every other finding is held, and the checks find
+// `needs-you`, `reply-shape`, `handover`, `how-it-runs`, `partner-words`, `page-path`, `unfilled-page`, `close-message`, `card-case`, `in-flight`, `proposal-record`, `welcome`, `window` and `hold`. Every other finding is held, and the checks find
 // it again at the first turn end where no row is in progress (`splitFindings`).
 //
 // `corpus` is the newest and the odd one out: every other check here reads what the TURN wrote, and
@@ -84,6 +85,7 @@ import { replayPanels } from "../lib/panel.ts";
 import { checkHowItRuns } from "../checks/how-it-runs.ts";
 import { checkPartnerWords } from "../checks/partner-words.ts";
 import { checkPagePath } from "../checks/page-path.ts";
+import { checkUnfilledPage } from "../checks/unfilled-page.ts";
 import { checkWorkstream, heldByStop } from "../checks/workstream-state.ts";
 import { ARC_FILE, PREVIEW_FILE, approachOf, arcDataDir, arcStatus, stepsMayStart, arcIdsOf, leafRows, logLinesOf, notesDirOf, previewOf, previewWouldChange, readArc, readJsonl, readQuestions, readyRows, stateFileOf,
          suggestionsFileOf, workstreamsOf } from "../lib/workstream.ts";
@@ -2260,6 +2262,7 @@ if (argv1Base === "stop.ts" || argv1Base === "stop.mjs") {
     ...span({ group: "stop", action: "how-it-runs" }, () => checkHowItRuns(withoutFences(reply), root)),
     ...span({ group: "stop", action: "partner-words" }, () => checkPartnerWords(withoutFences(reply), root, turn.prompt)),
     ...span({ group: "stop", action: "page-path" }, () => checkPagePath(withoutFences(reply))),
+    ...span({ group: "stop", action: "unfilled-page" }, () => checkUnfilledPage(withoutFences(reply))),
     ...span({ group: "stop", action: "welcome" }, () => checkWelcome(firstTurn, readWindow(root, session).welcome)),
     ...span({ group: "stop", action: "corpus" }, () => checkCorpus(root, reposWritten(root, session), mine)),
     // A MAIN WINDOW ONLY, AND NOT WHERE THE TURN CONTINUES BECAUSE A HOOK SPOKE: the offer is made once.

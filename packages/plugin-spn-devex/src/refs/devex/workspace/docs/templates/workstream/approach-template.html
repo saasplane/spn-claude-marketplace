@@ -41,7 +41,7 @@
 <!-- spn:doc
 {"id": "ws-{{NNN}}-{{slug}}", "variant": "approach", "title": "{{NAME}}", "lenses": ["{{LENS}}"], "status": "PLANNING", "summary": "{{SUMMARY}}", "keywords": ["{{KEYWORD}}"]}
 -->
-<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.16.0/docs-language.css" integrity="sha384-vlARMOwfCVdVyTzLK+L4DONP9TnpC3BqCZVg+yzW4NlO/wQLxmLEH54+WfMP6pLJ" crossorigin="anonymous">
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.16.0/docs-language.css" integrity="sha384-eVD+IKBOvQdjamPNYDYt/cSGd89JPQBFPUGneKDviQlHjWc8KB4hxNVbNQ1wRBQd" crossorigin="anonymous">
 <div class="sds-page">
 <nav class="sds-rail" id="rail">
   <div class="sds-rail-title">{{NAME}}</div>
@@ -97,14 +97,19 @@
 <section id="s2" data-block="reasons">
   <div class="sds-section-head"><h2>What</h2></div>
   <p class="sds-standfirst">{{DECISION}}</p>
-  <!-- What is told by construct and never by arc: an h3 for each domain, an h4 for each subdomain or construct, the whole change across every arc.
-       The page is the summary and the arc page is the preview, so a construct holds the decision and its links and none of the preview's code,
-       file paths, Today and Proposed tabs, value tables or checks' messages. Each arc's goal is in Plan, below. -->
+  <!-- What is told by domain and never by arc: an h3 for each domain with its one line, then a catalog LIST of its constructs, each a name and the sentence that
+       decides it. No h4 for each construct, no Arcs line and no arc link: Plan is the only place arcs are linked, and each Plan row's goal names the constructs the arc
+       changes. The page is the summary and the arc page is the preview, so a construct holds the decision and none of the preview's code, file paths, Today and Proposed
+       tabs, value tables or checks' messages. At most one small figure for each domain, after its list, only where the change IS a shape, of the kind rule 548 names
+       (a `dg` drawn by `docs figure draw`, matching the words above it); delete it otherwise. -->
   <h3 id="d1">{{DOMAIN}}</h3>
   <p class="sds-standfirst">{{DOMAIN-CHANGE}}</p>
-  <h4 id="c1">{{CONSTRUCT}}</h4>
-  <p>{{CHANGE}}</p>
-  <!-- A figure only where the change IS a shape (a small `dg`, drawn by `docs figure draw`, matching the words above it); delete this one otherwise: -->
+  <div class="sds-tiles" data-layout="LIST">
+    <div class="sds-tile">
+      <div class="sds-tile-body"><h4>{{CONSTRUCT}}</h4><p>{{CHANGE}}</p></div></div>
+    <div class="sds-tile">
+      <div class="sds-tile-body"><h4>{{CONSTRUCT}}</h4><p>{{CHANGE}}</p></div></div>
+  </div>
   <figure class="dl-figure">
   <div class="dl-frame">
   <svg class="dl-svg" viewBox="0 0 928 80" role="img" aria-label="{{FIGURE-ALT}}">
@@ -123,18 +128,14 @@
   </div>
   <figcaption>{{FIGURE-NOTE}}</figcaption>
   </figure>
-  <p><span class="sds-small">Arcs: <a href="notes/N001/arc.html">N001</a> &middot; <a href="notes/N002/arc.html">N002</a></span></p>
-  <p>Read the arc page &rarr; <a href="notes/N001/arc.html">{{ARC-NAME}}</a></p>
-  <h4 id="c2">{{CONSTRUCT}}</h4>
-  <p>{{CHANGE}}</p>
-  <p><span class="sds-small">Arcs: <a href="notes/N002/arc.html">N002</a></span></p>
-  <p>Read the arc page &rarr; <a href="notes/N002/arc.html">{{ARC-NAME}}</a></p>
   <h3 id="d2">{{DOMAIN}}</h3>
   <p class="sds-standfirst">{{DOMAIN-CHANGE}}</p>
-  <h4 id="c3">{{CONSTRUCT}}</h4>
-  <p>{{CHANGE}}</p>
-  <p><span class="sds-small">Arcs: <a href="notes/N001/arc.html">N001</a></span></p>
-  <p>Read the arc page &rarr; <a href="notes/N001/arc.html">{{ARC-NAME}}</a></p>
+  <div class="sds-tiles" data-layout="LIST">
+    <div class="sds-tile">
+      <div class="sds-tile-body"><h4>{{CONSTRUCT}}</h4><p>{{CHANGE}}</p></div></div>
+    <div class="sds-tile">
+      <div class="sds-tile-body"><h4>{{CONSTRUCT}}</h4><p>{{CHANGE}}</p></div></div>
+  </div>
 </section>
 <section id="arcs" data-block="sequence">
   <div class="sds-section-head"><h2>Plan</h2></div>
@@ -179,7 +180,7 @@
 <section id="s3" data-block="sequence">
   <div class="sds-section-head"><h2>How</h2></div>
   <p class="sds-standfirst">{{RELEASE-ORDER}}</p>
-  <!-- The release order is a chain, drawn by `docs figure draw` from a `chain` spec: book, Support, plugins, platform. -->
+  <!-- The release order is the page's one chain in How, drawn by `docs figure draw` from a `chain` spec: book, Support, plugins, platform. Then the repositories, each with Ships and After and no Arcs fact. -->
   <figure class="dl-figure">
   <div class="dl-frame">
   <svg class="dl-svg" viewBox="0 0 928 80" role="img" aria-label="The book releases first, then Support, then the plugins, then the platform.">
@@ -206,10 +207,10 @@
   <div class="sds-tiles" data-layout="LIST">
     <div class="sds-tile">
       <div class="sds-tile-body"><h4 id="h1">{{REPOSITORY}}</h4><p>{{REPO-CHANGE}}</p>
-      <dl class="sds-tile-facts"><div><dt>Ships</dt><dd>{{RELEASE}}</dd></div><div><dt>After</dt><dd>{{UPSTREAM}}</dd></div><div><dt>Arcs</dt><dd>N001 &middot; N002</dd></div></dl></div></div>
+      <dl class="sds-tile-facts"><div><dt>Ships</dt><dd>{{RELEASE}}</dd></div><div><dt>After</dt><dd>{{UPSTREAM}}</dd></div></dl></div></div>
     <div class="sds-tile">
       <div class="sds-tile-body"><h4 id="h2">{{REPOSITORY}}</h4><p>{{REPO-CHANGE}}</p>
-      <dl class="sds-tile-facts"><div><dt>Ships</dt><dd>nothing</dd></div><div><dt>After</dt><dd>{{UPSTREAM}}</dd></div><div><dt>Arcs</dt><dd>N002 &middot; follow-ups</dd></div></dl></div></div>
+      <dl class="sds-tile-facts"><div><dt>Ships</dt><dd>nothing</dd></div><div><dt>After</dt><dd>{{UPSTREAM}}</dd></div></dl></div></div>
   </div>
 </section>
 <section id="s4" data-block="reasons">
@@ -252,11 +253,13 @@
   <div class="sds-section-head"><h2>Deferred</h2></div>
   <p class="sds-standfirst">Each with the event that brings it back.</p>
   <h3 id="s5-{{domain}}">{{DOMAIN}}</h3>
-  <div class="sds-tiles" data-layout="LIST">
-    <div class="sds-tile">
-      <div class="sds-tile-body"><h4>{{ITEM}}</h4><p>{{WHY-NOT-NOW}}</p>
-      <dl class="sds-tile-facts"><div><dt>Needed for</dt><dd>{{EVENT}}</dd></div></dl></div></div>
-  </div>
+  <!-- One bordered list for each domain, framed like Plan's rows: one column and no header row. Each row is the item in bold, its description (why not now),
+       and an italic muted note naming what brings it back. No second column and no catalog panels. -->
+  <div class="sds-scroll"><table>
+    <tbody>
+      <tr><td><p><strong>{{ITEM}}</strong></p><p>{{WHY-NOT-NOW}}</p><p class="sds-small"><em>Needed for: {{EVENT}}</em></p></td></tr>
+    </tbody>
+  </table></div>
 </section>
 </div>
 </div>

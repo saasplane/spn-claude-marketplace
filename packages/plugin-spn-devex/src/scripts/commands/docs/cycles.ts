@@ -251,9 +251,11 @@ const withoutTitle = (cell: string): string => withoutAnchors(cell.replace(/<str
 /** The rows of a page's Cycles table, each under the key of the arc it names, in the page's order. */
 function tableRows(table: string): Map<string, string[]> {
   const rows = [...(table.match(/<tr\b[^>]*>[\s\S]*?<\/tr>/gi) ?? [])]
-    .map((row) => [...row.matchAll(/<td\b[^>]*>([\s\S]*?)<\/td>/gi)].map((found) => found[1]))
-    .filter((cells) => cells.length >= 2);
-  return new Map(rows.map((cells) => [cycleKey(titleOf(cells[0])), cells]));
+    .map((row) => ({ key: /^<tr\b[^>]*\bid="(N\d+[a-z]?|ideate|follow-ups)"/i.exec(row)?.[1] ?? null,
+      cells: [...row.matchAll(/<td\b[^>]*>([\s\S]*?)<\/td>/gi)].map((found) => found[1]) }))
+    .filter((row) => row.cells.length >= 2);
+  // THE KEY IS THE ROW'S OWN ADDRESS (`id="ideate"`, `id="N018"`), the anchor the template sets; a row without one is keyed by its title.
+  return new Map(rows.map((row) => [row.key ?? cycleKey(titleOf(row.cells[0])), row.cells]));
 }
 
 /** The arcs of a workstream, each under the key a Cycles row names it by. */
@@ -267,7 +269,7 @@ function arcsByKey(cycles: Cycle[]): Map<string, Cycle> {
  * `producedPage` rewrites a table whose rows are not in arc order. A closed workstream's page stays as it
  * closed, and is not compared.
  */
-export function tableDifferences(table: string, cycles: Cycle[]): { missing: string[]; unknown: string[]; stale: string[] } {
+export function tableDifferences(table: string, cycles: Cycle[], from?: { page: string; folder: string }): { missing: string[]; unknown: string[]; stale: string[] } {
   const onPage = tableRows(table);
   const inArcs = arcsByKey(cycles);
   const stale: string[] = [];
@@ -277,7 +279,8 @@ export function tableDifferences(table: string, cycles: Cycle[]): { missing: str
   for (const [key, cells] of onPage) {
     const cycle = inArcs.get(key);
     if (!cycle) continue;
-    const status = flat(cells[statusAt] ?? "");
+    const badge = /\bsds-status\s+sds-([a-z-]+)/i.exec(cells[statusAt] ?? "")?.[1]?.toUpperCase();
+    const status = badge && STATUSES.includes(badge as never) ? badge : flat(cells[statusAt] ?? "");
     if (cycle.status && statusWord(status) !== cycle.status)
       stale.push(`${key} reads ${statusWord(status) ?? `"${status}"`} and the arc reads ${cycle.status}`);
     // The Arc cell holds the title, the description and the facts.
@@ -292,8 +295,13 @@ export function tableDifferences(table: string, cycles: Cycle[]): { missing: str
     if (lineOf(cells[0]) !== lineOf(expected))
       stale.push(`${key}'s line is not the arc's own line`);
     // The facts are compared whole, links and their text, as plain text.
-    const facts = (html: string) => `${anchorsOf(html).map((anchor) => `${anchor.href} ${anchor.text}`).join("\n")}\n${flat(factsOf(html))}`;
-    if (facts(cells[0]) !== facts(expected))
+    // BY WHAT A LINK OPENS: its address resolved from the page's own folder, `arc.html` and `preview.html` being one page, and the link's words not read.
+    const opens = (href: string, onPage = false): string => {
+      const place = onPage && from && !/^[a-z][a-z0-9+.-]*:|^\//i.test(href) ? relative(from.folder, resolve(from.page, href)).split("\\").join("/") : posix.normalize(href);
+      return place.replace(/\/arc\.html$/, "/preview.html");
+    };
+    const facts = (html: string, onPage = false) => `${anchorsOf(html).map((anchor) => opens(anchor.href, onPage)).join("\n")}\n${withoutAnchors(factsOf(html)).replace(/\bSamples:/g, "Sample:")}`;
+    if (facts(cells[0], true) !== facts(expected))
       stale.push(`${key}'s links are not the arc's preview and samples`);
     if (cycle.status && !(cells[statusAt] ?? "").includes(`sds-status sds-${cycle.status.toLowerCase()}`))
       stale.push(`${key}'s Status is not its badge, \`sds-badge sds-status sds-${cycle.status.toLowerCase()}\``);
@@ -548,30 +556,24 @@ export function placedPage(text: string, places: Place[]): string {
 }
 
 /**
- * One place of How as an item of the catalog: its `Arcs` fact written, rewritten or added to the item whose `h4` names the
- * repository, and an item added at the end of the catalog, with the slots the agent fills, where none names it. The text of the item is the agent's.
+ * One place of How as an item of the catalog: an item added at the end of the catalog, with the slots the agent fills, where none names it. The text of the item is the agent's.
  */
 function placedTile(out: string, bodyAt: number, body: string, place: Place): string {
-  const value = arcsValue(place);
   const close = body.lastIndexOf("</section>");
   const end = body.lastIndexOf("</div>", close >= 0 ? close : body.length);
   const heads = [...body.matchAll(/<h4\b[^>]*>([\s\S]*?)<\/h4>/gi)].filter((found) => found.index! < end);
   const at = heads.findIndex((found) => namesPlace(flat(found[1]), place.repo));
   if (at < 0) {
     const tile = `  <div class="sds-tile">\n      <div class="sds-tile-body"><h4 id="${placeId(out, place.repo)}">${escape(place.repo)}</h4><p>{{REPO-CHANGE}}</p>\n` +
-      `      <dl class="sds-tile-facts"><div><dt>Ships</dt><dd>{{RELEASE}}</dd></div><div><dt>After</dt><dd>{{UPSTREAM}}</dd></div><div><dt>Arcs</dt><dd>${value}</dd></div></dl></div></div>\n  `;
+      `      <dl class="sds-tile-facts"><div><dt>Ships</dt><dd>{{RELEASE}}</dd></div><div><dt>After</dt><dd>{{UPSTREAM}}</dd></div></dl></div></div>\n  `;
     const where = bodyAt + end;
     return out.slice(0, where) + tile + out.slice(where);
   }
   const from = bodyAt + heads[at].index! + heads[at][0].length;
   const to = bodyAt + (heads[at + 1]?.index ?? end);
   const part = out.slice(from, to);
-  const fact = /<dt>Arcs<\/dt>\s*<dd>[\s\S]*?<\/dd>/;
-  let written: string;
-  if (fact.test(part)) written = part.replace(fact, `<dt>Arcs</dt><dd>${value}</dd>`);
-  else if (/<\/dl>/.test(part)) written = part.replace(/<\/dl>/, `<div><dt>Arcs</dt><dd>${value}</dd></div></dl>`);
-  else if (/<\/p>/.test(part)) written = part.replace(/<\/p>/, `</p>\n      <dl class="sds-tile-facts"><div><dt>Arcs</dt><dd>${value}</dd></div></dl>`);
-  else written = `\n      <dl class="sds-tile-facts"><div><dt>Arcs</dt><dd>${value}</dd></div></dl>${part}`;
+  // AN ITEM CARRIES NO `Arcs` FACT (RULE.DEVEX.WORKSPACE.487): Plan is the only place arcs are linked, so a fact an older page holds is taken out.
+  const written = part.replace(/<div><dt>Arcs<\/dt>\s*<dd>[\s\S]*?<\/dd><\/div>/, "");
   return out.slice(0, from) + written + out.slice(to);
 }
 

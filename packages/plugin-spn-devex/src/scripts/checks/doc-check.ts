@@ -403,7 +403,7 @@ export function cyclesRule(path: string, text: string): Finding[] {
       "run `spn-devex docs cycles write <workstream>` to write it from the arcs"]];
 
   // Rows are matched by arc, never by position: the page lists arcs in the order they run.
-  const { missing, unknown, stale } = tableDifferences(table, cyclesOf(home.folder));
+  const { missing, unknown, stale } = tableDifferences(table, cyclesOf(home.folder), { page: dirname(resolve(path)), folder: home.folder });
   const out: Finding[] = [...planRowSamples(table, home.folder)];
   if (missing.length)
     out.push([CYCLES, `Plan has no row for ${listed(missing)} — every arc in arcs/ is one row ` +
@@ -531,6 +531,28 @@ export function whatHowShape(text: string, older: boolean): Finding[] {
     if (/\bThe batch\b/.test(words))
       out.push([grade, `How tells how the go runs — that is the go plan's, and How says what changes in each repository ${where}`]);
   }
+  // THE ARC LINKS ARE PLAN'S ALONE, AND THE FIGURES ARE WHAT's AND HOW's (RULE.DEVEX.WORKSPACE.487): What and How link no arc and carry no `Arcs:` line,
+  // no figure stands in Why, Plan, Open or Deferred, a What domain holds at most one, and How holds its release chain, exactly one.
+  const figures = (body: string): number => (body.match(/<figure\b[^>]*\bclass="dl-figure"/g) ?? []).length;
+  for (const [name, body] of [["What", what], ["How", how]] as const) {
+    if (body === null) continue;
+    const link = /<a\b[^>]*\bhref="(?:[^"]*#(?:N\d+[a-z]?|ideate|follow-ups)\b|(?:[^"]*\/)?notes\/(?:N\d+[a-z]?|ideate|follow-ups)\/)[^"]*"/i.exec(body);
+    if (link || /\bArcs:/.test(flat(body)))
+      out.push([grade, `${name} ${link ? "links an arc" : "has an \`Arcs:\` line"} — Plan is the only place arcs are linked, and each Plan row's goal names the constructs the arc changes ${where}`]);
+  }
+  for (const name of ["Why", "Plan", "Open", "Deferred"]) {
+    const body = section(text, name);
+    if (body !== null && figures(body)) out.push([grade, `${name} holds a figure — figures stand in What (one for each domain, after its list, where the change is a shape) and in How (the release chain) ${where}`]);
+  }
+  if (what !== null) {
+    const crowded = what.split(/<h3\b/i).slice(1).filter((domain) => figures(domain) > 1).length;
+    if (crowded) out.push([grade, `${crowded === 1 ? "A What domain holds" : `${crowded} What domains hold`} more than one figure — at most one for each domain, after its list ${where}`]);
+  }
+  const deferred = section(text, "Deferred");
+  if (deferred !== null && (/class="sds-tiles"/.test(deferred) || /<th\b/i.test(deferred) || /<tr\b[^>]*>(?:(?!<\/tr>)[\s\S])*<\/td>\s*<td\b/i.test(deferred)))
+    out.push([grade, `Deferred is a catalog or a table of columns — it is one bordered list framed like Plan's rows: one column and no header row, each row the item in bold, its why-not-now line and an italic note, Needed for: …, naming what brings it back ${where}`]);
+  if (how !== null && figures(how) !== 1)
+    out.push([grade, `How holds ${figures(how) === 0 ? "no release chain" : `${figures(how)} figures`} — How's one figure is the release \`chain\`, then the repositories with Ships and After ${where}`]);
   if (what !== null) {
     const kinds = [/<pre\b/i.test(what) ? "a code block" : "", /class="sds-file"/.test(what) ? "a file frame" : "", /class="sds-tabset"/.test(what) ? "a tab set" : ""].filter(Boolean);
     if (kinds.length)
@@ -781,7 +803,7 @@ export function surfacePageCopy(path: string, text: string): Finding[] {
 const isArcPreview = (path: string): boolean => new RegExp(`[\\\\/]notes[\\\\/]${ARC_PART}[\\\\/](?:arc|preview)\\.html$`).test(path);
 
 // A comment every page keeps: the restated chapter, the page's `spn:doc` block, the approach page's `spn:closing` shape (replaced by the closing block at the close), the markers of a generated block, and the `no figure:` line that says why a long What has no figure.
-const KEPT_COMMENT = /^\s*(?:RESTATES:|spn:doc\b|spn:closing\b|\/?spn:generated\b|no figure:)/;
+export const KEPT_COMMENT = /^\s*(?:RESTATES:|spn:doc\b|spn:closing\b|\/?spn:generated\b|no figure:)/;
 const commentsOf = (text: string): string[] =>
   [...text.matchAll(/<!--([\s\S]*?)-->/g)].map((m) => m[1].replace(/\s+/g, " ").trim()).filter((one) => !KEPT_COMMENT.test(one));
 
@@ -819,6 +841,54 @@ export function templateShape(path: string, text: string, template: string | nul
   return [["RULE", `${basename(dirname(dirname(path))) === "notes" ? `notes/${basename(dirname(path))}/${basename(path)}` : basename(path)} ` +
     `${parts.join(", and ")} (RULE.DEVEX.WORKSPACE.187, .228, .233, .238) · fill every slot, drop the template's comments, ` +
     "keep to the template's sections, and say Overview in prose"]];
+}
+
+// ---------------------------------------------------------------------------- a page shown to the developer is filled
+
+const FILLED_MEDIA = /<(?:img|svg|table|figure|iframe|video|canvas|picture|ul|ol|dl|pre|hr|a|button|input|details|nav|blockquote|math|object|embed|audio)\b/i;
+const SLOT = /\{\{(?:(?!\{\{|\}\})[^\n])*\}\}/g;
+
+/** A template, or a file under a `templates/` folder, is a model and holds slots by design. */
+export const isTemplatePath = (path: string): boolean => /(?:^|\/)templates\//.test(slashes(path));
+
+/** The `{{…}}` slots a page's text still holds, each once, outside comments, scripts, styles and code. */
+export function slotsLeft(text: string): string[] {
+  // The page's own `spn:doc` block is read; every other comment is a note.
+  const bare = text.replace(/<!--(?!\s*spn:doc\b)[\s\S]*?-->/g, " ").replace(/<(script|style|code|pre)\b[\s\S]*?<\/\1>/gi, " ");
+  return [...new Set(bare.match(SLOT) ?? [])];
+}
+
+/**
+ * RULE.DEVEX.WORKSPACE.560: a page shown to the developer holds no placeholder and no empty section. One RULE finding for each
+ * slot list, each section whose heading has nothing under it, and each section whose only content is a placeholder. A file under a
+ * `templates/` folder is exempt, and a heading that is followed by a deeper heading is a section with parts, not an empty one.
+ */
+export function unfilledPage(path: string, text: string): Finding[] {
+  if (isTemplatePath(path) || !/\.html?$/i.test(path)) return [];
+  const out: Finding[] = [];
+  const slots = slotsLeft(text);
+  if (slots.length) out.push(["RULE", `this page still has slots to fill: ${slots.join(", ")}; fill them, or say it is a template (RULE.DEVEX.WORKSPACE.560)`]);
+  const bare = text.replace(/<!--[\s\S]*?-->/g, " ").replace(/<(script|style)\b[\s\S]*?<\/\1>/gi, " ");
+  const heads = [...bare.matchAll(/<h([1-6])\b[^>]*>([\s\S]*?)<\/h\1>/gi)];
+  for (const head of heads) {
+    const level = Number(head[1]);
+    if (level === 1) continue;   // the masthead's own heading; its subtitle and standfirst are `masthead`'s
+    const title = head[2].replace(/<[^>]*>/g, "").replace(/&[a-z]+;/g, " ").replace(/\s+/g, " ").trim();
+    // A heading that says there is nothing ("Open — no card is open") is the generated block's own.
+    if (/\bno card\b|\bnothing\b|\bnone\b/i.test(title)) continue;
+    const from = head.index! + head[0].length;
+    const rest = bare.slice(from);
+    const stop = rest.search(/<h[1-6]\b|<\/section>|<section\b|<\/main>|<footer\b|<\/body>/i);
+    const chunk = stop < 0 ? rest : rest.slice(0, stop);
+    const next = stop < 0 ? null : /^<h([1-6])/i.exec(rest.slice(stop));
+    if (next && Number(next[1]) > level) continue;
+    if (stop >= 0 && /^<section\b/i.test(rest.slice(stop))) continue;
+    if (FILLED_MEDIA.test(chunk)) continue;
+    const spoken = chunk.replace(/<[^>]*>/g, " ").replace(/&nbsp;/g, " ").trim();
+    if (!spoken) { out.push(["RULE", `the section "${title}" has a heading and nothing under it: fill it, or remove the section where the kind allows it (RULE.DEVEX.WORKSPACE.560)`]); continue; }
+    if (!spoken.replace(SLOT, "").trim()) out.push(["RULE", `the section "${title}" holds only a placeholder: write what it says, or remove the section (RULE.DEVEX.WORKSPACE.560)`]);
+  }
+  return out;
 }
 
 /**

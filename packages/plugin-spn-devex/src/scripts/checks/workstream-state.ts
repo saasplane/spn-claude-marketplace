@@ -10,7 +10,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { basename, dirname, join, relative, resolve } from "node:path";
 import { cardsDiffer, openWithoutCard } from "./questions.ts";
 import { TERMINAL } from "./arc-status.ts";
-import { pageRulesOnDisk } from "./doc-check.ts";
+import { pageRulesOnDisk, unfilledPage } from "./doc-check.ts";
 import { cyclesOf, headerStatusRule, tableStatuses } from "../commands/docs/cycles.ts";
 import { isDir, isFile, listdir } from "../lib/payload.ts";
 import { linksSharedStyles } from "../../../../plugin-support-lib/src/lib/page-styles.ts";
@@ -106,6 +106,35 @@ function indexPaths(node: unknown, base: string, out: string[]): void {
   const record = node as Record<string, unknown>;
   if (typeof record.path === "string") out.push(base + record.path);
   for (const key of ["groups", "children", "items"]) indexPaths(record[key], base, out);
+}
+
+/**
+ * RULE.DEVEX.WORKSPACE.560: no page of the work reaches the developer unfilled. A page the work holds, the approach page, an arc's page,
+ * and every HTML page a samples index lists, has no `{{…}}` slot left and no section with a heading and nothing under it. A review copy of a
+ * template, named `…-template.html`, is a template and is not read.
+ */
+export function unfilledFindings(file: string, label: string, generated: readonly string[] = []): string[] {
+  let text = "";
+  try { text = readFileSync(file, "utf8"); } catch { return []; }
+  if (TEMPLATE_COPY.test(file)) return [];
+  // A section the commands fill from the arcs and the cards (How, Open, Deferred on the approach page) is empty until they have something to write.
+  return unfilledPage(file, text).filter(([, message]) => !generated.some((name) => message.startsWith(`the section "${name}" has a heading and nothing under it`)))
+    .map(([, message]) => `${label}: ${message}`);
+}
+
+/** The pages a samples index lists, as files that exist. */
+export function listedSamples(ws: string, arc: string): string[] {
+  const dir = join(notesDirOf(ws, arc), "samples");
+  let text = "";
+  try { text = readFileSync(join(dir, "index.html"), "utf8"); } catch { return []; }
+  const json = /<script\b[^>]*\bid="index-data"[^>]*>([\s\S]*?)<\/script>/i.exec(text)?.[1];
+  if (!json) return [];
+  let data: unknown;
+  try { data = JSON.parse(json); } catch { return []; }
+  const base = typeof (data as { base?: unknown })?.base === "string" ? (data as { base: string }).base : "";
+  const paths: string[] = [];
+  indexPaths(data, base, paths);
+  return [...new Set(paths)].filter((one) => /\.html?$/i.test(one) && !one.split("/").includes("..")).map((one) => join(dir, one.split("#")[0])).filter((one) => isFile(one));
 }
 
 /**
@@ -494,6 +523,12 @@ export function checkWorkstream(ws: string): Finding[] {
   for (const arc of arcIdsOf(ws))
     for (const message of pageRulesOnDisk(previewOf(ws, arc))) out.push(say(arc, "pages")(`${NOTES}/${arc}/${arcPageNameOf(ws, arc)}: ${message}`));
   if (page) for (const message of pageRulesOnDisk(page)) out.push(say(null, "pages")(`${basename(page)}: ${message}`));
+  // NO PAGE REACHES THE DEVELOPER UNFILLED (RULE.DEVEX.WORKSPACE.560): the approach page, each arc's page, and every page a samples index lists.
+  if (page) for (const message of unfilledFindings(page, basename(page), ["How", "Open", "Deferred"])) out.push(say(null, "unfilled")(message));
+  for (const arc of arcIdsOf(ws)) {
+    for (const message of unfilledFindings(previewOf(ws, arc), `${NOTES}/${arc}/${arcPageNameOf(ws, arc)}`)) out.push(say(arc, "unfilled")(message));
+    for (const sample of listedSamples(ws, arc)) for (const message of unfilledFindings(sample, `${NOTES}/${arc}/samples/${relative(join(notesDirOf(ws, arc), "samples"), sample)}`)) out.push(say(arc, "unfilled")(message));
+  }
   // A preview linked from What outside its arc's entry belongs to no arc's check.
   out.push(...whatLinkFindings(ws, page, text, owners).map(say(null, "stamp")));
   // The status card is read from every arc together, so it belongs to none of them.

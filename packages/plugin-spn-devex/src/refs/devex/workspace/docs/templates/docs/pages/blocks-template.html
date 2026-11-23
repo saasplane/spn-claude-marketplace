@@ -7,7 +7,7 @@
 
 
 
-<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.16.0/docs-language.css" integrity="sha384-vlARMOwfCVdVyTzLK+L4DONP9TnpC3BqCZVg+yzW4NlO/wQLxmLEH54+WfMP6pLJ" crossorigin="anonymous">
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.16.0/docs-language.css" integrity="sha384-eVD+IKBOvQdjamPNYDYt/cSGd89JPQBFPUGneKDviQlHjWc8KB4hxNVbNQ1wRBQd" crossorigin="anonymous">
 <div class="sds-page">
 <nav class="sds-rail" id="rail">
   <div class="sds-rail-title">Blocks</div>
@@ -103,16 +103,23 @@ DOCK | a top bar over a column beside the page
   <pre data-lang="text">```catalog layout=LIST
 MARKETING · Visitor | a site for someone deciding whether the product is for them
   Layouts: TOPNAV for the site · CANVAS for a landing page that stands alone
+  Sections: every site section
   Standard pages: Text page, Not found
+  Audience: Visitor
 ```</pre>
+  <p>A fact whose value is a sentence takes a whole row of its own; short facts share a row in columns.</p>
   <div class="sds-tiles" data-layout="LIST" data-media="MARK">
     <div class="sds-tile"><span class="sds-tile-media" data-media="MARK"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg></span>
       <div class="sds-tile-body"><h4>MARKETING &middot; Visitor</h4><p>a site for someone deciding whether the product is for them</p>
-      <dl class="sds-tile-facts"><div><dt>Layouts</dt><dd><code>TOPNAV</code> for the site &middot; <code>CANVAS</code> for a landing page that stands alone</dd></div><div><dt>Standard pages</dt><dd>Text page, Not found</dd></div></dl></div></div>
+      <dl class="sds-tile-facts"><div class="sds-tile-fact-wide"><dt>Layouts</dt><dd><code>TOPNAV</code> for the site &middot; <code>CANVAS</code> for a landing page that stands alone</dd></div><div><dt>Sections</dt><dd>every site section</dd></div><div><dt>Standard pages</dt><dd>Text page, Not found</dd></div><div><dt>Audience</dt><dd>Visitor</dd></div></dl></div></div>
     <div class="sds-tile"><span class="sds-tile-media" data-media="MARK"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M10 4v4"/><path d="M2 8h20"/><path d="M6 4v4"/></svg></span>
       <div class="sds-tile-body"><h4>DASHBOARD &middot; Team</h4><p>an app a team uses as their job; admin and console apps are dashboards</p>
-      <dl class="sds-tile-facts"><div><dt>Layouts</dt><dd><code>RAIL</code> for the app &middot; <code>DOCK</code> for settings &middot; <code>CANVAS</code> for sign-in, an app that cannot start, a tool</dd></div><div><dt>Standard pages</dt><dd>Not found, No access</dd></div></dl></div></div>
+      <dl class="sds-tile-facts"><div class="sds-tile-fact-wide"><dt>Layouts</dt><dd><code>RAIL</code> for the app &middot; <code>DOCK</code> for settings &middot; <code>CANVAS</code> for sign-in, an app that cannot start, a tool</dd></div><div><dt>Standard pages</dt><dd>Not found, No access</dd></div></dl></div></div>
+    <div class="sds-tile"><span class="sds-tile-media" data-media="MARK"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg></span>
+      <div class="sds-tile-body"><h4>RESOURCES &middot; Learner</h4><p>a site for someone learning how the product works</p>
+      <dl class="sds-tile-facts sds-tile-facts-one"><div><dt>Needed for</dt><dd>a decision, then a later arc once it is made</dd></div></dl></div></div>
   </div>
+  <p>An item with exactly one fact draws it as one line under its description: a small muted label, then the value in italic. Two or more facts keep the columns.</p>
 
   <h4 id="b-catalog-table">TABLE layout</h4>
   <p class="sds-small"><strong>Use when</strong> two to four things are compared fact by fact.</p>

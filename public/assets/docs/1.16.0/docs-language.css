@@ -2787,7 +2787,7 @@
     --sds-tk-k: var(--sds-violet);
     --sds-tk-s: var(--sds-cyan);
     --sds-tk-c: var(--fg-quiet);
-    --sds-tk-t: var(--surface-brand);
+    --sds-tk-t: var(--surface-brand-fg);
     --sds-tk-n: var(--sds-orange);
     --sds-tk-add: var(--on-success-subtle);
     --sds-tk-del: var(--on-error-subtle);
@@ -2838,7 +2838,7 @@
     --sds-tk-k: var(--sds-violet);
     --sds-tk-s: var(--sds-cyan);
     --sds-tk-c: var(--fg-quiet);
-    --sds-tk-t: var(--surface-brand);
+    --sds-tk-t: var(--surface-brand-fg);
     --sds-tk-n: var(--sds-orange);
     --sds-tk-add: var(--on-success-subtle);
     --sds-tk-del: var(--on-error-subtle);
@@ -7363,7 +7363,7 @@
   color: var(--sds-text-description-card);
 }
 .sds-tiles[data-layout='LIST'] .sds-tile-facts {
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
   column-gap: 1.6rem;
   row-gap: .75rem;
 }
@@ -7379,11 +7379,27 @@
 .sds-tiles[data-layout='LIST'] .sds-tile-facts dd {
   color: var(--sds-text-title-card);
 }
+.sds-tiles[data-layout='LIST'] .sds-tile-fact-wide {
+  grid-column: 1 / -1;
+}
 .sds-tiles[data-layout='LIST'] .sds-tile-facts-one {
   grid-template-columns: 1fr;
 }
+.sds-tiles[data-layout='LIST'] .sds-tile-facts-one > div {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: .6rem;
+}
+.sds-tiles[data-layout='LIST'] .sds-tile-facts-one dt {
+  font-size: var(--sds-caption);
+  font-weight: var(--font-weight-regular, 400);
+  color: var(--sds-text-fact-card);
+}
 .sds-tiles[data-layout='LIST'] .sds-tile-facts-one dd {
-  line-height: 1.75;
+  font-style: italic;
+  color: var(--sds-text-description-card);
+  line-height: 1.5;
 }
 @media (max-width: 720px) {
   .sds-tiles[data-layout='LIST'] .sds-tile-facts {

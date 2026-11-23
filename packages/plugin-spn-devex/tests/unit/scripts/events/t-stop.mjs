@@ -2054,9 +2054,9 @@ console.log("\n=== stop — send-backs are written as they are said, the welcome
   const editRows = (ws, change) => { const data = JSON.parse(readFileSync(arcFile(ws), "utf8")); change(data); writeFileSync(arcFile(ws), `${JSON.stringify(data, null, 2)}\n`); };
   const PROMISE = "The page is written and its checks are green.\n\nNext I'll build it.";
 
-  check("[MKT.HOOKS.341] the thirteen checks about the reply are one set in lib/payload.ts",
-    payloadLib.REPLY_CHECKS instanceof Set && payloadLib.REPLY_CHECKS.size === 13
-      && ["needs-you", "reply-shape", "handover", "how-it-runs", "partner-words", "page-path", "close-message", "card-case", "in-flight", "proposal-record", "welcome", "window", "hold"].every((name) => payloadLib.REPLY_CHECKS.has(name)),
+  check("[MKT.HOOKS.341] the fourteen checks about the reply are one set in lib/payload.ts",
+    payloadLib.REPLY_CHECKS instanceof Set && payloadLib.REPLY_CHECKS.size === 14
+      && ["needs-you", "reply-shape", "handover", "how-it-runs", "partner-words", "page-path", "unfilled-page", "close-message", "card-case", "in-flight", "proposal-record", "welcome", "window", "hold"].every((name) => payloadLib.REPLY_CHECKS.has(name)),
     JSON.stringify([...(payloadLib.REPLY_CHECKS ?? [])]));
 
   // The suite runs with SPN_TELEMETRY=off (tests/run.mjs); these cases read the rows a hook writes, so they take it out

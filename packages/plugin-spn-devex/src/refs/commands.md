@@ -76,9 +76,11 @@ spn-devex docs index write <path> [--out <file>] — write the index of the repo
 
 spn-devex docs look <page> [--out <folder>] — render a whole page in light and in dark, and report console errors, failed requests and a page wider than its window
 
-spn-devex docs page check <seat…> — report each page that differs from what its seat file gives, and write nothing
+spn-devex docs page check <seat…> — report each page that differs from what its seat file gives, and write nothing; an `.html` page is read for slots, empty sections and every page finding
 
 spn-devex docs page write <seat…> — write each construct page from its seat file
+
+spn-devex docs page new <kind> <path> [--name <name>] [--workstream <NNN-subject>] [--arc <arc>] — start a hand page from its kind's template: the tool fills what it knows and names the placeholders still to fill
 
 spn-devex docs parity check [<path>…] — the parity findings under the paths, from the seats and the packages of each path's repository
 

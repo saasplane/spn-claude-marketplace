@@ -108,6 +108,7 @@ ${STYLES.stylesheet}
   <p>You get one place for the model. You get one shape per page, and you get one plain voice.</p>
 </section>
 <section id="s3"><div class="sds-section-head"><h2>How &mdash; the order</h2></div>
+  <figure class="dl-figure"><div class="dl-frame"><svg class="dl-svg" viewBox="0 0 928 80" role="img" aria-label="Book, then plugins."></svg></div></figure>
   <h3 id="h1">spn-foundation &mdash; the chapter</h3>
   <p>You read the chapter first, and the code follows it.</p>
 </section>

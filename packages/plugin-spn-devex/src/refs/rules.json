@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "book": {
     "repository": "spn-foundation",
-    "commit": "3db57223"
+    "commit": "73217ba9"
   },
   "rules": [
     {
@@ -14017,6 +14017,19 @@
           "heading": "While the shape is discussed, a find stays on the ideate arc"
         }
       ]
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.560",
+      "level": "MUST",
+      "params": {
+        "check": "doc-check"
+      },
+      "class": "checked",
+      "sentence": "A page shown to the developer holds no placeholder and no empty section",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "heading": "A page is written in two passes",
+      "decision": null,
+      "restated": []
     },
     {
       "id": "RULE.LAUNCHPAD.CONTROL_PLANE.001",
