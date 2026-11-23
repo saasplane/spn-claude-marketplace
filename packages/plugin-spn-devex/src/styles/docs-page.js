@@ -297,7 +297,7 @@
   rail.insertBefore(toggle,rail.firstChild);
   toggle.addEventListener('click',function(){var open=rail.classList.toggle('sds-is-open');toggle.setAttribute('aria-expanded',String(open));});
   rail.addEventListener('click',function(e){if(e.target.closest('a')){rail.classList.remove('sds-is-open');toggle.setAttribute('aria-expanded','false');}});
-  var narrow=window.matchMedia?window.matchMedia('(max-width: 75rem)'):null;
+  var narrow=window.matchMedia?window.matchMedia('(max-width: 68rem)'):null;
   function place(){
     var head=wrap.querySelector('.sds-masthead');
     if(narrow&&narrow.matches&&head)head.parentNode.insertBefore(rail,head.nextSibling);else if(rail.parentNode!==page)page.insertBefore(rail,wrap);

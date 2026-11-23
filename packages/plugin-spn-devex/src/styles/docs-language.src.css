@@ -134,16 +134,21 @@
 }
 
 /* THE TOKENS, each with its dark value. A page never writes a colour or a size of its own. */
-/* THE WIDTHS OF A PAGE are four of them: `--sds-page-max` is the cap of a page and of its footer,
+/* THE WIDTHS OF A PAGE are four of them: `--sds-page-max` is the cap of a page and of its footer (90rem, so a wide Mac
+   screen is used),
    `--sds-measure` is the longest line of running text, `--sds-rail-width` is the outline beside a page, and
    `--sds-tree-width` is the tree of the index: what a window leaves once a page inside the index has its outline,
-   gap, measure and gutters, so the page's text keeps its full line. No script and no page sets a width.
-   THE WINDOW WIDTHS WHERE THE LAYOUT FOLDS are tokens too: `--sds-outline-fold` is 75rem, the measure, the outline, its
-   gap and the gutters (58 + 13 + 3 + 1), below which the outline folds into a menu under the title, so the content never
-   narrows below the measure; `--sds-tree-fold` is 88.5rem, that and the tree's least width (13.5), below which the tree of
-   the index folds above the pages, so it folds first. A media query cannot read a token, so the same numbers are typed in the
-   queries and in the scripts, and `t-styles-current` holds them equal. 40rem is where a page takes the whole window.
-   After a change of `--sds-page-max`, `--sds-measure` or `--sds-rail-width`, change both folds. */
+   gap, content floor and gutters (the outline fold) and 2.5rem more, so the page keeps its outline beside the tree.
+   No script and no page sets a width.
+   THE CONTENT FLOOR, `--sds-content-floor`, is 50rem: the least width a page's content keeps while the outline stands.
+   THE WINDOW WIDTHS WHERE THE LAYOUT FOLDS are tokens too: `--sds-outline-fold` is 68rem, the content floor, the outline,
+   its gap and the gutters (50 + 14 + 3 + 1), below which the outline folds into a menu under the title, so a 13" or 14"
+   Mac with the index's tree open keeps its outline; `--sds-tree-fold` is 81.5rem, that and the tree's least width (13.5),
+   below which the tree of the index folds above the pages, so it folds first. The tree's width reads its middle term
+   from the outline fold the same way it always did: the outline fold plus 2.5rem (68 + 2.5 = 70.5; it was 75 + 2.5 = 77.5).
+   A media query cannot read a token, so the same numbers are typed in the queries and in the scripts, and
+   `t-styles-current` holds them equal. 40rem is where a page takes the whole window.
+   After a change of `--sds-page-max`, `--sds-content-floor` or `--sds-rail-width`, change both folds and the tree's middle term. */
 @layer theme {
   :root{
     --sds-weight-heading:var(--font-weight-bold);
@@ -177,10 +182,10 @@
     --sds-tk-k:var(--sds-violet); --sds-tk-s:var(--sds-cyan); --sds-tk-c:var(--fg-quiet); --sds-tk-t:var(--surface-brand); --sds-tk-n:var(--sds-orange); --sds-tk-add:var(--on-success-subtle); --sds-tk-del:var(--on-error-subtle);
     --sds-violet:#6d3a9c; --sds-violet-soft:#ece3f5; --sds-cyan:#1b6a86; --sds-cyan-soft:#dbeef4; --sds-pink:#a0366d;
     --sds-pink-soft:#f6e0ec; --sds-olive:#5a661c; --sds-olive-soft:#edf0d8; --sds-orange:#a55000; --sds-yellow:#6b5300; --sds-yellow-soft:#fbf1c4;
-    --sds-orange-soft:#fdebd3; --sds-page-max:80rem;
+    --sds-orange-soft:#fdebd3; --sds-page-max:90rem;
     /* the statuses of approach and preview pages, docs tokens, one value per mode */
     --sds-status-planning:oklch(0.767462 0.171331 61.6975); --sds-status-planning-soft:oklch(0.810515 0.145533 67.1324 / 0.2); --sds-status-implementing:oklch(0.3949 0.0942473 244.756); --sds-status-implementing-soft:oklch(0.3949 0.0942473 244.756 / 0.14); --sds-status-done:oklch(0.735386 0.13145 144.907); --sds-status-done-soft:oklch(0.767314 0.115667 145.001 / 0.18); --sds-status-proposed:rgb(107, 83, 0); --sds-status-proposed-soft:rgb(251, 241, 196); --sds-status-decided:oklch(0.570136 0.196001 256.188); --sds-status-decided-soft:oklch(0.699265 0.146593 249.792 / 0.13); --sds-status-running:rgb(165, 80, 0); --sds-status-running-soft:rgb(253, 235, 211); --sds-status-held:oklch(0.439 0 0); --sds-status-held-soft:oklch(0.97 0 0); --sds-status-part-landed:rgb(90, 102, 28); --sds-status-part-landed-soft:rgb(237, 240, 216); --sds-status-landed:oklch(0.735386 0.13145 144.907); --sds-status-landed-soft:oklch(0.767314 0.115667 145.001 / 0.18); --sds-status-carried:rgb(27, 106, 134); --sds-status-carried-soft:rgb(219, 238, 244); --sds-status-dropped:oklch(0.582835 0.202194 29.0717); --sds-status-dropped-soft:oklch(0.724946 0.15472 25.82 / 0.14);
-    --sds-measure:58rem; --sds-rail-width:13rem; --sds-tree-width:clamp(13.5rem,calc(100vw - 77.5rem),22rem); --sds-outline-fold:75rem; --sds-tree-fold:88.5rem;
+    --sds-measure:58rem; --sds-content-floor:50rem; --sds-rail-width:14rem; --sds-tree-width:clamp(13.5rem,calc(100vw - 70.5rem),22rem); --sds-outline-fold:68rem; --sds-tree-fold:81.5rem;
   }
   :root[data-mode="dark"]{
     --sds-tk-k:var(--sds-violet); --sds-tk-s:var(--sds-cyan); --sds-tk-c:var(--fg-quiet); --sds-tk-t:var(--surface-brand); --sds-tk-n:var(--sds-orange); --sds-tk-add:var(--on-success-subtle); --sds-tk-del:var(--on-error-subtle);
@@ -377,7 +382,7 @@
   .sds-open .sds-scroll{margin:.4rem 0}
   pre.sds-preview{@apply font-mono text-xs overflow-x-auto leading-normal; background:var(--surface); border:1px solid var(--surface-border); border-radius:var(--radius-lg); padding:.7rem .9rem; margin:1rem 0}
   footer{@apply font-ui text-xs text-fact; border-top:1px solid var(--sds-rule); padding-top:1.3rem}
-  @media (max-width:75rem){
+  @media (max-width:68rem){
     .sds-page, .sds-page[data-frame="page"].sds-has-rail{@apply gap-6 pt-8; grid-template-columns:minmax(0,1fr)}
     .sds-page > .sds-wrap, .sds-page > .sds-rail{grid-column:auto; grid-row:auto}
     .sds-rail{@apply static bg-card; border:1px solid var(--sds-rule); border-radius:var(--radius-sm); padding:.9rem 1rem}
@@ -865,7 +870,7 @@
 
   /* The index on a narrow screen: the side sits above the tabs. Folded, it is one line that holds the fold
    button and the head card. The script folds the tree at the start, and after a page is chosen. */
-  @media (max-width:88.5rem){
+  @media (max-width:81.5rem){
     .sds-index,.sds-index.sds-is-folded{grid-template-columns:minmax(0,1fr); grid-template-rows:auto minmax(0,1fr)}
     .sds-index-side,.sds-index.sds-is-folded .sds-index-side{@apply static bg-card; overflow-y:auto; border-right:0; border-bottom:1px solid var(--sds-rule); padding:.5rem .6rem; max-height:70dvh}
     .sds-index.sds-is-folded .sds-index-side{@apply flex-row items-center}
