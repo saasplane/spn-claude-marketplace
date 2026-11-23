@@ -37,7 +37,7 @@ Take the scope from the argument: one page, or a flow of pages. A flow is severa
 
 **Where the ask is to set up Figma, or the check before drawing finds something missing, read `skills/design/steps/setup-figma.md` and run it with the person before anything is drawn.**
 
-**Where the ask is to review the pages of a site or an app, and its design language exists, read `skills/design/steps/page-preview.md`.** It copies each running page with `spn-surface page copy`, applies the decided sections, media and words in the copy only, writes each section's note from its case line, and writes the surface page preview from the template.
+**Where the ask is to review the pages of a site or an app, and its design language exists, read `skills/design/steps/page-preview.md`.** It copies each running page with `spn-surface page copy`, applies the decided sections, media and words in the copy only, writes each section's note from its case line, and writes the surface preview from the template.
 
 **Where the ask is a review of a site, or an arc's final re-check of a site that is running, read `skills/design/steps/site-review.md` and run `skills/design/scripts/site-walk.mjs`.** It walks every page at a phone, a tablet and a desktop width in light and dark and reads computed values: each medium's scale and smallest text, the parts hidden at rest, sideways scroll, the head and the root files. A review of copies alone is not a review of the site.
 

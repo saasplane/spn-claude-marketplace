@@ -8,7 +8,7 @@
 //
 // AN ARC'S SAMPLES ARE INDEXED THE SAME WAY (RULE.DEVEX.WORKSPACE.520). A path that is an arc's `notes/<arc>/samples/` folder, or sits in it, is read as
 // the pocket: the pages under it become the tree, grouped by the folder each sits in (the folder is the purpose: `drawn-on-an-app`, `read-from-a-reference`),
-// and `write` writes `samples/index.html`, in the same frame as a repository's artifacts index.
+// and `write` writes `samples/index.html`, in the same frame as a repository's index page.
 //
 // A SUBJECT WITH TWO ACTIONS, AND A `tree` PATH. The path may be a repository, or any folder or file
 // inside one, and the command finds the repository from it. A repository has one index, so `write`
@@ -227,7 +227,7 @@ export function groupsOf(artifacts: string): { groups: TreeNode[]; pages: string
   return { groups, pages: files, notes };
 }
 
-/** What an index says of itself in its head, where it is not a repository's artifacts index. */
+/** What an index says of itself in its head, where it is not a repository's index page. */
 type Headed = { tab: string; id: string; title: string; summary: string };
 
 /** The index page: the template's shell, with its head and its slots filled and its tree written. */

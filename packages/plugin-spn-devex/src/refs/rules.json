@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "book": {
     "repository": "spn-foundation",
-    "commit": "d815d09a"
+    "commit": "50de1165"
   },
   "rules": [
     {
@@ -13425,9 +13425,9 @@
       "level": "GUIDE",
       "params": {},
       "class": "guidance",
-      "sentence": "A surface page preview is the workstream's third page template, used for a surface page review of a site's or an app's pages, and only once the app's design language exists",
+      "sentence": "A surface preview is a page template of its own, in `templates/surface/`, used for a surface page review of a site's or an app's pages, and only once the app's design language exists",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "heading": "The surface page preview",
+      "heading": "The surface preview",
       "decision": null,
       "restated": [
         {
@@ -13446,7 +13446,7 @@
       "class": "stated in a skill",
       "sentence": "The preview holds a bar and a frame, and nothing else",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "heading": "The surface page preview",
+      "heading": "The surface preview",
       "decision": null,
       "restated": [
         {
@@ -13470,7 +13470,7 @@
       "class": "stated in a skill",
       "sentence": "The copy names its own mode switch and holds its notes, and it is just the page when opened alone",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "heading": "The surface page preview",
+      "heading": "The surface preview",
       "decision": null,
       "restated": [
         {
@@ -13499,7 +13499,7 @@
       "class": "stated in a skill",
       "sentence": "The bar's message, the meta and the note marker change only with a new stylesheet version",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "heading": "The surface page preview",
+      "heading": "The surface preview",
       "decision": null,
       "restated": [
         {
@@ -13760,7 +13760,7 @@
       "class": "stated in a skill",
       "sentence": "A surface page sample is checked against the current standard for its kind before it is edited",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "heading": "The surface page preview",
+      "heading": "The surface preview",
       "decision": null,
       "restated": [
         {
@@ -13815,7 +13815,7 @@
         "skill": "spn-devex/ideate"
       },
       "class": "stated in a skill",
-      "sentence": "A page whose sidebar lists other pages is the artifact index, built from `templates/pages/index-template.html`, and it never has a sidebar of its own",
+      "sentence": "A page whose sidebar lists other pages is the index page, built from `templates/pages/index-template.html`, and it never has a sidebar of its own",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "The index of artifacts — one page that opens every other",
       "decision": null,
@@ -13846,7 +13846,7 @@
       "class": "stated in a skill",
       "sentence": "A design-language construct page holds its spec in a fold",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "heading": "The surface page preview",
+      "heading": "The surface preview",
       "decision": null,
       "restated": [
         {

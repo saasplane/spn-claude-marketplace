@@ -1,9 +1,9 @@
-// `spn-surface page copy` — one running page, copied into a folder as a self-contained file for a surface page preview.
+// `spn-surface page copy` — one running page, copied into a folder as a self-contained file for a surface preview.
 //
 //     spn-surface page copy <url> <folder> [--notes <notes.json>]
 //
 // Writes `<folder>/index.html`: the page's rendered markup, every stylesheet the page holds inlined in one `<style>`, its scripts
-// removed, and its fonts copied beside it into `<folder>/fonts/`. It adds what a surface page preview needs, with no outside
+// removed, and its fonts copied beside it into `<folder>/fonts/`. It adds what a surface preview needs, with no outside
 // names: a `preview-mode` meta naming the page's own mode switch, one hidden note for each section from the notes file
 // (`[{ "title": "<the section's heading>", "note": "<line>" }]`, marked `data-note`), and a few lines that read the preview's
 // message `{ "surface-page-preview": { mode, notes } }`. Opened alone, the copy is just the page. The site is only read, and
@@ -17,7 +17,7 @@ import { basename, join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { UsageFault, VALUE, readWords } from "../../../../../plugin-support-lib/src/lib/command.ts";
 
-export const describe = "Copy one running page into a folder as one self-contained file, with a hidden note for each section, for a surface page preview";
+export const describe = "Copy one running page into a folder as one self-contained file, with a hidden note for each section, for a surface preview";
 export const usage = "<url> <folder> [--notes <notes.json>]";
 
 /** One note of the notes file: the heading of the section it belongs to, and its line. */

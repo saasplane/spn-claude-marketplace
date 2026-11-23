@@ -308,7 +308,7 @@ When the arc changes code, the idea is worked in the code itself, one connected 
 - **The bar's message, the meta and the note marker change only with a new stylesheet version** (`RULE.DEVEX.WORKSPACE.537` · MUST · skill:spn-devex/ideate)
 - **A decision you give lives on the arc it moves, written in the reply that agrees it** (`RULE.DEVEX.WORKSPACE.544` · MUST · skill:spn-devex/ideate)
 - **A sample follows what it depends on: an edit checks it against the current standard for its kind first, and a standard that lands under it puts a row on the arc to re-cut it** (`RULE.DEVEX.WORKSPACE.546` · MUST · skill:spn-devex/ideate)
-- **A page whose sidebar lists other pages is the artifact index, built from `templates/pages/index-template.html`, and it never has a sidebar of its own** (`RULE.DEVEX.WORKSPACE.550` · MUST · skill:spn-devex/ideate)
+- **A page whose sidebar lists other pages is the index page, built from `templates/pages/index-template.html`, and it never has a sidebar of its own** (`RULE.DEVEX.WORKSPACE.550` · MUST · skill:spn-devex/ideate)
 - **A design-language construct page holds its spec in a fold** (`RULE.DEVEX.WORKSPACE.551` · MUST · skill:spn-devex/ideate)
 - **Registering is optional, and the chain is complete without it.** (`RULE.LAUNCHPAD.CONTROL_PLANE.001` · MUST · skill:spn-devex/ideate)
 - **Launchpad is built at the partner stage, on the same backbone and with the same stack every adopter gets. It consumes the published packages rather than reading around them.** (`RULE.LAUNCHPAD.CONTROL_PLANE.002` · MUST · skill:spn-devex/ideate)

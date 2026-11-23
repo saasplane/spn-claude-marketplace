@@ -19,7 +19,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "The figures — what sits inside a block, and the closed set of them",
-      "seen": "03955ec7"
+      "seen": "0102cb01"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
@@ -308,9 +308,9 @@ The web's way.
 | how ideas connect | a `dg` diagram |
 | a unit the design system builds | `unit`: inline when small, framed when window-sized (a layout, a whole page) |
 | a unit, variant or page shape not built yet | a skeleton, marked planned; once the design system builds it, the page writer flags it and it becomes a `unit` |
-| one whole page of a product, for review | the surface page preview |
-| several such pages | a samples index: the index template, each entry a surface page preview |
-| a running page as it is | `spn-surface page copy`, in a surface page preview |
+| one whole page of a product, for review | the surface preview |
+| several such pages | a samples index: the index template, each entry a surface preview |
+| a running page as it is | `spn-surface page copy`, in a surface preview |
 | a small picture of an item in a list | `CATALOG` media |
 
 **A skeleton is marked `"planned": true` at the top of its spec.** One that names a unit the design system builds, without the mark, stops the write: draw it with a `unit` fence instead.

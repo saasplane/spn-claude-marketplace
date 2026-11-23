@@ -1018,7 +1018,7 @@ console.log("\n=== doc-check — a long What on an open approach page holds a fi
 }
 
 {
-  console.log("\n=== doc-check — a surface page preview is a bar and a frame (05-artifacts.md, The surface page preview)");
+  console.log("\n=== doc-check — a surface preview is a bar and a frame (05-artifacts.md, The surface preview)");
   const { check } = await import("../../../../src/scripts/checks/doc-check.ts");
   const say = (label, ok, detail = "") => { n += 1; if (!ok) failed += 1; console.log(`  ${ok ? "PASS" : "FAIL"}  ${label}${ok || !detail ? "" : `\n        ${detail}`}`); };
   const path = join(stream(TMP, "096-surface", "open"), "notes", "N001", "samples", "home-preview.html");
@@ -1029,7 +1029,7 @@ console.log("\n=== doc-check — a long What on an open approach page holds a fi
     '<div class="sds-surface-switch"><button type="button" data-surface="mode" data-value="light">Light</button></div>\n' +
     '<div class="sds-surface-switch"><button type="button" data-surface="notes">Notes</button></div></header>\n' +
     `<main class="sds-surface-stage">${frame}</main>${more}\n</div>\n`;
-  const shaped = (text) => check(path, text).some(([, m]) => m.includes("a surface page preview"));
+  const shaped = (text) => check(path, text).some(([, m]) => m.includes("a surface preview"));
   const said = (text) => JSON.stringify(check(path, text));
   say("[MKT.HOOKS.522] green: the bar and the frame over a copy beside it draw nothing", check(path, surface()).length === 0, said(surface()));
   say("[MKT.HOOKS.522] red: a template slot left in is refused", shaped(surface().replace("Home</h1>", "{{THE PAGE'S NAME}}</h1>")), said(surface()));

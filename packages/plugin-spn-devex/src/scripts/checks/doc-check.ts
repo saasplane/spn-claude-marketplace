@@ -658,7 +658,7 @@ function workstreamTemplates(): string | null {
 export const isSurfacePreviewText = (text: string): boolean => /<!--\s*spn:doc[\s\S]*?"variant"\s*:\s*"surface-page-preview"/.test(text);
 
 /**
- * RULE.DEVEX.WORKSPACE.535: a surface page preview holds a bar and a frame and nothing else. It is held to the template: no `{{…}}` slot
+ * RULE.DEVEX.WORKSPACE.535: a surface preview holds a bar and a frame and nothing else. It is held to the template: no `{{…}}` slot
  * left in, the bar with the page's title and the width, mode and Notes switches, a frame whose address is the copy beside the page
  * (a relative path, never another site), and no section, table, list or paragraph of the page's own words, which belong in the copy.
  */
@@ -678,11 +678,11 @@ export function surfacePageShape(text: string): Finding[] {
   }
   if (/<(?:h2|h3|section|table|ul|ol|p)\b/i.test(bare.replace(/<header\b[\s\S]*?<\/header>/i, ""))) parts.push("holds words of its own beside the bar and the frame");
   if (!parts.length) return [];
-  return [["RULE", `a surface page preview ${parts.join(", and ")} (RULE.DEVEX.WORKSPACE.535) · keep to the template: the bar and the frame only, and the page's own words in its copy`]];
+  return [["RULE", `a surface preview ${parts.join(", and ")} (RULE.DEVEX.WORKSPACE.535) · keep to the template: the bar and the frame only, and the page's own words in its copy`]];
 }
 
 /**
- * RULE.DEVEX.WORKSPACE.536: the copy a surface page preview frames names its own mode switch in a `preview-mode` meta and listens for the
+ * RULE.DEVEX.WORKSPACE.536: the copy a surface preview frames names its own mode switch in a `preview-mode` meta and listens for the
  * bar's message `{ "surface-page-preview": { mode, notes } }`, whichever way it was made. Read only where the framed copy sits beside the
  * preview as a file; a copy that is not there is not judged here.
  */
@@ -696,7 +696,7 @@ export function surfacePageCopy(path: string, text: string): Finding[] {
   if (!/<meta\s+name="preview-mode"/i.test(copy)) missing.push("the `preview-mode` meta");
   if (!/surface-page-preview/.test(copy)) missing.push("a listener for the message `{ \"surface-page-preview\": { mode, notes } }`");
   if (!missing.length) return [];
-  return [["RULE", `the page a surface page preview frames (${src}) lacks ${missing.join(" and ")} (RULE.DEVEX.WORKSPACE.536) · a page made by any other means carries the same meta and listener, or the bar's switches do nothing`]];
+  return [["RULE", `the page a surface preview frames (${src}) lacks ${missing.join(" and ")} (RULE.DEVEX.WORKSPACE.536) · a page made by any other means carries the same meta and listener, or the bar's switches do nothing`]];
 }
 
 /** An arc's preview, by its fixed name in `notes/<arc>/` (`N<nnn>`, `ideate` or `follow-ups`). */
@@ -1393,7 +1393,7 @@ export function check(path: string, text: string, fragment = false): Finding[] {
     if (!fragment || ownSentences.length >= 5) found.push(...voice(ownProse, ownSentences, kindOf(path), isOperative(path)));
     return found;
   }
-  // A surface page preview is a bar and a frame (RULE.DEVEX.WORKSPACE.535): the template's shape is all it is read for, never an arc's preview's.
+  // A surface preview is a bar and a frame (RULE.DEVEX.WORKSPACE.535): the template's shape is all it is read for, never an arc's preview's.
   if (isHtml && !fragment && isSurfacePreviewText(text)) return [...structural(path), ...uncutVersions(text), ...surfacePageShape(text), ...surfacePageCopy(path, text)];
   const isApproach = isApproachPage(path);
   const isOverview = path.endsWith("-overview.html");

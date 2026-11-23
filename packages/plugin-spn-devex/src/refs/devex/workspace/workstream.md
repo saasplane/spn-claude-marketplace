@@ -17,7 +17,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
-      "seen": "deef5a41"
+      "seen": "4209ffa7"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -42,7 +42,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "section": "An arc carries its specification, or names the note that holds it",
-      "seen": "d688b918"
+      "seen": "be81bf10"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -61,7 +61,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "seen": "9a3ef351"
+      "seen": "fb510e13"
     }
   ]
 }
@@ -1410,12 +1410,12 @@ and is written by every `workstream` write and `docs cycles write`: never type i
 writes it into the previews of every open and backlog workstream.
 
 **An arc that changes several pages of a surface, or gathers many finds shared as screenshots, keeps each page as a sample of its own under one index** (`RULE.DEVEX.WORKSPACE.520` · GUIDE).
-The index is `notes/<arc>/samples/index.html`, the same frame as a repository's artifacts index: a tree in a side panel, with
+The index is `notes/<arc>/samples/index.html`, the same frame as a repository's index page: a tree in a side panel, with
 pages opened in tabs, grouped by what each is for. The arc's preview links the index once, says what each group holds, and keeps
 the decisions and any detail that is the arc's alone. An arc of one page, or with no drawn page, keeps everything on its preview.
 Writing, naming, grouping and retiring the pages is the agent's job, and a page a decision has overtaken leaves the index.
-`spn-devex docs index write` writes the index from the pages on disk, so the tree is never typed. **A page whose sidebar lists other pages is the artifact index, built from `templates/pages/index-template.html`, and it never has a sidebar of its own** (`RULE.DEVEX.WORKSPACE.550` · MUST · skill:spn-devex/ideate): a samples home, a set of previews and a set of reports are each an index of that template. A design language's samples are one such home, each sample in a surface page preview, in the repository that owns the language. A sample draws the changes
-already decided on its arcs, and never today's code as it stands. A few surface page previews are linked from the arc's preview, and many go in a group folder of the samples under the one index (`docs/…/05-artifacts.md § The surface page preview`).
+`spn-devex docs index write` writes the index from the pages on disk, so the tree is never typed. **A page whose sidebar lists other pages is the index page, built from `templates/pages/index-template.html`, and it never has a sidebar of its own** (`RULE.DEVEX.WORKSPACE.550` · MUST · skill:spn-devex/ideate): a samples home, a set of previews and a set of reports are each an index of that template. A design language's samples are one such home, each sample in a surface preview, in the repository that owns the language. A sample draws the changes
+already decided on its arcs, and never today's code as it stands. A few surface previews are linked from the arc's preview, and many go in a group folder of the samples under the one index (`docs/…/05-artifacts.md § The surface preview`).
 
 **A sheet entry, one a landed row holds included, may name the case ids its runner credits** (`RULE.DEVEX.WORKSPACE.529` · MUST · check:split-plan). `sheet edit <E> --credits <ids>` writes them, and a CODE or PROOF row lands on a credited id as on a case the run proved, where a tier id of the entry is in no case of the run. Crediting changes none of the work the entry plans, so it flags no landed part stale.
 

@@ -3,18 +3,18 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "section": "The surface page preview",
-      "seen": "1ead67e0"
+      "section": "The surface preview",
+      "seen": "ffd251e6"
     }
   ]
 }
 -->
 
-# The surface page preview
+# The surface preview
 
 Read this when the developer asks to review the pages of a site or an app, such as the SaaS Plane site or the hiring demo site, and only once the app's design language exists. Before it exists there is nothing for a page to follow, so the review is of the design language, on the arc's preview (`steps/design-language.md`).
 
-A surface page preview is the workstream's third page template, `surface-page-preview-template.html`: a bar and a frame and nothing else, over the copy of one page. The bar carries the page's title, the width switch, the mode switch and Notes, which is off by default. The copy, or the rendered page, is the work's own file and the preview only views it.
+A surface preview is a page template of its own, in `templates/surface/`, `surface-preview-template.html`: a bar and a frame and nothing else, over the copy of one page. The bar carries the page's title, the width switch, the mode switch and Notes, which is off by default. The copy, or the rendered page, is the work's own file and the preview only views it.
 
 ## The order
 
@@ -24,13 +24,13 @@ A page that exists only as a design is rendered from its tree; a page that runs 
 1. **Copy each running page.** After the design language, run `spn-surface page copy <url> <folder>` for each page, where `<folder>` is `.pages/<page>/` beside the preview. It writes one self-contained `index.html`, with the page's style inlined, its scripts removed and its fonts beside it. The site is only read, and nothing in it changes. A page that is not running yet is built in the worktree first, never drawn by a second renderer.
 2. **Apply what was decided in the copy only.** The decided sections, media and words are changed in the copy and never in the site, so the site stays as it is until the go. A medium is placed as the design language's section layers say, and a section's background is its own `mediaNode`.
 3. **Write each section's note from its case line.** The case line is the one line a section already has (`site-patterns.md`). Put the notes in a notes file, `[{ "title": "<the section's heading>", "note": "<line>" }]`, and give it to the command with `--notes <notes.json>`; each note is pinned to the section whose heading carries that title and stays hidden until the bar's Notes is on. Run the copy again after a note changes.
-4. **Write the surface page preview from the template.** Copy `surface-page-preview-template.html` and fill the page's name and the copy's address, nothing more. The bar and the frame are all the preview holds, and its `spn:doc` variant is `surface-page-preview`, so the docs check holds it to the template and the state check never counts it as the arc's second preview.
+4. **Write the surface preview from the template.** Copy `surface-preview-template.html` and fill the page's name and the copy's address, nothing more. The bar and the frame are all the preview holds, and its `spn:doc` variant is `surface-page-preview`, so the docs check holds it to the template and the state check never counts it as the arc's second preview.
 
 ## A group of pages
 
 - **A group has one layout sample, `00-layout`**, that shows the app's top navigation and footer once, with the menus open and the phone drawer. Every other page of the group shows its own content only, and a page shown alone keeps its layout.
 - **A few previews are linked from the arc's preview.** Many go in a samples group under the one index, which `spn-devex docs index write <samples folder>` produces from the pages on disk, and the arc's preview links the index alone.
-- **A design language's samples are one samples home, the artifact index, with each sample in a surface page preview.** They live in the repository that owns the language, in `docs/artifacts/design-languages/<language>/`: `index.html` is the home, made from the index template; `shared/`, `site/` and `app/` hold one folder per group, each sample two files named by its slot, the page itself and `<slot>.preview.html`, whose frame holds it; `assets/` holds what the pages load. The home has no sidebar of its own. Every language presents the one standard outline, Shared, Site and App, each run through Theme, Layouts, Pages, Containers, Widgets, Media, Motion and Words, and a sample the language leaves out keeps its entry as a short page marked *None* or *Inherited*. The list of samples is data beside the spec, `docs/specs/design-languages/<language>.samples.json`.
+- **A design language's samples are one samples home, the index page, with each sample in a surface preview.** They live in the repository that owns the language, in `docs/artifacts/design-languages/<language>/`: `index.html` is the home, made from the index template; `shared/`, `site/` and `app/` hold one folder per group, each sample two files named by its slot, the page itself and `<slot>.preview.html`, whose frame holds it; `assets/` holds what the pages load. The home has no sidebar of its own. Every language presents the one standard outline, Shared, Site and App, each run through Theme, Layouts, Pages, Containers, Widgets, Media, Motion and Words, and a sample the language leaves out keeps its entry as a short page marked *None* or *Inherited*. The list of samples is data beside the spec, `docs/specs/design-languages/<language>.samples.json`.
 
 ## Traps
 
