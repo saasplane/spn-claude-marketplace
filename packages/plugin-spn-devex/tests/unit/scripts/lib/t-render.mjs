@@ -308,6 +308,15 @@ console.log("\n=== the page renderer — a skeleton of a built unit, and a table
       && made(table(["Piece", "The question it answers", "Its terms"], ...rows(6).map((r) => [r[0], r[1], "t"]))).findings.every((f) => !f.message.includes("reads as a catalog")));
 }
 
+console.log("\n=== the page renderer — a catalog whose names read as conditions");
+{
+  const cond = made(fence("catalog", "how ideas connect | a map\na unit the design system builds | a unit fence"));
+  ok("[RULE.DEVEX.WORKSPACE.549] a catalog item whose name starts with a lower-case article or question word is a soft finding naming the item",
+    cond.findings.length === 1 && !cond.findings[0].stops && cond.findings[0].message === 'a `catalog` item "how ideas connect" reads as a condition: a first column of conditions is a table (rule 549)', JSON.stringify(cond.findings));
+  ok("[RULE.DEVEX.WORKSPACE.549] a digit opens a condition, and a capitalised or plain name does not",
+    made(fence("catalog", "5 files | a count")).findings.length === 1 && made(fence("catalog", "The Map | a map\nReach | a measure")).findings.length === 0);
+}
+
 console.log("\n=== the page renderer — a catalog in three layouts, with media and facts");
 {
   const legacy = made(fence("catalog", "Name | one line | `literal`\nOther | more"));

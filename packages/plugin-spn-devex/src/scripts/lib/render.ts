@@ -17,6 +17,7 @@ import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "no
 import { tmpdir } from "node:os";
 
 import { draw, figureOf, type Spec } from "./draw.ts";
+import { readsAsCondition } from "./block-fit.ts";
 import { sentenceColumn } from "./item-cells.ts";
 import { isSeatFile, producedPageOf } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { stylesDir } from "../../../../plugin-support-lib/src/lib/page-styles.ts";
@@ -537,6 +538,8 @@ function mediaOf(media: string, item: CatalogItem, findings: Finding[]): string 
 /** The cards of one set of items, as the fence's layout and media draw them. Without either, and with no facts, the one-line tile of old. */
 function catalogHtml(items: CatalogItem[], layout: string | null, media: string | null, findings: Finding[], compact = false): string {
   const hasFacts = items.some((item) => item.facts.length);
+  const condition = items.find((item) => readsAsCondition(item.name));
+  if (condition) findings.push({ message: `a \`catalog\` item "${condition.name}" reads as a condition: a first column of conditions is a table (rule 549)` });
   if (!layout && !media && !hasFacts) {
     const tiles = items.map(({ name, line, third }) => `    <div class="sds-tile"><h4>${inline(name)}</h4>${line ? `<p>${inline(line)}</p>` : ""}${third ? `<p class="sds-small"><code>${esc(third.replace(/^`|`$/g, ""))}</code></p>` : ""}</div>`);
     return `  <div class="sds-tiles">\n${tiles.join("\n")}\n  </div>`;
