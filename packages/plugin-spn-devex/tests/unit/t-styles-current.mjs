@@ -67,6 +67,8 @@ console.log("=== styles on the design system — the docs classes read the produ
     !/postMessage/.test(script) && !/preview-mode/.test(script) && !/surface-page-preview/.test(script));
   ok("[MKT.SCRIPTS.589] a page with no rail and three or more sections whose heads hold an h2 gets the rail from the script, and one with fewer gets none",
     /secs\.length<3\)return/.test(script) && /sds-has-rail/.test(script) && /createElement\('nav'\);rail\.className='sds-rail'/.test(script));
+  ok("[MKT.SCRIPTS.589] the page grid gives the content the free width and the outline its own: .sds-page's columns put minmax(0,1fr) first and the rail's width second",
+    /\.sds-page\{[^}]*grid-template-columns:minmax\(0,1fr\) var\(--sds-rail-width\)/.test(source));
   ok("[MKT.SCRIPTS.589] a narrow page folds the rail into a menu under the title, opened by a button",
     /sds-rail-toggle/.test(script) && /matchMedia\('\(max-width: 75rem\)'\)/.test(script));
   ok("[MKT.SCRIPTS.589] the page grid puts the wrap first and the rail second, on the right, and a page template page has the whole width",
