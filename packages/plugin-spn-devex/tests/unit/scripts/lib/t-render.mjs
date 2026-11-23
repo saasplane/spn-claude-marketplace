@@ -212,6 +212,32 @@ console.log("\n=== the page renderer — a unit fence is drawn by the render and
   });
   ok("[MKT.SCRIPTS.613] a render's refusal is a finding that stops the write, with the render's words, and no frame is drawn",
     refused.findings.length === 1 && refused.findings[0].stops === true && refused.findings[0].message.includes("DSFeature has no prop `kind`") && !refused.html.includes("<iframe"), JSON.stringify(refused.findings));
+  // Window-sized units stand in a frame.
+  const framedSeen = [];
+  setUnitRender((file) => { framedSeen.push(JSON.parse(readFileSync(file, "utf8"))); return '<!doctype html><html lang="en"><head><style>a{}</style></head><body><p class="w">a "whole" page & more</p></body></html>'; });
+  const layoutTree = { unit: "DSLayout", props: { type: "RAIL" } };
+  const layout = pageOf(fence("unit", JSON.stringify(layoutTree)), '<link rel="stylesheet" href="https://x/1.16.0/sds-docs.css">');
+  const manySections = pageOf(fence("unit", JSON.stringify({ sections: [{ unit: "DSFeature", props: {} }, { unit: "DSFeature", props: {} }] })));
+  const forcedOff = pageOf(fence("unit", JSON.stringify({ ...layoutTree, frame: false })));
+  const forcedOn = pageOf(fence("unit", JSON.stringify({ unit: "DSFeature", props: {}, frame: true, caption: "Framed" })));
+  const badFrame = pageOf(fence("unit", JSON.stringify({ unit: "DSFeature", props: {}, frame: "yes" })));
+  const iframes = layout.html.match(/<iframe\b[^>]*>/g) ?? [];
+  ok("[MKT.SCRIPTS.615] a unit fence whose first unit is DSLayout is drawn in two frames, light and dark, side by side, 640px high and full width",
+    layout.findings.length === 0 && iframes.length === 2 && iframes[0].includes('data-mode="light"') && iframes[1].includes('data-mode="dark"')
+      && iframes.every((tag) => tag.includes('height="640"') && tag.includes('width="100%"')) && layout.html.includes('<div class="sds-unit-pair">') && !layout.html.includes('class="sds-unit"'), layout.html.slice(-1500));
+  const srcdocs = [...layout.html.matchAll(/srcdoc="([^"]*)"/g)].map((m) => m[1].replace(/&quot;/g, '"').replace(/&amp;/g, "&"));
+  ok("[MKT.SCRIPTS.615] a frame's srcdoc is the render's whole printed page, with its mode on the html element, its quotes and ampersands escaped in the attribute",
+    srcdocs.length === 2 && srcdocs[0].startsWith("<!doctype html><html lang=\"en\" data-mode=\"light\">") && srcdocs[1].includes('data-mode="dark"') && srcdocs[0].includes("<style>a{}</style>")
+      && srcdocs[0].includes('a "whole" page & more') && layout.html.includes("a &quot;whole&quot; page &amp; more"), layout.html.slice(-1500));
+  ok("[MKT.SCRIPTS.615] a unit drawn in a frame needs no ds-unit.css, so the page links none, and the tree is still shown below",
+    !layout.html.includes("ds-unit.css") && layout.html.includes('<pre data-lang="json">'));
+  ok("[MKT.SCRIPTS.615] a tree with more than one section is drawn in a frame too",
+    (manySections.html.match(/<iframe\b/g) ?? []).length === 2 && !manySections.html.includes("ds-unit.css"), manySections.html.slice(-800));
+  ok("[MKT.SCRIPTS.615] \"frame\": false draws a layout inline, and \"frame\": true frames a small unit; the key is out of the tree sent to the render and of the tree shown",
+    !forcedOff.html.includes("<iframe") && forcedOff.html.includes('class="sds-unit" data-mode="light"') && (forcedOn.html.match(/<iframe\b/g) ?? []).length === 2
+      && !forcedOn.html.includes('"frame"') && !forcedOff.html.includes('"frame"') && framedSeen.every((seen) => !JSON.stringify(seen).includes('"frame"')) && forcedOn.html.includes("Framed"), forcedOff.html.slice(-800));
+  ok("[MKT.SCRIPTS.615] a frame that is no boolean stops the write",
+    badFrame.findings.length === 1 && badFrame.findings[0].stops === true && badFrame.findings[0].message.includes("`frame`"), JSON.stringify(badFrame.findings));
   setUnitRender();
 }
 

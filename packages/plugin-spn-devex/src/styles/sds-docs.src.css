@@ -1819,7 +1819,11 @@ pre .sds-tk-g { color: var(--sds-tk-c); font-style: normal; }
   max-height: 46rem;
 }
 .sds-unit-pair > .sds-unit + .sds-unit { border-left: 1px solid var(--sds-rule); }
+/* A window-sized unit: the pair is two frames, 640px high (the height attribute), with no border of their own. */
+.sds-unit-pair > .sds-unit-frame { display: block; width: 100%; min-width: 0; border: 0; background: transparent; }
+.sds-unit-pair > .sds-unit-frame + .sds-unit-frame { border-left: 1px solid var(--sds-rule); }
 @media (max-width: 720px) {
   .sds-unit-pair { grid-template-columns: 1fr; }
   .sds-unit-pair > .sds-unit + .sds-unit { border-left: 0; border-top: 1px solid var(--sds-rule); }
+  .sds-unit-pair > .sds-unit-frame + .sds-unit-frame { border-left: 0; border-top: 1px solid var(--sds-rule); }
 }

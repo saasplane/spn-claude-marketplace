@@ -87,8 +87,10 @@ function unitMarkup(page: string): string {
 /**
  * A fence tagged `unit`: one tree, a unit with its props. It is wrapped as a render file and drawn by the render, and the
  * unit's own markup stands in the page, once in light and once in dark, side by side (`.sds-unit`, styled by `ds-unit.css`),
- * with the tree below as code. The tree may carry a top-level `"caption"`: it is the figcaption's text, the unit's name stays
- * as the small label, and it is taken out before the render and before the tree is shown. A tree that is no JSON, a refusal
+ * with the tree below as code. A window-sized unit (the first unit is `DSLayout`, or the tree has more than one section) is drawn in an `iframe`
+ * instead, 640px high and full width, whose `srcdoc` is the render's whole printed page, one for light and one for dark; a top-level
+ * `"frame": true|false` forces either. The tree may carry a top-level `"caption"`: it is the figcaption's text, the unit's name stays
+ * as the small label. `caption` and `frame` are taken out before the render and before the tree is shown. A tree that is no JSON, a refusal
  * and a finding each stop the write with the render's words.
  */
 function unitFrame(body: string[], findings: Finding[]): string {
@@ -96,15 +98,24 @@ function unitFrame(body: string[], findings: Finding[]): string {
   let tree: any;
   try { tree = JSON.parse(body.join("\n")); } catch (e) { return stop(`a \`unit\` fence is not strict JSON — ${(e as Error).message}`); }
   let caption = "";
-  if (tree && typeof tree === "object" && !Array.isArray(tree) && "caption" in tree) {
-    const { caption: said, ...rest } = tree;
-    if (typeof said !== "string") return stop("a `unit` fence's `caption` is a string, the words under the unit");
-    caption = said.trim();
+  let forced: boolean | null = null;
+  if (tree && typeof tree === "object" && !Array.isArray(tree) && ("caption" in tree || "frame" in tree)) {
+    const { caption: said, frame, ...rest } = tree;
+    if (said !== undefined) {
+      if (typeof said !== "string") return stop("a `unit` fence's `caption` is a string, the words under the unit");
+      caption = said.trim();
+    }
+    if (frame !== undefined) {
+      if (typeof frame !== "boolean") return stop("a `unit` fence's `frame` is `true` or `false`: `true` draws the unit in a frame, `false` draws it inline");
+      forced = frame;
+    }
     tree = rest;
   }
   const sections = Array.isArray(tree?.sections) ? tree.sections : [tree];
   const name = sections[0]?.unit;
   if (typeof name !== "string") return stop("a `unit` fence holds a tree whose first unit has no name: `{ \"unit\": \"DSFeature\", \"props\": { … } }`");
+  // A window-sized unit, a layout or a page of several sections, stands in a frame of its own; `frame` says otherwise.
+  const framed = forced ?? (name === "DSLayout" || sections.length > 1);
   // A unit is drawn by the version its scoped stylesheet was cut from, so its markup and its styles always match.
   const ds = designSystemVersion(undefined, "ds-unit.css") ?? designSystemVersion();
   if (!ds) return stop("a `unit` fence cannot be drawn: the docs stylesheet's design-system version is not read from `ds-tokens.css` in the plugin's styles folder");
@@ -118,9 +129,21 @@ function unitFrame(body: string[], findings: Finding[]): string {
   } catch (e) {
     return stop(`the render stopped the \`${name}\` fence: ${(e as Error).message}`);
   } finally { rmSync(folder, { recursive: true, force: true }); }
-  unitUsed = true;
-  const markup = unitMarkup(page);
-  const mode = (m: "light" | "dark"): string => `    <div class="sds-unit" data-mode="${m}">${markup}</div>`;
+  let mode: (m: "light" | "dark") => string;
+  if (framed) {
+    // The render's whole printed page is the frame's document, so it needs no `ds-unit.css`; the mode is set on its `<html>`.
+    const document = (m: "light" | "dark"): string => {
+      const set = /<html\b[^>]*>/i.test(page)
+        ? page.replace(/<html\b([^>]*)>/i, (_w, attrs: string) => `<html${attrs.replace(/\sdata-mode="[^"]*"/i, "")} data-mode="${m}">`)
+        : `<html data-mode="${m}">${page}</html>`;
+      return set.replace(/&/g, "&amp;").replace(/"/g, "&quot;");
+    };
+    mode = (m) => `    <iframe class="sds-unit-frame" data-mode="${m}" title="${esc(name)}, ${m}" width="100%" height="640" srcdoc="${document(m)}"></iframe>`;
+  } else {
+    unitUsed = true;
+    const markup = unitMarkup(page);
+    mode = (m) => `    <div class="sds-unit" data-mode="${m}">${markup}</div>`;
+  }
   const label = caption ? `<span class="sds-file-path">${inline(caption)}</span><span class="sds-file-lang">${esc(name)}</span>`
     : `<span class="sds-file-path">${esc(name)}</span><span class="sds-file-lang">unit</span>`;
   return `  <figure class="sds-file">\n    <figcaption>${label}</figcaption>\n`
