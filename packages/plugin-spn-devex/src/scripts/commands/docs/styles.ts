@@ -5,25 +5,26 @@
 // write a copy of a page that carries its version's styles inside it. Every refusal exits 1 and
 // writes nothing.
 //
-//   spn-devex docs styles cut <version> [--root <folder>] [--ds <folder>] [--ds-version <tag>]   cut a version, with the design system's tokens copied first where --ds names its checkout
+//   spn-devex docs styles cut <version> [--replace] [--root <folder>] [--ds <folder>] [--ds-version <tag>]   cut a version, with the design system's tokens copied first where --ds names its checkout; --replace recuts one that is not published
+//   spn-devex docs styles preview <folder> [--root <folder>]               the quick loop: build, and copy the built files into <folder>/_assets/docs/<next version>/, no hashes
 //   spn-devex docs styles check <version> <folder…> [--root <folder>]      list the pages a move would change
 //   spn-devex docs styles repoint <version> <folder…> [--root <folder>]    move the pages
 //   spn-devex docs styles bundle <page> [--assets <folder>]                write the bundled copy
 //
-// A SUBJECT WITH FOUR ACTIONS, AND A `file` PATH. `check` is the look before `repoint` and writes
+// A SUBJECT WITH FIVE ACTIONS, AND A `file` PATH. `check` is the look before `repoint` and writes
 // nothing. The version is a word of its own before the paths, so it is never read as a path.
 
 import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import { existsSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, readdirSync, statSync, unlinkSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { DEVEX_WORKSTREAMS, slashes } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import {
   ANY_SERVED_NAMES, BUNDLED_SUFFIX, INTEGRITY_FILE, OLD_NAMES, OWN_COPY, STYLESHEET, STYLES_ADDRESS, anyNameOf, cutVersions, integrityTable,
-  nameIn, servedFilesOf, sha384Of, sharedStyles, stylesDir,
+  nameIn, newestVersion, servedFilesOf, sha384Of, sharedStyles, stylesDir,
 } from "../../../../../plugin-support-lib/src/lib/page-styles.ts";
-import { type Action, REQUIRED, UsageFault, VALUE, onePath, readWords, scopeOf } from "../../../../../plugin-support-lib/src/lib/command.ts";
+import { type Action, FLAG, REQUIRED, UsageFault, VALUE, onePath, readWords, scopeOf } from "../../../../../plugin-support-lib/src/lib/command.ts";
 import { resolveWorkspace } from "./_lib.ts";
 
 export const describe = "the shared page styles, served in versions: cut one, move pages to one, or bundle a page with its styles inside";
@@ -167,26 +168,70 @@ function refreshTokens(home: string, styles: string, ds: string, tag: string | n
   return null;
 }
 
+/** The branch the pages workflow serves `public/` from, as a remote-tracking ref, and the local branch it falls back to. */
+const PUBLISHED_REFS: readonly string[] = ["origin/develop", "develop"];
+
+/**
+ * THE VERSIONS THAT ARE PUBLISHED: the ones `versions.json` lists on the branch the pages workflow deploys (`develop`, the
+ * branch a plugin is installed from; `.github/workflows/pages.yml`). The release reads the remote's tags, but a version's
+ * folder is served from `develop`, so a version listed there is one a page may already link. The remote-tracking
+ * `origin/develop` is read first, then the local `develop`. Null where neither can be read.
+ */
+export function publishedVersions(home: string): Set<string> | null {
+  for (const ref of PUBLISHED_REFS) {
+    try {
+      const text = execFileSync("git", ["-C", home, "show", `${ref}:${slashes(join(STYLES_SEAT, VERSIONS_FILE))}`],
+        { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"], maxBuffer: 16 * 1024 * 1024 });
+      return new Set(Object.keys(JSON.parse(text) as Record<string, unknown>));
+    } catch { /* try the next ref */ }
+  }
+  return null;
+}
+
+const CANNOT_TELL = (): string => `which versions are published cannot be read: neither \`${PUBLISHED_REFS.join("`, nor `")}\` holds \`${slashes(join(STYLES_SEAT, VERSIONS_FILE))}\``;
+const PUBLISHED = (version: string): string => `${version} is published; a published version never changes. Cut a new one.`;
+
+/** Build the stylesheet from its source, so nothing served or previewed carries a stale built file. Null where it built, a sentence where it did not. */
+function buildStyles(home: string): string | null {
+  const script = join(home, "scripts", "build-styles.mjs");
+  if (!isFile(script)) return null;
+  try { execFileSync(process.execPath, [script], { stdio: ["ignore", "pipe", "pipe"], cwd: home }); return null; }
+  catch (error) { return `the build of the styles failed: ${String((error as { stderr?: unknown }).stderr ?? error).trim()}`; }
+}
+
 /** Copy the three built files, and the fonts beside them, into the version's folder, and list the version with each file's hash. */
-function cut(version: string, root: string | null, ds: string | null = null, dsVersion: string | null = null): number {
+function cut(version: string, root: string | null, ds: string | null = null, dsVersion: string | null = null, replace = false): number {
   if (!VERSION.test(version)) return refuse("cut", `\`${version}\` is not a version. A version is three numbers, such as \`1.1.0\``);
   const home = marketplaceFrom(root);
   if (home === null) return refuse("cut", NOT_MARKETPLACE(root));
   const styles = join(home, STYLES_SEAT);
+  const folder = join(home, SERVED_SEAT, version);
+  const earlier = versionsIn(styles);
+  if (typeof earlier === "string") return refuse("cut", earlier);
+  const exists = existsSync(folder) || version in earlier;
+  if (exists) {
+    const published = publishedVersions(home);
+    if (published?.has(version)) return refuse("cut", PUBLISHED(version));
+    if (!replace) {
+      const where = existsSync(folder) ? `exists at \`${folder}\`` : `is listed in \`${join(styles, VERSIONS_FILE)}\`, whose folder is \`${folder}\``;
+      return refuse("cut", `version ${version} ${where}. A version never changes once it is published, so cut the next one`
+        + (published === null ? `. \`--replace\` recuts a version that is not published, and it needs to read which are: ${CANNOT_TELL()}`
+          : ". Or, since it is not published, `--replace` recuts it in place"));
+    }
+    if (published === null) return refuse("cut", `\`--replace\` recuts only a version that is not published: ${CANNOT_TELL()}`);
+  } else if (replace) {
+    console.log(`note: version ${version} does not exist yet, so \`--replace\` changes nothing about this cut`);
+  }
   if (ds !== null) {
     const failed = refreshTokens(home, styles, resolve(ds), dsVersion);
     if (failed !== null) return refuse("cut", failed);
   } else if (dsVersion !== null) return refuse("cut", "`--ds-version` names a version of the design system, and it is read from the checkout `--ds` names");
-  const folder = join(home, SERVED_SEAT, version);
+  else {
+    const failed = buildStyles(home);
+    if (failed !== null) return refuse("cut", failed);
+  }
   const versions = versionsIn(styles);
   if (typeof versions === "string") return refuse("cut", versions);
-  if (existsSync(folder)) {
-    return refuse("cut", `version ${version} exists at \`${folder}\`. A version never changes once it is cut, so cut the next one`);
-  }
-  if (version in versions) {
-    return refuse("cut", `\`${join(styles, VERSIONS_FILE)}\` lists version ${version}, whose folder is \`${folder}\`. `
-      + "A version never changes once it is cut, so cut the next one");
-  }
   // From 1.16.0 a version also serves the design system's two stylesheets, cut by `scripts/build-unit-styles.mjs`.
   const served = servedFilesOf(version);
   const missing = served.filter((name) => !isFile(join(styles, name)));
@@ -196,6 +241,10 @@ function cut(version: string, root: string | null, ds: string | null = null, dsV
   const pinned: Record<string, string> = {};
   const built = served.map((name) => ({ name, bytes: readFileSync(join(styles, name)) }));
   mkdirSync(folder, { recursive: true });
+  // A RECUT LEAVES NO FILE OF THE OLD CUT BEHIND: a file of the folder the version no longer serves is removed, one file at a time.
+  if (replace) {
+    for (const name of readdirSync(folder)) if (!served.includes(name) && isFile(join(folder, name))) unlinkSync(join(folder, name));
+  }
   for (const { name, bytes } of built) {
     writeFileSync(join(folder, name), bytes);
     hashes[name] = createHash("sha256").update(bytes).digest("hex");
@@ -204,11 +253,58 @@ function cut(version: string, root: string | null, ds: string | null = null, dsV
   // THE FONTS SIT BESIDE THE STYLESHEET: its @font-face urls are relative to it, so the version's folder holds `fonts/` too.
   copyFonts(join(styles, FONTS_FOLDER), join(folder, FONTS_FOLDER));
   writeFileSync(join(styles, VERSIONS_FILE), `${JSON.stringify({ ...versions, [version]: hashes }, null, 2)}\n`, "utf8");
-  // THE INTEGRITY HASH IS RECORDED WITH THE VERSION AND NEVER CHANGES: a page links it beside the address.
+  // THE INTEGRITY HASH IS RECORDED WITH THE VERSION: a page links it beside the address. It changes only with `--replace`, on a version nobody has published.
   writeFileSync(join(styles, INTEGRITY_FILE), `${JSON.stringify({ ...integrityTable(styles), [version]: pinned }, null, 2)}\n`, "utf8");
 
-  console.log(`✓ cut version ${version} → ${folder}`);
+  console.log(`✓ ${exists ? "recut" : "cut"} version ${version} → ${folder}`);
   for (const name of served) console.log(`    ${name.padEnd(18)} sha256 ${hashes[name]} · ${pinned[name]}`);
+  return 0;
+}
+
+// ---------------------------------------------------------------------------- preview
+
+/** The folders a preview may write into: a workstream's folder, or a repository's artifacts pocket. */
+const PREVIEW_PLACE = new RegExp(`(?:^|\\/)(?:${escaped(DEVEX_WORKSTREAMS)}|docs\\/artifacts)(?:\\/|$)`);
+
+/** The version the next cut will be: the newest listed version where it is not published, else the next minor after it. */
+function nextVersion(versions: readonly string[], published: Set<string>): string {
+  const newest = newestVersion(versions);
+  if (newest === null) return "1.0.0";
+  if (!published.has(newest)) return newest;
+  const [major, minor] = newest.split(".").map(Number);
+  return `${major}.${minor + 1}.0`;
+}
+
+/**
+ * THE QUICK LOOP: build the stylesheet and copy the built shared files, and the fonts, into a samples folder under the name of
+ * the version the next cut will have. It lists no version and records no hash, so the pages of the folder link it with none.
+ * The one cut, with `--replace`, comes at the end.
+ */
+function preview(folder: string, root: string | null): number {
+  const target = resolve(folder);
+  if (!PREVIEW_PLACE.test(slashes(target))) {
+    return refuse("preview", `\`${target}\` is not under a workstream's folder (\`${slashes(DEVEX_WORKSTREAMS)}/\`) or a repository's \`docs/artifacts/\`, so nothing is written there`);
+  }
+  if (!isDir(target)) return refuse("preview", `\`${target}\` is not a folder`);
+  const home = marketplaceFrom(root);
+  if (home === null) return refuse("preview", NOT_MARKETPLACE(root));
+  const styles = join(home, STYLES_SEAT);
+  const versions = versionsIn(styles);
+  if (typeof versions === "string") return refuse("preview", versions);
+  const published = publishedVersions(home);
+  if (published === null) return refuse("preview", CANNOT_TELL());
+  const failed = buildStyles(home);
+  if (failed !== null) return refuse("preview", failed);
+  const version = nextVersion(Object.keys(versions), published);
+  const served = servedFilesOf(version);
+  const missing = served.filter((name) => !isFile(join(styles, name)));
+  if (missing.length) return refuse("preview", `\`${styles}\` holds no ${missing.map((name) => `\`${name}\``).join(", ")}. Build the styles first`);
+  const into = join(target, "_assets", "docs", version);
+  mkdirSync(into, { recursive: true });
+  for (const name of served) writeFileSync(join(into, name), readFileSync(join(styles, name)));
+  copyFonts(join(styles, FONTS_FOLDER), join(into, FONTS_FOLDER));
+  console.log(`✓ previewed ${served.length} files → ${into}  (version ${version}, nothing listed, no hashes)`);
+  for (const name of served) console.log(`    ${name}`);
   return 0;
 }
 
@@ -403,10 +499,15 @@ function versionFirst(words: string[]): { version: string; rest: string[] } {
 }
 
 function cutAction(args: string[]): number {
-  const words = readWords(args, { root: VALUE, ds: VALUE, "ds-version": VALUE });
+  const words = readWords(args, { root: VALUE, ds: VALUE, "ds-version": VALUE, replace: FLAG });
   const { version, rest } = versionFirst(words.paths);
   if (rest.length) throw new UsageFault("takes one version.");
-  return cut(version, words.value("root"), words.value("ds"), words.value("ds-version"));
+  return cut(version, words.value("root"), words.value("ds"), words.value("ds-version"), words.given("replace"));
+}
+
+function previewAction(args: string[]): number {
+  const words = readWords(args, { root: VALUE });
+  return preview(onePath(scopeOf(words.paths, REQUIRED)), words.value("root"));
 }
 
 /** `check` and `repoint` are one reading of the pages; `repoint` is the one that writes them. */
@@ -423,9 +524,14 @@ function bundleAction(args: string[]): Promise<number> {
 
 export const actions: Record<string, Action> = {
   cut: {
-    describe: "copy the built styles into a version's folder, and list the version; with --ds, copy the design system's tokens first and build",
-    usage: "<version> [--root <folder>] [--ds <folder>] [--ds-version <tag>]",
+    describe: "copy the built styles into a version's folder, and list the version; --replace recuts a version that is not published; with --ds, copy the design system's tokens first and build",
+    usage: "<version> [--replace] [--root <folder>] [--ds <folder>] [--ds-version <tag>]",
     run: cutAction,
+  },
+  preview: {
+    describe: "the quick loop: build the styles and copy the built files into <folder>/_assets/docs/<next version>/, with no hash and no version listed",
+    usage: "<folder> [--root <folder>]",
+    run: previewAction,
   },
   check: {
     describe: "list the pages a move to the version would change, and write nothing",

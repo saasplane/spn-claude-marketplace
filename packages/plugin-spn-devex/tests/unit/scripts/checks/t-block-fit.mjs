@@ -134,5 +134,19 @@ ok("[MKT.HOOKS.529] green: the index template's index-data is a frame", holdsTem
 ok("[MKT.HOOKS.529] red: .sds-page without .sds-masthead is no frame", !holdsTemplateFrame('<div class="sds-page"><div class="sds-wrap"></div></div>'));
 ok("[MKT.HOOKS.529] green: a frame named only inside a comment is no frame", !holdsTemplateFrame(`<!-- ${FRAMED} --><p>x</p>`));
 
+console.log("=== a list of links to other pages is a `cards` block (rule 549)");
+{
+  const DOORS = "these items are doors to other pages: a `cards` block (rule 549)";
+  ok("red: a list of two links to other pages is a SOFT hint to use cards", sayHtml('<ul><li><a href="a.html">The first path</a></li><li><a href="b.html">The second path</a></li></ul>', "overview").includes(DOORS));
+  ok("red: an item that names the link after a label is still a door", sayHtml('<ul><li>New here <a href="a.html">the day-zero walk</a></li><li>Building <a href="b.html">the path</a></li></ul>', "hub").includes(DOORS));
+  ok("green: links to anchors of the same page are a list of contents, silent", !sayHtml('<ul><li><a href="#one">One</a></li><li><a href="#two">Two</a></li></ul>').includes(DOORS));
+  ok("green: a list with one door among plain items is silent", !sayHtml('<ul><li>a plain item with several words in it</li><li><a href="b.html">The second path</a></li></ul>').includes(DOORS));
+  ok("green: a link that is a small part of a long item is silent", !sayHtml('<ul><li>This item says a good deal more than it links, in many words, <a href="a.html">see</a></li><li>And so does this item, in as many words as the first, <a href="b.html">here</a></li></ul>').includes(DOORS));
+  ok("green: a single link is no list of doors", !sayHtml('<ul><li><a href="a.html">The first path</a></li></ul>').includes(DOORS));
+  ok("red: a markdown list of two links to other pages is the same hint", say("- [The first path](a.md)\n- [The second path](b.md)").includes(DOORS));
+  ok("green: a markdown list of anchors is silent", !say("- [One](#one)\n- [Two](#two)").includes(DOORS));
+  ok("the hint is SOFT", blockFit(html('<ul><li><a href="a.html">The first path</a></li><li><a href="b.html">The second path</a></li></ul>'), true, "overview").every(([severity]) => severity === "SOFT"));
+}
+
 console.log(failed ? `\n  ${failed} of ${total} FAILED — t-block-fit` : `\n  all ${total} passed — t-block-fit`);
 process.exit(failed ? 1 : 0);

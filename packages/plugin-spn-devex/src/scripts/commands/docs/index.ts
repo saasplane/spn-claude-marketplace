@@ -33,8 +33,6 @@ const OPTIONS = { out: VALUE };
 const POCKET_PATH = `${DOCS}/${POCKET.artifacts}`;
 /** The groups of the tree, in their order. The public index holds the first three, and the private index the last. */
 const GROUPS = ["Docs", "Guides", "Surface", "Reports"] as const;
-/** How many tabs the index keeps open. One more page takes the tab that was opened longest ago. */
-const TAB_LIMIT = 8;
 /** The block of data that holds the tree, with the comment above it. */
 const DATA_BLOCK = /(?:<!--(?:(?!-->)[\s\S])*-->\s*)?<script type="application\/json" id="index-data">([\s\S]*?)<\/script>/;
 
@@ -47,7 +45,7 @@ export type TreeNode = {
   note?: string; beside?: boolean;
 };
 /** The data of an index: the path to the pages, the limit of tabs, and the groups. */
-export type Tree = { base: string; tabs: number; groups: TreeNode[] };
+export type Tree = { base: string; groups: TreeNode[] };
 
 /** What the index reads of one page: its text, its name, its kind, and the guide it was produced from. */
 type PageFacts = { text: string; title: string; kind: string; source: string | null };
@@ -338,7 +336,7 @@ function runSamples(samples: string, write: boolean, out: string | null): number
     const { groups, pages } = sampleGroupsOf(samples);
     if (!pages.length) throw new Refusal(`${relative(workspace, samples)} holds no page, so there is nothing to list`);
     const base = dirname(index) === samples ? "" : `${slashes(relative(dirname(index), samples))}/`;
-    const produce = (): string => indexPage(pageTemplate(templatesDir(workspace), TEMPLATE), { base, tabs: TAB_LIMIT, groups }, {
+    const produce = (): string => indexPage(pageTemplate(templatesDir(workspace), TEMPLATE), { base, groups }, {
       organisation: "SaaS Plane", location: `${stream} ${arc}`, repository: samples, hub: base + (groups.flatMap(entriesOf)[0]?.path ?? ""),
     }, { tab: `${stream} ${arc} samples`, id: `${stream}-${arc}-samples-index`, title: "Samples", summary: `Every sample page of arc ${arc}, in one tree grouped by what each is for, opened in tabs.` });
     if (write) return say(place(index, produce(), true, workspace, "index"), workspace) ? 1 : 0;
@@ -401,7 +399,7 @@ function run(args: string[], write: boolean): number {
       const headed = half ? { tab: `${named === "—" ? basename(repository) : named} ${half === VISIBILITY.public ? "Public" : "Private"}`, id: `${basename(repository)}-artifacts-${half}-index`,
         title: half === VISIBILITY.public ? "Public" : "Private",
         summary: `Every page of this repository's ${slashes(relative(repository, root))}, in one tree, opened in tabs.` } : undefined;
-      const produce = (): string => indexPage(pageTemplate(templatesDir(workspace), TEMPLATE), { base, tabs: TAB_LIMIT, groups }, {
+      const produce = (): string => indexPage(pageTemplate(templatesDir(workspace), TEMPLATE), { base, groups }, {
         organisation: "SaaS Plane",
         location: named === "—" ? basename(repository) : named,
         repository,

@@ -107,7 +107,7 @@ second an explaining page's.
 | `DIFF` | what a file says today and will say | a `FILE` frame holding a `diff` fence | an approach page or a preview only | the page writer (532) |
 | **Figure** | a shape: parts, a path, participants, data | a sentence before, the drawing, a caption after | drawn from a spec | `docs figure check` |
 | `CATALOG` | a set of named things, no order | a tile: name, line, literal | one line a tile | the page writer (532) |
-| `CARDS` | pages a reader might go to next | title, description, *Read more* | one grid for a subsection | the page writer (532) |
+| `CARDS` | pages a reader might go to next | optional kicker, title, description | one grid for a subsection | the page writer (532) |
 | `NEXT` | the two pages either side | a title and a direction | two doors, no paragraph | the page writer (532) |
 | **Sample link** | a whole file of the work | a link into `samples/` | never framed in the page | read at review |
 | **Card** | a decision still open | options side by side, and the card | the card section of the book | `doc-check` |
@@ -199,8 +199,8 @@ export interface IDSTheme {}
 ```
 ````
 
-`catalog` makes one tile a line in one grid, its literal in code and optional. `cards` makes a tile a door, the title
-and *Read more* both links. `next` makes the two doors, and a line may be left out. `file=<path>` makes the frame with
+`catalog` makes one tile a line in one grid, its literal in code and optional. `cards` makes a tile a door: the whole tile is one link, with an arrow after the title, and a line of four parts
+(`Kicker | Title | description | link`) puts a kicker before the title, where three parts do not. `next` makes the two doors, and a line may be left out. `file=<path>` makes the frame with
 the path as its title and the language as a badge. A `cards` line with no link, and a block with no line, are findings.
 The `PROSE` panel still has no spelling: write a paragraph where you wanted one, and never hand-write HTML to fake it.
 

@@ -10,6 +10,7 @@
 //   a sentence with three or more code spans                      a list, a table or a FILE frame
 //   a list past seven items, or an item of 25 words or more        a table of item cells
 //   a callout that is more than one sentence                      a paragraph, with the rule in one sentence
+//   a list whose items are links to other pages                   a `cards` block, the doors a reader goes to next
 
 import { basename } from "node:path";
 import { figureHints } from "./figure-hints.ts";
@@ -55,7 +56,7 @@ export function fitKind(path: string): FitKind | null {
 
 type Unit =
   | { kind: "p"; text: string; part: Part }
-  | { kind: "list"; items: string[]; part: Part }
+  | { kind: "list"; items: string[]; part: Part; doors?: boolean }
   | { kind: "callout"; text: string; part: Part };
 type Part = { name: string; other: boolean };
 
@@ -87,8 +88,8 @@ function unitsOfHtml(text: string): Unit[] {
     if (found[3] !== undefined || found[4] !== undefined) { part.other = true; held.push({ kind: "callout", text: plain(found[3] ?? found[4]), part }); continue; }
     if (found[5]) {
       part.other = true;
-      const items = [...found[6].matchAll(/<li\b[^>]*>([\s\S]*?)<\/li>/gi)].map((li) => plain(li[1]));
-      held.push({ kind: "list", items, part });
+      const raw = [...found[6].matchAll(/<li\b[^>]*>([\s\S]*?)<\/li>/gi)].map((li) => li[1]);
+      held.push({ kind: "list", items: raw.map(plain), part, doors: raw.length >= 2 && raw.every(linksElsewhereHtml) });
       continue;
     }
     if (found[8] !== undefined) {
@@ -103,6 +104,26 @@ function unitsOfHtml(text: string): Unit[] {
   flushPart(held, out, part);
   return out;
 }
+
+/**
+ * AN ITEM THAT IS A DOOR: its main content is a link to another page. A link to an anchor of the same page, a mail link, and a link
+ * that is only a small part of a longer item do not count; the link's words are at least two fifths of the item's.
+ */
+const DOOR_SHARE = 0.4;
+function isDoor(html: string, links: { href: string; text: string }[]): boolean {
+  const other = links.filter((one) => one.href && !one.href.startsWith("#") && !/^(?:mailto|tel|javascript):/i.test(one.href));
+  if (!other.length) return false;
+  const whole = countWords(plain(html));
+  return whole > 0 && other.reduce((sum, one) => sum + countWords(one.text), 0) / whole >= DOOR_SHARE;
+}
+function linksElsewhereHtml(li: string): boolean {
+  return isDoor(li, [...li.matchAll(/<a\b[^>]*\bhref="([^"]*)"[^>]*>([\s\S]*?)<\/a>/gi)].map((one) => ({ href: one[1], text: plain(one[2]) })));
+}
+function linksElsewhereMarkdown(item: string): boolean {
+  return isDoor(item, [...item.matchAll(/\[([^\]]*)\]\(([^)\s]*)[^)]*\)/g)].map((one) => ({ href: one[2], text: one[1] })));
+}
+
+export const DOORS_AS_CARDS = "these items are doors to other pages: a `cards` block (rule 549)";
 
 /** A part's units go out once the part is whole, so each knows whether another block sits beside it. */
 function flushPart(held: Unit[], out: Unit[], _part: Part): void {
@@ -128,7 +149,7 @@ function unitsOfMarkdown(text: string): Unit[] {
         at += 1;
         if (/^\s*(?:[-*]|\d+[.)])\s/.test(lines[at])) items.push(lines[at].replace(/^\s*(?:[-*]|\d+[.)])\s*/, "")); else items[items.length - 1] += ` ${lines[at].trim()}`;
       }
-      out.push({ kind: "list", items: items.map((one) => one.replace(/\*\*/g, "").replace(/\[([^\]]*)\]\([^)]*\)/g, "$1")), part });
+      out.push({ kind: "list", items: items.map((one) => one.replace(/\*\*/g, "").replace(/\[([^\]]*)\]\([^)]*\)/g, "$1")), part, doors: items.length >= 2 && items.every(linksElsewhereMarkdown) });
       continue;
     }
     if (!line.trim()) { flush(); continue; }
@@ -259,6 +280,7 @@ export function blockFit(text: string, isHtml: boolean, kind: FitKind): Finding[
       continue;
     }
     if (unit.kind === "list") {
+      if (unit.doors) out.push(["SOFT", DOORS_AS_CARDS]);
       const long = unit.items.filter((item) => countWords(item) >= bound.itemWords);
       if (unit.items.length > bound.items)
         out.push(["SOFT", `a list of ${unit.items.length} items, ${lead(unit.items[0])} — a list holds at most ${bound.items} (RULE.DEVEX.WORKSPACE.530) · make it a table of item cells`]);

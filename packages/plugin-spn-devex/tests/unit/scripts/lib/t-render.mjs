@@ -140,8 +140,13 @@ ok("red: several columns of sentences are a paragraph each, led by the column's 
     && catalog.includes('<div class="sds-tile"><h4>Guide</h4><p>stages and steps</p></div>'), catalog);
   ok("[RULE.DEVEX.WORKSPACE.532] a catalog line draws no code line when it has no literal", !catalog.split("\n").find((row) => row.includes("<h4>Guide</h4>"))?.includes("<code>"), catalog);
   const cards = produced(fence("cards", "Reading path | what it covers | path.md\nOther | a second door | other.md"));
-  ok("[RULE.DEVEX.WORKSPACE.532] a cards fence is a tile a door, its title and its Read more both links",
-    cards.includes('<h4><a href="path.md">Reading path</a></h4><p>what it covers</p><a class="sds-more" href="path.md">Read more &rarr;</a>') && cards.includes('href="other.md">Read more'), cards);
+  ok("[RULE.DEVEX.WORKSPACE.532] a cards fence is a tile a door: the whole tile is one link, with an arrow after the title and no Read more",
+    cards.includes('<a class="sds-tile sds-door" href="path.md"><span class="sds-door-title">Reading path<span class="sds-door-arrow" aria-hidden="true">&rarr;</span></span><span class="sds-door-line">what it covers</span></a>')
+      && cards.includes('href="other.md"') && !cards.includes("Read more") && !cards.includes("sds-door-kicker"), cards);
+  const kicked = produced(fence("cards", "Start here | Reading path | what it covers | path.md\nOther | a second door | other.md"));
+  ok("[RULE.DEVEX.WORKSPACE.532] a line of four parts puts a kicker before the title, and a line of three reads as before",
+    kicked.includes('<span class="sds-door-kicker">Start here</span><span class="sds-door-title">Reading path<') && kicked.includes('href="path.md"')
+      && kicked.includes('<span class="sds-door-title">Other<') && (kicked.match(/sds-door-kicker/g) ?? []).length === 1, kicked);
   ok("[RULE.DEVEX.WORKSPACE.532] one grid holds every card of the fence", (cards.match(/<div class="sds-tiles">/g) ?? []).length === 1, cards);
   const next = produced(fence("next", "previous | The page before | before.md\nnext | The page after | after.md"));
   ok("[RULE.DEVEX.WORKSPACE.532] a next fence is the two doors, previous then next",

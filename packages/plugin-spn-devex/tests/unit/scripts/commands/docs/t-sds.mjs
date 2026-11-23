@@ -114,8 +114,9 @@ for (const [name, body] of Object.entries(BUILT)) put(join(SCRATCH, "assets", na
 
 // ---------------------------------------------------------------------------- cut
 
-const CUT_USAGE = "usage: spn-devex docs styles cut <version> [--root <folder>] [--ds <folder>] [--ds-version <tag>]\n";
+const CUT_USAGE = "usage: spn-devex docs styles cut <version> [--replace] [--root <folder>] [--ds <folder>] [--ds-version <tag>]\n";
 const USAGE = CUT_USAGE +
+              "       spn-devex docs styles preview <folder> [--root <folder>]\n" +
               "       spn-devex docs styles check <version> <folder…> [--root <folder>]\n" +
               "       spn-devex docs styles repoint <version> <folder…> [--root <folder>]\n" +
               "       spn-devex docs styles bundle <page> [--assets <folder>]\n";
@@ -505,6 +506,94 @@ console.log("=== docs styles cut --ds — the design system's tokens are copied 
   const missing = sds("cut", "1.3.4", "--root", market, "--ds", join(SCRATCH, "no-such-support"));
   ok("[MKT.SCRIPTS.590] --ds naming a folder that is not there is refused, and cuts nothing",
     missing.code === 1 && missing.out.includes("is not a folder. `--ds` names the support repository's checkout") && !existsSync(join(SERVED_OF(market), "1.3.4")), missing.out);
+}
+
+console.log("=== docs styles cut --replace and docs styles preview — the quick loop and the one cut");
+{
+  const market = join(SCRATCH, "loop-marketplace");
+  const styles = join(market, "packages", "plugin-spn-devex", "src", "styles");
+  const served = join(market, "public", "assets", "docs");
+  const NEW = { "docs-language.css": CSS, "docs-page.js": PAGE_JS, "docs-index.js": INDEX_JS, "design-system-units.css": ".u{}\n", "design-system.css": ".d{}\n" };
+  for (const [name, body] of Object.entries(NEW)) put(join(styles, name), body);
+  for (const [name, body] of Object.entries(BUILT)) put(join(styles, name), body);
+  put(join(styles, "fonts", "Geist.woff2"), "font");
+  put(join(styles, "versions.json"), "{}\n");
+  put(join(market, "public", ".keep"), "");
+  // THE BUILD RUNS FIRST: a stand-in for `scripts/build-styles.mjs` writes the built stylesheet from a source beside it, as the real one does.
+  put(join(styles, "docs-language.src.css"), ".built-from-source{}\n");
+  put(join(market, "scripts", "build-styles.mjs"), "import { writeFileSync, readFileSync } from 'node:fs';\nimport { join, dirname } from 'node:path';\nimport { fileURLToPath } from 'node:url';\nconst s = join(dirname(fileURLToPath(import.meta.url)), '..', 'packages', 'plugin-spn-devex', 'src', 'styles');\nwriteFileSync(join(s, 'docs-language.css'), readFileSync(join(s, 'docs-language.src.css'), 'utf8'));\n");
+  const cutOne = (version) => sds("cut", version, "--root", market);
+  const first = cutOne("1.16.0");
+  const beforeBuild = readFileSync(join(served, "1.16.0", "docs-language.css"), "utf8");
+  ok("[MKT.SCRIPTS.98] a cut runs the build of the styles first, so the version holds the build of the source and not a stale built file", first.code === 0 && beforeBuild === ".built-from-source{}\n", first.out + beforeBuild);
+
+  // The published versions: the list on origin/develop. A scratch repository holds 1.15.0 there.
+  const git = (...args) => execFileSync("git", ["-C", market, "-c", "user.email=t@t", "-c", "user.name=t", "-c", "commit.gpgsign=false", ...args], { encoding: "utf8", stdio: "pipe" });
+  const cut15 = cutOne("1.15.0");
+  git("init", "-q");
+  git("add", "-A");
+  git("commit", "-q", "-m", "published 1.15.0 and 1.16.0");
+  // 1.16.0 is not published: it is listed on no branch the pages are served from. Publish 1.15.0 alone.
+  const listed = JSON.parse(readFileSync(join(styles, "versions.json"), "utf8"));
+  const onlyPublished = { "1.15.0": listed["1.15.0"] };
+  put(join(market, "published-list.json"), `${JSON.stringify(onlyPublished, null, 2)}\n`);
+  const blob = git("hash-object", "-w", join(market, "published-list.json")).trim();
+  const treeText = `100644 blob ${blob}\tversions.json\n`;
+  const sub = execFileSync("git", ["-C", market, "mktree"], { input: treeText, encoding: "utf8" }).trim();
+  const wrap = (path, tree) => path.split("/").reverse().reduce((inner, name) => execFileSync("git", ["-C", market, "mktree"], { input: `040000 tree ${inner}\t${name}\n`, encoding: "utf8" }).trim(), tree);
+  const root = wrap("packages/plugin-spn-devex/src/styles", sub);
+  const commit = execFileSync("git", ["-C", market, "-c", "user.email=t@t", "-c", "user.name=t", "commit-tree", root, "-m", "develop"], { encoding: "utf8" }).trim();
+  git("update-ref", "refs/remotes/origin/develop", commit);
+  rmSync(join(market, "published-list.json"));
+
+  const sameAgain = cutOne("1.16.0");
+  ok("[MKT.SCRIPTS.99] an existing version cut again without --replace is refused, and the refusal names --replace for an unpublished one",
+    cut15.code === 0 && sameAgain.code === 1 && sameAgain.out.includes("`--replace`") && sameAgain.out.includes("not published"), sameAgain.out);
+
+  // THE QUICK LOOP IS NOT A CUT: a change to the source shows in the preview, and the version lists nothing new.
+  put(join(styles, "docs-language.src.css"), ".built-from-source{}\n.second{}\n");
+  const samples = join(SCRATCH, "workspace", ".spndevex", "workstreams", "open", "001-loop", "notes", "N001", "samples");
+  mkdirSync(samples, { recursive: true });
+  const listBefore = readFileSync(join(styles, "versions.json"), "utf8");
+  const quick = sds("preview", samples, "--root", market);
+  const into = join(samples, "_assets", "docs", "1.16.0");
+  ok("[MKT.SCRIPTS.98] `preview` builds the styles and copies the built files, and the fonts, into <folder>/_assets/docs/<next version>/ under the names of that version",
+    quick.code === 0 && JSON.stringify(readdirSync(into).sort()) === JSON.stringify([...Object.keys(NEW), "fonts"].sort())
+      && readFileSync(join(into, "docs-language.css"), "utf8") === ".built-from-source{}\n.second{}\n" && readFileSync(join(into, "fonts", "Geist.woff2"), "utf8") === "font"
+      && quick.out.includes(into) && quick.out.includes("1.16.0"), quick.out);
+  ok("[MKT.SCRIPTS.98] `preview` lists no version and records no hash: versions.json, integrity.json and the served folders are as they were",
+    readFileSync(join(styles, "versions.json"), "utf8") === listBefore && readFileSync(join(served, "1.16.0", "docs-language.css"), "utf8") === ".built-from-source{}\n", quick.out);
+  put(join(styles, "docs-language.src.css"), ".built-from-source{}\n.third{}\n");
+  const quickAgain = sds("preview", samples, "--root", market);
+  ok("`preview` overwrites what an earlier preview wrote", quickAgain.code === 0 && readFileSync(join(into, "docs-language.css"), "utf8").includes(".third{}"), quickAgain.out);
+  const elsewhere = join(SCRATCH, "not-a-workstream");
+  mkdirSync(elsewhere, { recursive: true });
+  const outside = sds("preview", elsewhere, "--root", market);
+  ok("`preview` refuses a folder that is not under a workstream's folder or a repository's docs/artifacts, and writes nothing",
+    outside.code === 1 && outside.out.includes("refused") && readdirSync(elsewhere).length === 0, outside.out);
+  const artifacts = join(SCRATCH, "repo", "docs", "artifacts", "public", "docs");
+  mkdirSync(artifacts, { recursive: true });
+  ok("`preview` accepts a repository's docs/artifacts folder", sds("preview", artifacts, "--root", market).code === 0 && existsSync(join(artifacts, "_assets", "docs", "1.16.0", "docs-page.js")));
+
+  // THE ONE CUT: --replace recuts an unpublished version in place.
+  put(join(styles, "docs-language.src.css"), ".built-from-source{}\n.final{}\n");
+  put(join(served, "1.16.0", "left-behind.css"), "from the old cut\n");
+  const replaced = sds("cut", "1.16.0", "--replace", "--root", market);
+  const after = cutVersions(styles);
+  ok("[MKT.SCRIPTS.98] `cut --replace` recuts a version that is not published: its files, its versions.json entry and its integrity.json entry follow the build, and a file the version no longer serves is gone",
+    replaced.code === 0 && readFileSync(join(served, "1.16.0", "docs-language.css"), "utf8").includes(".final{}") && !existsSync(join(served, "1.16.0", "left-behind.css"))
+      && after["1.16.0"]["docs-language.css"] === sha(".built-from-source{}\n.final{}\n") && integrityTable(styles)["1.16.0"]["docs-language.css"] === sha384Of(Buffer.from(".built-from-source{}\n.final{}\n"))
+      && Object.keys(after).sort().join() === "1.15.0,1.16.0", replaced.out);
+  const published = sds("cut", "1.15.0", "--replace", "--root", market);
+  const beforeRefused = tree(market);
+  const publishedWithout = cutOne("1.15.0");
+  ok("[MKT.SCRIPTS.99] a published version is refused by name with --replace and without it, and nothing is written",
+    published.code === 1 && published.out.includes("1.15.0 is published; a published version never changes. Cut a new one.")
+      && publishedWithout.code === 1 && publishedWithout.out.includes("1.15.0 is published") && tree(market) === beforeRefused, published.out + publishedWithout.out);
+  rmSync(join(market, ".git", "refs", "remotes"), { recursive: true });
+  const unknown = sds("cut", "1.16.0", "--replace", "--root", market);
+  ok("[MKT.SCRIPTS.99] where no branch tells which versions are published, --replace and preview are refused, and nothing is written",
+    unknown.code === 1 && unknown.out.includes("cannot be read") && sds("preview", samples, "--root", market).code === 1, unknown.out);
 }
 
 console.log(failed ? `\n  ${failed} of ${total} FAILED — t-sds` : `\n  all ${total} passed — t-sds`);

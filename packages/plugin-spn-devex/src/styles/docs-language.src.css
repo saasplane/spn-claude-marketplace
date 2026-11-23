@@ -203,7 +203,7 @@
   *{@apply box-border}
   /* TEXT ON A CARD. Four text tokens, each with a second value for the fill of a card or a table, so text keeps
      its contrast on the surface it stands on. */
-  .bg-card,.sds-scroll,.sds-tile,.sds-side,pre,.sds-open,.sds-record-group,.sds-decider,.sds-prose,.sds-nextnav-card,.sds-card,.sds-frame,.sds-tabs,.sds-index-side{--sds-text-heading:var(--sds-text-heading-card); --sds-text-title:var(--sds-text-title-card); --sds-text-description:var(--sds-text-description-card); --sds-text-fact:var(--sds-text-fact-card); color:var(--sds-text-description)}
+  .bg-card,.sds-scroll,.sds-tile,.sds-side,pre,.sds-open,.sds-record-group,.sds-decider,.sds-prose,.sds-nextnav-card,.sds-card,.sds-frame,.sds-pagebar,.sds-index-side{--sds-text-heading:var(--sds-text-heading-card); --sds-text-title:var(--sds-text-title-card); --sds-text-description:var(--sds-text-description-card); --sds-text-fact:var(--sds-text-fact-card); color:var(--sds-text-description)}
   body{@apply m-0 bg-paper text-description font-ui; font-size:var(--font-content-lg-size); line-height:var(--font-content-md-line-height); -webkit-font-smoothing:antialiased}
   p{margin:0 0 1rem; max-width:var(--sds-measure)}
   p,li{font-size:var(--sds-body); line-height:var(--sds-body-lh)}
@@ -211,7 +211,7 @@
   strong{@apply text-title; font-weight:var(--sds-weight-title)}
   em{@apply italic text-description}
   a{@apply text-accent}
-  .sds-page{@apply grid gap-12; grid-template-columns:minmax(0,1fr) var(--sds-rail-width); max-width:min(98vw,var(--sds-page-max)); margin:0 auto; padding:3rem var(--sds-page-pad) 6rem; align-items:start}
+  .sds-page{@apply grid gap-12; grid-template-columns:minmax(0,1fr) var(--sds-rail-width); max-width:var(--sds-page-max); margin:0 auto; padding:3rem var(--sds-page-pad) 6rem; align-items:start}
   .sds-rail{@apply sticky top-10 font-ui text-xs}
   .sds-rail .sds-home{@apply pl-0 text-accent block; border-left:none; margin-bottom:.9rem; font-weight:var(--font-weight-semibold)}
   .sds-rail .sds-rail-title{@apply uppercase text-fact; letter-spacing:.15em; margin-bottom:.85rem; font-size:var(--font-content-xs-size); font-weight:var(--font-weight-bold)}
@@ -257,6 +257,17 @@
   .sds-tile h4 a:hover{@apply text-accent}
   .sds-tile p{@apply text-sm text-description max-w-none flex-1; margin:0 0 .6rem}
   .sds-tile .sds-more{@apply text-sm no-underline self-start; font-weight:var(--font-weight-semibold)}
+  /* A DOOR (the `cards` block): the whole tile is one link. An optional kicker, then the title with an arrow after it, then the line.
+     Hover and keyboard focus turn the border and the title to the accent, and the arrow moves right; focus draws the tree's ring. */
+  a.sds-door{@apply no-underline cursor-pointer; gap:.2rem; color:inherit}
+  .sds-door-kicker{@apply block font-ui uppercase text-fact; font-size:var(--font-content-xxs-size); font-weight:var(--font-weight-semibold); letter-spacing:.09em; line-height:var(--font-content-xxl3-line-height)}
+  .sds-door-title{@apply block font-ui text-md text-title; font-weight:var(--font-weight-semibold)}
+  .sds-door-arrow{@apply inline-block; margin-left:.35rem; transition:transform .15s}
+  .sds-door-line{@apply block flex-1 text-sm text-description}
+  a.sds-door:hover,a.sds-door:focus-visible{border-color:var(--sds-accent)}
+  a.sds-door:hover .sds-door-title,a.sds-door:focus-visible .sds-door-title{@apply text-accent}
+  a.sds-door:hover .sds-door-arrow,a.sds-door:focus-visible .sds-door-arrow{transform:translateX(.25rem)}
+  a.sds-door:focus-visible{outline:2px solid var(--sds-accent); outline-offset:-2px}
 
   /* The Summary's tiles */
   .sds-sides{@apply grid; grid-template-columns:repeat(auto-fit,minmax(14rem,1fr)); gap:.8rem; margin:1.2rem 0}
@@ -531,7 +542,7 @@
 
   /* Long paths wrap */
   p code,li code{@apply wrap-anywhere}
-  footer{max-width:min(98vw,var(--sds-page-max)); margin:0 auto; padding:1.3rem 16px 3rem}
+  footer{max-width:var(--sds-page-max); margin:0 auto; padding:1.3rem 16px 3rem}
 
   /* Phone width */
   @media (max-width:40rem){
@@ -767,8 +778,7 @@
   .sds-step-see .sds-label{@apply block font-ui tracking-widest uppercase text-fact; font-size:var(--sds-caption); line-height:var(--sds-caption-lh); margin-bottom:.2rem}
   .sds-step-see p{@apply m-0}
 
-  /* THE INDEX of a repository's artifacts: the tree of its pages on the left, and tabs on the right with one
-   page in each. The page fills the window, and each part scrolls by itself. The tree's width is a token. The side
+  /* THE INDEX of a repository's artifacts: the tree of its pages on the left, and one page at a time on the right, under a bar. The page fills the window, and each part scrolls by itself. The tree's width is a token. The side
    reads as the app rail does: a head card, small group headings, an icon per kind of page, the current page on a
    soft pill. Every colour reads a token, so the light and the dark theme each draw it with their own values. */
   .sds-index{@apply grid; --sds-rail-pill:color-mix(in srgb,var(--sds-text-title) 7%,transparent); --sds-rail-hover:color-mix(in srgb,var(--sds-text-title) 4%,transparent); grid-template-columns:var(--sds-tree-width) minmax(0,1fr); height:100dvh}
@@ -818,37 +828,24 @@
   .sds-tree-row{@apply flex items-center relative; border-radius:var(--radius-sm)}
   .sds-tree-row:hover{background:var(--sds-rail-hover)}
   .sds-tree-row:has(.sds-is-current){background:none}
-  .sds-tree-link{@apply flex items-center flex-1 min-w-0 font-ui text-sm text-title no-underline; gap:.55rem; padding:.42rem 2rem .42rem .55rem; border-radius:var(--radius-sm); line-height:var(--font-title-md-line-height); background:none; border:0}
+  .sds-tree-link{@apply flex items-center flex-1 min-w-0 font-ui text-sm text-title no-underline; gap:.55rem; padding:.42rem .55rem; border-radius:var(--radius-sm); line-height:var(--font-title-md-line-height); background:none; border:0}
   .sds-tree-link > span{@apply whitespace-nowrap overflow-hidden; text-overflow:ellipsis}
   .sds-tree-link .sds-ico{@apply text-description}
   .sds-tree-link.sds-is-current{@apply text-title; font-weight:var(--font-weight-semibold); background:var(--sds-rail-pill)}
   .sds-tree-link.sds-is-current .sds-ico{@apply text-title}
-  .sds-tree-group > summary:focus-visible,.sds-tree-link:focus-visible,.sds-tree-new:focus-visible,.sds-tree-fold:focus-visible,.sds-tab-title:focus-visible,.sds-tab-close:focus-visible,.sds-tab-copy:focus-visible,.sds-index-toggle:focus-visible,.sds-rail-brand:focus-visible,.sds-rail-groupmark:focus-visible{outline:2px solid var(--sds-accent); outline-offset:-2px}
+  .sds-tree-group > summary:focus-visible,.sds-tree-link:focus-visible,.sds-tree-fold:focus-visible,.sds-bar-button:focus-visible,.sds-index-toggle:focus-visible,.sds-rail-brand:focus-visible,.sds-rail-groupmark:focus-visible{outline:2px solid var(--sds-accent); outline-offset:-2px}
 
-  /* The index: the arrow that opens a page in a new tab. It is always there, faint at rest, and full on hover and
-   on the current row; it has its own room, so a name never runs under it. */
-  .sds-tree-new{@apply grid p-0 text-fact cursor-pointer absolute; place-items:center; right:.3rem; top:50%; transform:translateY(-50%); width:1.6rem; height:1.6rem; border:0; border-radius:var(--radius-sm); background:none; opacity:.55}
-  .sds-tree-row:hover .sds-tree-new,.sds-tree-new:focus-visible,.sds-tree-link.sds-is-current + .sds-tree-new{opacity:1}
-  .sds-tree-new:hover{@apply text-title; background:var(--sds-rail-pill)}
-  .sds-tree-new .sds-ico{width:.85rem; height:.85rem}
-
-  /* The index: the tabs. A tab that is not shown keeps its frame, so its page stays loaded. Each tab carries
-   its page's name, a copy of its whole address, the page alone in a new window, and its close. */
-  .sds-tabs{@apply flex gap-1 overflow-x-auto bg-card; align-items:flex-end; padding:.45rem .5rem 0; border-bottom:1px solid var(--sds-rule)}
-  .sds-tab{@apply flex items-center bg-card; flex:0 1 15rem; min-width:7rem; border:1px solid var(--sds-rule); border-bottom:0; border-radius:var(--radius-sm) var(--radius-sm) 0 0}
-  .sds-tab.sds-is-current{@apply bg-paper border-accent; box-shadow:inset 0 2px 0 var(--sds-accent)}
-  .sds-tab-title{@apply flex-1 min-w-0 overflow-hidden whitespace-nowrap text-left font-ui text-xs text-description cursor-pointer; text-overflow:ellipsis; border:0; background:none; padding:.42rem .2rem .42rem .7rem}
-  .sds-tab.sds-is-current .sds-tab-title{@apply text-title; font-weight:var(--font-weight-semibold)}
-  .sds-tab-copy{@apply flex-none grid text-fact cursor-pointer; place-items:center; width:1.4rem; height:1.4rem; border:0; border-radius:var(--radius-sm); background:none}
-  .sds-tab-copy .sds-ico{width:.85rem; height:.85rem}
-  .sds-tab-copy:hover,.sds-tab-copy.sds-is-copied{@apply text-accent}
-  .sds-tab-copy:hover{@apply bg-accent-soft}
-  .sds-tab-copy[hidden]{@apply hidden}
-  .sds-tab-close{@apply flex-none mr-1 text-fact text-md leading-none cursor-pointer; width:1.4rem; height:1.4rem; border:0; border-radius:var(--radius-sm); background:none}
-  .sds-tab-close:hover{@apply bg-accent-soft text-accent}
-  .sds-tab-close[disabled]{visibility:hidden}
-  .sds-tab-copied{@apply fixed font-ui text-xs pointer-events-none; z-index:30; padding:.3rem .6rem; border-radius:var(--radius-sm); font-weight:var(--font-weight-medium); line-height:var(--font-heading-xl-line-height); background:var(--sds-text-title); color:var(--sds-paper)}
-  .sds-tab-copied[hidden]{@apply hidden}
+  /* The index: the bar above the frame. One page is on screen at a time; the bar carries its name, a reload, a copy of
+   its whole address, and the page alone in a new window. */
+  .sds-pagebar{@apply flex items-center gap-1 bg-card; padding:.35rem .6rem .35rem .9rem; border-bottom:1px solid var(--sds-rule)}
+  .sds-bar-name{@apply flex-1 min-w-0 overflow-hidden whitespace-nowrap font-ui text-sm text-title; text-overflow:ellipsis; font-weight:var(--font-weight-semibold)}
+  .sds-bar-button{@apply flex-none grid text-fact cursor-pointer; place-items:center; width:1.6rem; height:1.6rem; border:0; border-radius:var(--radius-sm); background:none}
+  .sds-bar-button .sds-ico{width:.9rem; height:.9rem}
+  .sds-bar-button:hover,.sds-bar-button.sds-is-copied{@apply text-accent}
+  .sds-bar-button:hover{@apply bg-accent-soft}
+  .sds-bar-button[hidden]{@apply hidden}
+  .sds-bar-copied{@apply fixed font-ui text-xs pointer-events-none; z-index:30; padding:.3rem .6rem; border-radius:var(--radius-sm); font-weight:var(--font-weight-medium); line-height:var(--font-heading-xl-line-height); background:var(--sds-text-title); color:var(--sds-paper)}
+  .sds-bar-copied[hidden]{@apply hidden}
   .sds-panes{@apply flex-1 bg-paper; min-height:0}
   .sds-pane{@apply block w-full h-full bg-paper; border:0}
   .sds-pane[hidden]{@apply hidden}
@@ -864,11 +861,11 @@
   .sds-rail-groupmark{@apply font-ui text-description cursor-pointer; width:2rem; height:2rem; border-radius:var(--radius-sm); border:0; background:none; font-size:var(--font-content-xxs-size); font-weight:var(--font-weight-semibold); line-height:var(--font-heading-xxl-line-height); letter-spacing:.04em}
   .sds-rail-groupmark:hover,.sds-rail-groupmark.sds-is-current{@apply text-title; background:var(--sds-rail-pill)}
 
-  /* The index: the note of a slot. An entry whose address is still a slot has no page, so its tab shows a note. */
+  /* The index: the note of a slot. An entry whose address is still a slot has no page, so the frame's place shows a note. */
   .sds-pane-slot{@apply grid p-8; place-content:center; overflow-y:auto}
   .sds-pane-slot .sds-pull{@apply m-0; max-width:34rem}
 
-  /* The index on a narrow screen: the side sits above the tabs. Folded, it is one line that holds the fold
+  /* The index on a narrow screen: the side sits above the page. Folded, it is one line that holds the fold
    button and the head card. The script folds the tree at the start, and after a page is chosen. */
   @media (max-width:82.5rem){
     .sds-index,.sds-index.sds-is-folded{grid-template-columns:minmax(0,1fr); grid-template-rows:auto minmax(0,1fr)}
@@ -879,7 +876,7 @@
     .sds-index.sds-is-folded .sds-rail-marks{@apply hidden}
   }
   @media (prefers-reduced-motion:reduce){
-    .sds-tree-turn{transition:none}
+    .sds-tree-turn,.sds-door-arrow{transition:none}
   }
 
   /* ON THE DESIGN SYSTEM: the corners, the table and the drawings take the product's values. A table head is drawn as
@@ -1258,7 +1255,7 @@ pre .sds-tk-g { color: var(--sds-tk-c); font-style: normal; }
 }
 
 /* TABS: one thing in several forms, one shown at a time, in the design system's three looks (DSTabsType). The class is
-   sds-tabset, because sds-tabs already names the index's row of open pages. Without the script every panel shows. */
+   sds-tabset. Without the script every panel shows. */
 .sds-tabset {
   margin: 1.6rem 0;
 }

@@ -7,7 +7,7 @@
 
 
 
-<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.16.0/docs-language.css" integrity="sha384-OyDb7H6JzPz4We3hILWyxDyew4jJWK/IVFCOFRWU+iQ3xhH21R27fIism3iOgg+4" crossorigin="anonymous">
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.16.0/docs-language.css" integrity="sha384-26cGh2r3BnFXZzjrYGNP88OnUB7LiZR5SYyMbL9/PFUbQMOSJdaKC15VLushJlPV" crossorigin="anonymous">
 <div class="sds-page">
 <nav class="sds-rail" id="rail">
   <div class="sds-rail-title">Blocks</div>
@@ -2528,9 +2528,10 @@ deploy:
   </table></div>
   <h3 id="b-cards">CARDS &mdash; hub doors</h3>
   <p class="sds-small"><strong>Use when</strong> several pages are doors a reader might go to next.</p>
+  <p>{{A door is one link: the whole card, with an arrow after its title that moves right on hover. A kicker before the title says where the door leads in a word or two, and is left out where the title says it.}}</p>
   <div class="sds-tiles">
-    <div class="sds-tile"><h4><a href="#">{{Reading path}}</a></h4><p>{{what the path covers, in one line}}</p><a class="sds-more" href="#">Read more &rarr;</a></div>
-    <div class="sds-tile"><h4><a href="#">{{Reading path}}</a></h4><p>{{&hellip;}}</p><a class="sds-more" href="#">Read more &rarr;</a></div>
+    <a class="sds-tile sds-door" href="#"><span class="sds-door-kicker">{{Where it sits, in two words}}</span><span class="sds-door-title">{{Reading path}}<span class="sds-door-arrow" aria-hidden="true">&rarr;</span></span><span class="sds-door-line">{{what the path covers, in one line}}</span></a>
+    <a class="sds-tile sds-door" href="#"><span class="sds-door-title">{{Reading path}}<span class="sds-door-arrow" aria-hidden="true">&rarr;</span></span><span class="sds-door-line">{{&hellip;}}</span></a>
   </div>
   <p><a class="sds-more" href="#">Read {{the page, by the name it carries}} &rarr;</a> {{&mdash; the link under a subsection's text, when it has one path}}</p>
   <h3 id="b-next">NEXT &mdash; two doors</h3>

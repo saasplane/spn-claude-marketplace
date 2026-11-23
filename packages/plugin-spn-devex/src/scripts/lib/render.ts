@@ -687,17 +687,19 @@ function tabsBlock(tag: string, body: string[], findings: Finding[], nested: boo
 /**
  * The blocks that have a spelling of their own in markdown, each a fenced block tagged with its name and holding one line per thing, its parts split on ` | `:
  *   catalog   Name | one line | third, and facts indented under it       see `catalogBlock`; the tag takes layout= and media=
- *   cards     Title | description | link                                  a door each, title and Read more both links
+ *   cards     [Kicker |] Title | description | link                       a door each: the whole card is one link, an arrow after the title; four parts name a kicker, three do not
  *   next      previous | Title | link, and next | Title | link            the two doors either side of the page
  */
 function spelled(kind: string, body: string[], findings: Finding[]): string {
   const rows = body.map((row) => row.trim()).filter((row) => row && !row.startsWith("#")).map((row) => row.replace(/^[-*]\s+/, "").split(/\s+\|\s+/).map((cell) => cell.trim()));
   if (!rows.length) { findings.push({ message: `a \`${kind}\` block with no line` }); return ""; }
   if (kind === "cards") {
-    const tiles = rows.map(([title, line = "", link = ""]) => {
-      if (!link) findings.push({ message: `a \`cards\` line with no link, "${title}" — a card is Title | description | link` });
+    // A KICKER IS TOLD FROM A TITLE BY THE PART COUNT: four parts are Kicker | Title | line | link, anything shorter is Title | line | link.
+    const tiles = rows.map((row) => {
+      const [kicker, title, line = "", link = ""] = row.length >= 4 ? row : ["", ...row];
+      if (!link) findings.push({ message: `a \`cards\` line with no link, "${title}" — a card is [Kicker | ]Title | description | link` });
       const href = rewriteHref(link || "#");
-      return `    <div class="sds-tile"><h4><a href="${esc(href)}">${inline(title)}</a></h4>${line ? `<p>${inline(line)}</p>` : ""}<a class="sds-more" href="${esc(href)}">Read more &rarr;</a></div>`;
+      return `    <a class="sds-tile sds-door" href="${esc(href)}">${kicker ? `<span class="sds-door-kicker">${inline(kicker)}</span>` : ""}<span class="sds-door-title">${inline(title ?? "")}<span class="sds-door-arrow" aria-hidden="true">&rarr;</span></span>${line ? `<span class="sds-door-line">${inline(line)}</span>` : ""}</a>`;
     });
     return `  <div class="sds-tiles">\n${tiles.join("\n")}\n  </div>`;
   }

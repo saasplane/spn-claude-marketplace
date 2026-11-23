@@ -151,7 +151,7 @@ const withAreas = () => repo({
     tree.groups[1].children.map((node) => [node.label, node.kind]), [["Getting Started", "guide"], ["A Later Guide", "guide"]]);
   ok("the run says which construct no overview of its domain links", /SOFT[^\n]*01-kind-construct\.html\n[^\n]*no overview of its domain links/.test(ran.out), ran.out);
 
-  ok("the data keeps the path to the pages empty, and the limit of tabs", tree.base === "" && tree.tabs === 8, JSON.stringify([tree.base, tree.tabs]));
+  ok("the data keeps the path to the pages empty, and no limit of tabs", tree.base === "" && !("tabs" in tree), JSON.stringify(tree).slice(0, 80));
   const lines = linesFor(NEWEST, INDEX_SCRIPT, HASHES[NEWEST]);
   ok("the page links the newest version that was cut, and loads the index's script from it",
     text.includes(lines.stylesheet) && text.includes(lines.script) && !text.includes("/1.0.0/") && !text.includes("/1.2.0/"),

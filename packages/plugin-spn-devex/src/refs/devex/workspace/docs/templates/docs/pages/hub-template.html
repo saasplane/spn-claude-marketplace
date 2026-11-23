@@ -36,7 +36,7 @@
 {"id": "concept-overview", "variant": "overview", "title": "{{NAME}}", "lenses": ["{{LENS}}"], "summary": "{{SUMMARY}}"}
 -->
 
-<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.16.0/docs-language.css" integrity="sha384-OyDb7H6JzPz4We3hILWyxDyew4jJWK/IVFCOFRWU+iQ3xhH21R27fIism3iOgg+4" crossorigin="anonymous">
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.16.0/docs-language.css" integrity="sha384-26cGh2r3BnFXZzjrYGNP88OnUB7LiZR5SYyMbL9/PFUbQMOSJdaKC15VLushJlPV" crossorigin="anonymous">
 <div class="sds-page">
 
 <nav class="sds-rail" id="rail">
@@ -45,7 +45,7 @@
 <div class="sds-wrap">
 
 <header class="sds-masthead">
-  <div class="sds-eyebrow"><span class="sds-line1">{{WORKSPACE}} &nbsp;|&nbsp; {{REPOSITORY}} &nbsp;|&nbsp; {{NAME}}</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Overview</span><span class="sds-separator">|</span><span class="sds-label">For:</span> <span class="sds-audience"><span class="sds-badge sds-lens">{{ROLE}}</span><span class="sds-badge sds-lens">{{ROLE}}</span></span></span></div>
+  <div class="sds-eyebrow"><span class="sds-line1">{{WORKSPACE}} &middot; {{REPOSITORY}} &middot; {{NAME}}</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Overview</span><span class="sds-separator">|</span><span class="sds-label">For:</span> <span class="sds-audience"><span class="sds-badge sds-lens">{{ROLE}}</span><span class="sds-badge sds-lens">{{ROLE}}</span></span></span></div>
   <h1>{{TITLE}}</h1>
   <p class="sds-subtitle">{{SUBTITLE}}</p>
   <p class="sds-standfirst">{{LEAD}}</p>
@@ -95,8 +95,8 @@
   <h3 id="a2">{{SUB-AREA-3}} &mdash; {{what it is}}</h3>
   <p>{{ONCE-HOW}}</p>
   <div class="sds-tiles">
-    <div class="sds-tile"><h4><a href="#">{{Reading path}}</a></h4><p>{{PATH-COVERS}}</p><a class="sds-more" href="#">Read more &rarr;</a></div>
-    <div class="sds-tile"><h4><a href="#">{{Reading path}}</a></h4><p>{{&hellip;}}</p><a class="sds-more" href="#">Read more &rarr;</a></div>
+    <a class="sds-tile sds-door" href="#"><span class="sds-door-kicker">{{Reading path kind}}</span><span class="sds-door-title">{{Reading path}}<span class="sds-door-arrow" aria-hidden="true">&rarr;</span></span><span class="sds-door-line">{{PATH-COVERS}}</span></a>
+    <a class="sds-tile sds-door" href="#"><span class="sds-door-kicker">{{Reading path kind}}</span><span class="sds-door-title">{{Reading path}}<span class="sds-door-arrow" aria-hidden="true">&rarr;</span></span><span class="sds-door-line">{{&hellip;}}</span></a>
   </div>
 </section>
 
@@ -114,12 +114,12 @@
 
 <section id="s9" data-block="next">
   <div class="sds-section-head"><h2>Next — Where to go next</h2></div>
-  <ul>
-    <li>New here &rarr; <a href="#">{{the day-zero walk}}</a></li>
-    <li>Building {{SERVICE-WEB}} &rarr; <a href="#">{{the path}}</a></li>
-    <li>Reading one construct &rarr; <a href="#">{{the constructs face}}</a></li>
-    <li>What governs this book &rarr; <a href="#">{{the registers}}</a></li>
-  </ul>
+  <div class="sds-tiles">
+    <a class="sds-tile sds-door" href="#"><span class="sds-door-kicker">New here</span><span class="sds-door-title">{{the day-zero walk}}<span class="sds-door-arrow" aria-hidden="true">&rarr;</span></span></a>
+    <a class="sds-tile sds-door" href="#"><span class="sds-door-kicker">Building {{SERVICE-WEB}}</span><span class="sds-door-title">{{the path}}<span class="sds-door-arrow" aria-hidden="true">&rarr;</span></span></a>
+    <a class="sds-tile sds-door" href="#"><span class="sds-door-kicker">Reading one construct</span><span class="sds-door-title">{{the constructs face}}<span class="sds-door-arrow" aria-hidden="true">&rarr;</span></span></a>
+    <a class="sds-tile sds-door" href="#"><span class="sds-door-kicker">What governs this book</span><span class="sds-door-title">{{the registers}}<span class="sds-door-arrow" aria-hidden="true">&rarr;</span></span></a>
+  </div>
 </section>
 
 </div>

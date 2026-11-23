@@ -154,10 +154,30 @@ console.log("=== the index's brand — a link to the index itself, which opens i
 {
   const index = readFileSync(join(STYLES, "docs-index.js"), "utf8");
   ok("[MKT.SCRIPTS.589] the index opens its default page, the first row of the tree, from one function, and the brand says which page that is: aria-label `Open <name>`",
-    /function defaultRow\(\)\{return rows\[0\];\}/.test(index) && /open\(\(first\|\|defaultRow\(\)\)\.entry,true\)/.test(index)
+    /function defaultRow\(\)\{return rows\[0\];\}/.test(index) && /show\(start\)/.test(index) && /var start=\(first\|\|defaultRow\(\)\)\.entry;/.test(index)
       && /var openName='Open '\+named\(defaultRow\(\)\.entry\);/.test(index) && /brand\.setAttribute\('aria-label',openName\)/.test(index));
   ok("[MKT.SCRIPTS.589] the brand is a real link to index.html in the index template, so a click, a middle click and copy link give the index with no hash",
     /<a class="sds-rail-brand" href="index\.html"/.test(readFileSync(join(PLUGIN, "src", "refs", "devex", "workspace", "docs", "templates", "docs", "pages", "index-template.html"), "utf8")));
+}
+
+console.log("=== the index shows one page at a time — no tab strip, and a door is one link");
+{
+  const index = readFileSync(join(STYLES, "docs-index.js"), "utf8");
+  const source = readFileSync(join(STYLES, "docs-language.src.css"), "utf8");
+  const template = readFileSync(join(PLUGIN, "src", "refs", "devex", "workspace", "docs", "templates", "docs", "pages", "index-template.html"), "utf8");
+  ok("[MKT.SCRIPTS.589] the index script holds no tab: no strip, no close, no state of tabs, one frame, and the address is pushed by a click",
+    !/sds-tab\b|sds-tab-|tablist|role','tab'|shut\(|tabs\.push|data\.tabs/.test(index) && /pushState\(null,'',hashOf\(entry\)\)/.test(index) && /addEventListener\('hashchange'/.test(index));
+  ok("[MKT.SCRIPTS.589] the bar holds the page's name and three buttons: reload, copy link and open in a new window",
+    /data-act|tool\('reload'/.test(index) && /tool\('copy','Copy link'/.test(index) && /tool\('away','Open in a new window'/.test(index) && /sds-bar-name/.test(index));
+  ok("[MKT.SCRIPTS.589] a key held on a click, and a middle click, are left to the browser, and no row carries a second arrow",
+    /if\(held&&!unfilled\(entry\)\)return;/.test(index) && !/sds-tree-new/.test(index) && !/sds-tree-new/.test(source));
+  ok("[MKT.SCRIPTS.589] the stylesheet holds no rule only the tab strip used, and keeps the bar's",
+    !/\.sds-tabs\{|\.sds-tab\{|\.sds-tab-|\.sds-tab\./.test(source) && /\.sds-pagebar\{/.test(source) && /\.sds-bar-button\{/.test(source) && /\.sds-bar-copied\{/.test(source));
+  ok("[MKT.SCRIPTS.589] the index template has the bar and the frame's place and no tab strip, and its data holds no limit of tabs",
+    /id="index-bar"/.test(template) && /id="index-panes"/.test(template) && !/index-tabs|role="tablist"|"tabs"/.test(template));
+  ok("[MKT.SCRIPTS.532] a door is one link: the arrow moves right on hover and focus, the border and the title turn to the accent, and focus draws the tree's ring",
+    /a\.sds-door:hover \.sds-door-arrow,a\.sds-door:focus-visible \.sds-door-arrow\{transform:translateX\(\.25rem\)\}/.test(source)
+      && /a\.sds-door:hover,a\.sds-door:focus-visible\{border-color:var\(--sds-accent\)\}/.test(source) && /a\.sds-door:focus-visible\{outline:2px solid var\(--sds-accent\); outline-offset:-2px\}/.test(source));
 }
 
 console.log(failed ? `\n  ${failed} of ${total} FAILED — t-styles-current` : `\n  all ${total} passed — t-styles-current`);

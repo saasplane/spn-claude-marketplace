@@ -1,9 +1,11 @@
 /* RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § The index of artifacts — one page that opens every other
-   The index of a repository's artifacts: a tree of its pages on the left, read as the app rail is, and tabs on
-   the right with one page in each, in a frame of its own. The tree is read from the page's data block, which
-   `docs index` writes from the pages on disk. The shown page is kept in the address, `#<its path>`, so a reload or a
-   shared link opens it again; nothing else is remembered between visits. Each tab has a reload button. The index never reads what a frame holds, because a page opened from disk is a stranger to the page
-   that frames it. Every class it sets or reads opens with sds-. */
+   The index of a repository's artifacts: a tree of its pages on the left, read as the app rail is, and one page at
+   a time on the right, in one frame under a bar. The tree is read from the page's data block, which
+   `docs index` writes from the pages on disk. A click on an entry replaces the page in the frame and pushes the
+   address, `#<its path>`, so Back returns to the page before, and a reload or a shared link opens the page again; nothing
+   else is remembered between visits. The bar holds the page's name, reload, copy link and open in a new window; a click
+   on an entry with a key held, or a middle click, opens the page in a browser tab of its own. The index never reads what
+   a frame holds, because a page opened from disk is a stranger to the page that frames it. Every class it sets or reads opens with sds-. */
 /* THE MODE IS THE DESIGN SYSTEM'S, as on every page: an index that names none takes the reader's setting and follows it. */
 (function(){
   var root=document.documentElement;if(!root||root.getAttribute('data-mode')||!window.matchMedia)return;
@@ -13,7 +15,7 @@
 })();
 (function(){
   var store=document.getElementById('index-data'),whole=document.getElementById('index');
-  var tree=document.getElementById('index-tree'),bar=document.getElementById('index-tabs');
+  var tree=document.getElementById('index-tree'),bar=document.getElementById('index-bar');
   var panes=document.getElementById('index-panes'),toggle=document.getElementById('index-toggle');
   var marks=document.getElementById('index-marks');
   if(!store||!whole||!tree||!bar||!panes)return;
@@ -30,17 +32,17 @@
   /* An index shown inside another index takes that index's mode the same way, and passes it on to its own frames. */
   window.addEventListener('message',function(event){var data=event.data;if(event.source!==window.parent||window.parent===window||!data||data.sds!=='mode')return;if(data.mode!=='light'&&data.mode!=='dark')return;root.setAttribute('data-mode-chosen','');root.setAttribute('data-mode',data.mode);drawModeButton();Array.prototype.forEach.call(panes.querySelectorAll('iframe'),tellMode);});
   var data=JSON.parse(store.textContent);
-  var tabs=[],rows=[],groups=[],shown=null,clock=0;
+  var rows=[],groups=[],shown=null,frame=null,note=null;
   var narrow=window.matchMedia?window.matchMedia('(max-width:82.5rem)'):null;
 
   /* WHERE A PAGE IS. `data.base` is the one place the path to the pages is kept. A page marked `beside`
      sits next to the index itself, which only a sample does. */
   function address(entry){return (entry.beside?'':data.base)+entry.path;}
   /* A SLOT. A template writes `{{…}}` where an address goes. Such an entry has no page to load, so no
-     address is asked for, and its tab says that the page is a slot. */
+     address is asked for, and the frame's place shows a note that says the page is a slot. */
   function unfilled(entry){return /\{\{|\}\}/.test(address(entry));}
   /* THE NAME OF A PAGE. The tree shows an entry's label. A domain's overview is shown as Overview inside the
-     domain's group, so it has a title too, which is the overview's own. A tab is named by that title. */
+     domain's group, so it has a title too, which is the overview's own. The bar names the page by that title. */
   function named(entry){return entry.title||entry.label;}
   function pagesUnder(node){
     return (node.children||[]).reduce(function(sum,child){return sum+pagesUnder(child);},node.path?1:0);
@@ -120,7 +122,7 @@
     var words=document.createElement('span');words.textContent=entry.label;
     if(into.hasAttribute&&into.hasAttribute('data-first'))link.appendChild(icon(kindIcon(entry)));link.appendChild(words);
     if(entry.title)link.title=entry.title;
-    /* A plain click opens the page in the tab that is shown. A click with a key held is left to the browser,
+    /* A plain click shows the page in the frame. A click with a key held is left to the browser, which opens the link in a tab of its own,
        but not on a slot, which has no address to give the browser. */
     link.addEventListener('click',function(event){
       var held=event.metaKey||event.ctrlKey||event.shiftKey||event.altKey||event.button;
@@ -129,117 +131,96 @@
       /* A click that ends a drag across the words keeps the selection, and opens nothing. */
       var picked=window.getSelection&&window.getSelection();
       if(picked&&!picked.isCollapsed&&link.contains(picked.anchorNode))return;
-      open(entry,false);
+      go(entry);
     });
-    var more=document.createElement('button');more.type='button';more.className='sds-tree-new';more.appendChild(icon('out'));
-    more.title='Open in a new tab';more.setAttribute('aria-label','Open '+named(entry)+' in a new tab');
-    more.addEventListener('click',function(){open(entry,true);});
-    row.appendChild(link);row.appendChild(more);into.appendChild(row);
+    row.appendChild(link);into.appendChild(row);
     rows.push({entry:entry,link:link});
   }
 
-  /* THE TABS. Each tab owns one frame. A tab that is not shown keeps its frame, so its page stays loaded.
-     A tab carries its page's name, a copy of its whole address, the page alone in a new window, and its close.
-     A tab that holds a slot owns a note too, which is shown in place of the frame. */
+  /* THE BAR above the frame names the page on screen and holds three buttons: reload, a copy of the page's whole address,
+     and the page alone in a new window. The frame is made once, and a click on an entry points it at another page. */
   var told=null;
   function tell(button,words){
-    if(!told){told=document.createElement('div');told.className='sds-tab-copied';told.setAttribute('role','status');document.body.appendChild(told);}
+    if(!told){told=document.createElement('div');told.className='sds-bar-copied';told.setAttribute('role','status');document.body.appendChild(told);}
     var box=button.getBoundingClientRect();
     told.textContent=words;told.hidden=false;told.style.left=Math.max(8,box.left-20)+'px';told.style.top=(box.bottom+6)+'px';
     clearTimeout(tell.timer);tell.timer=setTimeout(function(){told.hidden=true;},1400);
   }
-  /* The whole address of the page a tab holds, as the browser bar would show it if the page were opened alone.
+  function tool(name,label,mark){
+    var button=document.createElement('button');button.type='button';button.className='sds-bar-button';button.title=label;button.setAttribute('aria-label',label);
+    button.setAttribute('data-act',name);button.appendChild(icon(mark));bar.appendChild(button);return button;
+  }
+  var title=document.createElement('span');title.className='sds-bar-name';bar.appendChild(title);
+  var again=tool('reload','Reload','reload'),copy=tool('copy','Copy link','copy'),away=tool('away','Open in a new window','out');
+  /* The whole address of the page on screen, as the browser bar would show it if the page were opened alone.
      Where the clipboard is not given to the page, the address is shown to copy by hand. */
-  function copyAddress(tab){
-    var at=whereOf(tab.entry);
+  copy.addEventListener('click',function(){
+    if(!shown)return;
+    var at=whereOf(shown);
     function done(){
-      tab.copy.classList.add('sds-is-copied');tab.copy.replaceChild(icon('check'),tab.copy.firstChild);tell(tab.copy,'Copied');
-      setTimeout(function(){tab.copy.classList.remove('sds-is-copied');tab.copy.replaceChild(icon('copy'),tab.copy.firstChild);},1400);
+      copy.classList.add('sds-is-copied');copy.replaceChild(icon('check'),copy.firstChild);tell(copy,'Copied');
+      setTimeout(function(){copy.classList.remove('sds-is-copied');copy.replaceChild(icon('copy'),copy.firstChild);},1400);
     }
     function byHand(){window.prompt('Copy this address',at);}
     if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(at).then(done,byHand);}else{byHand();}
+  });
+  away.addEventListener('click',function(){if(shown)window.open(whereOf(shown),'_blank','noopener');});
+  /* RELOAD the page on screen. A page opened from disk is a stranger to the index, so where its frame refuses the
+     call, the frame is pointed at the page's address again. */
+  again.addEventListener('click',function(){
+    if(!shown||unfilled(shown))return;
+    try{frame.contentWindow.location.reload();}
+    catch(e){mount(address(shown));frame.title=named(shown);frame.hidden=false;}
+  });
+  /* THE FRAME IS MADE AGAIN FOR EACH PAGE: pointing a frame that holds a page at another adds an entry to the browser's history,
+     and then Back would step the frame and leave the address on the page after. A new frame's first page adds none, so one
+     click is one step of history, the address's. */
+  function mount(at){
+    var next=document.createElement('iframe');next.className='sds-pane';next.hidden=true;
+    next.addEventListener('load',function(){tellMode(next);});
+    if(at!==null)next.src=at;
+    if(frame)panes.replaceChild(next,frame);else panes.appendChild(next);
+    frame=next;
   }
-  function make(){
-    var wrap=document.createElement('div');wrap.className='sds-tab';
-    var title=document.createElement('button');title.type='button';title.className='sds-tab-title';title.setAttribute('role','tab');
-    var again=document.createElement('button');again.type='button';again.className='sds-tab-copy sds-tab-reload';again.appendChild(icon('reload'));
-    var copy=document.createElement('button');copy.type='button';copy.className='sds-tab-copy';copy.appendChild(icon('copy'));
-    var away=document.createElement('button');away.type='button';away.className='sds-tab-copy sds-tab-away';away.appendChild(icon('out'));
-    var close=document.createElement('button');close.type='button';close.className='sds-tab-close';close.textContent='×';
-    var frame=document.createElement('iframe');frame.className='sds-pane';frame.hidden=true;
-    frame.addEventListener('load',function(){tellMode(frame);});
-    var tab={wrap:wrap,title:title,again:again,copy:copy,away:away,close:close,frame:frame,note:null,slot:false,entry:null,opened:0};
-    title.addEventListener('click',function(){show(tab);});
-    again.addEventListener('click',function(){reload(tab);});
-    copy.addEventListener('click',function(){copyAddress(tab);});
-    away.addEventListener('click',function(){window.open(whereOf(tab.entry),'_blank','noopener');});
-    close.addEventListener('click',function(){shut(tab);});
-    wrap.appendChild(title);wrap.appendChild(again);wrap.appendChild(copy);wrap.appendChild(away);wrap.appendChild(close);
-    bar.appendChild(wrap);panes.appendChild(frame);
-    tabs.push(tab);
-    return tab;
-  }
-  /* A tab's title is the name the tree's data gives the page, because the index cannot read the page's own. */
-  function load(tab,entry){
-    tab.entry=entry;
-    tab.title.textContent=named(entry);tab.title.title=named(entry);
-    tab.again.title='Reload';tab.again.setAttribute('aria-label','Reload '+named(entry));
-    tab.copy.title='Copy link';tab.copy.setAttribute('aria-label','Copy link to '+named(entry));
-    tab.away.title='Open in a new window';tab.away.setAttribute('aria-label','Open '+named(entry)+' in a new window');
-    tab.close.title='Close this tab';tab.close.setAttribute('aria-label','Close '+named(entry));
-    tab.frame.title=named(entry);tab.slot=unfilled(entry);
-    tab.again.hidden=tab.slot;tab.copy.hidden=tab.slot;tab.away.hidden=tab.slot;
-    if(!tab.slot){tab.frame.src=address(entry);return;}
-    /* A slot gives the frame nothing to load. A frame that held a page is emptied. */
-    if(tab.frame.hasAttribute('src'))tab.frame.src='about:blank';
-    say(tab,entry);
-  }
+  mount(null);
   /* THE NOTE OF A SLOT. It says, in the place of the page, that the page is a slot. */
-  function say(tab,entry){
-    if(!tab.note){
-      tab.note=document.createElement('div');tab.note.className='sds-pane sds-pane-slot';tab.note.hidden=true;
-      panes.insertBefore(tab.note,tab.frame);
-    }
+  function say(entry){
+    if(!note){note=document.createElement('div');note.className='sds-pane sds-pane-slot';note.hidden=true;panes.insertBefore(note,frame);}
     var box=document.createElement('div');box.className='sds-pull';
     var label=document.createElement('span');label.className='sds-label';label.textContent=named(entry);
     var words=document.createElement('p');
-    words.textContent='This page is a slot. Its address is not filled in, so this tab has no page to load. '+
+    words.textContent='This page is a slot. Its address is not filled in, so there is no page to load. '+
       'The build writes the tree from the pages on disk. Then each entry opens its page here.';
     box.appendChild(label);box.appendChild(words);
-    tab.note.textContent='';tab.note.appendChild(box);
+    note.textContent='';note.appendChild(box);
   }
-  /* RELOAD the page a tab holds. A page opened from disk is a stranger to the index, so where its frame refuses the
-     call, the frame is pointed at the page's address again. */
-  function reload(tab){
-    if(tab.slot)return;
-    try{tab.frame.contentWindow.location.reload();}
-    catch(e){var at=address(tab.entry);tab.frame.src='about:blank';setTimeout(function(){tab.frame.src=at;},0);}
-  }
-  /* THE ADDRESS keeps the shown page: `#` and the entry's path, written over the last, so the history is not filled. */
-  function keep(tab){
-    if(!tab.entry||tab.slot||!window.history||!history.replaceState)return;
-    var at='#'+encodeURIComponent(tab.entry.path).replace(/%2F/g,'/');
-    if(location.hash!==at)history.replaceState(null,'',at);
-  }
+  /* THE ADDRESS NAMES THE PAGE ON SCREEN: `#` and the entry's path. A click on an entry pushes it, so Back returns to the page
+     before; the opening of the index and the way back write it over the last. */
+  function hashOf(entry){return '#'+encodeURIComponent(entry.path).replace(/%2F/g,'/');}
   function asked(){
     if(!location.hash)return null;
     var want;try{want=decodeURIComponent(location.hash.slice(1));}catch(e){return null;}
     var hit=null;rows.forEach(function(row){if(!hit&&row.entry.path===want)hit=row;});
     return hit;
   }
-  function show(tab){
-    shown=tab;keep(tab);
-    tabs.forEach(function(one){
-      one.wrap.classList.toggle('sds-is-current',one===tab);
-      one.title.setAttribute('aria-selected',one===tab?'true':'false');
-      one.frame.hidden=one!==tab||one.slot;
-      if(one.note)one.note.hidden=one!==tab||!one.slot;
-      one.close.disabled=tabs.length<2;                 // the last tab cannot be closed
-    });
-    /* The tree shows which page the shown tab holds, opens what is above it, and the folded column marks its group. */
+  /* Show a page: the frame, the bar, and the tree's mark of where it is. Nothing is written to the address here. */
+  function show(entry){
+    var slot=unfilled(entry);
+    shown=entry;
+    title.textContent=named(entry);title.title=named(entry);
+    if(slot){
+      if(frame.hasAttribute('src'))mount(null);
+      say(entry);
+    }else if(frame.getAttribute('src')!==address(entry)){
+      mount(address(entry));
+    }
+    frame.title=named(entry);
+    frame.hidden=slot;if(note)note.hidden=!slot;
+    again.hidden=slot;copy.hidden=slot;away.hidden=slot;
+    /* The tree shows which page is on screen, opens what is above it, and the folded column marks its group. */
     var held=null;
     rows.forEach(function(row){
-      var here=row.entry===tab.entry;
+      var here=row.entry===entry;
       row.link.classList.toggle('sds-is-current',here);
       if(here){row.link.setAttribute('aria-current','page');}else{row.link.removeAttribute('aria-current');}
       if(!here)return;
@@ -249,30 +230,15 @@
       }
     });
     groups.forEach(function(group){if(group.mark)group.mark.classList.toggle('sds-is-current',group===held);});
-    if(tab.wrap.scrollIntoView)tab.wrap.scrollIntoView({block:'nearest',inline:'nearest'});
   }
-  /* `fresh` asks for a tab of its own. At the limit no tab is added: the tab opened longest ago takes the page. */
-  function open(entry,fresh){
-    var tab=shown;
-    if(fresh||!tab){
-      if(tabs.length<data.tabs){tab=make();}
-      else{tab=tabs.reduce(function(oldest,one){return one.opened<oldest.opened?one:oldest;});}
-      clock+=1;tab.opened=clock;
-      load(tab,entry);
-    }else if(tab.entry!==entry){
-      load(tab,entry);
+  /* A click on an entry: the page replaces the one on screen, and the address is pushed. */
+  function go(entry){
+    if(shown!==entry){
+      if(!unfilled(entry)&&window.history&&history.pushState&&location.hash!==hashOf(entry))history.pushState(null,'',hashOf(entry));
+      show(entry);
     }
-    show(tab);
     /* On a narrow screen the tree is over the page, so it folds away again once a page is chosen. */
     if(narrow&&narrow.matches)foldTree(true);
-  }
-  function shut(tab){
-    if(tabs.length<2)return;
-    var at=tabs.indexOf(tab);
-    tabs.splice(at,1);
-    bar.removeChild(tab.wrap);panes.removeChild(tab.frame);
-    if(tab.note)panes.removeChild(tab.note);
-    show(shown===tab?tabs[Math.min(at,tabs.length-1)]:shown);
   }
 
   /* THE TREE FOLDS AWAY with one click on the button in the head card, at any width, and comes back the same way.
@@ -311,6 +277,11 @@
     brand.setAttribute('aria-label',openName);brand.title=openName;
   }
   var first=asked();
-  if(rows.length)open((first||defaultRow()).entry,true);
-  window.addEventListener('hashchange',function(){var row=asked();if(row&&(!shown||shown.entry!==row.entry))open(row.entry,false);});
+  if(rows.length){
+    var start=(first||defaultRow()).entry;
+    if(!first&&!unfilled(start)&&window.history&&history.replaceState)history.replaceState(null,'',hashOf(start));
+    show(start);
+  }
+  /* Back and Forward, and an address typed or shared: the page the address names is the page on screen. */
+  window.addEventListener('hashchange',function(){var row=asked();if(row&&shown!==row.entry)show(row.entry);});
 })();

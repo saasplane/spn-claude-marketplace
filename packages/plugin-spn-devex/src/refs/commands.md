@@ -90,7 +90,9 @@ spn-devex docs status check <seat…> — report each status that differs from w
 
 spn-devex docs status write <seat…> — write the status the behaviour rows derive into each seat file
 
-spn-devex docs styles cut <version> [--root <folder>] [--ds <folder>] [--ds-version <tag>] — copy the built styles into a version's folder, and list the version; with --ds, copy the design system's tokens first and build
+spn-devex docs styles cut <version> [--replace] [--root <folder>] [--ds <folder>] [--ds-version <tag>] — copy the built styles into a version's folder, and list the version; --replace recuts a version that is not published; with --ds, copy the design system's tokens first and build
+
+spn-devex docs styles preview <folder> [--root <folder>] — the quick loop: build the styles and copy the built files into <folder>/_assets/docs/<next version>/, with no hash and no version listed
 
 spn-devex docs styles check <version> <folder…> [--root <folder>] — list the pages a move to the version would change, and write nothing
 
