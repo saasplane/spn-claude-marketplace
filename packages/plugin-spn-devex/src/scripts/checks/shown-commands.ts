@@ -2,8 +2,9 @@
 // RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § Code blocks
 // A COMMAND A PAGE SHOWS IS ONE THE COMMAND LINE ACCEPTS TODAY, as decision 046 holds a permission rule to the command table.
 // The table is `refs/commands.md` of each plugin, generated from the commands tree. A `node <name>.ts` line is a form that is gone, and a
-// `spn-devex`, `spn-apps`, `spn-surface` or `spn-infra` line whose command words the table does not hold is a finding. Every finding is SOFT
-// and names the closest current form. `spnutils` has no table in the plugins, so its lines are not read here.
+// `spn-devex`, `spn-apps`, `spn-surface`, `spn-infra` or `spnutils` line whose command words the table does not hold is a finding. Every finding
+// is SOFT and names the closest current form. `spnutils`'s table is `refs/spnutils-commands.json`, a snapshot of `spnutils help --json` (the
+// command and its signature) that the plugins' build refreshes where `spnutils` is on the PATH; a bare `spnutils` or one with only flags is not a command shown.
 //
 // WHAT IT READS. The lines of a `sh`, `bash`, `shell`, `zsh` or `console` fence in a seat file, the same in a `<pre data-lang="sh">` of a
 // page, and the command after "Try it:" on a line.
@@ -14,7 +15,7 @@ import { fileURLToPath } from "node:url";
 
 export type CommandEntry = { cli: string; words: string[]; usage: string };
 
-const CLIS = ["spn-devex", "spn-apps", "spn-surface", "spn-infra"];
+const CLIS = ["spn-devex", "spn-apps", "spn-surface", "spn-infra", "spnutils"];
 
 /** The commands one `commands.md` lists: the CLI, the plain words, and the line up to its dash. */
 export function parseCommandTable(markdown: string): CommandEntry[] {
@@ -29,6 +30,21 @@ export function parseCommandTable(markdown: string): CommandEntry[] {
   return out;
 }
 
+/** The commands the `spnutils` snapshot holds: its `commands[].command` words and its signature, or none where the text does not read. */
+export function parseSpnutilsSnapshot(json: string): CommandEntry[] {
+  try {
+    const held = JSON.parse(json) as { cli?: unknown; commands?: Array<{ command?: unknown; signature?: unknown }> };
+    if (held?.cli !== "spnutils" || !Array.isArray(held.commands)) return [];
+    const out: CommandEntry[] = [];
+    for (const one of held.commands) {
+      if (typeof one?.command !== "string" || typeof one.signature !== "string") continue;
+      const words = one.command.trim().split(/\s+/).filter(Boolean);
+      if (words.length) out.push({ cli: "spnutils", words, usage: one.signature });
+    }
+    return out;
+  } catch { return []; }
+}
+
 /** The tables of this plugin and of its sibling plugins in the same checkout; a plugin installed alone holds its own. */
 export function loadCommandTable(): CommandEntry[] {
   const here = dirname(fileURLToPath(import.meta.url));
@@ -41,6 +57,8 @@ export function loadCommandTable(): CommandEntry[] {
   } catch { /* an installed plugin has no siblings */ }
   const out: CommandEntry[] = [];
   for (const file of files) if (existsSync(file)) out.push(...parseCommandTable(readFileSync(file, "utf8")));
+  const snapshot = join(here, "..", "..", "refs", "spnutils-commands.json");
+  if (existsSync(snapshot)) out.push(...parseSpnutilsSnapshot(readFileSync(snapshot, "utf8")));
   return out;
 }
 
@@ -61,12 +79,13 @@ export function commandFinding(line: string, table: CommandEntry[]): string | nu
     const shown = `node ${name}.ts${sub ? ` ${sub}` : ""}`;
     return near ? `\`${shown}\` is gone: use \`${near.usage}\` (RULE.DEVEX.WORKSPACE.046)` : `\`${shown}\` is gone: no command of that name is in the command table (RULE.DEVEX.WORKSPACE.046)`;
   }
-  const start = /(?:^|[\s`$>(])((?:spn-devex|spn-apps|spn-surface|spn-infra))\s+([^`\n<]*)/.exec(line);
+  const start = /(?:^|[\s`$>(])((?:spn-devex|spn-apps|spn-surface|spn-infra|spnutils))\s+([^`\n<]*)/.exec(line);
   if (!start) return null;
   const cli = start[1];
   if (!table.some((e) => e.cli === cli)) return null; // a plugin whose table is not here is not read
   const words: string[] = [];
   for (const token of start[2].trim().split(/\s+/)) { if (!/^[a-z][a-z0-9-]*$/.test(token)) break; words.push(token); }
+  if (cli === "spnutils" && !words.length) return null; // `spnutils --version` or a bare name shows no command
   const own = table.filter((e) => e.cli === cli);
   if (own.some((e) => shared(e.words, words) === e.words.length)) return null;
   const best = own.map((e) => ({ e, n: shared(e.words, words) })).sort((a, b) => b.n - a.n)[0];

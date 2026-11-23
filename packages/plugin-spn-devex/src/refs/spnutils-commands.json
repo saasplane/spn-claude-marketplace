@@ -1,0 +1,289 @@
+{
+  "cli": "spnutils",
+  "commands": [
+    {
+      "command": "apps build",
+      "signature": "spnutils apps build [options] <package> [flavour]"
+    },
+    {
+      "command": "apps check",
+      "signature": "spnutils apps check [options] <package>"
+    },
+    {
+      "command": "apps clean",
+      "signature": "spnutils apps clean [options] <package>"
+    },
+    {
+      "command": "apps codegen",
+      "signature": "spnutils apps codegen [options] <target> <package>"
+    },
+    {
+      "command": "apps dev",
+      "signature": "spnutils apps dev [options] <package>"
+    },
+    {
+      "command": "apps format",
+      "signature": "spnutils apps format [options] <package>"
+    },
+    {
+      "command": "apps gen-barrel",
+      "signature": "spnutils apps gen-barrel [options] <package>"
+    },
+    {
+      "command": "apps gen-labels",
+      "signature": "spnutils apps gen-labels [options] <package>"
+    },
+    {
+      "command": "apps gen-symbols",
+      "signature": "spnutils apps gen-symbols [options] [package]"
+    },
+    {
+      "command": "apps gen-validators",
+      "signature": "spnutils apps gen-validators [options] <package>"
+    },
+    {
+      "command": "apps migrate",
+      "signature": "spnutils apps migrate [options] <operation> <package>"
+    },
+    {
+      "command": "apps release",
+      "signature": "spnutils apps release [options] [version]"
+    },
+    {
+      "command": "apps scaffold",
+      "signature": "spnutils apps scaffold [options] <selector> [value]"
+    },
+    {
+      "command": "apps start",
+      "signature": "spnutils apps start [options] <package>"
+    },
+    {
+      "command": "apps stop",
+      "signature": "spnutils apps stop [options] <package>"
+    },
+    {
+      "command": "apps surface",
+      "signature": "spnutils apps surface [options] <operation> [package]"
+    },
+    {
+      "command": "apps test",
+      "signature": "spnutils apps test [options] <tier> <run> <package>"
+    },
+    {
+      "command": "apps validate",
+      "signature": "spnutils apps validate [options] [selector] [value]"
+    },
+    {
+      "command": "infra app down",
+      "signature": "spnutils infra app down [options] <package>"
+    },
+    {
+      "command": "infra app up",
+      "signature": "spnutils infra app up [options] <package>"
+    },
+    {
+      "command": "infra bases publish",
+      "signature": "spnutils infra bases publish [options] <version>"
+    },
+    {
+      "command": "infra config diff",
+      "signature": "spnutils infra config diff [options] <spc> <env> <against>"
+    },
+    {
+      "command": "infra config export",
+      "signature": "spnutils infra config export [options] <spc>"
+    },
+    {
+      "command": "infra config get",
+      "signature": "spnutils infra config get [options] <spc> <key>"
+    },
+    {
+      "command": "infra config import",
+      "signature": "spnutils infra config import [options] <spc> <file>"
+    },
+    {
+      "command": "infra config list",
+      "signature": "spnutils infra config list [options] <spc>"
+    },
+    {
+      "command": "infra config render",
+      "signature": "spnutils infra config render [options] <spc> <env> <kindcode>"
+    },
+    {
+      "command": "infra config set",
+      "signature": "spnutils infra config set [options] <spc> <entries...>"
+    },
+    {
+      "command": "infra deployments status",
+      "signature": "spnutils infra deployments status [options] <spc>"
+    },
+    {
+      "command": "infra deployments up",
+      "signature": "spnutils infra deployments up [options] <spc>"
+    },
+    {
+      "command": "infra domain check-zone",
+      "signature": "spnutils infra domain check-zone [options] <code> <file>"
+    },
+    {
+      "command": "infra domain read-zone",
+      "signature": "spnutils infra domain read-zone [options] <code> <file>"
+    },
+    {
+      "command": "infra domain register",
+      "signature": "spnutils infra domain register [options] <spc> <domains...>"
+    },
+    {
+      "command": "infra domain unregister",
+      "signature": "spnutils infra domain unregister [options] [domain]"
+    },
+    {
+      "command": "infra environment down",
+      "signature": "spnutils infra environment down [options] <spc> <env>"
+    },
+    {
+      "command": "infra environment status",
+      "signature": "spnutils infra environment status [options] <spc> <env>"
+    },
+    {
+      "command": "infra environment up",
+      "signature": "spnutils infra environment up [options] <spc> <env>"
+    },
+    {
+      "command": "infra ground up",
+      "signature": "spnutils infra ground up [options]"
+    },
+    {
+      "command": "infra logs",
+      "signature": "spnutils infra logs [options] <spc> [service]"
+    },
+    {
+      "command": "infra organization down",
+      "signature": "spnutils infra organization down [options]"
+    },
+    {
+      "command": "infra organization status",
+      "signature": "spnutils infra organization status [options]"
+    },
+    {
+      "command": "infra organization trust-ca",
+      "signature": "spnutils infra organization trust-ca [options]"
+    },
+    {
+      "command": "infra organization up",
+      "signature": "spnutils infra organization up [options]"
+    },
+    {
+      "command": "infra platform down",
+      "signature": "spnutils infra platform down [options] <spc>"
+    },
+    {
+      "command": "infra platform status",
+      "signature": "spnutils infra platform status [options] <spc>"
+    },
+    {
+      "command": "infra platform up",
+      "signature": "spnutils infra platform up [options] <spc>"
+    },
+    {
+      "command": "infra release",
+      "signature": "spnutils infra release [options] <package> [version]"
+    },
+    {
+      "command": "infra scaffold module",
+      "signature": "spnutils infra scaffold module [options] <code>"
+    },
+    {
+      "command": "infra scaffold organization",
+      "signature": "spnutils infra scaffold organization [options] <org>"
+    },
+    {
+      "command": "infra scaffold platform",
+      "signature": "spnutils infra scaffold platform [options] <spc>"
+    },
+    {
+      "command": "infra scaffold repo",
+      "signature": "spnutils infra scaffold repo [options]"
+    },
+    {
+      "command": "infra show",
+      "signature": "spnutils infra show [options] <spc>"
+    },
+    {
+      "command": "infra test",
+      "signature": "spnutils infra test [options] <run> [package]"
+    },
+    {
+      "command": "infra validate",
+      "signature": "spnutils infra validate [options] [target]"
+    },
+    {
+      "command": "infra web configure",
+      "signature": "spnutils infra web configure [options] <spc> <env> <app>"
+    },
+    {
+      "command": "infra web deploy",
+      "signature": "spnutils infra web deploy [options] <spc> <env> <app>"
+    },
+    {
+      "command": "infra web rollback",
+      "signature": "spnutils infra web rollback [options] <spc> <env> <app> <release>"
+    },
+    {
+      "command": "login",
+      "signature": "spnutils login [options]"
+    },
+    {
+      "command": "repo agent-sync",
+      "signature": "spnutils repo agent-sync [options]"
+    },
+    {
+      "command": "repo backmerge",
+      "signature": "spnutils repo backmerge [options] <branch>"
+    },
+    {
+      "command": "repo create",
+      "signature": "spnutils repo create [options] <name>"
+    },
+    {
+      "command": "repo promote",
+      "signature": "spnutils repo promote [options] <to>"
+    },
+    {
+      "command": "workspace agent-sync",
+      "signature": "spnutils workspace agent-sync [options]"
+    },
+    {
+      "command": "workspace clock",
+      "signature": "spnutils workspace clock [options] [command]"
+    },
+    {
+      "command": "workspace clock set",
+      "signature": "spnutils workspace clock set [options]"
+    },
+    {
+      "command": "workspace env set",
+      "signature": "spnutils workspace env set [options] <key>"
+    },
+    {
+      "command": "workspace env show",
+      "signature": "spnutils workspace env show [options]"
+    },
+    {
+      "command": "workspace init",
+      "signature": "spnutils workspace init [options] [name]"
+    },
+    {
+      "command": "workspace status",
+      "signature": "spnutils workspace status [options]"
+    },
+    {
+      "command": "workspace worktree add",
+      "signature": "spnutils workspace worktree add [options] <number>"
+    },
+    {
+      "command": "workspace worktree remove",
+      "signature": "spnutils workspace worktree remove [options] <number>"
+    }
+  ]
+}

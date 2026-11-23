@@ -1,5 +1,5 @@
 // `checks/shown-commands.ts` — a command a docs page shows is one the command line accepts today (decision 046's rule, held to the command table).
-const { parseCommandTable, commandFinding, shownLines, shownCommandFindings, loadCommandTable } = await import("../../../../src/scripts/checks/shown-commands.ts");
+const { parseSpnutilsSnapshot, parseCommandTable, commandFinding, shownLines, shownCommandFindings, loadCommandTable } = await import("../../../../src/scripts/checks/shown-commands.ts");
 
 let total = 0, failed = 0;
 const ok = (label, condition, detail = "") => {
@@ -32,7 +32,23 @@ const gone = commandFinding("spn-devex docs audit", TABLE);
 ok("a command short of its action names the closest form", gone === "`spn-devex docs audit` is not a command the command line accepts: use `spn-devex docs audit check [<path>…] [--variant <name>]` (RULE.DEVEX.WORKSPACE.046)", gone);
 ok("a command that is nowhere in the table is refused", commandFinding("spn-devex nothing here", TABLE).includes("no command of that name"));
 ok("a line with no command has nothing to find", commandFinding("pnpm install", TABLE) === null);
-ok("a spnutils line is not read here, it has no table", commandFinding("spnutils workspace status", TABLE) === null);
+ok("a spnutils line is not read where the table holds no spnutils", commandFinding("spnutils workspace status", TABLE) === null);
+
+console.log("\n=== spnutils, from its snapshot (S72)");
+const SNAP = parseSpnutilsSnapshot(JSON.stringify({ cli: "spnutils", commands: [
+  { command: "workspace status", signature: "spnutils workspace status [options]" },
+  { command: "workspace clock set", signature: "spnutils workspace clock set [options] <timezone>" },
+] }));
+const BOTH = [...TABLE, ...SNAP];
+ok("the snapshot's commands are entries with their words and signature", SNAP.length === 2 && SNAP[1].words.join(" ") === "workspace clock set" && SNAP[0].usage === "spnutils workspace status [options]");
+ok("a snapshot of another cli or a text that does not read holds none", parseSpnutilsSnapshot("{}").length === 0 && parseSpnutilsSnapshot("nope").length === 0 && parseSpnutilsSnapshot('{"cli":"x","commands":[]}').length === 0);
+ok("a spnutils command the snapshot holds passes, with flags", commandFinding("spnutils workspace status --json", BOTH) === null);
+ok("a spnutils command that is gone is a finding naming the closest current form",
+  commandFinding("spnutils workspace clock", BOTH) === "`spnutils workspace clock` is not a command the command line accepts: use `spnutils workspace clock set [options] <timezone>` (RULE.DEVEX.WORKSPACE.046)", commandFinding("spnutils workspace clock", BOTH));
+ok("a spnutils command nowhere in the snapshot is refused", commandFinding("spnutils nothing here", BOTH).includes("no command of that name"));
+ok("a bare spnutils shows no command", commandFinding("spnutils --version", BOTH) === null);
+ok("a spnutils line in a sh fence is read", shownCommandFindings("```sh\nspnutils workspace statuss\n```", BOTH).length === 1);
+ok("the real snapshot loads beside the plugin tables", loadCommandTable().some((e) => e.cli === "spnutils" && e.words.join(" ") === "workspace status"));
 
 console.log("\n=== where a command is shown");
 const md = "Text `spn-devex nothing`.\n\n```sh\n$ spn-devex docs audit check a\nnode docs.ts audit b\n```\n\n```ts\nnode docs.ts audit c\n```\n\nTry it: `spn-devex docs prose`\n";
