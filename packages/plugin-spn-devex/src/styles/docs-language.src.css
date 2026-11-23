@@ -183,6 +183,10 @@
     --sds-violet:#6d3a9c; --sds-violet-soft:#ece3f5; --sds-cyan:#1b6a86; --sds-cyan-soft:#dbeef4; --sds-pink:#a0366d;
     --sds-pink-soft:#f6e0ec; --sds-olive:#5a661c; --sds-olive-soft:#edf0d8; --sds-orange:#a55000; --sds-yellow:#6b5300; --sds-yellow-soft:#fbf1c4;
     --sds-orange-soft:#fdebd3; --sds-page-max:90rem;
+    /* THE HEAD OF A FRAME (a file, a command, a unit, a fold) is one height and one inset: its first text starts --sds-frame-head-px
+       in from the frame's edge, its row is --sds-frame-head-h tall at the least, and its tag and copy button (1.5rem square) sit inside
+       that height without stretching it. A group panel's head and a table's first column take the same inset. */
+    --sds-frame-head-h:2rem; --sds-frame-head-px:1.1rem;
     /* the statuses of approach and preview pages, docs tokens, one value per mode */
     --sds-status-planning:oklch(0.767462 0.171331 61.6975); --sds-status-planning-soft:oklch(0.810515 0.145533 67.1324 / 0.2); --sds-status-implementing:oklch(0.3949 0.0942473 244.756); --sds-status-implementing-soft:oklch(0.3949 0.0942473 244.756 / 0.14); --sds-status-done:oklch(0.735386 0.13145 144.907); --sds-status-done-soft:oklch(0.767314 0.115667 145.001 / 0.18); --sds-status-proposed:rgb(107, 83, 0); --sds-status-proposed-soft:rgb(251, 241, 196); --sds-status-decided:oklch(0.570136 0.196001 256.188); --sds-status-decided-soft:oklch(0.699265 0.146593 249.792 / 0.13); --sds-status-running:rgb(165, 80, 0); --sds-status-running-soft:rgb(253, 235, 211); --sds-status-held:oklch(0.439 0 0); --sds-status-held-soft:oklch(0.97 0 0); --sds-status-part-landed:rgb(90, 102, 28); --sds-status-part-landed-soft:rgb(237, 240, 216); --sds-status-landed:oklch(0.735386 0.13145 144.907); --sds-status-landed-soft:oklch(0.767314 0.115667 145.001 / 0.18); --sds-status-carried:rgb(27, 106, 134); --sds-status-carried-soft:rgb(219, 238, 244); --sds-status-dropped:oklch(0.582835 0.202194 29.0717); --sds-status-dropped-soft:oklch(0.724946 0.15472 25.82 / 0.14);
     --sds-measure:58rem; --sds-content-floor:48rem; --sds-page-pad:2rem; --sds-rail-width:14rem; --sds-tree-width:clamp(13.5rem,calc(100vw - 71.5rem),22rem); --sds-outline-fold:69rem; --sds-tree-fold:82.5rem;
@@ -309,6 +313,7 @@
   tr:last-child > :first-child{border-bottom-left-radius:calc(var(--radius-lg) - var(--radius-lg))}
   tr:last-child > :last-child{border-bottom-right-radius:calc(var(--radius-lg) - var(--radius-lg))}
   td{@apply align-top text-description; padding:8px 16px; border-bottom:1px solid var(--surface-divider); font-size:var(--sds-small); line-height:var(--sds-small-lh)}
+  th:first-child,td:first-child{padding-left:var(--sds-frame-head-px)}
   tr.sds-current > td,tr.sds-current > th{background:var(--primary-subtle)}
   td > p{margin:0}
   td > p + p{margin-top:.35rem}
@@ -350,9 +355,9 @@
   /* FILE: a code block that is one file, framed, its path from the repository's root as the title and its
      language as a badge. The title bar takes no margin, and its path starts where the code starts. */
   .sds-file{@apply max-w-full overflow-hidden; background:var(--surface); border:1px solid var(--surface-border); border-radius:var(--radius-lg); margin:1.6rem 0}
-  .sds-file>figcaption{@apply flex items-center font-mono text-xs text-description; gap:.75rem; margin:0; padding:.4rem 1.1rem; border-bottom:1px solid var(--sds-rule); background:var(--muted)}
+  .sds-file>figcaption{@apply flex items-center font-mono text-xs text-description; box-sizing:border-box; min-height:var(--sds-frame-head-h); gap:.75rem; margin:0; padding:.2rem var(--sds-frame-head-px) .2rem var(--sds-frame-head-px); border-bottom:1px solid var(--sds-rule); background:var(--muted)}
   .sds-file .sds-file-path{@apply min-w-0 wrap-anywhere; flex:1}
-  .sds-file .sds-file-lang{@apply font-ui uppercase text-fact; flex:none; padding:0 .5rem; border:1px solid var(--sds-rule); border-radius:999px; font-size:var(--font-content-xxs-size); letter-spacing:.06em}
+  .sds-file .sds-file-lang,.sds-cmd-head .sds-file-lang{@apply font-ui uppercase text-fact; flex:none; padding:0 .5rem; border:1px solid var(--sds-rule); border-radius:999px; font-size:var(--font-content-xxs-size); letter-spacing:.06em}
   .sds-file>pre{margin:0; border:0; border-radius:0}
 
   /* A figure */
@@ -1195,8 +1200,9 @@ pre .sds-tk-g { color: var(--sds-tk-c); font-style: normal; }
    radius. Its head says where the command runs and holds the copy button; the `$` prompt is quiet and never selected; "What you see"
    sits in the same frame, below a rule, on the sunken ground. */
 .sds-cmd-frame { background: var(--surface); border: 1px solid var(--surface-border); border-radius: var(--radius-lg); margin: 1rem 0; overflow: hidden; }
-.sds-cmd-head { display: flex; align-items: center; justify-content: space-between; gap: .75rem; padding: .35rem .5rem .35rem 1rem; background: var(--muted); border-bottom: 1px solid var(--surface-border);
-  font-family: var(--font-text); font-size: var(--font-content-xs-size); line-height: var(--font-content-xs-line-height); font-weight: var(--font-weight-medium); text-transform: uppercase; letter-spacing: .06em; color: var(--fg-muted); }
+.sds-cmd-head { display: flex; align-items: center; gap: .75rem; box-sizing: border-box; min-height: var(--sds-frame-head-h); margin: 0; padding: .2rem var(--sds-frame-head-px); background: var(--muted); border-bottom: 1px solid var(--sds-rule);
+  font-family: var(--font-code); font-size: var(--font-content-xs-size); line-height: var(--font-content-xs-line-height); font-weight: 400; text-transform: none; letter-spacing: normal; color: var(--sds-text-description); }
+.sds-cmd-head .sds-file-path { flex: 1; min-width: 0; }
 .sds-cmd-copy { font: inherit; text-transform: none; letter-spacing: normal; color: var(--fg-muted); background: none; border: 1px solid transparent; border-radius: var(--radius-sm); padding: .1rem .5rem; cursor: pointer; }
 .sds-cmd-copy:hover { color: var(--fg); border-color: var(--surface-border); }
 .sds-cmd-frame > pre { margin: 0; border: 0; border-radius: 0; background: none; }
@@ -1204,8 +1210,8 @@ pre .sds-tk-g { color: var(--sds-tk-c); font-style: normal; }
 .sds-cmd-frame > .sds-step-see { margin: 0; padding: .6rem 1rem; border: 0; border-top: 1px solid var(--surface-border); border-radius: 0; background: var(--surface-sunken); }
 @media print { .sds-cmd-copy { display: none; } }
 /* the command frame's copy mark: the index's own copy icon in a square button, a check while copied */
-.sds-cmd-copy { display: grid; place-items: center; width: 1.6rem; height: 1.6rem; padding: 0; }
-.sds-cmd-copy svg { width: .9rem; height: .9rem; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.sds-cmd-copy { display: grid; place-items: center; flex: none; width: 1.5rem; height: 1.5rem; padding: 0; margin-right: calc(var(--sds-frame-head-px) * -.5); }
+.sds-cmd-copy svg { width: .85rem; height: .85rem; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .sds-cmd-copy.sds-is-copied { color: var(--on-success-subtle); }
 
 /* A SKELETON IS A DRAWING OF A SCREEN: its control icons (a row's menu, a pager's arrows, a select's chevron, a checkbox's tick) take the
@@ -1427,7 +1433,7 @@ pre .sds-tk-g { color: var(--sds-tk-c); font-style: normal; }
   align-items: baseline;
   justify-content: space-between;
   gap: 1rem;
-  padding: .8rem 1.1rem;
+  padding: .8rem var(--sds-frame-head-px);
   border-bottom: 1px solid var(--sds-rule);
   border-radius: calc(var(--radius) - 1px) calc(var(--radius) - 1px) 0 0;
   background: var(--muted);
@@ -1849,9 +1855,12 @@ pre .sds-tk-g { color: var(--sds-tk-c); font-style: normal; }
 }
 .sds-fold > summary {
   cursor: pointer;
-  padding: .55rem 1.1rem;
+  box-sizing: border-box;
+  min-height: var(--sds-frame-head-h);
+  padding: .4rem var(--sds-frame-head-px);
   font-family: var(--font-code);
-  font-size: var(--sds-sm);
+  font-size: var(--font-content-xs-size);
+  line-height: var(--font-content-xs-line-height);
   color: var(--sds-text-description);
 }
 .sds-fold > summary:hover { color: var(--sds-accent); }

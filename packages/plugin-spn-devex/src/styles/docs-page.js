@@ -464,6 +464,25 @@ try{if('scrollRestoration' in history)history.scrollRestoration='manual';}catch(
    from the command (the prompt is a mark, never selected or copied), then the step's "What you see" joined below in the same frame. */
 (function () {
   function esc(t) { return t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+  // Every frame's head ends the same way: its tag, then this copy button. The mark is the index's own (lucide copy), and a check
+  // while the text is on the clipboard; its words are its title and label.
+  var COPY = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M10 8h10a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H10a2 2 0 0 1-2-2V10a2 2 0 0 1 2-2z"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>';
+  var DONE = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M20 6 9 17l-5-5"/></svg>';
+  function copyButton(text, label) {
+    var copy = document.createElement('button'); copy.type = 'button'; copy.className = 'sds-cmd-copy'; copy.innerHTML = COPY; copy.title = 'Copy';
+    copy.setAttribute('aria-label', label);
+    copy.addEventListener('click', function () {
+      var done = function () { copy.innerHTML = DONE; copy.title = 'Copied'; copy.classList.add('sds-is-copied'); setTimeout(function () { copy.innerHTML = COPY; copy.title = 'Copy'; copy.classList.remove('sds-is-copied'); }, 1400); };
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text()).then(done, done); else done();
+    });
+    return copy;
+  }
+  // A file frame (a file, a unit) gains the button at the end of its head: it copies the frame's code.
+  Array.prototype.slice.call(document.querySelectorAll('figure.sds-file > figcaption')).forEach(function (cap) {
+    var code = cap.parentNode.querySelector('pre');
+    if (!code || cap.querySelector('.sds-cmd-copy')) return;
+    cap.appendChild(copyButton(function () { return code.textContent; }, 'Copy the code'));
+  });
   // A block tagged sh or bash is framed too when it holds commands; a script (a line that opens or closes a branch or a loop) stays
   // a plain code block, since a prompt on each line of a script would be wrong. The colouring before this ran on its text, so the
   // text is read again from the block.
@@ -485,18 +504,9 @@ try{if('scrollRestoration' in history)history.scrollRestoration='manual';}catch(
     }).join('\n');
     var frame = document.createElement('div'); frame.className = 'sds-cmd-frame';
     var head = document.createElement('div'); head.className = 'sds-cmd-head';
-    var where = document.createElement('span'); where.textContent = pre.getAttribute('data-run') === 'claude' ? 'Claude in VS Code' : 'Terminal';
-    // the copy mark is the index's own (lucide copy), and a check while the command is on the clipboard; its words are its title and label
-    var COPY = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M10 8h10a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H10a2 2 0 0 1-2-2V10a2 2 0 0 1 2-2z"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>';
-    var DONE = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M20 6 9 17l-5-5"/></svg>';
-    var copy = document.createElement('button'); copy.type = 'button'; copy.className = 'sds-cmd-copy'; copy.innerHTML = COPY; copy.title = 'Copy';
-    copy.setAttribute('aria-label', 'Copy the command');
-    copy.addEventListener('click', function () {
-      var text = commands.join('\n');
-      var done = function () { copy.innerHTML = DONE; copy.title = 'Copied'; copy.classList.add('sds-is-copied'); setTimeout(function () { copy.innerHTML = COPY; copy.title = 'Copy'; copy.classList.remove('sds-is-copied'); }, 1400); };
-      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done, done); else done();
-    });
-    head.appendChild(where); head.appendChild(copy);
+    var where = document.createElement('span'); where.className = 'sds-file-path'; where.textContent = pre.getAttribute('data-run') === 'claude' ? 'Claude in VS Code' : 'Terminal';
+    var tag = document.createElement('span'); tag.className = 'sds-file-lang'; tag.textContent = pre.getAttribute('data-run') === 'claude' ? 'claude' : 'sh';
+    head.appendChild(where); head.appendChild(tag); head.appendChild(copyButton(function () { return commands.join('\n'); }, 'Copy the command'));
     pre.parentNode.insertBefore(frame, pre);
     frame.appendChild(head); frame.appendChild(pre);
     var see = frame.nextElementSibling;

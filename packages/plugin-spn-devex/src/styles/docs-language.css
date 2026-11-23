@@ -2804,6 +2804,8 @@
     --sds-yellow-soft: #fbf1c4;
     --sds-orange-soft: #fdebd3;
     --sds-page-max: 90rem;
+    --sds-frame-head-h: 2rem;
+    --sds-frame-head-px: 1.1rem;
     --sds-status-planning: oklch(0.767462 0.171331 61.6975);
     --sds-status-planning-soft: oklch(0.810515 0.145533 67.1324 / 0.2);
     --sds-status-implementing: oklch(0.3949 0.0942473 244.756);
@@ -3448,6 +3450,9 @@
     font-size: var(--sds-small);
     line-height: var(--sds-small-lh);
   }
+  th:first-child,td:first-child {
+    padding-left: var(--sds-frame-head-px);
+  }
   tr.sds-current > td,tr.sds-current > th {
     background: var(--primary-subtle);
   }
@@ -3593,9 +3598,11 @@
     font-family: var(--sds-mono);
     font-size: var(--sds-xs);
     color: var(--sds-text-description);
+    box-sizing: border-box;
+    min-height: var(--sds-frame-head-h);
     gap: .75rem;
     margin: 0;
-    padding: .4rem 1.1rem;
+    padding: .2rem var(--sds-frame-head-px) .2rem var(--sds-frame-head-px);
     border-bottom: 1px solid var(--sds-rule);
     background: var(--muted);
   }
@@ -3604,7 +3611,7 @@
     overflow-wrap: anywhere;
     flex: 1;
   }
-  .sds-file .sds-file-lang {
+  .sds-file .sds-file-lang,.sds-cmd-head .sds-file-lang {
     font-family: var(--sds-ui);
     color: var(--sds-text-fact);
     text-transform: uppercase;
@@ -6689,18 +6696,24 @@
   .sds-cmd-head {
     display: flex;
     align-items: center;
-    justify-content: space-between;
     gap: .75rem;
-    padding: .35rem .5rem .35rem 1rem;
+    box-sizing: border-box;
+    min-height: var(--sds-frame-head-h);
+    margin: 0;
+    padding: .2rem var(--sds-frame-head-px);
     background: var(--muted);
-    border-bottom: 1px solid var(--surface-border);
-    font-family: var(--font-text);
+    border-bottom: 1px solid var(--sds-rule);
+    font-family: var(--font-code);
     font-size: var(--font-content-xs-size);
     line-height: var(--font-content-xs-line-height);
-    font-weight: var(--font-weight-medium);
-    text-transform: uppercase;
-    letter-spacing: .06em;
-    color: var(--fg-muted);
+    font-weight: 400;
+    text-transform: none;
+    letter-spacing: normal;
+    color: var(--sds-text-description);
+  }
+  .sds-cmd-head .sds-file-path {
+    flex: 1;
+    min-width: 0;
   }
   .sds-cmd-copy {
     font: inherit;
@@ -6744,13 +6757,15 @@
   .sds-cmd-copy {
     display: grid;
     place-items: center;
-    width: 1.6rem;
-    height: 1.6rem;
+    flex: none;
+    width: 1.5rem;
+    height: 1.5rem;
     padding: 0;
+    margin-right: calc(var(--sds-frame-head-px) * -.5);
   }
   .sds-cmd-copy svg {
-    width: .9rem;
-    height: .9rem;
+    width: .85rem;
+    height: .85rem;
     fill: none;
     stroke: currentColor;
     stroke-width: 2;
@@ -7027,7 +7042,7 @@
   align-items: baseline;
   justify-content: space-between;
   gap: 1rem;
-  padding: .8rem 1.1rem;
+  padding: .8rem var(--sds-frame-head-px);
   border-bottom: 1px solid var(--sds-rule);
   border-radius: calc(var(--radius) - 1px) calc(var(--radius) - 1px) 0 0;
   background: var(--muted);
@@ -7452,9 +7467,12 @@
 }
 .sds-fold > summary {
   cursor: pointer;
-  padding: .55rem 1.1rem;
+  box-sizing: border-box;
+  min-height: var(--sds-frame-head-h);
+  padding: .4rem var(--sds-frame-head-px);
   font-family: var(--font-code);
-  font-size: var(--sds-sm);
+  font-size: var(--font-content-xs-size);
+  line-height: var(--font-content-xs-line-height);
   color: var(--sds-text-description);
 }
 .sds-fold > summary:hover {
