@@ -19,12 +19,12 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "The figures — what sits inside a block, and the closed set of them",
-      "seen": "d1bbd288"
+      "seen": "03955ec7"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "Which block a content takes, and how its fence is written",
-      "seen": "eefd6716"
+      "seen": "67adbb5f"
     }
   ]
 }

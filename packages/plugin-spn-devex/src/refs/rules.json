@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "book": {
     "repository": "spn-foundation",
-    "commit": "39054297"
+    "commit": "d69260d1"
   },
   "rules": [
     {
@@ -2438,6 +2438,11 @@
       "heading": "A new window by presence",
       "decision": null,
       "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/workstream.md",
+          "heading": "Work is sized by its kind, and fixes gather into a round"
+        },
         {
           "plugin": "spn-devex",
           "path": "refs/devex/workspace/workstream.md",
@@ -13838,7 +13843,23 @@
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "The index of artifacts — one page that opens every other",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/docs/doc-sets.md",
+          "heading": "The artifacts pocket — concept, overview, construct page"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/workstream.md",
+          "heading": "Anything the developer has not reviewed: preview, confirm, record, then code"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.551",
@@ -13851,7 +13872,18 @@
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "The surface page preview",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/docs/doc-sets.md",
+          "heading": "The artifacts pocket — concept, overview, construct page"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.LAUNCHPAD.CONTROL_PLANE.001",
@@ -38177,7 +38209,18 @@
       "chapter": "04-capabilities/02-support/01-surface/03-standards-patterns/01-common/05-design-languages.md",
       "heading": "One source for the platform's look",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/design-languages.md",
+          "heading": "One source for the platform's look — 🔮"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/design-language.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.SUPPORT.SURFACE.596",
@@ -38190,7 +38233,13 @@
       "chapter": "04-capabilities/02-support/01-surface/11-delivery-library/01-common/02-render.md",
       "heading": "The command",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.SUPPORT.SURFACE.597",
@@ -38203,7 +38252,13 @@
       "chapter": "04-capabilities/02-support/01-surface/11-delivery-library/01-common/02-render.md",
       "heading": "A page that shows a copy",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     }
   ]
 }

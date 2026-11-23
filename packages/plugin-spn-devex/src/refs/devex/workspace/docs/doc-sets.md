@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "seen": "374413f4"
+      "seen": "9a3ef351"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
@@ -325,6 +325,8 @@ The pocket holds what the node **authors** rather than derives, and its three au
 | --- | --- | --- | --- |
 | **Guide page** | `artifacts/guides/<name>-guide.html` | `docs guide write <guide.md>` | the guide's markdown in `05-guides/`, and `guide-template.html` |
 | **The index of artifacts** | `artifacts/index.html` | `docs index write <repository>` | the pages on disk, and `artifact-index-template.html` |
+
+**A page whose sidebar lists other pages is the artifact index, and it never has a sidebar of its own** (`RULE.DEVEX.WORKSPACE.550` · MUST · skill:spn-devex/ideate). A samples home, a set of previews and a set of reports are each an index of `artifact-index-template.html`, so a reader finds one rail and one set of tabs for any set of pages. **A design language's samples are one samples home, with each sample in a surface page preview**, in `docs/artifacts/design-languages/<language>/`: `index.html` is the home, `shared/`, `site/` and `app/` hold one folder per group, each sample the page and its `<slot>.preview.html`, and `assets/` holds what the pages load; the list of samples is data beside the spec, `docs/specs/design-languages/<language>.samples.json`. **A design-language construct page holds its spec in a fold** (`RULE.DEVEX.WORKSPACE.551` · MUST · skill:spn-devex/ideate): a short opening states the language's picks, and one fold keeps the tables and drawings. **Done and landed read the Success badge**: border `--sds-success`, text `--on-success-subtle` and ground `--sds-success-soft`, in both themes, and the looks of `CATALOG`, `TABS`, group panels, the fold and a framed unit are the Docs design language's.
 
 **Every repository has its getting-started guide and its test-and-verify guide as a page.** A newcomer needs these before any other guide: the first says how to start, and the second says how to check that a change works. Every other guide stays markdown, unless a developer asks for it as a page. A guide page is stages, and a stage is steps. A step holds why, the command and what you see, in that order. The stylesheet numbers the steps, so nobody types a number. A guide page has no status. Where `docs guide` finds no step in a guide, it reports the guide and writes nothing.
 
