@@ -20,13 +20,18 @@
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "The figures — what sits inside a block, and the closed set of them",
       "seen": "d1bbd288"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "section": "Which block a content takes, and how its fence is written",
+      "seen": "eefd6716"
     }
   ]
 }
 -->
 # Blocks and figures, in the spelling you actually write
 
-**Source of truth:** the foundation's `04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md` — *The masthead, and the opening*, *The blocks*, *Four blocks have a spelling in markdown* and *The figures*. This file restates them for an agent that ships without the book beside it; where the two disagree, the book wins.
+**Source of truth:** the foundation's `04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md` — *The masthead, and the opening*, *The blocks*, *Four blocks have a spelling in markdown*, *Which block a content takes, and how its fence is written* and *The figures*. This file restates them for an agent that ships without the book beside it; where the two disagree, the book wins.
 
 **You write markdown.** `docs page write` produces the HTML, and the shared stylesheet that every page
 links supplies every border, background and colour. That gives a block the same form on every page
@@ -199,9 +204,55 @@ and *Read more* both links. `next` makes the two doors, and a line may be left o
 the path as its title and the language as a badge. A `cards` line with no link, and a block with no line, are findings.
 The `PROSE` panel still has no spelling: write a paragraph where you wanted one, and never hand-write HTML to fake it.
 
+## Which block a content takes, and how its fence is written
+
+**Content that has a shape takes the block that shape names, from this table, read down to the first row that fits** (rule RULE.DEVEX.WORKSPACE.549 · GUIDE). Headings and fact keys are words, never sentences: `Layout · Arrangement · Use`, `Standard pages`, `Frequency`.
+
+| When the content is | Use |
+| --- | --- |
+| 2–4 things compared fact by fact | `catalog layout=TABLE` |
+| things a reader browses | `catalog layout=GRID`, or `LIST` when the names are long |
+| more than six things in groups | group panels (`## Group` lines in a catalog) |
+| whole alternatives, where each reader needs one | `tabs look=PILL` |
+| one block in several forms | `tabs look=LINE` |
+| two short views flipped back and forth | `tabs look=SWITCH` |
+| detail some readers want | a fold |
+| a file the page explains | `file=<path> fold` with an empty body |
+| what every reader must read | stays on the page |
+| a wide comparison of attributes | a plain table |
+
+A plain table of a name column and a description column past four rows reads as a catalog, and the page writer says so as a soft finding. A fence is written as the page writer reads it, and reads as plain code on github.com:
+
+| Block | You write | It becomes |
+| --- | --- | --- |
+| `CATALOG`, `GRID` | a fence tagged `catalog`, one line a card: name, one line; the card's facts on the lines under it, indented, one `Key: value` a line | cards in a grid of two to four across, each fact's label above its value |
+| `CATALOG`, `LIST` | the same fence tagged `catalog layout=LIST` | one card a row, its name on the left and its facts on the right |
+| `CATALOG`, `TABLE` | the same fence tagged `catalog layout=TABLE` | the cards as columns and each fact key as a row |
+| `CATALOG` media | `media=ICON`, `MARK`, `AVATAR`, `AVATAR_GROUP` or `MEDIA_TOP` after the tag, one for every item; an item names its media after its line | `ICON` for an item read as a line, `MARK` for an item that is a thing of its own, `AVATAR` for a person or a team, `MEDIA_TOP` for an item told best by its shape |
+| `TABS` | a fence of tildes tagged `tabs look=LINE`, `SWITCH` or `PILL` (`LINE` when left out), and a `--- <label>` line before each panel, whose body is one block; two to six tabs, never nested | a bar at the start and one panel at a time; every panel shows where the script does not run |
+| group panels | `## Group` lines inside a `catalog` fence | one panel for each group |
+| fold | `file=<path> fold` after the language, the body left empty to read the file from the repository root | the file's frame inside a `details` whose summary is the path |
+
+````markdown
+```catalog layout=GRID
+`RAIL` | a sidebar
+  Navigation: at the side
+```
+
+~~~tabs look=PILL
+--- Server
+The server's way.
+--- Web
+The web's way.
+~~~
+
+```yaml file=docs/spec.yaml fold
+```
+````
+
 ## A rendered unit is a tree
 
-**A unit of the design system is shown as a fenced tree, and `docs page write` renders it into a unit in its own frame on every write** (rule RULE.DEVEX.WORKSPACE.538 · GUIDE). The fence is tagged `unit` and holds one tree in the render's form: a unit with its props, a placement or a slot, `specVersion` at the top, and no raw element. The writer sends the tree to `spnutils apps surface render` and sets the page it prints in a frame, light and dark side by side, the unit's name as the title and the tree below it as code. A tree the render refuses, or one with a finding, stops the write with the finding's words. On github.com the fence reads as plain code. The spelling is proposed until the book lands.
+**A unit of the design system is shown as a fenced tree, and `docs page write` renders it into a unit in its own frame on every write** (rule RULE.DEVEX.WORKSPACE.538 · GUIDE). The fence is tagged `unit` and holds one tree in the render's form: a unit with its props, a placement or a slot, `specVersion` at the top, and no raw element. The writer sends the tree to `spnutils apps surface render` and sets the page it prints in a frame, light and dark side by side, the unit's name as the title and the tree below it as code. A tree the render refuses, or one with a finding, stops the write with the finding's words. On github.com the fence reads as plain code.
 
 ````markdown
 ```unit
@@ -209,6 +260,24 @@ The `PROSE` panel still has no spelling: write a paragraph where you wanted one,
   "sections": [ { "unit": "DSFeature", "props": { "pageLevel": "PAGE", "type": "BACKDROP", "title": "A title" } } ] }
 ```
 ````
+
+**A window-sized unit is drawn in a frame of its own.** A tree whose first unit is `DSLayout`, or that holds more than one section, is set in an `iframe` of 640px height and full width, one for light and one for dark, and needs no `ds-unit.css`; a small unit stands inline. A `"frame": true` or `"frame": false` beside `caption` forces either, and the writer takes both keys out of the tree before it renders.
+
+## Which figure, for what you need to show
+
+**The figure is chosen by what the reader has to see, from this table, read down to the first row that fits** (rule RULE.DEVEX.WORKSPACE.548 · GUIDE). Anything the design system builds is drawn by the render, never by hand.
+
+| You need to show | Use |
+| --- | --- |
+| how ideas connect | a `dg` diagram |
+| a unit the design system builds | `unit`: inline when small, framed when window-sized (a layout, a whole page) |
+| a unit, variant or page shape not built yet | a skeleton, marked planned; once the design system builds it, the page writer flags it and it becomes a `unit` |
+| one whole page of a product, for review | the surface page preview |
+| several such pages | a samples index: the artifact index template, each entry a surface page preview |
+| a running page as it is | `spn-surface page copy`, in a surface page preview |
+| a small picture of an item in a list | `CATALOG` media |
+
+**A skeleton is marked `"planned": true` at the top of its spec.** One that names a unit the design system builds, without the mark, stops the write: draw it with a `unit` fence instead.
 
 ## A figure is a ```dg``` fence of strict JSON
 

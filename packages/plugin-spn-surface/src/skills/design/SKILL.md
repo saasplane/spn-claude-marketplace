@@ -404,7 +404,7 @@ The page is a use case, composed from the published library in a file that is no
 
 ## 8. Draw it as skeletons — a mock, with no Figma
 
-A mock is the tree drawn as skeletons, and it needs no connector. Draw it where the developer asks for a mock, or asks to see a page or a flow and the window holds no Figma connector. Read `skills/design/steps/mock.md` then, and follow it: the facts first, then one skeleton for each page in the order a person meets them, each move naming its page; each page drawn once, with its errors in place and its other states in words; a phone view only where the arrangement changes; each dialog or sheet as its own view; and a flow file that orders the pages. It reads the tree the steps above wrote, and decides nothing of its own.
+A mock is the tree drawn as skeletons, and it needs no connector. Draw it where the developer asks for a mock, or asks to see a page or a flow and the window holds no Figma connector. Read `skills/design/steps/mock.md` then, and follow it: the facts first, then one skeleton for each page in the order a person meets them, each move naming its page; each page drawn once, with its errors in place and its other states in words; a phone view only where the arrangement changes; each dialog or sheet as its own view; and a flow file that orders the pages. It reads the tree the steps above wrote, and decides nothing of its own. **A unit the design system builds is shown by a `unit` fence, and a unit, variant or page shape not built yet is shown by a skeleton marked `"planned": true`** (`RULE.DEVEX.WORKSPACE.548` · GUIDE); the page writer stops a skeleton that names a built unit without the mark.
 
 ## Close
 
