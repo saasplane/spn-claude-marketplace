@@ -1,13 +1,13 @@
-// `spn-surface page copy` — one running page, copied into a folder as a self-contained file for a surface preview.
+// `spn-surface page copy` — one running page, copied into a surface page: the surface page template with the copy's markup in it.
 //
-//     spn-surface page copy <url> <folder> [--notes <notes.json>]
+//     spn-surface page copy <url> <folder> [--notes <notes.json>] [--name <name>] [--ds <version>] [--app-css <path>] [--template <file>]
 //
-// Writes `<folder>/index.html`: the page's rendered markup, every stylesheet the page holds inlined in one `<style>`, its scripts
-// removed, and its fonts copied beside it into `<folder>/fonts/`. It adds what a surface preview needs, with no outside
-// names: a `preview-mode` meta naming the page's own mode switch, one hidden note for each section from the notes file
-// (`[{ "title": "<the section's heading>", "note": "<line>" }]`, marked `data-note`), and a few lines that read the preview's
-// message `{ "surface-page-preview": { mode, notes } }`. Opened alone, the copy is just the page. The site is only read, and
-// nothing in it or in any repository is changed.
+// Writes `<folder>/<name>.html`, the surface page template (`surface-page-template.html`) with the page's rendered markup in its `<template id="page">`:
+// every stylesheet the page holds inlined in one `<style>`, its scripts removed, one hidden note for each section from the notes file
+// (`[{ "title": "<the section's heading>", "note": "<line>" }]`, marked `data-note`), and the template's two metas set (`surface-ds` from `--ds`,
+// `surface-app-css` from `--app-css`, empty by default). The page's fonts are copied beside it into `<folder>/fonts/`. The shared script builds the
+// frame's document from the template, so the copy holds no meta for a mode switch and listens to no message. The site is only read, and nothing in
+// it or in any repository is changed.
 //
 // THE BROWSER IS THE ONE THE MACHINE ALREADY HAS, found the way `spn-devex docs look` finds it: the global Playwright (`npm root -g`)
 // and its own chromium. No path into a user's own install is named, and no browser profile is opened.
@@ -17,8 +17,8 @@ import { basename, join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { UsageFault, VALUE, readWords } from "../../../../../plugin-support-lib/src/lib/command.ts";
 
-export const describe = "Copy one running page into a folder as one self-contained file, with a hidden note for each section, for a surface preview";
-export const usage = "<url> <folder> [--notes <notes.json>]";
+export const describe = "Copy one running page into a folder as a surface page: the surface page template holding the copy's markup, with a hidden note for each section";
+export const usage = "<url> <folder> [--notes <notes.json>] [--name <name>] [--ds <version>] [--app-css <path>] [--template <file>]";
 
 /** One note of the notes file: the heading of the section it belongs to, and its line. */
 export type Note = { title: string; note: string };
@@ -26,15 +26,6 @@ export type Note = { title: string; note: string };
 export type Heading = { title: string; section: number };
 /** One note placed: its number, the section it is prepended to, and its markup. */
 export type Placed = { number: number; section: number; html: string };
-
-/** The page's own mode switch, as the preview's meta names it: the attribute, its light value and its dark value. */
-export const MODE_SWITCH = "data-mode light dark";
-
-/** The meta that tells the preview which attribute switches the page's mode. */
-export const previewMeta = (switchWords: string = MODE_SWITCH): string => `<meta name="preview-mode" content="${switchWords}">`;
-
-/** The few lines that read the preview's message; opened alone, they do nothing. */
-export const LISTENER = `<script>(function(){var m=document.querySelector('meta[name="preview-mode"]');var s=((m&&m.content)||'${MODE_SWITCH}').split(' ');addEventListener('message',function(e){var d=e.data&&e.data['surface-page-preview'];if(!d)return;document.documentElement.setAttribute(s[0],d.mode==='dark'?s[2]:s[1]);Array.prototype.forEach.call(document.querySelectorAll('[data-note]'),function(n){n.hidden=!d.notes;});});})();</script>`;
 
 const escapeHtml = (text: string): string => text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
@@ -60,11 +51,34 @@ export function placeNotes(notes: Note[], headings: Heading[]): Placed[] {
   return placed;
 }
 
-/** The copy: the page's markup with the style, the mode meta and the listener put in. */
-export function assemble(html: string, css: string): string {
-  const page = html.replace("</head>", () => `${previewMeta()}\n<style>\n${css}\n</style>\n</head>`).replace("</body>", () => `${LISTENER}\n</body>`);
-  return `<!doctype html>\n${page}`;
+/** The page's markup for the template: the page's style in one `<style>`, then what is inside its `<body>`. */
+export function pageMarkup(html: string, css: string): string {
+  const body = /<body\b[^>]*>([\s\S]*)<\/body>/i.exec(html)?.[1] ?? html;
+  return `<style>\n${css}\n</style>\n${body.trim()}\n`;
 }
+
+/** A name as a file name: lower case words joined by dashes. */
+export const slugOf = (name: string): string => name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") || "page";
+
+/**
+ * The surface page template filled with one copy: the name in its `<title>`, bar title and frame title, the page's id, the two metas, and the
+ * page's markup in place of the sample between `<template id="page">` and its end. A template that holds no such tags is refused by the caller.
+ */
+export function fillTemplate(template: string, markup: string, options: { name: string; ds: string; appCss: string }): string {
+  const open = template.indexOf('<template id="page">');
+  const close = template.indexOf("</template>", open);
+  if (open < 0 || close < 0) throw new UsageFault("takes a surface page template that holds a `<template id=\"page\">`, and this one does not.");
+  const head = template.slice(0, open + '<template id="page">'.length);
+  const filled = `${head}\n${markup}${template.slice(close)}`
+    .replace(/\{\{NAME\}\}/g, escapeHtml(options.name))
+    .replace(/\{\{page\}\}/g, slugOf(options.name))
+    .replace(/<meta name="surface-ds" content="[^"]*">/, () => `<meta name="surface-ds" content="${escapeHtml(options.ds)}">`)
+    .replace(/<meta name="surface-app-css" content="[^"]*">/, () => `<meta name="surface-app-css" content="${escapeHtml(options.appCss)}">`);
+  return filled;
+}
+
+/** Where the template is looked for when `--template` names none: the spn-devex plugin's copy beside this plugin in the marketplace. */
+export const TEMPLATE_BESIDE = resolve(import.meta.dirname, "..", "..", "..", "..", "..", "plugin-spn-devex", "src", "refs", "devex", "workspace", "docs", "templates", "surface", "surface-page-template.html");
 
 // What runs in the page, as text: this file is checked without a browser's types.
 const HEADINGS = "[...document.querySelectorAll('section h1, section h2, section h3')].map(function(h){var s=h.closest('section');return {title:h.textContent.trim(),section:s?[...document.querySelectorAll('section')].indexOf(s):-1};})";
@@ -83,7 +97,7 @@ function playwrightPath(): string | null {
 }
 
 export async function run(args: string[]): Promise<number> {
-  const words = readWords(args, { notes: VALUE });
+  const words = readWords(args, { notes: VALUE, name: VALUE, ds: VALUE, "app-css": VALUE, template: VALUE });
   if (words.paths.length !== 2) throw new UsageFault("takes a url and a folder.");
   const [url, folderWord] = words.paths;
   if (!/^(https?|file):\/\//.test(url)) throw new UsageFault(`takes a url that opens with http://, https:// or file://, and \`${url}\` does not.`);
@@ -91,6 +105,9 @@ export async function run(args: string[]): Promise<number> {
   const notesFile = words.value("notes");
   if (notesFile && !existsSync(resolve(notesFile))) throw new UsageFault(`names \`${notesFile}\`, and nothing is there.`);
   const notes: Note[] = notesFile ? JSON.parse(readFileSync(resolve(notesFile), "utf8")) : [];
+
+  const templateFile = resolve(words.value("template") ?? TEMPLATE_BESIDE);
+  if (!existsSync(templateFile)) throw new UsageFault(`names the surface page template \`${templateFile}\`, and nothing is there. Pass \`--template <file>\`, the \`surface-page-template.html\` of the spn-devex plugin's refs.`);
 
   const entry = playwrightPath();
   if (!entry) {
@@ -121,9 +138,11 @@ export async function run(args: string[]): Promise<number> {
       const relative = new URL(font).pathname;
       css = css.split(`url("${relative}")`).join(`url("fonts/${name}")`).split(`url(${relative})`).join(`url(fonts/${name})`);
     }
-    const copy = assemble(read.html, css);
-    writeFileSync(join(folder, "index.html"), copy);
-    console.log(`OK ${join(folder, "index.html")}: copied ${url} · ${read.fontUrls.length} fonts · ${Math.round(copy.length / 1024)} KB`);
+    const name = words.value("name") ?? (await page.title()) ?? "Page";
+    const copy = fillTemplate(readFileSync(templateFile, "utf8"), pageMarkup(read.html, css), { name, ds: words.value("ds") ?? "", appCss: words.value("app-css") ?? "" });
+    const out = join(folder, `${slugOf(name)}.html`);
+    writeFileSync(out, copy);
+    console.log(`OK ${out}: copied ${url} into the surface page template · ${read.fontUrls.length} fonts · ${Math.round(copy.length / 1024)} KB`);
     return 0;
   } finally {
     await browser.close();

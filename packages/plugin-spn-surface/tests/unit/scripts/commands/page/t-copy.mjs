@@ -5,7 +5,7 @@ import { pathToFileURL } from "node:url";
 
 const SRC = resolve(import.meta.dirname, "..", "..", "..", "..", "..", "src");
 const CLI = join(SRC, "scripts", "cli.ts");
-const { placeNotes, noteHtml, previewMeta, LISTENER, assemble, MODE_SWITCH } = await import(pathToFileURL(join(SRC, "scripts", "commands", "page", "copy.ts")).href);
+const { placeNotes, noteHtml, pageMarkup, fillTemplate, slugOf, TEMPLATE_BESIDE } = await import(pathToFileURL(join(SRC, "scripts", "commands", "page", "copy.ts")).href);
 
 let total = 0, failed = 0;
 const ok = (label, condition, detail = "") => {
@@ -28,14 +28,20 @@ ok("a note is numbered from 1 by its place in the notes file", placed.map((one) 
 const aside = noteHtml(2, "a <b> line");
 ok("a note is a hidden aside marked data-note, with its number and its words escaped", aside.startsWith('<aside data-note="2" hidden ') && aside.includes(">2</b>a &lt;b&gt; line</aside>"), aside);
 
-console.log("\n=== page copy — the meta and the listener");
-ok("the meta names the page's own mode switch", previewMeta() === '<meta name="preview-mode" content="data-mode light dark">' && MODE_SWITCH === "data-mode light dark", previewMeta());
-ok("the listener reads the preview's message and shows or hides the notes", LISTENER.includes("e.data['surface-page-preview']") && LISTENER.includes("n.hidden=!d.notes") && LISTENER.includes("setAttribute(s[0]"), LISTENER);
-ok("the listener names no outside address", !/https?:\/\//.test(LISTENER));
-
-console.log("\n=== page copy — the copy");
-const copy = assemble("<html><head><title>t</title></head><body><section></section></body></html>", "body{margin:0}");
-ok("it opens with a doctype, holds the meta and one style in the head, and the listener at the end of the body", copy.startsWith("<!doctype html>\n") && /<meta name="preview-mode"[^>]*>\n<style>\nbody\{margin:0\}\n<\/style>\n<\/head>/.test(copy) && copy.endsWith(`${LISTENER}\n</body></html>`), copy);
+console.log("\n=== page copy — the surface page template holds the copy");
+const TEMPLATE = '<meta name="surface-ds" content="11.21.0">\n<meta name="surface-app-css" content="">\n<title>{{NAME}}</title>\n<!-- spn:doc\n{"id": "surface-page-{{page}}", "variant": "surface-page", "title": "{{NAME}}"}\n-->\n<h1 class="sds-surface-title">{{NAME}}</h1>\n<template id="page">\n<div data-section="1">sample</div>\n</template>\n<script src="x.js"></script>\n';
+const markup = pageMarkup("<html><head><title>t</title></head><body class=\"a\"><section>Hero</section></body></html>", "body{margin:0}");
+ok("[MKT.SCRIPTS.637] the page's markup is its one style and what is inside its body", markup === "<style>\nbody{margin:0}\n</style>\n<section>Hero</section>\n", markup);
+const made = fillTemplate(TEMPLATE, markup, { name: "Home Page", ds: "11.22.0", appCss: "../assets/app.css" });
+ok("[MKT.SCRIPTS.637] the markup stands in the template's `page` tag, in place of the sample", made.includes('<template id="page">\n<style>') && !made.includes("sample</div>") && made.includes("<section>Hero</section>\n</template>"), made);
+ok("[MKT.SCRIPTS.637] the two metas are set, and the name stands in the title, the bar and the page's id", made.includes('content="11.22.0"') && made.includes('content="../assets/app.css"') && made.includes("<title>Home Page</title>") && made.includes("surface-page-home-page") && !made.includes("{{"), made);
+ok("[MKT.SCRIPTS.637] the copy holds no mode meta and no listener: the shared script sets the frame's own document", !/preview-mode|surface-page-preview|postMessage|addEventListener/.test(made));
+ok("[MKT.SCRIPTS.637] the template's own script line is kept", made.includes('<script src="x.js"></script>'));
+ok("[MKT.SCRIPTS.637] a name becomes a file name", slugOf("Home — Page 2") === "home-page-2" && slugOf("***") === "page");
+let refused = "";
+try { fillTemplate("<p>no tag</p>", markup, { name: "x", ds: "", appCss: "" }); } catch (error) { refused = String(error.message ?? error); }
+ok("[MKT.SCRIPTS.637] a template with no `page` tag is refused", refused.includes("template"), refused);
+ok("[MKT.SCRIPTS.637] the template is looked for beside the spn-devex plugin's refs when none is named", TEMPLATE_BESIDE.includes("plugin-spn-devex") && TEMPLATE_BESIDE.endsWith("surface-page-template.html"), TEMPLATE_BESIDE);
 
 console.log("\n=== page copy — refused by name");
 {
@@ -45,6 +51,8 @@ console.log("\n=== page copy — refused by name");
   ok("a word that is no url exits 2", bad.code === 2 && bad.out.includes("takes a url"), bad.out);
   const missing = run("https://example.invalid/", "/tmp/x", "--notes", "/nonexistent/notes.json");
   ok("a notes file that is not there exits 2 and names it", missing.code === 2 && missing.out.includes("/nonexistent/notes.json"), missing.out);
+  const noTemplate = run("https://example.invalid/", "/tmp/x", "--template", "/nonexistent/template.html");
+  ok("a template that is not there exits 2 and names it", noTemplate.code === 2 && noTemplate.out.includes("/nonexistent/template.html"), noTemplate.out);
   const help = run("--help");
   ok("--help names the command's words", help.out.includes("page copy") || help.out.includes("<url> <folder>"), help.out);
 }
