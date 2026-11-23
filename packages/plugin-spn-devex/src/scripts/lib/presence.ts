@@ -96,6 +96,21 @@ export function presenceWords(text: string): PresenceState | null {
 /** Whether the developer's words say to stay in this window (the window's own note keeps it). */
 export const staysInWindow = (text: string): boolean => STAY_WORDS.test(text);
 
+/**
+ * What a prompt the harness delivers opens with, after leading whitespace: a background helper's report, another session's message,
+ * a compaction summary, a skill's loaded text and a Stop hook's feedback. Such a prompt is not the developer's message.
+ */
+export const DELIVERED_PROMPTS = [
+  "<task-notification>",
+  "Another Claude session sent a message",
+  "This session is being continued from a previous conversation",
+  "Base directory for this skill:",
+  "Stop hook feedback:",
+] as const;
+
+/** Whether the harness delivered this prompt, and the developer did not write it. */
+export const deliveredPrompt = (prompt: string): boolean => DELIVERED_PROMPTS.some((start) => prompt.trimStart().startsWith(start));
+
 /** The state a message leaves, from the state it found and its words. */
 export function nextState(current: PresenceState, text: string): PresenceState {
   const said = presenceWords(text);
