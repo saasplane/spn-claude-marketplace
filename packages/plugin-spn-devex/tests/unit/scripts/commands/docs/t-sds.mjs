@@ -427,20 +427,20 @@ console.log("=== docs sds cut — from 1.16.0 a version also serves the design s
   mkdirSync(join(market, "public"), { recursive: true });
   const folder = join(market, "public", "assets", "docs", "1.16.0");
   const without = sds("cut", "1.16.0", "--root", market);
-  ok("a cut of 1.16.0 with no ds-unit.css or design-system.css in the styles folder is refused by their names, and writes nothing",
+  ok("[MKT.SCRIPTS.628] a cut of 1.16.0 with no ds-unit.css or design-system.css in the styles folder is refused by their names, and writes nothing",
     without.code === 1 && without.out.includes("`ds-unit.css`") && without.out.includes("`design-system.css`") && !existsSync(folder) && cutVersions(styles)["1.16.0"] === undefined, without.out);
   put(join(styles, "ds-unit.css"), ".sds-unit .a{color:red}\n");
   put(join(styles, "design-system.css"), ".a{color:red}\n");
   const cut = sds("cut", "1.16.0", "--root", market);
   const listed = cutVersions(styles)["1.16.0"];
   const pinned = integrityTable(styles)["1.16.0"];
-  ok("a cut of 1.16.0 serves the three shared files and the two design-system stylesheets, with a hash of each in versions.json and integrity.json",
+  ok("[MKT.SCRIPTS.628] a cut of 1.16.0 serves the three shared files and the two design-system stylesheets, with a hash of each in versions.json and integrity.json",
     cut.code === 0 && JSON.stringify(readdirSync(folder).sort()) === JSON.stringify(["ds-unit.css", "design-system.css", ...Object.keys(BUILT)].sort())
       && JSON.stringify(Object.keys(listed)) === JSON.stringify(["sds-docs.css", "sds-docs.js", "sds-index.js", "ds-unit.css", "design-system.css"])
       && listed["ds-unit.css"] === sha(".sds-unit .a{color:red}\n") && pinned["design-system.css"] === sha384Of(Buffer.from(".a{color:red}\n")), cut.out);
   const before = cutVersions(styles);
   const early = sds("cut", "1.15.1", "--root", market);
-  ok("a version before 1.16.0 still serves the three files alone", early.code === 0 && Object.keys(cutVersions(styles)["1.15.1"]).length === 3 && !existsSync(join(market, "public", "assets", "docs", "1.15.1", "ds-unit.css")) && Object.keys(before).length === 1, early.out);
+  ok("[MKT.SCRIPTS.628] a version before 1.16.0 still serves the three files alone", early.code === 0 && Object.keys(cutVersions(styles)["1.15.1"]).length === 3 && !existsSync(join(market, "public", "assets", "docs", "1.15.1", "ds-unit.css")) && Object.keys(before).length === 1, early.out);
 }
 
 console.log("=== docs sds cut --ds — the design system's tokens are copied from a pinned version, then built");

@@ -824,14 +824,14 @@ console.log("\n=== doc-check — a page of the artifacts pocket holds no sidebar
   const side = '<nav class="side"><a href="./a-overview.html">A</a><a href="./b-overview.html">B</a></nav>';
   const rail = '<nav class="sds-rail" id="rail"><a class="sds-home" href="../README.html">back</a><a href="#s0">One</a><a href="#s1">Two</a></nav>';
   const index = '<script type="application/json" id="index-data">{}</script>';
-  say("red: a nav that links two other pages is found, as a rule", sidebarRule(`<body>${side}</body>`).length === 1 && sidebarRule(`<body>${side}</body>`)[0][0] === "RULE", JSON.stringify(sidebarRule(side)));
-  say("green: the page's own rail, the way back and the outline links are not a sidebar", sidebarRule(`<body>${rail}</body>`).length === 0);
-  say("green: a nav of anchors on the page, and a nav that links one page, draw none", sidebarRule('<nav><a href="#a">a</a><a href="#b">b</a></nav>').length === 0 && sidebarRule('<nav><a href="./a.html">a</a></nav>').length === 0);
-  say("green: the index of artifacts, which holds an index-data block, is the one page that has such a nav", sidebarRule(`${index}<body>${side}</body>`).length === 0);
+  say("[MKT.SCRIPTS.631] red: a nav that links two other pages is found, as a rule", sidebarRule(`<body>${side}</body>`).length === 1 && sidebarRule(`<body>${side}</body>`)[0][0] === "RULE", JSON.stringify(sidebarRule(side)));
+  say("[MKT.SCRIPTS.631] green: the page's own rail, the way back and the outline links are not a sidebar", sidebarRule(`<body>${rail}</body>`).length === 0);
+  say("[MKT.SCRIPTS.631] green: a nav of anchors on the page, and a nav that links one page, draw none", sidebarRule('<nav><a href="#a">a</a><a href="#b">b</a></nav>').length === 0 && sidebarRule('<nav><a href="./a.html">a</a></nav>').length === 0);
+  say("[MKT.SCRIPTS.631] green: the index of artifacts, which holds an index-data block, is the one page that has such a nav", sidebarRule(`${index}<body>${side}</body>`).length === 0);
   const page = (body) => `<meta charset="utf-8">\n<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.16.0/sds-docs.css">\n<div class="sds-page">${body}</div>`;
   const hit = (path, body) => checkPage(path, page(body)).filter(([, text]) => text.includes("sidebar of links to other pages")).length;
-  say("red: a page under docs/artifacts/ with a sidebar is told by the whole check", hit("/r/docs/artifacts/docs/a-overview.html", side) === 1);
-  say("green: the same page outside the artifacts pocket, or its index, is not read", hit("/r/notes/a-overview.html", side) === 0 && hit("/r/docs/artifacts/index.html", side) === 0);
+  say("[MKT.SCRIPTS.631] red: a page under docs/artifacts/ with a sidebar is told by the whole check", hit("/r/docs/artifacts/docs/a-overview.html", side) === 1);
+  say("[MKT.SCRIPTS.631] green: the same page outside the artifacts pocket, or its index, is not read", hit("/r/notes/a-overview.html", side) === 0 && hit("/r/docs/artifacts/index.html", side) === 0);
 }
 
 // ── the compressed fault (RULE.DEVEX.WORKSPACE.096): a note on a page a person reads ──

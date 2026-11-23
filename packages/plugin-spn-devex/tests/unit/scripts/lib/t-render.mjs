@@ -187,8 +187,8 @@ console.log("\n=== the page renderer — a unit fence is drawn by the render and
   const badCaption = pageOf(fence("unit", JSON.stringify({ unit: "DSFeature", props: {}, caption: 3 })));
   setUnitRender((file) => { seen.push(JSON.parse(readFileSync(file, "utf8"))); return "<html><head></head><body><p class=\"x\">drawn & ready</p></body></html>"; });
   const pinned = readFileSync(resolve(HERE, "src", "styles", "ds-unit.css"), "utf8").split("\n")[0].match(/support-web-ds-ts v(\d+\.\d+\.\d+)/)?.[1];
-  ok("[MKT.SCRIPTS.613] a unit fence is wrapped as a render file holding the tree alone, `treeVersion` and its one section, and the render is given the default app",
-    seen.length === 1 && JSON.stringify(seen[0]) === JSON.stringify({ treeVersion: 1, sections: [tree] }) && designSystemVersion(undefined, "ds-unit.css") === pinned && DEFAULT_RENDER_APP === "www", JSON.stringify(seen));
+  ok("[MKT.SCRIPTS.613] a unit fence is wrapped as a render file holding the tree alone, `treeVersion` and its one section, and the render is given the `surface` app with the version its unit stylesheet was cut from",
+    seen.length === 1 && JSON.stringify(seen[0]) === JSON.stringify({ treeVersion: 1, sections: [tree] }) && designSystemVersion(undefined, "ds-unit.css") === pinned && DEFAULT_RENDER_APP === "surface", JSON.stringify(seen));
   ok("[MKT.SCRIPTS.613] the unit's markup stands in the page itself, once in light and once in dark, side by side, with the tree below as code, and no frame",
     made.findings.length === 0 && made.html.includes('<span class="sds-file-path">DSFeature</span><span class="sds-file-lang">unit</span>')
       && made.html.includes('<div class="sds-unit" data-mode="light"><p class="x">drawn & ready</p></div>') && made.html.includes('<div class="sds-unit" data-mode="dark"><p class="x">drawn & ready</p></div>')
@@ -222,21 +222,21 @@ console.log("\n=== the page renderer — a unit fence is drawn by the render and
   const forcedOn = pageOf(fence("unit", JSON.stringify({ unit: "DSFeature", props: {}, frame: true, caption: "Framed" })));
   const badFrame = pageOf(fence("unit", JSON.stringify({ unit: "DSFeature", props: {}, frame: "yes" })));
   const iframes = layout.html.match(/<iframe\b[^>]*>/g) ?? [];
-  ok("[MKT.SCRIPTS.615] a unit fence whose first unit is DSLayout is drawn in two frames, light and dark, side by side, 640px high and full width",
+  ok("[MKT.SCRIPTS.627] a unit fence whose first unit is DSLayout is drawn in two frames, light and dark, side by side, 640px high and full width",
     layout.findings.length === 0 && iframes.length === 2 && iframes[0].includes('data-mode="light"') && iframes[1].includes('data-mode="dark"')
       && iframes.every((tag) => tag.includes('height="640"') && tag.includes('width="100%"')) && layout.html.includes('<div class="sds-unit-pair">') && !layout.html.includes('class="sds-unit"'), layout.html.slice(-1500));
   const srcdocs = [...layout.html.matchAll(/srcdoc="([^"]*)"/g)].map((m) => m[1].replace(/&quot;/g, '"').replace(/&amp;/g, "&"));
-  ok("[MKT.SCRIPTS.615] a frame's srcdoc is the render's whole printed page, with its mode on the html element, its quotes and ampersands escaped in the attribute",
+  ok("[MKT.SCRIPTS.627] a frame's srcdoc is the render's whole printed page, with its mode on the html element, its quotes and ampersands escaped in the attribute",
     srcdocs.length === 2 && srcdocs[0].startsWith("<!doctype html><html lang=\"en\" data-mode=\"light\">") && srcdocs[1].includes('data-mode="dark"') && srcdocs[0].includes("<style>a{}</style>")
       && srcdocs[0].includes('a "whole" page & more') && layout.html.includes("a &quot;whole&quot; page &amp; more"), layout.html.slice(-1500));
-  ok("[MKT.SCRIPTS.615] a unit drawn in a frame needs no ds-unit.css, so the page links none, and the tree is still shown below",
+  ok("[MKT.SCRIPTS.627] a unit drawn in a frame needs no ds-unit.css, so the page links none, and the tree is still shown below",
     !layout.html.includes("ds-unit.css") && layout.html.includes('<pre data-lang="json">'));
-  ok("[MKT.SCRIPTS.615] a tree with more than one section is drawn in a frame too",
+  ok("[MKT.SCRIPTS.627] a tree with more than one section is drawn in a frame too",
     (manySections.html.match(/<iframe\b/g) ?? []).length === 2 && !manySections.html.includes("ds-unit.css"), manySections.html.slice(-800));
-  ok("[MKT.SCRIPTS.615] \"frame\": false draws a layout inline, and \"frame\": true frames a small unit; the key is out of the tree sent to the render and of the tree shown",
+  ok("[MKT.SCRIPTS.627] \"frame\": false draws a layout inline, and \"frame\": true frames a small unit; the key is out of the tree sent to the render and of the tree shown",
     !forcedOff.html.includes("<iframe") && forcedOff.html.includes('class="sds-unit" data-mode="light"') && (forcedOn.html.match(/<iframe\b/g) ?? []).length === 2
       && !forcedOn.html.includes('"frame"') && !forcedOff.html.includes('"frame"') && framedSeen.every((seen) => !JSON.stringify(seen).includes('"frame"')) && forcedOn.html.includes("Framed"), forcedOff.html.slice(-800));
-  ok("[MKT.SCRIPTS.615] a frame that is no boolean stops the write",
+  ok("[MKT.SCRIPTS.627] a frame that is no boolean stops the write",
     badFrame.findings.length === 1 && badFrame.findings[0].stops === true && badFrame.findings[0].message.includes("`frame`"), JSON.stringify(badFrame.findings));
   // The new render: the tree alone, the app from `--app`, both modes in one call, html by mode and device.
   const calls = [];
@@ -244,26 +244,28 @@ console.log("\n=== the page renderer — a unit fence is drawn by the render and
   setUnitRender((file, options) => { calls.push({ file: JSON.parse(readFileSync(file, "utf8")), options }); return modes('<p class="l">light</p>', '<p class="d">dark</p>'); });
   const small = pageOf(fence("unit", JSON.stringify({ unit: "DSFeature", props: {}, app: "docs" })));
   const whole = pageOf(fence("unit", JSON.stringify({ unit: "DSLayout", props: {} })));
-  ok("a unit fence is drawn by one call of the new render, each mode taking its own html, and the fence's `app` names the app row and is out of the tree",
+  ok("[MKT.SCRIPTS.632] a unit fence is drawn by one call of the new render, each mode taking its own html, and the fence's `app` names the app row and is out of the tree",
     calls.length === 2 && calls[0].options.app === "docs" && calls[0].options.inline === false && JSON.stringify(calls[0].file) === JSON.stringify({ treeVersion: 1, sections: [{ unit: "DSFeature", props: {} }] })
       && small.html.includes('data-mode="light"><p class="l">light</p>') && small.html.includes('data-mode="dark"><p class="d">dark</p>') && !small.html.includes('"app"'), small.html.slice(-700));
-  ok("a framed unit is drawn with --inline, the default app where the fence names none, and each frame holds its mode's page",
+  ok("[MKT.SCRIPTS.632] the `surface` app is drawn with --ds, the version ds-unit.css was cut from, and a fence naming another app sends no --ds",
+    calls[1].options.ds === designSystemVersion(undefined, "ds-unit.css") && /^\d+\.\d+\.\d+$/.test(calls[1].options.ds) && calls[0].options.app === "docs" && !("ds" in calls[0].options));
+  ok("[MKT.SCRIPTS.632] a framed unit is drawn with --inline, the default app where the fence names none, and each frame holds its mode's page",
     calls[1].options.inline === true && calls[1].options.app === DEFAULT_RENDER_APP && /srcdoc="[^"]*light/.test(whole.html) && /srcdoc="[^"]*dark/.test(whole.html), whole.html.slice(-700));
   setUnitRender(() => modes("<p>x</p>", "<p>y</p>", { findings: [{ message: "DSFeature has no prop `kind`" }] }));
   const lightFinding = pageOf(fence("unit", JSON.stringify(tree)));
   setUnitRender(() => JSON.stringify({ renders: { LIGHT: { DESKTOP: { html: "<p>x</p>", findings: [] } }, DARK: { DESKTOP: { html: "<p>y</p>", findings: ["dark said no"] } } } }));
   const darkFinding = pageOf(fence("unit", JSON.stringify(tree)));
-  ok("a finding in any mode stops the write with the render's words",
+  ok("[MKT.SCRIPTS.632] a finding in any mode stops the write with the render's words",
     lightFinding.findings.length === 1 && lightFinding.findings[0].stops === true && lightFinding.findings[0].message.includes("no prop `kind`")
       && darkFinding.findings.length === 1 && darkFinding.findings[0].stops === true && darkFinding.findings[0].message.includes("dark said no"), JSON.stringify([lightFinding.findings, darkFinding.findings]));
-  ok("a `unit` fence whose `app` is no string stops the write", pageOf(fence("unit", JSON.stringify({ unit: "DSFeature", props: {}, app: 3 }))).findings.some((f) => f.stops && f.message.includes("`app`")));
+  ok("[MKT.SCRIPTS.632] a `unit` fence whose `app` is no string stops the write", pageOf(fence("unit", JSON.stringify({ unit: "DSFeature", props: {}, app: 3 }))).findings.some((f) => f.stops && f.message.includes("`app`")));
   const both = pagesFromRender(modes("<p>L</p>", "<p>D</p>"));
   const oldShape = pagesFromRender(JSON.stringify({ pages: [{ html: "<p>one</p>", findings: [] }] }));
-  ok("pagesFromRender reads the new shape by mode, and the released `pages` shape for both modes",
+  ok("[MKT.SCRIPTS.632] pagesFromRender reads the new shape by mode, and the released `pages` shape for both modes",
     both.LIGHT === "<p>L</p>" && both.DARK === "<p>D</p>" && oldShape.LIGHT === "<p>one</p>" && oldShape.DARK === "<p>one</p>" && pageFromRender(modes("<p>L</p>", "<p>D</p>")) === "<p>L</p>");
   let refusedNew = "";
   try { pagesFromRender(JSON.stringify({ renders: { LIGHT: { DESKTOP: { findings: [] } } } })); } catch (e) { refusedNew = e.message; }
-  ok("a mode with no html is refused by its name", refusedNew.includes("LIGHT") && refusedNew.includes("`html`"), refusedNew);
+  ok("[MKT.SCRIPTS.632] a mode with no html is refused by its name", refusedNew.includes("LIGHT") && refusedNew.includes("`html`"), refusedNew);
   setUnitRender();
 }
 
@@ -282,24 +284,24 @@ console.log("\n=== the page renderer — a skeleton of a built unit, and a table
   }));
   setBuiltUnits(["DSFeature", "DSLayout"]);
   const built = made(skeleton({}));
-  ok("a `dg` skeleton whose frame names a unit the design system builds stops the write, naming the unit and the `unit` fence",
+  ok("[MKT.SCRIPTS.629] a `dg` skeleton whose frame names a unit the design system builds stops the write, naming the unit and the `unit` fence",
     built.findings.some((f) => f.stops === true && f.message.includes("`DSFeature`") && f.message.includes("`unit` fence") && f.message.includes('"planned": true')), JSON.stringify(built.findings));
-  ok("a skeleton marked `\"planned\": true` is let through, and so is one whose unit the design system does not build",
+  ok("[MKT.SCRIPTS.629] a skeleton marked `\"planned\": true` is let through, and so is one whose unit the design system does not build",
     !made(skeleton({ planned: true })).findings.some((f) => f.stops) && made(skeleton({}, "DSCard")).findings.length === 0, JSON.stringify(made(skeleton({ planned: true })).findings));
   const deep = made(fence("dg", JSON.stringify({ kind: "skeleton", views: [{ viewport: "DESKTOP", frame: { rows: [{ items: [{ frame: { unit: "DSLayout", rows: [{ items: [{ text: "x" }] }] } }] }] } }] })));
-  ok("a unit named in a view, a nested frame or a section is found too", deep.findings.some((f) => f.stops === true && f.message.includes("`DSLayout`")), JSON.stringify(deep.findings));
+  ok("[MKT.SCRIPTS.629] a unit named in a view, a nested frame or a section is found too", deep.findings.some((f) => f.stops === true && f.message.includes("`DSLayout`")), JSON.stringify(deep.findings));
   setBuiltUnits(null);
-  ok("where no list of built units can be read, no skeleton is held against it", !made(skeleton({})).findings.some((f) => f.message.includes("builds")));
+  ok("[MKT.SCRIPTS.629] where no list of built units can be read, no skeleton is held against it", !made(skeleton({})).findings.some((f) => f.message.includes("builds")));
   setBuiltUnits();
   const fileList = made(skeleton({}));
-  ok("the list of built units is read from ds-units.json in the styles folder by default, and DSFeature is built",
+  ok("[MKT.SCRIPTS.629] the list of built units is read from ds-units.json in the styles folder by default, and DSFeature is built",
     fileList.findings.some((f) => f.stops === true && f.message.includes("`DSFeature`")), JSON.stringify(fileList.findings));
 
   const rows = (n) => Array.from({ length: n }, (_, k) => [`Thing ${k + 1}`, `what thing ${k + 1} is`]);
   const catalog = made(table(["Name", "Description"], ...rows(5)));
-  ok("a plain table of a name column and a description column past four rows is a soft finding that points to a catalog fence",
+  ok("[MKT.SCRIPTS.630] a plain table of a name column and a description column past four rows is a soft finding that points to a catalog fence",
     catalog.findings.length === 1 && !catalog.findings[0].stops && catalog.findings[0].message.includes("reads as a catalog") && catalog.findings[0].message.includes("`catalog`"), JSON.stringify(catalog.findings));
-  ok("four rows, a wide comparison of attributes, and a Terms table draw none",
+  ok("[MKT.SCRIPTS.630] four rows, a wide comparison of attributes, and a Terms table draw none",
     made(table(["Name", "Description"], ...rows(4))).findings.length === 0
       && made(table(["Name", "Reads", "Writes", "Owns"], ...rows(6).map((r) => [...r, "x", "y"]))).findings.length === 0
       && made(table(["Term", "Contract term", "What it means"], ...rows(6).map((r) => [r[0], "`X`", r[1]]))).findings.length === 0

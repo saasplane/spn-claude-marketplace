@@ -32,13 +32,13 @@ export type Finding = { message: string; line?: number; stops?: boolean };
  * or the words it refused with. `inline` adds `--inline`, which prints a whole page with the design system's style.css inside it.
  * It is ONE FUNCTION, so a test replaces it with `setUnitRender`.
  */
-export type UnitRender = (file: string, options?: { app: string; inline: boolean }) => string;
+export type UnitRender = (file: string, options?: { app: string; inline: boolean; ds?: string }) => string;
 
 /**
- * The app row a `unit` fence is drawn under when the fence names none. NOT NAMED BY THE DEVELOPER YET: `www` is the code the render's
- * own fixtures use, and the docs' own app code replaces it here, in this one constant.
+ * The app a `unit` fence is drawn under when the fence names none: `surface`, Surface's own brand-free language (decided by the lead,
+ * 2026-11-23). It is drawn with `--ds <version>`, the version `ds-unit.css` was cut from; a fence naming another app sends no `--ds`.
  */
-export const DEFAULT_RENDER_APP = "www";
+export const DEFAULT_RENDER_APP = "surface";
 
 const findingWords = (findings: any[]): string => findings.map((f: any) => (typeof f === "string" ? f : f?.message ?? JSON.stringify(f))).join("; ");
 
@@ -80,7 +80,7 @@ export function pageFromRender(printed: string): string { return pagesFromRender
 
 const spnutilsRender: UnitRender = (file, options = { app: DEFAULT_RENDER_APP, inline: false }) => {
   try {
-    return execFileSync("spnutils", ["apps", "surface", "render", "--file", file, "--app", options.app, "--modes", "LIGHT,DARK", "--devices", "DESKTOP", ...(options.inline ? ["--inline"] : [])],
+    return execFileSync("spnutils", ["apps", "surface", "render", "--file", file, "--app", options.app, ...(options.ds ? ["--ds", options.ds] : []), "--modes", "LIGHT,DARK", "--devices", "DESKTOP", ...(options.inline ? ["--inline"] : [])],
       { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"], maxBuffer: 64 * 1024 * 1024 });
   } catch (error) {
     const failed = error as { stdout?: unknown; stderr?: unknown; message?: string };
@@ -151,14 +151,17 @@ function unitFrame(body: string[], findings: Finding[]): string {
   if (typeof name !== "string") return stop("a `unit` fence holds a tree whose first unit has no name: `{ \"unit\": \"DSFeature\", \"props\": { … } }`");
   // A window-sized unit, a layout or a page of several sections, stands in a frame of its own; `frame` says otherwise.
   const framed = forced ?? (name === "DSLayout" || sections.length > 1);
-  // The render takes the tree alone, and the app row it is drawn under comes from `--app`.
+  // The render takes the tree alone, and the app row it is drawn under comes from `--app`. The `surface` app is drawn with the design
+  // system version its unit stylesheet was cut from, so a unit's markup and its styles always match.
+  const ds = app === DEFAULT_RENDER_APP ? (designSystemVersion(undefined, "ds-unit.css") ?? designSystemVersion()) : null;
+  if (app === DEFAULT_RENDER_APP && !ds) return stop("a `unit` fence cannot be drawn: the docs stylesheet's design-system version is not read from `ds-unit.css` or `ds-tokens.css` in the plugin's styles folder");
   const file = { treeVersion: 1, sections };
   const folder = mkdtempSync(join(tmpdir(), "spn-unit-"));
   let pages: { LIGHT: string; DARK: string };
   try {
     const path = join(folder, "unit.json");
     writeFileSync(path, JSON.stringify(file));
-    pages = pagesFromRender(unitRender(path, { app, inline: framed }));
+    pages = pagesFromRender(unitRender(path, { app, inline: framed, ...(ds ? { ds } : {}) }));
   } catch (e) {
     return stop(`the render stopped the \`${name}\` fence: ${(e as Error).message}`);
   } finally { rmSync(folder, { recursive: true, force: true }); }
