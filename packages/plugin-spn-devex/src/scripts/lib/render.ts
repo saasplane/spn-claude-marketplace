@@ -28,30 +28,60 @@ export type Finding = { message: string; line?: number; stops?: boolean };
 // ---------------------------------------------------------------------------- the UNIT block
 
 /**
- * The render of one file: the page `spnutils apps surface render --file <file>` prints, or the words it refused with. It is ONE
- * FUNCTION, so a test replaces it with `setUnitRender` (Support's command is not released yet).
+ * The render of one file: what `spnutils apps surface render --file <file> --app <code> --modes LIGHT,DARK --devices DESKTOP` prints,
+ * or the words it refused with. `inline` adds `--inline`, which prints a whole page with the design system's style.css inside it.
+ * It is ONE FUNCTION, so a test replaces it with `setUnitRender`.
  */
-export type UnitRender = (file: string) => string;
+export type UnitRender = (file: string, options?: { app: string; inline: boolean }) => string;
 
 /**
- * The page in what the render printed. The render prints JSON, `{ pages: [{ html, findings }] }` today, so the page is the
- * first page's `html`, and a finding stops the write with the render's words. Printed text that is no JSON is the page itself.
+ * The app row a `unit` fence is drawn under when the fence names none. NOT NAMED BY THE DEVELOPER YET: `www` is the code the render's
+ * own fixtures use, and the docs' own app code replaces it here, in this one constant.
  */
-export function pageFromRender(printed: string): string {
+export const DEFAULT_RENDER_APP = "www";
+
+const findingWords = (findings: any[]): string => findings.map((f: any) => (typeof f === "string" ? f : f?.message ?? JSON.stringify(f))).join("; ");
+
+/**
+ * The page of each mode in what the render printed. Two shapes are read. The new render prints
+ * `{ renderVersion, ds, app, renders: { LIGHT: { DESKTOP: { html, findings } }, DARK: { … } } }`, and the page of a mode is its first
+ * device's `html`; a finding in any mode or device stops the write with the render's words. The released render prints
+ * `{ pages: [{ html, findings }] }`, and its first page stands for both modes. Printed text that is no JSON is the page itself.
+ */
+export function pagesFromRender(printed: string): { LIGHT: string; DARK: string } {
   const text = printed.trim();
-  if (!text.startsWith("{")) return printed;
+  if (!text.startsWith("{")) return { LIGHT: printed, DARK: printed };
   let out: any;
-  try { out = JSON.parse(text); } catch { return printed; }
+  try { out = JSON.parse(text); } catch { return { LIGHT: printed, DARK: printed }; }
+  if (out && typeof out.renders === "object" && out.renders) {
+    const pages: Record<string, string> = {};
+    const said: any[] = [];
+    for (const [mode, devices] of Object.entries<any>(out.renders)) {
+      for (const [device, one] of Object.entries<any>(devices ?? {})) {
+        if (Array.isArray(one?.findings)) said.push(...one.findings);
+        if (!(mode in pages) && typeof one?.html === "string") pages[mode] = one.html;
+        else if (typeof one?.html !== "string") said.push(`the render printed no page for ${mode} on ${device}: its JSON holds no \`html\``);
+      }
+    }
+    if (said.length) throw new Error(findingWords(said));
+    const light = pages.LIGHT ?? pages.DARK, dark = pages.DARK ?? pages.LIGHT;
+    if (light === undefined || dark === undefined) throw new Error("the render printed no page: its JSON holds no `renders`");
+    return { LIGHT: light, DARK: dark };
+  }
   const first = Array.isArray(out?.pages) ? out.pages[0] : out;
   const findings = Array.isArray(first?.findings) ? first.findings : [];
-  if (findings.length) throw new Error(findings.map((f: any) => (typeof f === "string" ? f : f?.message ?? JSON.stringify(f))).join("; "));
+  if (findings.length) throw new Error(findingWords(findings));
   if (typeof first?.html !== "string") throw new Error("the render printed no page: its JSON holds no `html`");
-  return first.html;
+  return { LIGHT: first.html, DARK: first.html };
 }
 
-const spnutilsRender: UnitRender = (file) => {
+/** The first mode's page of what the render printed (see `pagesFromRender`). */
+export function pageFromRender(printed: string): string { return pagesFromRender(printed).LIGHT; }
+
+const spnutilsRender: UnitRender = (file, options = { app: DEFAULT_RENDER_APP, inline: false }) => {
   try {
-    return pageFromRender(execFileSync("spnutils", ["apps", "surface", "render", "--file", file], { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"], maxBuffer: 64 * 1024 * 1024 }));
+    return execFileSync("spnutils", ["apps", "surface", "render", "--file", file, "--app", options.app, "--modes", "LIGHT,DARK", "--devices", "DESKTOP", ...(options.inline ? ["--inline"] : [])],
+      { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"], maxBuffer: 64 * 1024 * 1024 });
   } catch (error) {
     const failed = error as { stdout?: unknown; stderr?: unknown; message?: string };
     throw new Error(`${String(failed.stderr ?? "")}${String(failed.stdout ?? "")}`.trim() || String(failed.message));
@@ -90,7 +120,7 @@ function unitMarkup(page: string): string {
  * with the tree below as code. A window-sized unit (the first unit is `DSLayout`, or the tree has more than one section) is drawn in an `iframe`
  * instead, 640px high and full width, whose `srcdoc` is the render's whole printed page, one for light and one for dark; a top-level
  * `"frame": true|false` forces either. The tree may carry a top-level `"caption"`: it is the figcaption's text, the unit's name stays
- * as the small label. `caption` and `frame` are taken out before the render and before the tree is shown. A tree that is no JSON, a refusal
+ * as the small label. `caption`, `frame` and `app` (the code of the app row it is drawn under) are taken out before the render and before the tree is shown. A tree that is no JSON, a refusal
  * and a finding each stop the write with the render's words.
  */
 function unitFrame(body: string[], findings: Finding[]): string {
@@ -99,8 +129,13 @@ function unitFrame(body: string[], findings: Finding[]): string {
   try { tree = JSON.parse(body.join("\n")); } catch (e) { return stop(`a \`unit\` fence is not strict JSON — ${(e as Error).message}`); }
   let caption = "";
   let forced: boolean | null = null;
-  if (tree && typeof tree === "object" && !Array.isArray(tree) && ("caption" in tree || "frame" in tree)) {
-    const { caption: said, frame, ...rest } = tree;
+  let app = DEFAULT_RENDER_APP;
+  if (tree && typeof tree === "object" && !Array.isArray(tree) && ("caption" in tree || "frame" in tree || "app" in tree)) {
+    const { caption: said, frame, app: named, ...rest } = tree;
+    if (named !== undefined) {
+      if (typeof named !== "string" || !named.trim()) return stop("a `unit` fence's `app` is the code of an app row, a string: the app the unit is drawn under");
+      app = named.trim();
+    }
     if (said !== undefined) {
       if (typeof said !== "string") return stop("a `unit` fence's `caption` is a string, the words under the unit");
       caption = said.trim();
@@ -116,16 +151,14 @@ function unitFrame(body: string[], findings: Finding[]): string {
   if (typeof name !== "string") return stop("a `unit` fence holds a tree whose first unit has no name: `{ \"unit\": \"DSFeature\", \"props\": { … } }`");
   // A window-sized unit, a layout or a page of several sections, stands in a frame of its own; `frame` says otherwise.
   const framed = forced ?? (name === "DSLayout" || sections.length > 1);
-  // A unit is drawn by the version its scoped stylesheet was cut from, so its markup and its styles always match.
-  const ds = designSystemVersion(undefined, "ds-unit.css") ?? designSystemVersion();
-  if (!ds) return stop("a `unit` fence cannot be drawn: the docs stylesheet's design-system version is not read from `ds-tokens.css` in the plugin's styles folder");
-  const file = { app: { ds, theme: {}, layout: { type: "CANVAS", nav: [] }, page: "SITE" }, tree: { specVersion: 1, sections } };
+  // The render takes the tree alone, and the app row it is drawn under comes from `--app`.
+  const file = { treeVersion: 1, sections };
   const folder = mkdtempSync(join(tmpdir(), "spn-unit-"));
-  let page: string;
+  let pages: { LIGHT: string; DARK: string };
   try {
     const path = join(folder, "unit.json");
     writeFileSync(path, JSON.stringify(file));
-    page = unitRender(path);
+    pages = pagesFromRender(unitRender(path, { app, inline: framed }));
   } catch (e) {
     return stop(`the render stopped the \`${name}\` fence: ${(e as Error).message}`);
   } finally { rmSync(folder, { recursive: true, force: true }); }
@@ -133,6 +166,7 @@ function unitFrame(body: string[], findings: Finding[]): string {
   if (framed) {
     // The render's whole printed page is the frame's document, so it needs no `ds-unit.css`; the mode is set on its `<html>`.
     const document = (m: "light" | "dark"): string => {
+      const page = pages[m === "light" ? "LIGHT" : "DARK"];
       const set = /<html\b[^>]*>/i.test(page)
         ? page.replace(/<html\b([^>]*)>/i, (_w, attrs: string) => `<html${attrs.replace(/\sdata-mode="[^"]*"/i, "")} data-mode="${m}">`)
         : `<html data-mode="${m}">${page}</html>`;
@@ -141,8 +175,7 @@ function unitFrame(body: string[], findings: Finding[]): string {
     mode = (m) => `    <iframe class="sds-unit-frame" data-mode="${m}" title="${esc(name)}, ${m}" width="100%" height="640" srcdoc="${document(m)}"></iframe>`;
   } else {
     unitUsed = true;
-    const markup = unitMarkup(page);
-    mode = (m) => `    <div class="sds-unit" data-mode="${m}">${markup}</div>`;
+    mode = (m) => `    <div class="sds-unit" data-mode="${m}">${unitMarkup(pages[m === "light" ? "LIGHT" : "DARK"])}</div>`;
   }
   const label = caption ? `<span class="sds-file-path">${inline(caption)}</span><span class="sds-file-lang">${esc(name)}</span>`
     : `<span class="sds-file-path">${esc(name)}</span><span class="sds-file-lang">unit</span>`;

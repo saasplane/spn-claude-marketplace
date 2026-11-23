@@ -7,7 +7,7 @@ import { join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 
 const HERE = resolve(import.meta.dirname, "..", "..", "..", "..");
-const { renderPage, setUnitRender, setBuiltUnits, designSystemVersion, pageFromRender } = await import(pathToFileURL(resolve(HERE, "src", "scripts", "lib", "render.ts")).href);
+const { renderPage, setUnitRender, setBuiltUnits, designSystemVersion, pageFromRender, pagesFromRender, DEFAULT_RENDER_APP } = await import(pathToFileURL(resolve(HERE, "src", "scripts", "lib", "render.ts")).href);
 
 let total = 0, failed = 0;
 const ok = (label, condition, detail = "") => {
@@ -182,13 +182,13 @@ console.log("\n=== the page renderer — a unit fence is drawn by the render and
   setUnitRender((file) => { captionSeen.push(JSON.parse(readFileSync(file, "utf8"))); return "<body><p>x</p></body>"; });
   const captioned = pageOf(fence("unit", JSON.stringify({ unit: "DSFeature", props: {}, caption: "The `feature` hero" })));
   const sectionsSeen = [];
-  setUnitRender((file) => { sectionsSeen.push(...JSON.parse(readFileSync(file, "utf8")).tree.sections); return "<body><p>x</p></body>"; });
+  setUnitRender((file) => { sectionsSeen.push(...JSON.parse(readFileSync(file, "utf8")).sections); return "<body><p>x</p></body>"; });
   pageOf(fence("unit", JSON.stringify({ sections: [{ unit: "DSFeature", props: {} }], caption: "Two" })));
   const badCaption = pageOf(fence("unit", JSON.stringify({ unit: "DSFeature", props: {}, caption: 3 })));
   setUnitRender((file) => { seen.push(JSON.parse(readFileSync(file, "utf8"))); return "<html><head></head><body><p class=\"x\">drawn & ready</p></body></html>"; });
   const pinned = readFileSync(resolve(HERE, "src", "styles", "ds-unit.css"), "utf8").split("\n")[0].match(/support-web-ds-ts v(\d+\.\d+\.\d+)/)?.[1];
-  ok("[MKT.SCRIPTS.613] a unit fence is wrapped as a render file carrying the version its unit stylesheet was cut from and the tree as its one section",
-    seen.length === 1 && designSystemVersion(undefined, "ds-unit.css") === pinned && JSON.stringify(seen[0]) === JSON.stringify({ app: { ds: pinned, theme: {}, layout: { type: "CANVAS", nav: [] }, page: "SITE" }, tree: { specVersion: 1, sections: [tree] } }), JSON.stringify(seen));
+  ok("[MKT.SCRIPTS.613] a unit fence is wrapped as a render file holding the tree alone, `treeVersion` and its one section, and the render is given the default app",
+    seen.length === 1 && JSON.stringify(seen[0]) === JSON.stringify({ treeVersion: 1, sections: [tree] }) && designSystemVersion(undefined, "ds-unit.css") === pinned && DEFAULT_RENDER_APP === "www", JSON.stringify(seen));
   ok("[MKT.SCRIPTS.613] the unit's markup stands in the page itself, once in light and once in dark, side by side, with the tree below as code, and no frame",
     made.findings.length === 0 && made.html.includes('<span class="sds-file-path">DSFeature</span><span class="sds-file-lang">unit</span>')
       && made.html.includes('<div class="sds-unit" data-mode="light"><p class="x">drawn & ready</p></div>') && made.html.includes('<div class="sds-unit" data-mode="dark"><p class="x">drawn & ready</p></div>')
@@ -200,7 +200,7 @@ console.log("\n=== the page renderer — a unit fence is drawn by the render and
     !/<style|<script/.test(styled.html.slice(styled.html.indexOf("sds-unit-pair"), styled.html.indexOf("</figure>"))) && styled.html.includes("<p>body</p>"), styled.html.slice(-900));
   ok("[MKT.SCRIPTS.613] a caption is the figcaption's text, the unit's name stays as the small label, and the caption is out of the tree sent to the render and of the tree shown",
     captioned.html.includes('<span class="sds-file-path">The <code>feature</code> hero</span><span class="sds-file-lang">DSFeature</span>')
-      && captionSeen.length === 1 && !("caption" in captionSeen[0].tree.sections[0]) && !JSON.stringify(captionSeen[0]).includes("hero")
+      && captionSeen.length === 1 && !("caption" in captionSeen[0].sections[0]) && !JSON.stringify(captionSeen[0]).includes("hero")
       && !captioned.html.includes('"caption"'), captioned.html.slice(-900));
   ok("[MKT.SCRIPTS.613] a caption beside sections is taken out too, and a caption that is no string stops the write",
     JSON.stringify(sectionsSeen) === JSON.stringify([{ unit: "DSFeature", props: {} }]) && badCaption.findings.length === 1 && badCaption.findings[0].stops === true, JSON.stringify(badCaption.findings));
@@ -238,6 +238,32 @@ console.log("\n=== the page renderer — a unit fence is drawn by the render and
       && !forcedOn.html.includes('"frame"') && !forcedOff.html.includes('"frame"') && framedSeen.every((seen) => !JSON.stringify(seen).includes('"frame"')) && forcedOn.html.includes("Framed"), forcedOff.html.slice(-800));
   ok("[MKT.SCRIPTS.615] a frame that is no boolean stops the write",
     badFrame.findings.length === 1 && badFrame.findings[0].stops === true && badFrame.findings[0].message.includes("`frame`"), JSON.stringify(badFrame.findings));
+  // The new render: the tree alone, the app from `--app`, both modes in one call, html by mode and device.
+  const calls = [];
+  const modes = (light, dark, extra = {}) => JSON.stringify({ renderVersion: 1, ds: "11.21.0", app: "www", renders: { LIGHT: { DESKTOP: { html: light, findings: [], ...extra } }, DARK: { DESKTOP: { html: dark, findings: [] } } } });
+  setUnitRender((file, options) => { calls.push({ file: JSON.parse(readFileSync(file, "utf8")), options }); return modes('<p class="l">light</p>', '<p class="d">dark</p>'); });
+  const small = pageOf(fence("unit", JSON.stringify({ unit: "DSFeature", props: {}, app: "docs" })));
+  const whole = pageOf(fence("unit", JSON.stringify({ unit: "DSLayout", props: {} })));
+  ok("a unit fence is drawn by one call of the new render, each mode taking its own html, and the fence's `app` names the app row and is out of the tree",
+    calls.length === 2 && calls[0].options.app === "docs" && calls[0].options.inline === false && JSON.stringify(calls[0].file) === JSON.stringify({ treeVersion: 1, sections: [{ unit: "DSFeature", props: {} }] })
+      && small.html.includes('data-mode="light"><p class="l">light</p>') && small.html.includes('data-mode="dark"><p class="d">dark</p>') && !small.html.includes('"app"'), small.html.slice(-700));
+  ok("a framed unit is drawn with --inline, the default app where the fence names none, and each frame holds its mode's page",
+    calls[1].options.inline === true && calls[1].options.app === DEFAULT_RENDER_APP && /srcdoc="[^"]*light/.test(whole.html) && /srcdoc="[^"]*dark/.test(whole.html), whole.html.slice(-700));
+  setUnitRender(() => modes("<p>x</p>", "<p>y</p>", { findings: [{ message: "DSFeature has no prop `kind`" }] }));
+  const lightFinding = pageOf(fence("unit", JSON.stringify(tree)));
+  setUnitRender(() => JSON.stringify({ renders: { LIGHT: { DESKTOP: { html: "<p>x</p>", findings: [] } }, DARK: { DESKTOP: { html: "<p>y</p>", findings: ["dark said no"] } } } }));
+  const darkFinding = pageOf(fence("unit", JSON.stringify(tree)));
+  ok("a finding in any mode stops the write with the render's words",
+    lightFinding.findings.length === 1 && lightFinding.findings[0].stops === true && lightFinding.findings[0].message.includes("no prop `kind`")
+      && darkFinding.findings.length === 1 && darkFinding.findings[0].stops === true && darkFinding.findings[0].message.includes("dark said no"), JSON.stringify([lightFinding.findings, darkFinding.findings]));
+  ok("a `unit` fence whose `app` is no string stops the write", pageOf(fence("unit", JSON.stringify({ unit: "DSFeature", props: {}, app: 3 }))).findings.some((f) => f.stops && f.message.includes("`app`")));
+  const both = pagesFromRender(modes("<p>L</p>", "<p>D</p>"));
+  const oldShape = pagesFromRender(JSON.stringify({ pages: [{ html: "<p>one</p>", findings: [] }] }));
+  ok("pagesFromRender reads the new shape by mode, and the released `pages` shape for both modes",
+    both.LIGHT === "<p>L</p>" && both.DARK === "<p>D</p>" && oldShape.LIGHT === "<p>one</p>" && oldShape.DARK === "<p>one</p>" && pageFromRender(modes("<p>L</p>", "<p>D</p>")) === "<p>L</p>");
+  let refusedNew = "";
+  try { pagesFromRender(JSON.stringify({ renders: { LIGHT: { DESKTOP: { findings: [] } } } })); } catch (e) { refusedNew = e.message; }
+  ok("a mode with no html is refused by its name", refusedNew.includes("LIGHT") && refusedNew.includes("`html`"), refusedNew);
   setUnitRender();
 }
 

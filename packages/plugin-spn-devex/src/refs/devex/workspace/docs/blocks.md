@@ -261,7 +261,7 @@ The web's way.
 ```
 ````
 
-**A window-sized unit is drawn in a frame of its own.** A tree whose first unit is `DSLayout`, or that holds more than one section, is set in an `iframe` of 640px height and full width, one for light and one for dark, and needs no `ds-unit.css`; a small unit stands inline. A `"frame": true` or `"frame": false` beside `caption` forces either, and the writer takes both keys out of the tree before it renders.
+**A window-sized unit is drawn in a frame of its own.** A tree whose first unit is `DSLayout`, or that holds more than one section, is set in an `iframe` of 640px height and full width, one for light and one for dark, and needs no `ds-unit.css`; a small unit stands inline. A `"frame": true` or `"frame": false` beside `caption` forces either, and `"app": "<code>"` names the app row it is drawn under. The writer takes all three keys, and `caption`, out of the tree before it renders.
 
 ## Which figure, for what you need to show
 
