@@ -9,7 +9,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/06-blocks.md",
       "section": "The blocks — what a page reaches for instead of prose",
-      "seen": "a43adf0f"
+      "seen": "20c2d623"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/06-blocks.md",
@@ -19,7 +19,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/06-blocks.md",
       "section": "Which block a content takes, and how its fence is written",
-      "seen": "c9b9f01c"
+      "seen": "d568a0d4"
     }
   ]
 }
@@ -239,8 +239,8 @@ The rows leave some content between two of them. These lines settle the usual ca
 - **A catalog needs a name for each item, once.** A table whose first column repeats a name, or has no name at all, stays a table.
 - **A description is a clause a reader reads, not a value.** A column of sentences or clauses beside a name reads as a catalog. A column of numbers, owners, states or one-word values is a table of attributes, and stays a table.
 - **A fact is a value compared down a list; a phrase that describes the item goes in its line.** In a `catalog layout=LIST`, where every item holds one or two short facts (a word, a number, a status, a version; up to about 20 characters), they sit at the row's right end, one narrow column each, the column's name once at the top of the list. A fact that is a phrase is folded into the item's line (rule 549).
-- **Facts below an item's line stand in the same column on every item of the list, one column for each fact name** (`RULE.DEVEX.WORKSPACE.563` · GUIDE). A reader reads one name down the list, so a long value wraps inside its column and never takes the row, and an item without that fact leaves its column empty. The page writer lays it out where the list names two or three facts; with more, each fact takes its own room.
-- **A fact whose value is codes from a closed set is written as tags** (`RULE.DEVEX.WORKSPACE.564` · GUIDE): `Owes: [UNIT] [COMPONENT]`, one bracket for each code, drawn as one badge each. Up to three tags count as a short fact, so they stand in a side column. Use it for a tier, a status or a kind, never for words.
+- **Facts below an item's line stand in the same column on every item of the list, one column for each fact name** (`RULE.DEVEX.WORKSPACE.563` · GUIDE). A reader reads one name down the list, so a long value wraps inside its column and never takes the row, and an item without that fact leaves its column empty. The page writer lays it out where the list names two or three facts; with more, each fact takes a line of its own below the item.
+- **A fact whose value is codes from a closed set is written as tags** (`RULE.DEVEX.WORKSPACE.564` · GUIDE): `Owes: [UNIT] [COMPONENT]`, one bracket for each code, drawn as one badge each. Up to three tags count as a short fact, so they stand at the row's right end, one narrow column for each fact name. Use it for a tier, a status or a kind, never for words.
 - **Which part of a list item does this go in?** Read down to the first row that fits (rule 549):
 
 | What you have | It goes in |

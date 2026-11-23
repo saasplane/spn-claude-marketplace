@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/01-function/03-ideate.md",
-      "seen": "d32ca862"
+      "seen": "9aa7beb3"
     }
   ]
 }

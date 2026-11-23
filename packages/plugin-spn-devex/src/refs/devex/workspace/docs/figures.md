@@ -4,7 +4,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/07-figures.md",
       "section": "The figures — what sits inside a block, and the closed set of them",
-      "seen": "bfcd97a1"
+      "seen": "0497b3fc"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/07-figures.md",

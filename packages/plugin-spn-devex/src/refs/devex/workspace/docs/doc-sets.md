@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
-      "seen": "8829621b"
+      "seen": "2e5f7bbe"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
@@ -25,7 +25,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/02-document.md",
-      "seen": "aa30a7f1"
+      "seen": "64c44cb6"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/04-docs.md",
@@ -701,7 +701,7 @@ the rail, which is why a template ships every section and subsection with one. *
 
 **On a hub and an overview, the words after a heading's dash are a plain phrase a newcomer reads in one pass** (`RULE.DEVEX.WORKSPACE.561` · GUIDE). These pages are where a reader starts, so *Kind and shape — the one fact* becomes *Kind and shape — the one choice every other rule follows from*. The name before the dash stays short, because the rail shows only the name; the phrase has no word limit and keeps every term.
 
-**A heading's name is in sentence case, and the words after its dash run on in lowercase** (`RULE.DEVEX.WORKSPACE.562` · GUIDE): *Shared rules — the rules this path shares*. A construct's, a product's or a command's own name keeps the capitals it was given: *Module Contract Chain — how a contract reaches code*.
+**A heading's name inside a page is in sentence case, and the words after its dash run on in lowercase** (`RULE.DEVEX.WORKSPACE.562` · GUIDE): *Shared rules — the rules this path shares*. A construct's, a product's or a command's own name keeps the capitals it was given: *Module Contract Chain — how a contract reaches code*. A chapter's or a page's own title keeps the book's title case.
 
 ### Every page links one shared stylesheet, in one version
 
