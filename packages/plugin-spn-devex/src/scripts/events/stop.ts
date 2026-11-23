@@ -44,8 +44,8 @@
 //              under the status line (`orientation.ts`) is allowed and not required
 //   hold       while the developer is AWAY (`lib/presence.ts`), a reply that ends on a question or a hold while a decided arc of the
 //              window has a ready row is sent back with the row named: a hold is carried, never a stop
-//   window     by the developer's presence: PRESENT hears a new window offered at 200k, 300k and 400k at a clean point, once each, muted by
-//              "stay"; PRESENT and WATCHING hear the cost line at 500k and the compaction line at 850k, once each, even after "stay"; AWAY hears none
+//   window     by the developer's presence: PRESENT hears a new window offered at 200k, 300k and 400k, once each, muted by "stay", at this
+//              window's own clean point (no row of its arcs running, no helper of it out), and at 400k and past it at the next reply anyway; PRESENT and WATCHING hear the cost line at 500k and the compaction line at 850k, once each, even after "stay"; AWAY hears none
 //   corpus    the docs trees still answer the questions only a whole-corpus read can ask
 //
 // AN ARC IS READ FROM ITS DATA: its header and rows from `arcs/N<nnn>/state.json`, its events from
@@ -2035,7 +2035,8 @@ export function sayOnce(found: Warning[], told: Record<string, string>): { said:
 // While the developer is PRESENT, one line at each of OFFERS, at a clean point, said once each and muted for the rest of the
 // window once the developer says "stay". The cost line at COST_POINT and the compaction line at COMPACT_POINT are said once
 // each, even after "stay". WATCHING hears no offer, for someone who watches cannot open a window, and hears the other two.
-// AWAY hears nothing at any size. Never while a helper runs.
+// AWAY hears nothing at any size. The offers at 200k and 300k wait for this window's own clean point; at 400k and past it the offer
+// is said at the next reply even while a helper is out, and its message says the handover follows when the helper reports.
 const OFFERS = [200_000, 300_000, 400_000];
 const COST_POINT = 500_000;
 const COMPACT_POINT = 850_000;
@@ -2046,11 +2047,12 @@ const PERSON = "Say it in the developer's words and never this note's, with no t
 /**
  * THE WINDOW CHECK (RULE.DEVEX.AGENT.103), by the developer's presence. PRESENT: at a clean point, one line at 200k, 300k and 400k, each
  * said once and muted by "stay"; at 500k the cost line and at 850k the compaction line, each said once and said after "stay"
- * too. WATCHING: no offer line, the other two. AWAY: nothing. Clean is what can be computed: no row of this window's arcs
- * runs, no helper launched in the background is out, and `workstream state check` finds nothing for the window's workstreams
- * (the cost and compaction lines do not wait for the last). That every open point is written first cannot be computed, so
- * the message asks for it. It reads the transcript and keeps no state: which sizes it has said is read from the hook's own
- * feedback in it, and nothing is said while a helper runs.
+ * too. WATCHING: no offer line, the other two. AWAY: nothing. Clean is this window's own and what can be computed: no row of
+ * this window's arcs runs and no helper launched in the background by this window is out. Other arcs' standing findings do not
+ * hold the offer back (`checkWorkstreamState` is not asked). The cost and compaction lines, and the offer at 400k and past it,
+ * do not wait for a helper: the offer then says the handover follows when the helper reports (RULE.DEVEX.WORKSPACE.448). That
+ * every open point is written first cannot be computed, so the message asks for it. It reads the transcript and keeps no state:
+ * which sizes it has said is read from the hook's own feedback in it.
  *
  * @param mine      the workstreams this window works on
  * @param running   whether a row of this window's arcs is in progress (`workRuns`): the line then waits
@@ -2080,11 +2082,14 @@ export function checkWindow(root: string, transcript: string, mine: Set<string>,
     } catch { /* a torn line is skipped */ }
   }
   if (due <= said) return [];
-  // NEVER WHILE A HELPER RUNS: a row of the window's arcs in progress, or a background helper that has not handed back.
+  // THIS WINDOW'S OWN CLEAN POINT: no row of its arcs in progress, and no background helper of it that has not handed back, until
+  // the last offer's size (400k): from there the offer is said at the next reply, and says the handover follows the helper's report.
   if (running) return [];
-  const always = due >= COST_POINT;
-  if (helperOut(lines)) return [];
-  if (!always && checkWorkstreamState(root, mine).length) return [];
+  const helper = helperOut(lines);
+  const late = due >= OFFERS[OFFERS.length - 1];
+  if (helper && !late) return [];
+  const handoverWaits = helper && due < COST_POINT
+    ? "A helper of this window is still out, so the handover follows when it reports (RULE.DEVEX.WORKSPACE.448): say the offer now and write the handover after its report. " : "";
   const written = "Write every open point first: a suggestion as S<n>, a question as a card, decided work as a row. ";
   // THE OFFER IS WHERE A PERSON LEARNS HOW WINDOWS WORK (01-workstream.md § The agent offers a new window):
   // a partner holds no book, so the reply says why, what is kept and how, in the person's words.
@@ -2097,7 +2102,7 @@ export function checkWindow(root: string, transcript: string, mine: Set<string>,
     ? `${head}, and a window this long compacts soon, which drops detail. ${written}Then say in one plain sentence that this window will compact soon and what is kept, and that a new window with its handover keeps more. ${PERSON}`
     : due >= COST_POINT
     ? `${head}, and each reply now costs several times what a fresh window's does and takes longer. ${written}Then say in one plain sentence that replies are getting slow and dear${presence === "PRESENT" ? ", and that a new window would help" : ""}. ${PERSON}`
-    : `${head}, and the point is clean: no order running, \`workstream state check\` whole. ${written}${offer}${PERSON}`;
+    : `${head}, and ${helper ? "no order of this window is running" : "no order of this window is running and no helper of it is out"}. ${written}${handoverWaits}${offer}${PERSON}`;
   return [{ check: "window", message }];
 }
 
