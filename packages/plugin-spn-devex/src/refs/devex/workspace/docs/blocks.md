@@ -24,7 +24,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "Which block a content takes, and how its fence is written",
-      "seen": "67adbb5f"
+      "seen": "4d81b652"
     }
   ]
 }
@@ -207,6 +207,21 @@ The `PROSE` panel still has no spelling: write a paragraph where you wanted one,
 ## Which block a content takes, and how its fence is written
 
 **Content that has a shape takes the block that shape names, from this table, read down to the first row that fits** (rule RULE.DEVEX.WORKSPACE.549 · GUIDE). Headings and fact keys are words, never sentences: `Layout · Arrangement · Use`, `Standard pages`, `Frequency`.
+
+**Ask four questions in this order, and the first "yes" decides the block** (rule RULE.DEVEX.WORKSPACE.549 · GUIDE):
+
+1. Is the first thing on each line a condition, a question or a case ("when…", "a unit not built yet", "if…")? Write a plain table.
+2. Are two to four things compared fact by fact? Write `catalog layout=TABLE`.
+3. Is each line a thing with a name and a sentence a reader reads? Write `catalog layout=GRID`, or `LIST` when the names are long.
+4. Otherwise, write a plain table.
+
+Three worked examples, each as Content, Right, Wrong:
+
+- **The figure table itself.** Content: each row starts with a condition ("2–4 things compared fact by fact") and says what to use. Right: a plain table. Wrong: cards, because a reader looks a case up and does not browse names.
+- **Four checks, each a name, a sentence and a weight.** Content: `Reach`, `Voice`, `Length`, `Fit`, each with what it measures and how much it counts. Right: `catalog layout=GRID`. Wrong: a plain table, because the names are things a reader browses and the sentences are read.
+- **Five numbers sorted by kind.** Content: a kind in the first column and a count beside it. Right: a plain table. Wrong: a catalog, because a number is a value, not a sentence a reader reads.
+
+Then read the table down to the first row that fits.
 
 | When the content is | Use |
 | --- | --- |
