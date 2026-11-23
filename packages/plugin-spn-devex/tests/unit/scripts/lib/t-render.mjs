@@ -186,9 +186,9 @@ console.log("\n=== the page renderer — a unit fence is drawn by the render and
   pageOf(fence("unit", JSON.stringify({ sections: [{ unit: "DSFeature", props: {} }], caption: "Two" })));
   const badCaption = pageOf(fence("unit", JSON.stringify({ unit: "DSFeature", props: {}, caption: 3 })));
   setUnitRender((file) => { seen.push(JSON.parse(readFileSync(file, "utf8"))); return "<html><head></head><body><p class=\"x\">drawn & ready</p></body></html>"; });
-  const pinned = readFileSync(resolve(HERE, "src", "styles", "ds-tokens.css"), "utf8").split("\n")[0].match(/support-web-ds-ts v(\d+\.\d+\.\d+)/)?.[1];
-  ok("[MKT.SCRIPTS.613] a unit fence is wrapped as a render file carrying the pinned design-system version and the tree as its one section",
-    seen.length === 1 && designSystemVersion() === pinned && JSON.stringify(seen[0]) === JSON.stringify({ app: { ds: pinned, theme: {}, layout: { type: "CANVAS", nav: [] }, page: "SITE" }, tree: { specVersion: 1, sections: [tree] } }), JSON.stringify(seen));
+  const pinned = readFileSync(resolve(HERE, "src", "styles", "ds-unit.css"), "utf8").split("\n")[0].match(/support-web-ds-ts v(\d+\.\d+\.\d+)/)?.[1];
+  ok("[MKT.SCRIPTS.613] a unit fence is wrapped as a render file carrying the version its unit stylesheet was cut from and the tree as its one section",
+    seen.length === 1 && designSystemVersion(undefined, "ds-unit.css") === pinned && JSON.stringify(seen[0]) === JSON.stringify({ app: { ds: pinned, theme: {}, layout: { type: "CANVAS", nav: [] }, page: "SITE" }, tree: { specVersion: 1, sections: [tree] } }), JSON.stringify(seen));
   ok("[MKT.SCRIPTS.613] the unit's markup stands in the page itself, once in light and once in dark, side by side, with the tree below as code, and no frame",
     made.findings.length === 0 && made.html.includes('<span class="sds-file-path">DSFeature</span><span class="sds-file-lang">unit</span>')
       && made.html.includes('<div class="sds-unit" data-mode="light"><p class="x">drawn & ready</p></div>') && made.html.includes('<div class="sds-unit" data-mode="dark"><p class="x">drawn & ready</p></div>')

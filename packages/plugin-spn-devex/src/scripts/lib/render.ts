@@ -49,9 +49,9 @@ export function setUnitRender(render: UnitRender = spnutilsRender): void { unitR
  * The version of `@saasplane/support-web-ds-ts` the docs stylesheet's Support release pins: the tag the tokens file in the
  * plugin's styles folder was copied from, which `docs sds cut` writes in its first line. Null where it cannot be read.
  */
-export function designSystemVersion(styles: string | null = stylesDir(import.meta.dirname)): string | null {
-  if (!styles || !existsSync(join(styles, "ds-tokens.css"))) return null;
-  return /support-web-ds-ts v?(\d+\.\d+\.\d+)/.exec(readFileSync(join(styles, "ds-tokens.css"), "utf8").split("\n")[0])?.[1] ?? null;
+export function designSystemVersion(styles: string | null = stylesDir(import.meta.dirname), file = "ds-tokens.css"): string | null {
+  if (!styles || !existsSync(join(styles, file))) return null;
+  return /support-web-ds-ts v?(\d+\.\d+\.\d+)/.exec(readFileSync(join(styles, file), "utf8").split("\n")[0])?.[1] ?? null;
 }
 
 /** Set by `unitFrame` when a page draws a unit, so the page links `ds-unit.css`; reset for every page. */
@@ -89,7 +89,8 @@ function unitFrame(body: string[], findings: Finding[]): string {
   const sections = Array.isArray(tree?.sections) ? tree.sections : [tree];
   const name = sections[0]?.unit;
   if (typeof name !== "string") return stop("a `unit` fence holds a tree whose first unit has no name: `{ \"unit\": \"DSFeature\", \"props\": { … } }`");
-  const ds = designSystemVersion();
+  // A unit is drawn by the version its scoped stylesheet was cut from, so its markup and its styles always match.
+  const ds = designSystemVersion(undefined, "ds-unit.css") ?? designSystemVersion();
   if (!ds) return stop("a `unit` fence cannot be drawn: the docs stylesheet's design-system version is not read from `ds-tokens.css` in the plugin's styles folder");
   const file = { app: { ds, theme: {}, layout: { type: "CANVAS", nav: [] }, page: "SITE" }, tree: { specVersion: 1, sections } };
   const folder = mkdtempSync(join(tmpdir(), "spn-unit-"));
