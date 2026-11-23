@@ -7,7 +7,7 @@ import { join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 
 const HERE = resolve(import.meta.dirname, "..", "..", "..", "..");
-const { renderPage, setUnitRender, designSystemVersion } = await import(pathToFileURL(resolve(HERE, "src", "scripts", "lib", "render.ts")).href);
+const { renderPage, setUnitRender, designSystemVersion, pageFromRender } = await import(pathToFileURL(resolve(HERE, "src", "scripts", "lib", "render.ts")).href);
 
 let total = 0, failed = 0;
 const ok = (label, condition, detail = "") => {
@@ -334,6 +334,14 @@ console.log("\n=== the page renderer — a folded fence with no body reads its f
   ok("[MKT.SCRIPTS.616] with no root known, an empty folded fence stops the write; an empty fence that does not fold is not read",
     made("```json file=docs/specs/x.json fold\n```").findings.some((f) => f.stops) && made("```json file=docs/specs/x.json\n```").findings.length === 0);
   rmSync(root, { recursive: true, force: true });
+}
+
+{
+  const page = pageFromRender(JSON.stringify({ pages: [{ html: '<body><svg width="1em"></svg></body>', findings: [] }] }));
+  let refused = "";
+  try { pageFromRender(JSON.stringify({ pages: [{ html: "<body></body>", findings: [{ message: "DSTabs has no prop `x`" }] }] })); } catch (e) { refused = e.message; }
+  ok("[MKT.SCRIPTS.613] the render's printed JSON gives its first page's html, decoded, and a finding stops with the render's words; text that is no JSON is the page",
+    page === '<body><svg width="1em"></svg></body>' && refused.includes("DSTabs has no prop `x`") && pageFromRender("<body>x</body>") === "<body>x</body>", page + " | " + refused);
 }
 
 console.log(failed ? `\n  ${failed} of ${total} FAILED — t-render` : `\n  all ${total} passed — t-render`);

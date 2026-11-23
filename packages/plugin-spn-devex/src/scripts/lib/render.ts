@@ -33,9 +33,25 @@ export type Finding = { message: string; line?: number; stops?: boolean };
  */
 export type UnitRender = (file: string) => string;
 
+/**
+ * The page in what the render printed. The render prints JSON, `{ pages: [{ html, findings }] }` today, so the page is the
+ * first page's `html`, and a finding stops the write with the render's words. Printed text that is no JSON is the page itself.
+ */
+export function pageFromRender(printed: string): string {
+  const text = printed.trim();
+  if (!text.startsWith("{")) return printed;
+  let out: any;
+  try { out = JSON.parse(text); } catch { return printed; }
+  const first = Array.isArray(out?.pages) ? out.pages[0] : out;
+  const findings = Array.isArray(first?.findings) ? first.findings : [];
+  if (findings.length) throw new Error(findings.map((f: any) => (typeof f === "string" ? f : f?.message ?? JSON.stringify(f))).join("; "));
+  if (typeof first?.html !== "string") throw new Error("the render printed no page: its JSON holds no `html`");
+  return first.html;
+}
+
 const spnutilsRender: UnitRender = (file) => {
   try {
-    return execFileSync("spnutils", ["apps", "surface", "render", "--file", file], { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"], maxBuffer: 64 * 1024 * 1024 });
+    return pageFromRender(execFileSync("spnutils", ["apps", "surface", "render", "--file", file], { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"], maxBuffer: 64 * 1024 * 1024 }));
   } catch (error) {
     const failed = error as { stdout?: unknown; stderr?: unknown; message?: string };
     throw new Error(`${String(failed.stderr ?? "")}${String(failed.stdout ?? "")}`.trim() || String(failed.message));
