@@ -9,7 +9,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "The blocks — what a page reaches for instead of prose",
-      "seen": "1c506a4c"
+      "seen": "13d99337"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
@@ -19,12 +19,12 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "The figures — what sits inside a block, and the closed set of them",
-      "seen": "0102cb01"
+      "seen": "3608634f"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "Which block a content takes, and how its fence is written",
-      "seen": "e6afb1b9"
+      "seen": "e7d8e632"
     }
   ]
 }
@@ -312,6 +312,38 @@ The web's way.
 | several such pages | a samples index: the index template, each entry a surface preview |
 | a running page as it is | `spn-surface page copy`, in a surface preview |
 | a small picture of an item in a list | `CATALOG` media |
+
+**A passage that walks through three or more steps, relations, states or layers keeps its words and gains a `dg` figure beside it** (rule RULE.DEVEX.WORKSPACE.548 · GUIDE). The kind is the one the passage's shape names:
+
+| The passage walks through | `kind` |
+| --- | --- |
+| steps between named things | `chain` |
+| actors answering each other | `sequence` |
+| things related by verbs | `map` |
+| one-to-many links | `entities` |
+| states a thing moves between | `flowchart`, a box for each state and each link named for its event (`state` is not a `dg` kind yet) |
+| layers inside a boundary | `system` |
+| a choice with branches | `flowchart` |
+
+**The figure matches the passage.** Every box is a thing the passage names, in its words. Every link is a relation the passage states. A `chain` or a `sequence` runs in the passage's order. The `caption` says what to look at, in one sentence; the passage keeps the why. Never add a box the passage does not name, and never drop one it does.
+
+A worked example. The passage: *A seat file is read by the page writer, which draws it as a page; the check then reads the page and the index lists it.* Its figure:
+
+```dg
+{ "kind": "chain",
+  "title": "A seat file becomes a page, which is checked and listed",
+  "caption": "Look at where the check sits: it reads the page, never the seat file.",
+  "boxes": [{ "id": "a", "label": "Seat file" }, { "id": "b", "label": "Page writer" },
+            { "id": "c", "label": "Page" }, { "id": "d", "label": "Index" }] }
+```
+
+The boxes are the passage's nouns, the order is its order, and the reason the passage gives stays in the passage.
+
+Where the passage is unsure, these lines decide:
+- **A numbered list counts as the passage**, so it gains its figure beside it. A section that already holds a figure of the same steps gains no second one.
+- **A link runs from the thing that does to the thing it is done to, and its label is the passage's verb.** A passage that says the workloads *pull* draws `Workloads → Staging`, never a chain that reads as a push.
+- **Draw every relation the passage states between the boxes it names, and no relation it only implies.** At most six boxes; where the passage names more, the figure shows the part the caption points at.
+- **A caption states only what the passage states.** A cardinality or an exception the passage does not say is not written in the caption.
 
 **A skeleton is marked `"planned": true` at the top of its spec.** One that names a unit the design system builds, without the mark, stops the write: draw it with a `unit` fence instead.
 

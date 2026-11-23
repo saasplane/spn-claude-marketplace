@@ -27,6 +27,14 @@ function catalogHint(rows: string[][]): boolean {
   return body.every((cells) => /^`[^`]+`$|^\*\*[^*]+\*\*$/.test(cells[0]) && cells[1].split(/\s+/).length >= 12);
 }
 
+/** The two table hints, whichever unit raised them: a table that reads as a catalog, and a first column of conditions. */
+export const TABLE_HINTS = ["a table that reads as a catalog", "a first column of conditions"];
+
+/** The table hints of a whole markdown text, for the hook that scores a written seat file. */
+export function tableHintsOf(text: string): string[] {
+  return unitsOf(text).flatMap((unit) => unit.hints).filter((hint) => TABLE_HINTS.some((start) => hint.startsWith(start)));
+}
+
 /** The units of one markdown text, front matter and fenced code kept out of the heading scan. */
 export function unitsOf(text: string): Unit[] {
   const front = /^---\r?\n[\s\S]*?\r?\n---\r?\n/.exec(text)?.[0] ?? "";

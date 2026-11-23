@@ -323,6 +323,7 @@ console.log("\n=== doc-check — the masthead: h1, an optional p.sds-subtitle, o
 const CONSTRUCT = join(domainConstructsDir(PROBE_DOMAIN), "probe-construct.html");
 const page = (inner) => `<!doctype html>
 ${STYLES.stylesheet}
+<div class="sds-page"><div class="sds-wrap">
 <header class="sds-masthead">
   <div class="sds-eyebrow"><span class="sds-audience">Architect</span></div>
 ${inner}
@@ -330,6 +331,7 @@ ${inner}
 <section id="s0"><div class="sds-section-head"><h2>Overview</h2></div>
   <p>You read this part when you need the core. You leave it knowing where each piece sits.</p>
 </section>
+</div></div>
 `;
 // The same builder under a name the cases further down can reach, where `page` names a file.
 const constructPage = (inner) => page(inner);
@@ -362,8 +364,8 @@ one("a Subtitle under the Description is out of place",
 // THE PLACE OF A PAGE UNDER THE POCKET'S `docs` FOLDER NAMES ITS KIND. A page in a `constructs` folder
 // is a construct page, and every other page is an overview: beside the hub, or in a domain's folder.
 {
-  const OVERVIEW = `<!doctype html>\n${STYLES.stylesheet}\n<div class="sds-eyebrow">Who this is for &middot; a reader</div>\n` +
-    `<section><h2>Overview</h2><p>You read it once and you know it.</p></section>`;
+  const OVERVIEW = `<!doctype html>\n${STYLES.stylesheet}\n<div class="sds-page"><div class="sds-wrap"><div class="sds-masthead"><div class="sds-eyebrow">Who this is for &middot; a reader</div></div>\n` +
+    `<section><h2>Overview</h2><p>You read it once and you know it.</p></section></div></div>`;
   const strayConstruct = join(PROBE_DOMAIN, "probe-construct.html");
   one("[MKT.SCRIPTS.110] an overview in its domain's folder is held to its suffix, and draws no finding about its place",
     write(join(PROBE_DOMAIN, "probe-overview.html"), OVERVIEW), "silent");
@@ -713,11 +715,11 @@ try {
 
   // A guide page as `docs guide` writes it: a header line with no status, a Title, a Description, its
   // stages and its steps. It sits in `guides/`, and its name ends `-guide.html`.
-  const GUIDE = `<!doctype html>\n${STYLES.stylesheet}\n<nav class="sds-rail" id="rail"></nav>\n<header class="sds-masthead">\n` +
+  const GUIDE = `<!doctype html>\n${STYLES.stylesheet}\n<div class="sds-page"><div class="sds-wrap"><nav class="sds-rail" id="rail"></nav>\n<header class="sds-masthead">\n` +
     `  <div class="sds-eyebrow"><span class="sds-line1">SaaS Plane &nbsp;|&nbsp; Probe &nbsp;|&nbsp; Getting Started</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Guide</span></span></div>\n` +
     `  <h1>Getting Started</h1>\n  <p class="sds-standfirst">You go from a clone to a running service. Read it on your first day.</p>\n</header>\n` +
     `<section id="s1"><div class="sds-section-head"><h2>Machine ready — The machine is ready</h2></div>\n  <p>You install the tools once, and you check them once.</p>\n` +
-    `  <div class="sds-step"><h3 id="h1">Install the toolchain</h3><p>You need it before any other step.</p><pre>spnutils setup</pre><p>You see one line for each tool.</p></div>\n</section>\n${STYLES.script}\n`;
+    `  <div class="sds-step"><h3 id="h1">Install the toolchain</h3><p>You need it before any other step.</p><pre>spnutils setup</pre><p>You see one line for each tool.</p></div>\n</section>\n</div></div>${STYLES.script}\n`;
   const guidePage = join(guidePagesDir(PROBE_DOCS), "getting-started-guide.html");
   one("a guide page under artifacts/guides/ is in its place, and draws no finding", write(guidePage, GUIDE), "silent");
   one("a page under artifacts/guides/ whose name does not end -guide.html",
@@ -1102,6 +1104,36 @@ console.log("\n=== doc-check — a long What on an open approach page holds a fi
   say("[RULE.DEVEX.WORKSPACE.523] [MKT.HOOKS.524] green: an svg that carries data-dl-legend itself is a sample", hand(artifact, page(FLAT.replace("<svg ", "<svg data-dl-legend "))).length === 0);
   say("[RULE.DEVEX.WORKSPACE.523] [MKT.HOOKS.524] green: a seat file's fenced example of the old markup is not a figure", hand(seat, `# Thing\n\n\`\`\`html\n${FLAT}\n\`\`\`\n`).length === 0);
   say("[RULE.DEVEX.WORKSPACE.523] [MKT.HOOKS.524] green: a page of a closed workstream keeps the figures it closed with", hand(closed, page(FLAT)).length === 0);
+}
+
+
+console.log("\n=== doc-check — every page from a template, a shown command, and the hints on what is written (RULE.DEVEX.WORKSPACE.554, 557, 548)");
+{
+  const docCheck = await import("../../../../src/scripts/checks/doc-check.ts");
+  const say = (label, ok, detail = "") => { n += 1; if (!ok) failed += 1; console.log(`  ${ok ? "PASS" : "FAIL"}  ${label}${ok || !detail ? "" : `\n        ${String(detail).slice(0, 300)}`}`); };
+  const bare = join(PROBE_DOCS, "artifacts", "public", "docs", "probe-overview.html");
+  const framed = join(PROBE_DOCS, "artifacts", "public", "docs", "framed-overview.html");
+  const seat = join(PROBE_DOCS, "02-constructs", "01-probe", "01-thing.md");
+  const notes = join(stream(TMP, "097-x", "open"), "notes", "N001", "extra.html");
+  const sample = join(stream(TMP, "097-x", "open"), "notes", "N001", "samples", "home.html");
+  const FRAME = '<div class="sds-page"><div class="sds-wrap"><div class="sds-masthead"></div></div></div>';
+  const frames = (path, text) => docCheck.check(path, text).filter(([, m]) => m.includes("RULE.DEVEX.WORKSPACE.554"));
+  say("[MKT.HOOKS.529] red: a bare page of the public pocket is named, with the page template", frames(bare, `<!doctype html>${STYLES.stylesheet}<p>bare</p>`).length === 1 && frames(bare, `<!doctype html>${STYLES.stylesheet}<p>bare</p>`)[0][1].includes("page-template.html"));
+  say("[MKT.HOOKS.529] green: a page with the frame is silent on that", frames(framed, `<!doctype html>${STYLES.stylesheet}${FRAME}`).length === 0);
+  say("[MKT.HOOKS.529] red: a page in an arc's own notes needs the frame too", frames(notes, `<!doctype html>${STYLES.stylesheet}<p>bare</p>`).length === 1);
+  say("[MKT.HOOKS.529] green: a sample under samples/ is a view of the work, never a docs page", frames(sample, `<!doctype html>${STYLES.stylesheet}<p>bare</p>`).length === 0);
+  say("[MKT.HOOKS.529] green: an Edit's fragment is not judged for a frame", docCheck.check(bare, "<p>bare</p>", true).filter(([, m]) => m.includes("554")).length === 0);
+  const gone = docCheck.check(seat, "# Thing\n\nTry it: `node docs.ts audit docs/02-constructs`\n").filter(([, m]) => m.includes("is gone"));
+  say("[MKT.HOOKS.528] red: a seat file that shows an old command is told the current form", gone.length === 1 && gone[0][0] === "SOFT" && gone[0][1].includes("spn-devex docs audit"), JSON.stringify(gone));
+  say("[MKT.HOOKS.528] green: a current command is silent", docCheck.check(seat, "# Thing\n\nTry it: `spn-devex docs audit check docs`\n").filter(([, m]) => m.includes("is gone")).length === 0);
+  const written = docCheck.checkDoc({ tool_input: { file_path: seat, content: "# Thing\n\nThe writer draws it → the check reads it → the index lists it → the reader opens it.\n" } });
+  say("[MKT.HOOKS.532] red: the hook, on a written seat file, adds the figure hint", typeof written?.note === "string" && written.note.includes("add a dg figure beside it"), JSON.stringify(written));
+  const edited = docCheck.checkDoc({ tool_input: { file_path: seat, new_string: "The writer draws it → the check reads it → the index lists it → the reader opens it.\n" } });
+  say("[MKT.HOOKS.532] red: the hook, on an Edit's replacement text, adds it too", typeof edited?.note === "string" && edited.note.includes("add a dg figure beside it"), JSON.stringify(edited));
+  const table = "# Thing\n\n| Name | What |\n| --- | --- |\n" + ["a", "b", "c"].map((k) => `| \`${k}\` | one two three four five six seven eight nine ten eleven twelve words |`).join("\n") + "\n";
+  const catalog = docCheck.checkDoc({ tool_input: { file_path: seat, content: table } });
+  say("[MKT.HOOKS.532] red: the hook, on a written seat file, names a table that reads as a catalog", typeof catalog?.note === "string" && catalog.note.includes("reads as a catalog"), JSON.stringify(catalog));
+  say("[MKT.HOOKS.532] every hint the hook adds stays advisory: the note is no refusal", written?.deny === undefined && catalog?.deny === undefined);
 }
 
 console.log(failed ? `\n  ${failed} FAILED` : `\n  all ${n} passed`);

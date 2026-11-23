@@ -7,7 +7,7 @@ import { join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 
 const HERE = resolve(import.meta.dirname, "..", "..", "..", "..");
-const { blockFit, fitKind, BOUNDS } = await import(pathToFileURL(resolve(HERE, "src", "scripts", "lib", "block-fit.ts")).href);
+const { blockFit, fitKind, BOUNDS, templateFrameFindings, holdsTemplateFrame } = await import(pathToFileURL(resolve(HERE, "src", "scripts", "lib", "block-fit.ts")).href);
 
 let total = 0, failed = 0;
 const ok = (label, condition, detail = "") => {
@@ -111,6 +111,28 @@ const BARE = "this block is a tree: mark it `<pre data-lang=\"tree\">` so the sc
 ok("[RULE.DEVEX.WORKSPACE.238] red: a bare pre that reads as a tree is a soft finding with the exact message", blockFit(html(`<pre>${TREE}</pre>`), true, "preview").some(([sev, m]) => sev === "SOFT" && m === BARE));
 ok("[RULE.DEVEX.WORKSPACE.238] green: the same tree marked data-lang=\"tree\" is silent", sayHtml(`<pre data-lang="tree">${TREE}</pre>`).length === 0);
 ok("[RULE.DEVEX.WORKSPACE.238] green: a pre of code is no tree", sayHtml(`<pre>const a = 1;\nconst b = 2;</pre>`).length === 0);
+
+
+console.log("=== a figure beside the passage that calls for it, and matching it (RULE.DEVEX.WORKSPACE.548)");
+const FIG = (labels) => "```dg\n" + JSON.stringify({ kind: "chain", title: "t", caption: "c", boxes: labels.map((label, at) => ({ id: `b${at}`, label })) }) + "\n```";
+const STEPS = "A seat file is read by the page writer → drawn as a page → read by the check → listed by the index. The reader then opens it.";
+ok("[MKT.HOOKS.530] red: a paragraph with three arrows and no dg figure says what kind of figure to add", say(STEPS).some((m) => m.includes("a learner would see this faster as a chain: add a dg figure beside it") && m.includes("548")), JSON.stringify(say(STEPS)));
+ok("[MKT.HOOKS.530] green: the same paragraph with a dg fence in its section is silent on that", !say(`${STEPS}\n\n${FIG(["Seat file", "Page writer", "Page", "Check", "Index"])}`).some((m) => m.includes("add a dg figure")));
+ok("[MKT.HOOKS.530] red: a numbered list of three steps and no figure is flagged", say("1. Write the contract.\n2. Regenerate the validators.\n3. Write the service.").some((m) => m.includes("add a dg figure")));
+ok("[MKT.HOOKS.530] green: a paragraph of two steps is silent", !say("The writer draws the page, then the check reads it.").some((m) => m.includes("add a dg figure")));
+ok("[MKT.HOOKS.530] red: a sequence passage names a sequence", say("The client asks the server for a token. The server answers with one. The client then asks again → the server answers → done → ok.").some((m) => m.includes("as a sequence")));
+ok("[MKT.HOOKS.530] red: a figure whose box the section's prose never names is flagged with that label", say(`The writer draws the page and the check reads it.\n\n${FIG(["Writer", "Page", "Unicorn"])}`).some((m) => m.includes("the figure names Unicorn, which the passage does not")));
+ok("[MKT.HOOKS.530] green: a figure whose boxes the prose names is silent", say(`The writer draws the page and the check reads it.\n\n${FIG(["Writer", "Page", "Check"])}`).length === 0, JSON.stringify(say(`The writer draws the page and the check reads it.\n\n${FIG(["Writer", "Page", "Check"])}`)));
+ok("[MKT.HOOKS.530] green: a skeleton figure is never matched against the prose", say("A screen.\n\n```dg\n{\"kind\":\"skeleton\",\"frame\":{\"label\":\"Zzz\"}}\n```").length === 0);
+ok("[MKT.HOOKS.530] every figure hint is SOFT", blockFit(md(STEPS), false, "seat").every(([sev]) => sev === "SOFT"));
+
+console.log("=== a page with no template's frame (RULE.DEVEX.WORKSPACE.554)");
+const FRAMED = '<div class="sds-page"><div class="sds-wrap"><header class="sds-masthead"><h1>x</h1></header></div></div>';
+ok("[MKT.HOOKS.529] red: a bare page is a finding that names the page template", templateFrameFindings("<p>hi</p>").some(([sev, m]) => sev === "RULE" && m.includes("page-template.html") && m.includes("554")));
+ok("[MKT.HOOKS.529] green: .sds-page with .sds-wrap and .sds-masthead is a frame", holdsTemplateFrame(FRAMED) && templateFrameFindings(FRAMED).length === 0);
+ok("[MKT.HOOKS.529] green: the index template's index-data is a frame", holdsTemplateFrame('<script type="application/json" id="index-data">{}</script>'));
+ok("[MKT.HOOKS.529] red: .sds-page without .sds-masthead is no frame", !holdsTemplateFrame('<div class="sds-page"><div class="sds-wrap"></div></div>'));
+ok("[MKT.HOOKS.529] green: a frame named only inside a comment is no frame", !holdsTemplateFrame(`<!-- ${FRAMED} --><p>x</p>`));
 
 console.log(failed ? `\n  ${failed} of ${total} FAILED — t-block-fit` : `\n  all ${total} passed — t-block-fit`);
 process.exit(failed ? 1 : 0);

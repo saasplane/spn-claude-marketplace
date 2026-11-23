@@ -57,7 +57,9 @@ import { isBuilderWorkspace } from "../lib/builder.ts";
 import { ARC_ID } from "../lib/workstream-schema.ts";
 /** An arc's address as a pattern part, read from `ARC_ID`: `N<nnn>`, `ideate` or `follow-ups`. */
 const ARC_PART = ARC_ID.source.slice(1, -1);
-import { blockFit, fitKind } from "../lib/block-fit.ts";
+import { blockFit, fitKind, templateFrameFindings } from "../lib/block-fit.ts";
+import { shownCommandFindings } from "./shown-commands.ts";
+import { tableHintsOf } from "../commands/docs/blocks.ts";
 import { findPartnerWords } from "./partner-words.ts";
 import { titleFindingsOnDisk } from "./page-title.ts";
 import { whereTreeFindings } from "./where-tree.ts";
@@ -65,7 +67,7 @@ import { handDrawnFigures } from "../lib/figures.ts";
 import { bookClassFaults, inPluginSource, knownHolders, ownMarketplace, pluginNameFaults } from "./book-classes.ts";
 import { GUIDE_PAGE_SUFFIX, APPROACH_SUFFIX, ARTIFACT, CONSTRUCT_PAGES, CONSTRUCT_PAGE_SUFFIX, HUB, OVERVIEW_PAGE_SUFFIX, PLUGIN_TEMPLATES, POCKET,
          artifactDocsPathOf, decisionsRegister, inArtifacts, workstreamPrefixSource, isApproachPage, isRegister as inRegisters, pagePlaceOf,
-         workstreamDirOf, workstreamsDir, isSeatFile } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
+         workstreamDirOf, workstreamsDir, isSeatFile, visibilityOf } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { BUNDLED_SUFFIX, OWN_COPY, PAGE_SCRIPT, SERVED_FILES, cutVersions, linksSharedStyles, stylesDir } from "../../../../plugin-support-lib/src/lib/page-styles.ts";
 import { CYCLES_COLUMNS, cyclesOf, headerOf, headerStatusRule, openHeadingFor, openHeadingOf, tableColumns,
          tableDifferences } from "../commands/docs/cycles.ts";
@@ -1469,7 +1471,15 @@ export function check(path: string, text: string, fragment = false): Finding[] {
 
   // Where a paragraph, a list or a callout should have been a block: a page of a bounded kind, and a construct's seat file.
   const fit = isHtml ? fitKind(path) : (isSeatFile(path) ? "seat" : null);
-  if (fit && !fragment && !(isHtml && (inClosedWorkstream(path) || exemptWorkstream(path)))) out.push(...blockFit(text, isHtml, fit));
+  const judged = !(isHtml && (inClosedWorkstream(path) || exemptWorkstream(path)));
+  // The hook scores what it was handed, so a fragment gets the same block and figure hints as a whole page (RULE.DEVEX.WORKSPACE.548).
+  if (fit && judged) out.push(...blockFit(text, isHtml, fit));
+  if (!isHtml && fit && judged) out.push(...tableHintsOf(text).map((message): Finding => ["SOFT", message]));
+  // A command a page shows is one the command line accepts today (RULE.DEVEX.WORKSPACE.557).
+  if ((fit || (isHtml && inPocket(path))) && judged) out.push(...shownCommandFindings(text).map((message): Finding => ["SOFT", message]));
+  // Every HTML page of the pocket and of an arc's notes starts from a docs template (RULE.DEVEX.WORKSPACE.554).
+  if (isHtml && !fragment && startsFromTemplate(path)) out.push(...templateFrameFindings(text));
+  if (isHtml) out.push(...publicLinkFindings(path, text));
 
   const sents = sentences(prose);
   if (!fragment || sents.length >= 5) out.push(...voice(prose, sents, kindOf(path), isOperative(path)));
@@ -1479,6 +1489,32 @@ export function check(path: string, text: string, fragment = false): Finding[] {
   if (inBook(path)) out.push(...bookClassFaults(text, knownHolders(ownMarketplace())).map((f) => ["RULE", f] as Finding));
   if (inBook(path)) out.push(...workstreamCitations(path, text));
   return out;
+}
+
+/**
+ * A public page links only inside `public/` or out of the repository, never into `private/` and never to a `.md` seat file (RULE.DEVEX.WORKSPACE.555).
+ * A link with a scheme, a fragment and a `mailto:` leave the repository, so they are not read. Each finding names the link and what to do instead.
+ */
+export function publicLinkFindings(path: string, text: string): Finding[] {
+  if (visibilityOf(path) !== "public" || !path.endsWith(".html")) return [];
+  const out: Finding[] = [];
+  const seen = new Set<string>();
+  for (const found of text.replace(/<!--[\s\S]*?-->/g, " ").replace(/<(script|style)\b[\s\S]*?<\/\1>/gi, " ").matchAll(/<a\b[^>]*?\bhref="([^"#]+)/gi)) {
+    const href = found[1].replace(/[?].*$/, "");
+    if (/^(?:[a-z][a-z0-9+.-]*:|\/\/)/i.test(href) || seen.has(href)) continue;
+    seen.add(href);
+    if (/\.md$/i.test(href)) out.push(["RULE", `a public page links the seat file \`${href}\` — link the built page, or the file's address on github.com, read from the repository's git remote (RULE.DEVEX.WORKSPACE.555)`]);
+    else if (visibilityOf(resolve(dirname(path), href)) === "private") out.push(["RULE", `a public page links into private/, \`${href}\` — public/ is self-contained: link inside public/ or out of the repository (RULE.DEVEX.WORKSPACE.555)`]);
+  }
+  return out;
+}
+
+/** A page that owes a docs template's frame: a page of the artifacts pocket, or one of an arc's own notes, never a sample, a view of the work or a template. */
+export function startsFromTemplate(path: string): boolean {
+  const norm = slashes(path);
+  if (/\/(?:samples|work|templates|surface)\//.test(norm) || norm.endsWith(BUNDLED_SUFFIX)) return false;
+  if (inPocket(path) || /\/artifacts\/(?:public|private)\/[^/]+\.html$/.test(norm)) return true;
+  return /\/notes\/(?:N\d+|ideate|follow-ups)\/[^/]+\.html$/.test(norm) && !inClosedWorkstream(path);
 }
 
 /** A page of a repository's artifacts pocket, other than its index. */

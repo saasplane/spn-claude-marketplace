@@ -12,6 +12,7 @@
 //   a callout that is more than one sentence                      a paragraph, with the rule in one sentence
 
 import { basename } from "node:path";
+import { figureHints } from "./figure-hints.ts";
 
 export type Finding = [severity: string, message: string];
 
@@ -228,12 +229,28 @@ function treeFindings(text: string): Finding[] {
   return out;
 }
 
+/** The page template's name, for the finding a page with no template's frame draws. */
+export const PAGE_TEMPLATE = "page-template.html in the docs templates' pages folder";
+
+/** Whether a page holds a docs template's frame: `.sds-page` with `.sds-wrap` and `.sds-masthead`, the index template's `index-data`, or a surface page's own frame. */
+export function holdsTemplateFrame(text: string): boolean {
+  const t = text.replace(/<!--[\s\S]*?-->/g, " ");
+  if (/\bid="index-data"/.test(t) || /\bclass="[^"]*\bsds-surface\b/.test(t)) return true;
+  return /\bclass="[^"]*\bsds-page\b/.test(t) && /\bclass="[^"]*\bsds-wrap\b/.test(t) && /\bclass="[^"]*\bsds-masthead\b/.test(t);
+}
+
+/** An HTML page that starts from no docs template: a finding that names the page template (rule 554). */
+export function templateFrameFindings(text: string): Finding[] {
+  if (holdsTemplateFrame(text)) return [];
+  return [["RULE", `this page holds no template frame (\`.sds-page\` with \`.sds-wrap\` and \`.sds-masthead\`, or the index template's \`index-data\`) — every page starts from a docs template, and a page of a kind with no template of its own uses the page template, ${PAGE_TEMPLATE} (RULE.DEVEX.WORKSPACE.554)`]];
+}
+
 export type FitOptions = { kind: FitKind };
 
 /** The findings for one page's content. */
 export function blockFit(text: string, isHtml: boolean, kind: FitKind): Finding[] {
   const units = isHtml ? unitsOfHtml(text) : unitsOfMarkdown(text);
-  const out: Finding[] = isHtml ? [...tileFindings(text), ...treeFindings(text)] : [];
+  const out: Finding[] = isHtml ? [...tileFindings(text), ...treeFindings(text)] : figureHints(text);
   const bound = BOUNDS[kind];
   for (const unit of units) {
     if (unit.kind === "callout") {
