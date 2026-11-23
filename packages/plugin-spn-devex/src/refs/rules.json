@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "book": {
     "repository": "spn-foundation",
-    "commit": "82842d32"
+    "commit": "06ef6ea1"
   },
   "rules": [
     {
@@ -7288,7 +7288,7 @@
         "check": "doc-check"
       },
       "class": "checked",
-      "sentence": "Every repository's artifacts open from one page, `docs/artifacts/index.html`",
+      "sentence": "Every repository's artifacts open from two index pages, `docs/artifacts/public/index.html` and `docs/artifacts/private/index.html`",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "heading": "The index of artifacts — one page that opens every other",
       "decision": null,
@@ -7331,6 +7331,11 @@
       "heading": "What the pocket holds",
       "decision": null,
       "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/docs/doc-sets.md",
+          "heading": "The artifacts pocket — concept, overview, construct page"
+        },
         {
           "plugin": "spn-devex",
           "path": "refs/devex/workspace/docs/doc-sets.md",
@@ -13791,6 +13796,11 @@
       "decision": null,
       "restated": [
         {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "How a first proposal is shaped"
+        },
+        {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
           "heading": "8. Draw it as skeletons — a mock, with no Figma"
@@ -13873,6 +13883,110 @@
       "heading": "The approach document — a workstream's, never a repository's",
       "decision": null,
       "restated": []
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.553",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-devex/ideate"
+      },
+      "class": "stated in a skill",
+      "sentence": "A docs page has four regions, and each one behaves the same on every page",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "heading": "The templates — the pages, and the two seat files behind them",
+      "decision": null,
+      "restated": []
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.554",
+      "level": "MUST",
+      "params": {
+        "check": "doc-check"
+      },
+      "class": "checked",
+      "sentence": "Every HTML page in a repository's `docs/artifacts/` or an arc's `notes/` starts from one of the docs templates",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "heading": "The templates — the pages, and the two seat files behind them",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/docs/doc-sets.md",
+          "heading": "The artifacts pocket — concept, overview, construct page"
+        }
+      ]
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.555",
+      "level": "MUST",
+      "params": {
+        "check": "doc-check"
+      },
+      "class": "checked",
+      "sentence": "`public/` is self-contained",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "heading": "What the pocket holds",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/docs/doc-sets.md",
+          "heading": "The artifacts pocket — concept, overview, construct page"
+        }
+      ]
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.556",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
+      "sentence": "`private/` may link into `public/`",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "heading": "What the pocket holds",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/docs/doc-sets.md",
+          "heading": "The artifacts pocket — concept, overview, construct page"
+        }
+      ]
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.557",
+      "level": "MUST",
+      "params": {
+        "check": "doc-check"
+      },
+      "class": "checked",
+      "sentence": "A command a page shows, in a `sh` block or after \"Try it:\", is a form the command line accepts today",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "heading": "Which block a content takes, and how its fence is written",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "How a first proposal is shaped"
+        }
+      ]
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.558",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
+      "sentence": "A page that already exists gets its second pass file by file, and only its form changes",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "heading": "A page is written in two passes",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "How a first proposal is shaped"
+        }
+      ]
     },
     {
       "id": "RULE.LAUNCHPAD.CONTROL_PLANE.001",

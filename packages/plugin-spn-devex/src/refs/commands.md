@@ -42,6 +42,8 @@ spn-devex docs audit check [<path>…] [--variant <name>] [--finding <name>] —
 
 spn-devex docs audit report <repo> [--json] — the gap scan of one repository, printed; with --json, as data
 
+spn-devex docs blocks units <file> [--json] — print one unit for each section and subsection of a seat file, with the block hints raised for it
+
 spn-devex docs book check [<book>] [--run <name>] — read every chapter of the book through the book check; with --run, record a clean read as a named run in the book
 
 spn-devex docs coherence check [<path>] [--finding <name>] — the findings under the path, from every document of its repository compared with the others
