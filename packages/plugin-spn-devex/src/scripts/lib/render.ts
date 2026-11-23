@@ -538,6 +538,9 @@ function mediaOf(media: string, item: CatalogItem, findings: Finding[]): string 
 /** The cards of one set of items, as the fence's layout and media draw them. Without either, and with no facts, the one-line tile of old. */
 function catalogHtml(items: CatalogItem[], layout: string | null, media: string | null, findings: Finding[], compact = false): string {
   const hasFacts = items.some((item) => item.facts.length);
+  const words = (text: string): number => text.trim().split(/\s+/).filter(Boolean).length;
+  const longForCards = items.some((item) => words(item.name) > 4 || words(item.line ?? "") > 15 || item.facts.length > 3 || item.facts.some(([, value]) => words(value) > 5));
+  if (!layout && longForCards) findings.push({ message: "these items are long for cards: layout=LIST (rule 549)" });
   const condition = items.find((item) => readsAsCondition(item.name));
   if (condition) findings.push({ message: `a \`catalog\` item "${condition.name}" reads as a condition: a first column of conditions is a table (rule 549)` });
   if (!layout && !media && !hasFacts) {

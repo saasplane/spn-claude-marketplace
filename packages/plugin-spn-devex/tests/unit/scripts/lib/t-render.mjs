@@ -310,11 +310,21 @@ console.log("\n=== the page renderer — a skeleton of a built unit, and a table
 
 console.log("\n=== the page renderer — a catalog whose names read as conditions");
 {
-  const cond = made(fence("catalog", "how ideas connect | a map\na unit the design system builds | a unit fence"));
+  const cond = made(fence("catalog", "how ideas connect | a map\na unit not built | a unit fence"));
   ok("[RULE.DEVEX.WORKSPACE.549] a catalog item whose name starts with a lower-case article or question word is a soft finding naming the item",
     cond.findings.length === 1 && !cond.findings[0].stops && cond.findings[0].message === 'a `catalog` item "how ideas connect" reads as a condition: a first column of conditions is a table (rule 549)', JSON.stringify(cond.findings));
   ok("[RULE.DEVEX.WORKSPACE.549] a digit opens a condition, and a capitalised or plain name does not",
     made(fence("catalog", "5 files | a count")).findings.length === 1 && made(fence("catalog", "The Map | a map\nReach | a measure")).findings.length === 0);
+}
+
+console.log("\n=== the page renderer — a catalog with no layout whose items are long for cards");
+{
+  const longLine = Array.from({ length: 18 }, (_, k) => "w" + k).join(" ");
+  const long = made(fence("catalog", "Reach | " + longLine));
+  ok("[RULE.DEVEX.WORKSPACE.549] a catalog with no layout whose item line is past fifteen words is a soft finding to use LIST",
+    long.findings.length === 1 && !long.findings[0].stops && long.findings[0].message === "these items are long for cards: layout=LIST (rule 549)", JSON.stringify(long.findings));
+  ok("[RULE.DEVEX.WORKSPACE.549] a short card, and a long item with layout=LIST, draw none",
+    made(fence("catalog", "Reach | a short line")).findings.length === 0 && made(fence("catalog layout=LIST", "Reach | " + longLine)).findings.length === 0);
 }
 
 console.log("\n=== the page renderer — a catalog in three layouts, with media and facts");
