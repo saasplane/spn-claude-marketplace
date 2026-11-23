@@ -80,8 +80,8 @@ ok("a table that is not the Terms table carries no such class",
 const { cutVersions, integrityTable, newestVersion, linesFor } = await import(pathToFileURL(resolve(HERE, "..", "plugin-support-lib", "src", "lib", "page-styles.ts")).href);
 const { readFileSync } = await import("node:fs");
 const STYLES_HOME = resolve(HERE, "src", "styles");
-ok("the newest version of the shared styles is 1.15.0, the docs design language's, so every page writer links it",
-  newestVersion(Object.keys(cutVersions(STYLES_HOME))) === "1.15.0");
+ok("the newest version of the shared styles is 1.16.0, which serves ds-unit.css and design-system.css, so every page writer links it",
+  newestVersion(Object.keys(cutVersions(STYLES_HOME))) === "1.16.0");
 ok("and 1.10.0 serves the Terms shares: a fixed layout, and the stacked rows under 40rem",
   /table\.sds-terms\{table-layout:fixed\}|table\.sds-terms\s*\{[^}]*table-layout:\s*fixed/.test(readFileSync(resolve(HERE, "..", "..", "public", "assets", "docs", "1.10.0", "sds-docs.css"), "utf8"))
   && readFileSync(resolve(HERE, "..", "..", "public", "assets", "docs", "1.10.0", "sds-docs.css"), "utf8").includes("max-width:40rem"));
@@ -175,7 +175,7 @@ console.log("\n=== the page renderer — a unit fence is drawn by the render and
     furniture: { stylesheet, script: "", footer: "" },
   });
   setUnitRender(() => "<body><p>x</p></body>");
-  const linked = pageOf(fence("unit", JSON.stringify(tree)), '<link rel="stylesheet" href="https://x/1.15.0/sds-docs.css" integrity="sha384-b" crossorigin="anonymous">');
+  const linked = pageOf(fence("unit", JSON.stringify(tree)), '<link rel="stylesheet" href="https://x/1.16.0/sds-docs.css" integrity="sha384-b" crossorigin="anonymous">');
   setUnitRender(() => "<!doctype html><html><head><style>.a{color:red}</style></head><body><style>.b{}</style><p>body</p><script>alert(1)</script></body></html>");
   const styled = pageOf(fence("unit", JSON.stringify(tree)));
   const captionSeen = [];
@@ -194,7 +194,7 @@ console.log("\n=== the page renderer — a unit fence is drawn by the render and
       && made.html.includes('<div class="sds-unit" data-mode="light"><p class="x">drawn & ready</p></div>') && made.html.includes('<div class="sds-unit" data-mode="dark"><p class="x">drawn & ready</p></div>')
       && made.html.includes('<div class="sds-unit-pair">') && !made.html.includes("<iframe") && !made.html.includes("srcdoc") && made.html.includes('<pre data-lang="json">'), made.html.slice(-1800));
   ok("[MKT.SCRIPTS.613] a page with a unit fence links ds-unit.css after the shared stylesheet, from the same folder, and a page with none does not",
-    linked.html.indexOf("sds-docs.css") > 0 && linked.html.indexOf("ds-unit.css") > linked.html.indexOf("sds-docs.css") && linked.html.includes('href="https://x/1.15.0/ds-unit.css"') && !/ds-unit\.css"[^>]*integrity/.test(linked.html)
+    linked.html.indexOf("sds-docs.css") > 0 && linked.html.indexOf("ds-unit.css") > linked.html.indexOf("sds-docs.css") && linked.html.includes('href="https://x/1.16.0/ds-unit.css"') && !/ds-unit\.css"[^>]*integrity/.test(linked.html)
       && !produced(fence("json", "{}")).includes("ds-unit.css"), linked.html.slice(0, 600));
   ok("[MKT.SCRIPTS.613] the unit's markup holds no style and no script, whatever the printed page carried",
     !/<style|<script/.test(styled.html.slice(styled.html.indexOf("sds-unit-pair"), styled.html.indexOf("</figure>"))) && styled.html.includes("<p>body</p>"), styled.html.slice(-900));

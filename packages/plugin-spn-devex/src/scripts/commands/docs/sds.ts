@@ -20,8 +20,8 @@ import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { DEVEX_WORKSTREAMS, slashes } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import {
-  BUNDLED_SUFFIX, INDEX_SCRIPT, INTEGRITY_FILE, OWN_COPY, PAGE_SCRIPT, SERVED_FILES, STYLESHEET, STYLES_ADDRESS, cutVersions, integrityTable,
-  sha384Of, sharedStyles, stylesDir,
+  BUNDLED_SUFFIX, INDEX_SCRIPT, INTEGRITY_FILE, OWN_COPY, PAGE_SCRIPT, SERVED_FILES, STYLESHEET, STYLES_ADDRESS, UNIT_FILES, cutVersions, integrityTable,
+  servedFilesOf, sha384Of, sharedStyles, stylesDir,
 } from "../../../../../plugin-support-lib/src/lib/page-styles.ts";
 import { type Action, REQUIRED, UsageFault, VALUE, onePath, readWords, scopeOf } from "../../../../../plugin-support-lib/src/lib/command.ts";
 import { resolveWorkspace } from "./_lib.ts";
@@ -43,7 +43,7 @@ const VERSIONS_FILE = "versions.json";
 const FETCH_LIMIT_MS = 15_000;
 
 const escaped = (text: string): string => text.replace(/[.*+?^${}()|[\]\\/]/g, "\\$&");
-const SERVED_NAMES = SERVED_FILES.map(escaped).join("|");
+const SERVED_NAMES = [...SERVED_FILES, ...UNIT_FILES].map(escaped).join("|");
 
 /**
  * An element of a page that loads a shared file from the served address: everything before the
@@ -189,12 +189,14 @@ function cut(version: string, root: string | null, ds: string | null = null, dsV
     return refuse("cut", `\`${join(styles, VERSIONS_FILE)}\` lists version ${version}, whose folder is \`${folder}\`. `
       + "A version never changes once it is cut, so cut the next one");
   }
-  const missing = SERVED_FILES.filter((name) => !isFile(join(styles, name)));
+  // From 1.16.0 a version also serves the design system's two stylesheets, cut by `scripts/build-unit-styles.mjs`.
+  const served = servedFilesOf(version);
+  const missing = served.filter((name) => !isFile(join(styles, name)));
   if (missing.length) return refuse("cut", `\`${styles}\` holds no ${missing.map((name) => `\`${name}\``).join(", ")}. Build the styles first`);
 
   const hashes: Record<string, string> = {};
   const pinned: Record<string, string> = {};
-  const built = SERVED_FILES.map((name) => ({ name, bytes: readFileSync(join(styles, name)) }));
+  const built = served.map((name) => ({ name, bytes: readFileSync(join(styles, name)) }));
   mkdirSync(folder, { recursive: true });
   for (const { name, bytes } of built) {
     writeFileSync(join(folder, name), bytes);
@@ -208,7 +210,7 @@ function cut(version: string, root: string | null, ds: string | null = null, dsV
   writeFileSync(join(styles, INTEGRITY_FILE), `${JSON.stringify({ ...integrityTable(styles), [version]: pinned }, null, 2)}\n`, "utf8");
 
   console.log(`✓ cut version ${version} → ${folder}`);
-  for (const name of SERVED_FILES) console.log(`    ${name.padEnd(14)} sha256 ${hashes[name]} · ${pinned[name]}`);
+  for (const name of served) console.log(`    ${name.padEnd(18)} sha256 ${hashes[name]} · ${pinned[name]}`);
   return 0;
 }
 

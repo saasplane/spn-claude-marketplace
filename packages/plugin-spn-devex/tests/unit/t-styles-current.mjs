@@ -12,6 +12,9 @@ const ROOT = join(PLUGIN, "..", "..");
 const STYLES = join(PLUGIN, "src", "styles");
 const SERVED = join(ROOT, "public", "assets", "docs");
 const FILES = ["sds-docs.css", "sds-docs.js", "sds-index.js"];
+// From 1.16.0 a version also serves the design system's scoped stylesheet and its whole one.
+const UNIT_FILES = ["ds-unit.css", "design-system.css"];
+const filesOf = (version) => { const [major, minor] = version.split(".").map(Number); return major > 1 || minor >= 16 ? [...FILES, ...UNIT_FILES] : FILES; };
 
 let total = 0, failed = 0;
 const ok = (label, condition, detail = "") => {
@@ -30,7 +33,14 @@ try {
   check = { status: error.status ?? 1, output: `${error.stdout ?? ""}${error.stderr ?? ""}` };
 }
 ok("[MKT.SCRIPTS.589] a fresh build of sds-docs.src.css writes the bytes of sds-docs.css", check.status === 0, check.output.trim());
-for (const name of FILES) ok(`src/styles/${name} is there`, existsSync(join(STYLES, name)));
+for (const name of [...FILES, ...UNIT_FILES, "ds-units.json"]) ok(`src/styles/${name} is there`, existsSync(join(STYLES, name)));
+{
+  const units = JSON.parse(readFileSync(join(STYLES, "ds-units.json"), "utf8"));
+  ok("ds-units.json names the design-system version of ds-unit.css and lists the units it builds",
+    units.designSystem === /support-web-ds-ts v(\d+\.\d+\.\d+)/.exec(readFileSync(join(STYLES, "ds-unit.css"), "utf8").split("\n")[0])?.[1] && Array.isArray(units.units) && units.units.includes("DSLayout") && units.units.includes("DSFeature"));
+  ok("design-system.css is the scoped stylesheet's source whole: every rule of it stands unscoped",
+    !readFileSync(join(STYLES, "design-system.css"), "utf8").includes(".sds-unit") && readFileSync(join(STYLES, "design-system.css"), "utf8").length < readFileSync(join(STYLES, "ds-unit.css"), "utf8").length);
+}
 
 console.log("=== styles on the design system — the docs classes read the product's tokens");
 {
@@ -60,9 +70,10 @@ ok("every folder under public/assets/docs is a version the list holds, and every
 for (const [version, files] of Object.entries(versions)) {
   // From 1.12.0 a version also holds `fonts/`, the Geist files the stylesheet's @font-face rules name by a relative url.
   const withFonts = existsSync(join(SERVED, version, "fonts"));
-  ok(`${version} serves the three files and no other${withFonts ? ", and the fonts folder beside them" : ""}`,
-    JSON.stringify(Object.keys(files).sort()) === JSON.stringify(FILES)
-      && JSON.stringify(readdirSync(join(SERVED, version)).sort()) === JSON.stringify((withFonts ? [...FILES, "fonts"] : FILES).sort()));
+  const served = filesOf(version);
+  ok(`${version} serves the ${served.length === 3 ? "three" : "five"} files and no other${withFonts ? ", and the fonts folder beside them" : ""}`,
+    JSON.stringify(Object.keys(files).sort()) === JSON.stringify([...served].sort())
+      && JSON.stringify(readdirSync(join(SERVED, version)).sort()) === JSON.stringify((withFonts ? [...served, "fonts"] : served).sort()));
   if (withFonts) {
     // From 1.15.0 the design system's display font, Schibsted Grotesk, ships beside Geist, with its own licence.
     const wanted = ["Geist-Variable.woff2", "GeistMono-Variable.woff2", "OFL.txt", ...(Number(version.split(".")[1]) >= 15 ? ["SchibstedGrotesk-Variable.woff2", "OFL-SchibstedGrotesk.txt"] : [])];
@@ -79,7 +90,7 @@ const integrity = JSON.parse(readFileSync(join(STYLES, "integrity.json"), "utf8"
 ok("the integrity table holds exactly the versions that were cut",
   JSON.stringify(Object.keys(integrity).sort()) === JSON.stringify(Object.keys(versions).sort()));
 for (const version of Object.keys(versions))
-  for (const name of FILES)
+  for (const name of filesOf(version))
     ok(`${version}/${name} holds the sha384 the table records`,
       integrity[version]?.[name] === `sha384-${createHash("sha384").update(readFileSync(join(SERVED, version, name))).digest("base64")}`);
 

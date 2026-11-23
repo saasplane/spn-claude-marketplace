@@ -7,7 +7,15 @@
 //
 //     node scripts/build-unit-styles.mjs                          cut it from the design-system version `ds-tokens.css` was copied from
 //     node scripts/build-unit-styles.mjs --from <style.css> [--version <v>]   cut it from this file
-//     node scripts/build-unit-styles.mjs --check                  exit 1 where the file in the styles folder is not what a cut writes
+//     node scripts/build-unit-styles.mjs --units <snapshot.json>  read the built units from this snapshot (default: the one `spnutils apps surface snapshot support-web-ds-ts` writes)
+//     node scripts/build-unit-styles.mjs --check                  exit 1 where a file in the styles folder is not what a cut writes
+//
+// THREE FILES ARE CUT, and a version from 1.16.0 serves the first two beside the shared stylesheet:
+//   ds-unit.css         the design system's `style.css`, scoped under `.sds-unit`, for a unit drawn inline in a docs page
+//   design-system.css   the same `style.css`, whole and unscoped, for a page of its own that holds the design system's markup
+//   ds-units.json       the units the design system builds, `{ designSystem, readFrom, units: [...] }`, which the page writer reads to
+//                       tell a skeleton of a built unit from one that is planned. It is read from the surface snapshot of
+//                       `support-web-ds-ts`; where none is on the machine the list is not rewritten and says so.
 //
 // WHERE THE SOURCE IS READ. `ds-tokens.css` says in its first line which version of `support-web-ds-ts` it was copied from.
 // That version's published package holds `styles/style.css`; the agent's cache of the design system holds one folder per version
@@ -111,11 +119,26 @@ export function scopeUnitCss(css, version = "") {
   return `${head}\n${kept.join("\n")}${kept.length ? "\n" : ""}${scopeRules(bare)}\n`;
 }
 
+/** The design system's whole `style.css`, unscoped: the cut's comment first, then the file as it was released. */
+export function wholeCss(css, version = "") {
+  const head = `/* The design system's own stylesheet${version ? `, support-web-ds-ts ${version},` : ""} whole and unscoped, written by scripts/build-unit-styles.mjs. Never edited by hand: the cut writes it again. */`;
+  return `${head}\n${css.endsWith("\n") ? css : `${css}\n`}`;
+}
+
+/** The names of the units a surface snapshot of the design system holds, in its order; null where the snapshot holds none. */
+export function unitsOf(snapshot) {
+  const units = Array.isArray(snapshot?.units) ? snapshot.units.map((unit) => unit?.name).filter((name) => typeof name === "string") : [];
+  return units.length ? units : null;
+}
+
 // ---------------------------------------------------------------------------- the command
 
 const ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
 const STYLES = join(ROOT, "packages", "plugin-spn-devex", "src", "styles");
 const TARGET = join(STYLES, "ds-unit.css");
+const WHOLE = join(STYLES, "design-system.css");
+const UNITS = join(STYLES, "ds-units.json");
+const SNAPSHOT = join(homedir(), ".saasplane", "state", "surface", "compare", "support-web-ds-ts", "snapshot.json");
 
 /** The version `ds-tokens.css` was copied from, or null. */
 export function pinnedVersion(styles = STYLES) {
@@ -132,14 +155,32 @@ function main(argv) {
     source = join(homedir(), ".saasplane", "cache", "design-system", version, "node_modules", "@saasplane", "support-web-ds-ts", "styles", "style.css");
   }
   if (!existsSync(source)) { console.error(`\`${source}\` is not there. Sign in to the registry and run the render once so the design system ${version ?? ""} is cached, or name a file with \`--from <style.css>\`.`); return 2; }
-  const cut = scopeUnitCss(readFileSync(source, "utf8"), version ? `v${version}` : "");
+  const css = readFileSync(source, "utf8");
+  const tag = version ? `v${version}` : "";
+  const cut = scopeUnitCss(css, tag);
+  const whole = wholeCss(css, tag);
+  // The built units: from the snapshot, kept as it was where the machine holds none.
+  const snapshotFile = at("--units") ?? SNAPSHOT;
+  let units = null;
+  if (existsSync(snapshotFile)) {
+    try {
+      const snapshot = JSON.parse(readFileSync(snapshotFile, "utf8"));
+      const names = unitsOf(snapshot);
+      if (names) units = `${JSON.stringify({ designSystem: version ?? null, readFrom: snapshot?.source?.version ?? null, units: names }, null, 2)}\n`;
+    } catch { /* a snapshot that is no JSON gives no list */ }
+  }
   if (argv.includes("--check")) {
-    const same = existsSync(TARGET) && readFileSync(TARGET, "utf8") === cut;
-    console.log(same ? "ds-unit.css is current: a fresh cut writes the same bytes" : "ds-unit.css is behind its source: run `node scripts/build-unit-styles.mjs`");
-    return same ? 0 : 1;
+    const same = (file, text) => existsSync(file) && readFileSync(file, "utf8") === text;
+    const behind = [[TARGET, cut], [WHOLE, whole], ...(units ? [[UNITS, units]] : [])].filter(([file, text]) => !same(file, text)).map(([file]) => file.slice(STYLES.length + 1));
+    console.log(behind.length ? `${behind.join(", ")} behind the source: run \`node scripts/build-unit-styles.mjs\`` : "ds-unit.css and design-system.css are current: a fresh cut writes the same bytes");
+    return behind.length ? 1 : 0;
   }
   writeFileSync(TARGET, cut, "utf8");
+  writeFileSync(WHOLE, whole, "utf8");
   console.log(`cut ${TARGET.slice(ROOT.length + 1)} — ${cut.length} bytes, from ${source}`);
+  console.log(`cut ${WHOLE.slice(ROOT.length + 1)} — ${whole.length} bytes`);
+  if (units) { writeFileSync(UNITS, units, "utf8"); console.log(`cut ${UNITS.slice(ROOT.length + 1)} — from ${snapshotFile}`); }
+  else console.log(`${UNITS.slice(ROOT.length + 1)} not written: ${snapshotFile} holds no units. Run \`spnutils apps surface snapshot support-web-ds-ts\` first`);
   return 0;
 }
 

@@ -20,6 +20,14 @@ export const PAGE_SCRIPT = "sds-docs.js";
 export const INDEX_SCRIPT = "sds-index.js";
 /** The files one version serves, in the order `versions.json` lists them. */
 export const SERVED_FILES: readonly string[] = Object.freeze([STYLESHEET, PAGE_SCRIPT, INDEX_SCRIPT]);
+/** The scoped design-system stylesheet a page with an inline unit links, beside the shared stylesheet. Served from 1.16.0. */
+export const UNIT_STYLESHEET = "ds-unit.css";
+/** The design system's whole stylesheet, unscoped, for a page of its own that holds the system's markup. Served from 1.16.0. */
+export const DESIGN_SYSTEM_STYLESHEET = "design-system.css";
+/** The first version that serves the two design-system stylesheets beside the three shared files. */
+export const UNIT_FILES_FROM = "1.16.0";
+/** The two design-system stylesheets a version from `UNIT_FILES_FROM` serves, after the three shared files. */
+export const UNIT_FILES: readonly string[] = Object.freeze([UNIT_STYLESHEET, DESIGN_SYSTEM_STYLESHEET]);
 /** What the file name of a page's bundled copy ends in. A bundled copy is not a page of the tree. */
 export const BUNDLED_SUFFIX = ".bundled.html";
 /** The table of each cut version's integrity hash of each file it serves, beside `versions.json`. */
@@ -118,6 +126,14 @@ export function integrityFor(styles: string, version: string, files: readonly st
   const missing = files.filter((file) => !entry[file]);
   if (missing.length) throw new Error(`version ${version} has no integrity hash for ${missing.join(", ")} in \`${join(styles, INTEGRITY_FILE)}\``);
   return entry;
+}
+
+/** The files one version serves: the three shared files, and from `UNIT_FILES_FROM` the two design-system stylesheets. */
+export function servedFilesOf(version: string): readonly string[] {
+  const parts = (v: string): number[] => v.split(".").map(Number);
+  const a = parts(version), b = parts(UNIT_FILES_FROM);
+  const from = a[0] - b[0] || a[1] - b[1] || a[2] - b[2];
+  return from >= 0 ? [...SERVED_FILES, ...UNIT_FILES] : SERVED_FILES;
 }
 
 /** The newest version that was cut, by its three numbers, or null where none was. */

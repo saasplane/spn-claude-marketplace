@@ -1,8 +1,8 @@
 /* RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § The index of artifacts — one page that opens every other
    The index of a repository's artifacts: a tree of its pages on the left, read as the app rail is, and tabs on
    the right with one page in each, in a frame of its own. The tree is read from the page's data block, which
-   `docs index` writes from the pages on disk. Nothing is kept in the address, and nothing is remembered between
-   visits. The index never reads what a frame holds, because a page opened from disk is a stranger to the page
+   `docs index` writes from the pages on disk. The shown page is kept in the address, `#<its path>`, so a reload or a
+   shared link opens it again; nothing else is remembered between visits. Each tab has a reload button. The index never reads what a frame holds, because a page opened from disk is a stranger to the page
    that frames it. Every class it sets or reads opens with sds-. */
 /* THE MODE IS THE DESIGN SYSTEM'S, as on every page: an index that names none takes the reader's setting and follows it. */
 (function(){
@@ -58,6 +58,7 @@
     activity:['M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2'],
     chevron:['m9 18 6-6-6-6'],
     out:['M7 7h10v10','M7 17 17 7'],
+    reload:['M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8','M21 3v5h-5'],
     copy:['M10 8h10a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H10a2 2 0 0 1-2-2V10a2 2 0 0 1 2-2z','M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2'],
     check:['M20 6 9 17l-5-5'],
     sun:['M12 8a4 4 0 1 0 0 8a4 4 0 1 0 0-8','M12 2v2','M12 20v2','m4.93 4.93 1.41 1.41','m17.66 17.66 1.41 1.41','M2 12h2','M20 12h2','m6.34 17.66-1.41 1.41','m19.07 4.93-1.41 1.41'],
@@ -114,6 +115,8 @@
   function page(entry,into){
     var row=document.createElement('div');row.className='sds-tree-row';
     var link=document.createElement('a');link.className='sds-tree-link';link.href=unfilled(entry)?'#':address(entry);
+    /* An entry's words can be selected: a press and drag selects them instead of dragging the link. */
+    link.draggable=false;link.style.webkitUserDrag='none';
     var words=document.createElement('span');words.textContent=entry.label;
     if(into.hasAttribute&&into.hasAttribute('data-first'))link.appendChild(icon(kindIcon(entry)));link.appendChild(words);
     if(entry.title)link.title=entry.title;
@@ -122,7 +125,11 @@
     link.addEventListener('click',function(event){
       var held=event.metaKey||event.ctrlKey||event.shiftKey||event.altKey||event.button;
       if(held&&!unfilled(entry))return;
-      event.preventDefault();open(entry,false);
+      event.preventDefault();
+      /* A click that ends a drag across the words keeps the selection, and opens nothing. */
+      var picked=window.getSelection&&window.getSelection();
+      if(picked&&!picked.isCollapsed&&link.contains(picked.anchorNode))return;
+      open(entry,false);
     });
     var more=document.createElement('button');more.type='button';more.className='sds-tree-new';more.appendChild(icon('out'));
     more.title='Open in a new tab';more.setAttribute('aria-label','Open '+named(entry)+' in a new tab');
@@ -155,17 +162,19 @@
   function make(){
     var wrap=document.createElement('div');wrap.className='sds-tab';
     var title=document.createElement('button');title.type='button';title.className='sds-tab-title';title.setAttribute('role','tab');
+    var again=document.createElement('button');again.type='button';again.className='sds-tab-copy sds-tab-reload';again.appendChild(icon('reload'));
     var copy=document.createElement('button');copy.type='button';copy.className='sds-tab-copy';copy.appendChild(icon('copy'));
     var away=document.createElement('button');away.type='button';away.className='sds-tab-copy sds-tab-away';away.appendChild(icon('out'));
     var close=document.createElement('button');close.type='button';close.className='sds-tab-close';close.textContent='×';
     var frame=document.createElement('iframe');frame.className='sds-pane';frame.hidden=true;
     frame.addEventListener('load',function(){tellMode(frame);});
-    var tab={wrap:wrap,title:title,copy:copy,away:away,close:close,frame:frame,note:null,slot:false,entry:null,opened:0};
+    var tab={wrap:wrap,title:title,again:again,copy:copy,away:away,close:close,frame:frame,note:null,slot:false,entry:null,opened:0};
     title.addEventListener('click',function(){show(tab);});
+    again.addEventListener('click',function(){reload(tab);});
     copy.addEventListener('click',function(){copyAddress(tab);});
     away.addEventListener('click',function(){window.open(whereOf(tab.entry),'_blank','noopener');});
     close.addEventListener('click',function(){shut(tab);});
-    wrap.appendChild(title);wrap.appendChild(copy);wrap.appendChild(away);wrap.appendChild(close);
+    wrap.appendChild(title);wrap.appendChild(again);wrap.appendChild(copy);wrap.appendChild(away);wrap.appendChild(close);
     bar.appendChild(wrap);panes.appendChild(frame);
     tabs.push(tab);
     return tab;
@@ -174,11 +183,12 @@
   function load(tab,entry){
     tab.entry=entry;
     tab.title.textContent=named(entry);tab.title.title=named(entry);
+    tab.again.title='Reload';tab.again.setAttribute('aria-label','Reload '+named(entry));
     tab.copy.title='Copy link';tab.copy.setAttribute('aria-label','Copy link to '+named(entry));
     tab.away.title='Open in a new window';tab.away.setAttribute('aria-label','Open '+named(entry)+' in a new window');
     tab.close.title='Close this tab';tab.close.setAttribute('aria-label','Close '+named(entry));
     tab.frame.title=named(entry);tab.slot=unfilled(entry);
-    tab.copy.hidden=tab.slot;tab.away.hidden=tab.slot;
+    tab.again.hidden=tab.slot;tab.copy.hidden=tab.slot;tab.away.hidden=tab.slot;
     if(!tab.slot){tab.frame.src=address(entry);return;}
     /* A slot gives the frame nothing to load. A frame that held a page is emptied. */
     if(tab.frame.hasAttribute('src'))tab.frame.src='about:blank';
@@ -198,8 +208,27 @@
     box.appendChild(label);box.appendChild(words);
     tab.note.textContent='';tab.note.appendChild(box);
   }
+  /* RELOAD the page a tab holds. A page opened from disk is a stranger to the index, so where its frame refuses the
+     call, the frame is pointed at the page's address again. */
+  function reload(tab){
+    if(tab.slot)return;
+    try{tab.frame.contentWindow.location.reload();}
+    catch(e){var at=address(tab.entry);tab.frame.src='about:blank';setTimeout(function(){tab.frame.src=at;},0);}
+  }
+  /* THE ADDRESS keeps the shown page: `#` and the entry's path, written over the last, so the history is not filled. */
+  function keep(tab){
+    if(!tab.entry||tab.slot||!window.history||!history.replaceState)return;
+    var at='#'+encodeURIComponent(tab.entry.path).replace(/%2F/g,'/');
+    if(location.hash!==at)history.replaceState(null,'',at);
+  }
+  function asked(){
+    if(!location.hash)return null;
+    var want;try{want=decodeURIComponent(location.hash.slice(1));}catch(e){return null;}
+    var hit=null;rows.forEach(function(row){if(!hit&&row.entry.path===want)hit=row;});
+    return hit;
+  }
   function show(tab){
-    shown=tab;
+    shown=tab;keep(tab);
     tabs.forEach(function(one){
       one.wrap.classList.toggle('sds-is-current',one===tab);
       one.title.setAttribute('aria-selected',one===tab?'true':'false');
@@ -272,5 +301,7 @@
     });
   }
   foldTree(!!(narrow&&narrow.matches));
-  if(rows.length)open(rows[0].entry,true);
+  var first=asked();
+  if(rows.length)open((first||rows[0]).entry,true);
+  window.addEventListener('hashchange',function(){var row=asked();if(row&&(!shown||shown.entry!==row.entry))open(row.entry,false);});
 })();

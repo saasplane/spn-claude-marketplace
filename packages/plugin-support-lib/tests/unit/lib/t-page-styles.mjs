@@ -6,7 +6,7 @@ import { join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 
 const HERE = resolve(import.meta.dirname, "..", "..", "..");
-const { OWN_COPY, STYLES_ADDRESS, SERVED_FILES, sharedStyles, linksSharedStyles, linesFor, stylesDir, cutVersions, newestVersion, integrityFor, sha384Of } =
+const { OWN_COPY, STYLES_ADDRESS, SERVED_FILES, sharedStyles, linksSharedStyles, linesFor, stylesDir, cutVersions, newestVersion, integrityFor, sha384Of, servedFilesOf } =
   await import(pathToFileURL(resolve(HERE, "src", "lib", "page-styles.ts")).href);
 
 let total = 0, failed = 0;
@@ -76,6 +76,11 @@ console.log("=== page styles — the integrity of each file");
     ok("a file missing from a version's row is refused by name", said.includes("sds-docs.js"), said);
   } finally { rmSync(folder, { recursive: true, force: true }); }
 }
+
+console.log("=== page styles — the files a version serves");
+ok("a version before 1.16.0 serves the three shared files, and 1.16.0 and after serve the two design-system stylesheets too",
+  JSON.stringify(servedFilesOf("1.15.0")) === JSON.stringify(SERVED_FILES) && JSON.stringify(servedFilesOf("1.16.0")) === JSON.stringify([...SERVED_FILES, "ds-unit.css", "design-system.css"])
+    && servedFilesOf("1.20.1").length === 5 && servedFilesOf("2.0.0").length === 5 && servedFilesOf("1.9.0").length === 3);
 
 console.log(failed ? `\n  ${failed} of ${total} FAILED — page-styles` : `\n  all ${total} passed — page-styles`);
 process.exit(failed ? 1 : 0);

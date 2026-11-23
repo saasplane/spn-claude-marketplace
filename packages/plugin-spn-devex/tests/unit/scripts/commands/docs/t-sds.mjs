@@ -410,12 +410,37 @@ console.log("=== docs sds cut — the fonts sit beside the stylesheet");
   const woff = Buffer.from([0x77, 0x4f, 0x46, 0x32, 0x00, 0xff]);
   put(join(styles, "fonts", "Geist-Variable.woff2"), woff);
   put(join(styles, "fonts", "OFL.txt"), "OFL");
-  const run = sds("cut", "2.0.0", "--root", market);
-  const folder = join(market, "public", "assets", "docs", "2.0.0");
+  const run = sds("cut", "1.5.0", "--root", market);
+  const folder = join(market, "public", "assets", "docs", "1.5.0");
   ok("[MKT.SCRIPTS.98] cut copies the fonts folder beside the stylesheet, byte for byte, and lists no font in the hashes",
     run.code === 0 && readFileSync(join(folder, "fonts", "Geist-Variable.woff2")).equals(woff)
       && readFileSync(join(folder, "fonts", "OFL.txt"), "utf8") === "OFL"
-      && JSON.stringify(Object.keys(cutVersions(styles)["2.0.0"]).sort()) === JSON.stringify(Object.keys(BUILT).sort()), run.out);
+      && JSON.stringify(Object.keys(cutVersions(styles)["1.5.0"]).sort()) === JSON.stringify(Object.keys(BUILT).sort()), run.out);
+}
+
+console.log("=== docs sds cut — from 1.16.0 a version also serves the design system's two stylesheets");
+{
+  const market = join(SCRATCH, "unit-marketplace");
+  const styles = join(market, "packages", "plugin-spn-devex", "src", "styles");
+  for (const [name, body] of Object.entries(BUILT)) put(join(styles, name), body);
+  put(join(styles, "versions.json"), "{}\n");
+  mkdirSync(join(market, "public"), { recursive: true });
+  const folder = join(market, "public", "assets", "docs", "1.16.0");
+  const without = sds("cut", "1.16.0", "--root", market);
+  ok("a cut of 1.16.0 with no ds-unit.css or design-system.css in the styles folder is refused by their names, and writes nothing",
+    without.code === 1 && without.out.includes("`ds-unit.css`") && without.out.includes("`design-system.css`") && !existsSync(folder) && cutVersions(styles)["1.16.0"] === undefined, without.out);
+  put(join(styles, "ds-unit.css"), ".sds-unit .a{color:red}\n");
+  put(join(styles, "design-system.css"), ".a{color:red}\n");
+  const cut = sds("cut", "1.16.0", "--root", market);
+  const listed = cutVersions(styles)["1.16.0"];
+  const pinned = integrityTable(styles)["1.16.0"];
+  ok("a cut of 1.16.0 serves the three shared files and the two design-system stylesheets, with a hash of each in versions.json and integrity.json",
+    cut.code === 0 && JSON.stringify(readdirSync(folder).sort()) === JSON.stringify(["ds-unit.css", "design-system.css", ...Object.keys(BUILT)].sort())
+      && JSON.stringify(Object.keys(listed)) === JSON.stringify(["sds-docs.css", "sds-docs.js", "sds-index.js", "ds-unit.css", "design-system.css"])
+      && listed["ds-unit.css"] === sha(".sds-unit .a{color:red}\n") && pinned["design-system.css"] === sha384Of(Buffer.from(".a{color:red}\n")), cut.out);
+  const before = cutVersions(styles);
+  const early = sds("cut", "1.15.1", "--root", market);
+  ok("a version before 1.16.0 still serves the three files alone", early.code === 0 && Object.keys(cutVersions(styles)["1.15.1"]).length === 3 && !existsSync(join(market, "public", "assets", "docs", "1.15.1", "ds-unit.css")) && Object.keys(before).length === 1, early.out);
 }
 
 console.log("=== docs sds cut --ds — the design system's tokens are copied from a pinned version, then built");
@@ -441,24 +466,24 @@ console.log("=== docs sds cut --ds — the design system's tokens are copied fro
   put(join(market, "public", ".keep"), "");
   put(join(market, "scripts", "build-styles.mjs"), "import { writeFileSync, readFileSync } from 'node:fs';\nimport { join, dirname } from 'node:path';\nimport { fileURLToPath } from 'node:url';\nconst s = join(dirname(fileURLToPath(import.meta.url)), '..', 'packages', 'plugin-spn-devex', 'src', 'styles');\nwriteFileSync(join(s, 'sds-docs.css'), readFileSync(join(s, 'ds-tokens.css'), 'utf8'));\n");
 
-  const pinned = sds("cut", "3.0.0", "--root", market, "--ds", support, "--ds-version", "v1.0.0");
+  const pinned = sds("cut", "1.3.0", "--root", market, "--ds", support, "--ds-version", "v1.0.0");
   const tokens = existsSync(join(styles, "ds-tokens.css")) ? readFileSync(join(styles, "ds-tokens.css"), "utf8") : "";
   ok("[MKT.SCRIPTS.590] a cut with --ds copies the tokens of the version --ds-version names, from its commit and not from the working file",
     pinned.code === 0 && tokens.endsWith(":root{--surface:#fff}\n") && tokens.includes("support-web-ds-ts v1.0.0"), `${pinned.out} ${tokens}`);
   ok("[MKT.SCRIPTS.590] a cut with --ds builds the stylesheet after the tokens are copied, and serves that build in the version's folder",
-    readFileSync(join(SERVED_OF(market), "3.0.0", "sds-docs.css"), "utf8") === tokens, pinned.out);
-  const newest = sds("cut", "3.1.0", "--root", market, "--ds", support);
+    readFileSync(join(SERVED_OF(market), "1.3.0", "sds-docs.css"), "utf8") === tokens, pinned.out);
+  const newest = sds("cut", "1.3.1", "--root", market, "--ds", support);
   ok("[MKT.SCRIPTS.590] a cut with --ds and no --ds-version pins the newest released version of the design system",
     newest.code === 0 && readFileSync(join(styles, "ds-tokens.css"), "utf8").endsWith(":root{--surface:#eee}\n"), newest.out);
-  const unknown = sds("cut", "3.2.0", "--root", market, "--ds", support, "--ds-version", "v9.9.9");
+  const unknown = sds("cut", "1.3.2", "--root", market, "--ds", support, "--ds-version", "v9.9.9");
   ok("[MKT.SCRIPTS.590] a design-system version that was never released is refused by name, and cuts nothing",
-    unknown.code === 1 && unknown.out.includes("version `v9.9.9` of the design system holds no") && !existsSync(join(SERVED_OF(market), "3.2.0")), unknown.out);
-  const alone = sds("cut", "3.3.0", "--root", market, "--ds-version", "v1.0.0");
+    unknown.code === 1 && unknown.out.includes("version `v9.9.9` of the design system holds no") && !existsSync(join(SERVED_OF(market), "1.3.2")), unknown.out);
+  const alone = sds("cut", "1.3.3", "--root", market, "--ds-version", "v1.0.0");
   ok("[MKT.SCRIPTS.590] --ds-version with no --ds is refused, because the version is read from the checkout --ds names",
-    alone.code === 1 && alone.out.includes("`--ds-version` names a version of the design system") && !existsSync(join(SERVED_OF(market), "3.3.0")), alone.out);
-  const missing = sds("cut", "3.4.0", "--root", market, "--ds", join(SCRATCH, "no-such-support"));
+    alone.code === 1 && alone.out.includes("`--ds-version` names a version of the design system") && !existsSync(join(SERVED_OF(market), "1.3.3")), alone.out);
+  const missing = sds("cut", "1.3.4", "--root", market, "--ds", join(SCRATCH, "no-such-support"));
   ok("[MKT.SCRIPTS.590] --ds naming a folder that is not there is refused, and cuts nothing",
-    missing.code === 1 && missing.out.includes("is not a folder. `--ds` names the support repository's checkout") && !existsSync(join(SERVED_OF(market), "3.4.0")), missing.out);
+    missing.code === 1 && missing.out.includes("is not a folder. `--ds` names the support repository's checkout") && !existsSync(join(SERVED_OF(market), "1.3.4")), missing.out);
 }
 
 console.log(failed ? `\n  ${failed} of ${total} FAILED — t-sds` : `\n  all ${total} passed — t-sds`);
